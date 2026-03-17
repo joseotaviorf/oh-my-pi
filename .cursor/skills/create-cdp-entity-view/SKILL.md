@@ -1,6 +1,6 @@
 ---
 name: create-cdp-entity-view
-description: Creates a new CDP entity (also called "object" / "objeto") view in enrich_entities_views (bi-etl-ejuice) and enables the corresponding business type in Datazord (backend-services) so the new entity is visible in consumable endpoints. Operates on two repositories; entities come from the data lake via CDF (business-objects topic), not from a stream processor. Collects entity name, business context, personas, properties, and fast_lane prerequisites; generates SQL, metadata, entities.sql, manual_modifications, entities.yml, and Datazord enum/OpenAPI/label-rules/tests. Use when adding a new entity/object to the CDP entities model or enrich_entities_views.
+description: Creates a new CDP entity (also called "object" / "objeto") view in enrich_entities_views (bi-etl-ejuice) and enables the corresponding business type in Datazord (backend-services) so the new entity is visible in consumable endpoints. Operates on two repositories; entities come from the data lake via CDF (business-objects topic), not from a stream processor. Collects entity name, business context, source tables (with automatic 30-min cadence detection), personas, and properties; generates SQL, metadata, entities.sql, manual_modifications, entities.yml, and Datazord enum/OpenAPI/label-rules/tests. Use when adding a new entity/object to the CDP entities model or enrich_entities_views.
 ---
 
 # Create CDP Entity View (enrich_entities_views)
@@ -42,7 +42,9 @@ After this context, say you'll guide them step by step and move to Step 1.
 
 ## Step 1 — Gather information (conversational)
 
-**Interaction style:** Ask **one question at a time**. Wait for the answer before moving to the next.
+**Pre-fill from opening message:** Before asking any question, scan the user's initial message for information that was already provided (entity name, business context, source table, personas, etc.). Treat each piece of information found as if the user had already answered that question — skip it in the sequence and confirm it inline instead of asking. Example: if the user says "quero criar a entity visita", the entity name is already known (`visit`, in english); ask it again only if not clear.
+
+**Interaction style:** Ask **one question at a time**. Wait for the answer before moving to the next. **Never combine two items in the same message** — even if the second seems closely related (e.g. cadence confirmation + personas). Each table row below is one turn; send it, wait, then proceed.
 
 **Order** — follow this sequence:
 
@@ -50,9 +52,9 @@ After this context, say you'll guide them step by step and move to Step 1.
 |---|--------|------------|
 | 1 | **Entity name** | Ask: "What is the entity name?" Accept free text in any language or format. **You** normalize it: translate to English if needed, convert to `snake_case`, strip `FS_`/`FR_` prefixes. Examples: "FS_Diligence" → `diligence`; "photo session" → `photo_session`. **Multiple entities:** if the user provides more than one name (e.g. "collections e evictions"), treat each as a **separate entity**. Tell the user you will run the full flow (Steps 1–7) for one entity at a time, then loop back for the next. Start with the first one. After normalization, **confirm** the final name with the user and **check if it already exists** (see 1.1). If it exists, **skip and move to the next**. |
 | 2 | **Business context** | Ask whether this entity is only for RENT, only for SALE, for both, or not defined yet. RENT-only → `FR_` prefix; SALE-only → `FS_` prefix; both/unknown → no prefix. See [reference.md — Entity name and business_context](reference.md#entity-name-column-entity-and-business_context). |
-| 3 | **30-min and fast_lane** | Provide short context explaining that entity views run every 30 min and source tables ideally should be updated at the same cadence by a `fast_lane` or equivalent DAG. Then ask whether such a pipeline already exists for the source tables. See 1.3 for decision tree. |
-| 4 | **Source table** | Ask if the user knows which source table (and DAG) to use. Validate the answer per 1.4. |
-| 5 | **Personas** | Ask which personas this entity has (give examples: OWNER, TENANT_PROSPECT, AGENT_BROKER). Tell the user they can answer in any language — you translate to canonical UPPERCASE. See [reference.md — Personas](reference.md#personas-canonical-list-and-rules) for canonical list. |
+| 3 | **Source table** | Ask if the user knows which source table (and DAG) to use. Validate using the DAG's `layer` field in its declaration YAML (see 1.3). |
+| 4 | **Cadence check** | After the source is confirmed, **automatically** detect whether the source DAG supports 30-min cadence by reading its declaration YAML. Do **not** ask the user about fast_lane — infer it from `schedule_interval` and `dependencies.yaml`. See 1.4 for the algorithm. |
+| 5 | **Personas** | Ask which personas this entity has (give examples: OWNER, TENANT_PROSPECT, AGENT_BROKER). Tell the user they can answer in any language — you translate to canonical UPPERCASE. **After collecting, validate against the lifecycle rules** in [reference.md — Personas](reference.md#personas-canonical-list-and-rules): if the user says "buyer" for a pre-CCV entity (e.g. diligence), auto-correct to BUYER_PROSPECT and explain why. Same for "tenant"/"inquilino" on pre-contract entities → TENANT_PROSPECT. **Then, resolve `id_user` for each persona:** search the source table(s) confirmed in item 3 to find which column maps to `id_user` per persona (e.g. `id_seller` → OWNER, `id_buyer` → BUYER_PROSPECT). If a column is not directly available in the main table, identify the join path (e.g. `diligence.id_sales_flow → sales_flow.id_buyer`). Present the complete persona → source column mapping to the user and confirm before moving on. If any mapping cannot be resolved, add a `-- TODO` and inform the user. |
 | 6 | **Properties (JSON)** | Explain that properties are used as labels for agents (chatbots) and should be aligned with product + Conv XP. Ask which fields to include (e.g. status, when, what). If they include status, note that label-rules mapping will be handled in Datazord step (3.6). |
 
 **Rules:** Do not assume. If ambiguous, ask one clarifying question.
@@ -68,17 +70,36 @@ After this context, say you'll guide them step by step and move to Step 1.
 
 - RENT-only → `FR_` prefix, `business_context = 'RENT'`. SALE-only → `FS_` prefix, `business_context = 'SALE'`. Both/unknown → no prefix, source column or NULL. See [reference.md — Entity name and business_context](reference.md#entity-name-column-entity-and-business_context).
 
-### 1.3 30-min cadence and fast_lane
-
-- If **no fast_lane exists** and user **does not ask to create one**: get explicit confirmation they are aware the entity won't update every 30 min. Then proceed with source selection. Add a cadence comment at the top of the generated SQL (see 3.1).
-- If **no fast_lane exists** and user **asks to create one**: explain that this must be a **separate PR first** (upstream pipeline), merged and validated on Forno before the entity-view PR. Do not bundle both in the same PR — the entity view would reference a pipeline/table that does not yet exist in runtime. Use the `create-dag` skill for the upstream pipeline, then resume this skill after.
-
-### 1.4 Source table
+### 1.3 Source table (layer-based prioritization)
 
 - **If user knows the source:** validate before using:
-  - Views should read from **core** or **clean** (not enrich). If enrich, ask for the underlying core/clean.
-  - Check cadence: if the DAG runs only once/day and user said there is a fast_lane, flag the mismatch. If no fast_lane, remind them and get confirmation.
-- **If user does not know:** search (core_ first, then clean), propose candidates, confirm.
+  - Find the DAG's declaration YAML (search `dags/` for `*_declaration.yml` matching the DAG name).
+  - Read the `layer` field:
+    - `layer: core` → core DAG. Tables live in `core_*` schemas. **Preferred** — canonical models.
+    - `layer: raw` → raw/clean DAG. Tables live in `datalake_*_clean` schemas.
+  - Views must read from **core** or **clean** (not enrich). If the user provides an enrich source, explain that the priority is to use data coming directly from the product (core/clean) and ideally within the 30-min update window, then ask for the underlying core/clean.
+  - **If the user insists on using a non-ideal source** (e.g. enrich, or a source outside the 30-min window): warn once that this is not recommended because entities should prioritize data coming straight from the product with 30-min cadence. If they still insist, proceed — but add a `-- TODO: source is <layer>/<schedule>; consider migrating to a core/clean source with 30-min cadence.` comment at the top of the generated SQL.
+- **If user does not know:** search the repo for candidate DAGs, prioritizing by `layer`:
+  1. First look for `layer: core` DAGs that model the entity (e.g. `core_contract`, `core_house`).
+  2. If no core DAG exists, look for `layer: raw` DAGs that produce clean tables for that source (e.g. `sales_flow`, `ebdb_contract_fast_lane`).
+  3. Propose candidates with their `layer` and `schedule_interval`, confirm with the user.
+
+### 1.4 Automatic cadence detection
+
+After the source DAG is confirmed, **automatically** detect whether it supports 30-min cadence. Do **not** ask the user "is there a fast_lane?" — infer it from the declaration.
+
+**Algorithm:**
+
+1. Read the source DAG's declaration YAML.
+2. Check the `layer` field:
+   - **`layer: raw`:** read `schedule_interval`. Check if it follows a 30-min pattern (e.g. `0,30 * * * *` — runs at minute 0 and 30 of every hour). Any cron expression that produces at least two runs per hour qualifies.
+   - **`layer: core`:**
+     - (a) If the DAG has a `schedule_interval`: check for 30-min pattern (same logic as raw).
+     - (b) If no `schedule_interval` (typical — core DAGs use Dataset-based scheduling): look up `dags/dependencies.yaml` for `bietlejuice.<dag_name>:` → get the list of upstream DAG names → read THEIR declaration YAMLs → check THEIR `schedule_interval`. If **all** upstream DAGs run at 30-min cadence, the core DAG inherits that cadence.
+3. **Result:**
+   - **30-min cadence confirmed:** inform the user that the source supports 30-min updates and proceed normally. No cadence comment in the SQL.
+   - **Not 30-min:** warn the user that this source does not run every 30 minutes. Explain the impact: the entity will not update as frequently as others in the entities table. **Stop and wait for explicit acknowledgment** — do not bundle this with the next question (personas). Only after the user confirms, move to item 5. A cadence comment will be added in the SQL (see 3.1).
+   - **User asks to create a fast_lane/core pipeline:** explain that this must be a **separate PR first**, merged and validated on Forno before the entity-view PR. Do not bundle both in the same PR — the entity view would reference a pipeline/table that does not yet exist in runtime. Use the `create-dag` skill for the upstream pipeline, then resume this skill after.
 
 ## Step 2 — Immutable output schema
 
@@ -99,19 +120,21 @@ Key rules:
 
 - Path: `dags/growth/enrich_entities_views/queries/enrich/<entity_name>.sql`.
 - Pattern: CTE(s) building a **base** with all source columns; then `SELECT ... id_user, entity, persona, ...` per persona with `UNION ALL`. The final output must have exactly the 11 columns in order.
-- Follow SQL conventions (UPPERCASE keywords, snake_case, no `SELECT *`, partition/date filters when applicable). Prefer core_ over clean when a core model exists.
+- Follow SQL conventions (UPPERCASE keywords, snake_case, no `SELECT *`, partition/date filters when applicable). Prefer `layer: core` sources over `layer: raw` (clean) when a core model exists (see 1.3).
 - **SALE entities:** `id_contract` = NULL; do not join/derive.
-- **Source not fast_lane/core:** add comment at top: `-- Source: not fast_lane/core; entity is not updated every 30 mins. Revisit if 30-min cadence is needed.`
+- **Source without 30-min cadence:** if cadence detection (1.4) determined the source does not run every 30 min, add comment at top: `-- Source: <dag_name> runs at <schedule>; entity is not updated every 30 mins. Revisit if 30-min cadence is needed.`
 
 **Do not assume what you don't know.** Use inline TODO comments for unknowns:
 
 - **is_active:** if unclear which statuses mean "in progress", add `-- TODO: define is_active; confirm which values mean active vs finished` and use `NULL AS is_active` or a placeholder CASE.
 - **id_user / persona:** if the source has no explicit id per persona, add `-- TODO: id_owner not in source; consider joining to house/contract` and inform the user.
 
+**Do not add QUALIFY / ROW_NUMBER deduplication by default.** To decide whether it is needed, read the source DAG's declaration YAML and check the `clean_primary_keys` (or `raw_primary_keys`) field for the relevant table under `tables_customization`. If the primary key is declared and it is a single stable column (e.g. `["id"]` or `["id_diligence"]`), the clean table is already unique — do not add QUALIFY. If the primary key is composite (e.g. `["id", "rev"]`), the table may have multiple revisions per entity and QUALIFY may be appropriate. If the declaration does not declare primary keys at all or you have doubts, proceed without QUALIFY but add a comment and inform the user: `-- TODO: could not confirm uniqueness from declaration; review if QUALIFY ROW_NUMBER() deduplication is needed.`
+
 ### 3.2 Governance metadata
 
 - Path: `dags/growth/enrich_entities_views/metadata/enrich/<entity_name>.yml`.
-- Required: `database_name: datalake_entities_views`, `table_name: <entity_name>`, `description` (≥10 chars), `domain: Growth`, `owner: your.email@quintoandar.com.br` (placeholder). Each column needs `description` and `lineage`. Follow existing examples (e.g. `photo_session.yml`, `listing.yml`).
+- Required: `database_name: datalake_entities_views`, `table_name: <entity_name>`, `description` (≥10 chars), `domain: Growth`, `owner: your.email@quintoandar.com.br` (placeholder). Each column needs a `description` and `lineage` where applicable — follow `governance_metadata.mdc` rules. Follow existing examples (e.g. `photo_session.yml`, `listing.yml`).
 
 ### 3.3 Wire into entities.sql
 
@@ -169,7 +192,7 @@ After bi-etl-ejuice files are done, enable the new business type in Datazord. Se
 - [ ] entities.sql: new CTE + UNION ALL in `base`. `{sk_entity}` replicated from existing pattern.
 - [ ] entities.yml: lineage from `datalake_entities_views.<entity_name>` added; `sk_entity` lineage includes composing columns (entity, id_entity, id_user, persona + source); `ts_inactive` lineage references `ts_updated`; new entity category added.
 - [ ] manual_modifications.yaml: (A) every source table has entry under `enrich_entities_views.remove`; (B) new view task under `enrich_transactional_entities.remove`.
-- [ ] User reminded about properties alignment + fast_lane prerequisite.
+- [ ] Cadence detection ran (1.4); if source lacks 30-min cadence, user was warned and acknowledged. SQL comment added if applicable.
 - [ ] **Datazord:** BusinessType, openapi, label rules (full/placeholder/not applicable), UserContextMapperTest updated.
 - [ ] Any `-- TODO` / placeholder listed in wrap-up as pending action.
 
@@ -248,7 +271,15 @@ If tests pass, Datazord is validated locally. **Staging (after merge):** merging
 
 ## Step 7 — Wrap-up with the user
 
-**After file generation and local testing (or skip), present a structured summary with the following sections.** Use the user's language consistently.
+**Order of this step:**
+1. Present sections 7.1 and 7.2 immediately after file generation (before any testing).
+2. Offer bi-etl-ejuice local testing (Step 5). Wait for the answer.
+3. Only if Step 5 was completed (not skipped), offer Datazord local testing (Step 6). Wait for the answer.
+4. After both testing steps are resolved (executed or skipped), present section 7.3 (local testing result) and section 7.4 (next steps).
+
+The user may skip any or all testing steps. Always respect that choice and proceed to the next section.
+
+Use the user's language consistently throughout.
 
 ### 7.1 Files generated
 
@@ -268,10 +299,11 @@ Present as a numbered checklist:
 
 1. **Resolve TODOs** — fill in `is_active` logic, label-rules mappings, owner email, etc.
 2. **Review generated code** — all generated code may contain placeholders, assumptions, or errors. The user must review and validate before merging.
-3. **Local testing (if not done)** — if Step 5 was skipped, recommend running it before merging. Use the `run-dag-locally` skill for guidance.
-4. **bi-etl-ejuice: first production deploy** — after merge, manually trigger `enrich_entities_views` once so the view exists before `enrich_transactional_entities` runs (otherwise it will fail with "view not found").
-5. **backend-services (Datazord):** run unit tests locally (`./gradlew :app:containers:api:test --tests '*UserContextMapperTest*'`). After merge, staging deploy is automatic — validate the new business type in user-context/business-objects APIs.
-6. **If fast_lane/core needs to be created:** remind the user of the **two-PR strategy** — upstream pipeline PR merged and validated on Forno first; entity-view PR comes after. Bundling can break entities runtime.
+3. **bi-etl-ejuice local testing (if not done)** — if Step 5 was skipped, run it before merging. Use the `run-dag-locally` skill: trigger `enrich_entities_views` first, then `enrich_transactional_entities`.
+4. **Datazord local testing (if not done)** — if Step 6 was skipped, run unit tests: `unset CI && ./gradlew :app:containers:api:test --tests '*UserContextMapperTest*'`.
+5. **bi-etl-ejuice: first production deploy** — after merge, manually trigger `enrich_entities_views` once before the next scheduled run of `enrich_transactional_entities` (otherwise it will fail with "view not found").
+6. **backend-services (Datazord): after merge** — staging deploy is automatic; validate the new business type in user-context/business-objects APIs.
+7. **If 30-min cadence is needed but missing:** remind the user of the **two-PR strategy** — upstream pipeline (fast_lane or core DAG) PR merged and validated on Forno first; entity-view PR comes after. Bundling can break entities runtime. Use the `create-dag` skill for the upstream pipeline.
 
 ## Reference
 

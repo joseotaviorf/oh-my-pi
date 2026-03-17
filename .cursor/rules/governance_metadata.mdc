@@ -71,6 +71,9 @@ columns:
 - `personal_data_classification` must be set consistently across all layers for the same logical column (raw → clean → enrich → dw).
 
 ## Enrich & DW Columns — `lineage` required
+
+`lineage` is required for every column whose value **derives from a source column**. It is **not** required for columns whose value is a hardcoded literal in the SQL (e.g. `'RENT' AS business_context`, `'FS_DILIGENCE' AS entity`, `'OWNER' AS persona`). Hardcoded values have no source column to trace.
+
 ```yaml
 columns:
   id_contract:
@@ -84,6 +87,9 @@ columns:
     categories:                            # optional: for categorical columns
       ACTIVE: Currently active contract.
       CANCELED: Contract was canceled.
+  business_context:
+    # No lineage — hardcoded literal value ('RENT') in the SQL.
+    description: "Business context. Always RENT for this entity."
 ```
 
 ## Metric Columns — `dimension` or `metric` block required
@@ -129,7 +135,8 @@ make validate-lineage-consistency
 ## Common Mistakes
 - `description` shorter than 10 characters → CI fails.
 - `owner` not matching email regex → CI fails.
-- Missing `lineage` on an enrich/dw column → CI fails.
+- Missing `lineage` on an enrich/dw column that derives from a source → CI fails.
+- Adding `lineage` to a hardcoded literal column (e.g. `'RENT' AS business_context`) → incorrect; remove it.
 - Metric column without `dimension: true` or `metric:` block → CI fails.
 - Metric SQL referencing raw/clean tables directly → lineage validation fails.
 - Column containing personal data with no `personal_data_classification` → governance review will flag it.

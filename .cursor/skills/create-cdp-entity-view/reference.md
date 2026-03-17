@@ -43,26 +43,44 @@ Unique key: **(id_entity, id_user, persona)**. The same id_entity can appear in 
 ## Personas (canonical list and rules)
 
 - **Persona** = the role the user assumes on the platform in that context. It is **not** an attribute or segment (e.g. "PP Multi" is an attribute of the OWNER persona).
-- **Translate** user input to canonical UPPERCASE. E.g. "proprietário" → OWNER; "inquilino" → TENANT or TENANT_PROSPECT; "comprador" → BUYER or BUYER_PROSPECT; "corretor de visitas" → AGENT_BROKER.
+- **Translate** user input to canonical UPPERCASE, applying lifecycle rules to pick the correct variant. E.g. "proprietário" → OWNER; "inquilino" → TENANT_PROSPECT (pre-contract) or TENANT (post-contract) based on entity lifecycle; "comprador" → BUYER_PROSPECT (pre-CCV) or BUYER (post-CCV) based on entity lifecycle; "corretor de visitas" → AGENT_BROKER.
 - **Do not duplicate**: synonyms or subsets map to the canonical value (e.g. "proprietário multi" → OWNER).
 
 **Canonical list:**
 
-| Persona             | Description / common mapping        |
-|---------------------|-------------------------------------|
-| OWNER               | Property owner (PP = proprietário)  |
-| TENANT_PROSPECT     | Tenant prospect (rent)              |
-| BUYER_PROSPECT      | Buyer prospect (sale)               |
-| TENANT              | Tenant (already in contract)        |
-| BUYER               | Buyer (already in CCV)              |
-| PARTNER_CIQ         | CIQ partner                         |
-| AGENT_BROKER        | Broker (e.g. visitas)               |
-| AGENT_INSPECTOR     | Inspector                           |
-| AGENT_PHOTOGRAPHER  | Photographer                        |
+| Persona             | Description | Lifecycle boundary |
+|---------------------|-------------|--------------------|
+| OWNER               | Property owner (PP = proprietário) | Throughout the funnel — owner role does not change with lifecycle stage. |
+| TENANT_PROSPECT     | User in the **renting** process **before** contract signing. | RENT entities before contract: visit, offer, credit analysis. |
+| TENANT              | User who has already **signed a rental contract**. | RENT entities from contract signing onwards: active contract, termination. |
+| BUYER_PROSPECT      | User in the **buying** process **before** CCV completion. | SALE entities before CCV conclusion: offer, diligence, CCV in progress. |
+| BUYER               | User who has already **completed CCV** (deal closed). | SALE entities from CCV conclusion onwards. |
+| PARTNER_CIQ         | CIQ partner. | — |
+| AGENT_BROKER        | Broker (e.g. visitas). | — |
+| AGENT_INSPECTOR     | Inspector. | — |
+| AGENT_PHOTOGRAPHER  | Photographer. | — |
 
 Other personas may exist in the codebase; check `entities.sql` and existing views for consistency.
 
-For each persona, map the corresponding id in the source (id_owner → OWNER, id_tenant → TENANT_PROSPECT, etc.) and output one row per (id_entity, id_user, persona) via UNION ALL. If the source does not expose that id directly, derive it from related entities (contract, house) via joins, and document with a `-- TODO` comment in the query.
+**Lifecycle validation rule — PROSPECT vs non-PROSPECT:**
+
+The distinction between `_PROSPECT` and non-`_PROSPECT` depends on **where the entity sits in the product funnel**, not on the word the user uses:
+
+| Business context | Milestone | Before milestone | After milestone |
+|------------------|-----------|------------------|-----------------|
+| RENT | Contract signing | TENANT_PROSPECT | TENANT |
+| SALE | CCV completion | BUYER_PROSPECT | BUYER |
+
+**Examples:**
+
+- **RENT funnel (before contract):** visit, offer, credit analysis → use **TENANT_PROSPECT**.
+- **RENT funnel (after contract):** contract, termination → use **TENANT**.
+- **SALE funnel (before CCV):** offer, diligence, CCV in progress → use **BUYER_PROSPECT**.
+- **SALE funnel (after CCV):** CCV concluded → use **BUYER**.
+
+The agent **must** determine the entity's position in the funnel and select the correct variant. If the user says "buyer" for a pre-CCV entity (e.g. diligence), automatically correct to BUYER_PROSPECT and explain why. Same for "tenant"/"inquilino" on pre-contract entities.
+
+For each persona, map the corresponding id in the source (id_owner → OWNER, id_buyer → BUYER_PROSPECT, etc.) and output one row per (id_entity, id_user, persona) via UNION ALL. If the source does not expose that id directly, derive it from related entities (contract, house) via joins, and document with a `-- TODO` comment in the query.
 
 ---
 
@@ -70,7 +88,7 @@ For each persona, map the corresponding id in the source (id_owner → OWNER, id
 
 - **is_active:** Often based on a `status` column; if the source has no clear status or the mapping is unclear, add a `-- TODO` comment and a placeholder (e.g. `NULL AS is_active` or a `CASE` with a comment).
 - **id_user / persona:** If the source has no explicit column per persona, add a `-- TODO` comment and suggest deriving from contract/house.
-- **Source not fast_lane / core:** Add a comment at the top of the query: `-- Source: not fast_lane/core; entity is not updated every 30 mins. Revisit if 30-min cadence is needed.`
+- **Source without 30-min cadence:** When cadence detection (see 1.4) determines the source DAG does not run every 30 minutes, add a comment at the top of the query: `-- Source: <dag_name> runs at <schedule>; entity is not updated every 30 mins. Revisit if 30-min cadence is needed.`
 
 ---
 
@@ -79,6 +97,55 @@ For each persona, map the corresponding id in the source (id_owner → OWNER, id
 - Used as labels for agents (what, when, where).
 - Align with product team + Conv XP; CDP mapping spreadsheet: [link](https://drive.google.com/a/quintoandar.com.br/open?id=1VYonx8lRprEFwz0DheIIW12tLw83K-CVQX7XxbEwh9M).
 - Build with `TO_JSON(STRUCT(key1 AS key1, key2 AS key2, ...))`. Common keys: `status`, `when` (timestamp).
+
+---
+
+## Source table prioritization (layer-based)
+
+Entity views should read from **core** or **clean** sources (never enrich). Prioritize by the `layer` field in the source DAG's declaration YAML — not by the table schema name or a regex on the table path.
+
+| `layer` value in declaration | What it means | Schema pattern | Priority |
+|------------------------------|---------------|----------------|----------|
+| `core` | Core model DAG — canonical, deduplicated entity model | `core_<dag_schema>.<table>` | **1st** (preferred) |
+| `raw` | Raw/clean ingestion DAG — mirrors source DB | `datalake_<source>_clean.<table>` | **2nd** (fallback) |
+
+**How to determine the layer:**
+
+1. Identify the DAG that loads the desired source table (search `dags/` for the table name in `*_declaration.yml` files or under `tables_customization`).
+2. Read the `workflow.layer` field in that declaration YAML.
+3. If `layer: core` → the table lives in a `core_*` schema. Preferred because core models are canonical and deduplicated.
+4. If `layer: raw` → the DAG produces both raw and clean tables. The view should use the clean table (`datalake_<source>_clean.<table>`).
+
+**When searching for candidates (user doesn't know the source):**
+1. First look for `layer: core` DAGs under `dags/core/` that model the entity (e.g. `core_contract`, `core_house`, `core_visit`).
+2. If no core DAG exists, look for `layer: raw` DAGs that produce clean tables for the relevant source database.
+3. Present candidates with their `layer` and `schedule_interval` so the user can make an informed choice.
+
+---
+
+## Cadence detection (automatic)
+
+Entity views run every 30 minutes. Source tables ideally should be updated at the same cadence. Instead of asking the user whether a `fast_lane` exists, **detect cadence automatically** from the source DAG's declaration YAML.
+
+**Algorithm:**
+
+1. **`layer: raw` DAGs:** read `schedule_interval` from the declaration. A 30-min cadence means the cron expression produces at least two runs per hour (e.g. `0,30 * * * *`). DAGs with `fast_lane` in their name are the convention, but the check is the schedule — not the name.
+2. **`layer: core` DAGs:**
+   - (a) If the DAG has a `schedule_interval`: check for 30-min pattern (same as raw).
+   - (b) If no `schedule_interval` (typical for core): core DAGs use Dataset-based scheduling. Look up `dags/dependencies.yaml` for `bietlejuice.<dag_name>:` → extract upstream DAG names (format: `bietlejuice.<upstream_dag>:<task_id>`) → read each upstream DAG's declaration → check `schedule_interval`. If **all** upstream DAGs run at 30-min cadence, the core DAG inherits that cadence.
+
+**Outcomes:**
+
+| Result | Action |
+|--------|--------|
+| 30-min cadence confirmed | Inform user; no cadence comment in SQL |
+| Not 30-min | Warn user with specific schedule details; get explicit acknowledgment; add cadence comment in SQL (see "Query generation" section) |
+| User asks to create a fast_lane/core pipeline | Explain **separate PR first** strategy — upstream pipeline must be merged and validated on Forno before the entity-view PR |
+
+**Common 30-min patterns (cron):**
+- `0,30 * * * *` — every 30 min, 24h (standard)
+- `0,30 7-22 * * *` — every 30 min, business hours only
+- `30 7-22 * * *` — once per hour (does **not** qualify as 30-min)
 
 ---
 
@@ -143,7 +210,7 @@ Under `bietlejuice.enrich_transactional_entities:` → `remove:`, add: `bietleju
 
 When adding a new entity to `entities.sql`, update `dags/growth/enrich_transactional_entities/metadata/enrich/entities.yml`:
 
-- **Lineage:** add `datalake_entities_views.<entity_name>.<column>` to the lineage of every relevant column: `id_entity`, `id_house`, `id_contract`, `id_user`, `entity`, `persona`, `business_context`, `properties`, `ts_created`, `ts_updated`.
+- **Lineage:** add `datalake_entities_views.<entity_name>.<column>` to the lineage of columns that derive from a source column: typically `id_entity`, `id_house`, `id_contract`, `id_user`, `properties`, `ts_created`, `ts_updated`. Follow `governance_metadata.mdc` for the general rule on when lineage is required vs not required (e.g. hardcoded literal columns do not need lineage).
   - **`ts_inactive`:** derived in entities.sql as `CASE WHEN is_active = FALSE THEN ts_updated ELSE NULL END`. Its lineage should reference `datalake_entities_views.<entity_name>.ts_updated`.
   - **`sk_entity`:** a surrogate key composed from columns that identify the row. Add the source columns that feed into it: `entity`, `id_entity`, `id_user` (one per persona), and `persona` — e.g. `datalake_entities_views.<entity_name>.id_entity`, `.id_user`, `.entity`, `.persona`, plus the underlying source columns (e.g. `core_<source>.<table>.id_<persona>`).
 - **entity.categories:** add new entry (e.g. `FS_CCV: Short description.`).
