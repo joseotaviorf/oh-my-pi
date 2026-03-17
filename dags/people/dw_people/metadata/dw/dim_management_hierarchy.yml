@@ -5,7 +5,7 @@ domain: People
 description: |-
   Current snapshot of each employee's managerial chain. One row per employee.
   The hierarchy starts at the CEO (L0) and descends to the employee, who can appear at any level from L1 to L9 depending on the org depth.
-  Columns expose the person_number, name, and email of the employee and of each manager in the chain (L0 to L9).
+  Columns expose the person_number, name, and email of the employee, the direct manager, and each manager in the chain (L0 to L9).
   Use this table to filter, group, or join on any level of the reporting structure.
   Grain: one row per person_number (SCD Type 1).
 columns:
@@ -17,6 +17,18 @@ columns:
     description: Person number (Oracle HCM person identifier) of the employee whose current managerial chain is represented in this record.
     lineage:
       - datalake_people.management_hierarchy.person_number
+  person_number_manager:
+    description: Person number (Oracle HCM person identifier) of the direct manager.
+    lineage:
+      - datalake_people.management_hierarchy.person_number_manager
+  name_manager:
+    description: Full name of the direct manager.
+    lineage:
+      - datalake_people.management_hierarchy.name_manager
+  email_manager:
+    description: Work e-mail of the direct manager.
+    lineage:
+      - datalake_people.management_hierarchy.email_manager
   person_number_l0:
     description: Person number of the manager L0 (top-level manager / CEO in the valid chain).
     lineage:

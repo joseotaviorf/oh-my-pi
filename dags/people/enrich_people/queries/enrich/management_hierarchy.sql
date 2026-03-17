@@ -592,6 +592,9 @@ SELECT
     END AS manager_assignment_number,
     SIZE(hv.manager_struct_path) - 1 AS hierarchy_depth,
     CONCAT('L', CAST(SIZE(hv.manager_struct_path) - 1 AS STRING)) AS hierarchy_level,
+    COALESCE(im_dm.person_number, '') AS person_number_manager,
+    COALESCE(im_dm.name, '') AS name_manager,
+    COALESCE(im_dm.email, '') AS email_manager,
     COALESCE(CAST(hv.manager_struct_path[0].assignment_number AS STRING), '') AS assignment_number_l0,
     COALESCE(im_l0.person_number, '') AS person_number_l0,
     COALESCE(im_l0.name, '') AS name_l0,
@@ -642,6 +645,10 @@ FROM
 LEFT JOIN
     assignment_lookup AS im_self
     ON im_self.assignment_number = hv.assignment_number
+LEFT JOIN
+    assignment_lookup AS im_dm
+    ON SIZE(hv.manager_struct_path) >= 2
+    AND im_dm.assignment_number = hv.manager_struct_path[SIZE(hv.manager_struct_path) - 2].assignment_number
 LEFT JOIN
     assignment_lookup AS im_l0
     ON im_l0.assignment_number = hv.manager_struct_path[0].assignment_number

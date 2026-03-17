@@ -1,6 +1,9 @@
 SELECT
     sk_hierarchy_version AS sk_manager_hierarchy,
     person_number,
+    person_number_manager,
+    name_manager,
+    email_manager,
     person_number_l0,
     name_l0,
     email_l0,
