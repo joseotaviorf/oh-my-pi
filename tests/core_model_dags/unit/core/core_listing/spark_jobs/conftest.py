@@ -34,6 +34,31 @@ def spark_session():
 
 
 @pytest.fixture
+def house_df(spark_session):
+    """Create a sample house DataFrame for testing."""
+    schema = StructType(
+        [
+            StructField("id", LongType(), True),
+            StructField("rent", IntegerType(), True),
+            StructField("sale_price", IntegerType(), True),
+            StructField("total_value", IntegerType(), True),
+            StructField("condo", IntegerType(), True),
+            StructField("iptu", IntegerType(), True),
+            StructField("condo_type", StringType(), True),
+            StructField("iptu_type", StringType(), True),
+        ]
+    )
+
+    data = [
+        (1001, 2500, None, 3000, 400, 100, "Normal", "Normal"),
+        (1002, 3000, 500000, 3500, 350, 150, "IncluidoNoAluguel", "Normal"),
+        (2001, None, 800000, 800000, 500, 200, "Normal", "NaoInformado"),
+        (2003, None, 600000, 600000, None, None, "NaoExiste", "NaoExiste"),
+    ]
+    return spark_session.createDataFrame(data, schema)
+
+
+@pytest.fixture
 def listing_business_context_df(spark_session):
     """Create a sample listing_business_context DataFrame for testing."""
     schema = StructType(
@@ -44,6 +69,8 @@ def listing_business_context_df(spark_session):
             StructField("business_context", StringType(), True),
             StructField("status", StringType(), True),
             StructField("status_reason", StringType(), True),
+            StructField("ts_first_publication", TimestampType(), True),
+            StructField("ts_last_publication", TimestampType(), True),
             StructField("ts_created", TimestampType(), True),
             StructField("ts_updated", TimestampType(), True),
         ]
@@ -58,6 +85,8 @@ def listing_business_context_df(spark_session):
             "RENT",  # business_context
             "PUBLISHED",  # status
             None,  # status_reason
+            datetime(2024, 1, 15, 12, 0),  # ts_first_publication
+            datetime(2025, 3, 10, 10, 0),  # ts_last_publication
             datetime(2024, 1, 10, 10, 0),  # ts_created
             datetime(2025, 7, 8, 10, 0),  # ts_updated
         ),
@@ -69,6 +98,8 @@ def listing_business_context_df(spark_session):
             "RENT",  # business_context
             "SUSPENDED",  # status
             "RENTED",  # status_reason
+            datetime(2024, 4, 2, 10, 0),  # ts_first_publication
+            datetime(2024, 4, 15, 10, 0),  # ts_last_publication
             datetime(2024, 4, 1, 10, 0),  # ts_created
             datetime(2024, 4, 19, 10, 0),  # ts_updated
         ),
@@ -81,6 +112,8 @@ def listing_business_context_df(spark_session):
             "SALE",  # business_context
             "SUSPENDED",  # status
             None,  # status_reason
+            datetime(2024, 8, 15, 10, 0),  # ts_first_publication
+            datetime(2025, 5, 20, 10, 0),  # ts_last_publication
             datetime(2024, 8, 12, 10, 0),  # ts_created
             datetime(2025, 5, 21, 10, 0),  # ts_updated
         ),
@@ -92,6 +125,8 @@ def listing_business_context_df(spark_session):
             "SALE",  # business_context
             "PUBLISHED",  # status
             None,  # status_reason
+            datetime(2024, 3, 12, 10, 0),  # ts_first_publication
+            datetime(2024, 3, 14, 10, 0),  # ts_last_publication
             datetime(2024, 3, 10, 10, 0),  # ts_created
             datetime(2024, 3, 15, 11, 0),  # ts_updated
         ),
@@ -103,6 +138,8 @@ def listing_business_context_df(spark_session):
             "SALE",  # business_context
             "EDITING",  # status
             None,  # status_reason
+            None,  # ts_first_publication
+            None,  # ts_last_publication
             datetime(2022, 6, 1, 10, 0),  # ts_created (year <= 2022)
             None,  # ts_updated (NULL)
         ),
@@ -246,6 +283,7 @@ def mock_configuration_service():
             "z_order_by": ["id_house_listing", "business_context"],
             "partitions": ["year", "month", "day"],
             "LISTING_BUSINESS_CONTEXT_TABLE": "test.listing_business_context",
+            "HOUSE_TABLE": "test.house",
             "AUX_LBC_STATUS_VERSION_ORDER_TABLE": "test.aux_lbc_status_version_order",
             "AUX_HOUSE_LISTING_CATEGORY_TABLE": "test.aux_house_listing_category",
             "ENTITY_TYPE": "LISTING",
@@ -275,21 +313,25 @@ def core_listing_job(mock_configuration_service):
 
 
 @pytest.fixture
-def sale_listings_df(core_listing_job, listing_business_context_df):
+def sale_listings_df(core_listing_job, listing_business_context_df, house_df):
     """Process SALE listings DataFrame."""
-    return core_listing_job._process_sale_listings(listing_business_context_df)
+    return core_listing_job._process_sale_listings(
+        listing_business_context_df, house_df
+    )
 
 
 @pytest.fixture
 def rent_listings_df(
     core_listing_job,
     listing_business_context_df,
+    house_df,
     aux_lbc_status_version_order_df,
     aux_house_listing_category_df,
 ):
     """Process RENT listings DataFrame."""
     return core_listing_job._process_rent_listings(
         listing_business_context_df,
+        house_df,
         aux_lbc_status_version_order_df,
         aux_house_listing_category_df,
     )
@@ -300,6 +342,7 @@ def core_model_df(
     spark_session,
     core_listing_job,
     listing_business_context_df,
+    house_df,
     aux_lbc_status_version_order_df,
     aux_house_listing_category_df,
     mock_surrogate_keys_helper,
@@ -310,6 +353,8 @@ def core_model_df(
     def side_effect(table_name):
         if "listing_business_context" in table_name:
             return listing_business_context_df
+        elif "house" in table_name and "listing" not in table_name:
+            return house_df
         elif "lbc_status_version_order" in table_name:
             return aux_lbc_status_version_order_df
         elif "house_listing_category" in table_name:

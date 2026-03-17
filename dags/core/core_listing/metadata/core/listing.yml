@@ -37,6 +37,41 @@ columns:
       - core_listing.aux__lbc_status_version_order.listing_version
     description: Version number of the listing. In RENT context, it's an incremental number based on listing lifecycle events.
       In SALE, it's always 0 (single version).
+  price:
+    lineage:
+      - datalake_ebdb_clean.house.rent
+      - datalake_ebdb_clean.house.sale_price
+    description: Listing price. For RENT context, represents the monthly rent value. For SALE context, represents the sale price.
+  total_value:
+    lineage:
+      - datalake_ebdb_clean.house.total_value
+    description: Total value of the listing including all costs (rent/sale price + condo + iptu).
+  condo_value:
+    lineage:
+      - datalake_ebdb_clean.house.condo
+    description: Condominium fee value.
+  iptu_value:
+    lineage:
+      - datalake_ebdb_clean.house.iptu
+    description: House tax (IPTU) value.
+  condo_type:
+    lineage:
+      - datalake_ebdb_clean.house.condo_type
+    description: Type of condominium fee calculation.
+    categories:
+      NaoExiste: House does not have condominium fee.
+      IncluidoNoAluguel: Condominium fee is included in the rent value.
+      NaoInformado: Condominium fee type was not informed.
+      Normal: Condominium fee is charged separately.
+  iptu_type:
+    lineage:
+      - datalake_ebdb_clean.house.iptu_type
+    description: Type of IPTU calculation.
+    categories:
+      NaoExiste: House does not have IPTU.
+      IncluidoNoAluguel: IPTU is included in the rent value.
+      NaoInformado: IPTU type was not informed.
+      Normal: IPTU is charged separately.
   status:
     lineage:
       - datalake_ebdb_clean.listing_business_context.status
@@ -52,9 +87,9 @@ columns:
       - core_listing.aux__house_listing_category.listing_category
     description: Category of the listing based on its history.
     categories:
-      'First Listing': First time the property is listed (version 1).
-      'Re-Listing': Property was previously rented and is being listed again.
-      'Recovered': Property was unpublished for 84+ days and is being listed again.
+      'First Listing': First time the house is listed (version 1).
+      'Re-Listing': House was previously rented and is being listed again.
+      'Recovered': House was unpublished for 84+ days and is being listed again.
       'NA': Not Applicable. All cases of SALE. Cases of version 0 of RENT.
   ownership:
     lineage:
@@ -85,6 +120,14 @@ columns:
       - core_listing.aux__lbc_status_version_order.listing_version
     description: Boolean flag indicating if this is the most recent version of the listing.
       For SALE listings, this is always TRUE (only one version exists).
+  ts_first_publication:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_first_publication
+    description: Timestamp of the first publication of the listing.
+  ts_last_publication:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_last_publication
+    description: Timestamp of the last publication of the listing.
   ts_created:
     lineage:
       - datalake_ebdb_clean.listing_business_context.ts_created

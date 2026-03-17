@@ -34,6 +34,7 @@ class CoreListingSparkJob(BaseCoreModelSparkJob):
         return {
             'ENTITY_TYPE': self.get_config("ENTITY_TYPE"),
             'LISTING_BUSINESS_CONTEXT_TABLE': self.get_config("LISTING_BUSINESS_CONTEXT_TABLE"),
+            'HOUSE_TABLE': self.get_config("HOUSE_TABLE"),
             'AUX_LBC_STATUS_VERSION_ORDER_TABLE': self.get_config("AUX_LBC_STATUS_VERSION_ORDER_TABLE"),
             'AUX_HOUSE_LISTING_CATEGORY_TABLE': self.get_config("AUX_HOUSE_LISTING_CATEGORY_TABLE"),
         }
@@ -46,18 +47,20 @@ class CoreListingSparkJob(BaseCoreModelSparkJob):
 
         # Load source data
         listing_business_context_df = spark.read.table(config['LISTING_BUSINESS_CONTEXT_TABLE'])
+        house_df = spark.read.table(config['HOUSE_TABLE'])
         aux_lbc_status_version_order_df = spark.read.table(config['AUX_LBC_STATUS_VERSION_ORDER_TABLE'])
         aux_house_listing_category_df = spark.read.table(config['AUX_HOUSE_LISTING_CATEGORY_TABLE'])
 
         # Process RENT listings
         rent_df = self._process_rent_listings(
             listing_business_context_df,
+            house_df,
             aux_lbc_status_version_order_df,
             aux_house_listing_category_df
         )
 
         # Process SALE listings
-        sale_df = self._process_sale_listings(listing_business_context_df)
+        sale_df = self._process_sale_listings(listing_business_context_df, house_df)
 
         # Union RENT and SALE listings by column name
         result_df = rent_df.unionByName(sale_df)
@@ -81,20 +84,41 @@ class CoreListingSparkJob(BaseCoreModelSparkJob):
     def _process_rent_listings(
         self,
         listing_business_context_df: DataFrame,
+        house_df: DataFrame,
         aux_lbc_status_version_order_df: DataFrame,
         aux_house_listing_category_df: DataFrame
     ) -> DataFrame:
         """Process RENT listings from listing_business_context and aux__lbc_status_version_order tables."""
 
-        # Filter RENT listings in listing_business_context table
+        # Filter RENT listings in listing_business_context table and join with house
         lbc_rent_df = listing_business_context_df.filter(
             col("business_context") == "RENT"
+        ).alias("lbc_base").join(
+            house_df.select(
+                col("id"),
+                col("rent"),
+                col("total_value"),
+                col("condo"),
+                col("iptu"),
+                col("condo_type"),
+                col("iptu_type")
+            ).alias("h"),
+            col("lbc_base.id_house") == col("h.id"),
+            "left"
         ).select(
-            col("id_house"),
-            col("id"),
-            col("ownership"),
-            col("ts_created"),
-            col("business_context")
+            col("lbc_base.id_house"),
+            col("lbc_base.id"),
+            col("h.rent"),
+            col("h.total_value"),
+            col("h.condo"),
+            col("h.iptu"),
+            col("h.condo_type"),
+            col("h.iptu_type"),
+            col("lbc_base.ownership"),
+            col("lbc_base.ts_first_publication"),
+            col("lbc_base.ts_last_publication"),
+            col("lbc_base.ts_created"),
+            col("lbc_base.business_context")
         )
 
         # Create id_house_listing expression
@@ -159,6 +183,12 @@ class CoreListingSparkJob(BaseCoreModelSparkJob):
                 256
             ).alias("id_listing"),
             col("rb.listing_version").alias("version"),
+            col("lbc.rent").alias("price"),
+            col("lbc.total_value"),
+            col("lbc.condo").alias("condo_value"),
+            col("lbc.iptu").alias("iptu_value"),
+            col("lbc.condo_type"),
+            col("lbc.iptu_type"),
             col("rb.status"),
             col("rb.status_reason"),
             when(
@@ -170,43 +200,74 @@ class CoreListingSparkJob(BaseCoreModelSparkJob):
             col("rb.is_extended_rental"),
             col("rb.has_termination_canceled"),
             (col("rb.max_listing_version") == col("rb.listing_version")).alias("is_last_listing_version"),
+            col("lbc.ts_first_publication"),
+            col("lbc.ts_last_publication"),
             col("lbc.ts_created"),
             col("rb.ts_state_started").alias("ts_updated")
         )
 
         return rent_df
 
-    def _process_sale_listings(self, listing_business_context_df: DataFrame) -> DataFrame:
+    def _process_sale_listings(
+        self,
+        listing_business_context_df: DataFrame,
+        house_df: DataFrame
+    ) -> DataFrame:
         """Process SALE listings from listing_business_context table."""
 
         # Expression for id_house_listing
-        id_house_listing_expr = concat(col("id_house").cast("string"), lit("000")).cast("bigint")
+        id_house_listing_expr = concat(col("lbc.id_house").cast("string"), lit("000")).cast("bigint")
 
-        sale_df = listing_business_context_df.filter(
+        # Filter SALE listings and join with house table
+        sale_filtered_df = listing_business_context_df.filter(
             (col("business_context") == "SALE") &
             ~((year(col("ts_created")) <= 2022) & col("ts_updated").isNull())
-        ).select(
-            col("id_house"),
-            col("id").alias("id_listing_business_context"),
+        ).alias("lbc")
+
+        sale_joined_df = sale_filtered_df.join(
+            house_df.select(
+                col("id"),
+                col("sale_price"),
+                col("total_value"),
+                col("condo"),
+                col("iptu"),
+                col("condo_type"),
+                col("iptu_type")
+            ).alias("h"),
+            col("lbc.id_house") == col("h.id"),
+            "left"
+        )
+
+        sale_df = sale_joined_df.select(
+            col("lbc.id_house"),
+            col("lbc.id").alias("id_listing_business_context"),
             id_house_listing_expr.alias("id_house_listing"),
             sha2(
                 concat(
                     id_house_listing_expr.cast("string"),
-                    col("business_context")
+                    col("lbc.business_context")
                 ),
                 256
             ).alias("id_listing"),
             lit(0).alias("version"),
-            col("status"),
-            col("status_reason"),
+            col("h.sale_price").alias("price"),
+            col("h.total_value"),
+            col("h.condo").alias("condo_value"),
+            col("h.iptu").alias("iptu_value"),
+            col("h.condo_type"),
+            col("h.iptu_type"),
+            col("lbc.status"),
+            col("lbc.status_reason"),
             lit("NA").alias("category"),
-            col("ownership"),
-            col("business_context"),
+            col("lbc.ownership"),
+            col("lbc.business_context"),
             lit(False).alias("is_extended_rental"),
             lit(False).alias("has_termination_canceled"),
             lit(True).alias("is_last_listing_version"),
-            col("ts_created"),
-            col("ts_updated")
+            col("lbc.ts_first_publication"),
+            col("lbc.ts_last_publication"),
+            col("lbc.ts_created"),
+            col("lbc.ts_updated")
         )
 
         return sale_df

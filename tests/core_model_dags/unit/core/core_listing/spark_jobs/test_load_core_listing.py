@@ -16,6 +16,12 @@ class TestCoreListingSparkJob:
             "id_house_listing",
             "id_listing",
             "version",
+            "price",
+            "total_value",
+            "condo_value",
+            "iptu_value",
+            "condo_type",
+            "iptu_type",
             "status",
             "status_reason",
             "category",
@@ -24,6 +30,8 @@ class TestCoreListingSparkJob:
             "is_extended_rental",
             "has_termination_canceled",
             "is_last_listing_version",
+            "ts_first_publication",
+            "ts_last_publication",
             "ts_created",
             "ts_updated",
             "ts_load",
@@ -65,6 +73,7 @@ class TestCoreListingSparkJob:
         expected_keys = [
             "ENTITY_TYPE",
             "LISTING_BUSINESS_CONTEXT_TABLE",
+            "HOUSE_TABLE",
             "AUX_LBC_STATUS_VERSION_ORDER_TABLE",
             "AUX_HOUSE_LISTING_CATEGORY_TABLE",
         ]
@@ -228,3 +237,29 @@ class TestCoreListingSparkJob:
         assert (
             rent_id != sale_id
         ), "id_listing should be different for RENT and SALE contexts"
+
+    # ==================== Price Fields Tests ====================
+
+    def test_rent_listings_have_price_from_house_rent(self, rent_listings_df):
+        """Test that RENT listings get price from house.rent."""
+        for row in rent_listings_df.collect():
+            if row["id_house"] == 1001:
+                assert (
+                    row["price"] == 2500.0
+                ), "House 1001 should have rent price 2500.0"
+            elif row["id_house"] == 1002:
+                assert (
+                    row["price"] == 3000.0
+                ), "House 1002 should have rent price 3000.0"
+
+    def test_sale_listings_have_price_from_house_sale_price(self, sale_listings_df):
+        """Test that SALE listings get price from house.sale_price."""
+        for row in sale_listings_df.collect():
+            if row["id_house"] == 2001:
+                assert (
+                    row["price"] == 800000.0
+                ), "House 2001 should have sale price 800000.0"
+            elif row["id_house"] == 1002:
+                assert (
+                    row["price"] == 500000.0
+                ), "House 1002 should have sale price 500000.0"

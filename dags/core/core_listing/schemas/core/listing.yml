@@ -33,6 +33,36 @@ columns:
     type: int
     required: true
 
+  # Listing price
+  price:
+    type: int
+    required: false
+
+  # Total value including all costs
+  total_value:
+    type: int
+    required: false
+
+  # Condominium fee value
+  condo_value:
+    type: int
+    required: false
+
+  # Property tax (IPTU) value
+  iptu_value:
+    type: int
+    required: false
+
+  # Type of condominium fee calculation
+  condo_type:
+    type: string
+    required: false
+
+  # Type of IPTU calculation
+  iptu_type:
+    type: string
+    required: false
+
   # Current status of the listing
   status:
     type: string
@@ -73,6 +103,16 @@ columns:
     type: boolean
     required: true
 
+  # First publication timestamp
+  ts_first_publication:
+    type: timestamp
+    required: false
+
+  # Last publication timestamp
+  ts_last_publication:
+    type: timestamp
+    required: false
+
   # Audit timestamps
   ts_created:
     type: timestamp
@@ -101,6 +141,6 @@ columns:
     required: true
 
 # Schema constraints
-min_columns: 20
-max_columns: 20
+min_columns: 28
+max_columns: 28
 strict: true
