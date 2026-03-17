@@ -1,5 +1,6 @@
 SELECT
     BIGINT(`id`) AS id_partner,
+    uuid AS uuid_company,
     full_name,
     short_name,
     TIMESTAMP(created_at) AS ts_created,

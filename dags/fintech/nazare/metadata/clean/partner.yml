@@ -2,20 +2,30 @@
 database_name: datalake_nazare_clean
 table_name: partner
 owner: athos.sampayo@quintoandar.com.br
-domain: fintech
+domain: Fintech
+description: Table containing information about partners (related to Company entity).
 columns:
   id_partner:
     lineage:
       - datalake_nazare_raw.partner.id
+    description: Primary key (BIGINT). Auto-incrementing unique identifier for internal database operations and foreign key references.
+  uuid_company:
+    lineage:
+      - datalake_nazare_raw.partner.uuid
+    description: Unique identifier for the company in Company entity.
   full_name:
     lineage:
       - datalake_nazare_raw.partner.full_name
+    description: Full name of the partner.
   short_name:
     lineage:
       - datalake_nazare_raw.partner.short_name
+    description: Short name of the partner.
   ts_created:
     lineage:
       - datalake_nazare_raw.partner.created_at
+    description: Timestamp of the creation of the partner.
   ts_updated:
     lineage:
       - datalake_nazare_raw.partner.updated_at
+    description: Timestamp of the last update of the partner.
