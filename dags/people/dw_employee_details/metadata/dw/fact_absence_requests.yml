@@ -26,11 +26,11 @@ columns:
   person_number:
     description: Employee registration number. Use to link to other employee tables.
     lineage:
-      - datalake_people_core.identifier_mapping.person_number
+      - datalake_people.identifier_mapping.person_number
   assignment_number:
     description: Work contract or assignment code. Use to link to assignment-related tables.
     lineage:
-      - datalake_people_core.identifier_mapping.assignment_number
+      - datalake_people.identifier_mapping.assignment_number
   days_requested:
     description: Number of days the employee requested for the absence.
     lineage:

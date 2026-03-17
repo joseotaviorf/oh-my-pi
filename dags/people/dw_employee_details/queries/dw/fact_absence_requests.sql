@@ -14,7 +14,7 @@ base AS (
     FROM
         datalake_pin_absence_clean.person_entry AS pe
     INNER JOIN
-        datalake_people_core.identifier_mapping AS im
+        datalake_people.identifier_mapping AS im
             ON pe.id_period_of_service = im.id_period_of_service
     WHERE
         NOT im.is_user_test
