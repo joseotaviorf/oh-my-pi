@@ -264,6 +264,28 @@ class CrossDAGDependenciesValidator:
             and table in self.all_tables_by_dag_from_files[dag]
         )
 
+    def is_valid_cdc_dag(self, dag_name: str) -> bool:
+        """
+        Verifies if the DAG exists and is of type CDC.
+        CDC DAGs generate raw, transactional, and clean layers automatically.
+
+        :param dag_name: the DAG name
+        :type dag_name: str
+        :rtype: bool
+        """
+        dag_path = DAGPackagesPathService.get_dag_path(dag_name)
+        if not dag_path:
+            return False
+        declaration_path = join(dag_path, f"{dag_name}_declaration.yml")
+        if not isfile(declaration_path):
+            return False
+        try:
+            declaration = FileService.get_dict_from_yaml_file(declaration_path)
+            workflow = declaration.get("workflow") or {}
+            return workflow.get("type") == "cdc"
+        except Exception:
+            return False
+
     def validate_dags(self, dags):
         """
         Verifies if the DAG is valid and in opposite case register it on the
@@ -288,6 +310,10 @@ class CrossDAGDependenciesValidator:
                 self.register_into_invalid_list(dag)
             else:
                 for table in tables_by_dag[dag]:
+                    if table.startswith("transactional:"):
+                        if not self.is_valid_cdc_dag(dag):
+                            self.register_into_invalid_list(dag, table)
+                        continue
                     if not self.table_query_exists(dag, table):
                         self.register_into_invalid_list(dag, table)
 

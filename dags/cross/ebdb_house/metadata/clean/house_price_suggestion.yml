@@ -12,6 +12,10 @@ columns:
     lineage:
       - datalake_ebdb_raw.HousePriceSuggestion.house_id
     description: 'ID of the property (house) to which the suggestion refers.'
+  id_prediction:
+    lineage:
+      - datalake_ebdb_raw.HousePriceSuggestion.prediction_id
+    description: 'ID of the prediction (model) that generated this suggestion.'
   business_context:
     lineage:
       - datalake_ebdb_raw.HousePriceSuggestion.business_context
@@ -44,18 +48,14 @@ columns:
     lineage:
       - datalake_ebdb_raw.HousePriceSuggestion.deal_objective_upper_anchor
     description: 'Upper anchor used for the deal objective.'
-  id_prediction:
-    lineage:
-      - datalake_ebdb_raw.HousePriceSuggestion.prediction_id
-    description: 'ID of the prediction (model) that generated this suggestion.'
-  rule:
-    lineage:
-      - datalake_ebdb_raw.HousePriceSuggestion.rule
-    description: 'Business rule or heuristic applied to the suggestion (if any).'
   suggestion_certainty:
     lineage:
       - datalake_ebdb_raw.HousePriceSuggestion.suggestion_certainty
     description: 'Level of certainty or confidence associated with the suggestion.'
+  rule:
+    lineage:
+      - datalake_ebdb_raw.HousePriceSuggestion.rule
+    description: 'Business rule or heuristic applied to the suggestion (if any).'
   ts_created:
     lineage:
       - datalake_ebdb_raw.HousePriceSuggestion.created_at

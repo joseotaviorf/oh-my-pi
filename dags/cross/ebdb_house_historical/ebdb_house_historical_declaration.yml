@@ -1,0 +1,15 @@
+dag:
+  name: ebdb_house_historical
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      Creates historical tracking tables for House domain from CDC transactional layer.
+workflow:
+  type: query_delta
+  layer: clean
+  custom_schema: ebdb
+  default_extraction_type: incremental
+  default_partitions: ["year", "month", "day"]
+cluster:
+  type: databricks_16_4_min_general_cluster
+  databricks_conn_id: databricks_new
