@@ -68,14 +68,11 @@ columns:
       - datalake_pin_absence_clean.person_entry.vacation_cash_out_request
   days_to_be_accrued:
     description: |-
-      Vacation days not yet accrued in the period (open periods only). Zero for closed periods (Closed).
-      Open periods: days_accrued - days_already_accrued, where days_already_accrued = LEAST(days_accrued, 30 * days_elapsed / period_length).
+      Remaining vacation days to accrue in the period (30 - days_taken_total, capped at 0).
       Uses 30 as the standard vacation days per period (Brazil). Country-specific values not available.
     lineage:
-      - datalake_pin_core_clean.assignment_extra_info.days_vacation_acquired
-      - datalake_pin_core_clean.assignment_extra_info.dt_period_started
-      - datalake_pin_core_clean.assignment_extra_info.dt_period_ended
-      - datalake_pin_core_clean.assignment_extra_info.type_or_status
+      - datalake_pin_absence_clean.person_entry.days_duration
+      - datalake_pin_absence_clean.person_entry.vacation_cash_out_request
   has_available_days:
     description: Boolean flag indicating if the employee has a non-zero vacation day balance.
     lineage:

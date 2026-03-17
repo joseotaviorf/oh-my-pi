@@ -67,7 +67,7 @@ SELECT
         b.days_vacation_acquired - b.days_absence - b.days_cash_out,
         0
     ) AS days_balance,
-    GREATEST(30 - b.days_taken, 0) AS days_to_be_accrued,
+    GREATEST(30 - (b.days_absence + b.days_cash_out), 0) AS days_to_be_accrued,
     COALESCE(
         b.days_vacation_acquired - b.days_absence - b.days_cash_out,
         0
