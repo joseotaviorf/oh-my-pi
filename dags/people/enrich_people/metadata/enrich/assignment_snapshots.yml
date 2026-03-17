@@ -1,0 +1,143 @@
+database_name: datalake_people
+table_name: assignment_snapshots
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Daily snapshot of employee work assignments. One row per employee per assignment per day.
+  Grain: (id_assignment, dt_reference).
+  Known limitation: dt_original_hire is derived from MIN(dt_started) over periods_of_service per person,
+  which is a person-level approximation. The ideal source would be PER_SENIORITY_DATES_F (Oracle HCM),
+  which provides the corrected admission date per assignment. To be addressed when that table is ingested.
+columns:
+  id_assignment:
+    description: Unique identifier for the work assignment.
+    lineage:
+      - datalake_people.identifier_mapping.id_assignment
+  id_person:
+    description: Unique identifier for the person.
+    lineage:
+      - datalake_people.identifier_mapping.id_person
+  id_organization:
+    description: Organization identifier. 
+    lineage:
+      - datalake_pin_core_clean.all_assignments.id_organization
+  id_job:
+    description: Job identifier. 
+    lineage:
+      - datalake_pin_core_clean.all_assignments.id_job
+  sk_hierarchy_version:
+    description: Org structure identifier from management_hierarchy.
+    lineage:
+      - datalake_people.management_hierarchy.sk_hierarchy_version
+  sk_termination_event_definition:
+    description: Termination reason and type. Empty when still active.
+    lineage:
+      - datalake_pin_core_clean.action_occurrence.id_action
+      - datalake_pin_core_clean.action_occurrence.id_action_reason
+  sk_hired_date:
+    description: Hire date in YYYYMMDD format.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+  sk_terminated_date:
+    description: End date of the assignment in YYYYMMDD format. Shows 99991231 when still active.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_actual_termination
+  sk_reference_date:
+    description: Snapshot date in YYYYMMDD format.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+  person_number:
+    description: Unique employee identifier in the HR system.
+    lineage:
+      - datalake_people.identifier_mapping.person_number
+  assignment_number:
+    description: Employee registration number.
+    lineage:
+      - datalake_people.identifier_mapping.assignment_number
+  manager_assignment_number:
+    description: Assignment number of the direct manager. Use to join to assignment_snapshots or dim_personal_info for manager details. NULL when no manager (e.g. CEO).
+    lineage:
+      - datalake_people.management_hierarchy.manager_assignment_number
+  hierarchy_level:
+    description: Employee level in the org chart (L0 to L9).
+    lineage:
+      - datalake_people.management_hierarchy.hierarchy_level
+  hierarchy_depth:
+    description: Numeric level in the org chart (0 to 9).
+    lineage:
+      - datalake_people.management_hierarchy.hierarchy_depth
+  days_tenure_in_company:
+    description: Days since the employee's first hire at the company.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+  months_tenure_in_company:
+    description: Months since the employee's first hire at the company.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+  days_tenure_in_assignment:
+    description: Days since the employee started this specific assignment.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+  count_direct_report:
+    description: Number of employees who report directly to this assignment.
+    lineage:
+      - datalake_people.management_hierarchy.assignment_number_l0
+      - datalake_people.management_hierarchy.assignment_number_l8
+  count_indirect_report:
+    description: Number of employees who report indirectly to this assignment.
+    lineage:
+      - datalake_people.management_hierarchy.assignment_number_l0
+      - datalake_people.management_hierarchy.assignment_number_l7
+  is_manager:
+    description: True when the employee has leadership career track (L) or has at least one direct report.
+    lineage:
+      - datalake_pin_core_clean.all_assignments.ass_attribute14
+      - datalake_people.management_hierarchy.assignment_number_l0
+  is_member_lt:
+    description: True when the employee is in the Leadership Team (band 10+ or EXEC). Used for DE&I analytics.
+    lineage:
+      - datalake_people.job_with_salary_table.band
+  is_member_et:
+    description: True when the employee is in the Executive Team (L0 or L1 in hierarchy and band 14+).
+    lineage:
+      - datalake_people.management_hierarchy.assignment_number_l0
+      - datalake_people.management_hierarchy.assignment_number_l1
+      - datalake_people.job_with_salary_table.band
+  is_active:
+    description: True when the employee is currently active in this assignment.
+    lineage:
+      - datalake_pin_core_clean.all_assignments.assignment_status_type
+  is_terminated:
+    description: True when the assignment has ended.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_actual_termination
+  has_emergency_contact:
+    description: True when the employee has at least one emergency contact on file for this date.
+    lineage:
+      - datalake_pin_core_clean.people_extra_info.id_person
+  is_internal_transfer:
+    description: True when the employee was already at the company before this assignment.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+  dt_original_hire:
+    description: Date of the employee's first hire at the company. Derived from MIN(dt_started) over periods_of_service per person (approximation). PER_SENIORITY_DATES_F will provide assignment-level value when available.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+  dt_hired:
+    description: Date the employee started this assignment.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+  dt_terminated:
+    description: Date the assignment ended. Shows 9999-12-31 when still active.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_actual_termination
+  dt_notified:
+    description: Date when the termination was notified. Shows 9999-12-31 when still active.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_notified_termination
+  dt_reference:
+    description: Snapshot date.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+  ts_load:
+    description: When the record was loaded.

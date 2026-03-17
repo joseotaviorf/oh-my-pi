@@ -1,0 +1,148 @@
+database_name: dw_employee_details
+table_name: fact_assignment_snapshots
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Daily snapshot of employee work assignments. One row per employee per assignment per day.
+  Use for headcount by date, tenure analysis, admission and exit reporting.
+  Base data comes from datalake_people.assignment_snapshots (enrich layer). This fact adds
+  sk_cost_center_version, sk_job_version, sk_contact_version, sk_documentation_version,
+  sk_emergency_contact_version from DW dimension tables.
+  Grain: (assignment_number, dt_reference).
+  To get cost center name, job title, or contact details, use the sk_* columns to link to the corresponding dimension tables.
+  For manager details, use manager_assignment_number to join to assignment_snapshots.
+columns:
+  sk_cost_center_version:
+    description: Cost center identifier. Use to get cost center name and details from dim_cost_center.
+    lineage:
+      - dw_organization.dim_cost_center.sk_cost_center_version
+  sk_job_version:
+    description: Job identifier. Use to get job title and details from dim_job.
+    lineage:
+      - dw_compensation.dim_job.sk_job_version
+  sk_contact_version:
+    description: Contact info identifier. Use to get email, phone, and address from dim_contact.
+    lineage:
+      - dw_employee_details.dim_contact.sk_contact_version
+  sk_documentation_version:
+    description: Documentation identifier. Use to get document details from dim_documentation.
+    lineage:
+      - dw_employee_details.dim_documentation.sk_documentation_version
+  sk_emergency_contact_version:
+    description: Emergency contact identifier. Use to get emergency contact details from dim_emergency_contact.
+    lineage:
+      - dw_employee_details.dim_emergency_contact.sk_emergency_contact_version
+  sk_hierarchy_version:
+    description: Org structure identifier. Use to get management hierarchy from dim_management_hierarchy.
+    lineage:
+      - datalake_people.assignment_snapshots.sk_hierarchy_version
+  sk_termination_event_definition:
+    description: Termination reason and type. Use to get details from dim_event_definition. Empty when still active.
+    lineage:
+      - datalake_people.assignment_snapshots.sk_termination_event_definition
+  sk_hired_date:
+    description: Hire date in YYYYMMDD format. Use for date-based joins.
+    lineage:
+      - datalake_people.assignment_snapshots.sk_hired_date
+  sk_terminated_date:
+    description: End date of the assignment in YYYYMMDD format. Shows 99991231 when still active (no end date yet).
+    lineage:
+      - datalake_people.assignment_snapshots.sk_terminated_date
+  sk_reference_date:
+    description: Snapshot date in YYYYMMDD format. Each row shows the employee's status on this date.
+    lineage:
+      - datalake_people.assignment_snapshots.sk_reference_date
+  person_number:
+    description: Unique employee identifier in the HR system. Use to link to other employee details tables.
+    lineage:
+      - datalake_people.assignment_snapshots.person_number
+  assignment_number:
+    description: Employee registration number. Grain identifier for the work assignment. Use for joins.
+    lineage:
+      - datalake_people.assignment_snapshots.assignment_number
+  manager_assignment_number:
+    description: Assignment number of the direct manager. Use to join to assignment_snapshots for manager details. NULL when no manager (e.g. CEO).
+    lineage:
+      - datalake_people.assignment_snapshots.manager_assignment_number
+  hierarchy_level:
+    description: Employee level in the org chart (L0 to L9). L0 is CEO; L1 is one level below. Empty when not in hierarchy.
+    lineage:
+      - datalake_people.assignment_snapshots.hierarchy_level
+  hierarchy_depth:
+    description: Numeric level in the org chart (0 to 9). 0 is CEO; higher numbers are deeper. Empty when not in hierarchy.
+    lineage:
+      - datalake_people.assignment_snapshots.hierarchy_depth
+  days_tenure_in_company:
+    description: Days since the employee's first hire at the company. Use for company tenure analysis.
+    lineage:
+      - datalake_people.assignment_snapshots.days_tenure_in_company
+  months_tenure_in_company:
+    description: Months since the employee's first hire at the company. Use for company tenure analysis.
+    lineage:
+      - datalake_people.assignment_snapshots.months_tenure_in_company
+  days_tenure_in_assignment:
+    description: Days since the employee started this specific assignment. Use for time-in-current-role analysis.
+    lineage:
+      - datalake_people.assignment_snapshots.days_tenure_in_assignment
+  count_direct_report:
+    description: Number of employees who report directly to this assignment (one level below in the org hierarchy).
+    lineage:
+      - datalake_people.assignment_snapshots.count_direct_report
+  count_indirect_report:
+    description: Number of employees who report indirectly to this assignment (two or more levels below in the org hierarchy).
+    lineage:
+      - datalake_people.assignment_snapshots.count_indirect_report
+  is_member_lt:
+    description: True when the employee is in the Leadership Team (band 10+ or EXEC). Used for DE&I analytics.
+    lineage:
+      - datalake_people.assignment_snapshots.is_member_lt
+  is_member_et:
+    description: True when the employee is in the Executive Team (L0 or L1 in hierarchy and band 14+).
+    lineage:
+      - datalake_people.assignment_snapshots.is_member_et
+  is_manager:
+    description: True when the employee has leadership career track or has at least one direct report.
+    lineage:
+      - datalake_people.assignment_snapshots.is_manager
+  is_active:
+    description: True when the employee is currently active in this assignment.
+    lineage:
+      - datalake_people.assignment_snapshots.is_active
+  is_terminated:
+    description: True when the assignment has ended (employee left or was transferred out).
+    lineage:
+      - datalake_people.assignment_snapshots.is_terminated
+  has_emergency_contact:
+    description: True when the employee has at least one emergency contact on file.
+    lineage:
+      - datalake_people.assignment_snapshots.has_emergency_contact
+  is_internal_transfer:
+    description: True when the employee was already at the company before this assignment (e.g., moved between teams).
+    lineage:
+      - datalake_people.assignment_snapshots.is_internal_transfer
+  is_current:
+    description: True when this row is the most recent snapshot for the assignment (dt_reference = current date).
+    lineage:
+      - datalake_people.assignment_snapshots.dt_reference
+  dt_original_hire:
+    description: Date of the employee's first hire at the company. Stays the same when they move between teams or roles.
+    lineage:
+      - datalake_people.assignment_snapshots.dt_original_hire
+  dt_hired:
+    description: Date the employee started this assignment.
+    lineage:
+      - datalake_people.assignment_snapshots.dt_hired
+  dt_terminated:
+    description: Date the assignment ended. Shows 9999-12-31 when still active (no end date yet).
+    lineage:
+      - datalake_people.assignment_snapshots.dt_terminated
+  dt_notified:
+    description: Date when the termination was notified to HR. Shows 9999-12-31 when still active.
+    lineage:
+      - datalake_people.assignment_snapshots.dt_notified
+  dt_reference:
+    description: Snapshot date. Each row represents the employee's status on this date. Use for headcount by date.
+    lineage:
+      - datalake_people.assignment_snapshots.dt_reference
+  ts_load:
+    description: When the record was loaded. For technical use only.

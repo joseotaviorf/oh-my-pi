@@ -21,6 +21,21 @@ columns:
     description: Person number (Oracle HCM person identifier) of the employee whose managerial chain is tracked in this record.
     lineage:
       - datalake_people.identifier_mapping.person_number
+  manager_assignment_number:
+    description: Assignment number of the direct manager. Derived from manager_struct_path[SIZE-2]. NULL when employee is CEO (no manager).
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.id_manager_assignment
+      - datalake_people.identifier_mapping.assignment_number
+  hierarchy_depth:
+    description: Numeric level in the org chart (0=CEO, 1=L1, ..., 9=L9). Derived from SIZE(manager_struct_path) - 1.
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.id_manager_assignment
+      - datalake_people.identifier_mapping.assignment_number
+  hierarchy_level:
+    description: Employee level in the org chart (L0 to L9). Derived from 'L' || (SIZE(manager_struct_path) - 1).
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.id_manager_assignment
+      - datalake_people.identifier_mapping.assignment_number
   assignment_number_l0:
     description: Assignment number of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
     lineage:

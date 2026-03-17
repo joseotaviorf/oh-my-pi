@@ -1,0 +1,61 @@
+---
+table_name: datalake_people.assignment_snapshots
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  id_assignment:
+    is_complete:
+      severity_level: Error
+    custom:
+      # Grain uniqueness: one row per (id_assignment, dt_reference)
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT id_assignment, dt_reference
+          FROM datalake_people.assignment_snapshots
+          GROUP BY id_assignment, dt_reference
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
+  dt_reference:
+    is_complete:
+      severity_level: Error
+  person_number:
+    is_complete:
+      severity_level: Error
+  assignment_number:
+    is_complete:
+      severity_level: Error
+  dt_hired:
+    is_complete:
+      severity_level: Error
+  count_direct_report:
+    custom:
+      # CEO (id_assignment 300000008586218) reports must equal total employees per dt_reference
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT dt_reference
+          FROM datalake_people.assignment_snapshots
+          GROUP BY dt_reference
+          HAVING
+            MAX(
+              CASE
+                WHEN id_assignment = 300000008586218
+                THEN COALESCE(count_direct_report, 0) + COALESCE(count_indirect_report, 0)
+              END
+            ) IS NOT NULL
+            AND COUNT(DISTINCT id_assignment) != MAX(
+              CASE
+                WHEN id_assignment = 300000008586218
+                THEN COALESCE(count_direct_report, 0) + COALESCE(count_indirect_report, 0)
+              END
+            )
+        )) = 0
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Warning

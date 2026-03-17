@@ -26,7 +26,16 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
+  inner_dependencies:
+    fact_assignment_snapshots:
+      - dim_contact
+      - dim_documentation
+      - dim_emergency_contact
+      - dim_management_hierarchy
   tables_customization:
+    fact_assignment_snapshots:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
     dim_event_definition:
       vacuum_retention_hours: 168
       vacuum_lite: true

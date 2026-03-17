@@ -568,6 +568,13 @@ SELECT
     hv.sk_hierarchy_version,
     COALESCE(CAST(hv.assignment_number AS STRING), '') AS assignment_number,
     COALESCE(im_self.person_number, '') AS person_number,
+    CASE
+        WHEN SIZE(hv.manager_struct_path) >= 2
+        THEN CAST(hv.manager_struct_path[SIZE(hv.manager_struct_path) - 2].assignment_number AS STRING)
+        ELSE NULL
+    END AS manager_assignment_number,
+    SIZE(hv.manager_struct_path) - 1 AS hierarchy_depth,
+    CONCAT('L', CAST(SIZE(hv.manager_struct_path) - 1 AS STRING)) AS hierarchy_level,
     COALESCE(CAST(hv.manager_struct_path[0].assignment_number AS STRING), '') AS assignment_number_l0,
     COALESCE(im_l0.person_number, '') AS person_number_l0,
     COALESCE(im_l0.name, '') AS name_l0,
