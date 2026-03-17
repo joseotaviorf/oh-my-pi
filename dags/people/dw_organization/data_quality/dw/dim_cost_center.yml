@@ -19,21 +19,26 @@ column_level_validations:
     is_complete:
       severity_level: Error
   dt_valid_from:
-    is_complete:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Error
   dt_valid_to:
-    custom: # SCD2 validity: when end date is set, it must be strictly after start date (no inverted or zero-length intervals).
-      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM dw_organization.dim_cost_center WHERE dt_valid_to IS NOT NULL AND dt_valid_to <= dt_valid_from)) = 0"
+    custom: # SCD2 validity: when end date is set, it must be strictly after start date (exclude DW unknown row with sk = -1).
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM dw_organization.dim_cost_center WHERE sk_cost_center_version <> -1 AND dt_valid_to IS NOT NULL AND dt_valid_to <= dt_valid_from)) = 0"
       severity_level: Error
   cost_center_code:
-    is_complete:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Error
   cost_center_name:
-    is_complete:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Warning
   is_active:
-    is_complete:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Warning
   ts_load:
-    is_complete:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Warning
