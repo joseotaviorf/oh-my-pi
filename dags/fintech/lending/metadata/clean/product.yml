@@ -17,6 +17,10 @@ columns:
     lineage:
       - datalake_lending_raw.product.name
     description: Name of the product.
+  type:
+    lineage:
+      - datalake_lending_raw.product.type
+    description: Type or category of the product.
   ts_created:
     lineage:
       - datalake_lending_raw.product.created_at

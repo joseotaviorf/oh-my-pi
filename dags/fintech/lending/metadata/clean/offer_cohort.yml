@@ -9,22 +9,18 @@ columns:
     lineage:
       - datalake_lending_raw.offer_cohort.id
     description: Primary key of the offer cohort.
+  id_product:
+    lineage:
+      - datalake_lending_raw.offer_cohort.product_id
+    description: ID of the product.
+  id_offer_term_sheet:
+    lineage:
+      - datalake_lending_raw.offer_cohort.offer_term_sheet_id
+    description: ID of the offer term sheet associated to the cohort.
   name:
     lineage:
       - datalake_lending_raw.offer_cohort.name
     description: Name of the offer cohort.
-  product_id:
-    lineage:
-      - datalake_lending_raw.offer_cohort.product_id
-    description: ID of the product.
-  dt_start:
-    lineage:
-      - datalake_lending_raw.offer_cohort.start_date
-    description: Start date of the offer cohort.
-  dt_end:
-    lineage:
-      - datalake_lending_raw.offer_cohort.end_date
-    description: End date of the offer cohort.
   status:
     lineage:
       - datalake_lending_raw.offer_cohort.status
@@ -33,6 +29,14 @@ columns:
     lineage:
       - datalake_lending_raw.offer_cohort.customizations
     description: Customizations of the offer cohort.
+  dt_started:
+    lineage:
+      - datalake_lending_raw.offer_cohort.start_date
+    description: Start date of the offer cohort.
+  dt_ended:
+    lineage:
+      - datalake_lending_raw.offer_cohort.end_date
+    description: End date of the offer cohort.
   ts_created:
     lineage:
       - datalake_lending_raw.offer_cohort.created_at

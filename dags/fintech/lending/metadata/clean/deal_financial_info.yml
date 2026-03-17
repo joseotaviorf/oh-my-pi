@@ -57,14 +57,6 @@ columns:
     lineage:
       - datalake_lending_raw.deal_financial_info.operation_gross_amount
     description: Operation gross amount of the deal financial info.
-  dt_first_installment:
-    lineage:
-      - datalake_lending_raw.deal_financial_info.first_installment_date
-    description: First installment date of the deal financial info.
-  dt_last_installment:
-    lineage:
-      - datalake_lending_raw.deal_financial_info.last_installment_date
-    description: Last installment date of the deal financial info.
   tax_iof_fixed_rate:
     lineage:
       - datalake_lending_raw.deal_financial_info.tax_iof_fixed_rate
@@ -97,6 +89,14 @@ columns:
     lineage:
       - datalake_lending_raw.deal_financial_info.gross_costs_total_value
     description: Gross costs total value of the deal financial info.
+  dt_first_installment:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.first_installment_date
+    description: First installment date of the deal financial info.
+  dt_last_installment:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.last_installment_date
+    description: Last installment date of the deal financial info.
   ts_created:
     lineage:
       - datalake_lending_raw.deal_financial_info.created_at

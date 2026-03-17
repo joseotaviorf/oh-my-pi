@@ -9,6 +9,10 @@ columns:
     lineage:
       - datalake_lending_raw.user_consent.id
     description: Primary key of the user consent.
+  id_deal:
+    lineage:
+      - datalake_lending_raw.user_consent.deal_id
+    description: ID of the deal.
   uuid:
     lineage:
       - datalake_lending_raw.user_consent.uuid
@@ -29,10 +33,6 @@ columns:
     lineage:
       - datalake_lending_raw.user_consent.user_agent
     description: User agent of the user consent.
-  id_deal:
-    lineage:
-      - datalake_lending_raw.user_consent.deal_id
-    description: ID of the deal.
   ts_created:
     lineage:
       - datalake_lending_raw.user_consent.created_at

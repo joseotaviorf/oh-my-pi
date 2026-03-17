@@ -17,6 +17,10 @@ columns:
     lineage:
       - datalake_lending_raw.offer_cohort_member.person_uuid
     description: UUID of the person.
+  id_contract:
+    lineage:
+      - datalake_lending_raw.offer_cohort_member.contract_id
+    description: ID of the contract
   ts_created:
     lineage:
       - datalake_lending_raw.offer_cohort_member.created_at

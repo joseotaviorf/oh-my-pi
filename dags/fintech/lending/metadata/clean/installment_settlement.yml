@@ -1,0 +1,35 @@
+---
+database_name: datalake_lending_clean
+table_name: installment_settlement
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains settlement information for installments from external providers.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.installment_settlement.id
+    description: Primary key of the installment settlement.
+  id_installment:
+    lineage:
+      - datalake_lending_raw.installment_settlement.installment_id
+    description: Foreign key referencing the installment.
+  settlement_provider:
+    lineage:
+      - datalake_lending_raw.installment_settlement.settlement_provider
+    description: Identifier of the settlement provider that processed the payment.
+  settlement_info:
+    lineage:
+      - datalake_lending_raw.installment_settlement.settlement_info
+    description: JSON payload with settlement details (e.g. transaction_id).
+  status:
+    lineage:
+      - datalake_lending_raw.installment_settlement.status
+    description: Current status of the settlement.
+  ts_created:
+    lineage:
+      - datalake_lending_raw.installment_settlement.created_at
+    description: Timestamp when the settlement record was created.
+  ts_updated:
+    lineage:
+      - datalake_lending_raw.installment_settlement.updated_at
+    description: Timestamp when the settlement record was last updated.

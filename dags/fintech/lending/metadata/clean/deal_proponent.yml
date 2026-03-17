@@ -29,10 +29,6 @@ columns:
     lineage:
       - datalake_lending_raw.deal_proponent.cpf
     description: Brazilian individual taxpayer identification number (CPF).
-  dt_birth:
-    lineage:
-      - datalake_lending_raw.deal_proponent.birth_date
-    description: Date of birth of the proponent.
   email:
     lineage:
       - datalake_lending_raw.deal_proponent.email
@@ -69,6 +65,10 @@ columns:
     lineage:
       - datalake_lending_raw.deal_proponent.cep
     description: Brazilian postal code (CEP).
+  dt_birth:
+    lineage:
+      - datalake_lending_raw.deal_proponent.birth_date
+    description: Date of birth of the proponent.
   ts_created:
     lineage:
       - datalake_lending_raw.deal_proponent.created_at

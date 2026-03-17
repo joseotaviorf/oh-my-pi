@@ -17,10 +17,14 @@ columns:
     lineage:
       - datalake_lending_raw.installments.installment_id
     description: ID of the installment.
-  dt_due:
+  id_original_installment:
     lineage:
-      - datalake_lending_raw.installments.installment_due_date
-    description: Installment due date of the installment.
+      - datalake_lending_raw.installments.original_installment_id
+    description: Original installment ID of the installment.
+  installment_number:
+    lineage:
+      - datalake_lending_raw.installments.installment_number
+    description: Installment number of the installment.
   installment_principal_amount:
     lineage:
       - datalake_lending_raw.installments.installment_principal_amount
@@ -65,27 +69,31 @@ columns:
     lineage:
       - datalake_lending_raw.installments.installment_paid_amount
     description: Installment paid amount of the installment.
-  installment_payment_date:
-    lineage:
-      - datalake_lending_raw.installments.installment_payment_date
-    description: Installment payment date of the installment.
-  installment_number:
-    lineage:
-      - datalake_lending_raw.installments.installment_number
-    description: Installment number of the installment.
-  id_original_installment:
-    lineage:
-      - datalake_lending_raw.installments.original_installment_id
-    description: Original installment ID of the installment.
-  dt_original_due:
-    lineage:
-      - datalake_lending_raw.installments.installment_original_due_date
-    description: Original installment due date of the installment.
   installment_original_principal_amount:
     lineage:
       - datalake_lending_raw.installments.installment_original_principal_amount
     description: Original installment principal amount of the installment.
-  ts_created: 
+  chargeable_amount:
+    lineage:
+      - datalake_lending_raw.installments.chargeable_amount
+    description: Amount that can be charged for the installment.
+  dt_due:
+    lineage:
+      - datalake_lending_raw.installments.installment_due_date
+    description: Installment due date of the installment.
+  dt_payment:
+    lineage:
+      - datalake_lending_raw.installments.installment_payment_date
+    description: Date when the installment was paid.
+  dt_original_due:
+    lineage:
+      - datalake_lending_raw.installments.installment_original_due_date
+    description: Original installment due date of the installment.
+  dt_revised_due:
+    lineage:
+      - datalake_lending_raw.installments.revised_installment_due_date
+    description: Revised due date of the installment when rescheduled.
+  ts_created:
     lineage:
       - datalake_lending_raw.installments.created_at
     description: Timestamp when the installments was created.

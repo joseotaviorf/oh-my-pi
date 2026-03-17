@@ -8,7 +8,7 @@ columns:
   id:
     lineage:
       - datalake_lending_raw.deal_collateral.id
-    description: Primary key of the deal collateral.  
+    description: Primary key of the deal collateral.
   id_deal:
     lineage:
       - datalake_lending_raw.deal_collateral.deal_id
@@ -17,14 +17,14 @@ columns:
     lineage:
       - datalake_lending_raw.deal_collateral.external_id
     description: External ID of the deal collateral.
-  effective_date:
-    lineage:
-      - datalake_lending_raw.deal_collateral.effective_date
-    description: Effective date of the deal collateral.
   value:
     lineage:
       - datalake_lending_raw.deal_collateral.value
     description: Value of the deal collateral.
+  dt_effective:
+    lineage:
+      - datalake_lending_raw.deal_collateral.effective_date
+    description: Effective date of the deal collateral.
   ts_created:
     lineage:
       - datalake_lending_raw.deal_collateral.created_at

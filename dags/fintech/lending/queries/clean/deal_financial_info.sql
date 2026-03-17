@@ -1,4 +1,4 @@
-SELECT 
+SELECT
     id,
     deal_id AS id_deal,
     operation_net_amount,
@@ -12,8 +12,6 @@ SELECT
     operation_total_taxes,
     operation_total_costs,
     operation_gross_amount,
-    first_installment_date AS dt_first_installment,
-    last_installment_date AS dt_last_installment,
     tax_iof_fixed_rate,
     tax_iof_daily_rate,
     tax_iof_total_rate,
@@ -22,7 +20,9 @@ SELECT
     costs_rate_share,
     interest_total_value,
     gross_costs_total_value,
+    first_installment_date AS dt_first_installment,
+    last_installment_date AS dt_last_installment,
     created_at AS ts_created,
     updated_at AS ts_updated
-FROM 
+FROM
     datalake_lending_raw.deal_financial_info

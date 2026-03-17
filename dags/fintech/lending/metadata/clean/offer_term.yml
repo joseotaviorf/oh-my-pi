@@ -9,14 +9,14 @@ columns:
     lineage:
       - datalake_lending_raw.offer_term.id
     description: Primary key of the offer term.
-  uuid:
-    lineage:
-      - datalake_lending_raw.offer_term.uuid
-    description: UUID of the offer term.
   id_sheet:
     lineage:
       - datalake_lending_raw.offer_term.sheet_id
     description: ID of the offer term sheet this term belongs to.
+  uuid:
+    lineage:
+      - datalake_lending_raw.offer_term.uuid
+    description: UUID of the offer term.
   base_value_multiplier:
     lineage:
       - datalake_lending_raw.offer_term.base_value_multiplier

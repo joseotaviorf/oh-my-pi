@@ -1,8 +1,9 @@
-SELECT  
+SELECT
     id,
     uuid,
     name,
+    type,
     created_at AS ts_created,
     updated_at AS ts_updated
-FROM 
+FROM
     datalake_lending_raw.product
