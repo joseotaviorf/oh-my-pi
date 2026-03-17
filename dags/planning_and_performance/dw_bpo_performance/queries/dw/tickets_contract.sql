@@ -423,7 +423,7 @@ SELECT
   YEAR(TO_DATE(CURRENT_DATE)) AS year,
   MONTH(TO_DATE(CURRENT_DATE)) AS month,
   DAY(TO_DATE(CURRENT_DATE)) AS day,
-  DATE_FORMAT(NOW(), 'yyyy-MM-dd HH:mm') AS ts_load
+  NOW() AS ts_load
 FROM tabela_base AS tb
 LEFT JOIN flag_regra_3 AS r3
   ON tb.sk_user = r3.sk_user AND tb.contrato_prioritario IS NULL
