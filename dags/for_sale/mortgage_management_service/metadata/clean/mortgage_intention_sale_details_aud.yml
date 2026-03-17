@@ -1,0 +1,43 @@
+---
+database_name: datalake_mortgage_management_service_clean
+table_name: mortgage_intention_sale_details_aud
+owner: thiago.bueno@quintoandar.com.br
+domain: For Sale
+description: "Audit table for mortgage_intention_sale_details, tracking all historical changes made to mortgage intention sale detail records using Hibernate Envers for audit trail purposes."
+columns:
+  id:
+    description: 'Id of the mortgage intention sale details.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.id
+  rev:
+    description: 'Revision number for audit tracking.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.rev
+  revtype:
+    description: 'Revision type indicating the operation (0=insert, 1=update, 2=delete).'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.revtype
+  id_mortgage_intention:
+    description: 'Id of the mortgage intention.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.mortgage_intention_id
+  ts_created:
+    description: 'Timestamp of the creation of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.created_at
+  ts_updated:
+    description: 'Timestamp of the last update of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.updated_at
+  year:
+    description: 'Year of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.year
+  month:
+    description: 'Month of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.month
+  day:
+    description: 'Day of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.day

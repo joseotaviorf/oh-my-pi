@@ -1,0 +1,39 @@
+---
+database_name: datalake_mortgage_management_service_clean
+table_name: mortgage_proposal_aux_aud
+owner: thiago.bueno@quintoandar.com.br
+domain: For Sale
+description: "Audit table for mortgage_proposal_aux, tracking all historical changes made to mortgage proposal auxiliary records using Hibernate Envers for audit trail purposes."
+columns:
+  id:
+    description: 'Id of the mortgage proposal auxiliary data.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.id
+  rev:
+    description: 'Revision number for audit tracking.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.rev
+  revtype:
+    description: 'Revision type indicating the operation (0=insert, 1=update, 2=delete).'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.revtype
+  ts_created:
+    description: 'Timestamp of the creation of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.created_at
+  ts_updated:
+    description: 'Timestamp of the last update of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.updated_at
+  year:
+    description: 'Year of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.year
+  month:
+    description: 'Month of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.month
+  day:
+    description: 'Day of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.day

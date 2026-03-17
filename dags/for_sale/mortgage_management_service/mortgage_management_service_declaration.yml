@@ -1,0 +1,54 @@
+dag:
+  name: mortgage_management_service
+  schedule_start_date: 2026, 3, 11
+  schedule_interval: 0 21 * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      This DAG imports the tables from Mortgage Management Service, a service responsible for managing 
+      mortgage intentions, proposals, and related financial information for the ForSale business.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  source_database: mortgage_management_service
+  custom_schema: mortgage_management_service
+  dbutils_secret_key: MORTGAGE_MANAGEMENT_SERVICE_DB
+  has_hive_sync: true
+  tables_customization:
+    mortgage_intention:
+      clean_table_name: mortgage_intention
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    mortgage_intention_aud:
+      clean_table_name: mortgage_intention_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
+    mortgage_intention_amounts:
+      clean_table_name: mortgage_intention_amounts
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    mortgage_intention_amounts_aud:
+      clean_table_name: mortgage_intention_amounts_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
+    mortgage_intention_sale_details:
+      clean_table_name: mortgage_intention_sale_details
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    mortgage_intention_sale_details_aud:
+      clean_table_name: mortgage_intention_sale_details_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
+    mortgage_proposal_aux:
+      clean_table_name: mortgage_proposal_aux
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    mortgage_proposal_aux_aud:
+      clean_table_name: mortgage_proposal_aux_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id", "rev"]
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new_env

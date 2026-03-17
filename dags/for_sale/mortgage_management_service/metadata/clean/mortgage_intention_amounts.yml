@@ -1,0 +1,35 @@
+---
+database_name: datalake_mortgage_management_service_clean
+table_name: mortgage_intention_amounts
+owner: thiago.bueno@quintoandar.com.br
+domain: For Sale
+description: "The primary purpose of the mortgage_intention_amounts table is to store financial amount details associated with mortgage intentions, including property value, loan amount, and down payment information."
+columns:
+  id:
+    description: 'Id of the mortgage intention amounts.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_amounts.id
+  id_mortgage_intention:
+    description: 'Id of the mortgage intention.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_amounts.mortgage_intention_id
+  ts_created:
+    description: 'Timestamp of the creation of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_amounts.created_at
+  ts_updated:
+    description: 'Timestamp of the last update of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_amounts.updated_at
+  year:
+    description: 'Year of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_amounts.year
+  month:
+    description: 'Month of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_amounts.month
+  day:
+    description: 'Day of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_amounts.day

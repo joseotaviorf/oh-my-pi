@@ -1,0 +1,35 @@
+---
+database_name: datalake_mortgage_management_service_clean
+table_name: mortgage_intention_sale_details
+owner: thiago.bueno@quintoandar.com.br
+domain: For Sale
+description: "The primary purpose of the mortgage_intention_sale_details table is to store property sale-specific information linked to mortgage intentions, including property characteristics and sale conditions."
+columns:
+  id:
+    description: 'Id of the mortgage intention sale details.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.id
+  id_mortgage_intention:
+    description: 'Id of the mortgage intention.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.mortgage_intention_id
+  ts_created:
+    description: 'Timestamp of the creation of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.created_at
+  ts_updated:
+    description: 'Timestamp of the last update of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.updated_at
+  year:
+    description: 'Year of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.year
+  month:
+    description: 'Month of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.month
+  day:
+    description: 'Day of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.day

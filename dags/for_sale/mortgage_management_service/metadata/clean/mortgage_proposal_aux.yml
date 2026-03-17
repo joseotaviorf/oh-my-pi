@@ -1,0 +1,31 @@
+---
+database_name: datalake_mortgage_management_service_clean
+table_name: mortgage_proposal_aux
+owner: thiago.bueno@quintoandar.com.br
+domain: For Sale
+description: "The primary purpose of the mortgage_proposal_aux table is to store auxiliary information related to mortgage proposals, including additional details and complementary data for mortgage application processing."
+columns:
+  id:
+    description: 'Id of the mortgage proposal auxiliary data.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_proposal_aux.id
+  ts_created:
+    description: 'Timestamp of the creation of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_proposal_aux.created_at
+  ts_updated:
+    description: 'Timestamp of the last update of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_proposal_aux.updated_at
+  year:
+    description: 'Year of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_proposal_aux.year
+  month:
+    description: 'Month of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_proposal_aux.month
+  day:
+    description: 'Day of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_proposal_aux.day

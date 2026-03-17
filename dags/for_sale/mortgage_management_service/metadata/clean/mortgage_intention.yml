@@ -1,0 +1,31 @@
+---
+database_name: datalake_mortgage_management_service_clean
+table_name: mortgage_intention
+owner: thiago.bueno@quintoandar.com.br
+domain: For Sale
+description: "The primary purpose of the mortgage_intention table is to store mortgage intention records created by users interested in obtaining mortgage financing for property purchases."
+columns:
+  id:
+    description: 'Id of the mortgage intention.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention.id
+  ts_created:
+    description: 'Timestamp of the creation of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention.created_at
+  ts_updated:
+    description: 'Timestamp of the last update of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention.updated_at
+  year:
+    description: 'Year of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention.year
+  month:
+    description: 'Month of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention.month
+  day:
+    description: 'Day of the record.'
+    lineage:
+    - datalake_mortgage_management_service_raw.mortgage_intention.day
