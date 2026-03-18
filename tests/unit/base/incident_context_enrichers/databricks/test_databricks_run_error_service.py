@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 
-from bietlejuice.base.incident_context.databricks.databricks_run_error_service import (
+from bietlejuice.base.incident_context_enrichers.databricks.databricks_run_error_service import (
     DEFAULT_ERROR_MESSAGE,
     DatabricksRunErrorService,
 )

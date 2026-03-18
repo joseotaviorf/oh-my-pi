@@ -1,46 +1,19 @@
 import json
-import logging
 import sys
 import traceback
 from datetime import datetime
-from functools import wraps
-from typing import Any, Callable, Optional
+from typing import List
 
 from airflow.models import Variable
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.airflow.enums.dag_run_type_enum import DagRunTypeEnum
-from bietlejuice.base.incident_context.databricks.databricks_metadata_service import (
-    DatabricksMetadataService,
-)
+from bietlejuice.base.incident_context_enrichers.enricher import IncidentContextEnricher
 from bietlejuice.base.jiraops.jiraops_client import JiraOpsClient
 from bietlejuice.services.dataset_service import DatasetService
 
 logger = QuintoAndarLogger("JiraOpsCallback")
-safe_execute_logger = logging.getLogger(__name__)
-
-
-def _safe_execute(method: Callable[..., Any]) -> Callable[..., Optional[Any]]:
-    """Decorator that executes a method safely, logging and swallowing exceptions."""
-
-    @wraps(method)
-    def wrapper(self, *args, **kwargs) -> Optional[Any]:
-        try:
-            return method(self, *args, **kwargs)
-        except Exception as err:
-            exc_type, exc_value, exc_tb = sys.exc_info()
-            traceback_str = "".join(
-                traceback.format_exception(exc_type, exc_value, exc_tb)
-            )
-            safe_execute_logger.warning(
-                f"DAG {self._current_dag_id}: Couldn't {method.__name__}. "
-                f"Complete traceback: {traceback_str} "
-                f"Exception: {err}"
-            )
-            return None
-
-    return wrapper
 
 
 class JiraOpsCallback:
@@ -51,8 +24,31 @@ class JiraOpsCallback:
         self.cluster_args = cluster_args or {}
         self.responder_team_id = self.dag_args.get("jiraops_responder_team_id")
         self._current_dag_id = None
+        self._context_enrichers: List[IncidentContextEnricher] = []
+
+    def add_context_enricher(
+        self, enricher: IncidentContextEnricher
+    ) -> "JiraOpsCallback":
+        """Add an enricher to run when building the alert payload. Returns self for chaining."""
+        if isinstance(enricher, IncidentContextEnricher):
+            self._context_enrichers.append(enricher)
+        return self
 
     def _enrich_alert(self, context, extra_properties: dict, description: str):
+        for enricher in self._context_enrichers:
+            try:
+                extra_properties, description = enricher.enrich(
+                    context, extra_properties, description
+                )
+            except Exception as err:
+                exc_type, exc_value, exc_tb = sys.exc_info()
+                traceback_str = "".join(
+                    traceback.format_exception(exc_type, exc_value, exc_tb)
+                )
+                logger.warning(
+                    f"DAG {self._current_dag_id}: Enricher {type(enricher).__name__} failed. "
+                    f"Traceback: {traceback_str} Exception: {err}"
+                )
         return extra_properties, description
 
     def _create_alert(self, context, alert_type: str, include_task_id: bool = True):
@@ -140,33 +136,3 @@ class JiraOpsCallback:
     def dag_failure_alert(self, context):
         """Create an alert when DAG fails."""
         self._create_alert(context, alert_type="dag", include_task_id=False)
-
-
-class JiraOpsDatabricksCallback(JiraOpsCallback):
-    """JiraOps callback enriched with Databricks run error and log context."""
-
-    def __init__(self, dag_args=None, cluster_args=None):
-        super().__init__(dag_args=dag_args, cluster_args=cluster_args)
-        self.databricks_conn_id = self.cluster_args.get(
-            "databricks_conn_id", "databricks_default"
-        )
-
-    @_safe_execute
-    def _retrieve_databricks_context(self, context):
-        service = DatabricksMetadataService.from_airflow_context(
-            context, self.databricks_conn_id
-        )
-        return service.get_databricks_incident_context()
-
-    def _enrich_alert(self, context, extra_properties: dict, description: str):
-        databricks_context = self._retrieve_databricks_context(context)
-        if databricks_context:
-            extra_properties["DatabricksError"] = databricks_context.exception
-            extra_properties["DatabricksRunURL"] = databricks_context.databricks_run_url
-            extra_properties["ClusterLogLocation"] = databricks_context.log_destination
-            description += f"\nError: {databricks_context.exception}"
-            if databricks_context.databricks_run_url:
-                description += f"\nRun URL: {databricks_context.databricks_run_url}"
-            if databricks_context.log_destination:
-                description += f"\nCluster Logs: {databricks_context.log_destination}"
-        return extra_properties, description

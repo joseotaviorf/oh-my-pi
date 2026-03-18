@@ -5,10 +5,10 @@ from airflow.utils.context import Context
 from databricks_plugin.hooks.databricks_hook import QuintoAndarDatabricksHook
 from pydantic import BaseModel
 
-from bietlejuice.base.incident_context.databricks.databricks_cluster_log_service import (
+from bietlejuice.base.incident_context_enrichers.databricks.databricks_cluster_log_service import (
     DatabricksClusterLogService,
 )
-from bietlejuice.base.incident_context.databricks.databricks_run_error_service import (
+from bietlejuice.base.incident_context_enrichers.databricks.databricks_run_error_service import (
     DEFAULT_ERROR_MESSAGE,
     DatabricksRunErrorService,
 )

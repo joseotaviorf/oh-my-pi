@@ -14,7 +14,10 @@ from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
-from bietlejuice.base.jiraops.jiraops_callback import JiraOpsDatabricksCallback
+from bietlejuice.base.incident_context_enrichers.databricks.databricks_enricher import (
+    DatabricksIncidentContextEnricher,
+)
+from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 
 
 # ENV setup
@@ -76,19 +79,23 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 DAG_OWNER = DAGOwnerEnum.DATA_SS
-jiraops_callback = JiraOpsDatabricksCallback(
-    dag_args={
-        "name": DAG_NAME,
-        "schedule_start_date": MAIN_START_DATE,
-        "schedule_interval": MAIN_SCHEDULE_INTERVAL,
-        "owner": DAG_OWNER,
-        "documentation": dag_documentation,
-    },
-    cluster_args={
-        "type": cluster_type,
-        "databricks_conn_id": "databricks_new",
-        "custom_configurations": cluster_description,
-    },
+jiraops_callback = (
+    JiraOpsCallback(
+        dag_args={
+            "name": DAG_NAME,
+            "schedule_start_date": MAIN_START_DATE,
+            "schedule_interval": MAIN_SCHEDULE_INTERVAL,
+            "owner": DAG_OWNER,
+            "documentation": dag_documentation,
+        },
+        cluster_args={
+            "type": cluster_type,
+            "custom_configurations": cluster_description,
+        },
+    )
+)
+jiraops_callback.add_context_enricher(
+    DatabricksIncidentContextEnricher(databricks_conn_id="databricks_new")
 )
 dag = DAG(
     dag_id=DAG_ID,

@@ -4,6 +4,7 @@ import datetime
 import pendulum
 from unittest.mock import patch, MagicMock
 from bietlejuice.base.airflow.enums.dag_run_type_enum import DagRunTypeEnum
+from bietlejuice.base.incident_context_enrichers.enricher import IncidentContextEnricher
 
 FAKE_TIME = datetime.datetime(2025, 5, 5, 12, 0, 0)
 
@@ -52,6 +53,29 @@ def mock_jiraops_client():
         mock_client_instance.create_alert.return_value = mock_response
         mock_client_class.return_value = mock_client_instance
         yield mock_client_class, mock_client_instance
+
+
+class DummyEnricher(IncidentContextEnricher):
+    """Dummy enricher for tests: adds DummyKey to extra_properties and suffix to description."""
+
+    def enrich(self, context, extra_properties, description):
+        extra_properties = dict(extra_properties)
+        extra_properties["DummyKey"] = "dummy_value"
+        return extra_properties, description + "\n[Dummy enricher]"
+
+
+class DatabricksStyleDummyEnricher(IncidentContextEnricher):
+    """Dummy enricher that adds Databricks-like keys for tests."""
+
+    def enrich(self, context, extra_properties, description):
+        extra_properties = dict(extra_properties)
+        extra_properties["DatabricksError"] = "SparkException: OOM"
+        extra_properties["DatabricksRunURL"] = "https://dbc/runs/123"
+        extra_properties["ClusterLogLocation"] = "s3://logs/cluster-abc"
+        description += "\nError: SparkException: OOM"
+        description += "\nRun URL: https://dbc/runs/123"
+        description += "\nCluster Logs: s3://logs/cluster-abc"
+        return extra_properties, description
 
 
 def mock_context():
@@ -135,7 +159,7 @@ def jiraops_callback_with_config(mock_airflow_variables, patch_datetime_now):
 
 @pytest.fixture
 def jiraops_databricks_callback(mock_airflow_variables, patch_datetime_now):
-    """Patch Variable and datetime at use-site so we never invoke real Airflow."""
+    """Callback with Databricks-style enricher for tests."""
 
     class fake_datetime(datetime.datetime):
         @classmethod
@@ -149,9 +173,9 @@ def jiraops_databricks_callback(mock_airflow_variables, patch_datetime_now):
         "bietlejuice.base.jiraops.jiraops_callback.datetime",
         fake_datetime,
     ):
-        from bietlejuice.base.jiraops.jiraops_callback import JiraOpsDatabricksCallback
+        from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 
-        yield JiraOpsDatabricksCallback()
+        yield JiraOpsCallback().add_context_enricher(DatabricksStyleDummyEnricher())
 
 
 @patch("bietlejuice.services.dataset_service.DatasetService._get_run_type")
@@ -258,17 +282,7 @@ def test_alert_includes_databricks_context_when_available(
     mock_client_class, mock_client_instance = mock_jiraops_client
     context = mock_context()
 
-    mock_databricks_context = MagicMock()
-    mock_databricks_context.exception = "SparkException: OOM"
-    mock_databricks_context.databricks_run_url = "https://dbc/runs/123"
-    mock_databricks_context.log_destination = "s3://logs/cluster-abc"
-
-    with patch.object(
-        jiraops_databricks_callback,
-        "_retrieve_databricks_context",
-        return_value=mock_databricks_context,
-    ):
-        jiraops_databricks_callback.task_failure_alert(context)
+    jiraops_databricks_callback.task_failure_alert(context)
 
     _, kwargs = mock_client_instance.create_alert.call_args
     assert kwargs["extra_properties"]["DatabricksError"] == "SparkException: OOM"
@@ -290,10 +304,11 @@ def test_alert_sent_without_enrichment_when_databricks_context_fails(
     mock_client_class, mock_client_instance = mock_jiraops_client
     context = mock_context()
 
+    enricher = jiraops_databricks_callback._context_enrichers[0]
     with patch.object(
-        jiraops_databricks_callback,
-        "_retrieve_databricks_context",
-        return_value=None,
+        enricher,
+        "enrich",
+        side_effect=lambda c, e, d: (e, d),
     ):
         jiraops_databricks_callback.task_failure_alert(context)
 
@@ -336,3 +351,132 @@ def test_default_responder_team_id_is_none_when_no_dag_args(
 
     _, kwargs = mock_client_instance.create_alert.call_args
     assert kwargs["responder_team_id"] is None
+
+
+@patch("bietlejuice.services.dataset_service.DatasetService._get_run_type")
+def test_alert_includes_dummy_enricher_context_when_enricher_added(
+    mock_get_run_type,
+    mock_airflow_variables,
+    mock_jiraops_client,
+    jiraops_callback,
+):
+    mock_get_run_type.return_value = DagRunTypeEnum.IMPACT_DOWNSTREAM_DEPENDENTS
+    mock_client_class, mock_client_instance = mock_jiraops_client
+    context = mock_context()
+
+    jiraops_callback.add_context_enricher(DummyEnricher()).task_failure_alert(context)
+
+    mock_client_instance.create_alert.assert_called_once()
+    _, kwargs = mock_client_instance.create_alert.call_args
+    assert kwargs["extra_properties"]["DummyKey"] == "dummy_value"
+    assert "[Dummy enricher]" in kwargs["description"]
+
+
+@patch("bietlejuice.services.dataset_service.DatasetService._get_run_type")
+def test_add_context_enricher_returns_self_for_chaining(
+    mock_get_run_type,
+    mock_airflow_variables,
+    mock_jiraops_client,
+    jiraops_callback,
+):
+    result = jiraops_callback.add_context_enricher(DummyEnricher())
+    assert result is jiraops_callback
+    result.add_context_enricher(DummyEnricher())
+    assert len(jiraops_callback._context_enrichers) == 2
+
+
+@patch("bietlejuice.services.dataset_service.DatasetService._get_run_type")
+def test_enricher_that_raises_does_not_break_alert(
+    mock_get_run_type,
+    mock_airflow_variables,
+    mock_jiraops_client,
+    jiraops_callback,
+):
+    class FailingEnricher(IncidentContextEnricher):
+        def enrich(self, context, extra_properties, description):
+            raise ValueError("enricher failed")
+
+    mock_get_run_type.return_value = DagRunTypeEnum.IMPACT_DOWNSTREAM_DEPENDENTS
+    mock_client_class, mock_client_instance = mock_jiraops_client
+    context = mock_context()
+
+    jiraops_callback.add_context_enricher(FailingEnricher()).task_failure_alert(context)
+
+    mock_client_instance.create_alert.assert_called_once()
+    _, kwargs = mock_client_instance.create_alert.call_args
+    assert "DAG" in kwargs["extra_properties"]
+    assert "Task" in kwargs["extra_properties"]
+    assert "DummyKey" not in kwargs["extra_properties"]
+
+
+@patch("bietlejuice.services.dataset_service.DatasetService._get_run_type")
+def test_dag_failure_alert_creates_alert_without_task_id(
+    mock_get_run_type,
+    mock_airflow_variables,
+    mock_jiraops_client,
+    jiraops_callback,
+):
+    """DAG-level failure alert has no task_id in message, tags, or extra_properties."""
+    mock_get_run_type.return_value = DagRunTypeEnum.IMPACT_DOWNSTREAM_DEPENDENTS
+    mock_client_class, mock_client_instance = mock_jiraops_client
+    context = mock_context()
+
+    jiraops_callback.dag_failure_alert(context)
+
+    mock_client_instance.create_alert.assert_called_once()
+    _, kwargs = mock_client_instance.create_alert.call_args
+    assert kwargs["message"] == "DAG: test_dag Failed"
+    assert "test_task" not in kwargs["message"]
+    assert kwargs["tags"] == ["test_dag", "dag failed"]
+    assert "Task" not in kwargs["extra_properties"]
+    assert kwargs["extra_properties"]["DAG"] == "test_dag"
+
+
+def test_add_context_enricher_ignores_non_enricher(jiraops_callback):
+    """Passing a non-IncidentContextEnricher does not add it to _context_enrichers."""
+    result = jiraops_callback.add_context_enricher("not an enricher")
+    assert result is jiraops_callback
+    assert len(jiraops_callback._context_enrichers) == 0
+
+    result = jiraops_callback.add_context_enricher(None)
+    assert len(jiraops_callback._context_enrichers) == 0
+
+
+@patch("bietlejuice.services.dataset_service.DatasetService._get_run_type")
+def test_multiple_enrichers_run_in_order_and_chain_output(
+    mock_get_run_type,
+    mock_airflow_variables,
+    mock_jiraops_client,
+    jiraops_callback,
+):
+    """Enrichers run in order; second enricher receives first enricher's output."""
+
+    class FirstEnricher(IncidentContextEnricher):
+        def enrich(self, context, extra_properties, description):
+            extra_properties = dict(extra_properties)
+            extra_properties["First"] = "1"
+            return extra_properties, description + "\nFirst"
+
+    class SecondEnricher(IncidentContextEnricher):
+        def enrich(self, context, extra_properties, description):
+            extra_properties = dict(extra_properties)
+            assert (
+                "First" in extra_properties
+            ), "Second enricher should see First enricher output"
+            extra_properties["Second"] = "2"
+            return extra_properties, description + "\nSecond"
+
+    mock_get_run_type.return_value = DagRunTypeEnum.IMPACT_DOWNSTREAM_DEPENDENTS
+    mock_client_class, mock_client_instance = mock_jiraops_client
+    context = mock_context()
+
+    jiraops_callback.add_context_enricher(FirstEnricher()).add_context_enricher(
+        SecondEnricher()
+    ).task_failure_alert(context)
+
+    mock_client_instance.create_alert.assert_called_once()
+    _, kwargs = mock_client_instance.create_alert.call_args
+    assert kwargs["extra_properties"]["First"] == "1"
+    assert kwargs["extra_properties"]["Second"] == "2"
+    assert "\nFirst" in kwargs["description"]
+    assert "\nSecond" in kwargs["description"]

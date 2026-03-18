@@ -3,11 +3,11 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from bietlejuice.base.incident_context.databricks.databricks_metadata_service import (
+from bietlejuice.base.incident_context_enrichers.databricks.databricks_metadata_service import (
     DatabricksIncidentContext,
     DatabricksMetadataService,
 )
-from bietlejuice.base.incident_context.databricks.databricks_run_error_service import (
+from bietlejuice.base.incident_context_enrichers.databricks.databricks_run_error_service import (
     DEFAULT_ERROR_MESSAGE,
 )
 
@@ -52,7 +52,7 @@ class TestExtractRunIdFromUrl:
 
 class TestFromAirflowContext:
     @patch(
-        "bietlejuice.base.incident_context.databricks.databricks_metadata_service.QuintoAndarDatabricksHook"
+        "bietlejuice.base.incident_context_enrichers.databricks.databricks_metadata_service.QuintoAndarDatabricksHook"
     )
     def test_creates_service_from_context(self, mock_hook_cls):
         context = {
@@ -79,13 +79,13 @@ class TestFromAirflowContext:
 
 class TestGetDatabricksIncidentContext:
     @patch(
-        "bietlejuice.base.incident_context.databricks.databricks_metadata_service.QuintoAndarDatabricksHook"
+        "bietlejuice.base.incident_context_enrichers.databricks.databricks_metadata_service.QuintoAndarDatabricksHook"
     )
     @patch(
-        "bietlejuice.base.incident_context.databricks.databricks_metadata_service.DatabricksClusterLogService"
+        "bietlejuice.base.incident_context_enrichers.databricks.databricks_metadata_service.DatabricksClusterLogService"
     )
     @patch(
-        "bietlejuice.base.incident_context.databricks.databricks_metadata_service.DatabricksRunErrorService"
+        "bietlejuice.base.incident_context_enrichers.databricks.databricks_metadata_service.DatabricksRunErrorService"
     )
     def test_returns_full_context(self, mock_error_cls, mock_log_cls, mock_hook_cls):
         mock_hook = mock_hook_cls.return_value

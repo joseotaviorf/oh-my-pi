@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock
 
-from bietlejuice.base.incident_context.databricks.databricks_cluster_log_service import (
+from bietlejuice.base.incident_context_enrichers.databricks.databricks_cluster_log_service import (
     DatabricksClusterLogService,
 )
 

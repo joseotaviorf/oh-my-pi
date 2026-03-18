@@ -21,6 +21,9 @@ from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
+from bietlejuice.base.incident_context_enrichers.databricks.databricks_enricher import (
+    DatabricksIncidentContextEnricher,
+)
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -73,6 +76,13 @@ class BaseWorkflow(BuilderInterface):
             dag_args=self.dag_args,
             cluster_args=self.cluster_args,
         )
+
+        jiraops_callback.add_context_enricher(
+            DatabricksIncidentContextEnricher(
+                databricks_conn_id=self.cluster_args.get("databricks_conn_id")
+            )
+        )
+
         callback_by_task = self.dag_args.get("callback_by_task", True)
 
         dag = DAG(
