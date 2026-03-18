@@ -1,0 +1,59 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: sales_flow_relation
+domain: For Sale
+owner: vitor.musachio@quintoandar.com.br
+description: |
+  Associates a sales_flow to an external entity (company or agent) with a given role (related_as).
+  Used for listing owner, visit agent, demand owner, property consultant, etc.
+  One-to-one per sales_flow (sales_flow_id is unique). Source of the related entity is indicated by source_type.
+columns:
+  id:
+    description: Primary key of the sales_flow_relation record.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation.id
+  id_sales_flow:
+    description: Foreign key to the sales_flow table. Unique; each sales_flow has at most one relation record.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation.sales_flow_id
+  id_related:
+    description: External identifier of the related entity (company or agent ID according to source_type).
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation.related_id
+  source_type:
+    description: Type of the related entity reference (company or agent).
+    categories:
+      COMPANY_REF: Reference to a company.
+      AGENT_REF: Reference to an agent.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation.source_type
+  related_as:
+    description: Role of the related entity in the sales flow.
+    categories:
+      LISTING_OWNER: Owner of the listing.
+      AUTONOMOUS_AGENT: Autonomous agent.
+      VISIT_AGENT_REAL_STATE: Visit agent (real estate).
+      DEMAND_OWNER: Owner of the demand.
+      PROPERTY_CONSULTANT: Property consultant.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation.related_as
+  ts_created:
+    description: Timestamp when the relation was created.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation.created_at
+  ts_updated:
+    description: Timestamp when the relation was last updated.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation.updated_at
+  year:
+    description: Year partition value.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation.year
+  month:
+    description: Month partition value.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation.month
+  day:
+    description: Day partition value.
+    lineage:
+      - datalake_sales_flow_raw.sales_flow_relation.day

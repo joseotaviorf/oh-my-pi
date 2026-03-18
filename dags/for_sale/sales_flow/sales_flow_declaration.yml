@@ -342,6 +342,10 @@ workflow:
       clean_table_name: sales_flow_users_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
+    sales_flow_relation:
+      clean_table_name: sales_flow_relation
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
     screening:
       clean_table_name: screening
       raw_primary_keys: ["id"]
