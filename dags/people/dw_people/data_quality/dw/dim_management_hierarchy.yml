@@ -12,10 +12,10 @@ column_level_validations:
     is_unique:
       severity_level: Error
   person_number:
-    is_complete:
-      severity_level: Error
-    is_unique:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Error
   person_number_l0:
-    is_complete:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Error

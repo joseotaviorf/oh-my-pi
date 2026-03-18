@@ -51,7 +51,9 @@ column_level_validations:
     is_complete:
       severity_level: Warning
   full_name:
-    is_complete:
+    # 1 known null case (person_number 137786)
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Warning
   display_name:
     is_complete:

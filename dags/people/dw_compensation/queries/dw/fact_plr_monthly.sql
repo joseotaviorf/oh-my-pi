@@ -397,3 +397,5 @@ SELECT
     NOW() AS ts_load
 FROM
     base_calculations
+WHERE
+    sk_reference_month IS NOT NULL

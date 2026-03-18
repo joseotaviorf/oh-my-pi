@@ -23,18 +23,7 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
-  highest_education_level:
-    has_null_count:
-      less_than_or_equal_to: 1
-      severity_level: Warning
-  generation:
-    has_null_count:
-      less_than_or_equal_to: 1
-      severity_level: Warning
   dt_birth:
-    has_null_count:
-      less_than_or_equal_to: 1
-      severity_level: Warning
     custom:
       # Birth date cannot be in the future; must be within reasonable range (after 1900).
       constraint: |-

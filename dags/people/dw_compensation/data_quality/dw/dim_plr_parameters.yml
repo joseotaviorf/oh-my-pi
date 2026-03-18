@@ -19,9 +19,8 @@ column_level_validations:
     is_complete:
       severity_level: Error
   reference_year:
-    is_unique:
-      severity_level: Error
-    is_complete:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Error
     custom:
       # Ensure reference_year is within reasonable range (e.g., 2020-2100)

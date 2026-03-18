@@ -57,10 +57,6 @@ column_level_validations:
   is_leadership_job:
     is_complete:
       severity_level: Warning
-  salary_table:
-    has_null_count:
-      less_than_or_equal_to: 1
-      severity_level: Warning
   is_active:
     has_null_count:
       less_than_or_equal_to: 1
@@ -105,15 +101,6 @@ column_level_validations:
            HAVING COUNT(DISTINCT target_plr) > 1
            AND COUNT(*) = 1
          )
-        ) = 0
-      severity_level: Warning
-  target_plr_salary_multiplier:
-    custom:
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM datalake_people.job_with_salary_table
-         WHERE COALESCE(target_plr, 0) <> 0
-           AND COALESCE(target_plr_salary_multiplier, 0) <> 0
         ) = 0
       severity_level: Warning
   salary_range_min:

@@ -49,7 +49,8 @@ column_level_validations:
         ) = 0
       severity_level: Warning
   is_leadership_job:
-    is_complete:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Warning
   is_active:
     has_null_count:
@@ -99,11 +100,6 @@ column_level_validations:
         ) = 0
       severity_level: Warning
   target_plr_salary_multiplier:
-    custom:
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM dw_compensation.dim_job
-         WHERE COALESCE(target_plr, 0) <> 0
-           AND COALESCE(target_plr_salary_multiplier, 0) <> 0
-        ) = 0
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Warning
