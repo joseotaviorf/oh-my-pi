@@ -1,7 +1,8 @@
 import json
 import logging
+import time
 from datetime import date, datetime, timedelta
-from typing import List, Dict, Any, Optional, Generator, Tuple
+from typing import List, Dict, Any, Optional, Generator, Tuple, Callable
 
 from pyspark.sql import SparkSession
 
@@ -16,12 +17,14 @@ from bietlejuice.base.api.api_enum import APIEnum
 
 LOGGER = logging.getLogger(__name__)
 
+PIT_ID_EXPIRATION_PATTERNS = ("Pit_Id", "pit_id", "expired")
+MAX_PIT_RESUME_ATTEMPTS = 10
+WRITE_BATCH_SIZE = 5000
+
 API_BASE_URL = "https://auditlog.us.greenhouse.io/"
-JWT_TOKEN_URL = "https://harvest.greenhouse.io/auth/jwt_access_token"
+OAUTH_TOKEN_URL = "https://auth.greenhouse.io/token"
 DATABRICKS_SCOPE = "PEOPLE"
-API_KEY_FIELD = "api_key"
-TOKEN_EXPIRATION_SECONDS = 60 * 60 * 24  # JWT token valid for 24 hours
-TOKEN_EXPIRES_FIELD = "expires"
+TOKEN_EXPIRATION_SECONDS = 60 * 60 * 24  # OAuth token valid for 24 hours
 
 PAGE_SIZE = 500
 PAGINATION_RATE_LIMIT_DELAY = 10.5  # Seconds between pages (3 requests per 30s limit)
@@ -153,20 +156,22 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
 
         Sets up:
         - JWT token-based authentication via Basic Auth OAuth2 flow
-        - Token URL: https://harvest.greenhouse.io/auth/jwt_access_token
-        - Token expiration: 24 hours (86400 seconds)
+        - Token URL: https://auth.greenhouse.io/token (Harvest V3 OAuth)
+        - Scope: harvest (required by Greenhouse)
+        - Token expiration: from expires_at in response
         - Accept header: application/json
 
-        The API key is retrieved from Databricks Secrets (PEOPLE scope)
-        and used as both client_id and client_secret.
+        Credentials (client_id, client_secret) are retrieved from Databricks
+        Secrets (PEOPLE scope, GREENHOUSE_AUDIT_LOG_API key).
         """
         auth_handler = BasicAuthOAuth2ClientCredentials(
             databricks_scope=DATABRICKS_SCOPE,
-            secret_key=APIEnum.GREENHOUSE,
-            token_url=JWT_TOKEN_URL,
-            client_id_field=API_KEY_FIELD,
-            client_secret_field=API_KEY_FIELD,
-            expires_at_field=TOKEN_EXPIRES_FIELD,
+            secret_key=APIEnum.GREENHOUSE_AUDIT_LOG,
+            token_url=OAUTH_TOKEN_URL,
+            client_id_field="client_id",
+            client_secret_field="client_secret",
+            token_payload_extras={"scope": "harvest"},
+            expires_at_field="expires_at",
             fallback_token_expiration_seconds=TOKEN_EXPIRATION_SECONDS,
         )
         auth_handler.apply_auth(self.session)
@@ -243,6 +248,132 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
 
         return state
 
+    def _is_pit_id_expired(self, error: Exception) -> bool:
+        """
+        Checks if the error indicates Pit_Id expiration.
+
+        Per Greenhouse docs, when Pit_Id expires the API returns:
+        "The Pit_Id has expired. Remove it from the subsequent search."
+        """
+        error_str = str(error)
+        return any(pattern in error_str for pattern in PIT_ID_EXPIRATION_PATTERNS)
+
+    def _get_max_event_time(self, results: List[Dict[str, Any]]) -> Optional[str]:
+        """
+        Extracts the maximum event_time from results for resume.
+
+        Returns ISO-8601 formatted string for after_time parameter.
+        """
+        event_times = [
+            r.get("event_time")
+            for r in results
+            if r.get("event_time") is not None
+        ]
+        if not event_times:
+            return None
+        return max(event_times)
+
+    def fetch_pages_with_resume(
+        self,
+        on_page: Callable[[List[Dict[str, Any]]], None],
+        on_before_resume: Optional[Callable[[], None]] = None,
+    ) -> Tuple[int, int]:
+        """
+        Fetches all pages with Pit_Id resume per Greenhouse documentation.
+
+        When Pit_Id expires, starts a new request with after_time set to the
+        last event's event_time to avoid duplicates. Writes to S3 incrementally
+        via on_page callback so progress is persisted before expiration.
+
+        Args:
+            on_page: Callback invoked for each page of results (for streaming write).
+            on_before_resume: Optional callback invoked before resuming with new
+                after_time. Use to flush any unwritten buffered data.
+
+        Returns:
+            Tuple of (total_records_fetched, pit_id_resume_count).
+        """
+        if not self.endpoint:
+            raise ValueError(
+                "API endpoint (table_name) is not defined in the job arguments."
+            )
+
+        params = self.params.copy()
+        total_records = 0
+        resume_attempt = 0
+
+        while resume_attempt < MAX_PIT_RESUME_ATTEMPTS:
+            paginator = CursorPaginator(
+                client=self,
+                endpoint=self.endpoint,
+                initial_params=params,
+                cursor_param="Search-After",
+                cursor_location="header",
+                cursor_response_path="paging.next_search_after",
+                context_param="Pit-Id",
+                context_location="header",
+                context_response_path="paging.pit_id",
+                page_size_param="Size",
+                page_size_location="header",
+                page_size=PAGE_SIZE,
+                extract_results=lambda data: data.get("results", []),
+                extract_pagination_state=self._extract_pagination_state,
+                page_delay=PAGINATION_RATE_LIMIT_DELAY,
+                retry_on_context_expiration=False,
+            )
+
+            batch_for_resume: List[Dict[str, Any]] = []
+
+            try:
+                for page_results in paginator.fetch_all():
+                    batch_for_resume.extend(page_results)
+                    total_records += len(page_results)
+                    on_page(page_results)
+
+                LOGGER.info(
+                    "Pagination complete for '%s'. Fetched %d total records.",
+                    self.endpoint,
+                    total_records,
+                )
+                return total_records, resume_attempt
+
+            except Exception as e:
+                if not self._is_pit_id_expired(e):
+                    raise
+
+                if not batch_for_resume:
+                    LOGGER.error(
+                        "Pit_Id expired before any records were fetched. Cannot resume."
+                    )
+                    raise
+
+                if on_before_resume:
+                    on_before_resume()
+
+                last_event_time = self._get_max_event_time(batch_for_resume)
+                if not last_event_time:
+                    LOGGER.error(
+                        "Pit_Id expired but no event_time found in results. Cannot resume."
+                    )
+                    raise
+
+                resume_attempt += 1
+                params["after_time"] = last_event_time
+
+                LOGGER.warning(
+                    "Pit_Id expired. Resuming with after_time=%s (attempt %d/%d). "
+                    "Records fetched so far: %d",
+                    last_event_time,
+                    resume_attempt,
+                    MAX_PIT_RESUME_ATTEMPTS,
+                    total_records,
+                )
+
+        raise RuntimeError(
+            f"Pit_Id expired after {MAX_PIT_RESUME_ATTEMPTS} resume attempts. "
+            f"Total records fetched: {total_records}"
+        )
+
     def get_all_paginated_results(self) -> List[Dict[str, Any]]:
         """
         Fetches all paginated results from the Greenhouse Audit Log API.
@@ -305,8 +436,34 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
         return all_results
 
 
+def _log_window_metrics(
+    table_name: str,
+    load_start: str,
+    load_end: str,
+    records_loaded: int,
+    pit_id_resume_count: int,
+    elapsed_seconds: float,
+) -> None:
+    """Logs observability metrics for a single window."""
+    LOGGER.info(
+        "GreenhouseAuditLog window metrics: table=%s, load_start=%s, load_end=%s, "
+        "records_loaded=%d, pit_id_resume_count=%d, elapsed_seconds=%.2f",
+        table_name,
+        load_start,
+        load_end,
+        records_loaded,
+        pit_id_resume_count,
+        elapsed_seconds,
+        extra={
+            "greenhouse_audit_log_records_loaded": records_loaded,
+            "greenhouse_audit_log_pit_id_resume_count": pit_id_resume_count,
+            "greenhouse_audit_log_elapsed_seconds": round(elapsed_seconds, 2),
+        },
+    )
+
+
 def get_time_windows(
-    start_iso: str, end_iso: str, window_hours: int
+    start_iso: str, end_iso: str, window_hours: float
 ) -> Generator[Tuple[str, str], None, None]:
     """
     Yields (load_start, load_end) ISO strings for each N-hour window.
@@ -350,21 +507,15 @@ def _run_load_for_window(
     """
     Fetches data for a single time window and loads to raw layer.
 
+    Uses fetch_pages_with_resume for Pit_Id expiration handling per Greenhouse
+    docs: when Pit_Id expires, resumes with after_time=last event_time.
+    Writes to S3 incrementally so progress is persisted before expiration.
+
     Returns:
         Number of records loaded.
     """
     window_args = {**job_args, "load_start_date": load_start, "load_end_date": load_end}
     api_client = GreenhouseAuditLogAPI(window_args)
-    api_data_list = api_client.get_all_paginated_results()
-
-    if not api_data_list:
-        return 0
-
-    df = json_to_dataframe(spark, api_data_list, raw_column_name="raw_payload")
-    date_column_to_partition = job_args.get(
-        "date_column_to_partition", DEFAULT_PARTITION_COLUMN
-    )
-    df = insert_partitions(df, date_column_to_partition)
 
     raw_loader = RawLayerLoader(
         spark_client=spark_client,
@@ -375,8 +526,43 @@ def _run_load_for_window(
         partition_cols=job_args["partition_cols"],
         extraction_type=job_args["extraction_type"],
     )
-    raw_loader.load_to_raw(df)
-    return len(api_data_list)
+    date_column_to_partition = job_args.get(
+        "date_column_to_partition", DEFAULT_PARTITION_COLUMN
+    )
+
+    batch: List[Dict[str, Any]] = []
+
+    def write_batch_to_s3() -> None:
+        if not batch:
+            return
+        df = json_to_dataframe(spark, batch, raw_column_name="raw_payload")
+        df = insert_partitions(df, date_column_to_partition)
+        raw_loader.load_to_raw(df)
+        batch.clear()
+
+    def on_page(page_results: List[Dict[str, Any]]) -> None:
+        batch.extend(page_results)
+        if len(batch) >= WRITE_BATCH_SIZE:
+            write_batch_to_s3()
+
+    window_start_time = time.time()
+    total_records, pit_id_resume_count = api_client.fetch_pages_with_resume(
+        on_page=on_page,
+        on_before_resume=write_batch_to_s3,
+    )
+    write_batch_to_s3()
+    elapsed_seconds = time.time() - window_start_time
+
+    _log_window_metrics(
+        table_name=job_args["table_name"],
+        load_start=load_start,
+        load_end=load_end,
+        records_loaded=total_records,
+        pit_id_resume_count=pit_id_resume_count,
+        elapsed_seconds=elapsed_seconds,
+    )
+
+    return total_records, pit_id_resume_count
 
 
 def _format_date_for_display(value: Any) -> str:
@@ -384,6 +570,31 @@ def _format_date_for_display(value: Any) -> str:
     if isinstance(value, datetime):
         return value.strftime(GREENHOUSE_API_DATE_FORMAT)
     return str(value)
+
+
+def _log_execution_metrics(
+    table_name: str,
+    total_records: int,
+    total_pit_id_resumes: int,
+    total_windows: int,
+    elapsed_seconds: float,
+) -> None:
+    """Logs final observability metrics for the full job execution."""
+    LOGGER.info(
+        "GreenhouseAuditLog execution metrics: table=%s, total_records=%d, "
+        "total_pit_id_resumes=%d, total_windows=%d, total_elapsed_seconds=%.2f",
+        table_name,
+        total_records,
+        total_pit_id_resumes,
+        total_windows,
+        elapsed_seconds,
+        extra={
+            "greenhouse_audit_log_total_records": total_records,
+            "greenhouse_audit_log_total_pit_id_resumes": total_pit_id_resumes,
+            "greenhouse_audit_log_total_windows": total_windows,
+            "greenhouse_audit_log_total_elapsed_seconds": round(elapsed_seconds, 2),
+        },
+    )
 
 
 def main():
@@ -411,6 +622,7 @@ def main():
         Exception: If any error occurs during the ingestion process.
     """
     try:
+        job_start_time = time.time()
         job_args = BaseJobArgumentParser.parse_args()
         LOGGER.info(
             "Running Greenhouse Audit Log job with the following arguments: %s",
@@ -425,9 +637,12 @@ def main():
         backfill_window_hours = job_args.get("backfill_window_hours") or 0
         if isinstance(backfill_window_hours, str):
             try:
-                backfill_window_hours = int(backfill_window_hours)
+                backfill_window_hours = float(backfill_window_hours)
             except ValueError:
                 backfill_window_hours = 0
+
+        total_records = 0
+        total_pit_id_resumes = 0
 
         if backfill_window_hours > 0:
             windows = list(
@@ -435,14 +650,13 @@ def main():
             )
             total_windows = len(windows)
             LOGGER.info(
-                "Splitting interval into %d-hour windows: %s to %s -> %d windows",
+                "Splitting interval into %.1f-hour windows: %s to %s -> %d windows",
                 backfill_window_hours,
                 _format_date_for_display(load_start),
                 _format_date_for_display(load_end),
                 total_windows,
             )
 
-            total_records = 0
             for i, (window_start, window_end) in enumerate(windows, start=1):
                 LOGGER.info(
                     "Processing window %d/%d: %s to %s",
@@ -451,17 +665,27 @@ def main():
                     window_start,
                     window_end,
                 )
-                records = _run_load_for_window(
+                records, pit_resumes = _run_load_for_window(
                     spark, spark_client, job_args, window_start, window_end
                 )
                 total_records += records
+                total_pit_id_resumes += pit_resumes
                 LOGGER.info(
-                    "Completed window %d/%d (%d records)",
+                    "Completed window %d/%d (%d records, %d Pit_Id resumes)",
                     i,
                     total_windows,
                     records,
+                    pit_resumes,
                 )
 
+            elapsed_seconds = time.time() - job_start_time
+            _log_execution_metrics(
+                table_name=job_args.get("table_name"),
+                total_records=total_records,
+                total_pit_id_resumes=total_pit_id_resumes,
+                total_windows=total_windows,
+                elapsed_seconds=elapsed_seconds,
+            )
             LOGGER.info(
                 "Finished processing all %d windows. Total records loaded: %d",
                 total_windows,
@@ -473,8 +697,18 @@ def main():
             )
             load_end_str = _format_for_greenhouse_api(load_end, DEFAULT_END_TIME)
             LOGGER.info("Fetching data for table: %s", job_args.get("table_name"))
-            records = _run_load_for_window(
+            records, pit_resumes = _run_load_for_window(
                 spark, spark_client, job_args, load_start_str, load_end_str
+            )
+            total_records = records
+            total_pit_id_resumes = pit_resumes
+            elapsed_seconds = time.time() - job_start_time
+            _log_execution_metrics(
+                table_name=job_args.get("table_name"),
+                total_records=total_records,
+                total_pit_id_resumes=total_pit_id_resumes,
+                total_windows=1,
+                elapsed_seconds=elapsed_seconds,
             )
             if records > 0:
                 LOGGER.info(

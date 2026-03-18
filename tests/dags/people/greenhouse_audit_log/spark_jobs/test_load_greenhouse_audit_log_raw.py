@@ -22,11 +22,10 @@ from dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw i
     GreenhouseAuditLogAPI,
     main,
     format_search_after_cursor,
-    JWT_TOKEN_URL,
+    OAUTH_TOKEN_URL,
     DATABRICKS_SCOPE,
-    API_KEY_FIELD,
+    APIEnum,
     TOKEN_EXPIRATION_SECONDS,
-    TOKEN_EXPIRES_FIELD,
     PAGE_SIZE,
     PAGINATION_RATE_LIMIT_DELAY,
     DEFAULT_PARTITION_COLUMN,
@@ -182,6 +181,71 @@ class TestGreenhouseAuditLogAPIExtractPaginationState(unittest.TestCase):
         self.assertEqual(state, {})
 
 
+class TestGreenhouseAuditLogAPIPitIdResume(unittest.TestCase):
+    """Tests for Pit_Id expiration and resume logic."""
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_is_pit_id_expired_detects_expiration(self, mock_process_filters, mock_auth):
+        """Test _is_pit_id_expired detects Greenhouse Pit_Id expiration error."""
+        job_args = {"endpoint": "events", "base_filters": {}}
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        error = Exception('Bad Request: {"error":"The Pit_Id has expired. Remove it from the subsequent search."}')
+        self.assertTrue(api_client._is_pit_id_expired(error))
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_is_pit_id_expired_rejects_other_errors(self, mock_process_filters, mock_auth):
+        """Test _is_pit_id_expired returns False for non-Pit_Id errors."""
+        job_args = {"endpoint": "events", "base_filters": {}}
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        self.assertFalse(api_client._is_pit_id_expired(Exception("Network error")))
+        self.assertFalse(api_client._is_pit_id_expired(Exception("401 Unauthorized")))
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_get_max_event_time_returns_max(self, mock_process_filters, mock_auth):
+        """Test _get_max_event_time returns the latest event_time."""
+        job_args = {"endpoint": "events", "base_filters": {}}
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        results = [
+            {"event_time": "2025-01-15T10:00:00Z"},
+            {"event_time": "2025-01-16T11:00:00Z"},
+            {"event_time": "2025-01-15T09:00:00Z"},
+        ]
+        self.assertEqual(
+            api_client._get_max_event_time(results), "2025-01-16T11:00:00Z"
+        )
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_get_max_event_time_ignores_none(self, mock_process_filters, mock_auth):
+        """Test _get_max_event_time ignores records without event_time."""
+        job_args = {"endpoint": "events", "base_filters": {}}
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        results = [
+            {"id": "1"},
+            {"event_time": "2025-01-15T10:00:00Z"},
+        ]
+        self.assertEqual(
+            api_client._get_max_event_time(results), "2025-01-15T10:00:00Z"
+        )
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_get_max_event_time_returns_none_for_empty(self, mock_process_filters, mock_auth):
+        """Test _get_max_event_time returns None when no event_times."""
+        job_args = {"endpoint": "events", "base_filters": {}}
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        self.assertIsNone(api_client._get_max_event_time([]))
+        self.assertIsNone(api_client._get_max_event_time([{"id": "1"}, {"id": "2"}]))
+
+
 class TestGreenhouseAuditLogAPIInit(unittest.TestCase):
     """Tests for the GreenhouseAuditLogAPI.__init__ method."""
 
@@ -283,11 +347,12 @@ class TestGreenhouseAuditLogAPIAuthentication(unittest.TestCase):
         # Verify auth handler was created with correct params
         mock_auth_class.assert_called_once_with(
             databricks_scope=DATABRICKS_SCOPE,
-            secret_key=unittest.mock.ANY,  # APIEnum.GREENHOUSE
-            token_url=JWT_TOKEN_URL,
-            client_id_field=API_KEY_FIELD,
-            client_secret_field=API_KEY_FIELD,
-            expires_at_field=TOKEN_EXPIRES_FIELD,
+            secret_key=APIEnum.GREENHOUSE_AUDIT_LOG,
+            token_url=OAUTH_TOKEN_URL,
+            client_id_field="client_id",
+            client_secret_field="client_secret",
+            token_payload_extras={"scope": "harvest"},
+            expires_at_field="expires_at",
             fallback_token_expiration_seconds=TOKEN_EXPIRATION_SECONDS,
         )
 
@@ -567,6 +632,9 @@ class TestMainFunction(unittest.TestCase):
         }
 
     @patch(
+        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw._run_load_for_window"
+    )
+    @patch(
         "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.BaseJobArgumentParser"
     )
     @patch(
@@ -575,88 +643,28 @@ class TestMainFunction(unittest.TestCase):
     @patch(
         "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.SparkSession"
     )
-    @patch(
-        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.GreenhouseAuditLogAPI"
-    )
-    @patch(
-        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.json_to_dataframe"
-    )
-    @patch(
-        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.insert_partitions"
-    )
-    @patch(
-        "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.RawLayerLoader"
-    )
     def test_main_success_with_data(
         self,
-        mock_raw_loader_class,
-        mock_insert_partitions,
-        mock_json_to_df,
-        mock_api_class,
         mock_spark_session,
         mock_spark_client_class,
         mock_parser,
+        mock_run_load,
     ):
         """Test main function successfully loads data when API returns records."""
-        # Setup mocks
         mock_parser.parse_args.return_value = self.job_args
-        mock_spark_client = MagicMock()
-        mock_spark_client_class.return_value = mock_spark_client
-        mock_spark = MagicMock()
-        mock_spark_session.builder.getOrCreate.return_value = mock_spark
+        mock_spark_client_class.return_value = MagicMock()
+        mock_spark_session.builder.getOrCreate.return_value = MagicMock()
 
-        # Mock API response
-        mock_api_client = MagicMock()
-        api_data = [
-            {"id": "evt_1", "action": "create", "event_time": "2025-01-15T10:00:00Z"},
-            {"id": "evt_2", "action": "update", "event_time": "2025-01-16T11:00:00Z"},
-        ]
-        mock_api_client.get_all_paginated_results.return_value = api_data
-        mock_api_class.return_value = mock_api_client
+        mock_run_load.return_value = (2, 0)
 
-        # Mock DataFrame operations
-        mock_df = MagicMock()
-        mock_json_to_df.return_value = mock_df
-        mock_df_with_partitions = MagicMock()
-        mock_insert_partitions.return_value = mock_df_with_partitions
-
-        # Mock RawLayerLoader
-        mock_raw_loader = MagicMock()
-        mock_raw_loader_class.return_value = mock_raw_loader
-
-        # Execute
         main()
 
-        # Verify API client was created correctly (dates are formatted for API)
-        expected_args = {
-            **self.job_args,
-            "load_start_date": "2025-01-01T00:00:00Z",
-            "load_end_date": "2025-01-31T00:00:00Z",
-        }
-        mock_api_class.assert_called_once_with(expected_args)
-        mock_api_client.get_all_paginated_results.assert_called_once()
-
-        # Verify DataFrame creation
-        mock_json_to_df.assert_called_once_with(
-            mock_spark, api_data, raw_column_name="raw_payload"
-        )
-
-        # Verify partitions were added
-        mock_insert_partitions.assert_called_once_with(mock_df, "event_time")
-
-        # Verify RawLayerLoader was instantiated correctly
-        mock_raw_loader_class.assert_called_once_with(
-            spark_client=mock_spark_client,
-            environment="forno",
-            source="greenhouse_audit_log",
-            datalake_bucket="test-bucket",
-            table_name="greenhouse_audit_events",
-            partition_cols=["year", "month", "day"],
-            extraction_type="full",
-        )
-
-        # Verify data was loaded to raw layer
-        mock_raw_loader.load_to_raw.assert_called_once_with(mock_df_with_partitions)
+        expected_load_start = "2025-01-01T00:00:00Z"
+        expected_load_end = "2025-01-31T00:00:00Z"
+        mock_run_load.assert_called_once()
+        call_args = mock_run_load.call_args[0]
+        self.assertEqual(call_args[3], expected_load_start)
+        self.assertEqual(call_args[4], expected_load_end)
 
     @patch(
         "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.BaseJobArgumentParser"
@@ -685,19 +693,23 @@ class TestMainFunction(unittest.TestCase):
         # Setup mocks
         mock_parser.parse_args.return_value = self.job_args
 
-        # Mock API response with no data
+        # Mock API response with no data via fetch_pages_with_resume
         mock_api_client = MagicMock()
-        mock_api_client.get_all_paginated_results.return_value = []
+
+        def mock_fetch_empty(on_page, on_before_resume=None):
+            return 0, 0
+
+        mock_api_client.fetch_pages_with_resume = MagicMock(side_effect=mock_fetch_empty)
         mock_api_class.return_value = mock_api_client
 
         # Execute
         main()
 
         # Verify API was called
-        mock_api_client.get_all_paginated_results.assert_called_once()
+        mock_api_client.fetch_pages_with_resume.assert_called_once()
 
-        # Verify RawLayerLoader was NOT instantiated
-        mock_raw_loader_class.assert_not_called()
+        # RawLayerLoader is created but load_to_raw is not called (batch empty)
+        mock_raw_loader_class.assert_called_once()
 
     @patch(
         "dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw.BaseJobArgumentParser"
@@ -741,10 +753,16 @@ class TestMainFunction(unittest.TestCase):
         mock_spark = MagicMock()
         mock_spark_session.builder.getOrCreate.return_value = mock_spark
 
-        # Mock API response
+        # Mock API response via fetch_pages_with_resume
         mock_api_client = MagicMock()
         api_data = [{"id": "evt_1", "action": "create"}]
-        mock_api_client.get_all_paginated_results.return_value = api_data
+
+        def mock_fetch_default(on_page, on_before_resume=None):
+            if api_data:
+                on_page(api_data)
+            return len(api_data), 0
+
+        mock_api_client.fetch_pages_with_resume = mock_fetch_default
         mock_api_class.return_value = mock_api_client
 
         # Mock DataFrame operations
@@ -813,10 +831,10 @@ class TestMainFunction(unittest.TestCase):
         mock_spark_client_class.return_value = MagicMock()
         mock_spark_session.builder.getOrCreate.return_value = MagicMock()
 
-        # Mock API client to fail on 'get_all_paginated_results'
+        # Mock API client to fail on fetch_pages_with_resume
         mock_api_client = MagicMock()
-        mock_api_client.get_all_paginated_results.side_effect = Exception(
-            "API fetch failed"
+        mock_api_client.fetch_pages_with_resume = MagicMock(
+            side_effect=Exception("API fetch failed")
         )
         mock_api_class.return_value = mock_api_client  # Init works
 
@@ -826,9 +844,7 @@ class TestMainFunction(unittest.TestCase):
 
         self.assertIn("API fetch failed", str(context.exception))
         # Verify API was called
-        mock_api_client.get_all_paginated_results.assert_called_once()
-        # Ensure loader was not called
-        mock_raw_loader_class.assert_not_called()
+        mock_api_client.fetch_pages_with_resume.assert_called_once()
 
 
 if __name__ == "__main__":

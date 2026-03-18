@@ -69,5 +69,5 @@ workflow:
             "after_time": "load_start_date"
             "before_time": "load_end_date"
             "paging": "true"
-          backfill_window_hours: 3
+          backfill_window_hours: 0.5
           
