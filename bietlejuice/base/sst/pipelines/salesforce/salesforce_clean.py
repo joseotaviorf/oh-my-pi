@@ -8,11 +8,15 @@ from bietlejuice.base.sst.core.utils.common import (
 )
 from bietlejuice.base.sst.core.quality.checks import basic_quality_checks
 from bietlejuice.base.sst.core.observability.sensors import (
-    sensor_partition_hour,
     partition_has_data,
+    sensor_for_new_columns,
+    sensor_partition_hour,
 )
 
-from bietlejuice.base.sst.core.observability.metrics import save_volume_metric
+from bietlejuice.base.sst.core.observability.metrics import (
+    save_table_metadata_metric,
+    save_volume_metric,
+)
 from bietlejuice.base.sst.domains.salesforce.clean.check import check_missing_create
 from bietlejuice.base.sst.domains.salesforce.clean.transform import (
     in_memory_cdc_udpate,
@@ -123,6 +127,15 @@ def salesforce_clean_pipeline(spark, cfg):
         overwrite_schema=True,
     )
 
+    new_cols = sensor_for_new_columns(spark=spark, df=snapshot, table=target_table)
+    if new_cols:
+        logger.info(
+            f"m=salesforce_clean_pipeline, msg=New columns detected: {new_cols}"
+        )
+    else:
+        logger.info("m=salesforce_clean_pipeline, msg=No new columns detected")
+        new_cols = []
+
     _metric_grain = {
         "events_volume": ["partition_date", "partition_hour"],
         "events_type_volume": ["partition_date", "partition_hour", "event_type"],
@@ -135,8 +148,24 @@ def salesforce_clean_pipeline(spark, cfg):
             grain=grain,
             metric_name=_metric,
             table_name=target_table,
+            new_cols=new_cols,
             env=cfg.env,
             layer="clean",
             partition_cols=["partition_date", "partition_hour"],
         )
+
+    logger.info("m=salesforce_clean_pipeline, msg=Saving table_metadata metric")
+    save_table_metadata_metric(
+        spark=spark,
+        df=snapshot,
+        table_name=target_table,
+        new_cols=new_cols,
+        env=cfg.env,
+        layer="clean",
+        partition_values={
+            "partition_date": cfg.partition_date,
+            "partition_hour": cfg.partition_hour,
+        },
+        partition_cols=["partition_date", "partition_hour"],
+    )
     logger.info("m=salesforce_clean_pipeline, msg=Pipeline completed")

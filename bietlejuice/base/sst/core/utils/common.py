@@ -253,7 +253,32 @@ def safe_column_union(
 
 
 @logger(exclude_return=False)
-def _safe_merge_schema(spark, df, table):
+def _safe_merge_schema(spark: SparkSession, df: DataFrame, table: str) -> DataFrame:
+    """
+    Conform an incoming DataFrame to an existing target table schema.
+
+    The function identifies:
+      - new columns in `df` that are not in the target table schema (`updates`)
+      - columns present in the target table but missing from `df` (`missing_columns`)
+
+    Missing target columns are added to `df` as null values cast to the
+    target data types. The output column order is deterministic:
+    existing target columns first, followed by new incoming columns.
+
+    Parameters
+    ----------
+    spark : SparkSession
+        Active Spark session used to read target table schema.
+    df : DataFrame
+        Incoming DataFrame to be conformed.
+    table : str
+        Fully qualified target table name.
+
+    Returns
+    -------
+    DataFrame
+        DataFrame aligned to target schema plus any new incoming columns.
+    """
 
     target_table = spark.read.table(table)
     target_schema = {field.name: field.dataType for field in target_table.schema}
@@ -412,6 +437,29 @@ def normalize_column_name(col: str) -> str:
 
 
 def normalize_df_columns(df: DataFrame) -> DataFrame:
+    """
+    Normalize all DataFrame column names using `normalize_column_name`.
+
+    The function applies column-by-column normalization and validates that
+    the resulting names are unique. If normalization causes collisions
+    (e.g. two source columns mapping to the same normalized name), a
+    ValueError is raised with the conflicting mappings.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Input DataFrame with original column names.
+
+    Returns
+    -------
+    DataFrame
+        DataFrame with normalized column names.
+
+    Raises
+    ------
+    ValueError
+        If normalized column names are duplicated.
+    """
 
     original = df.columns
     new_cols = [normalize_column_name(col) for col in original]
@@ -431,6 +479,22 @@ def normalize_df_columns(df: DataFrame) -> DataFrame:
 
 
 def retrieve_spark_session(job_name: str) -> SparkSession:
+    """
+    Create or return a Spark session configured for Delta and S3.
+
+    Configuration includes Delta Lake extensions/catalog and S3A settings
+    used by SST jobs in this repository.
+
+    Parameters
+    ----------
+    job_name : str
+        Spark application name.
+
+    Returns
+    -------
+    SparkSession
+        Configured Spark session instance.
+    """
 
     return (
         SparkSession.builder.appName(job_name)

@@ -1,4 +1,6 @@
 from datetime import datetime
+import json
+import re
 
 from pyspark.sql import functions as F
 from quintoandar_logger import QuintoAndarLogger
@@ -15,6 +17,7 @@ def save_volume_metric(
     grain,
     metric_name,
     table_name,
+    new_cols,
     env,
     layer,
     partition_cols,
@@ -26,6 +29,7 @@ def save_volume_metric(
         .agg(F.count("*").alias("row_count"))
         .withColumn("metric_name", F.lit(metric_name))
         .withColumn("source_table", F.lit(table_name))
+        .withColumn("new_cols", F.lit(new_cols))
         .withColumn("metric_category", F.lit("volume"))
         .withColumn("layer", F.lit(layer))
         .withColumn("environment", F.lit(env))
@@ -34,6 +38,7 @@ def save_volume_metric(
             "metric_category",
             "metric_name",
             "source_table",
+            "new_cols",
             "environment",
             "layer",
             *grain,
@@ -51,6 +56,70 @@ def save_volume_metric(
 
     logger.info(f"m=save_volume_metric, msg=Partition columns: {partition_cols}")
     metric_table = f"datalake_sst_metrics.{metric_name}"
+    validate_and_write(
+        spark=spark,
+        df=_metric,
+        target_table=metric_table,
+        partition_cols=partition_cols,
+        overwrite_schema=False,
+        append=True,
+    )
+
+
+@logger(exclude=["spark", "df"], exclude_return=True)
+def save_table_metadata_metric(
+    spark,
+    df,
+    table_name,
+    new_cols,
+    env,
+    layer,
+    partition_values=None,
+    partition_cols=None,
+):
+    write_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    serialized_columns = json.dumps(df.columns)
+    serialized_new_cols = json.dumps(sorted(new_cols or []))
+
+    _metric = (
+        spark.range(1)
+        .withColumn("metric_category", F.lit("metadata"))
+        .withColumn("metric_name", F.lit("table_metadata"))
+        .withColumn("source_table", F.lit(table_name))
+        .withColumn("columns", F.lit(serialized_columns))
+        .withColumn("new_cols", F.lit(serialized_new_cols))
+        .withColumn("columns_count", F.lit(len(df.columns)))
+        .withColumn("environment", F.lit(env))
+        .withColumn("layer", F.lit(layer))
+        .withColumn("_write_timestamp", F.lit(write_timestamp))
+    )
+
+    partition_values = partition_values or {}
+    partition_cols = partition_cols or []
+    for partition_col, partition_value in partition_values.items():
+        _metric = _metric.withColumn(partition_col, F.lit(partition_value))
+
+    selected_cols = [
+        "metric_category",
+        "metric_name",
+        "source_table",
+        "columns",
+        "new_cols",
+        "columns_count",
+        "environment",
+        "layer",
+        *partition_cols,
+        "_write_timestamp",
+    ]
+    _metric = _metric.select(selected_cols)
+
+    sanitized_table_name = re.sub(r"\W", "_", table_name).strip("_").lower()
+    metric_table = f"datalake_sst_metrics.{sanitized_table_name}_metadata"
+
+    logger.info(
+        f"m=save_table_metadata_metric, msg=Writing metadata metric, "
+        f"metric_table={metric_table}, source_table={table_name}, partition_cols={partition_cols}"
+    )
     validate_and_write(
         spark=spark,
         df=_metric,

@@ -4,11 +4,30 @@
 
 import boto3
 import pyspark.sql.functions as F
+from typing import List
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.sst.core.utils.common import _table_exists
 
 
 logger = QuintoAndarLogger("sst.common.sensors")
+
+
+@logger(exclude_return=True)
+def sensor_for_new_columns(spark, df, table) -> List[str]:
+    """
+    Return incoming columns that are new to the target table schema.
+
+    Mirrors the "updates" diff used by `_safe_merge_schema`:
+    columns present in `df` but absent from the existing target table schema.
+    """
+    target_table = spark.read.table(table)
+    updates = set(df.columns) - set(target_table.columns)
+
+    logger.info(
+        f"m=sensor_for_new_columns, msg=Detected new columns, "
+        f"table={table}, new_columns={updates}"
+    )
+    return updates
 
 
 @logger(exclude_return=True)
