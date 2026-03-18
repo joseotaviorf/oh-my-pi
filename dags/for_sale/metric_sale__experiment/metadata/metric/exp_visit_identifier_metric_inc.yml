@@ -63,28 +63,50 @@ columns:
     description: Name of the identifier metric being calculated.
     categories:
       number_identifiers: Total count of unique identifiers in the experiment.
+      number_identifiers_with_vb: Count of identifiers with booked visits.
+      number_identifiers_with_vcf: Count of identifiers with confirmed visits.
       number_identifiers_with_vc: Count of identifiers with completed visits.
       number_identifiers_with_vcc: Count of identifiers with canceled visits.
       number_identifiers_with_vu: Count of identifiers with unsuccessful visits.
       number_identifiers_with_os: Count of identifiers with submitted offers.
       number_identifiers_with_oa: Count of identifiers with accepted offers.
       number_identifiers_with_cs: Count of identifiers with signed contracts.
-      identifier_with_vc: Percentage of identifiers with completed visits.
-      identifier_with_vcc: Percentage of identifiers with canceled visits.
-      identifier_with_vu: Percentage of identifiers with unsuccessful visits.
-      identifier_with_os: Percentage of identifiers with submitted offers.
-      identifier_with_oa: Percentage of identifiers with accepted offers.
-      identifier_with_cs: Percentage of identifiers with signed contracts.
+      identifiers_with_vb: Percentage of identifiers with booked visits.
+      identifiers_with_vcf: Percentage of identifiers with confirmed visits.
+      identifiers_with_vc: Percentage of identifiers with completed visits.
+      identifiers_with_vcc: Percentage of identifiers with canceled visits.
+      identifiers_with_vu: Percentage of identifiers with unsuccessful visits.
+      identifiers_with_os: Percentage of identifiers with submitted offers.
+      identifiers_with_oa: Percentage of identifiers with accepted offers.
+      identifiers_with_cs: Percentage of identifiers with signed contracts.
+      vb_per_identifier: Booked visits per identifier.
+      vcf_per_identifier: Confirmed visits per identifier.
+      vc_per_identifier: Completed visits per identifier.
+      vcc_per_identifier: Canceled visits per identifier.
+      vu_per_identifier: Unsuccessful visits per identifier.
+      os_per_identifier: Submitted offers per identifier.
+      oa_per_identifier: Accepted offers per identifier.
+      cs_per_identifier: Signed contracts per identifier.
     dimension: True
   control_metric_value:
     lineage:
       - metric_sale.exp_visit_cohort_inc.number_identifiers
+      - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vb
+      - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vcf
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vc
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vcc
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vu
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_os
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_oa
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_cs
+      - metric_sale.exp_visit_cohort_inc.num_vb_id
+      - metric_sale.exp_visit_cohort_inc.num_vcf_id
+      - metric_sale.exp_visit_cohort_inc.num_vc_id
+      - metric_sale.exp_visit_cohort_inc.num_vcc_id
+      - metric_sale.exp_visit_cohort_inc.num_vu_id
+      - metric_sale.exp_visit_cohort_inc.num_os_id
+      - metric_sale.exp_visit_cohort_inc.num_oa_id
+      - metric_sale.exp_visit_cohort_inc.num_cs_id
     description: Metric value for the control group (count for number metrics, percentage for ratio metrics).
     metric:
       name: Control Group Metric Value
@@ -98,12 +120,22 @@ columns:
   control_metric_error:
     lineage:
       - metric_sale.exp_visit_cohort_inc.number_identifiers
+      - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vb
+      - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vcf
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vc
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vcc
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vu
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_os
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_oa
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_cs
+      - metric_sale.exp_visit_cohort_inc.num_vb_id
+      - metric_sale.exp_visit_cohort_inc.num_vcf_id
+      - metric_sale.exp_visit_cohort_inc.num_vc_id
+      - metric_sale.exp_visit_cohort_inc.num_vcc_id
+      - metric_sale.exp_visit_cohort_inc.num_vu_id
+      - metric_sale.exp_visit_cohort_inc.num_os_id
+      - metric_sale.exp_visit_cohort_inc.num_oa_id
+      - metric_sale.exp_visit_cohort_inc.num_cs_id
     description: 95% confidence interval margin of error for control group metric (null for count metrics, calculated for percentage metrics).
     metric:
       name: Control Group Error Margin
@@ -117,12 +149,22 @@ columns:
   treatment_metric_value:
     lineage:
       - metric_sale.exp_visit_cohort_inc.number_identifiers
+      - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vb
+      - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vcf
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vc
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vcc
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vu
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_os
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_oa
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_cs
+      - metric_sale.exp_visit_cohort_inc.num_vb_id
+      - metric_sale.exp_visit_cohort_inc.num_vcf_id
+      - metric_sale.exp_visit_cohort_inc.num_vc_id
+      - metric_sale.exp_visit_cohort_inc.num_vcc_id
+      - metric_sale.exp_visit_cohort_inc.num_vu_id
+      - metric_sale.exp_visit_cohort_inc.num_os_id
+      - metric_sale.exp_visit_cohort_inc.num_oa_id
+      - metric_sale.exp_visit_cohort_inc.num_cs_id
     description: Metric value for the treatment group (count for number metrics, percentage for ratio metrics).
     metric:
       name: Treatment Group Metric Value
@@ -136,12 +178,22 @@ columns:
   treatment_metric_error:
     lineage:
       - metric_sale.exp_visit_cohort_inc.number_identifiers
+      - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vb
+      - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vcf
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vc
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vcc
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_vu
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_os
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_oa
       - metric_sale.exp_visit_cohort_inc.number_identifiers_with_cs
+      - metric_sale.exp_visit_cohort_inc.num_vb_id
+      - metric_sale.exp_visit_cohort_inc.num_vcf_id
+      - metric_sale.exp_visit_cohort_inc.num_vc_id
+      - metric_sale.exp_visit_cohort_inc.num_vcc_id
+      - metric_sale.exp_visit_cohort_inc.num_vu_id
+      - metric_sale.exp_visit_cohort_inc.num_os_id
+      - metric_sale.exp_visit_cohort_inc.num_oa_id
+      - metric_sale.exp_visit_cohort_inc.num_cs_id
     description: 95% confidence interval margin of error for treatment group metric (null for count metrics, calculated for percentage metrics using binomial proportion confidence interval).
     metric:
       name: Treatment Group Error Margin

@@ -216,6 +216,19 @@ columns:
       hierarchy: Executive
       approved_by: leticia.machado@quintoandar.com.br
       link_to_metric: ''
+  number_identifiers_with_vb:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of identifiers with visit booked within the cohort time window.
+    metric:
+      name: Number of Identifiers with Visit Booked
+      description: Target of number of Identifiers with Visit Booked within the aggregation.
+      acronym: NIwVB
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
   number_identifiers_with_vc:
     lineage:
       - dw_visit.dim_visit.sk_exp_identifier
@@ -302,6 +315,110 @@ columns:
       name: Number of Identifiers with Contract Signed
       description: Target of number of Identifiers with Contract Signed within the aggregation.
       acronym: NIwCS
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  num_vb_id:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of visits booked within the cohort time window.
+    metric:
+      name: Number of Visits Booked
+      description: Target of number of Visits Booked within the aggregation.
+      acronym: VB
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  num_vc_id:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of visits completed within the cohort time window.
+    metric:
+      name: Number of Visits Completed
+      description: Target of number of Visits Completed within the aggregation.
+      acronym: VC
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  num_vcf_id:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of visits confirmed within the cohort time window.
+    metric:
+      name: Number of Visits Confirmed
+      description: Target of number of Visits Confirmed within the aggregation.
+      acronym: VCf
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  num_vcc_id:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of visits canceled within the cohort time window.
+    metric:
+      name: Number of Visits Canceled
+      description: Target of number of Visits Canceled within the aggregation.
+      acronym: VCc
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  num_vu_id:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of visits unsuccessful within the cohort time window.
+    metric:
+      name: Number of Visits Unsuccessful
+      description: Target of number of Visits Unsuccessful within the aggregation.
+      acronym: VU
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  num_os_id:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of offers submitted within the cohort time window.
+    metric:
+      name: Number of Offers Submitted
+      description: Target of number of Offers Submitted within the aggregation.
+      acronym: OS
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  num_oa_id:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of offers accepted within the cohort time window.
+    metric:
+      name: Number of Offers Accepted
+      description: Target of number of Offers Accepted within the aggregation.
+      acronym: OA
+      is_additive: True
+      business_stage: Demand
+      hierarchy: Executive
+      approved_by: leticia.machado@quintoandar.com.br
+      link_to_metric: ''
+  num_cs_id:
+    lineage:
+      - dw_visit.dim_visit.sk_exp_identifier
+    description: Number of contracts signed within the cohort time window.
+    metric:
+      name: Number of Contracts Signed
+      description: Target of number of Contracts Signed within the aggregation.
+      acronym: CS
       is_additive: True
       business_stage: Demand
       hierarchy: Executive

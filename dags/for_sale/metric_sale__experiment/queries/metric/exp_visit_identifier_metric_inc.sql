@@ -11,6 +11,9 @@ WITH visit_per_identifier AS (
         -- number of identifiers
         COUNT(DISTINCT CASE WHEN exp_test_group = 'CONTROL' THEN number_identifiers END) AS count_identifiers_control,
         COUNT(DISTINCT CASE WHEN exp_test_group = 'TREATMENT' THEN number_identifiers END) AS count_identifiers_treatment,
+        -- identifier vb
+        COUNT(DISTINCT CASE WHEN exp_test_group = 'CONTROL' THEN number_identifiers_with_vb END) AS count_identifiers_with_vb_control,
+        COUNT(DISTINCT CASE WHEN exp_test_group = 'TREATMENT' THEN number_identifiers_with_vb END) AS count_identifiers_with_vb_treatment,
         -- identifier vcf
         COUNT(DISTINCT CASE WHEN exp_test_group = 'CONTROL' THEN number_identifiers_with_vcf END) AS count_identifiers_with_vcf_control,
         COUNT(DISTINCT CASE WHEN exp_test_group = 'TREATMENT' THEN number_identifiers_with_vcf END) AS count_identifiers_with_vcf_treatment,
@@ -32,27 +35,30 @@ WITH visit_per_identifier AS (
         -- identifier cs
         COUNT(DISTINCT CASE WHEN exp_test_group = 'CONTROL' THEN number_identifiers_with_cs END) AS count_identifiers_with_cs_control,
         COUNT(DISTINCT CASE WHEN exp_test_group = 'TREATMENT' THEN number_identifiers_with_cs END) AS count_identifiers_with_cs_treatment,
+        -- number of vb
+        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vb_id ELSE 0 END) AS sum_vb_control,
+        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vb_id ELSE 0 END) AS sum_vb_treatment,
         -- number of vc
-        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vc ELSE 0 END) AS sum_vc_control,
-        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vc ELSE 0 END) AS sum_vc_treatment,
+        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vc_id ELSE 0 END) AS sum_vc_control,
+        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vc_id ELSE 0 END) AS sum_vc_treatment,
         -- number of vcf
-        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vcf ELSE 0 END) AS sum_vcf_control,
-        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vcf ELSE 0 END) AS sum_vcf_treatment,
+        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vcf_id ELSE 0 END) AS sum_vcf_control,
+        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vcf_id ELSE 0 END) AS sum_vcf_treatment,
         -- number of vcc
-        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vcc ELSE 0 END) AS sum_vcc_control,
-        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vcc ELSE 0 END) AS sum_vcc_treatment,
+        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vcc_id ELSE 0 END) AS sum_vcc_control,
+        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vcc_id ELSE 0 END) AS sum_vcc_treatment,
         -- number of vu
-        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vu ELSE 0 END) AS sum_vu_control,
-        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vu ELSE 0 END) AS sum_vu_treatment,
+        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_vu_id ELSE 0 END) AS sum_vu_control,
+        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_vu_id ELSE 0 END) AS sum_vu_treatment,
         -- number of os
-        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_os ELSE 0 END) AS sum_os_control,
-        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_os ELSE 0 END) AS sum_os_treatment,
+        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_os_id ELSE 0 END) AS sum_os_control,
+        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_os_id ELSE 0 END) AS sum_os_treatment,
         -- number of oa
-        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_oa ELSE 0 END) AS sum_oa_control,
-        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_oa ELSE 0 END) AS sum_oa_treatment,
+        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_oa_id ELSE 0 END) AS sum_oa_control,
+        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_oa_id ELSE 0 END) AS sum_oa_treatment,
         -- number of cs
-        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_cs ELSE 0 END) AS sum_cs_control,
-        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_cs ELSE 0 END) AS sum_cs_treatment
+        SUM(CASE WHEN exp_test_group = 'CONTROL' THEN num_cs_id ELSE 0 END) AS sum_cs_control,
+        SUM(CASE WHEN exp_test_group = 'TREATMENT' THEN num_cs_id ELSE 0 END) AS sum_cs_treatment
     FROM
         metric_sale.exp_visit_cohort_inc
     WHERE
@@ -71,6 +77,13 @@ visit_by_identifier AS (
         -- number of identifiers
         SUM(count_identifiers_control) AS sum_identifiers_control,
         SUM(count_identifiers_treatment) AS sum_identifiers_treatment,
+        -- identifiers vb
+        SUM(count_identifiers_with_vb_control) AS sum_identifiers_with_vb_control,
+        SUM(count_identifiers_with_vb_treatment) AS sum_identifiers_with_vb_treatment,
+        (sum_identifiers_with_vb_control/sum_identifiers_control)*100 AS porc_identifier_with_vb_control,
+        (sum_identifiers_with_vb_treatment/sum_identifiers_treatment)*100 AS porc_identifier_with_vb_treatment,
+        1.96 * SQRT(sum_identifiers_with_vb_control / sum_identifiers_control * (1 - sum_identifiers_with_vb_control / sum_identifiers_control) / sum_identifiers_control) * 100 AS identifier_with_vb_control_error,
+        1.96 * SQRT(sum_identifiers_with_vb_treatment / sum_identifiers_treatment * (1 - sum_identifiers_with_vb_treatment / sum_identifiers_treatment) / sum_identifiers_treatment) * 100 AS identifier_with_vb_treatment_error,
         -- identifier vc
         SUM(count_identifiers_with_vc_control) AS sum_identifiers_with_vc_control,
         SUM(count_identifiers_with_vc_treatment) AS sum_identifiers_with_vc_treatment,
@@ -120,6 +133,11 @@ visit_by_identifier AS (
         (sum_identifiers_with_cs_treatment/sum_identifiers_treatment)*100 AS porc_identifier_with_cs_treatment,
         1.96 * SQRT(sum_identifiers_with_cs_control / sum_identifiers_control * (1 - sum_identifiers_with_cs_control / sum_identifiers_control) / sum_identifiers_control) * 100 AS identifier_with_cs_control_error,
         1.96 * SQRT(sum_identifiers_with_cs_treatment / sum_identifiers_treatment * (1 - sum_identifiers_with_cs_treatment / sum_identifiers_treatment) / sum_identifiers_treatment) * 100 AS identifier_with_cs_treatment_error,
+        -- number of vb
+        AVG(CASE WHEN count_identifiers_control != 0 THEN sum_vb_control ELSE NULL END) AS vb_per_identifier_control,
+        AVG(CASE WHEN count_identifiers_treatment != 0 THEN sum_vb_treatment ELSE NULL END) AS vb_per_identifier_treatment,
+        1.96 * STDDEV(IF(count_identifiers_control != 0, sum_vb_control, NULL)) / SQRT(SUM(count_identifiers_control)) AS vb_per_identifier_control_error,
+        1.96 * STDDEV(IF(count_identifiers_treatment != 0, sum_vb_treatment, NULL)) / SQRT(SUM(count_identifiers_treatment)) AS vb_per_identifier_treatment_error,
         -- number of vc
         AVG(CASE WHEN count_identifiers_control != 0 THEN sum_vc_control ELSE NULL END) AS vc_per_identifier_control,
         AVG(CASE WHEN count_identifiers_treatment != 0 THEN sum_vc_treatment ELSE NULL END) AS vc_per_identifier_treatment,
@@ -179,9 +197,11 @@ FROM
     visit_by_identifier AS vbi
 LATERAL VIEW
     STACK(
-        22, -- Number of metrics
+        25, -- Number of metrics
 
         'number_identifiers', CAST(vbi.sum_identifiers_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vbi.sum_identifiers_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+
+        'number_identifiers_with_vb', CAST(vbi.sum_identifiers_with_vb_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vbi.sum_identifiers_with_vb_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
 
         'number_identifiers_with_vc', CAST(vbi.sum_identifiers_with_vc_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vbi.sum_identifiers_with_vc_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
 
@@ -197,19 +217,23 @@ LATERAL VIEW
 
         'number_identifiers_with_cs', CAST(vbi.sum_identifiers_with_cs_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vbi.sum_identifiers_with_cs_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
 
-        'identifier_with_vc', vbi.porc_identifier_with_vc_control, vbi.identifier_with_vc_control_error, vbi.porc_identifier_with_vc_treatment, vbi.identifier_with_vc_treatment_error,
+        'identifiers_with_vb', vbi.porc_identifier_with_vb_control, vbi.identifier_with_vb_control_error, vbi.porc_identifier_with_vb_treatment, vbi.identifier_with_vb_treatment_error,
 
-        'identifier_with_vcf', vbi.porc_identifier_with_vcf_control, vbi.identifier_with_vcf_control_error, vbi.porc_identifier_with_vcf_treatment, vbi.identifier_with_vcf_treatment_error,
+        'identifiers_with_vc', vbi.porc_identifier_with_vc_control, vbi.identifier_with_vc_control_error, vbi.porc_identifier_with_vc_treatment, vbi.identifier_with_vc_treatment_error,
 
-        'identifier_with_vcc', vbi.porc_identifier_with_vcc_control, vbi.identifier_with_vcc_control_error, vbi.porc_identifier_with_vcc_treatment, vbi.identifier_with_vcc_treatment_error,
+        'identifiers_with_vcf', vbi.porc_identifier_with_vcf_control, vbi.identifier_with_vcf_control_error, vbi.porc_identifier_with_vcf_treatment, vbi.identifier_with_vcf_treatment_error,
 
-        'identifier_with_vu', vbi.porc_identifier_with_vu_control, vbi.identifier_with_vu_control_error, vbi.porc_identifier_with_vu_treatment, vbi.identifier_with_vu_treatment_error,
+        'identifiers_with_vcc', vbi.porc_identifier_with_vcc_control, vbi.identifier_with_vcc_control_error, vbi.porc_identifier_with_vcc_treatment, vbi.identifier_with_vcc_treatment_error,
 
-        'identifier_with_os', vbi.porc_identifier_with_os_control, vbi.identifier_with_os_control_error, vbi.porc_identifier_with_os_treatment, vbi.identifier_with_os_treatment_error,
+        'identifiers_with_vu', vbi.porc_identifier_with_vu_control, vbi.identifier_with_vu_control_error, vbi.porc_identifier_with_vu_treatment, vbi.identifier_with_vu_treatment_error,
 
-        'identifier_with_oa', vbi.porc_identifier_with_oa_control, vbi.identifier_with_oa_control_error, vbi.porc_identifier_with_oa_treatment, vbi.identifier_with_oa_treatment_error,
+        'identifiers_with_os', vbi.porc_identifier_with_os_control, vbi.identifier_with_os_control_error, vbi.porc_identifier_with_os_treatment, vbi.identifier_with_os_treatment_error,
 
-        'identifier_with_cs', vbi.porc_identifier_with_cs_control, vbi.identifier_with_cs_control_error, vbi.porc_identifier_with_cs_treatment, vbi.identifier_with_cs_treatment_error,
+        'identifiers_with_oa', vbi.porc_identifier_with_oa_control, vbi.identifier_with_oa_control_error, vbi.porc_identifier_with_oa_treatment, vbi.identifier_with_oa_treatment_error,
+
+        'identifiers_with_cs', vbi.porc_identifier_with_cs_control, vbi.identifier_with_cs_control_error, vbi.porc_identifier_with_cs_treatment, vbi.identifier_with_cs_treatment_error,
+
+        'vb_per_identifier', vbi.vb_per_identifier_control, vbi.vb_per_identifier_control_error, vbi.vb_per_identifier_treatment, vbi.vb_per_identifier_treatment_error,
 
         'vc_per_identifier', vbi.vc_per_identifier_control, vbi.vc_per_identifier_control_error, vbi.vc_per_identifier_treatment, vbi.vc_per_identifier_treatment_error,
 
