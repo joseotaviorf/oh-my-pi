@@ -1,22 +1,35 @@
 ---
 database_name: datalake_condominium_payments_clean
 table_name: attachment
+description: Clean table of file attachments for condominium payment invoices from the Condominium Payments API, including MIME type, source URL, and optional file access secret.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_condominium_payments_raw.attachment.id
+    description: Unique identifier of the attachment record in the source system.
   id_invoice:
     lineage:
       - datalake_condominium_payments_raw.attachment.invoice_id
+    description: Foreign key referencing the invoice this attachment belongs to.
   mime_type:
     lineage:
       - datalake_condominium_payments_raw.attachment.mime_type
+    description: MIME type of the attached file (for example application/pdf or image/png).
   source_url:
     lineage:
       - datalake_condominium_payments_raw.attachment.source_url
+    description: URL where the attachment file content can be retrieved from storage.
+  file_password:
+    lineage:
+      - datalake_condominium_payments_raw.attachment.file_password
+    description: Password or token required to access the attached file when if is a file protected by password.
   ts_created:
     lineage:
       - datalake_condominium_payments_raw.attachment.created_at
+    description: Timestamp when the attachment record was created in the source system.
   ts_updated:
     lineage:
       - datalake_condominium_payments_raw.attachment.updated_at
+    description: Timestamp when the attachment record was last updated in the source system.

@@ -3,6 +3,7 @@ SELECT
     CAST(invoice_id AS BIGINT) AS id_invoice,
     mime_type,
     source_url,
+    file_password,
     TO_TIMESTAMP(created_at) AS ts_created,
     TO_TIMESTAMP(updated_at) AS ts_updated
 FROM
