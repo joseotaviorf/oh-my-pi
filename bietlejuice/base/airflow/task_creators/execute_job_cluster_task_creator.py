@@ -32,10 +32,14 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
             )
 
     def __get_access_control_list(self) -> list:
-        acl = self.cluster_args.get(
-            "access_control_list",
-            self.config_service.get_config("default_access_control_list")[0],
-        )
+        acl = self.cluster_args.get("access_control_list")
+        if acl is None:
+            cluster_type = self.cluster_args.get("type")
+            if cluster_type:
+                cluster_template = self.config_service.get_config(cluster_type)
+                acl = cluster_template.get("access_control_list")
+        if acl is None:
+            acl = self.config_service.get_config("default_access_control_list")[0]
         if isinstance(acl, dict):
             return [acl]
         return acl
