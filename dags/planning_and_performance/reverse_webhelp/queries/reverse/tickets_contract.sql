@@ -258,7 +258,7 @@ SELECT
     YEAR(CURRENT_DATE) AS year,
     MONTH(CURRENT_DATE) AS month,
     DAY(CURRENT_DATE) AS day,
-    date_format(now(), 'yyyy-MM-dd HH:mm') AS ts_load
+    now() AS ts_load
 FROM tabela_base tb
 LEFT JOIN flag_regra_3 r3 ON tb.sk_user = r3.sk_user AND tb.contrato_prioritario IS NULL
 LEFT JOIN dw_customer_support.dim_analyst AS da_last ON da_last.sk_analyst = tb.sk_last_analyst
