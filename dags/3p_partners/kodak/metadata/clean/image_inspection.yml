@@ -58,6 +58,19 @@ columns:
       WATERMARK_REMOVAL_PENDING: 'Watermark detection/removal pending'
       NOISE_DETECTION_PENDING: 'Noise detection analysis pending'
       COMPLETED: 'All analysis steps completed'
+  photo_invalid_source_reason:
+    lineage:
+      - datalake_kodak_raw.image_inspection.photo_invalid_source_reason
+    description: 'Reason why the photo source was considered invalid during inspection. Populated when the image could not be properly processed from its original source.'
+    categories:
+      INVALID_URL: 'Source URL is malformed or invalid'
+      EMPTY_BODY: 'Response body from the image source was empty'
+      IMAGE_NOT_FOUND: 'Image was not found at the source location'
+      READER_NOT_FOUND: 'No suitable reader found to process the image format'
+      EXTENSION_NOT_SUPPORTED: 'Image file extension is not supported by the pipeline'
+      EMPTY_IMAGE: 'Image file exists but contains no valid image data'
+      IMPROPER_ENCODING: 'Image encoding is invalid or corrupted'
+      UNABLE_TO_ACCESS_EXTERNAL_URL: 'Unable to access external URL for download, typically due to domain blocking'
   description:
     lineage:
       - datalake_kodak_raw.image_inspection.description

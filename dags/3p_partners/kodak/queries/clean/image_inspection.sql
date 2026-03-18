@@ -8,6 +8,7 @@ SELECT
   house_place,
   room_type,
   status,
+  photo_invalid_source_reason,
   description,
   width,
   height,
