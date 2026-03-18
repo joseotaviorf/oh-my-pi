@@ -12,7 +12,7 @@
 4. [Subagents in this repo](#4-subagents-in-this-repo)
 5. [End-to-end DAG creation walkthrough](#5-end-to-end-dag-creation-walkthrough)
 
-Skills: [create-dag](#create-dag--scaffold-a-complete-new-dag) · [create-qube-spec](#create-qube-spec--scaffold-a-qube-semantic-layer-spec) · [validate-dag](#validate-dag--run-all-local-ci-checks-in-parallel) · [impact-analysis](#impact-analysis--trace-downstream-impact-of-a-rename-or-removal) · [review-pr](#review-pr--full-pre-push-code-review) · [generate-unit-test](#generate-unit-test--write-correctly-patterned-unit-tests) · [fix-ci-failure](#fix-ci-failure--diagnose-and-fix-a-woodpecker-ci-failure) · [upload-to-forno](#upload-to-forno--upload-artifacts-for-databricks-forno-testing) · [setup-local-environment](#setup-local-environment--set-up-or-restore-the-local-dev-environment)
+Skills: [create-dag](#create-dag--scaffold-a-complete-new-dag) · [create-qube-spec](#create-qube-spec--scaffold-a-qube-semantic-layer-spec) · [run-dag-locally](#run-dag-locally--run-and-test-a-dag-on-local-airflow-and-forno) · [impact-analysis](#impact-analysis--trace-downstream-impact-of-a-rename-or-removal) · [review-pr](#review-pr--full-pre-push-code-review) · [generate-unit-test](#generate-unit-test--write-correctly-patterned-unit-tests) · [fix-ci-failure](#fix-ci-failure--diagnose-and-fix-a-woodpecker-ci-failure) · [setup-local-environment](#setup-local-environment--set-up-or-restore-the-local-dev-environment)
 
 ---
 
@@ -24,33 +24,35 @@ Cursor's AI assistant can be guided by three layers of persistent context. Toget
 flowchart LR
     subgraph always_on ["🟢 Always Active — injected into every prompt"]
         direction TB
-        R1["📋 governance_metadata.mdc\nLGPD / PII classification\nmetadata YAML schema"]
+        R1["🏠 core.mdc\nrepo identity · architecture\nDAG Builder · folder structure"]
         R2["🏷️ naming_conventions.mdc\ncolumn · table · schema · DAG\nnaming patterns"]
-        R3["🐍 python_conventions.mdc\nBlack · Flake8 · imports\nQuintoAndarLogger · Pydantic v2"]
-        R4["🗄️ sql_conventions.mdc\nSQL style · no SELECT *\npartition filters · Person Data Model"]
-        R5["🧪 testing_conventions.mdc\nTDD Red→Green→Refactor\nPattern A vs Pattern B"]
     end
 
-    subgraph on_demand ["🔵 Loaded On Demand — when topic matches"]
+    subgraph on_demand ["🔵 Loaded On Demand — when glob matches"]
         direction TB
-        R6["⚙️ dag_build.mdc\ncluster presets · workflow types\nfolder structure"]
-        R7["🔷 databricks_conventions.mdc\nDelta syntax\nbracket vs Jinja templating"]
-        R8["📝 pr_template.mdc\nPR description template\nWhy · What · How tested"]
-        R9["🔮 qube_specs.mdc\ndimension · measure\nmetric declaration schemas"]
-        R10["🏗️ core_models_generation.mdc\nCore Model file structure\nSpark job · schema · tests"]
+        R3["📋 governance_metadata.mdc\nLGPD / PII classification\nmetadata YAML schema"]
+        R4["🐍 python_conventions.mdc\nBlack · Flake8 · imports\nQuintoAndarLogger · Pydantic v2"]
+        R5["🗄️ sql_conventions.mdc\nSQL style · no SELECT *\npartition filters · Person Data Model"]
+        R6["🧪 testing_conventions.mdc\nTDD Red→Green→Refactor\nPattern A vs Pattern B"]
+        R7["⚙️ dag_build.mdc\ncluster presets · workflow types\nfolder structure"]
+        R8["🔷 databricks_conventions.mdc\nDelta syntax\nbracket vs Jinja templating"]
+        R9["📝 pr_template.mdc\nPR description template\nWhy · What · How tested"]
+        R10["🔮 qube_specs.mdc\ndimension · measure\nmetric declaration schemas"]
+        R11["🏗️ core_models_generation.mdc\nCore Model file structure\nSpark job · schema · tests"]
+        R12["✅ data_quality_tests.mdc\nInmetro validation catalog\nhas_size · is_complete · custom"]
+        R13["👥 people_domain.mdc\nDW 2.0 schemas · SCD Type 2\nOracle HCM · deprecated DAGs"]
     end
 
     subgraph skills ["⚡ Skills — Step-by-step Playbooks"]
         direction TB
         S1["create-dag"]
         S2["create-qube-spec"]
-        S3["validate-dag"]
+        S3["run-dag-locally"]
         S4["impact-analysis"]
         S5["review-pr"]
         S6["generate-unit-test"]
         S7["fix-ci-failure"]
-        S8["upload-to-forno"]
-        S9["setup-local-environment"]
+        S8["setup-local-environment"]
     end
 
     subgraph subagents ["🧠 Subagents — Domain Experts"]
@@ -61,7 +63,7 @@ flowchart LR
     end
 
     always_on -->|"injected into every prompt"| skills
-    on_demand -->|"injected when topic matches"| skills
+    on_demand -->|"injected when glob matches"| skills
     skills -->|"orchestrates"| subagents
     subagents -->|"specialized judgment"| skills
 ```
@@ -95,33 +97,40 @@ Subagents are domain-specialist roles the AI adopts for specific types of judgme
 
 ## 2. Rules in this repo
 
-| Rule file | `alwaysApply` | Purpose |
+| Rule file | Activation | Purpose |
 |---|---|---|
-| `governance_metadata.mdc` | `true` | Governance metadata YAML schema, LGPD/privacy classification rules, validation commands |
-| `naming_conventions.mdc` | `true` | Column/table/schema/DAG naming conventions — prefixes, snake_case, DW vs lake patterns |
-| `python_conventions.mdc` | `true` | Black/Flake8, absolute imports, `QuintoAndarLogger`, ABCs, Enums, Pydantic v2, TDD rules |
-| `sql_conventions.mdc` | `true` | SQL style guide, `SELECT *` prohibition, partition filtering, Person Data Model / PII rules |
-| `testing_conventions.mdc` | `true` | Pattern A (Qube `unittest.TestCase`) vs Pattern B (pytest class), Spark session fixture, mocking |
-| `dag_build.mdc` | `false` | Full DAG Builder reference: all cluster presets, workflow types, folder structure, advanced parameters |
-| `databricks_conventions.mdc` | `false` | Databricks SQL addendum: `{bracket}` vs `{{ Jinja }}` templating, Delta-specific syntax |
-| `pr_template.mdc` | `false` | PR description template with Why/What/How tested/Checklist sections |
-| `qube_specs.mdc` | `false` | Qube semantic layer conventions: dimension, measure, and metric declaration schemas |
-| `core_models_generation.mdc` | `false` | Core Data Model generation: mandatory file structure, declaration standards, Spark job patterns, schema validation, and test conventions |
+| `core.mdc` | always | Repo identity, five-layer architecture, DAG Builder overview, folder structure, CI commands, `ConfigurationService` |
+| `naming_conventions.mdc` | always | Column/table/schema/DAG naming conventions — prefixes, snake_case, DW vs lake patterns |
+| `governance_metadata.mdc` | glob `**/metadata/**/*.yml` | Governance metadata YAML schema, LGPD/privacy classification rules, validation commands |
+| `python_conventions.mdc` | glob `**/*.py` | Black/Flake8, absolute imports, `QuintoAndarLogger`, ABCs, Enums, Pydantic v2, TDD rules |
+| `sql_conventions.mdc` | glob `**/*.sql` | SQL style guide, `SELECT *` prohibition, partition filtering, Person Data Model / PII rules |
+| `testing_conventions.mdc` | glob `tests/**` | Pattern A (Qube `unittest.TestCase`) vs Pattern B (pytest class), Spark session fixture, mocking |
+| `dag_build.mdc` | on demand | Full DAG Builder reference: all cluster presets, workflow types, folder structure, advanced parameters |
+| `databricks_conventions.mdc` | on demand | Databricks SQL addendum: `{bracket}` vs `{{ Jinja }}` templating, Delta-specific syntax |
+| `pr_template.mdc` | on demand | PR description template with Why/What/How tested/Checklist sections |
+| `qube_specs.mdc` | glob `dags/qube/*` | Qube semantic layer conventions: dimension, measure, and metric declaration schemas |
+| `core_models_generation.mdc` | on demand | Core Data Model generation: mandatory file structure, declaration standards, Spark job patterns, schema validation, and test conventions |
+| `data_quality_tests.mdc` | glob `dags/**/data_quality/**/*.yml` | Inmetro (Great Expectations) validation catalog: `has_size`, `is_complete`, `is_unique`, `has_null_count`, `has_size_variation`, `custom`; DW dimension `-1` unknown row handling; `alert_channel` routing |
+| `people_domain.mdc` | glob `dags/people/**/*` | People DW 2.0 schema structure (11 schemas), SCD Type 2 pattern, Oracle HCM `4712-12-31` normalization, deprecated DAG list, enrich domain-driven naming |
 
 ### How "always on" rules save you from repeating yourself
 
-When you type "does this new column need a `personal_data_classification`?", the AI already knows — from `governance_metadata.mdc` — that:
+`core.mdc` and `naming_conventions.mdc` are injected into every prompt. This means the AI always knows the five-layer architecture, DAG Builder conventions, and column/table naming patterns without you having to repeat them.
 
-- `personal`, `highly_personal`, and `sensitive` are the three valid values
-- `sensitive` columns in enrich/DW tables require `table_privileges` in the DAG declaration
-- `sensitive` columns in metric/qube outputs require `privacy.k_anonymity >= 5`
-- Columns classified in raw must carry the same classification through clean → enrich → DW
+`naming_conventions.mdc` means the AI automatically applies `id_`, `ts_`, `dt_`, `is_`, `sk_` prefixes, and knows which metastore schema belongs to each layer.
 
-You never have to say any of that. The rule is always in context.
+### How glob-triggered rules activate
 
-Similarly, `naming_conventions.mdc` means the AI automatically applies `id_`, `ts_`, `dt_`, `is_`, `sk_` prefixes; `sql_conventions.mdc` blocks any `SELECT *` and enforces partition filter checks; and `testing_conventions.mdc` enforces the TDD Red → Green → Refactor workflow before any new module is considered complete.
+Six rules activate automatically when you open or edit a matching file type:
 
-### How on-demand rules activate
+- **`governance_metadata.mdc`** activates for any `metadata/**/*.yml` file — it already knows that `personal`, `highly_personal`, and `sensitive` are the three valid PII tiers; that `sensitive` columns need `table_privileges`; and that `k_anonymity >= 5` is required in metric/qube outputs.
+- **`sql_conventions.mdc`** activates for any `.sql` file — it blocks `SELECT *`, enforces partition filters, and applies Person Data Model rules.
+- **`testing_conventions.mdc`** activates for any file under `tests/` — it enforces the TDD Red → Green → Refactor workflow and selects the correct test pattern (Pattern A vs Pattern B).
+- **`python_conventions.mdc`** activates for any `.py` file — it enforces Black/Flake8 style, `QuintoAndarLogger`, and Pydantic v2 APIs.
+- **`data_quality_tests.mdc`** activates for any `data_quality/**/*.yml` file — it provides the full Inmetro validation catalog, including the DW dimension `-1` unknown row rule.
+- **`people_domain.mdc`** activates for any file under `dags/people/` — it applies People DW 2.0 schema structure, SCD Type 2 conventions, Oracle HCM source system rules, and the list of deprecated DAGs to avoid.
+
+### How other on-demand rules activate
 
 When you ask "create a DAG for this new table", the AI recognises the DAG-building topic and loads `dag_build.mdc`, which tells it:
 
@@ -257,34 +266,39 @@ cluster:
 
 ---
 
-### `validate-dag` — Run all local CI checks in parallel
+### `run-dag-locally` — Run and test a DAG on local Airflow and Forno
 
-**Trigger phrases**: "validate my DAG", "check before pushing", "debug CI failure"
+**Trigger phrases**: "run my DAG locally", "test this DAG", "trigger the DAG", "upload to forno", "test on staging", "upload my changes to Databricks"
 
-**What it does**: Launches 3 shell subagents in parallel, then synthesizes results into a prioritized fix list:
+**What it does** (8 steps):
 
-| Check | Command |
+1. **Unit tests** — run the relevant test file first (`bietlejuice/foo/bar.py` → `tests/unit/foo/test_bar.py`); fix failures before proceeding
+2. **Prerequisites check** — verify Docker is running, Astro containers are up, and `GITHUB_TOKEN` / `DATABRICKS_TOKEN` / `DATABRICKS_USERNAME` are set
+3. **Upload artifacts to Forno S3** — upload only what changed (decision matrix below); `make upload-forno-release` for a full clean sync
+4. **Selective DAG sync** — copy only the target DAG (not all 771) into `local/astro/dags/`, then restart Astro containers
+5. **Verify via REST API** — poll `has_import_errors` and confirm all expected tasks are listed
+6. **Trigger** — POST to the Airflow API with `run_type: test_run` and a date range that matches available Forno data
+7. **Monitor** — poll DAG run and task states with exponential backoff (15 s → 60 s → 120 s)
+8. **Inspect failures** — pull logs from Airflow API; for `Workload failed` errors, query the Databricks runs API with the run ID from Airflow logs
+
+**Artifact upload decision matrix**:
+
+| Changed path | Make target |
 |---|---|
-| Declaration schema | `make validate-dag-declaration-files dag_name={dag_name}` |
-| Metadata content | `make validate-metadata-files-content` |
-| Lineage consistency | `make validate-lineage-consistency` |
+| `bietlejuice/qube/jobs/**/*.py` | `make upload-local-qube-jobs` |
+| `bietlejuice/**/*.py` (non-qube) | `make upload-local-package` |
+| `dags/**/spark_jobs/**/*.py` | `make upload-local-spark-jobs` |
+| `dags/**/queries/**/*.sql` | `make upload-local-queries` |
+| `dags/**/data_quality/**/*.yml` | `make upload-local-data-quality` |
+| `dags/**/schemas/**/*.json` | `make upload-local-schemas` |
+| Multiple / unsure | `make upload-forno-release` |
 
-**Example output synthesis**:
+**Key caveats**:
 
-```
-BLOCKING (must fix before push):
-  [declaration] fraud_events: missing required field 'owner' in metadata
-  [metadata] chargeback_summary.yml: description is too short (< 10 chars)
-  [lineage] chargeback_summary.amount: lineage points to unknown column
-
-NON-BLOCKING (warnings):
-  [metadata] fraud_events.yml: column 'cpf' missing personal_data_classification
-```
-
-Common fixes:
-- Missing `owner`: add `owner: your.name@quintoandar.com.br` to the metadata YAML
-- Short description: expand to at least 10 meaningful characters
-- Wrong lineage format: use `database.table.column` (e.g. `ebdb.fraud_raw.amount`)
+- **Core model DAGs**: `make upload-local-spark-jobs` uploads to a personal S3 path; core model DAGs resolve from the shared forno path. Use `aws s3 cp` directly to `github-repos/bi-etl-ejuice/spark_jobs/{dag_name}/` (Step 3a in the skill).
+- **Wheel build**: `setup.py` must read `requirements.txt`, not `requirements-freeze.txt`. If the wheel causes `ModuleNotFoundError` on Databricks, update `setup.py` accordingly (Step 3b in the skill).
+- **AWS credentials**: verify with `aws sts get-caller-identity` before every upload; renew with `aws sso login --profile forno` if expired.
+- **Selective copy**: do **not** use `make restart-local-environment` — it copies all 771 DAGs and slows the scheduler significantly.
 
 ---
 
@@ -333,7 +347,7 @@ CHANGE PLAN:
 
 **Trigger phrases**: "review my changes", "prepare a PR", "is this ready to push"
 
-**What it does**: Runs 5 checks in parallel before generating the PR description:
+**What it does**: Runs 7 checks in parallel before generating the PR description:
 
 | Check | What it catches |
 |---|---|
@@ -342,6 +356,8 @@ CHANGE PLAN:
 | Metadata pairs | `.sql` without matching `.yml`, description < 10 chars, missing lineage |
 | Python conventions | `logging.getLogger` instead of `QuintoAndarLogger`, relative imports, bare `NotImplementedError` |
 | LGPD classification | PII columns without `personal_data_classification`, `sensitive` without `table_privileges` |
+| Test coverage | Missing test files for changed modules, coverage below 80% threshold |
+| Lint | Additional lint checks beyond style (`make check-style`) |
 
 Blocking issues must be fixed before the PR description is generated.
 
@@ -352,6 +368,10 @@ Blocking issues must be fixed before the PR description is generated.
 **Trigger phrases**: "write tests for my Spark job", "generate unit tests", "add tests for this module"
 
 **What it does**: Reads the source module, selects the correct test pattern, mirrors the file path, and writes the test file.
+
+**Step 0 — TDD mode** (applied before writing any test):
+- If the implementation does **not exist yet**: generate `xfail` stub tests first (Red phase), then implement, then make tests pass (Green → Refactor).
+- If fixing a **bug**: add a parametrized regression test case that reproduces the bug before fixing it.
 
 **Pattern selection** (automatic, based on source path):
 
@@ -444,40 +464,6 @@ Most CI failures for new tables follow this order — fix them in sequence:
 **"Passes locally but fails in CI"**: CI compares against `origin/master`. Run `git fetch --no-tags origin +refs/heads/master` before reproducing locally.
 
 Note: `validate-cross-layer-joins` **always exits 0** — it is a warning-only check. Add justified entries to `scripts/governance_metadata_validation/skip_list.yml` if the violation is intentional.
-
----
-
-### `upload-to-forno` — Upload artifacts for Databricks forno testing
-
-**Trigger phrases**: "test on forno", "upload to Databricks", "test my changes on staging", "how do I test this on Databricks?"
-
-**What it does** (4 steps):
-
-1. **Check prerequisites** — AWS credentials (`aws sts get-caller-identity`) and `GITHUB_TOKEN`
-2. **Detect what changed** — `git diff --name-only origin/master HEAD` to identify changed paths
-3. **Upload the right artifacts** — based on the decision table below
-4. **Trigger the DAG** — via local Airflow UI, forno Airflow, or directly in Databricks Workflows
-
-**Changed path → upload decision table**:
-
-| Changed path pattern | Upload needed | Make target(s) |
-|---|---|---|
-| `bietlejuice/qube/jobs/**/*.py` | Qube jobs only | `make upload-local-qube-jobs` |
-| `bietlejuice/**/*.py` (any other path) | Full wheel + Spark jobs | `make upload-local-spark-jobs` then `make upload-local-wheel` |
-| Both qube jobs AND other bietlejuice files | All three | `make upload-local-spark-jobs` → `make upload-local-wheel` → `make upload-local-qube-jobs` |
-| `dags/**/*_declaration.yml` only | DAG files only, no S3 upload | `make create-dag-files` |
-| `queries/**/*.sql` or `scripts/**/*.py` | No upload needed | — |
-
-**Important**: After uploading a new wheel, Databricks clusters must be **restarted** to pick up the new code. Qube job uploads take effect immediately on next job start — no restart needed.
-
-**Common issues**:
-
-| Symptom | Fix |
-|---|---|
-| `NoCredentialsError` or `ExpiredToken` | `aws sso login --profile forno` |
-| `403 Forbidden` on S3 upload | Check profile has write access to the forno bucket |
-| Wheel build fails with import error | Export `GITHUB_TOKEN` and retry |
-| Databricks job uses old code after upload | Restart the Databricks cluster |
 
 ---
 
@@ -646,7 +632,7 @@ sequenceDiagram
     participant SK as create-dag Skill
     participant GO as Governance Officer
     participant RE as Reliability Engineer
-    participant V as validate-dag Skill
+    participant V as local_CI_checks
     participant PR as review-pr Skill
 
     U->>AI: "Create a DW DAG dw_fraud_metrics in fintech line with tables fraud_alerts and risk_scores"
@@ -658,7 +644,7 @@ sequenceDiagram
     GO-->>AI: personal_data_classification: personal — add to metadata
     AI->>RE: which cluster for join-heavy fraud SQL?
     RE-->>AI: upgrade to med_memory_cluster
-    AI->>V: invoke validate-dag skill
+    AI->>V: run make validate-* checks
     V-->>AI: all checks pass
     AI->>PR: invoke review-pr skill
     PR-->>U: PR description draft + no blocking issues
@@ -721,7 +707,7 @@ cluster:
 
 It also suggests adding `z_order_by: [id_contract, dt_event]` in `tables_customization` for the most common query patterns.
 
-**Step 5 — validate-dag skill confirms everything passes**
+**Step 5 — local CI checks confirm everything passes**
 
 ```
 make validate-dag-declaration-files dag_name=dw_fraud_metrics  ✓
@@ -759,12 +745,11 @@ Add DW DAG for banking fraud metrics to support the Fintech risk dashboard.
 |---|---|
 | Create a new DAG | "Create a DW DAG dw_payments in the fintech line" |
 | Create a Qube spec | "Create a Qube measure for visit_total with windows 1, 7, 28" |
-| Validate before pushing | "Validate my DAG dw_payments before I push" |
+| Run or test a DAG locally | "Run my DAG dw_payments locally" · "Test this DAG on forno" · "Upload my changes to Databricks" |
 | Impact of a rename | "What breaks if I rename enrich_contract.id_status?" |
 | Pre-push code review | "Review my changes and prepare the PR description" |
 | Generate unit tests | "Write unit tests for bietlejuice/qube/jobs/visit_total.py" |
 | Fix a CI failure | "validate-metadata-files-content is failing on my PR" |
-| Upload to forno | "Upload my changes to forno for testing" |
 | Set up local env | "Set up my local environment from scratch" |
 
 ### Prompts that activate each subagent
