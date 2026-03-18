@@ -1,5 +1,5 @@
 ---
-table_name: dw_employee_details.dim_personal_info
+table_name: dw_employee_details.dim_employee
 alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
@@ -39,7 +39,7 @@ column_level_validations:
       # Birth date cannot be in the future; must be within reasonable range (after 1900).
       constraint: |-
         (SELECT COUNT(*)
-         FROM dw_employee_details.dim_personal_info
+         FROM dw_employee_details.dim_employee
          WHERE dt_birth IS NOT NULL
            AND (dt_birth > CURRENT_DATE() OR dt_birth < DATE('1900-01-01'))
         ) = 0
@@ -52,7 +52,7 @@ column_level_validations:
       # Load timestamp cannot be in the future (detects clock skew or ingestion errors).
       constraint: |-
         (SELECT COUNT(*)
-         FROM dw_employee_details.dim_personal_info
+         FROM dw_employee_details.dim_employee
          WHERE ts_load IS NOT NULL
            AND ts_load > CURRENT_TIMESTAMP()
         ) = 0

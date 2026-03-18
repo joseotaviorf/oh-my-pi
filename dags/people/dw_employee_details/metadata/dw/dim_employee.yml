@@ -1,6 +1,6 @@
 ---
 database_name: dw_employee_details
-table_name: dim_personal_info
+table_name: dim_employee
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |

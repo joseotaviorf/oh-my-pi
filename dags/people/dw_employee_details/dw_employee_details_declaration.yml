@@ -54,7 +54,7 @@ workflow:
     dim_management_hierarchy:
       vacuum_retention_hours: 168
       vacuum_lite: true
-    dim_personal_info:
+    dim_employee:
       vacuum_retention_hours: 168
       vacuum_lite: true
     fact_vacation_balances:

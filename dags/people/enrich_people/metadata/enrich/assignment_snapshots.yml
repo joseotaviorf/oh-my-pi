@@ -55,7 +55,7 @@ columns:
     lineage:
       - datalake_people.identifier_mapping.assignment_number
   manager_assignment_number:
-    description: Assignment number of the direct manager. Use to join to assignment_snapshots or dim_personal_info for manager details. NULL when no manager (e.g. CEO).
+    description: Assignment number of the direct manager. Use to join to assignment_snapshots or dim_employee for manager details. NULL when no manager (e.g. CEO).
     lineage:
       - datalake_people.management_hierarchy.manager_assignment_number
   hierarchy_level:
