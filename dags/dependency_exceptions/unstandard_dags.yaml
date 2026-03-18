@@ -41,3 +41,5 @@ bietlejuice.gsheets_support_and_service: *gsheets-default
 bietlejuice.gsheets_static:
   <<: *gsheets-default
   is_static: true
+bietlejuice.hr_system_custom:
+  is_static: true

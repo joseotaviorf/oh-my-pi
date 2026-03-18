@@ -3,7 +3,7 @@ dag:
   dag_documentation:
     dag_purpose: |
       Retrieve data from Oracle HR System CUSTOM API, a sub product of Oracle Human Capital Resources (Oracle HCM).
-  schedule_interval: 0 3 * * *
+      Static DAG: legacy registration data rarely changes; no schedule (manual trigger only). Downstream DAGs (e.g. enrich_people) do not wait for it.
   owner: Data People
   callback_by_task: False
 cluster:
