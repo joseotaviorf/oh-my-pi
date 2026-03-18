@@ -1,0 +1,22 @@
+database_name: datalake_retsuko_clean
+table_name: discount_entry
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Association between a discount and an accounting entry in Retsuko.
+columns:
+  id:
+    description: "Primary key for joins in retsuko"
+    lineage:
+      - datalake_retsuko_raw.discount_entry.id
+  id_discount:
+    description: "Internal id of the discount"
+    lineage:
+      - datalake_retsuko_raw.discount_entry.discount_id
+  id_entry_external:
+    description: "External id of the related entry"
+    lineage:
+      - datalake_retsuko_raw.discount_entry.entry_external_id
+  ts_retsuko_created:
+    description: "Datetime when the row was created in Retsuko"
+    lineage:
+      - datalake_retsuko_raw.discount_entry.retsuko_created_at

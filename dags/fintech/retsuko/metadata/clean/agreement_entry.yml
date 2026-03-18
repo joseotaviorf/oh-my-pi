@@ -1,0 +1,58 @@
+database_name: datalake_retsuko_clean
+table_name: agreement_entry
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Links agreements to accounting entries per installment and accrual period.
+columns:
+  id:
+    description: "Primary key for joins in retsuko"
+    lineage:
+      - datalake_retsuko_raw.agreement_entry.id
+  id_external:
+    description: "Identifier of the agreement-entry row in upstream systems"
+    lineage:
+      - datalake_retsuko_raw.agreement_entry.external_id
+  id_agreement_external:
+    description: "External id of the parent agreement"
+    lineage:
+      - datalake_retsuko_raw.agreement_entry.agreement_external_id
+  id_from_entry_external:
+    description: "External id of the source entry"
+    lineage:
+      - datalake_retsuko_raw.agreement_entry.from_entry_external_id
+  id_to_entry_external:
+    description: "External id of the target entry"
+    lineage:
+      - datalake_retsuko_raw.agreement_entry.to_entry_external_id
+  installment_number:
+    description: "Installment index for this agreement-entry link"
+    lineage:
+      - datalake_retsuko_raw.agreement_entry.installment_number
+  accrual_year_month:
+    description: "Accrual period (year-month) for the entry"
+    lineage:
+      - datalake_retsuko_raw.agreement_entry.accrual_year_month
+  status:
+    description: "Lifecycle status of the agreement entry"
+    lineage:
+      - datalake_retsuko_raw.agreement_entry.status
+  ts_published:
+    description: "Datetime when the agreement entry was published"
+    lineage:
+      - datalake_retsuko_raw.agreement_entry.published_at
+  ts_created:
+    description: "Record creation datetime in source"
+    lineage:
+      - datalake_retsuko_raw.agreement_entry.created_at
+  ts_updated:
+    description: "Record last update datetime in source"
+    lineage:
+      - datalake_retsuko_raw.agreement_entry.updated_at
+  ts_retsuko_created:
+    description: "Datetime when the row was created in Retsuko"
+    lineage:
+      - datalake_retsuko_raw.agreement_entry.retsuko_created_at
+  ts_retsuko_updated:
+    description: "Datetime when the row was last updated in Retsuko"
+    lineage:
+      - datalake_retsuko_raw.agreement_entry.retsuko_updated_at

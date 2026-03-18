@@ -1,0 +1,102 @@
+database_name: datalake_retsuko_clean
+table_name: discount
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Discount definitions linked to contracts and accounts (rules, amounts, lifecycle).
+columns:
+  id:
+    description: "Primary key for joins in retsuko"
+    lineage:
+      - datalake_retsuko_raw.discount.id
+  id_external:
+    description: "Discount identifier in upstream systems"
+    lineage:
+      - datalake_retsuko_raw.discount.external_id
+  id_contract_external:
+    description: "External id of the related contract"
+    lineage:
+      - datalake_retsuko_raw.discount.contract_external_id
+  id_from_account_external:
+    description: "External id of the origin account"
+    lineage:
+      - datalake_retsuko_raw.discount.from_account_external_id
+  id_to_account_external:
+    description: "External id of the destination account"
+    lineage:
+      - datalake_retsuko_raw.discount.to_account_external_id
+  id_request_source:
+    description: "Identifier of the request source"
+    lineage:
+      - datalake_retsuko_raw.discount.request_source_id
+  id_idempotency:
+    description: "Idempotency key for the discount request"
+    lineage:
+      - datalake_retsuko_raw.discount.idempotency_id
+  description:
+    description: "Human-readable description of the discount"
+    lineage:
+      - datalake_retsuko_raw.discount.description
+  starts_when:
+    description: "When the discount start rule applies"
+    lineage:
+      - datalake_retsuko_raw.discount.starts_when
+  number_of_times:
+    description: "How many times the discount can apply"
+    lineage:
+      - datalake_retsuko_raw.discount.number_of_times
+  contract_end_action:
+    description: "Behavior when the contract ends"
+    lineage:
+      - datalake_retsuko_raw.discount.contract_end_action
+  bill_item:
+    description: "Bill item type affected by the discount"
+    lineage:
+      - datalake_retsuko_raw.discount.bill_item
+  amount:
+    description: "Discount amount"
+    lineage:
+      - datalake_retsuko_raw.discount.amount
+  request_source_name:
+    description: "Name of the request source"
+    lineage:
+      - datalake_retsuko_raw.discount.request_source_name
+  request_as:
+    description: "Context of how the discount was requested"
+    lineage:
+      - datalake_retsuko_raw.discount.request_as
+  source:
+    description: "Origin system or channel of the discount"
+    lineage:
+      - datalake_retsuko_raw.discount.source
+  normality_control:
+    description: "Normality control flag or code for the discount"
+    lineage:
+      - datalake_retsuko_raw.discount.normality_control
+  status:
+    description: "Lifecycle status of the discount"
+    lineage:
+      - datalake_retsuko_raw.discount.status
+  canceled_when:
+    description: "Rule or moment describing when the discount was canceled"
+    lineage:
+      - datalake_retsuko_raw.discount.canceled_when
+  ts_canceled:
+    description: "Datetime when the discount was canceled"
+    lineage:
+      - datalake_retsuko_raw.discount.canceled_at
+  ts_created:
+    description: "Record creation datetime in source"
+    lineage:
+      - datalake_retsuko_raw.discount.created_at
+  ts_published:
+    description: "Datetime when the discount was published"
+    lineage:
+      - datalake_retsuko_raw.discount.published_at
+  ts_retsuko_created:
+    description: "Datetime when the row was created in Retsuko"
+    lineage:
+      - datalake_retsuko_raw.discount.retsuko_created_at
+  ts_retsuko_updated:
+    description: "Datetime when the row was last updated in Retsuko"
+    lineage:
+      - datalake_retsuko_raw.discount.retsuko_updated_at

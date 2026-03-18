@@ -1,0 +1,90 @@
+database_name: datalake_retsuko_clean
+table_name: agreement
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Financial agreements linked to contracts (installments, accrual periods, billing rules).
+columns:
+  id:
+    description: "Primary key for joins in retsuko"
+    lineage:
+      - datalake_retsuko_raw.agreement.id
+  id_external:
+    description: "Agreement identifier in upstream systems"
+    lineage:
+      - datalake_retsuko_raw.agreement.external_id
+  id_contract_external:
+    description: "External id of the related contract"
+    lineage:
+      - datalake_retsuko_raw.agreement.contract_external_id
+  description:
+    description: "Human-readable description of the agreement"
+    lineage:
+      - datalake_retsuko_raw.agreement.description
+  total_amount:
+    description: "Total amount covered by the agreement"
+    lineage:
+      - datalake_retsuko_raw.agreement.total_amount
+  number_of_installments:
+    description: "Number of installments defined for the agreement"
+    lineage:
+      - datalake_retsuko_raw.agreement.number_of_installments
+  bill_item:
+    description: "Bill item type associated with the agreement"
+    lineage:
+      - datalake_retsuko_raw.agreement.bill_item
+  contract_end_action:
+    description: "Behavior when the contract ends (domain-specific)"
+    lineage:
+      - datalake_retsuko_raw.agreement.contract_end_action
+  producer:
+    description: "Source system or producer of the agreement record"
+    lineage:
+      - datalake_retsuko_raw.agreement.producer
+  charge_proportional:
+    description: "Whether charges are proportional (domain flag)"
+    lineage:
+      - datalake_retsuko_raw.agreement.charge_proportional
+  starts_when:
+    description: "When the agreement billing/start rule applies"
+    lineage:
+      - datalake_retsuko_raw.agreement.starts_when
+  finished_when:
+    description: "When the agreement end rule applies"
+    lineage:
+      - datalake_retsuko_raw.agreement.finished_when
+  tenant_accrual_year_month:
+    description: "Accrual year-month for the tenant side"
+    lineage:
+      - datalake_retsuko_raw.agreement.tenant_accrual_year_month
+  landlord_accrual_year_month:
+    description: "Accrual year-month for the landlord side"
+    lineage:
+      - datalake_retsuko_raw.agreement.landlord_accrual_year_month
+  ts_canceled:
+    description: "Datetime when the agreement was canceled"
+    lineage:
+      - datalake_retsuko_raw.agreement.canceled_at
+  ts_settle:
+    description: "Datetime when the agreement was settled"
+    lineage:
+      - datalake_retsuko_raw.agreement.settle_at
+  ts_published:
+    description: "Datetime when the agreement was published"
+    lineage:
+      - datalake_retsuko_raw.agreement.published_at
+  ts_created:
+    description: "Record creation datetime in source"
+    lineage:
+      - datalake_retsuko_raw.agreement.created_at
+  ts_updated:
+    description: "Record last update datetime in source"
+    lineage:
+      - datalake_retsuko_raw.agreement.updated_at
+  ts_retsuko_created:
+    description: "Datetime when the row was created in Retsuko"
+    lineage:
+      - datalake_retsuko_raw.agreement.retsuko_created_at
+  ts_retsuko_updated:
+    description: "Datetime when the row was last updated in Retsuko"
+    lineage:
+      - datalake_retsuko_raw.agreement.retsuko_updated_at

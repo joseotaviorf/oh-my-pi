@@ -1,0 +1,24 @@
+SELECT
+    id,
+    external_id AS id_external,
+    contract_external_id AS id_contract_external,
+    description,
+    total_amount,
+    number_of_installments,
+    bill_item,
+    contract_end_action,
+    producer,
+    charge_proportional,
+    starts_when,
+    finished_when,
+    tenant_accrual_year_month,
+    landlord_accrual_year_month,
+    timestamp(canceled_at) AS ts_canceled,
+    timestamp(settle_at) AS ts_settle,
+    timestamp(published_at) AS ts_published,
+    timestamp(created_at) AS ts_created,
+    timestamp(updated_at) AS ts_updated,
+    timestamp(retsuko_created_at) AS ts_retsuko_created,
+    timestamp(retsuko_updated_at) AS ts_retsuko_updated
+FROM
+    datalake_retsuko_raw.agreement

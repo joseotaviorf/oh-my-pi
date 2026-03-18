@@ -1,0 +1,74 @@
+database_name: datalake_retsuko_clean
+table_name: early_termination
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Early termination records for contracts (fees, accounts, notice, publishing).
+columns:
+  id:
+    description: "Primary key for joins in retsuko"
+    lineage:
+      - datalake_retsuko_raw.early_termination.id
+  id_external:
+    description: "Early termination identifier in upstream systems"
+    lineage:
+      - datalake_retsuko_raw.early_termination.external_id
+  id_contract_external:
+    description: "External id of the related contract"
+    lineage:
+      - datalake_retsuko_raw.early_termination.contract_external_id
+  id_from_account:
+    description: "Origin account id"
+    lineage:
+      - datalake_retsuko_raw.early_termination.from_account_id
+  id_to_account:
+    description: "Destination account id"
+    lineage:
+      - datalake_retsuko_raw.early_termination.to_account_id
+  dont_charge_adm_fee:
+    description: "Whether administrative fee is not charged on early termination"
+    lineage:
+      - datalake_retsuko_raw.early_termination.dont_charge_adm_fee
+  prior_notice:
+    description: "Prior notice configuration or value"
+    lineage:
+      - datalake_retsuko_raw.early_termination.prior_notice
+  fee_amount_agreed:
+    description: "Agreed fee amount for early termination"
+    lineage:
+      - datalake_retsuko_raw.early_termination.fee_amount_agreed
+  version:
+    description: "Record version"
+    lineage:
+      - datalake_retsuko_raw.early_termination.version
+  source:
+    description: "Origin system or channel of the record"
+    lineage:
+      - datalake_retsuko_raw.early_termination.source
+  normality_control:
+    description: "Normality control flag or code"
+    lineage:
+      - datalake_retsuko_raw.early_termination.normality_control
+  initial_year_month:
+    description: "Initial accrual year-month for the termination context"
+    lineage:
+      - datalake_retsuko_raw.early_termination.initial_year_month
+  ts_canceled:
+    description: "Datetime when the early termination was canceled"
+    lineage:
+      - datalake_retsuko_raw.early_termination.canceled_at
+  ts_created:
+    description: "Record creation datetime in source"
+    lineage:
+      - datalake_retsuko_raw.early_termination.created_at
+  ts_published:
+    description: "Datetime when the record was published"
+    lineage:
+      - datalake_retsuko_raw.early_termination.published_at
+  ts_retsuko_created:
+    description: "Datetime when the row was created in Retsuko"
+    lineage:
+      - datalake_retsuko_raw.early_termination.retsuko_created_at
+  ts_retsuko_updated:
+    description: "Datetime when the row was last updated in Retsuko"
+    lineage:
+      - datalake_retsuko_raw.early_termination.retsuko_updated_at

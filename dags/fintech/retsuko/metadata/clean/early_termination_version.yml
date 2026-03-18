@@ -1,0 +1,58 @@
+database_name: datalake_retsuko_clean
+table_name: early_termination_version
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Versioned snapshots of early termination terms (fees, installments, base due date).
+columns:
+  id:
+    description: "Primary key for joins in retsuko"
+    lineage:
+      - datalake_retsuko_raw.early_termination_version.id
+  id_external:
+    description: "Version identifier in upstream systems"
+    lineage:
+      - datalake_retsuko_raw.early_termination_version.external_id
+  id_early_termination_external:
+    description: "External id of the parent early termination"
+    lineage:
+      - datalake_retsuko_raw.early_termination_version.early_termination_external_id
+  version_type:
+    description: "Type of this termination version"
+    lineage:
+      - datalake_retsuko_raw.early_termination_version.version_type
+  is_active:
+    description: "Whether this version is the active one"
+    lineage:
+      - datalake_retsuko_raw.early_termination_version.active
+  fee_amount_agreed:
+    description: "Agreed fee amount for this version"
+    lineage:
+      - datalake_retsuko_raw.early_termination_version.fee_amount_agreed
+  fee_amount_original:
+    description: "Original fee amount before adjustments"
+    lineage:
+      - datalake_retsuko_raw.early_termination_version.fee_amount_original
+  number_of_installments:
+    description: "Number of installments in this version"
+    lineage:
+      - datalake_retsuko_raw.early_termination_version.number_of_installments
+  ts_base_due:
+    description: "Base due date used to build the installment schedule"
+    lineage:
+      - datalake_retsuko_raw.early_termination_version.base_due_date
+  ts_created:
+    description: "Record creation datetime in source"
+    lineage:
+      - datalake_retsuko_raw.early_termination_version.created_at
+  ts_published:
+    description: "Datetime when the version was published"
+    lineage:
+      - datalake_retsuko_raw.early_termination_version.published_at
+  ts_retsuko_created:
+    description: "Datetime when the row was created in Retsuko"
+    lineage:
+      - datalake_retsuko_raw.early_termination_version.retsuko_created_at
+  ts_retsuko_updated:
+    description: "Datetime when the row was last updated in Retsuko"
+    lineage:
+      - datalake_retsuko_raw.early_termination_version.retsuko_updated_at
