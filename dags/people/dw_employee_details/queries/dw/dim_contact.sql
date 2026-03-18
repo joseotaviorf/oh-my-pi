@@ -25,28 +25,6 @@ contact_versions AS (
     WHERE
         ap.dt_effective_started <= CURRENT_DATE
 ),
-work_email_at_version AS (
-    SELECT
-        cv.id_person,
-        cv.dt_effective_started,
-        ea.email_address AS work_email
-    FROM
-        contact_versions AS cv
-    INNER JOIN
-        datalake_pin_core_clean.email_address AS ea
-            ON cv.id_person = ea.id_person
-            AND ea.email_type = 'W1'
-            AND ea.dt_started <= cv.dt_effective_started
-            AND (ea.dt_ended >= cv.dt_effective_started OR ea.dt_ended IS NULL)
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                cv.id_person,
-                cv.dt_effective_started
-            ORDER BY
-                ea.dt_started DESC
-        ) = 1
-),
 personal_email_at_version AS (
     SELECT
         cv.id_person,
@@ -145,7 +123,6 @@ address_at_version AS (
 SELECT
     MD5(CONCAT_WS('|', CAST(cv.id_person AS STRING), CAST(cv.dt_effective_started AS STRING))) AS sk_contact_version,
     cv.person_number,
-    we.work_email,
     pe.personal_email,
     pv.country_code_number AS phone_country_code,
     pv.area_code AS phone_area_code,
@@ -192,10 +169,6 @@ SELECT
     NOW() AS ts_load
 FROM
     contact_versions AS cv
-LEFT JOIN
-    work_email_at_version AS we
-        ON cv.id_person = we.id_person
-        AND cv.dt_effective_started = we.dt_effective_started
 LEFT JOIN
     personal_email_at_version AS pe
         ON cv.id_person = pe.id_person

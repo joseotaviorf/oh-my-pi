@@ -75,6 +75,10 @@ columns:
     description: Boolean flag indicating if the assignment is currently active (TRUE) or not (FALSE).
     lineage:
     - datalake_pin_core_clean.all_assignments.assignment_status_type
+  is_person_latest_assignment:
+    description: |
+      True when this row represents the most recent assignment for the person (by dt_started / hire date).
+      Use to filter one row per person for dim_employee and similar person-level views.
   dt_projected_started:
     description: Projected start date for the employee's activities, usually for future hires.
     lineage:

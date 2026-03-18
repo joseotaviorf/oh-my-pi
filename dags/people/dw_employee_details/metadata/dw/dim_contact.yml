@@ -5,7 +5,7 @@ domain: People
 description: |
   Dimension table with contact information of employees.
   SCD Type 2: tracks historical versions when email, phone, address or github changes.
-  Includes work/personal email, phone, github username, and mailing address.
+  Includes personal email, phone, github username, and mailing address.
   sk_contact_version uniquely identifies each version (employee + valid from date).
 columns:
   sk_contact_version:
@@ -17,10 +17,6 @@ columns:
     description: Business key for the employee.
     lineage:
       - datalake_pin_core_clean.all_people.person_number
-  work_email:
-    description: Work email of the employee at this version.
-    lineage:
-      - datalake_pin_core_clean.email_address.email_address
   personal_email:
     description: Personal email of the employee at this version.
     lineage:

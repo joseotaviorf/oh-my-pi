@@ -1,0 +1,29 @@
+---
+database_name: dw_people
+table_name: dim_employee
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |
+  Dimension table for employee public profile. Contains person_number, name, work_email
+  for use in dashboards, hierarchy views, and non-sensitive reporting.
+  Grain: one record per employee. SCD Type 1: one row per employee with current values.
+columns:
+  sk_employee:
+    description: Surrogate key for the employee. Stable system identifier for the person.
+    lineage:
+      - datalake_people.identifier_mapping.id_person
+  person_number:
+    description: Internal person code. Unique identifier for the employee in the HR system (PIN - Oracle HCM).
+    lineage:
+      - datalake_people.identifier_mapping.person_number
+  name:
+    description: Current display or preferred name
+    lineage:
+      - datalake_people.identifier_mapping.display_name
+      - datalake_people.identifier_mapping.full_name
+  work_email:
+    description: Current work email of the employee.
+    lineage:
+      - datalake_people.identifier_mapping.work_email
+  ts_load:
+    description: Timestamp when the record was loaded into the data warehouse.

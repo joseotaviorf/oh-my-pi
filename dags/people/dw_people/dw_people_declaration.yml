@@ -30,6 +30,9 @@ workflow:
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
   tables_customization:
+    dim_employee:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
     dim_management_hierarchy:
       vacuum_retention_hours: 168
       vacuum_lite: true

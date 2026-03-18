@@ -30,6 +30,10 @@ columns:
     lineage:
       - datalake_pin_core_clean.person_name.display_name
       - datalake_pin_core_clean.person_name.full_name
+  work_email:
+    description: Current work email of the employee.
+    lineage:
+      - datalake_people.identifier_mapping.work_email
   highest_education_level:
     description: |
       Human-readable description of the highest education level attained by the employee

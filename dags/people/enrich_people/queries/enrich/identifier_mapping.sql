@@ -100,6 +100,12 @@ SELECT
     LOWER(pe.email_address) AS personal_email,
     tu.id_person IS NOT NULL AS is_user_test,
     ca.assignment_status_type = 'ACTIVE' AS is_active,
+    ROW_NUMBER() OVER (
+        PARTITION BY
+            ca.id_person
+        ORDER BY
+            pp.dt_started DESC NULLS LAST
+    ) = 1 AS is_person_latest_assignment,
     ca.dt_projected_started,
     pp.dt_started,
     pp.dt_actual_termination,
