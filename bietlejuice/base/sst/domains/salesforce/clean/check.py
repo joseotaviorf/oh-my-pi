@@ -69,6 +69,6 @@ def check_for_create_partition(df):
         Aggregated dataframe with one row per record_id and a boolean
         flag indicating CREATE presence.
     """
-    return df.groupby("record_id").agg(
+    return df.groupby("id_record").agg(
         F.bool_or(F.col("event_type") == "CREATE").alias("has_create")
     )

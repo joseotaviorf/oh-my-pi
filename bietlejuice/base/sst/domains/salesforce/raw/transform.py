@@ -12,7 +12,7 @@ def sf_cdc_mandatory_fields(df: DataFrame) -> DataFrame:
     assert "ChangeEventHeader" in cols, "Missing CDC column"
 
     sf_cols = {
-        "record_id": F.explode(F.col("ChangeEventHeader.recordIds")),
+        "id_record": F.explode(F.col("ChangeEventHeader.recordIds")),
         "entity_name": F.col("ChangeEventHeader.entityName"),
         "event_type": F.col("ChangeEventHeader.changeType"),
         "transaction_key": F.col("ChangeEventHeader.transactionKey"),

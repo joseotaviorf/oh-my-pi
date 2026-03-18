@@ -14,10 +14,10 @@ logger = QuintoAndarLogger("sst.domains.salesforce.clean.transform")
 def _latest_row_for_record_id(
     spark, records_id_df, target_table, sort_col="committed_at"
 ):
-    base_ids = records_id_df.select("record_id").dropDuplicates(["record_id"])
+    base_ids = records_id_df.select("id_record").dropDuplicates(["id_record"])
     latest = spark.read.table(target_table)
-    history = latest.join(F.broadcast(base_ids), "record_id", "right")
-    w = Window.partitionBy("record_id").orderBy(F.col(sort_col).desc_nulls_last())
+    history = latest.join(F.broadcast(base_ids), "id_record", "right")
+    w = Window.partitionBy("id_record").orderBy(F.col(sort_col).desc_nulls_last())
     return (
         history.withColumn("row", F.row_number().over(w))
         .withColumn(
@@ -60,17 +60,17 @@ def search_for_latest_record(spark, df, target_table):
 
 def in_memory_cdc_udpate(df):
     w = (
-        Window.partitionBy("record_id")
+        Window.partitionBy("id_record")
         .orderBy("commit_ts", "commit_number", "sequence_number")
         .rowsBetween(Window.unboundedPreceding, 0)
     )
     cols = [
         col
         for col in df.columns
-        if col not in ["record_id", "commit_number", "commit_ts", "sequence_number"]
+        if col not in ["id_record", "commit_number", "commit_ts", "sequence_number"]
     ]
     return df.select(
-        "record_id",
+        "id_record",
         "commit_number",
         "commit_ts",
         "sequence_number",

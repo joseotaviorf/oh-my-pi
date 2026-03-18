@@ -20,18 +20,18 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 
 from bietlejuice.services.configuration_service import ConfigurationService
-from databricks_plugin import ( 
+from databricks_plugin import (
     QuintoAndarDatabricksCheckJobTaskOperator,
     QuintoAndarDatabricksExecuteJobClusterOperator,
 )
-import os 
+import os
 
-#TODO: Move to only salesforce 
+#TODO: Move to only salesforce
 DAG_NAME = "salesforce_cdc"
-DAG_ID = f"sst.{DAG_NAME.replace('.', '_')}"
+DAG_ID = f"bietlejuice.{DAG_NAME.replace('.', '_')}"
 ENV = os.environ.get("ENVIRONMENT")
 CONFIG_SERVICE = ConfigurationService(DAG_NAME)
-DATABRICKS_CONN_ID = "databricks_new" 
+DATABRICKS_CONN_ID = "databricks_new"
 BIETLEJUICE_REPO_PATH  = CONFIG_SERVICE.get_config("databricks_bietlejuice_repo_path")
 BASE_SPARK_JOB_PATH = f"{BIETLEJUICE_REPO_PATH}/spark_jobs/{DAG_NAME}/"
 
@@ -62,12 +62,12 @@ def create_sst_task(
 
     base_parameters = {
         **BASE_PARAMETERS,
-        "target_schema": target_schema, 
+        "target_schema": target_schema,
         "target_table": target_table,
         "job_name": f"load_{target_schema}_{target_table}",
         **parameters
-    } 
-    #override task_id if provided 
+    }
+    #override task_id if provided
     task_id = f"load_{target_schema}_{target_table}" if not task_id else task_id
     entry_point = entry_point if entry_point.endswith(".py") else f"{entry_point}.py"
     base_parameters = parse_parameters(base_parameters)
@@ -95,7 +95,7 @@ def create_execute_job_cluster_task(dag: DAG, task_id: str):
     )
 
 def create_start_end_operator(task_id: str):
-    
+
     start = SStPlaceholderOperator(
         task_id=f"start_{task_id}"
     )
@@ -107,27 +107,28 @@ def create_start_end_operator(task_id: str):
 
 
 EVENTS_CONFIG = {
+    #TODO: Add all events
     "account": {
         "event_path": "raw/salesforce/AccountEvent",
     },
     "case": {
         "event_path": "raw/salesforce/CaseEvent",
     },
-    "checklist": {
-        "event_path": "raw/salesforce/Checklist__Event",
-    },
-    "contract": {
-        "event_path": "raw/salesforce/ContractEvent",
-    },
-    "contract_member": {
-        "event_path": "raw/salesforce/ContractMember__Event",
-    },
+    # "checklist": {
+    #     "event_path": "raw/salesforce/Checklist__Event",
+    # },
+    # "contract": {
+    #     "event_path": "raw/salesforce/ContractEvent",
+    # },
+    # "contract_member": {
+    #     "event_path": "raw/salesforce/ContractMember__Event",
+    # },
     "email_message": {
         "event_path": "raw/salesforce/EmailMessageEvent",
     },
-    "relisting_context": {
-        "event_path": "raw/salesforce/RelistingContext__Event",
-    },
+    # "relisting_context": {
+    #     "event_path": "raw/salesforce/RelistingContext__Event",
+    # },
     "user": {
         "event_path": "raw/salesforce/UserEvent",
     }
@@ -145,7 +146,7 @@ default_args = {
 with DAG(
     dag_id=DAG_ID,
     default_args=default_args,
-    schedule_interval="0 * * * *",  
+    schedule_interval="0 * * * *",
     start_date=datetime(2026, 3, 12),
     catchup=False,
     tags=["SST", "SF", "salesforce"],  # better formatting
@@ -153,7 +154,7 @@ with DAG(
     max_active_runs=1,
  ) as dag:
 
-    start, end = create_start_end_operator("salesforce") 
+    start, end = create_start_end_operator("salesforce")
     execute_job_cluster = create_execute_job_cluster_task(
             dag=dag,
             task_id="execute_cdc_cluster"
@@ -172,8 +173,8 @@ with DAG(
             parameters={
                 "source_schema": "datalake_salesforce_raw",
             },
-        ) >> end 
-        
-        
-   
+        ) >> end
+
+
+
     start >>  execute_job_cluster

@@ -64,7 +64,7 @@ def salesforce_raw_pipeline(spark, cfg):
     raw_df = sf_cdc_mandatory_fields(raw_df)
     raw_final = (
         raw_df.withColumn("source_file", F.input_file_name())
-        .withColumn("_created_at", F.lit(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        .withColumn("ts_load", F.lit(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
         .withColumn("partition_date", F.lit(cfg.partition_date))
         .withColumn("partition_hour", F.lit(cfg.partition_hour))
     )
@@ -74,12 +74,12 @@ def salesforce_raw_pipeline(spark, cfg):
     basic_quality_checks(
         raw_final,
         required_cols=[
-            "record_id",
+            "id_record",
             "transaction_key",
             "sequence_number",
             "commit_number",
         ],
-        unique_grain=["record_id", "transaction_key", "sequence_number"],
+        unique_grain=["id_record", "transaction_key", "sequence_number"],
         fail=True,
     )
     logger.info("m=salesforce_raw_pipeline, msg=Quality checks passed")

@@ -60,7 +60,7 @@ def salesforce_clean_pipeline(spark, cfg):
         if col
         not in [
             "source_file",
-            "created_at",
+            "ts_load",
             "ChangeEventHeader",
             "changed_field",
             "partition_date",
@@ -82,17 +82,17 @@ def salesforce_clean_pipeline(spark, cfg):
             (~F.col("new_record"))
             & (F.col("event_type") == "HISTORICAL")
             & (F.col("commit_number").isNull())
-        ).select("record_id")
+        ).select("id_record")
         all_events_df = all_events_df.join(
-            F.broadcast(invalid_ids), "record_id", "leftanti"
+            F.broadcast(invalid_ids), "id_record", "leftanti"
         )
 
-    created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ts_load = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     snapshot = (
         in_memory_cdc_udpate(all_events_df)
         .where(F.col("new_record") == F.lit(True))
         .drop("new_record")
-        .withColumn("_created_at", F.lit(created_at))
+        .withColumn("ts_load", F.lit(ts_load))
         .withColumn("partition_date", F.lit(cfg.partition_date))
         .withColumn("partition_hour", F.lit(cfg.partition_hour))
     )
@@ -100,12 +100,12 @@ def salesforce_clean_pipeline(spark, cfg):
     basic_quality_checks(
         snapshot,
         required_cols=[
-            "record_id",
+            "id_record",
             "transaction_key",
             "sequence_number",
             "commit_number",
         ],
-        unique_grain=["record_id", "transaction_key", "sequence_number"],
+        unique_grain=["id_record", "transaction_key", "sequence_number"],
         fail=True,
     )
 

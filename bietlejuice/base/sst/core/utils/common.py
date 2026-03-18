@@ -406,8 +406,8 @@ def normalize_column_name(col: str) -> str:
     col = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", col)
     col = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", col)
     col = col.lower()
-    if col.startswith("id_"):
-        col = col[3:] + "_id"
+    if col.endswith("_id"):
+        col = "id_" + col.replace("_id", "")
     return col
 
 
