@@ -191,7 +191,7 @@ FROM VALUES
                                                     'experiment_metrics', array()
                                                 )
                                 ),
-           'running', True
+           'running', False
         )
     ),
 
@@ -214,7 +214,7 @@ FROM VALUES
                                                     'experiment_metrics', array()
                                                 )
                                 ),
-           'running', True
+           'running', False
         )
     ),
 
@@ -237,7 +237,7 @@ FROM VALUES
                                                     'experiment_metrics', array()
                                                 )
                                 ),
-           'running', True
+           'running', False
         )
     ),
 
