@@ -10,6 +10,7 @@ employees AS (
         datalake_people.identifier_mapping AS im
     WHERE
         im.is_user_test = FALSE
+        AND im.assignment_type IN ('C', 'E')
 ),
 emergency_contacts AS (
     SELECT

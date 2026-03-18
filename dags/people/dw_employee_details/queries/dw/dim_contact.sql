@@ -6,6 +6,7 @@ employees AS (
         datalake_people.identifier_mapping AS im
     WHERE
         NOT im.is_user_test
+        AND im.assignment_type IN ('C', 'E')
 ),
 contact_versions AS (
     SELECT

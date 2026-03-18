@@ -6,6 +6,7 @@ valid_employees AS (
         datalake_people.identifier_mapping AS im
     WHERE
         NOT im.is_user_test
+        AND im.assignment_type IN ('C', 'E')
 ),
 all_change_dates AS (
     SELECT
