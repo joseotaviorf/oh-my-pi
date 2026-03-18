@@ -10,7 +10,7 @@ description: |
   sk_emergency_contact_version from DW dimension tables.
   Grain: (assignment_number, dt_reference).
   To get cost center name, job title, or contact details, use the sk_* columns to link to the corresponding dimension tables.
-  For manager details, use manager_assignment_number to join to assignment_snapshots.
+  For manager details and hierarchy attributes, use sk_hierarchy_version to join to dim_management_hierarchy.
 columns:
   sk_cost_center_version:
     description: Cost center identifier. Use to get cost center name and details from dim_cost_center.
@@ -60,18 +60,6 @@ columns:
     description: Employee registration number. Grain identifier for the work assignment. Use for joins.
     lineage:
       - datalake_people.assignment_snapshots.assignment_number
-  manager_assignment_number:
-    description: Assignment number of the direct manager. Use to join to assignment_snapshots for manager details. NULL when no manager (e.g. CEO).
-    lineage:
-      - datalake_people.assignment_snapshots.manager_assignment_number
-  hierarchy_level:
-    description: Employee level in the org chart (L0 to L9). L0 is CEO; L1 is one level below. Empty when not in hierarchy.
-    lineage:
-      - datalake_people.assignment_snapshots.hierarchy_level
-  hierarchy_depth:
-    description: Numeric level in the org chart (0 to 9). 0 is CEO; higher numbers are deeper. Empty when not in hierarchy.
-    lineage:
-      - datalake_people.assignment_snapshots.hierarchy_depth
   days_tenure_in_company:
     description: Days since the employee's first hire at the company. Use for company tenure analysis.
     lineage:

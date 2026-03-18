@@ -1,6 +1,9 @@
 SELECT
     mh.sk_hierarchy_version,
     mh.assignment_number,
+    mh.manager_assignment_number,
+    mh.hierarchy_level,
+    mh.hierarchy_depth,
     mh.assignment_number_l0,
     mh.name_l0,
     mh.email_l0,

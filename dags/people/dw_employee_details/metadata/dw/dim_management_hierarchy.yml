@@ -16,6 +16,18 @@ columns:
     description: Assignment number (employee code) whose managerial chain is tracked in this record.
     lineage:
       - datalake_people.management_hierarchy.assignment_number
+  manager_assignment_number:
+    description: Assignment number of the direct manager for this assignment in the valid hierarchy version. Empty when there is no direct manager in the chain.
+    lineage:
+      - datalake_people.management_hierarchy.manager_assignment_number
+  hierarchy_level:
+    description: Hierarchy level label of the assignment in the chain (L0 to L9), where L0 is the top-level manager.
+    lineage:
+      - datalake_people.management_hierarchy.hierarchy_level
+  hierarchy_depth:
+    description: Numeric depth of the assignment in the hierarchy chain (0 to 9), where 0 represents the top-level manager.
+    lineage:
+      - datalake_people.management_hierarchy.hierarchy_depth
   assignment_number_l0:
     description: Assignment number of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
     lineage:
