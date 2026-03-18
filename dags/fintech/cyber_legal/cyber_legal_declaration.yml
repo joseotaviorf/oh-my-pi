@@ -25,6 +25,7 @@ workflow:
     - "{load_end_date}"
     - "{extraction_type}"
     - "{partitions}"
+  execution_timeout_hours: 10
   tables_customization:
     case:
       clean_table_name: case
@@ -156,17 +157,17 @@ workflow:
         - "[]"
     document:
       clean_table_name: document
-      extraction_type: full
-      partitions: []
+      extraction_type: incremental
+      partitions: [year, month, day]
       extra_spark_job_arguments:
-        - "[]"
+        - "['DOADDDT']"
         - False
         - "[]"
 cluster:
   type: custom_cluster
   custom_configurations:
-    driver_node_type_id: m5d.2xlarge
-    node_type_id: r5d.2xlarge
+    driver_node_type_id: m5d.8xlarge
+    node_type_id: r5d.8xlarge
     num_workers: 3
     spark_version: 16.4.x-scala2.12
     single_user_name: "{{ var.value.databricks_single_user_name }}"

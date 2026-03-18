@@ -45,5 +45,17 @@ columns:
     description: "Date when the document was added to the system"
     lineage:
       - datalake_cyber_legal_raw.document.DOADDDT
+  year:
+    description: "Year of the partition"
+    lineage:
+      - datalake_cyber_legal_raw.document.year
+  month:
+    description: "Month of the partition"
+    lineage:
+      - datalake_cyber_legal_raw.document.month
+  day:
+    description: "Day of the partition"
+    lineage:
+      - datalake_cyber_legal_raw.document.day
   ts_load:
     description: "Timestamp when record was loaded into the clean layer"
