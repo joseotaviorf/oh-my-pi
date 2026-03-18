@@ -299,6 +299,12 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
             )
 
         params = self.params.copy()
+        LOGGER.info(
+            "Starting fetch for endpoint '%s' with window after_time=%s, before_time=%s",
+            self.endpoint,
+            params.get("after_time"),
+            params.get("before_time"),
+        )
         total_records = 0
         resume_attempt = 0
 
@@ -362,11 +368,13 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
 
                 LOGGER.warning(
                     "Pit_Id expired. Resuming with after_time=%s (attempt %d/%d). "
-                    "Records fetched so far: %d",
+                    "Records fetched so far: %d. Window: after_time=%s, before_time=%s",
                     last_event_time,
                     resume_attempt,
                     MAX_PIT_RESUME_ATTEMPTS,
                     total_records,
+                    self.params.get("after_time", "N/A"),
+                    self.params.get("before_time", "N/A"),
                 )
 
         raise RuntimeError(
@@ -531,17 +539,37 @@ def _run_load_for_window(
     )
 
     batch: List[Dict[str, Any]] = []
+    page_count = [0]
+    cumulative_records = [0]
 
     def write_batch_to_s3() -> None:
         if not batch:
             return
+        batch_size = len(batch)
+        LOGGER.info(
+            "Writing batch of %d records to raw layer (window %s to %s)",
+            batch_size,
+            load_start,
+            load_end,
+        )
         df = json_to_dataframe(spark, batch, raw_column_name="raw_payload")
         df = insert_partitions(df, date_column_to_partition)
         raw_loader.load_to_raw(df)
         batch.clear()
+        LOGGER.info("Batch write completed successfully")
 
     def on_page(page_results: List[Dict[str, Any]]) -> None:
+        page_count[0] += 1
+        cumulative_records[0] += len(page_results)
         batch.extend(page_results)
+        if page_count[0] % 10 == 0:
+            LOGGER.info(
+                "Fetch progress: page %d, cumulative records %d (window %s to %s)",
+                page_count[0],
+                cumulative_records[0],
+                load_start,
+                load_end,
+            )
         if len(batch) >= WRITE_BATCH_SIZE:
             write_batch_to_s3()
 
@@ -561,6 +589,15 @@ def _run_load_for_window(
         pit_id_resume_count=pit_id_resume_count,
         elapsed_seconds=elapsed_seconds,
     )
+
+    if total_records == 0:
+        LOGGER.warning(
+            "Window returned 0 records: %s to %s (table=%s). "
+            "API may have no data for this period or filters may exclude all events.",
+            load_start,
+            load_end,
+            job_args["table_name"],
+        )
 
     return total_records, pit_id_resume_count
 
@@ -625,9 +662,17 @@ def main():
         job_start_time = time.time()
         job_args = BaseJobArgumentParser.parse_args()
         LOGGER.info(
-            "Running Greenhouse Audit Log job with the following arguments: %s",
-            job_args,
+            "Greenhouse Audit Log job started: dag=%s, table=%s, env=%s, extraction=%s, "
+            "load_start=%s, load_end=%s, backfill_window_hours=%s",
+            job_args.get("dag_name"),
+            job_args.get("table_name"),
+            job_args.get("environment"),
+            job_args.get("extraction_type"),
+            job_args.get("load_start_date"),
+            job_args.get("load_end_date"),
+            job_args.get("backfill_window_hours"),
         )
+        LOGGER.info("Full job arguments: %s", job_args)
 
         spark_client = SparkClient()
         spark = SparkSession.builder.getOrCreate()
