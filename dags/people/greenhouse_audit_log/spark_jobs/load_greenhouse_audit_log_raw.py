@@ -18,7 +18,15 @@ from bietlejuice.base.api.api_enum import APIEnum
 LOGGER = logging.getLogger(__name__)
 
 PIT_ID_EXPIRATION_PATTERNS = ("Pit_Id", "pit_id", "expired")
-MAX_PIT_RESUME_ATTEMPTS = 10
+MAX_PIT_RESUME_ATTEMPTS = 3
+
+
+class InvalidCursorResumeError(Exception):
+    """
+    Raised when the API returns a malformed next_search_after cursor that cannot
+    be sent back (e.g. single integer when API expects integer,string). Triggers
+    resume with after_time, same as Pit_Id expiration.
+    """
 WRITE_BATCH_SIZE = 5000
 
 API_BASE_URL = "https://auditlog.us.greenhouse.io/"
@@ -70,9 +78,12 @@ def format_search_after_cursor(cursor_value: Any) -> Optional[str]:
     Formats the search_after cursor value for the Greenhouse Audit Log API.
 
     The Greenhouse API expects the Search-After header to follow the pattern
-    "integer,string" (exactly 2 components). However, the API sometimes returns
-    next_search_after with 3 components. This function ensures we only send
-    the first 2 components.
+    "integer,string" (exactly 2 components, with a non-empty string). The API
+    sometimes returns next_search_after with 1, 2, or 3 components. This
+    function ensures we only send a valid "integer,string" format. When the
+    cursor cannot be formatted validly (e.g., single integer only, or empty
+    string part), returns None so pagination stops instead of sending an
+    invalid request that would cause a 400 error.
 
     Args:
         cursor_value: The cursor value from the API response. Can be:
@@ -80,26 +91,27 @@ def format_search_after_cursor(cursor_value: Any) -> Optional[str]:
             - A string: "timestamp,hash1,hash2" or "timestamp,hash"
 
     Returns:
-        A properly formatted cursor string with exactly 2 components,
-        or None if the cursor is invalid.
+        A properly formatted cursor string with exactly 2 components
+        (integer, non-empty string), or None if the cursor is invalid.
     """
     if cursor_value is None:
         return None
 
     if isinstance(cursor_value, list):
         if len(cursor_value) >= 2:
-            return f"{cursor_value[0]},{cursor_value[1]}"
-        elif len(cursor_value) == 1:
-            return str(cursor_value[0])
+            first = cursor_value[0]
+            second = cursor_value[1]
+            if first is not None and second is not None and str(second).strip():
+                return f"{first},{second}"
         return None
 
     if isinstance(cursor_value, str):
         parts = [p.strip() for p in cursor_value.split(",")]
-        if len(parts) >= 2:
+        if len(parts) >= 2 and parts[0] and parts[1]:
             return f"{parts[0]},{parts[1]}"
-        return cursor_value
+        return None
 
-    return str(cursor_value)
+    return None
 
 
 class GreenhouseAuditLogAPI(BaseAPIClient):
@@ -222,17 +234,33 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
         3 components, but only accepts 2 components in the Search-After header.
         This method ensures the cursor is properly formatted.
 
+        When the API returns a malformed cursor (e.g. single integer) but we
+        have results, raises InvalidCursorResumeError to trigger resume with
+        after_time (same as Pit_Id expiration).
+
         Args:
             data: The JSON response from the API.
 
         Returns:
             Dict containing 'cursor' and optionally 'context' (pit_id).
+
+        Raises:
+            InvalidCursorResumeError: When cursor is malformed and we have
+                results, signaling that resume with after_time should be tried.
         """
         state = {}
 
         paging = data.get("paging", {})
         cursor_value = paging.get("next_search_after")
         formatted_cursor = format_search_after_cursor(cursor_value)
+
+        if cursor_value is not None and formatted_cursor is None:
+            results = data.get("results", [])
+            if results:
+                raise InvalidCursorResumeError(
+                    f"Invalid cursor format (cannot produce integer,string): {cursor_value}. "
+                    "Will resume with after_time."
+                )
 
         if formatted_cursor is not None:
             state["cursor"] = formatted_cursor
@@ -273,17 +301,30 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
             return None
         return max(event_times)
 
+    def _should_resume_on_error(self, error: Exception) -> bool:
+        """
+        Checks if the error indicates we should resume with after_time.
+
+        Applies to Pit_Id expiration and InvalidCursorResumeError (malformed
+        next_search_after that cannot be sent back to the API).
+        """
+        if isinstance(error, InvalidCursorResumeError):
+            return True
+        return self._is_pit_id_expired(error)
+
     def fetch_pages_with_resume(
         self,
         on_page: Callable[[List[Dict[str, Any]]], None],
         on_before_resume: Optional[Callable[[], None]] = None,
     ) -> Tuple[int, int]:
         """
-        Fetches all pages with Pit_Id resume per Greenhouse documentation.
+        Fetches all pages with Pit_Id and invalid-cursor resume per Greenhouse docs.
 
-        When Pit_Id expires, starts a new request with after_time set to the
-        last event's event_time to avoid duplicates. Writes to S3 incrementally
-        via on_page callback so progress is persisted before expiration.
+        When Pit_Id expires or the API returns a malformed next_search_after
+        cursor, starts a new request with after_time set to the last event's
+        event_time. Writes to S3 incrementally via on_page callback so progress
+        is persisted. After max resume attempts, returns what was fetched
+        instead of failing.
 
         Args:
             on_page: Callback invoked for each page of results (for streaming write).
@@ -291,7 +332,7 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
                 after_time. Use to flush any unwritten buffered data.
 
         Returns:
-            Tuple of (total_records_fetched, pit_id_resume_count).
+            Tuple of (total_records_fetched, resume_count).
         """
         if not self.endpoint:
             raise ValueError(
@@ -344,12 +385,12 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
                 return total_records, resume_attempt
 
             except Exception as e:
-                if not self._is_pit_id_expired(e):
+                if not self._should_resume_on_error(e):
                     raise
 
                 if not batch_for_resume:
                     LOGGER.error(
-                        "Pit_Id expired before any records were fetched. Cannot resume."
+                        "Resume triggered before any records were fetched. Cannot resume."
                     )
                     raise
 
@@ -359,16 +400,18 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
                 last_event_time = self._get_max_event_time(batch_for_resume)
                 if not last_event_time:
                     LOGGER.error(
-                        "Pit_Id expired but no event_time found in results. Cannot resume."
+                        "Resume triggered but no event_time found in results. Cannot resume."
                     )
                     raise
 
                 resume_attempt += 1
                 params["after_time"] = last_event_time
 
+                error_type = "Invalid cursor" if isinstance(e, InvalidCursorResumeError) else "Pit_Id expired"
                 LOGGER.warning(
-                    "Pit_Id expired. Resuming with after_time=%s (attempt %d/%d). "
+                    "%s. Resuming with after_time=%s (attempt %d/%d). "
                     "Records fetched so far: %d. Window: after_time=%s, before_time=%s",
+                    error_type,
                     last_event_time,
                     resume_attempt,
                     MAX_PIT_RESUME_ATTEMPTS,
@@ -377,10 +420,12 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
                     self.params.get("before_time", "N/A"),
                 )
 
-        raise RuntimeError(
-            f"Pit_Id expired after {MAX_PIT_RESUME_ATTEMPTS} resume attempts. "
-            f"Total records fetched: {total_records}"
+        LOGGER.warning(
+            "Max resume attempts (%d) reached. Returning %d records fetched so far.",
+            MAX_PIT_RESUME_ATTEMPTS,
+            total_records,
         )
+        return total_records, resume_attempt
 
     def get_all_paginated_results(self) -> List[Dict[str, Any]]:
         """

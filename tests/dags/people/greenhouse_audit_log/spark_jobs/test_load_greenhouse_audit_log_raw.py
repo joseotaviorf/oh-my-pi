@@ -20,6 +20,7 @@ sys.modules["quintoandar_logger"] = MagicMock()
 
 from dags.people.greenhouse_audit_log.spark_jobs.load_greenhouse_audit_log_raw import (  # noqa: E402
     GreenhouseAuditLogAPI,
+    InvalidCursorResumeError,
     main,
     format_search_after_cursor,
     OAUTH_TOKEN_URL,
@@ -59,14 +60,26 @@ class TestFormatSearchAfterCursor(unittest.TestCase):
         self.assertEqual(result, "1769113670314,8a7243fba6e775b3822a60a254563238")
 
     def test_format_cursor_list_with_one_element(self):
-        """Test formatting a list with 1 element."""
+        """Test that list with 1 element returns None (API requires integer,string)."""
         cursor = [1769113670314]
         result = format_search_after_cursor(cursor)
-        self.assertEqual(result, "1769113670314")
+        self.assertIsNone(result)
 
     def test_format_cursor_empty_list(self):
         """Test that empty list returns None."""
         result = format_search_after_cursor([])
+        self.assertIsNone(result)
+
+    def test_format_cursor_list_with_empty_second_element(self):
+        """Test that list with empty string as second element returns None."""
+        cursor = [1771866937368, ""]
+        result = format_search_after_cursor(cursor)
+        self.assertIsNone(result)
+
+    def test_format_cursor_list_with_none_second_element(self):
+        """Test that list with None as second element returns None."""
+        cursor = [1771866937368, None]
+        result = format_search_after_cursor(cursor)
         self.assertIsNone(result)
 
     def test_format_cursor_string_with_two_components(self):
@@ -88,16 +101,16 @@ class TestFormatSearchAfterCursor(unittest.TestCase):
         self.assertEqual(result, "1769113670314,8a7243fba6e775b3822a60a254563238")
 
     def test_format_cursor_string_single_component(self):
-        """Test formatting a string with single component."""
+        """Test that string with single component returns None (API requires integer,string)."""
         cursor = "1769113670314"
         result = format_search_after_cursor(cursor)
-        self.assertEqual(result, "1769113670314")
+        self.assertIsNone(result)
 
     def test_format_cursor_integer(self):
-        """Test formatting an integer value."""
+        """Test that integer value returns None (API requires integer,string)."""
         cursor = 1769113670314
         result = format_search_after_cursor(cursor)
-        self.assertEqual(result, "1769113670314")
+        self.assertIsNone(result)
 
 
 class TestGreenhouseAuditLogAPIExtractPaginationState(unittest.TestCase):
@@ -180,6 +193,44 @@ class TestGreenhouseAuditLogAPIExtractPaginationState(unittest.TestCase):
 
         self.assertEqual(state, {})
 
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_extract_pagination_state_invalid_cursor_with_results_raises(
+        self, mock_process_filters, mock_auth
+    ):
+        """Test that invalid cursor with results raises InvalidCursorResumeError."""
+        job_args = {"endpoint": "events", "base_filters": {}}
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        data = {
+            "paging": {"next_search_after": [1771866937368], "pit_id": "pit123"},
+            "results": [{"event_time": "2024-01-01T00:00:00Z"}],
+        }
+
+        with self.assertRaises(InvalidCursorResumeError) as ctx:
+            api_client._extract_pagination_state(data)
+
+        self.assertIn("1771866937368", str(ctx.exception))
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_extract_pagination_state_invalid_cursor_empty_results_no_raise(
+        self, mock_process_filters, mock_auth
+    ):
+        """Test that invalid cursor with empty results does not raise (last page)."""
+        job_args = {"endpoint": "events", "base_filters": {}}
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        data = {
+            "paging": {"next_search_after": [1771866937368], "pit_id": "pit123"},
+            "results": [],
+        }
+
+        state = api_client._extract_pagination_state(data)
+
+        self.assertNotIn("cursor", state)
+        self.assertEqual(state["context"], "pit123")
+
 
 class TestGreenhouseAuditLogAPIPitIdResume(unittest.TestCase):
     """Tests for Pit_Id expiration and resume logic."""
@@ -244,6 +295,32 @@ class TestGreenhouseAuditLogAPIPitIdResume(unittest.TestCase):
 
         self.assertIsNone(api_client._get_max_event_time([]))
         self.assertIsNone(api_client._get_max_event_time([{"id": "1"}, {"id": "2"}]))
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_should_resume_on_error_invalid_cursor(self, mock_process_filters, mock_auth):
+        """Test _should_resume_on_error returns True for InvalidCursorResumeError."""
+        job_args = {"endpoint": "events", "base_filters": {}}
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        self.assertTrue(
+            api_client._should_resume_on_error(
+                InvalidCursorResumeError("Invalid cursor")
+            )
+        )
+
+    @patch.object(GreenhouseAuditLogAPI, "_apply_authentication")
+    @patch.object(GreenhouseAuditLogAPI, "_process_filters")
+    def test_should_resume_on_error_pit_id_expired(self, mock_process_filters, mock_auth):
+        """Test _should_resume_on_error returns True for Pit_Id expiration."""
+        job_args = {"endpoint": "events", "base_filters": {}}
+        api_client = GreenhouseAuditLogAPI(job_args)
+
+        self.assertTrue(
+            api_client._should_resume_on_error(
+                Exception("The Pit_Id has expired. Remove it from the subsequent search.")
+            )
+        )
 
 
 class TestGreenhouseAuditLogAPIInit(unittest.TestCase):
