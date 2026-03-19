@@ -183,8 +183,10 @@ early_info AS (
     LEFT JOIN 
         datalake_inspection_services_clean.budget AS b
             ON ib.id_inspection = b.id_inspection
+    WHERE 
+      ib.inspection_type = 'offboarding'
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY ib.id_contract ORDER BY ib.ts_created DESC) = 1
+        ROW_NUMBER() OVER (PARTITION BY ib.id_contract ORDER BY ib.ts_updated DESC) = 1
 )
 SELECT
     t.id AS id_termination,
