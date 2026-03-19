@@ -95,7 +95,7 @@ terminations AS (
       AND ib.inspection_type = 'offboarding'
       AND DATE(ib.ts_synced - INTERVAL 3 HOUR) > DATE(t.ts_termination_request)
   WHERE
-    t.status != 'CANCELED'
+    t.status = 'DONE'
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY t.id_termination ORDER BY DATE(ib.ts_synced - INTERVAL 3 HOUR) DESC) = 1
 )

@@ -10,7 +10,7 @@ WITH
       -- Categories:
       an.value AS abc_variant,
       di.status AS inspection_status,
-      di.repair_request_ai_flow AS is_automated_ar,
+      CAST(di.repair_request_ai_flow AS BOOLEAN) AS is_automated_ar,
       di.ai_repair_analysis_control_group AS automation_group,
       --Values:
       fri.total_cost,
@@ -61,7 +61,7 @@ WITH
     WHERE TRUE
       AND di.inspection_type = 'offboarding'
   )
-SELECT 
+SELECT DISTINCT
     --Ids: 
     ft.sk_contract,
     ft.sk_house,
