@@ -281,15 +281,11 @@ class TestDatasetService:
             Dataset("dag:task")
         )
 
-    @mock.patch(
-        "bietlejuice.services.dataset_service.DatasetService._has_updated_dataset_before"
-    )
     def test_if_it_is_a_rerun_it_should_not_update_datasets(
-        self, mock_has_updated, mock_is_first_run_of_date, mock_context
+        self, mock_is_first_run_of_date, mock_context, database_query_function
     ):
-        # Patch to avoid real Airflow session/DB (which triggers broken model loading in CI)
-        mock_has_updated.return_value = True
         mock_is_first_run_of_date.return_value = False
+        database_query_function.return_value = "dataset-event"
 
         DatasetService.update_datasets(mock_context)
 

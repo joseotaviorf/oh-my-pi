@@ -1,6 +1,6 @@
 import json
 from datetime import timedelta
-from typing import Dict, Optional, Set
+from typing import Dict
 from os import path
 
 from airflow.utils.helpers import chain
@@ -10,10 +10,7 @@ from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator
 from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
-from bietlejuice.base.service.dag_packages_path_service import (
-    DAGPackagesPathService,
-    DataQualityLayerCache,
-)
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services import ConfigurationService
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
@@ -62,38 +59,6 @@ class DatalakeTaskGroup(BaseTaskGroup):
         self.inmetro_bucket = config_service.get_config("inmetro_bucket")
         self.databricks_conn_id = databricks_conn_id
         self.default_table_privileges = default_table_privileges
-        self._config_services: Dict[str, ConfigurationService] = {}
-        self._metadata_tables_cache: Dict[str, Set[str]] = {}
-        self._dq_cache = DataQualityLayerCache(self.relative_query_path)
-        self._has_any_metadata_cache: Optional[bool] = None
-
-    def _get_config_service(self, source: str) -> ConfigurationService:
-        """Return cached ConfigurationService for source, creating on first use."""
-        if source not in self._config_services:
-            self._config_services[source] = ConfigurationService(source)
-        return self._config_services[source]
-
-    def _get_metadata_tables(self, layer: str) -> Set[str]:
-        """Return cached set of table paths with metadata, loading once per layer."""
-        if layer not in self._metadata_tables_cache:
-            self._metadata_tables_cache[layer] = (
-                DAGMetadataService.list_metadata_table_paths(
-                    self.relative_query_path, layer
-                )
-            )
-        return self._metadata_tables_cache[layer]
-
-    def _has_any_metadata(self) -> bool:
-        """Return cached result of whether DAG has any metadata files."""
-        if self._has_any_metadata_cache is None:
-            self._has_any_metadata_cache = bool(
-                DAGMetadataService.get_all_dag_metadata_files(self.relative_query_path)
-            )
-        return self._has_any_metadata_cache
-
-    def _get_data_quality_tables(self, layer: str) -> Set[str]:
-        """Return cached set of table paths with data quality files, loading once per layer."""
-        return self._dq_cache.get(layer)
 
     def _build_load_task(
         self,
@@ -132,18 +97,18 @@ class DatalakeTaskGroup(BaseTaskGroup):
         metadata_file_type: str = None,
         bypass: str = "",
     ) -> QuintoAndarDatabricksSubmitRunOperator:
-        config_service = self._get_config_service(source)
+        config_service = ConfigurationService(source)
         product_db_name = ""
         if "lineage_product_database_name" in config_service.configs:
             product_db_name = config_service.get_config("lineage_product_database_name")
 
         if not metadata_file_type:
-            has_metadata = (
-                self._has_any_metadata()
-                if sync_mode == self.ALL_TABLES
-                else table_name in self._get_metadata_tables(layer)
-            )
-            if has_metadata:
+            if DAGMetadataService.metadata_file_exists(
+                relative_file_path=self.relative_query_path,
+                layer=layer,
+                table_name=table_name,
+                check_all_tables=sync_mode == self.ALL_TABLES,
+            ):
                 metadata_file_type = MetadataTypeEnum.TAGS.value
             elif product_db_name:
                 metadata_file_type = MetadataTypeEnum.FULL_CONTENT_LINEAGE.value
@@ -195,10 +160,14 @@ class DatalakeTaskGroup(BaseTaskGroup):
     ) -> list:
         data_quality_tasks = []
 
-        lookup_key = path.normpath(path.join(tree_path, table_name))
         if (
             sync_mode == self.SINGLE_TABLE
-            and lookup_key in self._get_data_quality_tables(layer)
+            and DAGPackagesPathService.artifact_file_exists(
+                artifact_type="data_quality",
+                dag_name=self.relative_query_path,
+                layer=layer,
+                table_name=path.join(tree_path, table_name),
+            )
         ):
             tables_names = [table_name]
 
@@ -457,8 +426,12 @@ class DatalakeTaskGroup(BaseTaskGroup):
         chain(load_table_task, metadata_sync_task)
 
         quality_tasks = []
-        lookup_key = path.normpath(path.join(tree_path, table_name))
-        if lookup_key in self._get_data_quality_tables(layer):
+        if DAGPackagesPathService.data_quality_tests_file_exists_in_composer(
+            dag_name=self.relative_query_path,
+            layer=layer,
+            table_name=table_name,
+            intermediate_path=tree_path,
+        ):
             quality_tasks = self._build_data_quality_tasks(
                 layer=layer,
                 sync_mode=self.SINGLE_TABLE,

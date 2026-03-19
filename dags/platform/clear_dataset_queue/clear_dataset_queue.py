@@ -52,6 +52,11 @@ def clear_dataset_data(dag: DAG, execution_date: datetime, session=None):
 
     session.commit()
 
+def list_all_dags():
+    dag_bag = DagBag(store_serialized_dags=True, include_examples=False)
+    dag_bag.collect_dags_from_db()
+    return sorted(dag_bag.dags.keys())
+
 with DAG(
     dag_id=DAG_ID,
     default_args=default_args,
@@ -63,13 +68,9 @@ with DAG(
         "dag_ids": Param(
             [],
             type="array",
-            description=(
-                "DAG IDs whose dataset queue should be cleared. "
-                "Only dataset-triggered DAGs are relevant here. "
-                "To find them, go to Airflow UI → Datasets and look for DAGs "
-                "listed as consumers of the dataset you want to reset."
-            ),
+            description="DAG IDs to clear dataset events for",
             items={"type": "string"},
+            examples=list_all_dags(),
         )
     }
 ) as dag:

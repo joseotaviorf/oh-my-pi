@@ -1,5 +1,4 @@
 import glob
-import os
 import re
 from typing import Dict, Optional, Tuple, Set, List
 
@@ -310,32 +309,6 @@ class DAGMetadataService:
             files_found = glob.glob(path, recursive=True)
 
         return files_found
-
-    @staticmethod
-    def list_metadata_table_paths(dag_name: str, layer: str) -> Set[str]:
-        """
-        Returns set of relative paths (without ext) for tables that have metadata files.
-        Used for batch existence checks to avoid per-table filesystem I/O.
-        """
-        dag_path = DAGPackagesPathService.get_dag_path(dag_name)
-        metadata_layer_path = os.path.join(dag_path, "metadata", layer)
-        result = set()
-        if os.path.isdir(metadata_layer_path):
-            pattern = os.path.join(metadata_layer_path, "**", "*")
-            for file_path in glob.glob(pattern, recursive=True):
-                if os.path.isfile(file_path):
-                    rel = os.path.relpath(file_path, metadata_layer_path)
-                    name_without_ext = os.path.splitext(rel)[0]
-                    result.add(name_without_ext)
-        legacy_path = os.path.join(DATALAKE_METADATA_PATH, dag_name, layer)
-        if os.path.isdir(legacy_path):
-            pattern = os.path.join(legacy_path, "**", "*")
-            for file_path in glob.glob(pattern, recursive=True):
-                if os.path.isfile(file_path):
-                    rel = os.path.relpath(file_path, legacy_path)
-                    name_without_ext = os.path.splitext(rel)[0]
-                    result.add(name_without_ext)
-        return result
 
     @staticmethod
     def metadata_file_exists(

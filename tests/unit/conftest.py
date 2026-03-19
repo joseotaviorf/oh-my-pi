@@ -5,8 +5,7 @@ import pytest
 
 def pytest_collection_modifyitems(items):
     """
-    Run raw_api_ingestion_workflow and reprocessing_guard_task_creator tests last
-    to avoid test order sensitivity.
+    Run raw_api_ingestion_workflow tests last to avoid test order sensitivity.
 
     RawAPIIngestionWorkflow imports BaseWorkflow, TaskCreatorFactory, JiraOpsCallback,
     ReprocessingGuardTaskCreator, and DatasetService. When those modules are loaded
@@ -18,14 +17,10 @@ def pytest_collection_modifyitems(items):
     raw_api_items = [
         i for i in items if "test_raw_api_ingestion_workflow" in str(i.path)
     ]
-    reprocessing_guard_items = [
-        i for i in items if "test_reprocessing_guard_task_creator" in str(i.path)
-    ]
-    items_to_run_last = raw_api_items + reprocessing_guard_items
-    if items_to_run_last:
-        for i in items_to_run_last:
+    if raw_api_items:
+        for i in raw_api_items:
             items.remove(i)
-        items.extend(items_to_run_last)
+        items.extend(raw_api_items)
 
 
 # Mock external plugins that might not be installed locally

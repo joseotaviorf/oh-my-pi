@@ -1,11 +1,9 @@
 import os
 from datetime import datetime
 import re
-from os import path as os_path
-from typing import Set, Tuple
+from typing import Tuple
 
 from airflow import DAG
-
 from airflow.datasets import BaseDataset
 from pendulum import timezone
 
@@ -13,10 +11,7 @@ from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.builder_interface import (
     BuilderInterface,
 )
-from bietlejuice.base.service.dag_packages_path_service import (
-    DAGPackagesPathService,
-    DataQualityLayerCache,
-)
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
@@ -56,7 +51,6 @@ class BaseWorkflow(BuilderInterface):
         self.cluster_args = cluster_args
         self.dataset_dependencies = dataset_dependencies
 
-        self._dq_cache = DataQualityLayerCache(self.dag_name)
         self.local_tz = timezone("America/Sao_Paulo")
 
     def get_date_param(self, dag_run, default_date, date_param_name) -> str:
@@ -261,21 +255,19 @@ class BaseWorkflow(BuilderInterface):
             if table_name not in tables_with_dependents:
                 table_task >> end_task
 
-    def _get_data_quality_tables(self, layer: str) -> Set[str]:
-        """Return cached set of table paths with data quality files, loading once per layer."""
-        return self._dq_cache.get(layer)
-
     def _check_include_data_quality_task(
         self, table_attributes: TableAttributes
     ) -> bool:
         """
         Checks if data quality tests task should be added into the workflow
         by verifying if its file exists for the provided table.
-        Uses batch-loaded data quality table paths for parse-time performance.
         """
-        return os_path.normpath(
-            table_attributes.table_name
-        ) in self._get_data_quality_tables(table_attributes.layer.value)
+        return DAGPackagesPathService.artifact_file_exists(
+            artifact_type="data_quality",
+            dag_name=self.dag_name,
+            layer=table_attributes.layer.value,
+            table_name=table_attributes.table_name,
+        )
 
     def _check_include_propagate_metadata_task(
         self, table_attributes: TableAttributes
