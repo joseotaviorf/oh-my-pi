@@ -13,12 +13,19 @@ SELECT
     finished_when,
     tenant_accrual_year_month,
     landlord_accrual_year_month,
+    source,
+    normality_control,
     timestamp(canceled_at) AS ts_canceled,
     timestamp(settle_at) AS ts_settle,
     timestamp(published_at) AS ts_published,
     timestamp(created_at) AS ts_created,
     timestamp(updated_at) AS ts_updated,
     timestamp(retsuko_created_at) AS ts_retsuko_created,
-    timestamp(retsuko_updated_at) AS ts_retsuko_updated
+    timestamp(retsuko_updated_at) AS ts_retsuko_updated,
+    timestamp(ts_database_transaction) AS ts_database_transaction,
+    year,
+    month,
+    day,
+    hour
 FROM
     datalake_retsuko_raw.agreement
