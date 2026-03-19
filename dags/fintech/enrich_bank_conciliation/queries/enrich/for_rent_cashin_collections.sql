@@ -1,4 +1,6 @@
-WITH pre_francesinha AS (
+WITH 
+
+pre_francesinha AS (
     SELECT
         our_number AS id_bank,
         CAST(SUBSTRING(UPPER(our_number), 1, LENGTH(our_number) - 1) AS INTEGER) AS our_number,
@@ -40,7 +42,11 @@ WITH pre_francesinha AS (
 francesinha AS (
     SELECT
         id_bank,
-        IF(LENGTH(our_number) >= 30, LEFT(our_number, LENGTH(our_number)-2), our_number) AS our_number,
+        CASE 
+            WHEN id_bank LIKE '000%' THEN LEFT(our_number, LENGTH(our_number)-2)
+            WHEN LENGTH(our_number) >= 30 THEN LEFT(our_number, LENGTH(our_number)-2)
+            ELSE our_number 
+        END AS our_number,
         bank_account,
         dt_paid,
         amount
@@ -136,15 +142,15 @@ checkout_union AS (
     UNION
 
     SELECT
-      b.our_number,
-      NULL AS id_pix_payment,
-      b.paid_amount AS amount,
-      'BOLECODE' AS payment_method,
-      b.status AS payment_status,
-      CASE WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
-      ELSE DATE(COALESCE(dt_credit, DATE(ts_paid))) END AS dt_paid
+        b.our_number,
+        NULL AS id_pix_payment,
+        b.paid_amount AS amount,
+        'BOLECODE' AS payment_method,
+        b.status AS payment_status,
+        CASE WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
+        ELSE DATE(COALESCE(dt_credit, DATE(ts_paid))) END AS dt_paid
     FROM
-      datalake_checkout_clean.bolecode b
+        datalake_checkout_clean.bolecode b
     LEFT JOIN
         dw_public.dim_date dd
             ON COALESCE(dt_credit, DATE(ts_paid)) = dd.date
@@ -158,13 +164,17 @@ checkout_union AS (
     UNION ALL
 
     SELECT
-      IF(LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) >= 30, LEFT(REGEXP_REPLACE(p.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) - 2), REGEXP_REPLACE(p.id_transaction, '^0+', '')) AS our_number,
-      p.id_transaction AS id_pix_payment,
-      p.due_amount AS amount,
-      'PIX' AS payment_method,
-      p.status AS payment_status,
-      CASE WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
-      ELSE DATE(p.ts_paid) END AS dt_paid
+        CASE 
+            WHEN p.id_transaction LIKE '000%' THEN LEFT(REGEXP_REPLACE(p.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) - 2)
+            WHEN LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) >= 30 THEN LEFT(REGEXP_REPLACE(p.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) - 2)
+        ELSE REGEXP_REPLACE(p.id_transaction, '^0+', '')
+        END AS our_number,
+        p.id_transaction AS id_pix_payment,
+        p.due_amount AS amount,
+        'PIX' AS payment_method,
+        p.status AS payment_status,
+        CASE WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
+        ELSE DATE(p.ts_paid) END AS dt_paid
     FROM
         datalake_checkout_clean.pix p
     LEFT JOIN
@@ -202,16 +212,21 @@ trato_feito AS (
     UNION ALL
 
     SELECT
-         IF(LENGTH(REGEXP_REPLACE(px.id_transaction, '^0+', '')) >= 30, LEFT(REGEXP_REPLACE(px.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(px.id_transaction, '^0+', '')) - 2), REGEXP_REPLACE(px.id_transaction, '^0+', '')) AS our_number,
+        CASE 
+            WHEN p.id_transaction LIKE '000%' THEN LEFT(REGEXP_REPLACE(p.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) - 2)
+            WHEN LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) >= 30 THEN LEFT(REGEXP_REPLACE(p.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) - 2)
+        ELSE REGEXP_REPLACE(p.id_transaction, '^0+', '')
+        END AS our_number,
         CAST(NULL AS STRING) AS id_invoice,
         ic.paid_amount AS amount,
-        CASE WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
+        CASE 
+            WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
         ELSE DATE(ic.ts_last_received - interval '3' hour) END AS dt_paid
     FROM
         datalake_trato_feito_clean.installment_charges AS ic
     LEFT JOIN
-        datalake_checkout_clean.pix AS px
-            ON ic.id_charge = px.id_charge
+        datalake_checkout_clean.pix AS p
+            ON ic.id_charge = p.id_charge
     LEFT JOIN
         dw_public.dim_date dd
             ON DATE(ic.ts_last_received - interval '3' hour) = dd.date
@@ -266,7 +281,7 @@ df AS (
     SELECT DISTINCT
         f.id_bank AS bank_number,
         cs.our_number AS id_our_number,
-        COALESCE(sbs.id_invoice, tf.id_invoice) AS id_invoice,
+        COALESCE(sbs.id_invoice, tf.id_invoice, s.id_finance_entity) AS id_invoice,
         vc.id_pix_payment,
         s.hash,
         f.bank_account AS bank_account_number,
@@ -322,7 +337,7 @@ df AS (
             ON (sbs.company_use = cs.our_number) OR (sbs.id_invoice = tf.id_invoice)
     LEFT JOIN
         sap s
-            ON (cs.our_number = s.our_number) OR (tf.id_invoice = s.id_finance_entity)
+            ON (cs.our_number = s.our_number) OR (tf.id_invoice = s.id_finance_entity) 
     WHERE
         cs.our_number IS NOT NULL
     AND

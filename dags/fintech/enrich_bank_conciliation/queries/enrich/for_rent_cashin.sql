@@ -1,4 +1,6 @@
-WITH francesinha AS (
+WITH 
+
+francesinha_base AS (
     SELECT
         UPPER(REPLACE(REPLACE(REGEXP_REPLACE(document_number, '^0000', ''), 'C!', ''), 'C|', '')) AS company_use,
         document_number AS bank_number,
@@ -16,7 +18,12 @@ WITH francesinha AS (
         1,2,3,4
 ),
 
-seu_barriga AS (
+francesinha AS (
+    SELECT *, ROW_NUMBER() OVER(PARTITION BY company_use ORDER BY dt_paid) AS rn
+    FROM francesinha_base
+),
+
+seu_barriga_base AS (
     SELECT
         id_external AS id_invoice,
         id_original_invoice_external,
@@ -43,6 +50,11 @@ seu_barriga AS (
         AND country_code = 'BR'
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY id_invoice, payment_company_use_number ORDER BY ts_created DESC) = 1
+),
+
+seu_barriga AS (
+    SELECT *, ROW_NUMBER() OVER(PARTITION BY company_use ORDER BY dt_paid) AS rn
+    FROM seu_barriga_base
 ),
 
 seu_barriga_sap AS (
@@ -73,7 +85,7 @@ seu_barriga_sap AS (
         ROW_NUMBER() OVER (PARTITION BY id_invoice, payment_company_use_number ORDER BY ts_created DESC) = 1
 ),
 
-sap AS (
+sap_base AS (
     SELECT DISTINCT
         id_business_entity,
         COALESCE(UPPER(REPLACE(REPLACE(id_external_payment, 'C!', ''), 'C|', '')), 
@@ -107,6 +119,11 @@ sap AS (
         1,2,3,4
     HAVING
         SUM(debit_credit) != 0
+),
+
+sap AS (
+    SELECT *, ROW_NUMBER() OVER(PARTITION BY company_use ORDER BY dt_paid) AS rn
+    FROM sap_base
 ),
 
 vans_checkout_union AS (
@@ -167,7 +184,7 @@ pre_vans_checkout AS (
         ROW_NUMBER() OVER (PARTITION BY our_number, paid_amount ORDER BY CASE WHEN id_invoice IS NOT NULL THEN company_use ELSE our_number END DESC) = 1
 ),
 
-vans_checkout AS (
+vans_checkout_base AS (
     SELECT
         company_use,
         id_invoice,
@@ -180,26 +197,19 @@ vans_checkout AS (
     GROUP BY 1,2,3,4,5
 ),
 
+vans_checkout AS (
+    SELECT *, ROW_NUMBER() OVER(PARTITION BY company_use ORDER BY dt_paid) AS rn
+    FROM vans_checkout_base
+),
+
 df_all AS (
-    SELECT DISTINCT
-        company_use
-    FROM
-        seu_barriga
-    UNION ALL
-    SELECT DISTINCT
-        company_use
-    FROM
-        vans_checkout
-    UNION ALL
-    SELECT DISTINCT
-        company_use
-    FROM
-        sap
-    UNION ALL
-    SELECT DISTINCT
-        company_use
-    FROM
-        francesinha
+    SELECT company_use, rn FROM seu_barriga
+    UNION DISTINCT
+    SELECT company_use, rn FROM vans_checkout
+    UNION DISTINCT
+    SELECT company_use, rn FROM sap
+    UNION DISTINCT
+    SELECT company_use, rn FROM francesinha
 ),
 
 df AS (
@@ -249,16 +259,16 @@ df AS (
         df_all cs
     LEFT JOIN
         francesinha f
-            on f.company_use = cs.company_use
+            ON f.company_use = cs.company_use AND f.rn = cs.rn
     LEFT JOIN
         vans_checkout vc
-            ON vc.company_use = cs.company_use
+            ON vc.company_use = cs.company_use AND vc.rn = cs.rn
     LEFT JOIN
         seu_barriga sb
-            on cs.company_use = sb.company_use
+            ON sb.company_use = cs.company_use AND sb.rn = cs.rn
     LEFT JOIN
         sap s
-            on cs.company_use = s.company_use
+            ON s.company_use = cs.company_use AND s.rn = cs.rn
     WHERE
         cs.company_use IS NOT NULL
     AND
