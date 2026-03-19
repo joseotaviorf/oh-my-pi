@@ -11,6 +11,18 @@ WITH business_model AS (
     datalake_visit.visit_business_model AS VBM
       ON V.id_visit = VBM.id_visit
 ),
+company_relation as (
+    SELECT DISTINCT
+        COALESCE(u.id, -1) AS sk_user,
+        bc.type AS buyer_company_relation_type,
+        bc.ts_started AS ts_start,
+        IFNULL(bc.ts_finished,current_date()) AS ts_end
+    FROM
+        datalake_rede_platform_clean.buyer_company AS bc
+    LEFT JOIN
+        datalake_ebdb_clean.user AS u
+            ON bc.uuid_person = u.uuid_person
+),
 adhoc_rules AS (
   SELECT
     dpce.id_demand_prospect_conversion_event,
@@ -21,6 +33,7 @@ adhoc_rules AS (
     CASE
       WHEN dpce.product_origin = 'AGENT_PWA'
         AND dpce.id_agent = sef.id_agent
+        AND (bcr.buyer_company_relation_type IS NULL OR bcr.buyer_company_relation_type != '3P')
       THEN "sale.acq.nonorg.na.d.referral.tqc1p"
       WHEN dpce.utm_medium = 'TQC 1P'
       THEN "sale.acq.nonorg.na.d.referral.tqc1p"
@@ -99,7 +112,8 @@ adhoc_rules AS (
     END AS operation_channel,
     CASE
       WHEN (dpce.product_origin = 'AGENT_PWA'
-          AND dpce.id_agent = sef.id_agent)
+          AND dpce.id_agent = sef.id_agent
+          AND (bcr.buyer_company_relation_type IS NULL OR bcr.buyer_company_relation_type != '3P'))
         OR dpce.utm_medium = 'TQC 1P'
       THEN 'TQC 1P'
       WHEN dpce.utm_medium = 'TQC 3P'
@@ -133,6 +147,10 @@ adhoc_rules AS (
     dpce.day
   FROM
     datalake_demand_flows.demand_prospect_conversion_events AS dpce
+  LEFT JOIN
+    company_relation AS bcr 
+    ON bcr.sk_user = dpce.id_prospect
+    AND DATE(dpce.ts_event) BETWEEN DATE(bcr.ts_start) AND DATE(bcr.ts_end)
   LEFT JOIN
     datalake_tqc_referral.sale_events_flow AS sef
       ON dpce.visit_code = sef.visit_code

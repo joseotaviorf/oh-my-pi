@@ -31,6 +31,18 @@ WITH jaiminho_concierge_events AS (
     AND user_notifications.year = 2026
     AND COALESCE(NULLIF(user_notifications.id_user, 0), ebdb_user.id) IS NOT NULL
     AND user_notifications.status != 'failed'
+),
+company_relation as (
+    SELECT DISTINCT
+        COALESCE(u.id, -1) AS sk_user,
+        bc.type AS buyer_company_relation_type,
+        bc.ts_started AS ts_start,
+        IFNULL(bc.ts_finished,current_date()) AS ts_end
+    FROM
+        datalake_rede_platform_clean.buyer_company AS bc
+    LEFT JOIN
+        datalake_ebdb_clean.user AS u
+            ON bc.uuid_person = u.uuid_person
 )
 SELECT
   id_user,
@@ -82,18 +94,18 @@ SELECT
   COALESCE(tqc.id_user_lead, tqc.lead_phone) AS id_user,
   COALESCE(tqc.id_user_lead, tqc.lead_phone, tqc.id_referral_flow) AS id_contact,
   CASE
-    WHEN agent.agent_type = 'CORRETOR_REDE'
+    WHEN bcr.buyer_company_relation_type = '3P'
     THEN 'TQC 3P'
     ELSE 'TQC 1P'
   END AS event_name,
   LOWER(tqc.origin) AS origin,
   CASE
-    WHEN agent.agent_type = 'CORRETOR_REDE'
+    WHEN bcr.buyer_company_relation_type = '3P'
     THEN 'TQC 3P'
-    ELSE 'TQC 1P'
+    ELSE 'TQC 1P' 
   END AS channel,
   CASE
-    WHEN agent.agent_type = 'CORRETOR_REDE'
+    WHEN bcr.buyer_company_relation_type = '3P'
     THEN 'TQC 3P'
     ELSE 'TQC 1P'
   END AS agent,
@@ -104,9 +116,10 @@ SELECT
   DAY(tqc.ts_created) AS day
 FROM
   datalake_tqc_referral.unified_lead_referral_flow AS tqc
-LEFT JOIN
-  datalake_ebdb_clean.agent_data AS agent
-    ON agent.id = tqc.id_agent
+LEFT JOIN 
+    company_relation AS bcr 
+    ON bcr.sk_user = COALESCE(tqc.id_user_lead, tqc.lead_phone)
+    and date(tqc.ts_created) between date(bcr.ts_start) and date(bcr.ts_end)
 WHERE
   status IN ('CONFIRMED', 'TRUE')
 UNION ALL
