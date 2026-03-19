@@ -4,7 +4,6 @@ get_external_id_contract AS (
         id_contract_external,
         id_contract,
         id_client,
-        contract_status,
         eviction_step,
         eviction_law_firm,
         reason_eviction,
@@ -43,13 +42,11 @@ SELECT
     c.process_type AS original_process_type,
     c.id_attorney_agency AS id_agency,
     ag.agency_name,
-    ag2.agency_name AS collection_agency_name,
     c.id_responsible_attorney AS internal_lawyer,
     c.id_external_attorney AS external_lawyer,
     c.id_supervisor_attorney AS supervising_lawyer,
     c.city,
     c.state,
-    ct.contract_status,
     dq.flag_account_in_agency_or_court AS contract_evictions_status,
     dq.evictions_label,
     ct.eviction_step,
@@ -118,9 +115,6 @@ LEFT JOIN
 LEFT JOIN
     datalake_cyber_clean.agency AS ag
         ON c.id_attorney_agency = ag.id_agency
-LEFT JOIN
-    datalake_cyber_clean.agency AS ag2
-        ON dq.id_agency = ag2.id_agency
 LEFT JOIN
     datalake_cyber_legal_clean.values_list vl2
         ON cuda.reason = vl2.value_code

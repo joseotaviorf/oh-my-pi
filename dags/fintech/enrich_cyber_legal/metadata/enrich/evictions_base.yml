@@ -45,10 +45,6 @@ columns:
     description: "Name of the attorney agency assigned to the legal case."
     lineage:
       - datalake_cyber_legal.process.agency_name
-  collection_agency:
-    description: "Name of the collection agency assigned to the legal case."
-    lineage:
-      - datalake_cyber_legal.process.collection_agency_name
   chamber:
     description: "Name of the court where the legal case is being processed."
     lineage:
@@ -61,10 +57,6 @@ columns:
     description: "City where the case is being processed."
     lineage:
       - datalake_cyber_legal.process.city
-  contract_status:
-    description: "Status of the contract."
-    lineage:
-      - datalake_cyber_legal.process.contract_status
   cyber_status:
     description: "Current status of the legal case (e.g., active, closed, pending)."
     lineage:
@@ -141,10 +133,6 @@ columns:
     description: "Total expense amount for the Satisfação do Crédito (Credit Satisfaction) stage."
     lineage:
       - datalake_cyber_legal.process_stages.expense_amount
-  passage_status:
-    description: "Status of passage between stages, classified as: Em finalização, Execução, Ativo, Quitado, Finalizado, or Encerrado."
-    lineage:
-      - datalake_cyber_legal.process
   is_reincident:
     description: "Flag indicating if the contract has multiple legal cases (reincident)."
   procedure:

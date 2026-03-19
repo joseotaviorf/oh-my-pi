@@ -74,8 +74,8 @@ SELECT DISTINCT
     IF(e.id_process IS NOT NULL, e.input_type, l.input_type) AS input_type,
     IF(e.id_process IS NOT NULL,
     CASE
-        WHEN o.open_amount IS NULL THEN 'Adimplente'
-        WHEN o.fpd_invoices > 0 THEN 'FPD'
+        WHEN o1.open_amount IS NULL THEN 'Adimplente'
+        WHEN o1.fpd_invoices > 0 THEN 'FPD'
         WHEN EXISTS (
                 SELECT 1
                 FROM negotiation n
@@ -83,19 +83,33 @@ SELECT DISTINCT
                   AND n.dt_down_payment <= DATE(e.dt_registered)
                   AND (n.dt_paid > DATE(e.dt_registered) OR n.dt_paid IS NULL)
               )
-            OR o.negotiation_invoices > 0 THEN 'Acordo Ativo'
-        WHEN o.monthly_invoices > 0 THEN 'Mensal'
-        WHEN o.open_amount IS NOT NULL THEN 'Demais Inadimplentes'
+            OR o1.negotiation_invoices > 0 THEN 'Acordo Ativo'
+        WHEN o1.monthly_invoices > 0 THEN 'Mensal'
+        WHEN o1.open_amount IS NOT NULL THEN 'Demais Inadimplentes'
         ELSE 'Outros'
     END, l.contract_category_at_registration) AS contract_category_at_registration,
     IF(e.id_process IS NOT NULL, e.action_type, l.action_type) AS action_type,
     IF(e.id_process IS NOT NULL, e.action, l.action) AS action,
     IF(e.id_process IS NOT NULL, e.office, l.office) AS office,
-    IF(e.id_process IS NOT NULL, e.collection_agency, l.collection_agency) AS collection_agency,
+    IF(e.id_process IS NOT NULL,
+    CASE
+        WHEN e.dt_registered < date('2025-10-17') AND e.dt_closure < DATE('2025-12-15') AND e.office = 'VZL' THEN 'PASCHOALOTTO'
+        WHEN e.office = 'VZL' THEN 'BULGARELLI'
+        WHEN e.office = 'GDM' THEN 'GONDIM'
+        WHEN e.office = 'PLL' THEN 'PELLON'
+        WHEN e.office = 'PLC' THEN 'PLC'
+        WHEN e.office = 'PSC' THEN 'PASCHOALOTTO'
+        ELSE e.office
+    END, l.collection_agency) AS collection_agency,
     IF(e.id_process IS NOT NULL, e.chamber, l.chamber) AS chamber,
     IF(e.id_process IS NOT NULL, e.region, l.region) AS region,
     IF(e.id_process IS NOT NULL, e.city, l.city) AS city,
-    IF(e.id_process IS NOT NULL, e.contract_status, l.contract_status) AS contract_status,
+    IF(e.id_process IS NOT NULL,
+    CASE
+        WHEN c.dt_ended_rental_confirmed IS NOT NULL THEN 'Finalizado'
+        WHEN c.ts_expected_termination IS NOT NULL AND c.dt_ended_rental_confirmed IS NULL THEN 'Finalizando'
+        ELSE 'Ativo'
+    END, l.contract_status) AS contract_status,
     IF(e.id_process IS NOT NULL, e.cyber_status, l.elaw_status) AS cyber_status,
     IF(e.id_process IS NOT NULL, e.last_stage, l.last_stage) AS last_stage,
     e.arbitral_distribution_expense_amount,
@@ -115,7 +129,16 @@ SELECT DISTINCT
     e.asset_attachment_expense_amount,
     e.asset_evaluation_expense_amount,
     e.credit_satisfaction_expense_amount,
-    IF(e.id_process IS NOT NULL, e.passage_status, l.passage_status) AS passage_status,
+    IF(e.id_process IS NOT NULL,
+    CASE
+        WHEN c.ts_expected_termination IS NOT NULL AND c.dt_ended_rental_confirmed IS NULL AND e.dt_closure IS NULL THEN 'Em finalização'
+        WHEN e.first_standardized_reason IN ('Imissao na Posse', 'Despejo Coercitivo') AND e.dt_closure IS NULL THEN 'Em finalização'
+        WHEN e.dt_closure IS NULL AND e.action IN ('Execucao') THEN 'Execução'
+        WHEN e.dt_closure IS NULL THEN 'Ativo'
+        WHEN e.dt_closure IS NOT NULL AND e.first_standardized_reason IN ('Quitacao') THEN 'Quitado'
+        WHEN e.dt_closure IS NOT NULL AND e.first_standardized_reason IN ('Rescisao') THEN 'Finalizado'
+        WHEN e.dt_closure IS NOT NULL THEN 'Encerrado'
+    ELSE NULL END, l.passage_status) AS passage_status,
     IF(e.id_process IS NOT NULL, e.procedure, l.procedure) AS procedure,
     IF(e.id_process IS NOT NULL, e.first_consolidated_reason, l.consolidated_reason) AS consolidated_reason,
     IF(e.id_process IS NOT NULL, e.first_standardized_reason, l.standardized_reason) AS standardized_reason,
@@ -340,23 +363,23 @@ LEFT JOIN
     ON e.dt_registered <= d.date AND (e.dt_closure >= d.date OR e.dt_closure IS NULL)
 LEFT JOIN
     open_amount oa
-    ON COALESCE(e.contract, l.contract) = oa.sk_contract
+    ON e.contract = oa.sk_contract
 LEFT JOIN
     overdue o
-    ON COALESCE(e.contract, l.contract) = o.sk_contract
+    ON e.contract = o.sk_contract
     AND DATE(
           CASE
-            WHEN e.cyber_status <> 'Completed' OR l.elaw_status <> 'Encerrado' THEN NULL
-            WHEN COALESCE(e.dt_closure, l.dt_elaw_closure) IS NOT NULL THEN COALESCE(e.dt_closure, l.dt_elaw_closure)
-            WHEN l.elaw_status = 'Encerrado' THEN COALESCE(e.dt_registered, l.dt_registered)
+            WHEN e.cyber_status <> 'Completed' THEN NULL
+            WHEN e.dt_closure IS NOT NULL THEN e.dt_closure
+            WHEN e.cyber_status = 'Completed' THEN e.dt_registered
             ELSE NULL
           END
       ) = o.dt_reference
 LEFT JOIN
     overdue o1
-    ON COALESCE(e.contract, l.contract) = o1.sk_contract
-    AND COALESCE(e.dt_registered, l.dt_registered) = o1.dt_reference
+    ON e.contract = o1.sk_contract
+    AND e.dt_registered = o1.dt_reference
 LEFT JOIN
     dw_rent.dim_contract c
-    ON COALESCE(e.contract, l.contract) = c.id_contract
+    ON e.contract = c.id_contract
 GROUP BY ALL

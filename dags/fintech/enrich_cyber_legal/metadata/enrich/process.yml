@@ -161,10 +161,6 @@ columns:
     description: "State where the case is being processed"
     lineage:
       - datalake_cyber_legal_clean.case.state
-  contract_status:
-    description: "Status of the contract"
-    lineage:
-      - datalake_cyber_legal_clean.contracts.contract_status
   ts_updated:
     description: "Timestamp of the last update"
     lineage:
@@ -177,10 +173,6 @@ columns:
     description: "Original process type of the case"
     lineage:
       - datalake_cyber_legal_clean.case.process_type
-  collection_agency_name:
-    description: "Collection agency name"
-    lineage:
-      - datalake_cyber_legal_clean.agency.agency_name
   total_package_amount:
     description: "Total package amount"
     lineage:
