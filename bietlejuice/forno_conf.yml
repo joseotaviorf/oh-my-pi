@@ -65,6 +65,7 @@ dags_out_of_pattern:
         "reverse_listings_locations_load",
         "reverse_listings_locations_access",
         "reverse_reports",
+        "reverse_listing_quality_load",
     ]
 databricks_bietlejuice_repo_path: s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice
 databricks_bucket: databricks.s3.forno.data.quintoandar.com.br

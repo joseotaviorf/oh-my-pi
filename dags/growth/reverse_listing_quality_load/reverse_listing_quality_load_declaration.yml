@@ -1,0 +1,23 @@
+dag:
+  name: reverse_listing_quality_load
+  schedule_start_date: 2026, 03, 10
+  owner: Data Growth
+  documentation:
+    dag_purpose: This DAG collects all new House Listings with photos into reverse_public.listing_quality. The access DAG reverse_listing_quality_access sends them to the MainListingQuality SQS queue for the ListingQuality service (main-sqs-consumers).
+workflow:
+  type: load
+  layer: reverse
+  custom_schema: listing_quality
+  default_extraction_type: full
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
+
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new
+  access_control_list:
+    - group_name: software-engineers
+      permission_level: CAN_MANAGE
+    - group_name: analytics-engineers
+      permission_level: CAN_MANAGE
