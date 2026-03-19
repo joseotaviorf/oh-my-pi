@@ -1,0 +1,37 @@
+---
+table_name: dw_people.fact_employees
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  sk_employee:
+    is_complete:
+      severity_level: Error
+    custom:
+      # Grain uniqueness: one row per (sk_employee, sk_reference_date)
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT sk_employee, sk_reference_date
+          FROM dw_people.fact_employees
+          GROUP BY sk_employee, sk_reference_date
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
+  sk_reference_date:
+    is_complete:
+      severity_level: Error
+  dt_reference:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Warning

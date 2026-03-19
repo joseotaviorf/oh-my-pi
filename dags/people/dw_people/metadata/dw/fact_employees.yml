@@ -1,0 +1,73 @@
+---
+database_name: dw_people
+table_name: fact_employees
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |
+  Employee snapshot fact table. One row per employee per reference date (last day of month or most recent day).
+  Use for headcount by date, tenure analysis, and organizational reporting.
+  Grain: (sk_employee, sk_reference_date).
+  Cost center is historically versioned (SCD2); business unit, job, and manager hierarchy use current values.
+columns:
+  sk_employee:
+    description: Surrogate key for the employee. FK to dim_employee.
+    lineage:
+      - dw_employee_details.dim_employee.sk_employee
+  sk_business_unit:
+    description: Business unit identifier. FK to dim_business_unit (current).
+    lineage:
+      - dw_organization.dim_business_unit.sk_business_unit
+  sk_job:
+    description: Job identifier. FK to dim_job (current).
+    lineage:
+      - dw_compensation.dim_job.sk_job_version
+  sk_cost_center_version:
+    description: Cost center version identifier. FK to dim_cost_center (SCD2, temporal at dt_reference).
+    lineage:
+      - dw_organization.dim_cost_center.sk_cost_center_version
+  sk_manager_hierarchy:
+    description: Manager hierarchy identifier. FK to dim_management_hierarchy (current).
+    lineage:
+      - datalake_people.management_hierarchy.sk_hierarchy_version
+  sk_hired_date:
+    description: Hire date in YYYYMMDD format. Use for date-based joins.
+    lineage:
+      - datalake_people.assignment_snapshots.sk_hired_date
+  sk_terminated_date:
+    description: Termination date in YYYYMMDD format. NULL when still active.
+    lineage:
+      - datalake_people.assignment_snapshots.sk_terminated_date
+  sk_reference_date:
+    description: Reference date of the snapshot in YYYYMMDD format. Last day of month or current date.
+    lineage:
+      - datalake_people.assignment_snapshots.sk_reference_date
+  business_unit_country:
+    description: Country of the business unit/job.
+    lineage:
+      - dw_compensation.dim_job.country
+  tenure_months:
+    description: Months since the employee's first hire at the company.
+    lineage:
+      - datalake_people.assignment_snapshots.months_tenure_in_company
+  is_active:
+    description: True when the employee is currently active.
+    lineage:
+      - datalake_people.assignment_snapshots.is_active
+  is_current:
+    description: True when dt_reference equals the most recent day (current date).
+    lineage:
+      - datalake_people.assignment_snapshots.is_current
+  dt_hired:
+    description: Date the employee started this assignment.
+    lineage:
+      - datalake_people.assignment_snapshots.dt_hired
+  dt_terminated:
+    description: Date the assignment ended. NULL when still active (dt_terminated >= current date).
+    lineage:
+      - datalake_people.assignment_snapshots.dt_terminated
+  dt_reference:
+    description: Reference date of the snapshot. Last day of month or current date.
+    lineage:
+      - datalake_people.assignment_snapshots.dt_reference
+  ts_load:
+    description: Timestamp when the record was loaded.

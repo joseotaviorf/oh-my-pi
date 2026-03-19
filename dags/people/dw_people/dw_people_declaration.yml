@@ -27,6 +27,10 @@ workflow:
   # When made public, configure a bucket with public access before re-enabling hive_sync.
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  inner_dependencies:
+    fact_employees:
+      - dim_management_hierarchy
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
   tables_customization:
@@ -34,5 +38,8 @@ workflow:
       vacuum_retention_hours: 168
       vacuum_lite: true
     dim_management_hierarchy:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    fact_employees:
       vacuum_retention_hours: 168
       vacuum_lite: true

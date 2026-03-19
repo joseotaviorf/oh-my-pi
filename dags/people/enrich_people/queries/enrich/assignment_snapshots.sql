@@ -24,6 +24,7 @@ current_assignments AS (
     SELECT
         id_assignment,
         id_organization,
+        id_business_unit,
         id_job,
         career_track
     FROM
@@ -259,6 +260,7 @@ SELECT
     ad.id_assignment,
     ad.id_person,
     ca.id_organization,
+    ca.id_business_unit,
     ca.id_job,
     mh.sk_hierarchy_version,
     ted.id_event_definition AS sk_termination_event_definition,
@@ -319,6 +321,11 @@ SELECT
         DATE('9999-12-31')
     ) AS dt_notified,
     ad.dt_reference AS dt_reference,
+    (
+        LAST_DAY(ad.dt_reference) = ad.dt_reference
+        OR ad.dt_reference = CURRENT_DATE()
+    ) AS is_monthly_snapshot,
+    ad.dt_reference = CURRENT_DATE() AS is_current,
     CURRENT_TIMESTAMP() AS ts_load
 FROM
     assignments_daily AS ad
