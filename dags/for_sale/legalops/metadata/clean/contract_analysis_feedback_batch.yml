@@ -1,0 +1,51 @@
+---
+database_name: datalake_legalops_clean
+table_name: contract_analysis_feedback_batch
+domain: For Sale
+owner: thiago.bueno@quintoandar.com.br
+description: Table with feedback batches submitted by analysts for contract analysis results.
+columns:
+  id:
+    description: Unique ID for the feedback batch record.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_feedback_batch.id
+  id_contract_analysis_job:
+    description: Foreign key to the contract analysis job associated with this feedback.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_feedback_batch.contract_analysis_job_id
+  id_sales_flow:
+    description: Foreign key to the sales flow associated with this feedback batch.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_feedback_batch.sales_flow_id
+  raw_payload:
+    description: JSON payload containing the raw feedback data submitted by the analyst.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_feedback_batch.raw_payload
+  person_uuid:
+    description: UUID of the person who submitted the feedback.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_feedback_batch.person_uuid
+  status:
+    description: Current processing status of the feedback batch.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_feedback_batch.status
+  ts_created:
+    description: Timestamp when the feedback batch was created.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_feedback_batch.created_at
+  ts_updated:
+    description: Timestamp of the last update to the feedback batch.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_feedback_batch.updated_at
+  year:
+    description: Year partition for the feedback batch record.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_feedback_batch.year
+  month:
+    description: Month partition for the feedback batch record.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_feedback_batch.month
+  day:
+    description: Day partition for the feedback batch record.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_feedback_batch.day

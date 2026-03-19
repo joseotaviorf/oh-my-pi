@@ -29,7 +29,15 @@ workflow:
     contract_analysis_data_relation:
       clean_table_name: contract_analysis_data_relation
       raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"] 
+      clean_primary_keys: ["id"]
+    contract_analysis_feedback_batch:
+      clean_table_name: contract_analysis_feedback_batch
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    contract_analysis_feedback_observations:
+      clean_table_name: contract_analysis_feedback_observations
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
 cluster:
   type: databricks_16_4_med_memory_general_cluster
   custom_configurations:
