@@ -10,9 +10,9 @@ columns:
     lineage:
       - datalake_people.identifier_mapping.assignment_number
   full_name:
-    description: Full name of the worker, if has social name it is the same.
+    description: Full name of the worker; sourced from display_name (uses social name when available).
     lineage:
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.display_name
   work_email:
     description: Corporate email of the employee.
     lineage:
@@ -20,7 +20,7 @@ columns:
   manager_name:
     description: Full name of the manager.
     lineage:
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.display_name
   manager_email:
     description: Corporate email of the manager.
     lineage:
