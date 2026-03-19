@@ -174,7 +174,7 @@ After bi-etl-ejuice files are done, enable the new business type in Datazord. Se
 2. **openapi.yaml** — append to `BusinessFilter.businessTypes` enum.
 3. **Label rules** — this is a **deferred gathering step**: the agent must ask the user about status→label mapping here, because this depends on what was generated in the SQL. See the decision tree below.
 4. **UserContextMapperTest.kt** — add to `allBusinessTypes` + `expectedStrings`.
-5. **Verification (optional):** `./gradlew :app:containers:api:test --tests '*UserContextMapperTest*'`
+5. **Verification (optional):** from `applications/datazord`, run `./gradlew ktlintFormat` then `./gradlew build clean`. Full build including integration tests requires Colima (Docker) to be running.
 
 **Label rules decision tree:**
 - **If view has status in properties:** ask the user: "For label rules, I need status values → label mappings. Do you have them? If not, I can search the repo or add a placeholder."
@@ -253,21 +253,12 @@ Offer to test locally. If the user declines, skip to Step 7.
 
 **Check Java 17:** run `java -version` automatically. If not available, guide `sdk install java 17.0.12-tem` or check `.sdkmanrc` in the datazord directory.
 
-**Run targeted tests** from `backend-services/applications/datazord`:
+**Run from `backend-services/applications/datazord`:**
 
-```bash
-unset CI && ./gradlew :app:containers:api:test --tests '*UserContextMapperTest*'
-```
+1. **Format:** `./gradlew ktlintFormat`
+2. **Build and tests:** `./gradlew build clean` — runs unit and integration tests. **Colima (Docker) must be running** for integration tests to succeed.
 
-If label rules were added in Step 3.6, also run:
-
-```bash
-unset CI && ./gradlew :app:core:test --tests '*BusinessObjectLabelService*'
-```
-
-No Docker or server startup needed — these are pure unit tests.
-
-If tests pass, Datazord is validated locally. **Staging (after merge):** merging triggers automatic staging deploy. Validate the new business type in user-context/business-objects APIs.
+If both steps pass, Datazord is validated locally. **Staging (after merge):** merging triggers automatic staging deploy. Validate the new business type in user-context/business-objects APIs.
 
 ## Step 7 — Wrap-up with the user
 
@@ -300,7 +291,7 @@ Present as a numbered checklist:
 1. **Resolve TODOs** — fill in `is_active` logic, label-rules mappings, owner email, etc.
 2. **Review generated code** — all generated code may contain placeholders, assumptions, or errors. The user must review and validate before merging.
 3. **bi-etl-ejuice local testing (if not done)** — if Step 5 was skipped, run it before merging. Use the `run-dag-locally` skill: trigger `enrich_entities_views` first, then `enrich_transactional_entities`.
-4. **Datazord local testing (if not done)** — if Step 6 was skipped, run unit tests: `unset CI && ./gradlew :app:containers:api:test --tests '*UserContextMapperTest*'`.
+4. **Datazord local testing (if not done)** — if Step 6 was skipped, from `applications/datazord` run `./gradlew ktlintFormat` then `./gradlew build clean`. Colima (Docker) must be running for integration tests.
 5. **bi-etl-ejuice: first production deploy** — after merge, manually trigger `enrich_entities_views` once before the next scheduled run of `enrich_transactional_entities` (otherwise it will fail with "view not found").
 6. **backend-services (Datazord): after merge** — staging deploy is automatic; validate the new business type in user-context/business-objects APIs.
 7. **If 30-min cadence is needed but missing:** remind the user of the **two-PR strategy** — upstream pipeline (fast_lane or core DAG) PR merged and validated on Forno first; entity-view PR comes after. Bundling can break entities runtime. Use the `create-dag` skill for the upstream pipeline.

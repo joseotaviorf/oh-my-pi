@@ -251,7 +251,7 @@ When adding a new entity to `entities.sql`, update `dags/growth/enrich_transacti
 
 When the entity has **no status** in properties → do not add label rules; state that in the output.
 
-**Testing commands:**
-- `./gradlew :app:containers:api:test --tests '*UserContextMapperTest*'`
-- If label rules added: `./gradlew :app:containers:api:test --tests '*BusinessObjectLabelService*'`
+**Testing commands (run from `applications/datazord`):**
+- `./gradlew ktlintFormat` — format Kotlin code before committing.
+- `./gradlew build clean` — unit and integration tests. **Colima (Docker) must be running** for integration tests.
 - Optional local API: `./gradlew :app:containers:api:bootRun --args='--spring.profiles.active=forno'`
