@@ -3,6 +3,7 @@ WITH values_updates AS (
         id,
         house_id,
         prediction_id,
+        cdc_transaction_id,
         STRUCT(
             deal_objective_lower_anchor,
             deal_objective_upper_anchor,
@@ -46,6 +47,7 @@ SELECT
     id,
     house_id AS id_house,
     prediction_id AS id_prediction,
+    cdc_transaction_id AS id_cdc_transaction,
     current_values.deal_objective_lower_anchor,
     current_values.deal_objective_upper_anchor,
     current_values.lower_bound_limit,

@@ -11,6 +11,18 @@ column_level_validations:
   id:
     is_complete:
       severity_level: Error
+    custom:
+      # Ensures composite key (id, id_cdc_transaction) is unique
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT id, id_cdc_transaction
+           FROM datalake_ebdb_clean.house_price_suggestion_historical
+           GROUP BY id, id_cdc_transaction
+           HAVING COUNT(*) > 1
+         )
+        ) = 0
+      severity_level: Error
 
   id_house:
     is_complete:
@@ -19,6 +31,10 @@ column_level_validations:
   id_prediction:
     is_complete:
       severity_level: Warning
+
+  id_cdc_transaction:
+    is_complete:
+      severity_level: Error
 
   suggested_price:
     is_complete:

@@ -2,22 +2,26 @@ database_name: datalake_ebdb_clean
 table_name: house_price_suggestion_historical
 owner: bruna.prates@quintoandar.com.br
 domain: For Sale
-description: Historical table tracking changes to price suggestion values for properties. Each record represents the last
-  state before a change occurred in the monitored fields (price bounds, anchors, suggested prices, rule, certainty). Built
-  from the CDC transactional layer.
+description: >
+  Tracks changes in price suggestion fields from HousePriceSuggestion table.
+  Each row represents a change, identified by composite key (id, id_cdc_transaction).
 columns:
   id:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.id
-    description: 'Primary ID for the price suggestion (same as in the source table).'
+    description: 'Primary key of HousePriceSuggestion source table. NOT unique here — one row per change. Part of composite key: (id, id_cdc_transaction).'
   id_house:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.house_id
-    description: 'ID of the property (house) to which the suggestion refers.'
+    description: 'ID of the property. A house may have two records in HousePriceSuggestion source table: one for RENT and one for SALE.'
   id_prediction:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.prediction_id
-    description: 'ID of the prediction (model) that generated this suggestion.'
+    description: 'UUID of the prediction that generated this suggestion. Changes with each update, so the same id may have different id_prediction values over time.'
+  id_cdc_transaction:
+    lineage:
+      - datalake_ebdb_transactional.HousePriceSuggestion.cdc_transaction_id
+    description: 'Unique identifier of the CDC transaction and required to distinguish multiple changes captured at the same ts_cdc_transaction. Part of the composite key: (id, id_cdc_transaction).'
   deal_objective_lower_anchor:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.deal_objective_lower_anchor
@@ -57,23 +61,30 @@ columns:
   business_context:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.business_context
-    description: 'Business context for which the price was suggested (e.g., RENT, SALE).'
+    description: 'Business context for which the price was suggested. Each (id_house, business_context) has a distinct id in HousePriceSuggestion.'
+    categories:
+      RENT: Rental property context.
+      SALE: Sale property context.
   op_cdc:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.op_cdc
-    description: 'CDC operation type: r (read/snapshot), c (create), u (update).'
+    description: 'CDC operation type captured by Debezium.'
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
   ts_created:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.created_at
-    description: 'Timestamp of when the suggestion record was created in the source.'
+    description: 'Timestamp of when the suggestion record was created in the HousePriceSuggestion source table.'
   ts_updated:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.updated_at
-    description: 'Timestamp of the last update to the suggestion record in the source.'
+    description: 'Timestamp of the last update to the suggestion record in the HousePriceSuggestion source table.'
   ts_cdc_transaction:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.ts_cdc_transaction
-    description: 'Timestamp when the CDC system captured this transaction.'
+    description: 'Timestamp when the CDC system captured this transaction. Multiple changes may occur at the same timestamp (millisecond precision), requiring id_cdc_transaction to distinguish them.'
   ts_database_transaction:
     lineage:
       - datalake_ebdb_transactional.HousePriceSuggestion.ts_database_transaction
