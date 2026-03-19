@@ -22,7 +22,6 @@ SELECT
     timestamp(updated_at) AS ts_updated,
     timestamp(retsuko_created_at) AS ts_retsuko_created,
     timestamp(retsuko_updated_at) AS ts_retsuko_updated,
-    timestamp(ts_database_transaction) AS ts_database_transaction,
     year,
     month,
     day,

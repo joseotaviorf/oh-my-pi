@@ -96,10 +96,6 @@ columns:
     description: "Datetime when the row was last updated in Retsuko"
     lineage:
       - datalake_retsuko_raw.agreement.retsuko_updated_at
-  ts_database_transaction:
-    description: "Timestamp of the database transaction in the source system"
-    lineage:
-      - datalake_retsuko_raw.agreement.ts_database_transaction
   year:
     description: "Partition year"
     lineage:
