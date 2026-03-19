@@ -47,12 +47,39 @@ def save_volume_metric(
         )
     )
 
-    metric_rows = _metric.collect()
-    if len(metric_rows) == 0:
+    if _metric.rdd.isEmpty():
         logger.warning(
             f"m=save_volume_metric, msg=No rows found for metric {metric_name}, "
         )
-        return None
+        grain_types = {field.name: field.dataType for field in df.schema.fields}
+        _metric = spark.range(1)
+
+        for grain_col in grain:
+            col_type = grain_types.get(grain_col)
+            grain_col_expr = F.lit(None).cast(col_type) if col_type else F.lit(None)
+            _metric = _metric.withColumn(grain_col, grain_col_expr)
+
+        _metric = (
+            _metric.withColumn("metric_category", F.lit("volume"))
+            .withColumn("metric_name", F.lit(metric_name))
+            .withColumn("source_table", F.lit(table_name))
+            .withColumn("new_cols", F.lit(new_cols))
+            .withColumn("environment", F.lit(env))
+            .withColumn("layer", F.lit(layer))
+            .withColumn("row_count", F.lit(0))
+            .withColumn("_write_timestamp", F.lit(write_timestamp))
+            .select(
+                "metric_category",
+                "metric_name",
+                "source_table",
+                "new_cols",
+                "environment",
+                "layer",
+                *grain,
+                "row_count",
+                "_write_timestamp",
+            )
+        )
 
     logger.info(f"m=save_volume_metric, msg=Partition columns: {partition_cols}")
     metric_table = f"datalake_sst_metrics.{metric_name}"
