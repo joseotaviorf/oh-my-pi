@@ -177,6 +177,10 @@ columns:
     description: "Total package amount"
     lineage:
       - datalake_cyber_legal_clean.delinquent_master.total_package_amount
+  contract_status:
+    description: "Status of the contract"
+    lineage:
+      - datalake_cyber_legal_clean.contracts.contract_status
   overdue_amount:
     description: "Overdue amount"
     lineage:

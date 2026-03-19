@@ -157,15 +157,6 @@ SELECT DISTINCT
     s.stage_penhora_expense_amount AS asset_attachment_expense_amount,
     s.stage_avaliacao_bens_expense_amount AS asset_evaluation_expense_amount,
     s.stage_satisfacao_credito_expense_amount AS credit_satisfaction_expense_amount,
-    CASE
-        WHEN p.contract_status = 'Finalizando' AND p.dt_status_changed IS NULL THEN 'Em finalização'
-        WHEN p.case_final_description IN ('IMISSÃO NA POSSE', 'DESPEJO COERCITIVO') AND p.ts_contract_end IS NULL THEN 'Em finalização'
-        WHEN p.dt_status_changed IS NULL AND p.original_process_type IN ('Execucao') THEN 'Execução'
-        WHEN p.dt_status_changed IS NULL THEN 'Ativo'
-        WHEN p.dt_status_changed IS NOT NULL AND p.case_final_description IN ('Quitacao') THEN 'Quitado'
-        WHEN p.dt_status_changed IS NOT NULL AND p.case_final_description IN ('Rescisao') THEN 'Finalizado'
-        WHEN p.dt_status_changed IS NOT NULL AND p.case_status = 'Completed' THEN 'Encerrado'
-    ELSE NULL END AS passage_status,
     CASE WHEN COUNT(*) OVER (PARTITION BY BIGINT(id_contract)) > 1 THEN TRUE ELSE FALSE END AS is_reincident,
     IF(p.case_status = 'Active' AND fpc.dt_first_closure IS NOT NULL, TRUE, FALSE) AS is_reopened,
     'not_in_cyber_legal' AS procedure,
