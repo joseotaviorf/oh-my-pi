@@ -16,7 +16,7 @@ WITH
             AND MIN_BY(sk_user_conversion, date) NOT IN (8919771, 11299701, 6001450) -- para não considerar casos de 3P FR
             AND MIN_BY(sk_user_affiliate, date) NOT IN (12306405, 14046860, 14053116, 14046994, 14217303) -- para não considerar casos de 3P FR
             AND MIN(date) >= DATE('{load_start_date}')
-            AND MIN(date) < DATE('{load_end_date}')
+            AND MIN(date) <= DATE('{load_end_date}')
     ), -- ids de imóveis de 1p publicados em first listing no intervalo
 
 
@@ -64,7 +64,7 @@ WITH
             user_sender_type
         FROM base_geral_last_job
         WHERE CAST(ts_photos_uploaded AS DATE) >= DATE('{load_start_date}')
-          AND CAST(ts_photos_uploaded AS DATE) < DATE('{load_end_date}')
+          AND CAST(ts_photos_uploaded AS DATE) <= DATE('{load_end_date}')
     ), -- puxa os ids de imóveis e jobs que tiveram o upload de fotos (trigger para publicação) ainda não processados pela DAG
 
 
