@@ -26,7 +26,7 @@ columns:
     description: The ID of the element that was edited or accessed. May be null if
       the action does not target one particular ID.
     lineage:
-      - datalake_greenhouse_audit_log_raw.events.event.target_id
+      - datalake_greenhouse_audit_log_raw.events.raw_payload
   id_close_reason_before_event:
     description: 'The ID of the closing reason before the event, if applicable.'
     lineage:

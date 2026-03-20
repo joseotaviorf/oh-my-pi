@@ -19,10 +19,7 @@ SELECT
     get_json_object(raw_payload, '$.performer.id'),
     CAST(performer.id AS STRING)
   ) AS id_performer,
-  COALESCE(
-    get_json_object(raw_payload, '$.event.target_id'),
-    CAST(event.target_id AS STRING)
-  ) AS id_event_target,
+  CAST(get_json_object(raw_payload, '$.event.target_id') AS STRING) AS id_event_target,
   COALESCE(
     FROM_JSON(
       get_json_object(raw_payload, '$.event.meta.close_reason_id'),
