@@ -15,7 +15,7 @@ class TestReprocessingGuardTaskCreator:
         mock_base_task_creator_module = mock.MagicMock()
         mock_base_task_creator_module.BaseTaskCreator = MockBaseTaskCreator
         with mock.patch(
-            "airflow.operators.python.get_current_context"
+            "bietlejuice.base.airflow.task_creators.reprocessing_guard_task_creator.get_current_context"
         ) as mock_get_current_context, mock.patch.dict(
             # So we don't have to install the databricks_plugin package
             "sys.modules",
