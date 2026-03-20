@@ -54,13 +54,13 @@ columns:
     lineage:
       - datalake_partner_payment_raw.operation_payments.agent_status
     description: Status of the agent.
-  agent_contract_type:
+  contract_type:
     lineage:
-      - datalake_partner_payment_raw.operation_payments.agent_contract_type
+      - datalake_partner_payment_raw.operation_payments.contract_type
     description: Type of the contract of the agent.
-  operation_agent_type:
+  operation_type:
     lineage:
-      - datalake_partner_payment_raw.operation_payments.operation_agent_type
+      - datalake_partner_payment_raw.operation_payments.operation_type
     description: Type of operation performed by the agent.
   operation_agent_status:
     lineage:
@@ -74,25 +74,25 @@ columns:
     lineage:
       - datalake_partner_payment_raw.operation_payments.house_reference
     description: Information about the house.
-  base_meter_value:
+  meters_base_reference:
     lineage:
-      - datalake_partner_payment_raw.operation_payments.base_meter_value
+      - datalake_partner_payment_raw.operation_payments.meters_base_reference
     description: Amount to be paid in relation to the base area considered for a house.
-  additional_meter_value:
+  meters_additional_reference:
     lineage:
-      - datalake_partner_payment_raw.operation_payments.additional_meter_value
+      - datalake_partner_payment_raw.operation_payments.meters_additional_reference
     description: Percentage to be paid related to the area that exceeds the base area of the house.
-  total_meter_value:
+  meters_total:
     lineage:
-      - datalake_partner_payment_raw.operation_payments.total_meter_value
+      - datalake_partner_payment_raw.operation_payments.meters_total
     description: The total amount to be paid for the house total area.
-  total_add_ons:
+  additionals_total:
     lineage:
-      - datalake_partner_payment_raw.operation_payments.total_add_ons
+      - datalake_partner_payment_raw.operation_payments.additionals_total
     description: The total amount to be paid for additional charges.
-  fixed_value:
+  fixed_reference:
     lineage:
-      - datalake_partner_payment_raw.operation_payments.fixed_value
+      - datalake_partner_payment_raw.operation_payments.fixed_reference
     description: Additional fixed amount considered to the calculate of the payment.
   operation_business:
     lineage:
