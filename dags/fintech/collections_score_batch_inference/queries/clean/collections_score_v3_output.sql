@@ -4,6 +4,7 @@ SELECT
   model_version,
   CAST(GET_JSON_OBJECT(output_data, '$.payment_probability') AS DOUBLE) AS payment_probability,
   CAST(GET_JSON_OBJECT(output_data, '$.score') AS INT) AS score,
+  'PROD_TEST' as flag_source,
   TO_DATE(FROM_UNIXTIME(CAST(GET_JSON_OBJECT(output_data, '$.dt_reference') AS BIGINT) / 1000)) AS dt_reference,
   TIMESTAMP(timestamp) as ts_inference,
   year,

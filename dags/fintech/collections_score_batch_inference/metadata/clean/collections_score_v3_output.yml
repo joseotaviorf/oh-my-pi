@@ -25,6 +25,8 @@ columns:
     lineage:
       - datalake_collections_score_batch_inference_raw.collections_score_v3_output.output_data
     description: "Collections score from inference output (score in JSON)."
+  flag_source:
+    description: "Flag source of the inference."
   dt_reference:
     lineage:
       - datalake_collections_score_batch_inference_raw.collections_score_v3_output.output_data
