@@ -22,6 +22,7 @@ SELECT
 	contract_id AS id_contract,
 	source_invoice_id AS id_source_invoice,
 	o.id_original,
+	i.seubarriga_invoice_id AS id_seubarriga_invoice,
 	account_type,
 	status,
 	sub_status,

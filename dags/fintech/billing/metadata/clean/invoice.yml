@@ -23,6 +23,10 @@ columns:
     description: Identifier of the retsuko invoice
     lineage:
       - datalake_billing_raw.invoice.payload
+  id_seubarriga_invoice:
+    description: Identifier of the Seubarriga invoice
+    lineage:
+      - datalake_billing_raw.invoice.seubarriga_invoice_id
   account_type:
     description: Type of the related account
     lineage:
