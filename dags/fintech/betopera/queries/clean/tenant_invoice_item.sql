@@ -11,6 +11,7 @@ SELECT
     refunded_item_id AS id_refunded_item,
     insurance_id AS id_insurance,
     accrual_year_month,
+    reference_year_month,
     DATE(accrued_date) AS dt_accrued,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated,

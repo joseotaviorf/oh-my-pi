@@ -51,6 +51,10 @@ columns:
     lineage:
       - datalake_betopera_raw.tenant_invoice_item.accrual_year_month
     description: "Year-month reference used for accrual accounting."
+  reference_year_month:
+    lineage:
+      - datalake_betopera_raw.tenant_invoice_item.reference_year_month
+    description: "Year-month reference that the tenant invoice item is associated with."
   dt_accrued:
     lineage:
       - datalake_betopera_raw.tenant_invoice_item.accrued_date
