@@ -1,0 +1,105 @@
+database_name: datalake_sap_accounting_process
+table_name: retsuko_transactional_third_parties_reverse
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description:
+  Table to track reverse transactional accounting for SeuBarriga/Retsuko bill-items mapped to SAP account
+  700004 (Between contracts), identifying cases where entries exist in SAP Ledger (accounting funnel) but do
+  not have a corresponding finance-entity-entry match in Retsuko for that ledger line. These are classified
+  as 'reverse straw failure' transactions for monitoring and root-cause analysis. Rows are filtered where
+  the Retsuko entry key does not align (id_finance_entity_entry from Retsuko is NULL in the result set).
+columns:
+  id_accounting_process:
+    description:
+      Unique key per row, built as ('RE-RTSK-T-' || id_finance_entity || '-' || account_number) then suffixed
+      with '-' || ROW_NUMBER() OVER (PARTITION BY that composite ORDER BY dt_sap_created) for deduplication.
+    lineage:
+      - datalake_accounting_funnel.ledger.id_finance_entity
+      - datalake_accounting_funnel.ledger.account_number
+  id_business_entity:
+    description: Business key for the contract, unique identifier for integration with external systems.
+    lineage:
+      - datalake_accounting_funnel.ledger.id_business_entity
+  id_finance_entity:
+    description: Business key for the invoice, unique identifier for integration with external systems.
+    lineage:
+      - datalake_accounting_funnel.ledger.id_finance_entity
+  id_finance_entity_entry:
+    description: Business key for the entry, unique identifier for integration with external systems.
+    lineage:
+      - datalake_accounting_funnel.ledger.id_finance_entity_entry
+  version:
+    description: Identifier of the versions from source system (SeuBarriga), could be v1 or v2. NULL when not linked via sap_entity.
+    lineage:
+      - datalake_retsuko_clean.sap_entity.version
+  business_unit:
+    description: Identifier created into this table for segmented the business unit. Always 'for rent' for records in this table.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.business_unit
+  source_name:
+    description: Origin system of the transaction. Always 'S4' for reverse transactions as they originate from SAP.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.source_name
+  accounting_type:
+    description: Information of type using for segregated accounts. Always 'transactional' for records in this table.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.accounting_type
+  account_number:
+    description: Identifier of accounts used by controllership accounting process in SAP (e.g. 700004 for this model).
+    lineage:
+      - datalake_accounting_funnel.ledger.account_number
+  accounting_name:
+    description: Human readable name for the transactional bucket; 'Between contracts' for account 700004 in this query.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.accounting_name
+  source_amount:
+    description: Value from Retsuko entry when a matching row exists in the join; may be NULL when no Retsuko match.
+    lineage:
+      - datalake_retsuko.entry.amount
+  sap_amount:
+    description: Value recorded in SAP Ledger.
+    lineage:
+      - datalake_accounting_funnel.ledger.debit_credit
+  is_completeness:
+    description: Indicates whether there is a corresponding entry/invoice in SAP. Always FALSE for reverse transactions.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.is_completeness
+  is_correctness:
+    description: TRUE if the difference between source and SAP amount is less than R$0.05. Always FALSE for reverse transactions.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.is_correctness
+  is_temporality:
+    description: TRUE if the SAP date is within 3 days after the source date. Always FALSE for reverse transactions.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.is_temporality
+  is_compliance:
+    description: TRUE if completeness, correctness, and temporality checks are all TRUE. Always FALSE for reverse transactions.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.is_compliance
+  accounting_process_status:
+    description: Classification of accounting status. Always 'reverse straw failure' for records in this table.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.accounting_process_status
+  error_description:
+    description:
+      Textual reason for accounting process failure. Can be 'source-{source_client}' when source_client is not 'seubarriga',
+      'manual transaction', 'transaction missing in sap entity', or 'wrong account number or postponed entry'.
+    lineage:
+      - datalake_sap_accounting_process.retsuko_transactional_third_parties_reverse.error_description
+      - datalake_accounting_funnel.ledger.source_client
+  accrual_year_month:
+    description: Account reference in the format YYYYMM from SAP Ledger.
+    lineage:
+      - datalake_accounting_funnel.ledger.accrual_year_month
+  dt_source_trigger:
+    description: Trigger date from Retsuko entry when matched; may be NULL when no Retsuko row applies.
+    lineage:
+      - datalake_retsuko.entry.ts_created
+  dt_sap_reference:
+    description: Reference date in SAP associated with accrual.
+    lineage:
+      - datalake_accounting_funnel.ledger.dt_reference
+  dt_sap_created:
+    description: Creation date of transaction in SAP.
+    lineage:
+      - datalake_accounting_funnel.ledger.dt_created
