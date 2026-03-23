@@ -649,10 +649,6 @@ bietlejuice.dw_employee_details:
 bietlejuice.dw_evictions:
   - bietlejuice.cyber:load-clean-logs-code-description:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-logs-juridical:first-run-of-day
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment:first-run-of-day
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation:first-run-of-day
-  - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline:first-run-of-day
-  - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.enrich_cyber_legal:load-enrich-alerts:first-run-of-day
   - bietlejuice.enrich_cyber_legal:load-enrich-evictions-base:first-run-of-day
   - bietlejuice.enrich_cyber_legal:load-enrich-expenses:first-run-of-day

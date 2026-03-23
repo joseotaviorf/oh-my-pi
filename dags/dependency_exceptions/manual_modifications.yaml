@@ -181,6 +181,12 @@ bietlejuice.dw_collection_recovery_quintocred:
     - bietlejuice.paschoalotto:load-clean-contract:first-run-of-day
     - bietlejuice.paschoalotto:load-clean-debt:first-run-of-day
     - bietlejuice.paschoalotto:load-clean-user:first-run-of-day
+bietlejuice.dw_evictions:
+  remove:
+    - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation-installment:first-run-of-day
+    - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-negotiation:first-run-of-day
+    - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline:first-run-of-day
+    - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
 bietlejuice.dw_offboarding:
   add:
     - bietlejuice.enrich_inspections:load-enrich-repair-request:first-run-of-day
