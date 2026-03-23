@@ -1022,6 +1022,9 @@ bietlejuice.reverse_demand_classifieds_ranking_access:
 bietlejuice.reverse_dsat_report_access:
   add:
     - bietlejuice.reverse_dsat_report_load:load-reverse-sale-dsat-report:first-run-of-day
+bietlejuice.reverse_listing_quality_access:
+  add:
+    - bietlejuice.reverse_listing_quality_load:load-reverse-listings-quality:first-run-of-day
 bietlejuice.reverse_listings_locations_access:
   add:
     - bietlejuice.reverse_listings_locations_load:load-reverse-listings-locations:first-run-of-day

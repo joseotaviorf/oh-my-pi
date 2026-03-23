@@ -1,0 +1,3 @@
+# SQS queue for MainListingQuality (resource-name: MainListingQuality, application: main-sqs-consumers)
+# Confirm the exact queue URL with your SQS/Backstage setup
+sqs_queue_url: "https://sqs.us-east-1.amazonaws.com/632540934959/ProdMainListingQuality"

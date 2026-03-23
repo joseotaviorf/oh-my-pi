@@ -1,0 +1,43 @@
+dag:
+  name: reverse_listing_quality_access
+  schedule_start_date: 2026, 03, 10
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG reads data from reverse_listing_quality.listing_quality (written by reverse_listing_quality_load)
+      and sends each row to the MainListingQuality SQS queue for the main-sqs-consumers application.
+workflow:
+  type: access
+  layer: reverse
+  custom_schema: reverse_listing_quality
+  load_spark_job: load_into_sqs
+  spark_job_arguments:
+    - "{dag_name}"
+    - "reverse_listing_quality"  # Database/schema where load DAG writes
+    - "{table_name}"
+  tables_customization:
+    listing_quality: {}
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: c5a.2xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+      first_on_demand: 1
+      spot_bid_price_percent: 100
+      zone_id: us-east-1d
+      availability: SPOT_WITH_FALLBACK
+      ebs_volume_size: 200
+      instance_profile_arn: "{{ var.value.instance_profile_secret_arn_reverse_listings_report }}"
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new
+  access_control_list:
+    - group_name: software-engineers
+      permission_level: CAN_MANAGE
+    - group_name: analytics-engineers
+      permission_level: CAN_MANAGE
