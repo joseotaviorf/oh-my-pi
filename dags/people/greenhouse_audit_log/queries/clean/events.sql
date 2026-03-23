@@ -55,11 +55,11 @@ SELECT
   ) AS performer_ip_address,
   COALESCE(
     get_json_object(raw_payload, '$.performer.meta.name'),
-    get_json_object(performer.meta, '$.name')
+    get_json_object(TO_JSON(performer.meta), '$.name')
   ) AS performer_name,
   COALESCE(
     get_json_object(raw_payload, '$.performer.meta.username'),
-    get_json_object(performer.meta, '$.username')
+    get_json_object(TO_JSON(performer.meta), '$.username')
   ) AS performer_username,
   COALESCE(
     get_json_object(raw_payload, '$.event.type'),
