@@ -1,0 +1,18 @@
+---
+database_name: datalake_hightouch_logs_raw
+table_name: sync_snapshot_trino
+domain: Growth
+description: Hightouch warehouse sync snapshot per row from Trino export (current row status per sync), sourced from CDP parquet under hightouch_audit
+columns:
+  sync_id:
+    description: Identifier of the Hightouch sync configuration
+  op_type:
+    description: Whether the row was added, changed, or unchanged relative to the last sync run
+  row_id:
+    description: Primary key value of the model row as defined in Hightouch
+  status:
+    description: Row-level sync outcome (succeeded, failed, or aborted)
+  failure_reason:
+    description: Error description when status is failed
+  fields:
+    description: JSON payload of model fields for the row as written by Hightouch warehouse sync logs

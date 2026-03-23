@@ -1,0 +1,50 @@
+---
+database_name: datalake_hightouch_logs_clean
+table_name: sync_snapshot_trino
+domain: Growth
+description: Clean Hightouch sync snapshot rows scoped to sync runs that started in the load window (joined from clean sync runs)
+columns:
+  id_sync:
+    description: Unique identifier for the sync configuration
+    lineage:
+      - datalake_hightouch_logs_raw.sync_snapshot_trino.sync_id
+  id_row:
+    description: Primary key value of the model row as defined in Hightouch
+    lineage:
+      - datalake_hightouch_logs_raw.sync_snapshot_trino.row_id
+  op_type:
+    description: Whether the row was added, changed, or unchanged relative to the last sync run
+    lineage:
+      - datalake_hightouch_logs_raw.sync_snapshot_trino.op_type
+  status:
+    description: Row-level sync outcome (succeeded, failed, or aborted)
+    lineage:
+      - datalake_hightouch_logs_raw.sync_snapshot_trino.status
+  failure_reason:
+    description: Error description when status is failed
+    lineage:
+      - datalake_hightouch_logs_raw.sync_snapshot_trino.failure_reason
+  model_fields_json:
+    description: JSON string of model fields for the row from warehouse sync logs
+    lineage:
+      - datalake_hightouch_logs_raw.sync_snapshot_trino.fields
+  ts_started:
+    description: Timestamp when the related sync run started (from sync_runs)
+    lineage:
+      - datalake_hightouch_logs_clean.sync_runs_trino.ts_started
+  ts_finished:
+    description: Timestamp when the related sync run finished (from sync_runs)
+    lineage:
+      - datalake_hightouch_logs_clean.sync_runs_trino.ts_finished
+  year:
+    description: Partition year from the related sync run
+    lineage:
+      - datalake_hightouch_logs_clean.sync_runs_trino.year
+  month:
+    description: Partition month from the related sync run
+    lineage:
+      - datalake_hightouch_logs_clean.sync_runs_trino.month
+  day:
+    description: Partition day from the related sync run
+    lineage:
+      - datalake_hightouch_logs_clean.sync_runs_trino.day
