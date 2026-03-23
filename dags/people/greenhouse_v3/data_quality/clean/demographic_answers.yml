@@ -1,0 +1,11 @@
+---
+table_name: datalake_greenhouse_v3_clean.demographic_answers
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+column_level_validations:
+  id_demographic_answer:
+    is_complete:
+      severity_level: Warning

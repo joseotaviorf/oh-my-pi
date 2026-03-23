@@ -5,7 +5,7 @@ domain: People
 description: |-
   This table contains notes associated with specific jobs, sourced from the Greenhouse Harvest API v3.  It includes the note's content, author, visibility, and relevant timestamps. The data is partitioned by the updated_at date.
 columns:
-  id:
+  id_job_note:
     description: Unique identifier for the job note.
     lineage:
     - datalake_greenhouse_v3_raw.job_notes.id

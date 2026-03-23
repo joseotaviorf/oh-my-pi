@@ -1,0 +1,93 @@
+SELECT
+    -- ids
+    id AS id_opening,
+    job_id AS id_job,
+    application_id AS id_application_hired,
+    custom_fields.ta_responsible.value.user_id AS id_ta_responsible,
+    close_reason_id AS id_close_reason,
+    -- text fields
+    opening_id AS code,
+    CASE WHEN open = true THEN 'open' ELSE 'closed' END AS status,
+    custom_fields.ta_responsible.value.name AS ta_responsible_name,
+    custom_fields.ta_responsible.value.email AS ta_responsible_email,
+    custom_fields.internal_position_name___quinto_andar_sp.external_id AS internal_position_code_quinto_andar_sp,
+    custom_fields.internal_position_name___quinto_andar_sp.value AS internal_position_name_quinto_andar_sp,
+    custom_fields.internal_position_name___quinto_andar_mg.external_id AS internal_position_code_quinto_andar_mg,
+    custom_fields.internal_position_name___quinto_andar_mg.value AS internal_position_name_quinto_andar_mg,
+    custom_fields.internal_position_name___classifieds.external_id AS internal_position_code_classifieds,
+    custom_fields.internal_position_name___classifieds.value AS internal_position_name_classifieds,
+    custom_fields.internal_position_name___benvi_pt.external_id AS internal_position_code_benvi_pt,
+    custom_fields.internal_position_name___benvi_pt.value AS internal_position_name_benvi_pt,
+    custom_fields.internal_position_name___mlsp.external_id AS internal_position_code_mlsp,
+    custom_fields.internal_position_name___mlsp.value AS internal_position_name_mlsp,
+    custom_fields.internal_position_name___grupo_navent_s_r_l_.external_id AS internal_position_code_grupo_navent,
+    custom_fields.internal_position_name___grupo_navent_s_r_l_.value AS internal_position_name_grupo_navent,
+    custom_fields.internal_position_name___dridco_s_a_u_.external_id AS internal_position_code_dridco,
+    custom_fields.internal_position_name___dridco_s_a_u_.value AS internal_position_name_dridco,
+    custom_fields.internal_position_name___one_loop_s_r_l_.external_id AS internal_position_code_one_loop,
+    custom_fields.internal_position_name___one_loop_s_r_l_.value AS internal_position_name_one_loop,
+    custom_fields.internal_position_name___soluser_soluciones_y_servicios_sa_de_cv.value AS internal_position_name_soluser,
+    custom_fields.internal_position_name___tecnolog_a_para_inmobiliarias_sa_de_cv.external_id AS internal_position_code_tecnologia_inmobiliarias,
+    custom_fields.internal_position_name___tecnolog_a_para_inmobiliarias_sa_de_cv.value AS internal_position_name_tecnologia_inmobiliarias,
+    custom_fields.internal_position_name___dridco_mexico_sa_de_cv.external_id AS internal_position_code_dridco_mexico,
+    custom_fields.internal_position_name___dridco_mexico_sa_de_cv.value AS internal_position_name_dridco_mexico,
+    custom_fields.affirmative_focus.value AS affirmative_focus,
+    custom_fields.band.value AS band,
+    custom_fields.career_path.value AS career_path,
+    custom_fields.headcount_hiring_manager_e_mail.value AS hiring_manager_email,
+    custom_fields.cost_center.external_id AS cost_center_code,
+    custom_fields.cost_center.value AS cost_center,
+    custom_fields.company.value AS company,
+    custom_fields.neotribe.value AS neotribe,
+    custom_fields.salary_scale.value AS salary_table,
+    custom_fields.overhead_or_capacity.value AS overhead_or_capacity,
+    custom_fields.recruitment_strategy.value AS recruitment_strategy,
+    custom_fields.work_hours.value AS work_hours,
+    custom_fields.workplace.value AS workplace,
+    custom_fields.can_ai_do_the_job___please_explain_.value AS question_can_ai_do_the_job,
+    custom_fields.reason_for_the_position_request.value AS request_reason,
+    custom_fields.what_is_the_justification_for_opening_this_position_.value AS request_justification,
+    custom_fields.what_is_the_replacement_reason_.value AS replacement_reason,
+    custom_fields.name_of_the_position___level_of_the_position_that_is_being_replaced_opening_1755793581_1519.value AS person_replaced_position_name,
+    custom_fields.band_of_the_person_being_replaced_opening_1755793711_165607.value AS person_replaced_band,
+    custom_fields.email_of_the_person_being_replaced_.value AS person_replaced_email,
+    custom_fields.monthly_salary_range.value.unit AS monthly_salary_range_currency,
+    custom_fields.plr.value.unit AS plr_currency,
+    custom_fields.rvv.value.unit AS rvv_currency,
+    custom_fields.sop.value.unit AS sop_currency,
+    custom_fields.what_is_the_job_id_in_budget_.value AS job_id_in_budget,
+    custom_fields.attention.value AS attention_notes,
+    -- numeric
+    CAST(custom_fields.equity_options_approval_exception_range.value.min_value AS DECIMAL(10, 2)) AS equity_options_min,
+    CAST(custom_fields.equity_options_approval_exception_range.value.max_value AS DECIMAL(10, 2)) AS equity_options_max,
+    CAST(custom_fields.monthly_salary_range.value.min_value AS DECIMAL(10, 2)) AS monthly_salary_range_min,
+    CAST(custom_fields.monthly_salary_range.value.max_value AS DECIMAL(10, 2)) AS monthly_salary_range_max,
+    CAST(custom_fields.plr.value.value AS DECIMAL(10, 2)) AS plr,
+    CAST(custom_fields.plr_latam.value AS DECIMAL(10, 2)) AS plr_salary_multiplier_latam,
+    CAST(custom_fields.rvv.value.value AS DECIMAL(10, 2)) AS rvv,
+    CAST(custom_fields.sop.value.value AS DECIMAL(10, 2)) AS sop,
+    -- boolean
+    CASE
+        WHEN custom_fields.confidentiality_flag.value = 'Confidential' THEN TRUE
+        ELSE FALSE
+    END AS is_confidential,
+    CAST(custom_fields.person_with_disabilties_.value AS BOOLEAN) AS has_disabilities_pwd_person_replaced,
+    CASE
+        WHEN custom_fields.will_this_position_be_100__dedicated_to_the_for_sale_team_.value = 'Yes' THEN TRUE
+        WHEN custom_fields.will_this_position_be_100__dedicated_to_the_for_sale_team_.value = 'No' THEN FALSE
+    END AS is_dedicated_to_for_sale_team,
+    -- dates
+    CAST(custom_fields.kickoff_date.value AS DATE) AS dt_kickoff,
+    -- timestamps
+    CAST(created_at AS TIMESTAMP) AS ts_created,
+    CAST(updated_at AS TIMESTAMP) AS ts_updated,
+    CAST(opened_at AS TIMESTAMP) AS ts_opened,
+    CAST(closed_at AS TIMESTAMP) AS ts_closed,
+    CAST(custom_fields.updated_at_oic.value AS TIMESTAMP) AS ts_updated_at_oracle,
+    NOW() AS ts_load,
+    -- partitions
+    year,
+    month,
+    day
+FROM
+    datalake_greenhouse_v3_raw.openings

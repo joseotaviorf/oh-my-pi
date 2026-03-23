@@ -1,6 +1,6 @@
 SELECT
     -- ids
-    id,
+    id AS id_approval_flow,
     -- Non-ids (foreign keys)
     job_id AS id_job,
     offer_id AS id_offer,

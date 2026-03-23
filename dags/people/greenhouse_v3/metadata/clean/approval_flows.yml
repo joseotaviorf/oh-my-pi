@@ -5,7 +5,7 @@ domain: People
 description: |-
   Table containing approval flows configuration, sourced from the Greenhouse Harvest API v3 'approval_flows' endpoint. Approval flows define the approval process for job-related actions.
 columns:
-  id:
+  id_approval_flow:
     description: The approval flow's unique identifier.
     lineage:
     - datalake_greenhouse_v3_raw.approval_flows.id

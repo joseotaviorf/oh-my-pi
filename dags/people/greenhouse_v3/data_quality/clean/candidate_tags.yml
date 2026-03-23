@@ -1,0 +1,11 @@
+---
+table_name: datalake_greenhouse_v3_clean.candidate_tags
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+column_level_validations:
+  id_candidate_tag:
+    is_complete:
+      severity_level: Warning

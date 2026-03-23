@@ -1,6 +1,6 @@
 SELECT
     -- ids
-    id,
+    id AS id_referrer,
     -- Non-ids (foreign keys)
     user_id AS id_user,
     -- Non-metrics (properties)

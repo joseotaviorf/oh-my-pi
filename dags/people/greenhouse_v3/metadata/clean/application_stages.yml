@@ -17,14 +17,14 @@ columns:
     description: The unique identifier of the job interview stage.
     lineage:
     - datalake_greenhouse_v3_raw.application_stages.job_interview_stage_id
-  is_current:
-    description: A boolean flag indicating if this is the current stage for the application.
-    lineage:
-    - datalake_greenhouse_v3_raw.application_stages.current
   days_in_stage:
     description: The number of days the application has been in this stage.
     lineage:
     - datalake_greenhouse_v3_raw.application_stages.days_in_stage
+  is_current:
+    description: A boolean flag indicating if this is the current stage for the application.
+    lineage:
+    - datalake_greenhouse_v3_raw.application_stages.current
   ts_created:
     description: The timestamp when the stage entry was created.
     lineage:

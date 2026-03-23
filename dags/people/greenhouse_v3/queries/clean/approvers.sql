@@ -1,6 +1,6 @@
 SELECT
     -- ids
-    id,
+    id AS id_approver,
     -- Non-ids (foreign keys)
     user_id AS id_user,
     approver_group_id AS id_approver_group,

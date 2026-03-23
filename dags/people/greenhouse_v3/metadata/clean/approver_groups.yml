@@ -5,7 +5,7 @@ domain: People
 description: |-
   Table containing approver groups configuration, sourced from the Greenhouse Harvest API v3 'approver_groups' endpoint. Approver groups define collections of users who can approve job-related actions.
 columns:
-  id:
+  id_approver_group:
     description: The approver group's unique identifier.
     lineage:
     - datalake_greenhouse_v3_raw.approver_groups.id

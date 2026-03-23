@@ -1,5 +1,5 @@
 SELECT
-    id,
+    id AS id_job_note,
     user_id AS id_user,
     job_id AS id_job,
     body,

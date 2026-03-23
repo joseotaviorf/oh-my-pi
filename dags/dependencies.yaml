@@ -2541,6 +2541,13 @@ bietlejuice.enrich_greenhouse:
   - bietlejuice.greenhouse:load-clean-demographics-questions:first-run-of-day
   - bietlejuice.greenhouse:load-clean-jobs:first-run-of-day
   - bietlejuice.greenhouse_audit_log:load-clean-events:first-run-of-day
+bietlejuice.enrich_greenhouse_migration:
+  - bietlejuice.greenhouse_audit_log:load-clean-events:first-run-of-day
+  - bietlejuice.greenhouse_v3:load-clean-close-reasons:first-run-of-day
+  - bietlejuice.greenhouse_v3:load-clean-demographic-answer-options:first-run-of-day
+  - bietlejuice.greenhouse_v3:load-clean-demographic-answers:first-run-of-day
+  - bietlejuice.greenhouse_v3:load-clean-demographic-questions:first-run-of-day
+  - bietlejuice.greenhouse_v3:load-clean-openings:first-run-of-day
 bietlejuice.enrich_greenseer:
   - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
   - bietlejuice.greenseer:load-clean-session:first-run-of-day

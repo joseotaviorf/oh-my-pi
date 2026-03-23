@@ -1,0 +1,169 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: candidates
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Table containing candidate data, sourced from the Greenhouse Harvest API v3 'candidates' endpoint.
+  In v3, recruiter and coordinator fields moved to applications. The 'is_private' field was renamed to 'private',
+  'photo_url' was deprecated, and 'keyed_custom_fields' was renamed to 'custom_fields'.
+columns:
+  id_candidate:
+    description: The candidate's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.id
+  id_linked_user:
+    description: The first linked Greenhouse user identifier for the candidate.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.linked_user_ids
+  first_name:
+    description: The candidate's first name.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.first_name
+  last_name:
+    description: The candidate's last name.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.last_name
+  full_name:
+    description: The candidate's full name, concatenated from first_name and last_name.
+  national_document_number:
+    description: The candidate's national identification document number.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.national_id.value
+  nationality:
+    description: The candidate's nationality.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.nationality.value
+  current_company:
+    description: The candidate's current company.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.company
+  current_job_title:
+    description: The candidate's current job title.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.title
+  hired_person_number:
+    description: The personal number assigned to the candidate after hiring.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.personal_number.value
+  hired_nif_tax_document_number:
+    description: The NIF (tax identification number) for Portugal-based hires.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.nif.value
+  hired_passport_number:
+    description: The passport number for Portugal-based hires.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.portugal_offer_passaporte.value
+  hired_accessibility_need:
+    description: The primary accessibility need for hired PwD candidates.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.pc_d_offer_acessibilidade_1__esp_.value
+  hired_accessibility_hybrid_office_needs:
+    description: Hybrid office accessibility needs for hired PwD candidates.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.pc_d_offer_acessibilidade_2__esp_.value
+  hired_accessibility_funding_preference:
+    description: Accessibility funding preference for hired PwD candidates.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.pc_d_offer_acessibilidade_3__esp_.value
+  pin_internal_person_number:
+    description: The employee ID from the internal HR system (PIn/Oracle HCM).
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.employee_id.value
+  pin_internal_job_title:
+    description: The current job title in the internal HR system.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.current_job_title.value
+  pin_internal_band:
+    description: The current band/level in the internal HR system.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.current_band.value
+  pin_internal_tenure:
+    description: The candidate's tenure in the internal HR system, in months.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.current_tenure.value
+  pin_internal_months_since_last_move:
+    description: Number of months since the candidate's last internal movement.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.time_since_last_movement.value
+  salary_pin_internal:
+    description: The candidate's current salary from the internal HR system.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.current_salary.value
+  is_private:
+    description: A boolean flag indicating if the candidate record is private (renamed from 'private' in v3).
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.private
+  has_valid_email:
+    description: A boolean flag indicating if the candidate can be emailed.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.can_email
+  is_previous_employee:
+    description: A boolean flag indicating if the candidate was a previous employee.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.previous_employee.value
+  has_work_authorization_hired:
+    description: A boolean flag indicating if the hired candidate has work authorization. May be null if not set.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.work_authorization.value
+  has_rvv_pin_internal:
+    description: A boolean flag indicating if the candidate has RVV (variable compensation) in the internal HR system.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.has_rvv.value
+  dt_birthday_hired:
+    description: The candidate's birth date, parsed from the custom field.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields.birth_date_candidate_1752263668_438955.value
+  ts_created:
+    description: The timestamp when the candidate record was created.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.created_at
+  ts_updated:
+    description: The timestamp when the candidate record was last updated.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.updated_at
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  tags:
+    description: An array of tags associated with the candidate.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.tags
+  linked_user_ids:
+    description: An array of linked Greenhouse user IDs.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.linked_user_ids
+  email_addresses:
+    description: An array of the candidate's email addresses.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.email_addresses
+  phone_numbers:
+    description: An array of the candidate's phone numbers.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.phone_numbers
+  social_media_addresses:
+    description: An array of the candidate's social media profiles.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.social_media_addresses
+  website_addresses:
+    description: An array of the candidate's website URLs.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.website_addresses
+  addresses:
+    description: An array of the candidate's addresses.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.addresses
+  custom_fields:
+    description: The raw struct of custom fields associated with the candidate (replaces keyed_custom_fields in v3).
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.custom_fields
+  year:
+    description: The year extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.year
+  month:
+    description: The month extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.month
+  day:
+    description: The day extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.candidates.day

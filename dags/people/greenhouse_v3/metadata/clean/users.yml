@@ -5,7 +5,7 @@ domain: People
 description: |-
   Table containing users information, sourced from the Greenhouse Harvest API v3 'users' endpoint. Users represent people who have access to the Greenhouse system.
 columns:
-  id:
+  id_user:
     description: The user's unique identifier.
     lineage:
     - datalake_greenhouse_v3_raw.users.id

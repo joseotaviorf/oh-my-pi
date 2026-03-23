@@ -1,0 +1,49 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: demographic_answers
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Table containing answers to demographic questions, sourced from the Greenhouse Harvest API v3 'demographic_answers' endpoint.
+columns:
+  id_demographic_answer:
+    description: The demographic answer's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answers.id
+  id_application:
+    description: The application's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answers.application_id
+  id_demographic_question:
+    description: The demographic question's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answers.demographic_question_id
+  id_demographic_answer_option:
+    description: The demographic answer option's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answers.demographic_answer_option_id
+  free_form_text:
+    description: Free-form text answer, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answers.free_form_text
+  ts_created:
+    description: The timestamp when the answer was created.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answers.created_at
+  ts_updated:
+    description: The timestamp when the answer was last updated.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answers.updated_at
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  year:
+    description: The year extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answers.year
+  month:
+    description: The month extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answers.month
+  day:
+    description: The day extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answers.day

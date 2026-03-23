@@ -1,5 +1,5 @@
 SELECT
-    id,
+    id AS id_job_interview_stage,
     job_id AS id_job,
     name,
     CAST(sort_order AS INT) AS sort_order,

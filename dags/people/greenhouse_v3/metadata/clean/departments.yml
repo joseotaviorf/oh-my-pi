@@ -1,0 +1,37 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: departments
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Table containing department data, sourced from the Greenhouse Harvest API v3 'departments' endpoint.
+columns:
+  id_department:
+    description: The department's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.departments.id
+  id_parent:
+    description: The parent department's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.departments.parent_id
+  id_external:
+    description: The department's external unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.departments.external_id
+  name:
+    description: The name of the department.
+    lineage:
+    - datalake_greenhouse_v3_raw.departments.name
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  year:
+    description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+    - datalake_greenhouse_v3_raw.departments.year
+  month:
+    description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+    - datalake_greenhouse_v3_raw.departments.month
+  day:
+    description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+    - datalake_greenhouse_v3_raw.departments.day

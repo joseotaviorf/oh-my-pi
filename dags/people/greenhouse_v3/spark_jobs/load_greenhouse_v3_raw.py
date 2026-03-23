@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import List, Dict, Any
 
@@ -26,9 +27,11 @@ class GreenhouseAPIV3(BaseAPIClient):
 
     # --- Databricks Secrets Configuration Constants ---
     _DATABRICKS_SCOPE = "PEOPLE"
-    _DATABRICKS_SECRET_KEY = APIEnum.GREENHOUSE_V3
+    _DATABRICKS_SECRET_KEY_PREFIX = APIEnum.GREENHOUSE_V3
     _CLIENT_ID_FIELD = "client_id"
     _CLIENT_SECRET_FIELD = "client_secret"
+
+    _V3_API_DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
     def __init__(self, job_args: Dict[str, Any]):
         """Initializes the API client with job-specific arguments."""
@@ -36,16 +39,32 @@ class GreenhouseAPIV3(BaseAPIClient):
 
         self.endpoint = job_args.get("table_name")
         self.params = job_args.get("params", {})
+        self.base_filters = self._parse_json_field(job_args.get("base_filters", {}))
         self.load_start_date = job_args.get("load_start_date")
         self.load_end_date = job_args.get("load_end_date")
+        self.extraction_type = job_args.get("extraction_type", "full")
 
         self._apply_authentication()
+        self._apply_date_filters()
+
+    @staticmethod
+    def _parse_json_field(value):
+        """Parses a field that may arrive as a JSON string due to framework serialization."""
+        if isinstance(value, str):
+            return json.loads(value)
+        return value
+
+    def _get_secret_key(self) -> str:
+        """Derives the per-table Databricks secret key from the endpoint name."""
+        if not self.endpoint:
+            raise ValueError("Cannot derive secret key: table_name is not set.")
+        return f"{self._DATABRICKS_SECRET_KEY_PREFIX}_{self.endpoint.upper()}"
 
     def _apply_authentication(self):
         """Configures and applies the authentication handler to the session."""
         auth_handler = BasicAuthOAuth2ClientCredentials(
             databricks_scope=self._DATABRICKS_SCOPE,
-            secret_key=self._DATABRICKS_SECRET_KEY,
+            secret_key=self._get_secret_key(),
             token_url=self._TOKEN_URL,
             client_id_field=self._CLIENT_ID_FIELD,
             client_secret_field=self._CLIENT_SECRET_FIELD,
@@ -53,6 +72,43 @@ class GreenhouseAPIV3(BaseAPIClient):
         auth_handler.apply_auth(self.session)
         self.session.headers.update({"Accept": "application/json"})
 
+    def _apply_date_filters(self):
+        """Processes ``base_filters`` from the declaration YAML into API query params.
+
+        Each key in ``base_filters`` follows the convention ``{field}_{operator}``
+        (e.g. ``updated_at_gte``, ``updated_at_lt``).  Values are placeholders
+        (``load_start_date`` / ``load_end_date``) resolved to ISO 8601 timestamps.
+
+        The v3 API accepts multiple operators on the same key as a single
+        pipe-separated value, producing e.g.
+        ``?updated_at=gte|<start>|lt|<end>``.
+        """
+        if self.extraction_type != "incremental":
+            return
+        if not self.base_filters:
+            return
+
+        date_placeholders = {
+            "load_start_date": self.load_start_date,
+            "load_end_date": self.load_end_date,
+        }
+
+        grouped: Dict[str, List[str]] = {}
+        for key, placeholder in self.base_filters.items():
+            date_value = date_placeholders.get(placeholder)
+            if date_value is None:
+                continue
+            parts = key.rsplit("_", 1)
+            if len(parts) != 2:
+                continue
+            field, operator = parts
+            date_str = date_value.strftime(self._V3_API_DATE_FORMAT)
+            grouped.setdefault(field, []).append(f"{operator}|{date_str}")
+
+        for field, values in grouped.items():
+            self.params[field] = "|".join(values)
+
+        LOGGER.info(f"Applied incremental date filters from base_filters: {grouped}")
 
     def get_all_paginated_results(self) -> List[Dict[str, Any]]:
         """

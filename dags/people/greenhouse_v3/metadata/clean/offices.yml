@@ -1,0 +1,41 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: offices
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Table containing office data, sourced from the Greenhouse Harvest API v3 'offices' endpoint.
+columns:
+  id_office:
+    description: The office's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.offices.id
+  id_parent:
+    description: The parent office's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.offices.parent_id
+  id_external:
+    description: The office's external unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.offices.external_id
+  name:
+    description: The name of the office.
+    lineage:
+    - datalake_greenhouse_v3_raw.offices.name
+  location_name:
+    description: The location of the office. In v3, this is a plain string rather than a nested object.
+    lineage:
+    - datalake_greenhouse_v3_raw.offices.location
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  year:
+    description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+    - datalake_greenhouse_v3_raw.offices.year
+  month:
+    description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+    - datalake_greenhouse_v3_raw.offices.month
+  day:
+    description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+    - datalake_greenhouse_v3_raw.offices.day

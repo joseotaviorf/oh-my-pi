@@ -1,0 +1,43 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: demographic_answer_options
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Table containing answer options for demographic questions, sourced from the Greenhouse Harvest API v3 'demographic_answer_options' endpoint.
+columns:
+  id_demographic_answer_option:
+    description: The demographic answer option's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answer_options.id
+  id_demographic_question:
+    description: The unique identifier for the demographic question to which this answer option belongs.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answer_options.demographic_question_id
+  name:
+    description: The name of the answer option.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answer_options.name
+  language:
+    description: The language of the answer option. Hardcoded as 'en' since v3 API no longer provides the translations array.
+  is_free_form:
+    description: A boolean flag indicating whether the answer option allows for free-form text input.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answer_options.free_form
+  is_active:
+    description: Indicates whether the answer option is currently active.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answer_options.active
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  year:
+    description: The year the data was loaded into the raw layer, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answer_options.year
+  month:
+    description: The month the data was loaded into the raw layer, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answer_options.month
+  day:
+    description: The day the data was loaded into the raw layer, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.demographic_answer_options.day

@@ -1,0 +1,250 @@
+database_name: datalake_greenhouse_migration
+table_name: job_openings
+owner: pedro.prates@quintoandar.com.br
+domain: People
+description: |-
+  Represents individual headcount requisitions, corresponding to 'Job Openings' in the Greenhouse ATS.
+  Migration version sourced from v3 clean openings table (standalone endpoint) with close_reasons join.
+  Replaces the v1 pattern of parsing openings from embedded JSON in the jobs table.
+columns:
+  id_opening:
+    description: The unique identifier for the job opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.id_opening
+  id_job:
+    description: The unique identifier for the job associated with this opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.id_job
+  id_application_hired:
+    description: The ID of the application that was hired for this opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.id_application_hired
+  id_ta_responsible:
+    description: The user ID of the Talent Acquisition person responsible for the opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.id_ta_responsible
+  id_close_reason:
+    description: The unique identifier for the reason the opening was closed.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.id_close_reason
+  code:
+    description: The human-readable opening identifier (e.g. '366-1').
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.code
+  internal_position_code:
+    description: The internal identifier for the position, consolidated from multiple company-specific fields via COALESCE.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.internal_position_code_quinto_andar_sp
+    - datalake_greenhouse_v3_clean.openings.internal_position_code_quinto_andar_mg
+    - datalake_greenhouse_v3_clean.openings.internal_position_code_classifieds
+    - datalake_greenhouse_v3_clean.openings.internal_position_code_benvi_pt
+    - datalake_greenhouse_v3_clean.openings.internal_position_code_mlsp
+    - datalake_greenhouse_v3_clean.openings.internal_position_code_grupo_navent
+    - datalake_greenhouse_v3_clean.openings.internal_position_code_dridco
+    - datalake_greenhouse_v3_clean.openings.internal_position_code_one_loop
+    - datalake_greenhouse_v3_clean.openings.internal_position_code_tecnologia_inmobiliarias
+    - datalake_greenhouse_v3_clean.openings.internal_position_code_dridco_mexico
+  internal_position_name:
+    description: The internal name for the position, consolidated from multiple company-specific fields via COALESCE.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.internal_position_name_quinto_andar_sp
+    - datalake_greenhouse_v3_clean.openings.internal_position_name_quinto_andar_mg
+    - datalake_greenhouse_v3_clean.openings.internal_position_name_classifieds
+    - datalake_greenhouse_v3_clean.openings.internal_position_name_benvi_pt
+    - datalake_greenhouse_v3_clean.openings.internal_position_name_mlsp
+    - datalake_greenhouse_v3_clean.openings.internal_position_name_grupo_navent
+    - datalake_greenhouse_v3_clean.openings.internal_position_name_dridco
+    - datalake_greenhouse_v3_clean.openings.internal_position_name_one_loop
+    - datalake_greenhouse_v3_clean.openings.internal_position_name_soluser
+    - datalake_greenhouse_v3_clean.openings.internal_position_name_tecnologia_inmobiliarias
+    - datalake_greenhouse_v3_clean.openings.internal_position_name_dridco_mexico
+  status:
+    description: The current status of the job opening ('open' or 'closed').
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.status
+  close_reason:
+    description: The name of the reason the opening was closed, resolved via join with close_reasons.
+    lineage:
+    - datalake_greenhouse_v3_clean.close_reasons.name
+  affirmative_focus:
+    description: Specifies the affirmative action focus for the job opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.affirmative_focus
+  attention_notes:
+    description: Any specific attention notes for this opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.attention_notes
+  band:
+    description: The salary band for the job opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.band
+  career_path:
+    description: The career path associated with the job opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.career_path
+  ta_responsible_name:
+    description: The name of the Talent Acquisition person responsible.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.ta_responsible_name
+  ta_responsible_email:
+    description: The email of the Talent Acquisition person responsible.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.ta_responsible_email
+  hiring_manager_email:
+    description: The email of the hiring manager for the opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.hiring_manager_email
+  cost_center_code:
+    description: The external identifier for the cost center associated with the opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.cost_center_code
+  cost_center:
+    description: The name of the cost center associated with the opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.cost_center
+  company:
+    description: The company associated with the job opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.company
+  neotribe:
+    description: The neotribe associated with the opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.neotribe
+  salary_table:
+    description: The salary scale or table for the job opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.salary_table
+  overhead_or_capacity:
+    description: Specifies if the position's headcount is for overhead or capacity.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.overhead_or_capacity
+  recruitment_strategy:
+    description: The recruitment strategy for this opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.recruitment_strategy
+  work_hours:
+    description: The expected work hours for the job opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.work_hours
+  workplace:
+    description: The workplace model for the job opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.workplace
+  question_can_ai_do_the_job:
+    description: The answer to the question of whether AI could perform the job's tasks.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.question_can_ai_do_the_job
+  request_reason:
+    description: The reason for the job opening request.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.request_reason
+  request_justification:
+    description: The justification for requesting this job opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.request_justification
+  replacement_reason:
+    description: The reason for replacement, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.replacement_reason
+  person_replaced_position_name:
+    description: The name and level of the position being replaced, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.person_replaced_position_name
+  person_replaced_band:
+    description: The band of the person being replaced, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.person_replaced_band
+  person_replaced_email:
+    description: The email of the person being replaced.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.person_replaced_email
+  monthly_salary_range_currency:
+    description: The currency for the monthly salary range.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.monthly_salary_range_currency
+  plr_currency:
+    description: The currency for the PLR (Profit Sharing) value.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.plr_currency
+  rvv_currency:
+    description: The currency for the RVV (Variable Sales Commission) value.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.rvv_currency
+  sop_currency:
+    description: The currency for the SOP (Stock Options Plan) value.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.sop_currency
+  equity_options_min:
+    description: The minimum monetary value/amount for equity options approval exception range.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.equity_options_min
+  equity_options_max:
+    description: The maximum monetary value/amount for equity options approval exception range.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.equity_options_max
+  monthly_salary_range_min:
+    description: The minimum monthly salary for the job opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.monthly_salary_range_min
+  monthly_salary_range_max:
+    description: The maximum monthly salary for the job opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.monthly_salary_range_max
+  plr:
+    description: The PLR (Profit Sharing) monetary value/amount.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.plr
+  plr_salary_multiplier_latam:
+    description: The salary multiplier for PLR (Profit Sharing). For LATAM positions only.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.plr_salary_multiplier_latam
+  rvv:
+    description: The RVV (Variable Sales Commission) monetary value/amount.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.rvv
+  sop:
+    description: The SOP (Stock Options Plan) monetary value/amount.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.sop
+  is_confidential:
+    description: A boolean flag indicating if the job opening is marked as confidential.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.is_confidential
+  has_disabilities_pwd_person_replaced:
+    description: A boolean flag indicating if the person being replaced had disabilities (PWD), if applicable.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.has_disabilities_pwd_person_replaced
+  is_dedicated_to_for_sale_team:
+    description: A boolean flag indicating if the position is dedicated to the 'For Sale' team.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.is_dedicated_to_for_sale_team
+  dt_kickoff:
+    description: The kickoff date for the job opening.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.dt_kickoff
+  ts_opened:
+    description: The timestamp when the job opening was opened.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.ts_opened
+  ts_closed:
+    description: The timestamp when the job opening was closed.
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.ts_closed
+  ts_updated_at_oracle:
+    description: The timestamp of the last update in Oracle Integration Cloud (OIC).
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.ts_updated_at_oracle
+  ts_load:
+    description: The timestamp when the record was loaded into the enrich layer.
+  year:
+    description: The year partition column, derived from the load timestamp (ts_load).
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.ts_load
+  month:
+    description: The month partition column, derived from the load timestamp (ts_load).
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.ts_load
+  day:
+    description: The day partition column, derived from the load timestamp (ts_load).
+    lineage:
+    - datalake_greenhouse_v3_clean.openings.ts_load

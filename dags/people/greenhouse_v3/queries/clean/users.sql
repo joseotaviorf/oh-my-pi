@@ -1,6 +1,6 @@
 SELECT
     -- ids
-    id,
+    id AS id_user,
     -- Non-ids (foreign keys)
     agency_id AS id_agency,
     employee_id AS id_employee,

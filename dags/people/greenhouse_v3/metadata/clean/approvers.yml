@@ -5,7 +5,7 @@ domain: People
 description: |-
   Table containing approvers information, sourced from the Greenhouse Harvest API v3 'approvers' endpoint. Approvers are users who can approve job-related actions.
 columns:
-  id:
+  id_approver:
     description: The approver's unique identifier.
     lineage:
     - datalake_greenhouse_v3_raw.approvers.id

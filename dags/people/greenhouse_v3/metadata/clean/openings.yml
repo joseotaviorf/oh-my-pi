@@ -1,0 +1,315 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: openings
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Table containing job opening data, sourced from the Greenhouse Harvest API v3 'openings' endpoint.
+  In v3, openings are a standalone endpoint (previously embedded as a JSON array within the jobs response).
+  All custom fields are flattened into top-level columns so the enrich layer can SELECT directly without FROM_JSON parsing.
+columns:
+  id_opening:
+    description: The opening's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.id
+  id_job:
+    description: The unique identifier of the job this opening belongs to.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.job_id
+  id_application_hired:
+    description: The unique identifier of the application that was hired for this opening, if any.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.application_id
+  id_ta_responsible:
+    description: The user ID of the TA (Talent Acquisition) responsible for the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.ta_responsible.value.user_id
+  id_close_reason:
+    description: The unique identifier of the reason the opening was closed, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.close_reason_id
+  code:
+    description: The human-readable opening identifier (e.g. '366-1').
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.opening_id
+  status:
+    description: The opening status, derived as 'open' when the opening is active and 'closed' otherwise.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.open
+  ta_responsible_name:
+    description: The full name of the TA responsible for the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.ta_responsible.value.name
+  ta_responsible_email:
+    description: The email address of the TA responsible for the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.ta_responsible.value.email
+  internal_position_code_quinto_andar_sp:
+    description: The external ID code for the internal position name at QuintoAndar SP.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___quinto_andar_sp.external_id
+  internal_position_name_quinto_andar_sp:
+    description: The internal position name at QuintoAndar SP.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___quinto_andar_sp.value
+  internal_position_code_quinto_andar_mg:
+    description: The external ID code for the internal position name at QuintoAndar MG.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___quinto_andar_mg.external_id
+  internal_position_name_quinto_andar_mg:
+    description: The internal position name at QuintoAndar MG.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___quinto_andar_mg.value
+  internal_position_code_classifieds:
+    description: The external ID code for the internal position name at Classifieds.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___classifieds.external_id
+  internal_position_name_classifieds:
+    description: The internal position name at Classifieds.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___classifieds.value
+  internal_position_code_benvi_pt:
+    description: The external ID code for the internal position name at Benvi PT.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___benvi_pt.external_id
+  internal_position_name_benvi_pt:
+    description: The internal position name at Benvi PT.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___benvi_pt.value
+  internal_position_code_mlsp:
+    description: The external ID code for the internal position name at MLSP.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___mlsp.external_id
+  internal_position_name_mlsp:
+    description: The internal position name at MLSP.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___mlsp.value
+  internal_position_code_grupo_navent:
+    description: The external ID code for the internal position name at Grupo Navent S.R.L.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___grupo_navent_s_r_l_.external_id
+  internal_position_name_grupo_navent:
+    description: The internal position name at Grupo Navent S.R.L.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___grupo_navent_s_r_l_.value
+  internal_position_code_dridco:
+    description: The external ID code for the internal position name at Dridco S.A.U.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___dridco_s_a_u_.external_id
+  internal_position_name_dridco:
+    description: The internal position name at Dridco S.A.U.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___dridco_s_a_u_.value
+  internal_position_code_one_loop:
+    description: The external ID code for the internal position name at One Loop S.R.L.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___one_loop_s_r_l_.external_id
+  internal_position_name_one_loop:
+    description: The internal position name at One Loop S.R.L.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___one_loop_s_r_l_.value
+  internal_position_name_soluser:
+    description: The internal position name at Soluser Soluciones y Servicios SA de CV.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___soluser_soluciones_y_servicios_sa_de_cv.value
+  internal_position_code_tecnologia_inmobiliarias:
+    description: The external ID code for the internal position name at Tecnologia para Inmobiliarias SA de CV.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___tecnolog_a_para_inmobiliarias_sa_de_cv.external_id
+  internal_position_name_tecnologia_inmobiliarias:
+    description: The internal position name at Tecnologia para Inmobiliarias SA de CV.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___tecnolog_a_para_inmobiliarias_sa_de_cv.value
+  internal_position_code_dridco_mexico:
+    description: The external ID code for the internal position name at Dridco Mexico SA de CV.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___dridco_mexico_sa_de_cv.external_id
+  internal_position_name_dridco_mexico:
+    description: The internal position name at Dridco Mexico SA de CV.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___dridco_mexico_sa_de_cv.value
+  affirmative_focus:
+    description: The affirmative action focus group for the opening, if any.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.affirmative_focus.value
+  band:
+    description: The compensation band level for the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.band.value
+  career_path:
+    description: The career path associated with the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.career_path.value
+  hiring_manager_email:
+    description: The email address of the headcount hiring manager for the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.headcount_hiring_manager_e_mail.value
+  cost_center_code:
+    description: The external ID code of the cost center associated with the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.cost_center.external_id
+  cost_center:
+    description: The name of the cost center associated with the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.cost_center.value
+  company:
+    description: The company entity associated with the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.company.value
+  neotribe:
+    description: The neotribe (organizational unit) associated with the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.neotribe.value
+  salary_table:
+    description: The salary scale/table reference for the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.salary_scale.value
+  overhead_or_capacity:
+    description: Whether the opening is classified as overhead or capacity.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.overhead_or_capacity.value
+  recruitment_strategy:
+    description: The recruitment strategy for the opening (e.g. internal, external).
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.recruitment_strategy.value
+  work_hours:
+    description: The work hours arrangement for the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.work_hours.value
+  workplace:
+    description: The workplace model for the opening (e.g. remote, hybrid, on-site).
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.workplace.value
+  question_can_ai_do_the_job:
+    description: Free-text response to whether AI can do this job and explanation.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.can_ai_do_the_job___please_explain_.value
+  request_reason:
+    description: The reason for requesting this position.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.reason_for_the_position_request.value
+  request_justification:
+    description: The justification for opening this position.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.what_is_the_justification_for_opening_this_position_.value
+  replacement_reason:
+    description: The reason for replacing the person in this position, if applicable.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.what_is_the_replacement_reason_.value
+  person_replaced_position_name:
+    description: The position name and level of the person being replaced.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.name_of_the_position___level_of_the_position_that_is_being_replaced_opening_1755793581_1519.value
+  person_replaced_band:
+    description: The compensation band of the person being replaced.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.band_of_the_person_being_replaced_opening_1755793711_165607.value
+  person_replaced_email:
+    description: The email address of the person being replaced.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.email_of_the_person_being_replaced_.value
+  monthly_salary_range_currency:
+    description: The currency unit for the monthly salary range (e.g. BRL).
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.monthly_salary_range.value.unit
+  plr_currency:
+    description: The currency unit for the PLR (profit sharing) amount.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.plr.value.unit
+  rvv_currency:
+    description: The currency unit for the RVV (variable compensation) amount.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.rvv.value.unit
+  sop_currency:
+    description: The currency unit for the SOP (stock option plan) amount.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.sop.value.unit
+  job_id_in_budget:
+    description: The job identifier in the budget system.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.what_is_the_job_id_in_budget_.value
+  attention_notes:
+    description: Free-text attention notes for the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.attention.value
+  equity_options_min:
+    description: The minimum value of the equity options approval exception range.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.equity_options_approval_exception_range.value.min_value
+  equity_options_max:
+    description: The maximum value of the equity options approval exception range.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.equity_options_approval_exception_range.value.max_value
+  monthly_salary_range_min:
+    description: The minimum value of the monthly salary range.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.monthly_salary_range.value.min_value
+  monthly_salary_range_max:
+    description: The maximum value of the monthly salary range.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.monthly_salary_range.value.max_value
+  plr:
+    description: The PLR (profit sharing) amount for the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.plr.value.value
+  plr_salary_multiplier_latam:
+    description: The PLR salary multiplier for LATAM entities.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.plr_latam.value
+  rvv:
+    description: The RVV (variable compensation) amount for the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.rvv.value.value
+  sop:
+    description: The SOP (stock option plan) amount for the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.sop.value.value
+  is_confidential:
+    description: A boolean flag indicating if the opening is confidential, derived from the confidentiality_flag custom field.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.confidentiality_flag.value
+  has_disabilities_pwd_person_replaced:
+    description: A boolean flag indicating if the person being replaced is a person with disabilities (PwD).
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.person_with_disabilties_.value
+  is_dedicated_to_for_sale_team:
+    description: A boolean flag indicating if this position is 100% dedicated to the For Sale team.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.will_this_position_be_100__dedicated_to_the_for_sale_team_.value
+  dt_kickoff:
+    description: The kickoff date for the opening.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.kickoff_date.value
+  ts_created:
+    description: The timestamp when the opening was created.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.created_at
+  ts_updated:
+    description: The timestamp when the opening was last updated.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.updated_at
+  ts_opened:
+    description: The timestamp when the opening was opened.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.opened_at
+  ts_closed:
+    description: The timestamp when the opening was closed.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.closed_at
+  ts_updated_at_oracle:
+    description: The timestamp of the last update in Oracle Integration Cloud (OIC).
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.updated_at_oic.value
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  year:
+    description: The year partition column, derived from the raw layer partition.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.year
+  month:
+    description: The month partition column, derived from the raw layer partition.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.month
+  day:
+    description: The day partition column, derived from the raw layer partition.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.day

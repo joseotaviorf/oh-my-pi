@@ -4,7 +4,7 @@ dag:
   callback_by_task: False
   documentation:
     dag_purpose: |
-      This DAG aims to ingest data from the Greenhouse API v3 (Recruitment).
+      This DAG aims to ingest data from the Greenhouse API v3 (Recruitment)
   schedule_interval: 0 3 * * *
 
 cluster:
@@ -47,33 +47,21 @@ workflow:
     - "{load_start_date}"
     - "{load_end_date}"
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
-
-  raw_inner_dependencies:
-    job_interview_stages:
-      - application_stages
-    job_notes:
-      - job_interview_stages
-    approval_flows:
-      - job_notes
-    approver_groups:
-      - approval_flows
-    approvers:
-      - approver_groups
-    users:
-      - approvers
-    referrers:
-      - users
-
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ts, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ts, 'load_end_date') }}"
   tables_customization:
 
     application_stages:
+      extraction_type: incremental
+      merge_on: ["id"]
       vacuum_retention_hours: 168
       vacuum_lite: true
       extra_spark_job_arguments:
         - endpoint: "application_stages"
           date_column_to_partition: "updated_at"
+          base_filters:
+            updated_at_gte: "load_start_date"
+            updated_at_lt: "load_end_date"
           params:
             per_page: 500
 
@@ -136,6 +124,142 @@ workflow:
       vacuum_lite: true
       extra_spark_job_arguments:
         - endpoint: "referrers"
+          date_column_to_partition: "updated_at"
+          params:
+            per_page: 500
+
+    close_reasons:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      partitions: []
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "close_reasons"
+          params:
+            per_page: 500
+
+    departments:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      partitions: []
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "departments"
+          params:
+            per_page: 500
+
+    offices:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      partitions: []
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "offices"
+          params:
+            per_page: 500
+
+    rejection_reasons:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      partitions: []
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "rejection_reasons"
+          params:
+            per_page: 500
+
+    candidate_tags:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      partitions: []
+      extra_spark_job_arguments:
+        - endpoint: "candidate_tags"
+          params:
+            per_page: 500
+
+    custom_fields:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      partitions: []
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "custom_fields"
+          params:
+            per_page: 500
+
+    demographic_questions:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      partitions: []
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "demographic_questions"
+          params:
+            per_page: 500
+
+    demographic_answer_options:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      partitions: []
+      z_order_by: ["is_active"]
+      extra_spark_job_arguments:
+        - endpoint: "demographic_answer_options"
+          params:
+            per_page: 500
+
+    demographic_answers:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - endpoint: "demographic_answers"
+          date_column_to_partition: "updated_at"
+          params:
+            per_page: 500
+
+    jobs:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "jobs"
+          date_column_to_partition: "updated_at"
+          params:
+            per_page: 500
+
+    openings:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - endpoint: "openings"
+          date_column_to_partition: "updated_at"
+          params:
+            per_page: 500
+
+    applications:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      z_order_by: ["status"]
+      extra_spark_job_arguments:
+        - endpoint: "applications"
+          date_column_to_partition: "updated_at"
+          params:
+            per_page: 500
+
+    candidates:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - endpoint: "candidates"
+          date_column_to_partition: "updated_at"
+          params:
+            per_page: 500
+
+    offers:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      z_order_by: ["status"]
+      extra_spark_job_arguments:
+        - endpoint: "offers"
           date_column_to_partition: "updated_at"
           params:
             per_page: 500

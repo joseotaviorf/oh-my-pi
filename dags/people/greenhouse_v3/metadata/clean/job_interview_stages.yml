@@ -5,7 +5,7 @@ domain: People
 description: |-
   This table contains information about the interview stages for each job posting, sourced from the Greenhouse Harvest API v3.  It includes details such as the stage name, its order in the interview plan, and status.  The data is partitioned by the updated_at date.
 columns:
-  id:
+  id_job_interview_stage:
     description: Unique identifier for the job interview stage.
     lineage:
     - datalake_greenhouse_v3_raw.job_interview_stages.id

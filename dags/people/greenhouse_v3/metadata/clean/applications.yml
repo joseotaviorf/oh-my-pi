@@ -1,0 +1,105 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: applications
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Table containing candidate applications data, sourced from the Greenhouse Harvest API v3 'applications' endpoint.
+  In v3, nested objects (source, credited_to, recruiter, coordinator, current_stage, rejection_reason) became scalar IDs.
+  Current stage information must be obtained from the 'application_stages' table.
+columns:
+  id_application:
+    description: The application's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.id
+  id_candidate:
+    description: The candidate's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.candidate_id
+  id_job:
+    description: The job's unique identifier associated with the application.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.job_id
+  id_job_post:
+    description: The job post's unique identifier associated with the application.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.job_post_id
+  id_source:
+    description: The source's unique identifier from which the application originated.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.source_id
+  id_referrer:
+    description: The unique identifier of the user who referred the candidate (replaces credited_to in v3).
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.referrer_id
+  status:
+    description: The current status of the application (e.g., active, rejected, hired).
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.status
+  candidate_preferred_name:
+    description: The candidate's preferred or social name.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.custom_fields.preferred_name___social_name__optional_.value
+  disability_type_details:
+    description: Details about the candidate's disability type, coalesced from multilingual custom fields (PT, ES, EN).
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.custom_fields.qual_o_seu_tipo_de_defici_ncia_.value
+    - datalake_greenhouse_v3_raw.applications.custom_fields._cu_l_es_su_tipo_de_discapacidad_.value
+    - datalake_greenhouse_v3_raw.applications.custom_fields.what_is_your_type_of_disability_.value
+  accessibility_needs:
+    description: The candidate's accessibility needs, coalesced from multilingual custom fields (PT, ES, EN).
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.custom_fields.pc_d_necessidade_de_acessibilidade.value
+    - datalake_greenhouse_v3_raw.applications.custom_fields.pc_d_necesidad_de_accesibilidad.value
+    - datalake_greenhouse_v3_raw.applications.custom_fields.pw_d___request_accessibility.value
+  work_authorization_validity:
+    description: Information on the validity of the candidate's work authorization.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.custom_fields.if_yes__what_is_the_validity___if_you_are_not_a_foreigner__put_n_a_.value
+  is_prospect:
+    description: A boolean flag indicating if the application is from a prospected candidate.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.prospect
+  has_work_authorization:
+    description: A boolean flag indicating if the candidate has legal authorization to work in the country where the job is located.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.custom_fields.are_you_legally_authorized_to_work_in_the_country_where_this_job_is_located_.value
+  has_disability:
+    description: A boolean flag indicating if the candidate has a disability, coalesced from multilingual custom fields (PT, ES, EN).
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.custom_fields.pt_possui_defici_ncia.value
+    - datalake_greenhouse_v3_raw.applications.custom_fields.es_possui_defici_ncia.value
+    - datalake_greenhouse_v3_raw.applications.custom_fields.en_possui_defici_ncia.value
+  ts_created:
+    description: The timestamp when the application was created (replaces applied_at in v3).
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.created_at
+  ts_rejected:
+    description: The timestamp when the application was rejected.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.rejected_at
+  ts_updated:
+    description: The timestamp when the application was last updated.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.updated_at
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  answers:
+    description: An array of answers to custom questions on the application.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.answers
+  custom_fields:
+    description: The raw struct of custom fields associated with the application (replaces keyed_custom_fields in v3).
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.custom_fields
+  year:
+    description: The year extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.year
+  month:
+    description: The month extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.month
+  day:
+    description: The day extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.day

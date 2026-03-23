@@ -1,0 +1,90 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: jobs
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Table containing job data, sourced from the Greenhouse Harvest API v3 'jobs' endpoint.
+  In v3, openings are a separate endpoint and hiring team members are split into dedicated endpoints (job_hiring_managers, job_owners).
+columns:
+  id_job:
+    description: The job's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.id
+  id_copied_from:
+    description: The identifier of the original job, in case this job was copied from another.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.copied_from_id
+  id_requisition:
+    description: The requisition ID for the job.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.requisition_id
+  id_department:
+    description: The unique identifier for the job's department. In v3 this is a scalar field directly on the job object.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.department_id
+  name:
+    description: The name of the job.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.name
+  status:
+    description: The current status of the job (e.g. open, closed, draft).
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.status
+  career_path:
+    description: The career path associated with the job.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.custom_fields.career_path.value
+  l1_full_name:
+    description: The full name of the primary leadership (L1) for this position.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.custom_fields.l1.value
+  careers_page_area:
+    description: Name of the area of interest associated with the job on the careers page.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.custom_fields.careers_page_area_of_interest.value
+  employment_type:
+    description: The employment type for the job (e.g. full-time, part-time, intern).
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.custom_fields.employment_type.value
+  is_confidential:
+    description: A boolean flag indicating if the job is confidential.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.confidential
+  is_template:
+    description: A boolean flag indicating if the job is a template.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.is_template
+  ts_created:
+    description: The timestamp when the job was created.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.created_at
+  ts_opened:
+    description: The timestamp when the job was opened.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.opened_at
+  ts_closed:
+    description: The timestamp when the job was closed.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.closed_at
+  ts_updated:
+    description: The timestamp when the job was last updated.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.updated_at
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  office_ids:
+    description: An array of office identifiers associated with the job.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.office_ids
+  year:
+    description: The year extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.year
+  month:
+    description: The month extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.month
+  day:
+    description: The day extracted from the 'updated_at' timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.jobs.day

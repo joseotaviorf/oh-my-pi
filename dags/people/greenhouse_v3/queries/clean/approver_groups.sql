@@ -1,6 +1,6 @@
 SELECT
     -- ids
-    id,
+    id AS id_approver_group,
     -- Non-ids (foreign keys)
     approval_flow_id AS id_approval_flow,
     -- Non-metrics (properties)

@@ -5,7 +5,7 @@ domain: People
 description: |-
   Table containing referrers information, sourced from the Greenhouse Harvest API v3 'referrers' endpoint. Referrers are users who have referred candidates to job openings.
 columns:
-  id:
+  id_referrer:
     description: The referrer's unique identifier.
     lineage:
     - datalake_greenhouse_v3_raw.referrers.id
