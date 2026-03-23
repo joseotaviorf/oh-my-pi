@@ -164,6 +164,7 @@ class Tables:
         "vespucio_sources_delta.source_navent_houses_composed"
     )
     source_union_houses = "vespucio_sources_delta.source_union_house"
+    source_idactum_houses = "vespucio_sources_delta.source_idactum_house"
     source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
     source_iptu_houses = "vespucio_sources_delta.source_iptu_house"
     source_cnefe_houses = "vespucio_sources_delta.source_cnefe_house"
@@ -281,6 +282,14 @@ source_tasks = [
             f"--output_table={Tables.source_union_houses}",
         ],
         task_id="union_house",
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
+            f"--script=idactum_house.sql",
+            f"--output_table={Tables.source_idactum_houses}",
+        ],
+        task_id="idactum_house",
     ),
     create_task(
         entry_point="sources_sql_job",
