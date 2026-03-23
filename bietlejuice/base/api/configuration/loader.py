@@ -663,7 +663,8 @@ class APIConfigurationLoader:
         date_format = (
             table_date_format
             if table_date_format
-            else self.workflow_config.get("date_format_mask")
+            else self.workflow_config.get("date_format")
+            or self.workflow_config.get("date_format_mask")
         )
 
         default_start_time = "T00:00:00.000Z"
@@ -720,10 +721,14 @@ class APIConfigurationLoader:
         """
         Returns the date column name for partitioning if configured.
 
+        Checks table_config first, then workflow_config as fallback.
+
         Returns:
             Optional[str]: Date column name or None
         """
-        return self.table_config.get("date_filter_column")
+        return self.table_config.get("date_filter_column") or self.workflow_config.get(
+            "date_filter_column"
+        )
 
     def get_payload_column_name(self) -> str:
         """
