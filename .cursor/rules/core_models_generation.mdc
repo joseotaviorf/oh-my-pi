@@ -87,11 +87,11 @@ cluster:
 
 ## 3. Conf Files (`spark_jobs/forno_conf.yml` and `spark_jobs/prod_conf.yml`)
 
-Both files are identical (forno and prod use the same table references):
+Both files are identical (forno and prod use the same table references).
 
 ```yaml
 ENTITY_TYPE: "{ENTITY}"         # UPPERCASE entity type string used for surrogate key generation
-{ENTITY}_TABLE: "{metastore}.{table}"   # source table (e.g. datalake_ebdb_clean.contract)
+{ENTITY}_TABLE: "{metastore}.{table}"   # e.g. clean: datalake_ebdb_clean.contract; see allowed layers table above for CORE / TRANSACTIONAL
 merge_on: ["sk_core_{entity}"]  # primary key for Delta MERGE
 ```
 
@@ -101,9 +101,32 @@ For incremental models, also add:
 when_matched_update_condition: "source.ts_updated > target.ts_updated"
 ```
 
+### Allowed source layers
+
+Every `*_TABLE` value in conf (including `{ENTITY}_TABLE` and any additional table keys) **must** resolve to a table in **one** of the layer families below. Do not point conf at enrich, dw, metric, raw, or other layers unless governance explicitly extends this policy.
+
+| Layer | Typical pattern | Examples |
+|-------|-----------------|----------|
+| **CLEAN** | `datalake_{source}_clean.{table}` | `datalake_ebdb_clean.house` (`core_house`) |
+| **CORE** | `core_{context}.{table}` | `core_listing.aux__lbc_status_version_order` (`core_listing`) |
+| **TRANSACTIONAL** | Transactional-domain data in the lake; often `datalake_{domain}_transact_clean.{table}` or a domain-specific transactional database | `datalake_rental_transact_clean.offer` (`core_offer`); `datalake_company_transactional.company` (`core_brokers`) |
+
 ---
 
-## 4. Implementation Logic (`spark_jobs/load_core_{entity}.py`)
+## 4. DAG dependencies (mandatory for scheduling)
+
+Core model DAGs use the same dependency machinery as the rest of the repo. Treat these artifacts as part of any new or changed core pipeline—not only declaration and Spark code.
+
+- **`dags/dependencies.yaml`** — Generated manifest keyed by Airflow DAG id (e.g. `bietlejuice.core_{entity}:`). Each entry lists upstream tasks as `dag_id:task_id`, sometimes with a `:first-run-of-day` suffix depending on scheduling. Commit this file; CI validates it (Woodpecker steps `validate-dags-dependencies-forno` / `validate-dags-dependencies-prod`; locally e.g. `ENVIRONMENT=forno make validate-dags-dependencies`).
+- **Regeneration** — After dependency-related edits, run `make dependencies-file` and commit the updated `dependencies.yaml`.
+- **`dags/dependency_exceptions/manual_modifications.yaml`** — Per-DAG `add:`, `remove:`, and `override:` lists of task specifiers applied after automatic generation. **Critical for core models:** reads from conf and `spark.table(...)` are **not** inferred from `queries/**/*.sql`, so upstream tasks usually **must** be wired here. Mirror existing `bietlejuice.core_*` entries: correct producer DAG, task id, and consistency with sibling DAGs (e.g. fast-lane vs `first-run-of-day` suffixes).
+- **`dags/dependency_exceptions/unstandard_dags.yaml`** — Non-standard task naming or static-DAG flags; core DAGs may appear here when already configured—follow existing patterns.
+
+For declaration-level `inner_dependencies` on **non–core_model** workflows, see `dag_build.mdc` and `core.mdc` in `.cursor/rules/` (DAG Builder overview).
+
+---
+
+## 5. Implementation Logic (`spark_jobs/load_core_{entity}.py`)
 
 Always extend `BaseCoreModelSparkJob` from `bietlejuice.base.spark.base_core_model_spark_job`. **Never** use the non-existent `CoreModelWorkflow` class.
 
@@ -172,7 +195,7 @@ if __name__ == "__main__":
 
 ---
 
-## 5. Schema File (`schemas/core/{entity}.yml`)
+## 6. Schema File (`schemas/core/{entity}.yml`)
 
 ```yaml
 # Schema validation for core_{entity}.{entity}
@@ -204,7 +227,7 @@ strict: true
 
 ---
 
-## 6. Testing (mandatory)
+## 7. Testing (mandatory)
 
 Tests for core model Spark jobs live under `tests/core_model_dags/unit/core/core_{entity}/spark_jobs/`, mirroring the `dags/core/` structure. They use a **session-scoped real SparkSession** (not `BaseSparkContext`) and import via the dotted `dags.*` namespace (the project root is on `sys.path` when pytest runs).
 
