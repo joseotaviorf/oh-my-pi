@@ -2,7 +2,7 @@ import os
 from bietlejuice.base.databricks.table_privilege_type_enum import TablePrivilegeTypeEnum
 from bietlejuice.base.spark import BaseSparkContext
 from quintoandar_logger import QuintoAndarLogger
-from py4j.protocol import Py4JError, Py4JJavaError
+from py4j.protocol import Py4JError
 
 
 class UnityCatalogHelper:
@@ -36,16 +36,12 @@ class UnityCatalogHelper:
 
     @staticmethod
     def is_cluster_unity_catalog_enabled() -> bool:
-        """Returns true if the cluster could use Unity Catalog (even if it doesn't by default).
-        On non-Databricks runtimes (e.g. EMR) the config is absent and we return False.
-        """
-        try:
-            return (
-                BaseSparkContext.spark.conf.get("spark.databricks.unityCatalog.enabled")
-                == "true"
-            )
-        except Py4JJavaError:
-            return False
+        """Returns true if the cluster could use Unity Catalog (even if it doesn't by default)"""
+
+        return (
+            BaseSparkContext.spark.conf.get("spark.databricks.unityCatalog.enabled")
+            == "true"
+        )
 
     @staticmethod
     def sync_table_to_unity_catalog(
