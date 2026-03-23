@@ -10,43 +10,63 @@ columns:
     lineage:
     - datalake_gsheets_people_raw.codex_cost_centers.cc_code
   business:
-    description: Business unit to which the cost center belongs.
+    description: |-
+      Business unit to which the cost center belongs.
+      Empty strings and the literal placeholder '-' from the sheet are normalized to NULL.
     lineage:
     - datalake_gsheets_people_raw.codex_cost_centers.business
   product:
-    description: Primary product associated with this cost center.
+    description: |-
+      Primary product associated with this cost center.
+      Empty strings and the literal placeholder '-' from the sheet are normalized to NULL.
     lineage:
     - datalake_gsheets_people_raw.codex_cost_centers.product
   brand:
-    description: Brand to which the cost center belongs.
+    description: |-
+      Brand to which the cost center belongs.
+      Empty strings and the literal placeholder '-' from the sheet are normalized to NULL.
     lineage:
     - datalake_gsheets_people_raw.codex_cost_centers.brand
   team:
-    description: Team to which the cost center belongs.
+    description: |-
+      Team to which the cost center belongs.
+      Empty strings and the literal placeholder '-' from the sheet are normalized to NULL.
     lineage:
     - datalake_gsheets_people_raw.codex_cost_centers.cc_name
   structure:
-    description: Structure to which the cost center belongs.
+    description: |-
+      Structure to which the cost center belongs.
+      Empty strings and the literal placeholder '-' from the sheet are normalized to NULL.
     lineage:
     - datalake_gsheets_people_raw.codex_cost_centers.structure_name
   chapter:
-    description: Chapter to which the cost center belongs.
+    description: |-
+      Chapter to which the cost center belongs.
+      Empty strings and the literal placeholder '-' from the sheet are normalized to NULL.
     lineage:
     - datalake_gsheets_people_raw.codex_cost_centers.pt_chapter
   line:
-    description: Line to which the cost center belongs.
+    description: |-
+      Line to which the cost center belongs.
+      Empty strings and the literal placeholder '-' from the sheet are normalized to NULL.
     lineage:
     - datalake_gsheets_people_raw.codex_cost_centers.pt_line
   owner_l1_email:
-    description: Email of the second highest manager (L1) in the hierarchy responsible for the cost center.
+    description: |-
+      Email of the second highest manager (L1) in the hierarchy responsible for the cost center.
+      Empty strings and the literal placeholder '-' from the sheet are normalized to NULL.
     lineage:
     - datalake_gsheets_people_raw.codex_cost_centers.l1_mail
   owner_l2_email:
-    description: Email of the third highest manager (L2) in the hierarchy responsible for the cost center.
+    description: |-
+      Email of the third highest manager (L2) in the hierarchy responsible for the cost center.
+      Empty strings and the literal placeholder '-' from the sheet are normalized to NULL.
     lineage:
     - datalake_gsheets_people_raw.codex_cost_centers.l2_mail
   owner_l3_email:
-    description: Email of the fourth highest manager (L3) in the hierarchy responsible for the cost center.
+    description: |-
+      Email of the fourth highest manager (L3) in the hierarchy responsible for the cost center.
+      Empty strings and the literal placeholder '-' from the sheet are normalized to NULL.
     lineage:
     - datalake_gsheets_people_raw.codex_cost_centers.l3_mail
   dt_updated:
