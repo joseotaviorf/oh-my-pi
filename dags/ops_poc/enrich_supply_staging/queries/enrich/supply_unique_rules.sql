@@ -1,6 +1,7 @@
 WITH funnel_summary AS (
     SELECT
         sk_supply,
+        sk_house,
         nm_business_context,
         MAX(funnel_order) AS max_stage,
         MAX(date) AS max_stage_date,
@@ -8,7 +9,7 @@ WITH funnel_summary AS (
     FROM
         dw_growth.obt_supply
     GROUP BY
-        1, 2
+        1, 2, 3
 ),
 ranked AS (
     SELECT
