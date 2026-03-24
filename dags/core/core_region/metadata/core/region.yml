@@ -20,6 +20,17 @@ columns:
     description: Parent region unique identifier. It's the id_region of the region one level above, 
       with the lowest level being "SubRegiao", then "MacroRegiao" and then "Cidade". Regions at the "Cidade"
       level have no id_parent_region.
+  id_city_region:
+    lineage:
+      - datalake_ebdb_clean.region.id
+    description: Identifier of the city-level region for this row, resolved along the parent chain. For SubRegiao,
+      this is the Cidade ancestor; for MacroRegiao, the parent Cidade; for Cidade, the row's own id. Use for joins
+      and filters at city granularity.
+  id_macro_region:
+    lineage:
+      - datalake_ebdb_clean.region.id
+    description: Identifier of the immediate parent region (id_parent_region of the current row). Null when the
+      row is Cidade and has no parent.
   id_state:
     lineage:
       - datalake_ebdb_clean.region.id_state
@@ -34,6 +45,12 @@ columns:
     lineage:
       - datalake_ebdb_clean.region.name
     description: Region's name.
+  city_region_name:
+    lineage:
+      - datalake_ebdb_clean.region.name
+    description: Name of the city-level region for this row, resolved along the same parent chain as id_city_region
+      (ancestor cidade name, parent cidade name, or this row's name when level is Cidade). Non-null for all rows
+      in the model; use for reporting and grouping by city.
   level:
     lineage:
       - datalake_ebdb_clean.region.level
@@ -60,12 +77,25 @@ columns:
       MX: Mexico's country code.
   country_name:
     lineage:
+      - datalake_ebdb_clean.state.id_country
       - datalake_ebdb_clean.country.name
-    description: Region's country name. Currently Brasil and Mexico.
+    description: Region country display name in English. Brazil (id_country 1) and Mexico (id_country 2) match
+      enrich_region; other countries use datalake_ebdb_clean.country.name.
   country_default_timezone:
     lineage:
       - datalake_ebdb_clean.country.default_timezone
     description: Region's country default timezone.
+  region_phone_ddd:
+    lineage:
+      - datalake_ebdb_clean.region_config.phone_ddd
+    description: Telephone area code (DDD) for the region from Main region configuration. Null when no
+      region_config row exists for this id_region.
+  greater_region:
+    lineage:
+      - datalake_ebdb_clean.region.name
+    description: Optional metro or commercial grouping label derived from city_region_name. Certain cities map to
+      themselves (e.g. Rio de Janeiro, Campinas); the São Paulo metropolitan area cities map to the label
+      Grande São Paulo. Null when city_region_name is not in any defined grouping.
   has_rent_operation:
     description: Boolean indicating if QuintoAndar operates with ForRent context in the given region (a region 
       can be exclusive to Rent, exclusive to Sale or served by both contexts). If true, indicates that there 

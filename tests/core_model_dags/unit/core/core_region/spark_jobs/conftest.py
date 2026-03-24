@@ -35,15 +35,11 @@ def spark_session():
 def region_df(spark_session):
     """Create a sample region DataFrame for testing.
 
-    Hierarchy:
-      Cidade (id=5, id_state=10) ← root, ts_database_transaction=2025-01-01
-        MacroRegiao (id=3, id_parent_region=5) — ts_database_transaction=2025-01-01
-          SubRegiao  (id=1, id_parent_region=3) — ts_database_transaction=2025-01-15 (recent)
-          SubRegiao  (id=2, id_parent_region=3) — ts_database_transaction=2025-01-20 (recent)
-          SubRegiao  (id=4, id_parent_region=3) — ts_database_transaction=2022-12-25 (old, for date-filter test)
+    Incremental window uses **ts_updated** (fallback ts_created). Hierarchy:
+      Cidade (id=5) → MacroRegiao (id=3) → SubRegiao (ids 1, 2, 4).
 
-    Parent rows (ids 3 and 5) must stay within the same date window as the SubRegiao rows
-    so that the self-join can resolve the hierarchy even during incremental (date-filtered) loads.
+    Rows 1,2,3,5 have ts_updated in Jan 2025; row 4 has ts_updated in 2022 (excluded from Jan window).
+    ts_database_transaction may differ (e.g. row 6 in extended tests).
     """
     schema = StructType(
         [
@@ -105,7 +101,7 @@ def region_df(spark_session):
             datetime(2025, 1, 20, 11, 0),
             datetime(2025, 1, 20, 11, 0),
         ),
-        # SubRegiao — old ts_database_transaction, used to assert date-filter exclusion
+        # SubRegiao — old ts_updated, excluded from Jan 2025 incremental window
         (
             4,
             3,
@@ -115,6 +111,70 @@ def region_df(spark_session):
             datetime(2022, 12, 25, 9, 0),
             datetime(2022, 12, 25, 10, 0),
             datetime(2022, 12, 25, 10, 0),
+        ),
+        # SubRegiao — ts_updated in window, ts_database_transaction outside (CDC lag / reorder)
+        (
+            6,
+            3,
+            "Vila Nova",
+            "SubRegiao",
+            None,
+            datetime(2025, 1, 5, 8, 0),
+            datetime(2025, 1, 10, 12, 0),
+            datetime(2019, 1, 1, 0, 0),
+        ),
+    ]
+    return spark_session.createDataFrame(data, schema)
+
+
+@pytest.fixture
+def region_df_skewed_incremental(spark_session):
+    """Same hierarchy as region_df but only SubRegiao id=1 has ts_updated in Jan 2025.
+
+    Parents (5, 3) have old ts_updated; incremental must still resolve city/macro via full table.
+    """
+    schema = StructType(
+        [
+            StructField("id", LongType(), True),
+            StructField("id_parent_region", LongType(), True),
+            StructField("name", StringType(), True),
+            StructField("level", StringType(), True),
+            StructField("id_state", LongType(), True),
+            StructField("ts_created", TimestampType(), True),
+            StructField("ts_updated", TimestampType(), True),
+            StructField("ts_database_transaction", TimestampType(), True),
+        ]
+    )
+    data = [
+        (
+            5,
+            None,
+            "São Paulo",
+            "Cidade",
+            10,
+            datetime(2010, 1, 1, 0, 0),
+            datetime(2010, 1, 1, 0, 0),
+            datetime(2025, 1, 1, 0, 0),
+        ),
+        (
+            3,
+            5,
+            "Zona Sul",
+            "MacroRegiao",
+            None,
+            datetime(2010, 1, 1, 0, 0),
+            datetime(2010, 1, 1, 0, 0),
+            datetime(2025, 1, 1, 0, 0),
+        ),
+        (
+            1,
+            3,
+            "Moema",
+            "SubRegiao",
+            None,
+            datetime(2025, 1, 1, 10, 0),
+            datetime(2025, 1, 15, 11, 0),
+            datetime(2025, 1, 15, 11, 0),
         ),
     ]
     return spark_session.createDataFrame(data, schema)
@@ -155,7 +215,27 @@ def state_df(spark_session):
     )
 
     data = [
-        (10, "São Paulo", "SP", 100),
+        # id_country matches EBDB country.id (1=Brazil, 2=Mexico).
+        (10, "São Paulo", "SP", 1),
+    ]
+    return spark_session.createDataFrame(data, schema)
+
+
+@pytest.fixture
+def region_config_df(spark_session):
+    """region_config rows: phone_ddd keyed by id_region (matches datalake_ebdb_clean.region_config)."""
+    schema = StructType(
+        [
+            StructField("id_region", LongType(), True),
+            StructField("phone_ddd", StringType(), True),
+        ]
+    )
+    data = [
+        (1, "11"),
+        (2, "11"),
+        (3, "11"),
+        (5, "11"),
+        (6, "11"),
     ]
     return spark_session.createDataFrame(data, schema)
 
@@ -177,7 +257,7 @@ def country_df(spark_session):
     )
 
     data = [
-        (100, "BR", "Brasil", "America/Sao_Paulo"),
+        (1, "BR", "Brasil", "America/Sao_Paulo"),
     ]
     return spark_session.createDataFrame(data, schema)
 
@@ -198,7 +278,7 @@ def country_df_with_null_code(spark_session):
     )
 
     data = [
-        (100, "BR", "Brasil", "America/Sao_Paulo"),
+        (1, "BR", "Brasil", "America/Sao_Paulo"),
         (200, None, "Unknown", "UTC"),
     ]
     return spark_session.createDataFrame(data, schema)
@@ -217,7 +297,7 @@ def state_df_with_unknown(spark_session):
     )
 
     data = [
-        (10, "São Paulo", "SP", 100),
+        (10, "São Paulo", "SP", 1),
         (20, "Unknown State", "XX", 200),
     ]
     return spark_session.createDataFrame(data, schema)
@@ -299,10 +379,13 @@ def mock_configuration_service():
             "ENTITY_TYPE": "REGION",
             "REGION_TABLE": "test.region",
             "REGION_BUSINESS_CONTEXTS_TABLE": "test.region_business_context_served",
+            "REGION_CONFIG_TABLE": "test.region_config",
             "STATE_TABLE": "test.state",
             "COUNTRY_TABLE": "test.country",
             "merge_on": ["id_region"],
-            "when_matched_update_condition": "source.ts_updated > target.ts_updated",
+            "when_matched_update_condition": (
+                "source.ts_region_updated > target.ts_region_updated"
+            ),
             "z_order_by": ["id_region"],
             "partitions": ["year", "month", "day"],
         }.get(key)
@@ -327,6 +410,7 @@ def mock_surrogate_keys_helper():
 def table_side_effect(
     region_df,
     region_business_contexts_df,
+    region_config_df,
     state_df,
     country_df,
 ):
@@ -336,6 +420,32 @@ def table_side_effect(
         mapping = {
             "test.region": region_df,
             "test.region_business_context_served": region_business_contexts_df,
+            "test.region_config": region_config_df,
+            "test.state": state_df,
+            "test.country": country_df,
+        }
+        if table_name not in mapping:
+            raise ValueError(f"Unknown table requested in test: {table_name}")
+        return mapping[table_name]
+
+    return side_effect
+
+
+@pytest.fixture
+def table_side_effect_skewed(
+    region_df_skewed_incremental,
+    region_business_contexts_df,
+    region_config_df,
+    state_df,
+    country_df,
+):
+    """table() mapping using region_df_skewed_incremental for test.region."""
+
+    def side_effect(table_name):
+        mapping = {
+            "test.region": region_df_skewed_incremental,
+            "test.region_business_context_served": region_business_contexts_df,
+            "test.region_config": region_config_df,
             "test.state": state_df,
             "test.country": country_df,
         }

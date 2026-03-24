@@ -3,5 +3,7 @@ REGION_TABLE: "datalake_ebdb_clean.region"
 STATE_TABLE: "datalake_ebdb_clean.state"
 COUNTRY_TABLE: "datalake_ebdb_clean.country"
 REGION_BUSINESS_CONTEXTS_TABLE: "datalake_ebdb_clean.region_business_contexts_served"
+REGION_CONFIG_TABLE: "datalake_ebdb_clean.region_config"
 
 merge_on: ["id_region"]
+when_matched_update_condition: "source.ts_region_updated > target.ts_region_updated"

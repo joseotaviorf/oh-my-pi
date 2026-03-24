@@ -367,11 +367,13 @@ bietlejuice.core_region:
     - bietlejuice.ebdb_location:load-clean-country
     - bietlejuice.ebdb_location:load-clean-region
     - bietlejuice.ebdb_location:load-clean-region-business-contexts-served
+    - bietlejuice.ebdb_location:load-clean-region-config
     - bietlejuice.ebdb_location:load-clean-state
   remove:
     - bietlejuice.ebdb_location:load-clean-country:first-run-of-day
     - bietlejuice.ebdb_location:load-clean-region:first-run-of-day
     - bietlejuice.ebdb_location:load-clean-region-business-contexts-served:first-run-of-day
+    - bietlejuice.ebdb_location:load-clean-region-config:first-run-of-day
     - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
 bietlejuice.core_contract:
   add:

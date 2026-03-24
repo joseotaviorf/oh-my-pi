@@ -12,14 +12,29 @@ columns:
   id_region:
     type: bigint
     required: true
-  
+
   # Parent region identifier (null for top-level Cidade regions)
   id_parent_region:
     type: bigint
     required: false
 
+  # City-level region id (resolved via EBDB parent hierarchy; matches enrich id_city semantics)
+  id_city_region:
+    type: bigint
+    required: true
+
+  # Immediate parent region id (matches enrich id_macro_region semantics)
+  id_macro_region:
+    type: bigint
+    required: false
+
   # Region name
   region_name:
+    type: string
+    required: true
+
+  # City-level region name (resolved via hierarchy; matches enrich city_name when from EBDB)
+  city_region_name:
     type: string
     required: true
 
@@ -32,7 +47,7 @@ columns:
   id_state:
     type: bigint
     required: true
-  
+
   # State name
   state_name:
     type: string
@@ -63,11 +78,21 @@ columns:
     type: string
     required: true
 
+  # Phone area code from region_config (nullable when no config row)
+  region_phone_ddd:
+    type: string
+    required: false
+
+  # Greater metro grouping derived from city name (same CASE as enrich datalake_region.region)
+  greater_region:
+    type: string
+    required: false
+
   # Has rent operation
   has_rent_operation:
     type: boolean
     required: true
-  
+
   # Has sale operation
   has_sale_operation:
     type: boolean
@@ -102,6 +127,6 @@ columns:
     required: true
 
 # Schema constraints
-min_columns: 20
-max_columns: 20
+min_columns: 25
+max_columns: 25
 strict: true

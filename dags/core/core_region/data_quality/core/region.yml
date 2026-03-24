@@ -18,6 +18,12 @@ column_level_validations:
   id_country:
     is_complete:
       severity_level: Error
+  id_city_region:
+    is_complete:
+      severity_level: Error
+  city_region_name:
+    is_complete:
+      severity_level: Error
   region_name:
     is_complete:
       severity_level: Error
