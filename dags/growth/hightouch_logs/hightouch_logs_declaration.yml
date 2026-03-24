@@ -89,7 +89,7 @@ workflow:
     # Clean layer is incremental: rows for sync_ids whose sync run started in the load window.
     sync_snapshot_trino:
       clean_z_order_by: [id_sync]
-      load_spark_job: load_hightouch_logs
+      load_spark_job: load_hightouch_sync_snapshot
       extra_spark_job_arguments:
         - "{environment}"
         - "{bucket}"
@@ -98,11 +98,11 @@ workflow:
         - "{table_name}"
         - "{load_start_date}"
         - "{load_end_date}"
-        - "full"
+        - "incremental"
         - "sync_id"
         - "s3://5a-cdp-processed-data-{environment}/repo/hightouch/hightouch_audit/sync_snapshot"
         - "parquet"
-      extraction_type: full
+      extraction_type: incremental
       clean_extraction_type: incremental
       raw_partitions: []
       clean_partitions: [year, month, day]
