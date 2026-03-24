@@ -1,0 +1,211 @@
+---
+database_name: datalake_people
+table_name: codex_pin_sync_drift
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  Comparison layer for the CODEX-to-PIN (Oracle HCM) alignment process. CODEX (GSheets /
+  codex_log) is the source of truth for cost-center attributes; PIN flexfields on
+  all_organization_units are the destination fields that should mirror CODEX. One row per
+  cost_center_code present in both systems, with side-by-side values and boolean drift flags.
+  Downstream workflows use this table to detect differences and push updates from CODEX into
+  PIN when attributes diverge.
+columns:
+  cost_center_code:
+    description: Natural key and table grain from CODEX (codex_log); join to PIN uses TRIM on both sides.
+    lineage:
+      - datalake_people.codex_log.cost_center_code
+      - datalake_pin_core_clean.all_organization_units.cost_center_code
+  codex_business:
+    description: Business unit from the current CODEX version (codex_log).
+    lineage:
+      - datalake_people.codex_log.business
+  pin_business:
+    description: Business unit from PIN clean all_organization_units for the department row effective today.
+    lineage:
+      - datalake_pin_core_clean.all_organization_units.business
+  codex_product:
+    description: Product from the current CODEX version (codex_log).
+    lineage:
+      - datalake_people.codex_log.product
+  pin_product:
+    description: Product from PIN clean all_organization_units for the department row effective today.
+    lineage:
+      - datalake_pin_core_clean.all_organization_units.product
+  codex_brand:
+    description: Brand from the current CODEX version (codex_log).
+    lineage:
+      - datalake_people.codex_log.brand
+  pin_brand:
+    description: Brand from PIN clean all_organization_units for the department row effective today.
+    lineage:
+      - datalake_pin_core_clean.all_organization_units.brand
+  codex_vertical:
+    description: Derived vertical (Ops, Corp, Tech) from the current CODEX version.
+    lineage:
+      - datalake_people.codex_log.vertical
+  pin_vertical:
+    description: Vertical from PIN clean all_organization_units for the department row effective today.
+    lineage:
+      - datalake_pin_core_clean.all_organization_units.vertical
+  codex_structure:
+    description: Structure from the current CODEX version (codex_log).
+    lineage:
+      - datalake_people.codex_log.structure
+  pin_structure:
+    description: Structure from PIN clean all_organization_units for the department row effective today.
+    lineage:
+      - datalake_pin_core_clean.all_organization_units.structure
+  codex_team:
+    description: Team from the current CODEX version (codex_log).
+    lineage:
+      - datalake_people.codex_log.team
+  pin_team:
+    description: Team from PIN clean all_organization_units for the department row effective today.
+    lineage:
+      - datalake_pin_core_clean.all_organization_units.team
+  codex_chapter:
+    description: Chapter from the current CODEX version (codex_log).
+    lineage:
+      - datalake_people.codex_log.chapter
+  pin_chapter:
+    description: Chapter from PIN clean all_organization_units for the department row effective today.
+    lineage:
+      - datalake_pin_core_clean.all_organization_units.chapter
+  codex_line:
+    description: Line from the current CODEX version (codex_log).
+    lineage:
+      - datalake_people.codex_log.line
+  pin_line:
+    description: Line from PIN clean all_organization_units for the department row effective today.
+    lineage:
+      - datalake_pin_core_clean.all_organization_units.line
+  codex_headcount_type:
+    description: Headcount type from the current CODEX version (codex_log).
+    lineage:
+      - datalake_people.codex_log.headcount_type
+  pin_headcount_type:
+    description: Headcount type from PIN clean all_organization_units for the department row effective today.
+    lineage:
+      - datalake_pin_core_clean.all_organization_units.headcount_type
+  codex_owner_l1_full_name:
+    description: L1 owner name on the current CODEX version (resolved upstream in codex_log).
+    lineage:
+      - datalake_people.codex_log.owner_l1_full_name
+  pin_name_owner_l1:
+    description: L1 owner name from PIN clean all_organization_units for the department row effective today.
+    lineage:
+      - datalake_pin_core_clean.all_organization_units.name_owner_l1
+  codex_owner_l2_full_name:
+    description: L2 owner name on the current CODEX version (resolved upstream in codex_log).
+    lineage:
+      - datalake_people.codex_log.owner_l2_full_name
+  pin_name_owner_l2:
+    description: L2 owner name from PIN clean all_organization_units for the department row effective today.
+    lineage:
+      - datalake_pin_core_clean.all_organization_units.name_owner_l2
+  codex_owner_l3_full_name:
+    description: L3 owner name on the current CODEX version (resolved upstream in codex_log).
+    lineage:
+      - datalake_people.codex_log.owner_l3_full_name
+  pin_name_owner_l3:
+    description: L3 owner name from PIN clean all_organization_units for the department row effective today.
+    lineage:
+      - datalake_pin_core_clean.all_organization_units.name_owner_l3
+  is_drift_business:
+    description: True when PIN's business unit for this cost center is not the same as CODEX's
+      (null-safe; a value on one side only still counts as a mismatch).
+    lineage:
+      - datalake_people.codex_log.business
+      - datalake_pin_core_clean.all_organization_units.business
+  is_drift_product:
+    description: True when PIN's product is not the same as CODEX's (null-safe).
+    lineage:
+      - datalake_people.codex_log.product
+      - datalake_pin_core_clean.all_organization_units.product
+  is_drift_brand:
+    description: True when PIN's brand is not the same as CODEX's (null-safe).
+    lineage:
+      - datalake_people.codex_log.brand
+      - datalake_pin_core_clean.all_organization_units.brand
+  is_drift_vertical:
+    description: True when PIN's vertical is not the same as CODEX's (null-safe).
+    lineage:
+      - datalake_people.codex_log.vertical
+      - datalake_pin_core_clean.all_organization_units.vertical
+  is_drift_structure:
+    description: True when PIN's structure grouping is not the same as CODEX's (null-safe).
+    lineage:
+      - datalake_people.codex_log.structure
+      - datalake_pin_core_clean.all_organization_units.structure
+  is_drift_team:
+    description: True when PIN's team value is not the same as CODEX's (null-safe).
+    lineage:
+      - datalake_people.codex_log.team
+      - datalake_pin_core_clean.all_organization_units.team
+  is_drift_chapter:
+    description: True when PIN's chapter is not the same as CODEX's (null-safe).
+    lineage:
+      - datalake_people.codex_log.chapter
+      - datalake_pin_core_clean.all_organization_units.chapter
+  is_drift_line:
+    description: True when PIN's line is not the same as CODEX's (null-safe).
+    lineage:
+      - datalake_people.codex_log.line
+      - datalake_pin_core_clean.all_organization_units.line
+  is_drift_headcount_type:
+    description: True when PIN's headcount type is not the same as CODEX's (null-safe).
+    lineage:
+      - datalake_people.codex_log.headcount_type
+      - datalake_pin_core_clean.all_organization_units.headcount_type
+  is_drift_owner_l1:
+    description: True when PIN's L1 cost-center owner name is not the same as CODEX's L1 owner
+      name (null-safe).
+    lineage:
+      - datalake_people.codex_log.owner_l1_full_name
+      - datalake_pin_core_clean.all_organization_units.name_owner_l1
+  is_drift_owner_l2:
+    description: True when PIN's L2 cost-center owner name is not the same as CODEX's L2 owner
+      name (null-safe).
+    lineage:
+      - datalake_people.codex_log.owner_l2_full_name
+      - datalake_pin_core_clean.all_organization_units.name_owner_l2
+  is_drift_owner_l3:
+    description: True when PIN's L3 cost-center owner name is not the same as CODEX's L3 owner
+      name (null-safe).
+    lineage:
+      - datalake_people.codex_log.owner_l3_full_name
+      - datalake_pin_core_clean.all_organization_units.name_owner_l3
+  is_any_drift:
+    description: |-
+      True when any of these CODEX vs PIN comparisons differ on this row (null-safe; same logic
+      as the OR of all is_drift_* flags): business (codex_business vs pin_business), product,
+      brand, vertical, structure, team, chapter, line, headcount_type, L1 owner name
+      (codex_owner_l1_full_name vs pin_name_owner_l1), L2 owner name, L3 owner name.
+    lineage:
+      - datalake_people.codex_log.business
+      - datalake_pin_core_clean.all_organization_units.business
+      - datalake_people.codex_log.product
+      - datalake_pin_core_clean.all_organization_units.product
+      - datalake_people.codex_log.brand
+      - datalake_pin_core_clean.all_organization_units.brand
+      - datalake_people.codex_log.vertical
+      - datalake_pin_core_clean.all_organization_units.vertical
+      - datalake_people.codex_log.structure
+      - datalake_pin_core_clean.all_organization_units.structure
+      - datalake_people.codex_log.team
+      - datalake_pin_core_clean.all_organization_units.team
+      - datalake_people.codex_log.chapter
+      - datalake_pin_core_clean.all_organization_units.chapter
+      - datalake_people.codex_log.line
+      - datalake_pin_core_clean.all_organization_units.line
+      - datalake_people.codex_log.headcount_type
+      - datalake_pin_core_clean.all_organization_units.headcount_type
+      - datalake_people.codex_log.owner_l1_full_name
+      - datalake_pin_core_clean.all_organization_units.name_owner_l1
+      - datalake_people.codex_log.owner_l2_full_name
+      - datalake_pin_core_clean.all_organization_units.name_owner_l2
+      - datalake_people.codex_log.owner_l3_full_name
+      - datalake_pin_core_clean.all_organization_units.name_owner_l3
+  ts_load:
+    description: Load timestamp for this table (set at query execution).

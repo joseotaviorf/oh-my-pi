@@ -1,0 +1,20 @@
+---
+table_name: datalake_people.codex_pin_sync_drift
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -50
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  cost_center_code:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error

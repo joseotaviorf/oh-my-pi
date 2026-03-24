@@ -42,6 +42,8 @@ workflow:
     codex_log:
       - codex_history_base
       - identifier_mapping
+    codex_pin_sync_drift:
+      - codex_log
   tables_customization:
     codex_history_base:
       extraction_type: incremental
@@ -71,5 +73,8 @@ workflow:
       vacuum_retention_hours: 168
       vacuum_lite: true
     assignment_snapshots:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    codex_pin_sync_drift:
       vacuum_retention_hours: 168
       vacuum_lite: true

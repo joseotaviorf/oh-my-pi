@@ -3178,6 +3178,7 @@ bietlejuice.enrich_people:
   - bietlejuice.pin_core:load-clean-action-reason-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-action-translation:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
+  - bietlejuice.pin_core:load-clean-all-organization-units:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-people:first-run-of-day
   - bietlejuice.pin_core:load-clean-assignment-supervisor:first-run-of-day
   - bietlejuice.pin_core:load-clean-email-address:first-run-of-day

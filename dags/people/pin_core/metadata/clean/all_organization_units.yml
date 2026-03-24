@@ -3,7 +3,11 @@ database_name: datalake_pin_core_clean
 table_name: all_organization_units
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: This is the master table which holds all organization identifiers.
+description: |-
+  Master table of organization identifiers from Oracle HCM.
+
+  CODEX-aligned flexfields may arrive from PIN loads with '-' as a null sentinel; here they are
+  TRIMmed and a lone '-' is stored as NULL so comparisons and joins match SQL null semantics.
 columns:
   id_business_group:
     description: Identifier of the enterprise, used for multi-tenancy partitioning.
@@ -23,6 +27,10 @@ columns:
     description: Identifier of the cost center in Greenhouse.
     lineage:
       - datalake_pin_core_raw.hr_all_organization_units_vl.attribute20
+  id_action_occurrence:
+    description: Identifier of the action occurrence associated with this organization row.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_vl.action_occurrence_id
   organization_code:
     description: Code of the organization.
     lineage:
@@ -62,7 +70,7 @@ columns:
   chapter:
     description: Chapter name associated with the cost center structure.
     lineage:
-      - datalake_pin_core_raw.hr_all_organization_units_vl.attribute14
+      - datalake_pin_core_raw.hr_all_organization_units_vl.attribute10
   brand:
     description: Brand linked to the cost center.
     lineage:
@@ -102,6 +110,10 @@ columns:
     categories:
       EXT: External organization.
       INT: Internal organization.
+  object_version_number:
+    description: Oracle object version number for optimistic locking on the source row, cast to INT.
+    lineage:
+      - datalake_pin_core_raw.hr_all_organization_units_vl.object_version_number
   ts_created:
     description: Timestamp of the creation of the row.
     lineage:
