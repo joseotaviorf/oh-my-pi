@@ -830,8 +830,8 @@ bietlejuice.dw_offer:
   - bietlejuice.rental_transact:load-clean-offer-topic-message:first-run-of-day
   - bietlejuice.rental_transact:load-clean-offer-topic:first-run-of-day
 bietlejuice.dw_organization:
-  - bietlejuice.enrich_gsheets_people:load-enrich-codex-log:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-business-unit:first-run-of-day
+  - bietlejuice.enrich_people:load-enrich-codex-log:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-job-with-salary-table:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-organization-units:first-run-of-day
   - bietlejuice.pin_core:load-clean-assignment-responsibility:first-run-of-day
@@ -2643,11 +2643,7 @@ bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2024:first-run-of-day
   - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2025:first-run-of-day
 bietlejuice.enrich_gsheets_people:
-  - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
-  - bietlejuice.gsheets_people:done-clean-codex-cost-centers:first-run-of-day
-  - bietlejuice.gsheets_people:done-clean-codex-cost-informations:first-run-of-day
   - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day
-  - bietlejuice.hr_system:load-clean-organizations:first-run-of-day
 bietlejuice.enrich_hefesto:
   - bietlejuice.enrich_support_users:load-enrich-analysts:first-run-of-day
   - bietlejuice.hefesto:load-clean-queue:first-run-of-day
@@ -3168,6 +3164,8 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.wall_street:load-clean-subscription-item:first-run-of-day
   - bietlejuice.wall_street:load-clean-subscription:first-run-of-day
 bietlejuice.enrich_people:
+  - bietlejuice.gsheets_people:done-clean-codex-cost-centers:first-run-of-day
+  - bietlejuice.gsheets_people:done-clean-codex-cost-informations:first-run-of-day
   - bietlejuice.hr_system:load-clean-actions-lov:first-run-of-day
   - bietlejuice.pin_compensation:load-clean-salary-bases:first-run-of-day
   - bietlejuice.pin_core:load-clean-action-base:first-run-of-day

@@ -16,24 +16,6 @@ workflow:
       merge_on: ["id"]
       vacuum_retention_hours: 168
       vacuum_lite: true
-    codex_history_base:
-      extraction_type: incremental
-      merge_on: ["id"]
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-    codex:
-      extraction_type: full
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-    codex_log:
-      extraction_type: full
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-  inner_dependencies:
-    codex:
-      - codex_history_base
-    codex_log:
-      - codex
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
 cluster:

@@ -1,4 +1,84 @@
 WITH
+employee_ids AS (
+  SELECT
+    work_email,
+    person_number,
+    full_name
+  FROM
+    datalake_people.identifier_mapping
+  WHERE
+    person_number IS NOT NULL
+    AND assignment_type IN ('E', 'C')
+  QUALIFY
+    ROW_NUMBER() OVER (
+      PARTITION BY
+        person_number
+      ORDER BY
+        assignment_number DESC
+    ) = 1
+),
+new_emails_from_mapping AS (
+  SELECT
+    emp_map.work_email,
+    emp_ids.person_number,
+    emp_ids.full_name
+  FROM
+    datalake_gsheets_people_clean.email_employee_mapping AS emp_map
+  INNER JOIN
+    employee_ids AS emp_ids
+      ON emp_map.person_number = emp_ids.person_number
+  LEFT ANTI JOIN
+    employee_ids AS existing_emails
+      ON emp_map.work_email = existing_emails.work_email
+),
+employee_ids_enrich AS (
+  SELECT
+    work_email,
+    person_number,
+    full_name
+  FROM
+    employee_ids
+  WHERE
+    work_email IS NOT NULL
+
+  UNION ALL
+
+  SELECT
+    work_email,
+    person_number,
+    full_name
+  FROM
+    new_emails_from_mapping
+),
+codex AS (
+  SELECT
+    codex.cost_center_code,
+    codex.business,
+    codex.product,
+    codex.brand,
+    codex.vertical,
+    codex.structure,
+    codex.team,
+    codex.chapter,
+    codex.line,
+    emp_id1.full_name AS owner_l1_full_name,
+    emp_id2.full_name AS owner_l2_full_name,
+    emp_id3.full_name AS owner_l3_full_name,
+    codex.headcount_type,
+    codex.dt_closing_month,
+    codex.ts_load
+  FROM
+    datalake_people.codex_history_base AS codex
+  LEFT JOIN
+    employee_ids_enrich AS emp_id1
+      ON codex.owner_l1_email = emp_id1.work_email
+  LEFT JOIN
+    employee_ids_enrich AS emp_id2
+      ON codex.owner_l2_email = emp_id2.work_email
+  LEFT JOIN
+    employee_ids_enrich AS emp_id3
+      ON codex.owner_l3_email = emp_id3.work_email
+),
 codex_ordered AS (
   SELECT
     cost_center_code,
@@ -30,7 +110,7 @@ codex_ordered AS (
     LAG(headcount_type) OVER w AS prev_headcount_type,
     LAG(cost_center_code) OVER w IS NULL AS is_first_version
   FROM
-    datalake_gsheets_people.codex
+    codex
   WINDOW
     w AS (PARTITION BY cost_center_code ORDER BY dt_closing_month)
 ),
@@ -95,8 +175,11 @@ one_per_version AS (
     with_version
   QUALIFY
     ROW_NUMBER() OVER (
-      PARTITION BY cost_center_code, version_num
-      ORDER BY dt_closing_month
+      PARTITION BY
+        cost_center_code,
+        version_num
+      ORDER BY
+        dt_closing_month
     ) = 1
 )
 SELECT

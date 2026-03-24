@@ -1,0 +1,78 @@
+---
+database_name: datalake_people
+table_name: codex_log
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  SCD Type 2 history of CODEX cost-center attributes. One row per (cost_center_code, version)
+  with dt_valid_from and dt_valid_to. Owner display names are resolved via identifier_mapping
+  and GSheets email mapping; a new version is created when any tracked attribute changes.
+columns:
+  cost_center_code:
+    description: Unique identifier of the cost center.
+    lineage:
+      - datalake_people.codex_history_base.cost_center_code
+  business:
+    description: Business unit to which the cost center belongs.
+    lineage:
+      - datalake_people.codex_history_base.business
+  product:
+    description: Primary product associated with this cost center.
+    lineage:
+      - datalake_people.codex_history_base.product
+  brand:
+    description: Brand to which the cost center belongs.
+    lineage:
+      - datalake_people.codex_history_base.brand
+  vertical:
+    description: Derived business vertical (Ops, Corp, Tech).
+    lineage:
+      - datalake_people.codex_history_base.vertical
+  structure:
+    description: Structure to which the cost center belongs.
+    lineage:
+      - datalake_people.codex_history_base.structure
+  team:
+    description: Team to which the cost center belongs.
+    lineage:
+      - datalake_people.codex_history_base.team
+  chapter:
+    description: Chapter to which the cost center belongs.
+    lineage:
+      - datalake_people.codex_history_base.chapter
+  line:
+    description: Line to which the cost center belongs.
+    lineage:
+      - datalake_people.codex_history_base.line
+  owner_l1_full_name:
+    description: Full name of the L1 owner (from identifier_mapping / email mapping).
+    lineage:
+      - datalake_people.codex_history_base.owner_l1_email
+      - datalake_people.identifier_mapping.full_name
+      - datalake_gsheets_people_clean.email_employee_mapping.work_email
+  owner_l2_full_name:
+    description: Full name of the L2 owner (from identifier_mapping / email mapping).
+    lineage:
+      - datalake_people.codex_history_base.owner_l2_email
+      - datalake_people.identifier_mapping.full_name
+      - datalake_gsheets_people_clean.email_employee_mapping.work_email
+  owner_l3_full_name:
+    description: Full name of the L3 owner (from identifier_mapping / email mapping).
+    lineage:
+      - datalake_people.codex_history_base.owner_l3_email
+      - datalake_people.identifier_mapping.full_name
+      - datalake_gsheets_people_clean.email_employee_mapping.work_email
+  headcount_type:
+    description: Inferred headcount type (Capacity or Overhead).
+    lineage:
+      - datalake_people.codex_history_base.headcount_type
+  dt_valid_from:
+    description: Start date of the validity interval for this version.
+    lineage:
+      - datalake_people.codex_history_base.dt_closing_month
+  dt_valid_to:
+    description: End date of the validity interval; NULL when is_current is true.
+  is_current:
+    description: True when this row is the active version for the cost center.
+  ts_load:
+    description: Load timestamp for this table (set at query execution).

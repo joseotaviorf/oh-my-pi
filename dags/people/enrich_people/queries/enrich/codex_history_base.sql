@@ -21,18 +21,18 @@ SELECT
   codex.product,
   codex.brand,
   CASE
-    WHEN codex.structure IN ('Sales','Operations','Marketing','Guarantees') THEN 'Ops'
-    WHEN codex.structure IN ('Finance','People','Legal','Administrative') THEN 'Corp'
+    WHEN codex.structure IN ('Sales', 'Operations', 'Marketing', 'Guarantees') THEN 'Ops'
+    WHEN codex.structure IN ('Finance', 'People', 'Legal', 'Administrative') THEN 'Corp'
     WHEN codex.structure = 'Product' THEN 'Tech'
   END AS vertical,
   codex.structure,
   codex.team,
-  NULLIF(codex.chapter, '-') AS chapter,
-  NULLIF(codex.line, '-') AS line,
-  NULLIF(codex.owner_l1_email, '-') AS owner_l1_email,
-  NULLIF(codex.owner_l2_email, '-') AS owner_l2_email,
-  NULLIF(codex.owner_l3_email, '-') AS owner_l3_email,
-  NULLIF(cc_hctype.headcount_type, '-') AS headcount_type,
+  codex.chapter,
+  codex.line,
+  codex.owner_l1_email,
+  codex.owner_l2_email,
+  codex.owner_l3_email,
+  cc_hctype.headcount_type,
   codex.dt_updated AS dt_closing_month,
   codex.ts_load
 FROM

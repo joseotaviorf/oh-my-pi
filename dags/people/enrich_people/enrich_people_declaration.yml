@@ -39,7 +39,19 @@ workflow:
       - identifier_mapping
       - assignment_termination
       - management_hierarchy
+    codex_log:
+      - codex_history_base
+      - identifier_mapping
   tables_customization:
+    codex_history_base:
+      extraction_type: incremental
+      merge_on: ["id"]
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    codex_log:
+      extraction_type: full
+      vacuum_retention_hours: 168
+      vacuum_lite: true
     event_definition:
       vacuum_retention_hours: 168
       vacuum_lite: true

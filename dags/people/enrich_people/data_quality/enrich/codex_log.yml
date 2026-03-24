@@ -1,5 +1,5 @@
 ---
-table_name: datalake_gsheets_people.codex_log
+table_name: datalake_people.codex_log
 alert_channel: PEOPLE_ALERTS
 
 table_level_validations:

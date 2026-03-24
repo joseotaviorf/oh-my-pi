@@ -43,7 +43,7 @@ WITH base AS (
         AND o.dt_effective_started <= a.dt_effective_ended
         AND (a.dt_effective_ended IS NULL OR a.dt_effective_ended >= o.dt_effective_started)
     LEFT JOIN
-        datalake_gsheets_people.codex_log AS c
+        datalake_people.codex_log AS c
         ON a.cost_center_code = c.cost_center_code
         AND c.dt_valid_from <= LEAST(COALESCE(o.dt_effective_ended, DATE '4712-12-31'), COALESCE(a.dt_effective_ended, DATE '4712-12-31'))
         AND (c.dt_valid_to IS NULL OR c.dt_valid_to >= GREATEST(o.dt_effective_started, COALESCE(a.dt_effective_started, o.dt_effective_started)))

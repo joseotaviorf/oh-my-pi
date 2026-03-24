@@ -1,0 +1,74 @@
+database_name: datalake_people
+table_name: codex_history_base
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: |-
+  Consolidated monthly snapshots of CODEX cost-center attributes from GSheets (clean layer).
+  One row per (cost_center_code, closing month). Built in enrich_people for downstream codex_log SCD2.
+columns:
+  id:
+    description: Unique identifier of the cost center in a particular month.
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.cost_center_code
+      - datalake_gsheets_people_clean.codex_cost_centers.dt_updated
+  cost_center_code:
+    description: Unique identifier of the cost center.
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.cost_center_code
+  business:
+    description: Business unit to which the cost center belongs.
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.business
+  product:
+    description: Primary product associated with this cost center.
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.product
+  brand:
+    description: Brand to which the cost center belongs.
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.brand
+  vertical:
+    description: |-
+      Derived business vertical based on structure (Ops, Corp, Tech).
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.structure
+  structure:
+    description: Structure to which the cost center belongs.
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.structure
+  team:
+    description: Team to which the cost center belongs.
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.team
+  chapter:
+    description: Chapter to which the cost center belongs.
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.pt_chapter
+  line:
+    description: Line to which the cost center belongs.
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.pt_line
+  owner_l1_email:
+    description: Email of the L1 owner in the hierarchy for the cost center.
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.l1_mail
+  owner_l2_email:
+    description: Email of the L2 owner in the hierarchy for the cost center.
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.l2_mail
+  owner_l3_email:
+    description: Email of the L3 owner in the hierarchy for the cost center.
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.l3_mail
+  headcount_type:
+    description: Inferred headcount type (Capacity or Overhead).
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_informations.cost_center_detail
+  dt_closing_month:
+    description: Official monthly version date of the CODEX snapshot.
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.dt_updated
+  ts_load:
+    description: Timestamp of ingestion into the data lake (clean source).
+    lineage:
+      - datalake_gsheets_people_clean.codex_cost_centers.ts_load
