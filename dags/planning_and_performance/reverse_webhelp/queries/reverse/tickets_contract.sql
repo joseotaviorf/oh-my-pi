@@ -1,4 +1,4 @@
-WITH 
+WITH
 -- 0. Pré-filtro de Departamentos
 target_departments AS (
     SELECT sk_department, department
@@ -19,9 +19,13 @@ target_departments AS (
         'Reparos PP Multi [BACK]',
         'Reembolso de Reparos [Back]',
         'Atendimento [Porto]',
-        'Triagem [Porto]'
+        'Triagem [Porto]',
+        'ReparAção Comum [BACK]',
+        'ReparAção (Piloto Urgente)',
+        'ReparAção Emergencial [BACK]'
     )
 ),
+
 
 pp_multi AS (
     SELECT
@@ -34,21 +38,22 @@ pp_multi AS (
     WHERE (ongoing_houses >= 5 OR is_pp_multi_active = TRUE)
 ),
 
+
 -- 1. UNIVERSO MESTRE
 universo_tickets AS (
-    SELECT 
+    SELECT
         TRY_CAST(bmt.sk_task AS BIGINT) AS sk_task,
         bmt.ts_started,
         ft.sk_user,
-        bmt.sk_agent, 
+        bmt.sk_agent,
         ft.sk_last_analyst,
         dd.department,
         ppm.is_pp_multi AS is_pp_multi,
         -- Tema detalhado apenas para os departamentos específicos
-        CASE 
-          WHEN dd.department IN ('CX Pagamentos Ativo [POS] [BACK] [PAY]', 'Alteração de dados bancários [BACK]', 'Aditivos [REP] [POS] [BACK]') 
-          THEN dt.theme_detail 
-          ELSE NULL 
+        CASE
+          WHEN dd.department IN ('CX Pagamentos Ativo [POS] [BACK] [PAY]', 'Alteração de dados bancários [BACK]', 'Aditivos [REP] [POS] [BACK]')
+          THEN dt.theme_detail
+          ELSE NULL
         END AS theme_detail,
         -- Lógica de Subdepartamento (Encadeamento)
         CASE
@@ -98,35 +103,36 @@ universo_tickets AS (
             ELSE NULL
         END AS subdepartment,
         NULLIF(ft.sk_contract, -1) AS sk_contract_ticket,
-        CASE 
-            WHEN bmt.dt_metric_reference >= current_date() - INTERVAL 1 DAY THEN bmt.status 
-            ELSE 'solved' 
+        CASE
+            WHEN bmt.dt_metric_reference >= current_date() - INTERVAL 1 DAY THEN bmt.status
+            ELSE 'solved'
         END AS status_real,
-        CASE 
-            WHEN bmt.dt_metric_reference >= current_date() - INTERVAL 1 DAY THEN 'BACKLOG_ATIVO' 
-            ELSE 'RECEM_RESOLVIDO' 
+        CASE
+            WHEN bmt.dt_metric_reference >= current_date() - INTERVAL 1 DAY THEN 'BACKLOG_ATIVO'
+            ELSE 'RECEM_RESOLVIDO'
         END AS categoria_origem
     FROM dw_customer_support.fact_backlog_metrics_tasks bmt
     INNER JOIN target_departments dd ON bmt.sk_main_department = dd.sk_department
     LEFT JOIN dw_customer_support.fact_tickets ft ON TRY_CAST(bmt.sk_task AS BIGINT) = ft.sk_ticket
     LEFT JOIN dw_customer_support.dim_ticket dit ON CAST(dit.sk_ticket AS STRING) = bmt.sk_task
     LEFT JOIN dw_customer_support.dim_taxonomy AS dt ON dt.sk_taxonomy = ft.sk_taxonomy      
-    LEFT JOIN pp_multi AS ppm 
+    LEFT JOIN pp_multi AS ppm
       ON ppm.sk_owner = ft.sk_user  
       AND to_date(ppm.dt_reference) = to_date(bmt.ts_started)  
     WHERE bmt.origin = 'email'
       AND (bmt.status IS NULL OR bmt.status IN ('open', 'new', 'hold', 'pending'))
       AND (
-          (bmt.dt_metric_reference = current_date() - INTERVAL 1 DAY) 
-          OR 
+          (bmt.dt_metric_reference = current_date() - INTERVAL 1 DAY)
+          OR
           (bmt.dt_metric_reference = current_date() - INTERVAL 3 DAY AND ft.ts_solved >= current_date() - INTERVAL 3 DAY)
       )
       AND dit.tags NOT LIKE '%closed_by_merge%'
 ),
 
+
 -- 2. EXTRAÇÃO DE TEXTO (Spark Regex usa escape duplo \\)
 backlog_text_extract AS (
-    SELECT 
+    SELECT
         dit.sk_ticket AS sk_task,
         TRY_CAST(regexp_extract(dit.custom_fields, '"ID do ticket vinculado":"(\\d+)"', 1) AS BIGINT) AS id_ticket_vinculado,
         TRY_CAST(regexp_extract(dit.custom_fields, 'Código do Imóvel.*?:.*?(\\d+)', 1) AS BIGINT) AS id_house_texto
@@ -134,14 +140,16 @@ backlog_text_extract AS (
     INNER JOIN (SELECT sk_task FROM universo_tickets) u ON dit.sk_ticket = u.sk_task
 ),
 
+
 -- 3. REGRAS DE CARTEIRIZAÇÃO
 flag_regra_1_5 AS (
     SELECT t.sk_ticket, t.sk_contract
     FROM dw_customer_support.fact_tickets t
-    INNER JOIN (SELECT DISTINCT id_ticket_vinculado FROM backlog_text_extract WHERE id_ticket_vinculado IS NOT NULL) bte 
+    INNER JOIN (SELECT DISTINCT id_ticket_vinculado FROM backlog_text_extract WHERE id_ticket_vinculado IS NOT NULL) bte
         ON t.sk_ticket = bte.id_ticket_vinculado
     WHERE t.sk_contract > 0
 ),
+
 
 flag_regra_2 AS (
     SELECT fhl.sk_owner, MIN(fhl.sk_contract) as sk_contract
@@ -151,6 +159,7 @@ flag_regra_2 AS (
     GROUP BY 1
 ),
 
+
 flag_regra_2_5 AS (
     SELECT bte.sk_task, MIN(fhl.sk_contract) as sk_contract
     FROM backlog_text_extract bte
@@ -158,6 +167,7 @@ flag_regra_2_5 AS (
     WHERE fhl.sk_contract > 0
     GROUP BY 1
 ),
+
 
 flag_regra_3 AS (
     SELECT fcp.sk_user, fcp.sk_contract
@@ -167,17 +177,18 @@ flag_regra_3 AS (
     WHERE dc.status IN ('Ativo', 'Finalizado')
 ),
 
+
 -- 4. CONSOLIDAÇÃO
 tabela_base AS (
-    SELECT 
+    SELECT
         u.*,
         COALESCE(u.sk_contract_ticket, r15.sk_contract, r2.sk_contract, r25.sk_contract) AS contrato_prioritario,
-        CASE 
+        CASE
             WHEN u.sk_contract_ticket IS NOT NULL THEN '1. Regra 1: Contrato do Ticket'
             WHEN r15.sk_contract IS NOT NULL THEN '1.5. Regra 1.5: Ticket Vinculado'
             WHEN r2.sk_contract IS NOT NULL THEN '2. Regra 2: Owner (Vínculo Direto)'
             WHEN r25.sk_contract IS NOT NULL THEN '2.5. Regra 2.5: Fallback Texto'
-            ELSE NULL 
+            ELSE NULL
         END AS regra_prioritaria
     FROM universo_tickets u
     LEFT JOIN backlog_text_extract bte ON u.sk_task = bte.sk_task
@@ -186,8 +197,9 @@ tabela_base AS (
     LEFT JOIN flag_regra_2_5 r25 ON u.sk_task = r25.sk_task
 )
 
+
 -- 5. RELATÓRIO FINAL
-SELECT 
+SELECT
     da_last.email AS analyst_email,
     CASE WHEN tb.categoria_origem = 'RECEM_RESOLVIDO' THEN 'INACTIVE' ELSE 'ACTIVE' END AS status,
     tb.sk_task AS sk_task,
@@ -199,10 +211,17 @@ SELECT
         WHEN (tb.department LIKE '%Alteração de dados bancários%' OR tb.department LIKE '%Pagamentos Ativo%') AND tb.subdepartment = 'IPTU' THEN 'cx_back_pay_iptu'
         WHEN (tb.department LIKE '%Alteração de dados bancários%' OR tb.department LIKE '%Pagamentos Ativo%') AND tb.subdepartment = 'Aluguel' THEN 'cx_backoffice_payments_aluguel'
         WHEN (tb.department LIKE '%Alteração de dados bancários%' OR tb.department LIKE '%Pagamentos Ativo%') AND tb.subdepartment = 'Reembolso de condomínio' THEN 'cx_back_pay_cond_reembolso'
-        
+	   WHEN (
+            tb.department LIKE '%Alteração de dados bancários%'
+            OR tb.department LIKE '%Pagamentos Ativo%') THEN 'cx_back_pay_cond_geral'
+
+
+       
         WHEN tb.department LIKE '%Aditivos%' AND tb.is_pp_multi = TRUE THEN 'cx_back_aditivos_pp_multi'
         WHEN tb.department LIKE '%Aditivos%' AND tb.subdepartment = 'IR' THEN 'cx_back_aditivos_ir'
         WHEN tb.department LIKE '%Aditivos%' AND tb.subdepartment = 'Ongoing' THEN 'cx_back_aditivos_pos'
+        WHEN tb.department LIKE '%Aditivos%' THEN 'cx_back_aditivos_pos'
+
 
         -- Outros Departamentos
         WHEN tb.department LIKE '%Onboarding%' THEN 'cx_back_onboarding_pos'
@@ -211,9 +230,9 @@ SELECT
         WHEN tb.department LIKE '%Rescisão por Inadimplência%' THEN 'cx_offboarding_despejo'
         WHEN tb.department LIKE '%Propostas Tarefas%' THEN 'cx_back_visitas_propostas_pre'
         WHEN tb.department LIKE '%Entrada no imóvel%' THEN 'cx_back_onboarding_pos'
-        WHEN tb.department LIKE '%Reparação Comum%' THEN 'reparos_comum'
-        WHEN tb.department LIKE '%Reparação (Piloto Urgente)%' THEN 'reparos_piloto_urgente'
-        WHEN tb.department LIKE '%Reparação Emergencial%' THEN 'reparos_emergencial'
+        WHEN tb.department LIKE '%ReparAção Comum%' THEN 'reparos_comum'
+        WHEN tb.department LIKE '%ReparAção (Piloto Urgente)%' THEN 'reparos_piloto_urgente'
+        WHEN tb.department LIKE '%ReparAção Emergencial%' THEN 'reparos_emergencial'
         WHEN tb.department LIKE '%FullService [BACK]%' THEN 'reparos_contestacao'
         WHEN tb.department LIKE '%Reembolso de Reparos%' THEN 'reparos_reembolso'
         WHEN tb.department LIKE '%Reparos PP Multi%' THEN 'reparos_pp_multi'
@@ -222,19 +241,19 @@ SELECT
         ELSE 'NÃO IDENTIFICADO'
     END AS context_identifier,
     COALESCE(tb.contrato_prioritario, r3.sk_contract) AS origin_identifier,
-    CASE 
+    CASE
         WHEN fcp.contract_role = 'landlord' THEN 'OWNER'
         WHEN fcp.contract_role = 'tenant' THEN 'TENANT'
         WHEN COALESCE(tb.contrato_prioritario, r3.sk_contract) IS NOT NULL THEN 'OTHER'
-        ELSE NULL 
+        ELSE NULL
     END AS user_type,    
-    CASE 
+    CASE
         WHEN tb.categoria_origem = 'RECEM_RESOLVIDO' THEN 'fechado + 3 dias'
         WHEN tb.status_real IN ('new', 'open') THEN 'aberto'
         WHEN tb.status_real = 'hold' THEN 'em espera'
         WHEN tb.status_real = 'pending' THEN 'pendente'
         WHEN tb.status_real = 'solved' THEN 'fechado'
-        ELSE tb.status_real 
+        ELSE tb.status_real
     END AS ticket_status,
     tb.department AS department,
     CASE
@@ -244,7 +263,7 @@ SELECT
         WHEN da_last.agent_organization IS NULL THEN 'Ticket ainda não atribuído'
         ELSE da_last.agent_organization
     END AS agent_organization,
-    COALESCE(tb.regra_prioritaria, 
+    COALESCE(tb.regra_prioritaria,
              CASE WHEN r3.sk_contract IS NOT NULL THEN '3. Regra 3: Multi-Contrato' ELSE '4. Sem Contrato Identificado' END
     ) AS contract_identification_rule,
     to_date(tb.ts_started) as ts_started,
@@ -262,8 +281,11 @@ SELECT
 FROM tabela_base tb
 LEFT JOIN flag_regra_3 r3 ON tb.sk_user = r3.sk_user AND tb.contrato_prioritario IS NULL
 LEFT JOIN dw_customer_support.dim_analyst AS da_last ON da_last.sk_analyst = tb.sk_last_analyst
-LEFT JOIN dw_rent.fact_contract_people fcp 
-    ON COALESCE(tb.contrato_prioritario, r3.sk_contract) = fcp.sk_contract 
+LEFT JOIN dw_rent.fact_contract_people fcp
+    ON COALESCE(tb.contrato_prioritario, r3.sk_contract) = fcp.sk_contract
     AND tb.sk_user = fcp.sk_user
     AND fcp.is_user = true
     AND  da_last.agent_organization IN ('webhelp', 'webhelpbr')
+
+
+
