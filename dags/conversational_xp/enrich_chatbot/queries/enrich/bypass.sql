@@ -10,7 +10,7 @@ WITH pre_bot_actions AS (
   FROM
     datalake_langfuse_clean.traces
   WHERE
-    ts_created BETWEEN '{load_start_date}' AND '{load_end_date}'
+    ts_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND input:user_context:user_pre_bot_actions != '[]'
     AND input:user_context:user_pre_bot_actions IS NOT NULL
 ),
@@ -23,24 +23,27 @@ bypasses AS (
     pre_bot_actions
 ),
 inside_sales_bypass AS (
-  SELECT DISTINCT
-    t.id_session
+  SELECT
+    t.id_session,
+    MIN(t.ts_created) AS ts_created
   FROM
     datalake_langfuse_clean.traces AS t
   INNER JOIN
     datalake_langfuse_clean.observations AS o
       ON o.id_trace = t.id_trace
-      AND o.ts_started BETWEEN '{load_start_date}' AND '{load_end_date}'
+      AND o.ts_started BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
       AND GET_JSON_OBJECT(o.output, '$.should_route') = 'true'
   WHERE
-    t.ts_created BETWEEN '{load_start_date}' AND '{load_end_date}'
+    t.ts_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  GROUP BY 1
 )
 SELECT
   id_session AS id_langfuse_session,
   bypass.title AS bypass,
   bypass.type AS type,
   bypass.ticket_id AS id_ticket,
-  bypass.department AS queue
+  bypass.department AS queue,
+  ts_created
 FROM
   bypasses
 UNION ALL
@@ -49,6 +52,7 @@ SELECT
   "inside_sales_bypass" AS bypass,
   NULL AS type,
   NULL AS id_ticket,
-  NULL AS queue
+  NULL AS queue,
+  ts_created
 FROM
   inside_sales_bypass

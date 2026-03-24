@@ -9,19 +9,24 @@ columns:
     description: "Langfuse session identifier"
     lineage:
       - datalake_langfuse_clean.traces.id_session
+      - datalake_langfuse_clean.observations.id_trace
   bypass:
-    description: "Pre-bot action bypass title"
+    description: "Pre-bot action bypass title, or 'inside_sales_bypass' for sessions routed by the inside sales agent"
     lineage:
       - datalake_langfuse_clean.traces.input
   type:
-    description: "Pre-bot action bypass type"
+    description: "Pre-bot action bypass type (e.g. TICKET, LINK, BYPASS)"
     lineage:
       - datalake_langfuse_clean.traces.input
   id_ticket:
-    description: "Ticket ID associated with the bypass action"
+    description: "Ticket ID associated with the bypass action, if any"
     lineage:
       - datalake_langfuse_clean.traces.input
   queue:
-    description: "Department from the bypass action"
+    description: "Department queue associated with the bypass action, if any"
     lineage:
       - datalake_langfuse_clean.traces.input
+  ts_created:
+    description: "Timestamp when the Langfuse trace session was created"
+    lineage:
+      - datalake_langfuse_clean.traces.ts_created
