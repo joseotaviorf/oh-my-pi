@@ -276,15 +276,21 @@ recontact_drilldown_d4 AS (
     DATE_SUB(CAST(tp.ts_started AS DATE), 3) AS recontact_search_window_from,
     tp.ts_started AS recontact_search_window_until,
     -- Recontact Flag
-    IF(DATEDIFF(CAST(tp.ts_started AS DATE), LAG(CAST(tp.ts_started AS DATE)) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started)) <= 3 
+    IF(DATEDIFF(CAST(tp.ts_started AS DATE), LAG(CAST(tp.ts_started AS DATE)) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started)) <= 4 
        AND tp.ts_started != LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started), 1, 0) AS recontact_flag,
     -- Theme Recontact Flag
-    IF(tp.theme IS NOT NULL AND DATEDIFF(CAST(tp.ts_started AS DATE), LAG(CAST(tp.ts_started AS DATE)) OVER (PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme ORDER BY tp.ts_started)) <= 3 
+    IF(tp.theme IS NOT NULL AND DATEDIFF(CAST(tp.ts_started AS DATE), LAG(CAST(tp.ts_started AS DATE)) OVER (PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme ORDER BY tp.ts_started)) <= 4 
        AND tp.ts_started != LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started), 1, 0) AS theme_recontact_flag,
     -- FCR Flag (Lead)
     IF(DATEDIFF(LEAD(CAST(tp.ts_started AS DATE)) OVER (PARTITION BY tp.sk_user, tp.last_team ORDER BY tp.ts_started), CAST(tp.ts_started AS DATE)) <= 4
        AND tp.sk_ticket != LEAD(tp.sk_ticket) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started)
        AND tp.ts_started != LEAD(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started), 1, 0) AS recontact_fcr_flag,
+        -- Recontact Flag D0
+    IF(DATEDIFF(CAST(tp.ts_started AS DATE), LAG(CAST(tp.ts_started AS DATE)) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started)) = 0 
+       AND tp.ts_started != LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started), 1, 0) AS recontact_flag_d0,
+        -- Theme Recontact Flag D0
+    IF(tp.theme IS NOT NULL AND DATEDIFF(CAST(tp.ts_started AS DATE), LAG(CAST(tp.ts_started AS DATE)) OVER (PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme ORDER BY tp.ts_started)) = 0 
+       AND tp.ts_started != LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started), 1, 0) AS theme_recontact_flag_D0,      
     LAG(tp.sk_ticket) OVER (PARTITION BY tp.sk_user, tp.last_team, tp.theme ORDER BY tp.ts_started) AS previous_contact_sk_ticket,
     LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user, tp.last_team, tp.theme ORDER BY tp.ts_started) AS previous_contact_ts_started,
     LAG(tp.channel) OVER (PARTITION BY tp.sk_user, tp.last_team, tp.theme ORDER BY tp.ts_started) AS previous_contact_channel,
@@ -295,7 +301,7 @@ recontact_drilldown_d4 AS (
   WHERE 
     tp.refined_direction = 'INBOUND'
     AND tp.last_department NOT IN ('Welcome Onboarding [BACK] [POS]', 'CX Welcome Onboarding [FRONT][POS]')
-    AND tp.channel IN ('call', 'chat')
+    AND tp.channel IN ('call', 'chat','email')
     AND tp.sk_user IS NOT NULL
     AND tp.sk_user > 0
 ),
@@ -455,6 +461,9 @@ SELECT
   tp.tarefa_partners,
   rd4.recontact_search_window_from AS recontact_search_window_from_d4,
   rd4.recontact_flag AS recontact_flag_d4,
+  rd4.recontact_flag_d0 AS recontact_flag_d0,
+  rd4.theme_recontact_flag AS theme_recontact_flag_d4,
+  rd4.theme_recontact_flag_d0 as theme_recontact_flag_d0,
   ppm.is_pp_multi,
   IF(tp.tags LIKE '%closed_by_merge%', 1, 0) as is_closed_by_merge,
   spoc.spoc_class,

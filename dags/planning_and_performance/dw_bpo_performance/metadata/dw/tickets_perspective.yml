@@ -401,6 +401,26 @@ columns:
       - dw_customer_support.fact_tickets.sk_user
       - dw_customer_support.dim_department.team
     description: Indicates whether the ticket meets the contact rules.
+  recontact_flag_d0:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.team
+    description: Indicates when the customer returned the contact on the same day.
+  theme_recontact_flag_d4:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.team
+      - dw_customer_support.dim_taxonomy.theme
+    description: Indicates when the customer returns within 4 days using the same taxonomy.
+  theme_recontact_flag_d0:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.team
+      - dw_customer_support.dim_taxonomy.theme
+    description: Indicates when the customer returns on the same day within the same taxonomy.
   is_pp_multi:
     lineage:
       - datalake_pp_multi.pp_multi_classification_history.pp_multi_classification
