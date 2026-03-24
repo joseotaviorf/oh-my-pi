@@ -1,3 +1,4 @@
+from bietlejuice.loaders.glue_metastore_loader import GlueMetastoreLoader
 from bietlejuice.loaders.hive_metastore_loader import HiveMetastoreLoader
 from bietlejuice.loaders.redshift_loader import RedshiftLoader
 from bietlejuice.loaders.spark_metastore_loader import SparkMetastoreLoader
