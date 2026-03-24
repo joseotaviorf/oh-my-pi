@@ -14,7 +14,7 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
     hubspot_brokers_history:
-      merge_on: [sk_broker, id_company, ts_updated]
+      merge_on: [sk_broker, id_hubspot_company, ts_updated]
       z_order_by: [sk_broker, ts_updated]
     broker_status_history:
       merge_on: [id_status_change]
