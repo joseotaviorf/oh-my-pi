@@ -1,5 +1,6 @@
 from unittest import mock
 
+
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )
@@ -105,3 +106,12 @@ class TestBietlejuiceDependencyHelperExtractDagAndTable:
             )
         assert dag_name == "dw_supply"
         assert table == "dw:growth_obt_supply"
+
+    def test_load_into_redshift_dw_task_uses_get_table_name_from_dw_task(self):
+        # Redshift path calls _get_table_name_from_dw_task; fact- case
+        task_name = "bietlejuice.dw_supply:load-into-redshift-dw-fact-supply-events"
+        dag_name, table = (
+            BietlejuiceDependencyHelper.extract_dag_and_table_from_task_name(task_name)
+        )
+        assert dag_name == "dw_supply"
+        assert table == "dw:fact_supply_events"

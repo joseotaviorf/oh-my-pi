@@ -1,0 +1,57 @@
+database_name: dw_performance_rent
+table_name: send_nps_ppmulti_offboarding
+description: This table filters contracts that will be enabled to trigger NPS surveys for the Offboarding campaign.
+domain: Support and Services
+owner: alef.vieiras@quintoandar.com.br
+columns:
+    customer_name:
+        lineage:
+            - datalake_ebdb_clean.contract_person.name
+        description: Customer name.
+    customer_email:
+        lineage:
+            - datalake_ebdb_clean.contract_person.email
+        description: Customer email.
+    customer_phone:
+        lineage:
+            - datalake_ebdb_clean.contract_person.phone_number
+        description: Customer Phone Number.
+    campaign_step:
+        lineage:
+            - "null"
+        description: Campaign belonging to the client to whom the NPS survey will be sent.
+    customer_type:
+        lineage:
+            - "null"
+        description: Indicates the type of client (Owner).
+    customer_cpf:
+        lineage:
+            - dw_public.dim_user.cpf
+        description: Indicates the CPF (Brazilian tax identification number) of the customer who will receive the survey.
+    id_user:
+        lineage:
+            - datalake_pp_multi.pp_multi_classification_history.id_owner
+        description: Customer identification.
+    campaign_type:
+        lineage:
+            - "null"
+        description: Indicates which campaign the customer is part of.
+    driver_type:
+        lineage:
+            - "null"
+        description: Returns the type of customer subscription.
+    id_driver:
+        lineage:
+            - dw_rent.dim_contract.sk_contract
+        description: Returns the customer contract numbers.
+    chave:
+        lineage:
+            - datalake_ebdb_clean.contract_person.email
+        description: Create a key using the email address with the execution date.
+    ts_load:
+        lineage:
+            - now()
+        description: Timestamp of the load.
+
+
+    
