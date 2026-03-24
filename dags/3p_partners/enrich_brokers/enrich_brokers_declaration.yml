@@ -14,8 +14,7 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
     hubspot_brokers_history:
-      merge_on: [sk_broker, id_hubspot_company, ts_updated]
-      z_order_by: [sk_broker, ts_updated]
+      extraction_type: full
     broker_status_history:
       merge_on: [id_status_change]
       when_matched_update_condition: "source.ts_end IS DISTINCT FROM target.ts_end OR source.is_current != target.is_current"
@@ -25,6 +24,9 @@ workflow:
     - hubspot_brokers_history
 cluster:
   type: databricks_16_4_min_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new_env
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
