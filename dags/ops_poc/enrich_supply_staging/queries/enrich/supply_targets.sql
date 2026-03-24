@@ -1,6 +1,7 @@
 SELECT
     date,
-    'qts' as source,
+    'qts' AS source,
+    'RENT' AS business_context,
     city_group, 
     planning_conversion,
     planning_operation,
@@ -16,7 +17,8 @@ FROM
 UNION ALL
 SELECT
     date,
-    'qts' as source,
+    'qts' AS source,
+    'SALE' AS business_context,
     city_group, 
     planning_conversion,
     planning_operation,
@@ -32,7 +34,8 @@ FROM
 UNION ALL
 SELECT
     date,
-    'okr' as source,
+    'okr' AS source,
+    'RENT' AS business_context,
     city_group,
     planning_conversion,
     planning_operation,
@@ -48,7 +51,8 @@ FROM
 UNION ALL
 SELECT
     date,
-    'okr' as source,
+    'okr' AS source,
+    'SALE' AS business_context,
     city_group, 
     planning_conversion,
     planning_operation,

@@ -12,6 +12,13 @@ columns:
       - scalability_metrics.sale_supply_budget_2026.date
       - scalability_metrics.rent_supply_okr_2026.date
       - scalability_metrics.sale_supply_okr_2026.date
+  business_context:
+    description: Business context of the target (RENT or SALE).
+    lineage:
+      - scalability_metrics.rent_supply_budget_2026.business_context
+      - scalability_metrics.sale_supply_budget_2026.business_context
+      - scalability_metrics.rent_supply_okr_2026.business_context
+      - scalability_metrics.sale_supply_okr_2026.business_context
   source:
     description: Origin of the target (qts for budget, okr for OKR targets).
   city_group:
