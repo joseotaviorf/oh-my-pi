@@ -43,6 +43,7 @@ SELECT
     t.repair_cost,
     t.spoc_wave,
     t.is_spoc AS is_spoc_contract,
+    t.is_spoc_eligible,
     t.is_spoc_control_group,
     t.is_relisting,
     t.has_automatically_closed_task,

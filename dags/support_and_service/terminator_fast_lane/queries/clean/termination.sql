@@ -22,6 +22,7 @@ SELECT
     inspection_date_offset_in_days,
     wave AS spoc_wave,
     is_spoc,
+    is_spoc_eligible,
     is_spoc_control_group,
     exit_inspection_required AS has_exit_inspection,
     relisting_enabled AS is_relisting,

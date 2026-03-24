@@ -45,6 +45,10 @@ columns:
     description: Boolean indicating whether the termination is part of the SPOC control group.
     lineage:
       - dw_offboarding.fact_terminations.is_spoc_contract
+  is_spoc_eligible:
+    description: Boolean indicating whether the termination is eligible for SPOC.
+    lineage:
+      - dw_offboarding.fact_terminations.is_spoc_eligible
   is_eviction:
     description: Boolean indicating whether the termination reason is eviction.
     lineage:

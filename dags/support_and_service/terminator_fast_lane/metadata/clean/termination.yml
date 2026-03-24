@@ -97,6 +97,10 @@ columns:
     lineage:
       - datalake_terminator_raw.termination.is_spoc
     description: Boolean information indicating whether the termination is part of the spoc.
+  is_spoc_eligible:
+    lineage:
+      - datalake_terminator_raw.termination.is_spoc_eligible
+    description: Boolean information indicating whether the termination is eligible for SPOC.
   is_spoc_control_group:
     lineage:
       - datalake_terminator_raw.termination.is_spoc_control_group

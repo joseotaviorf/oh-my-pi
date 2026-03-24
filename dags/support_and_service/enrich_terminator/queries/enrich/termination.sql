@@ -215,6 +215,7 @@ SELECT
     t.responsible_off_manager_email,
     neg.repair_resolution,
     t.is_spoc,
+    t.is_spoc_eligible,
     t.is_spoc_control_group,
     t.is_relisting,
     tw.has_automatically_closed_task,
