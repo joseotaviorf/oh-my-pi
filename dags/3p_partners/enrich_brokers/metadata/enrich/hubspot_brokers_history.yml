@@ -8,7 +8,7 @@ columns:
     lineage:
       - core_brokers.brokers.sk_broker
     description: Surrogate key identifying the broker.
-  id_company:
+  id_hubspot_company:
     lineage:
       - datalake_hubspot.company_history.id_company
     description: Identification of the company registered on HubSpot.
@@ -16,6 +16,10 @@ columns:
     lineage:
       - datalake_hubspot.company_history.id_hubspot_owner
     description: Identification of the HubSpot owner associated with the company.
+  cnpj:
+    lineage:
+      - datalake_hubspot.company_history.cnpj
+    description: CNPJ of the company.
   broker_status:
     lineage:
       - datalake_hubspot.company_history.sale_lead_status
@@ -31,6 +35,8 @@ columns:
     lineage:
       - datalake_hubspot.company_history.cluster_performance
     description: Performance classification of the company cluster.
+  broker_version:
+    description: Version of the broker record.
   is_current:
     description: True if the record is the current record for the broker, otherwise false.
   has_3p_access_control:
