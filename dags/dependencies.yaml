@@ -1174,8 +1174,8 @@ bietlejuice.dw_sap_accounting_process:
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-third-parties-reverse:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-third-parties:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-transactional-reverse:first-run-of-day
-  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-transactional-third-parties:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-transactional-third-parties-reverse:first-run-of-day
+  - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-transactional-third-parties:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-transactional:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-retsuko-write-off:first-run-of-day
   - bietlejuice.enrich_sap_accounting_process:load-enrich-reverse-accounts-420001-420002-420004:first-run-of-day
@@ -2539,9 +2539,7 @@ bietlejuice.enrich_greenhouse:
   - bietlejuice.greenhouse:load-clean-demographics-answers:first-run-of-day
   - bietlejuice.greenhouse:load-clean-demographics-questions:first-run-of-day
   - bietlejuice.greenhouse:load-clean-jobs:first-run-of-day
-  - bietlejuice.greenhouse_audit_log:load-clean-events:first-run-of-day
 bietlejuice.enrich_greenhouse_migration:
-  - bietlejuice.greenhouse_audit_log:load-clean-events:first-run-of-day
   - bietlejuice.greenhouse_v3:load-clean-close-reasons:first-run-of-day
   - bietlejuice.greenhouse_v3:load-clean-demographic-answer-options:first-run-of-day
   - bietlejuice.greenhouse_v3:load-clean-demographic-answers:first-run-of-day
