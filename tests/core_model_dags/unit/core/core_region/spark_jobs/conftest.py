@@ -230,12 +230,9 @@ def region_config_df(spark_session):
             StructField("phone_ddd", StringType(), True),
         ]
     )
+    # Production shape: region_config rows exist only for Cidade id_region; sub/macro inherit via join
     data = [
-        (1, "11"),
-        (2, "11"),
-        (3, "11"),
         (5, "11"),
-        (6, "11"),
     ]
     return spark_session.createDataFrame(data, schema)
 

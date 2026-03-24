@@ -78,7 +78,7 @@ columns:
     type: string
     required: true
 
-  # Phone area code from region_config (nullable when no config row)
+  # Phone area code from region_config for the resolved Cidade id (nullable when no config row)
   region_phone_ddd:
     type: string
     required: false

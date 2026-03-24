@@ -110,19 +110,21 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
             .join(c, col("c.id") == col("s.id_country"), "left")
         )
 
+        # Cidade id along parent chain (same key as id_state propagation); region_config is keyed by Cidade only
+        id_city_region = coalesce(col("sr.id"), col("mr.id"), col("r.id"))
+
         # Business context join
         bc = business_context_df.alias("bc")
 
         joined_df = joined_df.join(bc, col("bc.id_region") == col("r.id"), "left")
 
         rcfg = region_config_by_region.alias("rcfg")
-        joined_df = joined_df.join(rcfg, col("rcfg.id_region") == col("r.id"), "left")
+        joined_df = joined_df.join(rcfg, col("rcfg.id_region") == id_city_region, "left")
 
         # Apply WHERE c.code IS NOT NULL
         filtered_df = joined_df.filter(col("c.code").isNotNull())
 
         city_region_name = coalesce(col("sr.name"), col("mr.name"), col("r.name"))
-        id_city_region = coalesce(col("sr.id"), col("mr.id"), col("r.id"))
         # Align with enrich_region: English display names by EBDB country id (not raw c.name).
         country_name = (
             when(col("s.id_country") == 1, lit("Brazil"))

@@ -88,8 +88,10 @@ columns:
   region_phone_ddd:
     lineage:
       - datalake_ebdb_clean.region_config.phone_ddd
-    description: Telephone area code (DDD) for the region from Main region configuration. Null when no
-      region_config row exists for this id_region.
+    description: Telephone area code (DDD) from Main region configuration for the Cidade region linked via
+      the parent hierarchy (same resolution as id_city_region). Only Cidade rows have region_config in source;
+      MacroRegiao and SubRegiao inherit the related Cidade's phone_ddd. Null when no region_config exists for
+      that city id.
   greater_region:
     lineage:
       - datalake_ebdb_clean.region.name

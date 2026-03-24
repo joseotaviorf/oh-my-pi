@@ -306,6 +306,7 @@ class TestCreateCoreModelHierarchy:
         assert row["id_city_region"] == 5
         assert row["id_macro_region"] == 5
         assert row["city_region_name"] == "São Paulo"
+        assert row["region_phone_ddd"] == "11"
 
 
 class TestCreateCoreModelJoins:
