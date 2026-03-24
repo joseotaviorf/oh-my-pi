@@ -1,0 +1,74 @@
+database_name: datalake_retsuko_clean
+table_name: recurring_expense
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Recurring expense definitions linked to contracts and accounts (amounts, installments, billing).
+columns:
+  id:
+    description: "Primary key for joins in retsuko"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.id
+  id_external:
+    description: "Recurring expense identifier in upstream systems"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.external_id
+  id_contract_external:
+    description: "External id of the related contract"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.contract_external_id
+  id_from_account_external:
+    description: "External id of the origin account"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.from_account_external_id
+  id_to_account_external:
+    description: "External id of the destination account"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.to_account_external_id
+  description:
+    description: "Human-readable description of the recurring expense"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.description
+  amount:
+    description: "Amount for each installment or period"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.amount
+  initial_year_month:
+    description: "Year-month when the recurring expense starts"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.initial_year_month
+  installments:
+    description: "Number of installments for the recurring expense"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.installments
+  bill_item:
+    description: "Bill item type associated with the recurring expense"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.bill_item
+  source:
+    description: "Origin system or channel of the recurring expense record"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.source
+  normality_control:
+    description: "Normality control flag or code for the recurring expense"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.normality_control
+  ts_canceled:
+    description: "Datetime when the recurring expense was canceled"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.canceled_at
+  ts_created:
+    description: "Record creation datetime in source"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.created_at
+  ts_published:
+    description: "Datetime when the recurring expense was published"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.published_at
+  ts_retsuko_created:
+    description: "Datetime when the row was created in Retsuko"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.retsuko_created_at
+  ts_retsuko_updated:
+    description: "Datetime when the row was last updated in Retsuko"
+    lineage:
+      - datalake_retsuko_raw.recurring_expense.retsuko_updated_at
