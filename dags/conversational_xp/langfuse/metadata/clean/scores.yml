@@ -1,69 +1,78 @@
 database_name: datalake_langfuse_clean
 table_name: scores
+owner: william.angelo@quintoandar.com.br
+domain: Conversational XP
+description: "Scores from Langfuse. Each row represents a single evaluation score assigned to a trace or observation, used for tracking LLM quality and performance."
 columns:
   id_score:
+    description: unique identifier for the score
     lineage:
       - datalake_langfuse_raw.scores.id
   id_trace:
+    description: identifier of the trace this score is associated with
     lineage:
-      - datalake_langfuse_raw.scores.traceId
-  id_observation:
-    lineage:
-      - datalake_langfuse_raw.scores.observationId
+      - datalake_langfuse_raw.scores.trace_id
   id_session:
+    description: identifier of the session this score belongs to
     lineage:
-      - datalake_langfuse_raw.scores.sessionId
-  id_author_user:
+      - datalake_langfuse_raw.scores.session_id
+  id_observation:
+    description: identifier of the observation this score is associated with
     lineage:
-      - datalake_langfuse_raw.scores.authorUserId
-  id_config:
-    lineage:
-      - datalake_langfuse_raw.scores.configId
-  id_queue:
-    lineage:
-      - datalake_langfuse_raw.scores.queueId
+      - datalake_langfuse_raw.scores.observation_id
   id_project:
+    description: identifier of the project this score belongs to
     lineage:
-      - datalake_langfuse_raw.scores.projectId
+      - datalake_langfuse_raw.scores.project_id
+  metadata:
+    description: additional metadata associated with the score
+    lineage:
+      - datalake_langfuse_raw.scores.metadata
   comment:
+    description: free-text comment explaining the score rationale
     lineage:
       - datalake_langfuse_raw.scores.comment
   data_type:
+    description: data type of the score value (e.g., numeric, boolean, categorical)
     lineage:
-      - datalake_langfuse_raw.scores.dataType
+      - datalake_langfuse_raw.scores.data_type
   environment:
+    description: environment where the score was created
     lineage:
       - datalake_langfuse_raw.scores.environment
   name:
+    description: name of the score metric (e.g., relevance, correctness)
     lineage:
       - datalake_langfuse_raw.scores.name
   source:
+    description: origin of the score (e.g., API, annotation, evaluation)
     lineage:
       - datalake_langfuse_raw.scores.source
   string_value:
+    description: score value represented as string for categorical scores
     lineage:
-      - datalake_langfuse_raw.scores.stringValue
-  trace:
-    lineage:
-      - datalake_langfuse_raw.scores.trace
+      - datalake_langfuse_raw.scores.string_value
   value:
+    description: numeric score value
     lineage:
       - datalake_langfuse_raw.scores.value
   ts_created:
+    description: timestamp when the score was created
     lineage:
-      - datalake_langfuse_raw.scores.createdAt
-  ts_updated:
-    lineage:
-      - datalake_langfuse_raw.scores.updatedAt
+      - datalake_langfuse_raw.scores.timestamp
   year:
+    description: year partition
     lineage:
       - datalake_langfuse_raw.scores.year
   month:
+    description: month partition
     lineage:
       - datalake_langfuse_raw.scores.month
   day:
+    description: day partition
     lineage:
       - datalake_langfuse_raw.scores.day
   hour:
+    description: hour partition
     lineage:
-      - datalake_langfuse_raw.scores.hour 
+      - datalake_langfuse_raw.scores.hour

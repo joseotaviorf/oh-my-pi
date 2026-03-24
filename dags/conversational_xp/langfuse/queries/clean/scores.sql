@@ -20,6 +20,8 @@ SELECT
 FROM
     datalake_langfuse_raw.scores
 WHERE
-    CAST(timestamp AS TIMESTAMP) >= TIMESTAMP('{load_start_date}') - INTERVAL 2 HOUR
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL 1 DAY AND DATE('{load_end_date}')
+    AND CAST(timestamp AS TIMESTAMP) >= TIMESTAMP('{load_start_date}') - INTERVAL 2 HOUR
+    AND CAST(timestamp AS TIMESTAMP) < TIMESTAMP('{load_end_date}')
 QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_score ORDER BY ts_created DESC) = 1
