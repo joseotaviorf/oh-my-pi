@@ -132,41 +132,57 @@ visit_by_identifier AS (
         1.96 * SQRT(sum_identifiers_with_cs_control / sum_identifiers_control * (1 - sum_identifiers_with_cs_control / sum_identifiers_control) / sum_identifiers_control) * 100 AS identifier_with_cs_control_error,
         1.96 * SQRT(sum_identifiers_with_cs_treatment / sum_identifiers_treatment * (1 - sum_identifiers_with_cs_treatment / sum_identifiers_treatment) / sum_identifiers_treatment) * 100 AS identifier_with_cs_treatment_error,
         -- number of vb
+        SUM(sum_vb_control) AS total_vb_control,
+        SUM(sum_vb_treatment) AS total_vb_treatment,
         AVG(CASE WHEN count_identifiers_control != 0 THEN sum_vb_control ELSE NULL END) AS vb_per_identifier_control,
         AVG(CASE WHEN count_identifiers_treatment != 0 THEN sum_vb_treatment ELSE NULL END) AS vb_per_identifier_treatment,
         1.96 * STDDEV(IF(count_identifiers_control != 0, sum_vb_control, NULL)) / SQRT(SUM(count_identifiers_control)) AS vb_per_identifier_control_error,
         1.96 * STDDEV(IF(count_identifiers_treatment != 0, sum_vb_treatment, NULL)) / SQRT(SUM(count_identifiers_treatment)) AS vb_per_identifier_treatment_error,
         -- number of vc
+        SUM(sum_vc_control) AS total_vc_control,
+        SUM(sum_vc_treatment) AS total_vc_treatment,
         AVG(CASE WHEN count_identifiers_control != 0 THEN sum_vc_control ELSE NULL END) AS vc_per_identifier_control,
         AVG(CASE WHEN count_identifiers_treatment != 0 THEN sum_vc_treatment ELSE NULL END) AS vc_per_identifier_treatment,
         1.96 * STDDEV(IF(count_identifiers_control != 0, sum_vc_control, NULL)) / SQRT(SUM(count_identifiers_control)) AS vc_per_identifier_control_error,
         1.96 * STDDEV(IF(count_identifiers_treatment != 0, sum_vc_treatment, NULL)) / SQRT(SUM(count_identifiers_treatment)) AS vc_per_identifier_treatment_error,
         -- number of vcf
+        SUM(sum_vcf_control) AS total_vcf_control,
+        SUM(sum_vcf_treatment) AS total_vcf_treatment,
         AVG(CASE WHEN count_identifiers_control != 0 THEN sum_vcf_control ELSE NULL END) AS vcf_per_identifier_control,
         AVG(CASE WHEN count_identifiers_treatment != 0 THEN sum_vcf_treatment ELSE NULL END) AS vcf_per_identifier_treatment,
         1.96 * STDDEV(IF(count_identifiers_control != 0, sum_vcf_control, NULL)) / SQRT(SUM(count_identifiers_control)) AS vcf_per_identifier_control_error,
         1.96 * STDDEV(IF(count_identifiers_treatment != 0, sum_vcf_treatment, NULL)) / SQRT(SUM(count_identifiers_treatment)) AS vcf_per_identifier_treatment_error,
         -- number of vcc
+        SUM(sum_vcc_control) AS total_vcc_control,
+        SUM(sum_vcc_treatment) AS total_vcc_treatment,
         AVG(CASE WHEN count_identifiers_control != 0 THEN sum_vcc_control ELSE NULL END) AS vcc_per_identifier_control,
         AVG(CASE WHEN count_identifiers_treatment != 0 THEN sum_vcc_treatment ELSE NULL END) AS vcc_per_identifier_treatment,
         1.96 * STDDEV(IF(count_identifiers_control != 0, sum_vcc_control, NULL)) / SQRT(SUM(count_identifiers_control)) AS vcc_per_identifier_control_error,
         1.96 * STDDEV(IF(count_identifiers_treatment != 0, sum_vcc_treatment, NULL)) / SQRT(SUM(count_identifiers_treatment)) AS vcc_per_identifier_treatment_error,
         -- number of vu
+        SUM(sum_vu_control) AS total_vu_control,
+        SUM(sum_vu_treatment) AS total_vu_treatment,
         AVG(CASE WHEN count_identifiers_control != 0 THEN sum_vu_control ELSE NULL END) AS vu_per_identifier_control,
         AVG(CASE WHEN count_identifiers_treatment != 0 THEN sum_vu_treatment ELSE NULL END) AS vu_per_identifier_treatment,
         1.96 * STDDEV(IF(count_identifiers_control != 0, sum_vu_control, NULL)) / SQRT(SUM(count_identifiers_control)) AS vu_per_identifier_control_error,
         1.96 * STDDEV(IF(count_identifiers_treatment != 0, sum_vu_treatment, NULL)) / SQRT(SUM(count_identifiers_treatment)) AS vu_per_identifier_treatment_error,
         -- number of os
+        SUM(sum_os_control) AS total_os_control,
+        SUM(sum_os_treatment) AS total_os_treatment,
         AVG(CASE WHEN count_identifiers_control != 0 THEN sum_os_control ELSE NULL END) AS os_per_identifier_control,
         AVG(CASE WHEN count_identifiers_treatment != 0 THEN sum_os_treatment ELSE NULL END) AS os_per_identifier_treatment,
         1.96 * STDDEV(IF(count_identifiers_control != 0, sum_os_control, NULL)) / SQRT(SUM(count_identifiers_control)) AS os_per_identifier_control_error,
         1.96 * STDDEV(IF(count_identifiers_treatment != 0, sum_os_treatment, NULL)) / SQRT(SUM(count_identifiers_treatment)) AS os_per_identifier_treatment_error,
         -- number of oa
+        SUM(sum_oa_control) AS total_oa_control,
+        SUM(sum_oa_treatment) AS total_oa_treatment,
         AVG(CASE WHEN count_identifiers_control != 0 THEN sum_oa_control ELSE NULL END) AS oa_per_identifier_control,
         AVG(CASE WHEN count_identifiers_treatment != 0 THEN sum_oa_treatment ELSE NULL END) AS oa_per_identifier_treatment,
         1.96 * STDDEV(IF(count_identifiers_control != 0, sum_oa_control, NULL)) / SQRT(SUM(count_identifiers_control)) AS oa_per_identifier_control_error,
         1.96 * STDDEV(IF(count_identifiers_treatment != 0, sum_oa_treatment, NULL)) / SQRT(SUM(count_identifiers_treatment)) AS oa_per_identifier_treatment_error,
         -- number of cs
+        SUM(sum_cs_control) AS total_cs_control,
+        SUM(sum_cs_treatment) AS total_cs_treatment,
         AVG(CASE WHEN count_identifiers_control != 0 THEN sum_cs_control ELSE NULL END) AS cs_per_identifier_control,
         AVG(CASE WHEN count_identifiers_treatment != 0 THEN sum_cs_treatment ELSE NULL END) AS cs_per_identifier_treatment,
         1.96 * STDDEV(IF(count_identifiers_control != 0, sum_cs_control, NULL)) / SQRT(SUM(count_identifiers_control)) AS cs_per_identifier_control_error,
@@ -192,7 +208,7 @@ FROM
     visit_by_identifier AS vbi
 LATERAL VIEW
     STACK(
-        25, -- Number of metrics
+        33, -- Number of metrics
 
         'number_identifiers', CAST(vbi.sum_identifiers_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vbi.sum_identifiers_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
 
@@ -227,6 +243,22 @@ LATERAL VIEW
         'identifiers_with_oa', vbi.porc_identifier_with_oa_control, vbi.identifier_with_oa_control_error, vbi.porc_identifier_with_oa_treatment, vbi.identifier_with_oa_treatment_error,
 
         'identifiers_with_cs', vbi.porc_identifier_with_cs_control, vbi.identifier_with_cs_control_error, vbi.porc_identifier_with_cs_treatment, vbi.identifier_with_cs_treatment_error,
+
+        'number_vb_since_allocation', CAST(vbi.total_vb_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vbi.total_vb_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+
+        'number_vc_since_allocation', CAST(vbi.total_vc_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vbi.total_vc_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+
+        'number_vcf_since_allocation', CAST(vbi.total_vcf_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vbi.total_vcf_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+
+        'number_vcc_since_allocation', CAST(vbi.total_vcc_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vbi.total_vcc_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+
+        'number_vu_since_allocation', CAST(vbi.total_vu_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vbi.total_vu_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+
+        'number_os_since_allocation', CAST(vbi.total_os_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vbi.total_os_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+
+        'number_oa_since_allocation', CAST(vbi.total_oa_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vbi.total_oa_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+
+        'number_cs_since_allocation', CAST(vbi.total_cs_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vbi.total_cs_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
 
         'vb_per_identifier', vbi.vb_per_identifier_control, vbi.vb_per_identifier_control_error, vbi.vb_per_identifier_treatment, vbi.vb_per_identifier_treatment_error,
 

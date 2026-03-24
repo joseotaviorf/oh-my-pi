@@ -84,8 +84,10 @@ FROM
     visit_metrics AS vm
 LATERAL VIEW
     STACK(
-        15, -- Number of metrics
+        16, -- Number of metrics
 
+        'number_vb', CAST(vm.sum_vb_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vm.sum_vb_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
+        
         'number_vc', CAST(vm.sum_vc_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vm.sum_vc_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
 
         'number_vcf', CAST(vm.sum_vcf_control AS DOUBLE), CAST(NULL AS DOUBLE), CAST(vm.sum_vcf_treatment AS DOUBLE), CAST(NULL AS DOUBLE),
