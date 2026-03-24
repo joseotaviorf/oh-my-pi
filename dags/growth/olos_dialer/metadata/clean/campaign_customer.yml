@@ -2,14 +2,26 @@
 database_name: datalake_olos_dialer_clean
 table_name: campaign_customer
 owner: ana.araujo@quintoandar.com.br
-domain: growth
-description:
+domain: Growth
+description: Contains information about campaign customer in the olos dialer system.
 columns:
   id_campaign:
-    description:
+    description: Unique identifier of the campaign.
     lineage:
       - datalake_olos_dialer_raw.campaigncustomer.campaignid
   id_customer:
-    description:
+    description: Unique identifier of the customer.
     lineage:
       - datalake_olos_dialer_raw.campaigncustomer.customerid
+  year:
+    description: Partition column for the year of the record.
+    lineage:
+      - datalake_olos_dialer_raw.campaigncustomer.year
+  month:
+    description: Partition column for the month of the record.
+    lineage:
+      - datalake_olos_dialer_raw.campaigncustomer.month
+  day:
+    description: Partition column for the day of the record.
+    lineage:
+      - datalake_olos_dialer_raw.campaigncustomer.day

@@ -11,4 +11,4 @@ SELECT
 FROM
     datalake_olos_dialer_raw.LoginRawData
 WHERE
-    DATE(CONCAT(year,'-',month,'-',day)) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

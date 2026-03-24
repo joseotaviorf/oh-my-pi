@@ -2,26 +2,38 @@
 database_name: datalake_olos_dialer_clean
 table_name: disposition_plan
 owner: ana.araujo@quintoandar.com.br
-domain: growth
-description:
+domain: Growth
+description: Contains information about disposition plan in the olos dialer system.
 columns:
   id_disposition_plan:
-    description:
+    description: Unique identifier of the disposition plan.
     lineage:
       - datalake_olos_dialer_raw.dispositionplan.dispositionplanid
   id_last_modified_user:
-    description:
+    description: Unique identifier of the last modified user.
     lineage:
       - datalake_olos_dialer_raw.dispositionplan.lastmodifieduserid
   description:
-    description:
+    description: Textual description of the disposition plan.
     lineage:
       - datalake_olos_dialer_raw.dispositionplan.description
   is_activated:
-    description:
+    description: Is activated information.
     lineage:
       - datalake_olos_dialer_raw.dispositionplan.activated
   ts_last_modified:
-    description:
+    description: Timestamp when the record was last modified.
     lineage:
       - datalake_olos_dialer_raw.dispositionplan.lastmodified
+  year:
+    description: Partition column for the year of the record.
+    lineage:
+      - datalake_olos_dialer_raw.dispositionplan.year
+  month:
+    description: Partition column for the month of the record.
+    lineage:
+      - datalake_olos_dialer_raw.dispositionplan.month
+  day:
+    description: Partition column for the day of the record.
+    lineage:
+      - datalake_olos_dialer_raw.dispositionplan.day

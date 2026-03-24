@@ -2,74 +2,86 @@
 database_name: datalake_olos_dialer_clean
 table_name: attempts_raw_data
 owner: ana.araujo@quintoandar.com.br
-domain: growth
-description:
+domain: Growth
+description: Contains information about attempts raw data in the olos dialer system.
 columns:
   id_agent:
-    description:
+    description: Unique identifier of the agent.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.agentid
   id_attempts_raw_data:
-    description:
+    description: Unique identifier of the attempts raw data.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.attemptsrawdataid
   id_call:
-    description:
+    description: Unique identifier of the call.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.callid
   id_call_telecom:
-    description:
+    description: Unique identifier of the call telecom.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.callidtelecom
   id_campaign:
-    description:
+    description: Unique identifier of the campaign.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.campaignid
   id_lead:
-    description:
+    description: Unique identifier of the lead.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.customerid
   id_disposition:
-    description:
+    description: Unique identifier of the disposition.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.dispositionid
   id_mailing_phone_number:
-    description:
+    description: Unique identifier of the mailing phone number.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.mailingphonenumberid
   id_mailing_record:
-    description:
+    description: Unique identifier of the mailing record.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.mailingrecordid
   id_phone_type:
-    description:
+    description: Unique identifier of the phone type.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.phonetypeid
   dnis:
-    description:
+    description: Dnis information.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.dnis
   original_phone_number:
-    description:
+    description: Contact phone number associated with the record.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.originalphonenumber
   route:
-    description:
+    description: Route information.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.route
   table_name:
-    description:
+    description: Name of the source table.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.tablename
   ts_started:
-    description:
+    description: Timestamp when the record was started.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.startdate
   ts_call_ended:
-    description:
+    description: Timestamp when the record was call ended.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.endcall
   ts_wrap_ended:
-    description:
+    description: Timestamp when the record was wrap ended.
     lineage:
       - datalake_olos_dialer_raw.attemptsrawdata.endwrap
+  year:
+    description: Partition column for the year of the record.
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.year
+  month:
+    description: Partition column for the month of the record.
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.month
+  day:
+    description: Partition column for the day of the record.
+    lineage:
+      - datalake_olos_dialer_raw.attemptsrawdata.day

@@ -2,22 +2,34 @@
 database_name: datalake_olos_dialer_clean
 table_name: config_reasons
 owner: ana.araujo@quintoandar.com.br
-domain: growth
-description:
+domain: Growth
+description: Contains information about config reasons in the olos dialer system.
 columns:
   id_campaign:
-    description:
+    description: Unique identifier of the campaign.
     lineage:
       - datalake_olos_dialer_raw.configreasons.campaignid
   id_reason:
-    description:
+    description: Unique identifier of the reason.
     lineage:
       - datalake_olos_dialer_raw.configreasons.reasonid
   id_reason_type:
-    description:
+    description: Unique identifier of the reason type.
     lineage:
       - datalake_olos_dialer_raw.configreasons.reasontypeid
   description:
-    description:
+    description: Textual description of the config reasons.
     lineage:
       - datalake_olos_dialer_raw.configreasons.description
+  year:
+    description: Partition column for the year of the record.
+    lineage:
+      - datalake_olos_dialer_raw.configreasons.year
+  month:
+    description: Partition column for the month of the record.
+    lineage:
+      - datalake_olos_dialer_raw.configreasons.month
+  day:
+    description: Partition column for the day of the record.
+    lineage:
+      - datalake_olos_dialer_raw.configreasons.day

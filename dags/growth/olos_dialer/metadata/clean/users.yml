@@ -2,58 +2,70 @@
 database_name: datalake_olos_dialer_clean
 table_name: users
 owner: ana.araujo@quintoandar.com.br
-domain: growth
-description:
+domain: Growth
+description: Contains information about users in the olos dialer system.
 columns:
   id_user:
-    description:
+    description: Unique identifier of the user.
     lineage:
       - datalake_olos_dialer_raw.users.userid
   id_agent:
-    description:
+    description: Unique identifier of the agent.
     lineage:
       - datalake_olos_dialer_raw.users.agentid
   id_user_permission:
-    description:
+    description: Unique identifier of the user permission.
     lineage:
       - datalake_olos_dialer_raw.users.userpermissionid
   user_name:
-    description:
+    description: User name information.
     lineage:
       - datalake_olos_dialer_raw.users.username
   email:
-    description:
+    description: Email information.
     lineage:
       - datalake_olos_dialer_raw.users.email
   login:
-    description:
+    description: Login information.
     lineage:
       - datalake_olos_dialer_raw.users.login
   agent_profile:
-    description:
+    description: Agent profile information.
     lineage:
       - datalake_olos_dialer_raw.users.permissiondesc
   is_activated:
-    description:
+    description: Is activated information.
     lineage:
       - datalake_olos_dialer_raw.users.activated
   is_enable_personal_transfer:
-    description:
+    description: Is enable personal transfer information.
     lineage:
       - datalake_olos_dialer_raw.users.enablepersonaltransfer
   is_agent:
-    description:
+    description: Is agent information.
     lineage:
       - datalake_olos_dialer_raw.users.flag_agent
   is_manager:
-    description:
+    description: Is manager information.
     lineage:
       - datalake_olos_dialer_raw.users.flag_manager
   is_supervisor:
-    description:
+    description: Is supervisor information.
     lineage:
       - datalake_olos_dialer_raw.users.flag_supervisor
   ts_last_login:
-    description:
+    description: Timestamp when the record was last login.
     lineage:
       - datalake_olos_dialer_raw.users.lastlogin
+  year:
+    description: Partition column for the year of the record.
+    lineage:
+      - datalake_olos_dialer_raw.users.year
+  month:
+    description: Partition column for the month of the record.
+    lineage:
+      - datalake_olos_dialer_raw.users.month
+  day:
+    description: Partition column for the day of the record.
+    lineage:
+      - datalake_olos_dialer_raw.users.day
