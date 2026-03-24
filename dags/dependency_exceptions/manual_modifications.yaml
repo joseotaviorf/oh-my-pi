@@ -501,6 +501,8 @@ bietlejuice.enrich_health_metrics:
 bietlejuice.enrich_people:
   remove:
     - bietlejuice.hr_system_custom:load-clean-workers-registration:first-run-of-day
+    - bietlejuice.gsheets_people:done-clean-codex-cost-centers:first-run-of-day
+    - bietlejuice.gsheets_people:done-clean-codex-cost-informations:first-run-of-day
 bietlejuice.enrich_hr_system:
   remove:
     - bietlejuice.gsheets_people_static:load-clean-email-employee-mapping:first-run-of-day
