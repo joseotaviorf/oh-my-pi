@@ -2650,8 +2650,6 @@ bietlejuice.enrich_gsheets:
   - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2024-cohort:first-run-of-day
   - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2024:first-run-of-day
   - bietlejuice.gsheets_growth_targets:done-clean-supply-targets-2025:first-run-of-day
-bietlejuice.enrich_gsheets_people:
-  - bietlejuice.gsheets_people:done-clean-team-formation-product-tech:first-run-of-day
 bietlejuice.enrich_hefesto:
   - bietlejuice.enrich_support_users:load-enrich-analysts:first-run-of-day
   - bietlejuice.hefesto:load-clean-queue:first-run-of-day

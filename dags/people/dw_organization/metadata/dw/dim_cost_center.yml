@@ -7,7 +7,7 @@ description: |
   Cost center dimension implemented as SCD Type 2: each row is one version of a cost center, with a validity interval (dt_valid_from, dt_valid_to).
   A new version is created only when any attribute changes; consecutive periods with identical attributes are consolidated into a single row.
   The table is an integrated history of cost center data from two origins: (1) PIN (HR): organization, cost_center_code, cost_center_name, is_active,
-  and HRBPs (assignment responsibility — the business partner responsible for the cost center per period); (2) Codex (enrich_gsheets_people):
+  and HRBPs (assignment responsibility — the business partner responsible for the cost center per period); (2) Codex (gsheets_people clean):
   business, product, brand, vertical, structure, team, chapter, line, owners, headcount_type. The validity interval is the intersection of
   the cost center effective period (pin), the codex version period (codex_log), and the assignment responsibility period (pin); responsibility
   is joined by period overlap so the HRBP valid in each interval is used historically. Use is_current = TRUE for the latest version.
