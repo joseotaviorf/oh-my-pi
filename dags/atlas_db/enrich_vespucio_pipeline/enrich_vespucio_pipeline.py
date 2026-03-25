@@ -478,21 +478,44 @@ link_task = create_task(
         ],
     ),
 
-images_task = create_task(
-    entry_point="core_images_step",
-    parameters=[
-        f"--input_clustered_houses={Tables.cluster_step_houses}",
-        f"--input_extracted_houses={Tables.extract_step_houses}",
-        f"--input_kodak_photo_invalid_source={Tables.kodak_photo_invalid_source}",
-        f"--input_kodak_photo={Tables.kodak_photo}",
-        "--overwrite_schema",
-        f"--output_images_houses={Tables.images_step_houses}",
-        f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
-        f"--kodak_photo_sns_arn={config_service.get_config('kodak_photo_sns_arn')}",
-        "--kodak_photo_sns_region=us-east-1",
-        "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
-    ],
-)
+images_tasks = [
+    create_task(
+        entry_point="core_images_step",
+        parameters=[
+            f"--input_clustered_houses={Tables.cluster_step_houses}",
+            f"--input_extracted_houses={Tables.extract_step_houses}",
+            f"--input_kodak_photo={Tables.kodak_photo}",
+            "--overwrite_schema",
+            f"--output_images_houses={Tables.images_step_houses}",
+            "--thumbor_photo_url=https://www.quintoandar.com.br/img/v2",
+        ],
+    ),
+    create_task(
+        entry_point="core_images_upsert_io_step",
+        parameters=[
+            f"--input_kodak_photo={Tables.kodak_photo}",
+            f"--input_clustered_houses={Tables.cluster_step_houses}",
+            f"--input_extracted_houses={Tables.extract_step_houses}",
+            f"--input_kodak_photo_invalid_source={Tables.kodak_photo_invalid_source}",
+            "--overwrite_schema",
+            f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
+            f"--kodak_photo_sns_arn={config_service.get_config('kodak_photo_sns_arn')}",
+            "--kodak_photo_sns_region=us-east-1",
+        ],
+    ),
+    create_task(
+        entry_point="core_images_delete_io_step",
+        parameters=[
+            f"--input_kodak_photo={Tables.kodak_photo}",
+            f"--input_clustered_houses={Tables.cluster_step_houses}",
+            f"--input_extracted_houses={Tables.extract_step_houses}",
+            "--overwrite_schema",
+            f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
+            f"--kodak_photo_sns_arn={config_service.get_config('kodak_photo_sns_arn')}",
+            "--kodak_photo_sns_region=us-east-1",
+        ],
+    )
+]
 
 join_and_predict_task = [
     create_task(
@@ -732,17 +755,17 @@ chain(*address_tasks)
 address_tasks[-1] >> extract_step_task
 address_tasks[-1] >> cluster_task
 
-cluster_task >> images_task
+cluster_task >> images_tasks
 cluster_task >> link_task
 cluster_task >> source_predict_task
 cluster_task >> prioritize_step_task
 extract_step_task >> prioritize_step_task
-extract_step_task >> images_task
+extract_step_task >> images_tasks
 
 
 prioritize_step_task >> join_and_predict_task[0]
 link_task >> join_and_predict_task[0]
-images_task >> join_and_predict_task[0]
+images_tasks[0] >> join_and_predict_task[0]
 chain(*join_and_predict_task)
 
 source_predict_task >> join_and_predict_task[1]
