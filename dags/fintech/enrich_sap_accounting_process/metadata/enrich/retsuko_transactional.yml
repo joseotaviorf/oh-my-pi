@@ -4,7 +4,7 @@ owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
 description:
   Table to track transactional accounting processes, following the invoices' route between source (SeuBarriga/Retsuko) and SAP, considering sap gateway payload system.
-  It applies business rules for IPO to assess completeness, correctness (up to R$0.05 deviation), and temporality (within 3 days).
+  It applies business rules for IPO to assess completeness, correctness (up to R$0.05 deviation), and temporality (same calendar month as the source trigger, or the next month with at most three Brazilian business days between trigger and SAP reference dates).
   The final output includes a status classification and failure reason to support monitoring and root-cause analysis for transactional entries.
 columns:
   id_accounting_process:
@@ -64,9 +64,10 @@ columns:
     lineage:
       - datalake_sap_accounting_process.retsuko_transactional.is_correctness
   is_temporality:
-    description: TRUE if the SAP date is within 3 days after the source date.
+    description: TRUE if dt_sap_reference and dt_source_trigger are in the same calendar month, or if dt_sap_reference is in the month immediately after dt_source_trigger and there are at most three Brazilian business days (datalake_quintoandar.aux_date) between the two dates, inclusive. FALSE if either date is NULL or neither rule applies.
     lineage:
-      - datalake_sap_accounting_process.retsuko_transactional.is_temporality
+      - datalake_accounting_funnel.ledger.dt_reference
+      - datalake_quintoandar.aux_date.is_brz_business_day
   is_compliance:
     description: TRUE if completeness, correctness, and temporality checks are all TRUE.
     lineage:

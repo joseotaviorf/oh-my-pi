@@ -1,4 +1,13 @@
-WITH invoice AS (
+WITH aux_business_days AS (
+  SELECT
+    date
+  FROM
+    datalake_quintoandar.aux_date
+  WHERE
+    is_brz_business_day = TRUE
+),
+
+invoice AS (
   SELECT
     i.id,
     i.id_contract,
@@ -258,7 +267,23 @@ assertions_base AS (
     dt_sap_reference,
     dt_sap_created,
     IF((ABS(source_amount) - ABS(sap_amount)) >= 0.05 OR (ABS(source_amount) - ABS(sap_amount)) <= -0.05 OR sap_amount IS NULL, FALSE, TRUE) AS is_correctness,
-    IF(dt_sap_reference BETWEEN dt_source_trigger AND DATE_ADD(dt_source_trigger, 3), TRUE, FALSE) AS is_temporality
+    CASE
+      WHEN dt_sap_reference IS NULL OR dt_source_trigger IS NULL THEN FALSE
+      WHEN TRUNC(CAST(dt_source_trigger AS DATE), 'MM') = TRUNC(CAST(dt_sap_reference AS DATE), 'MM') THEN TRUE
+      WHEN
+        TRUNC(CAST(dt_sap_reference AS DATE), 'MM') = ADD_MONTHS(TRUNC(CAST(dt_source_trigger AS DATE), 'MM'), 1)
+        AND (
+          SELECT
+            COUNT(*)
+          FROM
+            aux_business_days ad
+          WHERE
+            ad.date >= LEAST(CAST(dt_source_trigger AS DATE), CAST(dt_sap_reference AS DATE))
+            AND ad.date <= GREATEST(CAST(dt_source_trigger AS DATE), CAST(dt_sap_reference AS DATE))
+        ) <= 3
+      THEN TRUE
+      ELSE FALSE
+    END AS is_temporality
   FROM 
     errors_base
 )

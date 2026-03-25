@@ -5,7 +5,7 @@ domain: Fintech
 description:
   Table to track transactional accounting processes for selected Retsuko bill items between contract, tenant, and landlord accounts,
   reconciled to SAP ledger account 700004. Same structure and logic as retsuko_transactional, source (SeuBarriga/Retsuko) to SAP via sap gateway,
-  with completeness, correctness (up to R$0.05 deviation), and temporality (within 3 days) for monitoring and root-cause analysis.
+  with completeness, correctness (up to R$0.05 deviation), and temporality (same calendar month as the source trigger, or the next month with at most three Brazilian business days between trigger and SAP reference dates) for monitoring and root-cause analysis.
 columns:
   id_accounting_process:
     description: Unique key for each record on this table, includes row number for deduplication
@@ -64,9 +64,10 @@ columns:
     lineage:
       - datalake_sap_accounting_process.retsuko_transactional_third_parties.is_correctness
   is_temporality:
-    description: TRUE if the SAP date is within 3 days after the source date.
+    description: TRUE if dt_sap_reference and dt_source_trigger are in the same calendar month, or if dt_sap_reference is in the month immediately after dt_source_trigger and there are at most three Brazilian business days (datalake_quintoandar.aux_date) between the two dates, inclusive. FALSE if either date is NULL or neither rule applies.
     lineage:
-      - datalake_sap_accounting_process.retsuko_transactional_third_parties.is_temporality
+      - datalake_accounting_funnel.ledger.dt_reference
+      - datalake_quintoandar.aux_date.is_brz_business_day
   is_compliance:
     description: TRUE if completeness, correctness, and temporality checks are all TRUE.
     lineage:
