@@ -1,3 +1,4 @@
+import copy
 import logging
 
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow import (
@@ -30,20 +31,24 @@ class WonkaWorkflow(BaseWorkflow):
 
         self.dag_id = f"quintoml.wonka.{self.dag_name.replace('-', '_')}"
 
-        # We need to update the cluster configs with values that come from the DAG declaration file.
-        wonka_cluster_config = self.config_service._configs[
+        # Merge prod `wonka_cluster` preset with the DAG declaration `cluster:` block into
+        # `self.cluster_args` (non-mutating; does not alter ConfigurationService caches).
+        wonka_cluster_preset = self.config_service.get_config(
             self._WONKA_CLUSTER_CONFIG_KEY
-        ]
-
-        self._deep_update(wonka_cluster_config, self.cluster_args)
+        )
+        self.cluster_args = self._get_deep_updated_dict(
+            wonka_cluster_preset, self.cluster_args
+        )
 
         # Merge custom_configurations.spark_conf into top-level spark_conf so the
         # Databricks Jobs API receives all spark configs (it only uses top-level spark_conf).
-        custom_spark_conf = wonka_cluster_config.get("custom_configurations", {}).get(
+        custom_spark_conf = self.cluster_args.get("custom_configurations", {}).get(
             "spark_conf"
         )
         if custom_spark_conf and isinstance(custom_spark_conf, dict):
-            self._deep_update(wonka_cluster_config, {"spark_conf": custom_spark_conf})
+            self.cluster_args = self._get_deep_updated_dict(
+                self.cluster_args, {"spark_conf": custom_spark_conf}
+            )
 
     def build_dag(self):
         dag = super().dag_instance()
@@ -64,23 +69,33 @@ class WonkaWorkflow(BaseWorkflow):
         return dag
 
     @staticmethod
-    def _deep_update(base_dict, update_dict):
+    def _get_deep_updated_dict(old_values, new_values):
         """
-        Recursively update a dictionary with another dictionary.
+        Return a new dict: deep merge of ``old_values`` with ``new_values`` (new wins on
+        conflicts). Dict values are merged recursively; lists and scalars are replaced.
 
-        Args:
-            base_dict: The dictionary to update (modified in place)
-            update_dict: The dictionary with values to merge in
+        Neither ``old_values`` nor ``new_values`` is modified.
         """
-        for key, value in update_dict.items():
+        if new_values is None:
+            new_values = {}
+        if not isinstance(new_values, dict):
+            raise TypeError("new_values must be a dict or None")
+        if old_values is None:
+            old_values = {}
+        if not isinstance(old_values, dict):
+            raise TypeError("old_values must be a dict or None")
+
+        result = copy.deepcopy(old_values)
+        for key, value in new_values.items():
             if (
-                key in base_dict
-                and isinstance(base_dict[key], dict)
+                key in result
+                and isinstance(result[key], dict)
                 and isinstance(value, dict)
             ):
-                WonkaWorkflow._deep_update(base_dict[key], value)
+                result[key] = WonkaWorkflow._get_deep_updated_dict(result[key], value)
             else:
-                base_dict[key] = value
+                result[key] = copy.deepcopy(value)
+        return result
 
     def _get_dag_documentation(self):
         # The original _get_dag_documentation method couples orchestration abstraction
