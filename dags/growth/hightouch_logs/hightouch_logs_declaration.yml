@@ -10,10 +10,6 @@ workflow:
   layer: raw
   load_spark_job: load_hightouch_logs_raw
   custom_schema: hightouch_logs
-  # sync_snapshot clean SQL joins clean sync_runs; ensure sync_runs loads first.
-  clean_inner_dependencies:
-    sync_snapshot_trino:
-      - sync_runs_trino
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
@@ -68,7 +64,6 @@ workflow:
       extraction_type: incremental
       partitions: [year, month, day]
     audience_membership_trino:
-      # Clean layer has id_audience / id_row only (no sync_id in this source).
       clean_z_order_by: [id_audience]
       load_spark_job: load_hightouch_logs
       extra_spark_job_arguments:
@@ -85,8 +80,6 @@ workflow:
         - "parquet"
       extraction_type: incremental
       partitions: [year, month, day]
-    # sync_snapshot has no row-level event time in Hightouch; raw load is full parquet read.
-    # Clean layer is incremental: rows for sync_ids whose sync run started in the load window.
     sync_snapshot_trino:
       clean_z_order_by: [id_sync]
       load_spark_job: load_hightouch_sync_snapshot

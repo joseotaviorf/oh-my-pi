@@ -16,3 +16,9 @@ columns:
     description: Error description when status is failed
   fields:
     description: JSON payload of model fields for the row as written by Hightouch warehouse sync logs
+  year:
+    description: Partition year derived from the export path date (YYYYMMDD segment)
+  month:
+    description: Partition month derived from the export path date
+  day:
+    description: Partition day derived from the export path date

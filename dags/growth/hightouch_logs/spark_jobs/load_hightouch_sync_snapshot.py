@@ -1,5 +1,11 @@
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
+from functools import reduce
+from typing import Optional
+
+import pyspark.sql.functions as F
+from pyspark.sql import DataFrame
+from pyspark.sql.utils import AnalysisException
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -13,26 +19,49 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 JOB_NAME = "Hightouch Sync Snapshot Load"
 logger = QuintoAndarLogger(JOB_NAME)
 spark_client = SparkClient()
+spark = spark_client.conn
 
 
-def _build_input_paths(base_path: str, load_start_date: str, load_end_date: str):
+def _read_snapshot_input(
+    base_path: str, load_start_date: str, load_end_date: str
+) -> Optional[DataFrame]:
+    """Reads parquet per YYYYMMDD path segment and adds year, month, day from that calendar day."""
     start = datetime.strptime(load_start_date, "%Y-%m-%d")
     end = datetime.strptime(load_end_date, "%Y-%m-%d")
 
-    paths = []
+    dfs = []
     current = start
     while current <= end:
         date_str = current.strftime("%Y%m%d")
-        paths.append(f"{base_path}/sync_id=*/{date_str}*")
+        path_glob = f"{base_path}/sync_id=*/{date_str}*"
+        try:
+            day_df = spark.read.parquet(path_glob)
+        except AnalysisException as exc:
+            logger.info(
+                "m=_read_snapshot_input, path_glob={}, msg=skipping day (no parquet): {}".format(
+                    path_glob, exc
+                )
+            )
+            current += timedelta(days=1)
+            continue
+
+        day_df = (
+            day_df.withColumn("year", F.lit(current.year))
+            .withColumn("month", F.lit(current.month))
+            .withColumn("day", F.lit(current.day))
+        )
+        dfs.append(day_df)
         current += timedelta(days=1)
 
-    return paths
+    if not dfs:
+        logger.info(
+            "m=_read_snapshot_input, load_start_date={}, load_end_date={}, msg=no parquet in range, nothing to load".format(
+                load_start_date, load_end_date
+            )
+        )
+        return None
 
-
-def _read_snapshot_input(base_path: str, load_start_date: str, load_end_date: str):
-    input_paths = _build_input_paths(base_path, load_start_date, load_end_date)
-    logger.info(f"m=_read_snapshot_input, input_paths={input_paths}, msg=reading parquet files")
-    return spark.read.parquet(*input_paths)
+    return reduce(lambda a, b: a.unionByName(b), dfs)
 
 
 def _write_to_raw(df, environment: str, source: str, datalake_bucket: str, table_name: str):
@@ -96,6 +125,10 @@ def main():
         load_start_date=args.load_start_date,
         load_end_date=args.load_end_date,
     )
+    if df is None:
+        logger.info("m=main, msg=no snapshot data in range, skipping write")
+        return
+
     _write_to_raw(
         df=df,
         environment=args.environment,

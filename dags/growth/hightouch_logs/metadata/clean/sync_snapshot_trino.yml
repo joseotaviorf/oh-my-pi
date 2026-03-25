@@ -2,7 +2,7 @@
 database_name: datalake_hightouch_logs_clean
 table_name: sync_snapshot_trino
 domain: Growth
-description: Clean Hightouch sync snapshot rows scoped to sync runs that started in the load window (joined from clean sync runs)
+description: Clean Hightouch sync snapshot rows for export days in the load window (partitions from raw, tagged at ingest from path date)
 columns:
   id_sync:
     description: Unique identifier for the sync configuration
@@ -28,23 +28,15 @@ columns:
     description: JSON string of model fields for the row from warehouse sync logs
     lineage:
       - datalake_hightouch_logs_raw.sync_snapshot_trino.fields
-  ts_started:
-    description: Timestamp when the related sync run started (from sync_runs)
-    lineage:
-      - datalake_hightouch_logs_clean.sync_runs_trino.ts_started
-  ts_finished:
-    description: Timestamp when the related sync run finished (from sync_runs)
-    lineage:
-      - datalake_hightouch_logs_clean.sync_runs_trino.ts_finished
   year:
-    description: Partition year from the related sync run
+    description: Partition year from raw (export path date)
     lineage:
-      - datalake_hightouch_logs_clean.sync_runs_trino.year
+      - datalake_hightouch_logs_raw.sync_snapshot_trino.year
   month:
-    description: Partition month from the related sync run
+    description: Partition month from raw (export path date)
     lineage:
-      - datalake_hightouch_logs_clean.sync_runs_trino.month
+      - datalake_hightouch_logs_raw.sync_snapshot_trino.month
   day:
-    description: Partition day from the related sync run
+    description: Partition day from raw (export path date)
     lineage:
-      - datalake_hightouch_logs_clean.sync_runs_trino.day
+      - datalake_hightouch_logs_raw.sync_snapshot_trino.day

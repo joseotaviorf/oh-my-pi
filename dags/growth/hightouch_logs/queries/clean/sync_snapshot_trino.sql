@@ -5,19 +5,15 @@ SELECT
     CAST(s.status AS STRING) AS status,
     CAST(s.failure_reason AS STRING) AS failure_reason,
     CAST(s.fields AS STRING) AS model_fields_json,
-    r.ts_started AS ts_started,
-    r.ts_finished AS ts_finished,
-    r.year AS year,
-    r.month AS month,
-    r.day AS day
+    s.year AS year,
+    s.month AS month,
+    s.day AS day
 FROM
     datalake_hightouch_logs_raw.sync_snapshot_trino AS s
-INNER JOIN datalake_hightouch_logs_clean.sync_runs_trino AS r
-    ON CAST(s.sync_id AS STRING) = r.id_sync
 WHERE
-    CAST(r.ts_started AS DATE) BETWEEN '{load_start_date}' AND '{load_end_date}'
+    MAKE_DATE(s.year, s.month, s.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 QUALIFY
     ROW_NUMBER() OVER (
         PARTITION BY CAST(s.sync_id AS STRING), CAST(s.row_id AS STRING)
-        ORDER BY r.ts_started DESC
+        ORDER BY MAKE_DATE(s.year, s.month, s.day) DESC, CAST(s.row_id AS STRING) DESC
     ) = 1
