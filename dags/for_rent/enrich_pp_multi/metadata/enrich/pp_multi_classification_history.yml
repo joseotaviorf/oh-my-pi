@@ -1,8 +1,7 @@
 database_name: datalake_pp_multi
 table_name: pp_multi_classification_history
 description:
-  Daily snapshot of PP Multi classification and supporting metrics per owner. It reconstructs history using
-  the full historical sources, so each partition (year, month, day) reflects the view as of that date.
+  Historical daily classification of PP Multi owners. Each partition represents a snapshot of all qualifying owners on that anchor day, with their classification (ACTIVE, POTENTIAL, LIFETIME), house portfolio statistics, visit metrics, key delivery stats, and contract information. Starting from March 2026, the ACTIVE classification is derived from the PP Multi management system (pp_multi_user) instead of the previous >= 5 ongoing houses heuristic. Historical partitions prior to this change retain the original classification criteria.
 domain: For Rent
 owner: data-for-rent@quintoandar.com.br
 columns:
@@ -12,10 +11,12 @@ columns:
       - datalake_rental_historical_follow_up.house_listings_daily_info.id_owner
   pp_multi_classification:
     description: PP Multi classification of the owner persona on the anchor day.
+    lineage:
+      - datalake_rental_management_clean.pp_multi_user.status
     categories:
-      ACTIVE: Owner has at least 5 ongoing houses on the anchor day.
-      POTENTIAL: Owner had at least 5 ongoing houses at some point in the last 2 years up to the anchor day.
-      LIFETIME: Owner had at least 5 ongoing houses historically, but not in the last 2 years up to the anchor day.
+      ACTIVE: Owner has status ACTIVE in the PP Multi system (pp_multi_user) on the anchor day.
+      POTENTIAL: Owner had at least 5 ongoing houses on the anchor day or at some point in the last 2 years, but is not ACTIVE in pp_multi_user.
+      LIFETIME: Owner had at least 5 ongoing houses historically, but does not qualify as ACTIVE or POTENTIAL.
   houses:
     description: Array of grouped house information for the ACTIVE snapshot (deduplicated by unique listing id) as of the anchor day.
   two_year_max_houses:

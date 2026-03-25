@@ -1,5 +1,14 @@
--- Early filter the owners that don't have at least 5 potential ongoing houses
-WITH owners_to_process AS (
+WITH pp_multi_owners AS (
+  SELECT
+    pmu.status AS pp_multi_user_status,
+    u.id AS id_owner
+  FROM
+    datalake_rental_management_clean.pp_multi_user AS pmu
+      INNER JOIN
+        datalake_ebdb_clean.user AS u
+        ON u.uuid_person = pmu.person_uuid
+),
+owners_to_process AS (
   SELECT
     id_owner
   FROM
@@ -8,6 +17,12 @@ WITH owners_to_process AS (
     id_owner
   HAVING
     COUNT(DISTINCT id_house) >= 5
+
+  UNION
+
+  SELECT id_owner
+  FROM pp_multi_owners
+  WHERE pp_multi_user_status = 'ACTIVE'
 ),
 daily_house_listing AS (
   SELECT
@@ -190,7 +205,8 @@ pp_multi_stats AS (
         )
       )
   WHERE
-    active_ongoing_houses >= 5
+    id_owner IN (SELECT id_owner FROM pp_multi_owners WHERE pp_multi_user_status = 'ACTIVE')
+    OR active_ongoing_houses >= 5
     OR two_year_max_ongoing_houses >= 5
     OR lifetime_max_ongoing_houses >= 5
 ),
@@ -200,23 +216,13 @@ pp_multi_houses AS (
     exploded_id_house AS id_house
   FROM
     pp_multi_stats AS pms
-    LATERAL VIEW EXPLODE(pms.active_houses) exploded_houses_table AS house_struct
-    LATERAL VIEW EXPLODE(house_struct.id_houses) exploded_ids_table AS exploded_id_house
-  UNION
-  SELECT DISTINCT
-    pms.id_owner,
-    exploded_id_house AS id_house
-  FROM
-    pp_multi_stats AS pms
-    LATERAL VIEW EXPLODE(pms.two_year_max_houses) exploded_houses_table AS house_struct
-    LATERAL VIEW EXPLODE(house_struct.id_houses) exploded_ids_table AS exploded_id_house
-  UNION
-  SELECT DISTINCT
-    pms.id_owner,
-    exploded_id_house AS id_house
-  FROM
-    pp_multi_stats AS pms
-    LATERAL VIEW EXPLODE(pms.lifetime_max_houses) exploded_houses_table AS house_struct
+    LATERAL VIEW EXPLODE(
+      CONCAT(
+        COALESCE(pms.active_houses, ARRAY()),
+        COALESCE(pms.two_year_max_houses, ARRAY()),
+        COALESCE(pms.lifetime_max_houses, ARRAY())
+      )
+    ) exploded_houses_table AS house_struct
     LATERAL VIEW EXPLODE(house_struct.id_houses) exploded_ids_table AS exploded_id_house
 ),
 pp_multi_visits AS (
@@ -306,8 +312,9 @@ SELECT
   pms.id_owner,
   ---
   CASE
-    WHEN pms.active_ongoing_houses >= 5 THEN 'ACTIVE'
-    WHEN pms.two_year_max_ongoing_houses >= 5 THEN 'POTENTIAL'
+    WHEN pmo.pp_multi_user_status = 'ACTIVE' THEN 'ACTIVE'
+    WHEN pms.active_ongoing_houses >= 5
+      OR pms.two_year_max_ongoing_houses >= 5 THEN 'POTENTIAL'
     ELSE 'LIFETIME'
   END AS pp_multi_classification,
   ---
@@ -354,6 +361,9 @@ SELECT
   EXTRACT(DAY FROM DATE('{load_start_date}')) AS day
 FROM
   pp_multi_stats AS pms
+LEFT JOIN
+  pp_multi_owners AS pmo
+    ON pmo.id_owner = pms.id_owner
 LEFT JOIN
   possible_fraud AS pf
     ON pf.id_owner = pms.id_owner
