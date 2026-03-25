@@ -1,8 +1,8 @@
 database_name: datalake_amplitude_clean
-table_name: 417002_datahub_search_results_view_events
+table_name: 417002_datahub_search_filters_show_more_events
 owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: This table contains the 'Search Results View' events from DataHub (Amplitude App ID 417002). It is triggered when the search results page is loaded/rendered for the user.
+description: This table contains the 'Search Filters Show More' events from DataHub (Amplitude App ID 417002). It is triggered when a user clicks "Show More" in the search filter panel. Supplements the search funnel tracking.
 columns:
   id_amplitude:
     description: Amplitude user identifier
@@ -40,32 +40,12 @@ columns:
     description: Event name
     lineage:
     - datalake_amplitude_clean.events.event_type
-  search_query:
-    description: The keyword used that generated these results.
-    lineage:
-    - datalake_amplitude_clean.events.event_properties 
-  results_total:
-    description: The total count of entities found for the query.
+  active_filter_count:
+    description: The number of currently active filters when "Show More" was clicked.
     lineage:
     - datalake_amplitude_clean.events.event_properties
-  filter_count:
-    description: The number of active filters applied to the search.
-    lineage:
-    - datalake_amplitude_clean.events.event_properties
-  filter_mode:
-    description: The filter mode used in the search (e.g., AND/OR logic).
-    lineage:
-    - datalake_amplitude_clean.events.event_properties
-  search_version:
-    description: The version of the search backend or algorithm used.
-    lineage:
-    - datalake_amplitude_clean.events.event_properties
-  entity_types:
-    description: The entity types included in the search results (JSON array).
-    lineage:
-    - datalake_amplitude_clean.events.event_properties
-  filter_fields:
-    description: The filter fields applied to the search (JSON array).
+  hidden_filter_count:
+    description: The number of hidden filters that were revealed by clicking "Show More".
     lineage:
     - datalake_amplitude_clean.events.event_properties
   ts_event:

@@ -1,8 +1,8 @@
 database_name: datalake_amplitude_clean
-table_name: 417002_datahub_search_results_view_events
+table_name: 417002_datahub_browse_v2_select_node_events
 owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
-description: This table contains the 'Search Results View' events from DataHub (Amplitude App ID 417002). It is triggered when the search results page is loaded/rendered for the user.
+description: This table contains the 'Browse V2 Select Node' events from DataHub (Amplitude App ID 417002). It is triggered when a user selects or deselects a node in the V2 browse sidebar, replacing the legacy browse experience.
 columns:
   id_amplitude:
     description: Amplitude user identifier
@@ -40,32 +40,28 @@ columns:
     description: Event name
     lineage:
     - datalake_amplitude_clean.events.event_type
-  search_query:
-    description: The keyword used that generated these results.
-    lineage:
-    - datalake_amplitude_clean.events.event_properties 
-  results_total:
-    description: The total count of entities found for the query.
+  target_node:
+    description: The type of node targeted in the browse sidebar (e.g., browse or platform).
     lineage:
     - datalake_amplitude_clean.events.event_properties
-  filter_count:
-    description: The number of active filters applied to the search.
+  browse_action:
+    description: The action performed on the node (select or deselect).
     lineage:
     - datalake_amplitude_clean.events.event_properties
-  filter_mode:
-    description: The filter mode used in the search (e.g., AND/OR logic).
+  entity:
+    description: The entity associated with the browse node.
     lineage:
     - datalake_amplitude_clean.events.event_properties
-  search_version:
-    description: The version of the search backend or algorithm used.
+  environment:
+    description: The environment context of the browse action.
     lineage:
     - datalake_amplitude_clean.events.event_properties
-  entity_types:
-    description: The entity types included in the search results (JSON array).
+  platform:
+    description: The platform associated with the browse node.
     lineage:
     - datalake_amplitude_clean.events.event_properties
-  filter_fields:
-    description: The filter fields applied to the search (JSON array).
+  target_depth:
+    description: The depth level of the target node in the browse tree hierarchy.
     lineage:
     - datalake_amplitude_clean.events.event_properties
   ts_event:

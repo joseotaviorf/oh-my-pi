@@ -59,7 +59,11 @@ columns:
   results_total:
     description: The total number of results found for that query. Helps distinguish broad searches (thousands of results) vs. specific searches.
     lineage:
-    - datalake_amplitude_clean.events.event_properties                       
+    - datalake_amplitude_clean.events.event_properties
+  search_page_number:
+    description: The page number of the search results where the click occurred.
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
   ts_event:
     description: Timestamp when the event was triggered
     lineage:

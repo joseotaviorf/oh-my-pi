@@ -51,7 +51,15 @@ columns:
   option_type:
     description: The category of the autocomplete suggestion selected. Usually matches the entity type, but helps distinguish between entity suggestions vs. query suggestions.
     lineage:
-    - datalake_amplitude_clean.events.event_properties                                  
+    - datalake_amplitude_clean.events.event_properties
+  api_variant:
+    description: The API variant used for the autocomplete request (e.g., to distinguish between different search backends).
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+  show_search_bar_autocomplete_redesign:
+    description: Feature flag indicating whether the user was shown the redesigned search bar autocomplete experience.
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
   ts_event:
     description: Timestamp when the event was triggered
     lineage:
