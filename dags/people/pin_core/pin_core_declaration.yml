@@ -35,6 +35,9 @@ workflow:
   type: custom_ingestion
   bucket_config_name: people_bucket
   has_hive_sync: false
+  spark_session_configs:
+    udfs:
+      - SF_FORMAT_PROPER_NOUN
   load_spark_job: load_pin_core_raw
   default_extraction_type: full
   spark_job_arguments:

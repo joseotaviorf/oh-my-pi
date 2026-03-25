@@ -30,7 +30,7 @@ SELECT
   asg_information_category AS assignment_information_category,
   employee_category,
   employment_category,
-  UPPER(assignment_name) AS assignment_name,
+  SF_FORMAT_PROPER_NOUN(assignment_name) AS assignment_name,
   created_by,
   last_updated_by AS updated_by,
   record_creator,

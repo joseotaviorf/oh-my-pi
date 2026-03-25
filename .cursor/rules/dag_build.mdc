@@ -671,9 +671,10 @@ Registers pre-defined Spark UDFs that can be called directly in SQL query files.
 workflow:
   spark_session_configs:
     udfs:
-      - SF_NORMALIZE_STRING        # available values from UDFEnum
+      - SF_NORMALIZE_STRING          # available values from UDFEnum
       - SF_REMOVE_ACCENTUATION
       - SF_ALPHANUMERIC_SNAKE_CASE
+      - SF_FORMAT_PROPER_NOUN         # clean-layer proper nouns: person names, job titles (PT/ES/US/EU particles + unaccent)
       - FINTECHOPS_WORK_MIN_SLA
       - FINTECH_COLLECTIONS_RENEGOTIATION
       - GET_PROFILING_DATA_QUALITY

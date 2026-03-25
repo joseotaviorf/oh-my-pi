@@ -4,6 +4,7 @@ owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
   Stores core and legislation-specific name components for individuals, including names in different character sets. Tracks changes over time with date effectivity.
+  Text name fields in clean are standardized for consistent reading and reporting across regions (Latin America, Portugal, United States): plain Latin letters, natural word capitalization, and short connecting words (articles and prepositions) in lowercase when they sit between other words.
 columns:
   id_business_group:
     description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
@@ -30,27 +31,27 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_person_names_f.last_updated_by
   display_name:
-    description: Formatted name for on-screen display, typically starting with the first name. Formatting may vary by legal code.
+    description: Formatted name for on-screen display, typically starting with the first name. In clean, accents are converted to plain Latin letters, each word is shown with a leading capital letter, and short connecting words (for example de, da, do, van, y) stay lowercase when they appear between other words.
     lineage:
     - datalake_pin_core_raw.per_person_names_f.display_name
   first_name:
-    description: The person's given name.
+    description: The person's given name. In clean, same text standardization as other name fields—plain Latin letters, natural capitalization, and short connecting words lowercase in the middle of the name.
     lineage:
     - datalake_pin_core_raw.per_person_names_f.first_name
   full_name:
-    description: System-constructed full name, suitable for formal use.
+    description: System-constructed full name, suitable for formal use. In clean, same text standardization as other name fields—plain Latin letters, natural capitalization, and short connecting words lowercase in the middle of the name.
     lineage:
     - datalake_pin_core_raw.per_person_names_f.full_name
   last_name:
-    description: The person's surname or family name.
+    description: The person's surname or family name. In clean, same text standardization as other name fields—plain Latin letters, natural capitalization, and short connecting words lowercase in the middle of the name.
     lineage:
     - datalake_pin_core_raw.per_person_names_f.last_name
   list_name:
-    description: Formatted name for alphabetical lists, often starting with the last name. Formatting may vary by legal code.
+    description: Formatted name for alphabetical lists, often starting with the last name. In clean, same text standardization as other name fields—plain Latin letters, natural capitalization, and short connecting words lowercase in the middle of the name.
     lineage:
     - datalake_pin_core_raw.per_person_names_f.list_name
   name_type:
-    description: Indicates if the name is globally applicable or specific to a legal context.
+    description: Indicates if the name is globally applicable or specific to a legal context. In clean, values are stored in uppercase as standardized codes for stable filtering and joins.
     lineage:
     - datalake_pin_core_raw.per_person_names_f.name_type
     categories:
@@ -59,11 +60,11 @@ columns:
       BR: Brazil.
       AR: Argentine.
   first_social_name:
-    description: The person's preferred given name (social name). From Name DFF field NAM_INFORMATION15.
+    description: The person's preferred given name (social name). From Name DFF field NAM_INFORMATION15. In clean, same text standardization as other name fields—plain Latin letters, natural capitalization, and short connecting words lowercase in the middle of the name.
     lineage:
     - datalake_pin_core_raw.per_person_names_f.nam_information15
   last_social_name:
-    description: The person's preferred surname (social name). From Name DFF field NAM_INFORMATION16.
+    description: The person's preferred surname (social name). From Name DFF field NAM_INFORMATION16. In clean, same text standardization as other name fields—plain Latin letters, natural capitalization, and short connecting words lowercase in the middle of the name.
     lineage:
     - datalake_pin_core_raw.per_person_names_f.nam_information16
   legislation_code:

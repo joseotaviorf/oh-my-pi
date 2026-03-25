@@ -3,7 +3,8 @@ table_name: all_assignments
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: Stores comprehensive information about employee assignments and work
-  terms.
+  terms. The job title text (assignment name) is presented in clean in a readable,
+  consistent style aligned with person-name fields in the People domain.
 columns:
   id_action_occurrence:
     description: Foreign Key to PER_ACTION_OCCURRENCES, indicating the action performed.
@@ -147,8 +148,10 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_all_assignments_m.employment_category
   assignment_name:
-    description: Describes the assignment or work terms (derived as [job name]   -
-      [department name] by default).
+    description: Job title (cargo) for the assignment. The full wording from the source
+      is kept—no words are removed. In clean, the title uses the same readable style
+      as person names—plain Latin letters (no accents), natural capitalization, and
+      short connecting words lowercase in the middle of the phrase.
     lineage:
     - datalake_pin_core_raw.per_all_assignments_m.assignment_name
   created_by:

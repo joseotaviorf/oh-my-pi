@@ -9,6 +9,7 @@ class UDFEnum(Enum):
     SF_REMOVE_ACCENTUATION = "SF_REMOVE_ACCENTUATION"
     SF_ALPHANUMERIC_SNAKE_CASE = "SF_ALPHANUMERIC_SNAKE_CASE"
     SF_NORMALIZE_STRING = "SF_NORMALIZE_STRING"
+    SF_FORMAT_PROPER_NOUN = "SF_FORMAT_PROPER_NOUN"
     FINTECHOPS_WORK_MIN_SLA = "FINTECHOPS_WORK_MIN_SLA"
     FINTECH_COLLECTIONS_RENEGOTIATION = "FINTECH_COLLECTIONS_RENEGOTIATION"
     GET_PROFILING_DATA_QUALITY = "GET_PROFILING_DATA_QUALITY"
@@ -39,6 +40,7 @@ class UDFEnum(Enum):
             cls.SF_REMOVE_ACCENTUATION: StringFormatter.replace_accents,
             cls.SF_ALPHANUMERIC_SNAKE_CASE: StringFormatter.set_alphanumeric_snake_case,
             cls.SF_NORMALIZE_STRING: StringFormatter.normalize_string,
+            cls.SF_FORMAT_PROPER_NOUN: StringFormatter.format_proper_noun,
             cls.FINTECHOPS_WORK_MIN_SLA: FintechUDFs.fintechops_work_min_sla,
             cls.FINTECH_COLLECTIONS_RENEGOTIATION: FintechUDFs.fintech_collections_renegotiation,
             cls.GET_PROFILING_DATA_QUALITY: ProfilingFromYaml.get_profiling_data_quality,
