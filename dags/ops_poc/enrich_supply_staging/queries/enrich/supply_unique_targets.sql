@@ -1,6 +1,7 @@
 SELECT 
     date,
     city_group,
+    campaign_cluster,
     planning_conversion,
     planning_operation,
     planning_cluster,

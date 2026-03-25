@@ -13,6 +13,10 @@ columns:
     description: A grouping of city or clusters of cities and neighborhoods.
     lineage:
       - scalability_metrics.supply_funnel_unique_target_2026.city_group
+  campaign_cluster:
+    description: A grouping of marketing campaigns.
+    lineage:
+      - scalability_metrics.supply_funnel_unique_target_2026.campaign_cluster
   planning_conversion:
     description: Detailed conversion operation type. Distinguishes the Inside Sales operations in Inbound, Outbound and IS Expert.
     lineage:
