@@ -1,33 +1,64 @@
 import json
 import re
-import requests
-from typing import Any, Dict, List, Optional, Union
 from datetime import datetime
+from typing import Any, Dict, List, Optional, Union
 
 import boto3
-
+import requests
 from airflow.datasets import Dataset
-from airflow.utils.context import Context
-from airflow.utils.types import DagRunType
-from airflow.utils.db import create_session
-from airflow.models.dataset import DatasetEvent
-from airflow.models import Variable
-from sqlalchemy.exc import SQLAlchemyError
-from airflow.utils.session import provide_session
-from sqlalchemy import text
 from airflow.exceptions import AirflowException
+from airflow.models import Variable
+from airflow.models.dataset import DatasetEvent
+from airflow.utils.context import Context
+from airflow.utils.db import create_session
+from airflow.utils.session import provide_session
+from airflow.utils.types import DagRunType
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 from bietlejuice.base.airflow.datasets.dataset_parser import DatasetParser
+from bietlejuice.base.airflow.enums.dag_run_type_enum import DagRunTypeEnum
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )
 from bietlejuice.base.dependencies.bietlejuice_redundant_dependency_finder import (
     BietlejuiceRedundantDependencyFinder,
 )
-from bietlejuice.base.airflow.enums.dag_run_type_enum import DagRunTypeEnum
 
 
 class DatasetService:
+    _LAYER_TO_DATABASE_NAME = {
+        "transactional": "datalake_{schema}_transactional",
+        "raw": "datalake_{schema}_raw",
+        "clean": "datalake_{schema}_clean",
+        "clean_staging": "datalake_{schema}_clean_staging",
+        "core": "{schema}",
+        "enrich": "datalake_{schema}",
+        "dw": "dw_{schema}",
+        "metric": "metric_{schema}",
+        "reverse": "reverse_{schema}",
+    }
+
+    @classmethod
+    def _build_table_dataset_name(cls, context: Context) -> Optional[str]:
+        """
+        Build a qualified table dataset name from task params.
+        Returns ``<database_name>.<table_name>`` in lowercase when schema,
+        layer and table_name are all present in context params, or ``None``
+        otherwise. Lowercasing aligns with lake naming and task_id slugify.
+        """
+        params = context.get("params", {})
+        schema = params.get("schema")
+        layer = params.get("layer")
+        table_name = params.get("table_name")
+        if not schema or not layer or not table_name:
+            return None
+        template = cls._LAYER_TO_DATABASE_NAME.get(layer)
+        if template is None:
+            return None
+        database_name = template.format(schema=schema)
+        return f"{database_name}.{table_name}".lower()
+
     @staticmethod
     def format_alert_message(context):
         return {
@@ -445,6 +476,7 @@ class DatasetService:
             )
 
             event_payloads: List[Dict[str, Any]] = []
+            table_dataset_name = cls._build_table_dataset_name(context)
 
             if DatasetService.is_reprocessing_run(context):
                 reprocessing_date = DatasetService.find_reprocessing_date(context)
@@ -477,6 +509,20 @@ class DatasetService:
                             extra_reprocessing,
                         )
                     )
+                    if table_dataset_name:
+                        context["outlet_events"][dataset_alias].add(
+                            Dataset(f"{table_dataset_name}:reprocessing"),
+                            extra=extra_reprocessing,
+                        )
+                        event_payloads.append(
+                            cls._build_dataset_event_payload(
+                                context,
+                                f"{table_dataset_name}:reprocessing",
+                                dataset_alias,
+                                "reprocessing",
+                                extra_reprocessing,
+                            )
+                        )
             elif DatasetService._is_impacting_downstream_dependents(context):
                 print(
                     "This run will impact downstream dependents, updating the dataset without a suffix."
@@ -487,6 +533,19 @@ class DatasetService:
                         context, dataset_name, dataset_alias, "normal", {}
                     )
                 )
+                if table_dataset_name:
+                    context["outlet_events"][dataset_alias].add(
+                        Dataset(table_dataset_name)
+                    )
+                    event_payloads.append(
+                        cls._build_dataset_event_payload(
+                            context,
+                            table_dataset_name,
+                            dataset_alias,
+                            "normal",
+                            {},
+                        )
+                    )
                 if is_first_run_of_date:
                     # Let's imagine we have a DAG A that is intraday,
                     # DAG B depends on DAG A, but DAG B only needs to run once (it is not intraday).
@@ -506,6 +565,19 @@ class DatasetService:
                             {},
                         )
                     )
+                    if table_dataset_name:
+                        context["outlet_events"][dataset_alias].add(
+                            Dataset(f"{table_dataset_name}:first-run-of-day")
+                        )
+                        event_payloads.append(
+                            cls._build_dataset_event_payload(
+                                context,
+                                f"{table_dataset_name}:first-run-of-day",
+                                dataset_alias,
+                                "first_run_of_day",
+                                {},
+                            )
+                        )
 
             try:
                 cls._write_dataset_events_to_s3(event_payloads)

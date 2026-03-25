@@ -133,7 +133,12 @@ class TestDatasetService:
         task_instance.dag_run = dag_run
 
         return {
-            "params": {"run_type": "impact_downstream_dependents"},
+            "params": {
+                "run_type": "impact_downstream_dependents",
+                "schema": "ebdb_contract",
+                "table_name": "contract",
+                "layer": "enrich",
+            },
             "outlets": [dataset_alias],
             "outlet_events": {"dag:task:alias": outlet_event_accessor},
             "triggering_dataset_events": {},
@@ -201,7 +206,9 @@ class TestDatasetService:
         mock_context["outlet_events"]["dag:task:alias"].add.assert_has_calls(
             [
                 mock.call(Dataset("dag:task")),
+                mock.call(Dataset("datalake_ebdb_contract.contract")),
                 mock.call(Dataset("dag:task:first-run-of-day")),
+                mock.call(Dataset("datalake_ebdb_contract.contract:first-run-of-day")),
             ],
             any_order=True,
         )
@@ -213,12 +220,19 @@ class TestDatasetService:
         mock_context["params"]["run_type"] = "reprocessing_run"
         DatasetService.update_datasets(mock_context)
 
-        mock_context["outlet_events"]["dag:task:alias"].add.assert_called_once_with(
-            Dataset("dag:task:reprocessing"),
-            extra={
-                "reprocessing_source": "dag",
-                "reprocessing_date": FAKE_TIME.date().isoformat(),
-            },
+        expected_extra = {
+            "reprocessing_source": "dag",
+            "reprocessing_date": FAKE_TIME.date().isoformat(),
+        }
+        mock_context["outlet_events"]["dag:task:alias"].add.assert_has_calls(
+            [
+                mock.call(Dataset("dag:task:reprocessing"), extra=expected_extra),
+                mock.call(
+                    Dataset("datalake_ebdb_contract.contract:reprocessing"),
+                    extra=expected_extra,
+                ),
+            ],
+            any_order=True,
         )
 
     def test_update_datasets_should_add_reprocessing_dataset_if_triggering_dataset_is_reprocessing(
@@ -235,12 +249,19 @@ class TestDatasetService:
         }
         DatasetService.update_datasets(mock_context)
 
-        mock_context["outlet_events"]["dag:task:alias"].add.assert_called_once_with(
-            Dataset("dag:task:reprocessing"),
-            extra={
-                "reprocessing_source": "dag2",
-                "reprocessing_date": FAKE_TIME.date().isoformat(),
-            },
+        expected_extra = {
+            "reprocessing_source": "dag2",
+            "reprocessing_date": FAKE_TIME.date().isoformat(),
+        }
+        mock_context["outlet_events"]["dag:task:alias"].add.assert_has_calls(
+            [
+                mock.call(Dataset("dag:task:reprocessing"), extra=expected_extra),
+                mock.call(
+                    Dataset("datalake_ebdb_contract.contract:reprocessing"),
+                    extra=expected_extra,
+                ),
+            ],
+            any_order=True,
         )
 
     def test_update_datasets_should_add_normal_dataset_if_triggering_dataset_is_not_reprocessing(
@@ -253,7 +274,9 @@ class TestDatasetService:
         mock_context["outlet_events"]["dag:task:alias"].add.assert_has_calls(
             [
                 mock.call(Dataset("dag:task")),
+                mock.call(Dataset("datalake_ebdb_contract.contract")),
                 mock.call(Dataset("dag:task:first-run-of-day")),
+                mock.call(Dataset("datalake_ebdb_contract.contract:first-run-of-day")),
             ],
             any_order=True,
         )
@@ -265,7 +288,9 @@ class TestDatasetService:
         mock_context["outlet_events"]["dag:task:alias"].add.assert_has_calls(
             [
                 mock.call(Dataset("dag:task")),
+                mock.call(Dataset("datalake_ebdb_contract.contract")),
                 mock.call(Dataset("dag:task:first-run-of-day")),
+                mock.call(Dataset("datalake_ebdb_contract.contract:first-run-of-day")),
             ],
             any_order=True,
         )
@@ -277,9 +302,19 @@ class TestDatasetService:
 
         DatasetService.update_datasets(mock_context)
 
-        mock_context["outlet_events"]["dag:task:alias"].add.assert_called_once_with(
-            Dataset("dag:task")
+        mock_context["outlet_events"]["dag:task:alias"].add.assert_has_calls(
+            [
+                mock.call(Dataset("dag:task")),
+                mock.call(Dataset("datalake_ebdb_contract.contract")),
+            ],
+            any_order=True,
         )
+        first_run_calls = [
+            c
+            for c in mock_context["outlet_events"]["dag:task:alias"].add.call_args_list
+            if "first-run-of-day" in str(c)
+        ]
+        assert len(first_run_calls) == 0
 
     def test_if_it_is_a_rerun_it_should_not_update_datasets(
         self, mock_is_first_run_of_date, mock_context, database_query_function
@@ -320,11 +355,12 @@ class TestDatasetService:
         mock_context["outlet_events"]["dag:task:alias"].add.assert_has_calls(
             [
                 mock.call(Dataset("dag:task")),
+                mock.call(Dataset("datalake_ebdb_contract.contract")),
                 mock.call(Dataset("dag:task:first-run-of-day")),
+                mock.call(Dataset("datalake_ebdb_contract.contract:first-run-of-day")),
             ],
             any_order=True,
         )
-        # When bucket is unset we must not write to S3 (put_object not called)
         s3_client.put_object.assert_not_called()
 
     @mock.patch("bietlejuice.services.dataset_service.boto3")
@@ -359,10 +395,15 @@ class TestDatasetService:
         assert call_kw["Key"].startswith("airflow_datasets/dataset_events/year=")
         body = json.loads(call_kw["Body"])
         assert isinstance(body, list)
-        assert len(body) == 2
+        assert len(body) == 4
         event_types = {e["event_type"] for e in body}
         assert "normal" in event_types
         assert "first_run_of_day" in event_types
+        dataset_names = {e["dataset_name"] for e in body}
+        assert "dag:task" in dataset_names
+        assert "datalake_ebdb_contract.contract" in dataset_names
+        assert "dag:task:first-run-of-day" in dataset_names
+        assert "datalake_ebdb_contract.contract:first-run-of-day" in dataset_names
         assert body[0]["dag_id"] == "dag"
         assert body[0]["task_id"] == "task"
         assert body[0]["dataset_alias"] == "dag:task:alias"
@@ -398,11 +439,113 @@ class TestDatasetService:
         call_kw = s3_client.put_object.call_args[1]
         body = json.loads(call_kw["Body"])
         assert isinstance(body, list)
-        assert len(body) == 1
-        assert body[0]["event_type"] == "reprocessing"
-        assert body[0]["dataset_name"] == "dag:task:reprocessing"
+        assert len(body) == 2
+        assert all(e["event_type"] == "reprocessing" for e in body)
+        dataset_names = {e["dataset_name"] for e in body}
+        assert "dag:task:reprocessing" in dataset_names
+        assert "datalake_ebdb_contract.contract:reprocessing" in dataset_names
         assert body[0]["extra"]["reprocessing_source"] == "dag"
         assert body[0]["extra"]["reprocessing_date"] == FAKE_TIME.date().isoformat()
+
+    def test_update_datasets_should_not_emit_table_event_when_table_name_missing(
+        self, mock_is_first_run_of_date, mock_context
+    ):
+        mock_is_first_run_of_date.return_value = True
+        del mock_context["params"]["table_name"]
+        del mock_context["params"]["schema"]
+        del mock_context["params"]["layer"]
+
+        DatasetService.update_datasets(mock_context)
+
+        mock_context["outlet_events"]["dag:task:alias"].add.assert_has_calls(
+            [
+                mock.call(Dataset("dag:task")),
+                mock.call(Dataset("dag:task:first-run-of-day")),
+            ],
+            any_order=True,
+        )
+        table_calls = [
+            c
+            for c in mock_context["outlet_events"]["dag:task:alias"].add.call_args_list
+            if "datalake_" in str(c) or "dw_" in str(c) or "metric_" in str(c)
+        ]
+        assert len(table_calls) == 0
+
+    def test_build_table_dataset_name_returns_none_when_params_missing(self):
+        context = {"params": {"run_type": "impact_downstream_dependents"}}
+        assert DatasetService._build_table_dataset_name(context) is None
+
+    def test_build_table_dataset_name_returns_qualified_name(self):
+        context = {
+            "params": {
+                "schema": "ebdb_contract",
+                "table_name": "contract",
+                "layer": "enrich",
+            }
+        }
+        assert (
+            DatasetService._build_table_dataset_name(context)
+            == "datalake_ebdb_contract.contract"
+        )
+
+    def test_build_table_dataset_name_for_dw_layer(self):
+        context = {
+            "params": {
+                "schema": "rent",
+                "table_name": "fact_contracts",
+                "layer": "dw",
+            }
+        }
+        assert (
+            DatasetService._build_table_dataset_name(context)
+            == "dw_rent.fact_contracts"
+        )
+
+    def test_build_table_dataset_name_for_clean_layer(self):
+        context = {
+            "params": {
+                "schema": "condominium_payments",
+                "table_name": "non_payment_report",
+                "layer": "clean",
+            }
+        }
+        assert (
+            DatasetService._build_table_dataset_name(context)
+            == "datalake_condominium_payments_clean.non_payment_report"
+        )
+
+    def test_build_table_dataset_name_for_core_layer(self):
+        context = {
+            "params": {
+                "schema": "core_house",
+                "table_name": "house",
+                "layer": "core",
+            }
+        }
+        assert DatasetService._build_table_dataset_name(context) == "core_house.house"
+
+    def test_build_table_dataset_name_returns_none_for_unknown_layer(self):
+        context = {
+            "params": {
+                "schema": "some_schema",
+                "table_name": "some_table",
+                "layer": "unknown_layer",
+            }
+        }
+        assert DatasetService._build_table_dataset_name(context) is None
+
+    def test_build_table_dataset_name_lowercases_mixed_case_table(self):
+        context = {
+            "params": {
+                "schema": "ebdb",
+                "table_name": "Contrato_AUD",
+                "layer": "raw",
+            }
+        }
+        assert (
+            DatasetService._build_table_dataset_name(context)
+            == "datalake_ebdb_raw.contrato_aud"
+        )
 
 
 def dataset_equals(d1: BaseDataset, d2: BaseDataset) -> bool:

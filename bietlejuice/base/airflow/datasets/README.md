@@ -94,6 +94,8 @@ As mentioned previously, a dataset can be named anything that is a valid URI. Ho
 
 Where `dag_name` is the name of the DAG that produces the dataset, and `task_id` is the ID of the task that produces the dataset. The optional suffix can be used to provide additional context about the dataset. For example, there is the suffix "first-run-of-day", which is used to indicate that the dataset was produced by the first run of the DAG on that day.
 
+**Task-based URIs remain the only ones used in [dependencies.yaml](../../../../dags/dependencies.yaml)**. Separately, load tasks also emit **table-qualified** dataset events (see [Table-qualified dataset events](#table-qualified-dataset-events)) so that each successful load is recorded under a stable metastore identity. Those URIs are not consumed by any DAG schedule today.
+
 We have a [dependencies.yaml file](../../../../dags/dependencies.yaml), where we declare the dependencies between DAGs and datasets. For example:
 
 ```yaml
@@ -137,6 +139,43 @@ If your DAG does not use any of these, you will need to call `DatasetAdder.attac
     - If the run is an Impact Downstream Dependents run, it will produce the dataset event corresponding to the task that just finished. For example, the task `task_1` of `dag_a` will produce the dataset `dag_a:task_1`. Additionally, it will check the XCOMs to determine if it is the first time this task is running today. If it is, it will also produce the dataset with the suffix "first-run-of-day" (e.g., `dag_a:task1:first-run-of-day`). This is useful for DAGs that are scheduled to run multiple times a day, but we want to trigger dependent DAGs only once per day.
     - If the run is a Reprocessing Run, it will only produce a dataset event with the suffix "reprocessing" (e.g., `dag_a:task_1:reprocessing`). This is useful for reprocessing purposes, where we want to forcefully update all dependent DAGs immediately and recursively, regardless of whether the other datasets are updated or not. This will be explained in more detail in the [Reprocessing Run](#reprocessing-run---this-will-trigger-the-entire-downstream-pipeline-from-this-dag) section.
 - Finally, it will update the XCOMs informing the start date, which will allow future runs to determine if it is the ":first-run-of-day" or not.
+
+#### Table-qualified dataset events
+
+In addition to the task-based URIs above, [DatasetService](../../../services/dataset_service.py) emits **one extra dataset event per physical table** whenever it would emit the corresponding task-based event. This is purely additive: the same `DatasetAlias` and callback path are used, and **nothing changes** for DAGs that only depend on `<dag_id>:<task_id>` URIs.
+
+**URI format**
+
+`<database_name>.<table_name>`
+
+The same optional suffixes apply as for task-based datasets:
+
+- Normal impact run: `<database_name>.<table_name>`
+- First run of the day: `<database_name>.<table_name>:first-run-of-day`
+- Reprocessing run: `<database_name>.<table_name>:reprocessing`
+
+`database_name` is derived from the task’s `params` (`layer` and `schema`) using the same metastore naming rules as the rest of the platform (aligned with the layer mappings in `datalake_metastore_mapping`, `dw_metastore_mapping`, `metric_metastore_mapping`, and `reverse_metastore_mapping`). `table_name` also comes from task `params`.
+
+**Examples**
+
+| DAG | Layer | Schema (params) | Table (params) | `database_name` | Table-qualified URI (base) |
+| --- | --- | --- | --- | --- | --- |
+| `enrich_ebdb_contract` | enrich | `ebdb_contract` | `contract` | `datalake_ebdb_contract` | `datalake_ebdb_contract.contract` |
+| `condominium_payments` (clean) | clean | `condominium_payments` | `non_payment_report` | `datalake_condominium_payments_clean` | `datalake_condominium_payments_clean.non_payment_report` |
+| `dw_rent` | dw | `rent` | `fact_contracts` | `dw_rent` | `dw_rent.fact_contracts` |
+| `core_house` | core | `core_house` | `house` | `core_house` | `core_house.house` |
+
+**When table-qualified events are not emitted**
+
+If `schema`, `layer`, or `table_name` is missing from the task context `params`, no table-qualified event is produced for that task. Task-based behavior is unchanged. For example, Raw GSheets workflows use `done-*` tasks that do not populate `table_name` in the same way as load tasks, so they do not emit these extra events.
+
+**Why this does not disturb existing orchestration**
+
+- Schedules and `dependencies.yaml` still reference only task-based URIs; no DAG is required to listen to `database.table` URIs today.
+- First-run-of-day detection uses patterns tied to the task-based URI; table-qualified `:first-run-of-day` URIs do not participate in that logic.
+- The reprocessing guard considers `triggering_dataset_events` for datasets the DAG actually listens to; until something schedules on a table-qualified URI, those events do not affect guards.
+
+Table-qualified events are included in the same export path as other outlet events (for example S3 event payloads) where the service already records emitted datasets.
 
 ### Configuring DAGs to listen to datasets
 
