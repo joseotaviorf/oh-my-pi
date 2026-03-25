@@ -262,6 +262,13 @@ SELECT
     ca.id_organization,
     ca.id_business_unit,
     ca.id_job,
+    MD5(
+        CONCAT_WS(
+            '|',
+            CAST(jwst.id_job AS STRING),
+            CAST(jwst.dt_valid_from AS STRING)
+        )
+    ) AS sk_job_version,
     mh.sk_hierarchy_version,
     ted.id_event_definition AS sk_termination_event_definition,
     DATE_FORMAT(ad.dt_started, 'yyyyMMdd') AS sk_hired_date,

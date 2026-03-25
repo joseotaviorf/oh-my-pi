@@ -29,6 +29,14 @@ columns:
     description: Job identifier. 
     lineage:
       - datalake_pin_core_clean.all_assignments.id_job
+  sk_job_version:
+    description: |
+      Surrogate key for the job SCD2 version effective on dt_reference, identical to dw_compensation.dim_job.sk_job_version
+      (MD5 of id_job and dt_valid_from from the matched job_with_salary_table row). NULL when id_job is null or no row
+      matches the assignment date window; consumers should COALESCE to the fact unknown key (e.g. '-1') when needed.
+    lineage:
+      - datalake_people.job_with_salary_table.id_job
+      - datalake_people.job_with_salary_table.dt_valid_from
   sk_hierarchy_version:
     description: Org structure identifier from management_hierarchy.
     lineage:

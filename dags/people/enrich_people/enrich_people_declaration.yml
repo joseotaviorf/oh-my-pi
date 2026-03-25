@@ -39,6 +39,7 @@ workflow:
       - identifier_mapping
       - assignment_termination
       - management_hierarchy
+      - job_with_salary_table
     codex_log:
       - codex_history_base
       - identifier_mapping
