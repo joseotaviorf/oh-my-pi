@@ -22,6 +22,8 @@ codex_current AS (
 pin_current AS (
   SELECT
     a.cost_center_code,
+    o.name AS pin_organization_name,
+    o.status AS pin_organization_status,
     a.business AS pin_business,
     a.product AS pin_product,
     a.brand AS pin_brand,
@@ -82,6 +84,8 @@ SELECT
   p.pin_name_owner_l2,
   c.codex_owner_l3_full_name,
   p.pin_name_owner_l3,
+  p.pin_organization_name,
+  p.pin_organization_status,
   c.codex_business IS DISTINCT FROM p.pin_business AS is_drift_business,
   c.codex_product IS DISTINCT FROM p.pin_product AS is_drift_product,
   c.codex_brand IS DISTINCT FROM p.pin_brand AS is_drift_brand,

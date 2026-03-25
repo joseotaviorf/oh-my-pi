@@ -9,7 +9,8 @@ description: |-
   all_organization_units are the destination fields that should mirror CODEX. One row per
   cost_center_code present in both systems, with side-by-side values and boolean drift flags.
   Downstream workflows use this table to detect differences and push updates from CODEX into
-  PIN when attributes diverge.
+  PIN when attributes diverge. PIN department display name and activity status (Oracle
+  hr_organization) are exposed as pin_organization_* for HCM reverse exports and tooling.
 columns:
   cost_center_code:
     description: Natural key and table grain from CODEX (codex_log); join to PIN uses TRIM on both sides.
@@ -112,6 +113,16 @@ columns:
     description: L3 owner name from PIN clean all_organization_units for the department row effective today.
     lineage:
       - datalake_pin_core_clean.all_organization_units.name_owner_l3
+  pin_organization_name:
+    description: Organization unit display name from PIN hr_organization for the same department row as the
+      flexfield comparison (effective today); used by HCM MERGE exports (e.g. Organization.Name).
+    lineage:
+      - datalake_pin_core_clean.hr_organization.name
+  pin_organization_status:
+    description: Organization status code as stored in PIN clean hr_organization (same string as the source;
+      e.g. Oracle HCM active/inactive codes). Used by HCM MERGE exports (e.g. OrgUnitClassification.Status).
+    lineage:
+      - datalake_pin_core_clean.hr_organization.status
   is_drift_business:
     description: True when PIN's business unit for this cost center is not the same as CODEX's
       (null-safe; a value on one side only still counts as a mismatch).

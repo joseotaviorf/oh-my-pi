@@ -56,3 +56,17 @@ workflow:
       extra_spark_job_arguments:
         - "10p4xUfeoTKxJB3RtrO8-Jf8O7sdnll8fT_PXZPB-EgU" # DAG reverse test sheet
         - "jobs"
+    # Use context: Used as the basis for the load that updates Codex data in PIN.
+    # Business Owner: jessica.mlara@quintoandar.com.br
+    # Data Owner: gabriel.berger@quintoandar.com.br
+    organization_codex_pin_sync:
+      extra_spark_job_arguments:
+        - "1_yTiwS3IhdOO9wn7yP4sGfRAAoYhZSHxZhszFYH0zx4"
+        - "Organization"
+    # Use context: Used as the basis for the load that updates Codex data in PIN.
+    # Business Owner: jessica.mlara@quintoandar.com.br
+    # Data Owner: gabriel.berger@quintoandar.com.br
+    org_unit_classification_codex_pin_sync:
+      extra_spark_job_arguments:
+        - "1_yTiwS3IhdOO9wn7yP4sGfRAAoYhZSHxZhszFYH0zx4"
+        - "OrgUnitClassification"
