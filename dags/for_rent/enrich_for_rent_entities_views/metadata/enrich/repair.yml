@@ -1,0 +1,56 @@
+database_name: datalake_for_rent_entities_views
+table_name: repair
+description: >
+  Enriched view of repair entities (FR_REPAIR_ONGOING and FR_REPAIR_OFFBOARDING) with persona expansion
+  (OWNER, TENANT, AGENT_INSPECTOR for offboarding repairs).
+  Consumed by enrich_transactional_entities consolidation.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_entity:
+    lineage:
+      - datalake_repairs_clean.repair_request.id
+      - datalake_inspection_services_clean.repair_request.id_repair_request
+    description: Repair request id serving as the entity identifier.
+  id_house:
+    lineage:
+      - datalake_repairs_clean.repair_request.id_house
+      - core_contract.contract.id_house
+    description: House id related to the repair (from repair_request or derived from contract).
+  id_contract:
+    lineage:
+      - datalake_repairs_clean.repair_request.id_contract
+      - datalake_inspection_services_clean.inspection.id_contract
+    description: Contract id associated with the repair.
+  id_user:
+    lineage:
+      - core_contract.contract.id_owner
+      - core_contract.contract.id_tenant
+      - datalake_inspection_services_clean.inspection.id_inspector
+    description: User id (owner, tenant, or inspector) associated with the repair.
+  entity:
+    description: FR_REPAIR_ONGOING or FR_REPAIR_OFFBOARDING.
+  persona:
+    description: OWNER, TENANT, or AGENT_INSPECTOR (only for FR_REPAIR_OFFBOARDING).
+  business_context:
+    description: Fixed value 'RENT'.
+  properties:
+    lineage:
+      - datalake_repairs_clean.repair_request.status
+      - datalake_repairs_clean.repair_request.ts_created
+      - datalake_inspection_services_clean.repair_request.ts_created
+    description: JSON with repair status and creation timestamp.
+  is_active:
+    description: >
+      For ongoing repairs: TRUE for active statuses (AWAITING_BUDGET, IN_PROGRESS, etc.), FALSE for FINISHED/RESOLVED/CANCELED.
+      For offboarding repairs: TRUE when is_finished = FALSE.
+  ts_created:
+    lineage:
+      - datalake_repairs_clean.repair_request.ts_created
+      - datalake_inspection_services_clean.repair_request.ts_created
+    description: Timestamp when the repair request was created.
+  ts_updated:
+    lineage:
+      - datalake_repairs_clean.repair_request.ts_updated
+      - datalake_inspection_services_clean.repair_request.ts_updated
+    description: Timestamp when the repair request was last updated.

@@ -1,0 +1,15 @@
+dag:
+  name: enrich_visit_entities_views
+  schedule_start_date: 2025, 1, 1
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      Creates an enriched view for VISIT entities (RENT and SALE) with persona expansion (OWNER, TENANT_PROSPECT/BUYER_PROSPECT, AGENT_BROKER).
+      Part of the CDP entities pipeline; consumed by enrich_transactional_entities via UNION ALL consolidation.
+workflow:
+  type: query_view
+  layer: enrich
+  has_hive_sync: false
+cluster:
+  type: databricks_16_4_med_general_2_workers_cluster
+  databricks_conn_id: databricks_new

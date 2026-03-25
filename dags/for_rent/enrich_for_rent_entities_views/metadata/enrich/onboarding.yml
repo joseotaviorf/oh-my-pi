@@ -1,0 +1,46 @@
+database_name: datalake_for_rent_entities_views
+table_name: onboarding
+description: >
+  Enriched view of FR_ONBOARDING entities with persona expansion (OWNER, TENANT).
+  Consumed by enrich_transactional_entities consolidation.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_entity:
+    lineage:
+      - datalake_ebdb_clean.onboarding.id
+    description: Onboarding id serving as the entity identifier.
+  id_house:
+    lineage:
+      - core_contract.contract.id_house
+    description: House id derived from the associated contract.
+  id_contract:
+    lineage:
+      - datalake_ebdb_clean.onboarding.id_contrato
+    description: Contract id associated with the onboarding process.
+  id_user:
+    lineage:
+      - core_contract.contract.id_owner
+      - core_contract.contract.id_tenant
+    description: User id (owner or tenant) from the associated contract.
+  entity:
+    description: Fixed value 'FR_ONBOARDING'.
+  persona:
+    description: OWNER or TENANT.
+  business_context:
+    description: Fixed value 'RENT'.
+  properties:
+    lineage:
+      - datalake_ebdb_clean.onboarding.status
+      - datalake_ebdb_clean.onboarding.ts_created
+    description: JSON with onboarding status and creation timestamp.
+  is_active:
+    description: TRUE for all statuses except Finished and Aborted (which are FALSE).
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.onboarding.ts_created
+    description: Timestamp when the onboarding was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.onboarding.ts_updated
+    description: Timestamp when the onboarding was last updated.

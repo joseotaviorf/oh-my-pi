@@ -1,0 +1,45 @@
+database_name: datalake_for_rent_entities_views
+table_name: reservation
+description: >
+  Enriched view of FR_RESERVATION entities with persona expansion (TENANT_PROSPECT, OWNER).
+  Consumed by enrich_transactional_entities consolidation.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_entity:
+    lineage:
+      - datalake_kill_queue_clean.reservation.id
+    description: Reservation id serving as the entity identifier.
+  id_house:
+    lineage:
+      - datalake_kill_queue_clean.reservation.id_house
+    description: House id related to the reservation.
+  id_contract:
+    description: Always NULL for reservation entities.
+  id_user:
+    lineage:
+      - datalake_kill_queue_clean.reservation.id_tenant
+      - datalake_ebdb_clean.house.id_user
+      - datalake_ebdb_clean.user.id
+    description: User id (tenant prospect or owner) associated with the reservation.
+  entity:
+    description: Fixed value 'FR_RESERVATION'.
+  persona:
+    description: TENANT_PROSPECT or OWNER.
+  business_context:
+    description: Fixed value 'RENT'.
+  properties:
+    lineage:
+      - datalake_kill_queue_clean.reservation.status
+      - datalake_kill_queue_clean.reservation.ts_created
+    description: JSON with reservation status and creation timestamp.
+  is_active:
+    description: TRUE when is_ongoing = TRUE, FALSE otherwise.
+  ts_created:
+    lineage:
+      - datalake_kill_queue_clean.reservation.ts_created
+    description: Timestamp when the reservation was created.
+  ts_updated:
+    lineage:
+      - datalake_kill_queue_clean.reservation.ts_updated
+    description: Timestamp when the reservation was last updated.

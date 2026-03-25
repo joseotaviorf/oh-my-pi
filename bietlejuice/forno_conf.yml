@@ -9,6 +9,7 @@ dags_out_of_pattern:
         "core_brokers",
         "core_contract",
         "core_credit_evaluation",
+        "core_house",
         "core_offer",
         "core_visit",
         "cyber",

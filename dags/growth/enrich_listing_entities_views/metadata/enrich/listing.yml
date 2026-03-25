@@ -1,0 +1,53 @@
+database_name: datalake_listing_entities_views
+table_name: listing
+description: >
+  Enriched view of LISTING entities across RENT and SALE business contexts.
+  Consolidates house, owner, and contract information for property listings.
+  Consumed by enrich_transactional_entities consolidation.
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_entity:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+      - datalake_ebdb_clean.listing_business_context.business_context
+    description: Composite key from id_house and business_context (CONCAT(id_house, '_', business_context)).
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.id_house
+    description: Foreign key referencing the house entity being listed.
+  id_contract:
+    lineage:
+      - core_contract.contract.id_contract
+    description: Contract id for RENT listings (most recent contract for the house), NULL for SALE listings.
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+      - datalake_ebdb_clean.user.id
+    description: Property owner id associated with the listing.
+  entity:
+    description: Fixed value 'LISTING'.
+  persona:
+    description: Fixed value 'OWNER'.
+  business_context:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.business_context
+    description: Business context (RENT or SALE).
+  properties:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status
+      - datalake_ebdb_clean.listing_business_context.status_reason
+      - datalake_ebdb_clean.listing_business_context.ts_created
+    description: JSON with transformed listing status and creation timestamp.
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.status
+    description: TRUE for PUBLISHED/EDITING, FALSE for OPTED_OUT/UNPUBLISHED/SUSPENDED.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_created
+    description: Timestamp when the listing was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.listing_business_context.ts_updated
+    description: Timestamp when the listing was last updated.

@@ -1,0 +1,46 @@
+database_name: datalake_for_rent_entities_views
+table_name: contract
+description: >
+  Enriched view of FR_CONTRACT entities with persona expansion (OWNER, TENANT/TENANT_PROSPECT).
+  Consumed by enrich_transactional_entities consolidation.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_entity:
+    lineage:
+      - core_contract.contract.id_contract
+    description: Contract id serving as the entity identifier.
+  id_house:
+    lineage:
+      - core_contract.contract.id_house
+    description: House id related to the contract.
+  id_contract:
+    lineage:
+      - core_contract.contract.id_contract
+    description: Contract id (same as id_entity for contract entities).
+  id_user:
+    lineage:
+      - core_contract.contract.id_owner
+      - core_contract.contract.id_tenant
+    description: User id (owner or tenant) associated with the contract.
+  entity:
+    description: Fixed value 'FR_CONTRACT'.
+  persona:
+    description: OWNER, TENANT (if signed), or TENANT_PROSPECT (if not signed).
+  business_context:
+    description: Fixed value 'RENT'.
+  properties:
+    lineage:
+      - core_contract.contract.status
+      - core_contract.contract.dt_started
+    description: JSON with contract status and start date.
+  is_active:
+    description: TRUE for Ativo/Minuta/PreAssinaturas, FALSE for Cancelado/Finalizado.
+  ts_created:
+    lineage:
+      - core_contract.contract.ts_created
+    description: Timestamp when the contract was created.
+  ts_updated:
+    lineage:
+      - core_contract.contract.ts_updated
+    description: Timestamp when the contract was last updated.

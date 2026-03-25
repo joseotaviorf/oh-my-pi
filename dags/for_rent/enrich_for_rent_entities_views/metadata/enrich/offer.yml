@@ -1,0 +1,44 @@
+database_name: datalake_for_rent_entities_views
+table_name: offer
+description: >
+  Enriched view of FR_OFFER entities with persona expansion (TENANT_PROSPECT, OWNER).
+  Consumed by enrich_transactional_entities consolidation.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_entity:
+    lineage:
+      - core_offer.offer.id_offer
+    description: Offer id serving as the entity identifier.
+  id_house:
+    lineage:
+      - core_offer.offer.id_house
+    description: House id related to the offer.
+  id_contract:
+    description: Always NULL for offer entities.
+  id_user:
+    lineage:
+      - core_offer.offer.id_tenant
+      - core_offer.offer.id_owner
+    description: User id (tenant prospect or owner) associated with the offer.
+  entity:
+    description: Fixed value 'FR_OFFER'.
+  persona:
+    description: TENANT_PROSPECT or OWNER.
+  business_context:
+    description: Fixed value 'RENT'.
+  properties:
+    lineage:
+      - core_offer.offer.status
+      - core_offer.offer.ts_expiration
+    description: JSON with offer status and expiration timestamp.
+  is_active:
+    description: TRUE for PROPOSED, FALSE for ACCEPTED/DISMISSED/REJECTED.
+  ts_created:
+    lineage:
+      - core_offer.offer.ts_created
+    description: Timestamp when the offer was created.
+  ts_updated:
+    lineage:
+      - core_offer.offer.ts_updated
+    description: Timestamp when the offer was last updated.

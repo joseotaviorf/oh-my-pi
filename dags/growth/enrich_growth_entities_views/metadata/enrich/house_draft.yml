@@ -1,0 +1,43 @@
+database_name: datalake_growth_entities_views
+table_name: house_draft
+description: >
+  Enriched view of HOUSE_DRAFT entities (self-service property registrations by owners).
+  Consumed by enrich_transactional_entities consolidation.
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_entity:
+    lineage:
+      - datalake_bob_clean.house_draft.id
+    description: House draft id serving as the entity identifier.
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house.id
+    description: House id derived from external id mapping.
+  id_contract:
+    description: Always NULL for house draft entities.
+  id_user:
+    lineage:
+      - datalake_bob_clean.registrar.id_main
+    description: Owner id who created the house draft.
+  entity:
+    description: Fixed value 'HOUSE_DRAFT'.
+  persona:
+    description: Fixed value 'OWNER'.
+  business_context:
+    description: Always NULL for house draft entities.
+  properties:
+    lineage:
+      - datalake_bob_clean.house_draft.status
+      - datalake_bob_clean.house_draft.ts_created
+    description: JSON with house draft status and creation timestamp.
+  is_active:
+    description: TRUE for EDITING/PROCESSING, FALSE for all other statuses.
+  ts_created:
+    lineage:
+      - datalake_bob_clean.house_draft.ts_created
+    description: Timestamp when the house draft was created.
+  ts_updated:
+    lineage:
+      - datalake_bob_clean.house_draft.ts_updated
+    description: Timestamp when the house draft was last updated.

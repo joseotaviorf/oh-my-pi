@@ -1,0 +1,128 @@
+database_name: datalake_transactional_entities_test
+table_name: entities
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+description: >
+  Test table for the redesigned CDP entities pipeline using domain-specific views.
+  Output schema is identical to datalake_transactional_entities.entities for comparison.
+  Uses UNION ALL from query_view DAGs (enrich_visit_entities_views, enrich_listing_entities_views,
+  enrich_for_rent_entities_views, enrich_fintech_entities_views, enrich_growth_entities_views)
+  instead of monolithic CTEs.
+columns:
+  sk_entity:
+    lineage:
+      - datalake_visit_entities_views.visit.id_entity
+      - datalake_visit_entities_views.visit.id_user
+      - datalake_listing_entities_views.listing.id_entity
+      - datalake_listing_entities_views.listing.id_user
+      - datalake_for_rent_entities_views.offer.id_entity
+      - datalake_for_rent_entities_views.offer.id_user
+      - datalake_for_rent_entities_views.contract.id_entity
+      - datalake_for_rent_entities_views.contract.id_user
+      - datalake_for_rent_entities_views.termination.id_entity
+      - datalake_for_rent_entities_views.termination.id_user
+      - datalake_for_rent_entities_views.inspection.id_entity
+      - datalake_for_rent_entities_views.inspection.id_user
+      - datalake_for_rent_entities_views.credit_evaluation.id_entity
+      - datalake_for_rent_entities_views.credit_evaluation.id_user
+      - datalake_for_rent_entities_views.onboarding.id_entity
+      - datalake_for_rent_entities_views.onboarding.id_user
+      - datalake_for_rent_entities_views.reservation.id_entity
+      - datalake_for_rent_entities_views.reservation.id_user
+      - datalake_for_rent_entities_views.repair.id_entity
+      - datalake_for_rent_entities_views.repair.id_user
+      - datalake_fintech_entities_views.invoice.id_entity
+      - datalake_fintech_entities_views.invoice.id_user
+      - datalake_growth_entities_views.photo_session.id_entity
+      - datalake_growth_entities_views.photo_session.id_user
+      - datalake_growth_entities_views.house_draft.id_entity
+      - datalake_growth_entities_views.house_draft.id_user
+    description: >
+      Surrogate key computed as SHA2(CONCAT_WS('||', entity, id_entity, persona, id_user), 256).
+      Must always be unique.
+  id_entity:
+    lineage:
+      - datalake_visit_entities_views.visit.id_entity
+      - datalake_listing_entities_views.listing.id_entity
+      - datalake_for_rent_entities_views.offer.id_entity
+      - datalake_for_rent_entities_views.contract.id_entity
+      - datalake_for_rent_entities_views.termination.id_entity
+      - datalake_for_rent_entities_views.inspection.id_entity
+      - datalake_for_rent_entities_views.credit_evaluation.id_entity
+      - datalake_for_rent_entities_views.onboarding.id_entity
+      - datalake_for_rent_entities_views.reservation.id_entity
+      - datalake_for_rent_entities_views.repair.id_entity
+      - datalake_fintech_entities_views.invoice.id_entity
+      - datalake_growth_entities_views.photo_session.id_entity
+      - datalake_growth_entities_views.house_draft.id_entity
+    description: Primary identifier for the entity from production systems.
+  id_house:
+    lineage:
+      - datalake_visit_entities_views.visit.id_house
+      - datalake_listing_entities_views.listing.id_house
+      - datalake_for_rent_entities_views.offer.id_house
+      - datalake_for_rent_entities_views.contract.id_house
+      - datalake_for_rent_entities_views.termination.id_house
+      - datalake_for_rent_entities_views.inspection.id_house
+      - datalake_for_rent_entities_views.credit_evaluation.id_house
+      - datalake_for_rent_entities_views.onboarding.id_house
+      - datalake_for_rent_entities_views.reservation.id_house
+      - datalake_for_rent_entities_views.repair.id_house
+      - datalake_fintech_entities_views.invoice.id_house
+      - datalake_growth_entities_views.photo_session.id_house
+      - datalake_growth_entities_views.house_draft.id_house
+    description: House id related to the entity (EBDB).
+  id_contract:
+    lineage:
+      - datalake_for_rent_entities_views.contract.id_contract
+      - datalake_for_rent_entities_views.termination.id_contract
+      - datalake_for_rent_entities_views.inspection.id_contract
+      - datalake_for_rent_entities_views.onboarding.id_contract
+      - datalake_for_rent_entities_views.repair.id_contract
+      - datalake_listing_entities_views.listing.id_contract
+      - datalake_fintech_entities_views.invoice.id_contract
+    description: Contract id related to the entity, if applicable.
+  id_user:
+    lineage:
+      - datalake_visit_entities_views.visit.id_user
+      - datalake_listing_entities_views.listing.id_user
+      - datalake_for_rent_entities_views.offer.id_user
+      - datalake_for_rent_entities_views.contract.id_user
+      - datalake_for_rent_entities_views.termination.id_user
+      - datalake_for_rent_entities_views.inspection.id_user
+      - datalake_for_rent_entities_views.credit_evaluation.id_user
+      - datalake_for_rent_entities_views.onboarding.id_user
+      - datalake_for_rent_entities_views.reservation.id_user
+      - datalake_for_rent_entities_views.repair.id_user
+      - datalake_fintech_entities_views.invoice.id_user
+      - datalake_growth_entities_views.photo_session.id_user
+      - datalake_growth_entities_views.house_draft.id_user
+    description: User id associated with the entity (EBDB).
+  uuid_person:
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+    description: Person UUID associated with the user.
+  entity:
+    description: Entity type string (VISIT, FR_OFFER, FR_CONTRACT, FR_TERMINATION, LISTING, FR_INSPECTION, FR_ONBOARDING, FR_CREDIT_EVALUATION, FR_RESERVATION, FR_REPAIR_ONGOING, FR_REPAIR_OFFBOARDING, FR_INVOICE, PHOTO_SESSION, HOUSE_DRAFT).
+  persona:
+    description: Role of the user in relation to the entity (OWNER, TENANT, TENANT_PROSPECT, BUYER_PROSPECT, AGENT_BROKER, AGENT_INSPECTOR, AGENT_PHOTOGRAPHER).
+  business_context:
+    description: Business context (RENT, SALE, or NULL).
+  properties:
+    description: JSON with entity-specific status and contextual information.
+  house_address:
+    lineage:
+      - core_house.house.address
+      - core_house.house.number
+      - core_house.house.complement
+      - core_house.house.neighborhood
+      - core_house.house.city
+    description: Full property address (address, number, complement, neighborhood, city).
+  is_active:
+    description: TRUE for active entities, FALSE for inactive. Inactive entities are retained for 30 days based on ts_updated.
+  ts_inactive:
+    description: Timestamp when the entity became inactive (ts_updated when is_active = FALSE, NULL otherwise).
+  ts_created:
+    description: Timestamp when the entity was created.
+  ts_updated:
+    description: Timestamp when the entity was last updated.

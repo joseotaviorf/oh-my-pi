@@ -1,0 +1,16 @@
+dag:
+  name: enrich_for_rent_entities_views
+  schedule_start_date: 2025, 1, 1
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      Creates enriched views for rental transaction entities: offer, contract, termination, inspection,
+      credit evaluation, onboarding, reservation, and repair.
+      Part of the CDP entities pipeline; consumed by enrich_transactional_entities via UNION ALL consolidation.
+workflow:
+  type: query_view
+  layer: enrich
+  has_hive_sync: false
+cluster:
+  type: databricks_16_4_med_general_2_workers_cluster
+  databricks_conn_id: databricks_new

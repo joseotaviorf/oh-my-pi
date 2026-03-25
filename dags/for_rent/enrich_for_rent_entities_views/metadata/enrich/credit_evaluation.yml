@@ -1,0 +1,44 @@
+database_name: datalake_for_rent_entities_views
+table_name: credit_evaluation
+description: >
+  Enriched view of FR_CREDIT_EVALUATION entities with persona expansion (OWNER, TENANT_PROSPECT).
+  Consumed by enrich_transactional_entities consolidation.
+domain: For Rent
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_entity:
+    lineage:
+      - core_credit_evaluation.credit_evaluation.id_credit_evaluation
+    description: Credit evaluation id serving as the entity identifier.
+  id_house:
+    lineage:
+      - core_credit_evaluation.credit_evaluation.id_house
+    description: House id related to the credit evaluation.
+  id_contract:
+    description: Always NULL for credit evaluation entities.
+  id_user:
+    lineage:
+      - core_credit_evaluation.credit_evaluation.id_owner
+      - core_credit_evaluation.credit_evaluation.id_user
+    description: User id (owner or tenant prospect) associated with the credit evaluation.
+  entity:
+    description: Fixed value 'FR_CREDIT_EVALUATION'.
+  persona:
+    description: OWNER or TENANT_PROSPECT.
+  business_context:
+    description: Fixed value 'RENT'.
+  properties:
+    lineage:
+      - core_credit_evaluation.credit_evaluation.status
+      - core_credit_evaluation.credit_evaluation.ts_created
+    description: JSON with credit evaluation status and creation timestamp.
+  is_active:
+    description: TRUE for NOT_SENT/ON_HOLD/PROCESSING, FALSE for CANCELLED/FAILED/FINISHED.
+  ts_created:
+    lineage:
+      - core_credit_evaluation.credit_evaluation.ts_created
+    description: Timestamp when the credit evaluation was created.
+  ts_updated:
+    lineage:
+      - core_credit_evaluation.credit_evaluation.ts_updated
+    description: Timestamp when the credit evaluation was last updated.

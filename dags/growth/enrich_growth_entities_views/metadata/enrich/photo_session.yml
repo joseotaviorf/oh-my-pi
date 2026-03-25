@@ -1,0 +1,44 @@
+database_name: datalake_growth_entities_views
+table_name: photo_session
+description: >
+  Enriched view of PHOTO_SESSION entities with persona expansion (OWNER, AGENT_PHOTOGRAPHER).
+  Consumed by enrich_transactional_entities consolidation.
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+columns:
+  id_entity:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.id
+    description: Photographer job id serving as the entity identifier.
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.id_house
+    description: House id related to the photo session.
+  id_contract:
+    description: Always NULL for photo session entities.
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+      - datalake_ebdb_clean.user.id
+    description: User id (property owner or photographer) associated with the photo session.
+  entity:
+    description: Fixed value 'PHOTO_SESSION'.
+  persona:
+    description: OWNER or AGENT_PHOTOGRAPHER.
+  business_context:
+    description: NULL for photo session entities (not tied to a specific business context).
+  properties:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.status
+      - datalake_ebdb_clean.photographer_job.ts_created
+    description: JSON with photo session status and creation timestamp.
+  is_active:
+    description: FALSE for PUBLICADO/CANCELADO/COMPLETADO/FOTOSTIRADAS, TRUE otherwise.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_created
+    description: Timestamp when the photo session was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.photographer_job.ts_updated
+    description: Timestamp when the photo session was last updated.

@@ -4149,6 +4149,12 @@ bietlejuice.enrich_transactional_entities:
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context
   - bietlejuice.ebdb_rent_flow_fast_lane:load-clean-onboarding
   - bietlejuice.terminator_fast_lane:load-clean-termination
+bietlejuice.enrich_transactional_entities_test:
+  - bietlejuice.core_contract:load-core-contract
+  - bietlejuice.core_credit_evaluation:load-core-credit-evaluation
+  - bietlejuice.core_house:load-core-house
+  - bietlejuice.core_offer:load-core-offer
+  - bietlejuice.core_visit:load-core-visit
 bietlejuice.enrich_trino_detractor:
   - bietlejuice.enrich_trino:load-enrich-trino-detractor-queries:first-run-of-day
   - bietlejuice.superset_internal:load-clean-ab-user:first-run-of-day
