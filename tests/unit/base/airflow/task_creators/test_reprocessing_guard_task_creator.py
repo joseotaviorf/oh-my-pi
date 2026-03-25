@@ -41,7 +41,7 @@ class TestReprocessingGuardTaskCreator:
             yield mock_get_current_context
 
     @pytest.fixture
-    def reprocessing_guard_task_creator(self):
+    def reprocessing_guard_task_creator(self, mock_get_current_context):
         from bietlejuice.base.airflow.task_creators.reprocessing_guard_task_creator import (
             ReprocessingGuardTaskCreator,
         )

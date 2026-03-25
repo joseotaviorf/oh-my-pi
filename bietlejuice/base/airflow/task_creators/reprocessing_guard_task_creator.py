@@ -3,7 +3,8 @@ from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )
 from bietlejuice.services.dataset_service import DatasetService
-from airflow.operators.python import get_current_context, ShortCircuitOperator
+import airflow.operators.python as airflow_python_operators
+from airflow.operators.python import ShortCircuitOperator
 from airflow.utils.context import Context
 
 
@@ -33,7 +34,9 @@ class ReprocessingGuardTaskCreator(BaseTaskCreator):
         )
 
     def _should_run_dag(self) -> bool:
-        context = get_current_context()
+        # Resolve via the Airflow module so tests can patch
+        # ``airflow.operators.python.get_current_context`` after this module is imported.
+        context = airflow_python_operators.get_current_context()
 
         if not DatasetService.is_reprocessing_run(context):
             print("Not a reprocessing run, allowing DAG to continue.")
