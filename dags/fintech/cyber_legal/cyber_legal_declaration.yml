@@ -25,7 +25,7 @@ workflow:
     - "{load_end_date}"
     - "{extraction_type}"
     - "{partitions}"
-  execution_timeout_hours: 10
+  execution_timeout_hours: 14
   tables_customization:
     case:
       clean_table_name: case
@@ -168,7 +168,7 @@ cluster:
   custom_configurations:
     driver_node_type_id: m5d.8xlarge
     node_type_id: r5d.8xlarge
-    num_workers: 5
+    num_workers: 6
     runtime_engine: PHOTON
     spark_version: 16.4.x-scala2.12
     single_user_name: "{{ var.value.databricks_single_user_name }}"

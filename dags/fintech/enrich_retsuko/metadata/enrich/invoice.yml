@@ -254,3 +254,5 @@ columns:
     description: "Invoice last update timestamp"
     lineage:
       - datalake_retsuko_clean.invoice.ts_retsuko_updated
+  ts_load:
+    description: "Timestamp when the table was loaded"

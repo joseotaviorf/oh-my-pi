@@ -54,7 +54,8 @@ SELECT
     inv.ts_nf_requested,
     inv.ts_created,
     inv.ts_synced,
-    inv.ts_retsuko_updated
+    inv.ts_retsuko_updated,
+    NOW() AS ts_load
 FROM
     datalake_retsuko_clean.invoice AS inv
 LEFT JOIN
