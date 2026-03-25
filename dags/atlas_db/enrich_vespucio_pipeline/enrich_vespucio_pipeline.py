@@ -164,7 +164,7 @@ class Tables:
         "vespucio_sources_delta.source_navent_houses_composed"
     )
     source_union_houses = "vespucio_sources_delta.source_union_house"
-    source_idactum_houses = "vespucio_sources_delta.source_idactum_house"
+    source_idactum_houses = "vespucio_sources_delta.source_idactum_houses"
     source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
     source_iptu_houses = "vespucio_sources_delta.source_iptu_house"
     source_cnefe_houses = "vespucio_sources_delta.source_cnefe_house"
@@ -358,6 +358,7 @@ stage_step_task = create_task(
         f"--input_source_ebdb_houses={Tables.source_ebdb_house}",
         f"--input_source_navent_houses_composed={Tables.source_navent_houses_composed}",
         f"--input_source_union_houses={Tables.source_union_houses}",
+        f"--input_source_idactum_houses={Tables.source_idactum_houses}",
         f"--overwrite_schema",
         f"--output_staged_condos={Tables.stage_step_condos}",
         f"--output_staged_houses={Tables.stage_step_houses}",
