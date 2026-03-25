@@ -108,27 +108,12 @@ def create_start_end_operator(task_id: str):
 
 EVENTS_CONFIG = {
     #TODO: Add all events
-    "account": {
-        "event_path": "raw/salesforce/AccountEvent",
-    },
     "case": {
         "event_path": "raw/salesforce/CaseEvent",
     },
-    # "checklist": {
-    #     "event_path": "raw/salesforce/Checklist__Event",
-    # },
-    # "contract": {
-    #     "event_path": "raw/salesforce/ContractEvent",
-    # },
-    # "contract_member": {
-    #     "event_path": "raw/salesforce/ContractMember__Event",
-    # },
     "email_message": {
         "event_path": "raw/salesforce/EmailMessageEvent",
     },
-    # "relisting_context": {
-    #     "event_path": "raw/salesforce/RelistingContext__Event",
-    # },
     "user": {
         "event_path": "raw/salesforce/UserEvent",
     }
