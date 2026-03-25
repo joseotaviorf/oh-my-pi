@@ -40,7 +40,7 @@ flowchart LR
         R10["🔮 qube_specs.mdc\ndimension · measure\nmetric declaration schemas"]
         R11["🏗️ core_models_generation.mdc\nCore Model file structure\nSpark job · schema · tests"]
         R12["✅ data_quality_tests.mdc\nInmetro validation catalog\nhas_size · is_complete · custom"]
-        R13["👥 people_domain.mdc\nDW 2.0 schemas · SCD Type 2\nOracle HCM · deprecated DAGs"]
+        R13["👥 people/people_domain.mdc\nDW 2.0 schemas · SCD Type 2\nOracle HCM · deprecated DAGs"]
     end
 
     subgraph skills ["⚡ Skills — Step-by-step Playbooks"]
@@ -111,7 +111,7 @@ Subagents are domain-specialist roles the AI adopts for specific types of judgme
 | `qube_specs.mdc` | glob `dags/qube/*` | Qube semantic layer conventions: dimension, measure, and metric declaration schemas |
 | `core_models_generation.mdc` | on demand | Core Data Model generation: mandatory file structure, declaration standards, Spark job patterns, schema validation, and test conventions |
 | `data_quality_tests.mdc` | glob `dags/**/data_quality/**/*.yml` | Inmetro (Great Expectations) validation catalog: `has_size`, `is_complete`, `is_unique`, `has_null_count`, `has_size_variation`, `custom`; DW dimension `-1` unknown row handling; `alert_channel` routing |
-| `people_domain.mdc` | glob `dags/people/**/*` | People DW 2.0 schema structure (11 schemas), SCD Type 2 pattern, Oracle HCM `4712-12-31` normalization, deprecated DAG list, enrich domain-driven naming |
+| `people/people_domain.mdc` | glob `dags/people/**/*` | People DW 2.0 schema structure (11 schemas), SCD Type 2 pattern, Oracle HCM `4712-12-31` normalization, deprecated DAG list, enrich domain-driven naming |
 
 ### How "always on" rules save you from repeating yourself
 
@@ -128,7 +128,7 @@ Six rules activate automatically when you open or edit a matching file type:
 - **`testing_conventions.mdc`** activates for any file under `tests/` — it enforces the TDD Red → Green → Refactor workflow and selects the correct test pattern (Pattern A vs Pattern B).
 - **`python_conventions.mdc`** activates for any `.py` file — it enforces Black/Flake8 style, `QuintoAndarLogger`, and Pydantic v2 APIs.
 - **`data_quality_tests.mdc`** activates for any `data_quality/**/*.yml` file — it provides the full Inmetro validation catalog, including the DW dimension `-1` unknown row rule.
-- **`people_domain.mdc`** activates for any file under `dags/people/` — it applies People DW 2.0 schema structure, SCD Type 2 conventions, Oracle HCM source system rules, and the list of deprecated DAGs to avoid.
+- **`people/people_domain.mdc`** activates for any file under `dags/people/` — it applies People DW 2.0 schema structure, SCD Type 2 conventions, Oracle HCM source system rules, and the list of deprecated DAGs to avoid.
 
 ### How other on-demand rules activate
 

@@ -148,3 +148,6 @@ local/astro/scripts/*
 # Airflow DAG Builder Python tfiles
 dags/**/*_dag.py
 .worktrees/
+
+# Cursor local scratch: drafts, test SQL, logs — not part of the official repo tree.
+.cursor/temp/

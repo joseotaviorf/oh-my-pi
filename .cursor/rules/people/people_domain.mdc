@@ -11,6 +11,33 @@ These conventions complement the core repository rules and naming conventions.
 
 ---
 
+## Useful Cursor skills
+
+Optional agent skills that complement this rule file (invoke by each skill’s YAML **`name`**). They cover **delivery workflow**; this document remains the source of truth for **pipeline design** under `dags/people/`.
+
+| Skill `name` | Path | Suggest when |
+|--------------|------|----------------|
+| **`people-jira-branch-setup`** | `.cursor/skills/people/jira-branch-setup/SKILL.md` | Starting **non–local-only** ticketed work: Jira + Git branch from `origin/master` / `origin/HEAD` — **before** heavy edits to People SQL/metadata. **Policies, naming, English on Jira** → **`dbp-jira-reference.md`**; **`.cursor/temp/`** mirror → **Delivery artifact folder** above. |
+| **`review-pr`** | `.cursor/skills/review-pr/SKILL.md` | Full local CI-style checks before merge (style, declarations, metadata pairs, etc.). |
+
+For Git sync and conflicts before a PR, use **Git Workflow** below.
+
+### Jira (DBP) — where to look
+
+Stable Jira/API facts for the Data People squad (project key, cloud ID, kickoff policies, branch/slug naming, quirks, workflow snapshot) live in **`.cursor/rules/people/dbp-jira-reference.md`**. Use that file during delivery skills; do not duplicate long tables here.
+
+### Delivery artifact folder (`.cursor/temp/`)
+
+Per-ticket delivery artifacts (PR drafts, planning, SQL tests, Databricks outputs) for People work live under **`.cursor/temp/`** in a subdirectory that **matches the Git branch name exactly** (same string, same `/` nesting).
+
+- Example: branch **`DBP-1268/add-cursor-skills`** → **`.cursor/temp/DBP-1268/add-cursor-skills/`** (not a shortened or flat folder name).
+- Resolve from **`git rev-parse --abbrev-ref HEAD`** after the branch exists; e.g. **`PEOPLE/foo-bar`** → **`.cursor/temp/PEOPLE/foo-bar/`**.
+- **`.cursor/temp/`** is **gitignored** (not committed).
+
+The **`people-jira-branch-setup`** skill uses this layout; additional People delivery skills under **`.cursor/skills/people/`** should reuse the same rule when they land in the repo.
+
+---
+
 ## Multi-File Consistency
 
 If you update logic in `queries/**/*.sql`, you **must** automatically check and update the corresponding `metadata/**/*.yml` and `data_quality/**/*.yml` (layer folders: clean, enrich, dw, etc.).
