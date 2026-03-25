@@ -213,23 +213,29 @@ trato_feito AS (
 
     SELECT
         CASE 
-            WHEN p.id_transaction LIKE '000%' THEN LEFT(REGEXP_REPLACE(p.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) - 2)
-            WHEN LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) >= 30 THEN LEFT(REGEXP_REPLACE(p.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(p.id_transaction, '^0+', '')) - 2)
-        ELSE REGEXP_REPLACE(p.id_transaction, '^0+', '')
+            WHEN px.id_transaction LIKE '000%' THEN LEFT(REGEXP_REPLACE(px.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(px.id_transaction, '^0+', '')) - 2)
+            WHEN LENGTH(REGEXP_REPLACE(px.id_transaction, '^0+', '')) >= 30 THEN LEFT(REGEXP_REPLACE(px.id_transaction, '^0+', ''), LENGTH(REGEXP_REPLACE(px.id_transaction, '^0+', '')) - 2)
+        ELSE REGEXP_REPLACE(px.id_transaction, '^0+', '')
         END AS our_number,
         CAST(NULL AS STRING) AS id_invoice,
         ic.paid_amount AS amount,
         CASE 
             WHEN dd.is_brz_fintech_business_day = false THEN dd.next_brz_fintech_business_day
-        ELSE DATE(ic.ts_last_received - interval '3' hour) END AS dt_paid
+        ELSE DATE(p.dt_paid) END AS dt_paid
     FROM
         datalake_trato_feito_clean.installment_charges AS ic
+    LEFT JOIN 
+        datalake_trato_feito_clean.installment i 
+        ON ic.id = i.id_installment_charge 
+    LEFT JOIN 
+        datalake_trato_feito_clean.payment p
+        ON i.id = p.id_installment
     LEFT JOIN
-        datalake_checkout_clean.pix AS p
-            ON ic.id_charge = p.id_charge
+        datalake_checkout_clean.pix AS px
+            ON ic.id_charge = px.id_charge
     LEFT JOIN
         dw_public.dim_date dd
-            ON DATE(ic.ts_last_received - interval '3' hour) = dd.date
+            ON DATE(p.dt_paid) = dd.date
 ),
 
 seu_barriga_sap AS (
