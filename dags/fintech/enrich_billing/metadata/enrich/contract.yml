@@ -21,6 +21,30 @@ columns:
     description: "Current revision number of the contract"
     lineage:
       - datalake_billing_clean.contract.current_revision
+  country:
+    description: "Country code from the latest contract revision payload"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  contract_version:
+    description: "Version string of the billing contract payload from the latest revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  guarantee:
+    description: "Guarantee type from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  rental_administrator:
+    description: "Rental administrator from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  landlord_legal_person:
+    description: "Landlord legal person type (e.g. physical) from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  landlord_transfer_funds_day:
+    description: "Day of month when landlord transfer funds from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
   condominium_amount:
     description: "Condominium amount from the latest contract revision"
     lineage:
@@ -71,6 +95,14 @@ columns:
       - datalake_billing_clean.contract_revision.contract_data
   ts_charge_ended:
     description: "Charge end timestamp extracted from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  ts_start_period:
+    description: "Contract start period timestamp from the latest contract revision"
+    lineage:
+      - datalake_billing_clean.contract_revision.contract_data
+  ts_end_period:
+    description: "Contract end period timestamp from the latest contract revision"
     lineage:
       - datalake_billing_clean.contract_revision.contract_data
   ts_created:
