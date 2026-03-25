@@ -49,7 +49,7 @@ def salesforce_clean_pipeline(spark, cfg):
         table_name=source_table,
         partition_date=cfg.partition_date,
         partition_hour=cfg.partition_hour,
-        fail=True,
+        fail=False,
     )
 
     event_df = (
