@@ -1,0 +1,47 @@
+---
+table_name: datalake_people.cost_center_history
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  id_organization:
+    is_complete:
+      severity_level: Error
+  cost_center_code:
+    is_complete:
+      severity_level: Error
+  is_active:
+    is_complete:
+      severity_level: Error
+  is_primary_organization:
+    is_complete:
+      severity_level: Error
+  is_current:
+    is_complete:
+      severity_level: Error
+  dt_valid_from:
+    is_complete:
+      severity_level: Error
+    custom:
+      # At most one row per organization and validity start (id_organization is the grain anchor)
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT
+            id_organization,
+            dt_valid_from
+          FROM datalake_people.cost_center_history
+          GROUP BY
+            id_organization,
+            dt_valid_from
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
