@@ -1,0 +1,46 @@
+---
+table_name: core_brokers.brokers_profile
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  sk_broker_profile:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_broker:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+  profile_status:
+    is_complete:
+      severity_level: Error
+  is_active_profile:
+    is_complete:
+      severity_level: Error
+  is_agent:
+    is_complete:
+      severity_level: Error
+  is_broker_admin:
+    is_complete:
+      severity_level: Error
+  has_3p_access_control:
+    is_complete:
+      severity_level: Error
+  ts_profile_updated:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error
+  uuid_person:
+    has_completeness:
+      greater_than: 0.95
+      severity_level: Warning

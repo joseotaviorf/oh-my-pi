@@ -1,0 +1,72 @@
+columns:
+  sk_broker_profile:
+    type: string
+    required: true
+
+  sk_broker:
+    type: string
+    required: true
+
+  uuid_person:
+    type: string
+    required: false
+
+  product_name:
+    type: string
+    required: false
+
+  business_context:
+    type: string
+    required: true
+
+  profile:
+    type: string
+    required: false
+
+  profile_status:
+    type: string
+    required: true
+
+  is_active_profile:
+    type: boolean
+    required: true
+
+  is_agent:
+    type: boolean
+    required: true
+
+  is_broker_admin:
+    type: boolean
+    required: true
+
+  has_3p_access_control:
+    type: boolean
+    required: true
+
+  ts_profile_created:
+    type: timestamp
+    required: false
+
+  ts_profile_updated:
+    type: timestamp
+    required: true
+
+  ts_load:
+    type: timestamp
+    required: true
+
+  year:
+    type: int
+    required: true
+
+  month:
+    type: int
+    required: true
+
+  day:
+    type: int
+    required: true
+
+min_columns: 17
+max_columns: 17
+strict: true

@@ -1,0 +1,81 @@
+database_name: core_brokers
+table_name: brokers_profile
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
+description: >
+  Broker member profiles for 3P rent and sale products: links people to companies
+  and products with role (profile) metadata from the Company service. Scoped to
+  company_product lines id_product 27 (sale) and 30 (rent).
+columns:
+  sk_broker_profile:
+    lineage:
+      - datalake_company_clean.member_profile.id
+    description: >
+      Surrogate key for a member_profile row (string cast of internal id). Uniquely
+      identifies one person-company-product-profile assignment.
+  sk_broker:
+    lineage:
+      - datalake_company_clean.member_profile.id_company
+    description: >
+      Surrogate key of the broker company (string cast of id_company), aligned with
+      the brokers core model sk_broker.
+  uuid_person:
+    lineage:
+      - datalake_company_clean.member_profile.uuid_person
+    description: Person UUID from the person service for the assigned member.
+  product_name:
+    lineage:
+      - datalake_company_clean.product.name
+    description: Name of the 3P product (rent or sale line) for this membership.
+  business_context:
+    description: >
+      High-level line derived from id_product: SALE for product 27, RENT for product 30.
+  profile:
+    lineage:
+      - datalake_company_clean.profile.profile_name
+    description: Human-readable profile or role name for this membership.
+  profile_status:
+    lineage:
+      - datalake_company_clean.member_profile.status
+    description: >
+      Lifecycle status of the membership in the source system (e.g. ACTIVE, INACTIVE).
+  is_active_profile:
+    lineage:
+      - datalake_company_clean.member_profile.status
+    description: True when profile_status is ACTIVE.
+  is_agent:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True when id_profile is 17 (third-party agent profile in source).
+  is_broker_admin:
+    lineage:
+      - datalake_company_clean.member_profile.id_profile
+    description: True when id_profile is 13 (company admin profile in source).
+  has_3p_access_control:
+    description: >
+      Literal true for rows in this table; indicates records participate in 3P
+      access control for rent/sale products.
+  ts_profile_created:
+    lineage:
+      - datalake_company_clean.member_profile.ts_created
+    description: When the membership was created in the source system.
+  ts_profile_updated:
+    lineage:
+      - datalake_company_clean.member_profile.ts_updated
+    description: >
+      Last update to the membership in the source; drives incremental loads and
+      merge updates in this table.
+  ts_load:
+    description: Timestamp when this core table was written by the ETL job.
+  year:
+    lineage:
+      - datalake_company_clean.member_profile.year
+    description: Partition year from member_profile.
+  month:
+    lineage:
+      - datalake_company_clean.member_profile.month
+    description: Partition month from member_profile.
+  day:
+    lineage:
+      - datalake_company_clean.member_profile.day
+    description: Partition day from member_profile.

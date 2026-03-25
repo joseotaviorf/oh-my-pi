@@ -1219,6 +1219,9 @@ bietlejuice.core_brokers:
     - bietlejuice.company:load-clean-document
     - bietlejuice.company:load-clean-company-product
     - bietlejuice.company:load-clean-address
+    - bietlejuice.company:load-clean-member-profile
+    - bietlejuice.company:load-clean-product
+    - bietlejuice.company:load-clean-profile
 bietlejuice.dw_sale_closing_flows:
   add:
     - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta:first-run-of-day

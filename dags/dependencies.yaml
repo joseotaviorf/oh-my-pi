@@ -12,6 +12,9 @@ bietlejuice.core_brokers:
   - bietlejuice.company:load-clean-company-document
   - bietlejuice.company:load-clean-company-product
   - bietlejuice.company:load-clean-document
+  - bietlejuice.company:load-clean-member-profile
+  - bietlejuice.company:load-clean-product
+  - bietlejuice.company:load-clean-profile
 bietlejuice.core_contract:
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract
 bietlejuice.core_credit_evaluation:

@@ -45,6 +45,12 @@ workflow:
       z_order_by: [sk_broker_product, ts_database_transaction]
       table_properties:
         "delta.enableChangeDataFeed": "true"
+    brokers_profile:
+      load_spark_job: load_core_broker_profiles
+      partitions: [year, month, day]
+      z_order_by: [sk_broker_profile]
+      table_properties:
+        "delta.enableChangeDataFeed": "true"
 cluster:
   type: databricks_16_4_rfleet_instance_cluster
   databricks_conn_id: databricks_new
