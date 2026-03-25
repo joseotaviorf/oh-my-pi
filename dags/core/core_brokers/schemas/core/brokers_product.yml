@@ -42,6 +42,10 @@ columns:
     type: string
     required: true
 
+  business_context:
+    type: string
+    required: true
+
   # Integrator partner
   integrator_partner:
     type: string
@@ -121,12 +125,16 @@ columns:
     type: string
     required: false
 
+  has_3p_access_control:
+    type: boolean
+    required: true
+
   # Audit timestamps
-  ts_created:
+  ts_product_created:
     type: timestamp
     required: false
 
-  ts_updated:
+  ts_product_updated:
     type: timestamp
     required: true
 
@@ -149,6 +157,6 @@ columns:
     required: true
 
 # Schema constraints
-min_columns: 33
-max_columns: 33
+min_columns: 35
+max_columns: 35
 strict: true

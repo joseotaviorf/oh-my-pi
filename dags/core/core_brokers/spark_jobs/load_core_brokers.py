@@ -81,7 +81,7 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
         )
 
         result_df = self._select_final_columns(result_df)
-        return self._add_partition_columns(result_df, "ts_updated")
+        return self._add_partition_columns(result_df, "ts_broker_updated")
 
     # ── historical model (brokers_historical) ───────────────────────
 
@@ -166,12 +166,15 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
         )
 
     @staticmethod
-    def _extract_document_number(doc_type, alias_name):
+    def _extract_document_number(doc_type, alias_name, digits_only: bool):
         """Build an aggregate expression that extracts a cleaned document number.
+
+        CNPJ uses digits-only; CRECI and RFC keep alphanumeric characters.
 
         Returns a ``Column`` expression suitable for use inside ``.agg()``.
         """
-        cleaned = regexp_replace(col("d.identification_number"), "[^0-9]", "")
+        pattern = "[^0-9]" if digits_only else "[^0-9A-Za-z]"
+        cleaned = regexp_replace(col("d.identification_number"), pattern, "")
         agg_expr = spark_max(when(col("d.document_type") == doc_type, cleaned))
         return when(agg_expr != "", agg_expr).alias(alias_name)
 
@@ -186,9 +189,9 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
         return (
             cd_with_doc.groupBy("cd.id_company")
             .agg(
-                self._extract_document_number("CRECI", "creci"),
-                self._extract_document_number("CNPJ", "cnpj"),
-                self._extract_document_number("RFC", "rfc"),
+                self._extract_document_number("CRECI", "creci", digits_only=False),
+                self._extract_document_number("CNPJ", "cnpj", digits_only=True),
+                self._extract_document_number("RFC", "rfc", digits_only=False),
             )
             .withColumnRenamed("id_company", "doc_id_company")
         )
@@ -286,7 +289,7 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
             col("a.city").alias("broker_city"),
             col("a.state").alias("broker_state"),
             col("a.country").alias("broker_country"),
-            col("a.zip_code").alias("broker_zip_code"),
+            regexp_replace(col("a.zip_code"), "[^0-9]", "").alias("broker_zip_code"),
             col("cd.creci"),
             col("cd.cnpj"),
             col("cd.rfc"),
@@ -295,8 +298,9 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
             col("cp.is_3p_active_broker"),
             col("cp.is_3p_active_rent_broker"),
             col("cp.is_3p_active_sale_broker"),
-            col("c.ts_created"),
-            col("c.ts_updated"),
+            lit(True).alias("has_3p_access_control"),
+            col("c.ts_created").alias("ts_broker_created"),
+            col("c.ts_updated").alias("ts_broker_updated"),
             current_timestamp().alias("ts_load"),
         ]
 

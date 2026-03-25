@@ -57,6 +57,12 @@ columns:
       - datalake_company_clean.company_product.status
     description: >
       Current status of the company-product relationship (e.g., ACTIVE, INACTIVE).
+  business_context:
+    lineage:
+      - datalake_company_clean.company_product.id_product
+    description: >
+      High-level business line for the 3P product: SALE when id_product is 27,
+      RENT when id_product is 30.
   integrator_partner:
     lineage:
       - datalake_company_clean.company.company_name
@@ -73,25 +79,25 @@ columns:
       - datalake_company_clean.revenue_share.commission
     description: >
       Commission percentage defined in the revenue share agreement for this
-      broker-product relationship.
+      broker-product relationship, rounded to five decimal places.
   demand_fee:
     lineage:
       - datalake_company_clean.revenue_share.demand_fee
     description: >
       Demand fee defined in the revenue share agreement for this broker-product
-      relationship.
+      relationship, rounded to five decimal places.
   supply_fee:
     lineage:
       - datalake_company_clean.revenue_share.supply_fee
     description: >
       Supply fee defined in the revenue share agreement for this broker-product
-      relationship.
+      relationship, rounded to five decimal places.
   platform_fee:
     lineage:
       - datalake_company_clean.revenue_share.platform_fee
     description: >
       Platform fee defined in the revenue share agreement for this broker-product
-      relationship.
+      relationship, rounded to five decimal places.
   bank:
     lineage:
       - datalake_company_clean.banking_information.bank
@@ -163,16 +169,20 @@ columns:
     description: >
       Array of distinct region IDs where this broker-product relationship
       operates, aggregated from the company_product_region table.
-  ts_created:
+  has_3p_access_control:
+    description: >
+      Indicates whether the broker-product row is subject to third-party access
+      control policies. Currently always true for all rows in this core model.
+  ts_product_created:
     lineage:
       - datalake_company_clean.company.ts_created
     description: Timestamp when the company record was initially created in the source system.
-  ts_updated:
+  ts_product_updated:
     lineage:
       - datalake_company_clean.company.ts_updated
     description: >
       Timestamp when the company record was last updated. Used for incremental
-      loading and change tracking.
+      loading, change tracking, and Delta merge updates.
   ts_load:
     description: >
       Timestamp when the Brokers Product Core Model was last loaded by the ETL
@@ -180,12 +190,12 @@ columns:
   year:
     lineage:
       - datalake_company_clean.company.ts_updated
-    description: Year partition column, derived from ts_updated.
+    description: Year partition column, derived from ts_product_updated.
   month:
     lineage:
       - datalake_company_clean.company.ts_updated
-    description: Month partition column, derived from ts_updated.
+    description: Month partition column, derived from ts_product_updated.
   day:
     lineage:
       - datalake_company_clean.company.ts_updated
-    description: Day partition column, derived from ts_updated.
+    description: Day partition column, derived from ts_product_updated.

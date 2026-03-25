@@ -7,6 +7,9 @@ from pyspark.sql.functions import (
     concat,
     current_timestamp,
     get_json_object,
+    lit,
+    round,
+    when,
 )
 
 from bietlejuice.base.core_models.core_brokers_base import (
@@ -90,7 +93,7 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
         )
 
         result_df = self._select_final_columns(result_df)
-        return self._add_partition_columns(result_df, "ts_updated")
+        return self._add_partition_columns(result_df, "ts_product_updated")
 
     # ── historical model (brokers_product_historical) ────────────────
 
@@ -334,12 +337,15 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
             col("p.name").alias("product_name"),
             col("p.business_segment"),
             col("cp.status").alias("product_status"),
+            when(col("cp.id_product") == 27, lit("SALE"))
+            .when(col("cp.id_product") == 30, lit("RENT"))
+            .alias("business_context"),
             col("ip.company_name").alias("integrator_partner"),
             col("ip.status").alias("integrator_partner_status"),
-            col("rs.commission"),
-            col("rs.demand_fee"),
-            col("rs.supply_fee"),
-            col("rs.platform_fee"),
+            round(col("rs.commission"), 5).cast("decimal(38,5)").alias("commission"),
+            round(col("rs.demand_fee"), 5).cast("decimal(38,5)").alias("demand_fee"),
+            round(col("rs.supply_fee"), 5).cast("decimal(38,5)").alias("supply_fee"),
+            round(col("rs.platform_fee"), 5).cast("decimal(38,5)").alias("platform_fee"),
             col("bi.bank"),
             col("bi.agency_number"),
             col("bi.account_number"),
@@ -352,8 +358,9 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
             col("cp.is_3p_active_sale_broker"),
             col("cp.has_opt_in_navent"),
             col("cpr.region_list"),
-            col("c.ts_created"),
-            col("c.ts_updated"),
+            lit(True).alias("has_3p_access_control"),
+            col("c.ts_created").alias("ts_product_created"),
+            col("c.ts_updated").alias("ts_product_updated"),
             current_timestamp().alias("ts_load"),
         ]
 

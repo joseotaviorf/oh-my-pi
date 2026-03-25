@@ -30,7 +30,10 @@ column_level_validations:
   is_3p_active_broker:
     is_complete:
       severity_level: Error
-  ts_updated:
+  has_3p_access_control:
+    is_complete:
+      severity_level: Error
+  ts_broker_updated:
     is_complete:
       severity_level: Error
   ts_load:

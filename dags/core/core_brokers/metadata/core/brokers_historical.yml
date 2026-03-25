@@ -82,14 +82,15 @@ columns:
   broker_zip_code:
     lineage:
       - datalake_company_clean.address.zip_code
-    description: Postal code (zip code) of the broker's address.
+    description: >
+      Postal code (zip code) of the broker's address, normalized to digits only.
   creci:
     lineage:
       - datalake_company_clean.document.identification_number
     description: >
       CRECI (Conselho Regional de Corretores de Imoveis) registration number.
-      Professional license number for real estate brokers in Brazil, containing
-      only numeric characters.
+      Professional license number for real estate brokers in Brazil, normalized
+      to alphanumeric characters (letters and digits).
   cnpj:
     lineage:
       - datalake_company_clean.document.identification_number
@@ -101,7 +102,7 @@ columns:
       - datalake_company_clean.document.identification_number
     description: >
       RFC (Registro Federal de Contribuyentes) number. Mexican federal tax ID
-      for companies, containing only numeric characters.
+      for companies, normalized to alphanumeric characters (letters and digits).
   is_3p_rent_broker:
     lineage:
       - datalake_company_clean.company_product.id_product
@@ -135,11 +136,15 @@ columns:
     description: >
       Boolean flag indicating if the company has the 3P sale product
       (id_product = 27) with status ACTIVE at the time of the transaction.
-  ts_created:
+  has_3p_access_control:
+    description: >
+      Indicates whether the broker is subject to third-party access control
+      policies. Currently always true for all rows in this core model.
+  ts_broker_created:
     lineage:
       - datalake_company_transactional.company.ts_created
     description: Timestamp when the company record was initially created in the source system.
-  ts_updated:
+  ts_broker_updated:
     lineage:
       - datalake_company_transactional.company.ts_updated
     description: >

@@ -100,12 +100,16 @@ columns:
     type: boolean
     required: true
 
+  has_3p_access_control:
+    type: boolean
+    required: true
+
   # Audit timestamps
-  ts_created:
+  ts_broker_created:
     type: timestamp
     required: false
 
-  ts_updated:
+  ts_broker_updated:
     type: timestamp
     required: true
 
@@ -128,6 +132,6 @@ columns:
     required: true
 
 # Schema constraints
-min_columns: 29
-max_columns: 29
+min_columns: 30
+max_columns: 30
 strict: true
