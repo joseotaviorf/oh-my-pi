@@ -97,8 +97,7 @@ workflow:
         - "parquet"
       extraction_type: incremental
       clean_extraction_type: incremental
-      raw_partitions: []
-      clean_partitions: [year, month, day]
+      partitions: [year, month, day]
       merge_on: [id_sync, id_row]
 cluster:
   type: databricks_16_4_min_2xlarge_memory_cluster_4_workers

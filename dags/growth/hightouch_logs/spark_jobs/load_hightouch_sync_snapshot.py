@@ -17,6 +17,7 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "Hightouch Sync Snapshot Load"
+RAW_PARTITION_COLUMNS = ["year", "month", "day"]
 logger = QuintoAndarLogger(JOB_NAME)
 spark_client = SparkClient()
 spark = spark_client.conn
@@ -82,7 +83,7 @@ def _write_to_raw(df, environment: str, source: str, datalake_bucket: str, table
         df=df,
         s3_path=full_table_path,
         format_options=SparkTableStorageFormat.DEFAULT_RAW,
-        write_mode="append",
+        partitions=RAW_PARTITION_COLUMNS,
         optimize_dataframe=False,
     )
 
