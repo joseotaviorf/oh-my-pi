@@ -42,6 +42,10 @@ columns:
     lineage:
       - datalake_company.company_sks.sk_company
     description: Surrogate key of the company; -1 when not linked.
+  id_by_real_estate:
+    lineage:
+      - datalake_3p_supply.lead_3p.id_by_real_estate
+    description: Property identifier as provided by the partner real estate system (external listing or property id).
   lead_hash:
     lineage:
       - datalake_3p_supply.lead_3p.lead_hash

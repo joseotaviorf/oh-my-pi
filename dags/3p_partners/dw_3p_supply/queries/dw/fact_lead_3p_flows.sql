@@ -8,6 +8,7 @@ SELECT
   COALESCE(ps.sk_person, -1) AS sk_person_owner_agent,
   COALESCE(cb.sk_broker, -1) AS sk_broker,
   COALESCE(cs.sk_company, -1) AS sk_company,
+  l.id_by_real_estate,
   l.lead_hash,
   lsc.business_context,
   lsc.is_opportunity,
