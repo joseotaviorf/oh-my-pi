@@ -68,6 +68,18 @@ columns:
     description: "Administrative fee percentage (e.g.: 0.08 for 8%)"
     lineage:
       - datalake_retsuko_raw.contract.administration_fee
+  adm_partner_brokerage_fee:
+    description: "Administrative partner brokerage fee amount for the contract (source currency units as in Retsuko)"
+    lineage:
+      - datalake_retsuko_raw.contract.adm_partner_brokerage_fee
+  brokerage_estate_agent_share:
+    description: "Estate agent share of brokerage fee for the contract"
+    lineage:
+      - datalake_retsuko_raw.contract.brokerage_estate_agent_share
+  brokerage_fee:
+    description: "Brokerage fee amount for the contract"
+    lineage:
+      - datalake_retsuko_raw.contract.brokerage_fee
   ts_signature:
     description: "Date and time of contract signature"
     lineage:
