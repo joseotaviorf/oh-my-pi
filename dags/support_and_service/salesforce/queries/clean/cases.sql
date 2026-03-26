@@ -71,6 +71,7 @@ SELECT
     TypeApproval__c AS case_type_approval,
     CommentsApproval__c AS case_comments_approval,
     ContractIdOddOrEven__c AS contract_id_odd_even,
+    OmniChannelQueue__c AS omni_channel_queue,
     CAST(IsABTest__c AS BOOLEAN) AS is_ab_test,
     CAST(PastDueDateSimulation__c AS BOOLEAN) AS is_past_due_date_simulation,
     CAST(SimulationTenantBudgetTimeLimit__c AS BOOLEAN) AS is_simulation_iq_budget_time_limit,

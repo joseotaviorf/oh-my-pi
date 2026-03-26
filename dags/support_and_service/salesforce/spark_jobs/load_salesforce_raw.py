@@ -341,6 +341,7 @@ def schema_define():
                             StructField("LastCustomerInteraction__c", StringType()),
                             StructField("TypeApproval__c", StringType()),
                             StructField("CommentsApproval__c", StringType()),
+                            StructField("OmniChannelQueue__c", StringType()),
                         ]
                     )
             },

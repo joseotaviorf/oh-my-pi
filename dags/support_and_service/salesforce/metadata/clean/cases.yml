@@ -140,6 +140,10 @@ columns:
     lineage:
       - datalake_salesforce_raw.case.ContractIdOddOrEven
     description: Descriptive column indicating if the case contract ID is odd or even.
+  omni_channel_queue:
+    lineage:
+      - datalake_salesforce_raw.case.OmniChannelQueue__c
+    description: Omni channel queue for the case.
   unlisting_reason:
     lineage:
       - datalake_salesforce_raw.case.UnlistingReason
