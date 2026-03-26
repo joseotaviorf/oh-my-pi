@@ -13,10 +13,6 @@ columns:
     description: "Court case identifier."
     lineage:
       - datalake_cyber_legal.process.id_court_case
-  id_contract_cyber:
-    description: "Contract identifier in CyberCredit system associated with the legal case."
-    lineage:
-      - datalake_cyber_legal.process.id_contract_cyber
   contract:
     description: "External contract identifier for the account under legal proceedings."
     lineage:

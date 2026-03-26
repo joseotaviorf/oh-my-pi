@@ -1,4 +1,16 @@
-WITH aux_calendar AS (
+WITH
+region AS (
+    SELECT DISTINCT
+        d.sk_contract,
+        g.short_region_name AS region,
+        g.city_name AS city
+    FROM dw_public.fact_listing_rent_flows d
+    LEFT JOIN dw_public.dim_house_listing f
+        ON f.sk_house_listing = d.sk_house_listing
+    LEFT JOIN dw_public.dim_region g
+        ON g.sk_region = d.sk_region
+),
+aux_calendar AS (
     SELECT
         d.sk_date,
         d.month_start,
@@ -102,8 +114,8 @@ SELECT DISTINCT
         ELSE e.office
     END, l.collection_agency) AS collection_agency,
     IF(e.id_process IS NOT NULL, e.chamber, l.chamber) AS chamber,
-    IF(e.id_process IS NOT NULL, e.region, l.region) AS region,
-    IF(e.id_process IS NOT NULL, e.city, l.city) AS city,
+    IF(e.id_process IS NOT NULL, r.region, l.region) AS region,
+    IF(e.id_process IS NOT NULL, r.city, l.city) AS city,
     IF(e.id_process IS NOT NULL,
     CASE
         WHEN c.dt_ended_rental_confirmed IS NOT NULL THEN 'Finalizado'
@@ -129,16 +141,7 @@ SELECT DISTINCT
     e.asset_attachment_expense_amount,
     e.asset_evaluation_expense_amount,
     e.credit_satisfaction_expense_amount,
-    IF(e.id_process IS NOT NULL,
-    CASE
-        WHEN c.ts_expected_termination IS NOT NULL AND c.dt_ended_rental_confirmed IS NULL AND e.dt_closure IS NULL THEN 'Em finalização'
-        WHEN e.first_standardized_reason IN ('Imissao na Posse', 'Despejo Coercitivo') AND e.dt_closure IS NULL THEN 'Em finalização'
-        WHEN e.dt_closure IS NULL AND e.action IN ('Execucao') THEN 'Execução'
-        WHEN e.dt_closure IS NULL THEN 'Ativo'
-        WHEN e.dt_closure IS NOT NULL AND e.first_standardized_reason IN ('Quitacao') THEN 'Quitado'
-        WHEN e.dt_closure IS NOT NULL AND e.first_standardized_reason IN ('Rescisao') THEN 'Finalizado'
-        WHEN e.dt_closure IS NOT NULL THEN 'Encerrado'
-    ELSE NULL END, l.passage_status) AS passage_status,
+    IF(e.id_process IS NOT NULL, 'not_in_cyber_legal', l.passage_status) AS passage_status,
     IF(e.id_process IS NOT NULL, e.procedure, l.procedure) AS procedure,
     IF(e.id_process IS NOT NULL, e.first_consolidated_reason, l.consolidated_reason) AS consolidated_reason,
     IF(e.id_process IS NOT NULL, e.first_standardized_reason, l.standardized_reason) AS standardized_reason,
@@ -382,4 +385,7 @@ LEFT JOIN
 LEFT JOIN
     dw_rent.dim_contract c
     ON e.contract = c.id_contract
+LEFT JOIN
+    region r
+    ON e.contract = r.sk_contract
 GROUP BY ALL

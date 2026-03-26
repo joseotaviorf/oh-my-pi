@@ -660,6 +660,8 @@ bietlejuice.dw_employee_details:
 bietlejuice.dw_evictions:
   - bietlejuice.cyber:load-clean-logs-code-description:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-logs-juridical:first-run-of-day
+  - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing:first-run-of-day
+  - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.enrich_cyber_legal:load-enrich-alerts:first-run-of-day
   - bietlejuice.enrich_cyber_legal:load-enrich-evictions-base:first-run-of-day
   - bietlejuice.enrich_cyber_legal:load-enrich-expenses:first-run-of-day
