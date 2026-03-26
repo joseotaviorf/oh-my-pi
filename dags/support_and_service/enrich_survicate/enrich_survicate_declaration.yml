@@ -26,6 +26,9 @@ workflow:
     repairs_surveys:
     - response_content
     - survey_responses
+    salesforce_surveys:
+    - response_content
+    - survey_responses
     scheduling_surveys:
     - response_content
     - survey_responses
