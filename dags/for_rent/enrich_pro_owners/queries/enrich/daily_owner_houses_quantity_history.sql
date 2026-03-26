@@ -1,18 +1,4 @@
-WITH b2b_user AS (
-  SELECT
-    u.id AS id_user,
-    pa.status AS partner_agent_status,
-    p.type AS partner_type
-  FROM
-    datalake_ebdb_clean.user AS u
-  LEFT JOIN
-    datalake_ebdb_clean.partner_agent AS pa
-      ON u.id = pa.id_user
-  LEFT JOIN
-    datalake_ebdb_clean.partner AS p
-      ON pa.id_partner = p.id
-),
-
+WITH 
 house_portability AS (
   SELECT
     hl.id_house,
@@ -140,26 +126,21 @@ owner_qtd_houses AS (
   GROUP BY 1,2,14,15
 ),
 
-pp_multi_history AS (
-  SELECT /*+ RANGE_JOIN(aud, 50000) */
-    COALESCE(aud.id_user, um.id_user) AS id_owner,
-    aud.id_account_manager,
-    aud.is_active,
-    DATE(FROM_UNIXTIME(ure.ts_revision/1000)) AS dt_event,
-    LEAD(DATE(FROM_UNIXTIME(ure.ts_revision/1000))) OVER (PARTITION BY COALESCE(aud.id_user, um.id_user) ORDER BY aud.rev) AS dt_next_event
+pp_multi_owners AS (
+  SELECT
+    pmu.status AS pp_multi_user_status,
+    pmu.id_account_manager,
+    u.id AS id_owner
   FROM
-    datalake_ebdb_clean.user_pro_owner_aud AS aud
-  LEFT JOIN
-    datalake_ebdb_clean.user_revision_entity AS ure
-      ON aud.rev = ure.id
-  LEFT JOIN
-    user_merge AS um
-      ON aud.id_user = um.id_predecessor_user
+    datalake_rental_management_clean.pp_multi_user AS pmu
+      INNER JOIN
+        datalake_ebdb_clean.user AS u
+        ON u.uuid_person = pmu.person_uuid
 )
 
-SELECT /*+ RANGE_JOIN(oqh, 800) */
+SELECT
   oqh.id_owner,
-  IF(ppm.is_active, ppm.id_account_manager, NULL) AS id_account_manager,
+  IF(pmo.pp_multi_user_status = 'ACTIVE', pmo.id_account_manager, NULL) AS id_account_manager,
   oqh.country_code,
   oqh.houses_published,
   oqh.houses_suspended,
@@ -173,7 +154,7 @@ SELECT /*+ RANGE_JOIN(oqh, 800) */
   oqh.quintoandar_houses,
   oqh.third_party_houses,
   oqh.is_merged_user,
-  IF(ppm.id_owner IS NOT NULL AND ppm.is_active, TRUE, FALSE) AS is_pp_multi_active,
+  IF(pmo.id_owner IS NOT NULL AND pmo.pp_multi_user_status = 'ACTIVE', TRUE, FALSE) AS is_pp_multi_active,
   oqh.dt_houses_owned,
   {year} AS year,
   {month} AS month,
@@ -181,7 +162,5 @@ SELECT /*+ RANGE_JOIN(oqh, 800) */
 FROM
   owner_qtd_houses AS oqh
 LEFT JOIN
-  pp_multi_history AS ppm
-    ON oqh.id_owner = ppm.id_owner
-    AND oqh.dt_houses_owned >= dt_event
-    AND oqh.dt_houses_owned < COALESCE(dt_next_event, CURRENT_DATE())
+  pp_multi_owners AS pmo
+    ON oqh.id_owner = pmo.id_owner

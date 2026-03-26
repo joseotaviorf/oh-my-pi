@@ -2,7 +2,13 @@ database_name: datalake_pro_owners
 table_name: daily_owner_houses_quantity_history
 description: Historical enriched table for rent context (PP Multi - Pro owner). Each
   row contains the changes of owner's quantity houses per day, just considering rent
-  and excluding b2b houses.
+  and excluding b2b houses. Starting from March 2026, the PP Multi active status
+  (is_pp_multi_active) and account manager (id_account_manager) are derived from
+  the PP Multi management system (pp_multi_user) instead of the legacy
+  user_pro_owner_aud audit table. Historical partitions prior to this change retain
+  the original values. Backfill caveat - if a past partition is reprocessed, these
+  two columns will reflect the current state of pp_multi_user, not the historical
+  state on that date.
 domain: For Rent
 owner: data-for-rent@quintoandar.com.br
 columns:
@@ -13,8 +19,8 @@ columns:
     description: Id user of the owner.
   id_account_manager:
     lineage:
-    - datalake_ebdb_clean.user_pro_owner_aud.id_account_manager
-    description: Id user of the account manager associated to an id_owner of a specific day.
+    - datalake_rental_management_clean.pp_multi_user.account_manager_id
+    description: Id user of the account manager associated to an id_owner. Sourced from pp_multi_user when status is ACTIVE, NULL otherwise.
   country_code:
     lineage:
     - datalake_ebdb_country.user.country_code
@@ -48,7 +54,9 @@ columns:
   is_merged_user:
     description: Boolean flag to check if the user is merged from another user.
   is_pp_multi_active:
-    description: Boolean flag to check if the customer is a PP Multi and is active.
+    lineage:
+    - datalake_rental_management_clean.pp_multi_user.status
+    description: Boolean flag indicating if the owner has status ACTIVE in the PP Multi system (pp_multi_user).
   dt_houses_owned:
     lineage:
     - datalake_quintoandar.aux_date.date
