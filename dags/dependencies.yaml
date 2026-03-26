@@ -595,6 +595,13 @@ bietlejuice.dw_demand:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results:first-run-of-day
   - bietlejuice.enrich_demand_conversion_events:load-enrich-top-of-funnel-results:first-run-of-day
+bietlejuice.dw_demographics:
+  - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
+  - bietlejuice.pin_core:load-clean-disability:first-run-of-day
+  - bietlejuice.pin_core:load-clean-ethnicity:first-run-of-day
+  - bietlejuice.pin_core:load-clean-foundation-lookup-value:first-run-of-day
+  - bietlejuice.pin_core:load-clean-people-legislative:first-run-of-day
+  - bietlejuice.pin_core:load-clean-religion:first-run-of-day
 bietlejuice.dw_employee:
   - bietlejuice.enrich_employment:load-enrich-employee-details:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes:first-run-of-day

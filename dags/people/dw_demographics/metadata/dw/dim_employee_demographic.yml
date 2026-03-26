@@ -1,0 +1,164 @@
+---
+database_name: dw_demographics
+table_name: dim_employee_demographic
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  DE&I dimension in dw_demographics. Each row is one employee’s demographic profile for a given country or region
+  (legislation) over a period where the normalized DE&I attributes stay the same. History is tracked over time: when attributes
+  change, a new period opens; consecutive periods with the same values are merged into one row.
+
+  Grain: one row per employee, per legislation, per contiguous period with unchanged attributes. Natural business key for a
+  version is employee + legislation + valid-from date.
+
+  Who is included: current People identifier rows for the person’s latest assignment, where the assignment is employee (E) or
+  contractor (C)—not pending (P). Test users are excluded.
+
+  Employees without legislative demographic rows in PIN still get one current row using the assignment’s legislation; fields
+  that would come from legislative data use “unknown” placeholders (-1 or null flags) as defined in the pipeline.
+
+  Display labels for ethnicity, religion, and sexual orientation come from PIN’s reference lists (US language), with fallbacks
+  where the primary list has no match.
+columns:
+  sk_employee:
+    description: |
+      Internal person key (string) for joining to other People data warehouse tables. Same person identifier as in PIN.
+    lineage:
+      - datalake_people.identifier_mapping.id_person
+  person_number:
+    description: |
+      Business key: PIN person number for the person’s latest E or C assignment (not pending workers).
+    lineage:
+      - datalake_people.identifier_mapping.person_number
+  legislation_code:
+    description: |
+      Country or region (legislation) this row applies to, from PIN legislative data. The BIM race flag
+      (is_underrepresented_race) is only filled for Brazil (BR); for other legislations it stays null.
+    lineage:
+      - datalake_pin_core_clean.people_legislative.legislation_code
+  ethnicity:
+    description: |
+      Self-declared ethnicity in English, from PIN reference data (primary ethnicity list, with a secondary list if the code
+      is missing from the first). Unknown or missing codes show as '-1'. For Brazil BIM reporting, which source codes count as
+      Indigenous, Black, or Brown is documented under is_underrepresented_race.
+    lineage:
+      - datalake_pin_core_clean.foundation_lookup_value.meaning
+      - datalake_pin_core_clean.ethnicity.ethnicity_code
+  religion:
+    description: |
+      Religion label in English from PIN reference data, matched to the person’s religion code. If the label is empty after
+      trimming, the raw code may appear (e.g. flex codes). NULL or NONE becomes '-1'.
+    lineage:
+      - datalake_pin_core_clean.foundation_lookup_value.meaning
+      - datalake_pin_core_clean.religion.religion_code
+  gender_identity_reported:
+    description: |
+      Self-declared gender identity exactly as captured in PIN (before mapping to gender_identity). Use gender_identity for
+      standardized reporting; use this column for audit or exact wording (LGPD special-category).
+    lineage:
+      - datalake_pin_core_clean.people_legislative.gender_identity
+  gender_identity:
+    description: |
+      Normalized gender identity for reporting (LGPD special-category): English title case, e.g. Woman Cisgender, Man Transgender,
+      Non Binary, Prefer Not To Say; '-1' when unknown. Values entered in PIN (Portuguese or English UI text) are mapped to these
+      labels until PIN stores standardized codes.
+    lineage:
+      - datalake_pin_core_clean.people_legislative.gender_identity
+    categories:
+      Woman Cisgender: Cisgender woman.
+      Woman Transgender: Transgender woman.
+      Man Cisgender: Cisgender man.
+      Man Transgender: Transgender man.
+      Non Binary: Non-binary or genderqueer.
+      Other: Other or fluid gender.
+      Prefer Not To Say: Respondent declined to identify.
+      '-1': Unknown or unmapped gender identity after normalization rules.
+  sexual_orientation:
+    description: |
+      Self-declared sexual orientation: English label from PIN’s sexual-orientation reference list, matched after cleaning the
+      stored value. English “Homosexual” aligns with the Portuguese label in PIN; empty or unmapped becomes '-1'.
+    lineage:
+      - datalake_pin_core_clean.foundation_lookup_value.meaning
+      - datalake_pin_core_clean.people_legislative.sexual_orientation
+    categories:
+      Asexual: Self-declared asexual orientation.
+      Bisexual: Self-declared bisexual orientation.
+      Heterosexual: Self-declared heterosexual orientation.
+      Homosexual: Self-declared homosexual orientation.
+      Other: Self-declared other sexual orientation.
+      Pansexual: Self-declared pansexual orientation.
+      "I'd rather not answer": Respondent declined to answer.
+      '-1': Empty, null, or unmapped after reference matching.
+  is_underrepresented_race:
+    description: |
+      DE&I glossary — BIM (Black, Indigenous, and Mixed-race): true when legislation is Brazil and the person’s primary
+      ethnicity code in PIN maps to Indigenous, Black, or Brown for local reporting; false when Brazil and not in that set;
+      null when legislation is not BR or ethnicity is unknown ('-1'). Included codes include 1, 3, 4, 7, 8, 15, 20, 60,
+      ORA_HRX_BRIN, ORA_HRX_MIXED (see team documentation for label mapping).
+    lineage:
+      - datalake_pin_core_clean.ethnicity.ethnicity_code
+    categories:
+      'TRUE': Ethnicity code is in the BIM set for Brazil (Indigenous, Black, or Brown per team rules).
+      'FALSE': Brazil and ethnicity is outside that set. Null when ethnicity is unknown ('-1'); see description.
+  is_lgbtqia:
+    description: |
+      DE&I glossary — LGBT+: true when sexual orientation (after PIN label resolution) is not heterosexual, or gender identity
+      is Woman Transgender, Man Transgender, Non Binary, or Other; null when both orientation and gender are unknown ('-1').
+    lineage:
+      - datalake_pin_core_clean.people_legislative.gender_identity
+      - datalake_pin_core_clean.people_legislative.sexual_orientation
+  is_underrepresented_gender:
+    description: |
+      Stricter DE&I read: true only for explicit non–Man Cisgender buckets (Woman Cisgender, Woman Transgender, Man Transgender,
+      Non Binary, Other); false for Man Cisgender; null when gender_identity is unknown ('-1') or Prefer Not To Say (not counted as
+      underrepresented gender for reporting). Broader than glossary “Women” alone; for Women-only metrics use is_woman.
+    lineage:
+      - datalake_pin_core_clean.people_legislative.gender_identity
+  is_woman:
+    description: |
+      DE&I glossary — Women: true when gender_identity is Woman Cisgender or Woman Transgender; null when gender_identity is '-1';
+      false otherwise.
+    lineage:
+      - datalake_pin_core_clean.people_legislative.gender_identity
+  is_neurodivergent:
+    description: |
+      Derived from the closed neurodiversity field in PIN: false for explicit non-neurodivergent / not applicable / declined
+      answers (including placeholder junk), null when missing, unknown ('-1'), or Other; true for any other resolved value
+      (assumes the closed list only contains neurodivergent affirmations besides the negatives above).
+    lineage:
+      - datalake_pin_core_clean.people_legislative.neurodiversity
+  has_self_declared_pwd:
+    description: True when the person answered yes to disability on the legislative self-declaration in PIN.
+    lineage:
+      - datalake_pin_core_clean.people_legislative.disability_answer
+  has_medical_disability_record:
+    description: |
+      DE&I glossary — PwD with documentation: true when an active disability record in PIN (medical documentation on file,
+      similar to a Brazilian “laudo”) overlaps this demographic period. This is separate from self-declaration only. Quota rules
+      (e.g. excluding some interns or young apprentices) are not applied here—filter downstream if your metric requires it.
+    lineage:
+      - datalake_pin_core_clean.disability.status
+      - datalake_pin_core_clean.disability.dt_effective_started
+      - datalake_pin_core_clean.disability.dt_effective_ended
+  is_underrepresented_group:
+    description: |
+      DE&I glossary — URG (Underrepresented Group): true if any of BIM (is_underrepresented_race), Women (is_woman), LGBT+
+      (is_lgbtqia), or PwD with medical documentation (has_medical_disability_record) applies; false if none apply. Can be null
+      when some inputs are unknown (e.g. null gender); in metrics that need a strict true/false, use COALESCE(is_underrepresented_group, false).
+    lineage:
+      - datalake_pin_core_clean.ethnicity.ethnicity_code
+      - datalake_pin_core_clean.people_legislative.gender_identity
+      - datalake_pin_core_clean.people_legislative.sexual_orientation
+      - datalake_pin_core_clean.disability.status
+  is_current:
+    description: True when this is the open-ended current period (no end date yet in the warehouse; end date stored as 9999-12-31).
+  dt_valid_from:
+    description: First day this version of the profile applies (inclusive).
+    lineage:
+      - datalake_pin_core_clean.people_legislative.dt_effective_started
+  dt_valid_to:
+    description: Last day this version applies (inclusive). Ongoing periods use 9999-12-31 as the end date.
+    lineage:
+      - datalake_pin_core_clean.people_legislative.dt_effective_ended
+  ts_load:
+    description: When this row was loaded into the data warehouse.

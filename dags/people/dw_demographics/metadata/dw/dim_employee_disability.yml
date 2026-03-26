@@ -1,0 +1,99 @@
+---
+database_name: dw_demographics
+table_name: dim_employee_disability
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  DE&I companion table in dw_demographics (DBP-1249): one row per employee, per country or region (legislation), per disability
+  record with its own effective dates in PIN. Use with dim_employee_demographic on sk_employee and legislation_code to add medical
+  disability detail and self-declared or accessibility fields that overlap that period.
+
+  Category and documented disability names use English labels from PIN reference data when available; otherwise the raw code or
+  category from the disability record is shown.
+
+  Same population as dim_employee_demographic: latest assignment types E or C in People identifier data (not pending), excluding
+  test users.
+columns:
+  sk_employee:
+    description: |
+      Internal person key (string); matches dim_employee_demographic.sk_employee for joins.
+    lineage:
+      - datalake_pin_core_clean.disability.id_person
+  person_number:
+    description: |
+      Business key: PIN person number for the latest E or C assignment (not pending workers).
+    lineage:
+      - datalake_people.identifier_mapping.person_number
+  legislation_code:
+    description: |
+      Country or region for this disability row; aligns with the disability record and the overlapping legislative row in PIN.
+    lineage:
+      - datalake_pin_core_clean.disability.legislation_code
+  category:
+    description: |
+      High-level disability category in English from PIN reference data when a label exists; otherwise the raw category from
+      the disability record.
+    lineage:
+      - datalake_pin_core_clean.foundation_lookup_value.meaning
+      - datalake_pin_core_clean.disability.category
+  documented_name:
+    description: |
+      Documented disability type in English from PIN reference data when a label exists; otherwise the disability code or
+      “Unknown” when nothing is available.
+    lineage:
+      - datalake_pin_core_clean.foundation_lookup_value.meaning
+      - datalake_pin_core_clean.disability.disability_code
+  self_declared_name:
+    description: |
+      Self-declared disability type or answer from PIN legislative fields when present (type or answer, whichever applies).
+    lineage:
+      - datalake_pin_core_clean.people_legislative.disability_type
+      - datalake_pin_core_clean.people_legislative.disability_answer
+  neurodiversity:
+    description: Self-declared neurodiversity detail from PIN legislative data, aligned to the same period when possible.
+    lineage:
+      - datalake_pin_core_clean.people_legislative.neurodiversity
+  accessibility_need:
+    description: Declared workplace accessibility need from PIN legislative data.
+    lineage:
+      - datalake_pin_core_clean.people_legislative.accessibility_need
+  disability_reason:
+    description: Reserved for congenital versus acquired classification when PIN exposes a dedicated field; currently not populated in this extract.
+  disability_status:
+    description: |
+      Human-readable status of the disability record in PIN: Active, Pending, or Inactive when the source code matches; if status
+      is missing, the label is Unknown; any other code is kept as returned from PIN.
+    lineage:
+      - datalake_pin_core_clean.disability.status
+    categories:
+      Active: PIN status is active (A).
+      Pending: PIN status is pending (P).
+      Inactive: PIN status is inactive (I).
+      Unknown: No status in PIN (null or empty).
+  is_active:
+    description: True when the disability record status is active in PIN; false otherwise.
+    lineage:
+      - datalake_pin_core_clean.disability.status
+    categories:
+      'TRUE': Record status is active.
+      'FALSE': Pending, inactive, null, or any other status.
+  is_primary:
+    description: |
+      True for the single disability row with the highest quota signal (quota_fte) per person and legislation—used as the primary
+      medical disability row when quota is set.
+    lineage:
+      - datalake_pin_core_clean.disability.quota_fte
+  is_quota_eligible:
+    description: True when PIN indicates a positive quota signal (quota_fte); used as eligibility signal for quota-related reporting.
+    lineage:
+      - datalake_pin_core_clean.disability.quota_fte
+  dt_valid_from:
+    description: First day this disability record is valid (inclusive).
+    lineage:
+      - datalake_pin_core_clean.disability.dt_effective_started
+  dt_valid_to:
+    description: Last day this record is valid (inclusive). Ongoing periods use 9999-12-31 as the end date.
+    lineage:
+      - datalake_pin_core_clean.disability.dt_effective_ended
+  ts_load:
+    description: When this row was loaded into the data warehouse.

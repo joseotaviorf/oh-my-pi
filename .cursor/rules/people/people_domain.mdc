@@ -53,7 +53,7 @@ Data is organized by functional domain for schema-level governance and access co
 | `dw_organization` | Cost centers, BUs, teams, job structure, Codex, business partners |
 | `dw_employee_details` | PII, lifecycle events (admissions/exits), documentation, vacation, leaves, dependents, education |
 | `dw_compensation` | Salary history, job level, pay-tables, merits/promotions, variable pay |
-| `dw_sociodemographics` | DE&I data |
+| `dw_demographics` | DE&I (diversity, equity, inclusion) and related sociodemographic dimensions |
 | `dw_performance` | Performance and talent cycles |
 | `dw_people` | Public profile (name, email, hierarchy, location, role) |
 | `dw_learning` | Learning & Development data |
