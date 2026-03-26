@@ -1,0 +1,55 @@
+database_name: datalake_retsuko_clean
+table_name: overlimit_check
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: Records of overlimit verification and resolution linked to agreements and contracts (reference entity, status, verifier and fixer).
+columns:
+  id:
+    description: "Primary key for joins in retsuko"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.id
+  id_external:
+    description: "External identifier of the overlimit check in upstream systems"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.external_id
+  id_contract:
+    description: "Identifier of the related contract"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.contract_id
+  id_reference:
+    description: "Identifier of the referenced entity (e.g. agreement or related record)"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.reference_id
+  reference_type:
+    description: "Type of the referenced entity discriminating what reference_id points to"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.reference_type
+  status:
+    description: "Current status of the overlimit check workflow"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.status
+  id_verified_by:
+    description: "Identifier of the actor or system that verified the overlimit condition"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.verified_by
+  ts_verified:
+    description: "Datetime when the overlimit check was verified"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.verified_at
+  id_fixed_by:
+    description: "Identifier of the actor or system that applied the fix for the overlimit"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.fixed_by
+  ts_fixed:
+    description: "Datetime when the overlimit issue was fixed"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.fixed_at
+  ts_created:
+    description: "Record creation datetime in source"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.created_at
+  ts_updated:
+    description: "Record last update datetime in source"
+    lineage:
+      - datalake_retsuko_raw.overlimit_check.updated_at
+

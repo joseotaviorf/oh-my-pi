@@ -60,6 +60,7 @@ workflow:
     monthly_closing_checks:
       get_table_metrics:
         count: id
+    overlimit_check: {}
     payment_block: {}
     recurrent_credit_card: {}
     recurring_expense: {}
