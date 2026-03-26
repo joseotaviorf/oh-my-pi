@@ -4,7 +4,8 @@ table_name: codex_pin_sync_drift
 owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: |-
-  Comparison layer for the CODEX-to-PIN (Oracle HCM) alignment process. CODEX (GSheets /
+  Comparison layer for the CODEX-to-PIN (Oracle HCM) alignment process (table name
+  codex_pin_sync_drift; superseded working name codex_pin_update). CODEX (GSheets /
   codex_log) is the source of truth for cost-center attributes; PIN flexfields on
   all_organization_units are the destination fields that should mirror CODEX. One row per
   cost_center_code present in both systems, with side-by-side values and boolean drift flags.

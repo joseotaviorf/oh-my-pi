@@ -3,7 +3,8 @@ table_name: datalake_gsheets_people_clean.codex_cost_centers
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
-    greater_than: 12000
+    # Baseline (Databricks prod, 2026-03-25): 14,900 rows. 90% of baseline (~10% buffer); aligns with has_size_variation ±10%.
+    greater_than: 13410
     severity_level: Error
   has_size_variation:
     variation_type: percentage
@@ -13,6 +14,64 @@ table_level_validations:
 column_level_validations:
   cost_center_code:
     is_complete:
-      severity_level: Warning
+      severity_level: Error
     is_unique:
+      severity_level: Warning
+    has_pattern:
+      # 6 characters: 3 digits, 1 letter, 1 digit, 1 letter (e.g. 001K3X).
+      pattern: '^[0-9]{3}[A-Za-z][0-9][A-Za-z]$'
+      severity_level: Error
+  dt_updated:
+    is_complete:
+      severity_level: Error
+    custom:
+      # DATE column: string form must be YYYY-MM-DD (e.g. 2026-03-01).
+      constraint: |-
+        (
+          SELECT COUNT(*)
+          FROM datalake_gsheets_people_clean.codex_cost_centers
+          WHERE
+            dt_updated IS NOT NULL
+            AND CAST(dt_updated AS STRING) NOT RLIKE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+        ) = 0
+      severity_level: Error
+  business:
+    is_complete:
+      severity_level: Warning
+  product:
+    is_complete:
+      severity_level: Warning
+  brand:
+    is_complete:
+      severity_level: Warning
+  team:
+    is_complete:
+      severity_level: Warning
+  structure:
+    is_complete:
+      severity_level: Warning
+  chapter:
+    has_completeness:
+      # Baseline (Databricks prod, 2026-03-25): ~0.084 complete; cap if null share stays >=75% of baseline (25% margin).
+      less_than_or_equal_to: 0.3129
+      severity_level: Warning
+  line:
+    has_completeness:
+      # Baseline (Databricks prod, 2026-03-25): ~0.086 complete; cap if null share stays >=75% of baseline (25% margin).
+      less_than_or_equal_to: 0.3144
+      severity_level: Warning
+  owner_l1_email:
+    has_completeness:
+      # Baseline (Databricks prod, 2026-03-25): ~0.228 complete; cap if null share stays >=75% of baseline (25% margin).
+      less_than_or_equal_to: 0.4203
+      severity_level: Warning
+  owner_l2_email:
+    has_completeness:
+      # Baseline (Databricks prod, 2026-03-25): ~0.224 complete; cap if null share stays >=75% of baseline (25% margin).
+      less_than_or_equal_to: 0.4175
+      severity_level: Warning
+  owner_l3_email:
+    has_completeness:
+      # Baseline (Databricks prod, 2026-03-25): ~0.223 complete; cap if null share stays >=75% of baseline (25% margin).
+      less_than_or_equal_to: 0.4165
       severity_level: Warning

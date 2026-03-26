@@ -4,16 +4,101 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    greater_than: 0
+    # Baseline (Databricks prod, 2026-03-25): 42,143 rows. 90% of baseline (~10% buffer).
+    greater_than: 37928
     severity_level: Error
+  # Incremental load: row count should not shrink vs prior run; cap spikes (People growing-table default).
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
 
 column_level_validations:
   cost_center_code:
     is_complete:
       severity_level: Error
+    has_pattern:
+      # Same as clean codex_cost_centers: 6 chars — 3 digits, 1 letter, 1 digit, 1 letter (e.g. 001K3X).
+      pattern: '^[0-9]{3}[A-Za-z][0-9][A-Za-z]$'
+      severity_level: Error
+    custom:
+      # One SCD2 row per (cost_center_code, validity start)
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT
+            cost_center_code,
+            dt_valid_from
+          FROM datalake_people.codex_log
+          GROUP BY
+            cost_center_code,
+            dt_valid_from
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
   dt_valid_from:
     is_complete:
       severity_level: Error
+  dt_valid_to:
+    custom:
+      # Closed intervals: dt_valid_to >= dt_valid_from; adjacent version starts the day after dt_valid_to.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.codex_log
+         WHERE dt_valid_to IS NOT NULL
+           AND dt_valid_to < dt_valid_from
+        ) = 0
+        AND (SELECT COUNT(*) FROM (
+          SELECT
+            cost_center_code,
+            dt_valid_from,
+            dt_valid_to,
+            is_current,
+            LEAD(dt_valid_from) OVER (
+              PARTITION BY cost_center_code
+              ORDER BY dt_valid_from, ts_load
+            ) AS next_valid_from
+          FROM datalake_people.codex_log
+        ) sub
+        WHERE NOT is_current
+          AND next_valid_from IS NOT NULL
+          AND date_add(dt_valid_to, 1) != next_valid_from
+        ) = 0
+      severity_level: Error
   is_current:
+    is_complete:
+      severity_level: Error
+    custom:
+      # Open end iff current; one current row per cost center and every CC has a current row.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.codex_log
+         WHERE (is_current = TRUE AND dt_valid_to IS NOT NULL)
+            OR (is_current = FALSE AND dt_valid_to IS NULL)
+        ) = 0
+        AND (SELECT COUNT(*) FROM datalake_people.codex_log WHERE is_current = TRUE)
+          = (SELECT COUNT(DISTINCT cost_center_code) FROM datalake_people.codex_log)
+      severity_level: Error
+  vertical:
+    custom:
+      # Derived vertical from structure; when set must be Ops, Corp, or Tech.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.codex_log
+         WHERE vertical IS NOT NULL
+           AND vertical NOT IN ('Ops', 'Corp', 'Tech')
+        ) = 0
+      severity_level: Warning
+  headcount_type:
+    custom:
+      # PIN headcount classification; when set must be Capacity or Overhead.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.codex_log
+         WHERE headcount_type IS NOT NULL
+           AND headcount_type NOT IN ('Capacity', 'Overhead')
+        ) = 0
+      severity_level: Warning
+  ts_load:
     is_complete:
       severity_level: Error

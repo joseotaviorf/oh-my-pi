@@ -1,5 +1,5 @@
 SELECT
-   cc_code AS cost_center_code,
+   TRIM(cc_code) AS cost_center_code,
    NULLIF(NULLIF(TRIM(business), ''), '-') AS business,
    NULLIF(NULLIF(TRIM(product), ''), '-') AS product,
    NULLIF(NULLIF(TRIM(brand), ''), '-') AS brand,

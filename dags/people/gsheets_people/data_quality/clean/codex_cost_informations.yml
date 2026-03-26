@@ -2,7 +2,8 @@ table_name: datalake_gsheets_people_clean.codex_cost_informations
 alert_channel: PEOPLE_ALERTS
 table_level_validations:
   has_size:
-    greater_than: 13500
+    # Baseline (Databricks prod, 2026-03-25): 16,925 rows. 90% of baseline (~10% buffer); aligns with has_size_variation ±10%.
+    greater_than: 15232
     severity_level: Error
   has_size_variation:
     variation_type: percentage
@@ -13,3 +14,21 @@ column_level_validations:
   cost_center_code:
     is_complete:
       severity_level: Warning
+    has_pattern:
+      # 6 characters: 3 digits, 1 letter, 1 digit, 1 letter (e.g. 001K3X).
+      pattern: '^[0-9]{3}[A-Za-z][0-9][A-Za-z]$'
+      severity_level: Error
+  dt_updated:
+    is_complete:
+      severity_level: Error
+    custom:
+      # DATE column: string form must be YYYY-MM-DD (e.g. 2026-03-01).
+      constraint: |-
+        (
+          SELECT COUNT(*)
+          FROM datalake_gsheets_people_clean.codex_cost_informations
+          WHERE
+            dt_updated IS NOT NULL
+            AND CAST(dt_updated AS STRING) NOT RLIKE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
+        ) = 0
+      severity_level: Error

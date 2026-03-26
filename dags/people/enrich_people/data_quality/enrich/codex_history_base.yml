@@ -4,8 +4,15 @@ alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
   has_size:
-    greater_than: 1300
+    # Baseline (Databricks prod, 2026-03-25): 255,981 rows. 90% of baseline (~10% buffer).
+    greater_than: 230382
     severity_level: Error
+  # Incremental load: row count should not shrink vs prior run; cap spikes (People growing-table default).
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
 
 column_level_validations:
   id:
@@ -15,7 +22,11 @@ column_level_validations:
       severity_level: Error
   cost_center_code:
     is_complete:
-      severity_level: Warning
+      severity_level: Error
+    has_pattern:
+      # Same as clean codex_cost_centers: 6 chars — 3 digits, 1 letter, 1 digit, 1 letter (e.g. 001K3X).
+      pattern: '^[0-9]{3}[A-Za-z][0-9][A-Za-z]$'
+      severity_level: Error
   business:
     is_complete:
       severity_level: Warning
@@ -27,7 +38,15 @@ column_level_validations:
       severity_level: Warning
   vertical:
     is_complete:
-      severity_level: Warning
+      severity_level: Error
+    custom:
+      # Allowed values only (non-null enforced by is_complete).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.codex_history_base
+         WHERE vertical NOT IN ('Ops', 'Corp', 'Tech')
+        ) = 0
+      severity_level: Error
   structure:
     is_complete:
       severity_level: Warning
@@ -35,5 +54,18 @@ column_level_validations:
     is_complete:
       severity_level: Warning
   dt_closing_month:
+    is_complete:
+      severity_level: Error
+  headcount_type:
+    custom:
+      # When set must be Capacity or Overhead (PIN classification).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.codex_history_base
+         WHERE headcount_type IS NOT NULL
+           AND headcount_type NOT IN ('Capacity', 'Overhead')
+        ) = 0
+      severity_level: Warning
+  ts_load:
     is_complete:
       severity_level: Error
