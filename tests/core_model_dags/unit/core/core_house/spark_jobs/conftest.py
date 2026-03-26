@@ -42,6 +42,8 @@ def house_df(spark_session):
             StructField("id", LongType(), True),
             StructField("id_user", LongType(), True),
             StructField("id_region", LongType(), True),
+            StructField("id_external", StringType(), True),
+            StructField("id_user_registrant", LongType(), True),
             StructField("address", StringType(), True),
             StructField("number", StringType(), True),
             StructField("neighborhood", StringType(), True),
@@ -51,6 +53,11 @@ def house_df(spark_session):
             StructField("total_area", IntegerType(), True),
             StructField("lat", DecimalType(10, 7), True),
             StructField("lng", DecimalType(10, 7), True),
+            StructField("type", StringType(), True),
+            StructField("bathrooms", IntegerType(), True),
+            StructField("bedrooms", IntegerType(), True),
+            StructField("suites", IntegerType(), True),
+            StructField("floor", IntegerType(), True),
             StructField("dt_creation", TimestampType(), True),
             StructField("ts_updated", TimestampType(), True),
             StructField("ts_database_transaction", TimestampType(), True),
@@ -63,6 +70,8 @@ def house_df(spark_session):
             1001,  # id
             101,  # id_user
             1,  # id_region
+            "EXT-1001",  # id_external
+            501,  # id_user_registrant
             "Rua das Flores",  # address
             "123",  # number
             "Centro",  # neighborhood
@@ -72,6 +81,11 @@ def house_df(spark_session):
             85,  # total_area
             Decimal("-23.5505840"),  # lat
             Decimal("-46.6333482"),  # lng
+            "Apartamento",  # type
+            2,  # bathrooms
+            3,  # bedrooms
+            1,  # suites
+            5,  # floor
             datetime(2020, 3, 15, 10, 0),  # dt_creation
             datetime(2024, 7, 10, 14, 30),  # ts_updated
             datetime(2024, 7, 10, 14, 30),  # ts_database_transaction
@@ -81,6 +95,8 @@ def house_df(spark_session):
             1002,  # id
             102,  # id_user
             1,  # id_region
+            "EXT-1002",  # id_external
+            502,  # id_user_registrant
             "Av. Paulista",  # address
             "1000",  # number
             "Bela Vista",  # neighborhood
@@ -90,6 +106,11 @@ def house_df(spark_session):
             120,  # total_area
             Decimal("-23.5614730"),  # lat
             Decimal("-46.6560826"),  # lng
+            "Apartamento",  # type
+            3,  # bathrooms
+            4,  # bedrooms
+            2,  # suites
+            10,  # floor
             datetime(2021, 6, 20, 9, 0),  # dt_creation
             datetime(2024, 8, 15, 11, 0),  # ts_updated
             datetime(2024, 8, 15, 11, 0),  # ts_database_transaction
@@ -99,6 +120,8 @@ def house_df(spark_session):
             1003,  # id
             103,  # id_user
             2,  # id_region
+            "EXT-1003",  # id_external
+            503,  # id_user_registrant
             "Rua Oscar Freire",  # address
             "500",  # number
             "Jardins",  # neighborhood
@@ -108,6 +131,11 @@ def house_df(spark_session):
             200,  # total_area
             Decimal("-23.5616176"),  # lat
             Decimal("-46.6710331"),  # lng
+            "Casa",  # type
+            4,  # bathrooms
+            5,  # bedrooms
+            3,  # suites
+            0,  # floor (ground floor for house)
             datetime(2022, 1, 10, 8, 0),  # dt_creation
             datetime(2024, 5, 20, 16, 0),  # ts_updated
             datetime(2024, 5, 20, 16, 0),  # ts_database_transaction
@@ -117,6 +145,8 @@ def house_df(spark_session):
             1004,  # id
             104,  # id_user
             1,  # id_region
+            "EXT-1004",  # id_external
+            504,  # id_user_registrant
             "Rua Antiga",  # address
             "10",  # number
             "Centro",  # neighborhood
@@ -126,6 +156,11 @@ def house_df(spark_session):
             50,  # total_area
             Decimal("-23.5500091"),  # lat
             Decimal("-46.6300338"),  # lng
+            "CasaCondominio",  # type
+            1,  # bathrooms
+            1,  # bedrooms
+            0,  # suites
+            2,  # floor
             datetime(2015, 6, 1, 10, 0),  # dt_creation (year <= 2015)
             None,  # ts_updated (NULL)
             datetime(2015, 6, 1, 10, 0),  # ts_database_transaction
@@ -135,6 +170,8 @@ def house_df(spark_session):
             1005,  # id
             105,  # id_user
             3,  # id_region
+            "EXT-1005",  # id_external
+            505,  # id_user_registrant
             "Rua Velha",  # address
             "20",  # number
             "Centro",  # neighborhood
@@ -144,6 +181,11 @@ def house_df(spark_session):
             60,  # total_area
             Decimal("-23.5510577"),  # lat
             Decimal("-46.6310273"),  # lng
+            "StudioOuKitchenette",  # type
+            1,  # bathrooms
+            1,  # bedrooms
+            0,  # suites
+            3,  # floor
             datetime(2014, 3, 1, 10, 0),  # dt_creation (year <= 2015)
             datetime(2024, 1, 15, 10, 0),  # ts_updated (NOT NULL)
             datetime(2024, 1, 15, 10, 0),  # ts_database_transaction
@@ -153,6 +195,8 @@ def house_df(spark_session):
             1006,  # id
             106,  # id_user
             1,  # id_region
+            "EXT-1006",  # id_external
+            506,  # id_user_registrant
             "Rua Nova",  # address
             "200",  # number
             "Pinheiros",  # neighborhood
@@ -162,6 +206,11 @@ def house_df(spark_session):
             90,  # total_area
             Decimal("-23.5670000"),  # lat
             Decimal("-46.6900000"),  # lng
+            "Apartamento",  # type
+            2,  # bathrooms
+            2,  # bedrooms
+            1,  # suites
+            7,  # floor
             datetime(2023, 5, 10, 10, 0),  # dt_creation
             datetime(2024, 5, 15, 10, 0),  # ts_updated (May)
             datetime(

@@ -13,10 +13,18 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.id
     description: House identifier. It's the primary key of the House table from Main's database (EBDB).
+  id_external:
+    lineage:
+      - datalake_ebdb_clean.house.id_external
+    description: External system identifier for house integration, used to reference it in other systems.
   id_region:
     lineage:
       - datalake_ebdb_clean.house.id_region
     description: Region identifier where the house is located.
+  id_user_registrant:
+    lineage:
+      - datalake_ebdb_clean.house.id_user_registrant
+    description: Unique identifier of the user who originally registered the house.
   id_owner:
     lineage:
       - datalake_ebdb_clean.house_listing_relation.id_related
@@ -51,6 +59,15 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.city
     description: City where the house is located.
+  type:
+    lineage:
+      - datalake_ebdb_clean.house.type
+    description: Property type classification.
+    categories:
+      Apartamento: Apartment unit in a residential building.
+      Casa: Standalone house property.
+      CasaCondominio: House within a gated condominium complex.
+      StudioOuKitchenette: Studio or kitchenette unit, typically a single room with integrated kitchen.
   total_area:
     lineage:
       - datalake_ebdb_clean.house.total_area
@@ -63,6 +80,22 @@ columns:
     lineage:
       - datalake_ebdb_clean.house.lng
     description: Geographic longitude coordinate of the house location.
+  total_bathrooms:
+    lineage:
+      - datalake_ebdb_clean.house.bathrooms
+    description: Total number of bathrooms in the house.
+  total_bedrooms:
+    lineage:
+      - datalake_ebdb_clean.house.bedrooms
+    description: Total number of bedrooms in the house.
+  total_suites:
+    lineage:
+      - datalake_ebdb_clean.house.suites
+    description: Number of master bedrooms with private bathrooms (suites) in the house.
+  floor:
+    lineage:
+      - datalake_ebdb_clean.house.floor
+    description: Floor level where the house is located within the building.
   ts_created:
     lineage:
       - datalake_ebdb_clean.house.dt_creation

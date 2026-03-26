@@ -13,8 +13,18 @@ columns:
     type: bigint
     required: true
 
+  # External identifier
+  id_external:
+    type: string
+    required: false
+
   # Region identifier
   id_region:
+    type: bigint
+    required: false
+
+  # User registrant identifier
+  id_user_registrant:
     type: bigint
     required: false
 
@@ -53,6 +63,11 @@ columns:
     type: string
     required: false
 
+  # Property type
+  type:
+    type: string
+    required: false
+
   # House characteristics
   total_area:
     type: int
@@ -65,6 +80,24 @@ columns:
 
   lng:
     type: decimal
+    required: false
+
+  # Room counts
+  total_bathrooms:
+    type: int
+    required: false
+
+  total_bedrooms:
+    type: int
+    required: false
+
+  total_suites:
+    type: int
+    required: false
+
+  # Floor level
+  floor:
+    type: int
     required: false
 
   # Audit timestamps
@@ -95,6 +128,6 @@ columns:
     required: true
 
 # Schema constraints
-min_columns: 20
-max_columns: 20
+min_columns: 27
+max_columns: 27
 strict: true

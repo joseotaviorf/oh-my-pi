@@ -118,6 +118,8 @@ class CoreHouseSparkJob(BaseCoreModelSparkJob):
         ).select(
             col("id"),
             col("id_user"),
+            col("id_external"),
+            col("id_user_registrant"),
             col("id_region"),
             col("address"),
             col("number"),
@@ -128,6 +130,11 @@ class CoreHouseSparkJob(BaseCoreModelSparkJob):
             col("total_area"),
             col("lat"),
             col("lng"),
+            col("type"),
+            col("bathrooms"),
+            col("bedrooms"),
+            col("suites"),
+            col("floor"),
             col("dt_creation"),
             col("ts_updated")
         )
@@ -182,7 +189,9 @@ class CoreHouseSparkJob(BaseCoreModelSparkJob):
         # Select final columns
         return result_df.select(
             col("h.id").alias("id_house"),
+            col("h.id_external"),
             col("h.id_region"),
+            col("h.id_user_registrant"),
             coalesce(col("u1.id"), col("h.id_user")).alias("id_owner"),
             coalesce(col("u1.uuid_person"), col("u2.uuid_person")).alias("uuid_owner"),
             col("h.address"),
@@ -191,9 +200,14 @@ class CoreHouseSparkJob(BaseCoreModelSparkJob):
             col("h.complement"),
             col("h.zipcode"),
             col("h.city"),
+            col("h.type"),
             col("h.total_area"),
             col("h.lat"),
             col("h.lng"),
+            col("h.bathrooms").alias("total_bathrooms"),
+            col("h.bedrooms").alias("total_bedrooms"),
+            col("h.suites").alias("total_suites"),
+            col("h.floor"),
             col("h.dt_creation").alias("ts_created"),
             col("h.ts_updated")
         )
