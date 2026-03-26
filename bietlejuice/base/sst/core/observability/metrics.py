@@ -17,7 +17,6 @@ def save_volume_metric(
     grain,
     metric_name,
     table_name,
-    new_cols,
     env,
     layer,
     partition_cols,
@@ -29,7 +28,6 @@ def save_volume_metric(
         .agg(F.count("*").alias("row_count"))
         .withColumn("metric_name", F.lit(metric_name))
         .withColumn("source_table", F.lit(table_name))
-        .withColumn("new_cols", F.lit(new_cols))
         .withColumn("metric_category", F.lit("volume"))
         .withColumn("layer", F.lit(layer))
         .withColumn("environment", F.lit(env))
@@ -38,7 +36,6 @@ def save_volume_metric(
             "metric_category",
             "metric_name",
             "source_table",
-            "new_cols",
             "environment",
             "layer",
             *grain,
@@ -63,7 +60,6 @@ def save_volume_metric(
             _metric.withColumn("metric_category", F.lit("volume"))
             .withColumn("metric_name", F.lit(metric_name))
             .withColumn("source_table", F.lit(table_name))
-            .withColumn("new_cols", F.lit(new_cols))
             .withColumn("environment", F.lit(env))
             .withColumn("layer", F.lit(layer))
             .withColumn("row_count", F.lit(0))
@@ -72,7 +68,6 @@ def save_volume_metric(
                 "metric_category",
                 "metric_name",
                 "source_table",
-                "new_cols",
                 "environment",
                 "layer",
                 *grain,

@@ -148,7 +148,6 @@ def salesforce_clean_pipeline(spark, cfg):
             grain=grain,
             metric_name=_metric,
             table_name=target_table,
-            new_cols=new_cols,
             env=cfg.env,
             layer="clean",
             partition_cols=["partition_date", "partition_hour"],
