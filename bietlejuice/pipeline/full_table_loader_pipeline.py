@@ -4,7 +4,9 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.pipeline.table_loader_pipeline import TableLoaderPipeline
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services.metastore_service_factory import (
+    MetastoreServiceFactory,
+)
 
 
 class FullTableLoaderPipeline(TableLoaderPipeline):
@@ -12,7 +14,9 @@ class FullTableLoaderPipeline(TableLoaderPipeline):
 
         spark_client = SparkClient()
 
-        spark_metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_service = (
+            MetastoreServiceFactory.create_loader_metastore_service(spark_client)
+        )
         s3_loader = S3Loader()
 
         if "optimize_dataframe" in load_options:

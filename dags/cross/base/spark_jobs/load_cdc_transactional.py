@@ -20,6 +20,10 @@ from bietlejuice.base.cdc.schema_treatment.schema_changes_notifier import (
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 
 
+from bietlejuice.base.spark.delta_secondary_catalog_sync import (
+    partition_columns_present,
+    sync_delta_write_to_secondary_catalog,
+)
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from datetime import datetime
@@ -81,11 +85,22 @@ def load_df_into_transactional(df, datalake_bucket, schema, table_name, partitio
 
     loader = DeltaLoader(spark)
 
+    full_transactional_name = f"datalake_{schema}_transactional.{table_name}"
+    transactional_s3_path = (
+        f"s3://{datalake_bucket}/transactional/{schema}/{table_name}/"
+    )
     loader.load_table(
-        f"datalake_{schema}_transactional.{table_name}",
-        path=f"s3://{datalake_bucket}/transactional/{schema}/{table_name}/",
+        full_transactional_name,
+        path=transactional_s3_path,
         source_df=df,
         partition_by=partitions,
+    )
+    sync_delta_write_to_secondary_catalog(
+        spark,
+        full_transactional_name,
+        transactional_s3_path,
+        df,
+        partition_columns_present(df, tuple(partitions)),
     )
 
 

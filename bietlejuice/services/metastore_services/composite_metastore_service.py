@@ -151,3 +151,30 @@ class CompositeMetastoreService(MetastoreService):
         self, database_name: str, table_name: str, formatted: bool = False
     ):
         return self._primary.get_table_description(database_name, table_name, formatted)
+
+    # -- SparkMetastoreService-only (primary delegation) ---------------------
+
+    def _spark_primary(self):
+        from bietlejuice.services.metastore_services.spark_metastore_service import (
+            SparkMetastoreService,
+        )
+
+        if not isinstance(self._primary, SparkMetastoreService):
+            raise TypeError(
+                "CompositeMetastoreService primary must be SparkMetastoreService, "
+                f"got {type(self._primary).__name__}"
+            )
+        return self._primary
+
+    def refresh_table(self, database_name: str, table_name: str) -> None:
+        return self._spark_primary().refresh_table(database_name, table_name)
+
+    def get_table_schema(self, database_name, table_name, ignore_partition_keys=False):
+        return self._spark_primary().get_table_schema(
+            database_name, table_name, ignore_partition_keys
+        )
+
+    def merge_table_and_dataframe_schemas(self, database_name, table_name, df):
+        return self._spark_primary().merge_table_and_dataframe_schemas(
+            database_name, table_name, df
+        )

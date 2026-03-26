@@ -12,11 +12,12 @@ class TestQueryViewCreatorPipeline:
             yield spark_client
 
     @pytest.fixture(autouse=True)
-    def mock_spark_metastore_service(self):
+    def mock_loader_metastore_service(self):
         with mock.patch(
-            "bietlejuice.pipeline.query_view_creator_pipeline.SparkMetastoreService"
-        ) as spark_metastore_service:
-            yield spark_metastore_service
+            "bietlejuice.pipeline.query_view_creator_pipeline.MetastoreServiceFactory.create_loader_metastore_service",
+            return_value=mock.MagicMock(),
+        ) as factory_mock:
+            yield factory_mock
 
     @pytest.fixture(autouse=True)
     def mock_sqlglot(self):
@@ -114,22 +115,22 @@ class TestQueryViewCreatorPipeline:
             )
 
     def test_create_databricks_database_success(
-        self, pipeline, mock_spark_metastore_service
+        self, pipeline, mock_loader_metastore_service
     ):
         # Arrange
         mock_spark_client = mock.MagicMock()
         mock_metastore_instance = mock.MagicMock()
-        mock_spark_metastore_service.return_value = mock_metastore_instance
+        mock_loader_metastore_service.return_value = mock_metastore_instance
 
         # Act
         pipeline._create_databricks_database(mock_spark_client)
 
         # Assert
-        mock_spark_metastore_service.assert_called_once_with(mock_spark_client)
+        mock_loader_metastore_service.assert_called_once_with(mock_spark_client)
         mock_metastore_instance.create_database.assert_called_once_with("test_db")
 
     def test_create_databricks_database_failure(
-        self, pipeline, mock_spark_metastore_service
+        self, pipeline, mock_loader_metastore_service
     ):
         # Arrange
         mock_spark_client = mock.MagicMock()
@@ -137,7 +138,7 @@ class TestQueryViewCreatorPipeline:
         mock_metastore_instance.create_database.side_effect = Exception(
             "Database creation failed"
         )
-        mock_spark_metastore_service.return_value = mock_metastore_instance
+        mock_loader_metastore_service.return_value = mock_metastore_instance
 
         # Act & Assert
         with pytest.raises(Exception, match="Database creation failed"):

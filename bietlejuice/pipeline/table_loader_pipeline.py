@@ -3,7 +3,9 @@ from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.pipeline.abstract_pipeline import AbstractPipeline
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services.metastore_service_factory import (
+    MetastoreServiceFactory,
+)
 from bietlejuice.base.udfs.udf_enum import UDFEnum
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 
@@ -60,7 +62,9 @@ class TableLoaderPipeline(AbstractPipeline):
 
         databases_to_be_created = [self.target_database_name, self.database_name]
 
-        spark_metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_service = (
+            MetastoreServiceFactory.create_loader_metastore_service(spark_client)
+        )
         for database in databases_to_be_created:
             spark_metastore_service.create_database(database)
 

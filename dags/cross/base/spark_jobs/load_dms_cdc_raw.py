@@ -6,6 +6,9 @@ from typing import List, Any
 from bietlejuice.base.cdc.reader.date_range_partition_reader import DateRangePartitionReader
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.spark.base_spark import BaseDBUtils
+from bietlejuice.base.spark.delta_secondary_catalog_sync import (
+    sync_delta_write_to_secondary_catalog,
+)
 from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
 
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
@@ -165,13 +168,21 @@ def main():
     else:
         table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
 
+    raw_table_s3_path = f"s3://{datalake_bucket}/raw/{schema}/{table_name}/"
     loader = DeltaLoader()
     loader.load_table(
         table_name=full_raw_table_name,
-        path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/",
+        path=raw_table_s3_path,
         source_df=df_dms_processor,
         merge_on=primary_keys,
         when_matched_update_condition="source.event_timestamp >= target.event_timestamp"
+    )
+    sync_delta_write_to_secondary_catalog(
+        spark,
+        full_raw_table_name,
+        raw_table_s3_path,
+        df_dms_processor,
+        [],
     )
     SparkTablePropertyHelper.set_property(full_raw_table_name, "primary_keys", ",".join(primary_keys))
 

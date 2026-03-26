@@ -4,8 +4,7 @@ from pyspark.sql import DataFrame
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.loaders.spark_metastore_loader import SparkMetastoreLoader
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.loaders.metastore_loader_factory import MetastoreLoaderFactory
 from bietlejuice.base.db import DatalakeMetastoreService
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
@@ -50,9 +49,9 @@ class RawLayerLoader:
         self.partition_cols = partition_cols
         self.extraction_type = extraction_type.lower()
         self.logger = logger
-        self.metastore_service = SparkMetastoreService(spark_client)
         self.s3_loader = S3Loader()
-        self.metastore_loader = SparkMetastoreLoader(self.metastore_service)
+        self.metastore_loader = MetastoreLoaderFactory.create(spark_client)
+        self.metastore_service = self.metastore_loader.metastore_service
 
         self.db_info = DatalakeMetastoreService.get_db_info(
             self.environment, self.source, self.datalake_bucket

@@ -44,3 +44,17 @@ class MetastoreServiceFactory:
             return services[0]
 
         return CompositeMetastoreService(services)
+
+    @staticmethod
+    def create_loader_metastore_service(spark_client) -> MetastoreService:
+        """Return Spark metastore service, wrapped for secondary catalog when enabled.
+
+        Prefer this over ``SparkMetastoreService(spark_client)`` in loaders and
+        pipelines so writes fan out to Glue (Databricks) or UC REST (EMR) when
+        configured.
+        """
+        from bietlejuice.services.metastore_services.spark_metastore_service import (
+            SparkMetastoreService,
+        )
+
+        return MetastoreServiceFactory.create(SparkMetastoreService(spark_client))

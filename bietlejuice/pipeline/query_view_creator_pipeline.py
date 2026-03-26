@@ -10,7 +10,9 @@ from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db.database_enum import DatabaseEnum
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.pipeline.abstract_pipeline import AbstractPipeline
-from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.metastore_services.metastore_service_factory import (
+    MetastoreServiceFactory,
+)
 
 DELTA_CATALOG = "delta"
 
@@ -90,7 +92,9 @@ class QueryViewCreatorPipeline(AbstractPipeline):
     def _create_databricks_database(self, spark_client: SparkClient):
         """Create the database on Databricks if it doesn't exist."""
         try:
-            spark_metastore_service = SparkMetastoreService(spark_client)
+            spark_metastore_service = (
+                MetastoreServiceFactory.create_loader_metastore_service(spark_client)
+            )
             spark_metastore_service.create_database(self.database_name)
             logger.info(
                 f"Successfully ensured database {self.database_name} exists on Databricks"

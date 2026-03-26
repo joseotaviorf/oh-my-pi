@@ -1,5 +1,7 @@
 import pytest
+from collections import OrderedDict
 from unittest import mock
+
 from bietlejuice.pipeline.delta_table_loader_pipeline import DeltaTableLoaderPipeline
 
 
@@ -12,13 +14,35 @@ class TestDeltaTableLoaderPipeline:
             yield delta_loader
 
     @pytest.fixture(autouse=True)
-    def mock_spark_metastore_service(self):
+    def mock_loader_metastore_service(self):
         with mock.patch(
-            "bietlejuice.pipeline.delta_table_loader_pipeline.SparkMetastoreService"
-        ) as spark_metastore_service:
-            yield spark_metastore_service
+            "bietlejuice.pipeline.delta_table_loader_pipeline.MetastoreServiceFactory.create_loader_metastore_service",
+            return_value=mock.MagicMock(),
+        ) as factory_mock:
+            yield factory_mock
 
-    def test_load_and_register(self, mock_delta_loader, mock_spark_metastore_service):
+    @pytest.fixture(autouse=True)
+    def mock_schema_from_dataframe(self):
+        with mock.patch(
+            "bietlejuice.pipeline.delta_table_loader_pipeline.SchemaService.get_schema_from_dataframe",
+            return_value=OrderedDict([("id", "bigint")]),
+        ) as p:
+            yield p
+
+    @pytest.fixture(autouse=True)
+    def mock_sync_to_secondary_catalog(self):
+        with mock.patch(
+            "bietlejuice.pipeline.delta_table_loader_pipeline.CatalogStrategyResolver.sync_to_secondary_catalog"
+        ) as p:
+            yield p
+
+    def test_load_and_register(
+        self,
+        mock_delta_loader,
+        mock_loader_metastore_service,
+        mock_schema_from_dataframe,
+        mock_sync_to_secondary_catalog,
+    ):
         # Arrange
         delta_table_loader_pipeline = DeltaTableLoaderPipeline(
             database_name="database_name",
@@ -57,5 +81,15 @@ class TestDeltaTableLoaderPipeline:
             when_matched_operation=None,
             when_not_matched_operation=None,
         )
-        mock_spark_metastore_service.assert_called_once()
-        mock_spark_metastore_service.return_value.refresh_table.assert_called_once()
+        mock_loader_metastore_service.assert_called_once()
+        mock_loader_metastore_service.return_value.refresh_table.assert_called_once()
+
+        mock_schema_from_dataframe.assert_called_once_with(df)
+        mock_sync_to_secondary_catalog.assert_called_once_with(
+            database_name="database_name",
+            table_name="table_name",
+            table_location="s3://bucket/database_name/table_name",
+            table_schema=OrderedDict([("id", "bigint")]),
+            partitions=["partition_col"],
+            format_str="DELTA",
+        )

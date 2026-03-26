@@ -12,11 +12,12 @@ class TestFullTableLoaderPipeline:
             yield s3_loader
 
     @pytest.fixture(autouse=True)
-    def mock_spark_metastore_service(self):
+    def mock_loader_metastore_service(self):
         with mock.patch(
-            "bietlejuice.pipeline.full_table_loader_pipeline.SparkMetastoreService"
-        ) as spark_metastore_service:
-            yield spark_metastore_service
+            "bietlejuice.pipeline.full_table_loader_pipeline.MetastoreServiceFactory.create_loader_metastore_service",
+            return_value=mock.MagicMock(),
+        ) as factory_mock:
+            yield factory_mock
 
     @pytest.fixture(autouse=True)
     def mock_spark_metastore_loader(self):

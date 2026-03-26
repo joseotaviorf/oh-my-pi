@@ -9,6 +9,10 @@ from bietlejuice.base.cdc.primary_key_identifiers.clean_primary_key_identifier i
 )
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.spark.delta_secondary_catalog_sync import (
+    partition_columns_present,
+    sync_delta_write_to_secondary_catalog,
+)
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
 
@@ -120,15 +124,23 @@ def main():
     else:
         table_privileges = TablePrivileges.from_environment_default(full_clean_table_name)
 
+    clean_table_s3_path = f"s3://{datalake_bucket}/clean/{schema}/{table_name}/"
     loader = DeltaLoader()
     loader.load_table(
         table_name=full_clean_table_name,
-        path=f"s3://{datalake_bucket}/clean/{schema}/{table_name}/",
+        path=clean_table_s3_path,
         source_df=clean_updates_df,
         merge_on=clean_primary_keys,
         when_not_matched_insert_condition="source.Op != 'D'",
         when_matched_update_condition="source.event_timestamp >= target.event_timestamp",
         when_matched_delete_condition="source.Op = 'D'",
+    )
+    sync_delta_write_to_secondary_catalog(
+        spark,
+        full_clean_table_name,
+        clean_table_s3_path,
+        clean_updates_df,
+        partition_columns_present(clean_updates_df, ("year", "month", "day")),
     )
 
     if (

@@ -9,6 +9,10 @@ from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder_factory import (
     CdcSchemaFinderFactory,
 )
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.spark.delta_secondary_catalog_sync import (
+    partition_columns_present,
+    sync_delta_write_to_secondary_catalog,
+)
 from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
@@ -178,11 +182,12 @@ def main():
     else:
         table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
 
+    raw_table_s3_path = f"s3://{datalake_bucket}/raw/{schema}/{table_name}/"
     loader = DeltaLoader(spark)
     if has_soft_delete:
         loader.load_table(
             table_name=full_raw_table_name,
-            path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/",
+            path=raw_table_s3_path,
             source_df=transactional_df,
             merge_on=primary_keys,
             when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction AND source.op_cdc != 'd'",
@@ -190,11 +195,18 @@ def main():
     else:
         loader.load_table(
             table_name=full_raw_table_name,
-            path=f"s3://{datalake_bucket}/raw/{schema}/{table_name}/",
+            path=raw_table_s3_path,
             source_df=transactional_df,
             merge_on=primary_keys,
             when_matched_update_condition="source.ts_database_transaction >= target.ts_database_transaction",
         )
+    sync_delta_write_to_secondary_catalog(
+        spark,
+        full_raw_table_name,
+        raw_table_s3_path,
+        transactional_df,
+        partition_columns_present(transactional_df, ("year", "month", "day")),
+    )
     SparkTablePropertyHelper.set_property(
         full_raw_table_name, "primary_keys", ",".join(primary_keys), spark
     )

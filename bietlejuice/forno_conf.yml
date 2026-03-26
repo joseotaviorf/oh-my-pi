@@ -180,6 +180,7 @@ cluster_template:
             spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
         spark_env_vars:
             PYSPARK_PYTHON: "/databricks/python3/bin/python3"
+            SPARK_RUNTIME: databricks
             ENVIRONMENT: "{{ var.value.environment }}"
             ARTIFACTS_BUCKET: *artifacts_bucket
         ssh_public_keys: []
@@ -249,6 +250,7 @@ cluster_template:
             spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
         spark_env_vars:
             PYSPARK_PYTHON: "/databricks/python3/bin/python3"
+            SPARK_RUNTIME: databricks
             ENVIRONMENT: "{{ var.value.environment }}"
             ARTIFACTS_BUCKET: *artifacts_bucket
         ssh_public_keys: []
@@ -277,60 +279,61 @@ wonka_cluster:
     databricks_conn_id: databricks_new
     custom_libraries:
         - maven:
-            coordinates: "org.apache.kafka:kafka-clients:3.5.1"
+              coordinates: "org.apache.kafka:kafka-clients:3.5.1"
     custom_configurations:
-        single_user_name: '{{ var.value.databricks_single_user_name }}'
+        single_user_name: "{{ var.value.databricks_single_user_name }}"
         data_security_mode: SINGLE_USER
         spark_conf:
             spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
             spark.databricks.delta.schema.autoMerge.enabled: "true"
     spark_env_vars:
-      PREV_DATA_INTERVAL_START_SUCCESS: "{{ prev_data_interval_start_success }}"
-      PREV_DATA_INTERVAL_END_SUCCESS: "{{ prev_data_interval_end_success }}"
-      PREV_START_DATE_SUCCESS: "{{ prev_start_date_success }}"
-      PREV_END_DATE_SUCCESS: "{{ prev_end_date_success }}"
-      DATA_INTERVAL_START: "{{ data_interval_start | ds }}"
-      DATA_INTERVAL_START_JUST_FOR_DEBUG: "{{ data_interval_start }}"
-      DATA_INTERVAL_END: "{{ data_interval_end }}"
-      LOGICAL_DATE: "{{ logical_date }}"
-      VAULT_SECRET: "{{ '{{secrets/mlops/VAULT_SECRET}}' }}"
-      ENVIRONMENT: "{{ var.value.environment }}"
-      FEATURE_STORE_HISTORICAL_DATABASE: "wonka"
-      FEATURE_STORE_S3_BUCKET: "wonka.s3.forno.data.quintoandar.com.br/wonka"
-      INMETRO_VERSION: "{{ var.value.environment }}"
-      INMETRO_DATA_ALARMS_SLACK_WEBHOOK: "https://notification-hub-internal-api.quintoandar.com.br/webhook/inmetro?space=data-alarms"
-      INMETRO_S3_BUCKET_LOADER: "inmetro-s3-forno-quintoandar-com-br"
-      KAFKA_CONNECTION_STRING: "kafka-01.svc.core-frn.habitat.zone:9092,kafka-02.svc.core-frn.habitat.zone:9092,kafka-03.svc.core-frn.habitat.zone:9092"
-      PYSPARK_PYTHON: "/databricks/python3/bin/python3"
-      SPARK_VERSION: "3.5.0"
-      STREAM_CHECKPOINT_PATH: "s3://wonka.s3.forno.data.quintoandar.com.br/checkpoints/online_feature_store"
-      STREAM_PROCESSING_TIME: "0 seconds"
-      ARTIFACTS_BUCKET: *artifacts_bucket
-      AIRFLOW_EXECUTION_PARAMS: "{{ dag_run.conf }}"
-      AIRFLOW_EXECUTION_DATE: "{{ ds }}"
-      AIRFLOW_PREVIOUS_EXECUTION_DATE: "{{ prev_ds }}"
-      AIRFLOW_NEXT_EXECUTION_DATE: "{{ next_ds }}"
-      WONKA_START_DATE: "{{ dag_run.conf.get('start_date', '') }}"
-      WONKA_END_DATE: "{{ dag_run.conf.get('end_date', '') }}"
-      WONKA_DISABLE_ONLINE_WRITER: "{{ dag_run.conf.get('disable_online_writer', 'false')}}"
-      WONKA_FORCE_FULL_LOAD: "{{ dag_run.conf.get('force_full_load', 'false')}}"
-      CDF_TO_KAFKA_USE_SCHEMA_REGISTRY: "false"
+        PREV_DATA_INTERVAL_START_SUCCESS: "{{ prev_data_interval_start_success }}"
+        PREV_DATA_INTERVAL_END_SUCCESS: "{{ prev_data_interval_end_success }}"
+        PREV_START_DATE_SUCCESS: "{{ prev_start_date_success }}"
+        PREV_END_DATE_SUCCESS: "{{ prev_end_date_success }}"
+        DATA_INTERVAL_START: "{{ data_interval_start | ds }}"
+        DATA_INTERVAL_START_JUST_FOR_DEBUG: "{{ data_interval_start }}"
+        DATA_INTERVAL_END: "{{ data_interval_end }}"
+        LOGICAL_DATE: "{{ logical_date }}"
+        VAULT_SECRET: "{{ '{{secrets/mlops/VAULT_SECRET}}' }}"
+        ENVIRONMENT: "{{ var.value.environment }}"
+        FEATURE_STORE_HISTORICAL_DATABASE: "wonka"
+        FEATURE_STORE_S3_BUCKET: "wonka.s3.forno.data.quintoandar.com.br/wonka"
+        INMETRO_VERSION: "{{ var.value.environment }}"
+        INMETRO_DATA_ALARMS_SLACK_WEBHOOK: "https://notification-hub-internal-api.quintoandar.com.br/webhook/inmetro?space=data-alarms"
+        INMETRO_S3_BUCKET_LOADER: "inmetro-s3-forno-quintoandar-com-br"
+        KAFKA_CONNECTION_STRING: "kafka-01.svc.core-frn.habitat.zone:9092,kafka-02.svc.core-frn.habitat.zone:9092,kafka-03.svc.core-frn.habitat.zone:9092"
+        PYSPARK_PYTHON: "/databricks/python3/bin/python3"
+        SPARK_RUNTIME: databricks
+        SPARK_VERSION: "3.5.0"
+        STREAM_CHECKPOINT_PATH: "s3://wonka.s3.forno.data.quintoandar.com.br/checkpoints/online_feature_store"
+        STREAM_PROCESSING_TIME: "0 seconds"
+        ARTIFACTS_BUCKET: *artifacts_bucket
+        AIRFLOW_EXECUTION_PARAMS: "{{ dag_run.conf }}"
+        AIRFLOW_EXECUTION_DATE: "{{ ds }}"
+        AIRFLOW_PREVIOUS_EXECUTION_DATE: "{{ prev_ds }}"
+        AIRFLOW_NEXT_EXECUTION_DATE: "{{ next_ds }}"
+        WONKA_START_DATE: "{{ dag_run.conf.get('start_date', '') }}"
+        WONKA_END_DATE: "{{ dag_run.conf.get('end_date', '') }}"
+        WONKA_DISABLE_ONLINE_WRITER: "{{ dag_run.conf.get('disable_online_writer', 'false')}}"
+        WONKA_FORCE_FULL_LOAD: "{{ dag_run.conf.get('force_full_load', 'false')}}"
+        CDF_TO_KAFKA_USE_SCHEMA_REGISTRY: "false"
     aws_attributes:
         <<: *aws_anchor
         availability: SPOT_WITH_FALLBACK
     init_scripts:
         - s3:
-            destination: "{{ var.value.artifacts_bucket }}/openlineage/init_script_openlineage.sh"
-            region: ""
+              destination: "{{ var.value.artifacts_bucket }}/openlineage/init_script_openlineage.sh"
+              region: ""
         - s3:
-            destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/install_spark_metrics_plugin.sh"
-            region: ""
+              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/install_spark_metrics_plugin.sh"
+              region: ""
         - s3:
-            destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/install_pex_generic.sh"
-            region: ""
+              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/install_pex_generic.sh"
+              region: ""
         - s3:
-            destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/get_credentials_from_vault.sh"
-            region: ""
+              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/get_credentials_from_vault.sh"
+              region: ""
 
 databricks_10_4_min_general_cluster:
     <<: *cluster_anchor
@@ -1661,6 +1664,133 @@ databricks_16_4_min_2xlarge_memory_cluster_4_workers:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
+
+### EMR Cluster Configs ###
+
+emr_cluster_base: &emr_cluster_anchor
+    cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
+    spark_version: emr-7.12.0
+    node_type_id: m7a.xlarge
+    driver_node_type_id: m7a.xlarge
+    num_workers: 2
+    autotermination_minutes: 20
+    emr_auto_terminate: false
+    aws_attributes: &emr_aws_anchor
+        availability: ON_DEMAND
+        ebs_volume_count: 1
+        ebs_volume_size: 200
+        ebs_volume_type: GENERAL_PURPOSE_SSD
+        instance_profile_arn: "{{ var.value.emr_instance_profile_arn }}"
+    emr_applications:
+        - Hadoop
+        - Hive
+        - JupyterEnterpriseGateway
+        - Livy
+        - Spark
+    emr_subnet_id: "{{ var.value.emr_subnet_id }}"
+    emr_service_role: "{{ var.value.emr_service_role }}"
+    emr_ebs_root_volume_size: 100
+    cluster_log_conf:
+        s3:
+            destination: "{{ var.value.artifacts_bucket }}/emr/logs/{{ dag.dag_id }}"
+    init_scripts:
+        - s3:
+              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/emr_init_script.sh"
+          args:
+              - "{{ var.value.artifacts_bucket }}"
+    custom_tags:
+        - key: app
+          value: airflow
+        - key: resource-name
+          value: emr
+        - key: environment
+          value: "{{ var.value.environment }}"
+        - key: owner
+          value: "{{ task.owner.lower().replace(' ', '-') }}"
+        - key: ecosystem
+          value: data-engineering
+        - key: data-classification
+          value: private
+        - key: cost-center
+          value: c052
+        - key: provisioner
+          value: emr
+        - key: for-use-with-amazon-emr-managed-policies
+          value: "true"
+    emr_configurations:
+        - Classification: iceberg-defaults
+          Properties:
+              iceberg.enabled: "true"
+        - Classification: delta-defaults
+          Properties:
+              delta.enabled: "true"
+        - Classification: yarn-env
+          Configurations:
+              - Classification: export
+                Properties:
+                    ARTIFACTS_BUCKET: *artifacts_bucket
+                    ENVIRONMENT: "{{ var.value.environment }}"
+                    SPARK_RUNTIME: "emr"
+                    DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
+                    DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
+          Properties: {}
+        - Classification: spark-hive-site
+          Properties:
+              hive.metastore.client.factory.class: "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
+    spark_conf:
+        spark.rpc.message.maxSize: "2000"
+        spark.sql.sources.partitionOverwriteMode: dynamic
+        spark.sql.parquet.filterPushdown: "true"
+        spark.sql.sources.default: parquet
+        spark.sql.legacy.createHiveTableByDefault: "true"
+        spark.sql.legacy.parquet.datetimeRebaseModeInRead: LEGACY
+        spark.sql.legacy.parquet.datetimeRebaseModeInWrite: LEGACY
+        spark.sql.legacy.timeParserPolicy: LEGACY
+        spark.sql.catalogImplementation: hive
+        spark.driverEnv.ARTIFACTS_BUCKET: *artifacts_bucket
+        spark.driverEnv.ENVIRONMENT: "{{ var.value.environment }}"
+        spark.driverEnv.SPARK_RUNTIME: "emr"
+        spark.driverEnv.DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
+        spark.driverEnv.DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
+        spark.executorEnv.ARTIFACTS_BUCKET: *artifacts_bucket
+        spark.executorEnv.ENVIRONMENT: "{{ var.value.environment }}"
+        spark.executorEnv.SPARK_RUNTIME: "emr"
+        spark.executorEnv.DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
+        spark.executorEnv.DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
+        spark.yarn.appMasterEnv.ARTIFACTS_BUCKET: *artifacts_bucket
+        spark.yarn.appMasterEnv.ENVIRONMENT: "{{ var.value.environment }}"
+        spark.yarn.appMasterEnv.SPARK_RUNTIME: "emr"
+        spark.yarn.appMasterEnv.DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
+        spark.yarn.appMasterEnv.DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
+    spark_env_vars:
+        ENVIRONMENT: "{{ var.value.environment }}"
+        ARTIFACTS_BUCKET: *artifacts_bucket
+        SPARK_RUNTIME: "emr"
+        DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
+        DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
+
+emr_7_12_med_general_cluster:
+    <<: *emr_cluster_anchor
+
+emr_7_12_min_general_cluster:
+    <<: *emr_cluster_anchor
+    node_type_id: m7a.2xlarge
+    driver_node_type_id: m7a.2xlarge
+    num_workers: 3
+    aws_attributes:
+        <<: *emr_aws_anchor
+        ebs_volume_size: 100
+        availability: ON_DEMAND
+
+emr_7_12_med_general_2_workers_cluster:
+    <<: *emr_cluster_anchor
+    node_type_id: m7a.xlarge
+    driver_node_type_id: m7a.xlarge
+    num_workers: 2
+    aws_attributes:
+        <<: *emr_aws_anchor
+        ebs_volume_size: 100
+        availability: ON_DEMAND
 
 ### Notification Configs ###
 notification_webhooks_keys:

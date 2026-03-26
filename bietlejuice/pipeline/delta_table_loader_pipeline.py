@@ -1,12 +1,14 @@
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.spark.catalog_strategy_resolver import CatalogStrategyResolver
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.base.spark.base_spark import BaseSparkContext
 from bietlejuice.pipeline.table_loader_pipeline import TableLoaderPipeline
-from bietlejuice.services.metastore_services.spark_metastore_service import (
-    SparkMetastoreService,
+from bietlejuice.services.metastore_services.metastore_service_factory import (
+    MetastoreServiceFactory,
 )
+from bietlejuice.services.schema_service import SchemaService
 from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
 from quintoandar_logger import QuintoAndarLogger
 
@@ -100,7 +102,9 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
 
     def load_and_register(self, df, format_options):
         spark_client = SparkClient()
-        spark_metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_service = (
+            MetastoreServiceFactory.create_loader_metastore_service(spark_client)
+        )
         delta_loader = DeltaLoader(spark=self.spark)
 
         s3_path = self.target_database_location + self.table_name
@@ -127,6 +131,16 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
 
         spark_metastore_service.refresh_table(
             self.target_database_name, self.table_name
+        )
+
+        table_schema = SchemaService.get_schema_from_dataframe(df)
+        CatalogStrategyResolver.sync_to_secondary_catalog(
+            database_name=self.target_database_name,
+            table_name=self.table_name,
+            table_location=s3_path,
+            table_schema=table_schema,
+            partitions=self.partitions,
+            format_str="DELTA",
         )
 
         if self.table_properties:

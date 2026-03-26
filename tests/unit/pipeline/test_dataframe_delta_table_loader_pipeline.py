@@ -1,4 +1,5 @@
 import pytest
+from collections import OrderedDict
 from unittest import mock
 from unittest.mock import Mock
 
@@ -17,11 +18,12 @@ class TestDataFrameDeltaTableLoaderPipeline:
             yield spark_client
 
     @pytest.fixture(autouse=True)
-    def mock_spark_metastore_service(self):
+    def mock_loader_metastore_service(self):
         with mock.patch(
-            "bietlejuice.pipeline.dataframe_delta_table_loader_pipeline.SparkMetastoreService"
-        ) as spark_metastore_service:
-            yield spark_metastore_service
+            "bietlejuice.pipeline.dataframe_delta_table_loader_pipeline.MetastoreServiceFactory.create_loader_metastore_service",
+            return_value=mock.MagicMock(),
+        ) as factory_mock:
+            yield factory_mock
 
     @pytest.fixture(autouse=True)
     def mock_delta_loader(self):
@@ -37,6 +39,21 @@ class TestDataFrameDeltaTableLoaderPipeline:
         ) as unity_catalog_helper:
             unity_catalog_helper.is_cluster_unity_catalog_enabled.return_value = True
             yield unity_catalog_helper
+
+    @pytest.fixture(autouse=True)
+    def mock_schema_from_dataframe(self):
+        with mock.patch(
+            "bietlejuice.pipeline.dataframe_delta_table_loader_pipeline.SchemaService.get_schema_from_dataframe",
+            return_value=OrderedDict([("id", "bigint")]),
+        ) as p:
+            yield p
+
+    @pytest.fixture(autouse=True)
+    def mock_sync_to_secondary_catalog(self):
+        with mock.patch(
+            "bietlejuice.pipeline.dataframe_delta_table_loader_pipeline.CatalogStrategyResolver.sync_to_secondary_catalog"
+        ) as p:
+            yield p
 
     @pytest.fixture
     def mock_dataframe(self):
@@ -133,7 +150,7 @@ class TestDataFrameDeltaTableLoaderPipeline:
         assert pipeline.table_privileges is None  # default
 
     def test_run_creates_databases_and_loads_data(
-        self, pipeline_params, mock_spark_client, mock_spark_metastore_service
+        self, pipeline_params, mock_spark_client, mock_loader_metastore_service
     ):
         """Test that run() method creates databases and loads data"""
         # Arrange
@@ -146,12 +163,12 @@ class TestDataFrameDeltaTableLoaderPipeline:
         # Verify SparkClient is instantiated (called twice: once in run(), once in _load_and_register())
         assert mock_spark_client.call_count == 2
 
-        # Verify SparkMetastoreService is instantiated with SparkClient
-        assert mock_spark_metastore_service.call_count == 2
-        mock_spark_metastore_service.assert_any_call(mock_spark_client.return_value)
+        # Verify loader metastore factory is used twice with SparkClient
+        assert mock_loader_metastore_service.call_count == 2
+        mock_loader_metastore_service.assert_any_call(mock_spark_client.return_value)
 
         # Verify databases are created
-        metastore_service_instance = mock_spark_metastore_service.return_value
+        metastore_service_instance = mock_loader_metastore_service.return_value
         assert metastore_service_instance.create_database.call_count == 2
         metastore_service_instance.create_database.assert_any_call("target_database")
         metastore_service_instance.create_database.assert_any_call("test_database")
@@ -176,7 +193,12 @@ class TestDataFrameDeltaTableLoaderPipeline:
             )
 
     def test_load_and_register_basic_functionality(
-        self, pipeline_params, mock_delta_loader, mock_spark_metastore_service
+        self,
+        pipeline_params,
+        mock_delta_loader,
+        mock_loader_metastore_service,
+        mock_schema_from_dataframe,
+        mock_sync_to_secondary_catalog,
     ):
         """Test _load_and_register method basic functionality"""
         # Arrange
@@ -207,9 +229,19 @@ class TestDataFrameDeltaTableLoaderPipeline:
         )
 
         # Verify table refresh is called
-        metastore_service_instance = mock_spark_metastore_service.return_value
+        metastore_service_instance = mock_loader_metastore_service.return_value
         metastore_service_instance.refresh_table.assert_called_once_with(
             "target_database", "test_table"
+        )
+
+        mock_schema_from_dataframe.assert_called_once_with(pipeline_params["dataframe"])
+        mock_sync_to_secondary_catalog.assert_called_once_with(
+            database_name="target_database",
+            table_name="test_table",
+            table_location="s3://test-bucket/target_database/test_table",
+            table_schema=OrderedDict([("id", "bigint")]),
+            partitions=["partition_col"],
+            format_str="DELTA",
         )
 
     def test_load_and_register_applies_table_privileges(

@@ -1,12 +1,14 @@
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.spark.catalog_strategy_resolver import CatalogStrategyResolver
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.base.spark.base_spark import BaseSparkContext
 from bietlejuice.pipeline.abstract_pipeline import AbstractPipeline
-from bietlejuice.services.metastore_services.spark_metastore_service import (
-    SparkMetastoreService,
+from bietlejuice.services.metastore_services.metastore_service_factory import (
+    MetastoreServiceFactory,
 )
+from bietlejuice.services.schema_service import SchemaService
 from pyspark.sql import DataFrame
 from quintoandar_logger import QuintoAndarLogger
 
@@ -112,7 +114,9 @@ class DataFrameDeltaTableLoaderPipeline(AbstractPipeline):
 
         # Create databases if they don't exist
         databases_to_be_created = [self.target_database_name, self.database_name]
-        spark_metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_service = (
+            MetastoreServiceFactory.create_loader_metastore_service(spark_client)
+        )
         for database in databases_to_be_created:
             spark_metastore_service.create_database(database)
 
@@ -126,7 +130,9 @@ class DataFrameDeltaTableLoaderPipeline(AbstractPipeline):
     def _load_and_register(self):
         """Load the DataFrame to Delta table and apply permissions"""
         spark_client = SparkClient()
-        spark_metastore_service = SparkMetastoreService(spark_client)
+        spark_metastore_service = (
+            MetastoreServiceFactory.create_loader_metastore_service(spark_client)
+        )
         delta_loader = DeltaLoader(spark=self.spark)
 
         s3_path = self.target_database_location + self.table_name
@@ -154,6 +160,16 @@ class DataFrameDeltaTableLoaderPipeline(AbstractPipeline):
         # Refresh the table in metastore
         spark_metastore_service.refresh_table(
             self.target_database_name, self.table_name
+        )
+
+        table_schema = SchemaService.get_schema_from_dataframe(self.dataframe)
+        CatalogStrategyResolver.sync_to_secondary_catalog(
+            database_name=self.target_database_name,
+            table_name=self.table_name,
+            table_location=s3_path,
+            table_schema=table_schema,
+            partitions=self.partitions,
+            format_str="DELTA",
         )
 
         # Apply table privileges if specified and Unity Catalog is enabled
