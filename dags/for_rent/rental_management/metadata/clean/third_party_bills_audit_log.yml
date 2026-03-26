@@ -1,0 +1,46 @@
+---
+database_name: datalake_rental_management_clean
+table_name: third_party_bills_audit_log
+description: |
+  Audit log of payment lifecycle events for third party bills (e.g. payment requested, payment completed),
+  including channel, author type, and optional context.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    description: Primary key of the third party bills audit log entry.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills_audit_log.id
+  id_third_party_bills:
+    description: Foreign key to the third party bill associated with this audit event.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills_audit_log.third_party_bills_id
+  event_type:
+    description: |
+      Payment lifecycle event that occurred (e.g. PAYMENT_REQUESTED, PAYMENT_COMPLETED).
+    lineage:
+      - datalake_rental_management_raw.third_party_bills_audit_log.event_type
+  channel:
+    description: |
+      Entry point or system that triggered the event (e.g. PAYOUT_SYSTEM_EVENT, MANUAL_OPERATION).
+    lineage:
+      - datalake_rental_management_raw.third_party_bills_audit_log.channel
+  author_type:
+    description: |
+      Whether the action was performed by a human (PERSON) or an automated service (SERVICE).
+    lineage:
+      - datalake_rental_management_raw.third_party_bills_audit_log.author_type
+  author_identifier:
+    description: |
+      Identifier of the author, such as a user ID or service name.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills_audit_log.author_identifier
+  description:
+    description: |
+      Optional human-readable context or additional details about the event.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills_audit_log.description
+  ts_created:
+    description: Timestamp when the audit log entry was created.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills_audit_log.created_at
