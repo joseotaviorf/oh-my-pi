@@ -17,6 +17,8 @@ MAX_MESSAGE_SIZE_BYTES = (
     246 * 1024
 )  # SQS maximum message size is 256KB, we'll use 246KB as a safe limit
 
+VALID_BUSINESS_CONTEXTS = {"RENT", "SALE"}
+
 
 def parse_arguments() -> Tuple[str, str, str]:
     parser = ArgumentParser(description=JOB_NAME)
@@ -38,17 +40,10 @@ def is_valid(row) -> bool:
         "state",
         "state_code",
         "country_code",
-        "region_level",
+        "country",
         "centroid_lat",
         "centroid_lng",
     ]
-
-    if row.region_level == "neighborhood":
-        mandatory_fields.append("neighborhood")
-
-    if row.region_level == "street":
-        mandatory_fields.append("street")
-        mandatory_fields.append("neighborhood")
 
     for field in mandatory_fields:
         if not hasattr(row, field):
@@ -66,6 +61,15 @@ def is_valid(row) -> bool:
     if not isinstance(row.business_contexts, (list, set)):
         return False
 
+    if not row.business_contexts:
+        return False
+
+    if not set(row.business_contexts).issubset(VALID_BUSINESS_CONTEXTS):
+        return False
+
+    if not isinstance(row.city_id, int) or row.city_id <= 0:
+        return False
+
     return True
 
 
@@ -78,8 +82,8 @@ def row_to_dict(row) -> Dict:
         "business_contexts": row.business_contexts,
         "state": row.state,
         "state_code": row.state_code,
-        "country_code": "BR",
-        "region_level": row.region_level,
+        "country_code": row.country_code,
+        "country": row.country,
         "centroid_lat": float(row.centroid_lat),
         "centroid_lng": float(row.centroid_lng),
     }

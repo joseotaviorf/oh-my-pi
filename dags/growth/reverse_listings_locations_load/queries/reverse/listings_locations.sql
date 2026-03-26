@@ -1,18 +1,13 @@
 SELECT
-  h.address.street,
-  h.address.neighborhood,
-  h.address.city,
-  c.id as city_id,
+  h.address.street as street,
+  h.address.neighborhood as neighborhood,
+  h.address.city as city,
+  r.id as city_id,
   collect_set(l.business_context) as business_contexts,
   s.name as state,
-  h.address.state_code,
+  h.address.state_code as state_code,
   h.address.country_code as country_code,
-  CASE
-    WHEN GROUPING(h.address.street) = 0 THEN 'street'
-    WHEN GROUPING(h.address.neighborhood) = 0 THEN 'neighborhood'
-    WHEN GROUPING(h.address.city) = 0 THEN 'city'
-    ELSE 'global'
-  END AS region_level,
+  co.name as country,
   AVG(h.lat) AS centroid_lat,
   AVG(h.lng) AS centroid_lng
 FROM
@@ -22,11 +17,13 @@ INNER JOIN
 INNER JOIN
   datalake_ebdb_clean.state s ON s.abbreviation = h.address.state_code
 INNER JOIN
-  datalake_ebdb_clean.city c ON lower(c.name) = lower(h.address.city) AND c.uf = s.abbreviation
+  datalake_ebdb_clean.region r ON lower(r.name) = lower(h.address.city) AND r.id_state = s.id
+INNER JOIN
+  datalake_ebdb_clean.country co ON co.id = s.id_country
 WHERE
   l.source_name = "ebdb_houses" AND h.address.country_code = "BR" AND l.status = "PUBLISHED"
 GROUP BY GROUPING SETS (
-    (h.address.street, h.address.neighborhood, h.address.city, c.id, h.address.state_code, s.name, country_code),
-    (h.address.neighborhood, h.address.city, c.id, h.address.state_code, s.name, country_code),
-    (h.address.city, c.id, h.address.state_code, s.name, country_code)
+    (street, neighborhood, city, city_id, state_code, state, country_code, country),
+    (neighborhood, city, city_id, state_code, state, country_code, country),
+    (city, city_id, state_code, state, country_code, country)
 )
