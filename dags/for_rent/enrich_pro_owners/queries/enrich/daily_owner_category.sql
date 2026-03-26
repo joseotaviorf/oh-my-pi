@@ -1,13 +1,4 @@
-WITH pro_owner_history as (
-  SELECT DISTINCT
-    poh.id_owner,
-    poh.is_pro_owner,
-    poh.ts_pro_owner_started,
-    poh.ts_pro_owner_ended
-  FROM
-    datalake_pro_owners.pro_owner_history AS poh
-),
-pp_multi_cluster AS (
+WITH pp_multi_cluster AS (
   SELECT
     id_owner,
     cluster,
@@ -22,12 +13,7 @@ owner_house_category AS(
     ohqh.id_owner,
     ohqh.country_code,
     ohqh.ongoing_houses >= 5 AS has_5_or_more_ongoing_houses,
-    CASE 
-      WHEN poh.is_pro_owner THEN TRUE
-      WHEN (poh.id_owner IS NULL 
-        OR poh.is_pro_owner) THEN FALSE
-      ELSE FALSE
-    END AS is_pp_multi,
+    ohqh.is_pp_multi_active AS is_pp_multi,
     CASE
       WHEN ohqh.id_owner = pmc.id_owner THEN pmc.cluster
       WHEN ohqh.ongoing_houses > 15 THEN 'Investors (15+)'
@@ -41,11 +27,6 @@ owner_house_category AS(
     ohqh.day
   FROM
     datalake_pro_owners.daily_owner_houses_quantity_history AS ohqh
-  LEFT JOIN
-    pro_owner_history AS poh
-      ON ohqh.id_owner = poh.id_owner
-      AND MAKE_DATE(ohqh.year, ohqh.month, ohqh.day) >= DATE(poh.ts_pro_owner_started)
-      AND MAKE_DATE(ohqh.year, ohqh.month, ohqh.day) < COALESCE(DATE(poh.ts_pro_owner_ended), CURRENT_DATE())
   LEFT JOIN
     pp_multi_cluster AS pmc
       ON ohqh.id_owner = pmc.id_owner
