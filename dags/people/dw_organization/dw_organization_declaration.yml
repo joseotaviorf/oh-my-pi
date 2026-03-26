@@ -8,7 +8,7 @@ dag:
       Holds dimension tables that describe organizational entities (e.g. jobs, cost centers, business units).
       No sensitive or PII data. Currently restricted to the people team; will be made available
       to the entire QuintoAndar once the DW tables are validated.
-      dim_cost_center uses SCD Type 2 (dt_valid_from, dt_valid_to) for codex attributes; other tables may use SCD Type 1.
+      dim_cost_center projects datalake_people.cost_center_history (SCD Type 2 built in enrich) and adds sk_cost_center_version; other tables may use SCD Type 1.
       Tables are designed to join primarily to dw_people.fact_employee for reporting and analytics.
 cluster:
   type: databricks_16_4_small_memory_people_cluster

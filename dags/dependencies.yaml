@@ -842,11 +842,8 @@ bietlejuice.dw_offer:
   - bietlejuice.rental_transact:load-clean-offer-topic:first-run-of-day
 bietlejuice.dw_organization:
   - bietlejuice.enrich_people:load-enrich-business-unit:first-run-of-day
-  - bietlejuice.enrich_people:load-enrich-codex-log:first-run-of-day
+  - bietlejuice.enrich_people:load-enrich-cost-center-history:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-job-with-salary-table:first-run-of-day
-  - bietlejuice.pin_core:load-clean-all-organization-units:first-run-of-day
-  - bietlejuice.pin_core:load-clean-assignment-responsibility:first-run-of-day
-  - bietlejuice.pin_core:load-clean-hr-organization:first-run-of-day
 bietlejuice.dw_payments_platform:
   - bietlejuice.enrich_payments_platform:load-enrich-payment-timeline:first-run-of-day
   - bietlejuice.enrich_payments_platform:load-enrich-payment:first-run-of-day
