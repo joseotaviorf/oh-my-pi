@@ -13,7 +13,7 @@ from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 DAG_NAME = "databricks_jobs_deletion"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2023, 7, 15, tzinfo=timezone("America/Sao_Paulo"))
-MAIN_SCHEDULE_INTERVAL = "0 20 * * *"
+MAIN_SCHEDULE_INTERVAL = "0 */8 * * *"
 
 PROJECT_TO_JOB_NAME_REGEX_MAPPING = {"bietlejuice": "^bietlejuice-", "wonka": "^wonka-"}
 JOBS_REMOVAL_TIMEDELTA = timedelta(days=1)
