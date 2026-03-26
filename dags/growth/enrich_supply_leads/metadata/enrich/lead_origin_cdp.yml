@@ -1,0 +1,159 @@
+database_name: datalake_supply_flows
+table_name: lead_origin_cdp
+domain: Growth
+owner: henrique.paulo@quintoandar.com.br
+description: Replica of lead_origin with UTM columns (source, medium, campaign, term, content) sourced from CDP user_tracking instead of the Rene Descartes and Amplitude COALESCE chain, enabling side-by-side attribution comparison.
+columns:
+  id_lead:
+    description: The unique identifier for each lead in the dataset.
+    lineage:
+      - datalake_rene_descartes_clean.house_lead.id
+  id_lead_ebdb:
+    description: The lead's identifier in the EBDB/Monolith.
+    lineage:
+      - datalake_rene_descartes_clean.house_lead.id_lead_ebdb
+  id_source_ctwa:
+    description: The Id for the campaign related to the click to whatsapp identifier.
+    lineage:
+      - datalake_supply_flows.inbound_attribution.id_source_ctwa
+  affiliate_type:
+    description: The type of affiliate associated with the lead's acquisition campaign.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  campaign:
+    description: The utm_campaign sourced from CDP user_tracking (egw_utm_campaign).
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_campaign
+  medium:
+    description: The utm_medium sourced from CDP user_tracking (egw_utm_medium), with referrer_domain fallback for SEO detection when UTMs are null.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_medium
+  source:
+    description: The utm_source sourced from CDP user_tracking (egw_utm_source), with referrer_domain fallback for SEO detection when UTMs are null.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_source
+  term:
+    description: The utm_term sourced from CDP user_tracking (egw_utm_term).
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_term
+  content:
+    description: The utm_content sourced from CDP user_tracking (egw_utm_content).
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_content
+  ops_agent:
+    description: The operational agent responsible for handling the lead.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  ops_objective:
+    description: The objective of the operational agent, derived from ops_agent value.
+  ops_partner:
+    description: The operational partner associated with the lead.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  application:
+    description: The origin or application from which the lead originated.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  city:
+    description: The city associated with the lead's acquisition.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  landing_page:
+    description: The landing page URL where the lead first arrived.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  reprocessed:
+    description: Indicates if the lead was automatically reprocessed from an original lead.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  ops_approach:
+    description: The approach used by operational teams to engage with the lead.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  ops_contact_medium:
+    description: The medium through which operational teams contacted the lead.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  platform:
+    description: The platform where the lead was acquired.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  lead_type:
+    description: The type of lead.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  detailed_route:
+    description: The concatenation of the path a lead used to reach the landing page where the creation process was triggered in the Product, and the associated experiment (A/B test) the lead was allocated to, if applicable.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  gclid:
+    description: The google click identifier of the lead.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  fbclid:
+    description: The facebook click identifier of the lead.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  ctwa_clid:
+    description: The whatsapp click identifier of the lead.
+    lineage:
+      - datalake_supply_flows.inbound_attribution.ctwa_clid
+  id_task:
+    description: The ID for the lead creation task.
+    lineage:
+      - datalake_supply_flows.inbound_attribution.id_task
+  id_chat_session:
+    description: The ID for the chat session in Sauron.
+    lineage:
+      - datalake_supply_flows.inbound_attribution.id_session
+  id_ai_core_session:
+    description: The ID for the chat in the Orchestrator/Copilot.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  quinto_andar_phone_number:
+    description: The QuintoAndar phone number the client used to get in touch and have their lead created.
+    lineage:
+      - datalake_supply_flows.inbound_attribution.quinto_andar_phone_number
+  url_source_ctwa:
+    description: The url for the campaign related to the click to whatsapp identifier.
+    lineage:
+      - datalake_supply_flows.inbound_attribution.url_source_ctwa
+  type_source_ctwa:
+    description: The type of the campaign related to the click to whatsapp identifier.
+    lineage:
+      - datalake_supply_flows.inbound_attribution.type_source_ctwa
+  original_lead:
+    description: The identifier of the original lead if the current lead is a result of reprocessing process.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  database_tracking_campaign:
+    description: The source system responsible for the campaign UTM value. Values are cdp or lost_tracking.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_campaign
+  database_tracking_medium:
+    description: The source system responsible for the medium UTM value. Values are cdp, cdp_referrer, or lost_tracking.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_medium
+  database_tracking_source:
+    description: The source system responsible for the source UTM value. Values are cdp, cdp_referrer, or lost_tracking.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_source
+  database_tracking_content:
+    description: The source system responsible for the content UTM value. Values are cdp or lost_tracking.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_content
+  database_tracking_term:
+    description: The source system responsible for the term UTM value. Values are cdp or lost_tracking.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_term
+  database_tracking_ctwa:
+    description: The source responsible for the ctwa information.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_supply_flows.inbound_attribution.ctwa_clid
+  ts_event:
+    description: The timestamp of the lead creation event.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.ts_created
+  ts_load:
+    description: The timestamp of the data load.

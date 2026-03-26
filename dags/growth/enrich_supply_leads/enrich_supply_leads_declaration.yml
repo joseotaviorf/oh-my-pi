@@ -22,8 +22,13 @@ workflow:
     inbound_attribution:
       merge_on: ["id_lead_ebdb"]
       z_order_by: ["id_lead_ebdb"]
+    lead_origin_cdp:
+      merge_on: ["id_lead"]
+      z_order_by: ["id_lead"]
   inner_dependencies:
     lead_origin:
+      - inbound_attribution
+    lead_origin_cdp:
       - inbound_attribution
   spark_session_configs:
     udfs: [SF_NORMALIZE_STRING]
