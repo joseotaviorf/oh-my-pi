@@ -1,4 +1,5 @@
 import re
+from os import path
 from unittest import mock
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 
@@ -143,3 +144,138 @@ class TestDAGMetadataService:
 
         # assert
         assert not exists
+
+
+class TestListMetadataTablePaths:
+    """Unit tests for DAGMetadataService.list_metadata_table_paths."""
+
+    @mock.patch("bietlejuice.services.dag_metadata_service.os.path.isdir")
+    @mock.patch.object(DAGPackagesPathService, "get_dag_path")
+    def test_returns_empty_set_when_both_dirs_absent(
+        self, mock_get_dag_path, mock_isdir
+    ):
+        # arrange — neither primary nor legacy directory exists
+        mock_get_dag_path.return_value = "/dags/for_rent/my_dag"
+        mock_isdir.return_value = False
+
+        # act
+        result = DAGMetadataService.list_metadata_table_paths("my_dag", "clean")
+
+        # assert
+        assert result == set()
+
+    @mock.patch("bietlejuice.services.dag_metadata_service.os.path.isfile")
+    @mock.patch("bietlejuice.services.dag_metadata_service.glob")
+    @mock.patch("bietlejuice.services.dag_metadata_service.os.path.isdir")
+    @mock.patch.object(DAGPackagesPathService, "get_dag_path")
+    def test_primary_path_files_returned_without_extensions(
+        self, mock_get_dag_path, mock_isdir, mock_glob, mock_isfile
+    ):
+        # arrange — primary metadata dir exists with two files; legacy dir absent
+        dag_path = "/dags/for_rent/my_dag"
+        mock_get_dag_path.return_value = dag_path
+        primary_dir = path.join(dag_path, "metadata", "clean")
+
+        def isdir_side_effect(p):
+            return p == primary_dir
+
+        mock_isdir.side_effect = isdir_side_effect
+        mock_isfile.return_value = True
+
+        primary_files = [
+            path.join(primary_dir, "contract.yml"),
+            path.join(primary_dir, "nested", "user.yaml"),
+        ]
+
+        def glob_side_effect(pattern, recursive=False):
+            if primary_dir in pattern:
+                return primary_files
+            return []
+
+        mock_glob.glob.side_effect = glob_side_effect
+
+        # act
+        result = DAGMetadataService.list_metadata_table_paths("my_dag", "clean")
+
+        # assert — extensions stripped; nested path preserved; normpath applied
+        assert path.normpath("contract") in result
+        assert path.normpath(path.join("nested", "user")) in result
+        assert not any(
+            name.endswith(".yml") or name.endswith(".yaml") for name in result
+        )
+
+    @mock.patch("bietlejuice.services.dag_metadata_service.os.path.isfile")
+    @mock.patch("bietlejuice.services.dag_metadata_service.glob")
+    @mock.patch("bietlejuice.services.dag_metadata_service.os.path.isdir")
+    @mock.patch.object(DAGPackagesPathService, "get_dag_path")
+    def test_legacy_path_used_when_primary_absent(
+        self, mock_get_dag_path, mock_isdir, mock_glob, mock_isfile
+    ):
+        # arrange — primary dir absent; legacy dir present with one file
+        dag_path = "/dags/for_rent/my_dag"
+        mock_get_dag_path.return_value = dag_path
+
+        legacy_dir = mock.patch(
+            "bietlejuice.services.dag_metadata_service.DATALAKE_METADATA_PATH",
+            "/legacy/metadata",
+        )
+
+        with legacy_dir:
+            resolved_legacy = path.join("/legacy/metadata", "my_dag", "clean")
+
+            def isdir_side_effect(p):
+                return p == resolved_legacy
+
+            mock_isdir.side_effect = isdir_side_effect
+            mock_isfile.return_value = True
+
+            def glob_side_effect(pattern, recursive=False):
+                if resolved_legacy in pattern:
+                    return [path.join(resolved_legacy, "fact_contract.yml")]
+                return []
+
+            mock_glob.glob.side_effect = glob_side_effect
+
+            # act
+            result = DAGMetadataService.list_metadata_table_paths("my_dag", "clean")
+
+        # assert — file from legacy path is present
+        assert path.normpath("fact_contract") in result
+
+    @mock.patch("bietlejuice.services.dag_metadata_service.os.path.isfile")
+    @mock.patch("bietlejuice.services.dag_metadata_service.glob")
+    @mock.patch("bietlejuice.services.dag_metadata_service.os.path.isdir")
+    @mock.patch.object(DAGPackagesPathService, "get_dag_path")
+    def test_both_paths_merged_into_union(
+        self, mock_get_dag_path, mock_isdir, mock_glob, mock_isfile
+    ):
+        # arrange — both primary and legacy dirs exist with distinct files
+        dag_path = "/dags/for_rent/my_dag"
+        mock_get_dag_path.return_value = dag_path
+        primary_dir = path.join(dag_path, "metadata", "clean")
+        mock_isfile.return_value = True
+
+        with mock.patch(
+            "bietlejuice.services.dag_metadata_service.DATALAKE_METADATA_PATH",
+            "/legacy/metadata",
+        ):
+            resolved_legacy = path.join("/legacy/metadata", "my_dag", "clean")
+
+            mock_isdir.return_value = True
+
+            def glob_side_effect(pattern, recursive=False):
+                if primary_dir in pattern:
+                    return [path.join(primary_dir, "contract.yml")]
+                if resolved_legacy in pattern:
+                    return [path.join(resolved_legacy, "user.yml")]
+                return []
+
+            mock_glob.glob.side_effect = glob_side_effect
+
+            # act
+            result = DAGMetadataService.list_metadata_table_paths("my_dag", "clean")
+
+        # assert — union of both paths; no duplicates
+        assert path.normpath("contract") in result
+        assert path.normpath("user") in result
+        assert len(result) == 2

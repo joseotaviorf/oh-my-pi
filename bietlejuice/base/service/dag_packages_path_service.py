@@ -1,12 +1,31 @@
 import re
+from functools import lru_cache
 from glob import glob
 from os import path, scandir
+from typing import Dict, Set
 import boto3
 
 from hierarchical_conf.hierarchical_conf import HierarchicalConf
 
 from bietlejuice import BIETLEJUICE_PROJECT_ROOT
 from dags import DAG_PACKAGES_ROOT
+
+
+class DataQualityLayerCache:
+    """Per-instance, per-layer cache of data quality file paths for parse-time performance."""
+
+    def __init__(self, dag_name: str) -> None:
+        self._dag_name = dag_name
+        self._cache: Dict[str, Set[str]] = {}
+
+    def get(self, layer: str) -> Set[str]:
+        if layer not in self._cache:
+            self._cache[layer] = (
+                DAGPackagesPathService.list_data_quality_table_paths_in_composer(
+                    self._dag_name, layer
+                )
+            )
+        return self._cache[layer]
 
 
 class DAGPackagesPathService:
@@ -43,6 +62,43 @@ class DAGPackagesPathService:
         "query": "queries",
     }
 
+    _line_folders_cache = None
+
+    @staticmethod
+    def _get_line_folders():
+        """Return the list of top-level domain folders under DAG_PACKAGES_ROOT.
+
+        The result is cached for the lifetime of the current process. In the
+        standard Airflow 2.x parse path each DAG file is processed in a fresh
+        subprocess, so the cache is effectively reset per parse cycle and
+        staleness is not a concern.
+
+        For long-running processes (e.g. a DagBag loaded in a webserver worker)
+        call ``DAGPackagesPathService.clear_path_caches()`` before re-scanning
+        if a new domain folder has been added since the process started.
+        """
+        if DAGPackagesPathService._line_folders_cache is None:
+            DAGPackagesPathService._line_folders_cache = list(
+                scandir(DAG_PACKAGES_ROOT)
+            )
+        return DAGPackagesPathService._line_folders_cache
+
+    @classmethod
+    def clear_path_caches(cls) -> None:
+        """Clear all process-scoped path caches in one call.
+
+        Both ``_line_folders_cache`` and the ``get_dag_path`` LRU cache are
+        intentionally process-scoped for parse-time performance. In the normal
+        Airflow 2.x parse flow (one subprocess per DAG file) they reset
+        automatically on each parse cycle.
+
+        Call this method from a long-running process (e.g. a DagBag reload in
+        the webserver) when DAG folders have been added or removed and a fresh
+        filesystem scan is needed.
+        """
+        cls._line_folders_cache = None
+        cls.get_dag_path.cache_clear()
+
     @staticmethod
     def _find_dag_in_line_folders(dag_name):
         """
@@ -51,8 +107,7 @@ class DAGPackagesPathService:
         :param dag_name: DAG name.
         :return: DAG folder path.
         """
-        dag_packages_parent_folders = scandir(DAG_PACKAGES_ROOT)
-        for line_folder in dag_packages_parent_folders:
+        for line_folder in DAGPackagesPathService._get_line_folders():
             dag_path = path.join(line_folder.path, dag_name)
             if path.isdir(dag_path):
                 return dag_path
@@ -179,15 +234,24 @@ class DAGPackagesPathService:
         return intermediate_path
 
     @staticmethod
+    @lru_cache(maxsize=1024)
     def get_dag_path(dag_name: str) -> str:
         """
-        Gets the DAG's full path
+        Gets the DAG's full path.
 
-        The path returned does not contain trailing slash, like `/dags/bla/foo`
+        The path returned does not contain a trailing slash, e.g. ``/dags/for_rent/my_dag``.
 
         * Method used only in Composer *
 
-        Finds the DAG path according to its location: inside the DAG Packages or in the legacy path (bietlejuice)
+        Finds the DAG path according to its location: inside the DAG Packages or
+        in the legacy path (bietlejuice).
+
+        Result is cached via ``@lru_cache`` for the lifetime of the current
+        process. This is safe in the standard Airflow 2.x parse flow (fresh
+        subprocess per DAG file). For long-running processes, call
+        ``DAGPackagesPathService.clear_path_caches()`` to invalidate both this
+        cache and ``_line_folders_cache`` together.
+
         :return: full DAG's parent path
         """
         if not dag_name:
@@ -379,6 +443,25 @@ class DAGPackagesPathService:
             table_names.append(re.search(filename_regex, file_path).group(1))
 
         return table_names
+
+    @staticmethod
+    def list_data_quality_table_paths_in_composer(dag_name: str, layer: str) -> set:
+        """
+        Returns set of relative paths (without ext) for tables that have data quality files.
+        Used for batch file-existence checks during DAG parse. Supports nested paths.
+        """
+        dag_path = DAGPackagesPathService.get_dag_path(dag_name)
+        data_quality_folder = path.join(dag_path, "data_quality", layer)
+        if not path.isdir(data_quality_folder):
+            return set()
+        files = glob(f"{data_quality_folder}/**/*.yml", recursive=True) + glob(
+            f"{data_quality_folder}/**/*.yaml", recursive=True
+        )
+        result = set()
+        for file_path in files:
+            rel = path.relpath(file_path, data_quality_folder)
+            result.add(path.normpath(path.splitext(rel)[0]))
+        return result
 
     @classmethod
     def artifact_file_exists(

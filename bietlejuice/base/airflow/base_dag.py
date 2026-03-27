@@ -1,5 +1,7 @@
+from functools import lru_cache
 from os import listdir
 from os.path import join
+
 from airflow.models.param import Param
 
 from quintoandar_logger import QuintoAndarLogger
@@ -19,6 +21,7 @@ logger = QuintoAndarLogger("BaseDAG")
 
 class BaseDAG:
     @staticmethod
+    @lru_cache(maxsize=1024)
     def get_dag_doc(dag_name, template_path=None):
         """
         :param dag_name: dag_name or tree_path to your doc.
