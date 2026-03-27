@@ -285,6 +285,28 @@ FROM VALUES
                                 ),
            'running', True
         )
+    ),
+
+    (
+        "ab_beakman_search_services_anonymous_user_embedding_fallback",
+        named_struct(
+            'begin_date', DATE('2026-03-25'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', "business_context = 'rent'",
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                ),
+           'running', True
+        )
     )
 
 AS experiment_config(experiment_name, config)
