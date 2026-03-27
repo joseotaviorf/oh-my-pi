@@ -1,110 +1,67 @@
-WITH source AS (
-  SELECT *
-  FROM datalake_greenhouse_audit_log_raw.events
-  WHERE
-    MAKE_DATE(year, month, day) >= DATE('{load_start_date}')
-    AND MAKE_DATE(year, month, day) < DATE('{load_end_date}')
-)
 SELECT
   -- ids
   COALESCE(
-    get_json_object(raw_payload, '$.organization_id'),
+    GET_JSON_OBJECT(raw_payload, '$.organization_id'),
     CAST(organization_id AS STRING)
   ) AS id_organization,
   COALESCE(
-    get_json_object(raw_payload, '$.request.id'),
+    GET_JSON_OBJECT(raw_payload, '$.request.id'),
     CAST(request.id AS STRING)
   ) AS id_request,
   COALESCE(
-    get_json_object(raw_payload, '$.performer.id'),
+    GET_JSON_OBJECT(raw_payload, '$.performer.id'),
     CAST(performer.id AS STRING)
   ) AS id_performer,
-  CAST(get_json_object(raw_payload, '$.event.target_id') AS STRING) AS id_event_target,
-  COALESCE(
-    FROM_JSON(
-      get_json_object(raw_payload, '$.event.meta.close_reason_id'),
-      'array<string>'
-    )[0],
-    FROM_JSON(
-      get_json_object(TO_JSON(event.meta), '$.close_reason_id'),
-      'array<string>'
-    )[0]
-  ) AS id_close_reason_before_event,
-  COALESCE(
-    FROM_JSON(
-      get_json_object(raw_payload, '$.event.meta.close_reason_id'),
-      'array<string>'
-    )[1],
-    FROM_JSON(
-      get_json_object(TO_JSON(event.meta), '$.close_reason_id'),
-      'array<string>'
-    )[1]
-  ) AS id_close_reason_after_event,
+  CAST(GET_JSON_OBJECT(raw_payload, '$.event.target_id') AS STRING) AS id_event_target,
+  FROM_JSON(
+    GET_JSON_OBJECT(raw_payload, '$.event.meta.close_reason_id'),
+    'array<string>'
+  )[0] AS id_close_reason_before_event,
+  FROM_JSON(
+    GET_JSON_OBJECT(raw_payload, '$.event.meta.close_reason_id'),
+    'array<string>'
+  )[1] AS id_close_reason_after_event,
   -- non-metrics
   COALESCE(
-    get_json_object(raw_payload, '$.request.type'),
+    GET_JSON_OBJECT(raw_payload, '$.request.type'),
     request.type
   ) AS request_type,
   COALESCE(
-    get_json_object(raw_payload, '$.performer.type'),
+    GET_JSON_OBJECT(raw_payload, '$.performer.type'),
     performer.type
   ) AS performer_type,
   COALESCE(
-    get_json_object(raw_payload, '$.performer.ip_address'),
+    GET_JSON_OBJECT(raw_payload, '$.performer.ip_address'),
     performer.ip_address
   ) AS performer_ip_address,
+  GET_JSON_OBJECT(raw_payload, '$.performer.meta.name') AS performer_name,
+  GET_JSON_OBJECT(raw_payload, '$.performer.meta.username') AS performer_username,
   COALESCE(
-    get_json_object(raw_payload, '$.performer.meta.name'),
-    get_json_object(performer.meta, '$.name')
-  ) AS performer_name,
-  COALESCE(
-    get_json_object(raw_payload, '$.performer.meta.username'),
-    get_json_object(performer.meta, '$.username')
-  ) AS performer_username,
-  COALESCE(
-    get_json_object(raw_payload, '$.event.type'),
+    GET_JSON_OBJECT(raw_payload, '$.event.type'),
     event.type
   ) AS event_type,
   COALESCE(
-    get_json_object(raw_payload, '$.event.target_type'),
+    GET_JSON_OBJECT(raw_payload, '$.event.target_type'),
     event.target_type
   ) AS event_target_type,
-  -- event.meta as JSON string (schema varies by event type)
-  COALESCE(
-    get_json_object(raw_payload, '$.event.meta'),
-    TO_JSON(event.meta)
-  ) AS event_meta,
+  GET_JSON_OBJECT(raw_payload, '$.event.meta') AS event_meta,
   -- dates
   CAST(
-    COALESCE(
-      FROM_JSON(
-        get_json_object(raw_payload, '$.event.meta.close_date'),
-        'array<string>'
-      )[0],
-      FROM_JSON(
-        get_json_object(TO_JSON(event.meta), '$.close_date'),
-        'array<string>'
-      )[0]
-    )
-    AS DATE
+    FROM_JSON(
+      GET_JSON_OBJECT(raw_payload, '$.event.meta.close_date'),
+      'array<string>'
+    )[0] AS DATE
   ) AS dt_closed_before_event,
   CAST(
-    COALESCE(
-      FROM_JSON(
-        get_json_object(raw_payload, '$.event.meta.close_date'),
-        'array<string>'
-      )[1],
-      FROM_JSON(
-        get_json_object(TO_JSON(event.meta), '$.close_date'),
-        'array<string>'
-      )[1]
-    )
-    AS DATE
+    FROM_JSON(
+      GET_JSON_OBJECT(raw_payload, '$.event.meta.close_date'),
+      'array<string>'
+    )[1] AS DATE
   ) AS dt_closed_after_event,
   -- timestamp
   CAST(
     COALESCE(
-      get_json_object(raw_payload, '$.event_time'),
+      GET_JSON_OBJECT(raw_payload, '$.event_time'),
       event_time
     )
     AS TIMESTAMP
@@ -115,4 +72,7 @@ SELECT
   month,
   day
 FROM
-  source
+  datalake_greenhouse_audit_log_raw.events
+WHERE
+  MAKE_DATE(year, month, day) >= DATE('{load_start_date}')
+  AND MAKE_DATE(year, month, day) < DATE('{load_end_date}')
