@@ -87,6 +87,7 @@ cluster:
 
 ### Key DAG Builder rules
 
+- **`schedule_interval`:** Cron strings in declarations are interpreted in **`America/Sao_Paulo`** for builder-created DAGs; the Airflow UI may display the same instant in UTC (see `dag_build.mdc`, section **`schedule_interval` and timezone**).
 - `{dag_name}_dag.py` is a thin boilerplate wrapper — never hand-code task logic there.
 - Generate Airflow Python files locally after editing declarations: `make create-dag-files` (or `make create-dag-files dag_name=<name>` for a single DAG).
 - Job cluster DAGs are capped at **100 tasks** per DAG (`query_delta`, `cdc`, `database_pull_delta`, `custom_ingestion`).

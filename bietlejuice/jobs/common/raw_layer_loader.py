@@ -59,14 +59,34 @@ class RawLayerLoader:
         self.database_name = self.db_info["db_raw_databricks"]
         self.database_location = self.db_info["db_raw_path"]
 
-    def load_to_raw(self, df: DataFrame) -> None:
+    def load_to_raw(
+        self,
+        df: DataFrame,
+        *,
+        metastore_force_recreate: bool = True,
+        apply_table_privileges: bool = True,
+        refresh_table_after_load: bool = True,
+    ) -> None:
         """
-        Orchestrates the process of loading the provided DataFrame into the raw data
-        layer. This includes creating the database, writing the DataFrame to S3,
-        updating the metastore, refreshing the table, and granting access permissions.
+        Orchestrates loading the DataFrame into the raw data layer: database creation,
+        S3 write, metastore update, optional grants, and optional table refresh.
+
+        For streaming incremental loads (multiple append batches in one job), callers
+        may set ``metastore_force_recreate=False``, ``apply_table_privileges=False``,
+        and ``refresh_table_after_load=False`` on intermediate batches, then call
+        :meth:`finalize_raw_layer_visibility` once at the end to grant privileges and
+        refresh Unity Catalog metadata (avoids expensive per-batch ``REFRESH TABLE``).
 
         Args:
-            df (DataFrame): The Spark DataFrame to be loaded into the raw layer.
+            df (DataFrame): Spark DataFrame to load into the raw layer.
+            metastore_force_recreate (bool): When True, always recreates the metastore
+                table from the DataFrame schema. When False, merges schema if the table
+                exists or creates it if missing. Defaults to True for backward
+                compatibility.
+            apply_table_privileges (bool): When True, applies configured table
+                privileges after the metastore update. Defaults to True.
+            refresh_table_after_load (bool): When True, runs ``REFRESH TABLE`` after
+                load. Defaults to True.
         """
         if df.isEmpty():
             self.logger.warning(
@@ -77,15 +97,25 @@ class RawLayerLoader:
         try:
             self._create_database_if_not_exists()
             self._load_df_to_s3(df)
-            self._update_metastore(df)
-            self._apply_privileges_to_people_team()
-            self._refresh_table()
+            self._update_metastore(df, force_recreate=metastore_force_recreate)
+            if apply_table_privileges:
+                self._apply_privileges_to_people_team()
+            if refresh_table_after_load:
+                self._refresh_table()
         except Exception as e:
             self.logger.error(
                 f"Failed to load data to raw layer for table '{self.table_name}'. Error: {e}",
                 exc_info=True,
             )
             raise
+
+    def finalize_raw_layer_visibility(self) -> None:
+        """
+        Applies table privileges and refreshes metastore metadata after one or more
+        incremental loads that deferred grants and refresh via :meth:`load_to_raw`.
+        """
+        self._apply_privileges_to_people_team()
+        self._refresh_table()
 
     def _create_database_if_not_exists(self) -> None:
         """
@@ -125,9 +155,14 @@ class RawLayerLoader:
             )
             raise
 
-    def _update_metastore(self, df: DataFrame) -> None:
+    def _update_metastore(self, df: DataFrame, force_recreate: bool = True) -> None:
         """
         Updates the Hive metastore with the schema and location of the data.
+
+        Args:
+            df (DataFrame): Sample DataFrame for schema and metastore alignment.
+            force_recreate (bool): Passed to the metastore loader; False enables
+                merge-in-place when the table already exists and schemas match.
         """
         format_options = SparkTableStorageFormat.DEFAULT_RAW
         self.logger.info(
@@ -139,7 +174,7 @@ class RawLayerLoader:
                 database_name=self.database_name,
                 table_name=self.table_name,
                 format_options=format_options,
-                force_recreate=True,
+                force_recreate=force_recreate,
                 database_location=self.database_location,
                 partitions=self.partition_cols,
             )

@@ -7,7 +7,8 @@ dag:
       This DAG ingests audit log events from the Greenhouse Audit Log API.
       Audit log provides a record of important events from the prior thirty days,
       offering insights into who accessed or edited information in Greenhouse Recruiting.
-  schedule_interval: "0 6 * * *"
+      Schedule: daily at 00:30 America/Sao_Paulo (03:30 UTC while Brazil observes UTC-3).
+  schedule_interval: "30 0 * * *"
 
 cluster:
   type: custom_cluster
@@ -69,5 +70,4 @@ workflow:
             "after_time": "load_start_date"
             "before_time": "load_end_date"
             "paging": "true"
-          backfill_window_hours: 0.5
-          
+

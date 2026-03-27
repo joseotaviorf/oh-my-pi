@@ -183,7 +183,7 @@ dag:
   name: "{normalized_dag_name}"         # Use normalized name from Step 1b (no "bietlejuice." prefix)
   owner: "Data Engineering"            # from DAGOwnerEnum
   catchup: false
-  schedule_interval: None
+  schedule_interval: None   # Cron uses America/Sao_Paulo for builder DAGs; UI may show UTC (+3h vs BRT). See dag_build.mdc.
   schedule_start_date: "2024, 1, 1"
   documentation:
     dag_purpose: "Brief description of what this DAG does."

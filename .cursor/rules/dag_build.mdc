@@ -37,6 +37,13 @@ dag:
         dag_purpose: "Brief explanation..."  # Optional
 ```
 
+### `schedule_interval` and timezone
+
+- **Timezone:** DAGs built by the DAG Builder use `BaseWorkflow`, which sets `schedule_start_date` with **`America/Sao_Paulo`** (`bietlejuice/base/airflow/dag_builders/main_builder/workflows/base_workflow.py`). In QuintoAndar Airflow (Forno/prod), cron **`schedule_interval`** values for those DAGs are interpreted in **`America/Sao_Paulo`**, not as plain UTC.
+- **Airflow UI:** Schedules may be shown in UTC. With Brazil at **UTC−3** (no DST since 2019), local BRT + 3 hours = UTC (e.g. **00:30 BRT → 03:30 UTC**, **06:00 BRT → 09:00 UTC**).
+- **Cron shape:** Five fields: `minute hour day_of_month month day_of_week` (Airflow cron).
+- **Declaration YAML:** There is no separate `timezone` field on `dag:`; authors should document unusual schedules in `documentation.dag_purpose` when helpful.
+
 ### workflow component (required)
 
 ```yaml

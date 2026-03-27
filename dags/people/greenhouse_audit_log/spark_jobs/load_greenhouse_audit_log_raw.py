@@ -27,6 +27,8 @@ class InvalidCursorResumeError(Exception):
     be sent back (e.g. single integer when API expects integer,string). Triggers
     resume with after_time, same as Pit_Id expiration.
     """
+
+
 WRITE_BATCH_SIZE = 5000
 
 API_BASE_URL = "https://auditlog.us.greenhouse.io/"
@@ -201,7 +203,10 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
         The resulting filters are stored in self.params and will be sent as
         query parameters in API requests.
         """
-        LOGGER.info("Processing filters. Base filters (before replacement): %s", self.base_filters)
+        LOGGER.info(
+            "Processing filters. Base filters (before replacement): %s",
+            self.base_filters,
+        )
         self.params = {}
 
         for key, value in self.base_filters.items():
@@ -219,12 +224,16 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
                 LOGGER.info("Filter '%s': %s", key, self.params[key])
             else:
                 self.params[key] = value
-        
+
         if "paging" not in self.params:
-            LOGGER.warning("Parameter 'paging' not found in filters. Adding 'paging=true' to enable pagination.")
+            LOGGER.warning(
+                "Parameter 'paging' not found in filters. Adding 'paging=true' to enable pagination."
+            )
             self.params["paging"] = "true"
-        
-        LOGGER.info("Filters processed. Final params to be sent to API: %s", self.params)
+
+        LOGGER.info(
+            "Filters processed. Final params to be sent to API: %s", self.params
+        )
 
     def _extract_pagination_state(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -293,9 +302,7 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
         Returns ISO-8601 formatted string for after_time parameter.
         """
         event_times = [
-            r.get("event_time")
-            for r in results
-            if r.get("event_time") is not None
+            r.get("event_time") for r in results if r.get("event_time") is not None
         ]
         if not event_times:
             return None
@@ -407,7 +414,11 @@ class GreenhouseAuditLogAPI(BaseAPIClient):
                 resume_attempt += 1
                 params["after_time"] = last_event_time
 
-                error_type = "Invalid cursor" if isinstance(e, InvalidCursorResumeError) else "Pit_Id expired"
+                error_type = (
+                    "Invalid cursor"
+                    if isinstance(e, InvalidCursorResumeError)
+                    else "Pit_Id expired"
+                )
                 LOGGER.warning(
                     "%s. Resuming with after_time=%s (attempt %d/%d). "
                     "Records fetched so far: %d. Window: after_time=%s, before_time=%s",
@@ -564,6 +575,10 @@ def _run_load_for_window(
     docs: when Pit_Id expires, resumes with after_time=last event_time.
     Writes to S3 incrementally so progress is persisted before expiration.
 
+    For ``extraction_type`` incremental, defers metastore recreation, grants, and
+    ``REFRESH TABLE`` to a single call at the end of the window so each append batch
+    avoids repeated Unity Catalog refresh (major runtime cost).
+
     Returns:
         Number of records loaded.
     """
@@ -583,9 +598,13 @@ def _run_load_for_window(
         "date_column_to_partition", DEFAULT_PARTITION_COLUMN
     )
 
+    extraction_type = str(job_args.get("extraction_type", "incremental")).lower()
+    use_incremental_metastore_strategy = extraction_type == "incremental"
+
     batch: List[Dict[str, Any]] = []
     page_count = [0]
     cumulative_records = [0]
+    any_write_in_window = [False]
 
     def write_batch_to_s3() -> None:
         if not batch:
@@ -599,7 +618,16 @@ def _run_load_for_window(
         )
         df = json_to_dataframe(spark, batch, raw_column_name="raw_payload")
         df = insert_partitions(df, date_column_to_partition)
-        raw_loader.load_to_raw(df)
+        any_write_in_window[0] = True
+        if use_incremental_metastore_strategy:
+            raw_loader.load_to_raw(
+                df,
+                metastore_force_recreate=False,
+                apply_table_privileges=False,
+                refresh_table_after_load=False,
+            )
+        else:
+            raw_loader.load_to_raw(df)
         batch.clear()
         LOGGER.info("Batch write completed successfully")
 
@@ -624,6 +652,9 @@ def _run_load_for_window(
         on_before_resume=write_batch_to_s3,
     )
     write_batch_to_s3()
+    if any_write_in_window[0] and use_incremental_metastore_strategy:
+        raw_loader.finalize_raw_layer_visibility()
+
     elapsed_seconds = time.time() - window_start_time
 
     _log_window_metrics(
@@ -782,9 +813,7 @@ def main():
                 total_records,
             )
         else:
-            load_start_str = _format_for_greenhouse_api(
-                load_start, DEFAULT_START_TIME
-            )
+            load_start_str = _format_for_greenhouse_api(load_start, DEFAULT_START_TIME)
             load_end_str = _format_for_greenhouse_api(load_end, DEFAULT_END_TIME)
             LOGGER.info("Fetching data for table: %s", job_args.get("table_name"))
             records, pit_resumes = _run_load_for_window(
