@@ -1,0 +1,124 @@
+---
+table_name: dw_devlake.fact_pull_requests
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  sk_pr:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_pr:
+    is_complete:
+      severity_level: Error
+    custom:
+      # One fact row per DevLake pull request
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT id_pr
+          FROM dw_devlake.fact_pull_requests
+          GROUP BY id_pr
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
+  sk_repo:
+    is_complete:
+      severity_level: Error
+    custom:
+      # Non-null sk_repo must resolve to dim_repo
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests f
+         LEFT JOIN dw_devlake.dim_repo d ON f.sk_repo = d.sk_repo
+         WHERE f.sk_repo IS NOT NULL AND d.sk_repo IS NULL
+        ) = 0
+      severity_level: Error
+  sk_team:
+    custom:
+      # When sk_team is present, it must exist on dim_team
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests f
+         LEFT JOIN dw_devlake.dim_team d ON f.sk_team = d.sk_team
+         WHERE f.sk_team IS NOT NULL AND d.sk_team IS NULL
+        ) = 0
+      severity_level: Error
+  sk_author_user:
+    custom:
+      # When author SK is present, it must exist on dim_user
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests f
+         LEFT JOIN dw_devlake.dim_user d ON f.sk_author_user = d.sk_user
+         WHERE f.sk_author_user IS NOT NULL AND d.sk_user IS NULL
+        ) = 0
+      severity_level: Error
+  sk_merged_by_user:
+    custom:
+      # When merger SK is present, it must exist on dim_user
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests f
+         LEFT JOIN dw_devlake.dim_user d ON f.sk_merged_by_user = d.sk_user
+         WHERE f.sk_merged_by_user IS NOT NULL AND d.sk_user IS NULL
+        ) = 0
+      severity_level: Error
+  sk_created_date:
+    custom:
+      # Created date key must exist on conformed calendar dimension
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests f
+         LEFT JOIN dw_public.dim_date d ON f.sk_created_date = d.sk_date
+         WHERE f.sk_created_date IS NOT NULL AND d.sk_date IS NULL
+        ) = 0
+      severity_level: Error
+  sk_merged_date:
+    custom:
+      # Merged date key must exist on conformed calendar dimension
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests f
+         LEFT JOIN dw_public.dim_date d ON f.sk_merged_date = d.sk_date
+         WHERE f.sk_merged_date IS NOT NULL AND d.sk_date IS NULL
+        ) = 0
+      severity_level: Error
+  sk_released_date:
+    custom:
+      # Released date key must exist on conformed calendar dimension
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests f
+         LEFT JOIN dw_public.dim_date d ON f.sk_released_date = d.sk_date
+         WHERE f.sk_released_date IS NOT NULL AND d.sk_date IS NULL
+        ) = 0
+      severity_level: Error
+  pr_status:
+    is_complete:
+      severity_level: Error
+  dt_created:
+    is_complete:
+      severity_level: Error
+  is_merged:
+    custom:
+      # is_merged must match pr_status (MERGED => true, else false)
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE (pr_status = 'MERGED' AND is_merged IS NOT TRUE)
+            OR (pr_status <> 'MERGED' AND is_merged IS NOT FALSE)
+        ) = 0
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Warning

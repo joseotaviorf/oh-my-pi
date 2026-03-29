@@ -1,0 +1,50 @@
+---
+database_name: dw_devlake
+table_name: dim_repo
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: |
+  Repository dimension. Grain: one row per GitHub repository in DevLake scope.
+  Conformed dimension — designed to serve all engineering metric fact tables
+  (fact_pull_requests, future fact_deployments, fact_cicd_runs).
+  repo_url is included to support natural-key joins from deployment tables
+  (5a_deployments uses repo_url as a string identifier).
+columns:
+  sk_repo:
+    description: Surrogate key (SHA2 of id_repo)
+    lineage:
+      - datalake_devlake_clean.repos.id_repo
+  id_repo:
+    description: DevLake surrogate repo ID (natural key from DevLake)
+    lineage:
+      - datalake_devlake_clean.repos.id_repo
+  repo_name:
+    description: Full repository name (format owner/repo-name)
+    lineage:
+      - datalake_devlake_clean.repos.repo_name
+  repo_url:
+    description: HTTPS clone URL of the repository
+    lineage:
+      - datalake_devlake_clean.repos.repo_url
+  repo_description:
+    description: Repository description from GitHub
+    lineage:
+      - datalake_devlake_clean.repos.repo_description
+  repo_language:
+    description: Primary programming language detected by GitHub
+    lineage:
+      - datalake_devlake_clean.repos.repo_language
+  id_owner:
+    description: Owner entity ID from GitHub
+    lineage:
+      - datalake_devlake_clean.repos.id_owner
+  forked_from:
+    description: "URL of the repository this was forked from, null if not a fork"
+    lineage:
+      - datalake_devlake_clean.repos.forked_from
+  is_deleted:
+    description: True when the repository has been deleted on GitHub
+    lineage:
+      - datalake_devlake_clean.repos.is_deleted
+  ts_load:
+    description: Timestamp when the row was last loaded into the DW

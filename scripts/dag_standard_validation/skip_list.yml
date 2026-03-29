@@ -46,6 +46,9 @@ dags_not_using_builder:
   - support_and_service/salesforce_cdc/salesforce_cdc.py
   - platform/trigger_datasets/trigger_datasets.py
   - platform/reset_datasets/reset_datasets.py
+  - tech_platform/dw_devlake/tools/generate_lineage_diagram.py
+  - tech_platform/dw_devlake/validation/test_with_fixtures.py
+  - tech_platform/dw_devlake/validation/validate_structure.py
 
 database_ingestion_without_cdc:
   - brokers_supply_processor

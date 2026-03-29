@@ -1,0 +1,16 @@
+database_name: datalake_devlake_raw
+table_name: teams
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: Raw snapshot of the organizational hierarchy synced daily from Backstage by the devlake-automations sync-users-and-teams cronjob. Contains two entity types (LINE and TEAM) in a self-referential hierarchy where TEAM rows reference their parent LINE via parent_id.
+columns:
+  id:
+    description: DevLake team ID (stable identifier from Backstage)
+  name:
+    description: Team or line canonical name
+  alias:
+    description: Short alias used in Grafana dashboards and filters
+  type:
+    description: "Entity level in the org hierarchy: LINE (department) or TEAM (squad)"
+  parent_id:
+    description: ID of the parent LINE entity. NULL for LINE-type rows; references teams.id for TEAM-type rows

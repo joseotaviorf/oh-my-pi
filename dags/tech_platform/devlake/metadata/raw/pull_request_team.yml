@@ -1,0 +1,12 @@
+database_name: datalake_devlake_raw
+table_name: pull_request_team
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: Factless bridge table associating pull requests with teams. Populated daily by the devlake-automations associate-prs-with-teams cronjob. A PR is associated with a team based on the author's team membership at ingestion time. Supports many-to-many PR-to-team relationships.
+columns:
+  base_repo_id:
+    description: DevLake repo ID (composite PK part 1, FK to repos.id)
+  pull_request_key:
+    description: GitHub PR number within the repository (composite PK part 2)
+  team_id:
+    description: DevLake team ID (composite PK part 3, FK to teams.id)

@@ -1,0 +1,26 @@
+---
+table_name: dw_devlake.dim_repo
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  sk_repo:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_repo:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  repo_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Warning

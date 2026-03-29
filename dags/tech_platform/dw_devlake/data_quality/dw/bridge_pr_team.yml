@@ -1,0 +1,39 @@
+---
+table_name: dw_devlake.bridge_pr_team
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  sk_pr:
+    is_complete:
+      severity_level: Error
+  sk_team:
+    is_complete:
+      severity_level: Error
+    custom:
+      # Bridge sk_team must exist on dim_team
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.bridge_pr_team b
+         LEFT JOIN dw_devlake.dim_team d ON b.sk_team = d.sk_team
+         WHERE d.sk_team IS NULL
+        ) = 0
+      severity_level: Error
+  id_pr:
+    custom:
+      # At most one row per (id_pr, id_team)
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT id_pr, id_team
+          FROM dw_devlake.bridge_pr_team
+          GROUP BY id_pr, id_team
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Warning

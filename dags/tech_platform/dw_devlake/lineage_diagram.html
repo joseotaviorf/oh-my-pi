@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dw_devlake — Column-Level Lineage</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+    background: #f1f5f9; padding: 32px 40px 48px; min-width: 1200px;
+  }
+  .page-header { margin-bottom: 12px; }
+  .page-header h1 { font-size: 17px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+  .page-header p { font-size: 12.5px; color: #64748b; }
+  .controls { display: flex; gap: 8px; margin-top: 10px; align-items: center; }
+  .controls button {
+    font-size: 11.5px; padding: 5px 12px; border-radius: 6px;
+    border: 1px solid #cbd5e1; background: #fff; color: #475569;
+    cursor: pointer; transition: all .15s; font-weight: 500;
+  }
+  .controls button:hover { background: #f8fafc; border-color: #94a3b8; }
+  .controls button.active { background: #0f172a; color: #fff; border-color: #0f172a; }
+  #diagram {
+    position: relative; display: flex; flex-direction: row;
+    gap: 140px; align-items: flex-start; margin-top: 20px;
+  }
+  #arrows { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 0; overflow: visible; }
+  .layer { display: flex; flex-direction: column; gap: 14px; position: relative; z-index: 1; min-width: 210px; }
+  .layer-hd { margin-bottom: 4px; }
+  .layer-name { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; }
+  .layer-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+  .layer-raw   .layer-name { color: #6b7280; }
+  .layer-clean .layer-name { color: #3b82f6; }
+  .layer-dw    .layer-name { color: #f97316; }
+  .table-card {
+    background: #fff; border-radius: 8px; overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,.09), 0 1px 2px rgba(0,0,0,.05);
+    border: 1px solid #e2e8f0; transition: box-shadow .2s, border-color .2s;
+  }
+  .table-card.highlight { box-shadow: 0 2px 12px rgba(0,0,0,.15); border-color: #94a3b8; }
+  .table-card.dimmed { opacity: 0.4; }
+  .table-header {
+    display: flex; flex-direction: row; align-items: center; justify-content: space-between;
+    padding: 10px 14px 9px; color: white; cursor: pointer;
+  }
+  .layer-raw   .table-header { background: #6b7280; }
+  .layer-clean .table-header { background: #3b82f6; }
+  .layer-dw    .table-header { background: #f97316; }
+  .table-header-left { display: flex; flex-direction: column; }
+  .table-name { font-size: 13px; font-weight: 700; letter-spacing: -.01em; }
+  .table-db { font-size: 10px; color: rgba(255,255,255,.72); margin-top: 2px; }
+  .col-count-badge {
+    font-size: 9.5px; background: rgba(255,255,255,.22); padding: 2px 7px;
+    border-radius: 10px; color: rgba(255,255,255,.85); font-weight: 600; white-space: nowrap;
+  }
+  .col-list { padding: 3px 0; }
+  .col-row {
+    padding: 4px 14px; font-size: 12px; color: #374151;
+    border-bottom: 1px solid #f8fafc; white-space: nowrap;
+    position: relative; cursor: default; transition: background .12s, opacity .12s;
+  }
+  .col-row:last-child { border-bottom: none; }
+  .col-row:hover { background: #f0f9ff; }
+  .col-row.generated { color: #9ca3af; font-style: italic; font-size: 11.5px; }
+  .col-row.linked:hover { background: #eff6ff; }
+  .col-row.highlight { background: #dbeafe; font-weight: 600; }
+  .col-row.dimmed { opacity: 0.3; }
+  .port {
+    position: absolute; width: 8px; height: 8px;
+    border-radius: 50%; top: 50%; transform: translateY(-50%); border: 2px solid #fff;
+  }
+  .port-r { right: -5px; }
+  .port-l { left: -5px; }
+  .layer-raw   .port { background: #6b7280; }
+  .layer-clean .port { background: #3b82f6; }
+  .layer-dw    .port { background: #f97316; }
+  .legend { display: flex; gap: 20px; margin-top: 28px; flex-wrap: wrap; align-items: center; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #64748b; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .edge-legend { display: flex; gap: 14px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+  .edge-legend-title { font-size: 11px; font-weight: 600; color: #64748b; margin-right: 4px; }
+  .edge-legend-item {
+    display: flex; align-items: center; gap: 5px; font-size: 11px; color: #64748b;
+    cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: background .12s;
+  }
+  .edge-legend-item:hover { background: #e2e8f0; }
+  .edge-legend-swatch { width: 18px; height: 3px; border-radius: 2px; flex-shrink: 0; }
+  #tooltip {
+    position: absolute; background: rgba(15,23,42,0.94); color: #e2e8f0;
+    padding: 10px 14px; border-radius: 8px; font-size: 11.5px; max-width: 340px;
+    pointer-events: none; z-index: 200; display: none; line-height: 1.5;
+    box-shadow: 0 4px 16px rgba(0,0,0,.25);
+  }
+  #tooltip .tt-title { font-weight: 700; font-size: 12px; color: #fff; margin-bottom: 4px; }
+  #tooltip .tt-badge {
+    display: inline-block; font-size: 10px; padding: 1px 6px;
+    border-radius: 4px; font-weight: 600; margin-left: 6px;
+  }
+  #tooltip .tt-row { display: flex; align-items: center; gap: 6px; margin-top: 3px; }
+  #tooltip .tt-arrow { color: #94a3b8; font-size: 10px; }
+  #tooltip .tt-desc { color: #94a3b8; font-size: 10.5px; margin-top: 4px; }
+  #metrics-panel {
+    position: fixed; bottom: 16px; right: 16px;
+    background: #fff; border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.12); border: 1px solid #e2e8f0;
+    padding: 14px 18px; z-index: 100; min-width: 280px;
+    display: none; font-size: 12px;
+  }
+  #metrics-panel.visible { display: block; }
+  #metrics-panel h3 { font-size: 12px; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+  .metric-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #f8fafc; }
+  .metric-row:last-child { border-bottom: none; }
+  .metric-label { color: #64748b; }
+  .metric-value { font-weight: 600; color: #0f172a; }
+  .metric-value.good { color: #059669; }
+  .metric-value.warn { color: #d97706; }
+  .metric-value.bad { color: #dc2626; }
+  .metric-section-title {
+    font-size: 10.5px; font-weight: 600; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 0.05em; margin-top: 10px; margin-bottom: 4px;
+  }
+  .badge-passthrough { background: #d1fae5; color: #065f46; }
+  .badge-rename { background: #dbeafe; color: #1e40af; }
+  .badge-sk { background: #fce7f3; color: #9d174d; }
+  .badge-datekey { background: #fef3c7; color: #92400e; }
+  .badge-cast { background: #e0e7ff; color: #3730a3; }
+  .badge-derive { background: #fde68a; color: #78350f; }
+  .badge-convert { background: #ccfbf1; color: #134e4a; }
+</style>
+</head>
+<body>
+<div class="page-header">
+  <h1>dw_devlake &mdash; Column-Level Data Lineage</h1>
+  <p>DevLake MySQL RDS &rarr; datalake_devlake_raw &rarr; datalake_devlake_clean &rarr; dw_devlake (Kimball star schema)</p>
+  <div class="controls">
+    <button id="btn-show-all">Show All Edges</button>
+    <button id="btn-metrics">Quality Metrics</button>
+  </div>
+</div>
+<div id="diagram">
+  <svg id="arrows"></svg>
+<div class="layer layer-raw">
+  <div class="layer-hd">
+    <div class="layer-name">datalake_devlake_raw</div>
+    <div class="layer-sub">MySQL CDC snapshot</div>
+  </div>
+<div class="table-card" data-table="datalake_devlake_raw__pull_request_team">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">pull_request_team</span>
+      <span class="table-db">datalake_devlake_raw</span>
+    </div>
+    <span class="col-count-badge">3 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row generated" data-col="base_repo_id">base_repo_id</div>
+    <div class="col-row generated" data-col="pull_request_key">pull_request_key</div>
+    <div class="col-row generated" data-col="team_id">team_id</div>
+  </div>
+</div>
+<div class="table-card" data-table="datalake_devlake_raw__pull_requests">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">pull_requests</span>
+      <span class="table-db">datalake_devlake_raw</span>
+    </div>
+    <span class="col-count-badge">16 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row generated" data-col="id">id</div>
+    <div class="col-row generated" data-col="base_repo_id">base_repo_id</div>
+    <div class="col-row generated" data-col="pull_request_key">pull_request_key</div>
+    <div class="col-row generated" data-col="title">title</div>
+    <div class="col-row generated" data-col="status">status</div>
+    <div class="col-row generated" data-col="base_ref">base_ref</div>
+    <div class="col-row generated" data-col="author_id">author_id</div>
+    <div class="col-row generated" data-col="author_name">author_name</div>
+    <div class="col-row generated" data-col="merged_by_id">merged_by_id</div>
+    <div class="col-row generated" data-col="merged_by_name">merged_by_name</div>
+    <div class="col-row generated" data-col="additions">additions</div>
+    <div class="col-row generated" data-col="deletions">deletions</div>
+    <div class="col-row generated" data-col="x_type">x_type</div>
+    <div class="col-row generated" data-col="created_date">created_date</div>
+    <div class="col-row generated" data-col="is_draft">is_draft</div>
+    <div class="col-row generated" data-col="merged_date">merged_date</div>
+  </div>
+</div>
+<div class="table-card" data-table="datalake_devlake_raw__pr_custom_metrics">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">pr_custom_metrics</span>
+      <span class="table-db">datalake_devlake_raw</span>
+    </div>
+    <span class="col-count-badge">6 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row generated" data-col="id">id</div>
+    <div class="col-row generated" data-col="repo_name">repo_name</div>
+    <div class="col-row generated" data-col="pr_released_date">pr_released_date</div>
+    <div class="col-row generated" data-col="pr_release_time">pr_release_time</div>
+    <div class="col-row generated" data-col="pr_deploy_time">pr_deploy_time</div>
+    <div class="col-row generated" data-col="created_at">created_at</div>
+  </div>
+</div>
+<div class="table-card" data-table="datalake_devlake_raw__repos">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">repos</span>
+      <span class="table-db">datalake_devlake_raw</span>
+    </div>
+    <span class="col-count-badge">8 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row generated" data-col="id">id</div>
+    <div class="col-row generated" data-col="name">name</div>
+    <div class="col-row generated" data-col="url">url</div>
+    <div class="col-row generated" data-col="description">description</div>
+    <div class="col-row generated" data-col="language">language</div>
+    <div class="col-row generated" data-col="owner_id">owner_id</div>
+    <div class="col-row generated" data-col="forked_from">forked_from</div>
+    <div class="col-row generated" data-col="deleted">deleted</div>
+  </div>
+</div>
+<div class="table-card" data-table="datalake_devlake_raw__teams">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">teams</span>
+      <span class="table-db">datalake_devlake_raw</span>
+    </div>
+    <span class="col-count-badge">5 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row generated" data-col="id">id</div>
+    <div class="col-row generated" data-col="name">name</div>
+    <div class="col-row generated" data-col="alias">alias</div>
+    <div class="col-row generated" data-col="type">type</div>
+    <div class="col-row generated" data-col="parent_id">parent_id</div>
+  </div>
+</div>
+<div class="table-card" data-table="datalake_devlake_raw__users">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">users</span>
+      <span class="table-db">datalake_devlake_raw</span>
+    </div>
+    <span class="col-count-badge">4 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row generated" data-col="id">id</div>
+    <div class="col-row generated" data-col="email">email</div>
+    <div class="col-row generated" data-col="github_user">github_user</div>
+    <div class="col-row generated" data-col="name">name</div>
+  </div>
+</div>
+</div>
+<div class="layer layer-clean">
+  <div class="layer-hd">
+    <div class="layer-name">datalake_devlake_clean</div>
+    <div class="layer-sub">renamed + derived columns</div>
+  </div>
+<div class="table-card" data-table="datalake_devlake_clean__pull_request_team">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">pull_request_team</span>
+      <span class="table-db">datalake_devlake_clean</span>
+    </div>
+    <span class="col-count-badge">3 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row" data-col="id_repo" title="DevLake repo ID (composite PK part 1, FK to datalake_devlake_clean.repos.id_repo)">id_repo</div>
+    <div class="col-row" data-col="pr_key" title="GitHub PR number within the repository (composite PK part 2)">pr_key</div>
+    <div class="col-row" data-col="id_team" title="DevLake team ID (composite PK part 3, FK to datalake_devlake_clean.teams.id_team)">id_team</div>
+  </div>
+</div>
+<div class="table-card" data-table="datalake_devlake_clean__pull_requests">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">pull_requests</span>
+      <span class="table-db">datalake_devlake_clean</span>
+    </div>
+    <span class="col-count-badge">17 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row" data-col="id_pr" title="DevLake surrogate PR ID">id_pr</div>
+    <div class="col-row" data-col="id_repo" title="DevLake surrogate repo ID (FK to datalake_devlake_clean.repos.id_repo)">id_repo</div>
+    <div class="col-row" data-col="pr_key" title="GitHub PR number within the repository">pr_key</div>
+    <div class="col-row" data-col="pr_title" title="Pull request title">pr_title</div>
+    <div class="col-row" data-col="pr_status" title="PR status: OPEN, MERGED, or CLOSED">pr_status</div>
+    <div class="col-row" data-col="pr_base_branch" title="Target branch name (e.g. main, master)">pr_base_branch</div>
+    <div class="col-row" data-col="id_author_user" title="DevLake user ID of the PR author (FK to datalake_devlake_clean.users.id_user)">id_author_user</div>
+    <div class="col-row" data-col="author_name" title="GitHub username of the PR author">author_name</div>
+    <div class="col-row" data-col="id_merged_by_user" title="DevLake user ID of the user who merged the PR (FK to datalake_devlake_clean.users.id_user)">id_merged_by_user</div>
+    <div class="col-row" data-col="merged_by_name" title="GitHub username of the user who merged the PR">merged_by_name</div>
+    <div class="col-row" data-col="is_merged" title="Derived from status: TRUE when PR status is MERGED">is_merged</div>
+    <div class="col-row" data-col="pr_additions" title="Number of lines added in the PR">pr_additions</div>
+    <div class="col-row" data-col="pr_deletions" title="Number of lines deleted in the PR">pr_deletions</div>
+    <div class="col-row" data-col="pr_type" title="PR type from conventional commit prefix: feat, fix, chore, refactor, docs, test, style, perf">pr_type</div>
+    <div class="col-row" data-col="ts_created" title="Timestamp when the PR was created">ts_created</div>
+    <div class="col-row" data-col="is_draft" title="True when the PR is in draft state">is_draft</div>
+    <div class="col-row" data-col="ts_merged" title="Timestamp when the PR was merged (null if not merged)">ts_merged</div>
+  </div>
+</div>
+<div class="table-card" data-table="datalake_devlake_clean__pr_custom_metrics">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">pr_custom_metrics</span>
+      <span class="table-db">datalake_devlake_clean</span>
+    </div>
+    <span class="col-count-badge">6 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row" data-col="id_pr" title="DevLake PR ID (1:1 FK to datalake_devlake_clean.pull_requests.id_pr)">id_pr</div>
+    <div class="col-row" data-col="repo_name" title="Short repository name (natural key; use id_repo from pull_requests for surrogate joins)">repo_name</div>
+    <div class="col-row" data-col="ts_released" title="Timestamp when the PR was deployed to production">ts_released</div>
+    <div class="col-row" data-col="pr_release_time_seconds" title="Lead time in seconds from first commit to production release (DORA Lead Time for Changes source metric)">pr_release_time_seconds</div>
+    <div class="col-row" data-col="pr_deploy_time_seconds" title="Deploy time in seconds from PR merge to production release">pr_deploy_time_seconds</div>
+    <div class="col-row" data-col="ts_created" title="Timestamp when this metric record was created">ts_created</div>
+  </div>
+</div>
+<div class="table-card" data-table="datalake_devlake_clean__repos">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">repos</span>
+      <span class="table-db">datalake_devlake_clean</span>
+    </div>
+    <span class="col-count-badge">8 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row" data-col="id_repo" title="DevLake surrogate repo ID (stable identifier)">id_repo</div>
+    <div class="col-row" data-col="repo_name" title="Full repository name (format owner/repo-name, e.g. quintoandar/backend-services)">repo_name</div>
+    <div class="col-row" data-col="repo_url" title="HTTPS clone URL of the repository">repo_url</div>
+    <div class="col-row" data-col="repo_description" title="Repository description from GitHub">repo_description</div>
+    <div class="col-row" data-col="repo_language" title="Primary programming language detected by GitHub">repo_language</div>
+    <div class="col-row" data-col="id_owner" title="Owner entity ID from GitHub">id_owner</div>
+    <div class="col-row" data-col="forked_from" title="URL of the repository this was forked from, null if not a fork">forked_from</div>
+    <div class="col-row" data-col="is_deleted" title="True when the repository has been deleted on GitHub">is_deleted</div>
+  </div>
+</div>
+<div class="table-card" data-table="datalake_devlake_clean__teams">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">teams</span>
+      <span class="table-db">datalake_devlake_clean</span>
+    </div>
+    <span class="col-count-badge">5 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row" data-col="id_team" title="DevLake team ID (stable identifier from Backstage)">id_team</div>
+    <div class="col-row" data-col="team_name" title="Team or line canonical name">team_name</div>
+    <div class="col-row" data-col="team_alias" title="Short alias used in Grafana dashboards and filters">team_alias</div>
+    <div class="col-row" data-col="team_type" title="Entity level in the org hierarchy: LINE (department) or TEAM (squad)">team_type</div>
+    <div class="col-row" data-col="id_parent_team" title="ID of the parent LINE entity. NULL for LINE-type rows; references id_team for TEAM-type rows">id_parent_team</div>
+  </div>
+</div>
+<div class="table-card" data-table="datalake_devlake_clean__users">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">users</span>
+      <span class="table-db">datalake_devlake_clean</span>
+    </div>
+    <span class="col-count-badge">4 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row" data-col="id_user" title="DevLake user ID (stable identifier from Backstage)">id_user</div>
+    <div class="col-row" data-col="user_email" title="Corporate email address of the engineer">user_email</div>
+    <div class="col-row" data-col="github_username" title="GitHub username associated with this engineer">github_username</div>
+    <div class="col-row" data-col="user_name" title="Display name of the engineer from Backstage">user_name</div>
+  </div>
+</div>
+</div>
+<div class="layer layer-dw">
+  <div class="layer-hd">
+    <div class="layer-name">dw_devlake</div>
+    <div class="layer-sub">Kimball star schema · 06:00 UTC</div>
+  </div>
+<div class="table-card" data-table="dw_devlake__bridge_pr_team">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">bridge_pr_team</span>
+      <span class="table-db">dw_devlake</span>
+    </div>
+    <span class="col-count-badge">7 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row" data-col="sk_pr" title="Surrogate key for the pull request (FK to fact_pull_requests.sk_pr)">sk_pr</div>
+    <div class="col-row" data-col="sk_team" title="Surrogate key for the team (FK to dim_team.sk_team)">sk_team</div>
+    <div class="col-row" data-col="id_pr" title="DevLake PR ID (natural key)">id_pr</div>
+    <div class="col-row" data-col="id_repo" title="DevLake repo ID (bridge join key)">id_repo</div>
+    <div class="col-row" data-col="pr_key" title="GitHub PR number within the repository (bridge join key)">pr_key</div>
+    <div class="col-row" data-col="id_team" title="DevLake team ID (natural key)">id_team</div>
+    <div class="col-row generated" data-col="ts_load" title="Timestamp when the row was last loaded into the DW">ts_load</div>
+  </div>
+</div>
+<div class="table-card" data-table="dw_devlake__fact_pull_requests">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">fact_pull_requests</span>
+      <span class="table-db">dw_devlake</span>
+    </div>
+    <span class="col-count-badge">25 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row" data-col="sk_pr" title="Surrogate key for the pull request (SHA2 of id_pr)">sk_pr</div>
+    <div class="col-row" data-col="sk_repo" title="Surrogate key for the repository (FK to dim_repo.sk_repo)">sk_repo</div>
+    <div class="col-row" data-col="sk_author_user" title="Surrogate key for the PR author (FK to dim_user.sk_user, role-playing)">sk_author_user</div>
+    <div class="col-row" data-col="sk_merged_by_user" title="Surrogate key for the engineer who merged the PR (FK to dim_user.sk_user, role-playing)">sk_merged_by_user</div>
+    <div class="col-row" data-col="sk_team" title="Surrogate key for the primary team (FK to dim_team.sk_team; primary team = MIN(id_team) from bridge_pr_team)">sk_team</div>
+    <div class="col-row" data-col="sk_created_date" title="Date key for PR creation date (FK to dw_public.dim_date.sk_date, format YYYYMMDD)">sk_created_date</div>
+    <div class="col-row" data-col="sk_merged_date" title="Date key for PR merge date (FK to dw_public.dim_date.sk_date, format YYYYMMDD). Null if not merged">sk_merged_date</div>
+    <div class="col-row" data-col="sk_released_date" title="Date key for production release date (FK to dw_public.dim_date.sk_date, format YYYYMMDD). Null if no release recorded">sk_released_date</div>
+    <div class="col-row" data-col="id_pr" title="DevLake PR ID (natural key)">id_pr</div>
+    <div class="col-row" data-col="id_repo" title="DevLake repo ID (natural key)">id_repo</div>
+    <div class="col-row" data-col="pr_key" title="GitHub PR number within the repository">pr_key</div>
+    <div class="col-row" data-col="pr_title" title="Pull request title">pr_title</div>
+    <div class="col-row" data-col="pr_status" title="PR status: OPEN, MERGED, or CLOSED">pr_status</div>
+    <div class="col-row" data-col="pr_base_branch" title="Target branch name (e.g. main, master)">pr_base_branch</div>
+    <div class="col-row" data-col="pr_type" title="PR type from conventional commit prefix: feat, fix, chore, refactor, docs, test, style, perf">pr_type</div>
+    <div class="col-row" data-col="is_merged" title="Derived from pr_status: TRUE when the PR status is MERGED">is_merged</div>
+    <div class="col-row" data-col="is_draft" title="True when the PR is in draft state">is_draft</div>
+    <div class="col-row" data-col="pr_additions" title="Number of lines added in the PR">pr_additions</div>
+    <div class="col-row" data-col="pr_deletions" title="Number of lines deleted in the PR">pr_deletions</div>
+    <div class="col-row" data-col="pr_release_time_seconds" title="Lead time in seconds from first commit to production release (DORA Lead Time for Changes). Divide by 3600 for hours, by 86400 for days">pr_release_time_seconds</div>
+    <div class="col-row" data-col="pr_deploy_time_seconds" title="Deploy time in seconds from PR merge to production release">pr_deploy_time_seconds</div>
+    <div class="col-row" data-col="dt_created" title="Date when the PR was created">dt_created</div>
+    <div class="col-row" data-col="dt_merged" title="Date when the PR was merged (null if not merged)">dt_merged</div>
+    <div class="col-row" data-col="dt_released" title="Date when the PR was deployed to production (null if no release recorded)">dt_released</div>
+    <div class="col-row generated" data-col="ts_load" title="Timestamp when the row was last loaded into the DW">ts_load</div>
+  </div>
+</div>
+<div class="table-card" data-table="dw_devlake__dim_repo">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">dim_repo</span>
+      <span class="table-db">dw_devlake</span>
+    </div>
+    <span class="col-count-badge">10 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row" data-col="sk_repo" title="Surrogate key (SHA2 of id_repo)">sk_repo</div>
+    <div class="col-row" data-col="id_repo" title="DevLake surrogate repo ID (natural key from DevLake)">id_repo</div>
+    <div class="col-row" data-col="repo_name" title="Full repository name (format owner/repo-name)">repo_name</div>
+    <div class="col-row" data-col="repo_url" title="HTTPS clone URL of the repository">repo_url</div>
+    <div class="col-row" data-col="repo_description" title="Repository description from GitHub">repo_description</div>
+    <div class="col-row" data-col="repo_language" title="Primary programming language detected by GitHub">repo_language</div>
+    <div class="col-row" data-col="id_owner" title="Owner entity ID from GitHub">id_owner</div>
+    <div class="col-row" data-col="forked_from" title="URL of the repository this was forked from, null if not a fork">forked_from</div>
+    <div class="col-row" data-col="is_deleted" title="True when the repository has been deleted on GitHub">is_deleted</div>
+    <div class="col-row generated" data-col="ts_load" title="Timestamp when the row was last loaded into the DW">ts_load</div>
+  </div>
+</div>
+<div class="table-card" data-table="dw_devlake__dim_team">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">dim_team</span>
+      <span class="table-db">dw_devlake</span>
+    </div>
+    <span class="col-count-badge">9 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row" data-col="sk_team" title="Surrogate key (SHA2 of id_team)">sk_team</div>
+    <div class="col-row" data-col="id_team" title="DevLake team ID (natural key from Backstage)">id_team</div>
+    <div class="col-row" data-col="team_name" title="Team or line canonical name">team_name</div>
+    <div class="col-row" data-col="team_alias" title="Short alias used in Grafana dashboards and filters">team_alias</div>
+    <div class="col-row" data-col="team_type" title="Entity level: LINE (department) or TEAM (squad)">team_type</div>
+    <div class="col-row" data-col="id_parent_team" title="ID of the parent LINE. NULL for LINE-type rows">id_parent_team</div>
+    <div class="col-row" data-col="line_name" title="Name of the parent LINE. Denormalized from the parent row for convenient filtering without self-join">line_name</div>
+    <div class="col-row" data-col="line_alias" title="Alias of the parent LINE">line_alias</div>
+    <div class="col-row generated" data-col="ts_load" title="Timestamp when the row was last loaded into the DW">ts_load</div>
+  </div>
+</div>
+<div class="table-card" data-table="dw_devlake__dim_user">
+  <div class="table-header">
+    <div class="table-header-left">
+      <span class="table-name">dim_user</span>
+      <span class="table-db">dw_devlake</span>
+    </div>
+    <span class="col-count-badge">6 cols</span>
+  </div>
+  <div class="col-list">
+    <div class="col-row" data-col="sk_user" title="Surrogate key (SHA2 of id_user)">sk_user</div>
+    <div class="col-row" data-col="id_user" title="DevLake user ID (natural key from Backstage)">id_user</div>
+    <div class="col-row" data-col="user_email" title="Corporate email address of the engineer">user_email</div>
+    <div class="col-row" data-col="github_username" title="GitHub username associated with this engineer">github_username</div>
+    <div class="col-row" data-col="user_name" title="Display name of the engineer">user_name</div>
+    <div class="col-row generated" data-col="ts_load" title="Timestamp when the row was last loaded into the DW">ts_load</div>
+  </div>
+</div>
+</div>
+</div>
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#6b7280"></div>datalake_devlake_raw</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div>datalake_devlake_clean</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div>dw_devlake</div>
+</div>
+<div class="edge-legend" id="edge-legend">
+  <span class="edge-legend-title">Edge colors (by source table):</span>
+</div>
+<div id="tooltip"></div>
+<div id="metrics-panel"><h3>Self-Validation Quality Metrics</h3><div id="metrics-content"></div></div>
+<script>
+const EDGES = [
+  {
+    "st": "datalake_devlake_raw__pr_custom_metrics",
+    "sc": "id",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pr_custom_metrics",
+    "dc": "id_pr",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pr_custom_metrics",
+    "sc": "repo_name",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pr_custom_metrics",
+    "dc": "repo_name",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pr_custom_metrics",
+    "sc": "pr_released_date",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pr_custom_metrics",
+    "dc": "ts_released",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pr_custom_metrics",
+    "sc": "pr_release_time",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pr_custom_metrics",
+    "dc": "pr_release_time_seconds",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pr_custom_metrics",
+    "sc": "pr_deploy_time",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pr_custom_metrics",
+    "dc": "pr_deploy_time_seconds",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pr_custom_metrics",
+    "sc": "created_at",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pr_custom_metrics",
+    "dc": "ts_created",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_request_team",
+    "sc": "base_repo_id",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_request_team",
+    "dc": "id_repo",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_request_team",
+    "sc": "pull_request_key",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_request_team",
+    "dc": "pr_key",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_request_team",
+    "sc": "team_id",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_request_team",
+    "dc": "id_team",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "id",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "id_pr",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "base_repo_id",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "id_repo",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "pull_request_key",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "pr_key",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "title",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "pr_title",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "status",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "pr_status",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "base_ref",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "pr_base_branch",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "author_id",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "id_author_user",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "author_name",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "author_name",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "merged_by_id",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "id_merged_by_user",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "merged_by_name",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "merged_by_name",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "status",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "is_merged",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "additions",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "pr_additions",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "deletions",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "pr_deletions",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "x_type",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "pr_type",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "created_date",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "ts_created",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "is_draft",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "is_draft",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__pull_requests",
+    "sc": "merged_date",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__pull_requests",
+    "dc": "ts_merged",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__repos",
+    "sc": "id",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__repos",
+    "dc": "id_repo",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__repos",
+    "sc": "name",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__repos",
+    "dc": "repo_name",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__repos",
+    "sc": "url",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__repos",
+    "dc": "repo_url",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__repos",
+    "sc": "description",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__repos",
+    "dc": "repo_description",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__repos",
+    "sc": "language",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__repos",
+    "dc": "repo_language",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__repos",
+    "sc": "owner_id",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__repos",
+    "dc": "id_owner",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__repos",
+    "sc": "forked_from",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__repos",
+    "dc": "forked_from",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__repos",
+    "sc": "deleted",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__repos",
+    "dc": "is_deleted",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__teams",
+    "sc": "id",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__teams",
+    "dc": "id_team",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__teams",
+    "sc": "name",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__teams",
+    "dc": "team_name",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__teams",
+    "sc": "alias",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__teams",
+    "dc": "team_alias",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__teams",
+    "sc": "type",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__teams",
+    "dc": "team_type",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__teams",
+    "sc": "parent_id",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__teams",
+    "dc": "id_parent_team",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__users",
+    "sc": "id",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__users",
+    "dc": "id_user",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__users",
+    "sc": "email",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__users",
+    "dc": "user_email",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__users",
+    "sc": "github_user",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__users",
+    "dc": "github_username",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_raw__users",
+    "sc": "name",
+    "sl": "raw",
+    "dt": "datalake_devlake_clean__users",
+    "dc": "user_name",
+    "dl": "clean"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "id_pr",
+    "sl": "clean",
+    "dt": "dw_devlake__bridge_pr_team",
+    "dc": "sk_pr",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__teams",
+    "sc": "id_team",
+    "sl": "clean",
+    "dt": "dw_devlake__bridge_pr_team",
+    "dc": "sk_team",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "id_pr",
+    "sl": "clean",
+    "dt": "dw_devlake__bridge_pr_team",
+    "dc": "id_pr",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_request_team",
+    "sc": "id_repo",
+    "sl": "clean",
+    "dt": "dw_devlake__bridge_pr_team",
+    "dc": "id_repo",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_request_team",
+    "sc": "pr_key",
+    "sl": "clean",
+    "dt": "dw_devlake__bridge_pr_team",
+    "dc": "pr_key",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_request_team",
+    "sc": "id_team",
+    "sl": "clean",
+    "dt": "dw_devlake__bridge_pr_team",
+    "dc": "id_team",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__repos",
+    "sc": "id_repo",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_repo",
+    "dc": "sk_repo",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__repos",
+    "sc": "id_repo",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_repo",
+    "dc": "id_repo",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__repos",
+    "sc": "repo_name",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_repo",
+    "dc": "repo_name",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__repos",
+    "sc": "repo_url",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_repo",
+    "dc": "repo_url",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__repos",
+    "sc": "repo_description",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_repo",
+    "dc": "repo_description",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__repos",
+    "sc": "repo_language",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_repo",
+    "dc": "repo_language",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__repos",
+    "sc": "id_owner",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_repo",
+    "dc": "id_owner",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__repos",
+    "sc": "forked_from",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_repo",
+    "dc": "forked_from",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__repos",
+    "sc": "is_deleted",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_repo",
+    "dc": "is_deleted",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__teams",
+    "sc": "id_team",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_team",
+    "dc": "sk_team",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__teams",
+    "sc": "id_team",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_team",
+    "dc": "id_team",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__teams",
+    "sc": "team_name",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_team",
+    "dc": "team_name",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__teams",
+    "sc": "team_alias",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_team",
+    "dc": "team_alias",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__teams",
+    "sc": "team_type",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_team",
+    "dc": "team_type",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__teams",
+    "sc": "id_parent_team",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_team",
+    "dc": "id_parent_team",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__teams",
+    "sc": "team_name",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_team",
+    "dc": "line_name",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__teams",
+    "sc": "team_alias",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_team",
+    "dc": "line_alias",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__users",
+    "sc": "id_user",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_user",
+    "dc": "sk_user",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__users",
+    "sc": "id_user",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_user",
+    "dc": "id_user",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__users",
+    "sc": "user_email",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_user",
+    "dc": "user_email",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__users",
+    "sc": "github_username",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_user",
+    "dc": "github_username",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__users",
+    "sc": "user_name",
+    "sl": "clean",
+    "dt": "dw_devlake__dim_user",
+    "dc": "user_name",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "id_pr",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "sk_pr",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__repos",
+    "sc": "id_repo",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "sk_repo",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__users",
+    "sc": "id_user",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "sk_author_user",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__users",
+    "sc": "id_user",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "sk_merged_by_user",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_request_team",
+    "sc": "id_team",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "sk_team",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "ts_created",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "sk_created_date",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "ts_merged",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "sk_merged_date",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pr_custom_metrics",
+    "sc": "ts_released",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "sk_released_date",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "id_pr",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "id_pr",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "id_repo",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "id_repo",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "pr_key",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "pr_key",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "pr_title",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "pr_title",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "pr_status",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "pr_status",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "pr_base_branch",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "pr_base_branch",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "pr_type",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "pr_type",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "pr_status",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "is_merged",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "is_draft",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "is_draft",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "pr_additions",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "pr_additions",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "pr_deletions",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "pr_deletions",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pr_custom_metrics",
+    "sc": "pr_release_time_seconds",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "pr_release_time_seconds",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pr_custom_metrics",
+    "sc": "pr_deploy_time_seconds",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "pr_deploy_time_seconds",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "ts_created",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "dt_created",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pull_requests",
+    "sc": "ts_merged",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "dt_merged",
+    "dl": "dw"
+  },
+  {
+    "st": "datalake_devlake_clean__pr_custom_metrics",
+    "sc": "ts_released",
+    "sl": "clean",
+    "dt": "dw_devlake__fact_pull_requests",
+    "dc": "dt_released",
+    "dl": "dw"
+  }
+];
+const TABLE_COLORS = {
+  "datalake_devlake_clean__pull_request_team": "#0891b2",
+  "datalake_devlake_raw__pull_request_team": "#0891b2",
+  "datalake_devlake_clean__pull_requests": "#2563eb",
+  "datalake_devlake_raw__pull_requests": "#2563eb",
+  "datalake_devlake_clean__pr_custom_metrics": "#7c3aed",
+  "datalake_devlake_raw__pr_custom_metrics": "#7c3aed",
+  "datalake_devlake_clean__repos": "#059669",
+  "datalake_devlake_raw__repos": "#059669",
+  "datalake_devlake_clean__teams": "#d97706",
+  "datalake_devlake_raw__teams": "#d97706",
+  "datalake_devlake_clean__users": "#dc2626",
+  "datalake_devlake_raw__users": "#dc2626"
+};
+const TABLE_SHORT_NAMES = {
+  "datalake_devlake_clean__pull_request_team": "pull_request_team",
+  "datalake_devlake_clean__pull_requests": "pull_requests",
+  "datalake_devlake_clean__pr_custom_metrics": "pr_custom_metrics",
+  "datalake_devlake_clean__repos": "repos",
+  "datalake_devlake_clean__teams": "teams",
+  "datalake_devlake_clean__users": "users"
+};
+const NS = 'http://www.w3.org/2000/svg';
+
+function classifyEdge(e) {
+  const s = e.sc, d = e.dc;
+  if (s === d) return { type:'passthrough', label:'=', css:'badge-passthrough', desc:'Passed through unchanged' };
+  if (e.sl === 'raw' && e.dl === 'clean') {
+    if (s === 'created_at' && d === 'ts_created') return { type:'rename', label:'rename', css:'badge-rename', desc:'Renamed to ts_ convention' };
+    if (s.endsWith('_date') && d.startsWith('ts_')) return { type:'cast', label:'cast→ts', css:'badge-cast', desc:'Cast to timestamp' };
+    if (s.endsWith('_time') && d.endsWith('_seconds')) return { type:'convert', label:'→seconds', css:'badge-convert', desc:'Converted to seconds' };
+    if (s === 'deleted' && d === 'is_deleted') return { type:'rename', label:'rename', css:'badge-rename', desc:'Renamed to is_ convention' };
+    if (s === 'status' && d === 'is_merged') return { type:'derive', label:'derive', css:'badge-derive', desc:"Derived: TRUE when status=MERGED" };
+    return { type:'rename', label:'rename', css:'badge-rename', desc:'Renamed: '+s+' → '+d };
+  }
+  if (e.sl === 'clean' && e.dl === 'dw') {
+    if (d.startsWith('sk_') && d.endsWith('_date') && s.startsWith('ts_')) return { type:'datekey', label:'→date_key', css:'badge-datekey', desc:'Date key: YYYYMMDD from '+s };
+    if (d.startsWith('sk_') && s.startsWith('id_')) return { type:'sk', label:'SHA2→SK', css:'badge-sk', desc:'Surrogate key via SHA2('+s+')' };
+    if (d.startsWith('dt_') && s.startsWith('ts_')) return { type:'cast', label:'ts→dt', css:'badge-cast', desc:'Cast timestamp to date' };
+    if (d === 'is_merged' && s === 'pr_status') return { type:'derive', label:'derive', css:'badge-derive', desc:"Derived: TRUE when MERGED" };
+    return { type:'passthrough', label:'=', css:'badge-passthrough', desc:'Passed through unchanged' };
+  }
+  return { type:'rename', label:'?', css:'badge-rename', desc:'' };
+}
+
+function getEl(t,c) { return document.querySelector('[data-table="'+t+'"] [data-col="'+c+'"]'); }
+function addPort(el,side) {
+  if (!el || el.querySelector('.port-'+side)) return;
+  const d = document.createElement('span'); d.className = 'port port-'+side;
+  el.appendChild(d); el.classList.add('linked');
+}
+function midY(r,w) { return (r.top+r.bottom)/2 - w.top; }
+
+function drawEdges() {
+  const svg = document.getElementById('arrows'), wrap = document.getElementById('diagram');
+  const wR = wrap.getBoundingClientRect(), frag = document.createDocumentFragment();
+  svg.innerHTML = '';
+  for (const e of EDGES) { addPort(getEl(e.st,e.sc),'r'); addPort(getEl(e.dt,e.dc),'l'); }
+  const pairs = new Map();
+  for (const e of EDGES) { const k=e.st+'→'+e.dt; if(!pairs.has(k))pairs.set(k,[]); pairs.get(k).push(e); }
+  const gapKeys = {'raw→clean':[],'clean→dw':[]};
+  for (const [k] of pairs) { const s=pairs.get(k)[0]; const g=s.sl+'→'+s.dl; if(gapKeys[g])gapKeys[g].push(k); }
+  const pairLane = new Map();
+  for (const [,keys] of Object.entries(gapKeys)) {
+    keys.forEach((k,i) => { pairLane.set(k, 0.25+(keys.length>1?(i/(keys.length-1))*0.4:0.2)); });
+  }
+  const pairCentroids = new Map();
+  for (const [pk,edges] of pairs) {
+    let sy=0,dy=0,c=0;
+    for (const e of edges) { const se=getEl(e.st,e.sc),de=getEl(e.dt,e.dc); if(!se||!de)continue; sy+=midY(se.getBoundingClientRect(),wR); dy+=midY(de.getBoundingClientRect(),wR); c++; }
+    if(c>0) pairCentroids.set(pk,{srcCentroid:sy/c,dstCentroid:dy/c,count:c});
+  }
+  const edgeEls = [];
+  for (const e of EDGES) {
+    const se=getEl(e.st,e.sc),de=getEl(e.dt,e.dc); if(!se||!de) continue;
+    const sr=se.getBoundingClientRect(),dr=de.getBoundingClientRect();
+    const x1=sr.right-wR.left, y1=midY(sr,wR), x2=dr.left-wR.left, y2=midY(dr,wR);
+    const pk=e.st+'→'+e.dt, lane=pairLane.get(pk)||0.45, color=TABLE_COLORS[e.st]||'#9ca3af';
+    const cen=pairCentroids.get(pk), bs=cen&&cen.count>2?0.65:0.3;
+    const mcy=cen?(cen.srcCentroid+cen.dstCentroid)/2:(y1+y2)/2;
+    const cy1=y1+(mcy-y1)*bs, cy2=y2+(mcy-y2)*bs;
+    const cx1=x1+(x2-x1)*lane, cx2=x2-(x2-x1)*(1-lane);
+    const p=document.createElementNS(NS,'path');
+    p.setAttribute('d','M'+x1+','+y1+' C'+cx1+','+cy1+' '+cx2+','+cy2+' '+x2+','+y2);
+    p.setAttribute('stroke',color); p.setAttribute('fill','none');
+    p.setAttribute('stroke-width','1.5'); p.setAttribute('stroke-opacity','0.07');
+    p.setAttribute('data-src-table',e.st); p.setAttribute('data-dst-table',e.dt);
+    p.setAttribute('data-src-col',e.sc); p.setAttribute('data-dst-col',e.dc);
+    p.classList.add('edge-path');
+    frag.appendChild(p); edgeEls.push({path:p, edge:e, x1:x1, y1:y1, x2:x2, y2:y2});
+  }
+  svg.appendChild(frag);
+  const r=wrap.getBoundingClientRect(); svg.setAttribute('width',r.width); svg.setAttribute('height',r.height);
+  return edgeEls;
+}
+
+let showAllMode = false;
+function setupInteraction(edgeEls) {
+  const allPaths=document.querySelectorAll('.edge-path'), allCards=document.querySelectorAll('.table-card'), allCols=document.querySelectorAll('.col-row');
+  const tooltip=document.getElementById('tooltip');
+  function highlightColumn(tid,cn) {
+    const ct=new Set(), cc=new Set();
+    for (const {path,edge} of edgeEls) {
+      if((edge.st===tid&&edge.sc===cn)||(edge.dt===tid&&edge.dc===cn)) {
+        path.setAttribute('stroke-opacity','0.85'); path.setAttribute('stroke-width','2.5');
+        ct.add(edge.st); ct.add(edge.dt); cc.add(edge.st+'::'+edge.sc); cc.add(edge.dt+'::'+edge.dc);
+      }
+    }
+    if(!cc.size) return;
+    allCards.forEach(c=>{ c.classList.toggle('highlight',ct.has(c.dataset.table)); c.classList.toggle('dimmed',!ct.has(c.dataset.table)); });
+    allCols.forEach(c=>{ const card=c.closest('.table-card'); if(!card)return; const cid=card.dataset.table+'::'+c.dataset.col;
+      c.classList.toggle('highlight',cc.has(cid)); c.classList.toggle('dimmed',!cc.has(cid)&&ct.has(card.dataset.table));
+    });
+    for (const {path} of edgeEls) {
+      const sk=path.getAttribute('data-src-table')+'::'+path.getAttribute('data-src-col');
+      const dk=path.getAttribute('data-dst-table')+'::'+path.getAttribute('data-dst-col');
+      if(!cc.has(sk)&&!cc.has(dk)) path.setAttribute('stroke-opacity','0.03');
+    }
+  }
+  function highlightTable(tid) {
+    const ct=new Set([tid]), cc=new Set();
+    for (const {path,edge} of edgeEls) {
+      if(edge.st===tid||edge.dt===tid) {
+        path.setAttribute('stroke-opacity','0.65'); path.setAttribute('stroke-width','2');
+        ct.add(edge.st); ct.add(edge.dt); cc.add(edge.st+'::'+edge.sc); cc.add(edge.dt+'::'+edge.dc);
+      }
+    }
+    allCards.forEach(c=>{ c.classList.toggle('highlight',ct.has(c.dataset.table)); c.classList.toggle('dimmed',!ct.has(c.dataset.table)); });
+    allCols.forEach(c=>{ const card=c.closest('.table-card'); if(!card)return;
+      if(ct.has(card.dataset.table)) { const cid=card.dataset.table+'::'+c.dataset.col; c.classList.toggle('highlight',cc.has(cid)); c.classList.toggle('dimmed',!cc.has(cid)); }
+    });
+    for (const {path} of edgeEls) {
+      const st=path.getAttribute('data-src-table'), dt=path.getAttribute('data-dst-table');
+      if(st!==tid&&dt!==tid) path.setAttribute('stroke-opacity','0.03');
+    }
+  }
+  function clearHighlight() {
+    if(showAllMode) return;
+    allCards.forEach(c=>c.classList.remove('highlight','dimmed'));
+    allCols.forEach(c=>c.classList.remove('highlight','dimmed'));
+    allPaths.forEach(p=>{ p.setAttribute('stroke-opacity','0.07'); p.setAttribute('stroke-width','1.5'); });
+    tooltip.style.display='none';
+  }
+  allCols.forEach(col=>{
+    col.addEventListener('mouseenter',(evt)=>{
+      if(showAllMode) return;
+      const card=col.closest('.table-card'); if(!card) return;
+      clearHighlight(); highlightColumn(card.dataset.table,col.dataset.col);
+      const edges=edgeEls.filter(({edge})=>(edge.st===card.dataset.table&&edge.sc===col.dataset.col)||(edge.dt===card.dataset.table&&edge.dc===col.dataset.col));
+      if(edges.length>0) {
+        let html=''; for (const {edge} of edges) { const ei=classifyEdge(edge); html+='<div class="tt-row"><span>'+edge.sc+'</span><span class="tt-arrow">→</span><span>'+edge.dc+'</span><span class="tt-badge '+ei.css+'">'+ei.label+'</span></div>'; }
+        tooltip.innerHTML='<div class="tt-title">'+col.dataset.col+' lineage</div>'+html;
+        tooltip.style.display='block';
+        const dR=document.getElementById('diagram').getBoundingClientRect();
+        tooltip.style.left=(evt.clientX-dR.left+16)+'px'; tooltip.style.top=(evt.clientY-dR.top-10)+'px';
+      }
+    });
+    col.addEventListener('mouseleave',clearHighlight);
+  });
+  document.querySelectorAll('.table-header').forEach(hdr=>{
+    hdr.addEventListener('mouseenter',()=>{ if(showAllMode)return; const c=hdr.closest('.table-card'); if(!c)return; clearHighlight(); highlightTable(c.dataset.table); });
+    hdr.addEventListener('mouseleave',clearHighlight);
+  });
+  const btnAll=document.getElementById('btn-show-all');
+  btnAll.addEventListener('click',()=>{
+    showAllMode=!showAllMode; btnAll.classList.toggle('active',showAllMode);
+    if(showAllMode) { allCards.forEach(c=>c.classList.remove('highlight','dimmed')); allCols.forEach(c=>c.classList.remove('highlight','dimmed')); allPaths.forEach(p=>{ p.setAttribute('stroke-opacity','0.45'); p.setAttribute('stroke-width','1.5'); }); }
+    else clearHighlight();
+  });
+  document.querySelectorAll('.edge-legend-item').forEach(item=>{
+    item.addEventListener('click',()=>{ const t=item.dataset.table; if(!t)return; showAllMode=false; btnAll.classList.remove('active'); clearHighlight(); highlightTable(t); });
+  });
+}
+
+function computeMetrics(edgeEls) {
+  const gE={'raw-clean':[],'clean-dw':[]};
+  for (const {edge,y1,y2} of edgeEls) { const g=edge.sl+'-'+edge.dl; if(gE[g])gE[g].push({y1,y2}); }
+  function cx(edges) { let c=0; for(let i=0;i<edges.length;i++) for(let j=i+1;j<edges.length;j++) { const a=edges[i],b=edges[j]; if((a.y1<b.y1&&a.y2>b.y2)||(a.y1>b.y1&&a.y2<b.y2))c++; } return c; }
+  const rc=cx(gE['raw-clean']),cd=cx(gE['clean-dw']);
+  const lens=edgeEls.map(({y1,y2})=>Math.abs(y2-y1));
+  const txTypes={};
+  for (const e of EDGES) { const i=classifyEdge(e); txTypes[i.type]=(txTypes[i.type]||0)+1; }
+  return { crossings:rc+cd, rawCleanCrossings:rc, cleanDwCrossings:cd, totalEdges:EDGES.length,
+    tablePairs:new Set(EDGES.map(e=>e.st+'→'+e.dt)).size,
+    avgEdgeLength:lens.reduce((a,b)=>a+b,0)/lens.length, maxEdgeLength:Math.max(...lens), transformTypes:txTypes };
+}
+
+function showMetrics(m) {
+  const p=document.getElementById('metrics-panel'),c=document.getElementById('metrics-content');
+  const cc=m.crossings===0?'good':m.crossings<50?'warn':'bad';
+  const txR=Object.entries(m.transformTypes).sort((a,b)=>b[1]-a[1]).map(([t,c])=>'<div class="metric-row"><span class="metric-label">'+t+'</span><span class="metric-value">'+c+'</span></div>').join('');
+  c.innerHTML='<div class="metric-section-title">Edge Crossings</div>'
+    +'<div class="metric-row"><span class="metric-label">Total crossings</span><span class="metric-value '+cc+'">'+m.crossings+'</span></div>'
+    +'<div class="metric-row"><span class="metric-label">Raw → Clean</span><span class="metric-value">'+m.rawCleanCrossings+'</span></div>'
+    +'<div class="metric-row"><span class="metric-label">Clean → DW</span><span class="metric-value">'+m.cleanDwCrossings+'</span></div>'
+    +'<div class="metric-section-title">Edge Statistics</div>'
+    +'<div class="metric-row"><span class="metric-label">Total edges</span><span class="metric-value">'+m.totalEdges+'</span></div>'
+    +'<div class="metric-row"><span class="metric-label">Table pairs</span><span class="metric-value">'+m.tablePairs+'</span></div>'
+    +'<div class="metric-row"><span class="metric-label">Avg edge length</span><span class="metric-value">'+m.avgEdgeLength.toFixed(0)+'px</span></div>'
+    +'<div class="metric-row"><span class="metric-label">Max edge length</span><span class="metric-value">'+m.maxEdgeLength.toFixed(0)+'px</span></div>'
+    +'<div class="metric-section-title">Transformations</div>'+txR;
+}
+
+window.addEventListener('load',()=>{
+  const el=document.getElementById('edge-legend');
+  for (const [tid,sn] of Object.entries(TABLE_SHORT_NAMES)) {
+    const c=TABLE_COLORS[tid], d=document.createElement('div');
+    d.className='edge-legend-item'; d.dataset.table=tid;
+    d.innerHTML='<div class="edge-legend-swatch" style="background:'+c+'"></div>'+sn;
+    el.appendChild(d);
+  }
+  const edgeEls=drawEdges(); setupInteraction(edgeEls);
+  const m=computeMetrics(edgeEls); showMetrics(m);
+  document.getElementById('btn-metrics').addEventListener('click',()=>{
+    document.getElementById('metrics-panel').classList.toggle('visible');
+    document.getElementById('btn-metrics').classList.toggle('active');
+  });
+  window.qualityReport=()=>{ console.table({'Total crossings':m.crossings,'Raw→Clean':m.rawCleanCrossings,'Clean→DW':m.cleanDwCrossings,'Edges':m.totalEdges,'Pairs':m.tablePairs,'Avg length':Math.round(m.avgEdgeLength),'Max length':Math.round(m.maxEdgeLength)}); return m; };
+  console.log('[lineage] '+m.totalEdges+' edges, '+m.crossings+' crossings, '+m.tablePairs+' pairs');
+});
+</script>
+</body>
+</html>

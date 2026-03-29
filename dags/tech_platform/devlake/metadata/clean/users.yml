@@ -1,0 +1,22 @@
+database_name: datalake_devlake_clean
+table_name: users
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: Standardized engineer records from DevLake, synced from Backstage. One row per engineer. The github_username column enables attribution of GitHub activity (PRs, commits) to organizational identities. Used in dw_devlake as the source for dim_user (role-playing for author, merger, and future assignee dimensions).
+columns:
+  id_user:
+    description: DevLake user ID (stable identifier from Backstage)
+    lineage:
+      - datalake_devlake_raw.users.id
+  user_email:
+    description: Corporate email address of the engineer
+    lineage:
+      - datalake_devlake_raw.users.email
+  github_username:
+    description: GitHub username associated with this engineer
+    lineage:
+      - datalake_devlake_raw.users.github_user
+  user_name:
+    description: Display name of the engineer from Backstage
+    lineage:
+      - datalake_devlake_raw.users.name

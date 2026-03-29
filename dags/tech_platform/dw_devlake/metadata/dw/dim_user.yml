@@ -1,0 +1,35 @@
+---
+database_name: dw_devlake
+table_name: dim_user
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: |
+  Engineer/user dimension. Grain: one row per engineer.
+  Role-playing dimension — the same dim_user is referenced multiple times in
+  fact_pull_requests as sk_author_user (PR author) and sk_merged_by_user (PR merger).
+  Future fact tables will add sk_assignee_user and sk_creator_user roles.
+  Conformed dimension — designed to serve fact_pull_requests, future fact_issues,
+  and future fact_incidents.
+columns:
+  sk_user:
+    description: Surrogate key (SHA2 of id_user)
+    lineage:
+      - datalake_devlake_clean.users.id_user
+  id_user:
+    description: DevLake user ID (natural key from Backstage)
+    lineage:
+      - datalake_devlake_clean.users.id_user
+  user_email:
+    description: Corporate email address of the engineer
+    lineage:
+      - datalake_devlake_clean.users.user_email
+  github_username:
+    description: GitHub username associated with this engineer
+    lineage:
+      - datalake_devlake_clean.users.github_username
+  user_name:
+    description: Display name of the engineer
+    lineage:
+      - datalake_devlake_clean.users.user_name
+  ts_load:
+    description: Timestamp when the row was last loaded into the DW

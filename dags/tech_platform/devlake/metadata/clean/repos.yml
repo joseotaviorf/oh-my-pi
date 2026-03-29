@@ -1,0 +1,38 @@
+database_name: datalake_devlake_clean
+table_name: repos
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: Standardized GitHub repositories from DevLake. One row per repository in DevLake scope. Serves as the canonical repository dimension source for all engineering metrics. The repo_url is included to support future natural-key joins from deployment tables (5a_deployments uses repo_url as a string key).
+columns:
+  id_repo:
+    description: DevLake surrogate repo ID (stable identifier)
+    lineage:
+      - datalake_devlake_raw.repos.id
+  repo_name:
+    description: Full repository name (format owner/repo-name, e.g. quintoandar/backend-services)
+    lineage:
+      - datalake_devlake_raw.repos.name
+  repo_url:
+    description: HTTPS clone URL of the repository
+    lineage:
+      - datalake_devlake_raw.repos.url
+  repo_description:
+    description: Repository description from GitHub
+    lineage:
+      - datalake_devlake_raw.repos.description
+  repo_language:
+    description: Primary programming language detected by GitHub
+    lineage:
+      - datalake_devlake_raw.repos.language
+  id_owner:
+    description: Owner entity ID from GitHub
+    lineage:
+      - datalake_devlake_raw.repos.owner_id
+  forked_from:
+    description: "URL of the repository this was forked from, null if not a fork"
+    lineage:
+      - datalake_devlake_raw.repos.forked_from
+  is_deleted:
+    description: True when the repository has been deleted on GitHub
+    lineage:
+      - datalake_devlake_raw.repos.deleted

@@ -1,2 +1,4 @@
 cross/base/
 **/spark_jobs/
+**/tools/
+**/validation/

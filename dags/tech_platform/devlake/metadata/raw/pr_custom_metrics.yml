@@ -1,0 +1,18 @@
+database_name: datalake_devlake_raw
+table_name: pr_custom_metrics
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: Raw snapshot of custom PR lead-time metrics computed by the devlake-automations calculate-pr-release-time cronjob. One row per merged PR. Contains release time (first commit to production) and deploy time (merge to production).
+columns:
+  id:
+    description: DevLake PR ID (FK to pull_requests.id, 1:1 relationship)
+  repo_name:
+    description: Short repository name (natural key, not the DevLake surrogate repo ID)
+  pr_released_date:
+    description: Timestamp when the PR was deployed to production
+  pr_release_time:
+    description: Lead time in minutes from first commit to production release
+  pr_deploy_time:
+    description: Deploy time in minutes from PR merge to production release
+  created_at:
+    description: Timestamp when this metric record was created

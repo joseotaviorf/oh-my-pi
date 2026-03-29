@@ -602,6 +602,13 @@ bietlejuice.dw_demographics:
   - bietlejuice.pin_core:load-clean-foundation-lookup-value:first-run-of-day
   - bietlejuice.pin_core:load-clean-people-legislative:first-run-of-day
   - bietlejuice.pin_core:load-clean-religion:first-run-of-day
+bietlejuice.dw_devlake:
+  - bietlejuice.devlake:load-clean-pr-custom-metrics:first-run-of-day
+  - bietlejuice.devlake:load-clean-pull-request-team:first-run-of-day
+  - bietlejuice.devlake:load-clean-pull-requests:first-run-of-day
+  - bietlejuice.devlake:load-clean-repos:first-run-of-day
+  - bietlejuice.devlake:load-clean-teams:first-run-of-day
+  - bietlejuice.devlake:load-clean-users:first-run-of-day
 bietlejuice.dw_employee:
   - bietlejuice.enrich_employment:load-enrich-employee-details:first-run-of-day
   - bietlejuice.enrich_hr_system:load-enrich-demographic-attributes:first-run-of-day

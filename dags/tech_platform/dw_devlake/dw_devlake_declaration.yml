@@ -1,0 +1,34 @@
+dag:
+  name: dw_devlake
+  owner: Tech Platform Engineering Productivity
+  catchup: false
+  schedule_start_date: "2026, 1, 1"
+  schedule_interval: 0 6 * * *
+  documentation:
+    dag_purpose: |
+      Kimball dimensional model on top of DevLake clean data.
+      Upstream: datalake_devlake_clean (produced by the devlake DAG at 04:00 UTC).
+      Output schema: dw_devlake.
+      Tables: dim_repo, dim_team, dim_user, bridge_pr_team, fact_pull_requests.
+      Enables PR cycle time, lead time (DORA), team velocity, and release cadence analysis
+      across all engineering lines and squads.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: devlake
+  inner_dependencies:
+    bridge_pr_team:
+      - dim_repo
+      - dim_team
+    fact_pull_requests:
+      - dim_repo
+      - dim_team
+      - dim_user
+      - bridge_pr_team
+cluster:
+  type: databricks_16_4_med_io-memory_photon_cluster
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"

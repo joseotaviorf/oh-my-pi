@@ -1,0 +1,18 @@
+database_name: datalake_devlake_clean
+table_name: pull_request_team
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: Standardized factless bridge associating pull requests with teams. Supports many-to-many relationships (a PR can belong to multiple teams). Join to pull_requests via (id_repo, pr_key); join to teams via id_team. Used in dw_devlake as the basis for bridge_pr_team.
+columns:
+  id_repo:
+    description: DevLake repo ID (composite PK part 1, FK to datalake_devlake_clean.repos.id_repo)
+    lineage:
+      - datalake_devlake_raw.pull_request_team.base_repo_id
+  pr_key:
+    description: GitHub PR number within the repository (composite PK part 2)
+    lineage:
+      - datalake_devlake_raw.pull_request_team.pull_request_key
+  id_team:
+    description: DevLake team ID (composite PK part 3, FK to datalake_devlake_clean.teams.id_team)
+    lineage:
+      - datalake_devlake_raw.pull_request_team.team_id

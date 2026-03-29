@@ -1,0 +1,22 @@
+database_name: datalake_devlake_raw
+table_name: repos
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: Raw snapshot of GitHub repositories within DevLake's collection scope. Synced via GitHub App integration. Serves as the canonical repository identity for all DevLake engineering metrics.
+columns:
+  id:
+    description: DevLake surrogate repo ID (format github:GithubRepo:<connection_id>:<github_repo_id>)
+  name:
+    description: Full repository name (format owner/repo-name, e.g. quintoandar/backend-services)
+  url:
+    description: HTTPS clone URL of the repository
+  description:
+    description: Repository description from GitHub
+  language:
+    description: Primary programming language detected by GitHub
+  owner_id:
+    description: Owner entity ID from GitHub
+  forked_from:
+    description: "URL of the repository this was forked from, null if not a fork"
+  deleted:
+    description: Boolean flag indicating if the repository was deleted

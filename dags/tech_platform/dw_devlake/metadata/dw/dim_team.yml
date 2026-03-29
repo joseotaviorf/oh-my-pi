@@ -1,0 +1,48 @@
+---
+database_name: dw_devlake
+table_name: dim_team
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: |
+  Team/line dimension. Grain: one row per team in the organizational hierarchy.
+  Flattens the two-level LINE→TEAM hierarchy into a single row per team, including
+  the parent LINE's name and alias as denormalized attributes. LINE-type rows are
+  also present (with null id_parent_team, line_name, line_alias).
+  Conformed dimension — designed to serve all engineering metric fact tables:
+  PRs (via bridge_pr_team), future deployments (via repo→PR→team), future issues
+  (via conformance of x_team/x_line text labels).
+columns:
+  sk_team:
+    description: Surrogate key (SHA2 of id_team)
+    lineage:
+      - datalake_devlake_clean.teams.id_team
+  id_team:
+    description: DevLake team ID (natural key from Backstage)
+    lineage:
+      - datalake_devlake_clean.teams.id_team
+  team_name:
+    description: Team or line canonical name
+    lineage:
+      - datalake_devlake_clean.teams.team_name
+  team_alias:
+    description: Short alias used in Grafana dashboards and filters
+    lineage:
+      - datalake_devlake_clean.teams.team_alias
+  team_type:
+    description: "Entity level: LINE (department) or TEAM (squad)"
+    lineage:
+      - datalake_devlake_clean.teams.team_type
+  id_parent_team:
+    description: ID of the parent LINE. NULL for LINE-type rows
+    lineage:
+      - datalake_devlake_clean.teams.id_parent_team
+  line_name:
+    description: Name of the parent LINE. Denormalized from the parent row for convenient filtering without self-join
+    lineage:
+      - datalake_devlake_clean.teams.team_name
+  line_alias:
+    description: Alias of the parent LINE
+    lineage:
+      - datalake_devlake_clean.teams.team_alias
+  ts_load:
+    description: Timestamp when the row was last loaded into the DW

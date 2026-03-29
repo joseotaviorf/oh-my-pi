@@ -1,0 +1,30 @@
+database_name: datalake_devlake_clean
+table_name: pr_custom_metrics
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: Standardized PR lead-time metrics from DevLake. One row per merged PR. Provides release_time (first commit to production, key DORA Lead Time metric) and deploy_time (merge to production). Joins to pull_requests via id_pr.
+columns:
+  id_pr:
+    description: DevLake PR ID (1:1 FK to datalake_devlake_clean.pull_requests.id_pr)
+    lineage:
+      - datalake_devlake_raw.pr_custom_metrics.id
+  repo_name:
+    description: Short repository name (natural key; use id_repo from pull_requests for surrogate joins)
+    lineage:
+      - datalake_devlake_raw.pr_custom_metrics.repo_name
+  ts_released:
+    description: Timestamp when the PR was deployed to production
+    lineage:
+      - datalake_devlake_raw.pr_custom_metrics.pr_released_date
+  pr_release_time_seconds:
+    description: Lead time in seconds from first commit to production release (DORA Lead Time for Changes source metric)
+    lineage:
+      - datalake_devlake_raw.pr_custom_metrics.pr_release_time
+  pr_deploy_time_seconds:
+    description: Deploy time in seconds from PR merge to production release
+    lineage:
+      - datalake_devlake_raw.pr_custom_metrics.pr_deploy_time
+  ts_created:
+    description: Timestamp when this metric record was created
+    lineage:
+      - datalake_devlake_raw.pr_custom_metrics.created_at

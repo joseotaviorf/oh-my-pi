@@ -1,0 +1,26 @@
+database_name: datalake_devlake_clean
+table_name: teams
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: Standardized organizational hierarchy from DevLake, synced from Backstage. Self-referential table with two entity levels — LINE (department) and TEAM (squad). A TEAM row references its parent LINE via id_parent_team. Used in dw_devlake to build dim_team with a flattened LINE+TEAM structure.
+columns:
+  id_team:
+    description: DevLake team ID (stable identifier from Backstage)
+    lineage:
+      - datalake_devlake_raw.teams.id
+  team_name:
+    description: Team or line canonical name
+    lineage:
+      - datalake_devlake_raw.teams.name
+  team_alias:
+    description: Short alias used in Grafana dashboards and filters
+    lineage:
+      - datalake_devlake_raw.teams.alias
+  team_type:
+    description: "Entity level in the org hierarchy: LINE (department) or TEAM (squad)"
+    lineage:
+      - datalake_devlake_raw.teams.type
+  id_parent_team:
+    description: ID of the parent LINE entity. NULL for LINE-type rows; references id_team for TEAM-type rows
+    lineage:
+      - datalake_devlake_raw.teams.parent_id

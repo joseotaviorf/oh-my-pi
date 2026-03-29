@@ -1,0 +1,113 @@
+---
+database_name: dw_devlake
+table_name: fact_pull_requests
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: |
+  Pull request fact table. Grain: one row per pull request.
+  Primary source for engineering velocity metrics: Lead Time for Changes (DORA),
+  PR throughput, code churn, and review cycle time — sliced by repository, team, and engineer.
+
+  sk_team is the primary team association (deterministic: MIN(id_team) from bridge_pr_team).
+  For full many-to-many team analysis, join via bridge_pr_team instead.
+
+  Date surrogate keys (sk_*_date) join to dw_public.dim_date for calendar attributes.
+columns:
+  sk_pr:
+    description: Surrogate key for the pull request (SHA2 of id_pr)
+    lineage:
+      - datalake_devlake_clean.pull_requests.id_pr
+  sk_repo:
+    description: Surrogate key for the repository (FK to dim_repo.sk_repo)
+    lineage:
+      - datalake_devlake_clean.repos.id_repo
+  sk_author_user:
+    description: Surrogate key for the PR author (FK to dim_user.sk_user, role-playing)
+    lineage:
+      - datalake_devlake_clean.users.id_user
+  sk_merged_by_user:
+    description: Surrogate key for the engineer who merged the PR (FK to dim_user.sk_user, role-playing)
+    lineage:
+      - datalake_devlake_clean.users.id_user
+  sk_team:
+    description: Surrogate key for the primary team (FK to dim_team.sk_team; primary team = MIN(id_team) from bridge_pr_team)
+    lineage:
+      - datalake_devlake_clean.pull_request_team.id_team
+  sk_created_date:
+    description: Date key for PR creation date (FK to dw_public.dim_date.sk_date, format YYYYMMDD)
+    lineage:
+      - datalake_devlake_clean.pull_requests.ts_created
+  sk_merged_date:
+    description: Date key for PR merge date (FK to dw_public.dim_date.sk_date, format YYYYMMDD). Null if not merged
+    lineage:
+      - datalake_devlake_clean.pull_requests.ts_merged
+  sk_released_date:
+    description: Date key for production release date (FK to dw_public.dim_date.sk_date, format YYYYMMDD). Null if no release recorded
+    lineage:
+      - datalake_devlake_clean.pr_custom_metrics.ts_released
+  id_pr:
+    description: DevLake PR ID (natural key)
+    lineage:
+      - datalake_devlake_clean.pull_requests.id_pr
+  id_repo:
+    description: DevLake repo ID (natural key)
+    lineage:
+      - datalake_devlake_clean.pull_requests.id_repo
+  pr_key:
+    description: GitHub PR number within the repository
+    lineage:
+      - datalake_devlake_clean.pull_requests.pr_key
+  pr_title:
+    description: Pull request title
+    lineage:
+      - datalake_devlake_clean.pull_requests.pr_title
+  pr_status:
+    description: "PR status: OPEN, MERGED, or CLOSED"
+    lineage:
+      - datalake_devlake_clean.pull_requests.pr_status
+  pr_base_branch:
+    description: Target branch name (e.g. main, master)
+    lineage:
+      - datalake_devlake_clean.pull_requests.pr_base_branch
+  pr_type:
+    description: "PR type from conventional commit prefix: feat, fix, chore, refactor, docs, test, style, perf"
+    lineage:
+      - datalake_devlake_clean.pull_requests.pr_type
+  is_merged:
+    description: "Derived from pr_status: TRUE when the PR status is MERGED"
+    lineage:
+      - datalake_devlake_clean.pull_requests.pr_status
+  is_draft:
+    description: True when the PR is in draft state
+    lineage:
+      - datalake_devlake_clean.pull_requests.is_draft
+  pr_additions:
+    description: Number of lines added in the PR
+    lineage:
+      - datalake_devlake_clean.pull_requests.pr_additions
+  pr_deletions:
+    description: Number of lines deleted in the PR
+    lineage:
+      - datalake_devlake_clean.pull_requests.pr_deletions
+  pr_release_time_seconds:
+    description: Lead time in seconds from first commit to production release (DORA Lead Time for Changes). Divide by 3600 for hours, by 86400 for days
+    lineage:
+      - datalake_devlake_clean.pr_custom_metrics.pr_release_time_seconds
+  pr_deploy_time_seconds:
+    description: Deploy time in seconds from PR merge to production release
+    lineage:
+      - datalake_devlake_clean.pr_custom_metrics.pr_deploy_time_seconds
+  dt_created:
+    description: Date when the PR was created
+    lineage:
+      - datalake_devlake_clean.pull_requests.ts_created
+  dt_merged:
+    description: Date when the PR was merged (null if not merged)
+    lineage:
+      - datalake_devlake_clean.pull_requests.ts_merged
+  dt_released:
+    description: Date when the PR was deployed to production (null if no release recorded)
+    lineage:
+      - datalake_devlake_clean.pr_custom_metrics.ts_released
+  ts_load:
+    description: Timestamp when the row was last loaded into the DW

@@ -1,0 +1,40 @@
+database_name: datalake_devlake_raw
+table_name: pull_requests
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: Raw snapshot of GitHub pull requests from DevLake. Includes custom enrichment columns (x_type, x_title_hash) added by the devlake-automations cronjobs.
+columns:
+  id:
+    description: DevLake surrogate ID for the pull request (format github:PullRequest:<connection_id>:<pr_number>)
+  base_repo_id:
+    description: DevLake repo ID (FK to repos.id)
+  pull_request_key:
+    description: GitHub PR number within the repository
+  title:
+    description: Pull request title
+  status:
+    description: "PR status: OPEN, MERGED, or CLOSED"
+  base_ref:
+    description: Target branch name (e.g. main, master)
+  author_id:
+    description: DevLake user ID of the PR author
+  author_name:
+    description: GitHub username of the PR author
+  merged_by_id:
+    description: DevLake user ID of the user who merged the PR
+  merged_by_name:
+    description: GitHub username of the user who merged the PR
+  additions:
+    description: Number of lines added in the PR
+  deletions:
+    description: Number of lines deleted in the PR
+  is_draft:
+    description: Boolean flag indicating whether the PR is in draft state
+  x_type:
+    description: "PR type derived from conventional commit prefix: feat, fix, chore, refactor, docs, test, style, perf"
+  x_title_hash:
+    description: SHA hash of the PR title used for deduplication in enrichment cronjobs
+  created_date:
+    description: Timestamp when the PR was created
+  merged_date:
+    description: Timestamp when the PR was merged (null if not merged)

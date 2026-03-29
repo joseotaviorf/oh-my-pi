@@ -1,0 +1,39 @@
+---
+database_name: dw_devlake
+table_name: bridge_pr_team
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: |
+  Many-to-many bridge between pull requests and teams. Grain: one row per PR-team assignment.
+  A PR can appear multiple times (one row per team it belongs to). Use this table when
+  you need precise team attribution for all team assignments (e.g. PRs that span multiple teams).
+  For simple team-level analysis, use sk_team on fact_pull_requests directly (primary team only).
+  Future fact tables (fact_deployments, fact_issues) will use analogous bridge tables
+  (bridge_deployment_team, bridge_issue_team) following this same pattern.
+columns:
+  sk_pr:
+    description: Surrogate key for the pull request (FK to fact_pull_requests.sk_pr)
+    lineage:
+      - datalake_devlake_clean.pull_requests.id_pr
+  sk_team:
+    description: Surrogate key for the team (FK to dim_team.sk_team)
+    lineage:
+      - datalake_devlake_clean.teams.id_team
+  id_pr:
+    description: DevLake PR ID (natural key)
+    lineage:
+      - datalake_devlake_clean.pull_requests.id_pr
+  id_repo:
+    description: DevLake repo ID (bridge join key)
+    lineage:
+      - datalake_devlake_clean.pull_request_team.id_repo
+  pr_key:
+    description: GitHub PR number within the repository (bridge join key)
+    lineage:
+      - datalake_devlake_clean.pull_request_team.pr_key
+  id_team:
+    description: DevLake team ID (natural key)
+    lineage:
+      - datalake_devlake_clean.pull_request_team.id_team
+  ts_load:
+    description: Timestamp when the row was last loaded into the DW
