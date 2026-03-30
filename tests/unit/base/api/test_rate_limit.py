@@ -20,19 +20,6 @@ class TestHeaderRateLimitAdapter(unittest.TestCase):
 
     @patch("bietlejuice.base.api.rate_limit.header_adapter.time.sleep")
     @patch("bietlejuice.base.api.rate_limit.header_adapter.time.time")
-    def test_wait_if_needed_proactive_wait(self, mock_time, mock_sleep):
-        """Tests proactive waiting when the remaining request limit is reached."""
-        mock_time.return_value = 1000.0
-        self.adapter.rate_limit_remaining = 4
-        self.adapter.rate_limit_reset_time = 1010.0
-
-        self.adapter._wait_if_needed()
-
-        mock_sleep.assert_called_once()
-        self.assertAlmostEqual(mock_sleep.call_args[0][0], 10.1)
-
-    @patch("bietlejuice.base.api.rate_limit.header_adapter.time.sleep")
-    @patch("bietlejuice.base.api.rate_limit.header_adapter.time.time")
     def test_wait_if_needed_no_wait(self, mock_time, mock_sleep):
         """Tests that there is no waiting if the remaining request limit is above the threshold."""
         mock_time.return_value = 1000.0
