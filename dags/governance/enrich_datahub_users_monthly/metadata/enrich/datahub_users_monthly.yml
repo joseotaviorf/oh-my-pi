@@ -1,0 +1,109 @@
+database_name: datalake_datahub_metrics
+table_name: datahub_users_monthly
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: |
+  Monthly snapshot of employee-level DataHub, Databricks, and Trino usage for a closed calendar month.
+  Grain: one row per employee (corporate email) per reference month. Analytics are monthly only: the specific calendar day
+  of an event or lifecycle change does not matter beyond whether it falls inside that month.
+  Eligibility (denominator): a collaborator is included if their employment interval overlaps the reference month by at least
+  one day (hired on or before the last day of the month; not terminated before the first day of the month).
+  Tool flags (numerator semantics): is_datahub_user, is_databricks_user, and is_trino_user are true if there was any qualifying
+  usage or account overlap on at least one day within that same month.
+  The Airflow DAG runs on day 1 at 10:00 UTC and loads the previous calendar month; Delta partitions use year, month, and day=1.
+  Org attributes (job_class, area_class, etc.) reflect org_chart at processing time; for notebook backfill of past months,
+  set is_backfilled_dimension_proxy to true when org dimensions are projected from the current org_chart.
+columns:
+  user_email:
+    lineage:
+      - datalake_people_public.org_chart.work_email
+      - datalake_amplitude_clean.events.id_user
+    description: Corporate email of the employee (from org chart), used as join key to tool usage sources.
+  area_class:
+    lineage:
+      - datalake_people_public.org_chart.chapter
+      - datalake_people_public.org_chart.directorate
+      - datalake_people_public.org_chart.vertical
+    description: |
+      High-level business segment for analysis. Logic: IF chapter = 'Data' OR directorate = 'Dados' THEN 'Tech - Data'
+      ELSE COALESCE(vertical, 'Corp'). Sourced from org_chart at snapshot time.
+  job_class:
+    lineage:
+      - datalake_people_public.org_chart.job_class
+    description: Role classification (e.g., Specialist, Manager) from org_chart at snapshot time.
+  business:
+    lineage:
+      - datalake_people_public.org_chart.business
+    description: Business unit from org_chart at snapshot time.
+  product:
+    lineage:
+      - datalake_people_public.org_chart.product
+    description: Product context from org_chart at snapshot time.
+  vertical:
+    lineage:
+      - datalake_people_public.org_chart.vertical
+    description: Vertical allocation from org_chart at snapshot time.
+  line:
+    lineage:
+      - datalake_people_public.org_chart.line
+    description: Product line from org_chart at snapshot time.
+  chapter:
+    lineage:
+      - datalake_people_public.org_chart.chapter
+    description: Chapter (discipline) from org_chart at snapshot time.
+  assignment_status_type:
+    lineage:
+      - datalake_people_public.org_chart.assignment_status_type
+    description: Assignment status from org_chart at snapshot time (e.g., ACTIVE, INACTIVE).
+  dt_hired:
+    lineage:
+      - datalake_people_public.org_chart.dt_hired
+    description: Hire date from org_chart (identifier_mapping.dt_started in upstream pipeline).
+  dt_terminated:
+    lineage:
+      - datalake_people_public.org_chart.dt_terminated
+    description: Termination date when applicable; null if still active per org_chart logic.
+  is_datahub_user:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+      - datalake_amplitude_clean.events.id_app
+    description: |
+      True if the user had at least one DataHub app (id_app 417002) event on any day of the reference month
+      (day-level timing within the month is not modeled beyond that).
+  is_databricks_user:
+    lineage:
+      - datalake_databricks.unique_users.dt_created
+      - datalake_databricks.unique_users.dt_deleted
+    description: |
+      True if the Databricks user lifecycle overlaps the reference month by at least one day: created on or before month end,
+      and if deleted, deleted on or after month start (any day in the month counts; no intraday semantics).
+  is_trino_user:
+    lineage:
+      - datalake_trino.query_usage_information.year
+      - datalake_trino.query_usage_information.month
+      - datalake_trino.query_usage_information.day
+      - datalake_trino.query_usage_information.session_user
+    description: |
+      True if at least one Trino query is recorded on any calendar day within the reference month (extraction date from
+      query_usage_information partitions).
+  dt_reference_month_start:
+    description: |
+      First day of the reference calendar month; with dt_reference_month_end, delimits the monthly window used for overlap
+      rules (not a claim about a specific day of activity).
+  dt_reference_month_end:
+    description: |
+      Last day of the reference calendar month (same as template param reference_month_end). Airflow passes an exclusive
+      data_interval_end; reference_month_end is one calendar day before that so the month window matches the DagRun data
+      interval. Used with month_start only to define the calendar month window; daily detail is out of scope for this table.
+  is_backfilled_dimension_proxy:
+    description: |
+      When true, org_chart-derived dimensions for this row were filled using a backfill path (e.g., notebook) that may
+      project current org attributes onto past months. Scheduled DAG runs use false.
+  ts_load:
+    description: Timestamp when the snapshot row was written by the pipeline.
+  year:
+    description: Calendar year of the reference month (Delta partition column).
+  month:
+    description: Calendar month number of the reference month (Delta partition column).
+  day:
+    description: Always 1; used with year and month to align to monthly Delta partition conventions.

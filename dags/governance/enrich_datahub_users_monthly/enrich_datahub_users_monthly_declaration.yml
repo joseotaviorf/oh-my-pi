@@ -1,0 +1,39 @@
+dag:
+  name: enrich_datahub_users_monthly
+  owner: Data Governance
+  schedule_interval: "0 10 1 * *"
+  schedule_start_date: "2025, 1, 1"
+  catchup: false
+  documentation:
+    dag_purpose: |
+      Monthly snapshot of DataHub adoption and related platform usage (Databricks, Trino) per employee.
+      Rules are monthly: a collaborator is in the universe if employed on any day of the reference month; tool flags are true
+      if there was any qualifying usage on any day that month. Runs day 1 at 10:00 UTC for the **previous** closed month
+      (partitions year/month/day=1). Historical backfill via manual Databricks notebook with the same SQL.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: datahub_metrics
+  extra_query_template_params:
+    reference_month_end: "{{ macros.ds_add(data_interval_end | ds, -1) }}"
+    is_backfilled_dimension_proxy: "false"
+  tables_customization:
+    datahub_users_monthly:
+      extraction_type: incremental
+      partitions:
+        - year
+        - month
+        - day
+      merge_on:
+        - year
+        - month
+        - day
+        - user_email
+      z_order_by:
+        - year
+        - month
+        - day
+        - user_email
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new_env
