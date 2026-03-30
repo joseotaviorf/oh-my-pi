@@ -149,7 +149,7 @@ SELECT DISTINCT
     IF(e.id_process IS NOT NULL, o1.delay_days, l.overdue_days_at_registration) AS overdue_days_at_registration,
     IF(e.id_process IS NOT NULL, e.succumbency_fee, l.succumbency_fee) AS succumbency_fee,
     IF(e.id_process IS NOT NULL, COALESCE(c.rent, 0) + COALESCE(c.iptu, 0) + COALESCE(c.condo, 0), l.total_package) AS total_package,
-    IF(e.id_process IS NOT NULL, IF(e.dt_closure IS NOT NULL, o.open_amount, oa.open_amount), l.total_due_amount) AS total_due_amount,
+    IF(e.id_process IS NOT NULL, COALESCE(o.open_amount, oa.open_amount), l.total_due_amount) AS total_due_amount,
     IF(e.id_process IS NOT NULL, e.ldt_stock, l.ldt_stock) AS ldt_stock,
     IF(e.id_process IS NOT NULL, e.stock_range, l.stock_range) AS stock_range,
     IF(e.id_process IS NOT NULL, e.ldt_resolution, l.ldt_resolution) AS ldt_resolution,
