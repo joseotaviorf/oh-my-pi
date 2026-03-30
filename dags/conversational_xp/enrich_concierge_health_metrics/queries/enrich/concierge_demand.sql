@@ -12,7 +12,7 @@ WITH visits AS (
         is_direct_visit_booked AS is_visit_booked,
         is_visit_completed,
         is_offer_submitted,
-        is_offer_accepted, 
+        is_offer_accepted,
         is_contract_signed,
         business_context,
         NULL AS days_msg2vb,
@@ -40,7 +40,7 @@ WITH visits AS (
         is_indirect_visit_booked AS is_visit_booked,
         is_visit_completed,
         is_offer_submitted,
-        is_offer_accepted, 
+        is_offer_accepted,
         is_contract_signed,
         business_context,
         days_msg2vb,
@@ -54,22 +54,20 @@ WITH visits AS (
     WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
 
-, prospect_activation_events AS ( 
+, prospect_activation_events AS (
     SELECT
         p.sk_prospect,
         p.sk_house,
         u.telefone_principal,
-        CASE 
+        CASE
             WHEN p.event_name = 'USER FIRST ACTIVATION' THEN 'new_prospect'
             WHEN p.event_name IN ('USER RECOVERY', 'USER RECOVERY IN OTHER CITY GROUP') THEN 'recovered_prospect'
         END AS prospect_event_type,
         p.ts_event AS ts_prospect_event,
-        b.id_visit,
-        p.operation_channel, 
+        p.sk_visit AS id_visit,
+        p.operation_channel,
         UPPER(p.business_context) AS business_context
     FROM dw_growth.fact_demand_prospect_events AS p
-    LEFT JOIN dw_public.dim_booking AS b 
-        ON b.sk_booking = p.sk_booking
     LEFT JOIN dw_public.dim_user u
         ON p.sk_prospect = u.sk_user
     WHERE p.event_name IN (
@@ -77,7 +75,7 @@ WITH visits AS (
             'USER RECOVERY',
             'USER RECOVERY IN OTHER CITY GROUP'
         )
-        AND p.flow_order = 1 
+        AND p.flow_order = 1
         AND p.ts_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
 
@@ -90,7 +88,7 @@ SELECT DISTINCT
     COALESCE(m.id_notification, CAST(-1 AS BIGINT)) AS id_notification,
     COALESCE(m.id_phone_session, '-') AS id_phone_session,
     v.id_house AS id_house_of_vb,
-    v.id_visit, 
+    v.id_visit,
     m.user_phone,
     COALESCE(v.visit_code, '-') AS visit_code,
     COALESCE(m.concierge_flow, 'Unknown') AS concierge_flow,
@@ -103,9 +101,9 @@ SELECT DISTINCT
     COALESCE(pe.prospect_event_type, p.prospect_event_type) AS prospect_event_type,
     m.user_phone IS NOT NULL
         AND (
-            p.id_user IS NULL 
-            OR p.prospect_event_type = 'prospect_churn' 
-            OR (p.prospect_event_type <> 'prospect_churn' AND DATE(p.ts_prospect_event) = DATE(m.ts_concierge_contact)) 
+            p.id_user IS NULL
+            OR p.prospect_event_type = 'prospect_churn'
+            OR (p.prospect_event_type <> 'prospect_churn' AND DATE(p.ts_prospect_event) = DATE(m.ts_concierge_contact))
         )
     AS is_contact_prospect,  -- a user is a contact prospect if he/she had contact with concierge and had never initiated a RENT/SALE flow, or had previously churned or had initiated a RENT/SALE flow on the day of the concierge contact.
     pe.sk_prospect IS NOT NULL AS is_concierge_prospect,

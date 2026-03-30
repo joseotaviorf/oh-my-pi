@@ -59,6 +59,7 @@ adhoc_rules AS (
     dpce.id_rent_flow,
     dpce.id_sale_flow,
     dpce.id_booking,
+    dpce.id_visit,
     dpce.id_offer,
     dpce.id_talk_to_agent,
     dpce.id_house,
@@ -148,7 +149,7 @@ adhoc_rules AS (
   FROM
     datalake_demand_flows.demand_prospect_conversion_events AS dpce
   LEFT JOIN
-    company_relation AS bcr 
+    company_relation AS bcr
     ON bcr.sk_user = dpce.id_prospect
     AND DATE(dpce.ts_event) BETWEEN DATE(bcr.ts_start) AND DATE(bcr.ts_end)
   LEFT JOIN
@@ -175,6 +176,7 @@ media_setup_ids AS (
     dpce.id_rent_flow,
     dpce.id_sale_flow,
     dpce.id_booking,
+    dpce.id_visit,
     dpce.id_offer,
     dpce.id_talk_to_agent,
     dpce.id_house,
@@ -242,6 +244,7 @@ SELECT
   id_rent_flow,
   id_sale_flow,
   id_booking,
+  id_visit,
   id_offer,
   id_talk_to_agent,
   id_house,

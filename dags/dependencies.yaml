@@ -1881,7 +1881,6 @@ bietlejuice.enrich_concierge_health_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-visit-schedule-confirmed-events:first-run-of-day
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
-  - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-prospect-events:first-run-of-day
   - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-dim-visit:first-run-of-day
@@ -2209,17 +2208,18 @@ bietlejuice.enrich_demand_conversion_events:
   - bietlejuice.enrich_amplitude_offer:load-enrich-offer-submitted-events:first-run-of-day
   - bietlejuice.enrich_amplitude_offer:load-enrich-sale-offer-raw-events:first-run-of-day
   - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit:first-run-of-day
-  - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
   - bietlejuice.enrich_business_model:load-enrich-visit-business-model:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
   - bietlejuice.enrich_growth_taxonomy:load-enrich-unified-taxonomy-dictionary:first-run-of-day
+  - bietlejuice.enrich_hub_services:load-enrich-secretariat-allocation-history:first-run-of-day
   - bietlejuice.enrich_offer:load-enrich-offer:first-run-of-day
   - bietlejuice.enrich_prospect_status:load-enrich-buyer-prospect-status:first-run-of-day
   - bietlejuice.enrich_prospect_status:load-enrich-tenant-prospect-status:first-run-of-day
   - bietlejuice.enrich_rental_transact:load-enrich-offer:first-run-of-day
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
   - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visit-schedules:first-run-of-day
   - bietlejuice.enrich_visit:load-enrich-visits:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand-exception-flow:first-run-of-day
   - bietlejuice.rede_platform:load-clean-buyer-company:first-run-of-day

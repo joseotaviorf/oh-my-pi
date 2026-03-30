@@ -27,6 +27,10 @@ columns:
     description: "Id of the visit booking."
     lineage:
       - datalake_demand_flows.demand_prospect_conversion_events.id_booking
+  id_visit:
+    description: "Id of the visit."
+    lineage:
+      - datalake_demand_flows.demand_prospect_conversion_events.id_visit
   id_offer:
     description: "Id of the offer made from a prospect to a house owner."
     lineage:

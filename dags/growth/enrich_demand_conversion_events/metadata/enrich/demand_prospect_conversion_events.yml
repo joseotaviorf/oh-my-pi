@@ -54,6 +54,10 @@ columns:
     lineage:
       - datalake_sale_demand_events.sale_demand_events.id_booking
       - datalake_rent_demand_events.rent_demand_events.id_booking
+  id_visit:
+    description: "Id of the visit."
+    lineage:
+      - datalake_visit.visit_schedules.id_visit
   id_offer:
     description: "Id of the offer made from a prospect to a house owner."
     lineage:
@@ -104,7 +108,7 @@ columns:
   visit_code:
     description: "Code of the visit when the event is related to a visit."
     lineage:
-      - datalake_booking.booking.code
+      - datalake_visit.visit_schedules.visit_code
   business_context:
     description: "Context in which that conversion happened."
     lineage:
@@ -112,19 +116,19 @@ columns:
   booking_creator:
     description: "Person/team that scheduled the visit to the property."
     lineage:
-      - datalake_booking.booking.user_sale_booking_creator
+      - datalake_visit.visit_schedules.user_role_creation
   product_origin:
     description: "System where the booking was registered"
     lineage:
-      - datalake_booking.booking.first_update_source
+      - datalake_visit.visit_schedules.channel_creation
   is_3p_demand:
     description: "Flag to point if that booking was created by an Rede agent."
     lineage:
-      - datalake_booking.booking.id_3p_demand
+      - datalake_visit.visit_schedules.is_3p_demand
   flg_via_reschedule:
     description: "Flag to indicate whether the visit is a reschedule."
     lineage:
-      - datalake_booking.booking.flg_via_reschedule
+      - datalake_visit.visit_schedules.is_rescheduled
   app_type:
     description: "Application from which the user made the conversion event."
     lineage:

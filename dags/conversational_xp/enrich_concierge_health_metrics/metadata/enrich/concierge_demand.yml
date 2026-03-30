@@ -2,7 +2,7 @@ database_name: datalake_search
 table_name: concierge_demand
 owner: yiyi.ji@quintoandar.com
 domain: Conversational XP
-description: Table containing information about inbound and outbound messages sent to and received by concierge, visits scheduled through concierge (direct and indirectly) and whether the user is a prospect or not. Concierge is identified as Julia in WhatsApp. 
+description: Table containing information about inbound and outbound messages sent to and received by concierge, visits scheduled through concierge (direct and indirectly) and whether the user is a prospect or not. Concierge is identified as Julia in WhatsApp.
 columns:
   id_user:
     lineage:
@@ -94,7 +94,7 @@ columns:
     description: Whether the user is a contact prospect or not. If a user had contacted concierge and never had initiated a RENT/SALE flow, or had previously churned or initiated a RENT/SALE flow on the day of the concierge contact then this user is a contact prospect.
   is_concierge_prospect:
     lineage:
-    - dw_public.dim_booking.id_visit
+    - dw_growth.fact_demand_prospect_events.sk_visit
     - datalake_search.concierge_messages.ts_message_sent
     - datalake_search.concierge_direct_vb.id_visit
     - datalake_search.concierge_direct_vb.visit_event_type

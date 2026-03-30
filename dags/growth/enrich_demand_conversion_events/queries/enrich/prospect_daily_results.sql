@@ -12,9 +12,9 @@ WITH prospect_status_events AS (
     tps.day
   FROM
     datalake_demand_flows.tenant_prospect_status AS tps
-  WHERE 
-    DATE(tps.ts_status_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')   
-  UNION ALL 
+  WHERE
+    DATE(tps.ts_status_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  UNION ALL
   SELECT
     bps.id_demand_prospect_conversion_event,
     bps.id_buyer_prospect AS id_prospect,
@@ -28,8 +28,8 @@ WITH prospect_status_events AS (
     bps.day
   FROM
     datalake_demand_flows.buyer_prospect_status AS bps
-  WHERE 
-    DATE(bps.ts_status_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')   
+  WHERE
+    DATE(bps.ts_status_started) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 
 prospect_results AS (
@@ -42,8 +42,9 @@ prospect_results AS (
     pse.event_detail,
     pcr.naming_convention_sufix,
     pcr.id_rent_flow,
-    pcr.id_sale_flow, 
+    pcr.id_sale_flow,
     pcr.id_booking,
+    pcr.id_visit,
     pcr.id_offer,
     pcr.id_talk_to_agent,
     pcr.id_house,
@@ -83,8 +84,9 @@ prospect_results AS (
     NULL AS event_detail,
     pcr.naming_convention_sufix,
     pcr.id_rent_flow,
-    pcr.id_sale_flow, 
+    pcr.id_sale_flow,
     pcr.id_booking,
+    pcr.id_visit,
     pcr.id_offer,
     pcr.id_talk_to_agent,
     pcr.id_house,
@@ -108,13 +110,13 @@ prospect_results AS (
     pcr.ts_event,
     pcr.year,
     pcr.month,
-    pcr.day 
+    pcr.day
   FROM
     datalake_demand_flows.prospect_results AS pcr
-  WHERE 
-    DATE(pcr.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')    
-  QUALIFY   
-    ROW_NUMBER() OVER(PARTITION BY id_demand_prospect_conversion_event ORDER BY ts_event ASC) = 1 
+  WHERE
+    DATE(pcr.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_demand_prospect_conversion_event ORDER BY ts_event ASC) = 1
 )
 
 SELECT
@@ -127,8 +129,9 @@ SELECT
   event_detail,
   naming_convention_sufix,
   id_rent_flow,
-  id_sale_flow, 
+  id_sale_flow,
   id_booking,
+  id_visit,
   id_offer,
   id_talk_to_agent,
   id_house,

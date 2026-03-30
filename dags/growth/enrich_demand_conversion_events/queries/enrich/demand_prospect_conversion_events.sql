@@ -85,17 +85,17 @@ booking_attribution AS (
     bce.ts_event
   FROM
     conversion_events_filtered AS bce
-  LEFT JOIN 
-    datalake_booking.booking AS b 
-      ON bce.id_booking = b.id
-      AND DATE(b.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  LEFT JOIN 
-    datalake_amplitude_visit.amplitude_visit AS src 
-      ON b.code = src.id_visit
+  LEFT JOIN
+    datalake_visit.visit_schedules AS vs
+      ON bce.id_booking = vs.id_schedule
+      AND DATE(vs.ts_schedule_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  LEFT JOIN
+    datalake_amplitude_visit.amplitude_visit AS src
+      ON vs.visit_code = src.id_visit
       AND DATE(src.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  LEFT JOIN 
-    datalake_tracked_events.attribution_cross_channel acc 
-      ON b.code = acc.visit_code
+  LEFT JOIN
+    datalake_tracked_events.attribution_cross_channel acc
+      ON vs.visit_code = acc.visit_code
       AND acc.event_name IN (
         'visit_schedule_confirmed',
         'debug_visit_schedule_confirmed'
@@ -123,7 +123,7 @@ sale_offer_from_amplitude AS (
     day
   FROM
     datalake_amplitude_offer.sale_offer_raw_events
-  QUALIFY 
+  QUALIFY
     ROW_NUMBER() OVER(
       PARTITION BY id_offer
       ORDER BY
@@ -194,16 +194,16 @@ sale_offer_attribution AS (
     soce.ts_event
   FROM
     conversion_events_filtered AS soce
-    LEFT JOIN 
-      sale_offer_from_amplitude AS sor 
+    LEFT JOIN
+      sale_offer_from_amplitude AS sor
         ON soce.id_offer = sor.id_offer
     AND (
       soce.id_prospect = sor.id_user
       OR soce.id_house = sor.id_house
     )
     AND sor.ts_event BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    LEFT JOIN 
-      datalake_tracked_events.attribution_cross_channel AS acc 
+    LEFT JOIN
+      datalake_tracked_events.attribution_cross_channel AS acc
         ON sor.id_offer = acc.id_firestore
     AND acc.event_name = 'sale_offer_form_accepted'
     AND DATE(acc.ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
@@ -230,7 +230,7 @@ rent_offer_from_amplitude AS (
     day
   FROM
     datalake_amplitude_offer.offer_submitted_events
-  QUALIFY 
+  QUALIFY
     ROW_NUMBER() OVER(
       PARTITION BY id_firestore
       ORDER BY
@@ -302,19 +302,19 @@ rent_offer_attribution AS (
     roce.ts_event
   FROM
     conversion_events_filtered AS roce
-    LEFT JOIN 
-      datalake_offer.offer AS off 
+    LEFT JOIN
+      datalake_offer.offer AS off
         ON (roce.id_offer = off.id_offer_context)
-    LEFT JOIN    
-      datalake_rental_transact.offer rto 
-        ON (off.id_offer_rental_transact = rto.id_offer) 
-    LEFT JOIN 
-      rent_offer_from_amplitude AS aos 
+    LEFT JOIN
+      datalake_rental_transact.offer rto
+        ON (off.id_offer_rental_transact = rto.id_offer)
+    LEFT JOIN
+      rent_offer_from_amplitude AS aos
         ON (COALESCE(off.id_firestore, rto.id_firestore) = aos.id_firestore)
         AND ((roce.id_prospect = aos.id_user) OR (roce.id_house = aos.id_house))
         AND (CAST(aos.ts_event AS DATE) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}'))
-    LEFT JOIN 
-      datalake_tracked_events.attribution_cross_channel AS acc 
+    LEFT JOIN
+      datalake_tracked_events.attribution_cross_channel AS acc
         ON (COALESCE(off.id_firestore, rto.id_firestore) = acc.id_firestore)
         AND (acc.event_name in ('offer_submitted', 'offer_submitted_new'))
         AND (CAST(acc.ts_event AS DATE) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}'))
@@ -337,8 +337,8 @@ legacy_data_talk_to_agent AS (
     a.branded
   FROM
     datalake_talk_to_agent.talk_to_agent AS a
-  INNER JOIN 
-    datalake_ebdb_clean.house AS h 
+  INNER JOIN
+    datalake_ebdb_clean.house AS h
       ON h.id = a.house_id
   WHERE
     DATE(a.first_message_ts) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
@@ -463,29 +463,37 @@ events_with_attribution AS (
     ce.ts_event
   FROM
     conversion_events_filtered AS ce
-  LEFT JOIN 
-    legacy_data_talk_to_agent ldtta 
+  LEFT JOIN
+    legacy_data_talk_to_agent ldtta
       ON ce.id_talk_to_agent = ldtta.id_talk_to_agent
   WHERE
     ce.id_event_type = 99
 ),
 booking_info AS (
   SELECT
-    b.id AS id_booking,
-    b.code AS visit_code,
+    vs.id_schedule AS id_booking,
+    vs.id_visit,
+    vs.visit_code,
     CASE
-      WHEN b.id_user_creation = b.id_user_sale_agent THEN 'Agent'
-      WHEN b.id_user_creation = b.id_visitor THEN 'SelfService'
-      WHEN b.id_user_creation = b.id_user_sale_attendence_5a THEN 'Secretaria'
-      WHEN b.user_creation_email LIKE '%quintoandar.com.br' THEN 'Admin/CX'
+      WHEN vs.user_role_creation = 'AGENT' THEN 'Agent'
+      WHEN vs.user_role_creation = 'DEMAND' THEN 'SelfService'
+      WHEN vs.user_role_creation = 'OPS' AND sec.id_secretariat_user IS NOT NULL THEN 'Secretaria'
+      WHEN vs.user_role_creation = 'OPS' AND sec.id_secretariat_user IS NULL THEN 'Admin/CX'
       ELSE 'Other'
     END AS user_booking_creator,
-    first_update_source,
-    is_3p_demand,
-    is_via_reschedule AS flg_via_reschedule,
-    ts_created
+    vs.channel_creation AS first_update_source,
+    vs.is_3p_demand,
+    vs.is_rescheduled AS flg_via_reschedule,
+    vs.ts_schedule_created AS ts_created
   FROM
-    datalake_booking.booking AS b
+    datalake_visit.visit_schedules AS vs
+  LEFT JOIN
+    datalake_hub_services.secretariat_allocation_history AS sec
+      ON vs.id_user_creation = sec.id_secretariat_user
+      AND vs.ts_schedule_created >= sec.ts_allocation_started
+      AND vs.ts_schedule_created <= COALESCE(sec.ts_allocation_ended, NOW())
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY vs.id_schedule ORDER BY sec.ts_allocation_started DESC) = 1
 ) -- , final AS(
 SELECT
   e.id_demand_prospect_conversion_event,
@@ -495,6 +503,7 @@ SELECT
   e.id_event_type,
   e.event_name,
   e.id_booking,
+  b.id_visit,
   e.id_offer,
   e.id_firestore,
   e.id_talk_to_agent,
@@ -525,12 +534,12 @@ SELECT
   DAY(e.dt_event) AS day
 FROM
   events_with_attribution AS e
-LEFT JOIN 
-  booking_info AS b 
+LEFT JOIN
+  booking_info AS b
     ON e.id_booking = b.id_booking
     AND DATE(b.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-LEFT JOIN 
-  datalake_ebdb_listing.house AS h 
+LEFT JOIN
+  datalake_ebdb_listing.house AS h
     ON e.id_house = h.id
 WHERE
   e.id_prospect IS NOT NULL

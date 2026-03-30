@@ -3,12 +3,12 @@ database_name: dw_growth
 table_name: fact_demand_prospect_events
 owner: isabela.matsumoto@quintoandar.com.br
 domain: Growth
-description: This table contains records of demand prospect conversion events across Rent and Sale business contexts. Each record represents a specific action (booking a visit, submitting an offer, or initiating a talk to an agent) performed by a prospect. This table also adds ad hoc rules and the construction of id_media_setup. 
+description: This table contains records of demand prospect conversion events across Rent and Sale business contexts. Each record represents a specific action (booking a visit, submitting an offer, or initiating a talk to an agent) performed by a prospect. This table also adds ad hoc rules and the construction of id_media_setup.
 columns:
   sk_prospect_event:
     description: 'Unique identifier for prospect event'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.id_prospect_event    
+      - datalake_demand_flows.prospect_daily_results.id_prospect_event
   sk_prospect:
     description: 'Id user of the prospect.'
     lineage:
@@ -16,7 +16,7 @@ columns:
   sk_rent_flow:
     description: 'Identifier of a user flow with a house in rent context.'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.id_rent_flow  
+      - datalake_demand_flows.prospect_daily_results.id_rent_flow
   sk_sale_flow:
     description: 'Identifier of a user flow with a house in sale context.'
     lineage:
@@ -24,32 +24,36 @@ columns:
   sk_flow:
     description: 'Identifier of a user flow with a house'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.id_rent_flow  
-      - datalake_demand_flows.prospect_daily_results.id_sale_flow  
+      - datalake_demand_flows.prospect_daily_results.id_rent_flow
+      - datalake_demand_flows.prospect_daily_results.id_sale_flow
   sk_booking:
     description: 'Id of the visit booking.'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.id_booking  
+      - datalake_demand_flows.prospect_daily_results.id_booking
+  sk_visit:
+    description: 'Id of the visit.'
+    lineage:
+      - datalake_demand_flows.prospect_daily_results.id_visit
   sk_offer:
     description: 'Id of the offer made from a prospect to a house owner.'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.id_offer  
+      - datalake_demand_flows.prospect_daily_results.id_offer
   sk_talk_to_agent:
     description: 'Synthetic id created to idendtify a TTA event.'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.id_talk_to_agent  
+      - datalake_demand_flows.prospect_daily_results.id_talk_to_agent
   sk_house:
     description: 'ID of the property for which the conversion was registered'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.id_house  
+      - datalake_demand_flows.prospect_daily_results.id_house
   sk_region:
     description: 'Id of the house region.'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.id_region  
+      - datalake_demand_flows.prospect_daily_results.id_region
   sk_owner:
     description: 'Id user of the house owner.'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.id_owner  
+      - datalake_demand_flows.prospect_daily_results.id_owner
   sk_agent:
     description: 'Id of the agent whose made the booking.'
     lineage:
@@ -61,25 +65,25 @@ columns:
   sk_event_date:
     description: 'Identifier of the date of conversion event'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.ts_event   
+      - datalake_demand_flows.prospect_daily_results.ts_event
   business_context:
     description: 'Context in witch that conversion happened.'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.business_context            
+      - datalake_demand_flows.prospect_daily_results.business_context
   event_type:
     description: 'Type event'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.id_event_type  
+      - datalake_demand_flows.prospect_daily_results.id_event_type
   event_name:
     description: 'Name of the demand prospect conversion event'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.event_name  
-      - datalake_demand_flows.buyer_prospect_status.prospect_event_name 
+      - datalake_demand_flows.prospect_daily_results.event_name
+      - datalake_demand_flows.buyer_prospect_status.prospect_event_name
       - datalake_demand_flows.tenant_prospect_status.prospect_event_name
   event_detail:
     description: 'Name of the event that trigged the change to that current row status.'
     lineage:
-      - datalake_demand_flows.buyer_prospect_status.status_trigger_event_name 
+      - datalake_demand_flows.buyer_prospect_status.status_trigger_event_name
       - datalake_demand_flows.tenant_prospect_status.status_trigger_event_name
   product_origin:
     description: 'System where the booking was registered'
@@ -88,19 +92,19 @@ columns:
   app_type:
     description: 'Application from which the user made the conversion event.'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.app_type  
+      - datalake_demand_flows.prospect_daily_results.app_type
   utm_medium:
     description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.utm_medium  
+      - datalake_demand_flows.prospect_daily_results.utm_medium
   utm_source:
     description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.utm_source  
+      - datalake_demand_flows.prospect_daily_results.utm_source
   utm_campaign:
     description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.utm_campaign  
+      - datalake_demand_flows.prospect_daily_results.utm_campaign
   utm_term:
     description: 'Marketing parameter that characterizes the campaign responsible for user conversion.'
     lineage:
@@ -116,8 +120,8 @@ columns:
   operation_channel:
     description: 'Physical agent, internal or external, who performed the conversion in the funnel stage under analysis'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.booking_creator 
-      - datalake_demand_flows.prospect_daily_results.id_booking 
+      - datalake_demand_flows.prospect_daily_results.booking_creator
+      - datalake_demand_flows.prospect_daily_results.id_booking
     categories:
       SelfService: 'Conversions that took place without the aid of any operation being carried out by the Prospect itself at the time of conversion.'
       Secretaria: 'Conversions that are recorded by the Sales Secretariat'
@@ -126,8 +130,8 @@ columns:
   referral_type:
     description: 'Grouping of results by type of user prospecting program/initiative. Program/Initiative: Program or initiative that has different types of partners.'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.booking_creator 
-      - datalake_demand_flows.prospect_daily_results.is_3p_demand 
+      - datalake_demand_flows.prospect_daily_results.booking_creator
+      - datalake_demand_flows.prospect_daily_results.is_3p_demand
     categories:
       Agents: 'Third-party brokers who make visits and can prospect tenants.'
       Rede: 'Real estate partners that prospect tenants and such prospecting is encouraged by Fifth Floor.'
@@ -135,35 +139,35 @@ columns:
   origin:
     description: QuintoAndar application where the conversion was carried out in the funnel stage under analysis.
     lineage:
-      - datalake_demand_flows.prospect_daily_results.product_origin 
+      - datalake_demand_flows.prospect_daily_results.product_origin
   platform:
     description: Platform of the prospect device where the evaluated event took place.
     lineage:
-      - datalake_demand_flows.prospect_daily_results.app_type 
+      - datalake_demand_flows.prospect_daily_results.app_type
   content_page:
     description: Classification of content pages depending on the strategy adopted.
   flow_order:
     description: 'User flow order with the house, depending on the event type and business context.'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.id_rent_flow  
+      - datalake_demand_flows.prospect_daily_results.id_rent_flow
       - datalake_demand_flows.prospect_daily_results.id_sale_flow
-      - datalake_demand_flows.prospect_daily_results.id_event_type 
-      - datalake_demand_flows.prospect_daily_results.business_context        
+      - datalake_demand_flows.prospect_daily_results.id_event_type
+      - datalake_demand_flows.prospect_daily_results.business_context
   ts_event:
     description: 'Timestamp of the conversion event'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.ts_event  
+      - datalake_demand_flows.prospect_daily_results.ts_event
   year:
     description: 'Year of the conversion event'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.year  
+      - datalake_demand_flows.prospect_daily_results.year
   month:
     description: 'Month of the conversion event'
     lineage:
-      - datalake_demand_flows.prospect_daily_results.month  
+      - datalake_demand_flows.prospect_daily_results.month
   day:
     description: 'Day of the conversion event'
     lineage:
       - datalake_demand_flows.prospect_daily_results.day
   ts_load:
-    description: 'Timestamp of when the table was loaded'         
+    description: 'Timestamp of when the table was loaded'

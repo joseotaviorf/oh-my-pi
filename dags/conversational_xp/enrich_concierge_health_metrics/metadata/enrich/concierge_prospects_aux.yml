@@ -14,7 +14,7 @@ columns:
     description: The id of the house that was to be visited.
   id_visit_prospect:
     lineage:
-    - dw_public.dim_booking.id_visit
+    - dw_growth.fact_demand_prospect_events.sk_visit
     description: The id of the visit that the user converted to a prospect.
   id_phone_session:
     lineage:
