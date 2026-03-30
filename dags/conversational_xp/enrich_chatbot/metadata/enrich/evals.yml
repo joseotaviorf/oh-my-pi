@@ -16,4 +16,7 @@ columns:
       - datalake_langfuse_clean.scores.id_score
       - datalake_langfuse_clean.scores.value
       - datalake_langfuse_clean.scores.ts_created
-
+  ts_created:
+    description: "Session creation timestamp"
+    lineage:
+      - datalake_chatbot.sessions.ts_created

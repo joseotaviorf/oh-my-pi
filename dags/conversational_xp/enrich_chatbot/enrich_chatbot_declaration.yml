@@ -24,6 +24,9 @@ workflow:
     bypass:
       merge_on: [id_langfuse_session, bypass]
       z_order_by: [id_langfuse_session]
+  inner_dependencies:
+    evals:
+      - sessions
 
 cluster:
   type: custom_cluster

@@ -115,15 +115,24 @@ tickets AS (
 escalation_queue AS (
   SELECT DISTINCT
     t.id_session,
-    GET_JSON_OBJECT(o.input, '$.department_name') AS queue
+    COALESCE(
+      GET_JSON_OBJECT(o.input, '$.metadata.metadata.queue_name'),
+      GET_JSON_OBJECT(o.input, '$.department_name')
+    ) AS queue
   FROM
     datalake_langfuse_clean.traces AS t
   INNER JOIN
     datalake_langfuse_clean.observations AS o
       ON o.id_trace = t.id_trace
       AND o.ts_started >= '{load_start_date}'
-      AND o.name = 'escalate_tool'
-      AND o.type = 'TOOL'
+      AND (
+        (
+          o.name = 'escalate_tool'
+          AND o.type = 'TOOL'
+        ) OR (
+          GET_JSON_OBJECT(o.input, '$.metadata.metadata.metadata_type') = 'human_escalation'
+        )
+      )
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY t.id_session ORDER BY t.ts_created DESC) = 1
 ),
@@ -142,7 +151,10 @@ SELECT
   s.id_session,
   s.id_sauron_session,
   s.id_langfuse_session,
-  t.id_ticket,
+  CASE
+    WHEN eq.queue IS NOT NULL THEN t.id_ticket
+    ELSE NULL
+  END AS id_ticket,
   s.id_user,
   s.user_phone_number,
   s.bot,
@@ -158,16 +170,12 @@ SELECT
   END AS whatsapp_number,
   s.status,
   lv.version,
+  eq.queue AS first_queue,
   CASE
-    WHEN t.id_ticket IS NOT NULL THEN 
-      COALESCE(
-        REPLACE(eq.queue, '[AeC] ', ''),
-        t.first_queue
-      )
+    WHEN eq.queue IS NOT NULL THEN REPLACE(t.last_queue, '[AeC] ', '')
     ELSE NULL
-  END AS first_queue,
-  REPLACE(t.last_queue, '[AeC] ', '') AS last_queue,
-  t.id_ticket IS NOT NULL AS is_escalated,
+  END AS last_queue,
+  eq.queue IS NOT NULL AS is_escalated,
   s.ts_created,
   s.ts_updated
 FROM
