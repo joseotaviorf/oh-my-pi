@@ -1,0 +1,60 @@
+---
+database_name: datalake_big_agent_clean
+table_name: external_invoice
+description: External invoice header linked to an earning, with accrual period, due
+  date, and JSON entries.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+    - datalake_big_agent_raw.external_invoice.id
+    description: Primary key identifier for this record.
+  id_earning:
+    lineage:
+    - datalake_big_agent_raw.external_invoice.earning_id
+    description: Earning record this invoice belongs to.
+  id_external:
+    lineage:
+    - datalake_big_agent_raw.external_invoice.external_id
+    description: Identifier in the external billing or ERP system.
+  accrual_year_month:
+    lineage:
+    - datalake_big_agent_raw.external_invoice.accrual_year_month
+    description: Accrual period encoded as year-month for accounting.
+  entries:
+    lineage:
+    - datalake_big_agent_raw.external_invoice.entries
+    description: JSON or structured payload describing invoice line entries.
+  purpose:
+    lineage:
+    - datalake_big_agent_raw.external_invoice.purpose
+    description: Business purpose or classification for the external invoice.
+  dt_due:
+    lineage:
+    - datalake_big_agent_raw.external_invoice.due_date
+    description: Due date for the external invoice payment.
+  ts_created_external:
+    lineage:
+    - datalake_big_agent_raw.external_invoice.external_created_at
+    description: Creation timestamp as recorded in the external billing system.
+  ts_created:
+    lineage:
+    - datalake_big_agent_raw.external_invoice.created_at
+    description: Timestamp when the record was created in the source system.
+  ts_updated:
+    lineage:
+    - datalake_big_agent_raw.external_invoice.updated_at
+    description: Timestamp when the record was last updated in the source system.
+  year:
+    lineage:
+    - datalake_big_agent_raw.external_invoice.year
+    description: Partition year for incremental load.
+  month:
+    lineage:
+    - datalake_big_agent_raw.external_invoice.month
+    description: Partition month for incremental load.
+  day:
+    lineage:
+    - datalake_big_agent_raw.external_invoice.day
+    description: Partition day for incremental load.

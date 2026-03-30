@@ -1,0 +1,32 @@
+---
+database_name: datalake_big_agent_clean
+table_name: user_revision_entity
+description: Maps a user revision event to a partition for audit or replay in Big
+  Agent.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+    - datalake_big_agent_raw.user_revision_entity.id
+    description: Primary key identifier for this record.
+  id_user:
+    lineage:
+    - datalake_big_agent_raw.user_revision_entity.user_id
+    description: Foreign key or business identifier (user) in the Big Agent model.
+  ts_revision:
+    lineage:
+    - datalake_big_agent_raw.user_revision_entity.timestamp
+    description: Timestamp of the user revision event in the source system.
+  year:
+    lineage:
+    - datalake_big_agent_raw.user_revision_entity.year
+    description: Partition year for incremental load.
+  month:
+    lineage:
+    - datalake_big_agent_raw.user_revision_entity.month
+    description: Partition month for incremental load.
+  day:
+    lineage:
+    - datalake_big_agent_raw.user_revision_entity.day
+    description: Partition day for incremental load.

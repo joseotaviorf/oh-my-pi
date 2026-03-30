@@ -1,0 +1,48 @@
+---
+database_name: datalake_big_agent_clean
+table_name: agency
+description: Links an enrollment to a house in the Big Agent incentive system, with
+  validity dates and lifecycle timestamps.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+    - datalake_big_agent_raw.agency.id
+    description: Primary key identifier for this record.
+  id_house:
+    lineage:
+    - datalake_big_agent_raw.agency.house_id
+    description: House identifier linked through this agency relationship.
+  id_enrollment:
+    lineage:
+    - datalake_big_agent_raw.agency.enrollment_id
+    description: Enrollment identifier linking the agent-program to the house.
+  dt_since:
+    lineage:
+    - datalake_big_agent_raw.agency.since
+    description: Date from which the agency relationship is effective.
+  ts_created:
+    lineage:
+    - datalake_big_agent_raw.agency.created_at
+    description: Timestamp when the record was created in the source system.
+  ts_deleted:
+    lineage:
+    - datalake_big_agent_raw.agency.deleted_at
+    description: Timestamp when the record was soft-deleted, if applicable.
+  ts_updated:
+    lineage:
+    - datalake_big_agent_raw.agency.updated_at
+    description: Timestamp when the record was last updated in the source system.
+  year:
+    lineage:
+    - datalake_big_agent_raw.agency.year
+    description: Partition year for incremental load.
+  month:
+    lineage:
+    - datalake_big_agent_raw.agency.month
+    description: Partition month for incremental load.
+  day:
+    lineage:
+    - datalake_big_agent_raw.agency.day
+    description: Partition day for incremental load.

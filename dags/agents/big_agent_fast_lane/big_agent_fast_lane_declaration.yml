@@ -1,7 +1,7 @@
 dag:
-  name: big_agent
+  name: big_agent_fast_lane
   schedule_start_date: 2020, 12, 21
-  schedule_interval: 0 0 * * *
+  schedule_interval: 0,30 * * * *
   owner: Data Agents
   documentation:
     dag_purpose: |
@@ -75,12 +75,8 @@ workflow:
     tier_aud: {}
     user_revision_entity: {}
 cluster:
-  type: custom_cluster
+  type: databricks_16_4_rfleet_instance_cluster
   custom_configurations:
-    driver_node_type_id: r5a.xlarge
-    node_type_id: r5a.xlarge
-    num_workers: 2
-    spark_version: 16.4.x-scala2.12
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:

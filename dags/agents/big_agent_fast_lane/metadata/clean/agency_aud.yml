@@ -1,0 +1,91 @@
+---
+database_name: datalake_big_agent_clean
+table_name: agency_aud
+description: Hibernate Envers audit rows for agency records linking enrollments to
+  houses, including revision and modification flags.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.id
+    description: Primary key identifier for this record.
+  id_enrollment:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.enrollment_id
+    description: Foreign key or business identifier (enrollment) in the Big Agent
+      model.
+  id_house:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.house_id
+    description: Foreign key or business identifier (house) in the Big Agent model.
+  rev:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.rev
+    description: Envers revision number linking to the audit metadata.
+  rev_end:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.revend
+    description: End revision bound for this Envers audit row.
+  rev_type:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.revtype
+    description: Revision operation type (insert, update, or delete semantics).
+  since:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.since
+    description: Effective start date or value for the agency relationship in audit.
+  mod_enrollment:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.enrollment_mod
+    description: Envers modification flag indicating whether enrollment changed in
+      this revision.
+  mod_house:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.house_mod
+    description: Envers modification flag indicating whether house changed in this
+      revision.
+  mod_since:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.since_mod
+    description: Envers modification flag indicating whether since changed in this
+      revision.
+  mod_ts_created:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.created_at_mod
+    description: Envers modification flag indicating whether ts_created changed in
+      this revision.
+  mod_ts_deleted:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.deleted_at_mod
+    description: Envers modification flag indicating whether ts_deleted changed in
+      this revision.
+  mod_ts_updated:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.updated_at_mod
+    description: Envers modification flag indicating whether ts_updated changed in
+      this revision.
+  ts_created:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.created_at
+    description: Timestamp when the record was created in the source system.
+  ts_deleted:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.deleted_at
+    description: Timestamp when the record was soft-deleted, if applicable.
+  ts_updated:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.updated_at
+    description: Timestamp when the record was last updated in the source system.
+  year:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.year
+    description: Partition year for incremental load.
+  month:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.month
+    description: Partition month for incremental load.
+  day:
+    lineage:
+    - datalake_big_agent_raw.agency_aud.day
+    description: Partition day for incremental load.

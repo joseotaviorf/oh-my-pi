@@ -1,0 +1,36 @@
+---
+database_name: datalake_big_agent_clean
+table_name: agent
+description: Agent entity in Big Agent storing JSON metadata for the agent profile
+  and partition columns.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+    - datalake_big_agent_raw.agent.id
+    description: Primary key identifier for this record.
+  details:
+    lineage:
+    - datalake_big_agent_raw.agent.metadata
+    description: JSON metadata describing the agent profile in Big Agent.
+  ts_created:
+    lineage:
+    - datalake_big_agent_raw.agent.created_at
+    description: Timestamp when the record was created in the source system.
+  ts_updated:
+    lineage:
+    - datalake_big_agent_raw.agent.updated_at
+    description: Timestamp when the record was last updated in the source system.
+  year:
+    lineage:
+    - datalake_big_agent_raw.agent.year
+    description: Partition year for incremental load.
+  month:
+    lineage:
+    - datalake_big_agent_raw.agent.month
+    description: Partition month for incremental load.
+  day:
+    lineage:
+    - datalake_big_agent_raw.agent.day
+    description: Partition day for incremental load.
