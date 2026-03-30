@@ -23,6 +23,9 @@ all_employees AS (
         END AS area_class
     FROM
         datalake_people_public.org_chart
+    WHERE
+        work_email IS NOT NULL
+        AND TRIM(work_email) <> ''
 ),
 eligible_employees AS (
     SELECT

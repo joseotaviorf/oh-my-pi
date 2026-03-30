@@ -8,6 +8,7 @@ description: |
   of an event or lifecycle change does not matter beyond whether it falls inside that month.
   Eligibility (denominator): a collaborator is included if their employment interval overlaps the reference month by at least
   one day (hired on or before the last day of the month; not terminated before the first day of the month).
+  org_chart rows with null or blank work_email are excluded so the monthly merge has at most one source row per user_email.
   Tool flags (numerator semantics): is_datahub_user, is_databricks_user, and is_trino_user are true if there was any qualifying
   usage or account overlap on at least one day within that same month.
   The Airflow DAG runs on day 1 at 10:00 UTC and loads the previous calendar month; Delta partitions use year, month, and day=1.
