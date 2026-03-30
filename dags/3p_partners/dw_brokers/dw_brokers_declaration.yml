@@ -1,0 +1,97 @@
+dag:
+  name: dw_brokers
+  schedule_start_date: 2026, 3, 1
+  owner: Data 3P Partners
+  documentation:
+    dag_purpose: |
+      DW layer for 3P brokers: dim_brokers (broker attributes, Hubspot cluster, active profile counts
+      from brokers_profile, account manager SK), dim_broker_products (product and fee attributes),
+      dim_broker_regions (broker product to region bridge from region_list), dim_broker_status_changes
+      (status periods from enrich broker_status_history), dim_broker_account_manager_changes (HubSpot
+      owner change periods per broker from hubspot_brokers_history, resolved to person SK),
+      dim_broker_profiles (member profiles from core brokers_profile with person SK and effective
+      intervals per person and profile type). Upstreams: core_brokers, core_region, datalake_brokers
+      (hubspot_brokers_history, broker_status_history), datalake_hubspot.owner,
+      datalake_person.person_sks. Schedule after enrich_brokers and core upstreams in Airflow.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: brokers
+  tables_customization:
+    dim_brokers:
+      partitions: [year, month, day]
+      merge_on: [sk_broker]
+      z_order_by: [sk_broker]
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+      row_filter_column_key: has_3p_access_control
+      row_filter: has_3p_access
+    dim_broker_products:
+      partitions: [year, month, day]
+      merge_on: [sk_broker_product]
+      z_order_by: [sk_broker_product]
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+      row_filter_column_key: has_3p_access_control
+      row_filter: has_3p_access
+    dim_broker_regions:
+      partitions: []
+      merge_on: [sk_broker_region]
+      z_order_by: [sk_broker_region]
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+      row_filter_column_key: has_3p_access_control
+      row_filter: has_3p_access
+    dim_broker_status_changes:
+      partitions: [year, month, day]
+      merge_on: [sk_status_change]
+      z_order_by: [sk_broker]
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+      row_filter_column_key: has_3p_access_control
+      row_filter: has_3p_access
+    dim_broker_account_manager_changes:
+      partitions: [year, month, day]
+      merge_on: [sk_account_manager_change]
+      z_order_by: [sk_broker]
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+      row_filter_column_key: has_3p_access_control
+      row_filter: has_3p_access
+    dim_broker_profiles:
+      partitions: [year, month, day]
+      merge_on: [sk_broker_profile]
+      z_order_by: [sk_broker]
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+      row_filter_column_key: has_3p_access_control
+      row_filter: has_3p_access
+cluster:
+  type: databricks_16_4_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: USER_ISOLATION
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
