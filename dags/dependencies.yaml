@@ -3309,6 +3309,7 @@ bietlejuice.enrich_pro_owners:
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
   - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts:first-run-of-day
   - bietlejuice.gsheets_agents:done-clean-pp-multi-cluster:first-run-of-day
+  - bietlejuice.rental_management:load-clean-pp-multi-audit-log:first-run-of-day
   - bietlejuice.rental_management:load-clean-pp-multi-user:first-run-of-day
 bietlejuice.enrich_property_tax:
   - bietlejuice.property_tax:load-clean-tax-report:first-run-of-day

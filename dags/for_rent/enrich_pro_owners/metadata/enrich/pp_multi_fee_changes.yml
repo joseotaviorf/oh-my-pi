@@ -1,22 +1,27 @@
 ---
 database_name: datalake_pro_owners
 table_name: pp_multi_fee_changes
-description: Table with historical information about the PP Multi's administration fee.
-  Each line represents the change of the adminstration_fee or is_active colum.
+description: Event-sourced changelog of PP Multi administration fee mutations.
+  Each row represents a change to the administration_fee or is_active status.
+  Historical data (before 2026-03-30) comes from ebdb pro_owner_fee_aud; newer data
+  comes from rental_management pp_multi_audit_log.
 domain: For Rent
 owner: data-for-rent@quintoandar.com.br
 columns:
   id_owner:
     lineage:
       - datalake_ebdb_clean.user_pro_owner.id_user
+      - datalake_ebdb_clean.user.id
     description: ID user of the PP Multi (ProOwner).
   administration_fee:
     lineage:
       - datalake_ebdb_clean.pro_owner_fee_aud.adm_fee
+      - datalake_rental_management_clean.pp_multi_audit_log.new_adm_fee
     description: Owner's/Landlord's administration fee.
   is_active:
     lineage:
       - datalake_ebdb_clean.pro_owner_fee_aud.is_active
+      - datalake_rental_management_clean.pp_multi_audit_log.is_new_fee_active
     description: Boolean flag to check if the adminstration fee is active.
   is_last_status_of_day:
     description: Boolean flag to indicate of the status is the last one of the day.
@@ -24,7 +29,9 @@ columns:
     description: Timestamp of when the status started.
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_rental_management_clean.pp_multi_audit_log.ts_created
   ts_adm_fee_ended:
     description: Timestamp of when the status ended.
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
+      - datalake_rental_management_clean.pp_multi_audit_log.ts_created
