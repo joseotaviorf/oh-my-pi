@@ -2,47 +2,36 @@
 alwaysApply: false
 description: Follow this template for PR descriptions. Use when writing or editing a PR description or preparing a PR for review.
 ---
-When you need to create a Pull Request on the repo, follow this template for the description. Use the **exact section order** below. Generate a professional, concise description in **English** based on the code changes and user input.
+### Guidelines for generating the PR:
+1. **Holistic Analysis:** Analyze the **entire diff** as a single block. Ignore chat history/incremental steps.
+2. **Jira Link:** Extract the Jira key from branch/commits. Generate Header: `## [KEY-123](https://your-domain.atlassian.net/browse/KEY-123)`. Omit if no key is found.
+3. **Why Section:** Write a **single, punchy bullet point** on purpose/value. **Do not** describe technical implementation.
+4. **What Section:** List actual changes from the **full diff**, ordered by impact.
+5. **Attention Points:** Use `### !Attention Points!` **only** for risks or **pending** tasks (style/docs/tests). Omit section if everything is complete.
+6. **Strict Omission:** **NO "N/A" or Meta-commentary**. Delete lines or sections entirely if they have no data.
+7. **Omit Screenshots:** Remove the "Screenshots" section if tests are only CI/CD/Checks or if no tests were run.
+8. **Clean Output:** Remove all instructional text and bracketed hints from the final response.
+
+---
+
+## [Jira Ticket Link]
 
 ### Why?
-Explain the **motivation** (business value or technical fix). Use user input or infer from code logic.
-
-_Replace me for a short overview of why this PR is being created._
+* [Single concise bullet on purpose/value.]
 
 ### What?
-Describe **what** is being modified at a high level (e.g. new table, new column, new logic).
-
-_Replace me for a detailed explanation of what is being modified._
-- _First changes;_
-- _Second changes;_
-- _..._
-
-_How about some checkboxes?_
-- [X] _First changes;_
-- [ ] _Second changes;_
-- _..._
+* [List of actual changes from the diff, ordered by impact.]
 
 ### How everything was tested?
-Describe the tests and environment. **Standard practice:** all tests should pass through **Forno** (staging); this is the default and encouraged flow. If the change did **not** go through Forno, provide a **justification** (e.g. scope, urgency, or exception approved by the team).
-
-- **Table/SQL changes:** A simple **count**, **select** or statistics are sufficient.
-- **New DAG:** A successful run on Forno is a good proof to display.
-- **Other:** Add the information needed to show how well the change was tested.
-
-_Please describe the tests you ran and any relevant details of your test configuration. If you did not run on Forno, explain why._
+* **Environment:** [e.g., Local / CI]
+* **Validation Details:**
+    * **Forno Airflow:** [Specify DAG/Task. Delete if unused.]
+    * **Databricks/SQL:** [Explain test case. Delete if unused.]
+    * **CI/CD & Checks:** [e.g., `review-pr` success. Delete if unused.]
+* **Not Tested:** [Technical justification ONLY if NO other tests were run. Delete otherwise.]
 
 #### Screenshots
-Reserve space or reference images for run result, dashboard, or sample query result when applicable.
-
+* - [Placeholder for Screenshot - Omit section if only CI/Checks were run]
 
 ### !Attention Points!
-Call out what the reviewer should pay attention to or concerns after the merge (e.g. dependency order, backfill, breaking change, follow-up work).
-
-_Replace me for what the reviewer will need to pay attention to in the PR or to cover any concerns after the merge._
-
-### Checklist before opening the PR!
-Use the **exact checklist** below. Leave items unchecked `[ ]` unless the user explicitly confirms they are done.
-
-- [ ] My code follows the style guidelines and [name conventions](https://docs.google.com/document/d/1mPPA716eoT3EZSqY0gA8a9ao4ObMyI9Y8QNd7CzlWWY) for DAGs, databases, columns, etc.
-- [ ] I have made corresponding changes to the documentation;
-- [ ] I have added tests that prove my fix is effective or that my feature works.
+* [List risks or pending standard checks. Omit section if empty.]
