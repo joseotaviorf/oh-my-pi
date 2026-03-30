@@ -175,7 +175,7 @@ SELECT
     WHEN eq.queue IS NOT NULL THEN REPLACE(t.last_queue, '[AeC] ', '')
     ELSE NULL
   END AS last_queue,
-  eq.queue IS NOT NULL AS is_escalated,
+  t.id_ticket IS NOT NULL AS is_escalated,
   s.ts_created,
   s.ts_updated
 FROM
