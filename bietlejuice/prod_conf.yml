@@ -179,6 +179,8 @@ cluster_template:
             SPARK_RUNTIME: databricks
             ENVIRONMENT: "{{ var.value.environment }}"
             ARTIFACTS_BUCKET: *artifacts_bucket
+            # Cross-account Glue Data Catalog (Databricks workspace → data account); Airflow Variable: glue_assume_role_arn
+            GLUE_ASSUME_ROLE_ARN: "{{ var.value.glue_assume_role_arn }}"
         ssh_public_keys: []
         spark_version: 10.4.x-scala2.12
         data_security_mode: SINGLE_USER
