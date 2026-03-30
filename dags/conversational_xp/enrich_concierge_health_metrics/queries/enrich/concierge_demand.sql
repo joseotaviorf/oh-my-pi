@@ -23,7 +23,7 @@ WITH visits AS (
         month,
         day
     FROM datalake_search.concierge_direct_vb
-    WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_7}) AND DATE('{end_date}')
+    WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 
     UNION ALL
 
@@ -51,11 +51,11 @@ WITH visits AS (
         month,
         day
     FROM datalake_search.concierge_indirect_vb
-    WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_7}) AND DATE('{end_date}')
+    WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
 
 , prospect_activation_events AS ( 
-    SELECT DISTINCT
+    SELECT
         p.sk_prospect,
         p.sk_house,
         u.telefone_principal,
@@ -78,7 +78,7 @@ WITH visits AS (
             'USER RECOVERY IN OTHER CITY GROUP'
         )
         AND p.flow_order = 1 
-        AND p.ts_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_7}) AND DATE('{end_date}')
+        AND p.ts_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
 
 SELECT DISTINCT
@@ -87,11 +87,12 @@ SELECT DISTINCT
     v.id_user AS id_user_visit,
     m.id_copilot_session,
     m.id_langfuse_session,
-    m.user_phone,
-    m.id_phone_session,
+    COALESCE(m.id_notification, CAST(-1 AS BIGINT)) AS id_notification,
+    COALESCE(m.id_phone_session, '-') AS id_phone_session,
     v.id_house AS id_house_of_vb,
     v.id_visit, 
-    v.visit_code,
+    m.user_phone,
+    COALESCE(v.visit_code, '-') AS visit_code,
     COALESCE(m.concierge_flow, 'Unknown') AS concierge_flow,
     COALESCE(m.concierge_flow_type, 'Unknown') AS concierge_flow_type,
     m.has_human_reply,
@@ -104,7 +105,7 @@ SELECT DISTINCT
         AND (
             p.id_user IS NULL 
             OR p.prospect_event_type = 'prospect_churn' 
-            OR (p.prospect_event_type <> 'prospect_churn' AND DATE(p.ts_prospect_event) = DATE(m.ts_message_sent)) 
+            OR (p.prospect_event_type <> 'prospect_churn' AND DATE(p.ts_prospect_event) = DATE(m.ts_concierge_contact)) 
         )
     AS is_contact_prospect,  -- a user is a contact prospect if he/she had contact with concierge and had never initiated a RENT/SALE flow, or had previously churned or had initiated a RENT/SALE flow on the day of the concierge contact.
     pe.sk_prospect IS NOT NULL AS is_concierge_prospect,
@@ -122,9 +123,9 @@ SELECT DISTINCT
     m.ts_first_outbound_contact,
     m.ts_first_inbound_contact,
     m.ts_first_concierge_contact,
-    m.ts_concierge_contact,
+    COALESCE(m.ts_concierge_contact, TIMESTAMP('1970-01-01')) AS ts_concierge_contact,
     COALESCE(pe.ts_prospect_event, p.ts_prospect_event) AS ts_prospect_event,
-    v.ts_concierge_visit_event,
+    COALESCE(v.ts_concierge_visit_event, TIMESTAMP('1970-01-01')) AS ts_concierge_visit_event,
     v.ts_visit_created,
     COALESCE(m.year, v.year) AS year,
     COALESCE(m.month, v.month) AS month,
@@ -139,6 +140,7 @@ FULL JOIN visits v
     AND m.concierge_flow_type = v.concierge_flow_type
 LEFT JOIN prospect_activation_events pe -- joining the visits that activated users as prospects with visits from concierge to get concierge prospects. The visits from concierge are the ones scheduled through concierge (direct) or through a visit schedule page link recommended by concierge on the same day as the contact (indirect).
     ON v.id_visit = pe.id_visit
+    AND v.business_context = pe.business_context
     AND (v.visit_event_type = 'VISIT_SCHEDULED' OR v.days_msg2vb = 0)
-WHERE MAKE_DATE(m.year, m.month, m.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_7}) AND DATE('{end_date}')
-    OR MAKE_DATE(v.year, v.month, v.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_7}) AND DATE('{end_date}')
+WHERE MAKE_DATE(m.year, m.month, m.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+    OR MAKE_DATE(v.year, v.month, v.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')

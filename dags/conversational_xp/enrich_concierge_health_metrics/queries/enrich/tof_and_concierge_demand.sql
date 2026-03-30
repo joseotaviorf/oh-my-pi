@@ -66,5 +66,5 @@ LEFT JOIN tof_users AS bc -- Concierge messages lack native business context, th
     ON c.id_user = bc.id_user 
     AND DATE_DIFF(MAKE_DATE(c.year, c.month, c.day), bc.dt_tof_event) <= 30
     AND bc.business_context IS NOT NULL
-WHERE t.dt_tof_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_7}) AND DATE('{end_date}')
-    OR MAKE_DATE(c.year, c.month, c.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_7}) AND DATE('{end_date}')
+WHERE t.dt_tof_event BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+    OR MAKE_DATE(c.year, c.month, c.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')

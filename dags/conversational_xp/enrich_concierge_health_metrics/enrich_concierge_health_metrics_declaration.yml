@@ -9,11 +9,9 @@ workflow:
   type: query_delta
   default_extraction_type: incremental
   extra_query_template_params:
-    "days_past_7": 7
-    "days_past_14": 14
-    "days_past_21": 21
     "days_past_30": 30
     "days_past_90": 90
+    "days_past_120": 120
     "start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     "end_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   inner_dependencies:
@@ -32,17 +30,67 @@ workflow:
       - concierge_demand
   tables_customization:
     concierge_messages:
-      partitions: [year, month, day]
+      merge_on: [
+        id_notification, 
+        id_message, 
+        id_user
+        ]
+      partitions: [
+        year, 
+        month, 
+        day
+        ]
     concierge_direct_vb:
-      partitions: [year, month, day]
+      merge_on: [
+        visit_code, 
+        ts_visit_event_created
+        ]
+      partitions: [
+        year, 
+        month, 
+        day
+        ]
     concierge_indirect_vb:
-      partitions: [year, month, day]
+      merge_on: [
+        visit_code
+        ]
+      partitions: [
+        year, 
+        month, 
+        day
+        ]
     concierge_prospects_aux:
-      partitions: [year, month, day]
+      merge_on: [
+        id_user, 
+        ts_concierge_contact, 
+        concierge_flow_type
+        ]
+      partitions: [
+        year,
+        month, 
+        day
+        ]
     concierge_demand:
-      partitions: [year, month, day]
+      merge_on: [
+        id_user, 
+        id_notification, 
+        id_phone_session, 
+        visit_code,
+        concierge_flow_type,
+        ts_concierge_contact,
+        ts_concierge_visit_event
+        ]
+      partitions: [
+        year, 
+        month, 
+        day
+        ]
     tof_and_concierge_demand:
-      partitions: [year, month, day]
+      partitions: [
+        year, 
+        month, 
+        day
+        ]
 cluster:
     type: databricks_16_4_med_general_2_workers_cluster
     databricks_conn_id: databricks_new_env

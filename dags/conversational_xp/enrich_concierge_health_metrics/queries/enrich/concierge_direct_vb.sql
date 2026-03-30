@@ -12,7 +12,7 @@ WITH concierge_direct_vb_code AS (
     JOIN datalake_langfuse_clean.observations AS o
         ON t.id_trace = o.id_trace
     WHERE o.name = 'schedule_visit_node'
-        AND c.ts_concierge_contact BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_21}) AND DATE('{end_date}')
+        AND c.ts_concierge_contact BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
 
 SELECT
@@ -49,5 +49,5 @@ LEFT JOIN concierge_direct_vb_code AS vc
     AND vc.ts_message_sent <= vsl.ts_created -- a message in concierge must preceed a visit that was created/changed in whatsapp channel. This avoids joining the visit to later messages in the same session, as visit_code is tied to message session and not to message.
 WHERE vsl.channel = 'WHATSAPP_CONCIERGE'
     AND vsl.event_type IN ('VISIT_SCHEDULED', 'VISIT_RESCHEDULED')
-    AND vsl.ts_created BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_21}) AND DATE('{end_date}')
+    AND vsl.ts_created BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 QUALIFY ROW_NUMBER() OVER (PARTITION BY dv.visit_code, vsl.ts_created ORDER BY vsl.ts_created - COALESCE(vc.ts_message_sent, vsl.ts_created) ASC) = 1 -- If in the same message session there are many concierge_flow_types prior to the creation/change of the visit, it ties the visit to the last message.

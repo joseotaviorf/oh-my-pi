@@ -27,6 +27,10 @@ columns:
     lineage:
     - datalake_search.concierge_messages.id_langfuse_session
     description: The id of the langfuse session.
+  id_notification:
+    lineage:
+    - datalake_search.concierge_messages.id_notification
+    description: The id of the outbound notification sent by concierge.
   user_phone:
     lineage:
     - datalake_search.concierge_messages.user_phone

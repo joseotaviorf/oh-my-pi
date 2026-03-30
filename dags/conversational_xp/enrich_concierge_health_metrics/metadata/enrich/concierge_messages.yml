@@ -18,6 +18,14 @@ columns:
     lineage:
     - datalake_copilot_service_clean.session.id_external
     description: The id of the conversation session in the langfuse tables.
+  id_notification:
+    lineage:
+    - datalake_jaiminho_clean.user_notifications.id
+    description: The id of the outbound notification.
+  id_message:
+    lineage:
+    - datalake_copilot_service_clean.message.id
+    description: The id of the message in the copilot tables.
   user_phone:
     lineage:
     - datalake_jaiminho_clean.user_notifications.destination
