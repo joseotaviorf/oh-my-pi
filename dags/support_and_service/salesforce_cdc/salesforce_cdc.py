@@ -123,7 +123,6 @@ EVENTS_CONFIG = {
 jiraops_callback = JiraOpsCallback()
 default_args = {
     "owner": "Data SS",
-    "depends_on_past": True,   # safer unless you truly need strict chaining
     "email_on_retry": False,
     "retries": 1,
     "on_failure_callback": jiraops_callback.task_failure_alert,
