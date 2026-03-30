@@ -51,7 +51,7 @@ class TestUnityCatalogRestMetastoreService(unittest.TestCase):
         self.assertEqual(call_kwargs.kwargs["table_name"], "tbl")
         self.assertEqual(call_kwargs.kwargs["data_source_format"], "DELTA")
 
-    def test_create_external_table_drops_and_recreates_existing_table(self):
+    def test_create_external_table_skips_when_table_exists(self):
         mock_client = MagicMock()
         mock_client.get_table.return_value = MagicMock()
         svc = self._make_service(mock_client)
@@ -67,8 +67,9 @@ class TestUnityCatalogRestMetastoreService(unittest.TestCase):
             format_options="DELTA",
         )
 
-        mock_client.delete_table.assert_called_once_with("quintoandar_forno.db.tbl")
-        mock_client.create_table.assert_called_once()
+        mock_client.get_table.assert_called_once_with("quintoandar_forno.db.tbl")
+        mock_client.delete_table.assert_not_called()
+        mock_client.create_table.assert_not_called()
 
     def test_drop_table_calls_delete(self):
         mock_client = MagicMock()

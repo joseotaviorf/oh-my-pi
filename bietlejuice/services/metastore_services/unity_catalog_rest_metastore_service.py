@@ -77,20 +77,23 @@ class UnityCatalogRestMetastoreService(MetastoreService):
         partition_cols: list,
         format_options,
     ) -> None:
-        """Create or update an external table in Unity Catalog."""
-        format_str = self._resolve_format(format_options)
-        columns = self._build_uc_columns(table_schema, partition_cols)
-        location = self._normalise_location(table_location)
+        """Create an external table in Unity Catalog if it does not exist.
 
+        When the table is already registered in UC, this is a no-op (no drop,
+        no recreate) so secondary sync does not churn catalog metadata.
+        """
         full_name = f"{self._catalog}.{database_name}.{table_name}"
         existing = self._client.get_table(full_name)
-
         if existing:
             logger.info(
                 f"m=create_external_table, table={full_name}, "
-                "msg=table exists in UC, dropping and recreating"
+                "msg=table exists in UC, skipping sync"
             )
-            self._client.delete_table(full_name)
+            return
+
+        format_str = self._resolve_format(format_options)
+        columns = self._build_uc_columns(table_schema, partition_cols)
+        location = self._normalise_location(table_location)
 
         logger.info(
             f"m=create_external_table, table={full_name}, " "msg=creating table in UC"
