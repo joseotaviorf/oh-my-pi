@@ -1,0 +1,48 @@
+---
+database_name: datalake_text2filter_evals_clean
+table_name: text2filter_evals
+owner: rafael.guedes@quintoandar.com.br
+domain: Conversational XP
+description: "Evaluation results from the text2filter LLM as Judge pipeline. Each row represents a single evaluation of how well the model extracted search filters from a user query, including the assigned score and reviewer comment."
+
+columns:
+  uuid:
+    description: "Unique identifier for the evaluated log entry"
+    lineage:
+      - datalake_text2filter_evals_raw.text2filter_evals.uuid
+  ts_log:
+    description: "Timestamp when the original log entry was recorded"
+    lineage:
+      - datalake_text2filter_evals_raw.text2filter_evals.ts_log
+  user_query:
+    description: "Text query submitted by the user to the search filter extraction model"
+    lineage:
+      - datalake_text2filter_evals_raw.text2filter_evals.user_query
+  current_filters:
+    description: "JSON string with the filters that were active before the model extraction"
+    lineage:
+      - datalake_text2filter_evals_raw.text2filter_evals.current_filters
+  extracted_filters:
+    description: "JSON string with the filters extracted by the text2filter model from the user query"
+    lineage:
+      - datalake_text2filter_evals_raw.text2filter_evals.extracted_filters
+  score:
+    description: "Numeric evaluation score assigned by the LLM judge to the filter extraction quality"
+    lineage:
+      - datalake_text2filter_evals_raw.text2filter_evals.score
+  comment:
+    description: "Textual explanation provided by the LLM judge for the assigned evaluation score"
+    lineage:
+      - datalake_text2filter_evals_raw.text2filter_evals.comment
+  year:
+    description: "Year partition extracted from the evaluation execution date"
+    lineage:
+      - datalake_text2filter_evals_raw.text2filter_evals.year
+  month:
+    description: "Month partition extracted from the evaluation execution date"
+    lineage:
+      - datalake_text2filter_evals_raw.text2filter_evals.month
+  day:
+    description: "Day partition extracted from the evaluation execution date"
+    lineage:
+      - datalake_text2filter_evals_raw.text2filter_evals.day

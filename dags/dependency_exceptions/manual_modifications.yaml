@@ -1239,6 +1239,9 @@ bietlejuice.demand_balancer_service:
 bietlejuice.search_metrics_service:
   add:
     - quintoml.search.search_monitoring.inference:first-run-of-day
+bietlejuice.text2filter_evals:
+  add:
+    - quintoml.copilot.text2filter_evals.inference:first-run-of-day
 bietlejuice.enrich_sale_salesforce:
   add:
     - bietlejuice.salesforce:load-clean-purchase-sale-contract:first-run-of-day

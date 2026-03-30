@@ -1,0 +1,33 @@
+dag:
+  name: text2filter_evals
+  schedule_start_date: 2026, 3, 24
+  owner: Data Conversational XP
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_text2filter_evals_into_datalake
+  default_partitions: [year, month, day]
+
+  spark_job_arguments:
+  - "{environment}"
+  - "{bucket}"
+  - "{dag_name}"
+  - s3://data-science.s3.data.quintoandar.com.br/text2filter-evals/text2filter_evals
+  - "{{ macros.ds_add(data_interval_start | ds, -1) }}"
+  - "{table_name}"
+  - "{partitions}"
+  - parquet
+
+  default_extraction_type: incremental
+
+  tables_customization:
+    text2filter_evals:
+      partitions:
+      - year
+      - month
+      - day
+
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new_env
