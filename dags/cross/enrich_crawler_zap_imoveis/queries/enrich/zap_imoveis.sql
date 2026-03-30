@@ -56,7 +56,7 @@ SELECT
     CAST(GET_JSON_OBJECT(house_info, '$.usage_type') AS STRING)
   ) AS usage_type,
   GET_JSON_OBJECT(contact_information,'$.advertiser_name') AS advertiser_name,
-  GET_JSON_OBJECT(contact_information,'$.advertiser_phone') AS advertiser_phone,
+  COALESCE(GET_JSON_OBJECT(contact_information,'$.advertiser_phone'), GET_JSON_OBJECT(contact_information,'$.advertiser_phones')) AS advertiser_phone,
   CAST(COALESCE(price.rent.condo_fee, price.sale.condo_fee) AS DOUBLE) AS condo_fee,
   CAST(COALESCE(price.rent.yearly_iptu, price.sale.yearly_iptu) AS DOUBLE) AS iptu,
   CAST(price.rent.price AS DOUBLE) AS price_rental,

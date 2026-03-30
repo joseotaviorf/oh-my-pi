@@ -81,7 +81,6 @@ SELECT
   ROUND(CAST(GET_JSON_OBJECT(price,'$.rent.price') AS DOUBLE)/CAST(GET_JSON_OBJECT(house_info,'$.total_area') AS INTEGER), 2) AS price_m2_rental,
   ROUND(CAST(GET_JSON_OBJECT(price,'$.sale.price') AS DOUBLE)/CAST(GET_JSON_OBJECT(house_info,'$.total_area') AS INTEGER), 2) AS price_m2_sale,
   CAST(GET_JSON_OBJECT(date_info,'$.publication_created_at') AS TIMESTAMP) AS ts_created,
-  CAST(GET_JSON_OBJECT(date_info,'$.updated_at') AS TIMESTAMP) AS ts_updated,
   year,
   month,
   day

@@ -147,11 +147,31 @@ columns:
       - datalake_crawler_loft.loft.contract_type
     description: |
       The contract type of the housing unit (non_exclusive or exclusive).
-  advertiser_name:
+  advertiser_id:
     lineage:
-      - datalake_crawler_loft.loft.agency_name
+      - datalake_crawler_loft.loft.advertiser_id
     description: |
       The name of the advertiser/agent responsible for the listing.
+  advertiser_name:
+    lineage:
+      - datalake_crawler_loft.loft.advertiser_name
+    description: |
+      The name of the advertiser/agent responsible for the listing.
+  advertiser_email:
+    lineage:
+      - datalake_crawler_loft.loft.advertiser_email
+    description: |
+      The email of the advertiser/agent responsible for the listing.
+  advertiser_cnpj:
+    lineage:
+      - datalake_crawler_loft.loft.advertiser_cnpj
+    description: |
+      The CNPJ of the advertiser/agent responsible for the listing.
+  advertiser_location:
+    lineage:
+      - datalake_crawler_loft.loft.advertiser_location
+    description: |
+      The location of the advertiser linked to the listing, can be the state, city or complete address depending on the available information.
   has_advertiser:
     lineage:
       - datalake_crawler_loft.loft.has_agency

@@ -173,7 +173,7 @@ columns:
     lineage:
       - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_phone
     description: |
-      The phone number of the advertiser/agent responsible for the listing.
+      The phone numbers of the advertiser/agent responsible for the listing.
   condo_fee:
     lineage:
       - datalake_crawler_zap_imoveis.zap_imoveis.condo_fee

@@ -201,7 +201,7 @@ columns:
     lineage:
       - datalake_crawler_zap_imoveis_clean.zap_imoveis.contact_information
     description: |
-      The phone number of the advertiser/agent responsible for the listing.
+      The phone numbers of the advertiser/agent responsible for the listing.
       It is provided by the original struct field "contact_information".
   condo_fee:
     lineage:

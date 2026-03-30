@@ -36,7 +36,6 @@ SELECT
     price_m2_rental,
     price_m2_sale,
     ts_created,
-    ts_updated,
     year,
     month,
     day

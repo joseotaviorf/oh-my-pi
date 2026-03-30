@@ -85,11 +85,31 @@ columns:
       - datalake_crawler_loft_raw.loft.contact_information
     description: |
       The advertiser information of the listing. It has the advertiser name and phones.
+  agency_id:
+    lineage:
+      - datalake_crawler_loft_raw.loft.agency_id
+    description: |
+      The advertiser ID linked to the listing.
   agency_name:
     lineage:
       - datalake_crawler_loft_raw.loft.agency_name
     description: |
       The advertiser linked to the listing.
+  agency_email:
+    lineage:
+      - datalake_crawler_loft_raw.loft.agency_email
+    description: |
+      The email of the advertiser linked to the listing.
+  agency_cnpj:
+    lineage:
+      - datalake_crawler_loft_raw.loft.agency_cnpj
+    description: |
+      The CNPJ of the advertiser linked to the listing.
+  agency_location:
+    lineage:
+      - datalake_crawler_loft_raw.loft.agency_address
+    description: |
+      The location of the advertiser linked to the listing, can be the state, city or complete address depending on the available information.
   has_agency:
     lineage:
       - datalake_crawler_loft_raw.loft.has_agency

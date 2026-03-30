@@ -216,11 +216,6 @@ columns:
       - datalake_crawler_df_imoveis.df_imoveis.ts_created
     description: |
       The timestamp when the listing was created.
-  ts_updated:
-    lineage:
-      - datalake_crawler_df_imoveis.df_imoveis.ts_updated
-    description: |
-      The timestamp when the listing was updated.
   year:
     lineage:
       - datalake_crawler_df_imoveis.df_imoveis.year

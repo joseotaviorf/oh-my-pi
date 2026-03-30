@@ -257,12 +257,6 @@ columns:
     description: |
       The timestamp when the listing was created.
       It is provided by the original struct field "date_info".  
-  ts_updated:
-    lineage:
-      - datalake_crawler_df_imoveis_clean.df_imoveis.date_info
-    description: |
-      The timestamp when the listing was updated.
-      It is provided by the original struct field "date_info".
   year:
     lineage:
       - datalake_crawler_df_imoveis_clean.df_imoveis.year
