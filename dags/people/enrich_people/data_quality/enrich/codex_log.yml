@@ -16,11 +16,8 @@ table_level_validations:
 
 column_level_validations:
   cost_center_code:
+    # has_pattern: enforced at ingest on datalake_gsheets_people_clean.codex_cost_centers (see codex_history_base DQ note).
     is_complete:
-      severity_level: Error
-    has_pattern:
-      # Same as clean codex_cost_centers: 6 chars — 3 digits, 1 letter, 1 digit, 1 letter (e.g. 001K3X).
-      pattern: '^[0-9]{3}[A-Za-z][0-9][A-Za-z]$'
       severity_level: Error
     custom:
       # One SCD2 row per (cost_center_code, validity start)

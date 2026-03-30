@@ -21,11 +21,9 @@ column_level_validations:
     is_complete:
       severity_level: Error
   cost_center_code:
+    # has_pattern: enforced at ingest on datalake_gsheets_people_clean.codex_cost_centers only.
+    # Enrich is incremental/historical; repeating pattern here duplicated clean and caused noisy Inmetro alerts.
     is_complete:
-      severity_level: Error
-    has_pattern:
-      # Same as clean codex_cost_centers: 6 chars — 3 digits, 1 letter, 1 digit, 1 letter (e.g. 001K3X).
-      pattern: '^[0-9]{3}[A-Za-z][0-9][A-Za-z]$'
       severity_level: Error
   business:
     is_complete:
