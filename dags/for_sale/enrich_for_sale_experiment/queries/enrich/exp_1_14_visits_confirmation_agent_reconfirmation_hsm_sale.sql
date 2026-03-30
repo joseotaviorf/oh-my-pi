@@ -25,7 +25,9 @@ WHERE
     DATE(v.ts_created) >= DATE('2026-03-20') AND v.business_context='SALE' --Experiment start
     AND ( --Rollout expansions
      (RIGHT(NULLIF(u.main_phone, ''), 3) >= 800 OR RIGHT(NULLIF(u.main_phone, ''), 3) <= 199)
-    )
+    OR 
+    (DATE(v.ts_created) >= DATE('2026-03-31') AND (RIGHT(NULLIF(u.main_phone, ''), 3) >= 650 OR RIGHT(NULLIF(u.main_phone, ''), 3) <= 349))
+    )   
     AND ( --Experiment end
     (v.ts_created::DATE >= DATE('2026-03-20') AND business_context = 'SALE'))
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11
