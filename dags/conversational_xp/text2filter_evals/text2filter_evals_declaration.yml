@@ -14,7 +14,7 @@ workflow:
   - "{bucket}"
   - "{dag_name}"
   - s3://data-science.s3.data.quintoandar.com.br/text2filter-evals/text2filter_evals
-  - "{{ macros.ds_add(data_interval_start | ds, -1) }}"
+  - "{{ data_interval_start | ds }}"
   - "{table_name}"
   - "{partitions}"
   - parquet

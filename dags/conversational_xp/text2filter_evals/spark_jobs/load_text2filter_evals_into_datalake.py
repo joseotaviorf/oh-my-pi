@@ -1,12 +1,14 @@
 import json
 import logging
 from argparse import ArgumentParser
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from quintoandar_logger import QuintoAndarLogger
 
+from pyspark.sql import functions as F
+
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkTableStorageFormat, SparkDataFrameService
+from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -74,11 +76,12 @@ def main() -> None:
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     dt_execution = datetime.strptime(date_to_ingest, "%Y-%m-%d")
+    source_date = dt_execution - timedelta(days=1)
     full_source_path = (
         f"{source_root_path}/"
-        f"year={dt_execution.year}/"
-        f"month={dt_execution.month}/"
-        f"day={dt_execution.day}/"
+        f"year={source_date.year}/"
+        f"month={source_date.month}/"
+        f"day={source_date.day}/"
     )
 
     logger.info(f"m=main, msg=Reading parquet from {full_source_path}")
@@ -86,10 +89,9 @@ def main() -> None:
     df = s3_consumer.get_data_from_file(full_source_path, data_format)
 
     df = (
-        SparkDataFrameService()
-        .input(df)
-        .create_year_month_day_columns_from_dataframe_column("ts_log")
-        .output()
+        df.withColumn("year", F.lit(dt_execution.year))
+        .withColumn("month", F.lit(dt_execution.month))
+        .withColumn("day", F.lit(dt_execution.day))
     )
 
     s3_loader.load_df(
