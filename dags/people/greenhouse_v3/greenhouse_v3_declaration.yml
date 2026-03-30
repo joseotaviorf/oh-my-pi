@@ -168,6 +168,16 @@ workflow:
           params:
             per_page: 500
 
+    sources:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      partitions: []
+      z_order_by: ["name"]
+      extra_spark_job_arguments:
+        - endpoint: "sources"
+          params:
+            per_page: 500
+
     candidate_tags:
       vacuum_retention_hours: 168
       vacuum_lite: true

@@ -1,0 +1,45 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: sources
+owner: pedro.prates@quintoandar.com.br
+domain: People
+description: |-
+  Table containing recruitment sources, sourced from the Greenhouse Harvest API v3 'sources' endpoint.
+columns:
+  id_source:
+    description: The source's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.sources.id
+  id_type:
+    description: The source type's unique identifier.
+    lineage:
+    - datalake_greenhouse_v3_raw.sources.type.id
+  name:
+    description: The name of the source.
+    lineage:
+    - datalake_greenhouse_v3_raw.sources.name
+  type_name:
+    description: The name of the source type (e.g. Agencies, Social Media).
+    lineage:
+    - datalake_greenhouse_v3_raw.sources.type.name
+  ts_created:
+    description: The timestamp when the source was created in Greenhouse.
+    lineage:
+    - datalake_greenhouse_v3_raw.sources.created_at
+  ts_updated:
+    description: The timestamp when the source was last updated in Greenhouse.
+    lineage:
+    - datalake_greenhouse_v3_raw.sources.updated_at
+  ts_load:
+    description: The timestamp when the record was loaded into the clean layer.
+  year:
+    description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+    - datalake_greenhouse_v3_raw.sources.year
+  month:
+    description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+    - datalake_greenhouse_v3_raw.sources.month
+  day:
+    description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+    - datalake_greenhouse_v3_raw.sources.day
