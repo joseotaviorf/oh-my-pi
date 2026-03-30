@@ -40,6 +40,11 @@ columns:
       Surrogate key for the cost center version in effect on dt_reference. NULL when there is no organization or no version covers that date.
     lineage:
       - datalake_people.cost_center_history.sk_cost_center_version
+  business_unit_country:
+    description: |
+      Country inferred for the job row effective on dt_reference (same row as sk_job_version in job_with_salary_table). NULL when no job row matches the date window.
+    lineage:
+      - datalake_people.job_with_salary_table.country
   sk_hierarchy_version:
     description: Org structure identifier from management_hierarchy.
     lineage:
@@ -160,6 +165,10 @@ columns:
       - datalake_pin_core_clean.periods_of_service.dt_started
   is_current:
     description: True when dt_reference equals the current date (most recent day available).
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+  is_primary_assignment_for_snapshot:
+    description: Indicates the current assignment for the employee on the reference date, based on the assignment start date (latest dt_started for id_person and dt_reference).
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_started
   ts_load:

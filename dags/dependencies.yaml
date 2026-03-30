@@ -864,10 +864,6 @@ bietlejuice.dw_payments_platform:
   - bietlejuice.enrich_payments_platform:load-enrich-payment-timeline:first-run-of-day
   - bietlejuice.enrich_payments_platform:load-enrich-payment:first-run-of-day
 bietlejuice.dw_people:
-  - bietlejuice.dw_compensation:load-dw-compensation-dim-job:first-run-of-day
-  - bietlejuice.dw_employee_details:load-dw-employee-details-dim-employee:first-run-of-day
-  - bietlejuice.dw_organization:load-dw-organization-dim-business-unit:first-run-of-day
-  - bietlejuice.dw_organization:load-dw-organization-dim-cost-center:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-assignment-snapshots:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-management-hierarchy:first-run-of-day

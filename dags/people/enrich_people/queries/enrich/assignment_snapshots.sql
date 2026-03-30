@@ -87,7 +87,6 @@ first_hire_per_person AS (
     GROUP BY
         ps.id_person
 ),
--- Explode date range into daily rows (grain: id_assignment, dt_reference)
 assignments_with_dates AS (
     SELECT
         ab.id_assignment,
@@ -124,6 +123,22 @@ assignments_daily AS (
     FROM
         assignments_with_dates AS awd
     LATERAL VIEW EXPLODE(dt_reference_array) dt_ref AS dt_reference
+),
+primary_assignment_per_person_day AS (
+    SELECT
+        ad.id_person,
+        ad.dt_reference,
+        ad.id_assignment
+    FROM
+        assignments_daily AS ad
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                ad.id_person,
+                ad.dt_reference
+            ORDER BY
+                ad.dt_started DESC
+        ) = 1
 ),
 -- Direct and indirect report counts from management hierarchy
 hierarchy_with_direct_manager AS (
@@ -270,6 +285,7 @@ SELECT
         )
     ) AS sk_job_version,
     cc.sk_cost_center_version,
+    jwst.country AS business_unit_country,
     mh.sk_hierarchy_version,
     ted.id_event_definition AS sk_termination_event_definition,
     DATE_FORMAT(ad.dt_started, 'yyyyMMdd') AS sk_hired_date,
@@ -334,6 +350,7 @@ SELECT
         OR ad.dt_reference = CURRENT_DATE()
     ) AS is_monthly_snapshot,
     ad.dt_reference = CURRENT_DATE() AS is_current,
+    COALESCE(pap.id_assignment = ad.id_assignment, FALSE) AS is_primary_assignment_for_snapshot,
     CURRENT_TIMESTAMP() AS ts_load
 FROM
     assignments_daily AS ad
@@ -387,6 +404,10 @@ LEFT JOIN
             NULLIF(pei.dt_effective_ended, DATE('4712-12-31')),
             DATE('9999-12-31')
         )
+LEFT JOIN
+    primary_assignment_per_person_day AS pap
+        ON pap.id_person = ad.id_person
+        AND pap.dt_reference = ad.dt_reference
 QUALIFY
     ROW_NUMBER() OVER (
         PARTITION BY

@@ -4,47 +4,67 @@ table_name: fact_employees
 owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: |
-  Employee snapshot fact table. One row per employee per reference date (last day of month or most recent day).
-  Use for headcount by date, tenure analysis, and organizational reporting.
-  Grain: (sk_employee, sk_reference_date).
-  Cost center is historically versioned (SCD2); business unit, job, and manager hierarchy use current values.
+  Recurring employee snapshots on fixed calendar reference dates (month-end in
+  the series plus the latest day): headcount, tenure, hire/termination, and org
+  placement. Attributes are not uniformly 'as of that date': cost center is
+  historical on the reference date; job, job country, business unit id, and
+  hierarchy version follow that assignment snapshot (see How it works).
+
+  Each row is one person on one reference date, with surrogate keys and dates
+  for employee, business unit, job, cost center, hierarchy, hire and termination,
+  reference and load timestamps, tenure in months, inferred job country, and
+  flags for active employment and whether the row is the latest-day snapshot.
+
+  How it works:
+  - Each employee appears once per snapshot date: there is a row for every
+    month-end in the series plus a row for the latest available day (current
+    observation).
+  - Cost center is historical—the version stored is the one effective on that
+    reference date.
+  - Job, job country, business unit id, and management hierarchy version follow
+    the assignment snapshot for that reference date.
+  - When a person has more than one assignment overlapping a reference date, the
+    enrich table flags the row to keep (latest hire) via
+    assignment_snapshots.is_primary_assignment_for_snapshot; this fact filters on
+    that flag plus monthly snapshot rows.
 columns:
   sk_employee:
-    description: Surrogate key for the employee. FK to dim_employee.
+    description: Person identifier (Oracle HCM id_person) carried as the employee key for this fact, aligned with dim_employee.sk_employee.
     lineage:
-      - dw_employee_details.dim_employee.sk_employee
+      - datalake_people.assignment_snapshots.id_person
   sk_business_unit:
-    description: Business unit identifier. FK to dim_business_unit (current).
+    description: Business unit identifier from the assignment snapshot for this reference date (same value as id_business_unit on the row).
     lineage:
-      - dw_organization.dim_business_unit.sk_business_unit
+      - datalake_people.assignment_snapshots.id_business_unit
   sk_job:
-    description: Job identifier. FK to dim_job (current).
+    description: Surrogate key for the job version that applies on this reference date.
     lineage:
-      - dw_compensation.dim_job.sk_job_version
+      - datalake_people.assignment_snapshots.sk_job_version
   sk_cost_center_version:
-    description: Cost center version identifier. FK to dim_cost_center (SCD2, temporal at dt_reference).
+    description: Surrogate key for the cost center organizational version effective on this reference date.
     lineage:
-      - dw_organization.dim_cost_center.sk_cost_center_version
+      - datalake_people.assignment_snapshots.sk_cost_center_version
   sk_manager_hierarchy:
-    description: Manager hierarchy identifier. FK to dim_management_hierarchy (current).
+    description: Surrogate key for the management hierarchy version effective on this reference date (same grain as the assignment snapshot).
     lineage:
-      - datalake_people.management_hierarchy.sk_hierarchy_version
+      - datalake_people.assignment_snapshots.sk_hierarchy_version
   sk_hired_date:
-    description: Hire date in YYYYMMDD format. Use for date-based joins.
+    description: Hire date in YYYYMMDD form for calendar-style joins.
     lineage:
       - datalake_people.assignment_snapshots.sk_hired_date
   sk_terminated_date:
-    description: Termination date in YYYYMMDD format. NULL when still active.
+    description: Termination date in YYYYMMDD form when the assignment has ended and termination is strictly before the load calendar date; NULL while still active or when termination is same-day or future relative to load (rule in this fact query).
     lineage:
       - datalake_people.assignment_snapshots.sk_terminated_date
+      - datalake_people.assignment_snapshots.dt_terminated
   sk_reference_date:
-    description: Reference date of the snapshot in YYYYMMDD format. Last day of month or current date.
+    description: Snapshot reference date in YYYYMMDD form (month-end in the series or the latest day).
     lineage:
       - datalake_people.assignment_snapshots.sk_reference_date
   business_unit_country:
-    description: Country of the business unit/job.
+    description: Country inferred for the job role on this snapshot (from job naming and classification rules).
     lineage:
-      - dw_compensation.dim_job.country
+      - datalake_people.assignment_snapshots.business_unit_country
   tenure_months:
     description: Months since the employee's first hire at the company.
     lineage:
@@ -54,7 +74,7 @@ columns:
     lineage:
       - datalake_people.assignment_snapshots.is_active
   is_current:
-    description: True when dt_reference equals the most recent day (current date).
+    description: True when the reference date is the latest observation day in the snapshot series (typically today).
     lineage:
       - datalake_people.assignment_snapshots.is_current
   dt_hired:
@@ -62,7 +82,7 @@ columns:
     lineage:
       - datalake_people.assignment_snapshots.dt_hired
   dt_terminated:
-    description: Date the assignment ended. NULL when still active (dt_terminated >= current date).
+    description: Calendar date the assignment ended for reporting; NULL when still active or when termination is same-day or future relative to load (rule in this fact query).
     lineage:
       - datalake_people.assignment_snapshots.dt_terminated
   dt_reference:
