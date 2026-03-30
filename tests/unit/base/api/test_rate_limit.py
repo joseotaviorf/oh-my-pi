@@ -18,8 +18,8 @@ class TestHeaderRateLimitAdapter(unittest.TestCase):
         """Stops the patcher."""
         self.mock_super_send.stop()
 
-    @patch("time.sleep")
-    @patch("time.time")
+    @patch("bietlejuice.base.api.rate_limit.header_adapter.time.sleep")
+    @patch("bietlejuice.base.api.rate_limit.header_adapter.time.time")
     def test_wait_if_needed_proactive_wait(self, mock_time, mock_sleep):
         """Tests proactive waiting when the remaining request limit is reached."""
         mock_time.return_value = 1000.0
@@ -31,8 +31,8 @@ class TestHeaderRateLimitAdapter(unittest.TestCase):
         mock_sleep.assert_called_once()
         self.assertAlmostEqual(mock_sleep.call_args[0][0], 10.1)
 
-    @patch("time.sleep")
-    @patch("time.time")
+    @patch("bietlejuice.base.api.rate_limit.header_adapter.time.sleep")
+    @patch("bietlejuice.base.api.rate_limit.header_adapter.time.time")
     def test_wait_if_needed_no_wait(self, mock_time, mock_sleep):
         """Tests that there is no waiting if the remaining request limit is above the threshold."""
         mock_time.return_value = 1000.0
@@ -52,7 +52,7 @@ class TestHeaderRateLimitAdapter(unittest.TestCase):
         self.assertEqual(self.adapter.rate_limit_remaining, 100)
         self.assertEqual(self.adapter.rate_limit_reset_time, 1700000000)
 
-    @patch("time.time")
+    @patch("bietlejuice.base.api.rate_limit.header_adapter.time.time")
     def test_update_rate_limit_from_headers_relative_seconds(self, mock_time):
         """Tests updating the rate limit from relative seconds."""
         mock_time.return_value = 1000.0
@@ -63,7 +63,7 @@ class TestHeaderRateLimitAdapter(unittest.TestCase):
         self.assertEqual(self.adapter.rate_limit_remaining, 50)
         self.assertEqual(self.adapter.rate_limit_reset_time, 1060.0)
 
-    @patch("time.sleep")
+    @patch("bietlejuice.base.api.rate_limit.header_adapter.time.sleep")
     def test_send_handles_429_with_retry_after(self, mock_sleep):
         """Tests reactive handling of a 429 response with a Retry-After header."""
         mock_request = requests.PreparedRequest()
