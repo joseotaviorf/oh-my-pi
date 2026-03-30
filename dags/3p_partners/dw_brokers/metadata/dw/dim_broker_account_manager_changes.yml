@@ -1,0 +1,65 @@
+database_name: dw_brokers
+table_name: dim_broker_account_manager_changes
+description: |
+  Data warehouse dimension of HubSpot account manager (owner) assignment periods per broker. Rows are
+  derived from distinct id_hubspot_owner changes in datalake_brokers.hubspot_brokers_history, versioned
+  per broker and resolved to person SK via datalake_hubspot.owner and datalake_person.person_sks.
+domain: 3P Partners
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_account_manager_change:
+    lineage:
+      - datalake_brokers.hubspot_brokers_history.sk_broker
+      - datalake_person.person_sks.id_person
+    description: |
+      Surrogate string key for the broker-owner assignment period, built from sk_broker, COALESCE(id_person, -1),
+      and sequential version within the broker.
+  sk_broker:
+    lineage:
+      - datalake_brokers.hubspot_brokers_history.sk_broker
+    description: Surrogate key of the broker for this account manager period.
+  sk_person_account_manager:
+    lineage:
+      - datalake_person.person_sks.sk_person
+    description: |
+      Surrogate key of the HubSpot owner mapped to Person when available; -1 when no mapping exists,
+      consistent with dim_brokers.
+  version:
+    lineage:
+      - datalake_brokers.hubspot_brokers_history.ts_updated
+    description: |
+      Sequential version of the account manager assignment for the broker, ordered by ts_updated at the
+      time of each distinct owner change.
+  is_current:
+    lineage:
+      - datalake_brokers.hubspot_brokers_history.ts_updated
+    description: |
+      True when this row is the latest assignment period for the broker (no later ts_updated in the
+      filtered change stream).
+  has_3p_access_control:
+    description: |
+      Boolean flag indicating that this row is subject to 3P Partners access control policies; always true
+      in this table.
+  ts_start:
+    lineage:
+      - datalake_brokers.hubspot_brokers_history.ts_updated
+    description: Start timestamp of the account manager period (first observation of this owner for the broker).
+  ts_end:
+    lineage:
+      - datalake_brokers.hubspot_brokers_history.ts_updated
+    description: |
+      End timestamp of the period (start of the next owner change); null while the assignment is current.
+  ts_load:
+    description: Timestamp when this DW row was loaded by the ETL process.
+  year:
+    lineage:
+      - datalake_brokers.hubspot_brokers_history.ts_updated
+    description: Partition year from period start (ts_start).
+  month:
+    lineage:
+      - datalake_brokers.hubspot_brokers_history.ts_updated
+    description: Partition month from period start (ts_start).
+  day:
+    lineage:
+      - datalake_brokers.hubspot_brokers_history.ts_updated
+    description: Partition day from period start (ts_start).
