@@ -4,12 +4,8 @@ dag:
   schedule_start_date: 2026, 2, 11
   documentation:
     dag_purpose: |
-      People DW layer for organization structure.
-      Holds dimension tables that describe organizational entities (e.g. jobs, cost centers, business units).
-      No sensitive or PII data. Currently restricted to the people team; will be made available
-      to the entire QuintoAndar once the DW tables are validated.
-      dim_cost_center projects datalake_people.cost_center_history (SCD Type 2 built in enrich) and adds sk_cost_center_version; other tables may use SCD Type 1.
-      Tables are designed to join primarily to dw_people.fact_employee for reporting and analytics.
+      People Data Warehouse — organization structure. Delivers dimensions for business units, cost centers, jobs, and related org reference data for People.
+      No sensitive or PII content. Access is limited to the people-analytics team until broader publication is approved.
 cluster:
   type: databricks_16_4_small_memory_people_cluster
   access_control_list:

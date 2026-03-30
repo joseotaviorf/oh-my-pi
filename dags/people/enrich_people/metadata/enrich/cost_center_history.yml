@@ -4,15 +4,12 @@ table_name: cost_center_history
 owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: |
-  Cost center history; Each row is one version of a cost center with a validity interval (dt_valid_from, dt_valid_to).
-  A new version is created only when any attribute changes; Consecutive periods with identical attributes are consolidated into a single row.
-  The table is an integrated history from two origins.
-  (1) PIN (HR): organization, cost_center_code, cost_center_name, is_active, and HRBPs (assignment responsibility — the business partner responsible for the cost center per period).
-  (2) Codex (datalake_people.codex_log, ultimately from gsheets_people clean): business, product, brand, vertical, structure, team, chapter, line, owners, headcount_type.
-  The validity interval is the intersection of the cost center effective period (PIN), the codex version period (codex_log), and the assignment responsibility period (PIN).
-  The table does not define a surrogate version key; natural keys and validity dates identify each row.
-  Use is_current = TRUE for versions still open under merge rules; End date dt_valid_to is 9999-12-31 when the version has no effective end in the integrated merge output.
+  Cost centers over time: code, name, reporting hierarchy fields (business, product, brand, structure, team, chapter, line, owner levels, headcount type), HRBP assignment and person identifiers, active flag, and the calendar period each configuration was valid.
+  Each row is one version of that content; align other tables to a row using the validity dates. is_current = true with dt_valid_to = 9999-12-31 marks versions that are still open in this table.
+  Slowly changing Type 2 in enrich: one row per cost center version (sk_cost_center_version), from dt_valid_from through dt_valid_to.
 columns:
+  sk_cost_center_version:
+    description: Unique surrogate key for this cost center version row. Use as the foreign key from facts and snapshots that store cost center version.
   id_organization:
     description: Organization identifier (same value across versions of the same org node in PIN).
     lineage:

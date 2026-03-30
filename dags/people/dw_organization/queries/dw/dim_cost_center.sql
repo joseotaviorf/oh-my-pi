@@ -1,11 +1,5 @@
 SELECT
-    MD5(
-        CONCAT(
-            CAST(h.id_organization AS STRING),
-            '|',
-            CAST(h.dt_valid_from AS STRING)
-        )
-    ) AS sk_cost_center_version,
+    h.sk_cost_center_version,
     h.cost_center_code,
     h.id_organization,
     h.sk_business_partner_assignment,

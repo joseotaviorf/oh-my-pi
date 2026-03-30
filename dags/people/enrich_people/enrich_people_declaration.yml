@@ -40,6 +40,7 @@ workflow:
       - assignment_termination
       - management_hierarchy
       - job_with_salary_table
+      - cost_center_history
     codex_log:
       - codex_history_base
       - identifier_mapping

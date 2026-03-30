@@ -269,6 +269,7 @@ SELECT
             CAST(jwst.dt_valid_from AS STRING)
         )
     ) AS sk_job_version,
+    cc.sk_cost_center_version,
     mh.sk_hierarchy_version,
     ted.id_event_definition AS sk_termination_event_definition,
     DATE_FORMAT(ad.dt_started, 'yyyyMMdd') AS sk_hired_date,
@@ -363,12 +364,20 @@ LEFT JOIN
         AND irc.dt_reference = ad.dt_reference
 LEFT JOIN
     datalake_people.job_with_salary_table AS jwst
-        ON jwst.id_job = ca.id_job
-        AND ad.dt_reference >= jwst.dt_valid_from
-        AND ad.dt_reference <= COALESCE(
-            NULLIF(jwst.dt_valid_to, DATE('4712-12-31')),
-            DATE('9999-12-31')
-        )
+    ON jwst.id_job = ca.id_job
+    AND ad.dt_reference >= jwst.dt_valid_from
+    AND ad.dt_reference <= COALESCE(
+        NULLIF(jwst.dt_valid_to, DATE('4712-12-31')),
+        DATE('9999-12-31')
+    )
+LEFT JOIN
+    datalake_people.cost_center_history AS cc
+    ON cc.id_organization = ca.id_organization
+    AND ad.dt_reference >= cc.dt_valid_from
+    AND ad.dt_reference <= COALESCE(
+        NULLIF(cc.dt_valid_to, DATE('4712-12-31')),
+        DATE('9999-12-31')
+    )
 LEFT JOIN
     datalake_pin_core_clean.people_extra_info AS pei
         ON pei.id_person = ad.id_person
@@ -384,6 +393,7 @@ QUALIFY
             ad.id_assignment,
             ad.dt_reference
         ORDER BY
+            cc.sk_cost_center_version NULLS LAST,
             pei.id_person_extra_info NULLS LAST,
             jwst.dt_valid_from DESC NULLS LAST
     ) = 1

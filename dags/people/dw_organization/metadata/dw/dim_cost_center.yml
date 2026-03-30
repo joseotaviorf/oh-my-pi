@@ -4,17 +4,14 @@ table_name: dim_cost_center
 owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: |
-  Cost center dimension (SCD Type 2) as a thin projection of datalake_people.cost_center_history.
-  Merge of consecutive periods, primary-organization resolution, and integrated PIN + Codex + assignment-responsibility
-  validity windows are implemented in enrich; this table adds the version surrogate key sk_cost_center_version as
-  MD5(CONCAT(CAST(id_organization AS STRING), '|', CAST(dt_valid_from AS STRING))) so existing fact joins remain stable.
-  Use is_current = TRUE for the open-ended version; dt_valid_to is 9999-12-31 when still current (same as enrich output).
+  Cost center dimension: codes, names, reporting attributes, HRBP keys, activity, and validity dates for each version of a cost center.
+  Each row is one complete attribute set for a version; use is_current and the validity dates to take current attributes only or to time-travel attributes.
+  Slowly changing dimension Type 2: one row per sk_cost_center_version, each with its own validity window.
 columns:
   sk_cost_center_version:
     description: Versioned surrogate key for the cost center version (MD5 of id_organization and dt_valid_from).
     lineage:
-      - datalake_people.cost_center_history.id_organization
-      - datalake_people.cost_center_history.dt_valid_from
+      - datalake_people.cost_center_history.sk_cost_center_version
   cost_center_code:
     description: PIN code that identifies each cost center.
     lineage:

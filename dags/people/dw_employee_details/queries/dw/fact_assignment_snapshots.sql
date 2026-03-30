@@ -1,6 +1,6 @@
 SELECT
-    COALESCE(cc.sk_cost_center_version, '-1') AS sk_cost_center_version,
-    COALESCE(j.sk_job_version, '-1') AS sk_job_version,
+    COALESCE(asn.sk_cost_center_version, '-1') AS sk_cost_center_version,
+    COALESCE(asn.sk_job_version, '-1') AS sk_job_version,
     COALESCE(ct.sk_contact_version, '-1') AS sk_contact_version,
     COALESCE(doc.sk_documentation_version, '-1') AS sk_documentation_version,
     COALESCE(ec.sk_emergency_contact_version, '-1') AS sk_emergency_contact_version,
@@ -32,22 +32,6 @@ SELECT
     CURRENT_TIMESTAMP() AS ts_load
 FROM
     datalake_people.assignment_snapshots AS asn
-LEFT JOIN
-    dw_organization.dim_cost_center AS cc
-        ON cc.id_organization = asn.id_organization
-        AND asn.dt_reference >= cc.dt_valid_from
-        AND asn.dt_reference <= COALESCE(
-            NULLIF(cc.dt_valid_to, DATE('4712-12-31')),
-            DATE('9999-12-31')
-        )
-LEFT JOIN
-    dw_compensation.dim_job AS j
-        ON j.id_job = asn.id_job
-        AND asn.dt_reference >= j.dt_valid_from
-        AND asn.dt_reference <= COALESCE(
-            NULLIF(j.dt_valid_to, DATE('4712-12-31')),
-            DATE('9999-12-31')
-        )
 LEFT JOIN
     dw_employee_details.dim_contact AS ct
         ON ct.person_number = asn.person_number

@@ -216,6 +216,13 @@ contiguous_validity_periods AS (
         with_prev_dt_valid_to
 )
 SELECT
+    MD5(
+        CONCAT(
+            CAST(id_organization AS STRING),
+            '|',
+            CAST(MIN(dt_valid_from) AS STRING)
+        )
+    ) AS sk_cost_center_version,
     id_organization,
     cost_center_code,
     sk_business_partner_assignment,

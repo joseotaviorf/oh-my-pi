@@ -3,23 +3,18 @@ table_name: fact_assignment_snapshots
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |
-  Daily snapshot of employee work assignments. One row per employee per assignment per day.
-  Use for headcount by date, tenure analysis, admission and exit reporting.
-  Base data comes from datalake_people.assignment_snapshots (enrich layer). This fact adds
-  sk_cost_center_version, sk_job_version, sk_contact_version, sk_documentation_version,
-  sk_emergency_contact_version from DW dimension tables.
-  Grain: (assignment_number, dt_reference).
-  To get cost center name, job title, or contact details, use the sk_* columns to link to the corresponding dimension tables.
-  For manager details and hierarchy attributes, use sk_hierarchy_version to join to dim_management_hierarchy.
+  Workforce assignments as of each calendar day: person and assignment identifiers, tenure, direct and indirect report counts, leadership and activity flags, hire and termination dates, and surrogate keys to job, cost center, contact, documentation, emergency contact, and hierarchy dimensions.
+  Supports headcount by date, tenure, admissions and exits, and org context; dimension labels and PII-heavy attributes are read via the sk_* columns on this table.
+  Daily snapshot fact: one row per assignment_number and dt_reference (not an SCD table; each row is a point-in-time slice).
 columns:
   sk_cost_center_version:
     description: Cost center identifier. Use to get cost center name and details from dim_cost_center.
     lineage:
-      - dw_organization.dim_cost_center.sk_cost_center_version
+      - datalake_people.assignment_snapshots.sk_cost_center_version
   sk_job_version:
     description: Job identifier. Use to get job title and details from dim_job.
     lineage:
-      - dw_compensation.dim_job.sk_job_version
+      - datalake_people.assignment_snapshots.sk_job_version
   sk_contact_version:
     description: Contact info identifier. Use to get email, phone, and address from dim_contact.
     lineage:
