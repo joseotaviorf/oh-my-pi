@@ -35,6 +35,9 @@ def test_save_volume_metric_writes_aggregated_rows_for_non_empty_df():
     with patch(
         "bietlejuice.base.sst.core.observability.metrics.validate_and_write"
     ) as mock_validate_and_write, patch(
+        "bietlejuice.base.sst.core.observability.metrics.F.coalesce",
+        return_value=DummyExpr(),
+    ), patch(
         "bietlejuice.base.sst.core.observability.metrics.F.count",
         return_value=DummyExpr(),
     ), patch(
@@ -81,6 +84,9 @@ def test_save_volume_metric_writes_zero_row_metric_for_empty_df():
     with patch(
         "bietlejuice.base.sst.core.observability.metrics.validate_and_write"
     ) as mock_validate_and_write, patch(
+        "bietlejuice.base.sst.core.observability.metrics.F.coalesce",
+        return_value=DummyExpr(),
+    ), patch(
         "bietlejuice.base.sst.core.observability.metrics.F.count",
         return_value=DummyExpr(),
     ), patch(
