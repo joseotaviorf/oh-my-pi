@@ -16,6 +16,7 @@ workflow:
   database_type: mysql
   dbutils_secret_key: DEVLAKE_DB
   lineage_product_database_name: devlake
+  custom_schema: devlake
   tables_customization:
     pull_requests:
       raw_primary_keys: [id]
