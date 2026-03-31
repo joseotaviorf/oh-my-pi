@@ -11,5 +11,3 @@ SELECT
     day
 FROM
     datalake_text2filter_evals_raw.text2filter_evals
-WHERE
-    MAKE_DATE(year, month, day) = MAKE_DATE({year}, {month}, {day})
