@@ -117,6 +117,8 @@ def salesforce_clean_pipeline(spark, cfg):
     logger.info(
         f"m=salesforce_clean_pipeline, msg=Metadata retrieved: {cfg.target_schema=}"
     )
+
+    new_cols = sensor_for_new_columns(spark=spark, df=snapshot, table=target_table)
     partition_filter = f"partition_date='{cfg.partition_date}' AND partition_hour='{cfg.partition_hour}'"
     validate_and_write(
         spark,
@@ -127,7 +129,6 @@ def salesforce_clean_pipeline(spark, cfg):
         overwrite_schema=True,
     )
 
-    new_cols = sensor_for_new_columns(spark=spark, df=snapshot, table=target_table)
     if new_cols:
         logger.info(
             f"m=salesforce_clean_pipeline, msg=New columns detected: {new_cols}"

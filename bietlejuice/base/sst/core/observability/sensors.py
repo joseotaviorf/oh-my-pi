@@ -19,7 +19,14 @@ def sensor_for_new_columns(spark, df, table) -> List[str]:
 
     Mirrors the "updates" diff used by `_safe_merge_schema`:
     columns present in `df` but absent from the existing target table schema.
+    Returns an empty list when the table does not yet exist (first run).
     """
+    if not _table_exists(spark, table):
+        logger.info(
+            f"m=sensor_for_new_columns, msg=Table does not exist yet, skipping diff, table={table}"
+        )
+        return []
+
     target_table = spark.read.table(table)
     updates = set(df.columns) - set(target_table.columns)
 
