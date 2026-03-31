@@ -25,7 +25,7 @@ def save_volume_metric(
     write_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     _metric = (
         df.groupby(grain)
-        .agg(F.coalesce(F.count("*").cast("long"), F.lit(0)).alias("row_count"))
+        .agg(F.coalesce(F.count("*").cast("bigint"), F.lit(0)).alias("row_count"))
         .withColumn("metric_name", F.lit(metric_name))
         .withColumn("source_table", F.lit(table_name))
         .withColumn("metric_category", F.lit("volume"))
