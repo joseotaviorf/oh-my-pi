@@ -3764,7 +3764,6 @@ bietlejuice.enrich_sap_accounting_process:
   - bietlejuice.enrich_accounting_funnel:load-enrich-ledger:first-run-of-day
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges-recupera:first-run-of-day
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges:first-run-of-day
-  - bietlejuice.enrich_public_date:load-enrich-aux-date:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-entry:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice-info:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day

@@ -764,7 +764,7 @@ bietlejuice.enrich_sale_visit_hubs:
   add:
     - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
 bietlejuice.enrich_sap_accounting_process:
-  add:
+  remove:
     - bietlejuice.enrich_public_date:load-enrich-aux-date:first-run-of-day
 bietlejuice.enrich_satisfaction_rating:
   remove:
