@@ -105,3 +105,24 @@ skip_list:
   - datalake_amplitude_clean.events
   - datalake_amplitude_events_clean.events
   - datalake_amplitude_backup_clean.events
+  - sandbox.base_final
+  - sandbox.base_funil
+  - sandbox.base_funnel_payment
+  - sandbox.base_rent
+  - sandbox.base_sale
+  - sandbox.ciq_embaixadores_funnel_payment
+  - sandbox.consultant_rent
+  - sandbox.consultant_sale
+  - sandbox.contract_rent
+  - sandbox.daily_sale
+  - sandbox.dates
+  - sandbox.dim_listing_rent
+  - sandbox.dim_listing_sale
+  - sandbox.grouped_rent
+  - sandbox.grouped_sale
+  - sandbox.house_parsed
+  - sandbox.integrity_engine_embaixadores
+  - sandbox.rent_status
+  - sandbox.sale_status
+  - sandbox.supply
+  - sandbox.vw_planning_performance_fact_daily_target_normalized
