@@ -271,39 +271,183 @@ off_tickets AS (
     ROW_NUMBER() OVER (PARTITION BY sk_contract, off_area ORDER BY ts_started DESC) = 1
 ),
 recontact_drilldown_d4 AS (
-  SELECT 
+SELECT
     tp.sk_ticket,
-    DATE_SUB(CAST(tp.ts_started AS DATE), 3) AS recontact_search_window_from,
+    -- Spark: date_add(data, dias)
+    date_add(to_date(tp.ts_started), -3) AS recontact_search_window_from,
     tp.ts_started AS recontact_search_window_until,
-    -- Recontact Flag
-    IF(DATEDIFF(CAST(tp.ts_started AS DATE), LAG(CAST(tp.ts_started AS DATE)) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started)) <= 4 
-       AND tp.ts_started != LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started), 1, 0) AS recontact_flag,
-    -- Theme Recontact Flag
-    IF(tp.theme IS NOT NULL AND DATEDIFF(CAST(tp.ts_started AS DATE), LAG(CAST(tp.ts_started AS DATE)) OVER (PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme ORDER BY tp.ts_started)) <= 4 
-       AND tp.ts_started != LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started), 1, 0) AS theme_recontact_flag,
-    -- FCR Flag (Lead)
-    IF(DATEDIFF(LEAD(CAST(tp.ts_started AS DATE)) OVER (PARTITION BY tp.sk_user, tp.last_team ORDER BY tp.ts_started), CAST(tp.ts_started AS DATE)) <= 4
-       AND tp.sk_ticket != LEAD(tp.sk_ticket) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started)
-       AND tp.ts_started != LEAD(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started), 1, 0) AS recontact_fcr_flag,
-        -- Recontact Flag D0
-    IF(DATEDIFF(CAST(tp.ts_started AS DATE), LAG(CAST(tp.ts_started AS DATE)) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started)) = 0 
-       AND tp.ts_started != LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started), 1, 0) AS recontact_flag_d0,
-        -- Theme Recontact Flag D0
-    IF(tp.theme IS NOT NULL AND DATEDIFF(CAST(tp.ts_started AS DATE), LAG(CAST(tp.ts_started AS DATE)) OVER (PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme ORDER BY tp.ts_started)) = 0 
-       AND tp.ts_started != LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started), 1, 0) AS theme_recontact_flag_D0,      
-    LAG(tp.sk_ticket) OVER (PARTITION BY tp.sk_user, tp.last_team, tp.theme ORDER BY tp.ts_started) AS previous_contact_sk_ticket,
-    LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user, tp.last_team, tp.theme ORDER BY tp.ts_started) AS previous_contact_ts_started,
-    LAG(tp.channel) OVER (PARTITION BY tp.sk_user, tp.last_team, tp.theme ORDER BY tp.ts_started) AS previous_contact_channel,
-    LAG(tp.theme) OVER (PARTITION BY tp.sk_user, tp.last_team, tp.theme ORDER BY tp.ts_started) AS previous_contact_theme,
-    LAG(tp.first_csat_score) OVER (PARTITION BY tp.sk_user, tp.last_team, tp.theme ORDER BY tp.ts_started) AS previous_contact_csat,
-    DATEDIFF(CAST(tp.ts_started AS DATE), LAG(CAST(tp.ts_started AS DATE)) OVER (PARTITION BY tp.sk_user, tp.last_team, tp.theme ORDER BY tp.ts_started)) AS days_since_last_contact
+
+    -- =========================
+    -- Recontact (geral) - OFICIAL (LEAD até D+4)
+    -- =========================
+    CASE
+      -- Spark datediff(fim, inicio) retorna a diferença em dias
+      WHEN datediff(
+             LEAD(to_date(tp.ts_started)) OVER (
+               PARTITION BY tp.sk_user_contract, tp.last_team
+               ORDER BY tp.ts_started, tp.sk_ticket
+             ),
+             to_date(tp.ts_started)
+           ) <= 4
+      THEN
+        CASE
+          WHEN tp.sk_ticket <> LEAD(tp.sk_ticket) OVER (
+                  PARTITION BY tp.sk_user_contract, tp.last_team
+                  ORDER BY tp.ts_started, tp.sk_ticket
+                )
+          THEN 1 ELSE 0
+        END
+      ELSE 0
+    END AS recontact_flag,
+
+    -- =========================
+    -- Recontact por theme - OFICIAL (LEAD até D+4)
+    -- =========================
+    CASE
+      WHEN tp.theme IS NULL THEN 0
+      WHEN datediff(
+             LEAD(to_date(tp.ts_started)) OVER (
+               PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme
+               ORDER BY tp.ts_started, tp.sk_ticket
+             ),
+             to_date(tp.ts_started)
+           ) <= 4
+      THEN
+        CASE
+          WHEN tp.sk_ticket <> LEAD(tp.sk_ticket) OVER (
+                  PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme
+                  ORDER BY tp.ts_started, tp.sk_ticket
+                )
+           AND tp.ts_started <> LEAD(tp.ts_started) OVER (
+                  PARTITION BY tp.sk_user_contract, tp.last_team
+                  ORDER BY tp.ts_started, tp.sk_ticket
+                )
+          THEN 1 ELSE 0
+        END
+      ELSE 0
+    END AS theme_recontact_flag,
+
+    -------------------- D0
+    CASE
+      WHEN tp.theme IS NULL THEN 0
+      WHEN datediff(
+             LEAD(to_date(tp.ts_started)) OVER (
+               PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme
+               ORDER BY tp.ts_started, tp.sk_ticket
+             ),
+             to_date(tp.ts_started)
+           ) = 0
+      THEN
+        CASE
+          WHEN tp.sk_ticket <> LEAD(tp.sk_ticket) OVER (
+                  PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme
+                  ORDER BY tp.ts_started, tp.sk_ticket
+                )
+           AND tp.ts_started <> LEAD(tp.ts_started) OVER (
+                  PARTITION BY tp.sk_user_contract, tp.last_team
+                  ORDER BY tp.ts_started, tp.sk_ticket
+                )
+          THEN 1 ELSE 0
+        END
+      ELSE 0
+    END AS theme_recontact_flag_D0,
+
+    -- =========================
+    -- Recontact por theme usando ts_started_new
+    -- =========================
+    CASE
+      WHEN tp.theme IS NULL THEN 0
+      WHEN datediff(
+             LEAD(to_date(tp.ts_started_new)) OVER (
+               PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme
+               ORDER BY tp.ts_started_new, tp.sk_ticket
+             ),
+             to_date(tp.ts_started_new)
+           ) <= 4
+      THEN
+        CASE
+          WHEN tp.sk_ticket <> LEAD(tp.sk_ticket) OVER (
+                  PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme
+                  ORDER BY tp.ts_started_new, tp.sk_ticket
+                )
+           AND tp.ts_started_new <> LEAD(tp.ts_started_new) OVER (
+                  PARTITION BY tp.sk_user_contract, tp.last_team
+                  ORDER BY tp.ts_started_new, tp.sk_ticket
+                )
+          THEN 1 ELSE 0
+        END
+      ELSE 0
+    END AS theme_recontact_flag_new,
+
+    -- =========================
+    -- Flag ligada ao FCR
+    -- =========================
+    CASE
+      WHEN datediff(
+             LEAD(to_date(tp.ts_started)) OVER (
+               PARTITION BY tp.sk_user_contract, tp.last_team
+               ORDER BY tp.ts_started, tp.sk_ticket
+             ),
+             to_date(tp.ts_started)
+           ) <= 4
+      THEN
+        CASE
+          WHEN tp.sk_ticket <> LEAD(tp.sk_ticket) OVER (
+                  PARTITION BY tp.sk_user_contract, tp.last_team
+                  ORDER BY tp.ts_started, tp.sk_ticket
+                )
+           AND tp.ts_started <> LEAD(tp.ts_started) OVER (
+                  PARTITION BY tp.sk_user_contract, tp.last_team
+                  ORDER BY tp.ts_started, tp.sk_ticket
+                )
+          THEN 1 ELSE 0
+        END
+      ELSE 0
+    END AS recontact_fcr_flag,
+
+    -- =========================
+    -- Campos do "próximo contato" (LEAD)
+    -- =========================
+    LEAD(tp.sk_ticket) OVER (
+      PARTITION BY tp.sk_user_contract, tp.last_team
+      ORDER BY tp.ts_started, tp.sk_ticket
+    ) AS previous_contact_sk_ticket,
+
+    LEAD(tp.ts_started) OVER (
+      PARTITION BY tp.sk_user_contract, tp.last_team
+      ORDER BY tp.ts_started, tp.sk_ticket
+    ) AS previous_contact_ts_started,
+
+    LEAD(tp.channel) OVER (
+      PARTITION BY tp.sk_user_contract, tp.last_team
+      ORDER BY tp.ts_started, tp.sk_ticket
+    ) AS previous_contact_channel,
+
+    LEAD(tp.theme) OVER (
+      PARTITION BY tp.sk_user_contract, tp.last_team
+      ORDER BY tp.ts_started, tp.sk_ticket
+    ) AS previous_contact_theme,
+
+    LEAD(tp.first_csat_score) OVER (
+      PARTITION BY tp.sk_user_contract, tp.last_team
+      ORDER BY tp.ts_started, tp.sk_ticket
+    ) AS previous_contact_csat,
+
+    datediff(
+      LEAD(to_date(tp.ts_started)) OVER (
+        PARTITION BY tp.sk_user_contract, tp.last_team
+        ORDER BY tp.ts_started, tp.sk_ticket
+      ),
+      to_date(tp.ts_started)
+    ) AS days_since_last_contact
+
   FROM tickets_perspective AS tp
-  WHERE 
+  WHERE
     tp.refined_direction = 'INBOUND'
     AND tp.last_department NOT IN ('Welcome Onboarding [BACK] [POS]', 'CX Welcome Onboarding [FRONT][POS]')
     AND tp.channel IN ('call', 'chat','email')
-    AND tp.sk_user IS NOT NULL
-    AND tp.sk_user > 0
+    AND tp.sk_user_contract IS NOT NULL
+    AND tp.sk_user_contract > 0
 ),
 pp_multi AS (
   SELECT   
@@ -459,11 +603,9 @@ SELECT
   tp.tipo_de_demanda,
   tp.tipo_de_processo,
   tp.tarefa_partners,
-  rd4.recontact_search_window_from AS recontact_search_window_from_d4,
-  rd4.recontact_flag AS recontact_flag_d4,
-  rd4.recontact_flag_d0 AS recontact_flag_d0,
-  rd4.theme_recontact_flag AS theme_recontact_flag_d4,
-  rd4.theme_recontact_flag_d0 as theme_recontact_flag_d0,
+  rd4.recontact_search_window_from           AS recontact_search_window_from_d4,
+  rd4.theme_recontact_flag                   AS theme_recontact_flag_d4,
+  rd4.theme_recontact_flag_d0                AS theme_recontact_flag_d0,
   ppm.is_pp_multi,
   IF(tp.tags LIKE '%closed_by_merge%', 1, 0) as is_closed_by_merge,
   spoc.spoc_class,
