@@ -1,0 +1,52 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: backoffice_journey_status
+owner: vinicius.vargas@quintoandar.com.br
+domain: For Sale
+description: "Tracks the backoffice journey onboarding status for buyers and sellers
+  in a sales flow, recording when each party completed the onboarding process."
+columns:
+  id:
+    description: 'Id of the backoffice journey status record.'
+    lineage:
+      - datalake_sales_flow_raw.backoffice_journey_status.id
+  id_sales_flow:
+    description: 'Id of the associated sales flow.'
+    lineage:
+      - datalake_sales_flow_raw.backoffice_journey_status.sales_flow_id
+  is_buyer_onboarded:
+    description: 'Flag indicating whether the buyer has completed onboarding.'
+    lineage:
+      - datalake_sales_flow_raw.backoffice_journey_status.is_buyer_onboarded
+  is_seller_onboarded:
+    description: 'Flag indicating whether the seller has completed onboarding.'
+    lineage:
+      - datalake_sales_flow_raw.backoffice_journey_status.is_seller_onboarded
+  ts_buyer_onboarding_concluded:
+    description: 'Timestamp when the buyer completed the onboarding process.'
+    lineage:
+      - datalake_sales_flow_raw.backoffice_journey_status.buyer_onboarding_concluded_at
+  ts_seller_onboarding_concluded:
+    description: 'Timestamp when the seller completed the onboarding process.'
+    lineage:
+      - datalake_sales_flow_raw.backoffice_journey_status.seller_onboarding_concluded_at
+  ts_created:
+    description: 'Timestamp of the creation of the record.'
+    lineage:
+      - datalake_sales_flow_raw.backoffice_journey_status.created_at
+  ts_updated:
+    description: 'Timestamp of the last update of the record.'
+    lineage:
+      - datalake_sales_flow_raw.backoffice_journey_status.updated_at
+  year:
+    description: 'Year of the record.'
+    lineage:
+      - datalake_sales_flow_raw.backoffice_journey_status.year
+  month:
+    description: 'Month of the record.'
+    lineage:
+      - datalake_sales_flow_raw.backoffice_journey_status.month
+  day:
+    description: 'Day of the record.'
+    lineage:
+      - datalake_sales_flow_raw.backoffice_journey_status.day
