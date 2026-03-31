@@ -119,7 +119,7 @@ SELECT
 ),
 errors_base AS (
   SELECT
-    m.id_feature AS id_business_entity,
+    m.id_external_offer AS id_business_entity,
     COALESCE(m.id_finance_entity, sl.id_finance_entity) AS id_finance_entity,
     CAST(NULL AS INT) AS id_finance_entity_entry,
     CAST(NULL AS STRING) AS version,

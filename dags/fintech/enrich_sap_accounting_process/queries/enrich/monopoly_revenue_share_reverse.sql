@@ -98,6 +98,7 @@ sap_ledger AS (
 SELECT
     l.id_finance_entity,
     l.id_finance_entity_entry,
+    l.id_business_entity,
     l.account_number,
     sg.id_feature,
     l.accrual_year_month,
@@ -112,11 +113,11 @@ SELECT
   WHERE 1=1
     AND dt_reference >= DATE('2025-01-01')
     AND account_number IN ('700006','700007','700013')
-  GROUP BY 1, 2, 3, 4, 5, 6
+  GROUP BY 1, 2, 3, 4, 5, 6, 7
 )
   SELECT
     ('RE-MNPL-RS-' || sl.id_finance_entity_entry || '-' || COALESCE(sl.account_number, '')) id_accounting_process, 
-    sl.id_feature AS id_business_entity,
+    sl.id_business_entity AS id_business_entity,
     sl.id_finance_entity AS id_finance_entity,
     sl.id_finance_entity_entry,
     CAST(NULL AS STRING) AS version,
