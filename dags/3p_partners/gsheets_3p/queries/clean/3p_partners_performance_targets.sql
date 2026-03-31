@@ -35,6 +35,7 @@ SELECT
     CAST(NULLIF(bps_totais, '') AS DOUBLE) AS bps_totais,
     CAST(NULLIF(nbp_unicos, '') AS DOUBLE) AS nbp_unicos,
     CAST(NULLIF(rbp_unicos, '') AS DOUBLE) AS rbp_unicos,
+    CAST(NULLIF(visita_avulsa_unicos, '') AS DOUBLE) AS visita_avulsa_unicos,
     TRUE AS has_3p_access_control,
     NULLIF(month, '') AS dt_month,
     NULLIF(day, '') AS dt_day,

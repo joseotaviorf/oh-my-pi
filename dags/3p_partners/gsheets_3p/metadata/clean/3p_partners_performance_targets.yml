@@ -149,6 +149,10 @@ columns:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.rbp_unicos
     description: The number of unique rBPs (Recovered Buyer Prospects) targeted.
+  visita_avulsa_unicos:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.visita_avulsa_unicos
+    description: The number of unique single visits targeted.
   has_3p_access_control:
     description: >
       Boolean flag indicating that this event is subject to 3P Partners access control policies.
