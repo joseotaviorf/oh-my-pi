@@ -1,7 +1,7 @@
 import json
 import logging
 from argparse import ArgumentParser
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -76,12 +76,11 @@ def main() -> None:
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     dt_execution = datetime.strptime(date_to_ingest, "%Y-%m-%d")
-    source_date = dt_execution - timedelta(days=1)
     full_source_path = (
         f"{source_root_path}/"
-        f"year={source_date.year}/"
-        f"month={source_date.month}/"
-        f"day={source_date.day}/"
+        f"year={dt_execution.year}/"
+        f"month={dt_execution.month}/"
+        f"day={dt_execution.day}/"
     )
 
     logger.info(f"m=main, msg=Reading parquet from {full_source_path}")
