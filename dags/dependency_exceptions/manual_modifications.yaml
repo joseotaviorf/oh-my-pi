@@ -498,6 +498,8 @@ bietlejuice.enrich_growth_taxonomy:
     - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
 bietlejuice.enrich_health_metrics:
   override: []
+bietlejuice.enrich_hubspot_claude_analyses:
+  override: []
 bietlejuice.enrich_people:
   remove:
     - bietlejuice.hr_system_custom:load-clean-workers-registration:first-run-of-day
