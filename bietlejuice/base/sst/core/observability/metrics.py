@@ -62,7 +62,7 @@ def save_volume_metric(
             .withColumn("source_table", F.lit(table_name))
             .withColumn("environment", F.lit(env))
             .withColumn("layer", F.lit(layer))
-            .withColumn("row_count", F.lit(0))
+            .withColumn("row_count", F.lit(0).cast("bigint"))
             .withColumn("_write_timestamp", F.lit(write_timestamp))
             .select(
                 "metric_category",
