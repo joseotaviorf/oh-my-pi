@@ -8,12 +8,20 @@ from py4j.protocol import Py4JError
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.spark.cluster_utils.factory import (
+    get_emr_dbutils_facade,
+    should_use_emr_cluster_utils,
+)
+
 logger = QuintoAndarLogger("base_spark")
 
 
 class BaseDBUtils:
     @logger(exclude_return=True)
     def get_dbutils(self):
+        # EMR: boto3-backed facade (Secrets Manager + S3). Databricks: native DBUtils / notebook dbutils.
+        if should_use_emr_cluster_utils():
+            return get_emr_dbutils_facade()
         try:
             from pyspark.dbutils import DBUtils  # type: ignore
 
