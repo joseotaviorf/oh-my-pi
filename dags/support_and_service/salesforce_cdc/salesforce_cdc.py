@@ -185,7 +185,7 @@ with DAG(
                 "source_schema": "datalake_salesforce_raw",
             },
         ) >> create_sync_metadata_task(
-            schema="datalake_salesforce_clean", 
+            schema="salesforce",
             table_name=f"events_{event.lower()}"
         ) >> end
 
