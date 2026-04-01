@@ -18,6 +18,8 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 
 from bietlejuice.services.configuration_service import ConfigurationService
 from databricks_plugin import (
@@ -32,8 +34,10 @@ DAG_ID = f"bietlejuice.{DAG_NAME.replace('.', '_')}"
 ENV = os.environ.get("ENVIRONMENT")
 CONFIG_SERVICE = ConfigurationService(DAG_NAME)
 DATABRICKS_CONN_ID = "databricks_new"
-BIETLEJUICE_REPO_PATH  = CONFIG_SERVICE.get_config("databricks_bietlejuice_repo_path")
+BIETLEJUICE_REPO_PATH = CONFIG_SERVICE.get_config("databricks_bietlejuice_repo_path")
 BASE_SPARK_JOB_PATH = f"{BIETLEJUICE_REPO_PATH}/spark_jobs/{DAG_NAME}/"
+BASE_SPARK_JOBS_PATH = f"{BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
+RELATIVE_DAG_PATH = "dags/support_and_service/salesforce_cdc"
 
 # Use config and DAG constants so the DAG works without requiring Airflow Variables
 # (bucket/dag_name/environment). Config is loaded per environment (forno_conf vs prod_conf).
@@ -94,6 +98,29 @@ def create_execute_job_cluster_task(dag: DAG, task_id: str):
         libraries=get_libs(ENV),
     )
 
+def create_sync_metadata_task(schema: str, table_name: str):
+    return QuintoAndarDatabricksCheckJobTaskOperator(
+        databricks_conn_id=DATABRICKS_CONN_ID,
+        dag=dag,
+        task_id=f"sync_metadata_{LayerEnum.CLEAN.value}_{table_name}",
+        json={
+            "spark_python_task": {
+                "python_file": f"{BASE_SPARK_JOBS_PATH}sync_metadata.py",
+                "parameters": [
+                    bucket,
+                    LayerEnum.CLEAN.value,
+                    schema,
+                    "--table-name",
+                    table_name,
+                    MetadataTypeEnum.LINEAGE.value,
+                    RELATIVE_DAG_PATH,
+                ],
+            }
+        },
+        execution_timeout=timedelta(minutes=30),
+    )
+
+
 def create_start_end_operator(task_id: str):
 
     start = SStPlaceholderOperator(
@@ -150,15 +177,17 @@ with DAG(
             target_table=f"events_{event.lower()}",
             entry_point="cdc_raw_ingestion",
             parameters=parameters,
-        )>> create_sst_task(
+        ) >> create_sst_task(
             target_schema="datalake_salesforce_clean",
             target_table=f"events_{event.lower()}",
             entry_point="cdc_clean",
             parameters={
                 "source_schema": "datalake_salesforce_raw",
             },
+        ) >> create_sync_metadata_task(
+            schema="datalake_salesforce_clean", 
+            table_name=f"events_{event.lower()}"
         ) >> end
 
 
-
-    start >>  execute_job_cluster
+    start >> execute_job_cluster
