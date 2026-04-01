@@ -28,24 +28,34 @@ columns:
     description: The utm_medium sourced from CDP user_tracking (egw_utm_medium), with referrer_domain fallback for SEO detection when UTMs are null.
     lineage:
       - datalake_cdp_clean.user_tracking.egw_utm_medium
+      - datalake_amplitude_lead.lead_origin.utm_medium
+      - datalake_growth_media_platform.facebook_metrics.utm_medium
   source:
     description: The utm_source sourced from CDP user_tracking (egw_utm_source), with referrer_domain fallback for SEO detection when UTMs are null.
     lineage:
       - datalake_cdp_clean.user_tracking.egw_utm_source
+      - datalake_amplitude_lead.lead_origin.utm_source
+      - datalake_growth_media_platform.facebook_metrics.utm_source
   term:
     description: The utm_term sourced from CDP user_tracking (egw_utm_term).
     lineage:
       - datalake_cdp_clean.user_tracking.egw_utm_term
+      - datalake_amplitude_lead.lead_origin.utm_term
+      - datalake_growth_media_platform.facebook_metrics.utm_term
   content:
     description: The utm_content sourced from CDP user_tracking (egw_utm_content).
     lineage:
       - datalake_cdp_clean.user_tracking.egw_utm_content
+      - datalake_amplitude_lead.lead_origin.utm_content
+      - datalake_growth_media_platform.facebook_metrics.utm_content
   ops_agent:
     description: The operational agent responsible for handling the lead.
     lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   ops_objective:
     description: The objective of the operational agent, derived from ops_agent value.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   ops_partner:
     description: The operational partner associated with the lead.
     lineage:
@@ -58,6 +68,7 @@ columns:
     description: The city associated with the lead's acquisition.
     lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.city
   landing_page:
     description: The landing page URL where the lead first arrived.
     lineage:
@@ -78,6 +89,7 @@ columns:
     description: The platform where the lead was acquired.
     lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.platform
   lead_type:
     description: The type of lead.
     lineage:
@@ -130,22 +142,37 @@ columns:
     description: The source system responsible for the campaign UTM value. Values are cdp or lost_tracking.
     lineage:
       - datalake_cdp_clean.user_tracking.egw_utm_campaign
+      - datalake_amplitude_lead.lead_origin.utm_campaign
+      - datalake_growth_media_platform.facebook_metrics.utm_campaign
+      - datalake_supply_flows.inbound_attribution.id_source_ctwa
   database_tracking_medium:
     description: The source system responsible for the medium UTM value. Values are cdp, cdp_referrer, or lost_tracking.
     lineage:
       - datalake_cdp_clean.user_tracking.egw_utm_medium
+      - datalake_amplitude_lead.lead_origin.utm_medium
+      - datalake_growth_media_platform.facebook_metrics.utm_medium
+      - datalake_supply_flows.inbound_attribution.id_source_ctwa
   database_tracking_source:
     description: The source system responsible for the source UTM value. Values are cdp, cdp_referrer, or lost_tracking.
     lineage:
       - datalake_cdp_clean.user_tracking.egw_utm_source
+      - datalake_amplitude_lead.lead_origin.utm_source
+      - datalake_growth_media_platform.facebook_metrics.utm_source
+      - datalake_supply_flows.inbound_attribution.id_source_ctwa
   database_tracking_content:
     description: The source system responsible for the content UTM value. Values are cdp or lost_tracking.
     lineage:
       - datalake_cdp_clean.user_tracking.egw_utm_content
+      - datalake_amplitude_lead.lead_origin.utm_content
+      - datalake_growth_media_platform.facebook_metrics.utm_content
+      - datalake_supply_flows.inbound_attribution.id_source_ctwa
   database_tracking_term:
     description: The source system responsible for the term UTM value. Values are cdp or lost_tracking.
     lineage:
       - datalake_cdp_clean.user_tracking.egw_utm_term
+      - datalake_amplitude_lead.lead_origin.utm_term
+      - datalake_growth_media_platform.facebook_metrics.utm_term
+      - datalake_supply_flows.inbound_attribution.id_source_ctwa
   database_tracking_ctwa:
     description: The source responsible for the ctwa information.
     lineage:
