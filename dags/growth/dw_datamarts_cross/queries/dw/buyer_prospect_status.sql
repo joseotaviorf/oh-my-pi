@@ -10,19 +10,12 @@ events AS (
         fsf.sk_sale_flow,
         fsf.sk_buyer,
         fsf.sk_region,
-        db.dt_created AS ts_event
+        fv.ts_booking_created AS ts_event
     FROM
-        dw_public.dim_booking AS db
-    JOIN
         dw_sale.fact_visits AS fv
-            USING(sk_booking)
     JOIN
         dw_sale.fact_sale_flows AS fsf
             ON fsf.sk_sale_flow = fv.sk_sale_flow
-    WHERE
-        db.sk_booking > 0
-        AND db.visit_intent = 'SALE'
-        AND db.type = 'Visita'
     UNION ALL
     SELECT
         fsf.sk_sale_flow,

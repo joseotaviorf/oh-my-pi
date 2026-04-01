@@ -90,7 +90,6 @@ bietlejuice.dw_datamarts_cross:
     - bietlejuice.enrich_big_agent:load-enrich-program:first-run-of-day
     - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
   remove:
-    - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
     - bietlejuice.dw_lead:load-dw-public-dim-lead:first-run-of-day
     - bietlejuice.dw_photo_jobs:load-dw-public-dim-photo-job:first-run-of-day
     - bietlejuice.dw_photo_jobs:load-dw-public-fact-photo-job:first-run-of-day
