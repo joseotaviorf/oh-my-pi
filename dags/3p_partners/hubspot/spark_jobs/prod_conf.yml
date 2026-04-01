@@ -252,9 +252,20 @@ deal:
       - cons_utm_term
       - cons_simulador_ia
       - cons_transbordo_conrado
+      - cons_mensagem_c2w
+      - cons_entrou_repescagem
+      - cons_motivo_saida_repescagem
+      - cons_entrou_repescagem_em
+      - cons_variante_repescagem
+      - cons_template_last_channel
+      - cons_contagem_disparos_repescagem
+      - cons_template_last_sent_at
+      - cons_saiu_repescagem_em
+      - qual_grupo
     propertiesWithHistory:
       - dealstage
       - pipeline
+      - cons_template_last_sent
     associations:
       - company
 ticket:

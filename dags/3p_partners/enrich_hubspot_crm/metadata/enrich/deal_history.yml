@@ -278,6 +278,10 @@ columns:
     lineage:
       - datalake_hubspot_clean.deal.properties
     description: Name of the last template used to contact the user on BLIP.
+  consorcio_template_last_channel:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Informs the channel of the last template sent.
   consorcio_inside_sales_pipeline:
     lineage:
       - datalake_hubspot_clean.deal.properties
@@ -330,10 +334,46 @@ columns:
     lineage:
       - datalake_hubspot_clean.deal.properties
     description: Informs when Conrado Simulador transfered the lead to a human analyst and whether it transferred due to user inactivity or not.
+  consorcio_group:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Informs which consorcio group the user joined.
+  consorcio_c2w_message:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Informs if the user answered the first Conrado message after actively sending the first message on the click to whatsapp flow.
+  consorcio_entered_rehabilitation:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Boolean if the discarded deal was eligible and entered the rehabilitation flow or not.
+  consorcio_rehabilitation_exit_reason:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Reason why that deal exited the rehabilitation flow, whether because it was ineligible before entering or became ineligible while already on the flow.
+  consorcio_rehabilitation_variant:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Which variant of the rehabilitation flow the deal took part of.
+  consorcio_rehabilitation_trigger_count:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Integer number of messages the user from that deal received while active on the rehabilitation flow.
   is_archived:
     lineage:
       - datalake_hubspot_clean.deal.is_archived
     description: Whether the deal is archived.
+  ts_consorcio_template_last_sent:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Timestamp of when the last template was sent to the user.
+  ts_consorcio_rehabilitation_entered:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Timestamp of when that deal entered the rehabilitation flow.
+  ts_consorcio_rehabilitation_exit:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Timestamp of when that deal exited the rehabilitation flow.
   ts_closed:
     lineage:
       - datalake_hubspot_clean.deal.properties
