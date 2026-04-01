@@ -2635,7 +2635,6 @@ bietlejuice.enrich_growth_media_platform_metrics:
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.google_ads:load-clean-ad-group-geo-performance:first-run-of-day
   - bietlejuice.google_ads:load-clean-campaigns-geo-performance:first-run-of-day
-  - bietlejuice.google_ads:load-clean-geo-target-constant:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-cost-taxonomy-translation-dictionary:first-run-of-day
   - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns:first-run-of-day
 bietlejuice.enrich_growth_media_platform_scd:

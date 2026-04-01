@@ -36,9 +36,6 @@ workflow:
     videos_performance:
       extra_spark_job_arguments:
         - videos_performance # report type
-    geo_target_constant:
-      extra_spark_job_arguments:
-        - geo_target_constant # report type
       extraction_type: full
       partitions: []
     campaigns_geo_performance:

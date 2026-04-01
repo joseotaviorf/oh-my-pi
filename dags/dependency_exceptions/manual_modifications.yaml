@@ -493,6 +493,7 @@ bietlejuice.enrich_growth_costs_sharing_rules:
 bietlejuice.enrich_growth_media_platform_metrics:
   remove:
     - bietlejuice.criteo_temp:load-clean-criteo-region-lookup:first-run-of-day
+    - bietlejuice.google_ads:load-clean-geo-target-constant:first-run-of-day
 bietlejuice.enrich_growth_taxonomy:
   remove:
     - bietlejuice.ebdb_visit:load-clean-visit-origin:first-run-of-day
