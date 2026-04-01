@@ -8,9 +8,14 @@ description: |
   Contains key accumulated features, calculated metrics, and forward-fill variables optimized for risk modeling
   and collection strategy analysis. This table focuses on the most critical features for predictive analytics.
 
-  This table implements a frozen payment probability logic where probability values are calculated on the first day
-  a contract enters each decision tree class (based on status and delay range) and remain constant until the contract
-  moves to a different tree or until month end. This provides stable segmentation for operational and strategic planning.
+  This table joins collections batch inference (collections_score_v3_output) for model-based payment_probability and
+  flag_source. It implements frozen payment probability bands (prob_payment): within each macro_segmentation island,
+  the first prob_payment_at_dt_reference value is held until the contract leaves that macro segment. A parallel
+  legacy rule-based band (legacy_prob_payment_at_dt_reference) is kept for comparison. Segmentation uses both daily
+  (segmentation_with_prob_payment_at_dt_reference) and frozen   (segmentation) probability logic for operational use.
+
+  Includes lead_23_n_quitacao_t1, the collections score model training target: count of T1 quitacao days
+  in the 23-day forward window on each reference date.
 columns:
   sk_contract_features_timeline:
     description: Record unique identification (surrogate key)
@@ -345,17 +350,18 @@ columns:
       - dw_collections_segmentation.fact_contract_wallet_timeline.overdue_recovered_amount_t2
   tree_class:
     description: |
-      Decision tree classification based on contract status and delay range. Used to determine when payment probability should be frozen.
-      Possible values: TREE 0 (Active 0-3 days), TREE 1 (Active 4-30 days), TREE 2 (Completed 0-30 days),
-      TREE 3 (Completed 31-90 days), TREE 4 (Completed 90+ days), NO_TREE (Active 30+ days)
+      Decision tree classification by contract status and T2 max delay (days). TREE 0: Active with delay 0-3; TREE 1: Active
+      with delay 4-30; TREE 2: Active with delay over 30; TREE 3: Ended with delay up to 30; TREE 4: Ended with delay
+      31 or more; NO_TREE: any other combination. Used for reporting and legacy comms-style logic (distinct from
+      macro_segmentation-based freezing of prob_payment).
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
   prob_payment_at_dt_reference:
     description: |
-      Payment probability calculated at each reference date before freezing. This is the raw probability calculation
-      that changes daily based on current contract conditions. Values: VERY_HIGH, HIGH, MEDIUM, LOW, VERY_LOW,
-      or NULL variations for different contract states
+      Payment probability band calculated at each reference date before macro-segment freezing. Combines rule-based
+      branches with collections score v3 thresholds on payment_probability_propagated (per contract status and delay
+      bucket). Values: VERY_HIGH, HIGH, MEDIUM, LOW, VERY_LOW, or NULL-prefixed states depending on phase.
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
@@ -372,15 +378,34 @@ columns:
       - dw_collections_segmentation.fact_contract_wallet_timeline.n_reparos_invoices
       - dw_collections_segmentation.fact_contract_features_timeline.share_monthly_paid_ontime_t1
       - dw_collections_segmentation.fact_contract_wallet_timeline.n_invoices_in_wallet
+      - datalake_collections_score_batch_inference_clean.collections_score_v3_output.payment_probability
+  legacy_prob_payment_at_dt_reference:
+    description: |
+      Legacy rule-based payment probability band computed at each reference date (no ML thresholds). Uses the same
+      contract, delay, MOB, eviction, and behavioral inputs as the historical segmentation rules before the collections
+      score model; values include VERY_HIGH, HIGH, MEDIUM, LOW, VERY_LOW, and NULL-prefixed states by contract phase.
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
+      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
+      - dw_collections_segmentation.fact_contract_features_timeline.avg_days_overdue_invoices_paid_t1
+      - dw_collections_segmentation.fact_contract_features_timeline.n_days_over1_t2_l180
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_broken_promessas_lifetime
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_max_n_repairs
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_broken_multiple_deals_lifetime
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_rental_core_invoices
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_acordo_invoices
+      - dw_collections_segmentation.fact_contract_features_timeline.acc_cpc_l90
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_reparos_invoices
+      - dw_collections_segmentation.fact_contract_features_timeline.share_monthly_paid_ontime_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_invoices_in_wallet
   prob_payment:
     description: |
-      Frozen payment probability for the month. This value is set on the first day a contract enters each tree class
-      and remains constant until the contract moves to a different tree or until month end. For contracts outside
-      defined trees (e.g., Active 30+), maintains the last probability from the previous tree entry.
+      Frozen payment probability band within each macro_segmentation island: the first prob_payment_at_dt_reference
+      value after a macro segment transition is repeated for every day until macro_segmentation changes (UNCLASSIFIED
+      yields NULL). Distinct from the raw model score columns payment_probability and payment_probability_propagated.
     lineage:
       - dw_collections_segmentation.fact_contract_features_timeline.prob_payment_at_dt_reference
-      - dw_collections_segmentation.fact_contract_features_timeline.tree_class
-      - dw_collections_segmentation.fact_contract_features_timeline.dt_month_start
+      - dw_collections_segmentation.fact_contract_features_timeline.macro_segmentation
   segmentation_with_prob_payment_at_dt_reference:
     description: |
       Detailed contract segmentation using the daily calculated payment probability (prob_payment_at_dt_reference).
@@ -401,9 +426,9 @@ columns:
       - dw_collections_segmentation.fact_contract_features_timeline.acc_deals_principal_discount_lifetime
   segmentation:
     description: |
-      Detailed contract segmentation using the frozen monthly payment probability (prob_payment). This is the stable
-      segmentation that uses the probability frozen at tree entry and remains constant within each tree/month period.
-      Includes same categories as segmentation_with_prob_payment_at_dt_reference but with frozen probability logic
+      Detailed contract segmentation using the frozen payment probability band (prob_payment), constant within each
+      macro_segmentation island. Same label set as segmentation_with_prob_payment_at_dt_reference but driven by
+      prob_payment instead of daily prob_payment_at_dt_reference.
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
@@ -439,13 +464,24 @@ columns:
       - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_monthlys_t1
       - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_others_t1
   dt_month_start:
-    description: First day of the month for the reference date - used to control the monthly probability freezing logic
+    description: First day of the calendar month containing dt_reference; supports monthly features and reporting alongside timeline rows.
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
   dt_contract_start:
     description: Contract start date
     lineage:
       - dw_collections_segmentation.fact_contract_wallet_timeline.dt_contract_start
+  lead_23_n_quitacao_t1:
+    description: |
+      Collections model target variable. Count of days in the forward window from the current
+      dt_reference through the next 23 timeline rows (ROWS BETWEEN 0 FOLLOWING AND 23 FOLLOWING)
+      where the contract shows a T1 quitacao: overdue recovered amount under T1 is positive and
+      there is no open overdue T1 balance in the wallet (same rule as is_quitacao_t1 on wallet timeline).
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.overdue_recovered_amount_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.open_wallet_overdue_t1
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
+      - dw_collections_segmentation.fact_contract_wallet_timeline.sk_contract
   year:
     description: Year extracted from dt_reference
     lineage:
@@ -504,3 +540,43 @@ columns:
     lineage:
       - dw_collections_segmentation.fact_contract_features_timeline.macro_segmentation
       - dw_collections_segmentation.fact_contract_features_timeline.next_macro_segmentation
+  days_in_macro_segmentation:
+    description: |
+      1-based day index within the current macro_segmentation island (same sk_contract, macro_segmentation, and
+      contiguous date streak). Adjusted so the count resets correctly when entering a macro segment mid-stream
+      (rn_prob_payment_by_tree_entrance logic).
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.macro_segmentation
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
+      - dw_collections_segmentation.fact_contract_wallet_timeline.sk_contract
+  days_in_segmentation:
+    description: |
+      1-based day index within the current fine-grained segmentation island (same sk_contract, segmentation label, and
+      contiguous date streak after micro-segmentation row numbering).
+    lineage:
+      - dw_collections_segmentation.fact_contract_features_timeline.segmentation
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
+      - dw_collections_segmentation.fact_contract_wallet_timeline.sk_contract
+  payment_probability_propagated:
+    description: |
+      Last non-null collections model payment probability carried forward along the contract timeline (LAST_VALUE over
+      dt_reference). Used when a given date has no fresh inference row so scoring rules still see a defined probability.
+    lineage:
+      - datalake_collections_score_batch_inference_clean.collections_score_v3_output.payment_probability
+      - dw_collections_segmentation.fact_contract_wallet_timeline.dt_reference
+  payment_probability:
+    description: |
+      Raw payment probability from collections score v3 batch inference for this contract and dt_reference (latest
+      inference by ts_inference when duplicates exist). Joined from collections_score_v3_output; distinct from prob_payment
+      and prob_payment_at_dt_reference, which are discrete bands.
+    lineage:
+      - datalake_collections_score_batch_inference_clean.collections_score_v3_output.payment_probability
+  flag_source:
+    description: Source indicator from the collections score v3 inference output describing how the score row was produced.
+    lineage:
+      - datalake_collections_score_batch_inference_clean.collections_score_v3_output.flag_source
+  flag_full_repair:
+    description: True when every invoice in the wallet is a repair invoice (n_reparos_invoices equals n_invoices_in_wallet).
+    lineage:
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_reparos_invoices
+      - dw_collections_segmentation.fact_contract_wallet_timeline.n_invoices_in_wallet
