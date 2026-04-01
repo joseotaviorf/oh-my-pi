@@ -1,0 +1,31 @@
+---
+table_name: datalake_ebdb_pricing.house_suggestion_changes
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_suggestion_change:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_house_suggestion:
+    is_complete:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - RENT
+        - SALE
+  is_last_suggestion:
+    is_complete:
+      severity_level: Error
+  is_last_suggestion_of_day:
+    is_complete:
+      severity_level: Error
+  ts_suggestion_started:
+    is_complete:
+      severity_level: Error

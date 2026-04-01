@@ -444,6 +444,9 @@ bietlejuice.enrich_customer_demand:
     - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
   remove:
     - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
+bietlejuice.enrich_ebdb_pricing:
+  add:
+    - bietlejuice.ebdb_house_historical:load-clean-house-price-suggestion-historical:first-run-of-day
 bietlejuice.enrich_ebdb_listing:
   remove:
     - bietlejuice.amplitude_subpartitioned:load-clean-370096-property-publish-success-events:first-run-of-day

@@ -2439,6 +2439,7 @@ bietlejuice.enrich_ebdb_photo_jobs:
 bietlejuice.enrich_ebdb_pricing:
   - bietlejuice.ebdb_house:load-clean-house-predicted-price-aud:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud:first-run-of-day
+  - bietlejuice.ebdb_house_historical:load-clean-house-price-suggestion-historical:first-run-of-day
   - bietlejuice.ebdb_listing:load-clean-dynamic-pricing-house-aud:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
