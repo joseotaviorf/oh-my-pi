@@ -40,6 +40,9 @@ from bietlejuice.base.airflow.task_creators.load_query_task_creator import (
 from bietlejuice.base.airflow.task_creators.load_delta_table_task_creator import (
     LoadDeltaTableTaskCreator,
 )
+from bietlejuice.base.airflow.task_creators.load_api_raw_task_creator import (
+    LoadAPIRawTaskCreator,
+)
 from bietlejuice.base.airflow.task_creators.load_custom_task_creator import (
     LoadCustomTaskCreator,
 )
@@ -98,6 +101,7 @@ class TaskCreatorFactory:
         TaskEnum.LOAD_CDC_CLEAN: LoadCDCCleanTaskCreator,
         TaskEnum.LOAD_CDC_RAW: LoadCDCRawTaskCreator,
         TaskEnum.LOAD_CDC_TRANSACTIONAL: LoadCDCTransactionalTaskCreator,
+        TaskEnum.LOAD_API_RAW: LoadAPIRawTaskCreator,
         TaskEnum.LOAD_CUSTOM: LoadCustomTaskCreator,
         TaskEnum.LOAD_DMS_CDC_CLEAN: LoadDMSCDCCleanTaskCreator,
         TaskEnum.LOAD_DMS_CDC_RAW: LoadDMSCDCRawTaskCreator,

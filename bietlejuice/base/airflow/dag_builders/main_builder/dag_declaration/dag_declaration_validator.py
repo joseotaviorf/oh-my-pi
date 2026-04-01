@@ -248,6 +248,11 @@ class DAGDeclarationValidator(Validator):
                                     "empty": False,
                                     "required": False,
                                 },
+                                "initial_delay_seconds": {
+                                    "type": "integer",
+                                    "min": 0,
+                                    "required": False,
+                                },
                                 "retry_after_header": {
                                     "type": "string",
                                     "empty": False,
@@ -349,6 +354,16 @@ class DAGDeclarationValidator(Validator):
                     },
                 },
                 "date_format_mask": {
+                    "type": "string",
+                    "empty": False,
+                    "required": False,
+                },
+                "date_format": {
+                    "type": "string",
+                    "empty": False,
+                    "required": False,
+                },
+                "date_filter_column": {
                     "type": "string",
                     "empty": False,
                     "required": False,

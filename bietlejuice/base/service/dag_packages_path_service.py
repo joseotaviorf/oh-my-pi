@@ -12,7 +12,12 @@ from dags import DAG_PACKAGES_ROOT
 
 
 class DataQualityLayerCache:
-    """Per-instance, per-layer cache of data quality file paths for parse-time performance."""
+    """Per-instance, per-layer cache of data quality file paths for parse-time performance.
+
+    After changes to path resolution or listing (e.g. ``list_data_quality_table_paths_in_composer``),
+    run a Composer smoke test that parses DAGs which reference many data-quality YAMLs so regressions
+    surface before production.
+    """
 
     def __init__(self, dag_name: str) -> None:
         self._dag_name = dag_name
@@ -34,6 +39,11 @@ class DAGPackagesPathService:
 
     The methods are annotated, so we know if they can be used in Databricks or Composer to avoid errors
      and after migration we can easily uncouple the code between Orchestration and Jobs Core code.
+
+    Performance-related behavior (``@lru_cache`` on ``get_dag_path``, ``DataQualityLayerCache``, and
+    helpers that scan data-quality paths) affects Composer DAG parsing and any code that walks many
+    DQ YAMLs. After substantive edits here, smoke-test DAG parse in Composer (or equivalent checks
+    that load many declarations and DQ files) to catch regressions.
     """
 
     __EXTENSIONS = {
@@ -82,6 +92,20 @@ class DAGPackagesPathService:
                 scandir(DAG_PACKAGES_ROOT)
             )
         return DAGPackagesPathService._line_folders_cache
+
+    @classmethod
+    def get_dag_domain_names(cls) -> list:
+        """
+        Return top-level domain folder names under DAG_PACKAGES_ROOT.
+
+        Discovered automatically via filesystem scan. Skips non-directories
+        and hidden/internal entries (e.g. __pycache__).
+        """
+        return [
+            e.name
+            for e in cls._get_line_folders()
+            if e.is_dir() and not e.name.startswith("_")
+        ]
 
     @classmethod
     def clear_path_caches(cls) -> None:

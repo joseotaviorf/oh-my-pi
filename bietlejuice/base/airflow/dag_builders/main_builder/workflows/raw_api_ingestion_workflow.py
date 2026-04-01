@@ -36,7 +36,8 @@ class RawAPIIngestionWorkflow(BaseWorkflow):
         """
         dag = super().dag_instance()
 
-        bucket = self.config_service.get_config("datalake_bucket")
+        bucket_config = self.workflow_args.get("bucket_config_name", "datalake_bucket")
+        bucket = self.config_service.get_config(bucket_config)
         load_start_date, load_end_date = self._initialize_load_start_and_end_date()
 
         self._set_default_spark_job_config()
@@ -72,7 +73,7 @@ class RawAPIIngestionWorkflow(BaseWorkflow):
         )
 
         self.load_raw_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.LOAD_CUSTOM
+            TaskEnum.LOAD_API_RAW
         )
 
         self.load_clean_task_creator = task_creator_factory.get_task_creator(
@@ -106,6 +107,10 @@ class RawAPIIngestionWorkflow(BaseWorkflow):
         This method ensures that load_spark_job, spark_job_prefix, and spark_job_arguments
         have appropriate defaults for the api_ingestion workflow, similar to how gsheets
         workflow handles its Spark job configuration.
+
+        The default ``spark_job_arguments`` list is kept for declaration consistency and readers of
+        the YAML only; the API raw load path uses ``LoadAPIRawTaskCreator``, which builds the Spark
+        job argument list in code via ``_get_parameters`` and does not consume this template.
         """
         if not self.workflow_args.get("load_spark_job"):
             self.workflow_args["load_spark_job"] = "load_api_ingestion_raw"
@@ -281,7 +286,7 @@ class RawAPIIngestionWorkflow(BaseWorkflow):
         Creates raw tasks, sets their internal dependencies and returns the first
         and the last tasks of the dependency flow.
 
-        This method creates the load raw task using LOAD_CUSTOM task creator, which will
+        This method creates the load raw task using LOAD_API_RAW task creator, which will
         execute the reusable load_api_ingestion_raw Spark job. The table name is converted
         to lowercase for most tasks to avoid Hive naming issues, except for the load task
         which uses the original table name. The method also conditionally creates sync metadata
