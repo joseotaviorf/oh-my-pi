@@ -34,11 +34,13 @@ SELECT
     -- timestamps
     CAST(created_at AS TIMESTAMP) AS ts_created,
     CAST(rejected_at AS TIMESTAMP) AS ts_rejected,
+    CAST(last_activity_at AS TIMESTAMP) AS ts_last_activity,
     CAST(updated_at AS TIMESTAMP) AS ts_updated,
     NOW() AS ts_load,
     -- arrays
     answers,
     custom_fields,
+    prospective_job_ids,
     -- partitions
     year,
     month,

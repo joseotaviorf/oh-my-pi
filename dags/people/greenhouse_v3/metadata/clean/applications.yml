@@ -77,6 +77,10 @@ columns:
     description: The timestamp when the application was rejected.
     lineage:
     - datalake_greenhouse_v3_raw.applications.rejected_at
+  ts_last_activity:
+    description: Timestamp of the last activity on the application.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.last_activity_at
   ts_updated:
     description: The timestamp when the application was last updated.
     lineage:
@@ -91,6 +95,10 @@ columns:
     description: The raw struct of custom fields associated with the application (replaces keyed_custom_fields in v3).
     lineage:
     - datalake_greenhouse_v3_raw.applications.custom_fields
+  prospective_job_ids:
+    description: Array of job IDs the prospect is associated with. NULL or empty for non-prospect applications.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.prospective_job_ids
   year:
     description: The year extracted from the 'updated_at' timestamp, used for partitioning.
     lineage:
