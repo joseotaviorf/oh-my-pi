@@ -18,6 +18,8 @@ SELECT
   cv.id_visit,
   cv.id_visit_business_model,
   cv.id_house,
+  IF(cv.business_model LIKE '%3P_SUPPLY%', cbs.sk_broker, NULL) AS sk_broker_supply,
+  IF(cv.business_model LIKE '%3P_DEMAND%' OR cv.business_model LIKE '%3P_LEAD_GEN%', cbd.sk_broker, NULL) AS sk_broker_demand,
   IF(cv.business_model LIKE '%3P_SUPPLY%', cs.sk_company, NULL) AS id_company_supply,
   IF(cv.business_model LIKE '%3P_DEMAND%' OR cv.business_model LIKE '%3P_LEAD_GEN%', cd.sk_company, NULL) AS id_company_demand,
   IF(cv.business_model LIKE '%3P_SUPPLY%', cs.company_name, NULL) AS partner_3p_supply,
@@ -46,5 +48,11 @@ LEFT JOIN
 LEFT JOIN
   datalake_company.company_sks AS cd
     ON vt.uuid_company = cd.uuid_company
+LEFT JOIN
+  core_brokers.brokers AS cbs
+    ON h.uuid_company = cbs.uuid_company
+LEFT JOIN
+  core_brokers.brokers AS cbd
+    ON vt.uuid_company = cbd.uuid_company
 QUALIFY
   ROW_NUMBER() OVER (PARTITION BY vt.id_visit ORDER BY vt.ts_updated DESC) = 1

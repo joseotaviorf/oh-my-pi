@@ -14,6 +14,14 @@ column_level_validations:
   id_visit_business_model:
     is_unique:
       severity_level: Error
+  sk_broker_supply:
+    custom:
+      constraint: "(SELECT COUNT(*) FROM datalake_visit.visit_business_model WHERE is_3p_supply = true AND sk_broker_supply IS NULL) = 0"
+      severity_level: Error
+  sk_broker_demand:
+    custom:
+      constraint: "(SELECT COUNT(*) FROM datalake_visit.visit_business_model WHERE (is_3p_demand = true OR is_3p_lead_gen = true) AND sk_broker_demand IS NULL) = 0"
+      severity_level: Error
   id_company_supply:
     custom:
       constraint: "(SELECT COUNT(*) FROM datalake_visit.visit_business_model WHERE is_3p_supply = true AND id_company_supply IS NULL) = 0"

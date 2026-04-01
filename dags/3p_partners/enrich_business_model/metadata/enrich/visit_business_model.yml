@@ -16,6 +16,16 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit.id_house
     description: The unique identifier of the house associated with the visit.
+  sk_broker_supply:
+    lineage:
+      - datalake_ebdb_clean.house.uuid_company
+      - core_brokers.brokers.uuid_company
+    description: The surrogate key of the broker in Rede QuintoAndar associated with the house (supply side). Only populated when business_model LIKE '%3P_SUPPLY%'. Can be joined with dw_brokers.dim_brokers.
+  sk_broker_demand:
+    lineage:
+      - datalake_ebdb_clean.visitor.uuid_company
+      - core_brokers.brokers.uuid_company
+    description: The surrogate key of the broker in Rede QuintoAndar associated with the agent visitor (demand side). Only populated when business_model LIKE '%3P_DEMAND%' OR '%3P_LEAD_GEN%'. Can be joined with dw_brokers.dim_brokers.
   id_company_supply:
     lineage:
       - datalake_company.company_sks.sk_company
