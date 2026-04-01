@@ -1,27 +1,11 @@
 WITH t_union AS (
 	SELECT
-		lo_external_id.*,
+		lo.*,
 		l.id AS id_from_lead
 	FROM datalake_ebdb_clean.lead l
-	JOIN datalake_amplitude_lead.lead_origin lo_external_id
-	    ON lo_external_id.formfield_lead_uuid =  l.id_external
-	    AND lo_external_id.formfield_lead_uuid IS NOT NULL
-    UNION ALL
-	SELECT
-		lo_firestore_id.*,
-		l.id AS id_from_lead
-	FROM datalake_ebdb_clean.lead l
-	JOIN datalake_amplitude_lead.lead_origin lo_firestore_id
-	    ON lo_firestore_id.id_firestore =  l.id_external
-	    AND lo_firestore_id.id_firestore IS NOT NULL
-    UNION ALL
-	SELECT
-		lo_lead_id.*,
-		l.id AS id_from_lead
-	FROM datalake_ebdb_clean.lead l
-	JOIN datalake_amplitude_lead.lead_origin lo_lead_id
-	    ON lo_lead_id.id_lead =  l.id
-	    AND lo_lead_id.id_lead IS NOT NULL
+	JOIN datalake_amplitude_lead.lead_origin lo
+	    ON lo.id_lead = l.id
+	    AND lo.id_lead IS NOT NULL
 ),
 t_rn AS (
     SELECT

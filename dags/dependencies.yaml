@@ -1458,10 +1458,6 @@ bietlejuice.enrich_amplitude_inspections:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-inspection-review-home-page-viewed-events:first-run-of-day
   - bietlejuice.inspection_services:load-clean-inspection-aud:first-run-of-day
 bietlejuice.enrich_amplitude_lead:
-  - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
-  - bietlejuice.amplitude_subpartitioned:load-clean-155696-refer-lead-referred-events:first-run-of-day
-  - bietlejuice.amplitude_subpartitioned:load-clean-155697-refer-lead-referred-events:first-run-of-day
-  - bietlejuice.amplitude_subpartitioned:load-clean-160023-affiliate-lead-referred-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-183047-intro-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-183047-lead-form-submitted-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-183047-price-suggestion-form-submitted-events:first-run-of-day
@@ -1471,7 +1467,6 @@ bietlejuice.enrich_amplitude_lead:
   - bietlejuice.amplitude_subpartitioned:load-clean-183047-rent-pricing-new-listing-page-viewed-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-205027-referral-form-accepted-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-205027-referral-form-discarded-events:first-run-of-day
-  - bietlejuice.rene_descartes:load-clean-house-lead:first-run-of-day
 bietlejuice.enrich_amplitude_magic_link:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
   - bietlejuice.enrich_support_users:load-enrich-analysts:first-run-of-day

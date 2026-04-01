@@ -6,97 +6,99 @@ description: This table contains acquisition data extracted from the René Desca
 columns:
   id_lead:
     description: The unique identifier for each lead in the dataset.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.house_lead.id
-      - datalake_amplitude_lead.lead_origin.formfield_lead_uuid
-      - datalake_amplitude_lead.lead_origin.id_firestore
   id_lead_ebdb:
     description: The lead's identifier in the EBDB/Monolith.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.house_lead.id_lead_ebdb
-  id_firestore:
-    description: The lead's identifier in the Firestore database.
-    lineage: 
-      - datalake_rene_descartes_clean.house_lead.id_external_reference
   id_source_ctwa:
     description: The Id for the campaign related to the click to whatsapp identifier.
     lineage:
       - datalake_supply_flows.inbound_attribution.id_source_ctwa
   affiliate_type:
     description: The type of affiliate associated with the lead's acquisition campaign.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   campaign:
     description: The campaign of the lead, referring to utm_campaign where the lead originated.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_amplitude_lead.lead_origin.utm_campaign
       - datalake_growth_media_platform.facebook_metrics.utm_campaign
   medium:
     description: The medium of the lead, referring to utm_medium where the lead originated.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_amplitude_lead.lead_origin.utm_medium
       - datalake_growth_media_platform.facebook_metrics.utm_medium
   source:
     description: The source of the lead, referring to utm_source where the lead originated.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_amplitude_lead.lead_origin.utm_source
       - datalake_growth_media_platform.facebook_metrics.utm_source
-  term:
-    description: The medium of the lead, referring to utm_medium where the lead originated.
-    lineage: 
-      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
-      - datalake_amplitude_lead.lead_origin.utm_term
-      - datalake_growth_media_platform.facebook_metrics.utm_term
   content:
-    description: The medium of the lead, referring to utm_medium where the lead originated.
-    lineage: 
+    description: The content parameter of the lead acquisition UTM set.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_amplitude_lead.lead_origin.utm_content
       - datalake_growth_media_platform.facebook_metrics.utm_content
+  term:
+    description: The term parameter of the lead acquisition UTM set.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.utm_term
+      - datalake_growth_media_platform.facebook_metrics.utm_term
   ops_agent:
     description: The operational agent responsible for handling the lead.
-    lineage: 
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  ops_objective:
+    description: Objective derived from ops_agent (acquisition when CAPTA_AI, conversion when another agent is set).
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   ops_partner:
     description: The operational partner associated with the lead.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   application:
     description: The origin or application from which the lead originated.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   city:
     description: The city associated with the lead's acquisition.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_amplitude_lead.lead_origin.city
   landing_page:
     description: The landing page URL where the lead first arrived.
-    lineage: 
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+  reprocessed:
+    description: Flag set to automatically_reprocessed when the lead has an original_lead reference from reprocessing.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   ops_approach:
     description: The approach used by operational teams to engage with the lead.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   ops_contact_medium:
     description: The medium through which operational teams contacted the lead.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   platform:
     description: The platform where the lead was acquired.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_amplitude_lead.lead_origin.platform
   lead_type:
     description: The type of lead
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   detailed_route:
     description: The concatenation of the path a lead used to reach the landing page where the creation process was triggered in the Product, and the associated experiment (A/B test) the lead was allocated to, if applicable. This can also be found in Amplitude events through the from_route and exp event properties. The hyphen (-) character separates both parameters.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   gclid:
     description: The google click identifier of the the lead.
@@ -105,20 +107,20 @@ columns:
   fbclid:
     description: The facebook click identifier of the the lead.
     lineage:
-      - dataleka_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   ctwa_clid:
     description: The whatsapp click identifier of the the lead.
     lineage:
       - datalake_supply_flows.inbound_attribution.ctwa_clid
-  id_task: 
+  id_task:
     description: The ID for the lead creation task.
     lineage:
       - datalake_supply_flows.inbound_attribution.id_task
-  id_chat_session: 
+  id_chat_session:
     description: The ID for the chat session in Sauron.
     lineage:
       - datalake_supply_flows.inbound_attribution.id_session
-  id_ai_core_session: 
+  id_ai_core_session:
     description: The ID for the chat in the Orchestrator/Copilot.
     lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
@@ -136,16 +138,53 @@ columns:
       - datalake_supply_flows.inbound_attribution.type_source_ctwa
   original_lead:
     description: The identifier of the original lead if the current lead is a result of reprocessing process.
-    lineage: 
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
-  ts_event:
-    description: The timestamp of the lead creation event.
-    lineage: 
-      - datalake_rene_descartes_clean.acquisition_misc_data.ts_created
-  ts_load:
-    description: The timestamp of the data load.
+  database_tracking_campaign:
+    description: Which upstream source supplied the resolved utm_campaign (rene_descartes, amplitude, facebook_api, or lost_tracking).
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.utm_campaign
+      - datalake_growth_media_platform.facebook_metrics.utm_campaign
+      - datalake_supply_flows.inbound_attribution.id_source_ctwa
+  database_tracking_medium:
+    description: Which upstream source supplied the resolved utm_medium.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.utm_medium
+      - datalake_growth_media_platform.facebook_metrics.utm_medium
+      - datalake_supply_flows.inbound_attribution.id_source_ctwa
+  database_tracking_source:
+    description: Which upstream source supplied the resolved utm_source.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.utm_source
+      - datalake_growth_media_platform.facebook_metrics.utm_source
+      - datalake_supply_flows.inbound_attribution.id_source_ctwa
+  database_tracking_content:
+    description: Which upstream source supplied the resolved utm_content.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.utm_content
+      - datalake_growth_media_platform.facebook_metrics.utm_content
+      - datalake_supply_flows.inbound_attribution.id_source_ctwa
+  database_tracking_term:
+    description: Which upstream source supplied the resolved utm_term.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_amplitude_lead.lead_origin.utm_term
+      - datalake_growth_media_platform.facebook_metrics.utm_term
+      - datalake_supply_flows.inbound_attribution.id_source_ctwa
   database_tracking_ctwa:
     description: The source responsible for the ctwa information.
-    lineage: 
-    - dataleka_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
-    - datalake_sauron_clean.session.metadata
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_supply_flows.inbound_attribution.ctwa_clid
+      - datalake_sauron_clean.session.metadata
+  ts_event:
+    description: The timestamp of the lead creation event.
+    lineage:
+      - datalake_rene_descartes_clean.acquisition_misc_data.ts_created
+      - datalake_amplitude_lead.lead_origin.ts_event
+  ts_load:
+    description: The timestamp of the data load.

@@ -1,15 +1,14 @@
 database_name: datalake_amplitude_lead
 table_name: lead_origin
+owner: henrique.paulo@quintoandar.com.br
+domain: Growth
+description: Enriched first-touch Amplitude attribution per lead (device, geography, UTM, platform, and event timestamp) from clean Amplitude funnel and referral event tables.
 columns:
   id_lead:
+    description: Unique lead identifier from EBDB aligned with the attributed Amplitude funnel events.
     lineage:
-      - datalake_amplitude_clean.events.event_properties
-      - datalake_amplitude_clean.205027_referral_form_discarded_events.ep_lead_id
-      - datalake_amplitude_clean.205027_referral_form_accepted_events.ep_lead_id
-      - datalake_amplitude_clean.160023_affiliate_lead_referred.ep_id_lead
-      - datalake_amplitude_clean.155696_refer_lead_referred.ep_id_lead
-      - datalake_amplitude_clean.155697_refer_lead_referred.ep_id_lead
-      - datalake_amplitude_clean.205027_intro_page_viewed.ep_id_lead
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.id_lead
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.id_lead
       - datalake_amplitude_clean.183047_intro_page_viewed_events.event_properties
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.event_properties
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.event_properties
@@ -17,16 +16,33 @@ columns:
       - datalake_amplitude_clean.183047_lead_form_submitted_events.id_lead_ebdb
       - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.id_lead_ebdb
       - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.id_lead_ebdb
-  id_firestore:
+  uuid:
+    description: Amplitude distinct user UUID from the attributed event used to join sessions and devices.
     lineage:
-      - datalake_rene_descartes_clean.house_lead.id
-      - datalake_amplitude_clean.events.user_properties
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.uuid
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.uuid
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.uuid
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.uuid
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.uuid
+      - datalake_amplitude_clean.183047_intro_page_viewed_events.uuid
+      - datalake_amplitude_clean.183047_property_details_page_viewed_events.uuid
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.uuid
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.uuid
+  id_device:
+    description: Device identifier from the Amplitude event used to correlate the attributed touchpoint.
+    lineage:
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.id_device
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.id_device
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.id_device
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.id_device
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.id_device
+      - datalake_amplitude_clean.183047_intro_page_viewed_events.id_device
+      - datalake_amplitude_clean.183047_property_details_page_viewed_events.id_device
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.id_device
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.id_device
   country_code:
+    description: Country code from Amplitude user properties on the event chosen for attribution.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
-      - datalake_amplitude_clean.155696_refer_lead_referred_events.user_properties
-      - datalake_amplitude_clean.155697_refer_lead_referred_events.user_properties
-      - datalake_amplitude_clean.160023_affiliate_lead_referred_events.user_properties
       - datalake_amplitude_clean.183047_lead_form_submitted_events.user_properties
       - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.user_properties
       - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.user_properties
@@ -37,11 +53,8 @@ columns:
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.user_properties
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.user_properties
   user_country:
+    description: Country field from the attributed Amplitude event (user or session context in clean tables).
     lineage:
-      - datalake_amplitude_clean.events.country
-      - datalake_amplitude_clean.155696_refer_lead_referred_events.country
-      - datalake_amplitude_clean.155697_refer_lead_referred_events.country
-      - datalake_amplitude_clean.160023_affiliate_lead_referred_events.country
       - datalake_amplitude_clean.183047_lead_form_submitted_events.country
       - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.country
       - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.country
@@ -51,173 +64,125 @@ columns:
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.country
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.country
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.country
-  formfield_lead_uuid:
-    lineage:
-      - datalake_amplitude_clean.183047_lead_form_submitted_events.formfield_lead_uuid
-      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.formfield_lead_uuid
-      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.formfield_lead_uuid
-  ts_event:
-    lineage:
-      - datalake_amplitude_clean.events.ts_event
-      - datalake_amplitude_clean.183047_lead_form_submitted_events.ts_event
-      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.ts_event
-      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.ts_event
-      - datalake_amplitude_clean.205027_referral_form_discarded_events.ts_event
-      - datalake_amplitude_clean.205027_referral_form_accepted_events.ts_event
-      - datalake_amplitude_clean.155696_refer_lead_referred.ts_event
-      - datalake_amplitude_clean.155697_refer_lead_referred.ts_event
-      - datalake_amplitude_clean.205027_intro_page_viewed.ts_event
-      - datalake_amplitude_clean.183047_intro_page_viewed_events.ts_event
-      - datalake_amplitude_clean.183047_property_details_page_viewed_events.ts_event
-      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.ts_event
-      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.ts_event
-  utm_campaign:
-    lineage:
-      - datalake_amplitude_clean.events.user_properties
-      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_campaign
-      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_campaign
-      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_campaign
-      - datalake_amplitude_clean.205027_referral_form_discarded_events.up_utm_campaign
-      - datalake_amplitude_clean.205027_referral_form_accepted_events.up_utm_campaign
-      - datalake_amplitude_clean.155696_refer_lead_referred.up_utm_campaign
-      - datalake_amplitude_clean.155697_refer_lead_referred.up_utm_campaign
-      - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_campaign
-      - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_campaign
-      - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_campaign
-      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_campaign
-      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_campaign
-  utm_medium:
-    lineage:
-      - datalake_amplitude_clean.events.user_properties
-      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_medium
-      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_medium
-      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_medium
-      - datalake_amplitude_clean.205027_referral_form_discarded_events.up_utm_medium
-      - datalake_amplitude_clean.205027_referral_form_accepted_events.up_utm_medium
-      - datalake_amplitude_clean.155696_refer_lead_referred.up_utm_medium
-      - datalake_amplitude_clean.155697_refer_lead_referred.up_utm_medium
-      - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_medium
-      - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_medium
-      - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_medium
-      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_medium
-      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_medium
-  utm_source:
-    lineage:
-      - datalake_amplitude_clean.events.user_properties
-      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_source
-      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_source
-      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_source
-      - datalake_amplitude_clean.205027_referral_form_discarded_events.up_utm_source
-      - datalake_amplitude_clean.205027_referral_form_accepted_events.up_utm_source
-      - datalake_amplitude_clean.155696_refer_lead_referred.up_utm_source
-      - datalake_amplitude_clean.155697_refer_lead_referred.up_utm_source
-      - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_source
-      - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_source
-      - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_source
-      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_source
-      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_source
-  utm_content:
-    lineage:
-      - datalake_amplitude_clean.events.user_properties
-      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_content
-      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_content
-      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_content
-      - datalake_amplitude_clean.205027_referral_form_discarded_events.up_utm_content
-      - datalake_amplitude_clean.205027_referral_form_accepted_events.up_utm_content
-      - datalake_amplitude_clean.155696_refer_lead_referred.up_utm_content
-      - datalake_amplitude_clean.155697_refer_lead_referred.up_utm_content
-      - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_content
-      - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_content
-      - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_content
-      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_content
-      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_content
-  utm_term:
-    lineage:
-      - datalake_amplitude_clean.events.user_properties
-      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_term
-      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_term
-      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_term
-      - datalake_amplitude_clean.205027_referral_form_discarded_events.up_utm_term
-      - datalake_amplitude_clean.205027_referral_form_accepted_events.up_utm_term
-      - datalake_amplitude_clean.155696_refer_lead_referred.up_utm_term
-      - datalake_amplitude_clean.155697_refer_lead_referred.up_utm_term
-      - datalake_amplitude_clean.205027_intro_page_viewed.up_utm_term
-      - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_term
-      - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_term
-      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_term
-      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_term
+  rule_num:
+    description: Numeric priority of the attribution rule that selected the winning event among candidate rows for the lead.
   platform:
+    description: Platform or surface (for example web versus app) from Amplitude app_type or user_properties on the attributed event.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
       - datalake_amplitude_clean.183047_lead_form_submitted_events.app_type
       - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.app_type
       - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.app_type
-      - datalake_amplitude_clean.205027_referral_form_discarded_events.up_platform
-      - datalake_amplitude_clean.205027_referral_form_accepted_events.up_platform
-      - datalake_amplitude_clean.155696_refer_lead_referred.up_platform
-      - datalake_amplitude_clean.155697_refer_lead_referred.up_platform
-      - datalake_amplitude_clean.205027_intro_page_viewed.up_platform
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.app_type
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.app_type
       - datalake_amplitude_clean.183047_intro_page_viewed_events.user_properties
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.user_properties
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.user_properties
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.user_properties
   referring_domain:
+    description: Referring domain on the attributed Amplitude event used for traffic source context.
     lineage:
-      - datalake_amplitude_clean.events.user_properties
       - datalake_amplitude_clean.183047_lead_form_submitted_events.referring_domain
       - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.referring_domain
       - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.referring_domain
-      - datalake_amplitude_clean.205027_referral_form_discarded_events.up_referring_domain
-      - datalake_amplitude_clean.205027_referral_form_accepted_events.up_referring_domain
-      - datalake_amplitude_clean.155696_refer_lead_referred.up_referring_domain
-      - datalake_amplitude_clean.155697_refer_lead_referred.up_referring_domain
-      - datalake_amplitude_clean.205027_intro_page_viewed.up_referring_domain
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.referring_domain
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.referring_domain
       - datalake_amplitude_clean.183047_intro_page_viewed_events.user_properties
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.user_properties
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.user_properties
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.user_properties
   region:
+    description: Geographic region from Amplitude event properties for the attributed touchpoint.
     lineage:
-      - datalake_amplitude_clean.events.region
       - datalake_amplitude_clean.183047_lead_form_submitted_events.region
       - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.region
       - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.region
       - datalake_amplitude_clean.205027_referral_form_discarded_events.region
       - datalake_amplitude_clean.205027_referral_form_accepted_events.region
-      - datalake_amplitude_clean.155696_refer_lead_referred.region
-      - datalake_amplitude_clean.155697_refer_lead_referred.region
-      - datalake_amplitude_clean.205027_intro_page_viewed.region
       - datalake_amplitude_clean.183047_intro_page_viewed_events.region
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.region
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.region
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.region
   city:
+    description: City from Amplitude event properties for the attributed touchpoint.
     lineage:
-      - datalake_amplitude_clean.events.city
       - datalake_amplitude_clean.183047_lead_form_submitted_events.city
       - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.city
       - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.city
       - datalake_amplitude_clean.205027_referral_form_discarded_events.city
       - datalake_amplitude_clean.205027_referral_form_accepted_events.city
-      - datalake_amplitude_clean.155696_refer_lead_referred.city
-      - datalake_amplitude_clean.155697_refer_lead_referred.city
-      - datalake_amplitude_clean.205027_intro_page_viewed.city
       - datalake_amplitude_clean.183047_intro_page_viewed_events.city
       - datalake_amplitude_clean.183047_property_details_page_viewed_events.city
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.city
       - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.city
-  uuid:
+  utm_campaign:
+    description: UTM campaign from Amplitude user properties or referral events for marketing attribution.
     lineage:
-      - datalake_amplitude_clean.events.uuid
-      - datalake_amplitude_clean.183047_lead_form_submitted_events.uuid
-      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.uuid
-      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.uuid
-      - datalake_amplitude_clean.205027_referral_form_discarded_events.uuid
-      - datalake_amplitude_clean.205027_referral_form_accepted_events.uuid
-      - datalake_amplitude_clean.155696_refer_lead_referred.uuid
-      - datalake_amplitude_clean.155697_refer_lead_referred.uuid
-      - datalake_amplitude_clean.205027_intro_page_viewed.uuid
-      - datalake_amplitude_clean.183047_intro_page_viewed_events.uuid
-      - datalake_amplitude_clean.183047_property_details_page_viewed_events.uuid
-      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.uuid
-      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.uuid
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_campaign
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_campaign
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_campaign
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.utm_campaign
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.utm_campaign
+      - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_campaign
+      - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_campaign
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_campaign
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_campaign
+  utm_medium:
+    description: UTM medium from Amplitude user properties or referral events for marketing attribution.
+    lineage:
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_medium
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_medium
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_medium
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.utm_medium
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.utm_medium
+      - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_medium
+      - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_medium
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_medium
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_medium
+  utm_source:
+    description: UTM source from Amplitude user properties or referral events for marketing attribution.
+    lineage:
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_source
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_source
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_source
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.utm_source
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.utm_source
+      - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_source
+      - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_source
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_source
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_source
+  utm_content:
+    description: UTM content from Amplitude user properties or referral events for marketing attribution.
+    lineage:
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_content
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_content
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_content
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.utm_content
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.utm_content
+      - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_content
+      - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_content
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_content
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_content
+  utm_term:
+    description: UTM term from Amplitude user properties or referral events for marketing attribution.
+    lineage:
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.up_utm_term
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.up_utm_term
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.up_utm_term
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.utm_term
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.utm_term
+      - datalake_amplitude_clean.183047_intro_page_viewed_events.up_utm_term
+      - datalake_amplitude_clean.183047_property_details_page_viewed_events.up_utm_term
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.up_utm_term
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.up_utm_term
+  ts_event:
+    description: Timestamp of the Amplitude event selected as the first-touch attribution for the lead.
+    lineage:
+      - datalake_amplitude_clean.183047_lead_form_submitted_events.ts_event
+      - datalake_amplitude_clean.183047_price_suggestion_form_submitted_events.ts_event
+      - datalake_amplitude_clean.183047_price_suggestion_sale_form_submitted_events.ts_event
+      - datalake_amplitude_clean.205027_referral_form_discarded_events.ts_event
+      - datalake_amplitude_clean.205027_referral_form_accepted_events.ts_event
+      - datalake_amplitude_clean.183047_intro_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_property_details_page_viewed_events.ts_event
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_form_submitted_events.ts_event
+      - datalake_amplitude_clean.183047_rent_pricing_new_listing_page_viewed_events.ts_event

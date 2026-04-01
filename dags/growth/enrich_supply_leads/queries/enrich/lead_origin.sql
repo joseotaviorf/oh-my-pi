@@ -49,9 +49,7 @@ affiliate_type_fix AS (
     AND lo_fix.affiliate_type IS NOT NULL
 ),
 lead_origin_amplitude AS (
-  -- Here, I collect data from Amplitude
   SELECT
-    COALESCE(formfield_lead_uuid, id_firestore) AS id_lead, -- This coalesce is necessary because we have two different keys in Amplitude
     id_lead AS id_lead_ebdb,
     IF(utm_campaign == '', '-1', utm_campaign) AS campaign,
     IF(utm_medium == '', '-1', utm_medium) AS medium,
@@ -65,7 +63,7 @@ lead_origin_amplitude AS (
     datalake_amplitude_lead.lead_origin AS lo
   WHERE
     DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY COALESCE(formfield_lead_uuid, id_firestore, id_lead) ORDER BY ts_event) = 1 -- Works if formfield_lead_uuid is a NULL
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_lead ORDER BY ts_event) = 1
 ),
 inbound_leads AS (
   SELECT 
@@ -95,19 +93,19 @@ mid_table AS (
     r.id_lead AS id_lead,
     r.id_lead_ebdb AS id_lead_ebdb,
     COALESCE(r.affiliate_type, atf.first_affiliate_type) AS affiliate_type,
-    COALESCE(IF(r.campaign == '', NULL, r.campaign), a.campaign, a2.campaign, inbound_leads.utm_campaign) AS campaign,
-    COALESCE(IF(r.medium == '', NULL, r.medium), a.medium, a2.medium, inbound_leads.utm_medium) AS medium,
-    COALESCE(IF(r.source == '', NULL, r.source), a.source, a2.source, inbound_leads.utm_source) AS source,
-    COALESCE(IF(r.content == '', NULL, r.content), a.content, a2.content, inbound_leads.utm_content) AS content,
-    COALESCE(IF(r.term == '', NULL, r.term), a.term, a2.term, inbound_leads.utm_term) AS term,
+    COALESCE(IF(r.campaign == '', NULL, r.campaign), a.campaign, inbound_leads.utm_campaign) AS campaign,
+    COALESCE(IF(r.medium == '', NULL, r.medium), a.medium, inbound_leads.utm_medium) AS medium,
+    COALESCE(IF(r.source == '', NULL, r.source), a.source, inbound_leads.utm_source) AS source,
+    COALESCE(IF(r.content == '', NULL, r.content), a.content, inbound_leads.utm_content) AS content,
+    COALESCE(IF(r.term == '', NULL, r.term), a.term, inbound_leads.utm_term) AS term,
     r.ops_agent,
     r.ops_partner,
     r.application,
-    COALESCE(r.city, a.city, a2.city) AS city,
+    COALESCE(r.city, a.city) AS city,
     r.landing_page,
     r.ops_approach,
     r.ops_contact_medium,
-    COALESCE(IF(r.platform == '', NULL, r.platform), a.platform, a2.platform) AS platform,
+    COALESCE(IF(r.platform == '', NULL, r.platform), a.platform) AS platform,
     r.lead_type,
     r.detailed_route,
     r.original_lead,
@@ -122,21 +120,18 @@ mid_table AS (
     inbound_leads.url_source_ctwa,
     inbound_leads.type_source_ctwa,
     -- We're tracking how database is the source of our UTMs
-    NVL2(r.campaign, 'rene_descartes', NVL2(a.campaign, 'amplitude', NVL2(a2.campaign, 'amplitude', NVL2(inbound_leads.utm_campaign, 'facebook_api', 'lost_tracking')))) AS database_tracking_campaign,
-    NVL2(r.medium, 'rene_descartes', NVL2(a.medium, 'amplitude', NVL2(a2.medium, 'amplitude', NVL2(inbound_leads.utm_medium, 'facebook_api', 'lost_tracking')))) AS database_tracking_medium,
-    NVL2(r.source, 'rene_descartes', NVL2(a.source, 'amplitude', NVL2(a2.source, 'amplitude', NVL2(inbound_leads.utm_source, 'facebook_api', 'lost_tracking')))) AS database_tracking_source,
-    NVL2(r.content, 'rene_descartes', NVL2(a.content, 'amplitude', NVL2(a2.content, 'amplitude', NVL2(inbound_leads.utm_content, 'facebook_api', 'lost_tracking')))) AS database_tracking_content,
-    NVL2(r.term, 'rene_descartes', NVL2(a.term, 'amplitude', NVL2(a2.term, 'amplitude', NVL2(inbound_leads.utm_term, 'facebook_api', 'lost_tracking')))) AS database_tracking_term,
+    NVL2(r.campaign, 'rene_descartes', NVL2(a.campaign, 'amplitude', NVL2(inbound_leads.utm_campaign, 'facebook_api', 'lost_tracking'))) AS database_tracking_campaign,
+    NVL2(r.medium, 'rene_descartes', NVL2(a.medium, 'amplitude', NVL2(inbound_leads.utm_medium, 'facebook_api', 'lost_tracking'))) AS database_tracking_medium,
+    NVL2(r.source, 'rene_descartes', NVL2(a.source, 'amplitude', NVL2(inbound_leads.utm_source, 'facebook_api', 'lost_tracking'))) AS database_tracking_source,
+    NVL2(r.content, 'rene_descartes', NVL2(a.content, 'amplitude', NVL2(inbound_leads.utm_content, 'facebook_api', 'lost_tracking'))) AS database_tracking_content,
+    NVL2(r.term, 'rene_descartes', NVL2(a.term, 'amplitude', NVL2(inbound_leads.utm_term, 'facebook_api', 'lost_tracking'))) AS database_tracking_term,
     NVL2(r.ctwa_clid, 'rene_descartes', NVL2(inbound_leads.ctwa_clid, 'sauron', 'lost_tracking')) AS database_tracking_ctwa,
     COALESCE(r.ts_event, a.ts_event) AS ts_event
   FROM
     lead_origin_rene_descartes AS r
   LEFT JOIN
     lead_origin_amplitude AS a
-      ON (a.id_lead = r.id_lead)
-  LEFT JOIN
-    lead_origin_amplitude AS a2
-      ON (r.id_lead_ebdb = a2.id_lead_ebdb)
+      ON (r.id_lead_ebdb = a.id_lead_ebdb)
   LEFT JOIN
     affiliate_type_fix AS atf
       ON (r.id_lead = atf.id_lead)
