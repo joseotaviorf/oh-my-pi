@@ -37,6 +37,14 @@ columns:
     lineage:
       - datalake_lending_raw.deal.value
     description: Value of the deal.
+  credit_note_number:
+    lineage:
+      - datalake_lending_raw.deal.credit_note_number
+    description: Credit note number associated to the deal.
+  credit_note_type:
+    lineage:
+      - datalake_lending_raw.deal.credit_note_type
+    description: Type of the credit note associated to the deal.
   ts_created:
     lineage:
       - datalake_lending_raw.deal.created_at

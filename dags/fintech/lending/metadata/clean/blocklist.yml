@@ -1,0 +1,27 @@
+---
+database_name: datalake_lending_clean
+table_name: blocklist
+owner: nilton.nakate@quintoandar.com.br
+domain: Fintech
+description: This table contains blocklist entries that prevent specific contracts from receiving lending offers for a given product.
+columns:
+  id:
+    lineage:
+      - datalake_lending_raw.blocklist.id
+    description: Primary key of the blocklist entry.
+  id_contract_external:
+    lineage:
+      - datalake_lending_raw.blocklist.contract_external_id
+    description: External ID of the contract that is blocked.
+  id_product:
+    lineage:
+      - datalake_lending_raw.blocklist.product_id
+    description: ID of the product for which the contract is blocked.
+  ts_blocked:
+    lineage:
+      - datalake_lending_raw.blocklist.blocked_at
+    description: Timestamp when the contract was blocked.
+  ts_unblocked:
+    lineage:
+      - datalake_lending_raw.blocklist.unblocked_at
+    description: Timestamp when the contract was unblocked, null if still active.

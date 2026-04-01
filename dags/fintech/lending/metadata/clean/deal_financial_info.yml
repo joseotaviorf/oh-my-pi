@@ -97,6 +97,10 @@ columns:
     lineage:
       - datalake_lending_raw.deal_financial_info.last_installment_date
     description: Last installment date of the deal financial info.
+  custom_fields:
+    lineage:
+      - datalake_lending_raw.deal_financial_info.custom_fields
+    description: Product-specific custom fields stored as JSON.
   ts_created:
     lineage:
       - datalake_lending_raw.deal_financial_info.created_at

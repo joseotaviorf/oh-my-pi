@@ -7,6 +7,8 @@ SELECT
     uuid,
     person_uuid AS uuid_person,
     value,
+    credit_note_number,
+    credit_note_type,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM

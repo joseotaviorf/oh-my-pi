@@ -22,6 +22,7 @@ SELECT
     gross_costs_total_value,
     first_installment_date AS dt_first_installment,
     last_installment_date AS dt_last_installment,
+    custom_fields,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM
