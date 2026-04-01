@@ -7,6 +7,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import MySqlConsumer, PostgresConsumer
 from bietlejuice.pipeline.delta_table_loader_pipeline import DeltaTableLoaderPipeline
@@ -47,6 +48,11 @@ def get_conn_config(dbutils_secret_key: str) -> dict:
 
 
 def main():
+    global spark
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+    
+        spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
     environment = args.env
     datalake_bucket = args.datalake_bucket

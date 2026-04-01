@@ -20,6 +20,7 @@ from bietlejuice.base.cdc.schema_treatment.schema_changes_notifier import (
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 
 
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.delta_secondary_catalog_sync import (
     partition_columns_present,
     sync_delta_write_to_secondary_catalog,
@@ -223,6 +224,11 @@ def format_and_deduplicate_df(
 
 
 def main():
+    global spark
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+    
+        spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
     environment = args.env
     incoming_bucket = args.incoming_bucket

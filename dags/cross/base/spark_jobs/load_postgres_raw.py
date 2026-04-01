@@ -9,6 +9,7 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import PostgresConsumer
@@ -69,6 +70,11 @@ def get_conn_config(dbutils_secret_key: str, dbutils_secret_scope: str) -> dict:
 
 
 def main():
+    global spark
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+    
+        spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
     environment = args.env
     datalake_bucket = args.datalake_bucket

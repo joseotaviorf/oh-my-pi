@@ -16,6 +16,7 @@ from argparse import ArgumentParser, Namespace
 
 from pyspark.sql import SparkSession
 
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.api.configuration.declaration_loader import (
     load_api_ingestion_declaration,
     validate_api_ingestion_dag_name,
@@ -198,7 +199,12 @@ def main() -> None:
         payload_column,
     )
 
-    spark = SparkSession.builder.getOrCreate()
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+
+        spark = create_emr_spark_session(JOB_NAME)
+    else:
+        spark = SparkSession.builder.getOrCreate()
     if not all_results:
         LOGGER.warning(
             "m=main, table_name=%s msg=No data returned from API. "

@@ -7,6 +7,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 from bietlejuice.pipeline.delta_table_loader_pipeline import DeltaTableLoaderPipeline
 from bietlejuice.base.databricks.row_filter import RowFilter
@@ -18,6 +19,11 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 def main():
+    global spark
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+
+        spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
     if args.table_privileges is not None:
         table_privileges_dict = json.loads(args.table_privileges)

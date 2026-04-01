@@ -4,6 +4,7 @@ from argparse import ArgumentParser, Namespace
 from multiprocessing.pool import ThreadPool
 from bietlejuice.base.db import MetastoreMappingFactory
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from quintoandar_logger import QuintoAndarLogger
 
@@ -12,6 +13,11 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def main():
+    global spark
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+
+        spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
     loader = DeltaLoader(spark)
     tables = json.loads(args.tables)

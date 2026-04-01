@@ -14,6 +14,7 @@ import os
 
 from pyspark.sql import SparkSession
 
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.services.cdf_services.cdf_to_kafka.service import DeltaCDFToKafkaService
 
 logger = logging.getLogger(__name__)
@@ -61,7 +62,12 @@ def main():
     """Main entry point."""
     args = parse_arguments()
 
-    spark = SparkSession.builder.getOrCreate()
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+
+        spark = create_emr_spark_session("load_cdf_to_datazord")
+    else:
+        spark = SparkSession.builder.getOrCreate()
 
     kafka_api_key = os.getenv("KAFKA_API_KEY")
     kafka_api_secret = os.getenv("KAFKA_API_SECRET")

@@ -13,6 +13,7 @@ from bietlejuice.base.spark.delta_secondary_catalog_sync import (
     partition_columns_present,
     sync_delta_write_to_secondary_catalog,
 )
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
 
@@ -81,6 +82,11 @@ def insert_columns_into_query(query:str, columns:List[str]) -> str:
 
 
 def main():
+    global spark
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+    
+        spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
     dag_name = args.dag_name
     environment = args.env

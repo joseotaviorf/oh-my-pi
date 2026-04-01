@@ -9,6 +9,7 @@ from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder_factory import (
     CdcSchemaFinderFactory,
 )
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.delta_secondary_catalog_sync import (
     partition_columns_present,
     sync_delta_write_to_secondary_catalog,
@@ -113,6 +114,11 @@ def dml_processor(transactional_df, primary_keys):
 
 
 def main():
+    global spark
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+
+        spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
     environment = args.env
     incoming_bucket = args.incoming_bucket

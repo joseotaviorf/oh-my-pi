@@ -19,6 +19,15 @@ def timestamp_to_date_string(ts: int) -> str:
 
 
 def get_spark_session(app_name: str, env: str = "dev") -> SparkSession:
+    from bietlejuice.base.spark.runtime_detector import RuntimeDetector
+
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
+
+        return create_emr_spark_session(app_name)
+
     builder = SparkSession.builder.appName(app_name)
 
     # Set warehouse directory explicitly to avoid path issues

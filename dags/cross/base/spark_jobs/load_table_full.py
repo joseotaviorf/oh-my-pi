@@ -9,6 +9,7 @@ from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService, MetricMetastoreMapping
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.pipeline.full_table_loader_pipeline import FullTableLoaderPipeline
 
 
@@ -67,6 +68,12 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    global spark
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+
+        spark = create_emr_spark_session(JOB_NAME)
 
     env = args.env
     datalake_bucket = args.datalake_bucket

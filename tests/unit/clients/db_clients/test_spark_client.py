@@ -1,4 +1,8 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
+
+from bietlejuice.clients.db_clients import SparkClient
 
 
 class TestSparkClient:
@@ -8,6 +12,21 @@ class TestSparkClient:
 
         # assert
         assert start_conn is None
+
+    @patch("bietlejuice.base.spark.spark_session_factory.create_emr_spark_session")
+    @patch("bietlejuice.base.spark.runtime_detector.RuntimeDetector")
+    def test_conn_on_emr_uses_factory(self, mock_runtime_detector, mock_create_emr):
+        mock_runtime_detector.is_emr.return_value = True
+        expected = MagicMock()
+        mock_create_emr.return_value = expected
+
+        client = SparkClient(session_params={"spark.custom": "x"}, app_name="job_x")
+        session = client.conn
+
+        assert session is expected
+        mock_create_emr.assert_called_once_with(
+            "job_x", extra_configs={"spark.custom": "x"}
+        )
 
     @pytest.mark.parametrize(
         "format, options, path",

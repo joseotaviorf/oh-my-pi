@@ -16,6 +16,7 @@ from bietlejuice.base.spark.delta_secondary_catalog_sync import (
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from pyspark.sql.functions import col
 
 from quintoandar_logger import QuintoAndarLogger
@@ -106,6 +107,11 @@ def insert_columns_into_query(query, columns):
 
 
 def main():
+    global spark
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+
+        spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
     dag_name = args.dag_name
     environment = args.env

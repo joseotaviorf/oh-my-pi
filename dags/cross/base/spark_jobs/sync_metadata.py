@@ -15,6 +15,7 @@ from bietlejuice.base.hive import TableStorageDescriptorEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.spark.base_spark import BaseSparkContext, BaseDBUtils
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 from bietlejuice.base.service import ServiceEnum
 from bietlejuice.loaders.hive_metastore_loader import HiveMetastoreLoader
@@ -455,6 +456,11 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+    global spark
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+
+        spark = create_emr_spark_session(JOB_NAME)
     bucket = args.bucket
     layer = LayerEnum(args.layer).value
     schema = args.schema
@@ -504,17 +510,17 @@ if __name__ == "__main__":
     if not bypass_propagate:
         jobs_to_run.append({"job": propagate_job, "params": propagate_params})
 
-exceptions = []
-for job_dict in jobs_to_run:
-    try:
-        print(f"\n\n{0:=<50} - {str(job_dict['job'])}")
-        job_dict["job"](*job_dict["params"])
-    except Exception as e:
-        base_logger.error(
-            f"m={JOB_NAME}, msg={job_dict['job']} failed with:\n\n\n {e} \n\n\nPassing to next before raising exception."
-        )
-        base_logger.error(traceback.format_exc())
-        exceptions.append(e)
+    exceptions = []
+    for job_dict in jobs_to_run:
+        try:
+            print(f"\n\n{0:=<50} - {str(job_dict['job'])}")
+            job_dict["job"](*job_dict["params"])
+        except Exception as e:
+            base_logger.error(
+                f"m={JOB_NAME}, msg={job_dict['job']} failed with:\n\n\n {e} \n\n\nPassing to next before raising exception."
+            )
+            base_logger.error(traceback.format_exc())
+            exceptions.append(e)
 
-if exceptions:
-    raise Exception(exceptions)
+    if exceptions:
+        raise Exception(exceptions)

@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DWMetastoreService
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.pipeline.default_row_addition_pipeline import (
     DefaultRowAdditionPipeline,
 )
@@ -33,6 +34,12 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    global spark
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+
+        spark = create_emr_spark_session(JOB_NAME)
 
     logger.info(
         f"m={JOB_NAME}, env={args.env}, dw_bucket={args.dw_bucket}, layer={args.layer}, "

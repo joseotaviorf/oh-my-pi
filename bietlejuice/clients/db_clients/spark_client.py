@@ -11,9 +11,10 @@ class SparkClient(DBClient):
     Run commands, return query results and reads data from external systems with Spark.
     """
 
-    def __init__(self, session_params=None):
+    def __init__(self, session_params=None, app_name: str = "SparkSqlClient"):
         self._session = None
         self.session_params = session_params
+        self._app_name = app_name
 
     @property
     def conn(self):
@@ -22,11 +23,22 @@ class SparkClient(DBClient):
         :return: SparkSession
         """
         if not self._session:
-            session_builder = SparkSession.builder
-            if self.session_params:
-                for param, val in self.session_params.items():
-                    session_builder.config(param, val)
-            self._session = session_builder.getOrCreate()
+            from bietlejuice.base.spark.runtime_detector import RuntimeDetector
+            from bietlejuice.base.spark.spark_session_factory import (
+                create_emr_spark_session,
+            )
+
+            if RuntimeDetector.is_emr():
+                self._session = create_emr_spark_session(
+                    self._app_name,
+                    extra_configs=self.session_params,
+                )
+            else:
+                session_builder = SparkSession.builder
+                if self.session_params:
+                    for param, val in self.session_params.items():
+                        session_builder = session_builder.config(param, val)
+                self._session = session_builder.getOrCreate()
         return self._session
 
     def get_records(self, query, parameters=None):

@@ -106,7 +106,16 @@ if __name__ == "__main__":
     # Initialize Spark to query table metadata
     from pyspark.sql import SparkSession
 
-    spark = SparkSession.builder.getOrCreate()
+    from bietlejuice.base.spark.runtime_detector import RuntimeDetector
+
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
+
+        spark = create_emr_spark_session("register_delta_table")
+    else:
+        spark = SparkSession.builder.getOrCreate()
 
     # Get current catalog for Unity Catalog environments
     try:

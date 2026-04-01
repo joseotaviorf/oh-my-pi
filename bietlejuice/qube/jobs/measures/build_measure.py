@@ -340,7 +340,16 @@ def _write_output(
         from pyspark.sql import SparkSession
         from pyspark.sql.utils import AnalysisException as SparkAnalysisException
 
-        spark = SparkSession.builder.getOrCreate()
+        from bietlejuice.base.spark.runtime_detector import RuntimeDetector
+
+        if RuntimeDetector.is_emr():
+            from bietlejuice.base.spark.spark_session_factory import (
+                create_emr_spark_session,
+            )
+
+            spark = create_emr_spark_session("build_measure")
+        else:
+            spark = SparkSession.builder.getOrCreate()
         full_table_name = f"{database_name}.{table_name}"
         expected_location_s3a = f"{database_location}{table_name}"
         expected_location_s3 = expected_location_s3a.replace("s3a://", "s3://")
