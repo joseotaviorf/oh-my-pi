@@ -319,17 +319,24 @@ class DAGPackagesPathService:
     ):
         """
         Opens the SQL file according to the place it is stored (if it is in
-         legacy path or in the DAGs packages)
+        legacy path or in the DAGs packages).
 
-        * Method used only in Databricks *
+        Used from Spark driver jobs (Databricks or EMR). When ``SPARK_RUNTIME=emr``,
+        S3 reads always use ``boto3`` regardless of ``engine`` (Databricks volume and
+        Spark-based readers are not used on EMR).
 
         :param dag_name: the DAG name
         :param table_name: the name of the table that the file is related to
         :param layer: the layer that the file is related to.
         :param intermediate_path: off intermediate path structure used in some DAGs
-        :param engine: engine to read the file from. Options: "spark", "boto3" or "databricks_volume"
+        :param engine: engine on Databricks: "spark", "boto3" or "databricks_volume". On EMR, boto3 is always used.
         :return: query content (the SQL)
         """
+        from bietlejuice.base.spark.runtime_detector import RuntimeDetector
+
+        if RuntimeDetector.is_emr():
+            engine = "boto3"
+
         intermediate_path = intermediate_path if intermediate_path is not None else ""
         sql_file_relative_path = path.join(
             "queries", dag_name, layer, intermediate_path, f"{table_name}.sql"
