@@ -4,8 +4,28 @@ from dateutil import parser
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from pyspark.sql.functions import split, when, lit, element_at, col, year, month, dayofmonth, hour, to_timestamp, from_json
-from pyspark.sql.types import StructType, StructField, StringType, LongType
+from pyspark.sql.functions import (
+    coalesce,
+    col,
+    dayofmonth,
+    element_at,
+    from_json,
+    hour,
+    lit,
+    map_values,
+    month,
+    split,
+    to_timestamp,
+    when,
+    year,
+)
+from pyspark.sql.types import (
+    LongType,
+    MapType,
+    StringType,
+    StructField,
+    StructType,
+)
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.spark import (
     spark
@@ -16,12 +36,30 @@ JOB_NAME = "istio_logs_load"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def _parse_user_claims(df):
+    """
+    Parse JWT claims from the user field, handling both formats:
+      - Forno/Staging:  result.principal_info.user = {email, id, ...}
+      - Production:     result.principal_info.user = {<issuer>: {email, id, ...}}
+    """
+    claims_schema = get_claims_schema()
+    user_raw = col("data.result.principal_info.user")
+
+    direct = from_json(user_raw, claims_schema)
+    user_map = from_json(user_raw, MapType(StringType(), StringType()))
+    wrapped = from_json(element_at(map_values(user_map), 1), claims_schema)
+
+    return df.withColumn("direct", direct).withColumn("wrapped", wrapped)
+
+
 def clean_cf(df):
     """
     Transform extract only the necessary columns.
     """
 
     df = df.withColumn("data", from_json(col("message"), get_istio_schema()))
+    df = _parse_user_claims(df)
+
     ts = to_timestamp(col("timestamp"))
     ts_event = to_timestamp(col("data.start_time"))
     traceparent = col("data.traceparent")
@@ -46,6 +84,15 @@ def clean_cf(df):
                col("data.response_flags").alias("response_flags"),
                col("data.response_code").alias("response_code"),
                col("data.request_id").alias("id_request"),
+               coalesce(col("direct.personUUID"), col("wrapped.personUUID")).alias("uuid_person_principal_user"),
+               coalesce(col("direct.id"), col("wrapped.id")).alias("id_principal_user"),
+               coalesce(col("direct.email"), col("wrapped.email")).alias("principal_user_email"),
+               coalesce(col("direct.iss"), col("wrapped.iss")).alias("principal_user_issuer"),
+               coalesce(col("direct.roles"), col("wrapped.roles")).alias("principal_user_roles"),
+               coalesce(col("direct.sudoed_by_id"), col("wrapped.sudoed_by_id")).alias("id_principal_user_impersonated_by"),
+               coalesce(col("direct.sub"), col("wrapped.sub")).alias("principal_user_sub"),
+               col("data.result.principal_info.service").alias("principal_service"),
+               col("data.result.response_code_details").alias("response_code_details"),
                col("app"),
                year(ts).alias("year"),
                month(ts).alias("month"),
@@ -107,7 +154,44 @@ def main():
         partition_by=args.partition_cols,
     )
 
+def get_claims_schema():
+    act_schema = StructType([
+        StructField('sub', StringType(), True),
+    ])
+
+    return StructType([
+        StructField('id', LongType(), True),
+        StructField('sub', StringType(), True),
+        StructField('act', act_schema, True),
+        StructField('aud', StringType(), True),
+        StructField('email', StringType(), True),
+        StructField('personUUID', StringType(), True),
+        StructField('name', StringType(), True),
+        StructField('firstname', StringType(), True),
+        StructField('iss', StringType(), True),
+        StructField('roles', StringType(), True),
+        StructField('jti', StringType(), True),
+        StructField('exp', LongType(), True),
+        StructField('iat', LongType(), True),
+        StructField('creationDate', StringType(), True),
+        StructField('userCreatedAt', StringType(), True),
+        StructField('sudoed_by_id', LongType(), True),
+        StructField('telefone', StringType(), True),
+        StructField('titulo', StringType(), True),
+    ])
+
+
 def get_istio_schema():
+    principal_info_schema = StructType([
+        StructField('user', StringType(), True),
+        StructField('service', StringType(), True),
+    ])
+
+    result_schema = StructType([
+        StructField('principal_info', principal_info_schema, True),
+        StructField('response_code_details', StringType(), True),
+    ])
+
     return StructType([
         StructField('response_code', LongType(), True),
         StructField('upstream_service_time', StringType(), True),
@@ -132,7 +216,8 @@ def get_istio_schema():
         StructField('upstream_cluster', StringType(), True),
         StructField('authority', StringType(), True),
         StructField('istio_policy_status', StringType(), True),
-        StructField('duration', LongType(), True)
+        StructField('duration', LongType(), True),
+        StructField('result', result_schema, True),
     ])
 
 if __name__ == "__main__":

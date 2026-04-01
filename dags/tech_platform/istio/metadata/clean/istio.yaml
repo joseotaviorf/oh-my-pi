@@ -60,3 +60,39 @@ columns:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/id_request
     description: Request ID
+  uuid_person_principal_user:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.personUUID
+    description: Person UUID extracted from the JWT payload
+  id_principal_user:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.id
+    description: Main user ID extracted from the JWT payload
+  principal_user_email:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.email
+    description: Email extracted from the JWT payload of the requesting user
+  principal_user_issuer:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.iss
+    description: JWT token issuer identifier (e.g. gandalf)
+  principal_user_roles:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.roles
+    description: Roles assigned to the user in the JWT payload
+  id_principal_user_impersonated_by:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.sudoed_by_id
+    description: ID of the user who impersonated this principal
+  principal_user_sub:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.sub
+    description: JWT subject claim identifying the principal (e.g. internal-bot)
+  principal_service:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.service
+    description: mTLS service identity (SPIFFE URI) of the downstream peer
+  response_code_details:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/result.response_code_details
+    description: Envoy response code details explaining the response outcome
