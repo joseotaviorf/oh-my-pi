@@ -174,6 +174,8 @@ class Tables:
 
     stage_step_condos = "vespucio_pipeline_delta.stage_step_condos"
     stage_step_houses = "vespucio_pipeline_delta.stage_step_houses"
+    source_adapter_step_condos = "vespucio_pipeline_delta.source_adapter_step_condos"
+    source_adapter_step_houses = "vespucio_pipeline_delta.source_adapter_step_houses"
     extract_step_condos = "vespucio_pipeline_delta.extract_step_condos"
     extract_step_houses = "vespucio_pipeline_delta.extract_step_houses"
     prioritize_step_condos = "vespucio_pipeline_delta.prioritize_step_condos"
@@ -365,11 +367,22 @@ stage_step_task = create_task(
     ],
 )
 
-extract_step_task = create_task(
-    entry_point="core_extract_step",
+source_adapter_step_task = create_task(
+    entry_point="source_adapter_step",
     parameters=[
         f"--input_staged_condos={Tables.stage_step_condos}",
         f"--input_staged_houses={Tables.stage_step_houses}",
+        f"--overwrite_schema",
+        f"--output_source_condos={Tables.source_adapter_step_condos}",
+        f"--output_source_houses={Tables.source_adapter_step_houses}",
+    ],
+)
+
+extract_step_task = create_task(
+    entry_point="core_extract_step",
+    parameters=[
+        f"--input_source_condos={Tables.source_adapter_step_condos}",
+        f"--input_source_houses={Tables.source_adapter_step_houses}",
         f"--input_address_adjusted_condos={Tables.address_adjusted_step_condos}",
         f"--input_address_adjusted_houses={Tables.address_adjusted_step_houses}",
         f"--overwrite_schema",
@@ -746,10 +759,11 @@ join_plugins = DummyOperator(task_id="join_plugins", dag=dag)
 execute_job_cluster_task >> source_tasks
 
 source_tasks >> stage_step_task
+stage_step_task >> source_adapter_step_task
 stage_step_task >> address_tasks[0]
-
 chain(*address_tasks)
 
+source_adapter_step_task >> extract_step_task
 address_tasks[-1] >> extract_step_task
 address_tasks[-1] >> cluster_task
 
