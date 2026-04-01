@@ -11,5 +11,10 @@ SELECT
     ALREVDT AS dt_reviewed,
     ALALERTDT AS dt_alert_expired,
     ALDTUPD AS ts_updated,
+    year,
+    month,
+    day,
     NOW() AS ts_load
 FROM datalake_cyber_legal_raw.caalert
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

@@ -97,5 +97,10 @@ SELECT
     CELWYPRVREF AS dt_previous_attorney_assigned,
     CELWYAGNREF AS dt_attorney_agency_assigned,
     CEDTUPD AS ts_updated,
+    year,
+    month,
+    day,
     NOW() AS ts_load
 FROM datalake_cyber_legal_raw.case
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

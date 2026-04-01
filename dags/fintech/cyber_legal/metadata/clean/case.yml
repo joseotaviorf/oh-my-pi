@@ -361,6 +361,18 @@ columns:
     description: "Timestamp of the last update"
     lineage:
       - datalake_cyber_legal_raw.case.CEDTUPD
+  year:
+    description: "Year of the partition"
+    lineage:
+      - datalake_cyber_legal_raw.case.year
+  month:
+    description: "Month of the partition"
+    lineage:
+      - datalake_cyber_legal_raw.case.month
+  day:
+    description: "Day of the partition"
+    lineage:
+      - datalake_cyber_legal_raw.case.day
   ts_load:
     description: "Timestamp when record was loaded into the clean layer"
   id_client_clean:
