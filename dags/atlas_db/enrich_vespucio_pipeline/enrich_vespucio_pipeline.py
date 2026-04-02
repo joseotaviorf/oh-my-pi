@@ -368,7 +368,7 @@ stage_step_task = create_task(
 )
 
 source_adapter_step_task = create_task(
-    entry_point="source_adapter_step",
+    entry_point="core_source_adapter_step",
     parameters=[
         f"--input_staged_condos={Tables.stage_step_condos}",
         f"--input_staged_houses={Tables.stage_step_houses}",
