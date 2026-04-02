@@ -35,6 +35,7 @@ workflow:
       transactional_datatype_overrides:
         quantity: "DECIMAL(38, 10)"
         amount: "DECIMAL(38, 10)"
+        additional_amount: "DECIMAL(38, 10)"
     error_records:
       clean_table_name: error_records
     agenda_availability:
