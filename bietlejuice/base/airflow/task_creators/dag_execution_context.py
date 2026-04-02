@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import Optional
+
 from airflow.models import DAG
 from bietlejuice.base.pipeline import EnvironmentEnum
 
@@ -21,6 +25,10 @@ class DagExecutionContext:
     execution_date: str = "{{ data_interval_start | ds }}"
     incoming_bucket: str = None
     databricks_conn_id: str = "databricks_job_cluster"
+    use_airflow_emr: bool = False
+    aws_conn_id: str = "aws_default"
+    emr_active_create_cluster_task_id: Optional[str] = None
+    job_cluster_engine: Optional["JobClusterEngine"] = None  # noqa: F821
 
     def __post_init__(self):
         assert self.dag is not None, "DAG is required"

@@ -71,7 +71,8 @@ class ExecuteJobClusterTaskCreator(BaseTaskCreator):
                 )
             ):
                 raise ValueError(
-                    f"Current Databricks version ({current_databricks_version}) is below the minimum required version ({self.minimum_databricks_version})"
+                    f"Current Databricks version ({current_databricks_version}) is below "
+                    f"the minimum required version ({self.minimum_databricks_version})"
                 )
 
     def __get_libraries(self) -> list:
