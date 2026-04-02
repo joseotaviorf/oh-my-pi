@@ -89,6 +89,7 @@ workflow:
       date_filter_column: updated_at
       extra_spark_job_arguments:
       - meeting
+  execution_timeout_hours: 3
 cluster:
   type: custom_cluster
   custom_configurations:
