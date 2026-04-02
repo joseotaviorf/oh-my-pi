@@ -70,7 +70,7 @@ SELECT DISTINCT
     i.sk_assessment,
     i.sk_client_side,
     --Id flags:
-    COALESCE(ft.is_spoc_contract, FALSE) AS is_spoc_contract,
+    COALESCE(ft.is_spoc_contract, FALSE) AND NOT COALESCE(ft.is_spoc_control_group, FALSE) AS is_spoc_contract,
     ft.is_spoc_eligible,
     COALESCE((dt.reason = 'EVICTION'), FALSE) AS is_eviction,
     dc.rent >= 2500 AS is_high_value,

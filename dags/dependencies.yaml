@@ -3087,6 +3087,8 @@ bietlejuice.enrich_offboarding:
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-department-control:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-inspection-analysis-forms:first-run-of-day
+  - bietlejuice.salesforce:load-clean-cases:first-run-of-day
+  - bietlejuice.salesforce:load-clean-record-types:first-run-of-day
   - bietlejuice.terminator:load-clean-application-user:first-run-of-day
   - bietlejuice.terminator:load-clean-attachment:first-run-of-day
   - bietlejuice.terminator:load-clean-negotiation:first-run-of-day

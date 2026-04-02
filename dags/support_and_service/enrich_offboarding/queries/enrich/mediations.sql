@@ -63,6 +63,36 @@ squad_from_tags AS (
   FROM
     mediation_tickets
 ),
+-- Source 3: Salesforce 
+mediation_with_salesforce AS (
+  SELECT
+   id_ticket,
+   id_contract,
+   id_termination,
+   is_ticket_opened_via_terminator,
+   ts_created,
+   squad
+  FROM
+    squad_from_tags
+  UNION ALL 
+  SELECT
+    c.id_case AS id_ticket,
+    c.id_contract,
+    c.id_external AS id_termination,
+    FALSE AS is_ticket_opened_via_terminator,
+    c.ts_created,
+    c.omni_channel_queue AS squad
+  FROM 
+    datalake_salesforce_clean.cases c
+  JOIN 
+    datalake_salesforce_clean.record_types rt
+      ON c.id_record_type = rt.id_record_type
+  WHERE 
+    rt.record_type_name = 'Mediação'
+    AND LOWER(c.case_status) NOT IN ('cancelado', 'canceled') 
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY c.id_contract ORDER BY c.ts_created DESC) = 1
+),
 mediation_per_contract AS (
   SELECT
     id_contract,
@@ -72,7 +102,7 @@ mediation_per_contract AS (
     squad,
     DATE(ts_created - INTERVAL 3 HOUR) AS dt_mediation
   FROM
-    squad_from_tags
+    mediation_with_salesforce
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY id_contract ORDER BY ts_created DESC) = 1
 ),
@@ -106,8 +136,8 @@ SELECT
   m.squad,
   m.id_ticket IS NOT NULL AS has_mediation_ticket,
   COALESCE(m.is_ticket_opened_via_terminator, FALSE) AS is_ticket_opened_via_terminator,
-  t.dt_inspection,
   m.dt_mediation,
+  t.dt_inspection,
   t.ts_termination_request,
   t.ts_termination_finished,
   t.ts_termination_updated

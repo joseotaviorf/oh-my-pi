@@ -42,7 +42,7 @@ columns:
     lineage:
       - dw_inspections.fact_inspection.sk_client_side
   is_spoc_contract:
-    description: Boolean indicating whether the termination is part of the SPOC control group.
+    description: Boolean indicating whether the termination is part of the SPOC test group.
     lineage:
       - dw_offboarding.fact_terminations.is_spoc_contract
   is_spoc_eligible:
