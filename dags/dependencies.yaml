@@ -4581,7 +4581,7 @@ bietlejuice.reverse_kyc:
   - bietlejuice.sales_flow:load-clean-seller-data:first-run-of-day
   - bietlejuice.vans:load-clean-payment:first-run-of-day
 bietlejuice.reverse_listing_quality_access:
-  - bietlejuice.reverse_listing_quality_load:load-reverse-listings-quality:first-run-of-day
+  - bietlejuice.reverse_listing_quality_load:load-reverse-listing-quality:first-run-of-day
 bietlejuice.reverse_listing_quality_load:
   - bietlejuice.dw_datamarts_for_sale:load-dw-datamarts-house-media:first-run-of-day
   - bietlejuice.dw_kodak:load-dw-public-fact-kodak-image-inspection:first-run-of-day
