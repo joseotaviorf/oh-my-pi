@@ -3,7 +3,7 @@ dag:
   schedule_start_date: 2026, 03, 10
   owner: Data Growth
   documentation:
-    dag_purpose: This DAG collects all new House Listings with photos into reverse_public.listing_quality. The access DAG reverse_listing_quality_access sends them to the MainListingQuality SQS queue for the ListingQuality service (main-sqs-consumers).
+    dag_purpose: This DAG collects all new House Listings with photos into reverse_listing_quality.listing_quality. The access DAG reverse_listing_quality_access sends them to the MainListingQuality SQS queue for the ListingQuality service (main-sqs-consumers).
 workflow:
   type: load
   layer: reverse

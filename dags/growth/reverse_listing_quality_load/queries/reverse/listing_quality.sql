@@ -238,21 +238,21 @@ SELECT DISTINCT
     CASE
     WHEN date_diff(MINUTE, a.ts_photos_uploaded, a.inspection_restb) NOT BETWEEN 0 AND 30 THEN NULL
     WHEN a.property_condition <= 2.7 OR a.property_condition IS NULL THEN true
-    ELSE false END AS verificacao_score, -- se o property_condition é menor ou igual a 2.7 ou nulo, será necessária verificação manual
+    ELSE false END AS verificar_ai_score, -- se o property_condition é menor ou igual a 2.7 ou nulo, será necessária verificação manual
 
     CASE
     WHEN date_diff(MINUTE, a.ts_photos_uploaded, a.inspection_restb) NOT BETWEEN 0 AND 30 THEN NULL
-    ELSE NOT d.has_bathroom END AS verificacao_banheiro, -- se não há pelo menos 1 foto de banheiro identificada, será necessária verificação manual
+    ELSE NOT d.has_bathroom END AS verificar_banheiro, -- se não há pelo menos 1 foto de banheiro identificada, será necessária verificação manual
 
     CASE
     WHEN date_diff(MINUTE, a.ts_photos_uploaded, a.inspection_restb) NOT BETWEEN 0 AND 30 THEN NULL
     WHEN (b.studio_kitnet AND b.images_per_room_from_house < 1.5) THEN true
     WHEN (NOT b.studio_kitnet AND b.images_per_room_from_house < 3) THEN true
-    ELSE false END AS verificacao_fotos_x_comodo, -- quando o im é studio ou kitnet e a média de fotos por cômodo é inferior a 1.5 ou quando o im não é studio ou kitnet e a média de fotos por cômodo é inferior a 3, necessita verificação manual
+    ELSE false END AS verificar_fotos_x_comodo, -- quando o im é studio ou kitnet e a média de fotos por cômodo é inferior a 1.5 ou quando o im não é studio ou kitnet e a média de fotos por cômodo é inferior a 3, necessita verificação manual
 
     CASE
     WHEN date_diff(MINUTE, a.ts_photos_uploaded, a.inspection_restb) NOT BETWEEN 0 AND 30 THEN NULL
-    ELSE c.placa_identificada END AS verificacao_placa, -- puxa a flag que sinaliza a verificação quando há placa identificada, excluindo casos em que a inspeção do restb aconteceu antes da data da última publicação
+    ELSE c.placa_identificada END AS verificar_placa, -- puxa a flag que sinaliza a verificação quando há placa identificada, excluindo casos em que a inspeção do restb aconteceu antes da data da última publicação
 
     b.total_internal_images,
     b.comodos_from_house,
@@ -272,13 +272,13 @@ SELECT  DISTINCT
     b.total_internal_images as num_internal_photos, -- numInternalPhotos
     b.images_per_room_from_house as images_per_room, -- imagesPerRoom
     b.property_condition, -- propertyCondition
-    NOT b.verificacao_banheiro as has_bathroom_photo, -- bathrooms
-    NOT b.verificacao_placa as has_plaque, -- hasPlaque
+    NOT b.verificar_banheiro as has_bathroom_photo, -- bathrooms
+    b.verificar_placa as has_plaque, -- hasPlaque
     CASE
         WHEN b.property_condition IS NULL THEN 0
-        WHEN (b.verificacao_score OR b.verificacao_banheiro OR b.verificacao_fotos_x_comodo) THEN 1
-        WHEN (NOT b.verificacao_score OR NOT b.verificacao_banheiro OR NOT b.verificacao_fotos_x_comodo) AND b.verificacao_placa THEN 2
-        WHEN (NOT b.verificacao_score OR NOT b.verificacao_banheiro OR NOT b.verificacao_fotos_x_comodo) AND NOT b.verificacao_placa THEN 3
+        WHEN (b.verificar_ai_score OR b.verificar_banheiro OR b.verificar_fotos_x_comodo) THEN 1
+        WHEN (NOT b.verificar_ai_score OR NOT b.verificar_banheiro OR NOT b.verificar_fotos_x_comodo) AND b.verificar_placa THEN 2
+        WHEN (NOT b.verificar_ai_score OR NOT b.verificar_banheiro OR NOT b.verificar_fotos_x_comodo) AND NOT b.verificar_placa THEN 3
         END AS analyst_queue -- analystQueue
 -- casos sem inspeção ou com inspeção inválida são identificados quando a coluna property_condition é nula e terão encaminhamento 0.
 -- casos que sinalizam a necessidade de pelo menos uma das verificações de padrão (property_condition abaixo da nota de corte, sem foto de banheiro ou média de fotos por cômodo abaixo do esperado) terão encaminhamento 1.
