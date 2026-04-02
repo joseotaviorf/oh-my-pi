@@ -10,7 +10,8 @@ dag:
       Upstream: datalake_devlake_clean (produced by the devlake DAG at 04:00 UTC).
       Output schema: dw_devlake.
       Tables: dim_repo, dim_team, dim_user, bridge_pr_team, fact_pull_requests.
-      Enables PR cycle time, lead time (DORA), team velocity, and release cadence analysis
+      Enables PR cycle time, lead time (DORA), team velocity, release cadence,
+      coding-time vs review-wait breakdown, review depth, and self-merge analysis
       across all engineering lines and squads.
 workflow:
   type: query_delta

@@ -6,12 +6,20 @@ domain: Tech Platform
 description: |
   Pull request fact table. Grain: one row per pull request.
   Primary source for engineering velocity metrics: Lead Time for Changes (DORA),
-  PR throughput, code churn, and review cycle time — sliced by repository, team, and engineer.
+  PR throughput, code churn, review cycle time, coding time, review depth,
+  and review quality (actionable suggestions, questions, rubber stamps)
+  — sliced by repository, team, engineer, and PR size category.
 
   sk_team is the primary team association (deterministic: MIN(id_team) from bridge_pr_team).
   For full many-to-many team analysis, join via bridge_pr_team instead.
 
   Date surrogate keys (sk_*_date) join to dw_public.dim_date for calendar attributes.
+
+  Cycle time breakdown (all in seconds, NULL when data unavailable):
+    coding_time_seconds     = ts_created - first_commit_ts  (local dev before PR)
+    review_wait_seconds     = first_comment_ts - ts_created (wait for first review)
+    first_approval_seconds  = first_approval_ts - ts_created (wait for first approval)
+    merge_after_approval_seconds = ts_merged - first_approval_ts (merge lag)
 columns:
   sk_pr:
     description: Surrogate key for the pull request (SHA2 of id_pr)
@@ -45,6 +53,14 @@ columns:
     description: Date key for production release date (FK to dw_public.dim_date.sk_date, format YYYYMMDD). Null if no release recorded
     lineage:
       - datalake_devlake_clean.pr_custom_metrics.ts_released
+  sk_first_commit_date:
+    description: Date key for the first commit authored date (FK to dw_public.dim_date.sk_date, format YYYYMMDD). Null if no commit data
+    lineage:
+      - datalake_devlake_clean.pull_request_commits.commit_authored_date
+  sk_first_approval_date:
+    description: Date key for the first approval date (FK to dw_public.dim_date.sk_date, format YYYYMMDD). Null if never approved
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.created_date
   id_pr:
     description: DevLake PR ID (natural key)
     lineage:
@@ -97,6 +113,139 @@ columns:
     description: Deploy time in seconds from PR merge to production release
     lineage:
       - datalake_devlake_clean.pr_custom_metrics.pr_deploy_time_seconds
+  commit_count:
+    description: Total number of commits in the PR (0 if no commit data)
+    lineage:
+      - datalake_devlake_clean.pull_request_commits.commit_sha
+  comment_count:
+    description: Total number of comments and reviews on the PR (0 if none)
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.id
+  review_comment_count:
+    description: Number of REVIEW-type comments (approvals, rejections, plain reviews)
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.type
+  diff_comment_count:
+    description: Number of inline code review comments (DIFF type). Proxy for review depth/thoroughness
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.type
+  approval_count:
+    description: Number of APPROVED reviews received
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.status
+  changes_requested_count:
+    description: Number of CHANGES_REQUESTED reviews. High values indicate rework cycles
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.status
+  dismissed_review_count:
+    description: "Number of DISMISSED reviews. Occurs when stale approvals are dismissed (e.g. homesbot auto-approval dismissed by maintainer) or when a CHANGES_REQUESTED review is dismissed after the author pushes fixes. 17% of PRs have dismissed reviews in prod; these PRs take 2x longer (123h vs 64h avg cycle time)"
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.status
+  reviewer_count:
+    description: Count of distinct reviewers who left REVIEW or DIFF comments (includes bots). See human_reviewer_count for human-only
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.account_id
+  bot_comment_count:
+    description: Number of comments from known bot accounts (CI bots, scanners, auto-approvers). Bot list maintained in the fact SQL
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.account_id
+  human_comment_count:
+    description: Number of comments from human reviewers (total minus bot). The real review engagement signal
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.account_id
+  human_approval_count:
+    description: Number of APPROVED reviews from humans only (excludes homesbot/homesbot-jr auto-approvals)
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.account_id
+      - datalake_devlake_clean.pull_request_comments.status
+  human_reviewer_count:
+    description: Count of distinct human reviewers who left REVIEW or DIFF comments (excludes all bots)
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.account_id
+  human_diff_comment_count:
+    description: Number of inline code review comments (DIFF type) from human reviewers. The core signal for review engagement depth
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.type
+      - datalake_devlake_clean.pull_request_comments.account_id
+  suggestion_count:
+    description: |
+      Number of DIFF comments from humans containing a GitHub ```suggestion block —
+      the most concrete form of review feedback where the reviewer proposes an exact code change.
+      HIGH PRECISION: the ```suggestion marker is unambiguous. Real example:
+      "Same idea as the other method.\n\n```suggestion\n    HouseTransactStateDTO fetch...```"
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.body
+      - datalake_devlake_clean.pull_request_comments.type
+      - datalake_devlake_clean.pull_request_comments.account_id
+  actionable_comment_count:
+    description: |
+      Number of human DIFF comments classified as actionable using keyword heuristics:
+      suggestion blocks + verbal suggestions (should/could/consider/instead/better/prefer)
+      + bug/error flags (bug/wrong/error/fix) + nit prefixes + TODO/FIXME references.
+      ~34% of human DIFF comments in prod. USE AS DIRECTIONAL SIGNAL, NOT A PRECISE COUNT.
+
+      Known false positive: the "fix" keyword catches author-reply confirmations
+      like "Fixed." or "fixed" — these are author acknowledgements, not reviewer flags.
+      The verbal_suggestion bucket also catches questions like "are you suggesting
+      that we should not..." which are borderline. Treat this column as "at least one
+      quality signal appeared", not a strict classification.
+
+      Best signal for precision: prefer suggestion_count (high precision) or nit-specific
+      patterns. Use actionable_comment_count for coarse team-level trends only.
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.body
+      - datalake_devlake_clean.pull_request_comments.type
+      - datalake_devlake_clean.pull_request_comments.account_id
+  question_comment_count:
+    description: |
+      Number of human DIFF comments that are context-seeking questions
+      (contain '?' and are under 200 chars, excluding suggestion blocks).
+      ~20% of human DIFF comments in prod. GOOD PRECISION for clear questions
+      like "It looks like the top padding has changed. Is that intended?" or
+      "Why is this needed?". May occasionally match short quips with '?' ("Java? 👀").
+      Questions indicate areas where the code is unclear but are not directly
+      actionable improvements — separate signal from actionable_comment_count.
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.body
+      - datalake_devlake_clean.pull_request_comments.type
+      - datalake_devlake_clean.pull_request_comments.account_id
+  pr_size_category:
+    description: "PR size bucket based on total changed lines (additions + deletions): XS (≤10), S (11-50), M (51-200), L (201-500), XL (>500). Prod data shows larger PRs get more comments but with lower actionable %. XL PRs take 2.3x longer to merge than S PRs"
+    lineage:
+      - datalake_devlake_clean.pull_requests.pr_additions
+      - datalake_devlake_clean.pull_requests.pr_deletions
+  coding_time_seconds:
+    description: "Seconds from first commit to PR creation. Negative means PR was opened before any commit. Measures local dev time before review"
+    lineage:
+      - datalake_devlake_clean.pull_requests.ts_created
+      - datalake_devlake_clean.pull_request_commits.commit_authored_date
+  review_wait_seconds:
+    description: "Seconds from PR creation to first comment/review. Measures how long PRs wait for review engagement"
+    lineage:
+      - datalake_devlake_clean.pull_requests.ts_created
+      - datalake_devlake_clean.pull_request_comments.created_date
+  first_approval_seconds:
+    description: "Seconds from PR creation to first approval. Measures total review cycle including revisions"
+    lineage:
+      - datalake_devlake_clean.pull_requests.ts_created
+      - datalake_devlake_clean.pull_request_comments.created_date
+  merge_after_approval_seconds:
+    description: "Seconds from first approval to merge. Measures merge lag — time approved PRs sit before being merged"
+    lineage:
+      - datalake_devlake_clean.pull_requests.ts_merged
+      - datalake_devlake_clean.pull_request_comments.created_date
+  human_review_wait_seconds:
+    description: "Seconds from PR creation to first HUMAN comment (excludes bot comments). The real review bottleneck metric — prod avg is 22 hours vs 16 min with bots"
+    lineage:
+      - datalake_devlake_clean.pull_requests.ts_created
+      - datalake_devlake_clean.pull_request_comments.created_date
+      - datalake_devlake_clean.pull_request_comments.account_id
+  human_first_approval_seconds:
+    description: "Seconds from PR creation to first HUMAN approval (excludes homesbot/homesbot-jr). 32% of PRs wait > 1 day in prod"
+    lineage:
+      - datalake_devlake_clean.pull_requests.ts_created
+      - datalake_devlake_clean.pull_request_comments.created_date
+      - datalake_devlake_clean.pull_request_comments.account_id
   dt_created:
     description: Date when the PR was created
     lineage:
@@ -109,5 +258,31 @@ columns:
     description: Date when the PR was deployed to production (null if no release recorded)
     lineage:
       - datalake_devlake_clean.pr_custom_metrics.ts_released
+  dt_first_commit:
+    description: Date of the first commit authored for this PR
+    lineage:
+      - datalake_devlake_clean.pull_request_commits.commit_authored_date
+  dt_last_commit:
+    description: Date of the last commit authored for this PR
+    lineage:
+      - datalake_devlake_clean.pull_request_commits.commit_authored_date
+  dt_first_comment:
+    description: Date of the first comment or review on the PR
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.created_date
+  dt_first_approval:
+    description: Date of the first APPROVED review on the PR (null if never approved)
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.created_date
+  dt_first_human_comment:
+    description: Date of the first comment from a human reviewer (null if only bots commented)
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.created_date
+      - datalake_devlake_clean.pull_request_comments.account_id
+  dt_first_human_approval:
+    description: Date of the first APPROVED review from a human (null if only bots approved or never approved)
+    lineage:
+      - datalake_devlake_clean.pull_request_comments.created_date
+      - datalake_devlake_clean.pull_request_comments.account_id
   ts_load:
     description: Timestamp when the row was last loaded into the DW

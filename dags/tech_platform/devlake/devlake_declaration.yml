@@ -8,7 +8,7 @@ dag:
     dag_purpose: |
       Ingests core DevLake tables from MySQL into the datalake (raw + clean layers).
       Source: DevLake RDS (devlake-prod.ciuoqxapzjot.us-east-1.rds.amazonaws.com).
-      Tables: pull_requests, pr_custom_metrics, pull_request_team, repos, teams, users.
+      Tables: pull_requests, pr_custom_metrics, pull_request_team, pull_request_commits, pull_request_comments, repos, teams, users.
       Runs daily at 4 AM UTC; serves as the upstream dependency for dw_devlake.
 workflow:
   type: cdc
@@ -39,6 +39,14 @@ workflow:
       raw_primary_keys: [id]
       clean_table_name: teams
       clean_primary_keys: [id_team]
+    pull_request_commits:
+      raw_primary_keys: [commit_sha, pull_request_id]
+      clean_table_name: pull_request_commits
+      clean_primary_keys: [commit_sha, id_pr]
+    pull_request_comments:
+      raw_primary_keys: [id]
+      clean_table_name: pull_request_comments
+      clean_primary_keys: [id_comment]
     users:
       raw_primary_keys: [id]
       clean_table_name: users

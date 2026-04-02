@@ -19,6 +19,8 @@ Daily ingestion of core DevLake tables from the production MySQL RDS into Databr
 | `pull_request_team` | `pull_request_team` | PR-to-team bridge (factless, many-to-many) |
 | `repos` | `repos` | GitHub repositories in DevLake scope |
 | `teams` | `teams` | Org hierarchy synced from Backstage (LINE/TEAM hierarchy) |
+| `pull_request_commits` | `pull_request_commits` | Commits linked to PRs (author, date) |
+| `pull_request_comments` | `pull_request_comments` | PR comments and reviews (timestamps, type) |
 | `users` | `users` | Engineers synced from Backstage |
 
 ## Downstream
@@ -32,3 +34,23 @@ Databricks secret key: `DEVLAKE_DB`. Contact the Tech Platform Engineering Produ
 ## Schedule
 
 Daily at 04:00 UTC.
+
+## Adding a new table — checklist
+
+When registering a new table in `devlake_declaration.yml` you **must** also create the following files or CI will fail:
+
+| File | Path | Purpose |
+|------|------|---------|
+| Clean SQL query | `queries/clean/<table>.sql` | Rename raw columns to QuintoAndar conventions (`id_` prefix, `ts_` for timestamps, `is_` for booleans) and select only business-relevant columns from `datalake_devlake_raw.<table>` |
+| Clean metadata | `metadata/clean/<table>.yml` | Describes every output column — `database_name`, `table_name`, `domain`, `owner`, `description`, per-column `description` + `lineage`. Validated by `make validate-metadata-files-content` |
+
+**Validate locally before opening the PR:**
+```bash
+CI_COMMIT_BRANCH=$(git branch --show-current) make validate-metadata-files-exist
+CI_COMMIT_BRANCH=$(git branch --show-current) make validate-metadata-files-content
+CI_COMMIT_BRANCH=$(git branch --show-current) make validate-lineage-consistency
+make dependencies-file   # regenerates dags/dependencies.yaml — commit the result
+CI_COMMIT_BRANCH=$(git branch --show-current) make validate-dependency-file-correctness
+```
+
+See `.cursor/skills/create-metadata-files/SKILL.md` for the full metadata authoring guide.

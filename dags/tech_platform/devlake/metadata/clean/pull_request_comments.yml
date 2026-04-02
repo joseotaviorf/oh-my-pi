@@ -1,0 +1,81 @@
+database_name: datalake_devlake_clean
+table_name: pull_request_comments
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: >
+  Standardized CDC mirror of DevLake pull_request_comments. One row per
+  comment or review event on a pull request. Primary key: id_comment.
+  Covers three comment types: REVIEW (approval/rejection events),
+  DIFF (inline code review comments), and NORMAL (general PR comments).
+  Join to pull_requests via id_pr. Used in dw_devlake fact_pull_requests
+  to derive review depth, cycle time phases, bot vs human review splits,
+  and comment quality signals (suggestion_count, actionable_comment_count).
+  Note: body field contains raw comment text used for keyword-based
+  classification of actionable feedback.
+columns:
+  id_comment:
+    description: >
+      DevLake comment ID (PK). Uniquely identifies a comment or review
+      event across all repositories.
+    lineage:
+      - datalake_devlake_raw.pull_request_comments.id
+  id_pr:
+    description: >
+      DevLake PR ID (FK to datalake_devlake_clean.pull_requests.id_pr).
+      Links the comment to its pull request.
+    lineage:
+      - datalake_devlake_raw.pull_request_comments.pull_request_id
+  account_id:
+    description: >
+      DevLake account ID of the comment author (FK to
+      datalake_devlake_clean.users). Used to distinguish bot accounts
+      (known CI bots, auto-approvers) from human reviewers. The
+      bot_accounts CTE in fact_pull_requests.sql maintains the exclusion
+      list.
+    lineage:
+      - datalake_devlake_raw.pull_request_comments.account_id
+  type:
+    description: >
+      Comment type: REVIEW (approval/rejection/change-request review
+      submitted via GitHub review UI), DIFF (inline code review comment
+      on a specific line), or NORMAL (general PR-level comment).
+    lineage:
+      - datalake_devlake_raw.pull_request_comments.type
+  status:
+    description: >
+      Review decision status, populated only for REVIEW-type comments:
+      APPROVED, CHANGES_REQUESTED, COMMENTED (review with comment but
+      no explicit decision), or DISMISSED (stale review dismissed by
+      maintainer). Null for DIFF and NORMAL types.
+    lineage:
+      - datalake_devlake_raw.pull_request_comments.status
+  body:
+    description: >
+      Raw text body of the comment. Used in fact_pull_requests for
+      keyword-based classification of comment quality: GitHub suggestion
+      blocks (body LIKE '%suggestion%'), verbal suggestions, bug flags,
+      and context-seeking questions. See dw_devlake.md precision notes
+      for classification accuracy caveats.
+    lineage:
+      - datalake_devlake_raw.pull_request_comments.body
+  commit_sha:
+    description: >
+      SHA of the commit the comment was submitted against. Populated for
+      DIFF and REVIEW comments; null for NORMAL comments. Can be used to
+      detect stale reviews (review submitted against an older commit than
+      HEAD).
+    lineage:
+      - datalake_devlake_raw.pull_request_comments.commit_sha
+  review_id:
+    description: >
+      DevLake review ID grouping DIFF comments that belong to the same
+      GitHub review submission. Null for NORMAL comments.
+    lineage:
+      - datalake_devlake_raw.pull_request_comments.review_id
+  created_date:
+    description: >
+      Timestamp when the comment was created (UTC). Used to compute
+      review_wait_seconds, first_approval_seconds, and human review
+      wait times in fact_pull_requests.
+    lineage:
+      - datalake_devlake_raw.pull_request_comments.created_date

@@ -1,0 +1,38 @@
+database_name: datalake_devlake_clean
+table_name: pull_request_commits
+owner: tech-platform-engprod@quintoandar.com.br
+domain: Tech Platform
+description: >
+  Standardized CDC mirror of DevLake pull_request_commits. One row per
+  commit-to-PR association. Primary key: (commit_sha, id_pr).
+  Links each commit to its pull request; join to pull_requests via id_pr.
+  Used in dw_devlake fact_pull_requests to derive commit_count and
+  coding_time_seconds (first_commit_ts to PR creation date).
+columns:
+  commit_sha:
+    description: >
+      SHA hash of the commit (composite PK part 1). Uniquely identifies the
+      commit in the git repository.
+    lineage:
+      - datalake_devlake_raw.pull_request_commits.commit_sha
+  id_pr:
+    description: >
+      DevLake PR ID (composite PK part 2, FK to
+      datalake_devlake_clean.pull_requests.id_pr). Links the commit to the
+      pull request it was included in.
+    lineage:
+      - datalake_devlake_raw.pull_request_commits.pull_request_id
+  commit_author_name:
+    description: Display name of the commit author as recorded in git.
+    lineage:
+      - datalake_devlake_raw.pull_request_commits.commit_author_name
+  commit_author_email:
+    description: Email address of the commit author as recorded in git.
+    lineage:
+      - datalake_devlake_raw.pull_request_commits.commit_author_email
+  commit_authored_date:
+    description: >
+      Timestamp when the commit was authored (UTC). Used to determine first
+      commit date per PR, which drives coding_time_seconds in fact_pull_requests.
+    lineage:
+      - datalake_devlake_raw.pull_request_commits.commit_authored_date

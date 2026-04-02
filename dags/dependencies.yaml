@@ -614,6 +614,8 @@ bietlejuice.dw_demographics:
   - bietlejuice.pin_core:load-clean-religion:first-run-of-day
 bietlejuice.dw_devlake:
   - bietlejuice.devlake:load-clean-pr-custom-metrics:first-run-of-day
+  - bietlejuice.devlake:load-clean-pull-request-comments:first-run-of-day
+  - bietlejuice.devlake:load-clean-pull-request-commits:first-run-of-day
   - bietlejuice.devlake:load-clean-pull-request-team:first-run-of-day
   - bietlejuice.devlake:load-clean-pull-requests:first-run-of-day
   - bietlejuice.devlake:load-clean-repos:first-run-of-day

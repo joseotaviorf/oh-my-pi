@@ -22,7 +22,6 @@ column_level_validations:
     is_complete:
       severity_level: Error
     custom:
-      # One fact row per DevLake pull request
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT id_pr
@@ -35,7 +34,6 @@ column_level_validations:
     is_complete:
       severity_level: Error
     custom:
-      # Non-null sk_repo must resolve to dim_repo
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_devlake.fact_pull_requests f
@@ -45,7 +43,6 @@ column_level_validations:
       severity_level: Error
   sk_team:
     custom:
-      # When sk_team is present, it must exist on dim_team
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_devlake.fact_pull_requests f
@@ -55,7 +52,6 @@ column_level_validations:
       severity_level: Error
   sk_author_user:
     custom:
-      # When author SK is present, it must exist on dim_user
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_devlake.fact_pull_requests f
@@ -65,7 +61,6 @@ column_level_validations:
       severity_level: Error
   sk_merged_by_user:
     custom:
-      # When merger SK is present, it must exist on dim_user
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_devlake.fact_pull_requests f
@@ -75,7 +70,6 @@ column_level_validations:
       severity_level: Error
   sk_created_date:
     custom:
-      # Created date key must exist on conformed calendar dimension
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_devlake.fact_pull_requests f
@@ -85,7 +79,6 @@ column_level_validations:
       severity_level: Error
   sk_merged_date:
     custom:
-      # Merged date key must exist on conformed calendar dimension
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_devlake.fact_pull_requests f
@@ -95,12 +88,29 @@ column_level_validations:
       severity_level: Error
   sk_released_date:
     custom:
-      # Released date key must exist on conformed calendar dimension
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_devlake.fact_pull_requests f
          LEFT JOIN dw_public.dim_date d ON f.sk_released_date = d.sk_date
          WHERE f.sk_released_date IS NOT NULL AND d.sk_date IS NULL
+        ) = 0
+      severity_level: Error
+  sk_first_commit_date:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests f
+         LEFT JOIN dw_public.dim_date d ON f.sk_first_commit_date = d.sk_date
+         WHERE f.sk_first_commit_date IS NOT NULL AND d.sk_date IS NULL
+        ) = 0
+      severity_level: Error
+  sk_first_approval_date:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests f
+         LEFT JOIN dw_public.dim_date d ON f.sk_first_approval_date = d.sk_date
+         WHERE f.sk_first_approval_date IS NOT NULL AND d.sk_date IS NULL
         ) = 0
       severity_level: Error
   pr_status:
@@ -111,12 +121,206 @@ column_level_validations:
       severity_level: Error
   is_merged:
     custom:
-      # is_merged must match pr_status (MERGED => true, else false)
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_devlake.fact_pull_requests
          WHERE (pr_status = 'MERGED' AND is_merged IS NOT TRUE)
             OR (pr_status <> 'MERGED' AND is_merged IS NOT FALSE)
+        ) = 0
+      severity_level: Error
+  commit_count:
+    is_complete:
+      severity_level: Warning
+    custom:
+      # commit_count must be >= 0 (COALESCE ensures no NULLs)
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE commit_count < 0
+        ) = 0
+      severity_level: Error
+  comment_count:
+    is_complete:
+      severity_level: Warning
+    custom:
+      # comment_count must be >= 0
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE comment_count < 0
+        ) = 0
+      severity_level: Error
+  approval_count:
+    custom:
+      # approval_count must be <= review_comment_count (approvals are a subset of reviews)
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE approval_count > review_comment_count
+        ) = 0
+      severity_level: Error
+  changes_requested_count:
+    custom:
+      # changes_requested_count must be <= review_comment_count
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE changes_requested_count > review_comment_count
+        ) = 0
+      severity_level: Error
+  dismissed_review_count:
+    is_complete:
+      severity_level: Warning
+    custom:
+      # dismissed_review_count must be <= review_comment_count
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE dismissed_review_count > review_comment_count
+        ) = 0
+      severity_level: Error
+  reviewer_count:
+    custom:
+      # reviewer_count should be 0 when there are no review/diff comments
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE review_comment_count + diff_comment_count = 0
+           AND reviewer_count > 0
+        ) = 0
+      severity_level: Error
+  coding_time_seconds:
+    custom:
+      # coding_time should be NULL when no commit data exists
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE commit_count = 0 AND coding_time_seconds IS NOT NULL
+        ) = 0
+      severity_level: Error
+  first_approval_seconds:
+    custom:
+      # first_approval should be NULL when no approvals exist
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE approval_count = 0 AND first_approval_seconds IS NOT NULL
+        ) = 0
+      severity_level: Error
+  merge_after_approval_seconds:
+    custom:
+      # merged PRs with approval should have non-null merge_after_approval
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE is_merged = TRUE
+           AND approval_count > 0
+           AND merge_after_approval_seconds IS NULL
+        ) = 0
+      severity_level: Warning
+  bot_comment_count:
+    is_complete:
+      severity_level: Warning
+    custom:
+      # bot + human must equal total comment_count
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE bot_comment_count + human_comment_count <> comment_count
+        ) = 0
+      severity_level: Error
+  human_comment_count:
+    is_complete:
+      severity_level: Warning
+  human_approval_count:
+    custom:
+      # human_approval_count must be <= approval_count
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE human_approval_count > approval_count
+        ) = 0
+      severity_level: Error
+  human_reviewer_count:
+    custom:
+      # human_reviewer_count must be <= reviewer_count
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE human_reviewer_count > reviewer_count
+        ) = 0
+      severity_level: Error
+  human_diff_comment_count:
+    is_complete:
+      severity_level: Warning
+    custom:
+      # human_diff_comment_count must be <= diff_comment_count
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE human_diff_comment_count > diff_comment_count
+        ) = 0
+      severity_level: Error
+  suggestion_count:
+    is_complete:
+      severity_level: Warning
+    custom:
+      # suggestion_count must be <= human_diff_comment_count (suggestions are a subset of human DIFF comments)
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE suggestion_count > human_diff_comment_count
+        ) = 0
+      severity_level: Error
+  actionable_comment_count:
+    is_complete:
+      severity_level: Warning
+    custom:
+      # actionable_comment_count must be <= human_diff_comment_count
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE actionable_comment_count > human_diff_comment_count
+        ) = 0
+      severity_level: Error
+  question_comment_count:
+    is_complete:
+      severity_level: Warning
+    custom:
+      # question_comment_count must be <= human_diff_comment_count
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE question_comment_count > human_diff_comment_count
+        ) = 0
+      severity_level: Error
+  pr_size_category:
+    is_complete:
+      severity_level: Error
+    custom:
+      # pr_size_category must be one of the valid values
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE pr_size_category NOT IN ('XS', 'S', 'M', 'L', 'XL')
+        ) = 0
+      severity_level: Error
+  human_review_wait_seconds:
+    custom:
+      # human_review_wait should be NULL when no human comments exist
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE human_comment_count = 0 AND human_review_wait_seconds IS NOT NULL
+        ) = 0
+      severity_level: Error
+  human_first_approval_seconds:
+    custom:
+      # human_first_approval should be NULL when no human approvals exist
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.fact_pull_requests
+         WHERE human_approval_count = 0 AND human_first_approval_seconds IS NOT NULL
         ) = 0
       severity_level: Error
   ts_load:
