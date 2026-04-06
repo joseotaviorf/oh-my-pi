@@ -19,8 +19,6 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
 )
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
-
 from bietlejuice.services.configuration_service import ConfigurationService
 from databricks_plugin import (
     QuintoAndarDatabricksCheckJobTaskOperator,
@@ -41,10 +39,7 @@ RELATIVE_DAG_PATH = "dags/support_and_service/salesforce_cdc"
 
 # Use config and DAG constants so the DAG works without requiring Airflow Variables
 # (bucket/dag_name/environment). Config is loaded per environment (forno_conf vs prod_conf).
-try:
-    bucket = CONFIG_SERVICE.get_config("datalake_bucket")
-except (IndexError, KeyError):
-    bucket = "5a-datalake-forno"
+bucket = CONFIG_SERVICE.get_config("datalake_bucket")
 
 
 BASE_PARAMETERS = {
@@ -112,8 +107,6 @@ def create_sync_metadata_task(schema: str, table_name: str):
                     schema,
                     "--table-name",
                     table_name,
-                    MetadataTypeEnum.LINEAGE.value,
-                    RELATIVE_DAG_PATH,
                 ],
             }
         },
@@ -183,6 +176,7 @@ with DAG(
             entry_point="cdc_clean",
             parameters={
                 "source_schema": "datalake_salesforce_raw",
+                "sync_hive": "True",
             },
         ) >> create_sync_metadata_task(
             schema="salesforce",

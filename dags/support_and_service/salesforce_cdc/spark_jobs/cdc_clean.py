@@ -32,12 +32,27 @@ from quintoandar_logger import QuintoAndarLogger
             help="Partition hour (HH).",
         ),
         dict(
-            name = "source_schema", 
+            name="bucket",
+            flags=["--bucket"],
+            type=str,
+            required=True,
+            help="S3 Bucket Name.",
+        ),
+        dict(
+            name="source_schema",
             flags=["--source_schema", "--source-schema"],
             type=str,
             required=True,
             help="Source schema (salesforce_cdc_raw).",
-        )
+        ),
+        dict(
+            name="sync_hive",
+            flags=["--sync_hive", "--sync-hive"],
+            type=lambda x: x.lower() == "true",
+            required=False,
+            default=False,
+            help="When true, calls sync_trino_table_schema from sync_metadata after writing to register or update the table in Trino's Delta catalog. Requires table_location to be set.",
+        ),
     ]
 )
 def run(cfg): 

@@ -3,6 +3,7 @@ import logging
 import traceback
 from argparse import ArgumentParser
 from collections import OrderedDict
+from typing import Optional
 
 from quintoandar_logger import QuintoAndarLogger
 from pyspark.sql import DataFrame
@@ -66,9 +67,8 @@ def _get_trino_client() -> TrinoClient:
     Retrieves a TrinoClient pointing to the Delta catalog, using credentials
     stored in Databricks secrets.
     """
-    trino_creds = json.loads(
-        dbutils.secrets.get("quintoandar", DatabaseEnum.TRINO)  # noqa: F821
-    )
+    dbutils = BaseDBUtils().get_dbutils()
+    trino_creds = json.loads(dbutils.secrets.get("quintoandar", DatabaseEnum.TRINO))
     return TrinoClient(
         host=trino_creds["host"],
         port=int(trino_creds["port"]),
@@ -79,25 +79,21 @@ def _get_trino_client() -> TrinoClient:
     )
 
 
-def _get_table_location(full_table_name: str) -> str:
+def _build_table_location(bucket: str, layer: str, schema: str, table_name: str) -> str:
     """
-    Retrieves the physical storage location of a Spark table by running
-    DESCRIBE EXTENDED and extracting the Location row.
+    Constructs the canonical S3 path for a Delta table following the datalake
+    convention: ``s3a://{bucket}/{layer}/{schema}/{table_name}``.
 
-    :param full_table_name: fully-qualified table name, e.g.
-        ``datalake_salesforce_clean.events_case``
-    :return: s3a:// path to the table root
+    This avoids relying on ``DESCRIBE EXTENDED``, which returns the Databricks
+    warehouse default when a table was created without an explicit location.
+
+    :param bucket: S3 bucket name (e.g. ``5a-datalake-prod``).
+    :param layer: Data layer (e.g. ``clean``).
+    :param schema: Source schema name (e.g. ``salesforce``).
+    :param table_name: Table name (e.g. ``events_case``).
+    :return: s3a:// path to the table root.
     """
-    table_info = spark.sql(  # noqa: F821
-        f"DESCRIBE EXTENDED {full_table_name}"
-    ).collect()
-    location_rows = [r for r in table_info if r[0] == "Location"]
-    if not location_rows:
-        raise ValueError(
-            f"m=_get_table_location, full_table_name={full_table_name}, "
-            "msg=Could not find Location row in DESCRIBE EXTENDED output"
-        )
-    return location_rows[0][1].replace("s3://", "s3a://")
+    return f"s3a://{bucket}/{layer}/{schema}/{table_name}"
 
 
 def sync_trino_table_schema(
@@ -168,6 +164,64 @@ def sync_trino_table_schema(
     )
 
 
+def _sync_trino_metadata(
+    target_table: str,
+    table_location: Optional[str],
+    df: DataFrame,
+) -> None:
+    """Sync Trino/Hive metastore after a Delta write.
+
+    Resolves the Trino client, derives the database and table names from
+    ``target_table``, and calls ``sync_trino_table_schema`` to register or
+    update the table schema in the Delta catalog.
+
+    Parameters
+    ----------
+    target_table : str
+        Fully qualified Delta table name (``catalog.db.table`` or ``db.table``).
+    table_location : str
+        S3/HDFS path where the Delta table data lives. Required.
+    df : DataFrame
+        DataFrame whose ``dtypes`` describe the current table schema.
+    """
+    logger = set_logger("_sync_trino_metadata")
+
+    if not table_location:
+        raise ValueError(
+            f"m=_sync_trino_metadata, target_table={target_table}, "
+            "msg=table_location is required when sync_hive=True"
+        )
+
+    parts = target_table.split(".")
+    db_name = parts[0] if len(parts) == 2 else ".".join(parts[:-1])
+    tname = parts[-1]
+    df_columns = OrderedDict((col.lower(), dtype) for col, dtype in df.dtypes)
+
+    logger.info(
+        f"m={logger.name}, db_name={db_name}, table_name={tname}, "
+        f"table_location={table_location}, msg=Starting Trino metadata sync"
+    )
+    try:
+        trino_client = _get_trino_client()
+        logger.info(
+            f"m={logger.name}, db_name={db_name}, table_name={tname}, "
+            "msg=Trino client created successfully"
+        )
+        sync_trino_table_schema(
+            trino_client, db_name, tname, table_location, df_columns
+        )
+        logger.info(
+            f"m={logger.name}, db_name={db_name}, table_name={tname}, "
+            "msg=Trino metadata sync completed successfully"
+        )
+    except Exception as e:
+        logger.error(
+            f"m={logger.name}, db_name={db_name}, table_name={tname}, "
+            f"table_location={table_location}, msg=Trino metadata sync failed with: {e}"
+        )
+        raise
+
+
 def sync_trino_tables_metadata(bucket, layer, schema, table_name, all_tables_flag):
     """
     Reads the column schema from each clean-layer DataFrame and ensures the
@@ -194,8 +248,7 @@ def sync_trino_tables_metadata(bucket, layer, schema, table_name, all_tables_fla
     trino_client = _get_trino_client()
 
     for tname, tmeta in tables_metadata.items():
-        full_table_name = f"{spark_ms.spark_database_name}.{tname}"
-        table_location = _get_table_location(full_table_name)
+        table_location = _build_table_location(bucket, layer, schema, tname)
         sync_trino_table_schema(
             trino_client,
             spark_ms.spark_database_name,
@@ -237,11 +290,6 @@ if __name__ == "__main__":
     schema = args.schema
     table_name = args.table_name
     all_tables_flag = args.all_tables_flag
-
-    base_dbutils = BaseDBUtils()
-    if base_dbutils.get_dbutils() is not None:
-        global dbutils
-        dbutils = base_dbutils.get_dbutils()
 
     try:
         sync_trino_tables_metadata(bucket, layer, schema, table_name, all_tables_flag)

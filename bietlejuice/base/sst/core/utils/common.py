@@ -6,12 +6,11 @@ from collections import Counter
 from functools import wraps
 from pyspark.sql import DataFrame, SparkSession
 from typing import Callable, List, Optional, Union
-from quintoandar_logger import QuintoAndarLogger
-
-
 import re
 import pyspark.sql.functions as F
 
+from quintoandar_logger import QuintoAndarLogger
+from bietlejuice.base.sst.core.metadata.sync_metadata import _sync_trino_metadata
 
 logger = QuintoAndarLogger("sst.common")
 
@@ -306,10 +305,12 @@ def validate_and_write(
     spark: SparkSession,
     df: DataFrame,
     target_table: str,
+    table_location: str,
     partition_filter: str = None,
     partition_cols: Optional[List[str]] = None,
     overwrite_schema: bool = False,
     append: bool = False,
+    sync_hive: bool = False,
 ):
     """
     Validate and write a filtered subset of columns to a Delta table using
@@ -336,6 +337,14 @@ def validate_and_write(
         Whether to append the DataFrame to the target table, the default is False to overwrite the partition (based on partition_filter).
         We should use partition_filter instead of appending to a table, this will ensure the results are always consistent and predictable.
         However, some cases we'll be just appending to a table, for example, when we're appending metrics to a table.
+    table_location : str
+        Explicit S3/HDFS path for the Delta table (e.g. ``s3a://my-bucket/clean/salesforce/events_case``).
+        The writer always sets this path — both on first creation and on subsequent writes — ensuring
+        data lands in the expected S3 location rather than the Databricks warehouse default.
+    sync_hive : bool, optional
+        When True, calls ``sync_trino_table_schema`` from ``sync_metadata`` after
+        writing to register or update the table in Trino's Delta catalog.
+        Requires ``table_location`` to be set. Defaults to False.
     """
 
     _require_qualified_table_name(target_table)
@@ -354,6 +363,11 @@ def validate_and_write(
         writer = df.write.format("delta").mode("overwrite")
         if partition_cols:
             writer = writer.partitionBy(*partition_cols)
+        if table_location:
+            writer = writer.option("path", table_location)
+            logger.info(
+                f"m=validate_and_write, msg=Using explicit table location: {table_location}"
+            )
         logger.info(f"m=validate_and_write, msg=Trying to create table: {target_table}")
         writer.saveAsTable(target_table)
 
@@ -388,12 +402,32 @@ def validate_and_write(
 
     writer = df.write.format("delta").option("mergeSchema", overwrite_schema_option)
 
+    if table_location:
+        writer = writer.option("path", table_location)
+        logger.info(
+            f"m=validate_and_write, msg=Using explicit table location: {table_location}"
+        )
+
     if append:
         writer = writer.mode("append")
     else:
         writer = writer.mode("overwrite")
         writer = writer.option("replaceWhere", partition_filter)
     writer.saveAsTable(target_table)
+
+    if not sync_hive:
+        logger.info(
+            f"m=validate_and_write, target_table={target_table}, "
+            "msg=Trino metadata sync skipped (sync_hive=False)"
+        )
+        return
+
+    _sync_trino_metadata(target_table, table_location, df)
+
+    logger.info(
+        f"m=validate_and_write, target_table={target_table}, "
+        "msg=Trino metadata sync completed"
+    )
 
 
 def normalize_column_name(col: str) -> str:

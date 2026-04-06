@@ -20,6 +20,7 @@ def save_volume_metric(
     env,
     layer,
     partition_cols,
+    table_location: str,
 ):
 
     write_timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -82,9 +83,11 @@ def save_volume_metric(
         spark=spark,
         df=_metric,
         target_table=metric_table,
+        table_location=table_location,
         partition_cols=partition_cols,
         overwrite_schema=False,
         append=True,
+        sync_hive=False,
     )
 
 
@@ -96,6 +99,7 @@ def save_table_metadata_metric(
     new_cols,
     env,
     layer,
+    table_location: str,
     partition_values=None,
     partition_cols=None,
 ):
@@ -146,7 +150,9 @@ def save_table_metadata_metric(
         spark=spark,
         df=_metric,
         target_table=metric_table,
+        table_location=table_location,
         partition_cols=partition_cols,
         overwrite_schema=False,
         append=True,
+        sync_hive=False,
     )

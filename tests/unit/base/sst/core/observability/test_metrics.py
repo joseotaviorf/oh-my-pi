@@ -56,6 +56,7 @@ def test_save_volume_metric_writes_aggregated_rows_for_non_empty_df():
             env="forno",
             layer="clean",
             partition_cols=["partition_date", "partition_hour"],
+            table_location="s3://bucket/path/to/table",
         )
 
     assert mock_validate_and_write.call_count == 1
@@ -105,6 +106,7 @@ def test_save_volume_metric_writes_zero_row_metric_for_empty_df():
             env="forno",
             layer="clean",
             partition_cols=["partition_date", "partition_hour"],
+            table_location="s3://bucket/path/to/table",
         )
 
     assert mock_validate_and_write.call_count == 1
@@ -138,6 +140,7 @@ def test_save_table_metadata_metric_writes_metadata_with_partition_values():
             new_cols=["status"],
             env="forno",
             layer="clean",
+            table_location="s3://bucket/path/to/table",
             partition_values={"year": "2024", "month": "01"},
             partition_cols=["year", "month"],
         )
@@ -179,6 +182,7 @@ def test_save_table_metadata_metric_writes_metadata_without_partition_values():
             new_cols=None,
             env="prod",
             layer="clean",
+            table_location="s3://bucket/path/to/table",
         )
 
     assert mock_validate_and_write.call_count == 1
@@ -217,6 +221,7 @@ def test_save_table_metadata_metric_sanitizes_table_name_special_chars():
             new_cols=[],
             env="forno",
             layer="enrich",
+            table_location="s3://bucket/path/to/table",
         )
 
     call_kwargs = mock_validate_and_write.call_args.kwargs

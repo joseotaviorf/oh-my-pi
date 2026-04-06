@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 from pyspark.sql import functions as F
@@ -120,13 +121,16 @@ def salesforce_clean_pipeline(spark, cfg):
 
     new_cols = sensor_for_new_columns(spark=spark, df=snapshot, table=target_table)
     partition_filter = f"partition_date='{cfg.partition_date}' AND partition_hour='{cfg.partition_hour}'"
+    table_location = f"s3a://{cfg.bucket}/clean/salesforce/{cfg.target_table}"
     validate_and_write(
         spark,
         snapshot,
-        target_table=target_table,  # "datalake_salesforce_test_cdc.events_case_clean",
+        target_table=target_table,
         partition_filter=partition_filter,
         partition_cols=["partition_date", "partition_hour"],
         overwrite_schema=True,
+        table_location=table_location,
+        sync_hive=cfg.sync_hive,
     )
 
     if new_cols:
@@ -141,6 +145,7 @@ def salesforce_clean_pipeline(spark, cfg):
         "events_volume": ["partition_date", "partition_hour"],
         "events_type_volume": ["partition_date", "partition_hour", "event_type"],
     }
+    sanitized_target_table = re.sub(r"\W", "_", target_table).strip("_").lower()
     for _metric, grain in _metric_grain.items():
         logger.info(f"m=salesforce_clean_pipeline, msg=Saving {_metric} metric")
         save_volume_metric(
@@ -152,6 +157,7 @@ def salesforce_clean_pipeline(spark, cfg):
             env=cfg.env,
             layer="clean",
             partition_cols=["partition_date", "partition_hour"],
+            table_location=f"s3a://{cfg.bucket}/sst_metrics/{_metric}",
         )
 
     logger.info("m=salesforce_clean_pipeline, msg=Saving table_metadata metric")
@@ -162,6 +168,7 @@ def salesforce_clean_pipeline(spark, cfg):
         new_cols=new_cols,
         env=cfg.env,
         layer="clean",
+        table_location=f"s3a://{cfg.bucket}/sst_metrics/{sanitized_target_table}_metadata",
         partition_values={
             "partition_date": cfg.partition_date,
             "partition_hour": cfg.partition_hour,

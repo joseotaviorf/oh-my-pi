@@ -91,6 +91,7 @@ def salesforce_raw_pipeline(spark, cfg):
     partition_cols = ["partition_date", "partition_hour"]
     logger.info(f"m=salesforce_raw_pipeline, msg=Partition columns: {partition_cols}")
 
+    table_location = f"s3a://{cfg.bucket}/raw/salesforce/{cfg.target_table}"
     validate_and_write(
         spark=spark,
         df=raw_final,
@@ -98,6 +99,7 @@ def salesforce_raw_pipeline(spark, cfg):
         partition_filter=partition_filter,
         partition_cols=partition_cols,
         overwrite_schema=True,
+        table_location=table_location,
     )
 
     _metric_grain = {
@@ -116,5 +118,6 @@ def salesforce_raw_pipeline(spark, cfg):
             env=cfg.env,
             layer="raw",
             partition_cols=["partition_date", "partition_hour"],
+            table_location=f"s3a://{cfg.bucket}/sst_metrics/{_metric}",
         )
     logger.info("m=salesforce_raw_pipeline, msg=Pipeline completed")
