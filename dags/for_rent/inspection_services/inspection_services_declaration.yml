@@ -35,6 +35,10 @@ workflow:
       clean_table_name: assessment_aud
       clean_primary_keys: [id_assessment, rev]
       raw_primary_keys: [id, rev]
+    assessment_details:
+      clean_table_name: assessment_details
+      clean_primary_keys: [id_assessment_detail]
+      raw_primary_keys: [id]
     automatic_invoice: {}
     automatic_invoice_aud: {}
     invoice_discount:

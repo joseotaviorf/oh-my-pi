@@ -1,0 +1,47 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: assessment_details
+description: >-
+  Detail records associated with property inspection assessments from the Inspections service.
+  Each row represents a specific attribute-value pair for an assessment, such as mediation requirements
+  or key location information. One row per assessment detail. Primary key: id_assessment_detail.
+  Foreign key: id_assessment references the assessment table.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id_assessment_detail:
+    description: "Primary key. Unique auto-generated identifier for each assessment detail record."
+    lineage:
+      - datalake_inspection_services_raw.assessment_details.id
+  id_assessment:
+    description: "Foreign key to datalake_inspection_services_clean.assessment. Identifies which assessment this detail belongs to."
+    lineage:
+      - datalake_inspection_services_raw.assessment_details.assessment_id
+  type:
+    description: "Type of assessment detail, indicating the category of information (e.g., mediation, key_location)."
+    lineage:
+      - datalake_inspection_services_raw.assessment_details.type
+  attribute:
+    description: "Attribute name associated with the assessment detail (e.g., required, street)."
+    lineage:
+      - datalake_inspection_services_raw.assessment_details.attribute
+  value:
+    description: "Value associated with the assessment detail attribute."
+    lineage:
+      - datalake_inspection_services_raw.assessment_details.value
+  ts_created:
+    description: "Timestamp when the assessment detail record was created in the source system."
+    lineage:
+      - datalake_inspection_services_raw.assessment_details.created_at
+  year:
+    description: "Year of the CDC update date, used as partition column."
+    lineage:
+      - datalake_inspection_services_raw.assessment_details.year
+  month:
+    description: "Month of the CDC update date, used as partition column."
+    lineage:
+      - datalake_inspection_services_raw.assessment_details.month
+  day:
+    description: "Day of the CDC update date, used as partition column."
+    lineage:
+      - datalake_inspection_services_raw.assessment_details.day
