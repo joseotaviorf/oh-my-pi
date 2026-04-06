@@ -20,3 +20,5 @@ SELECT
     day
 FROM
     datalake_betopera_raw.tenant_invoice_item
+WHERE 
+    TIMESTAMP(created_at) > '2026-03-10T14:59:56.977+00:00'
