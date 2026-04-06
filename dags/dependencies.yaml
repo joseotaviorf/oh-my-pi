@@ -1598,8 +1598,8 @@ bietlejuice.enrich_bank_conciliation:
   - bietlejuice.monopoly:load-clean-sale:first-run-of-day
   - bietlejuice.nexxera:load-clean-cnab-charges-recupera-velo-2:first-run-of-day
   - bietlejuice.pixar:load-clean-charge:first-run-of-day
-  - bietlejuice.rental_guarantee:load-clean-charge:first-run-of-day
   - bietlejuice.rental_guarantee:load-clean-sap:first-run-of-day
+  - bietlejuice.rental_guarantee_fast_lane:load-clean-charge:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-bill:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-billing-report:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-feature:first-run-of-day
@@ -3450,8 +3450,8 @@ bietlejuice.enrich_rent_potential_listing:
   - bietlejuice.enrich_listing_flow:load-enrich-listing-flows-with-reprocessed-leads:first-run-of-day
   - bietlejuice.enrich_listing_jobs:load-enrich-house-photo-job-tasks:first-run-of-day
 bietlejuice.enrich_rental_guarantee:
-  - bietlejuice.rental_guarantee:load-clean-charge:first-run-of-day
   - bietlejuice.rental_guarantee:load-clean-guarantee:first-run-of-day
+  - bietlejuice.rental_guarantee_fast_lane:load-clean-charge:first-run-of-day
 bietlejuice.enrich_rental_historical_follow_up:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-favorite-set-events:first-run-of-day
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day

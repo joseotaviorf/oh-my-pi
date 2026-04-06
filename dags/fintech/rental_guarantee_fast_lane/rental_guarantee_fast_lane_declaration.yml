@@ -1,0 +1,25 @@
+dag:
+  name: rental_guarantee_fast_lane
+  owner: Data Fintech
+  schedule_interval: 0,30 * * * *
+  documentation:
+    dag_purpose: |
+      Fast lane DAG for the Rental Guarantee Microservice, running every 30 minutes.
+      It loads only the charge table, which requires higher cadence than the main rental_guarantee DAG.
+      For more information about the database please refer to [the repository](https://github.com/quintoandar/rental-guarantee).
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  custom_schema: rental_guarantee
+  source_database: rentalguarantee
+  dbutils_secret_key: RENTAL_GUARANTEE_DB
+  tables_customization:
+    charge:
+      clean_table_name: charge
+      date_filter_column: updated_at
+      extraction_type: incremental
+      partitions: [year, month, day]
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new

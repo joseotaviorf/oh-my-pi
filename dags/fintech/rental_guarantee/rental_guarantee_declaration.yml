@@ -16,11 +16,6 @@ workflow:
     charge_aud:
       clean_table_name: charge_aud
       raw_primary_keys: ["id", "rev"]
-    charge:
-      clean_table_name: charge
-      date_filter_column: updated_at
-      extraction_type: incremental
-      partitions: [year, month, day]
     guarantee_aud:
       clean_table_name: guarantee_aud
       raw_primary_keys: ["id", "rev"]

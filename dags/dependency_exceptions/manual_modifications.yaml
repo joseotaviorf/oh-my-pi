@@ -692,7 +692,7 @@ bietlejuice.enrich_revenue_lines:
     - bietlejuice.fastforward:load-clean-gateway-loan-installment:first-run-of-day
     - bietlejuice.fastforward:load-clean-lra-installment-option:first-run-of-day
     - bietlejuice.owner_fees:load-clean-contract:first-run-of-day
-    - bietlejuice.rental_guarantee:load-clean-charge:first-run-of-day
+    - bietlejuice.rental_guarantee_fast_lane:load-clean-charge:first-run-of-day
     - bietlejuice.rental_guarantee:load-clean-guarantee:first-run-of-day
     - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
 
