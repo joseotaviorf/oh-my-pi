@@ -530,22 +530,27 @@ class BaseCoreModelSparkJob(ABC):
             # Table doesn't exist yet, so all columns are new
             target_cols = set()
 
-        # Create smart when_matched_operation:
-        # - For existing columns (in both source and target): use CASE WHEN to preserve non-null target values
-        # - For new columns (only in source): use source value directly
+        # Get pipeline configuration
+        merge_on = self.get_config("merge_on", required=False, default=None)
+
+        # Check if null values from source should overwrite target values (default: False for backward compatibility)
+        # When False (default): uses CASE WHEN to keep target value when source is NULL
+        # When True: always overwrites with source value, even if NULL
+        overwrite_with_null = self.get_config(
+            "overwrite_with_null", required=False, default=False
+        )
+
+        # Create when_matched_operation based on overwrite_with_null setting
         default_when_matched_operation = {}
         for col in source_cols:
-            if col in target_cols:
-                # Existing column: preserve non-null target values
+            if col in target_cols and not overwrite_with_null:
+                # Existing column with overwrite_with_null=False: use CASE WHEN to preserve non-null target values
                 default_when_matched_operation[col] = (
                     f"CASE WHEN source.{col} IS NOT NULL THEN source.{col} ELSE target.{col} END"
                 )
             else:
-                # New column: use source value directly (target column doesn't exist yet)
+                # New column or overwrite_with_null=True: use source value directly
                 default_when_matched_operation[col] = f"source.{col}"
-
-        # Get pipeline configuration
-        merge_on = self.get_config("merge_on", required=False, default=None)
 
         when_matched_update_condition = self.get_config(
             "when_matched_update_condition", required=False, default=None
