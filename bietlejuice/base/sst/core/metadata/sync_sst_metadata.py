@@ -15,7 +15,7 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark.base_spark import BaseDBUtils
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 
-JOB_NAME = "sync_metadata"
+JOB_NAME = "sync_sst_metadata"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 
 

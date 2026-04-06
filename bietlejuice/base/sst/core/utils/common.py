@@ -10,7 +10,7 @@ import re
 import pyspark.sql.functions as F
 
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.base.sst.core.metadata.sync_metadata import _sync_trino_metadata
+from bietlejuice.base.sst.core.metadata.sync_sst_metadata import _sync_trino_metadata
 
 logger = QuintoAndarLogger("sst.common")
 
