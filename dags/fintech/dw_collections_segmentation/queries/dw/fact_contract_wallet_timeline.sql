@@ -462,7 +462,7 @@ evictions_timeline AS (
         dt_reference
     FROM
         status_timeline_evic
-    WHERE status_time = 'EVEX'
+    WHERE status_time IN ('EVEX', 'EVPD')
     QUALIFY ROW_NUMBER() OVER (PARTITION BY id_contract, dt_reference ORDER BY id_process) = 1
 ),
 base_negotiations AS (
