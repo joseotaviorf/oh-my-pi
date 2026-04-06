@@ -30,6 +30,7 @@ workflow:
     case:
       clean_table_name: case
       extraction_type: incremental
+      merge_on: [id_case]
       partitions: [year, month, day]
       extra_spark_job_arguments:
         - "['CEDTUPD']"
@@ -62,6 +63,7 @@ workflow:
     cantfylg:
       clean_table_name: case_notification_log
       extraction_type: incremental
+      merge_on: [id_notification_request, id_notification_sequence]
       partitions: [year, month, day]
       extra_spark_job_arguments:
         - "['CNDTUPD']"
@@ -78,6 +80,7 @@ workflow:
     casestag:
       clean_table_name: case_stage
       extraction_type: incremental
+      merge_on: [id_case, id_stage]
       partitions: [year, month, day]
       extra_spark_job_arguments:
         - "['CSDTUPD']"
@@ -86,6 +89,7 @@ workflow:
     caseacct:
       clean_table_name: case_account
       extraction_type: incremental
+      merge_on: [id_case, id_contract_group, id_contract]
       partitions: [year, month, day]
       extra_spark_job_arguments:
         - "['CCDTUPD']"
@@ -94,6 +98,7 @@ workflow:
     caalert:
       clean_table_name: case_alert
       extraction_type: incremental
+      merge_on: [id_alert]
       partitions: [year, month, day]
       extra_spark_job_arguments:
         - "['ALDTUPD']"
@@ -101,10 +106,11 @@ workflow:
         - "[]"
     caexpns:
       clean_table_name: case_expense
-      extraction_type: full
-      partitions: []
+      extraction_type: incremental
+      merge_on: [id_expense]
+      partitions: [year, month, day]
       extra_spark_job_arguments:
-        - "[]"
+        - "['EXDTUPD']"
         - False
         - "[]"
     cardacct:
