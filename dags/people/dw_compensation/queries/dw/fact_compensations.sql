@@ -29,29 +29,73 @@ WITH salary_with_person AS (
         sal.is_salary_approved = TRUE
         AND sal.dt_started <= CURRENT_DATE
 ),
-assignment_history_base AS (
+transfer_continuation_periods AS (
+    SELECT
+        aa_next.id_period_of_service AS id_period_of_service
+    FROM
+        datalake_pin_core_clean.all_assignments AS aa
+    INNER JOIN
+        datalake_pin_core_clean.all_assignments AS aa_next
+            ON aa_next.id_person = aa.id_person
+            AND aa_next.assignment_sequence = aa.assignment_sequence + 1
+    WHERE
+        aa.assignment_status_type = 'INACTIVE'
+        AND aa.action_code = 'GLB_TRANSFER'
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY aa_next.id_period_of_service
+            ORDER BY aa.dt_effective_started ASC
+        ) = 1
+),
+assignment_identifier_mapping AS (
     SELECT
         id_assignment,
-        id_job,
-        dt_effective_started,
-        dt_effective_ended
+        id_period_of_service
     FROM
-        datalake_pin_core_clean.all_assignments
+        datalake_people.identifier_mapping
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY id_assignment
+            ORDER BY dt_started ASC
+        ) = 1
+),
+assignment_history_base AS (
+    SELECT
+        aa.id_person,
+        aa.id_assignment,
+        aa.id_job,
+        aa.dt_effective_started,
+        aa.dt_effective_ended,
+        im.id_period_of_service,
+        CASE
+            WHEN tcp.id_period_of_service IS NOT NULL
+            THEN TRUE
+            ELSE FALSE
+        END AS is_transfer_continuation
+    FROM
+        datalake_pin_core_clean.all_assignments AS aa
+    LEFT JOIN
+        assignment_identifier_mapping AS im
+            ON aa.id_assignment = im.id_assignment
+    LEFT JOIN
+        transfer_continuation_periods AS tcp
+            ON im.id_period_of_service = tcp.id_period_of_service
     WHERE
-        id_job IS NOT NULL
+        aa.id_job IS NOT NULL
     QUALIFY
         ROW_NUMBER() OVER (
             PARTITION BY
-                id_assignment,
-                dt_effective_started,
-                dt_effective_ended
+                aa.id_assignment,
+                aa.dt_effective_started,
+                aa.dt_effective_ended
             ORDER BY
-                effective_sequence DESC,
-                object_version_number DESC
+                aa.effective_sequence DESC,
+                aa.object_version_number DESC
         ) = 1
 ),
 assignment_job_groups AS (
     SELECT
+        id_person,
         id_assignment,
         id_job,
         dt_effective_started,
@@ -83,36 +127,83 @@ assignment_job_groups AS (
 ),
 assignment_history AS (
     SELECT
+        id_person,
         id_assignment,
+        id_period_of_service,
+        is_transfer_continuation,
         id_job,
         MIN(dt_effective_started) AS dt_effective_started,
         MAX(dt_effective_ended) AS dt_effective_ended
     FROM
         assignment_job_groups
     GROUP BY
+        id_person,
         id_assignment,
+        id_period_of_service,
+        is_transfer_continuation,
         id_job,
         change_group
 ),
+assignment_service_groups AS (
+    SELECT
+        id_person,
+        id_assignment,
+        SUM(
+            CASE
+                WHEN LAG(id_assignment) OVER (
+                    PARTITION BY id_person
+                    ORDER BY dt_assignment_started, id_assignment
+                ) IS NULL
+                THEN 1
+                WHEN is_transfer_continuation = TRUE
+                THEN 0
+                ELSE 1
+            END
+        ) OVER (
+            PARTITION BY id_person
+            ORDER BY dt_assignment_started, id_assignment
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS service_group
+    FROM (
+        SELECT
+            id_person,
+            id_assignment,
+            MAX(is_transfer_continuation) AS is_transfer_continuation,
+            MIN(dt_effective_started) AS dt_assignment_started
+        FROM
+            assignment_history
+        GROUP BY
+            id_person,
+            id_assignment
+    ) AS assignment_service_base
+),
 assignment_history_with_band AS (
     SELECT
+        ah.id_person,
         ah.id_assignment,
         ah.id_job,
-        ah.dt_effective_started,
-        ah.dt_effective_ended,
+        GREATEST(ah.dt_effective_started, dj.dt_valid_from) AS dt_effective_started,
+        LEAST(ah.dt_effective_ended, dj.dt_valid_to) AS dt_effective_ended,
+        asg.service_group,
         dj.band
     FROM
         assignment_history AS ah
     INNER JOIN
+        assignment_service_groups AS asg
+            ON ah.id_person = asg.id_person
+            AND ah.id_assignment = asg.id_assignment
+    INNER JOIN
         dw_compensation.dim_job AS dj
             ON ah.id_job = dj.id_job
-            AND dj.dt_valid_from <= ah.dt_effective_started
-            AND dj.dt_valid_to > ah.dt_effective_started
+            AND dj.dt_valid_from <= ah.dt_effective_ended
+            AND dj.dt_valid_to >= ah.dt_effective_started
     WHERE
         dj.band IS NOT NULL
 ),
 assignment_band_stint_groups AS (
     SELECT
+        id_person,
+        service_group,
         id_assignment,
         band,
         dt_effective_started,
@@ -120,18 +211,18 @@ assignment_band_stint_groups AS (
         SUM(
             CASE
                 WHEN LAG(dt_effective_ended) OVER (
-                    PARTITION BY id_assignment, band
+                    PARTITION BY id_person, service_group, band
                     ORDER BY dt_effective_started, dt_effective_ended
                 ) < DATE_ADD(dt_effective_started, -1)
                     OR LAG(dt_effective_ended) OVER (
-                        PARTITION BY id_assignment, band
+                        PARTITION BY id_person, service_group, band
                         ORDER BY dt_effective_started, dt_effective_ended
                     ) IS NULL
                 THEN 1
                 ELSE 0
             END
         ) OVER (
-            PARTITION BY id_assignment, band
+            PARTITION BY id_person, service_group, band
             ORDER BY dt_effective_started, dt_effective_ended
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ) AS stint_group
@@ -140,6 +231,8 @@ assignment_band_stint_groups AS (
 ),
 assignment_band_stints AS (
     SELECT
+        id_person,
+        service_group,
         id_assignment,
         band,
         MIN(dt_effective_started) AS dt_stint_start,
@@ -147,39 +240,49 @@ assignment_band_stints AS (
     FROM
         assignment_band_stint_groups
     GROUP BY
+        id_person,
+        service_group,
         id_assignment,
         band,
         stint_group
 ),
 assignment_job_stint_groups AS (
     SELECT
-        id_assignment,
-        id_job,
-        dt_effective_started,
-        dt_effective_ended,
+        ah.id_person,
+        asg.service_group,
+        ah.id_assignment,
+        ah.id_job,
+        ah.dt_effective_started,
+        ah.dt_effective_ended,
         SUM(
             CASE
                 WHEN LAG(dt_effective_ended) OVER (
-                    PARTITION BY id_assignment, id_job
+                    PARTITION BY ah.id_person, asg.service_group, ah.id_job
                     ORDER BY dt_effective_started, dt_effective_ended
                 ) < DATE_ADD(dt_effective_started, -1)
                     OR LAG(dt_effective_ended) OVER (
-                        PARTITION BY id_assignment, id_job
+                        PARTITION BY ah.id_person, asg.service_group, ah.id_job
                         ORDER BY dt_effective_started, dt_effective_ended
                     ) IS NULL
                 THEN 1
                 ELSE 0
             END
         ) OVER (
-            PARTITION BY id_assignment, id_job
+            PARTITION BY ah.id_person, asg.service_group, ah.id_job
             ORDER BY dt_effective_started, dt_effective_ended
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ) AS stint_group
     FROM
-        assignment_history
+        assignment_history AS ah
+    INNER JOIN
+        assignment_service_groups AS asg
+            ON ah.id_person = asg.id_person
+            AND ah.id_assignment = asg.id_assignment
 ),
 assignment_job_stints AS (
     SELECT
+        id_person,
+        service_group,
         id_assignment,
         id_job,
         MIN(dt_effective_started) AS dt_stint_start,
@@ -187,6 +290,8 @@ assignment_job_stints AS (
     FROM
         assignment_job_stint_groups
     GROUP BY
+        id_person,
+        service_group,
         id_assignment,
         id_job,
         stint_group
@@ -267,6 +372,52 @@ salary_with_assignment_job AS (
             AND assignment_history.dt_effective_started <= COALESCE(sal.dt_ended, DATE('4712-12-31'))
             AND assignment_history.dt_effective_ended > sal.dt_started
 ),
+salary_with_job_version AS (
+    -- Split salary periods by dim_job validity windows to keep current job-version attributes.
+    SELECT
+        sal.id_salary,
+        sal.id_person,
+        sal.id_assignment,
+        sal.id_period_of_service,
+        sal.person_number,
+        sal.assignment_number,
+        sal.currency_code,
+        sal.salary_amount,
+        sal.annual_salary,
+        sal.adjustment_amount,
+        sal.adjustment_percent,
+        sal.compa_ratio,
+        sal.range_position,
+        sal.is_salary_approved,
+        sal.id_action,
+        sal.id_action_reason,
+        sal.id_action_occurrence,
+        sal.id_job,
+        CASE
+            WHEN dj.sk_job_version IS NULL
+            THEN sal.dt_started
+            ELSE GREATEST(sal.dt_started, dj.dt_valid_from)
+        END AS dt_started,
+        CASE
+            WHEN dj.sk_job_version IS NULL
+            THEN sal.dt_ended
+            ELSE LEAST(COALESCE(sal.dt_ended, DATE('4712-12-31')), dj.dt_valid_to)
+        END AS dt_ended,
+        dj.sk_job_version,
+        dj.target_plr,
+        dj.target_plr_salary_multiplier,
+        dj.target_rvv,
+        dj.target_sop,
+        dj.target_hiring_sop,
+        dj.target_exceptional_bonus
+    FROM
+        salary_with_assignment_job AS sal
+    LEFT JOIN
+        dw_compensation.dim_job AS dj
+            ON sal.id_job = dj.id_job
+            AND dj.dt_valid_from <= COALESCE(sal.dt_ended, DATE('4712-12-31'))
+            AND dj.dt_valid_to >= sal.dt_started
+),
 salary_enriched AS (
     SELECT
         sal.id_salary,
@@ -288,24 +439,19 @@ salary_enriched AS (
         sal.dt_ended,
         ed.id_event_definition,
         ed.action_code,
-        dj.sk_job_version,
-        dj.target_plr,
-        dj.target_plr_salary_multiplier,
-        dj.target_rvv,
-        dj.target_sop,
-        dj.target_hiring_sop,
-        dj.target_exceptional_bonus
+        sal.sk_job_version,
+        sal.target_plr,
+        sal.target_plr_salary_multiplier,
+        sal.target_rvv,
+        sal.target_sop,
+        sal.target_hiring_sop,
+        sal.target_exceptional_bonus
     FROM
-        salary_with_assignment_job AS sal
+        salary_with_job_version AS sal
     LEFT JOIN
         datalake_people.event_definition AS ed
             ON sal.id_action = ed.id_action
             AND sal.id_action_reason = ed.id_reason
-    LEFT JOIN
-        dw_compensation.dim_job AS dj
-            ON sal.id_job = dj.id_job
-            AND dj.dt_valid_from <= sal.dt_started
-            AND dj.dt_valid_to > sal.dt_started
 ),
 salary_consolidation_base AS (
     SELECT
@@ -563,13 +709,13 @@ LEFT JOIN
         ON sal.sk_job_version = dj_band.sk_job_version
 LEFT JOIN
     assignment_job_stints AS ajst
-        ON sal.id_assignment = ajst.id_assignment
+        ON sal.id_person = ajst.id_person
         AND sal.id_job = ajst.id_job
         AND sal.dt_reference >= ajst.dt_stint_start
         AND sal.dt_reference <= ajst.dt_stint_ended
 LEFT JOIN
     assignment_band_stints AS abst
-        ON sal.id_assignment = abst.id_assignment
+        ON sal.id_person = abst.id_person
         AND dj_band.band = abst.band
         AND sal.dt_reference >= abst.dt_stint_start
         AND sal.dt_reference <= abst.dt_stint_ended

@@ -75,9 +75,31 @@ column_level_validations:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
+    custom:
+      # Band tenure must be populated whenever dim_job band is available for the row.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_compensation.fact_compensations AS fc
+         INNER JOIN dw_compensation.dim_job AS dj
+             ON fc.sk_job_version = dj.sk_job_version
+         WHERE dj.band IS NOT NULL
+           AND fc.days_tenure_in_band IS NULL
+        ) = 0
+      severity_level: Error
   months_tenure_in_band:
     has_min_value:
       greater_than_or_equal_to: 0
+      severity_level: Error
+    custom:
+      # Whole-month band tenure must follow the same completeness rule as day-level tenure.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_compensation.fact_compensations AS fc
+         INNER JOIN dw_compensation.dim_job AS dj
+             ON fc.sk_job_version = dj.sk_job_version
+         WHERE dj.band IS NOT NULL
+           AND fc.months_tenure_in_band IS NULL
+        ) = 0
       severity_level: Error
   dt_valid_from:
     is_complete:

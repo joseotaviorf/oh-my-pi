@@ -128,15 +128,19 @@ columns:
   days_tenure_in_position:
     description: |
       Tenure in the current job (position) in days.
-      Uses current stint (handles A->B->A returning to same job). Reference date LEAST(CURRENT_DATE, dt_valid_to).
-      NULL when job or assignment history is unavailable.
+      Uses current stint by employee across assignment transfers (handles A->B->A returning to same job).
+      Resets on rehire (new employment cycle that is not GLB_TRANSFER continuation).
+      Reference date LEAST(CURRENT_DATE, dt_valid_to).
+      NULL when job history is unavailable.
     lineage:
       - datalake_pin_core_clean.all_assignments.dt_effective_started
   days_tenure_in_band:
     description: |
       Tenure in the current band in days.
-      Uses current stint (handles A->B->A returning to same band). Reference date LEAST(CURRENT_DATE, dt_valid_to).
-      NULL when band or assignment history is unavailable.
+      Uses current stint by employee across assignment transfers (handles A->B->A returning to same band).
+      Resets on rehire (new employment cycle that is not GLB_TRANSFER continuation).
+      Reference date LEAST(CURRENT_DATE, dt_valid_to).
+      NULL when band history is unavailable.
     lineage:
       - datalake_pin_core_clean.all_assignments.dt_effective_started
       - dw_compensation.dim_job.band
@@ -151,13 +155,13 @@ columns:
   months_tenure_in_position:
     description: |
       Tenure in the current job (position) in whole months.
-      Same logic as days_tenure_in_position (current stint, reference date LEAST(CURRENT_DATE, dt_valid_to)).
+      Same logic as days_tenure_in_position (employee-level current stint, transfer continuity, rehire reset, reference date LEAST(CURRENT_DATE, dt_valid_to)).
     lineage:
       - datalake_pin_core_clean.all_assignments.dt_effective_started
   months_tenure_in_band:
     description: |
       Tenure in the current band in whole months.
-      Same logic as days_tenure_in_band (current stint, reference date LEAST(CURRENT_DATE, dt_valid_to)).
+      Same logic as days_tenure_in_band (employee-level current stint, transfer continuity, rehire reset, reference date LEAST(CURRENT_DATE, dt_valid_to)).
     lineage:
       - datalake_pin_core_clean.all_assignments.dt_effective_started
       - dw_compensation.dim_job.band
