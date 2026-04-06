@@ -235,7 +235,6 @@ assignment_band_stints AS (
     SELECT
         id_person,
         service_group,
-        id_assignment,
         band,
         MIN(dt_effective_started) AS dt_stint_start,
         MAX(dt_effective_ended) AS dt_stint_ended
@@ -244,7 +243,6 @@ assignment_band_stints AS (
     GROUP BY
         id_person,
         service_group,
-        id_assignment,
         band,
         stint_group
 ),
@@ -285,7 +283,6 @@ assignment_job_stints AS (
     SELECT
         id_person,
         service_group,
-        id_assignment,
         id_job,
         MIN(dt_effective_started) AS dt_stint_start,
         MAX(dt_effective_ended) AS dt_stint_ended
@@ -294,7 +291,6 @@ assignment_job_stints AS (
     GROUP BY
         id_person,
         service_group,
-        id_assignment,
         id_job,
         stint_group
 ),
