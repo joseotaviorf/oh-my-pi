@@ -41,11 +41,16 @@ columns:
     lineage:
     - datalake_pin_core_clean.all_assignments.reason_code
   dismissal_type:
-    description: Description of the employee dismissal type. Null if no dismissal.
+    description: |-
+      English dismissal action label from Oracle translations (language US). Null if no dismissal.
     lineage:
-    - datalake_hr_system_clean.actions_lov.description
+    - datalake_pin_core_clean.action_translation.description
+    - datalake_pin_core_clean.action_translation.action_name
   dismissal_reason:
-    description: Reason for the employee dismissal. Null if no dismissal.
+    description: |-
+      English dismissal reason from Oracle translations (language US). Null if no dismissal.
+      Downstream logic that compares Portuguese reason text (e.g. PLR eligibility on just cause)
+      must use datalake_employment.employee_details.dismissal_reason, not this table.
     lineage:
     - datalake_pin_core_clean.action_reason_translation.action_reason
   ts_load:
