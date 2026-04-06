@@ -10,7 +10,7 @@ WITH pre_bot_actions AS (
   FROM
     datalake_langfuse_clean.traces
   WHERE
-    ts_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    ts_created >= DATE('{load_start_date}')
     AND input:user_context:user_pre_bot_actions != '[]'
     AND input:user_context:user_pre_bot_actions IS NOT NULL
 ),
@@ -31,10 +31,10 @@ inside_sales_bypass AS (
   INNER JOIN
     datalake_langfuse_clean.observations AS o
       ON o.id_trace = t.id_trace
-      AND o.ts_started BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+      AND o.ts_started >= DATE('{load_start_date}')
       AND GET_JSON_OBJECT(o.output, '$.should_route') = 'true'
   WHERE
-    t.ts_created BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    t.ts_created >= DATE('{load_start_date}')
   GROUP BY 1
 )
 SELECT
