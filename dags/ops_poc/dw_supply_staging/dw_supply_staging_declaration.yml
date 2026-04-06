@@ -7,7 +7,7 @@ dag:
       This DAG loads the supply top-of-funnel (TOF) aggregated data into the DW layer.
 workflow:
   type: query_delta
-  layer: enrich
+  layer: dw
   custom_schema: supply_staging
   default_extraction_type: full
 cluster:
