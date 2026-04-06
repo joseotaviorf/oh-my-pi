@@ -1,0 +1,127 @@
+---
+database_name: datalake_superset
+table_name: dashboards
+owner: gustavo.akashi@quintoandar.com.br
+domain: Data Ops & Governance
+description:
+  Enriched Apache Superset dashboard catalog for data governance and discovery, with one row per
+  dashboard (latest version by change time). Combines ownership, company line parsed from the title,
+  chart membership, usage in the last 90 days, tags, certification, and a popularity rank within
+  each company line for prioritization of catalog and deprecation work.
+columns:
+  id:
+    lineage:
+      - datalake_superset_clean.dashboards.id
+    description:
+      Primary key of the dashboard in Superset. Uniquely identifies each row in this enrich output.
+  entity_name:
+    lineage:
+      - datalake_superset_clean.dashboards.dashboard_title
+    description:
+      Display name of the dashboard as stored in Superset, including bracket tags used for lineage
+      and area classification in the title.
+  entity_url:
+    lineage:
+      - datalake_superset_clean.dashboards.id
+    description:
+      Deep link to open the dashboard in the production Superset UI. Built by concatenating the
+      fixed Habitat base URL with the string form of the dashboard id.
+  technical_owner:
+    lineage:
+      - datalake_superset.ab_user.email
+    description:
+      Email of the Superset user who originally created the dashboard (creator account), joined from
+      ab_user using id_user_created.
+  last_owner:
+    lineage:
+      - datalake_superset.ab_user.email
+    description:
+      Email of the Superset user who last modified the dashboard record, joined from ab_user using
+      id_user_changed.
+  business_owners:
+    lineage:
+      - datalake_superset.ab_user.email
+    description:
+      Set of email addresses of users explicitly linked to the dashboard as owners in
+      dashboard_user, aggregated for business accountability separate from creator/changed-by.
+  company_line:
+    lineage:
+      - datalake_superset_clean.dashboards.dashboard_title
+    description:
+      Business area extracted from the dashboard title via a fixed regex over known company lines
+      (e.g. For Rent, Growth). Null when the title does not match the expected pattern.
+  tags:
+    lineage:
+      - datalake_superset_clean.dashboards.dashboard_title
+    description:
+      All bracketed tokens from the dashboard title except the matched company_line, as an array of
+      free-form labels used for grouping and search in the governance layer.
+  lineage_charts:
+    lineage:
+      - datalake_superset_clean.dashboard_slices.id_slice
+    description:
+      Distinct Superset slice (chart) ids associated with the dashboard, collected from
+      dashboard_slices to represent chart-level lineage for the dashboard entity.
+  entity_description:
+    lineage:
+      - datalake_superset_clean.dashboards.position_json
+    description:
+      Long-form description text parsed from MARKDOWN components in position_json when the content
+      looks like a structured description field; used to surface dashboard intent in the catalog.
+  platform:
+    description:
+      Constant identifier for the BI tool. Always superset for rows produced by this pipeline.
+  certified_by:
+    lineage:
+      - datalake_superset_clean.dashboards.certified_by
+    description:
+      Optional certification label or owner string from Superset when the dashboard is marked as
+      certified in the product.
+  entity_status:
+    lineage:
+      - datalake_superset_clean.logs.id_dashboard
+    description:
+      Lifecycle label ACTIVE when at least one qualifying dashboard view event exists in logs in the
+      trailing 90-day window, otherwise DEPRECATED for stale or unused dashboards.
+  ts_created:
+    lineage:
+      - datalake_superset_clean.dashboards.ts_created
+    description:
+      Timestamp when the dashboard was first created in Superset, in the source timezone stored by
+      the application.
+  ts_changed:
+    lineage:
+      - datalake_superset_clean.dashboards.ts_changed
+    description:
+      Timestamp of the most recent update to the dashboard row used to pick the latest version in
+      the deduplication logic.
+  last_90d_views:
+    lineage:
+      - datalake_superset_clean.logs.id_dashboard
+    description:
+      Count of DashboardRestApi.get events in logs for this dashboard in the last 90 days, used as a
+      volume signal for usage.
+  new_tags:
+    lineage:
+      - datalake_superset.tag.tag_name
+    description:
+      Superset object tags attached to the dashboard via tagged_object, collected as distinct tag
+      names for governance tagging separate from title brackets.
+  published:
+    lineage:
+      - datalake_superset_clean.dashboards.published
+    description:
+      Boolean from Superset indicating whether the dashboard is published and visible to consumers
+      according to product rules.
+  daily_users_last_90d:
+    lineage:
+      - datalake_superset_clean.logs.id_user
+    description:
+      Count of distinct viewer identities (user id and calendar day) in the last 90 days from
+      dashboard access logs, approximating daily active viewers.
+  popularity_by_line_rank:
+    lineage:
+      - datalake_superset_clean.logs.id_user
+    description:
+      Row number within each company_line ordering dashboards by daily_users_last_90d and then
+      last_90d_views descending, for relative popularity inside the same business line.

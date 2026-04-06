@@ -53,7 +53,7 @@ SELECT
   COALESCE(l.last_90d_views,0) AS last_90d_views,
   array_remove(regexp_extract_all(ls.slice_name, '\\[([^\\]]+)\\]'), ls.company_line) AS tags,
   tags.tags AS new_tags,
-  CONCAT("https://superset.data.quintoandar.com.br/explore/?slice_id=", ls.id) as chart_url
+  CONCAT("https://superset.apps.data-prd.habitat.zone/explore/?slice_id=", ls.id) as chart_url
 FROM last_slice ls
 JOIN datalake_superset.ab_user u_creator ON u_creator.id = ls.id_user_created
 JOIN datalake_superset.ab_user u_changed ON u_changed.id = ls.id_user_changed

@@ -4190,8 +4190,11 @@ bietlejuice.enrich_transactional_entities_test:
   - bietlejuice.core_house:load-core-house
   - bietlejuice.core_offer:load-core-offer
   - bietlejuice.core_visit:load-core-visit
+bietlejuice.enrich_trino:
+  - bietlejuice.enrich_superset:load-enrich-slices:first-run-of-day
 bietlejuice.enrich_trino_detractor:
   - bietlejuice.enrich_trino:load-enrich-trino-detractor-queries:first-run-of-day
+  - bietlejuice.enrich_superset:load-enrich-slices:first-run-of-day
   - bietlejuice.superset_internal:load-clean-ab-user:first-run-of-day
   - bietlejuice.superset_internal:load-clean-logs:first-run-of-day
 bietlejuice.enrich_trino_table_usage:

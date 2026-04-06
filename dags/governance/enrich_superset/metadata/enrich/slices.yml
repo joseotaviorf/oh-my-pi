@@ -1,0 +1,115 @@
+---
+database_name: datalake_superset
+table_name: slices
+owner: gustavo.akashi@quintoandar.com.br
+domain: Data Ops & Governance
+description:
+  Enriched Apache Superset chart (slice) catalog for governance and discovery, with one row per
+  chart at the latest version by change time. Adds parsed company line from the name, semantic-layer
+  flag from the datasource, consolidated owners and certification, 90-day usage, Superset tags, and
+  a direct explore URL for review workflows.
+columns:
+  id:
+    lineage:
+      - datalake_superset_clean.slices.id
+    description:
+      Primary key of the slice (chart) in Superset. Uniquely identifies each row in this enrich output.
+  slice_name:
+    lineage:
+      - datalake_superset_clean.slices.slice_name
+    description:
+      Chart title as stored in Superset, including bracket tags used for area classification and
+      governance labeling.
+  viz_type:
+    lineage:
+      - datalake_superset_clean.slices.viz_type
+    description:
+      Visualization type key from Superset (for example table, big_number, or deck.gl) indicating how
+      the chart renders.
+  description:
+    lineage:
+      - datalake_superset_clean.slices.description
+    description:
+      Free-text chart description maintained in Superset when authors document intent or usage notes.
+  id_datasource:
+    lineage:
+      - datalake_superset_clean.slices.id_datasource
+    description:
+      Foreign key to the Superset dataset (datasource) backing the chart, joined to tables for semantic
+      metadata.
+  business_owners:
+    lineage:
+      - datalake_superset.ab_user.email
+    description:
+      Set of email addresses of users linked as slice owners in slice_user, aggregated for business
+      accountability on the chart entity.
+  technical_owner:
+    lineage:
+      - datalake_superset.ab_user.email
+    description:
+      Email of the Superset user who created the slice, resolved via ab_user from id_user_created.
+  last_owner:
+    lineage:
+      - datalake_superset.ab_user.email
+    description:
+      Email of the Superset user who last modified the slice, resolved via ab_user from id_user_changed.
+  certified_by:
+    lineage:
+      - datalake_superset_clean.slices.certified_by
+    description:
+      Optional certification label from Superset when the chart is marked certified in the product.
+  ts_created:
+    lineage:
+      - datalake_superset_clean.slices.ts_created
+    description:
+      Timestamp when the slice was created in Superset.
+  ts_changed:
+    lineage:
+      - datalake_superset_clean.slices.ts_changed
+    description:
+      Timestamp of the latest slice update used to select the current row among historical versions.
+  company_line:
+    lineage:
+      - datalake_superset_clean.slices.slice_name
+    description:
+      Business area extracted from the slice name via regex over known company lines; null when the
+      title does not match the expected pattern.
+  is_semantic_layer:
+    lineage:
+      - datalake_superset.tables.is_semantic_layer
+    description:
+      Flag from the linked Superset physical or virtual dataset indicating whether the datasource is
+      classified as part of the semantic layer in the product.
+  platform:
+    description:
+      Constant identifier for the BI tool. Always superset for rows produced by this pipeline.
+  entity_status:
+    lineage:
+      - datalake_superset_clean.logs.id_slice
+    description:
+      Lifecycle label ACTIVE when at least one qualifying chart or explore event exists in logs in the
+      trailing 90-day window, otherwise DEPRECATED.
+  last_90d_views:
+    lineage:
+      - datalake_superset_clean.logs.id_slice
+    description:
+      Count of ChartDataRestApi.data and ExploreRestApi.get events in the last 90 days for this slice,
+      used as a usage volume signal.
+  tags:
+    lineage:
+      - datalake_superset_clean.slices.slice_name
+    description:
+      Bracketed tokens from the slice name excluding the matched company_line, as an array of labels
+      derived from the title for grouping and search.
+  new_tags:
+    lineage:
+      - datalake_superset.tag.tag_name
+    description:
+      Superset object tags attached to the slice via tagged_object, collected as distinct tag names for
+      governance tagging separate from title brackets.
+  chart_url:
+    lineage:
+      - datalake_superset_clean.slices.id
+    description:
+      Deep link to the Superset Explore view for this slice. Built by concatenating the fixed Habitat
+      explore URL prefix with slice_id query parameter from the chart id.

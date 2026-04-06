@@ -53,7 +53,7 @@ WITH last_dash AS (
 SELECT
   d.id,
   d.dashboard_title AS entity_name,
-  CONCAT('https://superset.data.quintoandar.com.br/superset/dashboard/', CAST(d.id AS string))  AS entity_url,
+  CONCAT('https://superset.apps.data-prd.habitat.zone/superset/dashboard/', CAST(d.id AS string))  AS entity_url,
   u_creator.email AS technical_owner,
   u_changed.email AS last_owner,
   dw.owners_email AS business_owners,
