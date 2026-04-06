@@ -97,6 +97,8 @@ assignment_job_groups AS (
     SELECT
         id_person,
         id_assignment,
+        id_period_of_service,
+        is_transfer_continuation,
         id_job,
         dt_effective_started,
         dt_effective_ended,
