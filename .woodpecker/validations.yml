@@ -101,3 +101,13 @@ steps:
     when:
       event: push
 
+  validate-source-layer-policy:
+    image: public.ecr.aws/docker/library/python:3.7.16
+    commands:
+      - make requirements-scripts
+      - make validate-source-layer-policy
+    when:
+      event: push
+      branch:
+        exclude: [forno, hotfix/*]
+

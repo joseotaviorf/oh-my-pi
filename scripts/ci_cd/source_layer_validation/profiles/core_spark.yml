@@ -1,0 +1,36 @@
+# Profile: Core model Spark DAGs under dags/core/<dag_name>/
+# Extend with new YAML profiles for other pipeline types (DW SQL, metric, etc.).
+
+id: core_spark
+cli_profile: core
+
+path_prefix: "dags/core/"
+# Path segments from repo root that form one DAG root (dags / core / <dag_folder>)
+dag_root_segment_count: 3
+
+spark_jobs_subdir: spark_jobs
+yaml_conf_files:
+  - prod_conf.yml
+  - forno_conf.yml
+
+# Keys whose subtrees are never table references (merge ops use source.col)
+skip_yaml_keys:
+  - merge_on
+  - when_matched_update_condition
+  - ENTITY_TYPE
+  - when_matched_operation
+  - when_not_matched_insert
+  - when_not_matched_by_source
+  - when_not_matched_by_target
+
+# Globs relative to spark_jobs/
+python_globs:
+  - "load_*.py"
+  - "*_base.py"
+
+scan_python_spark_table_literals: true
+
+# Optional (not set = CI stays YAML/Python-only for core Spark DAGs):
+# sql_scan_globs:
+#   - "queries/**/*.sql"
+# sql_read_dialect: spark

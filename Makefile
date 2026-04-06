@@ -453,6 +453,35 @@ validate-core-model-schema-content-all:
 	@echo ""
 	@PYTHONPATH=. python3 scripts/ci_cd/validate_core_model_schema_content.py -a
 
+.PHONY: validate-source-layer-policy
+## validates that changed DAGs only reference allowed source layers (CI/CD; PR-scoped; declaration-driven)
+## Profiles: scripts/ci_cd/source_layer_validation/profiles/*.yml (default: dags)
+validate-source-layer-policy:
+	@echo ""
+	@echo "Validating source-layer policy for changed DAGs"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@PYTHONPATH=. python3 scripts/ci_cd/source_layer_validation/validate_source_layer_policy.py --profile dags -b "$(CI_COMMIT_BRANCH)"
+
+.PHONY: validate-source-layer-policy-all
+## validates all DAGs under dags/ against source-layer policy (local audit; warnings-only for existing violations)
+validate-source-layer-policy-all:
+	@echo ""
+	@echo "Validating source-layer policy for all DAGs under dags/"
+	@echo "=========="
+	@echo ""
+	@PYTHONPATH=. python3 scripts/ci_cd/source_layer_validation/validate_source_layer_policy.py --profile dags -a
+
+.PHONY: validate-source-layer-policy-all-core
+## same as validate-source-layer-policy-all but only dags/core/ (faster local audit)
+validate-source-layer-policy-all-core:
+	@echo ""
+	@echo "Validating source-layer policy for all core DAGs"
+	@echo "=========="
+	@echo ""
+	@PYTHONPATH=. python3 scripts/ci_cd/source_layer_validation/validate_source_layer_policy.py --profile dags -a --core-only
+
 ###############################################################################
 ###################### Common commands ########################################
 ###############################################################################
