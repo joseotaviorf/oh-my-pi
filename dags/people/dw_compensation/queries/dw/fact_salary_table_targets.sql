@@ -56,7 +56,7 @@ dim_job_at_date AS (
         dw_compensation.dim_job AS dim_job
     WHERE
         dim_job.dt_valid_from <= dt_ref.dt_reference
-        AND (dim_job.dt_valid_to IS NULL OR dim_job.dt_valid_to > dt_ref.dt_reference)
+        AND dim_job.dt_valid_to > dt_ref.dt_reference
         AND dim_job.salary_table IS NOT NULL
         AND dim_job.band IS NOT NULL
         AND dim_job.is_active = TRUE

@@ -107,7 +107,7 @@ assignment_history_with_band AS (
         dw_compensation.dim_job AS dj
             ON ah.id_job = dj.id_job
             AND dj.dt_valid_from <= ah.dt_effective_started
-            AND (dj.dt_valid_to IS NULL OR dj.dt_valid_to > ah.dt_effective_started)
+            AND dj.dt_valid_to > ah.dt_effective_started
     WHERE
         dj.band IS NOT NULL
 ),
@@ -305,7 +305,7 @@ salary_enriched AS (
         dw_compensation.dim_job AS dj
             ON sal.id_job = dj.id_job
             AND dj.dt_valid_from <= sal.dt_started
-            AND (dj.dt_valid_to IS NULL OR dj.dt_valid_to > sal.dt_started)
+            AND dj.dt_valid_to > sal.dt_started
 ),
 salary_consolidation_base AS (
     SELECT
@@ -542,7 +542,7 @@ SELECT
     sal.dt_started AS dt_valid_from,
     CASE
         WHEN sal.dt_ended_normalized >= DATE('4712-12-31')
-        THEN NULL
+        THEN DATE('9999-12-31')
         ELSE sal.dt_ended_normalized
     END AS dt_valid_to,
     CASE

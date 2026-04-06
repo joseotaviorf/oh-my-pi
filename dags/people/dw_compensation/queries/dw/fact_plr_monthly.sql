@@ -173,7 +173,7 @@ compensation_by_contract_month AS (
         dj.target_plr,
         dj.target_plr_salary_multiplier,
         fc.dt_valid_from AS dt_job_info_valid_from,
-        COALESCE(fc.dt_valid_to, DATE('9999-12-31')) AS dt_job_info_valid_to,
+        fc.dt_valid_to AS dt_job_info_valid_to,
         CASE
             WHEN dj.band IS NULL
                 OR dj.country IS NULL THEN NULL
@@ -197,10 +197,10 @@ compensation_by_contract_month AS (
     LEFT JOIN
         plr_reference_months AS mc
             ON fc.dt_valid_from <= mc.dt_month_ended
-            AND COALESCE(fc.dt_valid_to, DATE('9999-12-31')) >= mc.dt_month_started
+            AND fc.dt_valid_to >= mc.dt_month_started
     WHERE
         plr_params.reference_year BETWEEN YEAR(fc.dt_valid_from)
-            AND COALESCE(YEAR(fc.dt_valid_to), 9999)
+            AND YEAR(fc.dt_valid_to)
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY fc.sk_contract, mc.dt_month_started ORDER BY fc.dt_valid_from DESC) = 1
 ),

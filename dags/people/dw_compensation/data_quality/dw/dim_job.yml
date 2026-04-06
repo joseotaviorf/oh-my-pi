@@ -78,6 +78,11 @@ column_level_validations:
            AND dt_valid_from < prev_dt_valid_to
         ) = 0
       severity_level: Error
+  # DW dimension non-SK: has_null_count (not is_complete). Up to one NULL for the default/unknown row.
+  dt_valid_to:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
   is_current:
     has_null_count:
       less_than_or_equal_to: 1

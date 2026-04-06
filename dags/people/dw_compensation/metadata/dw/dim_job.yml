@@ -13,7 +13,7 @@ description: |
 
   Compensation targets (PLR, RVV, SOP, etc.) default to 0 when not defined.
   Salary range values (min, mid, max) are in DECIMAL(18, 2) precision.
-  `dt_valid_to` is NULL when the version has no scheduled end date.
+  Open-ended job versions use `dt_valid_to` = `9999-12-31`.
 
 
 columns:
@@ -214,7 +214,9 @@ columns:
       - datalake_pin_core_clean.rate_values.dt_effective_started
       - datalake_pin_compensation_clean.salary_bases.dt_effective_started
   dt_valid_to:
-    description: Date until which this job version is valid (exclusive). NULL means the version has no scheduled end date.
+    description: |
+      End of the validity interval for this job version (SCD Type 2; same semantics as before, with no NULLs in DW).
+      `9999-12-31` means no scheduled end date (normalized from enrich NULL or Oracle `4712-12-31`).
     lineage:
       - datalake_pin_core_clean.job.dt_effective_ended
       - datalake_pin_core_clean.valid_grades.dt_effective_ended

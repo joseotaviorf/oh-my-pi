@@ -166,7 +166,9 @@ columns:
     lineage:
       - datalake_pin_compensation_clean.salary.dt_started
   dt_valid_to:
-    description: End date of validity for this salary record. NULL if currently active.
+    description: |
+      End date of validity for this salary record (SCD Type 2).
+      `9999-12-31` when the salary row is still open.
     lineage:
       - datalake_pin_compensation_clean.salary.dt_ended
   is_current:
