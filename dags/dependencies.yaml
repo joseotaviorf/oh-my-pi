@@ -902,6 +902,7 @@ bietlejuice.dw_pipeline:
   - bietlejuice.enrich_pipeline:load-enrich-dag-sla-information
   - bietlejuice.enrich_pipeline:load-enrich-line
 bietlejuice.dw_pricing:
+  - bietlejuice.enrich_ebdb_pricing:load-enrich-house-suggestion-changes:first-run-of-day
   - bietlejuice.enrich_ebdb_pricing:load-enrich-listing-prediction-changes:first-run-of-day
   - bietlejuice.enrich_ebdb_pricing:load-enrich-listing-price-change:first-run-of-day
 bietlejuice.dw_proposal:

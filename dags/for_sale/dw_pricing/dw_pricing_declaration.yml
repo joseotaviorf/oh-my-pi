@@ -8,6 +8,25 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: listing
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "prod"
+  tables_customization:
+    dim_price_suggested:
+      load_spark_job: load_dim_price_suggested
+      merge_on: ['sk_price_suggested']
+    fact_price_suggested:
+      load_spark_job: load_fact_price_suggested
+      merge_on: ['sk_price_suggested']
 cluster:
   type: custom_cluster
   custom_configurations:

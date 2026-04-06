@@ -37,12 +37,13 @@ class CrossDAGDependenciesValidator:
      in the dependencies file are valid.
 
     A DAG is valid if it has a declaration file.
-    A task is valid if it has a SparkSQL file and the task name in dependency
-     files follows the patterns.
+    A task is valid if it has a SparkSQL file OR is defined in tables_customization
+     with a load_spark_job, and the task name in dependency files follows the patterns.
     """
 
     def __init__(self) -> None:
         self.all_tables_by_dag_from_files = {}
+        self.all_spark_job_tables_by_dag = {}
         self.invalid_entities = {}
         self.dags_out_of_pattern = ConfigurationService().get_config(
             "dags_out_of_pattern"
@@ -286,6 +287,54 @@ class CrossDAGDependenciesValidator:
         except Exception:
             return False
 
+    def load_spark_job_tables_from_declarations(self):
+        """
+        Loads all tables with load_spark_job from declaration files, grouped by DAG name.
+        This preloads Spark job tables to avoid reading YAML files multiple times.
+
+        :return: Dictionary with the Spark job table names of each DAG
+        :rtype: dict[str:list()]
+        """
+        declaration_files = FileService.list_all_files_recursively(
+            DAG_PACKAGES_ROOT, extension="yml"
+        )
+        for file_path in declaration_files:
+            if not file_path.endswith("_declaration.yml"):
+                continue
+            try:
+                declaration = FileService.get_dict_from_yaml_file(file_path)
+                workflow = declaration.get("workflow") or {}
+                dag_info = declaration.get("dag") or {}
+                dag_name = dag_info.get("name")
+                layer = workflow.get("layer")
+
+                if not dag_name or not layer:
+                    continue
+
+                tables_customization = workflow.get("tables_customization") or {}
+                for table_name, table_config in tables_customization.items():
+                    if isinstance(table_config, dict) and table_config.get("load_spark_job"):
+                        formatted_table = f"{layer}:{table_name}"
+                        self.all_spark_job_tables_by_dag.setdefault(dag_name, [])
+                        self.all_spark_job_tables_by_dag[dag_name].append(formatted_table)
+            except Exception:
+                continue
+
+    def spark_job_table_exists(self, dag, table):
+        """
+        Verifies if the table has a respective Spark job in the declaration.
+
+        :param dag: the DAG name
+        :type dag: str
+        :param table: the table name in format "layer:table_name"
+        :type table: str
+        :rtype: bool
+        """
+        return (
+            dag in self.all_spark_job_tables_by_dag
+            and table in self.all_spark_job_tables_by_dag[dag]
+        )
+
     def validate_dags(self, dags):
         """
         Verifies if the DAG is valid and in opposite case register it on the
@@ -300,7 +349,7 @@ class CrossDAGDependenciesValidator:
 
     def validate_tables(self, tables_by_dag):
         """
-        Check whether each task from dependencies file has a respective query.
+        Check whether each task from dependencies file has a respective query or Spark job.
 
         :param tables_by_dag: the tables name (extracted from task name), grouped by DAG
         :type tables_by_dag: dict
@@ -315,7 +364,9 @@ class CrossDAGDependenciesValidator:
                             self.register_into_invalid_list(dag, table)
                         continue
                     if not self.table_query_exists(dag, table):
-                        self.register_into_invalid_list(dag, table)
+                        # Fallback: check if table uses a Spark job instead of SQL
+                        if not self.spark_job_table_exists(dag, table):
+                            self.register_into_invalid_list(dag, table)
 
     @staticmethod
     def get_dependency_values_without_tasks(dependencies: List[str]) -> List[str]:
@@ -550,6 +601,7 @@ class CrossDAGDependenciesValidator:
         )
 
         self.load_tables_from_db_folder()
+        self.load_spark_job_tables_from_declarations()
         (
             dags_without_tasks_in_file,
             tables_in_file,

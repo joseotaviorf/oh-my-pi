@@ -1,0 +1,26 @@
+---
+table_name: dw_listing.dim_price_suggested
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_price_suggested:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  business_context:
+    # DW dimension includes an unknown row (-1) with null attributes; allow at most 1 null.
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  rule:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  suggestion_certainty:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error

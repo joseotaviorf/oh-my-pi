@@ -1,0 +1,27 @@
+database_name: dw_listing
+table_name: dim_price_suggested
+description: Dimensional table containing descriptive attributes for price suggestions.
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
+columns:
+  sk_price_suggested:
+    description: Primary key referring to a price suggestion change.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.id_suggestion_change
+  rule:
+    description: Business rule or heuristic applied to the suggestion.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.rule
+  suggestion_certainty:
+    description: Level of certainty or confidence associated with the suggestion.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.suggestion_certainty
+  business_context:
+    description: Business context for which the price was suggested.
+    categories:
+      RENT: Rental property context.
+      SALE: Sale property context.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.business_context
+  ts_load:
+    description: Timestamp of when the table was loaded.

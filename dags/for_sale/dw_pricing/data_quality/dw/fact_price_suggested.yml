@@ -1,0 +1,31 @@
+---
+table_name: dw_listing.fact_price_suggested
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  sk_price_suggested:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_house:
+    is_complete:
+      severity_level: Error
+  sk_prediction:
+    is_complete:
+      severity_level: Error
+  suggested_price:
+    is_complete:
+      severity_level: Error
+  is_last_suggestion:
+    is_complete:
+      severity_level: Error
+  is_last_suggestion_of_day:
+    is_complete:
+      severity_level: Error
+  ts_suggestion_started:
+    is_complete:
+      severity_level: Error

@@ -1,0 +1,68 @@
+database_name: dw_listing
+table_name: fact_price_suggested
+description: Fact table containing measures (prices, bounds, anchors) for price suggestions.
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
+columns:
+  sk_price_suggested:
+    description: Primary key and foreign key referring to the price suggestion dimension.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.id_suggestion_change
+  sk_house:
+    description: Foreign key referring to the house ID.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.id_house
+  sk_prediction:
+    description: UUID of the prediction that generated this suggestion.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.id_prediction
+  deal_objective_lower_anchor:
+    description: Lower anchor used for the deal objective.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.deal_objective_lower_anchor
+  deal_objective_upper_anchor:
+    description: Upper anchor used for the deal objective.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.deal_objective_upper_anchor
+  lower_bound_limit:
+    description: The lowest allowed price (floor) for the context.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.lower_bound_limit
+  upper_bound_limit:
+    description: The highest allowed price (ceiling) for the context.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.upper_bound_limit
+  suggested_lower_bound_price:
+    description: The minimum value of the price range suggested by the pricing model.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.suggested_lower_bound_price
+  suggested_price:
+    description: The exact anchor value suggested by the pricing model.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.suggested_price
+  suggested_upper_bound_price:
+    description: The maximum value of the price range suggested by the pricing model.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.suggested_upper_bound_price
+  change_number:
+    description: Order of the suggestion change for each house within the same business context. Starts at 1 for the first suggestion.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.change_number
+  is_last_suggestion:
+    description: Boolean indicating whether this is the most recent suggestion for the house within the same business context.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.is_last_suggestion
+  is_last_suggestion_of_day:
+    description: Boolean indicating whether this is the most recent suggestion for the house within the same business context for that day.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.is_last_suggestion_of_day
+  ts_suggestion_started:
+    description: Timestamp when the suggestion became active.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.ts_suggestion_started
+  ts_suggestion_ended:
+    description: Timestamp when the suggestion was replaced by a new one. NULL if it is the current active suggestion.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.ts_suggestion_ended
+  ts_load:
+    description: Timestamp of when the table was loaded.
