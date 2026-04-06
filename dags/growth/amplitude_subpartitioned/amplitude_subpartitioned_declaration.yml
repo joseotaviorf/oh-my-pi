@@ -885,6 +885,9 @@ workflow:
     183047_mra_acceptance_viewed_events:
       run_optimize: false
       run_vacuum: false
+    170698_rm_invoice_pix_copy_paste_clicked_events:
+      run_optimize: false
+      run_vacuum: false
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new

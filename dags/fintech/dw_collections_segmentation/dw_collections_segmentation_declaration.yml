@@ -15,7 +15,7 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -30), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
-  execution_timeout_hours: 14
+  execution_timeout_hours: 4
   inner_dependencies:
     fact_contract_features_timeline:
       - fact_contract_wallet_timeline

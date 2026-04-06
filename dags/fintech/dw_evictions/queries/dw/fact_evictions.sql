@@ -355,6 +355,8 @@ SELECT DISTINCT
     e.dt_credit_satisfaction_start,
     e.dt_credit_satisfaction_end,
     IF(e.id_process IS NOT NULL, e.dt_closure, l.dt_elaw_closure) AS dt_closure,
+    c.dt_ended_rental_confirmed AS dt_finalizing,
+    c.ts_expected_termination AS dt_finalized_erc,
     e.ts_updated,
     NOW() AS ts_load
 FROM

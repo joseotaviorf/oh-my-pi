@@ -6,65 +6,78 @@ domain: Fintech
 owner: juliana.hocihara@quintoandar.com.br
 columns:
   sk_process:
-    description: "Process surrogate key - Legal process dossier identifier number."
+    description: "Process surrogate key — legal process identifier from Cyber Legal or eLaw when only the spreadsheet row exists."
     lineage:
       - datalake_cyber_legal.evictions_base.id_process
+      - datalake_gsheets_clean.evictions_base.id_process
   sk_contract:
-    description: "Contract surrogate key - External contract identifier for the account under legal proceedings."
+    description: "Contract surrogate key — external contract id under legal proceedings (Cyber Legal or eLaw row)."
     lineage:
       - datalake_cyber_legal.evictions_base.contract
+      - datalake_gsheets_clean.evictions_base.contract
   source:
-    description: "Source of the data."
-    lineage:
-      - datalake_cyber_legal.evictions_base.source
+    description: "System of record for the row — cyber_legal when a Cyber Legal process exists, otherwise elaw."
   process:
     description: "Legal process dossier identifier number."
     lineage:
       - datalake_cyber_legal.evictions_base.process
+      - datalake_gsheets_clean.evictions_base.process
   input_type:
     description: "Eviction label classification for the account."
     lineage:
       - datalake_cyber_legal.evictions_base.input_type
+      - datalake_gsheets_clean.evictions_base.input_type
   action_type:
     description: "Type of action classification (case subtype)."
     lineage:
       - datalake_cyber_legal.evictions_base.action_type
+      - datalake_gsheets_clean.evictions_base.action_type
   action:
     description: "Type of legal process or case classification (original process type)."
     lineage:
       - datalake_cyber_legal.evictions_base.action
+      - datalake_gsheets_clean.evictions_base.action
   office:
     description: "Name of the attorney agency assigned to the legal case."
     lineage:
       - datalake_cyber_legal.evictions_base.office
+      - datalake_gsheets_clean.evictions_base.office
   collection_agency:
-    description: "Name of the collection agency assigned to the legal case."
+    description: "Collection agency label — mapped from Cyber office rules or taken from eLaw collection_agency."
     lineage:
-      - datalake_cyber_legal.evictions_base.collection_agency
+      - datalake_cyber_legal.evictions_base.office
+      - datalake_gsheets_clean.evictions_base.collection_agency
   chamber:
     description: "Name of the court where the legal case is being processed."
     lineage:
       - datalake_cyber_legal.evictions_base.chamber
+      - datalake_gsheets_clean.evictions_base.chamber
   region:
-    description: "State where the case is being processed."
+    description: "State for the contract listing (Cyber) or eLaw region when the row is spreadsheet-only."
     lineage:
-      - datalake_cyber_legal.evictions_base.region
+      - dw_public.dim_region.short_region_name
+      - datalake_gsheets_clean.evictions_base.region
   city:
-    description: "City where the case is being processed."
+    description: "City for the contract listing (Cyber) or eLaw city when the row is spreadsheet-only."
     lineage:
-      - datalake_cyber_legal.evictions_base.city
+      - dw_public.dim_region.city_name
+      - datalake_gsheets_clean.evictions_base.city
   contract_status:
-    description: "Status of the contract."
+    description: "Contract lifecycle — Finalizado, Finalizando, or Ativo from dim_contract for Cyber; eLaw contract_status otherwise."
     lineage:
-      - datalake_cyber_legal.evictions_base.contract_status
+      - dw_rent.dim_contract.dt_ended_rental_confirmed
+      - dw_rent.dim_contract.ts_expected_termination
+      - datalake_gsheets_clean.evictions_base.contract_status
   cyber_status:
-    description: "Current status of the legal case (e.g., active, closed, pending)."
+    description: "Legal case status in Cyber Legal, or eLaw elaw_status when the row is spreadsheet-only."
     lineage:
       - datalake_cyber_legal.evictions_base.cyber_status
+      - datalake_gsheets_clean.evictions_base.elaw_status
   last_stage:
     description: "Description of the last process stage completed for the case."
     lineage:
       - datalake_cyber_legal.evictions_base.last_stage
+      - datalake_gsheets_clean.evictions_base.last_stage
   arbitral_distribution_expense_amount:
     description: "Total expense amount for the Distribuição Arbitral (Arbitral Distribution) stage."
     lineage:
@@ -134,13 +147,14 @@ columns:
     lineage:
       - datalake_cyber_legal.evictions_base.credit_satisfaction_expense_amount
   passage_status:
-    description: "Status of passage between stages, classified as: Em finalização, Execução, Ativo, Quitado, Finalizado, or Encerrado."
+    description: "Passage status — constant not_in_cyber_legal for Cyber Legal rows; eLaw passage_status from the spreadsheet when Cyber is absent."
     lineage:
-      - datalake_cyber_legal.evictions_base.passage_status
+      - datalake_gsheets_clean.evictions_base.passage_status
   procedure:
-    description: "Procedure classification (set to 'not_in_cyber_legal')."
+    description: "Procedure classification from Cyber Legal or eLaw depending on which side supplies the process."
     lineage:
       - datalake_cyber_legal.evictions_base.procedure
+      - datalake_gsheets_clean.evictions_base.procedure
   consolidated_reason:
     description: "Consolidated reason description for the case result (from cyber_legal first_consolidated_reason or elaw consolidated_reason)."
     lineage:
@@ -152,242 +166,281 @@ columns:
       - datalake_cyber_legal.evictions_base.first_standardized_reason
       - datalake_gsheets_clean.evictions_base.standardized_reason
   result:
-    description: "Result classification (set to 'not_in_cyber_legal')."
+    description: "Case result from Cyber Legal or eLaw depending on which side supplies the process."
     lineage:
       - datalake_cyber_legal.evictions_base.result
+      - datalake_gsheets_clean.evictions_base.result
   contract_category_at_registration:
-    description: "Contract category at the time of registration, classified as: Adimplente, FPD, Acordo Ativo, Mensal, Demais Inadimplentes, or Outros. Calculated from contract wallet timeline data."
+    description: "Wallet category at case registration for Cyber — Adimplente, FPD, Acordo Ativo, Mensal, Demais Inadimplentes, or Outros — from overdue portfolio, FPD, and negotiation rules; eLaw contract_category_at_registration otherwise."
     lineage:
-      - dw_collections_segmentation.fact_contract_wallet_timeline
+      - datalake_cyber_legal.evictions_base.dt_registered
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.open_amount
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.id_invoice
+      - datalake_retsuko.invoice.id_external
+      - datalake_gsheets_clean.evictions_base.contract_category_at_registration
   overdue_days_at_registration:
-    description: "Number of overdue days at registration (maximum delay of original invoices at T1)."
+    description: "Days overdue at registration — delay from overdue portfolio on registration date for Cyber, or eLaw overdue_days_at_registration."
     lineage:
-      - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_original_invoices_t1
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_invoice_due_adjust
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_reference
+      - datalake_gsheets_clean.evictions_base.overdue_days_at_registration
   succumbency_fee:
-    description: "Succumbency fee (set to 'not_in_cyber_legal')."
+    description: "Succumbency fee from Cyber Legal or eLaw depending on which side supplies the process."
     lineage:
       - datalake_cyber_legal.evictions_base.succumbency_fee
+      - datalake_gsheets_clean.evictions_base.succumbency_fee
   total_package:
-    description: "Total package value for the legal case."
+    description: "Monthly package for Cyber — rent plus IPTU plus condo from dim_contract; eLaw total_package otherwise."
     lineage:
-      - datalake_cyber_legal.evictions_base.total_package
+      - dw_rent.dim_contract.rent
+      - dw_rent.dim_contract.iptu
+      - dw_rent.dim_contract.condo
+      - datalake_gsheets_clean.evictions_base.total_package
   total_due_amount:
-    description: "Total due amount (overdue amount) for the contract."
+    description: "Open overdue amount for Cyber — from overdue timeline on closure reference or today’s open_amount snapshot; eLaw total_due_amount otherwise."
     lineage:
-      - datalake_cyber_legal.evictions_base.total_due_amount
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.due_amount
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_invoice_paid
+      - dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline.dt_reference
+      - datalake_gsheets_clean.evictions_base.total_due_amount
   ldt_stock:
     description: "Lead time to stock (number of days)."
     lineage:
       - datalake_cyber_legal.evictions_base.ldt_stock
+      - datalake_gsheets_clean.evictions_base.ldt_stock
   stock_range:
     description: "Stock range classification: <120D, 120-240D, 240-360D, >360D, or NULL."
     lineage:
       - datalake_cyber_legal.evictions_base.stock_range
+      - datalake_gsheets_clean.evictions_base.stock_range
   ldt_resolution:
     description: "Lead time to resolution (number of days)."
     lineage:
       - datalake_cyber_legal.evictions_base.ldt_resolution
+      - datalake_gsheets_clean.evictions_base.ldt_resolution
   resolution_range:
-    description: "Resolution range classification: <120D, 120-240D, 240-360D, >360D, or NULL."
+    description: "Resolution bucket for Cyber from ldt_resolution; eLaw Faixa_Resolucao when the row is spreadsheet-only."
     lineage:
-      - datalake_cyber_legal.evictions_base.resolution_range
+      - datalake_cyber_legal.evictions_base.ldt_resolution
+      - datalake_gsheets_clean.evictions_base.resolution_range
   ldt_coercive:
-    description: "Lead time to coercive action (set to 'not_in_cyber_legal')."
+    description: "Lead time to coercive action from Cyber Legal or eLaw depending on which side supplies the process."
     lineage:
       - datalake_cyber_legal.evictions_base.ldt_coercive
+      - datalake_gsheets_clean.evictions_base.ldt_coercive
   last_occurrence:
-    description: "Last occurrence information (set to 'not_in_cyber_legal')."
+    description: "Last occurrence metadata from Cyber Legal or eLaw depending on which side supplies the process."
     lineage:
       - datalake_cyber_legal.evictions_base.last_occurrence
+      - datalake_gsheets_clean.evictions_base.last_occurrence
   real_ldt_resolution:
-    description: "Real lead time to resolution calculated as the difference in days between case registration date and closure date."
+    description: "Real lead time to resolution — days between registration and closure for Cyber, or eLaw LDT_Resolucao_Real."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_registered
       - datalake_cyber_legal.evictions_base.dt_closure
+      - datalake_gsheets_clean.evictions_base.real_ldt_resolution
   ldt_arbitral_distribution:
     description: "Lead time to arbitral distribution (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_arbitral_citation:
     description: "Lead time to arbitral citation (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_arbitral_award:
     description: "Lead time to arbitral award (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_judiciary_distribution:
     description: "Lead time to judiciary distribution (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_judicial_summons_decision:
     description: "Lead time to judicial summons decision (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_judicial_summons:
     description: "Lead time to judicial summons (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_judicial_petition_r:
     description: "Lead time to judicial petition for reivindicatoria flow (number of business days from registration, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_judicial_summons_decision_r:
     description: "Lead time to judicial summons decision for reivindicatoria flow (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_possesion_imission_decisions_r:
     description: "Lead time to possession imission decisions for reivindicatoria flow (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_possesion_imission_issuance_r:
     description: "Lead time to possession imission issuance for reivindicatoria flow (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_coercive_decision:
     description: "Lead time to coercive decision (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_coercive_order_issuance_decision:
     description: "Lead time to coercive order issuance decision (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_execution_requirement:
     description: "Lead time to execution requirement (number of business days from registration, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_prejudgment_attachment:
     description: "Lead time to prejudgment attachment (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_execution_citation:
     description: "Lead time to execution citation (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_asset_attachment:
     description: "Lead time to asset attachment (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_asset_evaluation:
     description: "Lead time to asset evaluation (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   ldt_credit_satisfaction:
     description: "Lead time to credit satisfaction (number of business days, excluding holidays, weekends, and arbitration recess)."
     lineage:
       - datalake_cyber_legal.evictions_base
-      - DW_public.dim_date
+      - dw_public.dim_date.sk_date
   has_arbitration_defense:
-    description: "Flag indicating if there is arbitration defense (set to 'not_in_cyber_legal')."
+    description: "Whether arbitration defense exists — from Cyber Legal or eLaw depending on which side supplies the process."
     lineage:
       - datalake_cyber_legal.evictions_base.has_arbitration_defense
+      - datalake_gsheets_clean.evictions_base.has_arbitration_defense
   is_migrated:
-    description: "Flag indicating if the case was migrated from elaw to cyber legal."
+    description: "True when the same id_process exists in both Cyber Legal and the eLaw spreadsheet (full outer join match)."
+    lineage:
+      - datalake_cyber_legal.evictions_base.id_process
+      - datalake_gsheets_clean.evictions_base.id_process
   has_redistribution:
-    description: "Flag indicating if there is redistribution (set to 'not_in_cyber_legal')."
+    description: "Whether the case has redistribution — from Cyber Legal or eLaw depending on which side supplies the process."
     lineage:
       - datalake_cyber_legal.evictions_base.has_redistribution
+      - datalake_gsheets_clean.evictions_base.has_redistribution
   is_reincident:
-    description: "Flag indicating if the contract has multiple legal cases (reincident)."
+    description: "Reincidence flag from Cyber Legal or eLaw (boolean-cast for spreadsheet rows)."
     lineage:
       - datalake_cyber_legal.evictions_base.is_reincident
+      - datalake_gsheets_clean.evictions_base.is_reincident
   is_reopened:
     description: "Flag indicating if the legal case was reopened after a previous closure."
     lineage:
       - datalake_cyber_legal.evictions_base.is_reopened
   dt_registered:
-    description: "Date when the case was accepted for legal proceedings."
+    description: "Date when the case was accepted for legal proceedings (Cyber) or registered on the eLaw sheet."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_registered
+      - datalake_gsheets_clean.evictions_base.dt_registered
   dt_arbitral_distribution_start:
-    description: "Start date of the Distribuição Arbitral (Arbitral Distribution) stage."
+    description: "Start date of arbitral distribution — Cyber timestamp or eLaw dt_arbitral_distribution."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_arbitral_distribution_start
+      - datalake_gsheets_clean.evictions_base.dt_arbitral_distribution
   dt_arbitral_distribution_end:
     description: "End date of the Distribuição Arbitral (Arbitral Distribution) stage."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_arbitral_distribution_end
   dt_arbitral_citation_start:
-    description: "Start date of the Citação Arbitral (Arbitral Citation) stage."
+    description: "Start date of arbitral citation — Cyber timestamp or eLaw dt_arbitral_citation."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_arbitral_citation_start
+      - datalake_gsheets_clean.evictions_base.dt_arbitral_citation
   dt_arbitral_citation_end:
     description: "End date of the Citação Arbitral (Arbitral Citation) stage."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_arbitral_citation_end
   dt_arbitral_contestation:
-    description: "Date of arbitral contestation (currently not populated)."
+    description: "Date of arbitral contestation from Cyber Legal or eLaw when present."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_arbitral_contestation
+      - datalake_gsheets_clean.evictions_base.dt_arbitral_contestation
   dt_arbitral_sentence_start:
-    description: "Start date of the Sentença Arbitral (Arbitral Sentence) stage."
+    description: "Start date of arbitral sentence — Cyber timestamp or eLaw dt_arbitral_sentence."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_arbitral_sentence_start
+      - datalake_gsheets_clean.evictions_base.dt_arbitral_sentence
   dt_arbitral_sentence_end:
     description: "End date of the Sentença Arbitral (Arbitral Sentence) stage."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_arbitral_sentence_end
   dt_judiciary_pre_registration:
-    description: "Date of judiciary pre-registration (currently not populated)."
+    description: "Judiciary pre-registration date from Cyber Legal or eLaw when present."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_judiciary_pre_registration
+      - datalake_gsheets_clean.evictions_base.dt_judiciary_pre_registration
   dt_judiciary_distribution_start:
-    description: "Start date of the Distribuição Judicial (Judicial Distribution) stage."
+    description: "Start date of judiciary distribution — Cyber timestamp or eLaw dt_judiciary_distribution."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_judiciary_distribution_start
+      - datalake_gsheets_clean.evictions_base.dt_judiciary_distribution
   dt_judiciary_distribution_end:
     description: "End date of the Distribuição Judicial (Judicial Distribution) stage."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_judiciary_distribution_end
   dt_judicial_summons_decision_start:
-    description: "Start date of the Decisão de Citação Judicial (Judicial Citation Decision) stage."
+    description: "Start date of judicial summons decision — Cyber timestamp or eLaw column."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_judicial_summons_decision_start
+      - datalake_gsheets_clean.evictions_base.dt_judicial_summons_decision
   dt_judicial_summons_decision_end:
     description: "End date of the Decisão de Citação Judicial (Judicial Citation Decision) stage."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_judicial_summons_decision_end
   dt_judicial_summons_start:
-    description: "Start date of the Citação Judicial (Judicial Citation) stage."
+    description: "Start date of judicial summons — Cyber timestamp or eLaw dt_judicial_summons."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_judicial_summons_start
+      - datalake_gsheets_clean.evictions_base.dt_judicial_summons
   dt_judicial_summons_end:
     description: "End date of the Citação Judicial (Judicial Citation) stage."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_judicial_summons_end
   dt_judicial_defense:
-    description: "Date of judicial defense (set to 'not_in_cyber_legal')."
+    description: "Date of judicial defense from Cyber Legal or eLaw when present."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_judicial_defense
+      - datalake_gsheets_clean.evictions_base.dt_judicial_defense
   dt_coercive_decision_start:
-    description: "Start date of the Decisão Coercitivo (Coercive Decision) stage."
+    description: "Start date of coercive decision — Cyber timestamp or eLaw dt_coercive_decision."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_coercive_decision_start
+      - datalake_gsheets_clean.evictions_base.dt_coercive_decision
   dt_coercive_decision_end:
     description: "End date of the Decisão Coercitivo (Coercive Decision) stage."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_coercive_decision_end
   dt_coercive_issuance_start:
-    description: "Start date of the Emissão Coercitivo (Coercive Issuance) stage."
+    description: "Start date of coercive issuance — Cyber timestamp or eLaw dt_coercive_issuance."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_coercive_issuance_start
+      - datalake_gsheets_clean.evictions_base.dt_coercive_issuance
   dt_coercive_issuance_end:
     description: "End date of the Emissão Coercitivo (Coercive Issuance) stage."
     lineage:
@@ -441,9 +494,10 @@ columns:
     lineage:
       - datalake_cyber_legal.evictions_base.dt_execution_citation_end
   dt_asset_attachment_start:
-    description: "Start date of the Penhora (Asset Attachment) stage."
+    description: "Start date of asset attachment — Cyber timestamp or eLaw dt_asset_attachment."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_asset_attachment_start
+      - datalake_gsheets_clean.evictions_base.dt_asset_attachment
   dt_asset_attachment_end:
     description: "End date of the Penhora (Asset Attachment) stage."
     lineage:
@@ -465,14 +519,21 @@ columns:
     lineage:
       - datalake_cyber_legal.evictions_base.dt_credit_satisfaction_end
   dt_closure:
-    description: "Date when the case was closed (only populated when case_status is 'Completed')."
+    description: "Case closure date from Cyber Legal or eLaw dt_elaw_closure for spreadsheet-only rows."
     lineage:
       - datalake_cyber_legal.evictions_base.dt_closure
+      - datalake_gsheets_clean.evictions_base.dt_elaw_closure
+  dt_finalizing:
+    description: "Date rental end was confirmed on the contract (dim_contract.dt_ended_rental_confirmed); null when contract join is missing or row is eLaw-only without that join."
+    lineage:
+      - dw_rent.dim_contract.dt_ended_rental_confirmed
+  dt_finalized_erc:
+    description: "Expected contract termination timestamp from dim_contract (ts_expected_termination); null when contract join is missing or row is eLaw-only without that join."
+    lineage:
+      - dw_rent.dim_contract.ts_expected_termination
   ts_updated:
     description: "Timestamp when the record was last updated."
     lineage:
       - datalake_cyber_legal.evictions_base.ts_updated
   ts_load:
-    description: "Timestamp when the record was loaded into the data warehouse."
-    lineage:
-      - dw_evictions.fact_evictions.ts_load
+    description: "Warehouse load timestamp set at query run (NOW()); not sourced from upstream transactional systems."
