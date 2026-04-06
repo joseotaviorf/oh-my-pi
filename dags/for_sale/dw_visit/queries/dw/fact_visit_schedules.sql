@@ -25,8 +25,6 @@ SELECT
     es.days_visit_booked_to_visit,
     es.days_visit_booked_to_cancelled,
     es.days_visit_booked_to_visit_completed,
-    CASE WHEN es.is_hub_flow IS TRUE THEN 1 ELSE 0 END AS is_hub_flow,
-    CASE WHEN es.is_house_rented IS TRUE THEN 1 ELSE 0 END AS is_house_rented,
     CASE WHEN es.has_tenant_living IS TRUE THEN 1 ELSE 0 END AS has_tenant_living,
     es.is_3p_supply,
     es.is_3p_demand,
