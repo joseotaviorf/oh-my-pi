@@ -28,6 +28,31 @@ Ask (or infer from context):
 
 **If `workflow_type = cdc`, follow the CDC-specific steps below before Step 2.**
 
+**If `workflow_type = api_ingestion`, follow the API ingestion notes below before Step 2.**
+
+---
+
+## API ingestion notes (`type: api_ingestion`, raw layer)
+
+Use the **authoritative contract** in **`docs/api_ingestion/user_guide.md`** (parameters, auth, pagination, rate limits, output schema, known limitations). Extension points for code changes: **`docs/api_ingestion/contributing.md`**.
+
+- **Layer:** `raw`. **Spark job:** `load_api_ingestion_raw` (arguments are built in **`LoadAPIRawTaskCreator`**, not from templated `spark_job_arguments` in YAML).
+- **No raw SQL files** for the API pull itself — optional **`queries/clean/*.sql`** if you want downstream clean tasks.
+- **Metadata:** required for every **clean** (and other query-backed) table you add; raw JSON tables may still need governance depending on catalog policy — if in doubt, pair metadata with any consumer-facing SQL layer.
+- **Declaration:** `api_base_url`, `authentication` (workflow or per-table), `tables_customization` with `endpoint_path`, and explicit `api_policies.pagination` / `api_policies.rate_limiting` strategies (see docs — empty pagination dict fails validation).
+- **DAG name:** must end with **`_api`** (e.g. `rates_api`) so `{dag_name}_declaration.yml` matches `MANIFEST.in` (`*_api_declaration.y*ml`) and the YAML is bundled in the wheel for Databricks. This does **not** apply to **`workflow.custom_schema`** or metastore schema names — see **`docs/api_ingestion/user_guide.md`** (section *API ingestion DAG naming and schema*).
+- **Do not** add `default_extraction_type` / `default_partitions` to the workflow block for `api_ingestion` unless you confirm support (same exclusion list as CDC in Step 2c).
+
+**People domain (`dags/people/`):** apply **`.cursor/rules/people/people_domain.mdc`** (mandatory declaration: `people_bucket`, `*_people_cluster` preset, ACL, `credentials_scope: people`, etc.) together with **`docs/api_ingestion/user_guide.md`** for the `api_ingestion` YAML contract.
+
+**Extending the workflow in code** (new auth/pagination/rate-limit strategy, loader knobs, YAML validation — not only a new DAG declaration): follow **`docs/api_ingestion/contributing.md`**. Before opening the PR, use the same bar as its checklist:
+
+- [ ] [`api_ingestion_enums.py`](../../../bietlejuice/base/airflow/dag_builders/main_builder/workflows/api_ingestion_enums.py) if a new strategy/value was added
+- [ ] [`loader.py`](../../../bietlejuice/base/api/configuration/loader.py) wiring updated
+- [ ] [`dag_declaration_validator.py`](../../../bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py) updated for new YAML keys or allowed values
+- [ ] Unit tests added or updated (loader + implementation)
+- [ ] Docs: [`user_guide.md`](../../../docs/api_ingestion/user_guide.md) and [`contributing.md`](../../../docs/api_ingestion/contributing.md) if behavior or the “where to change” map changed
+
 ---
 
 ## Step 1b — Normalize DAG name based on layer
@@ -436,3 +461,16 @@ Add a `data_quality` file for all tables where data correctness is business-crit
 - [ ] All source tables have primary keys
 - [ ] `debezium_signal` is NOT in `tables_customization`
 - [ ] DAG runs successfully on Forno Airflow before merging PR
+
+**Additional checks for `api_ingestion` DAGs:**
+- [ ] **`dag.name`** ends with **`_api`** so the declaration is included via **`MANIFEST.in`** (`*_api_declaration.y*ml`); **`custom_schema`** may omit `_api` per **`docs/api_ingestion/user_guide.md`**
+- [ ] YAML matches **`docs/api_ingestion/user_guide.md`** (required keys, pagination/rate_limit strategies, auth)
+- [ ] If under **`dags/people/`**, **`people_domain.mdc`** conventions applied (bucket, cluster, ACL, `credentials_scope`, etc.)
+- [ ] DAG runs successfully on Forno Airflow before merging PR
+
+**Additional checks when changing `api_ingestion` framework code** (Python/runtime/validation — see **`docs/api_ingestion/contributing.md`**):
+- [ ] **`api_ingestion_enums.py`** updated if new strategy/value
+- [ ] **`bietlejuice/base/api/configuration/loader.py`** wiring updated
+- [ ] **`dag_declaration_validator.py`** updated
+- [ ] Unit tests (loader + implementation)
+- [ ] **`docs/api_ingestion/user_guide.md`** and **`contributing.md`** updated if contract or contributor map changed

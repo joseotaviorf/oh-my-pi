@@ -20,6 +20,8 @@ Optional agent skills that complement this rule file (invoke by each skill’s Y
 | **`people-jira-branch-setup`** | `.cursor/skills/people/jira-branch-setup/SKILL.md` | Starting **non–local-only** ticketed work: Jira + Git branch from `origin/master` / `origin/HEAD` — **before** heavy edits to People SQL/metadata. **Policies, naming, English on Jira** → **`dbp-jira-reference.md`**; **`.cursor/temp/`** mirror → **Delivery artifact folder** above. |
 | **`review-pr`** | `.cursor/skills/review-pr/SKILL.md` | Full local CI-style checks before merge (style, declarations, metadata pairs, etc.). |
 
+For **`workflow.type: api_ingestion`** under **`dags/people/`**, follow **`docs/api_ingestion/user_guide.md`** (and **`contributing.md`** for code changes) plus the **New DAGs in People** / **Mandatory Declaration** sections in this file (bucket, `*_people_cluster`, ACL, `credentials_scope`, etc.).
+
 For Git sync and conflicts before a PR, use **Git Workflow** below.
 
 ### Jira (DBP) — where to look
@@ -148,6 +150,7 @@ When creating new DAGs in `dags/people/`, use the following configuration patter
 | Cluster (gsheets) | `databricks_16_4_medium_general_people_cluster` | GSheets DAGs need general + gsheets library |
 | Cluster (heavier pin_*) | `databricks_16_4_medium_memory_people_cluster` | pin_talent, pin_performance (larger datasets) |
 | Cluster (custom_ingestion) | `custom_cluster` or `databricks_16_4_small_memory_people_cluster` | API DAGs (greenhouse, degreed) often use custom; pin_* use smaller preset |
+| Cluster (`api_ingestion`, raw) | `databricks_16_4_small_memory_people_cluster` (or heavier `*_people_cluster` if needed) | Same sizing idea as custom API pulls; must remain a **`*_people_cluster`** preset |
 | `databricks_conn_id` | `databricks_new_env` | For raw, clean, enrich, dw layers |
 | `credentials_scope` | `people` | For gsheets DAGs |
 

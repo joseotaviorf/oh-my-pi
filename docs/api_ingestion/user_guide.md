@@ -1,0 +1,673 @@
+# DAG Builder - API Ingestion Workflow
+
+The **api_ingestion** workflow is a declarative framework for building DAGs that ingest data from REST APIs into the data lake. Instead of writing a bespoke Spark job per integration, you configure the workflow via YAML: endpoints, authentication, pagination, and rate limiting. Shared runtime code performs HTTP calls, basic retries, and raw-layer writes; some declaration fields are reserved or only partially wired (called out explicitly below).
+
+This document describes the **api_ingestion** workflow currently implemented in the DAG Builder.  
+It focuses only on what exists in code today, plus known limitations.
+
+---
+
+## Index
+
+- [Raw: API Ingestion](#raw-api-ingestion)
+  - [Scope](#scope-what-this-workflow-is-for)
+  - [Before you start](#before-you-start-read-the-api-docs)
+- [How the DAG is built](#how-the-dag-is-built)
+- [API ingestion DAG naming and schema](#api-ingestion-dag-naming-and-schema)
+- [Parameters allowed via declaration file](#parameters-allowed-via-declaration-file)
+  - [Parameter reference (workflow)](#parameter-reference-workflow)
+- [tables_customization](#tables_customization-per-table)
+  - [Parameter reference (tables_customization)](#parameter-reference-tables_customization)
+- [Authentication](#authentication-workflowauthentication)
+  - [Parameter reference (authentication)](#parameter-reference-authentication)
+- [Request params and date placeholders](#request-params-and-date-placeholders)
+- [Pagination](#pagination-api_policiespagination)
+- [Rate limiting](#rate-limiting-api_policiesrate_limiting)
+- [Error handling](#error-handling-api_policieserror_handling)
+- [YAML examples](#yaml-examples-supported-features)
+- [Output: raw table schema](#output-raw-table-schema)
+- [Reference DAGs](#reference-dags)
+- [Known limitations](#known-limitations-current-mvp)
+- [Contributing](#contributing)
+
+## Raw: API Ingestion
+
+The purpose of this workflow is to ingest data from **REST APIs** into the **raw** data lake layer.
+
+Instead of creating custom code for each integration, you declare:
+
+- **what** endpoint to call (`endpoint_path`)
+- **how** to authenticate (`authentication`)
+- **how** to paginate (`api_policies.pagination`)
+- **how** to rate limit between pages (`api_policies.rate_limiting`)
+- **which** query params to send (including date placeholders)
+
+### Scope (what this workflow is for)
+
+- **Layer**: Raw (primary), optionally followed by **Clean** tasks if you provide clean queries.
+- **HTTP method**: **GET** only.
+- **Data model**: API responses are stored as **raw JSON strings** in a single column (`payload` by default).
+
+### Before you start (read the API docs)
+
+To configure a new ingestion you must read the **documentation of the API you are integrating** to identify:
+
+- **Authentication**: which strategy applies (none/basic/oauth2 client credentials), which secrets/fields you need, and whether tokens expire.
+- **Pagination**: none vs offset/limit vs cursor/PIT, where the cursor lives (headers vs params) and where “next cursor” is returned in the response.
+- **Rate limiting**: whether the API has limits, which headers it returns (if any), and if you need a fixed delay between requests.
+- **Filtering/query params**: which parameters are required and how to request an incremental window (dates), ordering, expansions, etc.
+- **Response shape**: whether results come as `list`, or inside `results` / `data` / `items`, and which field contains the record timestamp if you want partitioning by API time.
+
+Before configuring the ingestion, we suggest testing the API endpoint manually using Postman (or similar tools) to understand how authentication, pagination, and response formatting work in practice.
+
+---
+
+## How the DAG is built
+
+For each key under `workflow.tables_customization`, the builder creates a raw ingestion task that:
+- Makes HTTP requests to the configured API endpoint (handling authentication, pagination, and rate limiting)
+- Processes and normalizes the API response data
+- Writes the data as JSON strings to the raw data lake layer, automatically adding partition columns (`year`, `month`, `day`, `ts_load`) to the schema (physical partitioning can be configured via the `partitions` parameter)
+
+If there are matching clean queries in the DAG package (`queries/clean/<clean_table>.sql`), the workflow will also create clean tasks for those tables and chain them after the raw ingestion.
+
+### API ingestion DAG naming and schema
+
+For **`api_ingestion`**, the **DAG identifier** must follow a packaging rule:
+
+- **`dag.name`**, the folder under `dags/{line}/`, and the declaration filename **`{dag_name}_declaration.yml`** must all use the same `dag_name`, and that name **must end with `_api`** (e.g. `currency_api`).
+- **Reason:** `MANIFEST.in` includes only `**/*_api_declaration.y*ml` so the declaration is shipped inside the **Python wheel**. On Databricks, `load_api_ingestion_raw` resolves the YAML from the installed package (or local/S3 paths). If the filename does not match that pattern, the declaration may be missing at runtime after install.
+
+**Not tied to `_api`:** **`workflow.custom_schema`** and the resulting **raw metastore schema** (`datalake_{custom_schema}_raw` when that pattern applies) are **independent**. You may use a short or legacy schema name without `_api` (e.g. `dag.name: rates_api` with `custom_schema: currency`) as long as naming conventions for the lake layer are satisfied.
+
+---
+
+## Parameters allowed via declaration file
+
+This section describes the parameters you can configure in the `workflow` section of your DAG declaration file (`<dag_name>_declaration.yml`). For general information about building DAGs, including cluster configurations and DAG-level settings, see the [DAG Builder - User Guide](https://docs.google.com/document/d/1zq5_S0M9FuExHKsujpow6HqZxkzgSubQlDLaSOiwXCQ/edit?tab=t.0).
+
+### Required
+
+- **layer** (string): must be `raw`
+- **type** (string): must be `api_ingestion`
+- **api_base_url** (string or dict): base URL for the API  
+  - If `string`: used for all environments
+  - If `dict`: must include at least one env key (e.g. `prod`, `forno`). The runtime env is read from `ENVIRONMENT` (default: `forno`)
+- **tables_customization** (dict): maps “table names” to endpoint configs
+- **authentication** (dict) must be present either:
+  - once at workflow level (`workflow.authentication`), or
+  - per-table (`workflow.tables_customization.<table>.authentication`)
+
+### Optional
+
+- **payload_column_name** (string): column that will store the raw JSON string
+  - Default: `payload`
+- **date_format_mask** (string): `strftime` mask used to format `load_start_date` / `load_end_date` placeholders into strings (e.g. `%Y%m%d`)
+  - Table-level override: `workflow.tables_customization.<table>.date_format`
+- **api_policies** (dict): `rate_limiting`, `pagination`, `error_handling`
+- **alert_channel** (string): accepted in the declaration schema; today `APIConfigurationLoader` only **logs** that a channel was configured — it is **not** wired to `BaseAPIClient` yet
+- **load_spark_job** (string): defaults to `load_api_ingestion_raw`
+- **spark_job_prefix** (string): defaults to `base`
+- **spark_job_arguments** (list): default list is filled on the declaration for consistency with other workflows; **`LoadAPIRawTaskCreator` builds the real Spark positional arguments in code** (see `bietlejuice/base/airflow/task_creators/load_api_raw_task_creator.py`) and does **not** render this template
+
+### Parameter reference (workflow)
+
+Below are the workflow-level parameters **implemented/consumed by the current MVP**.
+
+- **`layer`** string (required): must be `raw`.
+- **`type`** string (required): must be `api_ingestion`.
+- **`api_base_url`** string or dict (required): API base URL.
+  - If `string`: used for all environments.
+  - If `dict`: keys are environments (e.g. `prod`, `forno`). Runtime env is read from `ENVIRONMENT` (default: `forno`).
+- **`credentials_scope`** string (optional): Databricks Secrets scope to read API credentials from (e.g. `people`).
+  - If omitted, falls back to `DATABRICKS_SECRET_SCOPE` (default: `quintoandar`).
+- **`tables_customization`** dict (required): mapping of table names → per-table config.
+- **`authentication`** dict (required\*): auth configuration (see “Authentication”).
+  - Must be present either at workflow level or per table (`tables_customization.<table>.authentication`).
+  - Cannot be `{}` (empty dict).
+- **`api_policies`** dict (optional): request behavior overrides.
+  - **`api_policies.pagination`** dict (optional): if omitted, a single request is made. If `{}` → validation error.
+  - **`api_policies.rate_limiting`** dict (optional): supports `fixed_delay` (sleep between pages) and optional **`initial_delay_seconds`** (sleep once in the Spark job before the first HTTP call — see `load_api_ingestion_raw.py`).
+  - **`api_policies.error_handling`** dict (optional):
+    - **`retry_policy`** dict (optional): only **`retries`** is applied today (mapped to `max_retries` on `BaseAPIClient`). Keys like **`delay`**, **`backoff_factor`**, and **`status_forcelist`** are **logged** if present but **not** passed into urllib3 (the client uses fixed defaults inside `BaseAPIClient`).
+    - **`non_fatal_status_codes`** list[int] (optional, default: `[]`): accepted in YAML and **logged** at client creation; **not** enforced by `BaseAPIClient` yet (HTTP errors still fail the job like any other non-2xx after retries).
+- **`payload_column_name`** string (optional, default: `payload`): JSON payload column name (can be overridden per table).
+- **`date_format_mask`** string (optional, default: `null`): `strftime` mask used when replacing `load_start_date` / `load_end_date` placeholders (workflow-level alias **`date_format`** is also accepted by the Cerberus schema and resolved the same way in `get_initial_params`).
+- **`extra_query_template_params`** dict (optional): used by DAG Builder macros and template rendering.
+  - **`load_start_date`** string (optional, default): `{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}`
+  - **`load_end_date`** string (optional, default): `{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}`
+- **`execution_timeout_hours`** float (optional, default: `2`): task timeout in hours (table-level override supported).
+- **`default_extraction_type`** string (optional, default: `full`): default extraction type for tables.
+- **`default_partitions`** list (optional, default: `[]`): default partitions list (commonly `[year, month, day]`).
+- **`raw_inner_dependencies`** dict (optional, default: `{}`): dependency graph to control **raw** task ordering.
+  - Keys are table names; values are lists of table names that must finish before the key starts.
+  - Useful to serialize calls when an API has token invalidation/race conditions under parallelism.
+- **`inner_dependencies`** dict (optional, default: `{}`): alias for `raw_inner_dependencies` (backward-compatible with other workflows).
+- **`clean_inner_dependencies`** dict (optional, default: `{}`): dependency graph to control **clean** task ordering (same format as `raw_inner_dependencies`).
+- **`custom_schema`** string (optional, default: dag name): used by TableAttributes schema inference.
+- **`load_spark_job`** string (optional, default: `load_api_ingestion_raw`): Spark job name used by raw load tasks.
+- **`spark_job_prefix`** string (optional, default: `base`): spark_jobs folder prefix (`/spark_jobs/<prefix>/`).
+- **`spark_job_arguments`** list (optional): if omitted, defaults are set by `RawAPIIngestionWorkflow` for declaration parity only; the running task still uses the fixed argument list from `LoadAPIRawTaskCreator` (see above).
+
+\* `authentication` is required, but can be defined at **workflow** level OR per **table**.
+
+---
+
+## `tables_customization` (per “table”)
+
+Each entry defines one API call pattern.
+
+### Required
+
+- **endpoint_path** (string): path appended to `api_base_url`
+
+### Optional
+
+- **params** (dict): query parameters sent on the request
+  - Any param value can use placeholders:
+    - `load_start_date` → formatted start date
+    - `load_end_date` → formatted end date
+- **date_filter_column** (string): JSON field name inside the payload used for partitioning
+  - If set, the job extracts `$.<date_filter_column>` from the payload and uses it to compute `year/month/day` partitions.
+  - If not set, partitions are computed from the default `ts_load` logic.
+- **clean_table_name** (string): if you have clean queries, this controls the expected clean query filename
+- **authentication** (dict): overrides workflow-level authentication for this table
+- **api_policies** (dict): overrides workflow-level policies for this table
+
+> Note: some keys seen in existing DAGs (e.g. `merge_schema`) are **not used** by the current implementation (see limitations).
+
+### Parameter reference (tables_customization)
+
+Each entry under `tables_customization` is a dictionary keyed by the **raw table name**:
+
+- **`tables_customization.<table>`** dict (required): table config.
+  - **`tables_customization.<table>.endpoint_path`** string (required): endpoint path appended to `api_base_url`.
+  - **`tables_customization.<table>.params`** dict (optional, default: `{}`): query parameters for the request.
+    - Supports placeholders `load_start_date` / `load_end_date`.
+    - If omitted, the loader defaults to `after_time`/`before_time` when dates are provided.
+  - **`tables_customization.<table>.authentication`** dict (required\*): overrides workflow authentication for this table.
+  - **`tables_customization.<table>.api_policies`** dict (optional): overrides workflow `api_policies` for this table.
+  - **`tables_customization.<table>.payload_column_name`** string (optional): overrides the payload column name.
+    - Default: workflow `payload_column_name` → `payload`.
+  - **`tables_customization.<table>.date_filter_column`** string (optional): JSON field name used for partitioning.
+  - **`tables_customization.<table>.date_format`** string (optional): overrides `workflow.date_format_mask` for placeholders.
+  - **`tables_customization.<table>.clean_table_name`** string (optional, default: `<table>`): clean query filename mapping.
+  - **`tables_customization.<table>.extraction_type`** string (optional, default: workflow `default_extraction_type` → `full`).
+  - **`tables_customization.<table>.partitions`** list (optional, default: workflow `default_partitions` → `[]`).
+  - **`tables_customization.<table>.execution_timeout_hours`** float (optional, default: workflow `execution_timeout_hours` → `2`).
+  - **`tables_customization.<table>.load_spark_job`** / **`spark_job_arguments`**: allowed in the shared declaration schema for other workflows; **`LoadAPIRawTaskCreator` always submits `load_api_ingestion_raw` with the fixed parameter list** — per-table overrides are **not** applied for `api_ingestion` today.
+  - **`tables_customization.<table>.spark_job_prefix`** string (optional, default: workflow `spark_job_prefix` → `base`): **used** to locate the job under `spark_jobs/<prefix>/` (same pattern as CDC/custom raw loaders).
+
+\* Per-table `authentication` is required if workflow-level `authentication` is missing.
+
+---
+
+## Authentication (`workflow.authentication`)
+
+The secret scope is read from:
+
+- `workflow.credentials_scope` (preferred, per-DAG), otherwise
+- `DATABRICKS_SECRET_SCOPE` (fallback, default: `quintoandar`).
+
+Whenever the API requires a credential (API key, token, client secret, etc.), it **must be stored in Databricks Secrets** and referenced from the YAML (e.g., via `authentication.secret_key` in the currently supported strategies).
+If you need help creating/updating a secret, see [Save a credential in Databricks Secrets](https://docs.google.com/document/d/1ZqeBdDOoij00-0lYF1QbWkmQdKFBVg494wlQTTHuLFY/edit?tab=t.0#heading=h.yvxztbuje7xm).
+
+### `strategy: none`
+
+No auth is applied.
+
+### `strategy: basic`
+
+Adds `Authorization: Basic <token>` to all requests.
+
+Config:
+
+- **secret_key** (string, required)
+- **token_field** (string, optional, default: `api_token`)
+- **username_field / password_field** (optional): if both are set, the token is built from `username:password` and base64-encoded
+
+### `strategy: oauth2_client_credentials`
+
+Fetches a token from `token_url` using **Basic Auth** (client_id/client_secret stored in Secrets) and then sends requests with `Authorization: Bearer <access_token>`.
+
+Config:
+
+- **secret_key** (string, required)
+- **token_url** (string, required)
+- **client_id_field** (string, optional, default: `client_id`)
+- **client_secret_field** (string, optional, default: `client_secret`)
+- **token_payload_extras** (dict, optional): extra payload fields added to the token request (`grant_type=client_credentials` is always included)
+- **expires_at_field / expires_in_field** (optional): how to read expiration from token response (defaults: `expires_at` / `expires_in`)
+
+### Parameter reference (authentication)
+
+- **`authentication.strategy`** string (required): one of `none`, `basic`, `oauth2_client_credentials`, `api_key`.
+- **`authentication.secret_key`** string (required for `basic` and `oauth2_client_credentials`): Databricks secret key.
+  - Secret scope is read from `workflow.credentials_scope` (preferred) or `DATABRICKS_SECRET_SCOPE` (fallback, default: `quintoandar`).
+
+For **`strategy: basic`**:
+
+- **`authentication.token_field`** string (optional, default: `api_token`): field in secret JSON holding the (pre-encoded) token.
+- **`authentication.username_field`** string (optional): if set together with `password_field`, builds token from `username:password`.
+- **`authentication.password_field`** string (optional): see above.
+
+For **`strategy: oauth2_client_credentials`**:
+
+- **`authentication.token_url`** string (required): token endpoint URL.
+- **`authentication.client_id_field`** string (optional, default: `client_id`): field in secret JSON.
+- **`authentication.client_secret_field`** string (optional, default: `client_secret`): field in secret JSON.
+- **`authentication.token_payload_extras`** dict (optional, default: `{}`): extra form fields for token request.
+- **`authentication.expires_at_field`** string (optional, default: `expires_at`): absolute expiry field in token response.
+- **`authentication.expires_in_field`** string (optional, default: `expires_in`): relative expiry field in token response.
+
+For **`strategy: api_key`**:
+
+- **`authentication.secret_key`** string (required): Databricks secret key containing the API key.
+- **`authentication.api_key_field`** string (optional, default: `api_key`): field in secret JSON holding the API key value.
+- **`authentication.location`** string (optional, default: `header`): one of `header`, `query_param`.
+- **`authentication.header_name`** string (optional, default: `x-api-key`): header name when using `location: header`.
+- **`authentication.query_param_name`** string (optional, default: `token`): query param name when using `location: query_param`.
+
+---
+
+## Request params and date placeholders
+
+When you set `params` for a table, the job replaces:
+
+- `load_start_date` with:
+  - `date_format_mask` / `date_format` if configured, otherwise ISO-8601 with `T00:00:00.000Z`
+- `load_end_date` with:
+  - `date_format_mask` / `date_format` if configured, otherwise ISO-8601 with `T23:59:59.999Z`
+
+If **no `params`** are provided for a table, the job defaults to:
+
+- `after_time=<start>`
+- `before_time=<end>`
+
+### Runtime params and `extra_details`
+
+`load_api_ingestion_raw` does **not** take an `extra_details` argument and **does not** merge Airflow-provided param overrides. Query parameters come from the DAG declaration (`tables_customization.<table>.params`) and from `load_start_date` / `load_end_date` passed as fixed Spark job arguments. To change params for a run, use declaration config, `extra_query_template_params` / macros where applicable, or extend the job (see [`contributing.md`](contributing.md)).
+
+---
+
+## Pagination (`api_policies.pagination`)
+
+Pagination can be configured at workflow level and overridden per-table.
+
+Supported strategies:
+
+- `none`
+- `offset_limit`
+- `cursor` (**Point-In-Time style, header-based**)
+
+### `strategy: offset_limit`
+
+Config:
+
+- **limit_param** (default: `limit`)
+- **offset_param** (default: `offset`)
+- **page_size** (default: `100`)
+
+The paginator will:
+
+- request pages with `offset=0, page_size`
+- increment offset by `page_size` until the response returns fewer than `page_size` records (or empty)
+
+### `strategy: cursor`
+
+This implementation is designed for “PIT + search_after” APIs (Greenhouse Audit Log style).
+
+Config (defaults shown):
+
+- **cursor_param**: `Search-After` (sent as a **header**)
+- **cursor_response_path**: `paging.next_search_after` (read from response JSON)
+- **context_param**: `Pit-Id` (sent as a **header**)
+- **context_response_path**: `paging.pit_id` (read from response JSON)
+- **page_size_param**: `Size` (sent as a **header**)
+- **page_size**: `500`
+- **results_response_path** (string, optional): field name in the response JSON containing the paginated results array. If not specified, the paginator automatically tries common field names (`results`, `items`, `data`, `records`, `entries`).
+
+Important behavior:
+
+- Cursor + context + page size are always sent via **headers** in the current loader.
+- If `results_response_path` is not specified, results are automatically extracted from common field names (`results`, `items`, `data`, `records`, `entries`). If specified, only that field is used.
+
+---
+
+## Rate limiting (`api_policies.rate_limiting`)
+
+Supported strategies:
+
+- `none`
+- `fixed_delay`
+
+### `strategy: fixed_delay`
+
+- **delay_seconds** (float): sleep time between pages when pagination is enabled.
+- **initial_delay_seconds** (int, optional): seconds to sleep **before the first request** for the table (handled in `load_api_ingestion_raw` before the client is used).
+- **retry_after_header** (string, optional): allowed in the declaration schema for forward compatibility; the shared `HeaderRateLimitAdapter` currently reads the standard **`Retry-After`** header only (custom header names are not wired through from YAML yet).
+
+Notes:
+
+- **`delay_seconds`** is applied **between pages**, not between independent tables.
+- Retries use urllib3’s `Retry` inside `BaseAPIClient` with a fixed `backoff_factor` and default status list (`429`, `500`, `502`, `503`, `504`); YAML `retry_policy.delay` / `backoff_factor` do not change that adapter today.
+
+---
+
+## Error handling (`api_policies.error_handling`)
+
+### Retries (`retry_policy`)
+
+- **`retries`**: mapped to `BaseAPIClient(..., max_retries=...)` (urllib3 `Retry.total`).
+- **`delay`**, **`backoff_factor`**, **`status_forcelist`**: preserved in YAML and surfaced in loader logs only; they do **not** currently reconfigure the urllib3 `Retry` object (see `bietlejuice/base/api/common/client.py`).
+
+### Non-fatal errors (`non_fatal_status_codes`)
+
+Declared for future behavior. Today the loader **logs** the list during client creation; **`BaseAPIClient` does not treat these codes as non-fatal** — the job still fails on HTTP error after the standard retry path unless the response is successful.
+
+---
+
+## YAML examples (supported features)
+
+The snippets below are intended to be copy/paste starting points for new DAGs and for validating supported strategies.
+
+### Minimal `api_ingestion` DAG (no auth, no pagination)
+
+```yaml
+workflow:
+  layer: raw
+  type: api_ingestion
+  api_base_url: "https://api.example.com/v1"
+
+  authentication:
+    strategy: "none"
+
+  api_policies:
+    pagination:
+      strategy: "none"
+    rate_limiting:
+      strategy: "none"
+
+  tables_customization:
+    my_table:
+      endpoint_path: "events"
+```
+
+### `api_base_url` per environment
+
+```yaml
+workflow:
+  api_base_url:
+    forno: "https://sandbox.api.example.com/v1"
+    prod: "https://api.example.com/v1"
+```
+
+### Auth: Basic (token from Secrets)
+
+```yaml
+workflow:
+  authentication:
+    strategy: "basic"
+    secret_key: "MY_API_SECRET"
+    token_field: "token"
+```
+
+### Auth: Basic (username/password from Secrets)
+
+```yaml
+workflow:
+  authentication:
+    strategy: "basic"
+    secret_key: "MY_API_SECRET"
+    username_field: "username"
+    password_field: "password"
+```
+
+### Auth: OAuth2 Client Credentials (token endpoint protected by Basic Auth)
+
+```yaml
+workflow:
+  authentication:
+    strategy: "oauth2_client_credentials"
+    secret_key: "MY_OAUTH_SECRET"
+    token_url: "https://auth.example.com/oauth/token"
+    client_id_field: "client_id"          # default
+    client_secret_field: "client_secret"  # default
+    token_payload_extras:
+      audience: "https://api.example.com/"
+```
+
+### Auth: API Key (header or query parameter)
+
+```yaml
+workflow:
+  authentication:
+    strategy: "api_key"
+    secret_key: "MY_API_KEY_SECRET"
+    api_key_field: "api_key"
+    location: "header"
+    header_name: "x-api-key"
+    # query_param_name: "token"
+```
+
+### Params with date placeholders + ISO timestamps (default)
+
+```yaml
+workflow:
+  tables_customization:
+    events:
+      endpoint_path: "events"
+      params:
+        after_time: "load_start_date"
+        before_time: "load_end_date"
+```
+
+### Params with custom date formatting (workflow-level)
+
+```yaml
+workflow:
+  date_format_mask: "%Y%m%d"
+  tables_customization:
+    rates:
+      endpoint_path: "USD-BRL/360"
+      params:
+        start_date: "load_start_date"
+        end_date: "load_end_date"
+```
+
+### Date formatting override (table-level)
+
+```yaml
+workflow:
+  date_format_mask: "%Y%m%d"
+  tables_customization:
+    events:
+      endpoint_path: "events"
+      date_format: "%Y-%m-%d"
+      params:
+        start: "load_start_date"
+        end: "load_end_date"
+```
+
+### Pagination: offset/limit
+
+```yaml
+workflow:
+  api_policies:
+    pagination:
+      strategy: "offset_limit"
+      limit_param: "limit"
+      offset_param: "offset"
+      page_size: 100
+```
+
+### Pagination: cursor (PIT + search_after header-based)
+
+```yaml
+workflow:
+  api_policies:
+    pagination:
+      strategy: "cursor"
+      cursor_param: "Search-After"
+      cursor_response_path: "paging.next_search_after"
+      context_param: "Pit-Id"
+      context_response_path: "paging.pit_id"
+      page_size_param: "Size"
+      page_size: 500
+      results_response_path: "results"  # optional: defaults to trying common field names
+```
+
+### Rate limiting: fixed delay between pages
+
+```yaml
+workflow:
+  api_policies:
+    rate_limiting:
+      strategy: "fixed_delay"
+      delay_seconds: 1.0
+      retry_after_header: "Retry-After"
+```
+
+### Error handling: retry policy + non-fatal codes
+
+```yaml
+workflow:
+  api_policies:
+    error_handling:
+      non_fatal_status_codes: [500]
+      retry_policy:
+        retries: 3
+        delay: 2
+        backoff_factor: 2
+```
+
+### Per-table override (auth/pagination/error handling)
+
+```yaml
+workflow:
+  authentication:
+    strategy: "none"
+  api_policies:
+    pagination:
+      strategy: "none"
+
+  tables_customization:
+    public_events:
+      endpoint_path: "events"
+
+    private_events:
+      endpoint_path: "private/events"
+      authentication:
+        strategy: "basic"
+        secret_key: "PRIVATE_API_SECRET"
+      api_policies:
+        pagination:
+          strategy: "offset_limit"
+          limit_param: "limit"
+          offset_param: "offset"
+          page_size: 50
+        error_handling:
+          retry_policy:
+            retries: 5
+            delay: 3
+            backoff_factor: 2
+```
+
+### Serializing raw tables (avoid concurrency issues)
+
+Some APIs can return intermittent 401s (or other failures) if multiple tables hit the API in parallel (e.g., token invalidation races). You can serialize raw loads with `raw_inner_dependencies` (or `inner_dependencies`):
+
+```yaml
+workflow:
+  raw_inner_dependencies:
+    job_interview_stages:
+      - application_stages
+    users:
+      - job_interview_stages
+```
+
+### Payload column name + partitioning by a JSON date field
+
+```yaml
+workflow:
+  payload_column_name: "raw_payload"
+  tables_customization:
+    events:
+      endpoint_path: "events"
+      date_filter_column: "event_time"
+```
+
+---
+
+## Output: raw table schema
+
+The Spark job builds rows with `bietlejuice.jobs.common.helpers.json_to_dataframe`:
+
+- API objects are passed through `clean_keys_recursive` (keys sanitized for Spark-friendly names).
+- When **`payload_column_name`** is set (default `payload`), each row includes that column with **`json.dumps(original_record)`** so the full response object is retained as a JSON string.
+- Spark infers additional columns from the normalized dicts (when the API returns flat fields, they appear as their own columns in addition to the payload column, depending on inference across the batch).
+- **`insert_partitions`** then adds **`ts_load`** (`now()`), and **`year`**, **`month`**, **`day`**. If **`date_filter_column`** is set (table or workflow), partitions are derived from that field when possible; otherwise partitions use the load timestamp.
+
+There is **no** dedicated `source` URL column written by `load_api_ingestion_raw` today (only the raw payload and inferred fields).
+
+---
+
+## Reference DAGs
+
+No DAG in this repository currently uses `workflow.type: api_ingestion` on `master`; the YAML snippets in this document are the supported contract. When a first production DAG is added, link it here. Note: [`dags/people/currency/currency_declaration.yml`](../../dags/people/currency/currency_declaration.yml) uses **`custom_ingestion`** (`load_currency_raw`), not `api_ingestion`.
+
+---
+
+## Known limitations (current MVP)
+
+### Authentication
+
+- Supported strategies: `oauth2_client_credentials`, `basic`, `api_key`, and `none`.
+- No Service Account / JWT flows (e.g., Google Workspace service account) are implemented.
+- No generic Bearer token strategy (static token from Secrets) is implemented.
+
+### Parallelism and token invalidation (401)
+
+Some APIs can invalidate previously-issued tokens when a new token is generated (or have other concurrency-sensitive auth behavior). Because `api_ingestion` can run multiple tables in parallel, this can surface as intermittent `401 Unauthorized` for some endpoints.
+
+- Example: Greenhouse v3 had intermittent 401s during parallel ingestions; one mitigation was to serialize raw loads using intra-DAG dependencies (see [PR #21643](https://github.com/quintoandar/bi-etl-ejuice/pull/21643)).
+
+**Workaround:** serialize the affected tables using `workflow.raw_inner_dependencies` (or `workflow.inner_dependencies`) (do **not** provide empty lists; only include tables that have dependencies):
+
+```yaml
+workflow:
+  raw_inner_dependencies:
+    job_interview_stages:
+      - application_stages
+    users:
+      - job_interview_stages
+```
+
+Longer-term, shared/reused token handling across parallel tasks is not implemented in the current MVP.
+
+### Pagination
+
+- No `link_header` pagination strategy.
+- **`_create_cursor_paginator`** wires **`cursor_location` / `context_location` / `page_size_location` to `"header"`** — query-param cursor APIs need loader changes.
+- For **cursor** pagination, result lists are resolved with **`CursorPaginator._default_extract_results`**, which scans `results`, `items`, `data`, `records`, `entries` (or a configured `results_response_path`).
+- For a **single-page** fetch (no paginator), `load_api_ingestion_raw` reads **`table_config.results_response_path`** (default key name **`"results"`**), then falls back to **`data`** if the list is empty — it does **not** scan all common names like the cursor paginator.
+
+### Rate limiting / 429
+
+- **`fixed_delay` / `delay_seconds`** only sleep **between pages** (when a paginator is used).
+- **`initial_delay_seconds`** sleeps once before any HTTP traffic for the table.
+- After a 429, urllib3 retries with the adapter stack; **`HeaderRateLimitAdapter`** may wait on the **`Retry-After`** response header. YAML **`retry_after_header`** is not passed through to rename that header yet.
+
+### Response extraction
+
+- **Single request:** default **`results`** key (override with per-table **`results_response_path`**), then **`data`** if empty; if the body is a **list**, it is used as-is.
+- **Cursor pagination:** default extractor tries common keys unless **`results_response_path`** is set in pagination config (see [`CursorPaginator`](../../bietlejuice/base/api/pagination/cursor.py)).
+
+---
+
+## Contributing
+
+If you want to extend `api_ingestion` (new auth/pagination/rate-limit strategies), see:
+
+- [`docs/api_ingestion/contributing.md`](contributing.md)
+
