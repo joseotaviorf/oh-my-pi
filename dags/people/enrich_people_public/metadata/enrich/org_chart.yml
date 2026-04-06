@@ -9,18 +9,18 @@ columns:
     description: Registration number of the worker.
     lineage:
       - datalake_people.identifier_mapping.assignment_number
-  full_name:
-    description: Full name of the worker; sourced from display_name (uses social name when available).
+  name:
+    description: Preferred full name of the worker for reporting.
     lineage:
-      - datalake_people.identifier_mapping.display_name
+      - datalake_people.identifier_mapping.name
   work_email:
     description: Corporate email of the employee.
     lineage:
       - datalake_people.identifier_mapping.work_email
   manager_name:
-    description: Full name of the manager.
+    description: Preferred full name of the manager for reporting.
     lineage:
-      - datalake_people.identifier_mapping.display_name
+      - datalake_people.identifier_mapping.name
   manager_email:
     description: Corporate email of the manager.
     lineage:

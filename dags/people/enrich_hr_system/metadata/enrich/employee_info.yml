@@ -2,7 +2,9 @@ database_name: datalake_hr_system
 table_name: employee_info
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Enrich table with informatiion about name and birth of the employee
+description: |-
+  Enrich table with information about name and birth of the employee.
+  documented_* columns are official / document-aligned names from HCM; first_social_name and last_social_name are preferred social name parts when present.
 columns:
   id_person:
     description: Id of the person
@@ -12,18 +14,18 @@ columns:
     description: Person number
     lineage:
     - datalake_people.identifier_mapping.person_number
-  first_name:
-    description: First name of the employee
+  documented_first_name:
+    description: Official / document-aligned first name of the employee from HCM.
     lineage:
-    - datalake_pin_core_clean.person_name.first_name
-  last_name:
-    description: Last name of the employee
+    - datalake_pin_core_clean.person_name.documented_first_name
+  documented_last_name:
+    description: Official / document-aligned last name of the employee from HCM.
     lineage:
-    - datalake_pin_core_clean.person_name.last_name
-  full_name:
-    description: Full name of the employee
+    - datalake_pin_core_clean.person_name.documented_last_name
+  documented_full_name:
+    description: Official / document-aligned full name of the employee from HCM.
     lineage:
-    - datalake_pin_core_clean.person_name.full_name
+    - datalake_pin_core_clean.person_name.documented_full_name
   first_social_name:
     description: First social name of the employee
     lineage:

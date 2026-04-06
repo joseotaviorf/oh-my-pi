@@ -3,8 +3,7 @@ employees AS (
     SELECT
         im.id_person,
         im.person_number,
-        im.display_name,
-        im.full_name,
+        im.name,
         im.work_email
     FROM
         datalake_people.identifier_mapping AS im
@@ -47,7 +46,7 @@ current_education AS (
 SELECT
     emp.id_person AS sk_employee,
     emp.person_number,
-    COALESCE(emp.display_name, emp.full_name) AS name,
+    emp.name AS name,
     emp.work_email,
     ce.highest_education_level,
     CASE

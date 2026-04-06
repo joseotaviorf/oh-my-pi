@@ -10,9 +10,9 @@ codex_current AS (
     team AS codex_team,
     chapter AS codex_chapter,
     line AS codex_line,
-    owner_l1_full_name AS codex_owner_l1_full_name,
-    owner_l2_full_name AS codex_owner_l2_full_name,
-    owner_l3_full_name AS codex_owner_l3_full_name,
+    owner_l1_name AS codex_owner_l1_name,
+    owner_l2_name AS codex_owner_l2_name,
+    owner_l3_name AS codex_owner_l3_name,
     headcount_type AS codex_headcount_type
   FROM
     datalake_people.codex_log
@@ -78,11 +78,11 @@ SELECT
   p.pin_line,
   c.codex_headcount_type,
   p.pin_headcount_type,
-  c.codex_owner_l1_full_name,
+  c.codex_owner_l1_name,
   p.pin_name_owner_l1,
-  c.codex_owner_l2_full_name,
+  c.codex_owner_l2_name,
   p.pin_name_owner_l2,
-  c.codex_owner_l3_full_name,
+  c.codex_owner_l3_name,
   p.pin_name_owner_l3,
   p.pin_organization_name,
   p.pin_organization_status,
@@ -95,9 +95,9 @@ SELECT
   c.codex_chapter IS DISTINCT FROM p.pin_chapter AS is_drift_chapter,
   c.codex_line IS DISTINCT FROM p.pin_line AS is_drift_line,
   c.codex_headcount_type IS DISTINCT FROM p.pin_headcount_type AS is_drift_headcount_type,
-  c.codex_owner_l1_full_name IS DISTINCT FROM p.pin_name_owner_l1 AS is_drift_owner_l1,
-  c.codex_owner_l2_full_name IS DISTINCT FROM p.pin_name_owner_l2 AS is_drift_owner_l2,
-  c.codex_owner_l3_full_name IS DISTINCT FROM p.pin_name_owner_l3 AS is_drift_owner_l3,
+  c.codex_owner_l1_name IS DISTINCT FROM p.pin_name_owner_l1 AS is_drift_owner_l1,
+  c.codex_owner_l2_name IS DISTINCT FROM p.pin_name_owner_l2 AS is_drift_owner_l2,
+  c.codex_owner_l3_name IS DISTINCT FROM p.pin_name_owner_l3 AS is_drift_owner_l3,
   (
     c.codex_business IS DISTINCT FROM p.pin_business
     OR c.codex_product IS DISTINCT FROM p.pin_product
@@ -108,9 +108,9 @@ SELECT
     OR c.codex_chapter IS DISTINCT FROM p.pin_chapter
     OR c.codex_line IS DISTINCT FROM p.pin_line
     OR c.codex_headcount_type IS DISTINCT FROM p.pin_headcount_type
-    OR c.codex_owner_l1_full_name IS DISTINCT FROM p.pin_name_owner_l1
-    OR c.codex_owner_l2_full_name IS DISTINCT FROM p.pin_name_owner_l2
-    OR c.codex_owner_l3_full_name IS DISTINCT FROM p.pin_name_owner_l3
+    OR c.codex_owner_l1_name IS DISTINCT FROM p.pin_name_owner_l1
+    OR c.codex_owner_l2_name IS DISTINCT FROM p.pin_name_owner_l2
+    OR c.codex_owner_l3_name IS DISTINCT FROM p.pin_name_owner_l3
   ) AS is_any_drift,
   NOW() AS ts_load
 FROM

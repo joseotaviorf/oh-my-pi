@@ -12,18 +12,18 @@ columns:
     description: Unique identifier for the employee.
     lineage:
     - datalake_hr_system.employee_info.person_number
-  first_name:
-    description: First name of the employee, if has social name it is not the same as the first social name
+  documented_first_name:
+    description: Official / document-aligned first name from HCM; may differ from social name parts.
     lineage:
-    - datalake_hr_system.employee_info.first_name
-  last_name:
-    description: Last name of the employee, if has social name it is not the same as the last social name
+    - datalake_hr_system.employee_info.documented_first_name
+  documented_last_name:
+    description: Official / document-aligned last name from HCM; may differ from social name parts.
     lineage:
-    - datalake_hr_system.employee_info.last_name
-  full_name:
-    description: Full name of the employee, if has social name it is the same
+    - datalake_hr_system.employee_info.documented_last_name
+  documented_full_name:
+    description: Official / document-aligned full name from HCM.
     lineage:
-    - datalake_hr_system.employee_info.full_name
+    - datalake_hr_system.employee_info.documented_full_name
   first_social_name:
     description: First social name of the employee
     lineage:

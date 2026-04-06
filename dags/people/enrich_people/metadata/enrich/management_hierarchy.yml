@@ -44,8 +44,7 @@ columns:
   name_manager:
     description: Full name of the direct manager.
     lineage:
-      - datalake_people.identifier_mapping.display_name
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
   email_manager:
     description: Work e-mail of the direct manager.
     lineage:
@@ -61,8 +60,7 @@ columns:
   name_l0:
     description: Full name of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
     lineage:
-      - datalake_people.identifier_mapping.display_name
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
   email_l0:
     description: Work e-mail of the manager L0 (Layer 0, top-level manager / CEO in the valid chain).
     lineage:
@@ -78,8 +76,7 @@ columns:
   name_l1:
     description: Full name of the manager L1 (Layer 1, one level below L0).
     lineage:
-      - datalake_people.identifier_mapping.display_name
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
   email_l1:
     description: Work e-mail of the manager L1 (Layer 1, one level below L0).
     lineage:
@@ -95,8 +92,7 @@ columns:
   name_l2:
     description: Full name of the manager L2 (Layer 2, one level below L1).
     lineage:
-      - datalake_people.identifier_mapping.display_name
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
   email_l2:
     description: Work e-mail of the manager L2 (Layer 2, one level below L1).
     lineage:
@@ -112,8 +108,7 @@ columns:
   name_l3:
     description: Full name of the manager L3 (Layer 3, one level below L2).
     lineage:
-      - datalake_people.identifier_mapping.display_name
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
   email_l3:
     description: Work e-mail of the manager L3 (Layer 3, one level below L2).
     lineage:
@@ -129,8 +124,7 @@ columns:
   name_l4:
     description: Full name of the manager L4 (Layer 4, one level below L3).
     lineage:
-      - datalake_people.identifier_mapping.display_name
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
   email_l4:
     description: Work e-mail of the manager L4 (Layer 4, one level below L3).
     lineage:
@@ -146,8 +140,7 @@ columns:
   name_l5:
     description: Full name of the manager L5 (Layer 5, one level below L4).
     lineage:
-      - datalake_people.identifier_mapping.display_name
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
   email_l5:
     description: Work e-mail of the manager L5 (Layer 5, one level below L4).
     lineage:
@@ -163,8 +156,7 @@ columns:
   name_l6:
     description: Full name of the manager L6 (Layer 6, one level below L5).
     lineage:
-      - datalake_people.identifier_mapping.display_name
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
   email_l6:
     description: Work e-mail of the manager L6 (Layer 6, one level below L5).
     lineage:
@@ -180,8 +172,7 @@ columns:
   name_l7:
     description: Full name of the manager L7 (Layer 7, one level below L6).
     lineage:
-      - datalake_people.identifier_mapping.display_name
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
   email_l7:
     description: Work e-mail of the manager L7 (Layer 7, one level below L6).
     lineage:
@@ -197,8 +188,7 @@ columns:
   name_l8:
     description: Full name of the manager L8 (Layer 8, one level below L7).
     lineage:
-      - datalake_people.identifier_mapping.display_name
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
   email_l8:
     description: Work e-mail of the manager L8 (Layer 8, one level below L7).
     lineage:
@@ -214,8 +204,7 @@ columns:
   name_l9:
     description: Full name of the manager L9 (Layer 9, one level below L8).
     lineage:
-      - datalake_people.identifier_mapping.display_name
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
   email_l9:
     description: Work e-mail of the manager L9 (Layer 9, one level below L8).
     lineage:

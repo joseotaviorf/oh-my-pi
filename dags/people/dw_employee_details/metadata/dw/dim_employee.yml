@@ -28,8 +28,7 @@ columns:
       Current display or preferred name (nome social). Use this name in all communications,
       reports, and dashboards. Do not use legal_name from dim_documentation for display.
     lineage:
-      - datalake_pin_core_clean.person_name.display_name
-      - datalake_pin_core_clean.person_name.full_name
+      - datalake_people.identifier_mapping.name
   work_email:
     description: Current work email of the employee.
     lineage:

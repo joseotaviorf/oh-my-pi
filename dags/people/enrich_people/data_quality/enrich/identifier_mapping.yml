@@ -44,18 +44,21 @@ column_level_validations:
     is_contained_in:
       values: ['ACTIVE', 'INACTIVE']
       severity_level: Warning
-  first_name:
+  documented_first_name:
     is_complete:
       severity_level: Warning
-  last_name:
+  documented_last_name:
     is_complete:
       severity_level: Warning
-  full_name:
+  documented_full_name:
     # 1 known null case (person_number 137786)
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
   display_name:
+    is_complete:
+      severity_level: Warning
+  name:
     is_complete:
       severity_level: Warning
   is_user_test:

@@ -16,7 +16,7 @@ goal_base AS (
     g.id_goal,
     ap.person_number,
     ab.person_number AS assigned_by_person_number,
-    pn.display_name,
+    im.name,
     rpt.review_period_name,
     gpt.goal_plan_name,
     g.goal_name,
@@ -79,10 +79,9 @@ goal_base AS (
       ON rpt.id_review_period = gpg.id_review_period
         AND rpt.language = 'PTB'
   INNER JOIN
-    datalake_pin_core_clean.person_name AS pn
-      ON pn.id_person = g.id_person
-        AND pn.name_type = 'GLOBAL'
-        AND pn.dt_effective_ended >= '4712-12-31'
+    datalake_people.identifier_mapping AS im
+      ON im.id_person = g.id_person
+        AND im.is_person_latest_assignment
   INNER JOIN
     datalake_pin_core_clean.all_people AS ap
       ON ap.id_person = g.id_person
@@ -213,7 +212,7 @@ SELECT
   b.id_goal,
   b.person_number,
   b.assigned_by_person_number,
-  b.display_name,
+  b.name,
   b.review_period_name,
   b.goal_plan_name,
   b.goal_name,

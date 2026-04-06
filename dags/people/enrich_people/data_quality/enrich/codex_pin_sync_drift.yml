@@ -45,7 +45,7 @@ column_level_validations:
   pin_organization_status:
     is_complete:
       severity_level: Error
-  codex_owner_l1_full_name:
+  codex_owner_l1_name:
     has_completeness:
       # Baseline (Databricks prod, 2026-03-25): ~0.989 complete; cap if null share stays >=75% of baseline (25% margin). Same patamar as pin_name_owner_l1.
       less_than_or_equal_to: 0.9915
@@ -85,7 +85,7 @@ column_level_validations:
       # Baseline (Databricks prod, 2026-03-25): ~0.989 complete; cap if null share stays >=75% of baseline (25% margin).
       less_than_or_equal_to: 0.9915
       severity_level: Warning
-  codex_owner_l2_full_name:
+  codex_owner_l2_name:
     has_completeness:
       # Baseline (Databricks prod, 2026-03-25): ~0.959 complete; cap if null share stays >=75% of baseline (25% margin).
       less_than_or_equal_to: 0.9689
@@ -95,7 +95,7 @@ column_level_validations:
       # Baseline (Databricks prod, 2026-03-25): ~0.959 complete; cap if null share stays >=75% of baseline (25% margin).
       less_than_or_equal_to: 0.9689
       severity_level: Warning
-  codex_owner_l3_full_name:
+  codex_owner_l3_name:
     has_completeness:
       # Baseline (Databricks prod, 2026-03-25): ~0.918 complete; cap if null share stays >=75% of baseline (25% margin).
       less_than_or_equal_to: 0.9383

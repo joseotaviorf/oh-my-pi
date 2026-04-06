@@ -114,7 +114,7 @@ legal_names AS (
     SELECT
         pr.id_person,
         pr.dt_valid_from,
-        pn.full_name AS legal_name
+        pn.documented_full_name AS legal_name
     FROM
         person_periods AS pr
     INNER JOIN

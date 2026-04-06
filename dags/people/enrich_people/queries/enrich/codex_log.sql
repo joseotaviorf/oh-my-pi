@@ -3,7 +3,7 @@ employee_ids AS (
   SELECT
     work_email,
     person_number,
-    full_name
+    name
   FROM
     datalake_people.identifier_mapping
   WHERE
@@ -21,7 +21,7 @@ new_emails_from_mapping AS (
   SELECT
     emp_map.work_email,
     emp_ids.person_number,
-    emp_ids.full_name
+    emp_ids.name
   FROM
     datalake_gsheets_people_clean.email_employee_mapping AS emp_map
   INNER JOIN
@@ -35,7 +35,7 @@ employee_ids_enrich AS (
   SELECT
     work_email,
     person_number,
-    full_name
+    name
   FROM
     employee_ids
   WHERE
@@ -46,7 +46,7 @@ employee_ids_enrich AS (
   SELECT
     work_email,
     person_number,
-    full_name
+    name
   FROM
     new_emails_from_mapping
 ),
@@ -61,9 +61,9 @@ codex AS (
     codex.team,
     codex.chapter,
     codex.line,
-    emp_id1.full_name AS owner_l1_full_name,
-    emp_id2.full_name AS owner_l2_full_name,
-    emp_id3.full_name AS owner_l3_full_name,
+    emp_id1.name AS owner_l1_name,
+    emp_id2.name AS owner_l2_name,
+    emp_id3.name AS owner_l3_name,
     codex.headcount_type,
     codex.dt_closing_month,
     codex.ts_load
@@ -90,9 +90,9 @@ codex_ordered AS (
     team,
     chapter,
     line,
-    owner_l1_full_name,
-    owner_l2_full_name,
-    owner_l3_full_name,
+    owner_l1_name,
+    owner_l2_name,
+    owner_l3_name,
     headcount_type,
     dt_closing_month,
     ts_load,
@@ -104,9 +104,9 @@ codex_ordered AS (
     LAG(team) OVER w AS prev_team,
     LAG(chapter) OVER w AS prev_chapter,
     LAG(line) OVER w AS prev_line,
-    LAG(owner_l1_full_name) OVER w AS prev_owner_l1_full_name,
-    LAG(owner_l2_full_name) OVER w AS prev_owner_l2_full_name,
-    LAG(owner_l3_full_name) OVER w AS prev_owner_l3_full_name,
+    LAG(owner_l1_name) OVER w AS prev_owner_l1_name,
+    LAG(owner_l2_name) OVER w AS prev_owner_l2_name,
+    LAG(owner_l3_name) OVER w AS prev_owner_l3_name,
     LAG(headcount_type) OVER w AS prev_headcount_type,
     LAG(cost_center_code) OVER w IS NULL AS is_first_version
   FROM
@@ -125,9 +125,9 @@ with_version AS (
     team,
     chapter,
     line,
-    owner_l1_full_name,
-    owner_l2_full_name,
-    owner_l3_full_name,
+    owner_l1_name,
+    owner_l2_name,
+    owner_l3_name,
     headcount_type,
     dt_closing_month,
     ts_load,
@@ -142,9 +142,9 @@ with_version AS (
         OR team IS DISTINCT FROM prev_team
         OR chapter IS DISTINCT FROM prev_chapter
         OR line IS DISTINCT FROM prev_line
-        OR owner_l1_full_name IS DISTINCT FROM prev_owner_l1_full_name
-        OR owner_l2_full_name IS DISTINCT FROM prev_owner_l2_full_name
-        OR owner_l3_full_name IS DISTINCT FROM prev_owner_l3_full_name
+        OR owner_l1_name IS DISTINCT FROM prev_owner_l1_name
+        OR owner_l2_name IS DISTINCT FROM prev_owner_l2_name
+        OR owner_l3_name IS DISTINCT FROM prev_owner_l3_name
         OR headcount_type IS DISTINCT FROM prev_headcount_type
         THEN 1
         ELSE 0
@@ -164,9 +164,9 @@ one_per_version AS (
     team,
     chapter,
     line,
-    owner_l1_full_name,
-    owner_l2_full_name,
-    owner_l3_full_name,
+    owner_l1_name,
+    owner_l2_name,
+    owner_l3_name,
     headcount_type,
     dt_closing_month AS dt_valid_from,
     ts_load,
@@ -192,9 +192,9 @@ SELECT
   team,
   chapter,
   line,
-  owner_l1_full_name,
-  owner_l2_full_name,
-  owner_l3_full_name,
+  owner_l1_name,
+  owner_l2_name,
+  owner_l3_name,
   headcount_type,
   CAST(dt_valid_from AS DATE) AS dt_valid_from,
   CAST(

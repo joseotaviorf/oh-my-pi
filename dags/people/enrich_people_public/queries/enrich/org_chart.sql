@@ -32,7 +32,7 @@ assignment_cte AS (
     o.subdirectorate,
     m.id_manager_assignment,
     em.id_person AS id_manager_person,
-    em.display_name AS manager_name,
+    em.name AS manager_name,
     em.work_email AS manager_email,
     jf.name_job_family AS position_class
   FROM
@@ -61,7 +61,7 @@ assignment_cte AS (
 
 SELECT
   e.assignment_number,
-  e.display_name AS full_name,
+  e.name AS name,
   e.work_email,
   a.manager_name,
   a.manager_email,

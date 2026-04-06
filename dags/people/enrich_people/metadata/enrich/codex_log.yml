@@ -44,23 +44,23 @@ columns:
     description: Line to which the cost center belongs.
     lineage:
       - datalake_people.codex_history_base.line
-  owner_l1_full_name:
-    description: Full name of the L1 owner (from identifier_mapping / email mapping).
+  owner_l1_name:
+    description: Preferred name of the L1 owner.
     lineage:
       - datalake_people.codex_history_base.owner_l1_email
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
       - datalake_gsheets_people_clean.email_employee_mapping.work_email
-  owner_l2_full_name:
-    description: Full name of the L2 owner (from identifier_mapping / email mapping).
+  owner_l2_name:
+    description: Preferred name of the L2 owner.
     lineage:
       - datalake_people.codex_history_base.owner_l2_email
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
       - datalake_gsheets_people_clean.email_employee_mapping.work_email
-  owner_l3_full_name:
-    description: Full name of the L3 owner (from identifier_mapping / email mapping).
+  owner_l3_name:
+    description: Preferred name of the L3 owner.
     lineage:
       - datalake_people.codex_history_base.owner_l3_email
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
       - datalake_gsheets_people_clean.email_employee_mapping.work_email
   headcount_type:
     description: Inferred headcount type (Capacity or Overhead).

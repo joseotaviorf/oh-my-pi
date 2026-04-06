@@ -98,47 +98,47 @@ columns:
       in the hierarchy.
     lineage:
     - datalake_people.identifier_mapping.assignment_number
-  full_name_leadership_0:
-    description: Full Name of the highest manager in the hierarchy. Usually equal
-      to the CEO id.
+  name_leadership_0:
+    description: Name of the highest manager in the hierarchy. Usually equal to the
+      CEO id.
     lineage:
-    - datalake_people.identifier_mapping.full_name
-  full_name_leadership_1:
-    description: Full Name of the second highest manager in the hierarchy.
+    - datalake_people.identifier_mapping.name
+  name_leadership_1:
+    description: Name of the second highest manager in the hierarchy.
     lineage:
-    - datalake_people.identifier_mapping.full_name
-  full_name_leadership_2:
-    description: Full Name of the third highest manager in the hierarchy.
+    - datalake_people.identifier_mapping.name
+  name_leadership_2:
+    description: Name of the third highest manager in the hierarchy.
     lineage:
-    - datalake_people.identifier_mapping.full_name
-  full_name_leadership_3:
-    description: Full Name of the fourth highest manager in the hierarchy.
+    - datalake_people.identifier_mapping.name
+  name_leadership_3:
+    description: Name of the fourth highest manager in the hierarchy.
     lineage:
-    - datalake_people.identifier_mapping.full_name
-  full_name_leadership_4:
-    description: Full Name of the fifth highest manager in the hierarchy.
+    - datalake_people.identifier_mapping.name
+  name_leadership_4:
+    description: Name of the fifth highest manager in the hierarchy.
     lineage:
-    - datalake_people.identifier_mapping.full_name
-  full_name_leadership_5:
-    description: Full Name of the sixth highest manager in the hierarchy.
+    - datalake_people.identifier_mapping.name
+  name_leadership_5:
+    description: Name of the sixth highest manager in the hierarchy.
     lineage:
-    - datalake_people.identifier_mapping.full_name
-  full_name_leadership_6:
-    description: Full Name of the seventh highest manager in the hierarchy.
+    - datalake_people.identifier_mapping.name
+  name_leadership_6:
+    description: Name of the seventh highest manager in the hierarchy.
     lineage:
-    - datalake_people.identifier_mapping.full_name
-  full_name_leadership_7:
-    description: Full Name of the eighth highest manager in the hierarchy.
+    - datalake_people.identifier_mapping.name
+  name_leadership_7:
+    description: Name of the eighth highest manager in the hierarchy.
     lineage:
-    - datalake_people.identifier_mapping.full_name
-  full_name_leadership_8:
-    description: Full Name of the ninth highest manager in the hierarchy.
+    - datalake_people.identifier_mapping.name
+  name_leadership_8:
+    description: Name of the ninth highest manager in the hierarchy.
     lineage:
-    - datalake_people.identifier_mapping.full_name
-  full_name_leadership_9:
-    description: Full Name of the tenth highest manager in the hierarchy.
+    - datalake_people.identifier_mapping.name
+  name_leadership_9:
+    description: Name of the tenth highest manager in the hierarchy.
     lineage:
-    - datalake_people.identifier_mapping.full_name
+    - datalake_people.identifier_mapping.name
   email_leadership_0:
     description: Email of the highest manager in the hierarchy. Usually equal to the
       CEO id.

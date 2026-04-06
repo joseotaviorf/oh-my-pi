@@ -15,9 +15,9 @@ SELECT
   -- -- non metric
   emp_info.person_number,
   -- -- name information,
-  emp_info.first_name,
-  emp_info.last_name,
-  emp_info.full_name,
+  emp_info.documented_first_name,
+  emp_info.documented_last_name,
+  emp_info.documented_full_name,
   emp_info.first_social_name,
   emp_info.last_social_name,
   -- -- birth info,

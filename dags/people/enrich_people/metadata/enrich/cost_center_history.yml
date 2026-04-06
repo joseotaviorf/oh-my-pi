@@ -65,15 +65,15 @@ columns:
   owner_l1_name:
     description: Name of the manager L1 responsible for the cost center (L denotes the management hierarchy layer, L0 is CEO, L1 is directly below L0).
     lineage:
-      - datalake_people.codex_log.owner_l1_full_name
+      - datalake_people.codex_log.owner_l1_name
   owner_l2_name:
     description: Name of the manager L2 responsible for the cost center (below L1 in the management hierarchy).
     lineage:
-      - datalake_people.codex_log.owner_l2_full_name
+      - datalake_people.codex_log.owner_l2_name
   owner_l3_name:
     description: Name of the manager L3 responsible for the cost center (below L2 in the management hierarchy).
     lineage:
-      - datalake_people.codex_log.owner_l3_full_name
+      - datalake_people.codex_log.owner_l3_name
   headcount_type:
     description: Type of headcount present in the cost center (e.g. Capacity, Overhead).
     lineage:

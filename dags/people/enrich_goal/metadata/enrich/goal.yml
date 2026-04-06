@@ -20,10 +20,10 @@ columns:
     description: Person number of the person who assigned the goal.
     lineage:
     - datalake_pin_core_clean.all_people.person_number
-  display_name:
-    description: Display name of the person to whom the goal is assigned.
+  name:
+    description: Preferred full name of the person to whom the goal is assigned.
     lineage:
-    - datalake_pin_core_clean.person_name.display_name
+    - datalake_people.identifier_mapping.name
   review_period_name:
     description: Name of the review period associated with the goal plan, in Portuguese (PTB).
     lineage:

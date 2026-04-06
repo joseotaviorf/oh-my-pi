@@ -574,7 +574,7 @@ assignment_lookup AS (
     SELECT
         assignment_number,
         person_number,
-        COALESCE(display_name, full_name) AS name,
+        name,
         work_email AS email
     FROM
         datalake_people.identifier_mapping

@@ -4,24 +4,24 @@ SELECT DISTINCT
   INITCAP(
     TRIM(
       REGEXP_REPLACE(
-        REGEXP_REPLACE(an.first_name, '[^a-zA-ZÀ-ÿ ]', ''), 
+        REGEXP_REPLACE(an.documented_first_name, '[^a-zA-ZÀ-ÿ ]', ''), 
       ' +', ' ')
     )
-  ) AS first_name,
+  ) AS documented_first_name,
   INITCAP(
     TRIM(
       REGEXP_REPLACE(
-        REGEXP_REPLACE(an.last_name, '[^a-zA-ZÀ-ÿ ]', ''), 
+        REGEXP_REPLACE(an.documented_last_name, '[^a-zA-ZÀ-ÿ ]', ''), 
       ' +', ' ')
     )
-  ) AS last_name,
+  ) AS documented_last_name,
   INITCAP(
     TRIM(
       REGEXP_REPLACE(
-        REGEXP_REPLACE(an.full_name, '[^a-zA-ZÀ-ÿ ]', ''), 
+        REGEXP_REPLACE(an.documented_full_name, '[^a-zA-ZÀ-ÿ ]', ''), 
       ' +', ' ')
     )
-  ) AS full_name,
+  ) AS documented_full_name,
   INITCAP(
     TRIM(
       REGEXP_REPLACE(

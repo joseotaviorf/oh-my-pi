@@ -32,11 +32,11 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 10
       severity_level: Warning
-  full_name_leadership_0:
+  name_leadership_0:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
-  full_name_leadership_1:
+  name_leadership_1:
     has_null_count:
       less_than_or_equal_to: 10
       severity_level: Warning

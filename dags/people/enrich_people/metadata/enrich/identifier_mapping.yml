@@ -4,6 +4,7 @@ owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
   Consolidated table that maps all identifiers for an employee (person, assignment, registration) in a single location. It serves as a crosswalk table to unify data from different HR systems and HCM tables.
+  Name columns: name is the preferred full name for reports and communications, resolved from person_name (GLOBAL) as concatenated social names when present, else display_name, else documented_full_name, then normalized in this query; use documented_* for official / document-aligned names from HCM.
 
 columns:
   id_assignment:
@@ -43,22 +44,29 @@ columns:
     description: Current status of the work assignment (e.g., ACTIVE, INACTIVE).
     lineage:
     - datalake_pin_core_clean.all_assignments.assignment_status_type
-  first_name:
-    description: The employee's first name.
+  documented_first_name:
+    description: Official / document-aligned first name from HCM (GLOBAL name). Not necessarily the preferred name for addressing the person.
     lineage:
-    - datalake_pin_core_clean.person_name.first_name
-  last_name:
-    description: The employee's last name.
+    - datalake_pin_core_clean.person_name.documented_first_name
+  documented_last_name:
+    description: Official / document-aligned last name from HCM (GLOBAL name). Not necessarily the preferred name for addressing the person.
     lineage:
-    - datalake_pin_core_clean.person_name.last_name
-  full_name:
-    description: The employee's full name.
+    - datalake_pin_core_clean.person_name.documented_last_name
+  documented_full_name:
+    description: Official / document-aligned full name from HCM (GLOBAL name). For compliance and formal records; prefer name for dashboards and communications.
     lineage:
-    - datalake_pin_core_clean.person_name.full_name
+    - datalake_pin_core_clean.person_name.documented_full_name
   display_name:
-    description: The employee's display name, typically a preferred or formatted name.
+    description: HCM display name from person_name (GLOBAL). Retained for traceability; prefer name for report-facing preferred full name.
     lineage:
     - datalake_pin_core_clean.person_name.display_name
+  name:
+    description: Preferred full name for reporting and communications, derived in this query from person_name (GLOBAL) social names, display_name, and documented_full_name.
+    lineage:
+    - datalake_pin_core_clean.person_name.first_social_name
+    - datalake_pin_core_clean.person_name.last_social_name
+    - datalake_pin_core_clean.person_name.display_name
+    - datalake_pin_core_clean.person_name.documented_full_name
   work_email:
     description: The employee's primary work email (W1), in lowercase.
     lineage:

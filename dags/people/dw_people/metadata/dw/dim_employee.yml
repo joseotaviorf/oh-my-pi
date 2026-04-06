@@ -19,8 +19,7 @@ columns:
   name:
     description: Current display or preferred name
     lineage:
-      - datalake_people.identifier_mapping.display_name
-      - datalake_people.identifier_mapping.full_name
+      - datalake_people.identifier_mapping.name
   work_email:
     description: Current work email of the employee.
     lineage:

@@ -5,6 +5,7 @@ domain: People
 description: |-
   Stores core and legislation-specific name components for individuals, including names in different character sets. Tracks changes over time with date effectivity.
   Text name fields in clean are standardized for consistent reading and reporting across regions (Latin America, Portugal, United States): plain Latin letters, natural word capitalization, and short connecting words (articles and prepositions) in lowercase when they sit between other words.
+  Preferred reporting full name (social name precedence over display_name over documented_full_name) is built in datalake_people.identifier_mapping.name; use documented_* fields here for official / document-aligned names from Oracle HCM (GLOBAL name type).
 columns:
   id_business_group:
     description: Identifier for the business unit, used for multi-tenant data separation. Foreign key.
@@ -31,23 +32,31 @@ columns:
     lineage:
     - datalake_pin_core_raw.per_person_names_f.last_updated_by
   display_name:
-    description: Formatted name for on-screen display, typically starting with the first name. In clean, accents are converted to plain Latin letters, each word is shown with a leading capital letter, and short connecting words (for example de, da, do, van, y) stay lowercase when they appear between other words.
+    description: |-
+      Formatted name for on-screen display from HCM (GLOBAL name type). In clean, accents are converted to plain Latin letters, each word is shown with a leading capital letter, and short connecting words (for example de, da, do, van, y) stay lowercase when they appear between other words.
+      For report-facing preferred full name, use datalake_people.identifier_mapping.name; display_name is retained here for traceability.
     lineage:
     - datalake_pin_core_raw.per_person_names_f.display_name
-  first_name:
-    description: The person's given name. In clean, same text standardization as other name fields—plain Latin letters, natural capitalization, and short connecting words lowercase in the middle of the name.
+  documented_first_name:
+    description: |-
+      Official / document-aligned given name from HCM (GLOBAL name type). Not necessarily how the person should be addressed when a social name exists.
+      In clean, same text standardization as other name fields.
     lineage:
     - datalake_pin_core_raw.per_person_names_f.first_name
-  full_name:
-    description: System-constructed full name, suitable for formal use. In clean, same text standardization as other name fields—plain Latin letters, natural capitalization, and short connecting words lowercase in the middle of the name.
-    lineage:
-    - datalake_pin_core_raw.per_person_names_f.full_name
-  last_name:
-    description: The person's surname or family name. In clean, same text standardization as other name fields—plain Latin letters, natural capitalization, and short connecting words lowercase in the middle of the name.
+  documented_last_name:
+    description: |-
+      Official / document-aligned surname from HCM (GLOBAL name type). Not necessarily how the person should be addressed when a social name exists.
+      In clean, same text standardization as other name fields.
     lineage:
     - datalake_pin_core_raw.per_person_names_f.last_name
+  documented_full_name:
+    description: |-
+      Official / document-aligned full name from HCM (GLOBAL name type), suitable for formal records and compliance. For preferred display in communications and reports, use datalake_people.identifier_mapping.name.
+      In clean, same text standardization as other name fields.
+    lineage:
+    - datalake_pin_core_raw.per_person_names_f.full_name
   list_name:
-    description: Formatted name for alphabetical lists, often starting with the last name. In clean, same text standardization as other name fields—plain Latin letters, natural capitalization, and short connecting words lowercase in the middle of the name.
+    description: Formatted name for alphabetical lists, often starting with the last name. In clean, same text standardization as other name fields.
     lineage:
     - datalake_pin_core_raw.per_person_names_f.list_name
   name_type:
@@ -60,11 +69,11 @@ columns:
       BR: Brazil.
       AR: Argentine.
   first_social_name:
-    description: The person's preferred given name (social name). From Name DFF field NAM_INFORMATION15. In clean, same text standardization as other name fields—plain Latin letters, natural capitalization, and short connecting words lowercase in the middle of the name.
+    description: The person's preferred given name (social name). From Name DFF field NAM_INFORMATION15. In clean, same text standardization as other name fields.
     lineage:
     - datalake_pin_core_raw.per_person_names_f.nam_information15
   last_social_name:
-    description: The person's preferred surname (social name). From Name DFF field NAM_INFORMATION16. In clean, same text standardization as other name fields—plain Latin letters, natural capitalization, and short connecting words lowercase in the middle of the name.
+    description: The person's preferred surname (social name). From Name DFF field NAM_INFORMATION16. In clean, same text standardization as other name fields.
     lineage:
     - datalake_pin_core_raw.per_person_names_f.nam_information16
   legislation_code:

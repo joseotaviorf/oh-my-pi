@@ -14,9 +14,9 @@ base AS (
         c.team,
         c.chapter,
         c.line,
-        c.owner_l1_full_name AS owner_l1_name,
-        c.owner_l2_full_name AS owner_l2_name,
-        c.owner_l3_full_name AS owner_l3_name,
+        c.owner_l1_name,
+        c.owner_l2_name,
+        c.owner_l3_name,
         c.headcount_type,
         o.status = 'A' AS is_active,
         COALESCE(

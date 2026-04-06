@@ -31,10 +31,12 @@ current_assignments AS (
 current_names AS (
     SELECT
         id_person,
-        first_name,
-        last_name,
-        full_name,
-        display_name
+        documented_first_name,
+        documented_last_name,
+        documented_full_name,
+        display_name,
+        first_social_name,
+        last_social_name
     FROM
         datalake_pin_core_clean.person_name
     WHERE
@@ -87,15 +89,24 @@ SELECT
     ca.assignment_type,
     ca.assignment_status_type,
     INITCAP(
-      TRIM(REGEXP_REPLACE(REGEXP_REPLACE(cn.first_name, '[^a-zA-ZÀ-ÿ ]', ''), ' +', ' '))
-    ) AS first_name,
+      TRIM(REGEXP_REPLACE(REGEXP_REPLACE(cn.documented_first_name, '[^a-zA-ZÀ-ÿ ]', ''), ' +', ' '))
+    ) AS documented_first_name,
     INITCAP(
-      TRIM(REGEXP_REPLACE(REGEXP_REPLACE(cn.last_name, '[^a-zA-ZÀ-ÿ ]', ''), ' +', ' '))
-    ) AS last_name,
+      TRIM(REGEXP_REPLACE(REGEXP_REPLACE(cn.documented_last_name, '[^a-zA-ZÀ-ÿ ]', ''), ' +', ' '))
+    ) AS documented_last_name,
     INITCAP(
-      TRIM(REGEXP_REPLACE(REGEXP_REPLACE(cn.full_name, '[^a-zA-ZÀ-ÿ ]', ''), ' +', ' '))
-    ) AS full_name,
+      TRIM(REGEXP_REPLACE(REGEXP_REPLACE(cn.documented_full_name, '[^a-zA-ZÀ-ÿ ]', ''), ' +', ' '))
+    ) AS documented_full_name,
     cn.display_name,
+    INITCAP(
+      TRIM(REGEXP_REPLACE(REGEXP_REPLACE(
+        COALESCE(
+          NULLIF(TRIM(CONCAT_WS(' ', cn.first_social_name, cn.last_social_name)), ''),
+          NULLIF(TRIM(cn.display_name), ''),
+          TRIM(cn.documented_full_name)
+        ),
+        '[^a-zA-ZÀ-ÿ ]', ''), ' +', ' '))
+    ) AS name,
     LOWER(we.email_address) AS work_email,
     LOWER(pe.email_address) AS personal_email,
     tu.id_person IS NOT NULL AS is_user_test,

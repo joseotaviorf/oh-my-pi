@@ -38,13 +38,13 @@ columns:
     lineage:
     - datalake_people.identifier_mapping.assignment_number
   employee_name:
-    description: Name of the employee.
+    description: Preferred full name of the employee for reporting.
     lineage:
-    - datalake_pin_core_clean.person_name.display_name
+    - datalake_people.identifier_mapping.name
   manager_name:
-    description: Name of the line manager.
+    description: Preferred full name of the line manager for reporting.
     lineage:
-    - datalake_pin_core_clean.person_name.display_name
+    - datalake_people.identifier_mapping.name
   created_by:
     description: User who created this record.
     lineage:
