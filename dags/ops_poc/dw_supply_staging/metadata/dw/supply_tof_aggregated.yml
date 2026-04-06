@@ -1,0 +1,366 @@
+---
+database_name: dw_supply_staging
+table_name: supply_tof_aggregated
+owner: data-ops-poc@quintoandar.com.br
+domain: Growth
+description: |
+  Table that consolidates supply top-of-funnel (TOF) metrics for planning and reporting.
+  Unions actual funnel volumes from obt_supply, budget and OKR targets from supply staging, unique
+  targets, marketing cost targets, allocated lead costs, and prior-year actuals; enriches with
+  campaign names, dim_date calendar attributes, and week/month/year-to-date flags versus the latest
+  obt_supply date.
+columns:
+  aux_reference:
+    description: Row source label distinguishing each union branch (e.g. actual volumes, budget, OKR, unique
+      targets, cost targets, allocated costs, or last-year actuals reshaped to the current year).
+  date:
+    description: Calendar date for the metric row; aligned to event or target date depending on the row source.
+    lineage:
+      - dw_growth.obt_supply.date
+      - dw_public.dim_date.date
+  acquisition_origin:
+    description: Describes the origin of lead acquisition in the supply user path.
+    lineage:
+      - dw_growth.obt_supply.acquisition_origin
+  business_context:
+    description: Business context of the row (RENT or SALE), equivalent to nm_business_context on obt_supply actual rows.
+    lineage:
+      - dw_growth.obt_supply.nm_business_context
+      - datalake_supply_staging.supply_targets.business_context
+  supply_source:
+    description: High-level supply channel grouping (1P, 3P, CIQ) derived from planning_operation for target rows;
+      from obt_supply for actual rows.
+    lineage:
+      - dw_growth.obt_supply.nm_supply_source
+      - datalake_supply_staging.supply_targets.planning_operation
+  company_report_origin:
+    description: Indicates the origin within the company that the report targets.
+    lineage:
+      - dw_growth.obt_supply.company_report_origin
+      - datalake_supply_staging.supply_targets.company_report_origin
+  planning_operation:
+    description: Identifies the conversion operation type for budget and OKR target rows.
+    lineage:
+      - dw_growth.obt_supply.planning_operation
+      - datalake_supply_staging.supply_targets.planning_operation
+  planning_conversion:
+    description: Detailed conversion operation type; distinguishes Inside Sales inbound, outbound, and expert flows.
+    lineage:
+      - dw_growth.obt_supply.planning_conversion
+      - datalake_supply_staging.supply_targets.planning_conversion
+  planning_cluster:
+    description: Channel segmented by cluster (e.g. affiliates) and medium (e.g. Owner PWA, price calculator).
+    lineage:
+      - dw_growth.obt_supply.planning_cluster
+      - datalake_supply_staging.supply_targets.planning_cluster
+  behavior_type:
+    description: Describes the behavior type of the lead, such as organic or non-organic.
+    lineage:
+      - dw_growth.obt_supply.behavior_type
+      - dw_growth.dim_media_setup.behavior_type
+  source:
+    description: The originating source of the lead within the marketing campaign context.
+    lineage:
+      - dw_growth.obt_supply.source
+      - dw_growth.dim_media_setup.source
+  medium:
+    description: The marketing medium used to generate the lead, such as PPC or affiliate marketing.
+    lineage:
+      - dw_growth.obt_supply.medium
+      - dw_growth.dim_media_setup.medium
+  nm_campaign:
+    description: Marketing campaign name; for actual rows, coalesced with the latest name from campaign name
+      history when available.
+    lineage:
+      - dw_growth.obt_supply.nm_campaign
+      - datalake_growth_media_platform.campaign_name_history.campaign_name
+  id_campaign:
+    description: Unique identifier for the media campaign used to join taxonomy and cost allocation.
+    lineage:
+      - datalake_growth_media_platform.campaign_name_history.id_campaign
+      - datalake_supply_staging.supply_costs_allocation_lead.id_campaign
+  country_code:
+    description: ISO country code where the lead or target applies.
+    lineage:
+      - dw_growth.obt_supply.country_code
+      - dw_public.dim_region.country_code
+  city_group:
+    description: A grouping of cities or clusters of cities and neighborhoods.
+    lineage:
+      - dw_growth.obt_supply.city_group
+      - dw_public.dim_region.city_group
+  ds_discard_reason:
+    description: Description of why the lead was discarded when applicable.
+    lineage:
+      - dw_growth.obt_supply.ds_discard_reason
+      - dw_growth.dim_supply_discards.ds_discard_reason
+  campaign_cluster:
+    description: Campaign cluster label from the supply campaign cluster taxonomy (GSheets).
+    lineage:
+      - datalake_gsheets_clean.supply_campaign_cluster.campaign_cluster
+  dt_creation_sf:
+    description: Date the lead was created in Salesforce for Carteirizado outbound rows.
+    lineage:
+      - datalake_salesforce_growth_clean.lead.creation_date
+  channel_sf:
+    description: Salesforce channel field for the lead on the latest updated row.
+    lineage:
+      - datalake_salesforce_growth_clean.lead.channel
+  is_carteirizacao:
+    description: TRUE when the lead matches portfolio Carteirizacao rules (BR outbound, Wololo portfolio, with
+      exclusions for specific conversion and affiliate users after 2025-09-01 for RENT).
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  is_exec_carteirizacao:
+    description: TRUE when the converting user is in the executive Carteirizacao allowlist and other outbound
+      carteirizacao conditions hold, with the same RENT exclusions as is_carteirizacao.
+    lineage:
+      - dw_growth.obt_supply.sk_user_conversion
+  is_3p_fr_test:
+    description: TRUE for RENT leads in a defined date window with specific conversion users (3P FR test cohort).
+    lineage:
+      - dw_growth.obt_supply.sk_user_conversion
+  is_click_to_wpp:
+    description: TRUE when the lead matches click-to-WhatsApp routing (UTM patterns or QuintoAndar phone numbers).
+    lineage:
+      - dw_growth.obt_supply.quinto_andar_phone_number
+  outbound_operation:
+    description: Outbound operation label from Salesforce Carteirizado flow or default non-Carteirizado.
+    lineage:
+      - datalake_salesforce_growth_clean.lead.id_lead
+  fl_unique:
+    description: Unique-supply classification from supply_unique_rules, literal Unique for Unique-target rows,
+      or Cross-listing when no rule matches.
+    lineage:
+      - datalake_supply_staging.supply_unique_rules.fl_unique
+  act_leads:
+    description: Count of distinct supply keys with funnel step lead on the calendar date and grain.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+      - dw_growth.obt_supply.cd_funnel_step
+  act_prospects:
+    description: Count of distinct supply keys with funnel step prospect on the calendar date and grain.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+      - dw_growth.obt_supply.cd_funnel_step
+  act_qualifieds:
+    description: Count of distinct supply keys with funnel step qualified on the calendar date and grain.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+      - dw_growth.obt_supply.cd_funnel_step
+  act_av_qualifieds:
+    description: Count of distinct supply keys with funnel step av_qualified on the calendar date and grain.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+      - dw_growth.obt_supply.cd_funnel_step
+  act_opportunities:
+    description: Count of distinct supply keys with funnel step opportunity on the calendar date and grain.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+      - dw_growth.obt_supply.cd_funnel_step
+  act_first_listings:
+    description: Count of distinct supply keys with funnel step first_listing on the calendar date and grain.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+      - dw_growth.obt_supply.cd_funnel_step
+  qty_p2q_cohort:
+    description: |
+      Count of prospects that later reached qualified, used as prospect-to-qualified cohort volume
+      at the same reporting grain.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_p2o_cohort:
+    description: Count of prospects that later reached opportunity in the prospect-to-opportunity cohort.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_p2l_cohort:
+    description: Count of prospects that later reached first listing in the prospect-to-listing cohort.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_p2q_cohort_d7:
+    description: Prospect-to-qualified cohort count where qualified occurred within seven days of prospect date.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_p2o_cohort_d7:
+    description: Prospect-to-opportunity cohort count where opportunity occurred within seven days of prospect date.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_p2l_cohort_d7:
+    description: Prospect-to-first-listing cohort count where listing occurred within seven days of prospect date.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_p2q_cohort_d14:
+    description: Prospect-to-qualified cohort count within fourteen days of the prospect event date.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_p2o_cohort_d14:
+    description: Prospect-to-opportunity cohort count within fourteen days of the prospect event date.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_p2l_cohort_d14:
+    description: Prospect-to-first-listing cohort count within fourteen days of the prospect event date.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_p2q_cohort_d28:
+    description: Prospect-to-qualified cohort count within twenty-eight days of the prospect event date.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_p2o_cohort_d28:
+    description: Prospect-to-opportunity cohort count within twenty-eight days of the prospect event date.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_p2l_cohort_d28:
+    description: Prospect-to-first-listing cohort count within twenty-eight days of the prospect event date.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_p2q_cohort_w0:
+    description: Prospect-to-qualified cohort count when qualified falls in the same calendar week as prospect.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_p2o_cohort_w0:
+    description: Prospect-to-opportunity cohort count when opportunity falls in the same calendar week as prospect.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_p2l_cohort_w0:
+    description: Prospect-to-first-listing cohort count when listing falls in the same calendar week as prospect.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_o2l_cohort:
+    description: Count of opportunities that later reached first listing at the reporting grain.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_o2l_cohort_d7:
+    description: Opportunity-to-first-listing cohort count within seven days of the opportunity date.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_o2l_cohort_d14:
+    description: Opportunity-to-first-listing cohort count within fourteen days of the opportunity date.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_o2l_cohort_d28:
+    description: Opportunity-to-first-listing cohort count within twenty-eight days of the opportunity date.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  qty_o2l_cohort_w0:
+    description: Opportunity-to-first-listing cohort count when listing falls in the same week as opportunity.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+  lastyear_leads:
+    description: Prior-year actual lead count shifted forward one year for year-over-year comparison rows.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+      - dw_growth.obt_supply.cd_funnel_step
+  lastyear_prospects:
+    description: Prior-year actual prospect count shifted forward one year for YoY comparison.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+      - dw_growth.obt_supply.cd_funnel_step
+  lastyear_opportunities:
+    description: Prior-year actual opportunity count shifted forward one year for YoY comparison.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+      - dw_growth.obt_supply.cd_funnel_step
+  lastyear_first_listings:
+    description: Prior-year actual first-listing count shifted forward one year for YoY comparison.
+    lineage:
+      - dw_growth.obt_supply.sk_supply
+      - dw_growth.obt_supply.cd_funnel_step
+  bup_prospects:
+    description: Sum of budget (QTS) prospect targets for the current year at the planning grain.
+    lineage:
+      - datalake_supply_staging.supply_targets.prospects
+  bup_qualifieds:
+    description: Sum of budget qualified targets from QTS supply_targets for the current year.
+    lineage:
+      - datalake_supply_staging.supply_targets.qualifieds
+  bup_opportunities:
+    description: Sum of budget opportunity targets from QTS supply_targets for the current year.
+    lineage:
+      - datalake_supply_staging.supply_targets.opportunities
+  bup_first_listings:
+    description: Sum of budget first-listing targets from QTS supply_targets for the current year.
+    lineage:
+      - datalake_supply_staging.supply_targets.first_listings
+  okr_prospects:
+    description: Sum of OKR prospect targets from supply_targets for the current year.
+    lineage:
+      - datalake_supply_staging.supply_targets.prospects
+  okr_qualifieds:
+    description: Sum of OKR qualified targets from supply_targets for the current year.
+    lineage:
+      - datalake_supply_staging.supply_targets.qualifieds
+  okr_opportunities:
+    description: Sum of OKR opportunity targets from supply_targets for the current year.
+    lineage:
+      - datalake_supply_staging.supply_targets.opportunities
+  okr_first_listings:
+    description: Sum of OKR first-listing targets from supply_targets for the current year.
+    lineage:
+      - datalake_supply_staging.supply_targets.first_listings
+  qts_prospects_unique:
+    description: Sum of unique-supply prospect volumes from supply_unique_targets.
+    lineage:
+      - datalake_supply_staging.supply_unique_targets.volumes_prospects_unique
+  qts_qualifieds_unique:
+    description: Sum of unique-supply qualified volumes from supply_unique_targets.
+    lineage:
+      - datalake_supply_staging.supply_unique_targets.volumes_qualifieds_unique
+  qts_opportunities_unique:
+    description: Sum of unique-supply opportunity volumes from supply_unique_targets.
+    lineage:
+      - datalake_supply_staging.supply_unique_targets.volumes_opportunities_unique
+  qts_first_listings_unique:
+    description: Sum of unique-supply first-listing volumes from supply_unique_targets.
+    lineage:
+      - datalake_supply_staging.supply_unique_targets.volumes_first_listings_unique
+  tgt_cost:
+    description: Target marketing cost per source from daily_target_supply_sale or daily_target_supply_rental
+      GSheets clean tables (summed at the row grain).
+    lineage:
+      - datalake_gsheets_clean.daily_target_supply_sale.cost_per_source
+      - datalake_gsheets_clean.daily_target_supply_rental.cost_per_source
+  mkt_cost:
+    description: Allocated shared media cost per lead from supply_costs_allocation_lead, with a 2026 uplift
+      factor applied to Facebook source rows from 2026-01-01 onward.
+    lineage:
+      - datalake_supply_staging.supply_costs_allocation_lead.shared_cost
+  month_start:
+    description: First calendar day of the month for the row date, from dim_date.
+    lineage:
+      - dw_public.dim_date.month_start
+  week_start:
+    description: Start of the week for the row date, from dim_date.
+    lineage:
+      - dw_public.dim_date.week_start
+  year:
+    description: Calendar year of the row date from dim_date.
+    lineage:
+      - dw_public.dim_date.year
+  max_date:
+    description: Latest event date present in dw_growth.obt_supply; anchor for partial period flags.
+    lineage:
+      - dw_growth.obt_supply.date
+  WTD:
+    description: TRUE when the row date is before the weekday of max_date within the same week, used to flag
+      week-to-date comparable periods.
+    lineage:
+      - dw_public.dim_date.date
+  MTD:
+    description: TRUE when the day-of-month of the row date is at or before the day-of-month of max_date.
+    lineage:
+      - dw_public.dim_date.date
+  YTD:
+    description: TRUE when the row date is in the same year as max_date and not after max_date in month-day order,
+      for year-to-date style filters.
+    lineage:
+      - dw_public.dim_date.date
+  MTD_CurrentMonth:
+    description: TRUE when the row date falls in max_date month from month start through max_date day.
+    lineage:
+      - dw_public.dim_date.date
+  YTD_CurrentYear:
+    description: TRUE when the row date is between the start of max_date year and max_date inclusive.
+    lineage:
+      - dw_public.dim_date.date
+  ts_load:
+    description: Timestamp when the row was materialized by the pipeline (load time).
