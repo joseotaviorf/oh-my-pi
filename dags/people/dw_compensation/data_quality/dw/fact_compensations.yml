@@ -43,6 +43,24 @@ column_level_validations:
   is_promotion_movement:
     is_complete:
       severity_level: Error
+    custom:
+      # Promotions should have positive salary adjustments. A small ratio of null/zero/negative
+      # is expected (salary row splits, legacy data, retroactive adjustments), but > 5% signals
+      # a classification regression (e.g., lateral moves being counted as promotions).
+      constraint: |-
+        (SELECT CASE
+           WHEN SUM(CASE WHEN is_promotion_movement = TRUE THEN 1 ELSE 0 END) = 0 THEN 0
+           WHEN 100.0
+             * SUM(CASE WHEN is_promotion_movement = TRUE
+                         AND (amount_adjustment IS NULL OR amount_adjustment <= 0) THEN 1 ELSE 0 END)
+             / SUM(CASE WHEN is_promotion_movement = TRUE THEN 1 ELSE 0 END)
+             > 5.0
+           THEN 1
+           ELSE 0
+         END
+         FROM dw_compensation.fact_compensations
+        ) = 0
+      severity_level: Warning
   days_tenure_in_company:
     has_min_value:
       greater_than_or_equal_to: 0

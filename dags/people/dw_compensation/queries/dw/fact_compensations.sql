@@ -19,6 +19,7 @@ WITH salary_with_person AS (
         sal.range_position,
         sal.is_salary_approved,
         sal.dt_started,
+        sal.dt_started AS dt_salary_original_started,
         sal.dt_ended
     FROM
         datalake_pin_compensation_clean.salary AS sal
@@ -348,6 +349,7 @@ salary_with_assignment_job AS (
         sal.id_action,
         sal.id_action_reason,
         sal.id_action_occurrence,
+        sal.dt_salary_original_started,
         COALESCE(assignment_history.id_job, sal.id_job) AS id_job,
         CASE
             WHEN assignment_history.id_job IS NULL
@@ -390,6 +392,7 @@ salary_with_job_version AS (
         sal.id_action,
         sal.id_action_reason,
         sal.id_action_occurrence,
+        sal.dt_salary_original_started,
         sal.id_job,
         CASE
             WHEN dj.sk_job_version IS NULL
@@ -428,8 +431,16 @@ salary_enriched AS (
         sal.currency_code,
         sal.salary_amount,
         sal.annual_salary,
-        sal.adjustment_amount,
-        sal.adjustment_percent,
+        CASE
+            WHEN sal.dt_started = sal.dt_salary_original_started
+            THEN sal.adjustment_amount
+            ELSE NULL
+        END AS adjustment_amount,
+        CASE
+            WHEN sal.dt_started = sal.dt_salary_original_started
+            THEN sal.adjustment_percent
+            ELSE NULL
+        END AS adjustment_percent,
         sal.compa_ratio,
         sal.range_position,
         sal.is_salary_approved,
@@ -437,6 +448,7 @@ salary_enriched AS (
         sal.dt_ended,
         ed.id_event_definition,
         ed.action_code,
+        ed.reason_code,
         sal.sk_job_version,
         sal.target_plr,
         sal.target_plr_salary_multiplier,
@@ -448,7 +460,8 @@ salary_enriched AS (
         salary_with_job_version AS sal
     LEFT JOIN
         datalake_people.event_definition AS ed
-            ON sal.id_action = ed.id_action
+            ON sal.dt_started = sal.dt_salary_original_started
+            AND sal.id_action = ed.id_action
             AND sal.id_action_reason = ed.id_reason
 ),
 salary_consolidation_base AS (
@@ -472,6 +485,7 @@ salary_consolidation_base AS (
         COALESCE(dt_ended, DATE('4712-12-31')) AS dt_ended_normalized,
         id_event_definition,
         action_code,
+        reason_code,
         sk_job_version,
         target_plr,
         target_plr_salary_multiplier,
@@ -595,6 +609,7 @@ salary_consolidated AS (
         MAX(dt_ended_normalized) AS dt_ended_normalized,
         id_event_definition,
         MAX(action_code) AS action_code,
+        MAX(reason_code) AS reason_code,
         sk_job_version,
         target_plr,
         target_plr_salary_multiplier,
@@ -671,7 +686,7 @@ SELECT
     -- Metrics - Flags
     sal.is_salary_approved,
     CASE
-        WHEN sal.action_code = 'PROMOTION'
+        WHEN sal.reason_code = 'CMP_PROM'
         THEN TRUE
         ELSE FALSE
     END AS is_promotion_movement,

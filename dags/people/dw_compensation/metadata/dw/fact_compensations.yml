@@ -49,6 +49,8 @@ columns:
     description: |
       Foreign key to dim_event_definition.
       Unified identifier for the action and reason that triggered this compensation change.
+      NULL on rows created by dim_job or assignment history version splits
+      (only populated on the originating row where the salary actually changed).
     lineage:
       - datalake_people.event_definition.id_event_definition
   person_number:
@@ -85,11 +87,17 @@ columns:
       - dw_compensation.dim_job.target_plr
       - dw_compensation.dim_job.target_plr_salary_multiplier
   amount_adjustment:
-    description: Monetary amount of the salary adjustment (difference from previous salary).
+    description: |
+      Monetary amount of the salary adjustment (difference from previous salary).
+      NULL on rows created by dim_job or assignment history version splits
+      (only populated on the originating row where the salary actually changed).
     lineage:
       - datalake_pin_compensation_clean.salary.adjustment_amount
   pct_adjustment:
-    description: Percentage increase of the salary adjustment over the base salary value.
+    description: |
+      Percentage increase of the salary adjustment over the base salary value.
+      NULL on rows created by dim_job or assignment history version splits
+      (only populated on the originating row where the salary actually changed).
     lineage:
       - datalake_pin_compensation_clean.salary.adjustment_percent
   range_position:
@@ -112,9 +120,13 @@ columns:
   is_promotion_movement:
     description: |
       TRUE if this salary change is associated with a promotion event.
-      Based on action_code = 'PROMOTION'.
+      Based on reason_code = 'CMP_PROM' from event_definition, which is more
+      precise than the broad action_code = 'PROMOTION' (which also includes
+      lateral moves, internal recruitment, and other non-promotion movements).
+      Always FALSE on rows created by dim_job or assignment history version splits
+      (event metadata is only attributed to the originating salary change row).
     lineage:
-      - datalake_people.event_definition.action_code
+      - datalake_people.event_definition.reason_code
   days_tenure_in_company:
     description: |
       Tenure in the company in days.
