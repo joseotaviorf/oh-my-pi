@@ -64,7 +64,7 @@ hubspot_company_name_history AS (
 SELECT
   wc.id,
   wc.id_hub_teams,
-  COALESCE(wc.id_company_hubspot, cs.id_hubspot, ch.id_company_hubspot, wcm.id_hubspot) AS id_company_hubspot,
+  COALESCE(wc.id_company_hubspot, cs.id_hubspot, ch.id_company_hubspot) AS id_company_hubspot,
   wc.hub_name_teams,
   wc.contract_name,
   wc.3p_partner,
@@ -83,8 +83,5 @@ LEFT JOIN
 LEFT JOIN
   hubspot_company_name_history AS ch
     ON wc.3p_partner = ch.hubspot_company_name
-LEFT JOIN
-  datalake_gsheets_clean.work_contract_matches AS wcm
-    ON wc.3p_partner = wcm.3p_partner
 GROUP BY
   ALL

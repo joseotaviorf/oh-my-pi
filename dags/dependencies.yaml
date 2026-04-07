@@ -2518,7 +2518,6 @@ bietlejuice.enrich_ebdb_work_contract:
   - bietlejuice.ebdb_contract:load-clean-work-contract:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-history:first-run-of-day
-  - bietlejuice.gsheets_3p:done-clean-work-contract-matches:first-run-of-day
   - bietlejuice.hubspot:load-clean-company:first-run-of-day
 bietlejuice.enrich_edwiges:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
