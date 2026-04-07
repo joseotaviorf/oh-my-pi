@@ -56,7 +56,13 @@ assignment_cte AS (
     md.dt_effective_started < DATE(CURRENT_DATE)
     AND md.assignment_type IN ('E', 'C')
   QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY md.id_assignment ORDER BY md.dt_effective_started DESC) = 1
+    ROW_NUMBER() OVER (
+      PARTITION BY md.id_assignment
+      ORDER BY
+        md.dt_effective_started DESC,
+        md.dt_effective_ended DESC,
+        md.ts_load DESC
+    ) = 1
 )
 
 SELECT
