@@ -44,7 +44,7 @@ leads AS (
     WHERE 
         obt.cd_funnel_step = 'lead'
         AND dms.naming_convention_sufix is not null
-        AND obt.company_report_origin IN ('Owner PWA - Paid', 'Price Calculator - Sale', 'Price Calculator')
+        AND obt.company_report_origin IN ('Owner PWA - Paid', 'Price Calculator - Sale', 'Price Calculator','Inbound')
         AND fse.sk_funnel_step = 5
     GROUP BY ALL
 ),
