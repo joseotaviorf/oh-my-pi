@@ -16,11 +16,19 @@ column_level_validations:
   sk_employee:
     is_unique:
       severity_level: Warning
-  first_name:
+  person_number:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
-  full_name:
+  documented_first_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  documented_last_name:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Warning
+  documented_full_name:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
@@ -40,19 +48,11 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
-  last_name:
-    has_null_count:
-      less_than_or_equal_to: 1
-      severity_level: Warning
   marital_status_code:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
   marital_status_description:
-    has_null_count:
-      less_than_or_equal_to: 1
-      severity_level: Warning
-  person_number:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
