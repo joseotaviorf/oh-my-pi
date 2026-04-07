@@ -13,6 +13,9 @@ from bietlejuice.base.airflow.task_creators.task_creator_factory import (
     TaskCreatorFactory,
 )
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.airflow.job_cluster_engine import (
+    get_job_cluster_completion_sink,
+)
 
 
 class RawCDCWorkflow(BaseWorkflow):
@@ -37,6 +40,7 @@ class RawCDCWorkflow(BaseWorkflow):
             load_end_date=load_end_date,
             incoming_bucket=incoming_bucket,
         )
+        self.dag_execution_context = dag_execution_context
         self._add_mandatory_libraries(dag_execution_context)
         self._initialize_task_creators(dag_execution_context)
 
@@ -77,7 +81,7 @@ class RawCDCWorkflow(BaseWorkflow):
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER,
             self.config_service,
-            minimum_databricks_version="12.2",
+            minimum_cluster_runtime_version="12.2",
         )
         self.load_transactional_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_CDC_TRANSACTIONAL
@@ -205,8 +209,14 @@ class RawCDCWorkflow(BaseWorkflow):
         execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task(
             execute_job_cluster_local_id
         )
+        cluster_completion_sink = get_job_cluster_completion_sink(
+            self.dag_execution_context,
+            execute_job_cluster_task,
+            dummy_terminate_job_cluster_task,
+            execute_job_cluster_local_id,
+        )
         dag_final_tasks = self._set_dag_final_tasks(
-            execute_job_cluster_local_id, dummy_terminate_job_cluster_task
+            execute_job_cluster_local_id, cluster_completion_sink
         )
         optimize_transactional_task = self.optimize_delta_table_task_creator.create_task(
             transactional_tables,
@@ -343,12 +353,13 @@ class RawCDCWorkflow(BaseWorkflow):
         return load_clean_task, last_clean_task
 
     def _set_dag_final_tasks(
-        self, execute_job_cluster_local_id: int, dummy_terminate_job_cluster_task
+        self, execute_job_cluster_local_id: int, cluster_completion_sink
     ):
         """
-        The final task of the DAG will either be the dummy_terminate_job_cluster_task, or the get_table_metrics_task.
+        The final task of the DAG will either be the cluster completion sink (terminate or
+        job-cluster-finished), or the get_table_metrics_task entry.
         This method creates the metrics task if it should be included in the workflow, and sets the dependencies. Otherwise,
-        it simply returns the dummy_terminate_job_cluster_task.
+        it simply returns the cluster_completion_sink.
         """
         # Since we use a single task for get_metrics task extract metrics
         # from all tables, this validates if this is the first time the
@@ -365,7 +376,7 @@ class RawCDCWorkflow(BaseWorkflow):
                     self.sync_metadata_task_creator,
                 )
             )
-            last_metrics_task >> dummy_terminate_job_cluster_task
+            last_metrics_task >> cluster_completion_sink
             return first_metrics_task
         else:
-            return dummy_terminate_job_cluster_task
+            return cluster_completion_sink

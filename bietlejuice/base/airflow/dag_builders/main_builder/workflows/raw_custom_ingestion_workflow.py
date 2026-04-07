@@ -13,6 +13,9 @@ from bietlejuice.base.airflow.task_creators.task_creator_factory import (
 )
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.airflow.job_cluster_engine import (
+    get_job_cluster_completion_sink,
+)
 
 
 class RawCustomIngestionWorkflow(BaseWorkflow):
@@ -60,7 +63,7 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER,
             self.config_service,
-            minimum_databricks_version="12.2",
+            minimum_cluster_runtime_version="12.2",
         )
         self.load_custom_ingestion_raw_task_creator = (
             task_creator_factory.get_task_creator(TaskEnum.LOAD_CUSTOM)
@@ -134,6 +137,12 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
         execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task(
             execute_job_cluster_local_id if execute_job_cluster_local_id > 1 else None
         )
+        cluster_completion_sink = get_job_cluster_completion_sink(
+            self.dag_execution_context,
+            execute_job_cluster_task,
+            dummy_terminate_job_cluster_task,
+            execute_job_cluster_local_id if execute_job_cluster_local_id > 1 else None,
+        )
 
         clean_tables_in_dag = self._get_tables()
         clean_table_names_in_dag = {t.table_name for t in clean_tables_in_dag}
@@ -159,9 +168,9 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
                     optimize_delta_table_local_id=execute_job_cluster_local_id,
                 )
             )
-            optimize_delta_tables_task >> dummy_terminate_job_cluster_task
+            optimize_delta_tables_task >> cluster_completion_sink
         else:
-            optimize_delta_tables_task = dummy_terminate_job_cluster_task
+            optimize_delta_tables_task = cluster_completion_sink
 
         raw_first_tasks = {}
         raw_last_tasks = {}
@@ -179,7 +188,7 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
             table_parameters,
         ) in tables_customization_without_raw_dependency.items():
             raw_initial_task, raw_final_task = self._create_raw_tasks(
-                table_name=raw_table_name, last_task=dummy_terminate_job_cluster_task
+                table_name=raw_table_name, last_task=cluster_completion_sink
             )
 
             raw_first_tasks[raw_table_name.lower()] = raw_initial_task

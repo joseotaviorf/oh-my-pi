@@ -12,6 +12,9 @@ from bietlejuice.base.airflow.task_creators.task_creator_factory import (
     TaskCreatorFactory,
 )
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.airflow.job_cluster_engine import (
+    get_job_cluster_completion_sink,
+)
 
 
 class RawDMSCDCWorkflow(BaseWorkflow):
@@ -37,6 +40,7 @@ class RawDMSCDCWorkflow(BaseWorkflow):
             load_end_date=load_end_date,
             incoming_bucket=incoming_bucket,
         )
+        self.dag_execution_context = dag_execution_context
         self._initialize_task_creators(dag_execution_context)
 
         raw_tables = self._get_raw_tables()
@@ -51,7 +55,7 @@ class RawDMSCDCWorkflow(BaseWorkflow):
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER,
             self.config_service,
-            minimum_databricks_version="12.2",
+            minimum_cluster_runtime_version="12.2",
         )
         self.load_dms_cdc_raw_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_DMS_CDC_RAW
@@ -105,7 +109,15 @@ class RawDMSCDCWorkflow(BaseWorkflow):
         """Creates all the tasks for the workflow and sets their dependencies."""
 
         execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
-        dag_final_tasks = self._set_dag_final_tasks()
+        dummy_terminate_job_cluster_task = (
+            self.dummy_job_cluster_finished_task_creator.create_task()
+        )
+        dag_final_tasks = get_job_cluster_completion_sink(
+            self.dag_execution_context,
+            execute_job_cluster_task,
+            dummy_terminate_job_cluster_task,
+            None,
+        )
         optimize_raw_task = self.optimize_delta_table_task_creator.create_task(
             raw_tables,
             parallelism=2,  # Lower because we don't want to overload the cluster while the next layer is being loaded
@@ -208,10 +220,3 @@ class RawDMSCDCWorkflow(BaseWorkflow):
             (load_clean_task >> data_quality_tests_clean_task >> dag_final_tasks)
 
         return load_clean_task, last_clean_task
-
-    def _set_dag_final_tasks(self):
-        dummy_terminate_job_cluster_task = (
-            self.dummy_job_cluster_finished_task_creator.create_task()
-        )
-
-        return dummy_terminate_job_cluster_task

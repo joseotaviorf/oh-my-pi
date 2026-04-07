@@ -14,6 +14,9 @@ from bietlejuice.base.airflow.task_creators.task_creator_factory import (
     TaskCreatorFactory,
 )
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.airflow.job_cluster_engine import (
+    get_job_cluster_completion_sink,
+)
 
 logger = logging.getLogger("WonkaWorkflow")
 
@@ -107,7 +110,7 @@ class WonkaWorkflow(BaseWorkflow):
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER,
             self.config_service,
-            minimum_databricks_version="12.2",
+            minimum_cluster_runtime_version="12.2",
         )
         self.load_wonka_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_WONKA
@@ -158,6 +161,12 @@ class WonkaWorkflow(BaseWorkflow):
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
         created_tasks_ids.append(dummy_terminate_job_cluster_task.task_id)
+        cluster_completion_sink = get_job_cluster_completion_sink(
+            self.dag_execution_context,
+            execute_job_cluster_task,
+            dummy_terminate_job_cluster_task,
+            None,
+        )
         wonka_table_attributes = TableAttributes(
             self.dag_args,
             self.workflow_args,
@@ -201,19 +210,16 @@ class WonkaWorkflow(BaseWorkflow):
         )
         created_tasks_ids.append(optimize_delta_tables_task.task_id)
 
-        (
-            execute_job_cluster_task
-            >> load_wonka_task
-            >> optimize_delta_tables_task
-            >> dummy_terminate_job_cluster_task
-        )
+        execute_job_cluster_task >> load_wonka_task >> optimize_delta_tables_task
 
         if datazord_config:
             (
                 optimize_delta_tables_task
                 >> load_cdf_to_datazord_task
-                >> dummy_terminate_job_cluster_task
+                >> cluster_completion_sink
             )
+        else:
+            optimize_delta_tables_task >> cluster_completion_sink
 
         DatasetAdder.attach_reprocessing_guard(
             execute_job_cluster_task, self.dag_execution_context

@@ -12,6 +12,9 @@ from bietlejuice.base.airflow.task_creators.dag_execution_context import (
 )
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.airflow.job_cluster_engine import (
+    get_job_cluster_completion_sink,
+)
 
 
 class ReverseAccessWorkflow(BaseWorkflow):
@@ -33,15 +36,17 @@ class ReverseAccessWorkflow(BaseWorkflow):
         dummy_terminate_job_cluster_task = (
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
+        cluster_completion_sink = get_job_cluster_completion_sink(
+            dag_execution_context,
+            execute_job_cluster_task,
+            dummy_terminate_job_cluster_task,
+            None,
+        )
 
         tables = self._get_tables()
         for table in tables:
             export_reverse_task = self.export_task_creator.create_task(table)
-            (
-                execute_job_cluster_task
-                >> export_reverse_task
-                >> dummy_terminate_job_cluster_task
-            )
+            (execute_job_cluster_task >> export_reverse_task >> cluster_completion_sink)
 
         if self._check_include_skip_run_task():
             skip_run_task = self.skip_run_task_creator.create_task()
@@ -72,7 +77,7 @@ class ReverseAccessWorkflow(BaseWorkflow):
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER,
             self.config_service,
-            minimum_databricks_version="12.2",
+            minimum_cluster_runtime_version="12.2",
         )
         self.export_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_CUSTOM, task_id_prefix="export", produce_datasets=False

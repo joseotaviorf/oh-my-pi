@@ -12,6 +12,9 @@ from bietlejuice.base.airflow.task_creators.task_creator_factory import (
     TaskCreatorFactory,
 )
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.airflow.job_cluster_engine import (
+    get_job_cluster_completion_sink,
+)
 
 
 class RawDatabasePullDeltaWorkflow(BaseWorkflow):
@@ -26,6 +29,7 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
         dag_execution_context = self._get_dag_execution_context(
             dag, bucket, load_start_date=load_start_date, load_end_date=load_end_date
         )
+        self.dag_execution_context = dag_execution_context
         self._initialize_task_creators(dag_execution_context)
 
         tables_customization = self.workflow_args["tables_customization"]
@@ -41,7 +45,7 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER,
             self.config_service,
-            minimum_databricks_version="12.2",
+            minimum_cluster_runtime_version="12.2",
         )
         self.load_database_pull_raw_task_creator = (
             task_creator_factory.get_database_task_creator(
@@ -153,8 +157,14 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
             table_attributes=cluster_clean_tables,
             optimize_delta_table_local_id=execute_job_cluster_local_id,
         )
+        cluster_completion_sink = get_job_cluster_completion_sink(
+            self.dag_execution_context,
+            execute_job_cluster_task,
+            dummy_terminate_job_cluster_task,
+            execute_job_cluster_local_id,
+        )
         dag_final_tasks = self._set_dag_final_tasks(
-            execute_job_cluster_local_id, dummy_terminate_job_cluster_task
+            execute_job_cluster_local_id, cluster_completion_sink
         )
 
         for raw_table, clean_table in zip(cluster_raw_tables, cluster_clean_tables):
@@ -245,12 +255,13 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
         return load_clean_task, last_clean_task
 
     def _set_dag_final_tasks(
-        self, execute_job_cluster_local_id, dummy_terminate_job_cluster_task
+        self, execute_job_cluster_local_id, cluster_completion_sink
     ):
         """
-        The final task of the DAG will either be the dummy_terminate_job_cluster_task, or the get_table_metrics_task.
+        The final task of the DAG will either be the cluster completion sink (terminate or
+        job-cluster-finished), or the get_table_metrics_task entry.
         This method creates the metrics task if it should be included in the workflow, and sets the dependencies. Otherwise,
-        it simply returns the dummy_terminate_job_cluster_task.
+        it simply returns the cluster_completion_sink.
         """
 
         # This guarantees that the task will be added only at the first local job cluster subdag.
@@ -266,7 +277,7 @@ class RawDatabasePullDeltaWorkflow(BaseWorkflow):
                     self.register_delta_table_task_creator,
                 )
             )
-            last_metrics_task >> dummy_terminate_job_cluster_task
+            last_metrics_task >> cluster_completion_sink
             return first_metrics_task
         else:
-            return dummy_terminate_job_cluster_task
+            return cluster_completion_sink
