@@ -246,7 +246,7 @@ FROM VALUES
         "ab_beakman_search_services_hue_v3_experiment_v3_sale",
         named_struct(
             'begin_date', DATE('2026-02-27'),
-            'end_date', NULL,
+            'end_date', DATE('2026-04-07'),
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
@@ -260,7 +260,7 @@ FROM VALUES
                                                     'experiment_metrics', array()
                                                 )
                                 ),
-           'running', True
+           'running', False
         )
     ),
 
