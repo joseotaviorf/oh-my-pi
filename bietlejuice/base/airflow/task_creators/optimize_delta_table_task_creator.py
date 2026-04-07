@@ -1,8 +1,13 @@
-from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
-from bietlejuice.formatters.string_formatter import StringFormatter
-from bietlejuice.base.pipeline import LayerEnum
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 import json
+
+from airflow.models.baseoperator import BaseOperator
+
+from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
+from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.airflow.optimize_delta_tables_cli import (
+    encode_tables_json_for_emr_cli,
+)
+from bietlejuice.formatters.string_formatter import StringFormatter
 
 
 class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
@@ -20,7 +25,7 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
         table_attributes: list,
         parallelism: int = 16,
         optimize_delta_table_local_id: int = None,
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    ) -> BaseOperator:
         """
         Returns the task that optimizes all the Delta tables in the list.
 
@@ -31,9 +36,12 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
         task_id = self.generate_task_id(table_attributes)
         if optimize_delta_table_local_id:
             task_id = f"{task_id}-{optimize_delta_table_local_id}"
+        tables_json = self._get_tables_parameter(table_attributes)
+        if self.dag_execution_context.use_airflow_emr:
+            tables_json = encode_tables_json_for_emr_cli(tables_json)
         parameters = [
             table_attributes[0].layer.value,
-            self._get_tables_parameter(table_attributes),
+            tables_json,
             parallelism,
         ]
 
@@ -92,4 +100,4 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
                 "z_order_by": z_order_by,
             }
 
-        return json.dumps(tables_config)
+        return json.dumps(tables_config, separators=(",", ":"))

@@ -1,9 +1,10 @@
+from airflow.models.baseoperator import BaseOperator
 from airflow.operators.python_operator import ShortCircuitOperator
+
 from bietlejuice.base.airflow.short_circuit_function_enum import (
     ShortCircuitFunctionEnum,
 )
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 
 
 class SkipRunTaskCreator(BaseTaskCreator):
@@ -14,7 +15,7 @@ class SkipRunTaskCreator(BaseTaskCreator):
 
     _TASK_ID_TEMPLATE = "check-day-to-skip-execution"
 
-    def create_task(self) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    def create_task(self) -> BaseOperator:
         short_circuit_customization = self._get_short_circuit_customization()
         (parameters, function_params) = self._get_parameters(
             short_circuit_customization

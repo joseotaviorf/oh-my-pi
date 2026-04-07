@@ -1,8 +1,9 @@
+from airflow.models.baseoperator import BaseOperator
+
 from bietlejuice.base.airflow.task_creators.register_delta_table_task_creator import (
     RegisterDeltaTableTaskCreator,
 )
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 
 
 class QubeRegisterDeltaTableTaskCreator(RegisterDeltaTableTaskCreator):
@@ -16,9 +17,7 @@ class QubeRegisterDeltaTableTaskCreator(RegisterDeltaTableTaskCreator):
 
     SPARK_JOB_NAME = "common/register_delta_table"
 
-    def create_task(
-        self, table_attributes: TableAttributes
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    def create_task(self, table_attributes: TableAttributes) -> BaseOperator:
         task_id = self.generate_task_id(table_attributes)
 
         # Extract windows from qube_specs (dimensions/measures/metrics all have windows)

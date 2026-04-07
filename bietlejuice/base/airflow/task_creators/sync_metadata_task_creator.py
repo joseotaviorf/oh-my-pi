@@ -1,8 +1,9 @@
+from airflow.models.baseoperator import BaseOperator
+
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 
 
 class SyncMetadataTaskCreator(BaseTaskCreator):
@@ -19,7 +20,7 @@ class SyncMetadataTaskCreator(BaseTaskCreator):
 
     def create_task(
         self, table_attributes: TableAttributes, bypass_task: str = None
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    ) -> BaseOperator:
         task_id = self.generate_task_id(table_attributes)
         parameters = self._get_parameters(table_attributes)
 

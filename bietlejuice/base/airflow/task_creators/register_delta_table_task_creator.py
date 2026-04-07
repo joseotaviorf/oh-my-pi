@@ -1,6 +1,7 @@
+from airflow.models.baseoperator import BaseOperator
+
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 
 
 class RegisterDeltaTableTaskCreator(BaseTaskCreator):
@@ -13,9 +14,7 @@ class RegisterDeltaTableTaskCreator(BaseTaskCreator):
     _TASK_ID_TEMPLATE = "register-table-{layer}-{table_name}"
     SPARK_JOB_NAME = "register_delta_table"
 
-    def create_task(
-        self, table_attributes: TableAttributes
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    def create_task(self, table_attributes: TableAttributes) -> BaseOperator:
         task_id = self.generate_task_id(table_attributes)
         parameters = [
             self.dag_execution_context.bucket,
