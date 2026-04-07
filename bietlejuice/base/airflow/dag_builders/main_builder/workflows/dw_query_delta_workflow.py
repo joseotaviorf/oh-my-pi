@@ -11,9 +11,11 @@ from bietlejuice.base.airflow.task_creators.dag_execution_context import (
 )
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
+from bietlejuice.base.airflow.job_cluster_engine import (
+    get_job_cluster_completion_sink,
+)
 
 
 class DwQueryDeltaWorkflow(BaseWorkflow):
@@ -49,6 +51,7 @@ class DwQueryDeltaWorkflow(BaseWorkflow):
             ) = self._create_dw_tasks(table, optimize_delta_tables)
 
         self._set_dependencies(
+            dag_execution_context,
             execute_job_cluster_task,
             table_first_tasks,
             table_last_tasks,
@@ -63,37 +66,20 @@ class DwQueryDeltaWorkflow(BaseWorkflow):
         return dag
 
     def _get_tables(self) -> List[TableAttributes]:
-        """Returns the table attributes for all the tables in the dw layer.
+        """Returns the table attributes for all the tables in the dw layer."""
 
-        Tables are discovered from two sources:
-        1. SQL files in queries/dw/ directory
-        2. Entries in tables_customization with load_spark_job (custom Spark jobs)
-        """
-        query_table_names = DAGPackagesPathService.list_queries_files_in_composer(
+        table_names = DAGPackagesPathService.list_queries_files_in_composer(
             dag_name=self.dag_name, layer=LayerEnum.DW.value
         )
-        tables = [
+        return [
             TableAttributes(self.dag_args, self.workflow_args, LayerEnum.DW, table_name)
-            for table_name in sorted(query_table_names)
+            for table_name in table_names
         ]
-        custom_table_names = self.workflow_args.get("tables_customization", {}).keys()
-        for table_name in custom_table_names:
-            if table_name in query_table_names:
-                continue
-            custom_table = TableAttributes(
-                self.dag_args, self.workflow_args, LayerEnum.DW, table_name
-            )
-            if custom_table.has_custom_spark_job:
-                tables.append(custom_table)
-        return tables
 
     def _create_dw_tasks(self, table: TableAttributes, last_task_after_groups) -> Tuple:
         """Returns a tuple with the first (Load) and last (Load or add default row) tasks of the table."""
 
-        if table.has_custom_spark_job:
-            load = self.load_custom_task_creator.create_task(table)
-        else:
-            load = self.load_dw_task_creator.create_task(table)
+        load = self.load_dw_task_creator.create_task(table)
         last_task_in_group = load
         if self._check_include_add_default_row_task(table):
             add_default_row = self.add_default_row_task_creator.create_task(table)
@@ -119,6 +105,7 @@ class DwQueryDeltaWorkflow(BaseWorkflow):
 
     def _set_dependencies(
         self,
+        dag_execution_context: DagExecutionContext,
         execute_job_cluster_task,
         table_first_tasks: dict,
         table_last_tasks: dict,
@@ -136,20 +123,23 @@ class DwQueryDeltaWorkflow(BaseWorkflow):
             skip_run_task = self.skip_run_task_creator.create_task()
             skip_run_task >> execute_job_cluster_task
 
-        optimize_delta_tables_task >> job_cluster_finished_task
+        cluster_completion_sink = get_job_cluster_completion_sink(
+            dag_execution_context,
+            execute_job_cluster_task,
+            job_cluster_finished_task,
+            None,
+        )
+        optimize_delta_tables_task >> cluster_completion_sink
 
     def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):
         task_creator_factory = TaskCreatorFactory(dag_execution_context)
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER,
             self.config_service,
-            minimum_databricks_version="12.2",
+            minimum_cluster_runtime_version="12.2",
         )
         self.load_dw_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_DELTA
-        )
-        self.load_custom_task_creator = task_creator_factory.get_task_creator(
-            TaskEnum.LOAD_CUSTOM, storage_format=StorageFormatEnum.DELTA
         )
         self.add_default_row_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.ADD_DEFAULT_ROW, is_delta=True

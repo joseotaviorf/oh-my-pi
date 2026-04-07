@@ -13,6 +13,10 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow 
     BaseWorkflow,
 )
 from bietlejuice.base.airflow.enums.task_enum import TaskEnum
+from bietlejuice.base.airflow.job_cluster_engine import (
+    attach_job_cluster_engine_to_context,
+    get_job_cluster_completion_sink,
+)
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
@@ -88,7 +92,7 @@ class QubeMetricWorkflow(BaseWorkflow):
         # Point to bietlejuice/qube/jobs/ instead of spark_jobs/base/
         base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/qube/jobs/"
 
-        return DagExecutionContext(
+        ctx = DagExecutionContext(
             dag,
             self.env,
             bucket,
@@ -98,6 +102,8 @@ class QubeMetricWorkflow(BaseWorkflow):
             self.cluster_args,
             **kwargs,
         )
+        attach_job_cluster_engine_to_context(ctx, self.config_service)
+        return ctx
 
     def build_dag(self):
         dag = super().dag_instance()
@@ -125,7 +131,7 @@ class QubeMetricWorkflow(BaseWorkflow):
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER,
             self.config_service,
-            minimum_databricks_version="12.2",
+            minimum_cluster_runtime_version="12.2",
         )
         self.build_qube_dimension_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.BUILD_QUBE_DIMENSION
@@ -148,6 +154,12 @@ class QubeMetricWorkflow(BaseWorkflow):
         execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
         dummy_terminate_job_cluster_task = (
             self.dummy_job_cluster_finished_task_creator.create_task()
+        )
+        cluster_completion_sink = get_job_cluster_completion_sink(
+            self.dag_execution_context,
+            execute_job_cluster_task,
+            dummy_terminate_job_cluster_task,
+            None,
         )
 
         # Load metric spec to get dependencies
@@ -218,9 +230,9 @@ class QubeMetricWorkflow(BaseWorkflow):
             register_task = self.register_delta_table_task_creator.create_task(
                 metric_table_attributes
             )
-            metric_task >> register_task >> dummy_terminate_job_cluster_task
+            metric_task >> register_task >> cluster_completion_sink
         else:
-            metric_task >> dummy_terminate_job_cluster_task
+            metric_task >> cluster_completion_sink
 
     def _check_include_sync_hive_tasks(self, table_attributes: TableAttributes) -> bool:
         """

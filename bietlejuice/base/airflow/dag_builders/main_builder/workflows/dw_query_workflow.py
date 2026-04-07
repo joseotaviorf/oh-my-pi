@@ -18,6 +18,9 @@ from bietlejuice.base.airflow.short_circuit_function_enum import (
     ShortCircuitFunctionEnum,
 )
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.airflow.job_cluster_engine import (
+    get_job_cluster_completion_sink,
+)
 
 
 class DWQueryWorkflow(BaseWorkflow):
@@ -102,6 +105,12 @@ class DWQueryWorkflow(BaseWorkflow):
         job_cluster_finished_task = (
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
+        cluster_completion_sink = get_job_cluster_completion_sink(
+            dag_execution_context,
+            execute_job_cluster_task,
+            job_cluster_finished_task,
+            None,
+        )
 
         dw_task_groups_boundaries = (
             self._get_dw_task_groups_boundaries(dw_task_groups, dw_staging_task_groups)
@@ -117,7 +126,7 @@ class DWQueryWorkflow(BaseWorkflow):
             dw_staging_task_groups,
             dw_task_groups,
             dw_task_groups_boundaries,
-            job_cluster_finished_task,
+            cluster_completion_sink,
         )
 
         DatasetAdder.attach_reprocessing_guard(
@@ -154,7 +163,7 @@ class DWQueryWorkflow(BaseWorkflow):
         dw_staging_task_groups,
         dw_task_groups,
         dw_task_groups_boundaries,
-        job_cluster_finished_task,
+        cluster_completion_sink,
     ):
         if skip_run_task:
             chain(skip_run_task, execute_job_cluster_task)
@@ -185,6 +194,4 @@ class DWQueryWorkflow(BaseWorkflow):
             dw_staging_task_groups, dw_task_groups
         )
 
-        job_cluster_finished_task.set_upstream(
-            DWTaskGroup.all_last_tasks(dw_task_groups)
-        )
+        cluster_completion_sink.set_upstream(DWTaskGroup.all_last_tasks(dw_task_groups))

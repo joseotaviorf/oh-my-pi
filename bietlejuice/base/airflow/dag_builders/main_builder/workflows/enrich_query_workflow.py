@@ -14,6 +14,9 @@ from bietlejuice.base.airflow.task_creators.dag_execution_context import (
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.airflow.job_cluster_engine import (
+    get_job_cluster_completion_sink,
+)
 
 
 class EnrichQueryWorkflow(BaseWorkflow):
@@ -35,6 +38,12 @@ class EnrichQueryWorkflow(BaseWorkflow):
         dummy_terminate_job_cluster_task = (
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
+        cluster_completion_sink = get_job_cluster_completion_sink(
+            dag_execution_context,
+            execute_job_cluster_task,
+            dummy_terminate_job_cluster_task,
+            None,
+        )
 
         table_first_tasks = {}
         table_last_tasks = {}
@@ -43,13 +52,13 @@ class EnrichQueryWorkflow(BaseWorkflow):
             (
                 table_first_tasks[table.table_name],
                 table_last_tasks[table.table_name],
-            ) = self._create_enrich_tasks(table, dummy_terminate_job_cluster_task)
+            ) = self._create_enrich_tasks(table, cluster_completion_sink)
 
         self._set_dependencies(
             execute_job_cluster_task,
             table_first_tasks,
             table_last_tasks,
-            dummy_terminate_job_cluster_task,
+            cluster_completion_sink,
         )
 
         DatasetAdder.attach_reprocessing_guard(

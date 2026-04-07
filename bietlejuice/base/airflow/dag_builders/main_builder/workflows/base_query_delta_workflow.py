@@ -17,6 +17,9 @@ from bietlejuice.base.airflow.task_creators.table_attributes import TableAttribu
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
+from bietlejuice.base.airflow.job_cluster_engine import (
+    get_job_cluster_completion_sink,
+)
 
 
 class BaseQueryDeltaWorkflow(BaseWorkflow):
@@ -79,6 +82,7 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
                         cluster_tables,
                         execute_job_cluster_local_id,
                         dummy_terminate_job_cluster_task,
+                        dag_execution_context,
                     )
                 )
                 cluster_tables = []
@@ -92,6 +96,7 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
                     cluster_tables,
                     execute_job_cluster_local_id,
                     dummy_terminate_job_cluster_task,
+                    dag_execution_context,
                 )
             )
 
@@ -104,6 +109,7 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
         cluster_tables: List[TableAttributes],
         execute_job_cluster_local_id: int,
         dummy_terminate_job_cluster_task,
+        dag_execution_context: DagExecutionContext,
     ) -> BaseOperator:
         """
         Creates all the tasks for the workflow and sets their dependencies.
@@ -138,6 +144,8 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
             table_last_tasks,
             optimize_delta_tables,
             dummy_terminate_job_cluster_task,
+            dag_execution_context,
+            execute_job_cluster_local_id,
         )
 
         return execute_job_cluster_task
@@ -190,6 +198,8 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
         table_last_tasks: dict,
         optimize_delta_tables_task,
         job_cluster_finished_task,
+        dag_execution_context: DagExecutionContext,
+        execute_job_cluster_local_id: int,
     ) -> None:
         self._set_inner_dependencies(
             table_first_tasks,
@@ -202,7 +212,13 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
             skip_run_task = self.skip_run_task_creator.create_task()
             skip_run_task >> execute_job_cluster_task
 
-        optimize_delta_tables_task >> job_cluster_finished_task
+        cluster_completion_sink = get_job_cluster_completion_sink(
+            dag_execution_context,
+            execute_job_cluster_task,
+            job_cluster_finished_task,
+            execute_job_cluster_local_id,
+        )
+        optimize_delta_tables_task >> cluster_completion_sink
 
     def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):
         task_creator_factory = TaskCreatorFactory(dag_execution_context)
@@ -212,7 +228,7 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER,
             self.config_service,
-            minimum_databricks_version="12.2",
+            minimum_cluster_runtime_version="12.2",
         )
         self.load_query_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_DELTA

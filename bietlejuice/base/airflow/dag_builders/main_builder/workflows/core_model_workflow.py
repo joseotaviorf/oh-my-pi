@@ -11,6 +11,9 @@ from bietlejuice.base.airflow.task_creators.task_creator_factory import (
     TaskCreatorFactory,
 )
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.airflow.job_cluster_engine import (
+    get_job_cluster_completion_sink,
+)
 
 
 class CoreModelWorkflow(BaseWorkflow):
@@ -50,7 +53,7 @@ class CoreModelWorkflow(BaseWorkflow):
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER,
             self.config_service,
-            minimum_databricks_version="12.2",
+            minimum_cluster_runtime_version="12.2",
         )
         self.load_core_model_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.LOAD_CORE_MODEL
@@ -87,6 +90,12 @@ class CoreModelWorkflow(BaseWorkflow):
         dummy_terminate_job_cluster_task = (
             self.dummy_job_cluster_finished_task_creator.create_task()
         )
+        cluster_completion_sink = get_job_cluster_completion_sink(
+            self.dag_execution_context,
+            execute_job_cluster_task,
+            dummy_terminate_job_cluster_task,
+            None,
+        )
         core_delta_tables = self._get_core_model_tables()
         optimize_delta_tables_task = self.optimize_delta_table_task_creator.create_task(
             core_delta_tables
@@ -117,7 +126,7 @@ class CoreModelWorkflow(BaseWorkflow):
             inner_dependencies_key="inner_dependencies",
         )
 
-        optimize_delta_tables_task >> dummy_terminate_job_cluster_task
+        optimize_delta_tables_task >> cluster_completion_sink
 
     @override
     def _check_include_sync_hive_tasks(self, table_attributes: TableAttributes) -> bool:

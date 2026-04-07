@@ -69,7 +69,7 @@ class RawAPIIngestionWorkflow(BaseWorkflow):
         self.execute_job_cluster_task_creator = task_creator_factory.get_task_creator(
             TaskEnum.EXECUTE_JOB_CLUSTER,
             self.config_service,
-            minimum_databricks_version="16.4",
+            minimum_cluster_runtime_version="16.4",
         )
 
         self.load_raw_task_creator = task_creator_factory.get_task_creator(
