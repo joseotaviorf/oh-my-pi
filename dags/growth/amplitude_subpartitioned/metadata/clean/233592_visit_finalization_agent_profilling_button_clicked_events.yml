@@ -1,0 +1,48 @@
+database_name: datalake_amplitude_clean
+table_name: 233592_visit_finalization_agent_profilling_button_clicked_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description:
+  Amplitude clean extract for visit_finalization_agent_profilling_button_clicked events from app 233592.
+  This event tracks when the agent clicks to proceed, after including the prospect's feedback about the property.
+columns:
+  id_user:
+    description: Unique identifier of the user (agent) who triggered the profiling button click, cast to BIGINT.
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  id_house:
+    description: Identifier of the house associated with the visit finalization flow, extracted from event_properties house_id and cast to BIGINT.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  visit_code:
+    description: Visit code for the visit finalization session, extracted from event_properties visit_code as string.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  business_context:
+    description: Business context label from event_properties business_context, normalized to uppercase for consistent categorical reporting.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  prospect_property_feedback:
+    description: Prospect property feedback value sent with the event, extracted from event_properties prospect_property_feedback.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  prospect_property_feedback_options:
+    description: Prospect property feedback options payload from the event, extracted from event_properties prospect_property_feedback_options.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  ts_event:
+    description: Timestamp when the visit finalization agent profiling button click event was recorded in Amplitude.
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  year:
+    description: Year component of the event date, used for table partitioning and incremental load windows.
+    lineage:
+      - datalake_amplitude_clean.events.year
+  month:
+    description: Month component of the event date, used for table partitioning and incremental load windows.
+    lineage:
+      - datalake_amplitude_clean.events.month
+  day:
+    description: Day component of the event date, used for table partitioning and incremental load windows.
+    lineage:
+      - datalake_amplitude_clean.events.day

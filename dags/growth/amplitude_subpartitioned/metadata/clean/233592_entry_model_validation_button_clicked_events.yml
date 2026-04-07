@@ -1,0 +1,52 @@
+database_name: datalake_amplitude_clean
+table_name: 233592_entry_model_validation_button_clicked_events
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description:
+  Amplitude clean extract for entry_model_validation_button_clicked events from app 233592.
+  This event tracks when the agent clicks to finalize the visit, after validating the property's entry form.
+columns:
+  id_user:
+    description: Unique identifier of the user (agent) who clicked the entry model validation control, cast to BIGINT.
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+  id_house:
+    description: Identifier of the house in context, extracted from event_properties house_id and cast to BIGINT.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  visit_code:
+    description: Visit code tying the event to a visit session, extracted from event_properties visit_code as string.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  business_context:
+    description: Business context label from event_properties business_context, normalized to uppercase for consistent categorical reporting.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  current_entry_model:
+    description: Entry model value before validation, extracted from event_properties current_entry_model.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  validated_entry_model:
+    description: Entry model value after validation or as submitted, extracted from event_properties validated_entry_model.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  entry_model_validation_origin:
+    description: Origin or surface where the validation action was triggered, extracted from event_properties entry_model_validation_origin.
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+  ts_event:
+    description: Timestamp when the entry_model_validation_button_clicked event was recorded in Amplitude.
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+  year:
+    description: Year component of the event date, used for table partitioning and incremental load windows.
+    lineage:
+      - datalake_amplitude_clean.events.year
+  month:
+    description: Month component of the event date, used for table partitioning and incremental load windows.
+    lineage:
+      - datalake_amplitude_clean.events.month
+  day:
+    description: Day component of the event date, used for table partitioning and incremental load windows.
+    lineage:
+      - datalake_amplitude_clean.events.day

@@ -474,6 +474,21 @@ workflow:
     233592_tts_helps_button_clicked_events:
       run_optimize: false
       run_vacuum: false
+    233592_entry_model_validation_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_recommend_send_an_offer_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_talk_to_the_owner_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_visit_finalization_agent_profilling_button_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    233592_visit_finalization_agent_success_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
     250821_photo_session_detail_viewed_events:
       run_optimize: false
       run_vacuum: false
