@@ -1961,6 +1961,7 @@ bietlejuice.enrich_content_funnel:
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-demand:first-run-of-day
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution:first-run-of-day
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visit-schedules:first-run-of-day
 bietlejuice.enrich_crawler_chaves_na_mao:
   - bietlejuice.crawler_chaves_na_mao:load-clean-chaves-na-mao:first-run-of-day
 bietlejuice.enrich_crawler_df_imoveis:
@@ -3897,6 +3898,7 @@ bietlejuice.enrich_seo_funnel:
   - bietlejuice.dw_datamarts_growth_cross:load-dw-datamarts-sale-performance-marketing-metrics-demand:first-run-of-day
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution:first-run-of-day
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visit-schedules:first-run-of-day
 bietlejuice.enrich_similarity_score:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_rental_historical_follow_up:load-enrich-house-listings-daily-info:first-run-of-day

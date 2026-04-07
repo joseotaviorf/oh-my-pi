@@ -30,12 +30,6 @@ columns:
       - datalake_top_of_funnel_demand.user_interactions.mkt_source
       - dw_datamarts.performance_marketing_metrics_demand.mkt_source
       - dw_datamarts.sale_performance_marketing_metrics_demand.mkt_source
-  utm_source:
-    description: Source of URL parameters
-    lineage:
-      - datalake_top_of_funnel_demand.user_interactions.utm_source
-      - dw_datamarts.performance_marketing_metrics_demand.utm_source
-      - dw_datamarts.sale_performance_marketing_metrics_demand.utm_source
   utm_medium:
     description: Medium of URL parameters
     lineage:

@@ -334,7 +334,6 @@ bietlejuice.enrich_consolidated_marketing_metrics:
     - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
 bietlejuice.enrich_content_funnel:
   remove:
-    - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
     - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
     - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
 bietlejuice.enrich_google_search_console_classified:
@@ -774,7 +773,6 @@ bietlejuice.enrich_satisfaction_rating:
     - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
 bietlejuice.enrich_seo_funnel:
   remove:
-    - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
     - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
     - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
 bietlejuice.enrich_semrush:
