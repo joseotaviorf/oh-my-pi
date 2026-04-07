@@ -17,6 +17,9 @@ from bietlejuice.base.service.dag_packages_path_service import (
     DAGPackagesPathService,
     DataQualityLayerCache,
 )
+from bietlejuice.base.airflow.job_cluster_engine import (
+    attach_job_cluster_engine_to_context,
+)
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
@@ -146,7 +149,7 @@ class BaseWorkflow(BuilderInterface):
             "databricks_bietlejuice_repo_path"
         )
         base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
-        return DagExecutionContext(
+        ctx = DagExecutionContext(
             dag,
             self.env,
             bucket,
@@ -156,6 +159,8 @@ class BaseWorkflow(BuilderInterface):
             self.cluster_args,
             **kwargs,
         )
+        attach_job_cluster_engine_to_context(ctx, self.config_service)
+        return ctx
 
     def _initialize_load_start_and_end_date(self) -> Tuple[str, str]:
         """

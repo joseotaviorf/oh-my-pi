@@ -1,9 +1,11 @@
-import json
-
 from argparse import ArgumentParser, Namespace
 from multiprocessing.pool import ThreadPool
+
 from bietlejuice.base.db import MetastoreMappingFactory
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.airflow.optimize_delta_tables_cli import (
+    decode_tables_config_from_cli,
+)
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from quintoandar_logger import QuintoAndarLogger
@@ -20,7 +22,7 @@ def main():
         spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
     loader = DeltaLoader(spark)
-    tables = json.loads(args.tables)
+    tables = decode_tables_config_from_cli(args.tables)
     logger.info(f"Starting vacuum and optimize for {len(tables)} tables, parallelism = {args.parallelism}.")
     pool = ThreadPool(processes=args.parallelism)
     pool.starmap(

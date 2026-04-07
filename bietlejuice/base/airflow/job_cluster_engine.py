@@ -323,6 +323,35 @@ class EmrJobClusterEngine(JobClusterEngine):
         )
 
 
+def get_job_cluster_completion_sink(
+    dag_execution_context: DagExecutionContext,
+    execute_job_cluster_task: BaseOperator,
+    job_cluster_finished_task: BaseOperator,
+    execute_job_cluster_local_id: Optional[int] = None,
+) -> BaseOperator:
+    """
+    Returns the task upstream work should link to before ``job-cluster-finished``.
+
+    Databricks: returns ``job_cluster_finished_task`` (job ends / autotermination).
+
+    EMR: creates ``terminate-emr-cluster`` (or suffixed), wires it to
+    ``job_cluster_finished_task``, and returns the terminate task so Spark work
+    flows ``... >> terminate >> job-cluster-finished``.
+    """
+    engine = dag_execution_context.job_cluster_engine
+    if engine is None or not engine.uses_emr_terminate_after_optimize:
+        return job_cluster_finished_task
+    terminate_suffix = None
+    if execute_job_cluster_local_id is not None and execute_job_cluster_local_id > 1:
+        terminate_suffix = execute_job_cluster_local_id
+    emr_terminate_task = engine.create_emr_terminate_cluster_task(
+        execute_cluster_task_id=execute_job_cluster_task.task_id,
+        terminate_task_local_suffix=terminate_suffix,
+    )
+    emr_terminate_task.set_downstream(job_cluster_finished_task)
+    return emr_terminate_task
+
+
 def build_job_cluster_engine(
     dag_execution_context: DagExecutionContext,
     config_service: ConfigurationService,

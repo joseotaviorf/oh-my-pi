@@ -1,10 +1,8 @@
 from abc import ABC, abstractmethod
-from datetime import timedelta
 from os import path
 from typing import Union
 
 from airflow.models.baseoperator import BaseOperator
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
@@ -40,7 +38,7 @@ class BaseTaskCreator(ABC):
         job_parameters: list,
         spark_job_prefix: str = None,
         execution_timeout_hours: int = _DEFAULT_EXECUTION_TIMEOUT_HOURS,
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    ) -> BaseOperator:
         """
         Returns a task that runs a Spark Job in the base spark jobs path, with the given name, task id, and parameters.
         Serves as an auxiliary function for subclasses, since most of them run in Spark Jobs.
@@ -57,20 +55,18 @@ class BaseTaskCreator(ABC):
             )
         spark_job_path = path.join(spark_job_directory, f"{spark_job_name}.py")
 
-        operator = QuintoAndarDatabricksCheckJobTaskOperator(
-            databricks_conn_id=self.dag_execution_context.databricks_conn_id,
-            dag=self.dag_execution_context.dag,
+        engine = self.dag_execution_context.job_cluster_engine
+        if engine is None:
+            raise ValueError(
+                "job_cluster_engine must be set on DagExecutionContext (call "
+                "attach_job_cluster_engine_to_context when building the context)."
+            )
+        return engine.create_spark_python_task(
+            spark_job_path=spark_job_path,
             task_id=task_id,
-            json={
-                "spark_python_task": {
-                    "python_file": spark_job_path,
-                    "parameters": job_parameters,
-                }
-            },
-            execution_timeout=timedelta(hours=execution_timeout_hours),
+            job_parameters=job_parameters,
+            execution_timeout_hours=execution_timeout_hours,
         )
-
-        return operator
 
     @classmethod
     def generate_task_id(

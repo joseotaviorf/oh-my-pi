@@ -1,145 +1,39 @@
-from datetime import timedelta
+from airflow.models.baseoperator import BaseOperator
+
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
-from bietlejuice.base.databricks.cluster_env_vars_helper import ClusterEnvVarsHelper
 from bietlejuice.services.configuration_service import ConfigurationService
-from databricks_plugin import QuintoAndarDatabricksExecuteJobClusterOperator
 
 
 class ExecuteJobClusterTaskCreator(BaseTaskCreator):
-    """Creates the task that executes a Databricks Job Cluster"""
-
-    _TASK_ID = "execute-job-cluster"
+    """Creates the task that starts the job cluster (Databricks job or EMR create cluster)."""
 
     def __init__(
         self,
         dag_execution_context: DagExecutionContext,
         config_service: ConfigurationService,
-        minimum_databricks_version: str = None,
+        minimum_cluster_runtime_version: str = None,
     ):
         super().__init__(dag_execution_context)
-        self.cluster_args = dag_execution_context.cluster_args
         self.config_service = config_service
-        self.minimum_databricks_version = minimum_databricks_version
-        if minimum_databricks_version:
-            self.minimum_databricks_major_version = int(
-                minimum_databricks_version.split(".")[0]
-            )
-            self.minimum_databricks_minor_version = int(
-                minimum_databricks_version.split(".")[1]
-            )
+        self.minimum_cluster_runtime_version = minimum_cluster_runtime_version
 
-    def __get_access_control_list(self) -> list:
-        acl = self.cluster_args.get("access_control_list")
-        if acl is None:
-            cluster_type = self.cluster_args.get("type")
-            if cluster_type:
-                cluster_template = self.config_service.get_config(cluster_type)
-                acl = cluster_template.get("access_control_list")
-        if acl is None:
-            acl = self.config_service.get_config("default_access_control_list")[0]
-        if isinstance(acl, dict):
-            return [acl]
-        return acl
-
-    def __get_cluster_configuration(self) -> dict:
-        cluster_type = self.cluster_args.get("type")
-        cluster_configuration = self.config_service.get_config(cluster_type)
-        updated_cluster_configuration = self.config_service._deep_update(
-            cluster_configuration, self.cluster_args.get("custom_configurations", {})
-        )
-        return updated_cluster_configuration
-
-    def __validate_databricks_version(self, cluster_configuration: dict):
-        if self.minimum_databricks_version:
-            current_databricks_version = cluster_configuration.get("spark_version")
-            current_databricks_major_version = int(
-                current_databricks_version.split(".")[0]
-            )
-            current_databricks_minor_version = int(
-                current_databricks_version.split(".")[1]
-            )
-            if (
-                current_databricks_major_version < self.minimum_databricks_major_version
-                or (
-                    current_databricks_major_version
-                    == self.minimum_databricks_major_version
-                    and current_databricks_minor_version
-                    < self.minimum_databricks_minor_version
-                )
-            ):
-                raise ValueError(
-                    f"Current Databricks version ({current_databricks_version}) is below "
-                    f"the minimum required version ({self.minimum_databricks_version})"
-                )
-
-    def __get_libraries(self) -> list:
-        default_libraries = self.config_service.get_config("default_libraries")
-        custom_libraries = [
-            (
-                {
-                    lib_type: lib_name.format(
-                        artifacts_bucket=self.config_service.get_config(
-                            "artifacts_bucket"
-                        )
-                    )
-                }
-                if isinstance(lib_name, str)
-                else {lib_type: lib_name}
-            )
-            for custom_libraries in self.cluster_args.get("custom_libraries", [])
-            for lib_type, lib_name in custom_libraries.items()
-        ]
-        libraries = default_libraries + custom_libraries
-        return libraries
-
-    def create_task(
-        self, execute_job_cluster_local_id=None
-    ) -> QuintoAndarDatabricksExecuteJobClusterOperator:
+    def create_task(self, execute_job_cluster_local_id=None) -> BaseOperator:
         """
-        Creates the ExecuteJobCluster task to enable Spark Jobs to run on Databricks Job Cluster
+        Creates the execute-job-cluster task so Spark jobs can run on the configured backend.
 
-        :param execute_job_cluster_local_id: This param adds a suffix with this ID to the task name, since a DAG can have multiple `execute-job-cluster` tasks due to Job Cluster API 100 tasks limitation.
+        :param execute_job_cluster_local_id: Suffix when a DAG has multiple clusters (API limits).
         """
-        cluster_configuration = self.__get_cluster_configuration()
-        cluster_configuration = self.__input_spark_env_vars(cluster_configuration)
-        self.__validate_databricks_version(cluster_configuration)
-        if execute_job_cluster_local_id:
-            task_id = f"{self._TASK_ID}-{execute_job_cluster_local_id}"
-        else:
-            task_id = self._TASK_ID
-
-        return QuintoAndarDatabricksExecuteJobClusterOperator(
-            databricks_conn_id=self.dag_execution_context.databricks_conn_id,
-            dag=self.dag_execution_context.dag,
-            task_id=task_id,
-            cluster_configuration=cluster_configuration,
-            libraries=self.__get_libraries(),
-            access_control_list=self.__get_access_control_list(),
-            execution_timeout=timedelta(hours=self._DEFAULT_EXECUTION_TIMEOUT_HOURS),
-        )
-
-    def __input_databricks_default_service_credential_name(
-        self, cluster_configuration: dict
-    ) -> dict:
-        dbr_version = cluster_configuration["spark_version"]
-        data_security_mode = cluster_configuration["data_security_mode"]
-
-        if data_security_mode == "USER_ISOLATION" and dbr_version >= "16.4":
-            cluster_configuration["spark_env_vars"][
-                "DATABRICKS_DEFAULT_SERVICE_CREDENTIAL_NAME"
-            ] = self.config_service.get_config(
-                "databricks_default_service_credential_name"
+        engine = self.dag_execution_context.job_cluster_engine
+        if engine is None:
+            raise ValueError(
+                "job_cluster_engine must be set on DagExecutionContext (call "
+                "attach_job_cluster_engine_to_context when building the context)."
             )
-        return cluster_configuration
-
-    def __input_spark_env_vars(self, cluster_configuration: dict) -> dict:
-        cluster_configuration = ClusterEnvVarsHelper.input_spark_env_vars(
-            cluster_configuration
+        return engine.create_execute_cluster_task(
+            config_service=self.config_service,
+            minimum_cluster_runtime_version=self.minimum_cluster_runtime_version,
+            execute_job_cluster_local_id=execute_job_cluster_local_id,
         )
-        cluster_configuration = self.__input_databricks_default_service_credential_name(
-            cluster_configuration
-        )
-        return cluster_configuration

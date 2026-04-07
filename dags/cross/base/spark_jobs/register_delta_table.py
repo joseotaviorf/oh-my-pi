@@ -6,6 +6,7 @@ from bietlejuice.clients.db_clients.trino_client import TrinoClient
 from bietlejuice.base.db.database_enum import DatabaseEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
+from bietlejuice.base.spark.base_spark import BaseDBUtils
 from trino.exceptions import TrinoUserError
 
 JOB_NAME = "register_delta_table"
@@ -27,6 +28,9 @@ def get_trino_client() -> TrinoClient:
     """
     Retrieves the Trino client using the credentials from Databricks Utils. The catalog will point to DELTA_CATALOG.
     """
+    base_dbutils = BaseDBUtils()
+    dbutils = base_dbutils.get_dbutils()
+
     trino_credentials = json.loads(
         dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.TRINO)
     )
