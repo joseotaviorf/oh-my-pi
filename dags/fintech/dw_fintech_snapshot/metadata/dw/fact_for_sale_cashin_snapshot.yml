@@ -1,0 +1,95 @@
+---
+database_name: dw_payment_snapshot
+table_name: fact_for_sale_cashin_snapshot
+owner: guilherme.sacramento@quintoandar.com.br
+domain: Fintech
+description: "datalake_bank_conciliation.for_sale_cashin monthly snapshot. Snapshots are taken the day after the first business day from the month."
+columns:
+  sk_house:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.sk_house
+    description: "House identifier derived from the sale revision."
+  sk_offer:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.sk_offer
+    description: "External offer identifier from the sale."
+  id_sale:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.id_sale
+    description: "Sale identifier from Monopoly."
+  id_sap_sale_transaction:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.id_sap_sale_transaction
+    description: "SAP sale transaction identifier."
+  bank_account:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.bank_account
+    description: "Bank account number where the cash-in was received."
+  account_number:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.account_number
+    description: "Account number (same as bank_account)."
+  company_use:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.company_use
+    description: "Document number or masked counterpart document used for matching."
+  counterpart_document:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.counterpart_document
+    description: "Masked counterpart document (CPF/CNPJ) from the bank statement."
+  counterpart_name:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.counterpart_name
+    description: "Name of the counterpart from the bank statement."
+  bank_paid_amount:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.bank_paid_amount
+    description: "Amount received in the bank (from boleto or transfer)."
+  bank_type_transaction:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.bank_type_transaction
+    description: "Type of bank transaction (BOLETO, PIX, TED, TEF)."
+  monopoly_income_from:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.monopoly_income_from
+    description: "Income source registered in Monopoly sale transactions."
+  monopoly_paid_amount:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.monopoly_paid_amount
+    description: "Amount registered as paid in Monopoly."
+  monopoly_is_reconcilied:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.monopoly_is_reconcilied
+    description: "Flag indicating if the transaction was reconciled with Monopoly."
+  sap_paid_amount:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.sap_paid_amount
+    description: "Amount registered as paid in SAP ledger."
+  sap_is_reconcilied:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.sap_is_reconcilied
+    description: "Flag indicating if the transaction was reconciled with SAP."
+  origin_transaction:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.origin_transaction
+    description: "Origin of the transaction (forsale or bypass)."
+  dt_bank_paid:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.dt_bank_paid
+    description: "Date the payment was received in the bank."
+  dt_monopoly_accounting:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.dt_monopoly_accounting
+    description: "Accounting date registered in Monopoly."
+  dt_sap_paid:
+    lineage:
+      - datalake_bank_conciliation.for_sale_cashin.dt_sap_paid
+    description: "Payment date registered in SAP."
+  ts_snapshot:
+    description: "Timestamp when the snapshot was taken."
+  year:
+    description: "Year of the date the snapshot was taken."
+  month:
+    description: "Month of the date the snapshot was taken."
+  day:
+    description: "Day of the date the snapshot was taken."

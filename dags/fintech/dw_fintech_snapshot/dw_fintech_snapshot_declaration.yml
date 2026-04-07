@@ -20,6 +20,8 @@ workflow:
       custom_schema: payment_snapshot
     dim_contract_snapshot:
       custom_schema: public_snapshot
+    fact_for_sale_cashin_snapshot:
+      custom_schema: payment_snapshot
 cluster:
   type: databricks_16_4_med_general_photon_cluster
   access_control_list:

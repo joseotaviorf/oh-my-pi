@@ -1,0 +1,27 @@
+SELECT
+    sk_house,
+    sk_offer,
+    id_sale,
+    id_sap_sale_transaction,
+    bank_account,
+    account_number,
+    company_use,
+    counterpart_document,
+    counterpart_name,
+    bank_paid_amount,
+    bank_type_transaction,
+    monopoly_income_from,
+    monopoly_paid_amount,
+    monopoly_is_reconcilied,
+    sap_paid_amount,
+    sap_is_reconcilied,
+    origin_transaction,
+    dt_bank_paid,
+    dt_monopoly_accounting,
+    dt_sap_paid,
+    NOW() AS ts_snapshot,
+    YEAR(CURRENT_DATE()) AS year,
+    MONTH(CURRENT_DATE()) AS month,
+    DAY(CURRENT_DATE()) AS day
+FROM
+    datalake_bank_conciliation.for_sale_cashin

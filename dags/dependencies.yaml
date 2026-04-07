@@ -689,6 +689,7 @@ bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry:first-run-of-day
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice:first-run-of-day
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries:first-run-of-day
+  - bietlejuice.enrich_bank_conciliation:load-enrich-for-sale-cashin:first-run-of-day
 bietlejuice.dw_fintech_snapshot_quintocred:
   - bietlejuice.dw_charging_payment_quintocred:load-dw-charging-payment-quintocred-fact-payment-full:first-run-of-day
   - bietlejuice.dw_charging_payment_quintocred:load-dw-charging-payment-quintocred-fact-propose-timeline:first-run-of-day
