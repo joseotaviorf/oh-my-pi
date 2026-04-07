@@ -1,9 +1,11 @@
+import json
+
+from airflow.models.baseoperator import BaseOperator
+
 from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
 from bietlejuice.base.airflow.task_creators.load_task_creator import LoadTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
-import json
 
 
 class LoadQueryTaskCreator(LoadTaskCreator):
@@ -18,9 +20,7 @@ class LoadQueryTaskCreator(LoadTaskCreator):
             storage_format=StorageFormatEnum.PARQUET,
         )
 
-    def _create_base_load_task(
-        self, table_attributes: TableAttributes
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    def _create_base_load_task(self, table_attributes: TableAttributes) -> BaseOperator:
         spark_job_name = f"load_table_{table_attributes.extraction_type}"
 
         if table_attributes.layer == LayerEnum.DW:

@@ -1,11 +1,13 @@
 from typing import List
+
+from airflow.models.baseoperator import BaseOperator
+
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.services.configuration_service import ConfigurationService
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 
 
 class LoadCDFtoDatazordTaskCreator(BaseTaskCreator):
@@ -51,7 +53,7 @@ class LoadCDFtoDatazordTaskCreator(BaseTaskCreator):
 
     def create_task(
         self, table_attributes: TableAttributes, key_columns: List[str]
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    ) -> BaseOperator:
         parameters = self._get_parameters(table_attributes, key_columns)
 
         return self._create_spark_job_task(

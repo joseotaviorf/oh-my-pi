@@ -1,9 +1,11 @@
 import bietlejuice.base.airflow.datasets.dataset_adder as dataset_adder
 from abc import ABC, abstractmethod
+
+from airflow.models.baseoperator import BaseOperator
+
+from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
-from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 
 
 class LoadTaskCreator(BaseTaskCreator, ABC):
@@ -20,18 +22,14 @@ class LoadTaskCreator(BaseTaskCreator, ABC):
         self.storage_format = storage_format
 
     @abstractmethod
-    def _create_base_load_task(
-        self, table_attributes: TableAttributes
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    def _create_base_load_task(self, table_attributes: TableAttributes) -> BaseOperator:
         """
         Each load task creator must implement this method to create its specific load task.
         The resulting task will then be modified to attach the necessary changes for all load tasks, like
         attaching the dataset to the task or applying common parameters.
         """
 
-    def create_task(
-        self, table_attributes: TableAttributes
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    def create_task(self, table_attributes: TableAttributes) -> BaseOperator:
         task = self._create_base_load_task(table_attributes)
         if self.produce_datasets:
             dataset_adder.DatasetAdder.attach_dataset_to_task(task)

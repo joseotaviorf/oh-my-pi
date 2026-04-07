@@ -1,14 +1,15 @@
 import json
+from typing import List
+
+from airflow.models.baseoperator import BaseOperator
+
 from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
-from bietlejuice.base.airflow.task_creators.load_task_creator import LoadTaskCreator
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
+from bietlejuice.base.airflow.task_creators.load_task_creator import LoadTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.services.configuration_service import ConfigurationService
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
-
-from typing import List
 
 
 class LoadDMSCDCCleanTaskCreator(LoadTaskCreator):
@@ -51,9 +52,7 @@ class LoadDMSCDCCleanTaskCreator(LoadTaskCreator):
             json.dumps(table_attributes.table_privileges),
         ]
 
-    def _create_base_load_task(
-        self, table_attributes: TableAttributes
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    def _create_base_load_task(self, table_attributes: TableAttributes) -> BaseOperator:
         task_id = self.generate_task_id(table_attributes)
         parameters = self._get_parameters(table_attributes)
 

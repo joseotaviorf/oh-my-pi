@@ -1,7 +1,9 @@
 from typing import Union
+
+from airflow.models.baseoperator import BaseOperator
+
 from bietlejuice.base.airflow.task_creators.load_task_creator import LoadTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 
 
 class LoadWonkaTaskCreator(LoadTaskCreator):
@@ -15,9 +17,7 @@ class LoadWonkaTaskCreator(LoadTaskCreator):
             self.dag_execution_context.workflow_args["wonka_config"]["pipeline_runner"]
         ]
 
-    def _create_base_load_task(
-        self, table_attributes: TableAttributes
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    def _create_base_load_task(self, table_attributes: TableAttributes) -> BaseOperator:
         task_id = self.generate_task_id(table_attributes)
         parameters = self._get_parameters()
 
@@ -30,7 +30,7 @@ class LoadWonkaTaskCreator(LoadTaskCreator):
 
     def create_task(
         self, table_attributes: Union[TableAttributes, list]
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    ) -> BaseOperator:
         """
         Creates a task that runs a Wonka pipeline.
 

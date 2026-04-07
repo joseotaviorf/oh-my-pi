@@ -1,9 +1,11 @@
+import json
+
+from airflow.models.baseoperator import BaseOperator
+
 from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
 from bietlejuice.base.airflow.task_creators.load_task_creator import LoadTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
-import json
 
 
 class LoadDeltaTableTaskCreator(LoadTaskCreator):
@@ -45,7 +47,7 @@ class LoadDeltaTableTaskCreator(LoadTaskCreator):
             "when_not_matched_operation", None
         )
 
-        return [
+        parameters = [
             self.dag_execution_context.environment,
             self.dag_execution_context.bucket,
             table_attributes.layer.value,
@@ -72,11 +74,22 @@ class LoadDeltaTableTaskCreator(LoadTaskCreator):
             json.dumps(table_attributes.table_privileges),
             "--table-properties",
             json.dumps(table_attributes.table_properties),
-            "--row-filter-column-key",
-            table_attributes.row_filter_column_key,
-            "--row-filter-function-name",
-            table_attributes.row_filter_function_name,
         ]
+        if table_attributes.row_filter_column_key:
+            parameters.extend(
+                [
+                    "--row-filter-column-key",
+                    table_attributes.row_filter_column_key,
+                ]
+            )
+        if table_attributes.row_filter_function_name:
+            parameters.extend(
+                [
+                    "--row-filter-function-name",
+                    table_attributes.row_filter_function_name,
+                ]
+            )
+        return parameters
 
     def _get_extra_query_template_params(
         self, table_attributes: TableAttributes
@@ -100,9 +113,7 @@ class LoadDeltaTableTaskCreator(LoadTaskCreator):
 
         return extra_query_template_params
 
-    def _create_base_load_task(
-        self, table_attributes: TableAttributes
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    def _create_base_load_task(self, table_attributes: TableAttributes) -> BaseOperator:
         if table_attributes.layer == LayerEnum.DW:
             task_id = self.generate_task_id(
                 table_attributes, dynamic_template="load-{layer}-{schema}-{table_name}"
