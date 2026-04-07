@@ -25,6 +25,7 @@ workflow:
     segments_perspective: {}
     tickets_perspective: {}
     backlog_metric: {}
+    tickets_contract: {}
 
 cluster:
   type: custom_cluster

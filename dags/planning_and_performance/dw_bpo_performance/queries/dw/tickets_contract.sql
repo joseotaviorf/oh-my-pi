@@ -20,8 +20,9 @@ WITH target_departments /* 0. Pré-filtro de Departamentos */ AS (
       'Reparos PP Multi [BACK]',
       'Reembolso de Reparos [Back]',
       'Atendimento [Porto]',
-      'Triagem [Porto]'
-    )
+      'Triagem [Porto]',
+      'CX Atendimento Escalado Receptivo [OFF] [POS] [BACK]'
+   )
 ), pp_multi AS (
   SELECT
     dt_houses_owned AS dt_reference,
@@ -45,18 +46,46 @@ WITH target_departments /* 0. Pré-filtro de Departamentos */ AS (
     ppm.is_pp_multi AS is_pp_multi,
     CASE
       WHEN dd.department IN (
-        'CX Pagamentos Ativo [POS] [BACK] [PAY]',
-        'Alteração de dados bancários [BACK]',
-        'Aditivos [REP] [POS] [BACK]'
+         'CX Pagamentos Ativo [POS] [BACK] [PAY]',
+      'CX Alteração de dados bancários [BACK] [POS] [PAY] [WH]',
+      'CX Onboarding [BACK] [POS] [WH]',
+      'Aditivos [POS] [BACK] [WH]',
+      'CX Propostas Tarefas [PRE] [BACK]',
+      'Atendimento Escalado [OFF] [POS] [BACK]',
+      'Rescisão por Inadimplência [OFF][POS][BACK]',
+      'Offboarding Reparos [OFF] [POS] [BACK]',
+      'Aditivos [REP] [POS] [BACK]',
+      'Alteração de dados bancários [BACK]',
+      'FullService [BACK]',
+      'Entrada no imóvel [ONB] [POS] [BACK]',
+      'Reparos PP Multi [BACK]',
+      'Reembolso de Reparos [Back]',
+      'Atendimento [Porto]',
+      'Triagem [Porto]',
+      'CX Atendimento Escalado Receptivo [OFF] [POS] [BACK]'
       )
       THEN dt.theme_detail
       ELSE NULL
     END AS theme_detail, /* Tema detalhado apenas para os departamentos específicos */
     CASE
       WHEN dd.department IN (
-        'CX Pagamentos Ativo [POS] [BACK] [PAY]',
-        'Alteração de dados bancários [BACK]',
-        'Aditivos [REP] [POS] [BACK]'
+   'CX Pagamentos Ativo [POS] [BACK] [PAY]',
+      'CX Alteração de dados bancários [BACK] [POS] [PAY] [WH]',
+      'CX Onboarding [BACK] [POS] [WH]',
+      'Aditivos [POS] [BACK] [WH]',
+      'CX Propostas Tarefas [PRE] [BACK]',
+      'Atendimento Escalado [OFF] [POS] [BACK]',
+      'Rescisão por Inadimplência [OFF][POS][BACK]',
+      'Offboarding Reparos [OFF] [POS] [BACK]',
+      'Aditivos [REP] [POS] [BACK]',
+      'Alteração de dados bancários [BACK]',
+      'FullService [BACK]',
+      'Entrada no imóvel [ONB] [POS] [BACK]',
+      'Reparos PP Multi [BACK]',
+      'Reembolso de Reparos [Back]',
+      'Atendimento [Porto]',
+      'Triagem [Porto]',
+      'CX Atendimento Escalado Receptivo [OFF] [POS] [BACK]'
       )
       THEN CASE
         WHEN dt.theme_detail IN (
@@ -366,6 +395,9 @@ SELECT
     THEN 'reparos_porto'
     WHEN tb.department LIKE '%Atendimento [Porto]%'
     THEN 'reparos_porto'
+    WHEN tb.department LIKE '% CX Atendimento Escalado Receptivo [OFF] [POS] [BACK]%'
+     THEN 'cx_offboarding_escalado'
+
     ELSE 'NÃO IDENTIFICADO'
   END AS context_identifier,
   COALESCE(tb.contrato_prioritario, r3.sk_contract) AS origin_identifier,
