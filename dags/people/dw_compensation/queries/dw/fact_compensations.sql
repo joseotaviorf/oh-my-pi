@@ -83,6 +83,7 @@ assignment_history_base AS (
             ON im.id_period_of_service = tcp.id_period_of_service
     WHERE
         aa.id_job IS NOT NULL
+        AND aa.assignment_number NOT LIKE 'P%'
     QUALIFY
         ROW_NUMBER() OVER (
             PARTITION BY
@@ -718,17 +719,23 @@ LEFT JOIN
     assignment_admission_started AS pos
         ON sal.id_assignment = pos.id_assignment
 LEFT JOIN
+    assignment_service_groups AS asg_sal
+        ON sal.id_person = asg_sal.id_person
+        AND sal.id_assignment = asg_sal.id_assignment
+LEFT JOIN
     dw_compensation.dim_job AS dj_band
         ON sal.sk_job_version = dj_band.sk_job_version
 LEFT JOIN
     assignment_job_stints AS ajst
         ON sal.id_person = ajst.id_person
         AND sal.id_job = ajst.id_job
+        AND asg_sal.service_group = ajst.service_group
         AND sal.dt_reference >= ajst.dt_stint_start
         AND sal.dt_reference <= ajst.dt_stint_ended
 LEFT JOIN
     assignment_band_stints AS abst
         ON sal.id_person = abst.id_person
         AND dj_band.band = abst.band
+        AND asg_sal.service_group = abst.service_group
         AND sal.dt_reference >= abst.dt_stint_start
         AND sal.dt_reference <= abst.dt_stint_ended
