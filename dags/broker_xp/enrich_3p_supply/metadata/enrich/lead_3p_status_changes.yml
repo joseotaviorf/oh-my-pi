@@ -1,0 +1,103 @@
+---
+database_name: datalake_3p_supply
+table_name: lead_3p_status_changes
+owner: patrick.nasser@quintoandar.com.br
+domain: Broker XP
+description: |
+  Status change timeline for 3P leads, built from the Hibernate Envers audit trail.
+  Each row represents a single status transition for a lead within a business context,
+  with start/end timestamps, parsed reason details, and macro reason classification.
+
+  **Sources**:
+  - datalake_brokers_supply_processor_clean.business_context_detail_aud (audit records)
+  - datalake_brokers_supply_processor_clean.business_context_detail (current state)
+  - datalake_brokers_supply_processor_clean.rev_info (revision timestamps)
+
+  **Key features**:
+  - ts_start/ts_end computed via LEAD() window function over revision timestamps
+  - status_reason JSON parsed into arrays for pending and not-eligible reasons
+  - reason_macro classifies each status reason into a high-level category
+  - Duplicate house ID extracted when applicable
+
+columns:
+  id_status_changes:
+    description: "Revision ID from the Envers audit trail, uniquely identifies each status change event (long)"
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail_aud.rev
+  sk_lead_3p_flow:
+    description: "Surrogate key for the lead flow: id_lead_3p * 10 for SALE, id_lead_3p * 10 + 1 for RENT (long)"
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.id_lead
+      - datalake_brokers_supply_processor_clean.business_context_detail.business_context
+  id_lead_3p:
+    description: "Lead ID (long), references lead_3p.id_lead_3p"
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.id_lead
+  sk_house_duplicated:
+    description: "Surrogate key for the duplicate house in EBDB when the lead was marked as duplicate (int, nullable)"
+  business_context:
+    description: "Business context (SALE, RENT, SALE_PRIMARY_MARKET)"
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.business_context
+  status:
+    description: "Lead status at this point in time (e.g. RECEIVED, PROCESSING, CONVERTED, REGISTERED)"
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail_aud.status
+  status_reason:
+    description: "Array of active reason keys (where value='true' in the status_reason map)"
+  not_eligible_pendings:
+    description: "Array of not-eligible reason messages from listOfNotEligibleReasonsMessages in the status_reason JSON"
+  eligible_pendings:
+    description: "Array of pending/eligible reason messages from listOfPendingReasonsMessages in the status_reason JSON"
+  reason_macro:
+    description: "High-level classification of status reasons: DUPLICATED, NO_OPERATIONAL_INTEREST, PHOTOS, OWNER_INFO, LISTING_INFO, OTHER, or N/A"
+  version:
+    description: "Sequence number of this status change within the lead and business context (1-based)"
+  is_not_eligible_pending:
+    description: "Whether the status has at least one not-eligible pending reason (boolean)"
+  is_eligible_pending:
+    description: "Whether the status has at least one eligible pending reason (boolean)"
+  is_opportunity:
+    description: "Whether the lead is an opportunity: NOT_CONVERTED with eligible pendings and no not-eligible pendings (boolean)"
+  is_first_sale_status:
+    description: "Whether this is the first status change for a SALE business context (boolean)"
+  is_first_rent_status:
+    description: "Whether this is the first status change for a RENT business context (boolean)"
+  is_current:
+    description: "Whether this is the most recent status (ts_end IS NULL) (boolean)"
+  has_3p_access_control:
+    description: "Access control flag for 3P data (boolean, always true)"
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.has_3p_access_control
+  ts_start:
+    description: "Timestamp when this status period started (from rev_info revision timestamp)"
+  ts_end:
+    description: "Timestamp when this status period ended (next revision timestamp, null if current)"
+  ts_first_registered_from_bsp_to_main:
+    description: "Earliest timestamp when status was REGISTERED or UNPUBLISHED (first registration to main) within this lead and business context"
+  ts_unpublished_in_bsp:
+    description: "Earliest timestamp when status was UNPUBLISHED within this lead and business context"
+  ts_discarded_in_bsp:
+    description: "Earliest timestamp when status was DISCARDED within this lead and business context"
+  ts_first_not_converted_in_bsp:
+    description: "Earliest timestamp when status was NOT_CONVERTED within this lead and business context"
+  ts_last_not_converted_in_bsp:
+    description: "Latest timestamp when status was NOT_CONVERTED within this lead and business context"
+  ts_first_processing_photos_in_bsp:
+    description: "Earliest timestamp when status was PROCESSING within this lead and business context"
+  ts_last_processing_photos_in_bsp:
+    description: "Latest timestamp when status was PROCESSING within this lead and business context"
+  ts_suspended_in_bsp:
+    description: "Earliest timestamp when status was SUSPENDED within this lead and business context"
+  ts_load:
+    description: "Timestamp when the record was processed by this DAG"
+  ts_business_context_created:
+    description: "Business context detail creation timestamp (America/Sao_Paulo timezone)"
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.ts_created
+  year:
+    description: "Partition column: year derived from ts_start"
+  month:
+    description: "Partition column: month derived from ts_start"
+  day:
+    description: "Partition column: day derived from ts_start"

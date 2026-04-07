@@ -1,0 +1,206 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: business_context_detail_aud
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: >
+  Complete audit trail for all changes made to the business_context_detail table, automatically maintained by Hibernate Envers.
+  This table captures the complete history of lead processing status changes, business context evaluations, and eligibility
+  decisions across the 3P Partners workflow, providing essential audit capabilities for compliance and process analysis.
+
+  AUDIT FUNCTIONALITY: Tracks every status transition, business context assignment, and processing decision made for 3P leads.
+  Each revision captures the complete state at the time of change, enabling reconstruction of lead processing history
+  and analysis of workflow evolution over time.
+
+  BUSINESS CONTEXT: Critical for 3P Partners operations requiring detailed audit trails for:
+  - Lead processing workflow analysis and optimization
+  - Partner performance evaluation and quality assessment
+  - Regulatory compliance and data governance requirements
+  - Processing decision accountability and dispute resolution
+  - System performance monitoring and bottleneck identification
+  - Filter rule effectiveness analysis and improvement
+
+  REVISION TRACKING: Uses Hibernate Envers revision system to maintain chronological change history.
+  Each revision represents a business decision point or status change in the lead processing pipeline.
+  Enables correlation with lead_3p_aud and file_aud for complete processing context.
+
+  WORKFLOW ANALYSIS: Essential for understanding lead processing funnel evolution, status transition patterns,
+  rejection reason trends, and business context evaluation effectiveness over time.
+
+  RELATED TABLES: Links to rev_info for revision timestamps, business_context_detail for current state,
+  lead_3p_aud for related lead changes. Critical component of complete 3P Partners audit ecosystem.
+
+  KEY ANALYSIS PATTERNS: Status transition analysis, Processing time tracking, Rejection reason trending,
+  Partner quality evolution, Business context preference analysis, Filter effectiveness measurement.
+
+  USE CASES: Lead processing funnel analysis, Partner performance tracking, Compliance auditing,
+  System troubleshooting, Process optimization, Quality improvement initiatives.
+
+  QUERY CONSIDERATIONS: High volume table with frequent status changes. Use modification flags and revision ranges
+  for efficient filtering. Join with rev_info for human-readable timestamps.
+columns:
+  id:
+    description: >
+      Business context detail identifier from main table (BIGINT, Not Nullable, Primary Key with rev).
+      Links back to current state in business_context_detail table.
+      Combined with rev forms composite primary key for audit entries.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.id
+  id_listing:
+    description: >
+      Legacy listing identifier at time of revision (BIGINT, Nullable, DEPRECATED).
+      Historical field maintained for audit completeness and data migration tracking.
+      Replaced by direct lead tracking in current architecture.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.listing_id
+  id_file:
+    description: >
+      File identifier linking to import batch at time of revision (BIGINT, Nullable).
+      Shows which file import was associated with this business context state.
+      Critical for tracking lead processing provenance and batch audit trails.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.file_id
+  id_partner:
+    description: >
+      Partner identifier at time of this revision (STRING, Not Nullable).
+      Tracks which partner was associated with the lead when this status change occurred.
+      Essential for partner performance analysis and relationship management audit.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.partner_id
+  business_context:
+    description: >
+      Business context being evaluated at time of revision (STRING, Not Nullable).
+      SALE: Property evaluation for sale on QuintoAndar platform with sale-specific rules.
+      RENT: Property evaluation for rental with rental-specific eligibility criteria.
+      Tracks business context assignments and changes over lead processing lifecycle.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.business_context
+    categories:
+      SALE: 'Sale context evaluation with sale-specific pricing, legal, and market validation rules'
+      RENT: 'Rent context evaluation with rental-specific eligibility criteria and tenant protection rules'
+  status:
+    description: >
+      Lead processing status at time of revision (STRING, Nullable).
+      Captures status progression: RECEIVED → IN_ANALYSIS → APPROVED/REJECTED/CONVERTED.
+      Critical for analyzing lead processing funnel performance and status transition patterns.
+      Historical status values preserved for workflow evolution analysis.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.status
+  status_reason:
+    description: >
+      Detailed reasoning for status at time of revision (JSON, Nullable).
+      JSON object with filter results, quality checks, and rejection reasons.
+      Structure: {"filter_name": true/false, "reason_code": "description"}.
+      Essential for understanding processing decisions and optimizing filter rules.
+      Tracks evolution of rejection patterns and quality assessment criteria.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.status_reason
+  version:
+    description: >
+      Application version number at time of revision (BIGINT, Nullable).
+      Tracks record versioning separate from audit revision system.
+      Used for conflict resolution analysis and optimistic locking audit.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.version
+  rev:
+    description: >
+      Hibernate Envers revision number (BIGINT, Not Nullable, Primary Key).
+      Global sequence identifying the transaction that created this audit record.
+      Links to rev_info table for revision metadata and precise timestamps.
+      Enables correlation across all audited tables for complete transaction context.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.rev
+  rev_end:
+    description: >
+      Revision number when this record was superseded (BIGINT, Nullable).
+      NULL for current/active audit records. Points to next revision that replaced this state.
+      Enables efficient querying of active states within specific time ranges.
+      Critical for point-in-time status reconstruction and temporal analysis.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.revend
+  rev_type:
+    description: >
+      Type of operation that created this audit record (SMALLINT, Not Nullable).
+      0 = INSERT (new business context evaluation), 1 = UPDATE (status/reason change), 2 = DELETE (context removal).
+      Essential for understanding the nature of each processing decision and workflow step.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.revtype
+    categories:
+      "0" : "CREATE - New business context evaluation initiated"
+      "1" : "UPDATE - Status change or reason modification"
+      "2" : "DELETE - Business context evaluation removed"
+  mod_id_listing:
+    description: >
+      Modification flag for legacy listing ID field (BOOLEAN, Nullable, DEPRECATED).
+      TRUE when listing association changed. Maintained for historical audit completeness.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.listing_id_mod
+  mod_id_file:
+    description: >
+      Modification flag for file ID association (BOOLEAN, Nullable).
+      TRUE when file link changed, typically during data corrections or batch re-assignments.
+      Important for tracking file processing audit and provenance changes.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.file_id_mod
+  mod_id_partner:
+    description: >
+      Modification flag for partner association (BOOLEAN, Nullable).
+      TRUE when partner assignment changed, indicating lead ownership transfers.
+      Critical for partner relationship audit and performance tracking.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.partner_id_mod
+  mod_business_context:
+    description: >
+      Modification flag for business context field (BOOLEAN, Nullable).
+      TRUE when business context changed (SALE ↔ RENT), indicating evaluation scope changes.
+      Important for tracking lead processing scope modifications and business rule changes.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.business_context_mod
+  mod_status:
+    description: >
+      Modification flag for status field (BOOLEAN, Nullable).
+      TRUE when lead processing status changed, marking key workflow transitions.
+      Essential for analyzing status transition patterns and processing performance.
+      Most critical modification flag for lead processing funnel analysis.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.status_mod
+  mod_status_reason:
+    description: >
+      Modification flag for status reasoning (BOOLEAN, Nullable).
+      TRUE when rejection reasons or filter results changed.
+      Critical for tracking processing decision evolution and filter rule effectiveness.
+      Essential for quality improvement and partner feedback analysis.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.status_reason_mod
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this event is subject to 3P Partners access control policies (BOOLEAN, Not Nullable, Always TRUE).
+      Static field used for access control and data governance within the 3P Partners domain.
+      All events in this table are related to 3P Partners operations and require appropriate access permissions.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
+  ts_created:
+    description: >
+      Original creation timestamp from main table (TIMESTAMP, Nullable).
+      Shows when the business context evaluation was initially created.
+      Preserved from main table for reference, differs from revision creation time.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.created_at
+  ts_updated:
+    description: >
+      Last update timestamp from main table at time of revision (TIMESTAMP, Nullable).
+      Tracks when the business context was last modified before this audit entry.
+      Use rev_info timestamps for actual audit record creation times.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.updated_at
+  year:
+    description: 'Partition column: Year extracted from revision timestamp for data lake partitioning optimization (INTEGER, Partition Key).'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.year
+  month:
+    description: 'Partition column: Month extracted from revision timestamp for data lake partitioning optimization (INTEGER, Partition Key).'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.month
+  day:
+    description: 'Partition column: Day extracted from revision timestamp for data lake partitioning optimization (INTEGER, Partition Key).'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail_aud.day

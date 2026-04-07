@@ -1,0 +1,169 @@
+---
+database_name: datalake_gsheets_clean
+table_name: 3p_partners_performance_targets
+domain: Broker XP
+owner: vitor.musachio@quintoandar.com.br
+description: This table contains the performance targets for the 3P Partners Operations team.
+columns:
+  broker:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.broker
+    description: The broker related to the target. In some cases won't be specified because the target is related to a go to market operation. Is analogous to the hubspot_company_tag in the table dw_public.dim_company_3p_partners.
+  company_cluster:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.company_cluster
+    description: This column is related to the company_cluster present in dw_public.dim_company_3p_partners. it corresponds to the clusterization of brokers in the marketplace operations.
+  account_manager:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.account_manager
+    description: This column defines the comercial responsible related to the target.
+  ops_squad:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.ops_squad
+    description: The designated marketplace ops analyst to the broker.
+  sale_secretariat:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.secretaria_vendas
+    description: The designated marketplace SV analyst to the broker.
+  expert:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.expert
+    description: The designated marketplace SV expert to the broker.
+  commercial_division:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.commercial_division
+    description: This is a categorical field that defines which commercial team is realted to this target.
+  business_model:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.business_model
+    description: "The type of Marketplace operation targeted. Ex: Supply, Demand, Clientes QA"
+  visit_booked:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.visit_booked
+    description: The number of booked visits targeted. It can be a float, since it's based on the day over day variations in For Sale's target. It is used mainly for month to date comparisons. This float explanation is applicable to all the following columns.
+  visit_confirmed:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.visit_confirmed
+    description: The number of completed visits targeted.
+  offer_sent:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.offer_sent
+    description: The number of sent offers targeted.
+  offer_accepted:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.offer_accepted
+    description: The number of accepted offers targeted.
+  contract_signed_total:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.contract_signed_total
+    description: The number of signed contracts targeted.
+  contract_signed_high_ticket:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.contract_signed_high_ticket
+    description: The number of signed high ticket contracts targeted.
+  ongoing_listing:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.ongoing_listing
+    description: The number of expected ongoing listings.
+  first_listing_total:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.first_listing_total
+    description: The number of expected publishings.
+  first_listing_first_batch:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.first_listing_first_batch
+    description: The number of expected published listings that came from the first 30 days of leads being sent by the broker.
+  first_listing_recurrent:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.first_listing_recurrent
+    description: The number of expected published listings that came after the first 30 days of leads being sent by the broker.
+  first_listing_high_ticket:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.first_listing_high_ticket
+    description: The number of expected publishings of high ticket houses.
+  leads_total:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.leads_total
+    description: The total number of leads targeted.
+  leads_first_batch:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.leads_first_batch
+    description: The number of expected leads that came from the first 30 days of leads being sent by the broker.
+  leads_recurrent:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.leads_recurrent
+    description: The number of expected leads that came after the first 30 days of leads being sent by the broker.
+  leads_high_ticket:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.leads_high_ticket
+    description: The number of expected high ticket leads targeted.
+  input_metric_1_name:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_1_name
+    description: The name of the first custom input metric defined for this target.
+  input_metric_1_value:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_1_value
+    description: The value of the first custom input metric defined for this target.
+  input_metric_2_name:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_2_name
+    description: The name of the second custom input metric defined for this target.
+  input_metric_2_value:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_2_value
+    description: The value of the second custom input metric defined for this target.
+  input_metric_3_name:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_3_name
+    description: The name of the third custom input metric defined for this target.
+  input_metric_3_value:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_3_value
+    description: The value of the third custom input metric defined for this target.
+  input_metric_4_name:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_4_name
+    description: The name of the fourth custom input metric defined for this target.
+  input_metric_4_value:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_4_value
+    description: The value of the fourth custom input metric defined for this target.
+  input_metric_5_name:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_5_name
+    description: The name of the fifth custom input metric defined for this target.
+  input_metric_5_value:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.input_metric_5_value
+    description: The value of the fifth custom input metric defined for this target.
+  bps_totais:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.bps_totais
+    description: The total number of BPs (Buyer Prospects) targeted.
+  nbp_unicos:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.nbp_unicos
+    description: The number of unique nBPs (New Buyer Prospects) targeted.
+  rbp_unicos:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.rbp_unicos
+    description: The number of unique rBPs (Recovered Buyer Prospects) targeted.
+  visita_avulsa_unicos:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.visita_avulsa_unicos
+    description: The number of unique single visits targeted.
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this event is subject to 3P Partners access control policies.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
+  dt_month:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.month
+    description: The corresponding month written in the yyyy-mm-dd format.
+  dt_day:
+    lineage:
+      - datalake_gsheets_raw.3p_partners_performance_targets.day
+    description: The corresponding day written in the yyyy-mm-dd format.
+  ts_load:
+    description: Date when the table data was updated.

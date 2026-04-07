@@ -1,0 +1,127 @@
+database_name: dw_brokers
+table_name: dim_broker_products
+description: |
+  Data warehouse dimension for broker products (Rede Sale, Rede Rent, etc.) from core_brokers.brokers_product,
+  including fee attributes and banking fields used for settlements.
+domain: Broker XP
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_broker_product:
+    lineage:
+      - core_brokers.brokers_product.sk_broker_product
+    description: Surrogate key of the broker product row; primary key of this dimension.
+  sk_broker:
+    lineage:
+      - core_brokers.brokers_product.sk_broker
+    description: Surrogate key of the parent broker.
+  product_name:
+    lineage:
+      - core_brokers.brokers_product.product_name
+    description: Product name label from core brokers product (e.g. Rede Sale, Rede Rent).
+  business_segment:
+    lineage:
+      - core_brokers.brokers_product.business_segment
+    description: Business segment classification from core brokers product.
+  product_status:
+    lineage:
+      - core_brokers.brokers_product.product_status
+    description: Status of the product enrollment from core brokers.
+  business_context:
+    lineage:
+      - core_brokers.brokers_product.business_context
+    description: |
+      Business context of the broker product from core brokers_product (e.g. SALE, RENT).
+  integrator_partner:
+    lineage:
+      - core_brokers.brokers_product.integrator_partner
+    description: Integrator partner name from core brokers product.
+  integrator_partner_status:
+    lineage:
+      - core_brokers.brokers_product.integrator_partner_status
+    description: Status of the integrator partner relationship from core brokers product.
+  commission:
+    lineage:
+      - core_brokers.brokers_product.commission
+    description: Commission rate from core brokers product, rounded to five decimals.
+  demand_fee:
+    lineage:
+      - core_brokers.brokers_product.demand_fee
+    description: Demand fee from core brokers product, rounded to five decimals.
+  supply_fee:
+    lineage:
+      - core_brokers.brokers_product.supply_fee
+    description: Supply fee from core brokers product, rounded to five decimals.
+  platform_fee:
+    lineage:
+      - core_brokers.brokers_product.platform_fee
+    description: Platform fee from core brokers product, rounded to five decimals.
+  bank:
+    lineage:
+      - core_brokers.brokers_product.bank
+    description: Bank name for payout account from core brokers product.
+  agency_number:
+    lineage:
+      - core_brokers.brokers_product.agency_number
+    description: Bank agency number for payout account from core brokers product.
+  account_number:
+    lineage:
+      - core_brokers.brokers_product.account_number
+    description: Bank account number for payout from core brokers product.
+  account_type:
+    lineage:
+      - core_brokers.brokers_product.account_type
+    description: Bank account type from core brokers product.
+  tier_name:
+    lineage:
+      - core_brokers.brokers_product.tier_name
+    description: Tier name for the broker product from core brokers.
+  is_3p_rent_broker:
+    lineage:
+      - core_brokers.brokers_product.is_3p_rent_broker
+    description: Flag indicating 3P rent broker for this product from core brokers.
+  is_3p_sale_broker:
+    lineage:
+      - core_brokers.brokers_product.is_3p_sale_broker
+    description: Flag indicating 3P sale broker for this product from core brokers.
+  is_3p_active_broker:
+    lineage:
+      - core_brokers.brokers_product.is_3p_active_broker
+    description: Flag indicating active 3P broker for this product from core brokers.
+  is_3p_active_rent_broker:
+    lineage:
+      - core_brokers.brokers_product.is_3p_active_rent_broker
+    description: Flag indicating active 3P rent broker for this product from core brokers.
+  is_3p_active_sale_broker:
+    lineage:
+      - core_brokers.brokers_product.is_3p_active_sale_broker
+    description: Flag indicating active 3P sale broker for this product from core brokers.
+  has_opt_in_navent:
+    lineage:
+      - core_brokers.brokers_product.has_opt_in_navent
+    description: Navent opt-in indicator from core brokers product.
+  has_3p_access_control:
+    description: |
+      Boolean flag indicating that this row is subject to 3P Partners access control policies;
+      always true in this table.
+  ts_product_created:
+    lineage:
+      - core_brokers.brokers_product.ts_created
+    description: Timestamp when the product row was created in core brokers.
+  ts_product_updated:
+    lineage:
+      - core_brokers.brokers_product.ts_updated
+    description: Timestamp when the product row was last updated in core brokers.
+  ts_load:
+    description: Timestamp when this DW row was loaded by the ETL process.
+  year:
+    lineage:
+      - core_brokers.brokers_product.ts_updated
+    description: Partition year from product last update timestamp.
+  month:
+    lineage:
+      - core_brokers.brokers_product.ts_updated
+    description: Partition month from product last update timestamp.
+  day:
+    lineage:
+      - core_brokers.brokers_product.ts_updated
+    description: Partition day from product last update timestamp.

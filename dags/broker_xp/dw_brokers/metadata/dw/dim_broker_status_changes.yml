@@ -1,0 +1,59 @@
+database_name: dw_brokers
+table_name: dim_broker_status_changes
+description: |
+  Data warehouse dimension of broker product status periods sourced from datalake_brokers.broker_status_history,
+  with business_context derived from product_name and is_current_cohort mirroring the enrich is_current flag.
+domain: Broker XP
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_status_change:
+    lineage:
+      - datalake_brokers.broker_status_history.id_status_change
+    description: |
+      Unique identifier of the status period, matching id_status_change from broker status history enrich.
+  sk_broker:
+    lineage:
+      - datalake_brokers.broker_status_history.sk_broker
+    description: Surrogate key of the broker for this status period.
+  broker_status:
+    lineage:
+      - datalake_brokers.broker_status_history.broker_status
+    description: Status value during the period (e.g. ACTIVE, INACTIVE) from enrich history.
+  business_context:
+    lineage:
+      - datalake_brokers.broker_status_history.product_name
+    description: SALE or RENT derived from product_name when Rede Sale or Rede Rent; otherwise null.
+  status_origin:
+    lineage:
+      - datalake_brokers.broker_status_history.status_origin
+    description: Source system of the status row (Hubspot or Company) from enrich history.
+  is_current_cohort:
+    lineage:
+      - datalake_brokers.broker_status_history.is_current
+    description: True when this period is the current status for the broker product in enrich history.
+  has_3p_access_control:
+    lineage:
+      - datalake_brokers.broker_status_history.has_3p_access_control
+    description: Access control flag propagated from enrich broker_status_history.
+  ts_start:
+    lineage:
+      - datalake_brokers.broker_status_history.ts_start
+    description: Start timestamp of the status period from enrich history.
+  ts_end:
+    lineage:
+      - datalake_brokers.broker_status_history.ts_end
+    description: End timestamp of the status period; null when current from enrich history.
+  ts_load:
+    description: Timestamp when this DW row was loaded by the ETL process.
+  year:
+    lineage:
+      - datalake_brokers.broker_status_history.ts_start
+    description: Partition year from status period start.
+  month:
+    lineage:
+      - datalake_brokers.broker_status_history.ts_start
+    description: Partition month from status period start.
+  day:
+    lineage:
+      - datalake_brokers.broker_status_history.ts_start
+    description: Partition day from status period start.

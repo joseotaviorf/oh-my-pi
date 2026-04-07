@@ -1,0 +1,51 @@
+---
+database_name: datalake_rede_platform_clean
+table_name: broker_deaccreditation_process
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: This table manages broker deaccreditation processes. When a brokerage is deaccredited, several steps need to be executed (listing transfers, lead updates, etc.).
+columns:
+  id:
+    description: The unique identifier for the broker deaccreditation process (PK).
+    lineage:
+      - datalake_rede_platform_raw.broker_deaccreditation_process.id
+  uuid_process:
+    description: The unique UUID of the deaccreditation process.
+    lineage:
+      - datalake_rede_platform_raw.broker_deaccreditation_process.process_uuid
+  uuid_company:
+    description: The UUID of the company being deaccredited.
+    lineage:
+      - datalake_rede_platform_raw.broker_deaccreditation_process.company_uuid
+  uuid_product:
+    description: The UUID of the related product.
+    lineage:
+      - datalake_rede_platform_raw.broker_deaccreditation_process.product_uuid
+  status:
+    description: The current status of the process. Possible values are IN_PROGRESS (async phase where workers are processing messages between domains), COMPLETED (all expected operations finished successfully), COMPLETED_WITH_PENDING (most operations completed but some items failed), FAILED (critical failure that prevented process completion).
+    lineage:
+      - datalake_rede_platform_raw.broker_deaccreditation_process.status
+  ts_created:
+    description: The timestamp when the process was created.
+    lineage:
+      - datalake_rede_platform_raw.broker_deaccreditation_process.created_at
+  ts_updated:
+    description: The timestamp of the last update to the process.
+    lineage:
+      - datalake_rede_platform_raw.broker_deaccreditation_process.updated_at
+  ts_completed:
+    description: The timestamp when the process was completed. Null if not yet completed.
+    lineage:
+      - datalake_rede_platform_raw.broker_deaccreditation_process.completed_at
+  year:
+    description: The year partition of the record.
+    lineage:
+      - datalake_rede_platform_raw.broker_deaccreditation_process.year
+  month:
+    description: The month partition of the record.
+    lineage:
+      - datalake_rede_platform_raw.broker_deaccreditation_process.month
+  day:
+    description: The day partition of the record.
+    lineage:
+      - datalake_rede_platform_raw.broker_deaccreditation_process.day

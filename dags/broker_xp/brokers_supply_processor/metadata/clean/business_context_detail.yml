@@ -1,0 +1,141 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: business_context_detail
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: >
+  Tracks business context and processing status for each 3P lead across different real estate contexts (SALE vs RENT).
+  Each lead can have multiple business context details - one for each applicable business context. This table serves as 
+  the main tracking mechanism for lead eligibility assessment, quality filtering, and publishing decisions. 
+  The status field indicates where each lead stands in the processing pipeline, while status_reason provides 
+  detailed explanations for rejection or approval decisions.
+
+  BUSINESS CONTEXT: This table is central to the 3P lead processing workflow. It enables QuintoAndar to evaluate the same property 
+  for both sale and rental contexts independently, applying different eligibility rules and quality thresholds. 
+  The incremental nature means analysts should use the most recent record per day for current state analysis.
+
+  WORKFLOW STAGES: Lead progression: RECEIVED → (filters applied) → APPROVED/REJECTED/CONVERTED. 
+  Status reasons track specific filter failures or quality issues that prevent progression.
+
+  TABLE CHARACTERISTICS: Incremental load with daily snapshots - use most recent record per day for current state. 
+  Type 1 SCD - overwrites previous values, use audit table for full history.
+
+  RELATED TABLES: lead_3p (many-to-one relationship - multiple contexts per lead), file (many-to-one relationship - multiple contexts per import file), 
+  business_context_detail_aud (full audit trail of all changes).
+
+  KEY METRICS: Conversion rate by business context (CONVERTED status), Rejection reasons analysis (status_reason aggregation), 
+  Processing time (ts_updated - ts_created), Partner quality score by approval rates, Business context preference patterns.
+
+  QUALITY INDICATORS: High rejection rates may indicate partner data quality issues, Long processing times may indicate filter performance problems, 
+  Status reason patterns reveal optimization opportunities.
+
+  USE CASES: Lead processing funnel analysis and conversion optimization, Partner data quality assessment and feedback, 
+  Business rule effectiveness measurement, Processing SLA monitoring and bottleneck identification, 
+  Market analysis by business context preferences, Filter rule impact analysis and optimization.
+columns:
+  id:
+    description: >
+      Unique auto-incrementing identifier for each business context detail record (BIGINT, Primary Key, Not Nullable).
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.id
+  id_listing:
+    description: >
+      Legacy field referencing listing table - typically NULL in current implementation (BIGINT, Nullable, DEPRECATED).
+      Originally intended to link to legacy listing records before current lead3p structure.
+      Replaced by id_lead in current architecture.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.listing_id
+  id_file:
+    description: >
+      Foreign key reference to the file table, indicating which bulk import batch this 
+      business context record belongs to (BIGINT, Not Nullable, Foreign Key: file.id). Used for tracking lead sources and import performance.
+      Critical for partner file processing audit and batch performance tracking.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.file_id
+  id_partner:
+    description: >
+      Identifier of the external partner/real estate agency that submitted the lead (STRING, Not Nullable).
+      Must match the partner_id from the associated file import.
+      Key dimension for partner performance analysis and relationship management.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.partner_id
+  id_lead:
+    description: >
+      Foreign key to the 3P lead record (BIGINT, Nullable). Links this business context row to lead_3p.id.
+      Primary relationship for joining processing status to lead payload; replaces legacy id_listing for current architecture.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.lead_id
+  business_context:
+    description: >
+      The real estate business context being evaluated for this lead (STRING, Not Nullable). Determines which 
+      eligibility rules and quality filters are applied during processing.
+      SALE: Property is being evaluated for sale on QuintoAndar platform. Applies sale-specific pricing, legal, and market validation rules.
+      RENT: Property is being evaluated for rental on QuintoAndar platform. Applies rental-specific eligibility criteria and tenant protection rules.
+      Single leads can have multiple contexts evaluated simultaneously. Each context may have different approval outcomes.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.business_context
+  status:
+    description: >
+      Current processing status of the lead within this business context (STRING, Nullable). 
+      Indicates the outcome of eligibility filtering and quality assessment.
+      RECEIVED: Lead has been imported and is queued for processing.
+      IN_ANALYSIS: Lead is currently being evaluated against eligibility rules.
+      APPROVED: Lead passed all filters and is eligible for publication.
+      REJECTED: Lead failed eligibility or quality filters and will not be published.
+      CONVERTED: Lead has been successfully sent to main QuintoAndar system.
+      SUSPENDED: Lead processing temporarily halted due to external factors.
+      DUPLICATE: Lead identified as duplicate and removed from processing.
+      Status progression indicates funnel conversion. CONVERTED status is the ultimate success metric.
+      Rejected leads should be analyzed via status_reason for filter optimization.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.status
+  status_reason:
+    description: >
+      JSON object containing detailed reasoning for the current status, especially for rejections (JSON, Nullable).
+      Keys represent specific filter or quality checks, values are typically boolean flags 
+      indicating pass/fail for each criterion.
+      Example: {"price_too_high": true, "incomplete_address": false, "missing_photos": true, 
+      "invalid_contact": false, "duplicate_property": false, "poor_image_quality": true}
+      Critical for understanding rejection patterns and optimizing partner data quality.
+      Used for feedback to partners and filter rule improvements.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.status_reason
+  version:
+    description: >
+      Version number tracking updates to this business context detail record (BIGINT, Nullable).
+      Increments with each modification to support change tracking and audit.
+      Used for optimistic locking and change conflict resolution.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.version
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this event is subject to 3P Partners access control policies (BOOLEAN, Not Nullable, Always TRUE).
+      Static field used for access control and data governance within the 3P Partners domain.
+      All events in this table are related to 3P Partners operations and require appropriate access permissions.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
+  ts_created:
+    description: >
+      Timestamp when this business context detail record was first created (TIMESTAMP, Not Nullable).
+      Represents when the lead entered evaluation for this specific business context.
+      Used for processing SLA tracking and performance monitoring.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.created_at
+  ts_updated:
+    description: >
+      Timestamp when this record was last modified (TIMESTAMP, Not Nullable). Updates automatically when 
+      status changes or status_reason is updated during processing.
+      Critical for understanding processing time and bottleneck identification.
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.updated_at
+  year:
+    description: 'Partition column: Year extracted from ts_created for data lake partitioning optimization (INTEGER, Partition Key).'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.year
+  month:
+    description: 'Partition column: Month extracted from ts_created for data lake partitioning optimization (INTEGER, Partition Key).'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.month
+  day:
+    description: 'Partition column: Day extracted from ts_created for data lake partitioning optimization (INTEGER, Partition Key).'
+    lineage:
+      - datalake_brokers_supply_processor_raw.business_context_detail.day

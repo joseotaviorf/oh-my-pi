@@ -1,0 +1,388 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: lead_3p_aud
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: >
+  Complete audit trail for all changes made to the lead_3p table, automatically maintained by Hibernate Envers.
+  This table captures every create, update, and delete operation on 3P property leads, providing comprehensive
+  change history for compliance, debugging, and data lineage analysis.
+
+  AUDIT FUNCTIONALITY: Every modification to a lead record creates a new audit entry with complete before/after
+  state information. The table maintains full data snapshots at each revision point, enabling point-in-time
+  reconstruction of any lead's historical state.
+
+  BUSINESS CONTEXT: Critical for 3P Partners operations requiring audit trails for:
+  - Regulatory compliance and data governance requirements
+  - Partner relationship management and dispute resolution  
+  - Lead processing troubleshooting and root cause analysis
+  - Data quality monitoring and improvement initiatives
+  - Performance analysis of processing pipeline changes
+
+  REVISION SYSTEM: Uses Hibernate Envers with revision numbers (rev) that increment globally across all audited tables.
+  Each revision represents a transaction boundary, allowing correlation of related changes across multiple tables.
+  rev_type indicates operation: 0=INSERT, 1=UPDATE, 2=DELETE. rev_end marks when a revision was superseded.
+
+  MODIFICATION FLAGS: Boolean fields with "mod_" prefix indicate which specific fields changed in each revision.
+  These enable efficient analysis of what properties were modified without comparing full JSON structures.
+
+  RELATED TABLES: Links to rev_info table for revision metadata and timestamps. Corresponds to lead_3p main table.
+  Coordinate with business_context_detail_aud for complete lead processing history.
+
+  KEY ANALYSIS PATTERNS: Lead lifecycle analysis, Property data evolution tracking, Partner data quality trends,
+  Processing pipeline impact assessment, Compliance auditing and reporting.
+
+  USE CASES: Historical lead state reconstruction, Change impact analysis, Data quality forensics,
+  Partner performance tracking, Regulatory compliance reporting, System troubleshooting and debugging.
+
+  QUERY CONSIDERATIONS: High volume table - use revision ranges and modification flags for efficient filtering.
+  Join with rev_info for human-readable timestamps. Consider partitioning by year/month for performance.
+columns:
+  id:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.id
+    description: >
+      Lead identifier from the main lead_3p table (BIGINT, Not Nullable).
+      Combined with rev forms composite primary key for audit table.
+      Links back to current lead state in main table.
+  id_partner:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.partner_id
+    description: >
+      Partner identifier at the time of this revision (STRING, Nullable).
+      Tracks which partner owned/managed the lead when this change occurred.
+      Historical value may differ from current partner assignment.
+  id_file:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.file_id
+    description: >
+      File identifier linking to import batch at time of this revision (BIGINT, Nullable).
+      Shows which file import was associated with this lead state.
+      Critical for tracking lead provenance and batch processing history.
+  id_listing:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.listing_id
+    description: >
+      Legacy listing identifier - typically NULL (BIGINT, Nullable, DEPRECATED).
+      Maintained for historical compatibility with older data model.
+  id_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.lead_id
+    description: >
+      Internal lead identifier used in legacy systems (BIGINT, Nullable, DEPRECATED).
+      Preserved for historical data integrity and migration tracking.
+  uuid_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.lead_uuid
+    description: >
+      Lead UUID at time of this revision (STRING, Nullable).
+      Enables tracking of UUID changes over time and cross-system correlation.
+      UUID typically stable but may change during data migrations.
+  id_real_estate:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.real_estate_id
+    description: >
+      Legacy real estate identifier - always NULL (BIGINT, Nullable, DEPRECATED).
+      Maintained for schema compatibility with historical audit records.
+  id_by_real_estate:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.id_by_real_estate
+    description: >
+      Partner's external identifier for the property at time of revision (STRING, Nullable).
+      Shows how partner identified this property in their system when change occurred.
+      May track partner system changes or corrections over time.
+  status:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.status
+    description: >
+      Lead status at time of this revision (STRING, Nullable, DEPRECATED).
+      Historical field - current status tracking moved to business_context_detail table.
+      Preserved for legacy audit trail analysis.
+  brokers:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.brokers
+    description: >
+      Broker information JSON structure at time of revision (JSON, Nullable).
+      Captures historical broker assignments, contact changes, and licensing updates.
+      Critical for tracking broker relationship evolution and contact information changes.
+  location:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.location
+    description: >
+      Property location data at time of revision (JSON, Nullable).
+      Tracks address corrections, coordinate updates, and geographic data enrichment.
+      Essential for analyzing location data quality improvements over time.
+  pricing:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.pricing
+    description: >
+      Pricing information structure at time of revision (JSON, Nullable).
+      Captures rent/sale price changes, fee adjustments, and market corrections.
+      Valuable for pricing trend analysis and market intelligence.
+  owner:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.owner
+    description: >
+      Property owner information at time of revision (JSON, Nullable).
+      Tracks owner contact updates, preference changes, and ownership transfers.
+      Important for communication history and relationship management.
+  blueprint:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.blueprint
+    description: >
+      Property layout and structural data at time of revision (JSON, Nullable).
+      Captures property feature updates, measurement corrections, and structural changes.
+      Useful for tracking property information accuracy improvements.
+  details:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.details
+    description: >
+      Detailed property characteristics at time of revision (JSON, Nullable).
+      Tracks amenity updates, feature additions, and property description improvements.
+      Essential for analyzing data enrichment processes and quality evolution.
+  access:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.access
+    description: >
+      Property access information at time of revision (JSON, Nullable).
+      Captures visiting arrangement changes, availability updates, and access instruction modifications.
+      Important for tracking operational process changes.
+  administrators:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.administrators
+    description: >
+      Property administrator information at time of revision (JSON, Nullable, DEPRECATED).
+      Legacy field maintained for historical audit completeness.
+  photos:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.photos
+    description: >
+      Property photos array at time of revision (JSON, Nullable).
+      Tracks photo additions, updates, quality improvements, and removals.
+      Critical for analyzing content quality evolution and visual data management.
+  lead_hash:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.lead_hash
+    description: >
+      Lead deduplication hash at time of revision (STRING, Nullable).
+      Tracks hash changes due to property data updates affecting deduplication logic.
+      Essential for analyzing duplicate detection algorithm effectiveness.
+  status_reason:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.status_reason
+    description: >
+      Status reasoning information at time of revision (JSON, Nullable, DEPRECATED).
+      Historical field - detailed status tracking moved to business_context_detail.
+      Maintained for legacy audit analysis and data migration validation.
+  cnpj:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.cnpj
+    description: >
+      Partner CNPJ (Brazilian tax ID) at time of revision (STRING, Nullable).
+      Tracks partner company changes, corrections, and data standardization.
+      Important for partner relationship audit and compliance reporting.
+  version:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.version
+    description: >
+      Record version number at time of revision (BIGINT, Nullable).
+      Application-level versioning separate from audit revision system.
+      Used for optimistic locking and conflict resolution tracking.
+  is_sent_to_main:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.sent_to_main
+    description: >
+      Main system integration flag at time of revision (BOOLEAN, Nullable).
+      Tracks when leads were successfully passed to QuintoAndar's main platform.
+      Critical for conversion funnel analysis and integration success tracking.
+  rev:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.rev
+    description: >
+      Hibernate Envers revision number (BIGINT, Not Nullable, Primary Key).
+      Global sequence number identifying the transaction that created this audit record.
+      Links to rev_info table for revision metadata and timestamp information.
+  rev_end:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.revend
+    description: >
+      Revision number when this record was superseded (BIGINT, Nullable).
+      NULL for current/active revisions. Points to next revision that replaced this state.
+      Enables efficient querying of record states within specific time ranges.
+  rev_type:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.revtype
+    description: >
+      Type of operation that created this audit record (SMALLINT, Not Nullable).
+      0 = INSERT (record creation), 1 = UPDATE (record modification), 2 = DELETE (record removal).
+      Essential for understanding the nature of each change and filtering by operation type.
+  mod_id_partner:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.partner_id_mod
+    description: >
+      Modification flag indicating if partner ID changed in this revision (BOOLEAN, Nullable).
+      TRUE when partner assignment was modified, FALSE when unchanged.
+      Enables efficient filtering for partner relationship changes.
+  mod_id_file:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.file_id_mod
+    description: >
+      Modification flag for file ID field (BOOLEAN, Nullable).
+      TRUE when file association changed, typically during data corrections or re-imports.
+  mod_id_listing:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.listing_id_mod
+    description: >
+      Modification flag for legacy listing ID field (BOOLEAN, Nullable, DEPRECATED).
+      Maintained for historical audit completeness.
+  mod_id_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.lead_id_mod
+    description: >
+      Modification flag for legacy lead ID field (BOOLEAN, Nullable, DEPRECATED).
+      Tracks changes to internal lead identifiers during system migrations.
+  mod_uuid_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.lead_uuid_mod
+    description: >
+      Modification flag for lead UUID field (BOOLEAN, Nullable).
+      TRUE when UUID was changed, typically during data migrations or corrections.
+  mod_id_real_estate:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.real_estate_id_mod
+    description: >
+      Modification flag for legacy real estate ID (BOOLEAN, Nullable, DEPRECATED).
+      Maintained for schema compatibility with historical audit records.
+  mod_id_by_real_estate:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.id_by_real_estate_mod
+    description: >
+      Modification flag for partner's external property ID (BOOLEAN, Nullable).
+      TRUE when partner corrected or updated their internal property identifier.
+  mod_status:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.status_mod
+    description: >
+      Modification flag for legacy status field (BOOLEAN, Nullable, DEPRECATED).
+      Historical tracking for status changes before business_context_detail implementation.
+  mod_brokers:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.brokers_mod
+    description: >
+      Modification flag for broker information JSON (BOOLEAN, Nullable).
+      TRUE when broker assignments, contacts, or licensing information changed.
+      Critical for tracking broker relationship evolution.
+  mod_location:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.location_mod
+    description: >
+      Modification flag for location data JSON (BOOLEAN, Nullable).
+      TRUE when address, coordinates, or geographic information was updated.
+      Important for location data quality analysis.
+  mod_pricing:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.pricing_mod
+    description: >
+      Modification flag for pricing information JSON (BOOLEAN, Nullable).
+      TRUE when rent/sale prices, fees, or costs were modified.
+      Essential for pricing trend analysis and market intelligence.
+  mod_owner:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.owner_mod
+    description: >
+      Modification flag for owner information JSON (BOOLEAN, Nullable).
+      TRUE when owner contact details, preferences, or status changed.
+      Important for communication and relationship management tracking.
+  mod_blueprint:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.blueprint_mod
+    description: >
+      Modification flag for property blueprint JSON (BOOLEAN, Nullable).
+      TRUE when structural information, measurements, or layout details changed.
+      Useful for tracking property information accuracy improvements.
+  mod_details:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.details_mod
+    description: >
+      Modification flag for property details JSON (BOOLEAN, Nullable).
+      TRUE when amenities, features, or characteristics were updated.
+      Critical for data enrichment and quality improvement analysis.
+  mod_access:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.access_mod
+    description: >
+      Modification flag for access information JSON (BOOLEAN, Nullable).
+      TRUE when visiting arrangements or availability information changed.
+      Important for operational process tracking.
+  mod_administrators:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.administrators_mod
+    description: >
+      Modification flag for legacy administrators field (BOOLEAN, Nullable, DEPRECATED).
+      Maintained for historical audit completeness.
+  mod_photos:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.photos_mod
+    description: >
+      Modification flag for photos array JSON (BOOLEAN, Nullable).
+      TRUE when property photos were added, updated, or removed.
+      Essential for visual content management and quality tracking.
+  mod_lead_hash:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.lead_hash_mod
+    description: >
+      Modification flag for deduplication hash (BOOLEAN, Nullable).
+      TRUE when hash changed due to property data updates affecting deduplication.
+      Important for duplicate detection algorithm analysis.
+  mod_status_reason:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.status_reason_mod
+    description: >
+      Modification flag for legacy status reason field (BOOLEAN, Nullable, DEPRECATED).
+      Historical tracking maintained for audit completeness.
+  mod_cnpj:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.cnpj_mod
+    description: >
+      Modification flag for partner CNPJ field (BOOLEAN, Nullable).
+      TRUE when partner tax identification was corrected or updated.
+      Important for partner data quality and compliance tracking.
+  mod_is_sent_to_main:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.sent_to_main_mod
+    description: >
+      Modification flag for main system integration status (BOOLEAN, Nullable).
+      TRUE when integration status changed, marking lead processing milestones.
+      Critical for conversion tracking and system integration analysis.
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this event is subject to 3P Partners access control policies (BOOLEAN, Not Nullable, Always TRUE).
+      Static field used for access control and data governance within the 3P Partners domain.
+      All events in this table are related to 3P Partners operations and require appropriate access permissions.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.created_at
+    description: >
+      Original creation timestamp from the main table (TIMESTAMP, Nullable).
+      Shows when the lead was initially created, preserved in audit for reference.
+      Different from revision timestamp which shows when audit record was created.
+  ts_updated:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.updated_at
+    description: >
+      Last update timestamp from main table at time of revision (TIMESTAMP, Nullable).
+      Tracks when the lead was last modified in the main table before this audit entry.
+      Use rev_info timestamps for actual audit record creation times.
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.year
+    description: 'Partition column: Year extracted from revision timestamp for data lake partitioning optimization (INTEGER, Partition Key).'
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.month
+    description: 'Partition column: Month extracted from revision timestamp for data lake partitioning optimization (INTEGER, Partition Key).'
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead3p_aud.day
+    description: 'Partition column: Day extracted from revision timestamp for data lake partitioning optimization (INTEGER, Partition Key).'

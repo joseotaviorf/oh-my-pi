@@ -1,0 +1,59 @@
+dag:
+  name: brokers_supply_processor
+  schedule_start_date: 2021, 8, 10
+  schedule_interval: 0 0 * * *
+  owner: Data Broker XP
+  documentation:
+    dag_purpose: >
+      Imports tables from brokers-supply-processor service, QuintoAndar's platform for processing 
+      third-party (3P) real estate leads from external partner agencies. Supports QuintoAndar's 
+      expansion into a partnership ecosystem by processing, filtering, and qualifying partner-submitted 
+      property leads for both SALE and RENT contexts.
+      
+      KEY TABLES: lead_3p (core property lead data), business_context_detail (lead status tracking), 
+      lead_in_flight (concurrency control for duplicate lead processing),
+      file (bulk import management) and audit tables (*_aud) for 
+      complete change history and compliance.
+      
+      PIPELINE: Daily CDC from PostgreSQL with 24-hour latency. Handles medium to high volume data 
+      depending on partner activity. Includes comprehensive audit trail for compliance and troubleshooting.
+      
+      USE CASES: Partner performance analysis, lead conversion funnel optimization, market intelligence, 
+      operational monitoring, and data quality management across the 3P Partners ecosystem.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  custom_schema: brokers_supply_processor
+  source_database: brokers_supply_processor
+  source_schema: public
+  default_partitions: [year, month, day]
+  dbutils_secret_key: BROKERS_SUPPLY_PROCESSOR_DB
+  tables_customization:
+    business_context_detail:
+      z_order_by: [id]
+    business_context_detail_aud:
+      raw_primary_keys: ["id", "rev"]
+    lead3p:
+      clean_table_name: lead_3p
+      z_order_by: [id]
+    lead3p_aud:
+      clean_table_name: lead_3p_aud
+      raw_primary_keys: ["id", "rev"]
+    lead_in_flight:
+      raw_primary_keys: ["lead_id"]
+    lead_update_operation_history:
+      z_order_by: [id]
+    revinfo:
+      clean_table_name: rev_info
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+cluster:
+  type: databricks_16_4_min_memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

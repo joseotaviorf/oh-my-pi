@@ -1,0 +1,51 @@
+database_name: datalake_brokers
+table_name: hubspot_brokers_history
+description: Enriched Hubspot company history with broker surrogate keys, mapping sale_lead_status to ACTIVE/INACTIVE broker status. Filters to companies that have been Rede Sale members.
+domain: Broker XP
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_broker:
+    lineage:
+      - core_brokers.brokers.sk_broker
+    description: Surrogate key identifying the broker.
+  id_hubspot_company:
+    lineage:
+      - datalake_hubspot.company_history.id_company
+    description: Identification of the company registered on HubSpot.
+  id_hubspot_owner:
+    lineage:
+      - datalake_hubspot.company_history.id_hubspot_owner
+    description: Identification of the HubSpot owner associated with the company.
+  cnpj:
+    lineage:
+      - datalake_hubspot.company_history.cnpj
+    description: CNPJ of the company.
+  broker_status:
+    lineage:
+      - datalake_hubspot.company_history.sale_lead_status
+    description: Broker status derived from HubSpot sale_lead_status. ACTIVE when sale_lead_status is 'Membro', INACTIVE otherwise.
+    categories:
+      ACTIVE: Broker with sale_lead_status equal to 'Membro'.
+      INACTIVE: Broker with sale_lead_status different from 'Membro'.
+  company_cluster:
+    lineage:
+      - datalake_hubspot.company_history.company_cluster
+    description: Classification assigned by the Operations team to the Rede partner company.
+  cluster_performance:
+    lineage:
+      - datalake_hubspot.company_history.cluster_performance
+    description: Performance classification of the company cluster.
+  broker_version:
+    description: Version of the broker record.
+  is_current:
+    description: True if the record is the current record for the broker, otherwise false.
+  has_3p_access_control:
+    description: >
+      Boolean flag indicating that this event is subject to 3P Partners access control policies.
+      Used by data governance tools and access control systems to apply 3P-specific security policies.
+  ts_updated:
+    lineage:
+      - datalake_hubspot.company_history.ts_updated
+    description: Timestamp of the company history record update on HubSpot.
+  ts_load:
+    description: Timestamp of when the record was loaded or last updated by the ETL process.

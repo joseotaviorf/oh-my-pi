@@ -1,0 +1,53 @@
+dag:
+  name: enrich_3p_supply
+  schedule_start_date: 2026, 3, 1
+  owner: Data Broker XP
+  documentation:
+    dag_purpose: |
+      Enrich layer for 3P Supply data from the Brokers Supply Processor service.
+      Produces denormalized and pre-computed tables to support DW Supply data model.
+
+      Tables:
+      - lead_3p: Flattened lead data with all JSON columns (location, pricing, blueprint,
+        owner, access, brokers, details, owner_agent) exploded into individual columns,
+        joined with house and business context detail (SALE/RENT).
+      - lead_3p_status_changes: Status change history per lead and business context,
+        with start/end timestamps, parsed status reasons, macro reason classification,
+        is_opportunity flag, and BSP-stage timestamps (ts_first_registered_from_bsp_to_main, etc.).
+      - listing_draft_status: House-to-listing mapping via EBDB with current main status,
+        availability start/end timestamps, first listing events, and portfolio manager publishing.
+      - broker_lead_relationship: Maps each lead flow to the most recent active broker
+        contract with partner-first-lead and post-contract-first-lead flags.
+workflow:
+  type: query_delta
+  layer: enrich
+  inner_dependencies:
+    listing_draft_status:
+      - lead_3p
+    broker_lead_relationship:
+      - lead_3p
+      - lead_3p_status_changes
+  tables_customization:
+    lead_3p:
+      merge_on: ["id_lead_3p"]
+      when_matched_update_condition: "source.ts_lead_updated > target.ts_lead_updated"
+      partitions: ["year", "month", "day"]
+      z_order_by: ["id_lead_3p"]
+    lead_3p_status_changes:
+      merge_on: ["id_lead_3p", "business_context", "ts_start"]
+      partitions: ["year", "month", "day"]
+      z_order_by: ["id_lead_3p"]
+    listing_draft_status:
+      merge_on: ["id_house", "business_context"]
+      z_order_by: ["id_house"]
+    broker_lead_relationship:
+      merge_on: ["sk_lead_3p_flow"]
+      z_order_by: ["sk_lead_3p_flow"]
+cluster:
+  type: databricks_16_4_min_memory_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: USER_ISOLATION
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
