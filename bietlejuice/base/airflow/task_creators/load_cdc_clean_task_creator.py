@@ -1,4 +1,7 @@
 import json
+
+from airflow.models.baseoperator import BaseOperator
+
 from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
 from bietlejuice.base.airflow.task_creators.load_task_creator import LoadTaskCreator
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
@@ -6,7 +9,6 @@ from bietlejuice.base.airflow.task_creators.dag_execution_context import (
 )
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.services.configuration_service import ConfigurationService
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 
 
 class LoadCDCCleanTaskCreator(LoadTaskCreator):
@@ -46,20 +48,28 @@ class LoadCDCCleanTaskCreator(LoadTaskCreator):
             clean_primary_keys,
             "--table-privileges",
             json.dumps(table_attributes.table_privileges),
-            "--row-filter-column-key",
-            table_attributes.row_filter_column_key,
-            "--row-filter-function-name",
-            table_attributes.row_filter_function_name,
         ]
+        if table_attributes.row_filter_column_key:
+            parameters.extend(
+                [
+                    "--row-filter-column-key",
+                    table_attributes.row_filter_column_key,
+                ]
+            )
+        if table_attributes.row_filter_function_name:
+            parameters.extend(
+                [
+                    "--row-filter-function-name",
+                    table_attributes.row_filter_function_name,
+                ]
+            )
 
         if table_attributes.has_soft_delete:
             parameters.append("--has-soft-delete")
 
         return parameters
 
-    def _create_base_load_task(
-        self, table_attributes: TableAttributes
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    def _create_base_load_task(self, table_attributes: TableAttributes) -> BaseOperator:
         task_id = self.generate_task_id(table_attributes)
         parameters = self._get_parameters(table_attributes)
 

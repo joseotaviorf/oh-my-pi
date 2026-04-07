@@ -5,9 +5,11 @@ Creates Airflow tasks that execute QUBE build_measure function as Spark jobs on 
 """
 
 import json
+
+from airflow.models.baseoperator import BaseOperator
+
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 
 
 class BuildQubeMeasureTaskCreator(BaseTaskCreator):
@@ -18,9 +20,7 @@ class BuildQubeMeasureTaskCreator(BaseTaskCreator):
     _TASK_ID_TEMPLATE = "build-qube-measure-{table_name}"
     SPARK_JOB_NAME = "measures/build_measure"
 
-    def create_task(
-        self, table_attributes: TableAttributes
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    def create_task(self, table_attributes: TableAttributes) -> BaseOperator:
         """
         Creates a task that runs a QUBE measure build job.
 
@@ -28,7 +28,7 @@ class BuildQubeMeasureTaskCreator(BaseTaskCreator):
             table_attributes: TableAttributes containing spec path and other parameters
 
         Returns:
-            QuintoAndarDatabricksCheckJobTaskOperator instance
+            Airflow operator for the measure build step (Databricks or EMR).
         """
         task_id = self.generate_task_id(table_attributes)
 

@@ -1,7 +1,9 @@
+import json
+
+from airflow.models.baseoperator import BaseOperator
+
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
-import json
 
 
 class GenerateDatabaseTableMetricsTaskCreator(BaseTaskCreator):
@@ -9,9 +11,7 @@ class GenerateDatabaseTableMetricsTaskCreator(BaseTaskCreator):
 
     SPARK_JOB_NAME = "generate_database_table_metrics"
 
-    def create_task(
-        self, table_attributes: TableAttributes
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    def create_task(self, table_attributes: TableAttributes) -> BaseOperator:
         task_id = "get-metrics"
         parameters = self._get_parameters(table_attributes)
 

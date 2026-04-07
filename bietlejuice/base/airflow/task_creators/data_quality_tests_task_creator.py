@@ -1,10 +1,11 @@
+from airflow.models.baseoperator import BaseOperator
+
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.dag_execution_context import (
     DagExecutionContext,
 )
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.services.configuration_service import ConfigurationService
-from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 
 
 class DataQualityTestsTaskCreator(BaseTaskCreator):
@@ -25,9 +26,7 @@ class DataQualityTestsTaskCreator(BaseTaskCreator):
         super().__init__(dag_execution_context)
         self.inmetro_bucket = config_service.get_config("inmetro_bucket")
 
-    def create_task(
-        self, table_attributes: TableAttributes
-    ) -> QuintoAndarDatabricksCheckJobTaskOperator:
+    def create_task(self, table_attributes: TableAttributes) -> BaseOperator:
         task_id = self.generate_task_id(table_attributes)
         parameters = self._get_parameters(table_attributes)
 
