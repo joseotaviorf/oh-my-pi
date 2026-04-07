@@ -1402,7 +1402,7 @@ bietlejuice.enrich_accounting_funnel:
   - bietlejuice.vans:load-clean-file:first-run-of-day
   - bietlejuice.vans:load-clean-payment-boleto:first-run-of-day
   - bietlejuice.vans:load-clean-payment:first-run-of-day
-  - bietlejuice.wall_street:load-clean-charge:first-run-of-day
+  - bietlejuice.wall_street_fast_lane:load-clean-charge:first-run-of-day
 bietlejuice.enrich_ada_crawls:
   - bietlejuice.ada_crawls:load-clean-internal-all:first-run-of-day
   - bietlejuice.ada_crawls:load-clean-issues:first-run-of-day
@@ -3049,7 +3049,7 @@ bietlejuice.enrich_nexxera:
   - bietlejuice.rental_guarantee_platform:load-clean-address:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-property-propose:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-propose:first-run-of-day
-  - bietlejuice.wall_street:load-clean-charge:first-run-of-day
+  - bietlejuice.wall_street_fast_lane:load-clean-charge:first-run-of-day
 bietlejuice.enrich_nps_answer_drivers:
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
@@ -3194,12 +3194,12 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.vans:load-clean-boleto:first-run-of-day
   - bietlejuice.vans:load-clean-file:first-run-of-day
   - bietlejuice.wall_street:load-clean-charge-aud:first-run-of-day
-  - bietlejuice.wall_street:load-clean-charge:first-run-of-day
   - bietlejuice.wall_street:load-clean-invoice-subscription-item:first-run-of-day
   - bietlejuice.wall_street:load-clean-invoice:first-run-of-day
   - bietlejuice.wall_street:load-clean-store:first-run-of-day
   - bietlejuice.wall_street:load-clean-subscription-item:first-run-of-day
   - bietlejuice.wall_street:load-clean-subscription:first-run-of-day
+  - bietlejuice.wall_street_fast_lane:load-clean-charge:first-run-of-day
 bietlejuice.enrich_people:
   - bietlejuice.pin_compensation:load-clean-salary-bases:first-run-of-day
   - bietlejuice.pin_core:load-clean-action-base:first-run-of-day

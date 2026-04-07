@@ -1,0 +1,26 @@
+dag:
+  name: wall_street_fast_lane
+  schedule_start_date: 2025, 1, 1
+  schedule_interval: 0,30 * * * *
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Fast lane DAG for Wall Street, running every 30 minutes.
+      It loads only the Charge table, which requires higher cadence than the main wall_street DAG.
+      Wall Street is a hub that integrates with financial service providers.
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: wall_street
+  database_type: mysql
+  source_database: wallstreet
+  source_schema: wallstreet
+  lineage_product_database_name: wallstreet
+  dbutils_secret_key: WALL_STREET_DB
+  tables_customization:
+    Charge:
+      clean_table_name: charge
+      primary_keys: ["id"]
+cluster:
+  type: databricks_16_4_rfleet_instance_cluster
+  databricks_conn_id: databricks_new

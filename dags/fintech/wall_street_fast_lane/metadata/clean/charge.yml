@@ -1,0 +1,143 @@
+database_name: datalake_wall_street_clean
+table_name: charge
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: >
+  Cleaned charge records from Wall Street, QuintoAndar's internal financial hub that integrates
+  with multiple payment acquirers and service providers (e.g., Cielo, Stone, Mundipagg).
+  Ingested via CDC from the MySQL wallstreet database. One row per charge. Primary key: id.
+  Tracks the full payment lifecycle — from charge creation through authorization, settlement,
+  refund, and chargeback — and links to subscriptions, invoices, stores, and customer entities.
+columns:
+  id:
+    lineage:
+      - datalake_wall_street_raw.charge.id
+    description: "Primary key. Unique identifier of the charge record in the Wall Street transactional database."
+  id_acquire:
+    lineage:
+      - datalake_wall_street_raw.charge.acquireId
+    description: "Foreign key referencing the acquire (payment processor or acquirer gateway) used to process this charge."
+  id_customer:
+    lineage:
+      - datalake_wall_street_raw.charge.customerId
+    description: "Foreign key identifying the customer who originated the charge within the Wall Street system."
+  id_store:
+    lineage:
+      - datalake_wall_street_raw.charge.store_id
+    description: "Foreign key referencing the store entity (business unit) associated with this charge."
+  id_external:
+    lineage:
+      - datalake_wall_street_raw.charge.externalId
+    description: "External identifier for the charge as provided by the payment acquirer or third-party system, used for cross-system reconciliation."
+  id_acquire_transaction:
+    lineage:
+      - datalake_wall_street_raw.charge.acquireTid
+    description: "Transaction ID assigned by the payment acquirer for this charge, used for settlement and dispute tracking."
+  id_business_entity:
+    lineage:
+      - datalake_wall_street_raw.charge.businessEntityId
+    description: "Foreign key referencing the business entity (company or legal entity) responsible for this charge on the QuintoAndar side."
+  id_finance_entity:
+    lineage:
+      - datalake_wall_street_raw.charge.financeEntityId
+    description: "Foreign key referencing the finance entity that manages the financial flow associated with this charge."
+  id_credit_card:
+    lineage:
+      - datalake_wall_street_raw.charge.creditCardId
+    description: "Foreign key referencing the credit card record used to process this charge. Null for non-card payment methods (e.g., PIX, boleto)."
+  acquire:
+    lineage:
+      - datalake_wall_street_raw.charge.acquire
+    description: "Name or code of the payment acquirer that processed this charge (e.g., Cielo, Stone, Mundipagg). Determines the processing rules and fee structure."
+  charge_status:
+    lineage:
+      - datalake_wall_street_raw.charge.chargeStatus
+    description: "Internal Wall Street status of the charge reflecting its current position in the payment lifecycle (e.g., PENDING, AUTHORIZED, PAID, FAILED, REFUNDED, CHARGEBACK)."
+  charge_history:
+    lineage:
+      - datalake_wall_street_raw.charge.chargeHistory
+    description: "Historical log of status transitions and events for this charge, stored as a JSON structure. Useful for auditing state changes over time."
+  code:
+    lineage:
+      - datalake_wall_street_raw.charge.code
+    description: "Internal product or charge type code within Wall Street, used to classify the nature of the payment (e.g., subscription, one-time fee)."
+  amount:
+    lineage:
+      - datalake_wall_street_raw.charge.amount
+    description: "Total monetary amount of the charge in BRL (Brazilian Reais) as defined at charge creation time. Does not account for refunds or fee deductions."
+  ts_paid:
+    lineage:
+      - datalake_wall_street_raw.charge.paidAt
+    description: "Timestamp (UTC) when the charge was confirmed as paid by the acquirer. Null when the charge is still pending or failed."
+  risk_entities:
+    lineage:
+      - datalake_wall_street_raw.charge.riskEntities
+    description: "JSON array containing risk assessment entities and scores associated with this charge, used for fraud prevention and underwriting decisions."
+  payer_name:
+    lineage:
+      - datalake_wall_street_raw.charge.payerName
+    description: "Full name of the payer responsible for this charge, as provided at payment time. Used for invoice and receipt generation."
+  payer_document_number:
+    lineage:
+      - datalake_wall_street_raw.charge.payerDocumentNumber
+    description: "CPF (individual) or CNPJ (company) document number of the payer, used for fiscal identification, NF-e issuance, and anti-fraud verification."
+  acquire_charge_status:
+    lineage:
+      - datalake_wall_street_raw.charge.acquireChargeStatus
+    description: "Charge status as returned directly by the payment acquirer's API, distinct from the internal Wall Street status. Preserves the acquirer's raw response for reconciliation."
+  installments:
+    lineage:
+      - datalake_wall_street_raw.charge.installments
+    description: "Number of installments configured for this charge. A value of 1 indicates a single full payment; values greater than 1 indicate an installment plan."
+  acquire_auth_code:
+    lineage:
+      - datalake_wall_street_raw.charge.acquireAuthCode
+    description: "Authorization code returned by the payment acquirer upon successful charge authorization. Used for dispute resolution and receipt validation."
+  acquire_nsu:
+    lineage:
+      - datalake_wall_street_raw.charge.acquireNsu
+    description: "NSU (Número Sequencial Único) assigned by the acquirer — a unique sequential number used in Brazilian payment systems for transaction traceability and acquirer-side reconciliation."
+  acquire_tid:
+    lineage:
+      - datalake_wall_street_raw.charge.acquireTid
+    description: "Transaction identifier (TID) from the acquirer, used for chargeback and dispute management. Mirrors id_acquire_transaction; maintained separately for traceability across integrations."
+  invoice_message:
+    lineage:
+      - datalake_wall_street_raw.charge.invoiceMessage
+    description: "Descriptive message or memo included in the invoice linked to this charge, typically displayed to the payer on billing statements."
+  refund_amount:
+    lineage:
+      - datalake_wall_street_raw.charge.refundAmount
+    description: "Amount refunded for this charge in BRL. Zero or null when no refund has been issued. Used to calculate net revenue and track refund exposure."
+  acquire_name:
+    lineage:
+      - datalake_wall_street_raw.charge.acquireName
+    description: "Human-readable name of the payment acquirer that processed this charge (e.g., Cielo, Stone, Getnet). Used for reporting and provider performance analysis."
+  acquire_message:
+    lineage:
+      - datalake_wall_street_raw.charge.acquireMessage
+    description: "Response message returned by the acquirer during charge processing, containing approval confirmation or rejection details. Useful for customer support and failure diagnosis."
+  acquire_return_code:
+    lineage:
+      - datalake_wall_street_raw.charge.acquireReturnCode
+    description: "Return code from the payment acquirer indicating the outcome of the charge attempt (e.g., approval, insufficient funds, card blocked). Maps to standard Brazilian payment return codes."
+  card_brand:
+    lineage:
+      - datalake_wall_street_raw.charge.cardBrand
+    description: "Brand of the credit card used for this charge (e.g., Visa, Mastercard, Elo, Amex). Used for payment mix analysis and acquirer routing decisions."
+  first_six_digits_card:
+    lineage:
+      - datalake_wall_street_raw.charge.firstSixDigitsCard
+    description: "First six digits (BIN — Bank Identification Number) of the card used for this charge, identifying the issuing bank and card product type without exposing the full card number."
+  last_four_digits_cards:
+    lineage:
+      - datalake_wall_street_raw.charge.lastFourDigitsCard
+    description: "Last four digits of the card number used for this charge, displayed to customers for card recognition and used in reconciliation without exposing the full PAN."
+  acquire_fee_percentage:
+    lineage:
+      - datalake_wall_street_raw.charge.acquireFeePercentage
+    description: "Fee percentage charged by the acquirer for processing this transaction, expressed as a decimal. Used to calculate net settlement amounts and track acquirer cost."
+  ts_updated:
+    lineage:
+      - datalake_wall_street_raw.charge.lastUpdate
+    description: "Timestamp (UTC) of the most recent update to this charge record in the Wall Street source system. Used to drive incremental CDC loads and detect late-arriving changes."

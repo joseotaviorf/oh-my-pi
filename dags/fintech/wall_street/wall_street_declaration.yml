@@ -22,9 +22,6 @@ workflow:
     Blocklist:
       clean_table_name: blocklist
       primary_keys: ["id"]
-    Charge:
-      clean_table_name: charge
-      primary_keys: ["id"]
     Charge_AUD:
       clean_table_name: charge_aud
       primary_keys: ["id", "rev"]
