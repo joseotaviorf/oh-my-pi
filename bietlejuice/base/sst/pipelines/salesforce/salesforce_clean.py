@@ -45,13 +45,19 @@ def salesforce_clean_pipeline(spark, cfg):
         return
 
     # spark, table_name, partition_date, partition_hour, fail=True
-    sensor_partition_hour(
+    has_data = sensor_partition_hour(
         spark=spark,
         table_name=source_table,
         partition_date=cfg.partition_date,
         partition_hour=cfg.partition_hour,
         fail=False,
     )
+    if not has_data:
+        logger.info(
+            f"m=salesforce_clean_pipeline, msg=No data found for {source_table} {cfg.partition_date} {cfg.partition_hour}"
+        )
+        logger.info("m=salesforce_clean_pipeline, msg=Exiting pipeline")
+        return
 
     event_df = (
         spark.read.table(source_table)
