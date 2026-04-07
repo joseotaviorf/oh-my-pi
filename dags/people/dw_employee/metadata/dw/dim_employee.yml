@@ -1,6 +1,6 @@
 database_name: dw_employee
 table_name: dim_employee
-owner: isabella.araujo@quintoandar.com.br
+owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: Dimension table with information about workers
 columns:
@@ -12,6 +12,11 @@ columns:
     description: Unique identifier for the employee.
     lineage:
     - datalake_hr_system.employee_info.person_number
+  full_name:
+    description: |
+      Preferred display / reference full name for reporting (social name precedence over display_name over documented full name), sourced from People enrich identifier_mapping.name. Exposed as full_name for compatibility with legacy consumers of this table. Use documented_full_name and other documented_* columns for official / document-aligned names from HCM.
+    lineage:
+    - datalake_people.identifier_mapping.name
   documented_first_name:
     description: Official / document-aligned first name from HCM; may differ from social name parts.
     lineage:

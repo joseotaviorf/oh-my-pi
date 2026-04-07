@@ -14,6 +14,7 @@ SELECT
   emp_info.id_person AS sk_employee,
   -- -- non metric
   emp_info.person_number,
+  im.name AS full_name,
   -- -- name information,
   emp_info.documented_first_name,
   emp_info.documented_last_name,
@@ -96,6 +97,11 @@ SELECT
   NOW() AS ts_load
 FROM
   datalake_hr_system.employee_info AS emp_info
-LEFT JOIN 
-  cte_enrich_demographic_attributes AS da 
-      ON emp_info.id_person = da.id_person
+LEFT JOIN
+  datalake_people.identifier_mapping AS im
+    ON emp_info.id_person = im.id_person
+    AND NOT im.is_user_test
+    AND im.is_person_latest_assignment
+LEFT JOIN
+  cte_enrich_demographic_attributes AS da
+    ON emp_info.id_person = da.id_person
