@@ -93,26 +93,6 @@ def create_execute_job_cluster_task(dag: DAG, task_id: str):
         libraries=get_libs(ENV),
     )
 
-def create_sync_metadata_task(schema: str, table_name: str):
-    return QuintoAndarDatabricksCheckJobTaskOperator(
-        databricks_conn_id=DATABRICKS_CONN_ID,
-        dag=dag,
-        task_id=f"sync_metadata_{LayerEnum.CLEAN.value}_{table_name}",
-        json={
-            "spark_python_task": {
-                "python_file": f"{BIETLEJUICE_REPO_PATH}/bietlejuice/base/sst/pipelines/metadata_sync/sync_clean.py",
-                "parameters": [
-                    bucket,
-                    LayerEnum.CLEAN.value,
-                    schema,
-                    "--table-name",
-                    table_name,
-                ],
-            }
-        },
-        execution_timeout=timedelta(minutes=30),
-    )
-
 
 def create_start_end_operator(task_id: str):
 
@@ -178,9 +158,6 @@ with DAG(
                 "source_schema": "datalake_salesforce_raw",
                 "sync_hive": "True",
             },
-        ) >> create_sync_metadata_task(
-            schema="salesforce",
-            table_name=f"events_{event.lower()}"
         ) >> end
 
 

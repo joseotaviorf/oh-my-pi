@@ -87,7 +87,7 @@ def save_volume_metric(
         partition_cols=partition_cols,
         overwrite_schema=False,
         append=True,
-        sync_hive=False,
+        sync_hive=True,
     )
 
 
@@ -154,5 +154,5 @@ def save_table_metadata_metric(
         partition_cols=partition_cols,
         overwrite_schema=False,
         append=True,
-        sync_hive=False,
+        sync_hive=True,
     )
