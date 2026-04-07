@@ -5,12 +5,12 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from collections import Counter
 from functools import wraps
 from pyspark.sql import DataFrame, SparkSession
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, Optional, Tuple, Union
 import re
 import pyspark.sql.functions as F
 
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.base.sst.core.metadata.sync_sst_metadata import _sync_trino_metadata
+from bietlejuice.base.sst.core.metadata.sync_metadata import sync_trino_metadata
 
 logger = QuintoAndarLogger("sst.common")
 
@@ -146,7 +146,7 @@ def default_args(
 @logger()
 def retrieve_database_metadata(
     environment: str, schema: str, bucket: str, layer: str
-) -> tuple[str, str]:
+) -> Tuple[str, str]:
     """
     Retrieve the Databricks database name and path for a given layer from the datalake metastore.
 
@@ -422,7 +422,7 @@ def validate_and_write(
         )
         return
 
-    _sync_trino_metadata(target_table, table_location, df)
+    sync_trino_metadata(target_table, table_location, df)
 
     logger.info(
         f"m=validate_and_write, target_table={target_table}, "

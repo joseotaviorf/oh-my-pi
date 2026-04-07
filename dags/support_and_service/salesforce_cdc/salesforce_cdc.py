@@ -100,7 +100,7 @@ def create_sync_metadata_task(schema: str, table_name: str):
         task_id=f"sync_metadata_{LayerEnum.CLEAN.value}_{table_name}",
         json={
             "spark_python_task": {
-                "python_file": f"{BASE_SPARK_JOBS_PATH}sync_metadata.py",
+                "python_file": f"{BASE_SPARK_JOBS_PATH}metadata_sync/sync_clean.py",
                 "parameters": [
                     bucket,
                     LayerEnum.CLEAN.value,

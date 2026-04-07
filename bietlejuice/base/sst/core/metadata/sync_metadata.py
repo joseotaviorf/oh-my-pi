@@ -1,7 +1,5 @@
 import json
 import logging
-import traceback
-from argparse import ArgumentParser
 from collections import OrderedDict
 from typing import Optional
 
@@ -11,11 +9,10 @@ from trino.exceptions import TrinoUserError
 
 from bietlejuice.base.db.database_enum import DatabaseEnum
 from bietlejuice.clients.db_clients.trino_client import TrinoClient
-from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark.base_spark import BaseDBUtils
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 
-JOB_NAME = "sync_sst_metadata"
+JOB_NAME = "sync_metadata"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 
 
@@ -164,7 +161,7 @@ def sync_trino_table_schema(
     )
 
 
-def _sync_trino_metadata(
+def sync_trino_metadata(
     target_table: str,
     table_location: Optional[str],
     df: DataFrame,
@@ -258,44 +255,3 @@ def sync_trino_tables_metadata(bucket, layer, schema, table_name, all_tables_fla
         )
 
     logger.info(f"m={logger.name}, msg=Finished Trino metadata synchronization.")
-
-
-base_logger = set_logger(JOB_NAME)
-
-if __name__ == "__main__":
-    parser = ArgumentParser(JOB_NAME)
-    parser.add_argument("bucket", type=str)
-    parser.add_argument("layer", type=str)
-    parser.add_argument("schema", type=str)
-    parser.add_argument(
-        "--table-name",
-        type=str,
-        dest="table_name",
-        required=False,
-        help="table name for single sync",
-    )
-    parser.add_argument(
-        "--all-tables",
-        nargs="?",
-        dest="all_tables_flag",
-        required=False,
-        default=False,
-        const=True,
-        help="flag to sync all tables from database",
-    )
-
-    args = parser.parse_args()
-    bucket = args.bucket
-    layer = LayerEnum(args.layer).value
-    schema = args.schema
-    table_name = args.table_name
-    all_tables_flag = args.all_tables_flag
-
-    try:
-        sync_trino_tables_metadata(bucket, layer, schema, table_name, all_tables_flag)
-    except Exception as e:
-        base_logger.error(
-            f"m={JOB_NAME}, msg=sync_trino_tables_metadata failed with:\n\n\n {e}"
-        )
-        base_logger.error(traceback.format_exc())
-        raise
