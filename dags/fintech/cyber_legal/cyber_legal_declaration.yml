@@ -29,9 +29,10 @@ workflow:
   tables_customization:
     case:
       clean_table_name: case
-      extraction_type: incremental
+      raw_extraction_type: incremental
+      raw_partitions: [year, month, day]
+      clean_extraction_type: full
       merge_on: [id_case]
-      partitions: [year, month, day]
       extra_spark_job_arguments:
         - "['CEDTUPD']"
         - False
@@ -62,9 +63,10 @@ workflow:
         - "[]"
     cantfylg:
       clean_table_name: case_notification_log
-      extraction_type: incremental
+      raw_extraction_type: incremental
+      raw_partitions: [year, month, day]
+      clean_extraction_type: full
       merge_on: [id_notification_request, id_notification_sequence]
-      partitions: [year, month, day]
       extra_spark_job_arguments:
         - "['CNDTUPD']"
         - False
@@ -79,36 +81,40 @@ workflow:
         - "[]"
     casestag:
       clean_table_name: case_stage
-      extraction_type: incremental
+      raw_extraction_type: incremental
+      raw_partitions: [year, month, day]
+      clean_extraction_type: full
       merge_on: [id_case, id_stage]
-      partitions: [year, month, day]
       extra_spark_job_arguments:
         - "['CSDTUPD']"
         - False
         - "[]"
     caseacct:
       clean_table_name: case_account
-      extraction_type: incremental
+      raw_extraction_type: incremental
+      raw_partitions: [year, month, day]
+      clean_extraction_type: full
       merge_on: [id_case, id_contract_group, id_contract]
-      partitions: [year, month, day]
       extra_spark_job_arguments:
         - "['CCDTUPD']"
         - False
         - "[]"
     caalert:
       clean_table_name: case_alert
-      extraction_type: incremental
+      raw_extraction_type: incremental
+      raw_partitions: [year, month, day]
+      clean_extraction_type: full
       merge_on: [id_alert]
-      partitions: [year, month, day]
       extra_spark_job_arguments:
         - "['ALDTUPD']"
         - False
         - "[]"
     caexpns:
       clean_table_name: case_expense
-      extraction_type: incremental
+      raw_extraction_type: incremental
+      raw_partitions: [year, month, day]
+      clean_extraction_type: full
       merge_on: [id_expense]
-      partitions: [year, month, day]
       extra_spark_job_arguments:
         - "['EXDTUPD']"
         - False

@@ -27,3 +27,4 @@ SELECT
 FROM datalake_cyber_legal_raw.casestag
 WHERE
     MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+QUALIFY ROW_NUMBER() OVER(PARTITION BY CSCASENO, CSSTGID ORDER BY MAKE_DATE(year,month,day) DESC) = 1
