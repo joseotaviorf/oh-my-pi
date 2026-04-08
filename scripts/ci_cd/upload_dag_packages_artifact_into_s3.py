@@ -9,6 +9,7 @@ from os import path
 
 import boto3
 from botocore.config import Config
+from tqdm import tqdm
 
 BI_ETL_EJUICE_ROOT = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -72,11 +73,15 @@ for root, dirs, files in os.walk(DAG_PACKAGES_ROOT):
         spark_job_s3_path = path.join(S3_DAGS_PACKAGES_PATH_PREFIX, dag_name, artifact_path.strip("/"), file_name)
         files_to_upload.append((spark_job_local_path, spark_job_s3_path))
 
-with ThreadPoolExecutor(max_workers=64) as executor:
-    futures = {
-        executor.submit(func, *file_to_upload): file_to_upload
-        for file_to_upload in files_to_upload
-    }
-    for future in as_completed(futures):
-        if future.exception():
-            raise future.exception()
+with tqdm(
+    desc=f"Uploading {artifact} into S3", total=len(files_to_upload)
+) as progress_bar:
+    with ThreadPoolExecutor(max_workers=64) as executor:
+        futures = {
+            executor.submit(func, *file_to_upload): file_to_upload
+            for file_to_upload in files_to_upload
+        }
+        for future in as_completed(futures):
+            if future.exception():
+                raise future.exception()
+            progress_bar.update(1)

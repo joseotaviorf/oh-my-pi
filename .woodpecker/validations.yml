@@ -2,55 +2,29 @@ clone:
   - name: clone
     image: woodpeckerci/plugin-git
     settings:
-      partial: false # We need the parent commit for git diff HEAD~1 HEAD (see .woodpecker docs)
-      depth: 2 # At least 2 commits so HEAD~1 exists in the clone
-
-# Default images (YAML anchors). Change here to update all steps consistently.
-# See https://woodpecker-ci.org/docs/usage/advanced-usage#anchors--aliases
-variables:
-  - &image_python_validation public.ecr.aws/docker/library/python:3.7.16
-  - &path_filter_dag_declarations
-    include:
-      # Declarations are `*_declaration.yml` per repo convention; `.yaml` included for parity.
-      - "dags/**/*_declaration.yml"
-      - "dags/**/*_declaration.yaml"
-    on_empty: false
-  - &path_filter_dags
-    include:
-      - "dags/**"
-    on_empty: false
-  - &path_filter_dags_metadata
-    include:
-      - "dags/**/metadata/**"
-    on_empty: false
-  - &path_filter_dags_core_schemas
-    include:
-      - "dags/core/**/schemas/**"
-    on_empty: false
+      partial: false # We need to clone the entire history to find the changed files
 
 steps:
   validate-dag-declaration-files:
-    image: *image_python_validation
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
-      - pip install Cerberus==1.3.4
+      - pip install tqdm==4.64.1 Cerberus==1.3.4
       - make requirements-scripts
       - make validate-dag-declaration-files level=debug
     when:
       event: push
-      path: *path_filter_dag_declarations
     depends_on: [] # This is for the steps to run in parallel
 
   validate-dags-up-to-standard:
-    image: *image_python_validation
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - make requirements-scripts
       - make validate-dags-up-to-standard
     when:
       event: push
-      path: *path_filter_dags
 
   validate-dags-dependencies-forno:
-    image: *image_python_validation
+    image: public.ecr.aws/docker/library/python:3.7.16
     environment:
       ENVIRONMENT: forno
     commands:
@@ -62,10 +36,9 @@ steps:
         exclude:
           - master
           - hotfix/*
-      path: *path_filter_dags
 
   validate-dags-dependencies-prod:
-    image: *image_python_validation
+    image: public.ecr.aws/docker/library/python:3.7.16
     environment:
       ENVIRONMENT: prod
     commands:
@@ -74,20 +47,18 @@ steps:
     when:
       event: push
       branch: [master, hotfix/*]
-      path: *path_filter_dags
 
   validate-dependency-file-correctness:
-    image: *image_python_validation
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - make requirements
       - make requirements-scripts
       - make validate-dependency-file-correctness
     when:
       event: push
-      path: *path_filter_dags
 
   validate-metadata-files-content:
-    image: *image_python_validation
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - make requirements-scripts
       - make validate-metadata-files-content
@@ -95,10 +66,9 @@ steps:
       event: push
       branch:
         exclude: [forno, hotfix/*]
-      path: *path_filter_dags_metadata
 
   validate-metadata-files-exist:
-    image: *image_python_validation
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - make requirements-scripts
       - make validate-metadata-files-exist
@@ -106,34 +76,30 @@ steps:
       event: push
       branch:
         exclude: [forno, hotfix/*]
-      path: *path_filter_dags_metadata
 
   validate-lineage-consistency:
-    image: *image_python_validation
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - make requirements-scripts
       - make validate-lineage-consistency
     when:
       event: push
-      path: *path_filter_dags_metadata
 
   validate-core-model-schemas:
-    image: *image_python_validation
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - make requirements-scripts
       - make validate-core-model-schemas
     when:
       event: push
-      path: *path_filter_dags_core_schemas
 
   validate-core-model-schema-content:
-    image: *image_python_validation
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - make requirements-scripts
       - make validate-core-model-schema-content
     when:
       event: push
-      path: *path_filter_dags_core_schemas
 
   validate-source-layer-policy:
     image: public.ecr.aws/docker/library/python:3.7.16
@@ -144,5 +110,4 @@ steps:
       event: push
       branch:
         exclude: [forno, hotfix/*]
-      path: *path_filter_dags
 

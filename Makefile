@@ -141,19 +141,19 @@ upload-local-qube-jobs:
 
 .PHONY: upload-local-queries
 upload-local-queries:
-	@pip install boto3==1.24.0 -q
+	@pip install boto3==1.24.0 tqdm==4.64.1 -q
 	@python3 scripts/ci_cd/upload_dag_packages_artifact_into_s3.py \
 		databricks.s3.forno.data.quintoandar.com.br queries
 
 .PHONY: upload-local-data-quality
 upload-local-data-quality:
-	@pip install boto3==1.24.0 -q
+	@pip install boto3==1.24.0 tqdm==4.64.1 -q
 	@python3 scripts/ci_cd/upload_dag_packages_artifact_into_s3.py \
 		databricks.s3.forno.data.quintoandar.com.br data_quality
 
 .PHONY: upload-local-schemas
 upload-local-schemas:
-	@pip install boto3==1.24.0 -q
+	@pip install boto3==1.24.0 tqdm==4.64.1 -q
 	@python3 scripts/ci_cd/upload_dag_packages_artifact_into_s3.py \
 		databricks.s3.forno.data.quintoandar.com.br schemas
 
@@ -496,22 +496,7 @@ create-dag-files:
 	@echo ""
 	@PYTHONPATH=. python3 scripts/ci_cd/airflow_dag_builder/create_dag_files.py -d $(dag_name)
 
-.PHONY: create-dag-files-from-git-diff
-## creates DAG Python files only for DAG folders touched in git diff HEAD~1..HEAD; falls back to all DAGs if none match
-create-dag-files-from-git-diff:
-	@echo ""
-	@echo "Creating DAG Python files from git diff (HEAD~1..HEAD)"
-	@echo "=========="
-	@echo ""
-	@dags=$$(bash scripts/ci_cd/changed_dag_names_from_git.sh | xargs); \
-	if [ -z "$$dags" ]; then \
-		echo "No dags/<domain>/<dag> paths in diff; running full create-dag-files"; \
-		$(MAKE) create-dag-files; \
-	else \
-		for dag in $$dags; do \
-			PYTHONPATH=. python3 scripts/ci_cd/airflow_dag_builder/create_dag_files.py -d $$dag || exit 1; \
-		done; \
-	fi
+
 
 .PHONY: clean
 ## delete all compiled python files

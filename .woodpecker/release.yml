@@ -3,108 +3,41 @@ depends_on:
   - tests
   - validations
 
-# Default images (YAML anchors). Change here to update all steps consistently.
-# See https://woodpecker-ci.org/docs/usage/advanced-usage#anchors--aliases
-variables:
-  - &image_plugin_git woodpeckerci/plugin-git
-  # Single Python image: packaging, DAG generation, uploads, and shell-only steps (replaces former 3.7.16 + alpine).
-  - &image_python public.ecr.aws/docker/library/python:3.9.5
-  - &image_plugins_s3 plugins/s3:1.4.0
-  - &image_beethoven_s3_sync_forno 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
-  - &image_beethoven_s3_sync_prod 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:prod-latest
-  - &image_beethoven_deploy_dags_forno 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-deploy-dags:forno-latest
-  - &image_beethoven_deploy_dags_prod 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-deploy-dags:prod-latest
-  - &path_filter_bietlejuice
-    include:
-      - "bietlejuice/**"
-    on_empty: false
-  # Main init_script.sh S3 upload: run when init script or scripts/wonka shell assets change.
-  - &path_filter_init_script_or_wonka
-    include:
-      - "scripts/init_script.sh"
-      - "scripts/wonka/**"
-      - "scripts/emr_init_script.sh"
-    on_empty: false
-  # Wonka shell uploads (pex, vault, spark metrics): run when DAGs under dags/wonka change.
-  - &path_filter_dags_wonka
-    include:
-      - "dags/wonka/**"
-    on_empty: false
-  # create-dag-files, bietlejuice/dags sync, Astronomer deploy: run when anything under dags/ changes.
-  - &path_filter_dags
-    include:
-      - "dags/**"
-    on_empty: false
-  # Databricks spark_jobs artifact upload: run when any DAG spark_jobs folder changes.
-  - &path_filter_dags_spark_jobs
-    include:
-      - "dags/**/spark_jobs/**"
-    on_empty: false
-  # Databricks SQL queries artifact upload: run when any DAG queries folder changes.
-  - &path_filter_dags_queries
-    include:
-      - "dags/**/queries/**"
-    on_empty: false
-  # Databricks data_quality artifact upload: run when any DAG data_quality folder changes.
-  - &path_filter_dags_data_quality
-    include:
-      - "dags/**/data_quality/**"
-    on_empty: false
-  # Databricks JSON schemas artifact upload: run when any DAG schemas folder changes.
-  - &path_filter_dags_schemas
-    include:
-      - "dags/**/schemas/**"
-    on_empty: false
-  # Metadata upload / propagator: run when any DAG governance metadata folder changes.
-  - &path_filter_dags_metadata
-    include:
-      - "dags/**/metadata/**"
-    on_empty: false
-  # Qube semantic layer sync to Databricks: run when anything under bietlejuice/qube changes.
-  - &path_filter_bietlejuice_qube
-    include:
-      - "bietlejuice/qube/**"
-    on_empty: false
-
 clone:
   - name: clone
-    image: *image_plugin_git
+    image: woodpeckerci/plugin-git
     settings:
-      partial: false # We need the parent commit for git diff HEAD~1 HEAD (see .woodpecker docs)
-      depth: 2 # At least 2 commits so HEAD~1 exists in the clone
+      partial: false # We need to clone the entire history to find the changed files
 
 steps:
   make-package-python:
-    image: *image_python
+    image: public.ecr.aws/docker/library/python:3.9.5
     commands:
       - make package
     when:
       event: [push, tag]
       branch: [master, forno, hotfix/*]
-      path: *path_filter_bietlejuice
 
   prepare-release-forno:
-    image: *image_python
+    image: public.ecr.aws/docker/library/alpine:3.10
     commands:
       - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec mv '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
     when:
       event: push
       branch: forno
-      path: *path_filter_bietlejuice
     depends_on: [make-package-python]
 
   prepare-release-prod:
-    image: *image_python
+    image: public.ecr.aws/docker/library/alpine:3.10
     commands:
       - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec cp '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
     when:
       event: [push, tag]
       branch: [master, hotfix/*]
-      path: *path_filter_bietlejuice
     depends_on: [make-package-python]
 
   export-releases-to-s3-prod:
-    image: *image_plugins_s3
+    image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
       source: dist/*.whl
@@ -115,11 +48,10 @@ steps:
     when:
       event: [push, tag]
       branch: [master, hotfix/*]
-      path: *path_filter_bietlejuice
     depends_on: [prepare-release-prod]
 
   export-releases-to-s3-forno:
-    image: *image_plugins_s3
+    image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
       source: dist/*.whl
@@ -130,11 +62,10 @@ steps:
     when:
       event: [push, tag]
       branch: forno
-      path: *path_filter_bietlejuice
     depends_on: [prepare-release-forno]
 
   export-init-script-to-s3-forno:
-    image: *image_plugins_s3
+    image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
       source: scripts/init_script.sh
@@ -145,10 +76,9 @@ steps:
     when:
       event: [push, tag]
       branch: forno
-      path: *path_filter_init_script_or_wonka
 
   export-install-pex-init-script-forno:
-    image: *image_plugins_s3
+    image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
       source: scripts/wonka/install_pex_generic.sh
@@ -159,10 +89,9 @@ steps:
     when:
       event: [push, tag]
       branch: forno
-      path: *path_filter_dags_wonka
 
   export-vault-secrets-init-script-forno:
-    image: *image_plugins_s3
+    image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
       source: scripts/wonka/get_credentials_from_vault.sh
@@ -173,10 +102,9 @@ steps:
     when:
       event: [push, tag]
       branch: forno
-      path: *path_filter_dags_wonka
 
   export-install-spark-metrics-plugin-forno:
-    image: *image_plugins_s3
+    image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
       source: scripts/wonka/install_spark_metrics_plugin.sh
@@ -187,10 +115,9 @@ steps:
     when:
       event: [push, tag]
       branch: forno
-      path: *path_filter_dags_wonka
 
   export-init-script-to-s3-prod:
-    image: *image_plugins_s3
+    image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
       source: scripts/init_script.sh
@@ -201,10 +128,9 @@ steps:
     when:
       event: [push, tag]
       branch: [master, hotfix/*]
-      path: *path_filter_init_script_or_wonka
-
+ 
   export-install-pex-init-script-prod:
-    image: *image_plugins_s3
+    image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
       source: scripts/wonka/install_pex_generic.sh
@@ -215,10 +141,9 @@ steps:
     when:
       event: [push, tag]
       branch: [master, hotfix/*]
-      path: *path_filter_dags_wonka
 
   export-vault-secrets-init-script-prod:
-    image: *image_plugins_s3
+    image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
       source: scripts/wonka/get_credentials_from_vault.sh
@@ -229,10 +154,9 @@ steps:
     when:
       event: [push, tag]
       branch: [master, hotfix/*]
-      path: *path_filter_dags_wonka
 
   export-install-spark-metrics-plugin-prod:
-    image: *image_plugins_s3
+    image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
       source: scripts/wonka/install_spark_metrics_plugin.sh
@@ -243,21 +167,19 @@ steps:
     when:
       event: [push, tag]
       branch: [master, hotfix/*]
-      path: *path_filter_dags_wonka
 
-  # create-dag-files-from-git-diff:
-  #   image: *image_python
-  #   commands:
-  #     - pip install "google-re2==1.1.20250805" "apache-airflow==2.10.4"
-  #     - make requirements-scripts
-  #     - make create-dag-files-from-git-diff
-  #   when:
-  #     event: push
-  #     branch: [forno, master, hotfix/*]
-  #     path: *path_filter_dags
+  create-dag-files:
+    image: public.ecr.aws/docker/library/python:3.9.5
+    commands:
+      - pip install "google-re2==1.1.20250805" "apache-airflow==2.10.4"
+      - make requirements-scripts
+      - make create-dag-files
+    when:
+      event: push
+      branch: [forno, master, hotfix/*]
 
   upload-bi-etl-ejuice-modules-s3-forno:
-    image: *image_beethoven_s3_sync_forno
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
     pull: true
     environment:
       BUCKET: artifacts.s3.forno.data.quintoandar.com.br
@@ -266,10 +188,9 @@ steps:
     when:
       event: push
       branch: [forno]
-      path: *path_filter_dags
 
   upload-bi-etl-ejuice-modules-s3-prod:
-    image: *image_beethoven_s3_sync_prod
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:prod-latest
     pull: true
     environment:
       BUCKET: artifacts.s3.data.quintoandar.com.br
@@ -278,10 +199,9 @@ steps:
     when:
       event: push
       branch: [master, hotfix/*]
-      path: *path_filter_dags
 
   upload-dag-packages-dags-s3-forno:
-    image: *image_beethoven_s3_sync_forno
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
     pull: true
     environment:
       BUCKET: artifacts.s3.forno.data.quintoandar.com.br
@@ -290,10 +210,10 @@ steps:
     when:
       event: push
       branch: [forno]
-      path: *path_filter_dags
+    depends_on: [create-dag-files]
 
   upload-dag-packages-dags-s3-prod:
-    image: *image_beethoven_s3_sync_prod
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:prod-latest
     pull: true
     environment:
       BUCKET: artifacts.s3.data.quintoandar.com.br
@@ -302,110 +222,100 @@ steps:
     when:
       event: push
       branch: [master, hotfix/*]
-      path: *path_filter_dags
+    depends_on: [create-dag-files]
 
   astronomer-deploy-dags-forno:
-    image: *image_beethoven_deploy_dags_forno
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-deploy-dags:forno-latest
     pull: true
     when:
       event: push
       branch: [forno]
-      path: *path_filter_dags
     depends_on:
       [upload-bi-etl-ejuice-modules-s3-forno, upload-dag-packages-dags-s3-forno]
 
   astronomer-deploy-dags-prod:
-    image: *image_beethoven_deploy_dags_prod
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-deploy-dags:prod-latest
     pull: true
     when:
       event: push
       branch: [master, hotfix/*]
-      path: *path_filter_dags
     depends_on:
       [upload-bi-etl-ejuice-modules-s3-prod, upload-dag-packages-dags-s3-prod]
 
   upload-dag-packages-spark-jobs-s3-forno:
-    image: *image_python
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
-      - pip install boto3==1.24.0
+      - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br spark_jobs
     when:
       event: push
       branch: forno
-      path: *path_filter_dags_spark_jobs
 
   upload-dag-packages-spark-jobs-s3-prod:
-    image: *image_python
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
-      - pip install boto3==1.24.0
+      - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks spark_jobs
     when:
       event: push
       branch: [master, hotfix/*]
-      path: *path_filter_dags_spark_jobs
 
   upload-dag-packages-queries-s3-forno:
-    image: *image_python
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
-      - pip install boto3==1.24.0
+      - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br queries
     when:
       event: push
       branch: forno
-      path: *path_filter_dags_queries
 
   upload-dag-packages-queries-s3-prod:
-    image: *image_python
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
-      - pip install boto3==1.24.0
+      - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks queries
     when:
       event: push
       branch: [master, hotfix/*]
-      path: *path_filter_dags_queries
 
   upload-dag-packages-data-quality-s3-forno:
-    image: *image_python
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
-      - pip install boto3==1.24.0
+      - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br data_quality
     when:
       event: push
       branch: forno
-      path: *path_filter_dags_data_quality
 
   upload-dag-packages-data-quality-s3-prod:
-    image: *image_python
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
-      - pip install boto3==1.24.0
+      - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks data_quality
     when:
       event: push
       branch: [master, hotfix/*]
-      path: *path_filter_dags_data_quality
 
   upload-dag-packages-schemas-s3-forno:
-    image: *image_python
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
-      - pip install boto3==1.24.0
+      - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br schemas
     when:
       event: push
       branch: forno
-      path: *path_filter_dags_schemas
 
   upload-dag-packages-schemas-s3-prod:
-    image: *image_python
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
-      - pip install boto3==1.24.0
+      - pip install boto3==1.24.0 tqdm==4.64.1
       - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks schemas
     when:
       event: [push, tag]
       branch: [master, hotfix/*]
-      path: *path_filter_dags_schemas
 
   load-metadata-files-to-s3-forno:
-    image: *image_python
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - pip install requests==2.28.1 PyYAML==5.1 boto3==1.24.0
       - make requirements-scripts
@@ -413,10 +323,9 @@ steps:
     when:
       event: push
       branch: forno
-      path: *path_filter_dags_metadata
 
   load-metadata-files-to-s3-prod:
-    image: *image_python
+    image: public.ecr.aws/docker/library/python:3.7.16
     commands:
       - pip install requests==2.28.1 PyYAML==5.1 boto3==1.24.0
       - make requirements-scripts
@@ -424,10 +333,9 @@ steps:
     when:
       event: push
       branch: [master, hotfix/*]
-      path: *path_filter_dags_metadata
 
   load-all-metadata-files-information-to-s3-forno:
-    image: *image_python
+    image: public.ecr.aws/docker/library/python:3.7.16
     environment:
       ENVIRONMENT: forno
     commands:
@@ -437,10 +345,9 @@ steps:
     when:
       event: push
       branch: forno
-      path: *path_filter_dags_metadata
 
   load-all-metadata-files-information-to-s3-prod:
-    image: *image_python
+    image: public.ecr.aws/docker/library/python:3.7.16
     environment:
       ENVIRONMENT: prod
     commands:
@@ -450,10 +357,9 @@ steps:
     when:
       event: push
       branch: [master, hotfix/*]
-      path: *path_filter_dags_metadata
 
   upload-qube-modules-s3-forno:
-    image: *image_beethoven_s3_sync_forno
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
     pull: true
     environment:
       BUCKET: databricks.s3.forno.data.quintoandar.com.br
@@ -462,10 +368,9 @@ steps:
     when:
       event: push
       branch: [forno]
-      path: *path_filter_bietlejuice_qube
 
   upload-qube-modules-s3-prod:
-    image: *image_beethoven_s3_sync_prod
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:prod-latest
     pull: true
     environment:
       BUCKET: 5a-databricks
@@ -474,4 +379,3 @@ steps:
     when:
       event: push
       branch: [master, hotfix/*]
-      path: *path_filter_bietlejuice_qube
