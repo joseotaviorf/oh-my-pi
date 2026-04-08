@@ -147,7 +147,7 @@ class RawLayerLoader:
                 s3_path=s3_path,
                 format_options=format_options,
                 partitions=self.partition_cols,
-                mode=mode,
+                write_mode=mode,
             )
         except Exception as e:
             self.logger.error(

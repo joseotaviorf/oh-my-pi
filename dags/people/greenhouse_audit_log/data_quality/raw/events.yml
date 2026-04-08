@@ -1,0 +1,45 @@
+---
+table_name: datalake_greenhouse_audit_log_raw.events
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+
+column_level_validations:
+  event_time:
+    is_complete:
+      severity_level: Warning
+    custom:
+      # Ensure there are no missing hourly buckets in the last 7 complete days.
+      constraint: |-
+        (WITH bounds AS (
+           SELECT
+             date_trunc('hour', current_timestamp()) AS end_hour_utc,
+             date_trunc('hour', current_timestamp()) - INTERVAL 7 DAYS AS start_hour_utc
+         ),
+         expected_hours AS (
+           SELECT
+             explode(
+               sequence(
+                 start_hour_utc,
+                 end_hour_utc - INTERVAL 1 HOUR,
+                 INTERVAL 1 HOUR
+               )
+             ) AS hour_bucket
+           FROM bounds
+         ),
+         observed_hours AS (
+           SELECT DISTINCT
+             date_trunc('hour', CAST(event_time AS TIMESTAMP)) AS hour_bucket
+           FROM datalake_greenhouse_audit_log_raw.events
+           WHERE CAST(event_time AS TIMESTAMP) >= (SELECT start_hour_utc FROM bounds)
+             AND CAST(event_time AS TIMESTAMP) < (SELECT end_hour_utc FROM bounds)
+         )
+         SELECT COUNT(*)
+         FROM expected_hours e
+         LEFT ANTI JOIN observed_hours o
+           ON e.hour_bucket = o.hour_bucket
+        ) = 0
+      severity_level: Warning
