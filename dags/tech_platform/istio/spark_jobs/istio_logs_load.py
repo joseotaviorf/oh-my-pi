@@ -14,6 +14,7 @@ from pyspark.sql.functions import (
     lit,
     map_values,
     month,
+    regexp_replace,
     split,
     to_timestamp,
     when,
@@ -70,6 +71,14 @@ def clean_cf(df):
         element_at(split(traceparent, "-"), 2)
     ).otherwise(lit(None))
 
+    _noise_services = ["default", "kong-serviceaccount", "kong-private-controller", "kong-public-controller"]
+    principal_service = regexp_replace(
+        col("data.result.principal_info.service"),
+        r"^spiffe://cluster\.local/ns/[^/]+/sa/",
+        ""
+    )
+    principal_service = when(principal_service.isin(_noise_services), lit(None)).otherwise(principal_service)
+
     df = df.select(
                ts_event.alias("ts_event"),
                trace_id.alias("id_trace"),
@@ -91,7 +100,7 @@ def clean_cf(df):
                coalesce(col("direct.roles"), col("wrapped.roles")).alias("principal_user_roles"),
                coalesce(col("direct.sudoed_by_id"), col("wrapped.sudoed_by_id")).alias("id_principal_user_impersonated_by"),
                coalesce(col("direct.sub"), col("wrapped.sub")).alias("principal_user_sub"),
-               col("data.result.principal_info.service").alias("principal_service"),
+               principal_service.alias("principal_service"),
                col("data.result.response_code_details").alias("response_code_details"),
                col("app"),
                year(ts).alias("year"),
