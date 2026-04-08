@@ -7,6 +7,8 @@ workflow:
   layer: dw
   custom_schema: losses
   has_load_to_redshift_task: false
+  short_circuit_customization:
+    function: CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH
   inner_dependencies:
     fact_losses:
       - fact_provision

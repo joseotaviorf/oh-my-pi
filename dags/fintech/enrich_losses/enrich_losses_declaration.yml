@@ -9,6 +9,8 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  short_circuit_customization:
+    function: CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH
   inner_dependencies:
     closing:
       - bill_items
