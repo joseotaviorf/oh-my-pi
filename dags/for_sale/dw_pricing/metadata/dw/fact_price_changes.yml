@@ -13,6 +13,10 @@ columns:
     description: Key referring to the the listing price predicted by calculator.
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.id_prediction_change
+  sk_price_suggested:
+    description: Key referring to the the price suggested.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.id_suggestion_change
   sk_house:
     description: Key referring to the house ID.
     lineage:
