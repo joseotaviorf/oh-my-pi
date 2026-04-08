@@ -50,6 +50,9 @@ bietlejuice.dw_3p_supply:
   - bietlejuice.enrich_3p_supply:load-enrich-listing-draft-status:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
+  - bietlejuice.kodak:load-clean-image-inspection-group:first-run-of-day
+  - bietlejuice.kodak:load-clean-image-inspection:first-run-of-day
+  - bietlejuice.kodak:load-clean-photo:first-run-of-day
 bietlejuice.dw_accounts_receivable:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day

@@ -1,0 +1,253 @@
+---
+database_name: dw_3p_supply
+table_name: dim_lead_3p_image_inspection
+description: |
+  Dimension of Kodak image inspections for 3P leads (LEAD3P domain): one row per
+  image inspection joined to lead, inspection group, and photo metadata. When
+  multiple lead_3p rows share the same uuid_lead, only the row with the highest
+  id_lead_3p is kept (QUALIFY). Used for photo quality and compliance analytics
+  in the 3P Supply DW.
+domain: Broker XP
+owner: patrick.nasser@quintoandar.com.br
+columns:
+  sk_image_inspection:
+    lineage:
+      - datalake_kodak_clean.image_inspection.id
+    description: Primary key; surrogate key of the image inspection (same as Kodak inspection id).
+  sk_image_inspection_duplicated:
+    lineage:
+      - datalake_kodak_clean.image_inspection.id_duplicate
+    description: Duplicate inspection reference; -1 when id_duplicate is null.
+  sk_lead_3p:
+    lineage:
+      - datalake_3p_supply.lead_3p.id_lead_3p
+    description: |
+      Surrogate key of the 3P lead linked via LEAD3P group external id; when several
+      lead_3p rows share uuid_lead, the one with max id_lead_3p is selected per uuid.
+  id_group:
+    lineage:
+      - datalake_kodak_clean.image_inspection.id_group
+    description: Foreign key to image_inspection_group.
+  deduplication_hash:
+    lineage:
+      - datalake_kodak_clean.image_inspection.deduplication_hash
+    description: Perceptual hash for image deduplication.
+  house_place:
+    lineage:
+      - datalake_kodak_clean.image_inspection.house_place
+    description: AI-classified location category of the image within the property.
+  image_inspection_status:
+    lineage:
+      - datalake_kodak_clean.image_inspection.status
+    description: Processing status of the image inspection workflow.
+  photo_mime_type:
+    lineage:
+      - datalake_kodak_clean.photo.metadata
+    description: MIME type extracted from photo JSON metadata ($.mimetype).
+  photo_order:
+    lineage:
+      - datalake_kodak_clean.photo.metadata
+    description: Order extracted from photo JSON metadata ($.order).
+  photo_path:
+    lineage:
+      - datalake_kodak_clean.photo.path
+    description: S3 path key for the photo file.
+  room_type:
+    lineage:
+      - datalake_kodak_clean.image_inspection.room_type
+    description: AI-identified room or area type.
+  url:
+    lineage:
+      - datalake_kodak_clean.image_inspection.url
+    description: Original source URL of the analyzed image.
+  approval_score_threshold:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.approval_score_threshold
+    description: Minimum score threshold for group-level approval.
+  brightness:
+    lineage:
+      - datalake_kodak_clean.image_inspection.brightness
+    description: AI brightness score for the image.
+  condition:
+    lineage:
+      - datalake_kodak_clean.image_inspection.condition
+    description: AI-assessed property condition score for the image.
+  framing:
+    lineage:
+      - datalake_kodak_clean.image_inspection.framing
+    description: AI framing score for the image.
+  framing_score:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.framing_score
+    description: Average framing score at group level.
+  height:
+    lineage:
+      - datalake_kodak_clean.image_inspection.height
+    description: Image height in pixels.
+  images_per_room:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.images_per_room
+    description: Average images per room at group level.
+  num_internal_photos:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.num_internal_photos
+    description: Count of interior photos at group level.
+  ordination:
+    lineage:
+      - datalake_kodak_clean.image_inspection.ordination
+    description: Display order of the image within the listing.
+  property_condition:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.property_condition
+    description: Aggregated property condition score at group level.
+  ratio:
+    lineage:
+      - datalake_kodak_clean.image_inspection.ratio
+    description: Aspect ratio of the image.
+  score:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.score
+    description: Overall quality score at group level.
+  sharpness:
+    lineage:
+      - datalake_kodak_clean.image_inspection.sharpness
+    description: AI sharpness score for the image.
+  total_faults:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.total_faults
+    description: Total quality faults at group level.
+  width:
+    lineage:
+      - datalake_kodak_clean.image_inspection.width
+    description: Image width in pixels.
+  image_inspection_version:
+    lineage:
+      - datalake_3p_supply.lead_3p.id_lead_3p
+      - datalake_kodak_clean.image_inspection_group.ts_created
+    description: |
+      Row number per lead by ascending group ts_created; ordering version among
+      inspections for the same lead.
+  is_approved:
+    lineage:
+      - datalake_kodak_clean.image_inspection.is_approved
+    description: Whether the image passed quality and compliance checks.
+  has_bonus_aspect_ratio:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_bonus_aspect_ratio
+    description: Group-level bonus flag for aspect ratio.
+  has_bonus_external:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_bonus_external
+    description: Group-level bonus flag for exterior photos.
+  has_bonus_good_sharpness:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_bonus_good_sharpness
+    description: Group-level bonus flag for sharpness.
+  has_bonus_images_per_room:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_bonus_images_per_room
+    description: Group-level bonus flag for images per room coverage.
+  has_bonus_sharpness:
+    lineage:
+      - datalake_kodak_clean.image_inspection.has_bonus_sharpness
+    description: Image-level sharpness bonus flag.
+  has_bonus_view:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_bonus_view
+    description: Group-level bonus flag for view photos.
+  has_fault_aspect_ratio:
+    lineage:
+      - datalake_kodak_clean.image_inspection.has_fault_aspect_ratio
+    description: Image-level aspect ratio fault flag.
+  has_fault_brightness:
+    lineage:
+      - datalake_kodak_clean.image_inspection.has_fault_brightness
+    description: Image-level brightness fault flag.
+  has_fault_sharpness:
+    lineage:
+      - datalake_kodak_clean.image_inspection.has_fault_sharpness
+    description: Image-level sharpness fault flag.
+  has_red_flags:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flags
+    description: Group-level critical red flag aggregate.
+  has_red_flag_aspect_ratio:
+    lineage:
+      - datalake_kodak_clean.image_inspection.has_red_flag_aspect_ratio
+    description: Image-level red flag for aspect ratio.
+  has_red_flag_casamineira:
+    lineage:
+      - datalake_kodak_clean.image_inspection.has_red_flag_casamineira
+    description: Image-level CasaMineira anti-fraud red flag.
+  has_red_flag_compliance:
+    lineage:
+      - datalake_kodak_clean.image_inspection.has_red_flag_compliance
+    description: Image-level compliance red flag.
+  has_red_flag_duplicate_image:
+    lineage:
+      - datalake_kodak_clean.image_inspection.has_red_flag_duplicate_image
+    description: Image-level duplicate red flag.
+  has_red_flag_images_per_room:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_images_per_room
+    description: Group-level red flag for insufficient images per room.
+  has_red_flag_media_modification:
+    lineage:
+      - datalake_kodak_clean.image_inspection.has_red_flag_media_modification
+    description: Image-level media modification red flag.
+  has_red_flag_not_property:
+    lineage:
+      - datalake_kodak_clean.image_inspection.has_red_flag_not_property
+    description: Image-level not-property red flag.
+  has_red_flag_primary_risk:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_primary_risk
+    description: Group-level primary risk red flag.
+  has_red_flag_property_condition:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.has_red_flag_property_condition
+    description: Group-level property condition red flag.
+  has_red_flag_sharpness:
+    lineage:
+      - datalake_kodak_clean.image_inspection.has_red_flag_sharpness
+    description: Image-level sharpness red flag.
+  has_red_flag_size:
+    lineage:
+      - datalake_kodak_clean.image_inspection.has_red_flag_size
+    description: Image-level size red flag.
+  has_red_flag_watermark:
+    lineage:
+      - datalake_kodak_clean.image_inspection.has_red_flag_watermark
+    description: Image-level watermark red flag.
+  has_3p_access_control:
+    description: Constant true for 3P access-controlled datasets in this DW.
+  ts_image_inspection_created:
+    lineage:
+      - datalake_kodak_clean.image_inspection.ts_created
+    description: When the image inspection row was created.
+  ts_image_inspection_group_created:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.ts_created
+    description: When the inspection group was created.
+  ts_image_inspection_updated:
+    lineage:
+      - datalake_kodak_clean.image_inspection.ts_updated
+    description: When the image inspection row was last updated.
+  ts_image_inspection_group_updated:
+    lineage:
+      - datalake_kodak_clean.image_inspection_group.ts_updated
+    description: When the inspection group was last updated.
+  ts_load:
+    description: Timestamp when the row was loaded by this DAG.
+  year:
+    lineage:
+      - datalake_kodak_clean.image_inspection.year
+    description: Partition year from source image_inspection table.
+  month:
+    lineage:
+      - datalake_kodak_clean.image_inspection.month
+    description: Partition month from source image_inspection table.
+  day:
+    lineage:
+      - datalake_kodak_clean.image_inspection.day
+    description: Partition day from source image_inspection table.
