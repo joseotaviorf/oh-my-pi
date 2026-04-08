@@ -398,6 +398,13 @@ workflow:
       extra_spark_job_arguments:
         - raw_custom_schema: pin_core
           date_column_to_partition: last_update_date    
+    per_seniority_dates_f:
+      clean_table_name: seniority_date
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - raw_custom_schema: pin_core
+          date_column_to_partition: last_update_date
     per_users:
       clean_table_name: user
       vacuum_retention_hours: 168

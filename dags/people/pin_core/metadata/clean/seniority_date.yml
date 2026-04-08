@@ -1,0 +1,158 @@
+database_name: datalake_pin_core_clean
+table_name: seniority_date
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Business-ready history of employee seniority dates from Oracle HCM.
+  Each row represents a person under a specific seniority rule and period, including tenure values and day-level adjustments used in workforce analyses.
+columns:
+  id_seniority_date:
+    description: Unique identifier of the seniority date record.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.seniority_date_id
+  id_business_group:
+    description: Identifier of the enterprise business group.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.business_group_id
+  id_person:
+    description: Identifier of the person that owns the seniority date record.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.person_id
+  id_level_object:
+    description: Identifier of the organizational level where the seniority rule applies, such as a job or position.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.level_object_id
+  id_ess_request:
+    description: Identifier of the Oracle ESS batch request that last processed the record.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.ess_request_id
+  id_triggering_field_number:
+    description: Numeric business key used by the rule trigger, usually related to job or position.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.seniority_field_number
+  id_last_update_session:
+    description: Session login identifier associated with the last update operation.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.last_update_login
+  seniority_rule_code:
+    description: Rule code that defines how seniority is calculated for the person.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.seniority_date_code
+  calculation_type:
+    description: Calculation mode for the row, such as manual update or automatic process.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.calculation_type
+  seniority_level_code:
+    description: Level code used by the rule context.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.level_code
+  triggering_field_code:
+    description: Field code that triggers the seniority rule calculation.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.seniority_field
+  seniority_field_key:
+    description: Unified trigger key stored by Oracle for the field that drives the rule.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.seniority_field_key
+  created_by_process:
+    description: Source channel that created the record, for example UI, HDL, or ESS.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.record_creator
+  created_by:
+    description: User that created the row in Oracle.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.created_by
+  last_updated_by:
+    description: User that last updated the row in Oracle.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.last_updated_by
+  object_version_number:
+    description: Oracle row version used for update control.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.object_version_number
+  years_tenure:
+    description: Tenure years calculated by the rule.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.seniority_los_years
+  months_tenure:
+    description: Remaining tenure months calculated by the rule.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.seniority_los_months
+  days_tenure:
+    description: Remaining tenure days calculated by the rule.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.seniority_los_days
+  days_tenure_total:
+    description: Total tenure converted to days for easier aggregation and comparisons.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.seniority_los_total_days
+  days_overlapping_period:
+    description: Number of overlapping days across assignments under the same seniority rule.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.overlapping_period_in_days
+  days_auto_adjustment:
+    description: Day adjustment automatically applied in this specific change event.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.auto_adjustment_days
+  days_auto_adjustment_total:
+    description: Cumulative automatic day adjustments up to this row.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.total_auto_adjustment_days
+  days_adjustment_total:
+    description: Cumulative day adjustments from all sources up to this row.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.total_adjustment_days
+  auto_adjustment_comments:
+    description: Optional note describing the automatic adjustment.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.auto_adjustment_comments
+  dt_effective_started:
+    description: Start date of the period when this row is valid.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.effective_start_date
+  dt_effective_ended:
+    description: End date of the period when this row is valid.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.effective_end_date
+  dt_first_assigned:
+    description: First date when this seniority attribute was assigned to the person in this level context.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.entry_date
+  dt_seniority:
+    description: Seniority reference date used to calculate tenure.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.seniority_date
+  dt_base_seniority:
+    description: Previous base seniority date used as reference for current adjustments.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.base_seniority_date
+  dt_exited:
+    description: Last date when this seniority attribute remained assigned at this level context.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.exit_date
+  dt_last_ess_run:
+    description: Date of the most recent ESS run that refreshed this seniority record.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.last_ess_run_date
+  ts_created:
+    description: Timestamp when Oracle created the record.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.creation_date
+  ts_updated:
+    description: Timestamp when Oracle last updated the record.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.last_update_date
+  ts_load:
+    description: Timestamp when the row was ingested into the clean layer.
+  year:
+    description: Year partition derived from the configured date partition column.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.year
+  month:
+    description: Month partition derived from the configured date partition column.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.month
+  day:
+    description: Day partition derived from the configured date partition column.
+    lineage:
+    - datalake_pin_core_raw.per_seniority_dates_f.day
