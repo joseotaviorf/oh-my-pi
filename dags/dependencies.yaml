@@ -986,7 +986,6 @@ bietlejuice.dw_rede_supply:
   - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company:first-run-of-day
-  - bietlejuice.enrich_rede_lead_acquisition:load-enrich-lead-3p-acquisition:first-run-of-day
   - bietlejuice.enrich_rede_supply:load-enrich-file-sks:first-run-of-day
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-reason-changes:first-run-of-day
   - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-reasons:first-run-of-day
@@ -3370,9 +3369,6 @@ bietlejuice.enrich_rede_house_history:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-history:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company:first-run-of-day
-bietlejuice.enrich_rede_lead_acquisition:
-  - bietlejuice.enrich_hubspot_events:load-enrich-membership-updates:first-run-of-day
-  - bietlejuice.enrich_rede_supply:load-enrich-lead-3p-status-changes:first-run-of-day
 bietlejuice.enrich_rede_supply:
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail-aud:first-run-of-day
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p-aud:first-run-of-day

@@ -1289,3 +1289,6 @@ bietlejuice.enrich_attribution:
   add:
     - bietlejuice.rene_descartes:load-clean-house-lead:first-run-of-day
     - bietlejuice.rene_descartes:load-clean-acquisition-misc-data:first-run-of-day
+bietlejuice.dw_rede_supply:
+  remove:
+    - bietlejuice.enrich_rede_lead_acquisition:load-enrich-lead-3p-acquisition:first-run-of-day
