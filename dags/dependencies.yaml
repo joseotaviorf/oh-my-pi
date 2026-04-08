@@ -445,7 +445,6 @@ bietlejuice.dw_customer_satisfaction:
 bietlejuice.dw_customer_support:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
   - bietlejuice.bigfone:load-clean-ivr-closed-history:first-run-of-day
-  - bietlejuice.enrich_chatbot:load-enrich-messages:first-run-of-day
   - bietlejuice.enrich_customer_demand:load-enrich-backlog-metrics-tasks:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-calls:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-csat:first-run-of-day

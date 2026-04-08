@@ -66,7 +66,7 @@ bietlejuice.dw_crm:
 bietlejuice.dw_customer_support:
   remove:
     - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics:first-run-of-day
-    - bietlejuice.datalake_chatbot:load-clean-messages:first-run-of-day
+    - bietlejuice.enrich_chatbot:load-enrich-messages:first-run-of-day
 bietlejuice.dw_customer_support_view:
   remove:
     - bietlejuice.dw_customer_support:load-dw-customer-support-dim-analyst:first-run-of-day
