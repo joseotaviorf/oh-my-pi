@@ -12,6 +12,7 @@ WITH orchestrator_sessions AS (
       WHEN m.channel = 'WHATSAPP_CONCIERGE_CHAT' THEN 'concierge'
       WHEN m.channel = 'COPILOT_CHAT' THEN 'copilot'
       WHEN m.channel = 'WHATSAPP_FORSALE_TRANSACT_EOP_CHAT' THEN 'vandinha'
+      WHEN m.channel = 'WHATSAPP_CLAUDIA_CHAT' THEN 'claudia'
       ELSE 'unknown'
     END AS bot,
     s.department AS first_queue,
