@@ -38,3 +38,6 @@ workflow:
     layoffs:
       vacuum_retention_hours: 168
       vacuum_lite: true
+    legacy_performance_review:
+      vacuum_retention_hours: 168
+      vacuum_lite: true

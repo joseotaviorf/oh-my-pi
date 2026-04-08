@@ -16,3 +16,9 @@ sheets_info:
     sheet_context: people
     sheet_id: 1T1y10q0txpu2af3jGyFM2QNf3TqPaT29UJoFje9khgk
     sheet_name: layoffs
+
+  legacy_performance_review:
+    clean_table_name: legacy_performance_review
+    sheet_context: people
+    sheet_id: 1yuoigACcuQKrJot3vYkfagcXtPc1_zqueI8eqxickl0
+    sheet_name: legacy_performa

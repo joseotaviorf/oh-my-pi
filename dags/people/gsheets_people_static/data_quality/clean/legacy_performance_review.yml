@@ -1,0 +1,7 @@
+---
+table_name: datalake_gsheets_people_static_clean.legacy_performance_review
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 10000
+    severity_level: Error

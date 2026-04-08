@@ -1,0 +1,106 @@
+database_name: datalake_gsheets_people_static_clean
+table_name: legacy_performance_review
+owner: gabriel.berger@quintoandar.com.br
+domain: People
+description: Archived legacy Performa performance and talent-review outcomes for cycles before PIN (Oracle HCM). Each row captures six How competency scores (0–4), an overall How score (1–4), What on a 0–1.2 scale and a normalized What (1–4), final performance score and band, talent-review ratings (readiness, risk of loss, potential, criticality, development matrix), and qualitative comments. Intended for historical comparison and reporting; not the canonical source for current people performance in the warehouse.
+columns:
+  performance_cycle:
+    description: Identifier of the performance review period, such as a semester or year code (e.g. 2022-h1).
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.ciclo
+  evaluator_email:
+    description: Work email of the evaluator, usually the people manager responsible for the review.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.email_avaliador
+  committee_comments:
+    description: Qualitative feedback from the performance or calibration committee. May include identifiable context.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.comentarios_do_comite
+  self_evaluation_comments:
+    description: Employee self-assessment narrative for the cycle.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.self_evaluation
+  peer_1_comments:
+    description: Free-text feedback from the first peer reviewer.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.peers_1
+  peer_2_comments:
+    description: Free-text feedback from the second peer reviewer.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.peers_2
+  peer_3_comments:
+    description: Free-text feedback from the third peer reviewer.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.peers_3
+  how_doing_the_right_thing_score:
+    description: How competency score for doing the right thing (legacy 0–4 scale).
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.how_faz_o_certo
+  how_customer_pain_resolution_score:
+    description: How competency score for resolving the customer pain point (0–4).
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.how_resolve_a_dor_do_cliente
+  how_embracing_change_score:
+    description: How competency score for embracing change and the new (0–4).
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.how_abraca_o_novo
+  how_delivers_on_commitments_score:
+    description: How competency score for delivering on commitments (0–4).
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.how_entrega_o_que_promete
+  how_collaborates_to_go_further_score:
+    description: How competency score for collaborating to go further (0–4).
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.how_colabora_para_ir_mais_longe
+  how_career_ownership_score:
+    description: How competency score for owning their own career progression (0–4).
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.how_protagoniza_a_propria_carreira
+  what_raw_score:
+    description: What component on the original 0–1.2 scale used in legacy Performa.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.what
+  what_normalized_score:
+    description: What score expressed on the 1–4 scale for comparison with How in the legacy formula.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.what_calculado
+  how_score:
+    description: Overall How numeric result on the 1–4 scale (aggregate of the How constructs in the legacy methodology).
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.how
+  performance_score:
+    description: Final numeric performance score combining How and What under the legacy Performa rules.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.performance
+  avg_what_and_how:
+    description: Reference average combining What and How.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.avg_what_and_how
+  performance_band_name:
+    description: Categorical performance band.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.fx_performance
+  readiness_rating:
+    description: Talent-review readinesslevel.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.prontidao
+  risk_of_loss_rating:
+    description: Talent-review assessment of flight or retention risk.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.risco_de_perda
+  potential_rating:
+    description: Talent-review potential level for growth or scope.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.potencial
+  criticality_rating:
+    description: Talent-review criticality of the role or person to the business.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.criticidade
+  development_matrix:
+    description: Placement on the legacy development or nine-box style matrix.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.matriz_de_desenvolvimento
+  ts_load:
+    description: System timestamp when the record was loaded in the batch that refreshed this table.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.ts_load
