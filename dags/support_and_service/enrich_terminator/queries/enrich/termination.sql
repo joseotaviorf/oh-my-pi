@@ -42,27 +42,28 @@ last_inspection_synch AS(
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY t.id ORDER BY ib.ts_inspected DESC) = 1
 ),
-last_negociation AS (
-    SELECT
+last_negotiation AS (
+    SELECT 
         tf.id_termination,
         tfn.discount_percentage AS fee_discount_percentage,
         tfn.discount_value AS fee_discount_value,
-        COALESCE(tfn.final_amount, tf.landlord_amount, tf.tenant_amount) AS fee_final_amount,
+        COALESCE(tfn.final_amount, tf.tenant_amount) AS fee_final_amount,
         tf.tenant_payment_method:['installments'] AS fee_number_of_installments,
         tf.tenant_payment_method:['paymentOption'] AS fee_payment_option,
         tfn.status AS fee_negotiation_status,
         CASE
-            WHEN tf.period_fee_missing_days > 0 THEN TRUE
+            WHEN COALESCE(tfn.final_amount, tf.tenant_amount) > 0 THEN TRUE
             ELSE FALSE
         END AS has_early_termination_fee,
         tf.is_fee_prior_notice,
         tfn.ts_created AS ts_fee_negotiation_created,
         tfn.ts_updated AS ts_fee_negotiation_updated
     FROM
-        datalake_terminator_clean.termination_fee_negotiation AS tfn
-    LEFT JOIN
         datalake_terminator_clean.termination_fee AS tf
+    LEFT JOIN
+        datalake_terminator_clean.termination_fee_negotiation AS tfn
             ON tf.id = tfn.id_termination_fee
+              AND tfn.status = 'CONFIRMED'
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY tf.id_termination ORDER BY tfn.ts_updated DESC) = 1
 ),
@@ -295,7 +296,7 @@ LEFT JOIN
     last_inspection_synch AS lis
         ON t.id = lis.id
 LEFT JOIN
-    last_negociation AS ln
+    last_negotiation AS ln
         ON t.id = ln.id_termination
 LEFT JOIN
     contract_info AS ci

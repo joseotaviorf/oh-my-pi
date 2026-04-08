@@ -165,7 +165,10 @@ columns:
     lineage:
       - datalake_terminator_clean.inspection_opted_out.is_exit_inspection_opt_out
   has_early_termination_fee:
-    description: Boolean information that indicates whether the termination fee is early.
+    description: Boolean flag indicating whether an early termination fee applies. True when the resolved fee amount (confirmed negotiated amount or tenant amount) is greater than zero.
+    lineage:
+      - datalake_terminator_clean.termination_fee_negotiation.final_amount
+      - datalake_terminator_clean.termination_fee.tenant_amount
   is_fee_prior_notice:
     description: Boolean information that indicates whether the termination fee is prior notice.
     lineage:
@@ -207,9 +210,10 @@ columns:
     lineage:
       - datalake_terminator_clean.termination_fee_negotiation.discount_value
   fee_final_amount:
-    description: Numerical information that indicates the final value of the termination fee.
+    description: Numerical information that indicates the final value of the termination fee. Resolved as the confirmed negotiated amount when available, otherwise falls back to the tenant amount from the fee record.
     lineage:
       - datalake_terminator_clean.termination_fee_negotiation.final_amount
+      - datalake_terminator_clean.termination_fee.tenant_amount
   fee_number_of_installments:
     description: Numerical information that indicates the number of installments for the termination fee.
     lineage:
