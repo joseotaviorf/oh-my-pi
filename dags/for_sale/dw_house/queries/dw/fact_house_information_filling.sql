@@ -1,6 +1,6 @@
 WITH house AS (
     SELECT
-        h.id AS id_house,
+        h.id AS sk_house,
         h.id_region,
         cs_supply.sk_company
     FROM
@@ -43,8 +43,8 @@ LEFT JOIN
         AND COALESCE(UPPER(ah.has_feature::STRING), 'Unknown') = dhi.value
 LEFT JOIN
     dw_house.dim_house_amenities_version AS dhav
-        ON ah.id_house = dhav.id_house
+        ON ah.id_house = dhav.sk_house
         AND ah.ts_change = dhav.ts_version_started
 LEFT JOIN
     house AS h
-        ON ah.id_house = h.id_house
+        ON ah.id_house = h.sk_house

@@ -709,14 +709,12 @@ bietlejuice.dw_house:
   - bietlejuice.ebdb_condo:load-clean-info-amenities:first-run-of-day
   - bietlejuice.ebdb_condo:load-clean-info-condo-amenities:first-run-of-day
   - bietlejuice.ebdb_house:load-clean-house-maintenance-condition:first-run-of-day
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history:first-run-of-day
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house-status:first-run-of-day
-  - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
-bietlejuice.dw_house_amenities:
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity-change-history:first-run-of-day
   - bietlejuice.enrich_ebdb_amenities:load-enrich-amenity:first-run-of-day
   - bietlejuice.enrich_ebdb_amenities:load-enrich-pivotted-amenities:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-status:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
 bietlejuice.dw_hub_services:
   - bietlejuice.enrich_hub_services_agents:load-enrich-member-profile:first-run-of-day

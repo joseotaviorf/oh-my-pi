@@ -2,7 +2,7 @@
 database_name: dw_house
 table_name: fact_house_information_filling
 description: Every time a particular information changes, such as a house or condo amenity, a new row is inserted in this table.
-domain: 3P Partners
+domain: For Sale
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_house_information_change:
@@ -12,7 +12,7 @@ columns:
     lineage:
       - dw_house.dim_house_amenities_version.sk_house_amenities_version
   sk_house:
-    description: Foreign key to the dimension table (dim_house) that contains the house that had an information change.
+    description: House key (dim_house.sk_house); sourced from amenity_change_history.id_house.
     lineage:
       - datalake_ebdb_amenities.amenity_change_history.id_house
   sk_information:

@@ -4,13 +4,16 @@ table_name: dim_house_amenities_version
 description: Slowly changing dimension of house and condo amenities. Every time an amenity associated with
   a house is updated, a new row is created in this table. It contains all the amenities of a given house,
   as well as the version number, and timestamps of start and end of the version.
-domain: 3P Partners
+domain: For Sale
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_house_amenities_version:
-    description: Primary key of the table, generated incrementally.
-  id_house:
-    description: Id of the house.
+    description: Primary key; Spark CONCAT(sk_house, version), stable for the same natural key on each full load.
+    lineage:
+      - datalake_ebdb_amenities.pivotted_amenities.id_house
+      - datalake_ebdb_amenities.pivotted_amenities.version
+  sk_house:
+    description: House dimension key in DW; sourced from pivotted_amenities.id_house.
     lineage:
       - datalake_ebdb_amenities.pivotted_amenities.id_house
   has_bathtub:

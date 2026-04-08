@@ -1,15 +1,6 @@
-WITH last_sk_values AS (
-    SELECT
-        COALESCE(MAX(sk_house_amenities_version), 0) AS max_sk_house_amenities_version
-    FROM
-        dw_house.dim_house_amenities_version
-)
 SELECT
-    COALESCE(
-        dhav.sk_house_amenities_version,
-        last_sk_values.max_sk_house_amenities_version + MONOTONICALLY_INCREASING_ID() + 1
-    ) AS sk_house_amenities_version,
-    pa.id_house,
+    CONCAT(pa.id_house, pa.version) AS sk_house_amenities_version,
+    pa.id_house AS sk_house,
     pa.has_bathtub,
     pa.has_shower_enclosure,
     pa.has_balcony,
@@ -97,9 +88,4 @@ SELECT
     pa.ts_version_ended,
     NOW() AS ts_load
 FROM
-    datalake_ebdb_amenities.pivotted_amenities AS pa,
-    last_sk_values
-LEFT JOIN
-    dw_house.dim_house_amenities_version AS dhav
-        ON pa.id_house = dhav.id_house
-        AND pa.version = dhav.version
+    datalake_ebdb_amenities.pivotted_amenities AS pa

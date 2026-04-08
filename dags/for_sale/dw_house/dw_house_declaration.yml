@@ -2,15 +2,25 @@ dag:
   name: dw_house
   schedule_start_date: 2020,08,29
   owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      Loads the house-related dimensional model into the data warehouse: dim_house, dim_house_amenities,
+      dim_house_status, dim_house_entrance_history; and 3P supply tables for amenity SCD versions,
+      the house/condo information catalog, and per-change history (dim_house_amenities_version,
+      dim_house_information, fact_house_information_filling).
 workflow:
   type: query_delta
   layer: dw
   custom_schema: house
+  inner_dependencies:
+    fact_house_information_filling:
+    - dim_house_amenities_version
+    - dim_house_information
   tables_customization:
     dim_house_status:
       custom_schema: rent
 cluster:
-  type: databricks_13_3_min_memory_cluster
+  type: databricks_16_4_min_memory_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
