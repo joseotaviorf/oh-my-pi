@@ -2,6 +2,7 @@ from bietlejuice.base.sst.domains.salesforce.clean.check import (
     check_for_create_partition,
 )
 from bietlejuice.base.sst.core.utils.common import _table_exists, safe_column_union
+from bietlejuice.base.sst.core.utils.transforms import nullify_fields_on_delete
 from quintoandar_logger import QuintoAndarLogger
 from pyspark.sql import Window
 
@@ -69,10 +70,27 @@ def in_memory_cdc_udpate(df):
         for col in df.columns
         if col not in ["id_record", "commit_number", "commit_ts", "sequence_number"]
     ]
-    return df.select(
+    updated_cdc = df.select(
         "id_record",
         "commit_number",
         "commit_ts",
         "sequence_number",
         *[F.last(F.col(col), ignorenulls=True).over(w).alias(col) for col in cols],
     )
+
+    delete_non_null_cols = [
+        "id_record",
+        "entity_name",
+        "event_type",
+        "transaction_key",
+        "sequence_number",
+        "commit_number",
+        "commit_ts",
+        "commit_user",
+        "changed_field",
+        "source_file",
+        "commited_at",
+        "new_record",
+    ]
+
+    return nullify_fields_on_delete(df=updated_cdc, non_null_cols=delete_non_null_cols)
