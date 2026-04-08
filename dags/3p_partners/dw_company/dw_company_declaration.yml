@@ -15,24 +15,9 @@ workflow:
           - SELECT
         data-engineers:
           - ALL PRIVILEGES
-    dim_company_event_type:
-      table_privileges:
-        3p-readers:
-          - SELECT
-        data-engineers:
-          - ALL PRIVILEGES
-    fact_company_events:
-      table_privileges:
-        3p-readers:
-          - SELECT
-        data-engineers:
-          - ALL PRIVILEGES
     dim_company:
         row_filter_column_key: has_3p_access_control
         row_filter: has_3p_access
-  inner_dependencies:
-    fact_company_events:
-      - dim_company_event_type
 cluster:
   type: databricks_16_4_med_general_cluster
   access_control_list:
