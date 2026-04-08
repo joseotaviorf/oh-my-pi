@@ -38,6 +38,7 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         when_not_matched_operation: dict = None,
         table_privileges: TablePrivileges = None,
         table_properties: dict = None,
+        column_mapping_mode: str = None,
         spark=BaseSparkContext.spark,
     ):
         """
@@ -98,6 +99,7 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
         self.when_matched_operation = when_matched_operation
         self.when_not_matched_operation = when_not_matched_operation
         self.table_properties = table_properties
+        self.column_mapping_mode = column_mapping_mode
         self.spark = spark
 
     def load_and_register(self, df, format_options):
@@ -127,6 +129,7 @@ class DeltaTableLoaderPipeline(TableLoaderPipeline):
             when_not_matched_by_source_delete_condition=self.when_not_matched_by_source_delete_condition,
             when_matched_operation=self.when_matched_operation,
             when_not_matched_operation=self.when_not_matched_operation,
+            column_mapping_mode=self.column_mapping_mode,
         )
 
         spark_metastore_service.refresh_table(

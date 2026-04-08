@@ -7,6 +7,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.spark.base_spark import BaseSparkContext
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 from bietlejuice.pipeline.delta_table_loader_pipeline import DeltaTableLoaderPipeline
@@ -18,12 +19,15 @@ JOB_NAME = "load_delta_table"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
+
 def main():
     global spark
     if RuntimeDetector.is_emr():
         from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
 
         spark = create_emr_spark_session(JOB_NAME)
+    else:
+        spark = BaseSparkContext.spark
     args = parse_arguments()
     if args.table_privileges is not None:
         table_privileges_dict = json.loads(args.table_privileges)
@@ -55,7 +59,7 @@ def main():
 
     spark_ms = SparkMetastoreHelper(args.bucket, args.layer, args.database_base_name, args.table_name, all_tables=False)
     database_name = spark_ms.spark_database_name
-    database_location = spark_ms.database_location.replace("s3a://", "s3://") # Seems to be faster
+    database_location = spark_ms.database_location.replace("s3a://", "s3://")  # Seems to be faster
     full_table_name = f"{database_name}.{args.table_name}"
 
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
@@ -70,6 +74,8 @@ def main():
         )
     else:
         table_privileges = TablePrivileges.from_environment_default(full_table_name)
+
+    column_mapping_mode = json.loads(args.column_mapping_mode)
 
     table_loader_pipeline = DeltaTableLoaderPipeline(
         database_name=database_name,
@@ -90,7 +96,8 @@ def main():
         when_not_matched_operation=json.loads(args.when_not_matched_operation),
         table_privileges=table_privileges,
         table_properties=json.loads(args.table_properties) if args.table_properties else None,
-        spark=spark
+        column_mapping_mode=column_mapping_mode,
+        spark=spark,
     )
     table_loader_pipeline.run()
 
@@ -160,17 +167,28 @@ def parse_arguments() -> Namespace:
         "when_matched_operation",
         type=str,
         help="Which columns to update when there is a match, and with which values. "
-           + "Should be a dictionary, with the keys being the columns to be updated, and "
-           + "the values being what to update them with. You can use source.<column_name> "
-           + "or target.<column_name> to disambiguate between the query result and the existing value.",
+        + "Should be a dictionary, with the keys being the columns to be updated, and "
+        + "the values being what to update them with. You can use source.<column_name> "
+        + "or target.<column_name> to disambiguate between the query result and the existing value.",
     )
     parser.add_argument(
         "when_not_matched_operation",
         type=str,
         help="Which columns to insert when there is not a match, and with which values. "
-           + "Should be a dictionary, with the keys being the columns to be updated, and "
-           + "the values being what to update them with. You can use source.<column_name> "
-           + "or target.<column_name> to disambiguate between the query result and the existing value.",
+        + "Should be a dictionary, with the keys being the columns to be updated, and "
+        + "the values being what to update them with. You can use source.<column_name> "
+        + "or target.<column_name> to disambiguate between the query result and the existing value.",
+    )
+    parser.add_argument(
+        "-cm",
+        "--column-mapping-mode",
+        type=str,
+        default="null",
+        help=(
+            "JSON-encoded delta.columnMapping.mode. Use null for default behavior. "
+            "Set to name when logical column names contain characters not allowed in Parquet "
+            "(see Delta column mapping; same token as in Delta table properties)."
+        ),
     )
     parser.add_argument(
         "-tp",
@@ -207,6 +225,7 @@ def parse_arguments() -> Namespace:
 
     return parser.parse_args()
 
+
 def get_query_template_params(execution_date: str, additional_query_template_params: dict) -> dict:
     dt_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
     query_template_params = {
@@ -216,6 +235,7 @@ def get_query_template_params(execution_date: str, additional_query_template_par
     }
     query_template_params.update(additional_query_template_params)
     return query_template_params
+
 
 if __name__ == "__main__":
     main()

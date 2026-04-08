@@ -1,6 +1,9 @@
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 
+_VALID_COLUMN_MAPPING_MODES = {None, "none", "name", "id"}
+
+
 class TableAttributes:
     def __init__(
         self,
@@ -26,6 +29,7 @@ class TableAttributes:
         )
         self.table_privileges = self._get_table_privileges()
         self.table_properties = self._get_table_properties()
+        self.column_mapping_mode = self._get_column_mapping_mode()
         self.has_soft_delete = self.get_has_soft_delete()
         self.row_filter_column_key = self.table_customization.get(
             "row_filter_column_key", ""
@@ -178,6 +182,15 @@ class TableAttributes:
             )
 
         return table_privileges
+
+    def _get_column_mapping_mode(self):
+        mode = self.table_customization.get("column_mapping_mode")
+        if mode not in _VALID_COLUMN_MAPPING_MODES:
+            raise ValueError(
+                f"Invalid column_mapping_mode '{mode}'. "
+                f"Valid values: {_VALID_COLUMN_MAPPING_MODES}"
+            )
+        return mode
 
     def _get_row_filter_function_name(self) -> str:
         self.row_filter = self.table_customization.get("row_filter", "")
