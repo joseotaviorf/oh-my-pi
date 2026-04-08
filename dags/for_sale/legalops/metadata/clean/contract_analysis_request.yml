@@ -33,6 +33,14 @@ columns:
     description: Error message if the contract analysis request failed.
     lineage:
       - datalake_legalops_raw.contract_analysis_request.error_message
+  analysis_started_at:
+    description: Timestamp when the contract analysis request started.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.analysis_started_at
+  analysis_ended_at:
+    description: Timestamp when the contract analysis request ended.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_request.analysis_ended_at
   ts_created:
     description: Timestamp when the contract analysis request was created.
     lineage:

@@ -21,6 +21,22 @@ columns:
     description: Foreign key to the document extraction.
     lineage:
       - datalake_legalops_raw.contract_analysis_data_relation.document_extraction_id
+  download_started_at:
+    description: Timestamp when the download of the document started.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_data_relation.download_started_at
+  download_ended_at:
+    description: Timestamp when the download of the document ended.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_data_relation.download_ended_at
+  extraction_started_at:
+    description: Timestamp when the extraction of the document started.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_data_relation.extraction_started_at
+  extraction_ended_at:
+    description: Timestamp when the extraction of the document ended.
+    lineage:
+      - datalake_legalops_raw.contract_analysis_data_relation.extraction_ended_at
   ts_created:
     description: Timestamp when the relation was created.
     lineage:

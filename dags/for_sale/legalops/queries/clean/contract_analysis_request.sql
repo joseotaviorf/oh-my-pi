@@ -6,6 +6,8 @@ SELECT
     request_payload,
     contract_analysis_result,
     error_message,
+    analysis_started_at,
+    analysis_ended_at,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
