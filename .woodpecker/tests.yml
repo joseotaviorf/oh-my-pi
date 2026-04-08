@@ -2,7 +2,17 @@ clone:
   - name: clone
     image: woodpeckerci/plugin-git
     settings:
-      partial: false # We need to clone the entire history to find the changed files
+      partial: false # We need the parent commit for git diff HEAD~1 HEAD (see .woodpecker docs)
+      depth: 2 # At least 2 commits so HEAD~1 exists in the clone
+
+# Matches scripts/ci_cd/core_models/check_core_model_changes.py CORE_MODEL_PATHS (Python only)
+variables:
+  - &path_filter_core_model_python
+    include:
+      - "dags/core/**/*.py"
+      - "tests/core_model_dags/**/*.py"
+      - "bietlejuice/base/core_models/**/*.py"
+    on_empty: false
 
 steps:
   unit-tests-python:
@@ -16,6 +26,10 @@ steps:
       - make unit-tests
     when:
       event: push
+      path:
+        include:
+          - "**/*.py"
+        on_empty: false
     depends_on: [] # This is for the steps to run in parallel
 
   integration-tests-python:
@@ -29,6 +43,10 @@ steps:
       - make integration-tests
     when:
       event: push
+      path:
+        include:
+          - "**/*.py"
+        on_empty: false
     depends_on: [] # This is for the steps to run in parallel
 
   core-model-tests-and-coverage:
@@ -42,3 +60,4 @@ steps:
       - make core-model-coverage
     when:
       event: push
+      path: *path_filter_core_model_python
