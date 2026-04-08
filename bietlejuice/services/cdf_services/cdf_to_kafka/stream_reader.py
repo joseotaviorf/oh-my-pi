@@ -5,6 +5,9 @@ from typing import Optional, Tuple
 
 from pyspark.sql import DataFrame, SparkSession
 
+from bietlejuice.services.cdf_services.cdf_to_kafka.cassandra_schema_validator import (
+    validate_against_cassandra_schema,
+)
 from bietlejuice.services.cdf_services.cdf_to_kafka.config import config
 from bietlejuice.services.cdf_services.cdf_to_kafka.transformations.common import (
     drop_partition_columns,
@@ -24,12 +27,16 @@ class DeltaCDFReader:
         self,
         spark: SparkSession,
         delta_table: str,
+        entity: str,
+        feature_set_name: str,
         schema_registry_url: Optional[str] = None,
         schema_registry_api_key: Optional[str] = None,
         schema_registry_api_secret: Optional[str] = None,
     ):
         self.spark = spark
         self.delta_table = delta_table
+        self.entity = entity
+        self.feature_set_name = feature_set_name
         self.schema_registry_url = schema_registry_url
         self.schema_registry_api_key = schema_registry_api_key
         self.schema_registry_api_secret = schema_registry_api_secret
@@ -78,6 +85,14 @@ class DeltaCDFReader:
         logger.info("Filtering and cleaning CDF events...")
         filtered_cdf = filter_cdf_events(cdf)
         cleaned_cdf = drop_partition_columns(filtered_cdf)
+
+        logger.info("Validating CDF schema against Cassandra schema...")
+        validate_against_cassandra_schema(
+            spark=self.spark,
+            dataframe=cleaned_cdf,
+            entity=self.entity,
+            feature_set_name=self.feature_set_name,
+        )
 
         schema_id = None
         if config.use_schema_registry:

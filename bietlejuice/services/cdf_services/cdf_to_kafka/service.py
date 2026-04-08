@@ -65,6 +65,8 @@ class DeltaCDFToKafkaService:
         self.reader = DeltaCDFReader(
             spark=spark,
             delta_table=delta_table,
+            entity=entity,
+            feature_set_name=self.feature_set_name,
             schema_registry_url=schema_registry_url,
             schema_registry_api_key=schema_registry_api_key,
             schema_registry_api_secret=schema_registry_api_secret,

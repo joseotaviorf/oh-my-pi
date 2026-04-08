@@ -17,11 +17,21 @@ def delta_table():
     return "db.feature_set__latest"
 
 
+@pytest.fixture
+def entity():
+    return "test_entity"
+
+
+@pytest.fixture
+def feature_set_name():
+    return "test_feature_set"
+
+
 class TestDeltaCDFReaderValidateTable:
     """Tests for DeltaCDFReader.validate_table method."""
 
     def test_raises_error_when_table_does_not_exist(
-        self, spark_session_mock, delta_table
+        self, spark_session_mock, delta_table, entity, feature_set_name
     ):
         """Test that ValueError is raised when table does not exist."""
         spark_session_mock.catalog.tableExists.return_value = False
@@ -29,12 +39,16 @@ class TestDeltaCDFReaderValidateTable:
         reader = DeltaCDFReader(
             spark=spark_session_mock,
             delta_table=delta_table,
+            entity=entity,
+            feature_set_name=feature_set_name,
         )
 
         with pytest.raises(ValueError, match="does not exist"):
             reader.validate_table()
 
-    def test_raises_error_when_cdf_not_enabled(self, spark_session_mock, delta_table):
+    def test_raises_error_when_cdf_not_enabled(
+        self, spark_session_mock, delta_table, entity, feature_set_name
+    ):
         """Test that ValueError is raised when CDF is not enabled."""
         spark_session_mock.catalog.tableExists.return_value = True
 
@@ -45,13 +59,15 @@ class TestDeltaCDFReaderValidateTable:
         reader = DeltaCDFReader(
             spark=spark_session_mock,
             delta_table=delta_table,
+            entity=entity,
+            feature_set_name=feature_set_name,
         )
 
         with pytest.raises(ValueError, match="Change Data Feed is not enabled"):
             reader.validate_table()
 
     def test_succeeds_when_table_exists_and_cdf_enabled(
-        self, spark_session_mock, delta_table
+        self, spark_session_mock, delta_table, entity, feature_set_name
     ):
         """Test that validation succeeds when table exists and CDF is enabled."""
         spark_session_mock.catalog.tableExists.return_value = True
@@ -63,6 +79,8 @@ class TestDeltaCDFReaderValidateTable:
         reader = DeltaCDFReader(
             spark=spark_session_mock,
             delta_table=delta_table,
+            entity=entity,
+            feature_set_name=feature_set_name,
         )
 
         reader.validate_table()
@@ -73,6 +91,9 @@ class TestDeltaCDFReaderValidateTable:
 class TestDeltaCDFReaderPrepareCdfStream:
     """Tests for DeltaCDFReader.prepare_cdf_stream method."""
 
+    @patch(
+        "bietlejuice.services.cdf_services.cdf_to_kafka.stream_reader.validate_against_cassandra_schema"
+    )
     @patch("bietlejuice.services.cdf_services.cdf_to_kafka.stream_reader.config")
     @patch(
         "bietlejuice.services.cdf_services.cdf_to_kafka.stream_reader.drop_partition_columns"
@@ -85,8 +106,11 @@ class TestDeltaCDFReaderPrepareCdfStream:
         mock_filter,
         mock_drop,
         mock_config,
+        mock_validate_cassandra,
         spark_session_mock,
         delta_table,
+        entity,
+        feature_set_name,
     ):
         """Test that prepare_cdf_stream filters and cleans the stream."""
         mock_config.use_schema_registry = False
@@ -105,15 +129,26 @@ class TestDeltaCDFReaderPrepareCdfStream:
         reader = DeltaCDFReader(
             spark=spark_session_mock,
             delta_table=delta_table,
+            entity=entity,
+            feature_set_name=feature_set_name,
         )
 
         result_df, schema_id = reader.prepare_cdf_stream(kafka_topic="test-topic")
 
         mock_filter.assert_called_once_with(mock_cdf)
         mock_drop.assert_called_once_with(mock_filtered)
+        mock_validate_cassandra.assert_called_once_with(
+            spark=spark_session_mock,
+            dataframe=mock_cleaned,
+            entity=entity,
+            feature_set_name=feature_set_name,
+        )
         assert result_df == mock_cleaned
         assert schema_id is None
 
+    @patch(
+        "bietlejuice.services.cdf_services.cdf_to_kafka.stream_reader.validate_against_cassandra_schema"
+    )
     @patch(
         "bietlejuice.services.cdf_services.cdf_to_kafka.stream_reader.register_schema_for_dataframe"
     )
@@ -130,8 +165,11 @@ class TestDeltaCDFReaderPrepareCdfStream:
         mock_drop,
         mock_config,
         mock_register_schema,
+        mock_validate_cassandra,
         spark_session_mock,
         delta_table,
+        entity,
+        feature_set_name,
     ):
         """Test that schema is registered when use_schema_registry is True."""
         mock_config.use_schema_registry = True
@@ -151,6 +189,8 @@ class TestDeltaCDFReaderPrepareCdfStream:
         reader = DeltaCDFReader(
             spark=spark_session_mock,
             delta_table=delta_table,
+            entity=entity,
+            feature_set_name=feature_set_name,
             schema_registry_url=schema_registry_url,
             schema_registry_api_key=schema_registry_api_key,
             schema_registry_api_secret=schema_registry_api_secret,
@@ -158,6 +198,12 @@ class TestDeltaCDFReaderPrepareCdfStream:
 
         result_df, schema_id = reader.prepare_cdf_stream(kafka_topic="test-topic")
 
+        mock_validate_cassandra.assert_called_once_with(
+            spark=spark_session_mock,
+            dataframe=mock_cleaned,
+            entity=entity,
+            feature_set_name=feature_set_name,
+        )
         mock_register_schema.assert_called_once_with(
             dataframe=mock_cleaned,
             topic="test-topic",

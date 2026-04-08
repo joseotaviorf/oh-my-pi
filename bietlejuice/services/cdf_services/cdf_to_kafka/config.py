@@ -34,5 +34,10 @@ class CDFToKafkaConfig:
         """Schema Registry API secret. Required when use_schema_registry is True."""
         return os.getenv("CDF_TO_KAFKA_SCHEMA_REGISTRY_SECRET")
 
+    @property
+    def environment(self) -> str:
+        """Current runtime environment. Defaults to 'dev' when not set."""
+        return os.getenv("ENVIRONMENT", "dev")
+
 
 config = CDFToKafkaConfig()
