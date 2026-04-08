@@ -1,0 +1,37 @@
+SELECT
+    id,
+    rev,
+    revend AS rev_end,
+    revtype AS rev_type,
+    version,
+    status,
+    external_id AS id_external,
+    external_system,
+    amount,
+    description,
+    reason,
+    purpose,
+    refunded_item_id AS id_refunded_item,
+    insurance_id AS id_insurance,
+    status_mod AS mod_status,
+    external_id_mod AS mod_id_external,
+    external_system_mod AS mod_external_system,
+    amount_mod AS mod_amount,
+    description_mod AS mod_description,
+    reason_mod AS mod_reason,
+    purpose_mod AS mod_purpose,
+    refunded_item_id_mod AS mod_id_refunded_item,
+    insurance_id_mod AS mod_id_insurance,
+    accrual_year_month_mod AS mod_accrual_year_month,
+    accrued_date_mod AS mod_accrued_date,
+    accrual_year_month,
+    DATE(accrued_date) AS dt_accrued,
+    TIMESTAMP(created_at) AS ts_created,
+    TIMESTAMP(updated_at) AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_betopera_raw.tenant_invoice_item_aud
+WHERE
+    TIMESTAMP(created_at) > '2026-03-10T14:59:56.977+00:00'

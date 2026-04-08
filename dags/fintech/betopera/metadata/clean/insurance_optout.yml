@@ -1,0 +1,81 @@
+database_name: datalake_betopera_clean
+table_name: insurance_optout
+domain: Fintech
+description: "Insurance opt-out records from Betopera, including approval, cancellation, and policy period details."
+columns:
+  id:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.id
+    description: "Unique identifier of the insurance opt-out record."
+  requester:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.requester
+    description: "Actor or system that requested the insurance opt-out operation."
+  id_insurance:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.insurance_id
+    description: "Foreign key referencing the related insurance record."
+  invoice_management_type:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.invoice_management_type
+    description: "Invoice management strategy associated with the opt-out process."
+  id_approver_user:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.approver_user_id
+    description: "Identifier of the user who approved the opt-out request."
+  status:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.status
+    description: "Current lifecycle status of the insurance opt-out request."
+  id_canceller_user:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.canceller_user_id
+    description: "Identifier of the user who cancelled the opt-out request."
+  cancellation_reason:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.cancellation_reason
+    description: "Business reason provided when the opt-out request is cancelled."
+  dt_external_policy_start:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.external_policy_start_date
+    description: "Start date of the external insurance policy linked to this request."
+  dt_external_policy_end:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.external_policy_end_date
+    description: "End date of the external insurance policy linked to this request."
+  dt_start:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.start_date
+    description: "Start date of the opt-out validity period."
+  dt_end:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.end_date
+    description: "End date of the opt-out validity period."
+  ts_approved:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.approved_at
+    description: "Timestamp when the opt-out request was approved."
+  ts_cancelled:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.cancelled_at
+    description: "Timestamp when the opt-out request was cancelled."
+  ts_created:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.created_at
+    description: "Timestamp when the opt-out record was created in the source."
+  ts_updated:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.updated_at
+    description: "Timestamp when the opt-out record was last updated in the source."
+  year:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.year
+    description: "Partition year of the source record."
+  month:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.month
+    description: "Partition month of the source record."
+  day:
+    lineage:
+      - datalake_betopera_raw.insurance_optout.day
+    description: "Partition day of the source record."

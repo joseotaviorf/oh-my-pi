@@ -29,6 +29,10 @@ workflow:
       clean_table_name: insurance_aud
       raw_primary_keys: ["id", "rev"]
     insurance: {}
+    insurance_optout_aud:
+      clean_table_name: insurance_optout_aud
+      raw_primary_keys: ["id", "rev"]
+    insurance_optout: {}
     payment_aud:
       clean_table_name: payment_aud
       raw_primary_keys: ["id", "rev"]
@@ -43,6 +47,9 @@ workflow:
     tenant_invoice_item:
       clean_table_name: tenant_invoice_item
       raw_primary_keys: ["id"]
+    tenant_invoice_item_aud:
+      clean_table_name: tenant_invoice_item_aud
+      raw_primary_keys: ["id", "rev"]
     api_audit_log:
       clean_table_name: api_audit_log
       raw_primary_keys: ["id"]
