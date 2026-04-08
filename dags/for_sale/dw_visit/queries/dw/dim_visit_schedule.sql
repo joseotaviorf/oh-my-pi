@@ -27,6 +27,7 @@ SELECT
   is_canceled AS is_schedule_canceled,
   is_unsuccessful AS is_schedule_unsuccessful,
   ts_schedule_created,
+  ts_next_schedule_created,
   ts_schedule_requested,
   ts_schedule_rescheduled,
   ts_schedule_confirmed,

@@ -135,6 +135,10 @@ columns:
     lineage:
       - datalake_visit.visit_schedules.ts_schedule_created
     description: Timestamp of the creation of the schedule (VISIT_REQUESTED or VISIT_RESCHEDULED). Data since 2020.
+  ts_next_schedule_created:
+    lineage:
+      - datalake_visit.visit_schedules.ts_next_schedule_created
+    description: Timestamp of the next schedule creation. Data since 2020.
   ts_schedule_requested:
     lineage:
       - datalake_visit.visit_schedules.ts_schedule_requested (VISIT_REQUESTED).

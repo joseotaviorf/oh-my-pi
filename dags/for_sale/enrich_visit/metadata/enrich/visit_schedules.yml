@@ -42,12 +42,20 @@ columns:
     description: Who canceled the schedule. Data since 2020.
   id_user_agent:
     lineage:
-      - datalake_ebdb_clean.visit.id_agent
-    description: Is the user Id of the agent.
+      - datalake_ebdb_clean.visit_aud.id_agent
+    description: Last user agent of the schedule.
   id_agent:
     lineage:
       - datalake_ebdb_clean.user.id_agent
-    description: Is the id agent of the agent.
+    description: Last agent of the schedule.
+  id_first_user_agent:
+    lineage:
+      - datalake_ebdb_clean.visit_aud.id_agent
+    description: First user agent of the schedule.
+  id_first_agent:
+    lineage:
+      - datalake_ebdb_clean.user.id_agent
+    description: First agent of the schedule.
   id_company_supply:
     lineage:
       - datalake_visit.visit_business_model.id_company_supply
@@ -223,6 +231,11 @@ columns:
       - datalake_ebdb_clean.visit_status_log.ts_created
       - datalake_ebdb_clean.booking.ts_created
     description: Timestamp of the creation of the schedule. Data since 2020.
+  ts_next_schedule_created:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.ts_created
+      - datalake_ebdb_clean.booking.ts_created
+    description: Timestamp of the next schedule creation. Data since 2020.
   ts_schedule_requested:
     lineage:
       - datalake_ebdb_clean.visit_status_log.ts_created

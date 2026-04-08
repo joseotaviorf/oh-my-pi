@@ -53,6 +53,7 @@ WITH schedule AS (
         ELSE 'REQUEST'
       END AS schedule_origin,
       LEAD(vsl.id_schedule) OVER(PARTITION BY vsl.id_visit ORDER BY MIN(vsl.ts_created)) AS id_succeed_schedule,
+      LEAD(MIN(vsl.ts_created)) OVER(PARTITION BY vsl.id_visit ORDER BY MIN(vsl.ts_created)) AS ts_next_schedule_created,
       MIN_BY(vsl.channel, vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_CONFIRMED') AS first_confirmed_channel,
       MIN_BY(vsl.author_user_role, vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_CONFIRMED') AS first_confirmed_user_role,
       MAX_BY(vsl.event_type, vsl.ts_created) FILTER (WHERE vsl.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND vsl.on_behalf_of = 'SUPPLY') AS last_confirm_answer_supply,
@@ -79,6 +80,7 @@ WITH schedule AS (
       MAX_BY(b.slot_day, b.ts_created) AS slot_schedule,
       MIN_BY(bsc.id_user, bsc.id) AS id_user_creator,
       LEAD(b.id) OVER(PARTITION BY b.id_visit ORDER BY MIN(b.ts_created)) AS id_succeed_schedule,
+      LEAD(MIN(b.ts_created)) OVER(PARTITION BY b.id_visit ORDER BY MIN(b.ts_created)) AS ts_next_schedule_created,
       LAG(b.id) OVER(PARTITION BY b.id_visit ORDER BY MIN(b.ts_created)) AS id_last_schedule,
       MAX(b.dt_booking) AS dt_schedule_visit,
       MIN(b.ts_created) AS ts_schedule_created,
@@ -116,6 +118,7 @@ WITH schedule AS (
     ts_schedule_confirmed,
     schedule_origin,
     id_succeed_schedule,
+    ts_next_schedule_created,
     last_confirm_answer_supply,
     last_confirm_answer_demand,
     last_confirm_answer_agent,
@@ -146,6 +149,7 @@ WITH schedule AS (
     ts_schedule_confirmed,
     IF(id_last_schedule IS NULL, 'REQUEST', 'RESCHEDULE') AS schedule_origin,
     id_succeed_schedule,
+    ts_next_schedule_created,
     NULL AS last_confirm_answer_supply,
     NULL AS last_confirm_answer_demand,
     NULL AS last_confirm_answer_agent,
@@ -160,6 +164,8 @@ WITH schedule AS (
 visit_aud AS (
   SELECT
     va.id_visit,
+    va.id_agent AS id_user_agent,
+    u.id_agent AS id_agent,
     va.ts_visit,
     ure.ts_revision AS ts_created
   FROM
@@ -167,6 +173,25 @@ visit_aud AS (
   LEFT JOIN
     datalake_ebdb_user.user_revision_entity AS ure
       ON va.rev = ure.id
+  LEFT JOIN
+    datalake_ebdb_clean.user AS u
+      ON va.id_agent = u.id
+),
+agent_schedule AS (
+  SELECT
+    s.id_schedule,
+    MIN_BY(v.id_agent, v.ts_created) AS id_first_agent,
+    MIN_BY(v.id_user_agent, v.ts_created) AS id_first_user_agent,
+    MAX_BY(v.id_agent, v.ts_created) AS id_last_agent,
+    MAX_BY(v.id_user_agent, v.ts_created) AS id_last_user_agent
+  FROM
+    schedule AS s
+  LEFT JOIN
+    visit_aud AS v
+      ON v.id_visit = s.id_visit
+      AND v.ts_created >= s.ts_schedule_created
+      AND v.ts_created < COALESCE(s.ts_next_schedule_created, NOW())
+  GROUP BY 1
 ),
 schedule_enriched AS (
   SELECT
@@ -180,6 +205,7 @@ schedule_enriched AS (
     schedule.application_source_creation,
     schedule.ts_event_tenant,
     schedule.ts_schedule_created,
+    schedule.ts_next_schedule_created,
     schedule.ts_schedule_requested,
     schedule.ts_schedule_rescheduled,
     schedule.ts_schedule_confirmed,
@@ -227,8 +253,10 @@ SELECT DISTINCT
   s.id_user_creator AS id_user_creation,
   s.user_role_creator AS user_role_creation,
   vcu.id_user AS id_user_cancelation,
-  v.id_agent AS id_user_agent,
-  ua.id_agent,
+  agent.id_first_agent,
+  agent.id_first_user_agent,
+  agent.id_last_agent AS id_agent,
+  agent.id_last_user_agent AS id_user_agent,
   vbm.id_company_supply,
   vbm.id_company_demand,
   vbm.is_3p_supply,
@@ -248,7 +276,7 @@ SELECT DISTINCT
   s.schedule_origin,
   s.channel_creation,
   s.application_source_creation,
-  IF(s.application_source_creation IS NULL, s.channel_creation, s.channel_creation || ' - ' || s.application_source_creation) AS source_creation_unified,
+  NULLIF(CONCAT_WS(' - ', s.channel_creation, s.application_source_creation),'') AS source_creation_unified,
   s.first_confirmed_channel,
   s.first_confirmed_user_role,
   s.last_confirm_answer_supply,
@@ -291,6 +319,7 @@ SELECT DISTINCT
   DATEDIFF(IF(pva.event_type = 'VISIT_DONE', pva.ts_post_visit_agent, NULL), ts_schedule_created) AS days_visit_booked_to_visit_completed,
   v.ts_visit,
   s.ts_schedule_created,
+  s.ts_next_schedule_created,
   s.ts_schedule_requested,
   s.ts_schedule_rescheduled,
   s.ts_schedule_confirmed,
@@ -315,8 +344,8 @@ LEFT JOIN
   visit_model AS vm
     ON s.id_visit = vm.id_visit
 LEFT JOIN
-  datalake_ebdb_clean.user AS ua
-    ON v.id_agent = ua.id
+  agent_schedule AS agent
+    ON agent.id_schedule = s.id_schedule
 LEFT JOIN
   datalake_ebdb_clean.visit_checkin AS v_cin
     ON v_cin.id_visit = s.id_visit

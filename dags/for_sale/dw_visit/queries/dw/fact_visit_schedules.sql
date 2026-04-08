@@ -12,6 +12,8 @@ SELECT
     es.id_company_demand AS sk_company_demand,
     es.id_agent AS sk_agent,
     es.id_user_agent AS sk_user_agent,
+    es.id_first_agent AS sk_first_agent,
+    es.id_first_user_agent AS sk_first_user_agent,
     svh.id_user_en AS sk_user_en,
     pfa.id_agent AS sk_fixed_agent,
     pfa.id_user_agent AS sk_user_fixed_agent,

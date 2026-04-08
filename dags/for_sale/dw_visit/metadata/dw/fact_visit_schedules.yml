@@ -60,12 +60,22 @@ columns:
     lineage:
       - datalake_visit.visit_schedules.id_agent
     description:
-      Is the id agent of the agent.
+      Is the last agent of the schedule.
   sk_user_agent:
     lineage:
       - datalake_visit.visit_schedules.id_user_agent
     description:
-      Is the user Id of the agent.
+      Is the last user agent of the schedule.
+  sk_first_agent:
+    lineage:
+      - datalake_visit.visit_schedules.id_first_agent
+    description:
+      Is the first agent of the schedule.
+  sk_first_user_agent:
+    lineage:
+      - datalake_visit.visit_schedules.id_first_user_agent
+    description:
+      Is the first user agent of the schedule.
   sk_user_en:
     lineage:
       - datalake_sale_visit_hubs.sale_visit_hubs.id_user_en
