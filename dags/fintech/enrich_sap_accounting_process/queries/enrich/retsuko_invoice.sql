@@ -142,14 +142,15 @@ retsuko_adm_service_fee AS (
     AND at.type IN ('contract', 'tenant','landlord')
     AND i.status != 'canceled'
     AND description != 'Crédito - Parcelamento corretagem - QuintoAndar'
-    AND e.bill_item IN (
-      'entry.bill-item/adm-fee', 
-      'entry.bill-item/igpm-adm-fee', 
-      'entry.bill-item/ipca-adm-fee', 
-      'entry.bill-item/adjustment-agreement-adm-fee', 
-      'entry.bill-item/lockin', 
-      'entry.bill-item/service-fee')
-    AND NOT(ct.landlord_legal_person = 'juridical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
+    AND  e.bill_item IN ('entry.bill-item/service-fee')
+         OR (ct.landlord_legal_person = 'physical' 
+            AND e.bill_item IN (
+              'entry.bill-item/adm-fee', 
+              'entry.bill-item/igpm-adm-fee', 
+              'entry.bill-item/ipca-adm-fee', 
+              'entry.bill-item/adjustment-agreement-adm-fee', 
+              'entry.bill-item/lockin')
+            )
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
   HAVING
       SUM(amount) != 0
