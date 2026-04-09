@@ -4,6 +4,10 @@ owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: Archived legacy Performa performance and talent-review outcomes for cycles before PIN (Oracle HCM). Each row captures six How competency scores (0–4), an overall How score (1–4), What on a 0–1.2 scale and a normalized What (1–4), final performance score and band, talent-review ratings (readiness, risk of loss, potential, criticality, development matrix), and qualitative comments. Intended for historical comparison and reporting; not the canonical source for current people performance in the warehouse.
 columns:
+  employee_email:
+    description: Work email of the employee being evaluated.
+    lineage:
+      - datalake_gsheets_people_raw.legacy_performance_review.email
   performance_cycle:
     description: Identifier of the performance review period, such as a semester or year code (e.g. 2022-h1).
     lineage:

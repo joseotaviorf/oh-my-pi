@@ -1,4 +1,5 @@
 SELECT
+    NULLIF(NULLIF(TRIM(lp.email), ''), '-') AS employee_email,
     NULLIF(NULLIF(TRIM(lp.ciclo), ''), '-') AS performance_cycle,
     NULLIF(NULLIF(TRIM(lp.email_avaliador), ''), '-') AS evaluator_email,
     NULLIF(NULLIF(TRIM(lp.comentarios_do_comite), ''), '-') AS committee_comments,
