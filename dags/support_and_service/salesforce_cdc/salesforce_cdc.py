@@ -110,12 +110,15 @@ EVENTS_CONFIG = {
     #TODO: Add all events
     "case": {
         "event_path": "raw/salesforce/CaseEvent",
+        "threshold_time_hours": 24,
     },
     "email_message": {
         "event_path": "raw/salesforce/EmailMessageEvent",
+        "threshold_time_hours": 24,
     },
     "user": {
         "event_path": "raw/salesforce/UserEvent",
+        "threshold_time_hours": 24,
     }
 }
 
@@ -145,21 +148,36 @@ with DAG(
     )
 
     for event, parameters in EVENTS_CONFIG.items():
+        event_table = f"events_{event.lower()}"
         execute_job_cluster >> create_sst_task(
             target_schema="datalake_salesforce_raw",
-            target_table=f"events_{event.lower()}",
+            target_table=event_table,
             entry_point="cdc_raw_ingestion",
             parameters=parameters,
         ) >> create_sst_task(
+            target_schema="datalake_salesforce_raw",
+            target_table=event_table,
+            entry_point="generic_quality_checks",
+            parameters={
+                "threshold_time_hours": parameters["threshold_time_hours"],
+            },
+            task_id=f"contract_quality_checks_raw_{event_table}",
+        ) >> create_sst_task(
             target_schema="datalake_salesforce_clean",
-            target_table=f"events_{event.lower()}",
+            target_table=event_table,
             entry_point="cdc_clean",
             parameters={
                 "source_schema": "datalake_salesforce_raw",
                 "sync_hive": "True",
             },
+        ) >> create_sst_task(
+            target_schema="datalake_salesforce_clean",
+            target_table=event_table,
+            entry_point="generic_quality_checks",
+            parameters={
+                "threshold_time_hours": parameters["threshold_time_hours"],
+            },
+            task_id=f"contract_quality_checks_clean_{event_table}",
         ) >> end
 
-
     start >> execute_job_cluster
-    
