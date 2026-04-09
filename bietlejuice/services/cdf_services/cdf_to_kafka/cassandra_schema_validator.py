@@ -59,6 +59,17 @@ def _extract_cassandra_columns(schema: dict, feature_set_name: str) -> Set[str]:
     return matched
 
 
+def _extract_shared_columns(schema: dict) -> list:
+    """Columns shared across feature sets"""
+
+    columns = schema.get("columns", {})
+    return [
+        col_name
+        for col_name, col_meta in columns.items()
+        if col_meta.get("feature_set_origin") == "shared"
+    ]
+
+
 def validate_against_cassandra_schema(
     spark: SparkSession,
     dataframe: DataFrame,
@@ -93,7 +104,12 @@ def validate_against_cassandra_schema(
     cassandra_columns = _extract_cassandra_columns(schema, feature_set_name)
 
     df_columns = set(get_data_columns_from(dataframe))
-    extra_columns = df_columns - cassandra_columns
+    shared_columns = set(_extract_shared_columns(schema))
+
+    # Columns that exist in the dataframe but are not in the Cassandra schema for this
+    # feature set and are not structural (partition, clustering, or Butterfree timestamp)
+    # are considered extra columns.
+    extra_columns = df_columns - cassandra_columns - shared_columns
 
     if extra_columns:
         sorted_extra = sorted(extra_columns)
