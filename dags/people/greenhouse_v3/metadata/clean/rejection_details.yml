@@ -1,0 +1,55 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: rejection_details
+owner: pedro.prates@quintoandar.com.br
+domain: People
+description: |-
+  Table containing rejection details for applications, sourced from the Greenhouse Harvest API v3 'rejection_details' endpoint. One row per rejected application, linking the application to its rejection reason, the user who rejected it, and any custom rejection question responses.
+columns:
+  id_rejection_detail:
+    description: The rejection detail's unique identifier in the Greenhouse system.
+    lineage:
+    - datalake_greenhouse_v3_raw.rejection_details.id
+  id_application:
+    description: Foreign key to the application that was rejected. References datalake_greenhouse_v3_clean.applications.id_application.
+    lineage:
+    - datalake_greenhouse_v3_raw.rejection_details.application_id
+  id_rejected_by:
+    description: Foreign key to the Greenhouse user who performed the rejection. References datalake_greenhouse_v3_clean.users.
+    lineage:
+    - datalake_greenhouse_v3_raw.rejection_details.rejected_by_id
+  id_rejection_note:
+    description: Unique identifier of the rejection note associated with this rejection detail.
+    lineage:
+    - datalake_greenhouse_v3_raw.rejection_details.rejection_note_id
+  id_rejection_reason:
+    description: Foreign key to the rejection reason applied. References datalake_greenhouse_v3_clean.rejection_reasons.id_rejection_reason.
+    lineage:
+    - datalake_greenhouse_v3_raw.rejection_details.rejection_reason_id
+  ts_rejected:
+    description: Timestamp (UTC) when the application was rejected.
+    lineage:
+    - datalake_greenhouse_v3_raw.rejection_details.rejected_at
+  ts_created:
+    description: Timestamp (UTC) when the rejection detail record was created in Greenhouse.
+    lineage:
+    - datalake_greenhouse_v3_raw.rejection_details.created_at
+  ts_updated:
+    description: Timestamp (UTC) when the rejection detail record was last updated in Greenhouse.
+    lineage:
+    - datalake_greenhouse_v3_raw.rejection_details.updated_at
+  ts_load:
+    description: Timestamp when the record was loaded into the clean layer.
+  question_custom_fields:
+    description: Struct containing custom rejection question fields and their responses, as configured in the Greenhouse rejection workflow.
+  year:
+    description: The year the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+    - datalake_greenhouse_v3_raw.rejection_details.year
+  month:
+    description: The month the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+    - datalake_greenhouse_v3_raw.rejection_details.month
+  day:
+    description: The day the data was loaded into the raw layer, used for partitioning. Derived from the 'ts_load' column in the raw layer.
+    lineage:
+    - datalake_greenhouse_v3_raw.rejection_details.day

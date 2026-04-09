@@ -273,3 +273,12 @@ workflow:
           date_column_to_partition: "updated_at"
           params:
             per_page: 500
+
+    rejection_details:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      z_order_by: ["id_rejection_detail"]
+      extra_spark_job_arguments:
+        - endpoint: "rejection_details"
+          params:
+            per_page: 500
