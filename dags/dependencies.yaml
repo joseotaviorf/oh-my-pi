@@ -3200,6 +3200,7 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.wall_street:load-clean-subscription:first-run-of-day
   - bietlejuice.wall_street_fast_lane:load-clean-charge:first-run-of-day
 bietlejuice.enrich_people:
+  - bietlejuice.gsheets_people_static:load-clean-email-employee-mapping:first-run-of-day
   - bietlejuice.pin_compensation:load-clean-salary-bases:first-run-of-day
   - bietlejuice.pin_core:load-clean-action-base:first-run-of-day
   - bietlejuice.pin_core:load-clean-action-occurrence:first-run-of-day
