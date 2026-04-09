@@ -21,6 +21,61 @@ column_level_validations:
       severity_level: Warning
     is_complete:
       severity_level: Warning
+  id_continuous_employment_cycle:
+    # Ensure active non-null, deterministic assignment mapping, and transfer-chain consistency.
+    custom:
+      constraint: |-
+        (
+          (SELECT COUNT(*)
+           FROM datalake_people.identifier_mapping
+           WHERE is_active = TRUE
+             AND id_continuous_employment_cycle IS NULL
+          ) = 0
+          AND
+          (SELECT COUNT(*)
+           FROM (
+             SELECT id_assignment
+             FROM datalake_people.identifier_mapping
+             GROUP BY id_assignment
+             HAVING COUNT(DISTINCT id_continuous_employment_cycle) > 1
+           ) assignment_violations
+          ) = 0
+          AND
+          (WITH transfer_links AS (
+             SELECT
+               aa.id_period_of_service AS previous_id_period_of_service,
+               aa_next.id_period_of_service AS next_id_period_of_service
+             FROM datalake_pin_core_clean.all_assignments AS aa
+             INNER JOIN datalake_pin_core_clean.all_assignments AS aa_next
+               ON aa_next.id_person = aa.id_person
+              AND aa_next.assignment_sequence = aa.assignment_sequence + 1
+             WHERE aa.assignment_status_type = 'INACTIVE'
+               AND aa.action_code = 'GLB_TRANSFER'
+             QUALIFY ROW_NUMBER() OVER (
+               PARTITION BY aa_next.id_period_of_service
+               ORDER BY aa.dt_effective_started ASC
+             ) = 1
+           ),
+           period_cycles AS (
+             SELECT
+               id_period_of_service,
+               id_continuous_employment_cycle
+             FROM datalake_people.identifier_mapping
+             QUALIFY ROW_NUMBER() OVER (
+               PARTITION BY id_period_of_service
+               ORDER BY dt_started ASC NULLS LAST, id_assignment ASC
+             ) = 1
+           )
+           SELECT COUNT(*)
+           FROM transfer_links AS tl
+           INNER JOIN period_cycles AS pc_prev
+             ON pc_prev.id_period_of_service = tl.previous_id_period_of_service
+           INNER JOIN period_cycles AS pc_next
+             ON pc_next.id_period_of_service = tl.next_id_period_of_service
+           WHERE pc_prev.id_continuous_employment_cycle <> pc_next.id_continuous_employment_cycle
+          ) = 0
+        )
+      severity_level: Warning
   id_person:
     is_complete:
       severity_level: Warning
@@ -65,6 +120,9 @@ column_level_validations:
     is_complete:
       severity_level: Warning
   is_active:
+    is_complete:
+      severity_level: Warning
+  dt_original_hired:
     is_complete:
       severity_level: Warning
   dt_started:
