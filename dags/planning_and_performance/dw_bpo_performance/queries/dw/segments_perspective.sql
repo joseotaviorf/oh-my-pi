@@ -30,7 +30,14 @@ WITH segments_perspective AS (
       WHEN fcc.sk_ticket > 0 THEN True 
       ELSE False 
     END AS has_ticket_created,
-    dd.department,
+     CASE WHEN dd.department = '[AeC] CX Pagamentos [FRONT] [POS]' THEN 'CX Pagamentos [FRONT] [POS]'  
+          WHEN dd.department = '[AeC] CX Rescisão [FRONT] [POS]' THEN 'CX Rescisão [FRONT] [POS]' 
+          WHEN dd.department = '[AeC] CX Mudança [FRONT] [POS]' THEN 'CX Mudança [FRONT] [POS]'
+          WHEN dd.department = '[AeC] CX Reparos [FRONT] [POS]' THEN 'CX Reparos [FRONT] [POS]'
+          WHEN dd.department = '[AeC] CX Propostas [FRONT] [PRE]' THEN 'CX Propostas [FRONT] [PRE]'
+          WHEN dd.department = '[AeC] CX Visitas [FRONT] [PRE]' THEN 'CX Visitas [FRONT] [PRE]'
+          WHEN dd.department = '[AeC] CX Parceiros [FRONT] [PRE]' THEN 'CX Parceiros [FRONT] [PRE]'
+          ELSE dd.department END AS department, 
     dd.team,
     dd.area,
     dd.front_or_back,
@@ -58,10 +65,24 @@ WITH segments_perspective AS (
       ELSE NULL 
     END AS front_pre_pos,
     dt.tags,
-    dd_last.department AS last_department,
+    CASE WHEN dd_last.department = '[AeC] CX Pagamentos [FRONT] [POS]' THEN 'CX Pagamentos [FRONT] [POS]'  
+          WHEN dd_last.department = '[AeC] CX Rescisão [FRONT] [POS]' THEN 'CX Rescisão [FRONT] [POS]'
+          WHEN dd_last.department = '[AeC] CX Mudança [FRONT] [POS]' THEN 'CX Mudança [FRONT] [POS]'
+          WHEN dd_last.department = '[AeC] CX Reparos [FRONT] [POS]' THEN 'CX Reparos [FRONT] [POS]'
+          WHEN dd_last.department = '[AeC] CX Propostas [FRONT] [PRE]' THEN 'CX Propostas [FRONT] [PRE]'
+          WHEN dd_last.department = '[AeC] CX Visitas [FRONT] [PRE]' THEN 'CX Visitas [FRONT] [PRE]'
+          WHEN dd_last.department = '[AeC] CX Parceiros [FRONT] [PRE]' THEN 'CX Parceiros [FRONT] [PRE]'
+          ELSE dd_last.department END AS last_department,
     dd_last.team AS last_team,
     dd_last.area AS last_area,
-    dd_first.department AS first_department,
+     CASE WHEN dd_first.department = '[AeC] CX Pagamentos [FRONT] [POS]' THEN 'CX Pagamentos [FRONT] [POS]'  
+          WHEN dd_first.department = '[AeC] CX Rescisão [FRONT] [POS]' THEN 'CX Rescisão [FRONT] [POS]'
+          WHEN dd_first.department = '[AeC] CX Mudança [FRONT] [POS]' THEN 'CX Mudança [FRONT] [POS]'
+          WHEN dd_first.department = '[AeC] CX Reparos [FRONT] [POS]' THEN 'CX Reparos [FRONT] [POS]'
+          WHEN dd_first.department = '[AeC] CX Propostas [FRONT] [PRE]' THEN 'CX Propostas [FRONT] [PRE]'
+          WHEN dd_first.department = '[AeC] CX Visitas [FRONT] [PRE]' THEN 'CX Visitas [FRONT] [PRE]'
+          WHEN dd_first.department = '[AeC] CX Parceiros [FRONT] [PRE]' THEN 'CX Parceiros [FRONT][PRE]'
+          ELSE dd_first.department END AS first_department,
     dd_first.team AS first_team,
     dd_first.area AS first_area,
     dd_prev.department AS transferred_from,
