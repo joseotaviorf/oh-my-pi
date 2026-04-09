@@ -12,6 +12,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.access_type_aud.id_house
       - datalake_ebdb_clean.entry_access_tracking.id_house
+      - datalake_ebdb_clean.contract.id_house
     description: ID of the house.
   id_occupant:
     lineage:
@@ -39,12 +40,14 @@ columns:
     lineage:
       - datalake_ebdb_clean.access_type_aud.additional_info
       - datalake_ebdb_clean.entry_access_tracking.entry_access_details
+      - datalake_klefki_clean.inspection_key_retrieval_confirmation.details
     description: Additional info about from the unified entry model.
   key_location:
     lineage:
       - datalake_ebdb_clean.access_authorization_type.name
       - datalake_ebdb_clean.entry_access_tracking.key_holder_role
       - datalake_ebdb_clean.entry_access_tracking.entry_access_type
+      - datalake_klefki_clean.inspection_key_retrieval_confirmation.inspector_key_location_type
     description: Location of the houses's key.
   entry_model_type:
     description: Type of entry models.
@@ -52,6 +55,7 @@ columns:
       - datalake_ebdb_clean.access_authorization_type.name
       - datalake_ebdb_clean.entry_access_tracking.key_holder_role
       - datalake_ebdb_clean.entry_access_tracking.entry_access_type
+      - datalake_klefki_clean.inspection_key_retrieval_confirmation.inspector_key_location_type
     categories:
       ASSISTED_ENTRANCE: When a third person is needed to enter.
       EASY_ENTRANCE: When no third person is needed to enter.
@@ -133,10 +137,12 @@ columns:
   ts_entrance_started:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
-      - datalake_ebdb_clean.entry_access_tracking.ts_updated
+      - datalake_ebdb_clean.entry_access_tracking.ts_created
+      - datalake_klefki_clean.inspection_key_retrieval_confirmation.ts_created
     description: Timestamp of when the entry condition started.
   ts_entrance_ended:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
-      - datalake_ebdb_clean.entry_access_tracking.ts_updated
+      - datalake_ebdb_clean.entry_access_tracking.ts_created
+      - datalake_klefki_clean.inspection_key_retrieval_confirmation.ts_created
     description: Timestamp of when the entry condition ended.

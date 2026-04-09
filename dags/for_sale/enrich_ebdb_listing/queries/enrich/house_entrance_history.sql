@@ -1,43 +1,106 @@
 WITH old_entry_model AS (
+    WITH access_type AS (
+        SELECT
+            access.id_house,
+            access.id_occupant,
+            occupant.name AS occupant_type,
+            restriction.name AS restriction_type,
+            key.name AS key_type,
+            access.additional_info AS entry_model_details,
+            CASE
+                WHEN authorization.name = "LockBox" THEN "LOCK_BOX"
+                WHEN authorization.name = "FrontDoor" THEN "FRONT_DOOR"
+                WHEN authorization.name = "KeysLocker" THEN "LOCKER"
+                WHEN authorization.name = "KeysWithAgent" THEN "AGENT"
+                WHEN authorization.name = "OwnerPresent" THEN "OWNER"
+                ELSE UPPER(authorization.name)
+            END AS key_location,
+            authorization.name AS authorization_type,
+            access.has_opted_keys_with_agent,
+            NULL AS entry_model_channel,
+            NULL AS actor_role,
+            ure.ts_revision AS ts_entrance_started
+        FROM
+            datalake_ebdb_clean.access_type_aud AS access
+        LEFT JOIN
+            datalake_ebdb_clean.access_authorization_type AS authorization
+                ON access.id_authorization = authorization.id
+        LEFT JOIN
+            datalake_ebdb_clean.occupant_type AS occupant
+                ON access.id_occupant = occupant.id
+        LEFT JOIN
+            datalake_ebdb_clean.restriction_type AS restriction
+                ON access.id_restriction = restriction.id
+        LEFT JOIN
+            datalake_ebdb_clean.key_type AS key
+                ON access.id_type = key.id
+        LEFT JOIN
+            datalake_ebdb_user.user_revision_entity AS ure
+                ON access.rev = ure.id
+        WHERE
+            access.id_house IS NOT NULL
+        QUALIFY
+            ROW_NUMBER() OVER(PARTITION BY access.id_house, ure.ts_revision ORDER BY access.rev) = 1
+    ),
+    inspection AS (
+        SELECT
+            c.id_house,
+            NULL AS id_occupant,
+            NULL AS occupant_type,
+            NULL AS restriction_type,
+            NULL AS key_type,
+            i.details AS entry_model_details,
+            CASE
+                WHEN i.inspector_key_location_type = 'GATEHOUSE' THEN 'FRONT_DOOR'
+                WHEN i.inspector_key_location_type = 'LOCKBOX' THEN 'LOCK_BOX'
+                WHEN i.inspector_key_location_type = 'PERSONALLYWITHSOMEONE' THEN 'EXTERNAL_RESPONSIBLE'
+                WHEN i.inspector_key_location_type = 'KEYSWITHAGENT' THEN 'AGENT'
+                ELSE i.inspector_key_location_type
+            END AS key_location,
+            NULL AS authorization_type,
+            NULL AS has_opted_keys_with_agent,
+            'INSPECTION_APP' AS entry_model_channel,
+            'INSPECTOR' AS actor_role,
+            i.ts_created AS ts_entrance_started
+        FROM
+            datalake_klefki_clean.inspection_key_retrieval_confirmation AS i
+        JOIN
+            datalake_ebdb_clean.contract AS c
+                ON i.id_contract = c.id
+        WHERE
+            i.ts_created::DATE < '2025-03-01'
+    )
     SELECT
-        access.id_house,
-        access.id_occupant,
-        occupant.name AS occupant_type,
-        restriction.name AS restriction_type,
-        key.name AS key_type,
-        access.additional_info AS entry_model_details,
-        CASE
-            WHEN authorization.name = "LockBox" THEN "LOCK_BOX"
-            WHEN authorization.name = "FrontDoor" THEN "FRONT_DOOR"
-            WHEN authorization.name = "KeysLocker" THEN "LOCKER"
-            WHEN authorization.name = "KeysWithAgent" THEN "AGENT"
-            WHEN authorization.name = "OwnerPresent" THEN "OWNER"
-            ELSE UPPER(authorization.name)
-        END AS key_location,
-        authorization.name AS authorization_type,
-        access.has_opted_keys_with_agent,
-        ure.ts_revision AS ts_entrance_started
+        id_house,
+        id_occupant,
+        occupant_type,
+        restriction_type,
+        key_type,
+        entry_model_details,
+        key_location,
+        authorization_type,
+        has_opted_keys_with_agent,
+        entry_model_channel,
+        actor_role,
+        ts_entrance_started
     FROM
-        datalake_ebdb_clean.access_type_aud AS access
-    LEFT JOIN
-        datalake_ebdb_clean.access_authorization_type AS authorization
-            ON access.id_authorization = authorization.id
-    LEFT JOIN
-        datalake_ebdb_clean.occupant_type AS occupant
-            ON access.id_occupant = occupant.id
-    LEFT JOIN
-        datalake_ebdb_clean.restriction_type AS restriction
-            ON access.id_restriction = restriction.id
-    LEFT JOIN
-        datalake_ebdb_clean.key_type AS key
-            ON access.id_type = key.id
-    LEFT JOIN
-        datalake_ebdb_user.user_revision_entity AS ure
-            ON access.rev = ure.id
-    WHERE
-        access.id_house IS NOT NULL
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY access.id_house, ure.ts_revision ORDER BY access.rev) = 1
+        access_type
+    UNION ALL
+    SELECT
+        id_house,
+        id_occupant,
+        occupant_type,
+        restriction_type,
+        key_type,
+        entry_model_details,
+        key_location,
+        authorization_type,
+        has_opted_keys_with_agent,
+        entry_model_channel,
+        actor_role,
+        ts_entrance_started
+    FROM
+        inspection
 ),
 new_entry_model AS (
     SELECT
@@ -105,8 +168,8 @@ unified_model AS (
         key_location,
         authorization_type,
         has_opted_keys_with_agent,
-        NULL AS entry_model_channel,
-        NULL AS actor_role,
+        entry_model_channel,
+        actor_role,
         NULL AS event_type,
         NULL AS entry_access_model,
         NULL AS key_holder_type,
