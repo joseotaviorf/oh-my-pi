@@ -1,0 +1,22 @@
+---
+dag:
+  name: enrich_sonia_closing_view
+  owner: Data ForRent
+  schedule_start_date: 2026, 4, 8
+  documentation:
+    dag_purpose: |
+      Non-materialized enrich view over CDP transactional rent-flow contract events (sent, canceled, signed),
+      exploded to one row per person side (tenant and owner) with house address, user id, and experiment binning hash.
+      Refreshes daily for Sonia closing analytics.
+workflow:
+  type: query_view
+  layer: enrich
+  has_hive_sync: true
+cluster:
+  type: databricks_16_4_min_memory_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
