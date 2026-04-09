@@ -69,16 +69,22 @@ columns:
     description: Boolean information indicating whether the tenant had access to the budget approval review.
   has_agreement:
     lineage:
-      - datalake_inspection_services_clean.inspection.has_agreement
-    description: Boolean information indicating whether the owner and tenant agreed on the repair report.
+      - datalake_inspection_services_clean.budget.is_early_both_agree
+      - datalake_inspections.reviewer.is_approved
+      - datalake_inspections.automatic_discounts.has_applied_discount
+      - datalake_inspection_services_clean.assessment_details.value
+    description: |
+      Boolean indicating whether the inspection reached an agreement by any means.
+      True when any of the following applies: early agreement, both parties approved budget,
+      discount agreement (has_applied_discount), or compulsory agreement (COMPULSORY_OWNER_APPROVAL).
   has_early_agreement:
     lineage:
       - datalake_inspection_services_clean.budget.is_early_both_agree
     description: Boolean information indicating whether the owner and tenant agreed to approve the repair report at the first review.
   has_late_agreement:
     lineage:
-      - datalake_inspection_services_clean.inspection.has_late_agreement
-    description: Boolean information indicating whether the owner and tenant agreed on the repair report only after the contestation analysis.
+      - datalake_inspections.reviewer.is_approved
+    description: Boolean indicating whether both owner and tenant approved budget approval (second review stage). Computed as has_owner_approved_budget_approval AND has_tenant_approved_budget_approval.
   has_discount_agreement:
     lineage:
       - datalake_inspections.automatic_discounts.has_applied_discount
@@ -86,6 +92,12 @@ columns:
       Boolean indicating whether a discount agreement was reached for the inspection.
       Uses has_applied_discount (offered value accepted and applied). The JOIN with automatic_discounts
       is restricted to bandaid cases only (has_applied_discount = TRUE).
+  has_compulsory_agreement:
+    lineage:
+      - datalake_inspection_services_clean.assessment_details.value
+    description: |
+      Boolean indicating whether the inspection was settled through compulsory owner approval.
+      Derived from assessment_details where value = 'COMPULSORY_OWNER_APPROVAL'.
   has_owner_approved_review:
     lineage:
       - datalake_inspections.reviewer.is_approved

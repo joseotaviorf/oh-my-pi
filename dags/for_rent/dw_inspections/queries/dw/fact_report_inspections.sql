@@ -98,15 +98,29 @@ WITH
       budget_approvals AS ba
         ON ra.id_inspection = ba.id_inspection
   ),
+  compulsory AS (
+    SELECT DISTINCT 
+      ad.id_assessment,
+      a.id_inspection,
+      TRUE AS has_compulsory_agreement
+    FROM 
+      datalake_inspection_services_clean.assessment_details AS ad 
+    JOIN 
+      assessment AS a
+        ON a.id_assessment = ad.id_assessment
+    WHERE 
+      ad.value = 'COMPULSORY_OWNER_APPROVAL'
+  ),
   db_approvals AS (
     SELECT 
       u.id_inspection,
       b.total_cost,
       b.owner_amount_payment,
       b.tenant_amount_payment,
-      CAST(i.has_agreement AS BOOLEAN) AS has_agreement,
+      CAST(i.has_agreement AS BOOLEAN) AS has_agreement, -- not used yet
       b.is_early_both_agree AS has_early_agreement,
-      CAST(i.has_late_agreement AS BOOLEAN) AS has_late_agreement,
+      CAST(i.has_late_agreement AS BOOLEAN) AS has_late_agreement, -- not used yet
+      COALESCE(c.has_compulsory_agreement, FALSE) AS has_compulsory_agreement,
       u.has_owner_approved_review,
       u.has_tenant_approved_review,
       u.has_owner_approved_budget_approval,
@@ -125,6 +139,9 @@ WITH
     LEFT JOIN 
       datalake_inspection_services_clean.inspection AS i
         ON u.id_inspection = i.id_inspection
+    LEFT JOIN 
+      compulsory AS c
+        ON u.id_inspection = c.id_inspection
   )
 SELECT
   isa.id_inspection AS sk_inspection,
@@ -145,10 +162,11 @@ SELECT
   isa.has_tenant_access_review,
   isa.has_owner_access_budget_approval,
   isa.has_tenant_access_budget_approval,
-  da.has_agreement,
+  da.has_early_agreement OR (da.has_tenant_approved_budget_approval AND da.has_owner_approved_budget_approval) OR ad.has_applied_discount OR da.has_compulsory_agreement AS has_agreement, 
   da.has_early_agreement,
-  da.has_late_agreement,
+  (da.has_tenant_approved_budget_approval AND da.has_owner_approved_budget_approval) AS has_late_agreement,
   ad.has_applied_discount AS has_discount_agreement,
+  da.has_compulsory_agreement,
   da.has_owner_approved_review,
   da.has_tenant_approved_review,
   da.has_owner_approved_budget_approval,

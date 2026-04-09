@@ -747,6 +747,7 @@ bietlejuice.dw_inspections:
   - bietlejuice.enrich_inspections:load-enrich-room:first-run-of-day
   - bietlejuice.enrich_inspections_metrics:load-enrich-inspection-achievements:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-inspectors-control:first-run-of-day
+  - bietlejuice.inspection_services:load-clean-assessment-details:first-run-of-day
   - bietlejuice.inspection_services:load-clean-budget:first-run-of-day
   - bietlejuice.inspection_services:load-clean-contestation:first-run-of-day
   - bietlejuice.inspection_services:load-clean-reviewer:first-run-of-day

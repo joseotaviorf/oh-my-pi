@@ -23,10 +23,11 @@ WITH
       fri.has_owner_access_budget_approval,
       fri.has_tenant_approved_budget_approval,
       fri.has_owner_approved_budget_approval,
-      fri.has_early_agreement OR (fri.has_tenant_approved_budget_approval AND fri.has_owner_approved_budget_approval) OR fri.has_discount_agreement AS has_agreement, 
+      fri.has_agreement, 
       fri.has_early_agreement,
-      (fri.has_tenant_approved_budget_approval AND fri.has_owner_approved_budget_approval) AS has_late_agreement, 
+      fri.has_late_agreement, 
       fri.has_discount_agreement,
+      fri.has_compulsory_agreement,
       -- Other flags:
       fi.has_early_mediation,
       -- Dates:
@@ -102,6 +103,7 @@ SELECT DISTINCT
     i.has_early_agreement,
     i.has_late_agreement, 
     i.has_discount_agreement,
+    i.has_compulsory_agreement,
     dt.has_mediation_ticket,
     i.has_early_mediation,
     --Repairs:
@@ -125,7 +127,6 @@ SELECT DISTINCT
     ad.discount_stage,
     ad.has_discount_try,
     ad.is_discount_accepted,
-    ad.has_applied_discount,
     ad.invoice_discount_value,
     --Leadtimes:
     DATE_DIFF(DAY, dd.date, ft.ts_termination_finished) AS leadtime_total,
@@ -173,6 +174,7 @@ LEFT JOIN
 LEFT JOIN 
     datalake_offboarding.mediations AS m
         ON ft.sk_contract = m.id_contract
+        AND ft.sk_termination = m.id_termination -- avoid duplicates
 LEFT JOIN 
     datalake_inspections.automatic_discounts AS ad
         ON i.sk_client_side = ad.uuid_inspection

@@ -2,10 +2,12 @@
 database_name: datalake_inspection_services_clean
 table_name: assessment_details
 description: >-
-  Detail records associated with property inspection assessments from the Inspections service.
-  Each row represents a specific attribute-value pair for an assessment, such as mediation requirements
-  or key location information. One row per assessment detail. Primary key: id_assessment_detail.
-  Foreign key: id_assessment references the assessment table.
+  EAV (Entity-Attribute-Value) detail records for property inspection assessments. Each row is an
+  attribute-value pair for an assessment. Records are immutable; when an optional attribute has no
+  value its row does not exist (value is never null). An assessment can have up to 2 review phases,
+  each generating up to 3 rows, so a single id_assessment may have up to 6 rows. Currently the only
+  type in use is 'MEDIATION'; additional types may be introduced in the future. Filter on
+  id_assessment + type together to leverage the source index.
 domain: For Rent
 owner: data-ae-for-rent@quintoandar.com.br
 columns:
@@ -14,19 +16,28 @@ columns:
     lineage:
       - datalake_inspection_services_raw.assessment_details.id
   id_assessment:
-    description: "Foreign key to datalake_inspection_services_clean.assessment. Identifies which assessment this detail belongs to."
+    description: "Foreign key to datalake_inspection_services_clean.assessment. Indexed at the source — always filter together with type."
     lineage:
       - datalake_inspection_services_raw.assessment_details.assessment_id
   type:
-    description: "Type of assessment detail, indicating the category of information (e.g., mediation, key_location)."
+    description: "Category of the assessment detail. Indexed at the source. Currently always 'MEDIATION'; additional types may be added in the future."
     lineage:
       - datalake_inspection_services_raw.assessment_details.type
   attribute:
-    description: "Attribute name associated with the assessment detail (e.g., required, street)."
+    description: >-
+      Attribute name within the given type. For type = 'MEDIATION', possible values are:
+      'MEDIATION_REQUIRED' (always present), 'MEDIATION_MOMENT' (always present),
+      'MEDIATION_REASON' (optional — row absent when there is no reason to record).
     lineage:
       - datalake_inspection_services_raw.assessment_details.attribute
   value:
-    description: "Value associated with the assessment detail attribute."
+    description: >-
+      Value of the attribute. Never null. Semantics by attribute:
+      - MEDIATION_REQUIRED: 'true' | 'false'
+      - MEDIATION_MOMENT: 'FIRST_REVIEW' | 'SECOND_REVIEW'
+      - MEDIATION_REASON (non-exhaustive): 'COMPULSORY_OWNER_APPROVAL' (contract is compulsory),
+        'BUDGET_APPROVAL_WITHOUT_AUTOMATIC_INVOICE', 'AUTOMATIC_INVOICE_APPLICABLE',
+        'EARLY_MEDIATION_REQUIRED'
     lineage:
       - datalake_inspection_services_raw.assessment_details.value
   ts_created:

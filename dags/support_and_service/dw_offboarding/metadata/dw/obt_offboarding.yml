@@ -217,6 +217,10 @@ columns:
       automatic discounts.
     lineage:
       - dw_inspections.fact_report_inspections.has_discount_agreement
+  has_compulsory_agreement:
+    description: Boolean indicating whether the inspection was settled through compulsory owner approval (COMPULSORY_OWNER_APPROVAL).
+    lineage:
+      - dw_inspections.fact_report_inspections.has_compulsory_agreement
   has_mediation_ticket:
     description: Boolean indicating presence of mediation ticket.
     lineage:
@@ -328,10 +332,6 @@ columns:
     description: Boolean indicating if discount was accepted.
     lineage:
       - datalake_inspections.automatic_discounts.is_discount_accepted
-  has_applied_discount:
-    description: Boolean indicating if discount was applied.
-    lineage:
-      - datalake_inspections.automatic_discounts.has_applied_discount
   invoice_discount_value:
     description: Discount value in the invoice.
     lineage:
