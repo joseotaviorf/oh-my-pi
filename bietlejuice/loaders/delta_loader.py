@@ -10,17 +10,6 @@ from delta.tables import DeltaTable
 
 logger = QuintoAndarLogger("DeltaLoader")
 
-_VALID_COLUMN_MAPPING_MODES = {"none", "name", "id"}
-_IDENTIFIER_CHARS = frozenset(
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_."
-)
-
-
-def _sanitize_identifier(value: str) -> str:
-    if not value or not all(ch in _IDENTIFIER_CHARS for ch in value):
-        raise ValueError(f"Invalid SQL identifier: {value!r}")
-    return value
-
 
 class DeltaLoader:
     """Class for loading data into a Delta table"""
@@ -42,7 +31,6 @@ class DeltaLoader:
         when_not_matched_by_source_delete_condition: str = None,
         when_matched_operation: dict = None,
         when_not_matched_operation: dict = None,
-        column_mapping_mode: str = None,
     ) -> None:
         """
         Load a DataFrame into a Delta table.
@@ -65,7 +53,7 @@ class DeltaLoader:
         - when_not_matched_operation: Specifies the columns and values to insert when there is no match. This should also be a dictionary,
         where keys are the columns to insert, and values are the data to be inserted. Again, source.<column_name> or target.<column_name> can be used to clarify data origin.
         """
-        database_name = _sanitize_identifier(table_name.split(".")[0].replace("`", ""))
+        database_name = table_name.split(".")[0].replace("`", "")
         self.spark.sql(f"CREATE DATABASE IF NOT EXISTS `{database_name}`")
 
         exists = self.spark.catalog.tableExists(table_name)
@@ -83,23 +71,12 @@ class DeltaLoader:
                 f"Table {table_name} does not exist. Creating a new empty table {table_name} on location."
             )
             self._create_empty_table(
-                table_name,
-                path,
-                source_df,
-                partition_by,
-                replace_if_exists=False,
-                column_mapping_mode=column_mapping_mode,
+                table_name, path, source_df, partition_by, replace_if_exists=False
             )
 
         if not merge_on:
             logger.info(f"Writing to table {table_name} on path {path}.")
-            self._write_to_table(
-                table_name,
-                source_df,
-                partition_by,
-                merge_schema,
-                column_mapping_mode=column_mapping_mode,
-            )
+            self._write_to_table(table_name, source_df, partition_by, merge_schema)
         else:
             logger.info(f"Merging to table {table_name}.")
             self._merge_to_table(
@@ -122,7 +99,6 @@ class DeltaLoader:
         source_df: DataFrame,
         partition_by: list = None,
         replace_if_exists: bool = False,
-        column_mapping_mode: str = None,
     ) -> DeltaTable:
         """Create an empty Delta table"""
         if replace_if_exists:
@@ -130,8 +106,6 @@ class DeltaLoader:
         else:
             builder = DeltaTable.createIfNotExists(self.spark)
         builder = builder.tableName(table_name)
-        if column_mapping_mode:
-            builder = builder.property("delta.columnMapping.mode", column_mapping_mode)
         schema = self.convert_schema_to_nullable(source_df.schema)
         builder = builder.addColumns(schema)
         if partition_by:
@@ -147,9 +121,8 @@ class DeltaLoader:
 
     def _convert_to_delta_table(self, table_name: str) -> None:
         """Convert a table to a Delta table"""
-        safe_table = _sanitize_identifier(table_name)
         try:
-            self.spark.sql(f"CONVERT TO DELTA {safe_table}")
+            self.spark.sql(f"CONVERT TO DELTA {table_name}")
             logger.info(f"Table {table_name} converted to Delta format.")
         except Py4JJavaError as e:
             error_class = e.java_exception.getClass().getName()
@@ -158,7 +131,7 @@ class DeltaLoader:
             if error_class != "java.io.FileNotFoundException":
                 raise e
             logger.info(f"Table {table_name} exists, but has no data. Dropping it.")
-            self.spark.sql(f"DROP TABLE {safe_table}")
+            self.spark.sql(f"DROP TABLE {table_name}")
         except AnalysisException as e:
             error_class = e.getErrorClass()
             # These errors happen, respectively:
@@ -173,7 +146,7 @@ class DeltaLoader:
             logger.info(
                 f"Delta log or table {table_name} was deleted. Dropping from Metastore so it can be recreated."
             )
-            self.spark.sql(f"DROP TABLE {safe_table}")
+            self.spark.sql(f"DROP TABLE {table_name}")
 
     def _write_to_table(
         self,
@@ -181,30 +154,14 @@ class DeltaLoader:
         source_df: DataFrame,
         partition_by: list = None,
         merge_schema: bool = True,
-        column_mapping_mode: str = None,
     ) -> None:
-        """Write a DataFrame to a Delta table"""
         # Force partitioned tables to use mergeSchema. DBR 16.4+ doesn't allow overwriteSchema in this case
         if partition_by:
             merge_schema = True
-
-        if column_mapping_mode:
-            if column_mapping_mode not in _VALID_COLUMN_MAPPING_MODES:
-                raise ValueError(
-                    f"Invalid column_mapping_mode: {column_mapping_mode!r}"
-                )
-            safe_table = _sanitize_identifier(table_name)
-            self.spark.sql(
-                f"ALTER TABLE {safe_table} SET TBLPROPERTIES "
-                f"('delta.columnMapping.mode' = '{column_mapping_mode}')"
-            )
-
-        writer = (
-            source_df.write.format("delta")
-            .option("mergeSchema", merge_schema)
-            .option("overwriteSchema", not merge_schema)
-        )
-        writer.mode("overwrite").saveAsTable(table_name, partitionBy=partition_by)
+        """Write a DataFrame to a Delta table"""
+        source_df.write.format("delta").option("mergeSchema", merge_schema).option(
+            "overwriteSchema", not merge_schema
+        ).mode("overwrite").saveAsTable(table_name, partitionBy=partition_by)
 
     def _merge_to_table(
         self,

@@ -56,17 +56,10 @@ workflow:
       extra_spark_job_arguments:
         - "10p4xUfeoTKxJB3RtrO8-Jf8O7sdnll8fT_PXZPB-EgU" # DAG reverse test sheet
         - "jobs"
-    column_mapping_delta_test_pin:
-      column_mapping_mode: name
-      extra_spark_job_arguments:
-        - "10p4xUfeoTKxJB3RtrO8-Jf8O7sdnll8fT_PXZPB-EgU" # DAG reverse test sheet
-        - "column_mapping_delta_test_pin"
     # Use context: Used as the basis for the load that updates Codex data in PIN.
     # Business Owner: jessica.mlara@quintoandar.com.br
     # Data Owner: gabriel.berger@quintoandar.com.br
     organization_codex_pin_sync:
-      # column_mapping_mode name: PIN columns follow Oracle flexfield naming (includes "=" between segment and context); the lake needs Delta "name" mapping so those headers load without errors.
-      column_mapping_mode: name
       extra_spark_job_arguments:
         - "1_yTiwS3IhdOO9wn7yP4sGfRAAoYhZSHxZhszFYH0zx4"
         - "Organization"

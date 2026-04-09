@@ -357,8 +357,6 @@ workflow:
             execution_timeout_hours: 3.0  # Optional
 ```
 
-*`load_delta_table` only:* `tables_customization.<table>.column_mapping_mode: name` if the job fails with `DELTA_INVALID_CHARACTERS_IN_COLUMN_NAMES` (e.g. Oracle flexfield-style column names).
-
 ### Raw Database Pull Delta
 
 ```yaml

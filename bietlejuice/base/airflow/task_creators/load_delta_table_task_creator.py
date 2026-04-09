@@ -70,8 +70,6 @@ class LoadDeltaTableTaskCreator(LoadTaskCreator):
             json.dumps(when_not_matched_by_source_delete_condition),
             json.dumps(when_matched_operation),
             json.dumps(when_not_matched_operation),
-            "--column-mapping-mode",
-            json.dumps(table_attributes.column_mapping_mode),
             "--table-privileges",
             json.dumps(table_attributes.table_privileges),
             "--table-properties",

@@ -1,5 +1,3 @@
-import pytest
-
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
@@ -506,33 +504,3 @@ class TestTableAttributes:
 
         # assert
         assert table_attributes.get_has_soft_delete() is False
-
-    @pytest.mark.parametrize("mode", [None, "none", "name", "id"])
-    def test_column_mapping_mode_accepts_valid_values(self, mode):
-        dag_args = {"name": "dag_name"}
-        workflow_args = {}
-        table_customization = {"column_mapping_mode": mode} if mode is not None else {}
-
-        table_attributes = TableAttributes(
-            dag_args=dag_args,
-            workflow_args=workflow_args,
-            layer=LayerEnum.CLEAN,
-            table_name="table_name",
-            table_customization=table_customization,
-        )
-
-        assert table_attributes.column_mapping_mode == mode
-
-    def test_column_mapping_mode_raises_on_invalid_value(self):
-        dag_args = {"name": "dag_name"}
-        workflow_args = {}
-        table_customization = {"column_mapping_mode": "nme"}
-
-        with pytest.raises(ValueError, match="Invalid column_mapping_mode"):
-            TableAttributes(
-                dag_args=dag_args,
-                workflow_args=workflow_args,
-                layer=LayerEnum.CLEAN,
-                table_name="table_name",
-                table_customization=table_customization,
-            )
