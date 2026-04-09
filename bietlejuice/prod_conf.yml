@@ -597,8 +597,8 @@ databricks_12_2_xmin_memory_cluster:
 
 databricks_16_4_xmin_view_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: c5a.large
-    node_type_id: c5a.large
+    driver_node_type_id: m5.large
+    node_type_id: m5.large
     num_workers: 1
     spark_version: 16.4.x-scala2.12
     aws_attributes:

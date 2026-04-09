@@ -658,6 +658,16 @@ databricks_16_4_xmin_memory_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_16_4_xmin_view_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5.large
+    node_type_id: m5.large
+    num_workers: 1
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 50
+
 databricks_12_2_med_memory_cluster:
     <<: *cluster_anchor
     driver_node_type_id: r5a.large
