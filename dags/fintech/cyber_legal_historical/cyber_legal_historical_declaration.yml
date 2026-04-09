@@ -34,6 +34,14 @@ workflow:
         - "['CESTATDT', 'CEDTUPD']"
         - False
         - "[]"
+    caseuda:
+      clean_table_name: historical_case_uda
+      extraction_type: incremental
+      partitions: [year, month, day]
+      extra_spark_job_arguments:
+        - "['CUDATE', 'CUREVGERAL', 'CUULTDT']"
+        - False
+        - "[]"
 cluster:
   type: custom_cluster
   custom_configurations:

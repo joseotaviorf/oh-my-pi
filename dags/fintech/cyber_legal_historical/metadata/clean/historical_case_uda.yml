@@ -1,0 +1,85 @@
+---
+database_name: datalake_cyber_legal_historical_clean
+table_name: historical_case_uda
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Clean layer table with complementary UDA (user-defined attributes) for historical Cyber Legal processes. Variable structure by company; one row per case attribute line from the legacy extraction. Joins to case history via id_case."
+columns:
+  id_case:
+    description: "Legal case number. Foreign key to link with historical case and status tables in the same DAG."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUCASENO
+  id_court_case:
+    description: "Court process identifier associated with the case in the judicial system."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUPROJUD
+  cause_loss_possibility_code:
+    description: "Code indicating the assessed possibility of loss for provisioning or risk reporting."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUPOSSIB
+  court_division_name:
+    description: "Name of the court division (vara) where the process is filed."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUVARA
+  judicial_district_name:
+    description: "Judicial district or comarca name for the proceeding."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUCOMARC
+  process_subtype:
+    description: "Subtype or classification of the legal process within the Cyber Legal model."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUSUBTIP
+  reason:
+    description: "Reason or motive text associated with the case line (MOTTOMB)."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUMOTTOMB
+  lov_code:
+    description: "List-of-values reference code for categorical attributes."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CULOV
+  decimal_value:
+    description: "Generic decimal numeric value stored for the UDA line when applicable."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUDECIMAL
+  provisioned_amount:
+    description: "Provisioned recovery amount in source currency for the case line."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUVALREC
+  updated_cause_value_amount:
+    description: "Updated total lawsuit or cause value after revisions."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUVLTTCAUSA
+  procedural_fine_amount:
+    description: "Procedural fine (multa) amount associated with the process."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUPEMULT
+  contingency_fee_amount:
+    description: "Contingency legal fees (honorários) amount for the case line."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUPEHONO
+  dt_notified:
+    description: "Date when the party or case was notified, from source CUDATE."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUDATE
+  dt_last_general_review:
+    description: "Date of the last general review of the case (CUREVGERAL)."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUREVGERAL
+  dt_last_movement:
+    description: "Date of the last registered movement on the case (CUULTDT)."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.CUULTDT
+  year:
+    description: "Partition year of the record in the historical raw extract."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.year
+  month:
+    description: "Partition month of the record in the historical raw extract."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.month
+  day:
+    description: "Partition day of the record in the historical raw extract."
+    lineage:
+      - datalake_cyber_legal_historical_raw.caseuda.day
+  ts_load:
+    description: "Timestamp when the record was loaded into the clean layer (pipeline run time)."

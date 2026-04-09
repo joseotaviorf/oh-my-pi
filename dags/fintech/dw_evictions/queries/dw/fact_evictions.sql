@@ -20,7 +20,7 @@ aux_calendar AS (
         d.weekend,
         d.is_brz_holiday,
         CASE WHEN d.date BETWEEN DATE('2025-12-22') AND DATE('2026-01-02') THEN True ELSE False END AS arbitration_recess,
-        CASE WHEN d.date BETWEEN DATE('2025-12-20') and DATE('2026-01-19') THEN True ELSE False END AS judicial_recess
+        CASE WHEN d.date BETWEEN DATE('2025-12-20') AND DATE('2026-01-19') THEN True ELSE False END AS judicial_recess
     FROM dw_public.dim_date AS d
         WHERE d.month_start <= DATE(DATE_TRUNC('month',CURRENT_DATE()))
 ),
@@ -42,13 +42,10 @@ fpd AS (
     ) AS retsuko_data
     WHERE row_number = 1
 ),
-open_amount AS (
-    SELECT
-        sk_contract,
-        SUM(due_amount) AS open_amount
+overdue_filtrado AS (
+    SELECT *
     FROM dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline
-    WHERE dt_invoice_paid IS NULL AND dt_reference = DATE(NOW())
-    GROUP BY 1
+    WHERE dt_invoice_paid IS NULL
 ),
 overdue AS (
     SELECT
@@ -61,9 +58,8 @@ overdue AS (
         COUNT(CASE WHEN o.invoice_type = 'monthly' THEN o.id_invoice END) AS monthly_invoices,
         COUNT(CASE WHEN o.negotiation_installment_number IS NOT NULL THEN o.id_invoice END) AS negotiation_invoices,
         COUNT(CASE WHEN fpd.id_invoice IS NOT NULL THEN o.id_invoice END) AS fpd_invoices
-    FROM dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline o
+    FROM overdue_filtrado o
     LEFT JOIN fpd ON o.id_invoice = fpd.id_invoice
-    WHERE o.dt_invoice_paid IS NULL
     GROUP BY 1, 2, 3
 ),
 negotiation AS (
@@ -77,7 +73,48 @@ negotiation AS (
         ON fni.sk_negotiation = fn.sk_negotiation
     WHERE fn.dt_down_payment IS NOT NULL
     AND fni.installment_number >= 2
+),
+process_evictions AS (
+    SELECT
+        eb.id_process AS sk_process,
+        CAST(eb.contract AS BIGINT) AS sk_contract,
+        DATE(COALESCE(eb.dt_closure, dt.max_dt_reference)) AS dt_reference,
+        DATE(DATEADD(day, -10, COALESCE(eb.dt_closure, dt.max_dt_reference))) AS dt_limite
+    FROM datalake_cyber_legal.evictions_base eb
+    CROSS JOIN (
+        SELECT MAX(dt_reference) AS max_dt_reference
+        FROM dw_collection_recovery_quintoandar.fact_overdue_portfolio_timeline
+    ) dt
+),
+overdue_order AS (
+    SELECT
+        pv.sk_process,
+        o.sk_contract,
+        o.dt_reference,
+        o.due_amount,
+        o.id_invoice,
+        o.invoice_type,
+        o.negotiation_installment_number,
+        o.delay_contamined_range,
+        o.dt_invoice_due_adjust,
+        DENSE_RANK() OVER (PARTITION BY pv.sk_process ORDER BY CASE WHEN o.dt_reference = pv.dt_reference THEN 1 ELSE 2 END, o.dt_reference DESC) AS rn
+  FROM overdue_filtrado o
+  LEFT JOIN process_evictions pv
+        ON pv.sk_contract = o.sk_contract
+        AND o.dt_reference BETWEEN pv.dt_limite AND pv.dt_reference
+),
+overdue_final as (
+    SELECT
+        oo.sk_process,
+        oo.sk_contract,
+        oo.dt_reference,
+        oo.delay_contamined_range,
+        SUM(oo.due_amount) AS open_amount
+    FROM overdue_order AS oo
+    WHERE rn = 1
+    GROUP BY 1,2,3,4
 )
+
 SELECT DISTINCT
     COALESCE(e.id_process, l.id_process) AS sk_process,
     IF(e.id_process IS NOT NULL, e.contract, l.contract) AS sk_contract,
@@ -105,7 +142,7 @@ SELECT DISTINCT
     IF(e.id_process IS NOT NULL, e.office, l.office) AS office,
     IF(e.id_process IS NOT NULL,
     CASE
-        WHEN e.dt_registered < date('2025-10-17') AND e.dt_closure < DATE('2025-12-15') AND e.office = 'VZL' THEN 'PASCHOALOTTO'
+        WHEN e.dt_registered < DATE('2025-10-17') AND e.dt_closure < DATE('2025-12-15') AND e.office = 'VZL' THEN 'PASCHOALOTTO'
         WHEN e.office = 'VZL' THEN 'BULGARELLI'
         WHEN e.office = 'GDM' THEN 'GONDIM'
         WHEN e.office = 'PLL' THEN 'PELLON'
@@ -149,7 +186,7 @@ SELECT DISTINCT
     IF(e.id_process IS NOT NULL, o1.delay_days, l.overdue_days_at_registration) AS overdue_days_at_registration,
     IF(e.id_process IS NOT NULL, e.succumbency_fee, l.succumbency_fee) AS succumbency_fee,
     IF(e.id_process IS NOT NULL, COALESCE(c.rent, 0) + COALESCE(c.iptu, 0) + COALESCE(c.condo, 0), l.total_package) AS total_package,
-    IF(e.id_process IS NOT NULL, COALESCE(o.open_amount, oa.open_amount), l.total_due_amount) AS total_due_amount,
+    IF(e.id_process IS NOT NULL, ovf.open_amount, l.total_due_amount) AS total_due_amount,
     IF(e.id_process IS NOT NULL, e.ldt_stock, l.ldt_stock) AS ldt_stock,
     IF(e.id_process IS NOT NULL, e.stock_range, l.stock_range) AS stock_range,
     IF(e.id_process IS NOT NULL, e.ldt_resolution, l.ldt_resolution) AS ldt_resolution,
@@ -361,25 +398,16 @@ SELECT DISTINCT
     NOW() AS ts_load
 FROM
     datalake_cyber_legal.evictions_base e
-FULL OUTER JOIN datalake_gsheets_clean.evictions_base l
+FULL OUTER JOIN
+    datalake_gsheets_clean.evictions_base l
     ON e.id_process = l.id_process
 LEFT JOIN
     aux_calendar d
-    ON e.dt_registered <= d.date AND (e.dt_closure >= d.date OR e.dt_closure IS NULL)
+    ON e.dt_registered <= d.date
+    AND (e.dt_closure >= d.date OR e.dt_closure IS NULL)
 LEFT JOIN
-    open_amount oa
-    ON e.contract = oa.sk_contract
-LEFT JOIN
-    overdue o
-    ON e.contract = o.sk_contract
-    AND DATE(
-          CASE
-            WHEN e.cyber_status <> 'Completed' THEN NULL
-            WHEN e.dt_closure IS NOT NULL THEN e.dt_closure
-            WHEN e.cyber_status = 'Completed' THEN e.dt_registered
-            ELSE NULL
-          END
-      ) = o.dt_reference
+    overdue_final AS ovf
+    ON ovf.sk_process = e.id_process
 LEFT JOIN
     overdue o1
     ON e.contract = o1.sk_contract
