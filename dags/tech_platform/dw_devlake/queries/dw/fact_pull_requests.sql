@@ -12,14 +12,14 @@ WITH primary_team AS (
 
 commit_stats AS (
     SELECT
-        pull_request_id,
+        id_pr,
         COUNT(*)                       AS commit_count,
         MIN(commit_authored_date)      AS first_commit_ts,
         MAX(commit_authored_date)      AS last_commit_ts
     FROM
         datalake_devlake_clean.pull_request_commits
     GROUP BY
-        pull_request_id
+        id_pr
 ),
 
 bot_accounts (account_id) AS (
@@ -47,7 +47,7 @@ bot_accounts (account_id) AS (
 
 comment_stats AS (
     SELECT
-        c.pull_request_id,
+        c.id_pr,
         COUNT(*)                                                                          AS comment_count,
         SUM(CASE WHEN c.type = 'REVIEW'                            THEN 1 ELSE 0 END)    AS review_comment_count,
         SUM(CASE WHEN c.type = 'DIFF'                              THEN 1 ELSE 0 END)    AS diff_comment_count,
@@ -94,7 +94,7 @@ comment_stats AS (
     LEFT JOIN
         bot_accounts AS b ON c.account_id = b.account_id
     GROUP BY
-        c.pull_request_id
+        c.id_pr
 )
 
 SELECT
@@ -199,7 +199,7 @@ LEFT JOIN
     AND pr.pr_key = pt.pr_key
 LEFT JOIN
     commit_stats AS cs
-    ON pr.id_pr = cs.pull_request_id
+    ON pr.id_pr = cs.id_pr
 LEFT JOIN
     comment_stats AS cms
-    ON pr.id_pr = cms.pull_request_id
+    ON pr.id_pr = cms.id_pr

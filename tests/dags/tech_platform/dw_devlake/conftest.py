@@ -79,7 +79,7 @@ PR_TEAM_SCHEMA = StructType(
 PR_COMMITS_SCHEMA = StructType(
     [
         StructField("commit_sha", StringType(), False),
-        StructField("pull_request_id", StringType(), False),
+        StructField("id_pr", StringType(), False),
         StructField("commit_author_name", StringType(), True),
         StructField("commit_author_email", StringType(), True),
         StructField("commit_authored_date", TimestampType(), True),
@@ -89,7 +89,7 @@ PR_COMMITS_SCHEMA = StructType(
 PR_COMMENTS_SCHEMA = StructType(
     [
         StructField("id", StringType(), False),
-        StructField("pull_request_id", StringType(), False),
+        StructField("id_pr", StringType(), False),
         StructField("account_id", StringType(), True),
         StructField("type", StringType(), True),
         StructField("status", StringType(), True),
