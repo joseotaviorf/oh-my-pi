@@ -6,100 +6,51 @@ owner: data-pp@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
-      - dw_customer_support.fact_tickets.sk_ticket
-    description: Surrogate key for the ticket, cast from id_ticket.
-  sk_agent:
-    lineage:
-      - dw_customer_support.dim_analyst.sk_last_analyst
-    description: Surrogate key for the ticket last analyst, cast from id_last_analyst.
-  sk_main_session:
-    lineage:
-      - dw_customer_support.fact_tickets.sk_session
-    description: Surrogate key for the ticket session, cast from id_session.
-  channel:
-    lineage:
-      - dw_customer_support.fact_tickets.channel
-    description: Channel of the ticket.
-  main_department:
-    lineage:
-      - dw_customer_support.dim_department.department
-    description: Main department of the ticket.
-  direction:
-    lineage:
-      - dw_customer_support.fact_tickets.direction
-    description: Direction of the ticket.
-  area:
-    lineage:
-      - dw_customer_support.dim_department.area
-    description: Department area of the ticket.
-  department:
-    lineage:
-      - dw_customer_support.dim_department.department
-    description: Department of the ticket.
-  journey_step:
-    lineage:
-      - dw_customer_support.dim_department.journey_step
-    description: Department journey step of the ticket.
-  board:
-    lineage:
-      - dw_customer_support.dim_department.board
-    description: Department board of the ticket.
-  front_or_back:
-    lineage:
-      - dw_customer_support.fact_tickets.front_or_back
-    description: Whether the ticket is from front or back.
-  team:
-    lineage:
-      - dw_customer_support.dim_department.team
-    description: Department team of the ticket.
-  external_url:
-    lineage:
-      - dw_customer_support.fact_tickets.sk_ticket
-    description: Zendesk external URL of the ticket.
-  agent_full_name:
-    lineage:
-      - dw_customer_support.dim_analyst.full_name
-    description: Full name of the agent.
-  agent_email:
-    lineage:
-      - dw_customer_support.dim_analyst.email
-    description: Email of the agent.
-  organization:
-    lineage:
-      - dw_customer_support.dim_analyst.agent_organization
-    description: Organization of the agent.
-  is_active:
-    lineage:
-      - dw_customer_support.dim_department.is_active
-    description: Whether the department is active or not.
-  is_ticket_session:
-    lineage:
-      - "null"
-    description: Not applicable for this metric.
-  is_fcr_customer:
-    lineage:
-      - "null"
-    description: Not applicable for this metric.
-  is_recontact:
-    lineage:
-      - "null"
-    description: Not applicable for this metric.
+      - datalake_customer_support.tickets.id_ticket
+    description: Ticket identifier associated with the contact.
   ts_started:
     lineage:
       - dw_customer_support.fact_tickets.ts_created
-    description: Timestamp of the ticket creation.
-  ts_survey:
-    lineage:
-      - "null"
-    description: Not applicable for this metric.
+    description: Ticket opening date
   ts_solved:
     lineage:
       - dw_customer_support.fact_tickets.ts_solved
-    description: Timestamp of the ticket solution.
-  ts_closed:
+    description: Returns the date the ticket was resolved.
+  last_team: 
+    lineage: 
+      - dw_customer_support.dim_department.team
+    description: Returns the last area belonging to the ticket.
+  channel:
     lineage:
-      - dw_customer_support.fact_tickets.ts_closed
-    description: Timestamp of the ticket closure.
+      - dw_customer_support.fact_tickets.channel
+    description: Communication channel of the contact (call or chat).
+  last_agent_organization:
+    lineage: 
+      - dw_customer_support.dim_analyst.agent_organization
+    description: Returns the organization of the analyst of the last analyst assigned to the ticket.
+  flag_back: 
+    lineage: 
+      - dw_customer_support.fact_tickets.front_or_back
+    description: Indicates whether the ticket belongs to the Back.
+  theme_recontact_flag:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.team
+      - dw_customer_support.dim_taxonomy.theme
+    description: Indicates whether the customer from that ticket returned within 4 days to discuss the same issue.
+  is_pp_multi:
+    lineage:
+      - datalake_pp_multi.pp_multi_classification_history.pp_multi_classification
+    description: Indicates whether the ticket owner is a PP Multi.
+  first_resolution_last_agent:
+    lineage: 
+     - dw_customer_support.fact_tickets.ts_solved
+    description: Returns the date of the first resolution by the analyst associated with the ticket. 
+  last_department:
+    lineage:
+      - dw_customer_support.dim_department.department
+    description: Returns the last department/queue associated with the ticket. 
   year:
     lineage:
       - current_date
@@ -114,5 +65,5 @@ columns:
     description: Current day.
   ts_load:
     lineage:
-      - NOW()
-    description: Timestamp of the data load.
+      - now()
+    description: Timestamp of the load.

@@ -26,6 +26,7 @@ workflow:
     tickets_perspective: {}
     backlog_metric: {}
     tickets_contract: {}
+    fcr_metric: {}
 
 cluster:
   type: custom_cluster
