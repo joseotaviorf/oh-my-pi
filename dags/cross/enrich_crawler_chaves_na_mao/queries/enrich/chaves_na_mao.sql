@@ -65,6 +65,7 @@ SELECT
     WHEN is_for_rent AND is_for_sale THEN TRUE
     ELSE FALSE
   END AS is_hybrid, 
+  REGEXP_EXTRACT(SPLIT_PART(GET_JSON_OBJECT(advertiser,'$.url'), '-', -1), '([0-9]+)', 1) AS advertiser_id,
   GET_JSON_OBJECT(advertiser,'$.name') AS advertiser_name,   
   GET_JSON_OBJECT(advertiser,'$.phone') AS advertiser_phone,
   GET_JSON_OBJECT(advertiser,'$.address.creci') AS advertiser_creci,      

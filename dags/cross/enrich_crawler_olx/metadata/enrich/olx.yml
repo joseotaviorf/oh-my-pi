@@ -131,7 +131,13 @@ columns:
     description: |
       The detailed type of the housing unit (e.g., Padrão, Casa de condomínio, Cobertura, etc.).
       It is provided by the original struct field "house_info", and it can
-      assume null values.  
+      assume null values.
+  advertiser_id:
+    lineage:
+      - datalake_crawler_olx_clean.olx.advertiser
+    description: |
+      The ID of the advertiser/agent responsible for the listing.
+      It is provided by the original struct field "advertiser".
   advertiser_name:
     lineage:
       - datalake_crawler_olx_clean.olx.contact_information

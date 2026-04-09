@@ -27,6 +27,7 @@ SELECT
   is_for_rent,       
   is_for_sale,             
   is_hybrid, 
+  advertiser_id,
   advertiser_name,   
   advertiser_phone,
   advertiser_creci,      

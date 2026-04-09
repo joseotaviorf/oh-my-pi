@@ -16,6 +16,7 @@ SELECT
   parking_spaces,
   unit_type,
   unit_subtype,
+  advertiser_id,
   advertiser_name,
   advertiser_phone,
   condo_fee,

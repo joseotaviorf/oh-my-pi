@@ -44,6 +44,7 @@
     CAST(GET_JSON_OBJECT(house_info,'$.garage_spaces') AS INTEGER) AS parking_spaces,
     CAST(GET_JSON_OBJECT(house_info,'$.unit_type') AS STRING) AS unit_type,
     CAST(GET_JSON_OBJECT(house_info,'$.re_types') AS STRING) AS unit_subtype,
+    CAST(GET_JSON_OBJECT(advertiser,'$.id') AS STRING) AS advertiser_id,
     COALESCE(GET_JSON_OBJECT(contact_information,'$.advertiser_name'),
              GET_JSON_OBJECT(advertiser,'$.name')) AS advertiser_name,
     COALESCE(GET_JSON_OBJECT(contact_information,'$.advertiser_phones[0]'),

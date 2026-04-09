@@ -37,6 +37,11 @@ columns:
       - datalake_crawler_zap_imoveis.zap_imoveis.platform
     description: |
       The origin of the house.
+  advertiser_listing_id:
+    lineage:
+      - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_listing_id
+    description: |
+      The ID of the listing in the advertiser's CRM.
   country:
     lineage:
       - datalake_crawler_zap_imoveis.zap_imoveis.country
@@ -164,6 +169,11 @@ columns:
     categories:
       COMMERCIAL: "Property designated for business or commercial use"
       RESIDENTIAL: "Property designated for residential use"
+  advertiser_id:
+    lineage:
+      - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_id
+    description: |
+      The ID of the advertiser/agent responsible for the listing.
   advertiser_name:
     lineage:
       - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_name

@@ -195,6 +195,13 @@ columns:
     description: |
       Boolean flag indicating if the property is available for both rent and sale.
       It is true when both type.rentable and type.buyable are true, false otherwise.
+  advertiser_id:
+    lineage:
+      - datalake_crawler_chaves_na_mao_clean.chaves_na_mao.advertiser
+    description: |
+      The ID of the advertiser responsible for the listing.
+      It is provided by the original struct field "advertiser" and is extracted from the digits in the advertiser url.
+      It can assume null values.
   advertiser_name:
     lineage:
       - datalake_crawler_chaves_na_mao_clean.chaves_na_mao.advertiser

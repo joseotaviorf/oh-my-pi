@@ -110,6 +110,11 @@ columns:
       - datalake_crawler_olx.olx.unit_subtype
     description: |
       The detailed type of the housing unit (e.g., Padrão, Casa de condomínio, Cobertura, etc.).
+  advertiser_id:
+    lineage:
+      - datalake_crawler_olx.olx.advertiser_id
+    description: |
+      The ID of the advertiser/agent responsible for the listing.
   advertiser_name:
     lineage:
       - datalake_crawler_olx.olx.advertiser_name

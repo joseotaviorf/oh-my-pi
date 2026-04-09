@@ -41,7 +41,12 @@ columns:
       - datalake_crawler_zap_imoveis_clean.zap_imoveis.origin
     description: |
       The origin of the house.
-      If the original value is null, then it assumes the value "ZapImoveis".
+      If the original value is null, then it assumes the value "ZapImoveis".  
+  advertiser_listing_id:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.advertiser_listing_id
+    description: |
+      The ID of the listing in the advertiser's CRM.
   country:
     lineage:
       - datalake_crawler_zap_imoveis_clean.zap_imoveis.address
@@ -191,6 +196,12 @@ columns:
     categories:
       COMMERCIAL: "Property designated for business or commercial use"
       RESIDENTIAL: "Property designated for residential use"
+  advertiser_id:
+    lineage:
+      - datalake_crawler_zap_imoveis_clean.zap_imoveis.contact_information
+    description: |
+      The ID of the advertiser/agent responsible for the listing.
+      It is provided by the original struct field "advertiser".
   advertiser_name:
     lineage:
       - datalake_crawler_zap_imoveis_clean.zap_imoveis.contact_information

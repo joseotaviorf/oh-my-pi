@@ -10,8 +10,10 @@ WITH json_select AS(
     TO_JSON(house_info) AS house_info,
     TO_JSON(type) AS type,
     TO_JSON(contact_information) AS contact_information,
+    TO_JSON(advertiser) AS advertiser,
     price,
     TO_JSON(date_info) AS date_info,
+    advertiser_listing_id,
     year,
     month,
     day
@@ -24,6 +26,7 @@ SELECT
   id_house_platform,
   id_house,
   platform,
+  advertiser_listing_id,
   GET_JSON_OBJECT(address,'$.country') AS country,
   GET_JSON_OBJECT(address,'$.state') AS state,
   CASE
@@ -55,6 +58,7 @@ SELECT
     CAST(GET_JSON_OBJECT(house_info, '$.usage_type[0]') AS STRING),
     CAST(GET_JSON_OBJECT(house_info, '$.usage_type') AS STRING)
   ) AS usage_type,
+  GET_JSON_OBJECT(advertiser,'$.id') AS advertiser_id,
   GET_JSON_OBJECT(contact_information,'$.advertiser_name') AS advertiser_name,
   COALESCE(GET_JSON_OBJECT(contact_information,'$.advertiser_phone'), GET_JSON_OBJECT(contact_information,'$.advertiser_phones')) AS advertiser_phone,
   CAST(COALESCE(price.rent.condo_fee, price.sale.condo_fee) AS DOUBLE) AS condo_fee,

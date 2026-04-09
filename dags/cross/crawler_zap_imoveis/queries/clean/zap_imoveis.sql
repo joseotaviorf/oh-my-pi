@@ -13,6 +13,7 @@ SELECT
   advertiser,
   price,
   date_info,
+  externalID AS advertiser_listing_id,
   year,
   month,
   day

@@ -98,6 +98,11 @@ columns:
     description: |
       It has important information about the crawler date, also, when the listing
       was created and when it was updated.
+  advertiser_listing_id:
+    lineage:
+      - datalake_crawler_zap_imoveis_raw.zap_imoveis.externalID
+    description: |
+      The ID of the listing in the advertiser's CRM.
   year:
     lineage:
       - datalake_crawler_zap_imoveis_raw.zap_imoveis.year

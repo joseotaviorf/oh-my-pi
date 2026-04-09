@@ -167,6 +167,11 @@ columns:
     description: |
       Boolean flag indicating if the property is available for both rent and sale.
       It is true when both type.rentable and type.buyable are true, false otherwise.
+  advertiser_id:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.advertiser_id
+    description: |
+      The ID of the advertiser responsible for the listing.
   advertiser_name:
     lineage:
       - datalake_crawler_chaves_na_mao.chaves_na_mao.advertiser_name
