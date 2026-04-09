@@ -401,7 +401,7 @@ def fetch_from_s3(spark, s3_service, proxy_path, start_timestamp, end_timestamp,
         return None
 
     if "metadata" in df.columns:
-        df = df.withColumn("metadata", F.col("metadata").cast("string"))
+        df = df.withColumn("metadata", F.to_json(F.col("metadata")))
 
     return df
 
