@@ -17,25 +17,8 @@ workflow:
       clean_table_name: operation_event
     operation_payments:
       clean_table_name: operation_payments
-      transactional_datatype_overrides:
-        house_area: "DECIMAL(38, 10)"
-        house_reference: "DECIMAL(38, 10)"
-        base_meter_value: "DECIMAL(38, 10)"
-        additional_meter_value: "DECIMAL(38, 10)"
-        total_meter_value: "DECIMAL(38, 10)"
-        total_add_ons: "DECIMAL(38, 10)"
-        fixed_value: "DECIMAL(38, 10)"
-        meters_base_reference: "DECIMAL(38, 10)"
-        meters_additional_reference: "DECIMAL(38, 10)"
-        meters_total: "DECIMAL(38, 10)"
-        additionals_total: "DECIMAL(38, 10)"
-        fixed_reference: "DECIMAL(38, 10)"
     additionals:
       clean_table_name: additionals
-      transactional_datatype_overrides:
-        quantity: "DECIMAL(38, 10)"
-        amount: "DECIMAL(38, 10)"
-        additional_amount: "DECIMAL(38, 10)"
     error_records:
       clean_table_name: error_records
     agenda_availability:

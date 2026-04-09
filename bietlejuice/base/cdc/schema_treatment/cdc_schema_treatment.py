@@ -57,11 +57,15 @@ class CdcSchemaTreatment(ABC):
                 )
         return transactional_dataframe
 
+    MAX_SPARK_DECIMAL_PRECISION = 38
+
     def _treat_decimal_columns(
         self, transactional_dataframe: DataFrame, latest_table_change: dict
     ) -> DataFrame:
         """
         CDC saves decimal and numeric data types as a float64. This method converts to decimal again.
+        Precision is capped at MAX_SPARK_DECIMAL_PRECISION (38) to avoid ArithmeticException
+        when source databases define columns with higher precision.
         """
         for column in latest_table_change["columns"]:
             if (
@@ -70,11 +74,14 @@ class CdcSchemaTreatment(ABC):
             ):
                 continue
             if column["typeName"].upper() in ("DECIMAL", "NUMERIC"):
-                type = f"decimal({column['length']}, {column['scale']})"
                 if column["length"] is None or column["scale"] is None:
-                    type = "decimal(38, 18)"
+                    decimal_type = "decimal(38, 18)"
+                else:
+                    precision = min(column["length"], self.MAX_SPARK_DECIMAL_PRECISION)
+                    scale = min(column["scale"], precision)
+                    decimal_type = f"decimal({precision}, {scale})"
                 transactional_dataframe = transactional_dataframe.withColumn(
-                    column["name"], col(column["name"]).cast(type)
+                    column["name"], col(column["name"]).cast(decimal_type)
                 )
 
         return transactional_dataframe
