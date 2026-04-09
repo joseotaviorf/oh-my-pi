@@ -3,7 +3,7 @@ WITH
         WITH vsl AS (
             SELECT
                 vsl.id_visit,
-                MAX_BY(vsl.id_schedule, vsl.ts_created) AS last_id_schedule,
+                MAX_BY(vsl.id_schedule, vsl.ts_created) AS id_last_schedule,
                 SUM(1) FILTER (WHERE vsl.event_type = 'VISIT_RESCHEDULED') AS nbr_reschedule,
                 MIN(vsl.on_behalf_of) FILTER (WHERE vsl.event_type = 'VISIT_REQUESTED') AS visit_request_on_behalf_of,
                 MIN(vsl.author_user_role) FILTER (WHERE vsl.event_type = 'VISIT_REQUESTED') AS visit_request_user_role,
@@ -48,7 +48,7 @@ WITH
         bsc AS (
             SELECT
                 b.id_visit,
-                MAX_BY(bsc.id_booking, bsc.ts_created) AS last_id_schedule,
+                MAX_BY(bsc.id_booking, bsc.ts_created) AS id_last_schedule,
                 MIN_BY(bsc.id_user, bsc.ts_created) AS id_user_visit_request,
                 SUM(1) FILTER (WHERE bsc.reason = 'SCHEDULE_CHANGE') AS nbr_reschedule,
                 MAX(bsc.ts_created) FILTER (WHERE bsc.reason = 'SCHEDULE_CHANGE') AS ts_visit_rescheduled,
@@ -81,7 +81,7 @@ WITH
         )
         SELECT
             id_visit,
-            last_id_schedule,
+            id_last_schedule,
             nbr_reschedule,
             visit_request_on_behalf_of,
             visit_request_user_role,
@@ -119,7 +119,7 @@ WITH
         UNION ALL
         SELECT
             id_visit,
-            last_id_schedule,
+            id_last_schedule,
             nbr_reschedule,
             NULL AS visit_request_on_behalf_of,
             NULL AS visit_request_user_role,
@@ -182,6 +182,7 @@ WITH
     )
 SELECT
     visit.id AS id_visit,
+    visit_log.id_last_schedule,
     visit.id_agent,
     visit.id_visitor,
     lh.id_user AS id_owner,
@@ -255,7 +256,7 @@ SELECT
     visit_log.visit_request_on_behalf_of,
     visit_log.visit_request_user_role,
     visit_log.visit_request_application_source,
-    IF(visit_log.visit_request_application_source IS NULL, v_origin.visit_request_channel, v_origin.visit_request_channel || ' - ' || visit_log.visit_request_application_source) AS visit_request_source_unified,
+    NULLIF(CONCAT_WS(' - ', v_origin.visit_request_channel, visit_log.visit_request_application_source),'') AS visit_request_source_unified,
     visit_log.first_supply_answer_channel,
     visit_log.first_supply_answer,
     visit_log.first_tenant_living_answer,
@@ -300,6 +301,8 @@ SELECT
     IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.has_demand_attended, NULL) AS has_unsuccessful_demand_attended,
     IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.has_agent_attended, NULL) AS has_unsuccessful_agent_attended,
     IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.has_supply_attended, NULL) AS has_unsuccessful_supply_attended,
+    visit.ts_created::DATE = visit.ts_visit::DATE AS is_visit_same_day_first_schedule,
+    COALESCE(visit_log.ts_visit_rescheduled::DATE, visit.ts_created::DATE) = visit.ts_visit::DATE AS is_visit_same_day_last_schedule,
     visit.dt_visit,
     TO_UTC_TIMESTAMP(
         (
@@ -334,7 +337,10 @@ SELECT
     IF(pva.event_type = 'VISIT_DONE', pva.ts_post_visit_agent, NULL) AS ts_visit_done,
     IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.ts_post_visit_agent, NULL) AS ts_visit_unsuccessful,
     visit_log.ts_visit_stalled,
-    vbh.ts_first_visit
+    vbh.ts_first_visit,
+    LAG(CASE WHEN pva.event_type = 'VISIT_DONE' THEN visit.ts_visit END, 1) IGNORE NULLS OVER(PARTITION BY visit.id_house ORDER BY visit.ts_visit, visit.ts_created) AS ts_visit_last_visit_done_of_house,
+    LAG(CASE WHEN pva.event_type = 'VISIT_DONE' THEN visit.ts_visit END , 1) IGNORE NULLS OVER(PARTITION BY visit.id_visitor ORDER BY visit.ts_visit, visit.ts_created) AS ts_visit_last_visit_done_of_visitor,
+    LAG(CASE WHEN pva.event_type = 'VISIT_DONE' THEN visit.ts_visit ELSE NULL END, 1) IGNORE NULLS OVER(PARTITION BY visit.id_house, visit.id_visitor ORDER BY visit.ts_visit, visit.ts_created) AS ts_visit_last_visit_done_of_house_and_visitor
 FROM
     datalake_ebdb_clean.visit AS visit
 LEFT JOIN

@@ -9,6 +9,11 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit.id
     description: Visit ID for connection to the Visit table
+  id_last_schedule:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.id_schedule
+      - datalake_ebdb_clean.booking.id
+    description: Last schedule ID of the visit. Data since 2020.
   id_agent:
     lineage:
       - datalake_ebdb_clean.visit.id_agent
@@ -338,6 +343,17 @@ columns:
     lineage:
       - datalake_visit.post_visit_agent_unified.has_supply_attended
     description: True if supply (owner) attended the visit.
+  is_visit_same_day_first_schedule:
+    lineage:
+      - datalake_ebdb_clean.visit.ts_created
+      - datalake_ebdb_clean.visit.ts_visit
+    description: True if the visit was scheduled on the same day as the visit.
+  is_visit_same_day_last_schedule:
+    lineage:
+      - datalake_ebdb_clean.visit.ts_created
+      - datalake_ebdb_clean.visit.ts_visit
+      - datalake_ebdb_clean.visit_status_log.ts_visit_rescheduled
+    description: True if the visit was scheduled on the same day as the last schedule.
   dt_visit:
     lineage:
       - datalake_ebdb_clean.visit.dt_visit
@@ -461,3 +477,15 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_aud.ts_visit
     description: Timestamp when the visit was first scheduled. Data since 2020.
+  ts_visit_last_visit_done_of_house:
+    lineage:
+      - datalake_ebdb_clean.visit.ts_visit
+    description: Timestamp when the last visit was done for the house.
+  ts_visit_last_visit_done_of_visitor:
+    lineage:
+      - datalake_ebdb_clean.visit.ts_visit
+    description: Timestamp when the last visit was done for the visitor.
+  ts_visit_last_visit_done_of_house_and_visitor:
+    lineage:
+      - datalake_ebdb_clean.visit.ts_visit
+    description: Timestamp when the last visit was done for the house and visitor.

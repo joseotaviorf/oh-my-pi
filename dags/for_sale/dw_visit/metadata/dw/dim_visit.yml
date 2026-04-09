@@ -213,6 +213,26 @@ columns:
     lineage:
       - datalake_visit.visits.is_3p_lead_gen
     description: If the visit has a 3P lead generation partner. Data since 2020.
+  is_visit_same_day_first_schedule:
+    lineage:
+      - datalake_visit.visits.is_visit_same_day_first_schedule
+    description: True if the visit was scheduled on the same day as the visit. Data since 2020.
+  is_visit_same_day_last_schedule:
+    lineage:
+      - datalake_visit.visits.is_visit_same_day_last_schedule
+    description: True if the visit was scheduled on the same day as the last schedule. Data since 2020.
+  is_house_revisit:
+    lineage:
+      - datalake_visit.visits.ts_visit_last_visit_done_of_house
+    description: True if the visit is a revisit of the house. Data since 2020.
+  is_visitor_revisit:
+    lineage:
+      - datalake_visit.visits.ts_visit_last_visit_done_of_visitor
+    description: True if the visit is a revisit of the visitor. Data since 2020.
+  is_house_visitor_revisit:
+    lineage:
+      - datalake_visit.visits.ts_visit_last_visit_done_of_house_and_visitor
+    description: True if the visit is a revisit of the house and visitor. Data since 2020.
   has_3p_access_control:
     lineage:
       - datalake_visit.visits.has_3p_access_control
@@ -317,5 +337,17 @@ columns:
     lineage:
       - datalake_visit.visits.ts_first_visit
     description: Timestamp when the visit was first scheduled. Data since 2020.
+  ts_visit_last_visit_done_of_house:
+    lineage:
+      - datalake_visit.visits.ts_visit_last_visit_done_of_house
+    description: Timestamp when the last visit was done for the house. Data since 2020.
+  ts_visit_last_visit_done_of_visitor:
+    lineage:
+      - datalake_visit.visits.ts_visit_last_visit_done_of_visitor
+    description: Timestamp when the last visit was done for the visitor. Data since 2020.
+  ts_visit_last_visit_done_of_house_and_visitor:
+    lineage:
+      - datalake_visit.visits.ts_visit_last_visit_done_of_house_and_visitor
+    description: Timestamp when the last visit was done for the house and visitor. Data since 2020.
   ts_load:
     description: Timestamp of the ingestion data.

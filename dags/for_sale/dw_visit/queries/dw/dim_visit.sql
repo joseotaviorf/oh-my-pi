@@ -46,6 +46,11 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   v.is_3p_supply AS is_visit_3p_supply,
   v.is_3p_demand AS is_visit_3p_demand,
   v.is_3p_lead_gen AS is_visit_3p_lead_gen,
+  IF(v.ts_visit_last_visit_done_of_house IS NOT NULL, TRUE, FALSE) AS is_house_revisit,
+  IF(v.ts_visit_last_visit_done_of_visitor IS NOT NULL, TRUE, FALSE) AS is_visitor_revisit,
+  IF(v.ts_visit_last_visit_done_of_house_and_visitor IS NOT NULL, TRUE, FALSE) AS is_house_visitor_revisit,
+  v.is_visit_same_day_first_schedule,
+  v.is_visit_same_day_last_schedule,
   v.has_3p_access_control,
   v.has_tenant_living AS has_visit_tenant_living,
   v.has_fup_collected AS has_visit_fup_collected,
@@ -72,6 +77,9 @@ SELECT -- [ODS] This table was migrated from ODS flow and needs a future refacto
   v.ts_visit_fup_collected,
   v.ts_visit_stalled,
   v.ts_first_visit,
+  v.ts_visit_last_visit_done_of_house,
+  v.ts_visit_last_visit_done_of_visitor,
+  v.ts_visit_last_visit_done_of_house_and_visitor,
   NOW() AS ts_load
 FROM
   datalake_visit.visits AS v

@@ -8,6 +8,10 @@ columns:
     description: Visit's id.
     lineage:
       - datalake_visit.visits.id_visit
+  sk_last_schedule:
+    description: Last schedule ID of the visit.
+    lineage:
+      - datalake_visit.visits.id_last_schedule
   sk_visitor:
     description: Visitor's id. (Connect with dim_user)
     lineage:

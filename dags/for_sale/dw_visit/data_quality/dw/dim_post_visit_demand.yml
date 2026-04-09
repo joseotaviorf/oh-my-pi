@@ -1,5 +1,5 @@
 ---
-table_name: dw_visit.post_visit_demand
+table_name: dw_visit.dim_post_visit_demand
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
   sk_visit:

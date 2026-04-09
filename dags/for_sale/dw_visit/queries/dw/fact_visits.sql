@@ -1,5 +1,6 @@
 SELECT
   v.id_visit AS sk_visit,
+  v.id_last_schedule AS sk_last_schedule,
   v.id_visitor AS sk_visitor,
   v.id_owner AS sk_owner,
   v.id_user_visit_request AS sk_user_visit_request,
