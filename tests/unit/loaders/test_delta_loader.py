@@ -1,6 +1,6 @@
 import pytest
 from unittest import mock
-from bietlejuice.loaders.delta_loader import DeltaLoader
+from bietlejuice.loaders.delta_loader import DeltaLoader, _sanitize_identifier
 from py4j.protocol import Py4JJavaError
 from pyspark.sql.utils import AnalysisException
 from pyspark.sql.types import StructField, StructType, StringType
@@ -11,6 +11,7 @@ class TestDeltaLoader:
     def delta_table_builder_mock(self):
         builder = mock.MagicMock()
         builder.tableName.return_value = builder
+        builder.property.return_value = builder
         builder.addColumns.return_value = builder
         builder.partitionedBy.return_value = builder
         builder.location.return_value = builder
@@ -231,6 +232,48 @@ class TestDeltaLoader:
         mock_spark_context.spark.sql.assert_any_call("DROP TABLE test_table")
         delta_table_builder_mock.execute.assert_called_once()
 
+    def test_create_empty_table_with_column_mapping_mode(
+        self,
+        mock_spark_context,
+        mock_delta_table,
+        delta_table_builder_mock,
+        mock_source_df,
+    ):
+        table_name = "test_database.test_table"
+        path = "test_path"
+        mock_spark_context.spark.catalog.tableExists.return_value = False
+        mock_delta_table.forName.side_effect = AnalysisException(
+            desc="DELTA_TABLE_NOT_FOUND", stackTrace=""
+        )
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+
+        delta_loader.load_table(
+            table_name, path, mock_source_df, column_mapping_mode="name"
+        )
+
+        delta_table_builder_mock.property.assert_called_once_with(
+            "delta.columnMapping.mode", "name"
+        )
+
+    def test_create_empty_table_without_column_mapping_mode(
+        self,
+        mock_spark_context,
+        mock_delta_table,
+        delta_table_builder_mock,
+        mock_source_df,
+    ):
+        table_name = "test_database.test_table"
+        path = "test_path"
+        mock_spark_context.spark.catalog.tableExists.return_value = False
+        mock_delta_table.forName.side_effect = AnalysisException(
+            desc="DELTA_TABLE_NOT_FOUND", stackTrace=""
+        )
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+
+        delta_loader.load_table(table_name, path, mock_source_df)
+
+        delta_table_builder_mock.property.assert_not_called()
+
     def test_write_to_table(self, mock_spark_context, mock_source_df, mock_delta_table):
         table_name = "test_table"
         path = "test_path"
@@ -248,6 +291,32 @@ class TestDeltaLoader:
         mock_source_df.write.saveAsTable.assert_called_once_with(
             table_name, partitionBy=partition_by
         )
+
+    def test_write_to_table_with_column_mapping_mode(
+        self, mock_spark_context, mock_source_df, mock_delta_table
+    ):
+        table_name = "test_table"
+        path = "test_path"
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        delta_loader.load_table(
+            table_name, path, mock_source_df, column_mapping_mode="name"
+        )
+
+        mock_spark_context.spark.sql.assert_any_call(
+            "ALTER TABLE test_table SET TBLPROPERTIES "
+            "('delta.columnMapping.mode' = 'name')"
+        )
+
+    def test_write_to_table_without_column_mapping_mode(
+        self, mock_spark_context, mock_source_df, mock_delta_table
+    ):
+        table_name = "test_table"
+        path = "test_path"
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        delta_loader.load_table(table_name, path, mock_source_df)
+
+        for call in mock_spark_context.spark.sql.call_args_list:
+            assert "delta.columnMapping.mode" not in str(call)
 
     def test_merge_to_table_without_delete(
         self,
@@ -376,3 +445,30 @@ class TestDeltaLoader:
         mock_spark_context.spark.sql.assert_called_once_with(
             "OPTIMIZE test_table ZORDER BY column1,column2"
         )
+
+    @pytest.mark.parametrize(
+        "identifier",
+        ["test_table", "db.table", "datalake_ebdb_raw.contract"],
+    )
+    def test_sanitize_identifier_accepts_valid_names(self, identifier):
+        assert _sanitize_identifier(identifier) == identifier
+
+    @pytest.mark.parametrize(
+        "identifier",
+        ["'; DROP TABLE --", "table; SELECT 1", "name WITH spaces", ""],
+    )
+    def test_sanitize_identifier_rejects_malicious_input(self, identifier):
+        with pytest.raises(ValueError, match="Invalid SQL identifier"):
+            _sanitize_identifier(identifier)
+
+    def test_write_to_table_rejects_invalid_column_mapping_mode(
+        self, mock_spark_context, mock_source_df, mock_delta_table
+    ):
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        with pytest.raises(ValueError, match="Invalid column_mapping_mode"):
+            delta_loader.load_table(
+                "test_table",
+                "test_path",
+                mock_source_df,
+                column_mapping_mode="'; DROP TABLE evil --",
+            )
