@@ -12,3 +12,12 @@ SELECT
     NOW() AS ts_load
 FROM
     datalake_degreed_raw.completions
+QUALIFY
+    ROW_NUMBER() OVER (
+        PARTITION BY id
+        ORDER BY
+            TO_TIMESTAMP(attributes.added_at) DESC NULLS LAST,
+            TO_DATE(attributes.completed_at) DESC NULLS LAST,
+            CAST(attributes.points_earned AS FLOAT) DESC NULLS LAST,
+            CAST(attributes.rating AS INT) DESC NULLS LAST
+    ) = 1

@@ -4,6 +4,7 @@ owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
   Table containing the stages an application has gone through, sourced from the Greenhouse Harvest API v3 'application_stages' endpoint.
+  When the raw feed contains duplicate application stage ids in the same incremental batch, the clean layer keeps one row per id, preferring the latest ts_updated, then latest ts_created, then latest ingestion partition (year, month, day).
 columns:
   id:
     description: The application stage's unique identifier.

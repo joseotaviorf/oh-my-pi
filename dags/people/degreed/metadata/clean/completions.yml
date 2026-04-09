@@ -4,6 +4,7 @@ owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
   This table holds records of all content completions within the organization. A completion signifies that a user has finished a piece of learning content, which may or may not be self-reported.
+  When the raw feed contains duplicate completion ids in the same load window, the clean layer keeps one row per id: the row with the latest ts_added, then latest dt_completed, then highest points_earned and rating for deterministic tie-breaking.
 columns:
   id:
     description: Unique identifier for the completion record.
