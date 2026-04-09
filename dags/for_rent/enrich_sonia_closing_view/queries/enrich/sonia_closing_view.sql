@@ -81,7 +81,7 @@ SELECT
   ABS(
       from_big_endian_64(
         xxhash64(
-          -- We use {id_house}-{uuid_tenant} as hash input so every contract
+          -- We use id_house-uuid_tenant as hash input so every contract
           -- created for a tenant in a given property always falls into the
           -- same group.
           to_utf8(CAST(s.id_house AS VARCHAR) || '-' || s.uuid_tenant)
