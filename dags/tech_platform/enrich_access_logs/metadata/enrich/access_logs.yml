@@ -11,7 +11,7 @@ columns:
   id_trace:
     lineage:
       - datalake_access_logs_clean.opa.id_trace
-    description: Trace ID
+    description: Distributed trace identifier
   ts_decision:
     lineage:
       - datalake_access_logs_clean.opa.ts_event
@@ -33,11 +33,11 @@ columns:
       - datalake_access_logs_clean.opa.request_real_ip
     description: Request real IP
   request_method:
-    lineage:  
+    lineage:
       - datalake_access_logs_clean.opa.request_method
     description: Request method
   request_user_agent:
-    lineage:  
+    lineage:
       - datalake_access_logs_clean.istio.request_user_agent
     description: Request user agent
   request_path:
@@ -82,23 +82,23 @@ columns:
     description: HTTP status code (only used when result_http_allowed is false)
   principal_user_email:
     lineage:
-      - datalake_access_logs_clean.opa.principal_user_email
-    description: Principal user email 
+      - datalake_access_logs_clean.istio.principal_user_email
+    description: Principal user email
   id_main_principal_user:
     lineage:
-      - datalake_access_logs_clean.opa.id_main_principal_user
+      - datalake_access_logs_clean.istio.id_principal_user
     description: Principal user main ID
   uuid_person_principal_user:
     lineage:
-      - datalake_access_logs_clean.opa.uuid_person_principal_user
+      - datalake_access_logs_clean.istio.uuid_person_principal_user
     description: Principal user person UUID
   principal_user_idp:
     lineage:
       - data_access_logs_clean.opa.principal_user_idp
     description: Principal user IDP
   principal_service:
-    lineage: 
-      - datalake_access_logs_clean.opa.principal_service
+    lineage:
+      - datalake_access_logs_clean.istio.principal_service
     description: Principal service
   principal_user_provided_roles:
     lineage:
@@ -106,11 +106,11 @@ columns:
     description: Role provided by principal user
   principal_user_issuer:
     lineage:
-      - datalake_access_logs_clean.opa.principal_user_issuer
+      - datalake_access_logs_clean.istio.principal_user_issuer
     description: Principal user issuer
   id_principal_user_impersonated_by:
     lineage:
-      - datalake_access_logs_clean.opa.id_principal_user_impersonated_by
+      - datalake_access_logs_clean.istio.id_principal_user_impersonated_by
     description: Principal user impersonated by
   principal_service_provided_roles:
     lineage:
@@ -119,4 +119,20 @@ columns:
   app:
     lineage:
       - datalake_access_logs_clean.opa.app
-    description: App that handled the request 
+    description: App that handled the request
+  year:
+    lineage:
+      - datalake_access_logs_clean.opa.year
+    description: Partition year of the event timestamp
+  month:
+    lineage:
+      - datalake_access_logs_clean.opa.month
+    description: Partition month of the event timestamp
+  day:
+    lineage:
+      - datalake_access_logs_clean.opa.day
+    description: Partition day of the event timestamp
+  hour:
+    lineage:
+      - datalake_access_logs_clean.opa.hour
+    description: Partition hour of the event timestamp

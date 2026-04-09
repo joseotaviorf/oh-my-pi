@@ -13,13 +13,7 @@ WITH opa_filtered AS (
         request_path,
         result_http_allowed,
         result_http_status,
-        principal_user_email,
-        id_main_principal_user,
-        uuid_person_principal_user,
         principal_user_idp,
-        principal_user_issuer,
-        id_principal_user_impersonated_by,
-        principal_service,
         principal_user_provided_roles,
         principal_service_provided_roles,
         app,
@@ -42,6 +36,12 @@ istio_filtered AS (
         request_duration_ms,
         response_flags,
         response_code,
+        principal_user_email,
+        id_principal_user,
+        uuid_person_principal_user,
+        principal_user_issuer,
+        principal_service,
+        id_principal_user_impersonated_by,
         app,
         year,
         month,
@@ -52,7 +52,7 @@ istio_filtered AS (
     WHERE
          MAKE_DATE(year, month, day) BETWEEN '{load_start_date}' AND '{load_end_date}'
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_request, app ORDER BY ts_event DESC) = 1 
+        ROW_NUMBER() OVER (PARTITION BY id_request, app ORDER BY ts_event DESC) = 1
 )
 SELECT
     opa.id_decision,
@@ -74,13 +74,13 @@ SELECT
     opa.request_path,
     opa.result_http_allowed,
     opa.result_http_status,
-    opa.principal_user_email,
-    opa.id_main_principal_user,
-    opa.uuid_person_principal_user,
+    istio.principal_user_email,
+    CAST(istio.id_principal_user AS STRING) AS id_main_principal_user,
+    istio.uuid_person_principal_user,
     opa.principal_user_idp,
-    opa.principal_user_issuer,
-    opa.id_principal_user_impersonated_by,
-    opa.principal_service,
+    istio.principal_user_issuer,
+    istio.id_principal_user_impersonated_by,
+    istio.principal_service,
     opa.principal_user_provided_roles,
     opa.principal_service_provided_roles,
     opa.app,
