@@ -37,10 +37,12 @@ columns:
   model_discount_type:
     lineage:
       - datalake_inspection_services_clean.invoice_discount.discount_type
-    description: Classification of the discount type.
+    description: |
+      Application mode of the bandaid discount. Both types are automatic (product-driven, ML-powered).
+      Does NOT distinguish automatic vs manual — all bandaids are automatic.
     categories:
-      OFFERED_DISCOUNT: Discounts offered to the user for approval.
-      AUTOMATIC_BANDAID: Discounts applied automatically by Bandaid ML.
+      OFFERED_DISCOUNT: Discount calculated and offered to the tenant for approval before application.
+      AUTOMATIC_BANDAID: Discount calculated and applied instantly without user interaction.
   discount_value_type:
     lineage:
       - datalake_inspection_services_clean.invoice_discount.discount_value_type

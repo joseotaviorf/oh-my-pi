@@ -4,6 +4,8 @@ globs: "**/*.sql"
 ---
 # SQL Style Guide
 
+> **Scope**: These rules apply when **contributing SQL files to the repository** (pipeline queries in `dags/`). Sections 1–8 (formatting, naming, style) also apply to ad-hoc analysis queries. Sections 9–12 (SELECT *, partition filtering, PII storage, layer policy) are pipeline-specific — for data exploration, see `data_exploration.mdc` or use the `@tars` keyword to activate the Data Analyst subagent.
+
 ## General SQL Principles
 
 - **Enforce consistency**: All SQL code should follow these guidelines
@@ -81,7 +83,7 @@ JOIN
 - **New lines** before `AND`/`OR`/`ON`, after root keywords (`SELECT`/`FROM`/`WHERE`/`JOIN`), and after semicolons. Do not use blank lines (DBeaver incompatible).
 - **Indentation**: Keywords left-aligned; columns indented by TAB or 2/4 spaces
 - **Commas** at end-of-line (right comma)
-- **Each column** on its own row in `SELECT`. Never use `SELECT *`.
+- **Each column** on its own row in `SELECT`
 - **DISTINCT** on the same row as `SELECT`
 
 ```sql
@@ -97,7 +99,7 @@ WHERE
 
 ---
 
-## 7. CTEs (Common Table Expressions)
+## 4. CTEs (Common Table Expressions)
 
 ### Rules
 
@@ -135,7 +137,7 @@ JOIN
 
 ---
 
-## 8. Joins
+## 5. Joins
 
 ### Rules
 
@@ -179,7 +181,7 @@ LEFT JOIN table_name_3 AS tn_3 ON tn_1.column_3 = tn_3.column_3
 
 ---
 
-## 9. Case-When Statements
+## 6. Case-When Statements
 
 ### Rules
 
@@ -220,7 +222,7 @@ WHERE
 
 ---
 
-## 10. Long Expressions — Line Breaks
+## 7. Long Expressions — Line Breaks
 
 Prioritise breaking long expressions into multiple lines so that statements stay readable and fit common line-length limits.
 
@@ -257,7 +259,7 @@ FROM
 
 ---
 
-## 11. Commenting
+## 8. Commenting
 
 ### Rules
 
@@ -298,7 +300,7 @@ WHERE
 
 ---
 
-## 12. No Wildcard Selects
+## 9. No Wildcard Selects
 
 ### Rule
 
@@ -357,11 +359,11 @@ QUALIFY ROW_NUMBER() OVER (PARTITION BY id_user ORDER BY ts_created DESC) = 1
 
 ---
 
-## 13. Query Performance and Partition Filtering
+## 10. Query Performance and Partition Filtering
 
 ### Rules
 
-#### 12a — Always filter on partition columns
+#### 10a — Always filter on partition columns
 
 When reading a partitioned table, include a predicate on its partition columns (`year`, `month`, `day`, or the date column declared as `partitions` in the DAG declaration). Without this, Databricks reads every partition (full table scan).
 
@@ -392,7 +394,7 @@ FROM
     datalake_ebdb_clean.contract
 ```
 
-#### 12b — Use incremental load params for large tables
+#### 10b — Use incremental load params for large tables
 
 For tables that grow continuously, use the `{load_start_date}` / `{load_end_date}` template params (resolved by the Spark job at runtime) instead of querying all historical data on every run.
 
@@ -422,7 +424,7 @@ FROM
     datalake_amplitude_clean.event
 ```
 
-#### 12c — Push filters before joins
+#### 10c — Push filters before joins
 
 Apply `WHERE` filters inside a CTE before joining to large tables. Filtering after the join forces Databricks to read and shuffle the full dataset first.
 
@@ -469,7 +471,7 @@ WHERE
     AND c.dt_signed < '{load_end_date}'
 ```
 
-#### 12d — Align predicates with Z-order columns
+#### 10d — Align predicates with Z-order columns
 
 When a table declares `z_order_by` columns in its DAG declaration, include those columns in `WHERE` or `JOIN` predicates whenever the query logic allows it. Z-ordering clusters data by those columns on disk; predicates on those columns skip data files via data skipping statistics.
 
@@ -489,7 +491,7 @@ WHERE
 
 ---
 
-## 14. Person Data Model — PII Centralisation
+## 11. Person Data Model — PII Centralisation
 
 ### Rule
 
@@ -572,7 +574,7 @@ LEFT JOIN
 
 ---
 
-## 15. Source Layer Policy by Target Layer
+## 12. Source Layer Policy by Target Layer
 
 ### Rule
 

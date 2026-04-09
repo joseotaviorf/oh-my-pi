@@ -41,6 +41,11 @@ columns:
     lineage:
       - datalake_inspection_services_raw.repair_request_history.type
     description: Descriptive information indicating at which stage the request arose.
+    categories:
+      REPAIR_ANALYSIS: Repair analysis stage (AR).
+      OWNER_REVIEW: Owner review stage.
+      CONTESTATION_ANALYSIS: Contestation analysis stage (AC).
+      BUDGET_APPROVAL: Budget approval stage.
   repair_service:
     lineage:
       - datalake_inspection_services_raw.repair_request_history.comment

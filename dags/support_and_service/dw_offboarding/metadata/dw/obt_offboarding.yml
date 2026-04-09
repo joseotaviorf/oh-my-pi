@@ -160,7 +160,11 @@ columns:
     lineage:
       - datalake_offboarding.mediations.squad
   has_repairs:
-    description: Boolean indicating whether the termination had repairs.
+    description: Indicates whether the termination had repairs.
+      It will be true if
+      (1) the count of tenant repairs in AC is greater than 0,
+      (2) if AC repairs = 0 but there were tenant repairs in review and the termination had early mediation, early both agree, or bandaid,
+      or (3) there were unset repairs.
     lineage:
       - dw_offboarding.fact_terminations.has_repairs
   has_tenant_access_review:
