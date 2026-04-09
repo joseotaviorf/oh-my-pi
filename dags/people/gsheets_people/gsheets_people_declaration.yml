@@ -27,13 +27,9 @@ workflow:
   bucket_config_name: people_bucket
   tables_customization:
     codex_cost_centers:
-      extraction_type: incremental
-      merge_on: ["cost_center_code", "year", "month"]
       vacuum_retention_hours: 168
       vacuum_lite: true
     codex_cost_informations:
-      extraction_type: incremental
-      merge_on: ["cost_center_code", "year", "month"]
       vacuum_retention_hours: 168
       vacuum_lite: true
     navent_convenia_like:
