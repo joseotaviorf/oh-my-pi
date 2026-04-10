@@ -764,7 +764,7 @@ classifieds_tasks = [
 
 classifieds_v2_tasks = [
     create_task(
-        entry_point="plugin_classifieds_v2",
+        entry_point="plugins_classifieds_v2",
         parameters=[
             f"--input_condo_compound={Tables.condo_compounds}",
             f"--input_house_compound={Tables.house_compounds}",
