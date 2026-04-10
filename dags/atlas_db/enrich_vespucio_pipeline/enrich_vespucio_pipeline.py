@@ -163,6 +163,9 @@ class Tables:
     source_navent_houses_composed = (
         "vespucio_sources_delta.source_navent_houses_composed"
     )
+    source_navent_publisher_reputation_score = (
+        "vespucio_sources_delta.source_navent_publisher_reputation"
+    )
     source_union_houses = "vespucio_sources_delta.source_union_house"
     source_idactum_houses = "vespucio_sources_delta.source_idactum_houses"
     source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
@@ -203,6 +206,9 @@ class Tables:
     zordominium_compounds = "zordominium_vespucio_plugin.zordominium_official_condos"
     classifieds_house_id = "vespucio_classifieds.classifieds_house_id"
     classified_compounds = "vespucio_classifieds.classifieds_compound"
+    classified_v2_compounds = "vespucio_classifieds.classifieds_v2"
+    classified_logging_table = "vespucio_classifieds.classifieds_publish_log"
+    classified_published_listings = "vespucio_classifieds.classifieds_published_listings"
 
     # golden_set_condo_compounds = (
     #     "vespucio_goldenset_delta.condo_compounds_employee_sample_v1"
@@ -217,6 +223,8 @@ class Tables:
     ebdb_clean_house_enrichment = "datalake_ebdb_clean.house_enrichment"
     ebdb_clean_house = "datalake_ebdb_clean.house"
     ebdb_clean_region = "datalake_ebdb_clean.region"
+    ebdb_clean_state = "datalake_ebdb_clean.state"
+    ebdb_country_table = "datalake_ebdb_clean.country"
     ebdb_clean_map_region = "datalake_ebdb_clean.map_region"
 
 
@@ -754,6 +762,37 @@ classifieds_tasks = [
     ),
 ]
 
+classifieds_v2_tasks = [
+    create_task(
+        entry_point="plugin_classifieds_v2",
+        parameters=[
+            f"--input_condo_compound={Tables.condo_compounds}",
+            f"--input_house_compound={Tables.house_compounds}",
+            f"--input_listing_compound={Tables.listings}",
+            f"--input_zordominium_compound={Tables.zordominium_compounds}",
+            f"--input_ebdb_region_table={Tables.ebdb_clean_region}",
+            f"--input_ebdb_state_table={Tables.ebdb_clean_state}",
+            f"--input_ebdb_country_table={Tables.ebdb_country_table}",
+            f"--input_navent_source_table={Tables.source_navent_houses_composed}",
+            f"--input_classified_house_id_table={Tables.classifieds_house_id}",
+            f"--input_navent_publisher_reputation_score={Tables.source_navent_publisher_reputation_score}",
+            f"--output_classified_compound={Tables.classified_v2_compounds}",
+            "--overwrite_schema",
+        ],
+    ),
+    create_task(
+        entry_point="plugins_classifieds_publisher",
+        parameters=[
+            f"--input_classifieds_table={Tables.classified_v2_compounds}",
+            f"--output_published_listings_table={Tables.classified_published_listings}",
+            f"--logging_table={Tables.classified_logging_table}",
+            f"--deployment_env={ENV}",
+            "--running_mode=prod",
+            "--overwrite_schema",
+        ],
+    ),
+]
+
 join_plugins = DummyOperator(task_id="join_plugins", dag=dag)
 
 execute_job_cluster_task >> source_tasks
@@ -790,3 +829,7 @@ join_plugins >> classifieds_tasks[0]
 chain(*classifieds_tasks)
 join_plugins >> zordominium_tasks[0]
 chain(*zordominium_tasks)
+
+classifieds_tasks[0] >> classifieds_v2_tasks[0]
+zordominium_tasks[0] >> classifieds_v2_tasks[0]
+chain(*classifieds_v2_tasks)
