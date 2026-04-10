@@ -5,9 +5,9 @@ WITH
     SELECT
       e_sent.id_event,
       TRY_CAST(e_sent.event_properties:id_house AS INT) AS id_house,
-      e_sent.event_properties:id_tenant AS uuid_tenant,
-      e_sent.event_properties:id_owner AS uuid_owner,
-      e_sent.event_properties:id_rent_flow AS id_rent_flow,
+      CAST(e_sent.event_properties:id_tenant AS STRING) AS uuid_tenant,
+      CAST(e_sent.event_properties:id_owner AS STRING) AS uuid_owner,
+      CAST(e_sent.event_properties:id_rent_flow AS STRING) AS id_rent_flow,
       e_sent.ts_event AS ts_sent
     FROM
       cdp_modeled_repo.tb_transactional AS e_sent
@@ -17,7 +17,7 @@ WITH
   ),
   contract_canceled_events AS (
     SELECT
-      e_canceled.event_properties:id_rent_flow AS id_rent_flow,
+      CAST(e_canceled.event_properties:id_rent_flow AS STRING) AS id_rent_flow,
       e_canceled.id_event,
       e_canceled.ts_event AS ts_canceled
     FROM
@@ -28,7 +28,7 @@ WITH
   ),
   contract_signed_events AS (
     SELECT
-      e_signed.event_properties:id_rent_flow AS id_rent_flow,
+      CAST(e_signed.event_properties:id_rent_flow AS STRING) AS id_rent_flow,
       e_signed.id_event,
       e_signed.ts_event AS ts_signed
     FROM
