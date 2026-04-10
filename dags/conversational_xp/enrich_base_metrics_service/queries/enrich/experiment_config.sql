@@ -291,7 +291,7 @@ FROM VALUES
         "ab_beakman_search_services_anonymous_user_embedding_fallback",
         named_struct(
             'begin_date', DATE('2026-03-25'),
-            'end_date', NULL,
+            'end_date', DATE('2026-04-08'),
             'variants', to_json(
                 named_struct(
                     '0', 'baseline',
@@ -305,7 +305,7 @@ FROM VALUES
                                                     'experiment_metrics', array()
                                                 )
                                 ),
-           'running', True
+           'running', False
         )
     )
 
