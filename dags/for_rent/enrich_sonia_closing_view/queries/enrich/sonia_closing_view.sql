@@ -1,13 +1,13 @@
 -- Rent-flow contract closing funnel from CDP transactional events; one row per contract_sent event x (tenant, owner).
--- Events from 2026-04-01 onward. Binning uses Spark xxhash64 on "id_house-uuid_tenant" (see binning_value).
+-- Events from 2026-04-01 onward. Binning uses crc32 on "id_house-uuid_tenant" (see binning_value).
 WITH
   contract_sent_events AS (
     SELECT
       e_sent.id_event,
-      TRY_CAST(get_json_object(e_sent.event_properties, '$.id_house') AS INT) AS id_house,
-      get_json_object(e_sent.event_properties, '$.id_tenant') AS uuid_tenant,
-      get_json_object(e_sent.event_properties, '$.id_owner') AS uuid_owner,
-      get_json_object(e_sent.event_properties, '$.id_rent_flow') AS id_rent_flow,
+      TRY_CAST(e_sent.event_properties:id_house AS INT) AS id_house,
+      e_sent.event_properties:id_tenant AS uuid_tenant,
+      e_sent.event_properties:id_owner AS uuid_owner,
+      e_sent.event_properties:id_rent_flow AS id_rent_flow,
       e_sent.ts_event AS ts_sent
     FROM
       cdp_modeled_repo.tb_transactional AS e_sent
@@ -17,7 +17,7 @@ WITH
   ),
   contract_canceled_events AS (
     SELECT
-      get_json_object(e_canceled.event_properties, '$.id_rent_flow') AS id_rent_flow,
+      e_canceled.event_properties:id_rent_flow AS id_rent_flow,
       e_canceled.id_event,
       e_canceled.ts_event AS ts_canceled
     FROM
@@ -28,7 +28,7 @@ WITH
   ),
   contract_signed_events AS (
     SELECT
-      get_json_object(e_signed.event_properties, '$.id_rent_flow') AS id_rent_flow,
+      e_signed.event_properties:id_rent_flow AS id_rent_flow,
       e_signed.id_event,
       e_signed.ts_event AS ts_signed
     FROM
@@ -79,7 +79,7 @@ SELECT
   s.user_role,
   s.uuid_person,
   u.id AS id_user,
-  abs(xxhash64(concat(CAST(s.id_house AS STRING), '-', s.uuid_tenant))) % 100 AS binning_value
+  abs(crc32(encode(concat(CAST(s.id_house AS STRING), '-', s.uuid_tenant), 'utf-8'))) % 100 AS binning_value
 FROM
   split_users AS s
   INNER JOIN datalake_ebdb_clean.user AS u
