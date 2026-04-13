@@ -43,7 +43,7 @@ seu_barriga_base AS (
         payment_company_use_number IS NOT NULL
         AND TRIM(payment_company_use_number) != ''
         AND lower(reason) NOT IN ('negotiation-5a', 'negotiation-recupera')
-        AND lower(paid_via) IN ('cnab', 'checkout-boleto')
+        AND lower(paid_via) IN ('cnab', 'checkout-boleto', 'checkout-bolecode-barcode')
         AND due_amount <= 0
         AND payment_status != 'canceled'
         AND status != 'canceled'
@@ -76,7 +76,7 @@ seu_barriga_sap AS (
     WHERE
         payment_company_use_number IS NOT NULL
         AND TRIM(payment_company_use_number) != ''
-        AND lower(paid_via) IN ('cnab', 'checkout-boleto', 'cyber-boleto')
+        AND lower(paid_via) IN ('cnab', 'checkout-boleto', 'cyber-boleto', 'checkout-bolecode-barcode')
         AND due_amount <= 0
         AND payment_status != 'canceled'
         AND status != 'canceled'
