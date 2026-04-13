@@ -1,0 +1,107 @@
+---
+database_name: datalake_amplitude_agents_app
+table_name: agents_sign_up_events
+description: Amplitude events from the Agents mobile app signup and onboarding funnel (error screens, pending analysis, welcome, and agent status views), filtered for the Agents app and selected event types within the load window.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_app:
+    lineage:
+      - datalake_amplitude_clean.events.id_app
+    description: App unique identifier for the Amplitude project (Agents app).
+  id_session:
+    lineage:
+      - datalake_amplitude_clean.events.id_session
+    description: Session unique identifier for the user session that generated the event.
+  id_user:
+    lineage:
+      - datalake_amplitude_clean.events.id_user
+    description: Amplitude user identifier associated with the event.
+  id_amplitude:
+    lineage:
+      - datalake_amplitude_clean.events.id_amplitude
+    description: Amplitude internal user identifier for the device or profile.
+  id_event:
+    lineage:
+      - datalake_amplitude_clean.events.id_event
+    description: Amplitude event unique identifier.
+  uuid_person:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: Person UUID extracted from event properties (personUUID), when present.
+  city:
+    lineage:
+      - datalake_amplitude_clean.events.city
+    description: City of origin associated with the event.
+  os_name:
+    lineage:
+      - datalake_amplitude_clean.events.os_name
+    description: Operating system name on which the event was recorded.
+  event_type:
+    lineage:
+      - datalake_amplitude_clean.events.event_type
+    description: Name of the Amplitude event (signup funnel screen or status view).
+  platform:
+    lineage:
+      - datalake_amplitude_clean.events.platform
+    description: Platform on which the event occurred (e.g., Android, iOS).
+  device_type:
+    lineage:
+      - datalake_amplitude_clean.events.device_type
+    description: Device type captured for the event.
+  country:
+    lineage:
+      - datalake_amplitude_clean.events.country
+    description: Country associated with the event.
+  uri:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: URI value parsed from event properties when available.
+  login_status:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Login status parsed from user properties.
+  app_type:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: App type parsed from user properties (e.g., agents-signup flow).
+  user_properties:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: JSON blob of user-level properties sent with the event.
+  event_properties:
+    lineage:
+      - datalake_amplitude_clean.events.event_properties
+    description: JSON blob of event-level properties sent with the event.
+  is_prod_event:
+    lineage:
+      - datalake_amplitude_clean.events.id_app
+    description: True when the event belongs to the production Amplitude project for the Agents app (id_app 233592); false otherwise.
+  is_dev_event:
+    lineage:
+      - datalake_amplitude_clean.events.id_app
+    description: True when the event belongs to the development Amplitude project for the Agents app (id_app 233591); false otherwise.
+  is_agent_signup:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: True when app_type from user properties equals the agents-signup value; false otherwise.
+  ts_attributed:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Attribution timestamp parsed from user_properties.attributed_at when present.
+  ts_event:
+    lineage:
+      - datalake_amplitude_clean.events.ts_event
+    description: Event occurrence timestamp from Amplitude.
+  year:
+    lineage:
+      - datalake_amplitude_clean.events.year
+    description: Partition year of the event.
+  month:
+    lineage:
+      - datalake_amplitude_clean.events.month
+    description: Partition month of the event.
+  day:
+    lineage:
+      - datalake_amplitude_clean.events.day
+    description: Partition day of the event.
