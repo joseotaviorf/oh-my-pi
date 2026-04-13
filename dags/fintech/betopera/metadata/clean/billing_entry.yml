@@ -1,0 +1,54 @@
+database_name: datalake_betopera_clean
+table_name: billing_entry
+domain: Fintech
+description: "Clean billing entry records from Betopera with payment and status details."
+columns:
+  id:
+    lineage:
+      - datalake_betopera_raw.billing_entry.id
+    description: "Unique identifier of the billing entry."
+  id_payment:
+    lineage:
+      - datalake_betopera_raw.billing_entry.payment_id
+    description: "Identifier of the payment associated with the billing entry."
+  prize_amount:
+    lineage:
+      - datalake_betopera_raw.billing_entry.prize_amount
+    description: "Prize amount associated with the billing entry."
+  fee_amount:
+    lineage:
+      - datalake_betopera_raw.billing_entry.fee_amount
+    description: "Fee amount associated with the billing entry."
+  reason:
+    lineage:
+      - datalake_betopera_raw.billing_entry.reason
+    description: "Reason associated with the billing entry charge or adjustment."
+  status:
+    lineage:
+      - datalake_betopera_raw.billing_entry.status
+    description: "Current status of the billing entry."
+  billing_year_month:
+    lineage:
+      - datalake_betopera_raw.billing_entry.billing_year_month
+    description: "Year-month reference used for billing entry aggregation."
+  ts_created:
+    lineage:
+      - datalake_betopera_raw.billing_entry.created_at
+    description: "Timestamp when the billing entry record was created."
+  ts_updated:
+    lineage:
+      - datalake_betopera_raw.billing_entry.updated_at
+    description: "Timestamp when the billing entry record was last updated."
+  year:
+    lineage:
+      - datalake_betopera_raw.billing_entry.year
+    description: "Partition year of the source record."
+  month:
+    lineage:
+      - datalake_betopera_raw.billing_entry.month
+    description: "Partition month of the source record."
+  day:
+    lineage:
+      - datalake_betopera_raw.billing_entry.day
+    description: "Partition day of the source record."
+

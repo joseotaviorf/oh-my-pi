@@ -1,0 +1,26 @@
+SELECT
+    id,
+    rev,
+    revend AS rev_end,
+    revtype AS rev_type,
+    billing_year_month,
+    payment_id AS id_payment,
+    prize_amount,
+    fee_amount,
+    reason,
+    status,
+    created_at_mod AS mod_created_at,
+    updated_at_mod AS mod_updated_at,
+    billing_year_month_mod AS mod_billing_year_month,
+    payment_id_mod AS mod_id_payment,
+    prize_amount_mod AS mod_prize_amount,
+    fee_amount_mod AS mod_fee_amount,
+    reason_mod AS mod_reason,
+    status_mod AS mod_status,
+    TIMESTAMP(created_at) AS ts_created,
+    TIMESTAMP(updated_at) AS ts_updated,
+    year,
+    month,
+    day
+FROM
+    datalake_betopera_raw.billing_entry_aud

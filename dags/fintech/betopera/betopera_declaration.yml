@@ -53,6 +53,24 @@ workflow:
     api_audit_log:
       clean_table_name: api_audit_log
       raw_primary_keys: ["id"]
+    billing:
+      clean_table_name: billing
+      raw_primary_keys: ["id"]
+    billing_entry:
+      clean_table_name: billing_entry
+      raw_primary_keys: ["id"]
+    billing_fee_type:
+      clean_table_name: billing_fee_type
+      raw_primary_keys: ["id"]
+    billing_aud:
+      clean_table_name: billing_aud
+      raw_primary_keys: ["id", "rev"]
+    billing_entry_aud:
+      clean_table_name: billing_entry_aud
+      raw_primary_keys: ["id", "rev"]
+    billing_fee_type_aud:
+      clean_table_name: billing_fee_type_aud
+      raw_primary_keys: ["id", "rev"]
 cluster:
   type: databricks_16_4_min_memory_cluster
   databricks_conn_id: databricks_new
