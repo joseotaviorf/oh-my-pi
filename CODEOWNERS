@@ -11,7 +11,7 @@ bietlejuice/base/spark/**                                               @quintoa
 bietlejuice/loaders/**                                                  @quintoandar/data-ingestion-code-owners
 bietlejuice/metastore_pipeline/**                                       @quintoandar/data-ingestion-code-owners
 bietlejuice/pipeline/**                                                 @quintoandar/data-ingestion-code-owners
-dags/**/metric_*                                                        @quintoandar/bi-etl-ejuice-metric-layer-code-owners
+dags/*/metric_*                                                         @quintoandar/bi-etl-ejuice-metric-layer-code-owners
 dags/platform/**                                                        @quintoandar/data-ingestion-code-owners
 dags/ops_poc/**                                                         @luisarodriguees @GabriellRodrigues @henriquedepaulo
 dags/planning_and_performance/**                                        @luisarodriguees @GabriellRodrigues
