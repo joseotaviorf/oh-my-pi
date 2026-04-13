@@ -1,39 +1,53 @@
 database_name: datalake_sorting_hat_clean
 table_name: analysis_request_proponent_data
+domain: Fintech
+description: Proponent-scoped request data (documents and raw payload) for a Sorting Hat analysis request.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestproponentdata.id
+    description: Primary key of the proponent-scoped analysis request data row.
   id_analysis_request:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestproponentdata.analysis_request_id
+    description: Foreign key to the parent analysis request.
   id_source:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestproponentdata.source_id
+    description: Identifier of the document or input source feeding this proponent data.
   id_state_machine:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestproponentdata.state_machine_id
+    description: State machine instance tied to this proponent data payload.
   attributes:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestproponentdata.attributes
+    description: JSON attributes specific to the proponent for this workflow step.
   document_type:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestproponentdata.external_id
+    description: Document or input type code associated with the proponent submission.
   document_number:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestproponentdata.result
+    description: Document number or extracted identifier from the proponent submission.
   raw_data:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestproponentdata.raw_data
+    description: Raw payload containing proponent documents or structured answers.
   source_entity:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestproponentdata.enterprise_group
+    description: Enterprise group or business entity context for this proponent data.
   version:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestproponentdata.version
+    description: Version of this proponent data snapshot for the same request.
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestproponentdata.created_at
+    description: Timestamp when this proponent data row was created.
   ts_updated:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestproponentdata.updated_at
+    description: Timestamp when this proponent data row was last updated.

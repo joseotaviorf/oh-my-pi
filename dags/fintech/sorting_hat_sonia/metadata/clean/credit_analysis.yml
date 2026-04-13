@@ -1,57 +1,77 @@
 database_name: datalake_sorting_hat_clean
 table_name: credit_analysis
+domain: Fintech
+description: Current credit analysis for a proposal (analyst decision, variant, category, bypass) in Sorting Hat.
 columns:
   id_credit_analysis:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.id
+    description: Primary key of the current credit analysis row (non-versioned snapshot).
   id_analyst:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.analyst_main_id
+    description: Sorting Hat user id of the analyst accountable for the decision.
   id_proposal:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.proposal_id
+    description: Proposal under evaluation in this credit analysis record.
   id_variant:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.variant_id
+    description: Experiment variant active when this analysis outcome was produced.
   id_user:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.user_id
+    description: Tenant user id associated with the underwriting case.
   id_early_credit_analysis:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.early_credit_analysis_id
+    description: Link back to the early credit evaluation that started the flow.
   level:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.level
+    description: Depth of manual review or automation tier applied to the case.
   type:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.type
+    description: Analysis type discriminator for routing and reporting.
   result:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.result
+    description: Final automated or manual decision encoded for downstream systems.
   reason:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.reason
+    description: Machine-readable reason code explaining the decision outcome.
   comment:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.comment
+    description: Analyst free-text commentary stored on the current analysis row.
   analyst_name:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.analyst_name
+    description: Cached analyst display name for dashboards and audit trails.
   category:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.category
+    description: Business category bucket for SLA and portfolio reporting.
   automatic_decision_reason:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.automatic_decision_reason
+    description: Explanation emitted by rules engines when no manual step ran.
   bypass:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.bypass
+    description: Indicates whether standard policy checks were intentionally skipped.
   is_a_potential_interview:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.should_interview
+    description: Flag used to schedule or suggest a human interview with the tenant.
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.created_at
+    description: Timestamp when this credit analysis row was created.
   ts_updated:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis.updated_at
+    description: Timestamp when this credit analysis row was last updated.

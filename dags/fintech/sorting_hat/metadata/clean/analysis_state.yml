@@ -1,33 +1,85 @@
 database_name: datalake_sorting_hat_clean
 table_name: analysis_state
+domain: Fintech
+description: State machine step for a credit analysis subject; structured_result JSON is parsed for income and group fields.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.analysisstate.id
+    description: Primary key of a single state node in the analysis state machine.
   id_state_group:
     lineage:
       - datalake_sorting_hat_raw.analysisstate.state_group_id
+    description: Foreign key grouping this state with others under the same machine run.
   id_subject:
     lineage:
       - datalake_sorting_hat_raw.analysisstate.subject_id
+    description: Identifier of the subject (e.g. proponent) this state applies to.
   input:
     lineage:
       - datalake_sorting_hat_raw.analysisstate.input
+    description: Structured input passed into this state transition for scoring or rules.
   raw_input:
     lineage:
       - datalake_sorting_hat_raw.analysisstate.raw_input
+    description: Unparsed or verbose input payload captured for this analysis state.
   result:
     lineage:
-      - datalake_sorting_hat_raw.analysisstate.input
+      - datalake_sorting_hat_raw.analysisstate.result
+    description: Output or intermediate result produced when leaving this analysis state.
   status:
     lineage:
-      - datalake_sorting_hat_raw.analysisstate.subject_id
+      - datalake_sorting_hat_raw.analysisstate.status
+    description: Status of this state execution within the analysis workflow.
   subject_type:
     lineage:
       - datalake_sorting_hat_raw.analysisstate.subject_type
+    description: Type of subject (e.g. proponent, guarantor) for this state row.
+  structured_result:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.structured_result
+    description: JSON payload parsed in clean SQL for income metrics and group flags.
+  homogeneous_group:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.structured_result
+    description: Homogeneous group label parsed from structured_result JSON in the clean transform.
+  declared_income:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.structured_result
+    description: Declared income value parsed from structured_result JSON in the clean transform.
+  bureau_income:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.structured_result
+    description: Bureau-reported income parsed from structured_result JSON in the clean transform.
+  income_changes:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.structured_result
+    description: Income change metric parsed from structured_result JSON in the clean transform.
+  max_bureau_income:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.structured_result
+    description: Maximum bureau income parsed from structured_result JSON in the clean transform.
+  bureau_and_declared_ratio:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.structured_result
+    description: Ratio of bureau to declared income parsed from structured_result JSON in the clean transform.
+  is_demoted_group:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.structured_result
+    description: Whether the group was demoted; parsed from structured_result JSON in the clean transform.
+  elected_income:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.structured_result
+    description: Elected income used by policy; parsed from structured_result JSON in the clean transform.
+  is_retenant:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.structured_result
+    description: Retenant flag parsed from structured_result JSON in the clean transform.
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.analysisstate.created_at
+    description: Timestamp when this analysis state row was created.
   ts_updated:
     lineage:
       - datalake_sorting_hat_raw.analysisstate.updated_at
+    description: Timestamp when this analysis state row was last updated.

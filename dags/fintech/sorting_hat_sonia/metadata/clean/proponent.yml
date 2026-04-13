@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: proponent
+domain: Fintech
 description: Table with information about the proponent.
 columns:
   id:
@@ -33,6 +34,7 @@ columns:
   dt_admitted:
     lineage:
       - datalake_sorting_hat_raw.proponent.admission_date
+    description: Employment admission date at the declared employer for income checks.
   cell_phone:
     lineage:
       - datalake_sorting_hat_raw.proponent.cell_phone

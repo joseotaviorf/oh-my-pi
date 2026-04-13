@@ -1,0 +1,53 @@
+database_name: datalake_sorting_hat_clean
+table_name: checklist_group
+domain: Fintech
+description: Groups items within a checklist with subject, comments, and compliance status in Sorting Hat.
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.checklistgroup.id
+    description: Primary key of the checklist group row.
+  id_checklist:
+    lineage:
+      - datalake_sorting_hat_raw.checklistgroup.checklist_id
+    description: Parent checklist that contains this group of related items.
+  id_comment_source:
+    lineage:
+      - datalake_sorting_hat_raw.checklistgroup.comment_source_id
+    description: Identifier of the user or system that authored the group comment.
+  id_subject:
+    lineage:
+      - datalake_sorting_hat_raw.checklistgroup.subject_id
+    description: Subject entity (e.g. proponent) evaluated in this checklist group.
+  comment:
+    lineage:
+      - datalake_sorting_hat_raw.checklistgroup.comment
+    description: Free-text reviewer comment for the whole checklist group.
+  comment_source_name:
+    lineage:
+      - datalake_sorting_hat_raw.checklistgroup.comment_source_name
+    description: Display name of the analyst or bot that wrote the comment.
+  comment_source_type:
+    lineage:
+      - datalake_sorting_hat_raw.checklistgroup.comment_source_type
+    description: Enum describing whether the comment came from a user, rule, or integration.
+  status:
+    lineage:
+      - datalake_sorting_hat_raw.checklistgroup.status
+    description: Review status of this checklist group within the workflow.
+  subject_type:
+    lineage:
+      - datalake_sorting_hat_raw.checklistgroup.subject_type
+    description: Type of subject tied to compliance evaluation in this group.
+  is_compliant:
+    lineage:
+      - datalake_sorting_hat_raw.checklistgroup.is_compliant
+    description: Whether all required items in the group satisfied policy rules.
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.checklistgroup.created_at
+    description: Timestamp when this checklist group row was created.
+  ts_updated:
+    lineage:
+      - datalake_sorting_hat_raw.checklistgroup.updated_at
+    description: Timestamp when this checklist group row was last updated.

@@ -1,0 +1,37 @@
+database_name: datalake_sorting_hat_clean
+table_name: checklist
+domain: Fintech
+description: Checklist instance for an analysis request (status, type, result, current version flag) in Sorting Hat.
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.checklist.id
+    description: Primary key of the checklist instance row.
+  id_analysis_request:
+    lineage:
+      - datalake_sorting_hat_raw.checklist.analysis_request_id
+    description: Foreign key to the analysis request owning this checklist.
+  result:
+    lineage:
+      - datalake_sorting_hat_raw.checklist.result
+    description: JSON or structured outcome summarizing checklist completion state.
+  status:
+    lineage:
+      - datalake_sorting_hat_raw.checklist.status
+    description: Workflow status of the checklist (open, pending, completed, etc.).
+  type:
+    lineage:
+      - datalake_sorting_hat_raw.checklist.type
+    description: Checklist template type defining required groups and items.
+  is_current_checklist:
+    lineage:
+      - datalake_sorting_hat_raw.checklist.is_current_checklist
+    description: True when this checklist version is the active one for the request.
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.checklist.created_at
+    description: Timestamp when this checklist row was created.
+  ts_updated:
+    lineage:
+      - datalake_sorting_hat_raw.checklist.updated_at
+    description: Timestamp when this checklist row was last updated.

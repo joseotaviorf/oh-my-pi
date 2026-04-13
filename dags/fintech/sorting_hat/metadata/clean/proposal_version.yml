@@ -1,201 +1,269 @@
 database_name: datalake_sorting_hat_clean
 table_name: proposal_version
+domain: Fintech
+description: Versioned proposal snapshots with home attributes, rent values, and analyst workflow fields for tenant credit.
 columns:
   id_proposal:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.id
+    description: Primary key of this proposal version snapshot row.
   id_drive:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.drive_id
+    description: Google Drive folder or document id attached to underwriting files.
   id_end_transaction:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.end_transaction_id
+    description: Identifier of the closing transaction when the deal finished.
   id_home_city:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_city_id
+    description: Normalized city id for the listing associated with the proposal.
   id_house:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.imovel_id
+    description: Listing or house id for the rented property in this proposal version.
   id_transaction:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.transaction_id
+    description: Open transaction id for the rental deal while it is in progress.
   analyst_name:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.analyst_name
+    description: Analyst responsible for the manual review at this version.
   comment:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.comment
+    description: Analyst free-text notes for this proposal version.
   home_city:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_city
+    description: City name of the listing as captured on the proposal.
   home_region:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_region
+    description: Region of the listing for geographic risk segmentation.
   home_state:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_state
+    description: State (UF) of the listing address on the proposal.
   home_type:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_type
+    description: Property type classification (apartment, house, etc.).
   home_zipcode:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_zipcode
+    description: Postal code of the listing used for location-based rules.
   operation_type:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.operation_type
+    description: Business operation context for this proposal snapshot.
   pre_analysis_reason:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.pre_analysis_reason
+    description: Reason returned when pre-analysis rules triggered or blocked flow.
   pre_analysis_result:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.pre_analysis_result
+    description: Outcome of automated pre-analysis before full underwriting.
   reason:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.reason
+    description: Primary reason code for approval, pendency, or decline.
   status:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.status
+    description: Workflow status of the proposal at this version timestamp.
   supervisor_name:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.supervisor_name
+    description: Supervisor overseeing the analyst for this proposal version.
   condo_value:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.condo_value
+    description: Monthly condominium fee for the listing in BRL.
   home_area:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_area
+    description: Usable private area of the home in square meters.
   home_bathrooms:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_bathrooms
+    description: Bathroom count for the listing on the proposal.
   home_bedrooms:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_bedrooms
+    description: Bedroom count for the listing on the proposal.
   home_garages:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_garages
+    description: Parking or garage spaces associated with the listing.
   home_insurance_value:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_insurance_value
+    description: Monthly home insurance premium considered in affordability checks.
   home_suites:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_suites
+    description: Suite count for the listing on the proposal.
   iptu_value:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.iptu_value
+    description: Monthly property tax (IPTU) installment used in the offer math.
   rent_value:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.rent_value
+    description: Monthly rent amount proposed for the tenant contract.
   has_bypassed_pre_analysis:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.bypass_pre_analysis
+    description: Whether the flow skipped standard pre-analysis gates for this case.
   is_home_exclusive_5A:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_exclusive_5A
+    description: Flag indicating the listing is in the exclusive 5A inventory segment.
   mod_id_drive:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.drive_id_mod
+    description: CDC flag indicating drive_id changed in this changelog event.
   mod_id_home_city:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_city_id_mod
+    description: CDC flag indicating home_city_id changed in this changelog event.
   mod_id_house:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.imovel_id_mod
+    description: CDC flag indicating house id changed in this changelog event.
   mod_analyst_name:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.analyst_name_mod
+    description: CDC flag indicating analyst_name changed in this changelog event.
   mod_comment:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.comment_mod
+    description: CDC flag indicating analyst comment changed in this changelog event.
   mod_home_city:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_city_mod
+    description: CDC flag indicating home_city text changed in this changelog event.
   mod_home_region:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_region_mod
+    description: CDC flag indicating home_region changed in this changelog event.
   mod_home_state:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_state_mod
+    description: CDC flag indicating home_state changed in this changelog event.
   mod_home_type:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_type_mod
+    description: CDC flag indicating home_type changed in this changelog event.
   mod_home_zipcode:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_zipcode_mod
+    description: CDC flag indicating home_zipcode changed in this changelog event.
   mod_pre_analysis_reason:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.pre_analysis_reason_mod
+    description: CDC flag indicating pre_analysis_reason changed in this changelog event.
   mod_pre_analysis_result:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.pre_analysis_result_mod
+    description: CDC flag indicating pre_analysis_result changed in this changelog event.
   mod_reason:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.reason_mod
+    description: CDC flag indicating decision reason changed in this changelog event.
   mod_status:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.status_mod
+    description: CDC flag indicating proposal status changed in this changelog event.
   mod_supervisor_name:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.supervisor_name_mod
+    description: CDC flag indicating supervisor_name changed in this changelog event.
   mod_condo_value:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.condo_value_mod
+    description: CDC flag indicating condo_value changed in this changelog event.
   mod_home_area:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_area_mod
+    description: CDC flag indicating home_area changed in this changelog event.
   mod_home_bathrooms:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_bathrooms_mod
+    description: CDC flag indicating home_bathrooms changed in this changelog event.
   mod_home_bedrooms:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_bedrooms_mod
+    description: CDC flag indicating home_bedrooms changed in this changelog event.
   mod_home_garages:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_garages_mod
+    description: CDC flag indicating home_garages changed in this changelog event.
   mod_home_insurance_value:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_insurance_value_mod
+    description: CDC flag indicating home_insurance_value changed in this changelog event.
   mod_home_suites:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_suites_mod
+    description: CDC flag indicating home_suites changed in this changelog event.
   mod_iptu_value:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.iptu_value_mod
+    description: CDC flag indicating iptu_value changed in this changelog event.
   mod_rent_value:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.rent_value_mod
+    description: CDC flag indicating rent_value changed in this changelog event.
   mod_has_bypassed_pre_analysis:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.bypass_pre_analysis_mod
+    description: CDC flag indicating bypass_pre_analysis changed in this changelog event.
   mod_is_home_exclusive_5A:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_exclusive_5A_mod
+    description: CDC flag indicating exclusive 5A flag changed in this changelog event.
   mod_ts_analyzed:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.analysis_date_mod
+    description: CDC flag indicating analysis_date changed in this changelog event.
   mod_ts_created:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.created_at_mod
+    description: CDC flag indicating created_at changed in this changelog event.
   mod_ts_home_last_published:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_last_published_at_mod
+    description: CDC flag indicating home_last_published_at changed in this changelog event.
   mod_ts_precessed:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.process_date_mod
+    description: CDC flag indicating process_date changed in this changelog event.
   mod_ts_updated:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.updated_at_mod
+    description: CDC flag indicating updated_at changed in this changelog event.
   ts_analyzed:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.analysis_date
+    description: Timestamp when analyst review or automated analysis completed.
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.created_at
+    description: Timestamp when this proposal version row was first created.
   ts_home_last_published:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.home_last_published_at
+    description: Last time the listing was published on the marketplace.
   ts_precessed:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.process_date
+    description: Timestamp when the proposal record was processed by Sorting Hat batch logic.
   ts_updated:
     lineage:
       - datalake_sorting_hat_raw.proposal_version.updated_at
+    description: Timestamp when this proposal version row was last updated.

@@ -1,18 +1,25 @@
 database_name: datalake_sorting_hat_clean
 table_name: offer
+domain: Fintech
+description: Offers associated with rental credit proposals (type, approval time, external ids) in Sorting Hat.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.offer.id
+    description: Primary key of the rental offer row in Sorting Hat.
   type:
     lineage:
       - datalake_sorting_hat_raw.offer.type
+    description: Offer category or product type for the tenant rental flow.
   ts_approved:
     lineage:
       - datalake_sorting_hat_raw.offer.approved_at
+    description: Timestamp when the offer was approved for the linked proposal.
   id_firestore:
     lineage:
       - datalake_sorting_hat_raw.offer.firestore_id
+    description: External Firestore document identifier for mobile or web clients.
   id_proposal:
     lineage:
       - datalake_sorting_hat_raw.offer.proposal_id
+    description: Foreign key to the proposal this offer extends or confirms.

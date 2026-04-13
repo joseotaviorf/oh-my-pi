@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: checklist_decision
+domain: Fintech
 description: This table stores the decision of the checklist after the analysis request flow.
 columns:
   id:

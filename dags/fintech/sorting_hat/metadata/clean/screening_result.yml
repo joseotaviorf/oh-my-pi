@@ -1,21 +1,29 @@
 database_name: datalake_sorting_hat_clean
 table_name: screening_result
+domain: Fintech
+description: Screening scores, liquidity, and risk categories for a rental credit proposal in Sorting Hat.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.screeningresult.id
+    description: Primary key of the screening result row.
   score:
     lineage:
       - datalake_sorting_hat_raw.screeningresult.score
+    description: Model or rules-based screening score for the proposal.
   risk_category:
     lineage:
       - datalake_sorting_hat_raw.screeningresult.risk_category
+    description: Risk bucket assigned during screening before manual review.
   liquidity:
     lineage:
       - datalake_sorting_hat_raw.screeningresult.liquidity
+    description: Liquidity indicator or metric from the screening model output.
   id_proposal:
     lineage:
       - datalake_sorting_hat_raw.screeningresult.proposal_id
+    description: Foreign key linking the screening outcome to the rental credit proposal.
   risk_category_canon:
     lineage:
       - datalake_sorting_hat_raw.screeningresult.risk_category_canon
+    description: Normalized risk category code used consistently across Sorting Hat reports.

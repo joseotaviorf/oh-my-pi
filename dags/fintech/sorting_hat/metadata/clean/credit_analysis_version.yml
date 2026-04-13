@@ -1,111 +1,149 @@
 database_name: datalake_sorting_hat_clean
 table_name: credit_analysis_version
+domain: Fintech
+description: Versioned credit analysis rows including analyst decisions, reasons, and modification tracking in Sorting Hat.
 columns:
   id_credit_analysis_version:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.id
+    description: Primary key of this versioned credit analysis snapshot.
   id_user:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.user_id
+    description: Tenant user identifier associated with this credit analysis version.
   id_early_credit_analysis:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.early_credit_analysis_id
+    description: Link to the early credit analysis that preceded full underwriting.
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.created_at
+    description: Timestamp when this credit analysis version row was created.
   ts_updated:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.updated_at
+    description: Timestamp when this credit analysis version row was last updated.
   level:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.level
+    description: Underwriting depth or review level assigned to the analysis.
   type:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.type
+    description: Analysis type discriminator (automatic, manual, appeal, etc.).
   is_a_potential_interview:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.should_interview
+    description: Whether the tenant was flagged for a potential interview or call.
   result:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.result
+    description: Decision outcome of the credit analysis at this version.
   reason:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.reason
+    description: Structured reason code explaining the decision outcome.
   comment:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.comment
+    description: Free-text analyst comment for this credit analysis version.
   analyst_name:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.analyst_name
+    description: Display name of the analyst who registered this version.
   id_analyst:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.analyst_main_id
+    description: Internal Sorting Hat user id of the responsible analyst.
   id_proposal:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.proposal_id
+    description: Proposal under review for this credit analysis version.
   id_transaction:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.transaction_id
+    description: Financial transaction id tied to this analysis snapshot.
   id_end_transaction:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.end_transaction_id
+    description: Closing transaction id when the deal reached a terminal state.
   operation_type:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.operation_type
+    description: Operation context (e.g. new rent, renewal) for this analysis row.
   category:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.category
+    description: Business category bucket used for reporting the decision.
   mod_ts_created:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.created_at_mod
+    description: CDC flag indicating created_at changed on this version row.
   mod_ts_updated:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.updated_at_mod
+    description: CDC flag indicating updated_at changed on this version row.
   mod_level:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.level_mod
+    description: CDC flag indicating review level changed on this version row.
   mod_type:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.type_mod
+    description: CDC flag indicating analysis type changed on this version row.
   mod_is_a_potential_interview:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.should_interview_mod
+    description: CDC flag indicating interview flag changed on this version row.
   mod_result:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.result_mod
+    description: CDC flag indicating decision result changed on this version row.
   mod_reason:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.reason_mod
+    description: CDC flag indicating reason code changed on this version row.
   mod_comment:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.comment_mod
+    description: CDC flag indicating analyst comment changed on this version row.
   mod_analyst_name:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.analyst_name_mod
+    description: CDC flag indicating analyst name changed on this version row.
   mod_id_analyst:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.analyst_main_id_mod
+    description: CDC flag indicating analyst id changed on this version row.
   mod_id_proposal:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.proposal_id_mod
+    description: CDC flag indicating proposal id changed on this version row.
   mod_category:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.category_mod
+    description: CDC flag indicating category changed on this version row.
   automatic_decision_reason:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.automatic_decision_reason
+    description: Explanation when the engine auto-approved or auto-declined the case.
   mod_automatic_decision_reason:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.automatic_decision_reason_mod
+    description: CDC flag indicating automatic decision reason changed on this row.
   bypass:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.bypass
+    description: Whether manual or policy bypass was applied to skip a standard rule.
   mod_bypass:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.bypass_mod
+    description: CDC flag indicating bypass flag changed on this version row.
   mod_id_user:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.user_id_mod
+    description: CDC flag indicating user id changed on this version row.
   mod_id_early_credit_analysis:
     lineage:
       - datalake_sorting_hat_raw.creditanalysis_version.early_credit_analysis_id_mod
+    description: CDC flag indicating early credit analysis link changed on this row.

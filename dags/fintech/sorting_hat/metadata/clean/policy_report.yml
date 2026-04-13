@@ -1,5 +1,6 @@
 database_name: datalake_sorting_hat_clean
 table_name: policy_report
+domain: Fintech
 description: Table with information about the credit policy.
 columns:
   id:

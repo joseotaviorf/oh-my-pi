@@ -1,33 +1,45 @@
 database_name: datalake_sorting_hat_clean
 table_name: analysis_request_data
+domain: Fintech
+description: Raw payload and attributes for an analysis request state machine execution in Sorting Hat.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestdata.id
+    description: Primary key of the analysis request data row.
   id_analysis_request:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestdata.analysis_request_id
+    description: Foreign key to the parent analysis request header.
   id_source:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestdata.source_id
+    description: Identifier of the upstream system or entity that produced this payload.
   id_state_machine:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestdata.state_machine_id
+    description: State machine instance this data row belongs to.
   attributes:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestdata.attributes
+    description: JSON attributes attached to this step of the analysis request flow.
   raw_data:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestdata.raw_data
+    description: Raw serialized payload submitted for automated or manual processing.
   source_entity:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestdata.source_entity
+    description: Logical entity name or type that originated this request data.
   version:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestdata.version
+    description: Version of this data snapshot for the same analysis request step.
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestdata.created_at
+    description: Timestamp when this analysis request data row was created.
   ts_updated:
     lineage:
       - datalake_sorting_hat_raw.analysisrequestdata.updated_at
+    description: Timestamp when this analysis request data row was last updated.

@@ -1,7 +1,7 @@
 dag:
   name: sorting_hat
   owner: Data Fintech
-  schedule_interval: 0 8,12,14,16,21 * * *
+  schedule_interval: 0 0,12 * * *
   documentation:
     dag_purpose: |
       Sorting Hat is a microservice responsible for credit policy and analysis for tenants' rental process. This DAG brings its data from a postgreSQL database.
@@ -13,34 +13,20 @@ workflow:
   source_database: sortinghat
   dbutils_secret_key: SORTINGHAT_DB
   tables_customization:
-    AnalysisMachine:
-      clean_table_name: analysis_machine
     AnalysisRequestData:
       clean_table_name: analysis_request_data
     AnalysisRequestProponentData:
       clean_table_name: analysis_request_proponent_data
-    AnalysisRequest:
-      clean_table_name: analysis_request
     AnalysisStateGroup:
       clean_table_name: analysis_state_group
     AnalysisState:
       clean_table_name: analysis_state
-    ChecklistGroup:
-      clean_table_name: checklist_group
-    ChecklistItem:
-      clean_table_name: checklist_item
-    ChecklistDecision:
-      clean_table_name: checklist_decision
-    Checklist:
-      clean_table_name: checklist
     ExternalScore:
       clean_table_name: external_score
     PolicyReport:
       clean_table_name: policy_report
     Variant:
       clean_table_name: variant
-    CreditAnalysis:
-      clean_table_name: credit_analysis
     CreditAnalysis_Version:
       clean_table_name: credit_analysis_version
     EarlyCreditAnalysis:
@@ -49,21 +35,12 @@ workflow:
       clean_table_name: experiment
     Offer:
       clean_table_name: offer
-    ProcessedMessage:
-      clean_table_name: processed_message
-      clean_primary_keys: ["id_subscriber", "id_message"]
-    Proponent:
-      clean_table_name: proponent
     Proponent_Version:
       clean_table_name: proponent_version
-    Proposal:
-      clean_table_name: proposal
     ProposalError:
       clean_table_name: proposal_error
     Proposal_Version:
       clean_table_name: proposal_version
-    message:
-      clean_table_name: message
     ScreeningResult:
       clean_table_name: screening_result
     ScreeningResult_Version:
@@ -71,10 +48,14 @@ workflow:
     User:
       clean_table_name: user
 cluster:
-  type: databricks_16_4_med_2xlarge_general_cluster
+  type: custom_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
+    driver_node_type_id:  r5.2xlarge
+    node_type_id:  r5.2xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

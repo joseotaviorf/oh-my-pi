@@ -1,111 +1,149 @@
 database_name: datalake_sorting_hat_clean
 table_name: proposal
+domain: Fintech
+description: Current rental credit proposal row with model scores, risk levels, home attributes, and analyst fields in Sorting Hat.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.proposal.id
+    description: Primary key of the current proposal row (mutable snapshot).
   id_house:
     lineage:
       - datalake_sorting_hat_raw.proposal.imovel_id
+    description: Listing or house identifier for the property being rented.
   ts_analyzed:
     lineage:
       - datalake_sorting_hat_raw.proposal.analysis_date
+    description: Timestamp when the latest automated or manual analysis finished.
   score_5a:
     lineage:
       - datalake_sorting_hat_raw.proposal.score_5a
+    description: Internal 5A model score used in default risk segmentation.
   score_5a_best_subset:
     lineage:
       - datalake_sorting_hat_raw.proposal.score_5a_best_subset
+    description: 5A score computed on the best-performing feature subset.
   score_cardif:
     lineage:
       - datalake_sorting_hat_raw.proposal.score_cardif
+    description: Cardif partnership score used for specific insurance products.
   score_cardif_best_subset:
     lineage:
       - datalake_sorting_hat_raw.proposal.score_cardif_best_subset
+    description: Cardif score variant restricted to the strongest feature subset.
   status:
     lineage:
       - datalake_sorting_hat_raw.proposal.status
+    description: Workflow status of the proposal in the rental credit pipeline.
   comment:
     lineage:
       - datalake_sorting_hat_raw.proposal.comment
+    description: Latest analyst or system comment visible on the proposal.
   analyst_name:
     lineage:
       - datalake_sorting_hat_raw.proposal.analyst_name
+    description: Analyst currently responsible for manual review of the proposal.
   supervisor_name:
     lineage:
       - datalake_sorting_hat_raw.proposal.supervisor_name
+    description: Supervisor overseeing the analyst assigned to this proposal.
   rent_value:
     lineage:
       - datalake_sorting_hat_raw.proposal.rent_value
+    description: Monthly rent amount in BRL proposed for the tenant contract.
   condo_value:
     lineage:
       - datalake_sorting_hat_raw.proposal.condo_value
+    description: Monthly condominium fee associated with the listing.
   iptu_value:
     lineage:
       - datalake_sorting_hat_raw.proposal.iptu_value
+    description: Monthly IPTU installment included in affordability calculations.
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.proposal.created_at
+    description: Timestamp when the proposal row was first created in Sorting Hat.
   ts_updated:
     lineage:
       - datalake_sorting_hat_raw.proposal.updated_at
+    description: Timestamp when the proposal row was last updated.
   home_area:
     lineage:
       - datalake_sorting_hat_raw.proposal.home_area
+    description: Private area in square meters captured from the listing data.
   home_bathrooms:
     lineage:
       - datalake_sorting_hat_raw.proposal.home_bathrooms
+    description: Bathroom count for the listing attached to the proposal.
   home_city:
     lineage:
       - datalake_sorting_hat_raw.proposal.home_city
+    description: City name of the listing used for regional risk policies.
   home_garages:
     lineage:
       - datalake_sorting_hat_raw.proposal.home_garages
+    description: Garage or parking spot count for the listing.
   home_region:
     lineage:
       - datalake_sorting_hat_raw.proposal.home_region
+    description: Region label for the listing location.
   home_suites:
     lineage:
       - datalake_sorting_hat_raw.proposal.home_suites
+    description: Suite count for the listing on the proposal.
   home_type:
     lineage:
       - datalake_sorting_hat_raw.proposal.home_type
+    description: Property type (apartment, house, studio, etc.) for the listing.
   home_zipcode:
     lineage:
       - datalake_sorting_hat_raw.proposal.home_zipcode
+    description: Postal code of the listing for geo-based underwriting rules.
   id_drive:
     lineage:
       - datalake_sorting_hat_raw.proposal.drive_id
+    description: Google Drive folder id holding underwriting evidence files.
   reason:
     lineage:
       - datalake_sorting_hat_raw.proposal.reason
+    description: Primary reason code driving the current proposal status.
   home_insurance_value:
     lineage:
       - datalake_sorting_hat_raw.proposal.home_insurance_value
+    description: Monthly home insurance premium used in total housing cost.
   risk_level:
     lineage:
       - datalake_sorting_hat_raw.proposal.risk_level
+    description: Coarse risk band derived from models for this proposal.
   risk_level_best_subset:
     lineage:
       - datalake_sorting_hat_raw.proposal.risk_level_best_subset
+    description: Risk band computed using the best subset scoring configuration.
   ts_processed:
     lineage:
       - datalake_sorting_hat_raw.proposal.process_date
-  is_home_exclusive_5a:
+    description: Timestamp when batch processing last refreshed derived fields.
+  is_home_exclusive_5A:
     lineage:
       - datalake_sorting_hat_raw.proposal.home_exclusive_5a
+    description: Indicates the listing belongs to the exclusive 5A inventory tier.
   ts_home_last_published:
     lineage:
       - datalake_sorting_hat_raw.proposal.home_last_published_at
+    description: Last marketplace publish timestamp for the underlying listing.
   has_bypassed_pre_analysis:
     lineage:
       - datalake_sorting_hat_raw.proposal.bypass_pre_analysis
+    description: True when pre-analysis automation was skipped by policy exception.
   pre_analysis_result:
     lineage:
       - datalake_sorting_hat_raw.proposal.pre_analysis_result
+    description: Outcome object from lightweight pre-analysis before full models.
   pre_analysis_reason:
     lineage:
       - datalake_sorting_hat_raw.proposal.pre_analysis_reason
+    description: Reason codes explaining pre-analysis approval, pendency, or decline.
   proposal_source:
     lineage:
       - datalake_sorting_hat_raw.proposal.proposal_source
+    description: Channel or product surface that originated this proposal record.

@@ -1,0 +1,57 @@
+database_name: datalake_sorting_hat_clean
+table_name: analysis_machine
+domain: Fintech
+description: State machine instance for a credit analysis request; context JSON may include proposal_id and risk_category.
+columns:
+  id:
+    lineage:
+      - datalake_sorting_hat_raw.analysismachine.id
+    description: Primary key of the analysis machine run in Sorting Hat.
+  id_analysis_request:
+    lineage:
+      - datalake_sorting_hat_raw.analysismachine.analysis_request_id
+    description: Parent analysis request that this machine execution belongs to.
+  id_proposal:
+    lineage:
+      - datalake_sorting_hat_raw.analysismachine.context
+    description: Proposal identifier extracted from the machine context JSON field proposal_id.
+  id_subject:
+    lineage:
+      - datalake_sorting_hat_raw.analysismachine.subject_id
+    description: Subject (e.g. proponent) identifier processed by this machine instance.
+  status:
+    lineage:
+      - datalake_sorting_hat_raw.analysismachine.status
+    description: Current lifecycle status of the analysis machine execution.
+  subject_type:
+    lineage:
+      - datalake_sorting_hat_raw.analysismachine.subject_type
+    description: Discriminator describing what kind of entity the subject represents.
+  type:
+    lineage:
+      - datalake_sorting_hat_raw.analysismachine.type
+    description: Machine type or template name defining transitions and policies.
+  is_current_machine:
+    lineage:
+      - datalake_sorting_hat_raw.analysismachine.is_current_machine
+    description: Whether this row is the active machine version for the analysis request.
+  machine_version:
+    lineage:
+      - datalake_sorting_hat_raw.analysismachine.machine_version
+    description: Monotonic version of the machine configuration used for this run.
+  context:
+    lineage:
+      - datalake_sorting_hat_raw.analysismachine.context
+    description: JSON payload for the machine run; parsed in clean SQL for proposal_id and risk_category.
+  risk_category:
+    lineage:
+      - datalake_sorting_hat_raw.analysismachine.context
+    description: Risk category string parsed from the machine context JSON in the clean transform.
+  ts_created:
+    lineage:
+      - datalake_sorting_hat_raw.analysismachine.created_at
+    description: Timestamp when this analysis machine row was created.
+  ts_updated:
+    lineage:
+      - datalake_sorting_hat_raw.analysismachine.updated_at
+    description: Timestamp when this analysis machine row was last updated.

@@ -1,249 +1,333 @@
 database_name: datalake_sorting_hat_clean
 table_name: proponent_version
+domain: Fintech
+description: Versioned proponent profile and PII (contact, income, scores) for rental credit proposals in Sorting Hat.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.id
+    description: Primary key of this proponent version snapshot row.
   id_end_transaction:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.end_transaction_id
+    description: Closing transaction id when the rental deal reached a terminal state.
   id_proposal:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.proposal_id
+    description: Proposal that this proponent profile belongs to at this version.
   id_screening_result:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.screening_result_id
+    description: Screening outcome row linked to this proponent snapshot.
   id_transaction:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.transaction_id
+    description: Open transaction id for the deal while underwriting is in progress.
   address:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.address
+    description: Street name for the proponent residential address on the form.
   address_number:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.address_number
+    description: Street number for the proponent residential address.
   bairro:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.bairro
+    description: Neighborhood (bairro) of the proponent address in Brazil.
   cell_phone:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.cell_phone
+    description: Mobile phone number provided by the proponent for contact.
   city:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.city
+    description: City of the proponent residential address.
   complement:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.complement
+    description: Apartment, block, or complement details for the address line.
   cpf:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.cpf
+    description: Brazilian individual taxpayer id (CPF) for the proponent.
   documentation_analysis:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.documentation_analysis
+    description: Status or notes from document verification for this proponent version.
   email:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.email
+    description: Email address supplied by the proponent for notifications.
   employer_name:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.employer_name
+    description: Employer or company name declared for income verification.
   employer_phone:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.employer_phone
+    description: Phone contact for the employer reference check.
   extra_income_origin:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.extra_income_origin
+    description: Source category for income beyond the primary salary.
   gender:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.gender
+    description: Gender self-identification captured on the rental application.
   income_nature:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.income_nature
-  location_nature:
+    description: Employment type or income regime (CLT, PJ, informal, etc.).
+  location_motive:
     lineage:
-      - datalake_sorting_hat_raw.proponent_version.location_nature
+      - datalake_sorting_hat_raw.proponent_version.location_motive
+    description: Declared reason or context for choosing the residential location (e.g., work, study).
   marital_status:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.marital_status
+    description: Marital status used for household and policy rules.
   mother_name:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.mother_name
+    description: Mother full name for identity validation in underwriting.
   name:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.name
+    description: Full legal name of the rental proponent on this version.
   nationality:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.nationality
+    description: Nationality or citizenship declared by the proponent.
   occupation_area:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.occupation_area
+    description: Broad occupation segment used for income benchmarking.
   operation_type:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.operation_type
+    description: Business operation context for this proponent snapshot.
   phone:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.phone
+    description: Landline or alternate phone for the proponent.
   profession:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.profession
+    description: Job title or profession declared by the proponent.
   residence_condition:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.residence_condition
+    description: Tenure type at the current address (owned, rented, family, etc.).
   second_doc_issuer:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.second_doc_issuer
+    description: Issuing authority for the secondary identity document.
   second_doc_number:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.second_doc_number
+    description: Number of the secondary identity document (RG, CNH, etc.).
   second_doc_type:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.second_doc_type
+    description: Type of secondary document used for KYC in this application.
   state:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.state
+    description: State (UF) of the proponent residential address.
   zipcode:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.zipcode
+    description: Postal code (CEP) for the proponent address.
   boavista_score:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.boavista_score
+    description: Boa Vista bureau score used in affordability and risk rules.
   extra_income_value:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.extra_income_value
+    description: Declared extra monthly income amount in BRL.
   monthly_income:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.monthly_income
+    description: Declared primary monthly income in BRL for the proponent.
   residence_time:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.residence_time
+    description: Length of time living at the current address in months or years.
   serasa_score:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.serasa_score
+    description: Serasa bureau score used alongside Boa Vista in screening.
   dt_admitted:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.admission_date
+    description: Employment admission date for the current job declared.
   dt_birthday:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.birthday
+    description: Date of birth of the proponent for age and policy checks.
   dt_second_doc_issued:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.second_doc_issue_date
+    description: Issue date printed on the secondary identity document.
   is_going_to_reside:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.will_reside
+    description: Whether the proponent will physically reside in the rented home.
   mod_address:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.address_mod
+    description: CDC flag indicating street address changed in this changelog event.
   mod_address_number:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.address_number_mod
+    description: CDC flag indicating address_number changed in this changelog event.
   mod_admission_date:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.admission_date_mod
+    description: CDC flag indicating admission_date changed in this changelog event.
   mod_bairro:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.bairro_mod
+    description: CDC flag indicating neighborhood changed in this changelog event.
   mod_birthday:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.birthday_mod
+    description: CDC flag indicating birthday changed in this changelog event.
   mod_boavista_score:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.boavista_score_mod
+    description: CDC flag indicating Boa Vista score changed in this changelog event.
   mod_cell_phone:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.cell_phone_mod
+    description: CDC flag indicating cell_phone changed in this changelog event.
   mod_city:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.city_mod
+    description: CDC flag indicating city changed in this changelog event.
   mod_complement:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.complement_mod
+    description: CDC flag indicating address complement changed in this changelog event.
   mod_cpf:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.cpf_mod
+    description: CDC flag indicating CPF changed in this changelog event.
   mod_documentation_analysis:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.documentation_analysis_mod
+    description: CDC flag indicating documentation_analysis changed in this changelog event.
   mod_email:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.email_mod
+    description: CDC flag indicating email changed in this changelog event.
   mod_employer_name:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.employer_name_mod
+    description: CDC flag indicating employer_name changed in this changelog event.
   mod_employer_phone:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.employer_phone_mod
+    description: CDC flag indicating employer_phone changed in this changelog event.
   mod_extra_income_origin:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.extra_income_origin_mod
+    description: CDC flag indicating extra_income_origin changed in this changelog event.
   mod_extra_income_value:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.extra_income_value_mod
+    description: CDC flag indicating extra_income_value changed in this changelog event.
   mod_gender:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.gender_mod
+    description: CDC flag indicating gender changed in this changelog event.
   mod_income_nature:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.income_nature_mod
+    description: CDC flag indicating income_nature changed in this changelog event.
   mod_location_motive:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.location_motive_mod
+    description: CDC flag indicating location motive field changed in this changelog event.
   mod_marital_status:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.marital_status_mod
+    description: CDC flag indicating marital_status changed in this changelog event.
   mod_monthly_income:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.monthly_income_mod
+    description: CDC flag indicating monthly_income changed in this changelog event.
   mod_mother_name:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.mother_name_mod
+    description: CDC flag indicating mother_name changed in this changelog event.
   mod_name:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.name_mod
+    description: CDC flag indicating legal name changed in this changelog event.
   mod_nationality:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.nationality_mod
+    description: CDC flag indicating nationality changed in this changelog event.
   mod_occupation_area:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.occupation_area_mod
+    description: CDC flag indicating occupation_area changed in this changelog event.
   mod_phone:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.phone_mod
+    description: CDC flag indicating phone changed in this changelog event.
   mod_profession:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.profession_mod
+    description: CDC flag indicating profession changed in this changelog event.
   mod_proposal_id:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.proposal_id_mod
+    description: CDC flag indicating proposal_id changed in this changelog event.
   mod_residence_condition:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.residence_condition_mod
+    description: CDC flag indicating residence_condition changed in this changelog event.
   mod_residence_time:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.residence_time_mod
+    description: CDC flag indicating residence_time changed in this changelog event.
   mod_screening_result_id:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.screening_result_id_mod
+    description: CDC flag indicating screening_result_id changed in this changelog event.
   mod_second_doc_issue_date:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.second_doc_issue_date_mod
+    description: CDC flag indicating secondary document issue date changed in this event.
   mod_second_doc_issuer:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.second_doc_issuer_mod
+    description: CDC flag indicating secondary document issuer changed in this event.
   mod_second_doc_number:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.second_doc_number_mod
+    description: CDC flag indicating secondary document number changed in this event.
   mod_second_doc_type:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.second_doc_type_mod
+    description: CDC flag indicating secondary document type changed in this event.
   mod_serasa_score:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.serasa_score_mod
+    description: CDC flag indicating Serasa score changed in this changelog event.
   mod_state:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.state_mod
+    description: CDC flag indicating state (UF) changed in this changelog event.
   mod_is_going_to_reside:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.will_reside_mod
+    description: CDC flag indicating will_reside flag changed in this changelog event.
   mod_zipcode:
     lineage:
       - datalake_sorting_hat_raw.proponent_version.zipcode_mod
+    description: CDC flag indicating zipcode changed in this changelog event.

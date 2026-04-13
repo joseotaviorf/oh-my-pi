@@ -1,12 +1,17 @@
 database_name: datalake_sorting_hat_clean
 table_name: proposal_error
+domain: Fintech
+description: Errors captured when Sorting Hat processes a tenant rental credit proposal.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.proposalerror.id
+    description: Primary key of the proposal error record.
   error:
     lineage:
       - datalake_sorting_hat_raw.proposalerror.error
+    description: Error message or payload describing the failure during proposal processing.
   id_proposal:
     lineage:
       - datalake_sorting_hat_raw.proposalerror.proposal_id
+    description: Foreign key to the proposal that failed validation or processing.

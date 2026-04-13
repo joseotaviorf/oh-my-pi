@@ -1,21 +1,29 @@
 database_name: datalake_sorting_hat_clean
 table_name: variant
+domain: Fintech
+description: Experiment variant definitions (model version and traffic allocation) for Sorting Hat A/B tests.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.variant.id
+    description: Primary key of the experiment variant.
   id_experiment:
     lineage:
       - datalake_sorting_hat_raw.variant.experiment_id
+    description: Parent experiment that owns this traffic split variant.
   model_version:
     lineage:
       - datalake_sorting_hat_raw.variant.model_version
+    description: Model or policy version identifier executed for subjects in this variant.
   name:
     lineage:
       - datalake_sorting_hat_raw.variant.name
+    description: Short label for the variant shown in Sorting Hat tooling.
   description:
     lineage:
       - datalake_sorting_hat_raw.variant.description
+    description: Longer explanation of what this experiment variant changes or tests.
   percentage:
     lineage:
       - datalake_sorting_hat_raw.variant.percentage
+    description: Share of traffic allocated to this variant within the experiment.

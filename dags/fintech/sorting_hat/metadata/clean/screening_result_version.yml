@@ -1,45 +1,61 @@
 database_name: datalake_sorting_hat_clean
 table_name: screening_result_version
+domain: Fintech
+description: Historical versions of screening results linked to proposals and financial transactions in Sorting Hat.
 columns:
   id_screening_result:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.id
+    description: Primary key of this versioned screening result row.
   id_end_transaction:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.end_transaction_id
+    description: End-transaction identifier when screening is tied to a financial closing event.
   id_transaction:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.transaction_id
+    description: Open transaction identifier associated with the screening snapshot.
   id_proposal:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.proposal_id
+    description: Proposal linked to this historical screening outcome.
   liquidity:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.liquidity
+    description: Liquidity metric captured for this version of the screening result.
   operation_type:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.operation_type
+    description: Business operation type (e.g. rent flow stage) when screening was recorded.
   risk_category:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.risk_category
+    description: Risk bucket for this version before canonical normalization.
   score:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.score
+    description: Screening model score stored for this historical version.
   risk_category_canon:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.risk_category_canon
+    description: Canonical risk label for reporting and policy alignment.
   mod_id_proposal:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.proposal_id_mod
+    description: CDC flag indicating proposal_id changed in this changelog row.
   mod_liquidity:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.liquidity_mod
+    description: CDC flag indicating liquidity changed in this changelog row.
   mod_risk_category:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.risk_category_mod
+    description: CDC flag indicating risk_category changed in this changelog row.
   mod_score:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.score_mod
+    description: CDC flag indicating score changed in this changelog row.
   mod_risk_category_canon:
     lineage:
       - datalake_sorting_hat_raw.screeningresult_version.risk_category_canon_mod
+    description: CDC flag indicating canonical risk category changed in this changelog row.

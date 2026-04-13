@@ -1,27 +1,37 @@
 database_name: datalake_sorting_hat_clean
 table_name: analysis_state_group
+domain: Fintech
+description: Groups of analysis states belonging to a machine run in the Sorting Hat analysis workflow.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.analysisstategroup.id
+    description: Primary key of the analysis state group row.
   id_machine:
     lineage:
       - datalake_sorting_hat_raw.analysisstategroup.machine_id
+    description: Foreign key to the analysis machine run that owns this group.
   group_name:
     lineage:
       - datalake_sorting_hat_raw.analysisstategroup.group_name
+    description: Human-readable name of the state group within the machine.
   group_type:
     lineage:
       - datalake_sorting_hat_raw.analysisstategroup.group_type
+    description: Category of the group used for routing or display in Sorting Hat.
   result:
     lineage:
       - datalake_sorting_hat_raw.analysisstategroup.result
+    description: Aggregated or summary result for all states in this group.
   status:
     lineage:
       - datalake_sorting_hat_raw.analysisstategroup.status
+    description: Execution status of the state group in the workflow.
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.analysisstategroup.created_at
+    description: Timestamp when the state group record was created.
   ts_updated:
     lineage:
       - datalake_sorting_hat_raw.analysisstategroup.updated_at
+    description: Timestamp when the state group record was last updated.

@@ -1,18 +1,25 @@
 database_name: datalake_sorting_hat_clean
 table_name: external_score
+domain: Fintech
+description: External credit bureau scores and sources keyed by CPF for Sorting Hat rental credit analysis.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.externalscore.id
+    description: Primary key of the external score row in Sorting Hat.
   cpf:
     lineage:
       - datalake_sorting_hat_raw.externalscore.cpf
+    description: Brazilian taxpayer id (CPF) used to fetch the external bureau score.
   source:
     lineage:
       - datalake_sorting_hat_raw.externalscore.source
+    description: Identifier of the bureau or provider that produced the score value.
   value:
     lineage:
       - datalake_sorting_hat_raw.externalscore.value
+    description: Numeric score or metric returned by the external credit source.
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.externalscore.created_at
+    description: Timestamp when the external score record was first created in Sorting Hat.

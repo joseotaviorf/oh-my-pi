@@ -1,18 +1,25 @@
 database_name: datalake_sorting_hat_clean
 table_name: experiment
+domain: Fintech
+description: Credit policy experiment metadata (name, description, and active window) in Sorting Hat.
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.experiment.id
+    description: Primary key of the credit policy experiment.
   name:
     lineage:
       - datalake_sorting_hat_raw.experiment.name
+    description: Short name of the experiment shown in Sorting Hat configuration.
   description:
     lineage:
       - datalake_sorting_hat_raw.experiment.description
+    description: Detailed narrative describing the hypothesis and scope of the experiment.
   ts_started:
     lineage:
       - datalake_sorting_hat_raw.experiment.start_date
+    description: Timestamp when the experiment began assigning traffic to variants.
   ts_ended:
     lineage:
       - datalake_sorting_hat_raw.experiment.end_date
+    description: Timestamp when the experiment stopped; null if still active.

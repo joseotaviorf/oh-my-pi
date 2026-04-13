@@ -1,36 +1,49 @@
 database_name: datalake_sorting_hat_clean
 table_name: early_credit_analysis
+domain: Fintech
+description: Early-stage credit evaluation outcomes before the full proposal flow (house, variant, risk category).
 columns:
   id:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.id
+    description: Primary key of the early credit analysis record.
   id_credit_evaluation:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.credit_evaluation_id
+    description: External credit evaluation identifier linked to this early analysis.
   id_user:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.user_id
+    description: User (tenant) identifier under evaluation in the early credit flow.
   id_house:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.house_id
+    description: Listing or house identifier associated with the early credit check.
   id_variant:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.variant_id
+    description: Experiment variant used when this early analysis was produced.
   result:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.result
+    description: Outcome payload or status from the early credit evaluation step.
   city:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.city
+    description: City context supplied for the early credit analysis.
   version:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.version
+    description: Version number of the early analysis record for the same evaluation.
   risk_category_canon:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.version
+    description: Canonical risk category label aligned with Sorting Hat policy for this analysis.
   ts_created:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.created_at
+    description: Timestamp when the early credit analysis row was created.
   ts_expired:
     lineage:
       - datalake_sorting_hat_raw.earlycreditanalysis.expiration_date
+    description: Timestamp after which the early credit analysis is no longer valid.
