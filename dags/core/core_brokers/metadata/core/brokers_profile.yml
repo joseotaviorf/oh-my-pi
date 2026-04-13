@@ -1,6 +1,6 @@
 database_name: core_brokers
 table_name: brokers_profile
-domain: 3P Partners
+domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 description: >
   Broker member profiles for 3P rent and sale products: links people to companies

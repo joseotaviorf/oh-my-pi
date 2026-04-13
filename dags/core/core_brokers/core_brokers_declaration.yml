@@ -1,7 +1,7 @@
 dag:
   name: core_brokers
   schedule_start_date: 2026, 1, 1
-  owner: Data 3P Partners
+  owner: Data Broker XP
   documentation:
     dag_purpose: |
       This is a DAG related to the Brokers Core Model.
@@ -52,7 +52,7 @@ workflow:
       table_properties:
         "delta.enableChangeDataFeed": "true"
 cluster:
-  type: databricks_16_4_rfleet_instance_cluster
+  type: databricks_16_4_in_memory_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
@@ -62,4 +62,3 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-      

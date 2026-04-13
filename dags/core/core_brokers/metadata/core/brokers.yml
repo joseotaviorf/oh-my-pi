@@ -1,6 +1,6 @@
 database_name: core_brokers
 table_name: brokers
-domain: 3P Partners
+domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 description: >
   Brokers Core Model containing consolidated information about partner real estate
