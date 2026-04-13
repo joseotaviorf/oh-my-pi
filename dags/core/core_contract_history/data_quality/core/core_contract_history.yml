@@ -1,0 +1,68 @@
+---
+table_name: core_contract.contract_history
+alert_channel: "#alerts-de-airflow-dags"
+is_incremental:
+  incremental_date_column: ts_transaction
+  incremental_date_mask: yyyy-MM-dd
+column_level_validations:
+  id_event:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_contract:
+    is_complete:
+      severity_level: Error
+  sk_core_contract:
+    is_complete:
+      severity_level: Error
+  event_name:
+    is_complete:
+      severity_level: Error
+    is_in:
+      severity_level: Error
+      values:
+        - ev_id_house
+        - ev_id_tenant
+        - ev_id_proposal
+        - ev_status
+        - ev_contract_rent_model
+        - ev_paying_condo
+        - ev_responsible_for_condo
+        - ev_paying_iptu
+        - ev_responsible_for_iptu
+        - ev_signature_type
+        - ev_status_closing
+        - ev_is_relisting_enabled
+        - ev_rent
+        - ev_iptu
+        - ev_rental_guarantee_installment
+        - ev_rental_guarantee_value
+        - ev_home_insurance_installment
+        - ev_home_insurance_value
+        - ev_first_rent_comission_fee
+        - ev_tenant_service_fee
+        - ev_agent_brokerage_share
+        - ev_dt_started
+        - ev_dt_entered
+        - ev_dt_termination
+        - ev_ts_contract_expected_end
+        - ev_ts_signed
+        - ev_ts_expected_termination
+        - ev_ts_minuta_approved
+        - ev_ts_created
+        - ev_ts_updated
+  event_type:
+    is_complete:
+      severity_level: Error
+    is_in:
+      severity_level: Error
+      values:
+        - cdc
+        - outbox_pattern
+  ts_transaction:
+    is_complete:
+      severity_level: Error
+  event_origin:
+    is_complete:
+      severity_level: Error

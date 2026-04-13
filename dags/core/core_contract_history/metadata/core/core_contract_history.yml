@@ -1,0 +1,145 @@
+database_name: core_contract
+table_name: contract_history
+domain: For Rent
+owner: marcio.gomes@quintoandar.com.br
+description: Historical core model for rent contracts. Each row represents a single field-level change detected from the CDC transactional layer, using a fixed narrow schema.
+columns:
+  id_event:
+    lineage:
+      - datalake_ebdb_transactional.contrato.id
+      - datalake_ebdb_transactional.contrato.ts_database_transaction
+    description: Unique event identifier generated as SHA256 hash of id_contract, event_name, and ts_transaction. Ensures idempotency on re-runs.
+  id_contract:
+    lineage:
+      - datalake_ebdb_transactional.contrato.id
+    description: Identifier of the contract entity that this event belongs to.
+  sk_core_contract:
+    lineage:
+      - datalake_ebdb_transactional.contrato.id
+    description: Surrogate key for the contract, generated as SHA256 hash of the literal CONTRACT and the contract id.
+  event_name:
+    lineage:
+      - datalake_ebdb_transactional.contrato.imovel_id
+      - datalake_ebdb_transactional.contrato.usuario_id
+      - datalake_ebdb_transactional.contrato.proposta_id
+      - datalake_ebdb_transactional.contrato.status
+      - datalake_ebdb_transactional.contrato.contractRentModel
+      - datalake_ebdb_transactional.contrato.paganteCondominio
+      - datalake_ebdb_transactional.contrato.responsavelCondominio
+      - datalake_ebdb_transactional.contrato.paganteIptu
+      - datalake_ebdb_transactional.contrato.responsavelIptu
+      - datalake_ebdb_transactional.contrato.tipoAssinatura
+      - datalake_ebdb_transactional.contrato.statusClosing
+      - datalake_ebdb_transactional.contrato.relistingEnabled
+      - datalake_ebdb_transactional.contrato.valorAluguel
+      - datalake_ebdb_transactional.contrato.iptu_valor
+      - datalake_ebdb_transactional.contrato.seguroFianca_parcelas
+      - datalake_ebdb_transactional.contrato.seguroFianca_valor
+      - datalake_ebdb_transactional.contrato.seguroResidencial_parcelas
+      - datalake_ebdb_transactional.contrato.seguroResidencial_valor
+      - datalake_ebdb_transactional.contrato.taxaComissaoPrimeiroAluguel
+      - datalake_ebdb_transactional.contrato.tenantServiceFee
+      - datalake_ebdb_transactional.contrato.estateAgentBrokerageShare
+      - datalake_ebdb_transactional.contrato.dataInicio
+      - datalake_ebdb_transactional.contrato.dataEntrada
+      - datalake_ebdb_transactional.contrato.dataRescisao
+      - datalake_ebdb_transactional.contrato.dataFimContratoPrevisto
+      - datalake_ebdb_transactional.contrato.dataAssinado
+      - datalake_ebdb_transactional.contrato.dataRescisaoPrevista
+      - datalake_ebdb_transactional.contrato.dataMinutaAprovada
+      - datalake_ebdb_transactional.contrato.criadoEm
+      - datalake_ebdb_transactional.contrato.atualizadoEm
+    description: Name of the event representing the changed column. Default pattern is ev_{target_col} from event_configs (optional explicit event_name overrides).
+    categories:
+      ev_id_house: Change detected in the house identifier (imovel_id) column.
+      ev_id_tenant: Change detected in the tenant identifier (usuario_id) column.
+      ev_id_proposal: Change detected in the proposal identifier (proposta_id) column.
+      ev_status: Change detected in the contract status column.
+      ev_contract_rent_model: Change detected in the contract rent model (contractRentModel) column.
+      ev_paying_condo: Change detected in the condo payer (paganteCondominio) column.
+      ev_responsible_for_condo: Change detected in the condo responsible party (responsavelCondominio) column.
+      ev_paying_iptu: Change detected in the IPTU payer (paganteIptu) column.
+      ev_responsible_for_iptu: Change detected in the IPTU responsible party (responsavelIptu) column.
+      ev_signature_type: Change detected in the signature type (tipoAssinatura) column.
+      ev_status_closing: Change detected in the closing status (statusClosing) column.
+      ev_is_relisting_enabled: Change detected in the relisting flag (relistingEnabled) column.
+      ev_rent: Change detected in the rent value (valorAluguel) column.
+      ev_iptu: Change detected in the IPTU value (iptu_valor) column.
+      ev_rental_guarantee_installment: Change detected in the rental guarantee installments (seguroFianca_parcelas) column.
+      ev_rental_guarantee_value: Change detected in the rental guarantee value (seguroFianca_valor) column.
+      ev_home_insurance_installment: Change detected in the home insurance installments (seguroResidencial_parcelas) column.
+      ev_home_insurance_value: Change detected in the home insurance value (seguroResidencial_valor) column.
+      ev_first_rent_comission_fee: Change detected in the first rent commission fee (taxaComissaoPrimeiroAluguel) column.
+      ev_tenant_service_fee: Change detected in the tenant service fee (tenantServiceFee) column.
+      ev_agent_brokerage_share: Change detected in the agent brokerage share (estateAgentBrokerageShare) column.
+      ev_dt_started: Change detected in the contract start date (dataInicio) column.
+      ev_dt_entered: Change detected in the entry date (dataEntrada) column.
+      ev_dt_termination: Change detected in the termination date (dataRescisao) column.
+      ev_ts_contract_expected_end: Change detected in the expected end date (dataFimContratoPrevisto) column.
+      ev_ts_signed: Change detected in the signature date (dataAssinado) column.
+      ev_ts_expected_termination: Change detected in the expected termination date (dataRescisaoPrevista) column.
+      ev_ts_minuta_approved: Change detected in the minuta approval date (dataMinutaAprovada) column.
+      ev_ts_created: Change detected in the creation timestamp (criadoEm) column.
+      ev_ts_updated: Change detected in the update timestamp (atualizadoEm) column.
+  event_type:
+    lineage:
+      - datalake_ebdb_transactional.contrato.op_cdc
+    description: Source type of the event. Currently only CDC is supported; outbox_pattern is reserved for future use.
+    categories:
+      cdc: Event sourced from CDC (Change Data Capture) transactional logs.
+      outbox_pattern: Event sourced from the Outbox pattern (future).
+  value:
+    lineage:
+      - datalake_ebdb_transactional.contrato.imovel_id
+      - datalake_ebdb_transactional.contrato.usuario_id
+      - datalake_ebdb_transactional.contrato.proposta_id
+      - datalake_ebdb_transactional.contrato.status
+      - datalake_ebdb_transactional.contrato.contractRentModel
+      - datalake_ebdb_transactional.contrato.paganteCondominio
+      - datalake_ebdb_transactional.contrato.responsavelCondominio
+      - datalake_ebdb_transactional.contrato.paganteIptu
+      - datalake_ebdb_transactional.contrato.responsavelIptu
+      - datalake_ebdb_transactional.contrato.tipoAssinatura
+      - datalake_ebdb_transactional.contrato.statusClosing
+      - datalake_ebdb_transactional.contrato.relistingEnabled
+      - datalake_ebdb_transactional.contrato.valorAluguel
+      - datalake_ebdb_transactional.contrato.iptu_valor
+      - datalake_ebdb_transactional.contrato.seguroFianca_parcelas
+      - datalake_ebdb_transactional.contrato.seguroFianca_valor
+      - datalake_ebdb_transactional.contrato.seguroResidencial_parcelas
+      - datalake_ebdb_transactional.contrato.seguroResidencial_valor
+      - datalake_ebdb_transactional.contrato.taxaComissaoPrimeiroAluguel
+      - datalake_ebdb_transactional.contrato.tenantServiceFee
+      - datalake_ebdb_transactional.contrato.estateAgentBrokerageShare
+      - datalake_ebdb_transactional.contrato.dataInicio
+      - datalake_ebdb_transactional.contrato.dataEntrada
+      - datalake_ebdb_transactional.contrato.dataRescisao
+      - datalake_ebdb_transactional.contrato.dataFimContratoPrevisto
+      - datalake_ebdb_transactional.contrato.dataAssinado
+      - datalake_ebdb_transactional.contrato.dataRescisaoPrevista
+      - datalake_ebdb_transactional.contrato.dataMinutaAprovada
+      - datalake_ebdb_transactional.contrato.criadoEm
+      - datalake_ebdb_transactional.contrato.atualizadoEm
+    description: New value of the changed column, cast to string. Contains the current value at the time of the transaction.
+  payload:
+    description: Event payload with additional context. NULL for CDC sources in Phase 1; will be enriched from AUD tables in a future phase. Outbox sources populate this with the full event content.
+  ts_transaction:
+    lineage:
+      - datalake_ebdb_transactional.contrato.ts_database_transaction
+    description: Exact timestamp of the change in the source database, from the CDC transactional layer.
+  event_origin:
+    description: Fully qualified name of the source table or system that generated the change event.
+  ts_load:
+    description: Timestamp of when the record was loaded into the historical core model.
+  year:
+    lineage:
+      - datalake_ebdb_transactional.contrato.ts_database_transaction
+    description: Year extracted from ts_transaction for partitioning.
+  month:
+    lineage:
+      - datalake_ebdb_transactional.contrato.ts_database_transaction
+    description: Month extracted from ts_transaction for partitioning.
+  day:
+    lineage:
+      - datalake_ebdb_transactional.contrato.ts_database_transaction
+    description: Day extracted from ts_transaction for partitioning.

@@ -1,0 +1,62 @@
+ENTITY_TYPE: "CONTRACT"
+CONTRACT_TRANSACTIONAL_TABLE: "datalake_ebdb_transactional.contrato"
+merge_on_historical: ["id_event"]
+when_matched_update_condition_historical: null
+event_configs:
+  - tracked_col: usuario_id
+    target_col: id_tenant
+    target_type: bigint
+  - tracked_col: proposta_id
+    target_col: id_proposal
+    target_type: bigint
+  - tracked_col: status
+    target_col: status
+    target_type: string
+  - tracked_col: contractRentModel
+    target_col: contract_rent_model
+    target_type: string
+  - tracked_col: paganteCondominio
+    target_col: paying_condo
+    target_type: string
+  - tracked_col: responsavelCondominio
+    target_col: responsible_for_condo
+    target_type: string
+  - tracked_col: paganteIptu
+    target_col: paying_iptu
+    target_type: string
+  - tracked_col: responsavelIptu
+    target_col: responsible_for_iptu
+    target_type: string
+  - tracked_col: tipoAssinatura
+    target_col: signature_type
+    target_type: string
+  - tracked_col: statusClosing
+    target_col: status_closing
+    target_type: string
+  - tracked_col: relistingEnabled
+    target_col: is_relisting_enabled
+    target_type: boolean
+  - tracked_col: valorAluguel
+    target_col: rent
+    target_type: double
+  - tracked_col: iptu_valor
+    target_col: iptu
+    target_type: double
+  - tracked_col: seguroFianca_parcelas
+    target_col: rental_guarantee_installment
+    target_type: int
+  - tracked_col: seguroFianca_valor
+    target_col: rental_guarantee_value
+    target_type: double
+  - tracked_col: seguroResidencial_parcelas
+    target_col: home_insurance_installment
+    target_type: int
+  - tracked_col: seguroResidencial_valor
+    target_col: home_insurance_value
+    target_type: double
+  - tracked_col: taxaComissaoPrimeiroAluguel
+    target_col: first_rent_comission_fee
+    target_type: double
+  - tracked_col: tenantServiceFee
+    target_col: tenant_service_fee
+    target_type: double
