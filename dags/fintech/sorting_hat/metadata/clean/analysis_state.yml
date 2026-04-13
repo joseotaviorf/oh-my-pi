@@ -83,3 +83,15 @@ columns:
     lineage:
       - datalake_sorting_hat_raw.analysisstate.updated_at
     description: Timestamp when this analysis state row was last updated.
+  op_cdc:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.op_cdc
+    description: CDC operation type for this row (insert, update, or delete).
+  ts_cdc_transaction:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.ts_cdc_transaction
+    description: Timestamp of the CDC capture transaction for this change event.
+  ts_database_transaction:
+    lineage:
+      - datalake_sorting_hat_raw.analysisstate.ts_database_transaction
+    description: Timestamp of the source database transaction that produced this row version.

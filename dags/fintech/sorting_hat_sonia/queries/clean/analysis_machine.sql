@@ -11,6 +11,9 @@ WITH json_parsed AS (
     context,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated,
+    op_cdc,
+    ts_cdc_transaction,
+    ts_database_transaction,
     FROM_JSON(
       context,
       'proposal_id INT, risk_category STRING'
@@ -32,6 +35,9 @@ SELECT
   context,
   parsed_json.risk_category,
   ts_created,
-  ts_updated
+  ts_updated,
+  op_cdc,
+  ts_cdc_transaction,
+  ts_database_transaction
 FROM
   json_parsed

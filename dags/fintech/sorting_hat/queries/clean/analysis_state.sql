@@ -11,6 +11,9 @@ WITH json_parsed AS (
     structured_result,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated,
+    op_cdc,
+    ts_cdc_transaction,
+    ts_database_transaction,
     FROM_JSON(
       structured_result,
       'homogeneous_group STRING, declared_income DECIMAL(18,2), bureau_income DECIMAL(18,2), income_changes DECIMAL(18,2), max_bureau_income DECIMAL(18,2), bureau_and_declared_ratio DECIMAL(18,2), is_demoted_group BOOLEAN, elected_income DECIMAL(18,2), is_retenant BOOLEAN'
@@ -39,6 +42,9 @@ SELECT
   parsed_json.elected_income,
   parsed_json.is_retenant,
   ts_created,
-  ts_updated
+  ts_updated,
+  op_cdc,
+  ts_cdc_transaction,
+  ts_database_transaction
 FROM
   json_parsed
