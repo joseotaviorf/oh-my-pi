@@ -177,6 +177,8 @@ class Tables:
 
     stage_step_condos = "vespucio_pipeline_delta.stage_step_condos"
     stage_step_houses = "vespucio_pipeline_delta.stage_step_houses"
+    address_details_hash = "vespucio_pipeline_delta.address_details_hash"
+    address_details_hasher_link = "vespucio_pipeline_delta.address_details_hasher_link"
     source_adapter_step_condos = "vespucio_pipeline_delta.source_adapter_step_condos"
     source_adapter_step_houses = "vespucio_pipeline_delta.source_adapter_step_houses"
     extract_step_condos = "vespucio_pipeline_delta.extract_step_condos"
@@ -372,6 +374,16 @@ stage_step_task = create_task(
         f"--overwrite_schema",
         f"--output_staged_condos={Tables.stage_step_condos}",
         f"--output_staged_houses={Tables.stage_step_houses}",
+    ],
+)
+
+address_details_hasher_step_task = create_task(
+    entry_point="core_address_details_hasher_step",
+    parameters=[
+    "--overwrite_schema",
+    f"--input_staged_houses={Tables.stage_step_houses}",
+    f"--output_address_details_hash={Tables.address_details_hash}",
+    f"--output_address_details_hasher_link={Tables.address_details_hasher_link}"
     ],
 )
 
@@ -798,6 +810,7 @@ join_plugins = DummyOperator(task_id="join_plugins", dag=dag)
 execute_job_cluster_task >> source_tasks
 
 source_tasks >> stage_step_task
+stage_step_task >> address_details_hasher_step_task
 stage_step_task >> source_adapter_step_task
 stage_step_task >> address_tasks[0]
 chain(*address_tasks)
