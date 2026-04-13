@@ -39,10 +39,6 @@ workflow:
       clean_table_name: notifications_tracking
       raw_primary_keys: [id]
       clean_primary_keys: [id]
-    user_contacts:
-      clean_table_name: user_contacts
-      raw_primary_keys: [id]
-      clean_primary_keys: [id]
 
 cluster:
   type: databricks_12_2_med_2xlarge_general_cluster
