@@ -26,7 +26,6 @@ workflow:
     business_unit_region_aud: {}
     lead: {}
     lead_aud: {}
-    member_profile: {}
     member_profile_aud: {}
     observation: {}
     observation_aud: {}
@@ -40,7 +39,6 @@ workflow:
     responsible_aud: {}
     revinfo: 
       clean_table_name: rev_info
-    users: {}
     users_aud: {}
     visitor: {}
     visitor_aud: {}

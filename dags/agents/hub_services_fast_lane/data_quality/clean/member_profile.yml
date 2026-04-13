@@ -1,5 +1,5 @@
 ---
-table_name: datalake_hub_services_clean.users
+table_name: datalake_hub_services_clean.member_profile
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
@@ -7,14 +7,25 @@ table_level_validations:
     severity_level: Error
 column_level_validations:
   id:
+    is_unique:
+      severity_level: Error
     is_complete:
       severity_level: Error
-  name:
+  profile:
     is_complete:
       severity_level: Error
   ts_created:
     is_complete:
       severity_level: Error
   ts_updated:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
     is_complete:
       severity_level: Error

@@ -1,0 +1,59 @@
+---
+database_name: datalake_hub_services_clean
+table_name: member_profile
+description: Hub Services member profile rows (latest version per id), linking users to business units, profile type, parent profile, relationship dates, and partition columns for incremental loads.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    description: Unique identifier for the member profile record in Hub Services.
+    lineage:
+      - datalake_hub_services_raw.member_profile.id
+  id_business_unit:
+    description: Business unit identifier associated with this member profile.
+    lineage:
+      - datalake_hub_services_raw.member_profile.business_unit_id
+  id_user:
+    description: Hub Services user identifier linked to this member profile.
+    lineage:
+      - datalake_hub_services_raw.member_profile.user_id
+  version:
+    description: Record version from the source system, used to order and deduplicate CDC changes.
+    lineage:
+      - datalake_hub_services_raw.member_profile.version
+  id_parent_member_profile:
+    description: Parent member profile identifier when the profile is nested or subordinate to another profile.
+    lineage:
+      - datalake_hub_services_raw.member_profile.parent_member_profile_id
+  profile:
+    description: Profile type or role code for the member (for example agent or hub-specific personas).
+    lineage:
+      - datalake_hub_services_raw.member_profile.profile
+  is_active:
+    description: Indicates whether the member profile is currently active in Hub Services.
+    lineage:
+      - datalake_hub_services_raw.member_profile.active
+  dt_relationship_started:
+    description: Calendar date when the relationship represented by this profile started.
+    lineage:
+      - datalake_hub_services_raw.member_profile.relationship_start_date
+  ts_created:
+    description: Timestamp when the member profile record was created in the source system.
+    lineage:
+      - datalake_hub_services_raw.member_profile.created_at
+  ts_updated:
+    description: Timestamp when the member profile record was last updated in the source system.
+    lineage:
+      - datalake_hub_services_raw.member_profile.updated_at
+  year:
+    description: Partition year derived from the CDC load or event date.
+    lineage:
+      - datalake_hub_services_raw.member_profile.year
+  month:
+    description: Partition month derived from the CDC load or event date.
+    lineage:
+      - datalake_hub_services_raw.member_profile.month
+  day:
+    description: Partition day derived from the CDC load or event date.
+    lineage:
+      - datalake_hub_services_raw.member_profile.day

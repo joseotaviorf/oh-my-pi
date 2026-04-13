@@ -1,0 +1,51 @@
+---
+database_name: datalake_hub_services_clean
+table_name: users
+description: Hub Services user records with latest version per id (deduplicated by partition on id and updated_at), including contact fields and load partitions for incremental processing.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    description: Unique identifier for the user within the Hub Services database.
+    lineage:
+      - datalake_hub_services_raw.users.id
+  id_external:
+    description: External user identifier used to join Hub Services users to main and EBDB user tables.
+    lineage:
+      - datalake_hub_services_raw.users.external_id
+  version:
+    description: Record version from the source system, used to order and deduplicate CDC changes.
+    lineage:
+      - datalake_hub_services_raw.users.version
+  name:
+    description: User display name as stored in Hub Services.
+    lineage:
+      - datalake_hub_services_raw.users.name
+  email:
+    description: User email address as stored in Hub Services.
+    lineage:
+      - datalake_hub_services_raw.users.email
+  phone_number:
+    description: User phone number as stored in Hub Services.
+    lineage:
+      - datalake_hub_services_raw.users.phone_number
+  ts_created:
+    description: Timestamp when the user record was created in the source system.
+    lineage:
+      - datalake_hub_services_raw.users.created_at
+  ts_updated:
+    description: Timestamp when the user record was last updated in the source system.
+    lineage:
+      - datalake_hub_services_raw.users.updated_at
+  year:
+    description: Partition year derived from the CDC load or event date.
+    lineage:
+      - datalake_hub_services_raw.users.year
+  month:
+    description: Partition month derived from the CDC load or event date.
+    lineage:
+      - datalake_hub_services_raw.users.month
+  day:
+    description: Partition day derived from the CDC load or event date.
+    lineage:
+      - datalake_hub_services_raw.users.day
