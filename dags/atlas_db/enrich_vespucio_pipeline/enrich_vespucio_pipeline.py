@@ -168,6 +168,7 @@ class Tables:
     )
     source_union_houses = "vespucio_sources_delta.source_union_house"
     source_idactum_houses = "vespucio_sources_delta.source_idactum_houses"
+    source_idactum_transactions = "vespucio_sources_delta.source_idactum_transactions"
     source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
     source_iptu_houses = "vespucio_sources_delta.source_iptu_house"
     source_cnefe_houses = "vespucio_sources_delta.source_cnefe_house"
@@ -306,6 +307,14 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
+            f"--script=idactum_transactions.sql",
+            f"--output_table={Tables.source_idactum_transactions}",
+        ],
+        task_id="idactum_transactions",
+    ),
+    create_task(
+        entry_point="sources_sql_job",
+        parameters=[
             f"--script=itbi_house.sql",
             f"--output_table={Tables.source_itbi_houses}",
         ],
@@ -371,6 +380,7 @@ stage_step_task = create_task(
         f"--input_source_navent_houses_composed={Tables.source_navent_houses_composed}",
         f"--input_source_union_houses={Tables.source_union_houses}",
         f"--input_source_idactum_houses={Tables.source_idactum_houses}",
+        f"--input_source_idactum_transactions={Tables.source_idactum_transactions}",
         f"--overwrite_schema",
         f"--output_staged_condos={Tables.stage_step_condos}",
         f"--output_staged_houses={Tables.stage_step_houses}",
