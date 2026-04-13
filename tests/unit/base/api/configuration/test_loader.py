@@ -132,6 +132,13 @@ class TestAPIConfigurationLoaderCreateAPIClient:
         assert client.base_url == "https://api.example.com/"
         mock_auth_class.assert_called_once()
         assert mock_auth_class.call_args.kwargs["expires_at_field"] == "expires_at"
+        assert mock_auth_class.call_args.kwargs["token_payload_extras"] == {}
+        assert (
+            mock_auth_class.call_args.kwargs["token_request_format"]
+            == "form_basic_auth"
+        )
+        assert mock_auth_class.call_args.kwargs["access_token_field"] == "access_token"
+        assert mock_auth_class.call_args.kwargs["http_user_agent"] is None
         mock_auth_instance.apply_auth.assert_called_once()
 
     @patch("bietlejuice.base.api.configuration.loader.BasicAuthOAuth2ClientCredentials")
@@ -158,6 +165,7 @@ class TestAPIConfigurationLoaderCreateAPIClient:
         loader.create_api_client()
 
         assert mock_auth_class.call_args.kwargs["databricks_scope"] == "people"
+        assert mock_auth_class.call_args.kwargs["http_user_agent"] is None
 
     def test_create_api_client_without_authentication(self):
         """Test that client is created without authentication when strategy is 'none'."""
@@ -172,6 +180,21 @@ class TestAPIConfigurationLoaderCreateAPIClient:
 
         assert isinstance(client, BaseAPIClient)
         assert client.base_url == "https://api.example.com/"
+        assert "Mozilla/5.0" not in client.session.headers.get("User-Agent", "")
+
+    def test_create_api_client_applies_http_user_agent_from_workflow(self):
+        """Optional workflow http_user_agent is set on the session and passed to OAuth2."""
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "http_user_agent": "CustomIntegration/1.0",
+            "authentication": {"strategy": "none"},
+        }
+        table_config = {"endpoint_path": "events"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        client = loader.create_api_client()
+
+        assert client.session.headers.get("User-Agent") == "CustomIntegration/1.0"
 
     def test_create_api_client_with_retry_policy(self):
         """Test that retry policy is configured correctly."""
@@ -636,6 +659,16 @@ class TestAPIConfigurationLoaderGetInitialParams:
         assert params["before_time"] == "2025-01-31T23:59:59.999Z"
         # paging parameter is no longer added automatically - must be explicitly configured
         assert "paging" not in params
+
+    def test_get_initial_params_explicit_empty_params_skips_date_defaults(self):
+        """Explicit ``params: {}`` must not inject after_time/before_time (APIs without date filters)."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {"endpoint_path": "employees", "params": {}}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        params = loader.get_initial_params("2025-01-01", "2025-01-31")
+
+        assert params == {}
 
     def test_get_initial_params_with_custom_date_format(self):
         """Test that custom date_format is applied correctly."""

@@ -142,9 +142,7 @@ def main() -> None:
     client = loader.create_api_client()
 
     endpoint = loader.get_endpoint_path()
-    initial_params = loader.get_initial_params(
-        args.load_start_date, args.load_end_date
-    )
+    initial_params = loader.get_initial_params(args.load_start_date, args.load_end_date)
     LOGGER.info(
         "m=main, endpoint=%s, params=%s msg=API request configuration",
         endpoint,
@@ -183,6 +181,10 @@ def main() -> None:
             all_results = data.get(results_path, [])
             if not all_results and "data" in data:
                 all_results = data.get("data", [])
+            if not all_results and "content" in data:
+                content = data.get("content")
+                if isinstance(content, list):
+                    all_results = content
         elif isinstance(data, list):
             all_results = data
         LOGGER.info(
@@ -200,15 +202,16 @@ def main() -> None:
     )
 
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
 
         spark = create_emr_spark_session(JOB_NAME)
     else:
         spark = SparkSession.builder.getOrCreate()
     if not all_results:
         LOGGER.warning(
-            "m=main, table_name=%s msg=No data returned from API. "
-            "Skipping load.",
+            "m=main, table_name=%s msg=No data returned from API. " "Skipping load.",
             args.table_name,
         )
         return
@@ -217,9 +220,7 @@ def main() -> None:
         "m=main, table_name=%s msg=Converting JSON to Spark DataFrame",
         args.table_name,
     )
-    df = json_to_dataframe(
-        spark, all_results, raw_column_name=payload_column
-    )
+    df = json_to_dataframe(spark, all_results, raw_column_name=payload_column)
 
     date_column = loader.get_date_column_for_partitioning()
     if date_column:

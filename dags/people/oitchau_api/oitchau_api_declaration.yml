@@ -1,0 +1,63 @@
+dag:
+  name: oitchau_api
+  owner: Data People
+  schedule_interval: 0 4 * * *
+  schedule_start_date: 2026, 4, 9
+  documentation:
+    dag_purpose: |
+      Ingests the Oitchau Integrations API employee directory (`GET .../employees`) into the raw layer.
+      Store credentials in Databricks Secrets (scope `people`): JSON secret referenced by `authentication.secret_key`
+      with `client_id` and `client_secret` for the integration client.
+
+cluster:
+  type: databricks_16_4_small_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+
+workflow:
+  layer: raw
+  type: api_ingestion
+  has_hive_sync: false
+  bucket_config_name: people_bucket
+  credentials_scope: people
+  custom_schema: oitchau
+  default_extraction_type: full
+  default_table_privileges:
+    people-team:
+      - ALL PRIVILEGES
+
+  api_base_url: https://api.oitchau.com.br/v2/public/integrations_api
+  # Oitchau sits behind rules that block default python-requests User-Agent (e.g. Cloudflare).
+  http_user_agent: >-
+    Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36
+    (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36
+
+  authentication:
+    strategy: oauth2_client_credentials
+    secret_key: OITCHAU_INTEGRATIONS_API
+    token_url: https://api.oitchau.com.br/v2/public/integrations_api/token
+    token_request_format: json_body
+    access_token_field: accessToken
+    expires_at_field: accessTokenExpiresAt
+    token_payload_extras:
+      response_type: token
+
+  api_policies:
+    pagination:
+      strategy: none
+    rate_limiting:
+      strategy: none
+
+  tables_customization:
+    employees:
+      endpoint_path: employees
+      params: {}
+      vacuum_retention_hours: 168
+      vacuum_lite: true

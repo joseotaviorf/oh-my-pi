@@ -102,6 +102,7 @@ This section describes the parameters you can configure in the `workflow` sectio
 
 - **payload_column_name** (string): column that will store the raw JSON string
   - Default: `payload`
+- **http_user_agent** (string): optional `User-Agent` for API and OAuth2 token HTTP calls (see parameter reference)
 - **date_format_mask** (string): `strftime` mask used to format `load_start_date` / `load_end_date` placeholders into strings (e.g. `%Y%m%d`)
   - Table-level override: `workflow.tables_customization.<table>.date_format`
 - **api_policies** (dict): `rate_limiting`, `pagination`, `error_handling`
@@ -119,6 +120,7 @@ Below are the workflow-level parameters **implemented/consumed by the current MV
 - **`api_base_url`** string or dict (required): API base URL.
   - If `string`: used for all environments.
   - If `dict`: keys are environments (e.g. `prod`, `forno`). Runtime env is read from `ENVIRONMENT` (default: `forno`).
+- **`http_user_agent`** string (optional): custom HTTP `User-Agent` on the `requests` session and on OAuth2 token requests. Omit to keep library defaults.
 - **`credentials_scope`** string (optional): Databricks Secrets scope to read API credentials from (e.g. `people`).
   - If omitted, falls back to `DATABRICKS_SECRET_SCOPE` (default: `quintoandar`).
 - **`tables_customization`** dict (required): mapping of table names → per-table config.
@@ -256,9 +258,13 @@ For **`strategy: oauth2_client_credentials`**:
 - **`authentication.token_url`** string (required): token endpoint URL.
 - **`authentication.client_id_field`** string (optional, default: `client_id`): field in secret JSON.
 - **`authentication.client_secret_field`** string (optional, default: `client_secret`): field in secret JSON.
-- **`authentication.token_payload_extras`** dict (optional, default: `{}`): extra form fields for token request.
+- **`authentication.token_payload_extras`** dict (optional, default: `{}`): merged into the token request. With the default **`token_request_format`** (`form_basic_auth`), extras are sent as **form** fields together with `grant_type=client_credentials` and HTTP Basic Auth (client id/secret). With **`token_request_format: json_body`**, extras are merged into a **JSON** body that also includes `client_id`, `client_secret`, and `grant_type`.
+- **`authentication.token_request_format`** string (optional, default: `form_basic_auth`): `form_basic_auth` (form body + HTTP Basic Auth to the token URL) or `json_body` (JSON body, no HTTP Basic Auth on the token call).
+- **`authentication.access_token_field`** string (optional, default: `access_token`): name of the access token property in the token JSON response (some APIs use camelCase, e.g. `accessToken`).
 - **`authentication.expires_at_field`** string (optional, default: `expires_at`): absolute expiry field in token response.
 - **`authentication.expires_in_field`** string (optional, default: `expires_in`): relative expiry field in token response.
+
+**Workflow-level (not under `authentication`):** **`http_user_agent`** applies to the HTTP session for API calls and, when using OAuth2, to token requests as well. See the workflow parameter reference.
 
 For **`strategy: api_key`**:
 
@@ -279,10 +285,12 @@ When you set `params` for a table, the job replaces:
 - `load_end_date` with:
   - `date_format_mask` / `date_format` if configured, otherwise ISO-8601 with `T23:59:59.999Z`
 
-If **no `params`** are provided for a table, the job defaults to:
+If the **`params` key is omitted** for a table, the job defaults to:
 
 - `after_time=<start>`
 - `before_time=<end>`
+
+If the table sets **`params: {}` explicitly**, **no** query parameters are added (use this for endpoints that do not support date filters).
 
 ### Runtime params and `extra_details`
 
@@ -614,7 +622,9 @@ There is **no** dedicated `source` URL column written by `load_api_ingestion_raw
 
 ## Reference DAGs
 
-No DAG in this repository currently uses `workflow.type: api_ingestion` on `master`; the YAML snippets in this document are the supported contract. When a first production DAG is added, link it here. Note: [`dags/people/currency/currency_declaration.yml`](../../dags/people/currency/currency_declaration.yml) uses **`custom_ingestion`** (`load_currency_raw`), not `api_ingestion`.
+- [`dags/people/oitchau_api/oitchau_api_declaration.yml`](../../dags/people/oitchau_api/oitchau_api_declaration.yml) — `api_ingestion` with JSON-body OAuth2 token, optional `http_user_agent`, `employees` endpoint, explicit empty `params`.
+
+Note: [`dags/people/currency/currency_declaration.yml`](../../dags/people/currency/currency_declaration.yml) uses **`custom_ingestion`** (`load_currency_raw`), not `api_ingestion`.
 
 ---
 

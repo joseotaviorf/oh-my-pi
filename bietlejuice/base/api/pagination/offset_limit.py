@@ -106,7 +106,7 @@ class OffsetLimitPaginator(BasePaginator):
         if isinstance(data, list):
             return data
         if isinstance(data, dict):
-            for field in ["results", "items", "data", "records", "entries"]:
+            for field in ["results", "items", "data", "content", "records", "entries"]:
                 if field in data and isinstance(data[field], list):
                     return data[field]
         return []

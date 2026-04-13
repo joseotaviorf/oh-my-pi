@@ -1,3 +1,4 @@
+import json
 import logging
 import time
 from typing import Dict, Any, Optional
@@ -33,6 +34,9 @@ class BasicAuthOAuth2ClientCredentials(AuthBase, RequestsAuthBase):
         expires_in_field: str = "expires_in",
         token_expiration_margin_seconds: int = 60,
         fallback_token_expiration_seconds: int = 3600,
+        token_request_format: str = "form_basic_auth",
+        access_token_field: str = "access_token",
+        http_user_agent: Optional[str] = None,
     ):
         """
         Initializes the OAuth 2.0 client credentials authentication handler.
@@ -57,6 +61,15 @@ class BasicAuthOAuth2ClientCredentials(AuthBase, RequestsAuthBase):
                 preemptively refresh the token before it expires.
             fallback_token_expiration_seconds (int): The token lifetime in
                 seconds to assume if expiration is not provided or fails to parse.
+            token_request_format (str): ``form_basic_auth`` (default) sends
+                ``application/x-www-form-urlencoded`` body with ``grant_type`` and
+                extras, and HTTP Basic Auth with client id/secret. ``json_body``
+                sends a JSON object including ``client_id``, ``client_secret``,
+                ``grant_type``, and ``token_payload_extras`` (no HTTP Basic Auth).
+            access_token_field (str): JSON field name for the bearer token in the
+                token response (default ``access_token``; some APIs use camelCase).
+            http_user_agent (Optional[str]): If set, sent as ``User-Agent`` on the
+                token HTTP request (e.g. when a provider blocks default Python clients).
         """
         super().__init__(databricks_scope, secret_key)
         self.token_url = token_url
@@ -67,6 +80,9 @@ class BasicAuthOAuth2ClientCredentials(AuthBase, RequestsAuthBase):
         self.expires_in_field = expires_in_field
         self.token_expiration_margin_seconds = token_expiration_margin_seconds
         self.fallback_token_expiration_seconds = fallback_token_expiration_seconds
+        self.token_request_format = token_request_format
+        self.access_token_field = access_token_field
+        self.http_user_agent = http_user_agent
 
         self._access_token: Optional[str] = None
         self._token_expires_at: float = 0.0
@@ -106,26 +122,65 @@ class BasicAuthOAuth2ClientCredentials(AuthBase, RequestsAuthBase):
                 "not found in the secret."
             )
 
-        data = {"grant_type": "client_credentials"}
-        data.update(self.token_payload_extras)
-
-        headers = {"Content-Type": "application/x-www-form-urlencoded"}
-        auth = (client_id, client_secret)
+        common_headers: Dict[str, str] = {"Accept": "application/json"}
+        if self.http_user_agent:
+            common_headers["User-Agent"] = self.http_user_agent
 
         try:
-            LOGGER.info(
-                f"Fetching new OAuth 2.0 token from '{self.token_url}' "
-                "using Basic Auth."
-            )
-            response = requests.post(
-                self.token_url, headers=headers, data=data, auth=auth
-            )
+            if self.token_request_format == "json_body":
+                payload = {
+                    "client_id": client_id,
+                    "client_secret": client_secret,
+                    "grant_type": "client_credentials",
+                }
+                payload.update(self.token_payload_extras)
+                headers = {
+                    **common_headers,
+                    "Content-Type": "application/json",
+                }
+                LOGGER.info(
+                    "Fetching new OAuth 2.0 token from '%s' using JSON body.",
+                    self.token_url,
+                )
+                response = requests.post(
+                    self.token_url,
+                    headers=headers,
+                    data=json.dumps(payload),
+                    timeout=60,
+                )
+            elif self.token_request_format == "form_basic_auth":
+                data = {"grant_type": "client_credentials"}
+                data.update(self.token_payload_extras)
+                headers = {
+                    **common_headers,
+                    "Content-Type": "application/x-www-form-urlencoded",
+                }
+                auth = (client_id, client_secret)
+                LOGGER.info(
+                    "Fetching new OAuth 2.0 token from '%s' using Basic Auth.",
+                    self.token_url,
+                )
+                response = requests.post(
+                    self.token_url,
+                    headers=headers,
+                    data=data,
+                    auth=auth,
+                    timeout=60,
+                )
+            else:
+                raise ValueError(
+                    f"Unsupported token_request_format: {self.token_request_format!r}. "
+                    "Use 'form_basic_auth' or 'json_body'."
+                )
+
             response.raise_for_status()
             response_json = response.json()
 
-            self._access_token = response_json.get("access_token")
+            self._access_token = response_json.get(self.access_token_field)
             if not self._access_token:
-                raise ValueError("'access_token' not found in the API response.")
+                raise ValueError(
+                    f"'{self.access_token_field}' not found in the token response."
+                )
 
             if self.expires_at_field in response_json:
                 expires_at_str = response_json[self.expires_at_field]

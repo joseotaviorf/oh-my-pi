@@ -145,6 +145,7 @@ Add tests in:
 - [`tests/unit/base/api/configuration/test_loader.py`](../../tests/unit/base/api/configuration/test_loader.py)  
   - loader wires the new strategy
   - required key validation is enforced
+- OAuth2 variants (JSON token body, camelCase token fields): [`tests/unit/base/api/auth/test_oauth2_json_body.py`](../../tests/unit/base/api/auth/test_oauth2_json_body.py)
 - Add a new file like `test_<your_auth>.py` under [`tests/unit/base/api/`](../../tests/unit/base/api/) (or extend existing auth tests)
 
 ### 6) Update docs

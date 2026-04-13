@@ -96,6 +96,22 @@ class APIConfigurationLoader:
             f"got {type(api_base_url).__name__}"
         )
 
+    def get_http_user_agent(self) -> Optional[str]:
+        """
+        Returns the optional HTTP User-Agent string for API and token requests.
+
+        When unset or blank, the client does not override ``requests`` defaults
+        for the session (OAuth token calls likewise omit a custom User-Agent).
+
+        Returns:
+            Optional[str]: Non-empty ``workflow.http_user_agent`` or None.
+        """
+        ua = self.workflow_config.get("http_user_agent")
+        if ua is None or not isinstance(ua, str):
+            return None
+        stripped = ua.strip()
+        return stripped or None
+
     def create_api_client(self) -> BaseAPIClient:
         """
         Creates and configures a BaseAPIClient with authentication applied.
@@ -226,6 +242,10 @@ class APIConfigurationLoader:
                 "No alert channel configured. Alerts will not be sent for HTTP errors."
             )
 
+        http_user_agent = self.get_http_user_agent()
+        if http_user_agent:
+            client.session.headers["User-Agent"] = http_user_agent
+
         return client
 
     def _apply_oauth2_authentication(
@@ -282,14 +302,27 @@ class APIConfigurationLoader:
             "credentials_scope"
         ) or os.environ.get("DATABRICKS_SECRET_SCOPE", "quintoandar")
 
+        token_payload_extras = auth_config.get("token_payload_extras") or {}
+        expires_in_field = auth_config.get("expires_in_field", "expires_in")
+        token_request_format = auth_config.get(
+            "token_request_format", "form_basic_auth"
+        )
+        access_token_field = auth_config.get("access_token_field", "access_token")
+        http_user_agent = self.get_http_user_agent()
+
         auth_handler = BasicAuthOAuth2ClientCredentials(
             databricks_scope=databricks_scope,
             secret_key=secret_key,
             token_url=token_url,
             client_id_field=client_id_field,
             client_secret_field=client_secret_field,
+            token_payload_extras=token_payload_extras,
             expires_at_field=expires_at_field,
+            expires_in_field=expires_in_field,
             fallback_token_expiration_seconds=fallback_token_expiration_seconds,
+            token_request_format=token_request_format,
+            access_token_field=access_token_field,
+            http_user_agent=http_user_agent,
         )
 
         auth_handler.apply_auth(client.session)
@@ -652,7 +685,11 @@ class APIConfigurationLoader:
         """
         params = {}
 
-        table_params = self.table_config.get("params", {})
+        if "params" in self.table_config:
+            table_params = self.table_config.get("params") or {}
+        else:
+            table_params = None
+
         table_date_format = self.table_config.get("date_format")
         if table_date_format == "":
             raise ValueError(
@@ -687,7 +724,7 @@ class APIConfigurationLoader:
             else:
                 return BaseAPIClient.format_iso_timestamp(date_str, time_suffix)
 
-        if table_params:
+        if table_params is not None:
             for key, value in table_params.items():
                 if isinstance(value, str):
                     if value == "load_start_date":
@@ -706,14 +743,15 @@ class APIConfigurationLoader:
                         params[key] = value
                 else:
                     params[key] = value
-        else:
-            if load_start_date:
-                formatted_date = format_date(load_start_date, default_start_time)
-                params["after_time"] = formatted_date
+            return params
 
-            if load_end_date:
-                formatted_date = format_date(load_end_date, default_end_time)
-                params["before_time"] = formatted_date
+        if load_start_date:
+            formatted_date = format_date(load_start_date, default_start_time)
+            params["after_time"] = formatted_date
+
+        if load_end_date:
+            formatted_date = format_date(load_end_date, default_end_time)
+            params["before_time"] = formatted_date
 
         return params
 
