@@ -1622,6 +1622,21 @@ databricks_16_4_medium_memory_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
 
+databricks_16_4_small_general_fleet_xlarge_single_node:
+    <<: *cluster_anchor_base
+    driver_node_type_id: m-fleet.xlarge
+    node_type_id: m-fleet.xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        ResourceClass: "SingleNode"
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 100
+
 databricks_16_4_rfleet_instance_cluster:
     <<: *cluster_anchor_base
     driver_instance_pool_id: *pool_rfleet_xlarge_on_demand
