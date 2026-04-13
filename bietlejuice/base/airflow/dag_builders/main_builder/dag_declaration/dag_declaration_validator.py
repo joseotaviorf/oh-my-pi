@@ -147,6 +147,11 @@ class DAGDeclarationValidator(Validator):
                     ],
                     "required": False,
                 },
+                "http_user_agent": {
+                    "type": "string",
+                    "empty": False,
+                    "required": False,
+                },
                 "authentication": {
                     "type": "dict",
                     "empty": False,
@@ -221,6 +226,26 @@ class DAGDeclarationValidator(Validator):
                             "required": False,
                         },
                         "password_field": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                        },
+                        "token_payload_extras": {
+                            "type": "dict",
+                            "required": False,
+                        },
+                        "expires_in_field": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                        },
+                        "token_request_format": {
+                            "type": "string",
+                            "empty": False,
+                            "required": False,
+                            "allowed": ["form_basic_auth", "json_body"],
+                        },
+                        "access_token_field": {
                             "type": "string",
                             "empty": False,
                             "required": False,
