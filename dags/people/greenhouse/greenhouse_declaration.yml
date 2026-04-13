@@ -143,6 +143,7 @@ workflow:
       extra_spark_job_arguments:
         - endpoint: "offers"
           date_column_to_partition: "updated_at"
+          page_size: 100
 
     offices:
       vacuum_retention_hours: 168

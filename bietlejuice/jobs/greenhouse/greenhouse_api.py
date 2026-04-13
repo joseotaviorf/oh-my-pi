@@ -31,6 +31,7 @@ class GreenhouseAPI:
         self.load_start_date = job_args.get("load_start_date")
         self.load_end_date = job_args.get("load_end_date")
         self.base_filters = job_args.get("base_filters", {})
+        self._page_size = int(job_args.get("page_size", self._PAGE_SIZE))
 
         self._api_key = self._get_secrets()
         self._auth_headers = self._create_auth_headers()
@@ -133,7 +134,7 @@ class GreenhouseAPI:
     def _fetch_paginated_data(self, params: dict) -> list:
         """Fetches all paginated data, using the rate-limit-aware request method."""
         processed_params = params.copy()
-        processed_params["per_page"] = self._PAGE_SIZE
+        processed_params["per_page"] = self._page_size
 
         for key, value in processed_params.items():
             if value == "load_start_date" and self.load_start_date:
