@@ -3,24 +3,25 @@ alwaysApply: false
 description: Follow this template for PR descriptions. Use when writing or editing a PR description or preparing a PR for review.
 ---
 ### Guidelines for generating the PR:
-1. **Holistic Analysis:** Analyze the **entire diff** as a single block. Ignore chat history/incremental steps.
-2. **Jira Link:** Extract the Jira key from branch/commits. Generate Header: `## [KEY-123](https://your-domain.atlassian.net/browse/KEY-123)`. Omit if no key is found.
-3. **Why Section:** Write a **single, punchy bullet point** on purpose/value. **Do not** describe technical implementation.
-4. **What Section:** List actual changes from the **full diff**, ordered by impact.
-5. **Attention Points:** Use `### !Attention Points!` **only** for risks or **pending** tasks (style/docs/tests). Omit section if everything is complete.
-6. **Strict Omission:** **NO "N/A" or Meta-commentary**. Delete lines or sections entirely if they have no data.
-7. **Omit Screenshots:** Remove the "Screenshots" section if tests are only CI/CD/Checks or if no tests were run.
-8. **Clean Output:** Remove all instructional text and bracketed hints from the final response.
+1. **Language (mandatory):** The PR **title** and **entire body** must be in **English** — professional, concise, and consistent with the rest of the repo. Never default to Portuguese or another language because of chat context or author preference, unless the user **explicitly** requests another language for that specific PR.
+2. **Holistic Analysis:** Analyze the **entire diff** as a single block. Ignore chat history/incremental steps.
+3. **PR title:** Use Conventional Commits: `type(scope): short imperative summary`. If a Jira key exists (from branch or commits), treat it as **context in scope** in **lowercase**: e.g. key `ABC-123` → title `feat(abc-123): ebdb_agent prospect tables and qualification layer`. The summary must still describe **what** changed (DAG, area, behavior); do not let the ticket replace the subject. Do **not** append `(ABC-123)` at the end of the title or use a standalone `##` heading for the ticket.
+4. **Jira in the body:** Do **not** use a top-level `##` heading for the ticket. When a key exists, add a **second bullet** under **Why?** with the Jira tracker link (see skeleton below). Omit that bullet entirely if there is no ticket.
+5. **Why Section:** First bullet = **purpose/value**. Second bullet (when applicable) = Jira tracker link only. **Do not** describe deep technical implementation here.
+6. **What Section:** List actual changes from the **full diff**, ordered by impact.
+7. **Attention Points:** Use `### !Attention Points!` **only** for risks or **pending** tasks (style/docs/tests). Omit section if everything is complete.
+8. **Strict Omission:** **NO "N/A" or Meta-commentary**. Delete lines or sections entirely if they have no data.
+9. **Omit Screenshots:** Remove the "Screenshots" section if tests are only CI/CD/Checks or if no tests were run.
+10. **Clean Output:** Remove all instructional text and bracketed hints from the final response.
 
 ---
 
-## [Jira Ticket Link]
-
 ### Why?
-* [Single concise bullet on purpose/value.]
+* [Single concise bullet on purpose/value — English.]
+* Jira: [KEY-123](https://quintoandar.atlassian.net/browse/KEY-123) _(Include this second bullet only when a ticket exists; replace KEY-123 with the real key. Omit this line if none.)_
 
 ### What?
-* [List of actual changes from the diff, ordered by impact.]
+* [List of actual changes from the diff, ordered by impact — English.]
 
 ### How everything was tested?
 * **Environment:** [e.g., Local / CI]

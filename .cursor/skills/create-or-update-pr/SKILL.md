@@ -76,7 +76,7 @@ Rules:
 
 ## Step 3 — Infer scope (optional)
 
-From changed paths, pick a short scope (snake_case), in priority order:
+If the branch name or commits include a **Jira key**, use it as **scope** in **lowercase** (e.g. `aarede-372`) — see **`.cursor/rules/pr_template.mdc`**. Otherwise, from changed paths pick a short scope (snake_case), in priority order:
 
 1. DAG folder name when `dags/**/<dag_name>/` or `*_declaration.yml` is touched
 2. Base name of a primary `.sql` under `queries/`
@@ -99,29 +99,34 @@ Examples:
 - `feat(jira_ops): ingest schedules and user accounts from Jira Ops API`
 - `fix(payments_join): correct null handling in join keys`
 
+When a **Jira key** exists (e.g. `ABC-123` from branch/commits), put it in **scope** in **lowercase** (`abc-123`) — **not** a suffix at the end of the title:
+
+- `feat(abc-123): ebdb_agent prospect tables and qualification layer`
+- `feat(aarede-372): add prospect and qualification tables to ebdb_agent clean layer`
+
 If the user wants the older short form:
 
 ```text
 <type>: <imperative description>
 ```
 
-Keep the title **under ~72 characters** when possible.
+Keep the title **under ~72 characters** when possible. Titles must be **English** (same as the PR body; see **`.cursor/rules/pr_template.mdc`**).
 
 ---
 
 ## Step 5 — Generate description
 
-### 5.1 — Content rules
+### 5.1 — Content rules (canonical: Cursor rule)
 
-- **Structure:** Read **`.github/PULL_REQUEST_TEMPLATE.md`** in this repo and use it as the **only** section layout for the PR body (headings, checklist items). Do not embed a parallel template in the assistant reply — follow that file.
+- **Structure and editorial rules:** Follow **`.cursor/rules/pr_template.mdc`** — read that file and use its **Guidelines** (English mandatory, title `feat(abc-123): …` when a key exists, **Why?** with a **second bullet** `Jira: [KEY](url)` when applicable) and its **section skeleton** (`### Why?` with two bullets max for ticket context; no `##` Jira heading; then `### What?`, `### How everything was tested?`, etc.). Do not duplicate a second template inside the skill; the rule is the source of truth for the generated PR body.
+- **Language:** PR **title** and **body** must be **English**, per the rule — even if the user writes in another language in chat. The assistant’s reply to the user may stay in the user’s language; the generated PR text does not.
 - Base **Why?** / **What?** on the **actual diff and commits** (`git log --oneline origin/master..HEAD` or `origin/main..HEAD`). **Do not invent** files, tickets, or behavior not present in the repo.
-- **Editorial refinements** (Jira link at top, omit empty sections, no “N/A”, when to drop Screenshots, remove placeholder instructional text): apply **`.cursor/rules/pr_template.mdc`** on top of the GitHub template.
-- Replace the template’s placeholder lines with real content; remove instructional `_Replace me…_` / italic hints in the final body.
+- **Optional alignment with GitHub:** **`.github/PULL_REQUEST_TEMPLATE.md`** is what contributors see in the GitHub UI when opening a PR in the browser. If the user or team wants the **checklist** lines from that file included at the bottom of the body, append them; otherwise the Cursor rule alone is enough for `gh pr create` / `--body-file`.
 
-### 5.2 — Filling the template
+### 5.2 — Filling the body
 
-1. Open **`.github/PULL_REQUEST_TEMPLATE.md`** and mirror its sections in **`/tmp/pr_body.md`** (or the body file used in Step 10).
-2. Fill **Why?**, **What?**, **How everything was tested?**, optional **Screenshots**, **!Attention Points!**, and tick **Checklist** items only when accurate.
+1. Open **`.cursor/rules/pr_template.mdc`** and build **`/tmp/pr_body.md`** (or the body file used in Step 10) from its structure: **Why?** = first bullet purpose, second bullet `Jira: [link]` only if a ticket exists; then **What?** and the rest.
+2. Apply the numbered **Guidelines** at the top of the rule (**English** for all PR prose; omit empty sections; no “N/A”; drop Screenshots when irrelevant; remove bracketed hints in the final text).
 3. For commands/tests relevant to this repo (when applicable), examples include `make check-style`, `make validate-dag-declaration-files dag_name=<name>` — only list what was run or what CI will run.
 
 ---
@@ -327,6 +332,7 @@ After **create** or **edit**, resolve the canonical browser URL and **show it cl
 
 ## Behavior rules
 
+- **English** for PR title and body (see **`.cursor/rules/pr_template.mdc`**); chat with the user may use their locale.
 - Keep the title short and specific.
 - **Never invent** tickets, file paths, or test results not supported by the diff or user message.
 - Prefer clarity over cleverness.
