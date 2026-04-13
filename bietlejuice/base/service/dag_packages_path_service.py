@@ -383,20 +383,31 @@ class DAGPackagesPathService:
 
     @staticmethod
     def get_data_quality_file_content_in_spark_jobs(
-        dag_name: str, table_name: str, layer: str, intermediate_path: str
+        dag_name: str,
+        table_name: str,
+        layer: str,
+        intermediate_path: str,
+        engine: str = "databricks_volume",
     ):
         """
         Opens the Data Quality file according to the place it is stored (if it is in
-         legacy path or in the DAGs packages)
+         legacy path or in the DAGs packages).
 
-        * Method used only in Databricks *
+        Used from Spark driver jobs (Databricks or EMR). When ``SPARK_RUNTIME=emr``,
+        S3 reads always use ``boto3`` regardless of ``engine``.
 
         :param dag_name: the DAG name
         :param layer: the layer that the file is related to.
         :param table_name: the name of the table that the file is related to
         :param intermediate_path: off intermediate path structure used in some DAGs
+        :param engine: engine on Databricks: "spark", "boto3" or "databricks_volume". On EMR, boto3 is always used.
         :return: the data quality content
         """
+        from bietlejuice.base.spark.runtime_detector import RuntimeDetector
+
+        if RuntimeDetector.is_emr():
+            engine = "boto3"
+
         data_quality_file_path = path.join(
             "data_quality", dag_name, layer, intermediate_path, f"{table_name}.yml"
         )
@@ -404,7 +415,8 @@ class DAGPackagesPathService:
         try:
             data_quality_content = (
                 DAGPackagesPathService._read_dag_package_file_from_s3(
-                    sql_file_relative_path=data_quality_file_path
+                    sql_file_relative_path=data_quality_file_path,
+                    engine=engine,
                 )
             )
         except Exception as e:
@@ -413,7 +425,8 @@ class DAGPackagesPathService:
                     DAGPackagesPathService._read_dag_package_file_from_s3(
                         sql_file_relative_path=data_quality_file_path.replace(
                             "yml", "yaml"
-                        )
+                        ),
+                        engine=engine,
                     )
                 )
             else:

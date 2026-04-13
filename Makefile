@@ -162,6 +162,9 @@ upload-local-init-scripts:
 	@aws s3 cp scripts/init_script.sh \
 		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/init_script.sh \
 		--acl bucket-owner-full-control
+	@aws s3 cp scripts/emr_init_script.sh \
+		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/emr_init_script.sh \
+		--acl bucket-owner-full-control
 	@aws s3 cp scripts/wonka/install_pex_generic.sh \
 		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/install_pex_generic.sh \
 		--acl bucket-owner-full-control

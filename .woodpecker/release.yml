@@ -77,6 +77,19 @@ steps:
       event: [push, tag]
       branch: forno
 
+  export-emr-init-script-to-s3-forno:
+    image: plugins/s3:1.4.0
+    settings:
+      bucket: artifacts.s3.forno.data.quintoandar.com.br
+      source: scripts/emr_init_script.sh
+      target: bi-etl-ejuice/
+      strip_prefix: scripts/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: forno
+
   export-install-pex-init-script-forno:
     image: plugins/s3:1.4.0
     settings:
@@ -128,7 +141,20 @@ steps:
     when:
       event: [push, tag]
       branch: [master, hotfix/*]
- 
+
+  export-emr-init-script-to-s3-prod:
+    image: plugins/s3:1.4.0
+    settings:
+      bucket: artifacts.s3.data.quintoandar.com.br
+      source: scripts/emr_init_script.sh
+      target: bi-etl-ejuice/
+      strip_prefix: scripts/
+      acl: bucket-owner-full-control
+      cache_control: no-cache
+    when:
+      event: [push, tag]
+      branch: [master, hotfix/*]
+
   export-install-pex-init-script-prod:
     image: plugins/s3:1.4.0
     settings:

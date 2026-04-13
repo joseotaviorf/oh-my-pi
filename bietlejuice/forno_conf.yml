@@ -1743,6 +1743,7 @@ emr_cluster_base: &emr_cluster_anchor
                     ARTIFACTS_BUCKET: *artifacts_bucket
                     ENVIRONMENT: "{{ var.value.environment }}"
                     SPARK_RUNTIME: "emr"
+                    SPARK_VERSION: "3.5"
                     DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
                     DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
           Properties: {}
@@ -1762,22 +1763,26 @@ emr_cluster_base: &emr_cluster_anchor
         spark.driverEnv.ARTIFACTS_BUCKET: *artifacts_bucket
         spark.driverEnv.ENVIRONMENT: "{{ var.value.environment }}"
         spark.driverEnv.SPARK_RUNTIME: "emr"
+        spark.driverEnv.SPARK_VERSION: "3.5"
         spark.driverEnv.DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
         spark.driverEnv.DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
         spark.executorEnv.ARTIFACTS_BUCKET: *artifacts_bucket
         spark.executorEnv.ENVIRONMENT: "{{ var.value.environment }}"
         spark.executorEnv.SPARK_RUNTIME: "emr"
+        spark.executorEnv.SPARK_VERSION: "3.5"
         spark.executorEnv.DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
         spark.executorEnv.DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
         spark.yarn.appMasterEnv.ARTIFACTS_BUCKET: *artifacts_bucket
         spark.yarn.appMasterEnv.ENVIRONMENT: "{{ var.value.environment }}"
         spark.yarn.appMasterEnv.SPARK_RUNTIME: "emr"
+        spark.yarn.appMasterEnv.SPARK_VERSION: "3.5"
         spark.yarn.appMasterEnv.DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
         spark.yarn.appMasterEnv.DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
     spark_env_vars:
         ENVIRONMENT: "{{ var.value.environment }}"
         ARTIFACTS_BUCKET: *artifacts_bucket
         SPARK_RUNTIME: "emr"
+        SPARK_VERSION: "3.5"
         DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
         DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
 

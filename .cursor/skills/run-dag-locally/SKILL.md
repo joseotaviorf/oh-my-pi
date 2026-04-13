@@ -106,7 +106,9 @@ This step is the local equivalent of the CI/CD `release.yml` pipeline that runs 
 | Data quality files | `dags/**/data_quality/` | `databricks.s3.forno` | `github-repos/bi-etl-ejuice/data_quality/` |
 | JSON schemas | `dags/**/schemas/` | `databricks.s3.forno` | `github-repos/bi-etl-ejuice/schemas/` |
 | Qube Python modules | `bietlejuice/qube/` | `databricks.s3.forno` | `github-repos/bi-etl-ejuice/bietlejuice/qube/` |
-| Init scripts | `scripts/init_script.sh`, `scripts/wonka/*.sh` | `artifacts.s3.forno` | `bi-etl-ejuice/` |
+| Init scripts | `scripts/init_script.sh`, `scripts/emr_init_script.sh`, `scripts/wonka/*.sh` | `artifacts.s3.forno` | `bi-etl-ejuice/` |
+
+EMR cluster templates point at `bi-etl-ejuice/emr_init_script.sh`; Databricks templates use `bi-etl-ejuice/init_script.sh`. Woodpecker `release.yml` uploads both via `export-init-script-to-s3-*` / `export-emr-init-script-to-s3-*` on forno and prod branches.
 
 ### Decision matrix — upload only what changed
 
@@ -118,7 +120,7 @@ This step is the local equivalent of the CI/CD `release.yml` pipeline that runs 
 | `dags/**/queries/**/*.sql` | Queries | `make upload-local-queries` |
 | `dags/**/data_quality/**/*.yml` | Data quality | `make upload-local-data-quality` |
 | `dags/**/schemas/**/*.json` | Schemas | `make upload-local-schemas` |
-| `scripts/init_script.sh` or `scripts/wonka/*.sh` | Init scripts | `make upload-local-init-scripts` |
+| `scripts/init_script.sh`, `scripts/emr_init_script.sh`, or `scripts/wonka/*.sh` | Init scripts | `make upload-local-init-scripts` |
 | Multiple / unsure | Everything | `make upload-forno-release` |
 
 ### Full Forno release (equivalent to pushing the `forno` branch)
@@ -149,7 +151,7 @@ make upload-local-schemas
 # Qube Python modules only (no cluster restart needed)
 make upload-local-qube-jobs
 
-# Init scripts (init_script.sh + wonka/*.sh) — rarely needed
+# Init scripts (Databricks init_script.sh, EMR emr_init_script.sh, wonka/*.sh) — rarely needed
 make upload-local-init-scripts
 ```
 
