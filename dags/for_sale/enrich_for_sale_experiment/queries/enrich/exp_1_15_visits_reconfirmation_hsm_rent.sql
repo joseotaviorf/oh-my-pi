@@ -17,5 +17,5 @@ FROM
 WHERE
     DATE(v.ts_created) >= DATE('2026-03-10') AND v.business_context='RENT' --Experiment start
     AND ( --Experiment end
-    (v.ts_created::DATE >= DATE('2026-03-10') AND business_context = 'RENT'))
+    (v.ts_created::DATE <= DATE('2026-04-12') AND business_context = 'RENT'))
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11

@@ -27,6 +27,8 @@ WHERE
      (RIGHT(NULLIF(u.main_phone, ''), 3) >= 800 OR RIGHT(NULLIF(u.main_phone, ''), 3) <= 199)
     OR 
     (DATE(v.ts_created) >= DATE('2026-03-31') AND (RIGHT(NULLIF(u.main_phone, ''), 3) >= 650 OR RIGHT(NULLIF(u.main_phone, ''), 3) <= 349))
+    OR 
+    (DATE(v.ts_created) >= DATE('2026-04-13') AND (RIGHT(NULLIF(u.main_phone, ''), 3) >= 500 OR RIGHT(NULLIF(u.main_phone, ''), 3) <= 499))
     )   
     AND ( --Experiment end
     (v.ts_created::DATE >= DATE('2026-03-20') AND business_context = 'SALE'))
