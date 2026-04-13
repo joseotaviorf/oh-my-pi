@@ -235,4 +235,11 @@ def get_query_template_params(execution_date: str, additional_query_template_par
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        try:
+            if RuntimeDetector.is_emr():
+                spark.stop()
+        except NameError:
+            pass

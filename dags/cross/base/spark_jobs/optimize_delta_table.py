@@ -89,4 +89,11 @@ def get_full_table_name(schema: str, layer: LayerEnum, table_name: str) -> str:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        try:
+            if RuntimeDetector.is_emr():
+                spark.stop()
+        except NameError:
+            pass

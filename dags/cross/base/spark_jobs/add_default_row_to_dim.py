@@ -15,8 +15,8 @@ JOB_NAME = "add_default_row_to_dim"
 
 logger = QuintoAndarLogger(JOB_NAME)
 
-if __name__ == "__main__":
 
+def main():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("dw_bucket")
@@ -65,3 +65,14 @@ if __name__ == "__main__":
             layer=args.layer,
         )
     default_row_addition_pipeline.run()
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    finally:
+        try:
+            if RuntimeDetector.is_emr():
+                spark.stop()
+        except NameError:
+            pass

@@ -400,7 +400,8 @@ def propagate_raw_metadata(
 
 base_logger = set_logger(JOB_NAME)
 
-if __name__ == "__main__":
+
+def main():
     parser = ArgumentParser(JOB_NAME)
     parser.add_argument("bucket", type=str)
     parser.add_argument("layer", type=str)
@@ -524,3 +525,14 @@ if __name__ == "__main__":
 
     if exceptions:
         raise Exception(exceptions)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    finally:
+        try:
+            if RuntimeDetector.is_emr():
+                spark.stop()
+        except NameError:
+            pass

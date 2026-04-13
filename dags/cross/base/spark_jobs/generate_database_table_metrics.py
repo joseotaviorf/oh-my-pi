@@ -152,4 +152,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        try:
+            if RuntimeDetector.is_emr():
+                spark.stop()
+        except NameError:
+            pass

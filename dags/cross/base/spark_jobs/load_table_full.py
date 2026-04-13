@@ -18,8 +18,8 @@ JOB_NAME = "load_table"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-if __name__ == "__main__":
 
+def main():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod values")
     parser.add_argument("datalake_bucket", type=str, help="datalake bucket")
@@ -157,7 +157,6 @@ if __name__ == "__main__":
     else:
         table_privileges = TablePrivileges.from_environment_default(f"{database_name}.{table_name}")
 
-
     table_loader_pipeline = FullTableLoaderPipeline(
         database_name=database_name,
         table_name=table_name,
@@ -172,3 +171,14 @@ if __name__ == "__main__":
         table_privileges=table_privileges,
     )
     table_loader_pipeline.run()
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    finally:
+        try:
+            if RuntimeDetector.is_emr():
+                spark.stop()
+        except NameError:
+            pass

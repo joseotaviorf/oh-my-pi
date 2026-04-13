@@ -1,8 +1,12 @@
 import logging
 import json
 from argparse import ArgumentParser, Namespace
+
 from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.pipeline.data_quality_tests_pipeline import DataQualityTestsPipeline
 from bietlejuice.services import ConfigurationService
 
@@ -34,6 +38,8 @@ def parse_args():
     parser.add_argument(
         "intermediate_path",
         type=str,
+        nargs="?",
+        default="",
         help="partial path used in some DAGs off of our pattern",
     )
 
@@ -41,7 +47,16 @@ def parse_args():
 
 
 def can_run_data_quality_in_this_cluster() -> bool:
-    # Pydequu is not compatible with Unity Catalog in Shared mode
+    """
+    Decide whether PyDeequ can run in this driver process.
+
+    - EMR (``SPARK_RUNTIME=emr``): always run in-process; no UC shared restriction.
+    - Databricks single-user UC: run in-process.
+    - Databricks shared UC: defer to the Kafka consumer on a single-user cluster.
+    """
+    if RuntimeDetector.is_emr():
+        return True
+    # PyDeequ is not compatible with Unity Catalog in Shared mode
     return (
         spark.conf.get("spark.databricks.clusterUsageTags.clusterUnityCatalogMode")
         == "SINGLE_USER"
@@ -50,9 +65,19 @@ def can_run_data_quality_in_this_cluster() -> bool:
 
 def publish_data_quality_request_to_kafka(args: Namespace) -> None:
     """
-    We have a separate job that runs in a single-user cluster (compatible with Pydequu).
+    We have a separate job that runs in a single-user cluster (compatible with PyDeequ).
     This function publishes a message to a Kafka topic that that job listens to.
+
+    Uses :class:`BaseDBUtils` so secrets resolve on EMR (AWS Secrets Manager facade)
+    and on Databricks (native ``dbutils``).
     """
+
+    dbutils = BaseDBUtils().get_dbutils()
+    if dbutils is None:
+        raise RuntimeError(
+            "dbutils is not available; cannot publish data quality request to Kafka. "
+            "On EMR set SPARK_RUNTIME=emr and ensure the EMR secrets facade is configured."
+        )
 
     broker = dbutils.secrets.get(
         scope="quintoandar", key="DATABRICKS_DATA_QUALITY_BOOTSTRAP"
@@ -107,6 +132,12 @@ def publish_message(message: str, topic: str, broker: str, key: str, secret: str
 
 
 def main() -> None:
+    global spark
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+
+        spark = create_emr_spark_session(JOB_NAME)
+
     args = parse_args()
 
     if can_run_data_quality_in_this_cluster():
@@ -129,4 +160,12 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    finally:
+        try:
+            if RuntimeDetector.is_emr():
+                spark.sparkContext._gateway.shutdown_callback_server()
+                spark.stop()
+        except NameError:
+            pass
