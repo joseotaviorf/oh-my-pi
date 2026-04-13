@@ -383,16 +383,6 @@ columns:
 
 **Valid domains:** `3P Partners`, `Agents`, `Cross`, `Data Science`, `For Rent`, `For Sale`, `Governance`, `Growth`, `MLOps`, `People`, `Platform`, `QCX`, `Support and Service`, `Tech Platform`
 
-## Step 4b — Personal data classification
-
-For every column in every metadata YAML created in Step 4, assess whether it contains data about an identifiable natural person. If so, set `personal_data_classification` to the appropriate tier. For the full classification reference, follow the `governance_metadata` rule:
-
-- `sensitive`: LGPD Art. 11 (racial origin, health, biometric, political, religion, etc.) — requires `table_privileges` in the declaration
-- `highly_personal`: financial/legal (credit, bank, criminal) — recommend `table_privileges`
-- `personal`: standard PII (name, CPF, email, phone, address, birth date)
-
-Apply the same classification consistently across all layers for the same logical column (raw → clean → enrich → dw).
-
 ---
 
 ## Step 5 — Validate
@@ -448,9 +438,6 @@ Add a `data_quality` file for all tables where data correctness is business-crit
 - [ ] `make validate-dag-declaration-files` passes
 - [ ] `make validate-metadata-files-content` passes
 - [ ] Task count under 100 (job cluster workflows)
-- [ ] Columns containing personal data carry `personal_data_classification` in metadata
-- [ ] Sensitive/Highly Personal columns have `table_privileges` set in the DAG declaration
-- [ ] LGPD legal basis confirmed (with the data owner) for any `sensitive` column
 - [ ] `default_extraction_type: full` included in workflow section (only for query_delta, custom_ingestion, core_model workflows; user can change to `incremental` if needed)
 - [ ] `default_partitions: []` included in workflow section (only for query_delta, custom_ingestion, core_model workflows; user informed to update if tables are partitioned)
 
