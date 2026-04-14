@@ -1,0 +1,37 @@
+---
+dag:
+  name: enrich_pricing_agent
+  owner: Data Growth
+  catchup: false
+  schedule_interval: 0 3 * * *
+  schedule_start_date: 2025, 1, 1
+  documentation:
+    dag_purpose: |
+      Enrich pricing agent interaction state tracker. Keeps the state of the interaction for each listing.
+      Builds tables from Langfuse classifications and WhatsApp HSM message counts via PySpark ETL.
+
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: pricing_agent
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{load_start_date}"
+  tables_customization:
+    interaction_state_tracker:
+      load_spark_job: load_interaction_state_tracker
+
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

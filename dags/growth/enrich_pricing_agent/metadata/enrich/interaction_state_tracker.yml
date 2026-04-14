@@ -1,0 +1,65 @@
+---
+database_name: datalake_pricing_agent
+table_name: interaction_state_tracker
+description: |
+  One row per (business_context, id_house, id_user) with the latest pricing agent interaction state.
+  Built from Langfuse PricingStateClassification scores joined with WhatsApp HSM message counts.
+  ASP-allocated houses are excluded. Merged on (business_context, id_house, id_user).
+domain: Growth
+owner: bruna.prates@quintoandar.com.br
+columns:
+  id_house:
+    lineage:
+      - datalake_langfuse_clean.scores.metadata
+    description: Unique identifier of the house associated with the interaction.
+  id_user:
+    lineage:
+      - datalake_langfuse_clean.scores.metadata
+    description: Unique identifier of the user (agent) associated with the interaction.
+  business_context:
+    lineage:
+      - datalake_langfuse_clean.scores.metadata
+    description: Business context of the pricing interaction.
+    categories:
+      RENT: The price interaction was performed in the context of rental.
+      SALE: The price interaction was performed in the context of sale.
+  interaction_state:
+    lineage:
+      - datalake_langfuse_clean.scores.string_value
+    description: Classification label assigned by the pricing AI to the agent interaction state (e.g. follow-up class).
+  house_ownership:
+    lineage:
+      - datalake_langfuse_clean.scores.metadata
+    description: Ownership type of the house at the time of the interaction.
+    categories:
+      STANDARD: The listing is standard, owned by QuintoAndar's platform.
+      THIRD_PARTY: The listing is third party, owned by a partner real estate agency.
+  sale_price:
+    lineage:
+      - datalake_langfuse_clean.scores.metadata
+    description: Sale price of the house as recorded in the interaction metadata.
+  calculator_p70_price:
+    lineage:
+      - datalake_langfuse_clean.scores.metadata
+    description: P70 price from the pricing calculator as recorded in the interaction metadata.
+  rent_price:
+    lineage:
+      - datalake_langfuse_clean.scores.metadata
+    description: Rent price of the house as recorded in the interaction metadata.
+  calculator_p90_price:
+    lineage:
+      - datalake_langfuse_clean.scores.metadata
+    description: P90 price from the pricing calculator as recorded in the interaction metadata.
+  hsm_count:
+    lineage:
+      - datalake_copilot_service_clean.message
+    description: Total count of HARDCODED WhatsApp HSM messages sent in the WHATSAPP_PRICING_AI_CHAT channel for this house and user.
+  hsm_detailed_count:
+    lineage:
+      - datalake_copilot_service_clean.message
+      - datalake_copilot_service_clean.state
+    description: Map of HSM template name to message count, capturing the breakdown of HSM messages by template for this house and user.
+  dt_state:
+    lineage:
+      - datalake_langfuse_clean.scores.metadata
+    description: Date of the first message in the most recent session, derived from first_message_ts.

@@ -1,0 +1,44 @@
+# Data quality rules for interaction_state_tracker.
+# Used by the DataQualityTestsPipeline (PyDeequ/inmetro). Same semantics as
+# pre-persist validation in load_interaction_state_tracker (validate_before_write).
+# Severity: Error = fail pipeline; Warning = log and continue.
+---
+table_name: datalake_pricing_agent.interaction_state_tracker
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  id_house:
+    is_complete:
+      severity_level: Error
+  id_user:
+    is_complete:
+      severity_level: Error
+    custom:
+      # Ensure the merge key (business_context, id_house, id_user) has no duplicates
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT business_context, id_house, id_user
+          FROM datalake_pricing_agent.interaction_state_tracker
+          GROUP BY business_context, id_house, id_user
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - RENT
+        - SALE
+      severity_level: Error
+  interaction_state:
+    is_complete:
+      severity_level: Error
+  dt_state:
+    is_complete:
+      severity_level: Error
