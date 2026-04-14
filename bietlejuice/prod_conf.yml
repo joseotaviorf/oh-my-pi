@@ -148,7 +148,7 @@ cluster_template:
             - s3:
                   destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
                   region: ""
-        spark_conf:
+        spark_conf: &spark_conf_base
             spark.rpc.message.maxSize: "2000"
             spark.sql.sources.partitionOverwriteMode: dynamic
             spark.sql.parquet.filterPushdown: "true"
@@ -1447,6 +1447,7 @@ databricks_16_4_small_general_fleet_xlarge_single_node:
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
+        <<: *spark_conf_base
         spark.databricks.cluster.profile: "singleNode"
         spark.master: "local[*]"
     custom_tags:
@@ -1462,6 +1463,7 @@ databricks_16_4_small_general_fleet_2xlarge_single_node:
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
+        <<: *spark_conf_base
         spark.databricks.cluster.profile: "singleNode"
         spark.master: "local[*]"
     custom_tags:
@@ -1477,6 +1479,7 @@ databricks_16_4_small_general_fleet_4xlarge_single_node:
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
+        <<: *spark_conf_base
         spark.databricks.cluster.profile: "singleNode"
         spark.master: "local[*]"
     custom_tags:
