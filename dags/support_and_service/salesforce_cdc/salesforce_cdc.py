@@ -106,7 +106,7 @@ def create_start_end_operator(task_id: str):
     )
     return start, end
 
-  
+
 jiraops_callback = JiraOpsCallback()
 webhook_salesforce_cdc = CONFIG_SERVICE.get_config("webhook_salesforce_cdc")
 gchat_callback = GchatCallback(webhook_url_variable=webhook_salesforce_cdc)
@@ -114,7 +114,7 @@ gchat_callback = GchatCallback(webhook_url_variable=webhook_salesforce_cdc)
 default_args = {
     "owner": "Data SS",
     "email_on_retry": False,
-    "retries": 1,
+    "retries": 3,
     "on_failure_callback": gchat_callback.task_failure_alert,
     #TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
     # "on_failure_callback": jiraops_callback.task_failure_alert,
