@@ -242,3 +242,15 @@ column_level_validations:
 - [ ] **DW dimensions**: Non-SK columns use `has_null_count` with `less_than_or_equal_to: 1` (not `is_complete`) due to the -1 unknown row
 - [ ] `custom` validations have a comment above explaining what is being validated
 - [ ] `is_contained_in` used only when nulls are not allowed (otherwise use `custom`)
+
+## Pre-merge: run custom constraints against Trino
+
+The inmetro framework (PyDeequ/Databricks) validates constraints at DAG runtime — not at development time. **Before merging any DW or Enrich SQL change, run every `custom` constraint from the YAML directly against Trino.** This catches referential integrity failures that would otherwise only surface as DataHub assertion failures after the first prod run.
+
+How to validate depends on whether the target table already exists:
+
+- **Table already exists** (modifying SQL) → run each `constraint` directly against the live Trino table. It must return `true` (e.g. `COUNT(*) = 0` returns 0).
+- **New table, but source tables exist** → wrap the full query as a CTE and substitute the CTE name for the table name in each constraint. This validates the SQL logic before anything is materialized — no Forno run needed.
+- **New table, sources don't exist yet** → Forno DAG run before merge is the only gate.
+
+This is especially critical for `sk_*` FK constraints — surrogate key mismatches produce 0% match rates and fail silently until DataHub reports them.

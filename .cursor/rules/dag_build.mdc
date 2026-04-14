@@ -794,3 +794,12 @@ workflow:
 - [ ] `debezium_signal` NOT in `tables_customization`
 - [ ] `dbutils_secret_key` uses uppercase if specified (e.g. `EBDB_DB`)
 - [ ] DAG tested on Forno Airflow before merging PR
+
+### DW / Enrich SQL (mandatory before marking done)
+- [ ] Every `sk_*` FK traced end-to-end across layers: the hash input in the fact SQL and in the dimension SQL must be the **same source identifier** — two IDs referring to the same entity but with different string formats produce different SHA2 values and break all joins silently
+- [ ] All `custom` referential integrity constraints from `data_quality/dw/*.yml` validated against Trino before merge:
+  - **Table already exists** → run constraints directly against the live table
+  - **New table, sources exist** → wrap the full query as a CTE and run constraints against the CTE output (validates logic before materialization — no Forno run needed)
+  - **New table, sources don't exist yet** → Forno DAG run before merge is the gate
+- [ ] Row count verified after any new JOIN — must equal the source row count (no fanout)
+- [ ] Nullable `sk_*` FKs use `COALESCE(SHA2(...), '-1')` to route unresolved members to the dimension's unknown row

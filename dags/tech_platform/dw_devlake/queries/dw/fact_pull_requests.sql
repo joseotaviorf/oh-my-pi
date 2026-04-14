@@ -100,8 +100,8 @@ comment_stats AS (
 SELECT
     SHA2(pr.id_pr, 256)             AS sk_pr,
     SHA2(pr.id_repo, 256)           AS sk_repo,
-    SHA2(pr.id_author_user, 256)    AS sk_author_user,
-    SHA2(pr.id_merged_by_user, 256) AS sk_merged_by_user,
+    COALESCE(SHA2(pr.id_author_user, 256), '-1')    AS sk_author_user,
+    COALESCE(SHA2(pr.id_merged_by_user, 256), '-1') AS sk_merged_by_user,
     SHA2(pt.id_team, 256)           AS sk_team,
     CAST(
         DATE_FORMAT(CAST(pr.ts_created AS DATE), 'yyyyMMdd') AS INT
