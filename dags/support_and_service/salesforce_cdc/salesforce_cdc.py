@@ -37,6 +37,7 @@ BIETLEJUICE_REPO_PATH = CONFIG_SERVICE.get_config("databricks_bietlejuice_repo_p
 BASE_SPARK_JOB_PATH = f"{BIETLEJUICE_REPO_PATH}/spark_jobs/{DAG_NAME}/"
 BASE_SPARK_JOBS_PATH = f"{BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
 RELATIVE_DAG_PATH = "dags/support_and_service/salesforce_cdc"
+EVENTS_CONFIG = CONFIG_SERVICE.get_config("events_config")
 
 # Use config and DAG constants so the DAG works without requiring Airflow Variables
 # (bucket/dag_name/environment). Config is loaded per environment (forno_conf vs prod_conf).
@@ -105,25 +106,8 @@ def create_start_end_operator(task_id: str):
     )
     return start, end
 
-
-
-EVENTS_CONFIG = {
-    #TODO: Add all events
-    "case": {
-        "event_path": "raw/salesforce/CaseEvent",
-        "threshold_time_hours": 24,
-    },
-    "email_message": {
-        "event_path": "raw/salesforce/EmailMessageEvent",
-        "threshold_time_hours": 24,
-    },
-    "user": {
-        "event_path": "raw/salesforce/UserEvent",
-        "threshold_time_hours": 24,
-    }
-}
-
-
+  
+jiraops_callback = JiraOpsCallback()
 webhook_salesforce_cdc = CONFIG_SERVICE.get_config("webhook_salesforce_cdc")
 gchat_callback = GchatCallback(webhook_url_variable=webhook_salesforce_cdc)
 
@@ -156,20 +140,15 @@ with DAG(
 
     for event, parameters in EVENTS_CONFIG.items():
         event_table = f"events_{event.lower()}"
-        execute_job_cluster >> create_sst_task(
+        threshold_time_hours = parameters.get("threshold_time_hours", 24)
+
+        raw_task = create_sst_task(
             target_schema="datalake_salesforce_raw",
             target_table=event_table,
             entry_point="cdc_raw_ingestion",
             parameters=parameters,
-        ) >> create_sst_task(
-            target_schema="datalake_salesforce_raw",
-            target_table=event_table,
-            entry_point="generic_quality_checks",
-            parameters={
-                "threshold_time_hours": parameters["threshold_time_hours"],
-            },
-            task_id=f"contract_quality_checks_raw_{event_table}",
-        ) >> create_sst_task(
+        )
+        clean_task = create_sst_task(
             target_schema="datalake_salesforce_clean",
             target_table=event_table,
             entry_point="cdc_clean",
@@ -177,14 +156,29 @@ with DAG(
                 "source_schema": "datalake_salesforce_raw",
                 "sync_hive": "True",
             },
-        ) >> create_sst_task(
-            target_schema="datalake_salesforce_clean",
-            target_table=event_table,
-            entry_point="generic_quality_checks",
-            parameters={
-                "threshold_time_hours": parameters["threshold_time_hours"],
-            },
-            task_id=f"contract_quality_checks_clean_{event_table}",
-        ) >> end
+        )
+
+        if parameters.get("skip_quality_contracts", False):
+            execute_job_cluster >> raw_task >> clean_task >> end
+        else:
+            quality_contract_raw = create_sst_task(
+                target_schema="datalake_salesforce_raw",
+                target_table=event_table,
+                entry_point="generic_quality_checks",
+                parameters={
+                    "threshold_time_hours": threshold_time_hours,
+                },
+                task_id=f"quality_contract_checks_raw_{event_table}",
+            )
+            quality_contract_clean = create_sst_task(
+                target_schema="datalake_salesforce_clean",
+                target_table=event_table,
+                entry_point="generic_quality_checks",
+                parameters={
+                    "threshold_time_hours": threshold_time_hours,
+                },
+                task_id=f"quality_contract_checks_clean_{event_table}",
+            )
+            execute_job_cluster >> raw_task >> quality_contract_raw >> clean_task >> quality_contract_clean >> end
 
     start >> execute_job_cluster
