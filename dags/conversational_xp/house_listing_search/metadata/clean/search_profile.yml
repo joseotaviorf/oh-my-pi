@@ -1,0 +1,35 @@
+---
+database_name: datalake_house_listing_search_clean
+table_name: search_profile
+owner: brandell.ferreira@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores saved search profiles in the House Listing Search service, keyed by an external UUID and by holder plus business context"
+columns:
+  id:
+    description: "Surrogate primary key for the search profile row in the transactional database"
+    lineage:
+    - datalake_house_listing_search_raw.search_profile.id
+  uuid_external_id:
+    description: "Stable external UUID that identifies the search profile outside the transactional database"
+    lineage:
+    - datalake_house_listing_search_raw.search_profile.external_id
+  id_profile_holder:
+    description: "Opaque identifier of the profile holder in the source system (for example a user id when profile_holder_type is a user entity)"
+    lineage:
+    - datalake_house_listing_search_raw.search_profile.profile_holder_id
+  profile_holder_type:
+    description: "Type of the profile holder entity that id_profile_holder refers to in the House Listing Search domain model"
+    lineage:
+    - datalake_house_listing_search_raw.search_profile.profile_holder_type
+  business_context:
+    description: "Business context in which the search profile applies (for example rent versus sale flows)"
+    lineage:
+    - datalake_house_listing_search_raw.search_profile.business_context
+  ts_created:
+    description: "Timestamp when the search profile row was first created in the source database"
+    lineage:
+    - datalake_house_listing_search_raw.search_profile.created_at
+  ts_updated:
+    description: "Timestamp when the search profile row was last updated in the source database"
+    lineage:
+    - datalake_house_listing_search_raw.search_profile.updated_at

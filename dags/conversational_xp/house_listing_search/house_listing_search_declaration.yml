@@ -17,6 +17,9 @@ workflow:
     recommendation: {}
     recommendation_user_use_case: {}
     recommendation_use_case: {}
+    search_profile: {}
+    search_profile_filters: {}
+    search_profile_description: {}
 
 cluster:
   type: custom_cluster

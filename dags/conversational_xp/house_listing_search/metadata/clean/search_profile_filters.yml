@@ -1,0 +1,31 @@
+---
+database_name: datalake_house_listing_search_clean
+table_name: search_profile_filters
+owner: brandell.ferreira@quintoandar.com.br
+domain: Conversational XP
+description: "This table stores the JSON search filters and usage counters linked one-to-one to each search profile in the House Listing Search service"
+columns:
+  id:
+    description: "Surrogate primary key for the search profile filters row in the transactional database"
+    lineage:
+    - datalake_house_listing_search_raw.search_profile_filters.id
+  id_search_profile:
+    description: "Foreign key to the parent search profile (matches search_profile.id in the source database)"
+    lineage:
+    - datalake_house_listing_search_raw.search_profile_filters.search_profile_id
+  filters_json:
+    description: "JSON document with the search filter payload associated to the profile (may include location and preference signals)"
+    lineage:
+    - datalake_house_listing_search_raw.search_profile_filters.filters
+  events_count:
+    description: "Number of recorded events associated with this filter snapshot in the source application"
+    lineage:
+    - datalake_house_listing_search_raw.search_profile_filters.events_count
+  ts_created:
+    description: "Timestamp when the filters row was first created in the source database"
+    lineage:
+    - datalake_house_listing_search_raw.search_profile_filters.created_at
+  ts_updated:
+    description: "Timestamp when the filters row was last updated in the source database"
+    lineage:
+    - datalake_house_listing_search_raw.search_profile_filters.updated_at
