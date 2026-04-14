@@ -21,7 +21,7 @@ workflow:
     addendums:
       clean_table_name: addendums
       raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]    
+      clean_primary_keys: ["id"]
     address_data:
       clean_table_name: address_data
       raw_primary_keys: ["id"]
@@ -361,11 +361,11 @@ workflow:
     screening_negotiation:
       clean_table_name: screening_negotiation
       raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]    
+      clean_primary_keys: ["id"]
     screening_note:
       clean_table_name: screening_note
       raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]      
+      clean_primary_keys: ["id"]
     screening_seller:
       clean_table_name: screening_seller
       raw_primary_keys: ["id"]
@@ -466,8 +466,8 @@ cluster:
   type: custom_cluster
   custom_configurations:
     driver_node_type_id: m5a.4xlarge
-    node_type_id: m5a.2xlarge
+    node_type_id: c5a.2xlarge
     num_workers: 3
     spark_version: 16.4.x-scala2.12
     aws_attributes:
-        ebs_volume_size: 200
+      ebs_volume_size: 200

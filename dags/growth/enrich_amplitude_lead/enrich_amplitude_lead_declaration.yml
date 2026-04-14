@@ -11,12 +11,14 @@ workflow:
   type: query_delta
   layer: enrich
 cluster:
-  type: databricks_16_4_max_io-memory_photon_cluster
-  databricks_conn_id: databricks_new_env
+  type: custom_cluster
   custom_configurations:
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: c5a.xlarge
+    spark_version: 16.4.x-scala2.12
+    num_workers: 4
     single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
-    aws_attributes:
-      availability: ON_DEMAND
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new_env

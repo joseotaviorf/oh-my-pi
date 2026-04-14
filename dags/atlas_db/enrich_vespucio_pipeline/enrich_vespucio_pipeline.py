@@ -62,6 +62,9 @@ CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_n
 CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
     "quintoandar_{{ var.value.environment }}"
 )
+CLUSTER_DESCRIPTION["driver_node_type_id"] = "r5a.4xlarge"
+CLUSTER_DESCRIPTION["node_type_id"] = "c5a.4xlarge"
+CLUSTER_DESCRIPTION["num_workers"] = 6
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
