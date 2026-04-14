@@ -128,7 +128,8 @@ default_args = {
     "owner": "Data SS",
     "email_on_retry": False,
     "retries": 1,
-    "on_failure_callback": jiraops_callback.task_failure_alert,
+    #TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
+    # "on_failure_callback": jiraops_callback.task_failure_alert,
 }
 with DAG(
     dag_id=DAG_ID,
@@ -137,7 +138,8 @@ with DAG(
     start_date=datetime(2026, 3, 12),
     catchup=False,
     tags=["SST", "SF", "salesforce"],  # better formatting
-    on_failure_callback=jiraops_callback.dag_failure_alert,
+    #TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
+    # on_failure_callback=jiraops_callback.dag_failure_alert,
     max_active_runs=1,
  ) as dag:
 
