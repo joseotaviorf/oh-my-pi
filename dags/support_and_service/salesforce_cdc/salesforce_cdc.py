@@ -19,6 +19,7 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
 )
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.notification.gchat_callback import GchatCallback
 from bietlejuice.services.configuration_service import ConfigurationService
 from databricks_plugin import (
     QuintoAndarDatabricksCheckJobTaskOperator,
@@ -123,11 +124,14 @@ EVENTS_CONFIG = {
 }
 
 
-jiraops_callback = JiraOpsCallback()
+webhook_salesforce_cdc = CONFIG_SERVICE.get_config("webhook_salesforce_cdc")
+gchat_callback = GchatCallback(webhook_url_variable=webhook_salesforce_cdc)
+
 default_args = {
     "owner": "Data SS",
     "email_on_retry": False,
     "retries": 1,
+    "on_failure_callback": gchat_callback.task_failure_alert,
     #TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
     # "on_failure_callback": jiraops_callback.task_failure_alert,
 }
@@ -138,6 +142,7 @@ with DAG(
     start_date=datetime(2026, 3, 12),
     catchup=False,
     tags=["SST", "SF", "salesforce"],  # better formatting
+    on_failure_callback=gchat_callback.dag_failure_alert,
     #TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
     # on_failure_callback=jiraops_callback.dag_failure_alert,
     max_active_runs=1,

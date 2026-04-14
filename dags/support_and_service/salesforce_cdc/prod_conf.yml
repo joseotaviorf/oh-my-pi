@@ -1,3 +1,6 @@
+# Create Airflow variable named WEBHOOK_SALESFORCE_CDC_PROD whose value is the Google Chat incoming webhook URL.
+webhook_salesforce_cdc: WEBHOOK_SALESFORCE_CDC_PROD
+
 dag_documentation:
   dag_purpose:
     "Salesforce Ingestion DAG responsible for ingesting data from Salesforce into the Data Lake.
