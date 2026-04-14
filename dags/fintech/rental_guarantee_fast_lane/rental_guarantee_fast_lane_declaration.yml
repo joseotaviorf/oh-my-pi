@@ -21,5 +21,5 @@ workflow:
       extraction_type: incremental
       partitions: [year, month, day]
 cluster:
-  type: databricks_16_4_small_general_fleet_xlarge_single_node
+  type: databricks_16_4_rfleet_instance_cluster
   databricks_conn_id: databricks_new
