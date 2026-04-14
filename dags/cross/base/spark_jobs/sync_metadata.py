@@ -265,7 +265,7 @@ def propagate_metadata(layer, metadata_type, db_name_part, table_name):
 
 
 # propagate RAW metadata helper function
-def _get_all_tables_metadata(spark_metastore_helper, metadata_type, relative_file_path):
+def _get_all_tables_metadata(spark_metastore_helper, metadata_type, relative_file_path, layer):
     """
     Fetches all database tables metadata for the specified metadata type (tags or lineage)
     This metadata will be shared during the parallelized processing of table names RDD.
@@ -370,7 +370,7 @@ def propagate_raw_metadata(
     spark_ms.validate_table_arguments()
 
     tables_metadata = _get_all_tables_metadata(
-        spark_ms, metadata_type, relative_file_path
+        spark_ms, metadata_type, relative_file_path, layer
     )
     spark_table_names = list(tables_metadata.keys())
 
