@@ -5,7 +5,7 @@ dag:
   owner: Data ForRent
   documentation:
     dag_purpose: |
-      <<TEST>> High-frequency DAG containing tables from rental flow context that are running every 30 minutes. 
+      <<TEST>> High-frequency DAG containing tables from rental flow context that are running every 30 minutes.
       This DAG provides fast data ingestion for onboarding and rental process monitoring in a test environment.
 workflow:
   type: cdc
@@ -24,5 +24,5 @@ workflow:
   extra_query_template_params:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
 cluster:
-  type: databricks_16_4_rfleet_instance_cluster
+  type: databricks_16_4_small_general_fleet_xlarge_single_node
   databricks_conn_id: databricks_new
