@@ -1,4 +1,50 @@
+/*
+ * fact_compensations — grain and design notes
+ *
+ * Grain: one row per approved salary record × assignment job period × dim_job validity window.
+ * A single salary entry can produce multiple rows when the employee's job changes mid-salary
+ * or when dim_job receives a new SCD2 version while the salary is still open.
+ *
+ * Transfer-continuation:
+ *   All GLB_TRANSFER continuity logic lives in datalake_people.identifier_mapping.
+ *   id_continuous_employment_cycle groups every assignment that belongs to the same
+ *   uninterrupted employment spell; it resets only on true rehire.
+ *   No transfer logic is reimplemented here.
+ *
+ * Tenure anchors:
+ *   - Company : dt_original_hired from identifier_mapping (respects transfer continuity).
+ *   - Position: start of the current job stint within the cycle (gaps-and-islands on id_job).
+ *               A→B→A returns a stint from the return date, not the original start.
+ *   - Band    : start of the current band stint within the cycle (gaps-and-islands on band
+ *               from dim_job). Band can be < position when a job is reclassified to a
+ *               different band without the employee changing roles (dim_job SCD2 update).
+ *
+ * CTE pipeline:
+ *   [assignment chain]
+ *     assignment_identifier_mapping   — one row per id_assignment with its cycle id
+ *     assignment_history_base         — all_assignments deduplicated per (assignment, date range)
+ *     assignment_job_groups           — detect job changes within an assignment (gaps-and-islands)
+ *     assignment_history              — one row per continuous job period per assignment
+ *     assignment_history_with_band    — enrich assignment history with band from dim_job
+ *     assignment_job_stint_groups     — detect job change across assignments within same cycle
+ *     job_tenure_start                — one row per (person, cycle, job, stint)
+ *     assignment_band_stint_groups    — detect band change across assignments within same cycle
+ *     band_tenure_start               — one row per (person, cycle, band, stint)
+ *
+ *   [salary chain]
+ *     salary_with_person              — approved salaries joined to identifier_mapping
+ *     salary_with_assignment_job      — split salary periods by job changes
+ *     salary_with_job_version         — split salary periods by dim_job SCD2 windows
+ *     salary_enriched                 — attach event_definition; null adjustments on split rows
+ *     salary_consolidation_base       — normalise NULL dt_ended to 4712-12-31
+ *     salary_consolidation_groups     — detect consecutive identical salary records (gaps-and-islands)
+ *     salary_consolidated             — collapse identical consecutive records into one row
+ *     salary_with_reference           — add dt_reference = LEAST(CURRENT_DATE, dt_valid_to)
+ */
 WITH salary_with_person AS (
+    -- Approved salaries enriched with person identifiers and cycle metadata from identifier_mapping.
+    -- dt_original_hired is the hire date for the current continuous employment cycle;
+    -- it is used directly as the company tenure anchor in the final SELECT.
     SELECT
         sal.id_salary,
         sal.id_person,
@@ -8,8 +54,10 @@ WITH salary_with_person AS (
         sal.id_action_reason,
         sal.id_action_occurrence,
         im.id_period_of_service,
+        im.id_continuous_employment_cycle,
         im.person_number,
         im.assignment_number,
+        im.dt_original_hired,
         sal.currency_code,
         sal.salary_amount,
         sal.annual_salary,
@@ -29,29 +77,15 @@ WITH salary_with_person AS (
     WHERE
         sal.is_salary_approved = TRUE
         AND sal.dt_started <= CURRENT_DATE
-),
-transfer_continuation_periods AS (
-    SELECT
-        aa_next.id_period_of_service AS id_period_of_service
-    FROM
-        datalake_pin_core_clean.all_assignments AS aa
-    INNER JOIN
-        datalake_pin_core_clean.all_assignments AS aa_next
-            ON aa_next.id_person = aa.id_person
-            AND aa_next.assignment_sequence = aa.assignment_sequence + 1
-    WHERE
-        aa.assignment_status_type = 'INACTIVE'
-        AND aa.action_code = 'GLB_TRANSFER'
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY aa_next.id_period_of_service
-            ORDER BY aa.dt_effective_started ASC
-        ) = 1
+        AND im.assignment_number NOT LIKE 'P%'
 ),
 assignment_identifier_mapping AS (
+    -- Stable mapping from id_assignment to id_continuous_employment_cycle.
+    -- QUALIFY picks the earliest dt_started in case an assignment appears in multiple
+    -- identifier_mapping rows (edge case from partial loads).
     SELECT
         id_assignment,
-        id_period_of_service
+        id_continuous_employment_cycle
     FROM
         datalake_people.identifier_mapping
     QUALIFY
@@ -61,26 +95,21 @@ assignment_identifier_mapping AS (
         ) = 1
 ),
 assignment_history_base AS (
+    -- Deduplicated assignment history: one row per (assignment, effective date range),
+    -- keeping the highest effective_sequence / object_version_number to resolve Oracle
+    -- correction rows that share the same date range.
     SELECT
         aa.id_person,
         aa.id_assignment,
         aa.id_job,
         aa.dt_effective_started,
         aa.dt_effective_ended,
-        im.id_period_of_service,
-        CASE
-            WHEN tcp.id_period_of_service IS NOT NULL
-            THEN TRUE
-            ELSE FALSE
-        END AS is_transfer_continuation
+        im.id_continuous_employment_cycle
     FROM
         datalake_pin_core_clean.all_assignments AS aa
     LEFT JOIN
         assignment_identifier_mapping AS im
             ON aa.id_assignment = im.id_assignment
-    LEFT JOIN
-        transfer_continuation_periods AS tcp
-            ON im.id_period_of_service = tcp.id_period_of_service
     WHERE
         aa.id_job IS NOT NULL
         AND aa.assignment_number NOT LIKE 'P%'
@@ -96,11 +125,12 @@ assignment_history_base AS (
         ) = 1
 ),
 assignment_job_groups AS (
+    -- Detect job changes within a single assignment using gaps-and-islands.
+    -- A new group starts when id_job changes or there is a date gap.
     SELECT
         id_person,
         id_assignment,
-        id_period_of_service,
-        is_transfer_continuation,
+        id_continuous_employment_cycle,
         id_job,
         dt_effective_started,
         dt_effective_ended,
@@ -130,11 +160,12 @@ assignment_job_groups AS (
         assignment_history_base
 ),
 assignment_history AS (
+    -- Collapse consecutive rows with the same job into one period per assignment.
+    -- Used both for salary splitting (salary_with_assignment_job) and tenure stints.
     SELECT
         id_person,
         id_assignment,
-        id_period_of_service,
-        is_transfer_continuation,
+        id_continuous_employment_cycle,
         id_job,
         MIN(dt_effective_started) AS dt_effective_started,
         MAX(dt_effective_ended) AS dt_effective_ended
@@ -143,59 +174,23 @@ assignment_history AS (
     GROUP BY
         id_person,
         id_assignment,
-        id_period_of_service,
-        is_transfer_continuation,
+        id_continuous_employment_cycle,
         id_job,
         change_group
 ),
-assignment_service_groups AS (
-    SELECT
-        id_person,
-        id_assignment,
-        SUM(
-            CASE
-                WHEN LAG(id_assignment) OVER (
-                    PARTITION BY id_person
-                    ORDER BY dt_assignment_started, id_assignment
-                ) IS NULL
-                THEN 1
-                WHEN is_transfer_continuation = TRUE
-                THEN 0
-                ELSE 1
-            END
-        ) OVER (
-            PARTITION BY id_person
-            ORDER BY dt_assignment_started, id_assignment
-            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-        ) AS service_group
-    FROM (
-        SELECT
-            id_person,
-            id_assignment,
-            MAX(is_transfer_continuation) AS is_transfer_continuation,
-            MIN(dt_effective_started) AS dt_assignment_started
-        FROM
-            assignment_history
-        GROUP BY
-            id_person,
-            id_assignment
-    ) AS assignment_service_base
-),
 assignment_history_with_band AS (
+    -- Enrich assignment history with the band from dim_job (SCD2).
+    -- Intersect date ranges so that a job reclassification (band change in dim_job without
+    -- the employee moving) creates a separate period for each band version.
+    -- This means band tenure can be shorter than position tenure when the job is reclassified.
     SELECT
         ah.id_person,
-        ah.id_assignment,
-        ah.id_job,
+        ah.id_continuous_employment_cycle,
         GREATEST(ah.dt_effective_started, dj.dt_valid_from) AS dt_effective_started,
         LEAST(ah.dt_effective_ended, dj.dt_valid_to) AS dt_effective_ended,
-        asg.service_group,
         dj.band
     FROM
         assignment_history AS ah
-    INNER JOIN
-        assignment_service_groups AS asg
-            ON ah.id_person = asg.id_person
-            AND ah.id_assignment = asg.id_assignment
     INNER JOIN
         dw_compensation.dim_job AS dj
             ON ah.id_job = dj.id_job
@@ -204,87 +199,44 @@ assignment_history_with_band AS (
     WHERE
         dj.band IS NOT NULL
 ),
-assignment_band_stint_groups AS (
+assignment_job_stint_groups AS (
+    -- Detect job stints across assignments within the same employment cycle.
+    -- Partitioning by id_continuous_employment_cycle ensures stints span GLB_TRANSFER
+    -- continuations (same cycle id) and reset on true rehire (new cycle id).
+    -- A new stint starts when there is a date gap > 1 day (A→B→A creates two stints for A).
     SELECT
         id_person,
-        service_group,
-        id_assignment,
-        band,
+        id_continuous_employment_cycle,
+        id_job,
         dt_effective_started,
         dt_effective_ended,
         SUM(
             CASE
                 WHEN LAG(dt_effective_ended) OVER (
-                    PARTITION BY id_person, service_group, band
+                    PARTITION BY id_person, id_continuous_employment_cycle, id_job
                     ORDER BY dt_effective_started, dt_effective_ended
                 ) < DATE_ADD(dt_effective_started, -1)
                     OR LAG(dt_effective_ended) OVER (
-                        PARTITION BY id_person, service_group, band
+                        PARTITION BY id_person, id_continuous_employment_cycle, id_job
                         ORDER BY dt_effective_started, dt_effective_ended
                     ) IS NULL
                 THEN 1
                 ELSE 0
             END
         ) OVER (
-            PARTITION BY id_person, service_group, band
+            PARTITION BY id_person, id_continuous_employment_cycle, id_job
             ORDER BY dt_effective_started, dt_effective_ended
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ) AS stint_group
     FROM
-        assignment_history_with_band
+        assignment_history
 ),
-assignment_band_stints AS (
+job_tenure_start AS (
+    -- One row per (person, cycle, job, stint).
+    -- dt_stint_start / dt_stint_ended bound the salary join in the final SELECT.
     SELECT
         id_person,
-        service_group,
-        band,
-        MIN(dt_effective_started) AS dt_stint_start,
-        MAX(dt_effective_ended) AS dt_stint_ended
-    FROM
-        assignment_band_stint_groups
-    GROUP BY
-        id_person,
-        service_group,
-        band,
-        stint_group
-),
-assignment_job_stint_groups AS (
-    SELECT
-        ah.id_person,
-        asg.service_group,
-        ah.id_assignment,
-        ah.id_job,
-        ah.dt_effective_started,
-        ah.dt_effective_ended,
-        SUM(
-            CASE
-                WHEN LAG(dt_effective_ended) OVER (
-                    PARTITION BY ah.id_person, asg.service_group, ah.id_job
-                    ORDER BY dt_effective_started, dt_effective_ended
-                ) < DATE_ADD(dt_effective_started, -1)
-                    OR LAG(dt_effective_ended) OVER (
-                        PARTITION BY ah.id_person, asg.service_group, ah.id_job
-                        ORDER BY dt_effective_started, dt_effective_ended
-                    ) IS NULL
-                THEN 1
-                ELSE 0
-            END
-        ) OVER (
-            PARTITION BY ah.id_person, asg.service_group, ah.id_job
-            ORDER BY dt_effective_started, dt_effective_ended
-            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-        ) AS stint_group
-    FROM
-        assignment_history AS ah
-    INNER JOIN
-        assignment_service_groups AS asg
-            ON ah.id_person = asg.id_person
-            AND ah.id_assignment = asg.id_assignment
-),
-assignment_job_stints AS (
-    SELECT
-        id_person,
-        service_group,
+        id_continuous_employment_cycle,
         id_job,
         MIN(dt_effective_started) AS dt_stint_start,
         MAX(dt_effective_ended) AS dt_stint_ended
@@ -292,53 +244,68 @@ assignment_job_stints AS (
         assignment_job_stint_groups
     GROUP BY
         id_person,
-        service_group,
+        id_continuous_employment_cycle,
         id_job,
         stint_group
 ),
-terminated_for_transfer AS (
+assignment_band_stint_groups AS (
+    -- Same gaps-and-islands logic as job stints, applied to band across the cycle.
     SELECT
-        aa_next.id_period_of_service AS id_period_of_service_next,
-        ps_prev.dt_started AS previous_dt_started
+        id_person,
+        id_continuous_employment_cycle,
+        band,
+        dt_effective_started,
+        dt_effective_ended,
+        SUM(
+            CASE
+                WHEN LAG(dt_effective_ended) OVER (
+                    PARTITION BY id_person, id_continuous_employment_cycle, band
+                    ORDER BY dt_effective_started, dt_effective_ended
+                ) < DATE_ADD(dt_effective_started, -1)
+                    OR LAG(dt_effective_ended) OVER (
+                        PARTITION BY id_person, id_continuous_employment_cycle, band
+                        ORDER BY dt_effective_started, dt_effective_ended
+                    ) IS NULL
+                THEN 1
+                ELSE 0
+            END
+        ) OVER (
+            PARTITION BY id_person, id_continuous_employment_cycle, band
+            ORDER BY dt_effective_started, dt_effective_ended
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS stint_group
     FROM
-        datalake_pin_core_clean.all_assignments AS aa
-    INNER JOIN
-        datalake_pin_core_clean.all_assignments AS aa_next
-            ON aa_next.id_person = aa.id_person
-            AND aa_next.assignment_sequence = aa.assignment_sequence + 1
-    LEFT JOIN
-        datalake_pin_core_clean.periods_of_service AS ps_prev
-            ON ps_prev.id_period_of_service = aa.id_period_of_service
-    WHERE
-        aa.assignment_status_type = 'INACTIVE'
-        AND aa.action_code = 'GLB_TRANSFER'
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY aa.id_period_of_service
-            ORDER BY aa.dt_effective_started ASC
-        ) = 1
+        assignment_history_with_band
 ),
-assignment_admission_started AS (
+band_tenure_start AS (
     SELECT
-        im.id_assignment,
-        COALESCE(tft.previous_dt_started, im.dt_started) AS dt_admission_started
+        id_person,
+        id_continuous_employment_cycle,
+        band,
+        MIN(dt_effective_started) AS dt_stint_start,
+        MAX(dt_effective_ended) AS dt_stint_ended
     FROM
-        datalake_people.identifier_mapping AS im
-    LEFT JOIN
-        terminated_for_transfer AS tft
-            ON tft.id_period_of_service_next = im.id_period_of_service
-    QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY im.id_assignment ORDER BY im.dt_started) = 1
+        assignment_band_stint_groups
+    GROUP BY
+        id_person,
+        id_continuous_employment_cycle,
+        band,
+        stint_group
 ),
 salary_with_assignment_job AS (
-    -- Split salary periods by assignment job changes
+    -- Split salary periods by assignment job changes.
+    -- When an employee changes job mid-salary, the salary row is split so each sub-period
+    -- carries the correct id_job. COALESCE falls back to sal.id_job when no assignment
+    -- history row overlaps (salary predates assignment history or pending assignment).
     SELECT
         sal.id_salary,
         sal.id_person,
         sal.id_assignment,
         sal.id_period_of_service,
+        sal.id_continuous_employment_cycle,
         sal.person_number,
         sal.assignment_number,
+        sal.dt_original_hired,
         sal.currency_code,
         sal.salary_amount,
         sal.annual_salary,
@@ -375,13 +342,17 @@ salary_with_assignment_job AS (
 ),
 salary_with_job_version AS (
     -- Split salary periods by dim_job validity windows to keep current job-version attributes.
+    -- Each dim_job SCD2 version carries its own compensation targets (PLR, RVV, SOP),
+    -- so a salary open across multiple dim_job versions must be split accordingly.
     SELECT
         sal.id_salary,
         sal.id_person,
         sal.id_assignment,
         sal.id_period_of_service,
+        sal.id_continuous_employment_cycle,
         sal.person_number,
         sal.assignment_number,
+        sal.dt_original_hired,
         sal.currency_code,
         sal.salary_amount,
         sal.annual_salary,
@@ -421,14 +392,20 @@ salary_with_job_version AS (
             AND dj.dt_valid_to >= sal.dt_started
 ),
 salary_enriched AS (
+    -- Attach event_definition for the salary change event.
+    -- Adjustment fields are zeroed on rows that were created by a job or dim_job split
+    -- (dt_started != dt_salary_original_started) since the adjustment belongs only
+    -- to the originating row where the actual salary change occurred.
     SELECT
         sal.id_salary,
         sal.id_person,
         sal.id_assignment,
         sal.id_period_of_service,
+        sal.id_continuous_employment_cycle,
         sal.id_job,
         sal.person_number,
         sal.assignment_number,
+        sal.dt_original_hired,
         sal.currency_code,
         sal.salary_amount,
         sal.annual_salary,
@@ -466,14 +443,18 @@ salary_enriched AS (
             AND sal.id_action_reason = ed.id_reason
 ),
 salary_consolidation_base AS (
+    -- Normalise NULL dt_ended to 4712-12-31 (Oracle open-ended sentinel) so that
+    -- the gaps-and-islands in salary_consolidation_groups can compare dates uniformly.
     SELECT
         id_salary,
         id_person,
         id_assignment,
         id_period_of_service,
+        id_continuous_employment_cycle,
         id_job,
         person_number,
         assignment_number,
+        dt_original_hired,
         currency_code,
         salary_amount,
         annual_salary,
@@ -498,6 +479,10 @@ salary_consolidation_base AS (
         salary_enriched
 ),
 salary_consolidation_groups AS (
+    -- Detect consecutive rows that are identical in every compensation attribute.
+    -- Such rows are artefacts of the job/dim_job splits above and should be merged.
+    -- A new group starts when any attribute changes or there is a date gap.
+    -- The <=> operator handles NULL-safe equality (NULL <=> NULL is TRUE).
     SELECT
         *,
         SUM(
@@ -595,9 +580,11 @@ salary_consolidated AS (
         id_person,
         id_assignment,
         id_period_of_service,
+        id_continuous_employment_cycle,
         id_job,
         MAX(person_number) AS person_number,
         MAX(assignment_number) AS assignment_number,
+        MAX(dt_original_hired) AS dt_original_hired,
         currency_code,
         salary_amount,
         annual_salary,
@@ -624,6 +611,7 @@ salary_consolidated AS (
         id_person,
         id_assignment,
         id_period_of_service,
+        id_continuous_employment_cycle,
         id_job,
         currency_code,
         salary_amount,
@@ -644,6 +632,10 @@ salary_consolidated AS (
         change_group
 ),
 salary_with_reference AS (
+    -- dt_reference is the effective date used to measure tenure for each row.
+    -- For open records (dt_ended_normalized = 4712-12-31) it is CURRENT_DATE.
+    -- For closed historical records it is the last day of validity (dt_valid_to),
+    -- so tenure reflects the employee's state at the end of that salary period.
     SELECT
         sal.*,
         LEAST(
@@ -692,12 +684,12 @@ SELECT
         ELSE FALSE
     END AS is_promotion_movement,
     -- Metrics - Tenure (reference date = LEAST(CURRENT_DATE, dt_valid_to); current stint for band/job)
-    DATEDIFF(sal.dt_reference, pos.dt_admission_started) AS days_tenure_in_company,
-    DATEDIFF(sal.dt_reference, ajst.dt_stint_start) AS days_tenure_in_position,
-    DATEDIFF(sal.dt_reference, abst.dt_stint_start) AS days_tenure_in_band,
-    FLOOR(MONTHS_BETWEEN(sal.dt_reference, pos.dt_admission_started)) AS months_tenure_in_company,
-    FLOOR(MONTHS_BETWEEN(sal.dt_reference, ajst.dt_stint_start)) AS months_tenure_in_position,
-    FLOOR(MONTHS_BETWEEN(sal.dt_reference, abst.dt_stint_start)) AS months_tenure_in_band,
+    DATEDIFF(sal.dt_reference, sal.dt_original_hired) AS days_tenure_in_company,
+    DATEDIFF(sal.dt_reference, jts.dt_stint_start) AS days_tenure_in_position,
+    DATEDIFF(sal.dt_reference, bts.dt_stint_start) AS days_tenure_in_band,
+    FLOOR(MONTHS_BETWEEN(sal.dt_reference, sal.dt_original_hired)) AS months_tenure_in_company,
+    FLOOR(MONTHS_BETWEEN(sal.dt_reference, jts.dt_stint_start)) AS months_tenure_in_position,
+    FLOOR(MONTHS_BETWEEN(sal.dt_reference, bts.dt_stint_start)) AS months_tenure_in_band,
     -- SCD Type 2 fields
     sal.dt_started AS dt_valid_from,
     CASE
@@ -716,26 +708,19 @@ SELECT
 FROM
     salary_with_reference AS sal
 LEFT JOIN
-    assignment_admission_started AS pos
-        ON sal.id_assignment = pos.id_assignment
-LEFT JOIN
-    assignment_service_groups AS asg_sal
-        ON sal.id_person = asg_sal.id_person
-        AND sal.id_assignment = asg_sal.id_assignment
-LEFT JOIN
     dw_compensation.dim_job AS dj_band
         ON sal.sk_job_version = dj_band.sk_job_version
 LEFT JOIN
-    assignment_job_stints AS ajst
-        ON sal.id_person = ajst.id_person
-        AND sal.id_job = ajst.id_job
-        AND asg_sal.service_group = ajst.service_group
-        AND sal.dt_reference >= ajst.dt_stint_start
-        AND sal.dt_reference <= ajst.dt_stint_ended
+    job_tenure_start AS jts
+        ON sal.id_person = jts.id_person
+        AND sal.id_job = jts.id_job
+        AND sal.id_continuous_employment_cycle = jts.id_continuous_employment_cycle
+        AND sal.dt_reference >= jts.dt_stint_start
+        AND sal.dt_reference <= jts.dt_stint_ended
 LEFT JOIN
-    assignment_band_stints AS abst
-        ON sal.id_person = abst.id_person
-        AND dj_band.band = abst.band
-        AND asg_sal.service_group = abst.service_group
-        AND sal.dt_reference >= abst.dt_stint_start
-        AND sal.dt_reference <= abst.dt_stint_ended
+    band_tenure_start AS bts
+        ON sal.id_person = bts.id_person
+        AND dj_band.band = bts.band
+        AND sal.id_continuous_employment_cycle = bts.id_continuous_employment_cycle
+        AND sal.dt_reference >= bts.dt_stint_start
+        AND sal.dt_reference <= bts.dt_stint_ended

@@ -131,51 +131,50 @@ columns:
     description: |
       Tenure in the company in days.
       Reference date is LEAST(CURRENT_DATE, dt_valid_to) so historical records reflect the full period.
-      Uses transfer-adjusted admission (previous_dt_started when GLB_TRANSFER) from identifier_mapping.
+      Uses dt_original_hired from identifier_mapping, which already encodes transfer-continuation logic:
+      the date resets only on true rehire; GLB_TRANSFER continuations preserve the original hire date.
       NULL when identifier_mapping data is unavailable.
     lineage:
-      - datalake_people.identifier_mapping.dt_started
-      - datalake_pin_core_clean.periods_of_service.dt_started
-      - datalake_pin_core_clean.all_assignments.action_code
+      - datalake_people.identifier_mapping.dt_original_hired
   days_tenure_in_position:
     description: |
-      Tenure in the current job (position) in days.
-      Uses current stint by employee across assignment transfers (handles A->B->A returning to same job).
-      Resets on rehire (new employment cycle that is not GLB_TRANSFER continuation).
-      Reference date LEAST(CURRENT_DATE, dt_valid_to).
+      Tenure in the current job (position) in days, measured from the start of the current stint.
+      A stint is a continuous period in the same job within the same id_continuous_employment_cycle;
+      it resets when the person moves to a different job and returns (A→B→A counts from the return date).
+      Resets on true rehire (new cycle in identifier_mapping). Reference date LEAST(CURRENT_DATE, dt_valid_to).
       NULL when job history is unavailable.
     lineage:
       - datalake_pin_core_clean.all_assignments.dt_effective_started
+      - datalake_people.identifier_mapping.id_continuous_employment_cycle
   days_tenure_in_band:
     description: |
-      Tenure in the current band in days.
-      Uses current stint by employee across assignment transfers (handles A->B->A returning to same band).
-      Resets on rehire (new employment cycle that is not GLB_TRANSFER continuation).
-      Reference date LEAST(CURRENT_DATE, dt_valid_to).
+      Tenure in the current band in days, measured from the start of the current stint.
+      A stint is a continuous period in the same band within the same id_continuous_employment_cycle;
+      it resets when the person moves to a different band and returns.
+      Resets on true rehire (new cycle in identifier_mapping). Reference date LEAST(CURRENT_DATE, dt_valid_to).
       NULL when band history is unavailable.
     lineage:
       - datalake_pin_core_clean.all_assignments.dt_effective_started
+      - datalake_people.identifier_mapping.id_continuous_employment_cycle
       - dw_compensation.dim_job.band
   months_tenure_in_company:
     description: |
       Tenure in the company in whole months.
-      Same logic as days_tenure_in_company (transfer-adjusted, reference date LEAST(CURRENT_DATE, dt_valid_to)).
+      Same logic as days_tenure_in_company (uses dt_original_hired, reference date LEAST(CURRENT_DATE, dt_valid_to)).
     lineage:
-      - datalake_people.identifier_mapping.dt_started
-      - datalake_pin_core_clean.periods_of_service.dt_started
-      - datalake_pin_core_clean.all_assignments.action_code
+      - datalake_people.identifier_mapping.dt_original_hired
   months_tenure_in_position:
     description: |
-      Tenure in the current job (position) in whole months.
-      Same logic as days_tenure_in_position (employee-level current stint, transfer continuity, rehire reset, reference date LEAST(CURRENT_DATE, dt_valid_to)).
+      Tenure in the current job (position) in whole months. Same logic as days_tenure_in_position.
     lineage:
       - datalake_pin_core_clean.all_assignments.dt_effective_started
+      - datalake_people.identifier_mapping.id_continuous_employment_cycle
   months_tenure_in_band:
     description: |
-      Tenure in the current band in whole months.
-      Same logic as days_tenure_in_band (employee-level current stint, transfer continuity, rehire reset, reference date LEAST(CURRENT_DATE, dt_valid_to)).
+      Tenure in the current band in whole months. Same logic as days_tenure_in_band.
     lineage:
       - datalake_pin_core_clean.all_assignments.dt_effective_started
+      - datalake_people.identifier_mapping.id_continuous_employment_cycle
       - dw_compensation.dim_job.band
   dt_valid_from:
     description: Start date of validity for this salary record (SCD Type 2).

@@ -66,7 +66,10 @@ column_level_validations:
       greater_than_or_equal_to: 0
       severity_level: Error
     custom:
-      # Tenure hierarchy: company >= position and company >= band when all non-null
+      # Tenure hierarchy: company >= position and company >= band when all non-null.
+      # band >= position is NOT enforced: when dim_job receives a new SCD2 version
+      # reclassifying a job's band, band tenure resets to the new version's start date
+      # even if the employee has been in that position longer (structural model limitation).
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_compensation.fact_compensations
@@ -77,9 +80,27 @@ column_level_validations:
            )
         ) = 0
       severity_level: Error
+    has_completeness:
+      # dt_original_hired (and id_continuous_employment_cycle) should be populated for nearly all
+      # compensation records; a low completeness rate signals a regression in identifier_mapping join.
+      greater_than_or_equal_to: 0.95
+      severity_level: Warning
   months_tenure_in_company:
     has_min_value:
       greater_than_or_equal_to: 0
+      severity_level: Error
+    custom:
+      # Same hierarchy check as days: company >= position and company >= band when all non-null.
+      # band >= position is NOT enforced (see days_tenure_in_company custom check for rationale).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_compensation.fact_compensations
+         WHERE months_tenure_in_company IS NOT NULL
+           AND (
+             (months_tenure_in_position IS NOT NULL AND months_tenure_in_company < months_tenure_in_position)
+             OR (months_tenure_in_band IS NOT NULL AND months_tenure_in_company < months_tenure_in_band)
+           )
+        ) = 0
       severity_level: Error
   days_tenure_in_position:
     has_min_value:
