@@ -595,3 +595,29 @@ class DAGDeclarationValidator(Validator):
                     f"msg='endpoint_path' is required for table '{table_name}' "
                     f"in api_ingestion workflow"
                 )
+
+            id_expansion = table_config.get("id_expansion")
+            if id_expansion is not None:
+                if not isinstance(id_expansion, dict):
+                    raise AssertionError(
+                        f"m=_validate_api_ingestion_workflow, "
+                        f"msg='id_expansion' for table '{table_name}' must be a dict"
+                    )
+                if not id_expansion.get("source_table"):
+                    raise AssertionError(
+                        f"m=_validate_api_ingestion_workflow, "
+                        f"msg='id_expansion.source_table' is required for table '{table_name}'"
+                    )
+                if not id_expansion.get("id_field"):
+                    raise AssertionError(
+                        f"m=_validate_api_ingestion_workflow, "
+                        f"msg='id_expansion.id_field' is required for table '{table_name}'"
+                    )
+                if not id_expansion.get("param_name") and not id_expansion.get(
+                    "path_param"
+                ):
+                    raise AssertionError(
+                        f"m=_validate_api_ingestion_workflow, "
+                        f"msg='id_expansion.param_name' or 'id_expansion.path_param' "
+                        f"is required for table '{table_name}'"
+                    )
