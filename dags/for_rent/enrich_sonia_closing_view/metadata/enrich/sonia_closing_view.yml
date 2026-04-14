@@ -9,17 +9,17 @@ owner: data-for-rent@quintoandar.com.br
 columns:
   pk_event_user:
     lineage:
-      - cdp_modeled_repo.tb_transactional.id_event
-      - cdp_modeled_repo.tb_transactional.event_properties
+      - datalake_cdp_clean.transactional.id_event
+      - datalake_cdp_clean.transactional.event_properties
     description: |
       Synthetic primary key concatenating CDP event id and person UUID for the row (tenant or owner arm).
   id_event:
     lineage:
-      - cdp_modeled_repo.tb_transactional.id_event
+      - datalake_cdp_clean.transactional.id_event
     description: Identifier of the rent_flow_contract_sent transactional event in CDP.
   id_house:
     lineage:
-      - cdp_modeled_repo.tb_transactional.event_properties
+      - datalake_cdp_clean.transactional.event_properties
     description: House id parsed from contract_sent event properties JSON.
   address_text:
     lineage:
@@ -28,29 +28,29 @@ columns:
     description: House street address and number joined as a single display string for the listing.
   id_rent_flow:
     lineage:
-      - cdp_modeled_repo.tb_transactional.event_properties
+      - datalake_cdp_clean.transactional.event_properties
     description: Rent flow identifier from contract_sent event properties JSON.
   ts_sent:
     lineage:
-      - cdp_modeled_repo.tb_transactional.ts_event
+      - datalake_cdp_clean.transactional.ts_event
     description: Contract sent event time formatted as yyyy-MM-dd HH:mm:ss (timezone as stored in CDP source).
   is_canceled:
     lineage:
-      - cdp_modeled_repo.tb_transactional.event_name
-      - cdp_modeled_repo.tb_transactional.ts_event
+      - datalake_cdp_clean.transactional.event_name
+      - datalake_cdp_clean.transactional.ts_event
     description: |
       True when a rent_flow_contract_canceled event exists for the same rent_flow with timestamp strictly after ts_sent.
   is_signed:
     lineage:
-      - cdp_modeled_repo.tb_transactional.event_name
-      - cdp_modeled_repo.tb_transactional.ts_event
+      - datalake_cdp_clean.transactional.event_name
+      - datalake_cdp_clean.transactional.ts_event
     description: |
       True when a rent_flow_contract_signed event exists for the same rent_flow with timestamp strictly after ts_sent.
   user_role:
     description: Person arm for the row; either tenant or owner (two rows per event when both UUIDs exist).
   uuid_person:
     lineage:
-      - cdp_modeled_repo.tb_transactional.event_properties
+      - datalake_cdp_clean.transactional.event_properties
     description: Person UUID for this row (tenant or owner UUID from event properties, selected by user_role).
   id_user:
     lineage:
@@ -58,7 +58,7 @@ columns:
     description: EBDB internal user id resolved from uuid_person via datalake_ebdb_clean.user.
   binning_value:
     lineage:
-      - cdp_modeled_repo.tb_transactional.event_properties
+      - datalake_cdp_clean.transactional.event_properties
     description: |
       Non-negative 64-bit hash bucket helper; Spark xxhash64 on UTF-8 concat of id_house, hyphen, and tenant UUID from the sent event.
       Compare experiment specs before relying on parity with other engines.

@@ -10,7 +10,7 @@ WITH
       CAST(e_sent.event_properties:id_rent_flow AS STRING) AS id_rent_flow,
       e_sent.ts_event AS ts_sent
     FROM
-      cdp_modeled_repo.tb_transactional AS e_sent
+      datalake_cdp_clean.transactional AS e_sent
     WHERE
       e_sent.event_name = 'rent_flow_contract_sent'
       AND e_sent.ts_event >= TIMESTAMP '2026-04-01 00:00:00'
@@ -21,7 +21,7 @@ WITH
       e_canceled.id_event,
       e_canceled.ts_event AS ts_canceled
     FROM
-      cdp_modeled_repo.tb_transactional AS e_canceled
+      datalake_cdp_clean.transactional AS e_canceled
     WHERE
       e_canceled.event_name = 'rent_flow_contract_canceled'
       AND e_canceled.ts_event >= TIMESTAMP '2026-04-01 00:00:00'
@@ -32,7 +32,7 @@ WITH
       e_signed.id_event,
       e_signed.ts_event AS ts_signed
     FROM
-      cdp_modeled_repo.tb_transactional AS e_signed
+      datalake_cdp_clean.transactional AS e_signed
     WHERE
       e_signed.event_name = 'rent_flow_contract_signed'
       AND e_signed.ts_event >= TIMESTAMP '2026-04-01 00:00:00'
