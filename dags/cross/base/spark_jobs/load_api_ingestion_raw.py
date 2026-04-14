@@ -13,6 +13,7 @@ import json
 import logging
 import time
 from argparse import ArgumentParser, Namespace
+from typing import Any, Dict, List
 
 from pyspark.sql import SparkSession
 
@@ -67,6 +68,106 @@ def _resolve_partitions(partitions_arg: str) -> list:
         "month",
         "day",
     ]
+
+
+def _initialize_spark() -> SparkSession:
+    """Returns an active SparkSession, using EMR-specific factory when appropriate."""
+    if RuntimeDetector.is_emr():
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
+
+        return create_emr_spark_session(JOB_NAME)
+    return SparkSession.builder.getOrCreate()
+
+
+def _fetch_with_id_expansion(
+    spark: SparkSession,
+    client: Any,
+    id_expansion_config: Dict[str, Any],
+    source_schema: str,
+    endpoint: str,
+    initial_params: Dict[str, Any],
+) -> List[Dict[str, Any]]:
+    """
+    Fetches data from a per-entity endpoint by fanning out over IDs from a source table.
+
+    For each entity ID found in the source raw table, issues one GET request to the
+    endpoint. Single-object responses are wrapped as list items and enriched with the
+    entity ID field for traceability. Dict or list API responses are both handled.
+
+    Args:
+        spark: Active SparkSession used to read the source table.
+        client: Authenticated BaseAPIClient.
+        id_expansion_config: id_expansion YAML block with source_table, id_field,
+            and param_name (query param) or path_param (URL path segment).
+        source_schema: Raw metastore schema name (e.g. "oitchau").
+        endpoint: API endpoint path.
+        initial_params: Base query params (e.g. date filters) to merge with each call.
+
+    Returns:
+        Combined list of response dicts from all per-entity API calls.
+    """
+    from pyspark.sql import functions as F
+
+    source_table = id_expansion_config["source_table"]
+    id_field = id_expansion_config["id_field"]
+    param_name = id_expansion_config.get("param_name")
+
+    full_table_name = f"datalake_{source_schema}_raw.{source_table}"
+    LOGGER.info(
+        "m=_fetch_with_id_expansion, source_table=%s msg=Reading entity IDs",
+        full_table_name,
+    )
+
+    ids_df = (
+        spark.table(full_table_name)
+        .select(F.get_json_object(F.col("payload"), f"$.{id_field}").alias("_id_value"))
+        .where(F.col("_id_value").isNotNull())
+        .distinct()
+    )
+    ids = [row["_id_value"] for row in ids_df.collect()]
+
+    LOGGER.info(
+        "m=_fetch_with_id_expansion, count=%d msg=Entity IDs loaded, starting fan-out",
+        len(ids),
+    )
+
+    all_results: List[Dict[str, Any]] = []
+    failed = 0
+
+    for entity_id in ids:
+        params = dict(initial_params)
+        if param_name:
+            params[param_name] = entity_id
+
+        try:
+            response = client.get(endpoint, params=params)
+            data = response.json() if hasattr(response, "json") else response
+
+            if isinstance(data, dict):
+                data[id_field] = entity_id
+                all_results.append(data)
+            elif isinstance(data, list):
+                for item in data:
+                    if isinstance(item, dict):
+                        item[id_field] = entity_id
+                all_results.extend(data)
+        except Exception as exc:
+            failed += 1
+            LOGGER.warning(
+                "m=_fetch_with_id_expansion, %s=%s, error=%s msg=Skipping entity after error",
+                id_field,
+                entity_id,
+                exc,
+            )
+
+    LOGGER.info(
+        "m=_fetch_with_id_expansion, total=%d, failed=%d msg=Fan-out complete",
+        len(all_results),
+        failed,
+    )
+    return all_results
 
 
 def main() -> None:
@@ -149,49 +250,72 @@ def main() -> None:
         initial_params,
     )
 
-    paginator = loader.create_paginator(client, endpoint, initial_params)
+    source_schema = workflow.get("custom_schema", dag_name)
+    if source_schema and source_schema.startswith("dw_"):
+        source_schema = source_schema.replace("dw_", "", 1)
 
-    all_results = []
-    if paginator:
+    id_expansion_config = loader.get_id_expansion_config()
+
+    if id_expansion_config:
         LOGGER.info(
-            "m=main, table_name=%s msg=Fetching data with pagination",
+            "m=main, table_name=%s msg=id_expansion configured, initializing Spark to read source IDs",
             args.table_name,
         )
-        page_num = 0
-        for page_results in paginator.fetch_all():
-            page_num += 1
-            all_results.extend(page_results)
+        spark = _initialize_spark()
+        all_results = _fetch_with_id_expansion(
+            spark=spark,
+            client=client,
+            id_expansion_config=id_expansion_config,
+            source_schema=source_schema,
+            endpoint=endpoint,
+            initial_params=initial_params,
+        )
+    else:
+        paginator = loader.create_paginator(client, endpoint, initial_params)
+
+        all_results = []
+        if paginator:
             LOGGER.info(
-                "m=main, table_name=%s, page=%d, page_records=%d, total_records=%d "
-                "msg=Page fetched",
+                "m=main, table_name=%s msg=Fetching data with pagination",
                 args.table_name,
-                page_num,
-                len(page_results),
+            )
+            page_num = 0
+            for page_results in paginator.fetch_all():
+                page_num += 1
+                all_results.extend(page_results)
+                LOGGER.info(
+                    "m=main, table_name=%s, page=%d, page_records=%d, total_records=%d "
+                    "msg=Page fetched",
+                    args.table_name,
+                    page_num,
+                    len(page_results),
+                    len(all_results),
+                )
+        else:
+            LOGGER.info(
+                "m=main, table_name=%s msg=Fetching single page (no pagination)",
+                args.table_name,
+            )
+            response = client.get(endpoint, params=initial_params)
+            data = response.json() if hasattr(response, "json") else response
+            if isinstance(data, dict):
+                results_path = table_config.get("results_response_path", "results")
+                all_results = data.get(results_path, [])
+                if not all_results and "data" in data:
+                    all_results = data.get("data", [])
+                if not all_results and "content" in data:
+                    content = data.get("content")
+                    if isinstance(content, list):
+                        all_results = content
+            elif isinstance(data, list):
+                all_results = data
+            LOGGER.info(
+                "m=main, table_name=%s, records=%d msg=Single page response received",
+                args.table_name,
                 len(all_results),
             )
-    else:
-        LOGGER.info(
-            "m=main, table_name=%s msg=Fetching single page (no pagination)",
-            args.table_name,
-        )
-        response = client.get(endpoint, params=initial_params)
-        data = response.json() if hasattr(response, "json") else response
-        if isinstance(data, dict):
-            results_path = table_config.get("results_response_path", "results")
-            all_results = data.get(results_path, [])
-            if not all_results and "data" in data:
-                all_results = data.get("data", [])
-            if not all_results and "content" in data:
-                content = data.get("content")
-                if isinstance(content, list):
-                    all_results = content
-        elif isinstance(data, list):
-            all_results = data
-        LOGGER.info(
-            "m=main, table_name=%s, records=%d msg=Single page response received",
-            args.table_name,
-            len(all_results),
-        )
+
+        spark = _initialize_spark()
 
     payload_column = loader.get_payload_column_name()
     LOGGER.info(
@@ -201,14 +325,6 @@ def main() -> None:
         payload_column,
     )
 
-    if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import (
-            create_emr_spark_session,
-        )
-
-        spark = create_emr_spark_session(JOB_NAME)
-    else:
-        spark = SparkSession.builder.getOrCreate()
     if not all_results:
         LOGGER.warning(
             "m=main, table_name=%s msg=No data returned from API. " "Skipping load.",
@@ -235,10 +351,6 @@ def main() -> None:
         partition_cols,
         date_column,
     )
-
-    source_schema = workflow.get("custom_schema", dag_name)
-    if source_schema and source_schema.startswith("dw_"):
-        source_schema = source_schema.replace("dw_", "", 1)
 
     raw_loader = RawLayerLoader(
         spark_client=SparkClient(),

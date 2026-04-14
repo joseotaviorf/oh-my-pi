@@ -306,3 +306,26 @@ pytest tests/unit/airflow/dag_builders/factories -q
 - [ ] Updated docs:
   - [`docs/api_ingestion/user_guide.md`](user_guide.md)
   - this file ([`docs/api_ingestion/contributing.md`](contributing.md)) if the “where to change” map evolved
+
+---
+
+## Adding id_expansion support for new endpoint types
+
+`id_expansion` enables fan-out fetching: one GET call per entity ID read from an already-ingested raw table. Implemented in DBP-1315 for `param_name` (query param) style. If a future endpoint requires **path-param injection** (ID in the URL, e.g. `employees/{uuid}/shifts`), the following files need extending:
+
+### Current implementation (query param style)
+
+| File | Change made |
+|---|---|
+| [`bietlejuice/base/api/configuration/loader.py`](../../bietlejuice/base/api/configuration/loader.py) | `get_id_expansion_config()` — returns the `id_expansion` block |
+| [`dags/cross/base/spark_jobs/load_api_ingestion_raw.py`](../../dags/cross/base/spark_jobs/load_api_ingestion_raw.py) | `_fetch_with_id_expansion()` — Spark fan-out loop; `main()` branches on `id_expansion_config` |
+| [`bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py`](../../bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py) | `_validate_api_ingestion_workflow()` — validates `id_expansion` required keys |
+
+### Extending to path_param (URL injection)
+
+To support `path_param` (e.g. `endpoint_path: employees/{employeeUuid}/shifts`):
+
+1. **`load_api_ingestion_raw.py`** — in `_fetch_with_id_expansion`, check for `path_param` and substitute it into `endpoint_path` using `endpoint.replace(f"{{{path_param}}}", entity_id)` instead of adding to `params`.
+2. **`dag_declaration_validator.py`** — the `path_param` key is already allowed by the current validation (either `param_name` or `path_param` must be present). No schema change needed.
+3. **Tests** — add test cases to [`tests/dags/cross/base/spark_jobs/test_load_api_ingestion_raw.py`](../../tests/dags/cross/base/spark_jobs/test_load_api_ingestion_raw.py) for path-substitution logic.
+4. **Docs** — update the `id_expansion` section in [`docs/api_ingestion/user_guide.md`](user_guide.md) to remove the "not yet implemented" note on `path_param`.

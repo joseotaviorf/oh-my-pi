@@ -818,3 +818,65 @@ class TestAPIConfigurationLoaderAlertChannel:
 
         assert isinstance(client, BaseAPIClient)
         assert client.base_url == "https://api.example.com/"
+
+
+class TestAPIConfigurationLoaderGetIdExpansionConfig:
+    """Test suite for get_id_expansion_config method."""
+
+    def test_returns_none_when_not_configured(self):
+        """Test that None is returned when id_expansion is absent from table_config."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {"endpoint_path": "employees/hoursbank/totals"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        assert loader.get_id_expansion_config() is None
+
+    def test_returns_config_when_present(self):
+        """Test that the full id_expansion dict is returned when configured."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {
+            "endpoint_path": "employees/hoursbank/totals",
+            "id_expansion": {
+                "source_table": "employees",
+                "id_field": "uuid",
+                "param_name": "employeeUuid",
+            },
+        }
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        config = loader.get_id_expansion_config()
+
+        assert config == {
+            "source_table": "employees",
+            "id_field": "uuid",
+            "param_name": "employeeUuid",
+        }
+
+    def test_returns_none_when_explicitly_set_to_none(self):
+        """Test that None is returned when id_expansion is explicitly set to None."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {
+            "endpoint_path": "employees/hoursbank/totals",
+            "id_expansion": None,
+        }
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        assert loader.get_id_expansion_config() is None
+
+    def test_config_with_path_param(self):
+        """Test that id_expansion with path_param (URL injection) is returned correctly."""
+        workflow_config = {"api_base_url": "https://api.example.com/"}
+        table_config = {
+            "endpoint_path": "holidays-groups/holidays/employees/{employeeUuid}",
+            "id_expansion": {
+                "source_table": "employees",
+                "id_field": "uuid",
+                "path_param": "employeeUuid",
+            },
+        }
+        loader = APIConfigurationLoader(workflow_config, table_config)
+
+        config = loader.get_id_expansion_config()
+
+        assert config["path_param"] == "employeeUuid"
+        assert "param_name" not in config

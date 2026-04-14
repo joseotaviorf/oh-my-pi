@@ -374,11 +374,11 @@ bietlejuice.dw_credit_analysis:
   - bietlejuice.enrich_sorting_hat:load-enrich-early-credit-analysis:first-run-of-day
   - bietlejuice.enrich_sorting_hat:load-enrich-policy-report:first-run-of-day
   - bietlejuice.rental_guarantee:load-clean-risk-category:first-run-of-day
-  - bietlejuice.sorting_hat_sonia:load-clean-credit-analysis:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-experiment:first-run-of-day
+  - bietlejuice.sorting_hat:load-clean-variant:first-run-of-day
+  - bietlejuice.sorting_hat_sonia:load-clean-credit-analysis:first-run-of-day
   - bietlejuice.sorting_hat_sonia:load-clean-proponent:first-run-of-day
   - bietlejuice.sorting_hat_sonia:load-clean-proposal:first-run-of-day
-  - bietlejuice.sorting_hat:load-clean-variant:first-run-of-day
 bietlejuice.dw_credit_evers:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-bridge-map-debt-negotiation:first-run-of-day
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-debt:first-run-of-day
@@ -401,12 +401,12 @@ bietlejuice.dw_credit_passport:
   - bietlejuice.enrich_docx:load-enrich-credit-evaluation-events:first-run-of-day
   - bietlejuice.enrich_sorting_hat:load-enrich-policy-report:first-run-of-day
   - bietlejuice.rental_guarantee:load-clean-guarantee:first-run-of-day
-  - bietlejuice.sorting_hat_sonia:load-clean-analysis-request:first-run-of-day
-  - bietlejuice.sorting_hat_sonia:load-clean-credit-analysis:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-early-credit-analysis:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-policy-report:first-run-of-day
-  - bietlejuice.sorting_hat_sonia:load-clean-proponent:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-variant:first-run-of-day
+  - bietlejuice.sorting_hat_sonia:load-clean-analysis-request:first-run-of-day
+  - bietlejuice.sorting_hat_sonia:load-clean-credit-analysis:first-run-of-day
+  - bietlejuice.sorting_hat_sonia:load-clean-proponent:first-run-of-day
 bietlejuice.dw_crm:
   - bietlejuice.ebdb_inspections_fast_lane:load-clean-inspection:first-run-of-day
   - bietlejuice.ebdb_proposal:load-clean-pre-proposal:first-run-of-day
@@ -1980,21 +1980,21 @@ bietlejuice.enrich_credit_analysis:
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow:first-run-of-day
   - bietlejuice.enrich_rental_guarantee:load-enrich-guarantee:first-run-of-day
   - bietlejuice.rental_guarantee:load-clean-risk-category:first-run-of-day
-  - bietlejuice.sorting_hat_sonia:load-clean-analysis-machine:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-analysis-request-data:first-run-of-day
-  - bietlejuice.sorting_hat_sonia:load-clean-analysis-request:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-analysis-state-group:first-run-of-day
   - bietlejuice.sorting_hat:load-clean-analysis-state:first-run-of-day
+  - bietlejuice.sorting_hat:load-clean-early-credit-analysis:first-run-of-day
+  - bietlejuice.sorting_hat:load-clean-proposal-version:first-run-of-day
+  - bietlejuice.sorting_hat:load-clean-screening-result:first-run-of-day
+  - bietlejuice.sorting_hat_sonia:load-clean-analysis-machine:first-run-of-day
+  - bietlejuice.sorting_hat_sonia:load-clean-analysis-request:first-run-of-day
   - bietlejuice.sorting_hat_sonia:load-clean-checklist-decision:first-run-of-day
   - bietlejuice.sorting_hat_sonia:load-clean-checklist-group:first-run-of-day
   - bietlejuice.sorting_hat_sonia:load-clean-checklist-item:first-run-of-day
   - bietlejuice.sorting_hat_sonia:load-clean-checklist:first-run-of-day
   - bietlejuice.sorting_hat_sonia:load-clean-credit-analysis:first-run-of-day
-  - bietlejuice.sorting_hat:load-clean-early-credit-analysis:first-run-of-day
   - bietlejuice.sorting_hat_sonia:load-clean-proponent:first-run-of-day
-  - bietlejuice.sorting_hat:load-clean-proposal-version:first-run-of-day
   - bietlejuice.sorting_hat_sonia:load-clean-proposal:first-run-of-day
-  - bietlejuice.sorting_hat:load-clean-screening-result:first-run-of-day
 bietlejuice.enrich_credit_evers:
   - bietlejuice.enrich_invoice:load-enrich-credit-invoice-original-due-date:first-run-of-day
 bietlejuice.enrich_credit_journey_experience:
@@ -2257,11 +2257,11 @@ bietlejuice.enrich_docpilot_audit:
   - bietlejuice.ebdb_proposal:load-clean-proposal-aud:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
+  - bietlejuice.sorting_hat:load-clean-credit-analysis-version:first-run-of-day
   - bietlejuice.sorting_hat_sonia:load-clean-analysis-request:first-run-of-day
   - bietlejuice.sorting_hat_sonia:load-clean-checklist-group:first-run-of-day
   - bietlejuice.sorting_hat_sonia:load-clean-checklist-item:first-run-of-day
   - bietlejuice.sorting_hat_sonia:load-clean-checklist:first-run-of-day
-  - bietlejuice.sorting_hat:load-clean-credit-analysis-version:first-run-of-day
 bietlejuice.enrich_documentation_metrics:
   - bietlejuice.documentation_metrics:load-clean-categories-documentation:first-run-of-day
   - bietlejuice.documentation_metrics:load-clean-columns-documentation:first-run-of-day

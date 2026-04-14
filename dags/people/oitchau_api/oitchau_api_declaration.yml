@@ -5,12 +5,14 @@ dag:
   schedule_start_date: 2026, 4, 9
   documentation:
     dag_purpose: |
-      Ingests the Oitchau Integrations API employee directory (`GET .../employees`) into the raw layer.
-      Store credentials in Databricks Secrets (scope `people`): JSON secret referenced by `authentication.secret_key`
-      with `client_id` and `client_secret` for the integration client.
+      Ingests Oitchau Integrations API resources into the raw layer: employees and hoursbank_totals.
+      Store credentials in Databricks Secrets (scope `people`): JSON secret referenced by
+      `authentication.secret_key` with `client_id` and `client_secret` for the integration client.
+      employees uses no pagination (full load). hoursbank_totals uses id_expansion: one call per
+      employee UUID from the employees table, fetching the D-1 hours bank balance for each employee.
 
 cluster:
-  type: databricks_16_4_small_memory_people_cluster
+  type: custom_cluster
   access_control_list:
     group_name: people-analytics
     permission_level: CAN_MANAGE
@@ -20,6 +22,12 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.large
+    num_workers: 1
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+      instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
 
 workflow:
   layer: raw
@@ -59,5 +67,18 @@ workflow:
     employees:
       endpoint_path: employees
       params: {}
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
+    hoursbank_totals:
+      endpoint_path: employees/hoursbank/totals
+      extraction_type: incremental
+      id_expansion:
+        source_table: employees
+        id_field: uuid
+        param_name: employeeUuid
+      date_format: "%Y-%m-%d"
+      params:
+        date: load_start_date
       vacuum_retention_hours: 168
       vacuum_lite: true

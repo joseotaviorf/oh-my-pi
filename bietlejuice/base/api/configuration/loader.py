@@ -785,3 +785,22 @@ class APIConfigurationLoader:
             or "payload"
         )
         return payload_column
+
+    def get_id_expansion_config(self) -> Optional[Dict[str, Any]]:
+        """
+        Returns the id_expansion configuration if present, or None.
+
+        id_expansion enables fan-out fetching: one API call per entity ID extracted
+        from an already-ingested raw source table. Required keys are source_table,
+        id_field, and either param_name (query param) or path_param (URL path segment).
+
+        Example YAML:
+            id_expansion:
+              source_table: employees
+              id_field: uuid
+              param_name: employeeUuid
+
+        Returns:
+            Optional[Dict[str, Any]]: id_expansion config dict, or None if not configured.
+        """
+        return self.table_config.get("id_expansion") or None

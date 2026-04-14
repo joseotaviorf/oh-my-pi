@@ -199,8 +199,84 @@ Each entry under `tables_customization` is a dictionary keyed by the **raw table
   - **`tables_customization.<table>.execution_timeout_hours`** float (optional, default: workflow `execution_timeout_hours` → `2`).
   - **`tables_customization.<table>.load_spark_job`** / **`spark_job_arguments`**: allowed in the shared declaration schema for other workflows; **`LoadAPIRawTaskCreator` always submits `load_api_ingestion_raw` with the fixed parameter list** — per-table overrides are **not** applied for `api_ingestion` today.
   - **`tables_customization.<table>.spark_job_prefix`** string (optional, default: workflow `spark_job_prefix` → `base`): **used** to locate the job under `spark_jobs/<prefix>/` (same pattern as CDC/custom raw loaders).
+  - **`tables_customization.<table>.id_expansion`** dict (optional): enables **fan-out fetching** — one API call per entity ID read from an already-ingested raw source table. See [id_expansion](#id_expansion-per-entity-fan-out) below.
 
 \* Per-table `authentication` is required if workflow-level `authentication` is missing.
+
+---
+
+## `id_expansion` (per-entity fan-out)
+
+Some API endpoints are **per-entity**: they require an entity ID (e.g. `employeeUuid`) as a query param or URL path segment and have no bulk variant. `id_expansion` enables ingesting these by reading the list of IDs from an already-ingested raw table and issuing one GET request per entity.
+
+### When to use
+
+Use `id_expansion` when:
+- The endpoint requires a single entity ID and returns data only for that entity.
+- No bulk/list variant exists (omitting the ID returns an error or empty response).
+- The entity list is already available in a raw table ingested by the same DAG.
+
+### YAML schema
+
+```yaml
+tables_customization:
+  <table_name>:
+    endpoint_path: <path>          # static endpoint path (no ID template needed)
+    id_expansion:
+      source_table: <table>        # raw table name within the same DAG schema
+      id_field: <json_field>       # JSON field to extract from payload column
+      param_name: <query_param>    # query parameter name to pass the ID (use this OR path_param)
+      # path_param: <placeholder>  # path segment placeholder — future; use when ID goes into the URL
+    params:
+      <key>: load_start_date       # other query params (dates etc.) work as usual
+    date_format: "%Y-%m-%d"        # optional date formatting for params
+```
+
+### Required keys
+
+| Key | Required | Description |
+|-----|----------|-------------|
+| `source_table` | yes | Name of the raw table to read entity IDs from (e.g. `employees`) |
+| `id_field` | yes | JSON field path inside `payload` to extract (e.g. `uuid`, `externalId`) |
+| `param_name` | yes* | Query parameter name to pass the ID to the endpoint (e.g. `employeeUuid`) |
+| `path_param` | yes* | URL path placeholder — use instead of `param_name` when ID goes in the path |
+
+\* Exactly one of `param_name` or `path_param` must be provided.
+
+### Runtime behaviour
+
+1. Spark reads `datalake_{custom_schema}_raw.{source_table}` and extracts distinct non-null `id_field` values from the `payload` JSON column.
+2. For each entity ID, a GET request is issued to `endpoint_path` with the ID appended as `param_name=<id>` plus any other `params`.
+3. Single-object (`dict`) responses are enriched with `{id_field: <entity_id>}` for traceability and appended as one record.
+4. List responses are flattened and each item is enriched with the entity ID.
+5. Failed individual calls (HTTP errors, timeouts) are logged as warnings and skipped — the job continues with the remaining IDs.
+6. All collected records are written to the raw layer as a single Delta table write.
+
+### Example — OiTchau hours bank balance
+
+```yaml
+tables_customization:
+  hoursbank_totals:
+    endpoint_path: employees/hoursbank/totals
+    extraction_type: incremental
+    id_expansion:
+      source_table: employees
+      id_field: uuid
+      param_name: employeeUuid
+    date_format: "%Y-%m-%d"
+    params:
+      date: load_start_date
+    vacuum_retention_hours: 168
+    vacuum_lite: true
+```
+
+This fetches the D-1 hours bank balance for each employee UUID in `datalake_oitchau_raw.employees`, adding ~4,490 rows per daily run.
+
+### Limitations
+
+- **`path_param`** (ID injected into the URL path) is declared in the YAML schema but **not yet implemented** in the runtime. Only `param_name` (query param) is currently supported. Path-param support will be added when a concrete use case requires it.
+- **Pagination per entity** is not supported. If an endpoint paginates within a per-entity call, use a custom Spark job instead.
+- The `source_table` must be ingested by the same DAG and exist in the raw layer before the `id_expansion` table task runs. Use `inner_dependencies` if explicit task ordering is needed.
 
 ---
 
