@@ -37,6 +37,10 @@ def is_valid(row) -> bool:
         "city",
         "city_id",
         "business_contexts",
+        "count_rent",
+        "count_sale",
+        "navent_count_rent",
+        "navent_count_sale",
         "state",
         "state_code",
         "country_code",
@@ -49,7 +53,8 @@ def is_valid(row) -> bool:
         if not hasattr(row, field):
             return False
 
-        if not getattr(row, field):
+        value = getattr(row, field)
+        if not value and value != 0:
             return False
 
     mandatory_coordinates = ["centroid_lat", "centroid_lng"]
@@ -70,6 +75,11 @@ def is_valid(row) -> bool:
     if not isinstance(row.city_id, int) or row.city_id <= 0:
         return False
 
+    count_fields = ["count_rent", "count_sale", "navent_count_rent", "navent_count_sale"]
+    for field in count_fields:
+        if not isinstance(getattr(row, field), int) or getattr(row, field) < 0:
+            return False
+
     return True
 
 
@@ -80,6 +90,10 @@ def row_to_dict(row) -> Dict:
         "city": row.city,
         "city_id": row.city_id,
         "business_contexts": row.business_contexts,
+        "count_rent": int(row.count_rent),
+        "count_sale": int(row.count_sale),
+        "navent_count_rent": int(row.navent_count_rent),
+        "navent_count_sale": int(row.navent_count_sale),
         "state": row.state,
         "state_code": row.state_code,
         "country_code": row.country_code,
