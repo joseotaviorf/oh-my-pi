@@ -12,48 +12,48 @@ columns:
   device_id:
     description: Device identifier from tb_user_tracking (id_anonymous). Primary key component for joins.
     lineage:
-      - cdp_modeled_repo.tb_user_tracking.id_anonymous
+      - datalake_cdp_clean.user_tracking.id_anonymous
   attribution_time:
     description: Last attribution timestamp for this device_id + UTM combination, from egw_last_attribution_time column.
     lineage:
-      - cdp_modeled_repo.tb_user_tracking.egw_last_attribution_time
+      - datalake_cdp_clean.user_tracking.egw_last_attribution_time
   gclid:
     description: Google Click ID (GCLID) from egw_gclid column. Part of merge key.
     lineage:
-      - cdp_modeled_repo.tb_user_tracking.egw_gclid
+      - datalake_cdp_clean.user_tracking.egw_gclid
   utm_term:
     description: UTM term parameter from egw_utm_term column. Part of merge key.
     lineage:
-      - cdp_modeled_repo.tb_user_tracking.egw_utm_term
+      - datalake_cdp_clean.user_tracking.egw_utm_term
   utm_source:
     description: UTM source parameter from egw_utm_source column. Part of merge key.
     lineage:
-      - cdp_modeled_repo.tb_user_tracking.egw_utm_source
+      - datalake_cdp_clean.user_tracking.egw_utm_source
   utm_medium:
     description: UTM medium parameter from egw_utm_medium column. Part of merge key.
     lineage:
-      - cdp_modeled_repo.tb_user_tracking.egw_utm_medium
+      - datalake_cdp_clean.user_tracking.egw_utm_medium
   utm_content:
     description: UTM content parameter from egw_utm_content column. Part of merge key.
     lineage:
-      - cdp_modeled_repo.tb_user_tracking.egw_utm_content
+      - datalake_cdp_clean.user_tracking.egw_utm_content
   utm_campaign:
     description: UTM campaign parameter from egw_utm_campaign column. Part of merge key.
     lineage:
-      - cdp_modeled_repo.tb_user_tracking.egw_utm_campaign
+      - datalake_cdp_clean.user_tracking.egw_utm_campaign
   ts_event:
     description: Timestamp when the tracking event occurred.
     lineage:
-      - cdp_modeled_repo.tb_user_tracking.ts_event
+      - datalake_cdp_clean.user_tracking.ts_event
   year:
     description: Year column used for partitioning.
     lineage:
-      - cdp_modeled_repo.tb_user_tracking.year
+      - datalake_cdp_clean.user_tracking.year
   month:
     description: Month column used for partitioning.
     lineage:
-      - cdp_modeled_repo.tb_user_tracking.month
+      - datalake_cdp_clean.user_tracking.month
   day:
     description: Day column used for partitioning.
     lineage:
-      - cdp_modeled_repo.tb_user_tracking.day
+      - datalake_cdp_clean.user_tracking.day

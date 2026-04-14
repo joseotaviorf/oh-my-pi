@@ -11,7 +11,7 @@ SELECT
   year,
   month,
   day
-FROM cdp_modeled_repo.tb_user_tracking
+FROM datalake_cdp_clean.user_tracking
 WHERE
   event_name <> '$identify'
   AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
