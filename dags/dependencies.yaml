@@ -3385,10 +3385,7 @@ bietlejuice.enrich_rede_supply:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
 bietlejuice.enrich_region:
-  - bietlejuice.ebdb_location:load-clean-country:first-run-of-day
-  - bietlejuice.ebdb_location:load-clean-region-business-contexts-served:first-run-of-day
-  - bietlejuice.ebdb_location:load-clean-region:first-run-of-day
-  - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
+  - bietlejuice.core_region:load-core-region:first-run-of-day
   - bietlejuice.gsheets_for_rent:done-clean-auxiliary-region:first-run-of-day
 bietlejuice.enrich_rent_demand_events:
   - bietlejuice.docx:load-clean-message:first-run-of-day

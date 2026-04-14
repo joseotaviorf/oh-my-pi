@@ -6,34 +6,34 @@ owner: isadora.gallerani@quintoandar.com.br
 columns:
   id:
     lineage:
-    - datalake_ebdb_clean.region.id
+      - core_region.region.id_region
     description: Unique id that identifies the region.
   id_city:
     lineage:
-    - datalake_ebdb_clean.region.id
-    description: City id of the region.
+      - core_region.region.id_city_region
+    description: City id of the region (city-level region id resolved along the parent hierarchy).
   id_macro_region:
     lineage:
-    - datalake_ebdb_clean.region.id
-    description: Macro region id of the region.
+      - core_region.region.id_macro_region
+    description: Macro region id of the region (immediate parent region id when applicable).
   id_state:
     lineage:
-      - datalake_ebdb_clean.region.id_state
+      - core_region.region.id_state
     description: Id of the region's state. It only comes from the region (itself or associated) that is at level = Cidade (city).
   id_country:
     lineage:
-    - datalake_ebdb_clean.state.id_country
+      - core_region.region.id_country
     description: Country id of the region.
   country_code:
     lineage:
-    - datalake_ebdb_clean.country.code
+      - core_region.region.country_code
     description: Country code of the region.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code
   level:
     lineage:
-    - datalake_ebdb_clean.region.level
+      - core_region.region.level
     description: The geopolitical subdivision that the region belongs to.
     categories:
       Cidade: The region is a city.
@@ -41,85 +41,112 @@ columns:
       SubRegiao: The region is a subregion.
   name:
     lineage:
-    - datalake_ebdb_clean.region.name
-    - datalake_gsheets_clean.auxiliary_region.neighbourhood
+      - core_region.region.region_name
+      - datalake_gsheets_clean.auxiliary_region.neighbourhood
     description: The name of the region.
   macro_region_name:
     lineage:
-    - datalake_ebdb_clean.region.name
-    description: Name of the macro region of the region.
+      - core_region.region.region_name
+    description: Name of the macro region of the region (parent row region_name when joined on id_macro_region).
   city_name:
     lineage:
-    - datalake_ebdb_clean.region.name
-    - datalake_gsheets_clean.auxiliary_region.city
+      - core_region.region.city_region_name
+      - datalake_gsheets_clean.auxiliary_region.city
     description: City name of the region.
   city_group:
     lineage:
-    - datalake_gsheets_clean.auxiliary_region.city_group
+      - datalake_gsheets_clean.auxiliary_region.city_group
     description: City group of the region.
   city_ddd:
     lineage:
-    - datalake_gsheets_clean.auxiliary_region.ddd
-    description: City DDD of the region.
+      - core_region.region.region_phone_ddd
+      - datalake_gsheets_clean.auxiliary_region.ddd
+    description: City DDD of the region. Telephone area code from Main region configuration when present, otherwise from auxiliary sheet.
   region_code:
     lineage:
-    - datalake_gsheets_clean.auxiliary_region.region_code
+      - datalake_gsheets_clean.auxiliary_region.region_code
     description: The region code, also related to agents' operation.
   region_code_deprecated:
     lineage:
-    - datalake_gsheets_clean.auxiliary_region.region_code_deprecated
+      - datalake_gsheets_clean.auxiliary_region.region_code_deprecated
     description: The region code related to photographers' operation.
   region_code_inspector:
     lineage:
-    - datalake_gsheets_clean.auxiliary_region.region_code_inspector
+      - datalake_gsheets_clean.auxiliary_region.region_code_inspector
     description: The region code related to inspectors' operation.
   short_region_name:
     lineage:
-    - datalake_gsheets_clean.auxiliary_region.state
-    description: Short region name.
+      - core_region.region.state_abbreviation
+    description: State abbreviation for the region (e.g. SP, RJ). Sourced from the Region Core Model.
   greater_region:
     lineage:
-    - datalake_gsheets_clean.auxiliary_region.city
-    - datalake_ebdb_clean.region.name
-    description: Greater region related to the region.
+      - core_region.region.city_region_name
+      - datalake_gsheets_clean.auxiliary_region.city
+    description: Greater region related to the region (metro grouping derived from coalesced city name and sheet override).
   regional:
     lineage:
-    - datalake_gsheets_clean.auxiliary_region.regional
+      - datalake_gsheets_clean.auxiliary_region.regional
     description: The regional related to the region.
   regional_deprecated:
     lineage:
-    - datalake_gsheets_clean.auxiliary_region.regional_deprecated
+      - datalake_gsheets_clean.auxiliary_region.regional_deprecated
     description: An old regional classification, deprecated.
   regional_inspection:
     lineage:
-    - datalake_gsheets_clean.auxiliary_region.regional_inspection
+      - datalake_gsheets_clean.auxiliary_region.regional_inspection
     description: The regional related to the inspections' operation.
   tier:
     lineage:
-    - datalake_gsheets_clean.auxiliary_region.tier
+      - datalake_gsheets_clean.auxiliary_region.tier
     description: The region classification in tiers, related to its city.
   country_name:
-    description: Coutry name of the region.
+    lineage:
+      - core_region.region.country_name
+    description: Country name of the region (English display for Brazil and Mexico; other countries from core model).
     categories:
       Brazil: Country is Brazil.
       Mexico: Country is Mexico.
   is_city:
     lineage:
-    - datalake_ebdb_clean.region.level
+      - core_region.region.level
     description: Boolean related to if the region is or not a city.
   has_rent_operation:
+    lineage:
+      - core_region.region.has_rent_operation
     description: Boolean indicating if QuintoAndar operates with ForRent context in
       the given region (a region can be exclusive to Rent, exclusive to Sale or served
       by both contexts). If true, indicates that there is Rent operation in the region.
   has_sale_operation:
+    lineage:
+      - core_region.region.has_sale_operation
     description: Boolean indicating if QuintoAndar operates with ForSale context in
       the given region (a region can be exclusive to Rent, exclusive to Sale or served
       by both contexts). If true, indicates that there is Sale operation in the region.
   ts_created:
     lineage:
-    - datalake_ebdb_clean.region.ts_created
+      - core_region.region.ts_region_created
     description: Timestamp of when the region was created.
   ts_updated:
     lineage:
-    - datalake_ebdb_clean.region.ts_updated
+      - core_region.region.ts_region_updated
     description: Timestamp of when the region was updated.
+  sk_core_region:
+    lineage:
+      - core_region.region.sk_core_region
+    description: Surrogate key of the region in the Region Core Model; stable join key to core_region.region.
+  country_default_timezone:
+    lineage:
+      - core_region.region.country_default_timezone
+    description: Default timezone for the region's country from Main.
+  year:
+    lineage:
+      - core_region.region.year
+    description: Year partition component from region last update timestamp (aligned with core_region.region).
+  month:
+    lineage:
+      - core_region.region.month
+    description: Month partition component from region last update timestamp (aligned with core_region.region).
+  day:
+    lineage:
+      - core_region.region.day
+    description: Day partition component from region last update timestamp (aligned with core_region.region).

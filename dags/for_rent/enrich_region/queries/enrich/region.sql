@@ -1,66 +1,54 @@
-WITH business_context_operation AS (
-    SELECT
-        id_region,
-        SOME(business_context = 'RENT') AS has_rent_operation,
-        SOME(business_context = 'SALE') AS has_sale_operation
-    FROM
-        datalake_ebdb_clean.region_business_contexts_served
-    GROUP BY
-        1
-)
 SELECT
-    CAST(r.id AS BIGINT) AS id,
-    c.id AS id_city,
-    mr.id AS id_macro_region,
-    COALESCE(r.id_state, mr.id_state, c.id_state) AS id_state,
-    CAST(st.id_country AS INTEGER) AS id_country,
-    ct.code AS country_code,
-    r.level,
-    COALESCE(NULLIF(r.name, ''), ar.neighbourhood) AS name,
-    mr.name AS macro_region_name,
-    COALESCE(c.name, ar.city) AS city_name,
-    ar.city_group,
-    CAST(ar.ddd AS STRING) AS city_ddd,
-    ar.region_code,
-    ar.region_code_deprecated,
-    ar.region_code_inspector,
-    ar.state AS short_region_name,
+    CAST(cr.id_region AS BIGINT) AS id,
+    cr.id_city_region AS id_city,
+    cr.id_macro_region AS id_macro_region,
+    cr.id_state AS id_state,
+    CAST(cr.id_country AS INTEGER) AS id_country,
+    cr.country_code AS country_code,
+    cr.level AS level,
+    COALESCE(NULLIF(cr.region_name, ''), ar.neighbourhood) AS name,
+    cr_parent.region_name AS macro_region_name,
+    COALESCE(cr.city_region_name, ar.city) AS city_name,
+    ar.city_group AS city_group,
+    COALESCE(cr.region_phone_ddd, CAST(ar.ddd AS STRING)) AS city_ddd,
+    ar.region_code AS region_code,
+    ar.region_code_deprecated AS region_code_deprecated,
+    ar.region_code_inspector AS region_code_inspector,
+    cr.state_abbreviation AS short_region_name,
     CASE
-        WHEN COALESCE(c.name, ar.city) IN ('Rio de Janeiro', 'Campinas') THEN COALESCE(c.name, ar.city)
-        WHEN COALESCE(c.name, ar.city) IN
-          ('São Paulo', 'São Bernardo do Campo', 'São Caetano do Sul', 'Santo André', 'Guarulhos', 'Osasco', 'Barueri') THEN 'Grande São Paulo'
+        WHEN COALESCE(cr.city_region_name, ar.city) IN ('Rio de Janeiro', 'Campinas')
+            THEN COALESCE(cr.city_region_name, ar.city)
+        WHEN COALESCE(cr.city_region_name, ar.city) IN (
+            'São Paulo',
+            'São Bernardo do Campo',
+            'São Caetano do Sul',
+            'Santo André',
+            'Guarulhos',
+            'Osasco',
+            'Barueri'
+        ) THEN 'Grande São Paulo'
         ELSE NULL
     END AS greater_region,
-    ar.regional,
-    ar.regional_deprecated,
-    ar.regional_inspection,
-    ar.tier,
-    CASE
-      WHEN st.id_country = 1 THEN 'Brazil'
-      WHEN st.id_country = 2 THEN 'Mexico'
-    END AS country_name,
-    (r.level = 'Cidade') AS is_city,
-    COALESCE(bco.has_rent_operation, FALSE) AS has_rent_operation,
-    COALESCE(bco.has_sale_operation, FALSE) AS has_sale_operation,
-    r.ts_created,
-    r.ts_updated
+    ar.regional AS regional,
+    ar.regional_deprecated AS regional_deprecated,
+    ar.regional_inspection AS regional_inspection,
+    ar.tier AS tier,
+    cr.country_name AS country_name,
+    (cr.level = 'Cidade') AS is_city,
+    cr.has_rent_operation AS has_rent_operation,
+    cr.has_sale_operation AS has_sale_operation,
+    cr.ts_region_created AS ts_created,
+    cr.ts_region_updated AS ts_updated,
+    cr.sk_core_region AS sk_core_region,
+    cr.country_default_timezone AS country_default_timezone,
+    cr.year AS year,
+    cr.month AS month,
+    cr.day AS day
 FROM
-  datalake_ebdb_clean.region AS r
+    core_region.region AS cr
 LEFT JOIN
-  datalake_ebdb_clean.region AS mr
-    ON mr.id = r.id_parent_region
+    core_region.region AS cr_parent
+    ON cr_parent.id_region = cr.id_macro_region
 LEFT JOIN
-  datalake_ebdb_clean.region AS c
-    ON c.id = mr.id_parent_region
-LEFT JOIN
-  datalake_ebdb_clean.state AS st
-    ON st.id = COALESCE(r.id_state, mr.id_state, c.id_state)
-JOIN
-  datalake_ebdb_clean.country AS ct
-    ON st.id_country = ct.id
-LEFT JOIN
-  datalake_gsheets_clean.auxiliary_region AS ar
-    ON r.id = ar.id
-LEFT JOIN
-  business_context_operation AS bco
-    ON bco.id_region = r.id
+    datalake_gsheets_clean.auxiliary_region AS ar
+    ON cr.id_region = ar.id
