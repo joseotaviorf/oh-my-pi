@@ -1,0 +1,62 @@
+database_name: datalake_jira_ops_clean
+table_name: user_account
+description: >
+  Jira Cloud user profiles from GET /rest/api/3/user (JIRA credentials), enriched with groups and
+  application roles, loaded from distinct accountIds extracted in the responders_account layer.
+domain: Data Ops & Governance
+owner: leonardo.soares@quintoandar.com.br
+columns:
+  id_account:
+    lineage:
+      - datalake_jira_ops_raw.user_account.accountId
+    description: Atlassian accountId used for user API calls.
+  account_type:
+    lineage:
+      - datalake_jira_ops_raw.user_account.accountType
+    description: Account type in Jira Cloud (e.g. atlassian, app).
+  email_address:
+    lineage:
+      - datalake_jira_ops_raw.user_account.emailAddress
+    description: User email address when returned by the API.
+  display_name:
+    lineage:
+      - datalake_jira_ops_raw.user_account.displayName
+    description: Display name of the Jira user.
+  locale:
+    lineage:
+      - datalake_jira_ops_raw.user_account.locale
+    description: Locale and language preferences for the user profile.
+  time_zone:
+    lineage:
+      - datalake_jira_ops_raw.user_account.timeZone
+    description: Time zone associated with the user profile.
+  groups:
+    lineage:
+      - datalake_jira_ops_raw.user_account.groups
+    description: Jira groups the user belongs to (expanded payload).
+  application_roles:
+    lineage:
+      - datalake_jira_ops_raw.user_account.applicationRoles
+    description: Application roles returned by the user API expand parameter.
+  avatar_urls:
+    lineage:
+      - datalake_jira_ops_raw.user_account.avatarUrls
+    description: Avatar URLs for standard API sizes.
+  is_active:
+    lineage:
+      - datalake_jira_ops_raw.user_account.active
+    description: Whether the Jira user account is active.
+  dt_load:
+    description: Load date of the ingestion into the data lake.
+  year:
+    lineage:
+      - datalake_jira_ops_raw.user_account.year
+    description: Partition year of the load date.
+  month:
+    lineage:
+      - datalake_jira_ops_raw.user_account.month
+    description: Partition month of the load date.
+  day:
+    lineage:
+      - datalake_jira_ops_raw.user_account.day
+    description: Partition day of the load date.

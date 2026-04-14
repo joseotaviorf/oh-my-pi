@@ -13,7 +13,7 @@ workflow:
   default_partitions: ["year", "month", "day"]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
   spark_job_arguments:
     - "{environment}"
     - "{bucket}"
@@ -25,23 +25,86 @@ workflow:
   raw_inner_dependencies:
     alert_log:
       - alerts
+    schedules_override:
+      - schedules
+    schedules_timeline:
+      - schedules
+    responders_account:
+      - schedules_timeline
+    user_account:
+      - responders_account
   tables_customization:
     alerts:
       extra_spark_job_arguments:
         - endpoint_enum: LIST_ALERTS
+          params:
+            cloud_id: cloud_id_secret
+            size: 100
           jql_query_filter: 'responders: "Data Engineering"'
     alert_log:
       extra_spark_job_arguments:
         - endpoint_enum: LIST_ALERT_LOG
+          params:
+            cloud_id: cloud_id_secret
+            size: 100
           feedback_config: 
             table: datalake_jira_ops_raw.alerts
             seleted_column: id
             feedback_key: alert_id
             date_column_filter: createdAt
+    schedules:
+      extraction_type: full
+      partitions: []
+      extra_spark_job_arguments:
+        - endpoint_enum: LIST_SCHEDULES
+          params:
+            cloud_id: cloud_id_secret
+    schedules_timeline:
+      extra_spark_job_arguments:
+        - endpoint_enum: GET_SCHEDULES_TIMELINE
+          params:
+            cloud_id: cloud_id_secret
+            interval: 1
+            interval_unit: week
+            date: "{{ data_interval_start | ds }}T00:00:00Z"
+            expand: "base, forwarding, override"
+          feedback_config: 
+            table: datalake_jira_ops_raw.schedules
+            seleted_column: id
+            feedback_key: schedule_id
+            date_column_filter: dt_load
+    schedules_override:
+      extra_spark_job_arguments:
+        - endpoint_enum: LIST_SCHEDULES_OVERRIDES
+          params:
+            cloud_id: cloud_id_secret
+          feedback_config: 
+            table: datalake_jira_ops_raw.schedules
+            seleted_column: id
+            feedback_key: schedule_id
+            date_column_filter: dt_load
+    user_account:
+      extra_spark_job_arguments:
+        - endpoint_enum: GET_USER
+          params:
+            expand: "groups, applicationRoles"
+          feedback_config:
+            table: datalake_jira_ops_raw.responders_account
+            seleted_column: id_account
+            feedback_key: accountId
+            date_column_filter: dt_load
+          api_enum: JIRA
+          consumer: jira_users
+    responders_account:
+      load_spark_job: load_responders_account_into_datalake_raw
+      extra_spark_job_arguments:
+        - feedback_config:
+            table_name: datalake_jira_ops_raw.schedules_timeline
+            date_column_filter: dt_load
 cluster:
   type: custom_cluster
   custom_libraries:
-    - whl: "{artifacts_bucket}/jira-api-client-python/quintoandar_jira_api_client-0.3.0-py2.py3-none-any.whl"
+    - whl: "{artifacts_bucket}/jira-api-client-python/quintoandar_jira_api_client-0.3.2-py2.py3-none-any.whl"
   custom_configurations:
     driver_node_type_id: r5d.4xlarge
     node_type_id: r5d.2xlarge

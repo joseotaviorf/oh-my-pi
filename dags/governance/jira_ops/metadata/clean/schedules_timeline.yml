@@ -1,0 +1,44 @@
+database_name: datalake_jira_ops_clean
+table_name: schedules_timeline
+description: >
+  On-call schedule timelines (GET_SCHEDULES_TIMELINE) with final and base windows per schedule, feeding
+  responders_account and user account enrichment in the same DAG.
+domain: Data Ops & Governance
+owner: leonardo.soares@quintoandar.com.br
+columns:
+  id_schedule:
+    lineage:
+      - datalake_jira_ops_raw.schedules_timeline.schedule_id
+    description: Schedule identifier injected via feedback from the schedules table.
+  final_timeline:
+    lineage:
+      - datalake_jira_ops_raw.schedules_timeline.finalTimeline
+    description: finalTimeline object from the API (rotations and consolidated periods).
+  base_timeline:
+    lineage:
+      - datalake_jira_ops_raw.schedules_timeline.baseTimeline
+    description: baseTimeline object from the API for the requested window.
+  dt_load:
+    lineage:
+      - datalake_jira_ops_raw.schedules_timeline.dt_load
+    description: Load date of the ingestion into the data lake.
+  ts_started:
+    lineage:
+      - datalake_jira_ops_raw.schedules_timeline.startDate
+    description: Start of the timeline window when present on raw.
+  ts_ended:
+    lineage:
+      - datalake_jira_ops_raw.schedules_timeline.endDate
+    description: End of the timeline window when present on raw.
+  year:
+    lineage:
+      - datalake_jira_ops_raw.schedules_timeline.year
+    description: Partition year of the load date.
+  month:
+    lineage:
+      - datalake_jira_ops_raw.schedules_timeline.month
+    description: Partition month of the load date.
+  day:
+    lineage:
+      - datalake_jira_ops_raw.schedules_timeline.day
+    description: Partition day of the load date.

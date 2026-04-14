@@ -1,0 +1,52 @@
+database_name: datalake_jira_ops_clean
+table_name: schedules
+description: >
+  On-call schedules catalog from the Jira Ops API, feeding timelines, overrides, and the responder
+  chain in the jira_ops DAG.
+domain: Data Ops & Governance
+owner: leonardo.soares@quintoandar.com.br
+columns:
+  id_schedule:
+    lineage:
+      - datalake_jira_ops_raw.schedules.id
+    description: Unique schedule identifier in Jira Service Management.
+  id_team:
+    lineage:
+      - datalake_jira_ops_raw.schedules.teamId
+    description: Owning or associated team for the schedule.
+  name:
+    lineage:
+      - datalake_jira_ops_raw.schedules.name
+    description: Human-readable on-call schedule name.
+  description:
+    lineage:
+      - datalake_jira_ops_raw.schedules.description
+    description: Schedule description text when provided by the API.
+  timezone:
+    lineage:
+      - datalake_jira_ops_raw.schedules.timezone
+    description: Reference time zone for the schedule.
+  rotations:
+    lineage:
+      - datalake_jira_ops_raw.schedules.rotations
+    description: Rotation structure returned by the API (JSON/struct).
+  is_enabled:
+    lineage:
+      - datalake_jira_ops_raw.schedules.enabled
+    description: Whether the schedule is enabled.
+  dt_load:
+    lineage:
+      - datalake_jira_ops_raw.schedules.dt_load
+    description: Load date of the ingestion into the data lake.
+  year:
+    lineage:
+      - datalake_jira_ops_raw.schedules.year
+    description: Partition year of the load date.
+  month:
+    lineage:
+      - datalake_jira_ops_raw.schedules.month
+    description: Partition month of the load date.
+  day:
+    lineage:
+      - datalake_jira_ops_raw.schedules.day
+    description: Partition day of the load date.

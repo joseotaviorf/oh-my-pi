@@ -1,4 +1,4 @@
 ---
 database_name: datalake_jira_ops_raw
-table_name: alerts
+table_name: schedules_override
 domain: Data Ops & Governance

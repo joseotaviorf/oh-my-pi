@@ -1,0 +1,4 @@
+---
+database_name: datalake_jira_ops_raw
+table_name: schedules_timeline
+domain: Data Ops & Governance

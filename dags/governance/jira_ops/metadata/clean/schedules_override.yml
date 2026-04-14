@@ -1,0 +1,52 @@
+database_name: datalake_jira_ops_clean
+table_name: schedules_override
+description: >
+  Schedule overrides (LIST_SCHEDULES_OVERRIDES) with time windows and per-period responder, linked to
+  the parent schedule via id_schedule for coverage and on-call exception analysis.
+domain: Data Ops & Governance
+owner: leonardo.soares@quintoandar.com.br
+columns:
+  id_schedule:
+    lineage:
+      - datalake_jira_ops_raw.schedules_override.schedule_id
+    description: Schedule this override applies to.
+  id_override_alias:
+    lineage:
+      - datalake_jira_ops_raw.schedules_override.alias
+    description: Override identifier or alias returned by the API.
+  rotation_ids:
+    lineage:
+      - datalake_jira_ops_raw.schedules_override.rotationIds
+    description: List of rotations affected by the override.
+  id_responder:
+    lineage:
+      - datalake_jira_ops_raw.schedules_override.responder.id
+    description: Responder identifier in the override context.
+  responder_type:
+    lineage:
+      - datalake_jira_ops_raw.schedules_override.responder.type
+    description: Responder type (e.g. user or team).
+  dt_load:
+    lineage:
+      - datalake_jira_ops_raw.schedules_override.dt_load
+    description: Load date of the ingestion into the data lake.
+  ts_started:
+    lineage:
+      - datalake_jira_ops_raw.schedules_override.startDate
+    description: Start of the override validity window (normalized timestamp).
+  ts_ended:
+    lineage:
+      - datalake_jira_ops_raw.schedules_override.endDate
+    description: End of the override validity window (normalized timestamp).
+  year:
+    lineage:
+      - datalake_jira_ops_raw.schedules_override.year
+    description: Partition year of the load date.
+  month:
+    lineage:
+      - datalake_jira_ops_raw.schedules_override.month
+    description: Partition month of the load date.
+  day:
+    lineage:
+      - datalake_jira_ops_raw.schedules_override.day
+    description: Partition day of the load date.

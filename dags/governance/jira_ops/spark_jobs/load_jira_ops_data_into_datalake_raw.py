@@ -8,9 +8,8 @@ import pyspark.sql.functions as F
 
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_jira_api_client.clients import JiraClient
-from quintoandar_jira_api_client.consumers.jira_ops_consumer import JiraOpsConsumer
+from quintoandar_jira_api_client.consumers import CONSUMERS
 
-from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient
 
 from bietlejuice.base.api.api_enum import APIEnum
@@ -54,7 +53,10 @@ if __name__ == "__main__":
     endpoint_params = json.loads(args.endpoint_params)
     endpoint_enum = endpoint_params.get("endpoint_enum")
     jql_query_filter = endpoint_params.get("jql_query_filter")
-    feedback_config = endpoint_params.get("feedback_config")
+    feedback_config = json.loads(endpoint_params.get("feedback_config", "{}"))
+    params = json.loads(endpoint_params.get("params", "{}"))
+    api_enum = endpoint_params.get("api_enum")
+    consumer = endpoint_params.get("consumer", "jira_ops")
 
     logger.info(
         f"""
@@ -68,10 +70,16 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=APIEnum.JIRA_OPS)
+    if api_enum:
+        api_enum_value = getattr(APIEnum, api_enum)
+    else:
+        api_enum_value = APIEnum.JIRA_OPS
+
+    json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key=api_enum_value)
     credentials = json.loads(json_credentials)
 
-    cloud_id = credentials["cloud_id"]
+    if credentials.get("cloud_id") and params.get("cloud_id"):
+        params["cloud_id"] = credentials.get("cloud_id")    
 
     jira_client = JiraClient(
         username=credentials["username"],
@@ -79,9 +87,8 @@ if __name__ == "__main__":
         server=credentials["server"],
     )
 
-    jira_consumer = JiraOpsConsumer(jira_client)
+    jira_consumer = CONSUMERS[consumer](jira_client)
 
-    params = {"cloud_id": f"{cloud_id}", "size": 100}
     response = None
 
     if jql_query_filter:
@@ -98,8 +105,6 @@ if __name__ == "__main__":
         params["query"] = jql_query_filter
 
     if feedback_config:
-        feedback_config = json.loads(feedback_config)
-
         table = feedback_config.get("table")
         seleted_column = feedback_config.get("seleted_column")
         feedback_key = feedback_config.get("feedback_key")
@@ -109,8 +114,9 @@ if __name__ == "__main__":
             BaseSparkContext.spark.table(table)
             .filter(
                 f"""
-                DATE({date_column_filter}) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
-            """
+                    DATE({date_column_filter}) BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
+                    AND {seleted_column} IS NOT NULL
+                """
             )
             .select(seleted_column)
             .collect()
