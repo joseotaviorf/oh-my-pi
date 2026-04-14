@@ -51,6 +51,13 @@ columns:
     lineage:
       - dw_customer_support.dim_department.department
     description: Returns the last department/queue associated with the ticket. 
+  theme_recontact_flag_per_bpo:
+    lineage:
+      - dw_customer_support.fact_tickets.ts_created
+      - dw_customer_support.fact_tickets.sk_user
+      - dw_customer_support.dim_department.team
+      - dw_customer_support.dim_taxonomy.theme
+    description: Indicates whether the customer from that ticket returned within 4 days to discuss the same issue per bpo.
   year:
     lineage:
       - current_date

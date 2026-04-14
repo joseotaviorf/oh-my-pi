@@ -308,6 +308,7 @@ SELECT
     t.last_agent_organization,
     t.flag_back,
     t.theme_recontact_flag,
+    t.theme_recontact_flag_per_bpo,
     t.last_department,
     ppm.is_pp_multi,
     fr.first_resolution as first_resolution_last_agent,
