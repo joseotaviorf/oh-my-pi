@@ -4,11 +4,11 @@ dag:
   owner: Data Fintech
   documentation:
     dag_purpose: |
-      This DAG creates and maintains the Credit Evaluation Core Model, which standardizes and enriches 
-      credit evaluation data from the DocX system. The model consolidates all credit assessments including 
-      regular evaluations, early credit approvals and Credit Passport validations with comprehensive 
+      This DAG creates and maintains the Credit Evaluation Core Model, which standardizes and enriches
+      credit evaluation data from the DocX system. The model consolidates all credit assessments including
+      regular evaluations, early credit approvals and Credit Passport validations with comprehensive
       business logic applied.
-      
+
       Key features:
       - Generates standardized surrogate keys (sk_core_credit_evaluation) for unique identification;
       - Reflects the product data found in the data lake's DocX clean layer;
@@ -37,5 +37,5 @@ workflow:
       table_properties:
         "delta.enableChangeDataFeed": "true"
 cluster:
-  type: databricks_16_4_rfleet_instance_cluster
+  type: databricks_16_4_small_general_fleet_xlarge_single_node
   databricks_conn_id: databricks_new
