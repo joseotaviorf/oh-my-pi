@@ -76,7 +76,7 @@ mediation_with_salesforce AS (
     squad_from_tags
   UNION ALL 
   SELECT
-    c.id_case AS id_ticket,
+    c.case_number AS id_ticket,
     c.id_contract,
     c.id_external AS id_termination,
     FALSE AS is_ticket_opened_via_terminator,
@@ -90,6 +90,7 @@ mediation_with_salesforce AS (
   WHERE 
     rt.record_type_name = 'Mediação'
     AND LOWER(c.case_status) NOT IN ('cancelado', 'canceled') 
+    AND c.omni_channel_queue NOT IN ('Squad 7 - Mediação')
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY c.id_contract ORDER BY c.ts_created DESC) = 1
 ),
