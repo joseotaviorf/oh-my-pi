@@ -40,7 +40,7 @@ cluster:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     driver_node_type_id:  r5.2xlarge
-    node_type_id:  r5.2xlarge
+    node_type_id:  c5.2xlarge
     num_workers: 3
     spark_version: 16.4.x-scala2.12
     spark_conf:
