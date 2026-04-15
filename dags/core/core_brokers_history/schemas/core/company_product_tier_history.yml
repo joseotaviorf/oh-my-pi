@@ -1,0 +1,43 @@
+columns:
+  id_event:
+    type: string
+    required: true
+  id_company_product_tier:
+    type: string
+    required: true
+  sk_core_company_product_tier:
+    type: string
+    required: true
+  event_name:
+    type: string
+    required: true
+  event_type:
+    type: string
+    required: true
+  value:
+    type: string
+    required: false
+  payload:
+    type: string
+    required: false
+  ts_transaction:
+    type: timestamp
+    required: true
+  event_origin:
+    type: string
+    required: true
+  ts_load:
+    type: timestamp
+    required: true
+  year:
+    type: int
+    required: true
+  month:
+    type: int
+    required: true
+  day:
+    type: int
+    required: true
+min_columns: 13
+max_columns: 13
+strict: true

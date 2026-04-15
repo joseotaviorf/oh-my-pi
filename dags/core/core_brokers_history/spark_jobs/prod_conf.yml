@@ -1,0 +1,30 @@
+ENTITY_TYPE: "BROKER"
+merge_on_historical: ["id_event"]
+when_matched_update_condition_historical: null
+
+COMPANY_HISTORY_TRANSACTIONAL_TABLE: "datalake_company_transactional.company"
+company_history_event_configs:
+  - tracked_col: company_name
+    target_col: company_name
+    target_type: string
+  - tracked_col: trade_name
+    target_col: trade_name
+    target_type: string
+  - tracked_col: status
+    target_col: status
+    target_type: string
+
+COMPANY_PRODUCT_HISTORY_TRANSACTIONAL_TABLE: "datalake_company_transactional.company_product"
+company_product_history_event_configs:
+  - tracked_col: product_settings
+    target_col: product_settings
+    target_type: string
+  - tracked_col: status
+    target_col: status
+    target_type: string
+
+COMPANY_PRODUCT_TIER_HISTORY_TRANSACTIONAL_TABLE: "datalake_company_transactional.company_product_tier"
+company_product_tier_history_event_configs:
+  - tracked_col: id_tier
+    target_col: id_tier
+    target_type: bigint

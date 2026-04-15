@@ -1,0 +1,67 @@
+database_name: core_brokers
+table_name: company_product_history
+domain: Broker XP
+owner: vitor.musachio@quintoandar.com.br
+description: >
+  Narrow field-level history for company_product from CDC. Primary key in the
+  source is (id_company, id_product); the core model stores a composite string
+  id_company_product for LAG partitioning and surrogate key generation.
+columns:
+  id_event:
+    lineage:
+      - datalake_company_transactional.company_product.id_company
+      - datalake_company_transactional.company_product.id_product
+      - datalake_company_transactional.company_product.ts_database_transaction
+    description: >
+      SHA256 hash of id_company_product composite, event_name, and ts_transaction.
+  id_company_product:
+    lineage:
+      - datalake_company_transactional.company_product.id_company
+      - datalake_company_transactional.company_product.id_product
+    description: >
+      Composite business key as id_company||id_product (string), matching the
+      transactional primary key.
+  sk_core_company_product:
+    lineage:
+      - datalake_company_transactional.company_product.id_company
+      - datalake_company_transactional.company_product.id_product
+    description: Surrogate key from COMPANY_PRODUCT literal and composite id string.
+  event_name:
+    lineage:
+      - datalake_company_transactional.company_product.product_settings
+      - datalake_company_transactional.company_product.status
+    description: Resolved event name for the changed field.
+    categories:
+      ev_product_settings: Change in product_settings.
+      ev_status: Change in status.
+  event_type:
+    lineage:
+      - datalake_company_transactional.company_product.op_cdc
+    description: CDC-sourced event type (cdc).
+  value:
+    lineage:
+      - datalake_company_transactional.company_product.product_settings
+      - datalake_company_transactional.company_product.status
+    description: New value of the changed column as string.
+  payload:
+    description: Reserved; null for CDC in this pipeline.
+  ts_transaction:
+    lineage:
+      - datalake_company_transactional.company_product.ts_database_transaction
+    description: Source database transaction time from CDC.
+  event_origin:
+    description: Fully qualified transactional table name for this job.
+  ts_load:
+    description: Load timestamp into the core history table.
+  year:
+    lineage:
+      - datalake_company_transactional.company_product.ts_database_transaction
+    description: Partition year from ts_transaction.
+  month:
+    lineage:
+      - datalake_company_transactional.company_product.ts_database_transaction
+    description: Partition month from ts_transaction.
+  day:
+    lineage:
+      - datalake_company_transactional.company_product.ts_database_transaction
+    description: Partition day from ts_transaction.

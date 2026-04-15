@@ -1,0 +1,64 @@
+database_name: core_brokers
+table_name: company_history
+domain: Broker XP
+owner: vitor.musachio@quintoandar.com.br
+description: >
+  Narrow field-level history for the company entity from CDC. Each row is one
+  tracked column change for company_name, trade_name, or status, keyed by company id.
+columns:
+  id_event:
+    lineage:
+      - datalake_company_transactional.company.id
+      - datalake_company_transactional.company.ts_database_transaction
+    description: >
+      SHA256 hash of id_company, event_name, and ts_transaction for idempotent merges.
+  id_company:
+    lineage:
+      - datalake_company_transactional.company.id
+    description: Company primary key (string cast of id).
+  sk_core_company:
+    lineage:
+      - datalake_company_transactional.company.id
+    description: Surrogate key from COMPANY literal and company id.
+  event_name:
+    lineage:
+      - datalake_company_transactional.company.company_name
+      - datalake_company_transactional.company.trade_name
+      - datalake_company_transactional.company.status
+    description: Resolved event name (ev_{target_col}) for the changed field.
+    categories:
+      ev_company_name: Change in company_name.
+      ev_trade_name: Change in trade_name.
+      ev_status: Change in status.
+  event_type:
+    lineage:
+      - datalake_company_transactional.company.op_cdc
+    description: CDC-sourced event type (cdc).
+  value:
+    lineage:
+      - datalake_company_transactional.company.company_name
+      - datalake_company_transactional.company.trade_name
+      - datalake_company_transactional.company.status
+    description: New value of the changed column as string.
+  payload:
+    description: Reserved; null for CDC in this pipeline.
+  ts_transaction:
+    lineage:
+      - datalake_company_transactional.company.ts_database_transaction
+    description: Source database transaction time from CDC.
+  event_origin:
+    description: Fully qualified transactional table name for this job.
+  ts_load:
+    description: Load timestamp into the core history table.
+  year:
+    lineage:
+      - datalake_company_transactional.company.ts_database_transaction
+    description: Partition year from ts_transaction.
+  month:
+    lineage:
+      - datalake_company_transactional.company.ts_database_transaction
+    description: Partition month from ts_transaction.
+  day:
+    lineage:
+      - datalake_company_transactional.company.ts_database_transaction
+    description: Partition day from ts_transaction.
