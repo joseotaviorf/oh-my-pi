@@ -12,6 +12,7 @@ SELECT
     landlord_doc_type,
     type,
     status,
+    cancellation_reason,
     digitable_line,
     version,
     updated_amount,

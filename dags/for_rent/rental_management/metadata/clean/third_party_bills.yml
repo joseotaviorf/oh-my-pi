@@ -58,6 +58,10 @@ columns:
     description: Status of the third party bill.
     lineage:
       - datalake_rental_management_raw.third_party_bills.status
+  cancellation_reason:
+    description: Reason recorded when the third party bill was canceled, when applicable.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills.cancellation_reason
   digitable_line:
     description: Digitable line of the third party bill.
     lineage:
