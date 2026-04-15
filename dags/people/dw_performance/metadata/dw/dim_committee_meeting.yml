@@ -3,19 +3,31 @@ table_name: dim_committee_meeting
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
-  Dimension that stores information about committee meetings, specifically those related to Talent Reviews.  It includes meeting identifiers, associated dashboard template, meeting date, title, and the reference period extracted from the title.
+  Dimension that stores committee meeting information for both Talent Review and Performance Calibration meeting types. One row per meeting. Primary key: sk_meeting. Used as a reference dimension by fact_talent_reviews (via sk_committee_meeting) and can be joined to fact_performance_calibrations via id_meeting. Includes a meeting_type discriminator to distinguish between the two meeting types.
 columns:
   sk_meeting:
-    description: Surrogate key that uniquely identifies a committee meeting.
+    description: Surrogate key that uniquely identifies a committee meeting. Derived from the source meeting identifier.
     lineage:
     - datalake_pin_hr_review_clean.meeting.id_meeting
   committee_title:
-    description: Official title of the committee meeting.
+    description: Official title of the committee meeting as defined in the HR Review source system.
     lineage:
     - datalake_pin_hr_review_clean.meeting.meeting_title
+  meeting_type:
+    description: Discriminator that classifies the meeting as 'talent_review' or 'performance_calibration', derived from the dashboard template name associated with the meeting.
+    lineage:
+    - datalake_pin_hr_review_clean.dashboard_template_translation.name
   reference_period:
-    description: Reference period of the meeting (e.g., Q1, Q2, H1, H2), extracted from the committee title. If no standard period is found, it defaults to the meeting title.
+    description: Reference period of the meeting (Q1, Q2, Q3, Q4, H1, H2), extracted from the committee title. NULL when no standard period pattern is found.
     lineage:
     - datalake_pin_hr_review_clean.meeting.meeting_title
+  meeting_status_code:
+    description: Status code of the committee meeting in the HR Review source system (e.g., OPEN, CLOSED).
+    lineage:
+    - datalake_pin_hr_review_clean.meeting.meeting_status_code
+  meeting_year:
+    description: Calendar year when the committee meeting took place, extracted from the meeting timestamp.
+    lineage:
+    - datalake_pin_hr_review_clean.meeting.ts_meeting
   ts_load:
     description: Timestamp indicating when the record was loaded into the dimension table.
