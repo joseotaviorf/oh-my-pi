@@ -199,6 +199,26 @@ assignment_history_with_band AS (
     WHERE
         dj.band IS NOT NULL
 ),
+assignment_job_max_end AS (
+    -- Running MAX of dt_effective_ended across all preceding rows within the same
+    -- (person, cycle, job) partition.  Using MAX instead of LAG is necessary because
+    -- concurrent assignments can produce overlapping periods for the same job; LAG
+    -- only sees the immediately preceding row and may miss a longer period that still
+    -- covers the current row's start date (causing a false stint break).
+    SELECT
+        id_person,
+        id_continuous_employment_cycle,
+        id_job,
+        dt_effective_started,
+        dt_effective_ended,
+        MAX(dt_effective_ended) OVER (
+            PARTITION BY id_person, id_continuous_employment_cycle, id_job
+            ORDER BY dt_effective_started, dt_effective_ended
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ) AS max_prev_ended
+    FROM
+        assignment_history
+),
 assignment_job_stint_groups AS (
     -- Detect job stints across assignments within the same employment cycle.
     -- Partitioning by id_continuous_employment_cycle ensures stints span GLB_TRANSFER
@@ -212,14 +232,8 @@ assignment_job_stint_groups AS (
         dt_effective_ended,
         SUM(
             CASE
-                WHEN LAG(dt_effective_ended) OVER (
-                    PARTITION BY id_person, id_continuous_employment_cycle, id_job
-                    ORDER BY dt_effective_started, dt_effective_ended
-                ) < DATE_ADD(dt_effective_started, -1)
-                    OR LAG(dt_effective_ended) OVER (
-                        PARTITION BY id_person, id_continuous_employment_cycle, id_job
-                        ORDER BY dt_effective_started, dt_effective_ended
-                    ) IS NULL
+                WHEN max_prev_ended IS NULL
+                    OR max_prev_ended < DATE_ADD(dt_effective_started, -1)
                 THEN 1
                 ELSE 0
             END
@@ -229,7 +243,7 @@ assignment_job_stint_groups AS (
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ) AS stint_group
     FROM
-        assignment_history
+        assignment_job_max_end
 ),
 job_tenure_start AS (
     -- One row per (person, cycle, job, stint).
@@ -248,6 +262,23 @@ job_tenure_start AS (
         id_job,
         stint_group
 ),
+assignment_band_max_end AS (
+    -- Running MAX of dt_effective_ended for overlapping-interval merging (same rationale
+    -- as assignment_job_max_end — concurrent assignments produce overlapping band periods).
+    SELECT
+        id_person,
+        id_continuous_employment_cycle,
+        band,
+        dt_effective_started,
+        dt_effective_ended,
+        MAX(dt_effective_ended) OVER (
+            PARTITION BY id_person, id_continuous_employment_cycle, band
+            ORDER BY dt_effective_started, dt_effective_ended
+            ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING
+        ) AS max_prev_ended
+    FROM
+        assignment_history_with_band
+),
 assignment_band_stint_groups AS (
     -- Same gaps-and-islands logic as job stints, applied to band across the cycle.
     SELECT
@@ -258,14 +289,8 @@ assignment_band_stint_groups AS (
         dt_effective_ended,
         SUM(
             CASE
-                WHEN LAG(dt_effective_ended) OVER (
-                    PARTITION BY id_person, id_continuous_employment_cycle, band
-                    ORDER BY dt_effective_started, dt_effective_ended
-                ) < DATE_ADD(dt_effective_started, -1)
-                    OR LAG(dt_effective_ended) OVER (
-                        PARTITION BY id_person, id_continuous_employment_cycle, band
-                        ORDER BY dt_effective_started, dt_effective_ended
-                    ) IS NULL
+                WHEN max_prev_ended IS NULL
+                    OR max_prev_ended < DATE_ADD(dt_effective_started, -1)
                 THEN 1
                 ELSE 0
             END
@@ -275,7 +300,7 @@ assignment_band_stint_groups AS (
             ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
         ) AS stint_group
     FROM
-        assignment_history_with_band
+        assignment_band_max_end
 ),
 band_tenure_start AS (
     SELECT
