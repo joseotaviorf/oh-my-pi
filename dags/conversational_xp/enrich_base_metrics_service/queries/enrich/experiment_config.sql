@@ -307,6 +307,29 @@ FROM VALUES
                                 ),
            'running', False
         )
+    ),
+
+    -- Feed sequence experiment
+    (
+        "ab_beakman_search_services_feed_sequence_experiment",
+        named_struct(
+            'begin_date', DATE('2026-04-09'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    '0', 'baseline',
+                    '1', 'treatment'
+                )
+            ),
+            'filters', NULL,
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                ),
+           'running', True
+        )
     )
 
 AS experiment_config(experiment_name, config)
