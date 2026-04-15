@@ -5,9 +5,8 @@ owner: vitor.musachio@quintoandar.com.br
 description: >
   Narrow field-level history for company_product from CDC, restricted to product ids
   27 and 30 (same scope as core_brokers). The transactional PK is (company_id,
-  product_id); the job renames these to id_company and id_product before history
-  logic. The core model stores a composite string id_company_product for LAG
-  partitioning and surrogate key generation.
+  product_id); the job renames these to id_company and id_product. Surrogate key
+  sk_company_product is concat(id_company, id_product) as string.
 columns:
   id_event:
     lineage:
@@ -15,19 +14,20 @@ columns:
       - datalake_company_transactional.company_product.product_id
       - datalake_company_transactional.company_product.ts_database_transaction
     description: >
-      SHA256 hash of id_company_product composite, event_name, and ts_transaction.
-  id_company_product:
+      SHA256 hash of composite id (id_company||id_product), event_name, and ts_transaction.
+  id_company:
+    lineage:
+      - datalake_company_transactional.company_product.company_id
+    description: Company id (string) from transactional company_id.
+  id_product:
+    lineage:
+      - datalake_company_transactional.company_product.product_id
+    description: Product id (string) from transactional product_id.
+  sk_company_product:
     lineage:
       - datalake_company_transactional.company_product.company_id
       - datalake_company_transactional.company_product.product_id
-    description: >
-      Composite business key as id_company||id_product (string), derived from
-      transactional company_id and product_id.
-  sk_core_company_product:
-    lineage:
-      - datalake_company_transactional.company_product.company_id
-      - datalake_company_transactional.company_product.product_id
-    description: Surrogate key from COMPANY_PRODUCT literal and composite id string.
+    description: Concatenation of id_company and id_product as string (no delimiter).
   event_name:
     lineage:
       - datalake_company_transactional.company_product.product_settings

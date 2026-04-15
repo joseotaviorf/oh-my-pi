@@ -26,6 +26,11 @@ _TABLE_ENTITY_AND_COMPOSITE: Dict[str, Tuple[str, bool]] = {
 
 _COMPOSITE_KEY_COL = "_history_pk"
 
+# HistoryBuilder emits id_company_product / id_company_product_tier from _history_pk
+# (id_company||id_product). Post-processing splits these and replaces sk_core_* with
+# sk_company_product = concat(id_company, id_product).
+_COMPOSITE_ID_SPLIT_PATTERN = r"\|\|"
+
 
 class CoreBrokersHistorySparkJob(BaseCoreModelSparkJob):
     """Narrow CDC field-level history for broker-scoped company and product tables.
@@ -36,7 +41,9 @@ class CoreBrokersHistorySparkJob(BaseCoreModelSparkJob):
     ``load_core_brokers``. Company history is restricted to companies that appear
     in ``company_product`` CDC for those products in the same load window.
     Composite primary keys use a synthetic ``_history_pk`` column for LAG
-    partitioning (``HistoryBuilder`` single-column contract).
+    partitioning (``HistoryBuilder`` single-column contract). Product and tier
+    outputs expose ``id_company``, ``id_product``, and ``sk_company_product``
+    (concat of the two ids); rows with null or blank ``value`` are dropped.
     """
 
     def __init__(self):
@@ -81,6 +88,9 @@ class CoreBrokersHistorySparkJob(BaseCoreModelSparkJob):
             event_type="cdc",
             event_origin=transactional_table,
         )
+
+        result_df = self._filter_value_filled(result_df)
+        result_df = self._reshape_composite_history_output(result_df, args.table_name)
 
         return result_df
 
@@ -150,6 +160,53 @@ class CoreBrokersHistorySparkJob(BaseCoreModelSparkJob):
         if "id_product" not in out.columns and "product_id" in out.columns:
             out = out.withColumnRenamed("product_id", "id_product")
         return out
+
+    def _filter_value_filled(self, df: DataFrame) -> DataFrame:
+        """Drop rows with null or blank ``value`` (history rows must carry a value)."""
+        v = F.col("value").cast("string")
+        return df.filter(
+            F.col("value").isNotNull() & (F.length(F.trim(v)) > 0)
+        )
+
+    def _reshape_composite_history_output(
+        self, df: DataFrame, table_name: str
+    ) -> DataFrame:
+        """Split composite id into id_company/id_product; set sk_company_product."""
+        if table_name == "broker_products_history":
+            composite_col = "id_company_product"
+            sk_old = "sk_core_company_product"
+        elif table_name == "broker_tiers_history":
+            composite_col = "id_company_product_tier"
+            sk_old = "sk_core_company_product_tier"
+        else:
+            return df
+
+        parts = F.split(F.col(composite_col), _COMPOSITE_ID_SPLIT_PATTERN)
+        out = (
+            df.withColumn("id_company", parts.getItem(0))
+            .withColumn("id_product", parts.getItem(1))
+            .withColumn(
+                "sk_company_product",
+                F.concat(F.col("id_company"), F.col("id_product")),
+            )
+            .drop(composite_col, sk_old)
+        )
+        return out.select(
+            "id_event",
+            "id_company",
+            "id_product",
+            "sk_company_product",
+            "event_name",
+            "event_type",
+            "value",
+            "payload",
+            "ts_transaction",
+            "event_origin",
+            "ts_load",
+            "year",
+            "month",
+            "day",
+        )
 
     def _prepare_keys(self, df: DataFrame, use_composite_pk: bool) -> DataFrame:
         """Normalize PK columns and optionally add synthetic composite key.

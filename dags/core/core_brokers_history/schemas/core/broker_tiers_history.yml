@@ -2,10 +2,13 @@ columns:
   id_event:
     type: string
     required: true
-  id_company_product_tier:
+  id_company:
     type: string
     required: true
-  sk_core_company_product_tier:
+  id_product:
+    type: string
+    required: true
+  sk_company_product:
     type: string
     required: true
   event_name:
@@ -38,6 +41,6 @@ columns:
   day:
     type: int
     required: true
-min_columns: 13
-max_columns: 13
+min_columns: 14
+max_columns: 14
 strict: true

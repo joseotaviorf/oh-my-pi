@@ -1,39 +1,33 @@
 ---
 table_name: core_brokers.broker_tiers_history
 alert_channel: "#alerts-de-airflow-dags"
-is_incremental:
-  incremental_date_column: ts_transaction
-  incremental_date_mask: yyyy-MM-dd
 column_level_validations:
   id_event:
     is_unique:
       severity_level: Error
     is_complete:
       severity_level: Error
-  id_company_product_tier:
+  id_company:
     is_complete:
       severity_level: Error
-  sk_core_company_product_tier:
+  id_product:
+    is_complete:
+      severity_level: Error
+  sk_company_product:
     is_complete:
       severity_level: Error
   event_name:
     is_complete:
       severity_level: Error
-    is_in:
-      severity_level: Error
-      values:
-        - ev_id_tier
   event_type:
     is_complete:
       severity_level: Error
-    is_in:
-      severity_level: Error
-      values:
-        - cdc
-        - outbox_pattern
   ts_transaction:
     is_complete:
       severity_level: Error
   event_origin:
+    is_complete:
+      severity_level: Error
+  value:
     is_complete:
       severity_level: Error

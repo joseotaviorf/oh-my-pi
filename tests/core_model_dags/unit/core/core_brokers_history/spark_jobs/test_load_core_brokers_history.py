@@ -27,8 +27,9 @@ EXPECTED_COMPANY_COLUMNS = {
 
 EXPECTED_COMPANY_PRODUCT_COLUMNS = {
     "id_event",
-    "id_company_product",
-    "sk_core_company_product",
+    "id_company",
+    "id_product",
+    "sk_company_product",
     "event_name",
     "event_type",
     "value",
@@ -154,7 +155,7 @@ class TestCoreBrokersHistoryBrokersSchema:
 
 class TestCoreBrokersHistoryBrokerProductsSchema:
 
-    def test_create_core_model_broker_products_returns_13_columns(
+    def test_create_core_model_broker_products_returns_14_columns(
         self,
         spark_session,
         transactional_company_product_df,
@@ -169,7 +170,7 @@ class TestCoreBrokersHistoryBrokerProductsSchema:
         ):
             result = job.create_core_model(spark_session, args)
 
-        assert len(result.columns) == 13
+        assert len(result.columns) == 14
         assert set(result.columns) == EXPECTED_COMPANY_PRODUCT_COLUMNS
 
     def test_composite_id_format(
@@ -188,7 +189,9 @@ class TestCoreBrokersHistoryBrokerProductsSchema:
             result = job.create_core_model(spark_session, args)
 
         for row in result.collect():
-            assert row["id_company_product"] == "1||30"
+            assert row["id_company"] == "1"
+            assert row["id_product"] == "30"
+            assert row["sk_company_product"] == "130"
 
     def test_id_event_deterministic(
         self,

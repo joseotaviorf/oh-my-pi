@@ -7,8 +7,8 @@ description: >
   product ids 27 and 30 (same scope as core_brokers). The transactional row key
   uses (company_id, product_id); the job renames these to id_company and id_product
   before history logic. Tier changes are tracked on transactional tier_id (event
-  name ev_id_tier via target_col). The composite id_company_product_tier column
-  encodes the row key for LAG and SKs.
+  name ev_id_tier via target_col). Surrogate key sk_company_product is
+  concat(id_company, id_product) as string.
 columns:
   id_event:
     lineage:
@@ -16,19 +16,20 @@ columns:
       - datalake_company_transactional.company_product_tier.product_id
       - datalake_company_transactional.company_product_tier.ts_database_transaction
     description: >
-      SHA256 hash of id_company_product_tier composite, event_name, and ts_transaction.
-  id_company_product_tier:
+      SHA256 hash of composite id (id_company||id_product), event_name, and ts_transaction.
+  id_company:
+    lineage:
+      - datalake_company_transactional.company_product_tier.company_id
+    description: Company id (string) from transactional company_id.
+  id_product:
+    lineage:
+      - datalake_company_transactional.company_product_tier.product_id
+    description: Product id (string) from transactional product_id.
+  sk_company_product:
     lineage:
       - datalake_company_transactional.company_product_tier.company_id
       - datalake_company_transactional.company_product_tier.product_id
-    description: >
-      Composite business key as id_company||id_product (string), derived from
-      transactional company_id and product_id for this association row.
-  sk_core_company_product_tier:
-    lineage:
-      - datalake_company_transactional.company_product_tier.company_id
-      - datalake_company_transactional.company_product_tier.product_id
-    description: Surrogate key from COMPANY_PRODUCT_TIER literal and composite id string.
+    description: Concatenation of id_company and id_product as string (no delimiter).
   event_name:
     lineage:
       - datalake_company_transactional.company_product_tier.tier_id
