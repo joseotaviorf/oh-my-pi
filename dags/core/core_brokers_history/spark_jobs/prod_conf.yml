@@ -2,8 +2,9 @@ ENTITY_TYPE: "BROKER"
 merge_on_historical: ["id_event"]
 when_matched_update_condition_historical: null
 
-COMPANY_HISTORY_TRANSACTIONAL_TABLE: "datalake_company_transactional.company"
-company_history_event_configs:
+BROKERS_HISTORY_TRANSACTIONAL_TABLE: "datalake_company_transactional.company"
+# tracked_col = column name in transactional CDC; target_col = core convention (ev_{target_col}).
+brokers_history_event_configs:
   - tracked_col: company_name
     target_col: company_name
     target_type: string
@@ -14,8 +15,8 @@ company_history_event_configs:
     target_col: status
     target_type: string
 
-COMPANY_PRODUCT_HISTORY_TRANSACTIONAL_TABLE: "datalake_company_transactional.company_product"
-company_product_history_event_configs:
+BROKER_PRODUCTS_HISTORY_TRANSACTIONAL_TABLE: "datalake_company_transactional.company_product"
+broker_products_history_event_configs:
   - tracked_col: product_settings
     target_col: product_settings
     target_type: string
@@ -23,8 +24,8 @@ company_product_history_event_configs:
     target_col: status
     target_type: string
 
-COMPANY_PRODUCT_TIER_HISTORY_TRANSACTIONAL_TABLE: "datalake_company_transactional.company_product_tier"
-company_product_tier_history_event_configs:
-  - tracked_col: id_tier
+BROKER_TIERS_HISTORY_TRANSACTIONAL_TABLE: "datalake_company_transactional.company_product_tier"
+broker_tiers_history_event_configs:
+  - tracked_col: tier_id
     target_col: id_tier
     target_type: bigint

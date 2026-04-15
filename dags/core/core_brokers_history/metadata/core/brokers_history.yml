@@ -1,10 +1,13 @@
 database_name: core_brokers
-table_name: company_history
+table_name: brokers_history
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 description: >
-  Narrow field-level history for the company entity from CDC. Each row is one
-  tracked column change for company_name, trade_name, or status, keyed by company id.
+  Narrow field-level history for the company entity from CDC, scoped to broker
+  companies: only companies that have company_product CDC rows for product ids 27
+  or 30 in the same incremental window are included (aligned with core_brokers).
+  Each output row is one tracked column change for company_name, trade_name, or
+  status, keyed by company id.
 columns:
   id_event:
     lineage:

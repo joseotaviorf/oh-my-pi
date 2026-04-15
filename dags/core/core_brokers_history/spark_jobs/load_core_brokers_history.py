@@ -14,23 +14,29 @@ from bietlejuice.pipeline.dataframe_delta_table_loader_pipeline import (
 
 JOB_NAME = "brokers_history"
 
+# Same product scope as ``load_core_brokers._process_company_product`` (3P rent/sale).
+THREE_P_BROKER_PRODUCT_IDS: Tuple[int, ...] = (27, 30)
+
 # Output table_name -> (entity_name for HistoryBuilder, use composite PK column)
 _TABLE_ENTITY_AND_COMPOSITE: Dict[str, Tuple[str, bool]] = {
-    "company_history": ("company", False),
-    "company_product_history": ("company_product", True),
-    "company_product_tier_history": ("company_product_tier", True),
+    "brokers_history": ("company", False),
+    "broker_products_history": ("company_product", True),
+    "broker_tiers_history": ("company_product_tier", True),
 }
 
 _COMPOSITE_KEY_COL = "_history_pk"
 
 
 class CoreBrokersHistorySparkJob(BaseCoreModelSparkJob):
-    """Narrow CDC field-level history for company-related transactional tables.
+    """Narrow CDC field-level history for broker-scoped company and product tables.
 
-    Writes to ``core_brokers.company_history``, ``company_product_history``, and
-    ``company_product_tier_history`` depending on ``table_name``. Composite
-    primary keys (company + product) use a synthetic ``_history_pk`` column for
-    LAG partitioning, matching :class:`HistoryBuilder` single-column contract.
+    Writes ``core_brokers.brokers_history``, ``broker_products_history``, and
+    ``broker_tiers_history``. Product and tier pipelines only include rows whose
+    ``id_product`` is in :data:`THREE_P_BROKER_PRODUCT_IDS`, matching
+    ``load_core_brokers``. Company history is restricted to companies that appear
+    in ``company_product`` CDC for those products in the same load window.
+    Composite primary keys use a synthetic ``_history_pk`` column for LAG
+    partitioning (``HistoryBuilder`` single-column contract).
     """
 
     def __init__(self):
@@ -55,7 +61,12 @@ class CoreBrokersHistorySparkJob(BaseCoreModelSparkJob):
         df = HistoricalHelper.load_transactional_data(
             spark, transactional_table, args
         )
-        df = self._normalize_tier_columns(df, args.table_name)
+        if args.table_name == "brokers_history":
+            df = self._semi_join_companies_with_three_p_products(spark, df, args)
+
+        df = self._normalize_tier_tracked_column(df, args.table_name)
+        df = self._align_transactional_fk_columns(df, args.table_name)
+        df = self._filter_three_p_product_rows(df, args.table_name)
         df = self._prepare_keys(df, use_composite_pk)
 
         id_col = _COMPOSITE_KEY_COL if use_composite_pk else "id"
@@ -73,20 +84,83 @@ class CoreBrokersHistorySparkJob(BaseCoreModelSparkJob):
 
         return result_df
 
-    def _normalize_tier_columns(self, df: DataFrame, table_name: str) -> DataFrame:
-        """Align tier FK column name with event_configs (id_tier)."""
-        if table_name != "company_product_tier_history":
+    def _semi_join_companies_with_three_p_products(
+        self, spark: SparkSession, company_df: DataFrame, args
+    ) -> DataFrame:
+        """Keep only company CDC rows for companies with product 27 or 30 in-window."""
+        cp_table = self.get_config(
+            "BROKER_PRODUCTS_HISTORY_TRANSACTIONAL_TABLE", required=True
+        )
+        cp_df = HistoricalHelper.load_transactional_data(spark, cp_table, args)
+        cp_df = self._align_transactional_fk_columns(
+            cp_df, "broker_products_history"
+        )
+        cp_df = cp_df.filter(
+            F.col("id_product").cast("long").isin(list(THREE_P_BROKER_PRODUCT_IDS))
+        )
+        allowed = (
+            cp_df.select(F.col("id_company").cast("string").alias("_sk_company"))
+            .distinct()
+        )
+        return company_df.join(
+            allowed,
+            F.col("id").cast("string") == F.col("_sk_company"),
+            "left_semi",
+        ).drop("_sk_company")
+
+    def _filter_three_p_product_rows(
+        self, df: DataFrame, table_name: str
+    ) -> DataFrame:
+        if table_name not in ("broker_products_history", "broker_tiers_history"):
             return df
-        if "id_tier" not in df.columns and "tier_id" in df.columns:
-            return df.withColumnRenamed("tier_id", "id_tier")
+        return df.filter(
+            F.col("id_product").cast("long").isin(list(THREE_P_BROKER_PRODUCT_IDS))
+        )
+
+    def _normalize_tier_tracked_column(
+        self, df: DataFrame, table_name: str
+    ) -> DataFrame:
+        """Align tier column with ``broker_tiers_history_event_configs``.
+
+        YAML uses ``tracked_col: tier_id`` and ``target_col: id_tier`` (contract-style
+        mapping). Some CDC snapshots expose ``id_tier`` instead of ``tier_id``; rename
+        so ``HistoryBuilder`` LAG runs on ``tier_id``.
+        """
+        if table_name != "broker_tiers_history":
+            return df
+        if "tier_id" not in df.columns and "id_tier" in df.columns:
+            return df.withColumnRenamed("id_tier", "tier_id")
         return df
 
+    def _align_transactional_fk_columns(
+        self, df: DataFrame, table_name: str
+    ) -> DataFrame:
+        """Map physical CDC FK names to core naming (id_company, id_product).
+
+        Mirrors the transactional FK renames in ``load_core_brokers_product`` for
+        ``datalake_company_transactional`` tables that still expose
+        ``company_id`` / ``product_id``.
+        """
+        if table_name not in ("broker_products_history", "broker_tiers_history"):
+            return df
+
+        out = df
+        if "id_company" not in out.columns and "company_id" in out.columns:
+            out = out.withColumnRenamed("company_id", "id_company")
+        if "id_product" not in out.columns and "product_id" in out.columns:
+            out = out.withColumnRenamed("product_id", "id_product")
+        return out
+
     def _prepare_keys(self, df: DataFrame, use_composite_pk: bool) -> DataFrame:
-        """Normalize PK columns and optionally add synthetic composite key."""
+        """Normalize PK columns and optionally add synthetic composite key.
+
+        For composite tables, ``id_company`` and ``id_product`` must already be
+        present (see ``_align_transactional_fk_columns``).
+        """
         if not use_composite_pk:
             return df
 
-        # Transactional layer aligns with id_company / id_product (see brokers lineage).
+        # Expect convention names after transactional alignment.
         for name in ("id_company", "id_product"):
             if name not in df.columns:
                 raise ValueError(

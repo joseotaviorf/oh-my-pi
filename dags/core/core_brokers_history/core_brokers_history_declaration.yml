@@ -4,9 +4,10 @@ dag:
   owner: Data Broker XP
   documentation:
     dag_purpose: |
-      Creates narrow field-level history core tables for company, company_product,
-      and company_product_tier from the transactional CDC layer (fixed 13-column
-      event schema per table).
+      Creates narrow field-level history core tables for broker scope: brokers_history
+      (company CDC), broker_products_history, and broker_tiers_history from the
+      transactional CDC layer. Only product ids 27 and 30 are included (same scope
+      as core_brokers). Fixed 13-column event schema per table.
 workflow:
   type: core_model
   layer: core
@@ -18,7 +19,7 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
   tables_customization:
-    company_history:
+    brokers_history:
       spark_job_arguments:
         - "{environment}"
         - "{bucket}"
@@ -32,7 +33,7 @@ workflow:
       z_order_by: [id_company, ts_transaction]
       table_properties:
         "delta.enableChangeDataFeed": "true"
-    company_product_history:
+    broker_products_history:
       spark_job_arguments:
         - "{environment}"
         - "{bucket}"
@@ -46,7 +47,7 @@ workflow:
       z_order_by: [id_company_product, ts_transaction]
       table_properties:
         "delta.enableChangeDataFeed": "true"
-    company_product_tier_history:
+    broker_tiers_history:
       spark_job_arguments:
         - "{environment}"
         - "{bucket}"

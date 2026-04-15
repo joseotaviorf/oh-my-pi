@@ -1,30 +1,32 @@
 database_name: core_brokers
-table_name: company_product_history
+table_name: broker_products_history
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 description: >
-  Narrow field-level history for company_product from CDC. Primary key in the
-  source is (id_company, id_product); the core model stores a composite string
-  id_company_product for LAG partitioning and surrogate key generation.
+  Narrow field-level history for company_product from CDC, restricted to product ids
+  27 and 30 (same scope as core_brokers). The transactional PK is (company_id,
+  product_id); the job renames these to id_company and id_product before history
+  logic. The core model stores a composite string id_company_product for LAG
+  partitioning and surrogate key generation.
 columns:
   id_event:
     lineage:
-      - datalake_company_transactional.company_product.id_company
-      - datalake_company_transactional.company_product.id_product
+      - datalake_company_transactional.company_product.company_id
+      - datalake_company_transactional.company_product.product_id
       - datalake_company_transactional.company_product.ts_database_transaction
     description: >
       SHA256 hash of id_company_product composite, event_name, and ts_transaction.
   id_company_product:
     lineage:
-      - datalake_company_transactional.company_product.id_company
-      - datalake_company_transactional.company_product.id_product
+      - datalake_company_transactional.company_product.company_id
+      - datalake_company_transactional.company_product.product_id
     description: >
-      Composite business key as id_company||id_product (string), matching the
-      transactional primary key.
+      Composite business key as id_company||id_product (string), derived from
+      transactional company_id and product_id.
   sk_core_company_product:
     lineage:
-      - datalake_company_transactional.company_product.id_company
-      - datalake_company_transactional.company_product.id_product
+      - datalake_company_transactional.company_product.company_id
+      - datalake_company_transactional.company_product.product_id
     description: Surrogate key from COMPANY_PRODUCT literal and composite id string.
   event_name:
     lineage:

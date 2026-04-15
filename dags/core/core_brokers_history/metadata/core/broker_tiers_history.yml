@@ -1,45 +1,48 @@
 database_name: core_brokers
-table_name: company_product_tier_history
+table_name: broker_tiers_history
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 description: >
-  Narrow field-level history for company_product_tier from CDC. Primary key in
-  the source is (id_company, id_product); tier changes are tracked on id_tier.
-  The composite id_company_product_tier column encodes the row key for LAG and SKs.
+  Narrow field-level history for company_product_tier from CDC, restricted to
+  product ids 27 and 30 (same scope as core_brokers). The transactional row key
+  uses (company_id, product_id); the job renames these to id_company and id_product
+  before history logic. Tier changes are tracked on transactional tier_id (event
+  name ev_id_tier via target_col). The composite id_company_product_tier column
+  encodes the row key for LAG and SKs.
 columns:
   id_event:
     lineage:
-      - datalake_company_transactional.company_product_tier.id_company
-      - datalake_company_transactional.company_product_tier.id_product
+      - datalake_company_transactional.company_product_tier.company_id
+      - datalake_company_transactional.company_product_tier.product_id
       - datalake_company_transactional.company_product_tier.ts_database_transaction
     description: >
       SHA256 hash of id_company_product_tier composite, event_name, and ts_transaction.
   id_company_product_tier:
     lineage:
-      - datalake_company_transactional.company_product_tier.id_company
-      - datalake_company_transactional.company_product_tier.id_product
+      - datalake_company_transactional.company_product_tier.company_id
+      - datalake_company_transactional.company_product_tier.product_id
     description: >
-      Composite business key as id_company||id_product (string), matching the
-      transactional primary key for this association row.
+      Composite business key as id_company||id_product (string), derived from
+      transactional company_id and product_id for this association row.
   sk_core_company_product_tier:
     lineage:
-      - datalake_company_transactional.company_product_tier.id_company
-      - datalake_company_transactional.company_product_tier.id_product
+      - datalake_company_transactional.company_product_tier.company_id
+      - datalake_company_transactional.company_product_tier.product_id
     description: Surrogate key from COMPANY_PRODUCT_TIER literal and composite id string.
   event_name:
     lineage:
-      - datalake_company_transactional.company_product_tier.id_tier
-    description: Resolved event name for tier identifier changes.
+      - datalake_company_transactional.company_product_tier.tier_id
+    description: Resolved event name for tier identifier changes (ev_id_tier).
     categories:
-      ev_id_tier: Change in id_tier (tier association).
+      ev_id_tier: Change in tier id (tier association); source column tier_id.
   event_type:
     lineage:
       - datalake_company_transactional.company_product_tier.op_cdc
     description: CDC-sourced event type (cdc).
   value:
     lineage:
-      - datalake_company_transactional.company_product_tier.id_tier
-    description: New id_tier value as string.
+      - datalake_company_transactional.company_product_tier.tier_id
+    description: New tier identifier value as string (from transactional tier_id).
   payload:
     description: Reserved; null for CDC in this pipeline.
   ts_transaction:

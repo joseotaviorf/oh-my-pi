@@ -1,5 +1,5 @@
 ---
-table_name: core_brokers.company_product_tier_history
+table_name: core_brokers.brokers_history
 alert_channel: "#alerts-de-airflow-dags"
 is_incremental:
   incremental_date_column: ts_transaction
@@ -10,10 +10,10 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  id_company_product_tier:
+  id_company:
     is_complete:
       severity_level: Error
-  sk_core_company_product_tier:
+  sk_core_company:
     is_complete:
       severity_level: Error
   event_name:
@@ -22,7 +22,9 @@ column_level_validations:
     is_in:
       severity_level: Error
       values:
-        - ev_id_tier
+        - ev_company_name
+        - ev_trade_name
+        - ev_status
   event_type:
     is_complete:
       severity_level: Error
