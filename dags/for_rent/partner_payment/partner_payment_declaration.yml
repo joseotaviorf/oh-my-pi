@@ -35,6 +35,10 @@ workflow:
       clean_table_name: payments_period
     photo_session_details:
       clean_table_name: photo_session_details
+    bills:
+      clean_table_name: bills
+    bill_reviews:
+      clean_table_name: bill_reviews
 cluster:
   type: databricks_16_4_med_general_cluster
   databricks_conn_id: databricks_new

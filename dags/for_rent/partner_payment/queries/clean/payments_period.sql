@@ -9,6 +9,7 @@ SELECT
     due_date AS dt_due,
     accrual_date AS dt_accrual,
     closing_date AS dt_closing,
+    invoice_upload_deadline AS dt_invoice_upload_deadline,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM

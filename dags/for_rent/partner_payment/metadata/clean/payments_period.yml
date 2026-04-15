@@ -46,6 +46,10 @@ columns:
     lineage:
       - datalake_partner_payment_raw.payments_period.closing_date
     description: Indicates the closing date related to the period.
+  dt_invoice_upload_deadline:
+    lineage:
+      - datalake_partner_payment_raw.payments_period.invoice_upload_deadline
+    description: The deadline for sending the invoice for the period.
   ts_created:
     lineage:
       - datalake_partner_payment_raw.payments_period.created_at

@@ -1,0 +1,53 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: bills
+description: |
+  Bills generated for partner companies paid through the Partner Payment service.
+  One row per bill. Primary key: id. Related to payments_period via id_payments_period (FK to payments_period).
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.bills.id
+    description: Primary key. Unique identifier of the bill in the transactional source.
+  id_payments_period:
+    lineage:
+      - datalake_partner_payment_raw.bills.payments_period_id
+    description: Foreign key to datalake_partner_payment_clean.payments_period. Identifies the payment period associated with this bill.
+  uuid_company:
+    lineage:
+      - datalake_partner_payment_raw.bills.company_uuid
+    description: UUID of the company associated with this bill.
+  id_payment_provider:
+    lineage:
+      - datalake_partner_payment_raw.bills.payment_provider_id
+    description: Identifier of this bill in the external payment provider system.
+  version:
+    lineage:
+      - datalake_partner_payment_raw.bills.version
+    description: Record version used for optimistic concurrency control.
+  status:
+    lineage:
+      - datalake_partner_payment_raw.bills.status
+    description: Current lifecycle status of the bill (e.g. pending, paid, canceled).
+  total_amount:
+    lineage:
+      - datalake_partner_payment_raw.bills.total_amount
+    description: Total monetary amount of the bill.
+  currency:
+    lineage:
+      - datalake_partner_payment_raw.bills.currency
+    description: Currency code of the bill amount (e.g. BRL).
+  payment_provider:
+    lineage:
+      - datalake_partner_payment_raw.bills.payment_provider
+    description: Name of the external system responsible for processing the payment.
+  ts_created:
+    lineage:
+      - datalake_partner_payment_raw.bills.created_at
+    description: Timestamp of the bill creation in the source system.
+  ts_updated:
+    lineage:
+      - datalake_partner_payment_raw.bills.updated_at
+    description: Timestamp of the last update to the bill in the source system.

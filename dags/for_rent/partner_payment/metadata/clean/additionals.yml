@@ -26,10 +26,14 @@ columns:
     lineage:
       - datalake_partner_payment_raw.additionals.quantity
     description: Threshold for considering whether to pay for the charge.
-  amount:
+  additional_amount:
     lineage:
-      - datalake_partner_payment_raw.additionals.amount
+      - datalake_partner_payment_raw.additionals.additional_amount
     description: Amount to pay for the charge.
+  currency:
+    lineage:
+      - datalake_partner_payment_raw.additionals.currency
+    description: The currency of the record.
   ts_created:
     lineage:
       - datalake_partner_payment_raw.additionals.created_at

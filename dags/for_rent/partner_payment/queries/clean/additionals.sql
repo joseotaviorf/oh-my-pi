@@ -4,7 +4,8 @@ SELECT
     version,
     additional_type,
     quantity,
-    amount,
+    additional_amount,
+    currency,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM
