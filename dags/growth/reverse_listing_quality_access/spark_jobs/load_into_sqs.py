@@ -5,7 +5,7 @@ Consumed by main-sqs-consumers application.
 import json
 import logging
 from argparse import ArgumentParser
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Tuple, Type, TypeVar
 
 import boto3
 
@@ -17,6 +17,10 @@ JOB_NAME = "load_into_sqs"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
+T = TypeVar("T")
+
+def safe_cast(value: str | None, target_type: Type[T]) -> T | None:
+    return target_type(value) if value is not None else None
 
 def parse_arguments() -> Tuple[str, str, str]:
     parser = ArgumentParser(description=JOB_NAME)
@@ -30,26 +34,16 @@ def parse_arguments() -> Tuple[str, str, str]:
 def row_to_message(row: Any) -> Dict[str, Any]:
     """Transform a listing_quality row to the payload expected by main-sqs-consumers."""
     return {
-        "houseId": int(row.house_id) if row.house_id is not None else None,
-        "jobId": int(row.job_id) if row.job_id is not None else None,
-        "commentPhotographer": str(row.photographer_comment)
-        if row.photographer_comment is not None
-        else None,
-        "videoLink": str(row.link_video) if row.link_video is not None else None,
-        "numInternalPhotos": int(row.num_internal_photos)
-        if row.num_internal_photos is not None
-        else None,
-        "imagesPerRoom": float(row.images_per_room)
-        if row.images_per_room is not None
-        else None,
-        "propertyCondition": float(row.property_condition)
-        if row.property_condition is not None
-        else None,
-        "hasBathroomPhoto": bool(row.has_bathroom_photo)
-        if row.has_bathroom_photo is not None
-        else None,
-        "hasPlaque": bool(row.has_plaque) if row.has_plaque is not None else None,
-        "analystQueue": int(row.analyst_queue) if row.analyst_queue is not None else None,
+        "houseId": safe_cast(row.house_id, int),
+        "jobId": safe_cast(row.job_id, int),
+        "commentPhotographer": safe_cast(row.photographer_comment, str),
+        "videoLink": safe_cast(row.link_video, str),
+        "numInternalPhotos": safe_cast(row.num_internal_photos, int),
+        "numBathroomPhotos": safe_cast(row.num_bathroom_photos, int),
+        "imagesPerRoom": safe_cast(row.images_per_room, float),
+        "propertyCondition": safe_cast(row.property_condition, float),
+        "hasPlaque": safe_cast(row.has_plaque, bool),
+        "analystQueue": safe_cast(row.analyst_queue, int),
     }
 
 

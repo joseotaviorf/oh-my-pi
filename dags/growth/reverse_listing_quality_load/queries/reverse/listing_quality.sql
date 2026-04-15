@@ -13,8 +13,6 @@ WITH
             sk_house
         HAVING
             MIN_BY(planning_operation, date) NOT IN ('Rede', 'Mercado Primário BH')
-            AND MIN_BY(sk_user_conversion, date) NOT IN (8919771, 11299701, 6001450) -- para não considerar casos de 3P FR
-            AND MIN_BY(sk_user_affiliate, date) NOT IN (12306405, 14046860, 14053116, 14046994, 14217303) -- para não considerar casos de 3P FR
             AND MIN(date) >= DATE('{load_start_date}')
             AND MIN(date) <= DATE('{load_end_date}')
     ), -- ids de imóveis de 1p publicados em first listing no intervalo
@@ -183,11 +181,12 @@ WITH
             a.id_house,
             b.studio_kitnet,
             SUM(a.images) AS total_internal_images,
+            SUM(IF(a.room_type = 'bathroom', a.images, 0)) AS total_bathroom_images,
             comodos_from_house,
             ROUND(CAST(SUM(a.images) AS DOUBLE) / comodos_from_house, 1) AS images_per_room_from_house
         FROM details_inspection a
             LEFT JOIN ims_details b ON (a.id_house = b.id_house)
-        GROUP BY 1, 2, 4
+        GROUP BY 1, 2, 5
     ), -- soma de fotos por cômodo, cálculo de média de fotos por cômodo - possui outras colunas no select apenas porque serão usadas mais pra frente
 
     placas_check AS (
@@ -255,6 +254,7 @@ SELECT DISTINCT
     ELSE c.placa_identificada END AS verificar_placa, -- puxa a flag que sinaliza a verificação quando há placa identificada, excluindo casos em que a inspeção do restb aconteceu antes da data da última publicação
 
     b.total_internal_images,
+    b.total_bathroom_images,
     b.comodos_from_house,
     b.images_per_room_from_house
 FROM details_inspection a
@@ -270,9 +270,9 @@ SELECT  DISTINCT
     a.internal_admin_info as photographer_comment, -- commentPhotographer
     c.link_video, -- videoLink
     b.total_internal_images as num_internal_photos, -- numInternalPhotos
+    b.total_bathroom_images as num_bathroom_photos, -- numBathroomPhotos
     b.images_per_room_from_house as images_per_room, -- imagesPerRoom
     b.property_condition, -- propertyCondition
-    NOT b.verificar_banheiro as has_bathroom_photo, -- bathrooms
     b.verificar_placa as has_plaque, -- hasPlaque
     CASE
         WHEN b.property_condition IS NULL THEN 0
