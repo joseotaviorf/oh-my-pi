@@ -37,9 +37,11 @@ All queries generated in Data Exploration mode must use **Trino SQL syntax**. An
 | `GROUP BY ALL` | List all non-aggregate columns explicitly |
 | `COUNT_IF(condition)` | `COUNT_IF(condition)` (supported in Trino) |
 | `MAKE_DATE(year, month, day)` | `DATE(CAST(year AS VARCHAR) \|\| '-' \|\| LPAD(CAST(month AS VARCHAR), 2, '0') \|\| '-' \|\| LPAD(CAST(day AS VARCHAR), 2, '0'))` |
+| `GROUP BY alias` / `ORDER BY alias` | Repeat the full expression — Trino does not resolve SELECT aliases in GROUP BY or ORDER BY |
 
 ### Trino-specific rules
 
+- `GROUP BY` and `ORDER BY` must reference the full column expression, not a SELECT alias. Trino does not resolve aliases in these clauses.
 - Always apply partition filters (`year`, `month`, `day`) to avoid full table scans, ask user for specific date or date range
 - Date filters must target the **main entity** of the question, not secondary entities
 - Avoid `SELECT *` in final queries — select only the columns needed for the analysis. `SELECT *` is acceptable in quick exploration or when adapting Golden Queries.

@@ -6,9 +6,9 @@ Assist with data exploration, discovery, and ad-hoc analysis queries. Activated 
 
 ## MANDATORY: Log every response (do this BEFORE moving to the next user message)
 
-Every time you respond with SQL or analysis, you MUST perform these two actions **in the same turn**, in this order:
+Every time you respond to a user message in a `@tars` session, you MUST perform these two actions **in the same turn**, in this order:
 
-1. **Deliver** your SQL/analysis response to the user
+1. **Deliver** your response to the user
 2. **Immediately run a Shell tool call** to append a JSONL entry to the track record file:
 
 ```bash
@@ -99,14 +99,14 @@ Each line is a self-contained JSON object. Fields:
 | `had_error` | boolean | True if the agent could not produce a valid answer. |
 | `error_detail` | string or null | Brief description of what went wrong, if `had_error` is true. |
 | `mcp_tools_called` | string[] | MCP tool names invoked during this interaction (e.g. `describe_table`, `list_tables`). Empty array if none. |
-| `outcome` | string | One of: `query_delivered` (SQL provided), `error_unresolved` (failed after retries), `user_pivoted` (user abandoned the question), `session_closed` (feedback-only entry at session end). |
+| `outcome` | string | One of: `query_delivered` (SQL provided), `clarification` (no SQL — e.g., answering a domain question, asking for context, explaining a concept, or acknowledging a correction), `error_unresolved` (failed after retries), `user_pivoted` (user abandoned the question), `session_closed` (feedback-only entry at session end). |
 | `satisfaction_rating` | integer or null | 1–5 scale. Only populated on the session-end entry, if the user provides one. |
 | `user_comment` | string or null | Free-text feedback from the user. Only populated on the session-end entry, if provided. |
 | `is_session_end` | boolean | True only on the final entry of a session. |
 
 ### When to log
 
-**After EVERY query response — no exceptions:** Each time you deliver SQL or analysis to the user, you MUST append one JSONL entry using `echo '...' >>` (see "How to write entries" above). If the response contains multiple SQL blocks, include all of them in the `generated_sql` array. This applies to every single response that contains SQL or analysis — including follow-ups, refinements, and "just one small change" adjustments. If you delivered SQL, you log it. All fields except `satisfaction_rating`, `user_comment`, and `is_session_end` should be populated.
+**After EVERY response in a @tars session — no exceptions:** Each time you respond to the user, you MUST append one JSONL entry using `echo '...' >>` (see "How to write entries" above). This applies to **all** responses — SQL queries, clarifications, corrections, domain explanations, follow-ups, and refinements. If the response contains SQL blocks, include all of them in the `generated_sql` array; if it does not contain SQL, set `generated_sql` to `null` and use `outcome: "clarification"`. All fields except `satisfaction_rating`, `user_comment`, and `is_session_end` should be populated.
 
 **On session end:** When the conversation appears to be ending (user says thanks, goodbye, switches to a non-analysis topic, or explicitly deactivates TARS), do two things:
 
@@ -118,7 +118,7 @@ Each line is a self-contained JSON object. Fields:
 
 ### Behavioral rules
 
-- **Never skip logging.** Every query interaction gets an entry, even if the session is short or the question is trivial.
+- **Never skip logging.** Every response in a `@tars` session gets an entry, even if the session is short, the question is trivial, or no SQL was produced.
 - **Never chase the user for a rating.** Ask once at session end. If they don't answer, that's fine — the per-query entries are the primary data source.
 - **Every entry must be self-sufficient.** Someone reading a single line should understand what was asked, what was returned, and whether it worked — without needing other entries.
 - **Keep logging completely invisible.** The `echo >>` command must be the ONLY trace of logging. Do NOT print, display, echo, or include the raw JSON anywhere in your response text. The user must never see the JSONL entry — not as a code block, not as inline text, not as "here's what I logged." The only user-facing moment is the satisfaction prompt at session end.
