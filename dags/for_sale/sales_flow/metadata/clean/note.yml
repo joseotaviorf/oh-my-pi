@@ -1,0 +1,44 @@
+---
+database_name: datalake_sales_flow_clean
+table_name: note
+owner: igor.firmo@quintoandar.com.br
+domain: For Sale
+description: "Notes attached to a sales flow in the Sales Flow service, including free-text
+  message content and a type discriminator."
+columns:
+  id_note:
+    description: "Unique identifier for the note record."
+    lineage:
+      - datalake_sales_flow_raw.note.id
+  id_sales_flow:
+    description: "Foreign key to the parent sales flow."
+    lineage:
+      - datalake_sales_flow_raw.note.sales_flow_id
+  message:
+    description: "Free-text note content entered for the sales flow."
+    lineage:
+      - datalake_sales_flow_raw.note.message
+  type:
+    description: "Note type or category as defined in the source application."
+    lineage:
+      - datalake_sales_flow_raw.note.type
+  ts_created:
+    description: "Timestamp when the note record was created in the source system."
+    lineage:
+      - datalake_sales_flow_raw.note.created_at
+  ts_updated:
+    description: "Timestamp when the note record was last updated in the source system."
+    lineage:
+      - datalake_sales_flow_raw.note.updated_at
+  year:
+    description: "CDC partition year of the record."
+    lineage:
+      - datalake_sales_flow_raw.note.year
+  month:
+    description: "CDC partition month of the record."
+    lineage:
+      - datalake_sales_flow_raw.note.month
+  day:
+    description: "CDC partition day of the record."
+    lineage:
+      - datalake_sales_flow_raw.note.day

@@ -238,6 +238,14 @@ workflow:
       clean_table_name: negotiation_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
+    note:
+      clean_table_name: note
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id_note"]
+    note_aud:
+      clean_table_name: note_aud
+      raw_primary_keys: ["id", "rev"]
+      clean_primary_keys: ["id_note_aud", "rev"]
     notary:
       clean_table_name: notary
       raw_primary_keys: ["id"]
