@@ -148,7 +148,7 @@ cluster_template:
             - s3:
                   destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
                   region: ""
-        spark_conf: &spark_conf_base
+        spark_conf: &spark_conf_base_anchor
             spark.rpc.message.maxSize: "2000"
             spark.sql.sources.partitionOverwriteMode: dynamic
             spark.sql.parquet.filterPushdown: "true"
@@ -199,29 +199,21 @@ cluster_template:
             instance_profile_arn: "{{ var.value.instance_profile_arn }}"
             spot_bid_price_percent: 100
             zone_id: us-east-1d
-        custom_tags:
-            - key: application
-              value: "{{ dag.dag_id }}"
-            - key: app
-              value: airflow
-            - key: resource-name
-              value: databricks
-            - key: environment
-              value: "{{ var.value.environment }}"
-            - key: owner
-              value: "{{ task.owner.lower().replace(' ', '-') }}"
-            - key: ecosystem
-              value: data-engineering
-            - key: data-classification
-              value: private
-            - key: sensitive-data
-              value: true
-            - key: cost-center
-              value: c052
-            - key: provisioner
-              value: bietlejuice
+        custom_tags: &cluster_custom_tags_anchor
+            application: "{{ dag.dag_id }}"
+            app: airflow
+            resource-name: databricks
+            environment: "{{ var.value.environment }}"
+            owner: "{{ task.owner.lower().replace(' ', '-') }}"
+            ecosystem: data-engineering
+            data-classification: private
+            sensitive-data: "true"
+            cost-center: c052
+            provisioner: bietlejuice
         node_type_id: m5a.large
         driver_node_type_id: m5a.large
+        spark_conf: &spark_conf_anchor
+            <<: *spark_conf_base_anchor
 
 custom_cluster:
     <<: *cluster_anchor
@@ -1441,48 +1433,51 @@ databricks_16_4_medium_memory_cluster:
         ebs_volume_size: 200
 
 databricks_16_4_small_general_fleet_xlarge_single_node:
-    <<: *cluster_anchor_base
+    <<: *cluster_anchor
     driver_node_type_id: m-fleet.xlarge
     node_type_id: m-fleet.xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
-        <<: *spark_conf_base
+        <<: *spark_conf_anchor
         spark.databricks.cluster.profile: "singleNode"
         spark.master: "local[*]"
     custom_tags:
+        <<: *cluster_custom_tags_anchor
         ResourceClass: "SingleNode"
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
 
 databricks_16_4_small_general_fleet_2xlarge_single_node:
-    <<: *cluster_anchor_base
+    <<: *cluster_anchor
     driver_node_type_id: m-fleet.2xlarge
     node_type_id: m-fleet.2xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
-        <<: *spark_conf_base
+        <<: *spark_conf_anchor
         spark.databricks.cluster.profile: "singleNode"
         spark.master: "local[*]"
     custom_tags:
+        <<: *cluster_custom_tags_anchor
         ResourceClass: "SingleNode"
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
 
 databricks_16_4_small_general_fleet_4xlarge_single_node:
-    <<: *cluster_anchor_base
+    <<: *cluster_anchor
     driver_node_type_id: m-fleet.4xlarge
     node_type_id: m-fleet.4xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
-        <<: *spark_conf_base
+        <<: *spark_conf_anchor
         spark.databricks.cluster.profile: "singleNode"
         spark.master: "local[*]"
     custom_tags:
+        <<: *cluster_custom_tags_anchor
         ResourceClass: "SingleNode"
     aws_attributes:
         <<: *aws_anchor

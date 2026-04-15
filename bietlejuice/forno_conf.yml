@@ -131,30 +131,21 @@ cluster_template:
                 destination: s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id}}
                 region: us-east-1
         cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
-        custom_tags:
-            - key: app
-              value: airflow
-            - key: resource-name
-              value: databricks
-            - key: environment
-              value: "{{ var.value.environment }}"
-            - key: owner
-              value: "{{ task.owner.lower().replace(' ', '-') }}"
-            - key: ecosystem
-              value: data-engineering
-            - key: data-classification
-              value: private
-            - key: sensitive-data
-              value: true
-            - key: cost-center
-              value: c052
-            - key: provisioner
-              value: databricks
+        custom_tags: &cluster_custom_tags_anchor
+            app: airflow
+            resource-name: databricks
+            environment: "{{ var.value.environment }}"
+            owner: "{{ task.owner.lower().replace(' ', '-') }}"
+            ecosystem: data-engineering
+            data-classification: private
+            sensitive-data: "true"
+            cost-center: c052
+            provisioner: databricks
         init_scripts:
             - s3:
                   destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
                   region: ""
-        spark_conf:
+        spark_conf: &spark_conf_anchor
             spark.rpc.message.maxSize: "2000"
             spark.sql.sources.partitionOverwriteMode: dynamic
             spark.sql.parquet.filterPushdown: "true"
@@ -224,7 +215,7 @@ cluster_template:
             - s3:
                   destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
                   region: ""
-        spark_conf: &spark_conf_base
+        spark_conf: &spark_conf_base_anchor
             spark.rpc.message.maxSize: "2000"
             spark.sql.sources.partitionOverwriteMode: dynamic
             spark.sql.parquet.filterPushdown: "true"
@@ -1623,68 +1614,55 @@ databricks_16_4_medium_memory_cluster:
         ebs_volume_size: 200
 
 databricks_16_4_small_general_fleet_xlarge_single_node:
-    <<: *cluster_anchor_base
+    <<: *cluster_anchor
     driver_node_type_id: m-fleet.xlarge
     node_type_id: m-fleet.xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
-        <<: *spark_conf_base
+        <<: *spark_conf_anchor
         spark.databricks.cluster.profile: "singleNode"
         spark.master: "local[*]"
     custom_tags:
+        <<: *cluster_custom_tags_anchor
         ResourceClass: "SingleNode"
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
 
 databricks_16_4_small_general_fleet_2xlarge_single_node:
-    <<: *cluster_anchor_base
+    <<: *cluster_anchor
     driver_node_type_id: m-fleet.2xlarge
     node_type_id: m-fleet.2xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
-        <<: *spark_conf_base
+        <<: *spark_conf_anchor
         spark.databricks.cluster.profile: "singleNode"
         spark.master: "local[*]"
     custom_tags:
+        <<: *cluster_custom_tags_anchor
         ResourceClass: "SingleNode"
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
 
 databricks_16_4_small_general_fleet_4xlarge_single_node:
-    <<: *cluster_anchor_base
+    <<: *cluster_anchor
     driver_node_type_id: m-fleet.4xlarge
     node_type_id: m-fleet.4xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
-        <<: *spark_conf_base
+        <<: *spark_conf_anchor
         spark.databricks.cluster.profile: "singleNode"
         spark.master: "local[*]"
     custom_tags:
+        <<: *cluster_custom_tags_anchor
         ResourceClass: "SingleNode"
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
-
-databricks_16_4_small_general_fleet_2xlarge_single_node:
-    <<: *cluster_anchor_base
-    driver_node_type_id: m-fleet.2xlarge
-    node_type_id: m-fleet.2xlarge
-    num_workers: 0
-    spark_version: 16.4.x-scala2.12
-    spark_conf:
-        <<: *spark_conf_base
-        spark.databricks.cluster.profile: "singleNode"
-        spark.master: "local[*]"
-    custom_tags:
-        ResourceClass: "SingleNode"
-    aws_attributes:
-        <<: *aws_anchor
-        ebs_volume_size: 100
 
 databricks_16_4_rfleet_instance_cluster:
     <<: *cluster_anchor_base
