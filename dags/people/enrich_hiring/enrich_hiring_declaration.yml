@@ -1,12 +1,12 @@
 dag:
-  name: enrich_greenhouse_migration
+  name: enrich_hiring
   schedule_start_date: 2026, 3, 13
   owner: Data People
   documentation:
     dag_purpose: |-
-      Migration DAG that replicates the enrich_greenhouse tables using v3 clean sources.
-      Outputs to a separate schema (datalake_greenhouse_migration) for side-by-side comparison
-      with the v1 enrich output before cutover.
+      Provider-agnostic hiring enrich layer. Consolidates Talent Acquisition data
+      (currently sourced from Greenhouse v3 clean tables) into domain-focused tables
+      for downstream DW consumption.
 cluster:
   type: databricks_16_4_small_memory_people_cluster
   access_control_list:
@@ -21,7 +21,7 @@ cluster:
 workflow:
   type: query_delta
   layer: enrich
-  custom_schema: greenhouse_migration
+  custom_schema: hiring
   default_extraction_type: full
   has_hive_sync: false
   bucket_config_name: people_bucket

@@ -473,7 +473,7 @@ bietlejuice.enrich_golden_set:
 bietlejuice.enrich_greenhouse:
   remove:
     - bietlejuice.greenhouse_audit_log:load-clean-events:first-run-of-day
-bietlejuice.enrich_greenhouse_migration:
+bietlejuice.enrich_hiring:
   remove:
     - bietlejuice.greenhouse_audit_log:load-clean-events:first-run-of-day
 bietlejuice.enrich_supply_leads:

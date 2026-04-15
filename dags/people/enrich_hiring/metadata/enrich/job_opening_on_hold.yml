@@ -1,9 +1,9 @@
 ---
-database_name: datalake_greenhouse_migration
+database_name: datalake_hiring
 table_name: job_opening_on_hold
 owner: pedro.prates@quintoandar.com.br
 domain: People
-description: Table that identifies all historical and current periods when a job opening was "On Hold". Each row represents a single "On Hold" event (a start and its corresponding end), allowing for duration and status calculation. Migration version sourced from v3 clean openings and close_reasons, with audit_log events unchanged.
+description: Table that identifies all historical and current periods when a job opening was "On Hold". Each row represents a single "On Hold" event (a start and its corresponding end), allowing for duration and status calculation. Sourced from v3 clean openings and close_reasons, with audit_log events.
 columns:
   id_job_opening:
     description: Unique identifier for the job opening.

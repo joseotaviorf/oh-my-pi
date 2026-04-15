@@ -1,8 +1,8 @@
-database_name: datalake_greenhouse_migration
+database_name: datalake_hiring
 table_name: demographics
 owner: pedro.prates@quintoandar.com.br
 domain: People
-description: Pivoted table containing demographic answers from the ATS (Greenhouse). Each row represents a unique application (id_application), with columns for each demographic question group, answers standardized to English (EN), and boolean flags for minority groups. Migration version sourced from v3 clean tables.
+description: Pivoted table containing demographic answers from the ATS (Greenhouse). Each row represents a unique application (id_application), with columns for each demographic question group, answers standardized to English (EN), and boolean flags for minority groups. Sourced from v3 clean tables.
 
 columns:
   id_application:

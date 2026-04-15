@@ -1,11 +1,10 @@
-database_name: datalake_greenhouse_migration
+database_name: datalake_hiring
 table_name: job_openings
 owner: pedro.prates@quintoandar.com.br
 domain: People
 description: |-
   Represents individual headcount requisitions, corresponding to 'Job Openings' in the Greenhouse ATS.
-  Migration version sourced from v3 clean openings table (standalone endpoint) with close_reasons join.
-  Replaces the v1 pattern of parsing openings from embedded JSON in the jobs table.
+  Sourced from v3 clean openings table (standalone endpoint) with close_reasons join.
 columns:
   id_opening:
     description: The unique identifier for the job opening.
