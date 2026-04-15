@@ -1,8 +1,11 @@
 ENTITY_TYPE: "CONTRACT"
 CONTRACT_TRANSACTIONAL_TABLE: "datalake_ebdb_transactional.contrato"
-merge_on_historical: ["id_event"]
-when_matched_update_condition_historical: null
+merge_on_historical: ["id_contract", "event_name", "ts_transaction", "year", "month", "day"]
+when_matched_update_condition_historical: "FALSE"
 event_configs:
+  - tracked_col: imovel_id
+    target_col: id_house
+    target_type: bigint
   - tracked_col: usuario_id
     target_col: id_tenant
     target_type: bigint
@@ -60,3 +63,33 @@ event_configs:
   - tracked_col: tenantServiceFee
     target_col: tenant_service_fee
     target_type: double
+  - tracked_col: estateAgentBrokerageShare
+    target_col: agent_brokerage_share
+    target_type: double
+  - tracked_col: dataInicio
+    target_col: dt_started
+    target_type: date
+  - tracked_col: dataEntrada
+    target_col: dt_entered
+    target_type: date
+  - tracked_col: dataRescisao
+    target_col: dt_termination
+    target_type: date
+  - tracked_col: dataFimContratoPrevisto
+    target_col: ts_contract_expected_end
+    target_type: date
+  - tracked_col: dataAssinado
+    target_col: ts_signed
+    target_type: timestamp
+  - tracked_col: dataRescisaoPrevista
+    target_col: ts_expected_termination
+    target_type: date
+  - tracked_col: dataMinutaAprovada
+    target_col: ts_minuta_approved
+    target_type: timestamp
+  - tracked_col: criadoEm
+    target_col: ts_created
+    target_type: timestamp
+  - tracked_col: atualizadoEm
+    target_col: ts_updated
+    target_type: timestamp

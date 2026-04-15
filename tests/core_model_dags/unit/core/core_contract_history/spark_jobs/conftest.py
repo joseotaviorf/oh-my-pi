@@ -185,8 +185,15 @@ HISTORICAL_EVENT_CONFIGS = [
 CONFIG_MAP = {
     "ENTITY_TYPE": "CONTRACT",
     "CONTRACT_TRANSACTIONAL_TABLE": "test.transactional_contrato",
-    "merge_on_historical": ["id_event"],
-    "when_matched_update_condition_historical": None,
+    "merge_on_historical": [
+        "id_contract",
+        "event_name",
+        "ts_transaction",
+        "year",
+        "month",
+        "day",
+    ],
+    "when_matched_update_condition_historical": "FALSE",
     "event_configs": HISTORICAL_EVENT_CONFIGS,
 }
 

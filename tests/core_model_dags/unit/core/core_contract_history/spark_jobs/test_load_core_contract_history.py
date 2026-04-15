@@ -6,7 +6,9 @@ the fixed 13-column narrow event-log schema used by contract_history.
 """
 
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
+
+from pyspark.sql.utils import AnalysisException
 
 from dags.core.core_contract_history.spark_jobs.load_core_contract_history import (
     CoreContractHistorySparkJob,
@@ -233,3 +235,145 @@ class TestCoreContractHistoryIdempotency:
             assert (
                 len(row["id_event"]) == 64
             ), f"Expected SHA-256 hex (64 chars), got {len(row['id_event'])}"
+
+
+class TestMergeStrategyConfig:
+
+    def test_merge_on_historical_uses_natural_key_with_partition_columns(
+        self, mock_configuration_service_history
+    ):
+        job = CoreContractHistorySparkJob()
+        merge_on = job.get_config("merge_on_historical", required=True)
+
+        assert merge_on == [
+            "id_contract",
+            "event_name",
+            "ts_transaction",
+            "year",
+            "month",
+            "day",
+        ]
+
+    def test_when_matched_update_condition_is_false(
+        self, mock_configuration_service_history
+    ):
+        job = CoreContractHistorySparkJob()
+        condition = job.get_config(
+            "when_matched_update_condition_historical",
+            required=False,
+            default=None,
+        )
+
+        assert condition == "FALSE"
+
+
+class TestTargetTableEmptyDetection:
+
+    def test_returns_true_when_table_does_not_exist(self, spark_session):
+        job = CoreContractHistorySparkJob()
+
+        result = job._is_target_table_empty(
+            spark_session, "nonexistent_db.nonexistent_table"
+        )
+
+        assert result is True
+
+    def test_returns_true_on_analysis_exception(self, spark_session):
+        job = CoreContractHistorySparkJob()
+        mock_spark = MagicMock()
+        # CapturedException needs desc and stackTrace (non-None) without a JVM origin;
+        # it also asserts SparkContext._jvm, so spark_session must run first.
+        mock_spark.catalog.tableExists.side_effect = AnalysisException(
+            desc="Table not found",
+            stackTrace="",
+        )
+
+        result = job._is_target_table_empty(mock_spark, "bad_db.bad_table")
+
+        assert result is True
+
+    def test_returns_true_when_table_is_empty(self):
+        job = CoreContractHistorySparkJob()
+        mock_spark = MagicMock()
+        mock_spark.catalog.tableExists.return_value = True
+        mock_spark.table.return_value.isEmpty.return_value = True
+
+        result = job._is_target_table_empty(mock_spark, "db.empty_table")
+
+        assert result is True
+
+    def test_returns_false_when_table_has_data(self):
+        job = CoreContractHistorySparkJob()
+        mock_spark = MagicMock()
+        mock_spark.catalog.tableExists.return_value = True
+        mock_spark.table.return_value.isEmpty.return_value = False
+
+        result = job._is_target_table_empty(mock_spark, "db.populated_table")
+
+        assert result is False
+
+
+class TestRunPipelineBypass:
+
+    def _make_pipeline_args(self):
+        return SimpleNamespace(
+            table_name="contract_history",
+            load_start_date="2026-01-01",
+            load_end_date="2026-02-01",
+            partitions="['year', 'month', 'day']",
+            schema="core_contract",
+            bucket="test-bucket",
+        )
+
+    @patch(
+        "dags.core.core_contract_history.spark_jobs.load_core_contract_history"
+        ".DataFrameDeltaTableLoaderPipeline"
+    )
+    def test_uses_direct_write_when_target_is_empty(
+        self,
+        mock_pipeline_cls,
+        spark_session,
+        transactional_contract_df,
+        mock_configuration_service_history,
+    ):
+        job = CoreContractHistorySparkJob()
+        args = self._make_pipeline_args()
+
+        with patch.object(
+            job, "_is_target_table_empty", return_value=True
+        ), patch.object(job, "setup_table_privileges", return_value=None):
+            job.run_pipeline(transactional_contract_df, args, spark_session)
+
+        call_kwargs = mock_pipeline_cls.call_args[1]
+        assert call_kwargs["merge_on"] is None
+        assert call_kwargs["when_matched_update_condition"] is None
+
+    @patch(
+        "dags.core.core_contract_history.spark_jobs.load_core_contract_history"
+        ".DataFrameDeltaTableLoaderPipeline"
+    )
+    def test_uses_partition_scoped_merge_when_target_has_data(
+        self,
+        mock_pipeline_cls,
+        spark_session,
+        transactional_contract_df,
+        mock_configuration_service_history,
+    ):
+        job = CoreContractHistorySparkJob()
+        args = self._make_pipeline_args()
+
+        with patch.object(
+            job, "_is_target_table_empty", return_value=False
+        ), patch.object(job, "setup_table_privileges", return_value=None):
+            job.run_pipeline(transactional_contract_df, args, spark_session)
+
+        call_kwargs = mock_pipeline_cls.call_args[1]
+        assert call_kwargs["merge_on"] == [
+            "id_contract",
+            "event_name",
+            "ts_transaction",
+            "year",
+            "month",
+            "day",
+        ]
+        assert call_kwargs["when_matched_update_condition"] == "FALSE"

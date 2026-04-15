@@ -1,7 +1,7 @@
 ENTITY_TYPE: "CONTRACT"
 CONTRACT_TRANSACTIONAL_TABLE: "datalake_ebdb_transactional.contrato"
-merge_on_historical: ["id_event"]
-when_matched_update_condition_historical: null
+merge_on_historical: ["id_contract", "event_name", "ts_transaction", "year", "month", "day"]
+when_matched_update_condition_historical: "FALSE"
 event_configs:
   - tracked_col: imovel_id
     target_col: id_house

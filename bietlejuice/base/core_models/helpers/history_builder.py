@@ -68,30 +68,44 @@ class HistoryBuilder:
         cols_to_select = list({id_col, ts_col, op_col} | set(tracked_cols))
         df_source = df.select(*[F.col(c) for c in cols_to_select])
 
-        df_with_prev = HistoryBuilder._apply_lag_windows(
-            df_source, id_col, ts_col, tracked_cols
-        )
+        spark = df_source.sparkSession
+        shuffle_partitions = int(spark.conf.get("spark.sql.shuffle.partitions", "200"))
+        df_source = df_source.repartition(shuffle_partitions, F.col(id_col))
 
-        event_dfs = HistoryBuilder._detect_and_pivot(
-            df_with_prev,
-            event_configs,
-            id_col,
-            ts_col,
-            op_col,
-            id_entity_col,
-            event_type,
-            event_origin,
-        )
+        # Cache the narrow, repartitioned DataFrame so the 29-branch union
+        # that follows can share a single shuffle + window evaluation.
+        # Caching here (not on the raw wide source) keeps the footprint small:
+        # only the ~32 relevant columns are materialised into executor memory.
+        df_source.cache()
+        try:
+            df_with_prev = HistoryBuilder._apply_lag_windows(
+                df_source, id_col, ts_col, tracked_cols
+            )
 
-        result_df = reduce(DataFrame.unionByName, event_dfs)
+            event_dfs = HistoryBuilder._detect_and_pivot(
+                df_with_prev,
+                event_configs,
+                id_col,
+                ts_col,
+                op_col,
+                id_entity_col,
+                event_type,
+                event_origin,
+            )
 
-        result_df = HistoryBuilder._generate_keys(result_df, entity_name, id_entity_col)
+            result_df = reduce(DataFrame.unionByName, event_dfs)
 
-        result_df = HistoryBuilder._add_metadata_columns(result_df)
+            result_df = HistoryBuilder._generate_keys(
+                result_df, entity_name, id_entity_col
+            )
 
-        return HistoryBuilder._select_output_columns(
-            result_df, id_entity_col, entity_name
-        )
+            result_df = HistoryBuilder._add_metadata_columns(result_df)
+
+            return HistoryBuilder._select_output_columns(
+                result_df, id_entity_col, entity_name
+            )
+        finally:
+            df_source.unpersist()
 
     @staticmethod
     def _validate_event_configs(event_configs: List[Dict[str, str]]) -> None:

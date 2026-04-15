@@ -2,7 +2,7 @@ database_name: core_contract
 table_name: contract_history
 domain: For Rent
 owner: marcio.gomes@quintoandar.com.br
-description: Historical core model for rent contracts. Each row represents a single field-level change detected from the CDC transactional layer, using a fixed narrow schema.
+description: Historical core model for rent contracts. Each row represents a single field-level change detected from the CDC transactional layer, using a fixed narrow schema. The core snapshot table core_contract.contract exposes rental_administrator as get_json_object(contract_rent_model, '$.rentalAdministrator') from clean data; there is no separate CDC column for it. Changes to who administers rent appear only when the full contractRentModel payload changes, surfaced here as event ev_contract_rent_model (value holds the serialized contractRentModel string).
 columns:
   id_event:
     lineage:
@@ -55,7 +55,7 @@ columns:
       ev_id_tenant: Change detected in the tenant identifier (usuario_id) column.
       ev_id_proposal: Change detected in the proposal identifier (proposta_id) column.
       ev_status: Change detected in the contract status column.
-      ev_contract_rent_model: Change detected in the contract rent model (contractRentModel) column.
+      ev_contract_rent_model: Change detected in the contract rent model (contractRentModel) column. Tracks the full JSON payload, not a single subfield. core_contract.contract.rental_administrator is derived from JSON path '$.rentalAdministrator' inside this payload; there is no ev_rental_administrator event. Use ev_contract_rent_model and parse value when analyzing rental administrator changes.
       ev_paying_condo: Change detected in the condo payer (paganteCondominio) column.
       ev_responsible_for_condo: Change detected in the condo responsible party (responsavelCondominio) column.
       ev_paying_iptu: Change detected in the IPTU payer (paganteIptu) column.

@@ -1,6 +1,7 @@
 import ast
 
 from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql.utils import AnalysisException
 
 from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
 from bietlejuice.base.core_models.helpers.historical_helper import HistoricalHelper
@@ -48,20 +49,11 @@ class CoreContractHistorySparkJob(BaseCoreModelSparkJob):
             spark, transactional_table, args
         )
 
-        source_count = df.count()
-        self.logger.info(
-            f"m=create_core_model, "
-            f"msg=Loaded {source_count} CDC rows from {transactional_table}, "
-            f"date_range={args.load_start_date}..{args.load_end_date}"
-        )
-        if source_count == 0:
-            self.logger.warning(
-                f"m=create_core_model, "
-                f"msg=Zero rows loaded from {transactional_table} for "
-                f"date_range={args.load_start_date}..{args.load_end_date}. "
-                f"Check that the transactional table has data in this range."
-            )
-
+        # HistoryBuilder caches only the narrow, repartitioned slice of the
+        # source data internally. Caching the full wide source here would
+        # materialise every column of the contrato table into executor memory
+        # before any column projection, causing unnecessary memory and swap
+        # pressure on r5a.large nodes.
         result_df = HistoryBuilder.build_history_for_columns(
             df,
             entity_name="contract",
@@ -73,22 +65,41 @@ class CoreContractHistorySparkJob(BaseCoreModelSparkJob):
             event_origin=transactional_table,
         )
 
-        event_count = result_df.count()
-        self.logger.info(
-            f"m=create_core_model, "
-            f"msg=Produced {event_count} event rows from {source_count} CDC rows"
-        )
-        if event_count == 0 and source_count > 0:
-            self.logger.warning(
-                f"m=create_core_model, "
-                f"msg=All {source_count} CDC rows were filtered out by change "
-                f"detection. No field-level changes detected in this batch."
-            )
+        # event_count = result_df.count()
+        # self.logger.info(
+        #     f"m=create_core_model, "
+        #     f"msg=Produced {event_count} history event rows, "
+        #     f"date_range={args.load_start_date}..{args.load_end_date}"
+        # )
+        # if event_count == 0:
+        #     self.logger.warning(
+        #         f"m=create_core_model, "
+        #         f"msg=Zero event rows produced from {transactional_table} for "
+        #         f"date_range={args.load_start_date}..{args.load_end_date}. "
+        #         f"Check that the transactional table has data and that field-level "
+        #         f"changes exist in this range."
+        #     )
 
         return result_df
 
+    def _is_target_table_empty(
+        self, spark: SparkSession, full_table_name: str
+    ) -> bool:
+        """Check if the target Delta table is missing or has zero rows."""
+        try:
+            if not spark.catalog.tableExists(full_table_name):
+                return True
+            return spark.table(full_table_name).isEmpty()
+        except AnalysisException:
+            return True
+
     def run_pipeline(self, dataframe: DataFrame, args, spark: SparkSession) -> None:
-        """Use ``merge_on_historical`` (id_event) for idempotent event-log inserts."""
+        """Partition-scoped insert-only merge for idempotent event-log writes.
+
+        On the first run (empty target table) the merge is skipped entirely
+        and a direct overwrite is used instead, avoiding the expensive
+        full-table scan that caused cluster timeouts on historical backfills.
+        """
         if args.partitions is not None:
             partitions = ast.literal_eval(args.partitions)
         else:
@@ -106,9 +117,24 @@ class CoreContractHistorySparkJob(BaseCoreModelSparkJob):
             f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
         )
 
+        full_table_name = f"{args.schema}.{args.table_name}"
+        target_is_empty = self._is_target_table_empty(spark, full_table_name)
+
+        if target_is_empty:
+            self.logger.info(
+                f"m=run_pipeline, "
+                f"msg=Target table {full_table_name} is empty, "
+                f"using direct write (no merge)"
+            )
+            effective_merge_on = None
+            effective_update_condition = None
+        else:
+            effective_merge_on = merge_on
+            effective_update_condition = when_matched_update_condition
+
         self.logger.info(
             f"m=run_pipeline, "
-            f"msg=Loading history with merge_on={merge_on}, "
+            f"msg=Loading history with merge_on={effective_merge_on}, "
             f"table_name={args.table_name}"
         )
 
@@ -121,8 +147,8 @@ class CoreContractHistorySparkJob(BaseCoreModelSparkJob):
             partitions=partitions,
             target_database_name=args.schema,
             target_database_location=database_location,
-            merge_on=merge_on,
-            when_matched_update_condition=when_matched_update_condition,
+            merge_on=effective_merge_on,
+            when_matched_update_condition=effective_update_condition,
             table_privileges=table_privileges,
             spark=spark,
         )
