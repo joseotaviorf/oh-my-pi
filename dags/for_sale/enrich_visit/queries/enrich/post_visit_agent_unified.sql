@@ -31,8 +31,8 @@ SELECT
     b.id AS id_schedule,
     COALESCE(b.visit_fup, vsl.visit_fup) AS reason,
     CASE
-        WHEN COALESCE(b.visit_fup, vsl.visit_fup) = 'VaiNegociar' THEN 'VISIT_DONE'
-        WHEN COALESCE(b.visit_fup, vsl.visit_fup) IN ('EntradaNaoAutorizada', 'NaoCompareceu') THEN 'VISIT_UNSUCCESSFUL'
+        WHEN COALESCE(b.visit_fup, vsl.visit_fup) IN ('VaiNegociar', 'NaoGostou', 'VisitouSozinho', 'Talvez') THEN 'VISIT_DONE'
+        WHEN COALESCE(b.visit_fup, vsl.visit_fup) IN ('EntradaNaoAutorizada', 'NaoCompareceu', 'ImovelAlugado') THEN 'VISIT_UNSUCCESSFUL'
         ELSE 'ERROR'
     END AS event_type,
     show_demand.has_attended AS has_demand_attended,
@@ -67,6 +67,5 @@ LEFT JOIN
 WHERE
     (b.visit_fup IS NOT NULL OR vsl.visit_fup IS NOT NULL)
     AND b.type = 'Visita'
-    AND v.ts_created::DATE >= '2020-01-01'
 QUALIFY
     ROW_NUMBER() OVER(PARTITION BY b.id_visit ORDER BY b.id DESC) = 1

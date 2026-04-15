@@ -10,39 +10,39 @@ columns:
   sk_visit:
     lineage:
       - datalake_visit.visits.id_visit
-    description: Key of visit. Data since 2020.
+    description: Key of visit. Data since 2015.
   id_visit:
     lineage:
       - datalake_visit.visits.id_visit
-    description: Id of visit (equal to key of visit). Data since 2020.
+    description: Id of visit (equal to key of visit). Data since 2015.
   visit_code:
     lineage:
       - datalake_visit.visits.code
-    description: Code of visit. Data since 2020.
+    description: Code of visit. Data since 2015.
   day_visit:
     lineage:
       - datalake_visit.visits.dt_visit
-    description: Date of visit. Data since 2020.
+    description: Date of visit. Data since 2015.
   slot:
     lineage:
       - datalake_visit.visits.slot
-    description: Slot time of visit (will be deprecated in the future). Data since 2020.
+    description: Slot time of visit (will be deprecated in the future). Data since 2015.
   slot_count:
     lineage:
       - datalake_visit.visits.slot_count
-    description: Number of available slots to visit (will be deprecated in the future). Data since 2020.
+    description: Number of available slots to visit (will be deprecated in the future). Data since 2015.
   type:
     lineage:
       - datalake_visit.visits.type
-    description: Useless (only 6 rows if type = 1 from 2015 - will be deprecated in the future). Data since 2020.
+    description: Useless (only 6 rows if type = 1 from 2015 - will be deprecated in the future). Data since 2015.
   status:
     lineage:
       - datalake_visit.visits.status
-    description: Visit status (will be deprecated in the future). Data since 2020.
+    description: Visit status (will be deprecated in the future). Data since 2015.
   computed_status:
     lineage:
       - datalake_visit.visits.computed_status
-    description: Last computed status unified from Visit. Data since 2020.
+    description: Last computed status unified from Visit. Data since 2015.
   behavior:
     lineage:
       - datalake_visit.visits.behavior
@@ -50,35 +50,35 @@ columns:
   booking_type:
     lineage:
       - datalake_visit.visits.booking_type
-    description: Type of the booking (will be deprecated in the future). Data since 2020.
+    description: Type of the booking (will be deprecated in the future). Data since 2016.
   business_context:
     lineage:
       - datalake_visit.visits.business_context
-    description: Which is the context of this visit. Data since 2020.
+    description: Which is the context of this visit. Data since 2015.
   business_model:
     lineage:
       - datalake_visit.visits.business_model
-    description: Identify the business model of the visit (will be deprecated in the future). Data since 2024-12.
+    description: Identify the business model of the visit (will be deprecated in the future). Data since 2020.
   business_model_supply:
     lineage:
       - datalake_visit.visits.business_model_supply
-    description: Identify if the business model of supply is 1P or 3P (will be deprecated in the future). Data since 2024-12.
+    description: Identify if the business model of supply is 1P or 3P (will be deprecated in the future). Data since 2020.
   business_model_demand:
     lineage:
       - datalake_visit.visits.business_model_supply_demand
-    description: Identify if the business model of demand is 1P or 3P (will be deprecated in the future). Data since 2024-12.
+    description: Identify if the business model of demand is 1P or 3P (will be deprecated in the future). Data since 2020.
   cancellation_reason:
     lineage:
       - datalake_visit.visits.cancellation_reason
-    description: What the reason for the cancellation of this visit. Data since 2024-05.
+    description: What the reason for the cancellation of this visit. Data since 2016.
   cancellation_on_behalf_of:
     lineage:
       - datalake_visit.visits.cancellation_on_behalf_of
-    description: In whose name that cancellation status. Data since 2024-05.
+    description: In whose name that cancellation status. Data since 2019.
   cancellation_channel:
     lineage:
       - datalake_visit.visits.cancellatin_channel
-    description: What the channel for the cancellation of this visit. Data since 2024-05.
+    description: What the channel for the cancellation of this visit. Data since 2019.
   cancellation_type:
     lineage:
       - datalake_visit.visits.cancellation_type
@@ -90,7 +90,7 @@ columns:
   unsuccessful_reason:
     lineage:
       - datalake_visit.visits.unsuccessful_reason
-    description: Reason of visit unsuccessful. Data since 2020.
+    description: Reason of visit unsuccessful. Data since 2016.
     categories:
       ASSISTED_ENTRANCE: When a third person is needed to enter.
       EASY_ENTRANCE: When no third person is needed to enter.
@@ -98,7 +98,7 @@ columns:
   visit_model:
     lineage:
       - datalake_visit.visits.visit_model
-    description: Visit model of the visit. Data since 2020.
+    description: Visit model of the visit. Data since 2015.
     categories:
       REGISTERED: When the visit is registered after after it has occurred
       FITTED: When the visit is fitted. It is already confirmed
@@ -106,7 +106,7 @@ columns:
   visit_schedule_type:
     lineage:
       - datalake_visit.visits.visit_schedule_type
-    description: Type of visit schedule based on the time of first schedule and last schedule. Data since 2020.
+    description: Type of visit schedule based on the time of first schedule and last schedule. Data since 2015.
     categories:
       NOT_CHANGED: When the schedule has not been changed (first = last)
       POSTPONED: When the visit was postponed (last > first)
@@ -114,7 +114,7 @@ columns:
   visit_request_channel:
     lineage:
       - datalake_visit.visits.visit_request_channel
-    description: Channel when the visit was requested. Data since 2020.
+    description: Channel when the visit was requested. Data since 2016.
   visit_request_on_behalf_of:
     lineage:
       - datalake_visit.visits.visit_request_on_behalf_of
@@ -130,7 +130,7 @@ columns:
   visit_request_source_unified:
     lineage:
       - datalake_visit.visits.visit_request_source_unified
-    description: Source of the visit request unified from channel and application source. Data since 2020.
+    description: Source of the visit request unified from channel and application source. Data since 2016.
   first_supply_answer:
     lineage:
       - datalake_visit.visits.first_supply_answer
@@ -164,43 +164,43 @@ columns:
   is_visit_confirmed:
     lineage:
       - datalake_visit.visits.is_confirmed
-    description: If the visit was confirmed by all. Data since 2020.
+    description: If the visit was confirmed by all. Data since 2015.
   is_visit_confirmed_last_schedule:
     lineage:
       - datalake_visit.visits.is_confirmed_by_last_schedule
-    description: If the visit was confirmed by the last schedule. Data since 2020.
+    description: If the visit was confirmed by the last schedule. Data since 2015.
   is_visit_completed:
     lineage:
       - datalake_visit.visits.is_completed
-    description: If the visit is completed. Data since 2020.
+    description: If the visit is completed. Data since 2015.
   is_visit_canceled:
     lineage:
       - datalake_visit.visits.is_canceled
-    description: If this visit is canceled. Data since 2020.
+    description: If this visit is canceled. Data since 2015.
   is_visit_unsuccessful:
     lineage:
       - datalake_visit.visits.is_unsuccessful
-    description: If this visit return unsuccessful. Data since 2020.
+    description: If this visit return unsuccessful. Data since 2015.
   is_visit_reschedule:
     lineage:
       - datalake_visit.visits.is_reschedule
-    description: If this visit is a reschedule. Data since 2020.
+    description: If this visit is a reschedule. Data since 2015.
   is_visit_cancelled_by_expiration:
     lineage:
       - datalake_visit.visits.is_cancelled_by_expiration
-    description: True if the visit was cancelled due to expired time. Data since 2024-05.
+    description: True if the visit was cancelled due to expired time. Data since 2015.
   is_visit_stalled:
     lineage:
       - datalake_visit.visits.is_stalled
-    description: If the visit is stalled. Data since 2020.
+    description: If the visit is stalled. Data since 2015.
   is_visit_registered:
     lineage:
       - datalake_visit.visits.is_registered
-    description: If the visit was registered by the agent. Data since 2020.
+    description: If the visit was registered by the agent. Data since 2015.
   is_visit_fitted:
     lineage:
       - datalake_visit.visits.is_fitted
-    description: If the visit was fitted by the agent. Data since 2020.
+    description: If the visit was fitted by the agent. Data since 2015.
   is_visit_3p_supply:
     lineage:
       - datalake_visit.visits.is_3p_supply
@@ -216,23 +216,23 @@ columns:
   is_visit_same_day_first_schedule:
     lineage:
       - datalake_visit.visits.is_visit_same_day_first_schedule
-    description: True if the visit was scheduled on the same day as the visit. Data since 2020.
+    description: True if the visit was scheduled on the same day as the visit. Data since 2015.
   is_visit_same_day_last_schedule:
     lineage:
       - datalake_visit.visits.is_visit_same_day_last_schedule
-    description: True if the visit was scheduled on the same day as the last schedule. Data since 2020.
+    description: True if the visit was scheduled on the same day as the last schedule. Data since 2015.
   is_house_revisit:
     lineage:
       - datalake_visit.visits.ts_visit_last_visit_done_of_house
-    description: True if the visit is a revisit of the house. Data since 2020.
+    description: True if the visit is a revisit of the house. Data since 2015.
   is_visitor_revisit:
     lineage:
       - datalake_visit.visits.ts_visit_last_visit_done_of_visitor
-    description: True if the visit is a revisit of the visitor. Data since 2020.
+    description: True if the visit is a revisit of the visitor. Data since 2015.
   is_house_visitor_revisit:
     lineage:
       - datalake_visit.visits.ts_visit_last_visit_done_of_house_and_visitor
-    description: True if the visit is a revisit of the house and visitor. Data since 2020.
+    description: True if the visit is a revisit of the house and visitor. Data since 2015.
   has_3p_access_control:
     lineage:
       - datalake_visit.visits.has_3p_access_control
@@ -244,23 +244,23 @@ columns:
   has_visit_finisher_status:
     lineage:
       - datalake_visit.visits.has_finisher_status
-    description: True when the visit has a finisher status. Data since 2020.
+    description: True when the visit has a finisher status. Data since 2015.
   has_visit_fup_collected:
     lineage:
       - datalake_visit.visits.has_fup_collected
-    description: True when the visit has a follow up collected. Data since 2020.
+    description: True when the visit has a follow up collected. Data since 2015.
   has_visit_more_one_agent:
     lineage:
       - datalake_visit.visits.has_more_one_agent
-    description: True when the visit has more than one associated agent. Data since 2020.
+    description: True when the visit has more than one associated agent. Data since 2015.
   has_unsuccessful_demand_attended:
     lineage:
       - datalake_visit.visits.has_demand_attended
-    description: True if demand (visitor) attended the visit. Data since 2020.
+    description: True if demand (visitor) attended the visit. Data since 2016.
   has_unsuccessful_agent_attended:
     lineage:
       - datalake_visit.visits.has_agent_attended
-    description: True if agent attended the visit. Data since 2020.
+    description: True if agent attended the visit. Data since 2016.
   has_unsuccessful_supply_attended:
     lineage:
       - datalake_visit.visits.has_supply_attended
@@ -268,86 +268,86 @@ columns:
   dt_created:
     lineage:
       - datalake_visit.visits.ts_created
-    description: Timestamp of visit creating. Data since 2020.
+    description: Timestamp of visit creating. Data since 2015.
   dt_updated:
     lineage:
       - datalake_visit.visits.ts_updated
-    description: Timestamp of visit updating. Data since 2020.
+    description: Timestamp of visit updating. Data since 2015.
   ts_visit:
     lineage:
       - datalake_visit.visits.ts_visit
-    description: Timestamp of visit. Data since 2020.
+    description: Timestamp of visit. Data since 2015.
   ts_visit_requested:
     lineage:
       - datalake_visit.visits.ts_visit_requested
-    description: Timestamp with the requested date of this visit. Data since 2020.
+    description: Timestamp with the requested date of this visit. Data since 2015.
   ts_visit_first_confirmed:
     lineage:
       - datalake_visit.visits.ts_visit_first_confirmed
-    description: Timestamp with the first confirmation of this visit. Data since 2020.
+    description: Timestamp with the first confirmation of this visit. Data since 2015.
   ts_visit_supply_answer:
     lineage:
       - datalake_visit.visits.ts_visit_supply_answer
-    description: Timestamp of the first supply confirmation answer.
+    description: Timestamp of the first supply confirmation answer. Data since 2024-11.
   ts_visit_demand_answer:
     lineage:
       - datalake_visit.visits.ts_visit_demand_answer
-    description: Timestamp of the first demand confirmation answer.
+    description: Timestamp with the demand answer date of this visit. Data since 2024-11.
   ts_visit_agent_answer:
     lineage:
       - datalake_visit.visits.ts_visit_agent_answer
-    description: Timestamp of the first agent confirmation answer.
+    description: Timestamp with the agent answer date of this visit. Data since 2024-11.
   ts_visit_tenant_answer:
     lineage:
       - datalake_visit.visits.ts_visit_tenant_answer
-    description: Timestamp of the first tenant living confirmation answer.
+    description: Timestamp with the tenant answer date of this visit. Data since 2024-11.
   ts_visit_last_confirmed:
     lineage:
       - datalake_visit.visits.ts_visit_last_confirmed
-    description: Timestamp with the last confirmation of this visit. Data since 2020.
+    description: Timestamp with the last confirmation of this visit. Data since 2015.
   ts_visit_first_rescheduled:
     lineage:
       - datalake_visit.visits.ts_visit_first_rescheduled
-    description: Timestamp with the first reschedule date of this visit. Data since 2020.
+    description: Timestamp with the first reschedule date of this visit. Data since 2015.
   ts_visit_last_rescheduled:
     lineage:
       - datalake_visit.visits.ts_visit_rescheduled
-    description: Timestamp with the last rescheduled date of this visit. Data since 2020.
+    description: Timestamp with the last rescheduled date of this visit. Data since 2015.
   ts_visit_canceled:
     lineage:
       - datalake_visit.visits.ts_visit_canceled
-    description: Timestamp with the canceled date of this visit. Data since 2020.
+    description: Timestamp with the canceled date of this visit. Data since 2015.
   ts_visit_unsuccessful:
     lineage:
       - datalake_visit.visits.ts_visit_unsuccessful
-    description: Timestamp with the unsuccessful date of this visit. Data since 2020.
+    description: Timestamp with the unsuccessful date of this visit. Data since 2015.
   ts_visit_done:
     lineage:
       - datalake_visit.visits.ts_visit_done
-    description: Timestamp with the done date of this visit. Data since 2020.
+    description: Timestamp with the done date of this visit. Data since 2015.
   ts_visit_fup_collected:
     lineage:
       - datalake_visit.visits.ts_visit_fup_collected
-    description: Timestamp with the follow up collected date of this visit. Data since 2020.
+    description: Timestamp with the follow up collected date of this visit. Data since 2015.
   ts_visit_stalled:
     lineage:
       - datalake_visit.visits.ts_visit_stalled
-    description: Timestamp when the visit was stalled. Data since 2020.
+    description: Timestamp when the visit was stalled. Data since 2015.
   ts_first_visit:
     lineage:
       - datalake_visit.visits.ts_first_visit
-    description: Timestamp when the visit was first scheduled. Data since 2020.
+    description: Timestamp when the visit was first scheduled. Data since 2015.
   ts_visit_last_visit_done_of_house:
     lineage:
       - datalake_visit.visits.ts_visit_last_visit_done_of_house
-    description: Timestamp when the last visit was done for the house. Data since 2020.
+    description: Timestamp when the last visit was done for the house. Data since 2015.
   ts_visit_last_visit_done_of_visitor:
     lineage:
       - datalake_visit.visits.ts_visit_last_visit_done_of_visitor
-    description: Timestamp when the last visit was done for the visitor. Data since 2020.
+    description: Timestamp when the last visit was done for the visitor. Data since 2015.
   ts_visit_last_visit_done_of_house_and_visitor:
     lineage:
       - datalake_visit.visits.ts_visit_last_visit_done_of_house_and_visitor
-    description: Timestamp when the last visit was done for the house and visitor. Data since 2020.
+    description: Timestamp when the last visit was done for the house and visitor. Data since 2015.
   ts_load:
     description: Timestamp of the ingestion data.

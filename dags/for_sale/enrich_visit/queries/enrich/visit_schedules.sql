@@ -52,8 +52,6 @@ WITH schedule AS (
         WHEN MIN(vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_RESCHEDULED') IS NOT NULL THEN 'RESCHEDULE'
         ELSE 'REQUEST'
       END AS schedule_origin,
-      LEAD(vsl.id_schedule) OVER(PARTITION BY vsl.id_visit ORDER BY MIN(vsl.ts_created)) AS id_succeed_schedule,
-      LEAD(MIN(vsl.ts_created)) OVER(PARTITION BY vsl.id_visit ORDER BY MIN(vsl.ts_created)) AS ts_next_schedule_created,
       MIN_BY(vsl.channel, vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_CONFIRMED') AS first_confirmed_channel,
       MIN_BY(vsl.author_user_role, vsl.ts_created) FILTER (WHERE vsl.event_type = 'VISIT_CONFIRMED') AS first_confirmed_user_role,
       MAX_BY(vsl.event_type, vsl.ts_created) FILTER (WHERE vsl.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND vsl.on_behalf_of = 'SUPPLY') AS last_confirm_answer_supply,
@@ -79,8 +77,6 @@ WITH schedule AS (
       b.id AS id_schedule,
       MAX_BY(b.slot_day, b.ts_created) AS slot_schedule,
       MIN_BY(bsc.id_user, bsc.id) AS id_user_creator,
-      LEAD(b.id) OVER(PARTITION BY b.id_visit ORDER BY MIN(b.ts_created)) AS id_succeed_schedule,
-      LEAD(MIN(b.ts_created)) OVER(PARTITION BY b.id_visit ORDER BY MIN(b.ts_created)) AS ts_next_schedule_created,
       LAG(b.id) OVER(PARTITION BY b.id_visit ORDER BY MIN(b.ts_created)) AS id_last_schedule,
       MAX(b.dt_booking) AS dt_schedule_visit,
       MIN(b.ts_created) AS ts_schedule_created,
@@ -95,7 +91,6 @@ WITH schedule AS (
         ON bsc.id_booking = b.id
     WHERE
       b.type = 'Visita'
-      AND v.ts_created::DATE >= '2020-01-01'
       AND v.ts_created::DATE < '2024-11-01'
     GROUP BY 1,2
   )
@@ -117,8 +112,9 @@ WITH schedule AS (
     ts_schedule_rescheduled,
     ts_schedule_confirmed,
     schedule_origin,
-    id_succeed_schedule,
-    ts_next_schedule_created,
+    LEAD(id_schedule) OVER(PARTITION BY id_visit ORDER BY ts_schedule_created, id_schedule) AS id_succeed_schedule,
+    LEAD(ts_schedule_created) OVER(PARTITION BY id_visit ORDER BY ts_schedule_created, id_schedule) AS ts_next_schedule_created,
+    LEAD(ts_schedule_created,2) OVER(PARTITION BY id_visit ORDER BY ts_schedule_created, id_schedule) AS ts_next_2_schedule_created,
     last_confirm_answer_supply,
     last_confirm_answer_demand,
     last_confirm_answer_agent,
@@ -148,8 +144,9 @@ WITH schedule AS (
     IF(id_last_schedule IS NOT NULL, ts_schedule_created, NULL) AS ts_schedule_rescheduled,
     ts_schedule_confirmed,
     IF(id_last_schedule IS NULL, 'REQUEST', 'RESCHEDULE') AS schedule_origin,
-    id_succeed_schedule,
-    ts_next_schedule_created,
+    LEAD(id_schedule) OVER(PARTITION BY id_visit ORDER BY ts_schedule_created, id_schedule) AS id_succeed_schedule,
+    LEAD(ts_schedule_created) OVER(PARTITION BY id_visit ORDER BY ts_schedule_created, id_schedule) AS ts_next_schedule_created,
+    LEAD(ts_schedule_created,2) OVER(PARTITION BY id_visit ORDER BY ts_schedule_created, id_schedule) AS ts_next_2_schedule_created,
     NULL AS last_confirm_answer_supply,
     NULL AS last_confirm_answer_demand,
     NULL AS last_confirm_answer_agent,
@@ -190,7 +187,7 @@ agent_schedule AS (
     visit_aud AS v
       ON v.id_visit = s.id_visit
       AND v.ts_created >= s.ts_schedule_created
-      AND v.ts_created < COALESCE(s.ts_next_schedule_created, NOW())
+      AND v.ts_created < COALESCE(IF(s.ts_schedule_created = s.ts_next_schedule_created, s.ts_next_2_schedule_created, s.ts_next_schedule_created), NOW())
   GROUP BY 1
 ),
 schedule_enriched AS (

@@ -3,7 +3,7 @@ WITH
         WITH vsl AS (
             SELECT
                 vsl.id_visit,
-                MAX_BY(vsl.id_schedule, vsl.ts_created) AS id_last_schedule,
+                MAX(vsl.id_schedule) AS id_last_schedule,
                 SUM(1) FILTER (WHERE vsl.event_type = 'VISIT_RESCHEDULED') AS nbr_reschedule,
                 MIN(vsl.on_behalf_of) FILTER (WHERE vsl.event_type = 'VISIT_REQUESTED') AS visit_request_on_behalf_of,
                 MIN(vsl.author_user_role) FILTER (WHERE vsl.event_type = 'VISIT_REQUESTED') AS visit_request_user_role,
@@ -48,7 +48,7 @@ WITH
         bsc AS (
             SELECT
                 b.id_visit,
-                MAX_BY(bsc.id_booking, bsc.ts_created) AS id_last_schedule,
+                MAX(bsc.id_booking) AS id_last_schedule,
                 MIN_BY(bsc.id_user, bsc.ts_created) AS id_user_visit_request,
                 SUM(1) FILTER (WHERE bsc.reason = 'SCHEDULE_CHANGE') AS nbr_reschedule,
                 MAX(bsc.ts_created) FILTER (WHERE bsc.reason = 'SCHEDULE_CHANGE') AS ts_visit_rescheduled,
@@ -286,17 +286,13 @@ SELECT
     IF(pva.id_visit IS NOT NULL, TRUE, FALSE) AS has_fup_collected,
     IF(visit_log.ts_visit_stalled IS NOT NULL, TRUE, FALSE) AS is_stalled,
     IF(computed_status_unified IN ('DONE','CANCELED','REQUEST_CANCELED','UNSUCCESSFUL','STALLED'), TRUE, FALSE) AS has_finisher_status,
-    CASE
-        WHEN visit_log.ts_visit_tenant_answer IS NOT NULL
-             OR visit_log.ts_visit_pending_tenant_answer IS NOT NULL THEN TRUE
-        ELSE FALSE
-    END AS has_tenant_living,
+    IF(visit_log.ts_visit_tenant_answer IS NOT NULL OR visit_log.ts_visit_pending_tenant_answer IS NOT NULL, TRUE, NULL) AS has_tenant_living,
     visit_log.last_event = 'ANSWER_PENDING' AS is_waiting_for_response,
     FALSE AS has_entrance_problem,
-    visit_log.ts_visit_supply_answer IS NOT NULL AS has_supply_answered,
-    visit_log.ts_visit_supply_confirmed IS NOT NULL AS has_supply_confirmed,
-    visit_log.ts_visit_tenant_answer IS NOT NULL AS has_tenant_answered,
-    visit_log.ts_visit_tenant_confirmed IS NOT NULL AS has_tenant_confirmed,
+    IF(visit_log.ts_visit_supply_answer IS NOT NULL, TRUE, NULL) AS has_supply_answered,
+    IF(visit_log.ts_visit_supply_confirmed IS NOT NULL, TRUE, NULL) AS has_supply_confirmed,
+    IF(visit_log.ts_visit_tenant_answer IS NOT NULL, TRUE, NULL) AS has_tenant_answered,
+    IF(visit_log.ts_visit_tenant_confirmed IS NOT NULL, TRUE, NULL) AS has_tenant_confirmed,
     visit_cancellation.is_cancelled_by_expiration,
     IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.has_demand_attended, NULL) AS has_unsuccessful_demand_attended,
     IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.has_agent_attended, NULL) AS has_unsuccessful_agent_attended,
@@ -339,7 +335,7 @@ SELECT
     visit_log.ts_visit_stalled,
     vbh.ts_first_visit,
     LAG(CASE WHEN pva.event_type = 'VISIT_DONE' THEN visit.ts_visit END, 1) IGNORE NULLS OVER(PARTITION BY visit.id_house ORDER BY visit.ts_visit, visit.ts_created) AS ts_visit_last_visit_done_of_house,
-    LAG(CASE WHEN pva.event_type = 'VISIT_DONE' THEN visit.ts_visit END , 1) IGNORE NULLS OVER(PARTITION BY visit.id_visitor ORDER BY visit.ts_visit, visit.ts_created) AS ts_visit_last_visit_done_of_visitor,
+    LAG(CASE WHEN pva.event_type = 'VISIT_DONE' THEN visit.ts_visit END, 1) IGNORE NULLS OVER(PARTITION BY visit.id_visitor ORDER BY visit.ts_visit, visit.ts_created) AS ts_visit_last_visit_done_of_visitor,
     LAG(CASE WHEN pva.event_type = 'VISIT_DONE' THEN visit.ts_visit ELSE NULL END, 1) IGNORE NULLS OVER(PARTITION BY visit.id_house, visit.id_visitor ORDER BY visit.ts_visit, visit.ts_created) AS ts_visit_last_visit_done_of_house_and_visitor
 FROM
     datalake_ebdb_clean.visit AS visit
@@ -375,5 +371,3 @@ LEFT JOIN
 LEFT JOIN
     visit_by_history AS vbh
         ON visit.id = vbh.id_visit
-WHERE
-    DATE(visit.ts_created) >= '2020-01-01'

@@ -20,14 +20,14 @@ WITH new_model AS (
     vsl.event_type IN ("VISIT_REQUEST_CANCELED", "VISIT_CANCELED")
     AND DATE(v.ts_created) >= '2024-11-01'
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY vsl.id_visit ORDER BY vsl.ts_created DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY vsl.id_visit ORDER BY vsl.ts_created, vsl.id_visit_status_log DESC) = 1
 ),
 old_model AS (
   WITH last_booking_status AS (
     SELECT
       b.id_visit,
       MAX_BY(b.id, b.ts_created) AS id_schedule,
-      MAX_BY(bsc.id_user, bsc.ts_created) AS id_user,
+      MAX_BY(bsc.id_user, struct(bsc.ts_created, bsc.id)) AS id_user,
       MAX_BY(b.status, b.ts_created) AS last_status,
       MAX(b.ts_updated) AS ts_created
     FROM
@@ -50,7 +50,6 @@ old_model AS (
     vcd.channel,
     vcd.on_behalf_of,
     vcd.reason,
-    vsl.author_user_role,
     IF(vcd.reason = 'REQUEST_EXPIRED', TRUE, FALSE) AS is_cancelled_by_expiration,
     lbs.ts_created,
     lbs.ts_created AS ts_updated
@@ -59,9 +58,6 @@ old_model AS (
   LEFT JOIN
     datalake_ebdb_clean.visit_cancellation_details AS vcd
       ON lbs.id_visit = vcd.id_visit
-  LEFT JOIN
-    datalake_ebdb_clean.visit_status_log AS vsl
-      ON vcd.id_visit_status_log = vsl.id_visit_status_log
   WHERE
     lbs.last_status = 'Cancelado'
 )
@@ -86,7 +82,7 @@ SELECT
   channel,
   on_behalf_of,
   reason,
-  author_user_role,
+  NULL AS author_user_role,
   NULL AS type,
   is_cancelled_by_expiration,
   ts_created,

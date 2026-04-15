@@ -9,69 +9,69 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_status_log.id_schedule
       - datalake_ebdb_clean.booking.id
-    description: Booking's Id. Data since 2020.
+    description: Booking's Id. Data since 2015.
   id_visit:
     lineage:
       - datalake_ebdb_clean.visit_status_log.id_visit
       - datalake_ebdb_clean.booking.id_visit
-    description: Visit's Id. Data since 2020.
+    description: Visit's Id. Data since 2015.
   id_visitor:
     lineage:
       - datalake_ebdb_clean.visit.id_visitor
-    description: Who is visiting the house.
+    description: Who is visiting the house. Data since 2015.
   id_owner:
     lineage:
       - datalake_ebdb_clean.house.id_user
-    description: House's Owner.
+    description: House's Owner. Data since 2015.
   id_house:
     lineage:
       - datalake_ebdb_clean.visit.id_house
-    description: Id of house.
+    description: Id of house. Data since 2015.
   id_user_creation:
     lineage:
       - datalake_ebdb_clean.visit_status_log.id_author_user
       - datalake_ebdb_clean.booking_status_change.id_user
-    description: Creator of the schedule. Data since 2020.
+    description: Creator of the schedule. Data since 2015.
   user_role_creation:
     lineage:
       - datalake_ebdb_clean.visit_status_log.author_user_role
-    description: User role of who created the schedule.
+    description: User role of who created the schedule. Data since 11-2024
   id_user_cancelation:
     lineage:
       - datalake_visit.visit_cancellation_unified.id_user
-    description: Who canceled the schedule. Data since 2020.
+    description: Who canceled the schedule. Data since 2015.
   id_user_agent:
     lineage:
       - datalake_ebdb_clean.visit_aud.id_agent
-    description: Last user agent of the schedule.
+    description: Last user agent of the schedule. Data since 2015.
   id_agent:
     lineage:
       - datalake_ebdb_clean.user.id_agent
-    description: Last agent of the schedule.
+    description: Last agent of the schedule. Data since 2015.
   id_first_user_agent:
     lineage:
       - datalake_ebdb_clean.visit_aud.id_agent
-    description: First user agent of the schedule.
+    description: First user agent of the schedule. Data since 2015.
   id_first_agent:
     lineage:
       - datalake_ebdb_clean.user.id_agent
-    description: First agent of the schedule.
+    description: First agent of the schedule. Data since 2015.
   id_company_supply:
     lineage:
       - datalake_visit.visit_business_model.id_company_supply
-    description: ID of the supply partner from the company domain. Obtained from visit_business_model which consolidates supply partner data.
+    description: ID of the supply partner from the company domain. Obtained from visit_business_model which consolidates supply partner data. Data since 2020.
   id_company_demand:
     lineage:
       - datalake_visit.visit_business_model.id_company_demand
-    description: ID of the demand partner from Hubspot. Obtained from visit_business_model which consolidates demand partner data.
+    description: ID of the demand partner from Hubspot. Obtained from visit_business_model which consolidates demand partner data. Data since 2023.
   is_3p_supply:
     lineage:
       - datalake_visit.visit_business_model.is_3p_supply
-    description: Boolean flag indicating if the visit has 3P supply partner. Obtained from visit_business_model.
+    description: Boolean flag indicating if the visit has 3P supply partner. Obtained from visit_business_model. Data since 2020.
   is_3p_demand:
     lineage:
       - datalake_visit.visit_business_model.is_3p_demand
-    description: Boolean flag indicating if the visit has 3P demand partner. Obtained from visit_business_model.
+    description: Boolean flag indicating if the visit has 3P demand partner. Obtained from visit_business_model. Data since 2020.
   is_3p_lead_gen:
     lineage:
       - datalake_visit.visit_business_model.is_3p_lead_gen
@@ -79,43 +79,43 @@ columns:
   has_3p_access_control:
     lineage:
       - datalake_visit.visit_business_model.has_3p_access_control
-    description: Boolean flag indicating if the visit has any 3P access control (supply, demand, or lead gen). Obtained from visit_business_model.
+    description: Boolean flag indicating if the visit has any 3P access control (supply, demand, or lead gen). Obtained from visit_business_model. Data since 2020.
   id_succeed_schedule:
     lineage:
       - datalake_ebdb_clean.visit_status_log.id_schedule
       - datalake_ebdb_clean.booking.id
-    description: The next schedule case when this schedule have a reschedule.
+    description: The next schedule case when this schedule have a reschedule. Data since 2015.
   id_sale_flow:
-    description: ID of the sale flow. Is the concatenation of ID buyer and ID house.
+    description: ID of the sale flow. Is the concatenation of ID buyer and ID house. Data since 2015.
   id_region:
     lineage:
       - datalake_ebdb_clean.house.id_region
-    description: ID of the region where house is located.
+    description: ID of the region where house is located. Data since 2015.
   visit_code:
     lineage:
       - datalake_ebdb_clean.visit.code
-    description: Code of the visit.
+    description: Code of the visit. Data since 2015.
   business_context:
     lineage:
       - datalake_ebdb_clean.visit.business_context
-    description: Business context of the schedule.
+    description: Business context of the schedule. Data since 2015.
   business_model:
     lineage:
       - datalake_ebdb_clean.visit.business_model
-    description: Business model of the visit.
+    description: Business model of the visit. Data since 2020.
   visit_model:
     lineage:
       - datalake_visit.visit_status_events.event_type
-    description: Visit model of the visit.
+    description: Visit model of the visit. Data since 2024-11.
   schedule_origin:
     lineage:
       - datalake_ebdb_clean.visit_status_log.event_type
       - datalake_ebdb_clean.booking.id
-    description: If the start of this schedule is from a Request or a Reschedule. Data since 2020.
+    description: If the start of this schedule is from a Request or a Reschedule. Data since 2015.
   channel_creation:
     lineage:
       - datalake_ebdb_clean.visit_status_log.channel
-    description: Channel from first event of schedule (VISIT_REQUESTED or VISIT_RESCHEDULED)
+    description: Channel from first event of schedule (VISIT_REQUESTED or VISIT_RESCHEDULED). Data since 2024-11.
   application_source_creation:
     lineage:
       - datalake_ebdb_clean.visit_status_log.application_source
@@ -124,145 +124,145 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_status_log.channel
       - datalake_ebdb_clean.visit_status_log.application_source
-    description: Source of the schedule creation unified from channel and application source.
+    description: Source of the schedule creation unified from channel and application source. Data since 2024-11.
   first_confirmed_channel:
     lineage:
       - datalake_ebdb_clean.visit_status_log.channel
-    description: Channel from first confirmation of schedule.
+    description: Channel from first confirmation of schedule. Data since 2024-11.
   first_confirmed_user_role:
     lineage:
       - datalake_ebdb_clean.visit_status_log.author_user_role
-    description: Role of user who is related to the first visit confirmation.
+    description: Role of user who is related to the first visit confirmation. Data since 2024-11.
   last_confirm_answer_supply:
-    description: Last answer of confirmation on behalf of supply.
+    description: Last answer of confirmation on behalf of supply. Data since 2024-11.
     categories:
       ANSWER_CONFIRMED: Supply's answer is confirmed for scheduling.
       ANSWER_PENDING: Supply's answer is pending for scheduling.
       ANSWER_REJECTED: Supply's answer is rejected for scheduling.
   last_confirm_answer_demand:
-    description: Last answer of confirmation on behalf of demand.
+    description: Last answer of confirmation on behalf of demand. Data since 2024-11.
     categories:
       ANSWER_CONFIRMED: Demand's answer is confirmed for scheduling.
       ANSWER_PENDING: Demand's answer is pending for scheduling.
       ANSWER_REJECTED: Demand's answer is rejected for scheduling.
   last_confirm_answer_agent:
-    description: Last answer of confirmation on behalf of agent.
+    description: Last answer of confirmation on behalf of agent. Data since 2024-11.
     categories:
       ANSWER_CONFIRMED: Agent's answer is confirmed for scheduling.
       ANSWER_PENDING: Agent's answer is pending for scheduling.
       ANSWER_REJECTED: Agent's answer is rejected for scheduling.
   last_confirm_answer_tenant_living:
-    description: Last answer of confirmation on behalf of tenant living.
+    description: Last answer of confirmation on behalf of tenant living. Data since 2024-11.
     categories:
       ANSWER_CONFIRMED: Tenant's answer is confirmed for scheduling.
       ANSWER_PENDING: Tenant's answer is pending for scheduling.
       ANSWER_REJECTED: Tenant's answer is rejected for scheduling.
   channel_confirmed_supply:
-    description: Channel from supply's confirmation of schedule.
+    description: Channel from supply's confirmation of schedule. Data since 2024-11.
   channel_confirmed_demand:
-    description: Channel from demand's confirmation of schedule.
+    description: Channel from demand's confirmation of schedule. Data since 2024-11.
   channel_confirmed_agent:
-    description: Channel from agent's confirmation of schedule.
+    description: Channel from agent's confirmation of schedule. Data since 2024-11.
   channel_confirmed_tenant_living:
-    description: Channel from tenant's confirmation of schedule.
+    description: Channel from tenant's confirmation of schedule. Data since 2024-11.
   is_confirmed_by_supply:
-    description: TRUE if the schedule is confirmed by supply.
+    description: TRUE if the schedule is confirmed by supply. Data since 2024-11.
   is_confirmed_by_demand:
-    description: TRUE if the schedule is confirmed by demand.
+    description: TRUE if the schedule is confirmed by demand. Data since 2024-11.
   is_confirmed_by_agent:
-    description: TRUE if the schedule is confirmed by agent.
+    description: TRUE if the schedule is confirmed by agent. Data since 2024-11.
   is_confirmed_by_tenant_living:
-    description: TRUE if the schedule is confirmed by tenant living.
+    description: TRUE if the schedule is confirmed by tenant living. Data since 2024-11.
   is_confirmed:
     lineage:
       - datalake_ebdb_clean.visit_status_log.ts_created
       - datalake_ebdb_clean.booking_status_change.ts_created
-    description: If the schedule was confirmed by all. Data since 2020.
+    description: If the schedule was confirmed by all. Data since 2015.
   is_completed:
     lineage:
       - datalake_visit.post_visit_agent_unified.event_type
-    description: If the schedule is completed.
+    description: If the schedule is completed. Data since 2015.
   is_rescheduled:
     lineage:
       - datalake_ebdb_clean.visit_status_log.ts_created
       - datalake_ebdb_clean.booking_status_change.ts_created
-    description: If the schedule is a reschedule. Data since 2020.
+    description: If the schedule is a reschedule. Data since 2015.
   is_canceled:
     lineage:
       - datalake_visit.visit_cancellation_unified.ts_created
-    description: If the schedule is canceled. Data since 2020.
+    description: If the schedule is canceled. Data since 2015.
   is_unsuccessful:
     lineage:
       - datalake_visit.post_visit_agent_unified.event_type
-    description: If the schedule return unsuccessful. Data since 2020.
+    description: If the schedule return unsuccessful. Data since 2015.
   has_tenant_living:
     lineage:
       - datalake_ebdb_clean.visit.behavior
-    description: TRUE if the visit requires tenant living confirmation.
+    description: TRUE if the visit requires tenant living confirmation. Data since 2015.
   days_visit_cancelled_to_visit:
     lineage:
       - datalake_ebdb_clean.visit.dt_visit
       - datalake_visit.visit_cancellation_unified.ts_created
-    description: Days between the visit cancelled and the visit. Data since 2020.
+    description: Days between the visit cancelled and the visit. Data since 2015.
   days_visit_booked_to_visit:
     lineage:
       - datalake_ebdb_clean.visit.dt_visit
       - datalake_ebdb_clean.visit_status_log.ts_created
       - datalake_ebdb_clean.booking.ts_created
-    description: Days between the visit booked and the visit. Data since 2020.
+    description: Days between the visit booked and the visit. Data since 2015.
   days_visit_booked_to_cancelled:
     lineage:
       - datalake_visit.visit_cancellation_unified.ts_created
       - datalake_ebdb_clean.visit_status_log.ts_created
       - datalake_ebdb_clean.booking.ts_created
-    description: Days between the booking creation and the visit cancelled date. Data since 2020.
+    description: Days between the booking creation and the visit cancelled date. Data since 2015.
   days_visit_booked_to_visit_completed:
     lineage:
       - datalake_visit.post_visit_agent_unified.ts_post_visit_agent
       - datalake_ebdb_clean.visit_status_log.ts_created
       - datalake_ebdb_clean.booking.ts_created
-    description: Days between the booking creation and the visit completed date. Data since 2020.
+    description: Days between the booking creation and the visit completed date. Data since 2015.
   ts_visit:
     lineage:
       - datalake_ebdb_clean.visit.ts_visit
-    description: Current timestamp when the visit was scheduled.
+    description: Current timestamp when the visit was scheduled. Data since 2015.
   ts_schedule_created:
     lineage:
       - datalake_ebdb_clean.visit_status_log.ts_created
       - datalake_ebdb_clean.booking.ts_created
-    description: Timestamp of the creation of the schedule. Data since 2020.
+    description: Timestamp of the creation of the schedule. Data since 2015.
   ts_next_schedule_created:
     lineage:
       - datalake_ebdb_clean.visit_status_log.ts_created
       - datalake_ebdb_clean.booking.ts_created
-    description: Timestamp of the next schedule creation. Data since 2020.
+    description: Timestamp of the next schedule creation. Data since 2015.
   ts_schedule_requested:
     lineage:
       - datalake_ebdb_clean.visit_status_log.ts_created
       - datalake_ebdb_clean.booking.ts_created
-    description: Timestamp of the request event. Data since 2020.
+    description: Timestamp of the request event. Data since 2015.
   ts_schedule_rescheduled:
     lineage:
       - datalake_ebdb_clean.visit_status_log.ts_created
       - datalake_ebdb_clean.booking.ts_created
-    description: Timestamp of the reschedule event. Data since 2020.
+    description: Timestamp of the reschedule event. Data since 2015.
   ts_schedule_confirmed:
     lineage:
       - datalake_ebdb_clean.visit_status_log.ts_created
       - datalake_ebdb_clean.booking_status_change.ts_created
-    description: Timestamp of the confirmation event. Data since 2020.
+    description: Timestamp of the confirmation event. Data since 2015.
   ts_schedule_completed:
     lineage:
       - datalake_visit.post_visit_agent_unified.ts_post_visit_agent
-    description: Timestamp of the completed event. Data since 2020.
+    description: Timestamp of the completed event. Data since 2015.
   ts_schedule_unsuccessful:
     lineage:
       - datalake_visit.post_visit_agent_unified.ts_post_visit_agent
-    description: Timestamp with the unsuccessful event. Data since 2020.
+    description: Timestamp with the unsuccessful event. Data since 2015.
   ts_schedule_canceled:
     lineage:
       - datalake_visit.visit_cancellation_unified.ts_created
-    description: Timestamp of the canceled event. Data since 2020.
+    description: Timestamp of the canceled event. Data since 2015.
   ts_schedule_visit:
     lineage:
       - datalake_ebdb_clean.visit_aud.ts_visit
@@ -270,10 +270,10 @@ columns:
       - datalake_ebdb_clean.booking.slot_booking
     description: Timestamp when the visit was scheduled for each id_schedule (UTC).
       The slot starts with 0 at 11:00 AM (UTC) and each unit is 15 minutes.
-      Data since 2020.
+      Data since 2015.
   ts_visit_checkin:
     lineage:
       - datalake_ebdb_clean.visit_checkin.ts_checkin
-    description: Visit checkin timestamp.
+    description: Visit checkin timestamp. Data since 2023.
   ts_load:
     description: Timestamp of the ingestion.

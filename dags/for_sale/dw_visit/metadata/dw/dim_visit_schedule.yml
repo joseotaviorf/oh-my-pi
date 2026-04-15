@@ -10,11 +10,11 @@ columns:
   sk_schedule:
     lineage:
       - datalake_visit.visit_schedules.id_schedule
-    description: ID of schedule. Data since 2020.
+    description: ID of schedule. Data since 2015.
   schedule_origin:
     lineage:
       - datalake_visit.visit_schedules.schedule_origin
-    description: If the start of this schedule is from a Request or a Reschedule. Data since 2020.
+    description: If the start of this schedule is from a Request or a Reschedule. Data since 2015.
   channel_creation:
     lineage:
       - datalake_visit.visit_schedules.channel_creation
@@ -106,64 +106,64 @@ columns:
   is_last_schedule:
     lineage:
       - datalake_visit.visit_schedules.id_succeed_schedule
-    description: TRUE when is the last schedule of visit. Data since 2020.
+    description: TRUE when is the last schedule of visit. Data since 2015.
   is_first_schedule:
     lineage:
       - datalake_visit.visit_schedules.schedule_origin
-    description: TRUE when is the first schedule of visit. Data since 2020.
+    description: TRUE when is the first schedule of visit. Data since 2015.
   is_schedule_confirmed:
     lineage:
       - datalake_visit.visit_schedules.is_confirmed
-    description: If the schedule was confirmed by all. Data since 2020.
+    description: If the schedule was confirmed by all. Data since 2015.
   is_schedule_completed:
     lineage:
       - datalake_visit.visit_schedules.is_completed
-    description: If the schedule is completed. Data since 2020.
+    description: If the schedule is completed. Data since 2015.
   is_schedule_rescheduled:
     lineage:
       - datalake_visit.visit_schedules.is_rescheduled
-    description: If the schedule is a reschedule. Data since 2020.
+    description: If the schedule is a reschedule. Data since 2015.
   is_schedule_canceled:
     lineage:
       - datalake_visit.visit_schedules.is_canceled
-    description: If the schedule is canceled. Data since 2020.
+    description: If the schedule is canceled. Data since 2015.
   is_schedule_unsuccessful:
     lineage:
       - datalake_visit.visit_schedules.is_unsuccessful
-    description: If the schedule return unsuccessful. Data since 2020.
+    description: If the schedule return unsuccessful. Data since 2015.
   ts_schedule_created:
     lineage:
       - datalake_visit.visit_schedules.ts_schedule_created
-    description: Timestamp of the creation of the schedule (VISIT_REQUESTED or VISIT_RESCHEDULED). Data since 2020.
+    description: Timestamp of the creation of the schedule (VISIT_REQUESTED or VISIT_RESCHEDULED). Data since 2015.
   ts_next_schedule_created:
     lineage:
       - datalake_visit.visit_schedules.ts_next_schedule_created
-    description: Timestamp of the next schedule creation. Data since 2020.
+    description: Timestamp of the next schedule creation. Data since 2015.
   ts_schedule_requested:
     lineage:
       - datalake_visit.visit_schedules.ts_schedule_requested (VISIT_REQUESTED).
-    description: Timestamp of the request event. Data since 2020.
+    description: Timestamp of the request event. Data since 2015.
   ts_schedule_rescheduled:
     lineage:
       - datalake_visit.visit_schedules.ts_schedule_rescheduled (VISIT_RESCHEDULED).
-    description: Timestamp of the reschedule event. Data since 2020.
+    description: Timestamp of the reschedule event. Data since 2015.
   ts_schedule_confirmed:
     lineage:
       - datalake_visit.visit_schedules.ts_schedule_confirmed
-    description: Timestamp of the first confirmation event (VISIT_CONFIRMED). Data since 2020.
+    description: Timestamp of the confirmation event. Data since 2015.
   ts_schedule_completed:
     lineage:
       - datalake_visit.visit_schedules.ts_schedule_completed
-    description: Timestamp of the completed event (VISIT_DONE). Data since 2020.
+    description: Timestamp of the completed event (VISIT_DONE). Data since 2015.
   ts_schedule_unsuccessful:
     lineage:
       - datalake_visit.visit_schedules.ts_schedule_unsuccessful
-    description: Timestamp with the unsuccessful event (VISIT_UNSUCCESSFUL). Data since 2020.
+    description: Timestamp with the unsuccessful event (VISIT_UNSUCCESSFUL). Data since 2015.
   ts_schedule_canceled:
     lineage:
       - datalake_visit.visit_schedules.ts_schedule_canceled
-    description: Timestamp of the canceled event (VISIT_REQUEST_CANCELED or VISIT_REQUEST_CANCELED). Data since 2020.
+    description: Timestamp of the canceled event (VISIT_REQUEST_CANCELED or VISIT_REQUEST_CANCELED). Data since 2015.
   ts_schedule_visit:
     lineage:
       - datalake_visit.visit_schedules.ts_schedule_visit
-    description: Timestamp when the visit was scheduled for each id_schedule. Data since 2020.
+    description: Timestamp when the visit was scheduled for each id_schedule (UTC). Data since 2015.
