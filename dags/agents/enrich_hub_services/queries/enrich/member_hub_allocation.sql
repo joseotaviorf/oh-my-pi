@@ -29,9 +29,23 @@ SELECT
     u_parent.uuid_person AS uuid_parent_person,
     mp.id_business_unit,
     bu.hub_name,
+    bu.city_group,
+    bu.city_name,
+    bu.short_region_name,
+    bu.lead_types,
     bu.business_context,
     mp.profile,
     ad.agent_type,
+    u.name AS user_name,
+    u.email AS user_email,
+    u.phone_number AS user_phone_number,
+    u.secondary_phone_number AS user_secondary_phone_number,
+    u.cpf AS user_cpf,
+    u_parent.name AS user_parent_name,
+    u_parent.email AS user_parent_email,
+    u_parent.phone_number AS user_parent_phone_number,
+    u_parent.secondary_phone_number AS user_parent_secondary_phone_number,
+    u_parent.cpf AS user_parent_cpf,
     aux_date.date AS dt_reference,
     aux_date.year,
     aux_date.month,
@@ -48,10 +62,11 @@ LEFT JOIN
     datalake_hub_services.users AS u_parent
         ON u_parent.id_user = mp.id_parent_user
 LEFT JOIN
-    datalake_hub_services_clean.business_unit AS bu
-        ON bu.id = mp.id_business_unit
-LEFT JOIN
     datalake_ebdb_clean.agent_data AS ad
         ON ad.id = u.id_agent
+LEFT JOIN
+    datalake_hub_services.business_unit AS bu
+        ON bu.id_business_unit = mp.id_business_unit
+        AND bu.is_last_region_associated IS TRUE
 WHERE
     MAKE_DATE(aux_date.year, aux_date.month, aux_date.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

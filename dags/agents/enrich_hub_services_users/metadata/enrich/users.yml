@@ -2,7 +2,8 @@
 database_name: datalake_hub_services
 table_name: users
 description: |
-  Crosses user data from Hub Services and user data from main/ebdb. 
+  Hub Services user rows reconciled to main/ebdb via id_external, with agent identity (id_agent,
+  uuid_person) and contact fields coalesced from clean Hub Services users and datalake_ebdb_clean.user.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
@@ -10,14 +11,14 @@ columns:
     lineage:
       - datalake_hub_services_clean.users.id
     description: |
-      User unique identifier on HubServices tables.
+      User unique identifier on Hub Services tables.
       Attention: This user ID refers to Hub Services and does not correspond to the main/admin/ebdb user.
   id_main_user:
     lineage:
       - datalake_hub_services_clean.users.id_external
+      - datalake_ebdb_user.user_merge.id_user
     description: |
-      Unique external user ID.
-      Attention: This ID refers to the user in main/admin/ebdb.
+      External user id in main/admin (ebdb), after merge resolution when the Hub id maps via user_merge.
   id_agent:
     lineage:
       - datalake_ebdb_clean.user.id_agent
@@ -32,17 +33,23 @@ columns:
     lineage:
       - datalake_hub_services_clean.users.name
       - datalake_ebdb_clean.user.name
-    description: User name.
+    description: Display name, preferring Hub Services clean when present.
   email:
     lineage:
       - datalake_hub_services_clean.users.email
       - datalake_ebdb_clean.user.email
-    description: User e-mail.
+    description: Email, preferring Hub Services clean when present.
   phone_number:
     lineage:
       - datalake_hub_services_clean.users.phone_number
-      - datalake_ebdb_clean.user.phone_number
-    description: User phone number.
+      - datalake_ebdb_clean.user.main_phone
+    description: Primary phone; Hub Services phone_number coalesced with ebdb main_phone.
+  secondary_phone_number:
+    lineage:
+      - datalake_ebdb_clean.user.secondary_phone
+      - datalake_ebdb_clean.user.main_phone
+    description: |
+      Secondary phone from ebdb when it differs from main_phone; otherwise null (avoids duplicating the main number).
   cpf:
     lineage:
       - datalake_ebdb_clean.user.cpf
@@ -54,20 +61,20 @@ columns:
   ts_created:
     lineage:
       - datalake_hub_services_clean.users.ts_created
-    description: User data creation datetime
+    description: User data creation datetime in Hub Services clean layer.
   ts_updated:
     lineage:
       - datalake_hub_services_clean.users.ts_updated
-    description: User data update datetime.
+    description: User data update datetime in Hub Services clean layer.
   year:
     lineage:
       - datalake_hub_services_clean.users.year
-    description: Year of update date.
+    description: Partition year of the Hub Services users snapshot.
   month:
     lineage:
       - datalake_hub_services_clean.users.month
-    description: Month of update date.
+    description: Partition month of the Hub Services users snapshot.
   day:
     lineage:
       - datalake_hub_services_clean.users.day
-    description: Day of update date.
+    description: Partition day of the Hub Services users snapshot.

@@ -1,0 +1,13 @@
+---
+table_name: datalake_hub_services.business_unit
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_business_unit:
+    is_complete:
+      severity_level: Error
+  hub_name:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error

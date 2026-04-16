@@ -4,7 +4,10 @@ dag:
   schedule_start_date: 2022, 7, 22
   owner: Data Agents
   documentation:
-    dag_purpose: This DAG creates the enriched tables for HubServices.
+    dag_purpose: |
+      Enriched Hub Services layer: secretariat allocation and hierarchy, business unit region,
+      member profiles and hub linkage, business unit dimension with region attributes, profile
+      snapshots, and daily member–hub allocation for agents and downstream consumers.
 workflow:
   type: query_delta
   layer: enrich
@@ -14,10 +17,24 @@ workflow:
   inner_dependencies:
     daily_secretariat_allocation:
       - secretariat_allocation_history
+    member_hub_allocation:
+      - member_profile
+      - business_unit
+    agent_hub_alocation:
+      - member_profile
   tables_customization:
     daily_secretariat_allocation:
       partitions: [dt_snapshot]
       extraction_type: incremental
+    profile:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    agent_hub_alocation:
+      extraction_type: incremental
+      partitions: [year, month, day]
+    member_hub_allocation:
+      extraction_type: incremental
+      partitions: [year, month, day]
 cluster:
   type: databricks_16_4_med_general_cluster
   databricks_conn_id: databricks_new_env

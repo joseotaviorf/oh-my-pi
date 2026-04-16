@@ -77,10 +77,9 @@ gsheets_tqc_agents_join AS (
         AND COALESCE(dua2.id_agent,0) != 0
         AND dua2.country_code = 'BR'
   LEFT JOIN
-    datalake_hub_services.agent_hub_relation AS ah
+    datalake_hub_services.member_hub_allocation AS ah
       ON COALESCE(daa1.id_agent,daa2.id_agent,dua1.id_agent,dua2.id_agent) = ah.id_agent
-        AND DATE(tqc.ts_appointment) = ah.ts_agent_hub_relation_date
-        AND ah.is_active = true
+      AND DATE(tqc.ts_appointment) = ah.dt_reference
   QUALIFY 
     ROW_NUMBER() OVER(
       PARTITION BY
@@ -170,11 +169,10 @@ LEFT JOIN
   datalake_ebdb_user.`user` AS u
     ON lr.id_lead = u.id
 LEFT JOIN
-  datalake_hub_services.agent_hub_relation AS ah
+  datalake_hub_services.member_hub_allocation AS ah
     ON lr.id_agent = ah.id_agent
-      AND DATE(lr.ts_created) = ah.ts_agent_hub_relation_date
-      AND ah.is_active = true
+    AND DATE(lr.ts_created) = ah.dt_reference
 WHERE
   lr.id_agent NOT IN (22605,22606,23920)
 QUALIFY
-  ROW_NUMBER() OVER(PARTITION BY lr.id ORDER BY ah.revision DESC) = 1 -- In some cases, there is more than one hub active for the same agent at a given day. We're getting the newest one.
+  ROW_NUMBER() OVER(PARTITION BY lr.id ORDER BY ah.dt_reference DESC) = 1 -- In some cases, there is more than one hub active for the same agent at a given day. We're getting the newest one.

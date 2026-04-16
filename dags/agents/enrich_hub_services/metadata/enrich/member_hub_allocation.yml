@@ -1,0 +1,173 @@
+---
+database_name: datalake_hub_services
+table_name: member_hub_allocation
+description: |
+  Daily allocation of Hub Services members to business units: explodes each active member–hub
+  relationship across calendar days via aux_date, enriches users and agent_data, and attaches hub
+  and region attributes from datalake_hub_services.business_unit (latest region row per unit).
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_member_profile:
+    lineage:
+      - datalake_hub_services.member_profile.id_member_profile
+    description: Unique identifier for the member profile.
+  id_user:
+    lineage:
+      - datalake_hub_services.member_profile.id_user
+    description: |
+      Hub Services internal user identifier for the member (join key to datalake_hub_services.users).
+      Not the same as main/admin (ebdb) user id.
+  id_main_user:
+    lineage:
+      - datalake_hub_services.users.id_main_user
+    description: |
+      Unique member external user ID (main/admin/ebdb).
+      Attention: This ID refers to the user in main/admin/ebdb.
+  id_agent:
+    lineage:
+      - datalake_hub_services.users.id_agent
+    description: |
+      Agent unique identifier.
+      Attention: This ID refers to the agent in main/admin/ebdb.
+  uuid_person:
+    lineage:
+      - datalake_hub_services.users.uuid_person
+    description: Person-level UUID from main/admin (ebdb) for this member.
+  uuid_company:
+    lineage:
+      - datalake_ebdb_clean.agent_data.uuid_company
+    description: Company UUID associated with the member (brokerage/company identifier).
+  id_parent_member_profile:
+    lineage:
+      - datalake_hub_services.member_profile.id_parent_member_profile
+    description: Unique identifier for the parent member profile.
+  id_parent_user:
+    lineage:
+      - datalake_hub_services.member_profile.id_parent_user
+    description: |
+      Hub Services internal user identifier for the parent member (join key to users for the parent).
+  id_parent_main_user:
+    lineage:
+      - datalake_hub_services.users.id_main_user
+    description: |
+      Parent member external user ID (main/admin/ebdb), from the parent row in users.
+  id_parent_agent:
+    lineage:
+      - datalake_hub_services.users.id_agent
+    description: Parent member agent unique identifier (main/admin/ebdb).
+  uuid_parent_person:
+    lineage:
+      - datalake_hub_services.users.uuid_person
+    description: Person-level UUID from main/admin (ebdb) for the parent member.
+  id_business_unit:
+    lineage:
+      - datalake_hub_services.member_profile.id_business_unit
+    description: Unique ID of the business unit where the member is allocated.
+  hub_name:
+    lineage:
+      - datalake_hub_services.business_unit.hub_name
+    description: Business unit display name from enrich business_unit.
+  city_group:
+    lineage:
+      - datalake_hub_services.business_unit.city_group
+    description: City group of the hub’s region from enrich business_unit.
+  city_name:
+    lineage:
+      - datalake_hub_services.business_unit.city_name
+    description: City name of the hub’s region from enrich business_unit.
+  short_region_name:
+    lineage:
+      - datalake_hub_services.business_unit.short_region_name
+    description: Short region label from enrich business_unit.
+  lead_types:
+    lineage:
+      - datalake_hub_services.business_unit.lead_types
+    description: Lead types served by the hub (from enrich business_unit).
+  business_context:
+    lineage:
+      - datalake_hub_services.business_unit.business_context
+    description: Commercial line of the business unit (e.g. sale or rent).
+    categories:
+      sale: Acting on sales.
+      rent: Acting on rent.
+  profile:
+    lineage:
+      - datalake_hub_services.member_profile.profile
+    description: Membership role type.
+    categories:
+      MANAGEMENT_SECRETARIAT: Exclusive ForSale profile. Manages a secretarial team.
+      TREATMENT_SECRETARIAT: Exclusive ForSale profile. Works directly on converting new buyer prospects.
+      ADMINISTRATIVE_SECRETARIAT: Exclusive ForSale profile. Directly administers a group of secretaries.
+      DISTRIBUTION_SECRETARIAT: Exclusive ForSale profile. Directly distributes leads to a group of secretaries.
+      NEGOTIATION_EXECUTIVE: Exclusive ForSale profile. Responsible for intermediating the offer negotiation stage between a buyer and seller until it results in a signed contract (CCV).
+      AGENT: Can belong to ForSale or ForRent. Acts as a visit broker.
+      TREATMENT_SECRETARIAT_NBP: Exclusive ForSale profile. A secretary who works directly on converting new buyer prospects.
+      THIRD_PARTY_TREATMENT_SECRETARIAT: Exclusive ForSale profile. Works directly on converting new buyer prospects, but the secretaries are third-party.
+      SELECT_EXECUTIVE: Exclusive ForRent profile. Responsible for supporting and managing the work of a group of brokers.
+      ASSOCIATED_EXECUTIVE: Exclusive ForSale profile. Responsible for managing the work of a group of business units (HUBs).
+      SUPERVISION_SECRETARIAT: Exclusive ForSale profile. Supervises a group of secretaries.
+      TREATMENT_SECRETARIAT_TWILIO: Exclusive ForSale profile. Works directly on converting new buyer prospects, with communication via Twilio (a CX tool).
+  agent_type:
+    lineage:
+      - datalake_ebdb_clean.agent_data.agent_type
+    description: Agent type.
+  user_name:
+    lineage:
+      - datalake_hub_services.users.name
+    description: Member user display name from Hub Services users.
+  user_email:
+    lineage:
+      - datalake_hub_services.users.email
+    description: Member user email from Hub Services users.
+  user_phone_number:
+    lineage:
+      - datalake_hub_services.users.phone_number
+    description: Member user primary phone (Hub Services clean coalesced with ebdb main phone in enrich users).
+  user_secondary_phone_number:
+    lineage:
+      - datalake_hub_services.users.secondary_phone_number
+    description: |
+      Member secondary phone when distinct from main phone in ebdb user; sourced from enrich users.
+  user_cpf:
+    lineage:
+      - datalake_hub_services.users.cpf
+    description: Member user CPF from Hub Services users.
+  user_parent_name:
+    lineage:
+      - datalake_hub_services.users.name
+    description: Parent member user display name from Hub Services users.
+  user_parent_email:
+    lineage:
+      - datalake_hub_services.users.email
+    description: Parent member user email from Hub Services users.
+  user_parent_phone_number:
+    lineage:
+      - datalake_hub_services.users.phone_number
+    description: Parent member primary phone from enrich users.
+  user_parent_secondary_phone_number:
+    lineage:
+      - datalake_hub_services.users.secondary_phone_number
+    description: Parent member secondary phone from enrich users (when applicable).
+  user_parent_cpf:
+    lineage:
+      - datalake_hub_services.users.cpf
+    description: Parent member user CPF from Hub Services users.
+  dt_reference:
+    lineage:
+      - datalake_quintoandar.aux_date.date
+    description: |
+      Calendar day on which the member–hub–parent relationship is considered active for this row
+      (exploded between relationship start and end dates).
+  year:
+    lineage:
+      - datalake_quintoandar.aux_date.year
+    description: Year of reference date.
+  month:
+    lineage:
+      - datalake_quintoandar.aux_date.month
+    description: Month of reference date.
+  day:
+    lineage:
+      - datalake_quintoandar.aux_date.day
+    description: Day of reference date.

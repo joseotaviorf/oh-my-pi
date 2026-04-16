@@ -1,6 +1,10 @@
 database_name: datalake_tqc_referral
 table_name: unified_lead_referral_flow
-description: This table unites the two sources of lead indication for TQC and enriches the source tables by adding important fields for performance analysis.
+description: |
+  Unifies the two TQC lead referral sources (legacy Google Sheets leads and agent_lead_referral),
+  enriches them for analysis, and resolves hub geography from datalake_hub_services.member_hub_allocation
+  (agent + referral date = dt_reference). Hub and region attributes on that allocation already reflect
+  the enrich business_unit grain (latest region per unit upstream).
 domain: For Sale
 owner: data-for-sale@quintoandar.com.br
 columns:
@@ -34,16 +38,20 @@ columns:
     description: Lead phone number.
   hub_name:
     lineage:
-      - datalake_hub_services.agent_hub_relation.hub_name
-    description: Hub business name.
+      - datalake_hub_services.member_hub_allocation.hub_name
+    description: |
+      Hub name from member_hub_allocation for the agent on the referral calendar day (same dt_reference
+      as the appointment or agent_lead_referral ts_created date).
   city_group:
     lineage:
-     - datalake_hub_services.agent_hub_relation.city_group
-    description: City group of the hub.
+      - datalake_hub_services.member_hub_allocation.city_group
+    description: City group of the hub’s region from member_hub_allocation.
   macro_region:
     lineage:
-      - datalake_hub_services.agent_hub_relation.short_region_name
-    description: Used by the OPS team to group regions between 'SP-RJ-POA', 'BH' and 'OTHER'.
+      - datalake_hub_services.member_hub_allocation.short_region_name
+    description: |
+      OPS-facing bucket derived from short_region_name on member_hub_allocation: 'BH' when MG,
+      'SP-RJ-POA' when RJ/SP/RS, otherwise 'OTHER'. Same CASE logic in both union branches.
   status:
     lineage:
       - datalake_ebdb_clean.agent_lead_referral.status

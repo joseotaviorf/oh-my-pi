@@ -1,0 +1,90 @@
+---
+database_name: datalake_hub_services
+table_name: business_unit
+description: |
+  Hub Services business units enriched with region linkage and canonical region attributes.
+  Each row represents a business unit in a given business context combined with one associated
+  region (deduplicated by latest business_unit_region update). Use is_last_region_associated
+  to identify the most recent region row per business unit when multiple region associations exist over time.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_business_unit:
+    lineage:
+      - datalake_hub_services_clean.business_unit.id
+    description: Unique identifier of the performance hub (business unit).
+  id_region:
+    lineage:
+      - datalake_hub_services_clean.business_unit_region.id_region
+    description: Region identifier linked to the business unit for this row.
+  hub_name:
+    lineage:
+      - datalake_hub_services_clean.business_unit.hub_name
+    description: Display name of the performance hub.
+  region_code:
+    lineage:
+      - datalake_region.region.region_code
+    description: Region code from the canonical region dimension.
+  city_group:
+    lineage:
+      - datalake_region.region.city_group
+    description: Greater metro or city grouping for the region.
+  city_name:
+    lineage:
+      - datalake_region.region.city_name
+    description: City name for the region.
+  short_region_name:
+    lineage:
+      - datalake_region.region.short_region_name
+    description: Short label for the region.
+  sdr_type:
+    lineage:
+      - datalake_hub_services_clean.business_unit.sdr_type
+    description: Secretariat (SDR) work type for the hub.
+  lead_types:
+    lineage:
+      - datalake_hub_services_clean.business_unit.lead_types
+    description: Lead types the hub serves.
+  negotiation_type:
+    lineage:
+      - datalake_hub_services_clean.business_unit.negotiation_type
+    description: Negotiation model applied by the hub.
+  business_context:
+    lineage:
+      - datalake_hub_services_clean.business_unit.business_context
+    description: Commercial line of the hub (e.g. sale or rent).
+    categories:
+      sale: Acting on sales.
+      rent: Acting on rent.
+  operational_context:
+    lineage:
+      - datalake_hub_services_clean.business_unit.operational_context
+    description: Operational context in which the hub operates.
+  is_last_region_associated:
+    description: |
+      True for the single row per business unit id whose region link has the most recent
+      business_unit_region update timestamp; false for all other region associations of the same unit.
+  ts_region_updated:
+    lineage:
+      - datalake_hub_services_clean.business_unit_region.ts_updated
+    description: Timestamp of the business unit–region link row used for this association.
+  ts_business_unit_created:
+    lineage:
+      - datalake_hub_services_clean.business_unit.ts_created
+    description: Timestamp when the business unit record was created in Hub Services.
+  ts_business_unit_updated:
+    lineage:
+      - datalake_hub_services_clean.business_unit.ts_updated
+    description: Timestamp when the business unit record was last updated in Hub Services.
+  year:
+    lineage:
+      - datalake_hub_services_clean.business_unit.year
+    description: Partition year of the business unit snapshot.
+  month:
+    lineage:
+      - datalake_hub_services_clean.business_unit.month
+    description: Partition month of the business unit snapshot.
+  day:
+    lineage:
+      - datalake_hub_services_clean.business_unit.day
+    description: Partition day of the business unit snapshot.
