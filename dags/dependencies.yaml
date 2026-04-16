@@ -2449,6 +2449,7 @@ bietlejuice.enrich_ebdb_listing:
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company:first-run-of-day
   - bietlejuice.klefki:load-clean-inspection-key-retrieval-confirmation:first-run-of-day
+  - bietlejuice.klefki:load-clean-key-delivery-location:first-run-of-day
   - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
 bietlejuice.enrich_ebdb_photo_jobs:
   - bietlejuice.ebdb_house:load-clean-house-registration-status-aud:first-run-of-day

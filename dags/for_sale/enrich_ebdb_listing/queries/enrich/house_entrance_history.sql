@@ -19,6 +19,8 @@ WITH old_entry_model AS (
             access.has_opted_keys_with_agent,
             NULL AS entry_model_channel,
             NULL AS actor_role,
+            NULL AS key_holder_name,
+            NULL AS key_holder_contact,
             ure.ts_revision AS ts_entrance_started
         FROM
             datalake_ebdb_clean.access_type_aud AS access
@@ -61,6 +63,8 @@ WITH old_entry_model AS (
             NULL AS has_opted_keys_with_agent,
             'INSPECTION_APP' AS entry_model_channel,
             'INSPECTOR' AS actor_role,
+            NULL AS key_holder_name,
+            NULL AS key_holder_contact,
             i.ts_created AS ts_entrance_started
         FROM
             datalake_klefki_clean.inspection_key_retrieval_confirmation AS i
@@ -69,38 +73,105 @@ WITH old_entry_model AS (
                 ON i.id_contract = c.id
         WHERE
             i.ts_created::DATE < '2025-03-01'
+    ),
+    tenant AS (
+        SELECT
+            id_property AS id_house,
+            NULL AS id_occupant,
+            NULL AS occupant_type,
+            NULL AS restriction_type,
+            NULL AS key_type,
+            NULL AS entry_model_details,
+            CASE
+                WHEN location = 'PERSONALLYWITHMYSELF' THEN 'TENANT'
+                WHEN location = 'GATEHOUSE' THEN 'FRONT_DOOR'
+                WHEN location = 'PERSONALLYWITHSOMEONE' THEN 'EXTERNAL_RESPONSIBLE'
+                WHEN location = 'LOCKBOX' THEN 'LOCK_BOX'
+                ELSE location
+            END AS key_location,
+            NULL AS authorization_type,
+            NULL AS has_opted_keys_with_agent,
+            'TENANT_PWA' AS entry_model_channel,
+            'TENANT' AS actor_role,
+            responsible_person_name AS key_holder_name,
+            responsible_person_phone AS key_holder_contact,
+            ts_created AS ts_entrance_started
+        FROM
+            datalake_klefki_clean.key_delivery_location
+        WHERE
+            ts_created::DATE < '2025-03-01'
+    ),
+    union_old AS (
+        SELECT
+            id_house,
+            id_occupant,
+            occupant_type,
+            restriction_type,
+            key_type,
+            entry_model_details,
+            key_location,
+            authorization_type,
+            has_opted_keys_with_agent,
+            entry_model_channel,
+            actor_role,
+            key_holder_name,
+            key_holder_contact,
+            ts_entrance_started
+        FROM
+            access_type
+        UNION ALL
+        SELECT
+            id_house,
+            id_occupant,
+            occupant_type,
+            restriction_type,
+            key_type,
+            entry_model_details,
+            key_location,
+            authorization_type,
+            has_opted_keys_with_agent,
+            entry_model_channel,
+            actor_role,
+            key_holder_name,
+            key_holder_contact,
+            ts_entrance_started
+        FROM
+            inspection
+        UNION ALL
+        SELECT
+            id_house,
+            id_occupant,
+            occupant_type,
+            restriction_type,
+            key_type,
+            entry_model_details,
+            key_location,
+            authorization_type,
+            has_opted_keys_with_agent,
+            entry_model_channel,
+            actor_role,
+            key_holder_name,
+            key_holder_contact,
+            ts_entrance_started
+        FROM
+            tenant
     )
     SELECT
         id_house,
-        id_occupant,
-        occupant_type,
-        restriction_type,
-        key_type,
+        COALESCE(id_occupant, LAG(id_occupant) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_entrance_started)) AS id_occupant,
+        COALESCE(occupant_type, LAG(occupant_type) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_entrance_started)) AS occupant_type,
+        COALESCE(restriction_type, LAG(restriction_type) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_entrance_started)) AS restriction_type,
+        COALESCE(key_type, LAG(key_type) IGNORE NULLS OVER(PARTITION BY id_house ORDER BY ts_entrance_started)) AS key_type,
         entry_model_details,
         key_location,
         authorization_type,
         has_opted_keys_with_agent,
         entry_model_channel,
         actor_role,
+        key_holder_name,
+        key_holder_contact,
         ts_entrance_started
-    FROM
-        access_type
-    UNION ALL
-    SELECT
-        id_house,
-        id_occupant,
-        occupant_type,
-        restriction_type,
-        key_type,
-        entry_model_details,
-        key_location,
-        authorization_type,
-        has_opted_keys_with_agent,
-        entry_model_channel,
-        actor_role,
-        ts_entrance_started
-    FROM
-        inspection
+    FROM union_old
 ),
 new_entry_model AS (
     SELECT
@@ -174,8 +245,8 @@ unified_model AS (
         NULL AS entry_access_model,
         NULL AS key_holder_type,
         NULL AS key_holder_identifier,
-        NULL AS key_holder_name,
-        NULL AS key_holder_contact,
+        key_holder_name,
+        key_holder_contact,
         NULL AS key_holder_business_context,
         NULL AS actor_user_type,
         "OLD_MODEL" AS entry_model_source,
