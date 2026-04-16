@@ -114,6 +114,14 @@ columns:
       - datalake_sale_offer_flows.sale_offer_flows.id_hub
       - datalake_ebdb_work_contract.work_contract.id_hub_teams
     description: Identification key of the business unit where the buyer was served.
+  sk_broker_supply:
+    lineage:
+      - datalake_booking.booking.sk_broker_supply
+    description: Surrogate key of the supply-side broker (core_brokers) when the business model implies 3P supply. Propagated from booking, sourced from visit_business_model.
+  sk_broker_demand:
+    lineage:
+      - datalake_booking.booking.sk_broker_demand
+    description: Surrogate key of the demand-side broker (core_brokers) when the business model implies 3P demand or lead gen. Propagated from booking, sourced from visit_business_model.
   id_company_supply:
     lineage:
       - datalake_booking.booking.id_company_supply

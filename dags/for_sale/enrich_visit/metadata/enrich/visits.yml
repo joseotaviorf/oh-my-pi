@@ -38,6 +38,14 @@ columns:
     description: Id for Rent Flow connection
   id_sale_flow:
     description: Id for Sale Flow connection, junction of visitor with house
+  sk_broker_supply:
+    lineage:
+      - datalake_visit.visit_business_model.sk_broker_supply
+    description: Surrogate key of the supply-side broker (core_brokers) when the business model implies 3P supply. From visit_business_model.
+  sk_broker_demand:
+    lineage:
+      - datalake_visit.visit_business_model.sk_broker_demand
+    description: Surrogate key of the demand-side broker (core_brokers) when the business model implies 3P demand or lead gen. From visit_business_model.
   id_company_supply:
     lineage:
       - datalake_visit.visit_business_model.id_company_supply

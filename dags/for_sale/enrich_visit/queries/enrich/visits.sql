@@ -190,6 +190,8 @@ SELECT
     COALESCE(hl.id_house_listing, -1) AS id_house_listing,
     -1 AS id_rent_flow,
     -1 AS id_sale_flow,
+    vbm.sk_broker_supply,
+    vbm.sk_broker_demand,
     vbm.id_company_supply,
     lh.uuid_company AS uuid_company_supply,
     vbm.id_company_demand,

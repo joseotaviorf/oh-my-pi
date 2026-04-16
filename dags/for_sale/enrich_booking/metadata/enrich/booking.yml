@@ -85,6 +85,14 @@ columns:
     lineage:
     - datalake_ebdb_clean.preferred_fixed_agent.id_agent_data
     description: Id of the fixed agent if the business context = sale
+  sk_broker_supply:
+    lineage:
+    - datalake_visit.visit_business_model.sk_broker_supply
+    description: Surrogate key of the supply-side broker (core_brokers) when the business model implies 3P supply. From visit_business_model.
+  sk_broker_demand:
+    lineage:
+    - datalake_visit.visit_business_model.sk_broker_demand
+    description: Surrogate key of the demand-side broker (core_brokers) when the business model implies 3P demand or lead gen. From visit_business_model.
   id_company_supply:
     lineage:
     - datalake_visit.visit_business_model.id_company_supply

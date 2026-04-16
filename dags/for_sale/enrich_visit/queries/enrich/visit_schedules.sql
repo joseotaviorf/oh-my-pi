@@ -254,6 +254,8 @@ SELECT DISTINCT
   agent.id_first_user_agent,
   agent.id_last_agent AS id_agent,
   agent.id_last_user_agent AS id_user_agent,
+  vbm.sk_broker_supply,
+  vbm.sk_broker_demand,
   vbm.id_company_supply,
   vbm.id_company_demand,
   vbm.is_3p_supply,
