@@ -1,4 +1,4 @@
-SELECT
+SELECT DISTINCT
   p.id_period,
   p.schedule_name,
   p.rotation_name,
