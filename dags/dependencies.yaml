@@ -72,14 +72,12 @@ bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_affiliates_cost_attributions:load-enrich-affiliate-costs:first-run-of-day
   - bietlejuice.robin_hood:load-clean-tax:first-run-of-day
 bietlejuice.dw_agent:
-  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
   - bietlejuice.core_brokers:load-core-brokers-profile:first-run-of-day
-  - bietlejuice.ebdb_agent:load-clean-agent-data-aud:first-run-of-day
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-types:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data:first-run-of-day
   - bietlejuice.ebdb_contract:load-clean-work-contract:first-run-of-day
   - bietlejuice.ebdb_photo_job:load-clean-photographer-data:first-run-of-day
-  - bietlejuice.ebdb_user_fast_lane:load-clean-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_agenda_allocation:load-enrich-agent-region-group:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-affiliate-data:first-run-of-day
