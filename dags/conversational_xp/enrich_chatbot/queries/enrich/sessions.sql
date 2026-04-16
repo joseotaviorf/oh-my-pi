@@ -15,7 +15,6 @@ WITH orchestrator_sessions AS (
       WHEN m.channel = 'WHATSAPP_CLAUDIA_CHAT' THEN 'claudia'
       ELSE 'unknown'
     END AS bot,
-    s.department AS first_queue,
     s.source,
     s.source_environment,
     s.status,
@@ -40,7 +39,6 @@ old_bot_sessions AS (
     gs.id_session,
     ss.user_data:["user_id"] AS id_user,
     'old bot' AS bot,
-    ss.department AS first_queue,
     ss.source,
     ss.source_environment,
     ss.status,
@@ -73,7 +71,6 @@ sessions AS (
     id_user,
     user_phone_number,
     bot,
-    first_queue,
     source,
     source_environment,
     status,
@@ -89,7 +86,6 @@ sessions AS (
     id_user,
     user_phone_number,
     bot,
-    first_queue,
     source,
     source_environment,
     status,
@@ -99,7 +95,7 @@ sessions AS (
     orchestrator_sessions
 ),
 tickets AS (
-  SELECT DISTINCT
+  SELECT
     t.id_ticket,
     t.id_session,
     t.first_queue,
@@ -110,6 +106,7 @@ tickets AS (
     sessions AS s
       ON t.id_session = s.id_sauron_session
       AND t.channel = 'chat'
+      AND t.ts_created >= '{load_start_date}'
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY t.id_session ORDER BY t.ts_updated DESC) = 1
 ),
@@ -118,24 +115,20 @@ escalation_queue AS (
     t.id_session,
     COALESCE(
       GET_JSON_OBJECT(o.input, '$.metadata.metadata.queue_name'),
+      GET_JSON_OBJECT(o.input, '$.last_bot_message.metadata.queue_name'),
       GET_JSON_OBJECT(o.input, '$.department_name')
-    ) AS queue
+    ) AS queue_name
   FROM
     datalake_langfuse_clean.traces AS t
   INNER JOIN
     datalake_langfuse_clean.observations AS o
       ON o.id_trace = t.id_trace
-      AND o.ts_started >= '{load_start_date}'
-      AND (
-        (
-          o.name = 'escalate_tool'
-          AND o.type = 'TOOL'
-        ) OR (
-          GET_JSON_OBJECT(o.input, '$.metadata.metadata.metadata_type') = 'human_escalation'
-        )
-      )
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY t.id_session ORDER BY t.ts_created DESC) = 1
+  INNER JOIN
+    sessions AS s
+      ON s.id_langfuse_session = t.id_session
+  WHERE
+    o.ts_started >= '{load_start_date}'
+    AND t.ts_created >= '{load_start_date}'
 ),
 langfuse_version AS (
   SELECT
@@ -152,10 +145,7 @@ SELECT
   s.id_session,
   s.id_sauron_session,
   s.id_langfuse_session,
-  CASE
-    WHEN eq.queue IS NOT NULL THEN t.id_ticket
-    ELSE NULL
-  END AS id_ticket,
+  t.id_ticket,
   s.id_user,
   s.user_phone_number,
   s.bot,
@@ -171,11 +161,8 @@ SELECT
   END AS whatsapp_number,
   s.status,
   lv.version,
-  eq.queue AS first_queue,
-  CASE
-    WHEN eq.queue IS NOT NULL THEN REPLACE(t.last_queue, '[AeC] ', '')
-    ELSE NULL
-  END AS last_queue,
+  eq.queue_name AS first_queue,
+  REPLACE(t.last_queue, '[AeC] ', '') AS last_queue,
   t.id_ticket IS NOT NULL AS is_escalated,
   s.ts_created,
   s.ts_updated
@@ -187,6 +174,7 @@ LEFT JOIN
 LEFT JOIN
   escalation_queue AS eq
     ON eq.id_session = s.id_langfuse_session
+    AND eq.queue_name IS NOT NULL
 LEFT JOIN
   langfuse_version AS lv
     ON lv.id_session = s.id_langfuse_session
