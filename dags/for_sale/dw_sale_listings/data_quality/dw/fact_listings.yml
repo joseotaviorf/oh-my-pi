@@ -52,6 +52,9 @@ column_level_validations:
   total_listings_offer_accepted:
     is_complete:
       severity_level: Error
+  sk_broker:
+    is_complete:
+      severity_level: Error
   ts_load:
     is_complete:
       severity_level: Error

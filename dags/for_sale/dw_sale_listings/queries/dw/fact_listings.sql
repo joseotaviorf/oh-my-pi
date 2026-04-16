@@ -11,6 +11,7 @@ SELECT
     END,
     -1
   ) AS sk_company,
+  IF(h.is_sale_3p_supply IS NOT NULL, cb.sk_broker, '-1') AS sk_broker,
   NULLIF(h.sale_price, 0) AS price,
   h.sale_price/h.total_area AS price_m2,
   COALESCE(BIGINT(DATE_FORMAT(sl.ts_first_publication, 'yyyyMMdd')), -1) AS sk_first_publication_date,
@@ -66,3 +67,6 @@ LEFT JOIN
        AND h.id_company_hubspot IS NULL
        AND h.partner_3p_supply = cs_supply.extracted_3p_tag
     )
+LEFT JOIN
+  core_brokers.brokers AS cb
+    ON h.uuid_company = cb.uuid_company

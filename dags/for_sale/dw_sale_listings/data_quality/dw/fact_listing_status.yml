@@ -30,6 +30,9 @@ column_level_validations:
   is_last_status:
     is_complete:
       severity_level: Error
+  sk_broker:
+    is_complete:
+      severity_level: Error
   ts_load:
     is_complete:
       severity_level: Error

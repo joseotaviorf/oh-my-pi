@@ -23,6 +23,12 @@ columns:
     lineage:
     - datalake_company.company_sks.sk_company
     description: Key of company that owned the listing at that point in time.
+  sk_broker:
+    lineage:
+      - core_brokers.brokers.sk_broker
+    description: >
+      Surrogate key of the 3P broker partner for the resolved company; '-1' when the
+      company is not in core_brokers.brokers.
   sk_first_publication_date:
     lineage:
     - datalake_sale_listings.sale_listing_status.ts_first_publication

@@ -3,6 +3,7 @@ SELECT
   COALESCE(sls.id_user_revision, -1) AS sk_user_revision,
   COALESCE(sls.id_region, -1) AS sk_region,
   COALESCE(cs_supply.sk_company, -1) AS sk_company,
+  COALESCE(cb.sk_broker, '-1') AS sk_broker,
   COALESCE(BIGINT(DATE_FORMAT(sls.ts_first_publication, 'yyyyMMdd')), -1) AS sk_first_publication_date,
   COALESCE(BIGINT(DATE_FORMAT(sls.ts_status_started, 'yyyyMMdd')), -1) AS sk_status_start_date,
   COALESCE(BIGINT(DATE_FORMAT(sls.ts_status_ended, 'yyyyMMdd')), -1) AS sk_status_end_date,
@@ -30,3 +31,6 @@ LEFT JOIN
        AND sls.id_company_hubspot IS NULL
        AND sls.partner_3p_supply = cs_supply.extracted_3p_tag
     )
+LEFT JOIN
+  core_brokers.brokers AS cb
+    ON sls.uuid_company = cb.uuid_company
