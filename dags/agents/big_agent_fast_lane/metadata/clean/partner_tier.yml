@@ -35,6 +35,10 @@ columns:
     lineage:
       - datalake_big_agent_raw.partner_tier.overwritten_reason
     description: Reason for overwrite when present.
+  status:
+    lineage:
+      - datalake_big_agent_raw.partner_tier.status
+    description: Lifecycle or processing status of the partner tier mapping.
   dt_validity_started:
     lineage:
       - datalake_big_agent_raw.partner_tier.validity_start_at

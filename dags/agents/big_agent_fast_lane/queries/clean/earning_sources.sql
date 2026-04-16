@@ -10,6 +10,8 @@ SELECT
     incentive_systems_calculated,
     base_amount,
     revenue_share_total_amount,
+    DATE(competence_date) AS dt_competence,
+    TIMESTAMP(occurred_at) AS ts_occurred,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated,
     year,

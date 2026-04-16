@@ -2,8 +2,8 @@
 database_name: datalake_big_agent_clean
 table_name: earning_sources
 description: |
-  Sources for earnings, including external domain references, UUIDs, amounts,
-  status and failure reasons, with timestamps and partitions.
+  Sources for earnings: external domain and cart UUIDs, amounts, currency, processing status,
+  competence date, occurrence time, and audit timestamps, partitioned by load date.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
@@ -27,10 +27,10 @@ columns:
     lineage:
       - datalake_big_agent_raw.earning_sources.external_domain_type
     description: Type discriminator for the external domain.
-  revenue_share_total_amount:
+  currency:
     lineage:
-      - datalake_big_agent_raw.earning_sources.revenue_share_total_amount
-    description: Total amount considered for revenue share.
+      - datalake_big_agent_raw.earning_sources.currency
+    description: Currency code for monetary fields.
   status:
     lineage:
       - datalake_big_agent_raw.earning_sources.status
@@ -39,18 +39,26 @@ columns:
     lineage:
       - datalake_big_agent_raw.earning_sources.failure_reason
     description: Failure reason when processing was not successful.
+  incentive_systems_calculated:
+    lineage:
+      - datalake_big_agent_raw.earning_sources.incentive_systems_calculated
+    description: Incentive systems considered or calculated for this source.
   base_amount:
     lineage:
       - datalake_big_agent_raw.earning_sources.base_amount
     description: Base amount used to compute earnings.
-  currency:
+  revenue_share_total_amount:
     lineage:
-      - datalake_big_agent_raw.earning_sources.currency
-    description: Currency code for monetary fields.
-  incentive_systems_calculated:
+      - datalake_big_agent_raw.earning_sources.revenue_share_total_amount
+    description: Total amount considered for revenue share.
+  dt_competence:
     lineage:
-      - datalake_big_agent_raw.earning_sources.incentive_systems_calculated
-    description: Incentive systems considered/calculated for this source.
+      - datalake_big_agent_raw.earning_sources.competence_date
+    description: Business competence date for the earning source (date only).
+  ts_occurred:
+    lineage:
+      - datalake_big_agent_raw.earning_sources.occurred_at
+    description: When the earning event occurred (source timestamp).
   ts_created:
     lineage:
       - datalake_big_agent_raw.earning_sources.created_at
