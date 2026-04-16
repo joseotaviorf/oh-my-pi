@@ -72,7 +72,8 @@ bietlejuice.dw_affiliate_costs:
   - bietlejuice.enrich_affiliates_cost_attributions:load-enrich-affiliate-costs:first-run-of-day
   - bietlejuice.robin_hood:load-clean-tax:first-run-of-day
 bietlejuice.dw_agent:
-  - bietlejuice.company:load-clean-member-profile:first-run-of-day
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
+  - bietlejuice.core_brokers:load-core-brokers-profile:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-types:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data:first-run-of-day

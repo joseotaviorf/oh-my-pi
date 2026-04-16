@@ -3,6 +3,7 @@ SELECT
   COALESCE(p.sk_person, -1) AS sk_person,
   COALESCE(u.id, -1) AS sk_user,
   COALESCE(c.sk_company, -1) AS sk_company,
+  COALESCE(cb.sk_broker, -1) AS sk_broker,
   u.id AS id_user,
   ad.code AS agent_code,
   ad.profile AS agent_profile,
@@ -22,8 +23,8 @@ SELECT
   u.is_tenant,
   ad.is_passive_lead_receiver,
   ad.is_service_link_active,
-  mp.status = 'ACTIVE' AS has_3p_member_profile_active,
-  mp.status IN ('PENDING CONFIRMATION', 'PENDING INVITATION') AS has_3p_member_profile_pending,
+  bp.profile_status = 'ACTIVE' AS has_3p_member_profile_active,
+  bp.profile_status IN ('PENDING CONFIRMATION', 'PENDING INVITATION') AS has_3p_member_profile_pending,
   ad.ts_created,
   ad.ts_updated,
   NOW() AS ts_load
@@ -54,10 +55,12 @@ LEFT JOIN
   datalake_company.company_sks AS c
     ON ad.uuid_company = c.uuid_company
 LEFT JOIN
-  datalake_company_clean.member_profile AS mp
-    ON p.uuid_person = mp.uuid_person
-    AND c.id_company = mp.id_company
-    AND mp.id_profile = 17 -- 3P agent profile in company service
-    AND mp.id_product = 27 -- 3P real estate product in company service
+  core_brokers.brokers AS cb
+    ON ad.uuid_company = cb.uuid_company 
+LEFT JOIN
+  core_brokers.brokers_profile AS bp
+    ON p.uuid_person = bp.uuid_person
+    AND cb.sk_broker = bp.sk_broker
+    AND bp.profile = 'third_party_agent' -- 3P agent profile in company service
 QUALIFY -- There are extremely few duplicate rows on agent_data_types (12/16595 at the moment of writing). This is to get rid of them.
   ROW_NUMBER() OVER(PARTITION BY ad.id ORDER BY at.types) = 1

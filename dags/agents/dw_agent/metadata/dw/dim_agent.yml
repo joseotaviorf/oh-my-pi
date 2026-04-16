@@ -1,6 +1,6 @@
 database_name: dw_public
 table_name: dim_agent
-description: Dimension table containing agent data with foreign keys to person, user, and company dimensions. Contains only agents (users with agent_data_id not null).
+description: Dimension table containing agent data with foreign keys to person, user, company, and 3P broker (core_brokers) dimensions. Contains only agents (users with agent_data_id not null).
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
@@ -20,6 +20,10 @@ columns:
     lineage:
     - datalake_company.company_sks.sk_company
     description: Foreign key to company dimension. Returns -1 when no company is associated.
+  sk_broker:
+    lineage:
+    - core_brokers.brokers.sk_broker
+    description: Foreign key to the 3P broker dimension (core brokers), matched by agent company UUID. Returns -1 when no broker row exists for the company.
   id_user:
     lineage:
     - datalake_ebdb_user.user.id
@@ -98,12 +102,14 @@ columns:
     description: If the agent's service link is currently active.
   has_3p_member_profile_active:
     lineage:
-    - datalake_company_clean.member_profile.status
-    description: If the agent has an active 3P member profile in company service (status = 'ACTIVE', profile = 17, product = 27).
+    - core_brokers.brokers_profile.profile_status
+    - core_brokers.brokers_profile.profile
+    description: True when the person has an active third_party_agent brokers_profile row for their broker (profile_status = 'ACTIVE', profile = 'third_party_agent').
   has_3p_member_profile_pending:
     lineage:
-    - datalake_company_clean.member_profile.status
-    description: If the agent has a pending 3P member profile in company service (status IN 'PENDING CONFIRMATION' or 'PENDING INVITATION', profile = 17, product = 27).
+    - core_brokers.brokers_profile.profile_status
+    - core_brokers.brokers_profile.profile
+    description: True when the person has a pending third_party_agent brokers_profile row for their broker (profile_status IN 'PENDING CONFIRMATION' or 'PENDING INVITATION', profile = 'third_party_agent').
   ts_created:
     lineage:
     - datalake_ebdb_clean.agent_data.ts_created

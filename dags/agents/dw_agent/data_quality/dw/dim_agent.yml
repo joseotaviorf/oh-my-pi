@@ -14,3 +14,6 @@ column_level_validations:
   sk_user:
     is_unique:
       severity_level: Error
+  sk_broker:
+    is_complete:
+      severity_level: Error
