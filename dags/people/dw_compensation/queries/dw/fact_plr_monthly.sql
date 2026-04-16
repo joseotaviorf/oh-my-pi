@@ -8,6 +8,18 @@ WITH params AS (
     WHERE
         reference_year <> -1
 ),
+performance_calibration_with_meeting_year AS (
+    SELECT
+        fpc.person_number,
+        fpc.performa_score,
+        fpc.sk_committee_meeting,
+        dcm.meeting_year
+    FROM
+        dw_performance.fact_performance_calibrations AS fpc
+    INNER JOIN
+        dw_performance.dim_committee_meeting AS dcm
+            ON fpc.sk_committee_meeting = dcm.sk_meeting
+),
 assignments_plr_eligibility AS (
     /* Base eligibility rules: hired by cutoff date, 90+ days in year (only for hires in reference year;
        hires before reference year are eligible regardless of days worked), not terminated for just cause.
@@ -65,7 +77,7 @@ assignments_plr_eligibility AS (
     CROSS JOIN
         params AS plr_params
     LEFT JOIN
-        dw_performance.fact_performance_calibrations AS fpc
+        performance_calibration_with_meeting_year AS fpc
             ON fpc.person_number = im.person_number
             AND fpc.meeting_year = plr_params.reference_year + 1
     WHERE
@@ -79,7 +91,7 @@ assignments_plr_eligibility AS (
     QUALIFY
         ROW_NUMBER() OVER (
             PARTITION BY im.person_number, plr_params.reference_year
-            ORDER BY fpc.meeting_year DESC, fpc.id_meeting DESC
+            ORDER BY fpc.meeting_year DESC, fpc.sk_committee_meeting DESC
         ) = 1
 ),
 plr_reference_months AS (

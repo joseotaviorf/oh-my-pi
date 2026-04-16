@@ -40,7 +40,9 @@ columns:
     lineage:
     - dw_performance.fact_performance_evaluations.cycle_name
   cycle_year:
-    description: Four-digit calendar year extracted from cycle_name for calibration meeting_year joins.
+    description: |-
+      Four-digit calendar year extracted from cycle_name for joins to calibration data via dim_committee_meeting.meeting_year.
+      Performa calibration committee meetings for a cycle usually occur in the calendar year after that cycle (meeting_year = cycle_year + 1).
     lineage:
     - dw_performance.fact_performance_evaluations.cycle_name
   goal_result:

@@ -336,6 +336,7 @@ bietlejuice.dw_company:
 bietlejuice.dw_compensation:
   - bietlejuice.dw_employee:load-dw-employee-dim-absence-type:first-run-of-day
   - bietlejuice.dw_employee:load-dw-employee-fact-absence-requests:first-run-of-day
+  - bietlejuice.dw_performance:load-dw-performance-dim-committee-meeting:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-fact-performance-calibrations:first-run-of-day
   - bietlejuice.enrich_employment:load-enrich-employee-details:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-event-definition:first-run-of-day

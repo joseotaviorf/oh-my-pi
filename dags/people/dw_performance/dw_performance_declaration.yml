@@ -31,6 +31,7 @@ workflow:
       - dim_performance_evaluation
     fact_performance_calibrations:
       - dim_performance_calibration
+      - dim_committee_meeting
     fact_smoke_detectors:
       - fact_goal_achievements
       - fact_performance_evaluations

@@ -96,7 +96,7 @@ band_to_one_five AS (
 calibration_curr AS (
   SELECT
     fpc.person_number,
-    fpc.meeting_year,
+    dcm.meeting_year,
     CASE TRIM(fpc.calibrated_impact_description)
       WHEN 'Outstanding' THEN 5
       WHEN 'Above expectations' THEN 4
@@ -115,11 +115,14 @@ calibration_curr AS (
     END AS calibrated_behavior_band
   FROM
     dw_performance.fact_performance_calibrations AS fpc
+  LEFT JOIN
+    dw_performance.dim_committee_meeting AS dcm
+      ON fpc.sk_committee_meeting = dcm.sk_meeting
 ),
 calibration_prev AS (
   SELECT
     fpc.person_number,
-    fpc.meeting_year,
+    dcm.meeting_year,
     CASE TRIM(fpc.calibrated_impact_description)
       WHEN 'Outstanding' THEN 5
       WHEN 'Above expectations' THEN 4
@@ -138,6 +141,9 @@ calibration_prev AS (
     END AS calibrated_behavior_band
   FROM
     dw_performance.fact_performance_calibrations AS fpc
+  LEFT JOIN
+    dw_performance.dim_committee_meeting AS dcm
+      ON fpc.sk_committee_meeting = dcm.sk_meeting
 ),
 base AS (
   SELECT

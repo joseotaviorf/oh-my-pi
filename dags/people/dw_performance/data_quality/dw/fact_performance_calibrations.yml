@@ -15,8 +15,8 @@ column_level_validations:
       severity_level: Warning
   person_number:
     custom:
-      # person_number and meeting_year should be unique
-      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM dw_performance.fact_performance_calibrations GROUP BY person_number, meeting_year HAVING COUNT(*) > 1)) = 0"
+      # At most one fact row per person and calibration meeting year (via committee meeting dimension)
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM dw_performance.fact_performance_calibrations AS f INNER JOIN dw_performance.dim_committee_meeting AS d ON f.sk_committee_meeting = d.sk_meeting GROUP BY f.person_number, d.meeting_year HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning
   performa_score_numeric:
     has_max_value:

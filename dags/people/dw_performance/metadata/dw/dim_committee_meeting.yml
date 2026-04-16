@@ -3,7 +3,7 @@ table_name: dim_committee_meeting
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
-  Dimension that stores committee meeting information for both Talent Review and Performance Calibration meeting types. One row per meeting. Primary key: sk_meeting. Used as a reference dimension by fact_talent_reviews (via sk_committee_meeting) and can be joined to fact_performance_calibrations via id_meeting. Includes a meeting_type discriminator to distinguish between the two meeting types.
+  Dimension that stores committee meeting information for both Talent Review and Performance Calibration meeting types. One row per meeting. Primary key: sk_meeting. Used as a reference dimension by fact_talent_reviews and fact_performance_calibrations (via sk_committee_meeting referencing sk_meeting). Includes a meeting_type discriminator to distinguish between the two meeting types.
 columns:
   sk_meeting:
     description: Surrogate key that uniquely identifies a committee meeting. Derived from the source meeting identifier.

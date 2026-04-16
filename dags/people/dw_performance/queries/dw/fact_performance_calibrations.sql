@@ -55,11 +55,8 @@ SELECT
     cs.impact_calibration_variation,
     cs.leadership_calibration_variation
   )) AS sk_performance_variation,
-  dpc.id_meeting,
+  dcm.sk_meeting AS sk_committee_meeting,
   dc.person_number,
-  dpc.meeting_status_code,
-  dc.meeting_year,
-  dpc.meeting_title,
   dpc.calibrated_behavior_description,
   dpc.calibrated_impact_description,
   dpc.calibrated_leadership_description,
@@ -96,6 +93,9 @@ LEFT JOIN
     ON dc.person_number = dpc.person_number
     AND dc.meeting_year = dpc.meeting_year
     AND dpc.is_current = TRUE
+LEFT JOIN
+  dw_performance.dim_committee_meeting AS dcm
+    ON dpc.id_meeting = dcm.sk_meeting
 LEFT JOIN
   calibrations_score AS cs
     ON (cs.sk_performance_calibration_version = dpc.sk_performance_calibration_version)
