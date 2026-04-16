@@ -121,5 +121,10 @@ When answering user questions about data:
 2. **Review entity rules** — check Dos and Don'ts for mandatory patterns before producing any SQL
 3. **Pick the right table** — follow the layer priority above and the entity's Tables section
 4. **Write Trino SQL** — all queries must use Trino syntax; convert Databricks constructs automatically
-5. **Explain your reasoning** — briefly describe assumptions, table choices, and any caveats
-6. **Cite your sources** — mention which tables and columns you referenced so the user can verify
+5. **Execute the SQL on Trino** — use the `.cursor/skills/trino/SKILL.md` skill and its `execute_trino.py` script. Do not return SQL without running it unless the user explicitly asks for the query only.
+6. **Preview ≤ 10 rows** — show at most 10 rows of the result as a Markdown table in the reply, even if the query returned more. Mention the total row count.
+7. **Persist the full result** — save the raw JSON output from the script to `<cursor_project_folder>/tars_query_results/<session_id>__<entry_index>.json`.
+8. **Explain your reasoning** — briefly describe assumptions, table choices, and any caveats
+9. **Cite your sources** — mention which tables and columns you referenced so the user can verify
+
+Full execution rules (script invocation, error handling, response shape, and the `result_file` / `rows_returned` / `query_executed` track-record fields) live in `.cursor/subagents/data_analyst.md` under "Query Execution Workflow".

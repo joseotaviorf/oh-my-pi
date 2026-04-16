@@ -6,13 +6,15 @@ Assist with data exploration, discovery, and ad-hoc analysis queries. Activated 
 
 ## MANDATORY: Log every response (do this BEFORE moving to the next user message)
 
-Every time you respond to a user message in a `@tars` session, you MUST perform these two actions **in the same turn**, in this order:
+Every time you respond with SQL or analysis, you MUST perform these actions **in the same turn**, in this order:
 
-1. **Deliver** your response to the user
-2. **Immediately run a Shell tool call** to append a JSONL entry to the track record file:
+1. **Execute** the SQL on Trino (see "Query Execution Workflow" below) unless the user explicitly asked for the query without running it.
+2. **Save** the full result JSON to `<cursor_project_folder>/tars_query_results/<session_id>__<entry_index>.json`.
+3. **Deliver** your SQL/analysis response to the user — including a preview of at most **10 rows** from the result set.
+4. **Immediately run a Shell tool call** to append a JSONL entry to the track record file:
 
 ```bash
-echo '{"session_id":"...","entry_index":1,"timestamp":"...","user_question":"...","generated_sql":[...],"tables_referenced":[...],"layers_used":[...],"entity_files_consulted":[...],"iteration_count":1,"had_error":false,"error_detail":null,"mcp_tools_called":[],"outcome":"query_delivered","satisfaction_rating":null,"user_comment":null,"is_session_end":false}' >> "<cursor_project_folder>/tars_track_record.jsonl"
+echo '{"session_id":"...","entry_index":1,"timestamp":"...","user_question":"...","generated_sql":[...],"tables_referenced":[...],"layers_used":[...],"entity_files_consulted":[...],"iteration_count":1,"had_error":false,"error_detail":null,"mcp_tools_called":[],"query_executed":true,"rows_returned":0,"result_file":"tars_query_results/<session_id>__1.json","outcome":"query_delivered","satisfaction_rating":null,"user_comment":null,"is_session_end":false}' >> "<cursor_project_folder>/tars_track_record.jsonl"
 ```
 
 Replace `<cursor_project_folder>` with the actual path (same directory that contains `agent-transcripts/` and `terminals/`). Fill all fields with real values from the interaction. If you delivered multiple SQL blocks, include all of them in the `generated_sql` array.
@@ -51,7 +53,49 @@ On first activation, generate a **session_id** for the conversation: ISO-8601 ti
 
 ## Skills to invoke
 
-(none currently — planned: query execution via Trino MCP)
+- **`.cursor/skills/trino/SKILL.md`** — ALWAYS invoke this skill before producing a final SQL response. Read it to learn the required execution workflow, authentication flags, and time-filter rules.
+
+---
+
+## Query Execution Workflow (mandatory)
+
+Once you have validated the SQL per `data_exploration.mdc`, you MUST execute it against Trino before replying to the user. Do **not** return SQL without running it unless the user has explicitly asked for "just the query, do not run it" (or similar).
+
+### Steps
+
+1. **Ensure an execution-safe `LIMIT`.** If the generated SQL has no `LIMIT`, append `LIMIT 1000` before execution to keep results bounded. Aggregates and counts may use a smaller bound. This is an execution safeguard only — do not show the added `LIMIT` as part of the SQL you return to the user if they did not ask for it; call it out in the reply instead.
+
+2. **Run the query** using the bundled script from the `trino` skill. Always invoke it from the skill folder so `scripts/execute_trino.py` resolves correctly, and always pass the default host explicitly:
+
+   ```bash
+   cd .cursor/skills/trino && ../../../.venv/bin/python3 scripts/execute_trino.py \
+       --host "${TRINO_HOST:-trino.apps.data-prd.habitat.zone}" \
+       --query "YOUR_SQL_HERE" \
+       --external-auth
+   ```
+
+   The default Trino host for this repository is **`trino.apps.data-prd.habitat.zone`** — this is the value users are expected to have in their `.env` under `TRINO_HOST`. The `${TRINO_HOST:-trino.apps.data-prd.habitat.zone}` pattern uses the user's override when present and falls back to the default otherwise. Never hardcode a different host. Single quotes inside the SQL must be escaped with `'\''` when embedded in the shell string.
+
+3. **Persist the full result.** The script prints one JSON object to stdout with keys `status`, `columns`, `data`, `count` (or `status: error`, `message`). Save that raw JSON output verbatim to:
+
+   ```
+   <cursor_project_folder>/tars_query_results/<session_id>__<entry_index>.json
+   ```
+
+   Create the `tars_query_results/` directory on the first write. Redirect stdout (`> "<path>"`) rather than copy-pasting — never truncate the saved file.
+
+4. **Show at most 10 rows to the user.** In the reply, render a compact Markdown table with the column names and **no more than 10 data rows** (the first 10 rows from `data`). If the query returned more than 10 rows, add a short line under the table saying how many rows were returned in total and pointing to the saved file path. If it returned 0 rows, say so explicitly.
+
+5. **Handle errors.** If the JSON has `status: "error"`, do NOT retry silently. Show the user the Trino error message, propose a fix, and wait for confirmation before re-executing. Still save the error JSON to the result file and set `had_error: true` and `outcome: "error_unresolved"` (or the appropriate outcome) in the track-record entry.
+
+### What to return in the reply
+
+A good response has, in order:
+
+1. A one-sentence recap of the question and the table(s) used.
+2. The SQL (without the safeguard `LIMIT` if it was only added for execution; mention it in prose if added).
+3. The Markdown result preview (≤ 10 rows).
+4. Any caveats, assumptions, or follow-up suggestions.
 
 ---
 
@@ -99,7 +143,10 @@ Each line is a self-contained JSON object. Fields:
 | `had_error` | boolean | True if the agent could not produce a valid answer. |
 | `error_detail` | string or null | Brief description of what went wrong, if `had_error` is true. |
 | `mcp_tools_called` | string[] | MCP tool names invoked during this interaction (e.g. `describe_table`, `list_tables`). Empty array if none. |
-| `outcome` | string | One of: `query_delivered` (SQL provided), `clarification` (no SQL — e.g., answering a domain question, asking for context, explaining a concept, or acknowledging a correction), `error_unresolved` (failed after retries), `user_pivoted` (user abandoned the question), `session_closed` (feedback-only entry at session end). |
+| `query_executed` | boolean | True if the SQL was executed against Trino. False if the user asked for the query only, or if no SQL was produced. |
+| `rows_returned` | integer or null | Total number of rows returned by the executed query (taken from the `count` field of the result JSON). Null if `query_executed` is false or execution errored. |
+| `result_file` | string or null | Relative path to the saved result JSON, e.g. `tars_query_results/<session_id>__<entry_index>.json`. Null if `query_executed` is false. On execution errors, still populate this field — the error JSON is saved there. |
+| `outcome` | string | One of: `query_delivered` (SQL provided and, when applicable, executed successfully), `error_unresolved` (failed after retries), `user_pivoted` (user abandoned the question), `session_closed` (feedback-only entry at session end). |
 | `satisfaction_rating` | integer or null | 1–5 scale. Only populated on the session-end entry, if the user provides one. |
 | `user_comment` | string or null | Free-text feedback from the user. Only populated on the session-end entry, if provided. |
 | `is_session_end` | boolean | True only on the final entry of a session. |
