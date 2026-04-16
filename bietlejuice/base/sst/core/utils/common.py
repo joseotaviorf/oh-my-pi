@@ -401,6 +401,7 @@ def validate_and_write(
     )
 
     writer = df.write.format("delta").option("mergeSchema", overwrite_schema_option)
+    writer = writer.partitionBy(*partition_cols) if partition_cols else writer
 
     if table_location:
         writer = writer.option("path", table_location)
