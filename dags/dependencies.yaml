@@ -884,10 +884,16 @@ bietlejuice.dw_people:
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-management-hierarchy:first-run-of-day
 bietlejuice.dw_performance:
+  - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_performance:load-enrich-performance-evaluation:first-run-of-day
   - bietlejuice.enrich_performance:load-enrich-talent-review:first-run-of-day
+  - bietlejuice.pin_core:load-clean-all-people:first-run-of-day
+  - bietlejuice.pin_goal:load-clean-goal-plan-to-goal:first-run-of-day
+  - bietlejuice.pin_goal:load-clean-goal-plan-translation:first-run-of-day
+  - bietlejuice.pin_goal:load-clean-goal:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-dashboard-template-translation:first-run-of-day
   - bietlejuice.pin_hr_review:load-clean-meeting:first-run-of-day
+  - bietlejuice.pin_talent:load-clean-review-period-translation:first-run-of-day
 bietlejuice.dw_performance_rent:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day

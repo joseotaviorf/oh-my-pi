@@ -1,0 +1,116 @@
+database_name: dw_performance
+table_name: fact_performa_smoke_detectors
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Fact table with Performa smoke-detector flags at individual level (SD 1–5 only).
+  Grain: one row per assignment and performance cycle (cycle_name), aligned with fact_performance_evaluations.
+  Combines weighted goal results from fact_goal_achievements, self and manager rating bands from
+  fact_performance_evaluations, and calibrated rating bands from fact_performance_calibrations to detect
+  inconsistencies between goals and manager impact, self versus manager misalignment (difference of at least
+  two ordinal steps on the 1–5 band scale), and drift versus the prior Performa cycle calibrated ratings.
+  Manager- and cluster-level detectors (SD 6–9) are out of scope for this table.
+columns:
+  sk_performance_evaluation_manager_version:
+    description: Surrogate key of the current MANAGER evaluation version linked to this cycle, for lineage to dim_performance_evaluation.
+    lineage:
+    - dw_performance.fact_performance_evaluations.sk_performance_evaluation_manager_version
+  sk_performance_evaluation_self_version:
+    description: Surrogate key of the current SELF evaluation version linked to this cycle, for lineage to dim_performance_evaluation.
+    lineage:
+    - dw_performance.fact_performance_evaluations.sk_performance_evaluation_self_version
+  sk_performance_evaluation_manager:
+    description: Surrogate key of the MANAGER evaluation (logical evaluation) for this cycle.
+    lineage:
+    - dw_performance.fact_performance_evaluations.sk_performance_evaluation_manager
+  sk_performance_evaluation_self:
+    description: Surrogate key of the SELF evaluation (logical evaluation) for this cycle.
+    lineage:
+    - dw_performance.fact_performance_evaluations.sk_performance_evaluation_self
+  person_number:
+    description: Employee person number resolved from the assignment via identifier_mapping (latest assignment).
+    lineage:
+    - datalake_people.identifier_mapping.person_number
+  assignment_number:
+    description: Assignment identifier from the performance evaluation fact; part of the fact grain with cycle_name.
+    lineage:
+    - dw_performance.fact_performance_evaluations.assignment_number
+  cycle_name:
+    description: Performance review cycle name (e.g. Performa year label); joins to review_period_name on goals.
+    lineage:
+    - dw_performance.fact_performance_evaluations.cycle_name
+  cycle_year:
+    description: Four-digit calendar year extracted from cycle_name for calibration meeting_year joins.
+    lineage:
+    - dw_performance.fact_performance_evaluations.cycle_name
+  goal_result:
+    description: Aggregated weighted goal achievement score for the person and cycle from fact_goal_achievements (MAX across goal plans when multiple exist).
+    lineage:
+    - dw_performance.fact_goal_achievements.goal_result
+  impact_rating_band_self:
+    description: Ordinal impact rating band (1–5) derived from the self-evaluation impact description text (Performa labels).
+    lineage:
+    - dw_performance.fact_performance_evaluations.impact_self
+  behavior_rating_band_self:
+    description: Ordinal behavior rating band (1–5) derived from the self-evaluation behavior description text (Performa labels).
+    lineage:
+    - dw_performance.fact_performance_evaluations.behavior_self
+  impact_rating_band_manager_evaluation:
+    description: Ordinal impact band (1–5) from the manager evaluation text only, before overlay with calibration meeting outputs.
+    lineage:
+    - dw_performance.fact_performance_evaluations.impact_manager
+  behavior_rating_band_manager_evaluation:
+    description: Ordinal behavior band (1–5) from the manager evaluation text only, before overlay with calibration meeting outputs.
+    lineage:
+    - dw_performance.fact_performance_evaluations.behavior_manager
+  impact_rating_band_manager_resolved:
+    description: |-
+      Effective manager impact band (1–5) used in smoke rules — post-calibration description from the calibration
+      meeting with meeting_year = cycle_year + 1 when present, otherwise the manager evaluation band.
+    lineage:
+    - dw_performance.fact_performance_calibrations.calibrated_impact_description
+    - dw_performance.fact_performance_evaluations.impact_manager
+  behavior_rating_band_manager_resolved:
+    description: |-
+      Effective manager behavior band (1–5) — post-calibration description from meeting_year = cycle_year + 1 when
+      present, otherwise the manager evaluation band.
+    lineage:
+    - dw_performance.fact_performance_calibrations.calibrated_behavior_description
+    - dw_performance.fact_performance_evaluations.behavior_manager
+  impact_rating_band_prior_performa_calibrated:
+    description: |-
+      Post-calibration impact band (1–5) from the prior closed Performa cycle, taken from the calibration row where
+      meeting_year equals cycle_year (same join rule as the legacy notebook).
+    lineage:
+    - dw_performance.fact_performance_calibrations.calibrated_impact_description
+  behavior_rating_band_prior_performa_calibrated:
+    description: Post-calibration behavior band (1–5) for the prior Performa cycle (meeting_year = cycle_year).
+    lineage:
+    - dw_performance.fact_performance_calibrations.calibrated_behavior_description
+  is_smoke_goal_score_inconsistent_with_resolved_manager_impact_band:
+    description: |-
+      Boolean (TRUE/FALSE). SD1 — when TRUE, goal_result (0.0–1.2 scale from fact_goal_achievements) is incompatible
+      with the resolved manager impact band using the legacy Performa bracket rules (e.g. very high goal score with
+      weak impact band, or the inverse).
+  is_smoke_gap_at_least_two_steps_impact_self_vs_manager_resolved:
+    description: |-
+      Boolean (TRUE/FALSE). SD2 — when TRUE, absolute difference between self and resolved manager impact bands is at
+      least two ordinal steps on the 1–5 scale.
+  is_smoke_gap_at_least_two_steps_behavior_self_vs_manager_resolved:
+    description: |-
+      Boolean (TRUE/FALSE). SD3 — when TRUE, absolute difference between self and resolved manager behavior bands is at
+      least two ordinal steps.
+  is_smoke_gap_at_least_two_steps_impact_resolved_vs_prior_performa_calibrated:
+    description: |-
+      Boolean (TRUE/FALSE). SD4 — when TRUE, resolved manager impact band differs from the prior-cycle calibrated impact
+      band by at least two ordinal steps.
+  is_smoke_gap_at_least_two_steps_behavior_resolved_vs_prior_performa_calibrated:
+    description: |-
+      Boolean (TRUE/FALSE). SD5 — when TRUE, resolved manager behavior band differs from the prior-cycle calibrated
+      behavior band by at least two ordinal steps.
+  num_smoke_flags_sd1_to_sd5:
+    description: |-
+      Integer count (0–5): sum of the five boolean smoke flags cast to integers for aggregation; excludes
+      manager-cluster detectors (SD6–SD9).
+  ts_load:
+    description: Timestamp when the warehouse row was loaded.

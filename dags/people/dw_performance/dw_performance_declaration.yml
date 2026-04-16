@@ -31,6 +31,10 @@ workflow:
       - dim_performance_evaluation
     fact_performance_calibrations:
       - dim_performance_calibration
+    fact_performa_smoke_detectors:
+      - fact_goal_achievements
+      - fact_performance_evaluations
+      - fact_performance_calibrations
   tables_customization:
     dim_committee_meeting:
       vacuum_retention_hours: 168
@@ -47,7 +51,13 @@ workflow:
     dim_talent_variation:
       vacuum_retention_hours: 168
       vacuum_lite: true
+    fact_goal_achievements:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
     fact_performance_evaluations:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    fact_performa_smoke_detectors:
       vacuum_retention_hours: 168
       vacuum_lite: true
     fact_talent_reviews:

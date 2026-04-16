@@ -1,0 +1,162 @@
+database_name: dw_performance
+table_name: fact_goal_achievements
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Fact table for goal (Impact Alignment) achievements. One row per goal (id_goal).
+  Grain: person_number x review_period_name x goal_plan_name x goal_name.
+  Includes achievement calculations with weighted percentages and effective weights,
+  normalized among goals that have registered results. The goal_result column provides
+  the overall weighted achievement score per person, review period, and goal plan.
+  Supports dashboard metrics for percentage of registered objectives and
+  registered calculations.
+columns:
+  id_goal:
+    description: |-
+      Unique identifier of the goal from the source system (Oracle HCM).
+      Primary key of the fact table, one row per goal.
+    lineage:
+    - datalake_pin_goal_clean.goal.id_goal
+  person_number:
+    description: Person number of the employee to whom the goal is assigned. Part of the fact table grain.
+    lineage:
+    - datalake_pin_core_clean.all_people.person_number
+  review_period_name:
+    description: |-
+      Name of the review period associated with the goal plan (in Portuguese).
+      Part of the fact table grain.
+    lineage:
+    - datalake_pin_talent_clean.review_period_translation.review_period_name
+  goal_plan_name:
+    description: |-
+      Name of the goal plan (in Portuguese). Part of the fact table grain.
+    lineage:
+    - datalake_pin_goal_clean.goal_plan_translation.goal_plan_name
+  goal_name:
+    description: Name of the goal. Part of the fact table grain.
+    lineage:
+    - datalake_pin_goal_clean.goal.goal_name
+  category:
+    description: |-
+      Normalized category of the goal. Can be 'kpi' (for Indicador/KPI)
+      or 'project' (for Projeto ou Processo Critico).
+    lineage:
+    - datalake_pin_goal_clean.goal.goal_category
+    categories:
+      kpi: Key Performance Indicator goal.
+      project: Project or Critical Process goal.
+  measurement_unit:
+    description: |-
+      Measurement unit for KPI goals. Can be 'value', 'percentage', or 'number'.
+      NULL for non-KPI goals.
+    lineage:
+    - datalake_pin_goal_clean.goal.attribute1_text
+  goal_orientation:
+    description: |-
+      Goal orientation indicating whether higher or lower values are better.
+      Can be 'maximize' or 'minimize'. NULL for non-KPI goals.
+    lineage:
+    - datalake_pin_goal_clean.goal.attribute2_text
+  goal_weight:
+    description: |-
+      Weight of the goal within the goal plan from Oracle HCM (Pin), sourced from clean goal_plan_to_goal.goal_weight.
+      The source does not always populate this field; NULL is possible when Pin has no weight on the goal-plan link.
+    lineage:
+    - datalake_pin_goal_clean.goal_plan_to_goal.goal_weight
+  minimum_value:
+    description: |-
+      Minimum threshold value for the goal. For KPI goals, this is the numeric floor
+      (orientation-adjusted). For project goals, this is the textual description of
+      minimum achievement. NULL for other categories.
+    lineage:
+    - datalake_pin_goal_clean.goal.attribute_number1_value
+    - datalake_pin_goal_clean.goal.attribute1_text
+  target_value:
+    description: |-
+      Target value for the goal. For KPI goals, this is the numeric target.
+      For project goals, this is the textual description of target achievement.
+      NULL for other categories.
+    lineage:
+    - datalake_pin_goal_clean.goal.attribute_number2_value
+    - datalake_pin_goal_clean.goal.attribute2_text
+  maximum_value:
+    description: |-
+      Maximum threshold value for the goal. For KPI goals, this is the numeric ceiling
+      (orientation-adjusted). For project goals, this is the textual description of
+      maximum achievement. NULL for other categories.
+    lineage:
+    - datalake_pin_goal_clean.goal.attribute_number3_value
+    - datalake_pin_goal_clean.goal.attribute3_text
+  result_value:
+    description: |-
+      Actual result value achieved for the goal. For KPI goals, this is the measured numeric value.
+      For project goals, this is the percentage completion value. NULL when not yet calculated.
+    lineage:
+    - datalake_pin_goal_clean.goal.attribute_number4_value
+    - datalake_pin_goal_clean.goal.attribute_number1_value
+  achievement_percentage:
+    description: |-
+      Calculated achievement percentage for the individual goal, bounded between 0% and 120%.
+      For KPI goals with full thresholds: linear interpolation from 70% (at minimum) to 100% (at target)
+      to 120% (at maximum). For KPI goals without thresholds: simple ratio calculation.
+      For project goals: result_value * 1%. NULL when result_value is missing.
+    lineage:
+    - datalake_pin_goal_clean.goal.attribute_number4_value
+    - datalake_pin_goal_clean.goal.attribute_number1_value
+    - datalake_pin_goal_clean.goal.attribute_number2_value
+    - datalake_pin_goal_clean.goal.attribute_number3_value
+  achievement_percentage_weighted:
+    description: |-
+      Achievement percentage weighted by the goal's original weight within the plan.
+      Calculated as achievement_percentage * goal_weight / 100.
+    lineage:
+    - datalake_pin_goal_clean.goal.attribute_number4_value
+    - datalake_pin_goal_clean.goal_plan_to_goal.goal_weight
+  effective_goal_weight:
+    description: |-
+      Normalized goal weight considering only goals that have a registered result (result_value IS NOT NULL).
+      Redistributes the total 100% weight among goals with results, so the sum of effective weights
+      for goals with results equals 100 per person/review_period/goal_plan combination.
+      NULL for goals without a registered result.
+    lineage:
+    - datalake_pin_goal_clean.goal_plan_to_goal.goal_weight
+    - datalake_pin_goal_clean.goal.attribute_number4_value
+  goal_result:
+    description: |-
+      Overall weighted achievement score for the person within a review period and goal plan.
+      Computed as the weighted average of achievement percentages for goals with results:
+      SUM(achievement_percentage * goal_weight) / SUM(goal_weight) where result_value IS NOT NULL.
+      Numeric scale is 0.0–1.2 (same unit as achievement_percentage: 1.0 is on-target, 1.2 is the capped maximum).
+      This value is the same for all goals in the same partition (window function).
+    lineage:
+    - datalake_pin_goal_clean.goal.attribute_number4_value
+    - datalake_pin_goal_clean.goal_plan_to_goal.goal_weight
+  is_calculation_registered:
+    description: |-
+      Boolean flag indicating whether the goal has a registered calculation result
+      (result_value IS NOT NULL). Used to compute the dashboard metric for percentage
+      of goals with registered calculations.
+    lineage:
+    - datalake_pin_goal_clean.goal.attribute_number4_value
+    - datalake_pin_goal_clean.goal.attribute_number1_value
+    categories:
+      'TRUE': Goal has a registered calculation result.
+      'FALSE': Goal does not have a registered calculation result.
+  dt_started:
+    description: Date when the goal was started.
+    lineage:
+    - datalake_pin_goal_clean.goal.dt_started
+  dt_target_completion:
+    description: Target completion date for the goal.
+    lineage:
+    - datalake_pin_goal_clean.goal.dt_target_completion
+  ts_created:
+    description: Timestamp of when the goal was created in the source system.
+    lineage:
+    - datalake_pin_goal_clean.goal.ts_created
+  ts_updated:
+    description: Timestamp of when the goal was last updated in the source system.
+    lineage:
+    - datalake_pin_goal_clean.goal.ts_updated
+  ts_load:
+    description: Timestamp indicating when the record was loaded into this fact table.

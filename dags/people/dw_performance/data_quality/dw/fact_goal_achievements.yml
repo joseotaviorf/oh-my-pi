@@ -1,0 +1,30 @@
+---
+table_name: dw_performance.fact_goal_achievements
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 1
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  id_goal:
+    has_completeness:
+      greater_than: 0.95
+      severity_level: Warning
+    is_unique:
+      severity_level: Warning
+  person_number:
+    is_complete:
+      severity_level: Warning
+  is_calculation_registered:
+    is_complete:
+      severity_level: Warning
+  ts_load:
+    is_complete:
+      severity_level: Warning
