@@ -21,7 +21,7 @@ workflow:
       z_order_by: [id_period, ts_period_started]
       merge_on: [id_period]
     overrides:
-      z_order_by: [id_period, ts_period_started]
+      z_order_by: [id_period, dt_load, ts_started]
 cluster:
   type: databricks_16_4_min_memory_cluster
   databricks_conn_id: databricks_new_env
