@@ -194,9 +194,13 @@ bietlejuice.dw_braze_events_user_dispatch:
   - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-owners-events:first-run-of-day
   - bietlejuice.enrich_braze_events_dispatches_user:load-enrich-tenants-events:first-run-of-day
 bietlejuice.dw_brokers:
+  - bietlejuice.company:load-clean-company:first-run-of-day
+  - bietlejuice.company:load-clean-tier:first-run-of-day
   - bietlejuice.core_brokers:load-core-brokers-product:first-run-of-day
   - bietlejuice.core_brokers:load-core-brokers-profile:first-run-of-day
   - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
+  - bietlejuice.core_brokers_history:load-core-broker-products-history:first-run-of-day
+  - bietlejuice.core_brokers_history:load-core-broker-tiers-history:first-run-of-day
   - bietlejuice.core_region:load-core-region:first-run-of-day
   - bietlejuice.enrich_brokers:load-enrich-broker-status-history:first-run-of-day
   - bietlejuice.enrich_brokers:load-enrich-hubspot-brokers-history:first-run-of-day

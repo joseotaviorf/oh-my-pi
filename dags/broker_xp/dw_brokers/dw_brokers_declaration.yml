@@ -10,9 +10,14 @@ dag:
       (status periods from enrich broker_status_history), dim_broker_account_manager_changes (HubSpot
       owner change periods per broker from hubspot_brokers_history, resolved to person SK),
       dim_broker_profiles (member profiles from core brokers_profile with person SK and effective
-      intervals per person and profile type). Upstreams: core_brokers, core_region, datalake_brokers
-      (hubspot_brokers_history, broker_status_history), datalake_hubspot.owner,
-      datalake_person.person_sks. Schedule after enrich_brokers and core upstreams in Airflow.
+      intervals per person and profile type), dim_broker_tier_changes (tier assignment periods per
+      broker product from core_brokers.broker_tiers_history joined to datalake_company_clean.tier),
+      dim_broker_integrator_partner_changes (integrator partner UUID periods from
+      core_brokers.broker_products_history resolved to company name via datalake_company_clean.company).
+      Upstreams: core_brokers, core_brokers_history (broker_tiers_history, broker_products_history),
+      core_region, datalake_brokers (hubspot_brokers_history, broker_status_history),
+      datalake_company_clean (tier, company), datalake_hubspot.owner, datalake_person.person_sks.
+      Schedule after enrich_brokers, core_brokers_history, and core upstreams in Airflow.
 workflow:
   type: query_delta
   layer: dw
@@ -77,6 +82,28 @@ workflow:
       partitions: [year, month, day]
       merge_on: [sk_broker_profile]
       z_order_by: [sk_broker]
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+      row_filter_column_key: has_3p_access_control
+      row_filter: has_3p_access
+    dim_broker_tier_changes:
+      partitions: [year, month, day]
+      merge_on: [sk_broker_tier_change]
+      z_order_by: [sk_broker_product]
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+      row_filter_column_key: has_3p_access_control
+      row_filter: has_3p_access
+    dim_broker_integrator_partner_changes:
+      partitions: [year, month, day]
+      merge_on: [sk_broker_integrator_partner_change]
+      z_order_by: [sk_broker_product]
       table_privileges:
         3p-readers:
           - SELECT

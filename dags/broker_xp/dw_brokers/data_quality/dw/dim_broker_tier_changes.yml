@@ -1,0 +1,48 @@
+---
+table_name: dw_brokers.dim_broker_tier_changes
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  sk_broker_tier_change:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  sk_broker:
+    is_complete:
+      severity_level: Error
+  sk_broker_product:
+    is_complete:
+      severity_level: Error
+  id_tier:
+    is_complete:
+      severity_level: Error
+  has_3p_access_control:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+  ts_start:
+    is_complete:
+      severity_level: Error
+  version:
+    is_complete:
+      severity_level: Error
+  is_current:
+    is_complete:
+      severity_level: Error

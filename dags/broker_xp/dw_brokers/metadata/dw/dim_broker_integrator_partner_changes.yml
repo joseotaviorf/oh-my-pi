@@ -1,0 +1,76 @@
+database_name: dw_brokers
+table_name: dim_broker_integrator_partner_changes
+description: |
+  Data warehouse dimension of integrator partner UUID assignment periods per broker product. Rows are
+  derived from distinct integratorPartner UUID values in product_settings changes
+  (core_brokers.broker_products_history, ev_product_settings), versioned per sk_broker_product and
+  resolved to company display name via datalake_company_clean.company when available.
+domain: Broker XP
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_broker_integrator_partner_change:
+    lineage:
+      - core_brokers.broker_products_history.sk_company_product
+      - core_brokers.broker_products_history.ts_transaction
+    description: |
+      Surrogate string key for the integrator partner assignment period, built from sk_broker_product and sequential version within the broker product.
+  sk_broker:
+    lineage:
+      - core_brokers.brokers_product.sk_broker
+    description: Surrogate key of the parent broker for this integrator partner period.
+  sk_broker_product:
+    lineage:
+      - core_brokers.broker_products_history.sk_company_product
+      - core_brokers.brokers_product.sk_broker_product
+    description: Surrogate key of the broker product row for this period.
+  uuid_integrator_partner:
+    lineage:
+      - core_brokers.broker_products_history.value
+    description: |
+      Integrator partner company UUID extracted from product_settings JSON at the start of this period.
+  integrator_partner:
+    lineage:
+      - datalake_company_clean.company.company_name
+    description: |
+      Company name from the clean company table when uuid_integrator_partner matches uuid_company; null
+      when no matching company row exists.
+  version:
+    lineage:
+      - core_brokers.broker_products_history.ts_transaction
+    description: |
+      Sequential version of the integrator partner assignment for the broker product, ordered by
+      ts_transaction at each distinct partner change.
+  is_current:
+    lineage:
+      - core_brokers.broker_products_history.ts_transaction
+    description: |
+      True when this row is the latest integrator partner period for the broker product (no later
+      ts_transaction in the filtered change stream).
+  has_3p_access_control:
+    description: |
+      Boolean flag indicating that this row is subject to 3P Partners access control policies; always true
+      in this table.
+  ts_start:
+    lineage:
+      - core_brokers.broker_products_history.ts_transaction
+    description: |
+      Start timestamp of the integrator partner period (first observation of this UUID for the product).
+  ts_end:
+    lineage:
+      - core_brokers.broker_products_history.ts_transaction
+    description: |
+      End timestamp of the period (start of the next partner change); null while the assignment is current.
+  ts_load:
+    description: Timestamp when this DW row was loaded by the ETL process.
+  year:
+    lineage:
+      - core_brokers.broker_products_history.ts_transaction
+    description: Partition year from period start (ts_start).
+  month:
+    lineage:
+      - core_brokers.broker_products_history.ts_transaction
+    description: Partition month from period start (ts_start).
+  day:
+    lineage:
+      - core_brokers.broker_products_history.ts_transaction
+    description: Partition day from period start (ts_start).
