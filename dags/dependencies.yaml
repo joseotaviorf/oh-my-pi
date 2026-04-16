@@ -717,6 +717,7 @@ bietlejuice.dw_fintech_snapshot_second_business_day:
 bietlejuice.dw_for_sale_experiment:
   - bietlejuice.enrich_for_sale_experiment:load-enrich-exp-identifier-unified:first-run-of-day
 bietlejuice.dw_house:
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
   - bietlejuice.ebdb_condo:load-clean-amenities:first-run-of-day
   - bietlejuice.ebdb_condo:load-clean-condo-amenities:first-run-of-day
   - bietlejuice.ebdb_condo:load-clean-info-amenities:first-run-of-day
