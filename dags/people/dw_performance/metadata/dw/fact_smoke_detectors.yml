@@ -1,5 +1,5 @@
 database_name: dw_performance
-table_name: fact_performa_smoke_detectors
+table_name: fact_smoke_detectors
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
