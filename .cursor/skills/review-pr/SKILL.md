@@ -52,6 +52,7 @@ For every changed `.py` file in `bietlejuice/`, verify:
 - No wildcard imports (`from x import *`)
 - No bare `raise NotImplementedError()` (use `@abstractmethod` instead)
 - Pydantic: `model_dump()` not `.dict()`, `field_validator` not `validator`
+- **No new `SparkSession` or `SparkContext` creation** — look for `SparkSession.builder...build()`, `SparkSession(...)`, `SparkContext(...)`, or `SparkContext(conf=...)`. The only acceptable pattern is `SparkSession.builder.getOrCreate()`. Creating a second session causes intermittent library-resolution failures on shared clusters (incident ref: PR #22756).
 
 Return: file path + line number for each violation found.
 
@@ -76,6 +77,24 @@ make lint
 ```
 Return: exit code, all warning/error lines. Classify as **blocking** if exit code is non-zero.
 
+## Step 2b — PR scope check (manual, no subagent)
+
+After gathering the changed files list from Step 1, assess whether the PR is **tightly scoped**:
+
+1. Identify the PR's primary intent (e.g., "add column mapping to delta loader", "create new DW table").
+2. Flag any changed files that do **not** directly serve that intent — especially modifications to shared base classes, loaders, Spark session setup, or utility modules that are unrelated to the feature.
+3. If a base class or shared loader (`bietlejuice/base/`, `bietlejuice/services/`, or any module imported by multiple DAGs) is modified, flag it as **high-impact** and recommend:
+   - Confirming the change is essential to the feature (not a drive-by refactor).
+   - Triggering at least 2–3 DAGs that use the same loader/base class after merge to validate there are no intermittent regressions.
+
+Classify scope issues as **non-blocking but should fix** — PRs with unrelated changes to shared infrastructure are a known source of intermittent production incidents (ref: PR #22756).
+
+4. **PR topic cohesion check**: Analyze the changed files and commit messages to identify how many **distinct themes** the PR addresses (e.g., new feature, refactor, bug fix, config change, dependency update).
+   - A PR should ideally address **one theme**.
+   - If it mixes two or more unrelated themes, suggest splitting into separate PRs — one per theme.
+   - Propose a concrete split when possible (e.g., "refactor of the loader in one PR, new column mapping feature in another").
+   - A small PR that mixes unrelated changes is worse than a large focused one, but even single-theme PRs with many files benefit from splitting into incremental batches to make review manageable.
+
 ## Step 3 — Synthesize findings
 
 Group all issues by severity:
@@ -93,6 +112,9 @@ Group all issues by severity:
 - Incomplete metadata (short descriptions, missing lineage)
 - Column matching a personal data pattern but missing `personal_data_classification`
 - New `bietlejuice/` module with no matching unit test file (config/constants modules exempt)
+- PR includes unrelated changes to shared base classes or loaders (scope creep)
+- New `SparkSession` or `SparkContext` creation instead of `getOrCreate()`
+- PR mixes multiple unrelated themes — suggest splitting into one PR per theme
 
 For each issue: file path, line (if available), what is wrong, exact fix.
 

@@ -68,6 +68,7 @@ class MyModel(BaseModel):
 - Inherit from `BaseCoreModelSparkJob` (`bietlejuice.base.spark.base_core_model_spark_job`).
 - Use `parse_args()` with the standard argument order: `environment`, `bucket`, `dag_name`, `schema`, `table_name`, `partitions`, `load_start_date`, `load_end_date`.
 - Use `ConfigurationService` for environment-aware config; never hard-code bucket paths or environment strings.
+- **Never create a new `SparkSession` or `SparkContext`**. Always reuse the existing session via `SparkSession.builder.getOrCreate()`. Creating a second session causes intermittent library-resolution errors on shared clusters . If you need specific Spark configs, set them on the existing session's `conf` object.
 
 ## Design Patterns & Modularity
 - Prefer **factory** or **strategy** patterns when behaviour varies by configuration or environment. Avoid long `if/elif` chains that encode business rules directly in pipeline logic.
