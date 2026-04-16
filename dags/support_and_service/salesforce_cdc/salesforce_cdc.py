@@ -115,6 +115,7 @@ default_args = {
     "owner": "Data SS",
     "email_on_retry": False,
     "retries": 3,
+    "depends_on_past": True,
     "on_failure_callback": gchat_callback.task_failure_alert,
     #TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
     # "on_failure_callback": jiraops_callback.task_failure_alert,
@@ -125,7 +126,6 @@ with DAG(
     schedule_interval="0 * * * *",
     start_date=datetime(2026, 3, 12),
     catchup=True,
-    depends_on_past=True,
     tags=["SST", "SF", "salesforce"],  # better formatting
     on_failure_callback=gchat_callback.dag_failure_alert,
     #TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
