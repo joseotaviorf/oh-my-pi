@@ -1,0 +1,14 @@
+---
+database_name: datalake_legaut_raw
+table_name: django_content_type
+domain: For Sale
+columns:
+  id:
+    tags:
+      - Internal
+  app_label:
+    tags:
+      - Internal
+  model:
+    tags:
+      - Internal

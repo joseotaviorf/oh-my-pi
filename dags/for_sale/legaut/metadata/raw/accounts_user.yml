@@ -1,0 +1,51 @@
+---
+database_name: datalake_legaut_raw
+table_name: accounts_user
+domain: For Sale
+columns:
+  id:
+    tags:
+      - Internal
+  password:
+    tags:
+      - PII
+      - Confidential
+  last_login:
+    tags:
+      - PII
+      - Confidential
+  is_superuser:
+    tags:
+      - Internal
+  username:
+    tags:
+      - PII
+      - Confidential
+  first_name:
+    tags:
+      - PII
+      - Confidential
+  last_name:
+    tags:
+      - PII
+      - Confidential
+  email:
+    tags:
+      - Public
+  is_staff:
+    tags:
+      - Internal
+  is_active:
+    tags:
+      - Internal
+  date_joined:
+    tags:
+      - PII
+      - Confidential
+  role:
+    tags:
+      - Internal
+  profile_img:
+    tags:
+      - PII
+      - Confidential

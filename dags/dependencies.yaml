@@ -2906,9 +2906,12 @@ bietlejuice.enrich_learning:
   - bietlejuice.degreed:load-clean-users:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
 bietlejuice.enrich_legaut:
+  - bietlejuice.legaut:load-clean-accounts-user:first-run-of-day
+  - bietlejuice.legaut:load-clean-auditlog-logentry:first-run-of-day
   - bietlejuice.legaut:load-clean-crawlers-crawler:first-run-of-day
   - bietlejuice.legaut:load-clean-crawlers-crawlergroup:first-run-of-day
   - bietlejuice.legaut:load-clean-crawlers-crawlertype:first-run-of-day
+  - bietlejuice.legaut:load-clean-django-content-type:first-run-of-day
   - bietlejuice.legaut:load-clean-meusite-city:first-run-of-day
   - bietlejuice.legaut:load-clean-meusite-document:first-run-of-day
   - bietlejuice.legaut:load-clean-meusite-project:first-run-of-day

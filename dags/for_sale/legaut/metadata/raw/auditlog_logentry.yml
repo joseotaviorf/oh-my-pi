@@ -1,0 +1,39 @@
+---
+database_name: datalake_legaut_raw
+table_name: auditlog_logentry
+domain: For Sale
+columns:
+  id:
+    tags:
+      - Internal
+  content_type_id:
+    tags:
+      - Internal
+  object_pk:
+    tags:
+      - Internal
+  object_id:
+    tags:
+      - Internal
+  object_repr:
+    tags:
+      - Internal
+  action:
+    tags:
+      - Internal
+  changes:
+    tags:
+      - Internal
+  actor_id:
+    tags:
+      - Internal
+  remote_addr:
+    tags:
+      - PII
+      - Confidential
+  timestamp:
+    tags:
+      - Internal
+  additional_data:
+    tags:
+      - Internal

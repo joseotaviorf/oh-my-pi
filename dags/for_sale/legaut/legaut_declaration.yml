@@ -15,8 +15,20 @@ workflow:
   custom_schema: legaut
   dbutils_secret_key: LEGAUT_DB
   tables_customization:
+    accounts_user:
+      clean_table_name: accounts_user
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
     accounts_useremail:
       clean_table_name: accounts_user_email
+    auditlog_logentry:
+      clean_table_name: auditlog_logentry
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    django_content_type:
+      clean_table_name: django_content_type
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
     crawlers_company:
       clean_table_name: crawlers_company
     crawlers_crawler:

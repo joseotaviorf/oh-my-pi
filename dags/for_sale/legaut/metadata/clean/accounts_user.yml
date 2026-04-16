@@ -1,0 +1,57 @@
+---
+database_name: datalake_legaut_clean
+table_name: accounts_user
+description: Legaut Django user accounts used to resolve actor email and profile fields for audit and product analytics.
+domain: For Sale
+owner: wesley.gomes@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_legaut_raw.accounts_user.id
+    description: Primary key of the user in the Legaut application database.
+  email:
+    lineage:
+      - datalake_legaut_raw.accounts_user.email
+    description: Business email of the Legaut user account; intended for shared operational analytics and Superset (not treated as confidential personal data in this pipeline).
+  username:
+    lineage:
+      - datalake_legaut_raw.accounts_user.username
+    description: Login username in Legaut.
+  first_name:
+    lineage:
+      - datalake_legaut_raw.accounts_user.first_name
+    description: User first name.
+  last_name:
+    lineage:
+      - datalake_legaut_raw.accounts_user.last_name
+    description: User last name.
+  is_active:
+    lineage:
+      - datalake_legaut_raw.accounts_user.is_active
+    description: Whether the user account is active.
+  is_staff:
+    lineage:
+      - datalake_legaut_raw.accounts_user.is_staff
+    description: Whether the user has staff access in Django admin.
+  is_superuser:
+    lineage:
+      - datalake_legaut_raw.accounts_user.is_superuser
+    description: Whether the user is a Django superuser.
+  role:
+    lineage:
+      - datalake_legaut_raw.accounts_user.role
+    description: Application-specific role code for the user.
+  ts_last_login:
+    lineage:
+      - datalake_legaut_raw.accounts_user.last_login
+    description: Last login timestamp for the user account.
+  ts_joined:
+    lineage:
+      - datalake_legaut_raw.accounts_user.date_joined
+    description: Account creation timestamp.
+  profile_img:
+    lineage:
+      - datalake_legaut_raw.accounts_user.profile_img
+    description: Path to the profile image file in storage.
+  ts_load:
+    description: Ingestion timestamp when this row was written to the clean layer.

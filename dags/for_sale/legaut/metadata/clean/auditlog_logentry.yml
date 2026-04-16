@@ -1,0 +1,53 @@
+---
+database_name: datalake_legaut_clean
+table_name: auditlog_logentry
+description: Django auditlog entries from Legaut (field-level change history), including Unit report_status updates for analytics.
+domain: For Sale
+owner: wesley.gomes@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_legaut_raw.auditlog_logentry.id
+    description: Primary key of the audit log row in the Legaut application database.
+  id_content_type:
+    lineage:
+      - datalake_legaut_raw.auditlog_logentry.content_type_id
+    description: Foreign key to django_content_type identifying the model that was changed.
+  object_pk:
+    lineage:
+      - datalake_legaut_raw.auditlog_logentry.object_pk
+    description: String representation of the changed object primary key.
+  object_id:
+    lineage:
+      - datalake_legaut_raw.auditlog_logentry.object_id
+    description: Numeric primary key of the changed object when available.
+  object_repr:
+    lineage:
+      - datalake_legaut_raw.auditlog_logentry.object_repr
+    description: String snapshot of the object at log time.
+  audit_action:
+    lineage:
+      - datalake_legaut_raw.auditlog_logentry.action
+    description: Audit action code (0 create, 1 update, 2 delete).
+  changes:
+    lineage:
+      - datalake_legaut_raw.auditlog_logentry.changes
+    description: JSON text of field changes (old and new values per field).
+  id_actor:
+    lineage:
+      - datalake_legaut_raw.auditlog_logentry.actor_id
+    description: Foreign key to accounts_user for the user who performed the change, when known.
+  remote_addr:
+    lineage:
+      - datalake_legaut_raw.auditlog_logentry.remote_addr
+    description: Client IP address for the request that generated the log entry, when available.
+  ts_audit:
+    lineage:
+      - datalake_legaut_raw.auditlog_logentry.timestamp
+    description: Timestamp when the audit entry was created in the source system.
+  additional_data:
+    lineage:
+      - datalake_legaut_raw.auditlog_logentry.additional_data
+    description: Optional JSON payload attached by django-auditlog.
+  ts_load:
+    description: Ingestion timestamp when this row was written to the clean layer.
