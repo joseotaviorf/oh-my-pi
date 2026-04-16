@@ -3,9 +3,7 @@ import pyspark.sql.functions as F
 
 from bietlejuice.base.sst.core.observability.metrics import save_volume_metric
 from bietlejuice.base.sst.core.quality.checks import basic_quality_checks
-from bietlejuice.base.sst.core.utils.common import (
-    validate_and_write,
-)
+from bietlejuice.base.sst.core.utils.common import validate_and_write
 from bietlejuice.base.sst.core.observability.sensors import (
     sensor_s3_file_exists,
     partition_has_data,
@@ -61,18 +59,12 @@ def salesforce_raw_pipeline(spark, cfg):
     )
 
     raw_df = read_sf_cdc_json(spark, s3_file_path)
-    raw_df = sf_cdc_mandatory_fields(raw_df)
-    raw_final = (
-        raw_df.withColumn("source_file", F.input_file_name())
-        .withColumn("ts_load", F.lit(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-        .withColumn("partition_date", F.lit(cfg.partition_date))
-        .withColumn("partition_hour", F.lit(cfg.partition_hour))
-    )
+    raw_df = sf_cdc_mandatory_fields(raw_df).drop_duplicates()
 
     # Quality checks
     # TODO: Transform this into a metric as well
     basic_quality_checks(
-        raw_final,
+        raw_df,
         required_cols=[
             "id_record",
             "transaction_key",
@@ -82,6 +74,14 @@ def salesforce_raw_pipeline(spark, cfg):
         unique_grain=["id_record", "transaction_key", "sequence_number"],
         fail=True,
     )
+
+    raw_final = (
+        raw_df.withColumn("source_file", F.col("_metadata.file_path"))
+        .withColumn("ts_load", F.lit(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+        .withColumn("partition_date", F.lit(cfg.partition_date))
+        .withColumn("partition_hour", F.lit(cfg.partition_hour))
+    )
+
     logger.info("m=salesforce_raw_pipeline, msg=Quality checks passed")
     logger.info(
         f"m=salesforce_raw_pipeline, msg=Metadata retrieved: {cfg.target_schema=}"
