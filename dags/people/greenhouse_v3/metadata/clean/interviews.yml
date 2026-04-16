@@ -1,0 +1,101 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: interviews
+owner: pedro.prates@quintoandar.com.br
+domain: People
+description: |-
+  Scheduled interview instances from the Greenhouse Harvest API v3 'interviews' endpoint. One row per interview occurrence for a candidate application.
+  Contains the actual interview start and end timestamps (ts_started, ts_ended), which represent when the interview was scheduled to happen, as opposed to stage transition dates in application_stages.
+  Primary key: id. Foreign keys: id_application (applications), id_job_interview (job_interviews), id_organizer (users), id_job (jobs).
+columns:
+  id:
+    description: Primary key. Unique identifier of the scheduled interview instance from Greenhouse.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.id
+  id_application:
+    description: Foreign key to applications. Identifies which candidate application this interview belongs to.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.application_id
+  id_job_interview:
+    description: Foreign key to job_interviews. Identifies the interview definition (type/step) within the job's interview plan.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.job_interview_id
+  id_job:
+    description: Foreign key to jobs. Identifies the job posting this interview is associated with.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.job_id
+  id_organizer:
+    description: Foreign key to users. Identifies the person who organized or scheduled this interview.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.organizer_id
+  id_external_event:
+    description: External calendar event identifier (e.g. Google Calendar event ID) linked to this interview, if available.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.external_event_id
+  status:
+    description: Current status of the interview in its lifecycle.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.status
+    categories:
+      to_be_scheduled: Interview needs to be scheduled.
+      scheduled: Interview has been scheduled with a confirmed date and time.
+      awaiting_feedback: Interview occurred and is awaiting scorecard feedback.
+      complete: Interview and feedback are complete.
+      skipped: Interview was skipped in the pipeline.
+      collect_feedback: Feedback collection is in progress.
+      to_be_sent: Availability request to be sent.
+      sent: Availability request has been sent.
+      received: Availability response has been received.
+  location:
+    description: Physical or virtual location where the interview takes place.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.location
+  video_conferencing_url:
+    description: URL for the video conferencing tool used for the interview (e.g. Google Meet, Zoom).
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.video_conferencing_url
+  ts_started:
+    description: Timestamp when the interview is scheduled to start. This is the actual interview date that People Analytics needs for funnel accuracy, as opposed to ts_entered in application_stages which only tracks stage transitions.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.starts_at
+  ts_ended:
+    description: Timestamp when the interview is scheduled to end.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.ends_at
+  ts_scheduled:
+    description: Timestamp when the interview was scheduled (i.e. when the scheduling action was performed).
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.scheduled_at
+  ts_availability_received:
+    description: Timestamp when the candidate's availability response was received.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.availability_received_at
+  dt_all_day_started:
+    description: Start date for all-day interviews that do not have a specific time of day.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.all_day_start_on
+  dt_all_day_ended:
+    description: End date for all-day interviews that do not have a specific time of day.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.all_day_end_on
+  ts_created:
+    description: Timestamp when the interview record was created in Greenhouse.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.created_at
+  ts_updated:
+    description: Timestamp when the interview record was last updated in Greenhouse.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.updated_at
+  ts_load:
+    description: Timestamp when the record was loaded into the clean layer.
+  year:
+    description: Year extracted from the updated_at timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.year
+  month:
+    description: Month extracted from the updated_at timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.month
+  day:
+    description: Day extracted from the updated_at timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviews.day

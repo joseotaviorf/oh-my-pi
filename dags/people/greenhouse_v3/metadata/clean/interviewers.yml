@@ -1,0 +1,60 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: interviewers
+owner: pedro.prates@quintoandar.com.br
+domain: People
+description: |-
+  Per-interview interviewer records from the Greenhouse Harvest API v3 'interviewers' endpoint. One row per interviewer per scheduled interview instance.
+  Primary key: id. Foreign keys: id_interview (interviews), id_user (users), id_scorecard (scorecards when submitted).
+  Contains the interviewer's response status and email. Used to understand who participated in each interview and their availability response.
+columns:
+  id:
+    description: Primary key. Unique identifier of the interviewer assignment to a specific interview.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviewers.id
+  id_interview:
+    description: Foreign key to interviews. The scheduled interview instance this interviewer is assigned to.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviewers.interview_id
+  id_user:
+    description: Foreign key to users. The Greenhouse user who is assigned as an interviewer.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviewers.user_id
+  id_scorecard:
+    description: Foreign key to scorecards. The scorecard submitted by this interviewer after the interview, if available.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviewers.scorecard_id
+  response_status:
+    description: The interviewer's calendar response status for the scheduled interview.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviewers.response_status
+    categories:
+      needs_action: Interviewer has not yet responded to the calendar invitation.
+      declined: Interviewer declined the calendar invitation.
+      tentative: Interviewer tentatively accepted the calendar invitation.
+      accepted: Interviewer accepted the calendar invitation.
+  email:
+    description: Email address of the interviewer (PII).
+    lineage:
+    - datalake_greenhouse_v3_raw.interviewers.email
+  ts_created:
+    description: Timestamp when the interviewer assignment was created in Greenhouse.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviewers.created_at
+  ts_updated:
+    description: Timestamp when the interviewer assignment was last updated in Greenhouse.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviewers.updated_at
+  ts_load:
+    description: Timestamp when the record was loaded into the clean layer.
+  year:
+    description: Year extracted from the updated_at timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviewers.year
+  month:
+    description: Month extracted from the updated_at timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviewers.month
+  day:
+    description: Day extracted from the updated_at timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.interviewers.day

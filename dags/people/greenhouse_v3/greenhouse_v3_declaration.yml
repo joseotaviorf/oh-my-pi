@@ -282,3 +282,40 @@ workflow:
         - endpoint: "rejection_details"
           params:
             per_page: 500
+
+    interviews:
+      extraction_type: incremental
+      merge_on: ["id"]
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - endpoint: "interviews"
+          date_column_to_partition: "updated_at"
+          base_filters:
+            updated_at_gte: "load_start_date"
+            updated_at_lt: "load_end_date"
+          params:
+            per_page: 500
+
+    job_interviews:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - endpoint: "job_interviews"
+          date_column_to_partition: "updated_at"
+          params:
+            per_page: 500
+
+    interviewers:
+      extraction_type: incremental
+      merge_on: ["id"]
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - endpoint: "interviewers"
+          date_column_to_partition: "updated_at"
+          base_filters:
+            updated_at_gte: "load_start_date"
+            updated_at_lt: "load_end_date"
+          params:
+            per_page: 500

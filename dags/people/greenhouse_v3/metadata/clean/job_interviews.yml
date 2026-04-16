@@ -1,0 +1,81 @@
+database_name: datalake_greenhouse_v3_clean
+table_name: job_interviews
+owner: pedro.prates@quintoandar.com.br
+domain: People
+description: |-
+  Interview definitions (steps) configured within each job's interview plan, sourced from the Greenhouse Harvest API v3 'job_interviews' endpoint.
+  One row per interview step per job. Each job_interview belongs to a job_interview_stage and defines a specific interview type (e.g. 'Hiring Manager Interview', 'Technical Exercise').
+  Primary key: id. Foreign keys: id_job_interview_stage (job_interview_stages), id_job (jobs).
+  This is a reference/configuration table — full extraction, relatively small volume.
+columns:
+  id:
+    description: Primary key. Unique identifier of the interview step definition within a job's interview plan.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.id
+  id_job_interview_stage:
+    description: Foreign key to job_interview_stages. The interview stage this interview step belongs to.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.job_interview_stage_id
+  id_job:
+    description: Foreign key to jobs. The job posting this interview definition is part of.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.job_id
+  name:
+    description: Display name of the interview step (e.g. 'Hiring Manager Interview', 'Technical Exercise', 'People Interview').
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.name
+  scheduling_type:
+    description: How the interview is scheduled within Greenhouse.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.scheduling_type
+    categories:
+      none: No scheduling required.
+      needs_scheduling: Interview needs to be scheduled by a coordinator.
+      take_home_test: Take-home assignment, not a scheduled meeting.
+      offer: Offer stage, not a traditional interview.
+  duration_minutes:
+    description: Estimated duration of the interview in minutes as configured in the job's interview plan.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.duration
+  sort_order:
+    description: Display order of this interview step within its parent interview stage.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.sort_order
+  summary:
+    description: Optional summary or description of the interview step provided by the hiring team.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.summary
+  instructions:
+    description: Optional instructions for interviewers or coordinators on how to conduct this interview step.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.instructions
+  is_active:
+    description: Boolean flag indicating whether this interview step is currently active in the job's interview plan.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.active
+  is_scorecard_required:
+    description: Boolean flag indicating whether a scorecard submission is required after this interview step.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.require_scorecard
+  ts_created:
+    description: Timestamp when the interview step definition was created in Greenhouse.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.created_at
+  ts_updated:
+    description: Timestamp when the interview step definition was last updated in Greenhouse.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.updated_at
+  ts_load:
+    description: Timestamp when the record was loaded into the clean layer.
+  year:
+    description: Year extracted from the updated_at timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.year
+  month:
+    description: Month extracted from the updated_at timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.month
+  day:
+    description: Day extracted from the updated_at timestamp, used for partitioning.
+    lineage:
+    - datalake_greenhouse_v3_raw.job_interviews.day
