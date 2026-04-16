@@ -1,0 +1,70 @@
+---
+database_name: datalake_jira_schedules
+table_name: overrides
+domain: Data Ops & Governance
+owner: leonardo.soares@quintoandar.com.br
+description: >
+  Enriched Jira Ops schedule overrides: rotations are exploded from each override row, deduplicated to the
+  latest load per schedule/rotation/window, then keyed with a hash id_period. Responder profile comes from
+  the user account dimension; override windows are in America/Sao_Paulo.
+columns:
+  id_override:
+    description: Override alias from the clean layer (API identifier for the override).
+    lineage:
+      - datalake_jira_ops_clean.schedules_override.id_override_alias
+  id_schedule:
+    description: Schedule UUID the override applies to.
+    lineage:
+      - datalake_jira_ops_clean.schedules_override.id_schedule
+  id_rotation:
+    description: Single rotation id after exploding the override rotation_ids array.
+    lineage:
+      - datalake_jira_ops_clean.schedules_override.rotation_ids
+  id_period:
+    description: >
+      Surrogate key (XXHASH64) over schedule id, rotation id, override window start, and override window end
+      to align with timeline period grain for joins.
+  id_responder:
+    description: Responder account id assigned in the override row.
+    lineage:
+      - datalake_jira_ops_clean.schedules_override.id_responder
+  responder_type:
+    description: Responder type from the override payload (e.g. user or team).
+    lineage:
+      - datalake_jira_ops_clean.schedules_override.responder_type
+  responder_name:
+    description: Display name from user_account when the responder resolves to a user.
+    lineage:
+      - datalake_jira_ops_clean.user_account.display_name
+  responder_email:
+    description: Email from user_account when the responder resolves to a user.
+    lineage:
+      - datalake_jira_ops_clean.user_account.email_address
+  is_last_period_override:
+    description: >
+      True for the row kept after ranking by dt_load desc within schedule, rotation, and override window;
+      used to keep the latest ingested snapshot per logical override period.
+  ts_started:
+    description: Override window start in America/Sao_Paulo (converted from UTC).
+    lineage:
+      - datalake_jira_ops_clean.schedules_override.ts_started
+  ts_ended:
+    description: Override window end in America/Sao_Paulo (converted from UTC).
+    lineage:
+      - datalake_jira_ops_clean.schedules_override.ts_ended
+  dt_load:
+    description: Ingestion load date used to filter and to pick the latest override row.
+    lineage:
+      - datalake_jira_ops_clean.schedules_override.dt_load
+  year:
+    description: Partition year from the source load.
+    lineage:
+      - datalake_jira_ops_clean.schedules_override.year
+  month:
+    description: Partition month from the source load.
+    lineage:
+      - datalake_jira_ops_clean.schedules_override.month
+  day:
+    description: Partition day from the source load.
+    lineage:
+      - datalake_jira_ops_clean.schedules_override.day

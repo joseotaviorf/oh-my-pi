@@ -66,7 +66,7 @@ workflow:
             cloud_id: cloud_id_secret
             interval: 1
             interval_unit: week
-            date: "{{ data_interval_start | ds }}T00:00:00Z"
+            date: "{{ data_interval_end | ds }}T00:00:00Z"
             expand: "base, forwarding, override"
           feedback_config: 
             table: datalake_jira_ops_raw.schedules
@@ -99,7 +99,8 @@ workflow:
       load_spark_job: load_responders_account_into_datalake_raw
       extra_spark_job_arguments:
         - feedback_config:
-            table_name: datalake_jira_ops_raw.schedules_timeline
+            timeline_table: datalake_jira_ops_raw.schedules_timeline
+            override_table: datalake_jira_ops_raw.schedules_override
             date_column_filter: dt_load
 cluster:
   type: custom_cluster

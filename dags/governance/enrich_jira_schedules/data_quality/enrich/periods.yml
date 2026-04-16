@@ -1,0 +1,24 @@
+---
+table_name: datalake_jira_schedules.periods
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_period:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_schedule:
+    is_complete:
+      severity_level: Error
+  ts_period_started:
+    is_complete:
+      severity_level: Error
+  ts_period_ended:
+    is_complete:
+      severity_level: Error
+  ts_timeline_started:
+    is_complete:
+      severity_level: Error
+  ts_timeline_ended:
+    is_complete:
+      severity_level: Error

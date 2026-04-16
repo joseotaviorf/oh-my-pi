@@ -1,0 +1,70 @@
+---
+database_name: datalake_jira_schedules
+table_name: data_engineer_on_call
+domain: Data Ops & Governance
+owner: leonardo.soares@quintoandar.com.br
+description: >
+  Subset of on-call periods for selected Data Engineering schedules: final timeline rows joined to base
+  timeline on the same id_period to detect responder overrides and expose original versus effective assignees.
+  Filtered by schedule id and load dates.
+columns:
+  id_period:
+    description: Surrogate period id; matches datalake_jira_schedules.periods.id_period.
+    lineage:
+      - datalake_jira_schedules.periods.id_period
+  schedule_name:
+    description: Schedule display name from the periods enrich table.
+    lineage:
+      - datalake_jira_schedules.periods.schedule_name
+  rotation_name:
+    description: Rotation name within the schedule.
+    lineage:
+      - datalake_jira_schedules.periods.rotation_name
+  rotation_order:
+    description: Rotation order within the schedule configuration.
+    lineage:
+      - datalake_jira_schedules.periods.rotation_order
+  id_responder:
+    description: Effective responder account id on the final timeline row.
+    lineage:
+      - datalake_jira_schedules.periods.id_responder
+  responder_name:
+    description: Display name of the effective responder.
+    lineage:
+      - datalake_jira_schedules.periods.responder_name
+  responder_email:
+    description: Email of the effective responder.
+    lineage:
+      - datalake_jira_schedules.periods.responder_email
+  is_overrided:
+    description: True when the final timeline responder differs from the base timeline for the same period.
+  id_original_responder:
+    description: Base-timeline responder id when an override exists; null otherwise.
+  original_responder_name:
+    description: Base-timeline responder display name when an override exists; null otherwise.
+  original_responder_email:
+    description: Base-timeline responder email when an override exists; null otherwise.
+  ts_period_started:
+    description: Period start in America/Sao_Paulo for the on-call window.
+    lineage:
+      - datalake_jira_schedules.periods.ts_period_started
+  ts_period_ended:
+    description: Period end for the on-call window.
+    lineage:
+      - datalake_jira_schedules.periods.ts_period_ended
+  dt_load:
+    description: Load partition date carried from periods for incremental filtering.
+    lineage:
+      - datalake_jira_schedules.periods.dt_load
+  year:
+    description: Partition year from the periods table.
+    lineage:
+      - datalake_jira_schedules.periods.year
+  month:
+    description: Partition month from the periods table.
+    lineage:
+      - datalake_jira_schedules.periods.month
+  day:
+    description: Partition day from the periods table.
+    lineage:
+      - datalake_jira_schedules.periods.day

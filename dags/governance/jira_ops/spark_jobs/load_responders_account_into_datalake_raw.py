@@ -42,7 +42,8 @@ if __name__ == "__main__":
     extra_args = json.loads(args.extra_args)
 
     feedback_config = json.loads(extra_args.get("feedback_config", "{}"))
-    source_table_name = feedback_config.get("table_name")
+    schedules_timeline_table_name = feedback_config.get("timeline_table")
+    schedules_override_table_name = feedback_config.get("override_table")
     date_column = feedback_config.get("date_column_filter")
     select_columns = date_column, *partition_cols
 
@@ -54,8 +55,9 @@ if __name__ == "__main__":
         """
     )
 
-    df = (
-        BaseSparkContext.spark.table(source_table_name)
+    # --- schedules timeline data processing ---
+    df_schedules_timeline = (
+        BaseSparkContext.spark.table(schedules_timeline_table_name)
         .where(
             F.col(date_column)
             .between(load_start_date, load_end_date)
@@ -63,7 +65,7 @@ if __name__ == "__main__":
     )
 
     df_base_responders = (
-        df.select(
+        df_schedules_timeline.select(
             F.explode("baseTimeline.rotations").alias("rotation"),
             *select_columns
         )
@@ -79,7 +81,7 @@ if __name__ == "__main__":
     )
 
     df_final_period = (
-        df.select(
+        df_schedules_timeline.select(
             F.explode("finalTimeline.rotations").alias("rotation"),
             *select_columns
         )
@@ -102,7 +104,8 @@ if __name__ == "__main__":
             df_final_period.select(
                 F.explode_outer("period.flattenedResponders").alias("responder"),
                 *select_columns
-            ).filter(F.col("responder.type") == "user")
+            )
+            .filter(F.col("responder.type") == "user")
             .select(
                 F.col("responder.id").alias("id_account"),
                 *select_columns
@@ -110,6 +113,22 @@ if __name__ == "__main__":
         )
 
     df_responders = df_final_responders.unionByName(df_base_responders)
+
+    # --- schedules override data processing ---
+    df_schedules_override_responders = (
+        BaseSparkContext.spark.table(schedules_override_table_name)
+        .where(
+            F.col(date_column)
+            .between(load_start_date, load_end_date)
+        )
+        .filter(F.col("responder.type") == "user")
+        .select(
+            F.col("responder.id").alias("id_account"),
+            *select_columns
+        )
+    )
+
+    df_responders = df_responders.unionByName(df_schedules_override_responders)
 
     df_final = (
         df_responders.filter(

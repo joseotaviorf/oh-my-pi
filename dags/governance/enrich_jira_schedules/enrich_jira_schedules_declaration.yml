@@ -1,0 +1,32 @@
+---
+dag:
+  name: enrich_jira_schedules
+  schedule_start_date: 2026, 4, 14
+  owner: Data Governance
+  documentation:
+    dag_purpose: Get data from JiraOps schedules to enrich Data Engineering On-Call schedules.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_partitions: [year, month, day]
+  default_extraction_type: incremental
+  extra_query_template_params:
+      load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+      load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
+  inner_dependencies:
+    data_engineer_on_call:
+      - periods
+  tables_customization:
+    data_engineer_on_call:
+      z_order_by: [id_period, ts_period_started]
+      merge_on: [id_period]
+    overrides:
+      z_order_by: [id_period, ts_period_started]
+cluster:
+  type: databricks_16_4_min_memory_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1,0 +1,104 @@
+---
+database_name: datalake_jira_schedules
+table_name: periods
+domain: Data Ops & Governance
+owner: leonardo.soares@quintoandar.com.br
+description: >
+  Enriched on-call periods from Jira Ops schedule timelines: base and final rotations are unioned,
+  joined to schedule metadata and user accounts. One row per rotation period with responder identity;
+  period timestamps are expressed in America/Sao_Paulo.
+columns:
+  id_schedule:
+    description: Jira Ops schedule UUID.
+    lineage:
+      - datalake_jira_ops_clean.schedules.id_schedule
+  id_team:
+    description: Team identifier linked to the schedule.
+    lineage:
+      - datalake_jira_ops_clean.schedules.id_team
+  id_rotation:
+    description: Rotation identifier within the schedule timeline.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline
+  id_period:
+    description: >
+      Surrogate key (XXHASH64) over schedule id, rotation id, period start, and period end (UTC fields
+      from the timeline) for a stable period grain.
+  id_responder:
+    description: Primary responder account id for the period (user or escalation target).
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline
+      - datalake_jira_ops_clean.user_account.id_account
+  id_flattened_responder:
+    description: >
+      Flattened responder id when the final timeline exposes flattened responders; null on base timeline rows.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline
+  schedule_name:
+    description: Human-readable schedule name.
+    lineage:
+      - datalake_jira_ops_clean.schedules.name
+  timeline_version:
+    description: Whether the row comes from the base or final timeline slice.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline
+  rotation_name:
+    description: Name of the rotation layer within the schedule.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline
+  rotation_order:
+    description: Order of the rotation within the schedule configuration.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline
+  period_type:
+    description: Period type from the Jira Ops payload (e.g. rotation window).
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline
+  responder_name:
+    description: Display name of the responder from the user account dimension.
+    lineage:
+      - datalake_jira_ops_clean.user_account.display_name
+  responder_email:
+    description: Email address of the responder from the user account dimension.
+    lineage:
+      - datalake_jira_ops_clean.user_account.email_address
+  is_responder_deleted:
+    description: True if the responder was marked deleted in the timeline payload; otherwise false.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline
+  is_rotation_deleted:
+    description: True if the rotation was marked deleted in the timeline payload; otherwise false.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline
+  ts_period_started:
+    description: Period start in America/Sao_Paulo, converted from UTC in the timeline.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline
+  ts_period_ended:
+    description: Period end in America/Sao_Paulo, converted from UTC in the timeline.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline
+  ts_timeline_started:
+    description: Loaded timeline snapshot window start in America/Sao_Paulo.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline.ts_started
+  ts_timeline_ended:
+    description: Loaded timeline snapshot window end in America/Sao_Paulo.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline.ts_ended
+  dt_load:
+    description: Ingestion partition date from the source timeline load.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline.dt_load
+  year:
+    description: Partition year from the source load.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline.year
+  month:
+    description: Partition month from the source load.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline.month
+  day:
+    description: Partition day from the source load.
+    lineage:
+      - datalake_jira_ops_clean.schedules_timeline.day

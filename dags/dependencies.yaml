@@ -2863,6 +2863,11 @@ bietlejuice.enrich_jira:
   - bietlejuice.jira:load-clean-issues:first-run-of-day
 bietlejuice.enrich_jira_bugs:
   - bietlejuice.jira:load-clean-issues:first-run-of-day
+bietlejuice.enrich_jira_schedules:
+  - bietlejuice.jira_ops:load-clean-schedules-override:first-run-of-day
+  - bietlejuice.jira_ops:load-clean-schedules-timeline:first-run-of-day
+  - bietlejuice.jira_ops:load-clean-schedules:first-run-of-day
+  - bietlejuice.jira_ops:load-clean-user-account:first-run-of-day
 bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue:load-clean-documentation:first-run-of-day
   - bietlejuice.kill_queue:load-clean-house:first-run-of-day
