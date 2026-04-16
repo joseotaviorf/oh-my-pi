@@ -305,7 +305,7 @@ FROM VALUES
                                                     'experiment_metrics', array()
                                                 )
                                 ),
-           'running', False
+           'running', True
         )
     ),
 
