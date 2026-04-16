@@ -111,12 +111,10 @@ workflow:
         - "[]"
     caexpns:
       clean_table_name: case_expense
-      raw_extraction_type: incremental
-      raw_partitions: [year, month, day]
-      clean_extraction_type: full
-      merge_on: [id_expense]
+      extraction_type: full
+      partitions: []
       extra_spark_job_arguments:
-        - "['EXDTUPD']"
+        - "[]"
         - False
         - "[]"
     cardacct:
