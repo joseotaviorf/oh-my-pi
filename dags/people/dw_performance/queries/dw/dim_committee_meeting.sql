@@ -24,8 +24,7 @@ INNER JOIN
     ON hm.id_dashboard_template = hdtt.id_dashboard_template
 WHERE
   hdtt.language = 'US'
-  AND hdtt.name IN (
-    'Talent Review',
-    'Calibration with distribution curve',
-    'Calibration without distribution curve'
+  AND (
+    hdtt.name LIKE 'Calibration%'
+    OR hdtt.name = 'Talent Review'
   )
