@@ -1,4 +1,4 @@
-SELECT DISTINCT
+SELECT
   p.id_period,
   p.schedule_name,
   p.rotation_name,
@@ -26,3 +26,5 @@ WHERE
   p.id_schedule IN ("9e63f54a-de9c-4e0d-bf48-75c95a28450d", "2fe05f0a-46ac-4b1c-8c20-fce1a9e5667b")
   AND p.timeline_version = "final"
   AND p.dt_load BETWEEN DATE("{load_start_date}") AND DATE("{load_end_date}")
+QUALIFY
+  ROW_NUMBER() OVER(PARTITION BY p.id_period ORDER BY p.dt_load DESC) = 1
