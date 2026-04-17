@@ -10,6 +10,7 @@ from pyspark.sql.functions import (
     dayofmonth,
     element_at,
     from_json,
+    get_json_object,
     hour,
     lit,
     map_values,
@@ -35,6 +36,39 @@ from bietlejuice.base.spark import (
 
 JOB_NAME = "istio_logs_load"
 logger = QuintoAndarLogger(JOB_NAME)
+
+
+def _extract_principal_identities_json():
+    """
+    Extract the identities JSON object from the JWT user payload, handling both formats:
+      - Forno/Staging:  result.principal_info.user = {email, identities, ...}  (flat)
+      - Production:     result.principal_info.user = {<issuer>: {email, identities, ...}}  (wrapped)
+
+    get_json_object is used instead of schema-based parsing because `identities` is a nested
+    JSON object; from_json with StringType returns null for object-typed values.
+    """
+    user_raw = col("data.result.principal_info.user")
+    user_map = from_json(user_raw, MapType(StringType(), StringType()))
+    wrapped_inner_json = element_at(map_values(user_map), 1)
+    return coalesce(
+        get_json_object(wrapped_inner_json, "$.identities"),
+        get_json_object(user_raw, "$.identities"),
+    )
+
+
+def _extract_principal_service():
+    """
+    Extract and normalise the mTLS service identity from the SPIFFE URI, filtering out
+    noise services irrelevant to audit purposes.
+    """
+    _noise_services = ["default", "kong-serviceaccount", "kong-private-controller", "kong-public-controller"]
+    service = regexp_replace(
+        col("data.result.principal_info.service"),
+        r"^spiffe://cluster\.local/ns/[^/]+/sa/",
+        "",
+    )
+    
+    return when(service.isin(_noise_services), lit(None)).otherwise(service)
 
 
 def _parse_user_claims(df):
@@ -71,13 +105,8 @@ def clean_cf(df):
         element_at(split(traceparent, "-"), 2)
     ).otherwise(lit(None))
 
-    _noise_services = ["default", "kong-serviceaccount", "kong-private-controller", "kong-public-controller"]
-    principal_service = regexp_replace(
-        col("data.result.principal_info.service"),
-        r"^spiffe://cluster\.local/ns/[^/]+/sa/",
-        ""
-    )
-    principal_service = when(principal_service.isin(_noise_services), lit(None)).otherwise(principal_service)
+    principal_identities_json = _extract_principal_identities_json()
+    principal_service = _extract_principal_service()
 
     df = df.select(
                ts_event.alias("ts_event"),
@@ -100,6 +129,7 @@ def clean_cf(df):
                coalesce(col("direct.roles"), col("wrapped.roles")).alias("principal_user_roles"),
                coalesce(col("direct.sudoed_by_id"), col("wrapped.sudoed_by_id")).alias("id_principal_user_impersonated_by"),
                coalesce(col("direct.sub"), col("wrapped.sub")).alias("principal_user_sub"),
+               principal_identities_json.alias("principal_identities_json"),
                principal_service.alias("principal_service"),
                col("data.result.response_code_details").alias("response_code_details"),
                col("app"),

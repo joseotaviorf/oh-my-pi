@@ -88,6 +88,10 @@ columns:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.sub
     description: JWT subject claim identifying the principal (e.g. internal-bot)
+  principal_identities_json:
+    lineage:
+      - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.user.identities
+    description: JSON object of linked principal identities by provider
   principal_service:
     lineage:
       - s3_auditlogs_bucket/proxy/.../istio-proxy/result.principal_info.service

@@ -92,6 +92,10 @@ columns:
     lineage:
       - datalake_access_logs_clean.istio.uuid_person_principal_user
     description: Principal user person UUID
+  principal_identities_json:
+    lineage:
+      - datalake_access_logs_clean.istio.principal_identities_json
+    description: JSON object of linked principal identities by provider
   principal_user_idp:
     lineage:
       - data_access_logs_clean.opa.principal_user_idp
