@@ -76,6 +76,14 @@ columns:
     lineage:
       - datalake_access_logs_clean.opa.result_http_allowed
     description: Authorization result
+  result_decision:
+    lineage:
+      - datalake_access_logs_clean.opa.result_decision
+    description: OPA result.decision when present in authorizer payload
+  result_decision_reasons:
+    lineage:
+      - datalake_access_logs_clean.opa.result_decision_reasons
+    description: Array of decision reasons codes from OPA context
   result_http_status:
     lineage:
       - datalake_access_logs_clean.opa.result_http_status

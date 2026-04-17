@@ -80,6 +80,15 @@ columns:
     lineage:
       - s3_auditlogs_bucket/opa.result.allowed
     description: Authorizer allowed
+  result_decision:
+    lineage:
+      - s3_auditlogs_bucket/opa.result.decision
+    description: OPA result.decision boolean when present
+  result_decision_reasons:
+    lineage:
+      - s3_auditlogs_bucket/opa.result.context.reason_user.error
+      - s3_auditlogs_bucket/opa.result.context.reason_admin.error
+    description: Array of decision reasons codes from result.context
   result_http_status:
     lineage:
       - s3_auditlogs_bucket/opa.result.http_status

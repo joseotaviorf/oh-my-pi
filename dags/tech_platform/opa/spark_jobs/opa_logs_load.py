@@ -4,7 +4,22 @@ from dateutil import parser
 
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from pyspark.sql.functions import split, when, element_at, lit, col, from_json, year, month, dayofmonth, hour, to_timestamp, translate
+from pyspark.sql.functions import (
+    split,
+    when,
+    element_at,
+    lit,
+    col,
+    array,
+    array_compact,
+    from_json,
+    year,
+    month,
+    dayofmonth,
+    hour,
+    to_timestamp,
+    translate,
+)
 from pyspark.sql.types import StructType, StructField, StringType, ArrayType, LongType, DoubleType, BooleanType
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.spark import (
@@ -50,6 +65,11 @@ def clean_cf(df):
         col("data.result.principalinfo.authorized_by").alias("request_authorized_by"),
         col("data.result.principalinfo.required_roles").alias("request_required_roles"),
         col("data.result.allowed").alias("result_http_allowed"),
+        col("data.result.decision").alias("result_decision"),
+        array_compact(array(
+            col("data.result.context.reason_user.error"),
+            col("data.result.context.reason_admin.error"),
+        )).alias("result_decision_reasons"),
         col("data.result.http_status").alias("result_http_status"),
         col("data.result.principalinfo.user.payload.email").alias("principal_user_email"),
         col("data.result.principalinfo.user.payload.main_user_id").alias("id_main_principal_user"),
@@ -280,6 +300,15 @@ def get_opa_schema():
         StructField('resp_status', LongType(), True),
         StructField('result', StructType([
             StructField('allowed', BooleanType(), True),
+            StructField('decision', BooleanType(), True),
+            StructField('context', StructType([
+                StructField('reason_user', StructType([
+                    StructField('error', StringType(), True)
+                ]), True),
+                StructField('reason_admin', StructType([
+                    StructField('error', StringType(), True)
+                ]), True)
+            ]), True),
             StructField('dynamic_metadata', StructType([
                 StructField('parameterized_path', StringType(), True)
             ]), True),
