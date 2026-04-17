@@ -27,6 +27,7 @@ Each entity file follows a standard structure:
 - `business_entities/inspection.md` — Property inspections (vistorias)
 - `business_entities/losses.md` — Accounting write-offs and provisioning (perdas / PDD)
 - `business_entities/nps.md` — Net Promoter Score campaigns via Tracksale (NPS)
+- `business_entities/payments.md` — Payment transactions across Checkout, Wall Street, and Vans (pagamentos / cobrança checkout)
 - `business_entities/repairs.md` — Offboarding and ongoing property repairs (reparos)
 - `business_entities/satisfaction.md` — Customer Satisfaction scores across channels (CSAT / satisfação)
 - `business_entities/termination.md` — Contract terminations (rescisões / offboarding)
