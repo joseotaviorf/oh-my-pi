@@ -7,7 +7,7 @@ eval AS (
     fpe.sk_performance_evaluation_self,
     fpe.assignment_number,
     fpe.cycle_name,
-    CAST(regexp_extract(fpe.cycle_name, '([0-9]{4})', 1) AS INT) AS cycle_year,
+    CAST(regexp_extract(fpe.cycle_name, '([0-9]{{4}})', 1) AS INT) AS cycle_year,
     fpe.behavior_self,
     fpe.impact_self,
     fpe.behavior_manager,
