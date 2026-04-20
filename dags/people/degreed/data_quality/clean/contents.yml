@@ -6,8 +6,26 @@ table_level_validations:
   has_size:
     greater_than_or_equal_to: 500
     severity_level: Warning
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Warning
 
 column_level_validations:
   id:
     is_unique:
       severity_level: Warning
+    is_complete:
+      severity_level: Error
+  ts_load:
+    custom:
+      # Freshness guard: every row is rewritten on each run (NOW() AS ts_load).
+      # Flag when the newest row is older than 2 days — this would have caught
+      # the stale clean.contents table that went unnoticed from 2026-03-05 onward.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_degreed_clean.contents
+         WHERE ts_load < CURRENT_DATE() - INTERVAL 2 DAYS
+        ) = 0
+      severity_level: Error
