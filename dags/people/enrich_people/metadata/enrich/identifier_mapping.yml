@@ -5,7 +5,7 @@ domain: People
 description: |-
   Consolidated table that maps all identifiers for an employee (person, assignment, registration) in a single location. It serves as a crosswalk table to unify data from different HR systems and HCM tables.
   Business rule for employment continuity:
-  - GLB_TRANSFER continuation (same person and assignment_sequence + 1) keeps the same employment cycle.
+  - GLB_TRANSFER continuation (same person and assignment_sequence + 1) keeps the same employment cycle only when both assignments are type E or C (Pending P is excluded).
   - Non-transfer rehiring starts a new employment cycle.
   - dt_original_hired is the earliest dt_started inside the current employment cycle.
   This means dt_original_hired is a cycle-based company tenure date.
@@ -23,12 +23,13 @@ columns:
     lineage:
     - datalake_pin_core_clean.all_assignments.id_period_of_service
   id_continuous_employment_cycle:
-    description: Stable identifier of the person's current continuous employment cycle. GLB_TRANSFER continuation keeps the same cycle id; non-transfer rehiring starts a new cycle id.
+    description: Stable identifier of the person's current continuous employment cycle. GLB_TRANSFER between assignment types E or C only keeps the same cycle id; transfers into or out of Pending (P) start a new cycle; non-transfer rehiring starts a new cycle id.
     lineage:
     - datalake_pin_core_clean.periods_of_service.id_period_of_service
     - datalake_pin_core_clean.periods_of_service.id_person
     - datalake_pin_core_clean.all_assignments.action_code
     - datalake_pin_core_clean.all_assignments.assignment_sequence
+    - datalake_pin_core_clean.all_assignments.assignment_type
   id_person:
     description: Unique identifier for the person, shared across all their contracts.
     lineage:
@@ -110,7 +111,7 @@ columns:
       Original hire date for the current continuous employment cycle.
       Calculation:
       - group periods_of_service by person and cycle continuity
-      - keep continuity for GLB_TRANSFER continuation (assignment_sequence + 1)
+      - keep continuity for GLB_TRANSFER continuation (assignment_sequence + 1) for assignment types E and C only
       - start a new cycle for non-transfer rehiring
       - return the minimum dt_started inside the cycle
       Interpretation for business users:

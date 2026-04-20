@@ -111,7 +111,9 @@ transfer_continuation_periods AS (
             ON aa_next.id_person = aa.id_person
             AND aa_next.assignment_sequence = aa.assignment_sequence + 1
     WHERE
-        aa.assignment_status_type = 'INACTIVE'
+        aa.assignment_type IN ('E', 'C')
+        AND aa_next.assignment_type IN ('E', 'C')
+        AND aa.assignment_status_type = 'INACTIVE'
         AND aa.action_code = 'GLB_TRANSFER'
     QUALIFY
         ROW_NUMBER() OVER (

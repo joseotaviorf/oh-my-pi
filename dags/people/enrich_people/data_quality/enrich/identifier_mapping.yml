@@ -41,7 +41,7 @@ column_level_validations:
            ) assignment_violations
           ) = 0
           AND
-          (WITH transfer_links AS (
+           (WITH transfer_links AS (
              SELECT
                aa.id_period_of_service AS previous_id_period_of_service,
                aa_next.id_period_of_service AS next_id_period_of_service
@@ -49,7 +49,9 @@ column_level_validations:
              INNER JOIN datalake_pin_core_clean.all_assignments AS aa_next
                ON aa_next.id_person = aa.id_person
               AND aa_next.assignment_sequence = aa.assignment_sequence + 1
-             WHERE aa.assignment_status_type = 'INACTIVE'
+             WHERE aa.assignment_type IN ('E', 'C')
+               AND aa_next.assignment_type IN ('E', 'C')
+               AND aa.assignment_status_type = 'INACTIVE'
                AND aa.action_code = 'GLB_TRANSFER'
              QUALIFY ROW_NUMBER() OVER (
                PARTITION BY aa_next.id_period_of_service
