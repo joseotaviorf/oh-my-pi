@@ -97,10 +97,10 @@ class GenericContractQualityChecks:
         )
 
         if count_rows == 0:
-            raise RuntimeError(
-                f"Table {self.table_name} has no data in the last."
-                f"{self.threshold_time_hours} hours"
+            self.logger.warning(
+                f"Table {self.table_name} has no data in the last {self.threshold_time_hours} hours"
             )
+            return
         self.logger.info(
             f"""
             m=generic_contract_quality_checks,

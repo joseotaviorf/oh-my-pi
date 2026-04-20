@@ -61,16 +61,17 @@ class TestCheckEmptyPartitions:
     """Behaviour of ``_freshness_check``."""
 
     @pytest.mark.parametrize("threshold_hours", [1, 24, 72])
-    def test_raises_runtime_error_when_filtered_frame_is_empty(
+    def test_logs_warning_when_filtered_frame_is_empty(
         self, mock_pyspark_functions, spark_table_chain, threshold_hours
     ):
         spark, _ = spark_table_chain(count=0)
         checks = _make_checks(spark, threshold_time_hours=threshold_hours)
 
-        with pytest.raises(RuntimeError) as exc_info:
+        with patch.object(checks.logger, "warning") as mock_warning:
             checks._freshness_check()
 
-        msg = str(exc_info.value)
+        mock_warning.assert_called_once()
+        msg = mock_warning.call_args[0][0]
         assert TABLE in msg
         assert str(threshold_hours) in msg
         assert "has no data in the last" in msg
@@ -81,8 +82,7 @@ class TestCheckEmptyPartitions:
         spark, _ = spark_table_chain(count=0)
         checks = _make_checks(spark)
 
-        with pytest.raises(RuntimeError):
-            checks._freshness_check()
+        checks._freshness_check()
 
         assert len(checks.quality_checks_data) == 1
         row = checks.quality_checks_data[0]
@@ -193,15 +193,20 @@ class TestRun:
     @patch(
         "bietlejuice.base.sst.pipelines.quality.contracts.generic.validate_and_write"
     )
-    def test_run_does_not_persist_when_freshness_check_raises(
+    def test_run_persists_failed_metric_when_table_empty(
         self, mock_validate_and_write, mock_pyspark_functions, spark_table_chain
     ):
         spark, _ = spark_table_chain(count=0)
         checks = _make_checks(spark)
 
         with patch.object(checks.logger, "info"):
-            with pytest.raises(RuntimeError):
+            with patch.object(checks.logger, "warning"):
                 checks.run()
 
-        mock_validate_and_write.assert_not_called()
-        spark.createDataFrame.assert_not_called()
+        spark.createDataFrame.assert_called_once()
+        mock_validate_and_write.assert_called_once()
+        rows = spark.createDataFrame.call_args[0][0]
+        assert len(rows) == 1
+        assert rows[0]["status"] == "failed"
+        assert rows[0]["count_rows"] == 0
+        assert rows[0]["metric_name"] == "freshness"
