@@ -5,11 +5,14 @@ dag:
   schedule_start_date: 2026, 4, 9
   documentation:
     dag_purpose: |
-      Ingests Oitchau Integrations API resources into the raw layer: employees and hoursbank_totals.
+      Ingests Oitchau Integrations API resources into the raw layer and materializes matching clean
+      Delta tables in datalake_oitchau_clean (queries/clean, merge keys per table). Raw tables:
+      employees and hoursbank_totals.
       Store credentials in Databricks Secrets (scope `people`): JSON secret referenced by
       `authentication.secret_key` with `client_id` and `client_secret` for the integration client.
       employees uses no pagination (full load). hoursbank_totals uses id_expansion: one call per
       employee UUID from the employees table, fetching the D-1 hours bank balance for each employee.
+      Fan-out table hoursbank_totals is chained after employees via raw_inner_dependencies.
 
 cluster:
   type: custom_cluster
@@ -37,6 +40,10 @@ workflow:
   credentials_scope: people
   custom_schema: oitchau
   default_extraction_type: full
+  default_clean_partitions:
+    - year
+    - month
+    - day
   default_table_privileges:
     people-team:
       - ALL PRIVILEGES
@@ -63,10 +70,16 @@ workflow:
     rate_limiting:
       strategy: none
 
+  raw_inner_dependencies:
+    hoursbank_totals:
+      - employees
+
   tables_customization:
     employees:
       endpoint_path: employees
       params: {}
+      merge_on:
+        - id_employee_profile
       vacuum_retention_hours: 168
       vacuum_lite: true
 
@@ -80,5 +93,8 @@ workflow:
       date_format: "%Y-%m-%d"
       params:
         date: load_start_date
+      merge_on:
+        - id_employee_profile
+        - dt_balanced
       vacuum_retention_hours: 168
       vacuum_lite: true

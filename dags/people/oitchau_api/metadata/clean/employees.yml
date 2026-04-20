@@ -1,0 +1,246 @@
+database_name: datalake_oitchau_clean
+table_name: employees
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Source is the Oitchau Integrations API ingested into datalake_oitchau_raw.
+  Oitchau employee profile snapshot used for timesheet identity and joins to requests
+  and hours bank; one row per employee profile UUID after deduplication.
+columns:
+  is_active:
+    description: Boolean flag from Oitchau (is_active) describing eligibility or configuration
+      state.
+    lineage:
+    - datalake_oitchau_raw.employees.active
+  associate_products:
+    description: Business attribute from Oitchau clean projection (associate_products)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.associateProducts
+  role_ids:
+    description: Array of role identifier strings from Oitchau (roleUuids) for time and
+      attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.roleUuids
+  id_avatar_cloudinary:
+    description: Cloudinary asset identifier from Oitchau (avatarId) for the employee profile avatar image.
+    lineage:
+    - datalake_oitchau_raw.employees.avatarId
+  avatar_version:
+    description: Business attribute from Oitchau clean projection (avatar_version)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.avatarVersion
+  dt_birth:
+    description: Employee birth calendar date from Oitchau (birthDate) for age-restricted analytics where legally permitted.
+    lineage:
+    - datalake_oitchau_raw.employees.birthDate
+  id_company:
+    description: UUID identifier from Oitchau (id_company) used as a natural
+      key for joins.
+    lineage:
+    - datalake_oitchau_raw.employees.companyUuid
+  contracted_hours_per_week:
+    description: Business attribute from Oitchau clean projection (contracted_hours_per_week)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.contractedHoursPerWeek
+  employee_national_tax_number:
+    description: Employee national tax registration number from Oitchau (cpf) as returned by the API for clean-layer fidelity.
+    lineage:
+    - datalake_oitchau_raw.employees.cpf
+  dt_deactivated:
+    description: Calendar date derived from Oitchau source fields (dt_deactivated)
+      for daily or period analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.deactivateDate
+  timezone_default:
+    description: Business attribute from Oitchau clean projection (timezone_default)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.defaultTimeZone
+  department_code:
+    description: Business attribute from Oitchau clean projection (department_code)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.department.code
+  id_department:
+    description: Identifier from Oitchau (id_department) used as a natural or surrogate
+      key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.employees.department.id
+  department_name:
+    description: Business attribute from Oitchau clean projection (department_name)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.department.name
+  id_department_key:
+    description: Alternate natural key string from Oitchau (id_department_key) for joins
+      alongside numeric id_department.
+    lineage:
+    - datalake_oitchau_raw.employees.department.uuid
+  id_external:
+    description: Identifier from Oitchau (id_external) used as a natural
+      or surrogate key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.employees.externalId
+  full_name:
+    description: Business attribute from Oitchau clean projection (full_name) for
+      time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.fullName
+  id_employee:
+    description: Identifier from Oitchau (id_employee) used as a natural
+      or surrogate key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.employees.id
+  job_title:
+    description: Business attribute from Oitchau clean projection (job_title) for
+      time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.jobTitle
+  dt_last_timesheet_locked:
+    description: Calendar date derived from Oitchau source fields (dt_last_timesheet_locked)
+      for daily or period analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.lastLockDate
+  locations:
+    description: Business attribute from Oitchau clean projection (locations) for
+      time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.locations
+  registration_code:
+    description: Business attribute from Oitchau clean projection (registration_code)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.matricula
+  pis_number:
+    description: Business attribute from Oitchau clean projection (pis_number) for
+      time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.pis
+  id_own_team:
+    description: UUID identifier from Oitchau (id_own_team) used as a natural
+      key for joins.
+    lineage:
+    - datalake_oitchau_raw.employees.ownTeamUuid
+  id_position_external:
+    description: External business identifier for the employee position from Oitchau (position.externalId).
+    lineage:
+    - datalake_oitchau_raw.employees.position.externalId
+  id_position:
+    description: Identifier from Oitchau (id_position) used as a natural or surrogate
+      key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.employees.position.id
+  position_title:
+    description: Business attribute from Oitchau clean projection (position_title)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.position.title
+  id_position_key:
+    description: Alternate natural key string from Oitchau (id_position_key) for joins
+      alongside numeric id_position.
+    lineage:
+    - datalake_oitchau_raw.employees.position.uuid
+  project_employee_cost:
+    description: Business attribute from Oitchau clean projection (project_employee_cost)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.projectEmployeeCost
+  role_name:
+    description: Business attribute from Oitchau clean projection (role_name) for
+      time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.role
+  dt_hired:
+    description: Calendar date derived from Oitchau source fields (dt_hired)
+      for daily or period analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.startDate
+  subsidiary_code:
+    description: Business attribute from Oitchau clean projection (subsidiary_code)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.subsidiary.code
+  id_subsidiary:
+    description: Identifier from Oitchau (id_subsidiary) used as a natural or surrogate
+      key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.employees.subsidiary.id
+  subsidiary_name:
+    description: Business attribute from Oitchau clean projection (subsidiary_name)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.subsidiary.name
+  id_subsidiary_taxpayer:
+    description: Taxpayer registration identifier for the subsidiary legal entity from Oitchau (subsidiary.taxPayerId).
+    lineage:
+    - datalake_oitchau_raw.employees.subsidiary.taxPayerId
+  id_subsidiary_key:
+    description: Alternate natural key string from Oitchau (id_subsidiary_key) for joins
+      alongside numeric id_subsidiary.
+    lineage:
+    - datalake_oitchau_raw.employees.subsidiary.uuid
+  id_supervisor_external:
+    description: External business identifier for the supervisor employee record from Oitchau (supervisor.externalId).
+    lineage:
+    - datalake_oitchau_raw.employees.supervisor.externalId
+  supervisor_full_name:
+    description: Business attribute from Oitchau clean projection (supervisor_full_name)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.supervisor.fullName
+  id_supervisor:
+    description: Identifier from Oitchau (id_supervisor) used as a natural or surrogate
+      key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.employees.supervisor.id
+  supervisor_registration_code:
+    description: Business attribute from Oitchau clean projection (supervisor_registration_code)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.employees.supervisor.matricula
+  supervisor_pis_number:
+    description: Supervisor PIS registration number from Oitchau (supervisor.pis) for clean-layer source fidelity.
+    lineage:
+    - datalake_oitchau_raw.employees.supervisor.pis
+  id_supervisor_key:
+    description: Alternate natural key string from Oitchau (id_supervisor_key) for joins
+      alongside numeric id_supervisor.
+    lineage:
+    - datalake_oitchau_raw.employees.supervisor.uuid
+  id_team:
+    description: UUID identifier from Oitchau (id_team) used as a natural key
+      for joins.
+    lineage:
+    - datalake_oitchau_raw.employees.teamUuid
+  ts_updated:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_updated)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.employees.updatedAt
+  id_employee_profile:
+    description: UUID identifier from Oitchau (id_employee_profile) used as a
+      natural key for joins.
+    lineage:
+    - datalake_oitchau_raw.employees.uuid
+  ts_load:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_load)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.employees.ts_load
+  year:
+    description: Airflow ingestion partition column year from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.employees.year
+  month:
+    description: Airflow ingestion partition column month from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.employees.month
+  day:
+    description: Airflow ingestion partition column day from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.employees.day

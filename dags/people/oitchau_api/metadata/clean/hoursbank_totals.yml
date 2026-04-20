@@ -1,0 +1,42 @@
+database_name: datalake_oitchau_clean
+table_name: hoursbank_totals
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Source is the Oitchau Integrations API ingested into datalake_oitchau_raw.
+  Oitchau hours-bank daily totals per employee profile and balance date for workforce
+  hour liability analytics.
+columns:
+  id_employee_profile:
+    description: UUID identifier from Oitchau (id_employee_profile) used as a
+      natural key for joins.
+    lineage:
+    - datalake_oitchau_raw.hoursbank_totals.uuid
+  dt_balanced:
+    description: Calendar date derived from Oitchau source fields (dt_balanced) for
+      daily or period analytics.
+    lineage:
+    - datalake_oitchau_raw.hoursbank_totals.date
+  hours_bank_totals:
+    description: Raw hours-bank totals payload from Oitchau (totals), typically a map of rule key to minutes; explode or flatten in enrich or DW.
+    lineage:
+    - datalake_oitchau_raw.hoursbank_totals.totals
+  ts_load:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_load)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.hoursbank_totals.ts_load
+  year:
+    description: Airflow ingestion partition column year from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.hoursbank_totals.year
+  month:
+    description: Airflow ingestion partition column month from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.hoursbank_totals.month
+  day:
+    description: Airflow ingestion partition column day from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.hoursbank_totals.day
