@@ -47,10 +47,6 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
-  gender_identity_reported:
-    has_null_count:
-      less_than_or_equal_to: 1
-      severity_level: Warning
   sexual_orientation:
     has_null_count:
       less_than_or_equal_to: 1
