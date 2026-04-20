@@ -1,80 +1,117 @@
 ---
 name: trino
-description: "TD Trino SQL with TD-specific functions (td_interval, td_time_range, td_time_string, td_sessionize). Use for writing and executing SQL against Trino/Treasure Data. Handles CLI detection, setup guidance, and Python-based execution."
+description: "Execute SQL against QuintoAndar's Trino cluster. Handles venv bootstrap, host resolution, SSO authentication, LIMIT safeguard, and persistence of results. Pure connectivity/execution — contains NO SQL authoring guidance (dialect, partition filters, layer choice live in data_exploration.mdc). ONLY usable when `@tars` mode is active; never invoke autonomously."
 ---
 
-# Treasure Data Trino SQL
+# Trino Execution Skill
 
-You are a senior data engineer specializing in Treasure Data (TD) Trino SQL. Your goal is to write efficient, high-performance queries and execute them while ensuring the environment is properly configured.
+Pure execution layer for the TARS loop. This skill does **not** teach SQL syntax, dialect conversion, partition filters, layer choice, or any authoring rule — those live in `.cursor/rules/data_exploration.mdc`. Authoring happens there; this skill only runs the finished SQL against the Trino cluster and returns its raw JSON output.
 
-## Trino Query Checklist
-- **Always include a time filter** on the `time` column to ensure partition pruning.
-- **Prefer `td_interval`** for relative time windows.
-- **Use `approx_distinct()` and `approx_percentile()`** for large datasets.
-- **Check environment** for `trino` CLI or `trino-python-client` before executing.
-- **Prompt for setup** if no execution path is found.
+---
+
+## Activation gate (mandatory)
+
+This skill is usable **only when the user has activated `@tars`** (same gating as `.cursor/rules/data_exploration.mdc` and `.cursor/subagents/data_analyst.md`).
+
+- Do NOT load or invoke this skill in contribution mode.
+- Do NOT mention or suggest this skill to users who are not in `@tars` mode.
+- If you find yourself reading this file outside a `@tars` session, stop and return to the standard repository context.
+
+---
 
 ## Execution Workflow
 
-### 1. Pre-requisite Check
-Ensure `pandas` and `keyring` are installed in the `.venv`.
+### 1. Bootstrap (first run only)
 
-### 2. Environment Setup
-The default Trino host for this repository is **`trino.apps.data-prd.habitat.zone`**. Users are expected to have this as `TRINO_HOST` in their `.env` (`TRINO_HOST=trino.apps.data-prd.habitat.zone`). If `TRINO_HOST` is not set, fall back to this default — in last case, ask the user to prompt the value.
-
-### 3. Execution
-Use the bundled `execute_trino.py` script for all queries. This script handles OAuth2/SSO authentication and caches tokens to prevent repeated prompts. Always pass the default host explicitly so the call works even when the user has not exported `TRINO_HOST`:
+If `venv` does not exist inside the skill folder, create it and install dependencies. One-time setup, no prior configuration required:
 
 ```bash
-.venv/bin/python3 scripts/execute_trino.py \
+[ ! -d .cursor/skills/trino/venv ] && \
+    python3 -m venv .cursor/skills/trino/venv && \
+    .cursor/skills/trino/venv/bin/pip install trino pandas keyring
+```
+
+### 2. Environment
+
+Default Trino host for this repository: **`trino.apps.data-prd.habitat.zone`**. Users are expected to have `TRINO_HOST=trino.apps.data-prd.habitat.zone` in their `.env`. Always pass the host as `"${TRINO_HOST:-trino.apps.data-prd.habitat.zone}"` so the user's override wins and the default is used otherwise. Never hardcode a different host.
+
+### 3. LIMIT safeguard
+
+Before executing, inspect the SQL. If it has no `LIMIT` clause, append `LIMIT 1000` purely as an execution safeguard so results stay bounded. Aggregates and counts may use a smaller bound. This is an **execution-only** safeguard — the SQL returned to the user in the reply is the original SQL without the safeguard LIMIT (call it out in prose if added).
+
+### 4. Invoke the bundled script
+
+Always invoke the bundled Python script. Do **not** use the `trino` CLI directly — the script handles OAuth2/SSO and caches tokens to prevent repeated prompts:
+
+```bash
+.cursor/skills/trino/venv/bin/python3 .cursor/skills/trino/scripts/execute_trino.py \
     --host "${TRINO_HOST:-trino.apps.data-prd.habitat.zone}" \
+    --catalog hive \
     --query "YOUR_SQL_HERE" \
     --external-auth
 ```
 
-**Mandatory Parameters:**
-- `--query`: The SQL query to execute.
-- `--external-auth`: Always include this flag for SSO environments.
-- `--host`: Always pass `"${TRINO_HOST:-trino.apps.data-prd.habitat.zone}"` so the default host is applied when the env var is not set.
+**Mandatory flags:**
+- `--query`: the SQL to execute.
+- `--host "${TRINO_HOST:-trino.apps.data-prd.habitat.zone}"`: always pass exactly this pattern.
+- `--external-auth`: always include for SSO environments.
 
-**Optional Parameters:**
-- `--port`: Defaults to 443 (HTTPS).
-- `--catalog` / `--schema`: Target specific data locations.
+**Optional flags:**
+- `--port`: defaults to 443 (HTTPS).
+- `--schema`: target a specific schema within the catalog.
 
-*Note: Do NOT use the `trino` CLI directly. The Python script is the primary and only execution path to ensure token caching works correctly.*
+Single quotes inside the SQL must be escaped with `'\''` when embedded in the shell string.
 
-## Time-Based Filtering (Syntax)
+### 5. Output contract
 
-### Relative Time with `td_interval`
-```sql
-where td_interval(time, '-1d', 'JST')      -- Yesterday (JST)
-where td_interval(time, '-1w', 'JST')      -- Previous week
+The script prints exactly one JSON object to stdout:
+
+- On success: `{ "status": "success", "columns": [...], "data": [[...], ...], "count": N }`.
+- On failure: `{ "status": "error", "message": "..." }`.
+
+### 6. Persist the full result
+
+Save the script's stdout **verbatim** (never copy-paste, never truncate) to:
+
+```
+<cursor_project_folder>/tars_query_results/<session_id>__<entry_index>.json
 ```
 
-### Explicit Ranges with `td_time_range`
-```sql
-where td_time_range(time, '2024-01-01', '2024-01-31')
-```
+`<cursor_project_folder>` is the directory that contains `agent-transcripts/` and `terminals/`. **Never** save to the workspace root (`bi-etl-ejuice/`) — always use the Cursor project folder. `<session_id>` and `<entry_index>` are provided by the TARS loop (see `.cursor/subagents/data_analyst.md`). Create the `tars_query_results/` folder on first write. Use shell redirection (`> "<path>"`) — not file-write tools.
 
-## Company Usage Examples
+### 7. Error handling
 
-To trigger this skill for company-specific queries, use prompts like:
+If the JSON has `status: "error"`, do NOT retry silently:
+- Surface the Trino error message to the user.
+- Still save the error JSON to the result file (the file must exist even on failure — the TARS loop references it).
+- Wait for the user to confirm a fix before re-executing.
 
-- **"Execute a Trino query to count the number of active users in the last 7 days from the `web_logs` database."**
-- **"Run a Trino SQL on `marketing.campaign_performance` to get the conversion rate for yesterday (JST)."**
-- **"Connect to Trino and show me the first 10 rows of the `transactions` table in the `sales` schema."**
-- **"Check if I have the Trino CLI installed, and if so, run `SELECT count(*) FROM access_logs`."**
-- **"I need to sessionize user events from `raw_events`. Can you write the Trino query and execute it for the last 24 hours?"**
+---
 
-## Performance Guidelines
-- **Good:** `where td_time_range(time, '2024-01-01', '2024-01-02')`
-- **Bad:** `where event_type = 'click'` (Missing time filter)
+## Common errors
 
-## Common Error Resolution
-- **Memory limit**: Add narrower time filters or use `approx_` functions.
-- **CLI not found**: Fallback to Python mode or prompt for installation.
-- **Timezone issues**: Specify timezone explicitly (e.g., 'JST', 'UTC').
+| Symptom | Cause | Fix |
+|---|---|---|
+| Memory limit exceeded | Query scans too much data | Tighten partition filters on the correct partition columns for the table (verify via declaration or metadata YAML — see `data_exploration.mdc`) |
+| Authentication prompt loop | Token cache missing/expired | Re-run once; the script caches the token after first SSO round-trip |
+| Host resolution error | `TRINO_HOST` set to a stale value | Unset or set to `trino.apps.data-prd.habitat.zone` |
 
-## Reference Resources
+---
+
+## Out of scope for this skill
+
+The following belong to `.cursor/rules/data_exploration.mdc`, not here:
+
+- SQL dialect conversion (Databricks → Trino).
+- Layer priority (DW → enrich → clean → metric).
+- Partition filters (`year`, `month`, `day`), column verification, entity routing.
+- Response shape (Markdown preview, row-count summary, case i vs case ii rendering).
+- `SELECT *` policy, deduplication patterns, type-safe JOINs.
+
+If you catch yourself answering one of those questions from this file, stop — the rule is the authority.
+
+---
+
+## Reference
+
 - [Trino Official Documentation](https://trino.io/docs/current/)
-- [Treasure Data Trino Functions Reference](https://docs.treasuredata.com/display/public/PD/Trino+SQL+Reference)

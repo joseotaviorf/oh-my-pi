@@ -24,6 +24,19 @@ When this rule is active, also read and follow `.cursor/subagents/data_analyst.m
 
 ---
 
+## Mandatory Execution (source of truth)
+
+**Every SQL produced in TARS mode MUST be executed** through the `.cursor/skills/trino/SKILL.md` skill. This applies to both:
+
+- **Case (i) — user asks for results** (e.g. "me retorne a quantidade de contratos assinados"): execute, then render a Markdown preview of at most 20 rows, state the total row count, and point to the saved JSON path.
+- **Case (ii) — user asks only for the query** (e.g. "me dê só a SQL, não rode"): **execute anyway** to validate it. In the reply, suppress the preview and include only the SQL plus a one-line validation status — either `Validada com sucesso` or the exact Trino error message. The JSON and track-record entry are saved in both cases.
+
+Execution is never optional. The only case where you should not hit Trino is when the user's question is purely conceptual (no SQL produced).
+
+All technical details of execution — venv bootstrap, `TRINO_HOST`, the `execute_trino.py` invocation, `LIMIT 1000` safeguard, result persistence path, error handling — live exclusively in `.cursor/skills/trino/SKILL.md`. This rule does not duplicate them; delegate to the skill.
+
+---
+
 ## SQL Dialect — Trino Only
 
 All queries generated in Data Exploration mode must use **Trino SQL syntax**. Analysts run queries on Trino (via Superset, DBeaver, or ad-hoc tools), never on Databricks directly.
@@ -42,7 +55,7 @@ All queries generated in Data Exploration mode must use **Trino SQL syntax**. An
 ### Trino-specific rules
 
 - `GROUP BY` and `ORDER BY` must reference the full column expression, not a SELECT alias. Trino does not resolve aliases in these clauses.
-- Always apply partition filters (`year`, `month`, `day`) to avoid full table scans, ask user for specific date or date range
+- Always apply partition filters to avoid full table scans, and ask the user for a specific date or date range. **Before writing the filter, verify the actual partition columns** for the target table — do not assume `year`, `month`, `day`. Look up the table's `*_declaration.yml` (field `partitions`) or its `metadata/{layer}/{table}.yml` (priority-10 columns per naming conventions). Some tables use `year/month/day/hour`, others use a single `dt_reference`, and columns named `year` or `month` are not always partitions.
 - Date filters must target the **main entity** of the question, not secondary entities
 - Avoid `SELECT *` in final queries — select only the columns needed for the analysis. `SELECT *` is acceptable in quick exploration or when adapting Golden Queries.
 - When the user asks for a count or rate, ensure the grain matches the expected output (watch out for JOINs that multiply rows)
@@ -121,10 +134,6 @@ When answering user questions about data:
 2. **Review entity rules** — check Dos and Don'ts for mandatory patterns before producing any SQL
 3. **Pick the right table** — follow the layer priority above and the entity's Tables section
 4. **Write Trino SQL** — all queries must use Trino syntax; convert Databricks constructs automatically
-5. **Execute the SQL on Trino** — use the `.cursor/skills/trino/SKILL.md` skill and its `execute_trino.py` script. Do not return SQL without running it unless the user explicitly asks for the query only.
-6. **Preview ≤ 10 rows** — show at most 10 rows of the result as a Markdown table in the reply, even if the query returned more. Mention the total row count.
-7. **Persist the full result** — save the raw JSON output from the script to `<cursor_project_folder>/tars_query_results/<session_id>__<entry_index>.json`.
-8. **Explain your reasoning** — briefly describe assumptions, table choices, and any caveats
-9. **Cite your sources** — mention which tables and columns you referenced so the user can verify
-
-Full execution rules (script invocation, error handling, response shape, and the `result_file` / `rows_returned` / `query_executed` track-record fields) live in `.cursor/subagents/data_analyst.md` under "Query Execution Workflow".
+5. **Delegate execution to the Trino skill** — after the SQL is final, hand it off to `.cursor/skills/trino/SKILL.md`. That skill is the single source of truth for script invocation, LIMIT safeguard, result persistence, and error handling. Follow the render rules from "Mandatory Execution" above for case (i) vs case (ii).
+6. **Explain your reasoning** — briefly describe assumptions, table choices, and any caveats
+7. **Cite your sources** — mention which tables and columns you referenced so the user can verify

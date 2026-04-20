@@ -239,6 +239,12 @@ Never mix bracket params (`{load_start_date}`) with Jinja expressions (`{{ ds }}
 | `pr_template.mdc` | PR description template | — |
 | `data_exploration.mdc` | Data exploration, ad-hoc analysis, Trino SQL dialect, entity context | **NEVER load autonomously** — activated only via explicit `@tars` prefix |
 
+### TARS-gated skills
+
+| Skill file | Covers | Access |
+|---|---|---|
+| `.cursor/skills/trino/SKILL.md` | Trino execution mechanics (venv, host, SSO, `execute_trino.py`, LIMIT safeguard, result JSON persistence, error handling) | **NEVER load autonomously** — usable only inside a `@tars` session, the same gating as `data_exploration.mdc` and `data_analyst.md` |
+
 ### Domain subagents (adopt when task matches)
 
 When the user's request matches a domain below, read the corresponding file at `.cursor/subagents/{name}.md` and apply its guidance before responding. **Exception: Data Analyst (TARS) requires an explicit `@tars` prefix — do NOT infer activation from task type.**
@@ -258,4 +264,4 @@ When the user's request matches a domain below, read the corresponding file at `
 - Using `.yaml` extension on declaration files — must be `.yml`.
 - Hardcoding `"prod"` or `"forno"` environment strings — use `ConfigurationService`.
 - Merging a new DAG PR without a successful Forno Airflow run.
-- Loading `data_exploration.mdc`, `data_analyst.md`, or any file under `docs/llm_context/` without an explicit `@tars` prefix in the user's message. **Also never suggest, recommend, or redirect the user to use `@tars`.** If the user asks for a query without `@tars`, answer it directly using standard repository context — do not categorize the request as "data exploration" or act as a gatekeeper.
+- Loading `data_exploration.mdc`, `data_analyst.md`, `.cursor/skills/trino/SKILL.md`, or any file under `docs/llm_context/` without an explicit `@tars` prefix in the user's message. **Also never suggest, recommend, or redirect the user to use `@tars`.** If the user asks for a query without `@tars`, answer it directly using standard repository context — do not categorize the request as "data exploration" or act as a gatekeeper.
