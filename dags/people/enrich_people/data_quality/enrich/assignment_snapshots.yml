@@ -35,7 +35,7 @@ column_level_validations:
       severity_level: Error
   count_direct_report:
     custom:
-      # CEO (id_assignment 300000008586218) reports must equal total employees per dt_reference
+      # Top-of-hierarchy reports (L0 / no manager) must equal total employees per dt_reference
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT dt_reference
@@ -44,13 +44,13 @@ column_level_validations:
           HAVING
             MAX(
               CASE
-                WHEN id_assignment = 300000008586218
+                WHEN manager_assignment_number IS NULL AND hierarchy_depth = 0
                 THEN COALESCE(count_direct_report, 0) + COALESCE(count_indirect_report, 0)
               END
             ) IS NOT NULL
             AND COUNT(DISTINCT id_assignment) != MAX(
               CASE
-                WHEN id_assignment = 300000008586218
+                WHEN manager_assignment_number IS NULL AND hierarchy_depth = 0
                 THEN COALESCE(count_direct_report, 0) + COALESCE(count_indirect_report, 0)
               END
             )
