@@ -29,17 +29,10 @@ workflow:
     auditlogs: ["ALL PRIVILEGES"]
 
 cluster:
-  type: custom_cluster
+  type: consolidation_m_general_single_node_cluster
   custom_configurations:
-    driver_node_type_id: r5a.2xlarge
-    node_type_id: r5a.2xlarge
-    num_workers: 2
-    spark_version: 16.4.x-scala2.12
     spark_conf:
       spark.sql.legacy.json.allowEmptyString.enabled: "true"
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
-    data_security_mode: SINGLE_USER
   access_control_list:
     group_name: auditlogs
     permission_level: CAN_MANAGE
