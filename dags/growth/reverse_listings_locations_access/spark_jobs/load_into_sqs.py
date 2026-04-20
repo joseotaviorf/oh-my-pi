@@ -75,7 +75,12 @@ def is_valid(row) -> bool:
     if not isinstance(row.city_id, int) or row.city_id <= 0:
         return False
 
-    count_fields = ["count_rent", "count_sale", "navent_count_rent", "navent_count_sale"]
+    count_fields = [
+        "count_rent",
+        "count_sale",
+        "navent_count_rent",
+        "navent_count_sale",
+    ]
     for field in count_fields:
         if not isinstance(getattr(row, field), int) or getattr(row, field) < 0:
             return False
@@ -87,6 +92,7 @@ def row_to_dict(row) -> Dict:
     return {
         "street": row.street if row.street else None,
         "neighborhood": row.neighborhood if row.neighborhood else None,
+        "neighborhood_id": int(row.neighborhood_id) if row.neighborhood_id else None,
         "city": row.city,
         "city_id": row.city_id,
         "business_contexts": row.business_contexts,
