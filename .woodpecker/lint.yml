@@ -1,5 +1,5 @@
-when:
-  event: push
+# Steps run only when Python sources change (step-level when); pipeline is always scheduled
+# so downstream pipelines (e.g. release depends_on: lint) are not blocked when no .py files change.
 
 steps:
   check-style-python:
@@ -9,6 +9,11 @@ steps:
       - apt-get install -y git > /dev/null
       - make requirements-lint
       - make check-style
+    when:
+      event: push
+      path:
+        include: ['**/*.py']
+        on_empty: false
     depends_on: [] # This is for the steps to run in parallel
 
   files-validation-python:
@@ -19,3 +24,8 @@ steps:
       - pip install --upgrade pip
       - make requirements-test
       - make files-validation
+    when:
+      event: push
+      path:
+        include: ['**/*.py']
+        on_empty: false

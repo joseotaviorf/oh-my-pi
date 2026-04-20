@@ -1,3 +1,9 @@
+# Path filters use Woodpecker `when.path` (push only). Skipped steps count as success so
+# downstream workflows (e.g. release depends_on: validations) still pass.
+#
+# DAG-side globs are kept coarse (`dags/**/*` or `dags/**/*.yml` where enough) instead of
+# per-folder patterns, so `when.path.include` stays short. Steps may run a bit more often than
+# strictly necessary; validation scripts still scope work via git diff where applicable.
 clone:
   - name: clone
     image: woodpeckerci/plugin-git
@@ -13,6 +19,12 @@ steps:
       - make validate-dag-declaration-files level=debug
     when:
       event: push
+      path:
+        include:
+          - 'dags/**/*.yml'
+          - 'bietlejuice/base/airflow/dag_builders/**/*.py'
+          - 'scripts/ci_cd/airflow_dag_builder/**/*.py'
+        on_empty: false
     depends_on: [] # This is for the steps to run in parallel
 
   validate-dags-up-to-standard:
@@ -22,6 +34,12 @@ steps:
       - make validate-dags-up-to-standard
     when:
       event: push
+      path:
+        include:
+          - 'dags/**/*'
+          - 'scripts/dag_standard_validation/**'
+          - 'bietlejuice/base/airflow/dag_builders/**/*.py'
+        on_empty: false
 
   validate-dags-dependencies-forno:
     image: public.ecr.aws/docker/library/python:3.7.16
@@ -36,6 +54,15 @@ steps:
         exclude:
           - master
           - hotfix/*
+      path:
+        include:
+          - 'dags/**/*'
+          - 'bietlejuice/base/dependencies/**/*.py'
+          - 'bietlejuice/base/airflow/**/*.py'
+          - 'bietlejuice/base/db/**/*.py'
+          - 'scripts/ci_cd/validate_dags_dependencies.py'
+          - 'scripts/dependency_handling/**'
+        on_empty: false
 
   validate-dags-dependencies-prod:
     image: public.ecr.aws/docker/library/python:3.7.16
@@ -47,6 +74,15 @@ steps:
     when:
       event: push
       branch: [master, hotfix/*]
+      path:
+        include:
+          - 'dags/**/*'
+          - 'bietlejuice/base/dependencies/**/*.py'
+          - 'bietlejuice/base/airflow/**/*.py'
+          - 'bietlejuice/base/db/**/*.py'
+          - 'scripts/ci_cd/validate_dags_dependencies.py'
+          - 'scripts/dependency_handling/**'
+        on_empty: false
 
   validate-dependency-file-correctness:
     image: public.ecr.aws/docker/library/python:3.7.16
@@ -56,6 +92,15 @@ steps:
       - make validate-dependency-file-correctness
     when:
       event: push
+      path:
+        include:
+          - 'dags/**/*'
+          - 'bietlejuice/base/dependencies/**/*.py'
+          - 'bietlejuice/base/airflow/**/*.py'
+          - 'bietlejuice/base/db/**/*.py'
+          - 'scripts/ci_cd/validate_dags_dependencies.py'
+          - 'scripts/dependency_handling/**'
+        on_empty: false
 
   validate-metadata-files-content:
     image: public.ecr.aws/docker/library/python:3.7.16
@@ -66,6 +111,11 @@ steps:
       event: push
       branch:
         exclude: [forno, hotfix/*]
+      path:
+        include:
+          - 'dags/**/*.yml'
+          - 'scripts/governance_metadata_validation/**'
+        on_empty: false
 
   validate-metadata-files-exist:
     image: public.ecr.aws/docker/library/python:3.7.16
@@ -76,6 +126,11 @@ steps:
       event: push
       branch:
         exclude: [forno, hotfix/*]
+      path:
+        include:
+          - 'dags/**/*.sql'
+          - 'scripts/governance_metadata_validation/**'
+        on_empty: false
 
   validate-lineage-consistency:
     image: public.ecr.aws/docker/library/python:3.7.16
@@ -84,6 +139,11 @@ steps:
       - make validate-lineage-consistency
     when:
       event: push
+      path:
+        include:
+          - 'dags/**/*'
+          - 'scripts/governance_metadata_validation/**'
+        on_empty: false
 
   validate-core-model-schemas:
     image: public.ecr.aws/docker/library/python:3.7.16
@@ -92,6 +152,11 @@ steps:
       - make validate-core-model-schemas
     when:
       event: push
+      path:
+        include:
+          - 'dags/core/**/*'
+          - 'scripts/ci_cd/validate_core_model_schemas.py'
+        on_empty: false
 
   validate-core-model-schema-content:
     image: public.ecr.aws/docker/library/python:3.7.16
@@ -100,6 +165,12 @@ steps:
       - make validate-core-model-schema-content
     when:
       event: push
+      path:
+        include:
+          - 'dags/core/**/*'
+          - 'scripts/ci_cd/validate_core_model_schema_content.py'
+          - 'bietlejuice/base/core_models/**/*.py'
+        on_empty: false
 
   validate-source-layer-policy:
     image: public.ecr.aws/docker/library/python:3.7.16
@@ -110,4 +181,8 @@ steps:
       event: push
       branch:
         exclude: [forno, hotfix/*]
-
+      path:
+        include:
+          - 'dags/**/*'
+          - 'scripts/ci_cd/source_layer_validation/**'
+        on_empty: false

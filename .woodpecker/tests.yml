@@ -1,3 +1,5 @@
+# Path filters use Woodpecker `when.path` (push only). Skipped steps count as success so
+# downstream workflows (e.g. release depends_on: tests) still pass.
 clone:
   - name: clone
     image: woodpeckerci/plugin-git
@@ -16,6 +18,9 @@ steps:
       - make unit-tests
     when:
       event: push
+      path:
+        include: ['**/*.py']
+        on_empty: false
     depends_on: [] # This is for the steps to run in parallel
 
   integration-tests-python:
@@ -29,6 +34,9 @@ steps:
       - make integration-tests
     when:
       event: push
+      path:
+        include: ['**/*.py']
+        on_empty: false
     depends_on: [] # This is for the steps to run in parallel
 
   core-model-tests-and-coverage:
@@ -42,3 +50,10 @@ steps:
       - make core-model-coverage
     when:
       event: push
+      path:
+        include:
+          # Same roots as scripts/ci_cd/core_models/check_core_model_changes.py (Python only)
+          - 'dags/core/**/*.py'
+          - 'tests/core_model_dags/**/*.py'
+          - 'bietlejuice/base/core_models/**/*.py'
+        on_empty: false
