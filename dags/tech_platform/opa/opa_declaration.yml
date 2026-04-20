@@ -29,10 +29,34 @@ workflow:
     auditlogs: ["ALL PRIVILEGES"]
 
 cluster:
-  type: consolidation_m_general_single_node_cluster
+  type: consolidation_g_general_photon_cluster
   custom_configurations:
     spark_conf:
+      # Required to parse OPA audit log JSON entries with empty string values.
       spark.sql.legacy.json.allowEmptyString.enabled: "true"
+
+      # --- S3 client tuning -------------------------------------------------
+      # The job reads ~150k tiny .gz files per hour; the dominant cost is S3
+      # round-trip latency, not bandwidth. Bump the per-JVM S3A thread pool
+      # and connection pool so each executor can saturate its NIC with many
+      # concurrent GETs instead of waiting on the default 10/15.
+      spark.hadoop.fs.s3a.threads.max: "64"
+      spark.hadoop.fs.s3a.connection.maximum: "200"
+
+      # --- Partition discovery (LIST) --------------------------------------
+      # Default is spark.default.parallelism, which is tiny on small workers.
+      # Force a higher fanout so the recursive LIST against the source bucket
+      # is parallelized across many threads instead of serialized on the
+      # driver.
+      spark.sql.sources.parallelPartitionDiscovery.parallelism: "200"
+
+      # --- File grouping into tasks ----------------------------------------
+      # Default 128 MB packs ~1500 tiny .gz files into a single task, hurting
+      # parallelism, failure recovery and S3-thread utilization. Drop to
+      # 16 MB and lower the per-file open-cost estimate so Spark plans many
+      # small, balanced tasks instead of a few fat ones.
+      spark.sql.files.maxPartitionBytes: "16777216"
+      spark.sql.files.openCostInBytes: "1048576"
   access_control_list:
     group_name: auditlogs
     permission_level: CAN_MANAGE
