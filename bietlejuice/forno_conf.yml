@@ -1883,27 +1883,34 @@ consolidation_m_general_single_node_cluster:
         <<: *cluster_custom_tags_anchor
         ResourceClass: "SingleNode"
 
-# Multi-node Graviton preset tuned for high-fanout S3 ingestion of many
-# small JSON files (e.g. OPA / Istio audit logs). Throughput on this
-# workload is bounded by S3 GET latency, not by CPU, so spreading work
-# across multiple workers (independent NICs and S3 connection pools)
-# matters more than vCPU per worker. The driver is memory-optimized
-# (r-class) because partition discovery loads ~100k file paths into
-# driver memory and the Spark JVM heap routinely climbs to ~7 GB during
-# the load; the follow-up Python tasks in the same DAG (e.g. metastore
-# register-table) then need room to import psycopg2 and run alongside
-# the still-warm Spark JVM. We sized this at 32 GB rather than 16 GB
-# because Databricks auto-scales the driver heap proportionally to node
-# memory: on a 16 GB driver the heap grew to ~14-15 GB, leaving Python
-# starved and OOM'ing on the psycopg2 import. The DAGs themselves cap
-# spark.driver.memory at 16g so Python is guaranteed ~14-15 GB of free
-# OS memory regardless of node size.
+# Multi-node Graviton + Photon preset tuned for high-fanout S3 ingestion
+# of many small JSON files (e.g. OPA / Istio audit logs). Throughput is
+# bounded by S3 GET latency, not by CPU, so spreading work across many
+# workers (independent NICs and S3 connection pools) matters more than
+# vCPU per worker. Photon is enabled for two reasons:
+#
+#   1. It vectorizes JSON parsing and Delta MERGE on the executors,
+#      cutting per-task CPU work and overall load runtime.
+#   2. On the driver it changes Databricks' memory budgeting: Photon
+#      reserves off-heap native memory for its own allocator, so the
+#      JVM heap is auto-sized smaller than on a vanilla Spark driver
+#      of the same node size. That leaves more free OS memory for the
+#      follow-up Python tasks in the DAG (e.g. metastore register-table)
+#      to import psycopg2 and run alongside the still-warm Spark JVM
+#      without OOM'ing.
+#
+# The driver is r8g.large (16 GB) -- a non-Photon driver of this size
+# was OOM'ing the Python tasks because the JVM heap grew to ~14-15 GB.
+# With Photon enabled the heap is capped lower by Databricks itself,
+# which is why we no longer set spark.driver.memory in the consuming
+# DAGs.
 consolidation_g_general_photon_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r8g.xlarge
+    driver_node_type_id: r8g.large
     node_type_id: m8g.xlarge
     num_workers: 4
     spark_version: 16.4.x-scala2.12
+    runtime_engine: PHOTON
 
 ### Notification Configs ###
 notification_webhooks_keys:
