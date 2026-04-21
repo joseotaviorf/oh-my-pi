@@ -1702,34 +1702,35 @@ consolidation_m_general_single_node_cluster:
         <<: *cluster_custom_tags_anchor
         ResourceClass: "SingleNode"
 
-# Multi-node Graviton + Photon preset tuned for high-fanout S3 ingestion
-# of many small JSON files (e.g. OPA / Istio audit logs). Throughput is
-# bounded by S3 GET latency, not by CPU, so spreading work across many
+# Multi-node Graviton preset tuned for high-fanout S3 ingestion of many
+# small JSON files (e.g. OPA / Istio audit logs). Throughput is bounded
+# by S3 GET latency, not by CPU or NIC, so spreading work across many
 # workers (independent NICs and S3 connection pools) matters more than
-# vCPU per worker. Photon is enabled for two reasons:
+# vCPU per worker.
 #
-#   1. It vectorizes JSON parsing and Delta MERGE on the executors,
-#      cutting per-task CPU work and overall load runtime.
-#   2. On the driver it changes Databricks' memory budgeting: Photon
-#      reserves off-heap native memory for its own allocator, so the
-#      JVM heap is auto-sized smaller than on a vanilla Spark driver
-#      of the same node size. That leaves more free OS memory for the
-#      follow-up Python tasks in the DAG (e.g. metastore register-table)
-#      to import psycopg2 and run alongside the still-warm Spark JVM
-#      without OOM'ing.
-#
-# The driver is r8g.large (16 GB) -- a non-Photon driver of this size
-# was OOM'ing the Python tasks because the JVM heap grew to ~14-15 GB.
-# With Photon enabled the heap is capped lower by Databricks itself,
-# which is why we no longer set spark.driver.memory in the consuming
-# DAGs.
-consolidation_g_general_photon_cluster:
+# Sizing rationale:
+#   - Driver: r6g.2xlarge (64 GB). The DAG ends with a Python task
+#     (register-table) that imports psycopg2 alongside a still-warm
+#     Spark JVM. Smaller drivers (8-16 GB) OOM'd consistently because
+#     the JVM heap, overlapping Python REPLs and OS daemons together
+#     exceeded the node's memory budget. 64 GB matches the historically
+#     working AMD r5a.2xlarge configuration and gives ample headroom.
+#   - Workers: m6g.xlarge x 4. Workload is I/O bound on S3 latency,
+#     not on CPU or network throughput, so additional vCPU per worker
+#     yields no measurable benefit over more, smaller workers.
+#   - Generation 6 Graviton: this workload is bottlenecked on S3
+#     round-trip latency, not CPU instruction throughput, so newer
+#     Gen 7/8 silicon brings no measurable speedup. Gen 6 instances
+#     are ~15% cheaper for identical wall-clock runtime.
+#   - Photon disabled: JSON parsing and Delta MERGE are small relative
+#     to S3 wait time, so Photon's vectorization gives negligible
+#     runtime benefit while adding cost.
+consolidation_g_general_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r8g.large
-    node_type_id: m8g.xlarge
+    driver_node_type_id: r6g.2xlarge
+    node_type_id: m6g.xlarge
     num_workers: 4
     spark_version: 16.4.x-scala2.12
-    runtime_engine: PHOTON
 
 ### Notification Configs ###
 notification_webhooks_keys:

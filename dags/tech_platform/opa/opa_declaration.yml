@@ -29,7 +29,7 @@ workflow:
     auditlogs: ["ALL PRIVILEGES"]
 
 cluster:
-  type: consolidation_g_general_photon_cluster
+  type: consolidation_g_general_cluster
   custom_configurations:
     spark_conf:
       # Required to parse OPA audit log JSON entries with empty string values.
