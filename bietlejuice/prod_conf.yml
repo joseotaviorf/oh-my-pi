@@ -1706,10 +1706,18 @@ consolidation_m_general_single_node_cluster:
 # small JSON files (e.g. OPA / Istio audit logs). Throughput on this
 # workload is bounded by S3 GET latency, not by CPU, so spreading work
 # across multiple workers (independent NICs and S3 connection pools)
-# matters more than vCPU per worker.
+# matters more than vCPU per worker. The driver is memory-optimized
+# (r-class) rather than larger m-class because partition discovery loads
+# ~100k file paths into driver memory and the Spark JVM heap routinely
+# climbs to ~7 GB during the load; the follow-up Python tasks in the same
+# DAG (e.g. metastore register-table) then need room to import psycopg2
+# and run alongside the still-warm Spark JVM. An 8 GB driver OOMs on the
+# Python step; r8g.large doubles the memory at ~30% extra cost rather
+# than ~100% for an m8g.xlarge driver, which the LIST stages (mostly
+# blocked on S3 I/O, not CPU) do not need.
 consolidation_g_general_photon_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m8g.large
+    driver_node_type_id: r8g.large
     node_type_id: m8g.xlarge
     num_workers: 4
     spark_version: 16.4.x-scala2.12
