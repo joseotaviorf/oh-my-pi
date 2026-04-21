@@ -4,6 +4,11 @@
 #
 # Wheel / create-dag / upload chains share YAML anchors so path predicates stay identical
 # within each chain (avoid skipping `make package` while a dependent step still runs).
+#
+# IMPORTANT: astronomer-deploy-dags-{env} depends_on upload-dag-packages-dags-s3-{env},
+# so *astronomer_deploy_path must be a subset of *upload_dags_path. Do NOT add paths here
+# (e.g. `bietlejuice/**`) that are not also covered by *upload_dags_path, or Woodpecker
+# will error with "depends on unknown step" when only those paths change.
 
 depends_on:
   - lint
@@ -345,7 +350,6 @@ steps:
       branch: [forno]
       path: &astronomer_deploy_path
         include:
-          - 'bietlejuice/**'
           - 'dags/**'
           - 'bietlejuice/base/airflow/dag_builders/**/*.py'
           - 'scripts/ci_cd/airflow_dag_builder/**/*.py'
@@ -396,6 +400,11 @@ steps:
     when:
       event: push
       branch: forno
+      path: &sst_pipelines_path
+        include:
+          - 'bietlejuice/base/sst/**'
+          - 'scripts/ci_cd/upload_sst_pipeline_into_s3.py'
+        on_empty: false
 
   upload-sst-pipelines-s3-prod:
     image: public.ecr.aws/docker/library/python:3.7.16
@@ -405,6 +414,7 @@ steps:
     when:
       event: push
       branch: [master, hotfix/*]
+      path: *sst_pipelines_path
 
   upload-dag-packages-queries-s3-forno:
     image: public.ecr.aws/docker/library/python:3.7.16
