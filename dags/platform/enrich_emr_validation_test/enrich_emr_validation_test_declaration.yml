@@ -1,0 +1,21 @@
+dag:
+  name: enrich_emr_validation_test
+  owner: Data Life Cycle
+  catchup: false
+  schedule_interval: None
+  schedule_start_date: "2026, 1, 1"
+  documentation:
+    dag_purpose: |
+      Smoke-test DAG to validate the EMR init script and Spark runtime.
+      Reads from an existing enrich table (datalake_airflow.dag) and writes
+      a small result set. Manual trigger only.
+
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: emr_validation_test
+  default_extraction_type: full
+  default_partitions: []
+
+cluster:
+  type: emr_7_12_med_general_cluster

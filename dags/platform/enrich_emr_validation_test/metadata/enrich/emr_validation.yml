@@ -1,0 +1,33 @@
+---
+database_name: datalake_emr_validation_test
+table_name: emr_validation
+description: Smoke-test table to validate the EMR Spark runtime and init script. Contains a snapshot of active Airflow DAGs.
+domain: Data Life Cycle
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_dag:
+    lineage:
+      - datalake_airflow.dag.id_dag
+    description: ID (name) of the DAG, primary key from the source table.
+  owners:
+    lineage:
+      - datalake_airflow.dag.owners
+    description: Owners of the DAG, separated by commas.
+  schedule_interval:
+    lineage:
+      - datalake_airflow.dag.schedule_interval
+    description: Schedule interval of the DAG, usually cron-like strings.
+  is_active:
+    lineage:
+      - datalake_airflow.dag.is_active
+    description: Whether the DAG is active or not.
+  is_paused:
+    lineage:
+      - datalake_airflow.dag.is_paused
+    description: Whether the DAG is paused or not.
+  source_provider:
+    lineage:
+      - datalake_airflow.dag.source_provider
+    description: Either Astro or Composer, indicating where the DAG was last seen.
+  ts_validated:
+    description: Timestamp when this validation run was executed.
