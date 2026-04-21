@@ -1888,17 +1888,19 @@ consolidation_m_general_single_node_cluster:
 # workload is bounded by S3 GET latency, not by CPU, so spreading work
 # across multiple workers (independent NICs and S3 connection pools)
 # matters more than vCPU per worker. The driver is memory-optimized
-# (r-class) rather than larger m-class because partition discovery loads
-# ~100k file paths into driver memory and the Spark JVM heap routinely
-# climbs to ~7 GB during the load; the follow-up Python tasks in the same
-# DAG (e.g. metastore register-table) then need room to import psycopg2
-# and run alongside the still-warm Spark JVM. An 8 GB driver OOMs on the
-# Python step; r8g.large doubles the memory at ~30% extra cost rather
-# than ~100% for an m8g.xlarge driver, which the LIST stages (mostly
-# blocked on S3 I/O, not CPU) do not need.
+# (r-class) because partition discovery loads ~100k file paths into
+# driver memory and the Spark JVM heap routinely climbs to ~7 GB during
+# the load; the follow-up Python tasks in the same DAG (e.g. metastore
+# register-table) then need room to import psycopg2 and run alongside
+# the still-warm Spark JVM. We sized this at 32 GB rather than 16 GB
+# because Databricks auto-scales the driver heap proportionally to node
+# memory: on a 16 GB driver the heap grew to ~14-15 GB, leaving Python
+# starved and OOM'ing on the psycopg2 import. The DAGs themselves cap
+# spark.driver.memory at 16g so Python is guaranteed ~14-15 GB of free
+# OS memory regardless of node size.
 consolidation_g_general_photon_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: r8g.large
+    driver_node_type_id: r8g.xlarge
     node_type_id: m8g.xlarge
     num_workers: 4
     spark_version: 16.4.x-scala2.12

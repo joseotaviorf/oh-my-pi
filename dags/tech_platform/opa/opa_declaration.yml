@@ -35,6 +35,17 @@ cluster:
       # Required to parse OPA audit log JSON entries with empty string values.
       spark.sql.legacy.json.allowEmptyString.enabled: "true"
 
+      # --- Driver heap cap -------------------------------------------------
+      # Databricks auto-sizes the driver JVM heap proportionally to node
+      # memory. On the 32 GB r8g.xlarge driver that lands around ~28 GB,
+      # which leaves Python tasks (e.g. metastore register-table) starved
+      # and OOM'ing on the psycopg2 import after the load finishes. Cap
+      # the heap explicitly at 16 GB so Python is guaranteed ~14-15 GB of
+      # free OS memory; this is still 2x our observed peak heap usage of
+      # ~7.45 GB during partition discovery, so Spark itself has plenty
+      # of room.
+      spark.driver.memory: "16g"
+
       # --- S3 client tuning -------------------------------------------------
       # The job reads ~150k tiny .gz files per hour; the dominant cost is S3
       # round-trip latency, not bandwidth. Bump the per-JVM S3A thread pool
