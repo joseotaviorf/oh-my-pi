@@ -1702,19 +1702,17 @@ consolidation_m_general_single_node_cluster:
         <<: *cluster_custom_tags_anchor
         ResourceClass: "SingleNode"
 
-# Multi-node Graviton + Photon preset tuned for high-fanout S3 ingestion of
-# many small JSON files (e.g. OPA / Istio audit logs). Workers are kept
-# narrow on purpose: throughput on this workload is bounded by S3 GET
-# latency, not by CPU, so independent worker NICs and S3 connection pools
-# matter more than vCPU per worker. Photon further reduces per-core CPU
-# work, so RAM-heavy / wide-core workers would sit idle.
+# Multi-node Graviton preset tuned for high-fanout S3 ingestion of many
+# small JSON files (e.g. OPA / Istio audit logs). Throughput on this
+# workload is bounded by S3 GET latency, not by CPU, so spreading work
+# across multiple workers (independent NICs and S3 connection pools)
+# matters more than vCPU per worker.
 consolidation_g_general_photon_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m7g.large
-    node_type_id: m7g.large
-    num_workers: 3
+    driver_node_type_id: m8g.large
+    node_type_id: m8g.xlarge
+    num_workers: 4
     spark_version: 16.4.x-scala2.12
-    runtime_engine: PHOTON
 
 ### Notification Configs ###
 notification_webhooks_keys:
