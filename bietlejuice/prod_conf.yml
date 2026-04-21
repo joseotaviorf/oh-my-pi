@@ -1702,36 +1702,6 @@ consolidation_m_general_single_node_cluster:
         <<: *cluster_custom_tags_anchor
         ResourceClass: "SingleNode"
 
-# Multi-node Graviton preset tuned for high-fanout S3 ingestion of many
-# small JSON files (e.g. OPA / Istio audit logs). Throughput is bounded
-# by S3 GET latency, not by CPU or NIC, so spreading work across many
-# workers (independent NICs and S3 connection pools) matters more than
-# vCPU per worker.
-#
-# Sizing rationale:
-#   - Driver: r6g.2xlarge (64 GB). The DAG ends with a Python task
-#     (register-table) that imports psycopg2 alongside a still-warm
-#     Spark JVM. Smaller drivers (8-16 GB) OOM'd consistently because
-#     the JVM heap, overlapping Python REPLs and OS daemons together
-#     exceeded the node's memory budget. 64 GB matches the historically
-#     working AMD r5a.2xlarge configuration and gives ample headroom.
-#   - Workers: m6g.xlarge x 4. Workload is I/O bound on S3 latency,
-#     not on CPU or network throughput, so additional vCPU per worker
-#     yields no measurable benefit over more, smaller workers.
-#   - Generation 6 Graviton: this workload is bottlenecked on S3
-#     round-trip latency, not CPU instruction throughput, so newer
-#     Gen 7/8 silicon brings no measurable speedup. Gen 6 instances
-#     are ~15% cheaper for identical wall-clock runtime.
-#   - Photon disabled: JSON parsing and Delta MERGE are small relative
-#     to S3 wait time, so Photon's vectorization gives negligible
-#     runtime benefit while adding cost.
-consolidation_g_general_cluster:
-    <<: *cluster_anchor
-    driver_node_type_id: r6g.2xlarge
-    node_type_id: m6g.xlarge
-    num_workers: 4
-    spark_version: 16.4.x-scala2.12
-
 ### Notification Configs ###
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_PROD_WEBHOOK

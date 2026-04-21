@@ -29,11 +29,29 @@ workflow:
     auditlogs: ["ALL PRIVILEGES"]
 
 cluster:
-  type: consolidation_g_general_cluster
+  # Reverted to the historically working AMD multi-node configuration after
+  # repeated OOMs on Graviton driver sizing experiments (#23104, #23107,
+  # #23108). r5a.2xlarge (64 GB) gives the Python `register-table` task
+  # enough headroom alongside the still-warm Spark JVM. Workers stay on
+  # r5a.xlarge -- Istio has lower file fanout than OPA, so half the worker
+  # CPU and S3 connection pool per node is sufficient. Inline settings
+  # below mirror the `cluster_anchor` defaults (single-user, SINGLE_USER
+  # mode, namespace) because `custom_cluster` does not inherit from anchors.
+  type: custom_cluster
   custom_configurations:
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
     spark_conf:
       # Required to parse Istio audit log JSON entries with empty string values.
       spark.sql.legacy.json.allowEmptyString.enabled: "true"
+
+      # Sets the default catalog so SQL run on this cluster resolves against
+      # the environment-aware Unity Catalog (mirrors the cluster_anchor default).
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
 
       # --- S3 client tuning -------------------------------------------------
       # The job reads many tiny .gz files per hour; the dominant cost is S3
