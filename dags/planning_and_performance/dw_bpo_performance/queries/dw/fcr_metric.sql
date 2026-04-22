@@ -11,6 +11,7 @@ WITH segments AS (
         ftm.sk_ticket
 ),
 
+
 tickets_perspective AS (
     SELECT
         ft.sk_ticket,
@@ -125,8 +126,9 @@ tickets_perspective AS (
         AND dd_last.area NOT LIKE '%MX%'
 ),
 
+
 recontact_drilldown AS (
-    SELECT 
+    SELECT
         tp.sk_ticket,
         tp.sk_user,
         tp.sk_user_contract,
@@ -184,6 +186,7 @@ recontact_drilldown AS (
         AND tp.channel IN ('chat', 'call', 'whatsapp')
 ),
 
+
 back_penalizations AS (
     SELECT
         tp.*,
@@ -199,86 +202,176 @@ back_penalizations AS (
         AND (tp.front_or_back = 'back' OR tp.channel = 'whatsapp')
 ),
 
+
 recontact_drilldown_per_bpo AS (
-  SELECT
+ SELECT
     tp.sk_ticket,
     tp.sk_user,
     tp.sk_user_contract,
     tp.last_team,
     tp.ts_started,
+
+
+    -- Contato anterior
     LAG(tp.sk_ticket) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) AS prev_sk_ticket,
     LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) AS prev_ts_started,
     LAG(tp.last_agent_email) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) AS prev_agent_email,
     LAG(tp.last_agent_organization) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) AS prev_agent_organization,
+
+
+    -- Flag de recontato (olhando para trás): diferença entre 0 e 4 dias
     CASE
       WHEN LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) IS NOT NULL
-        AND DATEDIFF(DATE(tp.ts_started), DATE(LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started))) BETWEEN 0 AND 4
+        AND DATEDIFF(
+            CAST(tp.ts_started AS DATE),
+            CAST(LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) AS DATE)
+        ) BETWEEN 0 AND 4
         AND tp.sk_ticket != LAG(tp.sk_ticket) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started)
         AND tp.ts_started != LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started)
       THEN 1 ELSE 0
     END AS recontact_flag_per_bpo,
+
+
+    -- Owner do recontato
     CASE
       WHEN LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) IS NOT NULL
-        AND DATEDIFF(DATE(tp.ts_started), DATE(LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started))) BETWEEN 0 AND 4
+        AND DATEDIFF(
+            CAST(tp.ts_started AS DATE),
+            CAST(LAG(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started) AS DATE)
+        ) BETWEEN 0 AND 4
       THEN LAG(tp.last_agent_organization) OVER (PARTITION BY tp.sk_user_contract, tp.last_team ORDER BY tp.ts_started)
       ELSE NULL
     END AS recontact_owner_org,
-    -- Theme recontact flag logic
+
+
+    -- Flag de recontato por tema (olhando para frente)
     CASE
-        WHEN DATEDIFF(LEAD(DATE(tp.ts_started)) OVER (PARTITION BY tp.sk_user, tp.last_team, tp.theme, tp.last_agent_organization ORDER BY tp.ts_started), DATE(tp.ts_started)) <= 4
+        WHEN DATEDIFF(
+            CAST(LEAD(tp.ts_started) OVER (PARTITION BY tp.sk_user, tp.last_team, tp.theme, tp.last_agent_organization ORDER BY tp.ts_started) AS DATE),
+            CAST(tp.ts_started AS DATE)
+        ) <= 4
         THEN CASE
-            WHEN tp.sk_ticket != LEAD(tp.sk_ticket) OVER (PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme, tp.last_agent_organization ORDER BY tp.ts_started)
-            THEN 1 ELSE 0
-        END
+                WHEN tp.sk_ticket != LEAD(tp.sk_ticket) OVER (PARTITION BY tp.sk_user_contract, tp.last_team, tp.theme, tp.last_agent_organization ORDER BY tp.ts_started)
+                 AND tp.ts_started != LEAD(tp.ts_started) OVER (PARTITION BY tp.sk_user_contract, tp.last_team, tp.last_agent_organization ORDER BY tp.ts_started)
+                 AND tp.theme IS NOT NULL
+                THEN 1 ELSE 0
+             END
         ELSE 0
     END AS theme_recontact_flag_bpo
-  FROM tickets_perspective tp
+
+
+FROM tickets_perspective tp
+WHERE
+    tp.sk_user_contract > 0
+    AND tp.last_area = 'CX'
+    AND (
+      tp.front_or_back = 'front'
+      OR tp.last_department IN ('[WH] Credito [FRONT]', '[WH] Closing [FRONT]')
+    )
+    AND tp.last_department NOT IN (
+      'Welcome Onboarding [BACK] [POS]',
+      'CX Welcome Onboarding [FRONT][POS]',
+      'EARLY DEMAND [CLOSING] [BACK]',
+      'FUP Carteirização B2C [CLO] [PRE] [BACK]',
+      'Closing Contratos [CLO] [PRE] [BACK]'
+    )
+    AND tp.refined_direction = 'INBOUND'
+    AND tp.channel IN ('chat', 'call', 'whatsapp')
 ),
 
+
 temp AS (
-    SELECT
-        tp.*,
-        rd.recontact_search_window_from,
-        rd.recontact_search_window_until,
-        rd.recontact_flag,
-        rd.theme_recontact_flag,
-        rd.theme_detail_recontact_flag,
-        rd.previous_contact_sk_ticket,
-        rd.previous_contact_channel,
-        rd.previous_agent,
-        rd.previous_contact_ts_started,
-        rd.previous_contact_theme,
-        rd.previous_contact_theme_detail,
-        rd.previous_contact_csat,
-        rd.days_since_last_contact,
-        rdb.recontact_flag_per_bpo,
-        rdb.recontact_owner_org,
-        rdb.prev_sk_ticket AS prev_contact_sk_ticket_per_bpo,
-        rdb.prev_ts_started AS prev_contact_ts_started_per_bpo,
-        rdb.prev_agent_email AS prev_contact_agent_per_bpo,
-        rdb.prev_agent_organization AS prev_contact_org_per_bpo,
-        rdb.theme_recontact_flag_bpo AS theme_recontact_flag_per_bpo,
-        bpe.flag_back_outbound,
-        bpe.flag_back_outbound_teste,
-        bpe.flag_back_wpp,
-        bpe.flag_back,
-        bpe.flag_replies,
-        bpe.sk_ticket AS sk_ticket_penalized,
-        bpe.ts_started AS ts_started_penalized,
-        bpe.channel AS channel_penalized,
-        bpe.theme  AS theme_penalized,
-        CASE
-            WHEN bpe.sk_user_contract IS NULL THEN 1
-            ELSE ROW_NUMBER() OVER (PARTITION BY tp.sk_ticket ORDER BY CAST(bpe.ts_started AS TIMESTAMP) ASC)
-        END AS rank_cte
-    FROM tickets_perspective AS tp
-    LEFT JOIN recontact_drilldown AS rd ON rd.sk_ticket = tp.sk_ticket
-    LEFT JOIN recontact_drilldown_per_bpo AS rdb ON rdb.sk_ticket = tp.sk_ticket
-    LEFT JOIN back_penalizations AS bpe ON tp.sk_user_contract = bpe.sk_user_contract 
-        AND tp.team_adjusted = bpe.team_adjusted 
-        AND tp.ts_started <= bpe.ts_started 
-        AND DATEDIFF(DATE(bpe.ts_started), DATE(tp.ts_started)) <= 4
+SELECT
+    tp.*,
+    rd.recontact_search_window_from,
+    rd.recontact_search_window_until,
+    rd.recontact_flag,
+    rd.theme_recontact_flag,
+    rd.theme_detail_recontact_flag,
+    rd.previous_contact_sk_ticket,
+    rd.previous_contact_channel,
+    rd.previous_agent,
+    rd.previous_contact_ts_started,
+    rd.previous_contact_theme,
+    rd.previous_contact_theme_detail,
+    rd.previous_contact_csat,
+    rd.days_since_last_contact,
+   
+    -- ✅ Recontato atribuído à BPO do contato anterior
+    rdb.recontact_flag_per_bpo,
+    rdb.recontact_owner_org,
+    rdb.prev_sk_ticket           AS prev_contact_sk_ticket_per_bpo,
+    rdb.prev_ts_started          AS prev_contact_ts_started_per_bpo,
+    rdb.prev_agent_email         AS prev_contact_agent_per_bpo,
+    rdb.prev_agent_organization  AS prev_contact_org_per_bpo,
+    rdb.theme_recontact_flag_bpo AS theme_recontact_flag_per_bpo,
+   
+    bpe.flag_back_outbound,
+    bpe.flag_back_outbound_teste,
+    bpe.flag_back_wpp,
+    bpe.flag_back,
+    bpe.flag_replies,
+    bpe.sk_ticket AS sk_ticket_penalized,
+    bpe.ts_started AS ts_started_penalized,
+    bpe.channel AS channel_penalized,
+    bpe.theme   AS theme_penalized,
+   
+    CASE
+        WHEN bpe.sk_user_contract IS NULL THEN 1
+        ELSE ROW_NUMBER() OVER (
+                PARTITION BY tp.sk_ticket
+                ORDER BY CAST(bpe.ts_started AS TIMESTAMP) ASC
+             )
+    END AS rank_cte
+FROM tickets_perspective AS tp
+LEFT JOIN recontact_drilldown AS rd
+    ON rd.sk_ticket = tp.sk_ticket
+LEFT JOIN recontact_drilldown_per_bpo AS rdb
+    ON rdb.sk_ticket = tp.sk_ticket
+LEFT JOIN back_penalizations AS bpe
+    ON tp.sk_user_contract = bpe.sk_user_contract
+   AND tp.team_adjusted   = bpe.team_adjusted
+   AND tp.ts_started      <= bpe.ts_started
+   -- Ajuste DATEDIFF para Spark SQL (Databricks)
+   AND DATEDIFF(CAST(bpe.ts_started AS DATE), CAST(tp.ts_started AS DATE)) <= 4
+WHERE
+    tp.front_or_back = 'front'
+    AND tp.sk_user_contract IS NOT NULL
+    AND tp.sk_user_contract > 0
+    AND tp.last_department IN (
+        'CX Mudança [FRONT] [POS]',
+        'CX Parceiros Compra e Venda [FRONT]',
+        'CX Parceiros [FRONT] [PRE]',
+        'CX Parceiros da Portaria [FRONT] [PRE]',
+        'CX Propostas [FRONT] [PRE]',
+        'CX Visitas [FRONT] [PRE]',
+        'Consultores imobiliários 5A',
+        'CX Pagamentos [FRONT] [POS]',
+        'CX Reparos [FRONT] [POS]',
+        'CX Rescisão [FRONT] [POS]',
+        'CX Visitas N1 & N2 [VIS] [PRE] [FRONT] [OUT]',
+        'CX PROPOSTAS CALL/CHAT [PRO][PRE][FRONT]',
+        'CX Plaquinhas [FRONT] [PRE]',
+        'CX Entrada no imóvel [ONB] [POS] [FRONT]',
+        'CX Pagamentos N1 [PAY] [POS] [FRONT]',
+        'CX Durante a locação e reparos [POS] [FRONT]',
+        'CX Rescisão e Vistoria [OFF] [POS] [FRONT]',
+        '[WH] Credito [FRONT]',
+        '[WH] Closing [FRONT]',
+        '[AeC] CX Pagamentos [FRONT] [POS]',
+        '[AeC] CX Rescisão [FRONT] [POS]',
+        '[AeC] CX Mudança [FRONT] [POS]',
+        '[AeC] CX Reparos [FRONT] [POS]',
+        '[AeC] CX Propostas [FRONT] [PRE]',
+        '[AeC] CX Visitas [FRONT] [PRE]',
+        '[AeC] CX Parceiros [FRONT] [PRE]',
+        '[AeC] CX Ongoing [FRONT] [POS]',
+        'CX Ongoing [FRONT] [POS]',
+        '[AeC] Consultores imobiliários 5A',
+        '[AeC] CX Parceiros Compra e Venda [FRONT]'
+    )
 ),
+
 
 pp_multi AS (
     SELECT
@@ -291,13 +384,15 @@ pp_multi AS (
     WHERE (ongoing_houses >= 5 OR is_pp_multi_active = TRUE)
 ),
 
+
 first_resolution as (
-  SELECT 
-    last_agent_email, 
-    min(ts_solved) as first_resolution 
-  FROM tickets_perspective 
-  GROUP BY 1 
+  SELECT
+    last_agent_email,
+    min(ts_solved) as first_resolution
+  FROM tickets_perspective
+  GROUP BY 1
 )
+
 
 SELECT
     t.sk_ticket,
@@ -324,3 +419,4 @@ WHERE
     AND DATE(t.ts_started) BETWEEN DATE('{load_start_date}') - INTERVAL '1' YEAR AND DATE_ADD(CURRENT_DATE(), -4)
     AND t.refined_direction = 'INBOUND'
     AND T.last_area = 'CX'
+

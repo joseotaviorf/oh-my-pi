@@ -6,8 +6,8 @@ owner: data-pp@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
-      - datalake_customer_support.tickets.id_ticket
-    description: Ticket identifier associated with the contact.
+      - dw_customer_support.fact_tickets.sk_ticket
+    description: Surrogate key for the ticket, cast from id_ticket.
   ts_started:
     lineage:
       - dw_customer_support.fact_tickets.ts_created
