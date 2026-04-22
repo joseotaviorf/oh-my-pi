@@ -20,7 +20,7 @@ events_config:
     event_path: "raw/salesforce/CaseMemberEvent"
   case_plates_lockbox:
     event_path: "raw/salesforce/CasePlatesLockboxEvent"
-  case_inspection::
+  case_inspection:
     event_path: "raw/salesforce/CaseInspectionEvent"
   case_repair_analysis:
     event_path: "raw/salesforce/CaseRepairAnalysisEvent"
