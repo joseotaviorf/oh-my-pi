@@ -8,11 +8,11 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
-  inner_dependencies:
-    city_groups_per_periods:
-      - region
   default_partitions:
     - country_code
+  tables_customization:
+    region:
+      has_hive_sync: false
 cluster:
   type: databricks_16_4_med_general_photon_cluster
   custom_configurations:
