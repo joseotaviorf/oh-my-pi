@@ -42,6 +42,18 @@ columns:
     lineage:
       - datalake_partner_payment_raw.operation_payments.agent_payment_id
     description: ID of the agent payment.
+  id_bill:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.bill_id
+    description: ID of the bill.
+  uuid_company:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.company_uuid
+    description: UUID of the company.
+  currency:
+    lineage:
+      - datalake_partner_payment_raw.operation_payments.currency
+    description: The currency of the record.
   version:
     lineage:
       - datalake_partner_payment_raw.operation_payments.version
