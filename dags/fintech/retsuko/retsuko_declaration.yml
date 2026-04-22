@@ -64,6 +64,7 @@ workflow:
     payment_block: {}
     recurrent_credit_card: {}
     recurring_expense: {}
+    recurring_expense_entry: {}
     sap_entity:
       get_table_metrics:
         count: id

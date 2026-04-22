@@ -1,0 +1,36 @@
+database_name: datalake_retsuko_clean
+table_name: recurring_expense_entry
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: 
+  Rows linking recurring expense definitions to published financial entries in Retsuko,
+  one row per recurring expense entry with identifiers for the parent recurring expense and the entry.
+columns:
+  id:
+    description: "Primary key of the recurring expense entry record in Retsuko."
+    lineage:
+      - datalake_retsuko_raw.recurring_expense_entry.id
+  id_recurring_expense:
+    description: "Internal identifier of the parent recurring expense this entry row belongs to."
+    lineage:
+      - datalake_retsuko_raw.recurring_expense_entry.recurring_expense_id
+  id_recurring_expense_external:
+    description: "External identifier of the parent recurring expense in upstream systems."
+    lineage:
+      - datalake_retsuko_raw.recurring_expense_entry.recurring_expense_external_id
+  id_entry_external:
+    description: "External identifier of the related financial entry in the source system."
+    lineage:
+      - datalake_retsuko_raw.recurring_expense_entry.entry_external_id
+  ts_published:
+    description: "Datetime when the recurring expense entry was published in Retsuko."
+    lineage:
+      - datalake_retsuko_raw.recurring_expense_entry.published_at
+  ts_retsuko_created:
+    description: "Datetime when the row was created in Retsuko."
+    lineage:
+      - datalake_retsuko_raw.recurring_expense_entry.retsuko_created_at
+  ts_retsuko_updated:
+    description: "Datetime when the row was last updated in Retsuko."
+    lineage:
+      - datalake_retsuko_raw.recurring_expense_entry.retsuko_updated_at

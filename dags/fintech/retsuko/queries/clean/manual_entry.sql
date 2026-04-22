@@ -15,8 +15,15 @@ SELECT
   installment_total_number,
   installment_total_amount,
   is_removed,
+  source_external_id,
+  normality_control,
+  source,
   accrual_year_month,
   accrued_date AS dt_accrued,
-  last_operation_date AS ts_last_operation
+  timestamp(last_operation_date) AS ts_last_operation,
+  timestamp(retsuko_created_at) AS ts_retsuko_created,
+  timestamp(retsuko_updated_at) AS ts_retsuko_updated,
+  timestamp(created_at) AS ts_created,
+  timestamp(updated_at) AS ts_updated
 FROM
   datalake_retsuko_raw.manual_entry
