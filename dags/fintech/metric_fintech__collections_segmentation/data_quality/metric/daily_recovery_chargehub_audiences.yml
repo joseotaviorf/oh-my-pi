@@ -19,27 +19,23 @@ column_level_validations:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
-  n_invoices_at_reference:
+  n_invoices_DT2_at_reference:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
-  n_invoices_acc:
+  n_invoices_DT2_acc:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
-  total_due_amount_acc:
+  due_amount_DT2_acc:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
-  total_due_amount_at_reference:
+  due_amount_DT2_at_reference:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
-  recovered_amount_at_reference:
-    has_min_value:
-      greater_than_or_equal_to: 0
-      severity_level: Error
-  recovered_amount_acc:
+  recovered_amount_DT2_acc:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
