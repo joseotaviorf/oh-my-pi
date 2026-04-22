@@ -2,23 +2,34 @@
 database_name: datalake_nazare_clean
 table_name: supply_acquisition_share
 owner: ae-finance-fintech@quintoandar.com.br
-domain: fintech
+domain: Fintech
+description: Stores the share configuration for each agent involved in a supply acquisition, including bonus fee details.
 columns:
   id:
+    description: Unique identifier of the supply acquisition share record.
     lineage:
     - datalake_nazare_raw.supply_acquisition_share.id
   id_house:
+    description: Identifier of the house associated with the supply acquisition share.
     lineage:
     - datalake_nazare_raw.supply_acquisition_share.house_id
   id_agent:
+    description: Identifier of the agent associated with the supply acquisition share.
     lineage:
     - datalake_nazare_raw.supply_acquisition_share.agent_id
   bonus_fee:
+    description: Bonus fee assigned to the agent for the supply acquisition share.
     lineage:
     - datalake_nazare_raw.supply_acquisition_share.bonus_fee
+  ts_deleted:
+    description: Timestamp when the supply acquisition share record was soft-deleted.
+    lineage:
+    - datalake_nazare_raw.supply_acquisition_share.deleted_at
   ts_created:
+    description: Timestamp when the supply acquisition share record was created.
     lineage:
     - datalake_nazare_raw.supply_acquisition_share.created_at
   ts_updated:
+    description: Timestamp when the supply acquisition share record was last updated.
     lineage:
     - datalake_nazare_raw.supply_acquisition_share.updated_at

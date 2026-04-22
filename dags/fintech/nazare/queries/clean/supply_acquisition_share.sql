@@ -3,6 +3,7 @@ SELECT
     BIGINT(house_id) AS id_house,
     BIGINT(agent_id) AS id_agent,
     bonus_fee,
+    TIMESTAMP(deleted_at) AS ts_deleted,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated
 FROM
