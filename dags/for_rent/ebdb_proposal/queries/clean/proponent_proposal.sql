@@ -53,6 +53,7 @@ SELECT
     dadosBancarios_tipoConta as account_type,
     tipoPessoa as person_type,
     dadosBancarios_banco_id as id_bank_account,
+    dadosBancarios_bankAccountValidation_id as id_bank_account_validation,
     dataValidadeDocumento as ts_document_validity,
     telefoneResidencial as residential_phone_number,
     origemRenda as source_of_income,

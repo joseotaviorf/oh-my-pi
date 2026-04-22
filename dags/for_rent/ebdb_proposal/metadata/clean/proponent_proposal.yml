@@ -1,189 +1,257 @@
 database_name: datalake_ebdb_clean
 table_name: proponent_proposal
+description: Clean mirror of EBDB PropostaProponente with one row per proposal participant and their personal, contact, address, income, documentation, and bank account data used in rental proposal analysis.
+domain: For Rent
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.propostaproponente.id
+    description: Primary key of the proposal participant record in EBDB PropostaProponente.
   has_contributed_to_current_house:
     lineage:
       - datalake_ebdb_raw.propostaproponente.contribuinoimovelatual
+    description: Boolean flag indicating whether the participant contributes financially to their current residence.
   cpf:
     lineage:
       - datalake_ebdb_raw.propostaproponente.cpf
+    description: Tax identity document informed by the participant, usually CPF and in legacy cases CNPJ.
   dt_admission_date:
     lineage:
       - datalake_ebdb_raw.propostaproponente.dataadmissao
+    description: Employment admission date informed for the participant current professional link.
   current_owner:
     lineage:
       - datalake_ebdb_raw.propostaproponente.donodoatual
+    description: Legacy free-text information about who owns the participant current residence.
   email:
     lineage:
       - datalake_ebdb_raw.propostaproponente.email
+    description: Main email address used to contact the participant during proposal and documentation steps.
   emp_link:
     lineage:
       - datalake_ebdb_raw.propostaproponente.empvinculo
+    description: Employment or income-link category declared by the participant, such as CLT or self-employed.
   company:
     lineage:
       - datalake_ebdb_raw.propostaproponente.empresa
+    description: Employer or institution name associated with the participant professional information.
   marital_status:
     lineage:
       - datalake_ebdb_raw.propostaproponente.estadocivil
+    description: Marital status declared by the participant in the proposal profile.
   name:
     lineage:
       - datalake_ebdb_raw.propostaproponente.nome
+    description: Full name of the proposal participant.
   profession:
     lineage:
       - datalake_ebdb_raw.propostaproponente.profissao
+    description: Profession or occupation informed for credit and documentation analysis.
   name_reference:
     lineage:
       - datalake_ebdb_raw.propostaproponente.refnome
+    description: Name of the personal or professional reference provided by the participant.
   phone_number_reference:
     lineage:
       - datalake_ebdb_raw.propostaproponente.reftelefone
+    description: Phone number of the participant reference contact.
   link_referencce:
     lineage:
       - datalake_ebdb_raw.propostaproponente.refvinculo
+    description: Relationship type between the participant and the reference contact.
   monthly_salary:
     lineage:
       - datalake_ebdb_raw.propostaproponente.rendamensal
+    description: Declared monthly income amount used in affordability and credit checks.
   rg:
     lineage:
       - datalake_ebdb_raw.propostaproponente.rg
+    description: RG identification document number informed by the participant.
   gender:
     lineage:
       - datalake_ebdb_raw.propostaproponente.sexo
+    description: Gender value associated with the participant profile.
   current_situation:
     lineage:
       - datalake_ebdb_raw.propostaproponente.situacaoatual
+    description: Current housing situation declared by the participant, such as rented or own property.
   phone_number:
     lineage:
       - datalake_ebdb_raw.propostaproponente.telefone
+    description: Primary phone number used to contact the participant.
   time_lived_in_residence:
     lineage:
       - datalake_ebdb_raw.propostaproponente.tempoderesidenciaanos
+    description: Time lived in the current residence, in years.
   id_proposal:
     lineage:
       - datalake_ebdb_raw.propostaproponente.proposta_id
+    description: Foreign key to the parent proposal record that this participant belongs to.
   number_of_dependents:
     lineage:
       - datalake_ebdb_raw.propostaproponente.numerodependentes
+    description: Number of financial dependents declared by the participant.
   neighborhood:
     lineage:
       - datalake_ebdb_raw.propostaproponente.bairro
+    description: Neighborhood of the participant current residential address.
   cep:
     lineage:
       - datalake_ebdb_raw.propostaproponente.cep
+    description: Postal code of the participant current residential address.
   city:
     lineage:
       - datalake_ebdb_raw.propostaproponente.cidade
+    description: City of the participant current residential address.
   complement:
     lineage:
       - datalake_ebdb_raw.propostaproponente.complemento
+    description: Additional address complement such as apartment, block, or landmark.
   address:
     lineage:
       - datalake_ebdb_raw.propostaproponente.endereco
+    description: Main street address line of the participant residence.
   number:
     lineage:
       - datalake_ebdb_raw.propostaproponente.numero
+    description: Street or building number of the participant address.
   id_estado:
     lineage:
       - datalake_ebdb_raw.propostaproponente.estado_id
+    description: Foreign key to Estado representing the state or region of the participant address.
   dt_rg_created:
     lineage:
       - datalake_ebdb_raw.propostaproponente.dataexpedicaorg
+    description: Issue date of the RG document informed by the participant.
   dt_birth:
     lineage:
       - datalake_ebdb_raw.propostaproponente.datanascimento
+    description: Birth date of the proposal participant.
   has_guarantor:
     lineage:
       - datalake_ebdb_raw.propostaproponente.fiador
+    description: Legacy boolean flag indicating whether this participant was marked as guarantor in older flows.
   issuing_body:
     lineage:
       - datalake_ebdb_raw.propostaproponente.orgaoexpedidor
+    description: Issuing authority of the participant identity document.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.propostaproponente.atualizadoem
+    description: Timestamp of the last update applied to the participant record in EBDB.
   ts_created:
     lineage:
       - datalake_ebdb_raw.propostaproponente.criadoem
+    description: Timestamp when the participant record was created in EBDB.
   type:
     lineage:
       - datalake_ebdb_raw.propostaproponente.tipo
+    description: Participant role in the proposal lifecycle, such as tenant, owner, guarantor, or resident.
   rental_motive:
     lineage:
       - datalake_ebdb_raw.propostaproponente.motivolocacao
+    description: Declared reason for renting the property in the proposal process.
   will_live:
     lineage:
       - datalake_ebdb_raw.propostaproponente.vaimorar
+    description: Boolean flag indicating whether the participant will live in the rented property.
   nationality:
     lineage:
       - datalake_ebdb_raw.propostaproponente.nacionalidade
+    description: Nationality declared by the participant.
   name_of_real_estate_company_or_landlord:
     lineage:
       - datalake_ebdb_raw.propostaproponente.nomeimobiliariaouproprietario
+    description: Name of the current landlord or real estate company related to the participant current housing.
   mothers_name:
     lineage:
       - datalake_ebdb_raw.propostaproponente.nomemae
+    description: Mother full name informed for identity validation and documentation checks.
   country_of_origin:
     lineage:
       - datalake_ebdb_raw.propostaproponente.paisorigem
+    description: Country of origin declared by the participant, mainly used in non-BR document flows.
   id_drive_folder:
     lineage:
       - datalake_ebdb_raw.propostaproponente.pastadriveid
+    description: Identifier of the participant Google Drive folder used in documentation workflows.
   branch:
     lineage:
       - datalake_ebdb_raw.propostaproponente.ramal
+    description: Extension number associated with the company phone contact.
   company_phone_number:
     lineage:
       - datalake_ebdb_raw.propostaproponente.telefoneempresa
+    description: Employer or company phone number informed by the participant.
   phone_number_of_real_estate_company_or_landlord:
     lineage:
       - datalake_ebdb_raw.propostaproponente.telefoneimobiliariaouproprietario
+    description: Contact phone number of the current landlord or real estate company.
   agency_number:
     lineage:
       - datalake_ebdb_raw.propostaproponente.dadosbancarios_agencia
+    description: Bank branch or agency number from the participant payment account details.
   account_number:
     lineage:
       - datalake_ebdb_raw.propostaproponente.dadosbancarios_contacorrente
+    description: Bank account number from the participant payment account details.
   account_cpf_or_cnpj:
     lineage:
       - datalake_ebdb_raw.propostaproponente.dadosbancarios_cpfoucnpj
+    description: CPF or CNPJ of the holder associated with the informed payment account.
   account_name:
     lineage:
       - datalake_ebdb_raw.propostaproponente.dadosbancarios_nome
+    description: Name of the holder associated with the informed payment account.
   has_secondary_account_holder:
     lineage:
       - datalake_ebdb_raw.propostaproponente.dadosbancarios_outrotitular
+    description: Boolean flag indicating whether the payment account belongs to a third-party holder.
   account_type:
     lineage:
       - datalake_ebdb_raw.propostaproponente.dadosbancarios_tipoconta
+    description: Type of bank account informed for payments, such as individual checking, joint checking, or savings.
   person_type:
     lineage:
       - datalake_ebdb_raw.propostaproponente.tipopessoa
+    description: Participant legal nature, distinguishing individual person from legal entity.
   id_bank_account:
     lineage:
       - datalake_ebdb_raw.propostaproponente.dadosbancarios_banco_id
+    description: Foreign key to the bank catalog entry selected in the participant bank data.
+  id_bank_account_validation:
+    lineage:
+      - datalake_ebdb_raw.propostaproponente.dadosbancarios_bankaccountvalidation_id
+    description: Foreign key to the bank account validation record linked to this participant account data.
   ts_document_validity:
     lineage:
       - datalake_ebdb_raw.propostaproponente.datavalidadedocumento
+    description: Expiration datetime of the identity document selected in the documentation flow.
   residential_phone_number:
     lineage:
       - datalake_ebdb_raw.propostaproponente.telefoneresidencial
+    description: Secondary residential phone number informed by the participant.
   source_of_income:
     lineage:
       - datalake_ebdb_raw.propostaproponente.origemrenda
+    description: Declared source of income used to complement the participant financial profile.
   additional_income:
     lineage:
       - datalake_ebdb_raw.propostaproponente.rendimentoadicional
+    description: Additional declared income amount besides the primary monthly salary.
   documentation_extra_comment:
     lineage:
       - datalake_ebdb_raw.propostaproponente.documentationextracomment
+    description: Free-text notes with extra context for participant documentation analysis.
   has_cpf_on_rg:
     lineage:
       - datalake_ebdb_raw.propostaproponente.rghascpf
+    description: Boolean flag indicating whether the uploaded RG document already contains CPF information.
   has_cpf_on_rne:
     lineage:
       - datalake_ebdb_raw.propostaproponente.rnehascpf
+    description: Boolean flag indicating whether the uploaded RNE or RNM document already contains CPF information.
   chosen_documentation_flow:
     lineage:
       - datalake_ebdb_raw.propostaproponente.chosendocumentationflow
+    description: Identity document type selected by the participant for upload and validation workflow.
