@@ -1,5 +1,8 @@
-# Path filters use Woodpecker `when.path` (push only). Skipped steps count as success so
-# downstream workflows (e.g. release depends_on: tests) still pass.
+# Path filters use Woodpecker `when.path` with `event: [push, pull_request]`.
+# See validations.yml header for the full rationale — pull_request is required
+# so that when.path evaluates the full PR diff, not just the last pushed commit.
+# Skipped steps count as success so downstream workflows
+# (e.g. release depends_on: tests) still pass.
 clone:
   - name: clone
     image: woodpeckerci/plugin-git
@@ -17,7 +20,7 @@ steps:
       - make requirements
       - make unit-tests
     when:
-      event: push
+      event: [push, pull_request]
       path:
         include: ['**/*.py']
         on_empty: false
@@ -33,7 +36,7 @@ steps:
       - make requirements
       - make integration-tests
     when:
-      event: push
+      event: [push, pull_request]
       path:
         include: ['**/*.py']
         on_empty: false
@@ -49,7 +52,7 @@ steps:
       - make requirements
       - make core-model-coverage
     when:
-      event: push
+      event: [push, pull_request]
       path:
         include:
           # Same roots as scripts/ci_cd/core_models/check_core_model_changes.py (Python only)

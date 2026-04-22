@@ -1,9 +1,21 @@
-# Path filters use Woodpecker `when.path` (push only). Skipped steps count as success so
-# downstream workflows (e.g. release depends_on: validations) still pass.
+# Path filters use Woodpecker `when.path` with `event: [push, pull_request]`.
 #
-# DAG-side globs are kept coarse (`dags/**/*` or `dags/**/*.yml` where enough) instead of
-# per-folder patterns, so `when.path.include` stays short. Steps may run a bit more often than
-# strictly necessary; validation scripts still scope work via git diff where applicable.
+# The pull_request event is critical for correctness: Woodpecker evaluates
+# when.path against the full PR diff (via GitHub PullRequests.ListFiles API),
+# not just the last pushed commit. Without it, a trivial final commit (e.g.
+# touching only a Dockerfile or a comment) would skip all validation steps
+# even when earlier commits in the same PR changed DAGs or Python modules.
+#
+# The push event is kept alongside pull_request so that direct pushes to
+# forno/master (which have no open PR) still trigger the relevant steps.
+#
+# Skipped steps count as success so downstream workflows
+# (e.g. release depends_on: validations) still pass.
+#
+# DAG-side globs are kept coarse (`dags/**/*` or `dags/**/*.yml` where enough)
+# instead of per-folder patterns, so `when.path.include` stays short. Steps
+# may run a bit more often than strictly necessary; validation scripts still
+# scope work via git diff where applicable.
 clone:
   - name: clone
     image: woodpeckerci/plugin-git
@@ -18,7 +30,7 @@ steps:
       - make requirements-scripts
       - make validate-dag-declaration-files level=debug
     when:
-      event: push
+      event: [push, pull_request]
       path:
         include:
           - 'dags/**/*.yml'
@@ -33,7 +45,7 @@ steps:
       - make requirements-scripts
       - make validate-dags-up-to-standard
     when:
-      event: push
+      event: [push, pull_request]
       path:
         include:
           - 'dags/**/*'
@@ -49,7 +61,7 @@ steps:
       - make requirements-scripts
       - make validate-dags-dependencies
     when:
-      event: push
+      event: [push, pull_request]
       branch:
         exclude:
           - master
@@ -72,7 +84,7 @@ steps:
       - make requirements-scripts
       - make validate-dags-dependencies
     when:
-      event: push
+      event: [push, pull_request]
       branch: [master, hotfix/*]
       path:
         include:
@@ -91,7 +103,7 @@ steps:
       - make requirements-scripts
       - make validate-dependency-file-correctness
     when:
-      event: push
+      event: [push, pull_request]
       path:
         include:
           - 'dags/**/*'
@@ -108,7 +120,7 @@ steps:
       - make requirements-scripts
       - make validate-metadata-files-content
     when:
-      event: push
+      event: [push, pull_request]
       branch:
         exclude: [forno, hotfix/*]
       path:
@@ -123,7 +135,7 @@ steps:
       - make requirements-scripts
       - make validate-metadata-files-exist
     when:
-      event: push
+      event: [push, pull_request]
       branch:
         exclude: [forno, hotfix/*]
       path:
@@ -138,7 +150,7 @@ steps:
       - make requirements-scripts
       - make validate-lineage-consistency
     when:
-      event: push
+      event: [push, pull_request]
       path:
         include:
           - 'dags/**/*'
@@ -151,7 +163,7 @@ steps:
       - make requirements-scripts
       - make validate-core-model-schemas
     when:
-      event: push
+      event: [push, pull_request]
       path:
         include:
           - 'dags/core/**/*'
@@ -164,7 +176,7 @@ steps:
       - make requirements-scripts
       - make validate-core-model-schema-content
     when:
-      event: push
+      event: [push, pull_request]
       path:
         include:
           - 'dags/core/**/*'
@@ -178,7 +190,7 @@ steps:
       - make requirements-scripts
       - make validate-source-layer-policy
     when:
-      event: push
+      event: [push, pull_request]
       branch:
         exclude: [forno, hotfix/*]
       path:

@@ -1,5 +1,10 @@
-# Steps run only when Python sources change (step-level when); pipeline is always scheduled
-# so downstream pipelines (e.g. release depends_on: lint) are not blocked when no .py files change.
+# Steps run only when Python sources change (step-level when).
+# event: [push, pull_request] — pull_request is required so that when.path
+# evaluates the full PR diff, not just the last pushed commit. See
+# validations.yml header for the full rationale.
+#
+# Pipeline is always triggered so downstream pipelines
+# (e.g. release depends_on: lint) are not blocked when no .py files change.
 
 steps:
   check-style-python:
@@ -10,7 +15,7 @@ steps:
       - make requirements-lint
       - make check-style
     when:
-      event: push
+      event: [push, pull_request]
       path:
         include: ['**/*.py']
         on_empty: false
@@ -25,7 +30,7 @@ steps:
       - make requirements-test
       - make files-validation
     when:
-      event: push
+      event: [push, pull_request]
       path:
         include: ['**/*.py']
         on_empty: false
