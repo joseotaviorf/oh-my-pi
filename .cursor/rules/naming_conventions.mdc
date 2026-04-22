@@ -1,5 +1,7 @@
 ---
-alwaysApply: true
+description: Snake_case rules, column prefixes (id_/sk_/uuid_/ts_/dt_/epoch_/is_/has_/mod_), table singular (dim_*) vs plural (fact_*), column ordering priority, metastore patterns by layer (raw/clean/enrich/dw/core/metric/reverse), and DAG naming patterns. Load when authoring or reviewing SQL, metadata YAML, declaration YAML, data-quality YAML, or any data-modeling file. Quick column-prefix cheat sheet stays always-on in `naming_cheatsheet.mdc`; this file is the full reference.
+globs: ["**/*.sql", "**/metadata/**/*.yml", "**/data_quality/**/*.yml", "**/*declaration*.yml", "dags/**/*.yml"]
+alwaysApply: false
 ---
 # Naming Conventions
 
@@ -82,84 +84,27 @@ alwaysApply: true
 9. **Array/struct/map columns** — Complex types, e.g. `custom_fields_json`, `tags`, `metadata_json`. Allowed in raw/clean (source fidelity); discouraged in enrich; **prohibited in DW** — flatten or extract to scalar columns before promoting.
 10. **Partitions** — Partition columns, e.g., `year`, `month`, `day` (always last)
 
-**Data Lake Example:**
+**Combined Example (DW Fact — covers all priority categories):**
 
 ```sql
 SELECT
-    id_contract,                      -- Priority 1: IDs
-    id_user,                          -- Priority 1: IDs
-    uuid_person,                       -- Priority 2: UUIDs
-    contract_status,                   -- Priority 4: Characteristics
-    rent_amount,                       -- Priority 4: Characteristics
-    days_first_listing_to_contract_signed,  -- Priority 5: Metrics
-    is_active,                         -- Priority 6: Boolean columns
-    dt_signed,                         -- Priority 7: Date columns
-    ts_created,                        -- Priority 8: Timestamp columns
-    year,                              -- Priority 10: Partitions
-    month,
-    day
-FROM
-    datalake_ebdb_clean.contract
+    sk_contract,                              -- 1: IDs (SKs in DW; use id_* in lake)
+    sk_user,                                  -- 1: IDs (FK)
+    sk_signed_date,                           -- 1: IDs (date SK)
+    uuid_person,                              -- 2: UUIDs
+    id_external,                              -- 3: Non-SKs (DW-only)
+    contract_status,                          -- 4: Characteristics
+    rent_amount,                              -- 4: Characteristics
+    days_first_listing_to_contract_signed,    -- 5: Metrics
+    is_active,                                -- 6: Booleans
+    dt_signed,                                -- 7: Date
+    ts_created,                               -- 8: Timestamp
+    ts_load,                                  -- 8: Timestamp
+    year, month, day                          -- 10: Partitions (always last)
+FROM datalake_ebdb_contract.contract
 ```
 
-**Data Warehouse Fact Table Example:**
-
-```sql
-SELECT
-    sk_contract,                      -- Priority 1: IDs (SKs)
-    sk_user,                          -- Priority 1: IDs (SKs)
-    sk_house,                         -- Priority 1: IDs (SKs)
-    sk_signed_date,                    -- Priority 1: IDs (SKs)
-    uuid_person,                      -- Priority 2: UUIDs
-    id_external,                      -- Priority 3: Non-SKs
-    contract_status,                   -- Priority 4: Characteristics
-    rent_amount,                       -- Priority 4: Characteristics
-    days_first_listing_to_contract_signed,  -- Priority 5: Metrics
-    is_active,                         -- Priority 6: Boolean columns
-    dt_signed,                         -- Priority 7: Date columns
-    ts_created,                        -- Priority 8: Timestamp columns
-    ts_load,                           -- Priority 8: Timestamp columns
-    year,                              -- Priority 10: Partitions
-    month,
-    day
-FROM
-    datalake_ebdb_contract.contract     -- Enrich DAG as source
-```
-
-**Data Warehouse Dimension Table Example:**
-
-```sql
-SELECT
-    sk_user,                          -- Priority 1: IDs (SKs)
-    sk_birth_date,                    -- Priority 1: IDs (SKs)
-    uuid_person,                      -- Priority 2: UUIDs
-    id_external,                      -- Priority 3: Non-SKs
-    user_name,                        -- Priority 4: Characteristics
-    user_email,                       -- Priority 4: Characteristics
-    days_registration_to_first_contract,  -- Priority 5: Metrics
-    is_active,                        -- Priority 6: Boolean columns
-    dt_birth,                         -- Priority 7: Date columns
-    ts_created,                       -- Priority 8: Timestamp columns
-    ts_load,                          -- Priority 8: Timestamp columns
-    year,                             -- Priority 10: Partitions
-    month,
-    day
-FROM
-    datalake_ebdb_user.user    -- Enrich DAG as source
-```
-
-| Column Type | Priority | Notes |
-|-------------|----------|-------|
-| IDs (primary/foreign keys) | 1 | Data Lake: `id_*`; Data Warehouse: `sk_*` (including `sk_*_date`) |
-| UUIDs | 2 | `uuid_*` identifiers |
-| Non-SKs (DW only) | 3 | External IDs, natural keys (e.g., `id_external`) |
-| Characteristics | 4 | Non-metric properties and attributes |
-| Metrics | 5 | Calculated metrics, SLA measures |
-| Boolean columns | 6 | `is_*`, `has_*`, `mod_*` flags |
-| Date columns | 7 | `dt_*` |
-| Timestamp columns | 8 | `ts_*`, including `ts_load` |
-| Array/struct/map columns | 9 | e.g. `custom_fields_json`, `tags`, `metadata_json`. Allowed in raw/clean; discouraged in enrich; prohibited in DW. |
-| Partitions | 10 | `event_name`, `year`, `month`, `day` (always last) |
+In a Data Lake table the only differences are: use `id_*` instead of `sk_*` for keys, and skip the priority-3 Non-SK section. In a DW Dimension, swap fact-style metrics for dimension attributes (e.g. `user_name`, `user_email`) and add an SCD-Type-2 trio (`dt_valid_from`, `dt_valid_to`, `is_current`) under priorities 4/6/7.
 
 ---
 
@@ -231,53 +176,11 @@ Choose schema placement based on context:
 |------|---------|-------|
 | **Custom Ingestion Spark Jobs** | `load_{source}_{layer}.py` | Used when `type: custom_ingestion` (e.g., `grb`, `jira`, `braze_events`) |
 
-**Spark Job Configuration:**
+**Spark Job Configuration (custom ingestion):**
 
-For custom ingestion DAGs, configure Spark job arguments using:
+For naming purposes you only need to know the three knobs: `extra_query_template_params` (Jinja params resolved by Airflow, e.g. `load_start_date` / `load_end_date`), `spark_job_arguments` (passed to Spark; references the template params with `{param}` syntax plus built-ins like `{environment}`, `{bucket}`, `{dag_name}`, `{table_name}`, `{extraction_type}`, `{partitions}`), and `tables_customization.extra_spark_job_arguments` (per-table overrides).
 
-- **`extra_query_template_params`**: Template parameters resolved at runtime using Jinja expressions. These parameters are primarily used for **incremental loads with date window filtering**. They can be referenced in SQL queries using `{param_name}` syntax and are passed to Spark jobs via `spark_job_arguments`.
-  
-  **Purpose**: Define date range parameters for incremental data extraction, allowing SQL queries to filter data within a specific time window.
-  
-  ```yaml
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
-  ```
-  
-  **Usage in SQL queries**: These parameters are substituted into SQL queries as date filters:
-  ```sql
-  WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-    -- or for single-bound filtering:
-    dt_reference >= DATE('{load_start_date}')
-    AND dt_reference < DATE('{load_end_date}')
-  ```
-  
-  **Note**: Parameters are resolved by Airflow at DAG execution time, then substituted into both SQL queries and Spark job arguments.
-
-- **`spark_job_arguments`**: Arguments passed to the Spark job. Can reference template params from `extra_query_template_params` using `{param_name}` syntax. Standard built-in params like `{environment}`, `{bucket}`, `{dag_name}`, `{table_name}`, `{extraction_type}`, `{partitions}` are also available.
-  ```yaml
-  spark_job_arguments:
-    - "{environment}"          # Built-in param
-    - "{bucket}"               # Built-in param
-    - "{dag_name}"             # Built-in param
-    - "{table_name}"           # Built-in param
-    - "{load_start_date}"       # References extra_query_template_params
-    - "{load_end_date}"        # References extra_query_template_params
-    - "{extraction_type}"      # Built-in param (full/incremental)
-    - "{partitions}"           # Built-in param
-  ```
-
-- **`tables_customization.extra_spark_job_arguments`**: Table-specific arguments that extend the default `spark_job_arguments`
-  ```yaml
-  tables_customization:
-    specific_table_name:
-      extra_spark_job_arguments:
-        - endpoint_enum: ISSUE_JQL_SEARCH
-  ```
-
-**Example:** See `dags/fintech/grb/grb_declaration.yml` for a complete custom ingestion DAG example.
+For full schemas, examples, and the date-window pattern see `dag_build.mdc`. Reference DAG: `dags/fintech/grb/grb_declaration.yml`.
 
 ---
 

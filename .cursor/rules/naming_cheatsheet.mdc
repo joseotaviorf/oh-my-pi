@@ -1,0 +1,28 @@
+---
+alwaysApply: true
+---
+# Naming Cheat Sheet
+
+All names: English, snake_case. For full conventions (metastore patterns, DAG names, schema rules, examples) see `naming_conventions.mdc` — auto-loads on `**/*.sql`, `**/metadata/**/*.yml`, `**/data_quality/**/*.yml`, declaration YAMLs.
+
+## Column prefixes
+
+| Prefix | Meaning | Examples |
+|---|---|---|
+| `id_*` | Lake primary / foreign keys | `id_house`, `id_user` |
+| `sk_*` | DW surrogate keys (incl. `sk_*_date`) | `sk_contract`, `sk_signed_date` |
+| `uuid_*` | UUID identifiers | `uuid_person`, `uuid_event` |
+| `ts_*` | Timestamp, past tense | `ts_created`, `ts_load` |
+| `dt_*` | Date, past tense | `dt_signed` |
+| `epoch_*` | Unix epoch | `epoch_event` |
+| `is_*` / `has_*` | Boolean | `is_active`, `has_house` |
+| `mod_*` | Modified column | `mod_is_penthouse` |
+
+## Tables
+
+- Dimensions: singular (`dim_user`, `dim_contract_person`).
+- Facts: plural (`fact_users`, `fact_contract_people`).
+
+## Column ordering (top → bottom)
+
+1 IDs → 2 UUIDs → 3 Non-SKs (DW only) → 4 Characteristics → 5 Metrics → 6 Booleans → 7 Dates → 8 Timestamps → 9 Arrays/structs/maps (raw/clean only; prohibited in DW) → 10 Partitions (`year`, `month`, `day` — always last).

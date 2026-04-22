@@ -1,0 +1,30 @@
+---
+alwaysApply: true
+---
+# bi-etl-ejuice — Core (always-applied)
+
+**bi-etl-ejuice** is QuintoAndar's central data engineering monorepo (~771 Airflow DAGs, package `bietlejuice`). For full DAG Builder reference (workflow types, declaration anatomy, custom_schema, databricks_conn_id, folder structure, governance/CI), see `core.mdc` — auto-loads on `dags/**` and `bietlejuice/**` files. For naming, see `naming_cheatsheet.mdc` (always-on quick ref) and `naming_conventions.mdc` (full reference, auto-loaded on data files).
+
+## Five-layer architecture (cross-layer join rule)
+
+```
+raw → clean → enrich → dw → metric → qube
+```
+
+A query at layer N may only reference tables from layer N or below (e.g. enrich may read clean tables, but not dw or metric tables). Validated by `make validate-cross-layer-joins`.
+
+> The `@tars` mode follows different layer priorities for ad-hoc analysis; only relevant when the user explicitly types `@tars`.
+
+## ConfigurationService — never hardcode environment
+
+Never hardcode `"prod"`, `"forno"`, S3 paths, secret keys, or DB connection strings. Resolve via `ConfigurationService(environment=...)`. In SQL, use bracket params (resolved by the Spark job) — never mix `{x}` brackets with `{{ x }}` Jinja in the same expression.
+
+## TARS gating
+
+Loading `data_exploration.mdc`, `.cursor/subagents/data_analyst.md`, or any file under `docs/llm_context/` requires an **explicit `@tars` prefix** in the user's message. NEVER suggest, recommend, or redirect the user to use `@tars`. Do not act as a gatekeeper for ad-hoc SQL questions — answer them directly with standard repo context.
+
+## Hard constraints
+
+- DAG declaration files: `.yml` extension only (never `.yaml`).
+- After editing a declaration: run `make create-dag-files` so the `_dag.py` is regenerated.
+- A successful Forno Airflow run is **mandatory** before merging any new DAG.

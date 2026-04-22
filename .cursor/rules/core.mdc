@@ -1,5 +1,7 @@
 ---
-alwaysApply: true
+description: Full bi-etl-ejuice DAG Builder reference — technology stack, layer architecture details, declaration anatomy (dag/workflow/cluster sections), workflow types per layer, databricks_conn_id rules, custom_schema derivation, folder structure (24 domains, qube and core sub-structures), governance/CI checks, common mistakes. Load when creating, reviewing, or troubleshooting any DAG, declaration YAML, or layer-specific work. The minimal always-on essentials (5-layer rule, ConfigurationService, TARS gating) live in `core_min.mdc`.
+globs: ["dags/**/*.yml", "dags/**/*.sql", "dags/**/*.py", "bietlejuice/**/*.py"]
+alwaysApply: false
 ---
 # bi-etl-ejuice — Core Repository Guide
 
@@ -102,21 +104,15 @@ cluster:
 | raw (CDC / custom), clean, enrich, dw | `databricks_new_env` |
 | metric, qube, reverse | `databricks_new` |
 
-### Workflow types by layer (recommended only)
+### Workflow types by layer (summary)
 
-| Layer | Recommended workflow type | Notes |
-|---|---|---|
-| raw | `cdc` | Debezium/S3-Sink; requires Kafka connector deployed first |
-| raw | `database_pull_delta` | Pull-based for Postgres/Mongo |
-| raw | `api_ingestion` | REST APIs with auth and pagination |
-| clean | `query_delta` | Standard SQL-based clean table |
-| enrich | `query_delta` | SQL with business logic |
-| dw | `query_delta` | Kimball dim/fact SQL |
-| metric | `query` or `query_delta` | Aggregated KPIs |
-| qube | `qube_dimension` / `qube_measure` / `qube_metric` | Semantic layer Spark jobs |
-| reverse | `load` / `access` / `load_access` | Export to external systems |
+- **raw**: `cdc` (Debezium), `database_pull_delta` (Postgres/Mongo pull), or `api_ingestion`.
+- **clean / enrich / dw**: `query_delta`.
+- **metric**: `query_delta` (preferred) or `query`.
+- **qube**: `qube_dimension` / `qube_measure` / `qube_metric`.
+- **reverse**: `load` / `access` / `load_access`.
 
-`query` (non-delta) and `database_pull` are deprecated — always use their `_delta` counterparts.
+`query` (non-delta) and `database_pull` are deprecated — always use their `_delta` counterparts. See `dag_build.mdc` for full per-type parameter schemas.
 
 ### `custom_schema` derivation rules
 
@@ -131,45 +127,16 @@ cluster:
 
 ## Repository Folder Structure
 
-```
-bi-etl-ejuice/
-├── bietlejuice/                         # Core Python package
-│   ├── base/
-│   │   ├── airflow/dag_builders/        # DAG Builder engine (~28 workflow types)
-│   │   └── spark/                       # BaseCoreModelSparkJob base class
-│   ├── qube/jobs/                       # Qube dimension/measure/metric Spark jobs
-│   └── services/
-│       └── configuration_service.py     # Environment-aware config (single source of truth)
-├── dags/
-│   └── {domain}/                        # 24 business domains (for_rent, fintech, agents…)
-│       └── {dag_name}/
-│           ├── {dag_name}_declaration.yml   # DAG source of truth
-│           ├── queries/{layer}/*.sql        # One .sql per output table
-│           ├── metadata/{layer}/*.yml       # Governance YAML (CI-enforced, required)
-│           ├── data_quality/{layer}/*.yml   # Optional Great Expectations assertions
-│           └── spark_jobs/                  # Custom Spark jobs (core model DAGs only)
-└── tests/
-    └── unit/                            # Mirrors bietlejuice/ package path structure
-```
+- **`bietlejuice/`** — Python package: `base/airflow/dag_builders/` (~28 workflow types), `base/spark/` (`BaseCoreModelSparkJob`), `qube/jobs/` (Qube Spark jobs), `services/configuration_service.py` (env-aware config).
+- **`dags/{domain}/{dag_name}/`** — every DAG has `{dag_name}_declaration.yml`, `queries/{layer}/*.sql`, `metadata/{layer}/*.yml` (CI-enforced), and optionally `data_quality/{layer}/*.yml` and `spark_jobs/` (core-model DAGs).
+- **`tests/unit/`** — mirrors `bietlejuice/` paths.
 
-**Business domains** (24 total): `core`, `for_rent`, `for_sale`, `fintech`, `agents`, `growth`, `people`, `platform`, `primitives`, `qcx`, `3p_partners`, `cross`, `ds_pricing`, `governance`, `mlops`, `qube`, `support_and_service`, `tech_platform`, and others.
+**24 business domains**: `core`, `for_rent`, `for_sale`, `fintech`, `agents`, `growth`, `people`, `platform`, `primitives`, `qcx`, `3p_partners`, `cross`, `ds_pricing`, `governance`, `mlops`, `qube`, `support_and_service`, `tech_platform`, and others.
 
-### Qube semantic layer sub-structure
+**Two special sub-structures:**
 
-Qube DAGs live under `dags/qube/` and follow a strict three-step pipeline. Each step is a separate DAG:
-
-```
-dags/qube/
-├── dimensions_{entity}_{name}/    # Step 1 — schedule: 0 5 * * *
-├── measures_{entity}_{name}/      # Step 2 — schedule: 0 6 * * *
-└── metrics_{name}/                # Step 3 — schedule: 0 7 * * *
-```
-
-Qube DAGs have no `queries/` or `metadata/` folders. All logic lives in `bietlejuice/qube/jobs/`.
-
-### Core model DAGs
-
-`dags/core/` contains canonical entity models (contract, house, offer, visit, listing). These use custom Spark jobs (`spark_jobs/` subdirectory) and JSON schema files instead of SQL. They inherit from `BaseCoreModelSparkJob`.
+- **`dags/qube/`** — three-step pipeline, one DAG per step: `dimensions_{entity}_{name}/` (cron `0 5 * * *`), `measures_{entity}_{name}/` (`0 6 * * *`), `metrics_{name}/` (`0 7 * * *`). No `queries/` or `metadata/`; all logic lives in `bietlejuice/qube/jobs/`.
+- **`dags/core/`** — canonical entity models (contract, house, offer, visit, listing). Custom Spark jobs in `spark_jobs/` plus JSON schema files instead of SQL; inherit from `BaseCoreModelSparkJob`.
 
 ---
 
@@ -255,6 +222,8 @@ When the user's request matches a domain below, read the corresponding file at `
 | Reliability Engineer | `reliability_engineer.md` | Cluster sizing, Delta optimizations, backfills, performance, test coverage |
 | Governance Officer | `governance_officer.md` | Metadata, SQL, or any change that may involve PII — enforce governance and block PII leaks |
 | Data Analyst (TARS) | `data_analyst.md` | User explicitly prefixes message with `@tars` — **NEVER activate by task-type inference** |
+
+(The available `.cursor/rules/*.mdc` and `.cursor/skills/` are listed in the system prompt — refer to them there.)
 
 ---
 
