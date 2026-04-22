@@ -67,7 +67,7 @@ columns:
     lineage:
     - datalake_pin.performance_evaluation.open_evaluation
   is_current:
-    description: Boolean flag indicating if this is the current active version of the evaluation (TRUE) or a historical version (FALSE). The current version has dt_valid_to = '9999-12-31'.
+    description: Boolean flag indicating if this is the current active version of the evaluation (TRUE) or a historical version (FALSE). When TRUE, this is the latest version whose validity includes today's date (future-only rows are excluded).
     lineage:
     - datalake_pin.performance_evaluation.dt_evaluation_occurred
   dt_valid_from:

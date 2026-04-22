@@ -54,7 +54,10 @@ SELECT
   numeric_behavior,
   numeric_impact,
   numeric_leadership,
-  (dt_valid_to = DATE('9999-12-31')) AS is_current,
+  (
+    dt_valid_from <= CURRENT_DATE
+    AND dt_valid_to >= CURRENT_DATE
+  ) AS is_current,
   dt_valid_from,
   dt_valid_to,
   NOW() AS ts_load

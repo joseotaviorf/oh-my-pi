@@ -108,7 +108,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_people.dt_effective_started
   is_current:
-    description: Flag indicating if this is the current version.
+    description: Flag indicating if this is the current version. When true, this is the latest version whose validity includes today's date (future-only rows are excluded).
     lineage:
       - datalake_pin_core_clean.all_people.dt_effective_started
   ts_load:

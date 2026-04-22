@@ -151,7 +151,7 @@ columns:
       - datalake_pin_core_clean.people_legislative.sexual_orientation
       - datalake_pin_core_clean.disability.status
   is_current:
-    description: True when this is the open-ended current period (no end date yet in the warehouse; end date stored as 9999-12-31).
+    description: True when this row is the latest merged demographic version whose validity includes today's date (future-only rows are excluded).
   dt_valid_from:
     description: First day this version of the profile applies (inclusive).
     lineage:

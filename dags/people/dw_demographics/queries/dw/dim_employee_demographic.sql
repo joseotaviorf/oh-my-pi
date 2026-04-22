@@ -548,7 +548,10 @@ SELECT
     ANY_VALUE(has_self_declared_pwd) AS has_self_declared_pwd,
     ANY_VALUE(has_medical_disability_record) AS has_medical_disability_record,
     ANY_VALUE(is_underrepresented_group) AS is_underrepresented_group,
-    MAX(dt_period_end) >= DATE('9999-12-31') AS is_current,
+    (
+      MIN(dt_period_start) <= CURRENT_DATE
+      AND MAX(dt_period_end) >= CURRENT_DATE
+    ) AS is_current,
     MIN(dt_period_start) AS dt_valid_from,
     MAX(dt_period_end) AS dt_valid_to,
     NOW() AS ts_load

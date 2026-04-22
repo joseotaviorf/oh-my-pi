@@ -448,7 +448,10 @@ SELECT
     mp.electoral_polling_station,
     mp.dt_valid_from,
     mp.dt_valid_to,
-    (mp.dt_valid_to = DATE('9999-12-31')) AS is_current,
+    (
+        mp.dt_valid_from <= CURRENT_DATE
+        AND mp.dt_valid_to >= CURRENT_DATE
+    ) AS is_current,
     NOW() AS ts_load
 FROM
     merged_periods AS mp

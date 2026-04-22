@@ -159,12 +159,16 @@ SELECT
         DATE('9999-12-31')
     ) AS dt_valid_to,
     (
-        LEAD(cv.dt_effective_started) OVER (
-            PARTITION BY
-                cv.id_person
-            ORDER BY
-                cv.dt_effective_started
-        ) IS NULL
+        cv.dt_effective_started <= CURRENT_DATE
+        AND COALESCE(
+            LEAD(cv.dt_effective_started) OVER (
+                PARTITION BY
+                    cv.id_person
+                ORDER BY
+                    cv.dt_effective_started
+            ) - INTERVAL '1 DAY',
+            DATE('9999-12-31')
+        ) >= CURRENT_DATE
     ) AS is_current,
     NOW() AS ts_load
 FROM

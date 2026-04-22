@@ -242,7 +242,13 @@ SELECT
     headcount_type,
     is_active,
     BOOL_OR(is_primary_organization) AS is_primary_organization,
-    BOOL_OR(dt_valid_to IS NULL) AS is_current,
+    (
+        MIN(dt_valid_from) <= CURRENT_DATE
+        AND COALESCE(
+            MAX(dt_valid_to),
+            DATE '9999-12-31'
+        ) >= CURRENT_DATE
+    ) AS is_current,
     MIN(dt_valid_from) AS dt_valid_from,
     COALESCE(
         MAX(dt_valid_to),

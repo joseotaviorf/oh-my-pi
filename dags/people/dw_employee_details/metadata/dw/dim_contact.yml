@@ -95,7 +95,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_people.dt_effective_started
   is_current:
-    description: True when this is the current contact version for the employee.
+    description: True when this is the current contact version for the employee. When true, this is the latest version whose validity includes today's date (future-only rows are excluded).
     lineage:
       - datalake_pin_core_clean.all_people.dt_effective_started
   ts_load:

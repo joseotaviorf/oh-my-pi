@@ -5,7 +5,7 @@ owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: |
   Cost centers over time: code, name, reporting hierarchy fields (business, product, brand, structure, team, chapter, line, owner levels, headcount type), HRBP assignment and person identifiers, active flag, and the calendar period each configuration was valid.
-  Each row is one version of that content; align other tables to a row using the validity dates. is_current = true with dt_valid_to = 9999-12-31 marks versions that are still open in this table.
+  Each row is one version of that content; align other tables to a row using the validity dates. When is_current is true, this row is the latest version whose validity includes today's date (future-only rows are excluded).
   Slowly changing Type 2 in enrich: one row per cost center version (sk_cost_center_version), from dt_valid_from through dt_valid_to.
 columns:
   sk_cost_center_version:
@@ -85,7 +85,7 @@ columns:
   is_primary_organization:
     description: Boolean flag indicating the canonical PIN organization row when multiple departments share the same cost_center_code and dt_valid_from; false otherwise. After contiguous merge, true if any contributing row was primary.
   is_current:
-    description: Boolean flag indicating if this version is still open-ended in the integrated merge (no effective end in the combined PIN, Codex, and responsibility windows).
+    description: When true, this row is the latest merged version whose validity includes today's date (future-only rows are excluded).
   dt_valid_from:
     description: Start date of the validity interval for this version.
     lineage:
