@@ -1,6 +1,11 @@
 from datetime import datetime
 import pyspark.sql.functions as F
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.sst.core.observability.sensors import (
+    sensor_table_exists,
+)
+
 from bietlejuice.base.sst.core.utils.common import (
     build_partition_filter,
     default_args,
@@ -19,6 +24,18 @@ def salesforce_lost_metrics(
     This is a salesforce CDC specific pipeline, we could change it later if necessary to compare row count from layer to layer
     But for now, let's keep it business specific.
     """
+
+    has_both_tables = sensor_table_exists(
+        spark, f"datalake_salesforce_raw.{target_table}", fail=False
+    ) and sensor_table_exists(
+        spark, f"datalake_salesforce_clean.{target_table}", fail=False
+    )
+    # This is to avoid failing the job for new events
+    if not has_both_tables:
+        logger.info("m=run, msg=Missing raw or clean table")
+        logger.info("m=run, msg=Skipping missing events metrics")
+        return
+
     raw = (
         spark.read.table(f"datalake_salesforce_raw.{target_table}")
         .where(F.col("partition_date") == partition_date)

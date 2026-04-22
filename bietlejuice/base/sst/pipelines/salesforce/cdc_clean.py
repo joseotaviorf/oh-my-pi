@@ -101,6 +101,7 @@ def salesforce_clean_pipeline(cfg):
         return
 
     # spark, table_name, partition_date, partition_hour, fail=True
+    # Will skip if no data or upstream table doesn't exist (E.g new events)
     has_data = sensor_partition_hour(
         spark=spark,
         table_name=source_table,

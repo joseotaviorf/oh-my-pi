@@ -39,9 +39,12 @@ def sensor_for_new_columns(spark, df, table) -> List[str]:
 
 @logger(exclude_return=True)
 def sensor_table_exists(spark, table_name, fail=True):
-    if not _table_exists(spark, table_name) and fail:
+    if not _table_exists(spark, table_name):
         logger.error(f"m=sensor_failure, msg= Table {table_name} does not exist")
-        raise ValueError(f"Table {table_name} does not exist")
+        if fail:
+            raise ValueError(f"Table {table_name} does not exist")
+        else:
+            return False
     return True
 
 
@@ -63,8 +66,10 @@ def sensor_partition_hour(spark, table_name, partition_date, partition_hour, fai
     """
     Follow same pattern as partition_has_date, but for sensors, we should be failing in case of no data and/or no table exists
     """
-    # If table doesn't exists, we should fail the job"
-    sensor_table_exists(spark, table_name)
+    # Temporarily skipping Raise in cases where the table doesn't exist
+    if not sensor_table_exists(spark, table_name, fail=fail):
+        logger.info(f"m=sensor_partition_hour, msg=Table {table_name} does not exist")
+        return False
     rows = partition_has_data(spark, table_name, partition_date, partition_hour)
     if rows:
         logger.info(

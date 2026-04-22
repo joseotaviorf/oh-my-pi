@@ -3,6 +3,9 @@ from bietlejuice.base.sst.core.utils.common import (
     default_args,
     retrieve_spark_session,
 )
+from bietlejuice.base.sst.core.observability.sensors import (
+    sensor_table_exists,
+)
 from bietlejuice.base.sst.core.observability.metrics import save_stability_metric
 
 logger = QuintoAndarLogger("sst.pipelines.metrics.pipeline_stability")
@@ -50,6 +53,11 @@ def run(cfg):
     size_lst = [7, 14, 28]
     for layer in LAYERS:
         target_table = f"datalake_salesforce_{layer}.{cfg.target_table}"
+        # This is to avoid failing the job for new events
+        if not sensor_table_exists(spark, target_table, fail=False):
+            logger.info(f"m=run, msg=Table {target_table} does not exist")
+            logger.info(f"m=run, msg=Skipping stability metrics for {layer=}")
+            continue
         for window_size in size_lst:
             logger.info(
                 f"m=save_stability_metric, msg=Saving stability metrics for {layer=}\t{cfg.target_table}\t{window_size}"

@@ -2,6 +2,9 @@ from bietlejuice.base.sst.core.utils.common import (
     default_args,
     retrieve_spark_session,
 )
+from bietlejuice.base.sst.core.observability.sensors import (
+    sensor_table_exists,
+)
 from bietlejuice.base.sst.core.observability.metrics import save_latency_metric
 from quintoandar_logger import QuintoAndarLogger
 
@@ -57,6 +60,12 @@ def run(cfg):
         logger.info(
             f"m=run, msg=Saving latency metric for {layer=} at {cfg.target_table}"
         )
+        # This is to avoid failing the job for new events
+        if not sensor_table_exists(spark, target_table, fail=False):
+            logger.info(f"m=run, msg=Table {target_table} does not exist")
+            logger.info(f"m=run, msg=Skipping latency metrics for {layer=}")
+            continue
+
         save_latency_metric(
             spark=spark,
             bucket=cfg.bucket,
