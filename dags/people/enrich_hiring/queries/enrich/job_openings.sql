@@ -16,7 +16,6 @@ SELECT
     open.internal_position_code_grupo_navent,
     open.internal_position_code_dridco,
     open.internal_position_code_one_loop,
-    open.internal_position_code_tecnologia_inmobiliarias,
     open.internal_position_code_dridco_mexico
   ) AS internal_position_code,
   COALESCE(
@@ -29,7 +28,6 @@ SELECT
     open.internal_position_name_dridco,
     open.internal_position_name_one_loop,
     open.internal_position_name_soluser,
-    open.internal_position_name_tecnologia_inmobiliarias,
     open.internal_position_name_dridco_mexico
   ) AS internal_position_name,
   open.status,

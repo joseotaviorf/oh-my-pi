@@ -41,7 +41,6 @@ columns:
     - datalake_greenhouse_v3_clean.openings.internal_position_code_grupo_navent
     - datalake_greenhouse_v3_clean.openings.internal_position_code_dridco
     - datalake_greenhouse_v3_clean.openings.internal_position_code_one_loop
-    - datalake_greenhouse_v3_clean.openings.internal_position_code_tecnologia_inmobiliarias
     - datalake_greenhouse_v3_clean.openings.internal_position_code_dridco_mexico
   internal_position_name:
     description: The internal name for the position, consolidated from multiple company-specific fields via COALESCE.
@@ -55,7 +54,6 @@ columns:
     - datalake_greenhouse_v3_clean.openings.internal_position_name_dridco
     - datalake_greenhouse_v3_clean.openings.internal_position_name_one_loop
     - datalake_greenhouse_v3_clean.openings.internal_position_name_soluser
-    - datalake_greenhouse_v3_clean.openings.internal_position_name_tecnologia_inmobiliarias
     - datalake_greenhouse_v3_clean.openings.internal_position_name_dridco_mexico
   status:
     description: The current status of the job opening ('open' or 'closed').

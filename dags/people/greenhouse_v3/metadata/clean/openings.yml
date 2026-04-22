@@ -111,14 +111,6 @@ columns:
     description: The internal position name at Soluser Soluciones y Servicios SA de CV.
     lineage:
     - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___soluser_soluciones_y_servicios_sa_de_cv.value
-  internal_position_code_tecnologia_inmobiliarias:
-    description: The external ID code for the internal position name at Tecnologia para Inmobiliarias SA de CV.
-    lineage:
-    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___tecnolog_a_para_inmobiliarias_sa_de_cv.external_id
-  internal_position_name_tecnologia_inmobiliarias:
-    description: The internal position name at Tecnologia para Inmobiliarias SA de CV.
-    lineage:
-    - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___tecnolog_a_para_inmobiliarias_sa_de_cv.value
   internal_position_code_dridco_mexico:
     description: The external ID code for the internal position name at Dridco Mexico SA de CV.
     lineage:

@@ -27,8 +27,6 @@ SELECT
     custom_fields.internal_position_name___one_loop_s_r_l_.external_id AS internal_position_code_one_loop,
     custom_fields.internal_position_name___one_loop_s_r_l_.value AS internal_position_name_one_loop,
     custom_fields.internal_position_name___soluser_soluciones_y_servicios_sa_de_cv.value AS internal_position_name_soluser,
-    custom_fields.internal_position_name___tecnolog_a_para_inmobiliarias_sa_de_cv.external_id AS internal_position_code_tecnologia_inmobiliarias,
-    custom_fields.internal_position_name___tecnolog_a_para_inmobiliarias_sa_de_cv.value AS internal_position_name_tecnologia_inmobiliarias,
     custom_fields.internal_position_name___dridco_mexico_sa_de_cv.external_id AS internal_position_code_dridco_mexico,
     custom_fields.internal_position_name___dridco_mexico_sa_de_cv.value AS internal_position_name_dridco_mexico,
     custom_fields.affirmative_focus.value AS affirmative_focus,
