@@ -7,12 +7,13 @@ WITH orchestrator_sessions AS (
     CASE
       WHEN m.channel = 'WHATSAPP_SONIA_CHAT' THEN 'sonia'
       WHEN m.channel IN ('IN_APP_SUPPORT_CHAT', 'WHATSAPP_SUPPORT_CHAT') THEN 'wall-e'
-      WHEN m.channel IN ('WHATSAPP_ISAIAS_CHAT', 'WHATSAPP_ISAIAS_MAIN_CHAT') THEN 'isaias'
       WHEN m.channel = 'WHATSAPP_MATTHEW_CHAT' THEN 'matthew'
       WHEN m.channel = 'WHATSAPP_CONCIERGE_CHAT' THEN 'concierge'
       WHEN m.channel = 'COPILOT_CHAT' THEN 'copilot'
       WHEN m.channel = 'WHATSAPP_FORSALE_TRANSACT_EOP_CHAT' THEN 'vandinha'
       WHEN m.channel = 'WHATSAPP_CLAUDIA_CHAT' THEN 'claudia'
+      WHEN m.channel = 'WHATSAPP_ALIAS_CHAT' THEN 'alias'
+      WHEN m.channel LIKE '%ISAIAS%' THEN 'isaias'
       ELSE 'unknown'
     END AS bot,
     s.source,
