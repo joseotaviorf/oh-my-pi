@@ -56,6 +56,7 @@ essential_features AS (
         days_since_contract_start,
         n_first_invoices_open,
         has_fpd_in_wallet,
+        has_fpd_in_wallet_general,
         qt_acordo_quebrado,
         qt_promessa_quebrada_fp,
         qt_aco_desconto,
@@ -268,7 +269,7 @@ calculate_monthly_payment_ratios AS (
                 AND max_delay_contaminated_contract_t2 <= 0 THEN 'ended-current'
             WHEN is_evictions THEN 'evictions'
             WHEN reference_contract_status = 'Ativo'
-                AND has_fpd_in_wallet THEN 'active-new-defaulter-first-payment-default'
+                AND has_fpd_in_wallet_general THEN 'active-new-defaulter-first-payment-default'
             WHEN reference_contract_status = 'Ativo'
                 AND has_negotiation_in_contract
                 AND max_delay_contaminated_contract_t1 <= 0 THEN 'active-ongoing-deal'
@@ -623,7 +624,7 @@ segmentation_features AS (
                 AND max_delay_contaminated_contract_t2 <= 0 THEN 'ended-current'
             WHEN is_evictions THEN 'evictions'
             WHEN reference_contract_status = 'Ativo'
-                AND has_fpd_in_wallet THEN 'active-new-defaulter-first-payment-default'
+                AND has_fpd_in_wallet_general THEN 'active-new-defaulter-first-payment-default'
             WHEN reference_contract_status = 'Ativo'
                 AND has_negotiation_in_contract
                 AND max_delay_contaminated_contract_t1 <= 0 THEN 'active-ongoing-deal'
@@ -750,7 +751,7 @@ segmentation_features AS (
                 AND max_delay_contaminated_contract_t2 <= 0 THEN 'ended-current'
             WHEN is_evictions THEN 'evictions'
             WHEN reference_contract_status = 'Ativo'
-                AND has_fpd_in_wallet THEN 'active-new-defaulter-first-payment-default'
+                AND has_fpd_in_wallet_general THEN 'active-new-defaulter-first-payment-default'
             WHEN reference_contract_status = 'Ativo'
                 AND has_negotiation_in_contract
                 AND max_delay_contaminated_contract_t1 <= 0 THEN 'active-ongoing-deal'

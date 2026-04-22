@@ -180,7 +180,17 @@ columns:
   n_first_invoices_open:
     description: Number of first invoices that are open
   has_fpd_in_wallet:
-    description: Flag indicating if contract has first payment default in wallet
+    description: |
+      Flag indicating the contract has a first-payment-default monthly invoice that is still
+      open at dt_reference. Excludes contracts whose guarantee is BROKERAGE_ONLY. Kept for
+      backward compatibility with downstream systems that consume the open-only definition.
+  has_fpd_in_wallet_general:
+    description: |
+      Flag indicating the contract has any first-payment-default monthly invoice in its wallet
+      regardless of payment status at dt_reference (open, paid, or written-down). Excludes
+      contracts whose guarantee is BROKERAGE_ONLY. Used by the segmentation analytical model so
+      that the FPD label persists on the recovery date itself, allowing correct attribution of
+      recovery to the FPD segment.
   array_open_invoices:
     description: Array of open invoice identifiers for the contract
     lineage:

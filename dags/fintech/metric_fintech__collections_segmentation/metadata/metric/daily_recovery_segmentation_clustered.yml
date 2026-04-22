@@ -1,14 +1,14 @@
 ---
 database_name: metric_fintech
-table_name: daily_recovery_segmentation
-description: Daily recovery metrics by theoretical segmentation, restricted to the last 6 months to keep the pipeline lightweight. Provides T2-delay recovery metrics aggregated by the theoretical segmentation model, excluding active-current and ended-current segments. Metrics are calculated both at reference date and accumulated from invoice creation until observation date.
+table_name: daily_recovery_segmentation_clustered
+description: Daily recovery metrics by clustered theoretical segmentation, restricted to the last 6 months to keep the pipeline lightweight. Pairs of closely related theoretical segmentations are collapsed into clustered buckets (under-mob3 early + late → under-mob3; early-low + late-low → low) to reduce noise while keeping more granularity than the macro and hyper segmentations. Metrics are T2-delay focused and calculated both at reference date and accumulated from invoice creation until observation date.
 domain: Fintech
 owner: ae-finance-fintech@quintoandar.com.br
 columns:
   segment:
     lineage:
       - dw_collections_segmentation.fact_contract_features_timeline.segmentation
-    description: Theoretical segmentation name calculated from contract features.
+    description: Clustered theoretical segmentation — the raw segmentation with selected pairs collapsed into shared buckets (active-new-defaulter-under-mob3 from under-mob3 early and late; active-new-defaulter-low from early-low and late-low); all other segmentation values are preserved as-is.
     dimension: True
   rn_business_day:
     description: Row number used to deduplicate rows by segment, reference month and business-day offset since pipe, keeping the most recent reference date first.
@@ -20,10 +20,10 @@ columns:
     description: Number of days between the reference date and the pipe date.
     dimension: True
   n_contracts_at_reference:
-    description: Number of distinct contracts in the segment at the reference date.
+    description: Number of distinct contracts in the clustered segment at the reference date.
     metric:
       name: Contracts at Reference
-      description: Number of distinct contracts in the segment at the reference date.
+      description: Number of distinct contracts in the clustered segment at the reference date.
       acronym: CAR
       is_additive: True
       business_stage: Collections
@@ -31,10 +31,10 @@ columns:
       approved_by: ae-finance-fintech@quintoandar.com.br
       link_to_metric: ""
   n_contracts_acc:
-    description: Accumulated number of distinct contracts in the segment from invoice creation until the observation date.
+    description: Accumulated number of distinct contracts in the clustered segment from invoice creation until the observation date.
     metric:
       name: Accumulated Contracts
-      description: Accumulated number of distinct contracts in the segment from invoice creation until the observation date.
+      description: Accumulated number of distinct contracts in the clustered segment from invoice creation until the observation date.
       acronym: AC
       is_additive: True
       business_stage: Collections
@@ -42,10 +42,10 @@ columns:
       approved_by: ae-finance-fintech@quintoandar.com.br
       link_to_metric: ""
   n_invoices_DT2_at_reference:
-    description: Number of distinct invoices with delay T2 (overdue) in the segment at the reference date.
+    description: Number of distinct invoices with delay T2 (overdue) in the clustered segment at the reference date.
     metric:
       name: Invoices Delay T2 at Reference
-      description: Number of distinct invoices with delay T2 (overdue) in the segment at the reference date.
+      description: Number of distinct invoices with delay T2 (overdue) in the clustered segment at the reference date.
       acronym: IDT2AR
       is_additive: True
       business_stage: Collections
@@ -53,10 +53,10 @@ columns:
       approved_by: ae-finance-fintech@quintoandar.com.br
       link_to_metric: ""
   n_invoices_DT2_acc:
-    description: Accumulated number of distinct invoices with delay T2 (overdue) in the segment from invoice creation until the observation date.
+    description: Accumulated number of distinct invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
     metric:
       name: Accumulated Invoices Delay T2
-      description: Accumulated number of distinct invoices with delay T2 (overdue) in the segment from invoice creation until the observation date.
+      description: Accumulated number of distinct invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
       acronym: AIDT2
       is_additive: True
       business_stage: Collections
@@ -64,10 +64,10 @@ columns:
       approved_by: ae-finance-fintech@quintoandar.com.br
       link_to_metric: ""
   recovered_invoices_DT2_acc:
-    description: Accumulated number of distinct recovered invoices with delay T2 (overdue) in the segment from invoice creation until the observation date.
+    description: Accumulated number of distinct recovered invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
     metric:
       name: Accumulated Recovered Invoices Delay T2
-      description: Accumulated number of distinct recovered invoices with delay T2 (overdue) in the segment from invoice creation until the observation date.
+      description: Accumulated number of distinct recovered invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
       acronym: ARIDT2
       is_additive: True
       business_stage: Collections
@@ -75,10 +75,10 @@ columns:
       approved_by: ae-finance-fintech@quintoandar.com.br
       link_to_metric: ""
   due_amount_DT2_at_reference:
-    description: Total due amount for invoices with delay T2 (overdue) in the segment at the reference date.
+    description: Total due amount for invoices with delay T2 (overdue) in the clustered segment at the reference date.
     metric:
       name: Due Amount Delay T2 at Reference
-      description: Total due amount for invoices with delay T2 (overdue) in the segment at the reference date.
+      description: Total due amount for invoices with delay T2 (overdue) in the clustered segment at the reference date.
       acronym: DADT2AR
       is_additive: True
       business_stage: Collections
@@ -86,10 +86,10 @@ columns:
       approved_by: ae-finance-fintech@quintoandar.com.br
       link_to_metric: ""
   due_amount_DT2_acc:
-    description: Accumulated total due amount for invoices with delay T2 (overdue) in the segment from invoice creation until the observation date.
+    description: Accumulated total due amount for invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
     metric:
       name: Accumulated Due Amount Delay T2
-      description: Accumulated total due amount for invoices with delay T2 (overdue) in the segment from invoice creation until the observation date.
+      description: Accumulated total due amount for invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
       acronym: ADADT2
       is_additive: True
       business_stage: Collections
@@ -97,10 +97,10 @@ columns:
       approved_by: ae-finance-fintech@quintoandar.com.br
       link_to_metric: ""
   recovered_amount_DT2_acc:
-    description: Accumulated total recovered amount for invoices with delay T2 (overdue) in the segment from invoice creation until the observation date.
+    description: Accumulated total recovered amount for invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
     metric:
       name: Accumulated Recovered Amount Delay T2
-      description: Accumulated total recovered amount for invoices with delay T2 (overdue) in the segment from invoice creation until the observation date.
+      description: Accumulated total recovered amount for invoices with delay T2 (overdue) in the clustered segment from invoice creation until the observation date.
       acronym: ARADT2
       is_additive: True
       business_stage: Collections
@@ -111,7 +111,7 @@ columns:
     description: Accumulated recovery rate on T2-delayed amount, computed as recovered_amount_DT2_acc divided by due_amount_DT2_acc.
     metric:
       name: Recovery Rate Amount T2
-      description: Accumulated recovery rate on T2-delayed amount for the segment, from invoice creation until the observation date.
+      description: Accumulated recovery rate on T2-delayed amount for the clustered segment, from invoice creation until the observation date.
       acronym: RRAT2
       is_additive: False
       business_stage: Collections

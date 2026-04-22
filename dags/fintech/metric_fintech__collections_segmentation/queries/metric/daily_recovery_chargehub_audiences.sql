@@ -1,376 +1,211 @@
-WITH chargehub_allocation AS (
-  SELECT DISTINCT
-    dt_last_appearance,
-    segment_name,
-    audience_name,
-    id_contract,
-    id_audience,
-    id_segment,
-    ts_entered_segment,
-    ts_entered_audience
-  FROM datalake_debt_recovery.segmentation_distribution
-  WHERE is_active
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, dt_last_appearance ORDER BY ts_entered_segment DESC, ts_entered_audience DESC) = 1
+WITH segment_allocation AS (
+    SELECT DISTINCT
+        dt_last_appearance,
+        segment_name,
+        audience_name,
+        id_contract
+    FROM
+        datalake_debt_recovery.segmentation_distribution
+    WHERE
+        is_active = TRUE
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY id_contract, dt_last_appearance
+        ORDER BY ts_entered_segment DESC, ts_entered_audience DESC
+    ) = 1
 ),
-
-month_view AS (
-  SELECT
-    DATE_TRUNC('month', m.dt_reference) AS month_ref,
-    COALESCE(ch.audience_name, 'Unsegmented') AS segmentation,
-    m.sk_invoice,
-    FIRST(t.dt_pipe) AS dt_pipe,
-    FIRST(m.sk_contract) AS sk_contract,
-    FIRST(ch.segment_name) AS segment_name,
-    MIN(m.dt_reference) AS dt_min_view,
-    MAX(m.dt_reference) AS dt_max_view,
-    MAX(m.due_amount) AS due_amount,
-    MAX(m.recovered_amount) AS recovered_amount,
-    MAX(CASE WHEN m.recovery_channel IN ('Negotiation - SSN', 'Paid in App','Paid outside App', 'Negotiation - Matthew', 'Negotiation of Installment - SSN') THEN m.recovered_amount ELSE NULL END) AS recovered_amount_digital,
-    MAX(CASE WHEN m.recovery_channel IN ('Negotiation - Advisory','Paid Installment in App', 'Paid Installment outside App') THEN m.recovered_amount ELSE NULL END) AS recovered_amount_bpo,
-    MAX(CASE WHEN m.recovery_channel IN ('Negotiation - Serasa') THEN m.recovered_amount ELSE NULL END) AS recovered_amount_dep,
-    MAX(m.invoice_delay_t2) AS invoice_delay_t2,
-    MAX(m.invoice_delay_t1) AS invoice_delay_t1,
-    MIN(m.contract_status) AS min_reference_contract_status,
-    MAX(m.contract_status) AS max_reference_contract_status
-  FROM dw_collections_segmentation.fact_invoice_wallet_timeline AS m
-  LEFT JOIN dw_collections_segmentation.fact_contract_features_timeline AS f ON f.dt_reference = m.dt_reference AND f.sk_contract = m.sk_contract
-  LEFT JOIN dw_collections_segmentation.fact_contract_wallet_timeline AS t ON t.dt_reference = m.dt_reference AND t.sk_contract = m.sk_contract
-  LEFT JOIN chargehub_allocation AS ch ON ch.dt_last_appearance = m.dt_reference AND ch.id_contract = m.sk_contract
-  WHERE ch.dt_last_appearance IS NOT NULL
-  GROUP BY 1,2,3
+invoice_month_boundaries AS (
+    SELECT
+        DATE_TRUNC('month', iwt.dt_reference) AS month_ref,
+        COALESCE(sda.audience_name, 'Unsegmented') AS segmentation,
+        iwt.sk_invoice,
+        FIRST(cwt.dt_pipe) AS dt_pipe,
+        FIRST(iwt.sk_contract) AS sk_contract,
+        MIN(iwt.dt_reference) AS dt_min_view,
+        MAX(iwt.dt_reference) AS dt_max_view,
+        MAX(iwt.due_amount) AS due_amount,
+        MAX(iwt.recovered_amount) AS recovered_amount,
+        MAX(iwt.invoice_delay_t2) AS invoice_delay_t2
+    FROM
+        dw_collections_segmentation.fact_invoice_wallet_timeline AS iwt
+    LEFT JOIN
+        dw_collections_segmentation.fact_contract_wallet_timeline AS cwt
+            ON cwt.dt_reference = iwt.dt_reference
+            AND cwt.sk_contract = iwt.sk_contract
+            AND MAKE_DATE(cwt.year, cwt.month, cwt.day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+    LEFT JOIN
+        segment_allocation AS sda
+            ON sda.dt_last_appearance = iwt.dt_reference
+            AND sda.id_contract = iwt.sk_contract
+    WHERE
+        MAKE_DATE(iwt.year, iwt.month, iwt.day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+        AND sda.dt_last_appearance IS NOT NULL
+    GROUP BY 1, 2, 3
 ),
-
-full_month_view AS (
-  SELECT
-    dd.date AS dt_reference,
-    m.segmentation AS segment,
-    FIRST(m.dt_pipe) AS dt_pipe,
-    FIRST(ch.segment_name) AS segment_name,
-    COUNT(DISTINCT CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation THEN f2.sk_contract
-        ELSE NULL
-    END) AS n_contracts_at_reference,
-    COUNT(DISTINCT m.sk_contract) AS n_contracts_acc,
-    COUNT(DISTINCT CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation THEN f.sk_invoice
-        ELSE NULL
-    END) AS n_invoices_at_reference,
-    COUNT(DISTINCT m.sk_invoice) AS n_invoices_acc,
-    SUM(ABS(m.due_amount)) AS total_due_amount_acc,
-    SUM(CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation THEN ABS(m.due_amount)
-        ELSE NULL
-    END) AS total_due_amount_at_reference,
-    SUM(CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation THEN f.recovered_amount
-        ELSE NULL
-    END) AS recovered_amount_at_reference,
-    COUNT(DISTINCT CASE WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation AND f.recovered_amount > 0 THEN f.sk_invoice ELSE NULL END) AS recovered_invoices_at_reference,
-    COUNT(DISTINCT CASE
-        WHEN dd.date <= m.dt_max_view AND f.recovered_amount > 0 THEN f.sk_invoice
-        WHEN dd.date > m.dt_max_view AND m.recovered_amount > 0 THEN m.sk_invoice
-        ELSE NULL END
-        ) AS recovered_invoices_acc,
-    COUNT(DISTINCT CASE WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation AND f.recovered_amount > 0 THEN f.sk_contract ELSE NULL END) AS recovered_contracts_at_reference,
-    COUNT(DISTINCT CASE
-            WHEN dd.date <= m.dt_max_view AND f.recovered_amount > 0 THEN f.sk_contract
-            WHEN dd.date > m.dt_max_view AND m.recovered_amount > 0 THEN m.sk_contract
-            ELSE NULL END) AS recovered_contracts_acc,
-    COUNT(DISTINCT CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-            AND f.invoice_delay_t1 > 0 THEN f.sk_invoice
-            ELSE NULL
-    END) AS n_invoices_DT1_at_reference,
-    COUNT(DISTINCT CASE
-        WHEN dd.date <= m.dt_max_view AND f.invoice_delay_t1 > 0 THEN f.sk_invoice
-        WHEN dd.date > m.dt_max_view AND m.invoice_delay_t1 > 0 THEN m.sk_invoice
-        ELSE NULL END) AS n_invoices_DT1_acc,
-    COUNT(DISTINCT CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-            AND f.invoice_delay_t1 <= 0 THEN f.sk_invoice
-            ELSE NULL
-    END) AS n_invoices_OT1_at_reference,
-    COUNT(DISTINCT CASE
-        WHEN dd.date <= m.dt_max_view AND f.invoice_delay_t1 <= 0 THEN f.sk_invoice
-        WHEN dd.date > m.dt_max_view AND m.invoice_delay_t1 <= 0 THEN m.sk_invoice
-        ELSE NULL
-    END) AS n_invoices_OT1_acc,
-    SUM(CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-        AND f.invoice_delay_t1 > 0 THEN ABS(m.due_amount)
-        ELSE NULL
-    END) AS due_amount_DT1_at_reference,
-    SUM(CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-        AND f.invoice_delay_t1 <= 0 THEN ABS(m.due_amount)
-        ELSE NULL
-    END) AS due_amount_OT1_at_reference,
-    SUM(CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-        AND f.invoice_delay_t1 > 0 THEN f.recovered_amount
-        ELSE NULL
-    END) AS recovered_amount_DT1_at_reference,
-    SUM(CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-        AND f.invoice_delay_t1 <= 0 THEN f.recovered_amount
-        ELSE NULL
-    END) AS recovered_amount_OT1_at_reference,
-    SUM(CASE
-        WHEN dd.date <= m.dt_max_view
-            AND f.invoice_delay_t1 > 0 THEN f.recovered_amount
-        WHEN dd.date > m.dt_max_view
-            AND m.invoice_delay_t1 > 0 THEN m.recovered_amount
-        ELSE NULL
-    END) AS recovered_amount_DT1_acc,
-    SUM(CASE
-        WHEN dd.date <= m.dt_max_view
-        AND f.invoice_delay_t1 <= 0 THEN f.recovered_amount
-        WHEN dd.date > m.dt_max_view
-            AND m.invoice_delay_t1 <= 0 THEN m.recovered_amount
-        ELSE NULL
-    END) AS recovered_amount_OT1_acc,
-    COUNT(DISTINCT CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-        AND f.recovered_amount > 0 AND f.invoice_delay_t1 > 0 THEN f.sk_invoice
-        ELSE NULL
-    END) AS recovered_invoices_DT1_at_reference,
-    COUNT(DISTINCT CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-        AND f.recovered_amount > 0 AND f.invoice_delay_t1 <= 0 THEN f.sk_invoice
-        ELSE NULL
-    END) AS recovered_invoices_OT1_at_reference,
-    COUNT(DISTINCT CASE
-        WHEN dd.date <= m.dt_max_view
-            AND f.recovered_amount > 0
-            AND f.invoice_delay_t1 > 0 THEN f.sk_invoice
-        WHEN dd.date > m.dt_max_view
-            AND m.recovered_amount > 0
-            AND m.invoice_delay_t1 > 0 THEN m.sk_invoice
-        ELSE NULL
-    END) AS recovered_invoices_DT1_acc,
-    COUNT(DISTINCT CASE
-        WHEN dd.date <= m.dt_max_view
-            AND f.recovered_amount > 0
-            AND f.invoice_delay_t1 <= 0 THEN f.sk_invoice
-        WHEN dd.date > m.dt_max_view
-            AND m.recovered_amount > 0
-            AND m.invoice_delay_t1 <= 0 THEN m.sk_invoice
-        ELSE NULL
-    END) AS recovered_invoices_OT1_acc,
-    COUNT(DISTINCT CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-            AND f.invoice_delay_t2 > 0 THEN f.sk_invoice
-        ELSE NULL
-    END) AS n_invoices_DT2_at_reference,
-    COUNT(DISTINCT
-        CASE WHEN dd.date <= m.dt_max_view AND f.invoice_delay_t2 > 0 THEN f.sk_invoice
-        WHEN dd.date > m.dt_max_view
-            AND m.invoice_delay_t2 > 0 THEN m.sk_invoice
-        ELSE NULL
-    END) AS n_invoices_DT2_acc,
-    COUNT(DISTINCT CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-            AND f.invoice_delay_t2 <= 0 THEN f.sk_invoice
-        ELSE NULL
-    END) AS n_invoices_OT2_at_reference,
-    COUNT(DISTINCT CASE
-        WHEN dd.date <= m.dt_max_view
-            AND f.invoice_delay_t2 <= 0 THEN f.sk_invoice
-        WHEN dd.date > m.dt_max_view
-            AND m.invoice_delay_t2 <= 0 THEN m.sk_invoice
-        ELSE NULL
-    END) AS n_invoices_OT2_acc,
-    SUM(CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-        AND f.invoice_delay_t2 > 0 THEN ABS(m.due_amount)
-        ELSE NULL END) AS due_amount_DT2_at_reference,
-    SUM(CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-        AND f.invoice_delay_t2 <= 0 THEN ABS(m.due_amount)
-        ELSE NULL END) AS due_amount_OT2_at_reference,
-    SUM(CASE
-        WHEN dd.date <= m.dt_max_view
-        AND f.invoice_delay_t2 <= 0 THEN ABS(m.due_amount)
-        WHEN dd.date > m.dt_max_view
-        AND m.invoice_delay_t2 <= 0 THEN ABS(m.due_amount)
-        ELSE NULL END) AS due_amount_OT2_acc,
-    SUM(CASE
-        WHEN dd.date <= m.dt_max_view
-        AND f.invoice_delay_t2 > 0 THEN ABS(m.due_amount)
-        WHEN dd.date > m.dt_max_view
-        AND m.invoice_delay_t2 > 0 THEN ABS(m.due_amount)
-        ELSE NULL END) AS due_amount_DT2_acc,
-    SUM(CASE
-        WHEN dd.date <= m.dt_max_view
-            AND f.invoice_delay_t2 > 0 THEN f.recovered_amount
-        WHEN dd.date > m.dt_max_view
-            AND m.recovered_amount > 0 THEN m.recovered_amount
-        ELSE NULL END) AS recovered_amount_DT2_acc,
-    SUM(CASE
-        WHEN dd.date <= m.dt_max_view
-            AND f.invoice_delay_t2 <= 0 THEN f.recovered_amount
-        WHEN dd.date > m.dt_max_view
-            AND m.recovered_amount > 0 THEN m.recovered_amount
-        ELSE NULL
-    END) AS recovered_amount_OT2_acc,
-    COUNT(DISTINCT CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-            AND f.recovered_amount > 0
-            AND f.invoice_delay_t2 > 0 THEN f.sk_invoice
-        ELSE NULL END) AS recovered_invoices_DT2_at_reference,
-    COUNT(DISTINCT CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-            AND f.recovered_amount > 0
-            AND f.invoice_delay_t2 <= 0 THEN f.sk_invoice
-        ELSE NULL END) AS recovered_invoices_OT2_at_reference,
-    COUNT(DISTINCT CASE
-        WHEN dd.date <= m.dt_max_view
-            AND f.recovered_amount > 0
-            AND f.invoice_delay_t2 > 0 THEN f.sk_invoice
-        WHEN dd.date > m.dt_max_view
-            AND m.recovered_amount > 0
-            AND m.invoice_delay_t2 > 0 THEN m.sk_invoice
-        ELSE NULL END) AS recovered_invoices_DT2_acc,
-    COUNT(DISTINCT CASE
-        WHEN dd.date <= m.dt_max_view
-            AND f.recovered_amount > 0
-            AND f.invoice_delay_t2 > 0 THEN f.sk_contract
-        WHEN dd.date > m.dt_max_view
-            AND m.recovered_amount > 0
-            AND m.invoice_delay_t2 > 0 THEN m.sk_contract
-        ELSE NULL
-    END) AS recovered_contracts_DT2_acc,
-    COUNT(DISTINCT CASE
-        WHEN dd.date <= m.dt_max_view
-                AND f.recovered_amount > 0
-                AND f.invoice_delay_t2 <= 0 THEN f.sk_contract
-        WHEN dd.date > m.dt_max_view
-            AND m.recovered_amount > 0
-            AND m.invoice_delay_t2 <= 0 THEN m.sk_contract
-        ELSE NULL
-    END) AS recovered_contracts_OT2_acc,
-    SUM(CASE WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation AND f.invoice_delay_t2 > 0 AND f.recovery_channel IN ('Negotiation - SSN', 'Paid in App','Paid outside App', 'Negotiation - Matthew', 'Negotiation of Installment - SSN') THEN f.recovered_amount ELSE NULL END) AS recovered_amount_DT2_Digital_at_reference,
-    SUM(CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-            AND f.invoice_delay_t1 > 0
-            AND f.recovery_channel IN ('Negotiation - SSN', 'Paid in App','Paid outside App', 'Negotiation - Matthew', 'Negotiation of Installment - SSN') THEN f.recovered_amount
-        ELSE NULL
-    END) AS recovered_amount_DT1_Digital_at_reference,
-    SUM(CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-            AND f.invoice_delay_t2 <= 0
-            AND f.recovery_channel IN ('Negotiation - SSN', 'Paid in App','Paid outside App', 'Negotiation - Matthew', 'Negotiation of Installment - SSN') THEN f.recovered_amount
-        ELSE NULL
-    END) AS recovered_amount_OT2_Digital_at_reference,
-    SUM(CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-            AND f.invoice_delay_t1 <= 0
-            AND f.recovery_channel IN ('Negotiation - SSN', 'Paid in App','Paid outside App', 'Negotiation - Matthew', 'Negotiation of Installment - SSN') THEN f.recovered_amount
-        ELSE NULL
-    END) AS recovered_amount_OT1_Digital_at_reference,
-    SUM(CASE
-            WHEN dd.date < m.dt_max_view AND f.invoice_delay_t2 > 0 THEN 0
-            WHEN dd.date >= m.dt_max_view AND m.invoice_delay_t2 > 0 THEN m.recovered_amount_digital
-            ELSE NULL
-    END) AS recovered_amount_DT2_Digital_acc,
-    SUM(CASE
-            WHEN dd.date < m.dt_max_view AND f.invoice_delay_t2 <= 0 THEN 0
-            WHEN dd.date >= m.dt_max_view AND m.invoice_delay_t2 <= 0 THEN m.recovered_amount_digital
-            ELSE NULL
-    END) AS recovered_amount_OT2_Digital_acc,
-    SUM(CASE
-            WHEN dd.date < m.dt_max_view AND f.invoice_delay_t1 > 0 THEN 0
-            WHEN dd.date >= m.dt_max_view AND m.invoice_delay_t1 > 0 THEN m.recovered_amount_digital
-            ELSE NULL
-    END) AS recovered_amount_DT1_Digital_acc,
-    SUM(CASE
-        WHEN dd.date < m.dt_max_view AND f.invoice_delay_t1 <= 0 THEN 0
-        WHEN dd.date >= m.dt_max_view AND m.invoice_delay_t1 <= 0 THEN m.recovered_amount_digital
-        ELSE NULL
-    END) AS recovered_amount_OT1_Digital_acc,
-    SUM(CASE
-        WHEN COALESCE(ch.audience_name, 'Unsegmented') = m.segmentation
-            AND f.recovery_channel IN ('Negotiation - SSN', 'Paid in App','Paid outside App', 'Negotiation - Matthew', 'Negotiation of Installment - SSN') THEN f.recovered_amount
-        ELSE NULL
-    END) AS recovered_amount_Digital_at_reference,
-    SUM(CASE
-        WHEN dd.date < m.dt_max_view THEN 0
-        WHEN dd.date >= m.dt_max_view THEN m.recovered_amount_digital
-        ELSE NULL
-    END) AS recovered_amount_acc
-  FROM dw_public.dim_date AS dd
-  LEFT JOIN month_view AS m
-    ON dd.date >= m.dt_min_view
-    AND dd.month_start = m.month_ref
-  LEFT JOIN dw_collections_segmentation.fact_invoice_wallet_timeline AS f
-    ON dd.date = f.dt_reference
-    AND f.sk_invoice = m.sk_invoice
-  LEFT JOIN dw_collections_segmentation.fact_contract_features_timeline AS f2
-    ON f2.dt_reference = f.dt_reference
-    AND f2.sk_contract = f.sk_contract
-  LEFT JOIN chargehub_allocation AS ch ON ch.dt_last_appearance = f.dt_reference AND ch.id_contract = f.sk_contract
-WHERE
-    dd.month_start >= DATE('2025-10-01')
-    AND dd.date <= CURRENT_DATE
-GROUP BY 1,2
+daily_accumulation AS (
+    SELECT
+        dd.date AS dt_reference,
+        imb.segmentation AS segment,
+        FIRST(imb.dt_pipe) AS dt_pipe,
+        -- Contracts
+        COUNT(DISTINCT
+            CASE
+                WHEN COALESCE(sda.audience_name, 'Unsegmented') = imb.segmentation THEN iwt.sk_contract
+                ELSE NULL
+            END
+        ) AS n_contracts_at_reference,
+        COUNT(DISTINCT imb.sk_contract) AS n_contracts_acc,
+        -- Invoices in delay-T2
+        COUNT(DISTINCT
+            CASE
+                WHEN COALESCE(sda.audience_name, 'Unsegmented') = imb.segmentation
+                 AND iwt.invoice_delay_t2 > 0 THEN iwt.sk_invoice
+                ELSE NULL
+            END
+        ) AS n_invoices_DT2_at_reference,
+        COUNT(DISTINCT
+            CASE
+                WHEN dd.date <= imb.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN iwt.sk_invoice
+                WHEN dd.date > imb.dt_max_view AND imb.invoice_delay_t2 > 0 THEN imb.sk_invoice
+                ELSE NULL
+            END
+        ) AS n_invoices_DT2_acc,
+        COUNT(DISTINCT
+            CASE
+                WHEN dd.date <= imb.dt_max_view
+                 AND iwt.recovered_amount > 0
+                 AND iwt.invoice_delay_t2 > 0 THEN iwt.sk_invoice
+                WHEN dd.date > imb.dt_max_view
+                 AND imb.recovered_amount > 0
+                 AND imb.invoice_delay_t2 > 0 THEN imb.sk_invoice
+                ELSE NULL
+            END
+        ) AS recovered_invoices_DT2_acc,
+        -- Due / recovered amount in delay-T2
+        SUM(
+            CASE
+                WHEN COALESCE(sda.audience_name, 'Unsegmented') = imb.segmentation
+                 AND iwt.invoice_delay_t2 > 0 THEN ABS(imb.due_amount)
+                ELSE NULL
+            END
+        ) AS due_amount_DT2_at_reference,
+        SUM(
+            CASE
+                WHEN dd.date <= imb.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN ABS(iwt.due_amount)
+                WHEN dd.date > imb.dt_max_view AND imb.invoice_delay_t2 > 0 THEN ABS(imb.due_amount)
+                ELSE NULL
+            END
+        ) AS due_amount_DT2_acc,
+        SUM(
+            CASE
+                WHEN dd.date <= imb.dt_max_view AND iwt.invoice_delay_t2 > 0 THEN iwt.recovered_amount
+                WHEN dd.date > imb.dt_max_view AND imb.invoice_delay_t2 > 0 THEN imb.recovered_amount
+                ELSE NULL
+            END
+        ) AS recovered_amount_DT2_acc
+    FROM
+        dw_public.dim_date AS dd
+    LEFT JOIN
+        invoice_month_boundaries AS imb
+            ON dd.date >= imb.dt_min_view
+            AND dd.month_start = imb.month_ref
+    LEFT JOIN
+        dw_collections_segmentation.fact_invoice_wallet_timeline AS iwt
+            ON iwt.dt_reference = dd.date
+            AND iwt.sk_invoice = imb.sk_invoice
+            AND MAKE_DATE(iwt.year, iwt.month, iwt.day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+    LEFT JOIN
+        segment_allocation AS sda
+            ON sda.dt_last_appearance = iwt.dt_reference
+            AND sda.id_contract = iwt.sk_contract
+    WHERE
+        dd.month_start >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+        AND dd.date <= CURRENT_DATE
+    GROUP BY 1, 2
+),
+business_day_context AS (
+    SELECT
+        da.segment,
+        DATE_DIFF(da.dt_reference, da.dt_pipe) AS days_to_pipe,
+        COUNT(
+            CASE
+                WHEN da.dt_reference >= da.dt_pipe AND dd.is_brz_fintech_business_day THEN da.dt_reference
+                ELSE NULL
+            END
+        ) OVER (
+            PARTITION BY da.segment, DATE_TRUNC('month', da.dt_reference)
+            ORDER BY da.dt_reference ASC
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) - 1 AS n_business_days_since_pipe,
+        da.n_contracts_at_reference,
+        da.n_contracts_acc,
+        da.n_invoices_DT2_at_reference,
+        da.n_invoices_DT2_acc,
+        da.recovered_invoices_DT2_acc,
+        da.due_amount_DT2_at_reference,
+        da.due_amount_DT2_acc,
+        da.recovered_amount_DT2_acc,
+        COALESCE(
+            da.recovered_amount_DT2_acc / NULLIF(da.due_amount_DT2_acc, 0),
+            0
+        ) AS recovery_rate_amount_t2,
+        dd.is_brz_fintech_business_day,
+        dd.next_brz_fintech_business_day,
+        DATE_TRUNC('month', da.dt_reference) AS dt_month_ref,
+        da.dt_pipe,
+        da.dt_reference
+    FROM
+        daily_accumulation AS da
+    LEFT JOIN
+        dw_public.dim_date AS dd
+            ON dd.date = da.dt_reference
+),
+final_ordering AS (
+    SELECT
+        bdc.segment,
+        ROW_NUMBER() OVER (
+            PARTITION BY bdc.n_business_days_since_pipe, bdc.dt_month_ref, bdc.segment
+            ORDER BY bdc.dt_reference DESC
+        ) AS rn_business_day,
+        bdc.n_business_days_since_pipe,
+        bdc.days_to_pipe,
+        bdc.n_contracts_at_reference,
+        bdc.n_contracts_acc,
+        bdc.n_invoices_DT2_at_reference,
+        bdc.n_invoices_DT2_acc,
+        bdc.recovered_invoices_DT2_acc,
+        bdc.due_amount_DT2_at_reference,
+        bdc.due_amount_DT2_acc,
+        bdc.recovered_amount_DT2_acc,
+        bdc.recovery_rate_amount_t2,
+        bdc.is_brz_fintech_business_day,
+        bdc.next_brz_fintech_business_day,
+        bdc.dt_month_ref,
+        bdc.dt_pipe,
+        bdc.dt_reference
+    FROM
+        business_day_context AS bdc
 )
 SELECT
     segment,
+    rn_business_day,
+    n_business_days_since_pipe,
+    days_to_pipe,
     n_contracts_at_reference,
     n_contracts_acc,
-    n_invoices_at_reference,
-    n_invoices_acc,
-    total_due_amount_acc,
-    total_due_amount_at_reference,
-    recovered_amount_at_reference,
-    recovered_amount_acc,
-    recovered_invoices_at_reference,
-    recovered_invoices_acc,
-    recovered_contracts_at_reference,
-    recovered_contracts_acc,
-    n_invoices_DT1_at_reference,
-    n_invoices_DT1_acc,
-    n_invoices_OT1_at_reference,
-    n_invoices_OT1_acc,
-    due_amount_DT1_at_reference,
-    due_amount_OT1_at_reference,
-    recovered_amount_DT1_at_reference,
-    recovered_amount_OT1_at_reference,
-    recovered_amount_DT1_acc,
-    recovered_amount_OT1_acc,
-    recovered_invoices_DT1_at_reference,
-    recovered_invoices_OT1_at_reference,
-    recovered_invoices_DT1_acc,
-    recovered_invoices_OT1_acc,
     n_invoices_DT2_at_reference,
     n_invoices_DT2_acc,
-    n_invoices_OT2_at_reference,
-    n_invoices_OT2_acc,
+    recovered_invoices_DT2_acc,
     due_amount_DT2_at_reference,
-    due_amount_OT2_at_reference,
-    due_amount_OT2_acc,
     due_amount_DT2_acc,
     recovered_amount_DT2_acc,
-    recovered_amount_OT2_acc,
-    recovered_invoices_DT2_at_reference,
-    recovered_invoices_OT2_at_reference,
-    recovered_invoices_DT2_acc,
-    recovered_contracts_DT2_acc,
-    recovered_contracts_OT2_acc,
-    recovered_amount_DT2_Digital_at_reference,
-    recovered_amount_DT1_Digital_at_reference,
-    recovered_amount_OT2_Digital_at_reference,
-    recovered_amount_OT1_Digital_at_reference,
-    recovered_amount_DT2_Digital_acc,
-    recovered_amount_OT2_Digital_acc,
-    recovered_amount_DT1_Digital_acc,
-    recovered_amount_OT1_Digital_acc,
-    recovered_amount_Digital_at_reference,
-    DATE_DIFF(dt_reference, dt_pipe) AS days_to_pipe,
-    dt_reference,
-    DATE_TRUNC('month', dt_reference) AS dt_month_ref,
-    segment_name,
+    recovery_rate_amount_t2,
+    is_brz_fintech_business_day,
+    next_brz_fintech_business_day,
+    dt_month_ref,
     dt_pipe,
+    dt_reference,
     NOW() AS ts_load
-FROM full_month_view
-WHERE segment IS NOT NULL
+FROM
+    final_ordering
+WHERE
+    segment IS NOT NULL

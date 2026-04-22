@@ -1,7 +1,28 @@
-WITH invoice_month_boundaries AS (
+WITH contract_features_normalized AS (
+    SELECT
+        sk_contract,
+        dt_reference,
+        CASE
+            WHEN segmentation IN (
+                'active-new-defaulter-under-mob3-early',
+                'active-new-defaulter-under-mob3-late'
+            ) THEN 'active-new-defaulter-under-mob3'
+            WHEN segmentation IN (
+                'active-new-defaulter-early-low',
+                'active-new-defaulter-late-low'
+            ) THEN 'active-new-defaulter-low'
+            ELSE segmentation
+        END AS segmentation
+    FROM
+        dw_collections_segmentation.fact_contract_features_timeline
+    WHERE
+        MAKE_DATE(year, month, day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+        AND segmentation NOT IN ('active-current', 'ended-current')
+),
+invoice_month_boundaries AS (
     SELECT
         DATE_TRUNC('month', iwt.dt_reference) AS month_ref,
-        cft.segmentation,
+        cfn.segmentation,
         iwt.sk_invoice,
         FIRST(cwt.dt_pipe) AS dt_pipe,
         FIRST(iwt.sk_contract) AS sk_contract,
@@ -17,14 +38,12 @@ WITH invoice_month_boundaries AS (
             ON cwt.dt_reference = iwt.dt_reference
             AND cwt.sk_contract = iwt.sk_contract
             AND MAKE_DATE(cwt.year, cwt.month, cwt.day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
-    LEFT JOIN
-        dw_collections_segmentation.fact_contract_features_timeline AS cft
-            ON cft.dt_reference = iwt.dt_reference
-            AND cft.sk_contract = iwt.sk_contract
-            AND MAKE_DATE(cft.year, cft.month, cft.day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+    INNER JOIN
+        contract_features_normalized AS cfn
+            ON cfn.dt_reference = iwt.dt_reference
+            AND cfn.sk_contract = iwt.sk_contract
     WHERE
         MAKE_DATE(iwt.year, iwt.month, iwt.day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
-        AND cft.segmentation NOT IN ('active-current', 'ended-current')
         AND cwt.wallet > 0
     GROUP BY 1, 2, 3
 ),
@@ -36,7 +55,7 @@ daily_accumulation AS (
         -- Contracts
         COUNT(DISTINCT
             CASE
-                WHEN COALESCE(cft.segmentation, 'Unsegmented') = imb.segmentation THEN iwt.sk_contract
+                WHEN COALESCE(cfn.segmentation, 'Unsegmented') = imb.segmentation THEN iwt.sk_contract
                 ELSE NULL
             END
         ) AS n_contracts_at_reference,
@@ -44,7 +63,7 @@ daily_accumulation AS (
         -- Invoices in delay-T2
         COUNT(DISTINCT
             CASE
-                WHEN COALESCE(cft.segmentation, 'Unsegmented') = imb.segmentation
+                WHEN COALESCE(cfn.segmentation, 'Unsegmented') = imb.segmentation
                  AND iwt.invoice_delay_t2 > 0 THEN iwt.sk_invoice
                 ELSE NULL
             END
@@ -70,7 +89,7 @@ daily_accumulation AS (
         -- Due / recovered amount in delay-T2
         SUM(
             CASE
-                WHEN COALESCE(cft.segmentation, 'Unsegmented') = imb.segmentation
+                WHEN COALESCE(cfn.segmentation, 'Unsegmented') = imb.segmentation
                  AND iwt.invoice_delay_t2 > 0 THEN ABS(imb.due_amount)
                 ELSE NULL
             END
@@ -101,10 +120,9 @@ daily_accumulation AS (
             AND iwt.sk_invoice = imb.sk_invoice
             AND MAKE_DATE(iwt.year, iwt.month, iwt.day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
     LEFT JOIN
-        dw_collections_segmentation.fact_contract_features_timeline AS cft
-            ON cft.dt_reference = iwt.dt_reference
-            AND cft.sk_contract = iwt.sk_contract
-            AND MAKE_DATE(cft.year, cft.month, cft.day) >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
+        contract_features_normalized AS cfn
+            ON cfn.dt_reference = iwt.dt_reference
+            AND cfn.sk_contract = iwt.sk_contract
     WHERE
         dd.month_start >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6' MONTHS
         AND dd.date <= CURRENT_DATE

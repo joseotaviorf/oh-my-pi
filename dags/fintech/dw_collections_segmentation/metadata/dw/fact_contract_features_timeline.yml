@@ -415,7 +415,7 @@ columns:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
       - dw_collections_segmentation.fact_contract_wallet_timeline.is_evictions
-      - dw_collections_segmentation.fact_contract_wallet_timeline.has_fpd_in_wallet
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_fpd_in_wallet_general
       - dw_collections_segmentation.fact_contract_wallet_timeline.has_negotiation_in_contract
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t1
       - dw_collections_segmentation.fact_contract_features_timeline.mob_months
@@ -433,7 +433,7 @@ columns:
       - dw_collections_segmentation.fact_contract_wallet_timeline.reference_contract_status
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
       - dw_collections_segmentation.fact_contract_wallet_timeline.is_evictions
-      - dw_collections_segmentation.fact_contract_wallet_timeline.has_fpd_in_wallet
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_fpd_in_wallet_general
       - dw_collections_segmentation.fact_contract_wallet_timeline.has_negotiation_in_contract
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t1
       - dw_collections_segmentation.fact_contract_features_timeline.mob_months
@@ -519,7 +519,7 @@ columns:
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t2
       - dw_collections_segmentation.fact_contract_wallet_timeline.max_delay_contaminated_contract_t1
       - dw_collections_segmentation.fact_contract_wallet_timeline.is_evictions
-      - dw_collections_segmentation.fact_contract_wallet_timeline.has_fpd_in_wallet
+      - dw_collections_segmentation.fact_contract_wallet_timeline.has_fpd_in_wallet_general
       - dw_collections_segmentation.fact_contract_wallet_timeline.has_negotiation_in_contract
       - dw_collections_segmentation.fact_contract_wallet_timeline.n_overdue_monthlys_t1
   next_macro_segmentation:
