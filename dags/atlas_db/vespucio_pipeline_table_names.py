@@ -61,6 +61,7 @@ class Tables:
     classified_v2_compounds = "vespucio_classifieds.classifieds_v2"
     classified_logging_table = "vespucio_classifieds.classifieds_publish_log"
     classified_published_listings = "vespucio_classifieds.classifieds_published_listings"
+    classifieds_to_delete = "vespucio_classifieds.classifieds_to_delete"
 
     # golden_set_condo_compounds = (
     #     "vespucio_goldenset_delta.condo_compounds_employee_sample_v1"
