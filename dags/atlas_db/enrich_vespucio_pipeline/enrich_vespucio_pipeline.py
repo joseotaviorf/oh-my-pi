@@ -1,4 +1,3 @@
-import os
 from datetime import datetime, timedelta
 from typing import List
 
@@ -23,6 +22,8 @@ from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.dataset_service import DatasetService
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 
+from dags.atlas_db.vespucio_pipeline_table_names import Tables
+
 VESPUCIO_PACKAGE_NAME = "vespucio"
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2021, 8, 24, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -31,7 +32,6 @@ CONTEXT = "vespucio_pipeline"
 DAG_NAME = f"enrich_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
-ENV = os.environ.get("ENVIRONMENT")
 EXECUTION_HOURS_TIMEOUT = 3.0
 
 _GEOCODE_MAX_PARTITIONS = 6
@@ -147,91 +147,6 @@ def create_task(entry_point: str, parameters: List[str], task_id: str = None):
         },
         execution_timeout=timedelta(hours=EXECUTION_HOURS_TIMEOUT),
     )
-
-
-class Tables:
-    source_clustering_image_model = (
-        "vespucio_sources_delta.source_clustering_image_model"
-    )
-    source_ebdb_condo = "vespucio_sources_delta.source_ebdb_condo"
-    source_kodak_metadata_condo = "vespucio_sources_delta.source_kodak_metadata_condo"
-    source_navent_condo = "vespucio_sources_delta.source_navent_condo"
-    source_union_condo = "vespucio_sources_delta.source_union_condo"
-    source_iptu_condo = "vespucio_sources_delta.source_iptu_condo"
-    source_ebdb_house = "vespucio_sources_delta.source_ebdb_house"
-    """
-    Instead of using `vespucio_sources_delta.source_navent_houses` we must use `_composed` version, which is
-    recreated every pipeline run with the increase of blocklist statuses
-    """
-    source_navent_houses_composed = (
-        "vespucio_sources_delta.source_navent_houses_composed"
-    )
-    source_navent_publisher_reputation_score = (
-        "vespucio_sources_delta.source_navent_publisher_reputation"
-    )
-    source_union_houses = "vespucio_sources_delta.source_union_house"
-    source_idactum_houses = "vespucio_sources_delta.source_idactum_houses"
-    source_idactum_transactions = "vespucio_sources_delta.source_idactum_transactions"
-    source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
-    source_iptu_houses = "vespucio_sources_delta.source_iptu_house"
-    source_cnefe_houses = "vespucio_sources_delta.source_cnefe_house"
-    source_loft_houses = "vespucio_sources_delta.source_loft_house"
-    source_viva_real_houses = "vespucio_sources_delta.source_viva_real_house"
-    source_zap_imoveis_houses = "vespucio_sources_delta.source_zap_imoveis_house"
-
-    stage_step_condos = "vespucio_pipeline_delta.stage_step_condos"
-    stage_step_houses = "vespucio_pipeline_delta.stage_step_houses"
-    address_details_hash = "vespucio_pipeline_delta.address_details_hash"
-    address_details_hasher_link = "vespucio_pipeline_delta.address_details_hasher_link"
-    source_adapter_step_condos = "vespucio_pipeline_delta.source_adapter_step_condos"
-    source_adapter_step_houses = "vespucio_pipeline_delta.source_adapter_step_houses"
-    extract_step_condos = "vespucio_pipeline_delta.extract_step_condos"
-    extract_step_houses = "vespucio_pipeline_delta.extract_step_houses"
-    prioritize_step_condos = "vespucio_pipeline_delta.prioritize_step_condos"
-    prioritize_step_houses = "vespucio_pipeline_delta.prioritize_step_houses"
-    geocode_step_cache = "vespucio_pipeline_delta.geocode_step_cache"
-    geocode_step_condos = "vespucio_pipeline_delta.geocode_step_condos"
-    geocode_step_houses = "vespucio_pipeline_delta.geocode_step_houses"
-    address_adjusted_step_condos = (
-        "vespucio_pipeline_delta.address_adjusted_step_condos"
-    )
-    address_adjusted_step_houses = (
-        "vespucio_pipeline_delta.address_adjusted_step_houses"
-    )
-    cluster_step_condos = "vespucio_pipeline_delta.cluster_step_condos"
-    cluster_step_houses = "vespucio_pipeline_delta.cluster_step_houses"
-    source_predict_step_houses = "vespucio_pipeline_delta.source_predict_step_houses"
-    join_step_condos = "vespucio_pipeline_delta.join_step_condos"
-    join_step_houses = "vespucio_pipeline_delta.join_step_houses"
-    images_step_houses = "vespucio_pipeline_delta.images_step_houses"
-    link_step = "vespucio_pipeline_delta.link_step"
-    condo_compounds = "vespucio_prod_delta.condo_compounds"
-    house_compounds = "vespucio_prod_delta.house_compounds"
-    listings = "vespucio_prod_delta.listings"
-
-    zordominium_compounds = "zordominium_vespucio_plugin.zordominium_official_condos"
-    classifieds_house_id = "vespucio_classifieds.classifieds_house_id"
-    classified_compounds = "vespucio_classifieds.classifieds_compound"
-    classified_v2_compounds = "vespucio_classifieds.classifieds_v2"
-    classified_logging_table = "vespucio_classifieds.classifieds_publish_log"
-    classified_published_listings = "vespucio_classifieds.classifieds_published_listings"
-
-    # golden_set_condo_compounds = (
-    #     "vespucio_goldenset_delta.condo_compounds_employee_sample_v1"
-    # )
-    # golden_set_condo_compounds_diff = (
-    #     "vespucio_goldenset_delta.condo_compounds_goldenset_diff"
-    # )
-
-    kodak_photo = "datalake_kodak_clean.photo"
-    kodak_photo_invalid_source = "datalake_kodak_clean.photo_invalid_source"
-
-    ebdb_clean_house_enrichment = "datalake_ebdb_clean.house_enrichment"
-    ebdb_clean_house = "datalake_ebdb_clean.house"
-    ebdb_clean_region = "datalake_ebdb_clean.region"
-    ebdb_clean_state = "datalake_ebdb_clean.state"
-    ebdb_country_table = "datalake_ebdb_clean.country"
-    ebdb_clean_map_region = "datalake_ebdb_clean.map_region"
 
 
 source_tasks = [
@@ -612,214 +527,6 @@ after_join_tasks = [
 ]
 
 
-yesterday = "{{ data_interval_start | ds }}"
-today = "{{ macros.ds_add(data_interval_start | ds, 1)  }}"
-
-plugin_tasks = [
-    create_task(
-        entry_point="plugins_compound_indexer",
-        parameters=[
-            f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
-            f"--update_alias",
-            f"--delete_old_indices",
-            f"--input_condo_compounds={Tables.condo_compounds}",
-            f"--input_house_compounds={Tables.house_compounds}",
-            f"--input_geocode_cache={Tables.geocode_step_cache}",
-            f"--output_index_prefix=vespucio_prod",
-            "--number_of_shards=3",
-            "--number_of_replicas=2",
-        ],
-    ),
-    create_task(
-        entry_point="plugins_address_details_indexer",
-        parameters=[
-            f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
-            f"--update_alias",
-            f"--delete_old_indices",
-            f"--input_house_compounds={Tables.house_compounds}",
-            f"--output_index_prefix=vespucio_prod_address_details",
-            "--number_of_shards=1",
-            "--number_of_replicas=2",
-        ],
-    ),
-    create_task(
-        entry_point="plugins_rede_house_enrichment_consolidate",
-        parameters=[
-            f"--sqs_queue_url={config_service.get_config('sqs_url_house_enrichment')}",
-            f"--sqs_region=us-east-1",
-            f"--sqs_batch_size=10",
-            f"--sqs_num_writers=10",
-            f"--input_ebdb_house_enrichment={Tables.ebdb_clean_house_enrichment}",
-            f"--input_condo_compounds={Tables.condo_compounds}",
-            f"--input_house_compounds={Tables.house_compounds}",
-        ],
-    ),
-    create_task(
-        entry_point="plugins_seo_neighborhood_recommendation",
-        parameters=[
-            f"--input_listings={Tables.listings}",
-            f"--input_houses={Tables.ebdb_clean_house}",
-            f"--input_regions={Tables.ebdb_clean_region}",
-            f"--input_map_regions={Tables.ebdb_clean_map_region}",
-            f"--output_database=neighborhood_recommendation_vespucio_plugin",
-            f"--output_listings_agg_by_neighborhood=listings_agg_by_neighborhood",
-            f"--output_listings_agg_by_city=listings_agg_by_city",
-            f"--output_listings_agg_ordered_by_count=listings_agg_ordered_by_count",
-            f"--output_nearest_neighborhoods=nearest_neighborhoods",
-            f"--output_keys_and_values_to_city_slug=keys_and_values_to_city_slug",
-            f"--output_keys_and_values_to_neighborhood_slug=keys_and_values_to_neighborhood_slug",
-            f"--output_price_by_neighborhood_slug=price_by_neighborhood_slug",
-            f"--env={ENV}",
-            f"--overwrite_schema",
-        ],
-    ),
-    create_task(
-        entry_point="plugins_property_search_indexer",
-        parameters=[
-            f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
-            f"--update_alias",
-            f"--delete_old_indices",
-            f"--input_house_compounds={Tables.house_compounds}",
-            f"--output_index_prefix=vespucio_prod",
-            "--number_of_shards=3",
-            "--number_of_replicas=2",
-        ],
-    ),
-    # create_task(
-    #     entry_point="plugins_diff_tables",
-    #     parameters=[
-    #         f"--overwrite_schema",
-    #         f"--input_left_table={Tables.condo_compounds}@{yesterday}",
-    #         f"--input_right_table={Tables.condo_compounds}@{today}",
-    #         f"--join_col=dejavuid",
-    #         f"--output_stats_table={Tables.condo_compounds}_daily_diff_stats",
-    #         f"--output_diff_table={Tables.condo_compounds}_daily_diff",
-    #         f"--output_label=condo_compounds_${yesterday}_vs_{today}",
-    #         f"--save_mode=append",
-    #     ],
-    #     task_id="plugins_diff_condo_compounds",
-    # ),
-    # create_task(
-    #     entry_point="plugins_diff_tables",
-    #     parameters=[
-    #         f"--overwrite_schema",
-    #         f"--input_left_table={Tables.house_compounds}@{yesterday}",
-    #         f"--input_right_table={Tables.house_compounds}@{today}",
-    #         f"--join_col=dejavuid",
-    #         f"--output_stats_table={Tables.house_compounds}_daily_diff_stats",
-    #         f"--output_diff_table={Tables.house_compounds}_daily_diff",
-    #         f"--output_label=house_compounds_${yesterday}_vs_{today}",
-    #         f"--save_mode=append",
-    #     ],
-    #     task_id="plugins_diff_house_compounds",
-    # ),
-    # create_task(
-    #     entry_point="plugins_diff_tables",
-    #     parameters=[
-    #         f"--overwrite_schema",
-    #         f"--input_left_table={Tables.golden_set_condo_compounds}@{today}",
-    #         f"--input_right_table={Tables.condo_compounds}@{today}",
-    #         f"--join_col=dejavuid",
-    #         f"--ignore_cols=sources,relations,content_md5",
-    #         f"--output_stats_table={Tables.golden_set_condo_compounds_diff}_stats",
-    #         f"--output_diff_table={Tables.golden_set_condo_compounds_diff}",
-    #         f"--output_label=condo_compounds_employee_sample_v1_vs_{today}",
-    #         f"--save_mode=append",
-    #     ],
-    #     task_id="plugins_diff_golden_set_condo_compounds",
-    # ),
-]
-
-zordominium_tasks = [
-    create_task(
-        entry_point="plugins_zordominium",
-        parameters=[
-            f"--operation=both",
-            f"--env={ENV}",
-            f"--stage_db=zordominium_vespucio_plugin",
-            f"--remove_old_condos=False",
-        ],
-    ),
-    create_task(
-        entry_point="plugins_condo_by_region",
-        parameters=[
-            f"--input_condos={Tables.zordominium_compounds}",
-            f"--input_listings={Tables.listings}",
-            f"--output_database=condos_by_region_plugin",
-            "--operation=all",
-            f"--env={ENV}",
-        ],
-    ),
-]
-
-classifieds_tasks = [
-    create_task(
-        entry_point="plugins_classifieds_house_id",
-        parameters=[
-            f"--input_listing_compound={Tables.listings}",
-            f"--input_classifieds_house_id={Tables.classifieds_house_id}",
-            f"--output_classifieds_house_id={Tables.classifieds_house_id}",
-        ],
-    ),
-    create_task(
-        entry_point="plugins_classifieds",
-        parameters=[
-            f"--overwrite_schema",
-            f"--input_condo_compound={Tables.condo_compounds}",
-            f"--input_house_compound={Tables.house_compounds}",
-            f"--input_listing_compound={Tables.listings}",
-            f"--input_zordominium_compound={Tables.zordominium_compounds}",
-            f"--output_classified_compound={Tables.classified_compounds}",
-        ],
-    ),
-    create_task(
-        entry_point="plugins_classified_indexer",
-        parameters=[
-            f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
-            f"--update_alias",
-            f"--delete_old_indices",
-            f"--input_classifieds={Tables.classified_compounds}",
-            f"--output_index_prefix=vespucio_prod",
-            f"--number_of_shards=4",
-            f"--number_of_replicas=2",
-            f"--refresh_interval=60",
-        ],
-    ),
-]
-
-classifieds_v2_tasks = [
-    create_task(
-        entry_point="plugins_classifieds_v2",
-        parameters=[
-            f"--input_condo_compound={Tables.condo_compounds}",
-            f"--input_house_compound={Tables.house_compounds}",
-            f"--input_listing_compound={Tables.listings}",
-            f"--input_zordominium_compound={Tables.zordominium_compounds}",
-            f"--input_region_table={Tables.ebdb_clean_region}",
-            f"--input_state_table={Tables.ebdb_clean_state}",
-            f"--input_country_table={Tables.ebdb_country_table}",
-            f"--input_navent_source_table={Tables.source_navent_houses_composed}",
-            f"--input_classified_house_id_table={Tables.classifieds_house_id}",
-            f"--input_navent_publisher_reputation_table={Tables.source_navent_publisher_reputation_score}",
-            f"--output_classified_compound={Tables.classified_v2_compounds}",
-            "--overwrite_schema",
-        ],
-    ),
-    create_task(
-        entry_point="plugins_classifieds_publisher",
-        parameters=[
-            f"--input_classifieds_table={Tables.classified_v2_compounds}",
-            f"--output_published_listings_table={Tables.classified_published_listings}",
-            f"--logging_table={Tables.classified_logging_table}",
-            f"--deployment_env={ENV}",
-            "--running_mode=prod",
-            "--overwrite_schema",
-        ],
-    ),
-]
-
-join_plugins = DummyOperator(task_id="join_plugins", dag=dag)
-
 execute_job_cluster_task >> source_tasks
 
 source_tasks >> stage_step_task
@@ -848,14 +555,4 @@ chain(*join_and_predict_task)
 source_predict_task >> join_and_predict_task[1]
 
 join_and_predict_task[-1] >> after_join_tasks
-after_join_tasks >> join_plugins
 
-join_plugins >> plugin_tasks
-join_plugins >> classifieds_tasks[0]
-chain(*classifieds_tasks)
-join_plugins >> zordominium_tasks[0]
-chain(*zordominium_tasks)
-
-classifieds_tasks[0] >> classifieds_v2_tasks[0]
-zordominium_tasks[0] >> classifieds_v2_tasks[0]
-chain(*classifieds_v2_tasks)

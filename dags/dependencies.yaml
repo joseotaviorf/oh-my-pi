@@ -4910,3 +4910,5 @@ bietlejuice.survicate_survey_attributes:
   - bietlejuice.survicate_surveys:load-raw-surveys:first-run-of-day
 bietlejuice.text2filter_evals:
   - quintoml.copilot.text2filter_evals.inference:first-run-of-day
+bietlejuice.vespucio_pipeline_plugins:
+  - bietlejuice.enrich_vespucio_pipeline:vespucio-core-pipeline-complete:first-run-of-day

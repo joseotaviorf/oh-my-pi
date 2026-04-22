@@ -392,7 +392,7 @@ expected_times_to_finish:
   bietlejuice.enrich_user: 07:42
   bietlejuice.enrich_velo: 07:56
   bietlejuice.enrich_velo_zendesk: 06:47
-  bietlejuice.enrich_vespucio_pipeline: "12:30"
+  bietlejuice.enrich_vespucio_pipeline: "12:00"
   bietlejuice.enrich_visit: 07:08
   bietlejuice.enrich_visit_agent_performance: "10:10"
   bietlejuice.enrich_wololo: 04:31
@@ -551,6 +551,7 @@ expected_times_to_finish:
   bietlejuice.velo_neurotech: 07:21
   bietlejuice.velo_neurotech_pj: 07:20
   bietlejuice.velo_zendesk: 06:29
+  bietlejuice.vespucio_pipeline_plugins: "13:30"
   bietlejuice.vespucio_service: 04:45
   bietlejuice.wall_street: "10:24"
   bietlejuice.wololo: 04:35

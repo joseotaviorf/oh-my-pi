@@ -1,0 +1,80 @@
+class Tables:
+    source_clustering_image_model = (
+        "vespucio_sources_delta.source_clustering_image_model"
+    )
+    source_ebdb_condo = "vespucio_sources_delta.source_ebdb_condo"
+    source_kodak_metadata_condo = "vespucio_sources_delta.source_kodak_metadata_condo"
+    source_navent_condo = "vespucio_sources_delta.source_navent_condo"
+    source_union_condo = "vespucio_sources_delta.source_union_condo"
+    source_iptu_condo = "vespucio_sources_delta.source_iptu_condo"
+    source_ebdb_house = "vespucio_sources_delta.source_ebdb_house"
+    # Prefer source_navent_houses_composed over source_navent_houses: recomposed each run with blocklist updates.
+    source_navent_houses_composed = (
+        "vespucio_sources_delta.source_navent_houses_composed"
+    )
+    source_navent_publisher_reputation_score = (
+        "vespucio_sources_delta.source_navent_publisher_reputation"
+    )
+    source_union_houses = "vespucio_sources_delta.source_union_house"
+    source_idactum_houses = "vespucio_sources_delta.source_idactum_houses"
+    source_idactum_transactions = "vespucio_sources_delta.source_idactum_transactions"
+    source_itbi_houses = "vespucio_sources_delta.source_itbi_house"
+    source_iptu_houses = "vespucio_sources_delta.source_iptu_house"
+    source_cnefe_houses = "vespucio_sources_delta.source_cnefe_house"
+    source_loft_houses = "vespucio_sources_delta.source_loft_house"
+    source_viva_real_houses = "vespucio_sources_delta.source_viva_real_house"
+    source_zap_imoveis_houses = "vespucio_sources_delta.source_zap_imoveis_house"
+
+    stage_step_condos = "vespucio_pipeline_delta.stage_step_condos"
+    stage_step_houses = "vespucio_pipeline_delta.stage_step_houses"
+    address_details_hash = "vespucio_pipeline_delta.address_details_hash"
+    address_details_hasher_link = "vespucio_pipeline_delta.address_details_hasher_link"
+    source_adapter_step_condos = "vespucio_pipeline_delta.source_adapter_step_condos"
+    source_adapter_step_houses = "vespucio_pipeline_delta.source_adapter_step_houses"
+    extract_step_condos = "vespucio_pipeline_delta.extract_step_condos"
+    extract_step_houses = "vespucio_pipeline_delta.extract_step_houses"
+    prioritize_step_condos = "vespucio_pipeline_delta.prioritize_step_condos"
+    prioritize_step_houses = "vespucio_pipeline_delta.prioritize_step_houses"
+    geocode_step_cache = "vespucio_pipeline_delta.geocode_step_cache"
+    geocode_step_condos = "vespucio_pipeline_delta.geocode_step_condos"
+    geocode_step_houses = "vespucio_pipeline_delta.geocode_step_houses"
+    address_adjusted_step_condos = (
+        "vespucio_pipeline_delta.address_adjusted_step_condos"
+    )
+    address_adjusted_step_houses = (
+        "vespucio_pipeline_delta.address_adjusted_step_houses"
+    )
+    cluster_step_condos = "vespucio_pipeline_delta.cluster_step_condos"
+    cluster_step_houses = "vespucio_pipeline_delta.cluster_step_houses"
+    source_predict_step_houses = "vespucio_pipeline_delta.source_predict_step_houses"
+    join_step_condos = "vespucio_pipeline_delta.join_step_condos"
+    join_step_houses = "vespucio_pipeline_delta.join_step_houses"
+    images_step_houses = "vespucio_pipeline_delta.images_step_houses"
+    link_step = "vespucio_pipeline_delta.link_step"
+    condo_compounds = "vespucio_prod_delta.condo_compounds"
+    house_compounds = "vespucio_prod_delta.house_compounds"
+    listings = "vespucio_prod_delta.listings"
+
+    zordominium_compounds = "zordominium_vespucio_plugin.zordominium_official_condos"
+    classifieds_house_id = "vespucio_classifieds.classifieds_house_id"
+    classified_compounds = "vespucio_classifieds.classifieds_compound"
+    classified_v2_compounds = "vespucio_classifieds.classifieds_v2"
+    classified_logging_table = "vespucio_classifieds.classifieds_publish_log"
+    classified_published_listings = "vespucio_classifieds.classifieds_published_listings"
+
+    # golden_set_condo_compounds = (
+    #     "vespucio_goldenset_delta.condo_compounds_employee_sample_v1"
+    # )
+    # golden_set_condo_compounds_diff = (
+    #     "vespucio_goldenset_delta.condo_compounds_goldenset_diff"
+    # )
+
+    kodak_photo = "datalake_kodak_clean.photo"
+    kodak_photo_invalid_source = "datalake_kodak_clean.photo_invalid_source"
+
+    ebdb_clean_house_enrichment = "datalake_ebdb_clean.house_enrichment"
+    ebdb_clean_house = "datalake_ebdb_clean.house"
+    ebdb_clean_region = "datalake_ebdb_clean.region"
+    ebdb_clean_state = "datalake_ebdb_clean.state"
+    ebdb_country_table = "datalake_ebdb_clean.country"
+    ebdb_clean_map_region = "datalake_ebdb_clean.map_region"
