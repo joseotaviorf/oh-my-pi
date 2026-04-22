@@ -220,7 +220,7 @@ SELECT DISTINCT
                   ) THEN d.sk_date END) AS ldt_arbitral_citation,
     COUNT(DISTINCT
             CASE
-                WHEN DATE(e.dt_arbitral_citation_start) <= d.date AND DATE(e.dt_arbitral_citation_start) IS NOT NULL
+                WHEN DATE(e.dt_arbitral_distribution_start) <= d.date AND DATE(e.dt_arbitral_distribution_start) IS NOT NULL
                 AND d.is_brz_holiday = "No holiday" AND d.weekend = 'Weekday' AND d.arbitration_recess = False
                 AND(
                   (DATE(e.dt_arbitral_sentence_start) IS NOT NULL AND DATE(e.dt_arbitral_sentence_start) >= d.date) OR
