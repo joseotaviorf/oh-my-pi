@@ -1,0 +1,64 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: availabilities
+description: |
+  This table contains the availabilities records that are part of the payment for companies.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.id
+    description: ID of the table, it’s the primary key.
+  id_agent:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.agent_id
+    description: The id of the agent that the availability is related to.
+  id_user:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.user_id
+    description: The id of the user that the availability is related to.
+  uuid_person:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.person_uuid
+    description: The person that the availability is related to.
+  uuid_company:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.company_uuid
+    description: The company that the availability is related to.
+  id_bill:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.bill_id
+    description: The id of the related bill.
+  agent_type:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.agent_type
+    description: Indicates to which agent type the issue belongs to.
+  amount:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.amount
+    description: The amount of the availability.
+  currency:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.currency
+    description: The currency of the record.
+  version:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.version
+    description: Record version.
+  dt_start:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.start_date
+    description: The start date considered for the calculation of the availability.
+  dt_end:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.end_date
+    description: The end date considered for the calculation of the availability.
+  ts_created:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.created_at
+    description: Timestamp of the record creation action.
+  ts_updated:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.updated_at
+    description: Timestamp of the record update action.

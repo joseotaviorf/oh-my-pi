@@ -1,0 +1,100 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: jira_remunerations
+description: |
+  This table contains the detailed remuneration tickets from Jira.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.id
+    description: ID of the table, it’s the primary key.
+  id_jira_issue:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.jira_issue_id
+    description: The id of Jira Issue in the Jira Issues table.
+  id_user:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.user_id
+    description: The id of the user that the ticket is related to.
+  uuid_person:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.person_uuid
+    description: The person that the ticket is related to.
+  uuid_company:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.company_uuid
+    description: The company that the ticket is related to.
+  id_source:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.source_id
+    description: The id in the source table of the record the issue references.
+  id_bill:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.bill_id
+    description: The id of the related bill.
+  id_operation_payment:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.operation_payment_id
+    description: The id of the related operation payment.
+  id_property:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.property_id
+    description: The property related to the record.
+  agent_type:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.agent_type
+    description: Indicates to which agent type the issue belongs to.
+  request_type:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.request_type
+    description: Indicates the remuneration type.
+  request_category:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.request_category
+    description: A category that describes the nature of the remuneration.
+  business_source:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.business_source
+    description: Indicates the business source of the record.
+  amount:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.amount
+    description: The amount of the issue in Jira.
+  currency:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.currency
+    description: The currency of the record.
+  source_type:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.source_type
+    description: The source type of the record the issue references.
+  remuneration_type:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.remuneration_type
+    description: The parsed type of remuneration issue, and additional or a discount.
+  report_description:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.report_description
+    description: The description that goes into the agent report.
+  version:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.version
+    description: Record version.
+  dt_reference:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.reference_date
+    description: The date to take into account for the payment reference.
+  dt_event_reference:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.event_reference_date
+    description: The reference date where the event would have happened.
+  ts_created:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.created_at
+    description: Timestamp of the record creation action.
+  ts_updated:
+    lineage:
+      - datalake_partner_payment_raw.jira_remunerations.updated_at
+    description: Timestamp of the record update action.

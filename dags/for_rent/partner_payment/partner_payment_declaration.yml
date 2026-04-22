@@ -39,6 +39,12 @@ workflow:
       clean_table_name: bills
     bill_reviews:
       clean_table_name: bill_reviews
+    jira_issues:
+      clean_table_name: jira_issues
+    jira_remunerations:
+      clean_table_name: jira_remunerations
+    availabilities:
+      clean_table_name: availabilities
 cluster:
   type: databricks_16_4_med_general_cluster
   databricks_conn_id: databricks_new

@@ -1,0 +1,26 @@
+SELECT
+    id,
+    jira_issue_id AS id_jira_issue,
+    user_id AS id_user,
+    person_uuid AS uuid_person,
+    company_uuid AS uuid_company,
+    source_id AS id_source,
+    bill_id AS id_bill,
+    operation_payment_id AS id_operation_payment,
+    property_id AS id_property,
+    agent_type,
+    request_type,
+    request_category,
+    business_source,
+    amount,
+    currency,
+    source_type,
+    remuneration_type,
+    report_description,
+    version,
+    reference_date AS dt_reference,
+    event_reference_date AS dt_event_reference,
+    created_at AS ts_created,
+    updated_at AS ts_updated
+FROM
+    datalake_partner_payment_raw.jira_remunerations
