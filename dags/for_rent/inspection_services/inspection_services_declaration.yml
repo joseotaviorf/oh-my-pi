@@ -97,6 +97,10 @@ workflow:
       clean_table_name: item_group_type
       clean_primary_keys: [id_item_group_type]
       raw_primary_keys: [id]
+    item_group_specification:
+      clean_table_name: item_group_specification
+      clean_primary_keys: [id_item_group_specification]
+      raw_primary_keys: [id]
     item_group_aud:
       clean_table_name: item_group_aud
       clean_primary_keys: [id_item_group, rev]

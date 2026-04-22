@@ -1,0 +1,43 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: item_group_specification
+description: Lookup table of possible specifications (variants) for each item group type evaluated during inspections (e.g. couch sizes, bed types, floor materials).
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id_item_group_specification:
+    lineage:
+      - datalake_inspection_services_raw.item_group_specification.id
+    description: Item Group Specification unique identifier
+  id_item_group_type:
+    lineage:
+      - datalake_inspection_services_raw.item_group_specification.item_group_type_id
+    description: Foreign key referencing the item group type this specification belongs to
+  name:
+    lineage:
+      - datalake_inspection_services_raw.item_group_specification.name
+    description: Name of the specification variant (e.g. 3_seater, double_bed, ceramic_porcelain_tile_floor)
+  position:
+    lineage:
+      - datalake_inspection_services_raw.item_group_specification.position
+    description: Display order of the specification within its item group type
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.item_group_specification.created_at
+    description: Creation date
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.item_group_specification.updated_at
+    description: Update date
+  year:
+    lineage:
+      - datalake_inspection_services_raw.item_group_specification.year
+    description: Year of update date.
+  month:
+    lineage:
+      - datalake_inspection_services_raw.item_group_specification.month
+    description: Month of update date.
+  day:
+    lineage:
+      - datalake_inspection_services_raw.item_group_specification.day
+    description: Day of update date.
