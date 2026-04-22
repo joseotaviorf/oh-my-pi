@@ -18,9 +18,12 @@ events_config:
     event_path: "raw/salesforce/CaseMediationEvent"
   case_member:
     event_path: "raw/salesforce/CaseMemberEvent"
-  # case_repair_analysis:
-  #   event_path: "raw/salesforce/CaseRepairAnalysisEvent"
-  #   skip_quality_contracts: true
+  case_plates_lockbox:
+    event_path: "raw/salesforce/CasePlatesLockboxEvent"
+  case_inspection::
+    event_path: "raw/salesforce/CaseInspectionEvent"
+  case_repair_analysis:
+    event_path: "raw/salesforce/CaseRepairAnalysisEvent"
   comment:
     event_path: "raw/salesforce/CommentEvent"
     skip_quality_contracts: true
