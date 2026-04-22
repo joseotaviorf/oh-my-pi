@@ -1613,6 +1613,7 @@ bietlejuice.enrich_bank_conciliation:
   - bietlejuice.itau_statements:load-clean-statement-879200452685:first-run-of-day
   - bietlejuice.itau_statements:load-clean-statement-879200494588:first-run-of-day
   - bietlejuice.itau_statements:load-clean-statement-879200984646:first-run-of-day
+  - bietlejuice.itau_statements:load-clean-statement-067000392216:first-run-of-day
   - bietlejuice.monopoly:load-clean-income-reference:first-run-of-day
   - bietlejuice.monopoly:load-clean-person-sale:first-run-of-day
   - bietlejuice.monopoly:load-clean-person:first-run-of-day
