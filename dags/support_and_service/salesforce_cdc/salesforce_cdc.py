@@ -34,8 +34,7 @@ ENV = os.environ.get("ENVIRONMENT")
 CONFIG_SERVICE = ConfigurationService(DAG_NAME)
 DATABRICKS_CONN_ID = "databricks_new"
 BIETLEJUICE_REPO_PATH = CONFIG_SERVICE.get_config("databricks_bietlejuice_repo_path")
-BASE_SPARK_JOB_PATH = f"{BIETLEJUICE_REPO_PATH}/spark_jobs/{DAG_NAME}/"
-BASE_SPARK_JOBS_PATH = f"{BIETLEJUICE_REPO_PATH}/spark_jobs/base/"
+BASE_SPARK_JOB_PATH = f"{BIETLEJUICE_REPO_PATH}/spark_jobs/sst_pipelines/"
 RELATIVE_DAG_PATH = "dags/support_and_service/salesforce_cdc"
 EVENTS_CONFIG = CONFIG_SERVICE.get_config("events_config")
 
@@ -61,15 +60,15 @@ def create_sst_task(
     task_id: str = None
 ):
 
+    task_id = f"load_{target_schema}_{target_table}" if not task_id else task_id
     base_parameters = {
         **BASE_PARAMETERS,
         "target_schema": target_schema,
         "target_table": target_table,
-        "job_name": f"load_{target_schema}_{target_table}",
+        "job_name": task_id,
         **parameters
     }
     #override task_id if provided
-    task_id = f"load_{target_schema}_{target_table}" if not task_id else task_id
     entry_point = entry_point if entry_point.endswith(".py") else f"{entry_point}.py"
     base_parameters = parse_parameters(base_parameters)
     return QuintoAndarDatabricksCheckJobTaskOperator(
@@ -94,6 +93,33 @@ def create_execute_job_cluster_task(dag: DAG, task_id: str):
         access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
         libraries=get_libs(ENV),
     )
+
+
+def build_metrics_tasks(event_table): 
+
+    return [ 
+        create_sst_task(
+            target_schema="",
+            target_table=event_table,
+            entry_point="quality/metrics/stability",
+            parameters={},
+            task_id=f"metrics_pipeline_stability_{event_table}",
+        ),
+        create_sst_task(
+            target_schema="",
+            target_table=event_table,
+            entry_point="quality/metrics/latency",
+            parameters={},
+            task_id=f"metrics_pipeline_latency_{event_table}",
+        ),
+        create_sst_task(
+            target_schema="",
+            target_table=event_table,
+            entry_point="salesforce/metrics/missing_events",
+            parameters={},
+            task_id=f"metrics_pipeline_missing_events_{event_table}",
+        ),
+    ]
 
 
 def create_start_end_operator(task_id: str):
@@ -146,26 +172,34 @@ with DAG(
         raw_task = create_sst_task(
             target_schema="datalake_salesforce_raw",
             target_table=event_table,
-            entry_point="cdc_raw_ingestion",
+            entry_point="salesforce/cdc_raw",
             parameters=parameters,
         )
+        
         clean_task = create_sst_task(
             target_schema="datalake_salesforce_clean",
             target_table=event_table,
-            entry_point="cdc_clean",
+            entry_point="salesforce/cdc_clean",
             parameters={
                 "source_schema": "datalake_salesforce_raw",
                 "sync_hive": "True",
             },
         )
 
+        metrics_tasks = build_metrics_tasks(event_table)
         if parameters.get("skip_quality_contracts", False):
-            execute_job_cluster >> raw_task >> clean_task >> end
+            (
+                execute_job_cluster 
+                >> raw_task 
+                >> clean_task 
+                >> metrics_tasks
+                >> end
+            )
         else:
             quality_contract_raw = create_sst_task(
                 target_schema="datalake_salesforce_raw",
                 target_table=event_table,
-                entry_point="generic_quality_checks",
+                entry_point="quality/contracts/generic",
                 parameters={
                     "threshold_time_hours": threshold_time_hours,
                 },
@@ -174,12 +208,20 @@ with DAG(
             quality_contract_clean = create_sst_task(
                 target_schema="datalake_salesforce_clean",
                 target_table=event_table,
-                entry_point="generic_quality_checks",
+                entry_point="quality/contracts/generic",
                 parameters={
                     "threshold_time_hours": threshold_time_hours,
                 },
                 task_id=f"quality_contract_checks_clean_{event_table}",
             )
-            execute_job_cluster >> raw_task >> quality_contract_raw >> clean_task >> quality_contract_clean >> end
+            (
+                execute_job_cluster 
+                >> raw_task 
+                >> quality_contract_raw 
+                >> clean_task 
+                >> quality_contract_clean 
+                >> metrics_tasks
+                >> end
+            )
 
     start >> execute_job_cluster

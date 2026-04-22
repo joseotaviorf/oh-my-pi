@@ -3,7 +3,12 @@ import pyspark.sql.functions as F
 
 from bietlejuice.base.sst.core.observability.metrics import save_volume_metric
 from bietlejuice.base.sst.core.quality.checks import basic_quality_checks
-from bietlejuice.base.sst.core.utils.common import validate_and_write
+from bietlejuice.base.sst.core.utils.common import (
+    build_partition_filter,
+    default_args,
+    retrieve_spark_session,
+    validate_and_write,
+)
 from bietlejuice.base.sst.core.observability.sensors import (
     sensor_s3_file_exists,
     partition_has_data,
@@ -21,12 +26,57 @@ logger = QuintoAndarLogger("sst.pipelines.salesforce_raw")
 
 
 @logger(exclude_return=True)
-def salesforce_raw_pipeline(spark, cfg):
+@default_args(
+    optional_args=[
+        dict(
+            name="dag_name",
+            flags=["--dag_name", "--dag-name"],
+            type=str,
+            required=False,
+            default="",
+            help="DAG name (optional).",
+        ),
+        dict(
+            name="bucket",
+            flags=["--bucket"],
+            type=str,
+            required=True,
+            help="S3 Bucket Name.",
+        ),
+        dict(
+            name="partition_date",
+            flags=["--partition_date", "--partition-date"],
+            type=str,
+            required=True,
+            help="Partition date (YYYY-MM-DD).",
+        ),
+        dict(
+            name="partition_hour",
+            flags=["--partition_hour", "--partition-hour"],
+            type=str,
+            required=True,
+            help="Partition hour (HH).",
+        ),
+        dict(
+            name="event_path",
+            flags=["--event_path", "--event-path"],
+            type=str,
+            required=True,
+            help="Path to event in S3 bucket.",
+        ),
+    ]
+)
+def salesforce_raw_pipeline(cfg):
     """
     Since most Salesforce pipelines should follow a pattern, this serves as a template
     It can be changed as needed, but let's try to keep it working as needed here
     """
     # Argument breaking logic
+    job_name = f"{cfg.dag_name}.{cfg.job_name}"
+    logger.info(f"m=run, CFG: {cfg}")
+    logger.info(f"m=run, msg=Starting events for {job_name=}")
+    logger.info(f"m=run, msg=Config: {cfg=}")
+    spark = retrieve_spark_session(job_name=job_name)
 
     partition_path = "/".join(cfg.partition_date.split("-") + [cfg.partition_hour])
     file_key = f"{cfg.event_path}/{partition_path}"
@@ -87,7 +137,12 @@ def salesforce_raw_pipeline(spark, cfg):
         f"m=salesforce_raw_pipeline, msg=Metadata retrieved: {cfg.target_schema=}"
     )
 
-    partition_filter = f"partition_date = '{cfg.partition_date}' AND partition_hour = '{cfg.partition_hour}'"
+    partition_filter = build_partition_filter(
+        {
+            "partition_date": cfg.partition_date,
+            "partition_hour": cfg.partition_hour,
+        }
+    )
     partition_cols = ["partition_date", "partition_hour"]
     logger.info(f"m=salesforce_raw_pipeline, msg=Partition columns: {partition_cols}")
 
@@ -121,3 +176,7 @@ def salesforce_raw_pipeline(spark, cfg):
             table_location=f"s3a://{cfg.bucket}/sst_metrics/{_metric}",
         )
     logger.info("m=salesforce_raw_pipeline, msg=Pipeline completed")
+
+
+if __name__ == "__main__":
+    salesforce_raw_pipeline()

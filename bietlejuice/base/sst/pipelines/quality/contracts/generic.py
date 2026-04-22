@@ -5,7 +5,13 @@ from pyspark.sql import functions as F
 from quintoandar_logger import QuintoAndarLogger
 
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
-from bietlejuice.base.sst.core.utils.common import validate_and_write
+from bietlejuice.base.sst.core.observability.common import current_write_timestamp
+
+from bietlejuice.base.sst.core.utils.common import (
+    default_args,
+    retrieve_spark_session,
+    validate_and_write,
+)
 
 
 class GenericContractQualityChecks:
@@ -14,14 +20,19 @@ class GenericContractQualityChecks:
         spark: SparkSession,
         table_name: str,
         bucket: str,
+        logger: QuintoAndarLogger = None,
         threshold_time_hours: int = 24,
     ):
         self.spark = spark
         self.table_name = table_name
         self.threshold_time_hours = threshold_time_hours
         self.bucket = bucket
-        self.logger = QuintoAndarLogger(
-            f"sst.pipelines.quality.contract.generic_checks.{table_name}"
+        self.logger = (
+            logger
+            if logger
+            else QuintoAndarLogger(
+                f"sst.pipelines.quality.contract.generic_checks.{table_name}"
+            )
         )
 
         self.metric_database = "datalake_sst_metrics"
@@ -92,7 +103,7 @@ class GenericContractQualityChecks:
                 "layer": self.table_name.split(".")[0].split("_")[-1],
                 "status": "success" if count_rows > 0 else "failed",
                 "last_row_timestamp": last_row_timestamp,
-                "_write_timestamp": datetime.now(),
+                "write_timestamp": current_write_timestamp(),
             }
         )
 
@@ -108,3 +119,68 @@ class GenericContractQualityChecks:
             Data has processed for the last time at {last_row_timestamp}
             """
         )
+
+
+@default_args(
+    optional_args=[
+        dict(
+            name="dag_name",
+            flags=["--dag_name", "--dag-name"],
+            type=str,
+            required=False,
+            default="",
+            help="DAG name (optional).",
+        ),
+        dict(
+            name="partition_date",
+            flags=["--partition_date", "--partition-date"],
+            type=str,
+            required=True,
+            help="Partition date (YYYY-MM-DD); Required by DAG template.",
+        ),
+        dict(
+            name="partition_hour",
+            flags=["--partition_hour", "--partition-hour"],
+            type=str,
+            required=True,
+            help="Partition hour (HH); Required by DAG template.",
+        ),
+        dict(
+            name="bucket",
+            flags=["--bucket"],
+            type=str,
+            required=True,
+            help="S3 Bucket Name.",
+        ),
+        dict(
+            name="threshold_time_hours",
+            flags=["--threshold_time_hours", "--threshold-time-hours"],
+            type=int,
+            required=False,
+            default=24,
+            help="Window in hours for ts_load freshness check.",
+        ),
+    ]
+)
+def run(cfg):
+    job_name = f"{cfg.dag_name}.{cfg.job_name}"
+    logger = QuintoAndarLogger(
+        f"sst.pipelines.quality.contract.generic_checks.{job_name}"
+    )
+    logger.info(f"m=run, msg=Starting generic contract quality checks for {job_name=}")
+    spark = retrieve_spark_session(job_name=job_name)
+    table_name = f"{cfg.target_schema}.{cfg.target_table}"
+    bucket = cfg.bucket
+    checks = GenericContractQualityChecks(
+        spark=spark,
+        table_name=table_name,
+        bucket=bucket,
+        logger=logger,
+        threshold_time_hours=cfg.threshold_time_hours,
+    )
+    checks.run()
+    logger.info("m=run, msg=Generic contract quality checks completed")
+
+
+if __name__ == "__main__":
+    run()

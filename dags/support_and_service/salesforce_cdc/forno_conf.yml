@@ -14,24 +14,6 @@ datalake_bucket: "5a-datalake-forno"
 events_config:
   case:
     event_path: "raw/salesforce/CaseEvent"
-  case_mediation:
-    event_path: "raw/salesforce/CaseMediationEvent"
-  case_member:
-    event_path: "raw/salesforce/CaseMemberEvent"
-  # case_repair_analysis:
-  #   event_path: "raw/salesforce/CaseRepairAnalysisEvent"
-  #   skip_quality_contracts: true
-  comment:
-    event_path: "raw/salesforce/CommentEvent"
-    skip_quality_contracts: true
-  dynamic_form:
-    event_path: "raw/salesforce/DynamicFormEvent"
-  email_message:
-    event_path: "raw/salesforce/EmailMessageEvent"
-  opportunity:
-    event_path: "raw/salesforce/OpportunityEvent"
-  user:
-    event_path: "raw/salesforce/UserEvent"
 
 custom_cluster:
   driver_node_type_id: r5d.xlarge

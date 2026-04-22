@@ -77,14 +77,14 @@ def default_args(
             name="target_schema",
             flags=["--target_schema", "--target-schema"],
             type=str,
-            required=True,
+            required=False,
             help="Target Database Name",
         ),
         dict(
             name="target_table",
             flags=["--target_table", "--target-table"],
             type=str,
-            required=True,
+            required=False,
             help="Target Table Name",
         ),
     ]
@@ -141,6 +141,42 @@ def default_args(
         return wrapper
 
     return decorator
+
+
+def build_partition_filter(filters: dict[str, object]) -> str:
+    """
+    Helper function to build a partition filter from a dictionary of filters.
+
+    Parameters
+    ----------
+    filters : dict[str, object]
+        Dictionary of filters.
+
+    Returns
+    -------
+    str: A string in A SQL format for the partition_filter
+
+    e.g:
+    -------
+    >>> build_partition_filter({"partition_date": "2026-01-01", "partition_hour": "00"})
+    "partition_date = '2026-01-01' AND partition_hour = '00'"
+
+    >>> build_partition_filter({"partition_date": "2026-01-01", "partition_hour": "00", "event_table":"events_case"})
+    "partition_date = '2026-01-01' AND partition_hour = '00' AND event_table = 'events_case'"
+
+    build_partition_filter({"partition_date": "2026-01-01", "threshold_time_hours": 24, "event_table":"events_case"})
+    "partition_date = '2026-01-01' AND threshold_time_hours = 42 AND event_table = 'events_case'"
+    """
+
+    expressions = []
+
+    for column, value in filters.items():
+        if isinstance(value, str):
+            expressions.append(f"{column} = '{value}'")
+        else:
+            expressions.append(f"{column} = {value}")
+
+    return " AND\n".join(expressions)
 
 
 @logger()
