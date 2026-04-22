@@ -9,48 +9,100 @@ columns:
     description: "Langfuse session identifier."
     lineage:
       - datalake_langfuse_clean.traces.id_session
-  has_user_name_success:
+  id_lead_retrieved:
+    description: "Lead identifier retrieved from the conversation flow input when available."
+    lineage:
+      - datalake_langfuse_clean.observations.input
+  has_user_name:
     description: "True when the user name qualification step succeeds with a captured first name."
     lineage:
       - datalake_langfuse_clean.observations.name
       - datalake_langfuse_clean.observations.output
-  has_property_address_success:
-    description: "True when the property address clarification step succeeds."
+  has_property_address:
+    description: "True when the property address clarification step is confirmed by the user."
     lineage:
       - datalake_langfuse_clean.observations.name
       - datalake_langfuse_clean.observations.output
-  has_property_address_confirmation_success:
-    description: "True when property address confirmation indicates coverage is available."
+  has_business_context:
+    description: "True when the listing type step succeeds with a for-rent or for-sale property intent."
     lineage:
       - datalake_langfuse_clean.observations.name
       - datalake_langfuse_clean.observations.output
-  has_property_address_confirmation_disqualification:
-    description: "True when property address confirmation disqualifies the conversation."
-    lineage:
-      - datalake_langfuse_clean.observations.name
-  has_property_type_disqualification:
-    description: "True when the property type step disqualifies the conversation."
-    lineage:
-      - datalake_langfuse_clean.observations.name
-  has_property_type_success:
-    description: "True when the property type clarification step succeeds."
-    lineage:
-      - datalake_langfuse_clean.observations.name
-  has_property_availability_disqualification:
-    description: "True when the property availability step disqualifies the conversation."
-    lineage:
-      - datalake_langfuse_clean.observations.name
-  has_property_availability_success:
-    description: "True when the property availability clarification step succeeds."
+  has_property_vacancy:
+    description: "True when the property vacancy clarification step confirms the property is available."
     lineage:
       - datalake_langfuse_clean.observations.name
       - datalake_langfuse_clean.observations.output
+  has_property_details:
+    description: "True when the property details node post-clarification step is reached in the flow."
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_property_features:
+    description: "True when the property numbers (features) node post-clarification step is reached in the flow."
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_property_condo:
+    description: "True when the condo costs node post-clarification step is reached in the flow."
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_property_iptu:
+    description: "True when the IPTU costs node post-clarification step is reached in the flow."
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_property_features_confirmation:
+    description: "True when the draft confirmation (property features confirmation) post-clarification step is reached."
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_pricing_information:
+    description: "True when the rent or sale pricing suggestion step captures a chosen price for the property."
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.output
+  has_photo_selected:
+    description: "True when the photo session scheduling step captures a photo schedule date for the property."
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.output
+  has_submission:
+    description: "True when the submission step confirms the photo session was successfully scheduled."
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.output
+  has_escalated_qualified:
+    description: "True when the conversation escalates via the qualified escalation node."
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_faq_agent_interaction:
+    description: "True when the FAQ agent is activated at least once during the conversation flow."
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_escalated_non_qualified:
+    description: "True when the conversation escalates via the non-qualified escalation node."
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_entry_model:
+    description: "True when the entry access model node post-clarification step is reached in the flow."
+    lineage:
+      - datalake_langfuse_clean.observations.name
+  has_easy_entry_model:
+    description: "True when the entry access model uses an easy-access type (front door, password, or keys with agent)."
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.output
+  has_auth_request:
+    description: "True when the photo session scheduling authentication clarification step is reached."
+    lineage:
+      - datalake_langfuse_clean.observations.name
   has_retrieved_lead:
-    description: "True when the flow retrieves a lead identifier during prospect retrieval."
+    description: "True when the flow retrieves a lead identifier during the prospect retrieval step."
     lineage:
       - datalake_langfuse_clean.observations.name
       - datalake_langfuse_clean.observations.input
-  id_lead_retrieved:
-    description: "Lead identifier retrieved from the conversation flow when available."
+  is_full_process:
+    description: "True when the draft is enabled in the output, indicating a full conversational process was completed."
     lineage:
-      - datalake_langfuse_clean.observations.input
+      - datalake_langfuse_clean.observations.output
+  ts_session:
+    description: "Earliest observation start timestamp within the session, used as the session timestamp."
+    lineage:
+      - datalake_langfuse_clean.traces.ts_created
