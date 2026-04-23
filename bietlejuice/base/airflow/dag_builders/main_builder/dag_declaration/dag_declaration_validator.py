@@ -621,3 +621,13 @@ class DAGDeclarationValidator(Validator):
                         f"msg='id_expansion.param_name' or 'id_expansion.path_param' "
                         f"is required for table '{table_name}'"
                     )
+                correlation_field = id_expansion.get("correlation_field")
+                if correlation_field is not None and (
+                    not isinstance(correlation_field, str)
+                    or not correlation_field.strip()
+                ):
+                    raise AssertionError(
+                        f"m=_validate_api_ingestion_workflow, "
+                        f"msg='id_expansion.correlation_field' for table '{table_name}' "
+                        f"must be a non-empty string when set"
+                    )

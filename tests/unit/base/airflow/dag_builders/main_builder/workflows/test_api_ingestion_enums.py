@@ -58,13 +58,18 @@ class TestPaginationStrategyEnum:
         """Test that NONE has correct value."""
         assert PaginationStrategyEnum.NONE.value == "none"
 
+    def test_page_per_page_value(self):
+        """Test that PAGE_PER_PAGE has correct value."""
+        assert PaginationStrategyEnum.PAGE_PER_PAGE.value == "page_per_page"
+
     def test_get_available_enum_values(self):
         """Test that get_available_enum_values returns all enum values."""
         values = PaginationStrategyEnum.get_available_enum_values()
         assert "cursor" in values
         assert "offset_limit" in values
+        assert "page_per_page" in values
         assert "none" in values
-        assert len(values) == 3
+        assert len(values) == 4
 
 
 class TestRateLimitingStrategyEnum:

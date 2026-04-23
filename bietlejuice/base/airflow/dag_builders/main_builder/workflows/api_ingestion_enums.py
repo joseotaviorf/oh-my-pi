@@ -23,6 +23,7 @@ class PaginationStrategyEnum(Enum):
 
     CURSOR = "cursor"
     OFFSET_LIMIT = "offset_limit"
+    PAGE_PER_PAGE = "page_per_page"
     NONE = "none"
 
     @classmethod
