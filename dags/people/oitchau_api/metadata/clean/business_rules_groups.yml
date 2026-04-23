@@ -1,0 +1,88 @@
+database_name: datalake_oitchau_clean
+table_name: business_rules_groups
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Oitchau business rules groups for timekeeping and payroll rules (clean projection from the Integrations API raw table).
+columns:
+  id_business_rules_group:
+    description: UUID of the business rules group from Oitchau; use for joins to nested rule payloads.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.uuid
+  id_company:
+    description: UUID identifier from Oitchau (id_company) used as a natural
+      key for joins.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.companyUuid
+  id_created_by_user:
+    description: Identifier from Oitchau (id_created_by_user) used as a natural or
+      surrogate key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.createdBy
+  id_updated_by_user:
+    description: Identifier from Oitchau (id_updated_by_user) used as a natural or
+      surrogate key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.updatedBy
+  id_external:
+    description: Identifier from Oitchau (id_external) used as a natural or surrogate
+      key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.externalId
+  group_name:
+    description: Business attribute from Oitchau clean projection (group_name) for
+      time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.name
+  group_status:
+    description: Status value from Oitchau (group_status) for workflow or lifecycle
+      reporting.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.status
+  user_profiles_count:
+    description: Count of user profiles linked to this rules group in Oitchau (`userProfilesCount` in the API).
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.userProfilesCount
+  is_default_group:
+    description: Boolean flag from Oitchau (is_default_group) describing eligibility
+      or configuration state.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.isDefault
+  is_locked_for_editing:
+    description: Boolean flag from Oitchau (is_locked_for_editing) describing eligibility
+      or configuration state.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.isLocked
+  ts_created:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_created)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.createdAt
+  ts_updated:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_updated)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.updatedAt
+  ts_load:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_load)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.ts_load
+  business_rules:
+    description: Raw businessRules payload from Oitchau (array, struct, or string); normalize or serialize in enrich when a stable JSON string is required.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.businessRules
+  year:
+    description: Airflow ingestion partition column year from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.year
+  month:
+    description: Airflow ingestion partition column month from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.month
+  day:
+    description: Airflow ingestion partition column day from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.business_rules_groups.day

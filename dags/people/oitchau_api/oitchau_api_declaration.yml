@@ -75,6 +75,13 @@ workflow:
       - employees
 
   tables_customization:
+    business_rules_groups:
+      endpoint_path: business_rules_groups
+      extraction_type: full
+      params: {}
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
     employees:
       endpoint_path: employees
       params: {}
