@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple
 from functools import reduce
 
 from pyspark.sql import DataFrame
@@ -72,6 +72,8 @@ class HistoryBuilder:
         shuffle_partitions = int(spark.conf.get("spark.sql.shuffle.partitions", "200"))
         df_source = df_source.repartition(shuffle_partitions, F.col(id_col))
 
+        default_values = HistoryBuilder._extract_default_values(event_configs)
+
         # Cache the narrow, repartitioned DataFrame so the 29-branch union
         # that follows can share a single shuffle + window evaluation.
         # Caching here (not on the raw wide source) keeps the footprint small:
@@ -79,7 +81,7 @@ class HistoryBuilder:
         df_source.cache()
         try:
             df_with_prev = HistoryBuilder._apply_lag_windows(
-                df_source, id_col, ts_col, tracked_cols
+                df_source, id_col, ts_col, tracked_cols, default_values
             )
 
             event_dfs = HistoryBuilder._detect_and_pivot(
@@ -118,12 +120,47 @@ class HistoryBuilder:
             resolve_event_name(ec, index=i)
 
     @staticmethod
+    def _extract_default_values(
+        event_configs: List[Dict[str, str]],
+    ) -> Dict[str, Tuple[str, str]]:
+        """Extract columns that carry a default_value from event_configs.
+
+        Returns a dict mapping tracked_col → (default_value_str, spark_type_str).
+        Only entries that explicitly declare ``default_value`` are included.
+        ``target_type`` is used as the Spark cast target; falls back to "string".
+        """
+        return {
+            ec["tracked_col"]: (ec["default_value"], ec.get("target_type", "string"))
+            for ec in event_configs
+            if "default_value" in ec
+        }
+
+    @staticmethod
     def _apply_lag_windows(
         df: DataFrame,
         id_col: str,
         ts_col: str,
         tracked_cols: List[str],
+        default_values: Optional[Dict[str, Tuple[str, str]]] = None,
     ) -> DataFrame:
+        """Apply coalesce defaults then compute LAG windows for change detection.
+
+        When a column has a ``default_value`` (from ``_extract_default_values``),
+        a coalesce is applied **before** the LAG window so that:
+        - Change detection operates on the effective (post-transformation) value.
+        - Transitions like ``null → false`` (same effective value) are correctly
+          suppressed rather than emitting a spurious event.
+        - The stored ``value`` in the output row already reflects the default.
+        """
+        if default_values is None:
+            default_values = {}
+
+        for col_name, (default_val, col_type) in default_values.items():
+            df = df.withColumn(
+                col_name,
+                F.coalesce(F.col(col_name), F.lit(default_val).cast(col_type)),
+            )
+
         w = Window.partitionBy(id_col).orderBy(ts_col)
         for col_name in tracked_cols:
             df = df.withColumn(f"_prev_{col_name}", F.lag(F.col(col_name)).over(w))

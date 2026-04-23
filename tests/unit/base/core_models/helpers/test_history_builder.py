@@ -15,6 +15,28 @@ from pyspark.sql.types import (
 
 from bietlejuice.base.core_models.helpers.history_builder import HistoryBuilder
 
+# ---------------------------------------------------------------------------
+# Shared schema / configs for default_value tests
+# ---------------------------------------------------------------------------
+
+DEFAULT_VALUE_SCHEMA = StructType(
+    [
+        StructField("id", StringType(), True),
+        StructField("relistingEnabled", BooleanType(), True),
+        StructField("op_cdc", StringType(), True),
+        StructField("ts_database_transaction", TimestampType(), True),
+    ]
+)
+
+DEFAULT_VALUE_EVENT_CONFIGS = [
+    {
+        "tracked_col": "relistingEnabled",
+        "target_col": "is_relisting_enabled",
+        "target_type": "boolean",
+        "default_value": "false",
+    }
+]
+
 
 EXPECTED_COLUMNS = {
     "id_event",
@@ -553,3 +575,138 @@ class TestHistoryBuilderEdgeCases:
         int_row = [r for r in result.collect() if r["event_name"] == "ev_COUNT"][0]
         assert isinstance(int_row["value"], str)
         assert int_row["value"] == "42"
+
+
+class TestHistoryBuilderDefaultValue:
+    """Tests for event_configs entries that declare a default_value.
+
+    Mirrors the is_relisting_enabled / relistingEnabled transformation on
+    core_contract_history: null → false so that null-to-null transitions
+    do not emit spurious events and stored values align with the current-state
+    model (core_contract.contract uses coalesce(is_relisting_enabled, false)).
+    """
+
+    def _build(self, spark_session, data):
+        df = spark_session.createDataFrame(data, DEFAULT_VALUE_SCHEMA)
+        return HistoryBuilder.build_history_for_columns(
+            df,
+            entity_name="contract",
+            id_col="id",
+            ts_col="ts_database_transaction",
+            op_col="op_cdc",
+            event_configs=DEFAULT_VALUE_EVENT_CONFIGS,
+            event_type="cdc",
+            event_origin=SOURCE_TABLE,
+        )
+
+    def test_create_with_null_stores_false_as_value(self, spark_session):
+        # arrange -- contract created with relistingEnabled = null
+        data = [("1", None, "c", datetime(2026, 1, 1, 8, 0, 0))]
+        result = self._build(spark_session, data)
+        rows = result.collect()
+        # create always emits; default coalesces null → false
+        assert len(rows) == 1
+        assert rows[0]["event_name"] == "ev_is_relisting_enabled"
+        assert rows[0]["value"] == "false"
+
+    def test_update_null_to_null_emits_no_event(self, spark_session):
+        # arrange -- relisting stays null across an update
+        data = [
+            ("2", None, "c", datetime(2026, 1, 1, 8, 0, 0)),
+            ("2", None, "u", datetime(2026, 1, 2, 8, 0, 0)),
+        ]
+        result = self._build(spark_session, data)
+        update_rows = [
+            r
+            for r in result.collect()
+            if r["ts_transaction"] == datetime(2026, 1, 2, 8, 0, 0)
+        ]
+        # null → null = false → false after coalesce: no change, no event
+        assert len(update_rows) == 0
+
+    def test_update_null_to_false_emits_no_event(self, spark_session):
+        # arrange -- relisting changes from null to explicit false (same effective value)
+        data = [
+            ("3", None, "c", datetime(2026, 1, 1, 8, 0, 0)),
+            ("3", False, "u", datetime(2026, 1, 2, 8, 0, 0)),
+        ]
+        result = self._build(spark_session, data)
+        update_rows = [
+            r
+            for r in result.collect()
+            if r["ts_transaction"] == datetime(2026, 1, 2, 8, 0, 0)
+        ]
+        # null → false = false → false after coalesce: same effective value, no event
+        assert len(update_rows) == 0
+
+    def test_update_null_to_true_emits_event_with_true_value(self, spark_session):
+        # arrange -- relisting becomes enabled
+        data = [
+            ("4", None, "c", datetime(2026, 1, 1, 8, 0, 0)),
+            ("4", True, "u", datetime(2026, 1, 2, 8, 0, 0)),
+        ]
+        result = self._build(spark_session, data)
+        update_rows = [
+            r
+            for r in result.collect()
+            if r["ts_transaction"] == datetime(2026, 1, 2, 8, 0, 0)
+        ]
+        # null → true = false → true after coalesce: effective change detected
+        assert len(update_rows) == 1
+        assert update_rows[0]["event_name"] == "ev_is_relisting_enabled"
+        assert update_rows[0]["value"] == "true"
+
+    def test_update_true_to_null_emits_event_with_false_value(self, spark_session):
+        # arrange -- relisting reverts to null (same effective value as false)
+        data = [
+            ("5", True, "c", datetime(2026, 1, 1, 8, 0, 0)),
+            ("5", None, "u", datetime(2026, 1, 2, 8, 0, 0)),
+        ]
+        result = self._build(spark_session, data)
+        update_rows = [
+            r
+            for r in result.collect()
+            if r["ts_transaction"] == datetime(2026, 1, 2, 8, 0, 0)
+        ]
+        # true → null = true → false after coalesce: this IS a change
+        # (effectively enabled → disabled), so an event should be emitted
+        assert len(update_rows) == 1
+        assert update_rows[0]["value"] == "false"
+
+    def test_column_without_default_value_is_unaffected(self, spark_session):
+        # arrange -- mix: one column with default_value, one without
+        schema = StructType(
+            [
+                StructField("id", StringType(), True),
+                StructField("relistingEnabled", BooleanType(), True),
+                StructField("rent", DoubleType(), True),
+                StructField("op_cdc", StringType(), True),
+                StructField("ts_database_transaction", TimestampType(), True),
+            ]
+        )
+        mixed_configs = [
+            {
+                "tracked_col": "relistingEnabled",
+                "target_col": "is_relisting_enabled",
+                "target_type": "boolean",
+                "default_value": "false",
+            },
+            {"tracked_col": "rent", "event_name": "ev_rent"},
+        ]
+        data = [("6", None, None, "c", datetime(2026, 2, 1, 8, 0, 0))]
+        df = spark_session.createDataFrame(data, schema)
+        result = HistoryBuilder.build_history_for_columns(
+            df,
+            entity_name="contract",
+            id_col="id",
+            ts_col="ts_database_transaction",
+            op_col="op_cdc",
+            event_configs=mixed_configs,
+            event_type="cdc",
+            event_origin=SOURCE_TABLE,
+        )
+        rows = {r["event_name"]: r for r in result.collect()}
+        # relistingEnabled: null → "false" via default_value
+        assert rows["ev_is_relisting_enabled"]["value"] == "false"
+        # rent: null stays null, no default applied
+        assert rows["ev_rent"]["value"] is None

@@ -62,7 +62,7 @@ columns:
       ev_responsible_for_iptu: Change detected in the IPTU responsible party (responsavelIptu) column.
       ev_signature_type: Change detected in the signature type (tipoAssinatura) column.
       ev_status_closing: Change detected in the closing status (statusClosing) column.
-      ev_is_relisting_enabled: Change detected in the relisting flag (relistingEnabled) column.
+      ev_is_relisting_enabled: "Change detected in the relisting flag (relistingEnabled) column. Null values are coalesced to false to align with the core_contract.contract transformation (coalesce(is_relisting_enabled, false)); a null-to-null transition therefore produces no event."
       ev_rent: Change detected in the rent value (valorAluguel) column.
       ev_iptu: Change detected in the IPTU value (iptu_valor) column.
       ev_rental_guarantee_installment: Change detected in the rental guarantee installments (seguroFianca_parcelas) column.

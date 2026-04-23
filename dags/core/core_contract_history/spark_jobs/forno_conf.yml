@@ -39,6 +39,7 @@ event_configs:
   - tracked_col: relistingEnabled
     target_col: is_relisting_enabled
     target_type: boolean
+    default_value: "false"
   - tracked_col: valorAluguel
     target_col: rent
     target_type: double
