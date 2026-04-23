@@ -1,8 +1,6 @@
 dag:
   name: enrich_emr_validation_test
   owner: Data Life Cycle
-  catchup: false
-  schedule_interval: None
   schedule_start_date: 2026, 1, 1
   documentation:
     dag_purpose: |
