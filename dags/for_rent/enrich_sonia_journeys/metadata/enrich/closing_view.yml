@@ -62,3 +62,8 @@ columns:
     description: |
       Non-negative 64-bit hash bucket helper; Spark xxhash64 on UTF-8 concat of id_house, hyphen, and tenant UUID from the sent event.
       Compare experiment specs before relying on parity with other engines.
+  binning_value_contract_id:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: |
+      Temporary binning value using modulo 100 of the contract id. This will be a temporary solution which is replicable to know the AB test attribution in the query used by operations team.

@@ -8,6 +8,7 @@ WITH
       CAST(e_sent.event_properties:id_tenant AS STRING) AS uuid_tenant,
       CAST(e_sent.event_properties:id_owner AS STRING) AS uuid_owner,
       CAST(e_sent.event_properties:id_rent_flow AS STRING) AS id_rent_flow,
+      CAST(e_sent.event_properties:id_contract AS INT) AS id_contract,
       e_sent.ts_event AS ts_sent
     FROM
       datalake_cdp_clean.transactional AS e_sent
@@ -79,7 +80,8 @@ SELECT
   s.user_role,
   s.uuid_person,
   u.id AS id_user,
-  abs(crc32(encode(concat(CAST(s.id_house AS STRING), '-', s.uuid_tenant), 'utf-8'))) % 100 AS binning_value
+  abs(crc32(encode(concat(CAST(s.id_house AS STRING), '-', s.uuid_tenant), 'utf-8'))) % 100 AS binning_value,
+  s.id_contract % 100 AS binning_value_contract_id
 FROM
   split_users AS s
   INNER JOIN datalake_ebdb_clean.user AS u
