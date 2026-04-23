@@ -1,0 +1,180 @@
+database_name: datalake_oitchau_clean
+table_name: punches
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Oitchau clock punches with employee and creator context (clean projection from the Integrations API raw table; incremental by punch date).
+columns:
+  id_punch:
+    description: Identifier from Oitchau (id_punch) used as a natural or surrogate
+      key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.punches.id
+  id_punch_key:
+    description: Alternate natural key string from Oitchau (id_punch_key) for joins
+      alongside numeric id_punch.
+    lineage:
+    - datalake_oitchau_raw.punches.uuid
+  punch_key:
+    description: Business attribute from Oitchau clean projection (punch_key) for
+      time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.punches.key
+  dt_punched:
+    description: Calendar date derived from Oitchau source fields (dt_punched) for daily
+      or period analytics.
+    lineage:
+    - datalake_oitchau_raw.punches.date
+  punch_time_local:
+    description: Business attribute from Oitchau clean projection (punch_time_local)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.punches.time
+  timezone_name:
+    description: Business attribute from Oitchau clean projection (timezone_name)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.punches.timezone
+  punch_type:
+    description: Business attribute from Oitchau clean projection (punch_type) for
+      time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.punches.type
+  punch_status:
+    description: Status value from Oitchau (punch_status) for workflow or lifecycle
+      reporting.
+    lineage:
+    - datalake_oitchau_raw.punches.status
+  is_manual_adjustment:
+    description: Boolean flag from Oitchau (is_manual_adjustment) describing eligibility
+      or configuration state.
+    lineage:
+    - datalake_oitchau_raw.punches.manual
+  duration_minutes:
+    description: Business attribute from Oitchau clean projection (duration_minutes)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.punches.minutes
+  punch_comment:
+    description: Business attribute from Oitchau clean projection (punch_comment)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.punches.comment
+  is_custom_location:
+    description: Boolean flag from Oitchau (is_custom_location) describing eligibility
+      or configuration state.
+    lineage:
+    - datalake_oitchau_raw.punches.customLocation
+  is_force_validated:
+    description: Boolean flag from Oitchau (is_force_validated) describing eligibility
+      or configuration state.
+    lineage:
+    - datalake_oitchau_raw.punches.forceValidated
+  late_reason:
+    description: Business attribute from Oitchau clean projection (late_reason) for
+      time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.punches.lateReason
+  id_location:
+    description: Identifier from Oitchau (id_location) used as a natural or surrogate
+      key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.punches.locationId
+  punch_reason:
+    description: Business attribute from Oitchau clean projection (punch_reason) for
+      time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.punches.reason
+  punch_source:
+    description: Business attribute from Oitchau clean projection (punch_source) for
+      time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.punches.source
+  validation_status:
+    description: Status value from Oitchau (validation_status) for workflow or lifecycle
+      reporting.
+    lineage:
+    - datalake_oitchau_raw.punches.validation
+  created_by_national_tax_number:
+    description: National tax registration number for the punch creator from Oitchau (createdBy.cpf).
+    lineage:
+    - datalake_oitchau_raw.punches.createdBy.cpf
+  id_created_by_external:
+    description: External business identifier for the punch creator profile from Oitchau (createdBy.externalId).
+    lineage:
+    - datalake_oitchau_raw.punches.createdBy.externalId
+  created_by_full_name:
+    description: Business attribute from Oitchau clean projection (created_by_full_name)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.punches.createdBy.fullName
+  id_created_by:
+    description: Identifier from Oitchau (id_created_by) used as a natural
+      or surrogate key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.punches.createdBy.id
+  created_by_registration_code:
+    description: Business attribute from Oitchau clean projection (created_by_registration_code)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.punches.createdBy.matricula
+  created_by_pis_number:
+    description: PIS registration number for the punch creator from Oitchau (createdBy.pis).
+    lineage:
+    - datalake_oitchau_raw.punches.createdBy.pis
+  id_created_by_profile:
+    description: UUID identifier from Oitchau (id_created_by_profile) used as
+      a natural key for joins.
+    lineage:
+    - datalake_oitchau_raw.punches.createdBy.uuid
+  employee_national_tax_number:
+    description: National tax registration number for the punched employee from Oitchau (employee.cpf).
+    lineage:
+    - datalake_oitchau_raw.punches.employee.cpf
+  id_employee_external:
+    description: External business identifier for the punched employee profile from Oitchau (employee.externalId).
+    lineage:
+    - datalake_oitchau_raw.punches.employee.externalId
+  employee_full_name:
+    description: Business attribute from Oitchau clean projection (employee_full_name)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.punches.employee.fullName
+  id_employee:
+    description: Identifier from Oitchau (id_employee) used as a natural
+      or surrogate key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.punches.employee.id
+  employee_registration_code:
+    description: Business attribute from Oitchau clean projection (employee_registration_code)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.punches.employee.matricula
+  employee_pis_number:
+    description: PIS registration number for the punched employee from Oitchau (employee.pis).
+    lineage:
+    - datalake_oitchau_raw.punches.employee.pis
+  id_employee_profile:
+    description: UUID identifier from Oitchau (id_employee_profile) used as a
+      natural key for joins.
+    lineage:
+    - datalake_oitchau_raw.punches.employee.uuid
+  ts_load:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_load)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.punches.ts_load
+  year:
+    description: Airflow ingestion partition column year from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.punches.year
+  month:
+    description: Airflow ingestion partition column month from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.punches.month
+  day:
+    description: Airflow ingestion partition column day from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.punches.day
