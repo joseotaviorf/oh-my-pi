@@ -1,7 +1,6 @@
 from argparse import ArgumentParser
-from datetime import date, timedelta
 
-from pyspark.sql import functions as F
+from pyspark.sql import DataFrame, functions as F
 from pyspark.sql.window import Window
 
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -37,12 +36,27 @@ SOURCE_COLUMNS = [
     "day",
 ]
 
+CHANGE_COLUMNS = [
+    "rule",
+    "suggestion_certainty",
+    "deal_objective_lower_anchor",
+    "deal_objective_upper_anchor",
+    "lower_bound_limit",
+    "upper_bound_limit",
+    "suggested_lower_bound_price",
+    "suggested_price",
+    "suggested_upper_bound_price",
+]
 
-def get_affected_houses(start_date, end_date):
-    """
-    Get distinct houses with CDC transactions in the date range.
-    Uses partition pruning (year, month, day) to avoid full table scan.
-    """
+HOUSE_WINDOW = (
+    Window
+    .partitionBy("id_house", "business_context")
+    .orderBy("ts_updated", "id_cdc_transaction")
+)
+
+
+def _get_candidates(start_date, end_date):
+    """Houses with any CDC activity in the date range (partition-pruned)."""
     return (
         spark.table(SOURCE_TABLE)
         .filter(
@@ -54,24 +68,45 @@ def get_affected_houses(start_date, end_date):
     )
 
 
-def build_suggestion_changes(affected_houses):
+def _build_all_changes(candidates):
     """
-    Build suggestion changes with window functions and surrogate key.
-    Reads only records for affected houses (full history needed for correct window calculations).
+    Read full history for candidate houses, detect real suggestion changes
+    via a single hash comparison, and return only changed rows.
     """
     source_df = spark.table(SOURCE_TABLE).select(*SOURCE_COLUMNS)
-
-    filtered_df = source_df.join(
-        F.broadcast(affected_houses),
-        ["id_house", "business_context"],
-        "inner"
+    history = source_df.join(
+        F.broadcast(candidates), ["id_house", "business_context"], "inner"
     )
 
-    window_by_house = (
-        Window
-        .partitionBy("id_house", "business_context")
-        .orderBy("ts_updated", "id_cdc_transaction")
+    change_hash = F.xxhash64(*[F.col(c) for c in CHANGE_COLUMNS])
+
+    return (
+        history
+        .withColumn("_hash", change_hash)
+        .withColumn("_prev_hash", F.lag("_hash").over(HOUSE_WINDOW))
+        .filter(
+            (F.col("_prev_hash").isNull())  # first record per house
+            | (F.col("_hash") != F.col("_prev_hash"))
+        )
+        .drop("_hash", "_prev_hash")
     )
+
+
+def _get_affected_houses(all_changes, start_date, end_date):
+    """Subset of houses whose real changes fall within the load window."""
+    return (
+        all_changes
+        .filter(
+            F.make_date(F.col("year"), F.col("month"), F.col("day"))
+            .between(start_date, end_date)
+        )
+        .select("id_house", "business_context")
+        .distinct()
+    )
+
+
+def _apply_window_columns(changes_df):
+    """Add change_number, suggestion time boundaries, and surrogate key."""
     window_by_house_day = (
         Window
         .partitionBy("id_house", "business_context", F.to_date("ts_updated"))
@@ -79,9 +114,9 @@ def build_suggestion_changes(affected_houses):
     )
 
     return (
-        filtered_df
-        .withColumn("change_number", F.row_number().over(window_by_house))
-        .withColumn("ts_suggestion_ended", F.lead("ts_updated").over(window_by_house))
+        changes_df
+        .withColumn("change_number", F.row_number().over(HOUSE_WINDOW))
+        .withColumn("ts_suggestion_ended", F.lead("ts_updated").over(HOUSE_WINDOW))
         .withColumn("_ts_next_same_day", F.lead("ts_updated").over(window_by_house_day))
         .withColumn("is_last_suggestion", F.col("ts_suggestion_ended").isNull())
         .withColumn("is_last_suggestion_of_day", F.col("_ts_next_same_day").isNull())
@@ -136,34 +171,53 @@ if __name__ == "__main__":
     start_date = F.lit(args.load_start_date).cast("date")
     end_date = F.lit(args.load_end_date).cast("date")
 
-    affected_houses = get_affected_houses(start_date, end_date)
+    candidates = _get_candidates(start_date, end_date)
+    all_changes = _build_all_changes(candidates)
+    all_changes.persist()
 
-    affected_count = affected_houses.count()
-    logger.info(f"m=__main__, affected_houses={affected_count:,}")
+    try:
+        affected_houses = _get_affected_houses(all_changes, start_date, end_date)
+        affected_count = affected_houses.count()
+        logger.info(f"m=__main__, affected_houses={affected_count:,}")
 
-    if affected_count == 0:
-        logger.warning("m=__main__, msg=No affected houses found in date range, skipping")
-    else:
-        result_df = build_suggestion_changes(affected_houses)
+        if affected_count == 0:
+            logger.warning(
+                "m=__main__, msg=No affected houses found in date range, skipping"
+            )
+        else:
+            result_df = _apply_window_columns(
+                all_changes.join(
+                    F.broadcast(affected_houses),
+                    ["id_house", "business_context"],
+                    "inner",
+                )
+            )
 
-        spark_client = SparkClient()
-        db_info = DatalakeMetastoreService.get_db_info(
-            args.environment, args.database_name, args.datalake_bucket
-        )
-        database_name = db_info["db_enrich_databricks"]
-        database_location = db_info["db_enrich_path"]
+            spark_client = SparkClient()
+            db_info = DatalakeMetastoreService.get_db_info(
+                args.environment, args.database_name, args.datalake_bucket
+            )
+            database_name = db_info["db_enrich_databricks"]
+            database_location = db_info["db_enrich_path"]
 
-        SparkMetastoreService(spark_client).create_database(database_name)
+            SparkMetastoreService(spark_client).create_database(database_name)
 
-        full_table_name = f"{database_name}.{args.table_name}"
-        s3_path = f"{database_location}{args.table_name}"
+            full_table_name = f"{database_name}.{args.table_name}"
+            s3_path = f"{database_location}{args.table_name}"
 
-        DeltaLoader().load_table(
-            table_name=full_table_name,
-            path=s3_path,
-            source_df=result_df,
-            merge_on=["id_suggestion_change"],
-        )
+            DeltaLoader().load_table(
+                table_name=full_table_name,
+                path=s3_path,
+                source_df=result_df,
+                merge_on=["id_suggestion_change"],
+            )
 
-        SparkMetastoreService(spark_client).refresh_table(database_name, args.table_name)
-        logger.info(f"m=__main__, table={full_table_name}, msg=Load completed successfully")
+            SparkMetastoreService(spark_client).refresh_table(
+                database_name, args.table_name
+            )
+            logger.info(
+                f"m=__main__, table={full_table_name}, "
+                f"msg=Load completed successfully"
+            )
+    finally:
+        all_changes.unpersist()
