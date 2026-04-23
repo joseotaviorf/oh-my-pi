@@ -3035,11 +3035,15 @@ bietlejuice.enrich_marketing_costs_sharing_rules:
   - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
   - bietlejuice.dw_user_affiliate:load-dw-public-dim-user-affiliate:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-partner:first-run-of-day
+  - bietlejuice.enrich_amplitude_visit:load-enrich-amplitude-visit:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing-status:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_rent_flow:load-enrich-rent-flow:first-run-of-day
   - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
   - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
+  - bietlejuice.enrich_tracked_events:load-enrich-attribution-cross-channel:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visits:first-run-of-day
+  - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
 bietlejuice.enrich_marketing_manual_daily_costs:
   - bietlejuice.gsheets_growth_intraday:done-clean-marketing-manual-shared-costs:first-run-of-day
   - bietlejuice.gsheets_growth_intraday:done-clean-marketing-name-convention-shared-costs:first-run-of-day

@@ -5,7 +5,7 @@ WITH
 rent_flow_client_info AS (
     SELECT DISTINCT
         COALESCE(house.id_region, -1) AS sk_region,
-        COALESCE(rent_flow.id_booking, -1) AS sk_booking,
+        COALESCE(rent_flow.id_visit, -1) AS sk_visit,
         COALESCE(dim_offer.sk_offer, -1) AS sk_offer,
         COALESCE(rent_flow.id_client, -1) AS sk_client
     FROM
@@ -21,9 +21,9 @@ rent_flow_client_info AS (
     ON
         dim_house_listing.id_house = house.id
     LEFT JOIN
-        dw_public.dim_booking
+        datalake_visit.visits
     ON
-        dim_booking.sk_booking = rent_flow.id_booking
+        visits.id_visit = rent_flow.id_visit
     LEFT JOIN
         dw_rent.dim_offer
     ON
@@ -32,9 +32,80 @@ rent_flow_client_info AS (
     WHERE
         dim_house_listing.is_for_rent
         AND (
-            COALESCE(dim_booking.visit_intent, '') <> 'SALE'
-            OR (dim_booking.visit_intent = 'SALE' AND rent_flow.id_contract IS NOT NULL)
+            COALESCE(visits.business_context, '') <> 'SALE'
+            OR (visits.business_context = 'SALE' AND rent_flow.id_contract IS NOT NULL)
         )
+),
+taxonomy_demand AS (
+    WITH taxonomy_unified AS (
+        SELECT *,
+            CASE
+                WHEN first_update_source = 'SelfServiceWeb' THEN 'TENANT_PWA'
+                WHEN first_update_source = 'Admin' THEN 'MAGIC_LINK'
+                WHEN first_update_source = 'Sistema' THEN 'SYSTEM'
+                WHEN first_update_source = 'Corretores' THEN 'AGENT_PWA'
+                WHEN first_update_source = 'Inquilinos' THEN 'TENANT_NATIVE'
+                WHEN first_update_source = 'Proprietarios' THEN 'OWNER_PWA'
+                WHEN first_update_source = 'Portfolio' THEN 'PORTFOLIO_MANAGER'
+                WHEN first_update_source = 'MagicLink' THEN 'MAGIC_LINK'
+                WHEN first_update_source = 'WhatsApp' THEN 'WHATSAPP'
+                ELSE UPPER(first_update_source)
+            END AS first_update_source_unified
+        FROM datalake_gsheets_clean.taxonomy_demand
+    ),
+    taxonomy_min_ids AS (
+        SELECT
+            MIN(CAST(id AS BIGINT)) AS id
+        FROM
+            taxonomy_unified
+        GROUP BY
+            LOWER(app_type),
+            LOWER(utm_source),
+            LOWER(utm_medium),
+            LOWER(branded),
+            LOWER(first_update_source_unified),
+            flg_via_reschedule
+    )
+    SELECT
+        CAST(td.id AS BIGINT) AS id,
+        td.app_type,
+        td.utm_source,
+        td.utm_medium,
+        td.branded,
+        td.first_update_source,
+        td.first_update_source_unified,
+        CAST(td.flg_via_reschedule AS BOOLEAN) AS flg_via_reschedule,
+        td.category AS mkt_category,
+        td.flow AS mkt_flow,
+        td.completion AS mkt_completion,
+        td.channel AS mkt_channel,
+        td.medium AS mkt_medium,
+        td.origin AS mkt_origin,
+        td.source AS mkt_source,
+        td.platform AS mkt_platform
+    FROM
+        taxonomy_unified AS td
+    JOIN
+        taxonomy_min_ids AS td_min
+            ON td.id = td_min.id
+),
+cross_channel AS (
+  SELECT
+    visit_code,
+    event_name,
+    final_attribution_app_type,
+    final_attribution_media_source,
+    final_attribution_source,
+    final_attribution_medium,
+    final_attribution_campaign,
+    final_attribution_content,
+    final_attribution_term,
+    final_attribution_branded,
+    final_attribution_origin
+  FROM
+    datalake_tracked_events.attribution_cross_channel
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY visit_code ORDER BY ts_event DESC) = 1
 ),
 -----------------------------------------------------------
 -- Query bookings, offers and talk to agent full history --
@@ -43,18 +114,31 @@ tenant_prospect_events AS (
   SELECT
     flrf.sk_client,
     flrf.sk_region,
-    b.mkt_medium,
-    b.mkt_source,
-    b.dt_created AS ts_event
+    CASE WHEN td.id IS NULL THEN 'Not Mapped' ELSE td.mkt_medium END AS mkt_medium,
+    CASE WHEN td.id IS NULL THEN 'Not Mapped' ELSE td.mkt_source END AS mkt_source,
+    v.ts_created AS ts_event
   FROM
-    dw_public.dim_booking AS b
-    JOIN rent_flow_client_info AS flrf
-      on b.sk_booking = flrf.sk_booking
+    datalake_visit.visits AS v
+  JOIN
+    rent_flow_client_info AS flrf
+      ON v.id_visit = flrf.sk_visit
+  LEFT JOIN
+    datalake_amplitude_visit.amplitude_visit AS src
+      ON v.code = src.id_visit
+  LEFT JOIN
+    cross_channel acc
+      ON v.code = acc.visit_code
+      AND acc.event_name IN ('visit_schedule_confirmed','debug_visit_schedule_confirmed')
+  LEFT JOIN
+    taxonomy_demand td
+      ON LOWER(COALESCE(td.app_type, '')) = LOWER(COALESCE(IF(acc.visit_code IS NOT NULL, acc.final_attribution_app_type, src.app_type), ''))
+      AND LOWER(COALESCE(td.utm_source, '')) = LOWER(COALESCE(IF(acc.visit_code IS NOT NULL, acc.final_attribution_source, src.utm_source), ''))
+      AND LOWER(COALESCE(td.utm_medium, '')) = LOWER(COALESCE(IF(acc.visit_code IS NOT NULL, acc.final_attribution_medium, src.utm_medium), ''))
+      AND LOWER(COALESCE(td.branded, '')) = LOWER(COALESCE(IF(acc.visit_code IS NOT NULL, COALESCE(acc.final_attribution_branded, "Outro"), COALESCE(src.branded, "Outro")),''))
+      AND LOWER(COALESCE(td.first_update_source_unified, '')) = LOWER(COALESCE(v.visit_request_channel, ''))
+      AND COALESCE(td.flg_via_reschedule, FALSE) = COALESCE(v.is_reschedule, FALSE)
   WHERE
-    b.sk_booking > 0
-    AND b.visit_intent = 'RENT'
-    AND b.type = 'Visita'
-    AND b.dt_created IS NOT NULL
+    v.business_context = 'RENT'
   UNION ALL
   SELECT
     flrf.sk_client,
