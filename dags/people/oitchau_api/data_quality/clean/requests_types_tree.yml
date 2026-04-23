@@ -1,0 +1,20 @@
+---
+table_name: datalake_oitchau_clean.requests_types_tree
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_request_type:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error

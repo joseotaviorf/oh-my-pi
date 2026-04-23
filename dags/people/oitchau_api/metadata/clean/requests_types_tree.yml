@@ -1,0 +1,86 @@
+database_name: datalake_oitchau_clean
+table_name: requests_types_tree
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Oitchau request type hierarchy with nested subtypes (clean projection from the Integrations API raw table).
+columns:
+  id_request_type:
+    description: Identifier from Oitchau (id_request_type) used as a natural or surrogate
+      key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.uuid
+  id_company:
+    description: UUID identifier from Oitchau (id_company) used as a natural
+      key for joins.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.companyUuid
+  id_request_type_template:
+    description: Identifier from Oitchau (id_request_type_template) used as a natural
+      or surrogate key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.requestTypeTemplateUuid
+  id_external:
+    description: Identifier from Oitchau (id_external) used as a natural or surrogate
+      key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.externalId
+  id_updated_by_user:
+    description: Identifier from Oitchau (id_updated_by_user) used as a natural or
+      surrogate key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.updatedBy
+  request_type_name:
+    description: Business attribute from Oitchau clean projection (request_type_name)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.name
+  is_active:
+    description: Boolean flag from Oitchau (is_active) describing eligibility or configuration
+      state.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.active
+  is_user_defined:
+    description: Boolean flag from Oitchau (is_user_defined) describing eligibility
+      or configuration state.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.userDefined
+  ts_created:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_created)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.createdAt
+  ts_updated:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_updated)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.updatedAt
+  ts_deleted:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_deleted)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.deletedAt
+  ts_load:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_load)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.ts_load
+  request_subtypes:
+    description: Business attribute from Oitchau clean projection (request_subtypes)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.subtypes
+  year:
+    description: Airflow ingestion partition column year from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.year
+  month:
+    description: Airflow ingestion partition column month from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.month
+  day:
+    description: Airflow ingestion partition column day from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.requests_types_tree.day

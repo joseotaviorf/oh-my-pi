@@ -105,3 +105,10 @@ workflow:
         - dt_balanced
       vacuum_retention_hours: 168
       vacuum_lite: true
+
+    requests_types_tree:
+      endpoint_path: requests/types/tree
+      extraction_type: full
+      params: {}
+      vacuum_retention_hours: 168
+      vacuum_lite: true
