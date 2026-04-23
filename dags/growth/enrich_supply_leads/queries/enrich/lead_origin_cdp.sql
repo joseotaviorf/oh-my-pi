@@ -1,15 +1,30 @@
 WITH cdp_utms AS (
   SELECT
     COALESCE(
-      CAST(GET_JSON_OBJECT(user_properties, '$.lead_id') AS BIGINT),
+      CAST(GET_JSON_OBJECT(event_properties, '$.lead_id') AS BIGINT),
       CAST(GET_JSON_OBJECT(event_properties, '$.formfield_lead_id') AS BIGINT)
     ) AS id_lead_ebdb,
-    egw_utm_source,
-    egw_utm_medium,
+    GET_JSON_OBJECT(user_properties, '$.egw_referrer_domain') AS egw_referrer_domain,
+    COALESCE(
+      egw_utm_source,
+      CASE
+        WHEN egw_referrer_domain IN ('www.google.com', 'www.google.com.br') THEN 'google'
+        WHEN egw_referrer_domain = 'www.bing.com' THEN 'bing'
+        WHEN egw_referrer_domain IN ('br.search.yahoo.com', 'r.search.yahoo.com') THEN 'yahoo'
+        WHEN egw_referrer_domain = 'search.brave.com' THEN 'brave'
+        WHEN egw_referrer_domain = 'duckduckgo.com' THEN 'duckduckgo'
+      END
+    ) AS egw_utm_source,
+    COALESCE(
+      egw_utm_medium,
+      CASE
+        WHEN egw_referrer_domain IN ('www.google.com', 'www.google.com.br', 'www.bing.com',
+          'br.search.yahoo.com', 'r.search.yahoo.com', 'search.brave.com', 'duckduckgo.com') THEN 'seo'
+      END
+    ) AS egw_utm_medium,
     egw_utm_campaign,
     egw_utm_term,
-    egw_utm_content,
-    GET_JSON_OBJECT(user_properties, '$.egw_referrer_domain') AS egw_referrer_domain
+    egw_utm_content
   FROM
     datalake_cdp_clean.user_tracking
   WHERE
@@ -17,15 +32,12 @@ WITH cdp_utms AS (
       'intro_page_viewed', 'property_details_page_viewed', 'property_address_details_page_viewed', 'rent_pricing_new_listing_page_viewed', 'sale_pricing_new_listing_page_viewed',
       'rent_pricing_new_listing_form_submitted', 'sale_pricing_new_listing_form_submitted', 'photo_scheduling_page_viewed', 'photo_scheduling_form_submitted')
     AND COALESCE(
-      CAST(GET_JSON_OBJECT(user_properties, '$.lead_id') AS BIGINT),
+      CAST(GET_JSON_OBJECT(event_properties, '$.lead_id') AS BIGINT),
       CAST(GET_JSON_OBJECT(event_properties, '$.formfield_lead_id') AS BIGINT)
     ) IS NOT NULL
     AND MAKE_DATE(year, month, day) >= DATE('{load_start_date}') - INTERVAL 60 DAYS
   QUALIFY ROW_NUMBER() OVER (
-    PARTITION BY COALESCE(
-      CAST(GET_JSON_OBJECT(user_properties, '$.lead_id') AS BIGINT),
-      CAST(GET_JSON_OBJECT(event_properties, '$.formfield_lead_id') AS BIGINT)
-    )
+    PARTITION BY id_lead_ebdb
     ORDER BY ts_event
   ) = 1
 ),
@@ -74,13 +86,13 @@ affiliate_type_fix AS (
 lead_origin_amplitude AS (
   SELECT
     id_lead AS id_lead_ebdb,
-    IF(utm_campaign == '', '-1', utm_campaign) AS campaign,
-    IF(utm_medium == '', '-1', utm_medium) AS medium,
-    IF(utm_source == '', '-1', utm_source) AS source,
-    IF(utm_content == '', '-1', utm_content) AS content,
-    IF(utm_term == '', '-1', utm_term) AS term,
-    IF(city == '', '-1', city) AS city,
-    IF(platform == '', '-1', platform) AS platform,
+    NULLIF(utm_campaign, '') AS campaign,
+    NULLIF(utm_medium, '') AS medium,
+    NULLIF(utm_source, '') AS source,
+    NULLIF(utm_content, '') AS content,
+    NULLIF(utm_term, '') AS term,
+    NULLIF(city, '') AS city,
+    NULLIF(platform, '') AS platform,
     ts_event
   FROM
     datalake_amplitude_lead.lead_origin AS lo
@@ -117,27 +129,8 @@ mid_table AS (
     r.id_lead_ebdb AS id_lead_ebdb,
     COALESCE(r.affiliate_type, atf.first_affiliate_type) AS affiliate_type,
     COALESCE(cdp.egw_utm_campaign, a.campaign, ia.utm_campaign) AS campaign,
-    COALESCE(
-      cdp.egw_utm_medium,
-      CASE
-        WHEN cdp.egw_referrer_domain IN ('www.google.com', 'www.google.com.br', 'www.bing.com',
-          'br.search.yahoo.com', 'r.search.yahoo.com', 'search.brave.com', 'duckduckgo.com') THEN 'seo'
-      END,
-      a.medium,
-      ia.utm_medium
-    ) AS medium,
-    COALESCE(
-      cdp.egw_utm_source,
-      CASE
-        WHEN cdp.egw_referrer_domain IN ('www.google.com', 'www.google.com.br') THEN 'google'
-        WHEN cdp.egw_referrer_domain = 'www.bing.com' THEN 'bing'
-        WHEN cdp.egw_referrer_domain IN ('br.search.yahoo.com', 'r.search.yahoo.com') THEN 'yahoo'
-        WHEN cdp.egw_referrer_domain = 'search.brave.com' THEN 'brave'
-        WHEN cdp.egw_referrer_domain = 'duckduckgo.com' THEN 'duckduckgo'
-      END,
-      a.source,
-      ia.utm_source
-    ) AS source,
+    COALESCE(cdp.egw_utm_medium, a.medium, ia.utm_medium) AS medium,
+    COALESCE(cdp.egw_utm_source, a.source, ia.utm_source) AS source,
     COALESCE(cdp.egw_utm_content, a.content, ia.utm_content) AS content,
     COALESCE(cdp.egw_utm_term, a.term, ia.utm_term) AS term,
     r.ops_agent,
@@ -162,8 +155,8 @@ mid_table AS (
     ia.url_source_ctwa,
     ia.type_source_ctwa,
     NVL2(cdp.egw_utm_campaign, 'cdp', NVL2(a.campaign, 'amplitude', NVL2(ia.utm_campaign, 'facebook_api', 'lost_tracking'))) AS database_tracking_campaign,
-    NVL2(cdp.egw_utm_medium, 'cdp', NVL2(cdp.egw_referrer_domain, 'cdp_referrer', NVL2(a.medium, 'amplitude', NVL2(ia.utm_medium, 'facebook_api', 'lost_tracking')))) AS database_tracking_medium,
-    NVL2(cdp.egw_utm_source, 'cdp', NVL2(cdp.egw_referrer_domain, 'cdp_referrer', NVL2(a.source, 'amplitude', NVL2(ia.utm_source, 'facebook_api', 'lost_tracking')))) AS database_tracking_source,
+    NVL2(cdp.egw_utm_medium, 'cdp', NVL2(a.medium, 'amplitude', NVL2(ia.utm_medium, 'facebook_api', 'lost_tracking'))) AS database_tracking_medium,
+    NVL2(cdp.egw_utm_source, 'cdp', NVL2(a.source, 'amplitude', NVL2(ia.utm_source, 'facebook_api', 'lost_tracking'))) AS database_tracking_source,
     NVL2(cdp.egw_utm_content, 'cdp', NVL2(a.content, 'amplitude', NVL2(ia.utm_content, 'facebook_api', 'lost_tracking'))) AS database_tracking_content,
     NVL2(cdp.egw_utm_term, 'cdp', NVL2(a.term, 'amplitude', NVL2(ia.utm_term, 'facebook_api', 'lost_tracking'))) AS database_tracking_term,
     NVL2(r.ctwa_clid, 'rene_descartes', NVL2(ia.ctwa_clid, 'sauron', 'lost_tracking')) AS database_tracking_ctwa,
