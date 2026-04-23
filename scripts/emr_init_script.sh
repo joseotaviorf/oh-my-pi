@@ -44,7 +44,7 @@ sudo mkdir -p $TMP_DIR/wheels
 sudo chown $(whoami) $TMP_DIR/wheels
 
 aws s3 cp ${ARTIFACTS_BUCKET}/bi-etl-ejuice/bi_etl_ejuice-latest-py3-none-any.whl $TMP_DIR/wheels/bi_etl_ejuice-latest-py3-none-any.whl
-aws s3 cp ${ARTIFACTS_BUCKET}/python-logger/quintoandar_logger-0.8.1-py3-none-any.whl $TMP_DIR/wheels/quintoandar_logger-0.8.1-py3-none-any.whl
+aws s3 cp ${ARTIFACTS_BUCKET}/python-logger/quintoandar_logger-0.8.0-py3-none-any.whl $TMP_DIR/wheels/quintoandar_logger-0.8.0-py3-none-any.whl
 aws s3 cp ${ARTIFACTS_BUCKET}/inmetro/inmetro-${INMETRO_VERSION}-py3-none-any.whl $TMP_DIR/wheels/inmetro-${INMETRO_VERSION}-py3-none-any.whl
 
 # On EMR, constrain urllib3 so we don't conflict with pre-installed awscli/botocore
