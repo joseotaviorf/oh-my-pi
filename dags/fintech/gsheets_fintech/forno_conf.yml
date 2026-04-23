@@ -237,6 +237,18 @@ sheets_info:
     clean_table_name: provider_pricing
     sheet_context: fintech
 
+  ead_lgd_assets:
+    sheet_id: 1j0QxkfqMlS04Q0gQz_2DOe7iR6SVsFdA23lj-4YCoXQ
+    sheet_name: ifrs_ativo
+    clean_table_name: ead_lgd_assets
+    sheet_context: fintech
+
+  ead_lgd_liability:
+    sheet_id: 1j0QxkfqMlS04Q0gQz_2DOe7iR6SVsFdA23lj-4YCoXQ
+    sheet_name: ifrs_passivo
+    clean_table_name: ead_lgd_liability
+    sheet_context: fintech
+
   target_nps_weekly:
     sheet_id: 17hx0dsLK4CJ-sivMf7w1L54LMpZgkHboKpuI0S1Di3o
     sheet_name: target_nps_weekly

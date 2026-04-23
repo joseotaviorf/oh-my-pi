@@ -1,0 +1,5 @@
+---
+database_name: datalake_gsheets_raw
+table_name: ead_lgd_asset
+domain: Fintech
+description: Raw EAD and LGD data imported from Google Sheets, containing IFRS assets data
