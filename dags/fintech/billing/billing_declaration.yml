@@ -36,6 +36,10 @@ workflow:
       clean_table_name: invoice
       transactional_datatype_overrides:
         due_amount: decimal(38,20)
+    recurrence:
+      clean_table_name: recurrence
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
     recurrence_phase_control:
       clean_table_name: recurrence_phase_control
     recurrence_phase_execution:

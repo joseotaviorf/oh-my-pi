@@ -1,0 +1,41 @@
+database_name: datalake_billing_clean
+table_name: recurrence
+domain: Fintech
+description: Data from the recurrence table containing the main recurrence entity with business context, source, and revision details
+columns:
+  id:
+    description: Unique identifier of the recurrence record
+    lineage:
+      - datalake_billing_raw.recurrence.id
+  uuid_recurrence:
+    description: UUID identifier of the recurrence
+    lineage:
+      - datalake_billing_raw.recurrence.recurrence_uuid
+  business_entity_id:
+    description: Identifier of the business entity associated with this recurrence
+    lineage:
+      - datalake_billing_raw.recurrence.business_entity_id
+  source:
+    description: Source system that originated this recurrence
+    lineage:
+      - datalake_billing_raw.recurrence.source
+  business_context:
+    description: Business context classification of the recurrence
+    lineage:
+      - datalake_billing_raw.recurrence.business_context
+  current_revision:
+    description: Current revision number of the recurrence
+    lineage:
+      - datalake_billing_raw.recurrence.current_revision
+  idempotency_key:
+    description: Key used to guarantee idempotent creation of the recurrence
+    lineage:
+      - datalake_billing_raw.recurrence.idempotency_key
+  ts_created:
+    description: Record creation timestamp
+    lineage:
+      - datalake_billing_raw.recurrence.created_at
+  ts_updated:
+    description: Record last update timestamp
+    lineage:
+      - datalake_billing_raw.recurrence.updated_at
