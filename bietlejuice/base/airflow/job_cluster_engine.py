@@ -23,6 +23,8 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 _EXECUTE_JOB_CLUSTER_TASK_ID = "execute-job-cluster"
 
+_DEFAULT_EMR_TASK_RETRIES = 3
+
 _EMR_EXTRA_SPARK_SUBMIT_ARGS = [
     "--conf",
     "spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension",
@@ -225,6 +227,16 @@ class DatabricksJobClusterEngine(JobClusterEngine):
 class EmrJobClusterEngine(JobClusterEngine):
     """EMR: create cluster, spark-submit per task, terminate after optimize."""
 
+    def _emr_operator_retry_kwargs(self) -> Dict[str, Any]:
+        cluster = self._ctx.cluster_args
+        kwargs: Dict[str, Any] = {
+            "retries": cluster.get("emr_task_retries", _DEFAULT_EMR_TASK_RETRIES),
+        }
+        delay_seconds = cluster.get("emr_retry_delay_seconds")
+        if delay_seconds is not None:
+            kwargs["retry_delay"] = timedelta(seconds=int(delay_seconds))
+        return kwargs
+
     def __init__(
         self,
         dag_execution_context: DagExecutionContext,
@@ -265,6 +277,7 @@ class EmrJobClusterEngine(JobClusterEngine):
             execution_timeout=timedelta(
                 hours=BaseTaskCreator._DEFAULT_EXECUTION_TIMEOUT_HOURS
             ),
+            **self._emr_operator_retry_kwargs(),
         )
 
     def create_spark_python_task(
@@ -297,6 +310,7 @@ class EmrJobClusterEngine(JobClusterEngine):
             aws_conn_id=self._ctx.aws_conn_id,
             dag=self._ctx.dag,
             execution_timeout=timedelta(hours=execution_timeout_hours),
+            **self._emr_operator_retry_kwargs(),
         )
 
     def create_emr_terminate_cluster_task(
@@ -320,6 +334,7 @@ class EmrJobClusterEngine(JobClusterEngine):
             trigger_rule="all_done",
             deferrable=True,
             dag=self._ctx.dag,
+            **self._emr_operator_retry_kwargs(),
         )
 
 

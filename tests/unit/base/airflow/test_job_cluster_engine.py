@@ -1,4 +1,6 @@
-from unittest.mock import MagicMock
+import sys
+from datetime import timedelta
+from unittest.mock import MagicMock, patch
 
 import pytest
 from airflow.models import DAG
@@ -92,6 +94,109 @@ class TestBuildJobClusterEngine:
 
         assert isinstance(engine, DatabricksJobClusterEngine)
         assert base_ctx.use_airflow_emr is False
+
+
+class TestEmrJobClusterEngineRetries:
+    _MERGED = {"spark_version": "emr-7-0"}
+
+    @staticmethod
+    def _install_fake_emr_plugin(create_cls=None, submit_cls=None, terminate_cls=None):
+        fake = MagicMock()
+        fake.QuintoAndarEmrCreateClusterOperator = create_cls or MagicMock()
+        submit_op = submit_cls or MagicMock()
+        fake.QuintoAndarEmrSubmitStepsOperator = submit_op
+        fake.QuintoAndarEmrTerminateClusterOperator = terminate_cls or MagicMock()
+        submit_op.build_spark_submit_step = MagicMock(
+            return_value={
+                "Name": "x",
+                "ActionOnFailure": "CONTINUE",
+                "HadoopJarStep": {"Jar": "command-runner.jar", "Args": []},
+            }
+        )
+        patcher = patch.dict(sys.modules, {"emr_plugin": fake})
+        return fake, patcher
+
+    @pytest.fixture
+    def emr_ctx(self):
+        dag = DAG(dag_id="emr_retries", schedule=None)
+        ctx = DagExecutionContext(
+            dag=dag,
+            environment="forno",
+            bucket="b",
+            base_spark_jobs_path="/x/",
+            dag_args={},
+            workflow_args={},
+            cluster_args={"type": "emr_cluster"},
+        )
+        ctx.aws_conn_id = "aws_default"
+        return ctx
+
+    def test_create_cluster_defaults_retries_three(self, emr_ctx):
+        mock_create = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(create_cls=mock_create)
+        engine = EmrJobClusterEngine(emr_ctx, self._MERGED, MagicMock())
+        with patcher:
+            engine.create_execute_cluster_task(
+                config_service=MagicMock(),
+                minimum_cluster_runtime_version=None,
+                execute_job_cluster_local_id=None,
+            )
+        kwargs = mock_create.call_args.kwargs
+        assert kwargs["retries"] == 3
+        assert "retry_delay" not in kwargs
+
+    def test_create_cluster_override_retries_and_delay(self, emr_ctx):
+        emr_ctx.cluster_args["emr_task_retries"] = 7
+        emr_ctx.cluster_args["emr_retry_delay_seconds"] = 90
+        mock_create = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(create_cls=mock_create)
+        engine = EmrJobClusterEngine(emr_ctx, self._MERGED, MagicMock())
+        with patcher:
+            engine.create_execute_cluster_task(
+                config_service=MagicMock(),
+                minimum_cluster_runtime_version=None,
+                execute_job_cluster_local_id=None,
+            )
+        kwargs = mock_create.call_args.kwargs
+        assert kwargs["retries"] == 7
+        assert kwargs["retry_delay"] == timedelta(seconds=90)
+
+    def test_submit_steps_matches_retry_kwargs(self, emr_ctx):
+        emr_ctx.cluster_args["emr_task_retries"] = 1
+        mock_create = MagicMock()
+        mock_submit = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(
+            create_cls=mock_create, submit_cls=mock_submit
+        )
+        engine = EmrJobClusterEngine(emr_ctx, self._MERGED, MagicMock())
+        with patcher:
+            engine.create_execute_cluster_task(
+                config_service=MagicMock(),
+                minimum_cluster_runtime_version=None,
+                execute_job_cluster_local_id=None,
+            )
+            engine.create_spark_python_task(
+                spark_job_path="s3://b/j.py",
+                task_id="load-foo",
+                job_parameters=["a"],
+                execution_timeout_hours=2,
+            )
+        kwargs = mock_submit.call_args.kwargs
+        assert kwargs["retries"] == 1
+
+    def test_terminate_matches_retry_kwargs(self, emr_ctx):
+        emr_ctx.cluster_args["emr_retry_delay_seconds"] = 45
+        mock_term = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(terminate_cls=mock_term)
+        engine = EmrJobClusterEngine(emr_ctx, self._MERGED, MagicMock())
+        with patcher:
+            engine.create_emr_terminate_cluster_task(
+                execute_cluster_task_id="execute-job-cluster",
+                terminate_task_local_suffix=None,
+            )
+        kwargs = mock_term.call_args.kwargs
+        assert kwargs["retries"] == 3
+        assert kwargs["retry_delay"] == timedelta(seconds=45)
 
 
 class TestDatabricksJobClusterEngineAcl:

@@ -485,6 +485,12 @@ class DAGDeclarationValidator(Validator):
                     ],
                 },
                 "databricks_conn_id": {"type": "string", "empty": False},
+                "emr_task_retries": {"type": "integer", "min": 0, "required": False},
+                "emr_retry_delay_seconds": {
+                    "type": "integer",
+                    "min": 0,
+                    "required": False,
+                },
             },
         },
     }
