@@ -100,6 +100,18 @@ columns:
       - datalake_accounting_funnel.invoice_all.status
       - datalake_accounting_funnel.accounts_payable.status
     description: "Description of payment status"
+  payment_status:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.payment_status
+    description: "Invoice payment process status from Retsuko; NULL on CAP union rows (not sourced from accounts_payable)"
+  reason:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.reason
+    description: "Retsuko invoice reason for extras purpose; NULL on CAP union rows"
+  producer:
+    lineage:
+      - datalake_accounting_funnel.invoice_all.producer
+    description: "Routine that produced the entry; NULL on CAP union rows"
   closing_mode:
     lineage:
       - datalake_accounting_funnel.invoice_all.closing_mode

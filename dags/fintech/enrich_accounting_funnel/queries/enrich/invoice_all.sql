@@ -57,23 +57,6 @@ SELECT
 FROM 
   pre_reversed_entries AS e
 ),
-next_business_day AS (
-  SELECT
-    dd.date,
-    CASE 
-      WHEN dd.date = DATE('2025-12-30') THEN DATE('2025-12-31')
-      ELSE MIN(dd_next.date) 
-    END AS date_next_bd
-  FROM
-    dw_public.dim_date AS dd
-  LEFT JOIN
-    dw_public.dim_date AS dd_next
-      ON dd_next.working_days_in_month <> dd.working_days_in_month
-      AND dd_next.date > dd.date
-      AND dd_next.working_days_in_month > 0
-  GROUP BY
-    1
-),
 not_invoiceable AS (
 
     SELECT
@@ -164,6 +147,8 @@ SELECT DISTINCT
     ELSE 'payable'
   END AS account_classification,
   IF(fie.sk_invoice = -1, 'not-invoiceable', i.payment_status) AS status,
+  inv.payment_status AS payment_status,
+  inv.reason AS reason,
   i.closing_mode,
   i.paid_via,
   c.type,
@@ -182,17 +167,17 @@ SELECT DISTINCT
   ie.accrual_year_month AS entry_accrual_year_month,
   ie.due_year_month AS entry_due_year_month,
   CAST(DATE_FORMAT(DATEADD(month, 1, DATE(fie.ts_created)), 'yyyyMM') AS INT) AS entry_creation_accrual_year_month,
-  TIMESTAMP(fie.ts_created) AS entry_created_date,
-  TIMESTAMP(i.ts_created) AS invoice_created_date,
+  DATE(fie.ts_created) AS entry_created_date,
+  DATE(i.ts_created) AS invoice_created_date,
   DATE(i.dt_due) AS invoice_due_date,
   DATE(i.dt_sent) AS invoice_sent_date,
   DATE(i.dt_paid) AS invoice_paid_date,
   DATE(i.dt_write_off) AS invoice_write_off_date,
-  TIMESTAMP(i.ts_canceled) AS invoice_canceled_date,
-  TIMESTAMP(rr.ts_entry_reversed) AS invoice_reversal_date,
-  DATE(nbd.date_next_bd) AS invoice_paid_date_next_business_day,
+  DATE(i.ts_canceled) AS invoice_canceled_date,
+  DATE(rr.ts_entry_reversed) AS invoice_reversal_date,
+  DATE(dd.next_brz_fintech_business_day) AS invoice_paid_date_next_business_day,
   DATE(CASE 
-    WHEN lower(paid_via) IN (
+    WHEN lower(i.paid_via) IN (
       'bank-transfer'
       ,'checkout-credit-card'
       ,'credit-card'
@@ -209,7 +194,7 @@ SELECT DISTINCT
       ,'internet-banking'
       ,'non-specified')
       THEN invoice_paid_date
-    WHEN lower(paid_via) IN (
+    WHEN lower(i.paid_via) IN (
       'cnab'
       ,'checkout-boleto'
       ,'cyber-boleto'
@@ -243,8 +228,11 @@ LEFT JOIN
     dw_payment.dim_invoice AS i
     ON fie.sk_invoice = i.sk_invoice
 LEFT JOIN
-    next_business_day AS nbd
-    ON nbd.date = i.dt_paid
+    datalake_retsuko.invoice AS inv
+    ON inv.id_external = CAST(fie.sk_invoice AS STRING)
+LEFT JOIN
+    dw_public.dim_date AS dd
+    ON dd.date = i.dt_paid
 LEFT JOIN
     datalake_retsuko.entry AS e
     ON e.id_external = fie.sk_invoice_entry

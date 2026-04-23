@@ -132,6 +132,14 @@ columns:
     lineage:
       - dw_payment.fact_invoice_entries.sk_invoice
       - dw_payment.dim_invoice.payment_status
+  payment_status:
+    description: "Invoice payment process status from Retsuko (distinct from invoice status); e.g. chargeback vs. canceled"
+    lineage:
+      - datalake_retsuko.invoice.payment_status
+  reason:
+    description: "When invoice purpose is extras, identifies what the invoice is about"
+    lineage:
+      - datalake_retsuko.invoice.reason
   closing_mode:
     lineage:
       - dw_payment.dim_invoice.closing_mode
