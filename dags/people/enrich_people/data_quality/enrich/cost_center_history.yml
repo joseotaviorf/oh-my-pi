@@ -30,8 +30,29 @@ column_level_validations:
   is_primary_organization:
     is_complete:
       severity_level: Error
+  is_future_version:
+    is_complete:
+      severity_level: Error
   is_current:
     is_complete:
+      severity_level: Error
+    custom:
+      # Exactly one is_current row per SCD2 chain (org + trimmed cost_center_code + HRBP assignment + HRBP person)
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT
+            id_organization,
+            TRIM(cost_center_code) AS tcc,
+            sk_business_partner_assignment,
+            sk_business_partner
+          FROM datalake_people.cost_center_history
+          GROUP BY
+            id_organization,
+            TRIM(cost_center_code),
+            sk_business_partner_assignment,
+            sk_business_partner
+          HAVING SUM(CASE WHEN is_current THEN 1 ELSE 0 END) <> 1
+        )) = 0
       severity_level: Error
   dt_valid_from:
     is_complete:

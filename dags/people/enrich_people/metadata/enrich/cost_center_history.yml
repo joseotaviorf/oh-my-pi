@@ -84,6 +84,8 @@ columns:
       - datalake_pin_core_clean.hr_organization.status
   is_primary_organization:
     description: Boolean flag indicating the canonical PIN organization row when multiple departments share the same cost_center_code and dt_valid_from; false otherwise. After contiguous merge, true if any contributing row was primary.
+  is_future_version:
+    description: True when this version's validity starts after the current calendar date (dt_valid_from > today).
   is_current:
     description: When true, this row is the latest merged version whose validity includes today's date (future-only rows are excluded).
   dt_valid_from:

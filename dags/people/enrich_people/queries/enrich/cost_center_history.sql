@@ -214,51 +214,74 @@ contiguous_validity_periods AS (
         ) AS validity_period_group_id
     FROM
         with_prev_dt_valid_to
-)
-SELECT
-    MD5(
-        CONCAT(
-            CAST(id_organization AS STRING),
-            '|',
-            CAST(MIN(dt_valid_from) AS STRING)
-        )
-    ) AS sk_cost_center_version,
-    id_organization,
-    cost_center_code,
-    sk_business_partner_assignment,
-    sk_business_partner,
-    cost_center_name,
-    business,
-    product,
-    brand,
-    vertical,
-    structure,
-    team,
-    chapter,
-    line,
-    owner_l1_name,
-    owner_l2_name,
-    owner_l3_name,
-    headcount_type,
-    is_active,
-    BOOL_OR(is_primary_organization) AS is_primary_organization,
-    (
-        MIN(dt_valid_from) <= CURRENT_DATE
-        AND COALESCE(
+),
+grouped_versions AS (
+    SELECT
+        MD5(
+            CONCAT(
+                CAST(id_organization AS STRING),
+                '|',
+                CAST(MIN(dt_valid_from) AS STRING)
+            )
+        ) AS sk_cost_center_version,
+        id_organization,
+        cost_center_code,
+        sk_business_partner_assignment,
+        sk_business_partner,
+        cost_center_name,
+        business,
+        product,
+        brand,
+        vertical,
+        structure,
+        team,
+        chapter,
+        line,
+        owner_l1_name,
+        owner_l2_name,
+        owner_l3_name,
+        headcount_type,
+        is_active,
+        BOOL_OR(is_primary_organization) AS is_primary_organization,
+        MIN(dt_valid_from) AS dt_valid_from,
+        COALESCE(
             MAX(dt_valid_to),
             DATE '9999-12-31'
-        ) >= CURRENT_DATE
-    ) AS is_current,
-    MIN(dt_valid_from) AS dt_valid_from,
-    COALESCE(
-        MAX(dt_valid_to),
-        DATE '9999-12-31'
-    ) AS dt_valid_to,
-    MIN(ts_created) AS ts_created,
-    NOW() AS ts_load
-FROM
-    contiguous_validity_periods
-GROUP BY
+        ) AS dt_valid_to,
+        MIN(ts_created) AS ts_created,
+        NOW() AS ts_load
+    FROM
+        contiguous_validity_periods
+    GROUP BY
+        id_organization,
+        cost_center_code,
+        sk_business_partner_assignment,
+        sk_business_partner,
+        cost_center_name,
+        business,
+        product,
+        brand,
+        vertical,
+        structure,
+        team,
+        chapter,
+        line,
+        owner_l1_name,
+        owner_l2_name,
+        owner_l3_name,
+        headcount_type,
+        is_active,
+        validity_period_group_id
+),
+with_future_flag AS (
+    SELECT
+        *,
+        dt_valid_from > CURRENT_DATE AS is_future_version
+    FROM
+        grouped_versions
+)
+SELECT
+    sk_cost_center_version,
     id_organization,
     cost_center_code,
     sk_business_partner_assignment,
@@ -277,4 +300,28 @@ GROUP BY
     owner_l3_name,
     headcount_type,
     is_active,
-    validity_period_group_id
+    is_primary_organization,
+    is_future_version,
+    ROW_NUMBER() OVER (
+        PARTITION BY
+            id_organization,
+            TRIM(cost_center_code),
+            sk_business_partner_assignment,
+            sk_business_partner
+        ORDER BY
+            CASE
+                WHEN is_future_version THEN
+                    1
+                ELSE
+                    0
+            END,
+            dt_valid_from DESC,
+            dt_valid_to DESC,
+            sk_cost_center_version DESC
+    ) = 1 AS is_current,
+    dt_valid_from,
+    dt_valid_to,
+    ts_created,
+    ts_load
+FROM
+    with_future_flag
