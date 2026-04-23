@@ -21,12 +21,12 @@ workflow:
     - "{table_name}"
     - "{partitions}"
   default_extraction_type: incremental
-  default_partitions: [year, month, day, hour]
+  default_partitions: [ year, month, day, hour ]
   tables_customization:
     istio:
-      merge_on: [year, month, day, hour, id_request]
+      merge_on: [ year, month, day, hour, id_request ]
   default_table_privileges:
-    auditlogs: ["ALL PRIVILEGES"]
+    auditlogs: [ "ALL PRIVILEGES" ]
 
 cluster:
   # Reverted to the historically working AMD multi-node configuration after
@@ -39,9 +39,9 @@ cluster:
   # mode, namespace) because `custom_cluster` does not inherit from anchors.
   type: custom_cluster
   custom_configurations:
-    driver_node_type_id: r5a.2xlarge
-    node_type_id: r5a.xlarge
-    num_workers: 2
+    driver_node_type_id: m7g.large
+    node_type_id: m7g.xlarge
+    num_workers: 5
     spark_version: 16.4.x-scala2.12
     single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
