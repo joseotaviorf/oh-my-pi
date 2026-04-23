@@ -1,0 +1,150 @@
+database_name: datalake_oitchau_clean
+table_name: requests_types_subtypes
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Oitchau request subtype catalog with approval and compliance fields (clean projection from the Integrations API raw table).
+columns:
+  id_request_subtype:
+    description: Identifier from Oitchau (id_request_subtype) used as a natural or
+      surrogate key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.uuid
+  id_company:
+    description: UUID identifier from Oitchau (id_company) used as a natural
+      key for joins.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.companyUuid
+  id_request_type:
+    description: Identifier from Oitchau (id_request_type) used as a natural or surrogate
+      key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.requestTypeUuid
+  id_request_subtype_template:
+    description: Identifier from Oitchau (id_request_subtype_template) used as a natural
+      or surrogate key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.requestSubtypeTemplateUuid
+  id_external:
+    description: Identifier from Oitchau (id_external) used as a natural or surrogate
+      key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.externalId
+  id_created_by_user:
+    description: Identifier from Oitchau (id_created_by_user) used as a natural or
+      surrogate key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.createdBy
+  id_updated_by_user:
+    description: Identifier from Oitchau (id_updated_by_user) used as a natural or
+      surrogate key in downstream joins.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.updatedBy
+  request_type:
+    description: Business attribute from Oitchau clean projection (request_type) for
+      time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.requestType
+  subtype_name:
+    description: Business attribute from Oitchau clean projection (subtype_name) for
+      time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.name
+  subtype_name_key:
+    description: Stable programmatic key for the subtype name variant from Oitchau (nameId), such as overtime or custom; not a surrogate identifier (see live API values).
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.nameId
+  translation_key:
+    description: Business attribute from Oitchau clean projection (translation_key)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.translationKey
+  hours_calculation_type:
+    description: Business attribute from Oitchau clean projection (hours_calculation_type)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.hoursCalculationType
+  approval_flow:
+    description: Business attribute from Oitchau clean projection (approval_flow)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.approvalFlow
+  attachment_policy:
+    description: Business attribute from Oitchau clean projection (attachment_policy)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.attachment
+  comment_policy:
+    description: Business attribute from Oitchau clean projection (comment_policy)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.comment
+  compliance_rules:
+    description: Business attribute from Oitchau clean projection (compliance_rules)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.complianceRules
+  custom_fields:
+    description: Business attribute from Oitchau clean projection (custom_fields)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.customFields
+  subtype_specific_fields:
+    description: Business attribute from Oitchau clean projection (subtype_specific_fields)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.subtypeSpecificFields
+  visibility_permission_roles:
+    description: Business attribute from Oitchau clean projection (visibility_permission_roles)
+      for time and attendance analytics.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.visibilityPermissionRoles
+  is_active:
+    description: Boolean flag from Oitchau (is_active) describing eligibility or configuration
+      state.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.active
+  is_paid_subtype:
+    description: Boolean flag from Oitchau (is_paid_subtype) describing eligibility
+      or configuration state.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.paid
+  is_discount_dsr:
+    description: Boolean flag from Oitchau (is_discount_dsr) describing eligibility
+      or configuration state.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.discountDsr
+  ts_created:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_created)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.createdAt
+  ts_updated:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_updated)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.updatedAt
+  ts_deleted:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_deleted)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.deletedAt
+  ts_load:
+    description: Timestamp from Oitchau in source string or timestamp form (ts_load)
+      for event ordering.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.ts_load
+  year:
+    description: Airflow ingestion partition column year from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.year
+  month:
+    description: Airflow ingestion partition column month from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.month
+  day:
+    description: Airflow ingestion partition column day from the raw pipeline for
+      incremental processing.
+    lineage:
+    - datalake_oitchau_raw.requests_types_subtypes.day
