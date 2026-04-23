@@ -1,13 +1,13 @@
 ---
 dag:
-  name: enrich_sonia_closing_view
+  name: enrich_sonia_journeys
   owner: Data ForRent
   schedule_start_date: 2026, 4, 8
   documentation:
     dag_purpose: |
-      Non-materialized enrich view over CDP transactional rent-flow contract events (sent, canceled, signed),
-      exploded to one row per person side (tenant and owner) with house address, user id, and experiment binning hash.
-      Refreshes daily for Sonia closing analytics.
+      Non-materialized enrich views for Sonia journeys.
+      Includes contract closing, docs demand resend and docs rejection journeys with context enrichment
+      and deterministic binning for experiments.
 workflow:
   type: query_view
   layer: enrich

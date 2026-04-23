@@ -1,0 +1,37 @@
+database_name: datalake_sonia_journeys
+table_name: ds2ca_resend_view
+description: |
+  Enrich view for Sonia docs demand resend journey events sourced from CDP transactional data.
+  Includes person first name enrichment, house address context, and deterministic binning by person UUID.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  id_event:
+    lineage:
+      - datalake_cdp_clean.transactional.id_event
+    description: Unique identifier for the docs demand resend event.
+  id_house:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: House id parsed from event_properties.
+  address_text:
+    lineage:
+      - datalake_ebdb_clean.house.address
+      - datalake_ebdb_clean.house.number
+    description: Concatenated house address and number.
+  id_rent_flow:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: Rent flow identifier parsed from event_properties.
+  uuid_person:
+    lineage:
+      - datalake_cdp_clean.transactional.id_person
+    description: Person UUID associated with the event.
+  binning_value:
+    lineage:
+      - datalake_cdp_clean.transactional.id_person
+    description: Deterministic hash bucket (0-99) generated from uuid_person.
+  ts_event:
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+    description: Event timestamp for rent_flow_docs_demand_docs_resend.

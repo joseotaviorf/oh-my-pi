@@ -1,0 +1,35 @@
+database_name: datalake_sonia_journeys
+table_name: ds2ca_reject_view
+description: |
+  Enrich view for Sonia journey events where tenant documentation analysis was rejected.
+  Includes rejection reason eligibility logic and deterministic binning by person UUID.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  id_event:
+    lineage:
+      - datalake_cdp_clean.transactional.id_event
+    description: Identifier of the rejected documentation analysis event.
+  uuid_person:
+    lineage:
+      - datalake_cdp_clean.transactional.id_person
+    description: Person UUID associated with the rejection event.
+  address_text:
+    lineage:
+      - datalake_ebdb_clean.house.address
+      - datalake_ebdb_clean.house.number
+      - datalake_ebdb_clean.proposal.id_house
+    description: Formatted house address resolved through proposal to house join.
+  has_only_eligible_rejection_reasons:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: |
+      Eligibility flag where 1 means all rejection reasons are in the allowed set and 0 otherwise.
+  binning_value:
+    lineage:
+      - datalake_cdp_clean.transactional.id_person
+    description: Deterministic hash bucket (0-99) generated from uuid_person.
+  ts_event:
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+    description: Event timestamp for tenant_rent_documentation_analysis_result_event.

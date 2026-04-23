@@ -1,5 +1,5 @@
-database_name: datalake_sonia_closing_view
-table_name: sonia_closing_view
+database_name: datalake_sonia_journeys
+table_name: closing_view
 description: |
   Enrich view for Sonia rent-flow contract closing analytics: contract_sent CDP events from 2026-04-01,
   with later canceled/signed flags per rent flow, exploded to tenant and owner rows, joined to EBDB user and house.
