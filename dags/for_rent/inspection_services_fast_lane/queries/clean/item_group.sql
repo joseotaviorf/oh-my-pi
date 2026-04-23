@@ -3,6 +3,7 @@ SELECT
     room_id AS id_room,
     type_id AS id_type,
     main_id AS id_main,
+    selected_specification_id AS id_selected_specification,
     uuid,
     name,
     comment,

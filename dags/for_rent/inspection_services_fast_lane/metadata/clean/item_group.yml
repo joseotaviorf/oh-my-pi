@@ -23,6 +23,10 @@ columns:
     lineage:
       - datalake_inspection_services_raw.item_group.main_id
     description: Item Group correlational unique identifier in the PWA database
+  id_selected_specification:
+      lineage:
+        - datalake_inspection_services_raw.item_group.selected_specification_id
+      description: Foreign key to connect the item group to the selected specification
   uuid:
     lineage:
       - datalake_inspection_services_raw.item_group.uuid
