@@ -84,6 +84,7 @@ def _initialize_spark() -> SparkSession:
 def _fetch_with_id_expansion(
     spark: SparkSession,
     client: Any,
+    loader: APIConfigurationLoader,
     id_expansion_config: Dict[str, Any],
     source_schema: str,
     endpoint: str,
@@ -92,15 +93,19 @@ def _fetch_with_id_expansion(
     """
     Fetches data from a per-entity endpoint by fanning out over IDs from a source table.
 
-    For each entity ID found in the source raw table, issues one GET request to the
-    endpoint. Single-object responses are wrapped as list items and enriched with the
-    entity ID field for traceability. Dict or list API responses are both handled.
+    For each entity ID, uses ``loader.create_paginator`` when the table declares pagination
+    (e.g. ``page_per_page``), flattening all pages into one list with ``id_field`` on each row.
+    Otherwise performs a single GET; dict envelopes are kept as one row per entity (with
+    correlation_field or id_field injected) and list bodies are flattened.
 
     Args:
         spark: Active SparkSession used to read the source table.
         client: Authenticated BaseAPIClient.
+        loader: Loader for the current table (builds paginators inside the fan-out).
         id_expansion_config: id_expansion YAML block with source_table, id_field,
-            and param_name (query param) or path_param (URL path segment).
+            and param_name (query param) or path_param (URL path segment). Optional
+            correlation_field names the JSON key used when stamping each response row
+            with the fan-out entity id (defaults to id_field).
         source_schema: Raw metastore schema name (e.g. "oitchau").
         endpoint: API endpoint path.
         initial_params: Base query params (e.g. date filters) to merge with each call.
@@ -112,7 +117,19 @@ def _fetch_with_id_expansion(
 
     source_table = id_expansion_config["source_table"]
     id_field = id_expansion_config["id_field"]
+    injection_key = id_expansion_config.get("correlation_field") or id_field
+    path_param = id_expansion_config.get("path_param")
     param_name = id_expansion_config.get("param_name")
+
+    if path_param and param_name:
+        raise ValueError(
+            "m=_fetch_with_id_expansion, msg=id_expansion must not set both "
+            "'path_param' and 'param_name'; use one."
+        )
+    if not path_param and not param_name:
+        raise ValueError(
+            "m=_fetch_with_id_expansion, msg=id_expansion requires 'path_param' or 'param_name'."
+        )
 
     full_table_name = f"datalake_{source_schema}_raw.{source_table}"
     LOGGER.info(
@@ -136,23 +153,57 @@ def _fetch_with_id_expansion(
     all_results: List[Dict[str, Any]] = []
     failed = 0
 
+    path_placeholder = "{" + path_param + "}" if path_param else ""
+
     for entity_id in ids:
         params = dict(initial_params)
-        if param_name:
+        resolved_endpoint = endpoint
+        if path_param:
+            if path_placeholder not in endpoint:
+                raise ValueError(
+                    f"m=_fetch_with_id_expansion, msg=endpoint_path must contain "
+                    f"placeholder '{path_placeholder}' when id_expansion.path_param is set."
+                )
+            resolved_endpoint = endpoint.replace(path_placeholder, str(entity_id))
+        else:
             params[param_name] = entity_id
 
         try:
-            response = client.get(endpoint, params=params)
-            data = response.json() if hasattr(response, "json") else response
+            paginator = loader.create_paginator(client, resolved_endpoint, params)
+            if paginator:
+                for page_rows in paginator.fetch_all():
+                    for item in page_rows:
+                        if isinstance(item, dict):
+                            item[injection_key] = entity_id
+                    all_results.extend(page_rows)
+            else:
+                response = client.get(resolved_endpoint, params=params)
+                data = response.json() if hasattr(response, "json") else response
 
-            if isinstance(data, dict):
-                data[id_field] = entity_id
-                all_results.append(data)
-            elif isinstance(data, list):
-                for item in data:
-                    if isinstance(item, dict):
-                        item[id_field] = entity_id
-                all_results.extend(data)
+                if isinstance(data, dict):
+                    meta = data.get("metadata")
+                    if isinstance(meta, dict):
+                        total_pages = meta.get("totalPages")
+                        if (
+                            isinstance(total_pages, (int, float))
+                            and int(total_pages) > 1
+                        ):
+                            LOGGER.warning(
+                                "m=_fetch_with_id_expansion, %s=%s, endpoint=%s, totalPages=%s "
+                                "msg=Multiple pages returned but only the first page was fetched; "
+                                "configure api_policies.pagination for this table.",
+                                id_field,
+                                entity_id,
+                                resolved_endpoint,
+                                total_pages,
+                            )
+                    data[injection_key] = entity_id
+                    all_results.append(data)
+                elif isinstance(data, list):
+                    for item in data:
+                        if isinstance(item, dict):
+                            item[injection_key] = entity_id
+                    all_results.extend(data)
         except Exception as exc:
             failed += 1
             LOGGER.warning(
@@ -265,6 +316,7 @@ def main() -> None:
         all_results = _fetch_with_id_expansion(
             spark=spark,
             client=client,
+            loader=loader,
             id_expansion_config=id_expansion_config,
             source_schema=source_schema,
             endpoint=endpoint,

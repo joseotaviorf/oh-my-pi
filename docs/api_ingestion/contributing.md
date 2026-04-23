@@ -64,7 +64,7 @@ New **`api_ingestion`** DAGs must use a **`dag.name`** (folder + `{dag_name}_dec
   - Responsible for interpreting YAML config and instantiating executable components:
     - `BaseAPIClient` (retry policy, non-fatal codes, alerts)
     - authentication handler(s)
-    - paginator (cursor / offset_limit / none)
+    - paginator (`none`, `offset_limit`, `page_per_page`, `cursor`)
   - If you add new knobs or strategies, the loader is usually the central wiring point.
 
 - **HTTP client + retries + alerts**:  
@@ -76,7 +76,7 @@ New **`api_ingestion`** DAGs must use a **`dag.name`** (folder + `{dag_name}_dec
   [`bietlejuice/base/api/auth/`](../../bietlejuice/base/api/auth/)
   - Responsible for applying request authentication (headers/session auth) using secrets from Databricks.
 
-- **Pagination strategies**:  
+- **Pagination strategies** (`none`, `offset_limit`, `page_per_page`, `cursor`):  
   [`bietlejuice/base/api/pagination/`](../../bietlejuice/base/api/pagination/)
   - Responsible for iterating through pages and yielding records per page according to the API pagination scheme.
 
@@ -157,6 +157,8 @@ Add tests in:
 ---
 
 ## Adding a new pagination strategy
+
+Existing strategies live under [`bietlejuice/base/api/pagination/`](../../bietlejuice/base/api/pagination/) (`none`, `offset_limit`, **`page_per_page`**, `cursor`). See [`docs/api_ingestion/user_guide.md`](user_guide.md) for YAML knobs before adding another.
 
 ### 1) Create paginator implementation
 
@@ -309,23 +311,20 @@ pytest tests/unit/airflow/dag_builders/factories -q
 
 ---
 
-## Adding id_expansion support for new endpoint types
+## `id_expansion` and per-entity fan-out (where to change)
 
-`id_expansion` enables fan-out fetching: one GET call per entity ID read from an already-ingested raw table. Implemented in DBP-1315 for `param_name` (query param) style. If a future endpoint requires **path-param injection** (ID in the URL, e.g. `employees/{uuid}/shifts`), the following files need extending:
+`id_expansion` runs **one GET per entity id** read from a prior raw table in the same DAG. The runtime supports:
 
-### Current implementation (query param style)
+- **`param_name`** — entity id as a query parameter.
+- **`path_param`** — entity id substituted into `endpoint_path` at **`{path_param}`** (e.g. `requests/employees/{employeeUuid}`).
+- **`correlation_field`** (optional) — JSON key used when stamping each row with the fan-out id (defaults to `id_field`).
+- **`api_policies.pagination`** on the same table (e.g. **`page_per_page`**) — used inside the fan-out so each per-entity call can walk all pages.
 
-| File | Change made |
-|---|---|
-| [`bietlejuice/base/api/configuration/loader.py`](../../bietlejuice/base/api/configuration/loader.py) | `get_id_expansion_config()` — returns the `id_expansion` block |
-| [`dags/cross/base/spark_jobs/load_api_ingestion_raw.py`](../../dags/cross/base/spark_jobs/load_api_ingestion_raw.py) | `_fetch_with_id_expansion()` — Spark fan-out loop; `main()` branches on `id_expansion_config` |
-| [`bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py`](../../bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py) | `_validate_api_ingestion_workflow()` — validates `id_expansion` required keys |
+| Concern | Primary file |
+|---------|----------------|
+| Fan-out loop, path substitution, row stamping, paginator wiring | [`dags/cross/base/spark_jobs/load_api_ingestion_raw.py`](../../dags/cross/base/spark_jobs/load_api_ingestion_raw.py) — `_fetch_with_id_expansion()` |
+| Loader helpers (`get_id_expansion_config`, paginator factory) | [`bietlejuice/base/api/configuration/loader.py`](../../bietlejuice/base/api/configuration/loader.py) |
+| Declaration validation (`source_table`, `id_field`, `param_name` xor `path_param`, `correlation_field`) | [`bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py`](../../bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py) |
+| Regression tests | [`tests/dags/cross/base/spark_jobs/test_load_api_ingestion_raw.py`](../../tests/dags/cross/base/spark_jobs/test_load_api_ingestion_raw.py) |
 
-### Extending to path_param (URL injection)
-
-To support `path_param` (e.g. `endpoint_path: employees/{employeeUuid}/shifts`):
-
-1. **`load_api_ingestion_raw.py`** — in `_fetch_with_id_expansion`, check for `path_param` and substitute it into `endpoint_path` using `endpoint.replace(f"{{{path_param}}}", entity_id)` instead of adding to `params`.
-2. **`dag_declaration_validator.py`** — the `path_param` key is already allowed by the current validation (either `param_name` or `path_param` must be present). No schema change needed.
-3. **Tests** — add test cases to [`tests/dags/cross/base/spark_jobs/test_load_api_ingestion_raw.py`](../../tests/dags/cross/base/spark_jobs/test_load_api_ingestion_raw.py) for path-substitution logic.
-4. **Docs** — update the `id_expansion` section in [`docs/api_ingestion/user_guide.md`](user_guide.md) to remove the "not yet implemented" note on `path_param`.
+**Further extensions** (multiple independent path placeholders, non-GET flows, cross-DAG id sources): treat as a **custom Spark job** or extend `_fetch_with_id_expansion` with new tests and validator rules; update [`docs/api_ingestion/user_guide.md`](user_guide.md) in the same PR.

@@ -25,7 +25,7 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    driver_node_type_id: r5a.xlarge
+    driver_node_type_id: r5a.2xlarge
     node_type_id: r5a.large
     num_workers: 1
     spark_version: 16.4.x-scala2.12
@@ -72,6 +72,8 @@ workflow:
 
   raw_inner_dependencies:
     hoursbank_totals:
+      - employees
+    requests_employees:
       - employees
 
   tables_customization:
@@ -130,5 +132,45 @@ workflow:
         to: load_start_date
       merge_on:
         - id_punch
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
+    requests:
+      endpoint_path: requests
+      params: {}
+      api_policies:
+        pagination:
+          strategy: page_per_page
+          page_param: page
+          per_page_param: per_page
+          page_size: 100
+        rate_limiting:
+          strategy: none
+      merge_on:
+        - id_request
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
+    requests_employees:
+      endpoint_path: requests/employees/{employeeUuid}
+      extraction_type: incremental
+      id_expansion:
+        source_table: employees
+        id_field: uuid
+        path_param: employeeUuid
+      date_format: "%Y-%m-%d"
+      params:
+        from: load_start_date
+        to: load_end_date
+      api_policies:
+        pagination:
+          strategy: page_per_page
+          page_param: page
+          per_page_param: per_page
+          page_size: 100
+        rate_limiting:
+          strategy: none
+      merge_on:
+        - id_request
       vacuum_retention_hours: 168
       vacuum_lite: true

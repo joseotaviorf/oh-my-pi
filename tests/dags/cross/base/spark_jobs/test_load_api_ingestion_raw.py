@@ -6,6 +6,8 @@ from a raw Spark table and making one API call per entity.
 """
 
 import sys
+
+import pytest
 from unittest.mock import MagicMock, call
 
 # Mock Spark/Databricks dependencies before importing the job module
@@ -54,6 +56,13 @@ class TestResolvePartitions:
 class TestFetchWithIdExpansion:
     """Test suite for _fetch_with_id_expansion."""
 
+    @staticmethod
+    def _loader_without_pagination():
+        """Loader whose create_paginator returns None (single GET per entity)."""
+        loader = MagicMock()
+        loader.create_paginator.return_value = None
+        return loader
+
     def _make_spark(self, ids):
         """Builds a mock SparkSession that returns the given list of ID strings."""
         rows = []
@@ -89,6 +98,7 @@ class TestFetchWithIdExpansion:
         results = _fetch_with_id_expansion(
             spark=spark,
             client=client,
+            loader=self._loader_without_pagination(),
             id_expansion_config={
                 "source_table": "employees",
                 "id_field": "uuid",
@@ -115,6 +125,7 @@ class TestFetchWithIdExpansion:
         results = _fetch_with_id_expansion(
             spark=spark,
             client=client,
+            loader=self._loader_without_pagination(),
             id_expansion_config={
                 "source_table": "employees",
                 "id_field": "uuid",
@@ -141,6 +152,7 @@ class TestFetchWithIdExpansion:
         results = _fetch_with_id_expansion(
             spark=spark,
             client=client,
+            loader=self._loader_without_pagination(),
             id_expansion_config={
                 "source_table": "employees",
                 "id_field": "uuid",
@@ -162,6 +174,7 @@ class TestFetchWithIdExpansion:
         _fetch_with_id_expansion(
             spark=spark,
             client=client,
+            loader=self._loader_without_pagination(),
             id_expansion_config={
                 "source_table": "employees",
                 "id_field": "uuid",
@@ -185,6 +198,7 @@ class TestFetchWithIdExpansion:
         _fetch_with_id_expansion(
             spark=spark,
             client=client,
+            loader=self._loader_without_pagination(),
             id_expansion_config={
                 "source_table": "employees",
                 "id_field": "uuid",
@@ -205,6 +219,88 @@ class TestFetchWithIdExpansion:
             params={"date": "2026-04-12", "employeeUuid": "uuid-b"},
         )
 
+    def test_path_param_substitutes_placeholder_in_url(self):
+        """path_param replaces {placeholder} in endpoint; ID is not sent as a query param."""
+        spark = self._make_spark(["emp-uuid-1"])
+        client = MagicMock()
+        client.get.return_value = self._make_response(
+            {"content": [{"uuid": "r1"}], "metadata": {"totalPages": 1}}
+        )
+
+        _fetch_with_id_expansion(
+            spark=spark,
+            client=client,
+            loader=self._loader_without_pagination(),
+            id_expansion_config={
+                "source_table": "employees",
+                "id_field": "uuid",
+                "path_param": "employeeUuid",
+            },
+            source_schema="oitchau",
+            endpoint="requests/employees/{employeeUuid}",
+            initial_params={"from": "2025-01-01", "to": "2026-01-01"},
+        )
+
+        client.get.assert_called_once_with(
+            "requests/employees/emp-uuid-1",
+            params={"from": "2025-01-01", "to": "2026-01-01"},
+        )
+
+    def test_id_expansion_with_paginator_flattens_all_pages(self):
+        """When create_paginator returns a paginator, all yielded rows get id_field and no bare GET."""
+        spark = self._make_spark(["emp-1"])
+        client = MagicMock()
+        paginator = MagicMock()
+        paginator.fetch_all.return_value = iter(
+            [
+                [{"requestUuid": "a"}],
+                [{"requestUuid": "b"}],
+            ]
+        )
+        loader = MagicMock()
+        loader.create_paginator.return_value = paginator
+
+        results = _fetch_with_id_expansion(
+            spark=spark,
+            client=client,
+            loader=loader,
+            id_expansion_config={
+                "source_table": "employees",
+                "id_field": "uuid",
+                "path_param": "employeeUuid",
+            },
+            source_schema="oitchau",
+            endpoint="requests/employees/{employeeUuid}",
+            initial_params={"from": "2025-01-01", "to": "2026-01-01"},
+        )
+
+        assert len(results) == 2
+        assert results[0]["uuid"] == "emp-1"
+        assert results[1]["uuid"] == "emp-1"
+        client.get.assert_not_called()
+        loader.create_paginator.assert_called_once()
+
+    def test_both_path_param_and_param_name_raises(self):
+        """Setting both path_param and param_name is rejected."""
+        spark = self._make_spark(["x"])
+        client = MagicMock()
+
+        with pytest.raises(ValueError, match="must not set both"):
+            _fetch_with_id_expansion(
+                spark=spark,
+                client=client,
+                loader=self._loader_without_pagination(),
+                id_expansion_config={
+                    "source_table": "employees",
+                    "id_field": "uuid",
+                    "path_param": "employeeUuid",
+                    "param_name": "employeeUuid",
+                },
+                source_schema="oitchau",
+                endpoint="requests/employees/{employeeUuid}",
+                initial_params={},
+            )
+
     def test_empty_source_table_returns_empty_list(self):
         """When the source table has no IDs, an empty list is returned without API calls."""
         spark = self._make_spark([])
@@ -213,6 +309,7 @@ class TestFetchWithIdExpansion:
         results = _fetch_with_id_expansion(
             spark=spark,
             client=client,
+            loader=self._loader_without_pagination(),
             id_expansion_config={
                 "source_table": "employees",
                 "id_field": "uuid",
@@ -225,3 +322,35 @@ class TestFetchWithIdExpansion:
 
         assert results == []
         client.get.assert_not_called()
+
+    def test_id_expansion_correlation_field_on_list_response(self):
+        """List bodies are stamped with correlation_field when set, preserving native uuid."""
+        spark = self._make_spark(["emp-1"])
+        client = MagicMock()
+        response = MagicMock()
+        response.json.return_value = [{"uuid": "holiday-a", "name": "Xmas"}]
+        client.get.return_value = response
+        loader = self._loader_without_pagination()
+
+        results = _fetch_with_id_expansion(
+            spark=spark,
+            client=client,
+            loader=loader,
+            id_expansion_config={
+                "source_table": "employees",
+                "id_field": "uuid",
+                "correlation_field": "employeeUuid",
+                "path_param": "employeeUuid",
+            },
+            source_schema="oitchau",
+            endpoint="holidays-groups/holidays/employees/{employeeUuid}",
+            initial_params={"from": "2026-01-01", "to": "2026-01-31"},
+        )
+
+        assert len(results) == 1
+        assert results[0]["uuid"] == "holiday-a"
+        assert results[0]["employeeUuid"] == "emp-1"
+        client.get.assert_called_once_with(
+            "holidays-groups/holidays/employees/emp-1",
+            params={"from": "2026-01-01", "to": "2026-01-31"},
+        )

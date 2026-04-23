@@ -21,7 +21,7 @@ It focuses only on what exists in code today, plus known limitations.
 - [Authentication](#authentication-workflowauthentication)
   - [Parameter reference (authentication)](#parameter-reference-authentication)
 - [Request params and date placeholders](#request-params-and-date-placeholders)
-- [Pagination](#pagination-api_policiespagination)
+- [Pagination](#pagination-api_policiespagination) (`none`, `offset_limit`, `page_per_page`, `cursor`)
 - [Rate limiting](#rate-limiting-api_policiesrate_limiting)
 - [Error handling](#error-handling-api_policieserror_handling)
 - [YAML examples](#yaml-examples-supported-features)
@@ -199,7 +199,7 @@ Each entry under `tables_customization` is a dictionary keyed by the **raw table
   - **`tables_customization.<table>.execution_timeout_hours`** float (optional, default: workflow `execution_timeout_hours` → `2`).
   - **`tables_customization.<table>.load_spark_job`** / **`spark_job_arguments`**: allowed in the shared declaration schema for other workflows; **`LoadAPIRawTaskCreator` always submits `load_api_ingestion_raw` with the fixed parameter list** — per-table overrides are **not** applied for `api_ingestion` today.
   - **`tables_customization.<table>.spark_job_prefix`** string (optional, default: workflow `spark_job_prefix` → `base`): **used** to locate the job under `spark_jobs/<prefix>/` (same pattern as CDC/custom raw loaders).
-  - **`tables_customization.<table>.id_expansion`** dict (optional): enables **fan-out fetching** — one API call per entity ID read from an already-ingested raw source table. See [id_expansion](#id_expansion-per-entity-fan-out) below.
+  - **`tables_customization.<table>.id_expansion`** dict (optional): enables **fan-out fetching** — one API call per entity ID read from an already-ingested raw source table. Supports **`param_name`** (query string), **`path_param`** (placeholder in `endpoint_path`, e.g. `requests/employees/{employeeUuid}`), and optional **`correlation_field`** for row stamping. See [id_expansion](#id_expansion-per-entity-fan-out) below.
 
 \* Per-table `authentication` is required if workflow-level `authentication` is missing.
 
@@ -221,15 +221,25 @@ Use `id_expansion` when:
 ```yaml
 tables_customization:
   <table_name>:
-    endpoint_path: <path>          # static endpoint path (no ID template needed)
+    # With query-param ID (endpoint_path has no placeholder):
+    endpoint_path: <path>
     id_expansion:
       source_table: <table>        # raw table name within the same DAG schema
       id_field: <json_field>       # JSON field to extract from payload column
-      param_name: <query_param>    # query parameter name to pass the ID (use this OR path_param)
-      # path_param: <placeholder>  # path segment placeholder — future; use when ID goes into the URL
+      param_name: <query_param>    # query parameter name (use this OR path_param, not both)
+      # correlation_field: <key>  # optional: JSON key used to stamp each row with the fan-out id
     params:
-      <key>: load_start_date       # other query params (dates etc.) work as usual
-    date_format: "%Y-%m-%d"        # optional date formatting for params
+      <key>: load_start_date
+    date_format: "%Y-%m-%d"
+
+  <table_name_path_style>:
+    # With path-segment ID — endpoint_path MUST contain {path_param} exactly once per segment:
+    endpoint_path: "parent/{employeeUuid}/child"
+    id_expansion:
+      source_table: employees
+      id_field: uuid
+      path_param: employeeUuid
+      # correlation_field: employeeUuid   # optional when API rows already use "uuid" for something else
 ```
 
 ### Required keys
@@ -238,17 +248,20 @@ tables_customization:
 |-----|----------|-------------|
 | `source_table` | yes | Name of the raw table to read entity IDs from (e.g. `employees`) |
 | `id_field` | yes | JSON field path inside `payload` to extract (e.g. `uuid`, `externalId`) |
-| `param_name` | yes* | Query parameter name to pass the ID to the endpoint (e.g. `employeeUuid`) |
-| `path_param` | yes* | URL path placeholder — use instead of `param_name` when ID goes in the path |
+| `param_name` | yes* | Query parameter name to pass the ID (e.g. `employeeUuid`) |
+| `path_param` | yes* | Placeholder name matching `{placeholder}` in `endpoint_path` (e.g. `employeeUuid` for `requests/employees/{employeeUuid}`) |
+| `correlation_field` | no | JSON key used when stamping each response row with the fan-out entity id; defaults to `id_field`. Use when list items already expose `uuid` (or similar) from the API and you must not overwrite it. |
 
 \* Exactly one of `param_name` or `path_param` must be provided.
 
 ### Runtime behaviour
 
 1. Spark reads `datalake_{custom_schema}_raw.{source_table}` and extracts distinct non-null `id_field` values from the `payload` JSON column.
-2. For each entity ID, a GET request is issued to `endpoint_path` with the ID appended as `param_name=<id>` plus any other `params`.
-3. Single-object (`dict`) responses are enriched with `{id_field: <entity_id>}` for traceability and appended as one record.
-4. List responses are flattened and each item is enriched with the entity ID.
+2. For each entity ID, the job either:
+   - substitutes **`{path_param}`** inside `endpoint_path` with the entity id (no query param for the id itself), or
+   - adds **`param_name=<entity_id>`** to the request query string (merged with `params`).
+3. If the table declares **`api_policies.pagination`** (e.g. **`page_per_page`**), each per-entity call uses that paginator and all pages are flattened into rows; otherwise a single GET is performed. If the response looks paginated (e.g. `metadata.totalPages` > 1) but no paginator is configured, only the first page is fetched and a **warning** is logged.
+4. Each row is stamped with **`correlation_field`** if set, else **`id_field`**, set to the fan-out entity id (so list items keep API-native keys such as `uuid` when needed).
 5. Failed individual calls (HTTP errors, timeouts) are logged as warnings and skipped — the job continues with the remaining IDs.
 6. All collected records are written to the raw layer as a single Delta table write.
 
@@ -272,11 +285,34 @@ tables_customization:
 
 This fetches the D-1 hours bank balance for each employee UUID in `datalake_oitchau_raw.employees`, adding ~4,490 rows per daily run.
 
+### Example — path param + pagination (OiTchau requests per employee)
+
+```yaml
+tables_customization:
+  requests_employees:
+    endpoint_path: requests/employees/{employeeUuid}
+    extraction_type: incremental
+    id_expansion:
+      source_table: employees
+      id_field: uuid
+      path_param: employeeUuid
+    date_format: "%Y-%m-%d"
+    params:
+      from: load_start_date
+      to: load_end_date
+    api_policies:
+      pagination:
+        strategy: page_per_page
+        page_param: page
+        per_page_param: per_page
+        page_size: 100
+```
+
 ### Limitations
 
-- **`path_param`** (ID injected into the URL path) is declared in the YAML schema but **not yet implemented** in the runtime. Only `param_name` (query param) is currently supported. Path-param support will be added when a concrete use case requires it.
-- **Pagination per entity** is not supported. If an endpoint paginates within a per-entity call, use a custom Spark job instead.
-- The `source_table` must be ingested by the same DAG and exist in the raw layer before the `id_expansion` table task runs. Use `inner_dependencies` if explicit task ordering is needed.
+- **`path_param`**: `endpoint_path` must contain the placeholder **`{<path_param>}`** exactly as built by the job (e.g. `{employeeUuid}`). Typos or missing braces fail at runtime.
+- **Unsupported fan-out patterns** still need a custom Spark job (e.g. multiple different path placeholders per call, or IDs not present in a prior raw table in the same DAG).
+- The `source_table` must be ingested by the same DAG and exist in the raw layer before the `id_expansion` table task runs. Use **`workflow.raw_inner_dependencies`** (or **`inner_dependencies`**) so the source raw task finishes first.
 
 ---
 
@@ -382,6 +418,7 @@ Supported strategies:
 
 - `none`
 - `offset_limit`
+- `page_per_page` (1-based `page` / `per_page` query params; optional **`results_response_path`**)
 - `cursor` (**Point-In-Time style, header-based**)
 
 ### `strategy: offset_limit`
@@ -415,6 +452,25 @@ Important behavior:
 
 - Cursor + context + page size are always sent via **headers** in the current loader.
 - If `results_response_path` is not specified, results are automatically extracted from common field names (`results`, `items`, `data`, `records`, `entries`). If specified, only that field is used.
+
+### `strategy: page_per_page`
+
+For APIs that use **1-based page index** and **page size** as query parameters (common pattern: `page`, `per_page`), with optional **`metadata`** in the JSON body to signal the last page (`page` / `totalPages`, including snake_case variants).
+
+Config (defaults shown):
+
+- **page_param** (default: `page`)
+- **per_page_param** (default: `per_page`)
+- **page_size** (default: `100`)
+- **results_response_path** (string, optional): if set, the paginator reads only that key for the list of rows; if omitted, **`PagePerPagePaginator`** tries common list keys (`results`, `items`, `data`, `content`, `records`, `entries`).
+
+Stopping rules:
+
+- current page **≥** `metadata.totalPages` (when both are present and parseable), or
+- the page returns **fewer rows than `page_size`**, or
+- the page is **empty**.
+
+**`delay_seconds`** from **`api_policies.rate_limiting`** (workflow or table) is applied as **`page_delay`** between pages for this paginator.
 
 ---
 
@@ -601,6 +657,26 @@ workflow:
       results_response_path: "results"  # optional: defaults to trying common field names
 ```
 
+### Pagination: page / per_page (table override)
+
+```yaml
+workflow:
+  api_policies:
+    pagination:
+      strategy: "none"
+    rate_limiting:
+      strategy: "none"
+  tables_customization:
+    events:
+      endpoint_path: "events"
+      api_policies:
+        pagination:
+          strategy: "page_per_page"
+          page_param: "page"
+          per_page_param: "per_page"
+          page_size: 100
+```
+
 ### Rate limiting: fixed delay between pages
 
 ```yaml
@@ -698,7 +774,7 @@ There is **no** dedicated `source` URL column written by `load_api_ingestion_raw
 
 ## Reference DAGs
 
-- [`dags/people/oitchau_api/oitchau_api_declaration.yml`](../../dags/people/oitchau_api/oitchau_api_declaration.yml) — `api_ingestion` with JSON-body OAuth2 token, optional `http_user_agent`, `employees` endpoint, explicit empty `params`.
+- [`dags/people/oitchau_api/oitchau_api_declaration.yml`](../../dags/people/oitchau_api/oitchau_api_declaration.yml) — `api_ingestion` reference: **`token_request_format: json_body`** OAuth2, optional **`http_user_agent`**, **`credentials_scope`**, tables with **`params: {}`** where the API rejects default date filters, **`page_per_page`** on large list endpoints, **`id_expansion`** with **`param_name`** (hours bank) and **`path_param`** + **`page_per_page`** (per-employee requests), **`workflow.raw_inner_dependencies`** for fan-out after `employees`, plus **clean** tables in the same DAG package (`queries/clean/*.sql`, **`merge_on`**, **`default_clean_extraction_type`** / **`default_clean_partitions`**).
 
 Note: [`dags/people/currency/currency_declaration.yml`](../../dags/people/currency/currency_declaration.yml) uses **`custom_ingestion`** (`load_currency_raw`), not `api_ingestion`.
 
@@ -736,6 +812,7 @@ Longer-term, shared/reused token handling across parallel tasks is not implement
 - No `link_header` pagination strategy.
 - **`_create_cursor_paginator`** wires **`cursor_location` / `context_location` / `page_size_location` to `"header"`** — query-param cursor APIs need loader changes.
 - For **cursor** pagination, result lists are resolved with **`CursorPaginator._default_extract_results`**, which scans `results`, `items`, `data`, `records`, `entries` (or a configured `results_response_path`).
+- **`page_per_page`** uses body **`metadata`** (`totalPages` / `page`, including snake_case) when present; otherwise it stops on short/empty pages (see [`PagePerPagePaginator`](../../bietlejuice/base/api/pagination/page_per_page.py)).
 - For a **single-page** fetch (no paginator), `load_api_ingestion_raw` reads **`table_config.results_response_path`** (default key name **`"results"`**), then falls back to **`data`** if the list is empty — it does **not** scan all common names like the cursor paginator.
 
 ### Rate limiting / 429

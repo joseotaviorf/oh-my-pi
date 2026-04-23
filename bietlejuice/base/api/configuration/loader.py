@@ -24,6 +24,7 @@ from bietlejuice.base.api.auth.api_key import APIKeyAuth
 from bietlejuice.base.api.pagination.base import BasePaginator
 from bietlejuice.base.api.pagination.cursor import CursorPaginator
 from bietlejuice.base.api.pagination.offset_limit import OffsetLimitPaginator
+from bietlejuice.base.api.pagination.page_per_page import PagePerPagePaginator
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.api_ingestion_enums import (
     AuthenticationStrategyEnum,
     PaginationStrategyEnum,
@@ -475,14 +476,14 @@ class APIConfigurationLoader:
         if pagination_config == {}:
             raise ValueError(
                 "Pagination strategy is required and cannot be empty. "
-                "Supported strategies: cursor, offset_limit, none"
+                "Supported strategies: cursor, offset_limit, page_per_page, none"
             )
 
         strategy = pagination_config.get("strategy")
         if not strategy or strategy == "":
             raise ValueError(
                 "Pagination strategy is required and cannot be empty. "
-                "Supported strategies: cursor, offset_limit, none"
+                "Supported strategies: cursor, offset_limit, page_per_page, none"
             )
 
         if strategy == PaginationStrategyEnum.CURSOR.value:
@@ -493,13 +494,17 @@ class APIConfigurationLoader:
             return self._create_offset_limit_paginator(
                 client, endpoint, initial_params, pagination_config
             )
+        elif strategy == PaginationStrategyEnum.PAGE_PER_PAGE.value:
+            return self._create_page_per_page_paginator(
+                client, endpoint, initial_params, pagination_config
+            )
         elif strategy == PaginationStrategyEnum.NONE.value:
             LOGGER.info("No pagination strategy configured. Fetching single page.")
             return None
         else:
             raise ValueError(
                 f"Pagination strategy '{strategy}' not supported. "
-                "Supported strategies: cursor, offset_limit, none"
+                "Supported strategies: cursor, offset_limit, page_per_page, none"
             )
 
     def _create_cursor_paginator(
@@ -648,6 +653,65 @@ class APIConfigurationLoader:
             page_delay=delay_seconds if delay_seconds > 0 else None,
         )
 
+    def _create_page_per_page_paginator(
+        self,
+        client: BaseAPIClient,
+        endpoint: str,
+        initial_params: Dict[str, Any],
+        pagination_config: Dict[str, Any],
+    ) -> PagePerPagePaginator:
+        """
+        Creates a PagePerPagePaginator for 1-based ``page`` / ``per_page`` style APIs.
+        """
+        workflow_api_policies = self.workflow_config.get("api_policies", {})
+        table_api_policies = self.table_config.get("api_policies", {})
+
+        workflow_rate_limiting = workflow_api_policies.get("rate_limiting", {})
+        table_rate_limiting = table_api_policies.get("rate_limiting", {})
+        rate_limiting = {}
+        rate_limiting.update(workflow_rate_limiting)
+        rate_limiting.update(table_rate_limiting)
+
+        delay_seconds = rate_limiting.get("delay_seconds", 0.0)
+
+        page_param = pagination_config.get("page_param", "page")
+        per_page_param = pagination_config.get("per_page_param", "per_page")
+        page_size = pagination_config.get("page_size", 100)
+
+        if not isinstance(page_size, int) or page_size <= 0:
+            raise ValueError(f"page_size must be a positive integer, got {page_size}")
+
+        results_response_path = pagination_config.get("results_response_path")
+        if results_response_path:
+
+            def extract_results(data):
+                if isinstance(data, dict):
+                    return data.get(results_response_path, [])
+                return []
+
+        else:
+            extract_results = None
+
+        LOGGER.info(
+            "Creating PagePerPagePaginator for endpoint '%s' with "
+            "page_param=%s, per_page_param=%s, page_size=%d",
+            endpoint,
+            page_param,
+            per_page_param,
+            page_size,
+        )
+
+        return PagePerPagePaginator(
+            client=client,
+            endpoint=endpoint,
+            initial_params=initial_params,
+            page_param=page_param,
+            per_page_param=per_page_param,
+            page_size=page_size,
+            page_delay=delay_seconds if delay_seconds > 0 else None,
+            extract_results=extract_results,
+        )
+
     def get_endpoint_path(self) -> str:
         """
         Returns the endpoint path for the table.
@@ -793,6 +857,9 @@ class APIConfigurationLoader:
         id_expansion enables fan-out fetching: one API call per entity ID extracted
         from an already-ingested raw source table. Required keys are source_table,
         id_field, and either param_name (query param) or path_param (URL path segment).
+        Optional correlation_field sets the response JSON key used to stamp each row
+        with the fan-out id (defaults to id_field, which must exist on the source
+        payload for ID extraction).
 
         Example YAML:
             id_expansion:

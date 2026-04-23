@@ -572,6 +572,32 @@ class TestAPIConfigurationLoaderCreatePaginator:
         assert paginator.offset_param == "start"
         assert paginator.page_size == 50
 
+    def test_create_paginator_page_per_page_strategy(self):
+        """Test that page_per_page pagination creates PagePerPagePaginator."""
+        from bietlejuice.base.api.pagination.page_per_page import PagePerPagePaginator
+
+        workflow_config = {
+            "api_base_url": "https://api.example.com/",
+            "api_policies": {
+                "pagination": {
+                    "strategy": "page_per_page",
+                    "page_param": "page",
+                    "per_page_param": "per_page",
+                    "page_size": 50,
+                }
+            },
+        }
+        table_config = {"endpoint_path": "requests"}
+        loader = APIConfigurationLoader(workflow_config, table_config)
+        client = Mock(spec=BaseAPIClient)
+
+        paginator = loader.create_paginator(client, "requests", {"from": "2025-01-01"})
+
+        assert isinstance(paginator, PagePerPagePaginator)
+        assert paginator.page_param == "page"
+        assert paginator.per_page_param == "per_page"
+        assert paginator.page_size == 50
+
     def test_create_paginator_invalid_strategy_raises_error(self):
         """Test that invalid pagination strategy raises ValueError."""
         workflow_config = {
