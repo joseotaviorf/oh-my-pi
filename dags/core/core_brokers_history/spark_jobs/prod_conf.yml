@@ -1,6 +1,5 @@
 ENTITY_TYPE: "BROKER"
 merge_on_historical: ["id_event"]
-when_matched_update_condition_historical: null
 
 BROKERS_HISTORY_TRANSACTIONAL_TABLE: "datalake_company_transactional.company"
 # tracked_col = column name in transactional CDC; target_col = core convention (ev_{target_col}).

@@ -50,7 +50,6 @@ CONFIG_MAP_BROKERS_HISTORY = {
     "BROKERS_HISTORY_TRANSACTIONAL_TABLE": "test.transactional_company",
     "BROKER_PRODUCTS_HISTORY_TRANSACTIONAL_TABLE": "test.transactional_company_product",
     "merge_on_historical": ["id_event"],
-    "when_matched_update_condition_historical": None,
     "brokers_history_event_configs": BROKERS_HISTORY_EVENT_CONFIGS,
 }
 
@@ -58,7 +57,6 @@ CONFIG_MAP_BROKER_PRODUCTS_HISTORY = {
     "ENTITY_TYPE": "BROKER",
     "BROKER_PRODUCTS_HISTORY_TRANSACTIONAL_TABLE": "test.transactional_company_product",
     "merge_on_historical": ["id_event"],
-    "when_matched_update_condition_historical": None,
     "broker_products_history_event_configs": BROKER_PRODUCTS_HISTORY_EVENT_CONFIGS,
 }
 
