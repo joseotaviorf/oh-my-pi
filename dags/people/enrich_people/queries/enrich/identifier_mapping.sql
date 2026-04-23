@@ -121,6 +121,19 @@ transfer_continuation_periods AS (
             ORDER BY aa.dt_effective_started ASC
         ) = 1
 ),
+employment_periods AS (
+    -- Periods of service with at least one employment assignment (E/C).
+    -- Pension / pre-hire (P) periods are excluded from the continuous employment cycle
+    -- computation; if they were kept, a chronologically interleaved P period could
+    -- break the gaps-and-islands chain between an INACTIVE GLB_TRANSFER and its
+    -- ACTIVE continuation, yielding inconsistent cycles.
+    SELECT DISTINCT
+        id_period_of_service
+    FROM
+        datalake_pin_core_clean.all_assignments
+    WHERE
+        assignment_type IN ('E', 'C')
+),
 period_cycle_base AS (
     SELECT
         ps.id_person,
@@ -129,6 +142,9 @@ period_cycle_base AS (
         tcp.id_period_of_service IS NOT NULL AS is_transfer_continuation
     FROM
         latest_periods_of_service AS ps
+    INNER JOIN
+        employment_periods AS ep
+            ON ps.id_period_of_service = ep.id_period_of_service
     LEFT JOIN
         transfer_continuation_periods AS tcp
             ON ps.id_period_of_service = tcp.id_period_of_service

@@ -23,7 +23,7 @@ columns:
     lineage:
     - datalake_pin_core_clean.all_assignments.id_period_of_service
   id_continuous_employment_cycle:
-    description: Stable identifier of the person's current continuous employment cycle. GLB_TRANSFER between assignment types E or C only keeps the same cycle id; transfers into or out of Pending (P) start a new cycle; non-transfer rehiring starts a new cycle id.
+    description: Stable identifier of the person's current continuous employment cycle. Computed only for employment periods (assignments of type E or C); pension / pre-hire (P) rows have NULL cycle. GLB_TRANSFER between assignment types E or C only keeps the same cycle id; non-transfer rehiring starts a new cycle id.
     lineage:
     - datalake_pin_core_clean.periods_of_service.id_period_of_service
     - datalake_pin_core_clean.periods_of_service.id_person
@@ -110,6 +110,7 @@ columns:
     description: |
       Original hire date for the current continuous employment cycle.
       Calculation:
+      - restrict to employment periods (periods with at least one E or C assignment); pension / pre-hire (P) rows have NULL
       - group periods_of_service by person and cycle continuity
       - keep continuity for GLB_TRANSFER continuation (assignment_sequence + 1) for assignment types E and C only
       - start a new cycle for non-transfer rehiring

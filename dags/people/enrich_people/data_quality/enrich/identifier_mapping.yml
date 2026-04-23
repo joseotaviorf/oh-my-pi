@@ -22,13 +22,17 @@ column_level_validations:
     is_complete:
       severity_level: Warning
   id_continuous_employment_cycle:
-    # Ensure active non-null, deterministic assignment mapping, and transfer-chain consistency.
+    # Continuous employment cycle is an employment (E/C) concept: pension / pre-hire (P)
+    # rows intentionally have NULL cycle (see enrich SQL `employment_periods` CTE).
+    # Ensure active employment rows are non-null, deterministic assignment mapping,
+    # and transfer-chain consistency.
     custom:
       constraint: |-
         (
           (SELECT COUNT(*)
            FROM datalake_people.identifier_mapping
            WHERE is_active = TRUE
+             AND assignment_type IN ('E', 'C')
              AND id_continuous_employment_cycle IS NULL
           ) = 0
           AND
@@ -125,7 +129,15 @@ column_level_validations:
     is_complete:
       severity_level: Warning
   dt_original_hired:
-    is_complete:
+    # Non-null for employment rows (E/C). Pension / pre-hire (P) rows have no
+    # continuous employment cycle and therefore no dt_original_hired.
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.identifier_mapping
+         WHERE assignment_type IN ('E', 'C')
+           AND dt_original_hired IS NULL
+        ) = 0
       severity_level: Warning
   dt_started:
     is_complete:
