@@ -462,10 +462,6 @@ workflow:
       clean_table_name: users_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
-    user_test_segment:
-      clean_table_name: user_test_segment
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]
     backoffice_journey_status:
       clean_table_name: backoffice_journey_status
       raw_primary_keys: ["id"]
