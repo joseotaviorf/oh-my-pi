@@ -59,7 +59,7 @@ fi
 echo "Downloading dependencies of internal wheels..."
 $PIP_EXEC download \
   "$TMP_DIR/wheels/bi_etl_ejuice-latest-py3-none-any.whl" \
-  "$TMP_DIR/wheels/quintoandar_logger-0.8.1-py3-none-any.whl" \
+  "$TMP_DIR/wheels/quintoandar_logger-0.8.0-py3-none-any.whl" \
   --dest "$TMP_DIR/wheels/" || echo "Some deps will be installed from source"
 
 # --------------------------------------------------
