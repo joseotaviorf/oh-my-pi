@@ -19,6 +19,8 @@ SELECT
     fee_1.sk_business_unit,
     fee_1.sk_company_supply,
     fee_1.sk_company_demand,
+    fee_1.sk_broker_supply,
+    fee_1.sk_broker_demand,
     fee_1.sk_secretariat_booking_creator,
     fee_1.sk_secretariat_on_event,
     fee_1.sk_last_secretariat,

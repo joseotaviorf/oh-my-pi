@@ -60,6 +60,14 @@ columns:
     description: Id of company supply.
     lineage:
       - datalake_visit.visits.id_company_supply
+  sk_broker_supply:
+    description: Surrogate key of the supply-side broker when the business model implies 3P supply.
+    lineage:
+      - datalake_visit.visits.sk_broker_supply
+  sk_broker_demand:
+    description: Surrogate key of the demand-side broker when the business model implies 3P demand or lead gen.
+    lineage:
+      - datalake_visit.visits.sk_broker_demand
   sk_house_entrance:
     lineage:
       - dw_house.dim_house_entrance_history.sk_house_entrance

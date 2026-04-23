@@ -10,6 +10,8 @@ SELECT
   at.sk_author_type AS sk_author_type,
   vse.id_company_demand AS sk_company_demand,
   vse.id_company_supply AS sk_company_supply,
+  COALESCE(vse.sk_broker_supply, -1) AS sk_broker_supply,
+  COALESCE(vse.sk_broker_demand, -1) AS sk_broker_demand,
   vse.is_3p_supply,
   vse.is_3p_demand,
   vse.is_3p_lead_gen,

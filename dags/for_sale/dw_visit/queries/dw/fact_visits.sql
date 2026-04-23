@@ -13,6 +13,8 @@ SELECT
   v.id_house_listing AS sk_house_listing,
   v.id_company_demand AS sk_company_demand,
   v.id_company_supply AS sk_company_supply,
+  COALESCE(v.sk_broker_supply, -1) AS sk_broker_supply,
+  COALESCE(v.sk_broker_demand, -1) AS sk_broker_demand,
   ppa.id_house_listing_relation AS sk_ppa_relation,
   bc.sk_business_context,
   dim_heh.sk_house_entrance,

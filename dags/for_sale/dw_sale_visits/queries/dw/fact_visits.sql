@@ -17,6 +17,8 @@ SELECT
     COALESCE(id_business_unit, -1) AS sk_business_unit,
     COALESCE(sk_company_supply, -1) AS sk_company_supply,
     COALESCE(sk_company_demand, -1) AS sk_company_demand,
+    COALESCE(sk_broker_supply, -1) AS sk_broker_supply,
+    COALESCE(sk_broker_demand, -1) AS sk_broker_demand,
     COALESCE(id_agent, -1) AS sk_agent,
     COALESCE(id_user_agent, -1) AS sk_user_agent,
     COALESCE(id_user_en, -1) AS sk_user_en,

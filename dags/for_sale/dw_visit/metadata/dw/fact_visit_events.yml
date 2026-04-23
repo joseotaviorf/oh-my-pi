@@ -59,6 +59,14 @@ columns:
       - datalake_visits.visit_status_events.id_company_supply
     description:
       Is the company supply key if applicable.
+  sk_broker_supply:
+    lineage:
+      - datalake_visit.visit_status_events.sk_broker_supply
+    description: Surrogate key of the supply-side broker when the business model implies 3P supply.
+  sk_broker_demand:
+    lineage:
+      - datalake_visit.visit_status_events.sk_broker_demand
+    description: Surrogate key of the demand-side broker when the business model implies 3P demand or lead gen.
   is_3p_supply:
     lineage:
       - datalake_visit.visit_status_events.is_3p_supply

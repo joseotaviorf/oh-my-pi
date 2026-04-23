@@ -32,6 +32,14 @@ columns:
     lineage:
     - datalake_booking.booking.id_company_demand
     description: Surrogate Key of the company in Rede QuintoAndar associated with the agent. Can be joined with dw_rede.dim_company. Obtained from booking table which gets it from visit_business_model.
+  sk_broker_supply:
+    lineage:
+    - datalake_booking.booking.sk_broker_supply
+    description: Surrogate key of the supply-side broker when the business model implies 3P supply. Propagated from booking (visit_business_model).
+  sk_broker_demand:
+    lineage:
+    - datalake_booking.booking.sk_broker_demand
+    description: Surrogate key of the demand-side broker when the business model implies 3P demand or lead gen. Propagated from booking (visit_business_model).
   partner_3p_supply:
     lineage:
     - datalake_booking.booking.partner_3p_supply

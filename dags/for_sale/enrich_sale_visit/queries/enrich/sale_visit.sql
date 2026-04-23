@@ -29,6 +29,8 @@ SELECT DISTINCT
     svh.id_business_unit,
     COALESCE(b.id_company_supply, -1) AS sk_company_supply,
     COALESCE(b.id_company_demand, -1) AS sk_company_demand,
+    COALESCE(b.sk_broker_supply, -1) AS sk_broker_supply,
+    COALESCE(b.sk_broker_demand, -1) AS sk_broker_demand,
     b.partner_3p_supply,
     b.partner_3p_demand,
     b.is_3p_supply,

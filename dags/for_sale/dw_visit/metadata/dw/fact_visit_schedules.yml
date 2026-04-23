@@ -56,6 +56,14 @@ columns:
       - datalake_visit.visit_schedules.id_company_demand
     description:
       Id of the company in Rede QuintoAndar associated with the agent.
+  sk_broker_supply:
+    lineage:
+      - datalake_visit.visit_schedules.sk_broker_supply
+    description: Surrogate key of the supply-side broker when the business model implies 3P supply.
+  sk_broker_demand:
+    lineage:
+      - datalake_visit.visit_schedules.sk_broker_demand
+    description: Surrogate key of the demand-side broker when the business model implies 3P demand or lead gen.
   sk_agent:
     lineage:
       - datalake_visit.visit_schedules.id_agent

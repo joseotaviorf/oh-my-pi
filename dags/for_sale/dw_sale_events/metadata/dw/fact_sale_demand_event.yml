@@ -96,6 +96,16 @@ columns:
     - dw_sale.fact_offers.sk_company_demand
     description: Key of the agents's company in Rede Demand at the start of the funnel,
       if that is the case. It can be joined with dw_public.dim_company or dw_public.dim_company_3p_partners.
+  sk_broker_supply:
+    lineage:
+    - dw_sale.fact_visits.sk_broker_supply
+    - dw_sale.fact_offers.sk_broker_supply
+    description: Surrogate key of the supply-side broker when the business model implies 3P supply.
+  sk_broker_demand:
+    lineage:
+    - dw_sale.fact_visits.sk_broker_demand
+    - dw_sale.fact_offers.sk_broker_demand
+    description: Surrogate key of the demand-side broker when the business model implies 3P demand or lead gen.
   sk_secretariat_booking_creator:
     lineage:
     - dw_sale.fact_visits.sk_secretariat_booking_creator
