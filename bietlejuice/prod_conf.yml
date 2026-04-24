@@ -1669,7 +1669,7 @@ emr_cluster_base: &emr_cluster_anchor
 emr_7_12_med_general_cluster:
     <<: *emr_cluster_anchor
 
-emr_7_12_min_general_cluster:
+emr_7_12_med_general_3_workers_cluster:
     <<: *emr_cluster_anchor
     node_type_id: m7a.2xlarge
     driver_node_type_id: m7a.2xlarge
@@ -1679,10 +1679,20 @@ emr_7_12_min_general_cluster:
         ebs_volume_size: 100
         availability: ON_DEMAND
 
-emr_7_12_med_general_2_workers_cluster:
+emr_7_12_min_general_2_workers_cluster:
     <<: *emr_cluster_anchor
     node_type_id: m7a.xlarge
     driver_node_type_id: m7a.xlarge
+    num_workers: 2
+    aws_attributes:
+        <<: *emr_aws_anchor
+        ebs_volume_size: 100
+        availability: ON_DEMAND
+
+emr_7_12_med_general_2_workers_cluster:
+    <<: *emr_cluster_anchor
+    node_type_id: m7a.2xlarge
+    driver_node_type_id: m7a.2xlarge
     num_workers: 2
     aws_attributes:
         <<: *emr_aws_anchor
