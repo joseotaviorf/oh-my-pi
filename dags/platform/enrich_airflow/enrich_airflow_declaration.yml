@@ -5,7 +5,7 @@ dag:
   documentation:
     dag_purpose: |
       Consolidate data about Airflow's internal metadata database. It unites tables both from
-      Astronomer (our current Airflow) and Composer (our previous Airflow).
+      Astronomer (our current Airflow) and Composer (our previous Airflow). 
 workflow:
   type: query_delta
   layer: enrich
