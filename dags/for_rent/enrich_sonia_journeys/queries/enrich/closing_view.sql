@@ -1,5 +1,5 @@
 -- Rent-flow contract closing funnel from CDP transactional events; one row per contract_sent event x (tenant, owner).
--- Events from 2026-04-01 onward. Binning uses crc32 on "id_house-uuid_tenant" (see binning_value).
+-- Events from 2026-04-24 onward. Binning uses crc32 on "id_house-uuid_tenant" (see binning_value).
 WITH
   contract_sent_events AS (
     SELECT
@@ -14,7 +14,7 @@ WITH
       datalake_cdp_clean.transactional AS e_sent
     WHERE
       e_sent.event_name = 'rent_flow_contract_sent'
-      AND e_sent.ts_event >= TIMESTAMP '2026-04-01 00:00:00'
+      AND e_sent.ts_event >= TIMESTAMP '2026-04-24 00:00:00'
   ),
   contract_canceled_events AS (
     SELECT
@@ -25,7 +25,7 @@ WITH
       datalake_cdp_clean.transactional AS e_canceled
     WHERE
       e_canceled.event_name = 'rent_flow_contract_canceled'
-      AND e_canceled.ts_event >= TIMESTAMP '2026-04-01 00:00:00'
+      AND e_canceled.ts_event >= TIMESTAMP '2026-04-24 00:00:00'
   ),
   contract_signed_events AS (
     SELECT
@@ -36,7 +36,26 @@ WITH
       datalake_cdp_clean.transactional AS e_signed
     WHERE
       e_signed.event_name = 'rent_flow_contract_signed'
-      AND e_signed.ts_event >= TIMESTAMP '2026-04-01 00:00:00'
+      AND e_signed.ts_event >= TIMESTAMP '2026-04-24 00:00:00'
+  ),
+  contract_party_events AS (
+    SELECT
+      CAST(e_party.event_properties:contractId AS INT) AS id_contract,
+      CAST(e_party.event_properties:contractPersonId AS INT) AS id_contract_person
+    FROM
+      datalake_cdp_clean.transactional AS e_party
+    WHERE
+      e_party.event_name IN ('tenant_added_to_contract', 'owner_added_to_contract')
+      AND e_party.ts_event >= TIMESTAMP '2026-04-24 00:00:00'
+  ),
+  contract_parties AS (
+    SELECT
+      id_contract,
+      count(DISTINCT id_contract_person) AS number_of_signatories
+    FROM
+      contract_party_events
+    GROUP BY
+      id_contract
   ),
   enriched_contract_sent AS (
     SELECT
@@ -80,6 +99,7 @@ SELECT
   s.user_role,
   s.uuid_person,
   u.id AS id_user,
+  coalesce(cp.number_of_signatories, 0) AS number_of_signatories,
   abs(crc32(encode(concat(CAST(s.id_house AS STRING), '-', s.uuid_tenant), 'utf-8'))) % 100 AS binning_value,
   s.id_contract % 100 AS binning_value_contract_id
 FROM
@@ -88,5 +108,7 @@ FROM
     ON s.uuid_person = u.uuid_person
   INNER JOIN datalake_ebdb_clean.house AS h
     ON s.id_house = h.id
+  LEFT JOIN contract_parties AS cp
+    ON cp.id_contract = s.id_contract
 WHERE
   s.uuid_person IS NOT NULL
