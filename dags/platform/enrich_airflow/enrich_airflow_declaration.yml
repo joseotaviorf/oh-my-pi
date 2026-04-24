@@ -2,7 +2,7 @@ dag:
   name: enrich_airflow
   owner: Data Life Cycle
   schedule_interval: 30 5-18/1 * * *
-  documentation:
+  documentation: 
     dag_purpose: |
       Consolidate data about Airflow's internal metadata database. It unites tables both from
       Astronomer (our current Airflow) and Composer (our previous Airflow). 
@@ -34,4 +34,5 @@ workflow:
     task_instance:
       - dag_run
 cluster:
-  type: emr_7_12_med_general_2_workers_cluster
+  type: databricks_13_3_med_general_cluster
+  databricks_conn_id: databricks_new_env
