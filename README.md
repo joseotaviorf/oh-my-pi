@@ -71,6 +71,13 @@ Be sure you have run `make requirements-test` to install the tests' dependencies
     make unit-tests
 ```
 
+To run only a subdirectory of `tests/unit/`, pass `component`:
+
+```bash
+    make unit-tests component=qube
+    make unit-tests component=base/api
+```
+
 ## Monitoring
 Please refer to the Monitoring page section to check the active monitorings we have: [Monitoring](https://www.notion.so/productquintoandar/Monitoring-33590fa5e29845debe55f11d1d49c5b0).
 

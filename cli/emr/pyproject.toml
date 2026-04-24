@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bi-etl-ejuice-emr"
+version = "0.0.1"
+description = "Container-friendly CLI for PySpark on AWS EMR (POC)."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "boto3>=1.24",
+    "click>=7,<9",
+    "pyyaml>=6",
+]
+
+[project.scripts]
+emr = "emr.cli:run"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]

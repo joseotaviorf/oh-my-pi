@@ -1,0 +1,11 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      PYTHONUNBUFFERED: "1"
+      EMR_ENVIRONMENT: ${EMR_ENVIRONMENT:-prod}
+    volumes:
+      - ${HOME}/.aws:/root/.aws:ro
+      - ./config:/config:ro

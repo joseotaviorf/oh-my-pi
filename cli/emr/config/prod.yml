@@ -1,0 +1,18 @@
+# EMR submit settings.
+
+region: us-east-1
+release_label: emr-7.5.0
+subnet_id: subnet-05cb5b20def7300c3
+job_flow_role: emr-prod
+service_role: arn:aws:iam::206390561754:role/EMR_DefaultRole_V2
+poll_sec: 15.0
+action_on_failure: TERMINATE_CLUSTER
+deploy_mode: cluster
+log_uri: s3://5a-datalake-prod/emr/emr-cli/logs/                 # TODO: define final path
+visible_to_all_users: true
+idle_timeout_sec: 600
+
+# Overridable per run (CLI args).
+master_instance_type: m5.xlarge
+core_instance_type: m5.xlarge
+core_instance_count: 2

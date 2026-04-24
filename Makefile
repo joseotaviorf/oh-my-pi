@@ -259,10 +259,10 @@ package:
 ## run black to fix code style
 lint:
 	@echo ""
-	@echo "Running lint in all files from <bietlejuice/>"
+	@echo "Running lint in <bietlejuice/> and <cli/emr/src/>"
 	@echo "=========="
 	@echo ""
-	@python -m black bietlejuice/ tests/unit/ tests/core_model_dags/ --exclude=".*\/__dags_template__.py"
+	@python -m black bietlejuice/ tests/unit/ tests/core_model_dags/ cli/emr/src/emr/ --exclude=".*\/__dags_template__.py"
 
 .PHONY: check-style
 ## check style with flake8 and black
@@ -271,8 +271,8 @@ check-style:
 	@echo "Running Check Style"
 	@echo "=========="
 	@echo ""
-	@python -m black --check bietlejuice/ tests/unit/ tests/core_model_dags/ --exclude=".*\/__dags_template__.py" && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint\" to apply style formatting to your code\n" && exit 1)
-	@python -m flake8 --config=setup.cfg bietlejuice/ tests/unit/ tests/core_model_dags/
+	@python -m black --check bietlejuice/ tests/unit/ tests/core_model_dags/ cli/emr/src/emr/ --exclude=".*\/__dags_template__.py" && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint\" to apply style formatting to your code\n" && exit 1)
+	@python -m flake8 --config=setup.cfg bietlejuice/ tests/unit/ tests/core_model_dags/ cli/emr/src/emr/
 
 ###############################################################################
 ###################### Tests commands #########################################
@@ -289,7 +289,11 @@ unit-tests:
 	@echo "Unit Tests"
 	@echo "=========="
 	@echo ""
-	@python -m pytest -W ignore::DeprecationWarning tests/unit/
+	@if [ -z "$(component)" ]; then \
+		python -m pytest -W ignore::DeprecationWarning tests/unit/; \
+	else \
+		python -m pytest -W ignore::DeprecationWarning "tests/unit/$(component)"; \
+	fi
 
 .PHONY: integration-tests
 ## run integration tests
