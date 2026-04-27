@@ -29,7 +29,7 @@ get_last_delqmst_data AS (
 SELECT
     c.id_case,
     cuda.id_court_case,
-    cacct.id_contract AS id_contract_cyber,
+    IF(cacct.id_contract LIKE '%NVO_JUICIO%', ec.contrato, cacct.id_contract) AS id_contract_cyber,
     ct.id_contract_external AS id_contract,
     c.id_dossier AS id_process,
     c.id_court,
@@ -90,6 +90,9 @@ SELECT
 FROM
     datalake_cyber_legal_clean.case AS c
 LEFT JOIN
+    datalake_cyber_legal_clean.elaw_contracts AS ec
+        ON c.id_case = ec.id_processo
+LEFT JOIN
     datalake_cyber_legal_clean.values_list vl
         ON c.closure_result = vl.value_code
 LEFT JOIN
@@ -103,14 +106,14 @@ LEFT JOIN
         ON cacct.id_case = c.id_case
 LEFT JOIN
     get_external_id_contract AS ct
-        ON cacct.id_contract = ct.id_contract
+        ON IF(cacct.id_contract LIKE '%NVO_JUICIO%', ec.contrato, cacct.id_contract) = ct.id_contract
 LEFT JOIN
     get_last_delqmst_data AS dq
-        ON cacct.id_contract = dq.id_contract
+        ON IF(cacct.id_contract LIKE '%NVO_JUICIO%', ec.contrato, cacct.id_contract) = dq.id_contract
 LEFT JOIN
     datalake_cyber_legal_clean.case_notification_log AS cntf
         ON c.id_case = cntf.id_case
-        AND cacct.id_contract = cntf.id_contract
+        AND IF(cacct.id_contract LIKE '%NVO_JUICIO%', ec.contrato, cacct.id_contract) = cntf.id_contract
 LEFT JOIN
     datalake_cyber_legal_clean.court AS crt
         ON c.id_court = crt.id_court
