@@ -1,0 +1,52 @@
+---
+table_name: datalake_oitchau_clean.requests
+alert_channel: PEOPLE_ALERTS
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_request:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_employee_profile:
+    is_complete:
+      severity_level: Error
+  approval_status:
+    is_contained_in:
+      values:
+      - pending
+      - approved
+      - declined
+      - ignored
+      severity_level: Warning
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+  ts_interval_ended:
+    # Finite requests (is_endless = false) must have an end timestamp so duration and payroll logic stay well-defined.
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+        FROM datalake_oitchau_clean.requests
+        WHERE is_endless = false
+          AND ts_interval_ended IS NULL) = 0
+      severity_level: Warning
+  ts_interval_started:
+    # When both interval bounds are present, the end instant must not be strictly before the start instant (invalid ranges).
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+        FROM datalake_oitchau_clean.requests
+        WHERE ts_interval_started IS NOT NULL
+          AND ts_interval_ended IS NOT NULL
+          AND ts_interval_ended < ts_interval_started) = 0
+      severity_level: Warning

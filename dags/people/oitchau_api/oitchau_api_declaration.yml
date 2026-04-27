@@ -138,6 +138,7 @@ workflow:
     requests:
       endpoint_path: requests
       params: {}
+      clean_extraction_type: full
       api_policies:
         pagination:
           strategy: page_per_page
@@ -146,8 +147,6 @@ workflow:
           page_size: 100
         rate_limiting:
           strategy: none
-      merge_on:
-        - id_request
       vacuum_retention_hours: 168
       vacuum_lite: true
 

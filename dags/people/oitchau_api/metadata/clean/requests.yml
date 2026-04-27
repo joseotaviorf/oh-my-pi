@@ -1,0 +1,180 @@
+database_name: datalake_oitchau_clean
+table_name: requests
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Clean projection of global Oitchau workforce requests (time off, adjustments, and related flows)
+  with approval fields and request intervals for People analytics and SLA reporting.
+columns:
+  id_request:
+    description: Request UUID; primary business key for the row.
+    lineage:
+    - datalake_oitchau_raw.requests.uuid
+  id_employee_profile:
+    description: Employee profile UUID on the request; join key to employees and downstream People models.
+    lineage:
+    - datalake_oitchau_raw.requests.userProfileUuid
+  id_company:
+    description: Oitchau company tenant UUID for the request.
+    lineage:
+    - datalake_oitchau_raw.requests.companyUuid
+  id_request_type:
+    description: Request type UUID; pairs with requests_types_tree for labels.
+    lineage:
+    - datalake_oitchau_raw.requests.requestTypeUuid
+  id_request_subtype:
+    description: Request subtype UUID; pairs with requests_types_subtypes for subtype rules.
+    lineage:
+    - datalake_oitchau_raw.requests.requestSubtypeUuid
+  id_created_by_user:
+    description: User profile UUID that created the request when the API exposes createdBy.
+    lineage:
+    - datalake_oitchau_raw.requests.createdBy
+  id_external:
+    description: External identifier from HRIS or integrations when externalId is present.
+    lineage:
+    - datalake_oitchau_raw.requests.externalId
+  approval_status:
+    description: Approval outcome state from Oitchau for pendency and SLA reporting.
+    lineage:
+    - datalake_oitchau_raw.requests.approvalStatus
+    categories:
+      pending: Awaiting approver decision or still in the configured approval flow.
+      approved: Approver accepted the request according to Oitchau rules.
+      declined: Approver rejected the request.
+      ignored: Request was bypassed or marked ignored in the approval flow.
+  approval_stage:
+    description: Numeric approval stage index from the API for the active flow.
+    lineage:
+    - datalake_oitchau_raw.requests.approvalStage
+  approval_flow:
+    description: Structured approval flow from the API (stages, approvers, and status metadata).
+    lineage:
+    - datalake_oitchau_raw.requests.approvalFlow
+  request_type:
+    description: Coarse request family label from Oitchau (for example medical, vacation, custom).
+    lineage:
+    - datalake_oitchau_raw.requests.requestType
+    categories:
+      medical: Health-related absence or certificate-driven flows when configured as medical in Oitchau.
+      vacation: Planned time-off or vacation request flows.
+      custom: Company-specific or custom-configured request types outside the standard families.
+  request_subtype_state:
+    description: Subtype configuration and validation snapshot embedded on the request payload.
+    lineage:
+    - datalake_oitchau_raw.requests.requestSubtypeState
+  hours_calculation_type:
+    description: Rule key for how hours interact with payroll or hours bank for this request.
+    lineage:
+    - datalake_oitchau_raw.requests.hoursCalculationType
+    categories:
+      compensateMissedHours: Hours calculation compensates missed hours per Oitchau subtype configuration.
+      noCompensation: No compensation of missed hours for this subtype or request.
+  external_source:
+    description: Label of the upstream system when externalId is populated.
+    lineage:
+    - datalake_oitchau_raw.requests.externalSource
+  validity_value:
+    description: Validity scalar from Oitchau when the API exposes validity on the request.
+    lineage:
+    - datalake_oitchau_raw.requests.validity
+  validity_type:
+    description: Unit or type of validity_value when the API exposes validityType.
+    lineage:
+    - datalake_oitchau_raw.requests.validityType
+  record_version:
+    description: API version or revision counter for the request row when present.
+    lineage:
+    - datalake_oitchau_raw.requests.version
+  timezone_name:
+    description: Timezone name applied to interval timestamps for the employee or subtype.
+    lineage:
+    - datalake_oitchau_raw.requests.timezone
+  request_comment:
+    description: Comment payload from Oitchau; normalize in enrich or downstream models.
+    lineage:
+    - datalake_oitchau_raw.requests.comment
+  is_all_day:
+    description: True when the request spans whole calendar days without clock times.
+    lineage:
+    - datalake_oitchau_raw.requests.allDay
+  is_paid_request:
+    description: True when the interval counts as paid time per Oitchau and subtype rules.
+    lineage:
+    - datalake_oitchau_raw.requests.paid
+  is_locked:
+    description: True when edits are blocked in Oitchau (payroll lock, approval state, or subtype rules).
+    lineage:
+    - datalake_oitchau_raw.requests.locked
+  is_endless:
+    description: True when the request has no fixed end instant and endTime may be null.
+    lineage:
+    - datalake_oitchau_raw.requests.isEndless
+  is_night_shift:
+    description: True when the interval is interpreted as crossing midnight or night-shift boundaries.
+    lineage:
+    - datalake_oitchau_raw.requests.isNightShift
+  is_up_to_date:
+    description: True when Oitchau marks the row as aligned with the latest server-side calculation or approval outcome.
+    lineage:
+    - datalake_oitchau_raw.requests.upToDate
+  ts_interval_started:
+    description: Start instant of the request interval as returned by Oitchau.
+    lineage:
+    - datalake_oitchau_raw.requests.startTime
+  ts_interval_ended:
+    description: End instant when not endless; null when open-ended or still in progress.
+    lineage:
+    - datalake_oitchau_raw.requests.endTime
+  ts_created:
+    description: Creation timestamp for the request row in Oitchau.
+    lineage:
+    - datalake_oitchau_raw.requests.createdAt
+  ts_updated:
+    description: Last structural update timestamp from Oitchau before user-facing edits when both exist.
+    lineage:
+    - datalake_oitchau_raw.requests.updatedAt
+  ts_updated_by_user:
+    description: Timestamp of the last end-user edit when the API exposes updatedByUserAt.
+    lineage:
+    - datalake_oitchau_raw.requests.updatedByUserAt
+  ts_deleted:
+    description: Soft-delete timestamp when the request was removed or anonymized while retaining history.
+    lineage:
+    - datalake_oitchau_raw.requests.deletedAt
+  ts_synced:
+    description: Last successful sync or reconciliation timestamp when syncedAt is populated.
+    lineage:
+    - datalake_oitchau_raw.requests.syncedAt
+  ts_load:
+    description: Raw ingestion load timestamp for operational monitoring.
+    lineage:
+    - datalake_oitchau_raw.requests.ts_load
+  custom_fields:
+    description: Custom field values from Oitchau; flatten in enrich when needed for analytics.
+    lineage:
+    - datalake_oitchau_raw.requests.customFields
+  attachments:
+    description: Attachment metadata from Oitchau; normalize in enrich or downstream models.
+    lineage:
+    - datalake_oitchau_raw.requests.attachments
+  request_logs:
+    description: Lifecycle or approval history events from Oitchau; parse in enrich when needed.
+    lineage:
+    - datalake_oitchau_raw.requests.logs
+  subtype_specific_fields:
+    description: Subtype-specific field values; map to scalars in enrich or DW when required.
+    lineage:
+    - datalake_oitchau_raw.requests.subtypeSpecificFields
+  year:
+    description: Ingestion partition year from the raw pipeline.
+    lineage:
+    - datalake_oitchau_raw.requests.year
+  month:
+    description: Ingestion partition month from the raw pipeline.
+    lineage:
+    - datalake_oitchau_raw.requests.month
+  day:
+    description: Ingestion partition day from the raw pipeline.
+    lineage:
+    - datalake_oitchau_raw.requests.day
