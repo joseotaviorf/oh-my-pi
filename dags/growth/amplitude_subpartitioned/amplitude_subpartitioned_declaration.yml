@@ -498,6 +498,9 @@ workflow:
     440441_home_page_viewed_events:
       run_optimize: false
       run_vacuum: false
+    440441_listing_registration_location_page_viewed_events:
+      run_optimize: false
+      run_vacuum: false
     525551_listing_page_viewed_events:
       run_optimize: false
       run_vacuum: false
