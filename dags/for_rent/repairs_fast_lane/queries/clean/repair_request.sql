@@ -15,6 +15,7 @@ SELECT
     owner_approval,
     service_provider,
     zendesk_tickets_info,
+    is_third_party_responsibility,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,

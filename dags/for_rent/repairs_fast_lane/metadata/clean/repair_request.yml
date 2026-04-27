@@ -102,6 +102,10 @@ columns:
       - datalake_repairs_raw.repair_request.zendesk_tickets_info
     description: JSON field containing Zendesk ticket information related to the repair request.
       Includes status and other relevant Zendesk integration data.
+  is_third_party_responsibility:
+    lineage:
+      - datalake_repairs_raw.repair_request.is_third_party_responsibility
+    description: Boolean flag indicating whether the expense is classified as third-party responsibility (non-IQ and non-PP).
   ts_created:
     lineage:
       - datalake_repairs_raw.repair_request.created_at

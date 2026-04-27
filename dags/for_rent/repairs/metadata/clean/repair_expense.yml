@@ -1,30 +1,48 @@
 database_name: datalake_repairs_clean
 table_name: repair_expense
+description:
+  Repair expense catalog from the Repairs service, defining expense types, approval rules,
+  and responsibility rules used when defining repairs.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_repairs_raw.repair_expense.id
+    description: Unique identifier for the repair expense type in the Repairs service.
   id_expense_group:
     lineage:
       - datalake_repairs_raw.repair_expense.expense_group_id
+    description: Foreign key to the expense group that categorizes this repair expense type.
   repair_name:
     lineage:
       - datalake_repairs_raw.repair_expense.name
+    description: Human-readable name of the repair expense type shown in product flows.
   repair_description:
     lineage:
       - datalake_repairs_raw.repair_expense.description
+    description: Longer text describing the repair expense type and when it applies.
   instant_approval:
     lineage:
       - datalake_repairs_raw.repair_expense.instant_approval
+    description: Flag indicating whether a repair can be auto-approved without landlord manual approval (deprecated).
   responsible_after_grace:
     lineage:
       - datalake_repairs_raw.repair_expense.responsible_after_grace
+    description: Responsible for the repair (PP or IQ) in the after grace phase and why (structural, improvement, etc).
   responsible_before_grace:
     lineage:
       - datalake_repairs_raw.repair_expense.responsible_before_grace
+    description: Responsible for the repair (PP or IQ) in the before grace phase and why (structural, improvement, etc).
+  is_third_party_responsibility:
+    lineage:
+      - datalake_repairs_raw.repair_expense.is_third_party_responsibility
+    description: Boolean flag indicating whether the expense is classified as third-party responsibility (non-IQ and non-PP).
   ts_created:
     lineage:
       - datalake_repairs_raw.repair_expense.created_at
+    description: Timestamp when the repair expense record was created in the source system.
   ts_updated:
     lineage:
       - datalake_repairs_raw.repair_expense.updated_at
+    description: Timestamp when the repair expense record was last updated in the source system.

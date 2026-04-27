@@ -6,6 +6,7 @@ SELECT
     instant_approval,
     responsible_after_grace,
     responsible_before_grace,
+    is_third_party_responsibility,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM
