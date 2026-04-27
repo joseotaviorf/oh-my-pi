@@ -34,10 +34,6 @@ columns:
     lineage:
       - datalake_rental_management_raw.managed_rental_users.role_related_as
     description: Array of role labels describing how the user relates to the managed rental.
-  profiles:
-    lineage:
-      - datalake_rental_management_raw.managed_rental_users.profiles
-    description: Array of profile identifiers attached to the managed rental user.
   ts_created:
     lineage:
       - datalake_rental_management_raw.managed_rental_users.created_at
