@@ -580,6 +580,8 @@ def retrieve_spark_session(job_name: str) -> SparkSession:
             "com.amazonaws.auth.DefaultAWSCredentialsProviderChain",
         )
         .config("spark.hadoop.fs.s3a.path.style.access", "true")
+        .config("spark.hadoop.fs.s3a.acl.default", "BucketOwnerFullControl")
+        .config("spark.hadoop.fs.s3a.canned.acl", "BucketOwnerFullControl")
         .config("spark.hadoop.fs.s3a.connection.maximum", "480")
         .config("spark.hadoop.fs.s3a.threads.max", "20")
         .config("spark.hadoop.fs.s3a.connection.timeout", "20000")

@@ -21,6 +21,8 @@ def create_emr_spark_session(
             "spark.sql.catalog.spark_catalog",
             "org.apache.spark.sql.delta.catalog.DeltaCatalog",
         )
+        .config("spark.hadoop.fs.s3a.acl.default", "BucketOwnerFullControl")
+        .config("spark.hadoop.fs.s3a.canned.acl", "BucketOwnerFullControl")
         .enableHiveSupport()
     )
     if extra_configs:

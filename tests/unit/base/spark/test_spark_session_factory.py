@@ -16,6 +16,12 @@ def test_create_emr_spark_session_configures_delta_and_hive(mock_spark_session):
 
     assert out is sess
     mock_spark_session.builder.appName.assert_called_once_with("my_job")
+    builder.config.assert_any_call(
+        "spark.hadoop.fs.s3a.acl.default", "BucketOwnerFullControl"
+    )
+    builder.config.assert_any_call(
+        "spark.hadoop.fs.s3a.canned.acl", "BucketOwnerFullControl"
+    )
     builder.enableHiveSupport.assert_called_once()
 
 
@@ -33,4 +39,4 @@ def test_create_emr_spark_session_applies_extra_configs(mock_spark_session):
     )
 
     assert out is sess
-    assert builder.config.call_count >= 4
+    assert builder.config.call_count == 6
