@@ -42,7 +42,7 @@ events_config:
 custom_cluster:
   driver_node_type_id: c5a.2xlarge
   node_type_id: c5a.2xlarge
-  num_workers: 2
+  num_workers: 1
   spark_version: 16.4.x-scala2.12
 
   spark_conf:
