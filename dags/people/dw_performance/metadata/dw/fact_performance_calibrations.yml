@@ -3,7 +3,7 @@ table_name: fact_performance_calibrations
 owner: pedro.prates@quintoandar.com.br
 domain: People
 description: |-
-  Fact table that consolidates calibration evaluation results at the person and meeting year level. It links to dim_performance_calibration, dim_performance_variation, and dim_committee_meeting (meeting attributes and year live on the committee meeting dimension). The table includes both pre-calibration and calibrated ratings for Behavior, Impact, and Leadership, along with calculated performance scores and calibration variation indicators.
+  Fact table that consolidates calibration evaluation results at the person and committee meeting level. It links to dim_performance_calibration, dim_performance_variation, and dim_committee_meeting (meeting attributes and calendar year live on the committee meeting dimension). The table includes both pre-calibration and calibrated ratings for Behavior, Impact, and Leadership, along with calculated performance scores and calibration variation indicators.
 columns:
   sk_performance_calibration_version:
     description: Surrogate key for the current version of the calibration evaluation in the dim_performance_calibration dimension. This key includes the calibration_version to uniquely identify a specific version.
@@ -26,7 +26,8 @@ columns:
     description: Foreign key to dim_committee_meeting.sk_meeting identifying the performance calibration committee meeting for this calibration row.
     lineage:
     - dw_performance.dim_committee_meeting.sk_meeting
-    - dw_performance.dim_performance_calibration.id_meeting
+    - datalake_pin.performa_calibration_evaluation.id_meeting
+    - datalake_pin.performa_calibration_extra_info.id_meeting
   person_number:
     description: Unique identifier for the person (employee) who was evaluated. Part of the logical grain with the calibration cycle (committee meeting year from dim_committee_meeting via sk_committee_meeting).
     lineage:

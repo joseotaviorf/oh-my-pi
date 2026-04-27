@@ -11,10 +11,10 @@ column_level_validations:
       severity_level: Warning
     is_unique:
       severity_level: Warning
-  person_number:
+  sk_performance_calibration:
     custom:
-      # Every person_number and meeting_year should have only one is_current = TRUE
-      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM dw_performance.dim_performance_calibration WHERE is_current = TRUE GROUP BY person_number, meeting_year HAVING COUNT(*) > 1)) = 0"
+      # At most one is_current = TRUE row per logical calibration
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM dw_performance.dim_performance_calibration WHERE is_current = TRUE GROUP BY sk_performance_calibration HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning
   calibrated_impact_numeric:
     has_max_value:

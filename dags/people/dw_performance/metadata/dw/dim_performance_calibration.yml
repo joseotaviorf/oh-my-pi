@@ -3,62 +3,42 @@ table_name: dim_performance_calibration
 owner: pedro.prates@quintoandar.com.br
 domain: People
 description: |-
-  Dimension table that stores calibration evaluation results from the Performa cycle with versioning. Combines data from both calibration_evaluation and extra_info sources, with calibration_evaluation taking precedence. Contains both pre-calibration (initial) and post-calibration (calibrated) ratings for three performance dimensions: Behavior, Impact, and Leadership. Each row represents a specific version of a calibration evaluation for an employee during a calibration meeting year, with versions created when multiple evaluations exist for the same person and year, ordered by source priority and evaluation timestamp.
+  Dimension table that stores calibration evaluation results from the Performa cycle with versioning. Combines data from both calibration_evaluation and extra_info sources, with calibration_evaluation taking precedence. Contains both pre-calibration (initial) and post-calibration (calibrated) ratings for three performance dimensions: Behavior, Impact, and Leadership. Each row represents a specific version of a calibration evaluation for an employee in a given committee meeting, with versions created when multiple evaluations exist for the same person and meeting, ordered by source priority and evaluation timestamp. Meeting year, title, status, and meeting id are modeled on dim_committee_meeting and reached through fact joins.
 columns:
   sk_performance_calibration_version:
-    description: Surrogate key that uniquely identifies a specific version of a calibration evaluation. Includes the calibration_version to distinguish between different versions of the same person and meeting year.
+    description: Surrogate key that uniquely identifies a specific version of a calibration evaluation. Includes the calibration_version to distinguish between different versions of the same person and meeting.
     lineage:
     - datalake_pin.performa_calibration_evaluation.person_number
-    - datalake_pin.performa_calibration_evaluation.meeting_year
+    - datalake_pin.performa_calibration_evaluation.id_meeting
     - datalake_pin.performa_calibration_extra_info.person_number
-    - datalake_pin.performa_calibration_extra_info.meeting_year
+    - datalake_pin.performa_calibration_extra_info.id_meeting
   sk_performance_calibration:
-    description: Surrogate key that identifies a calibration evaluation for a given person and meeting year, regardless of version. Used to link to the current version when combined with is_current = TRUE.
+    description: Surrogate key that identifies a calibration evaluation for a given person and committee meeting, regardless of version. Used to link to the current version when combined with is_current = TRUE.
     lineage:
     - datalake_pin.performa_calibration_evaluation.person_number
-    - datalake_pin.performa_calibration_evaluation.meeting_year
+    - datalake_pin.performa_calibration_evaluation.id_meeting
     - datalake_pin.performa_calibration_extra_info.person_number
-    - datalake_pin.performa_calibration_extra_info.meeting_year
+    - datalake_pin.performa_calibration_extra_info.id_meeting
   id_source_record:
     description: Identifier of the source record from the original table (id_calibration_evaluation from calibration_evaluation or id_person_extra_info from extra_info).
     lineage:
     - datalake_pin.performa_calibration_evaluation.id_calibration_evaluation
     - datalake_pin.performa_calibration_extra_info.id_person_extra_info
-  id_meeting:
-    description: Unique identifier for the calibration meeting where the evaluation was performed.
-    lineage:
-    - datalake_pin.performa_calibration_evaluation.id_meeting
-    - datalake_pin.performa_calibration_extra_info.id_meeting
   person_number:
     description: Unique identifier for the person (employee) who was evaluated.
     lineage:
     - datalake_pin.performa_calibration_evaluation.person_number
     - datalake_pin.performa_calibration_extra_info.person_number
-  meeting_status_code:
-    description: Status code of the calibration meeting.
-    lineage:
-    - datalake_pin.performa_calibration_evaluation.meeting_status_code
-    - datalake_pin.performa_calibration_extra_info.meeting_status_code
-  meeting_year:
-    description: Year when the calibration meeting occurred.
-    lineage:
-    - datalake_pin.performa_calibration_evaluation.meeting_year
-    - datalake_pin.performa_calibration_extra_info.meeting_year
   calibration_version:
-    description: Sequential version number for this calibration evaluation, starting at 1. Increments when multiple evaluations exist for the same person and meeting year, ordered by source priority (calibration_evaluation takes precedence over extra_info) and then by evaluation timestamp (most recent first).
+    description: Sequential version number for this calibration evaluation, starting at 1. Increments when multiple evaluations exist for the same person and meeting, ordered by source priority (calibration_evaluation takes precedence over extra_info) and then by evaluation timestamp (most recent first).
     lineage:
     - datalake_pin.performa_calibration_evaluation.ts_meeting
     - datalake_pin.performa_calibration_extra_info.dt_evaluation
   source_type:
-    description: Indicates the source of the calibration data. Can be 'calibration_evaluation' (from dashboard) or 'extra_info' (from people_extra_info/Notas Talent). Calibration_evaluation takes precedence when both sources exist for the same person and meeting year.
+    description: Indicates the source of the calibration data. Can be 'calibration_evaluation' (from dashboard) or 'extra_info' (from people_extra_info/Notas Talent). Calibration_evaluation takes precedence when both sources exist for the same person and meeting.
     lineage:
     - datalake_pin.performa_calibration_evaluation
     - datalake_pin.performa_calibration_extra_info
-  meeting_title:
-    description: Title or name of the calibration meeting.
-    lineage:
-    - datalake_pin.performa_calibration_evaluation.meeting_title
-    - datalake_pin.performa_calibration_extra_info.meeting_title
   calibrated_behavior_description:
     description: Textual description of the calibrated (post-meeting) Behavior rating.
     lineage:

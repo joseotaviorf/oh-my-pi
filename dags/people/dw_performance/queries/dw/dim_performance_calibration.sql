@@ -5,9 +5,6 @@ all_evaluations AS (
     CAST(id_calibration_evaluation AS STRING) AS id_source_record,
     person_number,
     id_meeting,
-    meeting_year,
-    meeting_title,
-    meeting_status_code,
     calibrated_behavior_description,
     calibrated_behavior_numeric,
     pre_calibration_behavior_description,
@@ -29,9 +26,6 @@ all_evaluations AS (
     CAST(id_person_extra_info AS STRING) AS id_source_record,
     person_number,
     id_meeting,
-    meeting_year,
-    meeting_title,
-    meeting_status_code,
     behavior_description AS calibrated_behavior_description,
     behavior_numeric AS calibrated_behavior_numeric,
     NULL AS pre_calibration_behavior_description,
@@ -54,9 +48,6 @@ calibrations_with_version AS (
     id_source_record,
     person_number,
     id_meeting,
-    meeting_year,
-    meeting_title,
-    meeting_status_code,
     calibrated_behavior_description,
     calibrated_behavior_numeric,
     pre_calibration_behavior_description,
@@ -73,7 +64,7 @@ calibrations_with_version AS (
     ROW_NUMBER() OVER (
       PARTITION BY
         person_number,
-        meeting_year
+        id_meeting
       ORDER BY
         CASE source_type
           WHEN 'calibration_evaluation' THEN 1
@@ -85,26 +76,22 @@ calibrations_with_version AS (
     all_evaluations
   WHERE
     person_number IS NOT NULL
-    AND meeting_year IS NOT NULL
+    AND id_meeting IS NOT NULL
 )
 SELECT
   MD5(CONCAT(
     CAST(person_number AS STRING),
-    CAST(meeting_year AS STRING),
+    CAST(id_meeting AS STRING),
     CAST(calibration_version AS STRING)
   )) AS sk_performance_calibration_version,
   MD5(CONCAT(
     CAST(person_number AS STRING),
-    CAST(meeting_year AS STRING)
+    CAST(id_meeting AS STRING)
   )) AS sk_performance_calibration,
   id_source_record,
-  id_meeting,
   person_number,
-  meeting_status_code,
-  meeting_year,
   calibration_version,
   source_type,
-  meeting_title,
   calibrated_behavior_description,
   calibrated_impact_description,
   calibrated_leadership_description,
