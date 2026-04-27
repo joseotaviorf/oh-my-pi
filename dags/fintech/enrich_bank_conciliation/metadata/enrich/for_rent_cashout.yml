@@ -3,73 +3,122 @@ database_name: datalake_bank_conciliation
 table_name: for_rent_cashout
 owner: ae-finance-fintech@quintoandar.com.br
 domain: Fintech
-description: Table containing bank reconciliation data for For Rent cash-out payments, comparing bank statements, CAP payments, and SAP entries.
+description: Table containing bank reconciliation data for For Rent cash-out payments, comparing bank statements, CAP payments, SAP ledger, and Retsuko CNAB invoices, with SAP gateway diagnostics when SAP is missing.
 columns:
   id_company_use:
-    description: 'Unique identifier for the payment, derived from company_use in various source systems'
+    description: >-
+      Normalized payment identifier aligned across Nexxera CNAB, CAP reference_1,
+      SAP ledger id_external_payment (and sap_payload fallback), and Retsuko invoice
+      payment_company_use_number.
     lineage:
     - datalake_nexxera.cnab_payments.company_use
     - datalake_accounting_funnel.payment_platforms.reference_1
-    - datalake_pas.ledger.id_external_payment
+    - datalake_accounting_funnel.ledger.id_external_payment
     - datalake_sap_gateway.sap_payload.id_external_payment
+    - datalake_retsuko.invoice.payment_company_use_number
   hash:
-    description: 'Hash values from SAP ledger entries for tracking purposes'
+    description: >-
+      Comma-separated list of SAP ledger entry hashes aggregated for the same
+      company_use, account, reference date, and tax date.
     lineage:
-    - datalake_pas.ledger.hash
+    - datalake_accounting_funnel.ledger.hash
+  id_invoice:
+    description: >-
+      Retsuko invoice external id (id_external) for CNAB-paid invoices matched on
+      company_use and paid date; used to join SAP entity and gateway for error detail.
+    lineage:
+    - datalake_retsuko.invoice.id_external
   bank_account_number:
-    description: 'Bank account number from Nexxera CNAB payments'
+    description: Bank account number from Nexxera CNAB payments (francesinha).
     lineage:
     - datalake_nexxera.cnab_payments.bank_account
   sap_account_number:
-    description: 'SAP account number from ledger entries'
+    description: SAP ledger account number for the reconciled cash-out posting.
     lineage:
-    - datalake_pas.ledger.account_number
+    - datalake_accounting_funnel.ledger.account_number
+  num_entries_sap:
+    description: Count of SAP ledger rows rolled into the aggregated company_use and date slice.
+    lineage:
+    - datalake_accounting_funnel.ledger.hash
   last_occurrence_code:
-    description: 'Last occurrence code from Nexxera CNAB payments'
+    description: Last occurrence code from Nexxera CNAB payments (e.g. paid or devolução).
     lineage:
     - datalake_nexxera.cnab_payments.occurrence_code
   bank_paid_amount:
-    description: 'Amount paid according to bank statements from Nexxera'
+    description: Amount from bank CNAB when occurrence is paid; zero when not paid line logic applies.
     lineage:
     - datalake_nexxera.cnab_payments.paid_amount
   cap_paid_amount:
-    description: 'Amount recorded in CAP payment platform'
+    description: Amount recorded in CAP vans_cap (chargebacks netted to zero in aggregation).
     lineage:
     - datalake_accounting_funnel.payment_platforms.paid_amount
   sap_paid_amount:
-    description: 'Amount recorded in SAP system for financial entries'
+    description: >-
+      Net SAP ledger debit_credit sum for the slice (same grain as hash aggregation).
     lineage:
-    - datalake_pas.ledger.debit_credit
+    - datalake_accounting_funnel.ledger.debit_credit
+  retsuko_paid_amount:
+    description: Paid amount on the matched Retsuko invoice (CNAB, paid, Brazil).
+    lineage:
+    - datalake_retsuko.invoice.paid_amount
   is_vans_compliance:
-    description: 'Boolean flag indicating if Vans compliance requirements are met'
+    description: >-
+      Whether Vans CAP vs bank vs SAP checks pass (chargeback with SAP zero, or bank
+      amount matches CAP amount).
     lineage:
     - datalake_nexxera.cnab_payments
     - datalake_accounting_funnel.payment_platforms
-    - datalake_pas.ledger
+    - datalake_accounting_funnel.ledger
   is_reconcilied:
-    description: 'Boolean flag indicating if the payment is reconciled between bank and SAP'
+    description: >-
+      Whether bank (francesinha) and SAP amounts and accounts align, including DV
+      refund cases with SAP zero or null.
     lineage:
     - datalake_nexxera.cnab_payments
-    - datalake_pas.ledger
+    - datalake_accounting_funnel.ledger
+  is_bank_concilied:
+    description: >-
+      Derived bank-vs-SAP conciliation flag using francesinha amount, SAP amount and
+      entry count, MLRA pattern, and date alignment rules.
+    lineage:
+    - datalake_nexxera.cnab_payments
+    - datalake_accounting_funnel.ledger
+  is_bank_concilied_detail:
+    description: >-
+      Text reason for is_bank_concilied (concilied, refund, missing francesinha/SAP,
+      chargeback zeroed, duplication hint, or amount mismatch).
+    lineage:
+    - datalake_nexxera.cnab_payments
+    - datalake_accounting_funnel.ledger
+  sap_error_detail:
+    description: >-
+      When SAP is missing per conciliation detail, explains diagnosis from Retsuko
+      invoice presence, sap_entity status, and SAP gateway sync/webhook errors.
+    lineage:
+    - datalake_retsuko_clean.sap_entity
+    - datalake_sap_gateway_clean.feature
+    - datalake_sap_gateway_clean.sync_sap_job
+    - datalake_sap_gateway_clean.webhook_log
   dt_bank_paid:
-    description: 'Date when the payment was made according to bank statements'
+    description: Payment date from Nexxera CNAB (francesinha).
     lineage:
     - datalake_nexxera.cnab_payments.dt_paid
   dt_cap_paid:
-    description: 'Date when the payment was recorded in CAP platform'
+    description: Payment date from CAP vans_cap.
     lineage:
     - datalake_accounting_funnel.payment_platforms.dt_paid
   dt_sap_paid:
-    description: 'Date when the payment was recorded in SAP system'
+    description: SAP ledger reference date (dt_reference) for the slice.
     lineage:
-    - datalake_pas.ledger.dt_reference
+    - datalake_accounting_funnel.ledger.dt_reference
   dt_sap_tax:
-    description: 'Tax date from SAP ledger entries'
+    description: Tax date from SAP ledger entries in the slice.
     lineage:
-    - datalake_pas.ledger.dt_tax
+    - datalake_accounting_funnel.ledger.dt_tax
   dt_paid:
-    description: 'Payment date from the combined source systems'
+    description: Calendar date from the cap_sap union key (company_use alignment date).
     lineage:
     - datalake_nexxera.cnab_payments.dt_paid
     - datalake_accounting_funnel.payment_platforms.dt_paid
-    - datalake_pas.ledger.dt_reference
+    - datalake_accounting_funnel.ledger.dt_reference
+    - datalake_retsuko.invoice.ts_paid

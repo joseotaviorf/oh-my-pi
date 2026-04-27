@@ -1606,6 +1606,7 @@ bietlejuice.enrich_bank_conciliation:
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges:first-run-of-day
   - bietlejuice.enrich_nexxera:load-enrich-cnab-payments:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
+  - bietlejuice.retsuko:load-clean-sap-entity:first-run-of-day
   - bietlejuice.enrich_sap:load-enrich-ledger:first-run-of-day
   - bietlejuice.enrich_sap_gateway:load-enrich-sap-payload:first-run-of-day
   - bietlejuice.itau_statements:load-clean-statement-067000392216:first-run-of-day
