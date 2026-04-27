@@ -526,12 +526,6 @@ after_join_tasks = [
     ),
 ]
 
-vespucio_core_pipeline_complete_task = DummyOperator(
-    task_id="vespucio-core-pipeline-complete",
-    dag=dag,
-)
-DatasetAdder.attach_dataset_to_task(vespucio_core_pipeline_complete_task)
-
 
 execute_job_cluster_task >> source_tasks
 
@@ -562,5 +556,3 @@ source_predict_task >> join_and_predict_task[1]
 
 join_and_predict_task[-1] >> after_join_tasks
 
-after_join_task[0] >> vespucio_core_pipeline_complete_task
-after_join_task[1] >> vespucio_core_pipeline_complete_task
