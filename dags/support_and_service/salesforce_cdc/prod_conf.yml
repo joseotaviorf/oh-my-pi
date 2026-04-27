@@ -40,10 +40,11 @@ events_config:
     event_path: "raw/salesforce/UserEvent"
 
 custom_cluster:
-  driver_node_type_id: r5d.xlarge
-  node_type_id: r5d.xlarge
-  num_workers: 4
+  driver_node_type_id: c5a.2xlarge
+  node_type_id: c5a.2xlarge
+  num_workers: 2
   spark_version: 16.4.x-scala2.12
+
   spark_conf:
     spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
     spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
