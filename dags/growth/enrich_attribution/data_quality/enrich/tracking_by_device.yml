@@ -1,20 +1,23 @@
 ---
-table_name: datalake_attribution.online_attribution
+table_name: datalake_attribution.tracking_by_device
 alert_channel: "#alerts-de-airflow-dags"
 table_level_validations:
   has_size:
     greater_than: 0
     severity_level: Error
 column_level_validations:
-  id_lead:
+  id_device:
     is_complete:
       severity_level: Error
-  id_device:
+  utm_hash:
     is_complete:
       severity_level: Error
   ts_utm_attribution_start:
     is_complete:
       severity_level: Error
   ts_utm_attribution_end:
+    is_complete:
+      severity_level: Error
+  ts_tracking:
     is_complete:
       severity_level: Error

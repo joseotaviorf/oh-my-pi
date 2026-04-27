@@ -4,10 +4,10 @@ dag:
   owner: Data Growth
   documentation:
     dag_purpose: |
-      THIS IS A POC TABLE - DO NOT USE IN PRODUCTION. Creates enriched tables for online attribution data that combines user tracking events from CDP
+      Creates enriched tables for online attribution data that combines user tracking events from CDP
       with lead attribution data from René Descartes. This table joins tracking events with lead data
-      based on device_id to provide a comprehensive table of online attribution for leads and user interactions.
-      Uses a materialized tracking_by_device_id table to maintain chronological history of touchpoints per device_id.
+      based on id_device to provide a comprehensive table of online attribution for leads and user interactions.
+      Uses a materialized tracking_by_device table to maintain chronological history of touchpoints per id_device.
 workflow:
   type: query_delta
   layer: enrich
@@ -17,16 +17,23 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
-    tracking_by_device_id:
-      merge_on: [device_id, gclid, utm_term, utm_source, utm_medium, utm_content, utm_campaign]
-      when_matched_update_condition: "source.attribution_time > target.attribution_time"
-      z_order_by: [device_id, attribution_time]
+    tracking_by_device:
+      merge_on: [id_device, utm_hash]
+      when_matched_update_condition: "source.ts_utm_attribution_end > target.ts_utm_attribution_end"
+      when_matched_operation:
+        # Update only the ts_utm_attribution_end column
+        {
+          "ts_utm_attribution_end": "source.ts_utm_attribution_end",
+        }
+      z_order_by: [id_device, ts_utm_attribution_start]
       extraction_type: incremental
     online_attribution:
+      merge_on: [id_lead]
+      z_order_by: [id_lead]
       extraction_type: incremental
   inner_dependencies:
     online_attribution:
-      - tracking_by_device_id
+      - tracking_by_device
 cluster:
   type: databricks_16_4_med_general_photon_cluster
   databricks_conn_id: databricks_new

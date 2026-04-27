@@ -4,59 +4,54 @@ table_name: online_attribution
 domain: Growth
 owner: "@data-growth"
 description: |
-  Enriched view that combines user tracking events from CDP with lead attribution data from René Descartes.
-  This view joins tracking events (from tb_user_tracking) with lead data (from house_lead and acquisition_misc_data)
-  based on device_id to provide a comprehensive view of online attribution for leads and user interactions.
+  Enriched view that attributes leads to their most recent online touchpoint. Leads from house_lead are joined
+  to acquisition_misc_data to retrieve the linked device IDs (extracted from the
+  acquisition_campaign:profileTracking:linked_devices JSON array). Each lead is then matched against the
+  tracking_by_device history to pick the most recent touchpoint whose ts_utm_attribution_start is at or before
+  the lead creation timestamp, keeping a single attribution row per lead.
 columns:
-  lead_id:
-    description: Lead identifier from house_lead table (id_lead_ebdb).
+  id_lead:
+    description: Lead identifier from house_lead (id_lead_ebdb). One row per lead.
     lineage:
       - datalake_rene_descartes_clean.house_lead.id_lead_ebdb
-  device_id:
-    description: Device identifier from tracking_by_device_id table, used to join tracking events with lead data.
+  id_device:
+    description: |
+      Device identifier of the attributed touchpoint. Sourced from the linked_devices array inside the
+      acquisition_campaign JSON (acquisition_misc_data.acquisition_campaign:profileTracking:linked_devices),
+      then matched against tracking_by_device.
     lineage:
-      - datalake_attribution.tracking_by_device_id.device_id
-  attribution_time:
-    description: Last attribution timestamp from tracking_by_device_id table.
-    lineage:
-      - datalake_attribution.tracking_by_device_id.attribution_time
-  gclid:
-    description: Google Click ID (GCLID) from tracking_by_device_id table.
-    lineage:
-      - datalake_attribution.tracking_by_device_id.gclid
-  utm_term:
-    description: UTM term parameter from tracking_by_device_id table.
-    lineage:
-      - datalake_attribution.tracking_by_device_id.utm_term
+      - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
+      - datalake_attribution.tracking_by_device.id_device
   utm_source:
-    description: UTM source parameter from tracking_by_device_id table.
+    description: UTM source of the attributed touchpoint, propagated from tracking_by_device.
     lineage:
-      - datalake_attribution.tracking_by_device_id.utm_source
+      - datalake_attribution.tracking_by_device.utm_source
   utm_medium:
-    description: UTM medium parameter from tracking_by_device_id table.
+    description: UTM medium of the attributed touchpoint, propagated from tracking_by_device.
     lineage:
-      - datalake_attribution.tracking_by_device_id.utm_medium
-  utm_content:
-    description: UTM content parameter from tracking_by_device_id table.
-    lineage:
-      - datalake_attribution.tracking_by_device_id.utm_content
+      - datalake_attribution.tracking_by_device.utm_medium
   utm_campaign:
-    description: UTM campaign parameter from tracking_by_device_id table.
+    description: UTM campaign of the attributed touchpoint, propagated from tracking_by_device.
     lineage:
-      - datalake_attribution.tracking_by_device_id.utm_campaign
-  ts_event:
-    description: Timestamp when the tracking event occurred, from tracking_by_device_id table.
+      - datalake_attribution.tracking_by_device.utm_campaign
+  utm_content:
+    description: UTM content of the attributed touchpoint, propagated from tracking_by_device.
     lineage:
-      - datalake_attribution.tracking_by_device_id.ts_event
-  year:
-    description: Year column used for partitioning, from tracking_by_device_id table.
+      - datalake_attribution.tracking_by_device.utm_content
+  utm_term:
+    description: UTM term of the attributed touchpoint, propagated from tracking_by_device.
     lineage:
-      - datalake_attribution.tracking_by_device_id.year
-  month:
-    description: Month column used for partitioning, from tracking_by_device_id table.
+      - datalake_attribution.tracking_by_device.utm_term
+  ts_utm_attribution_start:
+    description: |
+      Earliest tracking timestamp of the attributed touchpoint, propagated from tracking_by_device. Used both
+      to filter touchpoints occurring at or before the lead's ts_created and to pick the most recent one per
+      id_lead (ORDER BY ts_utm_attribution_start DESC).
     lineage:
-      - datalake_attribution.tracking_by_device_id.month
-  day:
-    description: Day column used for partitioning, from tracking_by_device_id table.
+      - datalake_attribution.tracking_by_device.ts_utm_attribution_start
+  ts_utm_attribution_end:
+    description: |
+      Latest tracking timestamp of the attributed touchpoint, propagated from tracking_by_device. Indicates
+      the last time the attributed UTM combination was seen for the device.
     lineage:
-      - datalake_attribution.tracking_by_device_id.day
+      - datalake_attribution.tracking_by_device.ts_utm_attribution_end

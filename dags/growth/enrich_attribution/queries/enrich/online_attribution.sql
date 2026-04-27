@@ -1,35 +1,40 @@
 WITH lead_base AS (
   SELECT
-    house_lead.id_lead_ebdb,
-    acquisition.acquisition_campaign
-  FROM datalake_rene_descartes_clean.house_lead
-  INNER JOIN datalake_rene_descartes_clean.acquisition_misc_data AS acquisition
-    ON house_lead.id_acquisition = acquisition.id
+    house_lead.id_lead_ebdb AS id_lead,
+    house_lead.ts_created as ts_created,
+    acquisition_misc_data.acquisition_campaign
+  FROM
+    datalake_rene_descartes_clean.house_lead AS house_lead
+  INNER JOIN
+    datalake_rene_descartes_clean.acquisition_misc_data AS acquisition_misc_data
+      ON house_lead.id_acquisition = acquisition_misc_data.id
   WHERE
     DATE(house_lead.ts_created) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
-
-device_ids_from_linked AS (
+lead_devices AS (
   SELECT
-    id_lead_ebdb AS lead_id,
-    EXPLODE(FROM_JSON(GET_JSON_OBJECT(acquisition_campaign, '$.profileTracking.linked_devices'), 'ARRAY<STRING>')) AS device_id
+    id_lead,
+    ts_created,
+    EXPLODE(FROM_JSON(acquisition_campaign:profileTracking:linked_devices, 'ARRAY<STRING>')) AS id_device
   FROM lead_base
 )
-
 SELECT
-  lead.lead_id,
-  tracking.device_id,
-  tracking.attribution_time,
-  tracking.gclid,
-  tracking.utm_term,
+  lead_devices.id_lead,
+  tracking.id_device,
   tracking.utm_source,
   tracking.utm_medium,
-  tracking.utm_content,
   tracking.utm_campaign,
-  tracking.ts_event,
-  tracking.year,
-  tracking.month,
-  tracking.day
-FROM device_ids_from_linked AS lead
-INNER JOIN datalake_attribution.tracking_by_device_id AS tracking
-  ON tracking.device_id = lead.device_id
+  tracking.utm_content,
+  tracking.utm_term,
+  tracking.ts_utm_attribution_start,
+  tracking.ts_utm_attribution_end
+FROM
+  lead_devices AS lead_devices
+INNER JOIN
+  datalake_attribution.tracking_by_device AS tracking
+    ON tracking.id_device = lead_devices.id_device AND tracking.ts_utm_attribution_start <= lead_devices.ts_created
+QUALIFY
+  ROW_NUMBER() OVER (
+    PARTITION BY lead_devices.id_lead
+    ORDER BY tracking.ts_utm_attribution_start DESC
+) = 1

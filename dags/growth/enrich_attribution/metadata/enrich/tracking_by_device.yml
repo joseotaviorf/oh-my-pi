@@ -1,0 +1,94 @@
+---
+database_name: datalake_attribution
+table_name: tracking_by_device
+domain: Growth
+owner: "@data-growth"
+description: |
+  Materialized intermediate table that maintains chronological history of touchpoints per id_device.
+  Each row represents a unique combination of id_device + UTM parameters (source/medium/campaign/content/term),
+  with the earliest and latest tracking timestamps for that combination plus an MD5 utm_hash surrogate key
+  over the device + UTM tuple. UTM values are reconciled between the explicit egw_utm_* columns and the
+  referrer_domain extracted from user_properties: when the referrer matches a known search engine (google,
+  bing, yahoo) the touchpoint is classified as SEO; when it matches a known LLM domain (chatgpt, gemini,
+  copilot, perplexity, claude, you.com, poe.com, deepseek) it is classified as LLM. This table is optimized
+  for efficient joins with lead data and chronological ordering of touchpoints for journey analysis.
+columns:
+  id_device:
+    description: Device identifier from user_tracking (id_anonymous). Primary key component for joins with lead data.
+    lineage:
+      - datalake_cdp_clean.user_tracking.id_anonymous
+  utm_source:
+    description: |
+      UTM source for the touchpoint. When the touchpoint is classified as SEO, the source is derived from
+      the referrer_domain (google, bing, yahoo). When classified as LLM, it is derived from the referrer_domain
+      (chatgpt, gemini, copilot, perplexity) or set to 'other_llm' for the secondary LLM group. Otherwise it
+      falls back to the original egw_utm_source value. Part of merge key.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_source
+      - datalake_cdp_clean.user_tracking.user_properties
+  utm_medium:
+    description: |
+      UTM medium for the touchpoint. Defaults to egw_utm_medium when the UTM attribution is more recent than the
+      referral attribution (or when no referral exists). Otherwise derived from referrer_domain: 'seo' for known
+      search engines (google, bing, yahoo), 'llm' for primary LLM domains (chatgpt, gemini, copilot, perplexity)
+      and 'other_llm' for secondary LLM domains (claude, you.com, poe.com, deepseek). Part of merge key.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_medium
+      - datalake_cdp_clean.user_tracking.egw_last_attribution_time
+      - datalake_cdp_clean.user_tracking.user_properties
+  utm_campaign:
+    description: |
+      UTM campaign for the touchpoint. For SEO touchpoints, set to 'branded' when the entrance URI is the
+      QuintoAndar home page and 'non-branded' otherwise. For LLM touchpoints (both primary and secondary),
+      set to 'llm'. Otherwise falls back to the original egw_utm_campaign value. Part of merge key.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_campaign
+      - datalake_cdp_clean.user_tracking.user_properties
+  utm_content:
+    description: |
+      UTM content for the touchpoint. NULL for SEO and LLM touchpoints; otherwise the original egw_utm_content
+      value. Part of merge key.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_content
+  utm_term:
+    description: |
+      UTM term for the touchpoint. NULL for SEO and LLM touchpoints; otherwise the original egw_utm_term value.
+      Part of merge key.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_term
+  utm_hash:
+    description: |
+      MD5 hash of the concatenation of utm_source, utm_medium, utm_campaign, utm_content and utm_term (each
+      NULL replaced by a placeholder string). This hash is used as part of the merge key instead of the
+      individual UTM columns because the merge operation on the delta table relies on the rule
+      'source.column = target.column', which does not match rows when either the source or target value is
+      NULL. Replacing NULLs with a placeholder before hashing produces a deterministic, non-null surrogate
+      key that allows the merge to correctly identify unique UTM combinations.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_utm_source
+      - datalake_cdp_clean.user_tracking.egw_utm_medium
+      - datalake_cdp_clean.user_tracking.egw_utm_campaign
+      - datalake_cdp_clean.user_tracking.egw_utm_content
+      - datalake_cdp_clean.user_tracking.egw_utm_term
+      - datalake_cdp_clean.user_tracking.user_properties
+  ts_utm_attribution_start:
+    description: |
+      Earliest tracking timestamp (MIN of ts_tracking) for the id_device + UTM combination. ts_tracking is
+      resolved per event as the most recent of egw_last_attribution_time and the referral timestamp
+      (egw_referrer_ts in user_properties, stored as epoch milliseconds and converted via
+      from_unixtime(... / 1000)), falling back to ts_event when both are null. Marks when this touchpoint
+      combination first appeared for the device. This column is not updated when new touchpoints are detected
+      for the same UTM combination because the start time is static once it's set.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_last_attribution_time
+      - datalake_cdp_clean.user_tracking.user_properties
+      - datalake_cdp_clean.user_tracking.ts_event
+  ts_utm_attribution_end:
+    description: |
+      Latest tracking timestamp (MAX of ts_tracking) for the id_device + UTM combination, resolved with the
+      same logic as ts_utm_attribution_start. Marks the most recent occurrence of this touchpoint combination
+      for the device. This column is updated when new touchpoints are detected for the same UTM combination.
+    lineage:
+      - datalake_cdp_clean.user_tracking.egw_last_attribution_time
+      - datalake_cdp_clean.user_tracking.user_properties
+      - datalake_cdp_clean.user_tracking.ts_event
