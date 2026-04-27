@@ -6,6 +6,7 @@ SELECT
     job_post_id AS id_job_post,
     source_id AS id_source,
     referrer_id AS id_referrer,
+    coordinator_id AS id_coordinator,
     -- text fields
     status,
     custom_fields.preferred_name___social_name__optional_.value AS candidate_preferred_name,

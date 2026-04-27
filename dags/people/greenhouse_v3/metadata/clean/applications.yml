@@ -31,6 +31,10 @@ columns:
     description: The unique identifier of the user who referred the candidate (replaces credited_to in v3).
     lineage:
     - datalake_greenhouse_v3_raw.applications.referrer_id
+  id_coordinator:
+    description: The unique identifier of the Greenhouse user assigned as the job coordinator from this application.
+    lineage:
+    - datalake_greenhouse_v3_raw.applications.coordinator_id
   status:
     description: The current status of the application (e.g., active, rejected, hired).
     lineage:
