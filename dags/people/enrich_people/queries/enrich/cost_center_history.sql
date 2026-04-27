@@ -305,16 +305,10 @@ SELECT
     ROW_NUMBER() OVER (
         PARTITION BY
             id_organization,
-            TRIM(cost_center_code),
-            sk_business_partner_assignment,
-            sk_business_partner
+            cost_center_code
         ORDER BY
-            CASE
-                WHEN is_future_version THEN
-                    1
-                ELSE
-                    0
-            END,
+            is_active DESC,
+            is_future_version ASC,
             dt_valid_from DESC,
             dt_valid_to DESC,
             sk_cost_center_version DESC
