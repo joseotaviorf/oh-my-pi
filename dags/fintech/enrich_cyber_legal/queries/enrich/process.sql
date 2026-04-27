@@ -30,7 +30,7 @@ SELECT
     c.id_case,
     cuda.id_court_case,
     IF(cacct.id_contract LIKE '%NVO_JUICIO%', ec.contrato, cacct.id_contract) AS id_contract_cyber,
-    ct.id_contract_external AS id_contract,
+    COALESCE(ct.id_contract_external, ec.contrato) AS id_contract,
     c.id_dossier AS id_process,
     c.id_court,
     crt.court_name,
