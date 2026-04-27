@@ -1,0 +1,48 @@
+---
+database_name: datalake_rental_management_clean
+table_name: managed_rental_users
+description: |
+  Users linked to a managed rental with roles, profiles, and invitation lifecycle status.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users.id
+    description: Surrogate primary key of the managed rental user record.
+  managed_rental_user_uuid:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users.managed_rental_user_uuid
+    description: Business UUID uniquely identifying the managed rental user.
+  id_managed_rental:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users.managed_rental_id
+    description: Foreign key to the parent managed rental record.
+  person_uuid:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users.person_uuid
+    description: UUID of the person in the identity graph when bound to a user.
+  version:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users.version
+    description: Optimistic locking version for the managed rental user row.
+  status:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users.status
+    description: Current lifecycle status of the managed rental user enrollment.
+  role_related_as:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users.role_related_as
+    description: Array of role labels describing how the user relates to the managed rental.
+  profiles:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users.profiles
+    description: Array of profile identifiers attached to the managed rental user.
+  ts_created:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users.created_at
+    description: Timestamp when the managed rental user row was created.
+  ts_updated:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users.updated_at
+    description: Timestamp when the managed rental user row was last updated.

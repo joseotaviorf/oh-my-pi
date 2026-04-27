@@ -1,0 +1,44 @@
+---
+database_name: datalake_rental_management_clean
+table_name: managed_rental_users_log
+description: |
+  Audit log of changes and events on managed rental users within rental management.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users_log.id
+    description: Surrogate primary key of the managed rental users log entry.
+  id_managed_rental:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users_log.managed_rental_id
+    description: Foreign key to the managed rental affected by the logged event.
+  id_managed_rental_users:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users_log.managed_rental_users_id
+    description: Foreign key to the managed rental user affected by the logged event.
+  author_user_type:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users_log.author_user_type
+    description: Category of the actor that authored the change or event.
+  author_user_change_identifier:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users_log.author_user_change_identifier
+    description: Identifier of the authoring user or system actor when available.
+  event_log_type:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users_log.event_log_type
+    description: Type code describing the business event recorded in the log.
+  channel:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users_log.channel
+    description: Channel through which the event was triggered or observed.
+  description:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users_log.description
+    description: Free-text description of the event; may contain personal context.
+  ts_created:
+    lineage:
+      - datalake_rental_management_raw.managed_rental_users_log.created_at
+    description: Timestamp when the log entry was created.
