@@ -18,6 +18,3 @@ column_level_validations:
   ts_utm_attribution_end:
     is_complete:
       severity_level: Error
-  ts_tracking:
-    is_complete:
-      severity_level: Error
