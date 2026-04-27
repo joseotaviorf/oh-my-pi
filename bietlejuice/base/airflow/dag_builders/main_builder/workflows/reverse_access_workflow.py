@@ -13,6 +13,7 @@ from bietlejuice.base.airflow.task_creators.dag_execution_context import (
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.airflow.job_cluster_engine import (
+    attach_emr_job_cluster_finished_work_prerequisites,
     get_job_cluster_completion_sink,
 )
 
@@ -51,6 +52,12 @@ class ReverseAccessWorkflow(BaseWorkflow):
         if self._check_include_skip_run_task():
             skip_run_task = self.skip_run_task_creator.create_task()
             skip_run_task >> execute_job_cluster_task
+
+        attach_emr_job_cluster_finished_work_prerequisites(
+            dag_execution_context,
+            dummy_terminate_job_cluster_task,
+            cluster_completion_sink=cluster_completion_sink,
+        )
 
         DatasetAdder.attach_reprocessing_guard(
             execute_job_cluster_task, dag_execution_context

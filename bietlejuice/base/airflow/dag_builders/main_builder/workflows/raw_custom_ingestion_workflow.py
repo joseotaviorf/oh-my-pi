@@ -14,6 +14,7 @@ from bietlejuice.base.airflow.task_creators.task_creator_factory import (
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.airflow.job_cluster_engine import (
+    attach_emr_job_cluster_finished_work_prerequisites,
     get_job_cluster_completion_sink,
 )
 
@@ -244,6 +245,12 @@ class RawCustomIngestionWorkflow(BaseWorkflow):
             clean_last_tasks,
             next_task_if_no_dependents=optimize_delta_tables_task,
             inner_dependencies_key="clean_inner_dependencies",
+        )
+
+        attach_emr_job_cluster_finished_work_prerequisites(
+            self.dag_execution_context,
+            dummy_terminate_job_cluster_task,
+            cluster_completion_sink=cluster_completion_sink,
         )
 
         return execute_job_cluster_task

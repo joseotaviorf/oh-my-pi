@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from datetime import timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence
 
 from airflow.models.baseoperator import BaseOperator
 from databricks_plugin import (
@@ -369,6 +369,42 @@ def get_job_cluster_completion_sink(
     )
     emr_terminate_task.set_downstream(job_cluster_finished_task)
     return emr_terminate_task
+
+
+def attach_emr_job_cluster_finished_work_prerequisites(
+    dag_execution_context: DagExecutionContext,
+    job_cluster_finished_task: BaseOperator,
+    work_completion_tasks: Optional[Sequence[BaseOperator]] = None,
+    *,
+    cluster_completion_sink: Optional[BaseOperator] = None,
+) -> None:
+    """
+    EMR: ``job-cluster-finished`` must not succeed on failed Spark/EMR work, but
+    ``terminate-emr-cluster`` is ``all_done`` and always succeeds if the API
+    call works. Add direct upstreams from the work tasks that must succeed
+    (same set that feeds the cluster completion sink) so the finished task
+    uses the default ``all_success`` and reflects failures. No-op on Databricks.
+
+    Pass **either** ``work_completion_tasks`` **or** ``cluster_completion_sink``
+    (not both). When ``cluster_completion_sink`` is set, direct upstreams of
+    the sink (usually ``terminate-emr-*``) are used—call this after all edges to
+    the sink are wired. If the sink is already ``job-cluster-finished`` (e.g.
+    Databricks), the function is a no-op.
+    """
+    if not dag_execution_context.use_airflow_emr:
+        return
+    if work_completion_tasks is not None and cluster_completion_sink is not None:
+        raise ValueError(
+            "Pass at most one of work_completion_tasks or cluster_completion_sink"
+        )
+    if cluster_completion_sink is not None:
+        if cluster_completion_sink is job_cluster_finished_task:
+            return
+        work_completion_tasks = list(cluster_completion_sink.upstream_list)
+    elif not work_completion_tasks:
+        return
+    for task in work_completion_tasks:
+        job_cluster_finished_task.set_upstream(task)
 
 
 def build_job_cluster_engine(

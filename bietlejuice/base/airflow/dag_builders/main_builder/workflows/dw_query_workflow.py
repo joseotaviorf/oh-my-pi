@@ -19,6 +19,7 @@ from bietlejuice.base.airflow.short_circuit_function_enum import (
 )
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.airflow.job_cluster_engine import (
+    attach_emr_job_cluster_finished_work_prerequisites,
     get_job_cluster_completion_sink,
 )
 
@@ -127,6 +128,8 @@ class DWQueryWorkflow(BaseWorkflow):
             dw_task_groups,
             dw_task_groups_boundaries,
             cluster_completion_sink,
+            job_cluster_finished_task,
+            dag_execution_context,
         )
 
         DatasetAdder.attach_reprocessing_guard(
@@ -164,6 +167,8 @@ class DWQueryWorkflow(BaseWorkflow):
         dw_task_groups,
         dw_task_groups_boundaries,
         cluster_completion_sink,
+        job_cluster_finished_task,
+        dag_execution_context: DagExecutionContext,
     ):
         if skip_run_task:
             chain(skip_run_task, execute_job_cluster_task)
@@ -194,4 +199,10 @@ class DWQueryWorkflow(BaseWorkflow):
             dw_staging_task_groups, dw_task_groups
         )
 
-        cluster_completion_sink.set_upstream(DWTaskGroup.all_last_tasks(dw_task_groups))
+        work_last_tasks = DWTaskGroup.all_last_tasks(dw_task_groups)
+        cluster_completion_sink.set_upstream(work_last_tasks)
+        attach_emr_job_cluster_finished_work_prerequisites(
+            dag_execution_context,
+            job_cluster_finished_task,
+            cluster_completion_sink=cluster_completion_sink,
+        )

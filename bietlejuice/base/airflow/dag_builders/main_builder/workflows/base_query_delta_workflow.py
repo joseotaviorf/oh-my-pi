@@ -18,6 +18,7 @@ from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.job_cluster_engine import (
+    attach_emr_job_cluster_finished_work_prerequisites,
     get_job_cluster_completion_sink,
 )
 
@@ -219,6 +220,11 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
             execute_job_cluster_local_id,
         )
         optimize_delta_tables_task >> cluster_completion_sink
+        attach_emr_job_cluster_finished_work_prerequisites(
+            dag_execution_context,
+            job_cluster_finished_task,
+            cluster_completion_sink=cluster_completion_sink,
+        )
 
     def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):
         task_creator_factory = TaskCreatorFactory(dag_execution_context)

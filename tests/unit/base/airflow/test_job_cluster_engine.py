@@ -10,6 +10,7 @@ from airflow.operators.empty import EmptyOperator
 from bietlejuice.base.airflow.job_cluster_engine import (
     DatabricksJobClusterEngine,
     EmrJobClusterEngine,
+    attach_emr_job_cluster_finished_work_prerequisites,
     build_job_cluster_engine,
     get_job_cluster_completion_sink,
 )
@@ -364,3 +365,64 @@ class TestGetJobClusterCompletionSink:
             execute_cluster_task_id="execute-job-cluster-2",
             terminate_task_local_suffix=2,
         )
+
+
+class TestAttachEmrJobClusterFinishedPrerequisites:
+    def test_noop_when_not_emr(self):
+        dag = DAG(dag_id="a_emr_off", schedule=None)
+        work = EmptyOperator(task_id="work", dag=dag)
+        jcf = EmptyOperator(task_id="job-cluster-finished", dag=dag)
+        term = EmptyOperator(task_id="terminate", dag=dag)
+        work.set_downstream(term)
+        ctx = MagicMock()
+        ctx.use_airflow_emr = False
+
+        attach_emr_job_cluster_finished_work_prerequisites(
+            ctx, jcf, (work,),
+        )
+
+        assert not jcf.upstream_task_ids
+
+    def test_emr_adds_explicit_upstreams(self):
+        dag = DAG(dag_id="a_emr_explicit", schedule=None)
+        w1 = EmptyOperator(task_id="w1", dag=dag)
+        w2 = EmptyOperator(task_id="w2", dag=dag)
+        jcf = EmptyOperator(task_id="job-cluster-finished", dag=dag)
+        ctx = MagicMock()
+        ctx.use_airflow_emr = True
+
+        attach_emr_job_cluster_finished_work_prerequisites(ctx, jcf, (w1, w2))
+
+        assert jcf.upstream_task_ids == {"w1", "w2"}
+
+    def test_emr_uses_cluster_completion_sink_upstream(self):
+        dag = DAG(dag_id="a_emr_sink", schedule=None)
+        work = EmptyOperator(task_id="work", dag=dag)
+        term = EmptyOperator(task_id="terminate-emr-cluster", dag=dag)
+        jcf = EmptyOperator(task_id="job-cluster-finished", dag=dag)
+        work.set_downstream(term)
+        term.set_downstream(jcf)
+        ctx = MagicMock()
+        ctx.use_airflow_emr = True
+
+        attach_emr_job_cluster_finished_work_prerequisites(
+            ctx, jcf, cluster_completion_sink=term
+        )
+
+        assert jcf.upstream_task_ids == {"work", "terminate-emr-cluster"}
+
+    def test_raises_if_both_explicit_and_sink(self):
+        dag = DAG(dag_id="a_bad", schedule=None)
+        a = EmptyOperator(task_id="a", dag=dag)
+        b = EmptyOperator(task_id="b", dag=dag)
+        jcf = EmptyOperator(task_id="job-cluster-finished", dag=dag)
+        ctx = MagicMock()
+        ctx.use_airflow_emr = True
+
+        with pytest.raises(
+            ValueError,
+            match="at most one of work_completion_tasks or cluster_completion_sink",
+        ):
+            attach_emr_job_cluster_finished_work_prerequisites(
+                ctx, jcf, (a,), cluster_completion_sink=b
+            )

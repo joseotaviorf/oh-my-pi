@@ -14,6 +14,7 @@ from bietlejuice.base.airflow.task_creators.table_attributes import TableAttribu
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.airflow.job_cluster_engine import (
+    attach_emr_job_cluster_finished_work_prerequisites,
     get_job_cluster_completion_sink,
 )
 
@@ -61,6 +62,8 @@ class QueryViewWorkflow(BaseWorkflow):
             table_first_tasks,
             table_last_tasks,
             cluster_completion_sink,
+            dummy_terminate_job_cluster_task,
+            dag_execution_context,
         )
 
         DatasetAdder.attach_reprocessing_guard(
@@ -120,7 +123,9 @@ class QueryViewWorkflow(BaseWorkflow):
         execute_job_cluster_task,
         table_first_tasks: dict,
         table_last_tasks: dict,
+        cluster_completion_sink,
         job_cluster_finished_task,
+        dag_execution_context: DagExecutionContext,
     ) -> None:
         """Set task dependencies including inner dependencies if configured."""
 
@@ -128,12 +133,17 @@ class QueryViewWorkflow(BaseWorkflow):
             table_first_tasks,
             table_last_tasks,
             previous_task_if_no_dependencies=execute_job_cluster_task,
-            next_task_if_no_dependents=job_cluster_finished_task,
+            next_task_if_no_dependents=cluster_completion_sink,
         )
 
         if self._check_include_skip_run_task():
             skip_run_task = self.skip_run_task_creator.create_task()
             skip_run_task >> execute_job_cluster_task
+        attach_emr_job_cluster_finished_work_prerequisites(
+            dag_execution_context,
+            job_cluster_finished_task,
+            cluster_completion_sink=cluster_completion_sink,
+        )
 
     def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):
         """Initialize all task creators used by this workflow."""
