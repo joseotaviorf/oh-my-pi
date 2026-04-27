@@ -1,0 +1,51 @@
+database_name: datalake_request_logging_clean
+table_name: visits
+description: Clean-layer of visits domain from request logging.
+  Each row is one request logging enriched from JSON in the raw visits table.
+domain: For Sale
+owner: guilherme.rocha@quintoandar.com.br
+columns:
+  id_request:
+    lineage:
+      - datalake_request_logging_raw.visits.request_id
+    description: Unique identifier of the agent or bot request event, sourced from the raw request_id field.
+  id_trace:
+    lineage:
+      - datalake_request_logging_raw.visits.trace_id
+    description: Trace identifier associated with the request, sourced from the raw trace_id field.
+  status_code:
+    lineage:
+      - datalake_request_logging_raw.visits.rpc_protocol
+    description: HTTP status code of the RPC response, read from rpc_protocol.http.status_code in the raw JSON payload.
+  tool:
+    lineage:
+      - datalake_request_logging_raw.visits.application_payload
+    description: Name of the tool invoked in the request, extracted from application_payload JSON path tool_name.
+  host:
+    lineage:
+      - datalake_request_logging_raw.visits.application_payload
+    description: Chat bot name from application_payload JSON path platform_info.chat_bot_name.
+  visit_code:
+    lineage:
+      - datalake_request_logging_raw.visits.application_payload
+    description: Code of visit associated with the request, from application_payload JSON path domain_info.visit_code.
+  ts_request:
+    lineage:
+      - datalake_request_logging_raw.visits.timestamp
+    description: Timestamp when the request was recorded in the source system (raw timestamp column).
+  year:
+    lineage:
+      - datalake_request_logging_raw.visits.timestamp
+    description: Calendar year partition component derived from the request timestamp.
+  month:
+    lineage:
+      - datalake_request_logging_raw.visits.timestamp
+    description: Calendar month partition component derived from the request timestamp.
+  day:
+    lineage:
+      - datalake_request_logging_raw.visits.timestamp
+    description: Calendar day partition component derived from the request timestamp.
+  hour:
+    lineage:
+      - datalake_request_logging_raw.visits.timestamp
+    description: Hour of day (0–23) derived from the request timestamp for partitioning and analysis.
