@@ -263,6 +263,8 @@ workflow:
 
 Path: `dags/{line}/{normalized_dag_name}/queries/{layer}/{table_name}.sql`
 
+**Literal `{` / `}` in `query_delta` SQL:** The loader runs Python `str.format(**query_template_params)` on the file before Spark executes it. Use `{load_start_date}` / `{load_end_date}` (and other declared keys) only for real template parameters. Any **literal** brace Spark must see (regex quantifiers like `{4}`, JSON snippets) must be written doubled — `{{` / `}}` — or the job fails at runtime (`KeyError` / `IndexError`). See **`databricks_conventions.mdc`** (Literal Braces) and **`sql_conventions.mdc`** §13.
+
 ### Source-layer priority for SQL creation
 
 When creating SQL for new DAGs, prioritize upstream layers as follows:

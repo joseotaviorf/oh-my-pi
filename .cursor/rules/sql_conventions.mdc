@@ -617,6 +617,19 @@ FROM
 
 ---
 
+## 13. Python `str.format` in pipeline query SQL (`query_delta` and similar)
+
+Some DAG workflows ship `.sql` files to Databricks and run them through Python **`str.format(**query_template_params)`** before Spark executes the text. In those files, **every** `{...}` substring is treated as a format field unless escaped.
+
+- Reserve **single-brace** `{name}` placeholders for **known runtime keys** only (for example `{load_start_date}`, `{load_end_date}` — see the DAG declaration and **`databricks_conventions.mdc`**).
+- For **literal** braces Spark must see (regex quantifiers such as `{4}` or `{2,3}`, JSON fragments, other fixed `{` / `}`), use **doubled** braces: `{{` and `}}` so formatting leaves a single `{` / `}` in the final SQL.
+
+Example: `regexp_extract(col, '([0-9]{{4}})', 1)` — not `'([0-9]{4})'`, which can raise **`IndexError: Replacement index 4 out of range`** at load time.
+
+For the full distinction between `{param}`, `{{ jinja }}`, and literal escapes, use **`databricks_conventions.mdc`** (Template Syntax and Literal Braces).
+
+---
+
 ## SQL Style Checklist
 
 - [ ] Columns are in English, lowercase, snake_case
@@ -643,3 +656,4 @@ FROM
 - [ ] Enrich queries use clean/enrich sources (not raw)
 - [ ] DW queries prioritize enrich sources and avoid DW-to-DW reads (except explicit datamarts)
 - [ ] Metric queries prioritize DW sources and avoid datamart DW tables as primary inputs
+- [ ] Literal `{` / `}` inside strings (regex, JSON, etc.) use `{{` / `}}` where pipeline SQL is passed through Python `str.format`; placeholders use only allowed `{param}` keys (see §13 and `databricks_conventions.mdc`)

@@ -42,6 +42,7 @@ Return: exit code and any error lines per DAG.
 For every changed `.sql` file, verify that a matching `.yml` exists in `metadata/{layer}/` with the same base name. Also check:
 - `description:` field is present and ≥ 10 chars
 - All columns have `lineage:` (enrich/dw) or `dimension:`/`metric:` block (metric layer)
+- **Python `str.format` on query files:** For `dags/**/queries/**/*.sql` loaded by `query_delta`-style pipelines (`TableLoaderPipeline` applies `.format(**query_template_params)`), scan for `{` inside string literals. Regex quantifiers (e.g. `{4}`, `{2,3}`), JSON, or other literals must use **`{{` / `}}`** so Spark receives single braces; otherwise the job fails at runtime with `KeyError` or `IndexError` (see **`databricks_conventions.mdc`** — Literal Braces, and **`sql_conventions.mdc`** §13). Flag obvious mistakes as **blocking** when the pattern is clearly a literal brace, not a declared `{load_start_date}`-style key.
 
 Return: list of missing or incomplete metadata files.
 
