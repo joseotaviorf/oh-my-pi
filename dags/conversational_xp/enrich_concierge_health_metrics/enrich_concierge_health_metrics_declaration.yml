@@ -10,6 +10,7 @@ workflow:
   default_extraction_type: incremental
   extra_query_template_params:
     "days_past_30": 30
+    "days_past_60": 60
     "days_past_90": 90
     "days_past_120": 120
     "start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"

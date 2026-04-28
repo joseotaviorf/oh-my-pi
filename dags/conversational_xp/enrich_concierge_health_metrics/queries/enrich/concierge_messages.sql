@@ -31,6 +31,7 @@ WITH base_outbound_notifications AS (
     AND un.action NOT ILIKE '%carousel%'
     AND un.action NOT ILIKE '%cancelation%'
     AND un.action NOT ILIKE '%optout%'
+    AND un.action NOT LIKE '%ConciergeSharedLpvAdsTrigger%'
     AND un.status IN ('delivered', 'read')
     AND MAKE_DATE(un.year, un.month, un.day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
