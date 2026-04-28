@@ -619,13 +619,15 @@ class DAGDeclarationValidator(Validator):
                         f"m=_validate_api_ingestion_workflow, "
                         f"msg='id_expansion.id_field' is required for table '{table_name}'"
                     )
-                if not id_expansion.get("param_name") and not id_expansion.get(
-                    "path_param"
-                ):
+                has_param = bool(id_expansion.get("param_name"))
+                has_path = bool(id_expansion.get("path_param"))
+                has_json_body = bool(id_expansion.get("json_body_field"))
+                mode_count = sum((has_param, has_path, has_json_body))
+                if mode_count != 1:
                     raise AssertionError(
                         f"m=_validate_api_ingestion_workflow, "
-                        f"msg='id_expansion.param_name' or 'id_expansion.path_param' "
-                        f"is required for table '{table_name}'"
+                        f"msg='id_expansion' requires exactly one of 'param_name', "
+                        f"'path_param', or 'json_body_field' for table '{table_name}'"
                     )
                 correlation_field = id_expansion.get("correlation_field")
                 if correlation_field is not None and (

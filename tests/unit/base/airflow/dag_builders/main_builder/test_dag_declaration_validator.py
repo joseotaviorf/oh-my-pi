@@ -580,7 +580,43 @@ class TestDAGDeclarationValidatorIdExpansion:
             }
         )
 
-        with pytest.raises(AssertionError, match="id_expansion.param_name"):
+        with pytest.raises(AssertionError, match="exactly one of"):
+            dag_declaration_validator.validate(dag_declaration=declaration)
+
+    def test_valid_id_expansion_with_json_body_field_passes(
+        self, dag_declaration_validator
+    ):
+        """Valid id_expansion using json_body_field (POST body) passes validation."""
+        declaration = self._base_declaration(
+            {
+                "endpoint_path": "costs/list",
+                "params": {},
+                "id_expansion": {
+                    "source_table": "employees",
+                    "id_field": "externalId",
+                    "correlation_field": "employeeExternalId",
+                    "json_body_field": "employeeExternalId",
+                },
+            }
+        )
+
+        dag_declaration_validator.validate(dag_declaration=declaration)
+
+    def test_id_expansion_multiple_target_modes_raises(self, dag_declaration_validator):
+        """Setting more than one of param_name, path_param, json_body_field raises."""
+        declaration = self._base_declaration(
+            {
+                "endpoint_path": "costs/list",
+                "id_expansion": {
+                    "source_table": "employees",
+                    "id_field": "externalId",
+                    "param_name": "x",
+                    "json_body_field": "employeeExternalId",
+                },
+            }
+        )
+
+        with pytest.raises(AssertionError, match="exactly one of"):
             dag_declaration_validator.validate(dag_declaration=declaration)
 
     def test_id_expansion_not_a_dict_raises(self, dag_declaration_validator):
