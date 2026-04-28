@@ -6,8 +6,8 @@ dag:
   documentation:
     dag_purpose: |
       Ingests Oitchau Integrations API resources into the raw layer and materializes matching clean
-      Delta tables in datalake_oitchau_clean (queries/clean, merge keys per table). Raw tables:
-      employees and hoursbank_totals.
+      Delta tables in datalake_oitchau_clean (queries/clean, merge keys per table). Raw tables
+      include employees, hoursbank_totals, and employee_costs (POST costs/list fan-out).
       Store credentials in Databricks Secrets (scope `people`): JSON secret referenced by
       `authentication.secret_key` with `client_id` and `client_secret` for the integration client.
       employees uses no pagination (full load). hoursbank_totals uses id_expansion: one call per
@@ -75,12 +75,26 @@ workflow:
       - employees
     requests_employees:
       - employees
+    employee_costs:
+      - employees
 
   tables_customization:
     business_rules_groups:
       endpoint_path: business_rules_groups
       extraction_type: full
       params: {}
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
+    employee_costs:
+      endpoint_path: costs/list
+      extraction_type: full
+      params: {}
+      id_expansion:
+        source_table: employees
+        id_field: externalId
+        correlation_field: employeeExternalId
+        json_body_field: employeeExternalId
       vacuum_retention_hours: 168
       vacuum_lite: true
 

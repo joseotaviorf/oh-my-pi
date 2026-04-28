@@ -36,7 +36,7 @@ class BaseAPIClient:
         retry_strategy = requests.packages.urllib3.util.retry.Retry(
             total=max_retries,
             status_forcelist=[429, 500, 502, 503, 504],
-            allowed_methods=["HEAD", "GET", "OPTIONS"],
+            allowed_methods=["HEAD", "GET", "OPTIONS", "POST"],
             backoff_factor=1,
         )
         adapter = HeaderRateLimitAdapter(
@@ -106,6 +106,29 @@ class BaseAPIClient:
         try:
             response = self.session.get(
                 url, params=params, headers=headers, timeout=self.timeout
+            )
+            self._handle_response(response)
+            return response
+        except requests.RequestException as e:
+            LOGGER.error(f"HTTP request to {url} failed: {e}")
+            raise APIException(f"Request to {endpoint} failed") from e
+
+    def post(
+        self,
+        endpoint: str,
+        params: Optional[dict] = None,
+        json: Optional[dict] = None,
+        headers: Optional[dict] = None,
+    ) -> requests.Response:
+        """Sends a POST request with an optional JSON body to the specified endpoint."""
+        url = f"{self.base_url.rstrip('/')}/{endpoint.lstrip('/')}"
+        try:
+            response = self.session.post(
+                url,
+                params=params,
+                json=json,
+                headers=headers,
+                timeout=self.timeout,
             )
             self._handle_response(response)
             return response

@@ -251,15 +251,17 @@ tables_customization:
 | `param_name` | yes* | Query parameter name to pass the ID (e.g. `employeeUuid`) |
 | `path_param` | yes* | Placeholder name matching `{placeholder}` in `endpoint_path` (e.g. `employeeUuid` for `requests/employees/{employeeUuid}`) |
 | `correlation_field` | no | JSON key used when stamping each response row with the fan-out entity id; defaults to `id_field`. Use when list items already expose `uuid` (or similar) from the API and you must not overwrite it. |
+| `json_body_field` | no\* | JSON body property name for **POST** fan-out (e.g. Oitchau `employeeExternalId`). Sends `POST` with body `{ "<json_body_field>": "<entity_id>" }` per ID. When the response is a dict with a `content` array, each element is flattened to one raw row (same as list responses). **Pagination is not supported** together with `json_body_field` (configure `api_policies.pagination` only for GET-style fan-out). |
 
-\* Exactly one of `param_name` or `path_param` must be provided.
+\* Exactly one of `param_name`, `path_param`, or `json_body_field` must be provided.
 
 ### Runtime behaviour
 
 1. Spark reads `datalake_{custom_schema}_raw.{source_table}` and extracts distinct non-null `id_field` values from the `payload` JSON column.
 2. For each entity ID, the job either:
    - substitutes **`{path_param}`** inside `endpoint_path` with the entity id (no query param for the id itself), or
-   - adds **`param_name=<entity_id>`** to the request query string (merged with `params`).
+   - adds **`param_name=<entity_id>`** to the request query string (merged with `params`), or
+   - sends **`POST`** with JSON body **`{ "<json_body_field>": "<entity_id>" }`** (query `params` from the table config are still sent on the URL when set).
 3. If the table declares **`api_policies.pagination`** (e.g. **`page_per_page`**), each per-entity call uses that paginator and all pages are flattened into rows; otherwise a single GET is performed. If the response looks paginated (e.g. `metadata.totalPages` > 1) but no paginator is configured, only the first page is fetched and a **warning** is logged.
 4. Each row is stamped with **`correlation_field`** if set, else **`id_field`**, set to the fan-out entity id (so list items keep API-native keys such as `uuid` when needed).
 5. Failed individual calls (HTTP errors, timeouts) are logged as warnings and skipped — the job continues with the remaining IDs.
@@ -284,6 +286,25 @@ tables_customization:
 ```
 
 This fetches the D-1 hours bank balance for each employee UUID in `datalake_oitchau_raw.employees`, adding ~4,490 rows per daily run.
+
+### Example — POST JSON body fan-out (OiTchau `costs/list`)
+
+```yaml
+tables_customization:
+  employee_costs:
+    endpoint_path: costs/list
+    extraction_type: full
+    params: {}
+    id_expansion:
+      source_table: employees
+      id_field: externalId
+      correlation_field: employeeExternalId
+      json_body_field: employeeExternalId
+    merge_on:
+      - id_cost_segment
+```
+
+Chain after `employees` via `workflow.raw_inner_dependencies.employee_costs: [employees]`. Each row in `content[]` becomes one raw record; `correlation_field` stamps the request identifier for joins.
 
 ### Example — path param + pagination (OiTchau requests per employee)
 
@@ -774,7 +795,7 @@ There is **no** dedicated `source` URL column written by `load_api_ingestion_raw
 
 ## Reference DAGs
 
-- [`dags/people/oitchau_api/oitchau_api_declaration.yml`](../../dags/people/oitchau_api/oitchau_api_declaration.yml) — `api_ingestion` reference: **`token_request_format: json_body`** OAuth2, optional **`http_user_agent`**, **`credentials_scope`**, tables with **`params: {}`** where the API rejects default date filters, **`page_per_page`** on large list endpoints, **`id_expansion`** with **`param_name`** (hours bank) and **`path_param`** + **`page_per_page`** (per-employee requests), **`workflow.raw_inner_dependencies`** for fan-out after `employees`, plus **clean** tables in the same DAG package (`queries/clean/*.sql`, **`merge_on`**, **`default_clean_extraction_type`** / **`default_clean_partitions`**).
+- [`dags/people/oitchau_api/oitchau_api_declaration.yml`](../../dags/people/oitchau_api/oitchau_api_declaration.yml) — `api_ingestion` reference: **`token_request_format: json_body`** OAuth2, optional **`http_user_agent`**, **`credentials_scope`**, tables with **`params: {}`** where the API rejects default date filters, **`page_per_page`** on large list endpoints, **`id_expansion`** with **`param_name`** (hours bank), **`path_param`** + **`page_per_page`** (per-employee requests), **`json_body_field`** + **`correlation_field`** for **POST** `costs/list`, **`workflow.raw_inner_dependencies`** for fan-out after `employees`, plus **clean** tables in the same DAG package (`queries/clean/*.sql`, **`merge_on`**, **`default_clean_extraction_type`** / **`default_clean_partitions`**).
 
 Note: [`dags/people/currency/currency_declaration.yml`](../../dags/people/currency/currency_declaration.yml) uses **`custom_ingestion`** (`load_currency_raw`), not `api_ingestion`.
 

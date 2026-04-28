@@ -856,7 +856,8 @@ class APIConfigurationLoader:
 
         id_expansion enables fan-out fetching: one API call per entity ID extracted
         from an already-ingested raw source table. Required keys are source_table,
-        id_field, and either param_name (query param) or path_param (URL path segment).
+        id_field, and exactly one of param_name (query param), path_param (URL path
+        segment), or json_body_field (POST JSON property holding the entity id).
         Optional correlation_field sets the response JSON key used to stamp each row
         with the fan-out id (defaults to id_field, which must exist on the source
         payload for ID extraction).

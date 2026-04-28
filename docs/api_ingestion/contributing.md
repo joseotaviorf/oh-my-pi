@@ -313,18 +313,19 @@ pytest tests/unit/airflow/dag_builders/factories -q
 
 ## `id_expansion` and per-entity fan-out (where to change)
 
-`id_expansion` runs **one GET per entity id** read from a prior raw table in the same DAG. The runtime supports:
+`id_expansion` runs **one HTTP request per entity id** read from a prior raw table in the same DAG (GET by default, POST when **`json_body_field`** is set). The runtime supports:
 
-- **`param_name`** — entity id as a query parameter.
+- **`param_name`** — entity id as a query parameter (GET).
 - **`path_param`** — entity id substituted into `endpoint_path` at **`{path_param}`** (e.g. `requests/employees/{employeeUuid}`).
+- **`json_body_field`** — entity id sent as JSON body `{ "<field>": "<id>" }` via **POST** (e.g. Oitchau `costs/list`). Response dicts with a **`content`** array are flattened to one row per element. **Pagination is not supported** with this mode.
 - **`correlation_field`** (optional) — JSON key used when stamping each row with the fan-out id (defaults to `id_field`).
-- **`api_policies.pagination`** on the same table (e.g. **`page_per_page`**) — used inside the fan-out so each per-entity call can walk all pages.
+- **`api_policies.pagination`** on the same table (e.g. **`page_per_page`**) — used inside the fan-out for **GET** so each per-entity call can walk all pages.
 
 | Concern | Primary file |
 |---------|----------------|
 | Fan-out loop, path substitution, row stamping, paginator wiring | [`dags/cross/base/spark_jobs/load_api_ingestion_raw.py`](../../dags/cross/base/spark_jobs/load_api_ingestion_raw.py) — `_fetch_with_id_expansion()` |
 | Loader helpers (`get_id_expansion_config`, paginator factory) | [`bietlejuice/base/api/configuration/loader.py`](../../bietlejuice/base/api/configuration/loader.py) |
-| Declaration validation (`source_table`, `id_field`, `param_name` xor `path_param`, `correlation_field`) | [`bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py`](../../bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py) |
+| Declaration validation (`source_table`, `id_field`, exactly one of `param_name` / `path_param` / `json_body_field`, `correlation_field`) | [`bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py`](../../bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py) |
 | Regression tests | [`tests/dags/cross/base/spark_jobs/test_load_api_ingestion_raw.py`](../../tests/dags/cross/base/spark_jobs/test_load_api_ingestion_raw.py) |
 
-**Further extensions** (multiple independent path placeholders, non-GET flows, cross-DAG id sources): treat as a **custom Spark job** or extend `_fetch_with_id_expansion` with new tests and validator rules; update [`docs/api_ingestion/user_guide.md`](user_guide.md) in the same PR.
+**Further extensions** (multiple independent path placeholders, POST with pagination, cross-DAG id sources): treat as a **custom Spark job** or extend `_fetch_with_id_expansion` with new tests and validator rules; update [`docs/api_ingestion/user_guide.md`](user_guide.md) in the same PR.

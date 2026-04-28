@@ -58,6 +58,25 @@ class TestBaseAPIClient(unittest.TestCase):
             f"{self.base_url}{endpoint}", params=params, headers=None, timeout=30
         )
 
+    def test_post_successful_request(self):
+        """Test a successful POST request with JSON body."""
+        mock_response = MagicMock(status_code=200)
+        mock_response.raise_for_status.return_value = None
+        self.client.session.post.return_value = mock_response
+
+        endpoint = "/costs/list"
+        body = {"employeeExternalId": "136116"}
+        response = self.client.post(endpoint, params=None, json=body)
+
+        self.client.session.post.assert_called_once_with(
+            f"{self.base_url}{endpoint}",
+            params=None,
+            json=body,
+            headers=None,
+            timeout=30,
+        )
+        self.assertEqual(response, mock_response)
+
     def test_handle_http_exceptions(self):
         """Test handling of specific HTTP error codes."""
         error_cases = [

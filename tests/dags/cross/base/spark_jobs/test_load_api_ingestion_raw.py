@@ -281,11 +281,11 @@ class TestFetchWithIdExpansion:
         loader.create_paginator.assert_called_once()
 
     def test_both_path_param_and_param_name_raises(self):
-        """Setting both path_param and param_name is rejected."""
+        """Setting more than one fan-out mode (path_param, param_name, json_body_field) is rejected."""
         spark = self._make_spark(["x"])
         client = MagicMock()
 
-        with pytest.raises(ValueError, match="must not set both"):
+        with pytest.raises(ValueError, match="exactly one of"):
             _fetch_with_id_expansion(
                 spark=spark,
                 client=client,
@@ -298,6 +298,68 @@ class TestFetchWithIdExpansion:
                 },
                 source_schema="oitchau",
                 endpoint="requests/employees/{employeeUuid}",
+                initial_params={},
+            )
+
+    def test_json_body_field_post_flattens_content_array(self):
+        """POST fan-out with json_body_field expands content[] and stamps correlation_field."""
+        spark = self._make_spark(["136116"])
+        client = MagicMock()
+        client.post.return_value = self._make_response(
+            {
+                "content": [
+                    {
+                        "uuid": "row-1",
+                        "rate": 45.45,
+                        "userProfileUuid": "prof-1",
+                    }
+                ]
+            }
+        )
+
+        results = _fetch_with_id_expansion(
+            spark=spark,
+            client=client,
+            loader=self._loader_without_pagination(),
+            id_expansion_config={
+                "source_table": "employees",
+                "id_field": "externalId",
+                "correlation_field": "employeeExternalId",
+                "json_body_field": "employeeExternalId",
+            },
+            source_schema="oitchau",
+            endpoint="costs/list",
+            initial_params={},
+        )
+
+        assert len(results) == 1
+        assert results[0]["uuid"] == "row-1"
+        assert results[0]["employeeExternalId"] == "136116"
+        client.post.assert_called_once_with(
+            "costs/list",
+            params={},
+            json={"employeeExternalId": "136116"},
+        )
+
+    def test_json_body_field_with_pagination_raises(self):
+        """json_body_field fan-out rejects pagination (GET-only paginators)."""
+        spark = self._make_spark(["1"])
+        client = MagicMock()
+        loader = MagicMock()
+        loader.create_paginator.return_value = MagicMock()
+
+        with pytest.raises(ValueError, match="json_body_field"):
+            _fetch_with_id_expansion(
+                spark=spark,
+                client=client,
+                loader=loader,
+                id_expansion_config={
+                    "source_table": "employees",
+                    "id_field": "externalId",
+                    "json_body_field": "employeeExternalId",
+                },
+                source_schema="oitchau",
+                endpoint="costs/list",
                 initial_params={},
             )
 
