@@ -1,6 +1,6 @@
 import pytest
 from unittest import mock
-from bietlejuice.loaders.delta_loader import DeltaLoader, _sanitize_identifier
+from bietlejuice.loaders.delta_loader import DeltaLoader, _check_identifier_safety
 from py4j.protocol import Py4JJavaError
 from pyspark.sql.utils import AnalysisException
 from pyspark.sql.types import StructField, StructType, StringType
@@ -450,16 +450,16 @@ class TestDeltaLoader:
         "identifier",
         ["test_table", "db.table", "datalake_ebdb_raw.contract"],
     )
-    def test_sanitize_identifier_accepts_valid_names(self, identifier):
-        assert _sanitize_identifier(identifier) == identifier
+    def test_check_identifier_safety_accepts_valid_names(self, identifier):
+        _check_identifier_safety(identifier)  # must not raise
 
     @pytest.mark.parametrize(
         "identifier",
         ["'; DROP TABLE --", "table; SELECT 1", "name WITH spaces", ""],
     )
-    def test_sanitize_identifier_rejects_malicious_input(self, identifier):
+    def test_check_identifier_safety_rejects_malicious_input(self, identifier):
         with pytest.raises(ValueError, match="Invalid SQL identifier"):
-            _sanitize_identifier(identifier)
+            _check_identifier_safety(identifier)
 
     def test_write_to_table_rejects_invalid_column_mapping_mode(
         self, mock_spark_context, mock_source_df, mock_delta_table
@@ -472,3 +472,47 @@ class TestDeltaLoader:
                 mock_source_df,
                 column_mapping_mode="'; DROP TABLE evil --",
             )
+
+    @pytest.mark.parametrize(
+        "malicious_name",
+        ["'; DROP TABLE users --", "table; SELECT 1", "evil name", ""],
+    )
+    def test_load_table_rejects_malicious_table_name(
+        self, mock_spark_context, mock_source_df, mock_delta_table, malicious_name
+    ):
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        with pytest.raises(ValueError, match="Invalid SQL identifier"):
+            delta_loader.load_table(malicious_name, "some_path", mock_source_df)
+
+    @pytest.mark.parametrize(
+        "malicious_name",
+        ["'; VACUUM users --", "table; DROP TABLE evil", "bad name"],
+    )
+    def test_vacuum_table_rejects_malicious_table_name(
+        self, mock_spark_context, malicious_name
+    ):
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        with pytest.raises(ValueError, match="Invalid SQL identifier"):
+            delta_loader.vacuum_table(malicious_name, 24)
+
+    @pytest.mark.parametrize(
+        "malicious_name",
+        ["'; VACUUM users --", "table; DROP TABLE evil", "bad name"],
+    )
+    def test_vacuum_lite_table_rejects_malicious_table_name(
+        self, mock_spark_context, malicious_name
+    ):
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        with pytest.raises(ValueError, match="Invalid SQL identifier"):
+            delta_loader.vacuum_lite_table(malicious_name, 24)
+
+    @pytest.mark.parametrize(
+        "malicious_name",
+        ["'; OPTIMIZE evil --", "table; DROP TABLE foo", "bad name"],
+    )
+    def test_optimize_table_rejects_malicious_table_name(
+        self, mock_spark_context, malicious_name
+    ):
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        with pytest.raises(ValueError, match="Invalid SQL identifier"):
+            delta_loader.optimize_table(malicious_name)

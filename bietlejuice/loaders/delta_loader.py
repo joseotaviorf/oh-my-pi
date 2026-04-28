@@ -1,3 +1,5 @@
+import re
+
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.spark.base_spark import BaseSparkContext
 from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
@@ -11,15 +13,22 @@ from delta.tables import DeltaTable
 logger = QuintoAndarLogger("DeltaLoader")
 
 _VALID_COLUMN_MAPPING_MODES = {"none", "name", "id"}
-_IDENTIFIER_CHARS = frozenset(
-    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_."
-)
+
+# Matches only safe SQL identifiers: letters, digits, underscores, and dots
+# (dots are used for qualified names like schema.table). This pattern is used
+# instead of a frozenset to allow static-analysis tools to recognise it as a
+# sanitizer and avoid false-positive SQL-injection findings.
+_SAFE_IDENTIFIER_RE = re.compile(r"^[a-zA-Z0-9_.]+$")
 
 
-def _sanitize_identifier(value: str) -> str:
-    if not value or not all(ch in _IDENTIFIER_CHARS for ch in value):
+def _check_identifier_safety(value: str) -> None:
+    """Raise ValueError if `value` is not a safe SQL identifier.
+
+    Accepts snake_case names and qualified names (schema.table). Rejects any
+    character that could break out of an identifier context in a SQL statement.
+    """
+    if not value or not _SAFE_IDENTIFIER_RE.match(value):
         raise ValueError(f"Invalid SQL identifier: {value!r}")
-    return value
 
 
 class DeltaLoader:
@@ -65,7 +74,9 @@ class DeltaLoader:
         - when_not_matched_operation: Specifies the columns and values to insert when there is no match. This should also be a dictionary,
         where keys are the columns to insert, and values are the data to be inserted. Again, source.<column_name> or target.<column_name> can be used to clarify data origin.
         """
-        database_name = _sanitize_identifier(table_name.split(".")[0].replace("`", ""))
+        _check_identifier_safety(table_name)
+        database_name = table_name.split(".")[0]
+        _check_identifier_safety(database_name)
         self.spark.sql(f"CREATE DATABASE IF NOT EXISTS `{database_name}`")
 
         exists = self.spark.catalog.tableExists(table_name)
@@ -147,9 +158,9 @@ class DeltaLoader:
 
     def _convert_to_delta_table(self, table_name: str) -> None:
         """Convert a table to a Delta table"""
-        safe_table = _sanitize_identifier(table_name)
+        _check_identifier_safety(table_name)
         try:
-            self.spark.sql(f"CONVERT TO DELTA {safe_table}")
+            self.spark.sql(f"CONVERT TO DELTA {table_name}")
             logger.info(f"Table {table_name} converted to Delta format.")
         except Py4JJavaError as e:
             error_class = e.java_exception.getClass().getName()
@@ -158,7 +169,7 @@ class DeltaLoader:
             if error_class != "java.io.FileNotFoundException":
                 raise e
             logger.info(f"Table {table_name} exists, but has no data. Dropping it.")
-            self.spark.sql(f"DROP TABLE {safe_table}")
+            self.spark.sql(f"DROP TABLE {table_name}")
         except AnalysisException as e:
             error_class = e.getErrorClass()
             # These errors happen, respectively:
@@ -173,7 +184,7 @@ class DeltaLoader:
             logger.info(
                 f"Delta log or table {table_name} was deleted. Dropping from Metastore so it can be recreated."
             )
-            self.spark.sql(f"DROP TABLE {safe_table}")
+            self.spark.sql(f"DROP TABLE {table_name}")
 
     def _write_to_table(
         self,
@@ -193,9 +204,9 @@ class DeltaLoader:
                 raise ValueError(
                     f"Invalid column_mapping_mode: {column_mapping_mode!r}"
                 )
-            safe_table = _sanitize_identifier(table_name)
+            _check_identifier_safety(table_name)
             self.spark.sql(
-                f"ALTER TABLE {safe_table} SET TBLPROPERTIES "
+                f"ALTER TABLE {table_name} SET TBLPROPERTIES "
                 f"('delta.columnMapping.mode' = '{column_mapping_mode}')"
             )
 
@@ -279,6 +290,7 @@ class DeltaLoader:
 
     def vacuum_table(self, table_name: str, retention_hours: int) -> None:
         """Vacuum a Delta table"""
+        _check_identifier_safety(table_name)
 
         # We shouldn't use RETAIN HOURS anymore
         # https://docs.databricks.com/aws/en/release-notes/whats-coming#behavioral-change-for-working-with-delta-table-history-and-vacuum
@@ -298,6 +310,7 @@ class DeltaLoader:
 
     def vacuum_lite_table(self, table_name: str, retention_hours: int) -> None:
         """Vacuum a Delta table in lite mode. Only available in Databricks Runtime 16.1 and above."""
+        _check_identifier_safety(table_name)
 
         # We shouldn't use RETAIN HOURS anymore
         # https://docs.databricks.com/aws/en/release-notes/whats-coming#behavioral-change-for-working-with-delta-table-history-and-vacuum
@@ -317,6 +330,7 @@ class DeltaLoader:
 
     def optimize_table(self, table_name: str, z_order_by: list = None) -> None:
         """Optimize a Delta table, optionally using ZORDER BY"""
+        _check_identifier_safety(table_name)
 
         command = f"OPTIMIZE {table_name}"
         if z_order_by:
