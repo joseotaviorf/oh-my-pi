@@ -1,0 +1,60 @@
+database_name: datalake_oitchau_clean
+table_name: employee_costs
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Oitchau Integrations API POST costs/list segments per employee (hourly rate windows).
+  Raw rows are produced by api_ingestion fan-out on employees.externalId as employeeExternalId.
+columns:
+  id_cost_segment:
+    description: |
+      Stable UUID for one salary or hourly-rate window row returned by Oitchau costs/list.
+    lineage:
+      - datalake_oitchau_raw.employee_costs.uuid
+  id_employee_profile:
+    description: Oitchau user profile UUID for the employee tied to the cost segment.
+    lineage:
+      - datalake_oitchau_raw.employee_costs.userProfileUuid
+  id_company:
+    description: Oitchau company UUID for the tenant context of the cost segment.
+    lineage:
+      - datalake_oitchau_raw.employee_costs.companyUuid
+  id_employee_external:
+    description: |
+      Business employee external identifier (matricula) sent as employeeExternalId on ingest;
+      aligns with employees.externalId for joins to HR keys.
+    lineage:
+      - datalake_oitchau_raw.employee_costs.employeeExternalId
+  cost_segment_status:
+    description: Oitchau lifecycle status for the cost row (for example ACTIVE).
+    lineage:
+      - datalake_oitchau_raw.employee_costs.status
+  hourly_rate_amount:
+    description: |
+      Hourly rate amount in tenant currency for the effective period; compensation-related.
+    lineage:
+      - datalake_oitchau_raw.employee_costs.rate
+  dt_period_started:
+    description: First calendar day the rate window applies (Oitchau startDate, ISO date).
+    lineage:
+      - datalake_oitchau_raw.employee_costs.startDate
+  dt_period_ended:
+    description: Last calendar day the rate window applies (Oitchau endDate, ISO date).
+    lineage:
+      - datalake_oitchau_raw.employee_costs.endDate
+  ts_load:
+    description: Ingestion timestamp from the raw pipeline for ordering and deduplication.
+    lineage:
+      - datalake_oitchau_raw.employee_costs.ts_load
+  year:
+    description: Airflow ingestion partition year from the raw pipeline.
+    lineage:
+      - datalake_oitchau_raw.employee_costs.year
+  month:
+    description: Airflow ingestion partition month from the raw pipeline.
+    lineage:
+      - datalake_oitchau_raw.employee_costs.month
+  day:
+    description: Airflow ingestion partition day from the raw pipeline.
+    lineage:
+      - datalake_oitchau_raw.employee_costs.day
