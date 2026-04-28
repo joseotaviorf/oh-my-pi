@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# TODO: switch to sso_DataAndAnalyticsEMRUser_staff profile
-_WEEP_ROLE_FORNO_DEFAULT="${WEEP_ROLE_ARN_FORNO:-arn:aws:iam::713278628093:role/sso_DataAndAnalyticsEMRAdmin_staff}"
-_WEEP_ROLE_PROD_DEFAULT="${WEEP_ROLE_ARN_PROD:-arn:aws:iam::206390561754:role/sso_DataAndAnalyticsEMRAdmin_staff}"
+_WEEP_ROLE_FORNO_DEFAULT="${WEEP_ROLE_ARN_FORNO:-arn:aws:iam::713278628093:role/sso_DataAndAnalyticsEMRUser_staff}"
+_WEEP_ROLE_PROD_DEFAULT="${WEEP_ROLE_ARN_PROD:-arn:aws:iam::206390561754:role/sso_DataAndAnalyticsEMRUser_staff}"
 
 _emr_env_raw="${EMR_ENVIRONMENT:-prod}"
 _emr_env="$(printf '%s' "${_emr_env_raw}" | tr '[:upper:]' '[:lower:]' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
