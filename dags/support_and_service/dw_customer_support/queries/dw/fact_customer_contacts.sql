@@ -199,6 +199,7 @@ twilio_contacts AS (
   LEFT JOIN
     datalake_customer_support.tickets AS t3
       ON t3.id_session = d.id_session
+      AND t3.id_user_main = d.id_user
       AND d.channel = 'chat'
   LEFT JOIN
     chat_reservation_timestamp AS crt
