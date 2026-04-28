@@ -18,7 +18,7 @@ events_config:
 custom_cluster:
   driver_node_type_id: c5a.large
   node_type_id: c5a.large
-  num_workers: 1
+  num_workers: 2
   spark_version: 16.4.x-scala2.12
   spark_conf:
     spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
