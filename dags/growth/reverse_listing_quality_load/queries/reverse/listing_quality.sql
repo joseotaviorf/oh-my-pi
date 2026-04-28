@@ -264,27 +264,41 @@ FROM details_inspection a
     ) -- consolida as informações relacionadas à inspeção do restb e cria as regras de verificação, incluindo em todos os cenários que casos em que a data da inspeção vem antes da data da última publicação, será tratado como se não houvesse inspeção
 
 
-SELECT  DISTINCT
-    a.id_house as house_id, -- houseId
-    a.id_job as job_id, -- photo jobId
-    a.internal_admin_info as photographer_comment, -- commentPhotographer
-    c.link_video, -- videoLink
-    b.total_internal_images as num_internal_photos, -- numInternalPhotos
-    b.total_bathroom_images as num_bathroom_photos, -- numBathroomPhotos
-    b.images_per_room_from_house as images_per_room, -- imagesPerRoom
-    b.property_condition, -- propertyCondition
-    b.verificar_placa as has_plaque, -- hasPlaque
-    CASE
-        WHEN b.property_condition IS NULL THEN 0
-        WHEN (b.verificar_ai_score OR b.verificar_banheiro OR b.verificar_fotos_x_comodo) THEN 1
-        WHEN (NOT b.verificar_ai_score OR NOT b.verificar_banheiro OR NOT b.verificar_fotos_x_comodo) AND b.verificar_placa THEN 2
-        WHEN (NOT b.verificar_ai_score OR NOT b.verificar_banheiro OR NOT b.verificar_fotos_x_comodo) AND NOT b.verificar_placa THEN 3
-        END AS analyst_queue -- analystQueue
--- casos sem inspeção ou com inspeção inválida são identificados quando a coluna property_condition é nula e terão encaminhamento 0.
--- casos que sinalizam a necessidade de pelo menos uma das verificações de padrão (property_condition abaixo da nota de corte, sem foto de banheiro ou média de fotos por cômodo abaixo do esperado) terão encaminhamento 1.
--- casos sem sinalização de necessidade de verificação de padrão, mas com placa identificada pelo restb, terão encaminhamento 2.
--- casos sem sinalização de necessidade de verificação de padrão e sem placa identificada pelo restb, terão encaminhamento 3.
-FROM ims_details a
-         LEFT JOIN base_formatada_kodak b ON (a.id_house = b.id_house)
-         LEFT JOIN videos c ON (c.id_external_domain = a.id_house)
-ORDER BY analyst_queue ASC, property_condition ASC
+SELECT
+    cast(uuid() AS varchar) AS uuid_listing_quality,
+    t.house_id,
+    t.job_id,
+    t.photographer_comment,
+    t.link_video,
+    t.num_internal_photos,
+    t.num_bathroom_photos,
+    t.images_per_room,
+    t.property_condition,
+    t.has_plaque,
+    t.analyst_queue
+FROM (
+    SELECT DISTINCT
+        a.id_house AS house_id, -- houseId
+        a.id_job AS job_id, -- photo jobId
+        a.internal_admin_info AS photographer_comment, -- commentPhotographer
+        c.link_video, -- videoLink
+        b.total_internal_images AS num_internal_photos, -- numInternalPhotos
+        b.total_bathroom_images AS num_bathroom_photos, -- numBathroomPhotos
+        b.images_per_room_from_house AS images_per_room, -- imagesPerRoom
+        b.property_condition, -- propertyCondition
+        b.verificar_placa AS has_plaque, -- hasPlaque
+        CASE
+            WHEN b.property_condition IS NULL THEN 0
+            WHEN (b.verificar_ai_score OR b.verificar_banheiro OR b.verificar_fotos_x_comodo) THEN 1
+            WHEN (NOT b.verificar_ai_score OR NOT b.verificar_banheiro OR NOT b.verificar_fotos_x_comodo) AND b.verificar_placa THEN 2
+            WHEN (NOT b.verificar_ai_score OR NOT b.verificar_banheiro OR NOT b.verificar_fotos_x_comodo) AND NOT b.verificar_placa THEN 3
+            END AS analyst_queue -- analystQueue
+    -- casos sem inspeção ou com inspeção inválida são identificados quando a coluna property_condition é nula e terão encaminhamento 0.
+    -- casos que sinalizam a necessidade de pelo menos uma das verificações de padrão (property_condition abaixo da nota de corte, sem foto de banheiro ou média de fotos por cômodo abaixo do esperado) terão encaminhamento 1.
+    -- casos sem sinalização de necessidade de verificação de padrão, mas com placa identificada pelo restb, terão encaminhamento 2.
+    -- casos sem sinalização de necessidade de verificação de padrão e sem placa identificada pelo restb, terão encaminhamento 3.
+    FROM ims_details a
+        LEFT JOIN base_formatada_kodak b ON (a.id_house = b.id_house)
+        LEFT JOIN videos c ON (c.id_external_domain = a.id_house)
+) t
+ORDER BY t.analyst_queue ASC, t.property_condition ASC

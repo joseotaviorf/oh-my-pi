@@ -34,6 +34,7 @@ def parse_arguments() -> Tuple[str, str, str]:
 def row_to_message(row: Any) -> Dict[str, Any]:
     """Transform a listing_quality row to the payload expected by main-sqs-consumers."""
     return {
+        "uuidListingQuality": safe_cast(row.uuid_listing_quality, str),
         "houseId": safe_cast(row.house_id, int),
         "jobId": safe_cast(row.job_id, int),
         "commentPhotographer": safe_cast(row.photographer_comment, str),
