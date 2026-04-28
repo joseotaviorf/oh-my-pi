@@ -41,3 +41,5 @@ columns:
     lineage:
       - datalake_tiers.metric_period.dt_end
     description: End date of the metric period window.
+  dt_last_processing:
+    description: Date on which this record was last written by the pipeline (CURRENT_DATE at job execution time).

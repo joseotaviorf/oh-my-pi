@@ -22,7 +22,8 @@ simple_metrics AS (
         COUNT(DISTINCT me.id_external_domain) AS value,
         me.is_valid,
         mp.dt_metric_period_started,
-        mp.dt_metric_period_ended
+        mp.dt_metric_period_ended,
+        CURRENT_DATE AS dt_last_processing
     FROM
         datalake_tiers.metric_events AS me
     JOIN
@@ -43,7 +44,8 @@ cumulative_metrics AS (
         SUM(COALESCE(me.cumulative_value, 0)) AS value,
         me.is_valid,
         mp.dt_metric_period_started,
-        mp.dt_metric_period_ended
+        mp.dt_metric_period_ended,
+        CURRENT_DATE AS dt_last_processing
     FROM
         datalake_tiers.metric_events AS me
     JOIN
@@ -90,7 +92,8 @@ BP2CCV_compound_metric AS (
         END AS value,
         cm.is_valid,
         cm.dt_metric_period_started,
-        cm.dt_metric_period_ended
+        cm.dt_metric_period_ended,
+        CURRENT_DATE AS dt_last_processing
     FROM
         compound_metrics AS cm
     LEFT JOIN
@@ -117,7 +120,8 @@ TP2CS_compound_metric AS (
         END AS value,
         cm.is_valid,
         cm.dt_metric_period_started,
-        cm.dt_metric_period_ended
+        cm.dt_metric_period_ended,
+        CURRENT_DATE AS dt_last_processing
     FROM
         compound_metrics AS cm
     LEFT JOIN
@@ -144,7 +148,8 @@ OS2CCV_BY_compound_metric AS (
         END AS value,
         cm.is_valid,
         cm.dt_metric_period_started,
-        cm.dt_metric_period_ended
+        cm.dt_metric_period_ended,
+        CURRENT_DATE AS dt_last_processing
     FROM
         compound_metrics AS cm
     LEFT JOIN
@@ -158,12 +163,67 @@ OS2CCV_BY_compound_metric AS (
         AND cm.metric = "OS2CCV_BY"
     GROUP BY ALL
 )
-SELECT * FROM simple_metrics
+SELECT
+    id_user,
+    id_agent,
+    uuid_person,
+    id_metric_period,
+    metric,
+    value,
+    is_valid,
+    dt_metric_period_started,
+    dt_metric_period_ended,
+    dt_last_processing
+FROM simple_metrics
 UNION ALL
-SELECT * FROM cumulative_metrics
+SELECT
+    id_user,
+    id_agent,
+    uuid_person,
+    id_metric_period,
+    metric,
+    value,
+    is_valid,
+    dt_metric_period_started,
+    dt_metric_period_ended,
+    dt_last_processing
+FROM cumulative_metrics
 UNION ALL
-SELECT * FROM BP2CCV_compound_metric
+SELECT
+    id_user,
+    id_agent,
+    uuid_person,
+    id_metric_period,
+    metric,
+    value,
+    is_valid,
+    dt_metric_period_started,
+    dt_metric_period_ended,
+    dt_last_processing
+FROM BP2CCV_compound_metric
 UNION ALL
-SELECT * FROM TP2CS_compound_metric
+SELECT
+    id_user,
+    id_agent,
+    uuid_person,
+    id_metric_period,
+    metric,
+    value,
+    is_valid,
+    dt_metric_period_started,
+    dt_metric_period_ended,
+    dt_last_processing
+FROM TP2CS_compound_metric
 UNION ALL
-SELECT * FROM OS2CCV_BY_compound_metric
+SELECT
+    id_user,
+    id_agent,
+    uuid_person,
+    id_metric_period,
+    metric,
+    value,
+    is_valid,
+    dt_metric_period_started,
+    dt_metric_period_ended,
+    dt_last_processing
+FROM OS2CCV_BY_compound_metric
