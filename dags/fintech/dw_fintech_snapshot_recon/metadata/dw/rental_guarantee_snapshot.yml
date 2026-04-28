@@ -1,0 +1,51 @@
+---
+database_name: dw_fintech_snapshot_recon
+table_name: rental_guarantee_snapshot
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Monthly snapshot of rental guarantee microservice guarantee rows joined to clean guarantee for payment recurrence, for finance reconciliation."
+columns:
+  id:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.id
+    description: "Primary identifier of the guarantee record in the rental guarantee service."
+  id_contract_ebdb:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.id_contract_ebdb
+    description: "EBDB contract identifier associated with the guarantee."
+  guarantee_type:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.guarantee_type
+    description: "Type of guarantee product or modality from the rental guarantee platform."
+  payment_recurrence:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.payment_recurrence
+    description: "Payment recurrence from cleaned guarantee table when available."
+  guarantee_status:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.guarantee_status
+    description: "Current status of the guarantee in the rental guarantee platform."
+  ts_started:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.ts_started
+    description: "Timestamp when the guarantee coverage starts."
+  ts_cancellation_requested:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.ts_cancellation_requested
+    description: "Timestamp when cancellation was requested for the guarantee."
+  ts_paid:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.ts_paid
+    description: "Timestamp when the guarantee was marked paid."
+  ts_expired:
+    lineage:
+      - datalake_rental_guarantee_clean.guarantee.ts_expired
+    description: "Timestamp when the guarantee expires or expired."
+  ts_snapshot:
+    description: "Timestamp when the snapshot job ran (NOW)."
+  year:
+    description: "Year of CURRENT_DATE when the snapshot was taken."
+  month:
+    description: "Month of CURRENT_DATE when the snapshot was taken."
+  day:
+    description: "Day of CURRENT_DATE when the snapshot was taken."

@@ -705,6 +705,27 @@ bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice:first-run-of-day
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries:first-run-of-day
   - bietlejuice.enrich_bank_conciliation:load-enrich-for-sale-cashin:first-run-of-day
+bietlejuice.dw_fintech_snapshot_recon:
+  - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
+  - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry:first-run-of-day
+  - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries:first-run-of-day
+  - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
+  - bietlejuice.dw_listing_temp:load-dw-public-fact-house-listings:first-run-of-day
+  - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+  - bietlejuice.ebdb_contract:load-clean-contract-person:first-run-of-day
+  - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
+  - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
+  - bietlejuice.enrich_accounting_funnel:load-enrich-cap-union-invoice:first-run-of-day
+  - bietlejuice.enrich_accounting_funnel:load-enrich-for-rent-contract-brokerage:first-run-of-day
+  - bietlejuice.enrich_accounting_funnel:load-enrich-invoice-all:first-run-of-day
+  - bietlejuice.enrich_rental_guarantee:load-enrich-guarantee:first-run-of-day
+  - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry:first-run-of-day
+  - bietlejuice.gsheets_fintech:done-clean-cod-locale:first-run-of-day
+  - bietlejuice.rental_guarantee:load-clean-guarantee:first-run-of-day
+  - bietlejuice.retsuko_fast_lane:load-clean-contract:first-run-of-day
+  - bietlejuice.robin_hood:load-clean-accounting-entry-balance:first-run-of-day
+  - bietlejuice.robin_hood:load-clean-accounting-entry-source:first-run-of-day
+  - bietlejuice.robin_hood:load-clean-payment-request:first-run-of-day
 bietlejuice.dw_fintech_snapshot_quintocred:
   - bietlejuice.dw_charging_payment_quintocred:load-dw-charging-payment-quintocred-fact-payment-full:first-run-of-day
   - bietlejuice.dw_charging_payment_quintocred:load-dw-charging-payment-quintocred-fact-propose-timeline:first-run-of-day

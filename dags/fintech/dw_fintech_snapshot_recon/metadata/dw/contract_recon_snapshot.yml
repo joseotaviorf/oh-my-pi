@@ -1,0 +1,152 @@
+---
+database_name: dw_fintech_snapshot_recon
+table_name: contract_recon_snapshot
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Monthly snapshot of contract attributes used for accounting funnel reconciliation (Brazil FullService active/finished contracts), aligned with enrich contract logic."
+columns:
+  sk_contract:
+    lineage:
+      - dw_rent.dim_contract.sk_contract
+    description: "Surrogate key of the contract in the rent data warehouse."
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.contract.id_house
+    description: "House identifier from EBDB contract linked to the DW contract."
+  locale:
+    lineage:
+      - dw_public.dim_region.city_name
+    description: "City name from listing, invoice-derived region, or house region (coalesced)."
+  localidade:
+    lineage:
+      - datalake_gsheets_clean.cod_locale.id_locale
+    description: "Locale identifier from cod_locale sheet matched to coalesced city name."
+  status:
+    lineage:
+      - dw_rent.dim_contract.status
+    description: "Contract lifecycle status from dim_contract (filtered to Ativo/Finalizado)."
+  version:
+    lineage:
+      - dw_rent.dim_contract.version
+    description: "Contract product version string from dim_contract."
+  guarantee:
+    lineage:
+      - dw_rent.dim_contract.guarantee
+    description: "Guarantee type or insurer associated with the contract."
+  is_contract_b2b:
+    lineage:
+      - dw_rent.dim_contract.is_contract_b2b
+    description: "Whether the contract is a B2B or partner-shared arrangement."
+  is_rental_paid_in_advance:
+    lineage:
+      - datalake_retsuko_clean.contract.is_rental_paid_in_advance
+    description: "Whether rent is paid in advance per Retsuko contract enrichment."
+  rental_administrator:
+    lineage:
+      - dw_rent.dim_contract.rental_administrator
+    description: "Party responsible for rental administration (e.g. QuintoAndar or owner)."
+  dt_start:
+    lineage:
+      - dw_rent.dim_contract.dt_start
+    description: "Contract start date from dim_contract."
+  contract_annulment:
+    lineage:
+      - datalake_ebdb_clean.contract.dt_termination
+    description: "Contract annulment or termination date from EBDB clean contract."
+  dt_intended_end:
+    lineage:
+      - dw_rent.dim_contract.dt_intended_end
+    description: "Intended end date of the contract from dim_contract."
+  ended_before_started:
+    lineage:
+      - dw_rent.dim_contract.dt_start
+      - datalake_ebdb_clean.contract.dt_termination
+    description: "True when start date is after termination date and termination is set."
+  rent:
+    lineage:
+      - dw_rent.dim_contract.rent
+    description: "Monthly rent amount from dim_contract."
+  iptu:
+    lineage:
+      - dw_rent.dim_contract.iptu
+    description: "IPTU amount from dim_contract."
+  condo:
+    lineage:
+      - dw_rent.dim_contract.condo
+    description: "Condominium fee amount from dim_contract."
+  home_insurance_value:
+    lineage:
+      - dw_rent.dim_contract.home_insurance_value
+    description: "Home insurance value from dim_contract."
+  monthly_administration_fee:
+    lineage:
+      - dw_rent.dim_contract.monthly_administration_fee
+    description: "Monthly administration fee from dim_contract."
+  tenant_service_fee:
+    lineage:
+      - dw_rent.dim_contract.tenant_service_fee
+    description: "Tenant service fee from dim_contract."
+  condo_payer:
+    lineage:
+      - dw_rent.dim_contract.condo_payer
+    description: "Party responsible for paying condominium charges."
+  iptu_payer:
+    lineage:
+      - dw_rent.dim_contract.iptu_payer
+    description: "Party responsible for paying IPTU."
+  first_rent_charged:
+    lineage:
+      - dw_rent.dim_contract.first_rent_charged
+    description: "First rent charged configuration from dim_contract."
+  "5A_brokerage_amount":
+    lineage:
+      - "datalake_accounting_funnel.for_rent_contract_brokerage.5A_brokerage_amount"
+    description: "QuintoAndar brokerage amount from accounting funnel contract brokerage table."
+  agent_brokerage_amount:
+    lineage:
+      - datalake_accounting_funnel.for_rent_contract_brokerage.agent_brokerage_amount
+    description: "Agent brokerage amount from for_rent_contract_brokerage."
+  ciq_brokerage_amount:
+    lineage:
+      - datalake_accounting_funnel.for_rent_contract_brokerage.ciq_brokerage_amount
+    description: "CIQ brokerage amount from for_rent_contract_brokerage."
+  select_brokerage_amount:
+    lineage:
+      - datalake_accounting_funnel.for_rent_contract_brokerage.select_brokerage_amount
+    description: "Select brokerage amount from for_rent_contract_brokerage."
+  "3p_brokerage_amount":
+    lineage:
+      - "datalake_accounting_funnel.for_rent_contract_brokerage.3p_brokerage_amount"
+    description: "Third-party brokerage amount from for_rent_contract_brokerage."
+  "5A_brokerage_share":
+    lineage:
+      - "datalake_accounting_funnel.for_rent_contract_brokerage.5A_brokerage_share"
+    description: "QuintoAndar brokerage share from for_rent_contract_brokerage."
+  agent_brokerage_share:
+    lineage:
+      - datalake_accounting_funnel.for_rent_contract_brokerage.agent_brokerage_share
+    description: "Agent brokerage share from for_rent_contract_brokerage."
+  ciq_brokerage_share:
+    lineage:
+      - datalake_accounting_funnel.for_rent_contract_brokerage.ciq_brokerage_share
+    description: "CIQ brokerage share from for_rent_contract_brokerage."
+  select_brokerage_share:
+    lineage:
+      - datalake_accounting_funnel.for_rent_contract_brokerage.select_brokerage_share
+    description: "Select brokerage share from for_rent_contract_brokerage."
+  "3p_brokerage_share":
+    lineage:
+      - "datalake_accounting_funnel.for_rent_contract_brokerage.3p_brokerage_share"
+    description: "Third-party brokerage share from for_rent_contract_brokerage."
+  contract_type:
+    lineage:
+      - datalake_ebdb_clean.contract_person.cpf
+    description: "PJ when CPF length is 18 in contract_person, otherwise PF (aggregated per contract)."
+  ts_snapshot:
+    description: "Timestamp when the snapshot job ran (NOW)."
+  year:
+    description: "Year of CURRENT_DATE when the snapshot was taken."
+  month:
+    description: "Month of CURRENT_DATE when the snapshot was taken."
+  day:
+    description: "Day of CURRENT_DATE when the snapshot was taken."

@@ -1,0 +1,54 @@
+---
+database_name: dw_fintech_snapshot_recon
+table_name: robin_hood_accounting_entry_snapshot
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Monthly snapshot of Robin Hood accounting entries for selected brokerage-related sources, enriched with contract and locale context for reconciliation."
+columns:
+  id_accounting_entry:
+    lineage:
+      - datalake_robin_hood.accounting_entry.id
+    description: "Primary identifier of the accounting entry in Robin Hood."
+  sk_contract:
+    lineage:
+      - datalake_robin_hood.accounting_entry.id_contract
+      - datalake_robin_hood.accounting_entry.description
+    description: "Contract key parsed from id_contract or numeric digits in entry description."
+  bill_item:
+    lineage:
+      - datalake_robin_hood.accounting_entry.source_bill_item
+    description: "Normalized bill item label derived from Robin Hood source_bill_item."
+  description:
+    description: "Fixed description label for Robin Hood broker corridor rows in this snapshot."
+  due_amount:
+    lineage:
+      - datalake_robin_hood.accounting_entry.due_amount
+    description: "Due amount on the accounting entry."
+  accrual_year_month:
+    lineage:
+      - datalake_robin_hood.accounting_entry.accrual_year_month
+    description: "Accrual year-month of the accounting entry."
+  invoice_paid_date:
+    lineage:
+      - datalake_robin_hood_clean.payment_request.dt_paid
+    description: "Payment date from linked payment request when available."
+  status:
+    lineage:
+      - datalake_robin_hood_clean.payment_request.status
+    description: "Status from payment request linked via accounting entry balance."
+  type:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry_source.source_name
+    description: "Robin Hood accounting entry source name (filtered brokerage-related sources)."
+  entry_created_date:
+    lineage:
+      - datalake_robin_hood.accounting_entry.ts_created
+    description: "Calendar date of accounting entry creation in Robin Hood."
+  ts_snapshot:
+    description: "Timestamp when the snapshot job ran (NOW)."
+  year:
+    description: "Year of CURRENT_DATE when the snapshot was taken."
+  month:
+    description: "Month of CURRENT_DATE when the snapshot was taken."
+  day:
+    description: "Day of CURRENT_DATE when the snapshot was taken."
