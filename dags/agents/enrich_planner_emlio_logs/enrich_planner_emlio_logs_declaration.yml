@@ -1,0 +1,33 @@
+dag:
+  name: enrich_planner_emlio_logs
+  schedule_start_date: 2026, 4, 22
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      Enrich tables for the planner emlio logs dataset.
+      Builds curated_agents_planner layer tables from clean/enrich sources.
+
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: curated_agents_planner
+  default_extraction_type: incremental
+  default_partitions: []
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+  tables_customization:
+    planner_emlio_logs:
+      load_spark_job: load_planner_emlio_logs
+
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new_env

@@ -21,14 +21,20 @@ _VALID_COLUMN_MAPPING_MODES = {"none", "name", "id"}
 _SAFE_IDENTIFIER_RE = re.compile(r"^[a-zA-Z0-9_.]+$")
 
 
-def _check_identifier_safety(value: str) -> None:
-    """Raise ValueError if `value` is not a safe SQL identifier.
+def _check_identifier_safety(value: str) -> str:
+    """Return `value` if it is a safe SQL identifier, else raise ValueError.
 
     Accepts snake_case names and qualified names (schema.table). Rejects any
     character that could break out of an identifier context in a SQL statement.
+
+    Returning the validated value (rather than being void) is intentional: SAST
+    tools break the taint chain only when the value used in SQL is the *return*
+    of a validation function, not when a void guard is called before the
+    original variable is reused.
     """
     if not value or not _SAFE_IDENTIFIER_RE.match(value):
         raise ValueError(f"Invalid SQL identifier: {value!r}")
+    return value
 
 
 class DeltaLoader:
@@ -74,9 +80,8 @@ class DeltaLoader:
         - when_not_matched_operation: Specifies the columns and values to insert when there is no match. This should also be a dictionary,
         where keys are the columns to insert, and values are the data to be inserted. Again, source.<column_name> or target.<column_name> can be used to clarify data origin.
         """
-        _check_identifier_safety(table_name)
-        database_name = table_name.split(".")[0]
-        _check_identifier_safety(database_name)
+        table_name = _check_identifier_safety(table_name)
+        database_name = _check_identifier_safety(table_name.split(".")[0])
         self.spark.sql(f"CREATE DATABASE IF NOT EXISTS `{database_name}`")
 
         exists = self.spark.catalog.tableExists(table_name)
@@ -158,7 +163,7 @@ class DeltaLoader:
 
     def _convert_to_delta_table(self, table_name: str) -> None:
         """Convert a table to a Delta table"""
-        _check_identifier_safety(table_name)
+        table_name = _check_identifier_safety(table_name)
         try:
             self.spark.sql(f"CONVERT TO DELTA {table_name}")
             logger.info(f"Table {table_name} converted to Delta format.")
@@ -204,7 +209,7 @@ class DeltaLoader:
                 raise ValueError(
                     f"Invalid column_mapping_mode: {column_mapping_mode!r}"
                 )
-            _check_identifier_safety(table_name)
+            table_name = _check_identifier_safety(table_name)
             self.spark.sql(
                 f"ALTER TABLE {table_name} SET TBLPROPERTIES "
                 f"('delta.columnMapping.mode' = '{column_mapping_mode}')"
@@ -251,8 +256,9 @@ class DeltaLoader:
         self.spark.conf.set("spark.databricks.delta.schema.autoMerge.enabled", "true")
 
         target_table = DeltaTable.forName(self.spark, table_name)
+        merge_keys = [_check_identifier_safety(col) for col in merge_on]
         join_condition = " AND ".join(
-            [f"source.{col} = target.{col}" for col in merge_on]
+            [f"source.{col} = target.{col}" for col in merge_keys]
         )
         merge_builder = target_table.alias("target").merge(
             source_df.alias("source"), join_condition
@@ -290,7 +296,7 @@ class DeltaLoader:
 
     def vacuum_table(self, table_name: str, retention_hours: int) -> None:
         """Vacuum a Delta table"""
-        _check_identifier_safety(table_name)
+        table_name = _check_identifier_safety(table_name)
 
         # We shouldn't use RETAIN HOURS anymore
         # https://docs.databricks.com/aws/en/release-notes/whats-coming#behavioral-change-for-working-with-delta-table-history-and-vacuum
@@ -310,7 +316,7 @@ class DeltaLoader:
 
     def vacuum_lite_table(self, table_name: str, retention_hours: int) -> None:
         """Vacuum a Delta table in lite mode. Only available in Databricks Runtime 16.1 and above."""
-        _check_identifier_safety(table_name)
+        table_name = _check_identifier_safety(table_name)
 
         # We shouldn't use RETAIN HOURS anymore
         # https://docs.databricks.com/aws/en/release-notes/whats-coming#behavioral-change-for-working-with-delta-table-history-and-vacuum
@@ -330,11 +336,12 @@ class DeltaLoader:
 
     def optimize_table(self, table_name: str, z_order_by: list = None) -> None:
         """Optimize a Delta table, optionally using ZORDER BY"""
-        _check_identifier_safety(table_name)
+        table_name = _check_identifier_safety(table_name)
 
         command = f"OPTIMIZE {table_name}"
         if z_order_by:
-            command += f" ZORDER BY {','.join(z_order_by)}"
+            z_cols = [_check_identifier_safety(c) for c in z_order_by]
+            command += f" ZORDER BY {','.join(z_cols)}"
         logger.info(f"Running optimize with command {command}")
         self.spark.sql(command)
         logger.info(f"Optimize successful for table {table_name}")

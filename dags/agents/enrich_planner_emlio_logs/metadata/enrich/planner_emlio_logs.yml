@@ -1,0 +1,94 @@
+---
+database_name: datalake_curated_agents_planner
+table_name: planner_emlio_logs
+description: |
+  Curated enrich table for planner-ml-service logs. One row per unique log event
+  (uuid + ts_log). Extracts structured input request fields and output ranking
+  fields from JSON payloads, enabling analysis of agent ranking decisions.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  uuid:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.uuid
+    description: Unique identifier of the log event emitted by planner-ml-service.
+  service_version:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.service_version
+    description: Version of the planner-ml-service that generated the log entry.
+  ts_log:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.ts_log
+    description: Timestamp at which the planner-ml-service emitted the log event.
+  response_type:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: Top-level key in the outputs JSON that identifies the response envelope (e.g. shadow_mode_response).
+  business_context:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+    description: Business context of the ranking request, uppercased (e.g. FOR_RENT, FOR_SALE).
+  id_house:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+    description: Identifier of the house for which agent ranking was requested.
+  id_prospect:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+    description: Identifier of the prospect associated with the ranking request.
+  id_region:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+    description: Identifier of the region associated with the ranking request.
+  list_agent_service_available:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+    description: Ordered list of agent IDs available for ranking according to the service input.
+  force_group:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+    description: Group override passed by the caller to force a specific agent group selection.
+  override_groups:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+    description: List of group overrides passed by the caller to restrict agent group selection.
+  debug_mode:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+    description: Flag indicating whether the ranking request was made in debug mode.
+  list_agent_ml_ranking:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: Ordered list of agent IDs as ranked by the ML model in the service response.
+  group:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: Agent group selected by the planner-ml-service for this request.
+  strategy_type_used:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: Strategy type applied by the planner-ml-service to produce the ranking (e.g. ml, random).
+  ranked_agents_count:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: Number of agents that were ranked by the service in this request.
+  metrics_calculate_ranking:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: JSON map of public ranking strategy scores used to calculate the final agent order.
+  first_agent_ml_ranking:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+    description: Agent ID ranked first by the ML model in list_agent_ml_ranking.
+  year:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.year
+    description: Partition year extracted from the log event timestamp.
+  month:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.month
+    description: Partition month extracted from the log event timestamp.
+  day:
+    lineage:
+      - datalake_emlio_clean.emlio_logs.day
+    description: Partition day extracted from the log event timestamp.
