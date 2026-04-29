@@ -1,0 +1,64 @@
+---
+database_name: datalake_oitchau_clean
+table_name: reports_detailed
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Oitchau Integrations API GET reports/detailed: consolidated per-employee time and payroll-related
+  aggregates for the requested calendar window (from/to). Each row is one employee profile ×
+  report period; nested metrics are stored as JSON strings for downstream parsing or DW modeling.
+columns:
+  id_employee_profile:
+    description: |
+      Oitchau employee profile UUID (same as employees.uuid), stamped as employeeUuid on the raw
+      fan-out request for joins to employees and dw_time.
+    lineage:
+      - datalake_oitchau_raw.reports_detailed.payload
+  report_status:
+    description: |
+      Plain string from Oitchau metadata.status: computation status for the report payload (for example
+      completed). Extracted via get_json_object from the payload, not a serialized JSON object.
+    lineage:
+      - datalake_oitchau_raw.reports_detailed.payload
+  report_hash:
+    description: |
+      Plain string from Oitchau metadata.hash: content fingerprint for change detection between reloads
+      of the same employee and period. Extracted via get_json_object, not a serialized JSON object.
+    lineage:
+      - datalake_oitchau_raw.reports_detailed.payload
+  dt_report_period_started:
+    description: First calendar day of the detailed report window from Oitchau metadata.startDate (ISO).
+    lineage:
+      - datalake_oitchau_raw.reports_detailed.payload
+  dt_report_period_ended:
+    description: Last calendar day of the detailed report window from Oitchau metadata.endDate (ISO).
+    lineage:
+      - datalake_oitchau_raw.reports_detailed.payload
+  ts_load:
+    description: Ingestion timestamp from the raw pipeline for ordering and deduplication.
+    lineage:
+      - datalake_oitchau_raw.reports_detailed.ts_load
+  detailed_report_content:
+    description: |
+      JSON string of the reports/detailed content object (totals, phases, DSR-related fields, and other
+      consolidated measures). Use for analytics not covered by punches or hoursbank_totals alone.
+    lineage:
+      - datalake_oitchau_raw.reports_detailed.payload
+  detailed_report_metadata:
+    description: |
+      JSON string of the reports/detailed metadata object (period boundaries, active phases, shift keys,
+      lastUpdatedAt). Pairs with detailed_report_content for full API fidelity.
+    lineage:
+      - datalake_oitchau_raw.reports_detailed.payload
+  year:
+    description: Airflow ingestion partition year from the raw pipeline.
+    lineage:
+      - datalake_oitchau_raw.reports_detailed.year
+  month:
+    description: Airflow ingestion partition month from the raw pipeline.
+    lineage:
+      - datalake_oitchau_raw.reports_detailed.month
+  day:
+    description: Airflow ingestion partition day from the raw pipeline.
+    lineage:
+      - datalake_oitchau_raw.reports_detailed.day
