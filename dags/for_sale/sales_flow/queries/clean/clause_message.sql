@@ -9,6 +9,7 @@ SELECT
     variables,
     is_negotiation_clause,
     clause_identifier,
+    notary_complexity,
     TIMESTAMP(created_at) AS ts_created,
     TIMESTAMP(updated_at) AS ts_updated,
     year,
@@ -16,4 +17,3 @@ SELECT
     day
 FROM
    datalake_sales_flow_raw.clause_message
-

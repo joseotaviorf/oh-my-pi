@@ -22,6 +22,14 @@ columns:
     description: 'Flag indicating whether the seller has completed onboarding.'
     lineage:
       - datalake_sales_flow_raw.backoffice_journey_status.is_seller_onboarded
+  is_buyer_eligible_for_chatbot:
+    description: 'Flag indicating whether the buyer is eligible to interact via chatbot.'
+    lineage:
+      - datalake_sales_flow_raw.backoffice_journey_status.is_buyer_eligible_for_chatbot
+  is_seller_eligible_for_chatbot:
+    description: 'Flag indicating whether the seller is eligible to interact via chatbot.'
+    lineage:
+      - datalake_sales_flow_raw.backoffice_journey_status.is_seller_eligible_for_chatbot
   ts_buyer_onboarding_concluded:
     description: 'Timestamp when the buyer completed the onboarding process.'
     lineage:

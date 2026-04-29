@@ -45,6 +45,10 @@ columns:
     description: A unique identifier for the clause.
     lineage:
       - datalake_sales_flow_raw.clause_message.clause_identifier
+  notary_complexity:
+    description: Indicates the complexity level of the notary process for this clause.
+    lineage:
+      - datalake_sales_flow_raw.clause_message.notary_complexity
   ts_created:
     description: Timestamp of when the clause message was created.
     lineage:
