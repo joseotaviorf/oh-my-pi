@@ -14,6 +14,7 @@ SELECT
     level,
     usage_details,
     cost_details,
+    latency,
     CAST(start_time AS TIMESTAMP) AS ts_started,
     CAST(end_time AS TIMESTAMP) AS ts_ended,
     year,

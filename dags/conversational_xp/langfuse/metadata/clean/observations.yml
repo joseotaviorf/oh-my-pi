@@ -64,6 +64,10 @@ columns:
     description: cost information for the observation
     lineage:
       - datalake_langfuse_raw.observations.cost_details
+  latency:
+    description: elapsed time for the observation (for example model call duration)
+    lineage:
+      - datalake_langfuse_raw.observations.latency
   ts_started:
     description: timestamp when the observation started
     lineage:
