@@ -3066,7 +3066,6 @@ bietlejuice.enrich_marketing_costs_offline:
   - bietlejuice.gsheets_growth:done-clean-marketing-offline-manual-share-city-group:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-marketing-offline-manual-share-cost-center:first-run-of-day
 bietlejuice.enrich_marketing_costs_sharing_rules:
-  - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-fact-house-listings:first-run-of-day
   - bietlejuice.dw_offer:load-dw-rent-dim-offer:first-run-of-day

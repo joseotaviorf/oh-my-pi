@@ -5,7 +5,7 @@ WITH
 rent_flow_client_info AS (
     SELECT DISTINCT
         COALESCE(house.id_region, -1) AS sk_region,
-        COALESCE(rent_flow.id_booking, -1) AS sk_booking,
+        COALESCE(rent_flow.id_visit, -1) AS sk_visit,
         COALESCE(dim_offer.sk_offer, -1) AS sk_offer,
         COALESCE(rent_flow.id_client, -1) AS sk_client
     FROM
@@ -21,9 +21,9 @@ rent_flow_client_info AS (
     ON
         dim_house_listing.id_house = house.id
     LEFT JOIN
-        dw_public.dim_booking
+        datalake_visit.visits
     ON
-        dim_booking.sk_booking = rent_flow.id_booking
+        visits.id_visit = rent_flow.id_visit
     LEFT JOIN
         dw_rent.dim_offer
     ON
@@ -32,9 +32,27 @@ rent_flow_client_info AS (
     WHERE
         dim_house_listing.is_for_rent
         AND (
-            COALESCE(dim_booking.visit_intent, '') <> 'SALE'
-            OR (dim_booking.visit_intent = 'SALE' AND rent_flow.id_contract IS NOT NULL)
+            COALESCE(visits.business_context, '') <> 'SALE'
+            OR (visits.business_context = 'SALE' AND rent_flow.id_contract IS NOT NULL)
         )
+),
+cross_channel AS (
+	SELECT
+		visit_code,
+		event_name,
+		final_attribution_app_type,
+		final_attribution_media_source,
+		final_attribution_source,
+		final_attribution_medium,
+		final_attribution_campaign,
+		final_attribution_content,
+		final_attribution_term,
+		final_attribution_branded,
+		final_attribution_origin
+  	FROM
+    	datalake_tracked_events.attribution_cross_channel
+	QUALIFY
+		ROW_NUMBER() OVER (PARTITION BY visit_code ORDER BY ts_event DESC) = 1
 ),
 -----------------------------------------------------------
 -- Query bookings, offers and talk to agent full history --
@@ -43,18 +61,22 @@ tenant_prospect_events AS (
 	SELECT
 		lrf.sk_client,
 		lrf.sk_region,
-		dbk.utm_campaign,
-		dbk.dt_created AS ts_interaction
+		IF(acc.visit_code IS NOT NULL, acc.final_attribution_campaign, src.utm_campaign) AS utm_campaign,
+		v.ts_created AS ts_interaction
 	FROM
-		dw_public.dim_booking AS dbk
+		datalake_visit.visits AS v
 	INNER JOIN
         rent_flow_client_info AS lrf
-        	USING(sk_booking)
+			ON v.id_visit = lrf.sk_visit
+	LEFT JOIN
+    	datalake_amplitude_visit.amplitude_visit AS src
+        	ON v.code = src.id_visit
+	LEFT JOIN
+		cross_channel AS acc
+			ON v.code = acc.visit_code
+			AND acc.event_name IN ('visit_schedule_confirmed','debug_visit_schedule_confirmed')
 	WHERE
-		dbk.sk_booking > 0
-		AND dbk.visit_intent = 'RENT'
-		AND dbk.type = 'Visita'
-		AND dbk.dt_created IS NOT NULL
+		v.business_context = 'RENT'
     UNION ALL
 	SELECT
 		lrf.sk_client,

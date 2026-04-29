@@ -126,11 +126,11 @@ tenant_prospect_events AS (
     datalake_amplitude_visit.amplitude_visit AS src
       ON v.code = src.id_visit
   LEFT JOIN
-    cross_channel acc
+    cross_channel AS acc
       ON v.code = acc.visit_code
       AND acc.event_name IN ('visit_schedule_confirmed','debug_visit_schedule_confirmed')
   LEFT JOIN
-    taxonomy_demand td
+    taxonomy_demand AS td
       ON LOWER(COALESCE(td.app_type, '')) = LOWER(COALESCE(IF(acc.visit_code IS NOT NULL, acc.final_attribution_app_type, src.app_type), ''))
       AND LOWER(COALESCE(td.utm_source, '')) = LOWER(COALESCE(IF(acc.visit_code IS NOT NULL, acc.final_attribution_source, src.utm_source), ''))
       AND LOWER(COALESCE(td.utm_medium, '')) = LOWER(COALESCE(IF(acc.visit_code IS NOT NULL, acc.final_attribution_medium, src.utm_medium), ''))

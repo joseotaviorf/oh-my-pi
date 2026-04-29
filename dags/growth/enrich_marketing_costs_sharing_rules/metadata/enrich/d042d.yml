@@ -9,20 +9,19 @@ columns:
     description: Date of applied share
     lineage:
       - datalake_quintoandar.aux_date.id_date
-  id_rule: 
-    description: Id rule
-    categories: 
-      d023d: ''
+  id_rule:
+    description: Id rule. Hard coded AS {id_rule}
   city_group:
     description: city_group segmentation
     lineage:
       - datalake_region.region.city_group
-  share: 
-    description: Percentage of cost that will be applied to specific city_group
-  funnel_side: 
-    description: Marketplace side of business
-    categories: 
-      demand: ''
-      supply: ''
+  share:
+    description: Fraction of demand marketing cost attributed to this city_group on id_date; count of distinct
+      first-interaction clients in the group divided by the day total, or the fallback share when
+      the validator count for the day is zero.
+    lineage:
+      - datalake_ebdb_rent_flow.rent_flow.id_client
+  funnel_side:
+    description: Marketplace side of business. Hard coded AS 'demand'
   business_context:
-    description: Business context of the rule.
+    description: Business context of the rule. Hard coded AS NULL STRING
