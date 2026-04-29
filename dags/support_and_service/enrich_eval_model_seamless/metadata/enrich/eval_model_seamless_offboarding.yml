@@ -1,0 +1,57 @@
+---
+database_name: datalake_eval_model_seamless
+table_name: eval_model_seamless_offboarding
+description: >
+  Enriched dataset for offline evaluation of the seamless offboarding model: SPOC-eligible
+  termination rows with classified support contact (tipo_ticket), joined to
+  users-and-journeys-ml predictions; rows are filtered using per-contract ticket presence
+  without exposing aggregate helper columns.
+domain: Support and Services
+owner: data-ae-ss@quintoandar.com.br
+columns:
+  id_contract:
+    description: Rental contract identifier from Terminator, aligned with listing contract keys.
+    lineage:
+      - datalake_terminator_clean.termination.id_contract
+  id_request:
+    description: Model request identifier from the Emlio input JSON payload (users-and-journeys-ml-service).
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+  id_contract_request:
+    description: Contract identifier from the Emlio input JSON payload (string path $.contract_id), aligned with the model request.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.inputs
+  spoc_wave:
+    description: SPOC wave or cohort label on the termination when present.
+    lineage:
+      - datalake_terminator_clean.termination.spoc_wave
+  is_spoc:
+    description: Whether the termination is flagged as part of the SPOC flow.
+    lineage:
+      - datalake_terminator_clean.termination.is_spoc
+  team:
+    description: Owning team name on the termination in Terminator.
+    lineage:
+      - datalake_terminator_clean.termination.team
+  prediction:
+    description: Model prediction value from the Emlio output JSON (users-and-journeys-ml-service).
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+  probability:
+    description: Model probability from the Emlio output JSON.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.outputs
+  tipo_ticket:
+    description: >
+      Support contact bucket matched to the contract timeline (front, escalated back,
+      exit inspection scheduling, Salesforce mediation); null when no classified match on that row.
+    lineage:
+      - datalake_customer_support.tickets.id_ticket
+  ts_created:
+    description: Termination record creation timestamp in Terminator.
+    lineage:
+      - datalake_terminator_clean.termination.ts_created
+  ts_log:
+    description: Emlio service log timestamp for the model call linked to this termination.
+    lineage:
+      - datalake_emlio_clean.emlio_logs.ts_log

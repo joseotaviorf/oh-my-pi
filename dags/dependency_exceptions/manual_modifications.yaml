@@ -464,6 +464,9 @@ bietlejuice.enrich_ebdb_user:
 bietlejuice.enrich_edwiges:
   add:
     - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
+bietlejuice.enrich_eval_model_seamless:
+  add:
+    - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
 bietlejuice.enrich_expected_contribution_margin:
   remove:
     - bietlejuice.enrich_losses:load-enrich-provision:first-run-of-day

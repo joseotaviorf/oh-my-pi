@@ -2586,6 +2586,15 @@ bietlejuice.enrich_employment:
   - bietlejuice.pin_core:load-clean-periods-of-service:first-run-of-day
 bietlejuice.enrich_emr_validation_test:
   - bietlejuice.enrich_airflow:load-enrich-dag:first-run-of-day
+bietlejuice.enrich_eval_model_seamless:
+  - bietlejuice.emlio:load-clean-emlio-logs:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
+  - bietlejuice.enrich_rent_flows:load-enrich-rent-flows:first-run-of-day
+  - bietlejuice.enrich_ss_logic_model:load-enrich-user-ss-metrics:first-run-of-day
+  - bietlejuice.salesforce:load-clean-cases:first-run-of-day
+  - bietlejuice.salesforce:load-clean-record-types:first-run-of-day
+  - bietlejuice.terminator_fast_lane:load-clean-termination:first-run-of-day
+  - bietlejuice.zendesk:load-clean-tickets:first-run-of-day
 bietlejuice.enrich_expected_contribution_margin:
   - bietlejuice.batch_inference:load-clean-batch-inference:first-run-of-day
   - bietlejuice.dw_rental_contribution_margin:load-dw-rental-contribution-margin-fact-house-listing-revenues:first-run-of-day
