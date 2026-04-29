@@ -13,6 +13,7 @@ WITH orchestrator_sessions AS (
       WHEN m.channel = 'WHATSAPP_FORSALE_TRANSACT_EOP_CHAT' THEN 'vandinha'
       WHEN m.channel = 'WHATSAPP_CLAUDIA_CHAT' THEN 'claudia'
       WHEN m.channel = 'WHATSAPP_ALIAS_CHAT' THEN 'alias'
+      WHEN m.channel = 'WHATSAPP_DOMINIC_CHAT' THEN 'dominic'
       WHEN m.channel LIKE '%ISAIAS%' THEN 'isaias'
       ELSE 'unknown'
     END AS bot,
