@@ -2,6 +2,7 @@ dag:
   name: gsheets_people
   schedule_interval: 0 2 * * *
   owner: Data People
+  callback_by_task: False
 cluster:
   type: databricks_16_4_medium_general_people_cluster
   access_control_list:

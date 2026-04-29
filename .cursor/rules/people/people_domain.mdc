@@ -163,6 +163,7 @@ Every new People DAG declaration **must** include:
 - `bucket_config_name: people_bucket`
 - `databricks_conn_id: databricks_new_env` (for raw, clean, enrich, dw; use `databricks_new` only for reverse layer per core rules)
 - `has_hive_sync: false`
+- **`dag.callback_by_task: False`** — set under the top-level `dag:` block (not under `workflow:`). Disables per-task failure callbacks so alerting stays at DAG level. **Required** for **raw** and **clean** layers (many parallel tasks would otherwise spam GChat/Jira). **Optional** for enrich, dw, metric, reverse, and other layers; use when you prefer DAG-level alerts. Default in the builder is per-task callbacks when omitted — see `.cursor/rules/dag_build.mdc` for placement.
 - `access_control_list` with `group_name: people-analytics` and `permission_level: CAN_MANAGE`
 - `default_table_privileges: people-team: ["ALL PRIVILEGES"]` for tables with PII or sensitive data
 
