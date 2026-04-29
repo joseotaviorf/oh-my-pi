@@ -7,7 +7,8 @@ from databricks_plugin import (
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from pendulum import datetime, timezone
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
@@ -22,7 +23,7 @@ SOURCE = "dataset_profiling"
 DAG_NAME = f"{SOURCE}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
 
-MAIN_START_DATE = datetime(2023, 6, 15, 0, 0, 0, tzinfo=timezone("America/Sao_Paulo"))
+MAIN_START_DATE = datetime(2023, 6, 15, 0, 0, 0, tzinfo=ZoneInfo("America/Sao_Paulo"))
 
 config_service = ConfigurationService(DAG_NAME)
 
