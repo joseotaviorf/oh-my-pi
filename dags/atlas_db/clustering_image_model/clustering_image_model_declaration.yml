@@ -5,28 +5,27 @@ dag:
   schedule_interval: "0 0 * * *"
   documentation:
     dag_purpose: |
-      The clustering image model DAG incrementally ingests data from a Data Science S3 bucket with
-      the results of an image clustering algorithm to detect houses by its images, increasing the
-      coverage and completeness of the missing complement in the Atlas DB project.
-      If there is no result for the previous day, no data will be ingested.
+      The clustering image model DAG incrementally ingests Matchmaker offline results from the
+      Data Science S3 bucket. Paths are partitioned by UTC processing date (YYYY-MM-DD) under
+      atlas/mm/results/, without per-region prefixes. If there is no parquet for a date in the
+      load window, that day is skipped. By default (no load_start_date/load_end_date in trigger
+      conf), the load window is one day: logical_date minus one calendar day (YYYY-MM-DD).
 workflow:
   layer: raw
   type: custom_ingestion
   load_spark_job: load_clustering_image_model_raw
   default_extraction_type: incremental
-  default_partitions: [region_name, year, month, day]
+  default_partitions: [year, month, day]
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(logical_date | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(logical_date | ds, -1), 'load_end_date') }}"
   spark_job_arguments:
     - "{environment}" # env
     - "{bucket}" # datalake_bucket
     - "{dag_name}" # source
     - "{table_name}" # table_name
     - "{partitions}" # partition_cols
-    - "s3://data-science.s3.data.quintoandar.com.br/atlas/datasets/output/" # base_path
-    - "dedup_output" # path_key
-    - "['sp_bh']" # region_list
+    - "s3://data-science.s3.data.quintoandar.com.br/atlas/mm/results/" # base_path (dated UTC folders)
     - "{load_start_date}" # load_start_date
     - "{load_end_date}" # load_end_date
   tables_customization:

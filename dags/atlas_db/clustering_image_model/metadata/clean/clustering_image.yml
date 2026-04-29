@@ -24,14 +24,6 @@ columns:
       The pair is the house with the greatest number of photos comparing with the anchor."
     lineage:
       - datalake_clustering_image_model_raw.clustering_image.sourcenameid_pair
-  region_name:
-    description: |
-      "The houses region name.
-      It is a partition column and is provided by the Data Science Team."
-    categories:
-      sp_bh: "Houses from São Paulo and Belo Horizonte cities."
-    lineage:
-      - datalake_clustering_image_model_raw.clustering_image.region_name
   unit_anchor:
     description: |
       "The anchor unit provided on its complement data.

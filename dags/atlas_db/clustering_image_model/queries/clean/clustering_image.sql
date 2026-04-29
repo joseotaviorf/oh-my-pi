@@ -2,7 +2,6 @@ SELECT
   condo AS id_condo,
   sourcenameid_anchor AS id_sourcename_anchor,
   sourcenameid_pair AS id_sourcename_pair,
-  region_name,
   unit_anchor,
   unit_pair,
   building_anchor,
