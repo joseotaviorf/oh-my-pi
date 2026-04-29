@@ -3,6 +3,8 @@ TMP_DIR="/tmp"
 DEEQU_JAR_VERSION="${DEEQU_JAR_VERSION:-2.0.8}"
 SPARK_VERSION="${SPARK_VERSION:-3.5}"
 INMETRO_VERSION="${INMETRO_VERSION:-2.3.0}"
+KAFKA_CLIENTS_JAR="${KAFKA_CLIENTS_JAR:-kafka-clients-3.5.0.jar}"
+MYSQL_JDBC_JAR="${MYSQL_JDBC_JAR:-mysql-connector-java-8.0.30.jar}"
 
 echo "BEGIN: Install QuintoAndar internal libs"
 
@@ -93,7 +95,9 @@ if [ "$PROVIDER" != "databricks" ]; then
         "deequ-${DEEQU_JAR_VERSION}-spark-${SPARK_VERSION}.jar" \
         "spark-measure_2.12-0.21.jar" \
         "spark-plugins_2.12-0.2.jar" \
-        "spark-cluster-metrics_2.12-0.1-SNAPSHOT.jar"; do
+        "spark-cluster-metrics_2.12-0.1-SNAPSHOT.jar" \
+        "${KAFKA_CLIENTS_JAR}" \
+        "${MYSQL_JDBC_JAR}"; do
         aws s3 cp "${ARTIFACTS_BUCKET}/jars/${jar}" "${TMP_DIR}/${jar}" \
             || echo "  WARN: ${jar} not found in S3, skipping"
     done
@@ -128,12 +132,14 @@ if [ "$PROVIDER" != "databricks" ]; then
         echo "  PostgreSQL JDBC installed at ${jdir}/${POSTGRES_JDBC_JAR}"
     done
 
-    echo "Installing data-quality JARs into Spark classpath..."
+    echo "Installing data-quality, Kafka and MySQL JARs into Spark classpath..."
     for jar in \
         "deequ-${DEEQU_JAR_VERSION}-spark-${SPARK_VERSION}.jar" \
         "spark-measure_2.12-0.21.jar" \
         "spark-plugins_2.12-0.2.jar" \
-        "spark-cluster-metrics_2.12-0.1-SNAPSHOT.jar"; do
+        "spark-cluster-metrics_2.12-0.1-SNAPSHOT.jar" \
+        "${KAFKA_CLIENTS_JAR}" \
+        "${MYSQL_JDBC_JAR}"; do
         if [ -f "${TMP_DIR}/${jar}" ]; then
             for jdir in $SPARK_JARS_DIRS; do
                 sudo cp "${TMP_DIR}/${jar}" "${jdir}/${jar}"
