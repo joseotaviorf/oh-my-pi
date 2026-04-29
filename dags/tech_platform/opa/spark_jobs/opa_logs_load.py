@@ -31,6 +31,17 @@ JOB_NAME = "opa_logs_load"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+# Outer envelope of each OPA log file. Only the fields actually consumed
+# downstream are declared; extra fields in the source JSON are ignored by
+# the reader. Providing an explicit schema avoids Spark's schema-inference
+# pass, which otherwise re-lists and re-reads every file under the path.
+OUTER_SCHEMA = StructType([
+    StructField("timestamp", StringType(), True),
+    StructField("message", StringType(), True),
+    StructField("app", StringType(), True),
+])
+
+
 def clean_cf(df):
     """
     Transform json to struct data and extract only the necessary columns.
@@ -126,12 +137,17 @@ def main():
         """
     )
 
-    df = spark.read.format("json").load(args.path.format(
-                args.execution_date.year,
-                str(args.execution_date.month).zfill(2),
-                str(args.execution_date.day).zfill(2),
-                str(args.execution_date.hour).zfill(2)
-    ))
+    df = (
+        spark.read
+        .schema(OUTER_SCHEMA)
+        .option("mode", "PERMISSIVE")
+        .json(args.path.format(
+            args.execution_date.year,
+            str(args.execution_date.month).zfill(2),
+            str(args.execution_date.day).zfill(2),
+            str(args.execution_date.hour).zfill(2),
+        ))
+    )
     df = clean_cf(df)
 
     DeltaLoader().load_table(
