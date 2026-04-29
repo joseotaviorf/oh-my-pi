@@ -58,6 +58,7 @@ base_bill_items AS (
             ELSE 'UNKNOWN'
         END AS cluster_name,
         b.bill_item,
+        b.bill_item_description,
         value_sign_bill_item,
         b.due_amount,
         b.accrual_year_month AS accrual_year_month_bill_item,
@@ -66,6 +67,22 @@ base_bill_items AS (
     INNER JOIN
         invoice_list AS li
         ON li.id_invoice = b.id_invoice
+),
+negotiation_parent_invoice AS (
+    SELECT
+        id_invoice,
+        MAX(id_parent_parsed) AS id_invoice_parent
+    FROM (
+        SELECT
+            b.id_invoice,
+            REGEXP_EXTRACT(bill_item_description, r' - ID (\d+)', 1) AS id_parent_parsed
+        FROM
+            base_bill_items AS b
+        WHERE
+            b.cluster_name = 'COLLECTIONS DEAL'
+    ) AS negotiation_lines
+    GROUP BY
+        id_invoice
 ),
 get_invoices_with_balance AS (
     SELECT
@@ -148,6 +165,7 @@ unified_selected_bill_items_invoices AS (
         m.dt_created,
         m.ts_retsuko_updated,
         m.id_original_invoice_external,
+        np.id_invoice_parent,
         COALESCE(b_list.list_bill_items, NULL) AS list_bill_items,
         COALESCE(f.has_bi_adm_fee, FALSE) AS has_bi_adm_fee,
         COALESCE(f.has_bi_between_contracts, FALSE) AS has_bi_between_contracts,
@@ -189,6 +207,9 @@ unified_selected_bill_items_invoices AS (
     LEFT JOIN
         get_invoices_bill_item_list AS b_list
         ON b_list.id_invoice = m.id_invoice
+    LEFT JOIN
+        negotiation_parent_invoice AS np
+        ON np.id_invoice = m.id_invoice
 ),
 original_flag AS (
     SELECT
@@ -226,6 +247,7 @@ original_flag AS (
         dt_created,
         ts_retsuko_updated,
         id_original_invoice_external,
+        id_invoice_parent,
         list_bill_items,
         has_bi_adm_fee,
         has_bi_between_contracts,
@@ -267,6 +289,7 @@ SELECT
     id_contract,
     id_account,
     id_original_invoice_external,
+    id_invoice_parent,
     tipo_fat,
     status,
     payment_status,

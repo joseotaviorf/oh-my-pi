@@ -24,6 +24,10 @@ columns:
     lineage:
       - datalake_retsuko.invoice.id_original_invoice_external
     description: "Original invoice external identifier"
+  id_invoice_parent:
+    lineage:
+      - datalake_retsuko.bill_items.bill_item_description
+    description: "Parent invoice external identifier parsed from COLLECTIONS DEAL bill_item_description using pattern suffix - ID digits aggregated per invoice"
   tipo_fat:
     lineage:
       - datalake_retsuko.invoice.purpose

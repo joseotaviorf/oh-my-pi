@@ -12,10 +12,10 @@ columns:
     lineage:
       - dw_collections_segmentation.fact_invoice_landlord_portfolio.id_invoice
     description: "Deal invoice (installment) identifier matched to the original invoice"
-  due_amount_deal:
+  match_type:
     lineage:
-      - dw_collections_segmentation.fact_invoice_landlord_portfolio.due_amount_adjustment
-    description: "Due amount of the deal invoice"
+      - dw_collections_segmentation.fact_invoice_landlord_portfolio.id_invoice_parent
+    description: "How the match was resolved bill_item_description when deal id_invoice_parent equals the original invoice id_invoice legacy_fallback when composite contract account due_amount_adjustment keys matched instead"
   status_deal:
     lineage:
       - dw_collections_segmentation.fact_invoice_landlord_portfolio.status
@@ -28,6 +28,14 @@ columns:
     lineage:
       - dw_collections_segmentation.fact_invoice_landlord_portfolio.purpose
     description: "Purpose of the deal invoice"
+  due_amount_deal:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_landlord_portfolio.due_amount_adjustment
+    description: "Due amount of the deal invoice"
+  rn_deal_order:
+    lineage:
+      - dw_collections_segmentation.fact_invoice_landlord_portfolio.id_invoice
+    description: "Row number indicating the order of deal invoices matched to the same original invoice preferring bill_item_description matches"
   dt_begin_deal:
     lineage:
       - dw_collections_segmentation.fact_invoice_landlord_portfolio.dt_begin
@@ -44,7 +52,3 @@ columns:
     lineage:
       - dw_collections_segmentation.fact_invoice_landlord_portfolio.dt_end
     description: "End date of the deal invoice"
-  rn_deal_order:
-    lineage:
-      - dw_collections_segmentation.fact_invoice_landlord_portfolio.id_invoice
-    description: "Row number indicating the order of deal invoices matched to the same original invoice"
