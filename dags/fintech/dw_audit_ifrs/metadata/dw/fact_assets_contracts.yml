@@ -1,0 +1,54 @@
+---
+database_name: dw_audit_ifrs
+table_name: fact_assets_contracts
+description: >-
+  Monthly fact of active portfolio contracts for IFRS / ECL audit: delay bucket, invoice account
+  type, guarantee, closing status, and applicable LGD from lookup table ead_lgd_asset (clean),
+  built from loss facts without bureau data.
+owner: ae-fintech@quintoandar.com.br
+domain: Fintech
+columns:
+  sk_contract:
+    lineage:
+      - dw_losses.fact_provision.sk_contract
+    description: Surrogate key of the contract in the operational loss model.
+  dt_closing:
+    lineage:
+      - dw_losses.fact_provision.dt_closing
+    description: Closing date of the position (reference month for the snapshot).
+  invoice_account_type:
+    lineage:
+      - dw_losses.fact_delay.user
+    description: Invoice-side account role (tenant when delay user is null; otherwise delay user value).
+  guarantee_group:
+    lineage:
+      - dw_losses.fact_losses.guarantee_group
+    description: Contract guarantee grouping (Paid or Free when absent).
+  closing_month_status:
+    lineage:
+      - dw_losses.fact_losses.contract_closing_month_status
+    description: Contract status in the closing month from the loss fact.
+  delay_contamined_range:
+    lineage:
+      - dw_losses.fact_delay.delay_contamined_range
+      - dw_losses.fact_losses.delay_contaminated_range
+    description: Contaminated delay bucket; prefers invoice-level delay when present (upstream column spelling).
+  initial_delay_stage:
+    lineage:
+      - dw_losses.fact_losses.delay_contaminated_range
+    description: Macro stage (Stage 1–3) derived from days-past-due bucket on source ranges.
+  is_early_bird:
+    description: Reserved for an early-bird branch; false in this fact until that branch is wired.
+  is_ongoing_contract:
+    lineage:
+      - dw_losses.fact_losses.contract_closing_month_status
+    description: True when closing-month contract status is Ativo (same source label as fact_losses).
+  loss_given_default:
+    lineage:
+      - dw_losses.fact_losses.is_contract_write_off
+      - datalake_gsheets_clean.ead_lgd_asset.loss_given_default
+    description: >-
+      Loss-given-default applied (1.0 on contract write-off; otherwise LGD coefficient from
+      datalake_gsheets_clean.ead_lgd_asset matching delay band and guarantee rule).
+  ts_load:
+    description: Warehouse load timestamp for the row.
