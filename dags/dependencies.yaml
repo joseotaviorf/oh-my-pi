@@ -705,6 +705,16 @@ bietlejuice.dw_fintech_snapshot:
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice:first-run-of-day
   - bietlejuice.dw_invoice_entries:load-dw-payment-fact-invoice-entries:first-run-of-day
   - bietlejuice.enrich_bank_conciliation:load-enrich-for-sale-cashin:first-run-of-day
+bietlejuice.dw_fintech_snapshot_quintocred:
+  - bietlejuice.dw_charging_payment_quintocred:load-dw-charging-payment-quintocred-fact-payment-full:first-run-of-day
+  - bietlejuice.dw_charging_payment_quintocred:load-dw-charging-payment-quintocred-fact-propose-timeline:first-run-of-day
+  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-occurrence:first-run-of-day
+  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-recurring-payment-no-renewal:first-run-of-day
+  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-recurring-payment-renewal:first-run-of-day
+  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-occurrence:first-run-of-day
+  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment:first-run-of-day
+  - bietlejuice.rental_guarantee_platform:load-clean-company-plan:first-run-of-day
+  - bietlejuice.rental_guarantee_platform:load-clean-delinquency:first-run-of-day
 bietlejuice.dw_fintech_snapshot_recon:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_invoice_entries:load-dw-payment-dim-invoice-entry:first-run-of-day
@@ -726,16 +736,6 @@ bietlejuice.dw_fintech_snapshot_recon:
   - bietlejuice.robin_hood:load-clean-accounting-entry-balance:first-run-of-day
   - bietlejuice.robin_hood:load-clean-accounting-entry-source:first-run-of-day
   - bietlejuice.robin_hood:load-clean-payment-request:first-run-of-day
-bietlejuice.dw_fintech_snapshot_quintocred:
-  - bietlejuice.dw_charging_payment_quintocred:load-dw-charging-payment-quintocred-fact-payment-full:first-run-of-day
-  - bietlejuice.dw_charging_payment_quintocred:load-dw-charging-payment-quintocred-fact-propose-timeline:first-run-of-day
-  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-occurrence:first-run-of-day
-  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-recurring-payment-no-renewal:first-run-of-day
-  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-aging-recurring-payment-renewal:first-run-of-day
-  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-occurrence:first-run-of-day
-  - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment:first-run-of-day
-  - bietlejuice.rental_guarantee_platform:load-clean-company-plan:first-run-of-day
-  - bietlejuice.rental_guarantee_platform:load-clean-delinquency:first-run-of-day
 bietlejuice.dw_fintech_snapshot_second_business_day:
   - bietlejuice.dw_collection_recovery_quintoandar:load-dw-collection-recovery-quintoandar-fact-overdue-portfolio-timeline:first-run-of-day
 bietlejuice.dw_for_sale_experiment:
@@ -1627,7 +1627,6 @@ bietlejuice.enrich_bank_conciliation:
   - bietlejuice.enrich_nexxera:load-enrich-cnab-charges:first-run-of-day
   - bietlejuice.enrich_nexxera:load-enrich-cnab-payments:first-run-of-day
   - bietlejuice.enrich_retsuko:load-enrich-invoice:first-run-of-day
-  - bietlejuice.retsuko:load-clean-sap-entity:first-run-of-day
   - bietlejuice.enrich_sap:load-enrich-ledger:first-run-of-day
   - bietlejuice.enrich_sap_gateway:load-enrich-sap-payload:first-run-of-day
   - bietlejuice.itau_statements:load-clean-statement-067000392216:first-run-of-day
@@ -1648,6 +1647,7 @@ bietlejuice.enrich_bank_conciliation:
   - bietlejuice.rental_guarantee_fast_lane:load-clean-charge:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-bill:first-run-of-day
   - bietlejuice.rental_guarantee_platform:load-clean-billing-report:first-run-of-day
+  - bietlejuice.retsuko:load-clean-sap-entity:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-feature:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-sync-sap-job:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-webhook-log:first-run-of-day

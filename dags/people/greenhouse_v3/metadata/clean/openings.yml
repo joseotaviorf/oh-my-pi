@@ -119,6 +119,10 @@ columns:
     description: The internal position name at Dridco Mexico SA de CV.
     lineage:
     - datalake_greenhouse_v3_raw.openings.custom_fields.internal_position_name___dridco_mexico_sa_de_cv.value
+  opening_related:
+    description: The human-readable related opening code/reference from the Greenhouse Opening Related custom field.
+    lineage:
+    - datalake_greenhouse_v3_raw.openings.custom_fields.opening_related.value
   affirmative_focus:
     description: The affirmative action focus group for the opening, if any.
     lineage:

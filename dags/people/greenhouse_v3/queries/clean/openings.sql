@@ -29,6 +29,7 @@ SELECT
     custom_fields.internal_position_name___soluser_soluciones_y_servicios_sa_de_cv.value AS internal_position_name_soluser,
     custom_fields.internal_position_name___dridco_mexico_sa_de_cv.external_id AS internal_position_code_dridco_mexico,
     custom_fields.internal_position_name___dridco_mexico_sa_de_cv.value AS internal_position_name_dridco_mexico,
+    custom_fields.opening_related.value AS opening_related,
     custom_fields.affirmative_focus.value AS affirmative_focus,
     custom_fields.band.value AS band,
     custom_fields.career_path.value AS career_path,
