@@ -1,7 +1,7 @@
 database_name: datalake_gsheets_clean
 table_name: ead_lgd_liability
 domain: Fintech
-description: Cleaned IFRS liability-side EAD and LGD parameters from Google Sheets, with typed dates, delay buckets, and loss given default coefficients by model version
+description: Cleaned IFRS liability-side EAD and LGD parameters from Google Sheets, including month and start-date reference windows, delay buckets, exposure at default and LGD coefficients by model version
 columns:
   initial_dt_month_reference:
     description: First month (as a calendar date) for which this row applies in the EAD and LGD lookup configuration
@@ -11,6 +11,14 @@ columns:
     description: Last month (as a calendar date) for which this row applies in the EAD and LGD lookup configuration
     lineage:
       - datalake_gsheets_raw.ead_lgd_liability.last_dt_month_reference
+  initial_dt_start_reference:
+    description: First contract or operation start date (as a calendar date) for which this coefficient row applies alongside the month window
+    lineage:
+      - datalake_gsheets_raw.ead_lgd_liability.initial_dt_start_reference
+  last_dt_start_reference:
+    description: Last contract or operation start date (as a calendar date) for which this coefficient row applies alongside the month window
+    lineage:
+      - datalake_gsheets_raw.ead_lgd_liability.last_dt_start_reference
   is_guarantee_paid:
     description: Boolean flag indicating whether the guarantee has been paid, used to select the appropriate LGD bucket
     lineage:
@@ -23,6 +31,10 @@ columns:
     description: Inclusive end of the delay range in days for matching overdue exposure to a loss given default rate
     lineage:
       - datalake_gsheets_raw.ead_lgd_liability.delay_range_end
+  exposure_at_default:
+    description: Exposure at default coefficient or multiplier published for the matching delay bucket, guarantee flag, and model version
+    lineage:
+      - datalake_gsheets_raw.ead_lgd_liability.exposure_at_default
   loss_given_default:
     description: Loss given default coefficient (between 0 and 1) applied to exposure for the matching delay bucket and model version
     lineage:
