@@ -1,0 +1,121 @@
+database_name: datalake_oitchau_clean
+table_name: payroll_layouts
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Rules that shape the payroll file sent to the provider or accounting—codes,
+  competence, hours format, and which events appear—so each company meets bank and
+  statutory expectations.
+columns:
+  id_payroll_layout:
+    description: Identifier of the payroll file layout configuration. Useful for picking
+      the same export format every time HR generates a file.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.uuid
+  id_company:
+    description: Identifier of the legal entity (company). Useful for knowing which
+      organization this layout belongs to.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.companyUuid
+  id_partner:
+    description: Identifier of the partner or channel for this layout. Useful when the
+      company runs payroll with a specific payroll partnership.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.partnerUuid
+  id_payroll_provider:
+    description: Identifier of the payroll provider or bank channel. Useful for knowing
+      which file columns and checks apply to this layout.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.payrollProviderUuid
+  id_created_by_user:
+    description: Identifier of the HR or payroll user who owns the layout. Useful for
+      tracing who maintains or last changed the export setup.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.createdBy
+  payroll_layout_name:
+    description: Friendly name HR uses to pick the right file layout when exporting
+      payroll.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.name
+  company_code:
+    description: Company code printed in the payroll file for the provider or accounting
+      to match the legal entity.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.companyCode
+  payroll_code:
+    description: Payroll code printed in the file so the provider routes the batch
+      correctly.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.payrollCode
+  competence_label:
+    description: Pay period or competence label shown in the file so finance ties rows
+      to the correct month.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.competence
+  payroll_date_format:
+    description: How payroll dates appear in the file (format rule), not the calendar
+      date of payment itself.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.payrollDate
+  hours_notation_format:
+    description: How worked hours are written in the file (for example decimal hours
+      versus clock notation) for payroll reading.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.hoursFormat
+  is_active:
+    description: Whether HR can still select this layout when generating payroll files.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.active
+  is_convert_values_to_absolute:
+    description: Whether amounts in the export are shown as absolute values for clearer
+      reading by the provider.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.convertValuesToAbs
+  is_use_absolute_for_grouped_values:
+    description: Whether grouped totals in the file use absolute values for consistency
+      with provider rules.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.useAbsForGroupedValues
+  ts_created:
+    description: When this layout was first created.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.createdAt
+  ts_updated:
+    description: Last time HR or payroll changed this layout when rules or provider
+      contracts change.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.updatedAt
+  extra_options:
+    description: Additional options the payroll provider accepts beyond standard columns
+      (for example rounding or supplements).
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.extraOptions
+  payroll_events:
+    description: Which payroll events (earnings, deductions, absences) are included in
+      files built with this layout.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.payrollEvents
+  payroll_provider:
+    description: Provider details packaged with this layout so everyone sees which bank
+      or bureau rules apply.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.payrollProvider
+  ts_load:
+    description: When this layout snapshot was last updated for HR catalogues and
+      audits.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.ts_load
+  year:
+    description: Calendar year of this layout snapshot so people can look up past
+      versions in reports.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.year
+  month:
+    description: Calendar month of this layout snapshot so people can look up past
+      versions in reports.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.month
+  day:
+    description: Calendar day of this layout snapshot so people can look up past
+      versions in reports.
+    lineage:
+    - datalake_oitchau_raw.payroll_layouts.day

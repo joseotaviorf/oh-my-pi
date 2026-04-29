@@ -1,0 +1,105 @@
+database_name: datalake_oitchau_clean
+table_name: payroll_groups_list
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Reusable template for payroll batches—cadence, eligibility, and who is
+  assigned—so HR runs each cycle with the same rules instead of rebuilding setup.
+columns:
+  id_payroll_group_definition:
+    description: Identifier of the reusable payroll-batch template. Useful for always
+      pointing to the same rules and roster setup across cycles.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.uuid
+  id_company:
+    description: Identifier of the legal entity (company). Useful for knowing which
+      company owns this template in multi-entity reporting.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.companyUuid
+  id_external:
+    description: Identifier of the template in an external HR or payroll system. Useful
+      for linking records when the company uses more than one tool.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.externalId
+  id_created_by_user:
+    description: Identifier of the HR or payroll user who created the template. Useful
+      for questions about who configured the setup.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.createdBy
+  payroll_group_definition_name:
+    description: Friendly name HR uses to find the template (for example monthly office
+      staff or hourly stores).
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.name
+  definition_status:
+    description: Whether the template is active, retired, or blocked from use.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.status
+  recurrence_rule:
+    description: How often the payroll batch repeats (for example weekly or monthly
+      cadence).
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.recurrence
+  is_default_definition:
+    description: Whether this template is the default choice for new batches in that
+      company.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.isDefault
+  is_locked_for_editing:
+    description: Whether HR has locked the template so fields cannot be changed during a
+      sensitive period.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.isLocked
+  is_for_deactivated_profile:
+    description: Whether the template explicitly covers people who already left the
+      company.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.forDeactivatedProfile
+  dt_last_locked:
+    description: Last date the template was locked for payroll or compliance processing.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.lastLockDate
+  dt_min_user_profile_assigned:
+    description: Earliest assignment date among employees linked to this template.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.minUserProfileAssignmentDate
+  dt_next_period_started:
+    description: Planned start date of the next pay window generated from this template.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.nextStartDate
+  dt_next_period_ended:
+    description: Planned end date of the next pay window generated from this template.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.nextEndDate
+  ts_created:
+    description: When this template was first created.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.createdAt
+  ts_updated:
+    description: Last time HR changed this template; explains why rules may differ from
+      earlier months.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.updatedAt
+  user_profile_payroll_groups:
+    description: People tied to this template so HR checks who is in the batch before
+      closing payroll.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.userProfilePayrollGroups
+  ts_load:
+    description: When this template snapshot was last updated for HR reviews and audits.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.ts_load
+  year:
+    description: Calendar year of this template snapshot so people can look up past
+      versions in reports.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.year
+  month:
+    description: Calendar month of this template snapshot so people can look up past
+      versions in reports.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.month
+  day:
+    description: Calendar day of this template snapshot so people can look up past
+      versions in reports.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups_list.day

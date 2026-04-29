@@ -6,13 +6,17 @@ dag:
   documentation:
     dag_purpose: |
       Ingests Oitchau Integrations API resources into the raw layer and materializes matching clean
-      Delta tables in datalake_oitchau_clean (queries/clean, merge keys per table). Raw tables
-      include employees, hoursbank_totals, and employee_costs (POST costs/list fan-out).
+      Delta tables in datalake_oitchau_clean (queries/clean; merge_on only where configured).
+      include employees, hoursbank_totals, employee_costs (POST costs/list fan-out), payroll,
+      payroll_groups, payroll_groups_list, and payroll_layouts from the Integrations API.
       Store credentials in Databricks Secrets (scope `people`): JSON secret referenced by
       `authentication.secret_key` with `client_id` and `client_secret` for the integration client.
       employees uses no pagination (full load). hoursbank_totals uses id_expansion: one call per
       employee UUID from the employees table, fetching the D-1 hours bank balance for each employee.
       Fan-out table hoursbank_totals is chained after employees via raw_inner_dependencies.
+      Payroll list uses status=completed (API contract). Payroll, payroll_groups,
+      payroll_groups_list, and payroll_layouts are full extractions: raw overwrite per run,
+      clean SQL without load-date filter, and no merge_on (same pattern as business_rules_groups).
 
 cluster:
   type: custom_cluster
@@ -119,6 +123,35 @@ workflow:
       merge_on:
         - id_employee_profile
         - dt_balanced
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
+    payroll:
+      endpoint_path: payroll
+      extraction_type: full
+      params:
+        status: completed
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
+    payroll_groups:
+      endpoint_path: payroll_groups
+      extraction_type: full
+      params: {}
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
+    payroll_groups_list:
+      endpoint_path: payroll_groups_list
+      extraction_type: full
+      params: {}
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
+    payroll_layouts:
+      endpoint_path: payroll/layouts
+      extraction_type: full
+      params: {}
       vacuum_retention_hours: 168
       vacuum_lite: true
 

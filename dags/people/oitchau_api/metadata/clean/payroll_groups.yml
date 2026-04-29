@@ -1,0 +1,96 @@
+database_name: datalake_oitchau_clean
+table_name: payroll_groups
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: Payroll batch for a company in a fixed pay window, with headcount and
+  signature status so HR and finance can track closure before paying employees.
+columns:
+  id_payroll_group:
+    description: Identifier of this payroll batch record. Useful for aligning HR and
+      finance on the same batch in lists, tickets, and checklists.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.uuid
+  id_payroll_group_business:
+    description: Identifier of the payroll batch in business-facing systems. Useful for
+      keeping one batch id across pay cycles and files so runs are not mixed up.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.payrollGroupUuid
+  id_company:
+    description: Identifier of the legal entity (company). Useful for filtering payroll
+      batches by organization in reports.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.companyUuid
+  id_created_by_user:
+    description: Identifier of the HR or payroll user who created the batch. Useful for
+      follow-up on who set up or owns the batch.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.createdBy
+  payroll_group_name:
+    description: Friendly name HR uses to recognise the batch (for example site, project,
+      or pay group).
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.name
+  payroll_group_status:
+    description: Where this payroll batch stands in the payroll process before payment
+      goes out.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.status
+  digital_signature_status:
+    description: Status of formal digital signatures on payroll documents tied to this
+      batch.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.digitalSignatureStatus
+  count_user_profiles:
+    description: Count of employee profiles in this payroll batch. Useful for headcount
+      checks before closing payroll.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.userProfilesCount
+  is_for_deactivated_profile:
+    description: Whether former employees are explicitly included in this batch configuration.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.forDeactivatedProfile
+  dt_period_started:
+    description: First calendar day of the pay window for this batch.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.startDate
+  dt_period_ended:
+    description: Last calendar day of the pay window for this batch.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.endDate
+  ts_digital_signature_status_changed:
+    description: When signature status last changed, for approval and compliance timelines.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.digitalSignatureStatusChangedAt
+  ts_created:
+    description: When this payroll batch was first registered.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.createdAt
+  report_insights:
+    description: Summary indicators HR reviews before closing the batch (for example
+      exceptions or totals).
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.reportInsights
+  selected_columns:
+    description: Which payroll columns HR chose to include in the export for this batch.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.selectedColumns
+  ts_load:
+    description: When this batch snapshot was last updated for company reports and
+      follow-up with the team.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.ts_load
+  year:
+    description: Calendar year of this batch snapshot so people can find older batches
+      in reports.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.year
+  month:
+    description: Calendar month of this batch snapshot so people can find older batches
+      in reports.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.month
+  day:
+    description: Calendar day of this batch snapshot so people can find older batches in
+      reports.
+    lineage:
+    - datalake_oitchau_raw.payroll_groups.day

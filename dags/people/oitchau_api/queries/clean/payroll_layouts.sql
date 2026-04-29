@@ -1,0 +1,26 @@
+SELECT
+    uuid AS id_payroll_layout,
+    companyUuid AS id_company,
+    partnerUuid AS id_partner,
+    payrollProviderUuid AS id_payroll_provider,
+    createdBy AS id_created_by_user,
+    name AS payroll_layout_name,
+    companyCode AS company_code,
+    payrollCode AS payroll_code,
+    competence AS competence_label,
+    payrollDate AS payroll_date_format,
+    hoursFormat AS hours_notation_format,
+    active AS is_active,
+    convertValuesToAbs AS is_convert_values_to_absolute,
+    useAbsForGroupedValues AS is_use_absolute_for_grouped_values,
+    createdAt AS ts_created,
+    updatedAt AS ts_updated,
+    extraOptions AS extra_options,
+    payrollEvents AS payroll_events,
+    payrollProvider AS payroll_provider,
+    ts_load,
+    year,
+    month,
+    day
+FROM
+    datalake_oitchau_raw.payroll_layouts

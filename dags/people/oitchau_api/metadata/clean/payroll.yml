@@ -1,0 +1,88 @@
+database_name: datalake_oitchau_clean
+table_name: payroll
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: One row per completed payroll export for a company pay period, with
+  per-employee lines so finance can reconcile payments, deductions, and hours.
+columns:
+  id_payroll_lock:
+    description: Identifier of the payroll export run. Useful for matching the same run
+      across lists, e-mails, and audits.
+    lineage:
+    - datalake_oitchau_raw.payroll.payrollLockUuid
+  id_payroll_layout:
+    description: Identifier of the file layout applied to this export. Useful for showing
+      which format accounting or the payroll provider received.
+    lineage:
+    - datalake_oitchau_raw.payroll.payrollLayoutUuid
+  id_company:
+    description: Identifier of the legal entity (company). Useful for scoping payroll
+      exports to the right organization in reports.
+    lineage:
+    - datalake_oitchau_raw.payroll.companyUuid
+  id_created_by_user:
+    description: Identifier of the HR or payroll user who owns this run. Useful for
+      tracing who opened or submitted the payroll.
+    lineage:
+    - datalake_oitchau_raw.payroll.createdBy
+  payroll_run_status:
+    description: Where this payroll stands in the payroll process (for example draft,
+      submitted, or closed).
+    lineage:
+    - datalake_oitchau_raw.payroll.status
+  dt_period_started:
+    description: First calendar day of the pay period covered by this export.
+    lineage:
+    - datalake_oitchau_raw.payroll.startDate
+  dt_period_ended:
+    description: Last calendar day of the pay period covered by this export.
+    lineage:
+    - datalake_oitchau_raw.payroll.endDate
+  ts_send_to_payroll_requested:
+    description: Moment the team requested to send this payroll to the payroll provider.
+    lineage:
+    - datalake_oitchau_raw.payroll.sendToPayrollRequestedAt
+  ts_sent_to_payroll:
+    description: Moment the payroll was actually sent to the payroll provider or bank file
+      channel.
+    lineage:
+    - datalake_oitchau_raw.payroll.sentToPayrollAt
+  ts_updated:
+    description: Last time someone changed anything on this payroll run.
+    lineage:
+    - datalake_oitchau_raw.payroll.updatedAt
+  payroll_file_urls:
+    description: Download links to generated payroll files for validation, submission,
+      or archive.
+    lineage:
+    - datalake_oitchau_raw.payroll.fileUrls
+  payroll_layout:
+    description: Snapshot of layout settings applied on this run so reviewers see which
+      rules and columns were used.
+    lineage:
+    - datalake_oitchau_raw.payroll.payrollLayout
+  payroll_report_rows:
+    description: Per-employee payroll lines (hours, earnings, deductions) attached to
+      this run for reconciliation.
+    lineage:
+    - datalake_oitchau_raw.payroll.report
+  ts_load:
+    description: When this payroll snapshot was last updated for company reports and
+      reconciliation.
+    lineage:
+    - datalake_oitchau_raw.payroll.ts_load
+  year:
+    description: Calendar year of this payroll snapshot so people can look up past
+      exports in reports.
+    lineage:
+    - datalake_oitchau_raw.payroll.year
+  month:
+    description: Calendar month of this payroll snapshot so people can look up past
+      exports in reports.
+    lineage:
+    - datalake_oitchau_raw.payroll.month
+  day:
+    description: Calendar day of this payroll snapshot so people can look up past exports
+      in reports.
+    lineage:
+    - datalake_oitchau_raw.payroll.day
