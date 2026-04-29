@@ -40,3 +40,12 @@ FROM
 WHERE
     MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}')
         AND DATE('{load_end_date}')
+QUALIFY
+    ROW_NUMBER() OVER (
+        PARTITION BY id
+        ORDER BY
+            ts_load DESC NULLS LAST,
+            year DESC,
+            month DESC,
+            day DESC
+    ) = 1

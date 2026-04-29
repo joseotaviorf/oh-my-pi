@@ -2,7 +2,7 @@ database_name: datalake_oitchau_clean
 table_name: punches
 owner: isabella.araujo@quintoandar.com.br
 domain: People
-description: Oitchau clock punches with employee and creator context (clean projection from the Integrations API raw table; incremental by punch date).
+description: Oitchau clock punches with employee and creator context (clean projection from the Integrations API raw table; incremental by punch date). Duplicate punch ids in raw are collapsed to one row per id_punch (latest ts_load).
 columns:
   id_punch:
     description: Identifier from Oitchau (id_punch) used as a natural or surrogate
