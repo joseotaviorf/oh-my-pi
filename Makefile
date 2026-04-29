@@ -16,6 +16,24 @@ clone-local-airflow-plugins:
 	@rm -fR ./local/astro/plugins_temp
 	@rm -fR ./local/astro/plugins/databricks_plugin.py
 	@echo "Cloning succeeded at ./local/astro/plugins"
+	@$(MAKE) normalize-local-astro-plugins
+
+.PHONY: normalize-local-astro-plugins
+## Ensures every plugin package is a direct child of local/astro/plugins/. Some upstream
+## trees nest packages under local/astro/plugins/plugins/; Airflow only adds the top-level
+## plugins/ dir to sys.path, so imports like `import extra_link_plugin` would fail otherwise.
+normalize-local-astro-plugins:
+	@if [ -d ./local/astro/plugins/plugins ]; then \
+		for nested in ./local/astro/plugins/plugins/*; do \
+			[ -e "$$nested" ] || continue; \
+			bn=$$(basename "$$nested"); \
+			if [ ! -e "./local/astro/plugins/$$bn" ]; then \
+				echo "local-astro: moving plugins/plugins/$$bn -> plugins/$$bn"; \
+				mv "$$nested" "./local/astro/plugins/"; \
+			fi; \
+		done; \
+		rmdir ./local/astro/plugins/plugins 2>/dev/null || true; \
+	fi
 
 clone-local-beethoven:
 	@echo "Cloning 'beethoven' from branch '$(branch)'"
@@ -27,6 +45,8 @@ clone-local-beethoven:
 	@cp -Rf ./local/astro/plugins_temp/airflow/plugins/ ./local/astro/plugins
 	@rm -fR ./local/astro/plugins_temp
 	@echo "Cloning succeeded at ./local/astro/plugins"
+	@$(MAKE) normalize-local-astro-plugins
+
 .PHONY: setup-bietlejuice
 setup-bietlejuice:
 	@echo "Setup bietlejuice at local airflow deployment"

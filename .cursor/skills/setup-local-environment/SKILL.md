@@ -156,6 +156,8 @@ This runs, in order:
 4. `astro dev start --no-cache --build-secrets id=GITHUB_TOKEN` — builds the Docker image and starts Airflow
 5. `make import-variables-and-connections` — seeds Airflow variables and connections
 
+Steps 2 and 3 each run `make normalize-local-astro-plugins` at the end, which flattens any `local/astro/plugins/plugins/*` into `local/astro/plugins/*` so Airflow can import top-level plugin packages such as `extra_link_plugin` (Airflow only adds the top-level `plugins/` directory to `sys.path`).
+
 This step takes 3–8 minutes on first run (Docker image build). Inform the user.
 
 **Health check timeout is not fatal**: The `astro dev start` command may report `The webserver health check timed out after 1m0s` — this does NOT mean the startup failed. The containers continue starting in the background. Verify with `astro dev ps` and check that all 4 containers (webserver, scheduler, triggerer, postgres) show `running`.
