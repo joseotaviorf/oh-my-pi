@@ -10,7 +10,7 @@ workflow:
   layer: raw
   load_spark_job: load_hightouch_logs_raw
   custom_schema: hightouch_logs
-  inner_dependencies:
+  raw_inner_dependencies:
     sync_runs_trino:
       - audience_membership_databricks
       - audience_membership_trino
