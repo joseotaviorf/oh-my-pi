@@ -265,7 +265,7 @@ FROM details_inspection a
 
 
 SELECT
-    cast(uuid() AS varchar) AS uuid_listing_quality,
+    cast(uuid() AS string) AS uuid_listing_quality,
     t.house_id,
     t.job_id,
     t.photographer_comment,
