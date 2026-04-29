@@ -1,7 +1,7 @@
 dag:
   name: hightouch_logs
   owner: Data Growth
-  schedule_interval: 0 * * * *
+  schedule_interval: 0 */2 * * *
   documentation:
     dag_purpose: |
       This DAG ingests data from Hightouch
@@ -10,6 +10,12 @@ workflow:
   layer: raw
   load_spark_job: load_hightouch_logs_raw
   custom_schema: hightouch_logs
+  inner_dependencies:
+    sync_runs_trino:
+      - audience_membership_databricks
+      - audience_membership_trino
+      - sync_runs_databricks
+      - sync_snapshot_trino
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
