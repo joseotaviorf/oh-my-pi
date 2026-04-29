@@ -24,7 +24,7 @@ SELECT
     CAST(fc.sk_broker AS STRING),
     CAST(COALESCE(ps.id_person, -1) AS STRING),
     CAST(fc.version AS STRING)
-  ) AS sk_account_manager_change,
+  ) AS sk_broker_account_manager_history,
   fc.sk_broker AS sk_broker,
   COALESCE(ps.sk_person, -1) AS sk_person_account_manager,
   fc.version,

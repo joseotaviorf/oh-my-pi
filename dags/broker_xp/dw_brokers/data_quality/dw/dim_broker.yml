@@ -1,5 +1,5 @@
 ---
-table_name: dw_brokers.dim_broker_account_manager_changes
+table_name: dw_brokers.dim_broker
 alert_channel: "#alerts-de-airflow-dags"
 
 table_level_validations:
@@ -8,15 +8,24 @@ table_level_validations:
     severity_level: Error
 
 column_level_validations:
-  sk_account_manager_change:
+  sk_broker:
     is_complete:
       severity_level: Error
     is_unique:
       severity_level: Error
-  sk_broker:
+  has_3p_access_control:
     is_complete:
       severity_level: Error
-  has_3p_access_control:
+  qt_active_agents:
+    is_complete:
+      severity_level: Error
+  qt_active_agents_in_lead_gen:
+    is_complete:
+      severity_level: Error
+  qt_active_broker_admins:
+    is_complete:
+      severity_level: Error
+  has_active_agents_in_lead_gen:
     is_complete:
       severity_level: Error
   ts_load:
@@ -29,17 +38,5 @@ column_level_validations:
     is_complete:
       severity_level: Error
   day:
-    is_complete:
-      severity_level: Error
-  ts_start:
-    is_complete:
-      severity_level: Error
-  sk_person_account_manager:
-    is_complete:
-      severity_level: Error
-  version:
-    is_complete:
-      severity_level: Error
-  is_current:
     is_complete:
       severity_level: Error

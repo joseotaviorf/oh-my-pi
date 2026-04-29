@@ -1,5 +1,5 @@
 ---
-table_name: dw_brokers.dim_brokers
+table_name: dw_brokers.dim_broker_tier_history
 alert_channel: "#alerts-de-airflow-dags"
 
 table_level_validations:
@@ -8,10 +8,19 @@ table_level_validations:
     severity_level: Error
 
 column_level_validations:
-  sk_broker:
+  sk_broker_tier_history:
     is_complete:
       severity_level: Error
     is_unique:
+      severity_level: Error
+  sk_broker:
+    is_complete:
+      severity_level: Error
+  sk_broker_product:
+    is_complete:
+      severity_level: Error
+  id_tier:
+    is_complete:
       severity_level: Error
   has_3p_access_control:
     is_complete:
@@ -26,5 +35,14 @@ column_level_validations:
     is_complete:
       severity_level: Error
   day:
+    is_complete:
+      severity_level: Error
+  ts_start:
+    is_complete:
+      severity_level: Error
+  version:
+    is_complete:
+      severity_level: Error
+  is_current:
     is_complete:
       severity_level: Error

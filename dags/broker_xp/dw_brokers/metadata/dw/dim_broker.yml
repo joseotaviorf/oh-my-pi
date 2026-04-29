@@ -1,9 +1,12 @@
 database_name: dw_brokers
-table_name: dim_brokers
+table_name: dim_broker
 description: |
   Data warehouse dimension for 3P broker companies from core_brokers.brokers, enriched with HubSpot
-  current owner mapped to person SK, and active profile counts from core_brokers.brokers_profile
-  (third_party_agent and company_admin by business context).
+  current owner mapped to person SK, active profile counts from core_brokers.brokers_profile
+  (third_party_agent and company_admin), passive lead-gen agent counts from datalake_ebdb_clean.agent_data,
+  and last membership transition timestamps derived from datalake_brokers.broker_status_history
+  (overall and Rede Rent / Rede Sale product lanes). Per-business-context SALE/RENT agent counts from
+  brokers_profile are not exposed on this table.
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
@@ -70,17 +73,14 @@ columns:
       - core_brokers.brokers_profile.sk_broker_profile
     description: |
       Count of active brokers_profile rows with profile third_party_agent for the broker
-      (profile_status ACTIVE).
-  qt_active_sale_agents:
+      (profile_status ACTIVE), without splitting by business_context.
+  qt_active_agents_in_lead_gen:
     lineage:
-      - core_brokers.brokers_profile.sk_broker_profile
+      - datalake_ebdb_clean.agent_data.id
+      - datalake_ebdb_clean.agent_data.uuid_company
     description: |
-      Count of active third_party_agent profiles with business_context SALE for the broker.
-  qt_active_rent_agents:
-    lineage:
-      - core_brokers.brokers_profile.sk_broker_profile
-    description: |
-      Count of active third_party_agent profiles with business_context RENT for the broker.
+      Count of active passive lead-receiver Rede agents (agent_type CORRETOR_REDE, is_active, is_passive_lead_receiver)
+      for the broker company uuid_company from agent_data.
   qt_active_broker_admins:
     lineage:
       - core_brokers.brokers_profile.sk_broker_profile
@@ -106,10 +106,59 @@ columns:
     lineage:
       - core_brokers.brokers.is_3p_active_sale_broker
     description: Flag indicating active 3P sale broker from core brokers.
+  has_active_agents_in_lead_gen:
+    lineage:
+      - datalake_ebdb_clean.agent_data.uuid_company
+      - core_brokers.brokers.uuid_company
+    description: |
+      True when at least one matching passive lead-receiver agent row exists in agent_data for the broker uuid_company.
   has_3p_access_control:
     description: |
       Boolean flag indicating that this row is subject to 3P Partners access control policies;
       always true in this table.
+  ts_last_membership_start:
+    lineage:
+      - datalake_brokers.broker_status_history.ts_start
+      - datalake_brokers.broker_status_history.broker_status
+    description: |
+      Latest ts_start where broker_status is ACTIVE in broker_status_history for the broker (any product lane).
+  ts_last_membership_end:
+    lineage:
+      - datalake_brokers.broker_status_history.ts_start
+      - datalake_brokers.broker_status_history.broker_status
+      - datalake_brokers.broker_status_history.is_current
+    description: |
+      Latest ts_start where broker_status is INACTIVE and is_current is true in broker_status_history for the broker.
+  ts_last_rent_membership_start:
+    lineage:
+      - datalake_brokers.broker_status_history.ts_start
+      - datalake_brokers.broker_status_history.product_name
+      - datalake_brokers.broker_status_history.broker_status
+    description: |
+      Latest ts_start where broker_status is ACTIVE and product_name is Rede Rent in broker_status_history.
+  ts_last_rent_membership_end:
+    lineage:
+      - datalake_brokers.broker_status_history.ts_start
+      - datalake_brokers.broker_status_history.product_name
+      - datalake_brokers.broker_status_history.broker_status
+      - datalake_brokers.broker_status_history.is_current
+    description: |
+      Latest ts_start where broker_status is INACTIVE, is_current is true, and product_name is Rede Rent.
+  ts_last_sale_membership_start:
+    lineage:
+      - datalake_brokers.broker_status_history.ts_start
+      - datalake_brokers.broker_status_history.product_name
+      - datalake_brokers.broker_status_history.broker_status
+    description: |
+      Latest ts_start where broker_status is ACTIVE and product_name is Rede Sale in broker_status_history.
+  ts_last_sale_membership_end:
+    lineage:
+      - datalake_brokers.broker_status_history.ts_start
+      - datalake_brokers.broker_status_history.product_name
+      - datalake_brokers.broker_status_history.broker_status
+      - datalake_brokers.broker_status_history.is_current
+    description: |
+      Latest ts_start where broker_status is INACTIVE, is_current is true, and product_name is Rede Sale.
   ts_broker_created:
     lineage:
       - core_brokers.brokers.ts_broker_created
@@ -124,13 +173,13 @@ columns:
     description: Timestamp when this DW row was loaded by the ETL process.
   year:
     lineage:
-      - core_brokers.brokers.ts_updated
-    description: Partition year from broker last update timestamp.
+      - core_brokers.brokers.ts_broker_updated
+    description: Partition year from broker last update timestamp (ts_broker_updated).
   month:
     lineage:
-      - core_brokers.brokers.ts_updated
-    description: Partition month from broker last update timestamp.
+      - core_brokers.brokers.ts_broker_updated
+    description: Partition month from broker last update timestamp (ts_broker_updated).
   day:
     lineage:
-      - core_brokers.brokers.ts_updated
-    description: Partition day from broker last update timestamp.
+      - core_brokers.brokers.ts_broker_updated
+    description: Partition day from broker last update timestamp (ts_broker_updated).

@@ -1,17 +1,19 @@
 database_name: dw_brokers
-table_name: dim_broker_profiles
+table_name: dim_broker_profile_history
 description: |
   Data warehouse dimension for 3P broker member profiles from core_brokers.brokers_profile, keyed by
-  sk_broker_profile, with person SK from person_sks, profile type and status flags, and effective
-  intervals per uuid_person and profile ordered by profile creation time (is_current, ts_end via LEAD).
+  sk_broker_profile_history (same value as core sk_broker_profile), with person SK from person_sks,
+  profile type and status flags, effective intervals per uuid_person and profile ordered by profile creation
+  time (is_current, ts_end via LEAD), and sequential version per person and profile.
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
-  sk_broker_profile:
+  sk_broker_profile_history:
     lineage:
       - core_brokers.brokers_profile.sk_broker_profile
     description: |
-      Surrogate key of the broker profile row from core brokers; primary key of this dimension.
+      Surrogate key of the broker profile row from core brokers (exposed with _history suffix for DW naming
+      consistency); primary key of this dimension.
   sk_broker:
     lineage:
       - core_brokers.brokers_profile.sk_broker
@@ -44,6 +46,14 @@ columns:
     lineage:
       - core_brokers.brokers_profile.profile
     description: True when profile equals company_admin.
+  version:
+    lineage:
+      - core_brokers.brokers_profile.uuid_person
+      - core_brokers.brokers_profile.profile
+      - core_brokers.brokers_profile.ts_profile_created
+    description: |
+      Sequential version of profile rows for the same uuid_person and profile, ordered by ts_profile_created
+      and sk_broker_profile.
   is_current:
     lineage:
       - core_brokers.brokers_profile.uuid_person

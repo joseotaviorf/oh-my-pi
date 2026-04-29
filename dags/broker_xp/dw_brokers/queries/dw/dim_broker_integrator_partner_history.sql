@@ -28,7 +28,7 @@ filtered_changes AS (
     )
 )
 SELECT
-  CONCAT(fc.sk_broker_product, fc.version) AS sk_broker_integrator_partner_change,
+  CONCAT(fc.sk_broker_product, fc.version) AS sk_broker_integrator_partner_history,
   bp.sk_broker AS sk_broker,
   bp.sk_broker_product,
   fc.uuid_integrator_partner,

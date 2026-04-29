@@ -1,16 +1,17 @@
 database_name: dw_brokers
-table_name: dim_broker_status_changes
+table_name: dim_broker_status_history
 description: |
   Data warehouse dimension of broker product status periods sourced from datalake_brokers.broker_status_history,
-  with business_context derived from product_name and is_current_cohort mirroring the enrich is_current flag.
+  with business_context derived from product_name, SCD2-style version, and is_current from enrich broker_status_history.is_current.
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
-  sk_status_change:
+  sk_broker_status_history:
     lineage:
       - datalake_brokers.broker_status_history.id_status_change
     description: |
-      Unique identifier of the status period, matching id_status_change from broker status history enrich.
+      Unique identifier of the status period, matching id_status_change from broker status history enrich;
+      primary key of this dimension.
   sk_broker:
     lineage:
       - datalake_brokers.broker_status_history.sk_broker
@@ -27,10 +28,19 @@ columns:
     lineage:
       - datalake_brokers.broker_status_history.status_origin
     description: Source system of the status row (Hubspot or Company) from enrich history.
-  is_current_cohort:
+  version:
+    lineage:
+      - datalake_brokers.broker_status_history.ts_start
+      - datalake_brokers.broker_status_history.id_status_change
+    description: |
+      Sequential version of status periods for the broker within the same business_context, ordered by ts_start
+      and id_status_change.
+  is_current:
     lineage:
       - datalake_brokers.broker_status_history.is_current
-    description: True when this period is the current status for the broker product in enrich history.
+    description: |
+      True when this period is the current status for the broker product in enrich history (same semantics as
+      the former is_current_cohort column).
   has_3p_access_control:
     lineage:
       - datalake_brokers.broker_status_history.has_3p_access_control

@@ -1,5 +1,5 @@
 SELECT
-  bsc.id_status_change AS sk_status_change,
+  bsc.id_status_change AS sk_broker_status_history,
   bsc.sk_broker,
   bsc.broker_status,
   CASE
@@ -7,7 +7,21 @@ SELECT
     WHEN bsc.product_name = 'Rede Rent' THEN 'RENT'
   END AS business_context,
   bsc.status_origin,
-  bsc.is_current AS is_current_cohort,
+  ROW_NUMBER() OVER (
+    PARTITION BY
+      bsc.sk_broker,
+      COALESCE(
+        CASE
+          WHEN bsc.product_name = 'Rede Sale' THEN 'SALE'
+          WHEN bsc.product_name = 'Rede Rent' THEN 'RENT'
+        END,
+        '__none__'
+      )
+    ORDER BY
+      bsc.ts_start,
+      bsc.id_status_change
+  ) AS version,
+  bsc.is_current,
   bsc.has_3p_access_control,
   bsc.ts_start,
   bsc.ts_end,

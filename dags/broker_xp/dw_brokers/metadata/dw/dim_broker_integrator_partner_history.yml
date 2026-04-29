@@ -1,5 +1,5 @@
 database_name: dw_brokers
-table_name: dim_broker_integrator_partner_changes
+table_name: dim_broker_integrator_partner_history
 description: |
   Data warehouse dimension of integrator partner UUID assignment periods per broker product. Rows are
   derived from distinct integratorPartner UUID values in product_settings changes
@@ -8,7 +8,7 @@ description: |
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
-  sk_broker_integrator_partner_change:
+  sk_broker_integrator_partner_history:
     lineage:
       - core_brokers.broker_products_history.sk_company_product
       - core_brokers.broker_products_history.ts_transaction

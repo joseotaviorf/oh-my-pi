@@ -1,13 +1,13 @@
 database_name: dw_brokers
-table_name: dim_broker_tier_changes
+table_name: dim_broker_tier_history
 description: |
-  Data warehouse dimension of broker product tier assignment periods. Rows are derived from distinct
+  Data warehouse dimension of broker product tier assignment periods (SCD2 history). Rows are derived from distinct
   tier id changes in core_brokers.broker_tiers_history (ev_id_tier), versioned per sk_broker_product
   and enriched with tier_name from datalake_company_clean.tier when the tier id resolves.
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
-  sk_broker_tier_change:
+  sk_broker_tier_history:
     lineage:
       - core_brokers.broker_tiers_history.sk_company_product
       - core_brokers.broker_tiers_history.ts_transaction

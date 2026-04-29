@@ -1,6 +1,6 @@
 ---
-table_name: dw_brokers.dim_broker_profiles
-alert_channel: "#alerts-de-airflow-3p-partners"
+table_name: dw_brokers.dim_broker_integrator_partner_history
+alert_channel: "#alerts-de-airflow-dags"
 
 table_level_validations:
   has_size:
@@ -8,7 +8,7 @@ table_level_validations:
     severity_level: Error
 
 column_level_validations:
-  sk_broker_profile:
+  sk_broker_integrator_partner_history:
     is_complete:
       severity_level: Error
     is_unique:
@@ -16,7 +16,10 @@ column_level_validations:
   sk_broker:
     is_complete:
       severity_level: Error
-  sk_person:
+  sk_broker_product:
+    is_complete:
+      severity_level: Error
+  uuid_integrator_partner:
     is_complete:
       severity_level: Error
   has_3p_access_control:
@@ -35,6 +38,9 @@ column_level_validations:
     is_complete:
       severity_level: Error
   ts_start:
+    is_complete:
+      severity_level: Error
+  version:
     is_complete:
       severity_level: Error
   is_current:

@@ -1,5 +1,5 @@
 database_name: dw_brokers
-table_name: dim_broker_account_manager_changes
+table_name: dim_broker_account_manager_history
 description: |
   Data warehouse dimension of HubSpot account manager (owner) assignment periods per broker. Rows are
   derived from distinct id_hubspot_owner changes in datalake_brokers.hubspot_brokers_history, versioned
@@ -7,7 +7,7 @@ description: |
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
-  sk_account_manager_change:
+  sk_broker_account_manager_history:
     lineage:
       - datalake_brokers.hubspot_brokers_history.sk_broker
       - datalake_person.person_sks.id_person
@@ -23,7 +23,7 @@ columns:
       - datalake_person.person_sks.sk_person
     description: |
       Surrogate key of the HubSpot owner mapped to Person when available; -1 when no mapping exists,
-      consistent with dim_brokers.
+      consistent with dim_broker.
   version:
     lineage:
       - datalake_brokers.hubspot_brokers_history.ts_updated

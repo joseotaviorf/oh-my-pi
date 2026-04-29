@@ -22,7 +22,7 @@ filtered_changes AS (
     AND (tc.id_tier != tc.prev_id_tier OR tc.prev_id_tier IS NULL)
 )
 SELECT
-  CONCAT(fc.sk_broker_product, fc.version) AS sk_broker_tier_change,
+  CONCAT(fc.sk_broker_product, fc.version) AS sk_broker_tier_history,
   bp.sk_broker AS sk_broker,
   bp.sk_broker_product,
   fc.id_tier,

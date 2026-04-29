@@ -4,26 +4,29 @@ dag:
   owner: Data Broker XP
   documentation:
     dag_purpose: |
-      DW layer for 3P brokers: dim_brokers (broker attributes, Hubspot cluster, active profile counts
-      from brokers_profile, account manager SK), dim_broker_products (product and fee attributes),
-      dim_broker_regions (broker product to region bridge from region_list), dim_broker_status_changes
-      (status periods from enrich broker_status_history), dim_broker_account_manager_changes (HubSpot
+      DW layer for 3P brokers: dim_broker (broker attributes, Hubspot cluster, active profile counts
+      from brokers_profile, passive lead-gen agent counts from agent_data, last membership timestamps from
+      broker_status_history, account manager SK; no per-business-context SALE/RENT agent counts on this table),
+      dim_broker_products (product and fee attributes),
+      dim_broker_regions (broker product to region bridge from region_list), dim_broker_status_history
+      (status periods from enrich broker_status_history), dim_broker_account_manager_history (HubSpot
       owner change periods per broker from hubspot_brokers_history, resolved to person SK),
-      dim_broker_profiles (member profiles from core brokers_profile with person SK and effective
-      intervals per person and profile type), dim_broker_tier_changes (tier assignment periods per
+      dim_broker_profile_history (member profiles from core brokers_profile with person SK and effective
+      intervals per person and profile type), dim_broker_tier_history (tier assignment periods per
       broker product from core_brokers.broker_tiers_history joined to datalake_company_clean.tier),
-      dim_broker_integrator_partner_changes (integrator partner UUID periods from
+      dim_broker_integrator_partner_history (integrator partner UUID periods from
       core_brokers.broker_products_history resolved to company name via datalake_company_clean.company).
       Upstreams: core_brokers, core_brokers_history (broker_tiers_history, broker_products_history),
       core_region, datalake_brokers (hubspot_brokers_history, broker_status_history),
-      datalake_company_clean (tier, company), datalake_hubspot.owner, datalake_person.person_sks.
+      datalake_company_clean (tier, company), datalake_hubspot.owner, datalake_person.person_sks,
+      datalake_ebdb_clean.agent_data.
       Schedule after enrich_brokers, core_brokers_history, and core upstreams in Airflow.
 workflow:
   type: query_delta
   layer: dw
   custom_schema: brokers
   tables_customization:
-    dim_brokers:
+    dim_broker:
       partitions: [year, month, day]
       merge_on: [sk_broker]
       z_order_by: [sk_broker]
@@ -56,9 +59,9 @@ workflow:
           - ALL PRIVILEGES
       row_filter_column_key: has_3p_access_control
       row_filter: has_3p_access
-    dim_broker_status_changes:
+    dim_broker_status_history:
       partitions: [year, month, day]
-      merge_on: [sk_status_change]
+      merge_on: [sk_broker_status_history]
       z_order_by: [sk_broker]
       table_privileges:
         3p-readers:
@@ -67,9 +70,9 @@ workflow:
           - ALL PRIVILEGES
       row_filter_column_key: has_3p_access_control
       row_filter: has_3p_access
-    dim_broker_account_manager_changes:
+    dim_broker_account_manager_history:
       partitions: [year, month, day]
-      merge_on: [sk_account_manager_change]
+      merge_on: [sk_broker_account_manager_history]
       z_order_by: [sk_broker]
       table_privileges:
         3p-readers:
@@ -78,9 +81,9 @@ workflow:
           - ALL PRIVILEGES
       row_filter_column_key: has_3p_access_control
       row_filter: has_3p_access
-    dim_broker_profiles:
+    dim_broker_profile_history:
       partitions: [year, month, day]
-      merge_on: [sk_broker_profile]
+      merge_on: [sk_broker_profile_history]
       z_order_by: [sk_broker]
       table_privileges:
         3p-readers:
@@ -89,9 +92,9 @@ workflow:
           - ALL PRIVILEGES
       row_filter_column_key: has_3p_access_control
       row_filter: has_3p_access
-    dim_broker_tier_changes:
+    dim_broker_tier_history:
       partitions: [year, month, day]
-      merge_on: [sk_broker_tier_change]
+      merge_on: [sk_broker_tier_history]
       z_order_by: [sk_broker_product]
       table_privileges:
         3p-readers:
@@ -100,9 +103,9 @@ workflow:
           - ALL PRIVILEGES
       row_filter_column_key: has_3p_access_control
       row_filter: has_3p_access
-    dim_broker_integrator_partner_changes:
+    dim_broker_integrator_partner_history:
       partitions: [year, month, day]
-      merge_on: [sk_broker_integrator_partner_change]
+      merge_on: [sk_broker_integrator_partner_history]
       z_order_by: [sk_broker_product]
       table_privileges:
         3p-readers:

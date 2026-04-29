@@ -1,5 +1,5 @@
 SELECT
-  bp.sk_broker_profile,
+  bp.sk_broker_profile AS sk_broker_profile_history,
   COALESCE(bp.sk_broker, -1) AS sk_broker,
   COALESCE(ps.sk_person, -1) AS sk_person,
   bp.profile,
@@ -7,6 +7,7 @@ SELECT
   bp.profile_status = 'ACTIVE' AS is_active_profile,
   bp.profile = 'third_party_agent' AS is_agent,
   bp.profile = 'company_admin' AS is_broker_admin,
+  ROW_NUMBER() OVER (PARTITION BY bp.uuid_person, bp.profile ORDER BY bp.ts_profile_created, bp.sk_broker_profile) AS version,
   LEAD(bp.ts_profile_created) OVER (PARTITION BY bp.uuid_person, bp.profile ORDER BY bp.ts_profile_created) IS NULL AS is_current,
   TRUE AS has_3p_access_control,
   bp.ts_profile_created AS ts_start,
