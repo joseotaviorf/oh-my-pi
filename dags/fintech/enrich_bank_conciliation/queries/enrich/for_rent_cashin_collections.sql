@@ -2,8 +2,25 @@ WITH
 
 pre_francesinha AS (
     SELECT
+        ext.origin_complement AS id_bank,
+        CASE
+            WHEN ext.origin_complement like '%BL%' THEN regexp_replace(substring(ext.origin_complement, 20, 20), '^0+', '')
+            ELSE regexp_replace(ext.origin_complement, '^0+', '')
+        END AS our_number_temp,
+        '04526' AS bank_account,
+        DATE(ext.date_accounting) AS dt_paid,
+        ext.amount_value AS amount
+    FROM
+        datalake_itau_statements_clean.statement_879200452685 ext
+    WHERE
+        ext.operation in ('C')
+        AND ext.literal_code in ('9489')
+),
+
+francesinha AS (
+    SELECT
         our_number AS id_bank,
-        CAST(SUBSTRING(UPPER(our_number), 1, LENGTH(our_number) - 1) AS INTEGER) AS our_number,
+        REGEXP_REPLACE(REGEXP_REPLACE(our_number, '^0+', ''), '.$', '') AS our_number,
         bank_account,
         dt_credit AS dt_paid,
         SUM(net_amount) AS amount
@@ -21,36 +38,16 @@ pre_francesinha AS (
     UNION
 
     SELECT
-        ext.origin_complement AS id_bank,
-        CASE
-            WHEN ext.origin_complement like '%BL%' THEN regexp_replace(
-            substring(ext.origin_complement, 20, 20),
-            '^0+',
-            '')
-            ELSE regexp_replace(ext.origin_complement, '^0+', '')
-        END AS our_number,
-        '04526' AS bank_account,
-        DATE(ext.date_accounting) AS dt_paid,
-        ext.amount_value AS amount
-    FROM
-        datalake_itau_statements_clean.statement_879200452685 ext
-    WHERE
-        ext.operation in ('C')
-        AND ext.literal_code in ('9489')
-),
-
-francesinha AS (
-    SELECT
         id_bank,
         CASE 
-            WHEN id_bank LIKE '000%' THEN LEFT(our_number, LENGTH(our_number)-2)
-            WHEN LENGTH(our_number) >= 30 THEN LEFT(our_number, LENGTH(our_number)-2)
-            ELSE our_number 
+            WHEN id_bank LIKE '000%' THEN REGEXP_REPLACE(REGEXP_REPLACE(our_number_temp, '.$', ''), '.$', '')
+            WHEN LENGTH(our_number_temp) >= 30 THEN REGEXP_REPLACE(REGEXP_REPLACE(our_number_temp, '.$', ''), '.$', '')
+            ELSE our_number_temp 
         END AS our_number,
         bank_account,
         dt_paid,
         amount
-    FROM
+    FROM 
         pre_francesinha
 ),
 
@@ -208,6 +205,8 @@ trato_feito AS (
     LEFT JOIN
         dw_public.dim_date dd
             ON COALESCE(DATE(p.dt_credit), DATE(p.dt_paid)) = dd.date
+    QUALIFY
+        ROW_NUMBER() OVER (PARTITION BY our_number ORDER BY date DESC) = 1
 
     UNION ALL
 
