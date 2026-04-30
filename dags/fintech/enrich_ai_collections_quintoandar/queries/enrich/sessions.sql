@@ -97,7 +97,10 @@ SELECT
     tf.is_owner_only,
     DATE(m.ts_created) AS dt_session_created,
     m.ts_created,
-    m.ts_updated
+    m.ts_updated,
+    YEAR(m.ts_updated) AS year,
+    MONTH(m.ts_updated) AS month,
+    DAYOFMONTH(m.ts_updated) AS day
 FROM
     datalake_chatbot.sessions AS m
 LEFT JOIN

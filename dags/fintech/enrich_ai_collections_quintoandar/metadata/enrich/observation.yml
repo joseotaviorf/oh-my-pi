@@ -108,3 +108,18 @@ columns:
     lineage:
       - datalake_langfuse_clean.observations.ts_ended
     description: "Timestamp of the last tracked Langfuse observation recorded for the session (over the named observations aggregated in this table)."
+  year:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_ended
+      - datalake_langfuse_clean.observations.ts_started
+    description: "Table partition calendar year from the maximum of observation end/start timestamps aggregated per Langfuse session."
+  month:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_ended
+      - datalake_langfuse_clean.observations.ts_started
+    description: "Table partition calendar month from the maximum of observation end/start timestamps aggregated per Langfuse session."
+  day:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_ended
+      - datalake_langfuse_clean.observations.ts_started
+    description: "Table partition calendar day from the maximum of observation end/start timestamps aggregated per Langfuse session."

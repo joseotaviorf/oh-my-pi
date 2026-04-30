@@ -117,3 +117,15 @@ columns:
     lineage:
       - datalake_chatbot.sessions.ts_updated
     description: "Timestamp when the chatbot session was last updated; used as the incremental watermark."
+  year:
+    lineage:
+      - datalake_chatbot.sessions.ts_updated
+    description: "Table partition calendar year derived from ts_updated when the enrich row was materialized."
+  month:
+    lineage:
+      - datalake_chatbot.sessions.ts_updated
+    description: "Table partition calendar month derived from ts_updated when the enrich row was materialized."
+  day:
+    lineage:
+      - datalake_chatbot.sessions.ts_updated
+    description: "Table partition calendar day of month derived from ts_updated when the enrich row was materialized."

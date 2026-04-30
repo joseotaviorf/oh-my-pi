@@ -27,3 +27,15 @@ columns:
       - datalake_chatbot.messages.id_user
       - datalake_chatbot.messages.ts_created
     description: "Single string with all session messages prefixed by their role or user identifier and joined by newline, ordered chronologically."
+  year:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: "Table partition calendar year derived from the latest message timestamp in the session aggregation."
+  month:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: "Table partition calendar month derived from the latest message timestamp in the session aggregation."
+  day:
+    lineage:
+      - datalake_chatbot.messages.ts_created
+    description: "Table partition calendar day derived from the latest message timestamp in the session aggregation."

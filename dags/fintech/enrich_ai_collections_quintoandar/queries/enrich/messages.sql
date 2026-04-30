@@ -55,7 +55,10 @@ SELECT
             element -> element.col2
         ),
         '\n'
-    ) AS full_conversation
+    ) AS full_conversation,
+    YEAR(MAX(ts_created)) AS year,
+    MONTH(MAX(ts_created)) AS month,
+    DAYOFMONTH(MAX(ts_created)) AS day
 FROM
     messages_as_struct
 GROUP BY

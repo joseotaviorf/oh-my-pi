@@ -28,7 +28,10 @@ SELECT
     MAX(CASE WHEN LOWER(obs.name) = 'handle_non_tenant' THEN 1 ELSE 0 END) AS flag_handle_non_tenant,
     -- Temporal aggregates (over the tracked observations only)
     MIN(obs.ts_started) AS ts_first_observation,
-    MAX(obs.ts_ended) AS ts_last_observation
+    MAX(obs.ts_ended) AS ts_last_observation,
+    YEAR(MAX(COALESCE(obs.ts_ended, obs.ts_started))) AS year,
+    MONTH(MAX(COALESCE(obs.ts_ended, obs.ts_started))) AS month,
+    DAYOFMONTH(MAX(COALESCE(obs.ts_ended, obs.ts_started))) AS day
 FROM
     datalake_langfuse_clean.observations AS obs
 INNER JOIN
