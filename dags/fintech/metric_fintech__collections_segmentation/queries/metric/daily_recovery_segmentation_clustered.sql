@@ -14,22 +14,53 @@ WITH contract_features_normalized AS (
             WHEN segmentation IN ('ended-had-forgiveness') THEN
                 CASE
                     WHEN reference_contract_status = 'Finalizado'
-                     AND max_delay_contaminated_contract_t2 <= 30 THEN 'ended-new-defaulter'
+                     AND max_delay_contaminated_contract_t2 <= 30
+                     AND prob_payment = 'HIGH' THEN 'ended-new-defaulter-high'
+                    WHEN reference_contract_status = 'Finalizado'
+                     AND max_delay_contaminated_contract_t2 <= 30
+                     AND prob_payment = 'LOW' THEN 'ended-new-defaulter-low'
                     WHEN reference_contract_status = 'Finalizado'
                      AND max_delay_contaminated_contract_t2 > 30
-                     AND max_delay_contaminated_contract_t2 <= 90 THEN 'ended-stock-31to90'
+                     AND max_delay_contaminated_contract_t2 <= 90
+                     AND prob_payment = 'HIGH' THEN 'ended-stock-31-90-high'
+                    WHEN reference_contract_status = 'Finalizado'
+                     AND max_delay_contaminated_contract_t2 > 30
+                     AND max_delay_contaminated_contract_t2 <= 90
+                     AND prob_payment = 'LOW' THEN 'ended-stock-31-90-low'
+                    WHEN reference_contract_status = 'Finalizado'
+                     AND max_delay_contaminated_contract_t2 > 30
+                     AND max_delay_contaminated_contract_t2 <= 90
+                     AND prob_payment = 'VERY_LOW' THEN 'ended-stock-31-90-repair'
                     WHEN reference_contract_status = 'Finalizado'
                      AND max_delay_contaminated_contract_t2 > 90
-                     AND max_delay_contaminated_contract_t2 <= 180 THEN 'ended-stock-91to180'
+                     AND max_delay_contaminated_contract_t2 <= 180
+                     AND prob_payment = 'HIGH' THEN 'ended-stock-91-180-high'
+                    WHEN reference_contract_status = 'Finalizado'
+                     AND max_delay_contaminated_contract_t2 > 90
+                     AND max_delay_contaminated_contract_t2 <= 180
+                     AND prob_payment = 'LOW' THEN 'ended-stock-91-180-low'
+                    WHEN reference_contract_status = 'Finalizado'
+                     AND max_delay_contaminated_contract_t2 > 90
+                     AND max_delay_contaminated_contract_t2 <= 180
+                     AND prob_payment = 'VERY_LOW' THEN 'ended-stock-91-180-repair'
                     WHEN reference_contract_status = 'Finalizado'
                      AND max_delay_contaminated_contract_t2 > 180
-                     AND max_delay_contaminated_contract_t2 <= 360 THEN 'ended-stock-181to360'
+                     AND max_delay_contaminated_contract_t2 <= 360
+                     AND prob_payment = 'HIGH' THEN 'ended-stock-181-360-high'
+                    WHEN reference_contract_status = 'Finalizado'
+                     AND max_delay_contaminated_contract_t2 > 180
+                     AND max_delay_contaminated_contract_t2 <= 360
+                     AND prob_payment = 'LOW' THEN 'ended-stock-181-360-low'
+                    WHEN reference_contract_status = 'Finalizado'
+                     AND max_delay_contaminated_contract_t2 > 180
+                     AND max_delay_contaminated_contract_t2 <= 360
+                     AND prob_payment = 'VERY_LOW' THEN 'ended-stock-181-360-repair'
                     WHEN reference_contract_status = 'Finalizado'
                      AND max_delay_contaminated_contract_t2 > 360
                      AND max_delay_contaminated_contract_t2 <= 1440 THEN 'ended-stock-361-1440'
                     WHEN reference_contract_status = 'Finalizado'
                      AND max_delay_contaminated_contract_t2 > 1440 THEN 'ended-stock-over1440'
-                    ELSE 'ended-had-forgiveness'
+                    ELSE segmentation
                 END
             ELSE segmentation
         END AS segmentation
