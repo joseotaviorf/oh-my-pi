@@ -131,6 +131,13 @@ escalation_queue AS (
   WHERE
     o.ts_started >= '{load_start_date}'
     AND t.ts_created >= '{load_start_date}'
+    AND COALESCE(
+      GET_JSON_OBJECT(o.input, '$.metadata.metadata.queue_name'),
+      GET_JSON_OBJECT(o.input, '$.last_bot_message.metadata.queue_name'),
+      GET_JSON_OBJECT(o.input, '$.department_name')
+    ) IS NOT NULL
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY t.id_session ORDER BY o.ts_started DESC) = 1
 ),
 langfuse_version AS (
   SELECT
