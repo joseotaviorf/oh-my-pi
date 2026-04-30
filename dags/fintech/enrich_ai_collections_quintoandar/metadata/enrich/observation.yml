@@ -1,0 +1,110 @@
+database_name: enrich_ai_collections_quintoandar
+table_name: observation
+description: Per-session summary of Langfuse observations for Matthew (collections AI agent) sessions, with flags grouping negotiation flow signals, technical-state signals, and trace volume aggregates.
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  id_langfuse_session:
+    lineage:
+      - datalake_langfuse_clean.traces.id_session
+    description: "Langfuse session identifier, joining back to enrich_ai_collections_quintoandar.sessions.id_external."
+  flag_ask_user_preferences:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the agent asked the user for preferences (ask_user_preferences observation) at least once in the session, else 0."
+  send_proposal_count:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "Number of times the agent sent a negotiation proposal (send_proposal observation) during the session."
+  flag_handle_segments_without_proposals:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the agent reached the handle_segments_without_proposals state at least once during the session, else 0."
+  handle_negotiation_cancelled_count:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "Number of times the agent reached the handle_negotiation_cancelled state during the session."
+  confirm_negotiation_count:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "Number of times the agent emitted a confirm_negotiation observation, signalling user-confirmed offers."
+  flag_create_negotiation:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the agent emitted a create_negotiation observation at least once in the session, else 0."
+  flag_collectionsinput_agent:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session contains the CollectionsInput observation (canonical Matthew V2 session entrypoint), else 0."
+  is_notification_reply:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session contains the outbound_payload_from_dto observation, indicating a reply triggered by a notification."
+  flag_has_collections_data_error:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.type
+    description: "1 if the session contains a handle_collections_data_error observation of type CHAIN or TOOL, signalling a collections data fetch failure."
+  flag_has_fetch_collections_data:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.type
+    description: "1 if the session contains a fetch_collections_data observation of type CHAIN or TOOL, signalling a collections data fetch attempt."
+  flag_handle_no_contracts:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.type
+    description: "1 if the session contains a handle_no_contracts observation of type CHAIN or TOOL, signalling that no contracts were available for the user."
+  flag_has_fetch_contracts:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.type
+    description: "1 if the session contains a fetch_contracts observation of type CHAIN or TOOL, signalling a contracts fetch attempt."
+  flag_payment_allegation_tool:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session invoked the PaymentAllegationTool tool at least once, else 0."
+  flag_debt_retriever_tool:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session invoked the DebtRetrieverTool tool at least once, else 0."
+  flag_user_debt_classifier_tool:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session invoked the UserDebtClassifierTool tool at least once, else 0."
+  flag_debt_finder_tool:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session invoked the DebtFinderTool tool at least once, else 0."
+  flag_get_yearly_paid_invoices_report_tool:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session invoked the get_yearly_paid_invoices_report_tool tool at least once, else 0."
+  flag_negotiation_proposer_tool:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session invoked the NegotiationProposerTool tool at least once, else 0."
+  flag_debt_summary_display_helper:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session reached the debt_summary_display_helper helper at least once, else 0."
+  flag_original_invoice_values_disagreement_helper:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session reached the original_invoice_values_disagreement_helper helper, signalling that the user disagreed with the original invoice values."
+  flag_ongoing_deal_renegotiation_request_helper:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session reached the ongoing_deal_renegotiation_request_helper helper, signalling that the user requested to renegotiate an ongoing deal."
+  flag_handle_non_tenant:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session reached the handle_non_tenant state, signalling that the user is not a tenant."
+  ts_first_observation:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_started
+    description: "Timestamp of the first tracked Langfuse observation recorded for the session (over the named observations aggregated in this table)."
+  ts_last_observation:
+    lineage:
+      - datalake_langfuse_clean.observations.ts_ended
+    description: "Timestamp of the last tracked Langfuse observation recorded for the session (over the named observations aggregated in this table)."

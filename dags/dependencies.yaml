@@ -261,7 +261,6 @@ bietlejuice.dw_collection_ai_agents:
   - bietlejuice.dw_contract:load-dw-rent-fact-contract-people:first-run-of-day
   - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
-  - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
   - bietlejuice.langfuse:load-clean-scores:first-run-of-day
 bietlejuice.dw_collection_recovery_quintoandar:
   - bietlejuice.enrich_collections_quintoandar:load-enrich-collection-events:first-run-of-day
@@ -1515,6 +1514,12 @@ bietlejuice.enrich_agreement_hourly:
   - bietlejuice.trato_feito_hourly:load-clean-installment
   - bietlejuice.trato_feito_hourly:load-clean-negotiation
   - bietlejuice.trato_feito_hourly:load-clean-payment
+bietlejuice.enrich_ai_collections_quintoandar:
+  - bietlejuice.enrich_chatbot:load-enrich-messages:first-run-of-day
+  - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
+  - bietlejuice.langfuse:load-clean-observations:first-run-of-day
+  - bietlejuice.langfuse:load-clean-scores:first-run-of-day
+  - bietlejuice.langfuse:load-clean-traces:first-run-of-day
 bietlejuice.enrich_airtable:
   - bietlejuice.airtable:load-clean-activated:first-run-of-day
   - bietlejuice.airtable:load-clean-cr-occurrences:first-run-of-day

@@ -1,0 +1,119 @@
+database_name: enrich_ai_collections_quintoandar
+table_name: sessions
+description: Universe of chatbot sessions that could contain Matthew (collections AI agent) interactions, with the AI agent source derived from Langfuse observation flags and trace presence.
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  id_session:
+    lineage:
+      - datalake_chatbot.sessions.id_session
+    description: "Internal session ID from the chatbot enrich layer."
+  id_sauron_session:
+    lineage:
+      - datalake_chatbot.sessions.id_sauron_session
+    description: "Sauron session ID associated with the chatbot session."
+  id_external:
+    lineage:
+      - datalake_chatbot.sessions.id_langfuse_session
+    description: "External (Langfuse) session ID used to integrate with Langfuse traces and observations."
+  id_ticket:
+    lineage:
+      - datalake_chatbot.sessions.id_ticket
+    description: "Customer support ticket ID associated with the session, when escalated."
+  id_user:
+    lineage:
+      - datalake_chatbot.sessions.id_user
+    description: "Identifier of the user that interacted with the chatbot in this session."
+  bot:
+    lineage:
+      - datalake_chatbot.sessions.bot
+    description: "Bot type that handled the session (matthew or wall-e)."
+  first_queue:
+    lineage:
+      - datalake_chatbot.sessions.first_queue
+    description: "First customer support queue that handled the session."
+  last_queue:
+    lineage:
+      - datalake_chatbot.sessions.last_queue
+    description: "Last customer support queue that handled the session."
+  ai_agent_source:
+    lineage:
+      - datalake_chatbot.sessions.bot
+      - datalake_ai_collections_quintoandar.observation.flag_collectionsinput_agent
+      - datalake_ai_collections_quintoandar.observation.flag_debt_retriever_tool
+      - datalake_ai_collections_quintoandar.observation.flag_user_debt_classifier_tool
+      - datalake_ai_collections_quintoandar.observation.flag_debt_finder_tool
+    description: "Source of the AI agent for the session: 'Matthew in Whatsapp' when bot=matthew, 'Matthew in Chat' when bot=wall-e and ANY Matthew detection signal is present (V2 CollectionsInput, V1.5 DebtRetrieverTool/UserDebtClassifierTool, or V1 DebtFinderTool), otherwise 'Wall-e'."
+  ai_agent_source_legacy:
+    lineage:
+      - datalake_chatbot.sessions.bot
+      - datalake_langfuse_clean.scores.value
+      - datalake_langfuse_clean.scores.name
+    description: "Legacy source of the AI agent for the session, derived from the SessionContainsMatthewAgentEvaluator Langfuse score (value=1) instead of observations. Kept to reproduce historical metrics that pre-date the observation-based logic."
+  is_matthew_in_session:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_collectionsinput_agent
+      - datalake_ai_collections_quintoandar.observation.flag_debt_retriever_tool
+      - datalake_ai_collections_quintoandar.observation.flag_user_debt_classifier_tool
+      - datalake_ai_collections_quintoandar.observation.flag_debt_finder_tool
+    description: "Boolean flag indicating that any Matthew agent version (V1, V1.5 or V2) was detected in the session via observation signals, derived from the OR of CollectionsInput, DebtRetrieverTool, UserDebtClassifierTool and DebtFinderTool. Note: this is observation-derived only and is strictly narrower than ai_agent_source — historical bot='matthew' (Whatsapp) sessions without recorded traces can have ai_agent_source='Matthew in Whatsapp' and is_matthew_in_session=FALSE simultaneously. For the canonical 'Matthew was involved' question use ai_agent_source <> 'Wall-e'."
+  matthew_version:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_collectionsinput_agent
+      - datalake_ai_collections_quintoandar.observation.flag_debt_retriever_tool
+      - datalake_ai_collections_quintoandar.observation.flag_user_debt_classifier_tool
+      - datalake_ai_collections_quintoandar.observation.flag_debt_finder_tool
+    description: "Detected Matthew agent version: 'V2' when the CollectionsInput observation is present (newest entrypoint), 'V1.5' when DebtRetrieverTool or UserDebtClassifierTool is present, 'V1' when DebtFinderTool is present, NULL otherwise. Precedence is V2 > V1.5 > V1. Observation-derived only: historical bot='matthew' (Whatsapp) sessions where traces were not recorded can be 'Matthew in Whatsapp' with matthew_version=NULL — downstream consumers should handle NULL explicitly (e.g. as a distinct 'unknown' bucket)."
+  flag_eval_matthew_in_chat:
+    lineage:
+      - datalake_chatbot.sessions.bot
+      - datalake_ai_collections_quintoandar.observation.flag_collectionsinput_agent
+    description: "Boolean flag indicating that the Matthew V2 agent was active inside an in-app chat session (bot=wall-e plus CollectionsInput observation). Narrower than is_matthew_in_session, kept for V2-specific analyses."
+  is_escalation:
+    lineage:
+      - datalake_chatbot.sessions.is_escalated
+    description: "Boolean flag indicating that the session was escalated to a human agent."
+  flag_session_with_trace:
+    lineage:
+      - datalake_langfuse_clean.traces.id_session
+    description: "Boolean flag indicating that the session has at least one Langfuse trace recorded (derived directly from datalake_langfuse_clean.traces, independent from observations)."
+  notif_ts_extracted:
+    lineage:
+      - datalake_langfuse_clean.traces.input
+    description: "Timestamp of the most recent user notification at the time the session started, extracted from the first Langfuse trace input JSON ($.user_context.user_last_notifications[0].sent_at)."
+  notif_text_extracted:
+    lineage:
+      - datalake_langfuse_clean.traces.input
+    description: "Text of the most recent user notification at the time the session started, extracted from the first Langfuse trace input JSON ($.user_context.user_last_notifications[0].text)."
+  notif_template_extracted:
+    lineage:
+      - datalake_langfuse_clean.traces.input
+    description: "Template name of the most recent user notification at the time the session started, extracted from the first Langfuse trace input JSON ($.user_context.user_last_notifications[0].template)."
+  user_roles_raw:
+    lineage:
+      - datalake_langfuse_clean.traces.input
+    description: "Raw user roles JSON value seen on the first Langfuse trace input ($.user_context.user_roles), kept verbatim for downstream parsing. user_roles is constant per session, so the first trace value is sufficient."
+  is_tenant:
+    lineage:
+      - datalake_langfuse_clean.traces.input
+    description: "1 if the user_roles seen on the first trace input contains TENANT, else 0."
+  is_owner:
+    lineage:
+      - datalake_langfuse_clean.traces.input
+    description: "1 if the user_roles seen on the first trace input contains OWNER, else 0."
+  is_owner_only:
+    lineage:
+      - datalake_langfuse_clean.traces.input
+    description: "1 if the user_roles seen on the first trace input contains OWNER and does NOT contain TENANT, else 0."
+  dt_session_created:
+    lineage:
+      - datalake_chatbot.sessions.ts_created
+    description: "Date when the session was created (extracted from ts_created)."
+  ts_created:
+    lineage:
+      - datalake_chatbot.sessions.ts_created
+    description: "Timestamp when the chatbot session was created."
+  ts_updated:
+    lineage:
+      - datalake_chatbot.sessions.ts_updated
+    description: "Timestamp when the chatbot session was last updated; used as the incremental watermark."

@@ -1,0 +1,40 @@
+dag:
+  name: enrich_ai_collections_quintoandar
+  schedule_start_date: 2026, 4, 29
+  owner: Data Fintech
+  documentation:
+    dag_purpose: |
+      Enrich layer for the Collections AI Agents (Matthew) analytics:
+      builds session universe, per-session observation summary and an
+      LLM-friendly agglutinated conversation string per id_sauron_session.
+
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: ai_collections_quintoandar
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  tables_customization:
+    sessions:
+      merge_on: [id_sauron_session]
+      z_order_by: [ts_updated, id_sauron_session]
+    observation:
+      merge_on: [id_langfuse_session]
+      z_order_by: [id_langfuse_session]
+    messages:
+      merge_on: [id_sauron_session]
+      z_order_by: [id_sauron_session]
+  inner_dependencies:
+    sessions:
+      - observation
+    messages:
+      - sessions
+
+cluster:
+  type: databricks_16_4_med_memory_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

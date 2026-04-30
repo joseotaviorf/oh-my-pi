@@ -1,77 +1,234 @@
 database_name: dw_collection_ai_agents
 table_name: fact_ai_agents_interaction
-description: AI agents interaction data with user sessions, bot information, and evaluation scores
+description: AI agents interaction fact table — one row per chatbot session with bot info, Matthew agent flags, trace context, observation aggregates, user wallet snapshot at session date and the agglutinated conversation string.
 domain: Fintech
 owner: juliana.hocihara@quintoandar.com.br
 columns:
   id_session:
     lineage:
-      - datalake_chatbot.sessions.id_session
-    description: "Internal session ID from the chatbot system"
+      - datalake_ai_collections_quintoandar.sessions.id_session
+    description: "Internal session ID from the chatbot system."
   id_sauron_session:
     lineage:
-      - datalake_chatbot.sessions.id_sauron_session
-    description: "Sauron session ID associated with the chatbot session"
+      - datalake_ai_collections_quintoandar.sessions.id_sauron_session
+    description: "Sauron session ID associated with the chatbot session."
   id_external:
     lineage:
-      - datalake_chatbot.sessions.id_external
-    description: "External session ID used for integration with other systems"
+      - datalake_ai_collections_quintoandar.sessions.id_external
+    description: "External (Langfuse) session ID used for integration with Langfuse traces and observations."
   id_ticket:
     lineage:
-      - datalake_chatbot.sessions.id_ticket
-    description: "Ticket ID associated with the session"
+      - datalake_ai_collections_quintoandar.sessions.id_ticket
+    description: "Customer support ticket ID associated with the session, when escalated."
   id_user:
     lineage:
-      - datalake_chatbot.sessions.id_user
-    description: "User ID associated with the session"
+      - datalake_ai_collections_quintoandar.sessions.id_user
+    description: "Identifier of the user that interacted with the chatbot in this session."
   bot:
     lineage:
-      - datalake_chatbot.sessions.bot
-    description: "Bot type that handled the session (matthew or wall-e)"
-  matthew_version:
-    description: "Matthew version that handled the session"
-  matthew_version_host_refined:
-    description: "Matthew version that handled the session, refined by the host"
+      - datalake_ai_collections_quintoandar.sessions.bot
+    description: "Bot type that handled the session (matthew or wall-e)."
   first_queue:
     lineage:
-      - datalake_chatbot.sessions.first_queue
-    description: "First queue that handled the session"
+      - datalake_ai_collections_quintoandar.sessions.first_queue
+    description: "First customer support queue that handled the session."
   last_queue:
     lineage:
-      - datalake_chatbot.sessions.last_queue
-    description: "Last queue that handled the session"
-  name:
-    lineage:
-      - datalake_langfuse_clean.scores.name
-    description: "Name of the evaluation metric from Langfuse"
-  value:
-    lineage:
-      - datalake_langfuse_clean.scores.value
-    description: "Evaluation score value from Langfuse"
-  flag_eval_matthew_in_chat:
-    lineage:
-      - datalake_langfuse_clean.scores.value
-    description: "Boolean flag indicating if Matthew agent was evaluated in the chat session"
+      - datalake_ai_collections_quintoandar.sessions.last_queue
+    description: "Last customer support queue that handled the session."
   ai_agent_source:
     lineage:
-      - datalake_langfuse_clean.scores.value
-      - datalake_chatbot.sessions.bot
-    description: "Source of the AI agent: 'Matthew in Chat', 'Matthew in Whatsapp', or 'Wall-e'"
+      - datalake_ai_collections_quintoandar.sessions.ai_agent_source
+    description: "Source of the AI agent for the session: 'Matthew in Whatsapp', 'Matthew in Chat' (any of V1, V1.5 or V2 Matthew signals detected on a wall-e session), or 'Wall-e'."
+  ai_agent_source_legacy:
+    lineage:
+      - datalake_ai_collections_quintoandar.sessions.ai_agent_source_legacy
+    description: "Legacy source of the AI agent for the session, derived from the SessionContainsMatthewAgentEvaluator Langfuse score (value=1) — kept to reproduce historical metrics that pre-date the observation-based logic."
+  is_matthew_in_session:
+    lineage:
+      - datalake_ai_collections_quintoandar.sessions.is_matthew_in_session
+    description: "Boolean flag indicating that any Matthew agent version (V1, V1.5 or V2) was detected via observation signals (OR of CollectionsInput, DebtRetrieverTool, UserDebtClassifierTool and DebtFinderTool). Strictly narrower than ai_agent_source: historical bot='matthew' (Whatsapp) sessions without recorded traces can have ai_agent_source='Matthew in Whatsapp' and is_matthew_in_session=FALSE simultaneously. For 'was Matthew involved' use ai_agent_source <> 'Wall-e'."
+  matthew_version:
+    lineage:
+      - datalake_ai_collections_quintoandar.sessions.matthew_version
+    description: "Detected Matthew agent version: 'V2' (CollectionsInput), 'V1.5' (DebtRetrieverTool or UserDebtClassifierTool), 'V1' (DebtFinderTool), NULL when no Matthew signal was detected. Precedence is V2 > V1.5 > V1. Observation-derived only: historical Whatsapp Matthew sessions where traces were not recorded can be 'Matthew in Whatsapp' with matthew_version=NULL — downstream consumers should handle NULL explicitly (e.g. as a distinct 'unknown' bucket)."
+  flag_eval_matthew_in_chat:
+    lineage:
+      - datalake_ai_collections_quintoandar.sessions.flag_eval_matthew_in_chat
+    description: "Boolean flag indicating that the Matthew V2 agent (CollectionsInput) was active inside an in-app chat session (bot=wall-e). Narrower than is_matthew_in_session."
   is_escalation:
     lineage:
-      - datalake_chatbot.sessions.is_escalation
-    description: "Flag indicating if the session was escalated"
+      - datalake_ai_collections_quintoandar.sessions.is_escalation
+    description: "Boolean flag indicating that the session was escalated to a human agent."
+  flag_session_with_trace:
+    lineage:
+      - datalake_ai_collections_quintoandar.sessions.flag_session_with_trace
+    description: "Boolean flag indicating that the session has at least one Langfuse trace recorded."
+  notif_ts_extracted:
+    lineage:
+      - datalake_ai_collections_quintoandar.sessions.notif_ts_extracted
+    description: "Timestamp of the most recent user notification at the time the session started."
+  notif_text_extracted:
+    lineage:
+      - datalake_ai_collections_quintoandar.sessions.notif_text_extracted
+    description: "Text of the most recent user notification at the time the session started."
+  notif_template_extracted:
+    lineage:
+      - datalake_ai_collections_quintoandar.sessions.notif_template_extracted
+    description: "Template name of the most recent user notification at the time the session started."
+  user_roles_raw:
+    lineage:
+      - datalake_ai_collections_quintoandar.sessions.user_roles_raw
+    description: "Raw user roles JSON value seen on the first Langfuse trace input."
+  is_tenant:
+    lineage:
+      - datalake_ai_collections_quintoandar.sessions.is_tenant
+    description: "1 if the user_roles seen on the first trace input contains TENANT, else 0."
+  is_owner:
+    lineage:
+      - datalake_ai_collections_quintoandar.sessions.is_owner
+    description: "1 if the user_roles seen on the first trace input contains OWNER, else 0."
+  is_owner_only:
+    lineage:
+      - datalake_ai_collections_quintoandar.sessions.is_owner_only
+    description: "1 if the user_roles seen on the first trace input contains OWNER and does NOT contain TENANT, else 0."
+  max_delay_contaminated_contract_t2:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.max_delay_contaminated_contract_t2
+    description: "Maximum delay in days for contaminated contracts (Window 2 days) for this user at the session date."
+  user_wallet_overdue_t2:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.user_wallet_overdue_t2
+    description: "Total overdue wallet amount for the user at the session date (Window 2 days)."
+  flag_user_delay:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.user_wallet_overdue_t2
+    description: "User payment status at session date: 'delay' when user_wallet_overdue_t2 > 0, otherwise 'current'."
+  n_contracts:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.n_contracts
+    description: "Total number of contracts associated with the user at the session date."
+  active_contracts:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.active_contracts
+    description: "Number of active contracts for the user at the session date."
+  contracts:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.contracts
+    description: "Array of all contract IDs associated with the user at the session date."
+  array_open_invoices:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.array_open_invoices
+    description: "Flattened array of all open invoices across the user's contracts at the session date."
+  flag_ask_user_preferences:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_ask_user_preferences
+    description: "1 if the agent asked the user for preferences during the session, else 0 (absent or no observations recorded for the session)."
+  send_proposal_count:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.send_proposal_count
+    description: "Number of times the agent sent a negotiation proposal during the session (0 when no observations recorded)."
+  flag_handle_segments_without_proposals:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_handle_segments_without_proposals
+    description: "1 if the agent reached the handle_segments_without_proposals state at least once, else 0 (absent or no observations recorded)."
+  handle_negotiation_cancelled_count:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.handle_negotiation_cancelled_count
+    description: "Number of times the agent reached the handle_negotiation_cancelled state (0 when no observations recorded)."
+  confirm_negotiation_count:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.confirm_negotiation_count
+    description: "Number of times the agent emitted a confirm_negotiation observation (0 when no observations recorded)."
+  flag_create_negotiation:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_create_negotiation
+    description: "1 if the agent emitted a create_negotiation observation at least once, else 0 (absent or no observations recorded)."
+  flag_collectionsinput_agent:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_collectionsinput_agent
+    description: "1 if the session contains the CollectionsInput observation (canonical Matthew V2 entrypoint), else 0 (absent or no observations recorded)."
+  is_notification_reply:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.is_notification_reply
+    description: "1 if the session contains the outbound_payload_from_dto observation, else 0 (absent or no observations recorded)."
+  flag_has_collections_data_error:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_has_collections_data_error
+    description: "1 if the session contains a handle_collections_data_error observation, else 0 (absent or no observations recorded)."
+  flag_has_fetch_collections_data:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_has_fetch_collections_data
+    description: "1 if the session contains a fetch_collections_data observation, else 0 (absent or no observations recorded)."
+  flag_handle_no_contracts:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_handle_no_contracts
+    description: "1 if the session contains a handle_no_contracts observation, else 0 (absent or no observations recorded)."
+  flag_has_fetch_contracts:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_has_fetch_contracts
+    description: "1 if the session contains a fetch_contracts observation, else 0 (absent or no observations recorded)."
+  flag_payment_allegation_tool:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_payment_allegation_tool
+    description: "1 if the session invoked the PaymentAllegationTool tool at least once, else 0 (absent or no observations recorded)."
+  flag_debt_retriever_tool:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_debt_retriever_tool
+    description: "1 if the session invoked the DebtRetrieverTool tool at least once, else 0 (absent or no observations recorded)."
+  flag_user_debt_classifier_tool:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_user_debt_classifier_tool
+    description: "1 if the session invoked the UserDebtClassifierTool tool at least once, else 0 (absent or no observations recorded)."
+  flag_debt_finder_tool:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_debt_finder_tool
+    description: "1 if the session invoked the DebtFinderTool tool at least once, else 0 (absent or no observations recorded)."
+  flag_get_yearly_paid_invoices_report_tool:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_get_yearly_paid_invoices_report_tool
+    description: "1 if the session invoked the get_yearly_paid_invoices_report_tool tool at least once, else 0 (absent or no observations recorded)."
+  flag_negotiation_proposer_tool:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_negotiation_proposer_tool
+    description: "1 if the session invoked the NegotiationProposerTool tool at least once, else 0 (absent or no observations recorded)."
+  flag_debt_summary_display_helper:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_debt_summary_display_helper
+    description: "1 if the session reached the debt_summary_display_helper helper at least once, else 0 (absent or no observations recorded)."
+  flag_original_invoice_values_disagreement_helper:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_original_invoice_values_disagreement_helper
+    description: "1 if the session reached the original_invoice_values_disagreement_helper helper, signalling that the user disagreed with the original invoice values; else 0 (absent or no observations recorded)."
+  flag_ongoing_deal_renegotiation_request_helper:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_ongoing_deal_renegotiation_request_helper
+    description: "1 if the session reached the ongoing_deal_renegotiation_request_helper helper, signalling that the user requested to renegotiate an ongoing deal; else 0 (absent or no observations recorded)."
+  flag_handle_non_tenant:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_handle_non_tenant
+    description: "1 if the session reached the handle_non_tenant state, signalling that the user is not a tenant; else 0 (absent or no observations recorded)."
+  ts_first_observation:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.ts_first_observation
+    description: "Timestamp of the first Langfuse observation recorded for the session."
+  ts_last_observation:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.ts_last_observation
+    description: "Timestamp of the last Langfuse observation recorded for the session."
+  full_conversation:
+    lineage:
+      - datalake_ai_collections_quintoandar.messages.full_conversation
+    description: "Single string with all session messages prefixed by their role or user identifier and joined by newline, ordered chronologically; intended for downstream LLM analysis."
   dt_session_created:
     lineage:
-      - datalake_chatbot.sessions.ts_created
-    description: "Date when the session was created (extracted from timestamp)"
+      - datalake_ai_collections_quintoandar.sessions.dt_session_created
+    description: "Date when the session was created."
   ts_created:
     lineage:
-      - datalake_chatbot.sessions.ts_created
-    description: "Timestamp when the session was created"
+      - datalake_ai_collections_quintoandar.sessions.ts_created
+    description: "Timestamp when the session was created."
   ts_updated:
     lineage:
-      - datalake_chatbot.sessions.ts_updated
-    description: "Timestamp when the session was last updated"
-  flag_session_with_trace:
-    description: "Boolean flag indicating if the session has a trace in Langfuse"
+      - datalake_ai_collections_quintoandar.sessions.ts_updated
+    description: "Timestamp when the session was last updated."
