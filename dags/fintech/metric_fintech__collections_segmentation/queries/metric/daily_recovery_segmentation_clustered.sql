@@ -11,6 +11,26 @@ WITH contract_features_normalized AS (
                 'active-new-defaulter-early-low',
                 'active-new-defaulter-late-low'
             ) THEN 'active-new-defaulter-low'
+            WHEN segmentation IN ('ended-had-forgiveness') THEN
+                CASE
+                    WHEN reference_contract_status = 'Finalizado'
+                     AND max_delay_contaminated_contract_t2 <= 30 THEN 'ended-new-defaulter'
+                    WHEN reference_contract_status = 'Finalizado'
+                     AND max_delay_contaminated_contract_t2 > 30
+                     AND max_delay_contaminated_contract_t2 <= 90 THEN 'ended-stock-31to90'
+                    WHEN reference_contract_status = 'Finalizado'
+                     AND max_delay_contaminated_contract_t2 > 90
+                     AND max_delay_contaminated_contract_t2 <= 180 THEN 'ended-stock-91to180'
+                    WHEN reference_contract_status = 'Finalizado'
+                     AND max_delay_contaminated_contract_t2 > 180
+                     AND max_delay_contaminated_contract_t2 <= 360 THEN 'ended-stock-181to360'
+                    WHEN reference_contract_status = 'Finalizado'
+                     AND max_delay_contaminated_contract_t2 > 360
+                     AND max_delay_contaminated_contract_t2 <= 1440 THEN 'ended-stock-361-1440'
+                    WHEN reference_contract_status = 'Finalizado'
+                     AND max_delay_contaminated_contract_t2 > 1440 THEN 'ended-stock-over1440'
+                    ELSE 'ended-had-forgiveness'
+                END
             ELSE segmentation
         END AS segmentation
     FROM
