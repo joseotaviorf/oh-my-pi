@@ -183,6 +183,20 @@ workflow:
       vacuum_retention_hours: 168
       vacuum_lite: true
 
+    reports_detailed:
+      endpoint_path: reports/detailed
+      extraction_type: full
+      id_expansion:
+        source_table: employees
+        id_field: uuid
+        param_name: employeeUuid
+      date_format: "%Y-%m-%d"
+      params:
+        from: load_start_date
+        to: load_end_date
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
     requests:
       endpoint_path: requests
       params: {}
