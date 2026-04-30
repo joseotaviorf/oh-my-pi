@@ -1,0 +1,63 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: item_room_price
+description: Price per item group, repair service, room type, and property area band for a pricing configuration.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id_item_room_price:
+    lineage:
+      - datalake_inspection_services_raw.item_room_price.id
+    description: Primary key of the item room price row
+  id_pricing_table_configuration:
+    lineage:
+      - datalake_inspection_services_raw.item_room_price.pricing_table_configuration_id
+    description: Foreign key to pricing_table_configuration
+  id_room_type:
+    lineage:
+      - datalake_inspection_services_raw.item_room_price.room_type_id
+    description: Foreign key to room_type
+  id_item_group_type:
+    lineage:
+      - datalake_inspection_services_raw.item_room_price.item_group_type_id
+    description: Foreign key to item_group_type
+  repair_service:
+    lineage:
+      - datalake_inspection_services_raw.item_room_price.repair_service
+    description: Repair service enum aligned with item_price
+  from_property_area:
+    lineage:
+      - datalake_inspection_services_raw.item_room_price.from_property_area
+    description: Inclusive lower bound of property area in square meters for this price
+  to_property_area:
+    lineage:
+      - datalake_inspection_services_raw.item_room_price.to_property_area
+    description: Upper bound of property area in square meters; null means no upper limit
+  price_amount:
+    lineage:
+      - datalake_inspection_services_raw.item_room_price.price_amount
+    description: Monetary amount for this room and area combination
+  price_currency:
+    lineage:
+      - datalake_inspection_services_raw.item_room_price.price_currency
+    description: Currency enum for price_amount
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.item_room_price.created_at
+    description: Record creation timestamp
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.item_room_price.updated_at
+    description: Last update timestamp
+  year:
+    lineage:
+      - datalake_inspection_services_raw.item_room_price.year
+    description: Partition year derived from update timestamp
+  month:
+    lineage:
+      - datalake_inspection_services_raw.item_room_price.month
+    description: Partition month derived from update timestamp
+  day:
+    lineage:
+      - datalake_inspection_services_raw.item_room_price.day
+    description: Partition day derived from update timestamp

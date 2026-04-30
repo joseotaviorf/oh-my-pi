@@ -1,0 +1,55 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: item_price
+description: Base price per item group type, optional specification, repair service, and pricing configuration.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id_item_price:
+    lineage:
+      - datalake_inspection_services_raw.item_price.id
+    description: Primary key of the item price row
+  id_pricing_table_configuration:
+    lineage:
+      - datalake_inspection_services_raw.item_price.pricing_table_configuration_id
+    description: Foreign key to pricing_table_configuration
+  id_item_group_type:
+    lineage:
+      - datalake_inspection_services_raw.item_price.item_group_type_id
+    description: Foreign key to item_group_type
+  id_item_group_specification:
+    lineage:
+      - datalake_inspection_services_raw.item_price.item_group_specification_id
+    description: Optional foreign key to item_group_specification
+  repair_service:
+    lineage:
+      - datalake_inspection_services_raw.item_price.repair_service
+    description: Repair service enum (e.g. painting, cleaning, installation)
+  price_amount:
+    lineage:
+      - datalake_inspection_services_raw.item_price.price_amount
+    description: Monetary amount of the base price
+  price_currency:
+    lineage:
+      - datalake_inspection_services_raw.item_price.price_currency
+    description: Currency enum for price_amount
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.item_price.created_at
+    description: Record creation timestamp
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.item_price.updated_at
+    description: Last update timestamp
+  year:
+    lineage:
+      - datalake_inspection_services_raw.item_price.year
+    description: Partition year derived from update timestamp
+  month:
+    lineage:
+      - datalake_inspection_services_raw.item_price.month
+    description: Partition month derived from update timestamp
+  day:
+    lineage:
+      - datalake_inspection_services_raw.item_price.day
+    description: Partition day derived from update timestamp

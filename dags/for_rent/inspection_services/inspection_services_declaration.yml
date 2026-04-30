@@ -89,6 +89,22 @@ workflow:
       clean_table_name: issue_type
       clean_primary_keys: [id_issue_type]
       raw_primary_keys: [id]
+    pricing_table_configuration:
+      clean_table_name: pricing_table_configuration
+      clean_primary_keys: [id_pricing_table_configuration]
+      raw_primary_keys: [id]
+    repair_city:
+      clean_table_name: repair_city
+      clean_primary_keys: [id_repair_city]
+      raw_primary_keys: [id]
+    repair_city_group:
+      clean_table_name: repair_city_group
+      clean_primary_keys: [id_repair_city_group]
+      raw_primary_keys: [id]
+    rent_value_rate:
+      clean_table_name: rent_value_rate
+      clean_primary_keys: [id_rent_value_rate]
+      raw_primary_keys: [id]
     item_group_type_aud:
       clean_table_name: item_group_type_aud
       clean_primary_keys: [id_item_group_type, rev]
@@ -100,6 +116,14 @@ workflow:
     item_group_specification:
       clean_table_name: item_group_specification
       clean_primary_keys: [id_item_group_specification]
+      raw_primary_keys: [id]
+    item_price:
+      clean_table_name: item_price
+      clean_primary_keys: [id_item_price]
+      raw_primary_keys: [id]
+    item_room_price:
+      clean_table_name: item_room_price
+      clean_primary_keys: [id_item_room_price]
       raw_primary_keys: [id]
     item_group_aud:
       clean_table_name: item_group_aud

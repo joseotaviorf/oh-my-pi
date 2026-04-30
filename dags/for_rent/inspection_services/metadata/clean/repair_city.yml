@@ -1,0 +1,39 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: repair_city
+description: Maps an external city or region identifier to a repair city group.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id_repair_city:
+    lineage:
+      - datalake_inspection_services_raw.repair_city.id
+    description: Primary key of the city-to-group association
+  id_repair_city_group:
+    lineage:
+      - datalake_inspection_services_raw.repair_city.repair_city_group_id
+    description: Foreign key to repair_city_group
+  id_city_region:
+    lineage:
+      - datalake_inspection_services_raw.repair_city.city_region_id
+    description: City or region identifier in the external inspections system
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.repair_city.created_at
+    description: Record creation timestamp
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.repair_city.updated_at
+    description: Last update timestamp
+  year:
+    lineage:
+      - datalake_inspection_services_raw.repair_city.year
+    description: Partition year derived from update timestamp
+  month:
+    lineage:
+      - datalake_inspection_services_raw.repair_city.month
+    description: Partition month derived from update timestamp
+  day:
+    lineage:
+      - datalake_inspection_services_raw.repair_city.day
+    description: Partition day derived from update timestamp

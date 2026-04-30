@@ -1,0 +1,43 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: repair_city_group
+description: Named city groups used to adjust repair pricing rates for a pricing configuration.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id_repair_city_group:
+    lineage:
+      - datalake_inspection_services_raw.repair_city_group.id
+    description: Primary key of the repair city group
+  id_pricing_table_configuration:
+    lineage:
+      - datalake_inspection_services_raw.repair_city_group.pricing_table_configuration_id
+    description: Foreign key to pricing_table_configuration
+  name:
+    lineage:
+      - datalake_inspection_services_raw.repair_city_group.name
+    description: Display name of the city group
+  rate:
+    lineage:
+      - datalake_inspection_services_raw.repair_city_group.rate
+    description: Rate multiplier for cities in this group
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.repair_city_group.created_at
+    description: Record creation timestamp
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.repair_city_group.updated_at
+    description: Last update timestamp
+  year:
+    lineage:
+      - datalake_inspection_services_raw.repair_city_group.year
+    description: Partition year derived from update timestamp
+  month:
+    lineage:
+      - datalake_inspection_services_raw.repair_city_group.month
+    description: Partition month derived from update timestamp
+  day:
+    lineage:
+      - datalake_inspection_services_raw.repair_city_group.day
+    description: Partition day derived from update timestamp

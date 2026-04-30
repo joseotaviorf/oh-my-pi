@@ -1,0 +1,47 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: rent_value_rate
+description: Rent value range rows with rate multipliers for a pricing table configuration.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id_rent_value_rate:
+    lineage:
+      - datalake_inspection_services_raw.rent_value_rate.id
+    description: Primary key of the rent value rate row
+  id_pricing_table_configuration:
+    lineage:
+      - datalake_inspection_services_raw.rent_value_rate.pricing_table_configuration_id
+    description: Foreign key to pricing_table_configuration
+  from_value:
+    lineage:
+      - datalake_inspection_services_raw.rent_value_rate.from_value
+    description: Inclusive lower bound of the rent value range
+  to_value:
+    lineage:
+      - datalake_inspection_services_raw.rent_value_rate.to_value
+    description: Upper bound of the rent value range; null means no upper limit
+  rate:
+    lineage:
+      - datalake_inspection_services_raw.rent_value_rate.rate
+    description: Rate multiplier for this rent value band
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.rent_value_rate.created_at
+    description: Record creation timestamp
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.rent_value_rate.updated_at
+    description: Last update timestamp
+  year:
+    lineage:
+      - datalake_inspection_services_raw.rent_value_rate.year
+    description: Partition year derived from update timestamp
+  month:
+    lineage:
+      - datalake_inspection_services_raw.rent_value_rate.month
+    description: Partition month derived from update timestamp
+  day:
+    lineage:
+      - datalake_inspection_services_raw.rent_value_rate.day
+    description: Partition day derived from update timestamp

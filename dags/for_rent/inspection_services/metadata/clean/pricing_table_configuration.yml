@@ -1,0 +1,51 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: pricing_table_configuration
+description: Versioned configuration for automatic repair pricing tables, including approval metadata and optimistic locking.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id_pricing_table_configuration:
+    lineage:
+      - datalake_inspection_services_raw.pricing_table_configuration.id
+    description: Primary key of the pricing configuration record
+  config_version:
+    lineage:
+      - datalake_inspection_services_raw.pricing_table_configuration.config_version
+    description: Unique business identifier of the configuration version
+  approver:
+    lineage:
+      - datalake_inspection_services_raw.pricing_table_configuration.approver
+    description: User who approved this configuration version
+  approval_url:
+    lineage:
+      - datalake_inspection_services_raw.pricing_table_configuration.approval_url
+    description: Reference URL for the approval record
+  version:
+    lineage:
+      - datalake_inspection_services_raw.pricing_table_configuration.version
+    description: JPA optimistic concurrency version counter
+  is_active:
+    lineage:
+      - datalake_inspection_services_raw.pricing_table_configuration.active
+    description: Whether this configuration is the active one (at most one active row enforced upstream)
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.pricing_table_configuration.created_at
+    description: Record creation timestamp
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.pricing_table_configuration.updated_at
+    description: Last update timestamp
+  year:
+    lineage:
+      - datalake_inspection_services_raw.pricing_table_configuration.year
+    description: Partition year derived from update timestamp
+  month:
+    lineage:
+      - datalake_inspection_services_raw.pricing_table_configuration.month
+    description: Partition month derived from update timestamp
+  day:
+    lineage:
+      - datalake_inspection_services_raw.pricing_table_configuration.day
+    description: Partition day derived from update timestamp
