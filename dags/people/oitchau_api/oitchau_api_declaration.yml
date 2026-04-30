@@ -7,17 +7,14 @@ dag:
   documentation:
     dag_purpose: |
       Ingests Oitchau Integrations API resources into the raw layer and materializes matching clean
-      Delta tables in datalake_oitchau_clean (queries/clean; merge_on only where configured). Raw tables
-      include employees, hoursbank_totals, employee_costs (POST costs/list fan-out), reports/detailed
-      (per-employee consolidated time report for the Airflow window), payroll, payroll_groups,
-      payroll_groups_list, and payroll_layouts from the Integrations API.
+      Delta tables in datalake_oitchau_clean (queries/clean; merge_on only where configured).
+      include employees, hoursbank_totals, employee_costs (POST costs/list fan-out), payroll,
+      payroll_groups, payroll_groups_list, and payroll_layouts from the Integrations API.
       Store credentials in Databricks Secrets (scope `people`): JSON secret referenced by
       `authentication.secret_key` with `client_id` and `client_secret` for the integration client.
       employees uses no pagination (full load). hoursbank_totals uses id_expansion: one call per
       employee UUID from the employees table, fetching the D-1 hours bank balance for each employee.
-      reports_detailed uses the same fan-out pattern: one GET reports/detailed per employee UUID with
-      from=load_start_date and to=load_end_date (consolidated report payload). Fan-out tables are chained
-      after employees via raw_inner_dependencies.
+      Fan-out table hoursbank_totals is chained after employees via raw_inner_dependencies.
       Payroll list uses status=completed (API contract). Payroll, payroll_groups,
       payroll_groups_list, and payroll_layouts are full extractions: raw overwrite per run,
       clean SQL without load-date filter, and no merge_on (same pattern as business_rules_groups).
@@ -84,8 +81,6 @@ workflow:
     requests_employees:
       - employees
     employee_costs:
-      - employees
-    reports_detailed:
       - employees
 
   tables_customization:
@@ -185,25 +180,6 @@ workflow:
         to: load_start_date
       merge_on:
         - id_punch
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-
-    reports_detailed:
-      endpoint_path: reports/detailed
-      extraction_type: incremental
-      id_expansion:
-        source_table: employees
-        id_field: uuid
-        param_name: employeeUuid
-        correlation_field: employeeUuid
-      date_format: "%Y-%m-%d"
-      params:
-        from: load_start_date
-        to: load_end_date
-      merge_on:
-        - id_employee_profile
-        - dt_report_period_started
-        - dt_report_period_ended
       vacuum_retention_hours: 168
       vacuum_lite: true
 
