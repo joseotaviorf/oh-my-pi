@@ -44,6 +44,8 @@ workflow:
       raw_primary_keys: ["lead_id"]
     lead_update_operation_history:
       z_order_by: [id]
+    owner_phone_refresh_tracking:
+      z_order_by: [id]
     revinfo:
       clean_table_name: rev_info
   extra_query_template_params:

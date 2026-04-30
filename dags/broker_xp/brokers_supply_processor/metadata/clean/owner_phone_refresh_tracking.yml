@@ -1,0 +1,52 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: owner_phone_refresh_tracking
+owner: leonardo.dalmeida@quintoandar.com.br
+domain: Broker XP
+description: >
+  Tracks asynchronous refresh attempts of owner phone data for third-party (3P) property leads in the
+  brokers-supply-processor service. Each row links a person and a lead to a workflow status when phone
+  information is reconciled or updated from partner systems.
+
+  RELATED TABLES: lead_3p (uuid_lead references lead_3p.uuid_lead).
+
+columns:
+  id:
+    lineage:
+      - datalake_brokers_supply_processor_raw.owner_phone_refresh_tracking.id
+    description: >
+      Auto-increment primary key for the owner phone refresh tracking record (BIGINT, Not Nullable).
+  uuid_person:
+    lineage:
+      - datalake_brokers_supply_processor_raw.owner_phone_refresh_tracking.person_uuid
+    description: >
+      UUID of the person whose owner phone refresh is being tracked (UUID, Not Nullable).
+  uuid_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.owner_phone_refresh_tracking.lead_uuid
+    description: >
+      UUID of the 3P property lead associated with this refresh attempt (UUID, Not Nullable).
+      Joins to lead_3p.uuid_lead for full lead context.
+  status:
+    lineage:
+      - datalake_brokers_supply_processor_raw.owner_phone_refresh_tracking.status
+    description: >
+      Current status of the owner phone refresh workflow (STRING, Not Nullable, max length 20).
+      Domain-specific values are defined in brokers-supply-processor (e.g. pending and terminal states).
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor_raw.owner_phone_refresh_tracking.created_at
+    description: >
+      Timestamp when the tracking row was created (TIMESTAMP, Not Nullable). Immutable after insert in source.
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.owner_phone_refresh_tracking.year
+    description: 'Partition column: year for data lake partitioning (INTEGER, Partition Key).'
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.owner_phone_refresh_tracking.month
+    description: 'Partition column: month for data lake partitioning (INTEGER, Partition Key).'
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.owner_phone_refresh_tracking.day
+    description: 'Partition column: day for data lake partitioning (INTEGER, Partition Key).'
