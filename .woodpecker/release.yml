@@ -4,6 +4,8 @@
 #
 # Wheel / create-dag / upload chains share YAML anchors so path predicates stay identical
 # within each chain (avoid skipping `make package` while a dependent step still runs).
+# API ingestion declaration YAML under dags/ is packaged in the wheel (MANIFEST.in); the
+# wheel must rebuild when those files change so Databricks reads current declarations.
 #
 # IMPORTANT: astronomer-deploy-dags-{env} depends_on upload-dag-packages-dags-s3-{env},
 # so *astronomer_deploy_path must be a subset of *upload_dags_path. Do NOT add paths here
@@ -36,6 +38,7 @@ steps:
             - 'setup.cfg'
             - 'pyproject.toml'
             - 'MANIFEST.in'
+            - 'dags/**/*_api_declaration.y*ml'
             - 'requirements.txt'
             - 'requirements-*.txt'
             - 'Makefile'
