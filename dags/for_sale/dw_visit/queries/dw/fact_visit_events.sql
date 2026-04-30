@@ -24,11 +24,11 @@ SELECT
   vse.id_sale_flow AS sk_sale_flow,
   -1 AS sk_entrance_type,
   dct.sk_cancellation_type AS sk_cancellation_type,
-  REPLACE(CAST(DATE(vse.ts_event_created) AS STRING), '-', '') AS sk_event_date,
+  REPLACE(CAST(DATE(vse.ts_created) AS STRING), '-', '') AS sk_event_date,
   vse.country_code,
   vse.ranking,
-  DATEDIFF(MINUTE,vse.ts_event_created , pe.ts_event_created) AS minutes_between_last_event,
-  DATEDIFF(HOUR,vse.ts_event_created , pe.ts_event_created) AS hours_between_last_event,
+  DATEDIFF(MINUTE,vse.ts_created , pe.ts_created) AS minutes_between_last_event,
+  DATEDIFF(HOUR,vse.ts_created , pe.ts_created) AS hours_between_last_event,
   NOW() AS ts_load
 FROM
   datalake_visit.visit_status_events AS vse

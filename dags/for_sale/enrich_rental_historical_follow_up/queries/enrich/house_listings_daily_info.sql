@@ -170,11 +170,11 @@ visits_new_modeling AS (
     JOIN
         datalake_ebdb_listing.house_listing AS hl
             ON hl.id_house = vse.id_house
-            AND vse.ts_event_created >= hl.ts_listing_version_start
-            AND vse.ts_event_created < COALESCE(hl.ts_listing_version_end, '2100-01-01')
+            AND vse.ts_created >= hl.ts_listing_version_start
+            AND vse.ts_created < COALESCE(hl.ts_listing_version_end, '2100-01-01')
     JOIN
         daily_base AS dbase
-            ON dbase.dt_day = DATE(vse.ts_event_created)
+            ON dbase.dt_day = DATE(vse.ts_created)
     WHERE
         vse.country_code = 'BR'
         AND vse.business_context = 'RENT'

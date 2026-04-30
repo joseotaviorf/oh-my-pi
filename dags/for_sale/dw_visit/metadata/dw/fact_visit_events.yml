@@ -123,7 +123,7 @@ columns:
       Key used to identifies the cancellation type of the visit if applicable.
   sk_event_date:
     lineage:
-      - datalake_visits.visit_status_events.ts_event_created
+      - datalake_visits.visit_status_events.ts_created
     description:
       Key used to see the date of the event.
   country_code:
@@ -138,12 +138,12 @@ columns:
       Identifies the ranking of the event.
   minutes_between_last_event:
     lineage:
-      - datalake_visits.visit_status_events.ts_event_created
+      - datalake_visits.visit_status_events.ts_created
     description:
       Identifies the time passed between the last event of the vist and the actual event (in minutes).
   hours_between_last_event:
     lineage:
-      - datalake_visits.visit_status_events.ts_event_created
+      - datalake_visits.visit_status_events.ts_created
     description:
       Identifies the time passed between the last event of the vist and the actual event (in hours).
   ts_load:

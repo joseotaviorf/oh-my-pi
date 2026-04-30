@@ -8,15 +8,15 @@ columns:
   id_visit:
     lineage:
       - datalake_ebdb_clean.visit.id
-      - datalake_ebdb_clean.visit_status_log.id_visit
+      - datalake_visit.visit_status_events.id_visit
     description: Primary key of table.
   visit_request_channel:
     lineage:
       - datalake_ebdb_clean.visit_origin.name
-      - datalake_ebdb_clean.visit_status_log.channel
+      - datalake_visit.visit_status_events.channel
     description: Channel of the visit origin (request event).
   ts_visit_requested:
     lineage:
       - datalake_ebdb_clean.visit.ts_created
-      - datalake_ebdb_clean.visit_status_log.ts_created
+      - datalake_visit.visit_status_events.ts_created
     description: Timestamp when the visit was requested (created).

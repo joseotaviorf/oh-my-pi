@@ -147,11 +147,11 @@ columns:
       AGENT: Only agent was evaluated.
   is_visit_completed_by_demand:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.event_type
+      - datalake_visit.visit_status_events.event_type
     description: What the demand answered about the visit completion. TRUE when the visit was completed by demand. FALSE when the visit was not completed by demand. NULL when the visit was canceled so the demand didn't answer.
   is_visit_canceled_by_demand:
     lineage:
-      - datalake_ebdb_clean.visit_status_log.event_type
+      - datalake_visit.visit_status_events.event_type
     description: What the demand answered about the visit cancellation. TRUE when the visit was canceled by demand. FALSE when the visit was not canceled by demand. NULL when the visit was not canceled so the demand didn't answer.
   ts_creation:
     lineage:

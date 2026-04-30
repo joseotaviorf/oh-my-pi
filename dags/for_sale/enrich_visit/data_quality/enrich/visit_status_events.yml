@@ -37,6 +37,6 @@ column_level_validations:
   ranking:
     is_complete:
       severity_level: Error
-  ts_event_created:
+  ts_created:
     is_complete:
       severity_level: Error

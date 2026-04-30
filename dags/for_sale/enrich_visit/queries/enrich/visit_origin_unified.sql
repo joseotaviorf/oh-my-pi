@@ -24,14 +24,17 @@ WITH old_origin AS (
 ),
 new_origin AS (
     SELECT
-        id_visit,
-        MIN_BY(channel, ts_created) AS visit_request_channel,
-        MIN(ts_created) AS ts_visit_requested
+        vse.id_visit,
+        MIN_BY(vse.channel, vse.ts_created) AS visit_request_channel,
+        MIN(vse.ts_created) AS ts_visit_requested
     FROM
-        datalake_ebdb_clean.visit_status_log
+        datalake_visit.visit_status_events AS vse
+    JOIN
+        datalake_ebdb_clean.visit AS v
+            ON vse.id_visit = v.id
     WHERE
-        event_type = 'VISIT_REQUESTED'
-        AND DATE(ts_created) >= '2024-11-01'
+        vse.event_type = 'VISIT_REQUESTED'
+        AND DATE(v.ts_created) >= '2024-11-01'
     GROUP BY 1
 )
 SELECT

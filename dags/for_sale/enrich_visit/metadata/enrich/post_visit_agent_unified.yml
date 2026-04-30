@@ -17,13 +17,13 @@ columns:
   reason:
     lineage:
       - datalake_ebdb_clean.booking.visit_fup
-      - datalake_ebdb_clean.visit_status_log.event_type
-      - datalake_ebdb_clean.visit_status_log.reason
+      - datalake_visit.visit_status_events.event_type
+      - datalake_visit.visit_status_events.reason
     description: Reason of visit finalization by agent.
   event_type:
     lineage:
       - datalake_ebdb_clean.booking.visit_fup
-      - datalake_ebdb_clean.visit_status_log.event_type
+      - datalake_visit.visit_status_events.event_type
     description: If the visit was done or unsuccessful.
     categories:
       VISIT_DONE: The visit was done by agent.
@@ -48,5 +48,5 @@ columns:
   ts_post_visit_agent:
     lineage:
       - datalake_ebdb_clean.booking.ts_visit_fup
-      - datalake_ebdb_clean.visit_status_log.ts_created
+      - datalake_visit.visit_status_events.ts_created
     description: Timestamp when the follow up was collected.

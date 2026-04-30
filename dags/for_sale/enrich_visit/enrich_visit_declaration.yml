@@ -8,13 +8,23 @@ workflow:
     type: query_delta
     layer: enrich
     inner_dependencies:
-      visits:
+        post_visit_demand:
+        - visit_status_events
+        post_visit_agent_unified:
+        - visit_status_events
+        visit_cancellation_unified:
+        - visit_status_events
+        visit_origin_unified:
+        - visit_status_events
+        visits:
         - visit_cancellation_unified
         - post_visit_agent_unified
         - visit_origin_unified
-      visit_schedules:
+        - visit_status_events
+        visit_schedules:
         - visit_cancellation_unified
         - post_visit_agent_unified
+        - visit_status_events
     execution_timeout_hours: 3
     tables_customization:
         visit_fitting:

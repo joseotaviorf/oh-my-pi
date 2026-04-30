@@ -1,34 +1,34 @@
 WITH new_model AS (
   SELECT
-    vsl.id_visit,
-    vsl.id_schedule,
-    vsl.id_author_user AS id_user,
-    vsl.channel,
-    vsl.on_behalf_of,
-    vsl.reason,
-    vsl.author_user_role,
-    vsl.event_type AS type,
-    IF(vsl.reason = 'REQUEST_EXPIRED', TRUE, FALSE) AS is_cancelled_by_expiration,
-    vsl.ts_created,
-    vsl.ts_updated
+    vse.id_visit,
+    vse.id_schedule,
+    vse.id_author_user AS id_user,
+    vse.channel,
+    vse.on_behalf_of,
+    vse.reason,
+    vse.author_user_role,
+    vse.event_type AS type,
+    IF(vse.reason = 'REQUEST_EXPIRED', TRUE, FALSE) AS is_cancelled_by_expiration,
+    vse.ts_created,
+    vse.ts_updated
   FROM
-    datalake_ebdb_clean.visit_status_log AS vsl
+    datalake_visit.visit_status_events AS vse
   JOIN
     datalake_ebdb_clean.visit AS v
-      ON vsl.id_visit = v.id
+      ON vse.id_visit = v.id
   WHERE
-    vsl.event_type IN ("VISIT_REQUEST_CANCELED", "VISIT_CANCELED")
+    vse.event_type IN ("VISIT_REQUEST_CANCELED", "VISIT_CANCELED")
     AND DATE(v.ts_created) >= '2024-11-01'
   QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY vsl.id_visit ORDER BY vsl.ts_created, vsl.id_visit_status_log DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY vse.id_visit ORDER BY vse.ts_created, vse.id_visit_status_log DESC) = 1
 ),
 old_model AS (
   WITH last_booking_status AS (
     SELECT
       b.id_visit,
-      MAX_BY(b.id, b.ts_created) AS id_schedule,
+      MAX(b.id) AS id_schedule,
       MAX_BY(bsc.id_user, struct(bsc.ts_created, bsc.id)) AS id_user,
-      MAX_BY(b.status, b.ts_created) AS last_status,
+      MAX_BY(b.status, struct(b.ts_created, b.id)) AS last_status,
       MAX(b.ts_updated) AS ts_created
     FROM
       datalake_ebdb_clean.booking AS b

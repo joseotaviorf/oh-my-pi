@@ -1,63 +1,64 @@
-WITH
-vsl AS (
+WITH vsl AS (
   SELECT
     id_visit_status_log,
     id_visit,
     id_schedule,
     id_author_user,
-    CASE
-        WHEN event_type = 'VISIT_BOOKED' THEN 'VISIT_CONFIRMED'
-        ELSE event_type
-    END AS event_type,
+    author_user_type,
+    author_user_role,
+    on_behalf_of,
+    channel,
+    application_source,
+    reason,
+    event_type,
     ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created ASC) AS ranking,
     CASE
       WHEN ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created DESC) == 1 THEN TRUE
       ELSE FALSE
     END AS is_visit_last_event,
-    author_user_type,
-    author_user_role,
-    on_behalf_of,
-    channel,
-    ts_created AS ts_event_created
+    ts_created,
+    ts_updated
   FROM
     datalake_ebdb_clean.visit_status_log
-),
-visit AS(
+)
   SELECT
+    CONCAT(vsl.id_visit_status_log,'R',vsl.ranking) AS id_visit_status_events,
+    vsl.id_visit_status_log,
     vsl.id_visit,
+    vsl.id_schedule,
+    vsl.id_author_user,
     v.id_visitor,
     v.id_agent,
     v.id_house,
+    COALESCE(hl.id_house_listing, -1) AS id_house_listing,
+    lh.id_user AS id_owner,
     -1 AS id_rent_flow,
     'NA' AS id_sale_flow, --esse id é um coalesce
     -1 AS id_fup_details,
-    v.business_context,
-    v.ts_created,
-    vsl.id_visit_status_log,
-    vsl.id_author_user,
-    vsl.id_schedule,
-    vsl.event_type,
-    vsl.ranking,
-    vsl.is_visit_last_event,
-    vsl.author_user_type,
-    vsl.author_user_role,
-    vsl.on_behalf_of,
-    vsl.channel,
-    vsl.ts_event_created,
     vbm.sk_broker_supply,
     vbm.sk_broker_demand,
     vbm.id_company_supply,
     vbm.id_company_demand,
     lh.uuid_company AS uuid_company_supply,
+    v.business_context,
+    vsl.event_type,
+    vsl.ranking,
+    vsl.author_user_type,
+    vsl.author_user_role,
+    vsl.on_behalf_of,
+    vsl.channel,
+    vsl.application_source,
+    vsl.reason,
     vbm.partner_3p_supply,
     vbm.partner_3p_demand,
+    hl.country_code,
     vbm.is_3p_supply,
     vbm.is_3p_demand,
     vbm.is_3p_lead_gen,
     vbm.has_3p_access_control,
-    lh.id_user AS id_owner,
-    COALESCE(hl.id_house_listing, -1) AS id_house_listing,
-    hl.country_code
+    vsl.is_visit_last_event,
+    vsl.ts_created,
+    vsl.ts_updated
   FROM
     datalake_ebdb_clean.visit AS v
   INNER JOIN
@@ -74,43 +75,5 @@ visit AS(
   LEFT JOIN
     datalake_visit.visit_business_model AS vbm
       ON v.id = vbm.id_visit
-)
-SELECT
-  CONCAT(v.id_visit_status_log,'R',ranking) AS id_visit_status_events,
-  v.id_visit_status_log,
-  v.id_visit,
-  v.id_schedule,
-  v.id_visitor,
-  v.id_owner,
-  v.id_agent,
-  v.id_author_user,
-  v.id_house,
-  v.id_house_listing,
-  v.id_rent_flow,
-  v.id_sale_flow,
-  v.id_fup_details,
-  v.sk_broker_supply,
-  v.sk_broker_demand,
-  v.id_company_supply,
-  v.id_company_demand,
-  v.uuid_company_supply,
-  v.partner_3p_supply,
-  v.partner_3p_demand,
-  v.is_3p_supply,
-  v.is_3p_demand,
-  v.is_3p_lead_gen,
-  v.has_3p_access_control,
-  v.business_context,
-  v.event_type,
-  v.ranking,
-  v.author_user_type,
-  v.author_user_role,
-  v.on_behalf_of,
-  v.channel,
-  v.country_code,
-  v.is_visit_last_event,
-  v.ts_event_created
-FROM
-   visit AS v
-WHERE
-    DATE(v.ts_event_created) >= '2024-11-01'
+  WHERE
+    DATE(v.ts_created) >= '2024-11-01'

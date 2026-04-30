@@ -3,7 +3,7 @@ table_name: visit_status_events
 description: Information about Rent and Sale visits status log events.
   Each row is an unique visit status.
 domain: For Sale
-owner: matheus.sampaio@quintoandar.com.br
+owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_visit_status_events:
     lineage:
@@ -128,9 +128,21 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_status_log.channel
     description: Visit channel
+  application_source:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.application_source
+    description: Application source of the event
+  reason:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.reason
+    description: Reason of the event
   is_visit_last_event:
     description: If it is the last event of that visit in the database
-  ts_event_created:
+  ts_created:
     lineage:
       - datalake_ebdb_clean.visit_status_log.ts_created
     description: When the event was created
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.visit_status_log.ts_updated
+    description: When the event was updated

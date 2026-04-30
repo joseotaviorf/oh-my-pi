@@ -234,7 +234,7 @@ visit_status_by_demand AS (
             ELSE NULL
         END AS is_visit_canceled_by_demand
     FROM
-        datalake_ebdb_clean.visit_status_log
+        datalake_visit.visit_status_events
     WHERE
         event_type IN ('ANSWER_VISIT_DONE', 'ANSWER_VISIT_UNSUCCESSFUL', 'ANSWER_VISIT_RIGHTFULLY_CANCELED', 'ANSWER_VISIT_WRONGFULLY_CANCELED')
         AND on_behalf_of = 'DEMAND'

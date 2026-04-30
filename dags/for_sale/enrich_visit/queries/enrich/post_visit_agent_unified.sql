@@ -6,7 +6,7 @@ WITH visit_show AS (
     FROM
         datalake_ebdb_clean.visitor
     QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY id_booking, type ORDER BY ts_created DESC) = 1
+        ROW_NUMBER() OVER(PARTITION BY id_booking, type ORDER BY ts_created DESC, ts_updated DESC, id DESC) = 1
 ),
 visit_status_log AS ( -- This is to handle the case where the visit_fup is not in the booking table (missing data from visit finalization rollout) so the visit finalization is enriched temporarily from visit_status_log table.
     SELECT
@@ -19,7 +19,7 @@ visit_status_log AS ( -- This is to handle the case where the visit_fup is not i
         END AS visit_fup,
         ts_created AS ts_visit_fup
     FROM
-        datalake_ebdb_clean.visit_status_log
+        datalake_visit.visit_status_events
     WHERE
         ts_created::DATE >= '2025-01-01'
         AND event_type IN ('VISIT_DONE', 'VISIT_UNSUCCESSFUL')
