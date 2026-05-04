@@ -1,0 +1,29 @@
+---
+database_name: datalake_fairness_assessment
+table_name: fairness_classification
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Latest human-readable FAIR class per FQN from fairness_assessment.tier_achieved; one row per
+  (database_name, table_name). See column descriptions below.
+columns:
+  database_name:
+    lineage:
+      - datalake_fairness_assessment.fairness_assessment.database_name
+    description: Spark metastore schema name of the table.
+  table_name:
+    lineage:
+      - datalake_fairness_assessment.fairness_assessment.table_name
+    description: Table name in the metastore schema.
+  classification:
+    description: |
+      Mapped from ``fairness_assessment.tier_achieved``: 0 → "Not FAIR", 1 →
+      "Findable, Accessible", 2 → "Findable, Accessible, Interoperable", 3 →
+      "Findable, Accessible, Interoperable and Reusable", 4 → "FAIR Masterpiece"
+      (see ``tier_achieved_to_classification`` in ``bietlejuice.governance.fairness_assessment.tiering``).
+  ts_assessed:
+    lineage:
+      - datalake_fairness_assessment.fairness_assessment.ts_assessed
+    description: |
+      UTC timestamp when the underlying ``fairness_assessment`` row used for this classification
+      was produced (same value as on the winning assessment row after de-duplication by FQN).

@@ -2630,6 +2630,10 @@ bietlejuice.enrich_facebook_insights:
   - bietlejuice.facebook_insights_region:load-clean-facebook-insights-832880310585080-region:first-run-of-day
   - bietlejuice.facebook_insights_region:load-clean-facebook-insights-994644903935458-region:first-run-of-day
   - bietlejuice.facebook_insights_region:load-clean-facebook-insights-994734287259853-region:first-run-of-day
+bietlejuice.enrich_fairness_assessment:
+  - bietlejuice.documentation_metrics:load-clean-columns-documentation:first-run-of-day
+  - bietlejuice.documentation_metrics:load-clean-tables-documentation:first-run-of-day
+  - bietlejuice.enrich_people_public:load-enrich-org-chart:first-run-of-day
 bietlejuice.enrich_find_health_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day
   - bietlejuice.enrich_base_metrics_service:load-enrich-recs-impressions-processed:first-run-of-day

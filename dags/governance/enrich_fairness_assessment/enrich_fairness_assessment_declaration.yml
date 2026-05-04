@@ -1,0 +1,69 @@
+dag:
+  name: enrich_fairness_assessment
+  owner: Data Governance
+  schedule_start_date: 2026, 4, 1
+  schedule_interval: "0 6 * * *"
+  documentation:
+    dag_purpose: |
+      FAIRness assessment Tier-1 phase — checks F1-01..F2-01, F4-01 (DataHub GraphQL ``DatasetFairSignals``
+      on Databricks and Trino dataset URNs; interim OR: pass if indexed
+      on at least one platform),
+      I1-02 and A1.2-03 (A1.2-03 interim: pass iff assigned data contract on Databricks entity, same signal
+      as I1-02; future: evaluate access-policy metadata published to DataHub), on documentation_metrics
+      tables_documentation joined to org_chart; writes enrich Delta. R1.3-01/R1.3-02 are not scored from
+      Woodpecker (no FQN join yet); proxy assumption and backlog to land CI validation results in the
+      lake are documented in table metadata for this DAG.
+
+      Schedule: daily 06:00 in America/Sao_Paulo (``0 6 * * *``) to align ``documentation_metrics``-based
+      inputs with a single morning batch, keep DataHub driver GraphQL volume predictable day-over-day, and
+      cap wall-clock with ``execution_timeout_hours: 4``. Woodpecker CI is not the runtime of this job;
+      optional repo lint/tests baseline is documented in ``docs/spikes/fairness-measurement-spike.md`` (§10).
+      Pause or change cadence only with Governance; update this field and re-validate the declaration.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: fairness_assessment
+  default_partitions:
+    - year
+    - month
+    - day
+  default_extraction_type: incremental
+  execution_timeout_hours: 4
+  has_hive_sync: false
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  inner_dependencies:
+    fairness_classification:
+      - fairness_assessment
+  tables_customization:
+    fairness_assessment:
+      load_spark_job: load_fairness_assessment
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{schema}"
+        - "{table_name}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+        - "{partitions}"
+        - "{dag_name}"
+    fairness_classification:
+      load_spark_job: load_fairness_assessment
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{schema}"
+        - "{table_name}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+        - "{partitions}"
+        - "{dag_name}"
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

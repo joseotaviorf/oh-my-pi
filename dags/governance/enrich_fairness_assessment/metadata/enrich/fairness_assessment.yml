@@ -1,0 +1,79 @@
+---
+database_name: datalake_fairness_assessment
+table_name: fairness_assessment
+owner: vitor.carneiro@quintoandar.com.br
+domain: Data Ops & Governance
+description: >
+  Per-table FAIRness MVP assessment from documentation_metrics, org_chart, Spark catalog, and DataHub
+  GraphQL; grain one row per (database_name, table_name, year, month, day). See column descriptions below.
+columns:
+  database_name:
+    lineage:
+      - datalake_documentation_metrics_clean.tables_documentation.database_name
+    description: Spark metastore schema name of the documented table.
+  table_name:
+    lineage:
+      - datalake_documentation_metrics_clean.tables_documentation.table_name
+    description: Table name in the metastore schema.
+  checks_result_json:
+    description: |
+      JSON map of requirement_id to {"passed": bool, "reason": string|null, optional "detail"}. **MVP gate**
+      (``MVP_TIER2_SCOPED_REQUIREMENT_IDS``): F1-01, F1-02, F1-03,
+      F2-01, F4-01, A1.2-03, I1-02, **F2-02**, **I1-01**. **F2-02** — column description richness
+      (``assess_column_description_quality``) on rows from ``columns_documentation``; failure reasons
+      no_column_docs_in_lake, column_description_not_substantive. **I1-01** — name coverage vs Spark
+      physical schema; reason ``undocumented_columns`` when any non-partition field is missing from the lake;
+      optional detail ``undocumented_column_names`` (business fields), ``undocumented_partition_column_names``,
+      and ``warnings`` when only partition columns are undocumented. **I3-01** / **I3-02** (DataHub) are emitted
+      for observability when GraphQL is configured; they do not affect the MVP tier score. F1-03 uses
+      ``spark.tableExists``; F4-01 uses DataHub ``dataset.exists``. I1-02 and A1.2-03 use the assigned
+      datacontract URN signal on the Databricks entity. See the historical spike doc for F4-01 and A1-03
+      context.
+  tier_achieved:
+    description: |
+      MVP mode: 2 if all checks in ``MVP_TIER2_SCOPED_REQUIREMENT_IDS`` pass, 1 if all Tier-1 active
+      checks (``TIER1_ACTIVE_REQUIREMENT_IDS``) pass but F2-02 or I1-01 fail, 0 if any Tier-1 check fails.
+      Values 3 and 4 are reserved for a future full cumulative tiering mode when the engine emits them.
+  fqn_occurrence_count:
+    description: |
+      Count of rows for the same (database_name, table_name) on the latest doc_dt per FQN within
+      the DAG load window (after filtering doc_dt to [load_start, load_end]); must be 1 for F1-02.
+  is_active_employee:
+    description: |
+      True when normalized owner email matches org_chart.work_email for a row with assignment_status_type = 'ACTIVE'.
+    lineage:
+      - datalake_people_public.org_chart.work_email
+      - datalake_people_public.org_chart.assignment_status_type
+  has_data_contract:
+    description: |
+      When DataHub GraphQL is configured: True if the Databricks dataset's ``institutionalMemory`` labels
+      contain an assigned data contract URN (``urn:prod:datacontract:``).
+      False when DataHub is not configured, ``dataset.exists`` is false, or only the placeholder
+      "[Data Contract] No data contract assigned" appears (no datacontract URN).
+  table_description_is_substantive:
+    description: |
+      True when ``assess_table_description_quality`` finds enough non-boilerplate vocabulary beyond
+      schema/table name tokens. False for empty, short, or generic PT/EN echo text. Heuristic only; does
+      not replace F2-01. No separate TDQ JSON column is stored on this table.
+  columns_description_is_substantive:
+    description: |
+      True if and only if the column-documentation snapshot (latest ``doc_dt`` join for this FQN) has at
+      least one documented column in the lake and **every** such column passes
+      ``assess_column_description_quality`` with ``is_substantive`` (independent of how F2-02 combines with
+      physical schema). If there are zero column docs in that snapshot, false.
+  tiering_rules_version:
+    description: Version tag for FAIRness tier ID sets (``TIERING_RULES_VERSION`` in ``bietlejuice.governance.fairness_assessment.constants``; referenced from the Spark job).
+  ts_assessed:
+    description: UTC timestamp when the assessment row was produced in the Spark job.
+  year:
+    lineage:
+      - datalake_documentation_metrics_clean.tables_documentation.year
+    description: Partition — documentation_metrics documentation day (year).
+  month:
+    lineage:
+      - datalake_documentation_metrics_clean.tables_documentation.month
+    description: Partition — documentation_metrics documentation day (month).
+  day:
+    lineage:
+      - datalake_documentation_metrics_clean.tables_documentation.day
+    description: Partition — documentation_metrics documentation day (day of month).
