@@ -9,8 +9,6 @@ column_level_validations:
   id_request:
     is_complete:
       severity_level: Error
-    is_unique:
-      severity_level: Error
   id_employee_profile:
     is_complete:
       severity_level: Error
