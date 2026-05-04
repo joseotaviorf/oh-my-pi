@@ -4336,7 +4336,6 @@ bietlejuice.enrich_velo_zendesk:
   - bietlejuice.velo_zendesk:load-clean-tickets-history:first-run-of-day
   - bietlejuice.velo_zendesk:load-clean-tickets:first-run-of-day
 bietlejuice.enrich_vespucio_pipeline:
-  - bietlejuice.clustering_image_model:load-clean-clustering-image:first-run-of-day
   - bietlejuice.ebdb_condo:load-clean-amenities:first-run-of-day
   - bietlejuice.ebdb_condo:load-clean-condo-contact:first-run-of-day
   - bietlejuice.ebdb_condo:load-clean-condo:first-run-of-day

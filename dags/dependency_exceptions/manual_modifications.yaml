@@ -1003,7 +1003,6 @@ bietlejuice.enrich_velo:
     - bietlejuice.velo_neurotech:load-clean-logs-credit-granting:first-run-of-day
 bietlejuice.enrich_vespucio_pipeline:
   add:
-    - bietlejuice.clustering_image_model:load-clean-clustering-image:first-run-of-day
     - bietlejuice.ebdb_condo:load-clean-amenities:first-run-of-day
     - bietlejuice.ebdb_condo:load-clean-condo:first-run-of-day
     - bietlejuice.ebdb_condo:load-clean-condo-contact:first-run-of-day
