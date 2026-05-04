@@ -55,7 +55,7 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 cluster:
-  type: databricks_16_4_med_general_cluster
+  type: consolidation_s_general_single_node_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
