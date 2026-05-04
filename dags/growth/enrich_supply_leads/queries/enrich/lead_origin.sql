@@ -4,11 +4,11 @@ WITH lead_origin_rene_descartes AS (
     hl.id AS id_lead,
     hl.id_lead_ebdb,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.affiliateType') AS STRING) AS affiliate_type,
-    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmCampaign') AS STRING) AS campaign,
-    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmMedium') AS STRING) AS medium,
-    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmSource') AS STRING) AS source,
-    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmContent') AS STRING) AS content,
-    CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmTerm') AS STRING) AS term,
+    NULLIF(CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmCampaign') AS STRING), '') AS campaign,
+    NULLIF(CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmMedium') AS STRING), '') AS medium,
+    NULLIF(CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmSource') AS STRING), '') AS source,
+    NULLIF(CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmContent') AS STRING), '') AS content,
+    NULLIF(CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.utmTerm') AS STRING), '') AS term,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.team') AS STRING) AS ops_agent,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.company') AS STRING) AS ops_partner,
     CAST(GET_JSON_OBJECT(amd.acquisition_campaign, '$.origin') AS STRING) AS application,
@@ -51,13 +51,13 @@ affiliate_type_fix AS (
 lead_origin_amplitude AS (
   SELECT
     id_lead AS id_lead_ebdb,
-    IF(utm_campaign == '', '-1', utm_campaign) AS campaign,
-    IF(utm_medium == '', '-1', utm_medium) AS medium,
-    IF(utm_source == '', '-1', utm_source) AS source,
-    IF(utm_content == '', '-1', utm_content) AS content,
-    IF(utm_term == '', '-1', utm_term) AS term,
-    IF(city == '', '-1', city) AS city,
-    IF(platform == '', '-1', platform) AS platform,
+    NULLIF(utm_campaign, '') AS campaign,
+    NULLIF(utm_medium, '') AS medium,
+    NULLIF(utm_source, '') AS source,
+    NULLIF(utm_content, '') AS content,
+    NULLIF(utm_term, '') AS term,
+    NULLIF(city, '') AS city,
+    NULLIF(platform, '') AS platform,
     ts_event
   FROM
     datalake_amplitude_lead.lead_origin AS lo
@@ -66,7 +66,7 @@ lead_origin_amplitude AS (
   QUALIFY ROW_NUMBER() OVER(PARTITION BY id_lead ORDER BY ts_event) = 1
 ),
 inbound_leads AS (
-  SELECT 
+  SELECT
     ia.id_lead_ebdb,
     ia.id_session,
     ia.id_task,
@@ -80,7 +80,7 @@ inbound_leads AS (
     fm.utm_content,
     fm.origin AS utm_source,
     'whatsapp' AS utm_medium
-  FROM 
+  FROM
     datalake_supply_flows.inbound_attribution AS ia
   LEFT JOIN
     datalake_growth_media_platform.facebook_metrics AS fm
@@ -93,11 +93,11 @@ mid_table AS (
     r.id_lead AS id_lead,
     r.id_lead_ebdb AS id_lead_ebdb,
     COALESCE(r.affiliate_type, atf.first_affiliate_type) AS affiliate_type,
-    COALESCE(IF(r.campaign == '', NULL, r.campaign), a.campaign, inbound_leads.utm_campaign) AS campaign,
-    COALESCE(IF(r.medium == '', NULL, r.medium), a.medium, inbound_leads.utm_medium) AS medium,
-    COALESCE(IF(r.source == '', NULL, r.source), a.source, inbound_leads.utm_source) AS source,
-    COALESCE(IF(r.content == '', NULL, r.content), a.content, inbound_leads.utm_content) AS content,
-    COALESCE(IF(r.term == '', NULL, r.term), a.term, inbound_leads.utm_term) AS term,
+    COALESCE(r.campaign, a.campaign, inbound_leads.utm_campaign) AS campaign,
+    COALESCE(r.medium, a.medium, inbound_leads.utm_medium) AS medium,
+    COALESCE(r.source, a.source, inbound_leads.utm_source) AS source,
+    COALESCE(r.content, a.content, inbound_leads.utm_content) AS content,
+    COALESCE(r.term, a.term, inbound_leads.utm_term) AS term,
     r.ops_agent,
     r.ops_partner,
     r.application,
