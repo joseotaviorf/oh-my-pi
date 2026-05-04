@@ -63,7 +63,7 @@ class LoadCDCRawTaskCreator(LoadTaskCreator):
             table_attributes.table_name,
             self.dag_execution_context.load_start_date,
             self.dag_execution_context.load_end_date,
-            primary_keys,
+            primary_keys if primary_keys else "None",
             dbutils_secret_key,
             "--table-privileges",
             json.dumps(table_attributes.table_privileges),

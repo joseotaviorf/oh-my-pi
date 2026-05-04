@@ -136,7 +136,7 @@ def main():
     else:
         table_privileges_dict = None
 
-    if args.primary_keys:
+    if args.primary_keys and args.primary_keys != "None":
         primary_keys = [key.strip() for key in args.primary_keys.split(",")]
     else:
         pk_identifier = RawPrimaryKeyIdentifier(

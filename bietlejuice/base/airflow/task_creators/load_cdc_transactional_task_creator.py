@@ -72,7 +72,7 @@ class LoadCDCTransactionalTaskCreator(LoadTaskCreator):
             self.dag_execution_context.load_start_date,
             self.dag_execution_context.load_end_date,
             str(partitions),
-            primary_keys,
+            primary_keys if primary_keys else "None",
             dbutils_secret_key,
             json.dumps(transactional_datatype_overrides),
             "--database-column-alias",

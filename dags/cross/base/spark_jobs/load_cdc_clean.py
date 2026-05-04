@@ -81,7 +81,7 @@ def get_primary_keys_from_args(args: Namespace) -> List[str]:
     the lineage file.
     """
 
-    if args.primary_keys:
+    if args.primary_keys and args.primary_keys != "None":
         return [key.strip() for key in args.primary_keys.split(",")]
 
     clean_pk_identifier = CleanPrimaryKeyIdentifier(

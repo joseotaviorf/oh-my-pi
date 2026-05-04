@@ -45,7 +45,7 @@ class LoadCDCCleanTaskCreator(LoadTaskCreator):
             table_attributes.table_name,
             self.dag_execution_context.load_start_date,
             self.dag_execution_context.load_end_date,
-            clean_primary_keys,
+            clean_primary_keys if clean_primary_keys else "None",
             "--table-privileges",
             json.dumps(table_attributes.table_privileges),
         ]

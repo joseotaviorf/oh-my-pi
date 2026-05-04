@@ -259,7 +259,7 @@ def main():
         dbutils_secret_key=dbutils_secret_key, schema=source_schema
     ).get_cdc_schema_finder(DatabaseTypeEnum(database_type))
 
-    if args.primary_keys:
+    if args.primary_keys and args.primary_keys != "None":
         primary_keys = [key.strip() for key in args.primary_keys.split(",")]
     else:
         table_metadata = schema_finder.find_latest_table_definition(table_name)
