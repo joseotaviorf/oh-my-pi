@@ -410,6 +410,18 @@ class TestDeltaLoader:
         )
         merge_builder_mock.execute.assert_called_once()
 
+    def test_merge_to_table_rejects_malicious_merge_on_column(
+        self, mock_delta_table, mock_source_df, mock_spark_context
+    ):
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        with pytest.raises(ValueError, match="Invalid SQL identifier"):
+            delta_loader.load_table(
+                "test_table",
+                None,
+                mock_source_df,
+                merge_on=["column1", "'; DROP TABLE users --"],
+            )
+
     def test_vacuum_table(self, mock_spark_context):
         table_name = "test_table"
         retention_hours = 24
@@ -445,6 +457,13 @@ class TestDeltaLoader:
         mock_spark_context.spark.sql.assert_called_once_with(
             "OPTIMIZE test_table ZORDER BY column1,column2"
         )
+
+    def test_optimize_table_rejects_malicious_z_order_column(
+        self, mock_spark_context
+    ):
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        with pytest.raises(ValueError, match="Invalid SQL identifier"):
+            delta_loader.optimize_table("test_table", ["column1", "'; evil --"])
 
     @pytest.mark.parametrize(
         "identifier",

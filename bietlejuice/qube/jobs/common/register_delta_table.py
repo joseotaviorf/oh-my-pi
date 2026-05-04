@@ -191,10 +191,8 @@ if __name__ == "__main__":
                 # For other errors, log and fallback to constructed path
                 print(f"WARNING: Failed to get location for {full_table_name}: {e}")
                 # Fallback to constructed path (for backwards compatibility)
-                table_location = (
-                    f"{spark_ms.database_location}/{windowed_table_name}".replace(
-                        "s3://", "s3a://"
-                    )
+                table_location = f"{spark_ms.database_location.rstrip('/')}/{windowed_table_name}".replace(
+                    "s3://", "s3a://"
                 )
                 print(f"  Falling back to constructed location: {table_location}")
                 try:
@@ -266,10 +264,8 @@ if __name__ == "__main__":
                 # For other errors, log and fallback to constructed path
                 print(f"WARNING: Failed to get location for {full_table_name}: {e}")
                 # Fallback to constructed path (for backwards compatibility)
-                table_location = (
-                    f"{spark_ms.database_location}/{base_table_name}".replace(
-                        "s3://", "s3a://"
-                    )
+                table_location = f"{spark_ms.database_location.rstrip('/')}/{base_table_name}".replace(
+                    "s3://", "s3a://"
                 )
                 print(f"  Falling back to constructed location: {table_location}")
                 try:

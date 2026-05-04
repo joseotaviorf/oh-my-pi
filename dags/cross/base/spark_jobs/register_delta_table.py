@@ -85,7 +85,9 @@ if __name__ == "__main__":
     spark_ms = SparkMetastoreHelper(bucket, layer, schema, table_name, all_tables=False)
 
     trino_client = get_trino_client()
-    table_location = f"{spark_ms.database_location}/{table_name}".replace(
+    # database_location ends with "/" from metastore mapping; avoid "//" in the path
+    # so Trino sees the same prefix as DeltaLoader (database_location + table_name).
+    table_location = f"{spark_ms.database_location.rstrip('/')}/{table_name}".replace(
         "s3://", "s3a://"
     )  # Required by Trino
 
