@@ -59,10 +59,6 @@ columns:
     lineage:
       - datalake_big_agent_raw.earning_sources_aud.failure_reason
     description: Failure reason when processing was not successful.
-  incentive_systems_calculated:
-    lineage:
-      - datalake_big_agent_raw.earning_sources_aud.incentive_systems_calculated
-    description: Incentive systems considered/calculated for this source.
   mod_uuid_earning_source:
     lineage:
       - datalake_big_agent_raw.earning_sources_aud.earning_source_uuid_mod
@@ -99,10 +95,6 @@ columns:
     lineage:
       - datalake_big_agent_raw.earning_sources_aud.failure_reason_mod
     description: Modification flag/column for failure_reason.
-  mod_incentive_systems_calculated:
-    lineage:
-      - datalake_big_agent_raw.earning_sources_aud.incentive_systems_calculated_mod
-    description: Modification flag/column for incentive_systems_calculated.
   ts_created:
     lineage:
       - datalake_big_agent_raw.earning_sources_aud.created_at

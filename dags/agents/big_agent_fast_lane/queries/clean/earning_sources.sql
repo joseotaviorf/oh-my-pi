@@ -7,7 +7,6 @@ SELECT
     currency,
     status,
     failure_reason,
-    incentive_systems_calculated,
     base_amount,
     revenue_share_total_amount,
     DATE(competence_date) AS dt_competence,

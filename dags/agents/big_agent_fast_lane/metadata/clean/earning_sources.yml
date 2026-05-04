@@ -39,10 +39,6 @@ columns:
     lineage:
       - datalake_big_agent_raw.earning_sources.failure_reason
     description: Failure reason when processing was not successful.
-  incentive_systems_calculated:
-    lineage:
-      - datalake_big_agent_raw.earning_sources.incentive_systems_calculated
-    description: Incentive systems considered or calculated for this source.
   base_amount:
     lineage:
       - datalake_big_agent_raw.earning_sources.base_amount
