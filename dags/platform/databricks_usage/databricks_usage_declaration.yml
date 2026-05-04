@@ -2,10 +2,28 @@ dag:
   name: databricks_usage
   owner: Data Life Cycle
   schedule_start_date: 2024, 5, 10
-  schedule_interval: 0 7 * * *
+  schedule_interval: null
   documentation:
     dag_purpose: |
-      This dag aims to ingest cost and usage data from Databricks.
+      DEPRECATED — this DAG ingests Databricks cost data from the legacy
+      CSV billing API and is superseded by direct reads from
+      system.billing.usage in dw_databricks_health.fact_databricks_task_run
+      (built by PR 5 of the Phase 1.5 observability stack —
+      bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md).
+      The system.billing.usage table is the canonical first-party source
+      and removes a fragile CSV download step.
+
+      This DAG continues to run for ~2 weeks of side-by-side validation
+      after fact_databricks_task_run goes live. Once parity is proven and
+      all downstream Superset charts that reference billable_usage have
+      been re-pointed, this DAG (and the billable_usage table) will be
+      deleted in a follow-up PR.
+
+      DO NOT add new consumers of billable_usage — point new charts /
+      analyses at dw_databricks_health.fact_databricks_task_run instead.
+
+      Original purpose: This dag aims to ingest cost and usage data from
+      Databricks.
 workflow:
   type: custom_ingestion
   layer: raw

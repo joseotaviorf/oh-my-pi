@@ -3,7 +3,25 @@ dag:
   owner: Data Life Cycle
   documentation: 
     dag_purpose: |
-      Generate metrics about job runs on Databricks.
+      DEPRECATED — this DAG is superseded by
+      dw_databricks_health.fact_databricks_task_run (built by PR 5 of the
+      Phase 1.5 observability stack —
+      bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md).
+      The new fact sources job-run timing and result state directly from
+      system.lakeflow.job_run_timeline / job_task_run_timeline at
+      per-task-run grain (a strict superset of what task_runs +
+      load_table_costs produce here).
+
+      This DAG continues to run for ~2 weeks of side-by-side validation
+      after fact_databricks_task_run goes live. Once parity is proven and
+      all downstream Superset charts have been re-pointed, this DAG (and
+      its tables) will be deleted in a follow-up PR.
+
+      DO NOT add new consumers of task_runs / load_table_costs — point
+      new charts / analyses at dw_databricks_health.fact_databricks_task_run
+      instead.
+
+      Original purpose: Generate metrics about job runs on Databricks.
 workflow:
   type: query_delta
   layer: enrich

@@ -1,0 +1,345 @@
+---
+database_name: dw_databricks_health
+table_name: fact_databricks_task_run
+description: |
+  Per Airflow-task-run health fact for the bietlejuice framework. One row
+  per (id_databricks_workspace, id_databricks_run, id_databricks_task_run),
+  which for query_delta DAGs is one row per Airflow task instance (because
+  query_delta provisions a job cluster per task).
+
+  Joins five sources:
+    - system.lakeflow.job_task_run_timeline (spine — per-task-run, setup time)
+    - system.lakeflow.job_run_timeline      (parent run state, run_type)
+    - system.compute.clusters               (cluster spec snapshots — latest)
+    - system.billing.usage                  (DBU per cluster-window)
+    - datalake_databricks_health.daily_cluster_health (PR 2 — P50/P95 utilization)
+
+  Phase 1.5 PR 5 of 5 — see
+  bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md
+  for the full investigation plan and the rationale for the 5-PR stack.
+  Closes O3 (cluster cost & health Delta) for the cost / utilization slice
+  and O4 (pool acquisition wait time) by exposing setup_duration_seconds
+  per task-run and the is_pool_acquisition_slow flag.
+
+  Cost attribution caveat: billing rows whose usage_start_time falls within
+  the task window are summed without time-slice apportionment. For job
+  clusters (1 task = 1 cluster) this is a 1:1 attribution. For shared
+  interactive clusters the same billing rows are counted by every concurrent
+  task, so dbu_consumed will over-attribute. Consumers should either filter
+  to job clusters (cluster_source = 'JOB') or apportion downstream.
+
+  USD conversion is intentionally skipped — system.billing.usage exposes
+  usage_quantity in DBUs but not the SKU rate. Joining
+  system.billing.list_prices is left as a follow-up enhancement.
+
+  Stage-level joins to PR 3 (spark_stage_metrics) and PR 4
+  (sparkmeasure_stage_metrics) are intentionally deferred to follow-up PRs
+  because the spark_app_id → task_run_id mapping is fuzzy (must match by
+  cluster_id + Spark-app start time within the task window).
+
+  Supersedes (does NOT yet retire) the cost-related legacy DAGs
+  enrich_databricks_usage_costs, enrich_databricks_job_runs and
+  databricks_usage. Actual deletion happens in follow-up PRs once this fact
+  proves parity (~2 weeks of side-by-side runs).
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+columns:
+  sk_databricks_task_run:
+    description: Surrogate key for the task-run. `xxhash64(id_databricks_workspace, id_databricks_run, id_databricks_task_run)`. Stable across re-runs.
+  sk_databricks_run:
+    description: Surrogate key for the parent Databricks job run. Same xxhash64 of (workspace_id, run_id) used by future dim_databricks_run.
+  sk_databricks_cluster:
+    description: Surrogate key for the cluster. `xxhash64(workspace_id, cluster_id)`. Same hash will be used by future dim_databricks_cluster.
+  sk_task_started_date:
+    description: Date surrogate key in `yyyyMMdd` integer form, derived from `dt_task_started`. Joinable to a future `dim_date` via `id_date`.
+  id_databricks_workspace:
+    description: Databricks workspace identifier.
+    lineage:
+      - system.lakeflow.job_task_run_timeline.workspace_id
+  id_databricks_run:
+    description: Databricks run identifier (the parent run that contains this task run).
+    lineage:
+      - system.lakeflow.job_task_run_timeline.run_id
+  id_databricks_task_run:
+    description: Databricks task-run identifier (unique per task attempt within a run).
+    lineage:
+      - system.lakeflow.job_task_run_timeline.task_run_id
+  id_databricks_job:
+    description: Databricks job identifier (the multi-task job definition).
+    lineage:
+      - system.lakeflow.job_task_run_timeline.job_id
+  id_databricks_task_key:
+    description: Human-readable task key from the Databricks job spec (e.g. `load_table_x`).
+    lineage:
+      - system.lakeflow.job_task_run_timeline.task_key
+  id_cluster:
+    description: Databricks cluster identifier — first element of `compute_ids` (the bietlejuice framework uses 1 cluster per task).
+    lineage:
+      - system.lakeflow.job_task_run_timeline.compute_ids
+  databricks_run_url:
+    description: |
+      Click-through URL to the Databricks UI for the parent run
+      (`<workspace_host>/jobs/<job_id>/runs/<run_id>`). Per-workspace mapping
+      mirrors `dags/platform/enrich_databricks/spark_jobs/{prod,forno}_conf.yml`.
+      Falls back to the Databricks accounts portal for unknown workspace IDs.
+    lineage:
+      - system.lakeflow.job_task_run_timeline.workspace_id
+      - system.lakeflow.job_task_run_timeline.job_id
+      - system.lakeflow.job_task_run_timeline.run_id
+  dag_name:
+    description: bietlejuice DAG identifier extracted from the cluster `application` tag (e.g. `bietlejuice.enrich_ebdb_contract`). Set by the framework when provisioning the cluster.
+    lineage:
+      - system.compute.clusters.tags
+  airflow_dag_id:
+    description: Airflow `dag_id` extracted from the cluster `dag_id` tag. Equivalent to `dag_name` minus the `bietlejuice.` prefix when the framework set both tags.
+    lineage:
+      - system.compute.clusters.tags
+  airflow_task_id:
+    description: Airflow `task_id` extracted from the cluster `task_id` tag. Identifies the specific task within the DAG that triggered this Spark application.
+    lineage:
+      - system.compute.clusters.tags
+  team_owner:
+    description: |
+      Team or person responsible for the workload, lifted from the cluster `owner` tag.
+      Set by the bietlejuice cluster builder from the Airflow task `owner` (e.g.
+      `data-life-cycle`, `data-for-rent`). The headline column for cost-attribution
+      dashboards — group by `team_owner` to answer "how much did Team X spend?".
+    lineage:
+      - system.compute.clusters.tags
+  cost_center:
+    description: |
+      Internal cost-center code lifted from the cluster `cost-center` tag (e.g. `c052`).
+      Currently uniform (`c052`) across bietlejuice-managed workloads but exposed as
+      a first-class column so finance dashboards can pivot on it without re-parsing
+      `custom_tags`, and so future per-domain cost centers (if introduced) flow
+      through automatically.
+    lineage:
+      - system.compute.clusters.tags
+  ecosystem:
+    description: |
+      Logical ecosystem the workload belongs to, lifted from the cluster `ecosystem`
+      tag. Always `data-engineering` for bietlejuice-managed clusters; surfaced here
+      so cross-ecosystem rollups (Databricks plus other compute platforms) can use a
+      single dimension.
+    lineage:
+      - system.compute.clusters.tags
+  environment:
+    description: |
+      Workspace environment lifted from the cluster `environment` tag (`forno` or
+      `prod`). Joinable across workspaces; lets dashboards filter to a specific
+      deployment when the same fact is materialised in both.
+    lineage:
+      - system.compute.clusters.tags
+  data_classification:
+    description: |
+      LGPD / data-classification label lifted from the cluster `data-classification`
+      tag (e.g. `private`). Currently uniform across bietlejuice clusters; reserved
+      for future workload-level classification overrides.
+    lineage:
+      - system.compute.clusters.tags
+  provisioner:
+    description: |
+      System that provisioned the cluster, lifted from the cluster `provisioner` tag.
+      Always `bietlejuice` for rows in this fact (the source CTE filters on
+      `tags['provisioner'] = 'bietlejuice'`); exposed so consumers that union this
+      fact with other sources can disambiguate origin.
+    lineage:
+      - system.compute.clusters.tags
+  cluster_name:
+    description: Cluster name (typically `<dag_id>_<run_id>` for job clusters).
+    lineage:
+      - system.compute.clusters.cluster_name
+  cluster_source:
+    description: How the cluster was created — JOB, UI, API, etc. JOB clusters have 1:1 task attribution; non-JOB clusters share billing across concurrent tasks.
+    lineage:
+      - system.compute.clusters.cluster_source
+  driver_node_type:
+    description: Driver instance type (e.g. `m5a.xlarge`, `r5d.2xlarge`).
+    lineage:
+      - system.compute.clusters.driver_node_type
+  worker_node_type:
+    description: Worker instance type. Null for single-node clusters.
+    lineage:
+      - system.compute.clusters.worker_node_type
+  dbr_version:
+    description: Databricks runtime version, e.g. `16.4.x-scala2.12` or `16.4.x-photon-scala2.12`.
+    lineage:
+      - system.compute.clusters.dbr_version
+  worker_count:
+    description: Fixed worker count for non-autoscaling clusters. Null when autoscaling.
+    lineage:
+      - system.compute.clusters.worker_count
+  min_autoscale_workers:
+    description: Lower bound of the autoscale range. Null for fixed-size clusters.
+    lineage:
+      - system.compute.clusters.min_autoscale_workers
+  max_autoscale_workers:
+    description: Upper bound of the autoscale range. Null for fixed-size clusters.
+    lineage:
+      - system.compute.clusters.max_autoscale_workers
+  peak_concurrent_workers:
+    description: Maximum number of distinct worker instances observed in any single minute on the day this task ran.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.peak_concurrent_workers
+  run_type:
+    description: Databricks run type — `JOB_RUN` (scheduled / triggered job) or `SUBMIT_RUN` (one-off API submission).
+    lineage:
+      - system.lakeflow.job_run_timeline.run_type
+  run_result_state:
+    description: Final state of the parent Databricks run (`SUCCEEDED`, `FAILED`, `CANCELED`, ...).
+    lineage:
+      - system.lakeflow.job_run_timeline.result_state
+  task_result_state:
+    description: Final state of this task-run (`SUCCEEDED`, `FAILED`, `CANCELED`, ...).
+    lineage:
+      - system.lakeflow.job_task_run_timeline.result_state
+  setup_duration_seconds:
+    description: Cluster cold-start time for this task in seconds — time spent acquiring instances and bootstrapping before the first user code executes. Headline pool-effectiveness metric (O4). On pooled clusters this is typically 30–60s; on non-pooled it is 4–8 minutes.
+    lineage:
+      - system.lakeflow.job_task_run_timeline.setup_duration_seconds
+  pre_init_script_seconds:
+    description: |
+      Seconds spent in cluster STARTING before init scripts begin (DBR pull, network
+      setup, instance provisioning). Cluster-day attribute — every task run on the
+      same (id_cluster, dt_task_started) carries the same value, so SUM aggregations
+      at task-run grain over-count; dedupe to (id_cluster, dt_task_started) first.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.pre_init_script_seconds
+  init_script_seconds:
+    description: |
+      **Init-script execution duration in seconds.** Headline metric for the
+      "optimise-or-remove init scripts" workstream (DPLT-928). Same cluster-day
+      caveat as `pre_init_script_seconds`: dedupe to (id_cluster, dt_task_started)
+      before SUM. Fleet baseline is mean ~95s, p95 ~210s.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.init_script_seconds
+  post_init_script_seconds:
+    description: |
+      Seconds between INIT_SCRIPTS_FINISHED and the cluster entering RUNNING
+      (mostly Spark/JVM warm-up). Same cluster-day dedupe caveat applies.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.post_init_script_seconds
+  cluster_startup_seconds:
+    description: |
+      Total wall-clock startup (`pre + init + post`) for the FIRST start of the
+      cluster on `dt_task_started`. Same cluster-day dedupe caveat applies.
+      Subsequent restarts within the same day are not captured.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.cluster_startup_seconds
+  total_duration_seconds:
+    description: Wall-clock duration of the task in seconds (`ts_task_ended - ts_task_started`). Includes setup + execution.
+  execution_duration_seconds:
+    description: Useful execution time (`total_duration_seconds - setup_duration_seconds`). What the task spent doing actual work, excluding cluster cold-start.
+  dbu_consumed:
+    description: Total DBUs billed against this task's cluster window (`SUM(usage_quantity WHERE usage_metadata.cluster_id = id_cluster AND usage_start_time BETWEEN ts_task_started AND ts_task_ended)`). Over-attributes for shared interactive clusters — see table description.
+    lineage:
+      - system.billing.usage.usage_quantity
+      - system.billing.usage.usage_metadata
+  total_dbu_cost_overwatch_usd:
+    description: |
+      Cluster-day total DBU cost in USD from Overwatch (`overwatch.clusterstatefact`).
+      Independent cross-check of the system-tables-derived `dbu_consumed`/USD trail —
+      material disagreement (>10%) usually indicates Overwatch-vs-Lakeflow attribution
+      drift on the underlying SKU. Same cluster-day dedupe caveat as the
+      `*_script_seconds` columns.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.total_dbu_cost_overwatch_usd
+  total_ec2_cost_overwatch_usd:
+    description: |
+      Cluster-day total EC2 / instance compute cost in USD from Overwatch. Useful for
+      "true cost" views (DBU + AWS infrastructure); system tables only expose DBU
+      SKUs, not the underlying EC2 pricing. Same cluster-day dedupe caveat applies.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.total_ec2_cost_overwatch_usd
+  p50_driver_cpu_busy_percent:
+    description: Median driver CPU busy percent on the cluster-day.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.p50_driver_cpu_busy_percent
+  p95_driver_cpu_busy_percent:
+    description: 95th percentile driver CPU busy percent on the cluster-day. Above ~80 indicates a driver CPU bottleneck.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.p95_driver_cpu_busy_percent
+  p50_driver_cpu_wait_percent:
+    description: Median driver I/O wait percent on the cluster-day.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.p50_driver_cpu_wait_percent
+  p95_driver_cpu_wait_percent:
+    description: 95th percentile driver I/O wait percent. Above ~5 suggests the driver is I/O bound.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.p95_driver_cpu_wait_percent
+  p50_driver_mem_used_percent:
+    description: Median driver memory used percent on the cluster-day.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.p50_driver_mem_used_percent
+  p95_driver_mem_used_percent:
+    description: 95th percentile driver memory used percent. Above ~80 indicates driver memory pressure.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.p95_driver_mem_used_percent
+  p50_worker_cpu_busy_percent:
+    description: Median worker CPU busy percent across all worker observations on the cluster-day.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.p50_worker_cpu_busy_percent
+  p95_worker_cpu_busy_percent:
+    description: 95th percentile worker CPU busy percent. Below ~30 suggests workers are over-provisioned.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.p95_worker_cpu_busy_percent
+  p50_worker_cpu_wait_percent:
+    description: Median worker I/O wait percent.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.p50_worker_cpu_wait_percent
+  p95_worker_cpu_wait_percent:
+    description: 95th percentile worker I/O wait percent. Above ~5 suggests workers are I/O bound — keep NVMe / consider Photon.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.p95_worker_cpu_wait_percent
+  p50_worker_mem_used_percent:
+    description: Median worker memory used percent.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.p50_worker_mem_used_percent
+  p95_worker_mem_used_percent:
+    description: 95th percentile worker memory used percent. Below ~50 suggests memory over-provisioning.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.p95_worker_mem_used_percent
+  nvme_utilization_pct_p95:
+    description: 95th percentile of per-node NVMe used percent on the cluster-day. Below ~10 on Standard-engine clusters means NVMe can be dropped.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.nvme_utilization_pct_p95
+  is_success:
+    description: True when `task_result_state = 'SUCCEEDED'`.
+  is_failed:
+    description: True when `task_result_state = 'FAILED'`.
+  is_photon:
+    description: True when the cluster's DBR is a Photon image.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.is_photon
+  is_pool_backed:
+    description: True when the cluster has a `driver_instance_pool_id` or `worker_instance_pool_id` set.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.is_pool_backed
+  is_pool_acquisition_slow:
+    description: True when `setup_duration_seconds > 90`. The 90s threshold is the O4 alerting line — sustained high values mean the underlying pool is undersized.
+  is_sensitive_data:
+    description: |
+      True when the cluster `sensitive-data` tag is `'true'`. Currently uniform
+      across bietlejuice-managed clusters (the framework default flags everything
+      as sensitive); exposed so consumers can filter sensitive vs non-sensitive
+      workloads when the framework starts setting it per-DAG.
+    lineage:
+      - system.compute.clusters.tags
+  dt_task_started:
+    description: Task start date (UTC), derived from the earliest `period_start_time` of the task's lifecycle.
+  ts_task_started:
+    description: Task start timestamp (UTC), `MIN(period_start_time)` across the task's lifecycle event rows.
+  ts_task_ended:
+    description: Task end timestamp (UTC), `MAX(period_end_time)` across the task's lifecycle event rows.
+  ts_run_started:
+    description: Parent run start timestamp (UTC). May be earlier than `ts_task_started` if other tasks ran before this one.
+  ts_run_ended:
+    description: Parent run end timestamp (UTC).
+  ts_load:
+    description: Timestamp the row was written by the DAG.
+  year:
+    description: Year of `dt_task_started` (partition column).
+  month:
+    description: Month of `dt_task_started` (partition column).
+  day:
+    description: Day of `dt_task_started` (partition column).

@@ -1,0 +1,57 @@
+dag:
+  name: dw_databricks_health
+  owner: Data Life Cycle
+  schedule_interval: null
+  documentation:
+    dag_purpose: |
+      Per-Airflow-task-run health fact that joins Databricks system tables
+      (system.lakeflow.job_run_timeline, system.lakeflow.job_task_run_timeline,
+      system.compute.clusters, system.billing.usage) with the cluster-shape +
+      utilisation slice produced by enrich_databricks_health (PR 2 of the
+      Phase 1.5 observability stack).
+
+      One row per (id_databricks_workspace, id_databricks_run, id_databricks_task_run).
+      Equivalently for the bietlejuice framework: one row per Airflow task
+      instance, since query_delta DAGs use job clusters (1 task = 1 cluster
+      = 1 Databricks job run).
+
+      Phase 1.5 PR 5 of 5 — see
+      bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md
+      (section "Phase 1.5 PR sequencing"). Closes O3 (cluster cost & health
+      Delta) and O4 (pool acquisition wait time) for the cost and timing
+      slice. Stage-level joins to PR 3 (spark_stage_metrics) and PR 4
+      (sparkmeasure_stage_metrics) are intentionally deferred to follow-up
+      PRs because the spark_app_id → task_run_id mapping is fuzzy (must
+      match by cluster_id + Spark-app start time within the task window)
+      and warrants its own design discussion.
+
+      Supersedes (does NOT yet retire) the cost-related legacy DAGs
+      enrich_databricks_usage_costs, enrich_databricks_job_runs and
+      databricks_usage. Those DAGs continue running; this PR adds
+      deprecation notes to their declarations so on-call knows about the
+      replacement. Actual deletion happens in follow-up PRs once this fact
+      proves parity (~2 weeks of side-by-side runs).
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: databricks_health
+  default_extraction_type: incremental
+  has_hive_sync: true
+  tables_customization:
+    fact_databricks_task_run:
+      partitions: [ year, month, day ]
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
+    load_end_date:   "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds,  1), 'load_end_date') }}"
+    environment:     "{{ var.value.environment }}"
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

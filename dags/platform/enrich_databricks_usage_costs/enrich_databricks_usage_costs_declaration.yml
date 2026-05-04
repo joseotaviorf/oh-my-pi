@@ -3,7 +3,25 @@ dag:
   owner: Data Life Cycle
   documentation:
     dag_purpose: |
-      Dag responsible for gathering and processing information related to the use/cost of the environment.
+      DEPRECATED — this DAG is superseded by
+      dw_databricks_health.fact_databricks_task_run (built by PR 5 of the
+      Phase 1.5 observability stack —
+      bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md).
+      The new fact sources cost data directly from system.billing.usage at
+      per-task-run grain, and joins it with cluster utilization (PR 2),
+      stage metrics (PR 3 / PR 4 — follow-ups), and Databricks system
+      tables for run timing.
+
+      This DAG continues to run for ~2 weeks of side-by-side validation
+      after fact_databricks_task_run goes live. Once parity is proven and
+      all downstream Superset charts have been re-pointed, this DAG (and
+      its tables) will be deleted in a follow-up PR.
+
+      DO NOT add new consumers of usage_costs — point new charts /
+      analyses at dw_databricks_health.fact_databricks_task_run instead.
+
+      Original purpose: Dag responsible for gathering and processing
+      information related to the use/cost of the environment.
 workflow:
   type: query_delta
   layer: enrich
