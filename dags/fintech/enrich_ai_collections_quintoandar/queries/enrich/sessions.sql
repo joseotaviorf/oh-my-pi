@@ -115,3 +115,8 @@ LEFT JOIN
 WHERE
     m.bot IN ('matthew', 'wall-e')
     AND m.ts_updated >= '{load_start_date}'
+QUALIFY
+    ROW_NUMBER() OVER (
+        PARTITION BY COALESCE(CAST(m.id_sauron_session AS STRING), CONCAT('id:', CAST(m.id_session AS STRING)))
+        ORDER BY m.ts_updated DESC NULLS LAST, m.id_session DESC NULLS LAST
+    ) = 1
