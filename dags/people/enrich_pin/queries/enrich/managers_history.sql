@@ -11,8 +11,7 @@ filtered_assignments AS (
   FROM 
     datalake_pin_core_clean.all_assignments
   WHERE 
-    is_primary
-    AND assignment_type IN ('E', 'C')
+    assignment_type IN ('E', 'C')
     AND dt_effective_started <= DATE('{load_start_date}')
   QUALIFY 
     ROW_NUMBER() OVER (PARTITION BY id_assignment ORDER BY dt_effective_started DESC) = 1
@@ -50,5 +49,4 @@ LEFT JOIN
   datalake_people.identifier_mapping AS eim
     ON eim.id_assignment = s.id_manager_assignment
 WHERE
-  s.is_primary
-  AND s.manager_type = 'LINE_MANAGER'
+  s.manager_type = 'LINE_MANAGER'
