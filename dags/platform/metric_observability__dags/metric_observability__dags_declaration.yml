@@ -1,0 +1,67 @@
+dag:
+  name: metric_observability__dags
+  schedule_start_date: 2026,04,18
+  schedule_interval: null
+  owner: Data Life Cycle
+  documentation:
+    dag_purpose: |
+      Per-DAG rolling observability metrics for the bietlejuice framework.
+      Wide-form schema: every metric column is duplicated as `_7d` and `_28d`,
+      both windows computed in a single SELECT over the same 28-day fact read
+      (7d aggregates produced via `FILTER (WHERE in_7d_window)`). One row per
+      (airflow_dag_id, dt_window_end) at table `metric_observability.dag_health`.
+
+      Window choice:
+        - 7d  → "act this sprint". Regression yesterday is visible immediately;
+                right-sizing decisions can land before the 28d average shifts.
+        - 28d → matches the Databricks billing aggregation default; smooths
+                single-day spikes (Mondays, releases, ad-hoc backfills) for
+                steady-state monitoring.
+
+      Headline columns (all duplicated `_7d` / `_28d`):
+        - Governance dimensions: team_owner, cost_center, ecosystem
+          (lifted from fact_databricks_task_run; enable per-team /
+          per-cost-center rollups without re-reading the underlying fact)
+        - Cost: total_dbu_consumed, total_cost_usd, avg_cost_usd_per_run
+        - Latency: p50/p95/p99 total_duration_seconds, avg/p95
+          setup_duration_seconds, p50/p95 init_script_seconds,
+          total_init_minutes (cluster-day deduped — drives the
+          optimise-or-remove init-script workstream, DPLT-928),
+          p95 cluster_startup_seconds
+        - Reliability: error_rate_pct, cold_start_rate_pct
+        - Cluster utilization: avg p95 driver/worker CPU + memory,
+          NVMe utilization (drives the NVMe-drop / right-size queue)
+        - Spark stage signals: total disk / memory spill, peak execution
+          memory, peak JVM heap, total GC time, peak task skew, shuffle
+          bytes (drives the spill / memory-pressure / skew backlog)
+        - Raw ratios: worker / driver CPU utilization, driver-minus-worker
+          pp, spill-to-input, cost efficiency (USD per executor-second).
+          Threshold-based booleans (`is_oversized`, etc.) live in the
+          metric_observability.dag_verdict view — DPLT-935 — NOT here.
+        - DQ: pct_runs_with_stage_data (Spark event log coverage)
+
+      Reads exclusively from dw_databricks_health.fact_databricks_task_run
+      — no other upstream. Consumed by Superset (dashboards), the per-team
+      rollup `metric_observability__teams.team_health` (DPLT-938), and the
+      anomaly-detection table `dag_cost_anomalies_d` (DPLT-936).
+workflow:
+  type: query_delta
+  layer: metric
+  custom_schema: observability
+  default_extraction_type: incremental
+  has_hive_sync: true
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+cluster:
+  type: databricks_16_4_med_general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
