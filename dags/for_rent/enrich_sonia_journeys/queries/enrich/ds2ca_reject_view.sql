@@ -4,7 +4,7 @@ WITH docs_rejected_events AS (
     id_user,
     CAST(id_person AS STRING) AS uuid_person,
     CAST(event_properties:proposal_id AS INT) AS id_proposal,
-    CAST(PARSE_JSON(TO_JSON(event_properties:party_rejection_reasons)) AS ARRAY<STRING>) AS party_rejection_reasons,
+    FROM_JSON(event_properties:party_rejection_reasons, 'ARRAY<STRING>') AS party_rejection_reasons,
     ts_event,
     event_properties
   FROM datalake_cdp_clean.transactional
