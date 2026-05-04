@@ -22,3 +22,10 @@ def nullify_fields_on_delete(df, non_null_cols=None):
             for col in df.columns  # So we don't change column order
         ]
     )
+
+
+def get_chunks(data, max_size):
+    """
+    Split a list (data) into chunks of max_size if necessary
+    """
+    return [data[i : i + max_size] for i in range(0, len(data), max_size)]
