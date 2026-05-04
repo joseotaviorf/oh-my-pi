@@ -1,31 +1,29 @@
 from argparse import ArgumentParser
 
-from pyspark.sql.functions import col, concat, lit, split, when
-
+import pandas as pd
 import yaml
+from pyspark.sql import functions as F
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
-    SparkTableStorageFormat,
-    SparkDataFrameService,
     BaseDBUtils,
+    SparkTableStorageFormat,
 )
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_dependency_tree_raw"
-
 DEPENDENCIES_S3_PATH = "astronomer/dags/dags/dependencies.yaml"
 
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def _fetch_dependencies_file(dbutils, environment):
+def _fetch_dependencies_file(dbutils):
     config_service = ConfigurationService(JOB_NAME)
     artifacts_bucket = config_service.get_config("artifacts_bucket")
     s3_path = f"{artifacts_bucket}/{DEPENDENCIES_S3_PATH}"
@@ -34,38 +32,27 @@ def _fetch_dependencies_file(dbutils, environment):
     content = dbutils.fs.head(s3_path, 1024 * 1024)
 
     data = yaml.safe_load(content)
-    if not data:
-        return []
-
-    rows = []
-    for dependent, deps in data.items():
-        dep_list = deps if isinstance(deps, list) else [deps]
-        for dependency in dep_list:
-            rows.append((dependent, dependency))
-
-    return rows
+    return pd.json_normalize(data or {})
 
 
-def _build_dependencies_spark_df(spark, dependency_rows):
-    if not dependency_rows:
-        return None
+def _explode_dependencies(wide_df):
+    df = wide_df.transpose()
+    df.columns = ["dependency"]
+    df["dependent"] = df.index
+    df = df.reset_index(drop=True).explode("dependency")
 
-    df = spark.createDataFrame(
-        dependency_rows,
-        schema="dependent:string, dependency:string",
+    dep_parts = df["dependency"].str.split(":", expand=True)
+    df["level_dag_dependency"] = df["dependent"].str.split(":").str[0]
+    df["up_level_dag_dependency"] = dep_parts[0]
+    df["up_level_task_dependency"] = dep_parts[1].fillna("terminate-cluster")
+    # third segment encodes run frequency modifiers (e.g. 'first-run-of-day')
+    df["up_level_run_suffix"] = (
+        dep_parts[2].where(dep_parts[2].notna(), other=None)
+        if 2 in dep_parts.columns
+        else None
     )
 
-    dep_split = split(col("dependency"), ":")
-    dep_col = split(col("dependent"), ":")
-
-    return df.select(
-        dep_col.getItem(0).alias("level_dag_dependency"),
-        dep_split.getItem(0).alias("up_level_dag_dependency"),
-        when(
-            dep_split.getItem(1).isNotNull(),
-            dep_split.getItem(1),
-        ).otherwise(lit("terminate-cluster")).alias("up_level_task_dependency"),
-    ).distinct()
+    return df
 
 
 if __name__ == "__main__":
@@ -88,93 +75,109 @@ if __name__ == "__main__":
     spark = spark_client.conn
 
     logger.info("m=main, msg=Fetching dependencies.yaml from S3...")
-    dependency_rows = _fetch_dependencies_file(dbutils, environment)
+    dependencies_wide_df = _fetch_dependencies_file(dbutils)
+    n_rows, n_cols = dependencies_wide_df.shape
 
-    if len(dependency_rows) < 1:
+    if n_rows < 1 or n_cols < 1:
         raise Exception(
             "Some problem with dependencies.yaml file ingestion. Schema doesn't match."
         )
 
-    dependencies = _build_dependencies_spark_df(spark, dependency_rows)
-    if dependencies is None:
+    dependencies_long_df = _explode_dependencies(dependencies_wide_df)
+    n_rows, n_cols = dependencies_long_df.shape
+
+    if n_rows <= 1 or n_cols != 6:
         raise Exception(
-            "Some problem with dependencies.yaml file ingestion. No data parsed."
+            "Some problem transforming wide to long dataframe. Schema doesn't match."
         )
 
-    n_rows = dependencies.count()
-    n_cols = len(dependencies.columns)
-    if n_rows <= 1 or n_cols != 3:
-        raise Exception(
-            "Some problem transforming dependencies. Schema doesn't match."
-        )
+    dependencies_df = dependencies_long_df[
+        [
+            "level_dag_dependency",
+            "up_level_dag_dependency",
+            "up_level_task_dependency",
+            "up_level_run_suffix",
+        ]
+    ].drop_duplicates()
 
-    # generate dependency tree
-    dag_dependencies = dependencies \
-        .select(
-            col('level_dag_dependency').alias('dag'),
-            '*',
-            lit(0).alias('level')
-        )
+    dependencies = spark.createDataFrame(
+        dependencies_df,
+        schema="level_dag_dependency:string, up_level_dag_dependency:string, up_level_task_dependency:string, up_level_run_suffix:string",
+    )
 
-    # Loop Through if you dont know recusrsive depth
-    level_dependencies = dependencies.withColumn(
-        'dag', col('level_dag_dependency'))
+    dag_dependencies = dependencies.select(
+        F.col("level_dag_dependency").alias("dag"), "*", F.lit(0).alias("level")
+    )
+
+    # iteratively resolves transitive dependencies since recursive depth is unknown
+    level_dependencies = dependencies.withColumn("dag", F.col("level_dag_dependency"))
 
     i = 1
     while True:
+        next_level = (
+            dependencies.withColumnRenamed("level_dag_dependency", "dag_dependent")
+            .withColumnRenamed("up_level_dag_dependency", "dag_dependency")
+            .withColumnRenamed("up_level_task_dependency", "task_dependency")
+            .withColumnRenamed("up_level_run_suffix", "run_suffix")
+        )
 
-        next_level = dependencies \
-            .withColumnRenamed('level_dag_dependency', 'dag_dependent') \
-            .withColumnRenamed('up_level_dag_dependency', 'dag_dependency') \
-            .withColumnRenamed('up_level_task_dependency', 'task_dependency')
-
-        update_dag_dependency = level_dependencies \
-            .select('dag', 'up_level_dag_dependency') \
-            .distinct() \
-            .join(next_level, on=level_dependencies['up_level_dag_dependency'] == next_level['dag_dependent'], how='left') \
-            .select(
-                'dag',
-                col('up_level_dag_dependency').alias('level_dag_dependency'),
-                col('dag_dependency').alias('up_level_dag_dependency'),
-                col('task_dependency').alias('up_level_task_dependency'),
-                lit(i).alias('level')
+        update_dag_dependency = (
+            level_dependencies.select("dag", "up_level_dag_dependency")
+            .distinct()
+            .join(
+                next_level,
+                on=level_dependencies["up_level_dag_dependency"]
+                == next_level["dag_dependent"],
+                how="left",
             )
+            .select(
+                "dag",
+                F.col("up_level_dag_dependency").alias("level_dag_dependency"),
+                F.col("dag_dependency").alias("up_level_dag_dependency"),
+                F.col("task_dependency").alias("up_level_task_dependency"),
+                F.col("run_suffix").alias("up_level_run_suffix"),
+                F.lit(i).alias("level"),
+            )
+        )
 
         level_dependencies = update_dag_dependency.select(
             "dag",
             "level_dag_dependency",
             "up_level_dag_dependency",
-            "up_level_task_dependency"
+            "up_level_task_dependency",
         )
 
         dag_dependencies = dag_dependencies.union(update_dag_dependency)
 
-        # Check if DF is empty. Break loop if empty, Otherwise continue with next level
-        if level_dependencies.where(col('up_level_dag_dependency').isNotNull()).count() == 0:
+        if (
+            level_dependencies.where(F.col("up_level_dag_dependency").isNotNull()).count()
+            == 0
+        ):
             break
-        else:
-            i += 1
 
-    df = dag_dependencies \
-        .where(col('level_dag_dependency').isNotNull()) \
-        .withColumn("up_level_task_dependency", concat(col("up_level_dag_dependency"), lit(":"), col("up_level_task_dependency"))) \
+        i += 1
+
+    df = (
+        dag_dependencies.where(F.col("level_dag_dependency").isNotNull())
+        .withColumn(
+            "up_level_task_dependency",
+            F.concat(
+                F.col("up_level_dag_dependency"),
+                F.lit(":"),
+                F.col("up_level_task_dependency"),
+            ),
+        )
         .distinct()
+    )
 
     n_rows, n_cols = (df.count(), len(df.columns))
 
-    if n_rows <= 2 or n_cols != 5:
+    if n_rows <= 2 or n_cols != 6:
         raise Exception(
-            "Some problem generating dependency tree. Schema doesn't match.")
+            "Some problem generating dependency tree. Schema doesn't match."
+        )
 
-    """
-    Load data to datalake.
-    """
-    spark_client = SparkClient()
-    spark_context = spark_client.conn.sparkContext
-    dataframe_service = SparkDataFrameService()
-
-    db_info = DatalakeMetastoreService.get_db_info(
-        environment, source, datalake_bucket)
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
@@ -193,9 +196,6 @@ if __name__ == "__main__":
         compression="gzip",
     )
 
-    """
-    Update metastore.
-    """
     spark_metastore_loader.update_metastore(
         df,
         database_name,

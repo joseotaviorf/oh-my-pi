@@ -1,26 +1,36 @@
 database_name: datalake_dependency_tree_clean
 table_name: dependency_tree
-owner: mario.abreu@quintoandar.com.br
+owner: data-platform-team@quintoandar.com.br
 domain: Data Life Cycle
-description: Dependency relation between DAGs.
+description: >
+  DAG dependency tree with direct and indirect relationships,
+  including depth information for each DAG.
 columns:
-  dag:
-    description: DAG's name.
+  id_dag:
+    description: ID of the DAG being analyzed.
     lineage:
       - datalake_dependency_tree_raw.dependency_tree.dag
-  level_dag_dependency:
-    description: First level (or simple direct) dependencies of a DAG.
-    lineage:
-      - datalake_dependency_tree_raw.dependency_tree.level_dag_dependency
-  up_level_dag_dependency:
-    description: Second level (or simple indirect) dependencies of a DAG.
+  id_dependency_dag:
+    description: ID of a DAG that id_dag depends on (directly or indirectly).
     lineage:
       - datalake_dependency_tree_raw.dependency_tree.up_level_dag_dependency
-  up_level_task_dependency:
-    description: Second level (or simple indirect) dependencies of a DAG at task level.
+  id_dependency_task:
+    description: Task-level detail of the dependency (format dag_id:task_id).
     lineage:
       - datalake_dependency_tree_raw.dependency_tree.up_level_task_dependency
-  level:
-    description: Depth level of dependency.
+  dependency_run_suffix:
+    description: Run frequency modifier declared on this dependency edge (e.g. 'first-run-of-day'). Null when no modifier is set.
+    lineage:
+      - datalake_dependency_tree_raw.dependency_tree.up_level_run_suffix
+  dependency_depth:
+    description: Hop distance from id_dag to id_dependency_dag. 0 means direct dependency, 1+ means indirect.
+    lineage:
+      - datalake_dependency_tree_raw.dependency_tree.level
+  is_direct_dependency:
+    description: True when dependency_depth is 0 (id_dependency_dag is a direct dependency of id_dag).
+    lineage:
+      - datalake_dependency_tree_raw.dependency_tree.level
+  dag_max_depth:
+    description: Maximum dependency depth for id_dag across all its dependencies. Indicates how deep the DAG's dependency tree goes.
     lineage:
       - datalake_dependency_tree_raw.dependency_tree.level
