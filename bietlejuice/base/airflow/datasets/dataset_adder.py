@@ -31,17 +31,20 @@ class DatasetAdder:
             )
         )
 
-        if task.on_success_callback is None:
-            task.on_success_callback = [dataset_service.DatasetService.update_datasets]
-        elif not isinstance(task.on_success_callback, list):
-            task.on_success_callback = [
-                task.on_success_callback,
-                dataset_service.DatasetService.update_datasets,
-            ]
-        else:
-            task.on_success_callback.append(
-                dataset_service.DatasetService.update_datasets
-            )
+        original_cb = task.on_success_callback
+
+        def _combined_callback(context):
+            # This function guarantees that the dataset is updated before the original callback is called.
+            dataset_service.DatasetService.update_datasets(context)
+            if original_cb:
+                callbacks = (
+                    original_cb if isinstance(original_cb, list) else [original_cb]
+                )
+                for cb in callbacks:
+                    print(f"Calling callback: {cb}")
+                    cb(context)
+
+        task.on_success_callback = _combined_callback
 
         # Shows a button to trigger the dataset manually
         task.operator_extra_links = tuple(task.operator_extra_links or ()) + (
