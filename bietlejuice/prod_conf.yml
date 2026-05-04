@@ -1377,7 +1377,6 @@ databricks_12_2_med_io-general_analytical_costs_photon_cluster:
         <<: *aws_anchor
         ebs_volume_size: 200
         instance_profile_arn: "{{ var.value.instance_profile_secret_arn_analytical_environment_costs }}"
-
 databricks_12_2_med_cluster:
     <<: *cluster_anchor
     driver_node_type_id: m5a.xlarge
@@ -1515,7 +1514,6 @@ databricks_16_4_small_general_fleet_8xlarge_single_node:
     aws_attributes:
         <<: *aws_anchor
         ebs_volume_size: 200
-
 databricks_16_4_rfleet_instance_cluster:
     <<: *cluster_anchor_base
     driver_instance_pool_id: *pool_rfleet_xlarge_on_demand
@@ -1723,10 +1721,265 @@ emr_7_12_med_general_2_workers_cluster:
         ebs_volume_size: 100
         availability: ON_DEMAND
 
+##### Consolidation Cluster Presets #####
+# Naming: consolidation_{size}_{family}_cluster
+# Sizes (vCPUs): xs=2  s=4  m=8  l=16  xl=32
+# Families: compute=c6g (1:2)  general=m6g (1:4)  memory=r6g (1:8)  — AWS Graviton (gen 6).
+# Special IAM: declare aws_attributes.instance_profile_arn in the DAG's custom_configurations.
+
+##### Compute Optimized (c6g — 1 vCPU : 2 GiB RAM) #####
+
+consolidation_xs_compute_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: c6g.large
+    node_type_id: c6g.large
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_s_compute_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: c6g.xlarge
+    node_type_id: c6g.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_m_compute_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: c6g.2xlarge
+    node_type_id: c6g.2xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_l_compute_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: c6g.4xlarge
+    node_type_id: c6g.4xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_xl_compute_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: c6g.8xlarge
+    node_type_id: c6g.8xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+##### General Purpose (m6g — 1 vCPU : 4 GiB RAM) #####
+
+consolidation_xs_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.large
+    node_type_id: m6g.large
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_s_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.xlarge
+    node_type_id: m6g.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_m_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.2xlarge
+    node_type_id: m6g.2xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_l_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.4xlarge
+    node_type_id: m6g.4xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_xl_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.8xlarge
+    node_type_id: m6g.8xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+##### Memory Optimized (r6g — 1 vCPU : 8 GiB RAM) #####
+
+consolidation_xs_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.large
+    node_type_id: r6g.large
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_s_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.xlarge
+    node_type_id: r6g.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_m_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.2xlarge
+    node_type_id: r6g.2xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_l_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.4xlarge
+    node_type_id: r6g.4xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_xl_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.8xlarge
+    node_type_id: r6g.8xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+##### Consolidation Single-Node Presets #####
+# Naming: consolidation_{size}_{family}_single_node_cluster
+# Sizes (vCPUs): xs=2  s=4  m=8  l=16  xl=32
+# Families: general=m6g (Graviton ARM, 1:4)  memory=r6g (Graviton ARM, 1:8)
+# compute family omitted — no dedicated single-node compute t-shirt in this set.
+# All specs: num_workers=0, singleNode spark conf, ResourceClass=SingleNode tag.
+# Default runtime: 16.4.x-scala2.12  (override per-DAG via custom_configurations.spark_version)
+
+##### General Purpose Single-Node (m6g — 1 vCPU : 4 GiB RAM) #####
+
+consolidation_xs_general_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.large
+    node_type_id: m6g.large
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_s_general_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.xlarge
+    node_type_id: m6g.xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
 consolidation_m_general_single_node_cluster:
     <<: *cluster_anchor
-    driver_node_type_id: m8g.2xlarge
-    node_type_id: m8g.2xlarge
+    driver_node_type_id: m6g.2xlarge
+    node_type_id: m6g.2xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_l_general_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.4xlarge
+    node_type_id: m6g.4xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_xl_general_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.8xlarge
+    node_type_id: m6g.8xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+##### Memory Optimized Single-Node (r6g — 1 vCPU : 8 GiB RAM) #####
+
+consolidation_xs_memory_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.large
+    node_type_id: r6g.large
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_s_memory_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.xlarge
+    node_type_id: r6g.xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_m_memory_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.2xlarge
+    node_type_id: r6g.2xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_l_memory_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.4xlarge
+    node_type_id: r6g.4xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_xl_memory_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.8xlarge
+    node_type_id: r6g.8xlarge
     num_workers: 0
     spark_version: 16.4.x-scala2.12
     spark_conf:
