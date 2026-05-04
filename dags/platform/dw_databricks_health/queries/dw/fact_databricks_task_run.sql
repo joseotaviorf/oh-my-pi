@@ -1,10 +1,10 @@
 -- ============================================================================
 -- fact_databricks_task_run.sql
 --
--- Per Airflow-task-run health fact joining Databricks system tables with the
--- pre-aggregated cluster utilisation snapshot from
--- datalake_databricks_health.daily_cluster_health (PR 2 of the Phase 1.5
--- observability stack).
+-- Per Airflow-task-run health fact joining Databricks system tables, the
+-- cluster-utilisation snapshot from datalake_databricks_health.daily_cluster
+-- _health (PR 23079), and per-stage Spark execution metrics from
+-- datalake_databricks_health.spark_stage_metrics (PR 23080).
 --
 -- Grain: one row per
 --   (id_databricks_workspace, id_databricks_run, id_databricks_task_run)
@@ -12,11 +12,12 @@
 -- because query_delta DAGs spin up a job cluster per task.
 --
 -- Source tables:
---   - system.lakeflow.job_task_run_timeline   (spine — per-task-run, setup time)
---   - system.lakeflow.job_run_timeline        (parent run state, run_type)
---   - system.compute.clusters                 (cluster spec snapshots — latest)
---   - system.billing.usage                    (DBU per cluster-window)
---   - datalake_databricks_health.daily_cluster_health (PR 2 — P50/P95 util)
+--   - system.lakeflow.job_task_run_timeline           (spine — per-task-run)
+--   - system.lakeflow.job_run_timeline                (parent run state)
+--   - system.compute.clusters                         (cluster spec — latest)
+--   - system.billing.usage                            (DBU per cluster-window)
+--   - datalake_databricks_health.daily_cluster_health (PR 23079 — P50/P95 util)
+--   - datalake_databricks_health.spark_stage_metrics  (PR 23080 — per stage)
 --
 -- Filters:
 --   - tags['provisioner'] = 'bietlejuice'   (framework-managed clusters only)
@@ -30,11 +31,17 @@
 --
 -- USD conversion is intentionally skipped in this version — system.billing.
 -- usage exposes usage_quantity in DBUs but not the SKU rate. Joining
--- system.billing.list_prices to derive USD is left as a follow-up
--- enhancement.
+-- system.billing.list_prices to derive USD is left as a follow-up.
 --
--- Stage-level joins (PR 3 spark_stage_metrics, PR 4 sparkmeasure) are
--- intentionally deferred — see the DAG declaration documentation.
+-- Stage-attribution strategy:
+--   spark_stage_metrics is keyed by (id_spark_app, id_stage, id_stage_attempt)
+--   plus dag_id (parsed from the event-log path). The path layout lacks
+--   task_id and cluster_id, so we attribute each Spark application to a task
+--   by matching dag_id + spark_app_first_seen ∈ [ts_task_started, ts_task_
+--   ended]. For DAGs with sequential tasks (the vast majority of query_delta
+--   DAGs) this is unique. For DAGs with PARALLEL tasks of the same dag_id,
+--   the same spark_app may match multiple task windows and the
+--   `is_stage_attribution_ambiguous` flag fires (spark_app_count > 1).
 -- ============================================================================
 WITH latest_cluster_spec AS (
     SELECT
@@ -69,14 +76,15 @@ WITH latest_cluster_spec AS (
         rn = 1
 ),
 task_run_spine AS (
-    -- Aggregate event-timeline rows down to one per task_run_id.
+    -- Aggregate event-timeline rows down to one per run_id (task run).
     -- job_task_run_timeline emits a new row every time a task transitions
     -- compute or status; we collapse the lifecycle here.
+    -- Column mapping: run_id → task_run_id, job_run_id → run_id.
     SELECT
         workspace_id,
         job_id,
-        run_id,
-        task_run_id,
+        job_run_id                                         AS run_id,
+        run_id                                             AS task_run_id,
         FIRST(task_key)                                    AS task_key,
         FIRST(compute_ids[0])                              AS cluster_id,
         MIN(period_start_time)                             AS ts_task_started,
@@ -91,7 +99,7 @@ task_run_spine AS (
         AND compute_ids IS NOT NULL
         AND ARRAY_SIZE(compute_ids) > 0
     GROUP BY
-        workspace_id, job_id, run_id, task_run_id
+        workspace_id, job_id, job_run_id, run_id
 ),
 parent_run AS (
     -- Same aggregation pattern for the parent run.
@@ -127,6 +135,125 @@ billing_per_task AS (
             AND DATE(u.usage_start_time) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY
         s.workspace_id, s.run_id, s.task_run_id
+),
+stage_per_app AS (
+    -- Roll up spark_stage_metrics from per-stage to per-spark-application,
+    -- and record the application's first-seen timestamp for the time-window
+    -- join in `stage_per_task` below.
+    SELECT
+        dag_id,
+        id_spark_app,
+        MIN(ts_stage_submitted)                            AS spark_app_first_seen,
+        MAX(ts_stage_completed)                            AS spark_app_last_seen,
+        COUNT(*)                                           AS stage_count,
+        SUM(CASE WHEN is_stage_failed THEN 1 ELSE 0 END)   AS failed_stage_count,
+        SUM(executor_run_time_ms)                          AS total_executor_run_time_ms,
+        -- Convert ns → ms so the unit lines up with the other duration cols.
+        SUM(executor_cpu_time_ns) / 1000000                AS total_executor_cpu_time_ms,
+        SUM(disk_bytes_spilled)                            AS total_disk_bytes_spilled,
+        SUM(memory_bytes_spilled)                          AS total_memory_bytes_spilled,
+        MAX(peak_execution_memory_bytes)                   AS max_peak_execution_memory_bytes,
+        SUM(input_bytes_read)                              AS total_input_bytes_read,
+        SUM(output_bytes_written)                          AS total_output_bytes_written,
+        SUM(shuffle_read_local_bytes + shuffle_read_remote_bytes)
+                                                           AS total_shuffle_bytes_read,
+        SUM(shuffle_write_bytes)                           AS total_shuffle_bytes_written,
+        -- Extended parser columns (require spark.eventLog.logStageExecutorMetrics=true,
+        -- enabled by PR 23078). NULL for stages parsed before that config landed.
+        MAX(max_jvm_heap_bytes)                            AS max_jvm_heap_bytes,
+        SUM(total_gc_time_ms)                              AS total_gc_time_ms,
+        MAX(max_task_run_time_ms)                          AS max_task_run_time_ms,
+        MAX(task_skew_ratio)                               AS max_task_skew_ratio,
+        -- Failure reason of the last failed stage in this spark_app
+        -- (chronologically). NULL when no stage in the app failed.
+        MAX_BY(
+            CASE WHEN is_stage_failed THEN stage_failure_reason END,
+            ts_stage_completed
+        )                                                  AS last_stage_failure_reason
+    FROM
+        datalake_databricks_health.spark_stage_metrics
+    WHERE
+        dt_stage_completed BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    GROUP BY
+        dag_id, id_spark_app
+),
+stage_per_task AS (
+    -- Attribute each spark_app to the matching task by dag_id + start time
+    -- falling within the task window. Sequential-task DAGs match uniquely;
+    -- DAGs with concurrent tasks of the same dag_id may match the same
+    -- spark_app to multiple tasks (`spark_app_count > 1` ⇒ ambiguous).
+    SELECT
+        s.workspace_id,
+        s.run_id,
+        s.task_run_id,
+        COUNT(DISTINCT spa.id_spark_app)                   AS spark_app_count,
+        SUM(spa.stage_count)                               AS stage_count,
+        SUM(spa.failed_stage_count)                        AS failed_stage_count,
+        SUM(spa.total_executor_run_time_ms)                AS total_executor_run_time_ms,
+        SUM(spa.total_executor_cpu_time_ms)                AS total_executor_cpu_time_ms,
+        SUM(spa.total_disk_bytes_spilled)                  AS total_disk_bytes_spilled,
+        SUM(spa.total_memory_bytes_spilled)                AS total_memory_bytes_spilled,
+        MAX(spa.max_peak_execution_memory_bytes)           AS max_peak_execution_memory_bytes,
+        SUM(spa.total_input_bytes_read)                    AS total_input_bytes_read,
+        SUM(spa.total_output_bytes_written)                AS total_output_bytes_written,
+        SUM(spa.total_shuffle_bytes_read)                  AS total_shuffle_bytes_read,
+        SUM(spa.total_shuffle_bytes_written)               AS total_shuffle_bytes_written,
+        MAX(spa.max_jvm_heap_bytes)                        AS max_jvm_heap_bytes,
+        SUM(spa.total_gc_time_ms)                          AS total_gc_time_ms,
+        MAX(spa.max_task_run_time_ms)                      AS max_task_run_time_ms,
+        MAX(spa.max_task_skew_ratio)                       AS max_task_skew_ratio,
+        -- Carry forward the most recent failure reason across all matched apps
+        -- so consumers don't have to drill into spark_stage_metrics for the
+        -- typical "what crashed?" question.
+        MAX_BY(spa.last_stage_failure_reason, spa.spark_app_last_seen)
+                                                           AS last_stage_failure_reason
+    FROM
+        task_run_spine s
+    INNER JOIN
+        latest_cluster_spec lcs
+            ON  lcs.cluster_id   = s.cluster_id
+            AND lcs.workspace_id = s.workspace_id
+    INNER JOIN
+        stage_per_app spa
+            ON  spa.dag_id               = lcs.tags['application']
+            AND spa.spark_app_first_seen >= s.ts_task_started
+            AND spa.spark_app_first_seen <  s.ts_task_ended
+    GROUP BY
+        s.workspace_id, s.run_id, s.task_run_id
+),
+stage_per_task_clean AS (
+    -- When attribution is ambiguous (a single spark_app matched multiple
+    -- concurrent tasks of the same dag_id), the rolled-up SUMs and MAXs are
+    -- over-counted and would silently corrupt downstream aggregates. NULL the
+    -- metric columns in that case so SUM/AVG skip them; consumers explicitly
+    -- opting in can `WHERE NOT is_stage_attribution_ambiguous`. The diagnostic
+    -- columns (`spark_app_count`, `last_stage_failure_reason`) and the
+    -- `failed_stage_count` boolean signal stay populated either way — they're
+    -- still useful even when the value is over-counted.
+    SELECT
+        workspace_id,
+        run_id,
+        task_run_id,
+        spark_app_count,
+        spark_app_count > 1                                                                  AS is_stage_attribution_ambiguous,
+        last_stage_failure_reason,
+        IF(spark_app_count > 1, NULL, stage_count)                                           AS stage_count,
+        IF(spark_app_count > 1, NULL, failed_stage_count)                                    AS failed_stage_count,
+        IF(spark_app_count > 1, NULL, total_executor_run_time_ms)                            AS total_executor_run_time_ms,
+        IF(spark_app_count > 1, NULL, total_executor_cpu_time_ms)                            AS total_executor_cpu_time_ms,
+        IF(spark_app_count > 1, NULL, total_disk_bytes_spilled)                              AS total_disk_bytes_spilled,
+        IF(spark_app_count > 1, NULL, total_memory_bytes_spilled)                            AS total_memory_bytes_spilled,
+        IF(spark_app_count > 1, NULL, max_peak_execution_memory_bytes)                       AS max_peak_execution_memory_bytes,
+        IF(spark_app_count > 1, NULL, total_input_bytes_read)                                AS total_input_bytes_read,
+        IF(spark_app_count > 1, NULL, total_output_bytes_written)                            AS total_output_bytes_written,
+        IF(spark_app_count > 1, NULL, total_shuffle_bytes_read)                              AS total_shuffle_bytes_read,
+        IF(spark_app_count > 1, NULL, total_shuffle_bytes_written)                           AS total_shuffle_bytes_written,
+        IF(spark_app_count > 1, NULL, max_jvm_heap_bytes)                                    AS max_jvm_heap_bytes,
+        IF(spark_app_count > 1, NULL, total_gc_time_ms)                                      AS total_gc_time_ms,
+        IF(spark_app_count > 1, NULL, max_task_run_time_ms)                                  AS max_task_run_time_ms,
+        IF(spark_app_count > 1, NULL, max_task_skew_ratio)                                   AS max_task_skew_ratio
+    FROM
+        stage_per_task
 )
 SELECT
     XXHASH64(s.workspace_id, s.run_id, s.task_run_id)              AS sk_databricks_task_run,
@@ -212,12 +339,35 @@ SELECT
     dch.p95_worker_mem_used_percent,
     dch.nvme_utilization_pct_p95,
 
+    -- Per-task-run Spark execution metrics (rolled up from spark_stage_metrics).
+    -- See `stage_per_task` and `stage_per_task_clean` CTEs above for the
+    -- time-window attribution rules and the ambiguity-NULL contract.
+    sptc.stage_count,
+    sptc.failed_stage_count,
+    sptc.spark_app_count,
+    sptc.total_executor_run_time_ms,
+    sptc.total_executor_cpu_time_ms,
+    sptc.total_disk_bytes_spilled,
+    sptc.total_memory_bytes_spilled,
+    sptc.max_peak_execution_memory_bytes,
+    sptc.total_input_bytes_read,
+    sptc.total_output_bytes_written,
+    sptc.total_shuffle_bytes_read,
+    sptc.total_shuffle_bytes_written,
+    sptc.max_jvm_heap_bytes,
+    sptc.total_gc_time_ms,
+    sptc.max_task_run_time_ms,
+    sptc.max_task_skew_ratio,
+    sptc.last_stage_failure_reason,
+
     s.task_result_state = 'SUCCEEDED'                              AS is_success,
     s.task_result_state = 'FAILED'                                 AS is_failed,
     dch.is_photon,
     dch.is_pool_backed,
     s.setup_duration_seconds > 90                                  AS is_pool_acquisition_slow,
     lcs.tags['sensitive-data'] = 'true'                            AS is_sensitive_data,
+    sptc.workspace_id IS NOT NULL                                  AS has_stage_data,
+    COALESCE(sptc.is_stage_attribution_ambiguous, FALSE)           AS is_stage_attribution_ambiguous,
 
     s.dt_task_started,
 
@@ -250,3 +400,8 @@ LEFT JOIN
     datalake_databricks_health.daily_cluster_health dch
         ON  dch.id_cluster     = s.cluster_id
         AND dch.dt_cluster_run = s.dt_task_started
+LEFT JOIN
+    stage_per_task_clean sptc
+        ON  sptc.workspace_id = s.workspace_id
+        AND sptc.run_id       = s.run_id
+        AND sptc.task_run_id  = s.task_run_id

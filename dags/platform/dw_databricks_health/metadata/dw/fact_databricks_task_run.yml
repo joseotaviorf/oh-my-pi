@@ -7,19 +7,13 @@ description: |
   which for query_delta DAGs is one row per Airflow task instance (because
   query_delta provisions a job cluster per task).
 
-  Joins five sources:
+  Joins six sources:
     - system.lakeflow.job_task_run_timeline (spine — per-task-run, setup time)
     - system.lakeflow.job_run_timeline      (parent run state, run_type)
     - system.compute.clusters               (cluster spec snapshots — latest)
     - system.billing.usage                  (DBU per cluster-window)
-    - datalake_databricks_health.daily_cluster_health (PR 2 — P50/P95 utilization)
-
-  Phase 1.5 PR 5 of 5 — see
-  bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md
-  for the full investigation plan and the rationale for the 5-PR stack.
-  Closes O3 (cluster cost & health Delta) for the cost / utilization slice
-  and O4 (pool acquisition wait time) by exposing setup_duration_seconds
-  per task-run and the is_pool_acquisition_slow flag.
+    - datalake_databricks_health.daily_cluster_health (PR 23079 — P50/P95 util)
+    - datalake_databricks_health.spark_stage_metrics  (PR 23080 — Spark stages)
 
   Cost attribution caveat: billing rows whose usage_start_time falls within
   the task window are summed without time-slice apportionment. For job
@@ -32,10 +26,20 @@ description: |
   usage_quantity in DBUs but not the SKU rate. Joining
   system.billing.list_prices is left as a follow-up enhancement.
 
-  Stage-level joins to PR 3 (spark_stage_metrics) and PR 4
-  (sparkmeasure_stage_metrics) are intentionally deferred to follow-up PRs
-  because the spark_app_id → task_run_id mapping is fuzzy (must match by
-  cluster_id + Spark-app start time within the task window).
+  Stage-attribution caveat: spark_stage_metrics is keyed by id_spark_app,
+  not task_run_id (the event-log path layout doesn't carry task_id). We
+  attribute each Spark application to a task by matching dag_id +
+  spark_app_first_seen ∈ [ts_task_started, ts_task_ended]. For DAGs with
+  sequential tasks (the vast majority of query_delta DAGs) this is unique;
+  for DAGs with parallel tasks of the same dag_id the same spark_app may
+  match multiple task windows and the `is_stage_attribution_ambiguous`
+  flag fires. **In that case the rolled-up stage-metric columns
+  (`total_*`, `max_*`, `stage_count`, `failed_stage_count`) are set to
+  NULL** so SUM/AVG aggregates over the fact stay honest. The diagnostic
+  columns (`spark_app_count`, `last_stage_failure_reason`,
+  `is_stage_attribution_ambiguous`, `has_stage_data`) remain populated.
+  Consumers wanting the (over-counted) raw values can still query
+  `datalake_databricks_health.spark_stage_metrics` directly.
 
   Supersedes (does NOT yet retire) the cost-related legacy DAGs
   enrich_databricks_usage_costs, enrich_databricks_job_runs and
@@ -303,6 +307,99 @@ columns:
     description: 95th percentile of per-node NVMe used percent on the cluster-day. Below ~10 on Standard-engine clusters means NVMe can be dropped.
     lineage:
       - datalake_databricks_health.daily_cluster_health.nvme_utilization_pct_p95
+  stage_count:
+    description: Number of Spark stages observed for this task-run (sum across all attributed Spark applications). Useful as a sanity check and as a denominator for "stages-per-task" rollups.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics
+  failed_stage_count:
+    description: Number of Spark stages that ended with a non-NULL failure reason. A non-zero value combined with `is_success = TRUE` typically means task-level retries succeeded after an early stage failure.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.is_stage_failed
+  spark_app_count:
+    description: Distinct Spark application count attributed to this task-run by the dag_id + start-time-window join. Always 1 for normal sequential-task DAGs; values > 1 fire `is_stage_attribution_ambiguous` and indicate parallel tasks of the same dag_id whose Spark application start times overlap.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.id_spark_app
+  total_executor_run_time_ms:
+    description: Sum of executor wall-clock time across all stages in this task-run, in milliseconds. From `spark_stage_metrics.executor_run_time_ms`. Useful as the denominator for GC-overhead and CPU-utilization ratios at the task-run level.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.executor_run_time_ms
+  total_executor_cpu_time_ms:
+    description: Sum of executor CPU time across all stages in this task-run, in milliseconds (converted from the underlying nanosecond accumulator). From `spark_stage_metrics.executor_cpu_time_ns / 1e6`. Compare with `total_executor_run_time_ms` to compute CPU efficiency — values approaching 1 indicate fully CPU-bound work; values much lower than 1 indicate I/O wait, GC, or scheduling overhead.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.executor_cpu_time_ns
+  total_disk_bytes_spilled:
+    description: Sum of bytes spilled from memory to local disk (NVMe / EBS) across all stages in this task-run. Non-zero values indicate memory pressure within the task; the headline NVMe-utilization signal at task-run level.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.disk_bytes_spilled
+  total_memory_bytes_spilled:
+    description: Sum of bytes that would have been written to disk if no spill (logical pre-serialization size) across all stages in this task-run. Always >= `total_disk_bytes_spilled`.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.memory_bytes_spilled
+  max_peak_execution_memory_bytes:
+    description: Maximum peak on-heap execution memory used by any single task in any stage of this task-run, in bytes. Useful for sizing executor memory at the DAG / task level.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.peak_execution_memory_bytes
+  total_input_bytes_read:
+    description: Sum of bytes read from data sources (S3, JDBC, etc.) across all stages in this task-run. From `spark_stage_metrics.input_bytes_read`.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.input_bytes_read
+  total_output_bytes_written:
+    description: Sum of bytes written to data sinks (S3, JDBC, etc.) across all stages in this task-run. From `spark_stage_metrics.output_bytes_written`.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.output_bytes_written
+  total_shuffle_bytes_read:
+    description: Sum of bytes read from shuffle (local + remote) across all stages in this task-run. From `spark_stage_metrics.shuffle_read_local_bytes + shuffle_read_remote_bytes`.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.shuffle_read_local_bytes
+      - datalake_databricks_health.spark_stage_metrics.shuffle_read_remote_bytes
+  total_shuffle_bytes_written:
+    description: Sum of bytes this task-run wrote to shuffle (consumed by downstream stages). From `spark_stage_metrics.shuffle_write_bytes`.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.shuffle_write_bytes
+  max_jvm_heap_bytes:
+    description: |
+      Maximum JVM heap memory used by any single executor in any stage of this task-run,
+      in bytes. From `spark_stage_metrics.max_jvm_heap_bytes`. Requires
+      `spark.eventLog.logStageExecutorMetrics=true` (enabled by PR #23078); will be
+      NULL for stages parsed before that landed. Useful for sizing
+      `spark.executor.memory`: a value approaching the configured heap suggests
+      executors are at risk of GC pressure or OOM.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.max_jvm_heap_bytes
+  total_gc_time_ms:
+    description: |
+      Total executor GC time (minor + major) across all stages in this task-run, in
+      milliseconds. From `spark_stage_metrics.total_gc_time_ms`. Compare with
+      `total_executor_run_time_ms` to compute GC overhead ratio — a healthy
+      task-run typically sits well under 10%. Requires PR #23078; NULL for older stages.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.total_gc_time_ms
+  max_task_run_time_ms:
+    description: |
+      Slowest single-task wall-clock execution time across all stages in this task-run,
+      in milliseconds. From `spark_stage_metrics.max_task_run_time_ms`. Combined with
+      `max_task_skew_ratio` for skew detection at the task-run level. Requires PR #23078.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.max_task_run_time_ms
+  max_task_skew_ratio:
+    description: |
+      Maximum task-skew ratio (`max_task_run_time_ms / median_task_run_time_ms`) observed
+      in any stage of this task-run. From `spark_stage_metrics.task_skew_ratio`. Values
+      around 1 indicate balanced partitions; values above ~4 are a strong signal of
+      data skew worth investigating in at least one stage. Requires PR #23078.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.task_skew_ratio
+  last_stage_failure_reason:
+    description: |
+      Failure reason string of the most recent failed stage attributed to this task-run
+      (chronological by `ts_stage_completed`). NULL when no stage failed across any of
+      the task-run's Spark applications. First-glance "what crashed?" answer for failed
+      runs without leaving the fact table; deeper drill-down (full stack trace, attempt
+      history) still requires `datalake_databricks_health.spark_stage_metrics`.
+    lineage:
+      - datalake_databricks_health.spark_stage_metrics.stage_failure_reason
+      - datalake_databricks_health.spark_stage_metrics.is_stage_failed
+      - datalake_databricks_health.spark_stage_metrics.ts_stage_completed
   is_success:
     description: True when `task_result_state = 'SUCCEEDED'`.
   is_failed:
@@ -325,6 +422,29 @@ columns:
       workloads when the framework starts setting it per-DAG.
     lineage:
       - system.compute.clusters.tags
+  has_stage_data:
+    description: |
+      True when the time-window join into `spark_stage_metrics` matched at least one
+      Spark application for this task-run. False for tasks whose Spark event log
+      hasn't landed yet (delayed S3 PUT), tasks that ran before PR 23078 enabled
+      eventLog, or non-Spark tasks. When false, all `total_*` / `max_*` /
+      `*_skew_ratio` columns and `stage_count` / `failed_stage_count` /
+      `spark_app_count` / `last_stage_failure_reason` are NULL.
+  is_stage_attribution_ambiguous:
+    description: |
+      True when more than one distinct `id_spark_app` matched this task-run via the
+      dag_id + start-time-window join (`spark_app_count > 1`). Indicates a DAG with
+      concurrent tasks of the same `dag_id` whose Spark applications started within
+      overlapping windows.
+
+      **When this flag is true, the rolled-up stage-metric columns (`total_*`,
+      `max_*`, `stage_count`, `failed_stage_count`) are NULL** to keep aggregates
+      honest — SUM/AVG would otherwise over-count the same Spark app once per
+      concurrent task. Diagnostic columns (`spark_app_count`,
+      `last_stage_failure_reason`, `has_stage_data`) stay populated. Consumers
+      wanting the over-counted raw values can query `spark_stage_metrics`
+      directly. Sequential-task DAGs (the vast majority of query_delta DAGs)
+      never trigger this flag.
   dt_task_started:
     description: Task start date (UTC), derived from the earliest `period_start_time` of the task's lifecycle.
   ts_task_started:
