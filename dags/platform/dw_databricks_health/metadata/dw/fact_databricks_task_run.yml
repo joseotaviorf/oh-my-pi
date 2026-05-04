@@ -7,11 +7,12 @@ description: |
   which for query_delta DAGs is one row per Airflow task instance (because
   query_delta provisions a job cluster per task).
 
-  Joins six sources:
+  Joins seven sources:
     - system.lakeflow.job_task_run_timeline (spine — per-task-run, setup time)
     - system.lakeflow.job_run_timeline      (parent run state, run_type)
     - system.compute.clusters               (cluster spec snapshots — latest)
     - system.billing.usage                  (DBU per cluster-window)
+    - system.billing.list_prices            (AWS USD list rate per DBU SKU)
     - datalake_databricks_health.daily_cluster_health (PR 23079 — P50/P95 util)
     - datalake_databricks_health.spark_stage_metrics  (PR 23080 — Spark stages)
 
@@ -22,9 +23,14 @@ description: |
   task, so dbu_consumed will over-attribute. Consumers should either filter
   to job clusters (cluster_source = 'JOB') or apportion downstream.
 
-  USD conversion is intentionally skipped — system.billing.usage exposes
-  usage_quantity in DBUs but not the SKU rate. Joining
-  system.billing.list_prices is left as a follow-up enhancement.
+  USD conversion uses system.billing.list_prices.pricing.default (list rate
+  in USD per DBU, AWS cloud) joined on sku_name + valid time window.
+  pricing_sku and dbu_rate_usd are exposed alongside cost_usd_estimate so
+  consumers can audit the conversion or apply their own currency conversion
+  (e.g. BRL via the QuintoAndar finance FX rate). No Graviton or
+  instance-pool discount applies to DBUs (validated in
+  bietlejuice/spark_debugging/mcp_a4_dbu_list_prices.sql); cost savings on
+  those come from EC2 cost and faster wall-clock.
 
   Stage-attribution caveat: spark_stage_metrics is keyed by id_spark_app,
   not task_run_id (the event-log path layout doesn't carry task_id). We
@@ -239,10 +245,23 @@ columns:
     lineage:
       - system.billing.usage.usage_quantity
       - system.billing.usage.usage_metadata
+  cost_usd_estimate:
+    description: Estimated cost in USD for this task-run, computed as `SUM(usage_quantity * pricing.default)` joining `system.billing.list_prices` on `sku_name` and the price's validity window. Uses **list price** (no enterprise / promotional discount). Same over-attribution caveat as `dbu_consumed` for shared interactive clusters. Currency conversion to BRL is left to consumers via the QuintoAndar finance FX rate.
+    lineage:
+      - system.billing.usage.usage_quantity
+      - system.billing.list_prices.pricing
+  dbu_rate_usd:
+    description: USD-per-DBU rate from `system.billing.list_prices.pricing.default` for this task's billing SKU. Exposed alongside `cost_usd_estimate` so consumers can audit the conversion. NULL when no matching price row was found (typically a brand-new SKU not yet present in list_prices).
+    lineage:
+      - system.billing.list_prices.pricing
+  pricing_sku:
+    description: Databricks SKU name used for billing this task (e.g. `JOBS_PHOTON_COMPUTE_AWS`, `JOBS_LIGHT_COMPUTE_AWS`, `ALL_PURPOSE_COMPUTE_AWS`). Determines the DBU rate. Multiple SKUs can apply across a task's billing window for hybrid clusters; we expose the first one observed (matching the same `FIRST()` pattern used elsewhere in this CTE).
+    lineage:
+      - system.billing.usage.sku_name
   total_dbu_cost_overwatch_usd:
     description: |
       Cluster-day total DBU cost in USD from Overwatch (`overwatch.clusterstatefact`).
-      Independent cross-check of the system-tables-derived `dbu_consumed`/USD trail —
+      Independent cross-check of the system-tables-derived `cost_usd_estimate` trail —
       material disagreement (>10%) usually indicates Overwatch-vs-Lakeflow attribution
       drift on the underlying SKU. Same cluster-day dedupe caveat as the
       `*_script_seconds` columns.

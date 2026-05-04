@@ -6,10 +6,12 @@ dag:
     dag_purpose: |
       Per-Airflow-task-run health fact that joins Databricks system tables
       (system.lakeflow.job_run_timeline, system.lakeflow.job_task_run_timeline,
-      system.compute.clusters, system.billing.usage) with the cluster-shape +
-      utilisation slice produced by enrich_databricks_health (PR 23079) and
-      the per-stage Spark execution metrics produced by enrich_spark_event
-      _logs (PR 23080).
+      system.compute.clusters, system.billing.usage, system.billing.list_prices)
+      with the cluster-shape + utilisation slice produced by
+      enrich_databricks_health (PR 23079) and the per-stage Spark execution
+      metrics produced by enrich_spark_event_logs (PR 23080). DBU usage is
+      converted to USD using list_prices (AWS USD per DBU); see table metadata
+      for attribution and pricing caveats.
 
       One row per (id_databricks_workspace, id_databricks_run, id_databricks_task_run).
       Equivalently for the bietlejuice framework: one row per Airflow task

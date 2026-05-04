@@ -16,6 +16,7 @@
 --   - system.lakeflow.job_run_timeline                (parent run state)
 --   - system.compute.clusters                         (cluster spec — latest)
 --   - system.billing.usage                            (DBU per cluster-window)
+--   - system.billing.list_prices                      (AWS USD list rate per DBU SKU)
 --   - datalake_databricks_health.daily_cluster_health (PR 23079 — P50/P95 util)
 --   - datalake_databricks_health.spark_stage_metrics  (PR 23080 — per stage)
 --
@@ -29,9 +30,14 @@
 -- interactive clusters this over-attributes — the same billing rows are
 -- counted by every concurrent task. Documented in metadata.
 --
--- USD conversion is intentionally skipped in this version — system.billing.
--- usage exposes usage_quantity in DBUs but not the SKU rate. Joining
--- system.billing.list_prices to derive USD is left as a follow-up.
+-- USD conversion uses system.billing.list_prices.pricing.default (list rate
+-- in USD per DBU, AWS cloud) joined on sku_name + valid time window. No
+-- Graviton or instance-pool discount applies to DBUs (validated in
+-- bietlejuice/spark_debugging/mcp_a4_dbu_list_prices.sql) — savings on
+-- those come from EC2 cost and faster wall-clock, not the DBU rate.
+-- Promotional / committed-use discounts are NOT applied; use
+-- pricing.effective_list.default in a follow-up if enterprise negotiated
+-- pricing is needed.
 --
 -- Stage-attribution strategy:
 --   spark_stage_metrics is keyed by (id_spark_app, id_stage, id_stage_attempt)
@@ -117,12 +123,35 @@ parent_run AS (
     GROUP BY
         workspace_id, run_id
 ),
+prices_per_sku AS (
+    -- One row per (sku, validity window). Filter to AWS DBU prices in USD.
+    -- price_end_time is NULL for the currently-effective price. We rely on
+    -- list price (pricing.default); promotional / effective_list pricing
+    -- can be swapped in here if QuintoAndar negotiates enterprise rates.
+    SELECT
+        sku_name,
+        pricing.default                                    AS unit_price_usd,
+        price_start_time,
+        price_end_time
+    FROM
+        system.billing.list_prices
+    WHERE
+        cloud             = 'AWS'
+        AND usage_unit    = 'DBU'
+        AND currency_code = 'USD'
+        AND price_start_time <= TIMESTAMP('{load_end_date}')
+        AND (price_end_time IS NULL OR price_end_time >= TIMESTAMP('{load_start_date}'))
+),
 billing_per_task AS (
     SELECT
         s.workspace_id,
         s.run_id,
         s.task_run_id,
-        SUM(u.usage_quantity)                              AS dbu_consumed
+        SUM(u.usage_quantity)                              AS dbu_consumed,
+        SUM(u.usage_quantity * COALESCE(p.unit_price_usd, 0))
+                                                           AS cost_usd_estimate,
+        FIRST(u.sku_name)                                  AS pricing_sku,
+        FIRST(p.unit_price_usd)                            AS dbu_rate_usd
     FROM
         task_run_spine s
     LEFT JOIN
@@ -133,6 +162,11 @@ billing_per_task AS (
             AND u.usage_start_time         >= s.ts_task_started
             AND u.usage_start_time          < s.ts_task_ended
             AND DATE(u.usage_start_time) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    LEFT JOIN
+        prices_per_sku p
+            ON  p.sku_name           = u.sku_name
+            AND u.usage_start_time  >= p.price_start_time
+            AND (p.price_end_time IS NULL OR u.usage_start_time < p.price_end_time)
     GROUP BY
         s.workspace_id, s.run_id, s.task_run_id
 ),
@@ -321,8 +355,12 @@ SELECT
     BIGINT(unix_timestamp(s.ts_task_ended) - unix_timestamp(s.ts_task_started))
         - COALESCE(s.setup_duration_seconds, 0)                    AS execution_duration_seconds,
     ROUND(COALESCE(b.dbu_consumed, 0), 4)                          AS dbu_consumed,
-    -- Overwatch-derived cluster-day cost cross-check (USD). Same dedupe caveat as
-    -- the *_script_seconds columns above — these are cluster-day, not task-run.
+    -- Primary USD cost trail derived from system.billing.usage × system.billing.list_prices.
+    ROUND(COALESCE(b.cost_usd_estimate, 0), 4)                     AS cost_usd_estimate,
+    b.dbu_rate_usd,
+    b.pricing_sku,
+    -- Overwatch-derived cluster-day cost cross-check (USD). Same cluster-day dedupe
+    -- caveat as the *_script_seconds columns above — these are cluster-day, not task-run.
     dch.total_dbu_cost_overwatch_usd,
     dch.total_ec2_cost_overwatch_usd,
     dch.p50_driver_cpu_busy_percent,
