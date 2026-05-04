@@ -1,0 +1,56 @@
+---
+database_name: datalake_hightouch_logs_raw
+table_name: sync_runs_trino_test
+domain: Growth
+description: Hightouch reverse ETL sync run execution metrics tracking data pipeline performance from Trino to marketing destinations
+columns:
+  sync_id:
+    description: Unique identifier for the sync configuration
+  sync_run_id:
+    description: Unique identifier for the specific sync run execution
+  primary_key:
+    description: Primary key configuration used for the sync
+  destination:
+    description: Target destination where data is being synchronized
+  model_name:
+    description: Name of the data model being synchronized
+  error:
+    description: Error message if the sync run encountered issues
+  status:
+    description: Overall status of the sync run (success, failed, running)
+  started_at:
+    description: Timestamp when the sync run was initiated
+  finished_at:
+    description: Timestamp when the sync run completed
+  num_planned_add:
+    description: Number of records planned to be added
+  num_planned_change:
+    description: Number of records planned to be changed
+  num_planned_remove:
+    description: Number of records planned to be removed
+  num_attempted_add:
+    description: Number of records attempted to be added
+  num_attempted_change:
+    description: Number of records attempted to be changed
+  num_attempted_remove:
+    description: Number of records attempted to be removed
+  num_succeeded_add:
+    description: Number of records successfully added
+  num_succeeded_change:
+    description: Number of records successfully changed
+  num_succeeded_remove:
+    description: Number of records successfully removed
+  num_failed_add:
+    description: Number of records that failed to be added
+  num_failed_change:
+    description: Number of records that failed to be changed
+  num_failed_remove:
+    description: Number of records that failed to be removed
+  model_id:
+    description: Unique identifier for the data model
+  year:
+    description: Partition column representing the year of the data
+  month:
+    description: Partition column representing the month of the data
+  day:
+    description: Partition column representing the day of the data
