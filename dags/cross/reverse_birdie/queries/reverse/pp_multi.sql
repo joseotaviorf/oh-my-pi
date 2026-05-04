@@ -8,7 +8,7 @@ WITH base_nps as (
     ans.comment,
     ans.ts_answered as data_resposta_nps,
     camp.metric_group,
-    rank() over (PARTITION BY disp.sk_user ORDER BY ans.ts_answered) rank_nps
+    rank() over (PARTITION BY disp.sk_user, camp.metric_group ORDER BY ans.ts_answered) rank_nps
   FROM
     dw_customer_satisfaction.dim_nps_answer AS ans
       LEFT JOIN dw_customer_satisfaction.fact_nps_dispatches AS disp
@@ -21,7 +21,7 @@ WITH base_nps as (
         ON c.sk_contract = disp.sk_contract
   WHERE
     disp.sk_nps_answer > 0
-    and camp.metric_group in ('currentpo')
+    and camp.metric_group in ('onbppm', 'ongppm', 'offppm')
     and camp.business_context = 'forRent'
     and year >= 2024
 ),
@@ -33,6 +33,7 @@ ultimo_nps as (
     score,
     score_category,
     comment,
+    metric_group,
     max(rank_nps) last_rank
   from
     base_nps nps
@@ -43,6 +44,7 @@ ultimo_nps as (
     4,
     5,
     6,
+    7,
     rank_nps
   having
     rank_nps = max(rank_nps)
@@ -393,7 +395,11 @@ jd as (
     un.score as rating,
     un.score_category,
     date_format(un.data_resposta_nps, 'yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') AS posted_at,
-    'currentpo' as nps_campanha,
+    case
+      when un.metric_group = 'onbppm' then 'pp_multi_onboarding'
+      when un.metric_group = 'ongppm' then 'pp_multi_ongoing'
+      when un.metric_group = 'offppm' then 'pp_multi_offboarding'
+    end as nps_campanha,
     a.cluster_pp_multi as type_pp,
     a.rn,
     CAST(

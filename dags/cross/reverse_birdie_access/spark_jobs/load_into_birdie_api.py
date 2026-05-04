@@ -143,12 +143,12 @@ def send_feedbacks_payload(api_url, feedbacks_endpoint, headers, feedbacks_resul
                 )
 
             if response.status_code == 201:
-                logger.info(f"m=Batch sent successfully. Dispatch number={successful_dispatches}, total size={total_dispatches}")
+                logger.info(f"m=Batch sent successfully. feedback_id={feedback_id}, Dispatch number={successful_dispatches}, total size={total_dispatches}")
                 successful_dispatches += 1
                 time.sleep(1)
                 break
             else:
-                logger.error(f"m=Error sending batch. Retrying... Batch_index={successful_dispatches}, status_code={response.status_code}. Message={response.text}")
+                logger.error(f"m=Error sending batch. Retrying... feedback_id={feedback_id}, Batch_index={successful_dispatches}, status_code={response.status_code}. Message={response.text}")
                 errors_dispatches.append(x)
 
     if successful_dispatches != total_dispatches:
@@ -205,12 +205,12 @@ def send_accounts_payload(api_url, accounts_endpoint, headers, accounts_results_
                 )
 
             if response.status_code == 201:
-                logger.info(f"m=Batch sent successfully. Dispatch number={successful_dispatches}, total size={total_dispatches}")
+                logger.info(f"m=Batch sent successfully. account_id={account_id}, Dispatch number={successful_dispatches}, total size={total_dispatches}")
                 successful_dispatches += 1
                 time.sleep(1)
                 break
             else:
-                logger.error(f"m=Error sending batch. Retrying... Batch_index={successful_dispatches}, status_code={response.status_code}. Message={response.text}")
+                logger.error(f"m=Error sending batch. Retrying... account_id={account_id}, Batch_index={successful_dispatches}, status_code={response.status_code}. Message={response.text}")
                 errors_dispatches.append(x)
 
     if successful_dispatches != total_dispatches:
