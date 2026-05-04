@@ -166,10 +166,22 @@ cluster_template:
             spark.plugins: "ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics,br.com.quintoandar.GangliaMetrics"
             spark.jars.packages: "ch.cern.sparkmeasure:spark-plugins_2.12:0.2,ch.cern.sparkmeasure:spark-measure_2.12:0.21"
             spark.cernSparkPlugin.cloudFsName: "s3a"
+            # TODO(DPLT-927): remove sparkmeasure listener once Spark event log pipeline is validated stable.
+            # Superseded by spark.eventLog.* below — event log parser covers all metrics plus executor memory peaks.
             spark.extraListeners: "ch.cern.sparkmeasure.FlightRecorderStageMetrics"
             spark.sparkmeasure.outputFilename: "/tmp/stageMetrics_flightRecorder.json"
             spark.sparkmeasure.outputFormat: "json"
             spark.sparkmeasure.printToStdout: "false"
+            # Spark event logs (Spark UI history) → S3, zstd-compressed. Ingested into
+            # datalake_databricks_health.spark_stage_metrics by bietlejuice.enrich_spark_event_logs.
+            # logStageExecutorMetrics is OFF by default in Spark; we MUST set it to true so the
+            # event log includes SparkListenerStageExecutorMetrics with peak JVM heap, GC time,
+            # on/off-heap execution memory per executor — the data needed for memory right-sizing.
+            spark.eventLog.enabled: "true"
+            spark.eventLog.dir: "s3a://{{ var.value.databricks_s3_bucket }}/spark-event-logs/{{ dag.dag_id }}"
+            spark.eventLog.compress: "true"
+            spark.eventLog.compression.codec: "zstd"
+            spark.eventLog.logStageExecutorMetrics: "true"
             spark.databricks.delta.retentionDurationCheck.enabled: "false"
             spark.databricks.behaviorChange.SC102534CommandRedactProperties.enabled: "false"
             spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
@@ -178,6 +190,8 @@ cluster_template:
             SPARK_RUNTIME: databricks
             ENVIRONMENT: "{{ var.value.environment }}"
             ARTIFACTS_BUCKET: *artifacts_bucket
+            DATABRICKS_S3_BUCKET: "{{ var.value.databricks_s3_bucket }}"
+            AIRFLOW_DAG_ID: "{{ dag.dag_id }}"
         ssh_public_keys: []
         node_type_id: m5a.large
         driver_node_type_id: m5a.large
@@ -236,10 +250,22 @@ cluster_template:
             spark.plugins: "ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics,br.com.quintoandar.GangliaMetrics"
             spark.jars.packages: "ch.cern.sparkmeasure:spark-plugins_2.12:0.2,ch.cern.sparkmeasure:spark-measure_2.12:0.21"
             spark.cernSparkPlugin.cloudFsName: "s3a"
+            # TODO(DPLT-927): remove sparkmeasure listener once Spark event log pipeline is validated stable.
+            # Superseded by spark.eventLog.* below — event log parser covers all metrics plus executor memory peaks.
             spark.extraListeners: "ch.cern.sparkmeasure.FlightRecorderStageMetrics"
             spark.sparkmeasure.outputFilename: "/tmp/stageMetrics_flightRecorder.json"
             spark.sparkmeasure.outputFormat: "json"
             spark.sparkmeasure.printToStdout: "false"
+            # Spark event logs (Spark UI history) → S3, zstd-compressed. Ingested into
+            # datalake_databricks_health.spark_stage_metrics by bietlejuice.enrich_spark_event_logs.
+            # logStageExecutorMetrics is OFF by default in Spark; we MUST set it to true so the
+            # event log includes SparkListenerStageExecutorMetrics with peak JVM heap, GC time,
+            # on/off-heap execution memory per executor — the data needed for memory right-sizing.
+            spark.eventLog.enabled: "true"
+            spark.eventLog.dir: "s3a://{{ var.value.databricks_s3_bucket }}/spark-event-logs/{{ dag.dag_id }}"
+            spark.eventLog.compress: "true"
+            spark.eventLog.compression.codec: "zstd"
+            spark.eventLog.logStageExecutorMetrics: "true"
             spark.databricks.delta.retentionDurationCheck.enabled: "false"
             spark.databricks.behaviorChange.SC102534CommandRedactProperties.enabled: "false"
             spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
@@ -248,6 +274,8 @@ cluster_template:
             SPARK_RUNTIME: databricks
             ENVIRONMENT: "{{ var.value.environment }}"
             ARTIFACTS_BUCKET: *artifacts_bucket
+            DATABRICKS_S3_BUCKET: "{{ var.value.databricks_s3_bucket }}"
+            AIRFLOW_DAG_ID: "{{ dag.dag_id }}"
         ssh_public_keys: []
         spark_version: 10.4.x-scala2.12
         data_security_mode: SINGLE_USER
