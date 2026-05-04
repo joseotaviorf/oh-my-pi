@@ -1,0 +1,60 @@
+dag:
+  name: enrich_databricks_query_history
+  owner: Data Life Cycle
+  schedule_interval: null
+  documentation:
+    dag_purpose: |
+      Daily snapshot of every SQL statement executed against Databricks
+      compute (SQL warehouses, all-purpose clusters, job clusters and
+      pipelines), sourced from system.query.history.
+
+      One row per statement_id. Captures execution status, duration
+      breakdown (compile / queue / wait-for-compute / execute / fetch),
+      I/O metrics (read bytes, files, rows, IO-cache hit rate, spill,
+      shuffle), the originating compute (cluster_id or warehouse_id) and
+      the attribution struct (`query_source`) flattened into first-class
+      ID columns: id_databricks_job, id_databricks_run,
+      id_databricks_task_run, id_dashboard, id_alert, id_notebook,
+      id_sql_query, id_pipeline, id_pipeline_update, id_genie_space.
+
+      Powers the Spark / Trino observability stack alongside
+      enrich_databricks_health (cluster utilization) and
+      enrich_spark_event_logs (per-stage metrics). Together they cover:
+
+        * enrich_databricks_health        — CPU / memory / NVMe per cluster-day
+        * enrich_spark_event_logs         — per-Spark-stage execution metrics
+        * enrich_databricks_query_history — per-SQL-statement metrics (this DAG)
+
+      Statement-level joins back to fact_databricks_task_run via
+      id_databricks_task_run (when the query was triggered by a job task)
+      or to a future warehouse-cluster fact via id_warehouse / id_cluster.
+      query_parameters is intentionally NOT exposed — its struct schema is
+      pathological (deeply recursive, contains every literal value in the
+      query) and CMK-redacted; consumers that need it should query the
+      source system table directly.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: databricks_health
+  default_extraction_type: incremental
+  has_hive_sync: true
+  tables_customization:
+    query_history:
+      partitions:
+        - year
+        - month
+        - day
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
+    load_end_date:   "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1),  'load_end_date') }}"
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

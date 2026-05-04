@@ -1,0 +1,299 @@
+---
+database_name: datalake_databricks_health
+table_name: query_history
+description: |
+  Daily snapshot of every SQL statement executed against Databricks compute
+  (SQL warehouses, all-purpose clusters, job clusters and pipelines), sourced
+  from system.query.history. One row per `id_statement`.
+
+  Captures execution status, duration breakdown (compile / queue / wait-for-
+  compute / execute / fetch), I/O metrics (read bytes, files, rows, IO-cache
+  hit rate, spill, shuffle), the originating compute (`id_cluster` or
+  `id_warehouse`) and the attribution struct (`query_source`) flattened
+  into first-class ID columns: `id_databricks_job`, `id_databricks_run`,
+  `id_databricks_task_run`, `id_dashboard`, `id_alert`, `id_notebook`,
+  `id_sql_query`, `id_pipeline`, `id_pipeline_update`, `id_genie_space`.
+
+  `query_parameters` is intentionally NOT exposed — its struct schema is
+  pathological (deeply recursive expression IDs, contains every literal in
+  the query) and CMK-redacted in many environments. Consumers that need it
+  should query `system.query.history` directly.
+
+  `query_tags_json` is preserved as a `map<string, string>` (allowed in
+  raw / clean / enrich layers; would be flattened or dropped if promoted
+  to DW per naming conventions).
+
+  Joins downstream:
+    * `id_databricks_task_run` → `dw_databricks_health.fact_databricks_task_run`
+    * `id_cluster`             → `enrich_databricks_health.daily_cluster_health`
+    * future `id_warehouse` join → SQL-warehouse fact table.
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_statement:
+    description: Statement (statement-execution) identifier. Primary key of this table; matches the ID surfaced by the Databricks Query History UI.
+    lineage:
+      - system.query.history.statement_id
+  id_session:
+    description: Spark / SQL session identifier. Multiple statements can share a session.
+    lineage:
+      - system.query.history.session_id
+  id_databricks_account:
+    description: Databricks account identifier.
+    lineage:
+      - system.query.history.account_id
+  id_databricks_workspace:
+    description: Databricks workspace where the statement was executed.
+    lineage:
+      - system.query.history.workspace_id
+  id_user:
+    description: Identifier of the user (or service principal) who submitted the statement.
+    lineage:
+      - system.query.history.executed_by_user_id
+  id_executed_as_user:
+    description: |
+      Identifier of the user / service principal whose privileges were used
+      to execute the statement (may differ from `id_user` when statements
+      run under a "run-as" identity, e.g. notebook owner or job service
+      principal).
+    lineage:
+      - system.query.history.executed_as_user_id
+  compute_type:
+    description: Compute type that ran the statement (`WAREHOUSE` for SQL warehouses, `CLUSTER` for all-purpose / job clusters, etc.). Flattened from `compute.type`.
+    lineage:
+      - system.query.history.compute
+  id_cluster:
+    description: Cluster id when the statement ran on a Databricks cluster (all-purpose, job or pipeline). Joinable to `system.compute.clusters.cluster_id` and to `enrich_databricks_health.daily_cluster_health.id_cluster`. Null when the statement ran on a SQL warehouse.
+    lineage:
+      - system.query.history.compute
+  id_warehouse:
+    description: SQL warehouse id when the statement ran on a SQL warehouse. Null when the statement ran on a cluster. Joinable to `system.compute.warehouses.warehouse_id`.
+    lineage:
+      - system.query.history.compute
+  id_databricks_job:
+    description: Databricks job id when the statement was triggered as part of a job-task execution. Null otherwise. Flattened from `query_source.job_info.job_id`.
+    lineage:
+      - system.query.history.query_source
+  id_databricks_run:
+    description: Databricks job-run id when the statement was triggered as part of a job-task execution. Joinable to `dw_databricks_health.fact_databricks_task_run.id_databricks_run`.
+    lineage:
+      - system.query.history.query_source
+  id_databricks_task_run:
+    description: Databricks task-run id when the statement was triggered as part of a job-task execution. Joinable to `dw_databricks_health.fact_databricks_task_run.id_databricks_task_run` for end-to-end SQL-statement → task → cost attribution.
+    lineage:
+      - system.query.history.query_source
+  id_dashboard:
+    description: Lakeview / AI/BI dashboard id when the statement was triggered by a dashboard widget refresh. Null otherwise.
+    lineage:
+      - system.query.history.query_source
+  id_legacy_dashboard:
+    description: Legacy (pre-Lakeview) dashboard id when the statement was triggered by a legacy dashboard refresh. Null otherwise.
+    lineage:
+      - system.query.history.query_source
+  id_alert:
+    description: Databricks SQL alert id when the statement was triggered by an alert evaluation. Null otherwise.
+    lineage:
+      - system.query.history.query_source
+  id_notebook:
+    description: Notebook id when the statement was triggered from a notebook. Null otherwise.
+    lineage:
+      - system.query.history.query_source
+  id_sql_query:
+    description: Saved SQL query id when the statement was triggered from a saved query. Null otherwise.
+    lineage:
+      - system.query.history.query_source
+  id_genie_space:
+    description: Databricks Genie space id when the statement was triggered by a Genie conversation. Null otherwise.
+    lineage:
+      - system.query.history.query_source
+  id_pipeline:
+    description: Lakeflow pipeline (DLT) id when the statement was issued by a pipeline. Null otherwise.
+    lineage:
+      - system.query.history.query_source
+  id_pipeline_update:
+    description: Lakeflow pipeline-update id (the specific run of the pipeline that issued the statement). Null otherwise.
+    lineage:
+      - system.query.history.query_source
+  id_cache_origin_statement:
+    description: |
+      When `is_from_result_cache` is true, the statement id whose result was
+      reused. Otherwise the statement's own id (so the column is never null).
+      Useful for measuring cache reuse and identifying queries that
+      consistently re-execute the same logical request.
+    lineage:
+      - system.query.history.cache_origin_statement_id
+  executed_by_email:
+    description: Email or username of the principal who submitted the statement.
+    lineage:
+      - system.query.history.executed_by
+  executed_as_user_name:
+    description: Display name of the user or service principal whose privileges were used to execute the statement.
+    lineage:
+      - system.query.history.executed_as
+  statement_type:
+    description: |
+      Statement family classification (e.g. `SELECT`, `INSERT`, `MERGE`,
+      `ALTER`, `COPY`, `DESCRIBE`). Set by Databricks; null for some Genie /
+      AI-assisted requests.
+    lineage:
+      - system.query.history.statement_type
+  execution_status:
+    description: |
+      Terminal state of the statement. One of `FINISHED` (success), `FAILED`
+      (see `error_message`) or `CANCELED` (user / timeout).
+    lineage:
+      - system.query.history.execution_status
+  client_application:
+    description: Application that initiated the statement (e.g. `Databricks SQL`, `Tableau`, `Power BI`, `dbt`, `Workflows`).
+    lineage:
+      - system.query.history.client_application
+  client_driver:
+    description: Connection driver used (e.g. `Databricks SQL Driver for Go`, `Databricks ODBC Driver`, `Databricks JDBC Driver`).
+    lineage:
+      - system.query.history.client_driver
+  statement_text:
+    description: |
+      Raw SQL text of the statement. Empty when customer-managed keys (CMK) are
+      configured for the workspace.
+
+      ⚠️ **Treat as `highly_personal` per the QuintoAndar Personal Data Catalog**:
+      user-authored SQL can contain literal personal / financial values in `WHERE`
+      clauses (e.g. `WHERE cpf = '...'`, `WHERE email = '...'`,
+      `WHERE credit_score > 600`). Access is restricted at the table level to
+      `data-platform-engineers` via `table_privileges` in the DAG declaration;
+      downstream consumers must not promote this column past the enrich layer.
+      The structured `personal_data_classification` field is intentionally absent
+      because the metadata schema validator does not yet accept it (governance
+      gap tracked separately) — descriptive enforcement only for now.
+    lineage:
+      - system.query.history.statement_text
+  error_message:
+    description: |
+      Error message when `execution_status = 'FAILED'`. Empty otherwise or when CMK is
+      configured.
+
+      ⚠️ **Treat as `highly_personal` per the QuintoAndar Personal Data Catalog**:
+      failed-query error messages can echo the offending literal values from the
+      SQL (`WHERE cpf = '...'` → "cpf '...' not found"), inheriting the same risk
+      profile as `statement_text`. Same access-control + non-promotion rules apply.
+    lineage:
+      - system.query.history.error_message
+  total_duration_ms:
+    description: Total wall-clock execution time in milliseconds, **excluding** result-fetch time. Headline latency metric for cost / SLO dashboards.
+    lineage:
+      - system.query.history.total_duration_ms
+  waiting_for_compute_duration_ms:
+    description: Milliseconds spent waiting for compute resources to be provisioned (e.g. SQL warehouse cold start). Non-zero values are signal for warehouse auto-stop / scale tuning.
+    lineage:
+      - system.query.history.waiting_for_compute_duration_ms
+  waiting_at_capacity_duration_ms:
+    description: Milliseconds spent queued waiting for available compute capacity. Persistent non-zero values indicate the warehouse / cluster is under-sized.
+    lineage:
+      - system.query.history.waiting_at_capacity_duration_ms
+  execution_duration_ms:
+    description: Milliseconds spent executing the statement after compilation and resource acquisition.
+    lineage:
+      - system.query.history.execution_duration_ms
+  compilation_duration_ms:
+    description: Milliseconds spent loading metadata and optimizing the statement (analysis + optimisation phases).
+    lineage:
+      - system.query.history.compilation_duration_ms
+  total_task_duration_ms:
+    description: Sum of all Spark task durations in milliseconds. Combined CPU time across all cores; can exceed `execution_duration_ms` when tasks ran in parallel and fall short when tasks waited on resources.
+    lineage:
+      - system.query.history.total_task_duration_ms
+  result_fetch_duration_ms:
+    description: Milliseconds spent fetching results to the client after execution finished. Large values suggest oversized result sets returning to the client.
+    lineage:
+      - system.query.history.result_fetch_duration_ms
+  read_partitions:
+    description: Number of source-table partitions read after partition pruning.
+    lineage:
+      - system.query.history.read_partitions
+  pruned_files:
+    description: Number of source files eliminated by table-partition and file-skipping pruning before any read.
+    lineage:
+      - system.query.history.pruned_files
+  read_files:
+    description: Number of source files actually read after pruning.
+    lineage:
+      - system.query.history.read_files
+  read_rows:
+    description: Number of rows scanned after partition / file / in-file / row pruning.
+    lineage:
+      - system.query.history.read_rows
+  produced_rows:
+    description: Total rows returned by the statement to the client.
+    lineage:
+      - system.query.history.produced_rows
+  read_bytes:
+    description: Bytes read from cloud storage after I/O pruning. Headline cost-of-read metric.
+    lineage:
+      - system.query.history.read_bytes
+  read_io_cache_percent:
+    description: Percentage (0..100) of read bytes served from the persistent IO cache. Higher is better for warehouses with hot working sets.
+    lineage:
+      - system.query.history.read_io_cache_percent
+  spilled_local_bytes:
+    description: Bytes temporarily written to local disk during execution. Non-zero values indicate memory pressure on the warehouse / cluster.
+    lineage:
+      - system.query.history.spilled_local_bytes
+  written_bytes:
+    description: Persistent bytes written to cloud storage by `INSERT` / `MERGE` / `COPY` / `UPDATE` statements.
+    lineage:
+      - system.query.history.written_bytes
+  written_rows:
+    description: Persistent rows written by `INSERT` / `MERGE` / `COPY` / `UPDATE` statements.
+    lineage:
+      - system.query.history.written_rows
+  written_files:
+    description: Persistent files (Parquet / Delta data files) written by the statement.
+    lineage:
+      - system.query.history.written_files
+  shuffle_read_bytes:
+    description: Total bytes shuffled across the network during execution. Large values combined with low `read_io_cache_percent` are a strong join / aggregation tuning signal.
+    lineage:
+      - system.query.history.shuffle_read_bytes
+  pruned_files_bytes:
+    description: Bytes of source files eliminated by partition / file pruning. Pair with `read_bytes` to compute pruning effectiveness (`pruned_files_bytes / (pruned_files_bytes + read_bytes)`).
+    lineage:
+      - system.query.history.pruned_files_bytes
+  read_files_bytes:
+    description: Bytes of source files actually read after pruning. Closely related to `read_bytes`; can differ when columnar / row-group pruning further reduces scan size below the file-level total.
+    lineage:
+      - system.query.history.read_files_bytes
+  is_from_result_cache:
+    description: True when the statement's result was served from the result cache. Distinguishes "real" execution from cache hits in cost / latency rollups.
+    lineage:
+      - system.query.history.from_result_cache
+  query_tags_json:
+    description: |
+      User-supplied custom tags attached to the statement, as a
+      `map<string, string>`. Allowed in the enrich layer (per naming
+      conventions); would be flattened or dropped if promoted to DW.
+    lineage:
+      - system.query.history.query_tags
+  dt_started:
+    description: Date partition derived from `ts_started` (`DATE(start_time)`). Use for time-bucketed dashboards.
+    lineage:
+      - system.query.history.start_time
+  ts_started:
+    description: Timestamp when Databricks received the statement-execution request (UTC).
+    lineage:
+      - system.query.history.start_time
+  ts_ended:
+    description: Timestamp when statement execution ended, **excluding** result-fetch time (UTC).
+    lineage:
+      - system.query.history.end_time
+  ts_updated:
+    description: Timestamp when the system table last received a progress update for this statement (UTC). Useful for detecting still-running queries when the table is read mid-execution.
+    lineage:
+      - system.query.history.update_time
+  ts_load:
+    description: Timestamp when this row was written by the bietlejuice DAG. Use to audit ingestion freshness vs the source `update_time`.
+  year:
+    description: Partition column. `YEAR(ts_started)`.
+  month:
+    description: Partition column. `MONTH(ts_started)`.
+  day:
+    description: Partition column. `DAY(ts_started)`.
