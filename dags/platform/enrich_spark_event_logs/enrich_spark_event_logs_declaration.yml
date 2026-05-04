@@ -1,0 +1,65 @@
+dag:
+  name: enrich_spark_event_logs
+  owner: Data Life Cycle
+  schedule_interval: null
+  documentation:
+    dag_purpose: |
+      Daily ingestion of Spark event logs emitted by every bietlejuice
+      cluster (enabled by PR 1 — spark.eventLog.enabled=true,
+      eventLog.dir=s3a://<bucket>/spark-event-logs/<dag_id>/). Parses
+      SparkListenerStageCompleted, SparkListenerStageExecutorMetrics,
+      and SparkListenerTaskEnd events into one row per Spark stage
+      attempt at datalake_databricks_health.spark_stage_metrics.
+
+      The extended parser is now the single source of truth for
+      stage-level Spark metrics — it supersedes the previously planned
+      sparkmeasure_stage_metrics table (which is being dropped) and
+      surfaces shuffle / spill / executor-time accumulators alongside
+      executor-level memory peaks, GC totals, and per-task wall-clock
+      percentiles for skew detection.
+
+      Powers the spill / shuffle / executor-time slice of the cluster
+      sizing work tracked in
+      bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md.
+      The DAG-level NVMe filter (per A2 of that doc) becomes possible
+      once this table is populated for ~7 days.
+
+      Cluster_id is intentionally not extracted here — that join lives
+      in PR 5, which uses system.lakeflow.job_run_timeline to map
+      spark_app_id → cluster_id (more reliable than parsing the
+      SparkListenerEnvironmentUpdate event, which can be missing on
+      short-lived apps).
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: databricks_health
+  default_extraction_type: incremental
+  has_hive_sync: true
+  tables_customization:
+    spark_stage_metrics:
+      load_spark_job: load_spark_stage_metrics
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{dag_name}"
+        - "{schema}"
+        - "{table_name}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+        - "{{ var.value.databricks_s3_bucket }}"
+      partitions: [ dt_stage_completed ]
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+  extra_query_template_params:
+    load_start_date:   "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
+    load_end_date:     "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds,  1), 'load_end_date') }}"
+    environment:       "{{ var.value.environment }}"
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1,0 +1,98 @@
+---
+database_name: datalake_databricks_health
+table_name: spark_stage_metrics
+description: |
+  Per-stage Spark execution metrics derived from Spark event logs emitted by
+  every bietlejuice cluster (enabled by PR 1 — spark.eventLog.enabled=true,
+  spark.eventLog.dir=s3a://<bucket>/spark-event-logs/<dag_id>/).
+
+  One row per Spark stage attempt. Built from three event types joined at the
+  (id_spark_app, id_stage, id_stage_attempt) grain:
+  SparkListenerStageCompleted (source of truth — accumulator-driven shuffle /
+  spill / executor-time metrics), SparkListenerStageExecutorMetrics (executor
+  memory peaks and GC totals, requires
+  spark.eventLog.logStageExecutorMetrics=true — enabled by PR #23078), and
+  SparkListenerTaskEnd (per-task wall-clock and GC time, aggregated into
+  approximate p50/p95/max for skew detection). The latter two are LEFT-joined
+  enrichments — a stage attempt with no matching events still produces a row
+  with NULL in those columns. This extended parser is the single source of
+  truth for stage-level Spark metrics.
+
+  Cluster_id is intentionally not extracted here; the
+  spark_app_id → cluster_id join is performed by the downstream DW DAG (PR 5)
+  using system.lakeflow.job_run_timeline, which is more reliable than parsing
+  SparkListenerEnvironmentUpdate events.
+
+  Powers the spill / shuffle slice of the cluster sizing work tracked in
+  bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md. The
+  DAG-level NVMe filter (per A2 of that doc) becomes possible once this table
+  has ~7 days of data.
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_spark_app:
+    description: Spark application identifier (e.g. `app-20260418-1234-5678`). Extracted from the event log directory name `eventlog-v2-<spark_app_id>/`.
+  id_stage:
+    description: Spark stage ID, unique within a Spark application. Same value as Spark UI's "Stage Id" column.
+  id_stage_attempt:
+    description: Stage attempt number (0 for first attempt, incremented on retry). Same stage_id may appear multiple times with different attempt ids if Spark retried after task failures.
+  dag_id:
+    description: Airflow DAG identifier (without the `bietlejuice.` prefix), extracted from the `spark-event-logs/<dag_id>/...` S3 path. Joinable to `dag_id` in `datalake_databricks_health.daily_cluster_health` via `system.lakeflow.job_run_timeline` in the downstream DW DAG.
+  stage_name:
+    description: Spark stage description string (typically the operator that produced it, e.g. `mapPartitions at MyDAG.scala:42`).
+  stage_failure_reason:
+    description: Spark-emitted failure message if the stage failed; NULL on success.
+  task_count:
+    description: Number of tasks in the stage. Equals the partition count of the upstream RDD/DataFrame.
+  executor_run_time_ms:
+    description: Sum of task execution time (wall clock) across all tasks in the stage, in milliseconds. From Spark internal accumulator `internal.metrics.executorRunTime`.
+  executor_cpu_time_ns:
+    description: Sum of task CPU time across all tasks in the stage, in nanoseconds. From Spark internal accumulator `internal.metrics.executorCpuTime`. Note the unit difference vs `executor_run_time_ms`.
+  shuffle_read_local_bytes:
+    description: Bytes read from shuffle partitions on the same executor (no network I/O). From `internal.metrics.shuffle.read.localBytesRead`.
+  shuffle_read_remote_bytes:
+    description: Bytes fetched from remote executors over the network during shuffle read. From `internal.metrics.shuffle.read.remoteBytesRead`. Combine with local for total shuffle read.
+  shuffle_write_bytes:
+    description: Bytes this stage wrote to shuffle (consumed by the next stage). From `internal.metrics.shuffle.write.bytesWritten`.
+  input_bytes_read:
+    description: Bytes read from data sources (S3, JDBC, etc.) by tasks in this stage. From `internal.metrics.input.bytesRead`.
+  output_bytes_written:
+    description: Bytes written to data sinks (S3, JDBC, etc.) by tasks in this stage. From `internal.metrics.output.bytesWritten`.
+  peak_execution_memory_bytes:
+    description: Peak on-heap memory used by any single task in this stage. From `internal.metrics.peakExecutionMemory`. Useful for sizing executor memory.
+  disk_bytes_spilled:
+    description: Bytes spilled from memory to local disk (NVMe / EBS) during execution. Non-zero indicates memory pressure. From `internal.metrics.diskBytesSpilled`. This is the headline NVMe-utilization signal at DAG level.
+  memory_bytes_spilled:
+    description: Bytes that would have been written to disk if no spill (logical size before serialization). From `internal.metrics.memoryBytesSpilled`. Always >= disk_bytes_spilled.
+  max_jvm_heap_bytes:
+    description: Peak JVM heap memory used by any single executor while running tasks for this stage attempt, in bytes. MAX across executors of `Executor Metrics.JVMHeapMemory` from `SparkListenerStageExecutorMetrics` events. Useful for sizing executor heap (`spark.executor.memory`); a value approaching the configured heap suggests the executor is at risk of GC pressure or OOM. NULL when `spark.eventLog.logStageExecutorMetrics` was not enabled at runtime.
+  max_on_heap_execution_memory_bytes:
+    description: Peak on-heap execution memory (the unified memory pool used for shuffle, sort, and aggregation buffers) used by any single executor for this stage attempt, in bytes. MAX of `Executor Metrics.OnHeapExecutionMemory`. High values relative to the JVM heap indicate execution-memory pressure that typically precedes spills.
+  max_off_heap_execution_memory_bytes:
+    description: Peak off-heap execution memory (Tungsten direct buffers, used when `spark.memory.offHeap.enabled=true`) used by any single executor for this stage attempt, in bytes. MAX of `Executor Metrics.OffHeapExecutionMemory`. Will be 0 when off-heap memory is disabled on the cluster.
+  total_minor_gc_time_ms:
+    description: Total time (summed across all executors of this stage attempt) spent in minor / young-generation GC pauses, in milliseconds. SUM of `Executor Metrics.MinorGCTime`. Frequent minor GCs are normal; abnormally high totals can indicate excessive short-lived allocations (e.g. boxing or unnecessary intermediate objects in UDFs).
+  total_major_gc_time_ms:
+    description: Total time (summed across all executors of this stage attempt) spent in major / full GC pauses, in milliseconds. SUM of `Executor Metrics.MajorGCTime`. High values are a strong signal of memory pressure — executors are spending wall-clock time collecting instead of computing, and OOM may be imminent.
+  total_gc_time_ms:
+    description: Total executor GC time for this stage attempt, in milliseconds. Sum of `total_minor_gc_time_ms` + `total_major_gc_time_ms`. Compare with `executor_run_time_ms` to compute the GC overhead ratio (a healthy stage typically sits well under 10%).
+  p50_task_run_time_ms:
+    description: Approximate median task wall-clock execution time within this stage attempt, in milliseconds. APPROX_PERCENTILE at 0.5 of `Task Metrics.Executor Run Time` from `SparkListenerTaskEnd` events. Reflects the typical task duration and is the denominator of `task_skew_ratio`.
+  p95_task_run_time_ms:
+    description: Approximate 95th-percentile task wall-clock execution time within this stage attempt, in milliseconds. APPROX_PERCENTILE at 0.95 of `Task Metrics.Executor Run Time`. The gap between p95 and p50 is a quick visual cue for tail-task-driven stage slowness.
+  max_task_run_time_ms:
+    description: Slowest single-task wall-clock execution time within this stage attempt, in milliseconds. MAX of `Task Metrics.Executor Run Time`. Combined with the median feeds `task_skew_ratio` for skew detection.
+  max_task_gc_time_ms:
+    description: Maximum JVM GC time observed in any single task of this stage attempt, in milliseconds. MAX of `Task Metrics.JVM GC Time`. A single task with disproportionately high GC time often points to a hot key or skewed partition that exhausts that executor's heap.
+  task_skew_ratio:
+    description: Ratio of the slowest task's run time to the approximate median task's run time within this stage attempt (`max_task_run_time_ms / NULLIF(p50_task_run_time_ms, 0)`). Lower bound clipped at 0; NULL when the median is 0 or unavailable. Values around 1 indicate balanced partitions; values above ~4 are a strong signal of data skew worth investigating (consider salting, repartitioning, or AQE skew-join).
+  is_stage_failed:
+    description: TRUE if `stage_failure_reason` is not NULL.
+  dt_stage_completed:
+    description: Date the stage completed, derived from the event log's `Completion Time` (UTC, milliseconds since epoch).
+  ts_stage_submitted:
+    description: Timestamp the stage was submitted to the scheduler, from the event log's `Submission Time`.
+  ts_stage_completed:
+    description: Timestamp the stage finished (success or failure), from the event log's `Completion Time`.
+  ts_load:
+    description: Timestamp this row was inserted into the table by the ingestion DAG.
