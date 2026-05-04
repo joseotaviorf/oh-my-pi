@@ -2207,6 +2207,7 @@ bietlejuice.enrich_cyber_legal:
   - bietlejuice.cyber_legal:load-clean-case-uda:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-case:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-court:first-run-of-day
+  - bietlejuice.cyber_legal:load-clean-text-content:first-run-of-day
   - bietlejuice.cyber_legal:load-clean-values-list:first-run-of-day
   - bietlejuice.cyber_legal_historical:load-clean-historical-case-status:first-run-of-day
 bietlejuice.enrich_dai_report:

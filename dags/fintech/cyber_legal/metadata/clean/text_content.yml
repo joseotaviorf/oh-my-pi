@@ -1,0 +1,22 @@
+---
+database_name: datalake_cyber_legal_clean
+table_name: text_content
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Table containing contract matching information for E-law migrated cases."
+columns:
+  id_case:
+    description: "CyberLegal legal case identifier."
+    lineage:
+      - datalake_cyber_legal_raw.text_content.TXCASENO
+  id_contract:
+    description: "Contract identifier linked to the case."
+    lineage:
+      - datalake_cyber_legal_raw.text_content.TXCON
+  ts_added:
+    description: "Timestamp indicating when the case was added to the system."
+    lineage:
+      - datalake_cyber_legal_raw.text_content.TXADDDT
+  ts_load:
+    description: "Timestamp when the record was loaded into the clean layer."
+    lineage: []

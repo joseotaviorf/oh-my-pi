@@ -3,7 +3,7 @@ SELECT
   e.id_invoice,
   e.id_agency,
   e.id_expense,
-  IF(cacct.id_contract LIKE '%NVO_JUICIO%', ec.contrato, cacct.id_contract) AS id_contract,
+  IF(cacct.id_contract LIKE '%NVO_JUICIO%', ec.id_contract, cacct.id_contract) AS id_contract,
   c.id_dossier AS id_process,
   e.id_stage,
   cstg.stage_description AS stage_description,
@@ -29,8 +29,8 @@ SELECT
   e.dt_recovered
 FROM datalake_cyber_legal_clean.case_expense AS e
 LEFT JOIN
-    datalake_cyber_legal_clean.elaw_contracts AS ec
-        ON e.id_case = ec.id_processo
+    datalake_cyber_legal_clean.text_content AS ec
+        ON e.id_case = ec.id_case
 LEFT JOIN
     datalake_cyber_legal_clean.case AS c
       ON e.id_case = c.id_case
