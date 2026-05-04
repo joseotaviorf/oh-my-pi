@@ -377,6 +377,8 @@ address_tasks = [
             f"--input_geocoded_houses={Tables.geocode_step_houses}",
             f"--input_source_cnefe_houses={Tables.source_cnefe_houses}",
             f"--input_source_iptu_houses={Tables.source_iptu_houses}",
+            f"--input_address_details_hasher_link={Tables.address_details_hasher_link}",
+            f"--input_staged_parsed_complements={Tables.staged_parsed_complements}",
             f"--overwrite_schema",
             f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
             f"--output_address_adjusted_condos={Tables.address_adjusted_step_condos}",
