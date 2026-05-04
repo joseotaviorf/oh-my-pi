@@ -49,7 +49,7 @@ columns:
       - datalake_chatbot.sessions.bot
       - datalake_langfuse_clean.scores.value
       - datalake_langfuse_clean.scores.name
-    description: "Legacy source of the AI agent for the session, derived from the SessionContainsMatthewAgentEvaluator Langfuse score (value=1) instead of observations. Kept to reproduce historical metrics that pre-date the observation-based logic."
+    description: "Legacy source of the AI agent for the session, derived from the Langfuse score (value > 0) under either the older SessionContainsMatthewAgentEvaluator or the newer MatthewVersionEvaluator (which encodes the version: 0=none, 1=V1, 1.5=V1.5, 2=V2). Kept to reproduce historical metrics that pre-date the observation-based logic; uses score-based detection in parallel to the observation-based ai_agent_source."
   is_matthew_in_session:
     lineage:
       - datalake_ai_collections_quintoandar.observation.flag_collectionsinput_agent

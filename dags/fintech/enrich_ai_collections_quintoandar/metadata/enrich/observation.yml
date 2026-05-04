@@ -45,6 +45,10 @@ columns:
       - datalake_langfuse_clean.observations.name
       - datalake_langfuse_clean.observations.type
     description: "1 if the session contains a handle_collections_data_error observation of type CHAIN or TOOL, signalling a collections data fetch failure."
+  flag_has_finance_fetch_error:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session contains a handle_finance_fetch_error observation, signalling a failure when fetching finance data for the user."
   flag_has_fetch_collections_data:
     lineage:
       - datalake_langfuse_clean.observations.name
@@ -100,6 +104,11 @@ columns:
     lineage:
       - datalake_langfuse_clean.observations.name
     description: "1 if the session reached the handle_non_tenant state, signalling that the user is not a tenant."
+  matthew_declared_escalation_reason:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.output
+    description: "Free-text escalation reason declared by Matthew when the session was handed off to human support, extracted from the OUTPUT JSON of the escalate_to_human_for_collections / escalate_tool observations. Tries three known JSON paths (CHAIN format, simple TOOL format, complex TOOL artifact format) and returns the first non-null match per session; NULL when no escalation observation is recorded. When multiple distinct reasons exist in the same session, MAX() picks one lexicographically — generally rare, but not deterministic."
   ts_first_observation:
     lineage:
       - datalake_langfuse_clean.observations.ts_started

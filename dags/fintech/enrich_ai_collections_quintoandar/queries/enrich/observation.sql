@@ -11,6 +11,7 @@ SELECT
     MAX(CASE WHEN LOWER(obs.name) = 'collectionsinput' THEN 1 ELSE 0 END) AS flag_collectionsinput_agent,
     MAX(CASE WHEN LOWER(obs.name) = 'outbound_payload_from_dto' THEN 1 ELSE 0 END) AS is_notification_reply,
     MAX(CASE WHEN LOWER(obs.name) = 'handle_collections_data_error' AND obs.type IN ('CHAIN', 'TOOL') THEN 1 ELSE 0 END) AS flag_has_collections_data_error,
+    MAX(CASE WHEN LOWER(obs.name) = 'handle_finance_fetch_error' THEN 1 ELSE 0 END) AS flag_has_finance_fetch_error,
     MAX(CASE WHEN LOWER(obs.name) = 'fetch_collections_data' AND obs.type IN ('CHAIN', 'TOOL') THEN 1 ELSE 0 END) AS flag_has_fetch_collections_data,
     MAX(CASE WHEN LOWER(obs.name) = 'handle_no_contracts' AND obs.type IN ('CHAIN', 'TOOL') THEN 1 ELSE 0 END) AS flag_handle_no_contracts,
     MAX(CASE WHEN LOWER(obs.name) = 'fetch_contracts' AND obs.type IN ('CHAIN', 'TOOL') THEN 1 ELSE 0 END) AS flag_has_fetch_contracts,
@@ -26,6 +27,21 @@ SELECT
     MAX(CASE WHEN LOWER(obs.name) = 'original_invoice_values_disagreement_helper' THEN 1 ELSE 0 END) AS flag_original_invoice_values_disagreement_helper,
     MAX(CASE WHEN LOWER(obs.name) = 'ongoing_deal_renegotiation_request_helper' THEN 1 ELSE 0 END) AS flag_ongoing_deal_renegotiation_request_helper,
     MAX(CASE WHEN LOWER(obs.name) = 'handle_non_tenant' THEN 1 ELSE 0 END) AS flag_handle_non_tenant,
+    -- Escalation reason declared by Matthew when handing off to human support.
+    -- Tries three known JSON shapes in obs.output and returns the first non-null match.
+    MAX(
+        CASE
+            WHEN LOWER(obs.name) IN ('escalate_to_human_for_collections', 'escalate_tool') THEN COALESCE(
+                GET_JSON_OBJECT(obs.output, '$.last_bot_message.metadata.escalation_reason'),
+                GET_JSON_OBJECT(obs.output, '$.metadata.escalation_reason'),
+                GET_JSON_OBJECT(
+                    GET_JSON_OBJECT(obs.output, '$.values[0].artifact.metadata'),
+                    '$.escalation_reason'
+                )
+            )
+            ELSE NULL
+        END
+    ) AS matthew_declared_escalation_reason,
     -- Temporal aggregates (over the tracked observations only)
     MIN(obs.ts_started) AS ts_first_observation,
     MAX(obs.ts_ended) AS ts_last_observation,
@@ -68,7 +84,10 @@ WHERE
         'debt_summary_display_helper',
         'original_invoice_values_disagreement_helper',
         'ongoing_deal_renegotiation_request_helper',
-        'handle_non_tenant'
+        'handle_non_tenant',
+        'escalate_to_human_for_collections',
+        'escalate_tool',
+        'handle_finance_fetch_error'
     )
 GROUP BY
     trc.id_session

@@ -43,7 +43,7 @@ columns:
   ai_agent_source_legacy:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.ai_agent_source_legacy
-    description: "Legacy source of the AI agent for the session, derived from the SessionContainsMatthewAgentEvaluator Langfuse score (value=1) — kept to reproduce historical metrics that pre-date the observation-based logic."
+    description: "Legacy source of the AI agent for the session, derived from the Langfuse score (value > 0) under SessionContainsMatthewAgentEvaluator or MatthewVersionEvaluator (the latter encodes the version: 0=none, 1=V1, 1.5=V1.5, 2=V2). Kept to reproduce historical metrics that pre-date the observation-based logic; runs in parallel to ai_agent_source."
   is_matthew_in_session:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.is_matthew_in_session
@@ -156,6 +156,10 @@ columns:
     lineage:
       - datalake_ai_collections_quintoandar.observation.flag_has_collections_data_error
     description: "1 if the session contains a handle_collections_data_error observation, else 0 (absent or no observations recorded)."
+  flag_has_finance_fetch_error:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_has_finance_fetch_error
+    description: "1 if the session contains a handle_finance_fetch_error observation, signalling a failure when fetching finance data for the user; else 0 (absent or no observations recorded)."
   flag_has_fetch_collections_data:
     lineage:
       - datalake_ai_collections_quintoandar.observation.flag_has_fetch_collections_data
@@ -208,6 +212,10 @@ columns:
     lineage:
       - datalake_ai_collections_quintoandar.observation.flag_handle_non_tenant
     description: "1 if the session reached the handle_non_tenant state, signalling that the user is not a tenant; else 0 (absent or no observations recorded)."
+  matthew_declared_escalation_reason:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.matthew_declared_escalation_reason
+    description: "Free-text escalation reason declared by Matthew when the session was handed off to human support, propagated from the enrich observation table. NULL when no escalation observation is recorded for the session."
   ts_first_observation:
     lineage:
       - datalake_ai_collections_quintoandar.observation.ts_first_observation

@@ -16,7 +16,7 @@ matthew_sessions AS (
     INNER JOIN
         touched_sessions AS ts
             ON ts.id_sauron_session = s.id_sauron_session
-    WHERE s.flag_eval_matthew_in_chat
+    WHERE s.flag_session_with_trace and s.ai_agent_source in ('Matthew in Chat', 'Matthew in Whatsapp')
 ),
 messages_as_struct AS (
     SELECT

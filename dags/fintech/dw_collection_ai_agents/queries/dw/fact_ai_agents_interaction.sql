@@ -39,6 +39,7 @@ SELECT
     COALESCE(o.flag_collectionsinput_agent, 0) AS flag_collectionsinput_agent,
     COALESCE(o.is_notification_reply, 0) AS is_notification_reply,
     COALESCE(o.flag_has_collections_data_error, 0) AS flag_has_collections_data_error,
+    COALESCE(o.flag_has_finance_fetch_error, 0) AS flag_has_finance_fetch_error,
     COALESCE(o.flag_has_fetch_collections_data, 0) AS flag_has_fetch_collections_data,
     COALESCE(o.flag_handle_no_contracts, 0) AS flag_handle_no_contracts,
     COALESCE(o.flag_has_fetch_contracts, 0) AS flag_has_fetch_contracts,
@@ -54,6 +55,7 @@ SELECT
     COALESCE(o.flag_original_invoice_values_disagreement_helper, 0) AS flag_original_invoice_values_disagreement_helper,
     COALESCE(o.flag_ongoing_deal_renegotiation_request_helper, 0) AS flag_ongoing_deal_renegotiation_request_helper,
     COALESCE(o.flag_handle_non_tenant, 0) AS flag_handle_non_tenant,
+    o.matthew_declared_escalation_reason,
     o.ts_first_observation,
     o.ts_last_observation,
     -- Agglutinated conversation for downstream LLM analysis

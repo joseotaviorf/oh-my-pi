@@ -30,7 +30,7 @@ WITH trace_first AS (
 score_matthew AS (
     SELECT
         s.id_session AS id_langfuse_session,
-        MAX(CASE WHEN s.value = 1 THEN 1 ELSE 0 END) AS flag_score_matthew_in_session
+        MAX(CASE WHEN s.value > 0 THEN 1 ELSE 0 END) AS flag_score_matthew_in_session
     FROM
         datalake_langfuse_clean.scores AS s
     INNER JOIN
@@ -40,7 +40,7 @@ score_matthew AS (
     WHERE
         MAKE_DATE(s.year, s.month, s.day) >= DATE('{load_start_date}') - INTERVAL 1 DAY
         AND s.ts_created >= TIMESTAMP('{load_start_date}') - INTERVAL 1 DAY
-        AND s.name = 'SessionContainsMatthewAgentEvaluator'
+        AND s.name in ('SessionContainsMatthewAgentEvaluator', 'MatthewVersionEvaluator')
         AND s.id_session IS NOT NULL
     GROUP BY
         s.id_session
