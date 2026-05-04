@@ -24,6 +24,7 @@ workflow:
     - "{table_name}"
     - "{load_start_date}"
     - "{load_end_date}"
+    - "prod"
   tables_customization:
     planner_emlio_logs:
       load_spark_job: load_planner_emlio_logs
