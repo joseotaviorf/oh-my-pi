@@ -1,0 +1,41 @@
+dag:
+  name: enrich_databricks_health
+  owner: Data Life Cycle
+  schedule_interval: null
+  documentation:
+    dag_purpose: |
+      Daily per-cluster health snapshot derived exclusively from Databricks
+      system tables (system.compute.node_timeline + system.compute.clusters).
+      One row per (cluster_id, dt_cluster_run). Captures P50/P95 of CPU,
+      memory, I/O wait and NVMe utilization plus cluster shape for every
+      bietlejuice-managed cluster.
+
+      Powers the cluster sizing / consolidation work tracked in
+      bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md and
+      replaces the ad-hoc MCP queries that have been used for the past
+      investigation cycle. Independent of (and complementary to)
+      enrich_databricks, which still sources from the deprecated Overwatch
+      tables; that DAG will be migrated to system tables in a follow-up PR.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  has_hive_sync: true
+  tables_customization:
+    daily_cluster_health:
+      partitions: [ dt_cluster_run ]
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
+    load_end_date:   "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1),  'load_end_date') }}"
+    environment:     "{{ var.value.environment }}"
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

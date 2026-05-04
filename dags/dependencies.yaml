@@ -2230,6 +2230,8 @@ bietlejuice.enrich_data_exposure:
   - bietlejuice.enrich_databricks:load-enrich-daily-group-members:first-run-of-day
   - bietlejuice.enrich_databricks:load-enrich-daily-table-privileges:first-run-of-day
   - bietlejuice.enrich_databricks:load-enrich-daily-users:first-run-of-day
+bietlejuice.enrich_databricks_health:
+  - bietlejuice.enrich_databricks:load-enrich-daily-clusters:first-run-of-day
 bietlejuice.enrich_databricks_job_runs:
   - bietlejuice.enrich_databricks:load-enrich-daily-clusters:first-run-of-day
   - bietlejuice.enrich_databricks:load-enrich-unique-clusters:first-run-of-day

@@ -1,0 +1,186 @@
+---
+database_name: datalake_databricks_health
+table_name: daily_cluster_health
+description: |
+  Daily per-cluster health snapshot from Databricks system tables, augmented with
+  Overwatch-derived startup timing and cost. One row per
+  (id_cluster, dt_cluster_run).
+
+  P50/P95 CPU/memory/I-O wait + NVMe utilization derived from
+  system.compute.node_timeline; cluster shape, DBR version, pool attachment and
+  tags from the latest snapshot of system.compute.clusters; init-script timing
+  and per-cluster DBU/EC2 cost (USD) from datalake_databricks.daily_clusters
+  (which materialises `INIT_SCRIPTS_STARTED` / `INIT_SCRIPTS_FINISHED` / `RUNNING`
+  state transitions from overwatch.clusterstatefact — signals not surfaced by
+  Databricks system tables).
+
+  Powers the cluster sizing and consolidation work tracked in
+  bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md.
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_cluster:
+    description: Databricks cluster id (system.compute.clusters.cluster_id).
+    lineage:
+      - system.compute.clusters.cluster_id
+  dag_name:
+    description: bietlejuice DAG identifier, extracted from the cluster `application` tag (e.g. `bietlejuice.enrich_ebdb_contract`).
+    lineage:
+      - system.compute.clusters.tags
+  cluster_name:
+    description: Cluster name (typically `<dag_id>_<run_id>` for job clusters).
+    lineage:
+      - system.compute.clusters.cluster_name
+  cluster_source:
+    description: How the cluster was created — JOB, UI, API, etc.
+    lineage:
+      - system.compute.clusters.cluster_source
+  driver_node_type:
+    description: Driver instance type (e.g. m5a.xlarge, r5d.2xlarge).
+    lineage:
+      - system.compute.clusters.driver_node_type
+  worker_node_type:
+    description: Worker instance type. Null for single-node clusters.
+    lineage:
+      - system.compute.clusters.worker_node_type
+  dbr_version:
+    description: Databricks runtime version, e.g. `16.4.x-scala2.12` or `16.4.x-photon-scala2.12`.
+    lineage:
+      - system.compute.clusters.dbr_version
+  worker_count:
+    description: Fixed worker count for non-autoscaling clusters. Null when autoscaling.
+    lineage:
+      - system.compute.clusters.worker_count
+  min_autoscale_workers:
+    description: Lower bound of the autoscale range. Null for fixed-size clusters.
+    lineage:
+      - system.compute.clusters.min_autoscale_workers
+  max_autoscale_workers:
+    description: Upper bound of the autoscale range. Null for fixed-size clusters.
+    lineage:
+      - system.compute.clusters.max_autoscale_workers
+  avg_concurrent_workers:
+    description: Average number of distinct worker instances observed per minute on `dt_cluster_run`. Reflects realised concurrency, not target.
+  peak_concurrent_workers:
+    description: Maximum number of distinct worker instances observed in any single minute on `dt_cluster_run`.
+  cluster_uptime_minutes:
+    description: |
+      Wall-clock span (in minutes) between the cluster's first and last node observation
+      on `dt_cluster_run`. **Overstates** real uptime for clusters that idle-shut-down and
+      restart within the same day (autoscaled / interactive). Use `cluster_active_minutes`
+      for cost-per-minute calculations.
+  cluster_active_minutes:
+    description: |
+      Count of distinct minutes on `dt_cluster_run` during which the cluster had at least
+      one node reporting metrics. This is the true "minutes the cluster was running" — correct
+      even when the cluster restarts within the day. Cost-per-minute calculations should
+      normalise DBU consumption by this column, not `cluster_uptime_minutes`.
+  pre_init_script_seconds:
+    description: |
+      Seconds elapsed between the cluster entering STARTING and INIT_SCRIPTS_STARTED.
+      Captures pre-init wait — DBR pull, network setup, instance provisioning. Null when
+      the cluster started on a previous day or did not run init scripts.
+    lineage:
+      - datalake_databricks.daily_clusters.seconds_cluster_started_to_init_scripts_started
+  init_script_seconds:
+    description: |
+      **Init-script execution duration in seconds** — wall-clock time between
+      INIT_SCRIPTS_STARTED and INIT_SCRIPTS_FINISHED. Fleet-wide mean is ~95s; outliers
+      above ~150s warrant investigation (heavy package installs, network calls, etc.).
+      Null when the cluster has no init scripts or started on a previous day.
+    lineage:
+      - datalake_databricks.daily_clusters.seconds_init_scripts_started_to_init_scripts_finished
+  post_init_script_seconds:
+    description: |
+      Seconds elapsed between INIT_SCRIPTS_FINISHED and the cluster entering RUNNING.
+      Mostly Spark/JVM warm-up after init scripts complete. Null when init scripts did
+      not run or the cluster started on a previous day.
+    lineage:
+      - datalake_databricks.daily_clusters.seconds_init_scripts_finished_to_running_started
+  cluster_startup_seconds:
+    description: |
+      Total wall-clock time from STARTING to RUNNING (sum of pre-init + init + post-init).
+      Note: only the first startup of the day is captured; subsequent restarts within the
+      same day are not in this column.
+    lineage:
+      - datalake_databricks.daily_clusters.seconds_total_startup_time
+  p50_driver_cpu_busy_percent:
+    description: Median driver CPU busy percent (cpu_user + cpu_system) across all observations on `dt_cluster_run`.
+  p95_driver_cpu_busy_percent:
+    description: 95th percentile of driver CPU busy percent on `dt_cluster_run`. Above ~80 indicates a driver CPU bottleneck.
+  p50_driver_cpu_wait_percent:
+    description: Median driver I/O wait percent on `dt_cluster_run`.
+  p95_driver_cpu_wait_percent:
+    description: 95th percentile of driver I/O wait percent on `dt_cluster_run`. Above ~5 suggests the driver is I/O bound.
+  p50_driver_mem_used_percent:
+    description: Median driver memory used percent on `dt_cluster_run`.
+  p95_driver_mem_used_percent:
+    description: 95th percentile of driver memory used percent on `dt_cluster_run`. Above ~80 indicates memory pressure on the driver.
+  p50_worker_cpu_busy_percent:
+    description: Median worker CPU busy percent across all worker observations on `dt_cluster_run`.
+  p95_worker_cpu_busy_percent:
+    description: 95th percentile of worker CPU busy percent. Below ~30 suggests the workers are over-provisioned.
+  p50_worker_cpu_wait_percent:
+    description: Median worker I/O wait percent.
+  p95_worker_cpu_wait_percent:
+    description: 95th percentile of worker I/O wait percent. Above ~5 suggests workers are I/O bound — keep NVMe / consider Photon.
+  p50_worker_mem_used_percent:
+    description: Median worker memory used percent.
+  p95_worker_mem_used_percent:
+    description: 95th percentile of worker memory used percent. Below ~50 suggests memory over-provisioning.
+  p95_driver_minus_worker_cpu_busy_percent:
+    description: |
+      `p95_driver_cpu_busy_percent − p95_worker_cpu_busy_percent`. First-glance "driver hot,
+      workers cold" signal. Positive values mean the driver's 95th percentile CPU busy is
+      higher than the workers'; large positive values (e.g. > 30) usually indicate a serial
+      driver-side bottleneck (Python UDFs, `.toPandas()`, large `.collect()`, `.show()`,
+      schema evolution, etc.) and the worker shape is over-provisioned relative to the
+      actual parallel work. Sort dashboards by this column to spot misallocated clusters.
+  nvme_capacity_bytes_per_node:
+    description: |
+      Per-node NVMe (`/local_disk0`) capacity in bytes, approximated as the
+      max free-bytes seen for that node on `dt_cluster_run` (assumes the
+      node was empty at boot). Null for nodes without local disk.
+  p95_nvme_used_bytes_per_node:
+    description: |
+      95th percentile of per-node NVMe used bytes (capacity − free) on
+      `dt_cluster_run`. Used to identify wasted NVMe capacity on clusters
+      that don't really need local SSD.
+  max_nvme_used_bytes_per_node:
+    description: Maximum per-node NVMe used bytes on `dt_cluster_run`.
+  nvme_utilization_pct_p95:
+    description: |
+      `100 * p95_nvme_used / nvme_capacity`. Below ~10 on Standard-engine
+      clusters means NVMe can be dropped (replace `m5d.*` with `m5a.*`,
+      etc.). Photon clusters require NVMe regardless of utilization.
+  num_node_observations:
+    description: Count of source `system.compute.node_timeline` rows aggregated into this row (sample-size sanity).
+  total_dbu_cost_overwatch_usd:
+    description: |
+      Total DBU cost in USD attributed to this cluster on `dt_cluster_run`, derived by
+      Overwatch from cluster state transitions and the active DBU price list. Independent
+      cross-check against `dw_databricks_health.fact_databricks_task_run.cost_usd_estimate`,
+      which derives cost from `system.billing.usage` × `system.billing.list_prices`.
+      Material disagreements (>10%) usually point to Overwatch-vs-Lakeflow attribution
+      drift on the underlying SKU.
+    lineage:
+      - datalake_databricks.daily_clusters.total_dbu_cost
+  total_ec2_cost_overwatch_usd:
+    description: |
+      Total EC2/instance compute cost in USD for driver + workers on `dt_cluster_run`,
+      from Overwatch. Useful for "true cost" views that include AWS infrastructure on top
+      of DBU charges; system tables only expose DBU SKUs, not the underlying EC2 pricing.
+    lineage:
+      - datalake_databricks.daily_clusters.total_ec2_cost
+  is_photon:
+    description: True when `dbr_version LIKE '%-photon-%'`. Photon DBR pricing differs from Standard.
+  is_pool_backed:
+    description: True when the cluster has a `driver_instance_pool_id` or `worker_instance_pool_id` set.
+  ts_cluster_first_seen:
+    description: First node observation timestamp for this cluster on `dt_cluster_run`.
+  ts_cluster_last_seen:
+    description: Last node observation timestamp for this cluster on `dt_cluster_run`.
+  ts_load:
+    description: Timestamp the row was written by the DAG.
+  dt_cluster_run:
+    description: UTC date of the cluster's node observations. Partition column.
