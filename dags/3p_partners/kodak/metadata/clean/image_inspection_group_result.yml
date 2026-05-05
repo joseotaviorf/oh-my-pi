@@ -73,6 +73,18 @@ columns:
     lineage:
     - datalake_kodak_raw.image_inspection_group_result.approval_score_threshold
     description: 'Minimum score threshold required for automatic approval in this specific business context. Properties scoring above this threshold are automatically approved, while lower scores require manual review.'
+  invalid_reasons:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.invalid_reasons
+    description: 'Set of Kodak GroupInvalidReason enum values persisted when the property image group is not approved in this business context (derived from photo download failures, watermark removal outcomes, score below threshold, or insufficient coverage). Serialized from the application as enum names.'
+    categories:
+      WATERMARK_REMOVAL_UNSUCCESSFUL: 'Watermark was detected but could not be removed successfully.'
+      WATERMARK_REMOVAL_PROCESS_ERROR: 'Watermark removal pipeline raised a processing error.'
+      EXTERNAL_IMAGE_URL_NOT_ACCESSIBLE: 'External photo URL could not be accessed during download or validation.'
+      EXTERNAL_API_NOT_ACCESSIBLE: 'Watermark removal external provider API was not reachable.'
+      POOR_IMAGE_QUALITY: 'Aggregated group score is below the approval threshold for this business context.'
+      IMAGE_ANALYSIS_FLOW_FAILURE: 'Fallback reason when no specific invalid reasons are recorded or the image analysis flow failed.'
+      INSUFFICIENT_PHOTOS_PER_ROOM: 'Photo coverage is insufficient relative to the property room count.'
   ts_created:
     lineage:
     - datalake_kodak_raw.image_inspection_group_result.created_at

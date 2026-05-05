@@ -15,6 +15,7 @@ SELECT
   total_faults,
   score,
   approval_score_threshold,
+  invalid_reasons,
   created_at AS ts_created,
   updated_at AS ts_updated,
   year,

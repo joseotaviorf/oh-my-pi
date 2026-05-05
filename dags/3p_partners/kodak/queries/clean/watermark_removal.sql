@@ -8,6 +8,7 @@ SELECT
   noise_detected AS is_noise_detected,
   successful AS is_successful,
   chosen AS is_chosen,
+  failure_reason,
   created_at AS ts_created,
   updated_at AS ts_updated
 FROM

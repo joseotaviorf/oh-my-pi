@@ -45,6 +45,14 @@ columns:
     lineage:
       - datalake_kodak_raw.watermark_removal.chosen
     description: 'Boolean flag indicating whether this provider result was selected as the final choice when multiple providers processed the same image. Only one result per image should be marked as chosen.'
+  failure_reason:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.failure_reason
+    description: 'Kodak WatermarkInvalidReason when watermark detection or removal did not complete successfully; null when processing succeeds and no failure applies.'
+    categories:
+      REMOVAL_UNSUCCESSFUL: 'Provider completed but the watermark could not be removed successfully.'
+      PROCESS_ERROR: 'Internal processing error during the watermark removal attempt.'
+      EXTERNAL_API_NOT_ACCESSIBLE: 'Watermark removal external provider API was not reachable.'
   ts_created:
     lineage:
       - datalake_kodak_raw.watermark_removal.created_at
