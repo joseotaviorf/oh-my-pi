@@ -1,0 +1,34 @@
+---
+table_name: dw_time.fact_time_attendance_requests
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -15
+    less_than_or_equal_to: 35
+    severity_level: Warning
+
+column_level_validations:
+  sk_time_request:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_employee:
+    is_complete:
+      severity_level: Error
+  sk_request:
+    is_complete:
+      severity_level: Error
+  id_request:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  person_number:
+    is_complete:
+      severity_level: Error

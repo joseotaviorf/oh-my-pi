@@ -1,0 +1,61 @@
+---
+database_name: dw_time
+table_name: fact_employee_hourly_cost_windows
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Salary-related hourly rate windows from the workforce time integration, after mapping each cost segment to
+  dw_people.dim_employee.
+
+  Grain: one row per cost segment identifier from the clean layer per mapped employee. Use to explain which rate applied
+  on a given date, or join from fact_hours_bank_rule_totals.sk_employee_cost_window for audit. Dashboards can rely on
+  hourly_rate_applied denormalized on the hours-bank fact when a single rate per balance row is enough.
+
+  Source rows live in datalake_oitchau_clean.employee_costs (Integrations API costs data ingested by oitchau_api), joined
+  through employees.id_employee_profile and registration to PIN person_number.
+columns:
+  sk_employee_cost_window:
+    description: |
+      Surrogate key for one cost window row, stable for joins from fact_hours_bank_rule_totals and other dw_time facts.
+  sk_employee:
+    description: |
+      Employee surrogate key shared across People marts; join dw_people.dim_employee for profile and hierarchy.
+    lineage:
+      - dw_people.dim_employee.sk_employee
+  id_employee_profile:
+    description: |
+      Workforce time user profile UUID on the cost row; aligns with datalake_oitchau_clean.employees.id_employee_profile.
+    lineage:
+      - datalake_oitchau_clean.employee_costs.id_employee_profile
+  id_cost_segment:
+    description: Natural key UUID for the salary-rate segment from the clean layer.
+    lineage:
+      - datalake_oitchau_clean.employee_costs.id_cost_segment
+  person_number:
+    description: |
+      Oracle HCM person number denormalized for filters and reconciliation with registration-based joins in the lake.
+    lineage:
+      - dw_people.dim_employee.person_number
+  cost_segment_status:
+    description: Status label from the source for the segment when present (for example ACTIVE).
+    lineage:
+      - datalake_oitchau_clean.employee_costs.cost_segment_status
+  hourly_rate_amount:
+    description: |
+      Hourly rate for this window in company currency (compensation-sensitive; same unit as the time product salaries
+      API).
+    lineage:
+      - datalake_oitchau_clean.employee_costs.hourly_rate_amount
+  dt_hourly_cost_segment_started:
+    description: Inclusive calendar date when this hourly cost segment started (source dt_period_started).
+    lineage:
+      - datalake_oitchau_clean.employee_costs.dt_period_started
+  dt_hourly_cost_segment_ended:
+    description: |
+      Inclusive calendar date when this segment ended when closed; null when still open or open-ended in the source.
+    lineage:
+      - datalake_oitchau_clean.employee_costs.dt_period_ended
+  ts_load:
+    description: |
+      Warehouse load timestamp for this row (set at ETL run time). Use for pipeline monitoring, not for segment validity
+      dates.

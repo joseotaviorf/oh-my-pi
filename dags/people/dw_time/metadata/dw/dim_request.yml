@@ -1,0 +1,79 @@
+---
+database_name: dw_time
+table_name: dim_request
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Catalog of time-and-attendance request subtypes (labels, stable technical keys, paid vs unpaid defaults, DSR discount
+  flags, active or inactive). Configuration is tenant-specific: subtypes reflect what the workforce time product exposes
+  (for example hour-bank discounts, day-off categories, course-only paths).
+
+  Grain: one row per request subtype. Use with fact_time_attendance_requests to classify each request line for approval
+  tracking, volumes by category, and payroll-adjacent analytics. Display names can change in the product; sk_request
+  stays stable for joins.
+
+  Rows are built from the subtype catalog in the clean layer; when a subtype appears on requests but is missing from the
+  catalog for the load window, a minimal placeholder row is added so every fact line still has a dimension parent.
+columns:
+  sk_request:
+    description: |
+      Surrogate key for this subtype in the warehouse. Join from fact_time_attendance_requests.sk_request to attach
+      subtype labels and policy defaults to each request row.
+  id_request_subtype:
+    description: |
+      Natural key (UUID) for the subtype in the time system. Use for reconciliation with exports or operational tools;
+      prefer sk_request for dashboard joins.
+    lineage:
+      - datalake_oitchau_clean.requests_types_subtypes.id_request_subtype
+  subtype_name:
+    description: |
+      Display name employees and managers see when choosing a request type (for example an absence or adjustment label).
+    lineage:
+      - datalake_oitchau_clean.requests_types_subtypes.subtype_name
+  subtype_name_key:
+    description: |
+      Stable technical name for the subtype; prefer for cross-system keys or exports that use the internal name instead
+      of the display label.
+    lineage:
+      - datalake_oitchau_clean.requests_types_subtypes.subtype_name_key
+  translation_key:
+    description: |
+      Optional key for localized labels; combine with subtype_name_key for multilingual or app-aligned filters.
+    lineage:
+      - datalake_oitchau_clean.requests_types_subtypes.translation_key
+  hours_calculation_type:
+    description: |
+      How this subtype interacts with payroll or the hours bank at category level (for example compensated time vs not),
+      as defined for that subtype in the source.
+    lineage:
+      - datalake_oitchau_clean.requests_types_subtypes.hours_calculation_type
+  is_active:
+    description: |
+      Whether employees can still open new requests of this subtype; inactive subtypes may appear on history but not on
+      new menus.
+    lineage:
+      - datalake_oitchau_clean.requests_types_subtypes.is_active
+  is_paid_subtype:
+    description: |
+      Default paid-time intent at subtype level when someone books this category (final pay rules remain with payroll).
+    lineage:
+      - datalake_oitchau_clean.requests_types_subtypes.is_paid_subtype
+  is_discount_dsr:
+    description: |
+      Whether weekly paid rest (DSR) discount rules apply for this subtype under company configuration in the time system.
+    lineage:
+      - datalake_oitchau_clean.requests_types_subtypes.is_discount_dsr
+  dt_updated:
+    description: |
+      Calendar date of ts_updated for joins to dim_date and day-level reporting without repeated CAST in consumers.
+    lineage:
+      - datalake_oitchau_clean.requests_types_subtypes.ts_updated
+  ts_updated:
+    description: |
+      When the source last changed settings or metadata for this subtype (not each individual employee request).
+    lineage:
+      - datalake_oitchau_clean.requests_types_subtypes.ts_updated
+  ts_load:
+    description: |
+      Warehouse load timestamp for this row (set at ETL run time). Use for pipeline freshness, not for request approval
+      timestamps.

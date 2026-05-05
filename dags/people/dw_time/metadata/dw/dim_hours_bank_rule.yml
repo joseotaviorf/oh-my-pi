@@ -1,0 +1,156 @@
+---
+database_name: dw_time
+table_name: dim_hours_bank_rule
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Dimension of hours-bank rule segments used in time and attendance: each row is one rule slice (for example a bucket
+  for overtime credited to the bank) within a company rule package from the workforce time integration.
+
+  Grain: one row per segment UUID (hours_bank_rule_key) after deduplication by latest load for that key. This is a
+  current-state reference dimension (not SCD Type 2): use it to label balance lines and explain caps, recurrence, and
+  alerts configured for each segment.
+
+  Join fact_hours_bank_rule_totals on sk_hours_bank_rule to attach group name, segment label, and policy fields to
+  employee balance rows. When the fact has no matching segment, sk_hours_bank_rule is null but hours_bank_rule_key on the
+  fact still holds the source key for investigation.
+columns:
+  sk_hours_bank_rule:
+    description: |
+      Surrogate key for this rule segment, stable for reporting joins. Join fact_hours_bank_rule_totals.sk_hours_bank_rule
+      to this column to bring labels and configuration into balance dashboards.
+  hours_bank_rule_key:
+    description: |
+      Natural key for the segment (UUID) as returned on hours-bank extracts from the time system. Prefer joining
+      analytics on sk_hours_bank_rule; use this field when reconciling files or API payloads keyed by UUID.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  group_name:
+    description: |
+      Human-readable name of the rule package (for example a regional or policy bundle) shown in workforce administration.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.group_name
+  group_status:
+    description: Whether the rule package is active or inactive in the source configuration.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.group_status
+  segment_label:
+    description: |
+      Short label for this slice within the package (often a code or number visible in admin screens).
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  segment_type:
+    description: |
+      Behaviour of this slice in the bank rule (for example which overtime or limit logic applies).
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  days_mask:
+    description: Weekday mask for which days this slice applies, when the source stores a bitmask.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  day_type_based_on_schedule:
+    description: Schedule-based day classification when used instead of a fixed weekday mask.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  split_days_based_on:
+    description: |
+      How calendar days are split for this rule version (for example relative to the employee schedule rather than a
+      fixed weekday mask).
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  phases_type:
+    description: How multiple bank phases combine for this rule version (for example percentage-based allocation).
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  weekday_stage:
+    description: Weekday-stage flag from paid-overtime configuration when present in the rule JSON.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  holiday_stage:
+    description: Holiday-stage flag from paid-overtime configuration when present in the rule JSON.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  missing_day_strategy:
+    description: Policy when a working day is missing from the schedule, as configured on the rule version.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  hours_bank_recurrence_period:
+    description: Recurrence period for the hours-bank cycle (for example monthly) on this rule version.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  hours_bank_recurrence_interval:
+    description: Interval count paired with hours_bank_recurrence_period for bank resets.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  hours_bank_reset_type:
+    description: How the bank balance resets between cycles on this rule version.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  hours_bank_balance_alert_limit:
+    description: Threshold value for the hours-bank balance alert when that alert is configured.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  hours_bank_balance_alert_limit_type:
+    description: Unit or scope for the hours-bank balance alert limit (for example per day or week).
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  extra_hours_balance_alert_limit:
+    description: Threshold value for the extra-hours balance alert when configured.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  extra_hours_balance_alert_limit_type:
+    description: Unit or scope for the extra-hours balance alert limit (for example per day).
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  user_profiles_count:
+    description: |
+      Count of employee profiles linked to this rules group in the source at extract time; indicates how many people the
+      bundle applies to.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.user_profiles_count
+  segment_limit_minutes:
+    description: Ceiling in minutes for this slice when the company configured a cap.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  segment_extra_hours:
+    description: Extra-hours factor or weight for this slice when configured in the rule JSON.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  is_default_group:
+    description: Whether this rules group is the company default in the time system.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.is_default_group
+  ignore_overtime_on_non_planned_days:
+    description: Whether overtime on non-planned days is ignored for this rule version.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  hours_bank_balance_alert_active:
+    description: Whether the hours-bank balance alert is enabled on this rule version.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  extra_hours_balance_alert_active:
+    description: Whether the extra-hours balance alert is enabled on this rule version.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.business_rules
+  dt_created:
+    description: |
+      Calendar date of ts_created for joins to dim_date and day-level reporting without repeated CAST in consumers.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.ts_created
+  dt_updated:
+    description: |
+      Calendar date of ts_updated for joins to dim_date and day-level reporting without repeated CAST in consumers.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.ts_updated
+  ts_created:
+    description: When the rules group was created in the source system (authoritative operational timestamp).
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.ts_created
+  ts_updated:
+    description: When the rules group was last updated in the source system.
+    lineage:
+      - datalake_oitchau_clean.business_rules_groups.ts_updated
+  ts_load:
+    description: |
+      Warehouse load timestamp for this row (set at ETL run time). Use for freshness checks, not for payroll cut-off
+      logic.

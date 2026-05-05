@@ -1,0 +1,58 @@
+dag:
+  name: dw_time
+  owner: Data People
+  schedule_start_date: 2026, 4, 27
+  documentation:
+    dag_purpose: |
+      People Data Warehouse schema dw_time for time-and-attendance facts (hours-bank balances and operational request
+      lines sourced from the workforce time integration). Dimensions cover hours-bank rule slices and request subtypes;
+      facts expose balances (with optional hourly rate and estimated cost denormalized on fact_hours_bank_rule_totals),
+      fact_employee_hourly_cost_windows for Oitchau salary-rate segments sourced from datalake_oitchau_clean.employee_costs
+      (Integrations API costs endpoint), and fact_time_attendance_requests for approvals and scheduling analytics.
+
+cluster:
+  type: databricks_16_4_small_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+
+workflow:
+  type: query_delta
+  layer: dw
+  bucket_config_name: people_bucket
+  custom_schema: time
+  has_hive_sync: false
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  default_table_privileges:
+    people-team: ["ALL PRIVILEGES"]
+    people-analytics: ["ALL PRIVILEGES"]
+  inner_dependencies:
+    fact_hours_bank_rule_totals:
+      - dim_hours_bank_rule
+      - fact_employee_hourly_cost_windows
+    fact_time_attendance_requests:
+      - dim_request
+  tables_customization:
+    dim_hours_bank_rule:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_request:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    fact_hours_bank_rule_totals:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    fact_employee_hourly_cost_windows:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    fact_time_attendance_requests:
+      vacuum_retention_hours: 168
+      vacuum_lite: true

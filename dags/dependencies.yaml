@@ -1323,6 +1323,15 @@ bietlejuice.dw_table_snapshot:
   - bietlejuice.enrich_trino_table_usage:load-enrich-total-table-usage-information:first-run-of-day
 bietlejuice.dw_taxonomy:
   - bietlejuice.enrich_growth_taxonomy:load-enrich-media-setup:first-run-of-day
+bietlejuice.dw_time:
+  - bietlejuice.dw_people:load-dw-people-dim-employee:first-run-of-day
+  - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
+  - bietlejuice.oitchau_api:load-clean-business-rules-groups:first-run-of-day
+  - bietlejuice.oitchau_api:load-clean-employee-costs:first-run-of-day
+  - bietlejuice.oitchau_api:load-clean-employees:first-run-of-day
+  - bietlejuice.oitchau_api:load-clean-hoursbank-totals:first-run-of-day
+  - bietlejuice.oitchau_api:load-clean-requests-types-subtypes:first-run-of-day
+  - bietlejuice.oitchau_api:load-clean-requests:first-run-of-day
 bietlejuice.dw_user:
   - bietlejuice.amplitude_subpartitioned:load-clean-283048-register-form-completed-events:first-run-of-day
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day

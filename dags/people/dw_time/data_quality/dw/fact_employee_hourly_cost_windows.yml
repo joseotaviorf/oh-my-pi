@@ -1,0 +1,20 @@
+---
+table_name: dw_time.fact_employee_hourly_cost_windows
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -50
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  sk_employee_cost_window:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_employee:
+    is_complete:
+      severity_level: Error

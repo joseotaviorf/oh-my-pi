@@ -1,0 +1,146 @@
+---
+database_name: dw_time
+table_name: fact_time_attendance_requests
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Line-level time-and-attendance requests: justified intervals, hour-bank adjustments, clock corrections modeled as
+  requests, day-off or benefit categories, and other subtypes the company configured—each row includes approval outcome
+  and interval timestamps.
+
+  Grain: one row per request identifier from the workforce time product after mapping the employee to PIN via
+  identifier_mapping (latest assignment, excluding test users). This mart focuses on the operational request stream;
+  some absences or benefits may still live only in Oracle HCM or other systems by policy.
+
+  Join dw_time.dim_request on sk_request for subtype labels and defaults (paid, DSR). Join dw_people.dim_employee on
+  sk_employee or person_number for org context. Use approval_status, approval_stage, and approval_flow with hierarchy
+  dimensions to monitor pending leader approvals before payroll close.
+
+  The physical table name is vendor-neutral so dw_time can hold additional workforce facts later without naming clashes.
+columns:
+  sk_time_request:
+    description: |
+      Surrogate key for one request in analytics; stable so counts and distinct request metrics stay consistent across
+      reloads.
+  sk_employee:
+    description: |
+      Employee surrogate key shared across People marts; join dw_people.dim_employee for name, hierarchy, and location used
+      in workforce reporting.
+    lineage:
+      - datalake_people.identifier_mapping.id_person
+  sk_request:
+    description: |
+      Foreign key to dw_time.dim_request for subtype name, paid default, DSR flag, and active flag. Built from the request
+      subtype on the fact, with fallback to a hash-based key when the catalog row is missing.
+    lineage:
+      - datalake_oitchau_clean.requests.id_request_subtype
+      - dw_time.dim_request.sk_request
+  id_request:
+    description: |
+      Natural key (UUID) from the time system for the request; use for reconciliation with exports or support tickets.
+    lineage:
+      - datalake_oitchau_clean.requests.id_request
+  person_number:
+    description: |
+      Oracle HCM person number (PIN); natural key for filters and spreadsheets; join dim_employee on person_number or
+      sk_employee.
+    lineage:
+      - datalake_people.identifier_mapping.person_number
+  approval_status:
+    description: |
+      Approval outcome (pending, approved, declined, ignored, and other values from the product). Pair with leader
+      dimensions to clear backlogs before payroll.
+    lineage:
+      - datalake_oitchau_clean.requests.approval_status
+  approval_stage:
+    description: Step index in the configured approval workflow so you can see how far a case has progressed.
+    lineage:
+      - datalake_oitchau_clean.requests.approval_stage
+  request_type:
+    description: |
+      High-level family of the request (for example medical, vacation, or other groupings configured in the time product).
+    lineage:
+      - datalake_oitchau_clean.requests.request_type
+  hours_calculation_type:
+    description: |
+      How this instance should interact with payroll or the hours bank on the line (may override the subtype default from
+      dim_request).
+    lineage:
+      - datalake_oitchau_clean.requests.hours_calculation_type
+  is_all_day:
+    description: True when the employee booked full calendar days without specific start and end clock times.
+    lineage:
+      - datalake_oitchau_clean.requests.is_all_day
+  is_paid_request:
+    description: |
+      True when this instance counts as paid time for that booking in the time system (payroll systems remain the source
+      of truth for pay).
+    lineage:
+      - datalake_oitchau_clean.requests.is_paid_request
+  is_locked:
+    description: True when the request can no longer be edited after approval or policy lock.
+    lineage:
+      - datalake_oitchau_clean.requests.is_locked
+  is_endless:
+    description: True when no end date or time is set yet (ongoing or open-ended booking, depending on company use).
+    lineage:
+      - datalake_oitchau_clean.requests.is_endless
+  is_night_shift:
+    description: True when the interval is flagged as crossing night-shift rules for the configured schedule.
+    lineage:
+      - datalake_oitchau_clean.requests.is_night_shift
+  is_up_to_date:
+    description: True when the source marks this row as aligned with the latest approval or calculation outcome.
+    lineage:
+      - datalake_oitchau_clean.requests.is_up_to_date
+  ts_interval_started:
+    description: Start timestamp of the booked interval (absence, adjustment, or other subtype).
+    lineage:
+      - datalake_oitchau_clean.requests.ts_interval_started
+  ts_interval_ended:
+    description: |
+      End timestamp when the request is not open-ended; null while open or endless depending on source behaviour.
+    lineage:
+      - datalake_oitchau_clean.requests.ts_interval_ended
+  dt_created:
+    description: |
+      Calendar date of ts_created for joins to dim_date and day-level reporting without repeated CAST in consumers.
+    lineage:
+      - datalake_oitchau_clean.requests.ts_created
+  dt_updated:
+    description: |
+      Calendar date of ts_updated for joins to dim_date and day-level reporting without repeated CAST in consumers.
+    lineage:
+      - datalake_oitchau_clean.requests.ts_updated
+  ts_created:
+    description: When the request was first created in the workforce time product.
+    lineage:
+      - datalake_oitchau_clean.requests.ts_created
+  ts_updated:
+    description: When the source last updated the request (status, interval, or other fields).
+    lineage:
+      - datalake_oitchau_clean.requests.ts_updated
+  ts_deleted:
+    description: When the request was cancelled or removed while retaining history for audit, when populated.
+    lineage:
+      - datalake_oitchau_clean.requests.ts_deleted
+  ts_synced:
+    description: Last refresh or reconciliation timestamp from the ingestion connector when populated.
+    lineage:
+      - datalake_oitchau_clean.requests.ts_synced
+  approval_flow:
+    description: |
+      JSON snapshot of approvers and stages stored with the request; supports operational views of routing (parse in SQL
+      or notebooks for deep dives).
+    lineage:
+      - datalake_oitchau_clean.requests.approval_flow
+  request_subtype_state:
+    description: |
+      JSON payload with subtype-specific fields for this request instance when applicable (shape depends on tenant
+      configuration).
+    lineage:
+      - datalake_oitchau_clean.requests.request_subtype_state
+  ts_load:
+    description: |
+      Warehouse load timestamp for this row (set at ETL run time). Use for pipeline freshness, not for request business
+      timestamps.

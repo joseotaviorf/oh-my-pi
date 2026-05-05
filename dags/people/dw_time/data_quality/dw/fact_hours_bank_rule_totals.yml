@@ -1,0 +1,50 @@
+---
+table_name: dw_time.fact_hours_bank_rule_totals
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  sk_hours_bank_rule_total:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_hours_bank_rule:
+    custom:
+      # Any non-null sk_hours_bank_rule must match dw_time.dim_hours_bank_rule (no orphan FKs when the key is set).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_time.fact_hours_bank_rule_totals f
+         WHERE f.sk_hours_bank_rule IS NOT NULL
+         AND NOT EXISTS (
+           SELECT 1 FROM dw_time.dim_hours_bank_rule d
+           WHERE d.sk_hours_bank_rule = f.sk_hours_bank_rule
+         )) = 0
+      severity_level: Error
+  sk_employee:
+    is_complete:
+      severity_level: Error
+  person_number:
+    is_complete:
+      severity_level: Error
+  sk_balance_date:
+    is_complete:
+      severity_level: Error
+  dt_hours_bank_balanced:
+    is_complete:
+      severity_level: Error
+  hours_bank_rule_key:
+    is_complete:
+      severity_level: Error
+  minutes_balance_rule:
+    is_complete:
+      severity_level: Error

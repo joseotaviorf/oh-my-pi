@@ -1,0 +1,102 @@
+---
+database_name: dw_time
+table_name: fact_hours_bank_rule_totals
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Hours-bank balances from the workforce time integration, split by rule or bucket that holds minutes for each employee
+  on a calendar day.
+
+  Grain: one row per employee (PIN person number) × balance date × rule key. Summing minutes_balance_rule for the same
+  person and date gives total minutes across buckets shown in that load; slice by rule for workforce or payroll support
+  analytics.
+
+  Population: employees who exist in the time product with a registration code that matches Oracle HCM person_number via
+  datalake_people.identifier_mapping and dw_people.dim_employee. People without a match do not appear.
+
+  Reporting: filter by balance date or person_number; join dw_people.dim_employee on sk_employee or person_number for
+  profile and hierarchy; join sk_balance_date or dt_hours_bank_balanced to dw_public.dim_date for calendars. Join
+  sk_hours_bank_rule to dw_time.dim_hours_bank_rule for readable rule labels (null sk when the fact key has no dimension
+  row, for example legacy or literal keys).
+
+  Hourly rate and estimated cost are denormalized from dw_time.fact_employee_hourly_cost_windows when the balance date
+  falls inside the rate window (open-ended windows use a null end date). Cost segments are loaded from
+  datalake_oitchau_clean.employee_costs via the oitchau_api ingestion path.
+columns:
+  sk_hours_bank_rule_total:
+    description: |
+      Surrogate key for one grain row (employee, balance date, rule). Stable for deduplication and fact table joins within
+      this mart.
+  sk_employee:
+    description: |
+      Employee surrogate key shared across People marts; join dw_people.dim_employee for name, email, and hierarchy.
+    lineage:
+      - dw_people.dim_employee.sk_employee
+  sk_balance_date:
+    description: |
+      Date dimension key (YYYYMMDD style) for the balance snapshot day; use with dim_date for week, month, or fiscal
+      reporting.
+    lineage:
+      - datalake_oitchau_clean.hoursbank_totals.dt_balanced
+      - dw_public.dim_date.sk_date
+  sk_hours_bank_rule:
+    description: |
+      Foreign key to dw_time.dim_hours_bank_rule for rule package and segment labels. Populated when the normalized map key
+      from the balance JSON matches a segment UUID on the dimension (leading underscores stripped, underscores mapped to
+      hyphens). Null when there is no matching segment.
+    lineage:
+      - dw_time.dim_hours_bank_rule.sk_hours_bank_rule
+  sk_employee_cost_window:
+    description: |
+      Foreign key to dw_time.fact_employee_hourly_cost_windows when a salary-rate window was matched for this balance row.
+    lineage:
+      - dw_time.fact_employee_hourly_cost_windows.sk_employee_cost_window
+  hours_bank_rule_key:
+    description: |
+      Rule or bucket identifier from the time product for this slice of the bank. Use with dim_hours_bank_rule for labels
+      when sk_hours_bank_rule is populated.
+    lineage:
+      - datalake_oitchau_clean.hoursbank_totals.hours_bank_totals
+  person_number:
+    description: |
+      Oracle HCM person number (PIN employee code). Natural key for filters, exports, and alignment with HR systems; join
+      dw_people.dim_employee on person_number or sk_employee.
+    lineage:
+      - dw_people.dim_employee.person_number
+  minutes_balance_rule:
+    description: |
+      Balance minutes for that employee, date, and rule. Additive measure: sum across rows with the same person and date
+      for total minutes in the snapshot; convert to hours in the reporting layer if needed.
+    lineage:
+      - datalake_oitchau_clean.hoursbank_totals.hours_bank_totals
+  hourly_rate_applied:
+    description: |
+      Hourly rate copied from the matched cost window when the balance date falls inside that segment. Null when no window
+      matches, the employee has no cost rows, or employee mapping fails. Same currency as the source rate.
+    lineage:
+      - datalake_oitchau_clean.employee_costs.hourly_rate_amount
+      - dw_time.fact_employee_hourly_cost_windows.hourly_rate_amount
+  estimated_balance_cost_amount:
+    description: |
+      Approximate monetary value of minutes_balance_rule at hourly_rate_applied (minutes divided by 60 times rate). Null
+      when hourly_rate_applied is null. For management estimates only; official payroll remains downstream systems.
+  dt_hours_bank_balanced:
+    description: Calendar date of the hours-bank snapshot (source column dt_balanced).
+    lineage:
+      - datalake_oitchau_clean.hoursbank_totals.dt_balanced
+  dt_hourly_rate_segment_started:
+    description: |
+      Start date of the matched hourly-rate window, copied from fact_employee_hourly_cost_windows for audit and support.
+    lineage:
+      - datalake_oitchau_clean.employee_costs.dt_period_started
+      - dw_time.fact_employee_hourly_cost_windows.dt_hourly_cost_segment_started
+  dt_hourly_rate_segment_ended:
+    description: |
+      End date of the matched hourly-rate window when closed; null when the matched segment is open-ended in the source.
+    lineage:
+      - datalake_oitchau_clean.employee_costs.dt_period_ended
+      - dw_time.fact_employee_hourly_cost_windows.dt_hourly_cost_segment_ended
+  ts_load:
+    description: |
+      Warehouse load timestamp for this row (set at ETL run time). Use for operational freshness, not for balance
+      business dates.

@@ -1,0 +1,30 @@
+---
+table_name: dw_time.dim_request
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  sk_request:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_request_subtype:
+    is_unique:
+      severity_level: Error
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+  subtype_name_key:
+    has_completeness:
+      greater_than_or_equal_to: 0.35
+      severity_level: Warning
