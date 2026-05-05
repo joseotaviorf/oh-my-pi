@@ -46,6 +46,11 @@ columns:
     description: Secondary satisfaction form responses.
     lineage:
       - datalake_satisfaction_rating.satisfaction_answers.secondary_satisfaction_score
+  is_solved:
+    description: Boolean flag indicating whether the Salesforce case linked to the satisfaction response was marked as solved at the time of the survey submission. 
+      It is only populated for Salesforce-originated responses; for all other sources, the value is NULL.
+    lineage:
+      - datalake_satisfaction_rating.satisfaction_answers.is_solved
   ts_submitted:
     description: Date the satisfaction response was submitted.
     lineage:

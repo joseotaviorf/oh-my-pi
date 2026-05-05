@@ -9,6 +9,7 @@ SELECT
     COALESCE(sa.id_respondent, -1) AS sk_user,
     sa.satisfaction_score,
     sa.secondary_satisfaction_score,
+    sa.is_solved,
     sa.ts_submitted,
     NOW() AS ts_load,
     sa.year,

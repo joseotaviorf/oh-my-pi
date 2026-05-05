@@ -165,6 +165,11 @@ columns:
       - datalake_satisfaction_rating.bigfone_surveys.secondary_score_description
       - datalake_satisfaction_rating.chat_fup_surveys.secondary_score_description
       - datalake_satisfaction_rating.survicate_surveys.secondary_score_description
+  is_solved:
+    description: Boolean flag indicating whether the Salesforce case linked to the satisfaction response was marked as solved at the time of the survey submission. 
+      It is only populated for Salesforce-originated responses via the Survicate surveys source; for all other sources, the value is NULL.
+    lineage:
+      - datalake_satisfaction_rating.survicate_surveys.is_solved
   custom_attributes:
     description: It may contain information specific to each form, such as other identifiers, boolean fields, etc.
     lineage:
