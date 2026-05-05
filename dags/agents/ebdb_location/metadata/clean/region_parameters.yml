@@ -1,0 +1,67 @@
+---
+database_name: datalake_ebdb_clean
+table_name: region_parameters
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Table that contains the parameters for each region.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.id
+    description: Unique identifier for the region parameters.
+  id_region_config:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.regionConfig_id
+    description: Identifier for region_config table.
+  business_context:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.businessContext
+    description: Business context served by the registered region(RENT/SALE).
+  max_price:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.maxPrice
+    description: Maximum price for the region.
+  min_price:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.minPrice
+    description: Minimum price for the region.
+  is_house_referral_enabled:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.houseReferralEnabled
+    description: Indicates if the house referral is enabled for the region.
+  is_house_registration_enabled:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.houseRegistrationEnabled
+    description: Indicates if the house registration is enabled for the region.
+  is_search_enabled:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.searchEnabled
+    description: Indicates if the search is enabled for the region.
+  is_visit_enabled:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.visitsEnabled
+    description: Indicates if the visits are enabled for the region.
+  is_address_number_required:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.addressNumberRequired
+    description: Indicates if the address number is required for the region.
+  is_talk_to_agent_enabled:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.talkToAgentEnabled
+    description: Indicates if the talk to agent is enabled for the region.
+  is_pfa_enabled:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.isPfaEnabled
+    description: Indicates if the PFA is enabled for the region.
+  is_keys_with_agent_enabled:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.isKeysWithAgentEnabled
+    description: Indicates if the keys with agent is enabled for the region.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.criadoEm
+    description: Timestamp when the record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.regionparameters.atualizadoEm
+    description: Timestamp when the record was last updated.
