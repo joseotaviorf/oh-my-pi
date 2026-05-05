@@ -141,7 +141,8 @@ daily_ongoing_listings AS (
         status_changes AS sc
     JOIN
         datalake_quintoandar.aux_date AS d
-            ON d.date BETWEEN sc.ts_status_started::DATE AND COALESCE(sc.ts_status_ended::DATE, NOW())
+            ON d.date >= sc.ts_status_started::DATE
+            AND d.date < COALESCE(sc.ts_status_ended::DATE, NOW())
     WHERE
         MAKE_DATE(d.year, d.month, d.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
         AND sc.status = 'PUBLISHED'

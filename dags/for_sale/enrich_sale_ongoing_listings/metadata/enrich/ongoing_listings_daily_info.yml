@@ -72,7 +72,7 @@ columns:
     description: Maximum price estimated by the calculator output. May also be referred as 'p_90'.
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_max_price
-  qt_search_result_page_viewed:
+  qt_search_results_page_viewed:
     description: Amount of times the house was shown in the search results in that day.
   qt_listing_page_viewed:
     description: Amount of times the listing page was viewed in that day.
