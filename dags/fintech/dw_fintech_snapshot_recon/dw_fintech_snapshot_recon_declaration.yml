@@ -5,6 +5,7 @@ dag:
 workflow:
   type: query_delta
   layer: dw
+  custom_schema: fintech_snapshot_recon
   default_partitions: ["year", "month", "day"]
   default_extraction_type: incremental
   has_load_to_redshift_task: false
