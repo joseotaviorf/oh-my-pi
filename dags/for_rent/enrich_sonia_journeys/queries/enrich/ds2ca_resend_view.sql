@@ -2,7 +2,7 @@ WITH docs_demand_resend_events AS (
   SELECT
     id_event,
     id_person AS uuid_person,
-    CAST(event_properties:id_house AS INT) AS id_house,
+    TRY_CAST(event_properties:id_house AS INT) AS id_house,
     CAST(event_properties:id_rent_flow AS STRING) AS id_rent_flow,
     ts_event
   FROM datalake_cdp_clean.transactional
@@ -10,7 +10,9 @@ WITH docs_demand_resend_events AS (
     event_name = 'rent_flow_docs_demand_docs_resend'
     -- When we start using sfmc for this journey we need to change this datetime
     -- to a point right after the last hightouch execution will take place.
-    AND ts_event >= TIMESTAMP '2026-01-01 00:00:00'
+    -- Cutoff bumped from 2026-01-01 to 2026-03-01: malformed events with null
+    -- id_person / id_house / id_rent_flow payloads only landed in Jan/Feb 2026.
+    AND ts_event >= TIMESTAMP '2026-03-01 00:00:00'
 )
 SELECT
   e.id_event,
