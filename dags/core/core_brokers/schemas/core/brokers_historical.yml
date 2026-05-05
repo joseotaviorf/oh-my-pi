@@ -25,6 +25,14 @@ columns:
     type: string
     required: false
 
+  broker_name_tag:
+    type: string
+    required: false
+
+  broker_trade_name_tag:
+    type: string
+    required: false
+
   broker_status:
     type: string
     required: true
@@ -150,6 +158,6 @@ columns:
     required: true
 
 # Schema constraints
-min_columns: 34
-max_columns: 34
+min_columns: 36
+max_columns: 36
 strict: true

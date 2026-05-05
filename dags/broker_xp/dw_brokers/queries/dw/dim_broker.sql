@@ -41,6 +41,8 @@ SELECT
   COALESCE(p.sk_person, -1) AS sk_person_account_manager,
   cb.broker_name,
   cb.broker_trade_name,
+  cb.broker_name_tag,
+  cb.broker_trade_name_tag,
   cb.broker_status,
   cb.broker_address,
   cb.broker_number,

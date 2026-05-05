@@ -6,6 +6,7 @@ from pyspark.sql.functions import (
     lit,
     max as spark_max,
     regexp_replace,
+    translate,
     when,
 )
 
@@ -13,6 +14,24 @@ from bietlejuice.base.core_models.core_brokers_base import (
     CoreBrokersBaseSparkJob,
 )
 from bietlejuice.base.core_models.helpers.historical_helper import HistoricalHelper
+
+_BROKER_STRING_TAG_ACCENT_FROM = (
+    "áàâãäéèêëíìîïóòôõöúùûüçÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇ"
+)
+_BROKER_STRING_TAG_ACCENT_TO = (
+    "aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC"
+)
+
+
+def _broker_string_tag(column):
+    """Remove accents and whitespace; preserve letter case; NULL in yields NULL out."""
+    return when(column.isNull(), lit(None).cast("string")).otherwise(
+        regexp_replace(
+            translate(column, _BROKER_STRING_TAG_ACCENT_FROM, _BROKER_STRING_TAG_ACCENT_TO),
+            r"\s+",
+            "",
+        )
+    )
 
 HISTORICAL_TABLE = "brokers_historical"
 
@@ -278,6 +297,8 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
             col("c.uuid_company"),
             col("c.company_name").alias("broker_name"),
             col("c.trade_name").alias("broker_trade_name"),
+            _broker_string_tag(col("c.company_name")).alias("broker_name_tag"),
+            _broker_string_tag(col("c.trade_name")).alias("broker_trade_name_tag"),
             when(col("cp.is_3p_active_broker"), lit("ACTIVE"))
             .otherwise(lit("INACTIVE"))
             .alias("broker_status"),

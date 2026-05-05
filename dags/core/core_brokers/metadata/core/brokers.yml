@@ -35,6 +35,16 @@ columns:
     description: >
       Commercial or trade name of the broker, which may differ from the legal name.
       This is the name commonly used in business operations.
+  broker_name_tag:
+    lineage:
+      - datalake_company_clean.company.company_name
+    description: >
+      broker_name with accents removed and all whitespace stripped; original letter case preserved.
+  broker_trade_name_tag:
+    lineage:
+      - datalake_company_clean.company.trade_name
+    description: >
+      broker_trade_name with accents removed and all whitespace stripped; original letter case preserved.
   broker_status:
     lineage:
       - datalake_company_clean.company_product.id_product

@@ -28,6 +28,16 @@ columns:
     lineage:
       - core_brokers.brokers.broker_trade_name
     description: Trade name of the broker company from core brokers.
+  broker_name_tag:
+    lineage:
+      - core_brokers.brokers.broker_name_tag
+    description: |
+      Normalized broker name (no accents, no whitespace; case preserved).
+  broker_trade_name_tag:
+    lineage:
+      - core_brokers.brokers.broker_trade_name_tag
+    description: |
+      Normalized broker trade name (no accents, no whitespace; case preserved).
   broker_status:
     lineage:
       - core_brokers.brokers.broker_status
