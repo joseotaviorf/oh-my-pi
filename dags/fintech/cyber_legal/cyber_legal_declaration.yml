@@ -13,8 +13,10 @@ workflow:
   load_spark_job: load_cyber_raw
   custom_schema: cyber_legal
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 0), 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 2), 'load_end_date') }}"
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start |
+      ds, 0), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start |
+      ds, 2), 'load_end_date') }}"
   default_extraction_type: full
   spark_job_arguments:
     - "{environment}"
@@ -30,9 +32,9 @@ workflow:
     case:
       clean_table_name: case
       raw_extraction_type: incremental
-      raw_partitions: [year, month, day]
+      raw_partitions: [ year, month, day ]
       clean_extraction_type: full
-      merge_on: [id_case]
+      merge_on: [ id_case ]
       extra_spark_job_arguments:
         - "['CEDTUPD']"
         - False
@@ -64,9 +66,9 @@ workflow:
     cantfylg:
       clean_table_name: case_notification_log
       raw_extraction_type: incremental
-      raw_partitions: [year, month, day]
+      raw_partitions: [ year, month, day ]
       clean_extraction_type: full
-      merge_on: [id_notification_request, id_notification_sequence]
+      merge_on: [ id_notification_request, id_notification_sequence ]
       extra_spark_job_arguments:
         - "['CNDTUPD']"
         - False
@@ -82,9 +84,9 @@ workflow:
     casestag:
       clean_table_name: case_stage
       raw_extraction_type: incremental
-      raw_partitions: [year, month, day]
+      raw_partitions: [ year, month, day ]
       clean_extraction_type: full
-      merge_on: [id_case, id_stage]
+      merge_on: [ id_case, id_stage ]
       extra_spark_job_arguments:
         - "['CSDTUPD']"
         - False
@@ -92,9 +94,9 @@ workflow:
     caseacct:
       clean_table_name: case_account
       raw_extraction_type: incremental
-      raw_partitions: [year, month, day]
+      raw_partitions: [ year, month, day ]
       clean_extraction_type: full
-      merge_on: [id_case, id_contract_group, id_contract]
+      merge_on: [ id_case, id_contract_group, id_contract ]
       extra_spark_job_arguments:
         - "['CCDTUPD']"
         - False
@@ -102,9 +104,9 @@ workflow:
     caalert:
       clean_table_name: case_alert
       raw_extraction_type: incremental
-      raw_partitions: [year, month, day]
+      raw_partitions: [ year, month, day ]
       clean_extraction_type: full
-      merge_on: [id_alert]
+      merge_on: [ id_alert ]
       extra_spark_job_arguments:
         - "['ALDTUPD']"
         - False
@@ -152,7 +154,7 @@ workflow:
     actfil:
       clean_table_name: logs_juridical
       extraction_type: incremental
-      partitions: [year, month, day]
+      partitions: [ year, month, day ]
       extra_spark_job_arguments:
         - "['ACENTDTE', 'ACACTDTE']"
         - True
@@ -168,17 +170,9 @@ workflow:
     document:
       clean_table_name: document
       extraction_type: incremental
-      partitions: [year, month, day]
+      partitions: [ year, month, day ]
       extra_spark_job_arguments:
         - "['DOADDDT']"
-        - False
-        - "[]"
-    text_content:
-      clean_table_name: text_content
-      extraction_type: full
-      partitions: []
-      extra_spark_job_arguments:
-        - "[]"
         - False
         - "[]"
 cluster:

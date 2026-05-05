@@ -11,7 +11,8 @@ columns:
     lineage:
       - datalake_retsuko.invoice.id
   id_invoice:
-    description: Business key for the invoice, representing a globally unique identifier for integration with external systems.
+    description: Business key for the invoice, representing a globally unique
+      identifier for integration with external systems.
     lineage:
       - datalake_retsuko.invoice.id_external
   id_original_invoice:
@@ -19,7 +20,8 @@ columns:
     lineage:
       - datalake_retsuko.invoice.id_original_invoice_external
   id_invoice_anchor:
-    description: Identifier for the anchor invoice in negotiation relationships, representing the parent invoice that serves as reference.
+    description: Identifier for the anchor invoice in negotiation relationships,
+      representing the parent invoice that serves as reference.
     lineage:
       - datalake_collections_quintoandar.negotiation.id_invoice
   id_account:
@@ -27,11 +29,13 @@ columns:
     lineage:
       - datalake_retsuko.invoice.id_account
   id_contract_internal:
-    description: Internal system identifier for the contract, serving as the primary technical key in the Retsuko system.
+    description: Internal system identifier for the contract, serving as the primary
+      technical key in the Retsuko system.
     lineage:
       - datalake_retsuko.invoice.id_contract
   id_contract:
-    description: Business key for the contract, representing a globally unique identifier used for integration with external systems.
+    description: Business key for the contract, representing a globally unique
+      identifier used for integration with external systems.
     lineage:
       - datalake_retsuko.invoice.id_contract_external
   id_negotiation_parent:
@@ -59,13 +63,10 @@ columns:
     lineage:
       - datalake_collections_quintoandar.negotiation.advisory
   has_app_action_event:
-    description: Flag indicating if there are app action events associated with this invoice.
+    description: Flag indicating if there are app action events associated with this
+      invoice.
     lineage:
       - datalake_collections_quintoandar.delinquency_app_events.ts_event
-  has_matthew_interaction:
-    description: Flag indicating if there are Matthew interaction events associated with this invoice.
-    lineage:
-      - datalake_collections_quintoandar.matthew_interaction.ts_created
   id_audit:
     description: Identifier for the audit trail associated with the invoice.
     lineage:
@@ -91,7 +92,8 @@ columns:
     lineage:
       - datalake_ebdb_contract.contract.id_house
   user:
-    description: The user associated with the invoice, typically the tenant responsible for the payment.
+    description: The user associated with the invoice, typically the tenant
+      responsible for the payment.
     lineage:
       - datalake_retsuko.invoice_info.invoice_user
   invoice_status:
@@ -99,7 +101,8 @@ columns:
     lineage:
       - datalake_retsuko.invoice.status
   contract_status:
-    description: Current status of the contract associated with the invoice (e.g., active, canceled).
+    description: Current status of the contract associated with the invoice (e.g.,
+      active, canceled).
     lineage:
       - datalake_ebdb_contract.contract.status
   payment_status:
@@ -107,19 +110,23 @@ columns:
     lineage:
       - datalake_retsuko.invoice.payment_status
   substatus:
-    description: Detailed substatus of the invoice, providing additional context to the main status (e.g., debt, ongoing negotiation).
+    description: Detailed substatus of the invoice, providing additional context to
+      the main status (e.g., debt, ongoing negotiation).
     lineage:
       - datalake_retsuko.invoice.substatus
   purpose:
-    description: Purpose or reason for the invoice generation (e.g., monthly rent, early termination, security deposit).
+    description: Purpose or reason for the invoice generation (e.g., monthly rent,
+      early termination, security deposit).
     lineage:
       - datalake_retsuko.invoice.purpose
   reason:
-    description: Reason for the invoice status or adjustments (e.g., negotiation, agreement, early termination).
+    description: Reason for the invoice status or adjustments (e.g., negotiation,
+      agreement, early termination).
     lineage:
       - datalake_retsuko.invoice.reason
   recovery_channel:
-    description: Classification of the recovery method used for the invoice based on payment status, negotiation details, and origin agreement.
+    description: Classification of the recovery method used for the invoice based on
+      payment status, negotiation details, and origin agreement.
     lineage:
       - datalake_retsuko.invoice.status
       - datalake_retsuko.invoice.reason
@@ -127,7 +134,9 @@ columns:
       - datalake_collections_quintoandar.negotiation.origin_agreement
       - datalake_collections_quintoandar.negotiation.advisory
   digital_recovery:
-    description: Classification of the recovery channel as digital or non-digital based on the recovery method used (BPO, DIGITAL, DIGITAL EXTERNAL PARTNERS, or NON DIGITAL OTHERS).
+    description: Classification of the recovery channel as digital or non-digital
+      based on the recovery method used (BPO, DIGITAL, DIGITAL EXTERNAL
+      PARTNERS, or NON DIGITAL OTHERS).
     lineage:
       - datalake_retsuko.invoice.status
       - datalake_retsuko.invoice.reason
@@ -154,7 +163,8 @@ columns:
     lineage:
       - datalake_collections_quintoandar.negotiation.promisse_payment_method
   net_rate_recovery:
-    description: Calculated recovery rate representing the ratio of down payment amount to original debt amount in negotiation agreements.
+    description: Calculated recovery rate representing the ratio of down payment
+      amount to original debt amount in negotiation agreements.
     lineage:
       - datalake_collections_quintoandar.negotiation.down_payment_amount
       - datalake_collections_quintoandar.negotiation.original_debt_amount
@@ -183,13 +193,21 @@ columns:
     lineage:
       - datalake_retsuko.invoice.is_write_off
   is_contract_write_off:
-    description: Indicates if the contract associated with the invoice has been written off as a loss.
+    description: Indicates if the contract associated with the invoice has been
+      written off as a loss.
     lineage:
       - datalake_retsuko.invoice.is_contract_write_off
   is_first_payment:
     description: Flag indicating if this is the first payment for the contract.
     lineage:
       - datalake_retsuko.invoice.is_first_payment
+  is_first_invoice_contract:
+    description: True when the invoice is the first monthly or onboarding invoice for the contract (ordering by adjusted due date, creation time, and invoice id).
+    lineage:
+      - datalake_retsuko.invoice.purpose
+      - datalake_retsuko.invoice.dt_due_adjusted
+      - datalake_retsuko.invoice.ts_created
+      - datalake_retsuko.invoice.id_external
   dt_due_adjusted:
     description: Adjusted due date for the invoice, considering any manual adjustments.
     lineage:
@@ -202,6 +220,10 @@ columns:
     description: Adjusted due date of the anchor invoice in negotiation relationships.
     lineage:
       - datalake_retsuko.invoice.dt_due_adjusted
+  dt_contract_start:
+    description: Date when the rental contract started (contract.dt_started).
+    lineage:
+      - datalake_ebdb_contract.contract.dt_started
   dt_contract_annulled:
     description: Date when the contract associated with the invoice was annulled.
     lineage:

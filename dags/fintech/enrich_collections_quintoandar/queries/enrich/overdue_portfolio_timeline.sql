@@ -19,7 +19,6 @@ target_invoices AS (
         i.is_contract_write_off,
         i.is_first_payment AS is_first_payment_default,
         i.has_app_action_event,
-        i.has_matthew_interaction,
         i.due_amount,
         i.paid_amount,
         i.contract_status,
@@ -94,7 +93,6 @@ invoices_timeline AS (
         i.is_contract_write_off,
         i.is_first_payment_default,
         i.has_app_action_event,
-        i.has_matthew_interaction,
         CASE
             WHEN DATE(i.ts_reference) < i.dt_contract_annulled THEN "Active"
             WHEN DATE(i.ts_reference) >= i.dt_contract_annulled THEN "Finished"
@@ -273,7 +271,6 @@ SELECT
     business_day,
     IF(dt_reference = max_date_between_business_days, TRUE, FALSE) AS is_last_business_days,
     has_app_action_event,
-    has_matthew_interaction,
     dt_contract_annulled,
     contract_due_date_min AS dt_contract_due_date_min,
     dt_paid_timeline AS dt_invoice_paid,

@@ -116,12 +116,11 @@ overdue_final as (
 )
 
 SELECT DISTINCT
-    COALESCE(e.id_process, l.id_process) AS sk_process,
-    IF(e.id_process IS NOT NULL, e.contract, l.contract) AS sk_contract,
-    CASE WHEN e.id_process IS NOT NULL THEN 'cyber_legal' ELSE 'elaw' END AS source,
-    IF(e.id_process IS NOT NULL, e.process, l.process) AS process,
-    IF(e.id_process IS NOT NULL, e.input_type, l.input_type) AS input_type,
-    IF(e.id_process IS NOT NULL,
+    e.id_process AS sk_process,
+    e.contract AS sk_contract,
+    'cyber_legal' AS source,
+    e.process AS process,
+    e.input_type AS input_type,
     CASE
         WHEN o1.open_amount IS NULL THEN 'Adimplente'
         WHEN o1.fpd_invoices > 0 THEN 'FPD'
@@ -136,11 +135,10 @@ SELECT DISTINCT
         WHEN o1.monthly_invoices > 0 THEN 'Mensal'
         WHEN o1.open_amount IS NOT NULL THEN 'Demais Inadimplentes'
         ELSE 'Outros'
-    END, l.contract_category_at_registration) AS contract_category_at_registration,
-    IF(e.id_process IS NOT NULL, e.action_type, l.action_type) AS action_type,
-    IF(e.id_process IS NOT NULL, e.action, l.action) AS action,
-    IF(e.id_process IS NOT NULL, e.office, l.office) AS office,
-    IF(e.id_process IS NOT NULL,
+    END AS contract_category_at_registration,
+    e.action_type AS action_type,
+    e.action AS action,
+    e.office AS office,
     CASE
         WHEN e.dt_registered < DATE('2025-10-17') AND e.dt_closure < DATE('2025-12-15') AND e.office = 'VZL' THEN 'PASCHOALOTTO'
         WHEN e.office = 'VZL' THEN 'BULGARELLI'
@@ -149,18 +147,17 @@ SELECT DISTINCT
         WHEN e.office = 'PLC' THEN 'PLC'
         WHEN e.office = 'PSC' THEN 'PASCHOALOTTO'
         ELSE e.office
-    END, l.collection_agency) AS collection_agency,
-    IF(e.id_process IS NOT NULL, e.chamber, l.chamber) AS chamber,
-    IF(e.id_process IS NOT NULL, r.region, l.region) AS region,
-    IF(e.id_process IS NOT NULL, r.city, l.city) AS city,
-    IF(e.id_process IS NOT NULL,
+    END AS collection_agency,
+    e.chamber,
+    r.region,
+    r.city,
     CASE
         WHEN c.dt_ended_rental_confirmed IS NOT NULL THEN 'Finalizado'
         WHEN c.ts_expected_termination IS NOT NULL AND c.dt_ended_rental_confirmed IS NULL THEN 'Finalizando'
         ELSE 'Ativo'
-    END, l.contract_status) AS contract_status,
-    IF(e.id_process IS NOT NULL, e.cyber_status, l.elaw_status) AS cyber_status,
-    IF(e.id_process IS NOT NULL, e.last_stage, l.last_stage) AS last_stage,
+    END AS contract_status,
+    e.cyber_status,
+    e.last_stage,
     e.arbitral_distribution_expense_amount,
     e.arbitral_citation_expense_amount,
     e.arbitral_sentence_expense_amount,
@@ -178,29 +175,28 @@ SELECT DISTINCT
     e.asset_attachment_expense_amount,
     e.asset_evaluation_expense_amount,
     e.credit_satisfaction_expense_amount,
-    IF(e.id_process IS NOT NULL, 'not_in_cyber_legal', l.passage_status) AS passage_status,
-    IF(e.id_process IS NOT NULL, e.procedure, l.procedure) AS procedure,
-    IF(e.id_process IS NOT NULL, e.first_consolidated_reason, l.consolidated_reason) AS consolidated_reason,
-    IF(e.id_process IS NOT NULL, e.first_standardized_reason, l.standardized_reason) AS standardized_reason,
-    IF(e.id_process IS NOT NULL, e.result, l.result) AS result,
-    IF(e.id_process IS NOT NULL, o1.delay_days, l.overdue_days_at_registration) AS overdue_days_at_registration,
-    IF(e.id_process IS NOT NULL, e.succumbency_fee, l.succumbency_fee) AS succumbency_fee,
-    IF(e.id_process IS NOT NULL, COALESCE(c.rent, 0) + COALESCE(c.iptu, 0) + COALESCE(c.condo, 0), l.total_package) AS total_package,
-    IF(e.id_process IS NOT NULL, ovf.open_amount, l.total_due_amount) AS total_due_amount,
-    IF(e.id_process IS NOT NULL, e.ldt_stock, l.ldt_stock) AS ldt_stock,
-    IF(e.id_process IS NOT NULL, e.stock_range, l.stock_range) AS stock_range,
-    IF(e.id_process IS NOT NULL, e.ldt_resolution, l.ldt_resolution) AS ldt_resolution,
-    IF(e.id_process IS NOT NULL,
+    'not_in_cyber_legal' AS passage_status,
+    e.procedure,
+    e.first_consolidated_reason AS consolidated_reason,
+    e.first_standardized_reason AS standardized_reason,
+    e.result,
+    o1.delay_days AS overdue_days_at_registration,
+    e.succumbency_fee,
+    COALESCE(c.rent, 0) + COALESCE(c.iptu, 0) + COALESCE(c.condo, 0) AS total_package,
+    ovf.open_amount AS total_due_amount,
+    e.ldt_stock AS ldt_stock,
+    e.stock_range AS stock_range,
+    e.ldt_resolution AS ldt_resolution,
     CASE
         WHEN e.ldt_resolution BETWEEN 0 AND 120 THEN '<120D'
         WHEN e.ldt_resolution BETWEEN 121 AND 240 THEN '120-240D'
         WHEN e.ldt_resolution BETWEEN 241 AND 360 THEN '240-360D'
         WHEN e.ldt_resolution BETWEEN 361 AND 5000 THEN '>360D'
         ELSE NULL
-    END, l.resolution_range) AS resolution_range,
-    IF(e.id_process IS NOT NULL, e.ldt_coercive, l.ldt_coercive) AS ldt_coercive,
-    IF(e.id_process IS NOT NULL, e.last_occurrence, l.last_occurrence) AS last_occurrence,
-    IF(e.id_process IS NOT NULL, DATE_DIFF(DAY, DATE(e.dt_registered), e.dt_closure), l.real_ldt_resolution) AS real_ldt_resolution,
+    END AS resolution_range,
+    e.ldt_coercive AS ldt_coercive,
+    e.last_occurrence AS last_occurrence,
+    DATE_DIFF(DAY, DATE(e.dt_registered), e.dt_closure) AS real_ldt_resolution,
         --leadtimes despejo
     COUNT(DISTINCT
         CASE
@@ -348,30 +344,29 @@ SELECT DISTINCT
                   (DATE(e.dt_credit_satisfaction_start) IS NOT NULL AND DATE(e.dt_credit_satisfaction_start) >= d.date) OR
                   (DATE(e.dt_credit_satisfaction_start) IS NULL AND CURRENT_DATE() >= d.date)
                   ) THEN d.sk_date END) AS ldt_credit_satisfaction,
-    IF(e.id_process IS NOT NULL, e.has_arbitration_defense, l.has_arbitration_defense) AS has_arbitration_defense,
-    IF(e.id_process IS NOT NULL, e.has_redistribution, l.has_redistribution) AS has_redistribution,
-    IF(e.id_process IS NOT NULL, e.is_reincident, CAST(l.is_reincident AS BOOLEAN)) AS is_reincident,
-    IF(e.id_process IS NOT NULL AND l.id_process IS NOT NULL, TRUE, FALSE) AS is_migrated,
+    e.has_arbitration_defense,
+    e.has_redistribution,
+    e.is_reincident,
     e.is_reopened,
-    IF(e.id_process IS NOT NULL, e.dt_registered, l.dt_registered) AS dt_registered,
-    IF(e.id_process IS NOT NULL, e.dt_arbitral_distribution_start, l.dt_arbitral_distribution) AS dt_arbitral_distribution_start,
+    e.dt_registered,
+    e.dt_arbitral_distribution_start,
     e.dt_arbitral_distribution_end,
-    IF(e.id_process IS NOT NULL, e.dt_arbitral_citation_start, l.dt_arbitral_citation) AS dt_arbitral_citation_start,
+    e.dt_arbitral_citation_start,
     e.dt_arbitral_citation_end,
-    IF(e.id_process IS NOT NULL, e.dt_arbitral_contestation, l.dt_arbitral_contestation) AS dt_arbitral_contestation,
-    IF(e.id_process IS NOT NULL, e.dt_arbitral_sentence_start, l.dt_arbitral_sentence) AS dt_arbitral_sentence_start,
+    e.dt_arbitral_contestation,
+    e.dt_arbitral_sentence_start,
     e.dt_arbitral_sentence_end,
-    IF(e.id_process IS NOT NULL, e.dt_judiciary_pre_registration, l.dt_judiciary_pre_registration) AS dt_judiciary_pre_registration,
-    IF(e.id_process IS NOT NULL, e.dt_judiciary_distribution_start, dt_judiciary_distribution) AS dt_judiciary_distribution_start,
+    e.dt_judiciary_pre_registration,
+    e.dt_judiciary_distribution_start,
     e.dt_judiciary_distribution_end,
-    IF(e.id_process IS NOT NULL, e.dt_judicial_summons_decision_start, l.dt_judicial_summons_decision) AS dt_judicial_summons_decision_start,
+    e.dt_judicial_summons_decision_start,
     e.dt_judicial_summons_decision_end,
-    IF(e.id_process IS NOT NULL, e.dt_judicial_summons_start, l.dt_judicial_summons) AS dt_judicial_summons_start,
+    e.dt_judicial_summons_start,
     e.dt_judicial_summons_end,
-    IF(e.id_process IS NOT NULL, e.dt_judicial_defense, l.dt_judicial_defense) AS dt_judicial_defense,
-    IF(e.id_process IS NOT NULL, e.dt_coercive_decision_start, l.dt_coercive_decision) AS dt_coercive_decision_start,
+    e.dt_judicial_defense,
+    e.dt_coercive_decision_start,
     e.dt_coercive_decision_end,
-    IF(e.id_process IS NOT NULL, e.dt_coercive_issuance_start, l.dt_coercive_issuance) AS dt_coercive_issuance_start,
+    e.dt_coercive_issuance_start,
     e.dt_coercive_issuance_end,
     e.dt_judicial_petition_start,
     e.dt_judicial_petition_end,
@@ -385,22 +380,19 @@ SELECT DISTINCT
     e.dt_prejudgment_attachment_end,
     e.dt_execution_citation_start,
     e.dt_execution_citation_end,
-    IF(e.id_process IS NOT NULL, e.dt_asset_attachment_start, l.dt_asset_attachment) AS dt_asset_attachment_start,
+    e.dt_asset_attachment_start,
     e.dt_asset_attachment_end,
     e.dt_asset_evaluation_start,
     e.dt_asset_evaluation_end,
     e.dt_credit_satisfaction_start,
     e.dt_credit_satisfaction_end,
-    IF(e.id_process IS NOT NULL, e.dt_closure, l.dt_elaw_closure) AS dt_closure,
+    e.dt_closure,
     c.dt_ended_rental_confirmed AS dt_finalizing,
     c.ts_expected_termination AS dt_finalized_erc,
     e.ts_updated,
     NOW() AS ts_load
 FROM
     datalake_cyber_legal.evictions_base e
-FULL OUTER JOIN
-    datalake_gsheets_clean.evictions_base l
-    ON e.id_process = l.id_process
 LEFT JOIN
     aux_calendar d
     ON e.dt_registered <= d.date

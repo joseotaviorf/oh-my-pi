@@ -142,13 +142,6 @@ paid_by_ssn AS (
       AND id_invoice IS NOT NULL
     GROUP BY 1,2
 ),
-matthew_interaction AS (
-    SELECT
-        id_contract,
-        MAX(ts_created) AS ts_created
-    FROM datalake_collections_quintoandar.matthew_interaction
-    GROUP BY 1
-),
 create_recovery_channel AS (
     SELECT
         b.id_external AS id_invoice,
@@ -256,7 +249,6 @@ create_recovery_channel AS (
         IF(cwo.id_contract_external IS NOT NULL, TRUE, FALSE) AS is_contract_write_off,
         IFNULL(fp.is_first_payment, FALSE) AS is_first_payment,
         IFNULL(fic.is_first_invoice_contract, FALSE) AS is_first_invoice_contract,
-        IF(matthew.id_contract IS NOT NULL, TRUE, FALSE) AS has_matthew_interaction,
         b.dt_due_adjusted,
         bn.dt_due_parent AS dt_invoice_anchor,
         bn.dt_due_adjusted_parent AS dt_adjusted_invoice_anchor,
@@ -298,11 +290,6 @@ create_recovery_channel AS (
             AND ssn.id_contract = b.id_contract_external
             AND DATE(ssn.ts_event) <= DATE(b.ts_paid)
             AND DATE(ssn.ts_event) >= DATE(b.ts_paid) - INTERVAL 5 DAY
-    LEFT JOIN matthew_interaction AS matthew
-        ON matthew.id_contract = b.id_contract_external
-            AND DATE(matthew.ts_created) <= DATE(b.ts_paid)
-            AND DATE(matthew.ts_created) >= DATE(b.ts_paid) - INTERVAL 2 DAY
-            AND DATE(matthew.ts_created) >= DATE(b.ts_created)
     LEFT JOIN
         datalake_trato_feito_clean.bill AS btf
             ON btf.id_external = b.id_external
@@ -357,7 +344,6 @@ SELECT
     is_contract_write_off,
     is_first_payment,
     is_first_invoice_contract,
-    has_matthew_interaction,
     dt_due_adjusted,
     dt_invoice_anchor,
     dt_adjusted_invoice_anchor,

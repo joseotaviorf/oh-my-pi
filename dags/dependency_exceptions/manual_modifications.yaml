@@ -18,6 +18,9 @@ bietlejuice.enrich_hightouch:
 bietlejuice.cyber_complement:
   add:
     - bietlejuice.cyber:load-raw-uda1:first-run-of-day
+bietlejuice.enrich_cyber_legal:
+  remove:
+    - bietlejuice.cyber_legal:load-clean-text-content:first-run-of-day
 bietlejuice.dw_accounts_receivable:
   remove:
     - bietlejuice.dw_losses:load-dw-losses-fact-delay:first-run-of-day
