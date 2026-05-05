@@ -62,7 +62,10 @@ def _build_fairness_enrich_output_dict(d: Mapping[str, Any]) -> dict[str, Any]:
     checks_payload: dict[str, Any] = {
         k: {"passed": v.passed, "reason": v.reason} for k, v in checks.items()
     }
-    if "I3-02" in checks_payload and d.get("datahub_lineage_upstream_total") is not None:
+    if (
+        "I3-02" in checks_payload
+        and d.get("datahub_lineage_upstream_total") is not None
+    ):
         checks_payload["I3-02"]["detail"] = {
             "upstream_total": int(d.get("datahub_lineage_upstream_total") or 0),
             "downstream_total": int(d.get("datahub_lineage_downstream_total") or 0),
@@ -131,12 +134,12 @@ def _build_column_descriptions_by_fqn_from_collected_rows(
         db_s, tb_s = str(db).strip(), str(tbl).strip()
         if not db_s or not tb_s:
             continue
-        col = r.get("column_name")
+        col = r["column_name"]
         if col is None or not str(col).strip():
             continue
         cname = str(col).strip()
         key = (db_s, tb_s)
-        m.setdefault(key, {})[cname] = r.get("column_description")
+        m.setdefault(key, {})[cname] = r["column_description"]
     return m
 
 
@@ -236,7 +239,9 @@ def main() -> None:
     load_end = F.to_date(F.lit(args.load_end_date))
 
     td_all = spark.table(TABLES_DOC).withColumn("doc_dt", doc_dt)
-    td = td_all.filter(F.col("doc_dt") >= load_start).filter(F.col("doc_dt") <= load_end)
+    td = td_all.filter(F.col("doc_dt") >= load_start).filter(
+        F.col("doc_dt") <= load_end
+    )
     per_fqn_max_dt = td.groupBy("database_name", "table_name").agg(
         F.max("doc_dt").alias("max_doc_dt"),
     )
@@ -285,10 +290,9 @@ def main() -> None:
     )
 
     exists_map, spark_probe_status_map = resolve_spark_table_exists_map(spark, td)
-    cd_rows = (
-        cd_f.select("database_name", "table_name", "column_name", "column_description")
-        .collect()
-    )
+    cd_rows = cd_f.select(
+        "database_name", "table_name", "column_name", "column_description"
+    ).collect()
     col_by_fqn = _build_column_descriptions_by_fqn_from_collected_rows(cd_rows)
     phys_map = resolve_spark_physical_field_names_lower(spark, exists_map)
     f2_i1_by_fqn: dict[
@@ -333,7 +337,9 @@ def main() -> None:
         return bc_spark_probe_status.value.get(key)
 
     exists_udf = F.udf(_lookup_spark_table_exists, BooleanType())
-    td = td.withColumn("spark_table_exists", exists_udf(F.col("database_name"), F.col("table_name")))
+    td = td.withColumn(
+        "spark_table_exists", exists_udf(F.col("database_name"), F.col("table_name"))
+    )
     probe_status_udf = F.udf(_lookup_spark_catalog_probe_status, StringType())
     td = td.withColumn(
         "spark_catalog_probe_status",
@@ -422,10 +428,12 @@ def main() -> None:
         )
         contract_fqn_map = compute_has_data_contract_by_fqn(collected, urn_contract)
         i3_own_map = compute_i3_ownership_pass_by_fqn(collected, urn_ownership)
-        i3_lin_pass_map, i3_up_tot_map, i3_down_tot_map = compute_i3_lineage_pass_and_totals_by_fqn(
-            collected,
-            urn_upstream_total,
-            urn_downstream_total,
+        i3_lin_pass_map, i3_up_tot_map, i3_down_tot_map = (
+            compute_i3_lineage_pass_and_totals_by_fqn(
+                collected,
+                urn_upstream_total,
+                urn_downstream_total,
+            )
         )
         if not token:
             logger.info(
@@ -470,7 +478,9 @@ def main() -> None:
         return bc_f4_reason.value.get(key)
 
     f4_udf = F.udf(_lookup_f4, BooleanType())
-    td = td.withColumn("f4_01_pass", f4_udf(F.col("database_name"), F.col("table_name")))
+    td = td.withColumn(
+        "f4_01_pass", f4_udf(F.col("database_name"), F.col("table_name"))
+    )
     f4_reason_udf = F.udf(_lookup_f4_failure_reason, StringType())
     td = td.withColumn(
         "f4_01_failure_reason",
@@ -515,8 +525,12 @@ def main() -> None:
     i3_02_udf = F.udf(_lookup_i3_02, BooleanType())
     lineage_up_udf = F.udf(_lookup_lineage_up, LongType())
     lineage_down_udf = F.udf(_lookup_lineage_down, LongType())
-    td = td.withColumn("i3_01_pass", i3_01_udf(F.col("database_name"), F.col("table_name")))
-    td = td.withColumn("i3_02_pass", i3_02_udf(F.col("database_name"), F.col("table_name")))
+    td = td.withColumn(
+        "i3_01_pass", i3_01_udf(F.col("database_name"), F.col("table_name"))
+    )
+    td = td.withColumn(
+        "i3_02_pass", i3_02_udf(F.col("database_name"), F.col("table_name"))
+    )
     td = td.withColumn(
         "datahub_lineage_upstream_total",
         lineage_up_udf(F.col("database_name"), F.col("table_name")),
