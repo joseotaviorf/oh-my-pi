@@ -1,34 +1,36 @@
 -- ============================================================================
 -- fact_databricks_task_run.sql
 --
--- Per Airflow-task-run health fact joining Databricks system tables, the
+-- Per task-run health fact joining Databricks system tables, the
 -- cluster-utilisation snapshot from datalake_databricks_health.daily_cluster
 -- _health (PR 23079), and per-stage Spark execution metrics from
 -- datalake_databricks_health.spark_stage_metrics (PR 23080).
 --
 -- Grain: one row per
 --   (id_databricks_workspace, id_databricks_run, id_databricks_task_run)
--- For the bietlejuice framework that is one row per Airflow task instance,
--- because query_delta DAGs spin up a job cluster per task.
+-- A Databricks job run uses one job cluster for all tasks in that run (new
+-- cluster on retry). Multiple Airflow-triggered jobs (e.g. parallel
+-- execute-job-cluster-N) mean multiple clusters per logical DAG execution.
 --
 -- Source tables:
 --   - system.lakeflow.job_task_run_timeline           (spine — per-task-run)
 --   - system.lakeflow.job_run_timeline                (parent run state)
 --   - system.compute.clusters                         (cluster spec — latest)
---   - system.billing.usage                            (DBU per cluster-window)
+--   - system.billing.usage                            (DBU per cluster, hourly buckets)
 --   - system.billing.list_prices                      (AWS USD list rate per DBU SKU)
 --   - datalake_databricks_health.daily_cluster_health (PR 23079 — P50/P95 util)
 --   - datalake_databricks_health.spark_stage_metrics  (PR 23080 — per stage)
 --
--- Filters:
---   - tags['provisioner'] = 'bietlejuice'   (framework-managed clusters only)
---   - tags['environment'] = '{environment}' (scope to local workspace)
+-- Cluster scope: all clusters that appear in Lakeflow task-run timeline for
+-- the load window (latest snapshot from system.compute.clusters). No
+-- provisioner or environment filter — covers bietlejuice, quintoml, CDP, and
+-- other job workloads present in Lakeflow.
 --
--- Cost attribution caveat: billing rows whose usage_start_time falls within
--- the task window are summed without time-slice apportionment. For job
--- clusters (1 task = 1 cluster) this is a 1:1 attribution. For shared
--- interactive clusters this over-attributes — the same billing rows are
--- counted by every concurrent task. Documented in metadata.
+-- Cost attribution: system.billing.usage is hour-bucketed (usage_start_time at
+-- HH:00:00). Joining billing rows to task time windows mis-attributes DBU.
+-- We sum DBU and USD per (workspace_id, cluster_id) for the load window, then
+-- allocate to tasks by each task's share of total task wall-clock seconds on
+-- that cluster (equal split when all task durations are zero).
 --
 -- USD conversion uses system.billing.list_prices.pricing.default (list rate
 -- in USD per DBU, AWS cloud) joined on sku_name + valid time window. No
@@ -44,9 +46,10 @@
 --   plus dag_id (parsed from the event-log path). The path layout lacks
 --   task_id and cluster_id, so we attribute each Spark application to a task
 --   by matching dag_id + spark_app_first_seen ∈ [ts_task_started, ts_task_
---   ended]. For DAGs with sequential tasks (the vast majority of query_delta
---   DAGs) this is unique. For DAGs with PARALLEL tasks of the same dag_id,
---   the same spark_app may match multiple task windows and the
+--   ended]. The dag_id key is aligned to COALESCE(cluster application tag,
+--   billing job_name, cluster_name). Sequential-task DAGs usually match
+--   uniquely. For DAGs with PARALLEL tasks of the same dag_id, the same
+--   spark_app may match multiple task windows and the
 --   `is_stage_attribution_ambiguous` flag fires (spark_app_count > 1).
 -- ============================================================================
 WITH latest_cluster_spec AS (
@@ -74,9 +77,7 @@ WITH latest_cluster_spec AS (
         FROM
             system.compute.clusters c
         WHERE
-            DATE(c.change_time) <= DATE('{load_end_date}')
-            AND c.tags['provisioner'] = 'bietlejuice'
-            AND c.tags['environment'] = '{environment}'
+            DATE(c.change_time) BETWEEN DATE_SUB(DATE('{load_start_date}'), 730) AND DATE('{load_end_date}')
     )
     WHERE
         rn = 1
@@ -142,33 +143,161 @@ prices_per_sku AS (
         AND price_start_time <= TIMESTAMP('{load_end_date}')
         AND (price_end_time IS NULL OR price_end_time >= TIMESTAMP('{load_start_date}'))
 ),
-billing_per_task AS (
-    SELECT
-        s.workspace_id,
-        s.run_id,
-        s.task_run_id,
-        SUM(u.usage_quantity)                              AS dbu_consumed,
-        SUM(u.usage_quantity * COALESCE(p.unit_price_usd, 0))
-                                                           AS cost_usd_estimate,
-        FIRST(u.sku_name)                                  AS pricing_sku,
-        FIRST(p.unit_price_usd)                            AS dbu_rate_usd
+run_clusters AS (
+    SELECT DISTINCT
+        workspace_id,
+        cluster_id
     FROM
-        task_run_spine s
-    LEFT JOIN
+        task_run_spine
+),
+usage_for_run_clusters AS (
+    SELECT
+        u.workspace_id,
+        u.usage_metadata.cluster_id                        AS cluster_id,
+        u.sku_name,
+        u.usage_quantity,
+        u.usage_start_time,
+        u.usage_metadata.job_name                          AS billing_job_name,
+        COALESCE(p.unit_price_usd, 0)                      AS unit_price_usd
+    FROM
         system.billing.usage u
-            ON  u.workspace_id              = s.workspace_id
-            AND u.usage_metadata.cluster_id = s.cluster_id
-            AND u.usage_unit                = 'DBU'
-            AND u.usage_start_time         >= s.ts_task_started
-            AND u.usage_start_time          < s.ts_task_ended
-            AND DATE(u.usage_start_time) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+    INNER JOIN
+        run_clusters rc
+            ON  rc.workspace_id              = u.workspace_id
+            AND rc.cluster_id                = u.usage_metadata.cluster_id
     LEFT JOIN
         prices_per_sku p
             ON  p.sku_name           = u.sku_name
             AND u.usage_start_time  >= p.price_start_time
             AND (p.price_end_time IS NULL OR u.usage_start_time < p.price_end_time)
+    WHERE
+        u.usage_unit = 'DBU'
+        AND DATE(u.usage_start_time) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+),
+sku_totals_by_cluster AS (
+    SELECT
+        workspace_id,
+        cluster_id,
+        sku_name,
+        SUM(usage_quantity)                                AS sku_dbu
+    FROM
+        usage_for_run_clusters
     GROUP BY
-        s.workspace_id, s.run_id, s.task_run_id
+        workspace_id, cluster_id, sku_name
+),
+cluster_primary_sku AS (
+    SELECT
+        workspace_id,
+        cluster_id,
+        MAX_BY(sku_name, sku_dbu)                          AS pricing_sku
+    FROM
+        sku_totals_by_cluster
+    GROUP BY
+        workspace_id, cluster_id
+),
+billing_per_cluster AS (
+    SELECT
+        ufr.workspace_id,
+        ufr.cluster_id,
+        SUM(ufr.usage_quantity)                            AS dbu_consumed,
+        SUM(ufr.usage_quantity * ufr.unit_price_usd)       AS cost_usd_estimate,
+        MAX_BY(ufr.billing_job_name, ufr.usage_quantity)    AS billing_job_name
+    FROM
+        usage_for_run_clusters ufr
+    GROUP BY
+        ufr.workspace_id, ufr.cluster_id
+),
+task_with_seconds AS (
+    SELECT
+        s.workspace_id,
+        s.job_id,
+        s.run_id,
+        s.task_run_id,
+        s.task_key,
+        s.cluster_id,
+        s.ts_task_started,
+        s.ts_task_ended,
+        s.setup_duration_seconds,
+        s.task_result_state,
+        s.dt_task_started,
+        GREATEST(
+            CAST(unix_timestamp(s.ts_task_ended) AS BIGINT)
+            - CAST(unix_timestamp(s.ts_task_started) AS BIGINT),
+            CAST(0 AS BIGINT)
+        )                                                  AS task_seconds
+    FROM
+        task_run_spine s
+),
+cluster_task_seconds AS (
+    SELECT
+        workspace_id,
+        cluster_id,
+        SUM(task_seconds)                                  AS cluster_total_seconds
+    FROM
+        task_with_seconds
+    GROUP BY
+        workspace_id, cluster_id
+),
+tasks_per_cluster AS (
+    SELECT
+        workspace_id,
+        cluster_id,
+        COUNT(*)                                           AS n_tasks
+    FROM
+        task_with_seconds
+    GROUP BY
+        workspace_id, cluster_id
+),
+billing_per_task AS (
+    SELECT
+        t.workspace_id,
+        t.run_id,
+        t.task_run_id,
+        COALESCE(CAST(bc.dbu_consumed AS DOUBLE), CAST(0 AS DOUBLE))
+            * (
+                CASE
+                    WHEN COALESCE(cts.cluster_total_seconds, CAST(0 AS BIGINT)) > CAST(0 AS BIGINT)
+                        THEN CAST(t.task_seconds AS DOUBLE) / CAST(cts.cluster_total_seconds AS DOUBLE)
+                    WHEN COALESCE(tpc.n_tasks, 0) > 0
+                        THEN 1.0 / CAST(tpc.n_tasks AS DOUBLE)
+                    ELSE CAST(1 AS DOUBLE)
+                END
+            )                                              AS dbu_consumed,
+        COALESCE(CAST(bc.cost_usd_estimate AS DOUBLE), CAST(0 AS DOUBLE))
+            * (
+                CASE
+                    WHEN COALESCE(cts.cluster_total_seconds, CAST(0 AS BIGINT)) > CAST(0 AS BIGINT)
+                        THEN CAST(t.task_seconds AS DOUBLE) / CAST(cts.cluster_total_seconds AS DOUBLE)
+                    WHEN COALESCE(tpc.n_tasks, 0) > 0
+                        THEN 1.0 / CAST(tpc.n_tasks AS DOUBLE)
+                    ELSE CAST(1 AS DOUBLE)
+                END
+            )                                              AS cost_usd_estimate,
+        cps.pricing_sku,
+        pr_eff.unit_price_usd                              AS dbu_rate_usd
+    FROM
+        task_with_seconds t
+    LEFT JOIN
+        cluster_task_seconds cts
+            ON  cts.workspace_id = t.workspace_id
+            AND cts.cluster_id   = t.cluster_id
+    LEFT JOIN
+        tasks_per_cluster tpc
+            ON  tpc.workspace_id = t.workspace_id
+            AND tpc.cluster_id   = t.cluster_id
+    LEFT JOIN
+        billing_per_cluster bc
+            ON  bc.workspace_id = t.workspace_id
+            AND bc.cluster_id   = t.cluster_id
+    LEFT JOIN
+        cluster_primary_sku cps
+            ON  cps.workspace_id = t.workspace_id
+            AND cps.cluster_id   = t.cluster_id
+    LEFT JOIN
+        prices_per_sku pr_eff
+            ON  pr_eff.sku_name = cps.pricing_sku
+            AND TIMESTAMP('{load_end_date}') >= pr_eff.price_start_time
+            AND (pr_eff.price_end_time IS NULL OR TIMESTAMP('{load_end_date}') < pr_eff.price_end_time)
 ),
 stage_per_app AS (
     -- Roll up spark_stage_metrics from per-stage to per-spark-application,
@@ -247,9 +376,17 @@ stage_per_task AS (
         latest_cluster_spec lcs
             ON  lcs.cluster_id   = s.cluster_id
             AND lcs.workspace_id = s.workspace_id
+    LEFT JOIN
+        billing_per_cluster bc_spark
+            ON  bc_spark.workspace_id = s.workspace_id
+            AND bc_spark.cluster_id   = s.cluster_id
     INNER JOIN
         stage_per_app spa
-            ON  spa.dag_id               = lcs.tags['application']
+            ON  spa.dag_id               = COALESCE(
+                    lcs.tags['application'],
+                    bc_spark.billing_job_name,
+                    lcs.cluster_name
+                )
             AND spa.spark_app_first_seen >= s.ts_task_started
             AND spa.spark_app_first_seen <  s.ts_task_ended
     GROUP BY
@@ -315,13 +452,20 @@ SELECT
         '/runs/', CAST(s.run_id AS STRING)
     )                                                              AS databricks_run_url,
 
-    lcs.tags['application']                                        AS dag_name,
-    lcs.tags['application']                                        AS airflow_dag_id,
+    COALESCE(
+        lcs.tags['application'],
+        bc_dag.billing_job_name,
+        lcs.cluster_name
+    )                                                              AS dag_name,
+    COALESCE(
+        lcs.tags['application'],
+        bc_dag.billing_job_name,
+        lcs.cluster_name
+    )                                                              AS airflow_dag_id,
     s.task_key                                                     AS airflow_task_id,
-    -- Governance / attribution tags. Set by the bietlejuice cluster builder; surfaced
-    -- here as first-class columns so cost dashboards can group by team / cost center
-    -- without re-parsing custom_tags. See `bietlejuice/prod_conf.yml` and `forno_conf.yml`
-    -- (cluster_anchor_base.custom_tags) for the canonical source.
+    -- Governance / attribution tags from cluster custom_tags when present
+    -- (bietlejuice / framework-managed workloads). Other provisioners may leave
+    -- these NULL — cost dashboards should tolerate NULL team_owner / cost_center.
     lcs.tags['owner']                                              AS team_owner,
     lcs.tags['cost-center']                                        AS cost_center,
     lcs.tags['ecosystem']                                          AS ecosystem,
@@ -425,6 +569,10 @@ JOIN
     latest_cluster_spec lcs
         ON  lcs.cluster_id   = s.cluster_id
         AND lcs.workspace_id = s.workspace_id
+LEFT JOIN
+    billing_per_cluster bc_dag
+        ON  bc_dag.workspace_id = s.workspace_id
+        AND bc_dag.cluster_id   = s.cluster_id
 LEFT JOIN
     parent_run pr
         ON  pr.workspace_id = s.workspace_id

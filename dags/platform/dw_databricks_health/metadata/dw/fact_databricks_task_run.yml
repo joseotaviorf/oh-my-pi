@@ -2,42 +2,47 @@
 database_name: dw_databricks_health
 table_name: fact_databricks_task_run
 description: |
-  Per Airflow-task-run health fact for the bietlejuice framework. One row
-  per (id_databricks_workspace, id_databricks_run, id_databricks_task_run),
-  which for query_delta DAGs is one row per Airflow task instance (because
-  query_delta provisions a job cluster per task).
+  Per Databricks task-run health fact for workloads present in Lakeflow
+  (system.lakeflow.job_task_run_timeline). One row per
+  (id_databricks_workspace, id_databricks_run, id_databricks_task_run). Covers
+  all job clusters that appear in the timeline for the load window — including
+  bietlejuice, quintoml / wonka, customer-data-platform, and other
+  provisioners — not only `tags['provisioner'] = 'bietlejuice'`.
 
   Joins seven sources:
     - system.lakeflow.job_task_run_timeline (spine — per-task-run, setup time)
     - system.lakeflow.job_run_timeline      (parent run state, run_type)
     - system.compute.clusters               (cluster spec snapshots — latest)
-    - system.billing.usage                  (DBU per cluster-window)
+    - system.billing.usage                  (DBU per cluster, hourly buckets)
     - system.billing.list_prices            (AWS USD list rate per DBU SKU)
     - datalake_databricks_health.daily_cluster_health (PR 23079 — P50/P95 util)
     - datalake_databricks_health.spark_stage_metrics  (PR 23080 — Spark stages)
 
-  Cost attribution caveat: billing rows whose usage_start_time falls within
-  the task window are summed without time-slice apportionment. For job
-  clusters (1 task = 1 cluster) this is a 1:1 attribution. For shared
-  interactive clusters the same billing rows are counted by every concurrent
-  task, so dbu_consumed will over-attribute. Consumers should either filter
-  to job clusters (cluster_source = 'JOB') or apportion downstream.
+  Cost attribution: billing usage rows are hour-bucketed. The fact sums DBU and
+  estimated USD per (workspace_id, cluster_id) for the load window, then
+  allocates each task run a share equal to its wall-clock duration on that
+  cluster divided by the sum of task durations on the same cluster (equal
+  split when all task durations are zero). This matches cluster-level system
+  billing and avoids both missing DBU (task-window join on hour buckets) and
+  double-counting across parallel tasks on one cluster.
 
   USD conversion uses system.billing.list_prices.pricing.default (list rate
-  in USD per DBU, AWS cloud) joined on sku_name + valid time window.
-  pricing_sku and dbu_rate_usd are exposed alongside cost_usd_estimate so
-  consumers can audit the conversion or apply their own currency conversion
-  (e.g. BRL via the QuintoAndar finance FX rate). No Graviton or
-  instance-pool discount applies to DBUs (validated in
+  in USD per DBU, AWS cloud) joined on sku_name + valid time window on each
+  usage row. `pricing_sku` and `dbu_rate_usd` reflect the dominant SKU by DBU
+  volume on the cluster for the window. pricing_sku and dbu_rate_usd are
+  exposed alongside cost_usd_estimate so consumers can audit the conversion or
+  apply their own currency conversion (e.g. BRL via the QuintoAndar finance FX
+  rate). No Graviton or instance-pool discount applies to DBUs (validated in
   bietlejuice/spark_debugging/mcp_a4_dbu_list_prices.sql); cost savings on
   those come from EC2 cost and faster wall-clock.
 
   Stage-attribution caveat: spark_stage_metrics is keyed by id_spark_app,
   not task_run_id (the event-log path layout doesn't carry task_id). We
   attribute each Spark application to a task by matching dag_id +
-  spark_app_first_seen ∈ [ts_task_started, ts_task_ended]. For DAGs with
-  sequential tasks (the vast majority of query_delta DAGs) this is unique;
-  for DAGs with parallel tasks of the same dag_id the same spark_app may
+  spark_app_first_seen ∈ [ts_task_started, ts_task_ended]. The match key is
+  COALESCE(cluster `application` tag, billing `usage_metadata.job_name`,
+  cluster_name) so non-bietlejuice clusters can still align when tags are
+  missing. For DAGs with parallel tasks of the same dag_id the same spark_app may
   match multiple task windows and the `is_stage_attribution_ambiguous`
   flag fires. **In that case the rolled-up stage-metric columns
   (`total_*`, `max_*`, `stage_count`, `failed_stage_count`) are set to
@@ -46,6 +51,9 @@ description: |
   `is_stage_attribution_ambiguous`, `has_stage_data`) remain populated.
   Consumers wanting the (over-counted) raw values can still query
   `datalake_databricks_health.spark_stage_metrics` directly.
+
+  Governance columns (`team_owner`, `cost_center`, `ecosystem`, etc.) come from
+  cluster tags when set; they are NULL for clusters without those tags.
 
   Supersedes (does NOT yet retire) the cost-related legacy DAGs
   enrich_databricks_usage_costs, enrich_databricks_job_runs and
@@ -83,7 +91,7 @@ columns:
     lineage:
       - system.lakeflow.job_task_run_timeline.task_key
   id_cluster:
-    description: Databricks cluster identifier — first element of `compute_ids` (the bietlejuice framework uses 1 cluster per task).
+    description: Databricks cluster identifier — first element of `compute_ids` from the Lakeflow task-run timeline (the cluster that executed this task).
     lineage:
       - system.lakeflow.job_task_run_timeline.compute_ids
   databricks_run_url:
@@ -97,62 +105,61 @@ columns:
       - system.lakeflow.job_task_run_timeline.job_id
       - system.lakeflow.job_task_run_timeline.run_id
   dag_name:
-    description: bietlejuice DAG identifier extracted from the cluster `application` tag (e.g. `bietlejuice.enrich_ebdb_contract`). Set by the framework when provisioning the cluster.
+    description: |
+      Workload identifier for grouping and joins. COALESCE of cluster `application`
+      tag, `system.billing.usage.usage_metadata.job_name` (dominant DBU row on the
+      cluster for the load window), then `cluster_name` when tags are absent.
     lineage:
       - system.compute.clusters.tags
+      - system.billing.usage.usage_metadata
+      - system.compute.clusters.cluster_name
   airflow_dag_id:
-    description: Airflow `dag_id` extracted from the cluster `dag_id` tag. Equivalent to `dag_name` minus the `bietlejuice.` prefix when the framework set both tags.
+    description: |
+      Same COALESCE chain as `dag_name` — aligns to Airflow / job naming when
+      available; falls back to billing job name or cluster name for non-bietlejuice
+      clusters.
     lineage:
       - system.compute.clusters.tags
+      - system.billing.usage.usage_metadata
+      - system.compute.clusters.cluster_name
   airflow_task_id:
     description: Airflow `task_id` extracted from the cluster `task_id` tag. Identifies the specific task within the DAG that triggered this Spark application.
     lineage:
       - system.compute.clusters.tags
   team_owner:
     description: |
-      Team or person responsible for the workload, lifted from the cluster `owner` tag.
-      Set by the bietlejuice cluster builder from the Airflow task `owner` (e.g.
-      `data-life-cycle`, `data-for-rent`). The headline column for cost-attribution
-      dashboards — group by `team_owner` to answer "how much did Team X spend?".
+      Team or person responsible for the workload, lifted from the cluster `owner` tag
+      when present (e.g. bietlejuice-managed clusters). NULL when the tag is not set.
     lineage:
       - system.compute.clusters.tags
   cost_center:
     description: |
-      Internal cost-center code lifted from the cluster `cost-center` tag (e.g. `c052`).
-      Currently uniform (`c052`) across bietlejuice-managed workloads but exposed as
-      a first-class column so finance dashboards can pivot on it without re-parsing
-      `custom_tags`, and so future per-domain cost centers (if introduced) flow
-      through automatically.
+      Internal cost-center code from the cluster `cost-center` tag when present.
+      NULL when not set on the cluster.
     lineage:
       - system.compute.clusters.tags
   ecosystem:
     description: |
-      Logical ecosystem the workload belongs to, lifted from the cluster `ecosystem`
-      tag. Always `data-engineering` for bietlejuice-managed clusters; surfaced here
-      so cross-ecosystem rollups (Databricks plus other compute platforms) can use a
-      single dimension.
+      Logical ecosystem from the cluster `ecosystem` tag when present. NULL when
+      not set.
     lineage:
       - system.compute.clusters.tags
   environment:
     description: |
-      Workspace environment lifted from the cluster `environment` tag (`forno` or
-      `prod`). Joinable across workspaces; lets dashboards filter to a specific
-      deployment when the same fact is materialised in both.
+      Value from the cluster `environment` tag when present (`forno`, `prod`, etc.).
+      NULL when not set.
     lineage:
       - system.compute.clusters.tags
   data_classification:
     description: |
-      LGPD / data-classification label lifted from the cluster `data-classification`
-      tag (e.g. `private`). Currently uniform across bietlejuice clusters; reserved
-      for future workload-level classification overrides.
+      LGPD / data-classification label from the cluster `data-classification` tag
+      when present. NULL when not set.
     lineage:
       - system.compute.clusters.tags
   provisioner:
     description: |
-      System that provisioned the cluster, lifted from the cluster `provisioner` tag.
-      Always `bietlejuice` for rows in this fact (the source CTE filters on
-      `tags['provisioner'] = 'bietlejuice'`); exposed so consumers that union this
-      fact with other sources can disambiguate origin.
+      System that provisioned the cluster from the `provisioner` tag (e.g.
+      `bietlejuice`, `quintoml`, `customer-data-platform`). NULL when the tag is absent.
     lineage:
       - system.compute.clusters.tags
   cluster_name:
@@ -241,21 +248,36 @@ columns:
   execution_duration_seconds:
     description: Useful execution time (`total_duration_seconds - setup_duration_seconds`). What the task spent doing actual work, excluding cluster cold-start.
   dbu_consumed:
-    description: Total DBUs billed against this task's cluster window (`SUM(usage_quantity WHERE usage_metadata.cluster_id = id_cluster AND usage_start_time BETWEEN ts_task_started AND ts_task_ended)`). Over-attributes for shared interactive clusters — see table description.
+    description: |
+      DBUs allocated to this task run — cluster total DBU for the load window
+      (from `system.billing.usage`, scoped to clusters in Lakeflow for this run)
+      multiplied by this task's share of total task wall-clock seconds on that
+      cluster. Aligns with hour-bucketed billing without mis-joining usage rows to
+      sub-hour task windows.
     lineage:
       - system.billing.usage.usage_quantity
       - system.billing.usage.usage_metadata
   cost_usd_estimate:
-    description: Estimated cost in USD for this task-run, computed as `SUM(usage_quantity * pricing.default)` joining `system.billing.list_prices` on `sku_name` and the price's validity window. Uses **list price** (no enterprise / promotional discount). Same over-attribution caveat as `dbu_consumed` for shared interactive clusters. Currency conversion to BRL is left to consumers via the QuintoAndar finance FX rate.
+    description: |
+      Estimated USD for this task run — cluster total (`SUM(usage_quantity × list
+      price)` per usage row) multiplied by the same duration share as `dbu_consumed`.
+      Uses list price (no enterprise / promotional discount). NULL rate components
+      are treated as zero on each usage row before summing.
     lineage:
       - system.billing.usage.usage_quantity
       - system.billing.list_prices.pricing
   dbu_rate_usd:
-    description: USD-per-DBU rate from `system.billing.list_prices.pricing.default` for this task's billing SKU. Exposed alongside `cost_usd_estimate` so consumers can audit the conversion. NULL when no matching price row was found (typically a brand-new SKU not yet present in list_prices).
+    description: |
+      USD-per-DBU list rate for `pricing_sku` evaluated at `load_end_date` from
+      `system.billing.list_prices`. NULL when the dominant SKU has no matching price row.
     lineage:
       - system.billing.list_prices.pricing
   pricing_sku:
-    description: Databricks SKU name used for billing this task (e.g. `JOBS_PHOTON_COMPUTE_AWS`, `JOBS_LIGHT_COMPUTE_AWS`, `ALL_PURPOSE_COMPUTE_AWS`). Determines the DBU rate. Multiple SKUs can apply across a task's billing window for hybrid clusters; we expose the first one observed (matching the same `FIRST()` pattern used elsewhere in this CTE).
+    description: |
+      Dominant Databricks SKU on the cluster for the load window (SKU with the
+      largest summed `usage_quantity` among DBU rows for that cluster). Used with
+      `dbu_rate_usd` for audit; the task-level `dbu_consumed` / `cost_usd_estimate`
+      can still blend multiple SKUs at the cluster aggregate before pro-rating.
     lineage:
       - system.billing.usage.sku_name
   total_dbu_cost_overwatch_usd:
@@ -435,10 +457,8 @@ columns:
     description: True when `setup_duration_seconds > 90`. The 90s threshold is the O4 alerting line — sustained high values mean the underlying pool is undersized.
   is_sensitive_data:
     description: |
-      True when the cluster `sensitive-data` tag is `'true'`. Currently uniform
-      across bietlejuice-managed clusters (the framework default flags everything
-      as sensitive); exposed so consumers can filter sensitive vs non-sensitive
-      workloads when the framework starts setting it per-DAG.
+      True when the cluster `sensitive-data` tag is `'true'`. False or NULL when
+      unset or any other value.
     lineage:
       - system.compute.clusters.tags
   has_stage_data:
@@ -462,8 +482,8 @@ columns:
       concurrent task. Diagnostic columns (`spark_app_count`,
       `last_stage_failure_reason`, `has_stage_data`) stay populated. Consumers
       wanting the over-counted raw values can query `spark_stage_metrics`
-      directly. Sequential-task DAGs (the vast majority of query_delta DAGs)
-      never trigger this flag.
+      directly. Workloads with a single Spark application per task window do not
+      trigger this flag.
   dt_task_started:
     description: Task start date (UTC), derived from the earliest `period_start_time` of the task's lifecycle.
   ts_task_started:

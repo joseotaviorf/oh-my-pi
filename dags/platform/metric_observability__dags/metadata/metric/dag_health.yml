@@ -21,7 +21,7 @@ description: |
   alongside the existing pairs.
 
   Powers the Phase 4 cluster-cost-observability dashboard:
-    - Governance dimensions (team_owner, cost_center, ecosystem)
+    - Governance dimensions (team_owner, cost_center, ecosystem, environment, provisioner)
     - Cost (DBU + USD), per run + total, both windows
     - Latency (avg/p50/p95/p99 total duration, setup duration), both windows
     - Reliability (error rate, cold start rate), both windows
@@ -90,6 +90,26 @@ columns:
       fact_databricks_task_run.ecosystem. Surfaced so cross-ecosystem
       rollups (Databricks plus other compute platforms) can use a single
       dimension.
+    dimension: True
+  environment:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.environment
+    description: |
+      Deployment environment of the cluster (prod, forno, staging), lifted
+      from fact_databricks_task_run.environment (originally the cluster
+      `environment` tag). Use to filter staging/forno costs from production
+      totals or to identify expensive non-prod workloads. NULL for clusters
+      without the tag.
+    dimension: True
+  provisioner:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.provisioner
+    description: |
+      System that provisioned the cluster (bietlejuice, quintoml, wonka,
+      customer-data-platform, databricks, etc.), lifted from
+      fact_databricks_task_run.provisioner (originally the cluster
+      `provisioner` tag). Use to segment cost by orchestrator/platform.
+      NULL for clusters without the tag (typically ad-hoc notebook jobs).
     dimension: True
 
   total_runs_7d:

@@ -54,6 +54,8 @@ WITH window_runs AS (
         team_owner,
         cost_center,
         ecosystem,
+        environment,
+        provisioner,
         id_databricks_run,
         id_databricks_task_run,
         id_cluster,
@@ -112,6 +114,8 @@ SELECT
     FIRST(team_owner)                                                                      AS team_owner,
     FIRST(cost_center)                                                                     AS cost_center,
     FIRST(ecosystem)                                                                       AS ecosystem,
+    FIRST(environment)                                                                     AS environment,
+    FIRST(provisioner)                                                                     AS provisioner,
 
     -- ── Volume ──────────────────────────────────────────────────────────────
     COUNT(DISTINCT id_databricks_run)      FILTER (WHERE in_7d_window)                     AS total_runs_7d,

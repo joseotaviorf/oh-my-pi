@@ -18,9 +18,10 @@ dag:
                 steady-state monitoring.
 
       Headline columns (all duplicated `_7d` / `_28d`):
-        - Governance dimensions: team_owner, cost_center, ecosystem
-          (lifted from fact_databricks_task_run; enable per-team /
-          per-cost-center rollups without re-reading the underlying fact)
+        - Governance dimensions: team_owner, cost_center, ecosystem,
+          environment, provisioner (lifted from fact_databricks_task_run;
+          enable per-team / per-cost-center / per-environment rollups
+          without re-reading the underlying fact)
         - Cost: total_dbu_consumed, total_cost_usd, avg_cost_usd_per_run
         - Latency: p50/p95/p99 total_duration_seconds, avg/p95
           setup_duration_seconds, p50/p95 init_script_seconds,

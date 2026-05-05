@@ -3,7 +3,7 @@ dag:
   owner: Data Life Cycle
   documentation:
     dag_purpose: |
-      Per-Airflow-task-run health fact that joins Databricks system tables
+      Per-task-run health fact that joins Databricks system tables
       (system.lakeflow.job_run_timeline, system.lakeflow.job_task_run_timeline,
       system.compute.clusters, system.billing.usage, system.billing.list_prices)
       with the cluster-shape + utilisation slice produced by
@@ -13,17 +13,19 @@ dag:
       for attribution and pricing caveats.
 
       One row per (id_databricks_workspace, id_databricks_run, id_databricks_task_run).
-      Equivalently for the bietlejuice framework: one row per Airflow task
-      instance, since query_delta DAGs use job clusters (1 task = 1 cluster
-      = 1 Databricks job run).
+      Covers all Lakeflow job clusters in the workspace (not only bietlejuice).
+      A Databricks job run typically uses one job cluster shared by all tasks in
+      that run; DBU is summed at cluster level for the load window then split
+      across tasks by wall-clock duration share on that cluster.
 
       Stage-attribution: spark_stage_metrics is keyed by id_spark_app, not
       task_run_id (the event-log path layout doesn't carry task_id). We
       attribute Spark applications to tasks by matching dag_id +
-      spark_app_first_seen ∈ [ts_task_started, ts_task_ended]. Sequential-
-      task DAGs match uniquely; parallel-task DAGs of the same dag_id may
-      match the same spark_app to multiple task windows and the
-      `is_stage_attribution_ambiguous` flag fires.
+      spark_app_first_seen ∈ [ts_task_started, ts_task_ended], using the same
+      COALESCE(application tag, billing job_name, cluster_name) key as
+      `dag_name`. Sequential-task DAGs usually match uniquely; parallel-task
+      DAGs of the same dag_id may match the same spark_app to multiple task
+      windows and the `is_stage_attribution_ambiguous` flag fires.
 
       Supersedes (does NOT yet retire) the cost-related legacy DAGs
       enrich_databricks_usage_costs, enrich_databricks_job_runs and
