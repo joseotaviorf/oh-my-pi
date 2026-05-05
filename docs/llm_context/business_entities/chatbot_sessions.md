@@ -98,6 +98,12 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 - `scores.id_session = sessions.id_langfuse_session`
 - Individual score records before MAP aggregation in `evals`
 
+### Supply Funnel / Isaias (1:N — one Isaias session may match many supply leads)
+
+- `sessions.id_sauron_session = dw_growth.obt_supply.sk_chat_session` (filter `sessions.bot = 'isaias'`)
+- For full supply funnel context, see `business_entities/supply.md`
+- Lead qualification flags: `datalake_chatbot.isaias_conversational_flow.id_langfuse_session = sessions.id_langfuse_session`
+
 ### Support Tickets (1:1 — latest ticket per session)
 
 - `sessions.id_ticket` links to `datalake_customer_support.tickets.id_ticket`

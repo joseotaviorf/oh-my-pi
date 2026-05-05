@@ -30,6 +30,7 @@ Each entity file follows a standard structure:
 - `business_entities/payments.md` — Payment transactions across Checkout, Wall Street, and Vans (pagamentos / cobrança checkout)
 - `business_entities/repairs.md` — Offboarding and ongoing property repairs (reparos)
 - `business_entities/satisfaction.md` — Customer Satisfaction scores across channels (CSAT / satisfação)
+- `business_entities/supply.md` — Property owner acquisition funnel from lead to first listing (captação / supply / aquisição de proprietários)
 - `business_entities/termination.md` — Contract terminations (rescisões / offboarding)
 
 ## Company-Wide Glossary
