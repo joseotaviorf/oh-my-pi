@@ -9,8 +9,7 @@ SELECT
 FROM
     datalake_oitchau_raw.hoursbank_totals
 WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}')
-        AND DATE('{load_end_date}')
+    MAKE_DATE(year, month, day) = DATE_ADD(DATE('{load_start_date}'), 1)
 QUALIFY
     ROW_NUMBER() OVER (
         PARTITION BY uuid, CAST(`date` AS DATE)
