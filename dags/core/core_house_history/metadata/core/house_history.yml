@@ -1,0 +1,129 @@
+database_name: core_house
+table_name: house_history
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
+description: >
+  Historical core model for house properties. Each row represents a single field-level
+  change detected from the CDC transactional layer, using a fixed narrow schema. Tracks
+  the same fields as core_house.house. Owner events are detected from a combined
+  timeline of house CDC + HLR CDC, capturing both usuario_id and HLR relationship changes.
+columns:
+  id_event:
+    lineage:
+      - datalake_ebdb_transactional.imovel.id
+      - datalake_ebdb_transactional.imovel.ts_database_transaction
+    description: Unique event identifier generated as SHA256 hash of id_house, event_name and ts_transaction. Ensures idempotency on re-runs.
+  id_house:
+    lineage:
+      - datalake_ebdb_transactional.imovel.id
+    description: Identifier of the house entity that this event belongs to.
+  sk_core_house:
+    lineage:
+      - datalake_ebdb_transactional.imovel.id
+    description: Surrogate key for the house, generated as SHA256 hash of the literal HOUSE and the house id. Matches sk_core_house in core_house.house.
+  event_name:
+    lineage:
+      - datalake_ebdb_transactional.imovel.externalId
+      - datalake_ebdb_transactional.imovel.regiao_id
+      - datalake_ebdb_transactional.imovel.originalUsuarioQueCadastrou_id
+      - datalake_ebdb_transactional.imovel.usuarioQueCadastrou_id
+      - datalake_ebdb_transactional.imovel.usuario_id
+      - datalake_ebdb_transactional.imovel.endereco
+      - datalake_ebdb_transactional.imovel.numero
+      - datalake_ebdb_transactional.imovel.bairro
+      - datalake_ebdb_transactional.imovel.complemento
+      - datalake_ebdb_transactional.imovel.cep
+      - datalake_ebdb_transactional.imovel.cidade
+      - datalake_ebdb_transactional.imovel.tipo
+      - datalake_ebdb_transactional.imovel.areaTotal
+      - datalake_ebdb_transactional.imovel.lat
+      - datalake_ebdb_transactional.imovel.lng
+      - datalake_ebdb_transactional.imovel.numeroBanheiros
+      - datalake_ebdb_transactional.imovel.numeroQuartos
+      - datalake_ebdb_transactional.imovel.numeroSuites
+      - datalake_ebdb_transactional.imovel.andar
+      - datalake_ebdb_transactional.imovel.dataCriacao
+      - datalake_ebdb_transactional.imovel.atualizadoEm
+      - datalake_ebdb_transactional.imovellistingrelation.relatedId
+      - datalake_ebdb_transactional.imovellistingrelation.relatedAs
+      - datalake_ebdb_transactional.imovellistingrelation.sourceType
+      - datalake_ebdb_transactional.usuario.personuuid
+    description: Name of the event representing the changed column. Default pattern is ev_{target_col} from event_configs.
+    categories:
+      ev_id_external: Change detected in the external identifier (externalId) column.
+      ev_id_region: Change detected in the region identifier (regiao_id) column.
+      ev_id_user_registrant: Change detected in the registrant user identifier, derived as coalesce(originalUsuarioQueCadastrou_id, usuarioQueCadastrou_id) matching core_house logic.
+      ev_id_owner: Change detected in the resolved owner. Computed as coalesce(hlr.relatedId, imovel.usuario_id) where HLR is filtered to PROPERTY_OWNER + MAIN_USER (most recent). Captures both usuario_id mutations and ImovelListingRelation mutations.
+      ev_uuid_owner: Change detected in the owner UUID. Resolved from usuario.personuuid via the current id_owner. Emitted alongside ev_id_owner when the owner identity changes.
+      ev_address: Change detected in the street address (endereco) column.
+      ev_number: Change detected in the street number (numero) column.
+      ev_neighborhood: Change detected in the neighborhood (bairro) column.
+      ev_complement: Change detected in the address complement (complemento) column.
+      ev_zipcode: Change detected in the ZIP/postal code (cep) column.
+      ev_city: Change detected in the city (cidade) column.
+      ev_type: Change detected in the property type (tipo) column.
+      ev_total_area: Change detected in the total area (areaTotal) column.
+      ev_lat: Change detected in the latitude coordinate column.
+      ev_lng: Change detected in the longitude coordinate column.
+      ev_total_bathrooms: Change detected in the total bathrooms (numeroBanheiros) column.
+      ev_total_bedrooms: Change detected in the total bedrooms (numeroQuartos) column.
+      ev_total_suites: Change detected in the total suites (numeroSuites) column.
+      ev_floor: Change detected in the floor level (andar) column.
+      ev_ts_created: Change detected in the creation timestamp (dataCriacao) column.
+      ev_ts_updated: Change detected in the last update timestamp (atualizadoEm) column.
+  event_type:
+    lineage:
+      - datalake_ebdb_transactional.imovel.op_cdc
+      - datalake_ebdb_transactional.imovellistingrelation.op_cdc
+    description: Source type of the event. Currently only CDC is supported; outbox_pattern is reserved for future use.
+    categories:
+      cdc: Event sourced from CDC (Change Data Capture) transactional logs.
+      outbox_pattern: Event sourced from the Outbox pattern (future).
+  value:
+    lineage:
+      - datalake_ebdb_transactional.imovel.externalId
+      - datalake_ebdb_transactional.imovel.regiao_id
+      - datalake_ebdb_transactional.imovel.originalUsuarioQueCadastrou_id
+      - datalake_ebdb_transactional.imovel.usuarioQueCadastrou_id
+      - datalake_ebdb_transactional.imovel.usuario_id
+      - datalake_ebdb_transactional.imovel.endereco
+      - datalake_ebdb_transactional.imovel.numero
+      - datalake_ebdb_transactional.imovel.bairro
+      - datalake_ebdb_transactional.imovel.complemento
+      - datalake_ebdb_transactional.imovel.cep
+      - datalake_ebdb_transactional.imovel.cidade
+      - datalake_ebdb_transactional.imovel.tipo
+      - datalake_ebdb_transactional.imovel.areaTotal
+      - datalake_ebdb_transactional.imovel.lat
+      - datalake_ebdb_transactional.imovel.lng
+      - datalake_ebdb_transactional.imovel.numeroBanheiros
+      - datalake_ebdb_transactional.imovel.numeroQuartos
+      - datalake_ebdb_transactional.imovel.numeroSuites
+      - datalake_ebdb_transactional.imovel.andar
+      - datalake_ebdb_transactional.imovel.dataCriacao
+      - datalake_ebdb_transactional.imovel.atualizadoEm
+      - datalake_ebdb_transactional.imovellistingrelation.relatedId
+      - datalake_ebdb_transactional.usuario.personuuid
+    description: New value of the changed column, cast to string.
+  payload:
+    description: Event payload with additional context. NULL for CDC sources; reserved for future outbox_pattern use.
+  ts_transaction:
+    lineage:
+      - datalake_ebdb_transactional.imovel.ts_database_transaction
+    description: Exact timestamp of the change in the source database, from the CDC transactional layer.
+  event_origin:
+    description: Fully qualified name of the source table that generated the change event.
+  ts_load:
+    description: Timestamp of when the record was loaded into the historical core model.
+  year:
+    lineage:
+      - datalake_ebdb_transactional.imovel.ts_database_transaction
+    description: Year extracted from ts_transaction for partitioning.
+  month:
+    lineage:
+      - datalake_ebdb_transactional.imovel.ts_database_transaction
+    description: Month extracted from ts_transaction for partitioning.
+  day:
+    lineage:
+      - datalake_ebdb_transactional.imovel.ts_database_transaction
+    description: Day extracted from ts_transaction for partitioning.

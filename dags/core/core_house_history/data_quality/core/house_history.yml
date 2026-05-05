@@ -1,0 +1,59 @@
+---
+table_name: core_house.house_history
+alert_channel: GCHAT_CORE_MODEL_SCHEMA_VALIDATION
+is_incremental:
+  incremental_date_column: ts_transaction
+  incremental_date_mask: yyyy-MM-dd
+column_level_validations:
+  id_event:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  sk_core_house:
+    is_complete:
+      severity_level: Error
+  event_name:
+    is_complete:
+      severity_level: Error
+    is_in:
+      severity_level: Error
+      values:
+        - ev_id_external
+        - ev_id_region
+        - ev_id_user_registrant
+        - ev_id_owner
+        - ev_uuid_owner
+        - ev_address
+        - ev_number
+        - ev_neighborhood
+        - ev_complement
+        - ev_zipcode
+        - ev_city
+        - ev_type
+        - ev_total_area
+        - ev_lat
+        - ev_lng
+        - ev_total_bathrooms
+        - ev_total_bedrooms
+        - ev_total_suites
+        - ev_floor
+        - ev_ts_created
+        - ev_ts_updated
+  event_type:
+    is_complete:
+      severity_level: Error
+    is_in:
+      severity_level: Error
+      values:
+        - cdc
+        - outbox_pattern
+  ts_transaction:
+    is_complete:
+      severity_level: Error
+  event_origin:
+    is_complete:
+      severity_level: Error

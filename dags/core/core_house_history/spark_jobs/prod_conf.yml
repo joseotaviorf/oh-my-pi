@@ -1,0 +1,64 @@
+ENTITY_TYPE: "HOUSE"
+HOUSE_TRANSACTIONAL_TABLE: "datalake_ebdb_transactional.imovel"
+HLR_TRANSACTIONAL_TABLE: "datalake_ebdb_transactional.imovellistingrelation"
+USER_TRANSACTIONAL_TABLE: "datalake_ebdb_transactional.usuario"
+merge_on_historical: ["id_house", "event_name", "ts_transaction", "year", "month", "day"]
+when_matched_update_condition_historical: "FALSE"
+event_configs:
+  - tracked_col: externalId
+    target_col: id_external
+    target_type: string
+  - tracked_col: regiao_id
+    target_col: id_region
+    target_type: bigint
+  - tracked_col: id_user_registrant
+    target_col: id_user_registrant
+    target_type: bigint
+  - tracked_col: endereco
+    target_col: address
+    target_type: string
+  - tracked_col: numero
+    target_col: number
+    target_type: string
+  - tracked_col: bairro
+    target_col: neighborhood
+    target_type: string
+  - tracked_col: complemento
+    target_col: complement
+    target_type: string
+  - tracked_col: cep
+    target_col: zipcode
+    target_type: string
+  - tracked_col: cidade
+    target_col: city
+    target_type: string
+  - tracked_col: tipo
+    target_col: type
+    target_type: string
+  - tracked_col: areaTotal
+    target_col: total_area
+    target_type: int
+  - tracked_col: lat
+    target_col: lat
+    target_type: decimal
+  - tracked_col: lng
+    target_col: lng
+    target_type: decimal
+  - tracked_col: numeroBanheiros
+    target_col: total_bathrooms
+    target_type: int
+  - tracked_col: numeroQuartos
+    target_col: total_bedrooms
+    target_type: int
+  - tracked_col: numeroSuites
+    target_col: total_suites
+    target_type: int
+  - tracked_col: andar
+    target_col: floor
+    target_type: int
+  - tracked_col: dataCriacao
+    target_col: ts_created
+    target_type: timestamp
+  - tracked_col: atualizadoEm
+    target_col: ts_updated
+    target_type: timestamp
