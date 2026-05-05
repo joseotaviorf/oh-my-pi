@@ -316,8 +316,8 @@ SELECT
     )                                                              AS databricks_run_url,
 
     lcs.tags['application']                                        AS dag_name,
-    lcs.tags['dag_id']                                             AS airflow_dag_id,
-    lcs.tags['task_id']                                            AS airflow_task_id,
+    lcs.tags['application']                                        AS airflow_dag_id,
+    s.task_key                                                     AS airflow_task_id,
     -- Governance / attribution tags. Set by the bietlejuice cluster builder; surfaced
     -- here as first-class columns so cost dashboards can group by team / cost center
     -- without re-parsing custom_tags. See `bietlejuice/prod_conf.yml` and `forno_conf.yml`
