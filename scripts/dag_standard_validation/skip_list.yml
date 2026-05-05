@@ -47,6 +47,7 @@ dags_not_using_builder:
   - support_and_service/chattermill/chattermill.py
   - support_and_service/salesforce_cdc/salesforce_cdc.py
   - platform/datahub_connection_test/datahub_connection_test.py
+  - support_and_service/salesforce_marketing_cloud/salesforce_marketing_cloud.py
   - platform/trigger_datasets/trigger_datasets.py
   - platform/reset_datasets/reset_datasets.py
   - tech_platform/dw_devlake/tools/generate_lineage_diagram.py

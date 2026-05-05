@@ -7,6 +7,7 @@ bs4==0.0.1
 businesstimedelta==1.0.1
 Click==7.0
 deepmerge==0.3.0
+defusedxml>=0.7.1
 delta-spark==2.3.0
 dependency-injector==4.46.0
 deprecated==1.2.10

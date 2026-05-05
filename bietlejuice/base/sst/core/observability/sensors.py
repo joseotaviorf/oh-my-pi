@@ -48,17 +48,22 @@ def sensor_table_exists(spark, table_name, fail=True):
     return True
 
 
-def partition_has_data(spark, table_name, partition_date, partition_hour):
+def partition_has_data(spark, table_name, partition_date, partition_hour=None):
     if not _table_exists(spark, table_name):
         return False
 
-    rows = (
-        spark.read.table(table_name)
-        .where(F.col("partition_date") == F.lit(partition_date))
-        .where(F.col("partition_hour") == F.lit(partition_hour))
-        .count()
-    )
-    return rows > 0
+    target_df = spark.read.table(table_name)
+    if "partition_date" not in target_df.columns:
+        return False
+
+    filtered = target_df.where(F.col("partition_date") == F.lit(partition_date))
+
+    if partition_hour is not None:
+        if "partition_hour" not in target_df.columns:
+            return False
+        filtered = filtered.where(F.col("partition_hour") == F.lit(partition_hour))
+
+    return filtered.count() > 0
 
 
 @logger(exclude_return=True)

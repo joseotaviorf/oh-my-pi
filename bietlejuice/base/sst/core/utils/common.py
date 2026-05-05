@@ -588,3 +588,17 @@ def retrieve_spark_session(job_name: str) -> SparkSession:
         .config("spark.hadoop.fs.s3a.socket.timeout", "20000")
         .getOrCreate()
     )
+
+
+@logger(exclude=["spark"], exclude_return=True)
+def validate_partition_readability(
+    spark,
+    target_table: str,
+    partition_date: str,
+) -> None:
+    (
+        spark.read.table(target_table)
+        .where(F.col("partition_date") == F.lit(partition_date))
+        .limit(1)
+        .collect()
+    )

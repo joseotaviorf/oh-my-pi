@@ -1,0 +1,25 @@
+dag_documentation:
+  dag_purpose:
+    "Salesforce Marketing Cloud ingestion DAG responsible for loading Sonia's SFMC Data Extensions to the raw layer."
+datalake_bucket: "5a-datalake-prod"
+raw_schema: "datalake_sfmc_raw"
+clean_schema: "datalake_sfmc_clean"
+objects_config:
+  sonia_closing_sendable:
+    external_identifier: "D7673084-AAF7-4F9C-8E9B-A5BE7EA45E42"
+  sonia_ep2ds:
+    external_identifier: "F0019893-5D1D-4462-8CB7-03D0B1980A47"
+custom_cluster:
+  driver_node_type_id: r5.large
+  node_type_id: r5.large
+  num_workers: 1
+  spark_version: 16.4.x-scala2.12
+  spark_conf:
+    spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
+    spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
+    spark.executor.heartbeatInterval: "100s"
+    spark.network.timeout: "600s"
+    spark.metrics.appStatusSource.enabled: "true"
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
