@@ -1,7 +1,6 @@
 dag:
   name: enrich_databricks_health
   owner: Data Life Cycle
-  schedule_interval: null
   documentation:
     dag_purpose: |
       Daily per-cluster health snapshot derived exclusively from Databricks

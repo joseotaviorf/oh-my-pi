@@ -1,7 +1,6 @@
 dag:
   name: dw_databricks_health
   owner: Data Life Cycle
-  schedule_interval: null
   documentation:
     dag_purpose: |
       Per-Airflow-task-run health fact that joins Databricks system tables

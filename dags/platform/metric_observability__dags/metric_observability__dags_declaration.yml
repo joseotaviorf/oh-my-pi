@@ -1,7 +1,6 @@
 dag:
   name: metric_observability__dags
   schedule_start_date: 2026,04,18
-  schedule_interval: null
   owner: Data Life Cycle
   documentation:
     dag_purpose: |

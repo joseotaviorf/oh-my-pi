@@ -1,7 +1,7 @@
 dag:
   name: enrich_databricks_query_history
   owner: Data Life Cycle
-  schedule_interval: null
+  schedule_interval: "0 0 * * *"
   documentation:
     dag_purpose: |
       Daily snapshot of every SQL statement executed against Databricks
