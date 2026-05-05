@@ -90,7 +90,7 @@ columns:
     description: |
       Click-through URL to the Databricks UI for the parent run
       (`<workspace_host>/jobs/<job_id>/runs/<run_id>`). Per-workspace mapping
-      mirrors `dags/platform/enrich_databricks/spark_jobs/{prod,forno}_conf.yml`.
+      mirrors `dags/platform/enrich_databricks/spark_jobs/prod_conf.yml` and `forno_conf.yml`.
       Falls back to the Databricks accounts portal for unknown workspace IDs.
     lineage:
       - system.lakeflow.job_task_run_timeline.workspace_id

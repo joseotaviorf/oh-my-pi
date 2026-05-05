@@ -302,7 +302,7 @@ SELECT
     s.task_key                                                     AS id_databricks_task_key,
     s.cluster_id                                                   AS id_cluster,
     -- Click-through URL to the Databricks UI for this run. Per-workspace mapping
-    -- mirrors `dags/platform/enrich_databricks/spark_jobs/{prod,forno}_conf.yml`.
+    -- mirrors `dags/platform/enrich_databricks/spark_jobs/prod_conf.yml` and `forno_conf.yml`.
     -- New workspaces should be added to that yaml AND here in the same PR.
     CONCAT(
         CASE s.workspace_id
@@ -320,7 +320,7 @@ SELECT
     lcs.tags['task_id']                                            AS airflow_task_id,
     -- Governance / attribution tags. Set by the bietlejuice cluster builder; surfaced
     -- here as first-class columns so cost dashboards can group by team / cost center
-    -- without re-parsing custom_tags. See bietlejuice/{prod,forno}_conf.yml
+    -- without re-parsing custom_tags. See `bietlejuice/prod_conf.yml` and `forno_conf.yml`
     -- (cluster_anchor_base.custom_tags) for the canonical source.
     lcs.tags['owner']                                              AS team_owner,
     lcs.tags['cost-center']                                        AS cost_center,
