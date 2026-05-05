@@ -1,4 +1,14 @@
-WITH inspections AS (
+WITH filter_type_tenant AS (
+    SELECT 'RESIDENT' AS val UNION ALL
+    SELECT 'TENANT' AS val UNION ALL
+    SELECT 'MORADOR' AS val UNION ALL
+    SELECT 'INQUILINO' AS val
+),
+filter_type_owner AS (
+    SELECT 'PROPRIETARIO' AS val UNION ALL
+    SELECT 'OWNER' AS val
+),
+inspections AS (
     SELECT DISTINCT
         id_inspection,
         id_client_side,
@@ -20,28 +30,28 @@ review_events AS (
         ia.id_client_side,
         ia.id_contract,
         ia.inspection_type,
-        COALESCE(SUM(CAST(insp.user_type = 'Proprietario' AS SMALLINT)), 0) AS total_owner_access_review,
-        COALESCE(MAX(insp.user_type = 'Proprietario'), FALSE) AS has_owner_access_review,
-        COALESCE(SUM(CAST(insp.user_type IN ('Inquilino', 'Morador') AS SMALLINT)), 0) AS total_tenant_access_review,
-        COALESCE(MAX(insp.user_type IN ('Inquilino', 'Morador')), FALSE) AS has_tenant_access_review,
+        COALESCE(SUM(CAST(UPPER(insp.user_type) IN (SELECT val FROM filter_type_owner) AS SMALLINT)), 0) AS total_owner_access_review,
+        COALESCE(MAX(UPPER(insp.user_type) IN (SELECT val FROM filter_type_owner)), FALSE) AS has_owner_access_review,
+        COALESCE(SUM(CAST(UPPER(insp.user_type) IN (SELECT val FROM filter_type_tenant) AS SMALLINT)), 0) AS total_tenant_access_review,
+        COALESCE(MAX(UPPER(insp.user_type) IN (SELECT val FROM filter_type_tenant)), FALSE) AS has_tenant_access_review,
         MIN(
             CASE
-            WHEN insp.user_type = 'Proprietario' THEN insp.ts_event
+                WHEN UPPER(insp.user_type) IN (SELECT val FROM filter_type_owner) THEN insp.ts_event
             END
         ) AS ts_first_owner_access_review,
         MAX(
             CASE
-                WHEN insp.user_type = 'Proprietario' THEN insp.ts_event
+                WHEN UPPER(insp.user_type) IN (SELECT val FROM filter_type_owner) THEN insp.ts_event
             END
         ) AS ts_last_owner_access_review,
         MIN(
             CASE
-            WHEN insp.user_type IN ('Inquilino', 'Morador') THEN insp.ts_event
+                WHEN UPPER(insp.user_type) IN (SELECT val FROM filter_type_tenant) THEN insp.ts_event
             END
         ) AS ts_first_tenant_access_review,
         MAX(
             CASE
-                WHEN insp.user_type IN ('Inquilino', 'Morador') THEN insp.ts_event
+                WHEN UPPER(insp.user_type) IN (SELECT val FROM filter_type_tenant) THEN insp.ts_event
             END
         ) AS ts_last_tenant_access_review,
         ia.ts_created AS ts_inspection_created,
@@ -63,28 +73,28 @@ budget_approval_events AS (
         ia.id_client_side,
         ia.id_contract,
         ia.inspection_type,
-        COALESCE(SUM(CAST(ba.user_type in ('Proprietario','OWNER') AS SMALLINT)), 0) AS total_owner_access_budget_approval,
-        COALESCE(MAX(ba.user_type  IN ('Proprietario','OWNER')), FALSE) AS has_owner_access_budget_approval,
-        COALESCE(SUM(CAST(ba.user_type IN ('RESIDENT','TENANT','Morador','Inquilino') AS SMALLINT)), 0) AS total_tenant_access_budget_approval,
-        COALESCE(MAX(ba.user_type IN('RESIDENT','TENANT','Morador','Inquilino')), FALSE) AS has_tenant_access_budget_approval,
+        COALESCE(SUM(CAST(UPPER(ba.user_type) IN (SELECT val FROM filter_type_owner) AS SMALLINT)), 0) AS total_owner_access_budget_approval,
+        COALESCE(MAX(UPPER(ba.user_type) IN (SELECT val FROM filter_type_owner)), FALSE) AS has_owner_access_budget_approval,
+        COALESCE(SUM(CAST(UPPER(ba.user_type) IN (SELECT val FROM filter_type_tenant) AS SMALLINT)), 0) AS total_tenant_access_budget_approval,
+        COALESCE(MAX(UPPER(ba.user_type) IN (SELECT val FROM filter_type_tenant)), FALSE) AS has_tenant_access_budget_approval,
         MIN(
             CASE
-            WHEN ba.user_type in ('Proprietario','OWNER') THEN ba.ts_event
+                WHEN UPPER(ba.user_type) IN (SELECT val FROM filter_type_owner) THEN ba.ts_event
             END
         ) AS ts_first_owner_access_budget_approval,
         MAX(
             CASE
-                WHEN ba.user_type in ('Proprietario','OWNER') THEN ba.ts_event
+                WHEN UPPER(ba.user_type) IN (SELECT val FROM filter_type_owner) THEN ba.ts_event
             END
         ) AS ts_last_owner_access_budget_approval,
         MIN(
             CASE
-            WHEN ba.user_type IN ('RESIDENT','TENANT','Morador','Inquilino') THEN ba.ts_event
+                WHEN UPPER(ba.user_type) IN (SELECT val FROM filter_type_tenant) THEN ba.ts_event
             END
         ) AS ts_first_tenant_access_budget_approval,
         MAX(
             CASE
-                WHEN ba.user_type IN ('RESIDENT','TENANT','Morador','Inquilino') THEN ba.ts_event
+                WHEN UPPER(ba.user_type) IN (SELECT val FROM filter_type_tenant) THEN ba.ts_event
             END
         ) AS ts_last_tenant_access_budget_approval,
         ia.ts_created AS ts_inspection_created,
