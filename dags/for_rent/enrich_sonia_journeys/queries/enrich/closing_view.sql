@@ -99,6 +99,7 @@ SELECT
   s.user_role,
   s.uuid_person,
   u.id AS id_user,
+  u.email AS user_email,
   coalesce(cp.number_of_signatories, 0) AS number_of_signatories,
   abs(crc32(encode(concat(CAST(s.id_house AS STRING), '-', s.uuid_tenant), 'utf-8'))) % 100 AS binning_value,
   s.id_contract % 100 AS binning_value_contract_id
