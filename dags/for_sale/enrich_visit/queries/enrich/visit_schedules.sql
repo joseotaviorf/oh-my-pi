@@ -20,6 +20,11 @@ WITH schedule AS (
       ) AS channel_creation,
       MAX(
         CASE
+          WHEN vse.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vse.channel_unified
+        END
+      ) AS channel_creation_unified,
+      MAX(
+        CASE
           WHEN vse.event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED') THEN vse.application_source
         END
       ) AS application_source_creation,
@@ -53,6 +58,7 @@ WITH schedule AS (
         ELSE 'REQUEST'
       END AS schedule_origin,
       MIN_BY(vse.channel, vse.ts_created) FILTER (WHERE vse.event_type = 'VISIT_CONFIRMED') AS first_confirmed_channel,
+      MIN_BY(vse.channel_unified, vse.ts_created) FILTER (WHERE vse.event_type = 'VISIT_CONFIRMED') AS first_confirmed_channel_unified,
       MIN_BY(vse.author_user_role, vse.ts_created) FILTER (WHERE vse.event_type = 'VISIT_CONFIRMED') AS first_confirmed_user_role,
       MAX_BY(vse.event_type, vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'SUPPLY') AS last_confirm_answer_supply,
       MAX_BY(vse.event_type, vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_PENDING', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'DEMAND') AS last_confirm_answer_demand,
@@ -61,7 +67,11 @@ WITH schedule AS (
       MAX_BY(vse.channel, vse.ts_created) FILTER (WHERE vse.event_type = 'ANSWER_CONFIRMED' AND vse.on_behalf_of = 'SUPPLY') AS channel_confirmed_supply,
       MAX_BY(vse.channel, vse.ts_created) FILTER (WHERE vse.event_type = 'ANSWER_CONFIRMED' AND vse.on_behalf_of = 'DEMAND') AS channel_confirmed_demand,
       MAX_BY(vse.channel, vse.ts_created) FILTER (WHERE vse.event_type = 'ANSWER_CONFIRMED' AND vse.on_behalf_of = 'AGENT') AS channel_confirmed_agent,
-      MAX_BY(vse.channel, vse.ts_created) FILTER (WHERE vse.event_type = 'ANSWER_CONFIRMED' AND vse.on_behalf_of = 'TENANT_LIVING') AS channel_confirmed_tenant_living
+      MAX_BY(vse.channel, vse.ts_created) FILTER (WHERE vse.event_type = 'ANSWER_CONFIRMED' AND vse.on_behalf_of = 'TENANT_LIVING') AS channel_confirmed_tenant_living,
+      MAX_BY(vse.channel_unified, vse.ts_created) FILTER (WHERE vse.event_type = 'ANSWER_CONFIRMED' AND vse.on_behalf_of = 'SUPPLY') AS channel_confirmed_supply_unified,
+      MAX_BY(vse.channel_unified, vse.ts_created) FILTER (WHERE vse.event_type = 'ANSWER_CONFIRMED' AND vse.on_behalf_of = 'DEMAND') AS channel_confirmed_demand_unified,
+      MAX_BY(vse.channel_unified, vse.ts_created) FILTER (WHERE vse.event_type = 'ANSWER_CONFIRMED' AND vse.on_behalf_of = 'AGENT') AS channel_confirmed_agent_unified,
+      MAX_BY(vse.channel_unified, vse.ts_created) FILTER (WHERE vse.event_type = 'ANSWER_CONFIRMED' AND vse.on_behalf_of = 'TENANT_LIVING') AS channel_confirmed_tenant_living_unified
     FROM
       datalake_visit.visit_status_events AS vse
     JOIN
@@ -102,8 +112,10 @@ WITH schedule AS (
     NULL AS slot_schedule,
     user_role_creator,
     first_confirmed_channel,
+    first_confirmed_channel_unified,
     first_confirmed_user_role,
     channel_creation,
+    channel_creation_unified,
     application_source_creation,
     NULL AS dt_schedule_visit,
     ts_event_tenant,
@@ -122,7 +134,11 @@ WITH schedule AS (
     channel_confirmed_supply,
     channel_confirmed_demand,
     channel_confirmed_agent,
-    channel_confirmed_tenant_living
+    channel_confirmed_tenant_living,
+    channel_confirmed_supply_unified,
+    channel_confirmed_demand_unified,
+    channel_confirmed_agent_unified,
+    channel_confirmed_tenant_living_unified
   FROM
     new
   UNION ALL
@@ -134,8 +150,10 @@ WITH schedule AS (
     slot_schedule,
     NULL AS user_role_creator,
     NULL AS first_confirmed_channel,
+    NULL AS first_confirmed_channel_unified,
     NULL AS first_confirmed_user_role,
     NULL AS channel_creation,
+    NULL AS channel_creation_unified,
     NULL AS application_source_creation,
     dt_schedule_visit,
     NULL AS ts_event_tenant,
@@ -154,7 +172,11 @@ WITH schedule AS (
     NULL AS channel_confirmed_supply,
     NULL AS channel_confirmed_demand,
     NULL AS channel_confirmed_agent,
-    NULL AS channel_confirmed_tenant_living
+    NULL AS channel_confirmed_tenant_living,
+    NULL AS channel_confirmed_supply_unified,
+    NULL AS channel_confirmed_demand_unified,
+    NULL AS channel_confirmed_agent_unified,
+    NULL AS channel_confirmed_tenant_living_unified
   FROM
     old
 ),
@@ -197,8 +219,10 @@ schedule_enriched AS (
     schedule.id_user_creator,
     schedule.user_role_creator,
     schedule.first_confirmed_channel,
+    schedule.first_confirmed_channel_unified,
     schedule.first_confirmed_user_role,
     schedule.channel_creation,
+    schedule.channel_creation_unified,
     schedule.application_source_creation,
     schedule.ts_event_tenant,
     schedule.ts_schedule_created,
@@ -216,6 +240,10 @@ schedule_enriched AS (
     schedule.channel_confirmed_demand,
     schedule.channel_confirmed_agent,
     schedule.channel_confirmed_tenant_living,
+    schedule.channel_confirmed_supply_unified,
+    schedule.channel_confirmed_demand_unified,
+    schedule.channel_confirmed_agent_unified,
+    schedule.channel_confirmed_tenant_living_unified,
     CASE
       WHEN schedule.source_schedule = 'NEW' THEN va.ts_visit
       WHEN schedule.source_schedule = 'OLD' THEN MAKE_TIMESTAMP(EXTRACT(YEAR FROM schedule.dt_schedule_visit), EXTRACT(MONTH FROM schedule.dt_schedule_visit), EXTRACT(DAY FROM schedule.dt_schedule_visit), (schedule.slot_schedule/4) + 11, (schedule.slot_schedule%4)*15, 0)
@@ -274,9 +302,11 @@ SELECT DISTINCT
   END AS visit_model,
   s.schedule_origin,
   s.channel_creation,
+  s.channel_creation_unified,
   s.application_source_creation,
   NULLIF(CONCAT_WS(' - ', s.channel_creation, s.application_source_creation),'') AS source_creation_unified,
   s.first_confirmed_channel,
+  s.first_confirmed_channel_unified,
   s.first_confirmed_user_role,
   s.last_confirm_answer_supply,
   s.last_confirm_answer_demand,
@@ -286,6 +316,10 @@ SELECT DISTINCT
   s.channel_confirmed_demand,
   s.channel_confirmed_agent,
   s.channel_confirmed_tenant_living,
+  s.channel_confirmed_supply_unified,
+  s.channel_confirmed_demand_unified,
+  s.channel_confirmed_agent_unified,
+  s.channel_confirmed_tenant_living_unified,
   CASE
     WHEN s.last_confirm_answer_supply = 'ANSWER_CONFIRMED' THEN TRUE
     WHEN s.last_confirm_answer_supply IN ('ANSWER_PENDING', 'ANSWER_REJECTED') THEN FALSE

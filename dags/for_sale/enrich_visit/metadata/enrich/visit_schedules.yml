@@ -124,6 +124,10 @@ columns:
     lineage:
       - datalake_visit.visit_status_events.channel
     description: Channel from first event of schedule (VISIT_REQUESTED or VISIT_RESCHEDULED). Data since 2024-11.
+  channel_creation_unified:
+    lineage:
+      - datalake_visit.visit_status_events.channel_unified
+    description: Unified channel from first event of schedule (VISIT_REQUESTED or VISIT_RESCHEDULED). Data since 2024-11.
   application_source_creation:
     lineage:
       - datalake_visit.visit_status_events.application_source
@@ -137,6 +141,10 @@ columns:
     lineage:
       - datalake_visit.visit_status_events.channel
     description: Channel from first confirmation of schedule. Data since 2024-11.
+  first_confirmed_channel_unified:
+    lineage:
+      - datalake_visit.visit_status_events.channel_unified
+    description: Unified channel from first confirmation of schedule. Data since 2024-11.
   first_confirmed_user_role:
     lineage:
       - datalake_visit.visit_status_events.author_user_role
@@ -166,13 +174,37 @@ columns:
       ANSWER_PENDING: Tenant's answer is pending for scheduling.
       ANSWER_REJECTED: Tenant's answer is rejected for scheduling.
   channel_confirmed_supply:
+    lineage:
+      - datalake_visit.visit_status_events.channel
     description: Channel from supply's confirmation of schedule. Data since 2024-11.
   channel_confirmed_demand:
+    lineage:
+      - datalake_visit.visit_status_events.channel
     description: Channel from demand's confirmation of schedule. Data since 2024-11.
   channel_confirmed_agent:
+    lineage:
+      - datalake_visit.visit_status_events.channel
     description: Channel from agent's confirmation of schedule. Data since 2024-11.
   channel_confirmed_tenant_living:
+    lineage:
+      - datalake_visit.visit_status_events.channel
     description: Channel from tenant's confirmation of schedule. Data since 2024-11.
+  channel_confirmed_supply_unified:
+    lineage:
+      - datalake_visit.visit_status_events.channel_unified
+    description: Unified channel from supply's confirmation of schedule. Data since 2024-11.
+  channel_confirmed_demand_unified:
+    lineage:
+      - datalake_visit.visit_status_events.channel_unified
+    description: Unified channel from demand's confirmation of schedule. Data since 2024-11.
+  channel_confirmed_agent_unified:
+    lineage:
+      - datalake_visit.visit_status_events.channel_unified
+    description: Unified channel from agent's confirmation of schedule. Data since 2024-11.
+  channel_confirmed_tenant_living_unified:
+    lineage:
+      - datalake_visit.visit_status_events.channel_unified
+    description: Unified channel from tenant's confirmation of schedule. Data since 2024-11.
   is_confirmed_by_supply:
     description: TRUE if the schedule is confirmed by supply. Data since 2024-11.
   is_confirmed_by_demand:

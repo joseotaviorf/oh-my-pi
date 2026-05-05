@@ -1,28 +1,16 @@
-WITH vsl AS (
+WITH request_logs as (
   SELECT
-    id_visit_status_log,
-    id_visit,
-    id_schedule,
-    id_author_user,
-    author_user_type,
-    author_user_role,
-    on_behalf_of,
-    channel,
-    application_source,
-    reason,
-    event_type,
-    ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created ASC) AS ranking,
-    CASE
-      WHEN ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created DESC) == 1 THEN TRUE
-      ELSE FALSE
-    END AS is_visit_last_event,
-    ts_created,
-    ts_updated
+    visit_code,
+    host,
+    ts_request
   FROM
-    datalake_ebdb_clean.visit_status_log
-)
+    datalake_request_logging_clean.visits
+  WHERE
+    ts_request::date >= '2026-04-29'
+    AND status_code = 200
+),
+vsl AS (
   SELECT
-    CONCAT(vsl.id_visit_status_log,'R',vsl.ranking) AS id_visit_status_events,
     vsl.id_visit_status_log,
     vsl.id_visit,
     vsl.id_schedule,
@@ -30,6 +18,55 @@ WITH vsl AS (
     v.id_visitor,
     v.id_agent,
     v.id_house,
+    v.business_context,
+    vsl.author_user_type,
+    vsl.author_user_role,
+    vsl.on_behalf_of,
+    vsl.channel,
+    CASE -- We will hard coded the channels until we have the channel in the request logging since the current data has fixed channels
+      WHEN rl.host = 'wall_e' THEN 'NATIVE_WALLE'
+      WHEN rl.host = 'concierge' THEN 'WHATSAPP_CONCIERGE'
+      WHEN rl.host = 'sonia' THEN 'WHATSAPP_SONIA'
+      ELSE UPPER(rl.host)
+    END AS host_unified,
+    CASE
+      WHEN vsl.channel IN ('NATIVE_WALLE', 'WHATSAPP_CONCIERGE', 'WHATSAPP_SONIA') THEN CONCAT('CONVERSATIONAL - ', vsl.channel) -- Unified the old IA channels with the new unified channels
+      WHEN vsl.channel = 'CONVERSATIONAL' THEN CONCAT_WS(' - ', vsl.channel, host_unified) -- Enrich the channel with the host unified
+      ELSE vsl.channel -- Keep the channel as is for other channels (not conversational)
+    END AS channel_unified,
+    vsl.application_source,
+    vsl.reason,
+    vsl.event_type,
+    ROW_NUMBER() OVER(PARTITION BY vsl.id_visit ORDER BY vsl.ts_created ASC) AS ranking,
+    CASE
+      WHEN ROW_NUMBER() OVER(PARTITION BY vsl.id_visit ORDER BY vsl.ts_created DESC) == 1 THEN TRUE
+      ELSE FALSE
+    END AS is_visit_last_event,
+    vsl.ts_created,
+    v.ts_created AS ts_visit_created,
+    vsl.ts_updated
+  FROM
+    datalake_ebdb_clean.visit_status_log AS vsl
+  JOIN
+    datalake_ebdb_clean.visit AS v
+      ON v.id = vsl.id_visit
+  LEFT JOIN
+    request_logs AS rl
+      ON rl.visit_code = v.code
+      AND ABS(DATE_DIFF(SECOND, rl.ts_request, vsl.ts_created)) < 1
+      AND vsl.channel = 'CONVERSATIONAL'
+  WHERE
+    DATE(v.ts_created) >= '2024-11-01'
+)
+  SELECT
+    CONCAT(vsl.id_visit_status_log,'R',vsl.ranking) AS id_visit_status_events,
+    vsl.id_visit_status_log,
+    vsl.id_visit,
+    vsl.id_schedule,
+    vsl.id_author_user,
+    vsl.id_visitor,
+    vsl.id_agent,
+    vsl.id_house,
     COALESCE(hl.id_house_listing, -1) AS id_house_listing,
     lh.id_user AS id_owner,
     -1 AS id_rent_flow,
@@ -40,13 +77,14 @@ WITH vsl AS (
     vbm.id_company_supply,
     vbm.id_company_demand,
     lh.uuid_company AS uuid_company_supply,
-    v.business_context,
+    vsl.business_context,
     vsl.event_type,
     vsl.ranking,
     vsl.author_user_type,
     vsl.author_user_role,
     vsl.on_behalf_of,
     vsl.channel,
+    vsl.channel_unified,
     vsl.application_source,
     vsl.reason,
     vbm.partner_3p_supply,
@@ -60,20 +98,15 @@ WITH vsl AS (
     vsl.ts_created,
     vsl.ts_updated
   FROM
-    datalake_ebdb_clean.visit AS v
-  INNER JOIN
     vsl
-      ON  v.id = vsl.id_visit
   INNER JOIN
     datalake_ebdb_listing.house lh
-      ON lh.id = v.id_house
+      ON lh.id = vsl.id_house
   LEFT JOIN
     datalake_ebdb_listing.house_listing AS hl
-      ON v.id_house = hl.id_house
-      AND DATE(v.ts_created) >= DATE(hl.ts_listing_version_start)
-      AND (DATE(v.ts_created) < DATE(hl.ts_listing_version_end) OR hl.ts_listing_version_end IS NULL)
+      ON vsl.id_house = hl.id_house
+      AND DATE(vsl.ts_visit_created) >= DATE(hl.ts_listing_version_start)
+      AND (DATE(vsl.ts_visit_created) < DATE(hl.ts_listing_version_end) OR hl.ts_listing_version_end IS NULL)
   LEFT JOIN
     datalake_visit.visit_business_model AS vbm
-      ON v.id = vbm.id_visit
-  WHERE
-    DATE(v.ts_created) >= '2024-11-01'
+      ON vsl.id_visit = vbm.id_visit

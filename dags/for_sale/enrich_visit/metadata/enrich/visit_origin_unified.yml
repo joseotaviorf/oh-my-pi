@@ -15,6 +15,11 @@ columns:
       - datalake_ebdb_clean.visit_origin.name
       - datalake_visit.visit_status_events.channel
     description: Channel of the visit origin (request event).
+  visit_request_channel_unified:
+    lineage:
+      - datalake_ebdb_clean.visit_origin.name
+      - datalake_visit.visit_status_events.channel_unified
+    description: Unified channel of the visit origin (request event). The channel is enriched with the host from the request logging in the conversational case.
   ts_visit_requested:
     lineage:
       - datalake_ebdb_clean.visit.ts_created

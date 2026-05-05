@@ -128,6 +128,11 @@ columns:
     lineage:
       - datalake_ebdb_clean.visit_status_log.channel
     description: Visit channel
+  channel_unified:
+    lineage:
+      - datalake_visit.visit_status_log.channel
+      - datalake_request_logging_clean.visits.host
+    description: Unified channel of the event. The channel is enriched with the host from the request logging in the conversational case.
   application_source:
     lineage:
       - datalake_ebdb_clean.visit_status_log.application_source

@@ -25,6 +25,11 @@ columns:
       - datalake_visit.visit_status_events.channel
       - datalake_ebdb_clean.visit_cancellation_details.channel
     description: The channel through which the visit was cancelled. Data since 2024-05.
+  channel_unified:
+    lineage:
+      - datalake_visit.visit_status_events.channel_unified
+      - datalake_ebdb_clean.visit_cancellation_details.channel
+    description: Unified channel of the cancellation. The channel is enriched with the host from the request logging in the conversational case.
   on_behalf_of:
     lineage:
       - datalake_visit.visit_status_events.on_behalf_of

@@ -17,6 +17,7 @@ WITH
                 MIN(vse.ts_created) FILTER (WHERE vse.event_type = 'VISIT_CONFIRMED') AS ts_visit_first_confirmed,
                 MAX(vse.ts_created) FILTER (WHERE vse.event_type = 'VISIT_CONFIRMED') AS ts_visit_last_confirmed,
                 MIN_BY(vse.channel, vse.ts_created) FILTER (WHERE vse.event_type = 'VISIT_CONFIRMED') AS visit_first_confirmed_channel,
+                MIN_BY(vse.channel_unified, vse.ts_created) FILTER (WHERE vse.event_type = 'VISIT_CONFIRMED') AS visit_first_confirmed_channel_unified,
                 MIN_BY(vse.author_user_role, vse.ts_created) FILTER (WHERE vse.event_type = 'VISIT_CONFIRMED') AS visit_first_confirmed_user_role,
                 MIN(vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'SUPPLY') AS ts_visit_supply_answer,
                 MIN(vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'DEMAND') AS ts_visit_demand_answer,
@@ -34,8 +35,10 @@ WITH
                 MAX_BY(vse.event_type, struct(vse.ts_created, vse.id_visit_status_log)) AS last_event,
                 MIN_BY(vse.event_type, vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'SUPPLY') AS first_supply_answer,
                 MIN_BY(vse.channel, vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'SUPPLY') AS first_supply_answer_channel,
+                MIN_BY(vse.channel_unified, vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'SUPPLY') AS first_supply_answer_channel_unified,
                 MIN_BY(vse.event_type, vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'TENANT_LIVING') AS first_tenant_living_answer,
-                MIN_BY(vse.channel, vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'TENANT_LIVING') AS first_tenant_living_answer_channel
+                MIN_BY(vse.channel, vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'TENANT_LIVING') AS first_tenant_living_answer_channel,
+                MIN_BY(vse.channel_unified, vse.ts_created) FILTER (WHERE vse.event_type IN ('ANSWER_CONFIRMED', 'ANSWER_REJECTED') AND vse.on_behalf_of = 'TENANT_LIVING') AS first_tenant_living_answer_channel_unified
             FROM
                 datalake_visit.visit_status_events AS vse
             JOIN
@@ -95,6 +98,7 @@ WITH
             ts_visit_first_confirmed,
             ts_visit_last_confirmed,
             visit_first_confirmed_channel,
+            visit_first_confirmed_channel_unified,
             visit_first_confirmed_user_role,
             ts_visit_supply_answer,
             ts_visit_demand_answer,
@@ -112,8 +116,10 @@ WITH
             last_event,
             first_supply_answer,
             first_supply_answer_channel,
+            first_supply_answer_channel_unified,
             first_tenant_living_answer,
-            first_tenant_living_answer_channel
+            first_tenant_living_answer_channel,
+            first_tenant_living_answer_channel_unified
         FROM
             vsl
         UNION ALL
@@ -133,6 +139,7 @@ WITH
             ts_visit_first_confirmed,
             ts_visit_last_confirmed,
             NULL AS visit_first_confirmed_channel,
+            NULL AS visit_first_confirmed_channel_unified,
             NULL AS visit_first_confirmed_user_role,
             NULL AS ts_visit_supply_answer,
             NULL AS ts_visit_demand_answer,
@@ -150,7 +157,9 @@ WITH
             NULL AS last_event,
             NULL AS first_supply_answer,
             NULL AS first_supply_answer_channel,
+            NULL AS first_supply_answer_channel_unified,
             NULL AS first_tenant_living_answer,
+            NULL AS first_tenant_living_answer_channel_unified,
             NULL AS first_tenant_living_answer_channel
         FROM
             bsc
@@ -241,6 +250,7 @@ SELECT
     visit_cancellation.reason AS cancellation_reason,
     visit_cancellation.on_behalf_of AS cancellation_on_behalf_of,
     visit_cancellation.channel AS cancellation_channel,
+    visit_cancellation.channel_unified AS cancellation_channel_unified,
     visit_cancellation.type AS cancellation_type,
     visit_cancellation.author_user_role AS cancellation_author_role,
     IF(pva.event_type = 'VISIT_UNSUCCESSFUL', pva.reason, NULL) AS unsuccessful_reason,
@@ -255,15 +265,19 @@ SELECT
         ELSE 'EARLY'
     END AS visit_schedule_type,
     v_origin.visit_request_channel,
+    v_origin.visit_request_channel_unified,
     visit_log.visit_request_on_behalf_of,
     visit_log.visit_request_user_role,
     visit_log.visit_request_application_source,
     NULLIF(CONCAT_WS(' - ', v_origin.visit_request_channel, visit_log.visit_request_application_source),'') AS visit_request_source_unified,
     visit_log.first_supply_answer_channel,
+    visit_log.first_supply_answer_channel_unified,
     visit_log.first_supply_answer,
     visit_log.first_tenant_living_answer,
     visit_log.first_tenant_living_answer_channel,
+    visit_log.first_tenant_living_answer_channel_unified,
     visit_log.visit_first_confirmed_channel,
+    visit_log.visit_first_confirmed_channel_unified,
     visit_log.visit_first_confirmed_user_role,
     CASE
       WHEN visit_log.nbr_reschedule IS NULL THEN 0
