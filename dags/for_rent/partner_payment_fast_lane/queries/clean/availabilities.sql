@@ -11,6 +11,8 @@ SELECT
     version,
     start_date AS dt_start,
     end_date AS dt_end,
+    total_working_days,
+    absence_days,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM

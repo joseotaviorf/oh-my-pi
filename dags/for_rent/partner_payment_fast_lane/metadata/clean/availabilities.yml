@@ -54,6 +54,14 @@ columns:
     lineage:
       - datalake_partner_payment_raw.availabilities.end_date
     description: The end date considered for the calculation of the availability.
+  total_working_days:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.total_working_days
+    description: The total of working days considered for the calculation.
+  absence_days:
+    lineage:
+      - datalake_partner_payment_raw.availabilities.absence_days
+    description: The absence considered for the calculation.
   ts_created:
     lineage:
       - datalake_partner_payment_raw.availabilities.created_at
