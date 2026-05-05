@@ -1,7 +1,7 @@
 ---
 database_name: datalake_privacy_hub_clean
 table_name: transaction
-domain: Primitives
+domain: Growth
 description: Clean transaction records from the privacy hub containing privacy-related transactions and consent management activities.
 columns:
   id:

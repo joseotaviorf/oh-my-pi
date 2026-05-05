@@ -1,7 +1,7 @@
 ---
 database_name: datalake_privacy_hub_clean
 table_name: intercepted_cookie
-domain: Primitives
+domain: Growth
 description: Clean intercepted cookie data from the privacy hub containing information about cookies detected on websites.
 columns:
   id:

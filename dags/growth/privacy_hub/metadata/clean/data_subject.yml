@@ -1,7 +1,7 @@
 ---
 database_name: datalake_privacy_hub_clean
 table_name: data_subject
-domain: Primitives
+domain: Growth
 description: Clean data subject information from the privacy hub containing personal data subjects and their associated metadata.
 columns:
   id:

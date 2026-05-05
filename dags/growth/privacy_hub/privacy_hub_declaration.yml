@@ -2,7 +2,7 @@ dag:
   name: privacy_hub
   schedule_start_date: 2021, 11, 30
   schedule_interval: 0 2 * * *
-  owner: Data Primitives
+  owner: Data Growth
   documentation:
     dag_purpose: |
       Retrieves data from the Privacy Hub  database (PostgreSQL). [Privacy Hub](https://github.com/quintoandar/backend-services/tree/6a2a395d11dc9df8f0b155a94617d429f0d8ab35/applications/privacy-hub)
@@ -31,12 +31,11 @@ workflow:
       clean_table_name: intercepted_cookie
       raw_primary_keys: [id]
       clean_primary_keys: [id]
-
 cluster:
-  type: databricks_13_3_med_2xlarge_general_cluster
-  databricks_conn_id: databricks_new
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

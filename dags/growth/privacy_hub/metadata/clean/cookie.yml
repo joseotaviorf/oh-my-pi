@@ -1,7 +1,7 @@
 ---
 database_name: datalake_privacy_hub_clean
 table_name: cookie
-domain: Primitives
+domain: Growth
 description: Clean cookie data from the privacy hub containing information about cookies defined and managed on websites.
 columns:
   id:
