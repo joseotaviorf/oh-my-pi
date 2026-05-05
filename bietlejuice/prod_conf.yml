@@ -1977,9 +1977,6 @@ consolidation_xl_memory_single_node_cluster:
         ResourceClass: "SingleNode"
 
 ### Notification Configs ###
-# Airflow Variable name whose value is the Google Chat incoming webhook URL (DAG failure alerts).
-temp_alerts_webhook: GCHAT_TEMP_ALERTS_PROD_WEBHOOK
-
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_PROD_WEBHOOK
 
