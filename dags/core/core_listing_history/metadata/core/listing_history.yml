@@ -1,0 +1,159 @@
+database_name: core_listing
+table_name: listing_history
+domain: For Sale
+owner: bruna.prates@quintoandar.com.br
+description: >
+  Historical core model for listings. Each row represents a single field-level
+  change detected across the listing lifecycle, using a fixed narrow schema.
+  Combines three event sources: LBC transactional CDC (ownership, publication
+  timestamps, SALE status), house price CDC from Imovel transactional (price,
+  total_value, condo, iptu, types) and aux-derived events for RENT (status,
+  version, category, flags from aux__lbc_status_version_order and
+  aux__house_listing_category). Tracks the same fields as core_listing.listing
+  with full historical change granularity.
+columns:
+  id_event:
+    lineage:
+      - datalake_ebdb_transactional.ListingBusinessContext.imovelId
+      - datalake_ebdb_transactional.ListingBusinessContext.businessContext
+      - datalake_ebdb_transactional.ListingBusinessContext.ts_database_transaction
+      - datalake_ebdb_transactional.imovel.id
+      - datalake_ebdb_transactional.imovel.ts_database_transaction
+    description: >
+      Unique event identifier generated as SHA256 hash of id_house,
+      business_context, event_name, and ts_transaction. Ensures idempotency
+      on re-runs and across overlapping date windows.
+  id_house:
+    lineage:
+      - datalake_ebdb_transactional.ListingBusinessContext.imovelId
+      - datalake_ebdb_transactional.imovel.id
+      - core_listing.aux__lbc_status_version_order.id_house
+    description: >
+      Identifier of the house entity this event belongs to.
+  id_house_listing:
+    lineage:
+      - datalake_ebdb_transactional.ListingBusinessContext.imovelId
+      - core_listing.aux__lbc_status_version_order.id_house
+      - core_listing.aux__lbc_status_version_order.listing_version
+    description: >
+      House listing identifier. Computed as concat(id_house, lpad(listing_version, 3, '0'))
+      cast to bigint. For SALE, version is always 0. For RENT, version is resolved
+      via temporal join with aux__lbc_status_version_order. Combined with
+      business_context, this is the natural entity key of the listing.
+  business_context:
+    lineage:
+      - datalake_ebdb_transactional.ListingBusinessContext.businessContext
+    description: Business context of the listing. Events from house CDC are split by context.
+    categories:
+      RENT: Listing configured for rental transactions.
+      SALE: Listing configured for sale transactions.
+  sk_core_listing_history:
+    lineage:
+      - datalake_ebdb_transactional.ListingBusinessContext.imovelId
+      - datalake_ebdb_transactional.ListingBusinessContext.businessContext
+      - core_listing.aux__lbc_status_version_order.listing_version
+    description: >
+      Surrogate key generated as SHA256 hash of the literal LISTING_HISTORY,
+      id_house_listing, and business_context.
+  event_name:
+    lineage:
+      - datalake_ebdb_transactional.ListingBusinessContext.status
+      - datalake_ebdb_transactional.ListingBusinessContext.statusReason
+      - datalake_ebdb_transactional.ListingBusinessContext.ownership
+      - datalake_ebdb_transactional.ListingBusinessContext.firstPublicationDate
+      - datalake_ebdb_transactional.ListingBusinessContext.lastPublicationDate
+      - datalake_ebdb_transactional.imovel.aluguel
+      - datalake_ebdb_transactional.imovel.salePrice
+      - datalake_ebdb_transactional.imovel.valorTotal
+      - datalake_ebdb_transactional.imovel.condominio
+      - datalake_ebdb_transactional.imovel.iptu
+      - datalake_ebdb_transactional.imovel.tipoCondominio
+      - datalake_ebdb_transactional.imovel.tipoIptu
+      - core_listing.aux__lbc_status_version_order.status
+      - core_listing.aux__lbc_status_version_order.status_reason
+      - core_listing.aux__lbc_status_version_order.listing_version
+      - core_listing.aux__lbc_status_version_order.is_extended_rental
+      - core_listing.aux__lbc_status_version_order.has_termination_canceled
+      - core_listing.aux__house_listing_category.listing_category
+    description: Name of the event representing the changed column, following ev_{target_col} convention.
+    categories:
+      ev_ownership: Change in listing ownership (STANDARD or THIRD_PARTY). Source is LBC transactional CDC.
+      ev_ts_first_publication: Change in the first publication timestamp. Source is LBC transactional CDC.
+      ev_ts_last_publication: Change in the last publication timestamp. Source is LBC transactional CDC.
+      ev_status: >
+        Change in listing status. For SALE from LBC transactional CDC; for RENT from
+        aux__lbc_status_version_order (version-aware status timeline).
+      ev_status_reason: >
+        Change in listing status reason. For SALE from LBC transactional CDC; for RENT
+        from aux__lbc_status_version_order.
+      ev_price: >
+        Change in listing price. For RENT tracks aluguel from imovel CDC;
+        for SALE tracks salePrice from imovel CDC.
+      ev_total_value: Change in total value (rent/sale + condo + iptu). Source is imovel CDC.
+      ev_condo_value: Change in condominium fee value. Source is imovel CDC.
+      ev_iptu_value: Change in IPTU tax value. Source is imovel CDC.
+      ev_condo_type: Change in condominium fee type. Source is imovel CDC.
+      ev_iptu_type: Change in IPTU type. Source is imovel CDC.
+      ev_version: Change in listing version number (RENT only). Source is aux__lbc_status_version_order.
+      ev_category: Change in listing category (RENT only). Source is aux__house_listing_category.
+      ev_is_extended_rental: Change in extended rental flag (RENT only). Source is aux__lbc_status_version_order.
+      ev_has_termination_canceled: Change in termination-canceled flag (RENT only). Source is aux__lbc_status_version_order.
+  event_type:
+    description: Source type of the event, indicating which pipeline produced it.
+    categories:
+      cdc: Event sourced from CDC transactional logs (ListingBusinessContext or imovel).
+      derived: Event derived from aux tables (aux__lbc_status_version_order, aux__house_listing_category).
+  value:
+    lineage:
+      - datalake_ebdb_transactional.ListingBusinessContext.status
+      - datalake_ebdb_transactional.ListingBusinessContext.statusReason
+      - datalake_ebdb_transactional.ListingBusinessContext.ownership
+      - datalake_ebdb_transactional.ListingBusinessContext.firstPublicationDate
+      - datalake_ebdb_transactional.ListingBusinessContext.lastPublicationDate
+      - datalake_ebdb_transactional.imovel.aluguel
+      - datalake_ebdb_transactional.imovel.salePrice
+      - datalake_ebdb_transactional.imovel.valorTotal
+      - datalake_ebdb_transactional.imovel.condominio
+      - datalake_ebdb_transactional.imovel.iptu
+      - datalake_ebdb_transactional.imovel.tipoCondominio
+      - datalake_ebdb_transactional.imovel.tipoIptu
+      - core_listing.aux__lbc_status_version_order.status
+      - core_listing.aux__lbc_status_version_order.status_reason
+      - core_listing.aux__lbc_status_version_order.listing_version
+      - core_listing.aux__lbc_status_version_order.is_extended_rental
+      - core_listing.aux__lbc_status_version_order.has_termination_canceled
+      - core_listing.aux__house_listing_category.listing_category
+    description: New value of the changed column, cast to string.
+  payload:
+    description: Reserved for future use. NULL for all current event sources.
+  ts_transaction:
+    lineage:
+      - datalake_ebdb_transactional.ListingBusinessContext.ts_database_transaction
+      - datalake_ebdb_transactional.imovel.ts_database_transaction
+      - core_listing.aux__lbc_status_version_order.ts_state_started
+    description: >
+      Timestamp of the change. For CDC events (LBC and imovel), from
+      ts_database_transaction. For derived events, from
+      aux__lbc_status_version_order.ts_state_started.
+  event_origin:
+    description: Fully qualified name of the source table that generated the change event.
+  ts_load:
+    description: Timestamp of when the record was loaded into the historical core model.
+  year:
+    lineage:
+      - datalake_ebdb_transactional.ListingBusinessContext.ts_database_transaction
+      - datalake_ebdb_transactional.imovel.ts_database_transaction
+      - core_listing.aux__lbc_status_version_order.ts_state_started
+    description: Year extracted from ts_transaction for partitioning.
+  month:
+    lineage:
+      - datalake_ebdb_transactional.ListingBusinessContext.ts_database_transaction
+      - datalake_ebdb_transactional.imovel.ts_database_transaction
+      - core_listing.aux__lbc_status_version_order.ts_state_started
+    description: Month extracted from ts_transaction for partitioning.
+  day:
+    lineage:
+      - datalake_ebdb_transactional.ListingBusinessContext.ts_database_transaction
+      - datalake_ebdb_transactional.imovel.ts_database_transaction
+      - core_listing.aux__lbc_status_version_order.ts_state_started
+    description: Day extracted from ts_transaction for partitioning.

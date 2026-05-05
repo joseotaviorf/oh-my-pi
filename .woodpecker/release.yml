@@ -39,6 +39,7 @@ steps:
             - 'pyproject.toml'
             - 'MANIFEST.in'
             - 'dags/**/*_api_declaration.y*ml'
+            - 'dags/**/spark_jobs/*_conf.y*ml'
             - 'requirements.txt'
             - 'requirements-*.txt'
             - 'Makefile'

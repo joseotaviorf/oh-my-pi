@@ -1,0 +1,64 @@
+---
+table_name: core_listing.listing_history
+alert_channel: GCHAT_CORE_MODEL_SCHEMA_VALIDATION
+is_incremental:
+  incremental_date_column: ts_transaction
+  incremental_date_mask: yyyy-MM-dd
+column_level_validations:
+  id_event:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_house:
+    is_complete:
+      severity_level: Error
+  id_house_listing:
+    is_complete:
+      severity_level: Error
+  business_context:
+    is_complete:
+      severity_level: Error
+    is_in:
+      severity_level: Error
+      values:
+        - RENT
+        - SALE
+  sk_core_listing_history:
+    is_complete:
+      severity_level: Error
+  event_name:
+    is_complete:
+      severity_level: Error
+    is_in:
+      severity_level: Error
+      values:
+        - ev_ownership
+        - ev_ts_first_publication
+        - ev_ts_last_publication
+        - ev_status
+        - ev_status_reason
+        - ev_price
+        - ev_total_value
+        - ev_condo_value
+        - ev_iptu_value
+        - ev_condo_type
+        - ev_iptu_type
+        - ev_version
+        - ev_category
+        - ev_is_extended_rental
+        - ev_has_termination_canceled
+  event_type:
+    is_complete:
+      severity_level: Error
+    is_in:
+      severity_level: Error
+      values:
+        - cdc
+        - derived
+  ts_transaction:
+    is_complete:
+      severity_level: Error
+  event_origin:
+    is_complete:
+      severity_level: Error

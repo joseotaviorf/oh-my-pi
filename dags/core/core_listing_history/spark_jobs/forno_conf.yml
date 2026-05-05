@@ -1,0 +1,93 @@
+ENTITY_TYPE: "LISTING_HISTORY"
+
+LBC_TRANSACTIONAL_TABLE: "datalake_ebdb_transactional.ListingBusinessContext"
+HOUSE_TRANSACTIONAL_TABLE: "datalake_ebdb_transactional.imovel"
+AUX_LBC_STATUS_VERSION_ORDER_TABLE: "core_listing.aux__lbc_status_version_order"
+AUX_HOUSE_LISTING_CATEGORY_TABLE: "core_listing.aux__house_listing_category"
+
+merge_on_historical: ["id_house_listing", "business_context", "event_name", "ts_transaction", "year", "month", "day"]
+when_matched_update_condition_historical: "FALSE"
+
+# LBC transactional CDC fields tracked for both RENT and SALE
+lbc_common_event_configs:
+  - tracked_col: ownership
+    target_col: ownership
+    target_type: string
+  - tracked_col: firstPublicationDate
+    target_col: ts_first_publication
+    target_type: string
+  - tracked_col: lastPublicationDate
+    target_col: ts_last_publication
+    target_type: string
+
+# LBC transactional CDC fields tracked only for SALE (RENT status comes from aux tables)
+lbc_sale_event_configs:
+  - tracked_col: status
+    target_col: status
+    target_type: string
+  - tracked_col: statusReason
+    target_col: status_reason
+    target_type: string
+
+# House transactional price configs for RENT (aluguel = price)
+rent_price_event_configs:
+  - tracked_col: aluguel
+    target_col: price
+    target_type: int
+  - tracked_col: valorTotal
+    target_col: total_value
+    target_type: int
+  - tracked_col: condominio
+    target_col: condo_value
+    target_type: int
+  - tracked_col: iptu
+    target_col: iptu_value
+    target_type: int
+  - tracked_col: tipoCondominio
+    target_col: condo_type
+    target_type: string
+  - tracked_col: tipoIptu
+    target_col: iptu_type
+    target_type: string
+
+# House transactional price configs for SALE (salePrice = price)
+sale_price_event_configs:
+  - tracked_col: salePrice
+    target_col: price
+    target_type: int
+  - tracked_col: valorTotal
+    target_col: total_value
+    target_type: int
+  - tracked_col: condominio
+    target_col: condo_value
+    target_type: int
+  - tracked_col: iptu
+    target_col: iptu_value
+    target_type: int
+  - tracked_col: tipoCondominio
+    target_col: condo_type
+    target_type: string
+  - tracked_col: tipoIptu
+    target_col: iptu_type
+    target_type: string
+
+# Aux-derived event configs for RENT (from aux__lbc_status_version_order + category)
+aux_event_configs:
+  - tracked_col: status
+    target_col: status
+    target_type: string
+  - tracked_col: status_reason
+    target_col: status_reason
+    target_type: string
+  - tracked_col: listing_version
+    target_col: version
+    target_type: int
+  - tracked_col: is_extended_rental
+    target_col: is_extended_rental
+    target_type: boolean
+  - tracked_col: has_termination_canceled
+    target_col: has_termination_canceled
+    target_type: boolean
+  - tracked_col: listing_category
+    target_col: category
+    target_type: string
