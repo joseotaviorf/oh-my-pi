@@ -260,16 +260,11 @@ cluster_aux as (
     END AS type_pp,
     doq.ongoing_houses,
     doq.is_pp_multi_active,
-    doq.dt_houses_owned,
-    DATE_TRUNC('MONTH', doq.dt_houses_owned) as month,
-    ROW_NUMBER() OVER (
-        PARTITION BY doq.id_owner, DATE_TRUNC('MONTH', doq.dt_houses_owned)
-        ORDER BY doq.dt_houses_owned DESC
-      ) AS rk
+    doq.dt_houses_owned
   FROM
     datalake_pro_owners.daily_owner_houses_quantity_history doq
   WHERE
-    doq.dt_houses_owned >= DATE('{load_start_date}') - INTERVAL '6' month
+    doq.dt_houses_owned = DATE('{load_start_date}') - INTERVAL '1' day
     AND (
       doq.ongoing_houses >= 5
       OR doq.is_pp_multi_active
@@ -293,7 +288,6 @@ aux_1 as (
     ca.type_pp,
     ca.ongoing_houses,
     ca.is_pp_multi_active,
-    ca.month,
     ca.dt_houses_owned,
     CASE
       WHEN is_pp_multi_active = false THEN pd.dt_houses_owned
@@ -304,9 +298,6 @@ aux_1 as (
       LEFT JOIN previous_date pd
         ON pd.id_owner = ca.id_owner
         AND pd.rk = 1
-  WHERE
-    ca.rk = 1
-    AND ca.dt_houses_owned = DATE('{load_start_date}') - INTERVAL '1' day
 ),
 aux_2 as (
   SELECT
@@ -416,11 +407,11 @@ jd as (
       left join base_nps bn
         on bn.sk_user = un.sk_user
         and bn.rank_nps = (un.last_rank - 1)
-      left join aux_2 i
+      inner join aux_2 i
         on i.id_owner = un.sk_user
       left join base_detractor bd
         on bd.sk_user = un.sk_user
-      left join base_contratos bc
+      inner join base_contratos bc
         on bc.id_owner = un.sk_user
       left join cluster_pp a
         on a.id_owner = un.sk_user
