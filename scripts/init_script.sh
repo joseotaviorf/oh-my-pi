@@ -14,7 +14,6 @@ spark_driver_config_content="[driver] {
     \"spark.plugins\" = \"ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics,br.com.quintoandar.GangliaMetrics\",
     \"spark.cernSparkPlugin.cloudFsName\" = \"s3a\",
     \"spark.cernSparkPlugin.registerOnDriver\" = \"true\",
-    # TODO(DPLT-927): remove once Spark event log pipeline is validated stable; superseded by spark.eventLog.* in cluster config.
     \"spark.extraListeners\" = \"ch.cern.sparkmeasure.FlightRecorderStageMetrics\"
 }
 "
@@ -23,14 +22,6 @@ echo "END: Modify Spark config settings"
 
 echo "BEGIN: Install QuintoAndar internal libs"
 /databricks/python/bin/pip install -q awscli
-
-if [ -n "$DATABRICKS_S3_BUCKET" ] && [ -n "$AIRFLOW_DAG_ID" ]; then
-  echo "BEGIN: Create Spark event-log directory"
-  aws s3api put-object \
-    --bucket "$DATABRICKS_S3_BUCKET" \
-    --key "spark-event-logs/$AIRFLOW_DAG_ID/" 2>/dev/null || true
-  echo "END: Create Spark event-log directory"
-fi
 
 aws s3 cp ${ARTIFACTS_BUCKET}/jars/deequ-${DEEQU_JAR_VERSION}-spark-${SPARK_VERSION}.jar $spark_jars_path/deequ-${DEEQU_JAR_VERSION}-spark-${SPARK_VERSION}.jar
 aws s3 cp ${ARTIFACTS_BUCKET}/jars/spark-measure_2.12-0.21.jar $spark_jars_path/spark-measure_2.12-0.21.jar
