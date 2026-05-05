@@ -2,17 +2,15 @@ WITH base AS (
     SELECT
         rf.sk_client,
         rf.sk_rent_flow,
-        db.dt_created AS dt_booking_created,
+        vs.ts_schedule_created AS dt_booking_created,
         do.dt_created AS dt_offer_sent,
         dc.ts_signature AS dt_contract_signed
     FROM
         dw_rent.fact_listing_rent_flows AS rf
     LEFT JOIN
-        dw_public.dim_booking AS db
-            ON rf.sk_booking = db.sk_booking
-            AND db.visit_intent = 'RENT'
-            AND db.type = 'Visita'
-            AND (db.country_code = 'BR' OR db.country_code IS NULL)
+        datalake_visit.visit_schedules AS vs
+            ON rf.sk_booking = vs.id_schedule
+            AND vs.business_context = 'RENT'
     LEFT JOIN
         dw_rent.dim_offer AS do
             ON rf.sk_offer = do.sk_offer
