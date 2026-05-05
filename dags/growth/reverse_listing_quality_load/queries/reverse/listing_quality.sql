@@ -14,7 +14,7 @@ WITH
         HAVING
             MIN_BY(planning_operation, date) NOT IN ('Rede', 'Mercado Primário BH')
             AND MIN(date) >= DATE('{load_start_date}')
-            AND MIN(date) <= DATE('{load_end_date}')
+            AND MIN(date) < DATE('{load_end_date}')
     ), -- ids de imóveis de 1p publicados em first listing no intervalo
 
 
@@ -46,7 +46,6 @@ WITH
                  LEFT JOIN base_geral_last_job b ON (a.id_house = b.id_house)
         WHERE b.id_job IS NULL -- condição para considerar o que não tem job
           -- AND c.sk_ticket IS NULL -- condição para considerar o que não passou por LQ
-          -- Nota: Precisa mesmo dessa informação? pois agora o hightouch vai garantir que puxa apenas listagens ainda sem tickets criados....
 
           AND b.user_sender_type IS DISTINCT FROM 'OWNER' -- condição para considerar o que não é de FotosPP
     ), -- ids dos imóveis publicados em first listing que não tiveram job, não vieram de FotosPP
@@ -62,7 +61,7 @@ WITH
             user_sender_type
         FROM base_geral_last_job
         WHERE CAST(ts_photos_uploaded AS DATE) >= DATE('{load_start_date}')
-          AND CAST(ts_photos_uploaded AS DATE) <= DATE('{load_end_date}')
+          AND CAST(ts_photos_uploaded AS DATE) < DATE('{load_end_date}')
     ), -- puxa os ids de imóveis e jobs que tiveram o upload de fotos (trigger para publicação) ainda não processados pela DAG
 
 
@@ -93,38 +92,19 @@ WITH
         SELECT
             a.id_house,
             a.id_job,
-            CAST(MIN(c.ts_first_publication) AS DATE) AS dt_first_publication,
-            CAST(MAX(c.ts_last_publication) AS DATE) AS dt_last_publication,
 
             a.ts_photos_uploaded,
             e.bathrooms,
             (e.bathrooms + e.bedrooms + 2) AS comodos_from_house,
             CASE WHEN e.type = 'StudioOuKitchenette' THEN true ELSE false END AS studio_kitnet,
-            e.internal_admin_info,
-
-            e.id_user AS pp_user_id
+            e.internal_admin_info
 
         FROM base_ims_completa a
-
-            LEFT JOIN datalake_ebdb_clean.listing_business_context c
-            ON a.id_house = c.id_house
 
             LEFT JOIN datalake_ebdb_clean.house e
             ON a.id_house = e.id
 
-            LEFT JOIN datalake_ebdb_user.user g
-            ON e.id_user = g.id
-
-            LEFT JOIN dw_public.dim_region h
-            ON e.id_region = h.sk_region
-
-            LEFT JOIN dw_datamarts.house_media i
-            ON a.id_house = CAST(i.id_house AS BIGINT)
-
-            LEFT JOIN datalake_ebdb_user.user j
-            ON (a.id_photographer_data = j.id_photographer_data) -- JOIN agora usa 'a'
-
-        GROUP BY a.id_house, a.id_job, a.ts_photos_uploaded, e.bathrooms, e.bedrooms, e.type, e.internal_admin_info, e.id_user
+GROUP BY a.id_house, a.id_job, a.ts_photos_uploaded, e.bathrooms, e.bedrooms, e.type, e.internal_admin_info
     ), -- reune as informações dos imóveis como quantidade de quartos e banheiros (informados pelo pp), a descrição do im, informação interna vindo do admin, contagem de vídeos por imóvel, dados do fotógrado e do proprietário
 
 
@@ -144,7 +124,6 @@ WITH
             b.room_type,
             b.sk_image_inspection,
             b.ts_created AS inspection_restb
-        --CAST(b.ts_created AS DATE) AS inspection_restb
         FROM last_inspection a
             LEFT JOIN dw_public.fact_kodak_image_inspection b
         ON a.last_id_group = b.id_group
@@ -160,12 +139,11 @@ WITH
             CASE WHEN b.room_type = 'bathroom' THEN true ELSE false END AS has_bathroom,
             b.room_type,
             b.inspection_restb,
-            a.dt_last_publication,
             a.ts_photos_uploaded,
             COUNT(DISTINCT b.sk_image_inspection) AS images
         FROM ims_details a
             LEFT JOIN fact_kodak_consolidated b ON (a.id_house = b.id_house)
-        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+        GROUP BY 1, 2, 3, 4, 5, 6, 7
     ), -- reúne informações puxadas nas CTEs anteriores, adionando uma coluna para identificar quando o cômodo for um banheiro e a contagem de fotos por cômodo
 
     basic_room_bathroom AS (
@@ -207,8 +185,6 @@ WITH
         SELECT
             id_external_domain,
             MAX_BY(id, id) AS id,
-            MAX_BY(id_source, id) AS id_source,
-            MAX_BY(video_source, id) AS video_source,
             MAX_BY(
             CASE
             WHEN video_source = 'VIMEO' THEN CONCAT('https://vimeo.com/', id_source)
@@ -226,7 +202,6 @@ SELECT DISTINCT
     a.id_house,
     a.id_group,
     a.inspection_restb,
-    a.dt_last_publication,
     a.ts_photos_uploaded,
     date_diff(DAY, a.ts_photos_uploaded, a.inspection_restb) AS dif_publication_inspection,
 
