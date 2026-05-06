@@ -10,7 +10,19 @@ from bietlejuice.base.cdc.schema_treatment.postgres_cdc_schema_finder import (
 
 
 class PostgresCdcSchemaTreatment(CdcSchemaTreatment):
-    TYPE_MAPPING = {"smallint": "int", "integer": "int"}
+    # Maps Postgres `information_schema.columns.data_type` values (lowercase, as
+    # returned by `PostgresCdcSchemaFinder`) to Spark/Delta types. Without these
+    # mappings the column type ends up being whatever Spark inferred from the
+    # Debezium JSON payload, which can land bigint FKs as `string` and floats
+    # as inconsistent types — and `_cast_differing_types` then perpetuates the
+    # wrong type forever once the transactional Delta table is created.
+    TYPE_MAPPING = {
+        "smallint": "int",
+        "integer": "int",
+        "bigint": "bigint",
+        "real": "float",
+        "double precision": "double",
+    }
 
     def __init__(
         self,
