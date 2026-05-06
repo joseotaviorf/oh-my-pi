@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 import yaml
 
@@ -31,7 +32,7 @@ def resolve_settings_path() -> str:
     )
 
 
-# Only these keys are read from the YAML settings file. Per-job fields (name, step_name, tags) come from the CLI.
+# Required YAML keys (see ``config/*.yml``).
 SETTINGS_FILE_KEYS = frozenset[str](
     {
         "release_label",
@@ -43,11 +44,13 @@ SETTINGS_FILE_KEYS = frozenset[str](
         "deploy_mode",
         "region",
         "log_uri",
+        "staging_uri",
         "visible_to_all_users",
         "master_instance_type",
         "core_instance_type",
         "core_instance_count",
         "idle_timeout_sec",
+        "use_spot",
     }
 )
 
@@ -66,20 +69,84 @@ def _validate_core_instance_count(n: int) -> int:
 
 
 def validate_bootstrap_script_uri(uri: str) -> str:
-    """EMR ScriptBootstrapAction Path: s3, http, or https URI."""
+    """Remote bootstrap script URI after staging: ``s3://`` only (no http(s))."""
     u = uri.strip()
     if not u:
         raise ValueError("bootstrap_script_uri must be non-empty")
-    lower = u.lower()
-    if not (
-        lower.startswith("s3://")
-        or lower.startswith("https://")
-        or lower.startswith("http://")
-    ):
-        raise ValueError(
-            "bootstrap_script_uri must start with s3://, http://, or https://"
-        )
+    if not u.lower().startswith("s3://"):
+        raise ValueError("bootstrap_script_uri must start with s3://")
     return u
+
+
+def validate_staging_uri(uri: str) -> str:
+    """S3 prefix for staging local uploads: ``s3://bucket/non-empty/prefix/`` (not bucket root)."""
+    u = uri.strip()
+    if not u.lower().startswith("s3://"):
+        raise ValueError("staging_uri must be an s3:// URI")
+    rest = u[5:]
+    if "/" not in rest:
+        raise ValueError(
+            "staging_uri must be s3://bucket/prefix/ (bucket-only URIs are not allowed)"
+        )
+    bucket, prefix = rest.split("/", 1)
+    if not bucket:
+        raise ValueError("staging_uri must include a bucket name")
+    if not prefix or not prefix.strip("/"):
+        raise ValueError(
+            "staging_uri must include a non-empty key prefix after the bucket "
+            "(avoid staging at bucket root)"
+        )
+    return u if u.endswith("/") else u + "/"
+
+
+def _resolve_bare_filesystem_path(raw: str, *, field: str) -> Path:
+    """Bare path: absolute or relative to ``Path.cwd()`` only; must exist as a file."""
+    local = Path(raw.strip()).expanduser()
+    if not local.is_absolute():
+        local = (Path.cwd() / local).resolve()
+    else:
+        local = local.resolve()
+    if not local.is_file():
+        raise ValueError(
+            f"{field} must be s3:// or an existing file path (got {raw!r})"
+        )
+    return local
+
+
+def normalize_job_or_bootstrap_uri(raw: str, *, field: str) -> str:
+    """Accept ``s3://`` or a bare filesystem path (relative → cwd); ``file:`` URLs are not accepted."""
+    s = raw.strip()
+    if not s:
+        raise ValueError(f"{field} must be non-empty")
+    low = s.lower()
+    if low.startswith(("http://", "https://")):
+        raise ValueError(
+            f"{field} must be s3:// or a local path (http(s) URLs are not supported)"
+        )
+    if low.startswith("s3://"):
+        return s
+
+    parsed = urlparse(s)
+    if parsed.scheme:
+        if parsed.scheme.lower() == "file":
+            raise ValueError(
+                f"{field} must be s3:// or a bare filesystem path "
+                f"(file: URLs are not supported; pass the path instead, got {raw!r})"
+            )
+        raise ValueError(
+            f"{field} must be s3:// or a bare filesystem path "
+            f"(unsupported scheme {parsed.scheme!r} in {raw!r})"
+        )
+
+    return _resolve_bare_filesystem_path(s, field=field).as_uri()
+
+
+def cli_emr_script_uri(uri: str, *, field: str) -> str:
+    """Bootstrap from CLI: ``s3://`` or bare path (relative → cwd)."""
+    normalized = normalize_job_or_bootstrap_uri(uri, field=field)
+    if normalized.lower().startswith("file://"):
+        return normalized
+    return validate_bootstrap_script_uri(normalized)
 
 
 # EMR AutoTerminationPolicy IdleTimeout (seconds): idle-only TTL, not wall-clock.
@@ -124,7 +191,7 @@ def load_settings_file(path: str | Path) -> dict[str, Any]:
             raise ValueError(f"Settings key {key!r} must not be null")
         if key == "poll_sec":
             out[key] = float(val)
-        elif key == "visible_to_all_users":
+        elif key in ("visible_to_all_users", "use_spot"):
             out[key] = bool(val)
         elif key == "core_instance_count":
             out[key] = _validate_core_instance_count(int(val))
@@ -132,6 +199,8 @@ def load_settings_file(path: str | Path) -> dict[str, Any]:
             out[key] = _validate_instance_type(key, str(val))
         elif key == "idle_timeout_sec":
             out[key] = validate_idle_timeout_sec(int(val))
+        elif key == "staging_uri":
+            out[key] = validate_staging_uri(str(val))
         else:
             out[key] = val
     return out
@@ -146,6 +215,7 @@ def merge_base_config(
     core_instance_type: str | None = None,
     core_instance_count: int | None = None,
     bootstrap_script_uri: str | None = None,
+    use_spot: bool | None = None,
 ) -> dict[str, Any]:
     """Load YAML settings plus shared CLI overrides (tags, instances, bootstrap)."""
     cfg = load_settings_file(config_path)
@@ -164,9 +234,11 @@ def merge_base_config(
         )
     if core_instance_count is not None:
         cfg["core_instance_count"] = _validate_core_instance_count(core_instance_count)
+    if use_spot is not None:
+        cfg["use_spot"] = bool(use_spot)
     if bootstrap_script_uri is not None:
-        cfg["bootstrap_script_uri"] = validate_bootstrap_script_uri(
-            bootstrap_script_uri
+        cfg["bootstrap_script_uri"] = cli_emr_script_uri(
+            bootstrap_script_uri, field="bootstrap_script_uri"
         )
     # EMR RunJobFlow Tags: list of {Key, Value}. Required for AmazonEMRServicePolicy_v2-scoped EC2 API calls.
     emr_tags: list[dict[str, str]] = []
@@ -192,6 +264,7 @@ def merge_runtime_config(
     core_instance_type: str | None = None,
     core_instance_count: int | None = None,
     bootstrap_script_uri: str | None = None,
+    use_spot: bool | None = None,
 ) -> dict[str, Any]:
     """Load settings from YAML, then apply per-run CLI fields (do not appear in the YAML file)."""
     cfg = merge_base_config(
@@ -202,9 +275,10 @@ def merge_runtime_config(
         core_instance_type=core_instance_type,
         core_instance_count=core_instance_count,
         bootstrap_script_uri=bootstrap_script_uri,
+        use_spot=use_spot,
     )
     if s3_uri is not None:
-        cfg["s3_uri"] = s3_uri
+        cfg["s3_uri"] = normalize_job_or_bootstrap_uri(s3_uri, field="uri")
     if step_name is not None:
         sn = step_name.strip()
         if not sn:
@@ -222,7 +296,7 @@ def merge_step_submit_config(
 ) -> dict[str, Any]:
     """Settings file plus fields needed to add a Spark step to an existing cluster."""
     cfg = load_settings_file(config_path)
-    cfg["s3_uri"] = s3_uri
+    cfg["s3_uri"] = normalize_job_or_bootstrap_uri(s3_uri, field="uri")
     sn = step_name.strip()
     if not sn:
         raise ValueError("step_name must be non-empty")

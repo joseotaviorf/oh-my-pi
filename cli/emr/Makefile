@@ -34,35 +34,37 @@ file-download:
 	./scripts/s3-file-download.sh "$(s3_uri)" "$(dest)"
 
 # Same as: docker compose run --rm app <subcommand> [OPTIONS]
-# Usage: make app-run args='transient --name my-flow --s3-uri s3://bucket/j.py --wait'
+# Usage: make app-run args='transient --name my-flow --uri s3://bucket/j.py --wait'
 app-run:
 	@test -n "$(args)" || (echo 'Usage: make app-run args="transient|create-cluster|submit-step|terminate ..."' >&2; exit 1)
 	$(COMPOSE) run --rm app $(args)
 
-# Transient cluster + step (README §3). Optional: step_name, bootstrap_script_uri, wait=1
+# Transient cluster + step (README §3). Optional: step_name, bootstrap_script_uri, wait=1, use_spot=1|0
 transient:
-	@test -n "$(name)" && test -n "$(s3_uri)" || (echo 'Usage: make transient name=... s3_uri=... [step_name=...] [bootstrap_script_uri=...] [wait=1]' >&2; exit 1)
+	@test -n "$(name)" && test -n "$(uri)" || (echo 'Usage: make transient name=... uri=... [step_name=...] [bootstrap_script_uri=...] [wait=1] [use_spot=1|0]' >&2; exit 1)
 	$(COMPOSE) run --rm app transient \
 		--name "$(name)" \
 		$(if $(strip $(step_name)),--step-name "$(step_name)") \
-		--s3-uri "$(s3_uri)" \
+		--uri "$(uri)" \
 		$(if $(strip $(bootstrap_script_uri)),--bootstrap-script-uri "$(bootstrap_script_uri)") \
+		$(if $(filter 1 true yes,$(use_spot)),--use-spot,$(if $(filter 0 false no,$(use_spot)),--no-use-spot,)) \
 		$(if $(filter 1 true yes,$(wait)),--wait)
 
-# Persistent cluster (README §4). Optional: bootstrap_script_uri
+# Persistent cluster (README §4). Optional: bootstrap_script_uri, use_spot=1|0
 create-cluster:
-	@test -n "$(name)" || (echo 'Usage: make create-cluster name=... [bootstrap_script_uri=...]' >&2; exit 1)
+	@test -n "$(name)" || (echo 'Usage: make create-cluster name=... [bootstrap_script_uri=...] [use_spot=1|0]' >&2; exit 1)
 	$(COMPOSE) run --rm app create-cluster \
 		--name "$(name)" \
-		$(if $(strip $(bootstrap_script_uri)),--bootstrap-script-uri "$(bootstrap_script_uri)")
+		$(if $(strip $(bootstrap_script_uri)),--bootstrap-script-uri "$(bootstrap_script_uri)") \
+		$(if $(filter 1 true yes,$(use_spot)),--use-spot,$(if $(filter 0 false no,$(use_spot)),--no-use-spot,))
 
 # Add Spark step to a running cluster (README §4). Optional: step_name, wait=1
 submit-step:
-	@test -n "$(cluster_id)" && test -n "$(s3_uri)" || (echo 'Usage: make submit-step cluster_id=... s3_uri=... [step_name=...] [wait=1]' >&2; exit 1)
+	@test -n "$(cluster_id)" && test -n "$(uri)" || (echo 'Usage: make submit-step cluster_id=... uri=... [step_name=...] [wait=1]' >&2; exit 1)
 	$(COMPOSE) run --rm app submit-step \
 		--cluster-id "$(cluster_id)" \
 		$(if $(strip $(step_name)),--step-name "$(step_name)") \
-		--s3-uri "$(s3_uri)" \
+		--uri "$(uri)" \
 		$(if $(filter 1 true yes,$(wait)),--wait)
 
 # Terminate cluster (README §4)

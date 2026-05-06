@@ -72,6 +72,8 @@ def build_instances_block(
     cfg: dict[str, Any], *, keep_job_flow_alive_when_no_steps: bool
 ) -> dict[str, Any]:
     core_count = int(cfg["core_instance_count"])
+    use_spot = bool(cfg.get("use_spot", True))
+    core_market = "SPOT" if use_spot else "ON_DEMAND"
     return {
         "InstanceGroups": [
             {
@@ -83,7 +85,7 @@ def build_instances_block(
             },
             {
                 "Name": "Core nodes",
-                "Market": "ON_DEMAND",
+                "Market": core_market,
                 "InstanceRole": "CORE",
                 "InstanceType": cfg["core_instance_type"],
                 "InstanceCount": max(1, core_count),

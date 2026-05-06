@@ -9,3 +9,4 @@ services:
     volumes:
       - ${HOME}/.aws:/root/.aws:ro
       - ./config:/config:ro
+      - ./samples:/samples:ro

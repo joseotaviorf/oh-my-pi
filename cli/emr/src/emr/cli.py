@@ -15,6 +15,7 @@ from emr.config import (
     validate_step_submit,
     validate_transient,
 )
+from emr.staging import resolve_local_uris_in_cfg
 
 
 def _tags_from_kv_pairs(pairs: tuple[str, ...]) -> dict[str, str]:
@@ -42,7 +43,15 @@ def main(ctx: click.Context) -> None:
 @main.command("transient")
 @click.pass_context
 @click.option("--wait/--no-wait", default=False, show_default=True)
-@click.option("--s3-uri", required=True, help="S3 URI of the PySpark script (.py)")
+@click.option(
+    "--uri",
+    "job_uri",
+    required=True,
+    help=(
+        "PySpark script: s3:// URI or bare filesystem path "
+        "(relative paths use cwd; staging_uri for uploads)."
+    ),
+)
 @click.option(
     "--name", "job_flow_name", required=True, help="Job flow Name for this RunJobFlow."
 )
@@ -77,15 +86,21 @@ def main(ctx: click.Context) -> None:
 @click.option(
     "--bootstrap-script-uri",
     default=None,
+    help=("Optional bootstrap: s3:// or bare path (relative → cwd)."),
+)
+@click.option(
+    "--use-spot/--no-use-spot",
+    "use_spot",
+    default=None,
     help=(
-        "Optional S3/HTTP(S) URI of a bootstrap shell script; runs on every instance "
-        "(master + cores) at cluster start before the Spark step."
+        "Override use_spot from settings: SPOT for core nodes (master stays "
+        "ON_DEMAND)."
     ),
 )
 def cmd_transient(
     ctx: click.Context,
     wait: bool,
-    s3_uri: str,
+    job_uri: str,
     job_flow_name: str,
     step_name: str,
     tag_pairs: tuple[str, ...],
@@ -93,13 +108,14 @@ def cmd_transient(
     core_instance_type: str | None,
     core_instance_count: int | None,
     bootstrap_script_uri: str | None,
+    use_spot: bool | None,
 ) -> None:
     settings_path = str(ctx.obj["settings_path"])
     tags: dict[str, str] | None = _tags_from_kv_pairs(tag_pairs) if tag_pairs else None
     try:
         cfg = merge_runtime_config(
             config_path=settings_path,
-            s3_uri=s3_uri,
+            s3_uri=job_uri,
             step_name=step_name,
             name=job_flow_name,
             tags=tags,
@@ -107,7 +123,9 @@ def cmd_transient(
             core_instance_type=core_instance_type,
             core_instance_count=core_instance_count,
             bootstrap_script_uri=bootstrap_script_uri,
+            use_spot=use_spot,
         )
+        resolve_local_uris_in_cfg(cfg)
         validate_transient(cfg)
     except ValueError as e:
         raise click.ClickException(str(e)) from e
@@ -149,7 +167,16 @@ def cmd_transient(
 @click.option(
     "--bootstrap-script-uri",
     default=None,
-    help="Optional bootstrap script URI (s3/http/https); runs on every instance at cluster start.",
+    help="Optional bootstrap (s3:// or bare path; relative → cwd).",
+)
+@click.option(
+    "--use-spot/--no-use-spot",
+    "use_spot",
+    default=None,
+    help=(
+        "Override use_spot from settings: SPOT for core nodes (master stays "
+        "ON_DEMAND)."
+    ),
 )
 def cmd_create_cluster(
     ctx: click.Context,
@@ -159,6 +186,7 @@ def cmd_create_cluster(
     core_instance_type: str | None,
     core_instance_count: int | None,
     bootstrap_script_uri: str | None,
+    use_spot: bool | None,
 ) -> None:
     """Persistent cluster; idle auto-termination uses ``idle_timeout_sec`` in the env YAML only."""
     settings_path = str(ctx.obj["settings_path"])
@@ -172,7 +200,9 @@ def cmd_create_cluster(
             core_instance_type=core_instance_type,
             core_instance_count=core_instance_count,
             bootstrap_script_uri=bootstrap_script_uri,
+            use_spot=use_spot,
         )
+        resolve_local_uris_in_cfg(cfg)
         validate_persistent_cluster(cfg)
     except ValueError as e:
         raise click.ClickException(str(e)) from e
@@ -204,7 +234,12 @@ def cmd_terminate(ctx: click.Context, cluster_id: str) -> None:
 @click.option(
     "--cluster-id", required=True, help="Running cluster id to add the step to."
 )
-@click.option("--s3-uri", required=True, help="S3 URI of the PySpark script (.py)")
+@click.option(
+    "--uri",
+    "job_uri",
+    required=True,
+    help=("PySpark script: s3:// or bare path (relative → cwd)."),
+)
 @click.option(
     "--step-name", default="Spark application", show_default=True, help="EMR step name."
 )
@@ -212,7 +247,7 @@ def cmd_terminate(ctx: click.Context, cluster_id: str) -> None:
 def cmd_submit_step(
     ctx: click.Context,
     cluster_id: str,
-    s3_uri: str,
+    job_uri: str,
     step_name: str,
     wait: bool,
 ) -> None:
@@ -220,10 +255,11 @@ def cmd_submit_step(
     try:
         cfg = merge_step_submit_config(
             config_path=settings_path,
-            s3_uri=s3_uri,
+            s3_uri=job_uri,
             step_name=step_name,
             region=str(load_settings_file(settings_path)["region"]),
         )
+        resolve_local_uris_in_cfg(cfg)
         validate_step_submit(cfg)
     except ValueError as e:
         raise click.ClickException(str(e)) from e

@@ -10,7 +10,9 @@ import pytest
 from emr.config import (
     SETTINGS_PATH_FORNO,
     SETTINGS_PATH_PROD,
+    cli_emr_script_uri,
     load_settings_file,
+    normalize_job_or_bootstrap_uri,
     normalize_tags,
     resolve_settings_path,
     validate_bootstrap_script_uri,
@@ -69,8 +71,57 @@ def test_validate_bootstrap_script_uri_accepts_s3() -> None:
 
 
 def test_validate_bootstrap_script_uri_rejects_invalid() -> None:
-    with pytest.raises(ValueError, match="must start with"):
+    with pytest.raises(ValueError, match="s3://"):
         validate_bootstrap_script_uri("file:///tmp/x.sh")
+
+
+def test_normalize_job_or_bootstrap_uri_rejects_http() -> None:
+    with pytest.raises(ValueError, match="http"):
+        normalize_job_or_bootstrap_uri("https://example.com/x.py", field="uri")
+
+
+def test_normalize_job_or_bootstrap_uri_bare_absolute_path(tmp_path: Path) -> None:
+    f = tmp_path / "job.py"
+    f.write_text("x", encoding="utf-8")
+    out = normalize_job_or_bootstrap_uri(str(f), field="uri")
+    assert out == f.resolve().as_uri()
+
+
+def test_normalize_job_or_bootstrap_uri_bare_relative_resolves_from_cwd(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    nested = tmp_path / "nested" / "job.py"
+    nested.parent.mkdir(parents=True)
+    nested.write_text("x", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    out = normalize_job_or_bootstrap_uri("nested/job.py", field="uri")
+    assert out == nested.resolve().as_uri()
+
+
+def test_normalize_job_or_bootstrap_uri_rejects_file_scheme_uri(tmp_path: Path) -> None:
+    f = tmp_path / "job.py"
+    f.write_text("x", encoding="utf-8")
+    uri = f.resolve().as_uri()
+    with pytest.raises(ValueError, match="file: URLs are not supported"):
+        normalize_job_or_bootstrap_uri(uri, field="uri")
+
+
+def test_normalize_job_or_bootstrap_uri_rejects_non_s3_scheme() -> None:
+    with pytest.raises(ValueError, match="unsupported scheme"):
+        normalize_job_or_bootstrap_uri("ftp://x/y.py", field="uri")
+
+
+def test_normalize_job_or_bootstrap_uri_remote_unchanged() -> None:
+    s = "s3://b/k.py"
+    assert normalize_job_or_bootstrap_uri(s, field="uri") == s
+
+
+def test_cli_emr_script_uri_local_bare_path(tmp_path: Path) -> None:
+    sh = tmp_path / "b.sh"
+    sh.write_text("#!", encoding="utf-8")
+    out = cli_emr_script_uri(str(sh), field="bootstrap_script_uri")
+    assert out == sh.resolve().as_uri()
 
 
 def test_validate_idle_timeout_sec_bounds() -> None:
@@ -95,11 +146,13 @@ def test_load_settings_file_rejects_unknown_keys(tmp_path: Path) -> None:
             action_on_failure: TERMINATE_CLUSTER
             deploy_mode: cluster
             log_uri: s3://b/l/
+            staging_uri: s3://b/emr/staging/cli/
             visible_to_all_users: true
             master_instance_type: m5.xlarge
             core_instance_type: m5.xlarge
             core_instance_count: 2
             idle_timeout_sec: 600
+            use_spot: true
             extra_bad: true
             """
         ).strip(),
@@ -123,11 +176,13 @@ def test_load_settings_file_ok(tmp_path: Path) -> None:
             action_on_failure: TERMINATE_CLUSTER
             deploy_mode: cluster
             log_uri: s3://b/l/
+            staging_uri: s3://b/emr/staging/cli/
             visible_to_all_users: true
             master_instance_type: m5.xlarge
             core_instance_type: m5.xlarge
             core_instance_count: 2
             idle_timeout_sec: 600
+            use_spot: false
             """
         ).strip(),
         encoding="utf-8",
@@ -136,6 +191,8 @@ def test_load_settings_file_ok(tmp_path: Path) -> None:
     assert cfg["region"] == "us-east-1"
     assert cfg["core_instance_count"] == 2
     assert cfg["visible_to_all_users"] is True
+    assert cfg["use_spot"] is False
+    assert cfg["staging_uri"] == "s3://b/emr/staging/cli/"
 
 
 def test_normalize_tags_dict() -> None:
@@ -191,6 +248,28 @@ def test_validate_step_submit_ok(tmp_path: Path) -> None:
     validate_step_submit(cfg)
 
 
+def test_merge_runtime_config_overrides_use_spot(tmp_path: Path) -> None:
+    p = _write_minimal_settings(tmp_path / "emr-settings.yaml")
+    from emr.config import merge_runtime_config
+
+    base = merge_runtime_config(
+        config_path=p,
+        s3_uri="s3://b/x.py",
+        step_name="step",
+        name="flow",
+    )
+    assert base["use_spot"] is True
+
+    off = merge_runtime_config(
+        config_path=p,
+        s3_uri="s3://b/x.py",
+        step_name="step",
+        name="flow",
+        use_spot=False,
+    )
+    assert off["use_spot"] is False
+
+
 def _write_minimal_settings(path: Path) -> Path:
     path.write_text(
         textwrap.dedent(
@@ -204,11 +283,13 @@ def _write_minimal_settings(path: Path) -> Path:
             action_on_failure: TERMINATE_CLUSTER
             deploy_mode: cluster
             log_uri: s3://b/l/
+            staging_uri: s3://b/emr/staging/cli/
             visible_to_all_users: true
             master_instance_type: m5.xlarge
             core_instance_type: m5.xlarge
             core_instance_count: 2
             idle_timeout_sec: 600
+            use_spot: true
             """
         ).strip(),
         encoding="utf-8",

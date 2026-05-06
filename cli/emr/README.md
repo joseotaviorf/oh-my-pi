@@ -46,7 +46,7 @@ make lint
 
 ## Settings file
 
-All keys in the table below are **mandatory** in each environment file (**`prod.yml`** / **`forno.yaml`**).
+**Required** keys in each environment file (**`prod.yml`** / **`forno.yaml`**):
 
 | Key | Type | Purpose |
 |-----|------|---------|
@@ -59,6 +59,7 @@ All keys in the table below are **mandatory** in each environment file (**`prod.
 | `deploy_mode` | string | Job deploy mode. |
 | `region` | string | EMR client region. |
 | `log_uri` | string | EMR log prefix (`s3://…/`). |
+| `staging_uri` | string | S3 prefix (`s3://…/`) for uploading local **`--uri`** / **`--bootstrap-script-uri`** paths. |
 | `visible_to_all_users` | bool | Whether the run is visible to all users. |
 | `master_instance_type` | string | Master **instance type** (overridable with **`--master-instance-type`**). |
 | `core_instance_type` | string | Core **instance type** (overridable with **`--core-instance-type`**). |
@@ -82,14 +83,15 @@ docker compose run --rm app <subcommand> [OPTIONS]
 
 | Option | Required | Default | Description |
 |--------|----------|---------|-------------|
-| `--s3-uri` | **yes** | — | PySpark script on S3. |
+| `--uri` | **yes** | — | PySpark script: **`s3://…`** or a **bare filesystem path**. Relative paths (e.g. **`samples/x.py`**) resolve from the **current working directory**. |
 | `--name` | **yes** | — | Job flow **`Name`**. |
 | `--step-name` | no | `Spark application` | EMR step name for this job. |
 | `--tag` | no | _(none)_ | Repeatable **`Key=Value`** → EMR tags. |
 | `--master-instance-type` | no |  **`m5.xlarge`** | Master **InstanceType** for this run. |
 | `--core-instance-type` | no |  **`m5.xlarge`** | Core **InstanceType** for this run. |
 | `--core-instance-count` | no | 2 | Core instance count for this run (**≥ 1**). |
-| `--bootstrap-script-uri` | no | _(none)_ | **Bootstrap** script URI (`s3://…`); EMR runs it on **every instance** (master + core) at cluster start, before the Spark step. |
+| `--bootstrap-script-uri` | no | _(none)_ | Same as **`--uri`**: **`s3://…`** or bare path (relative → cwd). |
+| `--use-spot` / `--no-use-spot` | no | from YAML | Override **`use_spot`**. |
 | `--wait` / `--no-wait` | no | `--no-wait` | Block until the step completes. |
 
 ### `create-cluster` subcommand
@@ -101,7 +103,8 @@ docker compose run --rm app <subcommand> [OPTIONS]
 | `--master-instance-type` | no | from YAML | Master **InstanceType**. |
 | `--core-instance-type` | no | from YAML | Core **InstanceType**. |
 | `--core-instance-count` | no | from YAML | Core instance count (**≥ 1**). |
-| `--bootstrap-script-uri` | no | _(none)_ | Optional bootstrap script URI. |
+| `--bootstrap-script-uri` | no | _(none)_ | Optional bootstrap script. |
+| `--use-spot` / `--no-use-spot` | no | from YAML | Override **`use_spot`**. |
 
 ### `terminate` subcommand
 
@@ -114,7 +117,7 @@ docker compose run --rm app <subcommand> [OPTIONS]
 | Option | Required | Default | Description |
 |--------|----------|---------|-------------|
 | `--cluster-id` | **yes** | — | Target cluster id. |
-| `--s3-uri` | **yes** | — | PySpark **`.py`** on S3. |
+| `--uri` | **yes** | — | Same as **`transient --uri`**. |
 | `--step-name` | no | `Spark application` | EMR step name. |
 | `--wait` / `--no-wait` | no | `--no-wait` | Block until the step completes. |
 
@@ -128,10 +131,10 @@ For a full passthrough, use **`make app-run args='…'`** and keep the real **`-
 
 | Make target | Role |
 |-------------|------|
-| **`make app-run args='…'`** | Forwards any subcommand and options, identical to **`docker compose run --rm app …`**: e.g. **`args='transient --name … --s3-uri … --wait'`** |
-| **`make transient`** | **`name=`**, **`s3_uri=`**; optional **`step_name=`**, **`bootstrap_script_uri=`**, **`wait=1`** |
-| **`make create-cluster`** | **`name=`**; optional **`bootstrap_script_uri=`** |
-| **`make submit-step`** | **`cluster_id=`**, **`s3_uri=`**; optional **`step_name=`**, **`wait=1`** |
+| **`make app-run args='…'`** | Forwards any subcommand and options, identical to **`docker compose run --rm app …`**: e.g. **`args='transient --name … --uri … --wait'`** |
+| **`make transient`** | **`name=`**, **`uri=`**; optional **`step_name=`**, **`bootstrap_script_uri=`**, **`wait=1`**, **`use_spot=1`** ( **`--use-spot`** ) or **`use_spot=0`** ( **`--no-use-spot`** ) |
+| **`make create-cluster`** | **`name=`**; optional **`bootstrap_script_uri=`**, **`use_spot=1`** or **`use_spot=0`** |
+| **`make submit-step`** | **`cluster_id=`**, **`uri=`**; optional **`step_name=`**, **`wait=1`** |
 | **`make terminate`** | **`cluster_id=`** |
 | **`make file-upload`** | **`local=`** (file), **`s3_prefix=`** (S3 directory; same as the upload script’s two positional args) |
 | **`make file-download`** | **`s3_uri=`**, **`dest=`** (local path) |
@@ -154,30 +157,27 @@ make weep-auth
 make build
 ```
 
-### 3. Upload jobs and bootstrap scripts as needed.
 
-```bash
-make file-upload local=./samples/job/sample_pi.py s3_prefix=s3://your-bucket/emr-cli/jobs/
-make file-upload local=./samples/init/worker_init_example.sh s3_prefix=s3://your-bucket/emr-cli/bootstrap/
-```
-
-### 4. Transient workflow.
+### 3. Transient workflow.
 
 ```bash
 make transient \
   name=my-test-flow \
   step_name=my-test-flow-step \
-  s3_uri=s3://your-bucket/emr-cli/jobs/sample_pi.py \
-  bootstrap_script_uri=s3://your-bucket/emr-cli/bootstrap/worker_init_example.sh \
+  uri='/samples/job/sample_pi.py' \
+  bootstrap_script_uri='/samples/init/worker_init_example.sh' \
   wait=1
 ```
 
-### 5. Persistent workflow.
+
+
+### 4. Persistent workflow.
 
 ```bash
 make create-cluster \
+  use_spot=0 \
   name=my-test-flow \
-  bootstrap_script_uri=s3://your-bucket/emr-cli/bootstrap/worker_init_example.sh
+  bootstrap_script_uri='/samples/init/worker_init_example.sh'
 ```
 
 Wait for cluster to be created.
@@ -186,7 +186,7 @@ Wait for cluster to be created.
 make submit-step \
   cluster_id=j-xxx \
   step_name=my-test-flow-step \
-  s3_uri=s3://your-bucket/emr-cli/jobs/sample_pi.py \
+  uri='/samples/job/sample_pi.py' \
   wait=1
 
 make terminate cluster_id=j-xxx
