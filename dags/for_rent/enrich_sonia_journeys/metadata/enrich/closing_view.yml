@@ -56,10 +56,18 @@ columns:
     lineage:
       - datalake_ebdb_clean.user.id
     description: EBDB internal user id resolved from uuid_person via datalake_ebdb_clean.user.
+  user_first_name:
+    lineage:
+      - datalake_ebdb_clean.user.name
+    description: First name extracted from the EBDB user full name.
   user_email:
     lineage:
       - datalake_ebdb_clean.user.email
     description: Email address of the user resolved from uuid_person via datalake_ebdb_clean.user.
+  user_phone:
+    lineage:
+      - datalake_ebdb_clean.user.main_phone
+    description: User phone number from EBDB with the plus sign removed.
   number_of_signatories:
     lineage:
       - datalake_cdp_clean.transactional.event_properties
