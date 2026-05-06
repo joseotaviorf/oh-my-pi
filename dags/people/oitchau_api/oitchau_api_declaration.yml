@@ -183,6 +183,14 @@ workflow:
       params:
         from: load_start_date
         to: load_start_date
+      api_policies:
+        pagination:
+          strategy: page_per_page
+          page_param: page
+          per_page_param: per_page
+          page_size: 100
+        rate_limiting:
+          strategy: none
       merge_on:
         - id_punch
       vacuum_retention_hours: 168

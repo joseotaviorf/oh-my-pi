@@ -5,6 +5,11 @@ table_level_validations:
   has_size:
     greater_than: 0
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 50
+    severity_level: Error
 column_level_validations:
   id_employee_profile:
     is_complete:
