@@ -20,8 +20,8 @@ from pyspark.sql.functions import lit, current_timestamp, explode
 # Import the functions we want to test
 import sys
 import os
-# Navigate from tests/primitives_dags/comms_manager_rules/tests/schema/ to dags/primitives/comms_manager_rules/spark_jobs/
-spark_jobs_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', 'dags', 'primitives', 'comms_manager_rules', 'spark_jobs')
+# Navigate from tests/support_and_service_dags/comms_manager_rules/tests/schema/ to dags/support_and_service/comms_manager_rules/spark_jobs/
+spark_jobs_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', 'dags', 'support_and_service', 'comms_manager_rules', 'spark_jobs')
 sys.path.append(spark_jobs_path)
 
 from load_comms_manager_rules import (

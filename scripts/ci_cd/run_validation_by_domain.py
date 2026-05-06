@@ -51,7 +51,6 @@ ALL_DOMAINS: List[str] = [
     "people",
     "planning_and_performance",
     "platform",
-    "primitives",
     "qcx",
     "qube",
     "support_and_service",

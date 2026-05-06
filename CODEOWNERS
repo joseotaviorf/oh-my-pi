@@ -18,7 +18,6 @@ dags/ops_poc/**                                                         @luisaro
 dags/planning_and_performance/**                                        @luisarodriguees @GabriellRodrigues
 scripts/ci_cd/**                                                        @quintoandar/data-ingestion-code-owners
 CODEOWNERS                                                              @quintoandar/data-ingestion-code-owners
-dags/primitives/                                                        @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/data-primitives
 dags/mlops/                                                             @quintoandar/mlcops
 dags/atlas_db/**                                                        @quintoandar/atlas-db-code-owners
 dags/conversational_xp/**                                               @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/bi-etl-ejuice-code-owners 

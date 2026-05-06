@@ -34,7 +34,6 @@ class DAGOwnerEnum:
     DATA_GROWTH = "Data Growth"
     DATA_PEOPLE = "Data People"
     DATA_LIFE_CYCLE = "Data Life Cycle"
-    DATA_PRIMITIVES = "Data Primitives"
     DATA_SS = "Data SS"
     MLOPS = "MLOps"
     TECH_PLATAFORM_CYBER_SECURITY = "Tech Platform Cyber Security"

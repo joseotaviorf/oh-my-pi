@@ -131,7 +131,7 @@ cluster:
 - **`dags/{domain}/{dag_name}/`** — every DAG has `{dag_name}_declaration.yml`, `queries/{layer}/*.sql`, `metadata/{layer}/*.yml` (CI-enforced), and optionally `data_quality/{layer}/*.yml` and `spark_jobs/` (core-model DAGs).
 - **`tests/unit/`** — mirrors `bietlejuice/` paths.
 
-**24 business domains**: `core`, `for_rent`, `for_sale`, `fintech`, `agents`, `growth`, `people`, `platform`, `primitives`, `qcx`, `3p_partners`, `cross`, `ds_pricing`, `governance`, `mlops`, `qube`, `support_and_service`, `tech_platform`, and others.
+**24 business domains**: `core`, `for_rent`, `for_sale`, `fintech`, `agents`, `growth`, `people`, `platform`, `qcx`, `3p_partners`, `cross`, `ds_pricing`, `governance`, `mlops`, `qube`, `support_and_service`, `tech_platform`, and others.
 
 **Two special sub-structures:**
 

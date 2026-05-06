@@ -2,6 +2,8 @@ database_name: datalake_amplitude_clean
 table_name: 183047_native_home_page_viewed_events
 description: This table contains native_home_page_viewed events from app 183047. It tracks
   user interactions and includes relevant metadata and user properties.
+owner: data-growth@quintoandar.com.br
+domain: Growth
 columns:
   id_amplitude:
     lineage:
@@ -19,10 +21,22 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.amplitude_event_type
     description: Column amplitude_event_type from Amplitude events
-  ab_beakman_native_owner_home_toggle:
+  ab_beakman_native_home_bff_supply_visits_tile:
     lineage:
       - datalake_amplitude_clean.events.user_properties
-    description: Column ab_beakman_native_owner_home_toggle from Amplitude events
+    description: Column ab_beakman_native_home_bff_supply_visits_tile from Amplitude events
+  rc_beakman_native_home_bff_supply_visits_tile:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Column rc_beakman_native_home_bff_supply_visits_tile from Amplitude events
+  ab_beakman_native_home_bff_supply_rental_transact_tile:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Column ab_beakman_native_home_bff_supply_rental_transact_tile from Amplitude events
+  rc_beakman_native_home_bff_supply_rental_transact_tile:
+    lineage:
+      - datalake_amplitude_clean.events.user_properties
+    description: Column rc_beakman_native_home_bff_supply_rental_transact_tile from Amplitude events
   id_app:
     lineage:
     - datalake_amplitude_clean.events.id_app
@@ -211,5 +225,3 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.ts_event
     description: Column dt_event from Amplitude events
-owner: eduardo.soares@quintoandar.com.br
-domain: Primitives

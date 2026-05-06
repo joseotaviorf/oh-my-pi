@@ -1,6 +1,6 @@
 database_name: datalake_comms_manager_clean
-domain: Primitives
-owner: eduardo.soares@quintoandar.com.br
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
 description: >
   Communication manager notification rules table containing business rules and actions for automated customer communications across the QuintoAndar platform. Each record represents a unique rule-action combination that defines when, how, and what communications should be sent to users based on their context, journey step, and profile. The table includes rule definitions, action specifications, message templates, and metadata for comprehensive communication orchestration.
 table_name: comms_manager_rules

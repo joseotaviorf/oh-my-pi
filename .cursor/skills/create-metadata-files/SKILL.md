@@ -209,7 +209,7 @@ Bad column description examples:
 ### 3.1 Domain values by layer (must match exactly)
 
 Use one exact value from this list (per [governance_metadata.mdc](.cursor/rules/governance_metadata.mdc)):
-- `3P Partners`, `Agents`, `Cross`, `Data Science`, `For Rent`, `For Sale`, `Governance`, `Growth`, `MLOps`, `People`, `Platform`, `Primitives`, `QCX`, `Support and Service`, `Tech Platform`
+- `3P Partners`, `Agents`, `Cross`, `Data Science`, `For Rent`, `For Sale`, `Governance`, `Growth`, `MLOps`, `People`, `Platform`, `QCX`, `Support and Service`, `Tech Platform`
 
 For the complete and up-to-date list, always consult the governance_metadata.mdc rule.
 

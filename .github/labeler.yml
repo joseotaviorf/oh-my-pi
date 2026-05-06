@@ -44,8 +44,6 @@ data-ingestion:
   - "**/bietlejuice/metastore_pipeline/**"
   - "**/bietlejuice/pipeline/**"
   - "**/dags/platform/**"
-data-primitives:
-  - "**/dags/primitives/**"
 data-services-support:
   - "**/dags/support_and_service/**"
 data-fintech:
