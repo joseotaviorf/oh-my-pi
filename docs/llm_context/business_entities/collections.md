@@ -11,7 +11,7 @@ Collections is the **operational phase** focused on recovering overdue payments:
 
 Fintech models described here live in **`dw_collection_recovery_quintoandar`**, **`dw_collections_landlord`**, **`dw_collections_segmentation`**, and **`dw_evictions`**. They connect to **losses / AR** models (`dw_losses`) for provisioned vs non-provisioned views and to **rent** (`dw_rent`) for contract attributes.
 
-**Matthew (collection AI agents):** not defined in these four DAGs; interaction flags such as **`has_matthew_interaction`** on the overdue portfolio timeline come from collections QuintoAndar datalake inputs.
+**Matthew (collection AI agents):** not defined in these four DAGs; interaction flags such as **`has_matthew_interaction`** on the overdue portfolio timeline come from collections QuintoAndar datalake inputs. For Matthew session-grain analytics (escalation rate, outbound reply, tools/helpers, full conversation), see `business_entities/matthew.md` (tables in `datalake_ai_collections_quintoandar.*` and `dw_collection_ai_agents.fact_ai_agents_interaction`).
 
 ## Synonyms
 

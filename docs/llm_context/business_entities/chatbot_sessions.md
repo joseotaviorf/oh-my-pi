@@ -109,6 +109,11 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 - `sessions.id_ticket` links to `datalake_customer_support.tickets.id_ticket`
 - Only populated when `sessions.is_escalated = true`
 
+### Matthew (collections AI agent)
+
+- For Matthew-specific session analysis (collections context, escalation pillars, outbound replies, tool/helper flags), use `datalake_ai_collections_quintoandar.sessions` / `observation` / `messages` and the OBT `dw_collection_ai_agents.fact_ai_agents_interaction`.
+- Matthew runs both as `bot = 'matthew'` (WhatsApp) and as a sub-agent inside `bot = 'wall-e'` (in-app); the canonical attribution lives in `ai_agent_source`. See `business_entities/matthew.md`.
+
 ## Dos and Don'ts
 
 **Do:**

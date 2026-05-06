@@ -26,6 +26,7 @@ Each entity file follows a standard structure:
 - `business_entities/department.md` — Support queue routing and SLA targets (departamento / fila / caixa)
 - `business_entities/inspection.md` — Property inspections (vistorias)
 - `business_entities/losses.md` — Accounting write-offs and provisioning (perdas / PDD)
+- `business_entities/matthew.md` — Collections AI agent for tenants with open balances (agente Matthew / cobrança IA)
 - `business_entities/nps.md` — Net Promoter Score campaigns via Tracksale (NPS)
 - `business_entities/payments.md` — Payment transactions across Checkout, Wall Street, and Vans (pagamentos / cobrança checkout)
 - `business_entities/repairs.md` — Offboarding and ongoing property repairs (reparos)
