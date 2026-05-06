@@ -315,6 +315,24 @@ unit-tests:
 		python -m pytest -W ignore::DeprecationWarning "tests/unit/$(component)"; \
 	fi
 
+.PHONY: unit-tests-changed
+## run unit tests scoped to modules changed since origin/master using pytest-testmon.
+## First run builds .testmondata (full suite within scope); subsequent runs are faster.
+## Falls back to tests/unit/ when framework-level files change.
+unit-tests-changed:
+	@echo ""
+	@echo "Unit Tests (changed modules only)"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@TEST_PATHS=$$(python scripts/ci_cd/detect_changed_tests.py origin/master | tr '\n' ' ') && \
+	 if [ -z "$$TEST_PATHS" ]; then \
+	   echo "No Python changes detected — skipping unit tests."; \
+	 else \
+	   echo "Scope: $$TEST_PATHS" && \
+	   python -m pytest -W ignore::DeprecationWarning --testmon $$TEST_PATHS; \
+	 fi
+
 .PHONY: integration-tests
 ## run integration tests
 integration-tests:

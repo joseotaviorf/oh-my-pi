@@ -45,6 +45,9 @@ coverage/
 nosetests.xml
 coverage.xml
 *-cov.xml
+.testmondata
+.testmondata-shm
+.testmondata-wal
 *,cover
 .hypothesis/
 

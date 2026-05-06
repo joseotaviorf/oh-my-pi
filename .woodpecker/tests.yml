@@ -10,7 +10,28 @@ clone:
       partial: false # We need to clone the entire history to find the changed files
 
 steps:
-  unit-tests-python:
+  # PR pushes: scope tests to changed modules via pytest-testmon + path detection.
+  # master pushes: run the full suite and (re)build .testmondata as the CI baseline.
+  changed-python-unit-tests:
+    image: octoenergy/pyspark:3.3.2
+    commands:
+      - export AIRFLOW_GPL_UNIDECODE=yes
+      - export AWS_DEFAULT_REGION=us-east-1
+      - pip install --upgrade pip
+      - make requirements
+      - make requirements-test
+      - make unit-tests-changed
+    when:
+      event: [push, pull_request]
+      branch:
+        exclude: [master, forno]
+      path:
+        include: ['**/*.py']
+        on_empty: false
+    depends_on: [] # This is for the steps to run in parallel
+  
+  # master pushes: run the full suite and (re)build .testmondata as the CI baseline.
+  full-python-unit-tests:
     image: octoenergy/pyspark:3.3.2
     commands:
       - export AIRFLOW_GPL_UNIDECODE=yes
@@ -21,6 +42,7 @@ steps:
       - make unit-tests
     when:
       event: [push, pull_request]
+      branch: [master, forno]
       path:
         include: ['**/*.py']
         on_empty: false
