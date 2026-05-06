@@ -308,5 +308,17 @@ columns:
     lineage:
       - datalake_collections_quintoandar.overdue_portfolio_timeline.dt_reference
     description: "The daily reference date for the overdue portfolio snapshot."
+  year:
+    lineage:
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.dt_reference
+    description: "The year corresponding to the `dt_reference`."
+  month:
+    lineage:
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.dt_reference
+    description: "The month corresponding to the `dt_reference`."
+  day:
+    lineage:
+      - datalake_collections_quintoandar.overdue_portfolio_timeline.dt_reference
+    description: "The day corresponding to the `dt_reference`."
   ts_load:
     description: "Timestamp indicating when the record was loaded into this table."

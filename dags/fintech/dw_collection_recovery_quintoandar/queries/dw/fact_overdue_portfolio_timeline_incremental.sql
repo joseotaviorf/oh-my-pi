@@ -166,6 +166,9 @@ SELECT
     a.dt_month_start,
     a.dt_month_end,
     a.dt_reference,
+    YEAR(a.dt_reference) AS year,
+    MONTH(a.dt_reference) AS month,
+    DAY(a.dt_reference) AS day,
     a.ts_load
 FROM add_all_dimensions AS a
 LEFT JOIN get_last_valid_partner AS g
