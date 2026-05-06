@@ -35,8 +35,7 @@ filtered_managers_history AS (
         datalake_people.identifier_mapping AS id_map_mgr
         ON id_map_mgr.id_assignment = supervisor.id_manager_assignment
     WHERE
-        supervisor.is_primary
-        AND supervisor.manager_type = 'LINE_MANAGER'
+        supervisor.manager_type = 'LINE_MANAGER'
         AND supervisor.dt_effective_started <= CURRENT_DATE
         AND NOT supervisor.id_manager_assignment IS NULL
         AND NOT id_map_emp.is_user_test
@@ -449,26 +448,31 @@ hierarchy_reordered AS (
     FROM
         hierarchy_union AS hu
 ),
+ceo_history_start AS (
+    SELECT MIN(dt_from) AS first_ceo_dt
+    FROM ceo_history
+),
 hierarchy_filtered AS (
     SELECT
         hr.assignment_number,
         hr.manager_struct_path,
         hr.dt_valid_from,
-        hr.dt_valid_to,
-        CASE
-            WHEN CURRENT_DATE BETWEEN hr.dt_valid_from AND hr.dt_valid_to
-            THEN TRUE
-            ELSE FALSE
-        END AS is_current
+        hr.dt_valid_to
     FROM
         hierarchy_reordered AS hr
-    INNER JOIN
+    LEFT JOIN
         ceo_history AS ceo
         ON ceo.assignment_number = hr.manager_struct_path[0].assignment_number
         AND hr.dt_valid_from <= COALESCE(ceo.dt_to, DATE('9999-12-31'))
         AND COALESCE(hr.dt_valid_to, DATE('9999-12-31')) >= ceo.dt_from
+    CROSS JOIN
+        ceo_history_start AS cs
     WHERE
         SIZE(hr.manager_struct_path) > 0
+        AND (
+            ceo.assignment_number IS NOT NULL
+            OR COALESCE(hr.dt_valid_to, DATE('9999-12-31')) < cs.first_ceo_dt
+        )
     QUALIFY
         ROW_NUMBER() OVER (
             PARTITION BY hr.assignment_number,
@@ -483,11 +487,6 @@ hierarchy_with_sig AS (
         manager_struct_path,
         dt_valid_from,
         dt_valid_to,
-        CASE
-            WHEN CURRENT_DATE BETWEEN dt_valid_from AND dt_valid_to
-            THEN TRUE
-            ELSE FALSE
-        END AS is_current,
         MD5(
             CONCAT_WS(
                 '|',
@@ -538,12 +537,7 @@ hierarchy_consolidated AS (
         assignment_number,
         MIN_BY(manager_struct_path, dt_valid_from) AS manager_struct_path,
         MIN(dt_valid_from) AS dt_valid_from,
-        MAX(dt_valid_to) AS dt_valid_to,
-        CASE
-            WHEN CURRENT_DATE BETWEEN MIN(dt_valid_from) AND MAX(dt_valid_to)
-            THEN TRUE
-            ELSE FALSE
-        END AS is_current
+        MAX(dt_valid_to) AS dt_valid_to
     FROM
         hierarchy_with_island
     GROUP BY
@@ -558,17 +552,38 @@ hierarchy_versioned AS (
             PARTITION BY assignment_number
             ORDER BY dt_valid_from NULLS LAST,
                 dt_valid_to NULLS LAST
-        ) AS hierarchy_version_seq,
+        ) AS hierarchy_version_seq
+    FROM
+        hierarchy_consolidated
+),
+hierarchy_tail_resolved AS (
+    SELECT
+        * EXCEPT (dt_valid_to),
+        CASE
+            WHEN ROW_NUMBER() OVER (
+                PARTITION BY assignment_number
+                ORDER BY dt_valid_from DESC, dt_valid_to DESC, hierarchy_version_seq DESC
+            ) = 1
+            THEN DATE('9999-12-31')
+            ELSE dt_valid_to
+        END AS dt_valid_to
+    FROM
+        hierarchy_versioned
+),
+hierarchy_open_ended AS (
+    SELECT
+        *,
         MD5(
             CONCAT_WS(
                 '|',
                 assignment_number,
                 DATE_FORMAT(dt_valid_from, 'yyyy-MM-dd'),
-                COALESCE(DATE_FORMAT(dt_valid_to, 'yyyy-MM-dd'), '9999-12-31')
+                DATE_FORMAT(dt_valid_to, 'yyyy-MM-dd')
             )
-        ) AS sk_hierarchy_version
+        ) AS sk_hierarchy_version,
+        CURRENT_DATE BETWEEN dt_valid_from AND dt_valid_to AS is_current
     FROM
-        hierarchy_consolidated
+        hierarchy_tail_resolved
 ),
 assignment_lookup AS (
     SELECT
@@ -643,7 +658,7 @@ SELECT
     hv.dt_valid_to,
     CURRENT_TIMESTAMP() AS ts_load
 FROM
-    hierarchy_versioned AS hv
+    hierarchy_open_ended AS hv
 LEFT JOIN
     assignment_lookup AS im_self
     ON im_self.assignment_number = hv.assignment_number

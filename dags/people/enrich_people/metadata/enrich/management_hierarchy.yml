@@ -211,15 +211,23 @@ columns:
       - datalake_people.identifier_mapping.work_email
   version:
     description: Sequential version number of the hierarchy for the assignment (increments when the chain changes).
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.dt_effective_started
+      - datalake_pin_core_clean.assignment_supervisor.dt_effective_ended
   is_current:
-    description: Indicates whether this hierarchy version is currently valid (TRUE) or historical (FALSE).
+    description: TRUE if this is the most recent valid hierarchy version for the assignment.
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.dt_effective_started
+      - datalake_pin_core_clean.assignment_supervisor.dt_effective_ended
   dt_valid_from:
     description: Date when this hierarchy version became effective.
     lineage:
       - datalake_pin_core_clean.assignment_supervisor.dt_effective_started
   dt_valid_to:
-    description: Date when this hierarchy version ended.
+    description: End date of this hierarchy version. The last version per assignment is always stored as 9999-12-31 regardless of the end date recorded in the source.
     lineage:
       - datalake_pin_core_clean.assignment_supervisor.dt_effective_ended
   ts_load:
     description: Timestamp when the record was loaded into the dimension.
+    lineage:
+      - datalake_people.management_hierarchy.ts_load

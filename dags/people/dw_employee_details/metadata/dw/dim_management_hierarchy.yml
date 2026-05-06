@@ -149,7 +149,7 @@ columns:
     lineage:
       - datalake_people.management_hierarchy.email_l9
   is_current:
-    description: Indicates whether this hierarchy version is currently valid (TRUE) or historical (FALSE).
+    description: TRUE if this is the most recent valid hierarchy version for the assignment.
     lineage:
       - datalake_people.management_hierarchy.is_current
   dt_valid_from:
@@ -157,7 +157,7 @@ columns:
     lineage:
       - datalake_people.management_hierarchy.dt_valid_from
   dt_valid_to:
-    description: Date when this hierarchy version ended. 9999-12-31 for current records per domain convention.
+    description: End date of this hierarchy version. Records with 9999-12-31 indicate the latest valid version for the assignment.
     lineage:
       - datalake_people.management_hierarchy.dt_valid_to
   ts_load:

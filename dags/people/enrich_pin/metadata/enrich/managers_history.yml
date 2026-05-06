@@ -79,3 +79,5 @@ columns:
     - datalake_pin_core_clean.assignment_supervisor.ts_updated
   ts_load:
     description: Timestamp indicating when the data was loaded into this table.
+    lineage:
+      - datalake_pin_core_clean.assignment_supervisor.ts_load
