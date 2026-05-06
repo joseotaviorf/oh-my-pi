@@ -143,15 +143,17 @@ def _nested_response_observability_json_path(relative_path: str) -> F.Column:
 
     Matches planner notebooks (``get_json_object(outputs, $.<response>.observability_data...)``).
     Used together with sibling-key envelope extracts via :func:`F.coalesce`.
+
+    PySpark's :func:`get_json_object` requires a **string** path, not a Column (see note above).
+    Dynamic paths are expressed via SQL ``concat`` inside :func:`F.expr`.
     """
-    return F.get_json_object(
-        F.col("outputs"),
-        F.concat(
-            F.lit("$."),
-            F.col("response_type"),
-            F.lit(".observability_data."),
-            F.lit(relative_path),
-        ),
+    if not relative_path or not _SAFE_IDENTIFIER_RE.match(relative_path):
+        raise ValueError(f"Invalid observability JSON relative_path: {relative_path!r}")
+    escaped = relative_path.replace("'", "''")
+    return F.expr(
+        "get_json_object(outputs, concat('$.', response_type, '.observability_data.', '{}'))".format(
+            escaped
+        )
     )
 
 
