@@ -8,6 +8,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 from emr.config import normalize_tags
+from emr.log_follow import StepLogTailer, step_logs_prefix
 from emr.steps import build_spark_step
 
 
@@ -20,6 +21,34 @@ def _emr_client(region: str | None):
 
 def _resolve_region(cfg: dict[str, Any]) -> str | None:
     return cfg.get("region") or cfg.get("aws_region")
+
+
+def emr_console_cluster_url(*, region: str, cluster_id: str) -> str:
+    """AWS console URL for the EMR cluster details page."""
+    r = region.strip()
+    return (
+        f"https://{r}.console.aws.amazon.com/emr/home"
+        f"?region={r}#/clusterDetails/{cluster_id}"
+    )
+
+
+def _console_region_from_client(client: Any, cfg: dict[str, Any]) -> str | None:
+    meta_region = getattr(client.meta, "region_name", None)
+    if meta_region:
+        return str(meta_region).strip()
+    resolved = _resolve_region(cfg)
+    return str(resolved).strip() if resolved else None
+
+
+def _print_cluster_console_url(
+    client: Any, cfg: dict[str, Any], cluster_id: str
+) -> None:
+    region = _console_region_from_client(client, cfg)
+    if region:
+        print(
+            "Cluster console URL: ",
+            emr_console_cluster_url(region=region, cluster_id=cluster_id),
+        )
 
 
 def resolve_step_id_after_run(
@@ -53,13 +82,31 @@ def wait_for_step_terminal(
     cluster_id: str,
     step_id: str,
     poll_sec: float = 15.0,
+    *,
+    follow_logs: bool = False,
+    log_uri: str | None = None,
+    s3_client: Any | None = None,
 ) -> str:
     """Return terminal state: COMPLETED, FAILED, CANCELLED, INTERRUPTED."""
     terminal = {"COMPLETED", "FAILED", "CANCELLED", "INTERRUPTED"}
+    tailer: StepLogTailer | None = None
+    log_bucket: str | None = None
+    log_prefix: str | None = None
+    if follow_logs and log_uri and s3_client:
+        tailer = StepLogTailer()
+        log_bucket, log_prefix = step_logs_prefix(log_uri, cluster_id, step_id)
+        print(f"Polling logs from S3: {log_bucket}/{log_prefix}")
+
+    def _tail_once() -> None:
+        if tailer and log_bucket and log_prefix and s3_client:
+            tailer.poll(s3_client, log_bucket, log_prefix)
+
     while True:
+        _tail_once()
         resp = client.describe_step(ClusterId=cluster_id, StepId=step_id)
         state = resp["Step"]["Status"]["State"]
         if state in terminal:
+            _tail_once()
             return state
         time.sleep(poll_sec)
 
@@ -139,7 +186,9 @@ def _build_run_job_flow_payload(
     return payload
 
 
-def submit_transient(cfg: dict[str, Any], *, wait: bool) -> None:
+def submit_transient(
+    cfg: dict[str, Any], *, wait: bool, follow_logs: bool = False
+) -> None:
     client = _emr_client(_resolve_region(cfg))
     step = build_spark_step(
         name=cfg["step_name"],
@@ -157,14 +206,24 @@ def submit_transient(cfg: dict[str, Any], *, wait: bool) -> None:
     resp = client.run_job_flow(**payload)
     job_flow_id = resp["JobFlowId"]
     print(f"JobFlowId={job_flow_id}")
+    _print_cluster_console_url(client, cfg, job_flow_id)
 
     if not wait:
         return
 
     step_id = resolve_step_id_after_run(client, job_flow_id, cfg["step_name"])
     print(f"StepId={step_id}")
+    s3_client: Any | None = None
+    if follow_logs:
+        s3_client = boto3.client("s3", region_name=_resolve_region(cfg))
     state = wait_for_step_terminal(
-        client, job_flow_id, step_id, poll_sec=_poll_sec(cfg)
+        client,
+        job_flow_id,
+        step_id,
+        poll_sec=_poll_sec(cfg),
+        follow_logs=follow_logs,
+        log_uri=str(cfg["log_uri"]) if cfg.get("log_uri") else None,
+        s3_client=s3_client,
     )
     print(f"Step finished: {state}")
     if state != "COMPLETED":
@@ -180,7 +239,9 @@ def create_persistent_cluster(cfg: dict[str, Any]) -> None:
         keep_job_flow_alive_when_no_steps=True,
     )
     resp = client.run_job_flow(**payload)
-    print(f"JobFlowId={resp['JobFlowId']}")
+    job_flow_id = resp["JobFlowId"]
+    print(f"JobFlowId={job_flow_id}")
+    _print_cluster_console_url(client, cfg, job_flow_id)
 
 
 def terminate_cluster(*, cluster_id: str, region: str | None) -> None:
@@ -189,7 +250,9 @@ def terminate_cluster(*, cluster_id: str, region: str | None) -> None:
     print(f"TerminateJobFlow requested for {cluster_id}")
 
 
-def submit_step_to_cluster(cfg: dict[str, Any], *, cluster_id: str, wait: bool) -> None:
+def submit_step_to_cluster(
+    cfg: dict[str, Any], *, cluster_id: str, wait: bool, follow_logs: bool = False
+) -> None:
     client = _emr_client(_resolve_region(cfg))
     step = build_spark_step(
         name=cfg["step_name"],
@@ -209,7 +272,18 @@ def submit_step_to_cluster(cfg: dict[str, Any], *, cluster_id: str, wait: bool) 
     if not wait:
         return
 
-    state = wait_for_step_terminal(client, cluster_id, step_id, poll_sec=_poll_sec(cfg))
+    s3_client: Any | None = None
+    if follow_logs:
+        s3_client = boto3.client("s3", region_name=_resolve_region(cfg))
+    state = wait_for_step_terminal(
+        client,
+        cluster_id,
+        step_id,
+        poll_sec=_poll_sec(cfg),
+        follow_logs=follow_logs,
+        log_uri=str(cfg["log_uri"]) if cfg.get("log_uri") else None,
+        s3_client=s3_client,
+    )
     print(f"Step finished: {state}")
     if state != "COMPLETED":
         raise SystemExit(1)

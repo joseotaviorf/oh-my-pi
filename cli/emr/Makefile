@@ -39,16 +39,17 @@ app-run:
 	@test -n "$(args)" || (echo 'Usage: make app-run args="transient|create-cluster|submit-step|terminate ..."' >&2; exit 1)
 	$(COMPOSE) run --rm app $(args)
 
-# Transient cluster + step (README §3). Optional: step_name, bootstrap_script_uri, wait=1, use_spot=1|0
+# Transient cluster + step (README §3). Optional: step_name, bootstrap_script_uri, wait=1, follow_logs=1, use_spot=1|0
 transient:
-	@test -n "$(name)" && test -n "$(uri)" || (echo 'Usage: make transient name=... uri=... [step_name=...] [bootstrap_script_uri=...] [wait=1] [use_spot=1|0]' >&2; exit 1)
+	@test -n "$(name)" && test -n "$(uri)" || (echo 'Usage: make transient name=... uri=... [step_name=...] [bootstrap_script_uri=...] [wait=1] [follow_logs=1] [use_spot=1|0]' >&2; exit 1)
 	$(COMPOSE) run --rm app transient \
 		--name "$(name)" \
 		$(if $(strip $(step_name)),--step-name "$(step_name)") \
 		--uri "$(uri)" \
 		$(if $(strip $(bootstrap_script_uri)),--bootstrap-script-uri "$(bootstrap_script_uri)") \
 		$(if $(filter 1 true yes,$(use_spot)),--use-spot,$(if $(filter 0 false no,$(use_spot)),--no-use-spot,)) \
-		$(if $(filter 1 true yes,$(wait)),--wait)
+		$(if $(filter 1 true yes,$(wait)),--wait) \
+		$(if $(filter 1 true yes,$(follow_logs)),--follow-logs,)
 
 # Persistent cluster (README §4). Optional: bootstrap_script_uri, use_spot=1|0
 create-cluster:
@@ -58,14 +59,15 @@ create-cluster:
 		$(if $(strip $(bootstrap_script_uri)),--bootstrap-script-uri "$(bootstrap_script_uri)") \
 		$(if $(filter 1 true yes,$(use_spot)),--use-spot,$(if $(filter 0 false no,$(use_spot)),--no-use-spot,))
 
-# Add Spark step to a running cluster (README §4). Optional: step_name, wait=1
+# Add Spark step to a running cluster (README §4). Optional: step_name, wait=1, follow_logs=1
 submit-step:
-	@test -n "$(cluster_id)" && test -n "$(uri)" || (echo 'Usage: make submit-step cluster_id=... uri=... [step_name=...] [wait=1]' >&2; exit 1)
+	@test -n "$(cluster_id)" && test -n "$(uri)" || (echo 'Usage: make submit-step cluster_id=... uri=... [step_name=...] [wait=1] [follow_logs=1]' >&2; exit 1)
 	$(COMPOSE) run --rm app submit-step \
 		--cluster-id "$(cluster_id)" \
 		$(if $(strip $(step_name)),--step-name "$(step_name)") \
 		--uri "$(uri)" \
-		$(if $(filter 1 true yes,$(wait)),--wait)
+		$(if $(filter 1 true yes,$(wait)),--wait) \
+		$(if $(filter 1 true yes,$(follow_logs)),--follow-logs,)
 
 # Terminate cluster (README §4)
 terminate:

@@ -93,6 +93,7 @@ docker compose run --rm app <subcommand> [OPTIONS]
 | `--bootstrap-script-uri` | no | _(none)_ | Same as **`--uri`**: **`s3://…`** or bare path (relative → cwd). |
 | `--use-spot` / `--no-use-spot` | no | from YAML | Override **`use_spot`**. |
 | `--wait` / `--no-wait` | no | `--no-wait` | Block until the step completes. |
+| `--follow-logs` / `--no-follow-logs` | no | `--no-follow-logs` | With **`--wait`**: poll EMR step logs on S3 (**`stdout`** / **`stderr`**) and print new bytes until the step finishes.|
 
 ### `create-cluster` subcommand
 
@@ -120,6 +121,7 @@ docker compose run --rm app <subcommand> [OPTIONS]
 | `--uri` | **yes** | — | Same as **`transient --uri`**. |
 | `--step-name` | no | `Spark application` | EMR step name. |
 | `--wait` / `--no-wait` | no | `--no-wait` | Block until the step completes. |
+| `--follow-logs` / `--no-follow-logs` | no | `--no-follow-logs` | Same as **`transient --follow-logs`**. |
 
 ## Make
 
@@ -132,9 +134,9 @@ For a full passthrough, use **`make app-run args='…'`** and keep the real **`-
 | Make target | Role |
 |-------------|------|
 | **`make app-run args='…'`** | Forwards any subcommand and options, identical to **`docker compose run --rm app …`**: e.g. **`args='transient --name … --uri … --wait'`** |
-| **`make transient`** | **`name=`**, **`uri=`**; optional **`step_name=`**, **`bootstrap_script_uri=`**, **`wait=1`**, **`use_spot=1`** ( **`--use-spot`** ) or **`use_spot=0`** ( **`--no-use-spot`** ) |
+| **`make transient`** | **`name=`**, **`uri=`**; optional **`step_name=`**, **`bootstrap_script_uri=`**, **`wait=1`**, **`follow_logs=1`**, **`use_spot=1`** ( **`--use-spot`** ) or **`use_spot=0`** ( **`--no-use-spot`** ) |
 | **`make create-cluster`** | **`name=`**; optional **`bootstrap_script_uri=`**, **`use_spot=1`** or **`use_spot=0`** |
-| **`make submit-step`** | **`cluster_id=`**, **`uri=`**; optional **`step_name=`**, **`wait=1`** |
+| **`make submit-step`** | **`cluster_id=`**, **`uri=`**; optional **`step_name=`**, **`wait=1`**, **`follow_logs=1`** |
 | **`make terminate`** | **`cluster_id=`** |
 | **`make file-upload`** | **`local=`** (file), **`s3_prefix=`** (S3 directory; same as the upload script’s two positional args) |
 | **`make file-download`** | **`s3_uri=`**, **`dest=`** (local path) |
@@ -166,7 +168,8 @@ make transient \
   step_name=my-test-flow-step \
   uri='/samples/job/sample_pi.py' \
   bootstrap_script_uri='/samples/init/worker_init_example.sh' \
-  wait=1
+  wait=1 \
+  follow_logs=1
 ```
 
 
@@ -187,7 +190,8 @@ make submit-step \
   cluster_id=j-xxx \
   step_name=my-test-flow-step \
   uri='/samples/job/sample_pi.py' \
-  wait=1
+  wait=1 \
+  follow_logs=1
 
 make terminate cluster_id=j-xxx
 ```

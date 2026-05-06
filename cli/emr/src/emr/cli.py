@@ -44,6 +44,15 @@ def main(ctx: click.Context) -> None:
 @click.pass_context
 @click.option("--wait/--no-wait", default=False, show_default=True)
 @click.option(
+    "--follow-logs/--no-follow-logs",
+    default=False,
+    show_default=True,
+    help=(
+        "With --wait: poll S3 step logs (stdout/stderr) and print new output "
+        "until the step finishes. Requires log_uri in the environment YAML."
+    ),
+)
+@click.option(
     "--uri",
     "job_uri",
     required=True,
@@ -100,6 +109,7 @@ def main(ctx: click.Context) -> None:
 def cmd_transient(
     ctx: click.Context,
     wait: bool,
+    follow_logs: bool,
     job_uri: str,
     job_flow_name: str,
     step_name: str,
@@ -130,8 +140,15 @@ def cmd_transient(
     except ValueError as e:
         raise click.ClickException(str(e)) from e
 
+    if follow_logs and not wait:
+        raise click.UsageError("--follow-logs requires --wait")
+    if follow_logs and not cfg.get("log_uri"):
+        raise click.ClickException(
+            "--follow-logs requires log_uri to be set in the environment config file"
+        )
+
     try:
-        emr_ops.submit_transient(cfg, wait=wait)
+        emr_ops.submit_transient(cfg, wait=wait, follow_logs=follow_logs)
     except Exception as e:
         print(str(e), file=sys.stderr)
         raise SystemExit(1) from e
@@ -244,12 +261,22 @@ def cmd_terminate(ctx: click.Context, cluster_id: str) -> None:
     "--step-name", default="Spark application", show_default=True, help="EMR step name."
 )
 @click.option("--wait/--no-wait", default=False, show_default=True)
+@click.option(
+    "--follow-logs/--no-follow-logs",
+    default=False,
+    show_default=True,
+    help=(
+        "With --wait: poll S3 step logs (stdout/stderr) and print new output "
+        "until the step finishes. Requires log_uri in the environment YAML."
+    ),
+)
 def cmd_submit_step(
     ctx: click.Context,
     cluster_id: str,
     job_uri: str,
     step_name: str,
     wait: bool,
+    follow_logs: bool,
 ) -> None:
     settings_path = str(ctx.obj["settings_path"])
     try:
@@ -264,8 +291,17 @@ def cmd_submit_step(
     except ValueError as e:
         raise click.ClickException(str(e)) from e
 
+    if follow_logs and not wait:
+        raise click.UsageError("--follow-logs requires --wait")
+    if follow_logs and not cfg.get("log_uri"):
+        raise click.ClickException(
+            "--follow-logs requires log_uri to be set in the environment config file"
+        )
+
     try:
-        emr_ops.submit_step_to_cluster(cfg, cluster_id=cluster_id.strip(), wait=wait)
+        emr_ops.submit_step_to_cluster(
+            cfg, cluster_id=cluster_id.strip(), wait=wait, follow_logs=follow_logs
+        )
     except Exception as e:
         print(str(e), file=sys.stderr)
         raise SystemExit(1) from e
