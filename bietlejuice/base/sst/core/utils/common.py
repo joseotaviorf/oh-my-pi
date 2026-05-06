@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 # Handle utils to be used across multiple jobs
 
 from argparse import ArgumentParser

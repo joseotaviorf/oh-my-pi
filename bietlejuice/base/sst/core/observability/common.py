@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from datetime import datetime
 from bietlejuice.base.sst.core.utils.common import (
     build_partition_filter,

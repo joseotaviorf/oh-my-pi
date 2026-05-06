@@ -2,22 +2,13 @@ from datetime import datetime, timedelta
 
 
 from airflow import DAG
-from airflow.operators.python import BranchPythonOperator
 from typing import List, Dict
 
-from bietlejuice.base.sst.airflow.operators.appflow_status_branch_operator import (
-    AppFlowStatusBranchOperator,
-)
 from bietlejuice.base.sst.airflow.operators.base import SStPlaceholderOperator
 from bietlejuice.base.sst.airflow.common.common import (
     get_libs,
     get_cluster_config,
     parse_parameters,
-)
-from bietlejuice.base.sst.core.appflow.marker import (
-    ACTIVE_STATUS,
-    describe_flow_status,
-    extract_flow_name,
 )
 
 from bietlejuice.base.sst.airflow.common.configs import DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST
@@ -142,30 +133,6 @@ def create_start_end_operator(task_id: str):
     return start, end
 
 
-def create_appflow_status_check_task(
-    event_table: str,
-    event_path: str,
-    active_task_id: str,
-    skip_task_id: str,
-) -> BranchPythonOperator:
-    """Gate the pipeline with a fast boto3 AppFlow status check run in Airflow.
-
-    Calls the AppFlow API directly from Airflowbefore the Spark-based
-    ``check_appflow_status`` task.  Routes to ``active_task_id`` (the Spark
-    check) when the flow is Active, otherwise skips to ``skip_task_id`` (end).
-    """
-    def _check_status(**context):
-        flow_name = extract_flow_name(event_path)
-        status = describe_flow_status(flow_name)
-        return active_task_id if status == ACTIVE_STATUS else skip_task_id
-
-    return BranchPythonOperator(
-        task_id=f"airflow_check_appflow_status_{event_table}",
-        python_callable=_check_status,
-        dag=dag,
-    )
-
-
 jiraops_callback = JiraOpsCallback()
 webhook_salesforce_cdc = CONFIG_SERVICE.get_config("webhook_salesforce_cdc")
 gchat_callback = GchatCallback(webhook_url_variable=webhook_salesforce_cdc)
@@ -193,7 +160,6 @@ with DAG(
  ) as dag:
 
     start, end = create_start_end_operator("salesforce")
-    end.trigger_rule = "none_failed_min_one_success"
     execute_job_cluster = create_execute_job_cluster_task(
             dag=dag,
             task_id="execute_cdc_cluster"
@@ -203,40 +169,13 @@ with DAG(
         event_table = f"events_{event.lower()}"
         threshold_time_hours = parameters.get("threshold_time_hours", 24)
 
-        check_appflow_status_task = create_sst_task(
-            target_schema="datalake_sst_metrics",
-            target_table=event_table,
-            entry_point="salesforce/check_appflow_status",
-            parameters={
-                "event_path": parameters["event_path"],
-            },
-            task_id=f"check_appflow_status_{event_table}",
-        )
-
         raw_task = create_sst_task(
             target_schema="datalake_salesforce_raw",
             target_table=event_table,
             entry_point="salesforce/cdc_raw",
             parameters=parameters,
         )
-
-        decide_appflow_status_task = AppFlowStatusBranchOperator(
-            dag=dag,
-            task_id=f"decide_appflow_status_{event_table}",
-            bucket=bucket,
-            target_table=event_table,
-            partition_date="{{ data_interval_start | ds }}",
-            partition_hour="{{ data_interval_start.strftime('%H') }}",
-            active_task_id=raw_task.task_id,
-        )
-
-        airflow_gate_task = create_appflow_status_check_task(
-            event_table=event_table,
-            event_path=parameters["event_path"],
-            active_task_id=check_appflow_status_task.task_id,
-            skip_task_id=end.task_id,
-        )
-
+        
         clean_task = create_sst_task(
             target_schema="datalake_salesforce_clean",
             target_table=event_table,
@@ -250,12 +189,9 @@ with DAG(
         metrics_tasks = build_metrics_tasks(event_table)
         if parameters.get("skip_quality_contracts", False):
             (
-                execute_job_cluster
-                >> airflow_gate_task
-                >> check_appflow_status_task
-                >> decide_appflow_status_task
-                >> raw_task
-                >> clean_task
+                execute_job_cluster 
+                >> raw_task 
+                >> clean_task 
                 >> metrics_tasks
                 >> end
             )
@@ -279,14 +215,11 @@ with DAG(
                 task_id=f"quality_contract_checks_clean_{event_table}",
             )
             (
-                execute_job_cluster
-                >> boto3_ga te_task
-                >> check_appflow_status_task
-                >> decide_appflow_status_task
-                >> raw_task
-                >> quality_contract_raw
-                >> clean_task
-                >> quality_contract_clean
+                execute_job_cluster 
+                >> raw_task 
+                >> quality_contract_raw 
+                >> clean_task 
+                >> quality_contract_clean 
                 >> metrics_tasks
                 >> end
             )
