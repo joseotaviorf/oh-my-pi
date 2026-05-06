@@ -498,9 +498,14 @@ SELECT
                                                                    AS total_duration_seconds,
     BIGINT(unix_timestamp(s.ts_task_ended) - unix_timestamp(s.ts_task_started))
         - COALESCE(s.setup_duration_seconds, 0)                    AS execution_duration_seconds,
-    ROUND(COALESCE(b.dbu_consumed, 0), 4)                          AS dbu_consumed,
+    -- DECIMAL(38,4) matches the existing Delta table physical type (legacy path used
+    -- SUM of usage_quantity as decimal). DOUBLE from duration-share arithmetic would
+    -- otherwise fail overwrite with [DELTA_FAILED_TO_MERGE_FIELDS] on merge.
+    CAST(ROUND(COALESCE(b.dbu_consumed, CAST(0 AS DOUBLE)), 4) AS DECIMAL(38, 4))
+                                                                   AS dbu_consumed,
     -- Primary USD cost trail derived from system.billing.usage × system.billing.list_prices.
-    ROUND(COALESCE(b.cost_usd_estimate, 0), 4)                     AS cost_usd_estimate,
+    CAST(ROUND(COALESCE(b.cost_usd_estimate, CAST(0 AS DOUBLE)), 4) AS DECIMAL(38, 4))
+                                                                   AS cost_usd_estimate,
     b.dbu_rate_usd,
     b.pricing_sku,
     -- Overwatch-derived cluster-day cost cross-check (USD). Same cluster-day dedupe
