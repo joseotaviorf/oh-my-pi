@@ -1,0 +1,63 @@
+dag:
+  name: offboarding_categorization
+  schedule_start_date: 2026, 2, 1
+  catchup: false
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      Loads daily parquet exports from the Wall-E offboarding session classifier (Data Science S3)
+      into the raw datalake, then promotes the same window to a Delta clean table for Trino and
+      Superset access (datalake_offboarding_clean.categorization). One file per calendar day under
+      session-metadata/{yyyy-MM-dd}.parquet. Persisted columns exclude chat message content
+      (projection in the Spark job).
+
+      Hive/Databricks schemas: datalake_offboarding_raw, datalake_offboarding_clean; table categorization.
+
+      Scheduling: dataset-driven (no cron). The DAG is triggered by Airflow after the upstream
+      `quintoml.post_contract.wall_e_offboarding_categoriser.inference` emits its
+      `:first-run-of-day` dataset for the current logical date. See `dags/dependencies.yaml`.
+
+      Backfill: trigger historical DAG runs manually so data_interval_start covers each date
+      (e.g. 2026-02-01 through 2026-03-31 for February partial and full March).
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  custom_schema: offboarding
+  load_spark_job: load_offboarding_categorization_raw
+  default_partitions: [year, month, day]
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - s3://data-science.s3.data.quintoandar.com.br/chatbot/wall-e-offboarding-categorizer/session-metadata
+    - "{{ data_interval_start | ds }}"
+    - "{table_name}"
+    - "{partitions}"
+    - parquet
+
+  default_extraction_type: incremental
+
+  tables_customization:
+    categorization:
+      merge_on:
+        - id_langfuse_session
+        - year
+        - month
+        - day
+      when_matched_update_condition: source.ts_load >= target.ts_load
+      partitions:
+        - year
+        - month
+        - day
+
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.sql.sources.partitionOverwriteMode: dynamic
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

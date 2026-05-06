@@ -1320,6 +1320,9 @@ bietlejuice.enrich_attribution:
 bietlejuice.dw_rede_supply:
   remove:
     - bietlejuice.enrich_rede_lead_acquisition:load-enrich-lead-3p-acquisition:first-run-of-day
+bietlejuice.offboarding_categorization:
+  add:
+    - quintoml.post_contract.wall_e_offboarding_categoriser.inference:first-run-of-day
 bietlejuice.enrich_fairness_assessment:
   override:
     - bietlejuice.documentation_metrics:load-clean-tables-documentation:first-run-of-day
