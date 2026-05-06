@@ -1,0 +1,59 @@
+---
+database_name: datalake_notifyme_clean
+table_name: alerts
+description: This table consolidates alerts data from NotifyMe. Alerts represent notification rules and conditions for users.
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
+columns:
+  id:
+    description: Unique identifier for the alert.
+    lineage:
+      - datalake_notifyme_raw.alerts.id
+  id_user:
+    description: Identifier of the user associated with the alert.
+    lineage:
+      - datalake_notifyme_raw.alerts.user_id
+  campaign_name:
+    description: Name of the campaign associated with the alert.
+    lineage:
+      - datalake_notifyme_raw.alerts.campaign_name
+  active:
+    description: Boolean flag indicating if the alert is active.
+    lineage:
+      - datalake_notifyme_raw.alerts.active
+  conditions:
+    description: JSON object containing the alert conditions and rules.
+    lineage:
+      - datalake_notifyme_raw.alerts.conditions
+  processing_status:
+    description: Current processing status of the alert.
+    lineage:
+      - datalake_notifyme_raw.alerts.processing_status
+  delete_reason:
+    description: Reason for alert deletion if applicable.
+    lineage:
+      - datalake_notifyme_raw.alerts.delete_reason
+  deleted:
+    description: Boolean flag indicating if the alert is deleted.
+    lineage:
+      - datalake_notifyme_raw.alerts.deleted
+  ts_created:
+    description: Timestamp when the alert was created.
+    lineage:
+      - datalake_notifyme_raw.alerts.created_at
+  ts_updated:
+    description: Timestamp when the alert was last updated.
+    lineage:
+      - datalake_notifyme_raw.alerts.updated_at
+  year:
+    description: Year extracted from the alert update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.alerts.updated_at
+  month:
+    description: Month extracted from the alert update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.alerts.updated_at
+  day:
+    description: Day extracted from the alert update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.alerts.updated_at

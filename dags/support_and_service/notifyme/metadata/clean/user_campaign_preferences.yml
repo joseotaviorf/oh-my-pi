@@ -1,0 +1,39 @@
+---
+database_name: datalake_notifyme_clean
+table_name: user_campaign_preferences
+description: This table consolidates user campaign preferences data from NotifyMe. Tracks user preferences for specific campaigns.
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
+columns:
+  id:
+    description: Unique identifier for the user campaign preference record.
+    lineage:
+      - datalake_notifyme_raw.user_campaign_preferences.id
+  id_user:
+    description: Identifier of the user associated with the campaign preference.
+    lineage:
+      - datalake_notifyme_raw.user_campaign_preferences.user_id
+  campaign_name:
+    description: Name of the campaign for which the user has preferences.
+    lineage:
+      - datalake_notifyme_raw.user_campaign_preferences.campaign_name
+  ts_created:
+    description: Timestamp when the user campaign preference record was created.
+    lineage:
+      - datalake_notifyme_raw.user_campaign_preferences.created_at
+  ts_updated:
+    description: Timestamp when the user campaign preference record was last updated.
+    lineage:
+      - datalake_notifyme_raw.user_campaign_preferences.updated_at
+  year:
+    description: Year extracted from the user campaign preference update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.user_campaign_preferences.updated_at
+  month:
+    description: Month extracted from the user campaign preference update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.user_campaign_preferences.updated_at
+  day:
+    description: Day extracted from the user campaign preference update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.user_campaign_preferences.updated_at

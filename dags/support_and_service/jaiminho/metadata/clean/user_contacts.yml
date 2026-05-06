@@ -1,0 +1,43 @@
+---
+database_name: datalake_jaiminho_clean
+table_name: user_contacts
+description: This table consolidates user contact records from Jaiminho.
+domain: Support and Services
+owner: gabriel.fonseca@quintoandar.com.br
+columns:
+  id:
+    description: Unique identifier for the user contact record.
+    lineage:
+      - datalake_jaiminho_raw.user_contacts.id
+  location:
+    description: Raw location data associated with the user contact.
+    lineage:
+      - datalake_jaiminho_raw.user_contacts.location
+  contacts_info:
+    description: Raw contact information data associated with the user contact.
+    lineage:
+      - datalake_jaiminho_raw.user_contacts.contactsInfo
+  version:
+    description: Version number of the user contact record.
+    lineage:
+      - datalake_jaiminho_raw.user_contacts.version
+  ts_created:
+    description: Timestamp when the user contact record was created.
+    lineage:
+      - datalake_jaiminho_raw.user_contacts.createdAt
+  ts_updated:
+    description: Timestamp when the user contact record was last updated.
+    lineage:
+      - datalake_jaiminho_raw.user_contacts.updatedAt
+  year:
+    description: Year extracted from the user contact update timestamp for partitioning.
+    lineage:
+      - datalake_jaiminho_raw.user_contacts.updatedAt
+  month:
+    description: Month extracted from the user contact update timestamp for partitioning.
+    lineage:
+      - datalake_jaiminho_raw.user_contacts.updatedAt
+  day:
+    description: Day extracted from the user contact update timestamp for partitioning.
+    lineage:
+      - datalake_jaiminho_raw.user_contacts.updatedAt

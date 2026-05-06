@@ -1,0 +1,67 @@
+---
+database_name: datalake_jaiminho_clean
+table_name: event_traces
+description: This table consolidates event traces from communications sent by Jaiminho.
+domain: Support and Services
+owner: conrado.fabri@quintoandar.com.br
+columns:
+  id:
+    description: Unique identifier for the event trace record.
+    lineage:
+      - datalake_jaiminho_raw.event_traces.id
+  id_trace:
+    description: Trace identifier used to correlate related events and track message flow.
+    lineage:
+      - datalake_jaiminho_raw.event_traces.traceId
+  id_entity:
+    description: Identifier of the entity (e.g., user, object) associated with the traced event.
+    lineage:
+      - datalake_jaiminho_raw.event_traces.entityId
+  entity_name:
+    description: Name or type of the entity associated with the traced event.
+    lineage:
+      - datalake_jaiminho_raw.event_traces.entityName
+  destination:
+    description: Target destination for the communication (e.g., email address, phone number).
+    lineage:
+      - datalake_jaiminho_raw.event_traces.destination
+  status:
+    description: Current status of the traced event (e.g., pending, sent, delivered, failed).
+    lineage:
+      - datalake_jaiminho_raw.event_traces.status
+  channel:
+    description: Communication channel used for the traced event (e.g., email, SMS, push).
+    lineage:
+      - datalake_jaiminho_raw.event_traces.channel
+  error_name:
+    description: Name or type of error that occurred during event processing, if any.
+    lineage:
+      - datalake_jaiminho_raw.event_traces.errorName
+  error_info:
+    description: Detailed information about any error that occurred during event processing.
+    lineage:
+      - datalake_jaiminho_raw.event_traces.errorInfo
+  is_error:
+    description: Boolean flag indicating whether an error occurred during event processing.
+    lineage:
+      - datalake_jaiminho_raw.event_traces.isError
+  ts_created:
+    description: Timestamp when the event trace was created.
+    lineage:
+      - datalake_jaiminho_raw.event_traces.createdAt
+  ts_updated:
+    description: Timestamp when the event trace was last updated.
+    lineage:
+      - datalake_jaiminho_raw.event_traces.updatedAt
+  year:
+    description: Year extracted from the event trace update timestamp for partitioning.
+    lineage:
+      - datalake_jaiminho_raw.event_traces.updatedAt
+  month:
+    description: Month extracted from the event trace update timestamp for partitioning.
+    lineage:
+      - datalake_jaiminho_raw.event_traces.updatedAt
+  day:
+    description: Day extracted from the event trace update timestamp for partitioning.
+    lineage:
+      - datalake_jaiminho_raw.event_traces.updatedAt

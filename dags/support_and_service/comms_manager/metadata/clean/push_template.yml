@@ -1,0 +1,74 @@
+---
+database_name: datalake_comms_manager_clean
+table_name: push_template
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
+description: >
+  Clean layer mirror of push notification templates managed by Comms Manager. Each row represents a push
+  template with title, content, language, category and metadata, used to power mobile push notifications sent
+  through the platform. Sourced from the Comms Manager PostgreSQL database via CDC.
+columns:
+  id:
+    description: Unique identifier of the push template, primary key inherited from the Comms Manager source.
+    lineage:
+      - datalake_comms_manager_raw.push_template.id
+  name:
+    description: Human-readable name of the push template, used for identification and management in the Comms Manager UI.
+    lineage:
+      - datalake_comms_manager_raw.push_template.name
+  provider_code:
+    description: Provider-specific code identifying the push template at the external push notification provider integration.
+    lineage:
+      - datalake_comms_manager_raw.push_template.providerCode
+  user_email:
+    description: Email of the user responsible for creating or last editing the template in the Comms Manager.
+    lineage:
+      - datalake_comms_manager_raw.push_template.userEmail
+  sample_data:
+    description: Sample payload data used to preview and validate the push template rendering before delivery.
+    lineage:
+      - datalake_comms_manager_raw.push_template.sampleData
+  title:
+    description: Title or headline of the push notification displayed at the top of the recipient's device.
+    lineage:
+      - datalake_comms_manager_raw.push_template.title
+  content:
+    description: Main body content of the push notification with placeholder variables for dynamic personalization.
+    lineage:
+      - datalake_comms_manager_raw.push_template.content
+  language:
+    description: Language code of the push template content, used to render localized notifications.
+    lineage:
+      - datalake_comms_manager_raw.push_template.language
+  metadata:
+    description: Additional template metadata stored as a JSON-like structure with provider-specific configuration.
+    lineage:
+      - datalake_comms_manager_raw.push_template.metadata
+  category:
+    description: Category classification of the push template (e.g. transactional, marketing, reminder) used for governance and reporting.
+    lineage:
+      - datalake_comms_manager_raw.push_template.category
+  is_manual:
+    description: Boolean flag indicating whether the template was created manually by an operator rather than provisioned automatically.
+    lineage:
+      - datalake_comms_manager_raw.push_template.isManual
+  ts_created:
+    description: Timestamp when the push template was originally created in the Comms Manager source system.
+    lineage:
+      - datalake_comms_manager_raw.push_template.createdAt
+  ts_updated:
+    description: Timestamp when the push template was last updated in the Comms Manager source system.
+    lineage:
+      - datalake_comms_manager_raw.push_template.updatedAt
+  year:
+    description: Year extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.push_template.updatedAt
+  month:
+    description: Month extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.push_template.updatedAt
+  day:
+    description: Day extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.push_template.updatedAt

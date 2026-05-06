@@ -1,0 +1,27 @@
+---
+database_name: datalake_notifyme_clean
+table_name: rev_info
+description: This table consolidates revision information data from NotifyMe. Tracks database revision history for audit purposes.
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
+columns:
+  rev:
+    description: Unique revision identifier.
+    lineage:
+      - datalake_notifyme_raw.revinfo.rev
+  ts_revision:
+    description: Timestamp of the revision.
+    lineage:
+      - datalake_notifyme_raw.revinfo.revtstmp
+  year:
+    description: Year extracted from the revision timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.revinfo.revtstmp
+  month:
+    description: Month extracted from the revision timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.revinfo.revtstmp
+  day:
+    description: Day extracted from the revision timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.revinfo.revtstmp

@@ -1,0 +1,39 @@
+---
+database_name: datalake_jaiminho_clean
+table_name: notifications_tracking
+description: This table consolidates notifications tracking from Jaiminho.
+domain: Support and Services
+owner: gabriel.fonseca@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_jaiminho_raw.notifications_tracking.id
+    description: The unique identifier for the user notification.
+  id_notification:
+    description: The identifier of the notification being tracked.
+    lineage:
+      - datalake_jaiminho_raw.notifications_tracking.notificationId
+  state:
+    description: The state tracked for the notification.
+    lineage:
+      - datalake_jaiminho_raw.notifications_tracking.status
+  error_code:
+    description: The error code associated with the notification tracking.
+    lineage:
+      - datalake_jaiminho_raw.notifications_tracking.errorCode
+  error_info:
+    description: Detailing of the error associated with the notification tracking.
+    lineage:
+      - datalake_jaiminho_raw.notifications_tracking.errorInfo
+  ts_sent:
+    description: Timestamp when the event being tracked was sent.
+    lineage:
+      - datalake_jaiminho_raw.notifications_tracking.timestamp
+  ts_created:
+    description: Timestamp when the tracking was created.
+    lineage:
+      - datalake_jaiminho_raw.notifications_tracking.createdAt
+  message_uid:
+    description: The identified of the message delivered to the user.
+    lineage:
+      - datalake_jaiminho_raw.notifications_tracking.messageUid

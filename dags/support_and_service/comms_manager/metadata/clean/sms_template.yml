@@ -1,0 +1,70 @@
+---
+database_name: datalake_comms_manager_clean
+table_name: sms_template
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
+description: >
+  Clean layer mirror of SMS templates managed by Comms Manager. Each row represents an SMS template with
+  content, language, category and metadata, used to power transactional and marketing SMS messages sent
+  through the platform. Sourced from the Comms Manager PostgreSQL database via CDC.
+columns:
+  id:
+    description: Unique identifier of the SMS template, primary key inherited from the Comms Manager source.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.id
+  name:
+    description: Human-readable name of the SMS template, used for identification and management in the Comms Manager UI.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.name
+  provider_code:
+    description: Provider-specific code identifying the SMS template at the external SMS provider integration.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.providerCode
+  user_email:
+    description: Email of the user responsible for creating or last editing the template in the Comms Manager.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.userEmail
+  sample_data:
+    description: Sample payload data used to preview and validate the SMS template rendering before delivery.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.sampleData
+  content:
+    description: Main body content of the SMS message with placeholder variables for dynamic personalization.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.content
+  language:
+    description: Language code of the SMS template content, used to render localized messages.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.language
+  metadata:
+    description: Additional template metadata stored as a JSON-like structure with provider-specific configuration.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.metadata
+  category:
+    description: Category classification of the SMS template (e.g. transactional, marketing, reminder) used for governance and reporting.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.category
+  is_manual:
+    description: Boolean flag indicating whether the template was created manually by an operator rather than provisioned automatically.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.isManual
+  ts_created:
+    description: Timestamp when the SMS template was originally created in the Comms Manager source system.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.createdAt
+  ts_updated:
+    description: Timestamp when the SMS template was last updated in the Comms Manager source system.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.updatedAt
+  year:
+    description: Year extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.updatedAt
+  month:
+    description: Month extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.updatedAt
+  day:
+    description: Day extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.sms_template.updatedAt

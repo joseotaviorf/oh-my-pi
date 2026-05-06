@@ -1,0 +1,62 @@
+dag:
+  name: notifyme
+  schedule_start_date: 2024, 1, 1
+  schedule_interval: 0 3,8,12 * * *
+  owner: Data SS
+  documentation:
+    dag_purpose: |
+      Retrieves data from the NotifyMe database (PostgreSQL). NotifyMe is a microservice that handles
+      notification campaigns, alerts, messages, and user preferences for the QuintoAndar platform.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  dbutils_secret_key: NOTIFYME_DB
+  lineage_product_database_name: notifyme
+  tables_customization:
+    alerts:
+      clean_table_name: alerts
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    alerts_processing_scheduler:
+      clean_table_name: alerts_processing_scheduler
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    blocked_listings:
+      clean_table_name: blocked_listings
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    campaigns:
+      clean_table_name: campaigns
+      raw_primary_keys: [name]
+      clean_primary_keys: [name]
+    messages:
+      clean_table_name: messages
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    revinfo:
+      clean_table_name: rev_info
+      raw_primary_keys: [rev]
+      clean_primary_keys: [rev]
+    subscriptions:
+      clean_table_name: subscriptions
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    user_campaign_preferences:
+      clean_table_name: user_campaign_preferences
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    users:
+      clean_table_name: users
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

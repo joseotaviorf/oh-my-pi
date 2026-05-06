@@ -1,0 +1,39 @@
+---
+database_name: datalake_notifyme_clean
+table_name: blocked_listings
+description: This table consolidates blocked listings data from NotifyMe. Tracks which listings are blocked for specific user campaign preferences.
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
+columns:
+  id:
+    description: Unique identifier for the blocked listing record.
+    lineage:
+      - datalake_notifyme_raw.blocked_listings.id
+  id_user_campaign_preferences:
+    description: Identifier of the user campaign preferences associated with the blocked listing.
+    lineage:
+      - datalake_notifyme_raw.blocked_listings.user_campaign_preferences
+  id_listing:
+    description: Identifier of the listing that is blocked.
+    lineage:
+      - datalake_notifyme_raw.blocked_listings.listing_id
+  ts_created:
+    description: Timestamp when the blocked listing record was created.
+    lineage:
+      - datalake_notifyme_raw.blocked_listings.created_at
+  ts_updated:
+    description: Timestamp when the blocked listing record was last updated.
+    lineage:
+      - datalake_notifyme_raw.blocked_listings.updated_at
+  year:
+    description: Year extracted from the blocked listing update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.blocked_listings.updated_at
+  month:
+    description: Month extracted from the blocked listing update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.blocked_listings.updated_at
+  day:
+    description: Day extracted from the blocked listing update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.blocked_listings.updated_at

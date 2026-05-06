@@ -1,0 +1,74 @@
+---
+database_name: datalake_comms_manager_clean
+table_name: central_template
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
+description: >
+  Clean layer mirror of central communication templates managed by Comms Manager. Each row represents a reusable
+  template used across multiple channels with title, content, language, category and metadata. Sourced from the
+  Comms Manager PostgreSQL database via CDC and used to power transactional and operational notifications.
+columns:
+  id:
+    description: Unique identifier of the central template, primary key inherited from the Comms Manager source.
+    lineage:
+      - datalake_comms_manager_raw.central_template.id
+  name:
+    description: Human-readable name of the template, used for identification and management in the Comms Manager UI.
+    lineage:
+      - datalake_comms_manager_raw.central_template.name
+  provider_code:
+    description: Provider-specific code identifying the template at the external messaging provider integration.
+    lineage:
+      - datalake_comms_manager_raw.central_template.providerCode
+  user_email:
+    description: Email of the user responsible for creating or last editing the template in the Comms Manager.
+    lineage:
+      - datalake_comms_manager_raw.central_template.userEmail
+  sample_data:
+    description: Sample payload data used to preview and validate the template rendering before delivery.
+    lineage:
+      - datalake_comms_manager_raw.central_template.sampleData
+  title:
+    description: Title or headline of the template displayed to the recipient depending on the delivery channel.
+    lineage:
+      - datalake_comms_manager_raw.central_template.title
+  content:
+    description: Main body content of the template with placeholder variables for dynamic personalization.
+    lineage:
+      - datalake_comms_manager_raw.central_template.content
+  language:
+    description: Language code of the template content, used to render localized communications.
+    lineage:
+      - datalake_comms_manager_raw.central_template.language
+  metadata:
+    description: Additional template metadata stored as a JSON-like structure with provider-specific configuration.
+    lineage:
+      - datalake_comms_manager_raw.central_template.metadata
+  category:
+    description: Category classification of the template (e.g. transactional, marketing, reminder) used for governance and reporting.
+    lineage:
+      - datalake_comms_manager_raw.central_template.category
+  is_manual:
+    description: Boolean flag indicating whether the template was created manually by an operator rather than provisioned automatically.
+    lineage:
+      - datalake_comms_manager_raw.central_template.isManual
+  ts_created:
+    description: Timestamp when the template was originally created in the Comms Manager source system.
+    lineage:
+      - datalake_comms_manager_raw.central_template.createdAt
+  ts_updated:
+    description: Timestamp when the template was last updated in the Comms Manager source system.
+    lineage:
+      - datalake_comms_manager_raw.central_template.updatedAt
+  year:
+    description: Year extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.central_template.updatedAt
+  month:
+    description: Month extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.central_template.updatedAt
+  day:
+    description: Day extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.central_template.updatedAt

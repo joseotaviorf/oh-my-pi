@@ -1,0 +1,39 @@
+---
+database_name: datalake_notifyme_clean
+table_name: alerts_processing_scheduler
+description: This table consolidates alerts processing scheduler data from NotifyMe. Tracks when campaigns were last processed.
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
+columns:
+  id:
+    description: Unique identifier for the processing scheduler record.
+    lineage:
+      - datalake_notifyme_raw.alerts_processing_scheduler.id
+  campaign_name:
+    description: Name of the campaign being scheduled for processing.
+    lineage:
+      - datalake_notifyme_raw.alerts_processing_scheduler.campaign_name
+  ts_last_processing:
+    description: Timestamp of the last processing date for the campaign.
+    lineage:
+      - datalake_notifyme_raw.alerts_processing_scheduler.last_processing_date
+  ts_created:
+    description: Timestamp when the scheduler record was created.
+    lineage:
+      - datalake_notifyme_raw.alerts_processing_scheduler.created_at
+  ts_updated:
+    description: Timestamp when the scheduler record was last updated.
+    lineage:
+      - datalake_notifyme_raw.alerts_processing_scheduler.updated_at
+  year:
+    description: Year extracted from the scheduler update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.alerts_processing_scheduler.updated_at
+  month:
+    description: Month extracted from the scheduler update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.alerts_processing_scheduler.updated_at
+  day:
+    description: Day extracted from the scheduler update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.alerts_processing_scheduler.updated_at

@@ -1,0 +1,47 @@
+---
+database_name: datalake_notifyme_clean
+table_name: messages
+description: This table consolidates messages data from NotifyMe. Messages represent actual notifications sent to users.
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
+columns:
+  id:
+    description: Unique identifier for the message.
+    lineage:
+      - datalake_notifyme_raw.messages.id
+  id_recipient:
+    description: Identifier of the user who received the message.
+    lineage:
+      - datalake_notifyme_raw.messages.recipient
+  id_alert:
+    description: Identifier of the alert that triggered the message.
+    lineage:
+      - datalake_notifyme_raw.messages.alert_id
+  content:
+    description: JSON object containing the message content and metadata.
+    lineage:
+      - datalake_notifyme_raw.messages.content
+  ts_sent:
+    description: Timestamp when the message was sent.
+    lineage:
+      - datalake_notifyme_raw.messages.sent_at
+  ts_created:
+    description: Timestamp when the message record was created.
+    lineage:
+      - datalake_notifyme_raw.messages.created_at
+  ts_updated:
+    description: Timestamp when the message record was last updated.
+    lineage:
+      - datalake_notifyme_raw.messages.updated_at
+  year:
+    description: Year extracted from the message update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.messages.updated_at
+  month:
+    description: Month extracted from the message update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.messages.updated_at
+  day:
+    description: Day extracted from the message update timestamp for partitioning.
+    lineage:
+      - datalake_notifyme_raw.messages.updated_at

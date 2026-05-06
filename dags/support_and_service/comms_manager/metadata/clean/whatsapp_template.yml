@@ -1,0 +1,90 @@
+---
+database_name: datalake_comms_manager_clean
+table_name: whatsapp_template
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
+description: >
+  Clean layer mirror of WhatsApp templates managed by Comms Manager. Each row represents a WhatsApp template
+  with content, language, Meta-specific category, approval status and rejection reason, used to power messages
+  sent through WhatsApp Business. Sourced from the Comms Manager PostgreSQL database via CDC.
+columns:
+  id:
+    description: Unique identifier of the WhatsApp template, primary key inherited from the Comms Manager source.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.id
+  sid_template:
+    description: Provider-specific template SID (e.g. Twilio template identifier) used to reference the WhatsApp template at the messaging provider.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.templateSid
+  name:
+    description: Human-readable name of the WhatsApp template, used for identification and management in the Comms Manager UI.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.name
+  provider_code:
+    description: Provider-specific code identifying the WhatsApp template at the external messaging provider integration.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.providerCode
+  user_email:
+    description: Email of the user responsible for creating or last editing the template in the Comms Manager.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.userEmail
+  sample_data:
+    description: Sample payload data used to preview and validate the WhatsApp template rendering before delivery.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.sampleData
+  content:
+    description: Main body content of the WhatsApp template with placeholder variables for dynamic personalization.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.content
+  language:
+    description: Language code of the WhatsApp template content, used to render localized messages.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.language
+  status:
+    description: Current approval status of the WhatsApp template at Meta (e.g. approved, pending, rejected) controlling whether it can be used to send messages.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.status
+  rejection_reason:
+    description: Reason returned by Meta when the WhatsApp template was rejected, used to guide template fixes and resubmission.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.rejectionReason
+  meta_category:
+    description: Category assigned by Meta to the WhatsApp template (e.g. utility, marketing, authentication), required by WhatsApp Business policy.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.metaCategory
+  category:
+    description: Internal category classification of the WhatsApp template used for governance and reporting in QuintoAndar.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.category
+  type:
+    description: Type of the WhatsApp template (e.g. text, media, interactive) defining the structure and supported components.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.type
+  metadata:
+    description: Additional template metadata stored as a JSON-like structure with provider-specific configuration.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.metadata
+  is_manual:
+    description: Boolean flag indicating whether the template was created manually by an operator rather than provisioned automatically.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.isManual
+  ts_created:
+    description: Timestamp when the WhatsApp template was originally created in the Comms Manager source system.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.createdAt
+  ts_updated:
+    description: Timestamp when the WhatsApp template was last updated in the Comms Manager source system.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.updatedAt
+  year:
+    description: Year extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.updatedAt
+  month:
+    description: Month extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.updatedAt
+  day:
+    description: Day extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.whatsapp_template.updatedAt

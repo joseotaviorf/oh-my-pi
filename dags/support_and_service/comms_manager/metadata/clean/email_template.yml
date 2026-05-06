@@ -1,0 +1,74 @@
+---
+database_name: datalake_comms_manager_clean
+table_name: email_template
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
+description: >
+  Clean layer mirror of email templates managed by Comms Manager. Each row represents an email template with
+  subject, provider configuration, sample data and user-profile targeting, used to power transactional and
+  marketing emails sent through the platform. Sourced from the Comms Manager PostgreSQL database via CDC.
+columns:
+  id:
+    description: Unique identifier of the email template, primary key inherited from the Comms Manager source.
+    lineage:
+      - datalake_comms_manager_raw.email_template.id
+  name:
+    description: Human-readable name of the email template, used for identification and management in the Comms Manager UI.
+    lineage:
+      - datalake_comms_manager_raw.email_template.name
+  category:
+    description: Category classification of the email template (e.g. transactional, marketing, reminder) used for governance and reporting.
+    lineage:
+      - datalake_comms_manager_raw.email_template.category
+  provider_url:
+    description: URL pointing to the email provider resource where the template is rendered or referenced.
+    lineage:
+      - datalake_comms_manager_raw.email_template.providerUrl
+  provider_code:
+    description: Provider-specific code identifying the email template at the external email provider integration.
+    lineage:
+      - datalake_comms_manager_raw.email_template.providerCode
+  user_email:
+    description: Email of the user responsible for creating or last editing the template in the Comms Manager.
+    lineage:
+      - datalake_comms_manager_raw.email_template.userEmail
+  sample_data:
+    description: Sample payload data used to preview and validate the email template rendering before delivery.
+    lineage:
+      - datalake_comms_manager_raw.email_template.sampleData
+  user_profile:
+    description: User profile or persona targeted by the email template (e.g. tenant, landlord, agent, lead).
+    lineage:
+      - datalake_comms_manager_raw.email_template.userProfile
+  metadata:
+    description: Additional template metadata stored as a JSON-like structure with provider-specific configuration.
+    lineage:
+      - datalake_comms_manager_raw.email_template.metadata
+  subject:
+    description: Subject line template for the email message, supporting placeholder variables for personalization.
+    lineage:
+      - datalake_comms_manager_raw.email_template.subject
+  is_manual:
+    description: Boolean flag indicating whether the template was created manually by an operator rather than provisioned automatically.
+    lineage:
+      - datalake_comms_manager_raw.email_template.isManual
+  ts_created:
+    description: Timestamp when the email template was originally created in the Comms Manager source system.
+    lineage:
+      - datalake_comms_manager_raw.email_template.createdAt
+  ts_updated:
+    description: Timestamp when the email template was last updated in the Comms Manager source system.
+    lineage:
+      - datalake_comms_manager_raw.email_template.updatedAt
+  year:
+    description: Year extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.email_template.updatedAt
+  month:
+    description: Month extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.email_template.updatedAt
+  day:
+    description: Day extracted from the template update timestamp, used for partitioning and time-based filtering.
+    lineage:
+      - datalake_comms_manager_raw.email_template.updatedAt
