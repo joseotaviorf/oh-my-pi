@@ -280,7 +280,7 @@ with DAG(
             )
             (
                 execute_job_cluster
-                >> airflow_gate_task
+                >> boto3_ga te_task
                 >> check_appflow_status_task
                 >> decide_appflow_status_task
                 >> raw_task
