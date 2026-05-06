@@ -1,24 +1,40 @@
-import sys
-from unittest.mock import MagicMock
+"""Unit tests for pure helpers in load_offboarding_categorization_raw.
 
-mock_pyspark = MagicMock()
-sys.modules["pyspark"] = mock_pyspark
-sys.modules["pyspark.sql"] = MagicMock()
-sys.modules["pyspark.sql.functions"] = MagicMock()
+The Spark / logger / bietlejuice dependencies are mocked **only during the
+import** of the module under test, via ``patch.dict("sys.modules", ...)`` used
+as a context manager. ``patch.dict`` snapshots ``sys.modules`` on enter and
+fully restores it on exit, so the real PySpark and ``quintoandar_logger``
+modules remain untouched for every other test in the same pytest run
+(prevents the leak that previously broke ~79 tests in cdf_services / qube /
+metastore by leaving ``MagicMock`` objects in place of the real libraries).
+"""
+import importlib
+from unittest.mock import MagicMock, patch
 
-sys.modules["bietlejuice.base.db"] = MagicMock()
-sys.modules["bietlejuice.base.spark"] = MagicMock()
-sys.modules["bietlejuice.clients.db_clients"] = MagicMock()
-sys.modules["bietlejuice.consumers.s3_consumer"] = MagicMock()
-sys.modules["bietlejuice.loaders"] = MagicMock()
-sys.modules["bietlejuice.loaders.s3_loader"] = MagicMock()
-sys.modules["bietlejuice.services.metastore_services"] = MagicMock()
-sys.modules["quintoandar_logger"] = MagicMock()
-
-from dags.for_rent.offboarding_categorization.spark_jobs.load_offboarding_categorization_raw import (  # noqa: E402
-    build_session_metadata_parquet_uri,
-    get_forno_adjusted_data_science_path,
+_MODULE_PATH = (
+    "dags.for_rent.offboarding_categorization.spark_jobs"
+    ".load_offboarding_categorization_raw"
 )
+
+_IMPORT_TIME_MOCKS = {
+    "pyspark": MagicMock(),
+    "pyspark.sql": MagicMock(),
+    "pyspark.sql.functions": MagicMock(),
+    "bietlejuice.base.db": MagicMock(),
+    "bietlejuice.base.spark": MagicMock(),
+    "bietlejuice.clients.db_clients": MagicMock(),
+    "bietlejuice.consumers.s3_consumer": MagicMock(),
+    "bietlejuice.loaders": MagicMock(),
+    "bietlejuice.loaders.s3_loader": MagicMock(),
+    "bietlejuice.services.metastore_services": MagicMock(),
+    "quintoandar_logger": MagicMock(),
+}
+
+with patch.dict("sys.modules", _IMPORT_TIME_MOCKS):
+    _job = importlib.import_module(_MODULE_PATH)
+
+build_session_metadata_parquet_uri = _job.build_session_metadata_parquet_uri
+get_forno_adjusted_data_science_path = _job.get_forno_adjusted_data_science_path
 
 
 def test_get_forno_adjusted_data_science_path_prod_unchanged():
