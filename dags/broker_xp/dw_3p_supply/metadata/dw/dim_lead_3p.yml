@@ -181,6 +181,14 @@ columns:
     lineage:
       - datalake_3p_supply.lead_3p.ts_rent_business_context_created
     description: Timestamp when the RENT business context was created for this lead.
+  ts_lead_created_broker_crm:
+    lineage:
+      - datalake_3p_supply.lead_3p.ts_lead_created_broker_crm
+    description: Timestamp when the lead was created in the partner broker CRM.
+  ts_lead_updated_broker_crm:
+    lineage:
+      - datalake_3p_supply.lead_3p.ts_lead_updated_broker_crm
+    description: Timestamp when the lead was last updated in the partner broker CRM.
   ts_load:
     description: Timestamp when the row was loaded by this DAG.
   year:

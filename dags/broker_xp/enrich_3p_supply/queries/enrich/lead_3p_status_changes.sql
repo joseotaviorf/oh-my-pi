@@ -75,7 +75,7 @@ SELECT
         st.status_reason)) >= 1
     THEN 'NO_OPERATIONAL_INTEREST'
     WHEN CARDINALITY(ARRAY_INTERSECT(
-      ARRAY('photoUrlRequiresHttps', 'photoAnalysisFlowFailure', 'unableToAccessExternalUrl', 'lessThanFourPhotos', 'poorImageQuality', 'photosInformationMissing'),
+      ARRAY('photoUrlRequiresHttps', 'photoAnalysisFlowFailure', 'unableToAccessExternalUrl', 'lessThanFourPhotos', 'poorImageQuality', 'photosInformationMissing','imageAnalysisRejected'),
         st.status_reason)) >= 1
     THEN 'PHOTOS'
     WHEN CARDINALITY(ARRAY_INTERSECT(

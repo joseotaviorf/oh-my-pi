@@ -43,6 +43,8 @@ SELECT
   ts_lead_updated,
   ts_sale_business_context_created,
   ts_rent_business_context_created,
+  ts_lead_created_broker_crm,
+  ts_lead_updated_broker_crm,
   CURRENT_TIMESTAMP() AS ts_load,
   year,
   month,

@@ -31,6 +31,19 @@ column_level_validations:
     is_contained_in:
       values: ["DUPLICATED", "NO_OPERATIONAL_INTEREST", "PHOTOS", "OWNER_INFO", "LISTING_INFO", "OTHER", "N/A"]
       severity_level: Error
+    custom:
+      # Alert when any currently-active status maps to 'OTHER': it means status_reason
+      # is non-empty but contains keys not yet mapped to a known macro bucket
+      # (DUPLICATED, NO_OPERATIONAL_INTEREST, PHOTOS, OWNER_INFO, LISTING_INFO).
+      # Action: investigate the new keys and add them to the appropriate ARRAY in
+      # dags/broker_xp/enrich_3p_supply/queries/enrich/lead_3p_status_changes.sql.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_3p_supply.lead_3p_status_changes
+         WHERE reason_macro = 'OTHER'
+           AND is_current = TRUE
+        ) = 0
+      severity_level: Warning
   ts_start:
     is_complete:
       severity_level: Error

@@ -107,6 +107,8 @@ SELECT
   l.ts_updated AS ts_lead_updated,
   FROM_UTC_TIMESTAMP(bs.ts_created, 'America/Sao_Paulo') AS ts_sale_business_context_created,
   FROM_UTC_TIMESTAMP(br.ts_created, 'America/Sao_Paulo') AS ts_rent_business_context_created,
+  CAST(TRIM(GET_JSON_OBJECT(l.brokers, '$.createdAt')) AS TIMESTAMP) AS ts_lead_created_broker_crm,
+  CAST(TRIM(GET_JSON_OBJECT(l.brokers, '$.updatedAt')) AS TIMESTAMP) AS ts_lead_updated_broker_crm,
   CURRENT_TIMESTAMP() AS ts_load,
   YEAR(l.ts_updated) AS year,
   MONTH(l.ts_updated) AS month,

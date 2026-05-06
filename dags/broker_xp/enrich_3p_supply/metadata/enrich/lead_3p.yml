@@ -178,6 +178,14 @@ columns:
     description: "Business context detail creation timestamp for RENT context (America/Sao_Paulo timezone)"
     lineage:
       - datalake_brokers_supply_processor_clean.business_context_detail.ts_created
+  ts_lead_created_broker_crm:
+    description: "Lead creation timestamp in the partner broker CRM, extracted from brokers JSON ($.createdAt)."
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
+  ts_lead_updated_broker_crm:
+    description: "Lead last update timestamp in the partner broker CRM, extracted from brokers JSON ($.updatedAt)."
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.brokers
   ts_load:
     description: "Timestamp when the record was processed by this DAG"
   year:
