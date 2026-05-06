@@ -12,6 +12,6 @@ SELECT
   month,
   day
 FROM
-  datalake_offboarding_raw.categorization
+  datalake_offboarding_categorization_raw.categorization
 WHERE
   MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

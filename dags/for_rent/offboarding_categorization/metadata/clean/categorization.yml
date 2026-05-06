@@ -1,5 +1,5 @@
 ---
-database_name: datalake_offboarding_clean
+database_name: datalake_offboarding_categorization_clean
 table_name: categorization
 owner: data-ae-for-rent@quintoandar.com.br
 domain: For Rent
@@ -12,56 +12,56 @@ columns:
     description: >
       Langfuse session identifier linking this row to traces and observations in the Langfuse lake.
     lineage:
-      - datalake_offboarding_raw.categorization.id_langfuse_session
+      - datalake_offboarding_categorization_raw.categorization.id_langfuse_session
   first_queue:
     description: >
       First support queue associated with the session at classification time (denormalized snapshot from export).
     lineage:
-      - datalake_offboarding_raw.categorization.first_queue
+      - datalake_offboarding_categorization_raw.categorization.first_queue
   last_queue:
     description: >
       Last support queue associated with the session at classification time (denormalized snapshot from export).
     lineage:
-      - datalake_offboarding_raw.categorization.last_queue
+      - datalake_offboarding_categorization_raw.categorization.last_queue
   offboarding_category:
     description: >
       Fine-grained offboarding category assigned by the classifier when is_offboarding is true.
     lineage:
-      - datalake_offboarding_raw.categorization.offboarding_category
+      - datalake_offboarding_categorization_raw.categorization.offboarding_category
   reasoning:
     description: >
       Short natural-language justification for the offboarding classification (may paraphrase user content).
     lineage:
-      - datalake_offboarding_raw.categorization.reasoning
+      - datalake_offboarding_categorization_raw.categorization.reasoning
   is_offboarding:
     description: >
       Classifier output indicating whether the session is treated as offboarding-related for analytics.
     lineage:
-      - datalake_offboarding_raw.categorization.is_offboarding
+      - datalake_offboarding_categorization_raw.categorization.is_offboarding
   is_escalated:
     description: >
       Classifier-exported flag for human escalation (may also exist in operational tables downstream).
     lineage:
-      - datalake_offboarding_raw.categorization.is_escalated
+      - datalake_offboarding_categorization_raw.categorization.is_escalated
   dt_session:
     description: >
       Calendar date of the chat session used for alignment with the daily export file.
     lineage:
-      - datalake_offboarding_raw.categorization.session_date
+      - datalake_offboarding_categorization_raw.categorization.session_date
   ts_load:
     description: >
       UTC timestamp when this row was written to the QuintoAndar raw datalake by the ingestion Spark job.
     lineage:
-      - datalake_offboarding_raw.categorization.ts_load
+      - datalake_offboarding_categorization_raw.categorization.ts_load
   year:
     description: Hive partition year derived from the ingestion calendar date for this export file.
     lineage:
-      - datalake_offboarding_raw.categorization.year
+      - datalake_offboarding_categorization_raw.categorization.year
   month:
     description: Hive partition month derived from the ingestion calendar date for this export file.
     lineage:
-      - datalake_offboarding_raw.categorization.month
+      - datalake_offboarding_categorization_raw.categorization.month
   day:
     description: Hive partition day derived from the ingestion calendar date for this export file.
     lineage:
-      - datalake_offboarding_raw.categorization.day
+      - datalake_offboarding_categorization_raw.categorization.day

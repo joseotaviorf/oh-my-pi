@@ -11,7 +11,9 @@ dag:
       session-metadata/{yyyy-MM-dd}.parquet. Persisted columns exclude chat message content
       (projection in the Spark job).
 
-      Hive/Databricks schemas: datalake_offboarding_raw, datalake_offboarding_clean; table categorization.
+      Hive/Databricks schemas: datalake_offboarding_categorization_raw, datalake_offboarding_categorization_clean; table categorization.
+      The dedicated `offboarding_categorization` schema (instead of the generic `offboarding`) avoids collisions
+      with other offboarding pipelines (`dw_offboarding`, `enrich_offboarding`, `enrich_amplitude_offboarding`).
 
       Scheduling: dataset-driven (no cron). The DAG is triggered by Airflow after the upstream
       `quintoml.post_contract.wall_e_offboarding_categoriser.inference` emits its
@@ -23,7 +25,7 @@ dag:
 workflow:
   layer: raw
   type: custom_ingestion
-  custom_schema: offboarding
+  custom_schema: offboarding_categorization
   load_spark_job: load_offboarding_categorization_raw
   default_partitions: [year, month, day]
 
