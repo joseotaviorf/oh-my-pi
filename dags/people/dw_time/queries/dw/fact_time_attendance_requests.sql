@@ -51,9 +51,6 @@ employee_registration AS (
         day
     FROM
         datalake_oitchau_clean.employees
-    WHERE
-        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}')
-            AND DATE('{load_end_date}')
     QUALIFY
         ROW_NUMBER() OVER (
             PARTITION BY
