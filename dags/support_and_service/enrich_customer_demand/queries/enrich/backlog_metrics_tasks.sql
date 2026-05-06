@@ -92,8 +92,4 @@ LEFT JOIN
     AND eb.dt_interval = do.dt_interval
 WHERE
     eb.dt_interval = DATE('{year}-{month}-{day}')
-    AND (
-        dt_final IS NULL
-        OR eb.dt_interval <> dt_final
-    )
     AND eb.type IS NOT NULL
