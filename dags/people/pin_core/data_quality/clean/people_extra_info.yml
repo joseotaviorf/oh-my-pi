@@ -9,8 +9,6 @@ column_level_validations:
   id_person_extra_info:
     is_complete:
       severity_level: Error
-    is_unique:
-      severity_level: Warning
   dt_effective_started:
     custom:
       # Validate that the effective period is not open with an inverted date range.

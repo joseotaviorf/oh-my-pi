@@ -1,4 +1,19 @@
-WITH rating_value AS (
+WITH pei_latest AS (
+  SELECT *
+  FROM
+    datalake_pin_core_clean.people_extra_info
+  WHERE
+    information_type = 'Notas Talent'
+    AND information_category = 'Notas Talent'
+  QUALIFY
+    ROW_NUMBER() OVER (
+      PARTITION BY
+        id_person_extra_info
+      ORDER BY
+        dt_effective_started DESC
+    ) = 1
+),
+rating_value AS (
   SELECT
     r.id_rating_level,
     r.rating_description,
@@ -53,10 +68,8 @@ LEFT JOIN
   datalake_people.identifier_mapping im
     ON (im.id_assignment = aa.id_assignment)
 LEFT JOIN
-  datalake_pin_core_clean.people_extra_info pei
-    ON (aa.id_person = pei.id_person
-      AND pei.information_type = 'Notas Talent'
-      AND pei.information_category = 'Notas Talent')
+  pei_latest AS pei
+    ON (aa.id_person = pei.id_person)
 LEFT JOIN
   datalake_pin_hr_review_clean.meeting m
     ON (m.id_meeting = pei.id_meeting)
