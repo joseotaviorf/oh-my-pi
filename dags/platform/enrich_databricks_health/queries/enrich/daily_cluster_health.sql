@@ -15,9 +15,8 @@
 --                                         timing and per-cluster DBU/EC2 cost in USD;
 --                                         not surfaced by system tables)
 --
--- Filters:
---   - tags['provisioner'] = 'bietlejuice'      (only framework-managed clusters)
---   - tags['environment'] = '{environment}'    (scope to local workspace)
+-- Cluster scope: all clusters present in system.compute.clusters (no provisioner
+-- or environment tag filter). Aligns with dw_databricks_health.fact_databricks_task_run.
 -- ============================================================================
 WITH latest_cluster_spec AS (
     SELECT
@@ -41,8 +40,6 @@ WITH latest_cluster_spec AS (
             system.compute.clusters c
         WHERE
             DATE(c.change_time) <= DATE('{load_end_date}')
-            AND c.tags['provisioner'] = 'bietlejuice'
-            AND c.tags['environment'] = '{environment}'
     )
     WHERE
         rn = 1
@@ -200,8 +197,7 @@ cluster_lifecycle AS (
     -- Per-cluster-day startup timing + Overwatch-derived cost. Source materialises
     -- INIT_SCRIPTS_STARTED / INIT_SCRIPTS_FINISHED / RUNNING events from
     -- overwatch.clusterstatefact, which is not surfaced by Databricks system tables.
-    -- Bietlejuice scope is enforced naturally via the LEFT JOIN against
-    -- latest_cluster_spec (which already filters tags['provisioner'] = 'bietlejuice').
+    -- Rows exist for any cluster-day present in daily_clusters for the load window.
     SELECT
         id_cluster,
         dt_cluster_run,

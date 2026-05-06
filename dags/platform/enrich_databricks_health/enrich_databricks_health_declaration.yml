@@ -7,7 +7,7 @@ dag:
       system tables (system.compute.node_timeline + system.compute.clusters).
       One row per (cluster_id, dt_cluster_run). Captures P50/P95 of CPU,
       memory, I/O wait and NVMe utilization plus cluster shape for every
-      bietlejuice-managed cluster.
+      cluster with observations in the workspace load window (no provisioner filter).
 
       Powers the cluster sizing / consolidation work tracked in
       bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md and
