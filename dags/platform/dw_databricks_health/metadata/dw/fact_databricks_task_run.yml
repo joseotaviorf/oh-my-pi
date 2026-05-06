@@ -280,6 +280,23 @@ columns:
       can still blend multiple SKUs at the cluster aggregate before pro-rating.
     lineage:
       - system.billing.usage.sku_name
+  total_cost_overwatch_usd:
+    description: |
+      Sum of Overwatch cluster-day DBU USD and EC2 USD (`total_dbu_cost_overwatch_usd`
+      + `total_ec2_cost_overwatch_usd`). Full Overwatch cost trail for cross-checks.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.total_dbu_cost_overwatch_usd
+      - datalake_databricks_health.daily_cluster_health.total_ec2_cost_overwatch_usd
+  cost_blended_usd:
+    description: |
+      Blended estimated USD: system-tables DBU cost (`cost_usd_estimate` from
+      billing.usage × list_prices, duration-share allocated) plus Overwatch EC2
+      (`total_ec2_cost_overwatch_usd`). Combines authoritative DBU pricing from
+      system tables with the only EC2 signal available in this model.
+    lineage:
+      - system.billing.usage.usage_quantity
+      - system.billing.list_prices.pricing
+      - datalake_databricks_health.daily_cluster_health.total_ec2_cost_overwatch_usd
   total_dbu_cost_overwatch_usd:
     description: |
       Cluster-day total DBU cost in USD from Overwatch (`overwatch.clusterstatefact`).

@@ -503,6 +503,22 @@ SELECT
                                                                    AS cost_usd_estimate,
     b.dbu_rate_usd,
     b.pricing_sku,
+    -- Overwatch DBU + EC2 combined (same grain as the separate overwatch columns below).
+    CAST(
+        ROUND(
+            COALESCE(CAST(dch.total_dbu_cost_overwatch_usd AS DOUBLE), CAST(0 AS DOUBLE))
+            + COALESCE(CAST(dch.total_ec2_cost_overwatch_usd AS DOUBLE), CAST(0 AS DOUBLE)),
+            4
+        ) AS DECIMAL(38, 4)
+    )                                                              AS total_cost_overwatch_usd,
+    -- System-tables DBU USD (cost_usd_estimate) + Overwatch EC2 — best blended total.
+    CAST(
+        ROUND(
+            COALESCE(CAST(b.cost_usd_estimate AS DOUBLE), CAST(0 AS DOUBLE))
+            + COALESCE(CAST(dch.total_ec2_cost_overwatch_usd AS DOUBLE), CAST(0 AS DOUBLE)),
+            4
+        ) AS DECIMAL(38, 4)
+    )                                                              AS cost_blended_usd,
     -- Overwatch-derived cluster-day cost cross-check (USD). Same cluster-day dedupe
     -- caveat as the *_script_seconds columns above — these are cluster-day, not task-run.
     dch.total_dbu_cost_overwatch_usd,

@@ -68,6 +68,8 @@ WITH window_runs AS (
         cluster_startup_seconds,
         dbu_consumed,
         cost_usd_estimate,
+        total_cost_overwatch_usd,
+        cost_blended_usd,
         is_success,
         is_failed,
         is_pool_acquisition_slow,
@@ -137,6 +139,19 @@ SELECT
         SUM(cost_usd_estimate) / NULLIF(COUNT(DISTINCT id_databricks_run), 0),
         4
     )                                                                                      AS avg_cost_usd_per_run_28d,
+    ROUND(SUM(total_cost_overwatch_usd) FILTER (WHERE in_7d_window), 4)                    AS total_cost_overwatch_usd_7d,
+    ROUND(SUM(total_cost_overwatch_usd),                             4)                    AS total_cost_overwatch_usd_28d,
+    ROUND(SUM(cost_blended_usd)        FILTER (WHERE in_7d_window), 4)                    AS total_cost_blended_usd_7d,
+    ROUND(SUM(cost_blended_usd),                                   4)                    AS total_cost_blended_usd_28d,
+    ROUND(
+        SUM(cost_blended_usd) FILTER (WHERE in_7d_window)
+            / NULLIF(COUNT(DISTINCT IF(in_7d_window, id_databricks_run, NULL)), 0),
+        4
+    )                                                                                      AS avg_cost_blended_usd_per_run_7d,
+    ROUND(
+        SUM(cost_blended_usd) / NULLIF(COUNT(DISTINCT id_databricks_run), 0),
+        4
+    )                                                                                      AS avg_cost_blended_usd_per_run_28d,
 
     -- ── Latency ─────────────────────────────────────────────────────────────
     ROUND(AVG(total_duration_seconds)     FILTER (WHERE in_7d_window), 2)                  AS avg_total_duration_seconds_7d,

@@ -10,6 +10,11 @@ dag:
       (7d aggregates produced via `FILTER (WHERE in_7d_window)`). One row per
       (airflow_dag_id, dt_window_end) at table `metric_observability.dag_health`.
 
+      Week-over-week companion table `metric_observability.dag_health_wow`
+      compares the trailing 7 days to the prior 7 days (14-day read) with
+      `_current_7d`, `_previous_7d`, and `_change_pct` columns for headline cost,
+      utilization, duration, reliability, and cost-efficiency metrics.
+
       Window choice:
         - 7d  → "act this sprint". Regression yesterday is visible immediately;
                 right-sizing decisions can land before the 28d average shifts.
@@ -22,7 +27,8 @@ dag:
           environment, provisioner (lifted from fact_databricks_task_run;
           enable per-team / per-cost-center / per-environment rollups
           without re-reading the underlying fact)
-        - Cost: total_dbu_consumed, total_cost_usd, avg_cost_usd_per_run
+        - Cost: total_dbu_consumed, total_cost_usd, total_cost_overwatch_usd,
+          total_cost_blended_usd, avg_cost_usd_per_run, avg_cost_blended_usd_per_run
         - Latency: p50/p95/p99 total_duration_seconds, avg/p95
           setup_duration_seconds, p50/p95 init_script_seconds,
           total_init_minutes (cluster-day deduped — drives the

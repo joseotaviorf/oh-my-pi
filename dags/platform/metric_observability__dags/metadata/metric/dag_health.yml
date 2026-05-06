@@ -229,6 +229,74 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_overwatch_usd_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_cost_overwatch_usd
+    description: Sum of total_cost_overwatch_usd (Overwatch DBU + EC2) across the 7-day window.
+    metric:
+      name: Total Overwatch Cost USD (7d)
+      description: Full Overwatch cost (DBU + EC2) for this DAG over the trailing 7-day window.
+      acronym: total_overwatch_usd_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_overwatch_usd_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_cost_overwatch_usd
+    description: Sum of total_cost_overwatch_usd (Overwatch DBU + EC2) across the 28-day window.
+    metric:
+      name: Total Overwatch Cost USD (28d)
+      description: Full Overwatch cost (DBU + EC2) for this DAG over the trailing 28-day window.
+      acronym: total_overwatch_usd_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_blended_usd_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_blended_usd
+    description: Sum of cost_blended_usd (system billing DBU USD + Overwatch EC2) across the 7-day window.
+    metric:
+      name: Total Blended Cost USD (7d)
+      description: Blended estimated USD (billing.usage list DBU + Overwatch EC2) over the trailing 7-day window.
+      acronym: total_blended_usd_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_blended_usd_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_blended_usd
+    description: Sum of cost_blended_usd across the 28-day window.
+    metric:
+      name: Total Blended Cost USD (28d)
+      description: Blended estimated USD (billing.usage list DBU + Overwatch EC2) over the trailing 28-day window.
+      acronym: total_blended_usd_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_cost_blended_usd_per_run_7d:
+    description: Average blended USD per run (total_cost_blended_usd_7d / total_runs_7d).
+    metric:
+      name: Avg Blended USD per Run (7d)
+      description: Mean blended USD cost per DAG run over the trailing 7-day window.
+      acronym: avg_blended_per_run_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_cost_blended_usd_per_run_28d:
+    description: Average blended USD per run (total_cost_blended_usd_28d / total_runs_28d).
+    metric:
+      name: Avg Blended USD per Run (28d)
+      description: Mean blended USD cost per DAG run over the trailing 28-day window.
+      acronym: avg_blended_per_run_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
 
   avg_total_duration_seconds_7d:
     lineage:

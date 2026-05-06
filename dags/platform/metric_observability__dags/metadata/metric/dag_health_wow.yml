@@ -1,0 +1,493 @@
+---
+database_name: metric_observability
+table_name: dag_health_wow
+description: |
+  Week-over-week comparison of Databricks DAG observability metrics. One row per
+  (airflow_dag_id, dt_window_end). Each headline metric is emitted as three
+  columns: `_current_7d` (trailing 7 days ending on dt_window_end),
+  `_previous_7d` (the 7 days immediately before that), and `_change_pct`
+  ((current − previous) / NULLIF(previous, 0) × 100). Reads exclusively from
+  dw_databricks_health.fact_databricks_task_run over a 14-calendar-day slice.
+
+  Use this table to see whether a cluster-spec or pipeline change from the last
+  sprint moved cost, utilization, duration, or reliability relative to the week
+  before.
+
+domain: Data Life Cycle
+owner: jose.rferreira@quintoandar.com.br
+columns:
+  airflow_dag_id:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.airflow_dag_id
+    description: Airflow / workload identifier (same COALESCE chain as `dag_name` on the fact).
+    dimension: True
+  dt_window_end:
+    description: Last calendar day included in the current 7-day window (inclusive end).
+    dimension: True
+  dag_name:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.dag_name
+    description: Human-readable workload name from the fact (FIRST across the 14-day slice).
+    dimension: True
+  team_owner:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.team_owner
+    description: Cluster `owner` tag when present.
+    dimension: True
+  cost_center:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_center
+    description: Cluster `cost-center` tag when present.
+    dimension: True
+  ecosystem:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.ecosystem
+    description: Cluster `ecosystem` tag when present.
+    dimension: True
+  environment:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.environment
+    description: Cluster `environment` tag when present.
+    dimension: True
+  provisioner:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.provisioner
+    description: Cluster `provisioner` tag when present.
+    dimension: True
+
+  total_dbu_consumed_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.dbu_consumed
+    description: Sum of `dbu_consumed` in the current 7-day window.
+    metric:
+      name: Total DBU Consumed Current 7d
+      description: Total DBUs in the trailing 7-day window ending on dt_window_end.
+      acronym: total_dbu_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_dbu_consumed_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.dbu_consumed
+    description: Sum of `dbu_consumed` in the previous 7-day window.
+    metric:
+      name: Total DBU Consumed Previous 7d
+      description: Total DBUs in the 7 days immediately before the current window.
+      acronym: total_dbu_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_dbu_consumed_change_pct:
+    description: Percent change in total DBU vs the prior week. Negative means fewer DBUs.
+    metric:
+      name: Total DBU Consumed WoW Change Pct
+      description: Week-over-week percent change in total DBU ((current − previous) / previous × 100).
+      acronym: total_dbu_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  total_cost_usd_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+    description: Sum of `cost_usd_estimate` (system billing list USD) in the current window.
+    metric:
+      name: Total Cost USD Current 7d
+      description: System-tables list USD cost in the trailing 7-day window.
+      acronym: total_cost_usd_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_usd_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+    description: Sum of `cost_usd_estimate` in the previous window.
+    metric:
+      name: Total Cost USD Previous 7d
+      description: System-tables list USD cost in the prior 7-day window.
+      acronym: total_cost_usd_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_usd_change_pct:
+    description: Percent change in total system-tables USD cost vs prior week.
+    metric:
+      name: Total Cost USD WoW Change Pct
+      description: Week-over-week percent change in total system-tables USD cost.
+      acronym: total_cost_usd_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  total_cost_blended_usd_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_blended_usd
+    description: Sum of `cost_blended_usd` (billing DBU USD + Overwatch EC2) in the current window.
+    metric:
+      name: Total Blended Cost USD Current 7d
+      description: Blended USD (billing.usage DBU + Overwatch EC2) in the trailing 7-day window.
+      acronym: total_blended_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_blended_usd_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_blended_usd
+    description: Sum of `cost_blended_usd` in the previous window.
+    metric:
+      name: Total Blended Cost USD Previous 7d
+      description: Blended USD in the prior 7-day window.
+      acronym: total_blended_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_blended_usd_change_pct:
+    description: Percent change in blended USD vs prior week.
+    metric:
+      name: Total Blended Cost USD WoW Change Pct
+      description: Week-over-week percent change in blended USD.
+      acronym: total_blended_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  avg_cost_usd_per_run_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+    description: Mean `cost_usd_estimate` per distinct parent run in the current window.
+    metric:
+      name: Avg Cost USD per Run Current 7d
+      description: Mean system-tables USD per parent run in the trailing 7-day window.
+      acronym: avg_cost_per_run_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_cost_usd_per_run_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+    description: Mean `cost_usd_estimate` per distinct parent run in the previous window.
+    metric:
+      name: Avg Cost USD per Run Previous 7d
+      description: Mean system-tables USD per parent run in the prior 7-day window.
+      acronym: avg_cost_per_run_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_cost_usd_per_run_change_pct:
+    description: Percent change in average cost per run vs prior week.
+    metric:
+      name: Avg Cost USD per Run WoW Change Pct
+      description: Week-over-week percent change in average USD per parent run.
+      acronym: avg_cost_per_run_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  avg_p95_worker_cpu_busy_percent_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p95_worker_cpu_busy_percent
+    description: Mean of per-task `p95_worker_cpu_busy_percent` in the current window.
+    metric:
+      name: Avg P95 Worker CPU Busy Current 7d
+      description: Mean of worker P95 CPU busy percent in the trailing 7-day window.
+      acronym: avg_p95_worker_cpu_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_worker_cpu_busy_percent_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p95_worker_cpu_busy_percent
+    description: Mean of `p95_worker_cpu_busy_percent` in the previous window.
+    metric:
+      name: Avg P95 Worker CPU Busy Previous 7d
+      description: Mean of worker P95 CPU busy percent in the prior 7-day window.
+      acronym: avg_p95_worker_cpu_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_worker_cpu_busy_percent_change_pct:
+    description: Relative percent change in average worker P95 CPU busy vs prior week.
+    metric:
+      name: Avg P95 Worker CPU Busy WoW Change Pct
+      description: Week-over-week percent change in mean worker P95 CPU busy.
+      acronym: avg_p95_worker_cpu_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  avg_p95_driver_cpu_busy_percent_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p95_driver_cpu_busy_percent
+    description: Mean of `p95_driver_cpu_busy_percent` in the current window.
+    metric:
+      name: Avg P95 Driver CPU Busy Current 7d
+      description: Mean of driver P95 CPU busy percent in the trailing 7-day window.
+      acronym: avg_p95_driver_cpu_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_driver_cpu_busy_percent_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p95_driver_cpu_busy_percent
+    description: Mean of `p95_driver_cpu_busy_percent` in the previous window.
+    metric:
+      name: Avg P95 Driver CPU Busy Previous 7d
+      description: Mean of driver P95 CPU busy percent in the prior 7-day window.
+      acronym: avg_p95_driver_cpu_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_driver_cpu_busy_percent_change_pct:
+    description: Relative percent change in average driver P95 CPU busy vs prior week.
+    metric:
+      name: Avg P95 Driver CPU Busy WoW Change Pct
+      description: Week-over-week percent change in mean driver P95 CPU busy.
+      acronym: avg_p95_driver_cpu_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  avg_p95_worker_mem_used_percent_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p95_worker_mem_used_percent
+    description: Mean of `p95_worker_mem_used_percent` in the current window.
+    metric:
+      name: Avg P95 Worker Mem Used Current 7d
+      description: Mean of worker P95 memory used percent in the trailing 7-day window.
+      acronym: avg_p95_worker_mem_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_worker_mem_used_percent_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p95_worker_mem_used_percent
+    description: Mean of `p95_worker_mem_used_percent` in the previous window.
+    metric:
+      name: Avg P95 Worker Mem Used Previous 7d
+      description: Mean of worker P95 memory used percent in the prior 7-day window.
+      acronym: avg_p95_worker_mem_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_worker_mem_used_percent_change_pct:
+    description: Relative percent change in average worker P95 memory used vs prior week.
+    metric:
+      name: Avg P95 Worker Mem Used WoW Change Pct
+      description: Week-over-week percent change in mean worker P95 memory used.
+      acronym: avg_p95_worker_mem_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  avg_p95_driver_mem_used_percent_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p95_driver_mem_used_percent
+    description: Mean of `p95_driver_mem_used_percent` in the current window.
+    metric:
+      name: Avg P95 Driver Mem Used Current 7d
+      description: Mean of driver P95 memory used percent in the trailing 7-day window.
+      acronym: avg_p95_driver_mem_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_driver_mem_used_percent_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p95_driver_mem_used_percent
+    description: Mean of `p95_driver_mem_used_percent` in the previous window.
+    metric:
+      name: Avg P95 Driver Mem Used Previous 7d
+      description: Mean of driver P95 memory used percent in the prior 7-day window.
+      acronym: avg_p95_driver_mem_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_driver_mem_used_percent_change_pct:
+    description: Relative percent change in average driver P95 memory used vs prior week.
+    metric:
+      name: Avg P95 Driver Mem Used WoW Change Pct
+      description: Week-over-week percent change in mean driver P95 memory used.
+      acronym: avg_p95_driver_mem_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  avg_total_duration_seconds_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_duration_seconds
+    description: Mean `total_duration_seconds` in the current window.
+    metric:
+      name: Avg Total Duration Seconds Current 7d
+      description: Mean wall-clock task duration (seconds) in the trailing 7-day window.
+      acronym: avg_total_dur_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_total_duration_seconds_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_duration_seconds
+    description: Mean `total_duration_seconds` in the previous window.
+    metric:
+      name: Avg Total Duration Seconds Previous 7d
+      description: Mean wall-clock task duration (seconds) in the prior 7-day window.
+      acronym: avg_total_dur_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_total_duration_seconds_change_pct:
+    description: Relative percent change in mean wall-clock duration vs prior week.
+    metric:
+      name: Avg Total Duration WoW Change Pct
+      description: Week-over-week percent change in mean total duration seconds.
+      acronym: avg_total_dur_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  total_runs_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
+    description: Count of distinct parent Databricks runs in the current window.
+    metric:
+      name: Total Runs Current 7d
+      description: Distinct parent runs in the trailing 7-day window.
+      acronym: total_runs_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_runs_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
+    description: Count of distinct parent runs in the previous window.
+    metric:
+      name: Total Runs Previous 7d
+      description: Distinct parent runs in the prior 7-day window.
+      acronym: total_runs_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_runs_change_pct:
+    description: Percent change in run volume vs prior week (context for cost deltas).
+    metric:
+      name: Total Runs WoW Change Pct
+      description: Week-over-week percent change in distinct parent run count.
+      acronym: total_runs_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  error_rate_pct_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_failed
+    description: Share of task runs with `is_failed` in the current window (0–100).
+    metric:
+      name: Error Rate Pct Current 7d
+      description: Failed task runs divided by all task runs in the trailing 7-day window.
+      acronym: err_rate_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Reliability
+      approved_by: jose.rferreira@quintoandar.com.br
+  error_rate_pct_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_failed
+    description: Share of task runs failed in the previous window.
+    metric:
+      name: Error Rate Pct Previous 7d
+      description: Error rate in the prior 7-day window.
+      acronym: err_rate_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Reliability
+      approved_by: jose.rferreira@quintoandar.com.br
+  error_rate_pct_change_pct:
+    description: Percent change in error rate vs prior week ((curr − prev) / prev × 100).
+    metric:
+      name: Error Rate WoW Change Pct
+      description: Relative change in error rate vs the prior week.
+      acronym: err_rate_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Reliability
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  cost_efficiency_usd_per_executor_second_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+      - dw_databricks_health.fact_databricks_task_run.total_executor_run_time_ms
+    description: |
+      Sum(`cost_usd_estimate`) / (sum(`total_executor_run_time_ms`) / 1000) for the current window.
+      Same definition as `dag_health.cost_efficiency_usd_per_executor_second_*`.
+    metric:
+      name: Cost Efficiency USD per Executor Second Current 7d
+      description: USD per executor-second in the trailing 7-day window (same as dag_health).
+      acronym: cost_eff_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  cost_efficiency_usd_per_executor_second_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+      - dw_databricks_health.fact_databricks_task_run.total_executor_run_time_ms
+    description: Cost efficiency USD per executor-second for the previous window.
+    metric:
+      name: Cost Efficiency USD per Executor Second Previous 7d
+      description: USD per executor-second in the prior 7-day window.
+      acronym: cost_eff_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  cost_efficiency_usd_per_executor_second_change_pct:
+    description: Relative percent change in cost efficiency vs prior week.
+    metric:
+      name: Cost Efficiency WoW Change Pct
+      description: Week-over-week percent change in USD per executor-second.
+      acronym: cost_eff_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  ts_load:
+    description: Timestamp when this metric row was materialized.
+    dimension: False
+  year:
+    description: Partition year derived from `dt_window_end`.
+    dimension: False
+  month:
+    description: Partition month derived from `dt_window_end`.
+    dimension: False
+  day:
+    description: Partition day derived from `dt_window_end`.
+    dimension: False
