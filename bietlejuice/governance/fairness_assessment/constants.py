@@ -286,8 +286,8 @@ TIERING_RULES_VERSION = "fairness-tiering-spike-2026-04-v9"
 # Same URLs as ``datahub_graphql_url`` in ``forno_conf.yml`` / ``prod_conf.yml``; keep in sync if infra
 # changes. Fairness Spark job may default to these when ``DATAHUB_GRAPHQL_URL`` is unset.
 
-DATAHUB_GRAPHQL_URL_FORNO = "https://datahub.apps.data-frn.habitat.zone/api/graphql"
-DATAHUB_GRAPHQL_URL_PROD = "https://datahub.apps.data-prd.habitat.zone/api/graphql"
+DATAHUB_GRAPHQL_URL_FORNO = "https://datahub-gms.apps.data-frn.habitat.zone/api/graphql"
+DATAHUB_GRAPHQL_URL_PROD = "https://datahub-gms.apps.data-prd.habitat.zone/api/graphql"
 
 
 def graphql_url_for_environment(environment: str) -> str:
@@ -311,6 +311,12 @@ DATAHUB_HTTP_ERROR = "HTTP_ERROR"
 DATAHUB_FETCH_ERROR = "FETCH_ERROR"
 DATAHUB_ENTITY_NOT_FOUND = "ENTITY_NOT_FOUND"
 DATAHUB_CHECK_FAILED = "DATAHUB_CHECK_FAILED"
+
+# Downstream override token: when DataHub is unreachable for an FQN (HTTP/FETCH error on F4-01),
+# I1-02 / I3-01 / I3-02 / A1.2-03 expose this single reason instead of their content-based defaults
+# (e.g. ``no_assigned_data_contract_urn_in_databricks_entity``) which would mislead consumers into
+# treating an infra outage as missing metadata.
+DATAHUB_UNREACHABLE_REASON = "datahub_unreachable"
 
 DATAHUB_F4_REASON_HOST_UNCONFIGURED = "datahub_host_unconfigured"
 DATAHUB_F4_REASON_NO_CANDIDATE_URNS = "datahub_no_candidate_platform_urns"

@@ -179,6 +179,7 @@ cluster_template:
             SPARK_RUNTIME: databricks
             ENVIRONMENT: "{{ var.value.environment }}"
             ARTIFACTS_BUCKET: *artifacts_bucket
+            DATAHUB_GRAPHQL_URL: "https://datahub-gms.apps.data-frn.habitat.zone/api/graphql"
         ssh_public_keys: []
         node_type_id: m5a.large
         driver_node_type_id: m5a.large
@@ -249,6 +250,7 @@ cluster_template:
             SPARK_RUNTIME: databricks
             ENVIRONMENT: "{{ var.value.environment }}"
             ARTIFACTS_BUCKET: *artifacts_bucket
+            DATAHUB_GRAPHQL_URL: "https://datahub-gms.apps.data-frn.habitat.zone/api/graphql"
         ssh_public_keys: []
         spark_version: 10.4.x-scala2.12
         data_security_mode: SINGLE_USER

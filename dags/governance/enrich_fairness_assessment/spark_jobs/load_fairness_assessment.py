@@ -215,12 +215,13 @@ def main() -> None:
     datahub_graphql = os.environ.get("DATAHUB_GRAPHQL_URL", "").strip()
     if not datahub_graphql:
         datahub_graphql = graphql_url_for_environment(args.environment)
+    # Defensive: env var may be set to ``.../graphql/`` by mistake; constants are slash-free.
     datahub_graphql = datahub_graphql.rstrip("/")
 
     token: Optional[str] = None
     try:
         dbutils = BaseDBUtils().get_dbutils()
-        raw_key = dbutils.secrets.get(scope="quintoandar", key="DATAHUB_API_KEY")
+        raw_key = dbutils.secrets.get(scope="data-governance", key="DATAHUB_API_KEY")
         if raw_key is not None and str(raw_key).strip():
             token = str(raw_key).strip()
     except Exception:

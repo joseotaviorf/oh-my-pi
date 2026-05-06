@@ -182,6 +182,7 @@ cluster_template:
             SPARK_RUNTIME: databricks
             ENVIRONMENT: "{{ var.value.environment }}"
             ARTIFACTS_BUCKET: *artifacts_bucket
+            DATAHUB_GRAPHQL_URL: "https://datahub-gms.apps.data-prd.habitat.zone/api/graphql"
             # Cross-account Glue Data Catalog (Databricks workspace → data account); Airflow Variable: glue_assume_role_arn
             GLUE_ASSUME_ROLE_ARN: "{{ var.value.glue_assume_role_arn }}"
         ssh_public_keys: []

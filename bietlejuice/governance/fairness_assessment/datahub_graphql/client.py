@@ -8,12 +8,20 @@ import urllib.error
 import urllib.request
 from typing import Any, Iterator, Mapping, Optional
 
+from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.governance.fairness_assessment.constants import (
     DATAHUB_DATA_CONTRACT_URN_MARKER,
     DATAHUB_FETCH_ERROR,
     DATAHUB_HTTP_ERROR,
     DATAHUB_URN_DIAG_OK,
 )
+
+LOGGER = QuintoAndarLogger(__name__)
+
+# Truncate response bodies in logs to avoid leaking large payloads / dumping noise; 500 chars is
+# enough for typical GraphQL/Auth error envelopes (HTML 401, JSON ``errors`` array, etc.).
+_HTTP_ERROR_BODY_MAX_CHARS = 500
 
 # -- URL + HTTP ----------------------------------------------------------------
 
@@ -77,26 +85,57 @@ def datahub_graphql_post(
         with urllib.request.urlopen(req, timeout=timeout_sec) as resp:
             status = int(getattr(resp, "status", None) or resp.getcode())
             if status != 200:
+                LOGGER.warning(
+                    f"m=datahub_graphql_post_non_200,url={graphql_url},status={status}"
+                )
                 return None, DATAHUB_HTTP_ERROR
             raw = resp.read()
             if not raw or not raw.strip():
+                LOGGER.warning(
+                    f"m=datahub_graphql_post_empty_body,url={graphql_url},status={status}"
+                )
                 return None, DATAHUB_FETCH_ERROR
             try:
                 text = raw.decode("utf-8")
             except UnicodeDecodeError:
+                LOGGER.warning(f"m=datahub_graphql_post_decode_error,url={graphql_url}")
                 return None, DATAHUB_FETCH_ERROR
             try:
                 root = json.loads(text)
             except json.JSONDecodeError:
+                LOGGER.warning(
+                    f"m=datahub_graphql_post_json_error,url={graphql_url},"
+                    f"body={text[:_HTTP_ERROR_BODY_MAX_CHARS]}"
+                )
                 return None, DATAHUB_FETCH_ERROR
             return root, DATAHUB_URN_DIAG_OK
-    except urllib.error.HTTPError:
+    except urllib.error.HTTPError as exc:
+        body = ""
+        try:
+            body = exc.read().decode("utf-8", errors="replace")[
+                :_HTTP_ERROR_BODY_MAX_CHARS
+            ]
+        except Exception:
+            # Body may already be consumed or unreadable; status/reason are still actionable.
+            pass
+        LOGGER.warning(
+            f"m=datahub_graphql_post_http_error,url={graphql_url},"
+            f"status={exc.code},reason={exc.reason},body={body}"
+        )
         return None, DATAHUB_HTTP_ERROR
-    except TimeoutError:
+    except TimeoutError as exc:
+        LOGGER.warning(
+            f"m=datahub_graphql_post_timeout,url={graphql_url},"
+            f"timeout_sec={timeout_sec},err={exc}"
+        )
         return None, DATAHUB_FETCH_ERROR
-    except urllib.error.URLError:
+    except urllib.error.URLError as exc:
+        LOGGER.warning(
+            f"m=datahub_graphql_post_url_error,url={graphql_url},reason={exc.reason}"
+        )
         return None, DATAHUB_FETCH_ERROR
-    except OSError:
+    except OSError as exc:
+        LOGGER.warning(f"m=datahub_graphql_post_os_error,url={graphql_url},err={exc}")
         return None, DATAHUB_FETCH_ERROR
 
 

@@ -11,6 +11,7 @@ from bietlejuice.governance.fairness_assessment.constants import (
     DATAHUB_F4_REASON_HOST_UNCONFIGURED,
     DATAHUB_F4_REASON_NO_CANDIDATE_URNS,
     DATAHUB_HTTP_ERROR,
+    DATAHUB_UNREACHABLE_REASON,
     DATAHUB_URN_DIAG_OK,
 )
 from bietlejuice.governance.fairness_assessment.datahub_graphql.compute_fqn_datahub_signals import (  # noqa: E501
@@ -41,6 +42,7 @@ __all__ = [
     "DATAHUB_F4_REASON_HOST_UNCONFIGURED",
     "DATAHUB_F4_REASON_NO_CANDIDATE_URNS",
     "DATAHUB_HTTP_ERROR",
+    "DATAHUB_UNREACHABLE_REASON",
     "DATAHUB_URN_DIAG_OK",
     "_parse_dataset_fair_signals",
     "build_dataset_urn",

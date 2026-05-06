@@ -21,7 +21,22 @@ from bietlejuice.governance.fairness_assessment.checks.interoperable import (
     check_i3_01_ownership_in_catalog,
     check_i3_02_lineage_in_catalog,
 )
+from bietlejuice.governance.fairness_assessment.constants import (
+    DATAHUB_FETCH_ERROR,
+    DATAHUB_HTTP_ERROR,
+    DATAHUB_UNREACHABLE_REASON,
+)
 from bietlejuice.governance.fairness_assessment.models import RequirementResult
+
+_DATAHUB_DEPENDENT_REQUIREMENT_IDS: tuple[str, ...] = (
+    "I1-02",
+    "I3-01",
+    "I3-02",
+    "A1.2-03",
+)
+_DATAHUB_UNREACHABLE_REASONS: frozenset[str] = frozenset(
+    {DATAHUB_HTTP_ERROR, DATAHUB_FETCH_ERROR}
+)
 
 
 def evaluate_mvp_checks_from_row(
@@ -89,4 +104,18 @@ def evaluate_mvp_checks_from_row(
         out["I3-01"] = check_i3_01_ownership_in_catalog(bool(row.get("i3_01_pass")))
     if row.get("i3_02_pass") is not None:
         out["I3-02"] = check_i3_02_lineage_in_catalog(bool(row.get("i3_02_pass")))
+
+    # When DataHub itself is unreachable for the FQN, F4-01 already exposes the network-level reason
+    # (HTTP_ERROR / FETCH_ERROR). Other DataHub-sourced checks only see empty maps and would fall back
+    # to content-style reasons (e.g. ``ownership_empty_in_datahub``), misleading consumers into treating
+    # an outage as missing metadata. Override their reason with a single ``datahub_unreachable`` token.
+    if f4_reason in _DATAHUB_UNREACHABLE_REASONS:
+        for rid in _DATAHUB_DEPENDENT_REQUIREMENT_IDS:
+            current = out.get(rid)
+            if current is not None and not current.passed:
+                out[rid] = RequirementResult(
+                    requirement_id=rid,
+                    passed=False,
+                    reason=DATAHUB_UNREACHABLE_REASON,
+                )
     return out

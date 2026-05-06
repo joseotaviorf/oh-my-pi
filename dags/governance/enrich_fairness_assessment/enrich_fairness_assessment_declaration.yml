@@ -16,7 +16,8 @@ dag:
 
       Schedule: daily 06:00 in America/Sao_Paulo (``0 6 * * *``) to align ``documentation_metrics``-based
       inputs with a single morning batch, keep DataHub driver GraphQL volume predictable day-over-day, and
-      cap wall-clock with ``execution_timeout_hours: 4``. Woodpecker CI is not the runtime of this job;
+      cap wall-clock with ``execution_timeout_hours: 8`` (raised from 4h after prod runs over +5000 FQNs
+      timed out at 4h). Woodpecker CI is not the runtime of this job;
       optional repo lint/tests baseline is documented in ``docs/spikes/fairness-measurement-spike.md`` (§10).
       Pause or change cadence only with Governance; update this field and re-validate the declaration.
 workflow:
@@ -28,7 +29,7 @@ workflow:
     - month
     - day
   default_extraction_type: incremental
-  execution_timeout_hours: 4
+  execution_timeout_hours: 8
   has_hive_sync: false
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
