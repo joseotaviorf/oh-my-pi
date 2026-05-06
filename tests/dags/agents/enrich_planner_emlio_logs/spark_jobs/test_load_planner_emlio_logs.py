@@ -69,6 +69,66 @@ class TestBuildPayloadEnvelope:
 
 
 # ---------------------------------------------------------------------------
+# metrics_calculate_ranking / evaluation_cache (nested vs sibling observability)
+# ---------------------------------------------------------------------------
+
+
+class TestEvaluationCacheExtraction:
+    """Observability scalars and evaluation_cache when data is only under response.observability_data."""
+
+    def test_nested_observability_data_populates_evaluation_cache_clean_json(self, spark, source_df):
+        """Mirrors planner_ml_service_emlio notebook path: $.response_type.observability_data..."""
+        import json
+
+        from dags.agents.enrich_planner_emlio_logs.spark_jobs.load_planner_emlio_logs import (
+            INPUT_SPECS,
+            OUTPUT_SPECS,
+            _apply_specs,
+            _build_payload_envelope,
+            _extract_observability_derived,
+        )
+
+        evaluation_cache = {
+            "BlakerScore": {
+                "scores": [0.5, 0.6],
+                "strategy_class_name": "BlakerScore",
+                "strategy_repr": "repr",
+            }
+        }
+        outputs = {
+            "shadow_mode_response": {
+                "agents": [101, 102],
+                "group": "g",
+                "observability_data": {
+                    "strategy_type_used": "sale_max15_maxintraday1_blaker_score",
+                    "ranked_agents_count": 2,
+                    "ranking_info": {"evaluation_cache": evaluation_cache},
+                },
+            }
+        }
+        inputs = json.dumps({"planner_agent_request": {"business_context": "sale", "id_house": "1"}})
+        outputs_str = json.dumps(outputs)
+
+        df = spark.createDataFrame(
+            [("uuid-nested", inputs, outputs_str, 2026, 4, 1)],
+            source_df.schema,
+        )
+        df = _build_payload_envelope(df)
+        row_env = df.collect()[0]
+        assert row_env["observability_type"] is None
+
+        df = _apply_specs(df, INPUT_SPECS + OUTPUT_SPECS)
+        row_out = df.select("strategy_type_used", "ranked_agents_count").collect()[0]
+        assert row_out["strategy_type_used"] == "sale_max15_maxintraday1_blaker_score"
+        assert row_out["ranked_agents_count"] == 2
+
+        df = _extract_observability_derived(df)
+        clean = df.select("evaluation_cache_clean_json").collect()[0][0]
+        assert clean is not None
+        assert "BlakerScore" in clean
+
+
+# ---------------------------------------------------------------------------
 # _deduplicate
 # ---------------------------------------------------------------------------
 

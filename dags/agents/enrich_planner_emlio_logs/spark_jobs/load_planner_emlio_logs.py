@@ -138,6 +138,23 @@ def _json_observability_field(field_path: str) -> F.Column:
     return F.get_json_object(F.col("_observability_envelope_json"), f"$.{field_path}")
 
 
+def _nested_response_observability_json_path(relative_path: str) -> F.Column:
+    """Scalar field under ``$.{response_type}.observability_data.<relative_path>`` in ``outputs``.
+
+    Matches planner notebooks (``get_json_object(outputs, $.<response>.observability_data...)``).
+    Used together with sibling-key envelope extracts via :func:`F.coalesce`.
+    """
+    return F.get_json_object(
+        F.col("outputs"),
+        F.concat(
+            F.lit("$."),
+            F.col("response_type"),
+            F.lit(".observability_data."),
+            F.lit(relative_path),
+        ),
+    )
+
+
 def _build_payload_envelope(df: DataFrame) -> DataFrame:
     """Detect envelope keys and materialise the envelope JSON strings.
 
@@ -217,8 +234,25 @@ INPUT_SPECS: tuple = (
 OUTPUT_SPECS: tuple = (
     FieldSpec("list_agent_ml_ranking", "response",      "agents",               dtype=ArrayType(IntegerType())),
     FieldSpec("group",                 "response",      "group"),
-    FieldSpec("strategy_type_used",    "observability", "strategy_type_used"),
-    FieldSpec("ranked_agents_count",   "observability", "ranked_agents_count",  cast=IntegerType()),
+    FieldSpec(
+        "strategy_type_used",
+        "observability",
+        "strategy_type_used",
+        post_process=lambda c: F.coalesce(
+            _nested_response_observability_json_path("strategy_type_used"),
+            c,
+        ),
+    ),
+    FieldSpec(
+        "ranked_agents_count",
+        "observability",
+        "ranked_agents_count",
+        cast=IntegerType(),
+        post_process=lambda c: F.coalesce(
+            _nested_response_observability_json_path("ranked_agents_count").cast(IntegerType()),
+            c,
+        ),
+    ),
     # evaluation_cache_clean_json and first_agent_ml_ranking are derived from the above
     # and handled separately in _extract_observability_derived below.
 )
@@ -282,6 +316,17 @@ def _clean_evaluation_cache(df: DataFrame) -> DataFrame:
     return df.withColumn("evaluation_cache_clean_json", F.to_json(clean_map))
 
 
+def _nested_ranking_evaluation_cache() -> F.Column:
+    """Path used by planner notebooks: ranking metadata nested under the response payload.
+
+    Some log rows only expose ``ranking_info.evaluation_cache`` at
+    ``$.{response_type}.observability_data`` inside ``outputs`` (not as a separate
+    ``*_observability_data`` sibling string). We coalesce this with the sibling-envelope
+    extract so ``metrics_calculate_ranking`` matches both layouts.
+    """
+    return _nested_response_observability_json_path("ranking_info.evaluation_cache")
+
+
 def _extract_observability_derived(df: DataFrame) -> DataFrame:
     """Compute columns derived from already-extracted output fields.
     - evaluation_cache_clean_json: parsed and cleaned scoring map (→ metrics_calculate_ranking)
@@ -289,7 +334,10 @@ def _extract_observability_derived(df: DataFrame) -> DataFrame:
     """
     df = df.withColumn(
         "evaluation_cache",
-        _json_observability_field("ranking_info.evaluation_cache"),
+        F.coalesce(
+            _nested_ranking_evaluation_cache(),
+            _json_observability_field("ranking_info.evaluation_cache"),
+        ),
     )
     df = _clean_evaluation_cache(df)
     return df.drop("evaluation_cache").withColumn(
