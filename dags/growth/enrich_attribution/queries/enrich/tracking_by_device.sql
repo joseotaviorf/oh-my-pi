@@ -50,11 +50,7 @@ WITH tracking AS (
       ELSE egw_utm_term
     END AS utm_term,
 
-    CASE
-      WHEN ts_utm_attribution >= ts_referral_attribution THEN ts_utm_attribution
-      WHEN ts_utm_attribution < ts_referral_attribution THEN ts_referral_attribution
-      ELSE COALESCE(ts_utm_attribution, ts_referral_attribution, ts_event)
-    END AS ts_tracking
+    ts_event AS ts_tracking
   FROM
     datalake_cdp_clean.user_tracking
   WHERE

@@ -5,8 +5,8 @@ domain: Growth
 owner: "@data-growth"
 description: |
   Enriched view that attributes leads to their most recent online touchpoint. Leads from house_lead are joined
-  to acquisition_misc_data to retrieve the linked device IDs (extracted from the
-  acquisition_campaign:profileTracking:linked_devices JSON array). Each lead is then matched against the
+  to acquisition_misc_data to retrieve the linked device IDs (extracted from the acquisition_campaign:deviceId
+  and acquisition_campaign:profileTracking:linked_devices JSON array). Each lead is then matched against the
   tracking_by_device history to pick the most recent touchpoint whose ts_utm_attribution_start is at or before
   the lead creation timestamp, keeping a single attribution row per lead.
 columns:
@@ -16,9 +16,10 @@ columns:
       - datalake_rene_descartes_clean.house_lead.id_lead_ebdb
   id_device:
     description: |
-      Device identifier of the attributed touchpoint. Sourced from the linked_devices array inside the
-      acquisition_campaign JSON (acquisition_misc_data.acquisition_campaign:profileTracking:linked_devices),
-      then matched against tracking_by_device.
+      Device identifier of the attributed touchpoint. Sourced from the acquisition_campaign:deviceId field and
+      linked_devices array inside the acquisition_campaign JSON
+      (acquisition_misc_data.acquisition_campaign:profileTracking:linked_devices), then matched against
+      tracking_by_device.
     lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_attribution.tracking_by_device.id_device

@@ -73,15 +73,10 @@ columns:
       - datalake_cdp_clean.user_tracking.user_properties
   ts_utm_attribution_start:
     description: |
-      Earliest tracking timestamp (MIN of ts_tracking) for the id_device + UTM combination. ts_tracking is
-      resolved per event as the most recent of egw_last_attribution_time and the referral timestamp
-      (egw_referrer_ts in user_properties, stored as epoch milliseconds and converted via
-      from_unixtime(... / 1000)), falling back to ts_event when both are null. Marks when this touchpoint
-      combination first appeared for the device. This column is not updated when new touchpoints are detected
-      for the same UTM combination because the start time is static once it's set.
+      Earliest tracking timestamp (MIN of ts_tracking) for the id_device + UTM combination. Marks when this
+      touchpoint combination first appeared for the device. This column is not updated when new touchpoints
+      are detected for the same UTM combination because the start time is static once it's set.
     lineage:
-      - datalake_cdp_clean.user_tracking.egw_last_attribution_time
-      - datalake_cdp_clean.user_tracking.user_properties
       - datalake_cdp_clean.user_tracking.ts_event
   ts_utm_attribution_end:
     description: |
@@ -89,6 +84,4 @@ columns:
       same logic as ts_utm_attribution_start. Marks the most recent occurrence of this touchpoint combination
       for the device. This column is updated when new touchpoints are detected for the same UTM combination.
     lineage:
-      - datalake_cdp_clean.user_tracking.egw_last_attribution_time
-      - datalake_cdp_clean.user_tracking.user_properties
       - datalake_cdp_clean.user_tracking.ts_event
