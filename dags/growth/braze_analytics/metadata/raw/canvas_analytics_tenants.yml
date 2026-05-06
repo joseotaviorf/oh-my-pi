@@ -1,6 +1,0 @@
----
-database_name: datalake_braze_analytics_raw
-table_name: canvas_analytics_tenants
-owner: data-growth
-domain: growth
-description: Daily series of various stats for a canvas over time. Data includes how many messages were sent, opened, clicked, or converted by messaging channel.

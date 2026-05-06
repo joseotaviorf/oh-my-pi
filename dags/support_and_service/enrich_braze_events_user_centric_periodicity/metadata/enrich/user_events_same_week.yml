@@ -1,0 +1,112 @@
+---
+database_name: datalake_braze_user_centric_periodicity
+table_name: user_events_same_week
+owner: leticia.lima@quintoandar.com.br
+domain: Support and Services
+description: This table contains details about all events related to a user that happened during a week.
+columns:
+  id_user_braze:
+    description: Unique code to identify an user created by Braze.
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.id_user_braze
+  id_user:
+    description: Unique code to identify an user created here at QuintoAndar.
+  total_campaigns_sent_to:
+    description: Volume of campaings that were sent to this user (COUNT DISTINCT id_campaign).
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.id_campaign
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_canvases_sent_to:
+    description: Volume of canvas that were sent to this user (COUNT DISTINCT id_canvas).
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.id_canvas
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_tenant_communications_sent_to:
+    description: Volume of comunications of any type (email, sms, push, ...) from a tenant campaign/canvas that were sent to this user.
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.user_type
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_owner_communications_sent_to:
+    description: Volume of comunications of any type (email, sms, push, ...) from a owner campaign/canvas that were sent to this user.
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.user_type
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_affiliate_communications_sent_to:
+    description: Volume of comunications of any type (email, sms, push, ...) from a affiliate campaign/canvas that were sent to this user.
+  total_emails_sent_to:
+    description: Volume of emails that were sent to this user.
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_emails_delivered_to:
+    description: Volume of emails that this user received.
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_email_opens:
+    description: Volume of emails that this user opened.
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_email_clicks:
+    description: Volume of emails that this user clicked.
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_push_notifications_sent_to:
+    description: Volume of push notifications that were sent to this user.
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_push_notification_opens:
+    description: Volume of push notifications that this user opened.
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_inapp_message_views:
+    description: Volume of inapp messages that this user saw.
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_inapp_message_clicks:
+    description: Volume of inapp messages that this user clicked.
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_webhooks_sent_to:
+    description: Volume of webhooks that were sent to this user.
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_sms_sent_to:
+    description: Volume of sms that were sent to this user.
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  total_sms_delivered_to:
+    description: Volume of sms that this user received.
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+  year:
+    description: Year of when the event occurred.
+  month:
+    description: Month of when the event occurred.
+  day:
+    description: Day of when the event occurred.
+

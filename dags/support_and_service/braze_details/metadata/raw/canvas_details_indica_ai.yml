@@ -1,0 +1,5 @@
+---
+database_name: datalake_braze_details_raw
+table_name: canvas_details_indica_ai
+domain: Support and Services
+owner: data-ss@quintoandar.com.br

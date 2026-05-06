@@ -1,0 +1,31 @@
+---
+database_name: datalake_braze_analytics_clean
+table_name: canvas_analytics_tenants
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
+description: Daily series of various stats for a canvas over time. Data includes how many messages were sent, opened, clicked, or converted by messaging channel.
+columns:
+  id_canvas:
+    description: Canvas ID as given by the Braze Platform.
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_tenants.canvas_id
+  canvas_name:
+    description: Name of the Canvas as defined in Braze Platform.
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_tenants.name
+  stats:
+    description: JSON containing informations abut the canvas and conversions.
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_tenants.stats
+  year:
+    description: Year of when the results refer to.
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_tenants.year
+  month:
+    description: Month of when the results refer to.
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_tenants.month
+  day:
+    description: Day of when the results refer to.
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_tenants.day

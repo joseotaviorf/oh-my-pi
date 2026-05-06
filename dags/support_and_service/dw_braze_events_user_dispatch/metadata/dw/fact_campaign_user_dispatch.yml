@@ -1,0 +1,210 @@
+database_name: dw_braze
+table_name: fact_campaign_user_dispatch
+description: Fact table that contains each dispatch for a user, in a Campaign. Campaigns
+  are a comms that are sent for a unique channel, with N variants. It's possible to
+  verify the interaction of a user in a communication, for example, if it user has
+  received, opened, clicked in case of e-mails. Each line is a dispatch sent from
+  Braze.
+domain: Support and Services
+owner: marcus.pinto@quintoandar.com.br
+columns:
+  sk_braze_user:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.id_user_braze
+    - datalake_braze_dispatches_user.tenants_events.id_user_braze
+    - datalake_braze_dispatches_user.affiliates_events.id_user_braze
+    description: Key of the user on the Braze Platform. It is NOT the same sk as our sk_user.
+  sk_user_dispatch:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.id_user_dispatch
+    - datalake_braze_dispatches_user.tenants_events.id_user_dispatch
+    - datalake_braze_dispatches_user.affiliates_events.id_user_dispatch
+    description: Key of the dispatch transmitted for Braze to a user.
+  sk_user:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.id_user
+    - datalake_braze_dispatches_user.tenants_events.id_user
+    - datalake_braze_dispatches_user.affiliates_events.id_user
+    description: Key of the user on the QuintoAndar Platforms.
+  sk_campaign:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.id_campaign
+    - datalake_braze_dispatches_user.tenants_events.id_campaign
+    - datalake_braze_dispatches_user.affiliates_events.id_campaign
+    description: Key of the campaign.
+  sk_variant_campaign:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.id_variant_campaign
+    - datalake_braze_dispatches_user.tenants_events.id_variant_campaign
+    - datalake_braze_dispatches_user.affiliates_events.id_variant_campaign
+    description: Key of the variant within a campaign. It can have different variants in the same campaign. Control groups are not a variant because it isn't sent.
+  user_type:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.user_type
+    - datalake_braze_dispatches_user.tenants_events.user_type
+    - datalake_braze_dispatches_user.affiliates_events.user_type
+    description: Which kind of user is receiving that communication.
+  event_channel:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.event_channel
+    - datalake_braze_dispatches_user.tenants_events.event_channel
+    - datalake_braze_dispatches_user.affiliates_events.event_channel
+    description: The channel through which the communication was sent.
+  ts_email_sent:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_email_sent
+    - datalake_braze_dispatches_user.tenants_events.ts_email_sent
+    - datalake_braze_dispatches_user.affiliates_events.ts_email_sent
+    description: Timestamp of when that communication of an e-mail was sent to a user.
+  ts_email_delivered:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_email_delivered
+    - datalake_braze_dispatches_user.tenants_events.ts_email_delivered
+    - datalake_braze_dispatches_user.affiliates_events.ts_email_delivered
+    description: Timestamp of when that communication of an e-mail was delivered to a user.
+  ts_email_bounced:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_email_bounced
+    - datalake_braze_dispatches_user.tenants_events.ts_email_bounced
+    - datalake_braze_dispatches_user.affiliates_events.ts_email_bounced
+    description: Timestamp of when that communication of an e-mail was bounced to a user. A bounced e-mail is a message that gets rejected by a mail server.
+  ts_email_unsubscribed:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_email_unsubscribed
+    - datalake_braze_dispatches_user.tenants_events.ts_email_unsubscribed
+    - datalake_braze_dispatches_user.affiliates_events.ts_email_unsubscribed
+    description: Timestamp of when that communication of an e-mail was unsubscribed by a user.
+  ts_email_spammed:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_email_spammed
+    - datalake_braze_dispatches_user.tenants_events.ts_email_spammed
+    - datalake_braze_dispatches_user.affiliates_events.ts_email_spammed
+    description: Timestamp of when that communication of an e-mail was spammed by a user.
+  ts_push_sent:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_push_sent
+    - datalake_braze_dispatches_user.tenants_events.ts_push_sent
+    - datalake_braze_dispatches_user.affiliates_events.ts_push_sent
+    description: Timestamp of when that communication of a push notification was sent to a user.
+  ts_push_bounced:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_push_bounced
+    - datalake_braze_dispatches_user.tenants_events.ts_push_bounced
+    - datalake_braze_dispatches_user.affiliates_events.ts_push_bounced
+    description: Timestamp of when that communication of a push notification was bounced to a user.
+  ts_sms_sent:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_sms_sent
+    - datalake_braze_dispatches_user.tenants_events.ts_sms_sent
+    - datalake_braze_dispatches_user.affiliates_events.ts_sms_sent
+    description: Timestamp of when that communication of an SMS was sent to a user.
+  ts_sms_send_to_carried:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_sms_send_to_carried
+    - datalake_braze_dispatches_user.tenants_events.ts_sms_send_to_carried
+    - datalake_braze_dispatches_user.affiliates_events.ts_sms_send_to_carried
+    description: Timestamp of when that communication of an SMS was sent to the server of the carrier that delivers the SMS to the phone.
+  ts_sms_delivered:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_sms_delivered
+    - datalake_braze_dispatches_user.tenants_events.ts_sms_delivered
+    - datalake_braze_dispatches_user.affiliates_events.ts_sms_delivered
+    description: Timestamp of when that communication of an SMS was delivered to a user.
+  ts_sms_rejected:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_sms_rejected
+    - datalake_braze_dispatches_user.tenants_events.ts_sms_rejected
+    - datalake_braze_dispatches_user.affiliates_events.ts_sms_rejected
+    description: Timestamp of when that communication of an SMS gets rejected by the carrier.
+  ts_sms_delivery_failed:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_sms_delivery_failed
+    - datalake_braze_dispatches_user.tenants_events.ts_sms_delivery_failed
+    - datalake_braze_dispatches_user.affiliates_events.ts_sms_delivery_failed
+    description: Timestamp of when that communication of an SMS had a failure in its delivery to a user.
+  ts_webhook_sent:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_webhook_sent
+    - datalake_braze_dispatches_user.tenants_events.ts_webhook_sent
+    - datalake_braze_dispatches_user.affiliates_events.ts_webhook_sent
+    description: Timestamp of when that communication of a webhook was sent to a user.
+  ts_inapp_impressioned:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_inapp_impressioned
+    - datalake_braze_dispatches_user.tenants_events.ts_inapp_impressioned
+    - datalake_braze_dispatches_user.affiliates_events.ts_inapp_impressioned
+    description: Timestamp of when that communication at in-app was impressed to a user. For a message to be impressed, it's needed to open the app.
+  total_email_opened:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_email_opened
+    - datalake_braze_dispatches_user.tenants_events.ts_email_opened
+    - datalake_braze_dispatches_user.affiliates_events.ts_email_opened
+    description: The amount of opens which that e-mail sent to that user had.
+  ts_email_first_opened:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_email_opened
+    - datalake_braze_dispatches_user.tenants_events.ts_email_opened
+    - datalake_braze_dispatches_user.affiliates_events.ts_email_opened
+    description: Timestamp of when that communication at e-mail was opened for the first time.
+  ts_email_last_opened:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_email_opened
+    - datalake_braze_dispatches_user.tenants_events.ts_email_opened
+    - datalake_braze_dispatches_user.affiliates_events.ts_email_opened
+    description: Timestamp of when that communication at e-mail was opened for the last time.
+  total_email_clicked:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_email_clicked
+    - datalake_braze_dispatches_user.tenants_events.ts_email_clicked
+    - datalake_braze_dispatches_user.affiliates_events.ts_email_clicked
+    description: The amount of clicks which that e-mail sent to that user had.
+  ts_email_first_clicked:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_email_clicked
+    - datalake_braze_dispatches_user.tenants_events.ts_email_clicked
+    - datalake_braze_dispatches_user.affiliates_events.ts_email_clicked
+    description: Timestamp of when that communication at e-mail was clicked for the first time.
+  ts_email_last_clicked:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_email_clicked
+    - datalake_braze_dispatches_user.tenants_events.ts_email_clicked
+    - datalake_braze_dispatches_user.affiliates_events.ts_email_clicked
+    description: Timestamp of when that communication at e-mail was clicked for the last time.
+  total_push_opened:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_push_opened
+    - datalake_braze_dispatches_user.tenants_events.ts_push_opened
+    - datalake_braze_dispatches_user.affiliates_events.ts_push_opened
+    description: The amount of opens which that push notification sent to that user had.
+  ts_push_first_opened:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_push_opened
+    - datalake_braze_dispatches_user.tenants_events.ts_push_opened
+    - datalake_braze_dispatches_user.affiliates_events.ts_push_opened
+    description: Timestamp of when that communication at push notification was opened for the first time.
+  ts_push_last_opened:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.ts_push_opened
+    - datalake_braze_dispatches_user.tenants_events.ts_push_opened
+    - datalake_braze_dispatches_user.affiliates_events.ts_push_opened
+    description: Timestamp of when that communication at push notification was opened for the last time.
+  year:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.year
+    - datalake_braze_dispatches_user.tenants_events.year
+    - datalake_braze_dispatches_user.affiliates_events.year
+    description: Year of when the dispatch of a campaign communication was recorded in the table. It's a partition key, so it's performatic to filter or join by this column.
+  month:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.month
+    - datalake_braze_dispatches_user.tenants_events.month
+    - datalake_braze_dispatches_user.affiliates_events.month
+    description: Month of when the dispatch of a campaign communication was recorded in the table. It's a partition key, so it's performatic to filter or join by this column.
+  day:
+    lineage:
+    - datalake_braze_dispatches_user.owners_events.day
+    - datalake_braze_dispatches_user.tenants_events.day
+    - datalake_braze_dispatches_user.affiliates_events.day
+    description: Day of when the dispatch of a campaign communication was recorded in the table. It's a partition key, so it's performatic to filter or join by this column.
+  ts_load:
+    description: Timestamp of when the dispatch of a campaign communication was recorded in the table.

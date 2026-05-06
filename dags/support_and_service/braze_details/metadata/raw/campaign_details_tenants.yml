@@ -1,0 +1,6 @@
+---
+database_name: datalake_braze_details_raw
+table_name: campaign_details_tenants
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
+description: Relevant information on a specified campaign.

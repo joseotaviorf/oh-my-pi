@@ -1,0 +1,31 @@
+---
+database_name: datalake_braze_analytics_clean
+table_name: canvas_analytics_indica_ai
+domain: Support and Services
+owner: data-ss@quintoandar.com.br
+description: Daily series of various stats for a canvas over time for the IndicaAi app group. Data includes how many messages were sent, opened, clicked, or converted by messaging channel.
+columns:
+  id_canvas:
+    description: Canvas ID as given by the Braze Platform.
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_indica_ai.canvas_id
+  canvas_name:
+    description: Name of the Canvas as defined in the Braze Platform.
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_indica_ai.name
+  stats:
+    description: JSON containing information about the canvas statistics and conversions broken down by channel and step.
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_indica_ai.stats
+  year:
+    description: Year extracted from the analytics timestamp, used for data partitioning and time-based filtering.
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_indica_ai.year
+  month:
+    description: Month extracted from the analytics timestamp, used for data partitioning and time-based filtering.
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_indica_ai.month
+  day:
+    description: Day extracted from the analytics timestamp, used for data partitioning and time-based filtering.
+    lineage:
+      - datalake_braze_analytics_raw.canvas_analytics_indica_ai.day

@@ -1,0 +1,96 @@
+---
+database_name: datalake_braze_user_centric
+table_name: user_events_daily
+owner: data-ss@quintoandar.com
+domain: Support and Services
+description: This table aggregates daily events for owners, tenants, and affiliates in a user-centric manner. Provides a comprehensive view of user interactions via different channels and actions.
+
+columns:
+  id_user_braze:
+    description: Unique identifier for the user in the Braze system
+    lineage:
+      - datalake_braze.events_owners.id_user_braze
+      - datalake_braze.events_tenants.id_user_braze
+      - datalake_braze.events_affiliates.id_user_braze
+
+  id_user:
+    description: General unique identifier for the user
+    lineage:
+      - datalake_braze.events_owners.id_user
+      - datalake_braze.events_tenants.id_user
+      - datalake_braze.events_affiliates.id_user
+  
+  id_canvas:
+    description: Unique identifier for the Braze canvas
+    lineage:
+      - datalake_braze.events_owners.id_canvas
+      - datalake_braze.events_tenants.id_canvas
+      - datalake_braze.events_affiliates.id_canvas
+
+  id_campaign:
+    description: Unique identifier for the Braze campaign
+    lineage:
+      - datalake_braze.events_owners.id_campaign
+      - datalake_braze.events_tenants.id_campaign
+      - datalake_braze.events_affiliates.id_campaign
+
+  event_type:
+    description: Type of the event
+    lineage:
+      - datalake_braze.events_owners.event_type
+      - datalake_braze.events_tenants.event_type
+      - datalake_braze.events_affiliates.event_type
+
+  event_channel:
+    description: Channel through which the event was triggered. Can be app, email, webhook, inappmessage or pushnotification
+    lineage:
+      - datalake_braze.events_owners.event_channel
+      - datalake_braze.events_tenants.event_channel
+      - datalake_braze.events_affiliates.event_channel
+  
+  event_action:
+    description: Action taken during the event
+    lineage:
+      - datalake_braze.events_owners.event_action
+      - datalake_braze.events_tenants.event_action
+      - datalake_braze.events_affiliates.event_action
+
+  user_type:
+    description: Type of the user involved in the event. Can be owner, tenant, or affiliate.
+    lineage:
+      - Static column generated in SQL query
+  
+  event_count:
+    description: Count of distinct events
+    lineage:
+      - datalake_braze.events_owners.id_event
+      - datalake_braze.events_tenants.id_event
+      - datalake_braze.events_affiliates.id_event
+
+  dt_event:
+    description: Date of the event
+    lineage:
+      - datalake_braze.events_owners.ts_event
+      - datalake_braze.events_tenants.ts_event
+      - datalake_braze.events_affiliates.ts_event
+
+  year:
+    description: The year the event occurred
+    lineage:
+      - datalake_braze.events_owners.year
+      - datalake_braze.events_tenants.year
+      - datalake_braze.events_affiliates.year
+
+  month:
+    description: The month the event occurred
+    lineage:
+      - datalake_braze.events_owners.month
+      - datalake_braze.events_tenants.month
+      - datalake_braze.events_affiliates.month
+
+  day:
+    description: The day the event occurred
+    lineage:
+      - datalake_braze.events_owners.day
+      - datalake_braze.events_tenants.day
+      - datalake_braze.events_affiliates.day

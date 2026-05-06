@@ -1,0 +1,123 @@
+---
+database_name: datalake_braze_user_centric_periodicity
+table_name: user_events_3w_before
+description: Table with metrics regarding all the communications sent to a user on the week before the week start of data last update. 
+domain: Support and Services
+owner: conrado.fabri@quintoandar.com.br
+columns:
+  id_user_braze:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.id_user_braze
+    description: Key of the user on the Braze Platform. It is NOT the same id as our id_user.
+  id_user:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.id_user
+    description: QuintoAndar's main user id.
+  total_campaigns_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.id_campaign
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total of send events for campaigns sent to the user on the week before the week start of data last update.
+  total_canvases_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.id_canvas
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total of send events for canvases sent to user on the week before the week start of data last update.
+  total_tenant_communications_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.user_type
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total of send events (either campaigns or canvases).
+  total_owner_communications_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.user_type
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total of send events (either campaigns or canvases).
+  total_emails_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total of send events for emails (either canvas or campaigns, tenants or owners app).
+  total_emails_delivered_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total of delivery events for emails (either canvas or campaigns,tenants or owners app).
+  total_email_opens:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total times the user opened emails (either canvas or campaigns, tenants or owners app).
+  total_email_clicks:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total times the user clicked on emails (either canvas or campaigns,tenants or owners app).
+  total_push_notifications_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total of send events for push notifications (either canvas or campaigns,tenants or owners app).
+  total_push_notification_opens:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total of delivery events for push notifications (either canvas or campaigns, tenants or owners app).
+  total_inapp_message_views:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total times the user viewed in app messages (either canvas or campaigns,tenants or owners app).
+  total_inapp_message_clicks:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total times the user clicked on an in app messages (either canvas or campaigns, tenants or owners app)
+  total_webhooks_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total of send events for webhooks (either canvas or campaigns, tenants or owners app).
+  total_sms_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total of send events for sms (either canvas or campaigns, tenants or owners app).
+  total_sms_delivered_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total of delivery events for emails (either canvas or campaigns,tenants or owners app).
+  total_affiliate_communications_sent_to:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.event_channel
+      - datalake_braze_user_centric.user_events_daily.event_action
+      - datalake_braze_user_centric.user_events_daily.event_count
+    description: Total of send events (either campaigns or canvases) sent to the affiliate users.
+  year:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.dt_event
+    description: Default partition column for incremental tables, based on DAG execution.
+  month:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.dt_event
+    description: Default partition column for incremental tables, based on DAG execution.
+  day:
+    lineage:
+      - datalake_braze_user_centric.user_events_daily.dt_event
+    description: Default partition column for incremental tables, based on DAG execution.

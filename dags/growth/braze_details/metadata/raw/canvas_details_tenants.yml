@@ -1,6 +1,0 @@
----
-database_name: datalake_braze_details_raw
-table_name: canvas_details_tenants
-owner: data-growth
-domain: growth
-description: Metadata about a Canvas, such as the name, time created, current status, and more.
