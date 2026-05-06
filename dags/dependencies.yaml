@@ -2009,7 +2009,6 @@ bietlejuice.enrich_consolidated_growth_metrics:
   - bietlejuice.google_ads:load-clean-videos-performance:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-cost-taxonomy-translation-dictionary:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags:first-run-of-day
-  - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns:first-run-of-day
 bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.criteo_campaigns:load-clean-criteo-campaigns:first-run-of-day
   - bietlejuice.enrich_facebook_insights:load-enrich-facebook-insights-impression-device:first-run-of-day
@@ -2019,7 +2018,6 @@ bietlejuice.enrich_consolidated_marketing_metrics:
   - bietlejuice.google_ads:load-clean-keywords-performance:first-run-of-day
   - bietlejuice.google_ads:load-clean-videos-performance:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-marketing-costs-google-ad-type-flags:first-run-of-day
-  - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns:first-run-of-day
 bietlejuice.enrich_consumption_bill:
   - bietlejuice.ebdb_administration:load-clean-consumption-bill-aud:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
@@ -2733,13 +2731,11 @@ bietlejuice.enrich_growth_media_platform_metrics:
   - bietlejuice.google_ads:load-clean-ad-group-geo-performance:first-run-of-day
   - bietlejuice.google_ads:load-clean-campaigns-geo-performance:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-cost-taxonomy-translation-dictionary:first-run-of-day
-  - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns:first-run-of-day
 bietlejuice.enrich_growth_media_platform_scd:
   - bietlejuice.enrich_criteo:load-enrich-criteo-campaigns:first-run-of-day
   - bietlejuice.enrich_facebook_insights:load-enrich-facebook-insights-region:first-run-of-day
   - bietlejuice.google_ads:load-clean-ad-group-geo-performance:first-run-of-day
   - bietlejuice.google_ads:load-clean-campaigns-geo-performance:first-run-of-day
-  - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns:first-run-of-day
 bietlejuice.enrich_growth_taxonomy:
   - bietlejuice.gsheets_growth:done-clean-dict-taxonomy-supply:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-levels-values:first-run-of-day

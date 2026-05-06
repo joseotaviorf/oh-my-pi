@@ -1,3 +1,9 @@
+bietlejuice.enrich_consolidated_growth_metrics:
+  remove:
+    - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns:first-run-of-day
+bietlejuice.enrich_growth_media_platform_scd:
+  remove:
+    - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns:first-run-of-day
 bietlejuice.enrich_criteo:
   add:
     - bietlejuice.criteo_temp:done-clean-criteo-costs:first-run-of-day
@@ -335,6 +341,7 @@ bietlejuice.enrich_consolidated_marketing_metrics:
     - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a033a:first-run-of-day
     - bietlejuice.enrich_marketing_costs_sharing_rules:load-enrich-a034a:first-run-of-day
     - bietlejuice.enrich_region:load-enrich-region:first-run-of-day
+    - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns:first-run-of-day
 bietlejuice.enrich_content_funnel:
   remove:
     - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
@@ -499,6 +506,7 @@ bietlejuice.enrich_growth_media_platform_metrics:
   remove:
     - bietlejuice.criteo_temp:load-clean-criteo-region-lookup:first-run-of-day
     - bietlejuice.google_ads:load-clean-geo-target-constant:first-run-of-day
+    - bietlejuice.lifull_campaigns:load-clean-trovit-campaigns:first-run-of-day
 bietlejuice.enrich_growth_taxonomy:
   remove:
     - bietlejuice.ebdb_visit:load-clean-visit-origin:first-run-of-day
