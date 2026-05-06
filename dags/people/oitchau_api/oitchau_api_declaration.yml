@@ -182,7 +182,7 @@ workflow:
       date_filter_column: date
       params:
         from: load_start_date
-        to: load_start_date
+        to: load_end_date
       api_policies:
         pagination:
           strategy: page_per_page
