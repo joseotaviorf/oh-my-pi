@@ -1,28 +1,29 @@
 import argparse
 import ast
 from datetime import datetime
-from functools import partial
-from typing import Dict
+from typing import Dict, Iterable, Iterator, List, Tuple
 
-import spacy
-from presidio_analyzer.nlp_engine import NlpEngineProvider
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.loaders.delta_loader import DeltaLoader
+from bietlejuice.services import ConfigurationService
 from presidio_analyzer import (
     AnalyzerEngine,
     BatchAnalyzerEngine,
     RecognizerRegistry,
 )
-from pyspark.sql import DataFrame
-from pyspark.sql.functions import col, explode, count, collect_list, struct, to_json
-from pyspark.sql.types import StructType, StringType, StructField, ArrayType, IntegerType, MapType
-
+from presidio_analyzer.nlp_engine import NlpEngineProvider
+from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql.functions import col, collect_list, count, explode, struct, to_json
+from pyspark.sql.types import (
+    ArrayType,
+    IntegerType,
+    MapType,
+    StringType,
+    StructField,
+    StructType,
+)
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.base.spark.base_spark import BaseDBUtils
 
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.services import ConfigurationService
-
-DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_pii_scan_into_datalake"
 logger = QuintoAndarLogger(JOB_NAME)
 
@@ -35,7 +36,6 @@ ENTITIES_LIST = [
     "CREDIT_CARD",
     "EMAIL_ADDRESS",
     "IP_ADDRESS",
-    "LOCATION",
     "PERSON",
     "PHONE_NUMBER",
     "URL",
@@ -71,6 +71,7 @@ LABELS_TO_IGNORE = {
     "FAC",
 }
 
+
 def load_recognizers_from_dict(recognizer_dict_list) -> RecognizerRegistry:
     """
     Load custom recognizers from a YAML configuration file and add them to the registry.
@@ -79,14 +80,15 @@ def load_recognizers_from_dict(recognizer_dict_list) -> RecognizerRegistry:
         registry: A RecognizerRegistry instance with the custom recognizers loaded.
     """
     if not recognizer_dict_list:
-      raise Exception("dict_recognizer_list is required.")
+        raise Exception("dict_recognizer_list is required.")
 
     registry = RecognizerRegistry()
     registry.load_predefined_recognizers()
     for dict_recognizer in recognizer_dict_list:
-      registry.add_pattern_recognizer_from_dict(dict_recognizer)
+        registry.add_pattern_recognizer_from_dict(dict_recognizer)
 
     return registry
+
 
 def load_nlp_config() -> Dict:
     """
@@ -102,6 +104,7 @@ def load_nlp_config() -> Dict:
     }
 
     return nlp_config
+
 
 def build_batch_analyzer(registry) -> BatchAnalyzerEngine:
     """
@@ -120,46 +123,95 @@ def build_batch_analyzer(registry) -> BatchAnalyzerEngine:
 
     return batch_analyzer
 
+
 def clean_result(result, matched_value):
     if not result:
-        return [{"type": "NOT_FOUND" if matched_value != "SAMPLE_TOO_BIG" else "SAMPLE_TOO_BIG", "score": 0.0, "matched_value": matched_value}]
+        return [
+            {
+                "type": "NOT_FOUND"
+                if matched_value != "SAMPLE_TOO_BIG"
+                else "SAMPLE_TOO_BIG",
+                "score": 0.0,
+                "matched_value": matched_value,
+            }
+        ]
     return [
-        {"type": r.entity_type if matched_value != "SAMPLE_TOO_BIG" else "SAMPLE_TOO_BIG", "score": r.score, "matched_value": matched_value}
+        {
+            "type": r.entity_type
+            if matched_value != "SAMPLE_TOO_BIG"
+            else "SAMPLE_TOO_BIG",
+            "score": r.score,
+            "matched_value": matched_value,
+        }
         for r in result
     ]
 
-def process_partition(iter_of_rows, batch_analyzer):
-    rows_list = list(iter_of_rows)
 
+def _rows_to_analyzer_inputs(rows_list: List) -> Tuple[Dict, Dict]:
     df_dict = {
-      row["id_entity"] : row["sample"] if row["len_sample"] < 4000 else ["SAMPLE_TOO_BIG"]
-      for row in rows_list
+        row["id_entity"]: row["sample"]
+        if row["len_sample"] < 4000
+        else ["SAMPLE_TOO_BIG"]
+        for row in rows_list
     }
-    df_dict_columns = {
-      row["id_entity"] : row["list_column_name"]
-      for row in rows_list
-    }
+    df_dict_columns = {row["id_entity"]: row["list_column_name"] for row in rows_list}
+    return df_dict, df_dict_columns
 
-    # pprint(df_dict)
-    results = list(batch_analyzer.analyze_dict(
-      input_dict=df_dict,
-      entities=ENTITIES_LIST,
-      score_threshold=SCORE_THRESHOLD,
-      language="en",
-    ))
 
-    col_results = list(batch_analyzer.analyze_dict(
-      input_dict=df_dict_columns,
-      entities=COLUMN_NAME_ENTITIES,
-      score_threshold=SCORE_THRESHOLD,
-      language="en",
-    ))
-    for col_result, result, row in zip(col_results, results, rows_list):
-      yield (
-        *row,
-        [clean_result(r, matched_value) for (r, matched_value) in zip(result.recognizer_results, result.value)],
-        [clean_result(c, c_matched_value) for (c, c_matched_value) in zip(col_result.recognizer_results, col_result.value)],
-      )
+def make_process_partition(recognizer_dict_list):
+    """
+    Build a mapPartitions callable that constructs Presidio once per Spark partition.
+
+    BatchAnalyzerEngine / spaCy are not reliably serializable across executors;
+    initializing on the worker matches common Spark patterns for Python NLP stacks.
+    """
+
+    def process_partition(iter_of_rows: Iterable) -> Iterator:
+        rows_list = list(iter_of_rows)
+        if not rows_list:
+            return
+
+        registry = load_recognizers_from_dict(recognizer_dict_list)
+        batch_analyzer = build_batch_analyzer(registry)
+
+        df_dict, df_dict_columns = _rows_to_analyzer_inputs(rows_list)
+
+        results = list(
+            batch_analyzer.analyze_dict(
+                input_dict=df_dict,
+                entities=ENTITIES_LIST,
+                score_threshold=SCORE_THRESHOLD,
+                language="en",
+            )
+        )
+
+        col_results = list(
+            batch_analyzer.analyze_dict(
+                input_dict=df_dict_columns,
+                entities=COLUMN_NAME_ENTITIES,
+                score_threshold=SCORE_THRESHOLD,
+                language="en",
+            )
+        )
+        for col_result, result, row in zip(col_results, results, rows_list):
+            yield (
+                *row,
+                [
+                    clean_result(r, matched_value)
+                    for (r, matched_value) in zip(
+                        result.recognizer_results, result.value
+                    )
+                ],
+                [
+                    clean_result(c, c_matched_value)
+                    for (c, c_matched_value) in zip(
+                        col_result.recognizer_results, col_result.value
+                    )
+                ],
+            )
+
+    return process_partition
+
 
 def load_table(
     dataframe: DataFrame,
@@ -167,7 +219,7 @@ def load_table(
     datalake_bucket: str,
     schema: str,
     table_name: str,
-    partition_cols: list
+    partition_cols: list,
 ) -> None:
     logger.info("m=load_table,msg='loading table'")
 
@@ -180,28 +232,47 @@ def load_table(
         table_name=f"{database_name}.{table_name}",
         path=f"{database_location}/{table_name}",
         source_df=dataframe,
-        partition_by=partition_cols
+        partition_by=partition_cols,
     )
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
-    parser.add_argument("schema", help="name of the schema of the table to be saved in the data lake")
-    parser.add_argument("table_name", help="name of the table to be saved in the data lake")
-    parser.add_argument("load_start_date", help="timestamp of the ingest to get the sample from")
+    parser.add_argument(
+        "schema", help="name of the schema of the table to be saved in the data lake"
+    )
+    parser.add_argument(
+        "table_name", help="name of the table to be saved in the data lake"
+    )
+    parser.add_argument(
+        "load_start_date", help="timestamp of the ingest to get the sample from"
+    )
     parser.add_argument("partitions", type=str)
     parser.add_argument("source", type=str)
+    parser.add_argument(
+        "--max_workers",
+        type=int,
+        default=8,
+        help=(
+            "Target number of Spark partitions before Presidio mapPartitions "
+            "(higher spreads work across more executors). Use 0 to keep the "
+            "DataFrame's natural partitioning."
+        ),
+    )
     args = parser.parse_args()
 
-    logger.info(f"m=main,msg='starting job',environment={args.environment},"
-                f"datalake_bucket={args.datalake_bucket},schema={args.schema},"
-                f"table_name={args.table_name}"
+    logger.info(
+        f"m=main,msg='starting job',environment={args.environment},"
+        f"datalake_bucket={args.datalake_bucket},schema={args.schema},"
+        f"table_name={args.table_name}"
     )
 
     return args
 
-def get_sample(date_filter) -> DataFrame:
+
+def get_sample(spark: SparkSession, date_filter: str) -> DataFrame:
     """
     Get a sample of the data from the specified layer from the sampling table
     generated by the sampling DAG.
@@ -239,6 +310,7 @@ def get_sample(date_filter) -> DataFrame:
       """
     return spark.sql(query)
 
+
 def main():
     """
     Main function to load PII scan results into the datalake.
@@ -248,52 +320,54 @@ def main():
     logger.info("m=main,msg='Starting PII scan load into the datalake'")
     args = parse_args()
     partition_cols = ast.literal_eval(args.partitions)
+    max_workers = args.max_workers
     config_service = ConfigurationService(args.source)
     recognizer_dict_list = config_service.get_config("recognizers")
 
-    spacy.cli.download("en_core_web_lg")
-    spacy.load('en_core_web_lg')
+    spark = SparkSession.getActiveSession() or SparkSession.builder.getOrCreate()
 
-    registry = load_recognizers_from_dict(recognizer_dict_list)
-    batch_analyzer = build_batch_analyzer(registry)
-
-    schema = StructType([
-        StructField("layer", StringType(), True),
-        StructField("id_entity", StringType(), True),
-        StructField("database_name", StringType(), True),
-        StructField("table_name", StringType(), True),
-        StructField("column_name", StringType(), True),
-        StructField("sample", ArrayType(StringType()), True),
-        StructField("len_sample", IntegerType(), True),
-        StructField("list_column_name", ArrayType(StringType()), True),
-        StructField("year", IntegerType(), True),
-        StructField("month", IntegerType(), True),
-        StructField("day", IntegerType(), True),
-        StructField("sample_results", ArrayType(
-            ArrayType(
-                MapType(StringType(), StringType(), True),
-                True
+    output_schema = StructType(
+        [
+            StructField("layer", StringType(), True),
+            StructField("id_entity", StringType(), True),
+            StructField("database_name", StringType(), True),
+            StructField("table_name", StringType(), True),
+            StructField("column_name", StringType(), True),
+            StructField("sample", ArrayType(StringType()), True),
+            StructField("len_sample", IntegerType(), True),
+            StructField("list_column_name", ArrayType(StringType()), True),
+            StructField("year", IntegerType(), True),
+            StructField("month", IntegerType(), True),
+            StructField("day", IntegerType(), True),
+            StructField(
+                "sample_results",
+                ArrayType(
+                    ArrayType(MapType(StringType(), StringType(), True), True), True
+                ),
+                True,
             ),
-            True
-        ), True),
-        StructField("col_results", ArrayType(
-            ArrayType(
-                MapType(StringType(), StringType(), True),
-                True
+            StructField(
+                "col_results",
+                ArrayType(
+                    ArrayType(MapType(StringType(), StringType(), True), True), True
+                ),
+                True,
             ),
-            True
-        ), True),
-    ])
+        ]
+    )
 
-    df = get_sample(date_filter=args.load_start_date)
+    df = get_sample(spark, date_filter=args.load_start_date)
+    if max_workers > 0:
+        df = df.repartition(max_workers)
+        logger.info(
+            f"m=main,msg='repartitioned for Presidio',target_partitions={max_workers}"
+        )
 
-
-    rdd = df.rdd.mapPartitions(partial(process_partition, batch_analyzer=batch_analyzer))
-    df_rebuilt = spark.createDataFrame(data=rdd, schema=schema).cache()
+    rdd = df.rdd.mapPartitions(make_process_partition(recognizer_dict_list))
+    df_rebuilt = spark.createDataFrame(data=rdd, schema=output_schema).cache()
 
     df_explode_sample = (
-        df_rebuilt
-        .select(
+        df_rebuilt.select(
             "layer",
             "id_entity",
             "database_name",
@@ -302,11 +376,18 @@ def main():
             "sample_results",
             "year",
             "month",
-            "day"
+            "day",
         )
-        .withColumn("sample_results_exploded", explode(col("sample_results").alias("sample_results_exploded")))
-        .withColumn("sample_results_exploded_inner",
-                    explode(col("sample_results_exploded").alias("sample_results_exploded_inner")))
+        .withColumn(
+            "sample_results_exploded",
+            explode(col("sample_results").alias("sample_results_exploded")),
+        )
+        .withColumn(
+            "sample_results_exploded_inner",
+            explode(
+                col("sample_results_exploded").alias("sample_results_exploded_inner")
+            ),
+        )
         .withColumn("sample_results_json", to_json(col("sample_results")))
         .select(
             "layer",
@@ -315,31 +396,43 @@ def main():
             "table_name",
             "column_name",
             "sample_results_json",
-            col("sample_results_exploded_inner.matched_value").alias("sample_matched_value"),
+            col("sample_results_exploded_inner.matched_value").alias(
+                "sample_matched_value"
+            ),
             col("sample_results_exploded_inner.type").alias("type"),
             col("sample_results_exploded_inner.score").alias("score"),
             "year",
             "month",
-            "day"
+            "day",
         )
     )
     grouped_sample = df_explode_sample.groupBy(
-        "layer", "id_entity", "database_name", "table_name", "column_name", "sample_results_json",
-        "year", "month", "day", "type"
-    ).agg(
-        count("*").alias("count")
-    )
+        "layer",
+        "id_entity",
+        "database_name",
+        "table_name",
+        "column_name",
+        "sample_results_json",
+        "year",
+        "month",
+        "day",
+        "type",
+    ).agg(count("*").alias("count"))
 
     summary_sample = grouped_sample.groupBy(
-        "layer", "id_entity", "database_name", "table_name", "column_name", "sample_results_json",
-        "year", "month", "day"
-    ).agg(
-        collect_list(struct("type", "count")).alias("sample_summary")
-    )
+        "layer",
+        "id_entity",
+        "database_name",
+        "table_name",
+        "column_name",
+        "sample_results_json",
+        "year",
+        "month",
+        "day",
+    ).agg(collect_list(struct("type", "count")).alias("sample_summary"))
 
     df_explode_col = (
-        df_rebuilt
-        .select(
+        df_rebuilt.select(
             "layer",
             "id_entity",
             "database_name",
@@ -348,11 +441,16 @@ def main():
             "col_results",
             "year",
             "month",
-            "day"
+            "day",
         )
-        .withColumn("col_results_exploded", explode(col("col_results").alias("col_results_exploded")))
-        .withColumn("col_results_exploded_inner",
-                    explode(col("col_results_exploded").alias("col_results_exploded_inner")))
+        .withColumn(
+            "col_results_exploded",
+            explode(col("col_results").alias("col_results_exploded")),
+        )
+        .withColumn(
+            "col_results_exploded_inner",
+            explode(col("col_results_exploded").alias("col_results_exploded_inner")),
+        )
         .withColumn("col_results_json", to_json(col("col_results")))
         .select(
             "layer",
@@ -366,26 +464,46 @@ def main():
             col("col_results_exploded_inner.score").alias("score"),
             "year",
             "month",
-            "day"
+            "day",
         )
     )
     grouped_col = df_explode_col.groupBy(
-        "layer", "id_entity", "database_name", "table_name", "column_name", "col_results_json",
-        "year", "month", "day", "type"
-    ).agg(
-        count("*").alias("count")
-    )
+        "layer",
+        "id_entity",
+        "database_name",
+        "table_name",
+        "column_name",
+        "col_results_json",
+        "year",
+        "month",
+        "day",
+        "type",
+    ).agg(count("*").alias("count"))
 
     summary_col = grouped_col.groupBy(
-        "layer", "id_entity", "database_name", "table_name", "column_name", "col_results_json",
-        "year", "month", "day"
-    ).agg(
-        collect_list(struct("type", "count")).alias("col_summary")
-    )
+        "layer",
+        "id_entity",
+        "database_name",
+        "table_name",
+        "column_name",
+        "col_results_json",
+        "year",
+        "month",
+        "day",
+    ).agg(collect_list(struct("type", "count")).alias("col_summary"))
     final_df = summary_sample.join(
         summary_col,
-        on=["layer", "id_entity", "database_name", "table_name", "column_name", "year", "month", "day"],
-        how="inner"
+        on=[
+            "layer",
+            "id_entity",
+            "database_name",
+            "table_name",
+            "column_name",
+            "year",
+            "month",
+            "day",
+        ],
+        how="inner",
     )
 
     load_table(
@@ -394,7 +512,9 @@ def main():
         args.datalake_bucket,
         args.schema,
         args.table_name,
-        partition_cols
+        partition_cols,
     )
+
+
 if __name__ == "__main__":
     main()
