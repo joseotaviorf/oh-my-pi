@@ -27,6 +27,10 @@ workflow:
       merge_on: [id_request]
       partitions: [year, month, day]
       z_order_by: [ts_request]
+    entryaccess:
+      merge_on: [id_request]
+      partitions: [year, month, day]
+      z_order_by: [ts_request]
 cluster:
   type: custom_cluster
   custom_configurations:

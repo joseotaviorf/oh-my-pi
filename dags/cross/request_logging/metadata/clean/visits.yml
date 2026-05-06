@@ -7,7 +7,7 @@ owner: guilherme.rocha@quintoandar.com.br
 columns:
   id_request:
     lineage:
-      - datalake_request_logging_raw.visits.request_id
+      - datalake_request_logging_raw.visits.request
     description: Unique identifier of the agent or bot request event, sourced from the raw request_id field.
   id_trace:
     lineage:
@@ -32,20 +32,12 @@ columns:
   ts_request:
     lineage:
       - datalake_request_logging_raw.visits.timestamp
-    description: Timestamp when the request was recorded in the source system (raw timestamp column).
+    description: Timestamp when the request was recorded in the source system.
   year:
-    lineage:
-      - datalake_request_logging_raw.visits.timestamp
-    description: Calendar year partition component derived from the request timestamp.
+    description: Calendar year when the request was loaded.
   month:
-    lineage:
-      - datalake_request_logging_raw.visits.timestamp
-    description: Calendar month partition component derived from the request timestamp.
+    description: Calendar month when the request was loaded.
   day:
-    lineage:
-      - datalake_request_logging_raw.visits.timestamp
-    description: Calendar day partition component derived from the request timestamp.
+    description: Calendar day when the request was loaded.
   hour:
-    lineage:
-      - datalake_request_logging_raw.visits.timestamp
-    description: Hour of day (0–23) derived from the request timestamp for partitioning and analysis.
+    description: Hour of day (0–23) when the request was loaded.

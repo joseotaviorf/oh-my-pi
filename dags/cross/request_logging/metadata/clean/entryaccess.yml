@@ -1,0 +1,43 @@
+database_name: datalake_request_logging_clean
+table_name: entryaccess
+description: Clean-layer table for entryaccess domain from request logging.
+  Each row is one request logging enriched from JSON in the raw entryaccess table.
+domain: Cross
+owner: guilherme.rocha@quintoandar.com.br
+columns:
+  id_request:
+    lineage:
+      - datalake_request_logging_raw.entryaccess.request
+    description: Request identifier extracted from the JSON path $.request_id.
+  id_trace:
+    lineage:
+      - datalake_request_logging_raw.entryaccess.trace_id
+    description: Trace identifier for the request, carried from the raw entryaccess trace_id column.
+  id_house:
+    lineage:
+      - datalake_request_logging_raw.entryaccess.application_payload
+    description: House identifier from application_payload JSON path $.domain_info.house_id.
+  status_code:
+    lineage:
+      - datalake_request_logging_raw.entryaccess.rpc_protocol
+    description: HTTP status code of the RPC response, extracted from rpc_protocol JSON path $.http.status_code.
+  tool:
+    lineage:
+      - datalake_request_logging_raw.entryaccess.application_payload
+    description: Tool name from application_payload JSON path $.tool_name.
+  host:
+    lineage:
+      - datalake_request_logging_raw.entryaccess.application_payload
+    description: Chat bot name from application_payload JSON path $.platform_info.chat_bot_name.
+  ts_request:
+    lineage:
+      - datalake_request_logging_raw.entryaccess.timestamp
+    description: Timestamp when the request was recorded in the source system.
+  year:
+    description: Calendar year when the request was loaded.
+  month:
+    description: Calendar month when the request was loaded.
+  day:
+    description: Calendar day when the request was loaded.
+  hour:
+    description: Hour of day (0–23) when the request was loaded.
