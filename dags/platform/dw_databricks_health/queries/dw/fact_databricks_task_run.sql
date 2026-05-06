@@ -456,11 +456,6 @@ SELECT
         lcs.tags['application'],
         bc_dag.billing_job_name,
         lcs.cluster_name
-    )                                                              AS dag_name,
-    COALESCE(
-        lcs.tags['application'],
-        bc_dag.billing_job_name,
-        lcs.cluster_name
     )                                                              AS airflow_dag_id,
     s.task_key                                                     AS airflow_task_id,
     -- Governance / attribution tags from cluster custom_tags when present
@@ -485,25 +480,41 @@ SELECT
     pr.run_result_state,
     s.task_result_state,
 
-    s.setup_duration_seconds,
-    -- Cluster-startup-phase timing from daily_cluster_health (Overwatch source).
-    -- These are cluster-day attributes — every task run on the same (cluster, date)
-    -- carries identical values. SUM aggregations at the task-run grain over-count;
-    -- dedupe to (id_cluster, dt_task_started) before summing.
-    dch.pre_init_script_seconds,
-    dch.init_script_seconds,
-    dch.post_init_script_seconds,
-    dch.cluster_startup_seconds,
+    -- Wall-clock durations: the two headline numbers a developer looks at first.
     BIGINT(unix_timestamp(s.ts_task_ended) - unix_timestamp(s.ts_task_started))
                                                                    AS total_duration_seconds,
     BIGINT(unix_timestamp(s.ts_task_ended) - unix_timestamp(s.ts_task_started))
         - COALESCE(s.setup_duration_seconds, 0)                    AS execution_duration_seconds,
+
+    -- CPU: driver then worker (P50 / P95 busy + wait).
+    dch.p50_driver_cpu_busy_percent,
+    dch.p95_driver_cpu_busy_percent,
+    dch.p50_driver_cpu_wait_percent,
+    dch.p95_driver_cpu_wait_percent,
+    dch.p50_worker_cpu_busy_percent,
+    dch.p95_worker_cpu_busy_percent,
+    dch.p50_worker_cpu_wait_percent,
+    dch.p95_worker_cpu_wait_percent,
+
+    -- Memory: driver then worker (P50 / P95 used).
+    dch.p50_driver_mem_used_percent,
+    dch.p95_driver_mem_used_percent,
+    dch.p50_worker_mem_used_percent,
+    dch.p95_worker_mem_used_percent,
+
+    -- Disk: /local_disk0 utilization (EBS-backed on standard instances; NVMe on d/i3/g5 families).
+    dch.nvme_utilization_pct_p95                                    AS local_disk_utilization_pct_p95,
+
+    -- Cost (DBU — system tables list price).
     CAST(ROUND(COALESCE(b.dbu_consumed, 0), 4) AS DECIMAL(25, 4))   AS dbu_consumed,
     CAST(ROUND(COALESCE(b.cost_usd_estimate, 0), 4) AS DECIMAL(37, 4))
                                                                    AS cost_usd_estimate,
     b.dbu_rate_usd,
     b.pricing_sku,
-    -- Overwatch DBU + EC2 combined (same grain as the separate overwatch columns below).
+    -- Cost (Overwatch EC2 + legacy — cluster-day attributes; dedupe before summing).
+    dch.total_ec2_cost_overwatch_usd,
+    dch.total_dbu_cost_overwatch_usd,
+    -- Overwatch DBU + EC2 combined (legacy bill-allocation cross-check).
     CAST(
         ROUND(
             COALESCE(CAST(dch.total_dbu_cost_overwatch_usd AS DOUBLE), CAST(0 AS DOUBLE))
@@ -511,7 +522,7 @@ SELECT
             4
         ) AS DECIMAL(38, 4)
     )                                                              AS total_cost_overwatch_usd,
-    -- System-tables DBU USD (cost_usd_estimate) + Overwatch EC2 — best blended total.
+    -- System-tables DBU USD (cost_usd_estimate) + Overwatch EC2.
     CAST(
         ROUND(
             COALESCE(CAST(b.cost_usd_estimate AS DOUBLE), CAST(0 AS DOUBLE))
@@ -519,23 +530,24 @@ SELECT
             4
         ) AS DECIMAL(38, 4)
     )                                                              AS cost_blended_usd,
-    -- Overwatch-derived cluster-day cost cross-check (USD). Same cluster-day dedupe
-    -- caveat as the *_script_seconds columns above — these are cluster-day, not task-run.
-    dch.total_dbu_cost_overwatch_usd,
-    dch.total_ec2_cost_overwatch_usd,
-    dch.p50_driver_cpu_busy_percent,
-    dch.p95_driver_cpu_busy_percent,
-    dch.p50_driver_cpu_wait_percent,
-    dch.p95_driver_cpu_wait_percent,
-    dch.p50_driver_mem_used_percent,
-    dch.p95_driver_mem_used_percent,
-    dch.p50_worker_cpu_busy_percent,
-    dch.p95_worker_cpu_busy_percent,
-    dch.p50_worker_cpu_wait_percent,
-    dch.p95_worker_cpu_wait_percent,
-    dch.p50_worker_mem_used_percent,
-    dch.p95_worker_mem_used_percent,
-    dch.nvme_utilization_pct_p95,
+
+    -- Cluster flags.
+    dch.is_photon,
+    (
+        COALESCE(lcs.worker_node_type, '') RLIKE 'd[.-]'
+        OR COALESCE(lcs.driver_node_type, '') RLIKE 'd[.-]'
+        OR COALESCE(lcs.worker_node_type, '') RLIKE '^(i[3-9]|g[4-5]|p[3-5]d|d[2-3])'
+        OR COALESCE(lcs.driver_node_type, '') RLIKE '^(i[3-9]|g[4-5]|p[3-5]d|d[2-3])'
+    )                                                              AS has_local_nvme,
+    dch.is_pool_backed,
+
+    -- State / quality flags.
+    s.task_result_state = 'SUCCEEDED'                              AS is_success,
+    s.task_result_state = 'FAILED'                                 AS is_failed,
+    s.setup_duration_seconds > 90                                  AS is_pool_acquisition_slow,
+    lcs.tags['sensitive-data'] = 'true'                            AS is_sensitive_data,
+    sptc.workspace_id IS NOT NULL                                  AS has_stage_data,
+    COALESCE(sptc.is_stage_attribution_ambiguous, FALSE)           AS is_stage_attribution_ambiguous,
 
     -- Per-task-run Spark execution metrics (rolled up from spark_stage_metrics).
     -- See `stage_per_task` and `stage_per_task_clean` CTEs above for the
@@ -558,17 +570,15 @@ SELECT
     sptc.max_task_skew_ratio,
     sptc.last_stage_failure_reason,
 
-    s.task_result_state = 'SUCCEEDED'                              AS is_success,
-    s.task_result_state = 'FAILED'                                 AS is_failed,
-    dch.is_photon,
-    dch.is_pool_backed,
-    s.setup_duration_seconds > 90                                  AS is_pool_acquisition_slow,
-    lcs.tags['sensitive-data'] = 'true'                            AS is_sensitive_data,
-    sptc.workspace_id IS NOT NULL                                  AS has_stage_data,
-    COALESCE(sptc.is_stage_attribution_ambiguous, FALSE)           AS is_stage_attribution_ambiguous,
+    -- Detailed cluster-startup timing (cluster-day attributes — dedupe before summing).
+    -- These are less frequently consulted; placed here so the headline metrics above are visible first.
+    s.setup_duration_seconds,
+    dch.pre_init_script_seconds,
+    dch.init_script_seconds,
+    dch.post_init_script_seconds,
+    dch.cluster_startup_seconds,
 
     s.dt_task_started,
-
     s.ts_task_started,
     s.ts_task_ended,
     pr.ts_run_started,

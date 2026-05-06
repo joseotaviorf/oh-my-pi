@@ -19,15 +19,10 @@ columns:
   airflow_dag_id:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.airflow_dag_id
-    description: Airflow / workload identifier (same COALESCE chain as `dag_name` on the fact).
+    description: Airflow / workload identifier (COALESCE chain on the fact).
     dimension: True
   dt_window_end:
     description: Last calendar day included in the current 7-day window (inclusive end).
-    dimension: True
-  dag_name:
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.dag_name
-    description: Human-readable workload name from the fact (FIRST across the 14-day slice).
     dimension: True
   team_owner:
     lineage:
@@ -54,6 +49,111 @@ columns:
       - dw_databricks_health.fact_databricks_task_run.provisioner
     description: Cluster `provisioner` tag when present.
     dimension: True
+
+  total_dag_runs_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.ts_run_started
+    description: Distinct minute buckets of parent run start (`date_trunc('MINUTE', ts_run_started)`) in the current window.
+    metric:
+      name: Total DAG Runs Current 7d
+      description: Approximate DAG executions in the trailing 7-day window (parallel multi-job runs sharing the same minute collapse).
+      acronym: total_dag_runs_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_dag_runs_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.ts_run_started
+    description: Distinct minute buckets of parent run start in the previous window.
+    metric:
+      name: Total DAG Runs Previous 7d
+      description: Approximate DAG executions in the prior 7-day window.
+      acronym: total_dag_runs_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_dag_runs_change_pct:
+    description: Week-over-week percent change in distinct DAG-run minute buckets.
+    metric:
+      name: Total DAG Runs WoW Change Pct
+      description: Relative change in approximate DAG execution count vs the prior week.
+      acronym: total_dag_runs_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  total_job_runs_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
+    description: Count of distinct Databricks job runs (`id_databricks_run`) in the current window.
+    metric:
+      name: Total Job Runs Current 7d
+      description: Distinct Databricks parent runs in the trailing 7-day window.
+      acronym: total_job_runs_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_job_runs_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
+    description: Count of distinct Databricks job runs in the previous window.
+    metric:
+      name: Total Job Runs Previous 7d
+      description: Distinct Databricks parent runs in the prior 7-day window.
+      acronym: total_job_runs_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_job_runs_change_pct:
+    description: Week-over-week percent change in distinct job run count.
+    metric:
+      name: Total Job Runs WoW Change Pct
+      description: Relative change in Databricks job run volume vs the prior week.
+      acronym: total_job_runs_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  total_task_runs_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.id_databricks_task_run
+    description: Count of distinct task runs in the current window.
+    metric:
+      name: Total Task Runs Current 7d
+      description: Distinct `id_databricks_task_run` rows in the trailing 7-day window.
+      acronym: total_task_runs_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_task_runs_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.id_databricks_task_run
+    description: Count of distinct task runs in the previous window.
+    metric:
+      name: Total Task Runs Previous 7d
+      description: Distinct task runs in the prior 7-day window.
+      acronym: total_task_runs_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_task_runs_change_pct:
+    description: Week-over-week percent change in task run count.
+    metric:
+      name: Total Task Runs WoW Change Pct
+      description: Relative change in task-level volume vs the prior week.
+      acronym: total_task_runs_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
 
   total_dbu_consumed_current_7d:
     lineage:
@@ -90,36 +190,71 @@ columns:
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
 
-  total_cost_usd_current_7d:
+  total_dbu_cost_usd_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
     description: Sum of `cost_usd_estimate` (system billing list USD) in the current window.
     metric:
-      name: Total Cost USD Current 7d
+      name: Total DBU Cost USD Current 7d
       description: System-tables list USD cost in the trailing 7-day window.
-      acronym: total_cost_usd_curr_7d
+      acronym: total_dbu_cost_usd_curr_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  total_cost_usd_previous_7d:
+  total_dbu_cost_usd_previous_7d:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
     description: Sum of `cost_usd_estimate` in the previous window.
     metric:
-      name: Total Cost USD Previous 7d
+      name: Total DBU Cost USD Previous 7d
       description: System-tables list USD cost in the prior 7-day window.
-      acronym: total_cost_usd_prev_7d
+      acronym: total_dbu_cost_usd_prev_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  total_cost_usd_change_pct:
+  total_dbu_cost_usd_change_pct:
     description: Percent change in total system-tables USD cost vs prior week.
     metric:
-      name: Total Cost USD WoW Change Pct
+      name: Total DBU Cost USD WoW Change Pct
       description: Week-over-week percent change in total system-tables USD cost.
-      acronym: total_cost_usd_wow_chg_pct
+      acronym: total_dbu_cost_usd_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  total_ec2_cost_overwatch_usd_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
+    description: Sum of Overwatch EC2 USD deduped one row per (cluster, day) via is_first_task_of_cluster_day.
+    metric:
+      name: Total EC2 Cost Overwatch USD Current 7d
+      description: EC2 portion from Overwatch for the trailing 7-day window (no task-level double count).
+      acronym: total_ec2_overwatch_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_ec2_cost_overwatch_usd_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
+    description: Sum of deduped Overwatch EC2 USD in the previous window.
+    metric:
+      name: Total EC2 Cost Overwatch USD Previous 7d
+      description: EC2 portion from Overwatch for the prior 7-day window.
+      acronym: total_ec2_overwatch_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_ec2_cost_overwatch_usd_change_pct:
+    description: Week-over-week percent change in deduped Overwatch EC2 USD.
+    metric:
+      name: Total EC2 Cost Overwatch USD WoW Change Pct
+      description: Relative change in Overwatch EC2 USD vs the prior week.
+      acronym: total_ec2_overwatch_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
@@ -127,11 +262,12 @@ columns:
 
   total_cost_blended_usd_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_blended_usd
-    description: Sum of `cost_blended_usd` (billing DBU USD + Overwatch EC2) in the current window.
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
+    description: SUM(system billing DBU USD) + SUM(deduped Overwatch EC2 USD per cluster-day); aligned with dag_health aggregate (not a raw SUM of fact.cost_blended_usd rows).
     metric:
       name: Total Blended Cost USD Current 7d
-      description: Blended USD (billing.usage DBU + Overwatch EC2) in the trailing 7-day window.
+      description: Blended USD (billing list DBU + deduped Overwatch EC2) in the trailing 7-day window.
       acronym: total_blended_curr_7d
       is_additive: False
       business_stage: Platform Operations
@@ -139,8 +275,9 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_cost_blended_usd_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_blended_usd
-    description: Sum of `cost_blended_usd` in the previous window.
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
+    description: Same blended definition as current window, for the prior 7-day slice.
     metric:
       name: Total Blended Cost USD Previous 7d
       description: Blended USD in the prior 7-day window.
@@ -153,43 +290,185 @@ columns:
     description: Percent change in blended USD vs prior week.
     metric:
       name: Total Blended Cost USD WoW Change Pct
-      description: Week-over-week percent change in blended USD.
+      description: Week-over-week percent change in blended USD (DBU list + deduped EC2).
       acronym: total_blended_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
 
-  avg_cost_usd_per_run_current_7d:
+  avg_dbu_cost_usd_per_dag_run_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-    description: Mean `cost_usd_estimate` per distinct parent run in the current window.
+      - dw_databricks_health.fact_databricks_task_run.ts_run_started
+    description: Mean `cost_usd_estimate` per distinct DAG-run minute bucket in the current window.
     metric:
-      name: Avg Cost USD per Run Current 7d
-      description: Mean system-tables USD per parent run in the trailing 7-day window.
-      acronym: avg_cost_per_run_curr_7d
+      name: Avg DBU Cost USD per DAG Run Current 7d
+      description: Mean system-tables list USD per approximate DAG execution (total_dbu_cost_usd / total_dag_runs).
+      acronym: avg_dbu_cost_per_dag_run_curr_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_cost_usd_per_run_previous_7d:
+  avg_dbu_cost_usd_per_dag_run_previous_7d:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-    description: Mean `cost_usd_estimate` per distinct parent run in the previous window.
+      - dw_databricks_health.fact_databricks_task_run.ts_run_started
+    description: Mean `cost_usd_estimate` per distinct DAG-run minute bucket in the previous window.
     metric:
-      name: Avg Cost USD per Run Previous 7d
-      description: Mean system-tables USD per parent run in the prior 7-day window.
-      acronym: avg_cost_per_run_prev_7d
+      name: Avg DBU Cost USD per DAG Run Previous 7d
+      description: Mean system-tables USD per approximate DAG execution in the prior 7-day window.
+      acronym: avg_dbu_cost_per_dag_run_prev_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_cost_usd_per_run_change_pct:
-    description: Percent change in average cost per run vs prior week.
+  avg_dbu_cost_usd_per_dag_run_change_pct:
+    description: Percent change in average DBU list USD per DAG run vs prior week.
     metric:
-      name: Avg Cost USD per Run WoW Change Pct
-      description: Week-over-week percent change in average USD per parent run.
-      acronym: avg_cost_per_run_wow_chg_pct
+      name: Avg DBU Cost USD per DAG Run WoW Change Pct
+      description: Week-over-week percent change in mean list USD per DAG-run minute bucket.
+      acronym: avg_dbu_cost_per_dag_run_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  avg_cost_blended_usd_per_dag_run_current_7d:
+    description: total_cost_blended_usd_current_7d / total_dag_runs_current_7d.
+    metric:
+      name: Avg Blended USD per DAG Run Current 7d
+      description: Mean blended USD per approximate DAG execution in the trailing 7-day window.
+      acronym: avg_blended_per_dag_run_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_cost_blended_usd_per_dag_run_previous_7d:
+    description: total_cost_blended_usd_previous_7d / total_dag_runs_previous_7d.
+    metric:
+      name: Avg Blended USD per DAG Run Previous 7d
+      description: Mean blended USD per approximate DAG execution in the prior 7-day window.
+      acronym: avg_blended_per_dag_run_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_cost_blended_usd_per_dag_run_change_pct:
+    description: Week-over-week percent change in average blended USD per DAG run.
+    metric:
+      name: Avg Blended USD per DAG Run WoW Change Pct
+      description: Relative change in mean blended cost per DAG-run minute bucket.
+      acronym: avg_blended_per_dag_run_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  cost_efficiency_usd_per_executor_second_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+      - dw_databricks_health.fact_databricks_task_run.total_executor_run_time_ms
+    description: |
+      Sum(`cost_usd_estimate`) / (sum(`total_executor_run_time_ms`) / 1000) for the current window.
+      Same definition as `dag_health.cost_efficiency_usd_per_executor_second_*`.
+    metric:
+      name: Cost Efficiency USD per Executor Second Current 7d
+      description: USD per executor-second in the trailing 7-day window (same as dag_health).
+      acronym: cost_eff_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  cost_efficiency_usd_per_executor_second_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+      - dw_databricks_health.fact_databricks_task_run.total_executor_run_time_ms
+    description: Cost efficiency USD per executor-second for the previous window.
+    metric:
+      name: Cost Efficiency USD per Executor Second Previous 7d
+      description: USD per executor-second in the prior 7-day window.
+      acronym: cost_eff_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  cost_efficiency_usd_per_executor_second_change_pct:
+    description: Relative percent change in cost efficiency vs prior week.
+    metric:
+      name: Cost Efficiency WoW Change Pct
+      description: Week-over-week percent change in USD per executor-second.
+      acronym: cost_eff_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  total_dbu_cost_overwatch_usd_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_dbu_cost_overwatch_usd
+    description: Legacy Overwatch DBU-only USD; summed once per cluster-day (deduped).
+    metric:
+      name: Total DBU Cost Overwatch USD Current 7d
+      description: Overwatch-reported DBU USD in the trailing 7-day window (legacy allocation).
+      acronym: total_dbu_overwatch_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_dbu_cost_overwatch_usd_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_dbu_cost_overwatch_usd
+    description: Legacy Overwatch DBU-only USD; summed once per cluster-day (deduped).
+    metric:
+      name: Total DBU Cost Overwatch USD Previous 7d
+      description: Overwatch-reported DBU USD in the prior 7-day window.
+      acronym: total_dbu_overwatch_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_dbu_cost_overwatch_usd_change_pct:
+    description: Week-over-week percent change in legacy Overwatch DBU USD (deduped).
+    metric:
+      name: Total DBU Cost Overwatch USD WoW Change Pct
+      description: Relative change in Overwatch DBU-only USD vs the prior week.
+      acronym: total_dbu_overwatch_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  total_cost_overwatch_usd_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_cost_overwatch_usd
+    description: Sum of legacy Overwatch total_cost_overwatch_usd (DBU + EC2 from Overwatch) deduped once per cluster-day.
+    metric:
+      name: Total Overwatch Cost USD Current 7d
+      description: Full legacy Overwatch cost in the trailing 7-day window.
+      acronym: total_overwatch_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_overwatch_usd_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_cost_overwatch_usd
+    description: Sum of legacy Overwatch total_cost_overwatch_usd deduped once per cluster-day.
+    metric:
+      name: Total Overwatch Cost USD Previous 7d
+      description: Full legacy Overwatch cost in the prior 7-day window.
+      acronym: total_overwatch_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_overwatch_usd_change_pct:
+    description: Week-over-week percent change in legacy full Overwatch USD (deduped).
+    metric:
+      name: Total Overwatch Cost USD WoW Change Pct
+      description: Relative change in full Overwatch USD vs the prior week.
+      acronym: total_overwatch_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
@@ -370,41 +649,6 @@ columns:
       hierarchy: Latency
       approved_by: jose.rferreira@quintoandar.com.br
 
-  total_runs_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
-    description: Count of distinct parent Databricks runs in the current window.
-    metric:
-      name: Total Runs Current 7d
-      description: Distinct parent runs in the trailing 7-day window.
-      acronym: total_runs_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_runs_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
-    description: Count of distinct parent runs in the previous window.
-    metric:
-      name: Total Runs Previous 7d
-      description: Distinct parent runs in the prior 7-day window.
-      acronym: total_runs_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_runs_change_pct:
-    description: Percent change in run volume vs prior week (context for cost deltas).
-    metric:
-      name: Total Runs WoW Change Pct
-      description: Week-over-week percent change in distinct parent run count.
-      acronym: total_runs_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-
   error_rate_pct_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.is_failed
@@ -438,45 +682,6 @@ columns:
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Reliability
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  cost_efficiency_usd_per_executor_second_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-      - dw_databricks_health.fact_databricks_task_run.total_executor_run_time_ms
-    description: |
-      Sum(`cost_usd_estimate`) / (sum(`total_executor_run_time_ms`) / 1000) for the current window.
-      Same definition as `dag_health.cost_efficiency_usd_per_executor_second_*`.
-    metric:
-      name: Cost Efficiency USD per Executor Second Current 7d
-      description: USD per executor-second in the trailing 7-day window (same as dag_health).
-      acronym: cost_eff_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  cost_efficiency_usd_per_executor_second_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-      - dw_databricks_health.fact_databricks_task_run.total_executor_run_time_ms
-    description: Cost efficiency USD per executor-second for the previous window.
-    metric:
-      name: Cost Efficiency USD per Executor Second Previous 7d
-      description: USD per executor-second in the prior 7-day window.
-      acronym: cost_eff_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  cost_efficiency_usd_per_executor_second_change_pct:
-    description: Relative percent change in cost efficiency vs prior week.
-    metric:
-      name: Cost Efficiency WoW Change Pct
-      description: Week-over-week percent change in USD per executor-second.
-      acronym: cost_eff_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
 
   ts_load:

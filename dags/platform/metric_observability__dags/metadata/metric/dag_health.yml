@@ -25,7 +25,7 @@ description: |
     - Cost (DBU + USD), per run + total, both windows
     - Latency (avg/p50/p95/p99 total duration, setup duration), both windows
     - Reliability (error rate, cold start rate), both windows
-    - Cluster utilization (driver/worker CPU + memory + NVMe), both windows
+    - Cluster utilization (driver/worker CPU + memory + local disk utilization), both windows
     - Spark stage signals (disk spill, peak execution / JVM heap memory,
       GC time, task skew, shuffle), both windows
     - Raw ratios (worker/driver CPU utilisation, driver-minus-worker pp,
@@ -57,11 +57,6 @@ columns:
     dimension: True
   dt_window_end:
     description: Last day of the rolling windows (inclusive). The 7d window covers (dt_window_end - 6 days)..dt_window_end; the 28d window covers (dt_window_end - 27 days)..dt_window_end. Equal to the data_interval_start of the run that produced this row.
-    dimension: True
-  dag_name:
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.dag_name
-    description: Full bietlejuice DAG name as registered in Airflow (e.g. bietlejuice.enrich_ebdb_booking).
     dimension: True
   team_owner:
     lineage:
@@ -112,26 +107,50 @@ columns:
       NULL for clusters without the tag (typically ad-hoc notebook jobs).
     dimension: True
 
-  total_runs_7d:
+  total_dag_runs_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
-    description: Distinct count of Databricks job runs that started inside the 7-day window for this DAG.
+      - dw_databricks_health.fact_databricks_task_run.ts_run_started
+    description: Approximate Airflow DAG executions in the 7-day window (distinct minute of ts_run_started).
     metric:
-      name: Total Runs (7d)
-      description: How many times this DAG was executed (counting parent run, not individual task runs) in the trailing 7-day window.
-      acronym: total_runs_7d
+      name: Total DAG Runs (7d)
+      description: Distinct parent-run start minutes in the trailing 7-day window (parallel multi-job executions collapse when sharing the same minute).
+      acronym: total_dag_runs_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Observability
       approved_by: jose.rferreira@quintoandar.com.br
-  total_runs_28d:
+  total_dag_runs_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.ts_run_started
+    description: Approximate Airflow DAG executions in the 28-day window (distinct minute of ts_run_started).
+    metric:
+      name: Total DAG Runs (28d)
+      description: Distinct parent-run start minutes in the trailing 28-day window.
+      acronym: total_dag_runs_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_job_runs_7d:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.id_databricks_run
-    description: Distinct count of Databricks job runs that started inside the 28-day window for this DAG.
+    description: Distinct Databricks job runs (id_databricks_run) in the 7-day window.
     metric:
-      name: Total Runs (28d)
-      description: How many times this DAG was executed (counting parent run, not individual task runs) in the trailing 28-day window.
-      acronym: total_runs_28d
+      name: Total Job Runs (7d)
+      description: How many Databricks job runs started in the trailing 7-day window (may exceed DAG executions when multiple jobs run in parallel).
+      acronym: total_job_runs_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_job_runs_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
+    description: Distinct Databricks job runs in the 28-day window.
+    metric:
+      name: Total Job Runs (28d)
+      description: How many Databricks job runs started in the trailing 28-day window.
+      acronym: total_job_runs_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Observability
@@ -185,46 +204,95 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  total_cost_usd_7d:
+  total_dbu_cost_usd_7d:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-    description: Sum of cost_usd_estimate across the 7-day window. List price; no Graviton / pool / enterprise discount applied.
+    description: Sum of system-billing list DBU USD (cost_usd_estimate) in the 7-day window.
     metric:
-      name: Total Cost USD (7d)
-      description: Total estimated USD cost (Databricks list price * DBUs) for this DAG over the trailing 7-day window. Headline cost KPI for short-window action.
-      acronym: cost_usd_7d
+      name: Total DBU Cost USD (7d)
+      description: Total estimated USD from Databricks list DBU price for this DAG over the trailing 7-day window.
+      acronym: total_dbu_cost_usd_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  total_cost_usd_28d:
+  total_dbu_cost_usd_28d:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-    description: Sum of cost_usd_estimate across the 28-day window. List price; no Graviton / pool / enterprise discount applied.
+    description: Sum of system-billing list DBU USD in the 28-day window.
     metric:
-      name: Total Cost USD (28d)
-      description: Total estimated USD cost (Databricks list price * DBUs) for this DAG over the trailing 28-day window. Headline cost KPI for steady-state monitoring.
-      acronym: cost_usd_28d
+      name: Total DBU Cost USD (28d)
+      description: Total estimated USD from Databricks list DBU price for this DAG over the trailing 28-day window.
+      acronym: total_dbu_cost_usd_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_cost_usd_per_run_7d:
-    description: Average USD cost per run (total_cost_usd_7d / total_runs_7d). Useful for comparing DAGs of different cadences.
+  avg_dbu_cost_usd_per_dag_run_7d:
+    description: Average system DBU USD per approximate DAG execution (total_dbu_cost_usd_7d / total_dag_runs_7d).
     metric:
-      name: Avg Cost USD per Run (7d)
-      description: Mean USD cost per DAG run across the trailing 7-day window. Smooths out cadence differences when ranking DAGs.
-      acronym: avg_cost_per_run_7d
+      name: Avg DBU Cost USD per DAG Run (7d)
+      description: Mean list DBU USD per distinct DAG-run minute bucket over the trailing 7-day window.
+      acronym: avg_dbu_cost_per_dag_run_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_cost_usd_per_run_28d:
-    description: Average USD cost per run (total_cost_usd_28d / total_runs_28d). Useful for comparing DAGs of different cadences.
+  avg_dbu_cost_usd_per_dag_run_28d:
+    description: Average system DBU USD per approximate DAG execution (total_dbu_cost_usd_28d / total_dag_runs_28d).
     metric:
-      name: Avg Cost USD per Run (28d)
-      description: Mean USD cost per DAG run across the trailing 28-day window. Smooths out cadence differences when ranking DAGs.
-      acronym: avg_cost_per_run_28d
+      name: Avg DBU Cost USD per DAG Run (28d)
+      description: Mean list DBU USD per distinct DAG-run minute bucket over the trailing 28-day window.
+      acronym: avg_dbu_cost_per_dag_run_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  total_ec2_cost_overwatch_usd_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
+    description: Sum of Overwatch EC2 USD deduped one row per (cluster, day) via is_first_task_of_cluster_day.
+    metric:
+      name: Total EC2 Cost Overwatch USD (7d)
+      description: EC2 portion from Overwatch daily_cluster_health for the trailing 7-day window.
+      acronym: total_ec2_overwatch_usd_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_ec2_cost_overwatch_usd_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
+    description: Sum of Overwatch EC2 USD deduped per cluster-day.
+    metric:
+      name: Total EC2 Cost Overwatch USD (28d)
+      description: EC2 portion from Overwatch for the trailing 28-day window.
+      acronym: total_ec2_overwatch_usd_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_dbu_cost_overwatch_usd_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_dbu_cost_overwatch_usd
+    description: Legacy Overwatch DBU-only USD; summed once per cluster-day (deduped).
+    metric:
+      name: Total DBU Cost Overwatch USD (7d)
+      description: Overwatch-reported DBU USD portion for the trailing 7-day window (legacy allocation).
+      acronym: total_dbu_overwatch_usd_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_dbu_cost_overwatch_usd_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_dbu_cost_overwatch_usd
+    description: Legacy Overwatch DBU-only USD; summed once per cluster-day (deduped).
+    metric:
+      name: Total DBU Cost Overwatch USD (28d)
+      description: Overwatch-reported DBU USD portion for the trailing 28-day window (legacy allocation).
+      acronym: total_dbu_overwatch_usd_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
@@ -232,7 +300,7 @@ columns:
   total_cost_overwatch_usd_7d:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.total_cost_overwatch_usd
-    description: Sum of total_cost_overwatch_usd (Overwatch DBU + EC2) across the 7-day window.
+    description: Sum of legacy Overwatch total_cost_overwatch_usd (DBU + EC2 from Overwatch) deduped once per cluster-day.
     metric:
       name: Total Overwatch Cost USD (7d)
       description: Full Overwatch cost (DBU + EC2) for this DAG over the trailing 7-day window.
@@ -244,7 +312,7 @@ columns:
   total_cost_overwatch_usd_28d:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.total_cost_overwatch_usd
-    description: Sum of total_cost_overwatch_usd (Overwatch DBU + EC2) across the 28-day window.
+    description: Sum of legacy Overwatch total_cost_overwatch_usd deduped once per cluster-day.
     metric:
       name: Total Overwatch Cost USD (28d)
       description: Full Overwatch cost (DBU + EC2) for this DAG over the trailing 28-day window.
@@ -255,8 +323,9 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_cost_blended_usd_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_blended_usd
-    description: Sum of cost_blended_usd (system billing DBU USD + Overwatch EC2) across the 7-day window.
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
+    description: SUM(system billing DBU USD) + SUM(deduped Overwatch EC2 USD per cluster-day); not a raw SUM of fact.cost_blended_usd rows.
     metric:
       name: Total Blended Cost USD (7d)
       description: Blended estimated USD (billing.usage list DBU + Overwatch EC2) over the trailing 7-day window.
@@ -267,8 +336,9 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_cost_blended_usd_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_blended_usd
-    description: Sum of cost_blended_usd across the 28-day window.
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
+    description: SUM(system billing DBU USD) + SUM(deduped Overwatch EC2 USD per cluster-day).
     metric:
       name: Total Blended Cost USD (28d)
       description: Blended estimated USD (billing.usage list DBU + Overwatch EC2) over the trailing 28-day window.
@@ -277,22 +347,22 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_cost_blended_usd_per_run_7d:
-    description: Average blended USD per run (total_cost_blended_usd_7d / total_runs_7d).
+  avg_cost_blended_usd_per_dag_run_7d:
+    description: total_cost_blended_usd_7d / total_dag_runs_7d.
     metric:
-      name: Avg Blended USD per Run (7d)
-      description: Mean blended USD cost per DAG run over the trailing 7-day window.
-      acronym: avg_blended_per_run_7d
+      name: Avg Blended USD per DAG Run (7d)
+      description: Mean blended USD per approximate DAG execution over the trailing 7-day window.
+      acronym: avg_blended_per_dag_run_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_cost_blended_usd_per_run_28d:
-    description: Average blended USD per run (total_cost_blended_usd_28d / total_runs_28d).
+  avg_cost_blended_usd_per_dag_run_28d:
+    description: total_cost_blended_usd_28d / total_dag_runs_28d.
     metric:
-      name: Avg Blended USD per Run (28d)
-      description: Mean blended USD cost per DAG run over the trailing 28-day window.
-      acronym: avg_blended_per_run_28d
+      name: Avg Blended USD per DAG Run (28d)
+      description: Mean blended USD per approximate DAG execution over the trailing 28-day window.
+      acronym: avg_blended_per_dag_run_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
@@ -792,26 +862,26 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cluster Utilization
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_nvme_utilization_pct_p95_7d:
+  avg_local_disk_utilization_pct_p95_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.nvme_utilization_pct_p95
-    description: Mean of per-task nvme_utilization_pct_p95 across the 7-day window. 0..100 scale. NULL when DAG ran on instances without NVMe.
+      - dw_databricks_health.fact_databricks_task_run.local_disk_utilization_pct_p95
+    description: Mean of per-task local_disk_utilization_pct_p95 across the 7-day window (0..100; `/local_disk0` mount).
     metric:
-      name: Avg p95 NVMe Utilization (7d)
-      description: Average tail NVMe utilization over the 7-day window.
-      acronym: avg_p95_nvme_7d
+      name: Avg p95 Local Disk Utilization (7d)
+      description: Average tail local disk utilization over the 7-day window.
+      acronym: avg_p95_local_disk_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cluster Utilization
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_nvme_utilization_pct_p95_28d:
+  avg_local_disk_utilization_pct_p95_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.nvme_utilization_pct_p95
-    description: Mean of per-task nvme_utilization_pct_p95 across the 28-day window. 0..100 scale. NULL when DAG ran on instances without NVMe.
+      - dw_databricks_health.fact_databricks_task_run.local_disk_utilization_pct_p95
+    description: Mean of per-task local_disk_utilization_pct_p95 across the 28-day window.
     metric:
-      name: Avg p95 NVMe Utilization (28d)
-      description: Average tail NVMe utilization. Persistently low values queue the DAG for NVMe-instance removal (cheaper non-NVMe SKU available).
-      acronym: avg_p95_nvme_28d
+      name: Avg p95 Local Disk Utilization (28d)
+      description: Average tail local disk utilization over the 28-day window.
+      acronym: avg_p95_local_disk_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cluster Utilization
@@ -1120,7 +1190,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   cost_efficiency_usd_per_executor_second_7d:
     description: |
-      `total_cost_usd_7d / (sum(total_executor_run_time_ms_7d) / 1000)`. USD spent
+      `total_dbu_cost_usd_7d / (sum(total_executor_run_time_ms_7d) / 1000)`. USD spent
       per second of useful executor compute over the 7-day window. Lower ⇒ better
       bang-for-the-buck. Captures both cluster-shape efficiency AND scheduling
       (cold starts and retries inflate cost without inflating executor time).
@@ -1135,7 +1205,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   cost_efficiency_usd_per_executor_second_28d:
     description: |
-      `total_cost_usd_28d / (sum(total_executor_run_time_ms_28d) / 1000)`. USD
+      `total_dbu_cost_usd_28d / (sum(total_executor_run_time_ms_28d) / 1000)`. USD
       spent per second of useful executor compute over the 28-day window. Lower
       ⇒ better bang-for-the-buck. Captures both cluster-shape efficiency AND
       scheduling overhead. NULL when stage data is unavailable / ambiguous.
@@ -1148,7 +1218,7 @@ columns:
       hierarchy: Right-Sizing Ratios
       approved_by: jose.rferreira@quintoandar.com.br
 
-  pct_runs_with_stage_data_7d:
+  pct_task_runs_with_stage_data_7d:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.has_stage_data
     description: Percentage of task runs in the 7-day window that have Spark event log stage metrics attached. 0..100 scale.
@@ -1160,7 +1230,7 @@ columns:
       business_stage: Platform Operations
       hierarchy: Data Quality
       approved_by: jose.rferreira@quintoandar.com.br
-  pct_runs_with_stage_data_28d:
+  pct_task_runs_with_stage_data_28d:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.has_stage_data
     description: Percentage of task runs in the 28-day window that have Spark event log stage metrics attached. 0..100 scale.

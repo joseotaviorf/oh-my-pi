@@ -104,20 +104,12 @@ columns:
       - system.lakeflow.job_task_run_timeline.workspace_id
       - system.lakeflow.job_task_run_timeline.job_id
       - system.lakeflow.job_task_run_timeline.run_id
-  dag_name:
+  airflow_dag_id:
     description: |
       Workload identifier for grouping and joins. COALESCE of cluster `application`
       tag, `system.billing.usage.usage_metadata.job_name` (dominant DBU row on the
       cluster for the load window), then `cluster_name` when tags are absent.
-    lineage:
-      - system.compute.clusters.tags
-      - system.billing.usage.usage_metadata
-      - system.compute.clusters.cluster_name
-  airflow_dag_id:
-    description: |
-      Same COALESCE chain as `dag_name` — aligns to Airflow / job naming when
-      available; falls back to billing job name or cluster name for non-bietlejuice
-      clusters.
+      Aligns with Airflow DAG naming when available.
     lineage:
       - system.compute.clusters.tags
       - system.billing.usage.usage_metadata
@@ -210,39 +202,6 @@ columns:
     description: Final state of this task-run (`SUCCEEDED`, `FAILED`, `CANCELED`, ...).
     lineage:
       - system.lakeflow.job_task_run_timeline.result_state
-  setup_duration_seconds:
-    description: Cluster cold-start time for this task in seconds — time spent acquiring instances and bootstrapping before the first user code executes. Headline pool-effectiveness metric (O4). On pooled clusters this is typically 30–60s; on non-pooled it is 4–8 minutes.
-    lineage:
-      - system.lakeflow.job_task_run_timeline.setup_duration_seconds
-  pre_init_script_seconds:
-    description: |
-      Seconds spent in cluster STARTING before init scripts begin (DBR pull, network
-      setup, instance provisioning). Cluster-day attribute — every task run on the
-      same (id_cluster, dt_task_started) carries the same value, so SUM aggregations
-      at task-run grain over-count; dedupe to (id_cluster, dt_task_started) first.
-    lineage:
-      - datalake_databricks_health.daily_cluster_health.pre_init_script_seconds
-  init_script_seconds:
-    description: |
-      **Init-script execution duration in seconds.** Headline metric for the
-      "optimise-or-remove init scripts" workstream (DPLT-928). Same cluster-day
-      caveat as `pre_init_script_seconds`: dedupe to (id_cluster, dt_task_started)
-      before SUM. Fleet baseline is mean ~95s, p95 ~210s.
-    lineage:
-      - datalake_databricks_health.daily_cluster_health.init_script_seconds
-  post_init_script_seconds:
-    description: |
-      Seconds between INIT_SCRIPTS_FINISHED and the cluster entering RUNNING
-      (mostly Spark/JVM warm-up). Same cluster-day dedupe caveat applies.
-    lineage:
-      - datalake_databricks_health.daily_cluster_health.post_init_script_seconds
-  cluster_startup_seconds:
-    description: |
-      Total wall-clock startup (`pre + init + post`) for the FIRST start of the
-      cluster on `dt_task_started`. Same cluster-day dedupe caveat applies.
-      Subsequent restarts within the same day are not captured.
-    lineage:
-      - datalake_databricks_health.daily_cluster_health.cluster_startup_seconds
   total_duration_seconds:
     description: Wall-clock duration of the task in seconds (`ts_task_ended - ts_task_started`). Includes setup + execution.
   execution_duration_seconds:
@@ -361,10 +320,21 @@ columns:
     description: 95th percentile worker memory used percent. Below ~50 suggests memory over-provisioning.
     lineage:
       - datalake_databricks_health.daily_cluster_health.p95_worker_mem_used_percent
-  nvme_utilization_pct_p95:
-    description: 95th percentile of per-node NVMe used percent on the cluster-day. Below ~10 on Standard-engine clusters means NVMe can be dropped.
+  local_disk_utilization_pct_p95:
+    description: |
+      Alias of daily_cluster_health `nvme_utilization_pct_p95`: utilization of the
+      `/local_disk0` mount (Databricks ephemeral local disk — NVMe instance store on
+      `d`-family shapes, EBS-backed on others). 0–100 scale.
     lineage:
       - datalake_databricks_health.daily_cluster_health.nvme_utilization_pct_p95
+  has_local_nvme:
+    description: |
+      TRUE when the worker or driver instance type typically includes physical NVMe
+      instance store (`d` before size separator, or storage/GPU families such as i3/g5),
+      derived from `driver_node_type` / `worker_node_type`. Does not read utilization.
+    lineage:
+      - system.compute.clusters.driver_node_type
+      - system.compute.clusters.worker_node_type
   stage_count:
     description: Number of Spark stages observed for this task-run (sum across all attributed Spark applications). Useful as a sanity check and as a denominator for "stages-per-task" rollups.
     lineage:
@@ -501,6 +471,39 @@ columns:
       wanting the over-counted raw values can query `spark_stage_metrics`
       directly. Workloads with a single Spark application per task window do not
       trigger this flag.
+  setup_duration_seconds:
+    description: Cluster cold-start time for this task in seconds — time spent acquiring instances and bootstrapping before the first user code executes. Headline pool-effectiveness metric (O4). On pooled clusters this is typically 30–60s; on non-pooled it is 4–8 minutes.
+    lineage:
+      - system.lakeflow.job_task_run_timeline.setup_duration_seconds
+  pre_init_script_seconds:
+    description: |
+      Seconds spent in cluster STARTING before init scripts begin (DBR pull, network
+      setup, instance provisioning). Cluster-day attribute — every task run on the
+      same (id_cluster, dt_task_started) carries the same value, so SUM aggregations
+      at task-run grain over-count; dedupe to (id_cluster, dt_task_started) first.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.pre_init_script_seconds
+  init_script_seconds:
+    description: |
+      **Init-script execution duration in seconds.** Headline metric for the
+      "optimise-or-remove init scripts" workstream (DPLT-928). Same cluster-day
+      caveat as `pre_init_script_seconds`: dedupe to (id_cluster, dt_task_started)
+      before SUM. Fleet baseline is mean ~95s, p95 ~210s.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.init_script_seconds
+  post_init_script_seconds:
+    description: |
+      Seconds between INIT_SCRIPTS_FINISHED and the cluster entering RUNNING
+      (mostly Spark/JVM warm-up). Same cluster-day dedupe caveat applies.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.post_init_script_seconds
+  cluster_startup_seconds:
+    description: |
+      Total wall-clock startup (`pre + init + post`) for the FIRST start of the
+      cluster on `dt_task_started`. Same cluster-day dedupe caveat applies.
+      Subsequent restarts within the same day are not captured.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.cluster_startup_seconds
   dt_task_started:
     description: Task start date (UTC), derived from the earliest `period_start_time` of the task's lifecycle.
   ts_task_started:
