@@ -27,14 +27,14 @@ columns:
   concierge_flow_type:
     lineage:
     - datalake_search.concierge_messages.concierge_flow_type
-    description: The type of the inbound/outbound message. E.g. 'Medium intent' (outbound), 'High intent' (inbound), 'Placas' (inbound), 'TTC' (inbound), etc. We are assigning 'Unknown' to the visits that are in the table datalake_ebdb_clean.visit_status_log (where channel is 'WHATSAPP_CONCIERGE') but not in the table datalake_search.concierge_messages.
+    description: The type of the inbound/outbound message. E.g. 'Medium intent' (outbound), 'High intent' (inbound), 'Placas' (inbound), 'TTC' (inbound), etc. We are assigning 'Unknown' to the visits that are in the table datalake_visit.visit_status_events (where channel is 'CONVERSATIONAL - WHATSAPP_CONCIERGE') but not in the table datalake_search.concierge_messages.
   visit_request_channel:
     lineage:
     - dw_visit.dim_visit.visit_request_channel
     description: The channel from which the visit was requested, e.g., 'WHATSAPP_CONCIERGE', 'TENANT_NATIVE', 'AGENT_PWA'.
   visit_event_type:
     lineage:
-    - datalake_ebdb_clean.visit_status_log.event_type
+    - datalake_visit.visit_status_events.event_type
     description: The type of the event that created/changed the visit, i.e., 'VISIT_SCHEDULED' or 'VISIT_RESCHEDULED' events.
   is_direct_visit_booked:
     description: Whether the visit was directly booked through concierge.
@@ -68,7 +68,7 @@ columns:
     description: The timestamp of the message sent.
   ts_visit_event_created:
     lineage:
-    - datalake_ebdb_clean.visit_status_log.ts_created
+    - datalake_visit.visit_status_events.ts_created
     description: The timestamp of the creation of the visit events ('VISIT_SCHEDULED' and 'VISIT_RESCHEDULED').
   ts_visit_created:
     lineage:
@@ -76,13 +76,13 @@ columns:
     description: The timestamp of the creation of the visit.
   year:
     lineage:
-    - datalake_ebdb_clean.visit_status_log.ts_created
+    - datalake_visit.visit_status_events.ts_created
     description: The year of the creation of the visit events ('VISIT_SCHEDULED' and 'VISIT_RESCHEDULED').
   month:
     lineage:
-    - datalake_ebdb_clean.visit_status_log.ts_created
+    - datalake_visit.visit_status_events.ts_created
     description: The month of the creation of the visit events ('VISIT_SCHEDULED' and 'VISIT_RESCHEDULED').
   day:
     lineage:
-    - datalake_ebdb_clean.visit_status_log.ts_created
+    - datalake_visit.visit_status_events.ts_created
     description: The day of the creation of the visit events ('VISIT_SCHEDULED' and 'VISIT_RESCHEDULED').

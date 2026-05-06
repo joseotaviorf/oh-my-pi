@@ -1968,9 +1968,9 @@ bietlejuice.enrich_concierge_health_metrics:
   - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-dim-visit:first-run-of-day
   - bietlejuice.dw_visit:load-dw-visit-fact-visits:first-run-of-day
-  - bietlejuice.ebdb_visit_fast_lane:load-clean-visit-status-log:first-run-of-day
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events:first-run-of-day
   - bietlejuice.enrich_search:load-enrich-amplitude-user-device:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visit-status-events:first-run-of-day
   - bietlejuice.jaiminho:load-clean-user-notifications:first-run-of-day
   - bietlejuice.langfuse:load-clean-observations:first-run-of-day
   - bietlejuice.langfuse:load-clean-traces:first-run-of-day

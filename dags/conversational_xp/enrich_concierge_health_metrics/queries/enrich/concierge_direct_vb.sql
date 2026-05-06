@@ -1,5 +1,5 @@
 WITH concierge_direct_vb_code AS (
-    -- This CTE retrieves the visit code from the Langfuse traces (messages exchanged between user and concierge) that evoked schedule_visit_node. This node confirms the schedule/reschedule of a visit.    
+    -- This CTE retrieves the visit code from the Langfuse traces (messages exchanged between user and concierge) that evoked schedule_visit_node. This node confirms the schedule/reschedule of a visit.
     SELECT DISTINCT
         c.id_phone_session,
         c.concierge_flow_type,
@@ -38,7 +38,7 @@ SELECT
     YEAR(vsl.ts_created) AS year,
     MONTH(vsl.ts_created) AS month,
     DAY(vsl.ts_created) AS day
-FROM datalake_ebdb_clean.visit_status_log AS vsl
+FROM datalake_visit.visit_status_events AS vsl
 JOIN dw_visit.dim_visit AS dv
     ON dv.sk_visit = vsl.id_visit
 JOIN dw_visit.fact_visits fv
@@ -47,7 +47,7 @@ LEFT JOIN concierge_direct_vb_code AS vc
     ON vc.visit_code = dv.visit_code
     AND vc.ts_concierge_contact <= vsl.ts_created
     AND vc.ts_message_sent <= vsl.ts_created -- a message in concierge must preceed a visit that was created/changed in whatsapp channel. This avoids joining the visit to later messages in the same session, as visit_code is tied to message session and not to message.
-WHERE vsl.channel = 'WHATSAPP_CONCIERGE'
+WHERE vsl.channel IN ('CONVERSATIONAL - WHATSAPP_CONCIERGE', 'CONVERSATIONAL - NATIVE_CONCIERGE')
     AND vsl.event_type IN ('VISIT_SCHEDULED', 'VISIT_RESCHEDULED')
     AND vsl.ts_created BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 QUALIFY ROW_NUMBER() OVER (PARTITION BY dv.visit_code, vsl.ts_created ORDER BY vsl.ts_created - COALESCE(vc.ts_message_sent, vsl.ts_created) ASC) = 1 -- If in the same message session there are many concierge_flow_types prior to the creation/change of the visit, it ties the visit to the last message.

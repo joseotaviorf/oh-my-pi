@@ -26,6 +26,7 @@ vsl AS (
       WHEN rl.host = 'wall_e' THEN 'NATIVE_WALLE'
       WHEN rl.host = 'concierge' THEN 'WHATSAPP_CONCIERGE'
       WHEN rl.host = 'sonia' THEN 'WHATSAPP_SONIA'
+      WHEN rl.host = 'isaias' THEN 'WHATSAPP_ISAIAS'
       ELSE UPPER(rl.host)
     END AS host_unified,
     CASE

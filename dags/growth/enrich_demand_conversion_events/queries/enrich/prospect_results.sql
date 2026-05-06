@@ -84,7 +84,7 @@ adhoc_rules AS (
     bm.is_1p_demand,
     bm.is_cqa_demand,
     CASE
-      WHEN dpce.product_origin = 'WHATSAPP_CONCIERGE'
+      WHEN dpce.product_origin IN ('CONVERSATIONAL - WHATSAPP_CONCIERGE', 'CONVERSATIONAL - NATIVE_CONCIERGE')
       THEN "Concierge"
       WHEN dpce.booking_creator IS NULL
         AND dpce.id_booking IS NOT NULL
