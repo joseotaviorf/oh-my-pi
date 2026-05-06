@@ -34,6 +34,8 @@ events_config:
     event_path: "raw/salesforce/DynamicFormEvent"
   email_message:
     event_path: "raw/salesforce/EmailMessageEvent"
+  mkt_cloud_trigger:
+    event_path: "raw/salesforce/MktCloudTriggerEvent"
   opportunity:
     event_path: "raw/salesforce/OpportunityEvent"
   user:
