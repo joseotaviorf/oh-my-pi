@@ -43,8 +43,9 @@ cluster:
         package: "presidio_analyzer==2.2.357"
     - pypi:
         package: "numpy==1.26.4"
-    # en_core_web_lg is not on PyPI; official wheel for spaCy 3.7.x (see load_nlp_config model_name).
-    - whl: "https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.7.1/en_core_web_lg-3.7.1-py3-none-any.whl"
+    # en_core_web_lg is not on PyPI. Databricks only installs wheels from S3/DBFS/Volumes/etc., not https://.
+    # Upload en_core_web_lg-3.7.1-py3-none-any.whl (Explosion spaCy models release) under spacy-models/ on artifacts_bucket.
+    - whl: "{artifacts_bucket}/spacy-models/en_core_web_lg-3.7.1-py3-none-any.whl"
   databricks_conn_id: databricks_new_env
   custom_configurations:
     num_workers: 4
