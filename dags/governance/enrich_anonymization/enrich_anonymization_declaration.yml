@@ -50,6 +50,7 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_version: 14.3.x-scala2.12
     spark_conf:
+      spark.scheduler.mode: FAIR
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
       spark.sql.execution.arrow.pyspark.enabled: True
       spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: True
