@@ -31,8 +31,26 @@ columns:
     description: Repair Request unique identifier (uuid)
   cost:
     lineage:
-      - datalake_inspection_services_raw.repair_request_history.repair_suggestion_id
-    description: Cost information linked to the repair request.
+      - datalake_inspection_services_raw.repair_request_history.cost_amount
+    description: Cost amount in the repair request, sourced from cost_amount in the raw layer.
+  cost_currency:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.cost_currency
+    description: Currency used in the repair quotation.
+    categories:
+      ARS: Argentine Peso
+      BRL: Brazilian Real
+      MXN: Mexican Peso
+      PAB: Panamanian Balboa
+      PEN: Peruvian Sol
+      USD: United States Dollar
+  cost_source:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_history.cost_source
+    description: Indicates whether the pricing originated from manual (OPS team) or automatic (InspectionsService).
+    categories:
+      MANUAL: Manual pricing by OPS team
+      AUTOMATIC: Automatic pricing by InspectionsService
   title:
     lineage:
       - datalake_inspection_services_raw.repair_request_history.uuid
