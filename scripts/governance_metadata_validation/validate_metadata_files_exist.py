@@ -4,9 +4,14 @@ import re
 
 import yaml
 
-from scripts.services.git_service import GitService
-
 from pathlib import Path
+
+from scripts.ci_cd.domain_cli import (
+    branch_name_arg_type,
+    domain_arg_type,
+    repo_relative_file_arg_type,
+)
+from scripts.services.git_service import GitService
 
 from scripts.services.metadata_file_service import MetadataFileService
 
@@ -18,6 +23,12 @@ SKIP_LIST_PATH_REGEX = re.compile(rf"(?:.*/)?dags/(?P<path>.*)")
 metadata_file_service = MetadataFileService()
 
 
+def _sanitized_domain(value):
+    if value is None:
+        return None
+    return domain_arg_type(value)
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -27,11 +38,28 @@ def parse_args():
         action="store_true",
         required=False,
     )
+    parser.add_argument(
+        "--domain",
+        type=domain_arg_type,
+        help="Restrict validation to a specific domain folder under dags/ (e.g. for_rent, fintech)",
+        required=False,
+        default=None,
+    )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument(
-        "-f", "--file", help="Path to a metadata file to be validated", required=False
+        "-f",
+        "--file",
+        type=repo_relative_file_arg_type,
+        help="Path to a metadata file to be validated",
+        required=False,
     )
-    group.add_argument("-b", "--branch", help="Branch to be validated", required=False)
+    group.add_argument(
+        "-b",
+        "--branch",
+        type=branch_name_arg_type,
+        help="Branch to be validated",
+        required=False,
+    )
     group.add_argument(
         "-a",
         "--all-files",
@@ -47,21 +75,30 @@ def parse_args():
     mode = None
     if file:
         mode = "file"
-    if branch:
+    if branch is not None:  # detect via presence, not truthiness (value may be "")
         mode = "branch"
     if all_files:
         mode = "all_files"
-    return mode, (file or branch or all_files), verbose
+    return mode, (file or branch or all_files), verbose, _sanitized_domain(args.domain)
 
 
-def get_query_file_paths(mode, input):
+def get_query_file_paths(mode, input, domain=None):
     files = []
+    if domain is not None:
+        domain = domain_arg_type(domain)
     if mode == "file":
+        input = repo_relative_file_arg_type(input)
         files = [(input, "A")]
     elif mode == "all_files":
         files = metadata_file_service.list_metadata_files()
     elif mode == "branch":
         git_service = GitService()
+        if not input:
+            import subprocess
+            input = subprocess.check_output(
+                ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
+            ).strip()
+        input = branch_name_arg_type(input)
         if input == "master":
             from_branch = "HEAD~1"
         else:
@@ -73,7 +110,11 @@ def get_query_file_paths(mode, input):
             ).items()
             if status in GitService.UPSERT_STATUS_CODES
         ]
-    return list(metadata_file_service.filter_query_files(files))
+    result = list(metadata_file_service.filter_query_files(files))
+    if domain:
+        domain_prefix = f"dags/{domain}/"
+        result = [(f, s) for f, s in result if f.startswith(domain_prefix)]
+    return result
 
 
 def remove_prefix(input_string):
@@ -99,8 +140,8 @@ def output_results(results):
 
 
 def main():
-    mode, input, verbose = parse_args()
-    query_files = get_query_file_paths(mode, input)
+    mode, input, verbose, domain = parse_args()
+    query_files = get_query_file_paths(mode, input, domain=domain)
     results = {"passed": [], "failed": [], "skipped": []}
 
     for file, status in query_files:

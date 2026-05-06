@@ -16,6 +16,7 @@ CI uses profile ``dags`` (``profiles/dags.yml``), path_prefix ``dags/``.
 from __future__ import print_function
 
 import argparse
+import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
@@ -40,6 +41,11 @@ from scripts.ci_cd.source_layer_validation.layer_classifier import (
 )
 from scripts.ci_cd.source_layer_validation.layer_policy_matrix import (
     allowed_layers_for_output,
+)
+from scripts.ci_cd.domain_cli import (
+    branch_name_arg_type,
+    domain_arg_type,
+    source_layer_profile_arg_type,
 )
 from scripts.ci_cd.source_layer_validation.read_dag_declaration import (
     get_workflow_layer_and_type,
@@ -284,6 +290,27 @@ def run_validation(
     return not any_strict_fail, had_warnings
 
 
+def _dag_roots_resolved_under_dags(roots: List[str]) -> List[str]:
+    """Keep only paths that resolve under ``dags/`` (defence against odd git paths)."""
+    repo = Path.cwd().resolve()
+    dags = (repo / "dags").resolve()
+    safe: List[str] = []
+    for r in roots:
+        rel = r.replace("\\", "/")
+        try:
+            resolved = (repo / rel).resolve()
+            resolved.relative_to(dags)
+        except (ValueError, OSError):
+            sys.stderr.write(
+                "Refusing unsafe DAG root path {!r} (must resolve under dags/).\n".format(
+                    r
+                )
+            )
+            sys.exit(2)
+        safe.append(rel)
+    return safe
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Validate source table layers for changed DAGs (profile-based)."
@@ -291,11 +318,13 @@ def main() -> None:
     parser.add_argument(
         "--profile",
         default="dags",
+        type=source_layer_profile_arg_type,
         help="Profile cli_profile from profiles/*.yml (default: dags)",
     )
     parser.add_argument(
         "-b",
         "--branch",
+        type=branch_name_arg_type,
         help="Branch name; diff against origin/master (or HEAD~1 on master)",
     )
     parser.add_argument(
@@ -310,6 +339,13 @@ def main() -> None:
         help="With -a, restrict audit to dags/core/ only",
     )
     parser.add_argument("-v", "--verbose", action="store_true")
+    parser.add_argument(
+        "--domain",
+        type=domain_arg_type,
+        help="Restrict validation to a specific domain folder under dags/ (e.g. for_rent, fintech)",
+        required=False,
+        default=None,
+    )
     args = parser.parse_args()
 
     profile = load_profile(args.profile)
@@ -359,6 +395,12 @@ def main() -> None:
                     branch_display, len(touched), profile["path_prefix"], len(dag_roots)
                 )
             )
+
+    if args.domain:
+        domain_prefix = f"dags/{args.domain}/"
+        dag_roots = [r for r in dag_roots if r.startswith(domain_prefix)]
+
+    dag_roots = _dag_roots_resolved_under_dags(dag_roots)
 
     # Audit mode (-a): strict rules would require synthetic changed_files; treat as lenient
     if args.all_dags:

@@ -1,21 +1,28 @@
 # Path filters use Woodpecker `when.path` with `event: [push, pull_request]`.
 #
-# The pull_request event is critical for correctness: Woodpecker evaluates
-# when.path against the full PR diff (via GitHub PullRequests.ListFiles API),
-# not just the last pushed commit. Without it, a trivial final commit (e.g.
-# touching only a Dockerfile or a comment) would skip all validation steps
-# even when earlier commits in the same PR changed DAGs or Python modules.
+# Domain-level parallelisation is handled dynamically by
+# scripts/ci_cd/run_validation_by_domain.py (the "runner"). For each validation step the
+# runner compares the branch against master to find which domains changed, then invokes
+# `make <target> domain=<d>` for every affected domain in parallel (ThreadPoolExecutor).
 #
-# The push event is kept alongside pull_request so that direct pushes to
-# forno/master (which have no open PR) still trigger the relevant steps.
+# Change-detection rules applied by the runner:
+#   • All changed files are under dags/{known_domain}/ → validate only those domains.
+#   • Any changed file is outside a known domain folder  → validate ALL 23 domains
+#     (framework / shared-file change that may affect every domain).
 #
-# Skipped steps count as success so downstream workflows
-# (e.g. release depends_on: validations) still pass.
+# Diff base by branch type:
+#   • master, forno, hotfix/* → HEAD~1..HEAD (only the current push commit)
+#   • feature branches        → origin/master..HEAD (all changes since branching)
 #
-# DAG-side globs are kept coarse (`dags/**/*` or `dags/**/*.yml` where enough)
-# instead of per-folder patterns, so `when.path.include` stays short. Steps
-# may run a bit more often than strictly necessary; validation scripts still
-# scope work via git diff where applicable.
+# Adding a new domain: update ALL_DOMAINS in scripts/ci_cd/run_validation_by_domain.py.
+# No YAML change needed.
+#
+# Locally callable: make validate-<step> domain=for_rent
+#
+# Each Woodpecker step runs in an isolated container, so installs (`make requirements-scripts`,
+# extra pip lines) repeat per step unless a cache/workspace plugin is introduced later.
+# YAML anchors in this file dedupe the *declared* image, and the identical commands/path
+# for the two validate-dags-dependencies-* steps (see comment on those steps).
 clone:
   - name: clone
     image: woodpeckerci/plugin-git
@@ -23,81 +30,12 @@ clone:
       partial: false # We need to clone the entire history to find the changed files
 
 steps:
-  validate-dag-declaration-files:
-    image: public.ecr.aws/docker/library/python:3.7.16
-    commands:
-      - pip install tqdm==4.64.1 Cerberus==1.3.4
-      - make requirements-scripts
-      - make validate-dag-declaration-files level=debug
-    when:
-      event: [push, pull_request]
-      path:
-        include:
-          - 'dags/**/*.yml'
-          - 'bietlejuice/base/airflow/dag_builders/**/*.py'
-          - 'scripts/ci_cd/airflow_dag_builder/**/*.py'
-        on_empty: false
-    depends_on: [] # This is for the steps to run in parallel
-
-  validate-dags-up-to-standard:
-    image: public.ecr.aws/docker/library/python:3.7.16
-    commands:
-      - make requirements-scripts
-      - make validate-dags-up-to-standard
-    when:
-      event: [push, pull_request]
-      path:
-        include:
-          - 'dags/**/*'
-          - 'scripts/dag_standard_validation/**'
-          - 'bietlejuice/base/airflow/dag_builders/**/*.py'
-        on_empty: false
-
-  validate-dags-dependencies-forno:
-    image: public.ecr.aws/docker/library/python:3.7.16
-    environment:
-      ENVIRONMENT: forno
-    commands:
-      - make requirements-scripts
-      - make validate-dags-dependencies
-    when:
-      event: [push, pull_request]
-      branch:
-        exclude:
-          - master
-          - hotfix/*
-      path:
-        include:
-          - 'dags/**/*'
-          - 'bietlejuice/base/dependencies/**/*.py'
-          - 'bietlejuice/base/airflow/**/*.py'
-          - 'bietlejuice/base/db/**/*.py'
-          - 'scripts/ci_cd/validate_dags_dependencies.py'
-          - 'scripts/dependency_handling/**'
-        on_empty: false
-
-  validate-dags-dependencies-prod:
-    image: public.ecr.aws/docker/library/python:3.7.16
-    environment:
-      ENVIRONMENT: prod
-    commands:
-      - make requirements-scripts
-      - make validate-dags-dependencies
-    when:
-      event: [push, pull_request]
-      branch: [master, hotfix/*]
-      path:
-        include:
-          - 'dags/**/*'
-          - 'bietlejuice/base/dependencies/**/*.py'
-          - 'bietlejuice/base/airflow/**/*.py'
-          - 'bietlejuice/base/db/**/*.py'
-          - 'scripts/ci_cd/validate_dags_dependencies.py'
-          - 'scripts/dependency_handling/**'
-        on_empty: false
+  # ---------------------------------------------------------------------------
+  # Global steps — not domain-scoped
+  # ---------------------------------------------------------------------------
 
   validate-dependency-file-correctness:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: &py37 public.ecr.aws/docker/library/python:3.7.16
     commands:
       - make requirements
       - make requirements-scripts
@@ -106,7 +44,7 @@ steps:
       event: [push, pull_request]
       path:
         include:
-          - 'dags/**/*'
+          - 'dags/dependencies.yaml'
           - 'bietlejuice/base/dependencies/**/*.py'
           - 'bietlejuice/base/airflow/**/*.py'
           - 'bietlejuice/base/db/**/*.py'
@@ -114,51 +52,8 @@ steps:
           - 'scripts/dependency_handling/**'
         on_empty: false
 
-  validate-metadata-files-content:
-    image: public.ecr.aws/docker/library/python:3.7.16
-    commands:
-      - make requirements-scripts
-      - make validate-metadata-files-content
-    when:
-      event: [push, pull_request]
-      branch:
-        exclude: [forno, hotfix/*]
-      path:
-        include:
-          - 'dags/**/*.yml'
-          - 'scripts/governance_metadata_validation/**'
-        on_empty: false
-
-  validate-metadata-files-exist:
-    image: public.ecr.aws/docker/library/python:3.7.16
-    commands:
-      - make requirements-scripts
-      - make validate-metadata-files-exist
-    when:
-      event: [push, pull_request]
-      branch:
-        exclude: [forno, hotfix/*]
-      path:
-        include:
-          - 'dags/**/*.sql'
-          - 'scripts/governance_metadata_validation/**'
-        on_empty: false
-
-  validate-lineage-consistency:
-    image: public.ecr.aws/docker/library/python:3.7.16
-    commands:
-      - make requirements-scripts
-      - make validate-lineage-consistency
-    when:
-      event: [push, pull_request]
-      path:
-        include:
-          - 'dags/**/*'
-          - 'scripts/governance_metadata_validation/**'
-        on_empty: false
-
   validate-core-model-schemas:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: *py37
     commands:
       - make requirements-scripts
       - make validate-core-model-schemas
@@ -171,7 +66,7 @@ steps:
         on_empty: false
 
   validate-core-model-schema-content:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: *py37
     commands:
       - make requirements-scripts
       - make validate-core-model-schema-content
@@ -184,17 +79,157 @@ steps:
           - 'bietlejuice/base/core_models/**/*.py'
         on_empty: false
 
-  validate-source-layer-policy:
-    image: public.ecr.aws/docker/library/python:3.7.16
+  # ---------------------------------------------------------------------------
+  # Domain-fanning steps — runner detects changed domains and parallelises
+  # ---------------------------------------------------------------------------
+
+  validate-dag-declaration-files:
+    image: *py37
+    commands:
+      - pip install tqdm==4.64.1 Cerberus==1.3.4
+      - make requirements-scripts
+      - PYTHONPATH=. python3 scripts/ci_cd/run_validation_by_domain.py
+          --make-target validate-dag-declaration-files
+          --make-extra-args "level=debug"
+    when:
+      event: [push, pull_request]
+      branch: [master, hotfix/*]
+      path:
+        include:
+          - 'dags/**/*.yml'
+          - 'bietlejuice/base/airflow/dag_builders/**/*.py'
+          - 'scripts/ci_cd/airflow_dag_builder/**/*.py'
+          - 'scripts/ci_cd/run_validation_by_domain.py'
+        on_empty: false
+    depends_on: []
+
+  validate-dags-up-to-standard:
+    image: *py37
     commands:
       - make requirements-scripts
-      - make validate-source-layer-policy
+      - PYTHONPATH=. python3 scripts/ci_cd/run_validation_by_domain.py
+          --make-target validate-dags-up-to-standard
+    when:
+      event: [push, pull_request]
+      path:
+        include:
+          - 'dags/**'
+          - 'scripts/dag_standard_validation/**'
+          - 'bietlejuice/base/airflow/dag_builders/**/*.py'
+          - 'scripts/ci_cd/run_validation_by_domain.py'
+        on_empty: false
+    depends_on: []
+
+  validate-metadata-files-content:
+    image: *py37
+    commands:
+      - make requirements-scripts
+      - PYTHONPATH=. python3 scripts/ci_cd/run_validation_by_domain.py
+          --make-target validate-metadata-files-content
     when:
       event: [push, pull_request]
       branch:
         exclude: [forno, hotfix/*]
       path:
         include:
-          - 'dags/**/*'
-          - 'scripts/ci_cd/source_layer_validation/**'
+          - 'dags/**/*.yml'
+          - 'scripts/governance_metadata_validation/**'
+          - 'scripts/ci_cd/run_validation_by_domain.py'
         on_empty: false
+    depends_on: []
+
+  validate-metadata-files-exist:
+    image: *py37
+    commands:
+      - make requirements-scripts
+      - PYTHONPATH=. python3 scripts/ci_cd/run_validation_by_domain.py
+          --make-target validate-metadata-files-exist
+    when:
+      event: [push, pull_request]
+      branch:
+        exclude: [forno, hotfix/*]
+      path:
+        include:
+          - 'dags/**/*.sql'
+          - 'scripts/governance_metadata_validation/**'
+          - 'scripts/ci_cd/run_validation_by_domain.py'
+        on_empty: false
+    depends_on: []
+
+  validate-lineage-consistency:
+    image: *py37
+    commands:
+      - make requirements-scripts
+      - PYTHONPATH=. python3 scripts/ci_cd/run_validation_by_domain.py
+          --make-target validate-lineage-consistency
+    when:
+      event: [push, pull_request]
+      branch:
+        exclude: [forno, hotfix/*]
+      path:
+        include:
+          - 'dags/**/*.sql'
+          - 'dags/**/*.yml'
+          - 'scripts/governance_metadata_validation/**'
+          - 'scripts/ci_cd/run_validation_by_domain.py'
+        on_empty: false
+    depends_on: []
+
+  validate-source-layer-policy:
+    image: *py37
+    commands:
+      - make requirements-scripts
+      - PYTHONPATH=. python3 scripts/ci_cd/run_validation_by_domain.py
+          --make-target validate-source-layer-policy
+    when:
+      event: [push, pull_request]
+      branch:
+        exclude: [forno, hotfix/*]
+      path:
+        include:
+          - 'dags/**'
+          - 'scripts/ci_cd/source_layer_validation/**'
+          - 'scripts/ci_cd/run_validation_by_domain.py'
+        on_empty: false
+    depends_on: []
+
+  # validate-dags-dependencies is two steps (not one) because ConfigurationService reads
+  # ENVIRONMENT and branch policy is mutually exclusive: forno for feature branches, prod
+  # for master/hotfix. Commands and path filters are identical — anchors keep them in sync.
+
+  validate-dags-dependencies-forno:
+    image: *py37
+    environment:
+      ENVIRONMENT: forno
+    commands: &validate_dags_dependencies_commands
+      - make requirements-scripts
+      - PYTHONPATH=. python3 scripts/ci_cd/run_validation_by_domain.py
+          --make-target validate-dags-dependencies
+    when:
+      event: [push, pull_request]
+      branch:
+        exclude:
+          - master
+          - hotfix/*
+      path: &validate_dags_dependencies_paths
+        include:
+          - 'dags/**'
+          - 'bietlejuice/base/dependencies/**/*.py'
+          - 'bietlejuice/base/airflow/**/*.py'
+          - 'bietlejuice/base/db/**/*.py'
+          - 'scripts/ci_cd/validate_dags_dependencies.py'
+          - 'scripts/dependency_handling/**'
+          - 'scripts/ci_cd/run_validation_by_domain.py'
+        on_empty: false
+    depends_on: []
+
+  validate-dags-dependencies-prod:
+    image: *py37
+    environment:
+      ENVIRONMENT: prod
+    commands: *validate_dags_dependencies_commands
+    when:
+      event: [push, pull_request]
+      branch: [master, hotfix/*]
+      path: *validate_dags_dependencies_paths
+    depends_on: []

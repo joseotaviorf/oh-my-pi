@@ -1,3 +1,4 @@
+import argparse
 import collections
 import glob
 import json
@@ -6,7 +7,7 @@ import re
 import sys
 from itertools import chain
 from os.path import join, isfile
-from typing import List, Tuple, Dict
+from typing import List, Optional, Tuple, Dict
 
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 
@@ -22,6 +23,8 @@ from bietlejuice.base.paths import QUERIES_DATALAKE_PATH
 from bietlejuice.services import FileService, ConfigurationService
 
 from dags import DAG_PACKAGES_ROOT
+
+from scripts.ci_cd.domain_cli import domain_arg_type
 
 LAYERS = ["clean", "core", "enrich", "dw", "metric", "raw"]
 
@@ -585,16 +588,46 @@ class CrossDAGDependenciesValidator:
                 msg = f"There are DAGs or Tables dependencies with invalid characters. There must be only alphanumeric and hyphen in task names. {self.concat_dependent_and_dependencies_to_msg(dict_structure, validation_message)}"
                 self.log_msg(msg=f"msg={msg}", force_log=True)
 
-    def validate(self) -> int:
+    @staticmethod
+    def _dag_belongs_to_domain(dag_name: str, domain: str) -> bool:
+        """
+        Returns True when dag_name lives under dags/{domain}/.
+
+        Uses DAGPackagesPathService.get_dag_path() to resolve the physical path
+        and then inspects the path segment immediately after 'dags/'.
+
+        :param dag_name: short DAG name (without 'bietlejuice.' prefix)
+        :param domain: domain folder name, e.g. 'for_rent', 'fintech'
+        :rtype: bool
+        """
+        dag_path = DAGPackagesPathService.get_dag_path(dag_name)
+        if not dag_path:
+            return False
+        parts = dag_path.replace("\\", "/").split("/")
+        try:
+            dags_idx = parts.index("dags")
+            return len(parts) > dags_idx + 1 and parts[dags_idx + 1] == domain
+        except ValueError:
+            return False
+
+    def validate(self, domain: Optional[str] = None) -> int:
         """
         Main validation method.
 
+        :param domain: when provided, restrict validation to DAGs that live under
+            dags/{domain}/. Reference data (all tables from all domains) is still
+            loaded so cross-domain dependencies are validated correctly.
         :return: 1 for error or 0 for success
         :rtype: int
         """
         self.log_msg(
             msg=f"msg=Validating dependencies from dependencies.yaml", force_log=True
         )
+        if domain:
+            self.log_msg(
+                msg=f"domain={domain}, msg=Restricting validation to domain.",
+                force_log=True,
+            )
         self.log_msg(
             msg=f"non_standard_dags={self.dags_out_of_pattern}, msg=Ignoring out-of-pattern DAGs.",
             force_log=True,
@@ -606,6 +639,23 @@ class CrossDAGDependenciesValidator:
             dags_without_tasks_in_file,
             tables_in_file,
         ) = self.get_tables_from_dependency_file()
+
+        if domain:
+            self.dependencies_raw = {
+                dep: tasks
+                for dep, tasks in self.dependencies_raw.items()
+                if self._dag_belongs_to_domain(dep.split(".")[-1], domain)
+            }
+            dags_without_tasks_in_file = [
+                d
+                for d in dags_without_tasks_in_file
+                if self._dag_belongs_to_domain(d, domain)
+            ]
+            tables_in_file = {
+                dag: tables
+                for dag, tables in tables_in_file.items()
+                if self._dag_belongs_to_domain(dag, domain)
+            }
 
         self.validate_repeated()
         self.validate_only_tasks_in_dependencies_file()
@@ -625,7 +675,26 @@ class CrossDAGDependenciesValidator:
         return status
 
 
-dependencies_validator = CrossDAGDependenciesValidator()
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Validate DAG dependencies declared in dags/dependencies.yaml"
+    )
+    parser.add_argument(
+        "--domain",
+        type=domain_arg_type,
+        help=(
+            "Restrict validation to DAGs that live under dags/<domain>/. "
+            "Cross-domain references are still validated correctly. "
+            "Example: --domain for_rent"
+        ),
+        required=False,
+        default=None,
+    )
+    return parser.parse_args()
 
-validation_status = dependencies_validator.validate()
-exit(validation_status)
+
+if __name__ == "__main__":
+    args = parse_args()
+    dependencies_validator = CrossDAGDependenciesValidator()
+    validation_status = dependencies_validator.validate(domain=args.domain)
+    exit(validation_status)

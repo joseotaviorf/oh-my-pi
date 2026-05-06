@@ -18,13 +18,9 @@ from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_decl
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.file_service import FileService
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--level", "-l", required=False, default="error")
-args = parser.parse_args()
-level = logging.getLevelName(args.level.upper())
+from scripts.ci_cd.domain_cli import domain_arg_type
 
 logger = QuintoAndarLogger("ValidateDAGDeclarationFiles")
-logger.setLevel(level)
 
 
 def dag_python_file_exists(dag_declaration_file_path):
@@ -56,42 +52,59 @@ def validate_one_dag(dag_declaration_file_path: str):
     logger.debug(f"Successfully validated file '{dag_declaration_file_path}'")
 
 
-func = validate_one_dag
-
-dag_declaration_glob_path = DAGPackagesPathService.generate_artifact_file_path(
-    artifact_type="dag_declaration", dag_name="**"
-)
-dag_declaration_files = glob(pathname=dag_declaration_glob_path, recursive=True)
-
-dag_declaration_fails_msg = ""
-
-if dag_declaration_files:
-    logger.info(
-        f"Validating DAG declaration files (count={len(dag_declaration_files)})"
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--level", "-l", required=False, default="error")
+    parser.add_argument(
+        "--domain",
+        type=domain_arg_type,
+        help="Restrict validation to a specific domain folder under dags/ (e.g. for_rent, fintech)",
+        required=False,
+        default=None,
     )
-    with ThreadPoolExecutor(max_workers=64) as executor:
-        futures = {
-            executor.submit(func, dag_declaration_file): dag_declaration_file
-            for dag_declaration_file in dag_declaration_files
-        }
-        processed = 0
-        for future in as_completed(futures):
-            if future.exception():
-                exc = future.exception()
-                error_msg = exc.args[1] if len(exc.args) > 1 else str(exc)
-                dag_declaration_fails_msg += "\n- Path: {}\n- Validation errors:\n{}".format(
-                    futures[future], error_msg
-                )
-            processed += 1
-            if processed % 50 == 0 or processed == len(dag_declaration_files):
-                logger.info(
-                    f"Validated {processed}/{len(dag_declaration_files)} files"
-                )
-    if dag_declaration_fails_msg:
-        sys.tracebacklimit = 0
-        raise AssertionError(
-            "DAG declaration validation failed for the following files:\n"
-            + dag_declaration_fails_msg
+    args = parser.parse_args()
+    level = logging.getLevelName(args.level.upper())
+    logger.setLevel(level)
+
+    dag_declaration_glob_path = DAGPackagesPathService.generate_artifact_file_path(
+        artifact_type="dag_declaration", dag_name="**"
+    )
+    dag_declaration_files = glob(pathname=dag_declaration_glob_path, recursive=True)
+
+    if args.domain:
+        dag_declaration_files = [
+            f for f in dag_declaration_files if f"/{args.domain}/" in f
+        ]
+
+    dag_declaration_fails_msg = ""
+
+    if dag_declaration_files:
+        logger.info(
+            f"Validating DAG declaration files (count={len(dag_declaration_files)})"
         )
-else:
-    logger.warning("No DAG declaration files were found!")
+        with ThreadPoolExecutor(max_workers=64) as executor:
+            futures = {
+                executor.submit(validate_one_dag, dag_declaration_file): dag_declaration_file
+                for dag_declaration_file in dag_declaration_files
+            }
+            processed = 0
+            for future in as_completed(futures):
+                if future.exception():
+                    exc = future.exception()
+                    error_msg = exc.args[1] if len(exc.args) > 1 else str(exc)
+                    dag_declaration_fails_msg += "\n- Path: {}\n- Validation errors:\n{}".format(
+                        futures[future], error_msg
+                    )
+                processed += 1
+                if processed % 50 == 0 or processed == len(dag_declaration_files):
+                    logger.info(
+                        f"Validated {processed}/{len(dag_declaration_files)} files"
+                    )
+        if dag_declaration_fails_msg:
+            sys.tracebacklimit = 0
+            raise AssertionError(
+                "DAG declaration validation failed for the following files:\n"
+                + dag_declaration_fails_msg
+            )
+    else:
+        logger.warning("No DAG declaration files were found!")

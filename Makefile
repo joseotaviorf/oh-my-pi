@@ -376,7 +376,7 @@ validate-dags-dependencies:
 	@echo "Validating DAGs dependencies"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/ci_cd/validate_dags_dependencies.py
+	@PYTHONPATH=. python3 scripts/ci_cd/validate_dags_dependencies.py $(if $(domain),--domain $(domain),)
 
 .PHONY: validate-dependency-file-correctness
 ## validates the correctness of the dags/dependencies.yaml file, according to the FileDependencyGenerator.
@@ -388,6 +388,8 @@ validate-dependency-file-correctness:
 	@PYTHONPATH=. python3 scripts/dependency_handling/validate_dependency_file_correctness.py
 
 level ?= warning
+domain ?=
+export ENVIRONMENT ?= forno
 .PHONY: validate-dag-declaration-files
 ## validates the content of DAG declaration YAML files, returning which keys of which files are not following requirements.
 ## May receive an optional `level={level}` argument to declare the expected logging level of the validation.
@@ -396,7 +398,7 @@ validate-dag-declaration-files:
 	@echo "Validating DAG declaration files"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/ci_cd/airflow_dag_builder/validate_dag_declaration_files.py -l $(level)
+	@PYTHONPATH=. python3 scripts/ci_cd/airflow_dag_builder/validate_dag_declaration_files.py -l $(level) $(if $(domain),--domain $(domain),)
 
 ## validates if the DAGs are using our current standards, such as using DAG Builder or CDC.
 validate-dags-up-to-standard:
@@ -404,7 +406,7 @@ validate-dags-up-to-standard:
 	@echo "Validating DAG declaration files"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/dag_standard_validation/validate_dags_following_current_standards.py
+	@PYTHONPATH=. python3 scripts/dag_standard_validation/validate_dags_following_current_standards.py $(if $(domain),--domain $(domain),)
 
 .PHONY: validate-metadata-files-content
 validate-metadata-files-content:
@@ -413,7 +415,7 @@ validate-metadata-files-content:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_metadata_files_content.py -b "$(CI_COMMIT_BRANCH)" -v
+	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_metadata_files_content.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
 
 .PHONY: validate-metadata-files-exist
 validate-metadata-files-exist:
@@ -422,7 +424,7 @@ validate-metadata-files-exist:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_metadata_files_exist.py -b "$(CI_COMMIT_BRANCH)" -v
+	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_metadata_files_exist.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
 
 .PHONY: validate-lineage-consistency
 validate-lineage-consistency:
@@ -431,7 +433,7 @@ validate-lineage-consistency:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_lineage_consistency.py -b "$(CI_COMMIT_BRANCH)" -v
+	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_lineage_consistency.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
 
 .PHONY: validate-lineage-consistency-all
 ## validates that all metadata files are consistent with SQL queries (local development)
@@ -489,7 +491,7 @@ validate-source-layer-policy:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/ci_cd/source_layer_validation/validate_source_layer_policy.py --profile dags -b "$(CI_COMMIT_BRANCH)"
+	@PYTHONPATH=. python3 scripts/ci_cd/source_layer_validation/validate_source_layer_policy.py --profile dags -b "$(CI_COMMIT_BRANCH)" $(if $(domain),--domain $(domain),)
 
 .PHONY: validate-source-layer-policy-all
 ## validates all DAGs under dags/ against source-layer policy (local audit; warnings-only for existing violations)
