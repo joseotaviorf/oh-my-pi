@@ -22,7 +22,6 @@ vsl AS (
     vsl.author_user_type,
     vsl.author_user_role,
     vsl.on_behalf_of,
-    vsl.channel,
     CASE -- We will hard coded the channels until we have the channel in the request logging since the current data has fixed channels
       WHEN rl.host = 'wall_e' THEN 'NATIVE_WALLE'
       WHEN rl.host = 'concierge' THEN 'WHATSAPP_CONCIERGE'
@@ -33,7 +32,7 @@ vsl AS (
       WHEN vsl.channel IN ('NATIVE_WALLE', 'WHATSAPP_CONCIERGE', 'WHATSAPP_SONIA') THEN CONCAT('CONVERSATIONAL - ', vsl.channel) -- Unified the old IA channels with the new unified channels
       WHEN vsl.channel = 'CONVERSATIONAL' THEN CONCAT_WS(' - ', vsl.channel, host_unified) -- Enrich the channel with the host unified
       ELSE vsl.channel -- Keep the channel as is for other channels (not conversational)
-    END AS channel_unified,
+    END AS channel,
     vsl.application_source,
     vsl.reason,
     vsl.event_type,
@@ -84,7 +83,6 @@ vsl AS (
     vsl.author_user_role,
     vsl.on_behalf_of,
     vsl.channel,
-    vsl.channel_unified,
     vsl.application_source,
     vsl.reason,
     vbm.partner_3p_supply,

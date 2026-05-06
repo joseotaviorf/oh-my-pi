@@ -79,10 +79,6 @@ columns:
     lineage:
       - datalake_visit.visits.cancellatin_channel
     description: What the channel for the cancellation of this visit. Data since 2019.
-  cancellation_channel_unified:
-    lineage:
-      - datalake_visit.visits.cancellation_channel_unified
-    description: Unified channel of the cancellation of this visit. Data since 2019.
   cancellation_type:
     lineage:
       - datalake_visit.visits.cancellation_type
@@ -119,10 +115,6 @@ columns:
     lineage:
       - datalake_visit.visits.visit_request_channel
     description: Channel when the visit was requested. Data since 2016.
-  visit_request_channel_unified:
-    lineage:
-      - datalake_visit.visits.visit_request_channel_unified
-    description: Unified channel when the visit was requested. Data since 2016.
   visit_request_on_behalf_of:
     lineage:
       - datalake_visit.visits.visit_request_on_behalf_of
@@ -150,10 +142,6 @@ columns:
     lineage:
       - datalake_visit.visits.first_supply_answer_channel
     description: Channel when owner answer the confirmation for the first time. Data since 2024-11.
-  first_supply_answer_channel_unified:
-    lineage:
-      - datalake_visit.visits.first_supply_answer_channel_unified
-    description: Unified channel when owner answer the confirmation for the first time. Data since 2024-11.
   first_tenant_living_answer:
     lineage:
       - datalake_visit.visits.first_tenant_living_answer
@@ -165,18 +153,10 @@ columns:
     lineage:
       - datalake_visit.visits.first_tenant_living_answer_channel
     description: Channel when tenant living answer the confirmation for the first time. Data since 2024-11.
-  first_tenant_living_answer_channel_unified:
-    lineage:
-      - datalake_visit.visits.first_tenant_living_answer_channel_unified
-    description: Unified channel when tenant living answer the confirmation for the first time. Data since 2024-11.
   visit_first_confirmed_channel:
     lineage:
       - datalake_visit.visits.visit_first_confirmed_channel
     description: Channel when the visit was confirmed for the first time. Data since 2024-11.
-  visit_first_confirmed_channel_unified:
-    lineage:
-      - datalake_visit.visits.visit_first_confirmed_channel_unified
-    description: Unified channel when the visit was confirmed for the first time. Data since 2024-11.
   visit_first_confirmed_user_role:
     lineage:
       - datalake_visit.visits.visit_first_confirmed_user_role

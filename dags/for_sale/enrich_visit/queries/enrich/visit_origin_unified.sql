@@ -26,7 +26,7 @@ new_origin AS (
     SELECT
         vse.id_visit,
         MIN_BY(vse.channel, vse.ts_created) AS visit_request_channel,
-        MIN_BY(vse.channel_unified, vse.ts_created) AS visit_request_channel_unified,
+        MIN_BY(vse.application_source, vse.ts_created) AS visit_request_application_source,
         MIN(vse.ts_created) AS ts_visit_requested
     FROM
         datalake_visit.visit_status_events AS vse
@@ -41,7 +41,7 @@ new_origin AS (
 SELECT
     id_visit,
     visit_request_channel,
-    visit_request_channel AS visit_request_channel_unified,
+    NULL AS visit_request_application_source,
     ts_visit_requested
 FROM
     old_origin
@@ -49,7 +49,7 @@ UNION ALL
 SELECT
     id_visit,
     visit_request_channel,
-    visit_request_channel_unified,
+    visit_request_application_source,
     ts_visit_requested
 FROM
     new_origin
