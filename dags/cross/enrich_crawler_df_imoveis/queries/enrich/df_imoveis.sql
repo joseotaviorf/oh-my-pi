@@ -26,6 +26,7 @@ SELECT
   id_house_platform,
   id_house,
   platform,
+  GET_JSON_OBJECT(house_info,'$.external_id') AS advertiser_listing_id,
   GET_JSON_OBJECT(address,'$.country') AS country,
   GET_JSON_OBJECT(address,'$.state') AS state,
   CASE
@@ -67,7 +68,9 @@ SELECT
   GET_JSON_OBJECT(advertiser,'$.name') AS advertiser_name,   
   GET_JSON_OBJECT(advertiser,'$.phone') AS advertiser_phone,
   GET_JSON_OBJECT(advertiser,'$.email') AS advertiser_email,
-  GET_JSON_OBJECT(advertiser,'$.address.creci') AS advertiser_creci,      
+  GET_JSON_OBJECT(advertiser,'$.address.creci') AS advertiser_creci,     
+  GET_JSON_OBJECT(advertiser,'$.url') AS advertiser_url,
+  REGEXP_EXTRACT(SPLIT_PART(GET_JSON_OBJECT(advertiser,'$.url'), '-', -1), '([0-9]+)', 1) AS advertiser_id, 
   CASE  
     WHEN GET_JSON_OBJECT(type,'$.operation_type') = 'rent' THEN CAST(GET_JSON_OBJECT(price,'$.rent.condo_fee') AS DOUBLE)
     ELSE CAST(GET_JSON_OBJECT(price,'$.sale.condo_fee') AS DOUBLE)

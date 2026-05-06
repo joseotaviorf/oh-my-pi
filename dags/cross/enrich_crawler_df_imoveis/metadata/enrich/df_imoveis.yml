@@ -38,6 +38,12 @@ columns:
       - datalake_crawler_df_imoveis_clean.df_imoveis.origin
     description: |
       The origin of the listing, which is always "dfimoveis" for this table.
+  advertiser_listing_id:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.house_info
+    description: |
+      The ID of the listing in the advertiser's CRM.
+      It is extracted from the "house_info" struct field.
   country:
     lineage:
       - datalake_crawler_df_imoveis_clean.df_imoveis.address
@@ -209,6 +215,18 @@ columns:
       The creci of the advertiser responsible for the listing.
       It is provided by the original struct field "advertiser", and it can
       assume null values.
+  advertiser_url:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.advertiser
+    description: |
+      The url of the advertiser responsible for the listing.
+      It is provided by the original struct field "advertiser".
+  advertiser_id:
+    lineage:
+      - datalake_crawler_df_imoveis_clean.df_imoveis.advertiser
+    description: |
+      The ID of the advertiser responsible for the listing.
+      It is extracted from the "advertiser.url" struct field using regex.
   condo_fee:
     lineage:
       - datalake_crawler_df_imoveis_clean.df_imoveis.type

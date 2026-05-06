@@ -38,6 +38,12 @@ columns:
       - datalake_crawler_chaves_na_mao_clean.chaves_na_mao.origin
     description: |
       The origin of the listing, which is always "chaves-na-mao" for this table.
+  advertiser_listing_id:
+    lineage:
+      - datalake_crawler_chaves_na_mao_clean.chaves_na_mao.house_info
+    description: |
+      The ID of the listing in the advertiser's CRM.
+      It is extracted from the "house_info" struct field and can assume null values.
   country:
     lineage:
       - datalake_crawler_chaves_na_mao_clean.chaves_na_mao.address
@@ -223,6 +229,48 @@ columns:
       The creci of the advertiser responsible for the listing.
       It is provided by the original struct field "advertiser", and it can
       assume null values.
+  advertiser_url:
+    lineage:
+      - datalake_crawler_chaves_na_mao_clean.chaves_na_mao.advertiser
+    description: |
+      The url of the advertiser responsible for the listing.
+      It is provided by the original struct field "advertiser".
+  advertiser_address_state:
+    lineage:
+      - datalake_crawler_chaves_na_mao_clean.chaves_na_mao.advertiser
+    description: |
+      The state of the advertiser's address.
+      It is provided by the original struct field "advertiser".
+  advertiser_address_city:
+    lineage:
+      - datalake_crawler_chaves_na_mao_clean.chaves_na_mao.advertiser
+    description: |
+      The city of the advertiser's address.
+      It is provided by the original struct field "advertiser".
+  advertiser_address_zip_code:
+    lineage:
+      - datalake_crawler_chaves_na_mao_clean.chaves_na_mao.advertiser
+    description: |
+      The zip code of the advertiser's address.
+      It is provided by the original struct field "advertiser".
+  advertiser_address_neighborhood:
+    lineage:
+      - datalake_crawler_chaves_na_mao_clean.chaves_na_mao.advertiser
+    description: |
+      The neighborhood of the advertiser's address.
+      It is provided by the original struct field "advertiser".
+  advertiser_address_street:
+    lineage:
+      - datalake_crawler_chaves_na_mao_clean.chaves_na_mao.advertiser
+    description: |
+      The street of the advertiser's address.
+      It is provided by the original struct field "advertiser".
+  advertiser_address_street_number:
+    lineage:
+      - datalake_crawler_chaves_na_mao_clean.chaves_na_mao.advertiser
+    description: |
+      The street number of the advertiser's address.
+      It is provided by the original struct field "advertiser".
   condo_fee:
     lineage:
       - datalake_crawler_chaves_na_mao_clean.chaves_na_mao.type

@@ -36,6 +36,11 @@ columns:
       - datalake_crawler_chaves_na_mao.chaves_na_mao.platform
     description: |
       The origin of the listing, which is always "chaves-na-mao" for this table.
+  advertiser_listing_id:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.advertiser_listing_id
+    description: |
+      The ID of the listing in the advertiser's CRM.
   country:
     lineage:
       - datalake_crawler_chaves_na_mao.chaves_na_mao.country
@@ -187,6 +192,41 @@ columns:
       - datalake_crawler_chaves_na_mao.chaves_na_mao.advertiser_creci
     description: |
       The creci of the advertiser responsible for the listing.
+  advertiser_url:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.advertiser_url
+    description: |
+      The url of the advertiser responsible for the listing.
+  advertiser_address_state:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.advertiser_address_state
+    description: |
+      The state of the advertiser's address.
+  advertiser_address_city:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.advertiser_address_city
+    description: |
+      The city of the advertiser's address.
+  advertiser_address_zip_code:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.advertiser_address_zip_code
+    description: |
+      The zip code of the advertiser's address.
+  advertiser_address_neighborhood:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.advertiser_address_neighborhood
+    description: |
+      The neighborhood of the advertiser's address.
+  advertiser_address_street:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.advertiser_address_street
+    description: |
+      The street of the advertiser's address.
+  advertiser_address_street_number:
+    lineage:
+      - datalake_crawler_chaves_na_mao.chaves_na_mao.advertiser_address_street_number
+    description: |
+      The street number of the advertiser's address.
   condo_fee:
     lineage:
       - datalake_crawler_chaves_na_mao.chaves_na_mao.condo_fee

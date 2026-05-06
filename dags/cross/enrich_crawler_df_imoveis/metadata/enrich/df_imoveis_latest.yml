@@ -36,6 +36,11 @@ columns:
       - datalake_crawler_df_imoveis.df_imoveis.platform
     description: |
       The origin of the listing, which is always "dfimoveis" for this table.
+  advertiser_listing_id:
+    lineage:
+      - datalake_crawler_df_imoveis.df_imoveis.advertiser_listing_id
+    description: |
+      The ID of the listing in the advertiser's CRM.
   country:
     lineage:
       - datalake_crawler_df_imoveis.df_imoveis.country
@@ -177,6 +182,16 @@ columns:
       - datalake_crawler_df_imoveis.df_imoveis.advertiser_creci
     description: |
       The creci of the advertiser responsible for the listing.
+  advertiser_url:
+    lineage:
+      - datalake_crawler_df_imoveis.df_imoveis.advertiser_url
+    description: |
+      The url of the advertiser responsible for the listing.
+  advertiser_id:
+    lineage:
+      - datalake_crawler_df_imoveis.df_imoveis.advertiser_id
+    description: |
+      The id of the advertiser responsible for the listing.
   condo_fee:
     lineage:
       - datalake_crawler_df_imoveis.df_imoveis.condo_fee

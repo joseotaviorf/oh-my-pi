@@ -36,6 +36,11 @@ columns:
       - datalake_crawler_olx.olx.platform
     description: |
       The origin of the house, which is always "olx" for this table.
+  advertiser_listing_id:
+    lineage:
+      - datalake_crawler_olx.olx.advertiser_listing_id
+    description: |
+      The ID of the listing in the advertiser's CRM.
   country:
     lineage:
       - datalake_crawler_olx.olx.country
@@ -74,6 +79,11 @@ columns:
     description: |
       The name of the listing.
       It is the listing description provided in the origin platform.
+  listing_url:
+    lineage:
+      - datalake_crawler_olx.olx.listing_url
+    description: |
+      The URL of the listing on the OLX platform.
   total_area:
     lineage:
       - datalake_crawler_olx.olx.total_area
@@ -125,6 +135,31 @@ columns:
       - datalake_crawler_olx.olx.advertiser_phone
     description: |
       The phone number of the advertiser/agent responsible for the listing.
+  advertiser_url:
+    lineage:
+      - datalake_crawler_olx.olx.advertiser_url
+    description: |
+      The URL of the advertiser's profile on the OLX platform.
+  advertiser_address_state:
+    lineage:
+      - datalake_crawler_olx.olx.advertiser_address_state
+    description: |
+      The state of the advertiser's address.
+  advertiser_address_city:
+    lineage:
+      - datalake_crawler_olx.olx.advertiser_address_city
+    description: |
+      The city of the advertiser's address.
+  advertiser_address_neighborhood:
+    lineage:
+      - datalake_crawler_olx.olx.advertiser_address_neighborhood
+    description: |
+      The neighborhood of the advertiser's address.
+  advertiser_is_professional:
+    lineage:
+      - datalake_crawler_olx.olx.advertiser_is_professional
+    description: |
+      Boolean flag indicating if the advertiser is a professional. 
   condo_fee:
     lineage:
       - datalake_crawler_olx.olx.condo_fee

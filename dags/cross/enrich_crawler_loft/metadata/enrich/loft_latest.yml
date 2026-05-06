@@ -81,6 +81,11 @@ columns:
     description: |
       The name of the listing.
       It is the listing description provided in the origin platform.
+  listing_url:
+    lineage:
+      - datalake_crawler_loft.loft.listing_url
+    description: |
+      The URL of the listing on the original platform.
   total_area:
     lineage:
       - datalake_crawler_loft.loft.total_area
@@ -182,6 +187,11 @@ columns:
       - datalake_crawler_loft.loft.is_marketplace
     description: |
       Boolean that indicates if the listing is part of Loft's marketplace.
+  advertiser_phone:
+    lineage:
+      - datalake_crawler_loft.loft.advertiser_phones
+    description: |
+      The phone number of the advertiser/agent responsible for the listing.
   condo_fee:
     lineage:
       - datalake_crawler_loft.loft.condo_fee

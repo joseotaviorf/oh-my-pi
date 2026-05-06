@@ -95,6 +95,11 @@ columns:
     description: |
       The name of the listing.
       It is the listing description provided in the origin platform.
+  listing_url:
+    lineage:
+      - datalake_crawler_zap_imoveis.zap_imoveis.listing_url
+    description: |
+      The URL of the listing on the original platform.
   total_area:
     lineage:
       - datalake_crawler_zap_imoveis.zap_imoveis.total_area
@@ -184,6 +189,46 @@ columns:
       - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_phone
     description: |
       The phone numbers of the advertiser/agent responsible for the listing.
+  advertiser_url:
+    lineage:
+      - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_url
+    description: |
+      The URL of the advertiser/agent responsible for the listing on the original platform.
+  advertiser_creci:
+    lineage:
+      - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_creci
+    description: |
+      The CRECI license number of the advertiser/agent responsible for the listing.
+  advertiser_address_state:
+    lineage:
+      - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_address_state
+    description: |
+      The state of the advertiser/agent's address.
+  advertiser_address_city:
+    lineage:
+      - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_address_city
+    description: |
+      The city of the advertiser/agent's address.
+  advertiser_address_zip_code:
+    lineage:
+      - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_address_zip_code
+    description: |
+      The zip code of the advertiser/agent's address.
+  advertiser_address_neighborhood:
+    lineage:
+      - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_address_neighborhood
+    description: |
+      The neighborhood of the advertiser/agent's address.
+  advertiser_address_street:
+    lineage:
+      - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_address_street
+    description: |
+      The street of the advertiser/agent's address.
+  advertiser_address_street_number:
+    lineage:
+      - datalake_crawler_zap_imoveis.zap_imoveis.advertiser_address_street_number
+    description: |
+      The street number of the advertiser/agent's address.
   condo_fee:
     lineage:
       - datalake_crawler_zap_imoveis.zap_imoveis.condo_fee

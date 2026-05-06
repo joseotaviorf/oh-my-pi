@@ -6,11 +6,13 @@ WITH json_select AS (
       city,
       TO_JSON(address) AS address,
       TO_JSON(geolocation) AS geolocation,
-      listing_name AS listing_name,
+      listing_name AS listing_name,      
+      TO_JSON(crawl_metadata) AS crawl_metadata,
       TO_JSON(house_info) AS house_info,
       TO_JSON(type) AS type,
       property_type,
       contract_type,
+      TO_JSON(contact_information) AS contact_information,
       agency_id AS advertiser_id,
       agency_name AS advertiser_name,
       agency_email AS advertiser_email,
@@ -47,6 +49,7 @@ SELECT
   GET_JSON_OBJECT(geolocation,'$.latitude') AS latitude,
   GET_JSON_OBJECT(geolocation,'$.longitude') AS longitude,
   listing_name,
+  GET_JSON_OBJECT(crawl_metadata,'$.listing_url') AS listing_url,
   CAST(GET_JSON_OBJECT(house_info,'$.total_area') AS INTEGER) AS total_area,
   CAST(GET_JSON_OBJECT(house_info,'$.area') AS INTEGER) AS area,      
   CAST(GET_JSON_OBJECT(house_info,'$.bathrooms') AS INTEGER) AS bathrooms,
@@ -66,7 +69,8 @@ SELECT
   advertiser_cnpj,
   advertiser_location,
   has_advertiser,
-  is_marketplace,
+  is_marketplace,  
+  GET_JSON_OBJECT(contact_information, '$.advertiser_phones[0]') AS advertiser_phone,
   CASE  
     WHEN CAST(GET_JSON_OBJECT(type,'$.rentable') AS BOOLEAN) = TRUE THEN CAST(GET_JSON_OBJECT(price,'$.rent.condo_fee') AS DOUBLE)
     ELSE CAST(GET_JSON_OBJECT(price,'$.sale.condo_fee') AS DOUBLE)

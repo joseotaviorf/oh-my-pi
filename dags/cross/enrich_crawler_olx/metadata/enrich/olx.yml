@@ -41,6 +41,14 @@ columns:
       - datalake_crawler_olx_clean.olx.origin
     description: |
       The origin of the house, which is always "olx" for this table.
+  advertiser_listing_id:
+    lineage:
+      - datalake_crawler_olx_clean.olx.house_info
+    description: |
+      The ID of the listing in the advertiser's CRM.
+      It is extracted from the "external_id" field in the "house_info" struct.
+      If "external_id" is null, it tries to extract the ID from the "description"
+      field using regex patterns that look for common formats of listing IDs in the text.
   country:
     lineage:
       - datalake_crawler_olx_clean.olx.address
@@ -87,6 +95,11 @@ columns:
     description: |
       The name of the listing.
       It is the listing description provided in the origin platform.
+  listing_url:
+    lineage:
+      - datalake_crawler_olx_clean.olx.crawl_metadata
+    description: |
+      The URL of the listing on the OLX platform.
   total_area:
     lineage:
       - datalake_crawler_olx_clean.olx.house_info
@@ -154,6 +167,36 @@ columns:
       The phone number of the advertiser/agent responsible for the listing.
       It is provided by the original struct field "contact_information" for data until August 2025.
       After that, it is provided by the original struct field "advertiser".
+  advertiser_url:
+    lineage:
+      - datalake_crawler_olx_clean.olx.advertiser
+    description: |
+      The URL of the advertiser's profile on the OLX platform.
+      It is provided by the original struct field "advertiser".
+  advertiser_address_state:
+    lineage:
+      - datalake_crawler_olx_clean.olx.advertiser
+    description: |
+      The state of the advertiser's address.
+      It is provided by the original struct field "advertiser".
+  advertiser_address_city:
+    lineage:
+      - datalake_crawler_olx_clean.olx.advertiser
+    description: |
+      The city of the advertiser's address.
+      It is provided by the original struct field "advertiser".
+  advertiser_address_neighborhood:
+    lineage:
+      - datalake_crawler_olx_clean.olx.advertiser
+    description: |
+      The neighborhood of the advertiser's address.
+      It is provided by the original struct field "advertiser".
+  advertiser_is_professional:
+    lineage:
+      - datalake_crawler_olx_clean.olx.advertiser
+    description: |
+      Boolean flag indicating if the advertiser is a professional.
+      It is provided by the original struct field "advertiser".
   condo_fee:
     lineage:
       - datalake_crawler_olx_clean.olx.house_info
