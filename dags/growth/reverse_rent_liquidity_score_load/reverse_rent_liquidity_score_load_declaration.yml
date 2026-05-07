@@ -1,0 +1,24 @@
+dag:
+  name: reverse_rent_liquidity_score_load
+  schedule_start_date: 2026, 04, 22
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      Loads rent liquidity scores from dw_liquidity.fact_house_rent_liquidity into reverse_rent_liquidity_score.rent_liquidity_score
+      (custom_schema rent_liquidity_score → catalog reverse_rent_liquidity_score). The access DAG reverse_rent_liquidity_score_access
+      sends each row to the MasterfeedHouseRentLiquidityScore SQS queue (Prod or Forno only; no staging queue for this feature).
+      In dw_liquidity.fact_house_rent_liquidity, house_liquidity_score is the value in rent_liquidity_score: the probability
+      that a house will be rented within 4 weeks after publication.
+workflow:
+  type: load
+  layer: reverse
+  custom_schema: rent_liquidity_score
+  default_extraction_type: full
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1112,6 +1112,9 @@ bietlejuice.reverse_listing_quality_access:
 bietlejuice.reverse_listings_locations_access:
   add:
     - bietlejuice.reverse_listings_locations_load:load-reverse-listings-locations:first-run-of-day
+bietlejuice.reverse_rent_liquidity_score_access:
+  add:
+    - bietlejuice.reverse_rent_liquidity_score_load:load-reverse-rent-liquidity-score:first-run-of-day
 bietlejuice.reverse_rent_listings_report_access:
   add:
     - bietlejuice.reverse_rent_listings_report_load:load-reverse-listing-similar-score:first-run-of-day
