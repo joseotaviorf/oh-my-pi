@@ -196,6 +196,8 @@ Ask: does the DAG need non-standard node types, Spot instances, or custom JARs/l
   - Metric layer: use `databricks_16_4_med_io-general_cluster` with `databricks_conn_id: databricks_new`.
 - **Yes** → use `custom_cluster` (see full template in `dag_build` rule).
 
+> **Note:** This is a safe default to get the scaffold in place. Step 7 applies the `right-size-cluster` skill to fine-tune the cluster block before the first run.
+
 | Layers | `databricks_conn_id` |
 |--------|---------------------|
 | enrich, dw, raw (CDC/custom) | `databricks_new_env` |
@@ -429,6 +431,18 @@ Add a `data_quality` file for all tables where data correctness is business-crit
 
 **Note on `severity_level`:** Both `Error` and `Warning` serve only to categorize how alerts are registered; neither actually blocks the pipeline. Use `Error` for critical validations that require immediate attention, and `Warning` for less critical checks that should be monitored but don't require immediate action.
 
+## Step 7 — Fine-tune cluster with right-size-cluster
+
+After the scaffold is complete, apply the [`right-size-cluster` skill](../right-size-cluster/SKILL.md) to confirm (or replace) the `cluster:` block set in Step 2b before the first production run.
+
+When invoking the skill:
+
+1. Inform it that this is a **brand-new DAG with no execution history** — it will skip its Steps 2 (logs) and 3 (Databricks cluster metrics) automatically and rely on its Step 1b (static analysis of declaration + SQL) instead.
+2. Do **not** skip the user-facing questions in `right-size-cluster` Step 1: the user must still be asked whether logs or cluster metrics are available. The runtime question (question 1) is for existing DAGs only — skip it here.
+3. Update the `cluster:` block in the declaration file with the recommendation produced by Step 8 of the skill.
+
+---
+
 ## Checklist
 
 - [ ] DAG name normalized according to layer conventions (Step 1b)
@@ -442,6 +456,7 @@ Add a `data_quality` file for all tables where data correctness is business-crit
 - [ ] Task count under 100 (job cluster workflows)
 - [ ] `default_extraction_type: full` included in workflow section (only for query_delta, custom_ingestion, core_model workflows; user can change to `incremental` if needed)
 - [ ] `default_partitions: []` included in workflow section (only for query_delta, custom_ingestion, core_model workflows; user informed to update if tables are partitioned)
+- [ ] Cluster right-sized via `right-size-cluster` skill (Step 7)
 
 **Additional checks for CDC DAGs:**
 - [ ] Kafka Connect + S3-Sink connectors already running (data confirmed in S3)
