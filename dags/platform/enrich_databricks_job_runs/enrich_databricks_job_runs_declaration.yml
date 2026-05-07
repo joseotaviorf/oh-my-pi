@@ -28,6 +28,7 @@ workflow:
   custom_schema: databricks
   default_extraction_type: incremental
   default_partitions: [year, month, day]
+  execution_timeout_hours: 4
   inner_dependencies:
     load_table_costs:
       - task_runs
