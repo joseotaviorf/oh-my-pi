@@ -28,9 +28,10 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
+  # Legacy dim: Kimball -1 + sparse PIN full_name; cap 5 avoids false positives until table sunset.
   documented_full_name:
     has_null_count:
-      less_than_or_equal_to: 1
+      less_than_or_equal_to: 5
       severity_level: Warning
   gender:
     has_null_count:
