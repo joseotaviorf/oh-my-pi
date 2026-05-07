@@ -37,7 +37,10 @@ WITH latest_cluster_spec AS (
         tags,
         CAST(
             FROM_JSON(TO_JSON(c.aws_attributes), 'map<string, string>')['availability'] AS STRING
-        ) AS cluster_availability
+        ) AS cluster_availability,
+        CAST(
+            FROM_JSON(TO_JSON(c.aws_attributes), 'map<string, string>')['first_on_demand'] AS INT
+        ) AS first_on_demand
     FROM (
         SELECT
             c.*,
@@ -245,6 +248,9 @@ node_hours_cost AS (
             )
             * (
                 CASE
+                    -- The driver node is On-Demand if first_on_demand > 0 (Databricks default for job clusters)
+                    WHEN n.driver = TRUE AND COALESCE(lcs.first_on_demand, 0) > 0
+                        THEN COALESCE(ip.on_demand_hourly_usd, CAST(0 AS DOUBLE))
                     WHEN UPPER(COALESCE(lcs.cluster_availability, 'ON_DEMAND')) LIKE '%SPOT%'
                         THEN CAST(0.37 AS DOUBLE) * COALESCE(ip.on_demand_hourly_usd, CAST(0 AS DOUBLE))
                     ELSE COALESCE(ip.on_demand_hourly_usd, CAST(0 AS DOUBLE))
@@ -253,6 +259,8 @@ node_hours_cost AS (
         ) AS total_ec2_cost_calculated_usd,
         SUM(
             CASE
+                WHEN n.driver = TRUE AND COALESCE(lcs.first_on_demand, 0) > 0
+                    THEN CAST(0 AS DOUBLE)
                 WHEN UPPER(COALESCE(lcs.cluster_availability, 'ON_DEMAND')) LIKE '%SPOT%'
                     THEN GREATEST(
                         CAST(0 AS BIGINT),
@@ -263,6 +271,11 @@ node_hours_cost AS (
         ) AS spot_hours,
         SUM(
             CASE
+                WHEN n.driver = TRUE AND COALESCE(lcs.first_on_demand, 0) > 0
+                    THEN GREATEST(
+                        CAST(0 AS BIGINT),
+                        CAST(unix_timestamp(n.end_time) AS BIGINT) - CAST(unix_timestamp(n.start_time) AS BIGINT)
+                    ) / 3600.0
                 WHEN UPPER(COALESCE(lcs.cluster_availability, 'ON_DEMAND')) NOT LIKE '%SPOT%'
                     THEN GREATEST(
                         CAST(0 AS BIGINT),

@@ -177,8 +177,10 @@ columns:
     description: |
       EC2 USD for this cluster-day from `system.compute.node_timeline` node wall-clock
       hours × `overwatch.instancedetails.On_Demand_Cost_Hourly` (API_Name = driver or
-      worker node type). Spot (`aws_attributes.availability` contains SPOT): rate × 0.37.
-      Covers all workspaces with node observations; NULL pricing rows contribute zero.
+      worker node type). Spot (`aws_attributes.availability` contains SPOT): hourly
+      rate multiplied by 0.37 vs on-demand. Note: if `aws_attributes.first_on_demand`
+      is > 0, the driver node is always priced as on-demand. Covers all workspaces
+      with node observations; NULL pricing rows contribute zero.
     lineage:
       - system.compute.node_timeline.start_time
       - system.compute.node_timeline.end_time
@@ -189,7 +191,8 @@ columns:
   spot_hours:
     description: |
       Sum of per-node hours on this cluster-day priced as Spot (driver + worker rows
-      where availability contains SPOT). Sub-hour precision from timeline timestamps.
+      where availability contains SPOT, excluding the driver if `first_on_demand` > 0).
+      Sub-hour precision from timeline timestamps.
     lineage:
       - system.compute.node_timeline.start_time
       - system.compute.node_timeline.end_time
