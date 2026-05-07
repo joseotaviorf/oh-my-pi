@@ -157,8 +157,10 @@ def main() -> None:
     from pyspark.sql.window import Window
     from quintoandar_logger import QuintoAndarLogger
 
+    from bietlejuice.base.databricks.table_privileges import TablePrivileges
     from bietlejuice.base.db import DatalakeMetastoreService
     from bietlejuice.base.spark import BaseDBUtils, BaseSparkContext
+    from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
     from bietlejuice.loaders.delta_loader import DeltaLoader
 
     def parse_args() -> argparse.Namespace:
@@ -199,6 +201,11 @@ def main() -> None:
                 StructField("day", IntegerType(), True),
             ]
         )
+
+    def _apply_default_uc_grants(full_table_name: str) -> None:
+        priv = TablePrivileges.from_environment_default(full_table_name)
+        if priv and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
+            priv.apply()
 
     args = parse_args()
     logger = QuintoAndarLogger(JOB_NAME)
@@ -561,6 +568,7 @@ def main() -> None:
         partition_by=partition_cols or None,
         merge_on=merge_on,
     )
+    _apply_default_uc_grants(full_table)
 
     w_latest = Window.partitionBy("database_name", "table_name").orderBy(
         F.col("ts_assessed").desc(),
@@ -594,6 +602,7 @@ def main() -> None:
         source_df=class_df,
         merge_on=["database_name", "table_name"],
     )
+    _apply_default_uc_grants(class_full)
 
 
 if __name__ == "__main__":
