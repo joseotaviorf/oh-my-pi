@@ -1,0 +1,40 @@
+dag:
+  name: property_dedup
+  owner: Data Growth
+  schedule_start_date: "2026, 4, 27"
+  schedule_interval: 0 0 * * *
+  documentation:
+    dag_purpose: |
+      Ingests the property-dedup PostgreSQL database into the datalake (raw + clean) via CDC.
+      Debezium and Kafka Connect are provisioned outside this repository; this DAG reads landing data
+      from the S3 sink and materializes transactional, raw Delta, and clean tables.
+      Core tables: similar_property (candidate duplicate), duplicity_output (rules-engine outcome).
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  custom_schema: property_dedup
+  source_database: propertydedup
+  source_schema: public
+  default_partitions: [year, month, day]
+  dbutils_secret_key: PROPERTY_DEDUP_DB
+  tables_customization:
+    similar_property:
+      clean_table_name: similar_property
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    duplicity_output:
+      clean_table_name: duplicity_output
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+cluster:
+  type: databricks_16_4_min_memory_cluster
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
