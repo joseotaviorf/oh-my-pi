@@ -7,7 +7,7 @@ description: |
   `_7d` and `_28d` suffix — both windows are computed in a single SELECT over
   the same 28-day fact read, with 7d aggregates produced via `FILTER (WHERE
   in_7d_window)`. Reads exclusively from
-  dw_databricks_health.fact_databricks_task_run.
+  dw_databricks_health.fact_databricks_dag_run.
 
   Window choice rationale:
     - 7d  → "act this sprint". A regression yesterday shows up immediately;
@@ -52,7 +52,7 @@ owner: jose.rferreira@quintoandar.com.br
 columns:
   airflow_dag_id:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.airflow_dag_id
+      - dw_databricks_health.fact_databricks_dag_run.airflow_dag_id
     description: Airflow DAG identifier without the bietlejuice. prefix (e.g. enrich_ebdb_booking).
     dimension: True
   dt_window_end:
@@ -60,56 +60,56 @@ columns:
     dimension: True
   team_owner:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.team_owner
+      - dw_databricks_health.fact_databricks_dag_run.team_owner
     description: |
       Team or person responsible for the DAG, lifted from
-      fact_databricks_task_run.team_owner (originally the cluster `owner`
+      fact_databricks_dag_run.team_owner (originally the cluster `owner`
       tag). The headline cost-attribution dimension; group-by this column to
       answer "how much did Team X spend?".
     dimension: True
   cost_center:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_center
+      - dw_databricks_health.fact_databricks_dag_run.cost_center
     description: |
       Internal cost-center code (e.g. `c052`), lifted from
-      fact_databricks_task_run.cost_center. Currently uniform across
+      fact_databricks_dag_run.cost_center. Currently uniform across
       bietlejuice-managed workloads but exposed so finance dashboards can
       pivot on it without re-parsing custom_tags.
     dimension: True
   ecosystem:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.ecosystem
+      - dw_databricks_health.fact_databricks_dag_run.ecosystem
     description: |
       Logical ecosystem the DAG belongs to (always `data-engineering` for
       bietlejuice-managed clusters), lifted from
-      fact_databricks_task_run.ecosystem. Surfaced so cross-ecosystem
+      fact_databricks_dag_run.ecosystem. Surfaced so cross-ecosystem
       rollups (Databricks plus other compute platforms) can use a single
       dimension.
     dimension: True
   environment:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.environment
+      - dw_databricks_health.fact_databricks_dag_run.environment
     description: |
       Deployment environment of the cluster (prod, forno, staging), lifted
-      from fact_databricks_task_run.environment (originally the cluster
+      from fact_databricks_dag_run.environment (originally the cluster
       `environment` tag). Use to filter staging/forno costs from production
       totals or to identify expensive non-prod workloads. NULL for clusters
       without the tag.
     dimension: True
   provisioner:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.provisioner
+      - dw_databricks_health.fact_databricks_dag_run.provisioner
     description: |
       System that provisioned the cluster (bietlejuice, quintoml, wonka,
       customer-data-platform, databricks, etc.), lifted from
-      fact_databricks_task_run.provisioner (originally the cluster
+      fact_databricks_dag_run.provisioner (originally the cluster
       `provisioner` tag). Use to segment cost by orchestrator/platform.
       NULL for clusters without the tag (typically ad-hoc notebook jobs).
     dimension: True
 
   total_dag_runs_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.ts_run_started
+      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
     description: Approximate Airflow DAG executions in the 7-day window (distinct minute of ts_run_started).
     metric:
       name: Total DAG Runs (7d)
@@ -121,7 +121,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_dag_runs_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.ts_run_started
+      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
     description: Approximate Airflow DAG executions in the 28-day window (distinct minute of ts_run_started).
     metric:
       name: Total DAG Runs (28d)
@@ -133,7 +133,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_job_runs_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
+      - dw_databricks_health.fact_databricks_dag_run.n_databricks_job_runs
     description: Distinct Databricks job runs (id_databricks_run) in the 7-day window.
     metric:
       name: Total Job Runs (7d)
@@ -145,7 +145,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_job_runs_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
+      - dw_databricks_health.fact_databricks_dag_run.n_databricks_job_runs
     description: Distinct Databricks job runs in the 28-day window.
     metric:
       name: Total Job Runs (28d)
@@ -157,7 +157,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_task_runs_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.id_databricks_task_run
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
     description: Distinct count of Databricks task runs that started inside the 7-day window for this DAG.
     metric:
       name: Total Task Runs (7d)
@@ -169,7 +169,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_task_runs_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.id_databricks_task_run
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
     description: Distinct count of Databricks task runs that started inside the 28-day window for this DAG.
     metric:
       name: Total Task Runs (28d)
@@ -182,7 +182,7 @@ columns:
 
   total_dbu_consumed_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.dbu_consumed
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_consumed
     description: Sum of DBUs consumed by this DAG across the 7-day window. Inherits over-attribution caveat for shared clusters.
     metric:
       name: Total DBU Consumed (7d)
@@ -194,7 +194,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_dbu_consumed_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.dbu_consumed
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_consumed
     description: Sum of DBUs consumed by this DAG across the 28-day window. Inherits over-attribution caveat for shared clusters.
     metric:
       name: Total DBU Consumed (28d)
@@ -206,8 +206,8 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_dbu_cost_usd_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-    description: Sum of system-billing list DBU USD (cost_usd_estimate) in the 7-day window.
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+    description: Sum of system-billing list DBU USD (`total_dbu_cost_usd` rolled up to logical DAG runs) in the 7-day window.
     metric:
       name: Total DBU Cost USD (7d)
       description: Total estimated USD from Databricks list DBU price for this DAG over the trailing 7-day window.
@@ -218,7 +218,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_dbu_cost_usd_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
     description: Sum of system-billing list DBU USD in the 28-day window.
     metric:
       name: Total DBU Cost USD (28d)
@@ -251,8 +251,8 @@ columns:
 
   total_ec2_cost_calculated_usd_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
-    description: Sum of calculated EC2 USD deduped one row per (cluster, day) via is_first_task_of_cluster_day.
+      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
+    description: Sum of calculated EC2 USD at logical DAG-run grain (rolled up from task apportionment).
     metric:
       name: Total EC2 Cost Calculated USD (7d)
       description: EC2 from node_timeline × instancedetails pricing for the trailing 7-day window.
@@ -263,8 +263,8 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_ec2_cost_calculated_usd_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
-    description: Sum of calculated EC2 USD deduped per cluster-day.
+      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
+    description: Sum of calculated EC2 USD at logical DAG-run grain over the 28-day window.
     metric:
       name: Total EC2 Cost Calculated USD (28d)
       description: EC2 from node_timeline × instancedetails pricing for the trailing 28-day window.
@@ -275,7 +275,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   spot_hours_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.spot_hours
+      - dw_databricks_health.fact_databricks_dag_run.spot_hours
     description: Sum of Spot-priced instance-hours deduped once per cluster-day.
     metric:
       name: Spot Instance Hours (7d)
@@ -287,7 +287,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   spot_hours_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.spot_hours
+      - dw_databricks_health.fact_databricks_dag_run.spot_hours
     description: Sum of Spot-priced instance-hours deduped per cluster-day.
     metric:
       name: Spot Instance Hours (28d)
@@ -299,7 +299,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   on_demand_hours_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.on_demand_hours
+      - dw_databricks_health.fact_databricks_dag_run.on_demand_hours
     description: Sum of on-demand instance-hours deduped once per cluster-day.
     metric:
       name: On Demand Instance Hours (7d)
@@ -311,7 +311,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   on_demand_hours_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.on_demand_hours
+      - dw_databricks_health.fact_databricks_dag_run.on_demand_hours
     description: Sum of on-demand instance-hours deduped per cluster-day.
     metric:
       name: On Demand Instance Hours (28d)
@@ -323,8 +323,8 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_cost_usd_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
     description: SUM(system billing DBU USD) + SUM(deduped calculated EC2 USD per cluster-day).
     metric:
       name: Total Cost USD (7d)
@@ -336,8 +336,8 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_cost_usd_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
     description: SUM(system billing DBU USD) + SUM(deduped calculated EC2 USD per cluster-day).
     metric:
       name: Total Cost USD (28d)
@@ -370,8 +370,8 @@ columns:
 
   total_ec2_cost_overwatch_usd_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
-    description: Sum of Overwatch EC2 USD deduped one row per (cluster, day) via is_first_task_of_cluster_day.
+      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_overwatch_usd
+    description: Sum of Overwatch EC2 USD at logical DAG-run grain (rolled up from task apportionment).
     metric:
       name: Total EC2 Cost Overwatch USD (7d)
       description: EC2 portion from Overwatch daily_cluster_health for the trailing 7-day window.
@@ -382,8 +382,8 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_ec2_cost_overwatch_usd_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
-    description: Sum of Overwatch EC2 USD deduped per cluster-day.
+      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_overwatch_usd
+    description: Sum of Overwatch EC2 USD at logical DAG-run grain over the 28-day window.
     metric:
       name: Total EC2 Cost Overwatch USD (28d)
       description: EC2 portion from Overwatch for the trailing 28-day window.
@@ -394,7 +394,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_dbu_cost_overwatch_usd_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_dbu_cost_overwatch_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_overwatch_usd
     description: Legacy Overwatch DBU-only USD; summed once per cluster-day (deduped).
     metric:
       name: Total DBU Cost Overwatch USD (7d)
@@ -406,7 +406,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_dbu_cost_overwatch_usd_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_dbu_cost_overwatch_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_overwatch_usd
     description: Legacy Overwatch DBU-only USD; summed once per cluster-day (deduped).
     metric:
       name: Total DBU Cost Overwatch USD (28d)
@@ -418,7 +418,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_cost_overwatch_usd_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_cost_overwatch_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_cost_overwatch_usd
     description: Sum of legacy Overwatch total_cost_overwatch_usd (DBU + EC2 from Overwatch) deduped once per cluster-day.
     metric:
       name: Total Overwatch Cost USD (7d)
@@ -430,7 +430,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_cost_overwatch_usd_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_cost_overwatch_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_cost_overwatch_usd
     description: Sum of legacy Overwatch total_cost_overwatch_usd deduped once per cluster-day.
     metric:
       name: Total Overwatch Cost USD (28d)
@@ -443,7 +443,7 @@ columns:
 
   avg_total_duration_seconds_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
     description: Average total task duration (setup + execution + cleanup) across the 7-day window, in seconds.
     metric:
       name: Avg Total Duration (7d)
@@ -455,7 +455,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_total_duration_seconds_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
     description: Average total task duration (setup + execution + cleanup) across the 28-day window, in seconds.
     metric:
       name: Avg Total Duration (28d)
@@ -467,7 +467,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   p50_total_duration_seconds_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
     description: 50th percentile (median) of total_duration_seconds across the 7-day window. Computed via APPROX_PERCENTILE.
     metric:
       name: p50 Total Duration (7d)
@@ -479,7 +479,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   p50_total_duration_seconds_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
     description: 50th percentile (median) of total_duration_seconds across the 28-day window. Computed via APPROX_PERCENTILE.
     metric:
       name: p50 Total Duration (28d)
@@ -491,7 +491,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   p95_total_duration_seconds_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
     description: 95th percentile of total_duration_seconds across the 7-day window. Computed via APPROX_PERCENTILE.
     metric:
       name: p95 Total Duration (7d)
@@ -503,7 +503,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   p95_total_duration_seconds_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
     description: 95th percentile of total_duration_seconds across the 28-day window. Computed via APPROX_PERCENTILE.
     metric:
       name: p95 Total Duration (28d)
@@ -515,7 +515,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   p99_total_duration_seconds_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
     description: 99th percentile of total_duration_seconds across the 7-day window. Computed via APPROX_PERCENTILE.
     metric:
       name: p99 Total Duration (7d)
@@ -527,7 +527,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   p99_total_duration_seconds_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
     description: 99th percentile of total_duration_seconds across the 28-day window. Computed via APPROX_PERCENTILE.
     metric:
       name: p99 Total Duration (28d)
@@ -539,7 +539,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_execution_duration_seconds_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_execution_duration_seconds
     description: Average execution-only duration (excludes setup) across the 7-day window, in seconds.
     metric:
       name: Avg Execution Duration (7d)
@@ -551,7 +551,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_execution_duration_seconds_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_execution_duration_seconds
     description: Average execution-only duration (excludes setup) across the 28-day window, in seconds.
     metric:
       name: Avg Execution Duration (28d)
@@ -563,7 +563,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_setup_duration_seconds_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.setup_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_setup_duration_seconds
     description: Average cluster setup duration across the 7-day window, in seconds.
     metric:
       name: Avg Setup Duration (7d)
@@ -575,7 +575,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_setup_duration_seconds_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.setup_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_setup_duration_seconds
     description: Average cluster setup duration across the 28-day window, in seconds.
     metric:
       name: Avg Setup Duration (28d)
@@ -587,7 +587,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   p95_setup_duration_seconds_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.setup_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_setup_duration_seconds
     description: 95th percentile of setup_duration_seconds across the 7-day window. Computed via APPROX_PERCENTILE.
     metric:
       name: p95 Setup Duration (7d)
@@ -599,7 +599,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   p95_setup_duration_seconds_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.setup_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_setup_duration_seconds
     description: 95th percentile of setup_duration_seconds across the 28-day window. Computed via APPROX_PERCENTILE.
     metric:
       name: p95 Setup Duration (28d)
@@ -612,7 +612,7 @@ columns:
 
   p50_init_script_seconds_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.init_script_seconds
+      - dw_databricks_health.fact_databricks_dag_run.max_init_script_seconds
     description: |
       Median init-script execution duration (seconds) across the 7-day window. Source values
       are deduped at the (id_cluster, dt_task_started) grain (init scripts run once per
@@ -627,7 +627,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   p50_init_script_seconds_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.init_script_seconds
+      - dw_databricks_health.fact_databricks_dag_run.max_init_script_seconds
     description: |
       Median init-script execution duration (seconds) across the 28-day window. Same
       cluster-day dedupe pattern as the 7d variant.
@@ -641,7 +641,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   p95_init_script_seconds_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.init_script_seconds
+      - dw_databricks_health.fact_databricks_dag_run.max_init_script_seconds
     description: |
       95th percentile init-script execution duration (seconds) across the 7-day window.
       Cluster-day deduped, then APPROX_PERCENTILE. Spikes here indicate occasional slow
@@ -656,7 +656,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   p95_init_script_seconds_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.init_script_seconds
+      - dw_databricks_health.fact_databricks_dag_run.max_init_script_seconds
     description: |
       95th percentile init-script execution duration (seconds) across the 28-day window.
       Cluster-day deduped before computing the percentile.
@@ -670,7 +670,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_init_minutes_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.init_script_seconds
+      - dw_databricks_health.fact_databricks_dag_run.max_init_script_seconds
     description: |
       Total wall-clock minutes spent running init scripts across all cluster starts of this
       DAG in the 7-day window. Computed as `SUM(init_script_seconds_per_cluster_day) / 60`,
@@ -686,7 +686,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_init_minutes_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.init_script_seconds
+      - dw_databricks_health.fact_databricks_dag_run.max_init_script_seconds
     description: |
       Total minutes spent running init scripts across all cluster starts of this DAG in the
       28-day window. Cluster-day deduped before SUM, then divided by 60. Pair with
@@ -702,7 +702,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   p95_cluster_startup_seconds_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cluster_startup_seconds
+      - dw_databricks_health.fact_databricks_dag_run.max_cluster_startup_seconds
     description: |
       95th percentile of total cluster startup time (`pre_init + init + post_init`) across
       the 7-day window. Cluster-day deduped. Captures end-to-end startup latency including
@@ -717,7 +717,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   p95_cluster_startup_seconds_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cluster_startup_seconds
+      - dw_databricks_health.fact_databricks_dag_run.max_cluster_startup_seconds
     description: |
       95th percentile of total cluster startup time across the 28-day window.
       Cluster-day deduped before APPROX_PERCENTILE.
@@ -732,8 +732,8 @@ columns:
 
   failed_task_runs_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_failed
-    description: Count of task runs that ended with is_failed = TRUE in the 7-day window.
+      - dw_databricks_health.fact_databricks_dag_run.n_failed_task_runs
+    description: Count of failed task runs (`SUM(n_failed_task_runs)`) in the 7-day window.
     metric:
       name: Failed Task Runs (7d)
       description: Number of failed task executions in the trailing 7-day window.
@@ -744,8 +744,8 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   failed_task_runs_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_failed
-    description: Count of task runs that ended with is_failed = TRUE in the 28-day window.
+      - dw_databricks_health.fact_databricks_dag_run.n_failed_task_runs
+    description: Count of failed task runs (`SUM(n_failed_task_runs)`) in the 28-day window.
     metric:
       name: Failed Task Runs (28d)
       description: Number of failed task executions (excludes manual cancellations and timeouts unless flagged is_failed in the fact).
@@ -755,6 +755,9 @@ columns:
       hierarchy: Reliability
       approved_by: jose.rferreira@quintoandar.com.br
   error_rate_pct_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.n_failed_task_runs
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
     description: Failed task runs as a percentage of total task runs in the 7-day window. 0..100 scale, two decimal places.
     metric:
       name: Error Rate (7d)
@@ -765,6 +768,9 @@ columns:
       hierarchy: Reliability
       approved_by: jose.rferreira@quintoandar.com.br
   error_rate_pct_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.n_failed_task_runs
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
     description: Failed task runs as a percentage of total task runs in the 28-day window. 0..100 scale, two decimal places.
     metric:
       name: Error Rate (28d)
@@ -774,9 +780,57 @@ columns:
       business_stage: Platform Operations
       hierarchy: Reliability
       approved_by: jose.rferreira@quintoandar.com.br
+  failed_dag_runs_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_task_failed
+    description: Count of logical DAG runs where at least one task failed in the 7-day window.
+    metric:
+      name: Failed DAG Runs (7d)
+      description: Number of logical DAG executions with at least one failed task in the trailing 7-day window.
+      acronym: failed_dag_runs_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Reliability
+      approved_by: jose.rferreira@quintoandar.com.br
+  failed_dag_runs_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_task_failed
+    description: Count of logical DAG runs where at least one task failed in the 28-day window.
+    metric:
+      name: Failed DAG Runs (28d)
+      description: Number of logical DAG executions with at least one failed task in the trailing 28-day window.
+      acronym: failed_dag_runs_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Reliability
+      approved_by: jose.rferreira@quintoandar.com.br
+  failed_dag_run_rate_pct_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_task_failed
+    description: Percentage of logical DAG runs with at least one failed task in the 7-day window. 0..100 scale, two decimal places.
+    metric:
+      name: Failed DAG Run Rate (7d)
+      description: Run-level failure rate — fraction of logical DAG executions that had any failing task in the trailing 7-day window.
+      acronym: failed_dag_run_rate_pct_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Reliability
+      approved_by: jose.rferreira@quintoandar.com.br
+  failed_dag_run_rate_pct_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_task_failed
+    description: Percentage of logical DAG runs with at least one failed task in the 28-day window. 0..100 scale, two decimal places.
+    metric:
+      name: Failed DAG Run Rate (28d)
+      description: Run-level failure rate in the trailing 28-day window. Complements error_rate_pct (task-level) for a complete reliability picture.
+      acronym: failed_dag_run_rate_pct_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Reliability
+      approved_by: jose.rferreira@quintoandar.com.br
   cold_start_count_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_pool_acquisition_slow
+      - dw_databricks_health.fact_databricks_dag_run.n_pool_acquisition_slow_tasks
     description: Count of task runs flagged as slow pool acquisition (setup_duration_seconds > 90) in the 7-day window.
     metric:
       name: Cold Start Count (7d)
@@ -788,7 +842,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   cold_start_count_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_pool_acquisition_slow
+      - dw_databricks_health.fact_databricks_dag_run.n_pool_acquisition_slow_tasks
     description: Count of task runs flagged as slow pool acquisition (setup_duration_seconds > 90) in the 28-day window.
     metric:
       name: Cold Start Count (28d)
@@ -841,7 +895,7 @@ columns:
 
   avg_p95_driver_cpu_busy_percent_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_driver_cpu_busy_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_busy_percent
     description: Mean of per-task p95_driver_cpu_busy_percent across the 7-day window. 0..100 scale.
     metric:
       name: Avg p95 Driver CPU Busy (7d)
@@ -853,7 +907,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_p95_driver_cpu_busy_percent_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_driver_cpu_busy_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_busy_percent
     description: Mean of per-task p95_driver_cpu_busy_percent across the 28-day window. 0..100 scale.
     metric:
       name: Avg p95 Driver CPU Busy (28d)
@@ -865,7 +919,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_p95_worker_cpu_busy_percent_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_worker_cpu_busy_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_busy_percent
     description: Mean of per-task p95_worker_cpu_busy_percent across the 7-day window. 0..100 scale.
     metric:
       name: Avg p95 Worker CPU Busy (7d)
@@ -877,7 +931,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_p95_worker_cpu_busy_percent_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_worker_cpu_busy_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_busy_percent
     description: Mean of per-task p95_worker_cpu_busy_percent across the 28-day window. 0..100 scale.
     metric:
       name: Avg p95 Worker CPU Busy (28d)
@@ -889,7 +943,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_p95_driver_mem_used_percent_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_driver_mem_used_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_mem_used_percent
     description: Mean of per-task p95_driver_mem_used_percent across the 7-day window. 0..100 scale.
     metric:
       name: Avg p95 Driver Mem Used (7d)
@@ -901,7 +955,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_p95_driver_mem_used_percent_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_driver_mem_used_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_mem_used_percent
     description: Mean of per-task p95_driver_mem_used_percent across the 28-day window. 0..100 scale.
     metric:
       name: Avg p95 Driver Mem Used (28d)
@@ -913,7 +967,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_p95_worker_mem_used_percent_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_worker_mem_used_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_mem_used_percent
     description: Mean of per-task p95_worker_mem_used_percent across the 7-day window. 0..100 scale.
     metric:
       name: Avg p95 Worker Mem Used (7d)
@@ -925,7 +979,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_p95_worker_mem_used_percent_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_worker_mem_used_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_mem_used_percent
     description: Mean of per-task p95_worker_mem_used_percent across the 28-day window. 0..100 scale.
     metric:
       name: Avg p95 Worker Mem Used (28d)
@@ -937,7 +991,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_local_disk_utilization_pct_p95_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.local_disk_utilization_pct_p95
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_local_disk_utilization_pct_p95
     description: Mean of per-task local_disk_utilization_pct_p95 across the 7-day window (0..100; `/local_disk0` mount).
     metric:
       name: Avg p95 Local Disk Utilization (7d)
@@ -949,7 +1003,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_local_disk_utilization_pct_p95_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.local_disk_utilization_pct_p95
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_local_disk_utilization_pct_p95
     description: Mean of per-task local_disk_utilization_pct_p95 across the 28-day window.
     metric:
       name: Avg p95 Local Disk Utilization (28d)
@@ -962,7 +1016,7 @@ columns:
 
   total_disk_bytes_spilled_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_disk_bytes_spilled
+      - dw_databricks_health.fact_databricks_dag_run.total_disk_bytes_spilled
     description: Sum of total_disk_bytes_spilled across the 7-day window. Sourced from spark_stage_metrics (PR 23080).
     metric:
       name: Total Disk Spilled (7d)
@@ -974,7 +1028,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_disk_bytes_spilled_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_disk_bytes_spilled
+      - dw_databricks_health.fact_databricks_dag_run.total_disk_bytes_spilled
     description: Sum of total_disk_bytes_spilled across the 28-day window. Sourced from spark_stage_metrics (PR 23080).
     metric:
       name: Total Disk Spilled (28d)
@@ -986,7 +1040,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_memory_bytes_spilled_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_memory_bytes_spilled
+      - dw_databricks_health.fact_databricks_dag_run.total_memory_bytes_spilled
     description: Sum of total_memory_bytes_spilled across the 7-day window. Sourced from spark_stage_metrics (PR 23080).
     metric:
       name: Total Memory Spilled (7d)
@@ -998,7 +1052,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_memory_bytes_spilled_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_memory_bytes_spilled
+      - dw_databricks_health.fact_databricks_dag_run.total_memory_bytes_spilled
     description: Sum of total_memory_bytes_spilled across the 28-day window. Sourced from spark_stage_metrics (PR 23080).
     metric:
       name: Total Memory Spilled (28d)
@@ -1010,7 +1064,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   peak_execution_memory_bytes_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.max_peak_execution_memory_bytes
+      - dw_databricks_health.fact_databricks_dag_run.max_peak_execution_memory_bytes
     description: Maximum of per-task max_peak_execution_memory_bytes across the 7-day window. Sourced from spark_stage_metrics (PR 23080).
     metric:
       name: Peak Execution Memory (7d)
@@ -1022,7 +1076,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   peak_execution_memory_bytes_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.max_peak_execution_memory_bytes
+      - dw_databricks_health.fact_databricks_dag_run.max_peak_execution_memory_bytes
     description: Maximum of per-task max_peak_execution_memory_bytes across the 28-day window. Sourced from spark_stage_metrics (PR 23080).
     metric:
       name: Peak Execution Memory (28d)
@@ -1034,7 +1088,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   peak_jvm_heap_bytes_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.max_jvm_heap_bytes
+      - dw_databricks_health.fact_databricks_dag_run.max_jvm_heap_bytes
     description: Maximum executor JVM heap usage across all task runs in the 7-day window, in bytes. Sourced from spark_stage_metrics extended parser (PR 23080).
     metric:
       name: Peak JVM Heap (7d)
@@ -1046,7 +1100,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   peak_jvm_heap_bytes_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.max_jvm_heap_bytes
+      - dw_databricks_health.fact_databricks_dag_run.max_jvm_heap_bytes
     description: Maximum executor JVM heap usage across all task runs in the 28-day window, in bytes. Sourced from spark_stage_metrics extended parser (PR 23080); requires PR 23078.
     metric:
       name: Peak JVM Heap (28d)
@@ -1058,7 +1112,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_gc_time_ms_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_gc_time_ms
+      - dw_databricks_health.fact_databricks_dag_run.total_gc_time_ms
     description: Sum of total_gc_time_ms across the 7-day window. Sourced from spark_stage_metrics extended parser (PR 23080).
     metric:
       name: Total GC Time (7d)
@@ -1070,7 +1124,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_gc_time_ms_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_gc_time_ms
+      - dw_databricks_health.fact_databricks_dag_run.total_gc_time_ms
     description: Sum of total_gc_time_ms across the 28-day window. Sourced from spark_stage_metrics extended parser (PR 23080); requires PR 23078.
     metric:
       name: Total GC Time (28d)
@@ -1082,7 +1136,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   peak_task_skew_ratio_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.max_task_skew_ratio
+      - dw_databricks_health.fact_databricks_dag_run.max_task_skew_ratio
     description: Maximum task-skew ratio observed across all task runs in the 7-day window. Sourced from spark_stage_metrics extended parser (PR 23080).
     metric:
       name: Peak Task Skew Ratio (7d)
@@ -1094,7 +1148,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   peak_task_skew_ratio_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.max_task_skew_ratio
+      - dw_databricks_health.fact_databricks_dag_run.max_task_skew_ratio
     description: Maximum task-skew ratio observed across all task runs in the 28-day window. Sourced from spark_stage_metrics extended parser (PR 23080).
     metric:
       name: Peak Task Skew Ratio (28d)
@@ -1106,7 +1160,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_shuffle_bytes_read_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_shuffle_bytes_read
+      - dw_databricks_health.fact_databricks_dag_run.total_shuffle_bytes_read
     description: Sum of total_shuffle_bytes_read across the 7-day window (local + remote). Sourced from spark_stage_metrics (PR 23080).
     metric:
       name: Total Shuffle Bytes Read (7d)
@@ -1118,7 +1172,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_shuffle_bytes_read_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_shuffle_bytes_read
+      - dw_databricks_health.fact_databricks_dag_run.total_shuffle_bytes_read
     description: Sum of total_shuffle_bytes_read across the 28-day window (local + remote). Sourced from spark_stage_metrics (PR 23080).
     metric:
       name: Total Shuffle Bytes Read (28d)
@@ -1130,7 +1184,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_shuffle_bytes_written_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_shuffle_bytes_written
+      - dw_databricks_health.fact_databricks_dag_run.total_shuffle_bytes_written
     description: Sum of total_shuffle_bytes_written across the 7-day window. Sourced from spark_stage_metrics (PR 23080).
     metric:
       name: Total Shuffle Bytes Written (7d)
@@ -1142,7 +1196,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_shuffle_bytes_written_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_shuffle_bytes_written
+      - dw_databricks_health.fact_databricks_dag_run.total_shuffle_bytes_written
     description: Sum of total_shuffle_bytes_written across the 28-day window. Sourced from spark_stage_metrics (PR 23080).
     metric:
       name: Total Shuffle Bytes Written (28d)
@@ -1293,7 +1347,7 @@ columns:
 
   pct_task_runs_with_stage_data_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.has_stage_data
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs_with_stage_data
     description: Percentage of task runs in the 7-day window that have Spark event log stage metrics attached. 0..100 scale.
     metric:
       name: Stage Data Coverage (7d)
@@ -1305,7 +1359,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   pct_task_runs_with_stage_data_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.has_stage_data
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs_with_stage_data
     description: Percentage of task runs in the 28-day window that have Spark event log stage metrics attached. 0..100 scale.
     metric:
       name: Stage Data Coverage (28d)

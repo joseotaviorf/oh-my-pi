@@ -160,7 +160,7 @@ columns:
     description: |
       Total DBU cost in USD attributed to this cluster on `dt_cluster_run`, derived by
       Overwatch from cluster state transitions and the active DBU price list. Independent
-      cross-check against `dw_databricks_health.fact_databricks_task_run.cost_usd_estimate`,
+      cross-check against `dw_databricks_health.fact_databricks_task_run.total_dbu_cost_usd`,
       which derives cost from `system.billing.usage` × `system.billing.list_prices`.
       Material disagreements (>10%) usually point to Overwatch-vs-Lakeflow attribution
       drift on the underlying SKU.

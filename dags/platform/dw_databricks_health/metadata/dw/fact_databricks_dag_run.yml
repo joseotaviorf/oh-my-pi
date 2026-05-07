@@ -1,0 +1,242 @@
+---
+database_name: dw_databricks_health
+table_name: fact_databricks_dag_run
+description: |
+  Logical Airflow DAG execution grain rolled up from `fact_databricks_task_run`.
+  One row per (`id_databricks_workspace`, `airflow_dag_id`, minute bucket of `ts_run_started`).
+  Parallel Databricks job runs whose tasks share the same DAG id and the same
+  start-minute bucket collapse into one row; numeric measures sum and P95 utilisation
+  metrics are weighted by task `execution_duration_seconds`.
+
+  Downstream metric-layer DAG `metric_observability__dags` consumes this table for
+  `dag_health` and `dag_health_wow` (one logical run = one row here).
+
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+columns:
+  sk_databricks_dag_run:
+    description: Surrogate key — `xxhash64(id_databricks_workspace, airflow_dag_id, unix_ts(minute_bucket))`.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.id_databricks_workspace
+      - dw_databricks_health.fact_databricks_task_run.airflow_dag_id
+      - dw_databricks_health.fact_databricks_task_run.ts_run_started
+  id_databricks_workspace:
+    description: Databricks workspace identifier.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.id_databricks_workspace
+  airflow_dag_id:
+    description: Airflow DAG identifier (`tags['airflow_dag_id']` when present).
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.airflow_dag_id
+  ts_logical_run_started:
+    description: Minute bucket — `date_trunc('MINUTE', ts_run_started)` from task runs in the group.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.ts_run_started
+  sk_dag_run_started_date:
+    description: Date surrogate key (`yyyyMMdd`) for the logical run start date.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.dt_task_started
+  team_owner:
+    description: Governance tag — `FIRST` within the logical-run group.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.team_owner
+  cost_center:
+    description: Governance tag — `FIRST` within the logical-run group.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_center
+  ecosystem:
+    description: Governance tag — `FIRST` within the logical-run group.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.ecosystem
+  environment:
+    description: Governance tag — `FIRST` within the logical-run group.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.environment
+  provisioner:
+    description: Governance tag — `FIRST` within the logical-run group.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.provisioner
+  n_databricks_job_runs:
+    description: Distinct Databricks parent run ids (`COUNT(DISTINCT id_databricks_run)`) in this logical bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
+  n_task_runs:
+    description: Task-run rows rolled into this logical bucket (`COUNT(DISTINCT id_databricks_task_run)`).
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.id_databricks_task_run
+  n_failed_task_runs:
+    description: Count of task runs with `is_failed` in this logical bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_failed
+  n_task_runs_with_stage_data:
+    description: Count of task runs with Spark stage attribution (`has_stage_data`).
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.has_stage_data
+  total_dbu_consumed:
+    description: Sum of task-level `total_dbu_consumed` in the logical bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_dbu_consumed
+  total_dbu_cost_usd:
+    description: Sum of task-level `total_dbu_cost_usd` (list-rate USD) in the logical bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_dbu_cost_usd
+  total_ec2_cost_calculated_usd:
+    description: Sum of apportioned calculated EC2 USD for tasks in the logical bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
+  spot_hours:
+    description: Sum of apportioned Spot instance-hours across tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.spot_hours
+  on_demand_hours:
+    description: Sum of apportioned on-demand instance-hours across tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.on_demand_hours
+  total_ec2_cost_overwatch_usd:
+    description: Sum of apportioned Overwatch EC2 USD across tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
+  total_dbu_cost_overwatch_usd:
+    description: Sum of apportioned Overwatch DBU USD across tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_dbu_cost_overwatch_usd
+  total_cost_overwatch_usd:
+    description: Sum of apportioned Overwatch total USD across tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_cost_overwatch_usd
+  total_cost_usd:
+    description: Sum of task-level `total_cost_usd` (DBU list USD + apportioned calculated EC2) in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_cost_usd
+  total_wall_clock_seconds:
+    description: Wall span from earliest task start to latest task end in the bucket (`MAX(ts_task_ended) - MIN(ts_task_started)`).
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.ts_task_started
+      - dw_databricks_health.fact_databricks_task_run.ts_task_ended
+  total_execution_duration_seconds:
+    description: Sum of task execution durations in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
+  total_setup_duration_seconds:
+    description: Sum of task setup durations in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.setup_duration_seconds
+  max_init_script_seconds:
+    description: Maximum init-script seconds among tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.init_script_seconds
+  max_cluster_startup_seconds:
+    description: Maximum cluster startup seconds among tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cluster_startup_seconds
+  weighted_avg_p95_driver_cpu_busy_percent:
+    description: P95 driver CPU busy percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p95_driver_cpu_busy_percent
+      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
+  weighted_avg_p95_worker_cpu_busy_percent:
+    description: P95 worker CPU busy percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p95_worker_cpu_busy_percent
+      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
+  weighted_avg_p95_driver_mem_used_percent:
+    description: P95 driver memory used percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p95_driver_mem_used_percent
+      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
+  weighted_avg_p95_worker_mem_used_percent:
+    description: P95 worker memory used percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p95_worker_mem_used_percent
+      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
+  weighted_avg_local_disk_utilization_pct_p95:
+    description: Local disk utilisation P95 weighted by `execution_duration_seconds` across tasks.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.local_disk_utilization_pct_p95
+      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
+  is_any_task_failed:
+    description: True if any task in the bucket failed.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_failed
+  is_any_task_success:
+    description: True if any task in the bucket succeeded.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_success
+  n_pool_acquisition_slow_tasks:
+    description: Count of tasks flagged `is_pool_acquisition_slow` in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_pool_acquisition_slow
+  total_executor_run_time_ms:
+    description: Sum of executor run-time milliseconds across tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_executor_run_time_ms
+  total_disk_bytes_spilled:
+    description: Sum of disk bytes spilled across tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_disk_bytes_spilled
+  total_memory_bytes_spilled:
+    description: Sum of memory bytes spilled across tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_memory_bytes_spilled
+  total_input_bytes_read:
+    description: Sum of input bytes read across tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_input_bytes_read
+  max_peak_execution_memory_bytes:
+    description: Maximum peak execution memory among tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.max_peak_execution_memory_bytes
+  max_jvm_heap_bytes:
+    description: Maximum JVM heap bytes among tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.max_jvm_heap_bytes
+  total_gc_time_ms:
+    description: Sum of GC time milliseconds across tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_gc_time_ms
+  max_task_skew_ratio:
+    description: Maximum task skew ratio among tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.max_task_skew_ratio
+  total_shuffle_bytes_read:
+    description: Sum of shuffle bytes read across tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_shuffle_bytes_read
+  total_shuffle_bytes_written:
+    description: Sum of shuffle bytes written across tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_shuffle_bytes_written
+  pricing_sku:
+    description: Dominant SKU label — `FIRST` within the logical-run group.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.pricing_sku
+  dbu_rate_usd:
+    description: Dominant list USD-per-DBU — `FIRST` within the logical-run group.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.dbu_rate_usd
+  dt_dag_run_started:
+    description: Calendar date of the logical run start (minute bucket date).
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.dt_task_started
+  ts_run_started_min:
+    description: Earliest `ts_run_started` among tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.ts_run_started
+  ts_run_ended_max:
+    description: Latest `ts_run_ended` among tasks in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.ts_run_ended
+  ts_load:
+    description: Pipeline load timestamp.
+  year:
+    description: Partition — year of `dt_dag_run_started`.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.dt_task_started
+  month:
+    description: Partition — month of `dt_dag_run_started`.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.dt_task_started
+  day:
+    description: Partition — day of `dt_dag_run_started`.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.dt_task_started

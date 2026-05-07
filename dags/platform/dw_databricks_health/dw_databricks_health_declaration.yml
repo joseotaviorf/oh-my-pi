@@ -37,8 +37,16 @@ workflow:
   custom_schema: databricks_health
   default_extraction_type: incremental
   has_hive_sync: true
+  inner_dependencies:
+    fact_databricks_dag_run:
+      - fact_databricks_task_run
   tables_customization:
     fact_databricks_task_run:
+      partitions: [ year, month, day ]
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+    fact_databricks_dag_run:
       partitions: [ year, month, day ]
       table_privileges:
         data-platform-engineers:

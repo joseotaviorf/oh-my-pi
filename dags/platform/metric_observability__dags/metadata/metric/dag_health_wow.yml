@@ -7,7 +7,7 @@ description: |
   columns: `_current_7d` (trailing 7 days ending on dt_window_end),
   `_previous_7d` (the 7 days immediately before that), and `_change_pct`
   ((current − previous) / NULLIF(previous, 0) × 100). Reads exclusively from
-  dw_databricks_health.fact_databricks_task_run over a 14-calendar-day slice.
+  dw_databricks_health.fact_databricks_dag_run over a 14-calendar-day slice.
 
   Use this table to see whether a cluster-spec or pipeline change from the last
   sprint moved cost, utilization, duration, or reliability relative to the week
@@ -18,7 +18,7 @@ owner: jose.rferreira@quintoandar.com.br
 columns:
   airflow_dag_id:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.airflow_dag_id
+      - dw_databricks_health.fact_databricks_dag_run.airflow_dag_id
     description: Airflow / workload identifier (COALESCE chain on the fact).
     dimension: True
   dt_window_end:
@@ -26,33 +26,33 @@ columns:
     dimension: True
   team_owner:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.team_owner
+      - dw_databricks_health.fact_databricks_dag_run.team_owner
     description: Cluster `owner` tag when present.
     dimension: True
   cost_center:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_center
+      - dw_databricks_health.fact_databricks_dag_run.cost_center
     description: Cluster `cost-center` tag when present.
     dimension: True
   ecosystem:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.ecosystem
+      - dw_databricks_health.fact_databricks_dag_run.ecosystem
     description: Cluster `ecosystem` tag when present.
     dimension: True
   environment:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.environment
+      - dw_databricks_health.fact_databricks_dag_run.environment
     description: Cluster `environment` tag when present.
     dimension: True
   provisioner:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.provisioner
+      - dw_databricks_health.fact_databricks_dag_run.provisioner
     description: Cluster `provisioner` tag when present.
     dimension: True
 
   total_dag_runs_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.ts_run_started
+      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
     description: Distinct minute buckets of parent run start (`date_trunc('MINUTE', ts_run_started)`) in the current window.
     metric:
       name: Total DAG Runs Current 7d
@@ -64,7 +64,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_dag_runs_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.ts_run_started
+      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
     description: Distinct minute buckets of parent run start in the previous window.
     metric:
       name: Total DAG Runs Previous 7d
@@ -87,7 +87,7 @@ columns:
 
   total_job_runs_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
+      - dw_databricks_health.fact_databricks_dag_run.n_databricks_job_runs
     description: Count of distinct Databricks job runs (`id_databricks_run`) in the current window.
     metric:
       name: Total Job Runs Current 7d
@@ -99,7 +99,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_job_runs_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
+      - dw_databricks_health.fact_databricks_dag_run.n_databricks_job_runs
     description: Count of distinct Databricks job runs in the previous window.
     metric:
       name: Total Job Runs Previous 7d
@@ -122,7 +122,7 @@ columns:
 
   total_task_runs_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.id_databricks_task_run
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
     description: Count of distinct task runs in the current window.
     metric:
       name: Total Task Runs Current 7d
@@ -134,7 +134,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_task_runs_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.id_databricks_task_run
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
     description: Count of distinct task runs in the previous window.
     metric:
       name: Total Task Runs Previous 7d
@@ -157,8 +157,8 @@ columns:
 
   total_dbu_consumed_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.dbu_consumed
-    description: Sum of `dbu_consumed` in the current 7-day window.
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_consumed
+    description: Sum of logical-roll-up `total_dbu_consumed` in the current 7-day window.
     metric:
       name: Total DBU Consumed Current 7d
       description: Total DBUs in the trailing 7-day window ending on dt_window_end.
@@ -169,8 +169,8 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_dbu_consumed_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.dbu_consumed
-    description: Sum of `dbu_consumed` in the previous 7-day window.
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_consumed
+    description: Sum of logical-roll-up `total_dbu_consumed` in the previous 7-day window.
     metric:
       name: Total DBU Consumed Previous 7d
       description: Total DBUs in the 7 days immediately before the current window.
@@ -192,8 +192,8 @@ columns:
 
   total_dbu_cost_usd_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-    description: Sum of `cost_usd_estimate` (system billing list USD) in the current window.
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+    description: Sum of `total_dbu_cost_usd` (system billing list USD) in the current window.
     metric:
       name: Total DBU Cost USD Current 7d
       description: System-tables list USD cost in the trailing 7-day window.
@@ -204,8 +204,8 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_dbu_cost_usd_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-    description: Sum of `cost_usd_estimate` in the previous window.
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+    description: Sum of `total_dbu_cost_usd` in the previous window.
     metric:
       name: Total DBU Cost USD Previous 7d
       description: System-tables list USD cost in the prior 7-day window.
@@ -227,8 +227,8 @@ columns:
 
   total_ec2_cost_calculated_usd_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
-    description: Sum of calculated EC2 USD deduped one row per (cluster, day) via is_first_task_of_cluster_day.
+      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
+    description: Sum of calculated EC2 USD at logical DAG-run grain (rolled up from task apportionment).
     metric:
       name: Total EC2 Cost Calculated USD Current 7d
       description: Calculated EC2 for the trailing 7-day window.
@@ -239,7 +239,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_ec2_cost_calculated_usd_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
     description: Sum of deduped calculated EC2 USD in the previous window.
     metric:
       name: Total EC2 Cost Calculated USD Previous 7d
@@ -262,7 +262,7 @@ columns:
 
   spot_hours_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.spot_hours
+      - dw_databricks_health.fact_databricks_dag_run.spot_hours
     description: Sum of Spot instance-hours deduped per cluster-day in the current window.
     metric:
       name: Spot Hours Current 7d
@@ -274,7 +274,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   spot_hours_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.spot_hours
+      - dw_databricks_health.fact_databricks_dag_run.spot_hours
     description: Sum of Spot instance-hours in the previous window.
     metric:
       name: Spot Hours Previous 7d
@@ -297,7 +297,7 @@ columns:
 
   on_demand_hours_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.on_demand_hours
+      - dw_databricks_health.fact_databricks_dag_run.on_demand_hours
     description: Sum of on-demand instance-hours deduped per cluster-day in the current window.
     metric:
       name: On Demand Hours Current 7d
@@ -309,7 +309,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   on_demand_hours_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.on_demand_hours
+      - dw_databricks_health.fact_databricks_dag_run.on_demand_hours
     description: Sum of on-demand instance-hours in the previous window.
     metric:
       name: On Demand Hours Previous 7d
@@ -332,8 +332,8 @@ columns:
 
   total_cost_usd_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
     description: SUM(system billing DBU USD) + SUM(deduped calculated EC2 USD per cluster-day).
     metric:
       name: Total Cost USD Current 7d
@@ -345,8 +345,8 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_cost_usd_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
     description: Same total-cost definition for the prior 7-day window.
     metric:
       name: Total Cost USD Previous 7d
@@ -369,9 +369,9 @@ columns:
 
   avg_dbu_cost_usd_per_dag_run_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-      - dw_databricks_health.fact_databricks_task_run.ts_run_started
-    description: Mean `cost_usd_estimate` per distinct DAG-run minute bucket in the current window.
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
+    description: Mean `total_dbu_cost_usd` per logical DAG run (minute bucket) in the current window.
     metric:
       name: Avg DBU Cost USD per DAG Run Current 7d
       description: Mean system-tables list USD per approximate DAG execution (total_dbu_cost_usd / total_dag_runs).
@@ -382,9 +382,9 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_dbu_cost_usd_per_dag_run_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-      - dw_databricks_health.fact_databricks_task_run.ts_run_started
-    description: Mean `cost_usd_estimate` per distinct DAG-run minute bucket in the previous window.
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
+    description: Mean `total_dbu_cost_usd` per logical DAG run (minute bucket) in the previous window.
     metric:
       name: Avg DBU Cost USD per DAG Run Previous 7d
       description: Mean system-tables USD per approximate DAG execution in the prior 7-day window.
@@ -437,10 +437,10 @@ columns:
 
   cost_efficiency_usd_per_executor_second_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-      - dw_databricks_health.fact_databricks_task_run.total_executor_run_time_ms
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_executor_run_time_ms
     description: |
-      Sum(`cost_usd_estimate`) / (sum(`total_executor_run_time_ms`) / 1000) for the current window.
+      Sum(`total_dbu_cost_usd`) / (sum(`total_executor_run_time_ms`) / 1000) for the current window.
       Same definition as `dag_health.cost_efficiency_usd_per_executor_second_*`.
     metric:
       name: Cost Efficiency USD per Executor Second Current 7d
@@ -452,8 +452,8 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   cost_efficiency_usd_per_executor_second_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-      - dw_databricks_health.fact_databricks_task_run.total_executor_run_time_ms
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_executor_run_time_ms
     description: Cost efficiency USD per executor-second for the previous window.
     metric:
       name: Cost Efficiency USD per Executor Second Previous 7d
@@ -476,8 +476,8 @@ columns:
 
   total_ec2_cost_overwatch_usd_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
-    description: Sum of Overwatch EC2 USD deduped one row per (cluster, day) via is_first_task_of_cluster_day.
+      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_overwatch_usd
+    description: Sum of Overwatch EC2 USD rolled up to logical DAG-run grain (from task apportionment).
     metric:
       name: Total EC2 Cost Overwatch USD Current 7d
       description: EC2 portion from Overwatch for the trailing 7-day window (legacy cross-check).
@@ -488,7 +488,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_ec2_cost_overwatch_usd_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_overwatch_usd
     description: Sum of deduped Overwatch EC2 USD in the previous window.
     metric:
       name: Total EC2 Cost Overwatch USD Previous 7d
@@ -511,7 +511,7 @@ columns:
 
   total_dbu_cost_overwatch_usd_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_dbu_cost_overwatch_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_overwatch_usd
     description: Legacy Overwatch DBU-only USD; summed once per cluster-day (deduped).
     metric:
       name: Total DBU Cost Overwatch USD Current 7d
@@ -523,7 +523,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_dbu_cost_overwatch_usd_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_dbu_cost_overwatch_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_overwatch_usd
     description: Legacy Overwatch DBU-only USD; summed once per cluster-day (deduped).
     metric:
       name: Total DBU Cost Overwatch USD Previous 7d
@@ -546,7 +546,7 @@ columns:
 
   total_cost_overwatch_usd_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_cost_overwatch_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_cost_overwatch_usd
     description: Sum of legacy Overwatch total_cost_overwatch_usd (DBU + EC2 from Overwatch) deduped once per cluster-day.
     metric:
       name: Total Overwatch Cost USD Current 7d
@@ -558,7 +558,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   total_cost_overwatch_usd_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_cost_overwatch_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_cost_overwatch_usd
     description: Sum of legacy Overwatch total_cost_overwatch_usd deduped once per cluster-day.
     metric:
       name: Total Overwatch Cost USD Previous 7d
@@ -581,7 +581,7 @@ columns:
 
   avg_p95_worker_cpu_busy_percent_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_worker_cpu_busy_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_busy_percent
     description: Mean of per-task `p95_worker_cpu_busy_percent` in the current window.
     metric:
       name: Avg P95 Worker CPU Busy Current 7d
@@ -593,7 +593,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_p95_worker_cpu_busy_percent_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_worker_cpu_busy_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_busy_percent
     description: Mean of `p95_worker_cpu_busy_percent` in the previous window.
     metric:
       name: Avg P95 Worker CPU Busy Previous 7d
@@ -616,7 +616,7 @@ columns:
 
   avg_p95_driver_cpu_busy_percent_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_driver_cpu_busy_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_busy_percent
     description: Mean of `p95_driver_cpu_busy_percent` in the current window.
     metric:
       name: Avg P95 Driver CPU Busy Current 7d
@@ -628,7 +628,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_p95_driver_cpu_busy_percent_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_driver_cpu_busy_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_busy_percent
     description: Mean of `p95_driver_cpu_busy_percent` in the previous window.
     metric:
       name: Avg P95 Driver CPU Busy Previous 7d
@@ -651,7 +651,7 @@ columns:
 
   avg_p95_worker_mem_used_percent_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_worker_mem_used_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_mem_used_percent
     description: Mean of `p95_worker_mem_used_percent` in the current window.
     metric:
       name: Avg P95 Worker Mem Used Current 7d
@@ -663,7 +663,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_p95_worker_mem_used_percent_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_worker_mem_used_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_mem_used_percent
     description: Mean of `p95_worker_mem_used_percent` in the previous window.
     metric:
       name: Avg P95 Worker Mem Used Previous 7d
@@ -686,7 +686,7 @@ columns:
 
   avg_p95_driver_mem_used_percent_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_driver_mem_used_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_mem_used_percent
     description: Mean of `p95_driver_mem_used_percent` in the current window.
     metric:
       name: Avg P95 Driver Mem Used Current 7d
@@ -698,7 +698,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_p95_driver_mem_used_percent_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_driver_mem_used_percent
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_mem_used_percent
     description: Mean of `p95_driver_mem_used_percent` in the previous window.
     metric:
       name: Avg P95 Driver Mem Used Previous 7d
@@ -719,9 +719,46 @@ columns:
       hierarchy: Cluster utilization
       approved_by: jose.rferreira@quintoandar.com.br
 
+  avg_local_disk_utilization_pct_p95_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_local_disk_utilization_pct_p95
+      - dw_databricks_health.fact_databricks_dag_run.total_execution_duration_seconds
+    description: Execution-time-weighted mean of `local_disk_utilization_pct_p95` in the current window.
+    metric:
+      name: Avg P95 Local Disk Utilization Current 7d
+      description: Duration-weighted average of per-run P95 local disk utilisation in the trailing 7-day window.
+      acronym: avg_p95_local_disk_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_local_disk_utilization_pct_p95_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_local_disk_utilization_pct_p95
+      - dw_databricks_health.fact_databricks_dag_run.total_execution_duration_seconds
+    description: Execution-time-weighted mean of `local_disk_utilization_pct_p95` in the previous window.
+    metric:
+      name: Avg P95 Local Disk Utilization Previous 7d
+      description: Duration-weighted average of per-run P95 local disk utilisation in the prior 7-day window.
+      acronym: avg_p95_local_disk_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_local_disk_utilization_pct_p95_change_pct:
+    description: Relative percent change in average P95 local disk utilisation vs prior week.
+    metric:
+      name: Avg P95 Local Disk Utilization WoW Change Pct
+      description: Week-over-week percent change in mean P95 local disk utilisation.
+      acronym: avg_p95_local_disk_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+
   avg_total_duration_seconds_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
     description: Mean `total_duration_seconds` in the current window.
     metric:
       name: Avg Total Duration Seconds Current 7d
@@ -733,7 +770,7 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   avg_total_duration_seconds_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_duration_seconds
+      - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
     description: Mean `total_duration_seconds` in the previous window.
     metric:
       name: Avg Total Duration Seconds Previous 7d
@@ -756,7 +793,8 @@ columns:
 
   error_rate_pct_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_failed
+      - dw_databricks_health.fact_databricks_dag_run.n_failed_task_runs
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
     description: Share of task runs with `is_failed` in the current window (0–100).
     metric:
       name: Error Rate Pct Current 7d
@@ -768,7 +806,8 @@ columns:
       approved_by: jose.rferreira@quintoandar.com.br
   error_rate_pct_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_failed
+      - dw_databricks_health.fact_databricks_dag_run.n_failed_task_runs
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
     description: Share of task runs failed in the previous window.
     metric:
       name: Error Rate Pct Previous 7d
@@ -784,6 +823,41 @@ columns:
       name: Error Rate WoW Change Pct
       description: Relative change in error rate vs the prior week.
       acronym: err_rate_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Reliability
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  failed_dag_run_rate_pct_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_task_failed
+    description: Percentage of logical DAG runs with at least one failed task in the current window. 0..100 scale.
+    metric:
+      name: Failed DAG Run Rate Current 7d
+      description: Run-level failure rate in the trailing 7-day window. Complements the task-level error_rate_pct.
+      acronym: failed_dag_run_rate_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Reliability
+      approved_by: jose.rferreira@quintoandar.com.br
+  failed_dag_run_rate_pct_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_task_failed
+    description: Percentage of logical DAG runs with at least one failed task in the previous window. 0..100 scale.
+    metric:
+      name: Failed DAG Run Rate Previous 7d
+      description: Run-level failure rate in the prior 7-day window.
+      acronym: failed_dag_run_rate_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Reliability
+      approved_by: jose.rferreira@quintoandar.com.br
+  failed_dag_run_rate_pct_change_pct:
+    description: Percent change in run-level failure rate vs prior week ((curr − prev) / prev × 100).
+    metric:
+      name: Failed DAG Run Rate WoW Change Pct
+      description: Week-over-week relative change in run-level failure rate.
+      acronym: failed_dag_run_rate_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Reliability

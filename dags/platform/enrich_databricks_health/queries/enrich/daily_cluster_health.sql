@@ -343,7 +343,7 @@ SELECT
     ROUND(nm.nvme_utilization_pct_p95, 2)                                                     AS nvme_utilization_pct_p95,
     cw.num_node_observations,
     -- Overwatch-derived total cost in USD per cluster-day; cross-check second source
-    -- to the system-tables-derived `cost_usd_estimate` in dw_databricks_health.fact.
+    -- to the system-tables-derived `total_dbu_cost_usd` in dw_databricks_health.fact.
     ROUND(cl.total_dbu_cost_overwatch_usd, 4)                                                 AS total_dbu_cost_overwatch_usd,
     ROUND(cl.total_ec2_cost_overwatch_usd, 4)                                                 AS total_ec2_cost_overwatch_usd,
     ROUND(nhc.total_ec2_cost_calculated_usd, 4)                                               AS total_ec2_cost_calculated_usd,

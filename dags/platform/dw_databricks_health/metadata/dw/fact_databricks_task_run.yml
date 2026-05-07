@@ -30,7 +30,7 @@ description: |
   in USD per DBU, AWS cloud) joined on sku_name + valid time window on each
   usage row. `pricing_sku` and `dbu_rate_usd` reflect the dominant SKU by DBU
   volume on the cluster for the window. pricing_sku and dbu_rate_usd are
-  exposed alongside cost_usd_estimate so consumers can audit the conversion or
+  exposed alongside total_dbu_cost_usd so consumers can audit the conversion or
   apply their own currency conversion (e.g. BRL via the QuintoAndar finance FX
   rate). No Graviton or instance-pool discount applies to DBUs (validated in
   bietlejuice/spark_debugging/mcp_a4_dbu_list_prices.sql); cost savings on
@@ -212,7 +212,7 @@ columns:
     description: Wall-clock duration of the task in seconds (`ts_task_ended - ts_task_started`). Includes setup + execution.
   execution_duration_seconds:
     description: Useful execution time (`total_duration_seconds - setup_duration_seconds`). What the task spent doing actual work, excluding cluster cold-start.
-  dbu_consumed:
+  total_dbu_consumed:
     description: |
       DBUs allocated to this task run — cluster total DBU for the load window
       (from `system.billing.usage`, scoped to clusters in Lakeflow for this run)
@@ -222,10 +222,10 @@ columns:
     lineage:
       - system.billing.usage.usage_quantity
       - system.billing.usage.usage_metadata
-  cost_usd_estimate:
+  total_dbu_cost_usd:
     description: |
-      Estimated USD for this task run — cluster total (`SUM(usage_quantity × list
-      price)` per usage row) multiplied by the same duration share as `dbu_consumed`.
+      Estimated USD for DBUs on this task run — cluster total (`SUM(usage_quantity × list
+      price)` per usage row) multiplied by the same duration share as `total_dbu_consumed`.
       Uses list price (no enterprise / promotional discount). NULL rate components
       are treated as zero on each usage row before summing.
     lineage:
@@ -241,7 +241,7 @@ columns:
     description: |
       Dominant Databricks SKU on the cluster for the load window (SKU with the
       largest summed `usage_quantity` among DBU rows for that cluster). Used with
-      `dbu_rate_usd` for audit; the task-level `dbu_consumed` / `cost_usd_estimate`
+      `dbu_rate_usd` for audit; the task-level `total_dbu_consumed` / `total_dbu_cost_usd`
       can still blend multiple SKUs at the cluster aggregate before pro-rating.
     lineage:
       - system.billing.usage.sku_name
@@ -250,49 +250,51 @@ columns:
       Cluster-day EC2 USD estimated from `system.compute.node_timeline` wall-clock
       hours per node × `overwatch.instancedetails.On_Demand_Cost_Hourly` by instance
       API name. Spot clusters (`aws_attributes.availability` contains SPOT): hourly
-      rate multiplied by 0.37 vs on-demand. Same cluster-day on every task row —
-      dedupe before SUM at DAG grain.
+      rate multiplied by 0.37 vs on-demand. Apportioned to this task by the same
+      duration share as DBU (`task_weight`); SUM across tasks on a cluster equals the
+      cluster-day total.
     lineage:
       - datalake_databricks_health.daily_cluster_health.total_ec2_cost_calculated_usd
   spot_hours:
     description: |
       Sum of driver + worker node-hours on the cluster-day counted as Spot pricing
-      (availability contains SPOT). Instance-hours, not cluster-hours.
+      (availability contains SPOT), apportioned to this task by duration share.
+      Instance-hours, not cluster-hours.
     lineage:
       - datalake_databricks_health.daily_cluster_health.spot_hours
   on_demand_hours:
     description: |
       Sum of driver + worker node-hours on the cluster-day counted as on-demand
-      pricing (non-Spot or NULL availability). Instance-hours.
+      pricing (non-Spot or NULL availability), apportioned to this task by duration share.
+      Instance-hours.
     lineage:
       - datalake_databricks_health.daily_cluster_health.on_demand_hours
   total_ec2_cost_overwatch_usd:
     description: |
-      Cluster-day total EC2 / instance compute cost in USD from Overwatch. Useful for
-      "true cost" views (DBU + AWS infrastructure); system tables only expose DBU
-      SKUs, not the underlying EC2 pricing. Same cluster-day dedupe caveat applies.
+      Cluster-day total EC2 / instance compute cost in USD from Overwatch, apportioned
+      to this task by duration share. Useful for cross-checks vs calculated EC2.
     lineage:
       - datalake_databricks_health.daily_cluster_health.total_ec2_cost_overwatch_usd
   total_dbu_cost_overwatch_usd:
     description: |
-      Cluster-day total DBU cost in USD from Overwatch (`overwatch.clusterstatefact`).
-      Independent cross-check of the system-tables-derived `cost_usd_estimate` trail —
+      Cluster-day total DBU cost in USD from Overwatch (`overwatch.clusterstatefact`),
+      apportioned to this task by duration share.
+      Independent cross-check of the system-tables-derived `total_dbu_cost_usd` trail —
       material disagreement (>10%) usually indicates Overwatch-vs-Lakeflow attribution
-      drift on the underlying SKU. Same cluster-day dedupe caveat as the
-      `*_script_seconds` columns.
+      drift on the underlying SKU.
     lineage:
       - datalake_databricks_health.daily_cluster_health.total_dbu_cost_overwatch_usd
   total_cost_overwatch_usd:
     description: |
       Sum of Overwatch cluster-day DBU USD and EC2 USD (`total_dbu_cost_overwatch_usd`
-      + `total_ec2_cost_overwatch_usd`). Full Overwatch cost trail for cross-checks.
+      + `total_ec2_cost_overwatch_usd`), both apportioned to this task by duration share.
     lineage:
       - datalake_databricks_health.daily_cluster_health.total_dbu_cost_overwatch_usd
       - datalake_databricks_health.daily_cluster_health.total_ec2_cost_overwatch_usd
   total_cost_usd:
     description: |
-      Estimated total USD for this task run: system-tables DBU (`cost_usd_estimate`)
-      plus cluster-day calculated EC2 (`total_ec2_cost_calculated_usd`). Uses
+      Estimated total USD for this task run: system-tables DBU USD (`total_dbu_cost_usd`)
+      plus apportioned calculated EC2 (`total_ec2_cost_calculated_usd`). Uses
       calculated EC2 so all workspaces are covered; Overwatch-only EC2 remains in
       `total_ec2_cost_overwatch_usd` for cross-check where Overwatch ingests the workspace.
     lineage:

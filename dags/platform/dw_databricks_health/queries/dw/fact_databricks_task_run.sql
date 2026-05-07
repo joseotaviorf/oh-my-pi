@@ -262,7 +262,7 @@ billing_per_task AS (
                         THEN 1.0 / CAST(tpc.n_tasks AS DOUBLE)
                     ELSE CAST(1 AS DOUBLE)
                 END
-            )                                              AS dbu_consumed,
+            )                                              AS total_dbu_consumed,
         COALESCE(CAST(bc.cost_usd_estimate AS DOUBLE), CAST(0 AS DOUBLE))
             * (
                 CASE
@@ -272,7 +272,7 @@ billing_per_task AS (
                         THEN 1.0 / CAST(tpc.n_tasks AS DOUBLE)
                     ELSE CAST(1 AS DOUBLE)
                 END
-            )                                              AS cost_usd_estimate,
+            )                                              AS total_dbu_cost_usd,
         (
             CASE
                 WHEN COALESCE(cts.cluster_total_seconds, CAST(0 AS BIGINT)) > CAST(0 AS BIGINT)
@@ -542,9 +542,9 @@ SELECT
     dch.nvme_utilization_pct_p95                                    AS local_disk_utilization_pct_p95,
 
     -- Cost (DBU — system tables list price).
-    CAST(ROUND(COALESCE(b.dbu_consumed, 0), 4) AS DECIMAL(25, 4))   AS dbu_consumed,
-    CAST(ROUND(COALESCE(b.cost_usd_estimate, 0), 4) AS DECIMAL(37, 4))
-                                                                   AS cost_usd_estimate,
+    CAST(ROUND(COALESCE(b.total_dbu_consumed, 0), 4) AS DECIMAL(25, 4))   AS total_dbu_consumed,
+    CAST(ROUND(COALESCE(b.total_dbu_cost_usd, 0), 4) AS DECIMAL(37, 4))
+                                                                   AS total_dbu_cost_usd,
     b.dbu_rate_usd,
     b.pricing_sku,
     CAST(ROUND(COALESCE(dch.total_ec2_cost_calculated_usd, 0) * COALESCE(b.task_weight, 1.0), 4) AS DECIMAL(38, 4))
@@ -564,10 +564,10 @@ SELECT
             4
         ) AS DECIMAL(38, 4)
     )                                                              AS total_cost_overwatch_usd,
-    -- System-tables DBU USD (cost_usd_estimate) + calculated EC2 (node_timeline × instancedetails).
+    -- System-tables DBU USD (total_dbu_cost_usd) + calculated EC2 (node_timeline × instancedetails).
     CAST(
         ROUND(
-            COALESCE(CAST(b.cost_usd_estimate AS DOUBLE), CAST(0 AS DOUBLE))
+            COALESCE(CAST(b.total_dbu_cost_usd AS DOUBLE), CAST(0 AS DOUBLE))
             + (COALESCE(CAST(dch.total_ec2_cost_calculated_usd AS DOUBLE), CAST(0 AS DOUBLE)) * COALESCE(b.task_weight, 1.0)),
             4
         ) AS DECIMAL(38, 4)
