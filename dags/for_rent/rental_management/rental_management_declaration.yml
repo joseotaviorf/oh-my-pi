@@ -48,6 +48,9 @@ workflow:
       transactional_datatype_overrides:
         previous_adm_fee: "DECIMAL(38, 10)"
         new_adm_fee: "DECIMAL(38, 10)"
+    non_payment_report: {}
+    attachment: {}
+    non_payment_report_attachment: {}
     managed_rental: {}
     managed_rental_users: {}
     managed_rental_users_invitation: {}

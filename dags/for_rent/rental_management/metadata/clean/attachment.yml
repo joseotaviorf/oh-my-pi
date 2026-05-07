@@ -1,0 +1,40 @@
+---
+database_name: datalake_rental_management_clean
+table_name: attachment
+description: |
+  File attachments stored via Blob Vault. Each attachment is linked to a non-payment report through
+  the non_payment_report_attachment join table. Tracks commitment status of uploaded files.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    description: Primary key identifier of the attachment.
+    lineage:
+      - datalake_rental_management_raw.attachment.id
+  uuid_blob_vault:
+    description: Unique Blob Vault identifier for the stored file.
+    lineage:
+      - datalake_rental_management_raw.attachment.blob_vault_id
+  password:
+    description: Optional password required to open the attached file. Nullable.
+    lineage:
+      - datalake_rental_management_raw.attachment.password
+  status:
+    description: Lifecycle status of the attachment.
+    categories:
+      CREATED: Attachment has been created but not yet committed.
+      COMMITTED: Attachment has been committed and is ready for use.
+    lineage:
+      - datalake_rental_management_raw.attachment.status
+  version:
+    description: Optimistic locking version counter for the attachment.
+    lineage:
+      - datalake_rental_management_raw.attachment.version
+  ts_created:
+    description: Timestamp of the creation of the attachment.
+    lineage:
+      - datalake_rental_management_raw.attachment.created_at
+  ts_updated:
+    description: Timestamp of the last update of the attachment.
+    lineage:
+      - datalake_rental_management_raw.attachment.updated_at

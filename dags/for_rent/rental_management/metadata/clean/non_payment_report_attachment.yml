@@ -1,0 +1,17 @@
+---
+database_name: datalake_rental_management_clean
+table_name: non_payment_report_attachment
+description: |
+  Join table linking non-payment reports to their file attachments. Composite primary key
+  on (non_payment_report_id, attachment_id). One row per report-attachment relationship.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id_non_payment_report:
+    description: Foreign key to the non-payment report.
+    lineage:
+      - datalake_rental_management_raw.non_payment_report_attachment.non_payment_report_id
+  id_attachment:
+    description: Foreign key to the attachment.
+    lineage:
+      - datalake_rental_management_raw.non_payment_report_attachment.attachment_id
