@@ -41,10 +41,6 @@ columns:
     lineage:
       - datalake_ebdb_raw.AccreditationContractTemplate.valid_from
     description: Date from which the template is valid for use.
-  dt_valid_to:
-    lineage:
-      - datalake_ebdb_raw.AccreditationContractTemplate.valid_to
-    description: Date until which the template remains valid, when an end date is set.
   ts_created:
     lineage:
       - datalake_ebdb_raw.AccreditationContractTemplate.created_at

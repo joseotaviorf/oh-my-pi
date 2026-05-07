@@ -8,7 +8,6 @@ SELECT
     author_type,
     author_identifier,
     valid_from AS dt_valid_from,
-    valid_to AS dt_valid_to,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM
