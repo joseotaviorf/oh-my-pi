@@ -7,7 +7,10 @@ SELECT
         WHEN asue.event_type = "agent_inactive_status_viewed" THEN "INACTIVE_AGENT_EXISTS"
         WHEN asue.event_type = "agent_pending_status_viewed" THEN "PROSPECT_AGENT_PENDING_APPROVAL"
     END AS status_reason,
-    asue.ts_event AS ts_created
+    asue.ts_event AS ts_created,
+    asue.year,
+    asue.month,
+    asue.day
 FROM
     datalake_amplitude_agents_app.agents_sign_up_events AS asue
 WHERE

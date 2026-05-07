@@ -21,3 +21,15 @@ columns:
     lineage:
       - datalake_amplitude_agents_app.agents_sign_up_events.ts_event
     description: Event timestamp from Amplitude, mapped as the creation time for this validation record.
+  year:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.year
+    description: Partition year from the source Amplitude signup event row.
+  month:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.month
+    description: Partition month from the source Amplitude signup event row.
+  day:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.day
+    description: Partition day from the source Amplitude signup event row.
