@@ -24,8 +24,8 @@
 --   total_task_runs_* — COUNT(DISTINCT id_databricks_task_run).
 --
 -- Cost: cluster-day Overwatch USD columns must be deduped with
--- `is_first_task_of_cluster_day`. Blended total = SUM(system DBU USD) +
--- SUM(deduped overwatch EC2 USD).
+-- `is_first_task_of_cluster_day`. Calculated EC2 (`total_ec2_cost_calculated_usd`)
+-- uses the same dedupe. `total_cost_usd` = SUM(DBU USD) + SUM(deduped calculated EC2 USD).
 -- ============================================================================
 WITH window_runs AS (
     SELECT
@@ -48,8 +48,11 @@ WITH window_runs AS (
         cluster_startup_seconds,
         dbu_consumed,
         cost_usd_estimate,
+        total_ec2_cost_calculated_usd,
+        spot_hours,
+        on_demand_hours,
+        total_cost_usd,
         total_cost_overwatch_usd,
-        cost_blended_usd,
         total_ec2_cost_overwatch_usd,
         total_dbu_cost_overwatch_usd,
         is_success,
@@ -113,43 +116,61 @@ SELECT
     )                                                                                    AS avg_dbu_cost_usd_per_dag_run_28d,
 
     ROUND(
-        SUM(IF(is_first_task_of_cluster_day, total_ec2_cost_overwatch_usd, NULL))
+        SUM(IF(is_first_task_of_cluster_day, total_ec2_cost_calculated_usd, NULL))
             FILTER (WHERE in_7d_window),
         4
-    )                                                                                    AS total_ec2_cost_overwatch_usd_7d,
+    )                                                                                    AS total_ec2_cost_calculated_usd_7d,
     ROUND(
-        SUM(IF(is_first_task_of_cluster_day, total_ec2_cost_overwatch_usd, NULL)),
+        SUM(IF(is_first_task_of_cluster_day, total_ec2_cost_calculated_usd, NULL)),
         4
-    )                                                                                    AS total_ec2_cost_overwatch_usd_28d,
+    )                                                                                    AS total_ec2_cost_calculated_usd_28d,
+    ROUND(
+        SUM(IF(is_first_task_of_cluster_day, spot_hours, NULL))
+            FILTER (WHERE in_7d_window),
+        4
+    )                                                                                    AS spot_hours_7d,
+    ROUND(
+        SUM(IF(is_first_task_of_cluster_day, spot_hours, NULL)),
+        4
+    )                                                                                    AS spot_hours_28d,
+    ROUND(
+        SUM(IF(is_first_task_of_cluster_day, on_demand_hours, NULL))
+            FILTER (WHERE in_7d_window),
+        4
+    )                                                                                    AS on_demand_hours_7d,
+    ROUND(
+        SUM(IF(is_first_task_of_cluster_day, on_demand_hours, NULL)),
+        4
+    )                                                                                    AS on_demand_hours_28d,
 
     ROUND(
         SUM(cost_usd_estimate) FILTER (WHERE in_7d_window)
-            + SUM(IF(is_first_task_of_cluster_day, total_ec2_cost_overwatch_usd, NULL))
+            + SUM(IF(is_first_task_of_cluster_day, total_ec2_cost_calculated_usd, NULL))
                 FILTER (WHERE in_7d_window),
         4
-    )                                                                                    AS total_cost_blended_usd_7d,
+    )                                                                                    AS total_cost_usd_7d,
     ROUND(
         SUM(cost_usd_estimate)
-            + SUM(IF(is_first_task_of_cluster_day, total_ec2_cost_overwatch_usd, NULL)),
+            + SUM(IF(is_first_task_of_cluster_day, total_ec2_cost_calculated_usd, NULL)),
         4
-    )                                                                                    AS total_cost_blended_usd_28d,
+    )                                                                                    AS total_cost_usd_28d,
     ROUND(
         (
             SUM(cost_usd_estimate) FILTER (WHERE in_7d_window)
-                + SUM(IF(is_first_task_of_cluster_day, total_ec2_cost_overwatch_usd, NULL))
+                + SUM(IF(is_first_task_of_cluster_day, total_ec2_cost_calculated_usd, NULL))
                     FILTER (WHERE in_7d_window)
         )
             / NULLIF(COUNT(DISTINCT IF(in_7d_window, date_trunc('MINUTE', ts_run_started), NULL)), 0),
         4
-    )                                                                                    AS avg_cost_blended_usd_per_dag_run_7d,
+    )                                                                                    AS avg_total_cost_usd_per_dag_run_7d,
     ROUND(
         (
             SUM(cost_usd_estimate)
-                + SUM(IF(is_first_task_of_cluster_day, total_ec2_cost_overwatch_usd, NULL))
+                + SUM(IF(is_first_task_of_cluster_day, total_ec2_cost_calculated_usd, NULL))
         )
             / NULLIF(COUNT(DISTINCT date_trunc('MINUTE', ts_run_started)), 0),
         4
-    )                                                                                    AS avg_cost_blended_usd_per_dag_run_28d,
+    )                                                                                    AS avg_total_cost_usd_per_dag_run_28d,
 
     ROUND(
         SUM(cost_usd_estimate) FILTER (WHERE in_7d_window)
@@ -161,6 +182,16 @@ SELECT
             / NULLIF(CAST(SUM(total_executor_run_time_ms) AS DOUBLE) / 1000.0, 0),
         6
     )                                                                                    AS cost_efficiency_usd_per_executor_second_28d,
+
+    ROUND(
+        SUM(IF(is_first_task_of_cluster_day, total_ec2_cost_overwatch_usd, NULL))
+            FILTER (WHERE in_7d_window),
+        4
+    )                                                                                    AS total_ec2_cost_overwatch_usd_7d,
+    ROUND(
+        SUM(IF(is_first_task_of_cluster_day, total_ec2_cost_overwatch_usd, NULL)),
+        4
+    )                                                                                    AS total_ec2_cost_overwatch_usd_28d,
 
     ROUND(
         SUM(IF(is_first_task_of_cluster_day, total_dbu_cost_overwatch_usd, NULL))

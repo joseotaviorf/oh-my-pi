@@ -18,7 +18,7 @@
 --   - system.compute.clusters                         (cluster spec — latest)
 --   - system.billing.usage                            (DBU per cluster, hourly buckets)
 --   - system.billing.list_prices                      (AWS USD list rate per DBU SKU)
---   - datalake_databricks_health.daily_cluster_health (PR 23079 — P50/P95 util)
+--   - datalake_databricks_health.daily_cluster_health (PR 23079 — P50/P95 util, calculated EC2)
 --   - datalake_databricks_health.spark_stage_metrics  (PR 23080 — per stage)
 --
 -- Cluster scope: all clusters that appear in Lakeflow task-run timeline for
@@ -511,6 +511,11 @@ SELECT
                                                                    AS cost_usd_estimate,
     b.dbu_rate_usd,
     b.pricing_sku,
+    CAST(ROUND(COALESCE(dch.total_ec2_cost_calculated_usd, 0), 4) AS DECIMAL(38, 4))
+                                                                   AS total_ec2_cost_calculated_usd,
+    CAST(ROUND(COALESCE(dch.spot_hours, 0), 4) AS DECIMAL(38, 4))    AS spot_hours,
+    CAST(ROUND(COALESCE(dch.on_demand_hours, 0), 4) AS DECIMAL(38, 4))
+                                                                   AS on_demand_hours,
     -- Cost (Overwatch EC2 + legacy — cluster-day attributes; dedupe before summing).
     dch.total_ec2_cost_overwatch_usd,
     dch.total_dbu_cost_overwatch_usd,
@@ -522,14 +527,14 @@ SELECT
             4
         ) AS DECIMAL(38, 4)
     )                                                              AS total_cost_overwatch_usd,
-    -- System-tables DBU USD (cost_usd_estimate) + Overwatch EC2.
+    -- System-tables DBU USD (cost_usd_estimate) + calculated EC2 (node_timeline × instancedetails).
     CAST(
         ROUND(
             COALESCE(CAST(b.cost_usd_estimate AS DOUBLE), CAST(0 AS DOUBLE))
-            + COALESCE(CAST(dch.total_ec2_cost_overwatch_usd AS DOUBLE), CAST(0 AS DOUBLE)),
+            + COALESCE(CAST(dch.total_ec2_cost_calculated_usd AS DOUBLE), CAST(0 AS DOUBLE)),
             4
         ) AS DECIMAL(38, 4)
-    )                                                              AS cost_blended_usd,
+    )                                                              AS total_cost_usd,
 
     -- Cluster flags.
     dch.is_photon,

@@ -239,22 +239,33 @@ columns:
       can still blend multiple SKUs at the cluster aggregate before pro-rating.
     lineage:
       - system.billing.usage.sku_name
-  total_cost_overwatch_usd:
+  total_ec2_cost_calculated_usd:
     description: |
-      Sum of Overwatch cluster-day DBU USD and EC2 USD (`total_dbu_cost_overwatch_usd`
-      + `total_ec2_cost_overwatch_usd`). Full Overwatch cost trail for cross-checks.
+      Cluster-day EC2 USD estimated from `system.compute.node_timeline` wall-clock
+      hours per node × `overwatch.instancedetails.On_Demand_Cost_Hourly` by instance
+      API name. Spot clusters (`aws_attributes.availability` contains SPOT): hourly
+      rate multiplied by 0.37 vs on-demand. Same cluster-day on every task row —
+      dedupe before SUM at DAG grain.
     lineage:
-      - datalake_databricks_health.daily_cluster_health.total_dbu_cost_overwatch_usd
-      - datalake_databricks_health.daily_cluster_health.total_ec2_cost_overwatch_usd
-  cost_blended_usd:
+      - datalake_databricks_health.daily_cluster_health.total_ec2_cost_calculated_usd
+  spot_hours:
     description: |
-      Blended estimated USD: system-tables DBU cost (`cost_usd_estimate` from
-      billing.usage × list_prices, duration-share allocated) plus Overwatch EC2
-      (`total_ec2_cost_overwatch_usd`). Combines authoritative DBU pricing from
-      system tables with the only EC2 signal available in this model.
+      Sum of driver + worker node-hours on the cluster-day counted as Spot pricing
+      (availability contains SPOT). Instance-hours, not cluster-hours.
     lineage:
-      - system.billing.usage.usage_quantity
-      - system.billing.list_prices.pricing
+      - datalake_databricks_health.daily_cluster_health.spot_hours
+  on_demand_hours:
+    description: |
+      Sum of driver + worker node-hours on the cluster-day counted as on-demand
+      pricing (non-Spot or NULL availability). Instance-hours.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.on_demand_hours
+  total_ec2_cost_overwatch_usd:
+    description: |
+      Cluster-day total EC2 / instance compute cost in USD from Overwatch. Useful for
+      "true cost" views (DBU + AWS infrastructure); system tables only expose DBU
+      SKUs, not the underlying EC2 pricing. Same cluster-day dedupe caveat applies.
+    lineage:
       - datalake_databricks_health.daily_cluster_health.total_ec2_cost_overwatch_usd
   total_dbu_cost_overwatch_usd:
     description: |
@@ -265,13 +276,23 @@ columns:
       `*_script_seconds` columns.
     lineage:
       - datalake_databricks_health.daily_cluster_health.total_dbu_cost_overwatch_usd
-  total_ec2_cost_overwatch_usd:
+  total_cost_overwatch_usd:
     description: |
-      Cluster-day total EC2 / instance compute cost in USD from Overwatch. Useful for
-      "true cost" views (DBU + AWS infrastructure); system tables only expose DBU
-      SKUs, not the underlying EC2 pricing. Same cluster-day dedupe caveat applies.
+      Sum of Overwatch cluster-day DBU USD and EC2 USD (`total_dbu_cost_overwatch_usd`
+      + `total_ec2_cost_overwatch_usd`). Full Overwatch cost trail for cross-checks.
     lineage:
+      - datalake_databricks_health.daily_cluster_health.total_dbu_cost_overwatch_usd
       - datalake_databricks_health.daily_cluster_health.total_ec2_cost_overwatch_usd
+  total_cost_usd:
+    description: |
+      Estimated total USD for this task run: system-tables DBU (`cost_usd_estimate`)
+      plus cluster-day calculated EC2 (`total_ec2_cost_calculated_usd`). Uses
+      calculated EC2 so all workspaces are covered; Overwatch-only EC2 remains in
+      `total_ec2_cost_overwatch_usd` for cross-check where Overwatch ingests the workspace.
+    lineage:
+      - system.billing.usage.usage_quantity
+      - system.billing.list_prices.pricing
+      - datalake_databricks_health.daily_cluster_health.total_ec2_cost_calculated_usd
   p50_driver_cpu_busy_percent:
     description: Median driver CPU busy percent on the cluster-day.
     lineage:

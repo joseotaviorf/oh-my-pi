@@ -3,8 +3,9 @@ database_name: datalake_databricks_health
 table_name: daily_cluster_health
 description: |
   Daily per-cluster health snapshot from Databricks system tables, augmented with
-  Overwatch-derived startup timing and cost. One row per
-  (id_cluster, dt_cluster_run).
+  Overwatch-derived startup timing and cost from `datalake_databricks.daily_clusters`,
+  plus EC2 USD calculated from node_timeline hours and `overwatch.instancedetails`
+  pricing (all workspaces). One row per (id_cluster, dt_cluster_run).
 
   P50/P95 CPU/memory/I-O wait + NVMe utilization derived from
   system.compute.node_timeline; cluster shape, DBR version, pool attachment and
@@ -172,6 +173,35 @@ columns:
       of DBU charges; system tables only expose DBU SKUs, not the underlying EC2 pricing.
     lineage:
       - datalake_databricks.daily_clusters.total_ec2_cost
+  total_ec2_cost_calculated_usd:
+    description: |
+      EC2 USD for this cluster-day from `system.compute.node_timeline` node wall-clock
+      hours × `overwatch.instancedetails.On_Demand_Cost_Hourly` (API_Name = driver or
+      worker node type). Spot (`aws_attributes.availability` contains SPOT): rate × 0.37.
+      Covers all workspaces with node observations; NULL pricing rows contribute zero.
+    lineage:
+      - system.compute.node_timeline.start_time
+      - system.compute.node_timeline.end_time
+      - system.compute.clusters.driver_node_type
+      - system.compute.clusters.worker_node_type
+      - system.compute.clusters.aws_attributes
+      - overwatch.instancedetails.On_Demand_Cost_Hourly
+  spot_hours:
+    description: |
+      Sum of per-node hours on this cluster-day priced as Spot (driver + worker rows
+      where availability contains SPOT). Sub-hour precision from timeline timestamps.
+    lineage:
+      - system.compute.node_timeline.start_time
+      - system.compute.node_timeline.end_time
+      - system.compute.clusters.aws_attributes
+  on_demand_hours:
+    description: |
+      Sum of per-node hours on this cluster-day priced as on-demand (non-Spot or NULL
+      availability). Sub-hour precision from timeline timestamps.
+    lineage:
+      - system.compute.node_timeline.start_time
+      - system.compute.node_timeline.end_time
+      - system.compute.clusters.aws_attributes
   is_photon:
     description: True when `dbr_version LIKE '%-photon-%'`. Photon DBR pricing differs from Standard.
   is_pool_backed:

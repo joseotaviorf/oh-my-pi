@@ -22,7 +22,7 @@ description: |
 
   Powers the Phase 4 cluster-cost-observability dashboard:
     - Governance dimensions (team_owner, cost_center, ecosystem, environment, provisioner)
-    - Cost (DBU + USD), per run + total, both windows
+    - Cost (DBU list USD, calculated EC2 USD, total USD, legacy Overwatch cross-checks), per window
     - Latency (avg/p50/p95/p99 total duration, setup duration), both windows
     - Reliability (error rate, cold start rate), both windows
     - Cluster utilization (driver/worker CPU + memory + local disk utilization), both windows
@@ -249,6 +249,125 @@ columns:
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
 
+  total_ec2_cost_calculated_usd_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
+    description: Sum of calculated EC2 USD deduped one row per (cluster, day) via is_first_task_of_cluster_day.
+    metric:
+      name: Total EC2 Cost Calculated USD (7d)
+      description: EC2 from node_timeline × instancedetails pricing for the trailing 7-day window.
+      acronym: total_ec2_calc_usd_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_ec2_cost_calculated_usd_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
+    description: Sum of calculated EC2 USD deduped per cluster-day.
+    metric:
+      name: Total EC2 Cost Calculated USD (28d)
+      description: EC2 from node_timeline × instancedetails pricing for the trailing 28-day window.
+      acronym: total_ec2_calc_usd_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  spot_hours_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.spot_hours
+    description: Sum of Spot-priced instance-hours deduped once per cluster-day.
+    metric:
+      name: Spot Instance Hours (7d)
+      description: Trailing 7-day sum of node-hours billed at Spot rate (0.37 × on-demand).
+      acronym: spot_hrs_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  spot_hours_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.spot_hours
+    description: Sum of Spot-priced instance-hours deduped per cluster-day.
+    metric:
+      name: Spot Instance Hours (28d)
+      description: Trailing 28-day sum of node-hours billed at Spot rate.
+      acronym: spot_hrs_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  on_demand_hours_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.on_demand_hours
+    description: Sum of on-demand instance-hours deduped once per cluster-day.
+    metric:
+      name: On Demand Instance Hours (7d)
+      description: Trailing 7-day sum of node-hours billed at on-demand list rate.
+      acronym: od_hrs_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  on_demand_hours_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.on_demand_hours
+    description: Sum of on-demand instance-hours deduped per cluster-day.
+    metric:
+      name: On Demand Instance Hours (28d)
+      description: Trailing 28-day sum of node-hours billed at on-demand list rate.
+      acronym: od_hrs_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_usd_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
+    description: SUM(system billing DBU USD) + SUM(deduped calculated EC2 USD per cluster-day).
+    metric:
+      name: Total Cost USD (7d)
+      description: List DBU USD plus calculated EC2 for the trailing 7-day window.
+      acronym: total_cost_usd_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_usd_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
+    description: SUM(system billing DBU USD) + SUM(deduped calculated EC2 USD per cluster-day).
+    metric:
+      name: Total Cost USD (28d)
+      description: List DBU USD plus calculated EC2 for the trailing 28-day window.
+      acronym: total_cost_usd_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_total_cost_usd_per_dag_run_7d:
+    description: total_cost_usd_7d / total_dag_runs_7d.
+    metric:
+      name: Avg Total Cost USD per DAG Run (7d)
+      description: Mean total USD (DBU + calculated EC2) per approximate DAG execution over the trailing 7-day window.
+      acronym: avg_total_cost_per_dag_run_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_total_cost_usd_per_dag_run_28d:
+    description: total_cost_usd_28d / total_dag_runs_28d.
+    metric:
+      name: Avg Total Cost USD per DAG Run (28d)
+      description: Mean total USD per approximate DAG execution over the trailing 28-day window.
+      acronym: avg_total_cost_per_dag_run_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
   total_ec2_cost_overwatch_usd_7d:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
@@ -317,52 +436,6 @@ columns:
       name: Total Overwatch Cost USD (28d)
       description: Full Overwatch cost (DBU + EC2) for this DAG over the trailing 28-day window.
       acronym: total_overwatch_usd_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_cost_blended_usd_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
-    description: SUM(system billing DBU USD) + SUM(deduped Overwatch EC2 USD per cluster-day); not a raw SUM of fact.cost_blended_usd rows.
-    metric:
-      name: Total Blended Cost USD (7d)
-      description: Blended estimated USD (billing.usage list DBU + Overwatch EC2) over the trailing 7-day window.
-      acronym: total_blended_usd_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_cost_blended_usd_28d:
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
-    description: SUM(system billing DBU USD) + SUM(deduped Overwatch EC2 USD per cluster-day).
-    metric:
-      name: Total Blended Cost USD (28d)
-      description: Blended estimated USD (billing.usage list DBU + Overwatch EC2) over the trailing 28-day window.
-      acronym: total_blended_usd_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_cost_blended_usd_per_dag_run_7d:
-    description: total_cost_blended_usd_7d / total_dag_runs_7d.
-    metric:
-      name: Avg Blended USD per DAG Run (7d)
-      description: Mean blended USD per approximate DAG execution over the trailing 7-day window.
-      acronym: avg_blended_per_dag_run_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_cost_blended_usd_per_dag_run_28d:
-    description: total_cost_blended_usd_28d / total_dag_runs_28d.
-    metric:
-      name: Avg Blended USD per DAG Run (28d)
-      description: Mean blended USD per approximate DAG execution over the trailing 28-day window.
-      acronym: avg_blended_per_dag_run_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost

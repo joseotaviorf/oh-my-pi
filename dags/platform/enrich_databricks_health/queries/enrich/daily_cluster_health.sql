@@ -2,7 +2,8 @@
 -- daily_cluster_health.sql
 --
 -- Per (id_cluster, dt_cluster_run) snapshot of cluster shape and resource
--- utilisation, sourced exclusively from Databricks system tables. One row
+-- utilisation from Databricks system tables, augmented with Overwatch pricing
+-- reference and Overwatch-derived lifecycle rows from daily_clusters.
 -- per cluster per UTC date the cluster had any node-timeline observations.
 --
 -- For multi-day clusters (interactive / long-running), expect one row per
@@ -11,6 +12,8 @@
 -- Source tables:
 --   - system.compute.node_timeline       (per-minute CPU, mem, disk per node)
 --   - system.compute.clusters            (cluster spec snapshots; latest row taken)
+--   - overwatch.instancedetails          (On_Demand_Cost_Hourly per API_Name — pricing
+--                                         reference for calculated EC2; all workspaces)
 --   - datalake_databricks.daily_clusters (Overwatch-derived lifecycle: init script
 --                                         timing and per-cluster DBU/EC2 cost in USD;
 --                                         not surfaced by system tables)
@@ -31,7 +34,10 @@ WITH latest_cluster_spec AS (
         max_autoscale_workers,
         driver_instance_pool_id,
         worker_instance_pool_id,
-        tags
+        tags,
+        CAST(
+            FROM_JSON(TO_JSON(c.aws_attributes), 'map<string, string>')['availability'] AS STRING
+        ) AS cluster_availability
     FROM (
         SELECT
             c.*,
@@ -40,9 +46,20 @@ WITH latest_cluster_spec AS (
             system.compute.clusters c
         WHERE
             DATE(c.change_time) <= DATE('{load_end_date}')
-    )
+    ) AS c
     WHERE
-        rn = 1
+        c.rn = 1
+),
+instance_pricing_active AS (
+    SELECT
+        API_Name,
+        MAX(CAST(`On_Demand_Cost_Hourly` AS DOUBLE)) AS on_demand_hourly_usd
+    FROM
+        overwatch.instancedetails
+    WHERE
+        isActive = TRUE
+    GROUP BY
+        API_Name
 ),
 node_observations AS (
     SELECT
@@ -211,6 +228,64 @@ cluster_lifecycle AS (
         datalake_databricks.daily_clusters
     WHERE
         dt_cluster_run BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+),
+node_hours_cost AS (
+    -- EC2 USD from node_timeline wall-clock hours × overwatch.instancedetails hourly
+    -- rate. Spot (availability contains SPOT): 0.37 × On_Demand (median AWS spot ratio).
+    SELECT
+        n.cluster_id,
+        n.dt_cluster_run,
+        SUM(
+            (
+                GREATEST(
+                    CAST(0 AS BIGINT),
+                    CAST(unix_timestamp(n.end_time) AS BIGINT) - CAST(unix_timestamp(n.start_time) AS BIGINT)
+                )
+                / 3600.0
+            )
+            * (
+                CASE
+                    WHEN UPPER(COALESCE(lcs.cluster_availability, 'ON_DEMAND')) LIKE '%SPOT%'
+                        THEN CAST(0.37 AS DOUBLE) * COALESCE(ip.on_demand_hourly_usd, CAST(0 AS DOUBLE))
+                    ELSE COALESCE(ip.on_demand_hourly_usd, CAST(0 AS DOUBLE))
+                END
+            )
+        ) AS total_ec2_cost_calculated_usd,
+        SUM(
+            CASE
+                WHEN UPPER(COALESCE(lcs.cluster_availability, 'ON_DEMAND')) LIKE '%SPOT%'
+                    THEN GREATEST(
+                        CAST(0 AS BIGINT),
+                        CAST(unix_timestamp(n.end_time) AS BIGINT) - CAST(unix_timestamp(n.start_time) AS BIGINT)
+                    ) / 3600.0
+                ELSE CAST(0 AS DOUBLE)
+            END
+        ) AS spot_hours,
+        SUM(
+            CASE
+                WHEN UPPER(COALESCE(lcs.cluster_availability, 'ON_DEMAND')) NOT LIKE '%SPOT%'
+                    THEN GREATEST(
+                        CAST(0 AS BIGINT),
+                        CAST(unix_timestamp(n.end_time) AS BIGINT) - CAST(unix_timestamp(n.start_time) AS BIGINT)
+                    ) / 3600.0
+                ELSE CAST(0 AS DOUBLE)
+            END
+        ) AS on_demand_hours
+    FROM
+        node_observations n
+    INNER JOIN
+        latest_cluster_spec lcs
+            ON n.cluster_id = lcs.cluster_id
+    LEFT JOIN
+        instance_pricing_active ip
+            ON  ip.API_Name = IF(
+                n.driver = TRUE,
+                lcs.driver_node_type,
+                COALESCE(lcs.worker_node_type, lcs.driver_node_type)
+            )
+    GROUP BY
+        n.cluster_id,
+        n.dt_cluster_run
 )
 SELECT
     cw.cluster_id                                                                             AS id_cluster,
@@ -258,6 +333,9 @@ SELECT
     -- to the system-tables-derived `cost_usd_estimate` in dw_databricks_health.fact.
     ROUND(cl.total_dbu_cost_overwatch_usd, 4)                                                 AS total_dbu_cost_overwatch_usd,
     ROUND(cl.total_ec2_cost_overwatch_usd, 4)                                                 AS total_ec2_cost_overwatch_usd,
+    ROUND(nhc.total_ec2_cost_calculated_usd, 4)                                               AS total_ec2_cost_calculated_usd,
+    ROUND(nhc.spot_hours, 4)                                                                  AS spot_hours,
+    ROUND(nhc.on_demand_hours, 4)                                                             AS on_demand_hours,
     lcs.dbr_version LIKE '%-photon-%'                                                         AS is_photon,
     (lcs.driver_instance_pool_id IS NOT NULL OR lcs.worker_instance_pool_id IS NOT NULL)      AS is_pool_backed,
     cw.ts_cluster_first_seen,
@@ -289,3 +367,7 @@ LEFT JOIN
     cluster_lifecycle  cl
         ON  cw.cluster_id    = cl.id_cluster
         AND cw.dt_cluster_run = cl.dt_cluster_run
+LEFT JOIN
+    node_hours_cost nhc
+        ON  cw.cluster_id    = nhc.cluster_id
+        AND cw.dt_cluster_run = nhc.dt_cluster_run

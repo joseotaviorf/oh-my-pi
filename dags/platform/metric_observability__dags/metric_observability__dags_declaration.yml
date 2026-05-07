@@ -31,9 +31,10 @@ dag:
         - Volume: total_dag_runs, total_job_runs, total_task_runs (DAG-run minute
           buckets vs Databricks job runs vs task runs)
         - Cost: total_dbu_consumed, total_dbu_cost_usd (billing list),
-          total_ec2_cost_overwatch_usd (deduped per cluster-day),
-          total_cost_blended_usd (list DBU + deduped EC2),
-          avg_dbu_cost_usd_per_dag_run, avg_cost_blended_usd_per_dag_run,
+          total_ec2_cost_calculated_usd, spot_hours, on_demand_hours (deduped per cluster-day),
+          total_cost_usd (list DBU + deduped calculated EC2),
+          total_ec2_cost_overwatch_usd (legacy deduped Overwatch EC2),
+          avg_dbu_cost_usd_per_dag_run, avg_total_cost_usd_per_dag_run,
           cost_efficiency_usd_per_executor_second,
           legacy Overwatch totals total_dbu_cost_overwatch_usd,
           total_cost_overwatch_usd

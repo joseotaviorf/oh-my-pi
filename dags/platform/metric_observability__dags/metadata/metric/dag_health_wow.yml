@@ -225,73 +225,143 @@ columns:
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
 
-  total_ec2_cost_overwatch_usd_current_7d:
+  total_ec2_cost_calculated_usd_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
-    description: Sum of Overwatch EC2 USD deduped one row per (cluster, day) via is_first_task_of_cluster_day.
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
+    description: Sum of calculated EC2 USD deduped one row per (cluster, day) via is_first_task_of_cluster_day.
     metric:
-      name: Total EC2 Cost Overwatch USD Current 7d
-      description: EC2 portion from Overwatch for the trailing 7-day window (no task-level double count).
-      acronym: total_ec2_overwatch_curr_7d
+      name: Total EC2 Cost Calculated USD Current 7d
+      description: Calculated EC2 for the trailing 7-day window.
+      acronym: total_ec2_calc_curr_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  total_ec2_cost_overwatch_usd_previous_7d:
+  total_ec2_cost_calculated_usd_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
-    description: Sum of deduped Overwatch EC2 USD in the previous window.
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
+    description: Sum of deduped calculated EC2 USD in the previous window.
     metric:
-      name: Total EC2 Cost Overwatch USD Previous 7d
-      description: EC2 portion from Overwatch for the prior 7-day window.
-      acronym: total_ec2_overwatch_prev_7d
+      name: Total EC2 Cost Calculated USD Previous 7d
+      description: Calculated EC2 for the prior 7-day window.
+      acronym: total_ec2_calc_prev_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  total_ec2_cost_overwatch_usd_change_pct:
-    description: Week-over-week percent change in deduped Overwatch EC2 USD.
+  total_ec2_cost_calculated_usd_change_pct:
+    description: Week-over-week percent change in deduped calculated EC2 USD.
     metric:
-      name: Total EC2 Cost Overwatch USD WoW Change Pct
-      description: Relative change in Overwatch EC2 USD vs the prior week.
-      acronym: total_ec2_overwatch_wow_chg_pct
+      name: Total EC2 Cost Calculated USD WoW Change Pct
+      description: Relative change in calculated EC2 USD vs the prior week.
+      acronym: total_ec2_calc_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
 
-  total_cost_blended_usd_current_7d:
+  spot_hours_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
-    description: SUM(system billing DBU USD) + SUM(deduped Overwatch EC2 USD per cluster-day); aligned with dag_health aggregate (not a raw SUM of fact.cost_blended_usd rows).
+      - dw_databricks_health.fact_databricks_task_run.spot_hours
+    description: Sum of Spot instance-hours deduped per cluster-day in the current window.
     metric:
-      name: Total Blended Cost USD Current 7d
-      description: Blended USD (billing list DBU + deduped Overwatch EC2) in the trailing 7-day window.
-      acronym: total_blended_curr_7d
+      name: Spot Hours Current 7d
+      description: Spot-priced node-hours in the trailing 7-day window.
+      acronym: spot_hrs_curr_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  total_cost_blended_usd_previous_7d:
+  spot_hours_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
-    description: Same blended definition as current window, for the prior 7-day slice.
+      - dw_databricks_health.fact_databricks_task_run.spot_hours
+    description: Sum of Spot instance-hours in the previous window.
     metric:
-      name: Total Blended Cost USD Previous 7d
-      description: Blended USD in the prior 7-day window.
-      acronym: total_blended_prev_7d
+      name: Spot Hours Previous 7d
+      description: Spot-priced node-hours in the prior 7-day window.
+      acronym: spot_hrs_prev_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  total_cost_blended_usd_change_pct:
-    description: Percent change in blended USD vs prior week.
+  spot_hours_change_pct:
+    description: Week-over-week percent change in Spot instance-hours.
     metric:
-      name: Total Blended Cost USD WoW Change Pct
-      description: Week-over-week percent change in blended USD (DBU list + deduped EC2).
-      acronym: total_blended_wow_chg_pct
+      name: Spot Hours WoW Change Pct
+      description: Relative change in Spot node-hours vs the prior week.
+      acronym: spot_hrs_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  on_demand_hours_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.on_demand_hours
+    description: Sum of on-demand instance-hours deduped per cluster-day in the current window.
+    metric:
+      name: On Demand Hours Current 7d
+      description: On-demand node-hours in the trailing 7-day window.
+      acronym: od_hrs_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  on_demand_hours_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.on_demand_hours
+    description: Sum of on-demand instance-hours in the previous window.
+    metric:
+      name: On Demand Hours Previous 7d
+      description: On-demand node-hours in the prior 7-day window.
+      acronym: od_hrs_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  on_demand_hours_change_pct:
+    description: Week-over-week percent change in on-demand instance-hours.
+    metric:
+      name: On Demand Hours WoW Change Pct
+      description: Relative change in on-demand node-hours vs the prior week.
+      acronym: od_hrs_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  total_cost_usd_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
+    description: SUM(system billing DBU USD) + SUM(deduped calculated EC2 USD per cluster-day).
+    metric:
+      name: Total Cost USD Current 7d
+      description: DBU list USD plus calculated EC2 in the trailing 7-day window.
+      acronym: total_cost_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_usd_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.cost_usd_estimate
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
+    description: Same total-cost definition for the prior 7-day window.
+    metric:
+      name: Total Cost USD Previous 7d
+      description: DBU list USD plus calculated EC2 in the prior 7-day window.
+      acronym: total_cost_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_usd_change_pct:
+    description: Percent change in total USD vs prior week.
+    metric:
+      name: Total Cost USD WoW Change Pct
+      description: Week-over-week percent change in total USD (DBU + calculated EC2).
+      acronym: total_cost_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
@@ -334,32 +404,32 @@ columns:
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
 
-  avg_cost_blended_usd_per_dag_run_current_7d:
-    description: total_cost_blended_usd_current_7d / total_dag_runs_current_7d.
+  avg_total_cost_usd_per_dag_run_current_7d:
+    description: total_cost_usd_current_7d / total_dag_runs_current_7d.
     metric:
-      name: Avg Blended USD per DAG Run Current 7d
-      description: Mean blended USD per approximate DAG execution in the trailing 7-day window.
-      acronym: avg_blended_per_dag_run_curr_7d
+      name: Avg Total Cost USD per DAG Run Current 7d
+      description: Mean total USD per approximate DAG execution in the trailing 7-day window.
+      acronym: avg_total_cost_curr_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_cost_blended_usd_per_dag_run_previous_7d:
-    description: total_cost_blended_usd_previous_7d / total_dag_runs_previous_7d.
+  avg_total_cost_usd_per_dag_run_previous_7d:
+    description: total_cost_usd_previous_7d / total_dag_runs_previous_7d.
     metric:
-      name: Avg Blended USD per DAG Run Previous 7d
-      description: Mean blended USD per approximate DAG execution in the prior 7-day window.
-      acronym: avg_blended_per_dag_run_prev_7d
+      name: Avg Total Cost USD per DAG Run Previous 7d
+      description: Mean total USD per approximate DAG execution in the prior 7-day window.
+      acronym: avg_total_cost_prev_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_cost_blended_usd_per_dag_run_change_pct:
-    description: Week-over-week percent change in average blended USD per DAG run.
+  avg_total_cost_usd_per_dag_run_change_pct:
+    description: Week-over-week percent change in average total USD per DAG run.
     metric:
-      name: Avg Blended USD per DAG Run WoW Change Pct
-      description: Relative change in mean blended cost per DAG-run minute bucket.
-      acronym: avg_blended_per_dag_run_wow_chg_pct
+      name: Avg Total Cost USD per DAG Run WoW Change Pct
+      description: Relative change in mean total cost per DAG-run minute bucket.
+      acronym: avg_total_cost_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
@@ -399,6 +469,41 @@ columns:
       name: Cost Efficiency WoW Change Pct
       description: Week-over-week percent change in USD per executor-second.
       acronym: cost_eff_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  total_ec2_cost_overwatch_usd_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
+    description: Sum of Overwatch EC2 USD deduped one row per (cluster, day) via is_first_task_of_cluster_day.
+    metric:
+      name: Total EC2 Cost Overwatch USD Current 7d
+      description: EC2 portion from Overwatch for the trailing 7-day window (legacy cross-check).
+      acronym: total_ec2_overwatch_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_ec2_cost_overwatch_usd_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
+    description: Sum of deduped Overwatch EC2 USD in the previous window.
+    metric:
+      name: Total EC2 Cost Overwatch USD Previous 7d
+      description: EC2 portion from Overwatch for the prior 7-day window.
+      acronym: total_ec2_overwatch_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_ec2_cost_overwatch_usd_change_pct:
+    description: Week-over-week percent change in deduped Overwatch EC2 USD.
+    metric:
+      name: Total EC2 Cost Overwatch USD WoW Change Pct
+      description: Relative change in Overwatch EC2 USD vs the prior week.
+      acronym: total_ec2_overwatch_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
