@@ -765,14 +765,6 @@ bietlejuice.dw_house:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-entrance-history:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-status:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
-bietlejuice.dw_hub_services:
-  - bietlejuice.enrich_hub_services:load-enrich-member-profile:first-run-of-day
-  - bietlejuice.enrich_hub_services:load-enrich-profile:first-run-of-day
-  - bietlejuice.enrich_hub_services_users:load-enrich-users:first-run-of-day
-  - bietlejuice.hub_services:load-clean-business-unit-region-aud:first-run-of-day
-  - bietlejuice.hub_services:load-clean-business-unit-region:first-run-of-day
-  - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
-  - bietlejuice.hub_services:load-clean-rev-info:first-run-of-day
 bietlejuice.dw_inspections:
   - bietlejuice.enrich_amplitude_inspections:load-enrich-inspection-stages-access:first-run-of-day
   - bietlejuice.enrich_inspections:load-enrich-appointment-inspection:first-run-of-day
