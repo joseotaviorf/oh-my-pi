@@ -133,6 +133,8 @@ cluster_template:
         custom_tags:
             - key: dag_id
               value: "{{ dag.dag_id }}"
+            - key: application
+              value: "{{ dag.dag_id }}"
             - key: app
               value: airflow
             - key: resource-name
