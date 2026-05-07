@@ -106,9 +106,10 @@ columns:
       - system.lakeflow.job_task_run_timeline.run_id
   airflow_dag_id:
     description: |
-      Workload identifier for grouping and joins. COALESCE of cluster `application`
-      tag, `system.billing.usage.usage_metadata.job_name` (dominant DBU row on the
-      cluster for the load window), then `cluster_name` when tags are absent.
+      Workload identifier for grouping and joins. When set, the cluster `dag_id`
+      tag is used first. Otherwise: COALESCE of cluster `application` tag,
+      `system.billing.usage.usage_metadata.job_name` (dominant DBU row on the cluster
+      for the load window), then `cluster_name` when tags are absent.
       When the raw value matches Airflow run naming (`_scheduled__`, `_manual__`,
       `_dataset__`, `_dataset_triggered__` before the timestamp), it is normalized:
       strip optional `job-<id>-run-<id>-` prefix, take the base before the run-type

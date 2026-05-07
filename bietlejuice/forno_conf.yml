@@ -135,6 +135,8 @@ cluster_template:
                 region: us-east-1
         cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
         custom_tags: &cluster_custom_tags_anchor
+            dag_id: "{{ dag.dag_id }}"
+            application: "{{ dag.dag_id }}"
             app: airflow
             resource-name: databricks
             environment: "{{ var.value.environment }}"
@@ -197,6 +199,10 @@ cluster_template:
                 region: us-east-1
         cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
         custom_tags:
+            - key: dag_id
+              value: "{{ dag.dag_id }}"
+            - key: application
+              value: "{{ dag.dag_id }}"
             - key: app
               value: airflow
             - key: resource-name

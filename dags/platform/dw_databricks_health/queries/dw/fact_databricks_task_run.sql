@@ -273,6 +273,15 @@ billing_per_task AS (
                     ELSE CAST(1 AS DOUBLE)
                 END
             )                                              AS cost_usd_estimate,
+        (
+            CASE
+                WHEN COALESCE(cts.cluster_total_seconds, CAST(0 AS BIGINT)) > CAST(0 AS BIGINT)
+                    THEN CAST(t.task_seconds AS DOUBLE) / CAST(cts.cluster_total_seconds AS DOUBLE)
+                WHEN COALESCE(tpc.n_tasks, 0) > 0
+                    THEN 1.0 / CAST(tpc.n_tasks AS DOUBLE)
+                ELSE CAST(1 AS DOUBLE)
+            END
+        )                                                  AS task_weight,
         cps.pricing_sku,
         pr_eff.unit_price_usd                              AS dbu_rate_usd
     FROM
@@ -452,9 +461,12 @@ SELECT
         '/runs/', CAST(s.run_id AS STRING)
     )                                                              AS databricks_run_url,
 
+    -- Prefer cluster `dag_id` tag when present; else derive from application/billing/cluster_name.
     -- Raw billing/cluster names use hyphens + Airflow run suffixes (_scheduled__, etc.).
     -- Normalize to Airflow-style IDs (e.g. bietlejuice.core_brokers_history_dataset) when that pattern matches.
     CASE
+        WHEN NULLIF(TRIM(COALESCE(lcs.tags['dag_id'], '')), '') IS NOT NULL
+            THEN TRIM(lcs.tags['dag_id'])
         WHEN COALESCE(lcs.tags['application'], bc_dag.billing_job_name, lcs.cluster_name)
             RLIKE '.*(_scheduled__|_manual__|_dataset__|_dataset_triggered__).*'
         THEN
@@ -535,19 +547,20 @@ SELECT
                                                                    AS cost_usd_estimate,
     b.dbu_rate_usd,
     b.pricing_sku,
-    CAST(ROUND(COALESCE(dch.total_ec2_cost_calculated_usd, 0), 4) AS DECIMAL(38, 4))
+    CAST(ROUND(COALESCE(dch.total_ec2_cost_calculated_usd, 0) * COALESCE(b.task_weight, 1.0), 4) AS DECIMAL(38, 4))
                                                                    AS total_ec2_cost_calculated_usd,
-    CAST(ROUND(COALESCE(dch.spot_hours, 0), 4) AS DECIMAL(38, 4))    AS spot_hours,
-    CAST(ROUND(COALESCE(dch.on_demand_hours, 0), 4) AS DECIMAL(38, 4))
+    CAST(ROUND(COALESCE(dch.spot_hours, 0) * COALESCE(b.task_weight, 1.0), 4) AS DECIMAL(38, 4))    AS spot_hours,
+    CAST(ROUND(COALESCE(dch.on_demand_hours, 0) * COALESCE(b.task_weight, 1.0), 4) AS DECIMAL(38, 4))
                                                                    AS on_demand_hours,
-    -- Cost (Overwatch EC2 + legacy — cluster-day attributes; dedupe before summing).
-    dch.total_ec2_cost_overwatch_usd,
-    dch.total_dbu_cost_overwatch_usd,
+    -- Cost (Overwatch EC2 + legacy). Apportioned by task weight.
+    CAST(ROUND(dch.total_ec2_cost_overwatch_usd * COALESCE(b.task_weight, 1.0), 4) AS DECIMAL(38, 4)) AS total_ec2_cost_overwatch_usd,
+    CAST(ROUND(dch.total_dbu_cost_overwatch_usd * COALESCE(b.task_weight, 1.0), 4) AS DECIMAL(38, 4)) AS total_dbu_cost_overwatch_usd,
     -- Overwatch DBU + EC2 combined (legacy bill-allocation cross-check).
     CAST(
         ROUND(
-            COALESCE(CAST(dch.total_dbu_cost_overwatch_usd AS DOUBLE), CAST(0 AS DOUBLE))
-            + COALESCE(CAST(dch.total_ec2_cost_overwatch_usd AS DOUBLE), CAST(0 AS DOUBLE)),
+            (COALESCE(CAST(dch.total_dbu_cost_overwatch_usd AS DOUBLE), CAST(0 AS DOUBLE))
+            + COALESCE(CAST(dch.total_ec2_cost_overwatch_usd AS DOUBLE), CAST(0 AS DOUBLE)))
+            * COALESCE(b.task_weight, 1.0),
             4
         ) AS DECIMAL(38, 4)
     )                                                              AS total_cost_overwatch_usd,
@@ -555,7 +568,7 @@ SELECT
     CAST(
         ROUND(
             COALESCE(CAST(b.cost_usd_estimate AS DOUBLE), CAST(0 AS DOUBLE))
-            + COALESCE(CAST(dch.total_ec2_cost_calculated_usd AS DOUBLE), CAST(0 AS DOUBLE)),
+            + (COALESCE(CAST(dch.total_ec2_cost_calculated_usd AS DOUBLE), CAST(0 AS DOUBLE)) * COALESCE(b.task_weight, 1.0)),
             4
         ) AS DECIMAL(38, 4)
     )                                                              AS total_cost_usd,
