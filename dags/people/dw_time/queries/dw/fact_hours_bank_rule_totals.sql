@@ -27,7 +27,7 @@ WITH hours_bank_snapshots AS (
 employee_registration AS (
     SELECT
         id_employee_profile,
-        registration_code
+        id_external
     FROM
         datalake_oitchau_clean.employees
     QUALIFY
@@ -54,7 +54,7 @@ hours_bank_with_employee AS (
             ON er.id_employee_profile = hb.id_employee_profile
     INNER JOIN
         dw_people.dim_employee AS de
-            ON TRIM(CAST(er.registration_code AS STRING)) = TRIM(CAST(de.person_number AS STRING))
+            ON TRIM(CAST(er.id_external AS STRING)) = TRIM(CAST(de.person_number AS STRING))
     WHERE
         hb.hours_bank_totals_map IS NOT NULL
         AND SIZE(hb.hours_bank_totals_map) > 0

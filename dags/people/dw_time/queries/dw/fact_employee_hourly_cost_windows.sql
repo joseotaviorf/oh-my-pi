@@ -29,7 +29,7 @@ WITH deduped_employee_cost_rows AS (
 employee_registration AS (
     SELECT
         id_employee_profile,
-        registration_code
+        id_external
     FROM
         datalake_oitchau_clean.employees
     QUALIFY
@@ -63,7 +63,7 @@ employee_hourly_costs_with_person AS (
             ON er.id_employee_profile = cd.id_employee_profile
     INNER JOIN
         dw_people.dim_employee AS de
-            ON TRIM(CAST(er.registration_code AS STRING)) = TRIM(CAST(de.person_number AS STRING))
+            ON TRIM(CAST(er.id_external AS STRING)) = TRIM(CAST(de.person_number AS STRING))
 )
 SELECT
     cm.sk_employee_cost_window,

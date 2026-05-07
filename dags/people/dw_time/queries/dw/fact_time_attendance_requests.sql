@@ -44,7 +44,7 @@ WITH deduped_time_requests AS (
 employee_registration AS (
     SELECT
         id_employee_profile,
-        registration_code,
+        id_external,
         ts_load,
         year,
         month,
@@ -99,7 +99,7 @@ time_requests_with_person AS (
             ON er.id_employee_profile = rq.id_employee_profile
     INNER JOIN
         datalake_people.identifier_mapping AS im
-            ON TRIM(CAST(er.registration_code AS STRING)) = TRIM(CAST(im.person_number AS STRING))
+            ON TRIM(CAST(er.id_external AS STRING)) = TRIM(CAST(im.person_number AS STRING))
             AND NOT im.is_user_test
             AND im.is_person_latest_assignment
     WHERE

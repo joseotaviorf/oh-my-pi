@@ -11,8 +11,8 @@ description: |
   person and date gives total minutes across buckets shown in that load; slice by rule for workforce or payroll support
   analytics.
 
-  Population: employees who exist in the time product with a registration code that matches Oracle HCM person_number via
-  datalake_people.identifier_mapping and dw_people.dim_employee. People without a match do not appear.
+  Population: employees who exist in the time product whose Oitchau externalId (id_external in clean) matches an Oracle HCM
+  person_number in dw_people.dim_employee. People without a match do not appear.
 
   Reporting: filter by balance date or person_number; join dw_people.dim_employee on sk_employee or person_number for
   profile and hierarchy; join sk_balance_date or dt_hours_bank_balanced to dw_public.dim_date for calendars. Join
