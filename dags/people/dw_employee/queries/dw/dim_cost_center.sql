@@ -1,3 +1,22 @@
+WITH active_department_responsibility AS (
+  SELECT
+    id_department,
+    id_assignment
+  FROM
+    datalake_hr_system_clean.areas_of_responsibility
+  WHERE
+    active_status = 'A'
+    AND id_template IS NOT NULL
+  QUALIFY
+    ROW_NUMBER() OVER (
+      PARTITION BY id_department
+      ORDER BY
+        dt_started DESC NULLS LAST,
+        dt_ended DESC NULLS LAST,
+        ts_load DESC,
+        id_assignment DESC
+    ) = 1
+)
 SELECT
   o.id_organization AS sk_cost_center,
   e.id_period_of_service AS sk_business_partner_assignment,
@@ -24,10 +43,8 @@ SELECT
 FROM
   datalake_hr_system_clean.organizations AS o
 LEFT JOIN 
-  datalake_hr_system_clean.areas_of_responsibility AS r 
+  active_department_responsibility AS r 
     ON o.id_organization = r.id_department
-    AND r.active_status = 'A'
-    AND r.id_template IS NOT NULL
 LEFT JOIN 
   datalake_people.identifier_mapping AS e 
     ON e.id_assignment = r.id_assignment
