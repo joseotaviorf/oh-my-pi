@@ -3,7 +3,7 @@ SELECT
     qsp.id_qualification,
     qsp.id_qualification_step,
     qsp.id AS id_qualification_step_progress,
-    IF(qsp.author_type = "USUARIO", qsp.author_identifier, NULL) AS id_user_step_responsible,
+    IF(qsp.author_type = "USUARIO", qsp.id_author_identifier, NULL) AS id_user_step_responsible,
     q.uuid_qualification,
     q.state AS qualification_state,
     q.reason AS qualification_state_reason,

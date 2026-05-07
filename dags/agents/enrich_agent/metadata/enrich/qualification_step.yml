@@ -23,7 +23,7 @@ columns:
     description: Unique identifier of the qualification step progress event.
   id_user_step_responsible:
     lineage:
-      - datalake_ebdb_clean.qualification_step_progress.author_identifier
+      - datalake_ebdb_clean.qualification_step_progress.id_author_identifier
       - datalake_ebdb_clean.qualification_step_progress.author_type
     description: User identifier responsible for the step when author type is USUARIO; otherwise null.
   uuid_qualification:

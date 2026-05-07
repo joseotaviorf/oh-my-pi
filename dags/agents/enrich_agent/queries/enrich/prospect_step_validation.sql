@@ -15,7 +15,7 @@ WITH prospect_validation AS (
         datalake_agent_accreditation.prospect_agent AS pa
     LEFT JOIN
         datalake_agent_accreditation.qualification_step AS qs
-            ON qs.id_agent_prospect = pa.id_prospect_agent
+            ON qs.id_prospect_agent = pa.id_prospect_agent
     LEFT JOIN
         datalake_agent_accreditation.agent AS a
             ON a.id_agent = pa.id_agent
