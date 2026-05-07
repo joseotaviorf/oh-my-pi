@@ -1,0 +1,57 @@
+---
+database_name: datalake_agent_accreditation
+table_name: prospect_step_validation
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: |
+  Unified prospect onboarding validation stream combining CRECI waiting rows, company association gaps for active agents
+  without a parent negotiation executive user joined from enrich_agent agent, signup profile conflicts from Amplitude,
+  and contract-signature terminal outcomes (cancelled, declined, auto-responded) on the CONTRACT_SIGNATURE step from
+  the enriched contract process table.
+columns:
+  id_prospect_agent:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.id
+    description: Prospect agent identifier from the enriched prospect profile.
+  id_user:
+    lineage:
+      - datalake_agent_accreditation.agent.id_user
+    description: Main application user id for the linked agent when present from enrich_agent agent output.
+  id_negotiation_executive_user:
+    lineage:
+      - datalake_agent_accreditation.agent.id_negotiation_executive_user
+    description: Negotiation executive user id from enrich_agent agent when the prospect resolves to an active agent Hub profile hierarchy.
+  uuid_person:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.uuid_person
+    description: Person UUID for the prospect or agent profile.
+  business_context_applied:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.business_context_of_interest
+    description: Business context of interest from the QuintoAndar prospect questionnaire.
+  agent_status:
+    lineage:
+      - datalake_ebdb_clean.agent.status
+    description: Status of the EBDB agent when the prospect is linked to an agent.
+  step_name:
+    lineage:
+      - datalake_ebdb_clean.qualification_step.name
+      - datalake_agent_accreditation.signup_profile_conflict.step_name
+    description: Step label from the qualification catalog, fixed EN_ASSOCIATION branch, or signup profile conflict table depending on the union branch.
+  step_status:
+    lineage:
+      - datalake_ebdb_clean.qualification_step_progress.status
+      - datalake_agent_accreditation.signup_profile_conflict.step_status
+    description: Step status from qualification progress, fixed WAITING_ACTION branch, or signup profile conflict table depending on the union branch.
+  status_reason:
+    lineage:
+      - datalake_ebdb_clean.qualification.state
+      - datalake_ebdb_clean.qualification_step.name
+      - datalake_ebdb_clean.qualification_step_progress.status
+      - datalake_amplitude_agents_app.agents_sign_up_events.event_type
+      - datalake_signatures_clean.signature.status
+    description: Validation reason by union branch (pending CRECI validation, parent user not attributed, signup profile conflict code from Amplitude, or contract signature outcome with CONTRACT_ prefix when not AUTO_RESPONDED).
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.ts_created
+    description: Prospect agent creation timestamp carried through all validation branches.

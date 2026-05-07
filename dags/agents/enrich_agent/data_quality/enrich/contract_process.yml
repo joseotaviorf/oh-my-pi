@@ -1,0 +1,29 @@
+---
+table_name: datalake_agent_accreditation.contract_process
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_contract_process:
+    is_complete:
+      severity_level: Error
+  id_prospect_agent:
+    is_complete:
+      severity_level: Error
+  id_qualification:
+    is_complete:
+      severity_level: Error
+  id_agreement_document:
+    is_complete:
+      severity_level: Error
+  id_signature:
+    is_complete:
+      severity_level: Error
+  contract_process_status:
+    is_complete:
+      severity_level: Error
+  signature_status:
+    is_complete:
+      severity_level: Error

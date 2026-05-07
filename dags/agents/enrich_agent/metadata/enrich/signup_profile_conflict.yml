@@ -1,0 +1,23 @@
+---
+database_name: datalake_agent_accreditation
+table_name: signup_profile_conflict
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Synthetic signup funnel rows for agent prospects blocked by an existing agent profile, derived from production Agents app Amplitude events only (active, inactive, or pending agent detected on signup screens).
+columns:
+  uuid_person:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.uuid_person
+    description: Person UUID from the Amplitude signup event payload.
+  step_name:
+    description: Fixed step label for this validation outcome; always SIGNUP_PROFILE_CONFLICT for rows in this table.
+  step_status:
+    description: Fixed status label for blocked signup flows; always BLOCKED for rows in this table.
+  status_reason:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.event_type
+    description: Reason code mapped from the Amplitude event type (active, inactive, or pending existing agent).
+  ts_created:
+    lineage:
+      - datalake_amplitude_agents_app.agents_sign_up_events.ts_event
+    description: Event timestamp from Amplitude, mapped as the creation time for this validation record.

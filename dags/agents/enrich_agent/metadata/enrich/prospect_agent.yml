@@ -1,0 +1,85 @@
+---
+database_name: datalake_agent_accreditation
+table_name: prospect_agent
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Prospect agent enriched with linked EBDB agent id when the person already has an agent, hub business unit and parent region ids derived from QuintoAndar prospect region types, and questionnaire fields (CRECI, availability, context preferences).
+columns:
+  id_prospect_agent:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.id
+    description: Unique identifier of the prospect agent record.
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent.id
+    description: Agent identifier when the prospect person matches an existing EBDB agent.
+  id_business_unit:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.id_primary_operating_region
+      - datalake_ebdb_clean.quintoandar_prospect_agent.primary_operating_region_type
+    description: Primary operating region id when the region type is HUB; otherwise null.
+  id_region:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.id_parent_operating_region
+      - datalake_ebdb_clean.quintoandar_prospect_agent.parent_operating_region_type
+    description: Parent operating region id when the parent region type is REGION; otherwise null.
+  uuid_prospect:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.uuid_prospect
+    description: Prospect UUID in the source system.
+  uuid_person:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.uuid_person
+    description: Person UUID linked to the prospect.
+  legal_entity_type:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.legal_entity_type
+    description: Legal entity type of the prospect (e.g., individual or company).
+  status:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.status
+    description: Current status of the prospect agent onboarding workflow.
+  business_association:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.business_association
+    description: Business association category for the prospect agent.
+  business_context_applied:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.business_context_of_interest
+    description: Business context of interest as captured in the QuintoAndar prospect questionnaire.
+  quintoandar_knowledge:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.quintoandar_knowledge
+    description: Declared knowledge level about QuintoAndar.
+  social:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.social
+    description: Social profile or link information provided by the prospect.
+  creci:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.creci
+    description: CRECI license number from the QuintoAndar prospect questionnaire.
+  creci_uf:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.creci_uf
+    description: State (UF) of the CRECI license.
+  is_available_on_weekends:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.is_available_on_weekends
+    description: Whether the prospect is available on weekends (QuintoAndar prospect questionnaire).
+  is_accepted_alternative_context:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.is_accepted_alternative_context
+    description: Whether the prospect accepts alternative business contexts.
+  is_accepted_alternative_region:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.is_accepted_alternative_region
+    description: Whether the prospect accepts alternative operating regions.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.ts_created
+    description: Timestamp when the prospect agent record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.ts_updated
+    description: Timestamp when the prospect agent record was last updated.

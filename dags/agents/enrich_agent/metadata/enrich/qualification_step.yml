@@ -1,0 +1,68 @@
+---
+database_name: datalake_agent_accreditation
+table_name: qualification_step
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Qualification workflow for agent prospects, joining EBDB qualification, step progress, and step definitions with parsed user responsible when the author is a user.
+columns:
+  id_prospect_agent:
+    lineage:
+      - datalake_ebdb_clean.qualification.id_agent_prospect
+    description: Prospect agent identifier linked to the qualification instance.
+  id_qualification:
+    lineage:
+      - datalake_ebdb_clean.qualification.id
+    description: Qualification instance identifier.
+  id_qualification_step:
+    lineage:
+      - datalake_ebdb_clean.qualification_step_progress.qualification_step_id
+    description: Qualification step identifier for the progress row.
+  id_qualification_step_progress:
+    lineage:
+      - datalake_ebdb_clean.qualification_step_progress.id
+    description: Unique identifier of the qualification step progress event.
+  id_user_step_responsible:
+    lineage:
+      - datalake_ebdb_clean.qualification_step_progress.author_identifier
+      - datalake_ebdb_clean.qualification_step_progress.author_type
+    description: User identifier responsible for the step when author type is USUARIO; otherwise null.
+  uuid_qualification:
+    lineage:
+      - datalake_ebdb_clean.qualification.qualification_uuid
+    description: Business UUID of the qualification instance.
+  qualification_state:
+    lineage:
+      - datalake_ebdb_clean.qualification.state
+    description: Current state of the qualification workflow.
+  qualification_state_reason:
+    lineage:
+      - datalake_ebdb_clean.qualification.reason
+    description: Reason recorded at qualification level in EBDB.
+  step_name:
+    lineage:
+      - datalake_ebdb_clean.qualification_step.name
+    description: Name of the qualification step definition.
+  step_status:
+    lineage:
+      - datalake_ebdb_clean.qualification_step_progress.status
+    description: Status of the qualification step after the progress event.
+  step_reason:
+    lineage:
+      - datalake_ebdb_clean.qualification_step_progress.reason
+    description: Reason or notes for the step progress event.
+  ts_step_changed:
+    lineage:
+      - datalake_ebdb_clean.qualification_step_progress.ts_changed
+    description: Timestamp when the step was changed in the source system.
+  ts_step_created:
+    lineage:
+      - datalake_ebdb_clean.qualification_step_progress.ts_created
+    description: Timestamp when the step progress record was created.
+  ts_qualification_created:
+    lineage:
+      - datalake_ebdb_clean.qualification.created_at
+    description: Timestamp when the qualification record was created.
+  ts_qualification_updated:
+    lineage:
+      - datalake_ebdb_clean.qualification.updated_at
+    description: Timestamp when the qualification record was last updated.

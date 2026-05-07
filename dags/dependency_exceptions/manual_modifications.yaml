@@ -249,6 +249,32 @@ bietlejuice.enrich_access_logs:
   remove:
     - bietlejuice.istio:load-clean-istio:first-run-of-day
     - bietlejuice.opa:load-clean-opa:first-run-of-day
+bietlejuice.enrich_agent: 
+  add:
+    - bietlejuice.ebdb_agent:load-clean-accreditation-contract-process 
+    - bietlejuice.ebdb_agent:load-clean-agent
+    - bietlejuice.ebdb_agent:load-clean-prospect-agent
+    - bietlejuice.ebdb_agent:load-clean-qualification-step-progress
+  remove:
+    - bietlejuice.company:load-clean-company:first-run-of-day
+    - bietlejuice.company:load-clean-member-profile:first-run-of-day
+    - bietlejuice.company:load-clean-product:first-run-of-day
+    - bietlejuice.ebdb_agent:load-clean-agent:first-run-of-day
+    - bietlejuice.ebdb_agent:load-clean-accreditation-contract-process:first-run-of-day
+    - bietlejuice.ebdb_agent:load-clean-accreditation-contract-template:first-run-of-day
+    - bietlejuice.ebdb_agent:load-clean-agent-external-reference:first-run-of-day
+    - bietlejuice.ebdb_agent:load-clean-prospect-agent:first-run-of-day
+    - bietlejuice.ebdb_agent:load-clean-qualification-step-progress:first-run-of-day
+    - bietlejuice.ebdb_agent:load-clean-qualification-step:first-run-of-day
+    - bietlejuice.ebdb_agent:load-clean-qualification:first-run-of-day
+    - bietlejuice.ebdb_agent:load-clean-quintoandar-prospect-agent:first-run-of-day
+    - bietlejuice.enrich_amplitude_agents_app:load-enrich-agents-sign-up-events:first-run-of-day
+    - bietlejuice.enrich_hub_services_users:load-enrich-users:first-run-of-day
+    - bietlejuice.hub_services_fast_lane:load-clean-member-profile:first-run-of-day
+    - bietlejuice.person:load-clean-credential-reference:first-run-of-day
+    - bietlejuice.person:load-clean-person:first-run-of-day
+    - bietlejuice.signatures:load-clean-agreement-document:first-run-of-day
+    - bietlejuice.signatures:load-clean-signature:first-run-of-day
 bietlejuice.enrich_agent_reports:
   add:
     - bietlejuice.ebdb_agent:load-clean-agent-data-aud:first-run-of-day

@@ -1,0 +1,68 @@
+---
+database_name: datalake_agent_accreditation
+table_name: contract_process
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Agent accreditation contract process joined to QuintoAndar partnership agreement documents and signatures in the Signatures service, restricted to QUINTOANDAR_AGENT / QUINTOANDAR_PARTNERSHIP_CONTRACT flows with author person UUID when the EBDB author is a person.
+columns:
+  id_prospect_agent:
+    lineage:
+      - datalake_ebdb_clean.qualification.id_agent_prospect
+    description: Prospect agent identifier from the qualification linked to the accreditation contract process.
+  id_qualification:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_process.qualification_id
+    description: Qualification instance identifier associated with the contract process.
+  id_contract_process:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_process.id
+    description: Unique identifier of the accreditation contract process record in EBDB.
+  id_contract_template:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_process.contract_template_id
+    description: Contract template identifier applied to this process.
+  id_replaced_process:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_process.replaced_process_id
+    description: Identifier of a superseded process when the workflow was restarted or replaced.
+  id_agreement_document:
+    lineage:
+      - datalake_signatures_clean.agreement_document.id
+    description: Agreement document identifier in the Signatures service matched via internal reference to the contract process UUID.
+  id_signature:
+    lineage:
+      - datalake_signatures_clean.signature.id
+    description: Signature record identifier linked to the agreement document.
+  uuid_author_person:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_process.author_identifier
+      - datalake_ebdb_clean.accreditation_contract_process.author_type
+    description: Person UUID of the author when author type is PERSON; otherwise null.
+  business_association:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_template.business_association
+    description: Business association context from the active contract template.
+  contract_process_status:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_process.status
+    description: Workflow status of the accreditation contract process in EBDB.
+  signature_status:
+    lineage:
+      - datalake_signatures_clean.signature.status
+    description: Status of the signature in the Signatures service for the partnership contract document.
+  ts_initiated:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_process.ts_initiated
+    description: Timestamp when the contract process was initiated.
+  ts_finished:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_process.ts_finished
+    description: Timestamp when the contract process finished, when applicable.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_process.ts_created
+    description: Timestamp when the contract process record was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_process.ts_updated
+    description: Timestamp when the contract process record was last updated in EBDB.

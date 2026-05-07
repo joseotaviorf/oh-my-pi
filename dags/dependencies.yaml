@@ -1480,6 +1480,11 @@ bietlejuice.enrich_agenda_allocation:
   - bietlejuice.enrich_ebdb_agents:load-enrich-agents-region:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.gsheets_for_rent:done-clean-auxiliary-region:first-run-of-day
+bietlejuice.enrich_agent:
+  - bietlejuice.ebdb_agent:load-clean-accreditation-contract-process
+  - bietlejuice.ebdb_agent:load-clean-agent
+  - bietlejuice.ebdb_agent:load-clean-prospect-agent
+  - bietlejuice.ebdb_agent:load-clean-qualification-step-progress
 bietlejuice.enrich_agent_accreditation:
   - bietlejuice.ebdb_agent:load-clean-agent-data-aud:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-business-contexts-served-aud:first-run-of-day
@@ -4732,10 +4737,10 @@ bietlejuice.reverse_neighborhood_price_range_load:
   - bietlejuice.ebdb_location:load-clean-region:first-run-of-day
 bietlejuice.reverse_nexxera:
   - bietlejuice.enrich_nexxera:load-enrich-dtw-filter:first-run-of-day
-bietlejuice.reverse_rent_liquidity_score_load:
-  - bietlejuice.dw_liquidity:load-dw-liquidity-fact-house-rent-liquidity:first-run-of-day
 bietlejuice.reverse_rent_liquidity_score_access:
   - bietlejuice.reverse_rent_liquidity_score_load:load-reverse-rent-liquidity-score:first-run-of-day
+bietlejuice.reverse_rent_liquidity_score_load:
+  - bietlejuice.dw_liquidity:load-dw-liquidity-fact-house-rent-liquidity:first-run-of-day
 bietlejuice.reverse_rent_listings_report_access:
   - bietlejuice.reverse_rent_listings_report_load:load-reverse-listing-similar-score:first-run-of-day
   - bietlejuice.reverse_rent_listings_report_load:load-reverse-rent-listing-offer-sent:first-run-of-day

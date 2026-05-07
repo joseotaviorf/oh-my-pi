@@ -1,0 +1,73 @@
+---
+database_name: datalake_agent_accreditation
+table_name: agent
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: |
+  Enriched EBDB agent profile with external references (partner and agent data IDs), main user id from person
+  credentials, company UUID and negotiation-executive user id from Hub Services member profiles where applicable,
+  latest company product name, and 1P/3P partnership flags.
+columns:
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent.id
+    description: Unique identifier of the agent in EBDB.
+  id_agent_data:
+    lineage:
+      - datalake_ebdb_clean.agent_external_reference.value
+    description: Dados Agente identifier resolved from agent external references when type is DADOS_AGENTE_ID.
+  id_partner:
+    lineage:
+      - datalake_ebdb_clean.agent_external_reference.value
+    description: Partner identifier resolved from agent external references when type is PARTNER_ID.
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.agent.uuid_person
+      - datalake_person_clean.credential_reference.id_reference
+    description: Main application user id linked to the agent via person UUID and main credential reference.
+  id_negotiation_executive_user:
+    lineage:
+      - datalake_hub_services.users.id_main_user
+    description: |
+      Hub user id for the negotiation-executive parent profile linked to this agent user's active AGENT
+      member-profile row (latest by creation time).
+  uuid_company:
+    lineage:
+      - datalake_ebdb_clean.agent.id_partnership_representative
+    description: Company UUID when the agent partnership representative type is COMPANY_UUID.
+  uuid_agent:
+    lineage:
+      - datalake_ebdb_clean.agent.uuid_agent
+    description: Business UUID of the agent in the source system.
+  uuid_person:
+    lineage:
+      - datalake_ebdb_clean.agent.uuid_person
+    description: Person UUID associated with the agent in the person registry.
+  affiliation_type:
+    lineage:
+      - datalake_ebdb_clean.agent.affiliation_type
+    description: Agent affiliation model (e.g., autonomous, company-managed).
+  status:
+    lineage:
+      - datalake_ebdb_clean.agent.status
+    description: Current lifecycle status of the agent.
+  company_product_name:
+    lineage:
+      - datalake_company_clean.product.name
+    description: Name of the company product tied to the agent via company membership profile (latest by update time).
+  is_1p_partnership:
+    lineage:
+      - datalake_ebdb_clean.agent.affiliation_type
+    description: True when affiliation type is autonomous (1P-style partnership flag).
+  is_3_partnership:
+    lineage:
+      - datalake_ebdb_clean.agent.affiliation_type
+    description: True when affiliation type is company-managed (3P-style partnership flag).
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.agent.ts_created
+    description: Timestamp when the agent record was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.agent.ts_updated
+    description: Timestamp when the agent record was last updated in EBDB.
