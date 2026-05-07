@@ -15,6 +15,7 @@ from emr.config import (
     validate_step_submit,
     validate_transient,
 )
+from emr.job_args import merged_job_script_args
 from emr.staging import resolve_local_uris_in_cfg
 
 
@@ -98,6 +99,36 @@ def main(ctx: click.Context) -> None:
     help=("Optional bootstrap: s3:// or bare path (relative → cwd)."),
 )
 @click.option(
+    "--bootstrap-arg",
+    "bootstrap_script_args",
+    multiple=True,
+    help=(
+        "Argument passed to the bootstrap script after Path (repeatable), "
+        "e.g. the artifacts bucket URI."
+    ),
+)
+@click.option(
+    "--job-args",
+    "job_args_line",
+    default=None,
+    help=(
+        "Single shell-style string of arguments for the Python driver after the "
+        ".py URI (spark-submit application args → sys.argv). Not for spark-submit "
+        "options such as --conf. Preferred for Make (JOB_ARGS=). Parsed with "
+        "shlex; combine with --job-arg."
+    ),
+)
+@click.option(
+    "--job-arg",
+    "job_script_args",
+    multiple=True,
+    help=(
+        "One token for the Python driver after the .py URI (repeatable). After "
+        "tokens from --job-args when both are set. Not for spark-submit flags "
+        "before the script."
+    ),
+)
+@click.option(
     "--use-spot/--no-use-spot",
     "use_spot",
     default=None,
@@ -118,11 +149,18 @@ def cmd_transient(
     core_instance_type: str | None,
     core_instance_count: int | None,
     bootstrap_script_uri: str | None,
+    bootstrap_script_args: tuple[str, ...],
+    job_args_line: str | None,
+    job_script_args: tuple[str, ...],
     use_spot: bool | None,
 ) -> None:
     settings_path = str(ctx.obj["settings_path"])
     tags: dict[str, str] | None = _tags_from_kv_pairs(tag_pairs) if tag_pairs else None
     try:
+        try:
+            job_merged = merged_job_script_args(job_args_line, job_script_args)
+        except ValueError as e:
+            raise click.BadParameter(str(e), param_hint="--job-args") from e
         cfg = merge_runtime_config(
             config_path=settings_path,
             s3_uri=job_uri,
@@ -133,6 +171,10 @@ def cmd_transient(
             core_instance_type=core_instance_type,
             core_instance_count=core_instance_count,
             bootstrap_script_uri=bootstrap_script_uri,
+            bootstrap_script_args=(
+                list(bootstrap_script_args) if bootstrap_script_args else None
+            ),
+            job_script_args=job_merged,
             use_spot=use_spot,
         )
         resolve_local_uris_in_cfg(cfg)
@@ -187,6 +229,15 @@ def cmd_transient(
     help="Optional bootstrap (s3:// or bare path; relative → cwd).",
 )
 @click.option(
+    "--bootstrap-arg",
+    "bootstrap_script_args",
+    multiple=True,
+    help=(
+        "Argument passed to the bootstrap script after Path (repeatable), "
+        "e.g. the artifacts bucket URI."
+    ),
+)
+@click.option(
     "--use-spot/--no-use-spot",
     "use_spot",
     default=None,
@@ -203,6 +254,7 @@ def cmd_create_cluster(
     core_instance_type: str | None,
     core_instance_count: int | None,
     bootstrap_script_uri: str | None,
+    bootstrap_script_args: tuple[str, ...],
     use_spot: bool | None,
 ) -> None:
     """Persistent cluster; idle auto-termination uses ``idle_timeout_sec`` in the env YAML only."""
@@ -217,6 +269,9 @@ def cmd_create_cluster(
             core_instance_type=core_instance_type,
             core_instance_count=core_instance_count,
             bootstrap_script_uri=bootstrap_script_uri,
+            bootstrap_script_args=(
+                list(bootstrap_script_args) if bootstrap_script_args else None
+            ),
             use_spot=use_spot,
         )
         resolve_local_uris_in_cfg(cfg)
@@ -270,6 +325,27 @@ def cmd_terminate(ctx: click.Context, cluster_id: str) -> None:
         "until the step finishes. Requires log_uri in the environment YAML."
     ),
 )
+@click.option(
+    "--job-args",
+    "job_args_line",
+    default=None,
+    help=(
+        "Single shell-style string of arguments for the Python driver after the "
+        ".py URI (spark-submit application args → sys.argv). Not for spark-submit "
+        "options such as --conf. Preferred for Make (JOB_ARGS=). Parsed with "
+        "shlex; combine with --job-arg."
+    ),
+)
+@click.option(
+    "--job-arg",
+    "job_script_args",
+    multiple=True,
+    help=(
+        "One token for the Python driver after the .py URI (repeatable). After "
+        "tokens from --job-args when both are set. Not for spark-submit flags "
+        "before the script."
+    ),
+)
 def cmd_submit_step(
     ctx: click.Context,
     cluster_id: str,
@@ -277,14 +353,21 @@ def cmd_submit_step(
     step_name: str,
     wait: bool,
     follow_logs: bool,
+    job_args_line: str | None,
+    job_script_args: tuple[str, ...],
 ) -> None:
     settings_path = str(ctx.obj["settings_path"])
     try:
+        try:
+            job_merged = merged_job_script_args(job_args_line, job_script_args)
+        except ValueError as e:
+            raise click.BadParameter(str(e), param_hint="--job-args") from e
         cfg = merge_step_submit_config(
             config_path=settings_path,
             s3_uri=job_uri,
             step_name=step_name,
             region=str(load_settings_file(settings_path)["region"]),
+            job_script_args=job_merged,
         )
         resolve_local_uris_in_cfg(cfg)
         validate_step_submit(cfg)

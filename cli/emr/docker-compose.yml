@@ -9,4 +9,5 @@ services:
     volumes:
       - ${HOME}/.aws:/root/.aws:ro
       - ./config:/config:ro
-      - ./samples:/samples:ro
+      # WORKDIR is /app — mount here so relative paths like samples/job/x.py resolve.
+      - ./samples:/app/samples:ro

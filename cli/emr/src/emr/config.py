@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 from urllib.parse import urlparse
 
 import yaml
@@ -51,6 +51,8 @@ SETTINGS_FILE_KEYS = frozenset[str](
         "core_instance_count",
         "idle_timeout_sec",
         "use_spot",
+        "applications",
+        "configurations",
     }
 )
 
@@ -154,6 +156,45 @@ _IDLE_TIMEOUT_SEC_MIN = 60
 _IDLE_TIMEOUT_SEC_MAX = 604800  # 7 days (AWS max)
 
 
+def validate_emr_applications(raw: Any) -> list[dict[str, str]]:
+    """Build EMR ``Applications`` payload: list of ``{\"Name\": \"Spark\"}`` dicts."""
+    if not isinstance(raw, list) or not raw:
+        raise ValueError("applications must be a non-empty YAML list")
+    out: list[dict[str, str]] = []
+    for item in raw:
+        if isinstance(item, str):
+            name = item.strip()
+            if not name:
+                raise ValueError("applications entries must be non-empty strings")
+            out.append({"Name": name})
+        elif isinstance(item, dict) and item.get("Name") is not None:
+            name = str(item["Name"]).strip()
+            if not name:
+                raise ValueError("applications Name must be non-empty")
+            out.append({"Name": name})
+        else:
+            raise ValueError(
+                "applications entries must be strings or mappings with a Name field"
+            )
+    return out
+
+
+def validate_emr_configurations(raw: Any) -> list[dict[str, Any]]:
+    """EMR ``Configurations`` blocks (Iceberg/Delta/Glue metastore, etc.). Empty list allowed."""
+    if raw is None:
+        return []
+    if not isinstance(raw, list):
+        raise ValueError("configurations must be a YAML list")
+    for item in raw:
+        if not isinstance(item, dict):
+            raise ValueError("each configurations entry must be a YAML mapping")
+        if "Classification" not in item:
+            raise ValueError(
+                "each configurations entry must include a Classification field"
+            )
+    return list(raw)
+
+
 def validate_idle_timeout_sec(n: int) -> int:
     if n < _IDLE_TIMEOUT_SEC_MIN or n > _IDLE_TIMEOUT_SEC_MAX:
         raise ValueError(
@@ -201,6 +242,10 @@ def load_settings_file(path: str | Path) -> dict[str, Any]:
             out[key] = validate_idle_timeout_sec(int(val))
         elif key == "staging_uri":
             out[key] = validate_staging_uri(str(val))
+        elif key == "applications":
+            out[key] = validate_emr_applications(val)
+        elif key == "configurations":
+            out[key] = validate_emr_configurations(val)
         else:
             out[key] = val
     return out
@@ -215,6 +260,7 @@ def merge_base_config(
     core_instance_type: str | None = None,
     core_instance_count: int | None = None,
     bootstrap_script_uri: str | None = None,
+    bootstrap_script_args: Sequence[str] | None = None,
     use_spot: bool | None = None,
 ) -> dict[str, Any]:
     """Load YAML settings plus shared CLI overrides (tags, instances, bootstrap)."""
@@ -240,6 +286,10 @@ def merge_base_config(
         cfg["bootstrap_script_uri"] = cli_emr_script_uri(
             bootstrap_script_uri, field="bootstrap_script_uri"
         )
+    if bootstrap_script_args:
+        cfg["bootstrap_script_args"] = [
+            str(a).strip() for a in bootstrap_script_args if str(a).strip()
+        ]
     # EMR RunJobFlow Tags: list of {Key, Value}. Required for AmazonEMRServicePolicy_v2-scoped EC2 API calls.
     emr_tags: list[dict[str, str]] = []
     if tags is not None:
@@ -264,6 +314,8 @@ def merge_runtime_config(
     core_instance_type: str | None = None,
     core_instance_count: int | None = None,
     bootstrap_script_uri: str | None = None,
+    bootstrap_script_args: Sequence[str] | None = None,
+    job_script_args: Sequence[str] | None = None,
     use_spot: bool | None = None,
 ) -> dict[str, Any]:
     """Load settings from YAML, then apply per-run CLI fields (do not appear in the YAML file)."""
@@ -275,6 +327,7 @@ def merge_runtime_config(
         core_instance_type=core_instance_type,
         core_instance_count=core_instance_count,
         bootstrap_script_uri=bootstrap_script_uri,
+        bootstrap_script_args=bootstrap_script_args,
         use_spot=use_spot,
     )
     if s3_uri is not None:
@@ -284,6 +337,10 @@ def merge_runtime_config(
         if not sn:
             raise ValueError("step_name must be non-empty")
         cfg["step_name"] = sn
+    if job_script_args:
+        cfg["job_script_args"] = [
+            str(a).strip() for a in job_script_args if str(a).strip()
+        ]
     return cfg
 
 
@@ -293,6 +350,7 @@ def merge_step_submit_config(
     s3_uri: str,
     step_name: str,
     region: str | None = None,
+    job_script_args: Sequence[str] | None = None,
 ) -> dict[str, Any]:
     """Settings file plus fields needed to add a Spark step to an existing cluster."""
     cfg = load_settings_file(config_path)
@@ -306,6 +364,10 @@ def merge_step_submit_config(
         if not r:
             raise ValueError("region must be non-empty when set")
         cfg["region"] = r
+    if job_script_args:
+        cfg["job_script_args"] = [
+            str(a).strip() for a in job_script_args if str(a).strip()
+        ]
     return cfg
 
 

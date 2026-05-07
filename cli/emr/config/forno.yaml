@@ -13,6 +13,28 @@ staging_uri: s3://artifacts.s3.forno.data.quintoandar.com.br/emr/staging/cli/
 visible_to_all_users: true
 idle_timeout_sec: 600
 
+# Same ``emr_applications`` as ``emr_cluster_base`` in ``bietlejuice/forno_conf.yml``:
+# Hadoop (YARN/HDFS), Hive (metastore SQL), JupyterEnterpriseGateway, Livy (REST),
+# Spark — plus configurations below for Glue + Delta/Iceberg.
+applications:
+  - Hadoop
+  - Hive
+  - Spark
+
+# Subset of ``emr_configurations`` from ``forno_conf.yml``: Delta/Iceberg toggles + Glue metastore client.
+# Does not include ``yarn-env`` (Databricks/UC secrets) — full parity uses Airflow + ``scripts/emr_init_script.sh``.
+configurations:
+  - Classification: iceberg-defaults
+    Properties:
+      iceberg.enabled: "true"
+  - Classification: delta-defaults
+    Properties:
+      delta.enabled: "true"
+  - Classification: spark-hive-site
+    Properties:
+      hive.metastore.client.factory.class: "com.amazonaws.glue.catalog.metastore.AWSG\
+        lueDataCatalogHiveClientFactory"
+
 # Overridable per run (CLI args).
 master_instance_type: m5.xlarge
 core_instance_type: m5.xlarge

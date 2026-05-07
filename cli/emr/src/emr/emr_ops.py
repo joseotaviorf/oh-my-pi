@@ -152,7 +152,7 @@ def _build_run_job_flow_payload(
     payload: dict[str, Any] = {
         "Name": cfg["name"],
         "ReleaseLabel": cfg["release_label"],
-        "Applications": [{"Name": "Spark"}],
+        "Applications": cfg["applications"],
         "JobFlowRole": cfg["job_flow_role"],
         "ServiceRole": cfg["service_role"],
         "Instances": build_instances_block(
@@ -164,12 +164,20 @@ def _build_run_job_flow_payload(
     if cfg.get("log_uri"):
         payload["LogUri"] = cfg["log_uri"]
 
+    emr_cfgs = cfg.get("configurations") or []
+    if emr_cfgs:
+        payload["Configurations"] = emr_cfgs
+
     bootstrap_uri = cfg.get("bootstrap_script_uri")
     if bootstrap_uri:
+        script_action: dict[str, Any] = {"Path": str(bootstrap_uri)}
+        bs_args = cfg.get("bootstrap_script_args")
+        if bs_args:
+            script_action["Args"] = [str(a) for a in bs_args]
         payload["BootstrapActions"] = [
             {
                 "Name": "Worker init script",
-                "ScriptBootstrapAction": {"Path": str(bootstrap_uri)},
+                "ScriptBootstrapAction": script_action,
             }
         ]
 
@@ -195,6 +203,7 @@ def submit_transient(
         action_on_failure=cfg["action_on_failure"],
         s3_py_uri=cfg["s3_uri"],
         deploy_mode=cfg["deploy_mode"],
+        py_script_args=cfg.get("job_script_args"),
     )
 
     payload = _build_run_job_flow_payload(
@@ -259,6 +268,7 @@ def submit_step_to_cluster(
         action_on_failure=cfg["action_on_failure"],
         s3_py_uri=cfg["s3_uri"],
         deploy_mode=cfg["deploy_mode"],
+        py_script_args=cfg.get("job_script_args"),
     )
     resp = client.add_job_flow_steps(JobFlowId=cluster_id, Steps=[step])
     step_ids = resp.get("StepIds") or []

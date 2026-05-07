@@ -153,6 +153,9 @@ def test_load_settings_file_rejects_unknown_keys(tmp_path: Path) -> None:
             core_instance_count: 2
             idle_timeout_sec: 600
             use_spot: true
+            applications:
+              - Spark
+            configurations: []
             extra_bad: true
             """
         ).strip(),
@@ -183,6 +186,10 @@ def test_load_settings_file_ok(tmp_path: Path) -> None:
             core_instance_count: 2
             idle_timeout_sec: 600
             use_spot: false
+            applications:
+              - Hadoop
+              - Spark
+            configurations: []
             """
         ).strip(),
         encoding="utf-8",
@@ -193,6 +200,8 @@ def test_load_settings_file_ok(tmp_path: Path) -> None:
     assert cfg["visible_to_all_users"] is True
     assert cfg["use_spot"] is False
     assert cfg["staging_uri"] == "s3://b/emr/staging/cli/"
+    assert cfg["applications"] == [{"Name": "Hadoop"}, {"Name": "Spark"}]
+    assert cfg["configurations"] == []
 
 
 def test_normalize_tags_dict() -> None:
@@ -248,6 +257,36 @@ def test_validate_step_submit_ok(tmp_path: Path) -> None:
     validate_step_submit(cfg)
 
 
+def test_merge_runtime_config_bootstrap_and_job_args(tmp_path: Path) -> None:
+    p = _write_minimal_settings(tmp_path / "emr-settings.yaml")
+    from emr.config import merge_runtime_config
+
+    cfg = merge_runtime_config(
+        config_path=p,
+        s3_uri="s3://b/job.py",
+        step_name="step",
+        name="flow",
+        bootstrap_script_args=("s3://artifacts.example",),
+        job_script_args=("--target-table", "sandbox.t"),
+    )
+    assert cfg["bootstrap_script_args"] == ["s3://artifacts.example"]
+    assert cfg["job_script_args"] == ["--target-table", "sandbox.t"]
+
+
+def test_merge_step_submit_config_job_args(tmp_path: Path) -> None:
+    p = _write_minimal_settings(tmp_path / "emr-settings.yaml")
+    from emr.config import merge_step_submit_config
+
+    cfg = merge_step_submit_config(
+        config_path=p,
+        s3_uri="s3://b/job.py",
+        step_name="step",
+        region="us-east-1",
+        job_script_args=["--foo", "bar"],
+    )
+    assert cfg["job_script_args"] == ["--foo", "bar"]
+
+
 def test_merge_runtime_config_overrides_use_spot(tmp_path: Path) -> None:
     p = _write_minimal_settings(tmp_path / "emr-settings.yaml")
     from emr.config import merge_runtime_config
@@ -290,6 +329,9 @@ def _write_minimal_settings(path: Path) -> Path:
             core_instance_count: 2
             idle_timeout_sec: 600
             use_spot: true
+            applications:
+              - Spark
+            configurations: []
             """
         ).strip(),
         encoding="utf-8",
