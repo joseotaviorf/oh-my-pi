@@ -1,47 +1,4 @@
-WITH cdp_utms AS (
-  SELECT
-    COALESCE(
-      CAST(GET_JSON_OBJECT(event_properties, '$.lead_id') AS BIGINT),
-      CAST(GET_JSON_OBJECT(event_properties, '$.formfield_lead_id') AS BIGINT)
-    ) AS id_lead_ebdb,
-    GET_JSON_OBJECT(user_properties, '$.egw_referrer_domain') AS egw_referrer_domain,
-    COALESCE(
-      egw_utm_source,
-      CASE
-        WHEN egw_referrer_domain IN ('www.google.com', 'www.google.com.br') THEN 'google'
-        WHEN egw_referrer_domain = 'www.bing.com' THEN 'bing'
-        WHEN egw_referrer_domain IN ('br.search.yahoo.com', 'r.search.yahoo.com') THEN 'yahoo'
-        WHEN egw_referrer_domain = 'search.brave.com' THEN 'brave'
-        WHEN egw_referrer_domain = 'duckduckgo.com' THEN 'duckduckgo'
-      END
-    ) AS egw_utm_source,
-    COALESCE(
-      egw_utm_medium,
-      CASE
-        WHEN egw_referrer_domain IN ('www.google.com', 'www.google.com.br', 'www.bing.com',
-          'br.search.yahoo.com', 'r.search.yahoo.com', 'search.brave.com', 'duckduckgo.com') THEN 'seo'
-      END
-    ) AS egw_utm_medium,
-    egw_utm_campaign,
-    egw_utm_term,
-    egw_utm_content
-  FROM
-    datalake_cdp_clean.user_tracking
-  WHERE
-    event_name IN ('lead_form_submitted', 'price_suggestion_form_submitted', 'price_suggestion_sale_form_submitted', 
-      'intro_page_viewed', 'property_details_page_viewed', 'property_address_details_page_viewed', 'rent_pricing_new_listing_page_viewed', 'sale_pricing_new_listing_page_viewed',
-      'rent_pricing_new_listing_form_submitted', 'sale_pricing_new_listing_form_submitted', 'photo_scheduling_page_viewed', 'photo_scheduling_form_submitted')
-    AND COALESCE(
-      CAST(GET_JSON_OBJECT(event_properties, '$.lead_id') AS BIGINT),
-      CAST(GET_JSON_OBJECT(event_properties, '$.formfield_lead_id') AS BIGINT)
-    ) IS NOT NULL
-    AND MAKE_DATE(year, month, day) >= DATE('{load_start_date}') - INTERVAL 60 DAYS
-  QUALIFY ROW_NUMBER() OVER (
-    PARTITION BY id_lead_ebdb
-    ORDER BY ts_event
-  ) = 1
-),
-lead_origin_rene_descartes AS (
+WITH lead_origin_rene_descartes AS (
   SELECT
     hl.id AS id_lead,
     hl.id_lead_ebdb,
@@ -98,10 +55,10 @@ lead_origin_amplitude AS (
     datalake_amplitude_lead.lead_origin AS lo
   WHERE
     DATE(ts_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_lead ORDER BY ts_event) = 1
+  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_lead ORDER BY ts_event) = 1
 ),
 inbound_leads AS (
-  SELECT 
+  SELECT
     ia.id_lead_ebdb,
     ia.id_session,
     ia.id_task,
@@ -115,7 +72,7 @@ inbound_leads AS (
     fm.utm_content,
     fm.origin AS utm_source,
     'whatsapp' AS utm_medium
-  FROM 
+  FROM
     datalake_supply_flows.inbound_attribution AS ia
   LEFT JOIN
     datalake_growth_media_platform.facebook_metrics AS fm
@@ -128,11 +85,11 @@ mid_table AS (
     r.id_lead AS id_lead,
     r.id_lead_ebdb AS id_lead_ebdb,
     COALESCE(r.affiliate_type, atf.first_affiliate_type) AS affiliate_type,
-    COALESCE(cdp.egw_utm_campaign, a.campaign, ia.utm_campaign) AS campaign,
-    COALESCE(cdp.egw_utm_medium, a.medium, ia.utm_medium) AS medium,
-    COALESCE(cdp.egw_utm_source, a.source, ia.utm_source) AS source,
-    COALESCE(cdp.egw_utm_content, a.content, ia.utm_content) AS content,
-    COALESCE(cdp.egw_utm_term, a.term, ia.utm_term) AS term,
+    COALESCE(oa.utm_campaign, a.utm_campaign, inbound_leads.utm_campaign) AS campaign,
+    COALESCE(oa.utm_medium, a.utm_medium, inbound_leads.utm_medium) AS medium,
+    COALESCE(oa.utm_source, a.utm_source, inbound_leads.utm_source) AS source,
+    COALESCE(oa.utm_content, a.utm_content, inbound_leads.utm_content) AS content,
+    COALESCE(oa.utm_term, a.utm_term, inbound_leads.utm_term) AS term,
     r.ops_agent,
     r.ops_partner,
     r.application,
@@ -144,37 +101,37 @@ mid_table AS (
     r.lead_type,
     r.detailed_route,
     r.original_lead,
-    ia.id_task,
+    inbound_leads.id_task,
     r.id_ai_core_session,
-    ia.id_session AS id_chat_session,
+    inbound_leads.id_session AS id_chat_session,
     r.gclid,
     r.fbclid,
-    ia.ctwa_clid,
-    ia.quinto_andar_phone_number,
-    ia.id_source_ctwa,
-    ia.url_source_ctwa,
-    ia.type_source_ctwa,
-    NVL2(cdp.egw_utm_campaign, 'cdp', NVL2(a.campaign, 'amplitude', NVL2(ia.utm_campaign, 'facebook_api', 'lost_tracking'))) AS database_tracking_campaign,
-    NVL2(cdp.egw_utm_medium, 'cdp', NVL2(a.medium, 'amplitude', NVL2(ia.utm_medium, 'facebook_api', 'lost_tracking'))) AS database_tracking_medium,
-    NVL2(cdp.egw_utm_source, 'cdp', NVL2(a.source, 'amplitude', NVL2(ia.utm_source, 'facebook_api', 'lost_tracking'))) AS database_tracking_source,
-    NVL2(cdp.egw_utm_content, 'cdp', NVL2(a.content, 'amplitude', NVL2(ia.utm_content, 'facebook_api', 'lost_tracking'))) AS database_tracking_content,
-    NVL2(cdp.egw_utm_term, 'cdp', NVL2(a.term, 'amplitude', NVL2(ia.utm_term, 'facebook_api', 'lost_tracking'))) AS database_tracking_term,
-    NVL2(r.ctwa_clid, 'rene_descartes', NVL2(ia.ctwa_clid, 'sauron', 'lost_tracking')) AS database_tracking_ctwa,
-    r.ts_event
+    inbound_leads.ctwa_clid,
+    inbound_leads.quinto_andar_phone_number,
+    inbound_leads.id_source_ctwa,
+    inbound_leads.url_source_ctwa,
+    inbound_leads.type_source_ctwa,
+    NVL2(oa.utm_campaign, 'cdp', NVL2(a.utm_campaign, 'amplitude', NVL2(inbound_leads.utm_campaign, 'facebook_api', 'lost_tracking'))) AS database_tracking_campaign,
+    NVL2(oa.utm_medium, 'cdp', NVL2(a.utm_medium, 'amplitude', NVL2(inbound_leads.utm_medium, 'facebook_api', 'lost_tracking'))) AS database_tracking_medium,
+    NVL2(oa.utm_source, 'cdp', NVL2(a.utm_source, 'amplitude', NVL2(inbound_leads.utm_source, 'facebook_api', 'lost_tracking'))) AS database_tracking_source,
+    NVL2(oa.utm_content, 'cdp', NVL2(a.utm_content, 'amplitude', NVL2(inbound_leads.utm_content, 'facebook_api', 'lost_tracking'))) AS database_tracking_content,
+    NVL2(oa.utm_term, 'cdp', NVL2(a.utm_term, 'amplitude', NVL2(inbound_leads.utm_term, 'facebook_api', 'lost_tracking'))) AS database_tracking_term,
+    NVL2(r.ctwa_clid, 'rene_descartes', NVL2(inbound_leads.ctwa_clid, 'sauron', 'lost_tracking')) AS database_tracking_ctwa,
+    COALESCE(r.ts_event, a.ts_event) AS ts_event
   FROM
     lead_origin_rene_descartes AS r
   LEFT JOIN
-    cdp_utms AS cdp
-      ON r.id_lead_ebdb = cdp.id_lead_ebdb
+    datalake_attribution.online_attribution AS oa
+      ON r.id_lead_ebdb = oa.id_lead
   LEFT JOIN
     lead_origin_amplitude AS a
-      ON (r.id_lead_ebdb = a.id_lead_ebdb)
+      ON r.id_lead_ebdb = a.id_lead_ebdb
   LEFT JOIN
     affiliate_type_fix AS atf
-      ON (r.id_lead = atf.id_lead)
+      ON r.id_lead = atf.id_lead
   LEFT JOIN
-    inbound_leads AS ia
-      ON ia.id_lead_ebdb = r.id_lead_ebdb
+    inbound_leads
+      ON inbound_leads.id_lead_ebdb = r.id_lead_ebdb
 )
 SELECT DISTINCT
   id_lead,

@@ -2,7 +2,7 @@ database_name: datalake_supply_flows
 table_name: lead_origin_cdp
 domain: Growth
 owner: henrique.paulo@quintoandar.com.br
-description: Replica of lead_origin with UTM columns (source, medium, campaign, term, content) sourced from CDP user_tracking instead of the Rene Descartes and Amplitude COALESCE chain, enabling side-by-side attribution comparison.
+description: Enriched lead attribution table with one row per lead. UTM columns (campaign, medium, source, term, content) are resolved via a COALESCE chain online_attribution (CDI tracking layer) first, then Amplitude, then Facebook API via inbound leads. Provides multi-source attribution context for supply leads along with ops metadata and tracking database provenance columns.
 columns:
   id_lead:
     description: The unique identifier for each lead in the dataset.
@@ -21,31 +21,32 @@ columns:
     lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   campaign:
-    description: The utm_campaign sourced from CDP user_tracking (egw_utm_campaign).
+    description: UTM campaign value resolved via COALESCE(online_attribution, amplitude, facebook_api). Identifies the marketing campaign that generated the lead.
     lineage:
-      - datalake_cdp_clean.user_tracking.egw_utm_campaign
+      - datalake_attribution.online_attribution.utm_campaign
+      - datalake_amplitude_lead.lead_origin.utm_campaign
+      - datalake_growth_media_platform.facebook_metrics.utm_campaign
   medium:
-    description: The utm_medium sourced from CDP user_tracking (egw_utm_medium), with referrer_domain fallback for SEO detection when UTMs are null.
+    description: UTM medium value resolved via COALESCE(online_attribution, amplitude, inbound_leads). For WhatsApp inbound leads the value is the literal 'whatsapp'.
     lineage:
-      - datalake_cdp_clean.user_tracking.egw_utm_medium
+      - datalake_attribution.online_attribution.utm_medium
       - datalake_amplitude_lead.lead_origin.utm_medium
-      - datalake_growth_media_platform.facebook_metrics.utm_medium
   source:
-    description: The utm_source sourced from CDP user_tracking (egw_utm_source), with referrer_domain fallback for SEO detection when UTMs are null.
+    description: UTM source value resolved via COALESCE(online_attribution, amplitude, facebook_api). For Facebook inbound leads the value is mapped from facebook_metrics.origin.
     lineage:
-      - datalake_cdp_clean.user_tracking.egw_utm_source
+      - datalake_attribution.online_attribution.utm_source
       - datalake_amplitude_lead.lead_origin.utm_source
-      - datalake_growth_media_platform.facebook_metrics.utm_source
+      - datalake_growth_media_platform.facebook_metrics.origin
   term:
-    description: The utm_term sourced from CDP user_tracking (egw_utm_term).
+    description: UTM term value resolved via COALESCE(online_attribution, amplitude, facebook_api). Typically identifies the paid keyword associated with the lead.
     lineage:
-      - datalake_cdp_clean.user_tracking.egw_utm_term
+      - datalake_attribution.online_attribution.utm_term
       - datalake_amplitude_lead.lead_origin.utm_term
       - datalake_growth_media_platform.facebook_metrics.utm_term
   content:
-    description: The utm_content sourced from CDP user_tracking (egw_utm_content).
+    description: UTM content value resolved via COALESCE(online_attribution, amplitude, facebook_api). Used to differentiate ads or links pointing to the same URL.
     lineage:
-      - datalake_cdp_clean.user_tracking.egw_utm_content
+      - datalake_attribution.online_attribution.utm_content
       - datalake_amplitude_lead.lead_origin.utm_content
       - datalake_growth_media_platform.facebook_metrics.utm_content
   ops_agent:
@@ -139,48 +140,43 @@ columns:
     lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   database_tracking_campaign:
-    description: The source system responsible for the campaign UTM value. Values are cdp, amplitude, facebook_api or lost_tracking.
+    description: Provenance label for the campaign UTM value. Possible values are cdp (online_attribution), amplitude, facebook_api, or lost_tracking.
     lineage:
-      - datalake_cdp_clean.user_tracking.egw_utm_campaign
+      - datalake_attribution.online_attribution.utm_campaign
       - datalake_amplitude_lead.lead_origin.utm_campaign
       - datalake_growth_media_platform.facebook_metrics.utm_campaign
-      - datalake_supply_flows.inbound_attribution.id_source_ctwa
   database_tracking_medium:
-    description: The source system responsible for the medium UTM value. Values are cdp, amplitude, facebook_api or lost_tracking.
+    description: Provenance label for the medium UTM value. Possible values are cdp (online_attribution), amplitude, facebook_api, or lost_tracking.
     lineage:
-      - datalake_cdp_clean.user_tracking.egw_utm_medium
+      - datalake_attribution.online_attribution.utm_medium
       - datalake_amplitude_lead.lead_origin.utm_medium
-      - datalake_growth_media_platform.facebook_metrics.utm_medium
-      - datalake_supply_flows.inbound_attribution.id_source_ctwa
   database_tracking_source:
-    description: The source system responsible for the source UTM value. Values are cdp, amplitude, facebook_api or lost_tracking.
+    description: Provenance label for the source UTM value. Possible values are cdp (online_attribution), amplitude, facebook_api, or lost_tracking.
     lineage:
-      - datalake_cdp_clean.user_tracking.egw_utm_source
+      - datalake_attribution.online_attribution.utm_source
       - datalake_amplitude_lead.lead_origin.utm_source
-      - datalake_growth_media_platform.facebook_metrics.utm_source
-      - datalake_supply_flows.inbound_attribution.id_source_ctwa
+      - datalake_growth_media_platform.facebook_metrics.origin
   database_tracking_content:
-    description: The source system responsible for the content UTM value. Values are cdp, amplitude, facebook_api or lost_tracking.
+    description: Provenance label for the content UTM value. Possible values are cdp (online_attribution), amplitude, facebook_api, or lost_tracking.
     lineage:
-      - datalake_cdp_clean.user_tracking.egw_utm_content
+      - datalake_attribution.online_attribution.utm_content
       - datalake_amplitude_lead.lead_origin.utm_content
       - datalake_growth_media_platform.facebook_metrics.utm_content
-      - datalake_supply_flows.inbound_attribution.id_source_ctwa
   database_tracking_term:
-    description: The source system responsible for the term UTM value. Values are cdp, amplitude, facebook_api or lost_tracking.
+    description: Provenance label for the term UTM value. Possible values are cdp (online_attribution), amplitude, facebook_api, or lost_tracking.
     lineage:
-      - datalake_cdp_clean.user_tracking.egw_utm_term
+      - datalake_attribution.online_attribution.utm_term
       - datalake_amplitude_lead.lead_origin.utm_term
       - datalake_growth_media_platform.facebook_metrics.utm_term
-      - datalake_supply_flows.inbound_attribution.id_source_ctwa
   database_tracking_ctwa:
     description: The source responsible for the ctwa information. Values are rene_descartes, sauron or lost_tracking.
     lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
       - datalake_supply_flows.inbound_attribution.ctwa_clid
   ts_event:
-    description: The timestamp of the lead creation event.
+    description: The timestamp of the lead creation event. Resolved via COALESCE(rene_descartes ts_created, amplitude ts_event).
     lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.ts_created
+      - datalake_amplitude_lead.lead_origin.ts_event
   ts_load:
     description: The timestamp of the data load.
