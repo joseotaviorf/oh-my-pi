@@ -96,6 +96,9 @@ columns:
   channel:
     description: Communication channel of the contact (call or chat).
   status:
+    lineage:
+      - datalake_customer_support.chats.task_completion_reason
+      - datalake_customer_support.chats.task_outcome
     description: Status of the interaction - represents how that interaction ended
     categories:
       tranferred: Not a terminal status, means the contact has a transfer generating a new interaction
@@ -116,7 +119,8 @@ columns:
   completion_reason:
     lineage:
       - datalake_customer_support.chats.task_completion_reason
-    description: Completion reason of the contact.
+      - datalake_customer_support.chats.task_outcome
+    description: Completion reason or outcome of the interaction.
   customer_phone_number:
     lineage:
       - datalake_customer_support.calls.from_phone_number

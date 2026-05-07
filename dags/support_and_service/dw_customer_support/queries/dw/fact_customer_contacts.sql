@@ -96,14 +96,14 @@ twilio_demand AS (
     'chat' AS channel,
     origin,
     CASE
-      WHEN task_completion_reason = 'task idled' THEN 'idled'
-      WHEN task_completion_reason = 'session expired' THEN 'expired'
-      WHEN task_completion_reason = 'task completed' THEN 'completed'
-      WHEN task_completion_reason = 'task transferred' THEN 'transferred'
+      WHEN COALESCE(task_completion_reason, task_outcome) = 'task idled' THEN 'idled'
+      WHEN COALESCE(task_completion_reason, task_outcome) = 'session expired' THEN 'expired'
+      WHEN COALESCE(task_completion_reason, task_outcome) = 'task completed' THEN 'completed'
+      WHEN COALESCE(task_completion_reason, task_outcome) = 'task transferred' THEN 'transferred'
       WHEN ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_created DESC) = 1 THEN 'completed'
       ELSE 'transferred'
     END AS status,
-    task_completion_reason AS completion_reason,
+    COALESCE(task_completion_reason, task_outcome) AS completion_reason,
     worker_email,
     twilio_phone_number AS quinto_andar_phone_number,
     customer_phone_number,
@@ -116,7 +116,7 @@ twilio_demand AS (
     TRUE AS is_contact_answered,
     CASE
       WHEN task_status = 'canceled' THEN FALSE
-      WHEN task_completion_reason = 'Task TTL Exceeded or Max assignment count exceeded' THEN FALSE
+      WHEN COALESCE(task_completion_reason, task_outcome) = 'Task TTL Exceeded or Max assignment count exceeded' THEN FALSE
       ELSE TRUE
     END AS is_interaction_answered,
     is_spoc_task,
