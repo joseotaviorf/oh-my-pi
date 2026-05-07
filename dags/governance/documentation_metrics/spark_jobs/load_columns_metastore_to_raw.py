@@ -56,6 +56,8 @@ def extract_layer_from_database_name(database_name):
             return LayerEnum.RAW.value
         if database_name.endswith("_clean"):
             return LayerEnum.CLEAN.value
+        if database_name.endswith("_transactional"):
+            return LayerEnum.TRANSACTIONAL.value
         else:
             return LayerEnum.ENRICH.value
     return ""
