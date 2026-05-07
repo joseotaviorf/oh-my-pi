@@ -1,42 +1,63 @@
 database_name: datalake_wall_street_clean
 table_name: charge_aud
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: "Audit log of charge records from Wall Street, including revision
+  metadata and field-level change tracking."
 columns:
   id:
     lineage:
       - datalake_wall_street_raw.charge_aud.id
-  rev:
-    lineage:
-      - datalake_wall_street_raw.charge_aud.rev
-  rev_type:
-    lineage:
-      - datalake_wall_street_raw.charge_aud.revtype
-  rev_end:
-    lineage:
-      - datalake_wall_street_raw.charge_aud.revend
-  acquire:
-    lineage:
-      - datalake_wall_street_raw.charge_aud.acquire
-  id_acquire:
-    lineage:
-      - datalake_wall_street_raw.charge_aud.acquireid
-  charge_status:
-    lineage:
-      - datalake_wall_street_raw.charge_aud.chargestatus
+    description: "Unique identifier of the charge."
   id_external:
     lineage:
       - datalake_wall_street_raw.charge_aud.externalid
-  ts_updated:
+    description: "External identifier for the charge."
+  rev:
     lineage:
-      - datalake_wall_street_raw.charge_aud.lastupdate
+      - datalake_wall_street_raw.charge_aud.rev
+    description: "Revision identifier."
+  rev_type:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.revtype
+    description: "Revision type."
+  rev_end:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.revend
+    description: "Revision end identifier."
+  acquire:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.acquire
+    description: "Acquire name."
+  id_acquire:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.acquireid
+    description: "Acquire ID."
+  charge_status:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.chargestatus
+    description: "Charge status."
   acquire_charge_status:
     lineage:
       - datalake_wall_street_raw.charge_aud.acquirechargestatus
+    description: "Acquire charge status."
   acquire_auth_code:
     lineage:
       - datalake_wall_street_raw.charge_aud.acquireauthcode
+    description: "Acquire authorization code."
   acquire_nsu:
     lineage:
       - datalake_wall_street_raw.charge_aud.acquirensu
+    description: "Acquire NSU."
   id_acquire_transaction:
     lineage:
       - datalake_wall_street_raw.charge_aud.acquiretid
+    description: "Acquire transaction ID."
+  ts_paid:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.paidat
+    description: "Timestamp when the charge was paid."
+  ts_updated:
+    lineage:
+      - datalake_wall_street_raw.charge_aud.lastupdate
+    description: "Timestamp when the charge was updated."

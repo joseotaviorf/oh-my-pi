@@ -1,15 +1,17 @@
-select
-    id, 
-    REV as rev, 
-    REVTYPE as rev_type,
-    REVEND as rev_end,
-    acquire, 
-    acquireId as id_acquire,  
-    chargeStatus as charge_status,
-    externalId as id_external,
-    lastUpdate as ts_updated,
-    acquireChargeStatus as acquire_charge_status,
-    acquireAuthCode as acquire_auth_code,
-    acquireNsu as acquire_nsu,
-    acquireTid as id_acquire_transaction
-from datalake_wall_street_raw.charge_aud
+SELECT
+    id,
+    externalId AS id_external,
+    acquireId AS id_acquire,
+    acquireTid AS id_acquire_transaction,
+    REV AS rev,
+    REVTYPE AS rev_type,
+    REVEND AS rev_end,
+    acquire,
+    chargeStatus AS charge_status,
+    acquireChargeStatus AS acquire_charge_status,
+    acquireAuthCode AS acquire_auth_code,
+    acquireNsu AS acquire_nsu,
+    paidAt AS ts_paid,
+    lastUpdate AS ts_updated
+FROM
+    datalake_wall_street_raw.charge_aud

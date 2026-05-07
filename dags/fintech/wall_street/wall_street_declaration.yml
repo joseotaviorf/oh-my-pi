@@ -18,43 +18,46 @@ workflow:
   tables_customization:
     AcquireChargeback:
       clean_table_name: acquire_chargeback
-      primary_keys: ["id"]
+      primary_keys: [ "id" ]
     Blocklist:
       clean_table_name: blocklist
-      primary_keys: ["id"]
+      primary_keys: [ "id" ]
     Charge_AUD:
       clean_table_name: charge_aud
-      primary_keys: ["id", "rev"]
+      primary_keys: [ "id", "rev" ]
     ChargeMundipagg:
       clean_table_name: charge_mundipagg
-      primary_keys: ["id"]
+      primary_keys: [ "id" ]
     Chargeback:
       clean_table_name: chargeback
-      primary_keys: ["id"]
+      primary_keys: [ "id" ]
     ChargebackNotification:
       clean_table_name: chargeback_notification
-      primary_keys: ["id"]
+      primary_keys: [ "id" ]
     CreditCard:
       clean_table_name: creditcard
-      primary_keys: ["id"]
+      primary_keys: [ "id" ]
     Invoice:
       clean_table_name: invoice
-      primary_keys: ["id"]
+      primary_keys: [ "id" ]
     InvoiceSubscriptionItem:
       clean_table_name: invoice_subscription_item
-      primary_keys: ["id"]
+      primary_keys: [ "id" ]
     Subscription:
       clean_table_name: subscription
-      primary_keys: ["id"]
+      primary_keys: [ "id" ]
     SubscriptionItem:
       clean_table_name: subscription_item
-      primary_keys: ["id"]
+      primary_keys: [ "id" ]
     Store:
       clean_table_name: store
-      primary_keys: ["id"]
+      primary_keys: [ "id" ]
     UserBlocklist:
       clean_table_name: user_blocklist
-      primary_keys: ["id_user"]
+      primary_keys: [ "id_user" ]
+    Hook:
+      clean_table_name: hook
+      primary_keys: [ "id" ]
 cluster:
   type: custom_cluster
   custom_libraries:

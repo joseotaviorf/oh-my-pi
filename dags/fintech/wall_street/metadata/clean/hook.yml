@@ -1,0 +1,54 @@
+---
+database_name: datalake_wall_street_clean
+table_name: hook
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+description: >-
+  Clean layer mirror of Wall Street hook records from MySQL CDC: one row per asynchronous
+  hook or callback job used by the financial integrations hub, including retry and status.
+columns:
+  id:
+    description: >-
+      Primary key of the hook row in the Wall Street transactional database, uniquely identifying this hook.
+    lineage:
+      - datalake_wall_street_raw.hook.id
+  id_entity:
+    description: >-
+      Identifier of the related business entity (for example a subscription or charge) when the hook targets a specific record.
+    lineage:
+      - datalake_wall_street_raw.hook.entityid
+  entity_type:
+    description: >-
+      Short label indicating what kind of entity id_entity refers to within the Wall Street service boundaries.
+    lineage:
+      - datalake_wall_street_raw.hook.entitytype
+  hook_type:
+    description: >-
+      Hook integration or workflow category from the source system, renamed from the reserved column name type.
+    lineage:
+      - datalake_wall_street_raw.hook.type
+  status:
+    description: >-
+      Current lifecycle status of the hook in the source application (for example pending, delivered, or failed).
+    lineage:
+      - datalake_wall_street_raw.hook.status
+  number_of_attempts:
+    description: >-
+      Total number of processing or delivery attempts recorded for this hook in the transactional system.
+    lineage:
+      - datalake_wall_street_raw.hook.numberofattempts
+  ts_created:
+    description: >-
+      Timestamp when the hook record was created in the source database, cast to timestamp in the clean layer.
+    lineage:
+      - datalake_wall_street_raw.hook.createdat
+  ts_first_attempt:
+    description: >-
+      Timestamp of the first execution or delivery attempt for this hook when the source captured it.
+    lineage:
+      - datalake_wall_street_raw.hook.firstattemptat
+  ts_last_attempt:
+    description: >-
+      Timestamp of the latest execution or delivery attempt for this hook when the source captured it.
+    lineage:
+      - datalake_wall_street_raw.hook.lastattemptat
