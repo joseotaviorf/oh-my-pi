@@ -70,5 +70,5 @@ def check_for_create_partition(df):
         flag indicating CREATE presence.
     """
     return df.groupby("id_record").agg(
-        F.bool_or(F.col("event_type") == "CREATE").alias("has_create")
+        F.bool_or(F.col("event_type").isin("CREATE", "RECOVERED")).alias("has_create")
     )

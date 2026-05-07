@@ -1,6 +1,6 @@
 """Salesforce REST ``/query`` helpers: paginated SOQL, optional retries, Spark partition closure.
 
-Lists/pandas only (not Spark DFs). Path from ``variables.QUERY_ENDPOINT``.
+Lists/pandas only (not Spark DFs). Path from ``configs.salesforce.QUERY_ENDPOINT``.
 
 Gotchas: pagination uses ``base_endpoint + nextRecordsUrl`` (must match your
 instance URL shape); results are one in-memory ``list``; page fetches are not
@@ -8,16 +8,26 @@ throttled. Retries key off substrings in ``str(exception)`` (fragile; e.g.
 timeouts may not match).
 """
 
-from bietlejuice.base.sst.domains.salesforce.api.common.variables import QUERY_ENDPOINT
+from bietlejuice.base.sst.configs.salesforce import QUERY_ENDPOINT
 from bietlejuice.base.sst.core.api.request import (
     get_request,
 )
-from bietlejuice.base.sst.domains.salesforce.api.common.headers import (
+from bietlejuice.base.sst.domains.salesforce.api.headers import (
     build_authorization_header,
 )
 import time
 import pandas as pd
 import json
+
+
+def build_query(columns, table_name, condition):
+    cols_query = "\n, ".join(columns)
+    query = f"""
+    SELECT {cols_query}
+    FROM {table_name}
+    WHERE {condition}
+  """
+    return query
 
 
 def query_all(base_endpoint, access_token, query: str):
@@ -179,3 +189,15 @@ def get_change_lst(endpoint, access_token, start_ts, end_ts):
     }
     response = get_request(endpoint=endpoint, headers=headers, params=params)
     return response
+
+
+def paralelize_queries(spark, queries, paralelism):
+    """Build a two-column DataFrame (idx, query) and repartition for parallel API work.
+
+    Accepts a list of query strings and materializes them with stable row indices
+    so executors can fan out API calls with controlled Spark parallelism.
+    """
+    return spark.createDataFrame(
+        [(idx, query) for idx, query in enumerate(queries)],
+        ["idx", "query"],
+    ).repartition(paralelism)

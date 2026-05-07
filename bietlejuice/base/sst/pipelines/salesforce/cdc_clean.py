@@ -156,7 +156,7 @@ def salesforce_clean_pipeline(cfg):
         )
 
     ts_load = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    snapshot = (
+    cdc_conformed_df = (
         in_memory_cdc_udpate(all_events_df)
         .where(F.col("new_record") == F.lit(True))
         .drop("new_record")
@@ -166,7 +166,7 @@ def salesforce_clean_pipeline(cfg):
     )
 
     basic_quality_checks(
-        snapshot,
+        cdc_conformed_df,
         required_cols=[
             "id_record",
             "transaction_key",
@@ -182,9 +182,9 @@ def salesforce_clean_pipeline(cfg):
         f"m=salesforce_clean_pipeline, msg=Metadata retrieved: {cfg.target_schema=}"
     )
 
-    new_cols = sensor_for_new_columns(spark=spark, df=snapshot, table=target_table)
-    partition_filter = f"partition_date='{cfg.partition_date}' AND partition_hour='{cfg.partition_hour}'"
-
+    new_cols = sensor_for_new_columns(
+        spark=spark, df=cdc_conformed_df, table=target_table
+    )
     partition_filter = build_partition_filter(
         {
             "partition_date": cfg.partition_date,
@@ -194,7 +194,7 @@ def salesforce_clean_pipeline(cfg):
     table_location = f"s3a://{cfg.bucket}/clean/salesforce/{cfg.target_table}"
     validate_and_write(
         spark,
-        snapshot,
+        cdc_conformed_df,
         target_table=target_table,
         partition_filter=partition_filter,
         partition_cols=["partition_date", "partition_hour"],
@@ -220,7 +220,7 @@ def salesforce_clean_pipeline(cfg):
         logger.info(f"m=salesforce_clean_pipeline, msg=Saving {_metric} metric")
         save_volume_metric(
             spark=spark,
-            df=snapshot,
+            df=cdc_conformed_df,
             grain=grain,
             metric_name=_metric,
             table_name=target_table,
@@ -233,7 +233,7 @@ def salesforce_clean_pipeline(cfg):
     logger.info("m=salesforce_clean_pipeline, msg=Saving table_metadata metric")
     save_table_metadata_metric(
         spark=spark,
-        df=snapshot,
+        df=cdc_conformed_df,
         table_name=target_table,
         new_cols=new_cols,
         env=cfg.env,

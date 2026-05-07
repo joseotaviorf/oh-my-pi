@@ -507,6 +507,42 @@ def normalize_column_name(col: str) -> str:
     return col
 
 
+def compare_schema_types(left_df: DataFrame, right_df: DataFrame) -> DataFrame:
+    """
+    Compare the schema types of two DataFrames and return a DataFrame with the comparison results.
+    Parameters
+    ----------
+    left_df : DataFrame
+        Left DataFrame to compare.
+    right_df : DataFrame
+        Right DataFrame to compare.
+
+    Returns
+    -------
+    DataFrame
+        DataFrame with the comparison results.
+    """
+    left_types = dict(left_df.dtypes)
+    right_types = dict(right_df.dtypes)
+
+    all_columns = sorted(set(left_types) | set(right_types))
+
+    rows = [
+        (
+            col,
+            left_types.get(col),
+            right_types.get(col),
+            left_types.get(col) == right_types.get(col),
+        )
+        for col in all_columns
+    ]
+
+    return left_df.sparkSession.createDataFrame(
+        rows,
+        ["column_name", "left_type", "right_type", "same_type"],
+    )
+
+
 def normalize_df_columns(df: DataFrame) -> DataFrame:
     """
     Normalize all DataFrame column names using `normalize_column_name`.
