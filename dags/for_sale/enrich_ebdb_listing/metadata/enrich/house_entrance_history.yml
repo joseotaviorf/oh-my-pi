@@ -74,7 +74,8 @@ columns:
   entry_model_channel:
     lineage:
       - datalake_ebdb_clean.entry_access_tracking.channel
-    description: Entry channel from new entry model.
+      - datalake_request_logging_clean.entryaccess.host
+    description: Unified entry channel from new entry model. The channel is enriched with the host from the request logging in the conversational case.
   actor_role:
     lineage:
       - datalake_ebdb_clean.entry_access_tracking.actor_role

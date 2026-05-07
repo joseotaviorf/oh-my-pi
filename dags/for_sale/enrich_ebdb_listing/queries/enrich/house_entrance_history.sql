@@ -196,6 +196,17 @@ new_entry_model AS (
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id_house, ts_created ORDER BY id) = 1
 ),
+request_logs AS (
+    SELECT
+        id_house,
+        host,
+        ts_request
+    FROM
+        datalake_request_logging_clean.entryaccess
+    WHERE
+        ts_request::DATE >= '2026-05-04'
+        AND status_code = 200
+),
 new_entry_model_enriched AS ( -- new entry model enriched with old entry model because some fields are not present in the new model
     SELECT
         new.id_house,
@@ -207,7 +218,18 @@ new_entry_model_enriched AS ( -- new entry model enriched with old entry model b
         new.key_location,
         old.authorization_type,
         new.has_opted_keys_with_agent,
-        new.entry_model_channel,
+        CASE -- We will hard coded the channels until we have the channel in the request logging since the current data has fixed channels
+            WHEN rl.host = 'wall_e' THEN 'NATIVE_WALLE'
+            WHEN rl.host = 'concierge' THEN 'WHATSAPP_CONCIERGE'
+            WHEN rl.host = 'sonia' THEN 'WHATSAPP_SONIA'
+            WHEN rl.host = 'isaias' THEN 'WHATSAPP_ISAIAS'
+            ELSE UPPER(rl.host)
+        END AS host_unified,
+        CASE
+            WHEN new.entry_model_channel IN ('NATIVE_WALLE', 'WHATSAPP_CONCIERGE', 'WHATSAPP_SONIA', 'WHATSAPP_ISAIAS') THEN CONCAT('CONVERSATIONAL - ', new.entry_model_channel) -- Unified the old IA channels with the new unified channels
+            WHEN new.entry_model_channel = 'CONVERSATIONAL' THEN CONCAT_WS(' - ', new.entry_model_channel, host_unified) -- Enrich the channel with the host unified
+            ELSE new.entry_model_channel -- Keep the channel as is for other channels (not conversational)
+        END AS entry_model_channel,
         new.actor_role,
         new.event_type,
         new.entry_access_model,
@@ -225,6 +247,11 @@ new_entry_model_enriched AS ( -- new entry model enriched with old entry model b
         old_entry_model AS old
             ON new.id_house = old.id_house
             AND DATE_ADD(SECOND, 1, new.ts_entrance_started) >= old.ts_entrance_started
+    LEFT JOIN
+        request_logs AS rl
+            ON new.id_house = rl.id_house
+            AND ABS(DATE_DIFF(SECOND, rl.ts_request, new.ts_entrance_started)) < 1
+            AND new.entry_model_channel = 'CONVERSATIONAL'
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY new.id_house, new.ts_entrance_started ORDER BY old.ts_entrance_started DESC) = 1
 ),
