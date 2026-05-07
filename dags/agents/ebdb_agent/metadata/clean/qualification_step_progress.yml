@@ -1,0 +1,47 @@
+---
+database_name: datalake_ebdb_clean
+table_name: qualification_step_progress
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Progress events for agent prospect qualification steps in EBDB, including status transitions, author, reason, and change timestamps.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.QualificationStepProgress.id
+    description: Unique identifier for the qualification step progress record.
+  id_qualification:
+    lineage:
+      - datalake_ebdb_raw.QualificationStepProgress.qualification_id
+    description: Foreign key to the qualification instance this progress belongs to.
+  id_qualification_step:
+    lineage:
+      - datalake_ebdb_raw.QualificationStepProgress.qualification_step_id
+    description: Foreign key to the qualification step being progressed.
+  id_author_identifier:
+    lineage:
+      - datalake_ebdb_raw.QualificationStepProgress.author_identifier
+    description: Identifier of the user or system actor that performed the change.
+  author_type:
+    lineage:
+      - datalake_ebdb_raw.QualificationStepProgress.author_type
+    description: Type of author (e.g., user, system) for the progress event.
+  status:
+    lineage:
+      - datalake_ebdb_raw.QualificationStepProgress.status
+    description: Status of the qualification step after this progress event.
+  reason:
+    lineage:
+      - datalake_ebdb_raw.QualificationStepProgress.reason
+    description: Reason or notes for the status change or transition.
+  ts_changed:
+    lineage:
+      - datalake_ebdb_raw.QualificationStepProgress.changed_at
+    description: Timestamp when the step status or data was changed in the source.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.QualificationStepProgress.created_at
+    description: Timestamp when the progress record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.QualificationStepProgress.updated_at
+    description: Timestamp when the progress record was last updated.

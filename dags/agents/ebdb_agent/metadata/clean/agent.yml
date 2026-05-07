@@ -33,6 +33,10 @@ columns:
     lineage:
       - datalake_ebdb_raw.agent.status
     description: Current status of the agent.
+  slug:
+    lineage:
+      - datalake_ebdb_raw.agent.slug
+    description: URL-friendly identifier or handle for the agent in internal systems.
   ts_created:
     lineage:
       - datalake_ebdb_raw.agent.created_at

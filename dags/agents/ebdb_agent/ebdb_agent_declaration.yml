@@ -13,6 +13,10 @@ workflow:
   source_database: ebdb
   source_schema: ebdb
   tables_customization:
+    AccreditationContractTemplate:
+      clean_table_name: accreditation_contract_template
+    AccreditationContractProcess:
+      clean_table_name: accreditation_contract_process
     Agent:
       clean_table_name: agent
     AgentEventLog:
@@ -57,6 +61,16 @@ workflow:
       clean_table_name: preferred_fixed_agent
     PreferredFixedAgent_AUD:
       clean_table_name: preferred_fixed_agent_aud
+    ProspectAgent:
+      clean_table_name: prospect_agent
+    Qualification:
+      clean_table_name: qualification
+    QualificationStep:
+      clean_table_name: qualification_step
+    QualificationStepProgress: 
+      clean_table_name: qualification_step_progress
+    QuintoAndarProspectAgent:
+      clean_table_name: quintoandar_prospect_agent
   extra_query_template_params:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
 cluster:

@@ -1,0 +1,24 @@
+SELECT
+    prospect_agent_id AS id_prospect_agent,
+    primary_operating_region_id AS id_primary_operating_region,
+    parent_operating_region_id AS id_parent_operating_region,
+    primary_operating_region_type,
+    parent_operating_region_type,
+    IF(TRIM(referral_code) = '', NULL, referral_code) AS referral_code,
+    creci,
+    creci_uf,
+    business_context_of_interest,
+    another_income_source,
+    commuting_method,
+    other_brokerage,
+    maximum_acquisition_per_month,
+    minimum_acquisition_per_month,
+    maximum_available_days,
+    minimum_available_days,
+    maximum_years_of_experience,
+    minimum_years_of_experience,
+    available_on_weekends AS is_available_on_weekends,
+    accepts_alternative_context AS is_accepted_alternative_context,
+    accepts_alternative_region AS is_accepted_alternative_region
+FROM
+    datalake_ebdb_raw.QuintoAndarProspectAgent

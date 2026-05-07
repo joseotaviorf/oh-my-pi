@@ -1,0 +1,59 @@
+---
+database_name: datalake_ebdb_clean
+table_name: accreditation_contract_process
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Accreditation contract process instances linked to a qualification and contract template, including lifecycle status, unsigned document storage key, author metadata, and process timestamps.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractProcess.id
+    description: Unique identifier for the accreditation contract process record.
+  id_qualification:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractProcess.qualification_id
+    description: Foreign key to the qualification associated with this contract process.
+  id_contract_template:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractProcess.contract_template_id
+    description: Foreign key to the contract template used for this process.
+  id_replaced_process:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractProcess.replaced_process_id
+    description: Identifier of a previous process that this record replaces, when applicable.
+  uuid_contract_process:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractProcess.contract_process_uuid
+    description: Business UUID of the contract process in the source system.
+  status:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractProcess.status
+    description: Current status of the accreditation contract process workflow.
+  unsigned_document_s3_key:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractProcess.unsigned_document_s3_key
+    description: Object key in S3 for the unsigned document associated with this process, when present.
+  author_type:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractProcess.author_type
+    description: Type of actor who created or last updated the process (e.g., user, system).
+  author_identifier:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractProcess.author_identifier
+    description: Identifier of the actor associated with the process in the source system.
+  ts_initiated:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractProcess.initiated_at
+    description: Timestamp when the contract process was initiated.
+  ts_finished:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractProcess.finished_at
+    description: Timestamp when the contract process finished, when applicable.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractProcess.created_at
+    description: Timestamp when the record was created in the source database.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractProcess.updated_at
+    description: Timestamp when the record was last updated in the source database.

@@ -1,0 +1,47 @@
+---
+database_name: datalake_ebdb_clean
+table_name: prospect_agent
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Prospect agent core information with identifiers, legal entity type, status, association, declared QuintoAndar knowledge, social reference, and timestamps.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.ProspectAgent.id
+    description: Unique identifier for the prospect agent.
+  uuid_prospect:
+    lineage:
+      - datalake_ebdb_raw.ProspectAgent.prospect_uuid
+    description: UUID of the prospect in the source system.
+  uuid_person:
+    lineage:
+      - datalake_ebdb_raw.ProspectAgent.person_uuid
+    description: UUID of the related person in the source system.
+  legal_entity_type:
+    lineage:
+      - datalake_ebdb_raw.ProspectAgent.legal_entity_type
+    description: Type of legal entity (e.g., individual or company).
+  status:
+    lineage:
+      - datalake_ebdb_raw.ProspectAgent.status
+    description: Current status of the prospect agent record.
+  business_association:
+    lineage:
+      - datalake_ebdb_raw.ProspectAgent.business_association
+    description: Type of business association related to the prospect agent.
+  quintoandar_knowledge:
+    lineage:
+      - datalake_ebdb_raw.ProspectAgent.quintoandar_knowledge
+    description: Declared level or category of knowledge about QuintoAndar from the prospect agent.
+  social:
+    lineage:
+      - datalake_ebdb_raw.ProspectAgent.social
+    description: Social profile or network reference provided by the prospect agent.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.ProspectAgent.created_at
+    description: Timestamp when the prospect agent record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.ProspectAgent.updated_at
+    description: Timestamp when the prospect agent record was last updated.

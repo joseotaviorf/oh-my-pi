@@ -6,6 +6,7 @@ SELECT
     partnership_representative_type,
     affiliation_type,
     status,
+    slug,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM

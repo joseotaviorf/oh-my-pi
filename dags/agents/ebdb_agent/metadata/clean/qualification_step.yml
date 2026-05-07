@@ -1,0 +1,31 @@
+---
+database_name: datalake_ebdb_clean
+table_name: qualification_step
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Catalog of qualification steps in EBDB (name, description, and identifiers) used to define the agent prospect qualification journey.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.QualificationStep.id
+    description: Unique identifier for the qualification step definition.
+  uuid_qualification_step:
+    lineage:
+      - datalake_ebdb_raw.QualificationStep.qualification_step_uuid
+    description: Business UUID for the qualification step in the source system.
+  description:
+    lineage:
+      - datalake_ebdb_raw.QualificationStep.description
+    description: Human-readable description of the qualification step.
+  name:
+    lineage:
+      - datalake_ebdb_raw.QualificationStep.name
+    description: Short name or label of the qualification step.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.QualificationStep.created_at
+    description: Timestamp when the qualification step record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.QualificationStep.updated_at
+    description: Timestamp when the qualification step record was last updated.

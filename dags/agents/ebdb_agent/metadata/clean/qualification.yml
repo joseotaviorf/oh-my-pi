@@ -1,0 +1,39 @@
+---
+database_name: datalake_ebdb_clean
+table_name: qualification
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Agent prospect qualification instance in EBDB, linking a prospect to a qualification template with current state, reason, and audit timestamps.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.qualification.id
+    description: Unique identifier for the qualification record.
+  id_agent_prospect:
+    lineage:
+      - datalake_ebdb_raw.qualification.agent_prospect_id
+    description: Foreign key to the agent prospect associated with this qualification.
+  id_qualification_template:
+    lineage:
+      - datalake_ebdb_raw.qualification.qualification_template_id
+    description: Identifier of the qualification template applied to this prospect.
+  uuid_qualification:
+    lineage:
+      - datalake_ebdb_raw.qualification.qualification_uuid
+    description: Business UUID for the qualification instance in the source system.
+  reason:
+    lineage:
+      - datalake_ebdb_raw.qualification.reason
+    description: Free-text or coded reason for the current qualification outcome or transition.
+  state:
+    lineage:
+      - datalake_ebdb_raw.qualification.state
+    description: Current state of the qualification workflow for this prospect.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.qualification.created_at
+    description: Timestamp when the qualification record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.qualification.updated_at
+    description: Timestamp when the qualification record was last updated.

@@ -1,0 +1,55 @@
+---
+database_name: datalake_ebdb_clean
+table_name: accreditation_contract_template
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Accreditation contract template definitions per business association, including display fields, document storage key, validity window, author metadata, and audit timestamps.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractTemplate.id
+    description: Unique identifier for the accreditation contract template.
+  business_association:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractTemplate.business_association
+    description: Business association context this template applies to.
+  name:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractTemplate.name
+    description: Human-readable name of the contract template.
+  description:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractTemplate.description
+    description: Longer description of the contract template purpose or content.
+  s3_key:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractTemplate.s3_key
+    description: Object key in S3 pointing to the template document or asset, when configured.
+  reason:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractTemplate.reason
+    description: Reason or notes associated with the template version or change.
+  author_type:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractTemplate.author_type
+    description: Type of actor who created or last updated the template.
+  author_identifier:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractTemplate.author_identifier
+    description: Identifier of the actor associated with the template in the source system.
+  dt_valid_from:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractTemplate.valid_from
+    description: Date from which the template is valid for use.
+  dt_valid_to:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractTemplate.valid_to
+    description: Date until which the template remains valid, when an end date is set.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractTemplate.created_at
+    description: Timestamp when the template record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.AccreditationContractTemplate.updated_at
+    description: Timestamp when the template record was last updated.

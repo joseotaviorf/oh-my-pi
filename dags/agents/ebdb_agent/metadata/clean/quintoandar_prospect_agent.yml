@@ -1,0 +1,91 @@
+---
+database_name: datalake_ebdb_clean
+table_name: quintoandar_prospect_agent
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: Prospect details for QuintoAndar agents, including licensing, interests, availability, experience, referral data, and operating regions.
+columns:
+  id_prospect_agent:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.prospect_agent_id
+    description: Unique identifier for the QuintoAndar prospect agent.
+  id_primary_operating_region:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.primary_operating_region_id
+    description: Identifier of the prospect agent primary operating region.
+  id_parent_operating_region:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.parent_operating_region_id
+    description: Identifier of the parent operating region for the primary region.
+  primary_operating_region_type:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.primary_operating_region_type
+    description: Type classification of the primary operating region.
+  parent_operating_region_type:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.parent_operating_region_type
+    description: Type classification of the parent operating region.
+  referral_code:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.referral_code
+    description: Referral code associated with the prospect agent; null when empty or blank after trim.
+  creci:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.creci
+    description: CRECI license number provided by the agent.
+  creci_uf:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.creci_uf
+    description: State (UF) of the CRECI license.
+  business_context_of_interest:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.business_context_of_interest
+    description: Business contexts the prospect is interested in serving.
+  another_income_source:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.another_income_source
+    description: Indicates if the agent has another income source.
+  commuting_method:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.commuting_method
+    description: Preferred commuting method of the prospect agent.
+  other_brokerage:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.other_brokerage
+    description: Indicates if the agent works with another brokerage.
+  maximum_acquisition_per_month:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.maximum_acquisition_per_month
+    description: Maximum acquisitions per month the agent expects to make.
+  minimum_acquisition_per_month:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.minimum_acquisition_per_month
+    description: Minimum acquisitions per month the agent expects to make.
+  maximum_available_days:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.maximum_available_days
+    description: Maximum number of days per week the agent is available.
+  minimum_available_days:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.minimum_available_days
+    description: Minimum number of days per week the agent is available.
+  maximum_years_of_experience:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.maximum_years_of_experience
+    description: Maximum years of professional experience declared by the agent.
+  minimum_years_of_experience:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.minimum_years_of_experience
+    description: Minimum years of professional experience declared by the agent.
+  is_available_on_weekends:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.available_on_weekends
+    description: Indicates whether the agent is available on weekends.
+  is_accepted_alternative_context:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.accepts_alternative_context
+    description: Indicates whether the prospect accepts alternative business contexts.
+  is_accepted_alternative_region:
+    lineage:
+      - datalake_ebdb_raw.QuintoAndarProspectAgent.accepts_alternative_region
+    description: Indicates whether the prospect accepts alternative operating regions.

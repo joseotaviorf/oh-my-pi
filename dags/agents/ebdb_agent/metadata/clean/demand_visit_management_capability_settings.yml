@@ -3,7 +3,7 @@ database_name: datalake_ebdb_clean
 table_name: demand_visit_management_capability_settings
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
-description: Settings for the Demand Visit Management capability, including business context.
+description: Settings for the Demand Visit Management capability, including business context and passive lead receiver flag.
 columns:
   id:
     lineage:
@@ -17,6 +17,10 @@ columns:
     lineage:
       - datalake_ebdb_raw.demandvisitmanagementcapabilitysettings.business_context
     description: Business context in which the capability is applied.
+  is_passive_lead_receiver:
+    lineage:
+      - datalake_ebdb_raw.demandvisitmanagementcapabilitysettings.passive_lead_receiver
+    description: Indicates whether this configuration enables receiving leads passively for demand visit management.
   ts_created:
     lineage:
       - datalake_ebdb_raw.demandvisitmanagementcapabilitysettings.created_at
