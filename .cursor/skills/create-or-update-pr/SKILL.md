@@ -20,7 +20,7 @@ description: Generate a standardized Pull Request title and description based on
 
 Run steps **in this order** (agents should not skip):
 
-1. Diff + commits → title + description (Steps 1–5)
+1. Diff + commits → title + description (Steps 1–5, including **5.3–5.4** merge when editing an existing PR)
 2. `gh` installed + authenticated (Step 6); use `env -u GITHUB_TOKEN` when API returns 401 (see 6.4)
 3. Resolve `ASSIGNEE` (Step 7)
 4. **Commit** any intended changes; then **push** branch to `origin` (Step 8)
@@ -121,13 +121,41 @@ Keep the title **under ~72 characters** when possible. Titles must be **English*
 - **Structure and editorial rules:** Follow **`.cursor/rules/pr_template.mdc`** — read that file and use its **Guidelines** (English mandatory, title `feat(abc-123): …` when a key exists, **Why?** with a **second bullet** `Jira: [KEY](url)` when applicable) and its **section skeleton** (`### Why?` with two bullets max for ticket context; no `##` Jira heading; then `### What?`, `### How everything was tested?`, etc.). Do not duplicate a second template inside the skill; the rule is the source of truth for the generated PR body.
 - **Language:** PR **title** and **body** must be **English**, per the rule — even if the user writes in another language in chat. The assistant’s reply to the user may stay in the user’s language; the generated PR text does not.
 - Base **Why?** / **What?** on the **actual diff and commits** (`git log --oneline origin/master..HEAD` or `origin/main..HEAD`). **Do not invent** files, tickets, or behavior not present in the repo.
-- **Optional alignment with GitHub:** **`.github/PULL_REQUEST_TEMPLATE.md`** is what contributors see in the GitHub UI when opening a PR in the browser. If the user or team wants the **checklist** lines from that file included at the bottom of the body, append them; otherwise the Cursor rule alone is enough for `gh pr create` / `--body-file`.
+- **Checklist:** Per **`.cursor/rules/pr_template.mdc`** guideline **11**, **new** PR bodies must end with **`### Checklist before opening the PR!`** copied from **`.github/PULL_REQUEST_TEMPLATE.md`**. When **updating** a PR, **never drop** an existing checklist — preserve it verbatim (rule **10**). If the old body had **no** checklist, **append** the default checklist once so the description matches the GitHub template.
 
 ### 5.2 — Filling the body
 
 1. Open **`.cursor/rules/pr_template.mdc`** and build **`/tmp/pr_body.md`** (or the body file used in Step 10) from its structure: **Why?** = first bullet purpose, second bullet `Jira: [link]` only if a ticket exists; then **What?** and the rest.
-2. Apply the numbered **Guidelines** at the top of the rule (**English** for all PR prose; omit empty sections; no “N/A”; drop Screenshots when irrelevant; remove bracketed hints in the final text).
+2. Apply the numbered **Guidelines** at the top of the rule (**English** for all PR prose; omit empty sections; no filler “N/A” outside **Screenshots**; remove bracketed instructional hints from the final text except the rule’s **Screenshots** placeholder).
 3. For commands/tests relevant to this repo (when applicable), examples include `make check-style`, `make validate-dag-declaration-files dag_name=<name>` — only list what was run or what CI will run.
+
+### 5.3 — Screenshots subsection
+
+Follow **`.cursor/rules/pr_template.mdc`** guideline **9** (always include `#### Screenshots`).
+
+- **New PR or no prior body:** Append the **canonical placeholder** bullet from the rule skeleton (English; tells the author to add visuals or replace with `Not applicable` / remove the line).
+- **Updating an existing PR:** Before overwriting the body, fetch the current description, e.g. `ghq pr view --json body -q .body` (or read from the GitHub API response used in Step 10.1). If the markdown contains `#### Screenshots` and the content **below that heading** is **not** empty and **not** only the canonical placeholder (e.g. it has image links, `![…]`, or substantive bullets), **copy that entire `#### Screenshots` block verbatim** into the new `/tmp/pr_body.md`. Otherwise keep the canonical placeholder.
+
+This preserves author-added screenshots while still leaving a visible to-do when nothing was filled in yet.
+
+### 5.4 — Preserve all other sections (no disappearing topics)
+
+Follow **`.cursor/rules/pr_template.mdc`** guidelines **7**, **10**, and **11**.
+
+When **creating** a PR, the file in Step 10 must include the full skeleton from the rule: through **`### Checklist before opening the PR!`** (from **`.github/PULL_REQUEST_TEMPLATE.md`**) unless the user explicitly asks to omit it.
+
+When **updating** a PR:
+
+1. Fetch **`BODY_OLD`** with `ghq pr view --json body -q .body` (strip trailing GitHub/Jira auto-footnotes only if you are re-adding a clean Jira link under **Why?**; otherwise leave footnotes alone).
+2. Build **`BODY_CORE`**: regenerated **`### Why?`**, **`### What?`**, **`### How everything was tested?`**, and **`#### Screenshots`** (per **5.3**).
+3. From **`BODY_OLD`**, extract and **append verbatim in original order** every block that must not be regenerated:
+   - **`### !Attention Points!`** through the line before the next top-level `###` (if present).
+   - **`### Checklist before opening the PR!`** through **end of file** (if present) — keep every `- [x]` / `- [ ]`.
+   - Any **other** `### …` heading that is not `Why?`, `What?`, or `How everything was tested?` (team-specific notes), same rule: preserve the full block in order.
+4. Final body = **`BODY_CORE`** + preserved blocks (typical order: **Attention** → **Checklist**; match **`BODY_OLD`** order when in doubt).
+5. If **`BODY_OLD`** had **no** checklist, **append** the default checklist from **`.github/PULL_REQUEST_TEMPLATE.md`** after the preserved blocks (guideline **11**).
+
+**Never** drop **`### Checklist before opening the PR!`** or other existing `###` sections when refreshing a description.
 
 ---
 
@@ -341,3 +369,5 @@ After **create** or **edit**, resolve the canonical browser URL and **show it cl
 - Prefer **body-file** over inline `--body` for any description longer than one line.
 - **Commit → push → create/edit**; **assign** the current user by default; use **`ghq`** / `env -u GITHUB_TOKEN -u GH_TOKEN` when tokens break API calls.
 - **Always surface the PR URL** to the user in the final reply (markdown link + PR number). This is part of a successful skill run, not optional metadata.
+- **Screenshots:** Never drop the `#### Screenshots` heading from generated bodies; merge existing PR content per Step **5.3**.
+- **Sections:** Never drop existing **`### …`** topics when updating a PR (checklist, Attention Points, custom headings); merge per Step **5.4**. New PRs include the default checklist per the rule.

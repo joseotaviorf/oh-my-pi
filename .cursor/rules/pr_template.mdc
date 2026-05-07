@@ -9,10 +9,12 @@ description: Follow this template for PR descriptions. Use when writing or editi
 4. **Jira in the body:** Do **not** use a top-level `##` heading for the ticket. When a key exists, add a **second bullet** under **Why?** with the Jira tracker link (see skeleton below). Omit that bullet entirely if there is no ticket.
 5. **Why Section:** First bullet = **purpose/value**. Second bullet (when applicable) = Jira tracker link only. **Do not** describe deep technical implementation here.
 6. **What Section:** List actual changes from the **full diff**, ordered by impact.
-7. **Attention Points:** Use `### !Attention Points!` **only** for risks or **pending** tasks (style/docs/tests). Omit section if everything is complete.
-8. **Strict Omission:** **NO "N/A" or Meta-commentary**. Delete lines or sections entirely if they have no data.
-9. **Omit Screenshots:** Remove the "Screenshots" section if tests are only CI/CD/Checks or if no tests were run.
-10. **Clean Output:** Remove all instructional text and bracketed hints from the final response.
+7. **Attention Points:** Use `### !Attention Points!` **only** for risks or **pending** tasks (style/docs/tests). For a **new** PR, **omit** the section if there is nothing material to flag. When **updating** an existing PR, if the current body already contains `### !Attention Points!` with content, **preserve that block verbatim** — do not delete it when regenerating **Why?** / **What?** / **How everything was tested?**.
+8. **Strict Omission:** Do not use bare **N/A**, “TBD”, or meta-commentary in **Why?**, **What?**, **How everything was tested?**, or **!Attention Points!** — omit empty subsections or bullets instead. **Exception:** the **Screenshots** subsection (rule 9) may use a short **English** placeholder such as *N/A — author to confirm or attach visuals* where a manual follow-up is intentional.
+9. **Screenshots (always keep the heading):** Always include `#### Screenshots` after **How everything was tested?** When **creating** a PR or when the existing PR body has **no** Screenshots block yet, add the subsection with the **canonical placeholder bullet** from the skeleton below (English; signals a manual step for the author). When **updating** an existing PR, if `#### Screenshots` is already filled with **real content** (e.g. image links, uploaded assets, or descriptive bullets that are not only the placeholder), **preserve that entire block verbatim** when regenerating the rest of the description. If the existing block is empty or only repeats the placeholder, you may replace it with a fresh placeholder.
+10. **No dropped sections (updates):** When **updating** an existing PR description, fetch the current GitHub body first. Regenerate in English only the core blocks **`### Why?`**, **`### What?`**, and **`### How everything was tested?`** (with **`#### Screenshots`** per rule 9). **Do not remove** any other topic the author already had: copy **verbatim** — in **the same order they appeared** — every remaining section, including at least **`### Checklist before opening the PR!`** (keep all `- [ ]` / `- [x]` states and links), **`### !Attention Points!`** (rule 7), and any other custom `### …` block (e.g. team notes). **Never** drop a heading that was present in the previous body unless the user explicitly asks to remove it.
+11. **Checklist on new PRs:** For a **new** PR (no prior body), always end the description with **`### Checklist before opening the PR!`** using the bullet list from **`.github/PULL_REQUEST_TEMPLATE.md`** (default **unchecked** `- [ ]` unless the author has already confirmed every item).
+12. **Clean Output:** Remove all instructional text and bracketed hints from the final response **except** the intentional Screenshots placeholder line and the real checklist lines from the template, which stay until the author edits them.
 
 ---
 
@@ -32,7 +34,12 @@ description: Follow this template for PR descriptions. Use when writing or editi
 * **Not Tested:** [Technical justification ONLY if NO other tests were run. Delete otherwise.]
 
 #### Screenshots
-* - [Placeholder for Screenshot - Omit section if only CI/Checks were run]
+* *To do (author): Add screenshots for UI or dashboard changes; for data/backend-only PRs, replace this line with `Not applicable` or remove it.*
 
 ### !Attention Points!
-* [List risks or pending standard checks. Omit section if empty.]
+* [List risks or pending standard checks. Omit this whole section on new PRs if empty.]
+
+### Checklist before opening the PR!
+- [ ] My code follows the style guidelines and [name conventions](https://docs.google.com/document/d/1mPPA716eoT3EZSqY0gA8a9ao4ObMyI9Y8QNd7CzlWWY) for DAGs, databases, columns, etc.
+- [ ] I have made corresponding changes to the documentation;
+- [ ] I have added tests that prove my fix is effective or that my feature works.
