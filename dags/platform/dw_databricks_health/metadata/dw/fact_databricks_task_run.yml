@@ -109,7 +109,12 @@ columns:
       Workload identifier for grouping and joins. COALESCE of cluster `application`
       tag, `system.billing.usage.usage_metadata.job_name` (dominant DBU row on the
       cluster for the load window), then `cluster_name` when tags are absent.
-      Aligns with Airflow DAG naming when available.
+      When the raw value matches Airflow run naming (`_scheduled__`, `_manual__`,
+      `_dataset__`, `_dataset_triggered__` before the timestamp), it is normalized:
+      strip optional `job-<id>-run-<id>-` prefix, take the base before the run-type
+      marker, then map `bietlejuice-` → `bietlejuice.` and `quintoml-wonka-` →
+      `quintoml.wonka.` so metrics aggregate on canonical DAG IDs (e.g.
+      `bietlejuice.metabase`, `quintoml.wonka.contract_collection_segmentation`).
     lineage:
       - system.compute.clusters.tags
       - system.billing.usage.usage_metadata

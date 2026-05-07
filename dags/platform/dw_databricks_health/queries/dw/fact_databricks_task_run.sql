@@ -452,11 +452,35 @@ SELECT
         '/runs/', CAST(s.run_id AS STRING)
     )                                                              AS databricks_run_url,
 
-    COALESCE(
-        lcs.tags['application'],
-        bc_dag.billing_job_name,
-        lcs.cluster_name
-    )                                                              AS airflow_dag_id,
+    -- Raw billing/cluster names use hyphens + Airflow run suffixes (_scheduled__, etc.).
+    -- Normalize to Airflow-style IDs (e.g. bietlejuice.core_brokers_history_dataset) when that pattern matches.
+    CASE
+        WHEN COALESCE(lcs.tags['application'], bc_dag.billing_job_name, lcs.cluster_name)
+            RLIKE '.*(_scheduled__|_manual__|_dataset__|_dataset_triggered__).*'
+        THEN
+            regexp_replace(
+                regexp_replace(
+                    regexp_extract(
+                        regexp_replace(
+                            COALESCE(
+                                lcs.tags['application'],
+                                bc_dag.billing_job_name,
+                                lcs.cluster_name
+                            ),
+                            '^job-[0-9]+-run-[0-9]+-',
+                            ''
+                        ),
+                        '^(.*?)(?:_scheduled__|_manual__|_dataset__|_dataset_triggered__).*',
+                        1
+                    ),
+                    '^bietlejuice-',
+                    'bietlejuice.'
+                ),
+                '^quintoml-wonka-',
+                'quintoml.wonka.'
+            )
+        ELSE COALESCE(lcs.tags['application'], bc_dag.billing_job_name, lcs.cluster_name)
+    END                                                            AS airflow_dag_id,
     s.task_key                                                     AS airflow_task_id,
     -- Governance / attribution tags from cluster custom_tags when present
     -- (bietlejuice / framework-managed workloads). Other provisioners may leave
