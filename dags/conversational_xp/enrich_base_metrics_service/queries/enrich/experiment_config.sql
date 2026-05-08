@@ -264,11 +264,11 @@ FROM VALUES
         )
     ),
 
-    -- Recs using only user profile essential filters
+    -- Recs using only user profile essential filters for sale
     (
-        "ab_beakman_search_services_feed_filter_search_profile_experiment",
+        "ab_beakman_search_services_feed_filter_search_profile_sale_experiment",
         named_struct(
-            'begin_date', DATE('2026-01-22'),
+            'begin_date', DATE('2026-05-07'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
@@ -313,7 +313,7 @@ FROM VALUES
     (
         "ab_beakman_search_services_feed_sequence_experiment",
         named_struct(
-            'begin_date', DATE('2026-04-09'),
+            'begin_date', DATE('2026-05-07'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
