@@ -11,6 +11,8 @@ metastore by leaving ``MagicMock`` objects in place of the real libraries).
 import importlib
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 _MODULE_PATH = (
     "dags.for_rent.offboarding_categorization.spark_jobs"
     ".load_offboarding_categorization_raw"
@@ -35,6 +37,7 @@ with patch.dict("sys.modules", _IMPORT_TIME_MOCKS):
 
 build_session_metadata_parquet_uri = _job.build_session_metadata_parquet_uri
 get_forno_adjusted_data_science_path = _job.get_forno_adjusted_data_science_path
+inclusive_calendar_days = _job.inclusive_calendar_days
 
 
 def test_get_forno_adjusted_data_science_path_prod_unchanged():
@@ -60,3 +63,20 @@ def test_build_session_metadata_parquet_uri():
         build_session_metadata_parquet_uri(f"{base}/", "2026-03-11")
         == f"{base}/2026-03-11.parquet"
     )
+
+
+def test_inclusive_calendar_days_single_day():
+    assert inclusive_calendar_days("2026-03-10", "2026-03-10") == ["2026-03-10"]
+
+
+def test_inclusive_calendar_days_multiple():
+    assert inclusive_calendar_days("2026-03-09", "2026-03-11") == [
+        "2026-03-09",
+        "2026-03-10",
+        "2026-03-11",
+    ]
+
+
+def test_inclusive_calendar_days_start_after_end_raises():
+    with pytest.raises(ValueError, match="must be <="):
+        inclusive_calendar_days("2026-03-12", "2026-03-10")

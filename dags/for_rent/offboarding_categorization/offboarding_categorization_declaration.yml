@@ -19,8 +19,10 @@ dag:
       `quintoml.post_contract.wall_e_offboarding_categoriser.inference` emits its
       `:first-run-of-day` dataset for the current logical date. See `dags/dependencies.yaml`.
 
-      Backfill: trigger historical DAG runs manually so data_interval_start covers each date
-      (e.g. 2026-02-01 through 2026-03-31 for February partial and full March).
+      Backfill: optional DagRun JSON conf with load_start_date and load_end_date (YYYY-MM-DD, inclusive).
+      The Spark task reads one parquet per calendar day in that range into raw; missing or empty daily
+      files are skipped with a warning. Automated runs without conf keep both dates equal to
+      data_interval_start (dataset-driven upstream), preserving single-day ingestion.
 
 workflow:
   layer: raw
@@ -34,7 +36,8 @@ workflow:
     - "{bucket}"
     - "{schema}"
     - s3://data-science.s3.data.quintoandar.com.br/chatbot/wall-e-offboarding-categorizer/session-metadata
-    - "{{ data_interval_start | ds }}"
+    - "{load_start_date}"
+    - "{load_end_date}"
     - "{table_name}"
     - "{partitions}"
     - parquet
