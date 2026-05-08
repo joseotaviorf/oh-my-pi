@@ -2,23 +2,28 @@ database_name: datalake_sonia_journeys
 table_name: ds2ca_resend_view
 description: |
   Enrich view for Sonia docs demand resend journey events sourced from CDP transactional data.
-  Includes person first name enrichment, house address context, and deterministic binning by person UUID.
+  Joins datalake_ebdb_clean.user for SFMC identity-fallback fields and datalake_ebdb_clean.house
+  for address context. One row per (id_event, uuid_person), with a synthetic pk_event_user that
+  matches the SFMC tb_*_PreContract_DS2CAResend_Sonia primary key, and a deterministic 0-99
+  binning bucket for experiment splits.
 domain: For Rent
 owner: data-for-rent@quintoandar.com.br
 columns:
+  pk_event_user:
+    lineage:
+      - datalake_cdp_clean.transactional.id_event
+      - datalake_cdp_clean.transactional.id_person
+    description: |
+      Synthetic primary key concatenating CDP event id and the actor's person UUID, used as the
+      upsert key by the SFMC sync query that populates tb_history_PreContract_DS2CAResend_Sonia.
   id_event:
     lineage:
       - datalake_cdp_clean.transactional.id_event
-    description: Unique identifier for the docs demand resend event.
+    description: Unique identifier for the rent_flow_docs_demand_docs_resend transactional event.
   id_house:
     lineage:
       - datalake_cdp_clean.transactional.event_properties
-    description: House id parsed from event_properties.
-  address_text:
-    lineage:
-      - datalake_ebdb_clean.house.address
-      - datalake_ebdb_clean.house.number
-    description: Concatenated house address and number.
+    description: House id parsed from event_properties; non-null after the 2026-03-01 cutoff.
   id_rent_flow:
     lineage:
       - datalake_cdp_clean.transactional.event_properties
@@ -26,12 +31,37 @@ columns:
   uuid_person:
     lineage:
       - datalake_cdp_clean.transactional.id_person
-    description: Person UUID associated with the event.
+    description: Person UUID associated with the event (the actor of the docs-demand resend).
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.user.id
+    description: EBDB internal user id resolved from uuid_person via datalake_ebdb_clean.user.
+  user_email:
+    lineage:
+      - datalake_ebdb_clean.user.email
+    description: User email used as last-resort fallback in the SFMC identity-resolution chain.
+  user_first_name:
+    lineage:
+      - datalake_ebdb_clean.user.name
+    description: |
+      First token of the user's display name (split on whitespace) used as last-resort fallback
+      in the SFMC identity-resolution chain. Mirrors the master closing view expression.
+  user_phone:
+    lineage:
+      - datalake_ebdb_clean.user.main_phone
+    description: |
+      User main phone with leading '+' stripped, used as last-resort fallback in the SFMC
+      identity-resolution chain. Mirrors the master closing view expression.
+  address_text:
+    lineage:
+      - datalake_ebdb_clean.house.address
+      - datalake_ebdb_clean.house.number
+    description: Concatenated house address and number for display in the SFMC message templates.
   binning_value:
     lineage:
       - datalake_cdp_clean.transactional.id_person
-    description: Deterministic hash bucket (0-99) generated from uuid_person.
+    description: Deterministic 0-99 hash bucket of uuid_person for experiment splits.
   ts_event:
     lineage:
       - datalake_cdp_clean.transactional.ts_event
-    description: Event timestamp for rent_flow_docs_demand_docs_resend.
+    description: Event timestamp formatted as yyyy-MM-dd HH:mm:ss for SFMC compatibility.

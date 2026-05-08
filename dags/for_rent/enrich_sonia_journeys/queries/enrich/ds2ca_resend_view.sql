@@ -15,13 +15,20 @@ WITH docs_demand_resend_events AS (
     AND ts_event >= TIMESTAMP '2026-03-01 00:00:00'
 )
 SELECT
+  CONCAT(CAST(e.id_event AS STRING), '-', e.uuid_person) AS pk_event_user,
   e.id_event,
   e.id_house,
   e.id_rent_flow,
   e.uuid_person,
+  u.id AS id_user,
+  u.email AS user_email,
+  split(trim(u.name), ' ')[0] AS user_first_name,
+  replace(u.main_phone, '+', '') AS user_phone,
   concat_ws(', ', CAST(h.address AS STRING), CAST(h.number AS STRING)) AS address_text,
   abs(crc32(encode(e.uuid_person, 'utf-8'))) % 100 AS binning_value,
   date_format(e.ts_event, 'yyyy-MM-dd HH:mm:ss') AS ts_event
 FROM docs_demand_resend_events AS e
-  LEFT JOIN datalake_ebdb_clean.house AS h
+  INNER JOIN datalake_ebdb_clean.user AS u
+    ON e.uuid_person = u.uuid_person
+  INNER JOIN datalake_ebdb_clean.house AS h
     ON e.id_house = h.id
