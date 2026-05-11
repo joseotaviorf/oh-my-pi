@@ -28,6 +28,10 @@ columns:
       company_use and paid date; used to join SAP entity and gateway for error detail.
     lineage:
     - datalake_retsuko.invoice.id_external
+  account_number:
+    description: Bank account number from Nexxera CNAB payments (francesinha) cast as VARCHAR(10).
+    lineage:
+    - datalake_nexxera.cnab_payments.bank_account
   bank_account_number:
     description: Bank account number from Nexxera CNAB payments (francesinha).
     lineage:

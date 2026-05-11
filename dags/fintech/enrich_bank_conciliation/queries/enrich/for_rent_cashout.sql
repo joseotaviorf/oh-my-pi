@@ -262,6 +262,10 @@ error_macro AS (
             WHEN vf = vs AND dt_bank_paid = dt_sap_paid THEN 'Concilied'
             WHEN last_occurrence_code = 'DV' AND (sap_paid_amount = 0 OR sap_paid_amount IS NULL) THEN 'Concilied - Refund'
             WHEN id_company_use LIKE '%MLRA%' THEN 'Not Concilied - LRA single entry'
+            WHEN id_company_use like '%MIP%' THEN 'Not Concilied - MPI single entry'
+            WHEN id_company_use like '%MCI%' THEN 'Not Concilied - MCI single entry'
+            WHEN id_company_use like '%!%' AND hash like 'm%' THEN 'Not Concilied - manual accounting'
+            WHEN dt_sap_tax IS NOT NULL AND dt_sap_tax < dt_sap_paid THEN 'Not Concilied - retroactive adjustment'
             WHEN bank_paid_amount  IS NULL AND vs>=0 THEN 'Not Concilied - Fracesinha missing'
             WHEN vf>0 AND sap_paid_amount IS NULL THEN 'Not Concilied - SAP missing'
             WHEN vf>0 AND sap_paid_amount = 0 AND num_entries_sap>0 THEN 'Concilied - SAP zeroed by chargeback'
@@ -275,6 +279,7 @@ SELECT
     id_company_use,
     aux.hash,
     id_invoice,
+    CAST(bank_account_number AS VARCHAR(10)) AS account_number,
     bank_account_number,
     sap_account_number,
     num_entries_sap,
