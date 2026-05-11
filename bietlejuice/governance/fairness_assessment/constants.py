@@ -334,6 +334,14 @@ DATAHUB_URN_DIAG_OK = "OK"
 
 DATAHUB_DATA_CONTRACT_URN_MARKER = "urn:prod:datacontract:"
 
+# GraphQL batching defaults: 25 URNs per POST × 4 driver workers = 100 URNs in flight.
+# Both knobs accept env overrides (``DATAHUB_GRAPHQL_BATCH_SIZE`` / ``DATAHUB_GRAPHQL_BATCH_WORKERS``)
+# resolved in ``compute_fqn_datahub_signals.resolve_datahub_urn_flags`` at call time, mirroring the
+# ``DATAHUB_GRAPHQL_URL`` env-first pattern so forno operators can tune without redeploying.
+DATAHUB_GRAPHQL_BATCH_SIZE = 25
+DATAHUB_GRAPHQL_BATCH_WORKERS = 4
+DATAHUB_GRAPHQL_BATCH_TIMEOUT_SEC = 60.0
+
 DATAHUB_DATASET_FAIR_SIGNALS_QUERY = """
 query DatasetFairSignals($urn: String!) {
   dataset(urn: $urn) {

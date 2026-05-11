@@ -2,25 +2,123 @@
 
 from __future__ import annotations
 
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Optional
+
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.governance.fairness_assessment.constants import (
     DATAHUB_CHECK_FAILED,
-    DATAHUB_DATASET_FAIR_SIGNALS_QUERY,
     DATAHUB_ENTITY_NOT_FOUND,
     DATAHUB_FETCH_ERROR,
     DATAHUB_F4_REASON_HOST_UNCONFIGURED,
     DATAHUB_F4_REASON_NO_CANDIDATE_URNS,
+    DATAHUB_GRAPHQL_BATCH_SIZE,
+    DATAHUB_GRAPHQL_BATCH_TIMEOUT_SEC,
+    DATAHUB_GRAPHQL_BATCH_WORKERS,
     DATAHUB_HTTP_ERROR,
     DATAHUB_URN_DIAG_OK,
 )
 from bietlejuice.governance.fairness_assessment.datahub_graphql.client import (
-    _parse_dataset_fair_signals,
+    build_dataset_fair_signals_batch_query,
     datahub_graphql_post,
+    parse_batch_fair_signals,
 )
 from bietlejuice.governance.fairness_assessment.datahub_graphql.urn_builder import (
     list_platform_urns_for_fqn,
 )
+
+LOGGER = QuintoAndarLogger(__name__)
+
+
+def _resolve_positive_int(env_name: str, default: int) -> int:
+    """Read a positive int from env (env > default). Falls back silently on bad input."""
+
+    raw = os.environ.get(env_name, "").strip()
+    if not raw:
+        return default
+    try:
+        value = int(raw)
+    except ValueError:
+        return default
+    return value if value > 0 else default
+
+
+def _chunk(seq: list[str], size: int) -> list[list[str]]:
+    return [seq[i : i + size] for i in range(0, len(seq), size)]
+
+
+def _record_batch_failure(
+    batch: list[str],
+    outcome: str,
+    *,
+    urn_hit: dict[str, bool],
+    urn_contract: dict[str, bool],
+    urn_diagnostic: dict[str, str],
+    urn_ownership: dict[str, bool],
+    urn_upstream_total: dict[str, int],
+    urn_downstream_total: dict[str, int],
+) -> None:
+    """Apply a batch-level failure (HTTP/timeout/JSON) uniformly to every URN in ``batch``."""
+
+    for urn in batch:
+        urn_hit[urn] = False
+        urn_contract[urn] = False
+        urn_ownership[urn] = False
+        urn_upstream_total[urn] = 0
+        urn_downstream_total[urn] = 0
+        urn_diagnostic[urn] = outcome
+
+
+def _record_urn_signals(
+    urn: str,
+    signals: tuple[bool, bool, bool, int, int, bool],
+    *,
+    urn_hit: dict[str, bool],
+    urn_contract: dict[str, bool],
+    urn_diagnostic: dict[str, str],
+    urn_ownership: dict[str, bool],
+    urn_upstream_total: dict[str, int],
+    urn_downstream_total: dict[str, int],
+) -> None:
+    """Translate a per-URN parse tuple into the six output dicts (mirrors legacy serial logic)."""
+
+    indexed_ok, has_contract, ownership_nonempty, up_n, down_n, had_ds = signals
+    if not had_ds or not indexed_ok:
+        urn_hit[urn] = False
+        urn_contract[urn] = False
+        urn_ownership[urn] = False
+        urn_upstream_total[urn] = 0
+        urn_downstream_total[urn] = 0
+        urn_diagnostic[urn] = DATAHUB_ENTITY_NOT_FOUND
+        return
+    urn_hit[urn] = True
+    urn_ownership[urn] = ownership_nonempty
+    urn_upstream_total[urn] = up_n
+    urn_downstream_total[urn] = down_n
+    is_databricks_urn = "dataPlatform:databricks" in urn
+    urn_contract[urn] = bool(is_databricks_urn and has_contract)
+    urn_diagnostic[urn] = DATAHUB_URN_DIAG_OK
+
+
+def _fetch_batch(
+    graphql_url: str,
+    token: Optional[str],
+    batch: list[str],
+    timeout_sec: float,
+) -> tuple[list[str], Optional[dict[str, Any]], str]:
+    """Worker callable: build the aliased query and POST it. Returns ``(batch, root, outcome)``."""
+
+    query, variables = build_dataset_fair_signals_batch_query(batch)
+    root, outcome = datahub_graphql_post(
+        graphql_url,
+        token,
+        query,
+        variables,
+        timeout_sec=timeout_sec,
+    )
+    return batch, root, outcome
 
 
 def resolve_datahub_urn_flags(
@@ -35,7 +133,7 @@ def resolve_datahub_urn_flags(
     dict[str, int],
     dict[str, int],
 ]:
-    """One GraphQL POST per unique URN.
+    """Batched GraphQL fetch: ``DATAHUB_GRAPHQL_BATCH_SIZE`` URNs per POST × ``WORKERS`` threads.
 
     Returns (urn_hit, urn_contract, urn_diagnostic, urn_ownership_nonempty, urn_upstream_total,
     urn_downstream_total).
@@ -45,7 +143,9 @@ def resolve_datahub_urn_flags(
     **I1-02 / urn_contract:** ``institutionalMemory`` labels containing ``urn:prod:datacontract:`` for
     Databricks URNs only.
 
-    ``urn_diagnostic`` reuses the same failure tokens for F4-01 reason roll-up per FQN.
+    ``urn_diagnostic`` reuses the same failure tokens for F4-01 reason roll-up per FQN. On batch
+    failure (HTTP/timeout/JSON) every URN in that batch inherits the diagnostic — no per-URN retry.
+    Tunable via ``DATAHUB_GRAPHQL_BATCH_SIZE`` / ``DATAHUB_GRAPHQL_BATCH_WORKERS`` env vars.
     """
 
     urns_ordered: list[str] = []
@@ -77,48 +177,74 @@ def resolve_datahub_urn_flags(
     urn_upstream_total: dict[str, int] = {}
     urn_downstream_total: dict[str, int] = {}
 
-    for urn in urns_ordered:
-        root, outcome = datahub_graphql_post(
-            graphql_url,
-            token,
-            DATAHUB_DATASET_FAIR_SIGNALS_QUERY,
-            {"urn": urn},
+    if not urns_ordered:
+        LOGGER.info(
+            "m=datahub_graphql_batch_summary,total_urns=0,batches=0,workers=0,"
+            "batch_size=0,batch_failures=0"
         )
-        if not root:
-            urn_hit[urn] = False
-            urn_contract[urn] = False
-            urn_ownership[urn] = False
-            urn_upstream_total[urn] = 0
-            urn_downstream_total[urn] = 0
-            urn_diagnostic[urn] = outcome
-            continue
-        indexed_ok, has_contract, ownership_nonempty, up_n, down_n, had_ds = (
-            _parse_dataset_fair_signals(root)
+        return (
+            urn_hit,
+            urn_contract,
+            urn_diagnostic,
+            urn_ownership,
+            urn_upstream_total,
+            urn_downstream_total,
         )
-        if not had_ds:
-            urn_hit[urn] = False
-            urn_contract[urn] = False
-            urn_ownership[urn] = False
-            urn_upstream_total[urn] = 0
-            urn_downstream_total[urn] = 0
-            urn_diagnostic[urn] = DATAHUB_ENTITY_NOT_FOUND
-            continue
-        if not indexed_ok:
-            urn_hit[urn] = False
-            urn_contract[urn] = False
-            urn_ownership[urn] = False
-            urn_upstream_total[urn] = 0
-            urn_downstream_total[urn] = 0
-            urn_diagnostic[urn] = DATAHUB_ENTITY_NOT_FOUND
-            continue
 
-        urn_hit[urn] = True
-        urn_ownership[urn] = ownership_nonempty
-        urn_upstream_total[urn] = up_n
-        urn_downstream_total[urn] = down_n
-        is_databricks_urn = "dataPlatform:databricks" in urn
-        urn_contract[urn] = bool(is_databricks_urn and has_contract)
-        urn_diagnostic[urn] = DATAHUB_URN_DIAG_OK
+    batch_size = _resolve_positive_int(
+        "DATAHUB_GRAPHQL_BATCH_SIZE", DATAHUB_GRAPHQL_BATCH_SIZE
+    )
+    workers = _resolve_positive_int(
+        "DATAHUB_GRAPHQL_BATCH_WORKERS", DATAHUB_GRAPHQL_BATCH_WORKERS
+    )
+    batches = _chunk(urns_ordered, batch_size)
+    effective_workers = min(workers, len(batches))
+    batch_failures = 0
+
+    with ThreadPoolExecutor(max_workers=effective_workers) as pool:
+        futures = [
+            pool.submit(
+                _fetch_batch,
+                graphql_url,
+                token,
+                batch,
+                DATAHUB_GRAPHQL_BATCH_TIMEOUT_SEC,
+            )
+            for batch in batches
+        ]
+        for fut in as_completed(futures):
+            batch, root, outcome = fut.result()
+            if not root:
+                batch_failures += 1
+                _record_batch_failure(
+                    batch,
+                    outcome,
+                    urn_hit=urn_hit,
+                    urn_contract=urn_contract,
+                    urn_diagnostic=urn_diagnostic,
+                    urn_ownership=urn_ownership,
+                    urn_upstream_total=urn_upstream_total,
+                    urn_downstream_total=urn_downstream_total,
+                )
+                continue
+            per_urn = parse_batch_fair_signals(root, batch)
+            for urn in batch:
+                _record_urn_signals(
+                    urn,
+                    per_urn[urn],
+                    urn_hit=urn_hit,
+                    urn_contract=urn_contract,
+                    urn_diagnostic=urn_diagnostic,
+                    urn_ownership=urn_ownership,
+                    urn_upstream_total=urn_upstream_total,
+                    urn_downstream_total=urn_downstream_total,
+                )
+
+    LOGGER.info(
+        f"m=datahub_graphql_batch_summary,total_urns={len(urns_ordered)},"
+        f"batches={len(batches)},workers={effective_workers},"
+        f"batch_size={batch_size},batch_failures={batch_failures}"
+    )
 
     return (
         urn_hit,

@@ -183,8 +183,8 @@ def institutional_memory_has_assigned_datacontract(institutional_memory: Any) ->
     return False
 
 
-def _parse_dataset_fair_signals(
-    root: Mapping[str, Any],
+def _parse_dataset_node(
+    ds: Any,
 ) -> tuple[
     bool,
     bool,
@@ -193,12 +193,12 @@ def _parse_dataset_fair_signals(
     int,
     bool,
 ]:
-    """From GraphQL root JSON, return (indexed_ok, has_contract, ownership_nonempty, up_tot, down_tot, had_dataset)."""
+    """Parse a single ``dataset`` node payload into the fair-signals tuple.
 
-    data = root.get("data")
-    if not isinstance(data, dict):
-        return False, False, False, 0, 0, False
-    ds = data.get("dataset")
+    Returns (indexed_ok, has_contract, ownership_nonempty, up_tot, down_tot, had_dataset).
+    ``had_dataset`` is False when the alias resolved to ``null`` (URN unknown to DataHub).
+    """
+
     if ds is None:
         return False, False, False, 0, 0, False
     if not isinstance(ds, dict):
@@ -228,3 +228,78 @@ def _parse_dataset_fair_signals(
         down_n = 0
 
     return indexed_ok, has_contract, ownership_nonempty, up_n, down_n, True
+
+
+def _parse_dataset_fair_signals(
+    root: Mapping[str, Any],
+) -> tuple[
+    bool,
+    bool,
+    bool,
+    int,
+    int,
+    bool,
+]:
+    """From single-dataset GraphQL root, return the fair-signals tuple (see ``_parse_dataset_node``)."""
+
+    data = root.get("data")
+    if not isinstance(data, dict):
+        return False, False, False, 0, 0, False
+    return _parse_dataset_node(data.get("dataset"))
+
+
+# -- GraphQL batching ---------------------------------------------------------------------------
+#
+# Single shared selection body: identical to ``DATAHUB_DATASET_FAIR_SIGNALS_QUERY`` but parameterised
+# by alias index so we can pack N datasets into one POST. Each alias costs ~10 in DataHub's GraphQL
+# complexity budget, so 25 aliases ≈ 250 — well under the default ``complexityLimit`` (2000).
+_DATASET_FAIR_SIGNALS_SELECTION = (
+    "exists "
+    "ownership { owners { owner { ... on CorpUser { urn } ... on CorpGroup { urn } } } } "
+    "upstream: lineage(input: { direction: UPSTREAM, start: 0, count: 0 }) { total } "
+    "downstream: lineage(input: { direction: DOWNSTREAM, start: 0, count: 0 }) { total } "
+    "institutionalMemory { elements { label url } }"
+)
+
+
+def build_dataset_fair_signals_batch_query(
+    urns: list[str],
+) -> tuple[str, dict[str, str]]:
+    """Build a single GraphQL query that fetches fair-signals for ``urns`` via aliases.
+
+    Returns ``(query, variables)``. Aliases are ``d{i}`` and variables are ``$u{i}``,
+    so callers can recover per-URN payloads via ``data["d{i}"]`` keyed by index.
+    """
+
+    if not urns:
+        return "query DatasetFairSignalsBatch { __typename }", {}
+
+    var_decls = ", ".join(f"$u{i}: String!" for i in range(len(urns)))
+    aliases = " ".join(
+        f"d{i}: dataset(urn: $u{i}) {{ {_DATASET_FAIR_SIGNALS_SELECTION} }}"
+        for i in range(len(urns))
+    )
+    query = f"query DatasetFairSignalsBatch({var_decls}) {{ {aliases} }}"
+    variables = {f"u{i}": urn for i, urn in enumerate(urns)}
+    return query, variables
+
+
+def parse_batch_fair_signals(
+    root: Mapping[str, Any],
+    urns: list[str],
+) -> dict[str, tuple[bool, bool, bool, int, int, bool]]:
+    """Parse a batched GraphQL root into ``{urn: fair_signals_tuple}``.
+
+    Missing aliases (``data["d{i}"]`` absent or ``null``) yield ``had_dataset=False``,
+    matching the per-URN ``ENTITY_NOT_FOUND`` semantics in ``resolve_datahub_urn_flags``.
+    """
+
+    result: dict[str, tuple[bool, bool, bool, int, int, bool]] = {}
+    data = root.get("data") if isinstance(root, Mapping) else None
+    if not isinstance(data, dict):
+        for urn in urns:
+            result[urn] = (False, False, False, 0, 0, False)
+        return result
+    for i, urn in enumerate(urns):
+        result[urn] = _parse_dataset_node(data.get(f"d{i}"))
+    return result
