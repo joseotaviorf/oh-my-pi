@@ -10,6 +10,11 @@ columns:
       - datalake_support_session_service_raw.support_session.id
     description: |
       Session identifier.
+  public_id:
+    lineage:
+      - datalake_support_session_service_raw.support_session.public_id
+    description: |
+      New session identifier.
   status:
     lineage:
       - datalake_support_session_service_raw.support_session.status
