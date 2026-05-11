@@ -2,76 +2,103 @@
 database_name: datalake_big_agent_clean
 table_name: earning_sources
 description: |
-  Sources for earnings: external domain and cart UUIDs, amounts, currency, processing status,
-  competence date, occurrence time, and audit timestamps, partitioned by load date.
+  Clean-layer snapshot of earning-source rows from the Big Agent Postgres CDC feed. Each row
+  represents one earning source with external domain and cart identifiers, monetary amounts,
+  processing and incentive-system calculation status, competence and event timestamps, and
+  audit fields. Grain is one row per earning source record; partitioned by year, month, and day
+  for incremental loads.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_big_agent_raw.earning_sources.id
-    description: Earning source identifier.
+    description: |
+      Primary key of the earning source in the transactional Big Agent database.
   id_external_domain:
     lineage:
       - datalake_big_agent_raw.earning_sources.external_domain_id
-    description: External domain identifier related to the earning source.
+    description: |
+      Identifier of the external business domain (for example marketplace or product area)
+      associated with this earning source.
   uuid_earning_source:
     lineage:
       - datalake_big_agent_raw.earning_sources.earning_source_uuid
-    description: UUID of the earning source.
+    description: |
+      Stable UUID that uniquely identifies the earning source across systems.
   uuid_external_cart:
     lineage:
       - datalake_big_agent_raw.earning_sources.external_cart_uuid
-    description: UUID of the external cart associated with the earning source.
+    description: |
+      UUID of the external cart or checkout context linked to this earning source, when applicable.
   external_domain_type:
     lineage:
       - datalake_big_agent_raw.earning_sources.external_domain_type
-    description: Type discriminator for the external domain.
+    description: |
+      Categorical discriminator describing which kind of external domain the identifiers refer to.
   currency:
     lineage:
       - datalake_big_agent_raw.earning_sources.currency
-    description: Currency code for monetary fields.
+    description: |
+      ISO or internal currency code applied to monetary amounts on this row.
   status:
     lineage:
       - datalake_big_agent_raw.earning_sources.status
-    description: Processing status of the earning source.
+    description: |
+      Pipeline processing status of the earning source (for example pending, processed, or failed).
   failure_reason:
     lineage:
       - datalake_big_agent_raw.earning_sources.failure_reason
-    description: Failure reason when processing was not successful.
+    description: |
+      Human-readable explanation when status indicates failure or rejection; null when successful.
   base_amount:
     lineage:
       - datalake_big_agent_raw.earning_sources.base_amount
-    description: Base amount used to compute earnings.
+    description: |
+      Base monetary amount in the stated currency used as input to earning calculations.
   revenue_share_total_amount:
     lineage:
       - datalake_big_agent_raw.earning_sources.revenue_share_total_amount
-    description: Total amount considered for revenue share.
+    description: |
+      Total monetary amount attributed to revenue-share logic for this earning source.
+  incentive_systems_calculation_status:
+    lineage:
+      - datalake_big_agent_raw.earning_sources.incentive_systems_calculation_status
+    description: |
+      Status of incentive-system calculations applied to this earning source (for example pending,
+      completed, or skipped), as recorded by Big Agent.
   dt_competence:
     lineage:
       - datalake_big_agent_raw.earning_sources.competence_date
-    description: Business competence date for the earning source (date only).
+    description: |
+      Business competence date (calendar date only) for which the earning applies.
   ts_occurred:
     lineage:
       - datalake_big_agent_raw.earning_sources.occurred_at
-    description: When the earning event occurred (source timestamp).
+    description: |
+      Source-system timestamp when the underlying earning event occurred (timezone as in source).
   ts_created:
     lineage:
       - datalake_big_agent_raw.earning_sources.created_at
-    description: Record creation timestamp.
+    description: |
+      Timestamp when the row was first created in the Big Agent database.
   ts_updated:
     lineage:
       - datalake_big_agent_raw.earning_sources.updated_at
-    description: Record last update timestamp.
+    description: |
+      Timestamp of the last update to this row in the Big Agent database.
   year:
     lineage:
       - datalake_big_agent_raw.earning_sources.year
-    description: Partition year.
+    description: |
+      Partition column: calendar year of the incremental load batch.
   month:
     lineage:
       - datalake_big_agent_raw.earning_sources.month
-    description: Partition month.
+    description: |
+      Partition column: calendar month of the incremental load batch.
   day:
     lineage:
       - datalake_big_agent_raw.earning_sources.day
-    description: Partition day.
+    description: |
+      Partition column: calendar day of the incremental load batch.

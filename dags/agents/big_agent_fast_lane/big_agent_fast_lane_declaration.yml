@@ -73,6 +73,7 @@ workflow:
     share_rule_aud: {}
     tier: {}
     tier_aud: {}
+    unresolved_earnings: {}
     user_revision_entity: {}
 cluster:
   type: databricks_16_4_small_general_fleet_2xlarge_single_node

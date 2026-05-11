@@ -1,0 +1,74 @@
+---
+database_name: datalake_big_agent_clean
+table_name: unresolved_earnings
+description: |
+  Clean-layer snapshot of unresolved earning rows from the Big Agent Postgres CDC feed. Each row
+  tracks an earning source that could not yet be matched or settled with an external receiver,
+  including incentive system context, resolution reason, and solve timestamp when cleared. Grain
+  is one row per unresolved-earnings record; partitioned by year, month, and day for incremental
+  loads.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_big_agent_raw.unresolved_earnings.id
+    description: |
+      Primary key of the unresolved-earnings record in the transactional Big Agent database.
+  id_earning_source:
+    lineage:
+      - datalake_big_agent_raw.unresolved_earnings.earning_source_id
+    description: |
+      Foreign key to the earning source row that remains unresolved pending external matching.
+  id_external_receiver:
+    lineage:
+      - datalake_big_agent_raw.unresolved_earnings.external_receiver_id
+    description: |
+      Identifier of the external receiver entity (partner or channel) associated with this queue
+      item, when known.
+  external_receiver_type:
+    lineage:
+      - datalake_big_agent_raw.unresolved_earnings.external_receiver_type
+    description: |
+      Categorical type of the external receiver (for example partner class or integration kind).
+  incentive_system:
+    lineage:
+      - datalake_big_agent_raw.unresolved_earnings.incentive_system
+    description: |
+      Incentive program or engine configuration key under which the earning was evaluated.
+  reason:
+    lineage:
+      - datalake_big_agent_raw.unresolved_earnings.reason
+    description: |
+      Business or operational reason explaining why the earning is still unresolved or how it
+      was categorized in the queue.
+  ts_solved:
+    lineage:
+      - datalake_big_agent_raw.unresolved_earnings.solved_at
+    description: |
+      Timestamp when the item was marked solved in the source; null while still open.
+  ts_created:
+    lineage:
+      - datalake_big_agent_raw.unresolved_earnings.created_at
+    description: |
+      Timestamp when the row was first created in the Big Agent database.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_raw.unresolved_earnings.updated_at
+    description: |
+      Timestamp of the last update to this row in the Big Agent database.
+  year:
+    lineage:
+      - datalake_big_agent_raw.unresolved_earnings.year
+    description: |
+      Partition column: calendar year of the incremental load batch.
+  month:
+    lineage:
+      - datalake_big_agent_raw.unresolved_earnings.month
+    description: |
+      Partition column: calendar month of the incremental load batch.
+  day:
+    lineage:
+      - datalake_big_agent_raw.unresolved_earnings.day
+    description: |
+      Partition column: calendar day of the incremental load batch.

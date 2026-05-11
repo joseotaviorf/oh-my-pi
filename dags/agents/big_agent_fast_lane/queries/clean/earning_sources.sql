@@ -9,6 +9,7 @@ SELECT
     failure_reason,
     base_amount,
     revenue_share_total_amount,
+    incentive_systems_calculation_status,
     DATE(competence_date) AS dt_competence,
     TIMESTAMP(occurred_at) AS ts_occurred,
     TIMESTAMP(created_at) AS ts_created,
