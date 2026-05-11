@@ -9,6 +9,7 @@ from bietlejuice.base.sst.core.utils.common import (
     retrieve_spark_session,
     validate_and_write,
 )
+from bietlejuice.base.sst.core.utils.transforms import apply_schema_remaps
 from bietlejuice.base.sst.core.observability.sensors import (
     sensor_s3_file_exists,
     partition_has_data,
@@ -130,7 +131,10 @@ def salesforce_raw_pipeline(cfg):
         .withColumn("ts_load", F.lit(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
         .withColumn("partition_date", F.lit(cfg.partition_date))
         .withColumn("partition_hour", F.lit(cfg.partition_hour))
-        .persist()
+    )
+
+    raw_final_remapped = apply_schema_remaps(
+        spark=spark, df=raw_final, target_table=target_table, accept_new_cols=True
     )
 
     logger.info("m=salesforce_raw_pipeline, msg=Quality checks passed")
@@ -139,10 +143,7 @@ def salesforce_raw_pipeline(cfg):
     )
 
     partition_filter = build_partition_filter(
-        {
-            "partition_date": cfg.partition_date,
-            "partition_hour": cfg.partition_hour,
-        }
+        {"partition_date": cfg.partition_date, "partition_hour": cfg.partition_hour}
     )
     partition_cols = ["partition_date", "partition_hour"]
     logger.info(f"m=salesforce_raw_pipeline, msg=Partition columns: {partition_cols}")
@@ -150,7 +151,7 @@ def salesforce_raw_pipeline(cfg):
     table_location = f"s3a://{cfg.bucket}/raw/salesforce/{cfg.target_table}"
     validate_and_write(
         spark=spark,
-        df=raw_final,
+        df=raw_final_remapped,
         target_table=target_table,
         partition_filter=partition_filter,
         partition_cols=partition_cols,
@@ -167,7 +168,7 @@ def salesforce_raw_pipeline(cfg):
         logger.info(f"m=salesforce_raw_pipeline, msg=Saving {_metric} metric")
         save_volume_metric(
             spark=spark,
-            df=raw_final,
+            df=raw_final_remapped,
             grain=grain,
             metric_name=_metric,
             table_name=target_table,
@@ -176,7 +177,7 @@ def salesforce_raw_pipeline(cfg):
             partition_cols=["partition_date", "partition_hour"],
             table_location=f"s3a://{cfg.bucket}/sst_metrics/{_metric}",
         )
-    raw_final.unpersist()
+    raw_final_remapped.unpersist()
     logger.info("m=salesforce_raw_pipeline, msg=Pipeline completed")
 
 
