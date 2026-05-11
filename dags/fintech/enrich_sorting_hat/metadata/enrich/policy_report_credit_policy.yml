@@ -1,0 +1,213 @@
+---
+database_name: datalake_sorting_hat
+table_name: policy_report_credit_policy
+owner: davi.figueiredo@quintoandar.com.br
+domain: Fintech
+description: >
+  Enriched CREDIT_POLICY policy reports from sorting-hat.
+columns:
+  id_policy_report:
+    description: "Policy report ID"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.id
+  id_credit_evaluation:
+    description: >
+      ID of the linked credit_evaluation. For CREDIT_EVALUATION source (Early
+      Credit evaluations) it is taken directly from id_external. For PROPOSAL
+      source (Regular Credit evaluations), we don't have a direct relationship
+      stored, and determine it by finding the most recent credit_evaluation for
+      the proposal created before the analysis.
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.id_external
+      - datalake_docx_clean.credit_evaluation.id
+  id_proposal:
+    description: "Proposal ID. Populated only when external_source = 'PROPOSAL',
+      otherwise NULL."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.id_external
+  id_external:
+    description: >
+      Raw external ID from the policy report. Either a proposal ID or a credit
+      evaluation ID depending on external_source.
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.id_external
+  external_source:
+    description: "Source that triggered the policy report."
+    categories:
+      PROPOSAL: "Policy was run for a Regular Credit evaluation. id_external refers to
+        the proposal."
+      CREDIT_EVALUATION: "Policy was run for an Early Credit evaluation (no associated
+        proposal). id_external refers to the credit_evaluation."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.external_source
+  version:
+    description: "Version of the policy report record (increased whenever a new
+      policy evaluation is run for the same proposal/credit_evaluation)."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.version
+  variant:
+    description: "Policy variant name that was executed (e.g.
+      alpha-v1.1-policy-4-category)."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.variant
+  is_retenant:
+    description: >
+      True if the proponent was considered a returning tenant for the policy run.
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.is_retenant
+  retenant_type:
+    description: >
+      Retenant classification from the RETENANT policy report for the same evaluation.
+      May diverge from is_retenant if the retenant evaluation was run after the
+      credit policy ran; see is_retenant_type_trusted.
+    categories:
+      NEW_USER: "No previous rental contract, or no RETENANT report found, or RETENANT
+        re-evaluated to NEW_USER after the credit policy ran"
+      FREE_RETENANT: "Returning tenant whose previous contract used the SeguroFairfax
+        guarantee"
+      PAID_RETENANT: "Returning tenant whose previous contract used a paid or deposit
+        guarantee"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.type
+      - datalake_sorting_hat_clean.policy_report.result.elected_contract_guarantee_type
+  is_retenant_type_trusted:
+    description: >
+      True when retenant_type can be fully trusted. In some cases, the RETENANT
+      policy_report is updated after the credit policy ran, meaning retenant_type
+      may reflect a later re-evaluation rather than what drove the decision. Those
+      cases are marked FALSE. As of May 2026, ~0.8% of records are FALSE, and only
+      ~0.3% of those have an actual retenant_type conflict.
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.ts_updated
+  risk_category:
+    description: "Coarse risk bucket (A-E) from the screening result, used as input
+      to the policy."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.risk_category
+  risk_category_canon:
+    description: "Fine-grained risk bucket (A1-J1) from the screening result, used
+      as input to the policy."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.risk_category_canon
+  city:
+    description: "City of the house, from the policy input."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.city
+  state:
+    description: "State of the house, from the policy input."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.state
+  passport_city:
+    description: "City override from the credit passport flow."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.passport_city
+  passport_state:
+    description: "State override from the credit passport flow."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.passport_state
+  rejection_reason:
+    description: >
+      Reason set when the policy did not run to a normal approval. NULL when the policy
+      ran and approved freely. BAD_SCORE_ALL_PROPONENTS is a normal policy-engine outcome
+      (analysis_category_name still reflects the actual result); other values indicate
+      an external override, in which case analysis_category_name is NULL.
+    categories:
+      BAD_SCORE_ALL_PROPONENTS: "All proponents scored below the threshold for a free guarantee;
+        the policy ran normally and analysis_category_name reflects the actual offer (paid or CLEAR_NO)."
+      INSUFFICIENT_INCOME: "Policy bypassed: total income was below the minimum threshold for the
+        property. The policy engine was not evaluated."
+      OTHER: "Result was externally overridden, not determined by the policy engine."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.rejection_reason
+  policy_dti:
+    description: "Debt-to-income cap applied by the policy (PERC_30, PERC_35,
+      PERC_40). Only present in CreditPassport variants."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.policy_dti
+  city_group:
+    description: "City group used for matrix selection (CITY_SP, CITY_RJ,
+      CITY_GROWTH_ROADMAP, CITY_OTHER)."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.execution_context.city_group
+  policy_matrix:
+    description: "Name of the policy matrix applied to the proposal."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.execution_context.policy_matrix
+  is_error_present:
+    description: "True if the policy result contained one or more errors."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.errors
+  analysis_category:
+    description: >
+      Integer code for the credit analysis category (guarantee product) assigned
+      by the policy. NULL means CLEAR_NO (rejected), or that the proposal was
+      automatically rejected (see rejection_reason).
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.analysis_category
+  analysis_category_name:
+    description: "Name for the analysis_category integer code. NULL if the proposal
+      was automatically rejected."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.analysis_category
+  experiment_groups:
+    description: >
+      MAP of experiment name to group assignment, parsed from the
+      execution_context experiment_groups array. Each element (e.g.
+      rented_anyway_package_test) is split on its last underscore to yield
+      {experiment_name: group}. Example: {'rented_anyway_package': 'test',
+      'rj_cgrm': 'control'}. NULL if the proposal was not assigned to any
+      experiment.
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.execution_context.experiment_groups
+  calibrated_score:
+    description: >
+      Normalized screening score used as input to the policy, taken from
+      raw_data. result.calibrated_score is always identical when present.
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.calibrated_score
+  score:
+    description: "Integer screening score (0-100) from the policy result."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.score
+  total_income:
+    description: "Sum of monthly income of all proponents, as provided to the policy."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.total_income
+  package_value:
+    description: "Rental package value (rent + condo + IPTU + insurance) provided to
+      the policy."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.package_value
+  house_random_percentage:
+    description: "Deterministic random value (0-99) based on house_id mod 100, used
+      for experiment assignment."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.result.execution_context.house_random_percentage
+  income_group:
+    description: "Income segmentation bucket. LOW_INCOME: total_income <= 7500.
+      HIGH_INCOME: total_income > 7500. NULL when total_income is NULL."
+    categories:
+      LOW_INCOME: "Total proponent income at or below R$ 7,500"
+      HIGH_INCOME: "Total proponent income above R$ 7,500"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.total_income
+  risk_category_range:
+    description: "Risk category range bucket grouping risk_category_canon into 6
+      bands used in credit analysis segmentation."
+    categories:
+      "[A1,A3]": "a. A1-A3 (lowest risk)"
+      "[A4,B1]": "b. A4-B1"
+      "[B2,D2]": "c. B2-D2"
+      "[D3,F1]": "d. D3-F1"
+      "[F2,I2]": "e. F2-I2"
+      "[I3,J1]": "f. I3-J1 (highest risk)"
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.risk_category_canon
+  ts_created:
+    description: "Timestamp when the policy report was created."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.ts_created
+  ts_updated:
+    description: "Timestamp when the policy report was last updated."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.ts_updated
