@@ -17,19 +17,24 @@ column_level_validations:
     is_complete:
       severity_level: Error
   person_number:
-    is_complete:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Error
   legislation_code:
-    is_complete:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Error
   dt_valid_from:
-    is_complete:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Error
   dt_valid_to:
-    is_complete:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Error
   is_current:
-    is_complete:
+    has_null_count:
+      less_than_or_equal_to: 1
       severity_level: Error
   ts_load:
     has_null_count:
