@@ -1,6 +1,7 @@
 SELECT
     id AS id_inspection,
     previous_inspection_id AS id_previous_inspection,
+    original_inspection_id AS id_original_inspection,
     client_side_id AS id_client_side,
     contract_id AS id_contract,
     external_id AS id_external,

@@ -18,6 +18,10 @@ columns:
       If there is a previous inspection for the same contract, it will
       be indicated in this column. It is usually completed in offboarding inspections,
       bringing the identification of the onboarding or dispute inspection.
+  id_original_inspection:
+    lineage:
+      - datalake_inspection_services_raw.inspection.original_inspection_id
+    description: Identifier of the original inspection that originated this one (e.g. rescheduled or duplicated inspections).
   id_client_side:
     lineage:
       - datalake_inspection_services_raw.inspection.client_side_id
