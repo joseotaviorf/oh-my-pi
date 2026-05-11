@@ -483,9 +483,9 @@ class TestMvpChecks(unittest.TestCase):
         }
         res = evaluate_mvp_checks_from_row(row)
         self.assertFalse(res["F1-03"].passed)
-        self.assertEqual(res["F1-03"].reason, "table_not_found_in_spark_catalog")
+        self.assertEqual(res["F1-03"].reason, "fqn_not_in_columns_metastore_snapshot")
 
-    def test_f1_03_exception_probe_reason(self):
+    def test_f1_03_missing_maps_to_fqn_not_in_snapshot(self):
         row = {
             "database_name": "dw_rent",
             "table_name": "fact_contract",
@@ -495,7 +495,7 @@ class TestMvpChecks(unittest.TestCase):
             "fqn_occurrence_count": 1,
             "is_active_employee": True,
             "spark_table_exists": False,
-            "spark_catalog_probe_status": "exception:AnalysisException",
+            "spark_catalog_probe_status": "missing_in_snapshot",
             "f4_01_pass": True,
             "has_data_contract": True,
             "f2_02_pass": True,
@@ -503,7 +503,7 @@ class TestMvpChecks(unittest.TestCase):
         }
         res = evaluate_mvp_checks_from_row(row)
         self.assertFalse(res["F1-03"].passed)
-        self.assertEqual(res["F1-03"].reason, "spark_catalog_table_exists_exception")
+        self.assertEqual(res["F1-03"].reason, "fqn_not_in_columns_metastore_snapshot")
 
     def test_f1_03_passes_when_spark_probe_true(self):
         row = {
@@ -539,7 +539,7 @@ class TestMvpChecks(unittest.TestCase):
         }
         res = evaluate_mvp_checks_from_row(row)
         self.assertFalse(res["F1-03"].passed)
-        self.assertEqual(res["F1-03"].reason, "spark_catalog_existence_not_assessed")
+        self.assertEqual(res["F1-03"].reason, "columns_metastore_snapshot_unavailable")
 
     def test_f1_03_fails_not_assessed_when_spark_probe_value_is_none(self):
         row = {
@@ -558,7 +558,7 @@ class TestMvpChecks(unittest.TestCase):
         }
         res = evaluate_mvp_checks_from_row(row)
         self.assertFalse(res["F1-03"].passed)
-        self.assertEqual(res["F1-03"].reason, "spark_catalog_existence_not_assessed")
+        self.assertEqual(res["F1-03"].reason, "columns_metastore_snapshot_unavailable")
 
     def test_i1_fails_without_contract(self):
         row = {
@@ -610,7 +610,7 @@ class TestF103Direct(unittest.TestCase):
     def test_fails_without_catalog_probe(self):
         r = check_f1_03_addressable_fqn("s", "t", spark_catalog_hit=None)
         self.assertFalse(r.passed)
-        self.assertEqual(r.reason, "spark_catalog_existence_not_assessed")
+        self.assertEqual(r.reason, "columns_metastore_snapshot_unavailable")
 
     def test_passes_with_catalog_hit(self):
         r = check_f1_03_addressable_fqn("s", "t", spark_catalog_hit=True)
@@ -619,17 +619,17 @@ class TestF103Direct(unittest.TestCase):
     def test_catalog_miss_explicit(self):
         r = check_f1_03_addressable_fqn("s", "t", spark_catalog_hit=False)
         self.assertFalse(r.passed)
-        self.assertEqual(r.reason, "table_not_found_in_spark_catalog")
+        self.assertEqual(r.reason, "fqn_not_in_columns_metastore_snapshot")
 
-    def test_catalog_exception_probe(self):
+    def test_snapshot_unavailable_probe(self):
         r = check_f1_03_addressable_fqn(
             "s",
             "t",
             spark_catalog_hit=False,
-            spark_catalog_probe_status="exception:RuntimeError",
+            spark_catalog_probe_status="snapshot_unavailable",
         )
         self.assertFalse(r.passed)
-        self.assertEqual(r.reason, "spark_catalog_table_exists_exception")
+        self.assertEqual(r.reason, "columns_metastore_snapshot_unavailable")
 
 
 class _FakeConfigService:

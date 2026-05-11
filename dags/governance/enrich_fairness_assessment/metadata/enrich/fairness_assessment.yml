@@ -4,8 +4,8 @@ table_name: fairness_assessment
 owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
 description: >
-  Per-table FAIRness MVP assessment from documentation_metrics, org_chart, Spark catalog, and DataHub
-  GraphQL; grain one row per (database_name, table_name, year, month, day). See column descriptions below.
+  Per-table FAIRness MVP assessment from documentation_metrics, columns_metastore snapshot, org_chart,
+  and DataHub GraphQL; grain one row per (database_name, table_name, year, month, day). See column descriptions below.
 columns:
   database_name:
     lineage:
@@ -21,12 +21,15 @@ columns:
       (``MVP_TIER2_SCOPED_REQUIREMENT_IDS``): F1-01, F1-02, F1-03,
       F2-01, F4-01, A1.2-03, I1-02, **F2-02**, **I1-01**. **F2-02** — column description richness
       (``assess_column_description_quality``) on rows from ``columns_documentation``; failure reasons
-      no_column_docs_in_lake, column_description_not_substantive. **I1-01** — name coverage vs Spark
-      physical schema; reason ``undocumented_columns`` when any non-partition field is missing from the lake;
+      no_column_docs_in_lake, column_description_not_substantive.
+      **I1-01** — name coverage vs physical schema from the latest partition of
+      ``datalake_documentation_metrics_clean.columns_metastore`` (Information Schema snapshot); reason
+      ``undocumented_columns`` when any non-partition field is missing from the lake; reason
+      ``spark_schema_not_in_columns_metastore_snapshot`` when the FQN is absent from that snapshot;
       optional detail ``undocumented_column_names`` (business fields), ``undocumented_partition_column_names``,
       and ``warnings`` when only partition columns are undocumented. **I3-01** / **I3-02** (DataHub) are emitted
-      for observability when GraphQL is configured; they do not affect the MVP tier score. F1-03 uses
-      ``spark.tableExists``; F4-01 uses DataHub ``dataset.exists``. I1-02 and A1.2-03 use the assigned
+      for observability when GraphQL is configured; they do not affect the MVP tier score. F1-03 uses the same
+      ``columns_metastore`` snapshot (presence of FQN); F4-01 uses DataHub ``dataset.exists``. I1-02 and A1.2-03 use the assigned
       datacontract URN signal on the Databricks entity. See the historical spike doc for F4-01 and A1-03
       context.
   tier_achieved:

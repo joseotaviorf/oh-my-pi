@@ -16,6 +16,7 @@ from typing import Any, Mapping, Optional
 
 from bietlejuice.governance.fairness_assessment.constants import (
     PARTITION_COLUMN_NAMES_LOWERCASE,
+    SCHEMA_NOT_IN_COLUMNS_METASTORE_REASON,
 )
 from bietlejuice.governance.fairness_assessment.description_quality import (
     assess_column_description_quality,
@@ -47,12 +48,16 @@ def compute_f2_02_and_i1_01_for_fqn(
     table_name: str,
     column_name_to_desc: Mapping[str, Optional[str]],
     *,
-    spark_table_exists: bool,
+    spark_table_exists: Optional[bool],
     physical_field_names_lower: frozenset[str],
 ) -> tuple[RequirementResult, RequirementResult, str, bool]:
-    """Return (F2-02, I1-01, JSON for ``i1_01_undocumented_json``, columns_description_is_substantive)."""
+    """Return (F2-02, I1-01, JSON for ``i1_01_undocumented_json``, columns_description_is_substantive).
 
-    has_physical = bool(spark_table_exists) and len(physical_field_names_lower) > 0
+    ``spark_table_exists``: ``True`` if the FQN is present in the ``columns_metastore`` snapshot;
+    ``False`` if absent; ``None`` if the snapshot could not be loaded (I1-01 → ``i1_01_not_assessed``).
+    """
+
+    has_physical = spark_table_exists is True and len(physical_field_names_lower) > 0
     col_map: dict[str, str] = {}
     for c, d in column_name_to_desc.items():
         ckey = (c or "").strip()
@@ -97,6 +102,17 @@ def compute_f2_02_and_i1_01_for_fqn(
         f2_ok,
         reason=None if f2_ok else f2_reason,
     )
+    if spark_table_exists is None:
+        i1r = RequirementResult("I1-01", False, "i1_01_not_assessed")
+        return (f2r, i1r, "{}", columns_description_is_substantive)
+    if spark_table_exists is False:
+        i1r = RequirementResult(
+            "I1-01",
+            False,
+            SCHEMA_NOT_IN_COLUMNS_METASTORE_REASON,
+        )
+        return (f2r, i1r, "{}", columns_description_is_substantive)
+
     i1r = RequirementResult(
         "I1-01",
         i1_ok,

@@ -1,6 +1,6 @@
 """
 Spark job: FAIR assessment — ``tables_documentation`` + ``columns_documentation`` + ``org_chart``;
-Spark catalog / field names, DataHub GraphQL; writes enrich Delta.
+``columns_metastore`` snapshot (F1-03 / I1-01), DataHub GraphQL; writes enrich Delta.
 
 Business rules live in :mod:`bietlejuice.governance.fairness_assessment`; this module is
 orchestration and PySpark I/O. PySpark imports stay in ``main()`` and ``_eval_partition`` so the
@@ -16,9 +16,8 @@ import os
 from datetime import datetime, timezone
 from typing import Any, Mapping, Optional
 
-from bietlejuice.governance.fairness_assessment.adapters.spark_catalog import (
-    resolve_spark_physical_field_names_lower,
-    resolve_spark_table_exists_map,
+from bietlejuice.governance.fairness_assessment.adapters.columns_metastore import (
+    resolve_columns_metastore_snapshot,
 )
 from bietlejuice.governance.fairness_assessment.constants import (
     COLUMNS_DOC,
@@ -157,10 +156,8 @@ def main() -> None:
     from pyspark.sql.window import Window
     from quintoandar_logger import QuintoAndarLogger
 
-    from bietlejuice.base.databricks.table_privileges import TablePrivileges
     from bietlejuice.base.db import DatalakeMetastoreService
     from bietlejuice.base.spark import BaseDBUtils, BaseSparkContext
-    from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
     from bietlejuice.loaders.delta_loader import DeltaLoader
 
     def parse_args() -> argparse.Namespace:
@@ -201,11 +198,6 @@ def main() -> None:
                 StructField("day", IntegerType(), True),
             ]
         )
-
-    def _apply_default_uc_grants(full_table_name: str) -> None:
-        priv = TablePrivileges.from_environment_default(full_table_name)
-        if priv and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
-            priv.apply()
 
     args = parse_args()
     logger = QuintoAndarLogger(JOB_NAME)
@@ -297,12 +289,31 @@ def main() -> None:
         F.lit(True),
     )
 
-    exists_map, spark_probe_status_map = resolve_spark_table_exists_map(spark, td)
+    exists_set, phys_map, snapshot_partition = resolve_columns_metastore_snapshot(
+        spark, args.environment, td
+    )
+    logger.info(
+        f"m=columns_metastore_snapshot_used,snapshot_partition={snapshot_partition}"
+    )
+    snapshot_ok = snapshot_partition is not None
+    exists_map: dict[tuple[str, str], Optional[bool]] = {}
+    spark_probe_status_map: dict[tuple[str, str], str] = {}
+    for r in td.select("database_name", "table_name").distinct().collect():
+        k = (str(r["database_name"] or "").strip(), str(r["table_name"] or "").strip())
+        if not snapshot_ok:
+            exists_map[k] = None
+            spark_probe_status_map[k] = "snapshot_unavailable"
+        elif k in exists_set:
+            exists_map[k] = True
+            spark_probe_status_map[k] = "in_snapshot"
+        else:
+            exists_map[k] = False
+            spark_probe_status_map[k] = "missing_in_snapshot"
+
     cd_rows = cd_f.select(
         "database_name", "table_name", "column_name", "column_description"
     ).collect()
     col_by_fqn = _build_column_descriptions_by_fqn_from_collected_rows(cd_rows)
-    phys_map = resolve_spark_physical_field_names_lower(spark, exists_map)
     f2_i1_by_fqn: dict[
         tuple[str, str],
         dict[str, Any],
@@ -310,8 +321,8 @@ def main() -> None:
     for r in td.select("database_name", "table_name").distinct().collect():
         k = (str(r["database_name"] or "").strip(), str(r["table_name"] or "").strip())
         cdesc = col_by_fqn.get(k, {})
-        ex = bool(exists_map.get(k, False))
-        ph = phys_map.get(k, frozenset())
+        ex = exists_map.get(k)
+        ph = phys_map.get(k, frozenset()) if ex is True else frozenset()
         f2r, i1r, i1_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
             k[0],
             k[1],
@@ -332,11 +343,11 @@ def main() -> None:
     bc_spark_probe_status = spark.sparkContext.broadcast(spark_probe_status_map)
     bc_f2_i1 = spark.sparkContext.broadcast(f2_i1_by_fqn)
 
-    def _lookup_spark_table_exists(db: Any, tbl: Any) -> bool:
+    def _lookup_spark_table_exists(db: Any, tbl: Any) -> Any:
         if db is None or tbl is None:
-            return False
+            return None
         key = (str(db).strip(), str(tbl).strip())
-        return bool(bc_exists.value.get(key, False))
+        return bc_exists.value.get(key)
 
     def _lookup_spark_catalog_probe_status(db: Any, tbl: Any) -> Any:
         if db is None or tbl is None:
@@ -568,7 +579,6 @@ def main() -> None:
         partition_by=partition_cols or None,
         merge_on=merge_on,
     )
-    _apply_default_uc_grants(full_table)
 
     w_latest = Window.partitionBy("database_name", "table_name").orderBy(
         F.col("ts_assessed").desc(),
@@ -602,7 +612,6 @@ def main() -> None:
         source_df=class_df,
         merge_on=["database_name", "table_name"],
     )
-    _apply_default_uc_grants(class_full)
 
 
 if __name__ == "__main__":

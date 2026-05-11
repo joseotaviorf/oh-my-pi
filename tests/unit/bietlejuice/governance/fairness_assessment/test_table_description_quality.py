@@ -12,6 +12,9 @@ from bietlejuice.governance.fairness_assessment.checks.findable.f2_02_substantiv
 from bietlejuice.governance.fairness_assessment.checks.interoperable.i1_01_documented_physical_fields import (  # noqa: E501
     check_i1_01_documented_physical_fields,
 )
+from bietlejuice.governance.fairness_assessment.constants import (
+    SCHEMA_NOT_IN_COLUMNS_METASTORE_REASON,
+)
 
 
 class TestAssessTableDescriptionQuality(unittest.TestCase):
@@ -108,7 +111,7 @@ class TestF2I1ColumnInteroperability(unittest.TestCase):
         self.assertEqual(d["undocumented_business_names"], ["x", "y"])
         self.assertEqual(d["undocumented_partition_names"], [])
 
-    def test_i1_passes_when_no_catalog_table(self):
+    def test_i1_fails_when_fqn_absent_from_columns_metastore_snapshot(self):
         long_desc = "This column stores the user identifier for cross-referencing with other dimensions."
         f2, i1, detail_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
             "a",
@@ -118,11 +121,10 @@ class TestF2I1ColumnInteroperability(unittest.TestCase):
             physical_field_names_lower=frozenset(),
         )
         self.assertTrue(cols_sub)
-        self.assertTrue(i1.passed)
+        self.assertFalse(i1.passed)
+        self.assertEqual(i1.reason, SCHEMA_NOT_IN_COLUMNS_METASTORE_REASON)
         self.assertTrue(f2.passed)
-        d = json.loads(detail_json)
-        self.assertEqual(d["undocumented_business_names"], [])
-        self.assertEqual(d["undocumented_partition_names"], [])
+        self.assertEqual(detail_json, "{}")
 
     def test_i1_passes_with_warning_when_only_partition_columns_undocumented(self):
         long = "Identifier column used in joins; stable surrogate key for the business entity in this table."
@@ -168,7 +170,22 @@ class TestF2I1ColumnInteroperability(unittest.TestCase):
         )
         self.assertFalse(cols_sub)
         self.assertTrue(f2.passed)
-        self.assertTrue(i1.passed)
+        self.assertFalse(i1.passed)
+        self.assertEqual(i1.reason, SCHEMA_NOT_IN_COLUMNS_METASTORE_REASON)
+
+    def test_i1_not_assessed_when_columns_metastore_snapshot_unavailable(self):
+        long_desc = "Identifier column used in joins; stable surrogate key for the business entity in this table."
+        f2, i1, detail_json, _cols_sub = compute_f2_02_and_i1_01_for_fqn(
+            "a",
+            "b",
+            {"x": long_desc},
+            spark_table_exists=None,
+            physical_field_names_lower=frozenset(),
+        )
+        self.assertFalse(i1.passed)
+        self.assertEqual(i1.reason, "i1_01_not_assessed")
+        self.assertEqual(detail_json, "{}")
+        self.assertTrue(f2.passed)
 
     def test_columns_sub_false_when_one_column_not_substantive(self):
         long = "Identifier column used in joins; stable surrogate key for the business entity in this table."

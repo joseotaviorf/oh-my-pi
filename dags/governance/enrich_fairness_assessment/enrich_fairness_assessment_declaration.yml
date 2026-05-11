@@ -20,6 +20,9 @@ dag:
       timed out at 4h). Woodpecker CI is not the runtime of this job;
       optional repo lint/tests baseline is documented in ``docs/spikes/fairness-measurement-spike.md`` (§10).
       Pause or change cadence only with Governance; update this field and re-validate the declaration.
+
+      Enrich outputs are Hive-synced (``has_hive_sync: true``) so ``fairness_assessment`` / ``fairness_classification``
+      are queryable in Trino alongside Databricks.
 workflow:
   type: query_delta
   layer: enrich
@@ -30,7 +33,7 @@ workflow:
     - day
   default_extraction_type: incremental
   execution_timeout_hours: 8
-  has_hive_sync: false
+  has_hive_sync: true
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
