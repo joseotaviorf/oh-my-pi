@@ -18,6 +18,10 @@ columns:
     description: ID of the contract.
     lineage:
       - datalake_rental_management_raw.third_party_bills.contract_id
+  id_invoice:
+    description: ID of the invoice that originated the third party bill.
+    lineage:
+      - datalake_rental_management_raw.third_party_bills.boleto_id
   uuid_payment_request:
     description: Unique identifier for the payment request of the third party bill.
     lineage:

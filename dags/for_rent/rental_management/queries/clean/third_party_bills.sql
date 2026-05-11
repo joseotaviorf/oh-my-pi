@@ -2,6 +2,7 @@ SELECT
     id,
     third_party_bills_uuid AS uuid_third_party_bills,
     contract_id AS id_contract,
+    boleto_id AS id_invoice,
     payment_request_uuid AS uuid_payment_request,
     bar_code,
     beneficiary_name,
