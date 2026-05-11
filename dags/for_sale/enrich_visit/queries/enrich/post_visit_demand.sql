@@ -223,64 +223,93 @@ house_evaluation AS (
 visit_status_by_demand AS (
     SELECT
         id_visit,
+        visit_code,
+        channel,
         CASE
-            WHEN event_type = 'ANSWER_VISIT_DONE' THEN TRUE
-            WHEN event_type = 'ANSWER_VISIT_UNSUCCESSFUL' THEN FALSE
+            WHEN event_type IN ('ANSWER_VISIT_DONE', 'ANSWER_DONE') THEN TRUE
+            WHEN event_type IN ('ANSWER_VISIT_UNSUCCESSFUL', 'ANSWER_UNSUCCESSFUL') THEN FALSE
             ELSE NULL
         END AS is_visit_completed_by_demand,
         CASE
-            WHEN event_type = 'ANSWER_VISIT_RIGHTFULLY_CANCELED' THEN TRUE
-            WHEN event_type = 'ANSWER_VISIT_WRONGFULLY_CANCELED' THEN FALSE
+            WHEN event_type IN ('ANSWER_VISIT_RIGHTFULLY_CANCELED', 'ANSWER_RIGHTFULLY_CANCELED') THEN TRUE
+            WHEN event_type IN ('ANSWER_VISIT_WRONGFULLY_CANCELED', 'ANSWER_WRONGFULLY_CANCELED') THEN FALSE
             ELSE NULL
-        END AS is_visit_canceled_by_demand
+        END AS is_visit_canceled_by_demand,
+        ts_created
     FROM
         datalake_visit.visit_status_events
-    WHERE
-        event_type IN ('ANSWER_VISIT_DONE', 'ANSWER_VISIT_UNSUCCESSFUL', 'ANSWER_VISIT_RIGHTFULLY_CANCELED', 'ANSWER_VISIT_WRONGFULLY_CANCELED')
+    WHERE -- In the future we will update all the event types removing the 'VISIT_' prefix since the new event types are not prefixed with 'VISIT_'
+        event_type IN ('ANSWER_VISIT_DONE', 'ANSWER_DONE', 'ANSWER_VISIT_UNSUCCESSFUL', 'ANSWER_UNSUCCESSFUL', 'ANSWER_VISIT_RIGHTFULLY_CANCELED', 'ANSWER_RIGHTFULLY_CANCELED', 'ANSWER_VISIT_WRONGFULLY_CANCELED', 'ANSWER_WRONGFULLY_CANCELED')
         AND on_behalf_of = 'DEMAND'
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY ts_created DESC) = 1
+),
+house_agent AS (
+    SELECT
+        COALESCE(agent.visit_code, house.visit_code) AS visit_code,
+        agent.agent_rating,
+        agent.agent_rating_comment,
+        house.house_rating,
+        house.house_rating_comment,
+        agent.agent_improvements,
+        agent.agent_good_points,
+        agent.agent_thoughtfulness,
+        agent.agent_punctuality,
+        agent.agent_house_features_knowledge,
+        agent.agent_rent_sale_process_knowledge,
+        agent.agent_get_in_touch,
+        agent.agent_other,
+        agent.agent_bypass_attempt,
+        house.house_improvements,
+        house.house_good_points,
+        house.house_location,
+        house.house_conservation,
+        house.house_neighborhood,
+        house.house_cost_benefit,
+        house.house_condominium_features,
+        house.house_ad_discrepancies,
+        CASE
+            WHEN agent.visit_code IS NOT NULL AND house.visit_code IS NOT NULL THEN 'AGENT_HOUSE'
+            WHEN agent.visit_code IS NULL AND house.visit_code IS NOT NULL THEN 'HOUSE'
+            WHEN agent.visit_code IS NOT NULL AND house.visit_code IS NULL THEN 'AGENT'
+        END AS evaluation_domain
+    FROM
+        agent_evaluation AS agent
+    FULL OUTER JOIN
+        house_evaluation AS house
+            ON agent.visit_code = house.visit_code
 )
 SELECT
-    v.id AS id_visit,
-    COALESCE(agent.visit_code, house.visit_code) AS visit_code,
-    agent.agent_rating,
-    agent.agent_rating_comment,
-    house.house_rating,
-    house.house_rating_comment,
-    agent.agent_improvements,
-    agent.agent_good_points,
-    agent.agent_thoughtfulness,
-    agent.agent_punctuality,
-    agent.agent_house_features_knowledge,
-    agent.agent_rent_sale_process_knowledge,
-    agent.agent_get_in_touch,
-    agent.agent_other,
-    agent.agent_bypass_attempt,
-    house.house_improvements,
-    house.house_good_points,
-    house.house_location,
-    house.house_conservation,
-    house.house_neighborhood,
-    house.house_cost_benefit,
-    house.house_condominium_features,
-    house.house_ad_discrepancies,
-    CASE
-        WHEN agent.visit_code IS NOT NULL AND house.visit_code IS NOT NULL THEN 'AGENT_HOUSE'
-        WHEN agent.visit_code IS NULL AND house.visit_code IS NOT NULL THEN 'HOUSE'
-        WHEN agent.visit_code IS NOT NULL AND house.visit_code IS NULL THEN 'AGENT'
-    END AS evaluation_domain,
+    vsbd.id_visit,
+    vsbd.visit_code,
+    vsbd.channel,
+    ha.agent_rating,
+    ha.agent_rating_comment,
+    ha.house_rating,
+    ha.house_rating_comment,
+    ha.agent_improvements,
+    ha.agent_good_points,
+    ha.agent_thoughtfulness,
+    ha.agent_punctuality,
+    ha.agent_house_features_knowledge,
+    ha.agent_rent_sale_process_knowledge,
+    ha.agent_get_in_touch,
+    ha.agent_other,
+    ha.agent_bypass_attempt,
+    ha.house_improvements,
+    ha.house_good_points,
+    ha.house_location,
+    ha.house_conservation,
+    ha.house_neighborhood,
+    ha.house_cost_benefit,
+    ha.house_condominium_features,
+    ha.house_ad_discrepancies,
+    ha.evaluation_domain,
     vsbd.is_visit_completed_by_demand,
     vsbd.is_visit_canceled_by_demand,
-    COALESCE(agent.dt_creation, house.dt_creation) AS ts_creation
+    vsbd.ts_created AS ts_creation
 FROM
-    agent_evaluation AS agent
-FULL OUTER JOIN
-    house_evaluation AS house
-        ON agent.visit_code = house.visit_code
-JOIN
-    datalake_ebdb_clean.visit AS v
-        ON v.code = COALESCE(agent.visit_code, house.visit_code)
-LEFT JOIN
     visit_status_by_demand AS vsbd
-        ON vsbd.id_visit = v.id
+LEFT JOIN
+    house_agent AS ha
+        ON vsbd.visit_code = ha.visit_code

@@ -13,6 +13,10 @@ columns:
     lineage:
       - datalake_visit.post_visit_demand.id_visit
     description: Key of visit.
+  channel:
+    lineage:
+      - datalake_visit.post_visit_demand.channel
+    description: Channel of the visit.
   agent_rating:
     lineage:
       - datalake_visit.post_visit_demand.agent_rating

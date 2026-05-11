@@ -3,7 +3,9 @@ database_name: datalake_visit
 table_name: post_visit_demand
 owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
-description: Post-visit evaluation data from the demand perspective, consolidating both agent and house
+description: Post-visit evaluation data from the demand perspective for visit created after 2024-11-01.
+  The demand answer if the visit was completed or not and if the visit was canceled or not in your perspective.
+  The data is enriched with the review table, which contains both agent and house
   ratings provided by visitors after completing property visits. This table combines feedback
   about agent performance (ratings, improvements, good points) and house evaluation (like/dislike,
   positive/negative points).
@@ -17,6 +19,10 @@ columns:
     lineage:
       - datalake_insider_clean.review.id_reviewed
     description: Visit code extracted from review identifiers.
+  channel:
+    lineage:
+      - datalake_visit.visit_status_events.channel
+    description: Channel of the visit.
   agent_rating:
     lineage:
       - datalake_insider_clean.review_feature.rating_selected

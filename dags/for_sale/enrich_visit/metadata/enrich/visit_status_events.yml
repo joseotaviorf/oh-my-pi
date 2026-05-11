@@ -103,6 +103,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_listing.country_code
     description: Country code of the property.
+  visit_code:
+    lineage:
+      - datalake_ebdb_clean.visit.code
+    description: Code of the visit.
   business_context:
     description: The context of the visit, which can be RENT or SALE
   ranking:
