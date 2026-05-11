@@ -14,14 +14,14 @@ WITH cte_demand AS (
     ),
     demand_3p AS (
         SELECT
-            DISTINCT db.sk_booking,
+            DISTINCT vs.id_schedule AS sk_booking,
             ap.demand_3p_partner,
             ap.is_3p_contract AS is_3p_demand
         FROM
             agents_3p AS ap
-            JOIN dw_public.dim_booking AS db ON ap.id_agent = db.id_agent
-            AND db.dt_created BETWEEN ap.ts_work_contract_started
-            AND COALESCE(ts_work_contract_ended, db.ts_load)
+            JOIN datalake_visit.visit_schedules AS vs ON ap.id_agent = vs.id_agent
+            AND vs.ts_schedule_created BETWEEN ap.ts_work_contract_started
+            AND COALESCE(ts_work_contract_ended, vs.ts_load)
     )
     SELECT
         fo.sk_offer,
