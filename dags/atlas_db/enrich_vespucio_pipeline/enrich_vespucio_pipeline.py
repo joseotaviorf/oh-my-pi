@@ -371,10 +371,20 @@ address_tasks = [
         ],
     ),
     create_task(
+        entry_point="core_address_details_parser_join_step",
+        parameters=[
+            f"--input_address_details_hasher_link={Tables.address_details_hasher_link}",
+            f"--input_geocoded_houses={Tables.geocode_step_houses}",
+            f"--input_staged_parsed_complements={Tables.staged_parsed_complements}",
+            f"--overwrite_schema",
+            f"--output_address_details_parser_join_houses={Tables.address_details_parser_join_houses}",
+        ],
+    ),
+    create_task(
         entry_point="core_address_adjustments_step",
         parameters=[
             f"--input_geocoded_condos={Tables.geocode_step_condos}",
-            f"--input_geocoded_houses={Tables.geocode_step_houses}",
+            f"--input_address_details_parser_join_houses={Tables.address_details_parser_join_houses}",
             f"--input_source_cnefe_houses={Tables.source_cnefe_houses}",
             f"--input_source_iptu_houses={Tables.source_iptu_houses}",
             f"--overwrite_schema",

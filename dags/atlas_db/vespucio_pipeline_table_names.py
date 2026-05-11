@@ -29,6 +29,8 @@ class Tables:
     stage_step_houses = "vespucio_pipeline_delta.stage_step_houses"
     address_details_hash = "vespucio_pipeline_delta.address_details_hash"
     address_details_hasher_link = "vespucio_pipeline_delta.address_details_hasher_link"
+    staged_parsed_complements = "vespucio_pipeline_delta.staged_parsed_complements"
+    address_details_parser_join_houses = "vespucio_pipeline_delta.address_details_parser_join_houses"
     source_adapter_step_condos = "vespucio_pipeline_delta.source_adapter_step_condos"
     source_adapter_step_houses = "vespucio_pipeline_delta.source_adapter_step_houses"
     extract_step_condos = "vespucio_pipeline_delta.extract_step_condos"
