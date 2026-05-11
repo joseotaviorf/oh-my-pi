@@ -1508,10 +1508,6 @@ bietlejuice.enrich_agent_reports:
   - bietlejuice.enrich_ebdb_agents:load-enrich-ciq-users:first-run-of-day
   - bietlejuice.enrich_tiers:load-enrich-ciq-first-listing:first-run-of-day
 bietlejuice.enrich_agents_validation:
-  - bietlejuice.big_agent_fast_lane:load-clean-earning-remuneration-log:first-run-of-day
-  - bietlejuice.big_agent_fast_lane:load-clean-earning-sources:first-run-of-day
-  - bietlejuice.big_agent_fast_lane:load-clean-earnings:first-run-of-day
-  - bietlejuice.big_agent_fast_lane:load-clean-new-earnings:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-types-aud:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data-types:first-run-of-day
   - bietlejuice.ebdb_agent:load-clean-agent-data:first-run-of-day

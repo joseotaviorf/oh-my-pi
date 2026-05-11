@@ -1,7 +1,0 @@
----
-table_name: datalake_agents_validation.new_vs_legacy_earnings_diff
-alert_channel: "#alerts_big_agent"
-table_level_validations:
-  has_size:
-    equal_to: 1
-    severity_level: Error
