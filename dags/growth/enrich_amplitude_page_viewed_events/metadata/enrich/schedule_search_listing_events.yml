@@ -4,6 +4,15 @@ description: This table consolidates and enriches data from multiple Amplitude p
 domain: Growth
 owner: growth@quintoandar.com.br
 columns:
+  tof_event_type:
+    description: Type of top-of-funnel page view event (schedule_page_viewed, search_page_viewed, search_results_page_viewed or listing_page_viewed) identifying the source branch of the UNION.
+  id_session:
+    description: Amplitude session identifier of the page view event.
+    lineage:
+      - datalake_amplitude_clean.170698_schedule_page_viewed_events.id_session
+      - datalake_amplitude_clean.170698_search_page_viewed_events.id_session
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_session
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.id_session
   ep_house_id:
     description: Unique identifier of the property being viewed, searched, or scheduled across different page types.
     lineage:
@@ -11,6 +20,10 @@ columns:
       - datalake_amplitude_clean.170698_search_page_viewed_events.id_house
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.ep_id_house
       - datalake_amplitude_clean.170698_listing_page_viewed_events.ep_house_id
+  id_region:
+    description: Sub-region identifier of the listing extracted from event_properties.sub_region_id (sourced from QuintoAndar Classifieds backend). Only populated for listing_page_viewed events; NULL for schedule, search and search_results branches.
+    lineage:
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.id_region
   id_amplitude:
     description: Unique identifier for the user in Amplitude analytics across all tracked page events.
     lineage:
@@ -102,6 +115,18 @@ columns:
       - datalake_amplitude_clean.170698_search_page_viewed_events.top5_house_id
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.top5_house_id
       - datalake_amplitude_clean.170698_listing_page_viewed_events.top5_house_id
+  is_qac:
+    description: Flag indicating if the page view event is associated with QuintoAndar Classifieds (QAC). Always False for schedule_page_viewed events (no QAC signal); for search and search_results events derives from nbr_listed_classifieds > 0; for listing events comes directly from event_properties.is_qac.
+    lineage:
+      - datalake_amplitude_clean.170698_search_page_viewed_events.is_qac
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.is_qac
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.is_qac
+  uri:
+    description: URI of the page viewed by the user. NULL for schedule_page_viewed events; populated for search, search_results and listing branches.
+    lineage:
+      - datalake_amplitude_clean.170698_search_page_viewed_events.uri
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.uri
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.uri
   ts_event:
     description: Timestamp when the page view event occurred across any of the tracked page types.
     lineage:

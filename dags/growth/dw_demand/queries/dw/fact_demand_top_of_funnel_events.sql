@@ -26,6 +26,7 @@ SELECT
   medium,
   source,
   CASE WHEN h.internal_admin_info LIKE '%[3P-%]%' THEN TRUE ELSE FALSE END AS is_rede_demand,
+  is_qac,
   dt_event,
   ts_event,
   year,

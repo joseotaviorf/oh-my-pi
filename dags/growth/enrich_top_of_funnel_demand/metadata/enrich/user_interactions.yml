@@ -1,92 +1,132 @@
+---
 database_name: datalake_top_of_funnel_demand
 table_name: user_interactions
+owner: growth@quintoandar.com.br
+domain: Growth
+description: 'Top of funnel user interactions enriched with marketing taxonomy and house region. One row per Amplitude page-viewed event consolidated from schedule, search and listing flows.'
+
 columns:
   id:
+    description: 'Synthetic surrogate key for the user interaction event, derived from the partition date and a row number.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.year
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.month
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.day
   id_tof_user:
+    description: 'Top of funnel user identifier, falling back to the device identifier when the logged user is not available.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_user
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_device
   id_house:
+    description: 'Identifier of the house associated with the event, derived from the event house id or the first house in the listing top5.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ep_house_id
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.top5_house_id
   sk_region:
+    description: 'Surrogate key for the region of the interaction. Resolved from the house region for organic traffic, and from the event region or URI fallbacks for QAC test traffic.'
     lineage:
       - datalake_ebdb_clean.house.id_region
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_region
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.uri
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.is_qac
   mkt_category:
+    description: 'Marketing taxonomy category mapped from the combination of app_type, utm_source, utm_medium and branded flag.'
     lineage:
       - datalake_gsheets_clean.taxonomy_demand.category
   mkt_flow:
+    description: 'Marketing taxonomy flow mapped from the combination of app_type, utm_source, utm_medium and branded flag.'
     lineage:
       - datalake_gsheets_clean.taxonomy_demand.flow
   mkt_completion:
+    description: 'Marketing taxonomy completion mapped from the combination of app_type, utm_source, utm_medium and branded flag.'
     lineage:
       - datalake_gsheets_clean.taxonomy_demand.completion
   mkt_origin:
+    description: 'Marketing taxonomy origin mapped from the combination of app_type, utm_source, utm_medium and branded flag.'
     lineage:
       - datalake_gsheets_clean.taxonomy_demand.origin
   mkt_channel:
+    description: 'Marketing taxonomy channel mapped from the combination of app_type, utm_source, utm_medium and branded flag.'
     lineage:
       - datalake_gsheets_clean.taxonomy_demand.channel
   mkt_medium:
+    description: 'Marketing taxonomy medium mapped from the combination of app_type, utm_source, utm_medium and branded flag.'
     lineage:
       - datalake_gsheets_clean.taxonomy_demand.medium
   mkt_source:
+    description: 'Marketing taxonomy source mapped from the combination of app_type, utm_source, utm_medium and branded flag.'
     lineage:
       - datalake_gsheets_clean.taxonomy_demand.source
   mkt_platform:
+    description: 'Marketing taxonomy platform mapped from the combination of app_type, utm_source, utm_medium and branded flag.'
     lineage:
       - datalake_gsheets_clean.taxonomy_demand.platform
   business_context:
+    description: 'Business context of the event (rent, sale, etc); defaults to rent when missing.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.business_context
   entrance_uri:
+    description: 'Entrance URI of the user session that generated the event.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.entrance_uri
   referrer:
+    description: 'Referrer URL captured for the user session that generated the event.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.referrer
   app_type:
+    description: 'Platform from which the event originated (web, ios, android).'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.up_platform
-  tof_event_type: 
-    lineage: 
+  tof_event_type:
+    description: 'Top of funnel event type that originated the row (e.g. listing_page_viewed, search_page_viewed).'
+    lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.tof_event_type
   utm_source:
+    description: 'UTM source parameter captured at the event.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.utm_source
   utm_medium:
+    description: 'UTM medium parameter captured at the event.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.utm_medium
   branded:
+    description: 'Classification of the campaign as Branded or Outro, derived from utm_campaign content.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.utm_campaign
   utm_campaign:
+    description: 'UTM campaign parameter captured at the event.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.utm_campaign
   utm_term:
+    description: 'UTM term parameter captured at the event.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.utm_term
   utm_content:
+    description: 'UTM content parameter captured at the event.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.utm_content
+  is_qac:
+    description: 'Flag indicating if the user interaction event is associated with QuintoAndar Classifieds (QAC).'
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.is_qac
   year:
+    description: 'Year partition of the event.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.year
   month:
+    description: 'Month partition of the event.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.month
   day:
+    description: 'Day partition of the event.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.day
   dt_event:
+    description: 'Date of the event, derived from ts_event.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event
   ts_event:
+    description: 'Timestamp of the original Amplitude page-viewed event.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ts_event

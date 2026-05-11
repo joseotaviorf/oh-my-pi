@@ -98,6 +98,10 @@ columns:
     description: "Points if the campaign responsible for the user conversion was a Branded advertising"
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.branded
+  is_qac:
+    description: "Flag indicating if the top of funnel event is associated with QuintoAndar Classifieds (QAC)."
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.is_qac
   campaign_business_context:
     description: "Intention of the actions/campaigns adopted in relation to the business context."
     categories:

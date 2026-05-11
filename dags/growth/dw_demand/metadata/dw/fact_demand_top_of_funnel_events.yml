@@ -2,7 +2,7 @@
 database_name: dw_growth
 table_name: fact_demand_top_of_funnel_events
 owner: isabela.matsumoto@quintoandar.com.br
-domain: growth
+domain: Growth
 description: 'This table tracks the top of the funnel interactions by users across different platforms and marketing channels. It includes ad hoc rules for media setup identification, user interaction details, and platform categorization.'
 
 columns:
@@ -22,10 +22,10 @@ columns:
     description: 'Identifier representing the region of the interaction or property.'
     lineage:
       - datalake_demand_flows.top_of_funnel_results.sk_region
-  sk_media_setup:
-    description: 'The final media setup identifier selected based on a priority order from adhoc, dictionary, exception flow, and naming convention.'
+  naming_convention_sufix:
+    description: 'The final media setup naming convention suffix selected based on a priority order from adhoc, dictionary, exception flow, and naming convention.'
     lineage:
-      - datalake_demand_flows.top_of_funnel_results.final_id_media_setup
+      - datalake_demand_flows.top_of_funnel_results.naming_convention_sufix
   business_context:
     description: 'Context in witch that tof event happened.'
     lineage:
@@ -127,6 +127,10 @@ columns:
     description: 'Flag indicating if this house came from a rede partner'
     lineage:
       - datalake_ebdb_clean.house.internal_admin_info
+  is_qac:
+    description: 'Flag indicating if the event came from QuintoAndar Classifieds (QAC).'
+    lineage:
+      - datalake_demand_flows.top_of_funnel_results.is_qac
   dt_event:
     description: 'Date of the event'
     lineage:

@@ -67,6 +67,9 @@ filtered_events AS (
             THEN 'Branded'
             ELSE 'Outro'
         END AS branded,
+        is_qac,
+        uri,
+        CAST(id_region AS STRING) AS id_region,
         year,
         month,
         day,
@@ -92,7 +95,16 @@ SELECT
     BIGINT(year*10000 + month*100 + day || ROW_NUMBER() OVER (ORDER BY evt.dt_event)) AS id,
     evt.id_tof_user,
     COALESCE(evt.id_house, -1) AS id_house,
-    COALESCE(dh.sk_region, -1) AS sk_region,
+    CASE
+        WHEN evt.is_qac = FALSE THEN dh.sk_region
+        WHEN evt.is_qac = TRUE AND dh.sk_region IS NOT NULL THEN dh.sk_region -- QAC Test region with parsed region
+        WHEN evt.is_qac = TRUE AND evt.id_region IS NOT NULL THEN evt.id_region -- QAC Test region with parsed region
+        WHEN evt.is_qac = TRUE AND LOWER(uri) LIKE '%belo-horizonte-mg%' THEN '1535' -- QAC Test Region with fallback for region
+        WHEN evt.is_qac = TRUE AND LOWER(uri) LIKE '%rio-de-janeiro-rj%' THEN '1507' -- QAC Test Region with fallback for region
+        WHEN evt.is_qac = TRUE AND LOWER(uri) LIKE '%porto-alegre-rs%' THEN '1842' -- QAC Test Region with fallback for region
+        WHEN evt.is_qac = TRUE AND LOWER(uri) LIKE '%campinas-sp%' THEN '1' -- QAC Test Region with fallback for region
+        ELSE '-1'
+    END AS sk_region,
     COALESCE(td.mkt_category, 'Not Mapped') AS mkt_category,
     COALESCE(td.mkt_flow, 'Not Mapped') AS mkt_flow,
     COALESCE(td.mkt_completion, 'Not Mapped') AS mkt_completion,
@@ -112,6 +124,7 @@ SELECT
     evt.utm_campaign,
     evt.utm_term,
     evt.utm_content,
+    evt.is_qac,
     year,
     month,
     day,
