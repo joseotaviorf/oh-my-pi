@@ -44,6 +44,7 @@ cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
 cluster_configuration["node_type_id"] = "c-fleet.xlarge"
 cluster_configuration["is_single_node"] = True
+cluster_configuration["kind"] = "CLASSIC_PREVIEW"
 cluster_configuration["data_security_mode"] = "SINGLE_USER"
 cluster_configuration["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
 cluster_configuration["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
