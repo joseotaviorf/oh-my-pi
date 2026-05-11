@@ -16,6 +16,7 @@ WITH base_outbound_notifications AS (
       WHEN un.action = 'ConciergeTriggerRetargeting' THEN 'Retargeting'
       WHEN un.action LIKE 'ConciergeContactSubmissionClassifieds%' AND CAST(un.payload AS STRING) LIKE '%Chaves%' THEN 'Classifieds - Chaves na mão'
       WHEN un.action LIKE 'ConciergeContactSubmissionClassifieds%' THEN 'Classifieds'
+      WHEN un.action LIKE 'ConciergeContactSubmissionTtcQac%' THEN 'TTC QAC Outbound'
       WHEN un.action LIKE 'ConciergeContactSubmissionTtc%' THEN 'TTC Outbound'
       ELSE 'Undefined'
     END AS concierge_flow_type,
