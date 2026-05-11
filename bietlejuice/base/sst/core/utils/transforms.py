@@ -75,9 +75,9 @@ def apply_schema_remaps(
     accept_new_cols: bool = False,
 ) -> DataFrame:
     """
-  Since API and CDC may have different types, we're making sure we're matching the types
-  This can be used for clean events (it should be normalized first) or for RAW (no normalization needed)
-  """
+    Since API and CDC may have different types, we're making sure we're matching the types
+    This can be used for clean events (it should be normalized first) or for RAW (no normalization needed)
+    """
 
     if isinstance(target_table, str):
         target_table = spark.table(target_table)
@@ -93,7 +93,7 @@ def apply_schema_remaps(
         if column_name not in df.columns or not accept_new_cols:
             continue
 
-        elif right_type == None and accept_new_cols:
+        elif right_type is None and accept_new_cols:
             expr = F.col(column_name)
 
         elif left_type == right_type:
