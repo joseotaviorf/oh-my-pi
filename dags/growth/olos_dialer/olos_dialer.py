@@ -42,7 +42,8 @@ raw_spark_job_file = (
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
-cluster_configuration["node_type_id"] = "m5a.xlarge"
+cluster_configuration["node_type_id"] = "c-fleet.xlarge"
+cluster_configuration["is_single_node"] = True
 cluster_configuration["data_security_mode"] = "SINGLE_USER"
 cluster_configuration["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
 cluster_configuration["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
@@ -74,6 +75,7 @@ def change_case(table_name, list_out_of_pattern=LIST_OUT_OF_PATTERN):
 jiraops_callback = JiraOpsCallback()
 dag = DAG(
     dag_id=DAG_ID,
+    max_active_tasks=32,
     default_args={
         "owner": DAGOwnerEnum.DATA_GROWTH,
         "wait_for_downstream": False,
