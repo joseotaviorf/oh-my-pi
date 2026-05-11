@@ -16,6 +16,7 @@ SELECT
   END AS reference_period,
   hm.meeting_status_code,
   YEAR(hm.ts_meeting) AS meeting_year,
+  hm.ts_meeting AS ts_meeting,
   NOW() AS ts_load
 FROM
   datalake_pin_hr_review_clean.meeting AS hm

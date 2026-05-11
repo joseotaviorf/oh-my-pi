@@ -29,5 +29,9 @@ columns:
     description: Calendar year when the committee meeting took place, extracted from the meeting timestamp.
     lineage:
     - datalake_pin_hr_review_clean.meeting.ts_meeting
+  ts_meeting:
+    description: Timestamp of the committee meeting in the HR Review source system. Used to resolve the canonical meeting when a person appears in more than one calibration committee in the same calendar year.
+    lineage:
+    - datalake_pin_hr_review_clean.meeting.ts_meeting
   ts_load:
     description: Timestamp indicating when the record was loaded into the dimension table.

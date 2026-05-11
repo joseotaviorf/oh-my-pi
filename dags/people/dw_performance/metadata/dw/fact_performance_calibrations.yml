@@ -3,7 +3,10 @@ table_name: fact_performance_calibrations
 owner: pedro.prates@quintoandar.com.br
 domain: People
 description: |-
-  Fact table that consolidates calibration evaluation results at the person and committee meeting level. It links to dim_performance_calibration, dim_performance_variation, and dim_committee_meeting (meeting attributes and calendar year live on the committee meeting dimension). The table includes both pre-calibration and calibrated ratings for Behavior, Impact, and Leadership, along with calculated performance scores and calibration variation indicators.
+  Fact table that consolidates calibration evaluation results at the person level per calibration meeting year.
+  It links to dim_performance_calibration, dim_performance_variation, and dim_committee_meeting.
+  The table includes both pre-calibration and calibrated ratings for Behavior, Impact, and Leadership, along with calculated performance scores and calibration variation indicators.
+  When the same person appears in more than one performance calibration committee in the same calendar year, a single canonical row is kept. The committee with calibrated Impact and Behavior numerics populated is preferred. If several committees still qualify on that criterion, the most recent committee meeting timestamp wins; remaining ties break on meeting id.
 columns:
   sk_performance_calibration_version:
     description: Surrogate key for the current version of the calibration evaluation in the dim_performance_calibration dimension. This key includes the calibration_version to uniquely identify a specific version.
@@ -29,7 +32,7 @@ columns:
     - datalake_pin.performa_calibration_evaluation.id_meeting
     - datalake_pin.performa_calibration_extra_info.id_meeting
   person_number:
-    description: Unique identifier for the person (employee) who was evaluated. Part of the logical grain with the calibration cycle (committee meeting year from dim_committee_meeting via sk_committee_meeting).
+    description: Unique identifier for the person (employee) who was evaluated.
     lineage:
     - datalake_pin.performa_calibration_evaluation.person_number
     - datalake_pin.performa_calibration_extra_info.person_number
