@@ -32,6 +32,7 @@ dag:
       - **image_inspection_group_result**: Business context-specific group analysis results
       - **watermark_removal**: Watermark detection and removal processing results
       - **photo_invalid_source**: Tracking of failed photo processing attempts
+      - **refine_history**: Audit log of Refine - Photo Lever runs, capturing image quality attributes and URLs before and after the refine workflow
       - **Audit tables**: Complete change history via Hibernate Envers for compliance
       
       **Business Impact:**
@@ -51,6 +52,7 @@ workflow:
     group_analysis: {}
     photo: {}
     photo_invalid_source: {}
+    refine_history: {}
     photosphere:
       clean_table_name: photo_sphere
     userrevisionentity:
@@ -59,9 +61,6 @@ workflow:
     video_aud:
       raw_primary_keys: ["id", "rev"]
     watermark_removal: {}
-  extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
-    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 cluster:
   type: databricks_16_4_med_2xlarge_general_cluster
   databricks_conn_id: databricks_new
