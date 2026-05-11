@@ -16,10 +16,10 @@ workflow:
   source_database: hubs
   custom_schema: hub_services
   tables_customization:
-    business_unit: 
+    business_unit:
       transactional_datatype_overrides:
         lead_types: string
-    business_unit_aud: 
+    business_unit_aud:
       transactional_datatype_overrides:
         lead_types: string
     business_unit_region: {}
@@ -37,7 +37,7 @@ workflow:
     reminder_type_aud: {}
     responsible: {}
     responsible_aud: {}
-    revinfo: 
+    revinfo:
       clean_table_name: rev_info
     users_aud: {}
     visitor: {}
