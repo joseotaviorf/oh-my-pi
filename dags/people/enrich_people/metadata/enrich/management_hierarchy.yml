@@ -7,6 +7,7 @@ description: |-
   Grain: one record per assignment per hierarchy version (period when the chain is valid). Rows with identical hierarchy attributes and sequential validity dates are consolidated into a single record with merged date range.
   The hierarchy shows up to 10 levels (L0 to L9), ordered from the CEO (L0) down to the employee (L1 to L9). Only hierarchies where the CEO (person in the highest band) is L0 are considered valid.
   Only assignments with assignment_type in ('C', 'E') are included; assignment_type 'P' is excluded.
+  Employees flagged is_user_test in identifier_mapping remain excluded from the base population; managers in the LINE_MANAGER chain are not excluded by that flag so mis-scoped open ID_ONDA1 identifiers do not drop entire subtrees from valid CEO-linked hierarchies.
 columns:
   sk_hierarchy_version:
     description: Deterministic surrogate key for the hierarchy version. Generated as MD5 hash of assignment_number + dt_valid_from + dt_valid_to.

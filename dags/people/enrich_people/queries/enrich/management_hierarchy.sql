@@ -39,7 +39,6 @@ filtered_managers_history AS (
         AND supervisor.dt_effective_started <= CURRENT_DATE
         AND NOT supervisor.id_manager_assignment IS NULL
         AND NOT id_map_emp.is_user_test
-        AND NOT id_map_mgr.is_user_test
         AND id_map_emp.assignment_type IN ('C', 'E')
         AND id_map_mgr.assignment_type IN ('C', 'E')
 ),
