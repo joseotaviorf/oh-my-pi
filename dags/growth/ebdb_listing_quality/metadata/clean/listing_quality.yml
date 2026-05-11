@@ -1,0 +1,110 @@
+database_name: datalake_ebdb_clean
+table_name: listing_quality
+domain: Growth
+description: Listing quality verification records produced by the ListingQuality service from the EBDB main database, used to evaluate listings before publication and route them to the analyst queue.
+owner: data.growth@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.listingquality.id
+    description: Primary key of the listing quality verification record.
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.listingquality.house_id
+    description: Foreign key to the house under listing quality evaluation.
+  id_photographer_job:
+    lineage:
+      - datalake_ebdb_raw.listingquality.photographer_job_id
+    description: Foreign key to the photographer job that generated the photos under evaluation.
+  analyst_queue:
+    lineage:
+      - datalake_ebdb_raw.listingquality.analyst_queue
+    description: Routing bucket assigned by the listing quality rules (0 - no inspection / invalid; 1 - pattern verification needed; 2 - sign plaque verification needed; 3 - no verification needed).
+  photographer_comment:
+    lineage:
+      - datalake_ebdb_raw.listingquality.photographer_comment
+    description: Free-text comment left by the photographer during the photo job.
+  plaque_condition:
+    lineage:
+      - datalake_ebdb_raw.listingquality.plaque_condition
+    description: Condition of the sign plaque identified at the property (e.g. legible, damaged).
+  plaque_code:
+    lineage:
+      - datalake_ebdb_raw.listingquality.plaque_code
+    description: Alphanumeric code printed on the sign plaque at the property.
+  plaque_location:
+    lineage:
+      - datalake_ebdb_raw.listingquality.plaque_location
+    description: Location where the sign plaque was placed at the property.
+  plaque_issue:
+    lineage:
+      - datalake_ebdb_raw.listingquality.plaque_issue
+    description: Issue identified on the sign plaque (e.g. wrong code, missing information).
+  lockbox_condition:
+    lineage:
+      - datalake_ebdb_raw.listingquality.lockbox_condition
+    description: Condition of the lockbox installed at the property.
+  lockbox_comment:
+    lineage:
+      - datalake_ebdb_raw.listingquality.lockbox_comment
+    description: Free-text comment about the lockbox at the property.
+  link_video:
+    lineage:
+      - datalake_ebdb_raw.listingquality.link_video
+    description: External URL of the property video associated with the listing.
+  owner_description_analysis:
+    lineage:
+      - datalake_ebdb_raw.listingquality.owner_description_analysis
+    description: Result of the analysis applied to the property owner description text.
+  final_classification:
+    lineage:
+      - datalake_ebdb_raw.listingquality.final_classification
+    description: Final classification assigned to the listing quality record after analyst review.
+  analyst_comment:
+    lineage:
+      - datalake_ebdb_raw.listingquality.analyst_comment
+    description: Free-text comment left by the analyst that reviewed the listing quality record.
+  ai_score:
+    lineage:
+      - datalake_ebdb_raw.listingquality.ai_score
+    description: AI-generated property condition score used in the analyst queue routing rules.
+  images_per_room:
+    lineage:
+      - datalake_ebdb_raw.listingquality.images_per_room
+    description: Average number of internal images uploaded per room of the property.
+  num_internal_photos:
+    lineage:
+      - datalake_ebdb_raw.listingquality.num_internal_photos
+    description: Total number of internal photos uploaded for the listing.
+  num_bathroom_photos:
+    lineage:
+      - datalake_ebdb_raw.listingquality.num_bathroom_photos
+    description: Total number of bathroom photos uploaded for the listing.
+  has_illegible_plaque:
+    lineage:
+      - datalake_ebdb_raw.listingquality.illegible_plaque
+    description: Boolean flag indicating whether the sign plaque at the property is illegible.
+  has_lockbox:
+    lineage:
+      - datalake_ebdb_raw.listingquality.has_lockbox
+    description: Boolean flag indicating whether the property has a lockbox installed.
+  has_video:
+    lineage:
+      - datalake_ebdb_raw.listingquality.has_video
+    description: Boolean flag indicating whether the listing has an associated video.
+  has_fraud_report:
+    lineage:
+      - datalake_ebdb_raw.listingquality.fraud_report
+    description: Boolean flag indicating whether a fraud report was raised for the listing.
+  reason_unpublish:
+    lineage:
+      - datalake_ebdb_raw.listingquality.reason_unpublish
+    description: JSON payload describing the reasons that led the listing to be unpublished.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.listingquality.criadoem
+    description: Timestamp when the listing quality record was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.listingquality.atualizadoem
+    description: Timestamp of the last update applied to the listing quality record in EBDB.
