@@ -285,6 +285,18 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.event_properties
     description: Sale value of house
+  id_region:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Sub-region identifier of the listing extracted from event_properties.sub_region_id (sourced from QuintoAndar Classifieds backend).
+  uri:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: URI of the listing page viewed by the user.
+  is_qac:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Flag indicating if the listing page view event came from QuintoAndar Classifieds (QAC).
 owner: eduardo.soares@quintoandar.com.br
 domain: Growth
 description: This table contains listing_page_viewed events from app 170698. It tracks

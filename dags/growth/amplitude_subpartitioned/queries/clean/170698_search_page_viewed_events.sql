@@ -60,6 +60,14 @@ SELECT
             THEN SPLIT(REGEXP_REPLACE(GET_JSON_OBJECT(event_properties , '$.top5_house_id'), '\\[|\\]|\\"', ''), ',')
         ELSE NULL
     END AS top5_house_id,
+    CAST(GET_JSON_OBJECT(event_properties, '$.nbr_listed_classifieds') AS INTEGER) AS nbr_listed_classifieds,
+    CAST(GET_JSON_OBJECT(event_properties, '$.nbr_search_results') AS INTEGER) AS nbr_search_results,
+    CAST(GET_JSON_OBJECT(event_properties, '$.nbr_search_classifieds') AS INTEGER) AS nbr_search_classifieds,
+    CAST(GET_JSON_OBJECT(event_properties, '$.nbr_search_transactional') AS INTEGER) AS nbr_search_transactional,
+    CASE
+        WHEN nbr_listed_classifieds > 0 THEN True 
+        ELSE False 
+    END AS is_qac,
     is_paying,
     is_attribution_event,
     ts_server_received,

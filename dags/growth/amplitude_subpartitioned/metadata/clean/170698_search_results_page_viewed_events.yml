@@ -301,6 +301,26 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.user_properties
     description: Column referrer from Amplitude events
+  nbr_listed_classifieds:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Number of QuintoAndar Classifieds (QAC) listings displayed in the search results page view event.
+  nbr_search_results:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Total number of search results returned for the search query.
+  nbr_search_classifieds:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Number of QuintoAndar Classifieds (QAC) results returned for the search query.
+  nbr_search_transactional:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Number of transactional (non-QAC) results returned for the search query.
+  is_qac:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Flag indicating if the search results page view event includes any QuintoAndar Classifieds (QAC) listed (nbr_listed_classifieds > 0).
 owner: eduardo.soares@quintoandar.com.br
 domain: Growth
 description: This table contains search_results_page_viewed events from app 170698.

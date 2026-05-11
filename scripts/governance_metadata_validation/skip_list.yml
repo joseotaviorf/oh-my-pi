@@ -112,3 +112,7 @@ parsing_skip_list:
   - dags/fintech/payable_accounts_transactions/queries/clean/accounts_payable.sql
   - dags/fintech/enrich_cyber_legal/queries/enrich/evictions_base.sql
   - dags/people/enrich_hr_system/queries/enrich/employee_info.sql
+
+  # SELECT * preserves the raw Amplitude event payload columns consumed by many downstream teams;
+  # explicit column list is intentionally not enforced here.
+  - dags/growth/amplitude_subpartitioned/queries/clean/170698_listing_page_viewed_events.sql

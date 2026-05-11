@@ -1,5 +1,6 @@
 SELECT
     GET_JSON_OBJECT(event_properties, '$.house_id') AS ep_house_id,
+    CAST(GET_JSON_OBJECT(event_properties, '$.sub_region_id') AS INTEGER) AS id_region,
     *,
     COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(user_properties, '$.entrance_uri'), 'utm_source=([^&|$]+)', 1), ''), 'direct') AS up_utm_source,
     COALESCE(NULLIF(REGEXP_EXTRACT(GET_JSON_OBJECT(user_properties, '$.entrance_uri'), 'utm_medium=([^&|$]+)', 1), ''), 'direct') AS up_utm_medium,
@@ -20,6 +21,8 @@ SELECT
       THEN SPLIT(REGEXP_REPLACE(GET_JSON_OBJECT(event_properties , '$.top5_house_id'), '\\[|\\]|\\"', ''), ',')
       ELSE NULL
     END AS top5_house_id,
+    CAST(GET_JSON_OBJECT(event_properties, '$.uri') AS STRING) AS uri,
+    COALESCE(CAST(GET_JSON_OBJECT(event_properties, '$.is_qac') AS BOOLEAN), FALSE) AS is_qac,
     GET_JSON_OBJECT(event_properties, '$.visit_status') AS visit_status,
     CAST(GET_JSON_OBJECT(event_properties, '$.valor_aluguel') AS BIGINT) AS rent_value,
     CAST(GET_JSON_OBJECT(event_properties, '$.valor_condominio') AS BIGINT) AS condo_value,
