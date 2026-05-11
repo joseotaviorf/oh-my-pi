@@ -42,10 +42,15 @@ raw_spark_job_file = (
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
+
+# Single node cluster configuration
+del cluster_configuration["driver_node_type_id"]
 cluster_configuration["node_type_id"] = "c-fleet.xlarge"
 cluster_configuration["is_single_node"] = True
+del cluster_configuration["num_workers"]
 cluster_configuration["kind"] = "CLASSIC_PREVIEW"
 cluster_configuration["data_security_mode"] = "SINGLE_USER"
+
 cluster_configuration["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
 cluster_configuration["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
 cluster_configuration = ClusterEnvVarsHelper.input_spark_env_vars(
