@@ -15,6 +15,8 @@ workflow:
       - agent_status_by_month
     agent_independent_campinas_metrics:
       - agent_status_by_month
+    agent_new_agent_activation_metrics:
+      - agent_status_by_month
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
@@ -38,6 +40,10 @@ workflow:
       load_spark_job: load_agent_independent_campinas_metrics
       extra_spark_job_arguments:
         - "18"
+    agent_new_agent_activation_metrics:
+      load_spark_job: load_agent_new_agent_activation_metrics
+      extra_spark_job_arguments:
+        - "2"
 
 cluster:
   type: databricks_16_4_med_general_cluster

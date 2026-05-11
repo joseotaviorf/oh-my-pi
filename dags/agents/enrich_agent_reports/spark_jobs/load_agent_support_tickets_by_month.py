@@ -3,8 +3,31 @@
 # MAGIC %run "/Workspace/Data Engineering/Data Partners/1. Utils/templates/local_config"
 
 # COMMAND ----------
+#
+# load_agent_support_tickets_by_month — ETL summary
+# ---------------------------------------------------------------------------
+# Writes: enrich schema table agent_support_tickets_by_month (Delta, merge on id_user +
+# reference_month).
+#
+# Steps:
+#   1. `_month_range` + `_filter_in_month_window`: clamp all sourced facts (status, CIQ qualifiers,
+#      listings, visits, Zendesk-like tickets) to the same `[month_start, month_end]` — safe for wide
+#      backfills; each row retains its own `reference_month` grain.
+#   2. Remove fotógrafo/vistoriador users via `dim_agent` → `left_anti` on `id_user`.
+#   3. Build qualified CIQ months (first valid listing + 2 follow-on months), listing counts,
+#      visit counts (visit month + next month, capped at window end), ticket aggregates with taxonomy.
+#   4. Join `agent_status_by_month` to metrics + `independent_agent_eligible` + `business_context`.
+#   5. `_add_eligibility_flags`: OKR-facing flags (e.g. `is_agent_active` = passive lead receiver &
+#      ACTIVE; `is_independent_agent`; `is_ineligible`; CIQ Demand eligibility).
+#   6. Schema/key validation, Delta merge to enrich.
+#
+# How to run unit tests (repo root; pyenv activate bi-etl-ejuice):
+#   python -m pytest tests/unit/agents/enrich_agent_reports/test_load_agent_support_tickets_by_month.py -v
+#
 
 # DBTITLE 1,Import libs
+from __future__ import annotations
+
 from argparse import ArgumentParser, Namespace
 from datetime import date, timedelta, datetime
 from dateutil.relativedelta import relativedelta
@@ -43,7 +66,6 @@ from pyspark.sql.types import (
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
-from bietlejuice.base.spark.base_spark import BaseSparkContext
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
@@ -58,14 +80,11 @@ JOB_NAME = "load_agent_support_tickets_by_month"
 logger = QuintoAndarLogger(JOB_NAME)
 
 # Constants to avoid magic values; single place to change behavior of simple business rules
-AGENT_STATUS_ACTIVE = "ACTIVE"
-AGENT_STATUS_INACTIVE = "INACTIVE"
-MIN_VISITS_FOR_ACTIVE_AGENT = 1
 MIN_LISTINGS_FOR_ACTIVE_CIQ = 1
 
 
 TABLE_CIQ_FIRST_LISTING   = "datalake_tiers.ciq_first_listing"
-TABLE_BOOKING             = "datalake_booking.booking"
+TABLE_VISIT_SCHEDULES     = "datalake_visit.visit_schedules"
 TABLE_PARTNER             = "datalake_ebdb_clean.partner"
 TABLE_PARTNER_AGENT       = "datalake_ebdb_clean.partner_agent"
 TABLE_DIM_USER            = "dw_public.dim_user"
@@ -74,7 +93,10 @@ TABLE_CIQ_AGENTS          = "datalake_ebdb_agents.ciq_agents"
 TABLE_DIM_AGENT           = "dw_public.dim_agent"
 TABLE_FACT_TICKETS        = "dw_customer_support.fact_tickets"
 TABLE_DIM_TAXONOMY        = "dw_customer_support.dim_taxonomy"
+
 TABLE_STATUS_BY_MONTH     = "datalake_agent_reports.agent_status_by_month"
+
+EXCLUDED_AGENT_TYPES = ["Vistoria", "VistoriaQuarteirizada", "SessaoFotos"]
 
 # COMMAND ----------
 
@@ -103,15 +125,6 @@ def parse_args() -> Namespace:
         parser.add_argument(name, nargs="?", type=type_, default=default_val, help=help_text)
     namespace, _ = parser.parse_known_args()
     return namespace
-
-# --- Date range: last N months (inclusive) from interval end ---
-def _month_range(load_end_date: str, months_window: int = 18) -> tuple[date, date]:
-    """Return (month_start, month_end) as Python dates (first day of each month) for the lookback window."""
-    num_months = int(months_window)
-    end_date = datetime.strptime(load_end_date, "%Y-%m-%d").date()
-    month_end = end_date.replace(day=1)
-    month_start = month_end - relativedelta(months=num_months - 1)
-    return month_start, month_end
 
 # COMMAND ----------
 
@@ -204,16 +217,16 @@ def _all_agents_visits_by_month(load_end_date: str, months_window: int = 18) -> 
     """Count distinct visits per (id_agent, reference_month); visits counts for the month that they were made and the following month"""
     month_start, month_end = _month_range(load_end_date, months_window)
     completed_visits = (
-        spark.table(TABLE_BOOKING)
+        spark.table(TABLE_VISIT_SCHEDULES)
         .filter(
-            (col("is_visit_completed") == True)
-            & col("dt_booking").isNotNull()
+            (col("is_completed") == True)
+            & col("ts_schedule_visit").isNotNull()
         )
         .withColumn(
             "visit_month",
-            date_trunc("month", col("dt_booking")),
+            date_trunc("month", col("ts_schedule_visit")),
         )
-        .select("id_agent", "id", "visit_month")
+        .select("id_agent", "id_schedule", "visit_month")
     )
     visits_in_window = _filter_in_month_window(
         completed_visits, "visit_month", month_start, month_end
@@ -229,10 +242,21 @@ def _all_agents_visits_by_month(load_end_date: str, months_window: int = 18) -> 
     return (
         visits_with_reference_months
         .groupBy("id_agent", "month_ref")
-        .agg(countDistinct("id").alias("total_visits_count"))
+        .agg(countDistinct("id_schedule").alias("total_visits_count"))
         .withColumn("reference_month", to_date(col("month_ref")))
         .drop("month_ref")
     )
+
+def _excluded_agent_users() -> DataFrame:
+    """Returns distinct id_user for fotógrafo/vistoriador agents to exclude from broker reports."""
+    return (
+        spark.table(TABLE_DIM_AGENT)
+        .filter(col("agent_type").isin(EXCLUDED_AGENT_TYPES))
+        .select(col("sk_user").alias("id_user"))
+        .filter(col("id_user").isNotNull())
+        .distinct()
+    )
+
 
 def _independent_agent_eligible() -> DataFrame:
     """Service criteria for eligibility for independent agents. This is how the services see independent agent, not how Operations define (they use a sheet-based control)"""
@@ -424,20 +448,20 @@ def _add_eligibility_flags(base_with_metrics: DataFrame) -> DataFrame:
     Add final output columns: identity columns, metrics, and boolean eligibility/activity flags.
     Uses constants for status values and thresholds so rules are easy to read and change.
     """
-    agent_status = coalesce(col("agent_status"), lit(AGENT_STATUS_INACTIVE))
-    ciq_status = coalesce(col("ciq_status"), lit(AGENT_STATUS_INACTIVE))
+    agent_status = coalesce(col("agent_status"), lit("INACTIVE"))
+    ciq_status = coalesce(col("ciq_status"), lit("INACTIVE"))
     is_passive = coalesce(col("is_passive_lead_receiver_current"), lit(True))
 
-    is_demand_agent_eligible = (agent_status == AGENT_STATUS_ACTIVE)
-    is_ciq_eligible = (ciq_status == AGENT_STATUS_ACTIVE)
+    is_demand_agent_eligible = (agent_status == "ACTIVE")
+    is_ciq_eligible = (ciq_status == "ACTIVE")
     is_independent_agent = (
         (is_passive == False)
-        & (ciq_status == AGENT_STATUS_ACTIVE)
-        & (agent_status == AGENT_STATUS_ACTIVE)
+        & (ciq_status == "ACTIVE")
+        & (agent_status == "ACTIVE")
     )
-    is_agent_active = (agent_status == AGENT_STATUS_ACTIVE) & (col("total_visits_count") > MIN_VISITS_FOR_ACTIVE_AGENT)
-    is_ciq_active = (ciq_status == AGENT_STATUS_ACTIVE) & (col("total_listings_count") > MIN_LISTINGS_FOR_ACTIVE_CIQ)
-    is_ineligible = (agent_status == AGENT_STATUS_INACTIVE) & (ciq_status == AGENT_STATUS_INACTIVE)
+    is_agent_active = is_passive & (agent_status == "ACTIVE")
+    is_ciq_active = (ciq_status == "ACTIVE") & (col("total_listings_count") > MIN_LISTINGS_FOR_ACTIVE_CIQ)
+    is_ineligible = (agent_status == "INACTIVE") & (ciq_status == "INACTIVE")
 
     return base_with_metrics.select(
         col("id_user"),
@@ -471,6 +495,10 @@ def build_agent_support_tickets_by_month(args: Namespace) -> DataFrame:
     status_by_month = spark.table(TABLE_STATUS_BY_MONTH)
     status_by_month_in_window = _filter_in_month_window(
         status_by_month, "reference_month", month_start, month_end
+    )
+    excluded_users = _excluded_agent_users()
+    status_by_month_in_window = status_by_month_in_window.join(
+        excluded_users, on="id_user", how="left_anti"
     )
 
     qualified_ciq_user_months       = _qualified_active_ciqs_by_month(args.load_end_date, months_window)

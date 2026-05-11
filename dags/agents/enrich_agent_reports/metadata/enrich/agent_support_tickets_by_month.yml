@@ -29,7 +29,7 @@ columns:
     description: Count of CIQ listings for this agent in the month (lookback window). Non-null, >= 0.
   total_visits_count:
     lineage:
-      - datalake_booking.booking
+      - datalake_visit.visit_schedules
     description: Count of completed visits for this agent in the month (2-month window). Non-null, >= 0.
   is_sale_agent:
     lineage:
@@ -61,7 +61,8 @@ columns:
   is_independent_agent:
     description: True when not passive lead receiver, CIQ active, and demand active. Non-null.
   is_agent_active:
-    description: True when demand active and total_visits_count > threshold. Non-null.
+    description: >
+      True when agent_status is ACTIVE and is_passive_lead_receiver is True (passive lead receiver / FR-FS agent). Non-null.
   is_ciq_active:
     description: True when CIQ active and total_listings_count > threshold. Non-null.
   is_ciq_qualified_active:
