@@ -16,7 +16,9 @@ workflow:
     ListingQuality:
       raw_primary_keys: ["id"]
       clean_table_name: listing_quality
-      z_order_by:
+      raw_z_order_by:
+        - house_id
+      clean_z_order_by:
         - id_house
   extra_query_template_params:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
