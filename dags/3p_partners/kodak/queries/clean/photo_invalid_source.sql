@@ -10,3 +10,5 @@ SELECT
   day
 FROM
   datalake_kodak_raw.photo_invalid_source
+WHERE
+  MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
