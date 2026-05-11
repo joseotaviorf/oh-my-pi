@@ -1,16 +1,18 @@
+from __future__ import annotations
+
 # Handle utils to be used across multiple jobs
 
 from argparse import ArgumentParser
 from bietlejuice.base.db import DatalakeMetastoreService
 from collections import Counter
 from functools import wraps
-from pyspark.sql import DataFrame, SparkSession
-from typing import Callable, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Callable, List, Optional, Tuple, Union
 import re
-import pyspark.sql.functions as F
+
+if TYPE_CHECKING:
+    from pyspark.sql import DataFrame, SparkSession
 
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.base.sst.core.metadata.sync_metadata import sync_trino_metadata
 
 logger = QuintoAndarLogger("sst.common")
 
@@ -263,6 +265,8 @@ def safe_column_union(
     DataFrame
         DataFrame with union of columns, conformed for safe merge/write.
     """
+    import pyspark.sql.functions as F
+
     spark = spark or df.sparkSession
     current_df = spark.read.table(current) if isinstance(current, str) else current
 
@@ -314,6 +318,7 @@ def _safe_merge_schema(spark: SparkSession, df: DataFrame, table: str) -> DataFr
     DataFrame
         DataFrame aligned to target schema plus any new incoming columns.
     """
+    import pyspark.sql.functions as F
 
     target_table = spark.read.table(table)
     target_schema = {field.name: field.dataType for field in target_table.schema}
@@ -459,6 +464,8 @@ def validate_and_write(
         )
         return
 
+    from bietlejuice.base.sst.core.metadata.sync_metadata import sync_trino_metadata
+
     sync_trino_metadata(target_table, table_location, df)
 
     logger.info(
@@ -567,6 +574,7 @@ def normalize_df_columns(df: DataFrame) -> DataFrame:
     ValueError
         If normalized column names are duplicated.
     """
+    import pyspark.sql.functions as F
 
     original = df.columns
     new_cols = [normalize_column_name(col) for col in original]
@@ -632,6 +640,8 @@ def validate_partition_readability(
     target_table: str,
     partition_date: str,
 ) -> None:
+    import pyspark.sql.functions as F
+
     (
         spark.read.table(target_table)
         .where(F.col("partition_date") == F.lit(partition_date))
