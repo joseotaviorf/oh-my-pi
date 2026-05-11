@@ -93,7 +93,7 @@ def apply_schema_remaps(
         if column_name not in df.columns or not accept_new_cols:
             continue
 
-        elif right_type is None and accept_new_cols:
+        elif right_type == "null" and accept_new_cols:
             expr = F.col(column_name)
 
         elif left_type == right_type:
