@@ -2890,6 +2890,8 @@ bietlejuice.enrich_internal_chat:
   - bietlejuice.enrich_hub_services:load-enrich-member-profile:first-run-of-day
   - bietlejuice.enrich_hub_services_users:load-enrich-users:first-run-of-day
   - bietlejuice.internal_chat:load-clean-internal-chat-messages:first-run-of-day
+bietlejuice.enrich_intune:
+  - bietlejuice.intune:load-clean-managed-devices:first-run-of-day
 bietlejuice.enrich_invoice:
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
