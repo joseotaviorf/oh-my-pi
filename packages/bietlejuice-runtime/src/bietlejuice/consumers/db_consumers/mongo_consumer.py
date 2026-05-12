@@ -258,3 +258,6 @@ class MongoConsumer(DBConsumer):
                 f"There are no values for '{column_name}' in '{table_name}' table"
             )
         return record_sample
+
+
+# Force deploy
