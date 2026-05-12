@@ -6,6 +6,7 @@
 #
 # load_agent_new_agent_activation_metrics — ETL summary
 # ---------------------------------------------------------------------------
+# Chore: no-op comment to trigger Woodpecker upload-dag-packages-spark-jobs-s3-prod on merge.
 # Writes: enrich schema table agent_new_agent_activation_metrics (Delta, merge on id_user +
 # reference_month, partition reference_month).
 #
