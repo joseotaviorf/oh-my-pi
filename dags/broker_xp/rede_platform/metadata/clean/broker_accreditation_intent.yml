@@ -1,0 +1,61 @@
+---
+database_name: datalake_rede_platform_clean
+table_name: broker_accreditation_intent
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: >-
+  Transient broker accreditation "Intent" from Rede Platform (SSBA POC): early capture of interest and partial form data before the user is
+  authenticated or legally bound. Rows act as a durable save-state (e.g. after Unbounce); payload holds broker + legal representative snapshot until
+  the flow links a person_uuid and eventually yields a Prospect. Not a partner company record in the Company domain.
+columns:
+  id:
+    description: Surrogate primary key for the accreditation intent row in Rede Platform.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_intent.id
+  uuid_intent:
+    description: Business UUID that uniquely identifies the accreditation intent across services.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_intent.intent_uuid
+  uuid_person:
+    description: >-
+      When set, the Person UUID of the legal representative linked to this intent after signup; null while the intent exists only from the
+      unauthenticated capture path.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_intent.person_uuid
+  last_completed_step:
+    description: Last completed step in the intent lifecycle before a Prospect is created.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_intent.last_completed_step
+    categories:
+      INTENT_CREATED: Initial capture (e.g. webhook from landing); intent row persisted with payload.
+      TERMS_ACCEPTED: User accepted pre-partnership terms in the logged-in flow; intent updated before prospect persistence.
+  version:
+    description: Optimistic locking version for Hibernate/JPA concurrency control on the source row.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_intent.version
+  ts_created:
+    description: Timestamp when the intent row was created in the source database.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_intent.created_at
+  ts_updated:
+    description: Timestamp of the last update to the intent row in the source database.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_intent.updated_at
+  payload_json:
+    description: >-
+      JSONB snapshot of broker and legal representative fields as stored by the service (e.g. companyTaxId, crmUsed, contact data); shape is
+      defined by the Rede Platform API contract for intents.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_intent.payload
+  year:
+    description: Partition year derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_intent.year
+  month:
+    description: Partition month derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_intent.month
+  day:
+    description: Partition day derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_intent.day

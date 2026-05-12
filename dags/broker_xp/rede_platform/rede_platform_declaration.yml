@@ -4,7 +4,8 @@ dag:
   schedule_interval: 0 21,8,12 * * *
   owner: Data Broker XP
   documentation:
-    dag_purpose: This DAG imports the tables from Rede Platform, a service responsible for store the relations between buyers and companies in 3P Demand.
+    dag_purpose: >-
+      Imports Rede Platform Postgres via CDC into the data lake: 3P buyer–company relations (Demand) and broker lifecycle data.
 workflow:
   type: cdc
   layer: raw
@@ -16,9 +17,14 @@ workflow:
   tables_customization:
     buyer_company: {}
     buyer_company_event: {}
+    broker_accreditation_intent: {}
+    broker_accreditation_prospect: {}
+    broker_accreditation_prospect_address: {}
+    broker_accreditation_prospect_banking: {}
+    broker_accreditation_prospect_broker_profile: {}
+    broker_deaccreditation_listing_salesflows: {}
     broker_deaccreditation_process: {}
     broker_deaccreditation_process_statistics: {}
-    broker_deaccreditation_listing_salesflows: {}
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

@@ -1,0 +1,55 @@
+---
+database_name: datalake_rede_platform_clean
+table_name: broker_accreditation_prospect_address
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: Structured mailing or business address collected for a broker accreditation prospect in Rede Platform.
+columns:
+  id:
+    description: Surrogate primary key for the prospect address row.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_address.id
+  id_prospect:
+    description: Foreign key to broker_accreditation_prospect (one address per prospect).
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_address.prospect_id
+  postal_code:
+    description: Postal or ZIP code for the declared address.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_address.postal_code
+  street:
+    description: Street name for the declared address.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_address.street
+  street_number:
+    description: Street number (building number) for the declared address.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_address.number
+  complement:
+    description: Optional address complement such as apartment, floor, or block.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_address.complement
+  neighborhood:
+    description: Neighborhood or district name for the declared address.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_address.neighborhood
+  state:
+    description: State or federative unit code or name for the declared address.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_address.state
+  city:
+    description: City name for the declared address.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_address.city
+  year:
+    description: Partition year derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_address.year
+  month:
+    description: Partition month derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_address.month
+  day:
+    description: Partition day derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_address.day

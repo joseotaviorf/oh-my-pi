@@ -1,0 +1,47 @@
+---
+database_name: datalake_rede_platform_clean
+table_name: broker_accreditation_prospect_banking
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: Banking and PIX payout details collected for broker accreditation payout setup for a prospect in Rede Platform.
+columns:
+  id:
+    description: Surrogate primary key for the prospect banking row.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_banking.id
+  id_prospect:
+    description: Foreign key to broker_accreditation_prospect (one banking record per prospect).
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_banking.prospect_id
+  bank_code:
+    description: Bank institution code as captured in the accreditation form.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_banking.bank_code
+  agency:
+    description: Bank branch or agency identifier for the declared account.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_banking.agency
+  account_number:
+    description: Bank account number for payouts (may include check digit depending on source formatting).
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_banking.account_number
+  account_type:
+    description: Type of account (e.g. checking, payment) as a string from the application.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_banking.account_type
+  pix_key:
+    description: Optional PIX key for alternative payout routing when provided by the prospect.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_banking.pix_key
+  year:
+    description: Partition year derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_banking.year
+  month:
+    description: Partition month derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_banking.month
+  day:
+    description: Partition day derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_banking.day

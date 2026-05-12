@@ -1,0 +1,49 @@
+---
+database_name: datalake_rede_platform_clean
+table_name: broker_accreditation_prospect_broker_profile
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: >-
+  Normalized brokerage attributes for an accreditation Prospect (moved out of intent payload): company name, CNPJ, CRECI, CRM, portfolio size.
+  One row per prospect; populated at POST /brokers/accreditation/prospects, not at intent creation.
+columns:
+  id:
+    description: Surrogate primary key for the prospect broker profile row.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_broker_profile.id
+  id_prospect:
+    description: Foreign key to broker_accreditation_prospect (one profile per prospect).
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_broker_profile.prospect_id
+  company_name:
+    description: Legal or trade name of the brokerage company provided in the accreditation form.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_broker_profile.company_name
+  company_tax_id:
+    description: Corporate taxpayer identifier (CNPJ, normalized) for the brokerage legal entity; used for deduplication checks in the application.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_broker_profile.company_tax_id
+  real_estate_license_number:
+    description: Official real-estate license number (CRECI or equivalent) declared for the brokerage.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_broker_profile.real_estate_license_number
+  crm_used:
+    description: Name or label of the CRM system declared as used by the brokerage.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_broker_profile.crm_used
+  number_of_properties:
+    description: Count of properties declared by the brokerage in the accreditation questionnaire.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_broker_profile.number_of_properties
+  year:
+    description: Partition year derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_broker_profile.year
+  month:
+    description: Partition month derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_broker_profile.month
+  day:
+    description: Partition day derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect_broker_profile.day

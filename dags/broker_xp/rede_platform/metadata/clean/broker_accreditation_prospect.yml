@@ -1,0 +1,63 @@
+---
+database_name: datalake_rede_platform_clean
+table_name: broker_accreditation_prospect
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: >-
+  Durable "Prospect" from SSBA: created only after mandatory fields, Privacy Hub consent, and Terms acceptance. Exactly one prospect per intent
+  (intent_uuid is unique). person_uuid is always set; company_uuid is reserved for post–manual activation in core systems (POC does not auto-provision Company).
+  Child tables hold normalized profile, address, and banking. Downstream Ops still performs contract and Magic Link provisioning.
+columns:
+  id:
+    description: Surrogate primary key for the prospect row in Rede Platform.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect.id
+  uuid_prospect:
+    description: Business UUID that uniquely identifies the accreditation prospect.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect.prospect_uuid
+  uuid_intent:
+    description: FK to broker_accreditation_intent.uuid_intent; one-to-one — at most one prospect row per intent.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect.intent_uuid
+  uuid_person:
+    description: UUID of the natural person who is applying for broker accreditation.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect.person_uuid
+  uuid_company:
+    description: >-
+      Optional Company domain UUID after manual activation; typically null at POC creation time until Ops creates the agency in core systems.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect.company_uuid
+  status:
+    description: Prospect lifecycle in the accreditation pipeline (application enum).
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect.status
+    categories:
+      CREATED: Status when the prospect row is persisted at the end of the self-service flow (POC default).
+      CONVERTED: Reserved for later lifecycle steps (e.g. after Company domain activation); not necessarily set in the initial POC path.
+      ABANDONED: Reserved for disqualified or abandoned prospects.
+  version:
+    description: Optimistic locking version for the prospect row in the source database.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect.version
+  ts_created:
+    description: Timestamp when the prospect row was created.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect.created_at
+  ts_updated:
+    description: Timestamp of the last update to the prospect row.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect.updated_at
+  year:
+    description: Partition year derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect.year
+  month:
+    description: Partition month derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect.month
+  day:
+    description: Partition day derived from the CDC ingest pipeline.
+    lineage:
+      - datalake_rede_platform_raw.broker_accreditation_prospect.day
