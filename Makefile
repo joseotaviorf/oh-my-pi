@@ -310,7 +310,7 @@ build:
 	@mkdir -p build/dags_yaml
 	@rsync -a --include='*/' --include='*.yml' --exclude='*' dags/ build/dags_yaml/
 	@touch build/dags_yaml/__init__.py
-	@uv build packages/bietlejuice-runtime --out-dir dist/
+	@uv build --wheel packages/bietlejuice-runtime --out-dir dist/
 
 .PHONY: install
 ## install all package dependencies via uv
