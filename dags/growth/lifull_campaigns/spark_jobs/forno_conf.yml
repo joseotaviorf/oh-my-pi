@@ -1,10 +1,11 @@
 ---
-login_url: https://thribee.com/index.php/cod.campaigns_performance
+login_url: https://thribee.com/cod.login
 campaign_url: https://thribee.com/index.php/cod.source_overview_report_json
 accounts:
-  sales:
-    account_name: quintoandar_sales_homes_br
-    account_id: 5940223
+  # It was deactivated. Keep it for reference.
+    # sales:
+    #   account_name: quintoandar_sales_homes_br
+    #   account_id: 5940223
   rent:
     account_name: quintoandar_rent_homes_br
     account_id: 18263
