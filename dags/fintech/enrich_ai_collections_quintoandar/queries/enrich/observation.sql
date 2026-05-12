@@ -9,6 +9,7 @@ SELECT
     MAX(CASE WHEN LOWER(obs.name) = 'create_negotiation' THEN 1 ELSE 0 END) AS flag_create_negotiation,
     -- Group 2: Matthew technical-state signals
     MAX(CASE WHEN LOWER(obs.name) = 'collectionsinput' THEN 1 ELSE 0 END) AS flag_collectionsinput_agent,
+    MAX(CASE WHEN LOWER(obs.name) IN ('collectionsagentv1input', 'collectionsagentv3input') THEN 1 ELSE 0 END) AS flag_collectionsinputv3_agent,
     MAX(CASE WHEN LOWER(obs.name) = 'outbound_payload_from_dto' THEN 1 ELSE 0 END) AS is_notification_reply,
     MAX(CASE WHEN LOWER(obs.name) = 'handle_collections_data_error' AND obs.type IN ('CHAIN', 'TOOL') THEN 1 ELSE 0 END) AS flag_has_collections_data_error,
     MAX(CASE WHEN LOWER(obs.name) = 'handle_finance_fetch_error' THEN 1 ELSE 0 END) AS flag_has_finance_fetch_error,
@@ -27,6 +28,7 @@ SELECT
     MAX(CASE WHEN LOWER(obs.name) = 'original_invoice_values_disagreement_helper' THEN 1 ELSE 0 END) AS flag_original_invoice_values_disagreement_helper,
     MAX(CASE WHEN LOWER(obs.name) = 'ongoing_deal_renegotiation_request_helper' THEN 1 ELSE 0 END) AS flag_ongoing_deal_renegotiation_request_helper,
     MAX(CASE WHEN LOWER(obs.name) = 'handle_non_tenant' THEN 1 ELSE 0 END) AS flag_handle_non_tenant,
+    MAX(CASE WHEN LOWER(obs.name) IN ('escalate_to_human_for_collections', 'escalate_tool') THEN 1 ELSE 0 END) AS flag_escalation_attempted,
     -- Escalation reason declared by Matthew when handing off to human support.
     -- Tries three known JSON shapes in obs.output and returns the first non-null match.
     MAX(
@@ -87,7 +89,9 @@ WHERE
         'handle_non_tenant',
         'escalate_to_human_for_collections',
         'escalate_tool',
-        'handle_finance_fetch_error'
+        'handle_finance_fetch_error',
+        'collectionsagentv1input',
+        'collectionsagentv3input'
     )
 GROUP BY
     trc.id_session

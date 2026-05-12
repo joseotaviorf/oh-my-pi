@@ -36,6 +36,10 @@ columns:
     lineage:
       - datalake_langfuse_clean.observations.name
     description: "1 if the session contains the CollectionsInput observation (canonical Matthew V2 session entrypoint), else 0."
+  flag_collectionsinputv3_agent:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session contains the canonical Matthew V3 entrypoint observation, else 0. Built from observation names in ('collectionsagentv1input', 'collectionsagentv3input') because, during the V3 rollout, the backend still emits the legacy 'collectionsagentv1input' name for V3 sessions; both are matched until the upstream rename PR ships, after which only 'collectionsagentv3input' is expected."
   is_notification_reply:
     lineage:
       - datalake_langfuse_clean.observations.name
@@ -104,6 +108,10 @@ columns:
     lineage:
       - datalake_langfuse_clean.observations.name
     description: "1 if the session reached the handle_non_tenant state, signalling that the user is not a tenant."
+  flag_escalation_attempted:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+    description: "1 if the session contains an escalation tool observation (escalate_to_human_for_collections or escalate_tool), signalling that Matthew attempted to hand the conversation off to a human agent; else 0. Existence-only flag — independent from whether the escalation reason JSON could be parsed (see matthew_declared_escalation_reason)."
   matthew_declared_escalation_reason:
     lineage:
       - datalake_langfuse_clean.observations.name

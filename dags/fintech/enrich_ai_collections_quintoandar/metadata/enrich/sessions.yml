@@ -40,10 +40,11 @@ columns:
     lineage:
       - datalake_chatbot.sessions.bot
       - datalake_ai_collections_quintoandar.observation.flag_collectionsinput_agent
+      - datalake_ai_collections_quintoandar.observation.flag_collectionsinputv3_agent
       - datalake_ai_collections_quintoandar.observation.flag_debt_retriever_tool
       - datalake_ai_collections_quintoandar.observation.flag_user_debt_classifier_tool
       - datalake_ai_collections_quintoandar.observation.flag_debt_finder_tool
-    description: "Source of the AI agent for the session: 'Matthew in Whatsapp' when bot=matthew, 'Matthew in Chat' when bot=wall-e and ANY Matthew detection signal is present (V2 CollectionsInput, V1.5 DebtRetrieverTool/UserDebtClassifierTool, or V1 DebtFinderTool), otherwise 'Wall-e'."
+    description: "Source of the AI agent for the session: 'Matthew in Whatsapp' when bot=matthew, 'Matthew in Chat' when bot=wall-e and ANY Matthew detection signal is present (V3 CollectionsInputV3, V2 CollectionsInput, V1.5 DebtRetrieverTool/UserDebtClassifierTool, or V1 DebtFinderTool), otherwise 'Wall-e'."
   ai_agent_source_legacy:
     lineage:
       - datalake_chatbot.sessions.bot
@@ -53,22 +54,25 @@ columns:
   is_matthew_in_session:
     lineage:
       - datalake_ai_collections_quintoandar.observation.flag_collectionsinput_agent
+      - datalake_ai_collections_quintoandar.observation.flag_collectionsinputv3_agent
       - datalake_ai_collections_quintoandar.observation.flag_debt_retriever_tool
       - datalake_ai_collections_quintoandar.observation.flag_user_debt_classifier_tool
       - datalake_ai_collections_quintoandar.observation.flag_debt_finder_tool
-    description: "Boolean flag indicating that any Matthew agent version (V1, V1.5 or V2) was detected in the session via observation signals, derived from the OR of CollectionsInput, DebtRetrieverTool, UserDebtClassifierTool and DebtFinderTool. Note: this is observation-derived only and is strictly narrower than ai_agent_source — historical bot='matthew' (Whatsapp) sessions without recorded traces can have ai_agent_source='Matthew in Whatsapp' and is_matthew_in_session=FALSE simultaneously. For the canonical 'Matthew was involved' question use ai_agent_source <> 'Wall-e'."
+    description: "Boolean flag indicating that any Matthew agent version (V1, V1.5, V2 or V3) was detected in the session via observation signals, derived from the OR of CollectionsInputV3, CollectionsInput, DebtRetrieverTool, UserDebtClassifierTool and DebtFinderTool. Note: this is observation-derived only and is strictly narrower than ai_agent_source — historical bot='matthew' (Whatsapp) sessions without recorded traces can have ai_agent_source='Matthew in Whatsapp' and is_matthew_in_session=FALSE simultaneously. For the canonical 'Matthew was involved' question use ai_agent_source <> 'Wall-e'."
   matthew_version:
     lineage:
       - datalake_ai_collections_quintoandar.observation.flag_collectionsinput_agent
+      - datalake_ai_collections_quintoandar.observation.flag_collectionsinputv3_agent
       - datalake_ai_collections_quintoandar.observation.flag_debt_retriever_tool
       - datalake_ai_collections_quintoandar.observation.flag_user_debt_classifier_tool
       - datalake_ai_collections_quintoandar.observation.flag_debt_finder_tool
-    description: "Detected Matthew agent version: 'V2' when the CollectionsInput observation is present (newest entrypoint), 'V1.5' when DebtRetrieverTool or UserDebtClassifierTool is present, 'V1' when DebtFinderTool is present, NULL otherwise. Precedence is V2 > V1.5 > V1. Observation-derived only: historical bot='matthew' (Whatsapp) sessions where traces were not recorded can be 'Matthew in Whatsapp' with matthew_version=NULL — downstream consumers should handle NULL explicitly (e.g. as a distinct 'unknown' bucket)."
+    description: "Detected Matthew agent version: 'V3' when the CollectionsInputV3 observation is present (newest entrypoint, also matched against the legacy 'collectionsagentv1input' name during the rollout window), 'V2' when CollectionsInput is present, 'V1.5' when DebtRetrieverTool or UserDebtClassifierTool is present, 'V1' when DebtFinderTool is present, NULL otherwise. Precedence is V3 > V2 > V1.5 > V1. Observation-derived only: historical bot='matthew' (Whatsapp) sessions where traces were not recorded can be 'Matthew in Whatsapp' with matthew_version=NULL — downstream consumers should handle NULL explicitly (e.g. as a distinct 'unknown' bucket)."
   flag_eval_matthew_in_chat:
     lineage:
       - datalake_chatbot.sessions.bot
       - datalake_ai_collections_quintoandar.observation.flag_collectionsinput_agent
-    description: "Boolean flag indicating that the Matthew V2 agent was active inside an in-app chat session (bot=wall-e plus CollectionsInput observation). Narrower than is_matthew_in_session, kept for V2-specific analyses."
+      - datalake_ai_collections_quintoandar.observation.flag_collectionsinputv3_agent
+    description: "Boolean flag indicating that the Matthew V2 or V3 agent was active inside an in-app chat session (bot=wall-e plus CollectionsInput or CollectionsInputV3 observation). Narrower than is_matthew_in_session, kept for the V2-vs-V3 experiment scope."
   is_escalation:
     lineage:
       - datalake_chatbot.sessions.is_escalated

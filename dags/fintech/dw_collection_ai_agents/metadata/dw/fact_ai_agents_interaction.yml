@@ -1,6 +1,6 @@
 database_name: dw_collection_ai_agents
 table_name: fact_ai_agents_interaction
-description: AI agents interaction fact table — one row per chatbot session with bot info, Matthew agent flags, trace context, observation aggregates, user wallet snapshot at session date and the agglutinated conversation string.
+description: AI agents interaction fact table — one row per chatbot session with bot info, Matthew agent flags (V1, V1.5, V2, V3), trace context, observation aggregates (including escalation attempts), user wallet snapshot and 2-day post-session payment / overdue-recovery for the user, plus the agglutinated conversation string.
 domain: Fintech
 owner: juliana.hocihara@quintoandar.com.br
 columns:
@@ -39,23 +39,23 @@ columns:
   ai_agent_source:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.ai_agent_source
-    description: "Source of the AI agent for the session: 'Matthew in Whatsapp', 'Matthew in Chat' (any of V1, V1.5 or V2 Matthew signals detected on a wall-e session), or 'Wall-e'."
+    description: "Source of the AI agent for the session: 'Matthew in Whatsapp', 'Matthew in Chat' (any of V1, V1.5, V2 or V3 Matthew signals detected on a wall-e session), or 'Wall-e'."
   ai_agent_source_legacy:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.ai_agent_source_legacy
-    description: "Legacy source of the AI agent for the session, derived from the Langfuse score (value > 0) under SessionContainsMatthewAgentEvaluator or MatthewVersionEvaluator (the latter encodes the version: 0=none, 1=V1, 1.5=V1.5, 2=V2). Kept to reproduce historical metrics that pre-date the observation-based logic; runs in parallel to ai_agent_source."
+    description: "Legacy source of the AI agent for the session, derived from the Langfuse score (value > 0) under SessionContainsMatthewAgentEvaluator or MatthewVersionEvaluator (the latter encodes the version: 0=none, 1=V1, 1.5=V1.5, 2=V2). Kept to reproduce historical metrics that pre-date the observation-based logic; runs in parallel to ai_agent_source. Does not yet encode V3 — V3 detection lives in ai_agent_source / matthew_version only."
   is_matthew_in_session:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.is_matthew_in_session
-    description: "Boolean flag indicating that any Matthew agent version (V1, V1.5 or V2) was detected via observation signals (OR of CollectionsInput, DebtRetrieverTool, UserDebtClassifierTool and DebtFinderTool). Strictly narrower than ai_agent_source: historical bot='matthew' (Whatsapp) sessions without recorded traces can have ai_agent_source='Matthew in Whatsapp' and is_matthew_in_session=FALSE simultaneously. For 'was Matthew involved' use ai_agent_source <> 'Wall-e'."
+    description: "Boolean flag indicating that any Matthew agent version (V1, V1.5, V2 or V3) was detected via observation signals (OR of CollectionsInputV3, CollectionsInput, DebtRetrieverTool, UserDebtClassifierTool and DebtFinderTool). Strictly narrower than ai_agent_source: historical bot='matthew' (Whatsapp) sessions without recorded traces can have ai_agent_source='Matthew in Whatsapp' and is_matthew_in_session=FALSE simultaneously. For 'was Matthew involved' use ai_agent_source <> 'Wall-e'."
   matthew_version:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.matthew_version
-    description: "Detected Matthew agent version: 'V2' (CollectionsInput), 'V1.5' (DebtRetrieverTool or UserDebtClassifierTool), 'V1' (DebtFinderTool), NULL when no Matthew signal was detected. Precedence is V2 > V1.5 > V1. Observation-derived only: historical Whatsapp Matthew sessions where traces were not recorded can be 'Matthew in Whatsapp' with matthew_version=NULL — downstream consumers should handle NULL explicitly (e.g. as a distinct 'unknown' bucket)."
+    description: "Detected Matthew agent version: 'V3' (CollectionsInputV3 — also matched against the legacy 'collectionsagentv1input' name during the V3 rollout window), 'V2' (CollectionsInput), 'V1.5' (DebtRetrieverTool or UserDebtClassifierTool), 'V1' (DebtFinderTool), NULL when no Matthew signal was detected. Precedence is V3 > V2 > V1.5 > V1. Observation-derived only: historical Whatsapp Matthew sessions where traces were not recorded can be 'Matthew in Whatsapp' with matthew_version=NULL — downstream consumers should handle NULL explicitly (e.g. as a distinct 'unknown' bucket)."
   flag_eval_matthew_in_chat:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.flag_eval_matthew_in_chat
-    description: "Boolean flag indicating that the Matthew V2 agent (CollectionsInput) was active inside an in-app chat session (bot=wall-e). Narrower than is_matthew_in_session."
+    description: "Boolean flag indicating that the Matthew V2 or V3 agent (CollectionsInput or CollectionsInputV3) was active inside an in-app chat session (bot=wall-e). Narrower than is_matthew_in_session — kept as the eligibility flag for the V2-vs-V3 experiment."
   is_escalation:
     lineage:
       - datalake_ai_collections_quintoandar.sessions.is_escalation
@@ -96,6 +96,10 @@ columns:
     lineage:
       - dw_collection_ai_agents.fact_user_wallet_timeline.max_delay_contaminated_contract_t2
     description: "Maximum delay in days for contaminated contracts (Window 2 days) for this user at the session date."
+  user_wallet:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.user_wallet
+    description: "Total open wallet amount in BRL for the user across all contracts at the session date (sum of wallet across the user's contracts in fact_user_wallet_timeline). Used to size the debt the Matthew session is trying to recover."
   user_wallet_overdue_t2:
     lineage:
       - dw_collection_ai_agents.fact_user_wallet_timeline.user_wallet_overdue_t2
@@ -116,6 +120,14 @@ columns:
     lineage:
       - dw_collection_ai_agents.fact_user_wallet_timeline.contracts
     description: "Array of all contract IDs associated with the user at the session date."
+  user_overdue_recovered_amount_t2_w_2:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.user_overdue_recovered_amount_t2_w_2
+    description: "Overdue amount in BRL recovered for the user within a 2-day window starting at the session date (sum across the user's contracts of overdue_recovered_amount_t2 plus the next day, from fact_user_wallet_timeline). Used to attribute Matthew's V2-vs-V3 lift on overdue recovery shortly after the conversation."
+  user_payment_w_2:
+    lineage:
+      - dw_collection_ai_agents.fact_user_wallet_timeline.user_payment_w_2
+    description: "Total payment amount in BRL recovered for the user within a 2-day window starting at the session date (sum across the user's contracts of recovered_amount plus the next day, from fact_user_wallet_timeline). Used to attribute Matthew's V2-vs-V3 lift on overall payments shortly after the conversation."
   array_open_invoices:
     lineage:
       - dw_collection_ai_agents.fact_user_wallet_timeline.array_open_invoices
@@ -148,6 +160,10 @@ columns:
     lineage:
       - datalake_ai_collections_quintoandar.observation.flag_collectionsinput_agent
     description: "1 if the session contains the CollectionsInput observation (canonical Matthew V2 entrypoint), else 0 (absent or no observations recorded)."
+  flag_collectionsinputv3_agent:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_collectionsinputv3_agent
+    description: "1 if the session contains the canonical Matthew V3 entrypoint observation, else 0 (absent or no observations recorded). Sourced from observation names in ('collectionsagentv1input', 'collectionsagentv3input') because, during the V3 rollout, the backend still emits the legacy 'collectionsagentv1input' name for V3 sessions; both are matched until the upstream rename PR ships."
   is_notification_reply:
     lineage:
       - datalake_ai_collections_quintoandar.observation.is_notification_reply
@@ -212,6 +228,10 @@ columns:
     lineage:
       - datalake_ai_collections_quintoandar.observation.flag_handle_non_tenant
     description: "1 if the session reached the handle_non_tenant state, signalling that the user is not a tenant; else 0 (absent or no observations recorded)."
+  flag_escalation_attempted:
+    lineage:
+      - datalake_ai_collections_quintoandar.observation.flag_escalation_attempted
+    description: "1 if the session contains an escalation tool observation (escalate_to_human_for_collections or escalate_tool), signalling that Matthew attempted to hand the conversation off to a human agent; else 0 (absent or no observations recorded). Existence-only flag — independent from whether the escalation reason JSON could be parsed (see matthew_declared_escalation_reason). Used in the V2-vs-V3 experiment to compare hand-off rates."
   matthew_declared_escalation_reason:
     lineage:
       - datalake_ai_collections_quintoandar.observation.matthew_declared_escalation_reason

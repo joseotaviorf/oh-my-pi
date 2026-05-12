@@ -57,7 +57,8 @@ SELECT
     CASE
         WHEN m.bot = 'matthew' THEN 'Matthew in Whatsapp'
         WHEN m.bot = 'wall-e' AND (
-            COALESCE(o.flag_collectionsinput_agent, 0) = 1
+            COALESCE(o.flag_collectionsinputv3_agent, 0) = 1
+            OR COALESCE(o.flag_collectionsinput_agent, 0) = 1
             OR COALESCE(o.flag_debt_retriever_tool, 0) = 1
             OR COALESCE(o.flag_user_debt_classifier_tool, 0) = 1
             OR COALESCE(o.flag_debt_finder_tool, 0) = 1
@@ -71,11 +72,13 @@ SELECT
     END AS ai_agent_source_legacy,
     (
         COALESCE(o.flag_collectionsinput_agent, 0) = 1
+        OR COALESCE(o.flag_collectionsinputv3_agent, 0) = 1
         OR COALESCE(o.flag_debt_retriever_tool, 0) = 1
         OR COALESCE(o.flag_user_debt_classifier_tool, 0) = 1
         OR COALESCE(o.flag_debt_finder_tool, 0) = 1
     ) AS is_matthew_in_session,
     CASE
+        WHEN COALESCE(o.flag_collectionsinputv3_agent, 0) = 1 THEN 'V3'
         WHEN COALESCE(o.flag_collectionsinput_agent, 0) = 1 THEN 'V2'
         WHEN COALESCE(o.flag_debt_retriever_tool, 0) = 1
             OR COALESCE(o.flag_user_debt_classifier_tool, 0) = 1 THEN 'V1.5'
@@ -83,7 +86,7 @@ SELECT
         ELSE NULL
     END AS matthew_version,
     CASE
-        WHEN m.bot = 'wall-e' AND COALESCE(o.flag_collectionsinput_agent, 0) = 1 THEN TRUE
+        WHEN m.bot = 'wall-e' AND (COALESCE(o.flag_collectionsinput_agent, 0) = 1 OR COALESCE(o.flag_collectionsinputv3_agent, 0) = 1) THEN TRUE
         ELSE FALSE
     END AS flag_eval_matthew_in_chat,
     m.is_escalated AS is_escalation,
