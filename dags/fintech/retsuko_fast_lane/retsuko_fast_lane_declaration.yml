@@ -1,7 +1,7 @@
 dag:
   name: retsuko_fast_lane
   schedule_start_date: 2021, 2, 20
-  schedule_interval: 30 7-22 * * *
+  schedule_interval: 30 6-19 * * *
   owner: Data Fintech
   documentation:
     dag_purpose: |
@@ -10,7 +10,7 @@ dag:
       It does not create or own any information and it is not its purpose to do that. All the data it has comes from other financial
       services (today is only [SeuBarriga](https://github.com/quintoandar/seubarriga)).
 
-      This DAG has only tables that must run every 1 hour, between 6h30 AM to 22h30 AM.
+      This DAG has only tables that must run every 1 hour, between 6h30 AM to 19h30 AM.
 workflow:
   type: cdc
   layer: raw
@@ -21,21 +21,21 @@ workflow:
   dbutils_secret_key: RETSUKO_DB
   tables_customization:
     account:
-      clean_primary_keys: [id]
+      clean_primary_keys: [ id ]
       clean_table_name: account
-      clean_z_order_by: [id_contract]
+      clean_z_order_by: [ id_contract ]
     contract:
-      clean_primary_keys: [id]
+      clean_primary_keys: [ id ]
       clean_table_name: contract
-      clean_z_order_by: [ts_signature]
+      clean_z_order_by: [ ts_signature ]
     invoice:
-      clean_primary_keys: [id]
+      clean_primary_keys: [ id ]
       clean_table_name: invoice
-      clean_z_order_by: [id_contract, ts_due]
+      clean_z_order_by: [ id_contract, ts_due ]
     entry_partitioned:
-      clean_primary_keys: [id]
+      clean_primary_keys: [ id ]
       clean_table_name: entry_partitioned
-      clean_z_order_by: [ts_created]
+      clean_z_order_by: [ ts_created ]
 cluster:
   type: databricks_16_4_small_general_fleet_xlarge_single_node
   databricks_conn_id: databricks_new
