@@ -1,0 +1,5 @@
+database_name: datalake_iru_raw
+table_name: managed_devices
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+description: "Raw managed devices from IRU/Kandji MDM platform via REST API."
