@@ -11,15 +11,10 @@ workflow:
   default_extraction_type: full
   default_partitions: [country_code]
 cluster:
-  type: custom_cluster
+  type: consolidation_s_general_single_node_cluster
   custom_configurations:
-    driver_node_type_id: r5d.large
-    node_type_id: r5d.large
-    num_workers: 2
-    spark_version: 12.2.x-scala2.12
-    spark_conf:
-      spark.sql.sources.partitionOverwriteMode: static
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
   databricks_conn_id: databricks_new_env
