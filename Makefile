@@ -306,6 +306,10 @@ build:
 	@echo "=========="
 	@echo ""
 	@uv build packages/bietlejuice-core --out-dir dist/
+	@rm -rf build/dags_yaml
+	@mkdir -p build/dags_yaml
+	@rsync -a --include='*/' --include='*.yml' --exclude='*' dags/ build/dags_yaml/
+	@touch build/dags_yaml/__init__.py
 	@uv build packages/bietlejuice-runtime --out-dir dist/
 
 .PHONY: install
