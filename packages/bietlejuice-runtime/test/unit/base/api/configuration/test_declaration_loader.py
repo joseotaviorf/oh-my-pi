@@ -115,7 +115,9 @@ class TestLoadApiIngestionDeclarationDatabricksVolumeRegression:
                 ),
                 patch(
                     "bietlejuice.base.api.configuration.declaration_loader._load_from_installed_package",
-                    side_effect=AssertionError("_load_from_installed_package must not be called"),
+                    side_effect=AssertionError(
+                        "_load_from_installed_package must not be called"
+                    ),
                 ),
             ):
                 result = load_api_ingestion_declaration(dag_name)

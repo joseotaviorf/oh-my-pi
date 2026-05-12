@@ -298,7 +298,9 @@ class TestDAGPackagesPathService:
 
     # --- Volume (Databricks) fallback in _get_line_folders ---
 
-    @mock.patch("bietlejuice.base.service.dag_packages_path_service.DAG_PACKAGES_ROOT", None)
+    @mock.patch(
+        "bietlejuice.base.service.dag_packages_path_service.DAG_PACKAGES_ROOT", None
+    )
     @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isdir")
     @mock.patch("bietlejuice.base.service.dag_packages_path_service.scandir")
     @mock.patch("bietlejuice.base.service.dag_packages_path_service.HierarchicalConf")
@@ -328,7 +330,9 @@ class TestDAGPackagesPathService:
         mock_scandir.assert_called_once_with(expected_dags_root)
         assert result == [dir_mock]
 
-    @mock.patch("bietlejuice.base.service.dag_packages_path_service.DAG_PACKAGES_ROOT", None)
+    @mock.patch(
+        "bietlejuice.base.service.dag_packages_path_service.DAG_PACKAGES_ROOT", None
+    )
     @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isdir")
     @mock.patch("bietlejuice.base.service.dag_packages_path_service.HierarchicalConf")
     def test_get_line_folders_returns_empty_when_volume_dags_dir_absent(
@@ -347,7 +351,9 @@ class TestDAGPackagesPathService:
         # assert — graceful fallback to empty list
         assert result == []
 
-    @mock.patch("bietlejuice.base.service.dag_packages_path_service.DAG_PACKAGES_ROOT", None)
+    @mock.patch(
+        "bietlejuice.base.service.dag_packages_path_service.DAG_PACKAGES_ROOT", None
+    )
     @mock.patch("bietlejuice.base.service.dag_packages_path_service.HierarchicalConf")
     def test_get_line_folders_returns_empty_on_config_error(self, mock_conf_cls):
         # arrange — HierarchicalConf raises (e.g. missing key outside Databricks)
@@ -359,7 +365,9 @@ class TestDAGPackagesPathService:
         # assert — exception swallowed; empty list returned
         assert result == []
 
-    @mock.patch("bietlejuice.base.service.dag_packages_path_service.DAG_PACKAGES_ROOT", None)
+    @mock.patch(
+        "bietlejuice.base.service.dag_packages_path_service.DAG_PACKAGES_ROOT", None
+    )
     @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isdir")
     @mock.patch("bietlejuice.base.service.dag_packages_path_service.scandir")
     @mock.patch("bietlejuice.base.service.dag_packages_path_service.HierarchicalConf")

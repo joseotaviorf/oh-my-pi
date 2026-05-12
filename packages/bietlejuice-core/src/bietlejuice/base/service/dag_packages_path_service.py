@@ -101,7 +101,9 @@ class DAGPackagesPathService:
             return DAGPackagesPathService._line_folders_cache
 
         if DAG_PACKAGES_ROOT:
-            DAGPackagesPathService._line_folders_cache = list(scandir(DAG_PACKAGES_ROOT))
+            DAGPackagesPathService._line_folders_cache = list(
+                scandir(DAG_PACKAGES_ROOT)
+            )
             return DAGPackagesPathService._line_folders_cache
 
         # Databricks: resolve the dags/ tree from the Volume mount.
