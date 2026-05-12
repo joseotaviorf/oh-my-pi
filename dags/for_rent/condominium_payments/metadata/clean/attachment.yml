@@ -13,6 +13,10 @@ columns:
     lineage:
       - datalake_condominium_payments_raw.attachment.invoice_id
     description: Foreign key referencing the invoice this attachment belongs to.
+  id_blob_vault:
+    lineage:
+      - datalake_condominium_payments_raw.attachment.blob_vault_id
+    description: Unique Blob Vault identifier for the stored file. Nullable when the attachment is not stored in Blob Vault.
   mime_type:
     lineage:
       - datalake_condominium_payments_raw.attachment.mime_type
