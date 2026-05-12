@@ -1,0 +1,909 @@
+import os
+
+# Import the functions we want to test
+import sys
+import unittest
+from argparse import Namespace
+from unittest.mock import Mock, call, patch
+
+from pyspark.sql import DataFrame
+
+
+def _find_project_root() -> str:
+    current = os.path.abspath(os.path.dirname(__file__))
+    while current != os.path.dirname(current):
+        if os.path.exists(os.path.join(current, ".git")):
+            return current
+        current = os.path.dirname(current)
+    raise RuntimeError("Could not locate project root from test path")
+
+
+spark_jobs_path = os.path.join(
+    _find_project_root(),
+    "dags",
+    "primitives",
+    "comms_manager_rules",
+    "spark_jobs",
+)
+sys.path.append(spark_jobs_path)
+
+from load_comms_manager_rules import (  # noqa: E402
+    collect_all_files,
+    explode_and_flatten_actions,
+    explode_rules,
+    get_last_version,
+    main,
+    parse_arguments,
+    process_communication_rules,
+    read_communication_rules_json,
+    write_dataframe_with_s3_loader,
+)
+
+
+class TestGetLastVersion(unittest.TestCase):
+    """Test cases for get_last_version function."""
+
+    @patch("load_comms_manager_rules.col")
+    @patch("load_comms_manager_rules.BaseDBUtils")
+    @patch("load_comms_manager_rules.spark")
+    def test_get_last_version_success(self, mock_spark, mock_base_dbutils, mock_col):
+        """Test successful retrieval of latest JSON file with recursive search."""
+        # Mock dbutils and file listing
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+
+        # Mock directory structure with files and subdirectories
+        # First call to ls returns a mix of directories and files
+        mock_root_items = [
+            Mock(path="s3://path/2024/", isDir=lambda: True),
+            Mock(path="s3://path/old_file.txt", isDir=lambda: False),  # Non-JSON file
+        ]
+
+        # Second call to ls (for 2024/ directory) returns more subdirectories
+        mock_2024_items = [
+            Mock(path="s3://path/2024/01/", isDir=lambda: True),
+            Mock(path="s3://path/2024/02/", isDir=lambda: True),
+        ]
+
+        # Third call to ls (for 2024/01/ directory) returns JSON files
+        mock_jan_items = [
+            Mock(
+                path="s3://path/2024/01/file1.json",
+                isDir=lambda: False,
+                modificationTime=1000,
+                size=1024,
+            ),
+            Mock(
+                path="s3://path/2024/01/file2.json",
+                isDir=lambda: False,
+                modificationTime=2000,
+                size=2048,
+            ),
+        ]
+
+        # Fourth call to ls (for 2024/02/ directory) returns JSON files
+        mock_feb_items = [
+            Mock(
+                path="s3://path/2024/02/file3.json",
+                isDir=lambda: False,
+                modificationTime=1500,
+                size=1536,
+            ),
+        ]
+
+        # Set up the side_effect to return different results for different paths
+        def ls_side_effect(path):
+            if path == "s3://test-path/":
+                return mock_root_items
+            elif path == "s3://path/2024/":
+                return mock_2024_items
+            elif path == "s3://path/2024/01/":
+                return mock_jan_items
+            elif path == "s3://path/2024/02/":
+                return mock_feb_items
+            else:
+                return []
+
+        mock_dbutils.fs.ls.side_effect = ls_side_effect
+
+        mock_df = Mock()
+        mock_spark.createDataFrame.return_value = mock_df
+        mock_df.orderBy.return_value = mock_df
+        mock_df.limit.return_value = mock_df
+        mock_df.collect.return_value = [
+            Mock(path="s3://path/2024/01/file2.json", modificationTime=2000, size=2048)
+        ]
+
+        # Mock col function
+        mock_col.return_value = Mock()
+        mock_col.return_value.desc.return_value = "mocked_col_desc"
+
+        # Test
+        result = get_last_version("s3://test-path/")
+
+        # Assertions
+        self.assertEqual(result, "s3://path/2024/01/file2.json")
+        # Verify that createDataFrame was called with only JSON files (3 files)
+        mock_spark.createDataFrame.assert_called_once()
+        called_args = mock_spark.createDataFrame.call_args[0][0]
+        self.assertEqual(len(called_args), 3)  # Should have 3 JSON files
+        # Verify all files in the call are JSON files
+        for file_obj in called_args:
+            self.assertTrue(file_obj.path.endswith(".json"))
+
+    @patch("load_comms_manager_rules.BaseDBUtils")
+    def test_get_last_version_no_files(self, mock_base_dbutils):
+        """Test behavior when no JSON files are found."""
+        # Mock dbutils with empty file list
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+        mock_dbutils.fs.ls.return_value = []
+
+        # Test
+        result = get_last_version("s3://empty-path/")
+
+        # Assertions
+        self.assertIsNone(result)
+
+    @patch("load_comms_manager_rules.BaseDBUtils")
+    def test_get_last_version_exception(self, mock_base_dbutils):
+        """Test graceful handling of S3 access errors."""
+        # Mock dbutils to raise exception
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+        mock_dbutils.fs.ls.side_effect = Exception("S3 access failed")
+
+        # Test - should handle exception gracefully and return None
+        result = get_last_version("s3://error-path/")
+
+        # Assertions - should return None when S3 access fails
+        self.assertIsNone(result)
+
+
+class TestCollectAllFiles(unittest.TestCase):
+    """Test cases for collect_all_files function."""
+
+    @patch("load_comms_manager_rules.BaseDBUtils")
+    def test_collect_all_files_json_only(self, mock_base_dbutils):
+        """Test collecting only JSON files from a flat directory structure."""
+        # Mock dbutils
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+
+        # Mock file listing - mix of JSON and non-JSON files
+        mock_items = [
+            Mock(path="s3://path/file1.json", isDir=lambda: False),
+            Mock(path="s3://path/file2.txt", isDir=lambda: False),
+            Mock(
+                path="s3://path/file3.JSON", isDir=lambda: False
+            ),  # Test case insensitive
+            Mock(path="s3://path/file4.csv", isDir=lambda: False),
+        ]
+        mock_dbutils.fs.ls.return_value = mock_items
+
+        # Test
+        result = collect_all_files("s3://path/")
+
+        # Assertions
+        self.assertEqual(len(result), 2)  # Only JSON files
+        self.assertEqual(result[0].path, "s3://path/file1.json")
+        self.assertEqual(result[1].path, "s3://path/file3.JSON")
+        mock_dbutils.fs.ls.assert_called_once_with("s3://path/")
+
+    @patch("load_comms_manager_rules.BaseDBUtils")
+    def test_collect_all_files_recursive_search(self, mock_base_dbutils):
+        """Test recursive search through directory structure."""
+        # Mock dbutils
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+
+        # Mock directory structure
+        mock_root_items = [
+            Mock(path="s3://path/subdir1/", isDir=lambda: True),
+            Mock(path="s3://path/subdir2/", isDir=lambda: True),
+            Mock(path="s3://path/root_file.json", isDir=lambda: False),
+        ]
+
+        mock_subdir1_items = [
+            Mock(path="s3://path/subdir1/file1.json", isDir=lambda: False),
+            Mock(path="s3://path/subdir1/file1.txt", isDir=lambda: False),
+        ]
+
+        mock_subdir2_items = [
+            Mock(path="s3://path/subdir2/file2.json", isDir=lambda: False),
+        ]
+
+        # Set up side_effect for different paths
+        def ls_side_effect(path):
+            if path == "s3://path/":
+                return mock_root_items
+            elif path == "s3://path/subdir1/":
+                return mock_subdir1_items
+            elif path == "s3://path/subdir2/":
+                return mock_subdir2_items
+            else:
+                return []
+
+        mock_dbutils.fs.ls.side_effect = ls_side_effect
+
+        # Test
+        result = collect_all_files("s3://path/")
+
+        # Assertions
+        self.assertEqual(len(result), 3)  # 3 JSON files total
+        json_paths = [item.path for item in result]
+        self.assertIn("s3://path/root_file.json", json_paths)
+        self.assertIn("s3://path/subdir1/file1.json", json_paths)
+        self.assertIn("s3://path/subdir2/file2.json", json_paths)
+
+        # Verify recursive calls
+        expected_calls = [
+            call("s3://path/"),
+            call("s3://path/subdir1/"),
+            call("s3://path/subdir2/"),
+        ]
+        mock_dbutils.fs.ls.assert_has_calls(expected_calls, any_order=True)
+
+    @patch("load_comms_manager_rules.BaseDBUtils")
+    def test_collect_all_files_custom_extension(self, mock_base_dbutils):
+        """Test collecting files with custom extension."""
+        # Mock dbutils
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+
+        # Mock file listing
+        mock_items = [
+            Mock(path="s3://path/file1.csv", isDir=lambda: False),
+            Mock(path="s3://path/file2.json", isDir=lambda: False),
+            Mock(
+                path="s3://path/file3.CSV", isDir=lambda: False
+            ),  # Test case insensitive
+            Mock(path="s3://path/file4.txt", isDir=lambda: False),
+        ]
+        mock_dbutils.fs.ls.return_value = mock_items
+
+        # Test with .csv extension
+        result = collect_all_files("s3://path/", file_extension=".csv")
+
+        # Assertions
+        self.assertEqual(len(result), 2)  # Only CSV files
+        csv_paths = [item.path for item in result]
+        self.assertIn("s3://path/file1.csv", csv_paths)
+        self.assertIn("s3://path/file3.CSV", csv_paths)
+
+    @patch("load_comms_manager_rules.BaseDBUtils")
+    def test_collect_all_files_empty_directory(self, mock_base_dbutils):
+        """Test behavior with empty directory."""
+        # Mock dbutils
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+        mock_dbutils.fs.ls.return_value = []
+
+        # Test
+        result = collect_all_files("s3://empty-path/")
+
+        # Assertions
+        self.assertEqual(len(result), 0)
+        mock_dbutils.fs.ls.assert_called_once_with("s3://empty-path/")
+
+    @patch("load_comms_manager_rules.BaseDBUtils")
+    def test_collect_all_files_access_error(self, mock_base_dbutils):
+        """Test graceful handling of S3 access errors."""
+        # Mock dbutils to raise exception
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+        mock_dbutils.fs.ls.side_effect = Exception("S3 access failed")
+
+        # Test - should handle exception gracefully
+        result = collect_all_files("s3://error-path/")
+
+        # Assertions
+        self.assertEqual(len(result), 0)  # Should return empty list
+        mock_dbutils.fs.ls.assert_called_once_with("s3://error-path/")
+
+    @patch("load_comms_manager_rules.BaseDBUtils")
+    def test_collect_all_files_mixed_access_errors(self, mock_base_dbutils):
+        """Test handling mixed success/error scenarios in recursive search."""
+        # Mock dbutils
+        mock_dbutils = Mock()
+        mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
+
+        # Mock directory structure where one subdirectory fails
+        mock_root_items = [
+            Mock(path="s3://path/good_subdir/", isDir=lambda: True),
+            Mock(path="s3://path/bad_subdir/", isDir=lambda: True),
+            Mock(path="s3://path/root_file.json", isDir=lambda: False),
+        ]
+
+        mock_good_subdir_items = [
+            Mock(path="s3://path/good_subdir/file1.json", isDir=lambda: False),
+        ]
+
+        # Set up side_effect - good_subdir works, bad_subdir fails
+        def ls_side_effect(path):
+            if path == "s3://path/":
+                return mock_root_items
+            elif path == "s3://path/good_subdir/":
+                return mock_good_subdir_items
+            elif path == "s3://path/bad_subdir/":
+                raise Exception("Access denied")
+            else:
+                return []
+
+        mock_dbutils.fs.ls.side_effect = ls_side_effect
+
+        # Test
+        result = collect_all_files("s3://path/")
+
+        # Assertions - should get files from accessible paths
+        self.assertEqual(len(result), 2)  # root_file.json + good_subdir/file1.json
+        json_paths = [item.path for item in result]
+        self.assertIn("s3://path/root_file.json", json_paths)
+        self.assertIn("s3://path/good_subdir/file1.json", json_paths)
+
+
+class TestDataProcessingFunctions(unittest.TestCase):
+    """Test cases for data processing functions."""
+
+    @patch("load_comms_manager_rules.spark")
+    def test_read_communication_rules_json_success(self, mock_spark):
+        """Test successful JSON reading."""
+        # Mock DataFrame
+        mock_df = Mock(spec=DataFrame)
+        mock_spark.read.option.return_value.json.return_value = mock_df
+        mock_df.count.return_value = 5
+
+        # Test
+        result = read_communication_rules_json("s3://test-path/file.json")
+
+        # Assertions
+        self.assertEqual(result, mock_df)
+        mock_spark.read.option.assert_called_once_with("multiline", "true")
+
+    @patch("load_comms_manager_rules.spark")
+    def test_read_communication_rules_json_exception(self, mock_spark):
+        """Test exception handling in JSON reading."""
+        # Mock exception
+        mock_spark.read.option.return_value.json.side_effect = Exception(
+            "File not found"
+        )
+
+        # Test
+        with self.assertRaises(Exception) as context:
+            read_communication_rules_json("s3://invalid-path/file.json")
+
+        self.assertIn("File not found", str(context.exception))
+
+    @patch("load_comms_manager_rules.explode")
+    @patch("load_comms_manager_rules.to_timestamp")
+    @patch("load_comms_manager_rules.col")
+    def test_explode_rules(self, mock_col, mock_to_timestamp, mock_explode):
+        """Test rules explosion function with proper mocking."""
+        # Mock DataFrame
+        mock_df = Mock(spec=DataFrame)
+        mock_exploded_df = Mock(spec=DataFrame)
+
+        mock_df.select.return_value = mock_exploded_df
+        mock_exploded_df.count.return_value = 10
+
+        # Mock Spark functions to return mock objects that can be chained
+        mock_col.return_value = Mock()
+        mock_to_timestamp.return_value = Mock()
+        mock_to_timestamp.return_value.alias.return_value = "generated_at_alias"
+        mock_explode.return_value = Mock()
+        mock_explode.return_value.alias.return_value = "rule_alias"
+
+        # Test - this calls the REAL function with mocked Spark functions
+        result = explode_rules(mock_df)
+
+        # Assertions
+        self.assertEqual(result, mock_exploded_df)
+        mock_df.select.assert_called_once()
+        mock_col.assert_called_with("metadata.generated_at")
+        mock_to_timestamp.assert_called_once()
+        mock_explode.assert_called_with("rules")
+
+    @patch("load_comms_manager_rules.dayofmonth")
+    @patch("load_comms_manager_rules.month")
+    @patch("load_comms_manager_rules.year")
+    @patch("load_comms_manager_rules.explode")
+    @patch("load_comms_manager_rules.col")
+    def test_explode_and_flatten_actions(
+        self, mock_col, mock_explode, mock_year, mock_month, mock_dayofmonth
+    ):
+        """Test action explosion and flattening function with proper mocking."""
+        # Mock DataFrame chain
+        mock_rules_df = Mock(spec=DataFrame)
+        mock_with_actions_df = Mock(spec=DataFrame)
+        mock_flat_df = Mock(spec=DataFrame)
+
+        mock_with_year_df = Mock(spec=DataFrame)
+        mock_with_month_df = Mock(spec=DataFrame)
+        mock_with_day_df = Mock(spec=DataFrame)
+
+        mock_rules_df.select.return_value = mock_with_actions_df
+        mock_with_actions_df.select.return_value = mock_flat_df
+
+        # Chain the withColumn calls: flat_df -> year_df -> month_df -> day_df
+        mock_flat_df.withColumn.return_value = mock_with_year_df
+        mock_with_year_df.withColumn.return_value = mock_with_month_df
+        mock_with_month_df.withColumn.return_value = mock_with_day_df
+        mock_with_day_df.count.return_value = 25
+
+        # Mock Spark functions to return mock objects that can be chained
+        mock_col_instance = Mock()
+        mock_col_instance.alias.return_value = "mocked_col_with_alias"
+        mock_col.return_value = mock_col_instance
+
+        mock_explode_instance = Mock()
+        mock_explode_instance.alias.return_value = "mocked_explode_with_alias"
+        mock_explode.return_value = mock_explode_instance
+
+        # Mock date functions
+        mock_year.return_value = "mocked_year"
+        mock_month.return_value = "mocked_month"
+        mock_dayofmonth.return_value = "mocked_day"
+
+        # Test - this calls the REAL function with mocked Spark functions
+        result = explode_and_flatten_actions(mock_rules_df)
+
+        # Assertions
+        self.assertEqual(
+            result, mock_with_day_df
+        )  # Final result should be the last DataFrame in the chain
+        self.assertEqual(mock_rules_df.select.call_count, 1)
+        self.assertEqual(mock_with_actions_df.select.call_count, 1)
+
+        # Verify each DataFrame's withColumn was called once
+        mock_flat_df.withColumn.assert_called_once()
+        mock_with_year_df.withColumn.assert_called_once()
+        mock_with_month_df.withColumn.assert_called_once()
+
+    @patch("load_comms_manager_rules.dayofmonth")
+    @patch("load_comms_manager_rules.month")
+    @patch("load_comms_manager_rules.year")
+    @patch("load_comms_manager_rules.explode")
+    @patch("load_comms_manager_rules.col")
+    def test_explode_and_flatten_actions_with_optional_fields(
+        self, mock_col, mock_explode, mock_year, mock_month, mock_dayofmonth
+    ):
+        """Test that explode_and_flatten_actions handles optional fields gracefully using col()."""
+        # Mock DataFrame chain
+        mock_rules_df = Mock(spec=DataFrame)
+        mock_with_actions_df = Mock(spec=DataFrame)
+        mock_flat_df = Mock(spec=DataFrame)
+
+        mock_with_year_df = Mock(spec=DataFrame)
+        mock_with_month_df = Mock(spec=DataFrame)
+        mock_with_day_df = Mock(spec=DataFrame)
+
+        mock_rules_df.select.return_value = mock_with_actions_df
+        mock_with_actions_df.select.return_value = mock_flat_df
+
+        # Chain the withColumn calls
+        mock_flat_df.withColumn.return_value = mock_with_year_df
+        mock_with_year_df.withColumn.return_value = mock_with_month_df
+        mock_with_month_df.withColumn.return_value = mock_with_day_df
+        mock_with_day_df.count.return_value = 10
+
+        # Mock col() to return objects with alias method (for optional fields)
+        mock_col_instance = Mock()
+        mock_col_instance.alias.return_value = "mocked_col_with_alias"
+        mock_col.return_value = mock_col_instance
+
+        # Mock explode function
+        mock_explode_instance = Mock()
+        mock_explode_instance.alias.return_value = "mocked_explode_with_alias"
+        mock_explode.return_value = mock_explode_instance
+
+        # Mock date functions
+        mock_year.return_value = "mocked_year"
+        mock_month.return_value = "mocked_month"
+        mock_dayofmonth.return_value = "mocked_day"
+
+        # Test - this calls the REAL function
+        result = explode_and_flatten_actions(mock_rules_df)
+
+        # Verify the function completed successfully
+        self.assertEqual(result, mock_with_day_df)
+
+        # Verify col() was called for optional fields (should be called multiple times)
+        # The function uses col() for: generated_at, status, and all scope/action fields except IDs
+        self.assertGreater(
+            mock_col.call_count,
+            10,
+            "col() should be called multiple times for optional fields",
+        )
+
+        # Verify specific col() calls for key optional fields
+        expected_col_calls = [
+            call("generated_at"),
+            call("rule.status"),
+            call("rule.scope.business_context"),
+            call("rule.scope.category"),
+            call("action.notification_type"),
+            call("action.templates.subject_template"),
+        ]
+
+        # Check that some of our expected col() calls were made
+        for expected_call in expected_col_calls[
+            :3
+        ]:  # Check first 3 to avoid over-asserting
+            self.assertIn(
+                expected_call,
+                mock_col.call_args_list,
+                f"Expected col() call {expected_call} not found",
+            )
+
+        # Verify select operations were called properly
+        mock_rules_df.select.assert_called_once()
+        mock_with_actions_df.select.assert_called_once()
+
+        # Verify date columns were added
+        self.assertEqual(mock_flat_df.withColumn.call_count, 1)
+        self.assertEqual(mock_with_year_df.withColumn.call_count, 1)
+        self.assertEqual(mock_with_month_df.withColumn.call_count, 1)
+
+        # Verify Spark functions were called correctly
+        mock_col.assert_any_call("rule.scope.profile")
+        mock_col.assert_any_call("action.profile")
+        mock_explode.assert_called_with("rule.actions")
+
+        # Verify date functions were called
+        mock_year.assert_called_once_with(mock_col.return_value)
+        mock_month.assert_called_once_with(mock_col.return_value)
+        mock_dayofmonth.assert_called_once_with(mock_col.return_value)
+
+    @patch("load_comms_manager_rules.explode_and_flatten_actions")
+    @patch("load_comms_manager_rules.explode_rules")
+    @patch("load_comms_manager_rules.read_communication_rules_json")
+    def test_process_communication_rules_success(
+        self, mock_read_json, mock_explode_rules, mock_explode_actions
+    ):
+        """Test complete processing pipeline."""
+        # Mock the pipeline
+        mock_raw_df = Mock(spec=DataFrame)
+        mock_rules_df = Mock(spec=DataFrame)
+        mock_flat_df = Mock(spec=DataFrame)
+
+        mock_read_json.return_value = mock_raw_df
+        mock_explode_rules.return_value = mock_rules_df
+        mock_explode_actions.return_value = mock_flat_df
+
+        # Test
+        result = process_communication_rules("s3://test-path/file.json")
+
+        # Assertions
+        self.assertEqual(result, mock_flat_df)
+        mock_read_json.assert_called_once_with("s3://test-path/file.json")
+        mock_explode_rules.assert_called_once_with(mock_raw_df)
+        mock_explode_actions.assert_called_once_with(mock_rules_df)
+
+    @patch("load_comms_manager_rules.read_communication_rules_json")
+    def test_process_communication_rules_exception(self, mock_read_json):
+        """Test exception handling in processing pipeline."""
+        # Mock exception
+        mock_read_json.side_effect = Exception("Processing failed")
+
+        # Test
+        with self.assertRaises(Exception) as context:
+            process_communication_rules("s3://error-path/file.json")
+
+        self.assertIn("Processing failed", str(context.exception))
+
+
+class TestS3LoaderFunction(unittest.TestCase):
+    """Test cases for S3Loader writing function."""
+
+    @patch("load_comms_manager_rules.S3Loader")
+    @patch("load_comms_manager_rules.SparkTableStorageFormat")
+    def test_write_dataframe_with_s3_loader_success(
+        self, mock_storage_format, mock_s3_loader_class
+    ):
+        """Test successful DataFrame writing with S3Loader."""
+        # Mock DataFrame
+        mock_df = Mock(spec=DataFrame)
+        mock_df.count.return_value = 100
+
+        # Mock S3Loader
+        mock_s3_loader = Mock()
+        mock_s3_loader_class.return_value = mock_s3_loader
+        mock_storage_format.DEFAULT_RAW = "JSON"
+
+        # Test with partitions
+        write_dataframe_with_s3_loader(
+            mock_df, "s3://bucket/path/", "['year', 'month', 'day']"
+        )
+
+        # Assertions
+        mock_s3_loader_class.assert_called_once()
+        mock_s3_loader.load_df.assert_called_once_with(
+            df=mock_df,
+            s3_path="s3://bucket/path/",
+            format_options="JSON",
+            partitions=["year", "month", "day"],
+            optimize_dataframe=False,
+        )
+
+    @patch("load_comms_manager_rules.S3Loader")
+    @patch("load_comms_manager_rules.SparkTableStorageFormat")
+    def test_write_dataframe_with_s3_loader_no_partitions(
+        self, mock_storage_format, mock_s3_loader_class
+    ):
+        """Test DataFrame writing without partitions."""
+        # Mock DataFrame
+        mock_df = Mock(spec=DataFrame)
+        mock_df.count.return_value = 50
+
+        # Mock S3Loader
+        mock_s3_loader = Mock()
+        mock_s3_loader_class.return_value = mock_s3_loader
+        mock_storage_format.DEFAULT_RAW = "JSON"
+
+        # Test without partitions
+        write_dataframe_with_s3_loader(mock_df, "s3://bucket/path/", None)
+
+        # Assertions
+        mock_s3_loader.load_df.assert_called_once_with(
+            df=mock_df,
+            s3_path="s3://bucket/path/",
+            format_options="JSON",
+            partitions=None,
+            optimize_dataframe=False,
+        )
+
+    @patch("load_comms_manager_rules.S3Loader")
+    def test_write_dataframe_with_s3_loader_invalid_partitions(
+        self, mock_s3_loader_class
+    ):
+        """Test handling of invalid partition format."""
+        # Mock DataFrame
+        mock_df = Mock(spec=DataFrame)
+        mock_df.count.return_value = 75
+
+        # Mock S3Loader
+        mock_s3_loader = Mock()
+        mock_s3_loader_class.return_value = mock_s3_loader
+
+        # Test with invalid partition format
+        write_dataframe_with_s3_loader(mock_df, "s3://bucket/path/", "invalid_format")
+
+        # Should call with partitions=None due to parsing error
+        mock_s3_loader.load_df.assert_called_once()
+        call_args = mock_s3_loader.load_df.call_args
+        self.assertIsNone(call_args[1]["partitions"])
+
+    @patch("load_comms_manager_rules.S3Loader")
+    def test_write_dataframe_with_s3_loader_exception(self, mock_s3_loader_class):
+        """Test exception handling in S3Loader writing."""
+        # Mock DataFrame
+        mock_df = Mock(spec=DataFrame)
+
+        # Mock S3Loader to raise exception
+        mock_s3_loader = Mock()
+        mock_s3_loader_class.return_value = mock_s3_loader
+        mock_s3_loader.load_df.side_effect = Exception("S3 write failed")
+
+        # Test
+        with self.assertRaises(Exception) as context:
+            write_dataframe_with_s3_loader(mock_df, "s3://bucket/path/", None)
+
+        self.assertIn("S3 write failed", str(context.exception))
+
+
+class TestArgumentParsing(unittest.TestCase):
+    """Test cases for argument parsing function."""
+
+    @patch(
+        "sys.argv",
+        [
+            "script.py",
+            "prod",
+            "bucket",
+            "dag",
+            "schema",
+            "table",
+            "['year']",
+            "s3://path/",
+            "2024-01-01",
+        ],
+    )
+    def test_parse_arguments_success(self):
+        """Test successful argument parsing."""
+        args = parse_arguments()
+
+        self.assertEqual(args.environment, "prod")
+        self.assertEqual(args.datalake_bucket, "bucket")
+        self.assertEqual(args.dag_name, "dag")
+        self.assertEqual(args.schema, "schema")
+        self.assertEqual(args.table_name, "table")
+        self.assertEqual(args.partitions, "['year']")
+        self.assertEqual(args.execution_date, "2024-01-01")
+        self.assertEqual(args.comms_manager_rules_path, "s3://path/")
+
+    @patch(
+        "sys.argv",
+        [
+            "script.py",
+            "prod",
+            "bucket",
+            "dag",
+            "schema",
+            "table",
+            "s3://path/",
+            "2024-01-01",
+        ],
+    )
+    def test_parse_arguments_optional_partitions(self):
+        """Test argument parsing with optional partitions."""
+        args = parse_arguments()
+
+        self.assertEqual(args.environment, "prod")
+        self.assertEqual(args.datalake_bucket, "bucket")
+        self.assertEqual(args.dag_name, "dag")
+        self.assertEqual(args.schema, "schema")
+        self.assertEqual(args.table_name, "table")
+        self.assertIsNone(args.partitions)  # Should be None when not provided
+        self.assertEqual(args.execution_date, "2024-01-01")
+        self.assertEqual(args.comms_manager_rules_path, "s3://path/")
+
+
+class TestMainFunction(unittest.TestCase):
+    """Test cases for main function."""
+
+    # Using fixtures from conftest.py instead of setUp
+
+    @patch("load_comms_manager_rules.write_dataframe_with_s3_loader")
+    @patch("load_comms_manager_rules.process_communication_rules")
+    @patch("load_comms_manager_rules.get_last_version")
+    @patch("load_comms_manager_rules.parse_arguments")
+    @patch("load_comms_manager_rules.logging.basicConfig")
+    def test_main_success(
+        self,
+        mock_logging_config,
+        mock_parse_args,
+        mock_get_version,
+        mock_process_rules,
+        mock_write_s3,
+    ):
+        """Test successful main function execution."""
+        # Create mock arguments
+
+        mock_args = Namespace(
+            environment="prod",
+            datalake_bucket="test-bucket",
+            dag_name="comms_manager_rules",
+            schema="comms_manager",
+            table_name="comms_manager_rules",
+            partitions="['year', 'month', 'day']",
+            execution_date="2024-01-01",
+            comms_manager_rules_path="s3://comms-manager-{environment}/notification-rules/versions/",
+        )
+        mock_parse_args.return_value = mock_args
+
+        # Mock pipeline
+        mock_get_version.return_value = "s3://path/latest-file.json"
+        mock_processed_dataframe = Mock(spec=DataFrame)
+        mock_process_rules.return_value = mock_processed_dataframe
+
+        # Test
+        main()
+
+        # Assertions
+        mock_parse_args.assert_called_once()
+        mock_logging_config.assert_called_once()
+        mock_get_version.assert_called_once_with(
+            "s3://comms-manager-prod/notification-rules/versions/"
+        )
+        mock_process_rules.assert_called_once_with("s3://path/latest-file.json")
+        mock_write_s3.assert_called_once_with(
+            mock_processed_dataframe,
+            "s3://test-bucket/raw/comms_manager/comms_manager_rules",
+            "['year', 'month', 'day']",
+        )
+        mock_processed_dataframe.printSchema.assert_called_once()
+
+    @patch("load_comms_manager_rules.get_last_version")
+    @patch("load_comms_manager_rules.parse_arguments")
+    @patch("load_comms_manager_rules.logging.basicConfig")
+    def test_main_no_files_found(
+        self, mock_logging_config, mock_parse_args, mock_get_version
+    ):
+        """Test main function when no files are found."""
+        # Create mock arguments
+
+        mock_args = Namespace(
+            environment="prod",
+            datalake_bucket="test-bucket",
+            dag_name="comms_manager_rules",
+            schema="comms_manager",
+            table_name="comms_manager_rules",
+            partitions="['year', 'month', 'day']",
+            execution_date="2024-01-01",
+            comms_manager_rules_path="s3://comms-manager-{environment}/notification-rules/versions/",
+        )
+        mock_parse_args.return_value = mock_args
+
+        # Mock no files found
+        mock_get_version.return_value = None
+
+        # Test
+        result = main()
+
+        # Assertions
+        self.assertIsNone(result)  # Should return None when no files
+        mock_get_version.assert_called_once_with(
+            "s3://comms-manager-prod/notification-rules/versions/"
+        )
+
+    @patch("load_comms_manager_rules.get_last_version")
+    @patch("load_comms_manager_rules.parse_arguments")
+    @patch("load_comms_manager_rules.logging.basicConfig")
+    def test_main_exception_handling(
+        self, mock_logging_config, mock_parse_args, mock_get_version
+    ):
+        """Test main function exception handling."""
+        # Create mock arguments
+
+        mock_args = Namespace(
+            environment="prod",
+            datalake_bucket="test-bucket",
+            dag_name="comms_manager_rules",
+            schema="comms_manager",
+            table_name="comms_manager_rules",
+            partitions="['year', 'month', 'day']",
+            execution_date="2024-01-01",
+            comms_manager_rules_path="s3://comms-manager-{environment}/notification-rules/versions/",
+        )
+        mock_parse_args.return_value = mock_args
+
+        # Mock exception
+        mock_get_version.side_effect = Exception("Test exception")
+
+        # Test
+        with self.assertRaises(Exception) as context:
+            main()
+
+        self.assertIn("Test exception", str(context.exception))
+
+
+class TestIntegration(unittest.TestCase):
+    """Integration test cases."""
+
+    @patch("load_comms_manager_rules.write_dataframe_with_s3_loader")
+    @patch("load_comms_manager_rules.explode_and_flatten_actions")
+    @patch("load_comms_manager_rules.explode_rules")
+    @patch("load_comms_manager_rules.read_communication_rules_json")
+    @patch("load_comms_manager_rules.get_last_version")
+    def test_full_pipeline_integration(
+        self,
+        mock_get_version,
+        mock_read_json,
+        mock_explode_rules,
+        mock_explode_actions,
+        mock_write_s3,
+    ):
+        """Test full pipeline integration."""
+        # Mock the entire pipeline
+        mock_get_version.return_value = "s3://path/file.json"
+
+        mock_raw_df = Mock(spec=DataFrame)
+        mock_rules_df = Mock(spec=DataFrame)
+        mock_flat_df = Mock(spec=DataFrame)
+
+        mock_read_json.return_value = mock_raw_df
+        mock_explode_rules.return_value = mock_rules_df
+        mock_explode_actions.return_value = mock_flat_df
+
+        # Test
+        result = process_communication_rules("s3://test-path/file.json")
+
+        # Assertions
+        self.assertEqual(result, mock_flat_df)
+        mock_read_json.assert_called_once_with("s3://test-path/file.json")
+        mock_explode_rules.assert_called_once_with(mock_raw_df)
+        mock_explode_actions.assert_called_once_with(mock_rules_df)
+
+
+if __name__ == "__main__":
+    unittest.main()

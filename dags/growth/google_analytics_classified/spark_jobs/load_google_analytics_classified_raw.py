@@ -1,5 +1,5 @@
 from argparse import ArgumentParser
-from bietlejuice.base.api import APIEnum
+from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat, SparkDataFrameService
 from bietlejuice.clients.db_clients import SparkClient

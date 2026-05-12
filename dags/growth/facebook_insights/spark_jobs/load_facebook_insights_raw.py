@@ -10,7 +10,7 @@ from quintoandar_facebook_api_client.clients import FacebookClient
 from bietlejuice.formatters import StringFormatter
 from bietlejuice.base.spark import SparkTableStorageFormat, BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.base.api import APIEnum
+from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkDataFrameService
 from bietlejuice.services.metastore_services import SparkMetastoreService

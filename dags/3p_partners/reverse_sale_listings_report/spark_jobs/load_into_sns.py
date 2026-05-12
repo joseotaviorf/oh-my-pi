@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from datetime import datetime, date
 from typing import Tuple, List
 import boto3
-from bietlejuice.services import ConfigurationService
+from bietlejuice.services.configuration_service import ConfigurationService
 from pyspark.sql.functions import make_date
 from quintoandar_logger import QuintoAndarLogger
 

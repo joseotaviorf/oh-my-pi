@@ -1,3 +1,83 @@
-[tool.black]
+# Root pyproject.toml — not a buildable package.
+# Per-package configuration (pytest, coverage, uv) lives in packages/*/pyproject.toml.
+# Shared tool configuration (ruff, sqlfluff) lives here so every package inherits it.
+#
+# bietlejuice-runtime is INTENTIONALLY NOT a workspace member. It is a
+# standalone uv project (its own pyproject.toml + uv.lock + .venv) because
+# the libraries DBR 12.2 / 13.3 / 16.4 ship are far older than what
+# apache-airflow 2.11 (Astro Runtime 13.4) requires; a single workspace
+# lockfile cannot satisfy both worlds. See packages/bietlejuice-runtime/README.md
+# for the full rationale and IDE setup.
+
+[tool.uv.workspace]
+members = [
+    "packages/bietlejuice-core",
+    "packages/bietlejuice-airflow",
+    "packages/bietlejuice-compiler",
+]
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+# Old QuintoAndar API clients pin ancient transitive deps. These overrides
+# tell the resolver to ignore those constraints workspace-wide and use the
+# versions we actually run in production (DBR 16.4 / Airflow 2.10.4).
+override-dependencies = [
+    "requests>=2.32.3",        # validations-engine, tracksale, chattermill, criteo pin 2.23/2.28; let runtime provide newer if available
+    "tenacity>=8.2.2",         # braze pins 4.12, survicate/omie/velo/hr-system pin 5.0
+    "pyspark==3.5.3",          # braze pins 2.4.3; DBR 16.4 ships 3.5.2, delta-spark requires ==3.5.3
+    "quintoandar-logger>=0.4.0", # most API clients pin ==0.8.0; we install 0.8.1 from git
+]
+
+# Declare quintoandar-logger at the workspace root so the VCS source applies
+# to all members and their transitive deps (e.g. the old API client packages).
+# bietlejuice-runtime declares its own equivalent entry locally because it
+# is not a workspace member.
+[tool.uv.sources]
+quintoandar-logger = { git = "https://github.com/quintoandar/python-logger", tag = "0.8.1" }
+
+# ---------------------------------------------------------------------------
+# Ruff — shared across all packages (ruff walks up the directory tree).
+# ---------------------------------------------------------------------------
+[tool.ruff]
 line-length = 88
-include = '(bietlejuice/|tests/unit/composer/|cli/emr/src/emr/).*\.py$'
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP"]
+ignore = ["UP006", "UP007", "UP035", "UP038"]  # keep Optional, Union, List, Dict; allow isinstance(x, (a, b))
+
+[tool.ruff.lint.isort]
+known-first-party = ["bietlejuice"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# ---------------------------------------------------------------------------
+# SQLFluff — repo-wide SQL linting for queries/ and dags/.
+# ---------------------------------------------------------------------------
+[tool.sqlfluff.core]
+dialect = "sparksql"
+templater = "jinja"
+max_line_length = 120
+ignore = "templating"
+
+[tool.sqlfluff.rules.capitalisation.keywords]
+capitalisation_policy = "upper"
+
+[tool.sqlfluff.rules.capitalisation.identifiers]
+capitalisation_policy = "lower"
+
+[tool.sqlfluff.rules.capitalisation.functions]
+extended_capitalisation_policy = "upper"
+ignore_words = "None"
+ignore_words_regex = "None"
+
+[tool.sqlfluff.rules.capitalisation.literals]
+capitalisation_policy = "upper"
+
+[tool.sqlfluff.rules.aliasing.table]
+aliasing = "explicit"
+
+[tool.sqlfluff.rules.aliasing.column]
+aliasing = "explicit"

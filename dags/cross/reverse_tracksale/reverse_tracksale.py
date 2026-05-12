@@ -13,7 +13,8 @@ from databricks_plugin import (
 )
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
-from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import DatabricksGroupNameEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.dataset_service import DatasetService
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder

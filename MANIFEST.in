@@ -1,7 +1,0 @@
-recursive-include bietlejuice/db *
-recursive-include bietlejuice/ *.y*ml
-recursive-include dags/ **/*_conf.y*ml
-recursive-include dags/ **/spark_jobs/*_conf.y*ml
-recursive-include dags/ **/gsheets_files.yaml
-recursive-include dags/ **/gsheets_*_declaration.y*ml
-recursive-include dags/ **/*_api_declaration.y*ml

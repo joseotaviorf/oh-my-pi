@@ -12,7 +12,7 @@ from pyspark.sql.types import StructField, StructType, StringType
 from quintoandar_gsheets_api_client.producer import GoogleSheetsWriter
 from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
 
-from bietlejuice.base.api import APIEnum
+from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.api_consumers.gsheets_consumer import GsheetsConsumer

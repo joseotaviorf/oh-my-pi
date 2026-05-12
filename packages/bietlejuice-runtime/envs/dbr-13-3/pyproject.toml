@@ -1,0 +1,76 @@
+# Local-only dev project: a venv that mirrors Databricks Runtime 13.3 LTS.
+# https://docs.databricks.com/aws/en/release-notes/runtime/13.3lts
+#
+# This pyproject is NEVER published as a wheel. Its only job is to feed
+# `uv sync` so the resulting .venv has every DBR 13.3-bundled Python library
+# pinned to the exact version the cluster ships, plus bietlejuice-runtime and
+# bietlejuice-core in editable mode for local development.
+#
+# Refresh procedure: re-pull the "Installed Python libraries" table from the
+# release notes URL above when DBR 13.3 receives a maintenance update, then
+# update the version pins below.
+#
+# Packages NOT pre-installed by DBR 13.3 (omitted here; install separately if
+# needed for local dev): google-auth, opentelemetry-api, opentelemetry-sdk,
+# PyYAML.
+
+[project]
+name = "bietlejuice-runtime-env-dbr-13-3"
+version = "0.0.0"
+description = "Local-only env: bietlejuice-runtime against DBR 13.3 LTS pinned libs (Python 3.10.12)"
+# Narrow to DBR 13.3's exact Python so uv resolves a single (Python × pin)
+# combination — no per-Python-version splits, no per-extra splits.
+requires-python = ">=3.10,<3.11"
+dependencies = [
+    "bietlejuice-runtime",
+    # DBR 13.3 LTS bundled Python libraries.
+    # psycopg2-binary (not psycopg2) is intentional — see envs/dbr-16-4/pyproject.toml
+    # for the rationale. Local-only, never deployed.
+    "psycopg2-binary==2.9.3",
+    "databricks-sdk==0.1.6",
+    "ipython==8.10.0",
+    "joblib==1.2.0",
+    "numpy==1.21.5",
+    "pandas==1.4.4",
+    "pydantic==1.10.6",
+    "python-dateutil==2.8.2",
+    "tenacity==8.1.0",
+    "urllib3==1.26.11",
+    "cryptography==37.0.1",
+    "pyarrow==8.0.0",
+    # DBR 13.3 ships grpcio==1.48.1, but its cp310 macOS wheel is x86_64-only
+    # (no arm64). 1.62.0 is the first cp310 release with a universal2 wheel,
+    # so Apple Silicon devs can install without compiling. The wheel itself
+    # does NOT depend on grpcio at this exact version; on the cluster, DBR's
+    # pre-installed grpcio 1.48.1 wins on sys.path. Local-only.
+    "grpcio==1.62.0",
+]
+
+[tool.uv.sources]
+bietlejuice-runtime = { path = "../..", editable = true }
+bietlejuice-core    = { path = "../../../bietlejuice-core", editable = true }
+quintoandar-logger  = { git = "https://github.com/quintoandar/python-logger", tag = "0.8.1" }
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+# This pyproject is a local-only env shim; it has no source code of its own
+# and is never published. `package = false` tells uv not to invoke a build
+# backend for it, so we don't need [build-system] / [tool.hatch.build...].
+package = false
+# Mirror of runtime's overrides — keep in sync with
+# packages/bietlejuice-runtime/pyproject.toml.
+override-dependencies = [
+    "requests>=2.32.3",
+    "tenacity>=8.0.1",
+    "pyspark==3.5.3",
+    "quintoandar-logger>=0.4.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==8.3.5",
+    "pytest-cov",
+    "moto[s3]",
+    "bietlejuice-core",
+    "quintoandar-logger>=0.4.0",
+]

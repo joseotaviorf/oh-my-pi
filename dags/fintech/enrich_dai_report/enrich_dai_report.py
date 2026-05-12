@@ -19,7 +19,8 @@ from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.databricks import DatabricksGroupNameEnum, ClusterPermissionEnum
+from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import DatabricksGroupNameEnum
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 from bietlejuice.services.dataset_service import DatasetService
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder

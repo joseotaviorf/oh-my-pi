@@ -7,7 +7,7 @@ from datetime import datetime, date, timezone
 from uuid import uuid4
 
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.services import ConfigurationService
+from bietlejuice.services.configuration_service import ConfigurationService
 
 from quintoandar_logger import QuintoAndarLogger
 

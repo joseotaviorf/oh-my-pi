@@ -2,15 +2,44 @@
 # `event: [push, tag]` with branch and path in one `when` object. Skipped steps count as
 # success so upstream `depends_on: lint/tests/validations` still passes.
 #
-# Wheel / create-dag / upload chains share YAML anchors so path predicates stay identical
-# within each chain (avoid skipping `make package` while a dependent step still runs).
-# API ingestion declaration YAML under dags/ is packaged in the wheel (MANIFEST.in); the
-# wheel must rebuild when those files change so Databricks reads current declarations.
+# This file uses two YAML anchors as the only sources of truth for path predicates:
 #
-# IMPORTANT: astronomer-deploy-dags-{env} depends_on upload-dag-packages-dags-s3-{env},
-# so *astronomer_deploy_path must be a subset of *upload_dags_path. Do NOT add paths here
-# (e.g. `bietlejuice/**`) that are not also covered by *upload_dags_path, or Woodpecker
-# will error with "depends on unknown step" when only those paths change.
+#   *wheel_package_path   — fires the wheel-build / publish chain
+#                           (make-package-python -> prepare-release-* -> export-releases-to-s3-*)
+#
+#   *dag_bundle_sync_path — fires the DAG-bag delivery chain
+#                           (create-dag-files -> stage-bietlejuice-tree
+#                            -> upload-bi-etl-ejuice-modules-s3-* + upload-dag-packages-dags-s3-*
+#                            -> astronomer-deploy-dags-*)
+#
+# CRITICAL: every step inside a chain MUST reuse the chain's anchor. Within a chain
+# the steps have hard `depends_on` links — if an upstream filter is narrower than a
+# downstream filter, the upstream step is skipped on a push that matches only the
+# downstream paths, and Woodpecker treats a skipped dep the same as a failed dep,
+# cascade-skipping the whole tail. The previous setup had three separate, drifting
+# anchors for the DAG-bag chain (`&bietlejuice_sync_path`, `&upload_dags_path`,
+# `&astronomer_deploy_path`) which silently kept library-only changes from ever
+# triggering `astronomer-deploy-dags-*`, leaving the live DAG bag stale.
+#
+# Repo layout note: `bietlejuice` is split across `packages/bietlejuice-core/src/bietlejuice/`
+# and `packages/bietlejuice-airflow/src/bietlejuice/`. The Astronomer DAG bundle still
+# expects a single `bietlejuice/` tree under `s3://{bucket}/astronomer/dags/`, so the
+# `stage-bietlejuice-tree` step below merges both into `staging/bietlejuice/` before
+# `upload-bi-etl-ejuice-modules-s3-{env}` mirrors it to S3.
+#
+# `setup` runs `uv sync` for the compiler workspace once before any parallel Python
+# steps. Without it, several release steps share the repo workspace and concurrent
+# `uv run --project packages/bietlejuice-compiler` races on `.venv` (intermittent CI
+# failure). Same pattern as `.woodpecker/validations.yml` + `depends_on: [setup]`.
+#
+# Wheel pipeline (`make-package-python` -> `prepare-release-*` -> `export-releases-to-s3-*`):
+# `make build` produces TWO wheels into `dist/` — `bietlejuice_core-*.whl` and
+# `bietlejuice_runtime-*.whl`. These are the wheels Spark/Databricks/EMR jobs install
+# via `default_libraries` / `emr_init_script.sh`. The Airflow wheel is intentionally NOT
+# published here because Airflow code is shipped via the Astro DAG bundle (see
+# stage-bietlejuice-tree), not pip-installed on Spark workers. The legacy
+# `bi_etl_ejuice-latest` alias was retired with this change; consumers were migrated to
+# install both `bietlejuice_core-latest` and `bietlejuice_runtime-latest`.
 
 depends_on:
   - lint
@@ -24,31 +53,49 @@ clone:
       partial: false # We need to clone the entire history to find the changed files
 
 steps:
-  make-package-python:
-    image: public.ecr.aws/docker/library/python:3.9.5
+  setup:
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - make package
+      - apt-get update -qq && apt-get install -y --no-install-recommends make git
+      - pip install uv
+      - uv sync --project packages/bietlejuice-compiler
+    when:
+      event: [push, tag]
+
+  make-package-python:
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    commands:
+      - apt-get update -qq && apt-get install -y --no-install-recommends make git
+      - pip install uv
+      # `make build` runs `uv build` for bietlejuice-core and bietlejuice-runtime; uv
+      # writes both wheels (and sdists) into the workspace-root `dist/`, which is what
+      # `prepare-release-*` and `export-releases-to-s3-*` consume.
+      - make build
     when:
       event: [push, tag]
       branch: [master, forno, hotfix/*]
       path: &wheel_package_path
-          include:
-            - 'bietlejuice/**'
-            - 'setup.py'
-            - 'setup.cfg'
-            - 'pyproject.toml'
-            - 'MANIFEST.in'
-            - 'dags/**/*_api_declaration.y*ml'
-            - 'dags/**/spark_jobs/*_conf.y*ml'
-            - 'requirements.txt'
-            - 'requirements-*.txt'
-            - 'Makefile'
-          on_empty: false
+        include:
+          - "packages/bietlejuice-core/**"
+          - "packages/bietlejuice-runtime/**"
+          - "pyproject.toml"
+          - "uv.lock"
+          - "dags/**/*_api_declaration.y*ml"
+          - "dags/**/spark_jobs/*_conf.y*ml"
+          - "requirements.txt"
+          - "requirements-*.txt"
+          - "Makefile"
+        on_empty: false
+    depends_on: [setup]
 
   prepare-release-forno:
     image: public.ecr.aws/docker/library/alpine:3.10
     commands:
-      - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec mv '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
+      # forno only ever publishes the latest build, so we `mv` the versioned wheels to
+      # their `*-latest-*` aliases. dist/ ends up with exactly two files which
+      # `export-releases-to-s3-forno` mirrors to S3.
+      - find . -wholename "./dist/bietlejuice_core-*.whl" -not -name "*-latest-*" -exec mv '{}' ./dist/bietlejuice_core-latest-py3-none-any.whl \;
+      - find . -wholename "./dist/bietlejuice_runtime-*.whl" -not -name "*-latest-*" -exec mv '{}' ./dist/bietlejuice_runtime-latest-py3-none-any.whl \;
     when:
       event: push
       branch: forno
@@ -58,7 +105,11 @@ steps:
   prepare-release-prod:
     image: public.ecr.aws/docker/library/alpine:3.10
     commands:
-      - find . -wholename "./dist/bi_etl_ejuice-*-py3-none-any.whl" -exec cp '{}' ./dist/bi_etl_ejuice-latest-py3-none-any.whl \;
+      # prod copies (not moves), so both versioned wheels (e.g. bietlejuice_core-0.1.0.whl)
+      # and `*-latest-*` aliases get uploaded — versioned ones provide rollback targets
+      # in S3 (s3://artifacts.s3.data.../bi-etl-ejuice/).
+      - find . -wholename "./dist/bietlejuice_core-*.whl" -not -name "*-latest-*" -exec cp '{}' ./dist/bietlejuice_core-latest-py3-none-any.whl \;
+      - find . -wholename "./dist/bietlejuice_runtime-*.whl" -not -name "*-latest-*" -exec cp '{}' ./dist/bietlejuice_runtime-latest-py3-none-any.whl \;
     when:
       event: [push, tag]
       branch: [master, hotfix/*]
@@ -99,9 +150,9 @@ steps:
     image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
-      source: scripts/init_script.sh
+      source: packages/bietlejuice-compiler/scripts/init_script.sh
       target: bi-etl-ejuice/
-      strip_prefix: scripts/
+      strip_prefix: packages/bietlejuice-compiler/scripts/
       acl: bucket-owner-full-control
       cache_control: no-cache
     when:
@@ -109,16 +160,16 @@ steps:
       branch: forno
       path:
         include:
-          - 'scripts/init_script.sh'
+          - "packages/bietlejuice-compiler/scripts/init_script.sh"
         on_empty: false
 
   export-emr-init-script-to-s3-forno:
     image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
-      source: scripts/emr_init_script.sh
+      source: packages/bietlejuice-compiler/scripts/emr_init_script.sh
       target: bi-etl-ejuice/
-      strip_prefix: scripts/
+      strip_prefix: packages/bietlejuice-compiler/scripts/
       acl: bucket-owner-full-control
       cache_control: no-cache
     when:
@@ -126,16 +177,16 @@ steps:
       branch: forno
       path:
         include:
-          - 'scripts/emr_init_script.sh'
+          - "packages/bietlejuice-compiler/scripts/emr_init_script.sh"
         on_empty: false
 
   export-install-pex-init-script-forno:
     image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
-      source: scripts/wonka/install_pex_generic.sh
+      source: packages/bietlejuice-compiler/scripts/wonka/install_pex_generic.sh
       target: bi-etl-ejuice/
-      strip_prefix: scripts/wonka/
+      strip_prefix: packages/bietlejuice-compiler/scripts/wonka/
       acl: bucket-owner-full-control
       cache_control: no-cache
     when:
@@ -143,16 +194,16 @@ steps:
       branch: forno
       path:
         include:
-          - 'scripts/wonka/install_pex_generic.sh'
+          - "packages/bietlejuice-compiler/scripts/wonka/install_pex_generic.sh"
         on_empty: false
 
   export-vault-secrets-init-script-forno:
     image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
-      source: scripts/wonka/get_credentials_from_vault.sh
+      source: packages/bietlejuice-compiler/scripts/wonka/get_credentials_from_vault.sh
       target: bi-etl-ejuice/
-      strip_prefix: scripts/wonka/
+      strip_prefix: packages/bietlejuice-compiler/scripts/wonka/
       acl: bucket-owner-full-control
       cache_control: no-cache
     when:
@@ -160,16 +211,16 @@ steps:
       branch: forno
       path:
         include:
-          - 'scripts/wonka/get_credentials_from_vault.sh'
+          - "packages/bietlejuice-compiler/scripts/wonka/get_credentials_from_vault.sh"
         on_empty: false
 
   export-install-spark-metrics-plugin-forno:
     image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
-      source: scripts/wonka/install_spark_metrics_plugin.sh
+      source: packages/bietlejuice-compiler/scripts/wonka/install_spark_metrics_plugin.sh
       target: bi-etl-ejuice/
-      strip_prefix: scripts/wonka/
+      strip_prefix: packages/bietlejuice-compiler/scripts/wonka/
       acl: bucket-owner-full-control
       cache_control: no-cache
     when:
@@ -177,16 +228,16 @@ steps:
       branch: forno
       path:
         include:
-          - 'scripts/wonka/install_spark_metrics_plugin.sh'
+          - "packages/bietlejuice-compiler/scripts/wonka/install_spark_metrics_plugin.sh"
         on_empty: false
 
   export-init-script-to-s3-prod:
     image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
-      source: scripts/init_script.sh
+      source: packages/bietlejuice-compiler/scripts/init_script.sh
       target: bi-etl-ejuice/
-      strip_prefix: scripts/
+      strip_prefix: packages/bietlejuice-compiler/scripts/
       acl: bucket-owner-full-control
       cache_control: no-cache
     when:
@@ -194,16 +245,16 @@ steps:
       branch: [master, hotfix/*]
       path:
         include:
-          - 'scripts/init_script.sh'
+          - "packages/bietlejuice-compiler/scripts/init_script.sh"
         on_empty: false
 
   export-emr-init-script-to-s3-prod:
     image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
-      source: scripts/emr_init_script.sh
+      source: packages/bietlejuice-compiler/scripts/emr_init_script.sh
       target: bi-etl-ejuice/
-      strip_prefix: scripts/
+      strip_prefix: packages/bietlejuice-compiler/scripts/
       acl: bucket-owner-full-control
       cache_control: no-cache
     when:
@@ -211,16 +262,16 @@ steps:
       branch: [master, hotfix/*]
       path:
         include:
-          - 'scripts/emr_init_script.sh'
+          - "packages/bietlejuice-compiler/scripts/emr_init_script.sh"
         on_empty: false
 
   export-install-pex-init-script-prod:
     image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
-      source: scripts/wonka/install_pex_generic.sh
+      source: packages/bietlejuice-compiler/scripts/wonka/install_pex_generic.sh
       target: bi-etl-ejuice/
-      strip_prefix: scripts/wonka/
+      strip_prefix: packages/bietlejuice-compiler/scripts/wonka/
       acl: bucket-owner-full-control
       cache_control: no-cache
     when:
@@ -228,16 +279,16 @@ steps:
       branch: [master, hotfix/*]
       path:
         include:
-          - 'scripts/wonka/install_pex_generic.sh'
+          - "packages/bietlejuice-compiler/scripts/wonka/install_pex_generic.sh"
         on_empty: false
 
   export-vault-secrets-init-script-prod:
     image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
-      source: scripts/wonka/get_credentials_from_vault.sh
+      source: packages/bietlejuice-compiler/scripts/wonka/get_credentials_from_vault.sh
       target: bi-etl-ejuice/
-      strip_prefix: scripts/wonka/
+      strip_prefix: packages/bietlejuice-compiler/scripts/wonka/
       acl: bucket-owner-full-control
       cache_control: no-cache
     when:
@@ -245,16 +296,16 @@ steps:
       branch: [master, hotfix/*]
       path:
         include:
-          - 'scripts/wonka/get_credentials_from_vault.sh'
+          - "packages/bietlejuice-compiler/scripts/wonka/get_credentials_from_vault.sh"
         on_empty: false
 
   export-install-spark-metrics-plugin-prod:
     image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
-      source: scripts/wonka/install_spark_metrics_plugin.sh
+      source: packages/bietlejuice-compiler/scripts/wonka/install_spark_metrics_plugin.sh
       target: bi-etl-ejuice/
-      strip_prefix: scripts/wonka/
+      strip_prefix: packages/bietlejuice-compiler/scripts/wonka/
       acl: bucket-owner-full-control
       cache_control: no-cache
     when:
@@ -262,26 +313,62 @@ steps:
       branch: [master, hotfix/*]
       path:
         include:
-          - 'scripts/wonka/install_spark_metrics_plugin.sh'
+          - "packages/bietlejuice-compiler/scripts/wonka/install_spark_metrics_plugin.sh"
         on_empty: false
 
+  # Single source of truth for the entire DAG-bag delivery chain
+  # (create-dag-files → stage/upload → astronomer-deploy-dags). All five
+  # downstream steps reuse `*dag_bundle_sync_path` so a push touching ANY
+  # path that affects what Astro discovers will fire the chain end-to-end.
+  #
+  # Previously each step had its own narrower `when.path` block, which meant:
+  #   - library-only changes (packages/bietlejuice-{core,airflow}/src/**)
+  #     would update the S3 mirror but never trigger
+  #     `astronomer-deploy-dags-forno`, leaving the live DAG bag stale
+  #     until someone happened to touch dags/** or Makefile;
+  #   - keeping the trigger sets in sync across five steps was error-prone
+  #     and had already drifted (`create-dag-files` listed
+  #     `dags/dependencies.yaml` separately even though `dags/**` covers it).
+  #
+  # CRITICAL: every step that participates in the DAG-bag delivery chain
+  # MUST use `*dag_bundle_sync_path`. The chain has internal `depends_on`
+  # links — if upstream filters were narrower than downstream filters, the
+  # upstream would skip and cascade-skip the downstream (Woodpecker treats
+  # skipped deps the same as failed deps for `depends_on`). Likewise, if
+  # `stage-bietlejuice-tree` were skipped while
+  # `upload-bi-etl-ejuice-modules-s3-{env}` fired, the upload would mirror
+  # a missing `staging/bietlejuice/` and beethoven-s3-sync's mirror-delete
+  # would wipe `s3://{bucket}/astronomer/dags/bietlejuice/` in prod.
   create-dag-files:
-    image: public.ecr.aws/docker/library/python:3.9.5
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - pip install "google-re2==1.1.20250805" "apache-airflow==2.10.4"
-      - make requirements-scripts
+      - apt-get update -qq && apt-get install -y --no-install-recommends make git
+      - pip install uv
       - make create-dag-files
     when:
       event: push
       branch: [forno, master, hotfix/*]
-      path:
+      path: &dag_bundle_sync_path
         include:
-          - 'dags/**/*'
-          - 'dags/dependencies.yaml'
-          - 'bietlejuice/base/airflow/dag_builders/**/*.py'
-          - 'scripts/ci_cd/airflow_dag_builder/**/*.py'
-          - 'Makefile'
+          - "packages/bietlejuice-core/src/**"
+          - "packages/bietlejuice-airflow/src/**"
+          - "dags/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/**/*.py"
+          - "Makefile"
         on_empty: false
+    depends_on: [setup]
+
+  stage-bietlejuice-tree:
+    image: public.ecr.aws/docker/library/alpine:3.20
+    commands:
+      - rm -rf staging/bietlejuice
+      - mkdir -p staging/bietlejuice
+      - cp -a packages/bietlejuice-core/src/bietlejuice/. staging/bietlejuice/
+      - cp -a packages/bietlejuice-airflow/src/bietlejuice/. staging/bietlejuice/
+    when:
+      event: push
+      branch: [forno, master, hotfix/*]
+      path: *dag_bundle_sync_path
 
   upload-bi-etl-ejuice-modules-s3-forno:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
@@ -289,18 +376,12 @@ steps:
     environment:
       BUCKET: artifacts.s3.forno.data.quintoandar.com.br
       S3_PREFIX: astronomer/dags
-      SOURCE: bietlejuice
+      SOURCE: staging/bietlejuice
     when:
       event: push
       branch: [forno]
-      path: &bietlejuice_sync_path
-        include:
-          - 'bietlejuice/**'
-          - 'dags/**'
-          - 'bietlejuice/base/airflow/dag_builders/**/*.py'
-          - 'scripts/ci_cd/airflow_dag_builder/**/*.py'
-          - 'Makefile'
-        on_empty: false
+      path: *dag_bundle_sync_path
+    depends_on: [stage-bietlejuice-tree]
 
   upload-bi-etl-ejuice-modules-s3-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:prod-latest
@@ -308,11 +389,12 @@ steps:
     environment:
       BUCKET: artifacts.s3.data.quintoandar.com.br
       S3_PREFIX: astronomer/dags
-      SOURCE: bietlejuice
+      SOURCE: staging/bietlejuice
     when:
       event: push
       branch: [master, hotfix/*]
-      path: *bietlejuice_sync_path
+      path: *dag_bundle_sync_path
+    depends_on: [stage-bietlejuice-tree]
 
   upload-dag-packages-dags-s3-forno:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
@@ -324,13 +406,7 @@ steps:
     when:
       event: push
       branch: [forno]
-      path: &upload_dags_path
-        include:
-          - 'dags/**'
-          - 'bietlejuice/base/airflow/dag_builders/**/*.py'
-          - 'scripts/ci_cd/airflow_dag_builder/**/*.py'
-          - 'Makefile'
-        on_empty: false
+      path: *dag_bundle_sync_path
     depends_on: [create-dag-files]
 
   upload-dag-packages-dags-s3-prod:
@@ -343,7 +419,7 @@ steps:
     when:
       event: push
       branch: [master, hotfix/*]
-      path: *upload_dags_path
+      path: *dag_bundle_sync_path
     depends_on: [create-dag-files]
 
   astronomer-deploy-dags-forno:
@@ -352,13 +428,7 @@ steps:
     when:
       event: push
       branch: [forno]
-      path: &astronomer_deploy_path
-        include:
-          - 'dags/**'
-          - 'bietlejuice/base/airflow/dag_builders/**/*.py'
-          - 'scripts/ci_cd/airflow_dag_builder/**/*.py'
-          - 'Makefile'
-        on_empty: false
+      path: *dag_bundle_sync_path
     depends_on:
       [upload-bi-etl-ejuice-modules-s3-forno, upload-dag-packages-dags-s3-forno]
 
@@ -368,184 +438,193 @@ steps:
     when:
       event: push
       branch: [master, hotfix/*]
-      path: *astronomer_deploy_path
+      path: *dag_bundle_sync_path
     depends_on:
       [upload-bi-etl-ejuice-modules-s3-prod, upload-dag-packages-dags-s3-prod]
 
   upload-dag-packages-spark-jobs-s3-forno:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br spark_jobs
+      - pip install uv
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br spark_jobs
     when:
       event: push
       branch: forno
       path: &dag_artifact_spark_jobs_path
         include:
-          - 'dags/**/spark_jobs/**'
-          - 'scripts/ci_cd/upload_dag_packages_artifact_into_s3.py'
+          - "dags/**/spark_jobs/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py"
         on_empty: false
+    depends_on: [setup]
 
   upload-dag-packages-spark-jobs-s3-prod:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks spark_jobs
+      - pip install uv
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks spark_jobs
     when:
       event: push
       branch: [master, hotfix/*]
       path: *dag_artifact_spark_jobs_path
+    depends_on: [setup]
 
   upload-sst-pipelines-s3-forno:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_sst_pipeline_into_s3.py databricks.s3.forno.data.quintoandar.com.br
+      - pip install uv
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_sst_pipeline_into_s3.py databricks.s3.forno.data.quintoandar.com.br
     when:
       event: push
       branch: forno
       path: &sst_pipelines_path
         include:
-          - 'bietlejuice/base/sst/**'
-          - 'scripts/ci_cd/upload_sst_pipeline_into_s3.py'
+          - "packages/bietlejuice-runtime/src/bietlejuice/base/sst/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/upload_sst_pipeline_into_s3.py"
         on_empty: false
+    depends_on: [setup]
 
   upload-sst-pipelines-s3-prod:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_sst_pipeline_into_s3.py 5a-databricks
+      - pip install uv
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_sst_pipeline_into_s3.py 5a-databricks
     when:
       event: push
       branch: [master, hotfix/*]
       path: *sst_pipelines_path
+    depends_on: [setup]
 
   upload-dag-packages-queries-s3-forno:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br queries
+      - pip install uv
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br queries
     when:
       event: push
       branch: forno
       path: &dag_artifact_queries_path
         include:
-          - 'dags/**/queries/**'
-          - 'scripts/ci_cd/upload_dag_packages_artifact_into_s3.py'
+          - "dags/**/queries/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py"
         on_empty: false
+    depends_on: [setup]
 
   upload-dag-packages-queries-s3-prod:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks queries
+      - pip install uv
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks queries
     when:
       event: push
       branch: [master, hotfix/*]
       path: *dag_artifact_queries_path
+    depends_on: [setup]
 
   upload-dag-packages-data-quality-s3-forno:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br data_quality
+      - pip install uv
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br data_quality
     when:
       event: push
       branch: forno
       path: &dag_artifact_data_quality_path
         include:
-          - 'dags/**/data_quality/**'
-          - 'scripts/ci_cd/upload_dag_packages_artifact_into_s3.py'
+          - "dags/**/data_quality/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py"
         on_empty: false
+    depends_on: [setup]
 
   upload-dag-packages-data-quality-s3-prod:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks data_quality
+      - pip install uv
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks data_quality
     when:
       event: push
       branch: [master, hotfix/*]
       path: *dag_artifact_data_quality_path
+    depends_on: [setup]
 
   upload-dag-packages-schemas-s3-forno:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br schemas
+      - pip install uv
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br schemas
     when:
       event: push
       branch: forno
       path: &dag_artifact_schemas_path
         include:
-          - 'dags/**/schemas/**'
-          - 'scripts/ci_cd/upload_dag_packages_artifact_into_s3.py'
+          - "dags/**/schemas/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py"
         on_empty: false
+    depends_on: [setup]
 
   upload-dag-packages-schemas-s3-prod:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - pip install boto3==1.24.0 tqdm==4.64.1
-      - python scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks schemas
+      - pip install uv
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks schemas
     when:
       event: [push, tag]
       branch: [master, hotfix/*]
       path: *dag_artifact_schemas_path
+    depends_on: [setup]
 
   load-metadata-files-to-s3-forno:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - pip install requests==2.28.1 PyYAML==5.1 boto3==1.24.0
-      - make requirements-scripts
-      - PYTHONPATH=. python scripts/ci_cd/upload_metadata_files_into_s3.py --branch ${CI_COMMIT_BRANCH} --bucket "data-documentation.s3.forno.data.quintoandar.com.br" --host "https://metadata-propagator.apps.data-frn.habitat.zone/"
+      - pip install uv
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_metadata_files_into_s3.py --branch ${CI_COMMIT_BRANCH} --bucket "data-documentation.s3.forno.data.quintoandar.com.br" --host "https://metadata-propagator.apps.data-frn.habitat.zone/"
     when:
       event: push
       branch: forno
       path: &metadata_propagation_path
         include:
-          - 'dags/**/metadata/**'
-          - 'scripts/ci_cd/upload_metadata_files_into_s3.py'
-          - 'scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py'
-          - 'Makefile'
-          - 'requirements-scripts.txt'
+          - "dags/**/metadata/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/upload_metadata_files_into_s3.py"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py"
+          - "Makefile"
         on_empty: false
+    depends_on: [setup]
 
   load-metadata-files-to-s3-prod:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - pip install requests==2.28.1 PyYAML==5.1 boto3==1.24.0
-      - make requirements-scripts
-      - PYTHONPATH=. python scripts/ci_cd/upload_metadata_files_into_s3.py --branch ${CI_COMMIT_BRANCH} --bucket "data-documentation.s3.data.quintoandar.com.br" --host "https://metadata-propagator.apps.data-prd.habitat.zone/"
+      - pip install uv
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_metadata_files_into_s3.py --branch ${CI_COMMIT_BRANCH} --bucket "data-documentation.s3.data.quintoandar.com.br" --host "https://metadata-propagator.apps.data-prd.habitat.zone/"
     when:
       event: push
       branch: [master, hotfix/*]
       path: *metadata_propagation_path
+    depends_on: [setup]
 
   load-all-metadata-files-information-to-s3-forno:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     environment:
       ENVIRONMENT: forno
     commands:
-      - pip install boto3==1.24.0 PyYAML==5.1 hierarchical-conf==1.0.3
-      - make requirements-scripts
-      - PYTHONPATH=. python scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py databricks.s3.forno.data.quintoandar.com.br
+      - pip install uv
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py databricks.s3.forno.data.quintoandar.com.br
     when:
       event: push
       branch: forno
       path: *metadata_propagation_path
+    depends_on: [setup]
 
   load-all-metadata-files-information-to-s3-prod:
-    image: public.ecr.aws/docker/library/python:3.7.16
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     environment:
       ENVIRONMENT: prod
     commands:
-      - pip install boto3==1.24.0 PyYAML==5.1 hierarchical-conf==1.0.3
-      - make requirements-scripts
-      - PYTHONPATH=. python scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py 5a-databricks
+      - pip install uv
+      - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py 5a-databricks
     when:
       event: push
       branch: [master, hotfix/*]
       path: *metadata_propagation_path
+    depends_on: [setup]
 
   upload-qube-modules-s3-forno:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/beethoven-s3-sync:forno-latest
@@ -553,13 +632,13 @@ steps:
     environment:
       BUCKET: databricks.s3.forno.data.quintoandar.com.br
       S3_PREFIX: github-repos/bi-etl-ejuice/
-      SOURCE: bietlejuice/qube
+      SOURCE: packages/bietlejuice-runtime/src/bietlejuice/qube
     when:
       event: push
       branch: [forno]
       path: &qube_modules_path
         include:
-          - 'bietlejuice/qube/**'
+          - "packages/bietlejuice-runtime/src/bietlejuice/qube/**"
         on_empty: false
 
   upload-qube-modules-s3-prod:
@@ -568,7 +647,7 @@ steps:
     environment:
       BUCKET: 5a-databricks
       S3_PREFIX: github-repos/bi-etl-ejuice/
-      SOURCE: bietlejuice/qube
+      SOURCE: packages/bietlejuice-runtime/src/bietlejuice/qube
     when:
       event: push
       branch: [master, hotfix/*]

@@ -4,7 +4,7 @@ import os
 import pyspark.sql.functions as F
 import re
 from argparse import ArgumentParser, Namespace
-from bietlejuice import BIETLEJUICE_PROJECT_ROOT
+from bietlejuice.base.paths import BIETLEJUICE_CONFIG_ROOT
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseSparkContext, SparkTableStorageFormat
 from bietlejuice.base.pipeline import LayerEnum
@@ -44,7 +44,7 @@ def main() -> None:
 def get_query_bucket_and_prefix_in_s3() -> tuple[str, str]:
     """Returns, respectively, the bucket and prefix in S3 where the queries are stored."""
 
-    global_confs = HierarchicalConf([BIETLEJUICE_PROJECT_ROOT])
+    global_confs = HierarchicalConf([BIETLEJUICE_CONFIG_ROOT])
     query_files_bucket = global_confs.get_config("databricks_bucket")
     dags_packages_files_prefix = global_confs.get_config(
         "dags_packages_files_path_in_s3"

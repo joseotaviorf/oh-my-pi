@@ -31,7 +31,7 @@ flowchart LR
     subgraph on_demand ["🔵 Loaded On Demand — when glob matches"]
         direction TB
         R3["📋 governance_metadata.mdc\nLGPD / PII classification\nmetadata YAML schema"]
-        R4["🐍 python_conventions.mdc\nBlack · Flake8 · imports\nQuintoAndarLogger · Pydantic v2"]
+        R4["🐍 python_conventions.mdc\nRuff · imports\nQuintoAndarLogger · Pydantic v2"]
         R5["🗄️ sql_conventions.mdc\nSQL style · no SELECT *\npartition filters · Person Data Model"]
         R6["🧪 testing_conventions.mdc\nTDD Red→Green→Refactor\nPattern A vs Pattern B"]
         R7["⚙️ dag_build.mdc\ncluster presets · workflow types\nfolder structure"]
@@ -102,9 +102,9 @@ Subagents are domain-specialist roles the AI adopts for specific types of judgme
 | `core.mdc` | always | Repo identity, five-layer architecture, DAG Builder overview, folder structure, CI commands, `ConfigurationService` |
 | `naming_conventions.mdc` | always | Column/table/schema/DAG naming conventions — prefixes, snake_case, DW vs lake patterns |
 | `governance_metadata.mdc` | glob `**/metadata/**/*.yml` | Governance metadata YAML schema, LGPD/privacy classification rules, validation commands |
-| `python_conventions.mdc` | glob `**/*.py` | Black/Flake8, absolute imports, `QuintoAndarLogger`, ABCs, Enums, Pydantic v2, TDD rules |
+| `python_conventions.mdc` | glob `**/*.py` | Ruff (format + lint), absolute imports, `QuintoAndarLogger`, ABCs, Enums, Pydantic v2, TDD rules |
 | `sql_conventions.mdc` | glob `**/*.sql` | SQL style guide, `SELECT *` prohibition, partition filtering, Person Data Model / PII rules |
-| `testing_conventions.mdc` | glob `tests/**` | Pattern A (Qube `unittest.TestCase`) vs Pattern B (pytest class), Spark session fixture, mocking |
+| `testing_conventions.mdc` | glob `packages/*/test/**` | Pattern A (Qube `unittest.TestCase`) vs Pattern B (pytest class), Spark session fixture, mocking |
 | `dag_build.mdc` | on demand | Full DAG Builder reference: all cluster presets, workflow types, folder structure, advanced parameters |
 | `databricks_conventions.mdc` | on demand | Databricks SQL addendum: `{bracket}` vs `{{ Jinja }}` templating, Delta-specific syntax |
 | `pr_template.mdc` | on demand | PR description template with Why/What/How tested/Checklist sections |
@@ -125,8 +125,8 @@ Six rules activate automatically when you open or edit a matching file type:
 
 - **`governance_metadata.mdc`** activates for any `metadata/**/*.yml` file — it already knows that `personal`, `highly_personal`, and `sensitive` are the three valid PII tiers; that `sensitive` columns need `table_privileges`; and that `k_anonymity >= 5` is required in metric/qube outputs.
 - **`sql_conventions.mdc`** activates for any `.sql` file — it blocks `SELECT *`, enforces partition filters, and applies Person Data Model rules.
-- **`testing_conventions.mdc`** activates for any file under `tests/` — it enforces the TDD Red → Green → Refactor workflow and selects the correct test pattern (Pattern A vs Pattern B).
-- **`python_conventions.mdc`** activates for any `.py` file — it enforces Black/Flake8 style, `QuintoAndarLogger`, and Pydantic v2 APIs.
+- **`testing_conventions.mdc`** activates for any file under `packages/*/test/` — it enforces the TDD Red → Green → Refactor workflow and selects the correct test pattern (Pattern A vs Pattern B).
+- **`python_conventions.mdc`** activates for any `.py` file — it enforces Ruff style, `QuintoAndarLogger`, and Pydantic v2 APIs.
 - **`data_quality_tests.mdc`** activates for any `data_quality/**/*.yml` file — it provides the full Inmetro validation catalog, including the DW dimension `-1` unknown row rule.
 - **`people/people_domain.mdc`** activates for any file under `dags/people/` — it applies People DW 2.0 schema structure, SCD Type 2 conventions, Oracle HCM source system rules, and the list of deprecated DAGs to avoid.
 
@@ -272,10 +272,10 @@ cluster:
 
 **What it does** (8 steps):
 
-1. **Unit tests** — run the relevant test file first (`bietlejuice/foo/bar.py` → `tests/unit/foo/test_bar.py`); fix failures before proceeding
+1. **Unit tests** — run the relevant test file first (`packages/bietlejuice-runtime/src/bietlejuice/foo/bar.py` → `packages/bietlejuice-runtime/test/unit/foo/test_bar.py`); fix failures before proceeding
 2. **Prerequisites check** — verify Docker is running, Astro containers are up, and `GITHUB_TOKEN` / `DATABRICKS_TOKEN` / `DATABRICKS_USERNAME` are set
 3. **Upload artifacts to Forno S3** — upload only what changed (decision matrix below); `make upload-forno-release` for a full clean sync
-4. **Selective DAG sync** — copy only the target DAG (not all 771) into `local/astro/dags/`, then restart Astro containers
+4. **Live code** — DAGs and bietlejuice source are bind-mounted into the Airflow containers; changes are reflected live (scheduler re-parses within 15–30s). Restart only when pip dependencies change
 5. **Verify via REST API** — poll `has_import_errors` and confirm all expected tasks are listed
 6. **Trigger** — POST to the Airflow API with `run_type: test_run` and a date range that matches available Forno data
 7. **Monitor** — poll DAG run and task states with exponential backoff (15 s → 60 s → 120 s)
@@ -285,8 +285,8 @@ cluster:
 
 | Changed path | Make target |
 |---|---|
-| `bietlejuice/qube/jobs/**/*.py` | `make upload-local-qube-jobs` |
-| `bietlejuice/**/*.py` (non-qube) | `make upload-local-package` |
+| `packages/bietlejuice-runtime/src/bietlejuice/qube/jobs/**/*.py` | `make upload-local-qube-jobs` |
+| `packages/*/src/bietlejuice/**/*.py` (non-qube) | `make upload-local-package` |
 | `dags/**/spark_jobs/**/*.py` | `make upload-local-spark-jobs` |
 | `dags/**/queries/**/*.sql` | `make upload-local-queries` |
 | `dags/**/data_quality/**/*.yml` | `make upload-local-data-quality` |
@@ -295,10 +295,9 @@ cluster:
 
 **Key caveats**:
 
-- **Core model DAGs**: `make upload-local-spark-jobs` uploads to a personal S3 path; core model DAGs resolve from the shared forno path. Use `aws s3 cp` directly to `github-repos/bi-etl-ejuice/spark_jobs/{dag_name}/` (Step 3a in the skill).
-- **Wheel build**: `setup.py` must read `requirements.txt`, not `requirements-freeze.txt`. If the wheel causes `ModuleNotFoundError` on Databricks, update `setup.py` accordingly (Step 3b in the skill).
-- **AWS credentials**: verify with `aws sts get-caller-identity` before every upload; renew with `aws sso login --profile forno` if expired.
-- **Selective copy**: do **not** use `make restart-local-environment` — it copies all 771 DAGs and slows the scheduler significantly.
+- **Core model DAGs**: `make upload-local-spark-jobs` uploads to a personal S3 path; core model DAGs resolve from the shared forno path. Use `aws s3 cp` directly to `github-repos/bi-etl-ejuice/spark_jobs/{dag_name}/` (see the skill for details).
+- **AWS credentials**: verify with `aws sts get-caller-identity` before every upload; renew via Weep if expired.
+- **Bind mounts**: DAGs and source code are live-mounted — only restart when pip dependencies change.
 
 ---
 
@@ -351,7 +350,7 @@ CHANGE PLAN:
 
 | Check | What it catches |
 |---|---|
-| Style (`make check-style`) | Black formatting errors, Flake8 lint violations |
+| Style (`make check-style`) | Ruff formatting and lint violations |
 | Declaration validation | Invalid workflow type, missing required fields, wrong cluster conn_id |
 | Metadata pairs | `.sql` without matching `.yml`, description < 10 chars, missing lineage |
 | Python conventions | `logging.getLogger` instead of `QuintoAndarLogger`, relative imports, bare `NotImplementedError` |
@@ -377,13 +376,13 @@ Blocking issues must be fixed before the PR description is generated.
 
 | Source path prefix | Test pattern | Framework |
 |---|---|---|
-| `bietlejuice/qube/` | Pattern A | `unittest.TestCase` + `@patch` at import location |
+| `packages/bietlejuice-runtime/src/bietlejuice/qube/` | Pattern A | `unittest.TestCase` + `@patch` at import location |
 | All other paths | Pattern B | `pytest` class + `@mock.patch.object` fixtures |
 
 **Example — Qube job test (Pattern A)**
 
-Source: `bietlejuice/qube/jobs/contract_total.py`
-Test file: `tests/unit/qube/jobs/test_contract_total.py`
+Source: `packages/bietlejuice-runtime/src/bietlejuice/qube/jobs/contract_total.py`
+Test file: `packages/bietlejuice-runtime/test/unit/qube/jobs/test_contract_total.py`
 
 ```python
 import unittest
@@ -402,8 +401,8 @@ class TestContractTotalJob(unittest.TestCase):
 
 **Example — DAG builder Spark job test (Pattern B)**
 
-Source: `bietlejuice/base/spark/some_job.py`
-Test file: `tests/unit/base/spark/test_some_job.py`
+Source: `packages/bietlejuice-runtime/src/bietlejuice/base/spark/some_job.py`
+Test file: `packages/bietlejuice-runtime/test/unit/base/spark/test_some_job.py`
 
 ```python
 import pytest
@@ -463,7 +462,7 @@ Most CI failures for new tables follow this order — fix them in sequence:
 
 **"Passes locally but fails in CI"**: CI compares against `origin/master`. Run `git fetch --no-tags origin +refs/heads/master` before reproducing locally.
 
-Note: `validate-cross-layer-joins` **always exits 0** — it is a warning-only check. Add justified entries to `scripts/governance_metadata_validation/skip_list.yml` if the violation is intentional.
+Note: `validate-cross-layer-joins` **always exits 0** — it is a warning-only check. Add justified entries to `packages/bietlejuice-compiler/scripts/governance_metadata_validation/skip_list.yml` if the violation is intentional.
 
 ---
 
@@ -473,12 +472,11 @@ Note: `validate-cross-layer-joins` **always exits 0** — it is a warning-only c
 
 **What it does** (6 steps):
 
-1. **Check prerequisites** — `pyenv`, `astro` CLI, Docker Desktop, Python 3.8.12
+1. **Check prerequisites** — `uv`, `astro` CLI, Docker Desktop, Python 3.12
 2. **Set environment variables** — `make setup-local-variables` writes `GITHUB_TOKEN`, `DATABRICKS_TOKEN`, `DATABRICKS_USERNAME` to `~/.zshrc`
-3. **Create Python virtualenv** — `make environment` (pyenv + virtualenv for Python 3.8.12)
-4. **Install dependencies** — `make requirements` → `make requirements-test` → `make requirements-lint` (in order)
-5. **Generate DAG Python files** — `make create-dag-files` (must run before Airflow sees any DAGs)
-6. **Start the local Airflow stack** — `make run-local-environment` (builds Docker image via Astro, seeds variables/connections — takes 3–8 min on first run)
+3. **Install dependencies** — `make install` (runs `uv sync` for all workspace packages)
+4. **Generate DAG Python files** — `make create-dag-files` (must run before Airflow sees any DAGs)
+5. **Start the local Airflow stack** — `make run-local-environment` (builds Docker image via Astro, seeds variables/connections — takes 3–8 min on first run)
 
 Airflow UI will be available at http://localhost:8080 (`admin` / `admin`).
 
@@ -504,8 +502,7 @@ make run-local-environment branch=your-branch-name
 
 **Setup checklist**:
 - `GITHUB_TOKEN`, `DATABRICKS_TOKEN`, `DATABRICKS_USERNAME` set and exported
-- Python 3.8.12 virtualenv `bi-etl-ejuice` active
-- `make requirements` completed without errors
+- `make install` completed without errors
 - `make create-dag-files` completed without errors
 - Three Astro containers running (`webserver`, `scheduler`, `postgres`)
 - Airflow UI accessible at http://localhost:8080
@@ -748,7 +745,7 @@ Add DW DAG for banking fraud metrics to support the Fintech risk dashboard.
 | Run or test a DAG locally | "Run my DAG dw_payments locally" · "Test this DAG on forno" · "Upload my changes to Databricks" |
 | Impact of a rename | "What breaks if I rename enrich_contract.id_status?" |
 | Pre-push code review | "Review my changes and prepare the PR description" |
-| Generate unit tests | "Write unit tests for bietlejuice/qube/jobs/visit_total.py" |
+| Generate unit tests | "Write unit tests for packages/bietlejuice-runtime/src/bietlejuice/qube/jobs/visit_total.py" |
 | Fix a CI failure | "validate-metadata-files-content is failing on my PR" |
 | Set up local env | "Set up my local environment from scratch" |
 

@@ -15,7 +15,7 @@ from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageForma
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 
-from bietlejuice.services import FileService
+from bietlejuice.services.file_service import FileService
 
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
 from bietlejuice.services.metastore_services import SparkMetastoreService

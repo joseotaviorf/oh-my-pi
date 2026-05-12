@@ -20,7 +20,7 @@ from bietlejuice.base.spark import (
     SparkDataFrameService,
 )
 
-from bietlejuice.services import ConfigurationService
+from bietlejuice.services.configuration_service import ConfigurationService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_reclameaqui_tickets"

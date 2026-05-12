@@ -1,0 +1,20 @@
+# Taplo (Even Better TOML LSP) configuration.
+#
+# Auto-discovered by taplo / `tamasfe.even-better-toml` from the workspace
+# root. Excludes lock files and other large/non-source TOML so the LSP
+# doesn't enumerate them — without this exclusion the LSP crashes on large
+# uv.lock files (~738 KB at the workspace root, plus per-package locks).
+# See https://github.com/tamasfe/taplo/issues/339.
+
+include = ["**/*.toml"]
+exclude = [
+  "**/*.lock",
+  "**/.venv/**",
+  "**/.cache/**",
+  "**/__pycache__/**",
+  "**/.pytest_cache/**",
+  "**/node_modules/**",
+  "staging/**",
+  "dist/**",
+  ".worktrees/**",
+]

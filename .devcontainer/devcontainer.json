@@ -1,0 +1,156 @@
+{
+  "name": "bi-etl-ejuice",
+  "build": {
+    "dockerfile": "Dockerfile",
+    // Build context is the repo root so the Dockerfile can COPY packages/.
+    "context": "..",
+    // BuildKit secret (same pattern as local/astro/Dockerfile): token is not passed as
+    // a build-arg, so it does not end up in image metadata. Host must export GITHUB_TOKEN.
+    "options": [
+      "--secret",
+      "id=GITHUB_TOKEN,env=GITHUB_TOKEN"
+    ]
+  },
+  // Forward the host GITHUB_TOKEN so any in-container git operations can
+  // reach private GitHub repos if needed.
+  // UV_PROJECT_ENVIRONMENT directs uv to use /home/vscode/.venv (pre-built in
+  // the image) instead of the default .venv inside the workspace folder. This
+  // prevents the host OS venv from colliding with the container venv when
+  // developers switch between local and devcontainer workflows.
+  "remoteEnv": {
+    "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
+    "DATABRICKS_TOKEN": "${localEnv:DATABRICKS_TOKEN}",
+    "DATABRICKS_USERNAME": "${localEnv:DATABRICKS_USERNAME}",
+    "UV_PROJECT_ENVIRONMENT": "/home/vscode/.venv",
+    "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+  },
+  // Container-wide environment. TZ keeps in-container log timestamps aligned
+  // with the team's local time (instead of UTC, which is the upstream default).
+  "containerEnv": {
+    "TZ": "America/Sao_Paulo"
+  },
+  // Mounts:
+  //   * ~/.aws — read-only bind so AWS CLI v2 inside the container picks up
+  //     the host's credentials and config without re-auth. Caveat: if your
+  //     ~/.aws/config is a symlink into ~/.dotfiles, the link target won't
+  //     resolve inside the container — convert it to a real file or set
+  //     AWS_CONFIG_FILE to credentials-only.
+  //   * ~/.databrickscfg — read-only bind so the Databricks CLI default
+  //     profile works without re-auth.
+  //   * Named volume for the uv cache — persistent across container
+  //     recreations. The runtime image intentionally drops the build-time
+  //     cache (~600-800 MB), so this volume re-warms it on first use and
+  //     keeps it across rebuilds. post-create.sh chowns it to vscode on first
+  //     run because Docker creates new volumes as root-owned.
+  "mounts": [
+    "source=${localEnv:HOME}/.aws,target=/home/vscode/.aws,type=bind,readonly",
+    "source=${localEnv:HOME}/.databrickscfg,target=/home/vscode/.databrickscfg,type=bind,readonly",
+    "source=bi-etl-ejuice-uv-cache,target=/home/vscode/.cache/uv,type=volume"
+  ],
+  // Forwarded ports: with Docker-outside-of-Docker, Astro/Airflow and Spark
+  // bind to 127.0.0.1 on the host. Listing them here gives Cursor/VS Code a
+  // labeled entry in the Ports panel and silences the auto-detect prompt.
+  "forwardPorts": [8080, 4040],
+  "portsAttributes": {
+    "8080": {
+      "label": "Airflow UI (astro dev start)",
+      "onAutoForward": "silent"
+    },
+    "4040": {
+      "label": "Spark UI",
+      "onAutoForward": "silent"
+    }
+  },
+  // Re-links the editable workspace packages from the build-time /tmp/workspace
+  // paths to the bind-mounted /workspaces/ paths. All third-party wheels are
+  // already installed in the pre-built venv, so this completes in ~1-2 seconds.
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "customizations": {
+    "vscode": {
+      // Keep the comments next to each extension so reviewers can tell why
+      // it's here and avoid bikeshedding the list.
+      "extensions": [
+        // Python language support: run, debug, REPL, terminal integration.
+        // Does NOT include type-checking — that's anysphere.cursorpyright's job.
+        "ms-python.python",
+        // Cursor's Pyright fork: type-check, autocomplete, hover, go-to-def.
+        // python.languageServer: "None" (below) keeps the Python extension
+        // from also starting Pylance/Pyright and conflicting.
+        "anysphere.cursorpyright",
+        // Ruff lint + formatter (matches the Astral toolchain — same authors as uv).
+        "charliermarsh.ruff",
+        // TOML syntax + format + schema validation for pyproject.toml etc.
+        // Workspace-root .taplo.toml excludes lockfiles to keep its LSP from
+        // crashing on uv.lock (~738 KB).
+        "tamasfe.even-better-toml",
+        // YAML syntax + schema validation. The DAG declarations, Woodpecker
+        // pipelines, and metadata files are all YAML.
+        "redhat.vscode-yaml",
+        // SQL editor with a connection panel — run queries against connected DBs.
+        "mtxr.sqltools",
+        // SQLFluff Language Server (uses your dev-installed sqlfluff for diagnostics).
+        "xsw.vscode-sqlfluff-lsp",
+        // Inline git blame, history, line/branch comparisons.
+        "eamodio.gitlens",
+        // Show diagnostics inline next to the code (no need to hover).
+        "usernamehw.errorlens",
+        // Container/image/volume tree pane — pairs with Docker-outside-of-Docker.
+        "ms-azuretools.vscode-docker"
+      ],
+      // Pylance triggers the "Would you like Cursor Pyright to import your
+      // settings from Pylance?" prompt every time it's installed. Listing it
+      // here tells Cursor not to auto-recommend it, which prevents the
+      // Pylance install from happening at all.
+      "unwantedRecommendations": [
+        "ms-python.vscode-pylance"
+      ],
+      "settings": {
+        // Pre-built venv lives outside the workspace bind-mount at a fixed path.
+        "python.defaultInterpreterPath": "/home/vscode/.venv/bin/python",
+        // Force Pyright/CursorPyright to resolve monorepo packages from source.
+        "python.analysis.extraPaths": [
+          "${workspaceFolder}/packages/bietlejuice-core/src",
+          "${workspaceFolder}/packages/bietlejuice-airflow/src",
+          "${workspaceFolder}/packages/bietlejuice-compiler/src",
+          "${workspaceFolder}/packages/bietlejuice-runtime/src"
+        ],
+        "python.analysis.venvPath": "/home/vscode",
+        "python.analysis.venv": ".venv",
+        // Keep the Python extension from starting its own LSP — anysphere.cursorpyright
+        // is the sole type-checker.
+        "python.languageServer": "None",
+        "python.testing.pytestEnabled": true,
+        "python.testing.unittestEnabled": false,
+        // Each package has its own [tool.pytest.ini_options] in packages/*/pyproject.toml.
+        // Point VS Code test discovery at packages/ so all package test trees are visible
+        // in the test panel. Import mode matches the per-package configuration.
+        "python.testing.pytestArgs": [
+          "--import-mode=importlib",
+          "packages/"
+        ],
+        // Per-language formatters.
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff"
+        },
+        "[yaml]": {
+          "editor.defaultFormatter": "redhat.vscode-yaml"
+        },
+        "[toml]": {
+          "editor.defaultFormatter": "tamasfe.even-better-toml"
+        },
+        "editor.formatOnSave": true,
+        // Quality-of-life defaults.
+        "editor.rulers": [100],
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        "git.autofetch": true
+      }
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "version": "latest",
+      "moby": false
+    }
+  }
+}

@@ -17,7 +17,7 @@ from inmetro.loaders import S3Loader as InmetroS3Loader
 from inmetro.parsers.profiles import PyDeequProfileParser
 from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.spark import BaseDBUtils
-from bietlejuice.base.service import ServiceEnum
+from bietlejuice.base.service.service_enum import ServiceEnum
 from bietlejuice.base.pipeline import MetadataTypeEnum
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.metadata_propagator_pipeline.dataset_profiling_pipeline import (

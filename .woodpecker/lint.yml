@@ -21,11 +21,24 @@
 # unaffected: their merge-commit diff represents the full set of merged changes.
 
 steps:
-  check-style-python:
-    image: public.ecr.aws/docker/library/python:3.9-bookworm
+  setup:
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - apt-get update
-      - apt-get install -y git > /dev/null
+      - apt-get update && apt-get install -y git > /dev/null
+      - pip install uv
+      - uv sync --directory packages/bietlejuice-core
+      - uv sync --directory packages/bietlejuice-airflow
+      # Lint and type-check use runtime's own venv (broad versions, no DBR pins).
+      # The DBR-specific envs/dbr-16-4 sub-project is not needed here — ruff and
+      # ty don't import the DBR-pinned libs themselves.
+      - uv sync --directory packages/bietlejuice-runtime
+      - uv sync --directory packages/bietlejuice-compiler
+
+  check-style-python:
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    commands:
+      - apt-get update && apt-get install -y git > /dev/null
+      - pip install uv
       - |
         # For push events on feature branches, `when.path` only checks the last
         # commit diff. Evaluate the full branch diff vs origin/master instead so
@@ -42,7 +55,6 @@ steps:
               ;;
           esac
         fi
-      - make requirements-lint
       - make check-style
     when:
       # pull_request: `when.path` already evaluates the full PR diff — keep as-is.
@@ -56,13 +68,13 @@ steps:
       - event: push
         branch:
           exclude: [master, forno, hotfix/*]
-    depends_on: [] # This is for the steps to run in parallel
+    depends_on: [setup]
 
   files-validation-python:
-    image: public.ecr.aws/docker/library/python:3.9-bookworm
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - apt-get update
-      - apt-get install -y git > /dev/null
+      - apt-get update && apt-get install -y git > /dev/null
+      - pip install uv
       - |
         # Same full-branch-diff guard as check-style-python (see header comment).
         if [ "$CI_PIPELINE_EVENT" = "push" ]; then
@@ -77,8 +89,6 @@ steps:
               ;;
           esac
         fi
-      - pip install --upgrade pip
-      - make requirements-test
       - make files-validation
     when:
       - event: [push, pull_request]
@@ -88,3 +98,18 @@ steps:
       - event: push
         branch:
           exclude: [master, forno, hotfix/*]
+    depends_on: [setup]
+
+  type-check-python:
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    failure: ignore
+    commands:
+      - apt-get update && apt-get install -y git > /dev/null
+      - pip install uv
+      - make type-check
+    when:
+      event: [push, pull_request]
+      path:
+        include: ['**/*.py']
+        on_empty: false
+    depends_on: [setup]

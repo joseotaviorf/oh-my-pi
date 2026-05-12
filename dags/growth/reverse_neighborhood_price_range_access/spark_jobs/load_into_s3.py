@@ -2,7 +2,7 @@ import logging
 import json
 from datetime import datetime
 from argparse import ArgumentParser
-from bietlejuice.services import ConfigurationService
+from bietlejuice.services.configuration_service import ConfigurationService
 from typing import Tuple, Any
 import boto3
 import time

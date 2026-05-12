@@ -4,7 +4,7 @@ import os
 from typing import Any
 from argparse import ArgumentParser
 
-from bietlejuice.base.api import APIEnum
+from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.services.configuration_service import ConfigurationService

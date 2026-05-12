@@ -1,13 +1,33 @@
+import glob
 import os
+
 import boto3
 
 
-s3 = boto3.client('s3')
+s3 = boto3.client("s3")
 username = os.getlogin()
-s3_bucket = 'artifacts.s3.forno.data.quintoandar.com.br'
-s3_folder_path = 'bi-etl-ejuice-local/{username}/bi_etl_ejuice-0.1.0-py3-none-any.whl'.format(username=username)
-local_path = '/home/<BIETLEJUICE_FOLDER>/dist/bi_etl_ejuice-0.1.0-py3-none-any.whl'
+s3_bucket = "artifacts.s3.forno.data.quintoandar.com.br"
 
-print("Uploading python wheel to S3")
-s3.upload_file(local_path, s3_bucket, s3_folder_path,
-               ExtraArgs={'ACL': 'bucket-owner-full-control'})
+repo_root = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+
+wheels = sorted(
+    glob.glob(os.path.join(repo_root, "dist", "bietlejuice_core-*.whl"))
+    + glob.glob(os.path.join(repo_root, "dist", "bietlejuice_runtime-*.whl"))
+)
+
+if not wheels:
+    raise FileNotFoundError(
+        "No wheels found in dist/. Run `make build` before uploading."
+    )
+
+for local_path in wheels:
+    filename = os.path.basename(local_path)
+    s3_key = f"bi-etl-ejuice-local/{username}/{filename}"
+    print(f"Uploading {filename} to s3://{s3_bucket}/{s3_key}")
+    s3.upload_file(
+        local_path,
+        s3_bucket,
+        s3_key,
+        ExtraArgs={"ACL": "bucket-owner-full-control"},
+    )
+    print(f"Uploaded {filename} successfully.")

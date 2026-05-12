@@ -7,7 +7,7 @@ from pyspark.sql.functions import current_timestamp, lit
 from pyspark.sql.dataframe import DataFrame
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.services import ConfigurationService
+from bietlejuice.services.configuration_service import ConfigurationService
 from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_instance_pools"

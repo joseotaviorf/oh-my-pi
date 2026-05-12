@@ -76,7 +76,7 @@ If there are matching clean queries in the DAG package (`queries/clean/<clean_ta
 For **`api_ingestion`**, the **DAG identifier** must follow a packaging rule:
 
 - **`dag.name`**, the folder under `dags/{line}/`, and the declaration filename **`{dag_name}_declaration.yml`** must all use the same `dag_name`, and that name **must end with `_api`** (e.g. `currency_api`).
-- **Reason:** `MANIFEST.in` includes only `**/*_api_declaration.y*ml` so the declaration is shipped inside the **Python wheel**. On Databricks, `load_api_ingestion_raw` resolves the YAML from the installed package (or local/S3 paths). If the filename does not match that pattern, the declaration may be missing at runtime after install.
+- **Reason:** the hatch build config in `packages/bietlejuice-runtime/pyproject.toml` includes only `**/*_api_declaration.y*ml` so the declaration is shipped inside the **Python wheel**. On Databricks, `load_api_ingestion_raw` resolves the YAML from the installed package (or local/S3 paths). If the filename does not match that pattern, the declaration may be missing at runtime after install.
 
 **Not tied to `_api`:** **`workflow.custom_schema`** and the resulting **raw metastore schema** (`datalake_{custom_schema}_raw` when that pattern applies) are **independent**. You may use a short or legacy schema name without `_api` (e.g. `dag.name: rates_api` with `custom_schema: currency`) as long as naming conventions for the lake layer are satisfied.
 

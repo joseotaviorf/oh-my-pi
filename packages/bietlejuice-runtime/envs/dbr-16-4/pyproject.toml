@@ -1,0 +1,91 @@
+# Local-only dev project: a venv that mirrors Databricks Runtime 16.4 LTS.
+# https://docs.databricks.com/aws/en/release-notes/runtime/16.4lts
+#
+# This pyproject is NEVER published as a wheel. Its only job is to feed
+# `uv sync` so the resulting .venv has every DBR 16.4-bundled Python library
+# pinned to the exact version the cluster ships, plus bietlejuice-runtime and
+# bietlejuice-core in editable mode for local development.
+#
+# Refresh procedure: re-pull the "Installed Python libraries" table from the
+# release notes URL above when DBR 16.4 receives a maintenance update, then
+# update the version pins below.
+
+[project]
+name = "bietlejuice-runtime-env-dbr-16-4"
+version = "0.0.0"
+description = "Local-only env: bietlejuice-runtime against DBR 16.4 LTS pinned libs (Python 3.12.3)"
+# Narrow to DBR 16.4's exact Python so uv resolves a single (Python × pin)
+# combination — no per-Python-version splits, no per-extra splits.
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "bietlejuice-runtime",
+    # DBR 16.4 LTS bundled Python libraries.
+    # psycopg2-binary (not psycopg2) is intentional for local dev: same wire
+    # API but no libpq / pg_config required to build. DBR ships psycopg2==2.9.3,
+    # but psycopg2-binary 2.9.3 has no cp312 wheels (predates Python 3.12);
+    # 2.9.9 is the first release with cp312 wheels. Older dbr envs (12.2/13.3)
+    # use cp39/cp310 and can stay pinned at 2.9.3. The wheel itself does NOT
+    # depend on psycopg2 at all (see ../../pyproject.toml comment); on the
+    # cluster, DBR's pre-installed psycopg2 wins on sys.path. Local-only.
+    "psycopg2-binary==2.9.9",
+    "databricks-sdk==0.30.0",
+    "google-auth==2.35.0",
+    "ipython==8.25.0",
+    "joblib==1.4.2",
+    "numpy==1.26.4",
+    "opentelemetry-api==1.27.0",
+    "opentelemetry-sdk==1.27.0",
+    # pandas is intentionally UNPINNED here. DBR 16.4 ships pandas==1.5.3 built
+    # in-house against Python 3.12, but PyPI only publishes 1.5.3 wheels for
+    # cp38–cp311 and the source dist is not 3.12-clean. We still need pandas
+    # installed (runtime imports it in wire_format.py and fintech UDFs); uv
+    # resolves whatever cp312-compatible version is latest (typically 2.x).
+    # The wheel itself does NOT depend on pandas; on the cluster, DBR's
+    # pandas 1.5.3 wins on sys.path. Older dbr envs (12.2/13.3) keep their
+    # pandas pins because cp39/cp310 wheels exist for those versions.
+    "pandas",
+    "pydantic==2.8.2",
+    "python-dateutil==2.9.0.post0",
+    "tenacity==8.2.2",
+    "urllib3==1.26.16",
+    "cryptography==42.0.5",
+    "pyarrow==15.0.2",
+    "grpcio==1.60.0",
+    "PyYAML==6.0.1",
+]
+
+[tool.uv.sources]
+# bietlejuice-runtime lives two directories up (envs/dbr-16-4 → envs → runtime).
+# bietlejuice-core lives one level above runtime in packages/.
+bietlejuice-runtime = { path = "../..", editable = true }
+bietlejuice-core    = { path = "../../../bietlejuice-core", editable = true }
+quintoandar-logger  = { git = "https://github.com/quintoandar/python-logger", tag = "0.8.1" }
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+# This pyproject is a local-only env shim; it has no source code of its own
+# and is never published. `package = false` tells uv not to invoke a build
+# backend for it, so we don't need [build-system] / [tool.hatch.build...].
+package = false
+# Mirror of runtime's overrides — uv overrides are project-local and do not
+# propagate through path sources, so any env that depends on runtime needs
+# its own copy. Keep in sync with packages/bietlejuice-runtime/pyproject.toml.
+override-dependencies = [
+    "requests>=2.32.3",
+    "tenacity>=8.0.1",
+    "pyspark==3.5.3",
+    "quintoandar-logger>=0.4.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==8.3.5",
+    "pytest-cov",
+    "pytest-testmon",
+    "moto[s3]",
+    # bietlejuice-core is needed at test time only — runtime's tests import a
+    # handful of modules that live in core. The wheel never sees this; on the
+    # cluster, default_libraries installs both bietlejuice wheels.
+    "bietlejuice-core",
+    "quintoandar-logger>=0.4.0",
+]

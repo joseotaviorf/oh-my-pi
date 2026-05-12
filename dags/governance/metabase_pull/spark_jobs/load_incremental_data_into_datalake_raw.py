@@ -19,7 +19,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 
-from bietlejuice.base.db import QUERIES_DATALAKE_PATH
+from bietlejuice.base.paths import QUERIES_DATALAKE_PATH
 
 JOB_NAME = "load_incremental_data_into_datalake_raw"
 

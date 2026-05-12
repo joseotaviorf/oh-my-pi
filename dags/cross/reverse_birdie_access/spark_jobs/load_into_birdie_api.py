@@ -9,7 +9,7 @@ import numpy as np
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
-from bietlejuice.services import ConfigurationService
+from bietlejuice.services.configuration_service import ConfigurationService
 from pyspark.sql.functions import date_format, to_timestamp
 from quintoandar_logger import QuintoAndarLogger
 

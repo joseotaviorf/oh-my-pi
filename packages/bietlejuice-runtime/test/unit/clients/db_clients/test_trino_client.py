@@ -1,0 +1,189 @@
+from unittest.mock import Mock
+
+from trino import constants
+from trino.dbapi import Connection
+
+from bietlejuice.clients.db_clients import TrinoClient
+
+
+class TestTrinoClient:
+    def test_conn(self):
+        # arrange
+        mocked_trino_client = TrinoClient(
+            host="host",
+            port=443,
+            user="jose.silva",
+            password="pwd",
+            source="bietlejuice",
+        )
+
+        # act
+        conn = mocked_trino_client.conn
+
+        # assert
+        assert isinstance(conn, Connection)
+        assert conn.catalog == "hive"
+        assert conn.http_scheme == constants.HTTPS
+        assert conn.source == "bietlejuice"
+
+    def test_get_records(self, mocked_trino_client):
+        # arrange
+        query = "select * from bla where x={}"
+        parameters = ["foo"]
+
+        expected_return = [("1", "2", "3")]
+
+        mocked_trino_conn = Mock()
+
+        mocked_cursor = Mock()
+        mocked_cursor.fetchall.return_value = expected_return
+
+        new_obj = Mock()
+        new_obj.cursor.return_value = mocked_cursor
+
+        mocked__enter__ = Mock()
+        mocked__enter__.return_value = new_obj
+
+        mocked_trino_conn.__enter__ = mocked__enter__
+        mocked_trino_conn.__exit__ = Mock()
+
+        mocked_trino_client.connection = mocked_trino_conn
+
+        # act
+        returned_value = mocked_trino_client.get_records(query, parameters)
+
+        # assert
+        assert returned_value == expected_return
+        mocked_cursor.execute.assert_called_once_with(query, parameters)
+        mocked_cursor.fetchall.assert_called_once_with()
+
+    def test_run(self, mocked_trino_client):
+        # arrange
+        command = "drop table bla"
+        parameters = ["foo"]
+
+        mocked_cursor = Mock()
+        new_obj = Mock()
+        new_obj.cursor.return_value = mocked_cursor
+
+        mocked__enter__ = Mock()
+        mocked__enter__.return_value = new_obj
+
+        mocked_trino_conn = Mock()
+        mocked_trino_conn.__enter__ = mocked__enter__
+        mocked_trino_conn.__exit__ = Mock()
+
+        mocked_trino_client.connection = mocked_trino_conn
+
+        # act
+        mocked_trino_client.run(command, parameters)
+
+        # assert
+        mocked_cursor.execute.assert_called_once_with(command, parameters)
+
+    def test_register_table(self, mocked_trino_client):
+        # arrange
+        schema_name = "schema"
+        table_name = "table"
+        table_location = "location"
+
+        command = f"""
+            CALL hive.system.register_table(
+                schema_name => '{schema_name}',
+                table_name => '{table_name}',
+                table_location => '{table_location}'
+            )
+            """
+
+        mocked_trino_client.run = Mock()
+
+        # act
+        mocked_trino_client.register_table(schema_name, table_name, table_location)
+
+        # assert
+        mocked_trino_client.run.assert_called_once_with(command)
+
+    def test_unregister_table(self, mocked_trino_client):
+        # arrange
+        schema_name = "schema"
+        table_name = "table"
+
+        command = f"""
+            CALL hive.system.unregister_table(
+                schema_name => '{schema_name}',
+                table_name => '{table_name}'
+            )
+            """
+
+        mocked_trino_client.run = Mock()
+
+        # act
+        mocked_trino_client.unregister_table(schema_name, table_name)
+
+        # assert
+        mocked_trino_client.run.assert_called_once_with(command)
+
+    def test_drop_table(self, mocked_trino_client):
+        # arrange
+        schema_name = "schema"
+        table_name = "table"
+
+        command = f'DROP TABLE "{schema_name}"."{table_name}"'
+
+        mocked_trino_client.run = Mock()
+
+        # act
+        mocked_trino_client.drop_table(schema_name, table_name)
+
+        # assert
+        mocked_trino_client.run.assert_called_once_with(command)
+
+    def test_table_exists_if_show_tables_returns_nothing(self, mocked_trino_client):
+        # arrange
+        schema_name = "schema"
+        table_name = "table"
+
+        mocked_trino_client.get_records = Mock(return_value=[])
+
+        # act
+        returned_value = mocked_trino_client.table_exists(schema_name, table_name)
+
+        # assert
+        assert not returned_value
+        mocked_trino_client.get_records.assert_called_once_with(
+            "SHOW TABLES FROM schema LIKE 'table'"
+        )
+
+    def test_table_exists_if_show_tables_returns_something(self, mocked_trino_client):
+        # arrange
+        schema_name = "schema"
+        table_name = "table"
+
+        mocked_trino_client.get_records = Mock(return_value=[("table",)])
+
+        # act
+        returned_value = mocked_trino_client.table_exists(schema_name, table_name)
+
+        # assert
+        assert returned_value
+        mocked_trino_client.get_records.assert_called_once_with(
+            "SHOW TABLES FROM schema LIKE 'table'"
+        )
+
+    def test_get_table_ddl(self, mocked_trino_client):
+        # arrange
+        schema_name = "schema"
+        table_name = "table"
+
+        expected_return = "CREATE TABLE table (id int)"
+
+        mocked_trino_client.get_records = Mock(return_value=[(expected_return,)])
+
+        # act
+        returned_value = mocked_trino_client.get_table_ddl(schema_name, table_name)
+
+        # assert
+        assert returned_value == expected_return
+        mocked_trino_client.get_records.assert_called_once_with(
+            'SHOW CREATE TABLE "schema"."table"'
+        )

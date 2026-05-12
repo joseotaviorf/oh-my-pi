@@ -42,10 +42,8 @@ Run the local equivalent of the failing step. Use a shell subagent (Task tool wi
 ```bash
 cd /path/to/bi-etl-ejuice
 
-# Install scripts requirements first (mirrors what CI does)
-make requirements-scripts
+uv sync --directory packages/bietlejuice-compiler
 
-# Then run the failing check — replace with the correct target from the table above
 make {failing_make_target}
 ```
 
@@ -109,7 +107,7 @@ git fetch --no-tags origin +refs/heads/master
 This step **always exits 0** (warning only — it never blocks CI). If it reports violations:
 - Review the SQL file flagged
 - Either fix the query to avoid raw-layer references in DW queries
-- Or add the path to `scripts/governance_metadata_validation/skip_list.yml` under `cross_layer_joins_dw_raw` with a justification comment
+- Or add the path to `packages/bietlejuice-compiler/scripts/governance_metadata_validation/skip_list.yml` under `cross_layer_joins_dw_raw` with a justification comment
 
 ### Core model failures (`validate-core-model-schemas`, `validate-core-model-schema-content`)
 

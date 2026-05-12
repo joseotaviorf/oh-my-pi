@@ -1,0 +1,71 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bietlejuice-core"
+version = "0.1.0"
+description = "Core utilities shared across all bietlejuice execution contexts"
+requires-python = ">=3.9,<3.13"
+dependencies = [
+    "boto3>=1.37.3",             # provided by runtime
+    "Cerberus>=1.3.5",           # not in runtime; keep
+    "Deprecated>=1.2.18",        # provided by runtime
+    "hierarchical-conf==1.0.4",  # not in runtime; keep
+    # quintoandar-logger intentionally omitted from Requires-Dist: it is a private
+    # GitHub package not on PyPI. pip (used by Databricks cluster libraries) cannot
+    # resolve it. It is deployed to clusters via default_libraries
+    # (quintoandar_logger-*.whl) and to Airflow via the Astronomer environment.
+    # For local dev / CI it is declared in [dependency-groups].dev (uv installs it
+    # via the [tool.uv.sources] git entry); production installs do not see it.
+    "requests>=2.32.3",          # provided by runtime
+    "Unidecode==1.1.1",          # not in runtime; keep (text-unidecode is, but not Unidecode)
+    "PyYAML>=6.0.1",             # provided by runtime; floor matches DBR 16.4's bundled 6.0.1
+    # pyspark intentionally omitted: only imported at function level in
+    # dag_packages_path_service.py; provided by bietlejuice-runtime in Spark contexts
+]
+
+[tool.uv.sources]
+quintoandar-logger = { git = "https://github.com/quintoandar/python-logger", tag = "0.8.1" }
+
+[tool.pytest.ini_options]
+testpaths = ["test/unit", "test/integration"]
+pythonpath = ["src"]
+addopts = ["--import-mode=importlib", "--cov=bietlejuice", "--cov-report=term-missing"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bietlejuice"]
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+
+[dependency-groups]
+dev = [
+    "pytest==8.3.5",   # airflow constraints-2-10
+    "pytest-cov",
+    "pytest-testmon",
+    "ruff==0.5.5",     # airflow constraints-2-10
+    "ty",              # no constraint available
+    # quintoandar-logger lives here (not in [project.dependencies]) so the
+    # published wheel stays installable by pip on Databricks; uv sync picks it
+    # up for tests via the [tool.uv.sources] git entry above.
+    "quintoandar-logger>=0.4.0",
+]
+
+
+[tool.ty.environment]
+python-version = "3.10"
+
+[tool.coverage.run]
+source = ["bietlejuice"]
+omit = ["*/__init__.py"]
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

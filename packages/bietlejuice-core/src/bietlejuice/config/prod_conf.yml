@@ -1,0 +1,2002 @@
+---
+artifacts_bucket: &artifacts_bucket s3://artifacts.s3.data.quintoandar.com.br
+athena_query_results_bucket: s3://5a-datalake/query_results/
+dags_out_of_pattern:
+    [
+        "amplitude",
+        "amplitude_demand",
+        "amplitude_supply",
+        "core_brokers",
+        "core_brokers_history",
+        "core_contract",
+        "core_credit_evaluation",
+        "core_house",
+        "core_offer",
+        "core_region",
+        "core_visit",
+        "cyber",
+        "cyber_complement",
+        "dw_contract_test",
+        "dw_datamarts_cross",
+        "dw_datamarts_for_rent",
+        "dw_datamarts_growth_cross",
+        "dw_datamarts_spark.for_sale",
+        "dw_datamarts_spark.for_sale_cross",
+        "dw_quintocred_ifrs",
+        "dw_rent_demand_events_snapshot",
+        "dw_satisfaction_rating",
+        "dw_velo",
+        "enrich_anonymization",
+        "enrich_chatbot",
+        "enrich_copilot_service",
+        "enrich_databricks",
+        "enrich_house_feature_inference",
+        "enrich_hr_system_custom",
+        "enrich_lost_listings",
+        "enrich_table_dependency_tree",
+        "enrich_vespucio_pipeline",
+        "quintoml.copilot.text2filter_evals.inference",
+        "quintoml.post_contract.wall_e_offboarding_categoriser.inference",
+        "quintoml.recs.house_user_embeddings.inference",
+        "quintoml.search.maestro.inference",
+        "quintoml.search.search_monitoring.inference",
+        "reverse_anonymization",
+        "reverse_atento",
+        "reverse_atento_test",
+        "reverse_ccv_price_report_load",
+        "reverse_dashboard_governance",
+        "reverse_demand_score",
+        "reverse_demand_classifieds_ranking",
+        "reverse_dsat_report_load",
+        "reverse_sale_listings_report",
+        "reverse_rent_liquidity_score_load",
+        "reverse_rent_liquidity_score_access",
+        "reverse_rent_listings_report_load",
+        "reverse_idactum_load",
+        "reverse_minority_report_ss",
+        "reverse_nazare",
+        "reverse_nexxera",
+        "reverse_regions_polygon",
+        "reverse_sale_unavailable_listings_load",
+        "reverse_supply",
+        "reverse_tracksale",
+        "reverse_webhelp",
+        "reverse_birdie",
+        "reverse_birdie_access",
+        "reverse_webhelp_test",
+        "reverse_kyc",
+        "survicate_surveys",
+        "survicate_survey_attributes",
+        "reverse_neighborhood_price_range_load",
+        "reverse_neighborhood_price_range_access",
+        "reverse_integration_cloudzero",
+        "reverse_listings_locations_load",
+        "reverse_listings_locations_access",
+        "reverse_reports",
+        "reverse_listing_quality_load",
+        "reverse_listing_quality_access",
+    ]
+databricks_bietlejuice_repo_path: s3://5a-databricks/github-repos/bi-etl-ejuice
+databricks_bucket: 5a-databricks
+dags_packages_files_path_in_s3: "github-repos/bi-etl-ejuice/"
+data_documentation_bucket: data-documentation.s3.data.quintoandar.com.br
+datalake_bucket: 5a-datalake-prod
+incoming_bucket: 5a-datalake-incoming-prod
+wonka_bucket: wonka.s3.data.quintoandar.com.br
+doc_md_chart_url: https://n2065e18540524a1cp-tp.appspot.com/admin/airflow/chart?chart_id=11&iteration_no=22&dag_id=
+dw_bucket: 5a-dw-prod
+planning_and_performance_bucket: 5a-dataops-prod
+people_bucket: people-s3-data-quintoandar-com-br
+union_bucket: ingestao-dados-union/union
+analytical_environment_costs_bucket: 5a-analytical-environment-costs-prod
+inmetro_bucket: s3://inmetro-s3-data-quintoandar-com-br
+metrics_bucket: 5a-business-metrics-com-br-prod
+datahub_host: https://datahub.apps.data-prd.habitat.zone
+spectrum_iam_role: arn:aws:iam::206390561754:role/SpectrumCrossAccount
+spark_jobs_logs_path: s3://5a-databricks/logs/jobs/
+volume_databricks_bucket: /Volumes/quintoandar_prod/default/databricks_s3_prod_data/
+volume_data_documentation_bucket: /Volumes/quintoandar_prod/default/data_documentation_s3_prod_data/
+databricks_default_service_credential_name: databricks_default_service_credential_prod
+data_quality_tests_kafka_topic: prod_databricks.events.data_quality
+default_libraries: [
+        {
+            "whl": "s3://artifacts.s3.data.quintoandar.com.br/bi-etl-ejuice/bietlejuice_core-latest-py3-none-any.whl",
+        },
+        {
+            "whl": "s3://artifacts.s3.data.quintoandar.com.br/bi-etl-ejuice/bietlejuice_runtime-latest-py3-none-any.whl",
+        },
+        {
+            "whl": "s3://artifacts.s3.data.quintoandar.com.br/python-logger/quintoandar_logger-0.8.0-py3-none-any.whl",
+        },
+        {
+            # To be used with data quality tests job
+            "jar": "s3://artifacts.s3.data.quintoandar.com.br/jars/kafka-clients-3.5.0.jar",
+        },
+    ]
+default_access_control_list:
+    - group_name: analytics-engineers
+      permission_level: CAN_MANAGE
+
+##### Cluster Pools #####
+
+pool_m5a_xlarge_on_demand: &pool_m5a_xlarge_on_demand 0909-205705-pelts9-pool-0fnxc9hu
+pool_m5a_xlarge_spot: &pool_m5a_xlarge_spot 0909-210021-must9-pool-419cr6z6
+pool_rfleet_xlarge_on_demand: &pool_rfleet_xlarge_on_demand 0923-015726-valor51-pool-oodxplb6
+
+##### Clusters Configs #####
+cluster_template:
+    # "cluster_anchor_base" is the one to use for clusters with instance pools
+    cluster_base: &cluster_anchor_base
+        autotermination_minutes: 20
+        aws_attributes:
+            instance_profile_arn: "{{ var.value.instance_profile_arn }}"
+        cluster_log_conf:
+            s3:
+                destination: s3://{{ var.value.databricks_s3_bucket }}/logs/jobs/{{ dag.dag_id}}
+                region: us-east-1
+        cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
+        custom_tags:
+            - key: dag_id
+              value: "{{ dag.dag_id }}"
+            - key: application
+              value: "{{ dag.dag_id }}"
+            - key: app
+              value: airflow
+            - key: resource-name
+              value: databricks
+            - key: environment
+              value: "{{ var.value.environment }}"
+            - key: owner
+              value: "{{ task.owner.lower().replace(' ', '-') }}"
+            - key: ecosystem
+              value: data-engineering
+            - key: data-classification
+              value: private
+            - key: sensitive-data
+              value: true
+            - key: cost-center
+              value: c052
+            - key: provisioner
+              value: bietlejuice
+        init_scripts:
+            - s3:
+                  destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
+                  region: ""
+        spark_conf: &spark_conf_base_anchor
+            spark.rpc.message.maxSize: "2000"
+            spark.sql.sources.partitionOverwriteMode: dynamic
+            spark.sql.parquet.filterPushdown: "true"
+            spark.sql.sources.default: parquet
+            spark.sql.legacy.createHiveTableByDefault: "true"
+            spark.sql.legacy.parquet.datetimeRebaseModeInRead: LEGACY
+            spark.sql.legacy.parquet.datetimeRebaseModeInWrite: LEGACY
+            spark.sql.legacy.timeParserPolicy: LEGACY
+            spark.metrics.conf.*.sink.graphite.class: "org.apache.spark.metrics.sink.GraphiteSink"
+            spark.metrics.conf.*.sink.graphite.host: "graphite-exporter.quintoandar.com.br"
+            spark.metrics.conf.*.sink.graphite.period: "15"
+            spark.metrics.conf.*.sink.graphite.port: "9109"
+            spark.metrics.conf.*.sink.graphite.unit: "seconds"
+            spark.metrics.conf.*.source.jvm.class: "org.apache.spark.metrics.source.JvmSource"
+            spark.metrics.namespace: "{{ dag.dag_id.replace('.', '_').replace('_', '.', 1) }}"
+            spark.plugins: "ch.cern.CloudFSMetrics,ch.cern.CgroupMetrics,br.com.quintoandar.GangliaMetrics"
+            spark.jars.packages: "ch.cern.sparkmeasure:spark-plugins_2.12:0.2,ch.cern.sparkmeasure:spark-measure_2.12:0.21"
+            spark.cernSparkPlugin.cloudFsName: "s3a"
+            spark.extraListeners: "ch.cern.sparkmeasure.FlightRecorderStageMetrics"
+            spark.sparkmeasure.outputFilename: "/tmp/stageMetrics_flightRecorder.json"
+            spark.sparkmeasure.outputFormat: "json"
+            spark.sparkmeasure.printToStdout: "false"
+            spark.databricks.delta.retentionDurationCheck.enabled: "false"
+            spark.databricks.behaviorChange.SC102534CommandRedactProperties.enabled: "false"
+            spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
+        spark_env_vars:
+            PYSPARK_PYTHON: "/databricks/python3/bin/python3"
+            SPARK_RUNTIME: databricks
+            ENVIRONMENT: "{{ var.value.environment }}"
+            ARTIFACTS_BUCKET: *artifacts_bucket
+            DATAHUB_GRAPHQL_URL: "https://datahub-gms.apps.data-prd.habitat.zone/api/graphql"
+            # Cross-account Glue Data Catalog (Databricks workspace → data account); Airflow Variable: glue_assume_role_arn
+            GLUE_ASSUME_ROLE_ARN: "{{ var.value.glue_assume_role_arn }}"
+        ssh_public_keys: []
+        spark_version: 10.4.x-scala2.12
+        data_security_mode: SINGLE_USER
+        single_user_name: "{{ var.value.databricks_single_user_name }}"
+
+    # "cluster_anchor" is the one to use for clusters without instance pools
+    cluster_template_no_pool: &cluster_anchor
+        <<: *cluster_anchor_base
+        enable_elastic_disk: "true"
+        aws_attributes: &aws_anchor
+            availability: SPOT_WITH_FALLBACK
+            ebs_volume_count: 1
+            first_on_demand: 1
+            ebs_volume_size: 100
+            ebs_volume_type: GENERAL_PURPOSE_SSD
+            instance_profile_arn: "{{ var.value.instance_profile_arn }}"
+            spot_bid_price_percent: 100
+            zone_id: us-east-1d
+        custom_tags: &cluster_custom_tags_anchor
+            dag_id: "{{ dag.dag_id }}"
+            application: "{{ dag.dag_id }}"
+            app: airflow
+            resource-name: databricks
+            environment: "{{ var.value.environment }}"
+            owner: "{{ task.owner.lower().replace(' ', '-') }}"
+            ecosystem: data-engineering
+            data-classification: private
+            sensitive-data: "true"
+            cost-center: c052
+            provisioner: bietlejuice
+        node_type_id: m5a.large
+        driver_node_type_id: m5a.large
+        spark_conf: &spark_conf_anchor
+            <<: *spark_conf_base_anchor
+
+custom_cluster:
+    <<: *cluster_anchor
+
+custom_cluster_with_sedona:
+    <<: *cluster_anchor
+    init_scripts:
+        - s3:
+              destination: "{{ var.value.artifacts_bucket }}/sedona/sedona-init.sh"
+              region: ""
+        - s3:
+              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
+              region: ""
+
+wonka_cluster:
+    <<: *cluster_anchor
+    access_control_list:
+        group_name: mlops
+        permission_level: CAN_MANAGE
+    databricks_conn_id: databricks_new
+    custom_libraries:
+        - maven:
+              coordinates: "org.apache.kafka:kafka-clients:3.5.1"
+    custom_configurations:
+        single_user_name: "{{ var.value.databricks_single_user_name }}"
+        data_security_mode: SINGLE_USER
+        spark_conf:
+            spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+            spark.databricks.delta.schema.autoMerge.enabled: "true"
+    spark_env_vars:
+        PREV_DATA_INTERVAL_START_SUCCESS: "{{ prev_data_interval_start_success }}"
+        PREV_DATA_INTERVAL_END_SUCCESS: "{{ prev_data_interval_end_success }}"
+        PREV_START_DATE_SUCCESS: "{{ prev_start_date_success }}"
+        PREV_END_DATE_SUCCESS: "{{ prev_end_date_success }}"
+        DATA_INTERVAL_START: "{{ data_interval_start | ds }}"
+        DATA_INTERVAL_START_JUST_FOR_DEBUG: "{{ data_interval_start }}"
+        DATA_INTERVAL_END: "{{ data_interval_end }}"
+        LOGICAL_DATE: "{{ logical_date }}"
+        VAULT_SECRET: "{{ '{{secrets/mlops/VAULT_SECRET}}' }}"
+        ENVIRONMENT: "{{ var.value.environment }}"
+        FEATURE_STORE_HISTORICAL_DATABASE: "wonka"
+        FEATURE_STORE_S3_BUCKET: "wonka.s3.data.quintoandar.com.br/wonka"
+        INMETRO_VERSION: "{{ var.value.environment }}"
+        INMETRO_DATA_ALARMS_SLACK_WEBHOOK: "https://notification-hub-internal-api.quintoandar.com.br/webhook/inmetro?space=data-alarms"
+        INMETRO_S3_BUCKET_LOADER: "inmetro-s3-data-quintoandar-com-br"
+        KAFKA_CONNECTION_STRING: "kafka-01.svc.core-prd.habitat.zone:9092,kafka-02.svc.core-prd.habitat.zone:9092,kafka-03.svc.core-prd.habitat.zone:9092"
+        PYSPARK_PYTHON: "/databricks/python3/bin/python3"
+        SPARK_RUNTIME: databricks
+        SPARK_VERSION: "3.5.0"
+        STREAM_CHECKPOINT_PATH: "s3://wonka.s3.data.quintoandar.com.br/checkpoints/online_feature_store"
+        STREAM_PROCESSING_TIME: "0 seconds"
+        ARTIFACTS_BUCKET: *artifacts_bucket
+        AIRFLOW_EXECUTION_PARAMS: "{{ dag_run.conf }}"
+        AIRFLOW_EXECUTION_DATE: "{{ ds }}"
+        AIRFLOW_PREVIOUS_EXECUTION_DATE: "{{ prev_ds }}"
+        AIRFLOW_NEXT_EXECUTION_DATE: "{{ next_ds }}"
+        WONKA_START_DATE: "{{ dag_run.conf.get('start_date', '') }}"
+        WONKA_END_DATE: "{{ dag_run.conf.get('end_date', '') }}"
+        WONKA_DISABLE_ONLINE_WRITER: "{{ dag_run.conf.get('disable_online_writer', 'false')}}"
+        WONKA_FORCE_FULL_LOAD: "{{ dag_run.conf.get('force_full_load', 'false')}}"
+        CDF_TO_KAFKA_USE_SCHEMA_REGISTRY: "false"
+    aws_attributes:
+        <<: *aws_anchor
+        availability: SPOT_WITH_FALLBACK
+    init_scripts:
+        - s3:
+              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/install_spark_metrics_plugin.sh"
+              region: ""
+        - s3:
+              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/install_pex_generic.sh"
+              region: ""
+        - s3:
+              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/get_credentials_from_vault.sh"
+              region: ""
+
+databricks_10_4_min_general_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5a.large
+    driver_node_type_id: m5a.large
+    num_workers: 2
+    spark_version: 10.4.x-scala2.12
+
+databricks_12_2_min_general_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5a.large
+    driver_node_type_id: m5a.large
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+
+databricks_13_3_min_general_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5a.large
+    driver_node_type_id: m5a.large
+    num_workers: 1
+    spark_version: 13.3.x-scala2.12
+
+databricks_16_4_min_general_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5a.large
+    driver_node_type_id: m5a.large
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+databricks_13_3_min_general_2_workers_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5d.large
+    driver_node_type_id: m5d.large
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+
+databricks_16_4_min_general_2_workers_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5d.large
+    driver_node_type_id: m5d.large
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+databricks_13_3_min_2_fixed_workers_general_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5d.xlarge
+    driver_node_type_id: m5d.large
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+
+databricks_10_4_med_general_cluster:
+    <<: *cluster_anchor_base
+    driver_instance_pool_id: *pool_m5a_xlarge_on_demand
+    instance_pool_id: *pool_m5a_xlarge_spot
+    num_workers: 3
+    spark_version: 10.4.x-scala2.12
+
+databricks_12_2_med_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_med_2xlarge_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_med_4xlarge_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.4xlarge
+    node_type_id: m5a.8xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_med_2xlarge_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_med_2xlarge_3_workers_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_2xlarge_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_med_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_med_memory_2_workers_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_memory_2_workers_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_med_memory_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_memory_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_med_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_med_memory_on_demand_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.2xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+        availability: ON_DEMAND
+
+databricks_13_3_med_memory_2_workers_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_med_general_2_workers_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_general_2_workers_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_med_general_driver_2_min_workers_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.large
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_general_driver_2_min_workers_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.large
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_med_general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: m5d.4xlarge
+    num_workers: 3
+    runtime_engine: PHOTON
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_med_compute_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: c5a.2xlarge
+    node_type_id: c5a.2xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_min_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.large
+    node_type_id: r5a.large
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_min_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_xmin_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.large
+    node_type_id: r5a.large
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_xmin_view_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5.large
+    node_type_id: m5.large
+    num_workers: 1
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 50
+
+databricks_16_4_xmin_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.large
+    node_type_id: r5a.large
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_min_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.large
+    node_type_id: r5a.large
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_min_2xlarge_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.2xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_10_4_med_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.8xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 3
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_med_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.8xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_10_4_max_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.8xlarge
+    num_workers: 4
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_min_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.large
+    node_type_id: r5a.xlarge
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_min_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.large
+    node_type_id: r5a.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_min_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.large
+    node_type_id: r5a.xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_med_io-general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.4xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_med_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_10_4_max_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.8xlarge
+    num_workers: 4
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_max_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.8xlarge
+    num_workers: 4
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_max_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.8xlarge
+    num_workers: 4
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_min_io-general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.large
+    node_type_id: m5a.xlarge
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_min_io-general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.large
+    node_type_id: m5a.xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_min_io-general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.large
+    node_type_id: m5a.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_med_io-general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.4xlarge
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_io-general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: m5a.4xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_max_io-general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.4xlarge
+    node_type_id: m5a.8xlarge
+    num_workers: 4
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_max_io-general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.4xlarge
+    node_type_id: m5a.8xlarge
+    num_workers: 4
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_10_4_min_general_photon_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5d.large
+    driver_node_type_id: m5d.large
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 10.4.x-scala2.12
+
+databricks_12_2_min_general_photon_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5d.large
+    driver_node_type_id: m5d.large
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+
+databricks_16_4_min_general_photon_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5d.large
+    driver_node_type_id: m5d.large
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+databricks_13_3_min_xlarge_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.xlarge
+    node_type_id: r5d.large
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+
+databricks_12_2_min_xlarge_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.xlarge
+    node_type_id: r5d.large
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_min_xlarge_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.large
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_min_xlarge_io-memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.large
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_min_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.large
+    node_type_id: r5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_nano_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.large
+    node_type_id: r5d.large
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_min_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.large
+    node_type_id: r5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+
+databricks_13_3_med_mem_driver_min_memory_2_nodes_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+
+databricks_16_4_med_mem_driver_min_memory_2_nodes_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+databricks_13_3_med_mem_driver_min_memory_2_nodes_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+
+databricks_16_4_med_mem_driver_min_memory_2_nodes_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+databricks_10_4_med_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_med_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_xmed_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.xlarge
+    node_type_id: r5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_xmed_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.xlarge
+    node_type_id: r5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_xmed_2w_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.xlarge
+    node_type_id: r5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_xmin-io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.xlarge
+    node_type_id: r5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_xmin-io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.xlarge
+    node_type_id: r5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_10_4_min_memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 10.4.x-scala2.12
+
+databricks_12_2_min_memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+
+databricks_16_4_min_memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+databricks_10_4_med_memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.8xlarge
+    node_type_id: r5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_med_memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.8xlarge
+    node_type_id: r5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_10_4_med_general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 10.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_med_general_3_nodes_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.xlarge
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+
+databricks_12_2_med_general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_med_3_fixed_workers_general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_med_2_fixed_workers_general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_med_2_fixed_workers_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.xlarge
+    num_workers: 2
+    spark_version: 13.3.x-scala2.12
+
+databricks_13_3_min_fixed_workers_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.large
+    num_workers: 1
+    spark_version: 13.3.x-scala2.12
+
+databricks_12_2_med_2xlarge_general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_2xlarge_general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_med_4xlarge_general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.4xlarge
+    node_type_id: r5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_4xlarge_general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.4xlarge
+    node_type_id: r5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_driver_med_general_mem_nodes_med_mem_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: m5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+
+databricks_13_3_driver_med_mem_nodes_general_med_mem_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: m5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 13.3.x-scala2.12
+
+databricks_12_2_med_io-general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: m5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_io-general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: m5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_min_io-general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.xlarge
+    node_type_id: r5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_min_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.large
+    node_type_id: r5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_min_io-general_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.xlarge
+    node_type_id: r5d.xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_max_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.4xlarge
+    node_type_id: r5d.8xlarge
+    runtime_engine: PHOTON
+    num_workers: 4
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_max_io-memory_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5d.4xlarge
+    node_type_id: r5d.8xlarge
+    runtime_engine: PHOTON
+    num_workers: 4
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_small_memory_people_cluster:
+    <<: *cluster_anchor
+    node_type_id: r5a.large
+    driver_node_type_id: r5a.large
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+        instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
+
+databricks_16_4_medium_general_people_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+        instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
+
+databricks_16_4_medium_memory_people_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+        instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
+
+databricks_16_4_med_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: m5a.2xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_5_workers_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.2xlarge
+    node_type_id: r5a.2xlarge
+    num_workers: 5
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_min_analytical_costs_cluster:
+    <<: *cluster_anchor
+    node_type_id: m5a.large
+    driver_node_type_id: m5a.large
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+        instance_profile_arn: "{{ var.value.instance_profile_secret_arn_analytical_environment_costs }}"
+
+databricks_12_2_med_io-general_analytical_costs_photon_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5d.2xlarge
+    node_type_id: m5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 3
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+        instance_profile_arn: "{{ var.value.instance_profile_secret_arn_analytical_environment_costs }}"
+databricks_12_2_med_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.4xlarge
+    num_workers: 4
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_med_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m5a.xlarge
+    node_type_id: m5a.4xlarge
+    num_workers: 4
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_12_2_med_mem_driver_high_mem_nodes:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 2
+    spark_version: 12.2.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_13_3_high_mem_driver_high_mem_nodes:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 5
+    spark_version: 13.3.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_high_mem_driver_high_mem_nodes:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 5
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_high_mem_driver_high_mem_nodes_3_workers:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.4xlarge
+    node_type_id: r5a.4xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_medium_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.xlarge
+    node_type_id: r5a.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_small_general_fleet_xlarge_single_node:
+    <<: *cluster_anchor
+    driver_node_type_id: m-fleet.xlarge
+    node_type_id: m-fleet.xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_small_general_fleet_2xlarge_single_node:
+    <<: *cluster_anchor
+    driver_node_type_id: m-fleet.2xlarge
+    node_type_id: m-fleet.2xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_small_general_fleet_4xlarge_single_node:
+    <<: *cluster_anchor
+    driver_node_type_id: m-fleet.4xlarge
+    node_type_id: m-fleet.4xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_small_general_fleet_8xlarge_single_node:
+    <<: *cluster_anchor
+    driver_node_type_id: m-fleet.8xlarge
+    node_type_id: m-fleet.8xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+databricks_16_4_rfleet_instance_cluster:
+    <<: *cluster_anchor_base
+    driver_instance_pool_id: *pool_rfleet_xlarge_on_demand
+    instance_pool_id: *pool_rfleet_xlarge_on_demand
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+databricks_16_4_rfleet_instance_cluster_3_workers:
+    <<: *cluster_anchor_base
+    driver_instance_pool_id: *pool_rfleet_xlarge_on_demand
+    instance_pool_id: *pool_rfleet_xlarge_on_demand
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+
+databricks_16_4_rfleet_instance_cluster_4_workers:
+    <<: *cluster_anchor_base
+    driver_instance_pool_id: *pool_rfleet_xlarge_on_demand
+    instance_pool_id: *pool_rfleet_xlarge_on_demand
+    num_workers: 4
+    spark_version: 16.4.x-scala2.12
+
+databricks_16_4_rfleet_instance_cluster_5_workers:
+    <<: *cluster_anchor_base
+    driver_instance_pool_id: *pool_rfleet_xlarge_on_demand
+    instance_pool_id: *pool_rfleet_xlarge_on_demand
+    num_workers: 5
+    spark_version: 16.4.x-scala2.12
+
+databricks_16_4_rfleet_instance_cluster_7_workers:
+    <<: *cluster_anchor_base
+    driver_instance_pool_id: *pool_rfleet_xlarge_on_demand
+    instance_pool_id: *pool_rfleet_xlarge_on_demand
+    num_workers: 7
+    spark_version: 16.4.x-scala2.12
+
+databricks_16_4_min_2xlarge_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.2xlarge
+    num_workers: 3
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+databricks_16_4_min_2xlarge_memory_cluster_4_workers:
+    <<: *cluster_anchor
+    driver_node_type_id: r5a.2xlarge
+    node_type_id: r5a.2xlarge
+    num_workers: 4
+    spark_version: 16.4.x-scala2.12
+    aws_attributes:
+        <<: *aws_anchor
+        ebs_volume_size: 200
+
+### EMR Cluster Configs ###
+
+emr_cluster_base: &emr_cluster_anchor
+    cluster_name: "{{ dag.dag_id }}_{{ run_id }}"
+    spark_version: emr-7.12.0
+    node_type_id: m7a.xlarge
+    driver_node_type_id: m7a.xlarge
+    num_workers: 2
+    autotermination_minutes: 20
+    emr_auto_terminate: false
+    aws_attributes: &emr_aws_anchor
+        availability: ON_DEMAND
+        ebs_volume_count: 1
+        ebs_volume_size: 200
+        ebs_volume_type: GENERAL_PURPOSE_SSD
+        instance_profile_arn: "{{ var.value.emr_instance_profile_arn }}"
+    emr_applications:
+        - Hadoop
+        - Hive
+        - JupyterEnterpriseGateway
+        - Livy
+        - Spark
+    emr_subnet_id: "{{ var.value.emr_subnet_id }}"
+    emr_service_role: "{{ var.value.emr_service_role }}"
+    emr_ebs_root_volume_size: 100
+    cluster_log_conf:
+        s3:
+            destination: "{{ var.value.artifacts_bucket }}/emr/logs/{{ dag.dag_id }}"
+    init_scripts:
+        - s3:
+              destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/emr_init_script.sh"
+          args:
+              - "{{ var.value.artifacts_bucket }}"
+    custom_tags:
+        - key: app
+          value: airflow
+        - key: resource-name
+          value: emr
+        - key: environment
+          value: "{{ var.value.environment }}"
+        - key: owner
+          value: "{{ task.owner.lower().replace(' ', '-') }}"
+        - key: ecosystem
+          value: data-engineering
+        - key: data-classification
+          value: private
+        - key: cost-center
+          value: c052
+        - key: provisioner
+          value: emr
+        - key: for-use-with-amazon-emr-managed-policies
+          value: "true"
+    emr_configurations:
+        - Classification: iceberg-defaults
+          Properties:
+              iceberg.enabled: "true"
+        - Classification: delta-defaults
+          Properties:
+              delta.enabled: "true"
+        - Classification: yarn-env
+          Configurations:
+              - Classification: export
+                Properties:
+                    ARTIFACTS_BUCKET: *artifacts_bucket
+                    ENVIRONMENT: "{{ var.value.environment }}"
+                    SPARK_RUNTIME: "emr"
+                    SPARK_VERSION: "3.5"
+                    DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
+                    DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
+          Properties: {}
+        - Classification: spark-hive-site
+          Properties:
+              hive.metastore.client.factory.class: "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
+    spark_conf:
+        spark.rpc.message.maxSize: "2000"
+        spark.sql.sources.partitionOverwriteMode: dynamic
+        spark.sql.parquet.filterPushdown: "true"
+        spark.sql.sources.default: parquet
+        spark.sql.legacy.createHiveTableByDefault: "true"
+        spark.sql.legacy.parquet.datetimeRebaseModeInRead: LEGACY
+        spark.sql.legacy.parquet.datetimeRebaseModeInWrite: LEGACY
+        spark.sql.legacy.timeParserPolicy: LEGACY
+        spark.sql.catalogImplementation: hive
+        spark.driverEnv.ARTIFACTS_BUCKET: *artifacts_bucket
+        spark.driverEnv.ENVIRONMENT: "{{ var.value.environment }}"
+        spark.driverEnv.SPARK_RUNTIME: "emr"
+        spark.driverEnv.SPARK_VERSION: "3.5"
+        spark.driverEnv.DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
+        spark.driverEnv.DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
+        spark.executorEnv.ARTIFACTS_BUCKET: *artifacts_bucket
+        spark.executorEnv.ENVIRONMENT: "{{ var.value.environment }}"
+        spark.executorEnv.SPARK_RUNTIME: "emr"
+        spark.executorEnv.SPARK_VERSION: "3.5"
+        spark.executorEnv.DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
+        spark.executorEnv.DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
+        spark.yarn.appMasterEnv.ARTIFACTS_BUCKET: *artifacts_bucket
+        spark.yarn.appMasterEnv.ENVIRONMENT: "{{ var.value.environment }}"
+        spark.yarn.appMasterEnv.SPARK_RUNTIME: "emr"
+        spark.yarn.appMasterEnv.SPARK_VERSION: "3.5"
+        spark.yarn.appMasterEnv.DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
+        spark.yarn.appMasterEnv.DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
+    spark_env_vars:
+        ENVIRONMENT: "{{ var.value.environment }}"
+        ARTIFACTS_BUCKET: *artifacts_bucket
+        SPARK_RUNTIME: "emr"
+        SPARK_VERSION: "3.5"
+        DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
+        DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
+
+emr_7_12_med_general_cluster:
+    <<: *emr_cluster_anchor
+
+emr_7_12_med_general_3_workers_cluster:
+    <<: *emr_cluster_anchor
+    node_type_id: m7a.2xlarge
+    driver_node_type_id: m7a.2xlarge
+    num_workers: 3
+    aws_attributes:
+        <<: *emr_aws_anchor
+        ebs_volume_size: 100
+        availability: ON_DEMAND
+
+emr_7_12_min_general_2_workers_cluster:
+    <<: *emr_cluster_anchor
+    node_type_id: m7a.xlarge
+    driver_node_type_id: m7a.xlarge
+    num_workers: 2
+    aws_attributes:
+        <<: *emr_aws_anchor
+        ebs_volume_size: 100
+        availability: ON_DEMAND
+
+emr_7_12_min_general_3_workers_cluster:
+    <<: *emr_cluster_anchor
+    node_type_id: m7a.xlarge
+    driver_node_type_id: m7a.xlarge
+    num_workers: 3
+    aws_attributes:
+        <<: *emr_aws_anchor
+        ebs_volume_size: 100
+        availability: ON_DEMAND
+
+emr_7_12_med_general_2_workers_cluster:
+    <<: *emr_cluster_anchor
+    node_type_id: m7a.2xlarge
+    driver_node_type_id: m7a.2xlarge
+    num_workers: 2
+    aws_attributes:
+        <<: *emr_aws_anchor
+        ebs_volume_size: 100
+        availability: ON_DEMAND
+
+##### Consolidation Cluster Presets #####
+# Naming: consolidation_{size}_{family}_cluster
+# Sizes (vCPUs): xs=2  s=4  m=8  l=16  xl=32
+# Families: compute=c6g (1:2)  general=m6g (1:4)  memory=r6g (1:8)  — AWS Graviton (gen 6).
+# Special IAM: declare aws_attributes.instance_profile_arn in the DAG's custom_configurations.
+
+##### Compute Optimized (c6g — 1 vCPU : 2 GiB RAM) #####
+
+consolidation_xs_compute_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: c6g.large
+    node_type_id: c6g.large
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_s_compute_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: c6g.xlarge
+    node_type_id: c6g.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_m_compute_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: c6g.2xlarge
+    node_type_id: c6g.2xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_l_compute_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: c6g.4xlarge
+    node_type_id: c6g.4xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_xl_compute_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: c6g.8xlarge
+    node_type_id: c6g.8xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+##### General Purpose (m6g — 1 vCPU : 4 GiB RAM) #####
+
+consolidation_xs_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.large
+    node_type_id: m6g.large
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_s_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.xlarge
+    node_type_id: m6g.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_m_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.2xlarge
+    node_type_id: m6g.2xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_l_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.4xlarge
+    node_type_id: m6g.4xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_xl_general_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.8xlarge
+    node_type_id: m6g.8xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+##### Memory Optimized (r6g — 1 vCPU : 8 GiB RAM) #####
+
+consolidation_xs_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.large
+    node_type_id: r6g.large
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_s_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.xlarge
+    node_type_id: r6g.xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_m_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.2xlarge
+    node_type_id: r6g.2xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_l_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.4xlarge
+    node_type_id: r6g.4xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+consolidation_xl_memory_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.8xlarge
+    node_type_id: r6g.8xlarge
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+##### Consolidation Single-Node Presets #####
+# Naming: consolidation_{size}_{family}_single_node_cluster
+# Sizes (vCPUs): xs=2  s=4  m=8  l=16  xl=32
+# Families: general=m6g (Graviton ARM, 1:4)  memory=r6g (Graviton ARM, 1:8)
+# compute family omitted — no dedicated single-node compute t-shirt in this set.
+# All specs: num_workers=0, singleNode spark conf, ResourceClass=SingleNode tag.
+# Default runtime: 16.4.x-scala2.12  (override per-DAG via custom_configurations.spark_version)
+
+##### General Purpose Single-Node (m6g — 1 vCPU : 4 GiB RAM) #####
+
+consolidation_xs_general_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.large
+    node_type_id: m6g.large
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_s_general_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.xlarge
+    node_type_id: m6g.xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_m_general_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.2xlarge
+    node_type_id: m6g.2xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_l_general_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.4xlarge
+    node_type_id: m6g.4xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_xl_general_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: m6g.8xlarge
+    node_type_id: m6g.8xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+##### Memory Optimized Single-Node (r6g — 1 vCPU : 8 GiB RAM) #####
+
+consolidation_xs_memory_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.large
+    node_type_id: r6g.large
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_s_memory_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.xlarge
+    node_type_id: r6g.xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_m_memory_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.2xlarge
+    node_type_id: r6g.2xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_l_memory_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.4xlarge
+    node_type_id: r6g.4xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+consolidation_xl_memory_single_node_cluster:
+    <<: *cluster_anchor
+    driver_node_type_id: r6g.8xlarge
+    node_type_id: r6g.8xlarge
+    num_workers: 0
+    spark_version: 16.4.x-scala2.12
+    spark_conf:
+        <<: *spark_conf_anchor
+        spark.databricks.cluster.profile: "singleNode"
+        spark.master: "local[*]"
+    custom_tags:
+        <<: *cluster_custom_tags_anchor
+        ResourceClass: "SingleNode"
+
+### Notification Configs ###
+notification_webhooks_keys:
+    data_quality: GCHAT_DATA_QUALITY_PROD_WEBHOOK
+
+vespucio_pipeline_version: "latest"
+vespucio_output_path: "s3://5a-vespucio-prod"
+
+### Datazord Configs
+datazord_kafka_bootstrap_servers: "lkc-256gpm-jv0e34.us-east-1.aws.glb.confluent.cloud:9092"
+datazord_base_checkpoint_location: "s3://wonka.s3.data.quintoandar.com.br/checkpoints/cdf-to-kafka"

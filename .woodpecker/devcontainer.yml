@@ -1,0 +1,60 @@
+# Devcontainer image build — DISABLED.
+#
+# This pipeline exists so the multi-stage `.devcontainer/Dockerfile` can be
+# verified to build under sandboxed CI conditions (catching drift on
+# pyproject.toml / uv.lock changes that locally rebuild fine but break in a
+# clean runner). It is NOT auto-triggered — `event: manual` means it only runs
+# when someone clicks "Run pipeline" in the Web UI, or via `woodpecker-cli`.
+# No registry push.
+#
+# To enable on push (e.g. when registry distribution is later approved):
+#   1. Replace `event: manual` with `event: [push, pull_request]` and add
+#      `branch: master` (or whatever auto-build branch is desired).
+#   2. Add a path filter so the pipeline only runs when the image inputs
+#      actually change:
+#        path:
+#          include:
+#            - '.devcontainer/**'
+#            - 'pyproject.toml'
+#            - 'uv.lock'
+#            - 'packages/*/pyproject.toml'
+#            - 'packages/*/uv.lock'
+#            - 'packages/bietlejuice-runtime/envs/*/pyproject.toml'
+#            - 'packages/bietlejuice-runtime/envs/*/uv.lock'
+#            - '.woodpecker/devcontainer.yml'
+#          on_empty: false
+#   3. To publish, set `output: type=registry` and `repo:` to the registry URL,
+#      and add tags (e.g. `latest`, `sha-${CI_COMMIT_SHA}`). Multi-arch via
+#      `platforms: linux/amd64,linux/arm64` if the runner has buildx + QEMU,
+#      or split into a per-arch matrix on native runners and a manifest-merge
+#      step.
+
+clone:
+  - name: clone
+    image: woodpeckerci/plugin-git
+    settings:
+      partial: false  # full history, in case future path filters rely on it
+
+steps:
+  build-devcontainer-image:
+    image: woodpeckerci/plugin-docker-buildx
+    settings:
+      dockerfile: .devcontainer/Dockerfile
+      context: .
+      tags: bi-etl-ejuice-devcontainer:ci-${CI_COMMIT_SHA}
+      output: type=docker  # build only — no push to any registry
+      build_args:
+        - UV_VERSION=0.11.7
+        - ASTRO_CLI_VERSION=1.41.0
+      # Private GitHub deps (quintoandar-logger and the quintoandar-*-api-client
+      # packages declared in packages/bietlejuice-runtime/pyproject.toml) are
+      # cloned via a BuildKit secret mount in the Dockerfile. The Woodpecker
+      # secret name (left side of `from_secret:`) needs to exist in this repo's
+      # secret settings; rename to whatever the org uses for cross-repo PATs.
+      secrets:
+        - id=GITHUB_TOKEN,env=GITHUB_TOKEN
+    environment:
+      GITHUB_TOKEN:
+        from_secret: github_token
+    when:
+      event: manual

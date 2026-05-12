@@ -8,7 +8,7 @@ username = os.getlogin()
 s3_bucket = 'databricks.s3.forno.data.quintoandar.com.br'
 s3_folder_path = 'github-repos/bi-etl-ejuice-local/{username}/spark_jobs'.format(username=username)
 
-composer_dags_folder = 'bietlejuice/dags/'
+composer_dags_folder = 'dags/'
 abs_path = os.path.dirname(os.path.realpath(__file__))
 
 for root, _, files in os.walk('{}/../{}'.format(abs_path, composer_dags_folder)):

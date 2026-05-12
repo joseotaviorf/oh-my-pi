@@ -14,7 +14,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql.functions import lit
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.api import APIEnum
+from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import (
     BaseDBUtils,

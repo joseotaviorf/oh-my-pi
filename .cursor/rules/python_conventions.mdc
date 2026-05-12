@@ -5,7 +5,7 @@ alwaysApply: false
 # Python Conventions — bietlejuice
 
 ## Formatting & Tooling
-- **Black** line length: **88**. **Flake8** for linting. **Python 3.8.12** (pyenv).
+- **Ruff** line length: **88** (format + lint). Python **>=3.10** (workspace packages: airflow, compiler) / **>=3.9** (core, runtime).
 - Run `make check-style` to lint before committing.
 
 ## Imports
@@ -79,4 +79,4 @@ class MyModel(BaseModel):
 
 ## Test-Driven Development (TDD)
 
-Follow Red → Green → Refactor for every new module or function. Every new `.py` module must ship with a companion test file in `tests/unit/` in the same diff. See `testing_conventions.mdc` for full TDD rules, patterns, and fixtures.
+Follow Red → Green → Refactor for every new module or function. Every new `.py` module must ship with a companion test file in `packages/*/test/unit/` in the same diff. See `testing_conventions.mdc` for full TDD rules, patterns, and fixtures.

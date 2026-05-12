@@ -11,7 +11,7 @@ from google.oauth2.credentials import Credentials
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.api import APIEnum
+from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient

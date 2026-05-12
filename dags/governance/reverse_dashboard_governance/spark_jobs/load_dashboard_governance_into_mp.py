@@ -8,7 +8,7 @@ from quintoandar_logger import QuintoAndarLogger
 from requests import RequestException
 from requests.adapters import HTTPAdapter, Retry
 
-from bietlejuice.base.service import ServiceEnum
+from bietlejuice.base.service.service_enum import ServiceEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient
 

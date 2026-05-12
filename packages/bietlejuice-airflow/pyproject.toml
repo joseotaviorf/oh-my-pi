@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bietlejuice-airflow"
+version = "0.1.0"
+description = "Airflow runtime components for bietlejuice DAGs"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+    "bietlejuice-core",
+    # apache-airflow is provided by the Astro runtime; installed locally via the
+    # `dev` group below so the IDE/language server can resolve airflow imports
+    # but `uv export --no-dev` keeps it out of local/astro/requirements.txt
+    # (avoids shadowing the runtime's customized providers in the venv).
+    "boto3>=1.37.3",             # provided by runtime
+    "pendulum>=3.1.0",           # provided by runtime
+    "pydantic>=2.8.2",           # provided by runtime; floor for incident_context_enrichers
+    "quintoandar-logger>=0.4.0", # private VCS source; not in runtime
+    "requests>=2.32.3",          # provided by runtime
+    "SQLAlchemy>=1.4.54",        # provided by runtime
+    "workalendar==17.0.0",       # not in runtime; keep pin
+    "PyYAML>=6.0.2",             # provided by runtime
+]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]
+pythonpath = ["src"]
+addopts = ["--import-mode=importlib", "--cov=bietlejuice", "--cov-report=term-missing"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bietlejuice"]
+
+[tool.uv.sources]
+bietlejuice-core = { workspace = true }
+quintoandar-logger = { git = "https://github.com/quintoandar/python-logger", tag = "0.8.1" }
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+
+[dependency-groups]
+dev = [
+    "apache-airflow==2.11.0",  # provided by Astro runtime 13.4.0; local-only for IDE
+    "pytest==8.3.5",
+    "pytest-cov",
+    "pytest-testmon",
+    "ruff==0.5.5",
+    "ty",                      # no constraint available
+]
+
+
+[tool.ty.environment]
+python-version = "3.10"
+
+[tool.coverage.run]
+source = ["bietlejuice"]
+omit = ["*/__init__.py"]
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

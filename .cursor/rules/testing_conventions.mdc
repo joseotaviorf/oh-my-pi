@@ -1,7 +1,7 @@
 ---
 alwaysApply: false
 description: Testing conventions for bietlejuice — TDD workflow, two distinct patterns (Qube vs DAG builder), Spark session fixture, sys.modules mocking, and file mirroring.
-globs: "tests/**"
+globs: "packages/*/test/**"
 ---
 
 # Testing Conventions — bietlejuice
@@ -15,7 +15,7 @@ Every new Python module or function must follow Red → Green → Refactor befor
 3. **Refactor** — Clean up the implementation and tests while keeping all assertions green.
 
 **AI-generated code rules (non-negotiable):**
-- The test file for a new module must be created **before or in the same commit** as the implementation. A PR that adds `bietlejuice/foo/bar.py` without `tests/unit/foo/test_bar.py` must be rejected.
+- The test file for a new module must be created **before or in the same commit** as the implementation. A PR that adds `packages/bietlejuice-runtime/src/bietlejuice/foo/bar.py` without `packages/bietlejuice-runtime/test/unit/foo/test_bar.py` must be rejected.
 - If a test file does not yet exist for a module being changed, create or update it before touching the implementation.
 - Every bug fix requires a regression test that pins the broken input as a parametrized case — no exceptions.
 - When reviewing AI-generated code, verify the companion test was committed in the same diff, not as a follow-up.
@@ -31,20 +31,20 @@ AI-generated code frequently introduces silent regressions in adjacent modules. 
 
 | Type | When | Tool | Location |
 |------|------|------|----------|
-| Unit | For every public function/class in `bietlejuice/` | pytest / unittest | `tests/unit/` |
-| Regression | After every bug fix — pin the broken input as a test case | pytest | `tests/unit/` same file |
-| Integration | For Spark jobs that touch real I/O (S3, Delta) | pytest + real SparkSession | `tests/integration/` |
+| Unit | For every public function/class in `packages/*/src/bietlejuice/` | pytest / unittest | `packages/*/test/unit/` |
+| Regression | After every bug fix — pin the broken input as a test case | pytest | `packages/*/test/unit/` same file |
+| Integration | For Spark jobs that touch real I/O (S3, Delta) | pytest + real SparkSession | `packages/*/test/integration/` |
 | Smoke | After each Forno Airflow run — assert row count > 0 and key columns non-null | Data quality file | `data_quality/{layer}/` |
 | E2E | For full pipeline runs validated on Forno before merging | Manual / Forno Airflow | Forno run required |
 
 **Mandatory minimums:**
-- Every new `.py` module in `bietlejuice/` must ship with at least unit tests (happy path + one error/edge case).
+- Every new `.py` module in `packages/*/src/bietlejuice/` must ship with at least unit tests (happy path + one error/edge case).
 - Every bug fix must include a regression test pinning the broken input.
 - Forno Airflow smoke run is required before merging any new DAG (apply to all workflow types, not just CDC).
 
 ## Two Patterns — do NOT mix them
 
-### Pattern A: Qube jobs (`tests/unit/qube/`)
+### Pattern A: Qube jobs (`packages/bietlejuice-runtime/test/unit/qube/`)
 Use `unittest.TestCase` with `@patch` decorators. PySpark `F.*` functions are mocked — no real Spark computation.
 
 ```python
@@ -70,7 +70,7 @@ class TestMyQubeFunction(unittest.TestCase):
 
 Mock the full module path: `"bietlejuice.qube.jobs.{module}.F.{function}"`.
 
-### Pattern B: DAG builders, services, pipelines (`tests/unit/base/`, `tests/unit/services/`, etc.)
+### Pattern B: DAG builders, services, pipelines (`packages/*/test/unit/base/`, `packages/*/test/unit/services/`, etc.)
 Use pytest classes with fixtures. Use `@mock.patch.object` for method-level mocking.
 
 ```python
@@ -90,8 +90,8 @@ class TestMyClass:
         mock_method.assert_called_once_with("arg")
 ```
 
-## Top-Level `conftest.py` — required sys.modules mocking
-`tests/unit/conftest.py` must mock Airflow and Databricks plugins **before** any imports:
+## Package-level `conftest.py` — required sys.modules mocking
+Each package that imports Airflow or Databricks plugins needs a `conftest.py` at its test root (e.g. `packages/bietlejuice-airflow/test/unit/conftest.py`) to mock external plugins **before** any imports:
 
 ```python
 import sys
@@ -111,7 +111,7 @@ def setup_airflow_hooks():
 ```
 
 ## Spark Session Fixture (Qube tests only)
-In `tests/unit/qube/conftest.py` — session-scoped real Spark, not a mock:
+In `packages/bietlejuice-runtime/test/unit/qube/conftest.py` — session-scoped real Spark, not a mock:
 
 ```python
 import pytest
@@ -130,24 +130,28 @@ def spark():
     spark.stop()
 ```
 
+## Runtime tests and PySpark
+
+Runtime tests run with the **dbr-16-4** venv. `PYSPARK_PYTHON` and `PYSPARK_DRIVER_PYTHON` point at that venv's interpreter so Spark workers use the correct Python. `make unit-tests` handles this automatically.
+
 ## File Structure — mirror the source
 ```
-bietlejuice/qube/jobs/metrics/build_metric.py
-→ tests/unit/qube/test_build_metric_unit.py
+packages/bietlejuice-runtime/src/bietlejuice/qube/jobs/metrics/build_metric.py
+→ packages/bietlejuice-runtime/test/unit/qube/test_build_metric_unit.py
 
-bietlejuice/base/airflow/dag_builders/main_builder/dag_yaml_parser.py
-→ tests/unit/base/airflow/dag_builders/main_builder/test_dag_yaml_parser.py
+packages/bietlejuice-airflow/src/bietlejuice/base/airflow/dag_builders/main_builder/dag_yaml_parser.py
+→ packages/bietlejuice-airflow/test/unit/base/airflow/dag_builders/main_builder/test_dag_yaml_parser.py
 ```
 
 ## General Rules
 - Use **Arrange / Act / Assert** comment structure inside each test method.
 - Use `@pytest.mark.parametrize` for table-driven valid/invalid cases.
 - Combine `contextlib.nullcontext()` and `pytest.raises()` in parametrize for error-path testing.
-- Run tests: `make unit-tests` or `pytest tests/unit/path/to/test_file.py -v`.
+- Run tests: `make unit-tests` or `uv run --directory packages/bietlejuice-{pkg} pytest test/unit/path/to/test_file.py -v`.
 
 ## TDD Checklist (run before every PR)
 
-- [ ] Test file exists and mirrors the source path under `tests/unit/`
+- [ ] Test file exists and mirrors the source path under `packages/*/test/unit/`
 - [ ] Test file was committed before or alongside the implementation (not as a follow-up)
 - [ ] Every public function/method has at least a happy-path test and one error/edge-case test
 - [ ] All `@pytest.mark.xfail(strict=True)` stubs have been converted to real assertions before merge

@@ -17,7 +17,7 @@ from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.spark.base_spark import BaseSparkContext, BaseDBUtils
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
-from bietlejuice.base.service import ServiceEnum
+from bietlejuice.base.service.service_enum import ServiceEnum
 from bietlejuice.loaders.hive_metastore_loader import HiveMetastoreLoader
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
 from bietlejuice.services.metastore_services.hive_metastore_service import (

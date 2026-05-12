@@ -5,7 +5,7 @@ from pyspark.sql.types import StructType, StructField, StringType
 from argparse import ArgumentParser, Namespace
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.services import ConfigurationService
+from bietlejuice.services.configuration_service import ConfigurationService
 from databricks.sdk import AccountClient
 
 JOB_NAME = "load_daily_group_members"

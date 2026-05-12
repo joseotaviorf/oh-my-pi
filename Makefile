@@ -1,7 +1,45 @@
 ###############################################################################
+######################### Dev Container environment ###########################
+###############################################################################
+.PHONY: devcontainer-build
+## Builds the dev container image locally via the multi-stage
+## .devcontainer/Dockerfile. The builder stage carries the compile toolchains
+## (build-essential, python3-dev, liblz4-dev, openjdk-17-jdk) and is discarded;
+## the runtime image carries only the JRE-headless, the three pre-built venvs
+## (workspace + bietlejuice-runtime + dbr-16-4), the uv binary, and the Astro
+## CLI. The uv wheel cache is intentionally NOT in the final image. On first
+## container creation, post-create.sh re-links editable workspace packages and
+## symlinks the pre-staged bietlejuice-runtime venvs into the workspace
+## (~1-2s, no wheel downloads). Re-run whenever the Dockerfile, root
+## pyproject.toml/uv.lock, any packages/*/pyproject.toml, or
+## packages/bietlejuice-runtime/envs/*/pyproject.toml change.
+## Requires GITHUB_TOKEN in your shell for private Git deps; it is passed as a
+## BuildKit secret (not a build-arg). Cursor also builds on 'Reopen in Container'.
+devcontainer-build:
+	@echo "Building dev container image"
+	@echo "=========="
+	@echo ""
+	@DOCKER_BUILDKIT=1 docker build \
+	  --secret id=GITHUB_TOKEN,env=GITHUB_TOKEN \
+	  -t bi-etl-ejuice-devcontainer:latest \
+	  -f .devcontainer/Dockerfile \
+	  .
+	@echo ""
+	@echo "-> Image ready: bi-etl-ejuice-devcontainer:latest"
+	@echo "-> Open the project in Cursor and choose 'Reopen in Container'"
+
+###############################################################################
+###################### Package paths ##########################################
+###############################################################################
+# Compiler scripts root
+COMPILER_SCRIPTS := packages/bietlejuice-compiler/scripts
+export PYTHONPATH := .:packages/bietlejuice-compiler$(if $(PYTHONPATH),:$(PYTHONPATH),)
+
+###############################################################################
 ###################### Local Airflow Docker environment #######################
 ###############################################################################
 branch ?= forno
+verbose ?=
 .PHONY: clone-local-airflow-plugins
 ## Clones QuintoAndar's custom Airflow Plugins (https://github.com/quintoandar/airflow-plugins) into a local plugins folder.
 ## May receive an optional `branch={branch}` argument to clone a specified branch. Defaults to `forno`.
@@ -44,15 +82,68 @@ clone-local-beethoven:
 	@git clone -b $(branch) --quiet --depth 1 https://github.com/quintoandar/beethoven.git ./local/astro/plugins_temp
 	@cp -Rf ./local/astro/plugins_temp/airflow/plugins/ ./local/astro/plugins
 	@rm -fR ./local/astro/plugins_temp
+	@if [ -d ./local/astro/plugins/plugins ]; then \
+	  cp -Rf ./local/astro/plugins/plugins/. ./local/astro/plugins/ && \
+	  rm -fR ./local/astro/plugins/plugins; \
+	fi
 	@echo "Cloning succeeded at ./local/astro/plugins"
 	@$(MAKE) normalize-local-astro-plugins
 
 .PHONY: setup-bietlejuice
+## Prepares the local Astro environment for a (re)build.
+## - Copies compiler scripts (needed at runtime by the Airflow workers).
+## - Regenerates local/astro/requirements.txt from the uv workspace lock,
+##   exporting only the transitive deps of bietlejuice-airflow (the packages
+##   themselves are bind-mounted live via docker-compose.override.yml).
+## Re-run whenever packages/*/pyproject.toml dependencies change.
 setup-bietlejuice:
 	@echo "Setup bietlejuice at local airflow deployment"
 	@echo "=========="
-	@rm -fR ./local/astro/scripts || true
-	@cp -Rf ./scripts/ ./local/astro/scripts
+	@uv export \
+	  --package bietlejuice-airflow \
+	  --no-dev \
+	  --no-hashes \
+	  --no-emit-package bietlejuice-airflow \
+	  --no-emit-package bietlejuice-core \
+	  -o local/astro/requirements.txt
+
+# resolve active shell rc file (zsh vs bash); caller may override via SHELL_RC env var.
+SHELL_RC_EXPR := $${SHELL_RC:-$$(if [ "$$(basename "$$SHELL")" = "zsh" ]; then echo "$$HOME/.zshrc"; else echo "$$HOME/.bashrc"; fi)}
+
+# load env vars with precedence: ~/.profile → ~/.bash_profile → shell rc → ./.env (last wins).
+define load_env_vars
+	SHELL_RC="$(SHELL_RC_EXPR)"; \
+	set -a; \
+	for f in "$$HOME/.profile" "$$HOME/.bash_profile" "$$SHELL_RC" ./.env; do \
+	  [ -f "$$f" ] && . "$$f" 2>/dev/null || true; \
+	done; \
+	set +a
+endef
+
+# prompt for a missing credential and persist it into the active shell rc file.
+# usage: $(call prompt_and_persist,VAR_NAME,prompt text)
+define prompt_and_persist
+	if [ -z "$${$(1)}" ]; then \
+	  printf '$(2)'; \
+	  read -r $(1); \
+	  echo "export $(1)=$${$(1)}" >> "$$SHELL_RC"; \
+	fi
+endef
+
+# wait up to 150s for the Astro scheduler container to answer `airflow db check`.
+define wait_for_scheduler
+	echo "Waiting for Airflow to finish initializing..."; \
+	SCHEDULER=$$(docker ps --filter "name=scheduler" --format "{{.Names}}" | grep -E "^astro_" | head -1); \
+	if [ -z "$$SCHEDULER" ]; then echo "ERROR: Scheduler container not found." >&2; exit 1; fi; \
+	i=0; \
+	while [ $$i -lt 30 ]; do \
+	  docker exec $$SCHEDULER airflow db check > /dev/null 2>&1 && echo "Airflow is ready." && break; \
+	  i=$$((i+1)); \
+	  printf "  Attempt %d/30 — retrying in 5s...\n" $$i; \
+	  sleep 5; \
+	done; \
+	docker exec $$SCHEDULER airflow db check > /dev/null 2>&1 || { echo "ERROR: Airflow did not become ready after 150s." >&2; exit 1; }
+endef
 
 .PHONY: setup-local-variables
 ## receives and sets up local shell variables to store token credentials used in the local Airflow environment.
@@ -61,32 +152,21 @@ setup-local-variables:
 	@echo "Setting up local variables"
 	@echo "=========="
 	@echo ""
-	@if [ -z "${GITHUB_TOKEN}" ]; then\
-		if [ -f $$HOME/.zshrc ]; then SHELL_RC="$$HOME/.zshrc"; else SHELL_RC="$$HOME/.bashrc"; fi;\
-		printf 'Enter your GitHub token \e]8;;https://docs.github.com/en/enterprise-server@3.4/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token\e\\[click here for info]\e]8;;\e\\: ';\
-		read -r GITHUB_TOKEN;\
-		echo export GITHUB_TOKEN=$$GITHUB_TOKEN >> $$SHELL_RC;\
-	fi
-	@if [ -z "${DATABRICKS_TOKEN}" ]; then\
-		if [ -f $$HOME/.zshrc ]; then SHELL_RC="$$HOME/.zshrc"; else SHELL_RC="$$HOME/.bashrc"; fi;\
-		printf 'Enter your Databricks token \e]8;;https://docs.databricks.com/dev-tools/api/latest/authentication.html#generate-a-personal-access-token\e\\[click here for info]\e]8;;\e\\: ';\
-		read -r DATABRICKS_TOKEN;\
-		echo export DATABRICKS_TOKEN=$$DATABRICKS_TOKEN >> $$SHELL_RC;\
-	fi
-	@if [ -z "${DATABRICKS_USERNAME}" ]; then\
-		if [ -f $$HOME/.zshrc ]; then SHELL_RC="$$HOME/.zshrc"; else SHELL_RC="$$HOME/.bashrc"; fi;\
-		printf 'Enter your Databricks Username (email@quintoandar.com.br) ';\
-		read -r DATABRICKS_USERNAME;\
-		echo export DATABRICKS_USERNAME=$$DATABRICKS_USERNAME >> $$SHELL_RC;\
-	fi
-
+	@$(load_env_vars); \
+	ENV_FILE="$$(pwd)/.env"; \
+	SOURCE_LINE="[ -f \"$$ENV_FILE\" ] && source \"$$ENV_FILE\""; \
+	grep -qF "$$SOURCE_LINE" "$$SHELL_RC" 2>/dev/null || echo "$$SOURCE_LINE" >> "$$SHELL_RC"; \
+	$(call prompt_and_persist,GITHUB_TOKEN,Enter your GitHub token: ); \
+	$(call prompt_and_persist,DATABRICKS_TOKEN,Enter your Databricks token: ); \
+	$(call prompt_and_persist,DATABRICKS_USERNAME,Enter your Databricks Username (email@quintoandar.com.br): )
 	@echo "All variables set!"
 	@echo "~> Restart your shell to apply changes!"
 
 .PHONY: import-variables-and-connections
 import-variables-and-connections:
 	@echo "Import Variables and Connections"
-	@cd ./local/astro; \
+	@$(load_env_vars); \
+	cd ./local/astro; \
 	sh import_conn_vars.sh
 
 branch ?= forno
@@ -100,98 +180,108 @@ run-local-environment:
 	@echo "Recreating local Airflow environment"
 	@echo "=========="
 	@echo ""
-	@cd ./local/astro; \
-	astro dev start --no-cache --build-secrets id=GITHUB_TOKEN
+	@$(load_env_vars); \
+	REPO_ROOT="$$(pwd)"; \
+	export LOCAL_WORKSPACE_FOLDER="$${LOCAL_WORKSPACE_FOLDER:-$$REPO_ROOT}"; \
+	cd ./local/astro; \
+	astro dev start --no-cache --build-secrets id=GITHUB_TOKEN $(if $(verbose),--verbosity debug,); \
+	if [ $$? -ne 0 ]; then \
+	  echo ""; \
+	  echo "Note: astro dev start health check timed out."; \
+	  echo "This is expected inside a Docker-outside-Docker devcontainer: the Astro"; \
+	  echo "webserver port is bound to 127.0.0.1 on the host daemon and is not"; \
+	  echo "reachable via localhost from within the devcontainer network namespace."; \
+	  echo "Bind mounts use LOCAL_WORKSPACE_FOLDER (host path); see .devcontainer/devcontainer.json."; \
+	  echo "Verifying containers started correctly via Docker socket..."; \
+	  astro dev ps | grep -q "running" || { echo "ERROR: Airflow containers are not running." >&2; exit 1; }; \
+	  echo "All containers are running. Proceeding..."; \
+	fi
+	@$(wait_for_scheduler)
 	@make import-variables-and-connections
 
 .PHONY: restart-local-environment
 restart-local-environment:
 	@echo "Restart local Airflow environment"
 	@make setup-bietlejuice
-	@cd ./local/astro; \
-	astro dev restart --no-cache --build-secrets id=GITHUB_TOKEN
+	@$(load_env_vars); \
+	cd ./local/astro; \
+	astro dev restart --no-cache --build-secrets id=GITHUB_TOKEN $(if $(verbose),--verbose,); \
+	if [ $$? -ne 0 ]; then \
+	  echo ""; \
+	  echo "Note: astro dev restart health check timed out."; \
+	  echo "This is expected inside a Docker-outside-Docker devcontainer."; \
+	  echo "Verifying containers started correctly via Docker socket..."; \
+	  astro dev ps | grep -q "running" || { echo "ERROR: Airflow containers are not running." >&2; exit 1; }; \
+	  echo "All containers are running. Proceeding..."; \
+	fi
+	@$(wait_for_scheduler)
 
 .PHONY: stop-local-environment
 stop-local-environment:
-	@echo "Restart local Airflow environment"
+	@echo "Stop local Airflow environment"
 	@cd ./local/astro; \
 	astro dev stop
 
-.PHONY: stop-local-environment
+.PHONY: kill-local-environment
 kill-local-environment:
 	@echo "Delete local Airflow environment"
 	@cd ./local/astro; \
 	astro dev kill
 
 ###############################################################################
-###################### Local Tests Docker environment #########################
-###############################################################################
-.PHONY: _build-tests-environment
-_build-tests-environment:
-	@docker build -f local/tests-environment.Dockerfile -t bietlejuice-tests-local --build-arg GITHUB_TOKEN=${GITHUB_TOKEN} .
-
-.PHONY: run-tests-environment
-run-tests-environment:
-	@make _build-tests-environment
-	@docker run bietlejuice
-
-###############################################################################
 ###################### Local environment S3 upload ############################
 ###############################################################################
 .PHONY: upload-local-wheel
 upload-local-wheel:
-	@python3 -m setup sdist bdist_wheel
-	@python3 local/upload_local_whl_to_s3.py
+	@make build
+	@uv run --project packages/bietlejuice-runtime python local/upload_local_whl_to_s3.py
 
 .PHONY: upload-local-spark-jobs
 upload-local-spark-jobs:
-	@python3 local/upload_local_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
+	@uv run --project packages/bietlejuice-runtime python local/upload_local_spark_jobs_to_s3.py databricks.s3.forno.data.quintoandar.com.br
 
 .PHONY: upload-local-package
 upload-local-package:
-	@python3 local/upload_local_spark_jobs_to_s3.py
-	@python3 -m setup sdist bdist_wheel
-	@python3 local/upload_local_whl_to_s3.py
+	@uv run --project packages/bietlejuice-runtime python local/upload_local_spark_jobs_to_s3.py
+	@make build
+	@uv run --project packages/bietlejuice-runtime python local/upload_local_whl_to_s3.py
 
 .PHONY: upload-local-qube-jobs
 upload-local-qube-jobs:
-	@aws s3 sync bietlejuice/qube \
+	@aws s3 sync packages/bietlejuice-runtime/src/bietlejuice/qube \
 		s3://databricks.s3.forno.data.quintoandar.com.br/github-repos/bi-etl-ejuice/bietlejuice/qube \
 		--acl bucket-owner-full-control
 
 .PHONY: upload-local-queries
 upload-local-queries:
-	@pip install boto3==1.24.0 tqdm==4.64.1 -q
-	@python3 scripts/ci_cd/upload_dag_packages_artifact_into_s3.py \
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/upload_dag_packages_artifact_into_s3.py \
 		databricks.s3.forno.data.quintoandar.com.br queries
 
 .PHONY: upload-local-data-quality
 upload-local-data-quality:
-	@pip install boto3==1.24.0 tqdm==4.64.1 -q
-	@python3 scripts/ci_cd/upload_dag_packages_artifact_into_s3.py \
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/upload_dag_packages_artifact_into_s3.py \
 		databricks.s3.forno.data.quintoandar.com.br data_quality
 
 .PHONY: upload-local-schemas
 upload-local-schemas:
-	@pip install boto3==1.24.0 tqdm==4.64.1 -q
-	@python3 scripts/ci_cd/upload_dag_packages_artifact_into_s3.py \
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/upload_dag_packages_artifact_into_s3.py \
 		databricks.s3.forno.data.quintoandar.com.br schemas
 
 .PHONY: upload-local-init-scripts
 upload-local-init-scripts:
-	@aws s3 cp scripts/init_script.sh \
+	@aws s3 cp $(COMPILER_SCRIPTS)/init_script.sh \
 		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/init_script.sh \
 		--acl bucket-owner-full-control
-	@aws s3 cp scripts/emr_init_script.sh \
+	@aws s3 cp $(COMPILER_SCRIPTS)/emr_init_script.sh \
 		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/emr_init_script.sh \
 		--acl bucket-owner-full-control
-	@aws s3 cp scripts/wonka/install_pex_generic.sh \
+	@aws s3 cp $(COMPILER_SCRIPTS)/wonka/install_pex_generic.sh \
 		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/install_pex_generic.sh \
 		--acl bucket-owner-full-control
-	@aws s3 cp scripts/wonka/get_credentials_from_vault.sh \
+	@aws s3 cp $(COMPILER_SCRIPTS)/wonka/get_credentials_from_vault.sh \
 		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/get_credentials_from_vault.sh \
 		--acl bucket-owner-full-control
-	@aws s3 cp scripts/wonka/install_spark_metrics_plugin.sh \
+	@aws s3 cp $(COMPILER_SCRIPTS)/wonka/install_spark_metrics_plugin.sh \
 		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/install_spark_metrics_plugin.sh \
 		--acl bucket-owner-full-control
 
@@ -208,129 +298,188 @@ upload-forno-release:
 ###############################################################################
 ###################### Local Python environment ###############################
 ###############################################################################
-.PHONY: environment
-environment:
+.PHONY: build
+## build wheels for Databricks-deployed packages (bietlejuice-core + bietlejuice-runtime)
+build:
 	@echo ""
-	@echo "Creating Python environment for bi-etl-ejuice package"
+	@echo "Building wheels"
 	@echo "=========="
 	@echo ""
-	@pyenv install -s 3.8.12
-	@pyenv virtualenv 3.8.12 bi-etl-ejuice
-	@pyenv local bi-etl-ejuice
-	@echo "-> Python virtual environment 'bi-etl-ejuice' has been set as the current virtualenv."
+	@uv build packages/bietlejuice-core --out-dir dist/
+	@uv build packages/bietlejuice-runtime --out-dir dist/
 
-###############################################################################
-###################### Requirements setup #####################################
-###############################################################################
-.PHONY: requirements
-requirements:
+.PHONY: install
+## install all package dependencies via uv
+## Note: runtime is a standalone uv project (not a workspace member). Its venv
+## holds the broad-version deps for lint/type-check; the DBR-pinned libs that
+## tests need live in dedicated sub-projects under packages/bietlejuice-runtime/envs/.
+## We sync envs/dbr-16-4 by default so `make unit-tests` works out of the box.
+## Switch to another DBR's env with `make sync-dbr DBR=12.2|13.3`.
+install:
 	@echo ""
-	@echo "Installing packages"
+	@echo "Installing all packages"
 	@echo "=========="
 	@echo ""
-	@python -m pip install -U -r requirements.txt --extra-index-url https://quintoandar.github.io/python-package-server/
-	@make requirements-lint
+	@uv sync --directory packages/bietlejuice-core
+	@uv sync --directory packages/bietlejuice-airflow
+	@# `env -u UV_PROJECT_ENVIRONMENT` is a no-op locally but inside the devcontainer
+	@# it stops uv from redirecting runtime's / the env's .venv into the shared
+	@# workspace venv at /home/vscode/.venv (which would clobber it).
+	@env -u UV_PROJECT_ENVIRONMENT uv sync --directory packages/bietlejuice-runtime
+	@env -u UV_PROJECT_ENVIRONMENT uv sync --directory packages/bietlejuice-runtime/envs/dbr-16-4
+	@uv sync --directory packages/bietlejuice-compiler
 
-.PHONY: requirements-test
-requirements-test:
+DBR ?= 16.4
+.PHONY: sync-dbr
+## sync the runtime DBR env to a specific DBR (DBR=12.2|13.3|16.4, default 16.4).
+## Each sub-project under packages/bietlejuice-runtime/envs/dbr-X-Y is a tiny
+## "shim" pyproject whose only job is to produce a venv that mirrors that DBR:
+## the Python version, the bundled libs (numpy, pandas, pyarrow, psycopg2, ...),
+## plus bietlejuice-runtime + bietlejuice-core in editable mode. uv resolves
+## one DBR per .venv, so there is no cross-DBR conflict.
+## Point your IDE at envs/dbr-X-Y/.venv/bin/python after running this.
+sync-dbr:
 	@echo ""
-	@echo "Installing tests packages"
+	@echo "Syncing bietlejuice-runtime env for DBR $(DBR)"
 	@echo "=========="
 	@echo ""
-	@python -m pip install -r requirements_test.txt  --extra-index-url https://quintoandar.github.io/python-package-server/
-
-.PHONY: requirements-lint
-requirements-lint:
-	@echo ""
-	@echo "Installing lint packages"
-	@echo "=========="
-	@echo ""
-	@python -m pip install -r requirements_lint.txt
-
-.PHONY: requirements-scripts
-requirements-scripts:
-	@echo ""
-	@echo "Installing scripts packages"
-	@echo "=========="
-	@echo ""
-	@python -m pip install -U -r requirements_scripts.txt --extra-index-url https://quintoandar.github.io/python-package-server/
-
-###############################################################################
-###################### Package setup ##########################################
-###############################################################################
-.PHONY: package
-package:
-	@make requirements
-	@echo ""
-	@echo "Creating 'requirements-freeze.txt' to prepare building dependencies"
-	@echo "=========="
-	@echo ""
-	@python -m pip freeze > requirements-freeze.txt
-	@echo ""
-	@echo "Creating wheel for bi-etl-ejuice"
-	@echo "=========="
-	@echo ""
-	@PYTHONPATH=. python -m setup sdist bdist_wheel
+	@case "$(DBR)" in \
+	  12.2|13.3|16.4) ;; \
+	  *) echo "ERROR: Unknown DBR: $(DBR). Supported: 12.2, 13.3, 16.4" >&2 && exit 1 ;; \
+	esac
+	@# See `install` target for why we unset UV_PROJECT_ENVIRONMENT.
+	@env -u UV_PROJECT_ENVIRONMENT uv sync --directory "packages/bietlejuice-runtime/envs/dbr-$$(echo $(DBR) | tr . -)"
 
 ###############################################################################
 ###################### Style handling #########################################
 ###############################################################################
 .PHONY: lint
-## run black to fix code style
+## run ruff to fix code style
 lint:
 	@echo ""
-	@echo "Running lint in <bietlejuice/> and <cli/emr/src/>"
+	@echo "Running lint in all files from <packages/>"
 	@echo "=========="
 	@echo ""
-	@python -m black bietlejuice/ tests/unit/ tests/core_model_dags/ cli/emr/src/emr/ --exclude=".*\/__dags_template__.py"
+	@uv run --directory packages/bietlejuice-core     ruff format src/ test/
+	@uv run --directory packages/bietlejuice-airflow  ruff format src/ test/
+	@uv run --directory packages/bietlejuice-runtime  ruff format src/ test/
+	@uv run --directory packages/bietlejuice-compiler ruff format src/ test/
 
 .PHONY: check-style
-## check style with flake8 and black
+## check style with ruff
 check-style:
 	@echo ""
 	@echo "Running Check Style"
 	@echo "=========="
 	@echo ""
-	@python -m black --check bietlejuice/ tests/unit/ tests/core_model_dags/ cli/emr/src/emr/ --exclude=".*\/__dags_template__.py" && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint\" to apply style formatting to your code\n" && exit 1)
-	@python -m flake8 --config=setup.cfg bietlejuice/ tests/unit/ tests/core_model_dags/ cli/emr/src/emr/
+	@uv run --directory packages/bietlejuice-core     ruff format --check src/ test/
+	@uv run --directory packages/bietlejuice-core     ruff check src/ test/
+	@uv run --directory packages/bietlejuice-airflow  ruff format --check src/ test/
+	@uv run --directory packages/bietlejuice-airflow  ruff check src/ test/
+	@uv run --directory packages/bietlejuice-runtime  ruff format --check src/ test/
+	@uv run --directory packages/bietlejuice-runtime  ruff check src/ test/
+	@uv run --directory packages/bietlejuice-compiler ruff format --check src/ test/
+	@uv run --directory packages/bietlejuice-compiler ruff check src/ test/
+
+.PHONY: fix-style
+## fix style with ruff using check --fix
+fix-style:
+	@echo ""
+	@echo "Running Style Fix (ruff --fix)"
+	@echo "=========="
+	@echo ""
+	@uv run --directory packages/bietlejuice-core     ruff check --fix src/ test/
+	@uv run --directory packages/bietlejuice-airflow  ruff check --fix src/ test/
+	@uv run --directory packages/bietlejuice-runtime  ruff check --fix src/ test/
+	@uv run --directory packages/bietlejuice-compiler ruff check --fix src/ test/
+
+.PHONY: type-check
+## run ty type checker across all packages (informative; use failure:ignore in CI)
+type-check:
+	@echo ""
+	@echo "Type Check"
+	@echo "=========="
+	@echo ""
+	@uv run --directory packages/bietlejuice-core     ty check src/
+	@uv run --directory packages/bietlejuice-airflow  ty check src/
+	@uv run --directory packages/bietlejuice-runtime  ty check src/
+	@uv run --directory packages/bietlejuice-compiler ty check src/
+
+.PHONY: lint-sql
+## run sqlfluff to fix SQL style in dags/
+lint-sql:
+	@echo ""
+	@echo "Running SQL lint"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler sqlfluff fix dags/
+
+.PHONY: check-sql
+## check SQL style with sqlfluff in dags/
+check-sql:
+	@echo ""
+	@echo "Running SQL Check Style"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler sqlfluff lint dags/
 
 ###############################################################################
 ###################### Tests commands #########################################
 ###############################################################################
 
 .PHONY: tests
-## run all unit and integration tests
+## run all tests across all packages
 tests:
-	@python -m pytest -W ignore::DeprecationWarning tests
+	@make unit-tests
 
 .PHONY: unit-tests
+## Runtime tests run from the dbr-16-4 env's venv so the resolved
+## numpy/pandas/pydantic/... versions match what production runs on DBR 16.4.
+## Pytest still reads its config from packages/bietlejuice-runtime/pyproject.toml
+## because that is the cwd we hand to it. PYSPARK_PYTHON/PYSPARK_DRIVER_PYTHON
+## are pinned to the env's interpreter so Spark workers don't pick up some
+## unrelated `python3` from PATH (e.g. a system 3.14) and crash with
+## PYTHON_VERSION_MISMATCH.
 unit-tests:
 	@echo ""
 	@echo "Unit Tests"
 	@echo "=========="
 	@echo ""
-	@if [ -z "$(component)" ]; then \
-		python -m pytest -W ignore::DeprecationWarning tests/unit/; \
-	else \
-		python -m pytest -W ignore::DeprecationWarning "tests/unit/$(component)"; \
-	fi
+	@uv run --directory packages/bietlejuice-core     pytest -W ignore::DeprecationWarning
+	@uv run --directory packages/bietlejuice-airflow  pytest -W ignore::DeprecationWarning
+	@cd packages/bietlejuice-runtime && DBR_PY=$$(uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && PYSPARK_PYTHON=$$DBR_PY PYSPARK_DRIVER_PYTHON=$$DBR_PY uv run --project envs/dbr-16-4 pytest -W ignore::DeprecationWarning
+	@uv run --directory packages/bietlejuice-compiler pytest -W ignore::DeprecationWarning
 
 .PHONY: unit-tests-changed
-## run unit tests scoped to modules changed since origin/master using pytest-testmon.
-## First run builds .testmondata (full suite within scope); subsequent runs are faster.
-## Falls back to tests/unit/ when framework-level files change.
+## run unit tests scoped to packages changed since origin/master using pytest-testmon.
+## Detects which packages (core, airflow, runtime, compiler) have changes and runs
+## only their test suites. Falls back to all packages for framework-level changes.
 unit-tests-changed:
 	@echo ""
-	@echo "Unit Tests (changed modules only)"
+	@echo "Unit Tests (changed packages only)"
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@TEST_PATHS=$$(python scripts/ci_cd/detect_changed_tests.py origin/master | tr '\n' ' ') && \
-	 if [ -z "$$TEST_PATHS" ]; then \
+	@PKGS=$$(uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/detect_changed_tests.py origin/master | tr '\n' ' ') && \
+	 if [ -z "$$PKGS" ]; then \
 	   echo "No Python changes detected — skipping unit tests."; \
 	 else \
-	   echo "Scope: $$TEST_PATHS" && \
-	   python -m pytest -W ignore::DeprecationWarning --testmon $$TEST_PATHS; \
+	   echo "Affected packages: $$PKGS" && \
+	   FAILED=0 && \
+	   for pkg in $$PKGS; do \
+	     echo "" && echo "--- $$pkg ---" && \
+	     case $$pkg in \
+	       core) uv run --directory packages/bietlejuice-core pytest --testmon -W ignore::DeprecationWarning || FAILED=1 ;; \
+	       airflow) uv run --directory packages/bietlejuice-airflow pytest --testmon -W ignore::DeprecationWarning || FAILED=1 ;; \
+	       runtime) cd packages/bietlejuice-runtime && \
+	         DBR_PY=$$(uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && \
+	         PYSPARK_PYTHON=$$DBR_PY \
+	         PYSPARK_DRIVER_PYTHON=$$DBR_PY \
+	         uv run --project envs/dbr-16-4 pytest --testmon -W ignore::DeprecationWarning && cd ../.. || { cd ../..; FAILED=1; } ;; \
+	       compiler) uv run --directory packages/bietlejuice-compiler pytest --testmon -W ignore::DeprecationWarning || FAILED=1 ;; \
+	     esac; \
+	   done && \
+	   [ $$FAILED -eq 0 ] || exit 1; \
 	 fi
 
 .PHONY: integration-tests
@@ -340,7 +489,7 @@ integration-tests:
 	@echo "Integration Tests"
 	@echo "================="
 	@echo ""
-	@python -m pytest -W ignore::DeprecationWarning tests/integration
+	@uv run --directory packages/bietlejuice-core pytest test/integration -W ignore::DeprecationWarning
 
 .PHONY: files-validation
 files-validation:
@@ -348,17 +497,19 @@ files-validation:
 	@echo "Validation Files Tests"
 	@echo "=========="
 	@echo ""
-	@python -m pytest tests/files_validation/
+	@uv run --directory packages/bietlejuice-compiler pytest test/unit/files_validation/
 
 .PHONY: core-model-tests
 ## run core model DAG tests with coverage check (CI/CD only - only runs if core model changes detected)
+## Same rationale as unit-tests: runs from the dbr-16-4 env's venv to mirror prod versions.
+## PYSPARK_PYTHON pinning matches unit-tests; see comment there.
 core-model-tests:
 	@echo ""
 	@echo "Checking for core model changes"
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 -m pytest -W ignore::DeprecationWarning tests/core_model_dags/ bietlejuice/base/core_models/
+	@cd packages/bietlejuice-runtime && DBR_PY=$$(uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && PYSPARK_PYTHON=$$DBR_PY PYSPARK_DRIVER_PYTHON=$$DBR_PY uv run --project envs/dbr-16-4 pytest -W ignore::DeprecationWarning test/core_model_dags/ src/bietlejuice/base/core_models/
 
 .PHONY: core-model-coverage
 ## check test coverage for core model source code (CI/CD only - only runs if core model changes detected)
@@ -366,14 +517,13 @@ core-model-coverage:
 	@echo ""
 	@echo "Checking for core model changes"
 	@echo "=========="
-	# @echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/ci_cd/core_models/check_core_model_changes.py -b "$(CI_COMMIT_BRANCH)" -v && exit 0 || \
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/core_models/check_core_model_changes.py -b "$(CI_COMMIT_BRANCH)" -v && exit 0 || \
 		(echo "" && \
 		 echo "Core Model Test Coverage Check" && \
 		 echo "==========" && \
 		 echo "" && \
-		 PYTHONPATH=. python3 scripts/ci_cd/core_models/check_core_model_coverage.py -v)
+		 uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/core_models/check_core_model_coverage.py -v)
 
 ###############################################################################
 ###################### Validations commands ###################################
@@ -386,7 +536,7 @@ transcript-sql-files:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/ci_cd/sql_transcript.py --mode git-diff --from-branch origin/master --to-branch HEAD
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/sql_transcript.py --mode git-diff --from-branch origin/master --to-branch HEAD
 
 .PHONY: validate-dags-dependencies
 validate-dags-dependencies:
@@ -394,7 +544,7 @@ validate-dags-dependencies:
 	@echo "Validating DAGs dependencies"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/ci_cd/validate_dags_dependencies.py $(if $(domain),--domain $(domain),)
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_dags_dependencies.py $(if $(domain),--domain $(domain),)
 
 .PHONY: validate-dependency-file-correctness
 ## validates the correctness of the dags/dependencies.yaml file, according to the FileDependencyGenerator.
@@ -403,7 +553,7 @@ validate-dependency-file-correctness:
 	@echo "Validating correctness of dags/dependencies.yaml file"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/dependency_handling/validate_dependency_file_correctness.py
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/dependency_handling/validate_dependency_file_correctness.py
 
 level ?= warning
 domain ?=
@@ -416,7 +566,7 @@ validate-dag-declaration-files:
 	@echo "Validating DAG declaration files"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/ci_cd/airflow_dag_builder/validate_dag_declaration_files.py -l $(level) $(if $(domain),--domain $(domain),)
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/validate_dag_declaration_files.py -l $(level) $(if $(domain),--domain $(domain),)
 
 ## validates if the DAGs are using our current standards, such as using DAG Builder or CDC.
 validate-dags-up-to-standard:
@@ -424,7 +574,7 @@ validate-dags-up-to-standard:
 	@echo "Validating DAG declaration files"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/dag_standard_validation/validate_dags_following_current_standards.py $(if $(domain),--domain $(domain),)
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/dag_standard_validation/validate_dags_following_current_standards.py $(if $(domain),--domain $(domain),)
 
 .PHONY: validate-metadata-files-content
 validate-metadata-files-content:
@@ -433,7 +583,7 @@ validate-metadata-files-content:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_metadata_files_content.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/governance_metadata_validation/validate_metadata_files_content.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
 
 .PHONY: validate-metadata-files-exist
 validate-metadata-files-exist:
@@ -442,7 +592,7 @@ validate-metadata-files-exist:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_metadata_files_exist.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/governance_metadata_validation/validate_metadata_files_exist.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
 
 .PHONY: validate-lineage-consistency
 validate-lineage-consistency:
@@ -451,7 +601,7 @@ validate-lineage-consistency:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_lineage_consistency.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/governance_metadata_validation/validate_lineage_consistency.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
 
 .PHONY: validate-lineage-consistency-all
 ## validates that all metadata files are consistent with SQL queries (local development)
@@ -460,7 +610,7 @@ validate-lineage-consistency-all:
 	@echo "Validating all metadata files for consistency with SQL queries"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/governance_metadata_validation/validate_lineage_consistency.py -a
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/governance_metadata_validation/validate_lineage_consistency.py -a
 
 .PHONY: validate-core-model-schemas
 ## validates that all core model tables have corresponding schema files (CI/CD only)
@@ -470,7 +620,7 @@ validate-core-model-schemas:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/ci_cd/validate_core_model_schemas.py -b "$(CI_COMMIT_BRANCH)" -v
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_core_model_schemas.py -b "$(CI_COMMIT_BRANCH)" -v
 
 .PHONY: validate-core-model-schema-content
 ## validates that core model schema files have correct content structure (CI/CD only)
@@ -480,7 +630,7 @@ validate-core-model-schema-content:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/ci_cd/validate_core_model_schema_content.py -b "$(CI_COMMIT_BRANCH)" -v
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_core_model_schema_content.py -b "$(CI_COMMIT_BRANCH)" -v
 
 .PHONY: validate-core-model-schemas-all
 ## validates that all core model tables have corresponding schema files (local development)
@@ -489,7 +639,7 @@ validate-core-model-schemas-all:
 	@echo "Validating all core model schema files"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/ci_cd/validate_core_model_schemas.py -a
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_core_model_schemas.py -a
 
 .PHONY: validate-core-model-schema-content-all
 ## validates that all core model schema files have correct content structure (local development)
@@ -498,18 +648,27 @@ validate-core-model-schema-content-all:
 	@echo "Validating all core model schema file content"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/ci_cd/validate_core_model_schema_content.py -a
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/validate_core_model_schema_content.py -a
+
+.PHONY: validate-queries-datalake-path-import
+## ensures QUERIES_DATALAKE_PATH is not imported from bietlejuice.base.db (use bietlejuice.base.paths)
+validate-queries-datalake-path-import:
+	@echo ""
+	@echo "Validating QUERIES_DATALAKE_PATH import (not from bietlejuice.base.db)"
+	@echo "=========="
+	@echo ""
+	@python3 $(COMPILER_SCRIPTS)/ci_cd/validate_queries_datalake_path_import.py
 
 .PHONY: validate-source-layer-policy
 ## validates that changed DAGs only reference allowed source layers (CI/CD; PR-scoped; declaration-driven)
-## Profiles: scripts/ci_cd/source_layer_validation/profiles/*.yml (default: dags)
+## Profiles: packages/bietlejuice-compiler/scripts/ci_cd/source_layer_validation/profiles/*.yml (default: dags)
 validate-source-layer-policy:
 	@echo ""
 	@echo "Validating source-layer policy for changed DAGs"
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@PYTHONPATH=. python3 scripts/ci_cd/source_layer_validation/validate_source_layer_policy.py --profile dags -b "$(CI_COMMIT_BRANCH)" $(if $(domain),--domain $(domain),)
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/source_layer_validation/validate_source_layer_policy.py --profile dags -b "$(CI_COMMIT_BRANCH)" $(if $(domain),--domain $(domain),)
 
 .PHONY: validate-source-layer-policy-all
 ## validates all DAGs under dags/ against source-layer policy (local audit; warnings-only for existing violations)
@@ -518,7 +677,7 @@ validate-source-layer-policy-all:
 	@echo "Validating source-layer policy for all DAGs under dags/"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/ci_cd/source_layer_validation/validate_source_layer_policy.py --profile dags -a
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/source_layer_validation/validate_source_layer_policy.py --profile dags -a
 
 .PHONY: validate-source-layer-policy-all-core
 ## same as validate-source-layer-policy-all but only dags/core/ (faster local audit)
@@ -527,7 +686,17 @@ validate-source-layer-policy-all-core:
 	@echo "Validating source-layer policy for all core DAGs"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/ci_cd/source_layer_validation/validate_source_layer_policy.py --profile dags -a --core-only
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/source_layer_validation/validate_source_layer_policy.py --profile dags -a --core-only
+
+MAKE_TARGET ?=
+MAKE_EXTRA_ARGS ?=
+.PHONY: run-domain-validation
+## CI entrypoint: runs a validation make target per changed domain in parallel.
+## Detects which domains have changes and calls `make <MAKE_TARGET> domain=<d>` for each.
+## Usage: make run-domain-validation MAKE_TARGET=validate-dag-declaration-files MAKE_EXTRA_ARGS="level=debug"
+run-domain-validation:
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/run_validation_by_domain.py \
+		--make-target $(MAKE_TARGET) $(if $(MAKE_EXTRA_ARGS),--make-extra-args "$(MAKE_EXTRA_ARGS)",)
 
 ###############################################################################
 ###################### Common commands ########################################
@@ -541,7 +710,7 @@ create-dag-files:
 	@echo "Creating the DAGs' Python files"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/ci_cd/airflow_dag_builder/create_dag_files.py -d $(dag_name)
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/create_dag_files.py -d $(dag_name)
 
 
 
@@ -627,7 +796,7 @@ dependencies-file:
 	@echo "Generating dependencies.yaml file"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/dependency_handling/automate_dependencies.py
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/dependency_handling/automate_dependencies.py
 
 .PHONY: freeze-dependency-exceptions
 ## Automatically generate dependency_exceptions/manual_modifications.yaml, based on the dependencies.yaml file
@@ -636,7 +805,7 @@ freeze-dependency-exceptions:
 	@echo "Generating dependencies.yaml file"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/dependency_handling/freeze_dependency_exceptions.py
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/dependency_handling/freeze_dependency_exceptions.py
 
 
 .PHONY: generate-enrich-dag-declaration
@@ -646,4 +815,4 @@ generate-enrich-dag-declaration:
 	@echo "Generating Enrich dag declaration based on dag file"
 	@echo "=========="
 	@echo ""
-	@PYTHONPATH=. python3 scripts/artifact_generation/generate_enrich_template_from_py_file.py -d $(dag_name)
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/artifact_generation/generate_enrich_template_from_py_file.py -d $(dag_name)

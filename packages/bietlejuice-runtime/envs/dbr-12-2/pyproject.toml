@@ -1,0 +1,68 @@
+# Local-only dev project: a venv that mirrors Databricks Runtime 12.2 LTS.
+# https://docs.databricks.com/aws/en/release-notes/runtime/12.2lts
+#
+# This pyproject is NEVER published as a wheel. Its only job is to feed
+# `uv sync` so the resulting .venv has every DBR 12.2-bundled Python library
+# pinned to the exact version the cluster ships, plus bietlejuice-runtime and
+# bietlejuice-core in editable mode for local development.
+#
+# Refresh procedure: re-pull the "Installed Python libraries" table from the
+# release notes URL above when DBR 12.2 receives a maintenance update, then
+# update the version pins below.
+#
+# Packages NOT pre-installed by DBR 12.2 (omitted here; install separately if
+# needed for local dev): databricks-sdk, google-auth, grpcio,
+# opentelemetry-api, opentelemetry-sdk, pydantic, PyYAML.
+
+[project]
+name = "bietlejuice-runtime-env-dbr-12-2"
+version = "0.0.0"
+description = "Local-only env: bietlejuice-runtime against DBR 12.2 LTS pinned libs (Python 3.9.21)"
+# Narrow to DBR 12.2's exact Python so uv resolves a single (Python × pin)
+# combination — no per-Python-version splits, no per-extra splits.
+requires-python = ">=3.9,<3.10"
+dependencies = [
+    "bietlejuice-runtime",
+    # DBR 12.2 LTS bundled Python libraries.
+    # psycopg2-binary (not psycopg2) is intentional — see envs/dbr-16-4/pyproject.toml
+    # for the rationale. Local-only, never deployed.
+    "psycopg2-binary==2.9.3",
+    "ipython==8.5.0",
+    "joblib==1.1.1",
+    "numpy==1.21.5",
+    "pandas==1.4.2",
+    "python-dateutil==2.8.2",
+    "tenacity==8.0.1",
+    "urllib3==1.26.9",
+    "cryptography==3.4.8",
+    "pyarrow==7.0.0",
+]
+
+[tool.uv.sources]
+bietlejuice-runtime = { path = "../..", editable = true }
+bietlejuice-core    = { path = "../../../bietlejuice-core", editable = true }
+quintoandar-logger  = { git = "https://github.com/quintoandar/python-logger", tag = "0.8.1" }
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+# This pyproject is a local-only env shim; it has no source code of its own
+# and is never published. `package = false` tells uv not to invoke a build
+# backend for it, so we don't need [build-system] / [tool.hatch.build...].
+package = false
+# Mirror of runtime's overrides — keep in sync with
+# packages/bietlejuice-runtime/pyproject.toml.
+override-dependencies = [
+    "requests>=2.32.3",
+    "tenacity>=8.0.1",
+    "pyspark==3.5.3",
+    "quintoandar-logger>=0.4.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==8.3.5",
+    "pytest-cov",
+    "moto[s3]",
+    "bietlejuice-core",
+    "quintoandar-logger>=0.4.0",
+]

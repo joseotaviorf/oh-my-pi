@@ -23,7 +23,7 @@ When contributing, prefer changes that improve **reusability** and **config-driv
 
 ### Packaging: `dag_name` vs `custom_schema`
 
-New **`api_ingestion`** DAGs must use a **`dag.name`** (folder + `{dag_name}_declaration.yml`) ending in **`_api`** so the file matches [`MANIFEST.in`](../../MANIFEST.in) (`*_api_declaration.y*ml`) and is bundled in the wheel for Databricks. **`workflow.custom_schema`** and raw metastore schema names **do not** follow that suffix rule — see [`user_guide.md`](user_guide.md) (*API ingestion DAG naming and schema*).
+New **`api_ingestion`** DAGs must use a **`dag.name`** (folder + `{dag_name}_declaration.yml`) ending in **`_api`** so the file matches the hatch build inclusion pattern (`*_api_declaration.y*ml` in [`packages/bietlejuice-runtime/pyproject.toml`](../../packages/bietlejuice-runtime/pyproject.toml)) and is bundled in the wheel for Databricks. **`workflow.custom_schema`** and raw metastore schema names **do not** follow that suffix rule — see [`user_guide.md`](user_guide.md) (*API ingestion DAG naming and schema*).
 
 ---
 

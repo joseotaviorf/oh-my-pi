@@ -1,8 +1,6 @@
 # Path filters use Woodpecker `when.path` with `event: [push, pull_request]`.
 # See validations.yml header for the full rationale — pull_request is required
 # so that when.path evaluates the full PR diff, not just the last pushed commit.
-# Skipped steps count as success so downstream workflows
-# (e.g. release depends_on: tests) still pass.
 clone:
   - name: clone
     image: woodpeckerci/plugin-git
@@ -10,75 +8,103 @@ clone:
       partial: false # We need to clone the entire history to find the changed files
 
 steps:
-  # PR pushes: scope tests to changed modules via pytest-testmon + path detection.
-  # master pushes: run the full suite and (re)build .testmondata as the CI baseline.
-  changed-python-unit-tests:
-    image: octoenergy/pyspark:3.3.2
+  setup:
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - export AIRFLOW_GPL_UNIDECODE=yes
+      - apt-get update && apt-get install -y git > /dev/null
+      - pip install uv
+      - uv sync --directory packages/bietlejuice-core
+      - uv sync --directory packages/bietlejuice-airflow
+      # Runtime is a standalone uv project; sync it once for lint/type-check.
+      - uv sync --directory packages/bietlejuice-runtime
+      # DBR-pinned tests run from the dbr-16-4 sub-project's venv. It mirrors
+      # DBR 16.4 LTS bundled libs (numpy, pandas, pyarrow, psycopg2, pydantic, ...)
+      # so CI imports resolve to the same versions seen on the cluster. Other
+      # DBRs (12.2 / 13.3) are not yet matrix-tested.
+      - uv sync --directory packages/bietlejuice-runtime/envs/dbr-16-4
+      - uv sync --directory packages/bietlejuice-compiler
+    when:
+      event: [push, pull_request]
+
+  # PR pushes: scope tests to changed modules via pytest-testmon + path detection.
+  # master/forno pushes run the full suite via unit-tests-python instead.
+  changed-unit-tests-python:
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    commands:
+      - apt-get update && apt-get install -y openjdk-17-jdk > /dev/null
+      - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+      - pip install uv
       - export AWS_DEFAULT_REGION=us-east-1
-      - pip install --upgrade pip
-      - make requirements
-      - make requirements-test
       - make unit-tests-changed
     when:
       event: [push, pull_request]
       branch:
         exclude: [master, forno]
       path:
-        include: ['**/*.py']
+        include:
+          - '**/*.py'
+          - 'pyproject.toml'
+          - 'packages/*/pyproject.toml'
+          - 'uv.lock'
         on_empty: false
-    depends_on: [] # This is for the steps to run in parallel
-  
-  # master pushes: run the full suite and (re)build .testmondata as the CI baseline.
-  full-python-unit-tests:
-    image: octoenergy/pyspark:3.3.2
+    depends_on: [setup]
+
+  # master/forno pushes: run the full suite and rebuild .testmondata as the CI baseline.
+  unit-tests-python:
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - export AIRFLOW_GPL_UNIDECODE=yes
+      - apt-get update && apt-get install -y openjdk-17-jdk > /dev/null
+      - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+      - pip install uv
       - export AWS_DEFAULT_REGION=us-east-1
-      - pip install --upgrade pip
-      - make requirements-test
-      - make requirements
       - make unit-tests
     when:
       event: [push, pull_request]
       branch: [master, forno]
       path:
-        include: ['**/*.py']
+        include:
+          - '**/*.py'
+          - 'pyproject.toml'
+          - 'packages/*/pyproject.toml'
+          - 'uv.lock'
         on_empty: false
-    depends_on: [] # This is for the steps to run in parallel
+    depends_on: [setup]
 
   integration-tests-python:
-    image: octoenergy/pyspark:3.3.2
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - export AIRFLOW_GPL_UNIDECODE=yes
+      - apt-get update && apt-get install -y openjdk-17-jdk > /dev/null
+      - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+      - pip install uv
       - export AWS_DEFAULT_REGION=us-east-1
-      - pip install --upgrade pip
-      - make requirements-test
-      - make requirements
       - make integration-tests
     when:
       event: [push, pull_request]
       path:
-        include: ['**/*.py']
+        include:
+          - '**/*.py'
+          - 'pyproject.toml'
+          - 'packages/*/pyproject.toml'
+          - 'uv.lock'
         on_empty: false
-    depends_on: [] # This is for the steps to run in parallel
+    depends_on: [setup]
 
   core-model-tests-and-coverage:
-    image: octoenergy/pyspark:3.3.2
+    image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - export AIRFLOW_GPL_UNIDECODE=yes
+      - apt-get update && apt-get install -y openjdk-17-jdk > /dev/null
+      - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+      - pip install uv
       - export AWS_DEFAULT_REGION=us-east-1
-      - pip install --upgrade pip
-      - make requirements-test
-      - make requirements
       - make core-model-coverage
     when:
       event: [push, pull_request]
       path:
         include:
-          # Same roots as scripts/ci_cd/core_models/check_core_model_changes.py (Python only)
           - 'dags/core/**/*.py'
-          - 'tests/core_model_dags/**/*.py'
-          - 'bietlejuice/base/core_models/**/*.py'
+          - 'packages/bietlejuice-runtime/test/**/*.py'
+          - 'packages/bietlejuice-runtime/src/bietlejuice/base/core_models/**/*.py'
+          - 'packages/bietlejuice-airflow/src/bietlejuice/base/core_models/**/*.py'
+          - 'packages/bietlejuice-core/src/bietlejuice/base/core_models/**/*.py'
         on_empty: false
+    depends_on: [setup]

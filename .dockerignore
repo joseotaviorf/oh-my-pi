@@ -8,3 +8,18 @@ jobs/etl
 terraform
 airflow_python/logs
 logs
+
+# Python build / cache byproducts — keep them out of the build context so
+# `.devcontainer/Dockerfile` doesn't pull host-side state into /tmp/workspace.
+# In particular, packages/bietlejuice-runtime/.venv is a *symlink* created by
+# .devcontainer/post-create.sh that points at /opt/... inside the container;
+# without this exclusion, COPYing it into the builder makes uv sync fail with
+# "File exists" because the symlink shadows the venv path uv wants to create.
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.coverage
+**/.coverage.*
+**/.ruff_cache
+**/.mypy_cache
+**/.cursor/temp

@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, Namespace
 from multiprocessing.pool import ThreadPool
 
-from bietlejuice.base.db import MetastoreMappingFactory
+from bietlejuice.base.db.metastore_mapping_factory import MetastoreMappingFactory
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.airflow.optimize_delta_tables_cli import (
     decode_tables_config_from_cli,

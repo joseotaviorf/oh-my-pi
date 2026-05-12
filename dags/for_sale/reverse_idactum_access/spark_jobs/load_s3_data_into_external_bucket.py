@@ -15,7 +15,7 @@ from bietlejuice.services.messaging_services.message import Message
 import boto3
 from pyspark.sql.utils import AnalysisException
 
-from bietlejuice.services import ConfigurationService
+from bietlejuice.services.configuration_service import ConfigurationService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_s3_data_into_external_bucket"

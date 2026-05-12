@@ -11,65 +11,182 @@
   </tr>
 </table>
 
-# Bi-etl-ejuice
-Repository with implementation of Airflow DAGs and Spark Jobs.
+# bi-etl-ejuice
+
+Airflow DAGs, Spark jobs, and supporting libraries for QuintoAndar’s data platform (orchestrated in Airflow, executed on Databricks and related runtimes).
 
 <img src="bietlejuice.jpg" width="200">
 
 ---
 
-## Table of contents
+## Overview
 
-- [Bi-etl-ejuice](#bi-etl-ejuice)
-  - [Table of contents](#table-of-contents)
-  - [Project Overview](#project-overview)
-  - [Getting Started](#getting-started)
-    - [⚙️ Local Setup Instructions](#️-local-setup-instructions)
-  - [Useful Commands](#useful-commands)
-    - [Lint \& Check Style](#lint--check-style)
-    - [Local Tests](#local-tests)
-  - [Monitoring](#monitoring)
-  - [Airflow extra features](#airflow-extra-features)
-  - [Hotfixes deployment flow :fire:](#hotfixes-deployment-flow-fire)
+- **`dags/`** — Pipelines by **business domain** and **DAG name**. A typical folder includes:
+  - `*_declaration.yml` — Airflow schedule and workflow; generated `*_dag.py` from the DAG builder
+  - **`queries/`** — SQL by layer (where applicable)
+  - **`metadata/`** — Governance YAML (one per table, paired with `queries/`)
+  - **`data_quality/`** — (optional) Great Expectations specs
+  - **`spark_jobs/`** — (optional) PySpark for custom Spark jobs
+  - **`schemas/`** — (core model DAGs) JSON schema files
+  - **`dags/qube/`** — Qube dimensions / measures / metrics: declarations here; Spark implementation lives under **`packages/`** (not the `queries/` + `metadata/` layout above)
+- **`packages/`** — Python code for **`bietlejuice`**, split into **four** installable projects so **Airflow** and **Databricks** can depend on different pins without one giant package:
+  - **`bietlejuice-core`** — shared config, validation, and utilities
+  - **`bietlejuice-airflow`** — DAG builder, Airflow integration (Airflow 2.11.x / Astro Runtime 13.4.x)
+  - **`bietlejuice-runtime`** — Spark, Qube, UDFs, Databricks-side code (separate `uv` lock; optional per-**DBR** venvs under `envs/`)
+  - **`bietlejuice-compiler`** — `create-dag-files`, validation scripts, SQL tooling
 
-## Project Overview
+**Tooling:** dependencies and tasks are managed with **[uv](https://docs.astral.sh/uv/)**; **Ruff** replaces Black/Flake8; tests run with **pytest** per package. CI uses **Woodpecker** (see `.woodpecker/`).
 
-  This repository contains the code used to implement the DAGs and Spark Jobs which run in the [Google Cloud Platform (GCP)](http://composer.quintoandar.com.br) and Databricks, respectively.
-  For information about the project, architecture and processes please referer to the [Knowledge Base](https://www.notion.so/productquintoandar/Knowledge-Base-8109bb2d9c344e1f8dc7e79c3600635f) page in our [Data Engineering Wiki](https://www.notion.so/productquintoandar/Data-Engineering-Wiki-509776d7775a4abf97c7cd53731749c7).
+For **design decisions, CI behavior, multi-DBR layout, and IDE details**, see **[`docs/bietlejuice_restructuring.md`](docs/bietlejuice_restructuring.md)**.
 
-## Getting Started
+---
 
- Commands for common steps are defined on a [Makefile](https://en.wikipedia.org/wiki/Makefile),
- please refer to this file at the project root to check the existing commands.
+## Clone the repository
 
-### ⚙️ [Local Setup Instructions](local/README.md)
-
-## Useful Commands
-
-### Lint & Check Style
-
-Having all set with the local environment, you can use any of the following commands for checking the code style standards:
-
- - Run the check style command for acknowledge possible problems:
+If you are reading this on GitHub, start by cloning the repo and entering the project directory:
 
 ```bash
-    make check-style
+git clone git@github.com:quintoandar/bi-etl-ejuice.git
+cd bi-etl-ejuice
 ```
 
- - Then run the lint command for fixing the automatically fixable inconsistencies. P.S.: Not all the problems can be
-fixed by this command, so you might need to run `make check-style` and check the reaming manual fixes.
+(Use HTTPS if you prefer: `https://github.com/quintoandar/bi-etl-ejuice.git`.)
 
-```bash
-    make lint
-```
+---
 
-### Local Tests
+## Recommended: Dev container (primary)
 
-Be sure you have run `make requirements-test` to install the tests' dependencies and then run:
+**Prefer the dev container** for day-to-day work. It bakes in **uv**, **Java**, OS packages, a warmed wheel cache, and a single **Python** environment so everyone matches CI and you avoid “works on my machine” drift.
 
-```bash
-    make unit-tests
-```
+### What you need on your machine (host)
+
+Almost everything runs **inside Docker**; the host is only there to run containers and to talk to GitHub.
+
+| On the host                             | Why                                                                                                                                                                                                                                                                                          |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Docker**                              | Build and run the dev container image, and (with Docker-outside-of-Docker) run **local Airflow (Astro)** from inside the container. Use a current **Docker with BuildKit** (default in recent Docker Desktop / Engine) so the image build can use the **GITHUB_TOKEN** secret.               |
+| **Git**                                 | Clone and version control.                                                                                                                                                                                                                                                                   |
+| **Editor**                              | [Cursor](https://cursor.com/) (recommended) or [VS Code](https://code.visualstudio.com/) with the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) installed, so you can open the folder *in* a dev container (see below). |
+| **Credentials (environment variables)** | See below.                                                                                                                                                                                                                                                                                   |
+
+**You do not** need a separate **Python**, **uv**, or **Java** install on the host for normal development in the dev container—the **Dockerfile** and `postCreateCommand` set those up. Optional **Astro CLI** and similar tooling are expected to be used **from the container** (or installed there as in the current `.devcontainer` setup) when you run `make` targets.
+
+### Credentials (host shell → passed into the container / build)
+
+- **`GITHUB_TOKEN`** — **Required** for the image build and for `uv sync` when private Git dependencies (e.g. `quintoandar-logger`) are resolved. Export it in your **host** shell before `make devcontainer-build` or let your editor pass it when building the devcontainer.
+- **`DATABRICKS_TOKEN`**, **`DATABRICKS_USERNAME`** — Optional on the **host**; the devcontainer forwards them so `make run-local-environment` and Databricks usage behave like on a bare machine.
+
+`make setup-local-variables` can help persist GitHub/Databricks env vars in your host shell if you are not using another secrets manager.
+
+### Open the project in the dev container (recommended: IDE)
+
+**Cursor** and **VS Code** can build and start the dev container the **first time you open the project** in the container (no `make` step required for that first build), as long as **Docker** is running and your credentials are available.
+
+- **Cursor** — Open the cloned repo, then use the command palette: **“Dev Containers: Reopen in Container”**. The **first** open **builds the image automatically** (one-time, can take several minutes); then **`.devcontainer/post-create.sh`** runs `uv sync`. See [Dev Containers in VS Code](https://code.visualstudio.com/docs/devcontainers/containers) for the same workflow in compatible editors.
+- **VS Code** — Install the official [**Dev Containers** extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) (ID `ms-vscode-remote.remote-containers`, published by Microsoft). Open the repo folder, then **Dev Containers: Reopen in Container**; the first run builds the image, then `post-create` runs.
+
+Set **`GITHUB_TOKEN`** on the host (and optional **`DATABRICKS_*`**) so the build and `uv sync` can reach private Git dependencies (see the **Credentials** subsection above).
+
+1. From a terminal **inside the container**, after checkout or when dependencies change:
+
+   ```bash
+   make install
+   ```
+
+2. **Local Airflow** is supported from inside the container via **Docker-outside-of-Docker** (the Docker socket is mounted so `astro` uses the host engine). See [Local Airflow (Astronomer Astro)](#local-airflow-astronomer-astro).
+
+Editor defaults (Ruff, Pyright/Cursor Pyright, pytest under `packages/`) are described in **[`docs/bietlejuice_restructuring.md`](docs/bietlejuice_restructuring.md)** (*Dev container and IDE settings*).
+
+### Build the dev container image from the command line (optional)
+
+If you prefer to **pre-build** the image, or you are not using the IDE flow:
+
+1. Export **`GITHUB_TOKEN`** in your host shell (and optional **`DATABRICKS_*`**).
+2. Run (BuildKit passes the token as a **secret**, not a build-arg):
+
+   ```bash
+   make devcontainer-build
+   ```
+
+3. In **Cursor** or **VS Code**: **“Dev Containers: Reopen in Container”** to attach to that image, then `make install` inside the container when needed.
+
+---
+
+## Alternative: develop on the host (no dev container)
+
+Use this if you **cannot** use Docker for development or you strongly prefer a native environment.
+
+### What you need on the machine
+
+| Requirement     | Notes                                                                                                                                                                                                                                   |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **uv**          | [Install uv](https://docs.astral.sh/uv/getting-started/); it drives `make install`, `uv run`, and wheel builds.                                                                                                                         |
+| **Python**      | Versions are pinned per `packages/*/pyproject.toml` (workspace packages are typically **3.10+**; **bietlejuice-runtime** also uses **per-DBR** venvs under `packages/bietlejuice-runtime/envs/` for cluster parity: 3.9 / 3.10 / 3.12). |
+| **Java**        | **JDK 17** for Spark-related tests and tooling (CI uses OpenJDK 17 for those steps).                                                                                                                                                    |
+| **Docker**      | **Only if** you use **local Airflow (Astro)** — same engine as today; you still run containers on the host.                                                                                                                             |
+| **Credentials** | **`GITHUB_TOKEN`** for `uv sync` and private git deps. **`DATABRICKS_TOKEN` / `DATABRICKS_USERNAME`** for local Airflow and Databricks (`make setup-local-variables` can help).                                                         |
+
+From the **repository root**:
+
+1. **Install** all package venvs (workspace + **bietlejuice-runtime** + default **dbr-16-4** test env):
+
+   ```bash
+   make install
+   ```
+
+2. **Tests and style:**
+
+   ```bash
+   make check-style
+   make unit-tests
+   ```
+
+3. **Optional —** switch the DBR mirror venv (default **16.4**):
+
+   ```bash
+   make sync-dbr DBR=12.2   # or 13.3 / 16.4
+   ```
+
+4. **Regenerate Airflow `*.py` from declarations** when needed:
+
+   ```bash
+   make create-dag-files
+   # or: make create-dag-files dag_name=<name>
+   ```
+
+For all targets, see the root **`Makefile`**.
+
+---
+
+## Local Airflow (Astronomer Astro)
+
+The stack uses **Astro Runtime 13.4.x**-style images; **bietlejuice** **core** and **airflow** sources are **bind-mounted**; **`local/astro/requirements.txt`** is produced with **`uv export`** from **bietlejuice-airflow**.
+
+Typical flow (repo root, **in the dev container or on the host** if Docker is available):
+
+1. `make setup-local-variables` (once) — if you still need to set tokens in your environment.
+2. `make create-dag-files` when declarations or the DAG builder change.
+3. `make run-local-environment` — optional `verbose=1` for more Astro logs.
+4. UI: **https://localhost:8080** (check Astro’s output for the exact URL/port).
+
+Install the [**Astro CLI**](https://www.astronomer.io/docs/astro/cli/install-cli/) where you run the commands (in many setups that is **inside the devcontainer**; on the host-only path, install it on the host). More context: [`local/README.md`](local/README.md) (some steps there may be legacy—prefer this README and the **Makefile**).
+
+---
+
+## Useful commands (quick reference)
+
+| Command                                      | Purpose                                                                   |
+| -------------------------------------------- | ------------------------------------------------------------------------- |
+| `make install`                               | Sync all packages + default **dbr-16-4** env for runtime tests.           |
+| `make check-style` / `make fix-style`        | Ruff format + check (see Makefile for `lint` vs fix).                     |
+| `make type-check`                            | `ty` on each package (optional local signal; CI is non-blocking).         |
+| `make unit-tests` / `make integration-tests` | Pytest per package; runtime uses the **dbr-16-4** venv.                   |
+| `make build`                                 | Build **bietlejuice-core** and **bietlejuice-runtime** wheels to `dist/`. |
+| `make run-local-environment`                 | Start local Airflow via Astro.                                            |
+
+For SQL style on `dags/`, see `make check-sql` / `make lint-sql` in the **Makefile**.
+
+---
 
 To run only a subdirectory of `tests/unit/`, pass `component`:
 
@@ -78,12 +195,8 @@ To run only a subdirectory of `tests/unit/`, pass `component`:
     make unit-tests component=base/api
 ```
 
-## Monitoring
-Please refer to the Monitoring page section to check the active monitorings we have: [Monitoring](https://www.notion.so/productquintoandar/Monitoring-33590fa5e29845debe55f11d1d49c5b0).
+---
 
-## Airflow extra features
+## Hotfixes
 
-You can enable some extra features like an _Auto Refresh_ button on the DAG's page with [this chrome extension](https://chrome.google.com/webstore/detail/airflow-lifunf/eloabhccocaamibhganmeogabcenidfa)
-
-## Hotfixes deployment flow :fire:
-If you need to urgent deploy a change you can use the _hotfix_ flow. Please check it out in the [Wiki page](https://docs.google.com/document/d/13_0MoPv_R5eYk647v7BRQSp4O6P-mcr3AdouC8gwXVk/edit#heading=h.otmv9f3bbomh).
+Urgent production path: [Hotfix flow (Google Doc)](https://docs.google.com/document/d/13_0MoPv_R5eYk647v7BRQSp4O6P-mcr3AdouC8gwXVk/edit#heading=h.otmv9f3bbomh).

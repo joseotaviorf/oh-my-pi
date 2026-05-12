@@ -8,7 +8,7 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.pipeline.data_quality_tests_pipeline import DataQualityTestsPipeline
-from bietlejuice.services import ConfigurationService
+from bietlejuice.services.configuration_service import ConfigurationService
 
 
 JOB_NAME = "data_quality_tests"

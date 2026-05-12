@@ -1,0 +1,218 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "bietlejuice-runtime"
+version = "0.1.0"
+description = "Databricks/Spark runtime components for bietlejuice pipelines"
+requires-python = ">=3.9,<3.13"
+dependencies = [
+    # bietlejuice-core is intentionally absent from Requires-Dist. It is NOT on PyPI,
+    # so pip (used by Databricks cluster libraries) cannot resolve it. Both wheels are
+    # always co-deployed via `default_libraries` in forno_conf / prod_conf, so core is
+    # always present in the Python environment at runtime. For local development,
+    # core is wired in via the [tool.uv.sources] path entry below (editable install).
+    "bs4>=0.0.1",
+    "businesstimedelta",            # used by FintechUDFs.fintechops_work_min_sla pandas UDF
+    "delta-spark==3.3.1",           # must match DBR 16.4 Delta Lake 3.3.1 exactly
+    "dependency-injector>=4.46.0",
+    "facebook-business",
+    "ftfy",
+    "google-api-python-client",
+    "gspread",
+    "hierarchical-conf>=1.0.4",
+    "hive-metastore-client>=1.0.9",
+    "holidays",                     # used by FintechUDFs.fintechops_work_min_sla pandas UDF
+    "hubspot-api-client",
+    "kafka-python",
+    "langfuse",
+    "defusedxml",
+    "oauth2client",
+    "opentelemetry-exporter-otlp-proto-http>=1.22.0",
+    "paramiko",
+    "pendulum",
+    "presidio-analyzer",
+    "pymongo>=4.0.0",
+    # pyspark is intentionally absent from Requires-Dist: DBR 16.4 bundles PySpark 3.5.2
+    # directly; installing from PyPI would download a 317 MB sdist and shadow the
+    # cluster-bundled copy. The pyspark==3.5.3 pin in [tool.uv].override-dependencies
+    # keeps the uv resolver happy when resolving delta-spark==3.3.1 locally.
+    "pytopojson",
+    # quintoandar-logger intentionally omitted from Requires-Dist: it is a private
+    # GitHub package not on PyPI. pip (used by Databricks cluster libraries) cannot
+    # resolve it. It is deployed to clusters via default_libraries
+    # (quintoandar_logger-*.whl). For local dev / CI it is declared in
+    # [dependency-groups].dev (uv installs it via the [tool.uv.sources] git entry
+    # added below); production installs do not see it.
+    "spacy",
+    "SQLAlchemy>=1.4.54",
+    "sqlglot>=26.9.0",
+    "trino>=0.305.0",
+
+    # validations-engine pins requests==2.28.1, but [tool.uv].override-dependencies
+    # below forces requests>=2.32.3; it works fine.
+    "validations-engine==2.0.0",
+    # QuintoAndar private API clients are intentionally absent from Requires-Dist.
+    # See comment block below for the full explanation.
+]
+
+# The following packages are required by production code but cannot be declared as
+# pip-resolvable Requires-Dist. They are intentionally absent from [project.dependencies]
+# and are stubbed at test collection time via test/unit/conftest.py:
+#
+# --- No public source ---
+#   edwiges                             → no public PyPI or GitHub source found
+#   quintoandar-airtable-api-client     → no public PyPI or GitHub source found
+#   quintoandar-hubspot-api-client      → no public PyPI or GitHub source found
+#   quintoandar-reclameaqui-api-client  → no public PyPI or GitHub source found
+#   quintoandar-sap-4hana-api-client    → no public PyPI or GitHub source found
+#   quintoandar-twilio-flex-insights-api-client → no public PyPI or GitHub source found
+#
+# --- Python 3.12 incompatible on the index ---
+#   inmetro                             → requires-python = ">=3.9,<3.12"; incompatible with Python 3.12
+#
+# --- Internal Nexus index, all published versions cap at Requires-Python <3.12 ---
+#   DBR 16.4 runs Python 3.12. When these appear in Requires-Dist, pip on the cluster
+#   finds the Nexus-published versions (2.14.x–2.18.x) but discards them all because
+#   of the <3.12 cap, reporting "from versions: none" and failing the library install.
+#   On production clusters they are available because they were pre-installed via
+#   cluster-scoped libraries (Databricks cluster UI / terraform), not through this wheel.
+#   For local dev and CI they live in [dependency-groups].dev; uv installs them from the
+#   GitHub git tags declared in [tool.uv.sources], which carry no <3.12 constraint.
+#
+#   quintoandar-braze-api-client
+#   quintoandar-chattermill-api-client
+#   quintoandar-criteo-api-client
+#   quintoandar-facebook-api-client
+#   quintoandar-gsheets-api-client
+#   quintoandar-hr-system-api-client
+#   quintoandar-jira-api-client
+#   quintoandar-omie-api-client
+#   quintoandar-survicate-api-client
+#   quintoandar-tracksale-api-client
+#   quintoandar-velo-neurotech-api-client
+
+# DBR-bundled libraries (numpy, pandas, pyarrow, psycopg2, ...) are intentionally
+# absent from [project.dependencies]. The cluster's pre-installed copy wins on
+# sys.path at runtime; the wheel never ships duplicates.
+#
+# For local development, those DBR-pinned libraries live in per-DBR sub-projects
+# under envs/dbr-{12-2,13-3,16-4}/pyproject.toml. Each sub-project depends on
+# this runtime via a path source and pins the libs to the exact versions that
+# DBR ships, plus the matching Python version (3.9 / 3.10 / 3.12). This keeps
+# the wheel itself broad and clean while letting `make sync-dbr DBR=<v>` build
+# a venv that mirrors a specific DBR's Python env without dependency conflicts.
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/bietlejuice"]
+
+[tool.uv.sources]
+# bietlejuice-runtime is a standalone uv project (not a workspace member), so
+# bietlejuice-core is wired in via a relative path source. `editable = true`
+# means changes to core's source tree are picked up without re-running uv sync.
+bietlejuice-core                   = { path = "../bietlejuice-core", editable = true }
+quintoandar-logger                 = { git = "https://github.com/quintoandar/python-logger",                    tag = "0.8.1" }
+quintoandar-braze-api-client       = { git = "https://github.com/quintoandar/braze-api-client-python",           tag = "0.1.0" }
+quintoandar-chattermill-api-client = { git = "https://github.com/quintoandar/chattermill-api-client-python",     tag = "0.1.0" }
+quintoandar-criteo-api-client      = { git = "https://github.com/quintoandar/criteo-api-client-python",          tag = "0.1.0" }
+quintoandar-facebook-api-client    = { git = "https://github.com/quintoandar/facebook-api-client-python",        tag = "0.1.2" }
+quintoandar-gsheets-api-client     = { git = "https://github.com/quintoandar/gsheets-api-client-python",        tag = "0.5.0" }
+quintoandar-hr-system-api-client   = { git = "https://github.com/quintoandar/hr-system-api-client-python",      tag = "0.1.2" }
+quintoandar-jira-api-client        = { git = "https://github.com/quintoandar/jira-api-client-python",           tag = "0.2.1" }
+quintoandar-omie-api-client        = { git = "https://github.com/quintoandar/omie-api-client-python",           tag = "0.4.1" }
+quintoandar-survicate-api-client   = { git = "https://github.com/quintoandar/survicate-api-client-python",      tag = "0.1.0" }
+quintoandar-tracksale-api-client   = { git = "https://github.com/quintoandar/tracksale-api-client-python",      tag = "0.2.0" }
+quintoandar-velo-neurotech-api-client = { git = "https://github.com/quintoandar/velo-neurotech-api-client-python", tag = "0.3.2" }
+
+[tool.uv]
+index-strategy = "unsafe-best-match"
+# Old QuintoAndar API clients pin ancient transitive deps. These overrides
+# tell the resolver to ignore those constraints and use newer versions. The
+# same set of overrides is duplicated in each envs/dbr-X-Y/pyproject.toml
+# because uv overrides are project-local and do not propagate through path
+# sources; keep both in sync.
+override-dependencies = [
+    "requests>=2.32.3",        # validations-engine, tracksale, chattermill, criteo pin 2.23/2.28
+    # 8.0.1 is DBR 12.2's bundled tenacity. The override still clears the API
+    # clients' ancient pins (braze ==4.12, survicate/omie/velo/hr-system ==5.0)
+    # because all of those are below 8.0.1, while letting envs/dbr-X-Y pin a
+    # specific DBR version on top.
+    "tenacity>=8.0.1",
+    "pyspark==3.5.3",          # delta-spark==3.3.1 requires pyspark>=3.5.3; keeps the uv resolver
+                               # happy locally. pyspark itself is absent from Requires-Dist —
+                               # DBR bundles it; braze-api-client's ancient 2.4.3 pin is also overridden here.
+    "quintoandar-logger>=0.4.0", # most API clients pin ==0.8.0; we install 0.8.1 from git
+]
+
+[dependency-groups]
+# This group powers `make check-style` and `make type-check` for runtime —
+# linting and type-checking only. It deliberately does NOT install the
+# DBR-pinned libraries; those live in envs/dbr-X-Y/pyproject.toml so the
+# universal lockfile can resolve cleanly.
+#
+# To run tests against a specific DBR's pinned libs, use the env's venv:
+#   make sync-dbr DBR=16.4
+#   cd packages/bietlejuice-runtime && envs/dbr-16-4/.venv/bin/pytest
+dev = [
+    "pytest==8.3.5",   # airflow constraints-2-10
+    "pytest-cov",
+    "ruff==0.5.5",     # airflow constraints-2-10
+    "ty",              # no constraint available
+    "moto[s3]",        # AWS service mocking for s3_service tests
+    # quintoandar-logger lives here (not in [project.dependencies]) so the
+    # published wheel stays installable by pip on Databricks; uv sync picks it
+    # up for tests via the [tool.uv.sources] git entry above.
+    "quintoandar-logger>=0.4.0",
+    # QuintoAndar API clients live here (not in [project.dependencies]) for the same
+    # reason: all Nexus-published versions have Requires-Python <3.12, so pip on
+    # DBR 16.4 (Python 3.12) finds nothing and fails. The git tags in [tool.uv.sources]
+    # carry no such cap and install cleanly for local dev and CI. On production clusters
+    # they are available as pre-installed cluster-scoped libraries.
+    "quintoandar-braze-api-client",
+    "quintoandar-chattermill-api-client",
+    "quintoandar-criteo-api-client",
+    "quintoandar-facebook-api-client",
+    "quintoandar-gsheets-api-client",
+    "quintoandar-hr-system-api-client",
+    "quintoandar-jira-api-client",
+    "quintoandar-omie-api-client",
+    "quintoandar-survicate-api-client",
+    "quintoandar-tracksale-api-client",
+    "quintoandar-velo-neurotech-api-client",
+    # bietlejuice-core is needed at test time only: a handful of runtime tests
+    # exercise modules that live in core (bietlejuice.base.pipeline,
+    # bietlejuice.base.db.{datalake,dw}_metastore_service,
+    # bietlejuice.base.service.dag_packages_path_service, and the namespace
+    # bietlejuice.base.airflow.enums shipped from core). Production wheels
+    # never see this — Databricks installs both wheels via default_libraries.
+    "bietlejuice-core",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["test/unit"]
+pythonpath = ["src"]
+addopts = ["--import-mode=importlib", "--cov=bietlejuice", "--cov-report=term-missing"]
+markers = [
+    "unit: unit tests",
+    "core_models: core data model tests",
+    "schema_validation: schema validation tests",
+]
+
+
+[tool.ty.environment]
+python-version = "3.10"
+
+[tool.coverage.run]
+source = ["bietlejuice"]
+omit = ["*/__init__.py"]
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
