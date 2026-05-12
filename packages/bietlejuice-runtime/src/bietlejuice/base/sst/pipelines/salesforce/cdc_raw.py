@@ -15,6 +15,7 @@ from bietlejuice.base.sst.core.utils.common import (
     retrieve_spark_session,
     validate_and_write,
 )
+from bietlejuice.base.sst.core.utils.transforms import apply_schema_remaps
 from bietlejuice.base.sst.domains.salesforce.raw.io import read_sf_cdc_json
 from bietlejuice.base.sst.domains.salesforce.raw.transform import (
     sf_cdc_mandatory_fields,
@@ -131,6 +132,10 @@ def salesforce_raw_pipeline(cfg):
         .persist()
     )
 
+    raw_final_remapped = apply_schema_remaps(
+        spark=spark, df=raw_final, target_table=target_table, accept_new_cols=True
+    )
+
     logger.info("m=salesforce_raw_pipeline, msg=Quality checks passed")
     logger.info(
         f"m=salesforce_raw_pipeline, msg=Metadata retrieved: {cfg.target_schema=}"
@@ -148,7 +153,7 @@ def salesforce_raw_pipeline(cfg):
     table_location = f"s3a://{cfg.bucket}/raw/salesforce/{cfg.target_table}"
     validate_and_write(
         spark=spark,
-        df=raw_final,
+        df=raw_final_remapped,
         target_table=target_table,
         partition_filter=partition_filter,
         partition_cols=partition_cols,
@@ -164,7 +169,7 @@ def salesforce_raw_pipeline(cfg):
         logger.info(f"m=salesforce_raw_pipeline, msg=Saving {_metric} metric")
         save_volume_metric(
             spark=spark,
-            df=raw_final,
+            df=raw_final_remapped,
             grain=grain,
             metric_name=_metric,
             table_name=target_table,

@@ -10,7 +10,7 @@ import pyspark.sql.functions as F
 from pyspark.sql import DataFrame, SparkSession
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db.datalake_metastore_service import DatalakeMetastoreService
+from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.sst.core.metadata.sync_metadata import sync_trino_metadata
 
 logger = QuintoAndarLogger("sst.common")
