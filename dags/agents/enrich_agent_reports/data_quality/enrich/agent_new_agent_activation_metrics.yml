@@ -1,3 +1,6 @@
+# Data quality rules for agent_new_agent_activation_metrics.
+# Used by DataQualityTestsPipeline (PyDeequ/inmetro). Aligns with validate_before_write in
+# load_agent_new_agent_activation_metrics. Error = fail pipeline.
 ---
 table_name: datalake_agent_reports.agent_new_agent_activation_metrics
 alert_channel: "#alerts-de-airflow-dags"
