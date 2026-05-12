@@ -1,0 +1,134 @@
+database_name: datalake_crowdstrike_clean
+table_name: managed_devices
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+description: Clean snapshot of managed devices from CrowdStrike Falcon EDR platform, with normalized identifiers and timestamps.
+columns:
+  id_device:
+    description: Unique device identifier in CrowdStrike Falcon.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.device_id
+  id_cid:
+    description: CrowdStrike customer identifier (CID).
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.cid
+  nm_hostname:
+    description: Device hostname as reported by CrowdStrike.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.hostname
+  ds_platform:
+    description: Operating system platform (Mac, Windows, Linux).
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.platform_name
+  id_platform:
+    description: Platform identifier code.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.platform_id
+  ds_os_version:
+    description: Operating system version name.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.os_version
+  ds_os_build:
+    description: Operating system build number.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.os_build
+  ds_major_version:
+    description: Major version number of the operating system.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.major_version
+  ds_minor_version:
+    description: Minor version number of the operating system.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.minor_version
+  ds_agent_version:
+    description: CrowdStrike Falcon agent version installed on the device.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.agent_version
+  ds_external_ip:
+    description: External IP address of the device.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.external_ip
+  ds_local_ip:
+    description: Local IP address of the device.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.local_ip
+  ds_mac_address:
+    description: MAC address of the device network interface.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.mac_address
+  ds_machine_domain:
+    description: Domain the machine is joined to.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.machine_domain
+  nm_last_login_user:
+    description: Username of the last user who logged into the device.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.last_login_user
+  id_last_login_uid:
+    description: User ID of the last user who logged into the device.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.last_login_uid
+  id_last_login_user_sid:
+    description: Windows SID of the last user who logged into the device.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.last_login_user_sid
+  id_config_base:
+    description: Base configuration identifier.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.config_id_base
+  id_config_build:
+    description: Build configuration identifier.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.config_id_build
+  id_config_platform:
+    description: Platform configuration identifier.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.config_id_platform
+  ds_criticality:
+    description: Device criticality level assigned in CrowdStrike.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.criticality
+  ds_containment_status:
+    description: Filesystem containment status of the device.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.filesystem_containment_status
+  ds_reduced_functionality_mode:
+    description: Indicates if device is running in reduced functionality mode.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.reduced_functionality_mode
+  ds_rtr_state:
+    description: Real-time response state (enabled/disabled).
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.rtr_state
+  ds_safe_mode:
+    description: Indicates if device is running in safe mode.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.safe_mode
+  ts_first_seen:
+    description: Timestamp when the device was first seen by CrowdStrike.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.first_seen
+  ts_last_seen:
+    description: Timestamp when the device was last seen by CrowdStrike.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.last_seen
+  ts_last_login:
+    description: Timestamp of the last user login on the device.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.last_login_timestamp
+  ts_agent_local_time:
+    description: Local time of the CrowdStrike agent on the device.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.agent_local_time
+  year:
+    description: Year partition of the ingestion date.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.year
+  month:
+    description: Month partition of the ingestion date.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.month
+  day:
+    description: Day partition of the ingestion date.
+    lineage:
+      - datalake_crowdstrike_raw.managed_devices.day

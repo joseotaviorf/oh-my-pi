@@ -1,0 +1,67 @@
+dag:
+  name: crowdstrike
+  owner: Tech Platform Cyber Security
+  callback_by_task: False
+  documentation:
+    dag_purpose: |
+      This DAG ingests managed devices data from CrowdStrike Falcon EDR platform via REST API into raw and clean layers.
+  schedule_interval: 0 3 * * *
+
+cluster:
+  type: custom_cluster
+  access_control_list:
+    group_name: auditlogs
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    driver_node_type_id: m5d.4xlarge
+    node_type_id: m5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+
+workflow:
+  layer: raw
+  has_hive_sync: false
+  type: custom_ingestion
+  bucket_config_name: datalake_bucket
+  load_spark_job: load_crowdstrike_raw
+  dbutils_secret_key: CROWDSTRIKE_API_CREDENTIALS
+  default_table_privileges:
+    auditlogs:
+      - ALL PRIVILEGES
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{{ data_interval_start | ds }}"
+    - "{partitions}"
+    - "{extraction_type}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "{table_privileges}"
+
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start |
+      ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+
+  default_partitions: [ year, month, day ]
+
+  tables_customization:
+    managed_devices:
+      clean_table_name: managed_devices
+      merge_on: [ year, month, day, id_device ]
+      clean_partitions: [ year, month, day ]
+      extraction_type: full
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+      extra_spark_job_arguments:
+        - base_filters:
+            limit: "500"

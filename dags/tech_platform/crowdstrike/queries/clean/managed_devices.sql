@@ -1,0 +1,37 @@
+SELECT
+    device_id AS id_device,
+    cid AS id_cid,
+    hostname AS nm_hostname,
+    platform_name AS ds_platform,
+    platform_id AS id_platform,
+    os_version AS ds_os_version,
+    os_build AS ds_os_build,
+    major_version AS ds_major_version,
+    minor_version AS ds_minor_version,
+    agent_version AS ds_agent_version,
+    external_ip AS ds_external_ip,
+    local_ip AS ds_local_ip,
+    mac_address AS ds_mac_address,
+    machine_domain AS ds_machine_domain,
+    last_login_user AS nm_last_login_user,
+    last_login_uid AS id_last_login_uid,
+    last_login_user_sid AS id_last_login_user_sid,
+    config_id_base AS id_config_base,
+    config_id_build AS id_config_build,
+    config_id_platform AS id_config_platform,
+    criticality AS ds_criticality,
+    filesystem_containment_status AS ds_containment_status,
+    reduced_functionality_mode AS ds_reduced_functionality_mode,
+    rtr_state AS ds_rtr_state,
+    safe_mode AS ds_safe_mode,
+    TRY_CAST(first_seen AS TIMESTAMP) AS ts_first_seen,
+    TRY_CAST(last_seen AS TIMESTAMP) AS ts_last_seen,
+    TRY_CAST(last_login_timestamp AS TIMESTAMP) AS ts_last_login,
+    TRY_CAST(agent_local_time AS TIMESTAMP) AS ts_agent_local_time,
+    year,
+    month,
+    day
+FROM
+    datalake_crowdstrike_raw.managed_devices
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
