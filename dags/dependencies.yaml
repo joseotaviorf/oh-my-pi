@@ -227,8 +227,14 @@ bietlejuice.dw_brokers:
 bietlejuice.dw_business_unit_region:
   - bietlejuice.enrich_hub_services:load-enrich-business-unit-region:first-run-of-day
 bietlejuice.dw_buyer_prospect:
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
+  - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
   - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect-type:first-run-of-day
   - bietlejuice.enrich_buyer_prospect:load-enrich-buyer-prospect:first-run-of-day
+  - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visits:first-run-of-day
+  - bietlejuice.rede_platform:load-clean-buyer-company-event:first-run-of-day
+  - bietlejuice.rede_platform:load-clean-buyer-company:first-run-of-day
 bietlejuice.dw_charging_payment_quintocred:
   - bietlejuice.dw_collection_recovery_quintocred:load-dw-collection-recovery-quintocred-fact-proposal-signature-payment-timeline:first-run-of-day
   - bietlejuice.dw_quintocred_ifrs:load-dw-velo-quintocred-ifrs-recurring-payment:first-run-of-day

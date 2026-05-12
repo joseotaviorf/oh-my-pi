@@ -2,6 +2,13 @@ dag:
   name: dw_buyer_prospect
   schedule_start_date: 2020,08,29
   owner: Data ForSale
+  documentation:
+    dag_purpose:
+      Creates the dw_sale models for the buyer prospect context. This DAG is
+      triggered daily via Mediator and produces, via full load, the
+      fact_buyer_prospects fact table and the dim_buyer_prospect_type and
+      dim_buyer_prospect_3p_history dimensions used to attribute funnel events
+      to the correct prospect window.
 workflow:
   type: query_delta
   layer: dw

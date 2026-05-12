@@ -1,0 +1,19 @@
+---
+table_name: dw_sale.dim_buyer_prospect_3p_history
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_buyer:
+    is_complete:
+      severity_level: Error
+  demand_type:
+    is_complete:
+      severity_level: Error
+  buyer_prospect_type:
+    is_complete:
+      severity_level: Error
+  version:
+    is_complete:
+      severity_level: Error
+  ts_started:
+    is_complete:
+      severity_level: Error
