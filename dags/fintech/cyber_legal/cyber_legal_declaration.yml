@@ -71,7 +71,7 @@ workflow:
       merge_on: [ id_notification_request, id_notification_sequence ]
       extra_spark_job_arguments:
         - "['CNDTUPD']"
-        - False
+        - True
         - "[]"
     caseuda:
       clean_table_name: case_uda
@@ -79,7 +79,7 @@ workflow:
       partitions: []
       extra_spark_job_arguments:
         - "[]"
-        - False
+        - True
         - "[]"
     casestag:
       clean_table_name: case_stage
@@ -89,7 +89,7 @@ workflow:
       merge_on: [ id_case, id_stage ]
       extra_spark_job_arguments:
         - "['CSDTUPD']"
-        - False
+        - True
         - "[]"
     caseacct:
       clean_table_name: case_account
@@ -99,7 +99,7 @@ workflow:
       merge_on: [ id_case, id_contract_group, id_contract ]
       extra_spark_job_arguments:
         - "['CCDTUPD']"
-        - False
+        - True
         - "[]"
     caalert:
       clean_table_name: case_alert
@@ -109,7 +109,7 @@ workflow:
       merge_on: [ id_alert ]
       extra_spark_job_arguments:
         - "['ALDTUPD']"
-        - False
+        - True
         - "[]"
     caexpns:
       clean_table_name: case_expense
@@ -117,7 +117,7 @@ workflow:
       partitions: []
       extra_spark_job_arguments:
         - "[]"
-        - False
+        - True
         - "[]"
     cardacct:
       clean_table_name: card_account
@@ -173,7 +173,7 @@ workflow:
       partitions: [ year, month, day ]
       extra_spark_job_arguments:
         - "['DOADDDT']"
-        - False
+        - True
         - "[]"
 cluster:
   type: custom_cluster
