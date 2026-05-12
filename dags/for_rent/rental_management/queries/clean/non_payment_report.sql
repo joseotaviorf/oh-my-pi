@@ -9,7 +9,10 @@ SELECT
     status,
     version,
     due_date AS dt_due,
-    original_due_dates AS dt_original_dues,
+    TRANSFORM(
+        original_due_dates,
+        x -> DATE_ADD(DATE '1970-01-01', CAST(x AS INT))
+    ) AS dt_original_dues,
     created_at AS ts_created,
     updated_at AS ts_updated
 FROM
