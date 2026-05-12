@@ -65,7 +65,7 @@ steps:
   make-package-python:
     image: public.ecr.aws/docker/library/python:3.12-bookworm
     commands:
-      - apt-get update -qq && apt-get install -y --no-install-recommends make git
+      - apt-get update -qq && apt-get install -y --no-install-recommends make git rsync
       - pip install uv
       # `make build` runs `uv build` for bietlejuice-core and bietlejuice-runtime; uv
       # writes both wheels (and sdists) into the workspace-root `dist/`, which is what
