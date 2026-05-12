@@ -1,6 +1,4 @@
 import json
-import boto3
-import os
 
 from concurrent.futures import ThreadPoolExecutor
 from argparse import ArgumentParser
@@ -14,8 +12,6 @@ from bietlejuice.base.spark import (
     BaseDBUtils,
     SparkTableStorageFormat,
     SparkDataFrameService,
-    spark,
-    sc,
 )
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
