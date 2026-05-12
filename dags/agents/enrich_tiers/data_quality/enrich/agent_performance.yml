@@ -11,10 +11,10 @@ column_level_validations:
   uuid_person:
     is_complete:
       severity_level: Error
-  metric:
+  metric_name:
     is_complete:
       severity_level: Error
-  value:
+  metric_value:
     is_complete:
       severity_level: Error
   dt_metric_period_started:

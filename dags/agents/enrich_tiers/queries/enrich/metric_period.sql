@@ -1,9 +1,9 @@
-WITH bimester AS (
+WITH month_period AS (
     SELECT DISTINCT
-        bimester_start,
-        bimester_end,
+        month_start,
+        month_end,
         year,
-        bimester
+        month
     FROM
         datalake_quintoandar.aux_date
     WHERE
@@ -32,17 +32,17 @@ metrics AS (
 SELECT
     XXHASH64(
         metrics.metric,
-        bimester.bimester_start
+        month_period.month_start
     ) AS id,
     metrics.metric,
     "VALID" AS status,
-    bimester.bimester_start AS dt_init,
-    bimester.bimester_end AS dt_end,
-    TIMESTAMP(bimester.bimester_start) AS ts_created,
+    month_period.month_start AS dt_init,
+    month_period.month_end AS dt_end,
+    TIMESTAMP(month_period.month_start) AS ts_created,
     NOW() AS ts_updated,
-    bimester.year,
-    bimester.bimester
+    month_period.year,
+    month_period.month
 FROM
-    bimester
+    month_period
 CROSS JOIN
     metrics

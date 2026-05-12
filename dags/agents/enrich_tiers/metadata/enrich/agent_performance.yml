@@ -25,9 +25,9 @@ columns:
     lineage:
       - datalake_tiers.metric_period.id
     description: Identifier of the metric period.
-  metric:
+  metric_name:
     description: Metric name aggregated (e.g., CCV, GMV, CCV_TQC, CCV_CIQ, OS_BY, OS2CCV_BY, BP2CCV, BP, TP, and INVALID variants).
-  value:
+  metric_value:
     description: Aggregated metric value for the period (count or ratio depending on the metric definition).
   is_valid:
     lineage:
@@ -36,7 +36,7 @@ columns:
   dt_metric_period_started:
     lineage:
       - datalake_tiers.metric_period.dt_init
-    description: Start date of the metric period window.
+    description: Start date of the metric period window (`dt_*` lake naming; same semantics as metric period start).
   dt_metric_period_ended:
     lineage:
       - datalake_tiers.metric_period.dt_end
