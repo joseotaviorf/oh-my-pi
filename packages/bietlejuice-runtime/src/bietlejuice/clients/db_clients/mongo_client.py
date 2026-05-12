@@ -65,7 +65,8 @@ class MongoClient(DBClient):
         :param mongo_collection: Name of the collection
         :param query: query content
         :type query: dict
-        :return: ``(cursor, nb_documents)`` from ``find`` and ``count_documents``
+        :return: ``(documents, nb_documents)`` — all matching documents as a list
+            (materialized before the connection closes) and ``count_documents`` total.
         """
         with self.conn as conn:
             collection = conn[self.db][mongo_collection]
@@ -75,7 +76,10 @@ class MongoClient(DBClient):
                 if k in ("skip", "limit", "hint", "maxTimeMS", "collation", "session")
             }
             nb_documents = collection.count_documents(query, **count_kwargs)
-            documents = collection.find(query, **kwargs)
+            # Cursor must be exhausted while the client is still open; returning a
+            # live cursor after the context exits closes the client and breaks
+            # iteration (InvalidOperation: Cannot use MongoClient after close).
+            documents = list(collection.find(query, **kwargs))
             logger.info(
                 f"m=get_documents, nb_documents={nb_documents}, msg=query execution succeeded"
             )
