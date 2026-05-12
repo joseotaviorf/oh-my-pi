@@ -269,6 +269,12 @@ Not all leads follow every stage. Leads may be discarded at any step, reprocesse
 - `datalake_chatbot.isaias_conversational_flow.id_lead_retrieved = CAST(obt_supply.sk_lead AS VARCHAR)`
 - NULL `id_lead_retrieved` means Isaias didn't surface a supply lead during that session
 
+### 3P Supply (sub-funnel — drill-in for `acquisition_origin = 'rede'`)
+
+- The `dw_3p_supply` schema is the granular model for the rede (third-party broker) channel — partner-submitted leads ingested via the BSP. See `business_entities/3p_supply.md`.
+- Bridge via `obt_supply.sk_house = dw_3p_supply.fact_lead_3p_flows.sk_house` (filter `<> -1` on both sides).
+- Use `obt_supply` for cross-channel funnel (1P / CIQ / 3P) and `dw_3p_supply` for partner / broker / BSP-reason analysis on rede leads.
+
 ### Region (N:1)
 
 - `obt_supply.sk_region = dw_region.dim_region.sk_region`

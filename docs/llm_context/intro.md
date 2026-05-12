@@ -21,6 +21,7 @@ Each entity file follows a standard structure:
 
 ### Available entities
 
+- `business_entities/3p_supply.md` — Third-party (rede) lead supply chain from BSP to first listing (rede / supply 3P / leads de parceiros / marketplace)
 - `business_entities/chatbot_sessions.md` — AI chatbot conversation sessions (sessões de chatbot / atendimento bot)
 - `business_entities/collections.md` — Overdue payment recovery operations (cobrança)
 - `business_entities/department.md` — Support queue routing and SLA targets (departamento / fila / caixa)
