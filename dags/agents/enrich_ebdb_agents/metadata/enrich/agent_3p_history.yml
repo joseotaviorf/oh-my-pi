@@ -1,0 +1,62 @@
+---
+database_name: datalake_ebdb_agents
+table_name: agent_3p_history
+description: SCD-style history of 3P agents (agent_type = 'CORRETOR_REDE'), built from
+  agent_data_aud revisions. Each row represents a version of a 3P agent's state, with
+  start/end timestamps delimiting the validity window. Restricted to agents linked to
+  Marketplace 5A brokers; data of exclusive interest to the 3P team.
+domain: Agents
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.id
+    description: ID of the 3P agent. Foreign key to dw_agent.dim_agent.sk_agent.
+  id_user:
+    lineage:
+      - datalake_ebdb_user.user.id
+    description: ID of the user associated with the agent. May be null when no user is linked.
+  uuid_company:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.uuid_company
+    description: UUID of the broker company (Rede partner) the agent belongs to.
+  agent_type:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.agent_type
+    description: Agent type from agent_data_aud. Always 'CORRETOR_REDE' in this table.
+  contract_name:
+    lineage:
+      - datalake_ebdb_clean.work_contract.contract_name
+    description: Name of the work contract attached to the agent in this revision.
+  version:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Sequential revision number per agent (1 = oldest), assigned by ROW_NUMBER over ts_revision.
+  is_3p_agent:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.agent_type
+    description: Flag indicating whether the agent is a 3P agent (agent_type = 'CORRETOR_REDE'). Always true in this table.
+  is_active:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.is_active
+    description: Whether the agent was active as of this revision.
+  is_passive_lead_receiver:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.is_passive_lead_receiver
+    description: Whether the agent was configured to receive passive leads as of this revision. When true, it means the agent is enabled to operate in the lead gen business model.
+  is_current:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Flag identifying the most recent revision per agent (latest ts_revision).
+  is_deleted:
+    lineage:
+      - datalake_ebdb_clean.agent_data_aud.rev_type
+    description: Whether this revision represents a delete operation (rev_type = 2).
+  ts_started:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp when this revision became effective (ts_revision of the change).
+  ts_ended:
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Timestamp when this revision was superseded by the next one. Null for the current revision.

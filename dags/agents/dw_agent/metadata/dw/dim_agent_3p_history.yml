@@ -1,0 +1,71 @@
+---
+database_name: dw_agent
+table_name: dim_agent_3p_history
+description: SCD-style dimension with the historical changes of 3P agents (CORRETOR_REDE)
+  linked to Marketplace 5A brokers. Each row is a version of a 3P agent's state with
+  start/end timestamps and a flag identifying the current revision. Data of exclusive
+  interest to the 3P team.
+domain: Agents
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_agent_3p_history:
+    lineage:
+      - datalake_ebdb_agents.agent_3p_history.id_agent
+      - datalake_ebdb_agents.agent_3p_history.version
+    description: Surrogate key of the 3P agent history row. Defined as COALESCE(id_agent, 0, version);
+      because id_agent is non-null in practice this collapses to id_agent grain. Uniqueness is on
+      (sk_agent, version), not on this column alone.
+  sk_agent:
+    lineage:
+      - datalake_ebdb_agents.agent_3p_history.id_agent
+    description: Foreign key to dw_public.dim_agent.sk_agent.
+  sk_user:
+    lineage:
+      - datalake_ebdb_agents.agent_3p_history.id_user
+    description: Foreign key to the user table (datalake_ebdb_user.user.id). Null when no user is linked.
+  sk_broker:
+    lineage:
+      - core_brokers.brokers.sk_broker
+    description: Foreign key to the 3P broker dimension (core_brokers.brokers), matched by uuid_company.
+  agent_type:
+    lineage:
+      - datalake_ebdb_agents.agent_3p_history.agent_type
+    description: Agent type. Always 'CORRETOR_REDE' in this dimension.
+  contract_name:
+    lineage:
+      - datalake_ebdb_agents.agent_3p_history.contract_name
+    description: Name of the work contract attached to the agent in this revision.
+  version:
+    lineage:
+      - datalake_ebdb_agents.agent_3p_history.version
+    description: Sequential revision number per agent (1 = oldest revision).
+  is_3p_agent:
+    lineage:
+      - datalake_ebdb_agents.agent_3p_history.is_3p_agent
+    description: Flag indicating whether the agent is a 3P agent. Always true in this dimension.
+  is_active:
+    lineage:
+      - datalake_ebdb_agents.agent_3p_history.is_active
+    description: Whether the agent was active as of this revision.
+  is_passive_lead_receiver:
+    lineage:
+      - datalake_ebdb_agents.agent_3p_history.is_passive_lead_receiver
+    description: Whether the agent was configured to receive passive leads as of this revision. When true, it means the agent is enabled to operate in the lead gen business model.
+  is_current:
+    lineage:
+      - datalake_ebdb_agents.agent_3p_history.is_current
+    description: Flag identifying the most recent revision per agent.
+  is_deleted:
+    lineage:
+      - datalake_ebdb_agents.agent_3p_history.is_deleted
+    description: Whether this revision represents a delete operation in the source.
+  ts_started:
+    lineage:
+      - datalake_ebdb_agents.agent_3p_history.ts_started
+    description: Timestamp when this revision became effective.
+  ts_ended:
+    lineage:
+      - datalake_ebdb_agents.agent_3p_history.ts_ended
+    description: Timestamp when this revision was superseded by the next one. Null for the current revision.
+  ts_load:
+    description: Timestamp of when the table was last processed.

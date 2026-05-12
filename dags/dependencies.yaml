@@ -80,6 +80,7 @@ bietlejuice.dw_agent:
   - bietlejuice.ebdb_photo_job:load-clean-photographer-data:first-run-of-day
   - bietlejuice.enrich_agenda_allocation:load-enrich-agent-region-group:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
+  - bietlejuice.enrich_ebdb_agents:load-enrich-agent-3p-history:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-affiliate-data:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-agent-data:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day

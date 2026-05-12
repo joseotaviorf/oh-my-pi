@@ -1,0 +1,10 @@
+---
+table_name: datalake_ebdb_agents.agent_3p_history
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_agent:
+    is_complete:
+      severity_level: Error
+  version:
+    is_complete:
+      severity_level: Error
