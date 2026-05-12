@@ -75,7 +75,18 @@ class DAGPackagesPathService:
 
     @staticmethod
     def _get_line_folders():
-        """Return the list of top-level domain folders under DAG_PACKAGES_ROOT.
+        """Return the list of top-level domain folders under the DAG packages tree.
+
+        In Airflow/Composer, ``DAG_PACKAGES_ROOT`` is the filesystem path to the
+        ``dags/`` directory, and the result is obtained by ``scandir``.
+
+        In Databricks, ``DAG_PACKAGES_ROOT`` is ``None`` because the ``dags``
+        package is not on ``sys.path``. In that case the method falls back to the
+        Databricks Volume mount: it reads ``volume_databricks_bucket`` and
+        ``dags_packages_files_path_in_s3`` from the bietlejuice config and scans
+        ``{volume}/{prefix}dags/`` — the same path layout used by
+        ``_read_dag_package_file_from_s3``.  Any config/IO error is swallowed and
+        an empty list is returned so callers fall through to the S3/volume loaders.
 
         The result is cached for the lifetime of the current process. In the
         standard Airflow 2.x parse path each DAG file is processed in a fresh
@@ -86,14 +97,26 @@ class DAGPackagesPathService:
         call ``DAGPackagesPathService.clear_path_caches()`` before re-scanning
         if a new domain folder has been added since the process started.
         """
-        if DAGPackagesPathService._line_folders_cache is None:
-            if not DAG_PACKAGES_ROOT:
-                DAGPackagesPathService._line_folders_cache = []
-                return DAGPackagesPathService._line_folders_cache
+        if DAGPackagesPathService._line_folders_cache is not None:
+            return DAGPackagesPathService._line_folders_cache
 
-            DAGPackagesPathService._line_folders_cache = list(
-                scandir(DAG_PACKAGES_ROOT)
-            )
+        if DAG_PACKAGES_ROOT:
+            DAGPackagesPathService._line_folders_cache = list(scandir(DAG_PACKAGES_ROOT))
+            return DAGPackagesPathService._line_folders_cache
+
+        # Databricks: resolve the dags/ tree from the Volume mount.
+        try:
+            global_confs = HierarchicalConf([BIETLEJUICE_CONFIG_ROOT])
+            volume = global_confs.get_config("volume_databricks_bucket")
+            prefix = global_confs.get_config("dags_packages_files_path_in_s3")
+            dags_root = path.join(volume, prefix, "dags")
+            if path.isdir(dags_root):
+                DAGPackagesPathService._line_folders_cache = list(scandir(dags_root))
+                return DAGPackagesPathService._line_folders_cache
+        except Exception:  # noqa: BLE001 — config may be absent outside Databricks
+            pass
+
+        DAGPackagesPathService._line_folders_cache = []
         return DAGPackagesPathService._line_folders_cache
 
     @classmethod

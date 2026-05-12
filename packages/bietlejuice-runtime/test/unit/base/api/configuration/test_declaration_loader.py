@@ -2,7 +2,8 @@
 Unit tests for load_api_ingestion_declaration and dag_name validation.
 """
 
-from unittest.mock import mock_open
+import sys
+from unittest.mock import mock_open, patch
 
 import pytest
 
@@ -86,3 +87,40 @@ class TestLoadApiIngestionDeclarationValidation:
 
         with pytest.raises(FileNotFoundError, match="Could not load a valid"):
             load_api_ingestion_declaration("bad_dag")
+
+
+class TestLoadApiIngestionDeclarationDatabricksVolumeRegression:
+    """Regression: no ModuleNotFoundError when `dags` is not on sys.path (Databricks)."""
+
+    def test_loads_from_volume_path_without_dags_module(self, tmp_path):
+        """
+        When DAGPackagesPathService.get_dag_path resolves a Volume-mounted path
+        (as happens after the _get_line_folders Volume fallback), the loader must
+        open the declaration file directly without ever importing the `dags` package.
+        _load_from_installed_package must never be reached.
+        """
+        dag_name = "oitchau_api"
+        dag_dir = tmp_path / "people" / dag_name
+        dag_dir.mkdir(parents=True)
+        decl_file = dag_dir / f"{dag_name}_declaration.yml"
+        decl_file.write_text("workflow:\n  type: api_ingestion\n", encoding="utf-8")
+
+        # Ensure `dags` is absent from sys.modules to simulate the Databricks env.
+        original_dags = sys.modules.pop("dags", None)
+        try:
+            with (
+                patch(
+                    "bietlejuice.base.api.configuration.declaration_loader.DAGPackagesPathService.get_dag_path",
+                    return_value=str(dag_dir),
+                ),
+                patch(
+                    "bietlejuice.base.api.configuration.declaration_loader._load_from_installed_package",
+                    side_effect=AssertionError("_load_from_installed_package must not be called"),
+                ),
+            ):
+                result = load_api_ingestion_declaration(dag_name)
+
+            assert result == {"workflow": {"type": "api_ingestion"}}
+        finally:
+            if original_dags is not None:
+                sys.modules["dags"] = original_dags

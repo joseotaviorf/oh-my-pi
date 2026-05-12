@@ -2,19 +2,16 @@
 Declaration loader for API Ingestion workflow.
 
 Loads DAG declaration YAML for a given dag_name. Tries in order:
-1. Local filesystem (Composer, local dev)
-2. Installed package (Databricks - *_api_declaration.y*ml bundled via hatch build
-   config in pyproject.toml)
-3. S3/volume (legacy fallback)
-
-Convention: api_ingestion DAGs are named with _api suffix (e.g. currency_api).
-The declaration file is {dag_name}_declaration.yml. The hatch build config includes
-only *_api_declaration.y*ml so only these DAGs are bundled in the wheel.
+1. Local filesystem via DAGPackagesPathService (Composer/local dev, and Databricks
+   Volume when DAG_PACKAGES_ROOT is resolved from the mounted Volume path).
+2. Installed package via importlib.resources (only if ``dags`` is an installed
+   Python package — not applicable on standard Databricks cluster wheels).
+3. S3/volume explicit scan via DAGPackagesPathService (legacy fallback).
 """
 
 import logging
 import re
-from os import path, scandir
+from os import path
 from typing import Any, Callable, Dict, Iterator, Literal, Optional, Tuple, cast
 
 import yaml
@@ -101,18 +98,16 @@ def validate_api_ingestion_dag_name(dag_name: str) -> str:
 
 def _iter_dag_domain_names() -> Iterator[str]:
     """
-    Yield top-level domain folder names under ``DAG_PACKAGES_ROOT``.
+    Yield top-level domain folder names discovered by ``DAGPackagesPathService``.
 
-    Skips non-directories and hidden/internal entries (e.g. ``__pycache__``).
+    Delegates to ``DAGPackagesPathService.get_dag_domain_names()`` so the same
+    path-resolution logic (Composer filesystem or Databricks Volume) is used
+    consistently everywhere, without importing the ``dags`` package directly.
 
     Yields:
         Domain folder name strings.
     """
-    from dags import DAG_PACKAGES_ROOT
-
-    for entry in scandir(DAG_PACKAGES_ROOT):
-        if entry.is_dir() and not entry.name.startswith("_"):
-            yield entry.name
+    yield from DAGPackagesPathService.get_dag_domain_names()
 
 
 def _try_read_declaration_from_package(
@@ -152,6 +147,10 @@ def _try_read_declaration_from_package(
                 "package",
                 resource_path.name,
             )
+    except ModuleNotFoundError:
+        # The `dags` package is not installed in the current environment
+        # (e.g. Databricks cluster wheel — only bietlejuice is installed).
+        return None
     except (FileNotFoundError, OSError):
         return None
     return None

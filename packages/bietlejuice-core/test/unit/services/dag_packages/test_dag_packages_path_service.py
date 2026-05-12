@@ -295,3 +295,98 @@ class TestDAGPackagesPathService:
         # act / assert — two consecutive clears without error
         DAGPackagesPathService.clear_path_caches()
         DAGPackagesPathService.clear_path_caches()
+
+    # --- Volume (Databricks) fallback in _get_line_folders ---
+
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.DAG_PACKAGES_ROOT", None)
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isdir")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.scandir")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.HierarchicalConf")
+    def test_get_line_folders_uses_volume_when_dag_packages_root_is_none(
+        self, mock_conf_cls, mock_scandir, mock_isdir
+    ):
+        # arrange — simulate Databricks: no DAG_PACKAGES_ROOT, but a mounted Volume
+        volume = "/Volumes/prod/bi"
+        prefix = "github-repos/bi-etl-ejuice/"
+        expected_dags_root = path.join(volume, prefix, "dags")
+
+        mock_conf_instance = mock_conf_cls.return_value
+        mock_conf_instance.get_config.side_effect = lambda k: (
+            volume if k == "volume_databricks_bucket" else prefix
+        )
+        mock_isdir.return_value = True
+
+        dir_mock = Mock()
+        dir_mock.name = "people"
+        dir_mock.path = path.join(expected_dags_root, "people")
+        mock_scandir.return_value = [dir_mock]
+
+        # act
+        result = DAGPackagesPathService._get_line_folders()
+
+        # assert — scandir was called on the Volume dags/ root
+        mock_scandir.assert_called_once_with(expected_dags_root)
+        assert result == [dir_mock]
+
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.DAG_PACKAGES_ROOT", None)
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isdir")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.HierarchicalConf")
+    def test_get_line_folders_returns_empty_when_volume_dags_dir_absent(
+        self, mock_conf_cls, mock_isdir
+    ):
+        # arrange — Volume config resolves but the dags/ directory does not exist
+        mock_conf_instance = mock_conf_cls.return_value
+        mock_conf_instance.get_config.side_effect = lambda k: (
+            "/vol" if k == "volume_databricks_bucket" else "prefix/"
+        )
+        mock_isdir.return_value = False
+
+        # act
+        result = DAGPackagesPathService._get_line_folders()
+
+        # assert — graceful fallback to empty list
+        assert result == []
+
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.DAG_PACKAGES_ROOT", None)
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.HierarchicalConf")
+    def test_get_line_folders_returns_empty_on_config_error(self, mock_conf_cls):
+        # arrange — HierarchicalConf raises (e.g. missing key outside Databricks)
+        mock_conf_cls.side_effect = Exception("config unavailable")
+
+        # act
+        result = DAGPackagesPathService._get_line_folders()
+
+        # assert — exception swallowed; empty list returned
+        assert result == []
+
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.DAG_PACKAGES_ROOT", None)
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.path.isdir")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.scandir")
+    @mock.patch("bietlejuice.base.service.dag_packages_path_service.HierarchicalConf")
+    def test_get_dag_path_resolves_via_volume(
+        self, mock_conf_cls, mock_scandir, mock_isdir
+    ):
+        # arrange — Volume exposes dags/people/oitchau_api/
+        volume = "/Volumes/prod/bi"
+        prefix = "github-repos/bi-etl-ejuice/"
+        dags_root = path.join(volume, prefix, "dags")
+
+        mock_conf_instance = mock_conf_cls.return_value
+        mock_conf_instance.get_config.side_effect = lambda k: (
+            volume if k == "volume_databricks_bucket" else prefix
+        )
+        mock_isdir.side_effect = lambda p: p in {
+            dags_root,
+            path.join(dags_root, "people", "oitchau_api"),
+        }
+
+        people_entry = Mock()
+        people_entry.name = "people"
+        people_entry.path = path.join(dags_root, "people")
+        mock_scandir.return_value = [people_entry]
+
+        # act
+        result = DAGPackagesPathService.get_dag_path("oitchau_api")
+
+        # assert — resolved to the Volume-mounted path
+        assert result == path.join(dags_root, "people", "oitchau_api")
