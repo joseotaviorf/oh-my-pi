@@ -5,6 +5,20 @@
 #
 # Pipeline is always triggered so downstream pipelines
 # (e.g. release depends_on: lint) are not blocked when no .py files change.
+#
+# FALSE-POSITIVE GUARD (feature branch pushes):
+# `when.path` on `push` events evaluates only the LAST commit diff. A
+# "retrigger" commit that touches no .py files (e.g. a YAML-only bump) causes
+# all lint/validation steps to be skipped, yielding a green pipeline even when
+# an earlier commit in the same branch introduced a lint violation.
+#
+# Fix: for push events on feature branches a second `when` clause (no path
+# filter) always triggers the step. The commands then run `git diff
+# origin/master...HEAD` to decide whether any Python files changed in the
+# FULL branch — if not, they exit 0 cheaply. For pull_request events the
+# existing path filter already evaluates the full PR diff (correct), so no
+# change is needed for that event type. Master/hotfix/forno pushes are also
+# unaffected: their merge-commit diff represents the full set of merged changes.
 
 steps:
   check-style-python:
@@ -12,13 +26,36 @@ steps:
     commands:
       - apt-get update
       - apt-get install -y git > /dev/null
+      - |
+        # For push events on feature branches, `when.path` only checks the last
+        # commit diff. Evaluate the full branch diff vs origin/master instead so
+        # a non-Python "retrigger" commit cannot hide a prior lint failure.
+        if [ "$CI_PIPELINE_EVENT" = "push" ]; then
+          case "$CI_COMMIT_BRANCH" in
+            master|forno|hotfix/*) ;;
+            *)
+              PY_DIFF=$(git diff origin/master...HEAD --name-only 2>/dev/null | grep '\.py$' || true)
+              if [ -z "$PY_DIFF" ]; then
+                echo "No Python files in full branch diff vs master — lint skipped"
+                exit 0
+              fi
+              ;;
+          esac
+        fi
       - make requirements-lint
       - make check-style
     when:
-      event: [push, pull_request]
-      path:
-        include: ['**/*.py']
-        on_empty: false
+      # pull_request: `when.path` already evaluates the full PR diff — keep as-is.
+      # push (master/hotfix): merge-commit diff covers all merged changes — keep as-is.
+      - event: [push, pull_request]
+        path:
+          include: ['**/*.py']
+          on_empty: false
+      # push (feature branches): no path filter so the step always runs;
+      # the commands above perform the full-diff check internally.
+      - event: push
+        branch:
+          exclude: [master, forno, hotfix/*]
     depends_on: [] # This is for the steps to run in parallel
 
   files-validation-python:
@@ -26,11 +63,28 @@ steps:
     commands:
       - apt-get update
       - apt-get install -y git > /dev/null
+      - |
+        # Same full-branch-diff guard as check-style-python (see header comment).
+        if [ "$CI_PIPELINE_EVENT" = "push" ]; then
+          case "$CI_COMMIT_BRANCH" in
+            master|forno|hotfix/*) ;;
+            *)
+              PY_DIFF=$(git diff origin/master...HEAD --name-only 2>/dev/null | grep '\.py$' || true)
+              if [ -z "$PY_DIFF" ]; then
+                echo "No Python files in full branch diff vs master — files-validation skipped"
+                exit 0
+              fi
+              ;;
+          esac
+        fi
       - pip install --upgrade pip
       - make requirements-test
       - make files-validation
     when:
-      event: [push, pull_request]
-      path:
-        include: ['**/*.py']
-        on_empty: false
+      - event: [push, pull_request]
+        path:
+          include: ['**/*.py']
+          on_empty: false
+      - event: push
+        branch:
+          exclude: [master, forno, hotfix/*]
