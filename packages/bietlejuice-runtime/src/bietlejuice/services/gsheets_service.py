@@ -1,6 +1,5 @@
 import gc
 import logging
-import os
 import re
 import time
 from datetime import datetime, timedelta
@@ -20,7 +19,6 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import DatabricksConsumer
-from dags import DAG_PACKAGES_ROOT
 
 JOB_NAME = "gsheets_service"
 
@@ -28,7 +26,6 @@ logging.getLogger("py4j").setLevel(logging.INFO)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-DEPS_YAML_PATH = os.path.join(DAG_PACKAGES_ROOT, "dependencies.yaml")
 GSHEETS_DATALAKE_RAW_SCHEMA = "datalake_{schema}_raw"
 GSHEETS_DATALAKE_CLEAN_SCHEMA = "datalake_{schema}_clean"
 
