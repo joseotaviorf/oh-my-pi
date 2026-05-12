@@ -97,17 +97,18 @@ class MongoConsumer(DBConsumer):
         return converted_data
 
     @logger(exclude_return=True)
-    def __convert_bson_documents_to_spark_dataframe(self, documents):
+    def __convert_bson_documents_to_spark_dataframe(self, documents, nb_documents):
         """
         Converts [a list of] bson documents to spark_dataframe using bson_dumps
         :param documents: return get_documents method in MongoClient
         :type documents: list of bson documents or a bson document
+        :param nb_documents: document count for the query (PyMongo 4+ has no Cursor.count)
         :return: A Spark DataFrame with all columns of the string type
         """
         # documents are a list of Bson (Mongo format), it's necessary to convert to dict.
         # convert  bson -> json_string -> dict
 
-        if documents.count() > NB_DOCUMENTS:
+        if nb_documents > NB_DOCUMENTS:
             # 2 = datetime ISO8601
             DEFAULT_JSON_OPTIONS.datetime_representation = 2
             pool = Pool(processes=NB_THREADS)
@@ -219,8 +220,8 @@ class MongoConsumer(DBConsumer):
         :return: A Spark DataFrame with the query results.
         OBS: ALL fields are converted to string type
         """
-        documents = self.mongo_client.get_documents(table_name, query)
-        df = self.__convert_bson_documents_to_spark_dataframe(documents)
+        documents, nb_documents = self.mongo_client.get_documents(table_name, query)
+        df = self.__convert_bson_documents_to_spark_dataframe(documents, nb_documents)
         return df
 
     @logger

@@ -31,17 +31,5 @@ workflow:
       extraction_type: incremental
     workgroups: {}
 cluster:
-  type: databricks_12_2_med_memory_cluster
-  custom_configurations:
-    autotermination_minutes: 20
-    aws_attributes:
-      first_on_demand: 1
-      spot_bid_price_percent: 100
-      zone_id: us-east-1d
-      availability: SPOT_WITH_FALLBACK
-      ebs_volume_size: 200
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  type: consolidation_s_memory_single_node_cluster
   databricks_conn_id: databricks_new

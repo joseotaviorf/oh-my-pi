@@ -65,15 +65,21 @@ class MongoClient(DBClient):
         :param mongo_collection: Name of the collection
         :param query: query content
         :type query: dict
-        :return: list of documents
+        :return: ``(cursor, nb_documents)`` from ``find`` and ``count_documents``
         """
         with self.conn as conn:
             collection = conn[self.db][mongo_collection]
+            count_kwargs = {
+                k: v
+                for k, v in kwargs.items()
+                if k in ("skip", "limit", "hint", "maxTimeMS", "collation", "session")
+            }
+            nb_documents = collection.count_documents(query, **count_kwargs)
             documents = collection.find(query, **kwargs)
             logger.info(
-                f"m=get_documents, nb_documents={documents.count()}, msg=query execution succeeded"
+                f"m=get_documents, nb_documents={nb_documents}, msg=query execution succeeded"
             )
-            return documents
+            return documents, nb_documents
 
     @logger(exclude_return=True)
     def run(self, command, parameters=None):
