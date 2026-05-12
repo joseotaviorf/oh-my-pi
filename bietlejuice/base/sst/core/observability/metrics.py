@@ -338,7 +338,7 @@ def save_volume_metric(
         )
     )
 
-    if _metric.rdd.isEmpty():
+    if _metric.isEmpty():
         logger.warning(
             f"m=save_volume_metric, msg=No rows found for metric {metric_name}, "
         )

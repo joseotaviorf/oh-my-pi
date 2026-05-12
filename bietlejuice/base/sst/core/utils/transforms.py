@@ -4,7 +4,7 @@ from pyspark.sql import DataFrame, SparkSession
 from bietlejuice.base.sst.core.utils.common import compare_schema_types
 from bietlejuice.base.sst.domains.salesforce.api.transform import (
     cast_string_to_boolean,
-    remap_struct_expr,
+    parse_struct_column,
 )
 
 
@@ -101,7 +101,7 @@ def apply_schema_remaps(
             expr = F.col(column_name)
 
         elif right_type.startswith("struct<"):
-            expr = remap_struct_expr(column_name, right_type)
+            expr = parse_struct_column(left_type, column_name, right_type)
 
         # Missing value or unable to convert it
         elif left_type is None:

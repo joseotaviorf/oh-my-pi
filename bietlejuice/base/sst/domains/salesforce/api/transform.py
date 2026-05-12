@@ -1,7 +1,7 @@
 from pyspark.sql import DataFrame
 import pyspark.sql.functions as F
 from pyspark.sql import Column
-from pyspark.sql.types import DataType, StructType
+from pyspark.sql.types import DataType, StructType, StringType
 
 
 def build_change_events_fields(
@@ -111,6 +111,22 @@ def cast_string_to_boolean(col_name: str):
         .when(normalized == "false", F.lit(False))
         .otherwise(F.lit(None).cast("boolean"))
     )
+
+
+def parse_struct_column(dtype: str, col_name: str, target_schema: StructType):
+    """
+    Parse a struct column from a string to a struct type
+    If the column is a string, it will be parsed to a struct type
+    If the column is already a struct type, it will be cast to the target schema
+    If the column is not a string or a struct type, it will be returned as is
+    """
+    if isinstance(dtype, StringType):
+        return F.from_json(F.col(col_name), target_schema)
+
+    if isinstance(dtype, StructType):
+        return F.col(col_name).cast(target_schema)
+
+    return F.lit(None).cast(target_schema)
 
 
 def remap_struct_expr(col_name: str, target_col: str) -> Column:

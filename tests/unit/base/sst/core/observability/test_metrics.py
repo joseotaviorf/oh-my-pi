@@ -25,7 +25,7 @@ def test_save_volume_metric_writes_aggregated_rows_for_non_empty_df():
     """
     spark = MagicMock()
     metric_df = MagicMock()
-    metric_df.rdd.isEmpty.return_value = False
+    metric_df.isEmpty.return_value = False
     metric_df.withColumn.return_value = metric_df
     metric_df.select.return_value = metric_df
 
@@ -66,7 +66,7 @@ def test_save_volume_metric_writes_aggregated_rows_for_non_empty_df():
 def test_save_volume_metric_writes_zero_row_metric_for_empty_df():
     spark = MagicMock()
     initial_metric_df = MagicMock()
-    initial_metric_df.rdd.isEmpty.return_value = True
+    initial_metric_df.isEmpty.return_value = True
     initial_metric_df.withColumn.return_value = initial_metric_df
     initial_metric_df.select.return_value = initial_metric_df
 
