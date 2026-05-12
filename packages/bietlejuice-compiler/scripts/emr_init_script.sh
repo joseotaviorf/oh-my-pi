@@ -49,7 +49,7 @@ sudo chown $(whoami) $TMP_DIR/wheels
 # (Spark/Databricks job machinery, depends on core). Spark workers need both.
 aws s3 cp ${ARTIFACTS_BUCKET}/bi-etl-ejuice/bietlejuice_core-latest-py3-none-any.whl $TMP_DIR/wheels/bietlejuice_core-latest-py3-none-any.whl
 aws s3 cp ${ARTIFACTS_BUCKET}/bi-etl-ejuice/bietlejuice_runtime-latest-py3-none-any.whl $TMP_DIR/wheels/bietlejuice_runtime-latest-py3-none-any.whl
-aws s3 cp ${ARTIFACTS_BUCKET}/python-logger/quintoandar_logger-0.8.1-py3-none-any.whl $TMP_DIR/wheels/quintoandar_logger-0.8.1-py3-none-any.whl
+aws s3 cp ${ARTIFACTS_BUCKET}/python-logger/quintoandar_logger-0.8.0-py3-none-any.whl $TMP_DIR/wheels/quintoandar_logger-0.8.0-py3-none-any.whl
 aws s3 cp ${ARTIFACTS_BUCKET}/inmetro/inmetro-${INMETRO_VERSION}-py3-none-any.whl $TMP_DIR/wheels/inmetro-${INMETRO_VERSION}-py3-none-any.whl
 
 # On EMR, constrain urllib3 so we don't conflict with pre-installed awscli/botocore
@@ -65,7 +65,7 @@ echo "Downloading dependencies of internal wheels..."
 $PIP_EXEC download \
   "$TMP_DIR/wheels/bietlejuice_core-latest-py3-none-any.whl" \
   "$TMP_DIR/wheels/bietlejuice_runtime-latest-py3-none-any.whl" \
-  "$TMP_DIR/wheels/quintoandar_logger-0.8.1-py3-none-any.whl" \
+  "$TMP_DIR/wheels/quintoandar_logger-0.8.0-py3-none-any.whl" \
   --dest "$TMP_DIR/wheels/" || echo "Some deps will be installed from source"
 
 # --------------------------------------------------
