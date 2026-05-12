@@ -690,6 +690,7 @@ bietlejuice.enrich_reverses_monitoring:
   add:
     - bietlejuice.reverse_webhelp:load-reverse-backlog-metric:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-csat-front:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-cases-perspective:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-demand-metric:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-fcr-metric:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-general-metric:first-run-of-day
@@ -1178,6 +1179,7 @@ bietlejuice.reverse_webhelp_access:
   add:
     - bietlejuice.reverse_webhelp:load-reverse-backlog-metric:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-csat-front:first-run-of-day
+    - bietlejuice.reverse_webhelp:load-reverse-cases-perspective:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-demand-metric:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-fcr-metric:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-general-metric:first-run-of-day

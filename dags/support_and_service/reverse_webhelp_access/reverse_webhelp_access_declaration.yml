@@ -22,6 +22,9 @@ workflow:
     csat_front:
       extra_spark_job_arguments:
       - cx
+    cases_perspective:
+      extra_spark_job_arguments:
+      - cx
     demand_metric:
       extra_spark_job_arguments:
       - cx
