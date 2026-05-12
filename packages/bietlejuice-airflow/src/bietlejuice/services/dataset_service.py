@@ -37,6 +37,7 @@ class DatasetService:
         "dw": "dw_{schema}",
         "metric": "metric_{schema}",
         "reverse": "reverse_{schema}",
+        "wonka": "wonka",
     }
 
     @classmethod

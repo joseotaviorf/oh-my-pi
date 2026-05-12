@@ -322,9 +322,8 @@ wonka_cluster:
         AIRFLOW_EXECUTION_DATE: "{{ ds }}"
         AIRFLOW_PREVIOUS_EXECUTION_DATE: "{{ prev_ds }}"
         AIRFLOW_NEXT_EXECUTION_DATE: "{{ next_ds }}"
-        WONKA_START_DATE: "{{ dag_run.conf.get('start_date', '') }}"
-        WONKA_END_DATE: "{{ dag_run.conf.get('end_date', '') }}"
-        WONKA_DISABLE_ONLINE_WRITER: "{{ dag_run.conf.get('disable_online_writer', 'false')}}"
+        WONKA_START_DATE: "{{ dag_run.conf.get('load_start_date', dag_run.conf.get('start_date', '')) }}"
+        WONKA_END_DATE: "{{ dag_run.conf.get('load_end_date', dag_run.conf.get('end_date', '')) }}"
         WONKA_FORCE_FULL_LOAD: "{{ dag_run.conf.get('force_full_load', 'false')}}"
         CDF_TO_KAFKA_USE_SCHEMA_REGISTRY: "false"
     aws_attributes:
