@@ -36,45 +36,46 @@ contract_people_timeline AS (
 -- Uses datalake_customer_support.tickets (not DW) and Zendesk clean for via_channel on scheduling rules.
 pre_tickets AS (
   SELECT
-    CAST(ft.id_user_main AS INTEGER) AS id_user,
-    CAST(ft.id_ticket AS STRING) AS id_ticket,
-    COALESCE(ft.id_contract, -1) AS id_contract_ticket,
+    CAST(ft.sk_user AS INTEGER) AS id_user,
+    CAST(ft.sk_ticket AS STRING) AS id_ticket,
+    COALESCE(ft.sk_contract, -1) AS id_contract_ticket,
     CAST(ft.ts_created AS DATE) AS day_ticket_started,
-    CASE
-      WHEN ((ft.front_or_back = 'front' AND ft.channel IN ('chat', 'call') AND ft.area = 'CX') OR ft.last_queue IN ('Offboarding Front'))
-           AND (ft.step_tag = 'rental_offboarding')
-           AND (LOWER(TRIM(ft.contact_motivation_tag)) IN ('complaint', 'request'))
-           THEN 'front'
-      WHEN ft.last_queue IN ('Atendimento Escalado [OFF] [POS] [BACK]') AND ft.channel IN ('email')
-           THEN 'back escaladado'
-      WHEN (ft.last_queue IN ('Agendamento Vistoria Saída [SO]')
-           AND CAST(get_json_object(ft.custom_fields, '$["[SO] Time"]') AS VARCHAR(30)) IN ('agendamento_offboarding')
-           AND ft.last_analyst_email IS NOT NULL
-           AND TRIM(ft.last_analyst_email) <> ''
-           AND ft.channel = 'email'
-           AND (CASE
-                  WHEN z.via_channel = 'api' AND CAST(get_json_object(ft.custom_fields, '$["Taskmaster Task Id"]') AS VARCHAR(30)) IS NOT NULL THEN TRUE
-                  WHEN z.via_channel = 'web' THEN TRUE
-                  ELSE FALSE
-                END) = TRUE)
-           THEN 'Agendamento Vistoria'
-      ELSE NULL
-    END AS tipo_ticket
-  FROM datalake_customer_support.tickets ft
-  LEFT JOIN datalake_zendesk_clean.tickets z
-    ON CAST(z.id_ticket AS BIGINT) = CAST(ft.id_ticket AS BIGINT)
+    CASE WHEN ((ft.front_or_back = 'front' 
+      AND ft.channel IN ('chat','call') 
+      AND dd.area = 'CX') OR dd.department IN ('Offboarding Front')) 
+      AND (tx.step_tag = 'rental_offboarding') 
+      AND (tx.motivation in ('complaint', 'request')) THEN 'front'
+      WHEN dd.department IN ('Atendimento Escalado [OFF] [POS] [BACK]') AND ft.channel IN ('email') THEN 'back escaladado'
+      WHEN dd.department IN ('Offboarding Reparos [OFF] [POS] [BACK]') AND ft.channel IN ('email') THEN 'mediacao'
+      WHEN (dd.department IN ('Agendamento Vistoria Saída [SO]')
+       AND CAST(get_json_object(dit.custom_fields, '$["[SO] Time"]') AS VARCHAR(30)) IN ('agendamento_offboarding')
+       AND da_last.sk_analyst <> '-1'
+       AND ft.channel = 'email'
+       AND (CASE WHEN dit.ticket_via = 'api' 
+       AND CAST(get_json_object(dit.custom_fields, '$["Taskmaster Task Id"]') AS VARCHAR(30)) is not NULL THEN TRUE WHEN dit.ticket_via = 'web' THEN TRUE ELSE FALSE END) = TRUE) THEN 'Agendamento Vistoria' 
+       ELSE NULL END tipo_ticket
+  FROM dw_customer_support.fact_tickets ft
+  INNER JOIN dw_customer_support.dim_department dd
+    ON ft.sk_main_department = dd.sk_department
+  LEFT JOIN dw_customer_support.dim_ticket AS dit
+      ON dit.sk_ticket = ft.sk_ticket
+  LEFT JOIN dw_customer_support.dim_analyst AS da_last
+      ON da_last.sk_analyst = ft.sk_last_analyst
+ LEFT JOIN dw_customer_support.dim_taxonomy tx
+        ON tx.sk_taxonomy = ft.sk_taxonomy
   WHERE CAST(ft.ts_created AS DATE) >= DATE('2026-04-01')
     AND CAST(ft.ts_created AS DATE) >= ADD_MONTHS(CURRENT_DATE(), -6)
 ),
 
 -- Salesforce mediation cases as another contact signal (no user key; contract-level).
-mediacao AS (
+salesforce AS (
   SELECT DISTINCT
     NULL AS id_user,
     CAST(case_number AS STRING) AS id_ticket,
     CAST(c.id_contract AS INT) AS id_contract_ticket,
     CAST(c.ts_created AS DATE) AS day_ticket_started,
-    'mediacao' AS tipo_ticket
+    CASE WHEN rt.record_type_name IN ('Mediação') AND c.omni_channel_queue NOT IN ('Squad 7 - Mediação') THEN 'mediacao' 
+         WHEN rt.record_type_name IN ('Reagendamento de Vistoria') THEN 'Agendamento Vistoria' ELSE NULL END AS tipo_ticket
   FROM datalake_salesforce_clean.cases AS c
   INNER JOIN datalake_salesforce_clean.record_types AS rt
      ON rt.id_record_type = c.id_record_type
@@ -82,14 +83,12 @@ mediacao AS (
     AND CAST(c.ts_created AS DATE) >= DATE('2026-04-01')
     AND CAST(c.ts_created AS DATE) >= ADD_MONTHS(CURRENT_DATE(), -6)
     AND c.case_status NOT IN ('CANCELED')
-    AND c.omni_channel_queue NOT IN ('Squad 7 - Mediação')
-    AND rt.record_type_name IN ('Mediação')
 ),
 
 tickets AS (
   SELECT * FROM pre_tickets
   UNION ALL
-  SELECT * FROM mediacao
+  SELECT * FROM salesforce
 ),
 
 -- Map offboarding users to contracts via enrich rent flows (tenant prospect or owner).
@@ -208,7 +207,7 @@ SELECT DISTINCT
   team,
   prediction,
   probability,
-  tipo_ticket,
+  CASE WHEN tipo_ticket = 'Agendamento Vistoria' THEN 'Reagendamento de Vistoria' ELSE tipo_ticket END AS tipo_ticket,
   ts_created,
   ts_log
 FROM cleaned_data
