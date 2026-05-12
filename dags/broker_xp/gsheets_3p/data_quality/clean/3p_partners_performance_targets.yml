@@ -1,0 +1,47 @@
+table_name: datalake_gsheets_clean.3p_partners_performance_targets
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  bps_totais:
+    custom:
+      # SUM(bps_totais) must match between raw and clean layers.
+      constraint: |-
+        (SELECT COALESCE(SUM(TRY_CAST(NULLIF(bps_totais, '') AS DOUBLE)), 0)
+           FROM datalake_gsheets_raw.3p_partners_performance_targets)
+        =
+        (SELECT COALESCE(SUM(TRY_CAST(bps_totais AS DOUBLE)), 0)
+           FROM datalake_gsheets_clean.3p_partners_performance_targets)
+      severity_level: Error
+  nbp_unicos:
+    custom:
+      # SUM(nbp_unicos) must match between raw and clean layers.
+      constraint: |-
+        (SELECT COALESCE(SUM(TRY_CAST(NULLIF(nbp_unicos, '') AS DOUBLE)), 0)
+           FROM datalake_gsheets_raw.3p_partners_performance_targets)
+        =
+        (SELECT COALESCE(SUM(TRY_CAST(nbp_unicos AS DOUBLE)), 0)
+           FROM datalake_gsheets_clean.3p_partners_performance_targets)
+      severity_level: Error
+  rbp_unicos:
+    custom:
+      # SUM(rbp_unicos) must match between raw and clean layers.
+      constraint: |-
+        (SELECT COALESCE(SUM(TRY_CAST(NULLIF(rbp_unicos, '') AS DOUBLE)), 0)
+           FROM datalake_gsheets_raw.3p_partners_performance_targets)
+        =
+        (SELECT COALESCE(SUM(TRY_CAST(rbp_unicos AS DOUBLE)), 0)
+           FROM datalake_gsheets_clean.3p_partners_performance_targets)
+      severity_level: Error
+  visita_avulsa_unicos:
+    custom:
+      # SUM(visita_avulsa_unicos) must match between raw and clean layers.
+      constraint: |-
+        (SELECT COALESCE(SUM(TRY_CAST(NULLIF(visita_avulsa_unicos, '') AS DOUBLE)), 0)
+           FROM datalake_gsheets_raw.3p_partners_performance_targets)
+        =
+        (SELECT COALESCE(SUM(TRY_CAST(visita_avulsa_unicos AS DOUBLE)), 0)
+           FROM datalake_gsheets_clean.3p_partners_performance_targets)
+      severity_level: Error
