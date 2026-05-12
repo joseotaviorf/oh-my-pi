@@ -1,25 +1,44 @@
 ---
 database_name: datalake_condominium_payments_clean
 table_name: non_payment_report
+description: |
+  Clean table of non-payment reports from Condominium Payments API. One row per report
+  created for a contract with condominium-related payment issues.
+domain: For Rent
 columns:
   id:
+    description: Primary key identifier of the non-payment report in the source system.
     lineage:
       - datalake_condominium_payments_raw.non_payment_report.id
   id_contract:
+    description: Foreign key to the contract associated with the non-payment report.
     lineage:
       - datalake_condominium_payments_raw.non_payment_report.contract_id
+  uuid_third_party_bill:
+    description: UUID of the third-party bill linked to the non-payment report.
+    lineage:
+      - datalake_condominium_payments_raw.non_payment_report.third_party_bill_uuid
   expense_type:
+    description: Type of condominium payment expense associated with the report.
     lineage:
       - datalake_condominium_payments_raw.non_payment_report.expense_type
   created_by:
+    description: Source user or system that created the non-payment report.
     lineage:
       - datalake_condominium_payments_raw.non_payment_report.created_by
   notification_source:
+    description: Source channel that originated the non-payment notification.
     lineage:
       - datalake_condominium_payments_raw.non_payment_report.notification_source
+  is_rental_management_sync_initiated:
+    description: Boolean flag indicating whether synchronization with Rental Management was initiated.
+    lineage:
+      - datalake_condominium_payments_raw.non_payment_report.rental_management_sync_initiated
   ts_created:
+    description: Timestamp when the non-payment report was created in the source system.
     lineage:
       - datalake_condominium_payments_raw.non_payment_report.created_at
   ts_updated:
+    description: Timestamp when the non-payment report was last updated in the source system.
     lineage:
       - datalake_condominium_payments_raw.non_payment_report.updated_at
