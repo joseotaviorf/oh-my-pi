@@ -256,8 +256,8 @@ aws s3 cp "${ARTIFACTS_BUCKET}/bi-etl-ejuice/bietlejuice_core-latest-py3-none-an
     "${TMP_DIR}/wheels/bietlejuice_core-latest-py3-none-any.whl"
 aws s3 cp "${ARTIFACTS_BUCKET}/bi-etl-ejuice/bietlejuice_runtime-latest-py3-none-any.whl" \
     "${TMP_DIR}/wheels/bietlejuice_runtime-latest-py3-none-any.whl"
-aws s3 cp "${ARTIFACTS_BUCKET}/python-logger/quintoandar_logger-0.8.1-py3-none-any.whl" \
-    "${TMP_DIR}/wheels/quintoandar_logger-0.8.1-py3-none-any.whl"
+aws s3 cp "${ARTIFACTS_BUCKET}/python-logger/quintoandar_logger-0.8.0-py3-none-any.whl" \
+    "${TMP_DIR}/wheels/quintoandar_logger-0.8.0-py3-none-any.whl"
 aws s3 cp "${ARTIFACTS_BUCKET}/inmetro/inmetro-${INMETRO_VERSION}-py3-none-any.whl" \
     "${TMP_DIR}/wheels/inmetro-${INMETRO_VERSION}-py3-none-any.whl"
 
@@ -296,7 +296,7 @@ if ! uv_pip_install \
     --overrides "${OVERRIDES_FILE}" \
     "${CORE_WHL}" \
     "${RUNTIME_WHL}" \
-    "${TMP_DIR}/wheels/quintoandar_logger-0.8.1-py3-none-any.whl"; then
+    "${TMP_DIR}/wheels/quintoandar_logger-0.8.0-py3-none-any.whl"; then
     echo "Error: failed to install bietlejuice stack (see uv resolver output above)."
     exit 1
 fi
