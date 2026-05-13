@@ -66,6 +66,10 @@ dags/**/*_dag.py
 # Git worktrees (best-of-n runners, etc.)
 .worktrees/
 
+# TARS local artifacts
+tars_query_results/
+tars_track_record.jsonl
+
 # Cursor local scratch: drafts, test SQL, logs
 .cursor/temp/
 .uv-cache
