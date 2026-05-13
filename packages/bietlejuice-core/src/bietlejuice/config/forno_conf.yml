@@ -1777,7 +1777,7 @@ emr_cluster_base: &emr_cluster_anchor
     emr_ebs_root_volume_size: 100
     cluster_log_conf:
         s3:
-            destination: "{{ var.value.artifacts_bucket }}/emr/logs/{{ dag.dag_id }}"
+            destination: "{{ var.value.artifacts_bucket }}/emr/logs/dags/{{ dag.dag_id }}"
     init_scripts:
         - s3:
               destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/emr_init_script.sh"
