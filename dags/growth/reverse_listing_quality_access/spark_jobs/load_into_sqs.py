@@ -9,7 +9,7 @@ from typing import Any, Dict, Tuple, Type, TypeVar
 
 import boto3
 
-from bietlejuice.services import ConfigurationService
+from bietlejuice.services.configuration_service import ConfigurationService
 from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_into_sqs"

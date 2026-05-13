@@ -9,7 +9,7 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkDataFrameService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.services import ConfigurationService
+from bietlejuice.services.configuration_service import ConfigurationService
 from pyspark.errors import AnalysisException
 from pyspark.sql import DataFrame, Row
 from pyspark.sql.types import (

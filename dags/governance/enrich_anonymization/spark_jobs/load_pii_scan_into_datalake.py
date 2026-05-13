@@ -5,7 +5,7 @@ from typing import Dict, Iterable, Iterator, List, Tuple
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.services import ConfigurationService
+from bietlejuice.services.configuration_service import ConfigurationService
 from presidio_analyzer import (
     AnalyzerEngine,
     BatchAnalyzerEngine,

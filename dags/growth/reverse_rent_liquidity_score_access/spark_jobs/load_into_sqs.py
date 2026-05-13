@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Tuple
 
 import boto3
 
-from bietlejuice.services import ConfigurationService
+from bietlejuice.services.configuration_service import ConfigurationService
 from quintoandar_logger import QuintoAndarLogger
 
 # Masterfeed SQS export for reverse_rent_liquidity_score.rent_liquidity_score (rent liquidity score to Masterfeed).
