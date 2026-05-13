@@ -1,0 +1,41 @@
+dag:
+  name: lifull_campaigns
+  owner: Data Growth
+  schedule_start_date: 2021, 9, 1
+  schedule_interval: "0 2 * * *"
+  documentation:
+    dag_purpose: |
+      Crawler diário do Thribee/Lifull que extrai métricas de campanhas Trovit/Mitula.
+      Faz POST autenticado, captura o token via cookies e baixa os dados para o datalake.
+      Materializa o raw `campaigns_overview_report` e o clean `trovit_campaigns`.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_lifull_campaigns_raw
+  default_extraction_type: incremental
+  default_raw_partitions: [acc, dt]
+  default_clean_partitions: [id_account, dt_loaded]
+  spark_job_arguments:
+    - "{environment}"        # environment
+    - "{bucket}"             # datalake_bucket
+    - "{dag_name}"           # source = lifull_campaigns
+    - "{load_start_date}"    # load_start_date
+    - "{load_end_date}"      # load_end_date
+    - "{table_name}"         # raw_table_name = campaigns_overview_report
+    - "{partitions}"         # raw_partition_cols (JSON list, parseable por literal_eval)
+  tables_customization:
+    campaigns_overview_report:
+      clean_table_name: trovit_campaigns
+
+cluster:
+  type: databricks_16_4_min_io-general_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
