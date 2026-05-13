@@ -24,7 +24,7 @@ MAIN_START_DATE = datetime(
 MAIN_SCHEDULE_INTERVAL = "0 13,16,18,20 * * *"
 
 config_service = ConfigurationService()
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_12_2_med_general_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config("consolidation_s_general_single_node_cluster")
 
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
@@ -44,9 +44,8 @@ base_spark_jobs_path = f"{databricks_bietlejuice_repo_path}/spark_jobs/{DAG_NAME
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 default_libraries = config_service.get_config("default_libraries")
 custom_libraries = [
-    {"maven": {"coordinates": "mysql:mysql-connector-java:5.1.47"}},
+    {"maven": {"coordinates": "mysql:mysql-connector-java:8.0.33"}},
     {"pypi": {"package": "hubspot-api-client==5.0.0"}},
-    {"pypi": {"package": "google-auth==2.13.0"}},
     {"pypi": {"package": "google-api-python-client==2.55.0"}},
     {"pypi": {"package": "validations-engine==2.0.0"}},
     {
