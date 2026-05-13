@@ -4715,6 +4715,8 @@ bietlejuice.reverse_listings_locations_load:
   - bietlejuice.ebdb_location:load-clean-country:first-run-of-day
   - bietlejuice.ebdb_location:load-clean-region:first-run-of-day
   - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
+  - bietlejuice.ebdb_location:load-clean-region-config:first-run-of-day
+  - bietlejuice.ebdb_location:load-clean-region-parameters:first-run-of-day
 bietlejuice.reverse_minority_report_ss:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_contract:load-dw-rent-fact-contract-people:first-run-of-day

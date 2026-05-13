@@ -1,4 +1,54 @@
-WITH base_listings AS (
+WITH region_settings AS (
+  SELECT 
+  region_config.id_region, 
+  region_config.featured_rank, 
+  COLLECT_SET(region_parameters.business_context) AS ebdb_enabled_business_contexts,
+  STRUCT(
+    STRUCT(
+      MAX(
+        CASE 
+          WHEN region_parameters.business_context = "RENT" 
+            THEN region_parameters.min_price 
+          ELSE 0 
+        END
+      ) AS min, 
+      MAX(
+        CASE 
+          WHEN region_parameters.business_context = "RENT" 
+            THEN region_parameters.max_price 
+          ELSE 0 
+        END
+      ) AS max
+    ) AS rent,
+    STRUCT(
+      MAX(
+        CASE 
+          WHEN region_parameters.business_context = "SALE" 
+            THEN region_parameters.min_price 
+          ELSE 0 
+        END
+      ) AS min, 
+      MAX(
+        CASE 
+          WHEN region_parameters.business_context = "SALE" 
+            THEN region_parameters.max_price 
+          ELSE 0 
+        END
+      ) AS max
+    ) AS sale
+  ) AS prices  
+FROM 
+  datalake_ebdb_clean.region_config AS region_config
+LEFT JOIN 
+  datalake_ebdb_clean.region_parameters AS region_parameters 
+    ON region_config.id = region_parameters.id_region_config
+WHERE 
+  region_parameters.is_search_enabled = TRUE
+GROUP BY 
+  region_config.id_region, 
+  region_config.featured_rank
+), 
+base_listings AS (
   SELECT
     listings.dejavuid,
     region_neighborhood.id AS neighborhood_id,
@@ -12,6 +62,9 @@ WITH base_listings AS (
     country_dim.name AS country,
     compounds.lat,
     compounds.lng,
+    region_settings.ebdb_enabled_business_contexts,
+    region_settings.featured_rank,
+    region_settings.prices,
     MAX(
       CASE
         WHEN listings.business_context = 'RENT'
@@ -69,6 +122,9 @@ WITH base_listings AS (
   INNER JOIN
     datalake_ebdb_clean.country AS country_dim
       ON country_dim.id = state_dim.id_country
+  LEFT JOIN 
+    region_settings
+      ON region_settings.id_region = region_city.id
   WHERE
     (listings.source_name = 'ebdb_houses' OR listings.source_name = 'navent_houses')
     AND compounds.address.country_code = 'BR'
@@ -86,9 +142,11 @@ WITH base_listings AS (
     compounds.address.country_code,
     country_dim.name,
     compounds.lat,
-    compounds.lng
+    compounds.lng,
+    region_settings.ebdb_enabled_business_contexts,
+    region_settings.featured_rank,
+    region_settings.prices
 )
-
 SELECT
   neighborhood_id,
   city_id,
@@ -108,11 +166,14 @@ SELECT
   FILTER(ARRAY(
     CASE WHEN SUM(is_rent + is_navent_rent) > 0 THEN 'RENT' END,
     CASE WHEN SUM(is_sale + is_navent_sale) > 0 THEN 'SALE' END
-  ), x -> x IS NOT NULL) AS business_contexts
+  ), x -> x IS NOT NULL) AS business_contexts,
+  ebdb_enabled_business_contexts,
+  featured_rank,
+  prices
 FROM
   base_listings
 GROUP BY GROUPING SETS (
   (neighborhood_id, city_id, street, neighborhood, city, state_code, state, country_code, country),
   (neighborhood_id, city_id, neighborhood, city, state_code, state, country_code, country),
-  (city_id, city, state_code, state, country_code, country)
+  (city_id, city, state_code, state, country_code, country, ebdb_enabled_business_contexts, featured_rank, prices)
 )

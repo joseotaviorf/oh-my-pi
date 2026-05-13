@@ -106,6 +106,9 @@ def row_to_dict(row) -> Dict:
         "country": row.country,
         "centroid_lat": float(row.centroid_lat),
         "centroid_lng": float(row.centroid_lng),
+        "prices": row.prices.to_json(),
+        "featured_rank": int(row.featured_rank),
+        "ebdb_enabled_business_contexts": row.ebdb_enabled_business_contexts,
     }
 
 
