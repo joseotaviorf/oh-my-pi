@@ -109,9 +109,14 @@ if __name__ == "__main__":
 
     if api_response:
 
-        try:
+        if schema is not None:
             df = spark_client.create_dataframe(api_response, schema=schema)
-        except ValueError:
+        else:
+            # Pre-serialise nested dict/list fields and drop None values so Spark's
+            # schema inference never fails on all-null fields like `justifications`
+            # (the Tracksale answer endpoint can return that field as None for every
+            # record in a daily batch). This also matches the enrich layer, which
+            # treats `justifications` as a JSON string.
             df = spark_client.create_dataframe(
                 JsonService.transform_json_list_terms(api_response)
             )
