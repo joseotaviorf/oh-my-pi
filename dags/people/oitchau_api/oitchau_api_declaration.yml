@@ -48,6 +48,10 @@ workflow:
   credentials_scope: people
   custom_schema: oitchau
   default_extraction_type: full
+  default_raw_partitions:
+    - year
+    - month
+    - day
   default_clean_partitions:
     - year
     - month
