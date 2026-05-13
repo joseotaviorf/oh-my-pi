@@ -1,0 +1,35 @@
+database_name: datalake_sonia_journeys
+table_name: closing_contract_person_view
+description: |
+  Enrich view with contract person ids captured from tenant/owner add to contract events.
+  For each contract person id, contact and name fields are prioritized from Lake contract_person;
+  when not found in Lake, event payload values are used as fallback.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  id_contract_person:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: Contract person identifier parsed from the transactional event payload and used as join key to Lake contract person data.
+  user_email:
+    lineage:
+      - datalake_ebdb_clean.contract_person.email
+      - datalake_cdp_clean.transactional.event_properties
+    description: Email prioritized from Lake contract person and fallback to the most recent event value for the same contract person id.
+  user_phone:
+    lineage:
+      - datalake_ebdb_clean.contract_person.phone_number
+      - datalake_cdp_clean.transactional.event_properties
+    description: |
+      Phone prioritized from Lake contract person and fallback to event value for the same contract person id,
+      normalized to digits only and prefixed with country code 55 when the captured number has up to 11 digits.
+  first_name:
+    lineage:
+      - datalake_ebdb_clean.contract_person.name
+      - datalake_cdp_clean.transactional.event_properties
+    description: First name extracted from Lake contract person name with fallback to event payload name for the same contract person id.
+  last_name:
+    lineage:
+      - datalake_ebdb_clean.contract_person.name
+      - datalake_cdp_clean.transactional.event_properties
+    description: Last name extracted from Lake contract person name with fallback to event payload name for the same contract person id.
