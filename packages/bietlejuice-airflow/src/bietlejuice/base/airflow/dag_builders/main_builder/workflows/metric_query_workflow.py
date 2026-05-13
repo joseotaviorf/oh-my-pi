@@ -10,6 +10,7 @@ from bietlejuice.base.airflow.dag_builders.main_builder.workflows.base_workflow 
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.databricks.cluster_env_vars_helper import ClusterEnvVarsHelper
 from bietlejuice.base.pipeline import LayerEnum
 
 
@@ -106,6 +107,13 @@ class MetricQueryWorkflow(BaseWorkflow):
     def get_cluster_params(self):
         cluster_configuration = self.config_service.get_config(
             self.cluster_args["type"]
+        )
+        cluster_configuration = self.config_service._deep_update(
+            cluster_configuration,
+            self.cluster_args.get("custom_configurations", {}),
+        )
+        cluster_configuration = ClusterEnvVarsHelper.input_spark_env_vars(
+            cluster_configuration
         )
         default_libraries = self.config_service.get_config("default_libraries")
         acl = self.cluster_args["access_control_list"]
