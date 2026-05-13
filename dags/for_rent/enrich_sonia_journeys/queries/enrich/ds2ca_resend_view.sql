@@ -7,7 +7,7 @@ WITH docs_demand_resend_events AS (
     ts_event
   FROM datalake_cdp_clean.transactional
   WHERE
-    event_name = 'rent_flow_docs_demand_docs_resend'
+    event_name = 'rent_flow_tenant_documentation_resend'
     -- When we start using sfmc for this journey we need to change this datetime
     -- to a point right after the last hightouch execution will take place.
     -- Cutoff bumped from 2026-01-01 to 2026-03-01: malformed events with null
