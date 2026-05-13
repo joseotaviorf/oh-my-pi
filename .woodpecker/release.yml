@@ -54,16 +54,16 @@ clone:
 
 steps:
   setup:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - apt-get update -qq && apt-get install -y --no-install-recommends make git
-      - pip install uv
       - uv sync --project packages/bietlejuice-compiler
     when:
       event: [push, tag]
 
   make-package-python:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
       - apt-get update -qq && apt-get install -y --no-install-recommends make git rsync
       - pip install uv
@@ -340,10 +340,9 @@ steps:
   # a missing `staging/bietlejuice/` and beethoven-s3-sync's mirror-delete
   # would wipe `s3://{bucket}/astronomer/dags/bietlejuice/` in prod.
   create-dag-files:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - apt-get update -qq && apt-get install -y --no-install-recommends make git
-      - pip install uv
       - make create-dag-files
     when:
       event: push
@@ -443,9 +442,9 @@ steps:
       [upload-bi-etl-ejuice-modules-s3-prod, upload-dag-packages-dags-s3-prod]
 
   upload-dag-packages-spark-jobs-s3-forno:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - pip install uv
       - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br spark_jobs
     when:
       event: push
@@ -458,9 +457,9 @@ steps:
     depends_on: [setup]
 
   upload-dag-packages-spark-jobs-s3-prod:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - pip install uv
       - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks spark_jobs
     when:
       event: push
@@ -469,9 +468,9 @@ steps:
     depends_on: [setup]
 
   upload-sst-pipelines-s3-forno:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - pip install uv
       - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_sst_pipeline_into_s3.py databricks.s3.forno.data.quintoandar.com.br
     when:
       event: push
@@ -484,9 +483,9 @@ steps:
     depends_on: [setup]
 
   upload-sst-pipelines-s3-prod:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - pip install uv
       - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_sst_pipeline_into_s3.py 5a-databricks
     when:
       event: push
@@ -495,9 +494,9 @@ steps:
     depends_on: [setup]
 
   upload-dag-packages-queries-s3-forno:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - pip install uv
       - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br queries
     when:
       event: push
@@ -510,9 +509,9 @@ steps:
     depends_on: [setup]
 
   upload-dag-packages-queries-s3-prod:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - pip install uv
       - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks queries
     when:
       event: push
@@ -521,9 +520,9 @@ steps:
     depends_on: [setup]
 
   upload-dag-packages-data-quality-s3-forno:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - pip install uv
       - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br data_quality
     when:
       event: push
@@ -536,9 +535,9 @@ steps:
     depends_on: [setup]
 
   upload-dag-packages-data-quality-s3-prod:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - pip install uv
       - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks data_quality
     when:
       event: push
@@ -547,9 +546,9 @@ steps:
     depends_on: [setup]
 
   upload-dag-packages-schemas-s3-forno:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - pip install uv
       - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py databricks.s3.forno.data.quintoandar.com.br schemas
     when:
       event: push
@@ -562,9 +561,9 @@ steps:
     depends_on: [setup]
 
   upload-dag-packages-schemas-s3-prod:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - pip install uv
       - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_dag_packages_artifact_into_s3.py 5a-databricks schemas
     when:
       event: [push, tag]
@@ -573,9 +572,9 @@ steps:
     depends_on: [setup]
 
   load-metadata-files-to-s3-forno:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - pip install uv
       - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_metadata_files_into_s3.py --branch ${CI_COMMIT_BRANCH} --bucket "data-documentation.s3.forno.data.quintoandar.com.br" --host "https://metadata-propagator.apps.data-frn.habitat.zone/"
     when:
       event: push
@@ -590,9 +589,9 @@ steps:
     depends_on: [setup]
 
   load-metadata-files-to-s3-prod:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - pip install uv
       - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_metadata_files_into_s3.py --branch ${CI_COMMIT_BRANCH} --bucket "data-documentation.s3.data.quintoandar.com.br" --host "https://metadata-propagator.apps.data-prd.habitat.zone/"
     when:
       event: push
@@ -601,11 +600,11 @@ steps:
     depends_on: [setup]
 
   load-all-metadata-files-information-to-s3-forno:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     environment:
       ENVIRONMENT: forno
     commands:
-      - pip install uv
       - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py databricks.s3.forno.data.quintoandar.com.br
     when:
       event: push
@@ -614,11 +613,11 @@ steps:
     depends_on: [setup]
 
   load-all-metadata-files-information-to-s3-prod:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     environment:
       ENVIRONMENT: prod
     commands:
-      - pip install uv
       - uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/ci_cd/upload_all_metadata_files_informations_into_s3.py 5a-databricks
     when:
       event: push

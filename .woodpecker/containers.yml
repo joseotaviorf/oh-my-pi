@@ -1,0 +1,95 @@
+# Container image builds — CI images published to ECR, devcontainer build-only.
+#
+# CI images (ci-base, ci-jdk): amd64-only via ECR-hosted plugins/docker (native IAM auth).
+# Devcontainer: arm64 build validation only (dry_run); push via `make publish-devcontainer`.
+# Single Dockerfile: .container/Dockerfile with targets ci-base, ci-jdk, devcontainer.
+#
+# Tag convention (env prefix required by ECR tagging policy):
+#   master → prod-<target>-latest   + prod-<target>-<sha7>
+#
+# No custom clone: default plugin-git shallow clone is enough (Docker build only; no git diff).
+
+steps:
+  publish-ci-base-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker
+    pull: true
+    settings:
+      repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
+      dockerfile: .container/Dockerfile
+      target: ci-base
+      tag:
+        - prod-ci-base-latest
+        - prod-ci-base-${CI_COMMIT_SHA:0:7}
+      build_args:
+        - UV_VERSION=0.11.7
+        - TARGETARCH=amd64
+      secret: id=GITHUB_TOKEN,env=GITHUB_TOKEN
+    environment:
+      GITHUB_TOKEN:
+        from_secret: github_token
+    when:
+      - path:
+          include:
+            - '.container/Dockerfile'
+            - 'pyproject.toml'
+            - 'uv.lock'
+            - 'packages/*/pyproject.toml'
+        branch: [master]
+        event: push
+      - event: manual
+
+  publish-ci-jdk-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker
+    pull: true
+    settings:
+      repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
+      dockerfile: .container/Dockerfile
+      target: ci-jdk
+      tag:
+        - prod-ci-jdk-latest
+        - prod-ci-jdk-${CI_COMMIT_SHA:0:7}
+      build_args:
+        - UV_VERSION=0.11.7
+        - TARGETARCH=amd64
+      secret: id=GITHUB_TOKEN,env=GITHUB_TOKEN
+    environment:
+      GITHUB_TOKEN:
+        from_secret: github_token
+    when:
+      - path:
+          include:
+            - '.container/Dockerfile'
+            - 'pyproject.toml'
+            - 'uv.lock'
+            - 'packages/*/pyproject.toml'
+            - 'packages/bietlejuice-runtime/uv.lock'
+            - 'packages/bietlejuice-runtime/hatch_build.py'
+            - 'packages/bietlejuice-runtime/envs/*/pyproject.toml'
+            - 'packages/bietlejuice-runtime/envs/*/uv.lock'
+        branch: [master]
+        event: push
+      - event: manual
+
+  # Build-only (no push) — validates the Dockerfile builds on arm64.
+  # ECR push for devcontainer is done locally via `make publish-devcontainer`.
+  # The ECR-hosted plugins/docker used by CI images doesn't support multi-arch,
+  # and plugin-docker-buildx can't auth to ECR without explicit AWS keys.
+  build-devcontainer-prod:
+    image: woodpeckerci/plugin-docker-buildx
+    privileged: true
+    settings:
+      dockerfile: .container/Dockerfile
+      context: .
+      target: devcontainer
+      platforms: ['linux/arm64']
+      dry_run: true
+      build_args:
+        - UV_VERSION=0.11.7
+        - ASTRO_CLI_VERSION=1.41.0
+      secrets:
+        - 'id=GITHUB_TOKEN\\,env=GITHUB_TOKEN'
+    environment:
+      GITHUB_TOKEN:
+        from_secret: github_token
+    when:
+      - event: manual

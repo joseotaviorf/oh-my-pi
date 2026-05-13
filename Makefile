@@ -1,31 +1,153 @@
 ###############################################################################
-######################### Dev Container environment ###########################
+######################### CI Docker images ####################################
 ###############################################################################
-.PHONY: devcontainer-build
-## Builds the dev container image locally via the multi-stage
-## .devcontainer/Dockerfile. The builder stage carries the compile toolchains
-## (build-essential, python3-dev, liblz4-dev, openjdk-17-jdk) and is discarded;
-## the runtime image carries only the JRE-headless, the three pre-built venvs
-## (workspace + bietlejuice-runtime + dbr-16-4), the uv binary, and the Astro
-## CLI. The uv wheel cache is intentionally NOT in the final image. On first
-## container creation, post-create.sh re-links editable workspace packages and
-## symlinks the pre-staged bietlejuice-runtime venvs into the workspace
-## (~1-2s, no wheel downloads). Re-run whenever the Dockerfile, root
-## pyproject.toml/uv.lock, any packages/*/pyproject.toml, or
-## packages/bietlejuice-runtime/envs/*/pyproject.toml change.
-## Requires GITHUB_TOKEN in your shell for private Git deps; it is passed as a
-## BuildKit secret (not a build-arg). Cursor also builds on 'Reopen in Container'.
-devcontainer-build:
-	@echo "Building dev container image"
+# PLATFORM: set to build for a specific arch (e.g. PLATFORM=linux/arm64).
+# Omit for native-arch builds (the default).
+PLATFORM ?=
+
+.PHONY: build-ci-container-base
+## Builds the ci-base image: python:3.12-slim-bookworm + git + make + uv.
+## Used by lint, validation, and release CI steps.
+## Requires GITHUB_TOKEN for private Git deps (BuildKit secret), same as build-devcontainer.
+## Optional: PLATFORM=linux/arm64 for cross-arch builds.
+build-ci-container-base:
+	@echo "Building CI base image$(if $(PLATFORM), ($(PLATFORM)),)"
 	@echo "=========="
 	@echo ""
 	@DOCKER_BUILDKIT=1 docker build \
+	  $(if $(PLATFORM),--platform $(PLATFORM),) \
+	  --target ci-base \
 	  --secret id=GITHUB_TOKEN,env=GITHUB_TOKEN \
-	  -t bi-etl-ejuice-devcontainer:latest \
-	  -f .devcontainer/Dockerfile \
+	  -t bi-etl-ejuice-ci:base-latest \
+	  -f .container/Dockerfile \
 	  .
 	@echo ""
-	@echo "-> Image ready: bi-etl-ejuice-devcontainer:latest"
+	@echo "-> Image ready: bi-etl-ejuice-ci:base-latest"
+
+.PHONY: build-ci-container-jdk
+## Builds the ci-jdk image: ci-base + openjdk-17-jre-headless.
+## Used by test CI steps (PySpark needs a JVM).
+## Requires GITHUB_TOKEN for private Git deps (BuildKit secret), same as build-devcontainer.
+## Optional: PLATFORM=linux/arm64 for cross-arch builds.
+build-ci-container-jdk:
+	@echo "Building CI JDK image$(if $(PLATFORM), ($(PLATFORM)),)"
+	@echo "=========="
+	@echo ""
+	@DOCKER_BUILDKIT=1 docker build \
+	  $(if $(PLATFORM),--platform $(PLATFORM),) \
+	  --target ci-jdk \
+	  --secret id=GITHUB_TOKEN,env=GITHUB_TOKEN \
+	  -t bi-etl-ejuice-ci:jdk-latest \
+	  -f .container/Dockerfile \
+	  .
+	@echo ""
+	@echo "-> Image ready: bi-etl-ejuice-ci:jdk-latest"
+
+.PHONY: build-ci-containers
+## Builds both CI images (ci-base + ci-jdk) in one go.
+## Requires GITHUB_TOKEN for private Git deps (same as build-devcontainer).
+build-ci-containers: build-ci-container-base build-ci-container-jdk
+
+###############################################################################
+######################### ECR publish (local) #################################
+###############################################################################
+# Publishes container images to ECR from a developer machine.
+# Requires: `aws ecr get-login-password` to work (e.g. via `qli aws export`).
+#
+# Usage:
+#   make publish-ci-base          # push ci-base (amd64)
+#   make publish-ci-jdk           # push ci-jdk  (amd64)
+#   make publish-devcontainer     # push devcontainer (arm64)
+#   make publish-containers       # push all three
+#
+# SHA: first 7 chars of HEAD, used for the immutable tag.
+# ENV: tag prefix (default: prod).
+
+ECR_REPO   := 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
+ECR_REGION := us-east-1
+SHA7       := $(shell git rev-parse --short=7 HEAD)
+ENV_PREFIX ?= prod
+
+_ecr-login:
+	@aws ecr get-login-password --region $(ECR_REGION) \
+	  | docker login --username AWS --password-stdin \
+	    796143582747.dkr.ecr.$(ECR_REGION).amazonaws.com
+
+.PHONY: publish-ci-base
+## Build and push ci-base image to ECR (amd64).
+publish-ci-base: _ecr-login
+	@echo "Publishing ci-base → $(ECR_REPO):$(ENV_PREFIX)-ci-base-latest"
+	@DOCKER_BUILDKIT=1 docker build \
+	  --platform linux/amd64 \
+	  --target ci-base \
+	  --secret id=GITHUB_TOKEN,env=GITHUB_TOKEN \
+	  -t $(ECR_REPO):$(ENV_PREFIX)-ci-base-latest \
+	  -t $(ECR_REPO):$(ENV_PREFIX)-ci-base-$(SHA7) \
+	  -f .container/Dockerfile \
+	  .
+	@docker push $(ECR_REPO):$(ENV_PREFIX)-ci-base-latest
+	@docker push $(ECR_REPO):$(ENV_PREFIX)-ci-base-$(SHA7)
+	@echo "-> Pushed $(ENV_PREFIX)-ci-base-latest + $(ENV_PREFIX)-ci-base-$(SHA7)"
+
+.PHONY: publish-ci-jdk
+## Build and push ci-jdk image to ECR (amd64).
+publish-ci-jdk: _ecr-login
+	@echo "Publishing ci-jdk → $(ECR_REPO):$(ENV_PREFIX)-ci-jdk-latest"
+	@DOCKER_BUILDKIT=1 docker build \
+	  --platform linux/amd64 \
+	  --target ci-jdk \
+	  --secret id=GITHUB_TOKEN,env=GITHUB_TOKEN \
+	  -t $(ECR_REPO):$(ENV_PREFIX)-ci-jdk-latest \
+	  -t $(ECR_REPO):$(ENV_PREFIX)-ci-jdk-$(SHA7) \
+	  -f .container/Dockerfile \
+	  .
+	@docker push $(ECR_REPO):$(ENV_PREFIX)-ci-jdk-latest
+	@docker push $(ECR_REPO):$(ENV_PREFIX)-ci-jdk-$(SHA7)
+	@echo "-> Pushed $(ENV_PREFIX)-ci-jdk-latest + $(ENV_PREFIX)-ci-jdk-$(SHA7)"
+
+.PHONY: publish-devcontainer
+## Build and push devcontainer image to ECR (arm64).
+## Requires GITHUB_TOKEN env var for private Git deps.
+publish-devcontainer: _ecr-login
+	@echo "Publishing devcontainer → $(ECR_REPO):$(ENV_PREFIX)-devcontainer-latest"
+	@DOCKER_BUILDKIT=1 docker build \
+	  --platform linux/arm64 \
+	  --target devcontainer \
+	  --secret id=GITHUB_TOKEN,env=GITHUB_TOKEN \
+	  -t $(ECR_REPO):$(ENV_PREFIX)-devcontainer-latest \
+	  -t $(ECR_REPO):$(ENV_PREFIX)-devcontainer-$(SHA7) \
+	  -f .container/Dockerfile \
+	  .
+	@docker push $(ECR_REPO):$(ENV_PREFIX)-devcontainer-latest
+	@docker push $(ECR_REPO):$(ENV_PREFIX)-devcontainer-$(SHA7)
+	@echo "-> Pushed $(ENV_PREFIX)-devcontainer-latest + $(ENV_PREFIX)-devcontainer-$(SHA7)"
+
+.PHONY: publish-containers
+## Build and push all container images to ECR.
+publish-containers: publish-ci-base publish-ci-jdk publish-devcontainer
+
+###############################################################################
+######################### Dev Container environment ###########################
+###############################################################################
+.PHONY: build-devcontainer
+## Builds the devcontainer image locally (all stages in one go):
+##   make build-devcontainer
+## Builds ci-base → ci-jdk → devcontainer in a single Docker build.
+## Requires GITHUB_TOKEN for private Git deps (BuildKit secret).
+## Optional: PLATFORM=linux/arm64 for cross-arch builds.
+build-devcontainer:
+	@echo "Building dev container image$(if $(PLATFORM), ($(PLATFORM)),)"
+	@echo "=========="
+	@echo ""
+	@DOCKER_BUILDKIT=1 docker build \
+	  $(if $(PLATFORM),--platform $(PLATFORM),) \
+	  --target devcontainer \
+	  --secret id=GITHUB_TOKEN,env=GITHUB_TOKEN \
+	  -t bi-etl-ejuice:devcontainer-latest \
+	  -f .container/Dockerfile \
+	  .
+	@echo ""
+	@echo "-> Image ready: bi-etl-ejuice:devcontainer-latest"
 	@echo "-> Open the project in Cursor and choose 'Reopen in Container'"
 
 ###############################################################################

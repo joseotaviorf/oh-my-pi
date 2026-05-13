@@ -1,0 +1,49 @@
+add_newline = true
+command_timeout = 500
+
+format = "$directory$git_branch$git_status$python$nodejs$docker_context$character"
+
+[character]
+success_symbol = "[❯](bold #7aa2f7)"
+error_symbol = "[❯](bold #f7768e)"
+
+[directory]
+style = "bold #7aa2f7"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = " "
+style = "italic #bb9af7"
+format = "on [$symbol$branch]($style) "
+
+[git_status]
+style = "bold #bb9af7"
+format = "[[($all_status$ahead_behind)]($style)]($style) "
+up_to_date = " "
+untracked = "? "
+modified = "!"
+staged = "+"
+renamed = "»"
+deleted = "✘"
+
+[python]
+symbol = " "
+style = "bold #ff9e64"
+format = 'via [${symbol}${version}( \($virtualenv\))]($style) '
+
+[nodejs]
+symbol = " "
+style = "bold #73daca"
+format = "via [$symbol($version)]($style) "
+
+[docker_context]
+symbol = " "
+style = "bold #7aa2f7"
+format = "on [$symbol$context]($style) "
+
+[aws]
+disabled = true
+
+[battery]
+disabled = true

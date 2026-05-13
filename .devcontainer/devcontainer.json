@@ -1,11 +1,25 @@
 {
   "name": "bi-etl-ejuice",
+  // The terminal prompt uses Starship with Nerd Font symbols. Install a Nerd
+  // Font on your *host* machine so the glyphs render correctly:
+  //   brew install --cask font-jetbrains-mono-nerd-font
+  // or download from https://www.nerdfonts.com/
+  //
+  // Pre-built image from ECR. Multi-arch (amd64 + arm64) — works on both CI
+  // runners and developer MacBooks without a local Docker build.
+  // To build locally instead: `make build-devcontainer`, or comment out
+  // "image" and uncomment "build" below.
+  // "image": "796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:devcontainer-prod-latest",
+  // All three venvs are pre-installed in the image at /opt/bietlejuice/venvs/:
+  //   workspace/  — core + airflow + compiler (used by default via UV_PROJECT_ENVIRONMENT)
+  //   runtime/    — bietlejuice-runtime standalone
+  //   dbr-16-4/   — runtime pinned to DBR 16.4 LTS libs
+  // post-create.sh re-links editable packages into these venvs from the
+  // bind-mounted workspace (~1-2s). See .container/Dockerfile for the rationale.
   "build": {
-    "dockerfile": "Dockerfile",
-    // Build context is the repo root so the Dockerfile can COPY packages/.
+    "dockerfile": "../.container/Dockerfile",
     "context": "..",
-    // BuildKit secret (same pattern as local/astro/Dockerfile): token is not passed as
-    // a build-arg, so it does not end up in image metadata. Host must export GITHUB_TOKEN.
+    "target": "devcontainer",
     "options": [
       "--secret",
       "id=GITHUB_TOKEN,env=GITHUB_TOKEN"
@@ -13,21 +27,24 @@
   },
   // Forward the host GITHUB_TOKEN so any in-container git operations can
   // reach private GitHub repos if needed.
-  // UV_PROJECT_ENVIRONMENT directs uv to use /home/vscode/.venv (pre-built in
-  // the image) instead of the default .venv inside the workspace folder. This
-  // prevents the host OS venv from colliding with the container venv when
-  // developers switch between local and devcontainer workflows.
+  // UV_PROJECT_ENVIRONMENT directs uv to use the pre-built workspace venv at
+  // /opt/bietlejuice/venvs/workspace instead of the default .venv inside the
+  // workspace folder. This prevents the host OS venv from colliding with the
+  // container venv when developers switch between local and devcontainer workflows.
   "remoteEnv": {
     "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}",
     "DATABRICKS_TOKEN": "${localEnv:DATABRICKS_TOKEN}",
     "DATABRICKS_USERNAME": "${localEnv:DATABRICKS_USERNAME}",
-    "UV_PROJECT_ENVIRONMENT": "/home/vscode/.venv",
+    "UV_PROJECT_ENVIRONMENT": "/opt/bietlejuice/venvs/workspace",
     "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
   },
   // Container-wide environment. TZ keeps in-container log timestamps aligned
   // with the team's local time (instead of UTC, which is the upstream default).
   "containerEnv": {
-    "TZ": "America/Sao_Paulo"
+    "TZ": "America/Sao_Paulo",
+    // The uv cache lives on a Docker volume (different filesystem), so
+    // hardlinks from cache → venv fail. Copy mode avoids the warning.
+    "UV_LINK_MODE": "copy"
   },
   // Mounts:
   //   * ~/.aws — read-only bind so AWS CLI v2 inside the container picks up
@@ -50,7 +67,10 @@
   // Forwarded ports: with Docker-outside-of-Docker, Astro/Airflow and Spark
   // bind to 127.0.0.1 on the host. Listing them here gives Cursor/VS Code a
   // labeled entry in the Ports panel and silences the auto-detect prompt.
-  "forwardPorts": [8080, 4040],
+  "forwardPorts": [
+    8080,
+    4040
+  ],
   "portsAttributes": {
     "8080": {
       "label": "Airflow UI (astro dev start)",
@@ -105,8 +125,8 @@
         "ms-python.vscode-pylance"
       ],
       "settings": {
-        // Pre-built venv lives outside the workspace bind-mount at a fixed path.
-        "python.defaultInterpreterPath": "/home/vscode/.venv/bin/python",
+        // Pre-built workspace venv lives outside the workspace bind-mount at a fixed path.
+        "python.defaultInterpreterPath": "/opt/bietlejuice/venvs/workspace/bin/python",
         // Force Pyright/CursorPyright to resolve monorepo packages from source.
         "python.analysis.extraPaths": [
           "${workspaceFolder}/packages/bietlejuice-core/src",
@@ -114,8 +134,8 @@
           "${workspaceFolder}/packages/bietlejuice-compiler/src",
           "${workspaceFolder}/packages/bietlejuice-runtime/src"
         ],
-        "python.analysis.venvPath": "/home/vscode",
-        "python.analysis.venv": ".venv",
+        "python.analysis.venvPath": "/opt/bietlejuice/venvs",
+        "python.analysis.venv": "workspace",
         // Keep the Python extension from starting its own LSP — anysphere.cursorpyright
         // is the sole type-checker.
         "python.languageServer": "None",
@@ -140,10 +160,15 @@
         },
         "editor.formatOnSave": true,
         // Quality-of-life defaults.
-        "editor.rulers": [100],
+        "editor.rulers": [
+          100
+        ],
         "files.trimTrailingWhitespace": true,
         "files.insertFinalNewline": true,
-        "git.autofetch": true
+        "git.autofetch": true,
+        // Starship prompt uses Nerd Font symbols — this font must be
+        // installed on the host (the container renders nothing itself).
+        "terminal.integrated.fontFamily": "'JetBrainsMono Nerd Font Mono', monospace"
       }
     }
   },

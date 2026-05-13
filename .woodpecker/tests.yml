@@ -9,13 +9,12 @@ clone:
 
 steps:
   setup:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
+    pull: true
     commands:
-      - apt-get update && apt-get install -y git > /dev/null
-      - pip install uv
       - uv sync --directory packages/bietlejuice-core
       - uv sync --directory packages/bietlejuice-airflow
-      # Runtime is a standalone uv project; sync it once for lint/type-check.
+      # Runtime is a standalone uv project; sync it once for test steps.
       - uv sync --directory packages/bietlejuice-runtime
       # DBR-pinned tests run from the dbr-16-4 sub-project's venv. It mirrors
       # DBR 16.4 LTS bundled libs (numpy, pandas, pyarrow, psycopg2, pydantic, ...)
@@ -29,11 +28,9 @@ steps:
   # PR pushes: scope tests to changed modules via pytest-testmon + path detection.
   # master/forno pushes run the full suite via unit-tests-python instead.
   changed-unit-tests-python:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
+    pull: true
     commands:
-      - apt-get update && apt-get install -y openjdk-17-jdk > /dev/null
-      - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-      - pip install uv
       - export AWS_DEFAULT_REGION=us-east-1
       - make unit-tests-changed
     when:
@@ -51,11 +48,9 @@ steps:
 
   # master/forno pushes: run the full suite and rebuild .testmondata as the CI baseline.
   unit-tests-python:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
+    pull: true
     commands:
-      - apt-get update && apt-get install -y openjdk-17-jdk > /dev/null
-      - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-      - pip install uv
       - export AWS_DEFAULT_REGION=us-east-1
       - make unit-tests
     when:
@@ -71,11 +66,9 @@ steps:
     depends_on: [setup]
 
   integration-tests-python:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
+    pull: true
     commands:
-      - apt-get update && apt-get install -y openjdk-17-jdk > /dev/null
-      - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-      - pip install uv
       - export AWS_DEFAULT_REGION=us-east-1
       - make integration-tests
     when:
@@ -90,11 +83,9 @@ steps:
     depends_on: [setup]
 
   core-model-tests-and-coverage:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
+    pull: true
     commands:
-      - apt-get update && apt-get install -y openjdk-17-jdk > /dev/null
-      - export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-      - pip install uv
       - export AWS_DEFAULT_REGION=us-east-1
       - make core-model-coverage
     when:

@@ -22,23 +22,18 @@
 
 steps:
   setup:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - apt-get update && apt-get install -y git > /dev/null
-      - pip install uv
-      - uv sync --directory packages/bietlejuice-core
-      - uv sync --directory packages/bietlejuice-airflow
-      # Lint and type-check use runtime's own venv (broad versions, no DBR pins).
-      # The DBR-specific envs/dbr-16-4 sub-project is not needed here — ruff and
-      # ty don't import the DBR-pinned libs themselves.
-      - uv sync --directory packages/bietlejuice-runtime
-      - uv sync --directory packages/bietlejuice-compiler
+      # The image ships a pre-built workspace venv at /opt/bietlejuice/venvs/workspace
+      # (UV_PROJECT_ENVIRONMENT default). This re-links editable packages from the
+      # checked-out workspace and installs any new deps introduced by this PR (~1-2s).
+      - uv sync
 
   check-style-python:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - apt-get update && apt-get install -y git > /dev/null
-      - pip install uv
       - |
         # For push events on feature branches, `when.path` only checks the last
         # commit diff. Evaluate the full branch diff vs origin/master instead so
@@ -71,10 +66,9 @@ steps:
     depends_on: [setup]
 
   files-validation-python:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     commands:
-      - apt-get update && apt-get install -y git > /dev/null
-      - pip install uv
       - |
         # Same full-branch-diff guard as check-style-python (see header comment).
         if [ "$CI_PIPELINE_EVENT" = "push" ]; then
@@ -101,11 +95,10 @@ steps:
     depends_on: [setup]
 
   type-check-python:
-    image: public.ecr.aws/docker/library/python:3.12-bookworm
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
     failure: ignore
     commands:
-      - apt-get update && apt-get install -y git > /dev/null
-      - pip install uv
       - make type-check
     when:
       event: [push, pull_request]
