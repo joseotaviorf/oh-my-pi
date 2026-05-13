@@ -64,10 +64,14 @@ columns:
     description: |
       True for the single row per business unit id whose region link has the most recent
       business_unit_region update timestamp; false for all other region associations of the same unit.
-  ts_region_updated:
+  ts_region_association_created:
+    lineage:
+      - datalake_hub_services_clean.business_unit_region.ts_created
+    description: Timestamp when the business unit–region association row was created in Hub Services clean.
+  ts_region_association_updated:
     lineage:
       - datalake_hub_services_clean.business_unit_region.ts_updated
-    description: Timestamp of the business unit–region link row used for this association.
+    description: Timestamp when the business unit–region association row was last updated in Hub Services clean.
   ts_business_unit_created:
     lineage:
       - datalake_hub_services_clean.business_unit.ts_created

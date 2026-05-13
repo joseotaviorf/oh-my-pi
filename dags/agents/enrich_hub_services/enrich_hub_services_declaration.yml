@@ -17,9 +17,10 @@ workflow:
   inner_dependencies:
     daily_secretariat_allocation:
       - secretariat_allocation_history
+    member_profile:
+      - business_unit
     member_hub_allocation:
       - member_profile
-      - business_unit
     agent_hub_alocation:
       - member_profile
   tables_customization:

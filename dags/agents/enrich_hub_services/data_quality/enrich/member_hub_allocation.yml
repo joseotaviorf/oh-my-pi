@@ -2,6 +2,9 @@
 table_name: datalake_hub_services.member_hub_allocation
 alert_channel: "#alerts-de-airflow-dags"
 column_level_validations:
+  id_member_relationship:
+    is_complete:
+      severity_level: Error
   id_member_profile:
     is_complete:
       severity_level: Error

@@ -6,9 +6,12 @@ table_level_validations:
     greater_than: 28000
     severity_level: Error
 column_level_validations:
-  id_member_relationship:
+  id_revision:
     is_unique:
       severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_member_relationship:
     is_complete:
       severity_level: Error
   id_member_profile:

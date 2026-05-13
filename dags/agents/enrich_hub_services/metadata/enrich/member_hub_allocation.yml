@@ -2,12 +2,18 @@
 database_name: datalake_hub_services
 table_name: member_hub_allocation
 description: |
-  Daily allocation of Hub Services members to business units: explodes each active member–hub
-  relationship across calendar days via aux_date, enriches users and agent_data, and attaches hub
-  and region attributes from datalake_hub_services.business_unit (latest region row per unit).
+  Daily allocation of Hub Services members to business units: explodes each member–hub relationship
+  across calendar days via aux_date using relationship start/end from enrich member_profile (already
+  denormalized with user, agent, parent, and hub attributes). One row per member relationship and reference day.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
+  id_member_relationship:
+    lineage:
+      - datalake_hub_services.member_profile.id_member_relationship
+    description: |
+      Stable relationship identifier (hash of profile, business unit, and parent profile) propagated
+      from enrich member_profile.
   id_member_profile:
     lineage:
       - datalake_hub_services.member_profile.id_member_profile
@@ -20,24 +26,24 @@ columns:
       Not the same as main/admin (ebdb) user id.
   id_main_user:
     lineage:
-      - datalake_hub_services.users.id_main_user
+      - datalake_hub_services.member_profile.id_main_user
     description: |
       Unique member external user ID (main/admin/ebdb).
       Attention: This ID refers to the user in main/admin/ebdb.
   id_agent:
     lineage:
-      - datalake_hub_services.users.id_agent
+      - datalake_hub_services.member_profile.id_agent
     description: |
       Agent unique identifier.
       Attention: This ID refers to the agent in main/admin/ebdb.
   uuid_person:
     lineage:
-      - datalake_hub_services.users.uuid_person
+      - datalake_hub_services.member_profile.uuid_person
     description: Person-level UUID from main/admin (ebdb) for this member.
   uuid_company:
     lineage:
-      - datalake_ebdb_clean.agent_data.uuid_company
-    description: Company UUID associated with the member (brokerage/company identifier).
+      - datalake_hub_services.member_profile.uuid_company
+    description: Company UUID from agent_data for the member agent (brokerage / company identifier).
   id_parent_member_profile:
     lineage:
       - datalake_hub_services.member_profile.id_parent_member_profile
@@ -49,48 +55,25 @@ columns:
       Hub Services internal user identifier for the parent member (join key to users for the parent).
   id_parent_main_user:
     lineage:
-      - datalake_hub_services.users.id_main_user
+      - datalake_hub_services.member_profile.id_parent_main_user
     description: |
-      Parent member external user ID (main/admin/ebdb), from the parent row in users.
+      Parent member external user ID (main/admin/ebdb), from enrich member_profile.
   id_parent_agent:
     lineage:
-      - datalake_hub_services.users.id_agent
+      - datalake_hub_services.member_profile.id_parent_agent
     description: Parent member agent unique identifier (main/admin/ebdb).
   uuid_parent_person:
     lineage:
-      - datalake_hub_services.users.uuid_person
+      - datalake_hub_services.member_profile.uuid_parent_person
     description: Person-level UUID from main/admin (ebdb) for the parent member.
   id_business_unit:
     lineage:
       - datalake_hub_services.member_profile.id_business_unit
     description: Unique ID of the business unit where the member is allocated.
-  hub_name:
+  id_region:
     lineage:
-      - datalake_hub_services.business_unit.hub_name
-    description: Business unit display name from enrich business_unit.
-  city_group:
-    lineage:
-      - datalake_hub_services.business_unit.city_group
-    description: City group of the hub’s region from enrich business_unit.
-  city_name:
-    lineage:
-      - datalake_hub_services.business_unit.city_name
-    description: City name of the hub’s region from enrich business_unit.
-  short_region_name:
-    lineage:
-      - datalake_hub_services.business_unit.short_region_name
-    description: Short region label from enrich business_unit.
-  lead_types:
-    lineage:
-      - datalake_hub_services.business_unit.lead_types
-    description: Lead types served by the hub (from enrich business_unit).
-  business_context:
-    lineage:
-      - datalake_hub_services.business_unit.business_context
-    description: Commercial line of the business unit (e.g. sale or rent).
-    categories:
-      sale: Acting on sales.
-      rent: Acting on rent.
+      - datalake_hub_services.member_profile.id_region
+    description: Region identifier of the hub row associated to the member for the relationship window.
   profile:
     lineage:
       - datalake_hub_services.member_profile.profile
@@ -110,49 +93,80 @@ columns:
       TREATMENT_SECRETARIAT_TWILIO: Exclusive ForSale profile. Works directly on converting new buyer prospects, with communication via Twilio (a CX tool).
   agent_type:
     lineage:
-      - datalake_ebdb_clean.agent_data.agent_type
-    description: Agent type.
+      - datalake_hub_services.member_profile.agent_type
+    description: Agent type from enrich member_profile (sourced from agent_data).
+  hub_name:
+    lineage:
+      - datalake_hub_services.member_profile.hub_name
+    description: Business unit display name from enrich member_profile.
+  city_group:
+    lineage:
+      - datalake_hub_services.member_profile.city_group
+    description: City group of the hub’s region from enrich member_profile.
+  city_name:
+    lineage:
+      - datalake_hub_services.member_profile.city_name
+    description: City name of the hub’s region from enrich member_profile.
+  short_region_name:
+    lineage:
+      - datalake_hub_services.member_profile.short_region_name
+    description: Short region label from enrich member_profile.
+  lead_types:
+    lineage:
+      - datalake_hub_services.member_profile.lead_types
+    description: Lead types served by the hub (from enrich member_profile).
+  business_context:
+    lineage:
+      - datalake_hub_services.member_profile.business_context
+    description: Commercial line of the business unit (e.g. sale or rent).
+    categories:
+      sale: Acting on sales.
+      rent: Acting on rent.
   user_name:
     lineage:
-      - datalake_hub_services.users.name
-    description: Member user display name from Hub Services users.
+      - datalake_hub_services.member_profile.name
+    description: Member user display name (from enrich member_profile / Hub Services users).
   user_email:
     lineage:
-      - datalake_hub_services.users.email
-    description: Member user email from Hub Services users.
+      - datalake_hub_services.member_profile.email
+    description: Member user email (from enrich member_profile / Hub Services users).
   user_phone_number:
     lineage:
-      - datalake_hub_services.users.phone_number
-    description: Member user primary phone (Hub Services clean coalesced with ebdb main phone in enrich users).
+      - datalake_hub_services.member_profile.phone_number
+    description: Member user primary phone (from enrich member_profile / Hub Services users).
   user_secondary_phone_number:
     lineage:
-      - datalake_hub_services.users.secondary_phone_number
-    description: |
-      Member secondary phone when distinct from main phone in ebdb user; sourced from enrich users.
+      - datalake_hub_services.member_profile.secondary_phone_number
+    description: Member secondary phone when applicable (from enrich member_profile / Hub Services users).
   user_cpf:
     lineage:
-      - datalake_hub_services.users.cpf
-    description: Member user CPF from Hub Services users.
-  user_parent_name:
+      - datalake_hub_services.member_profile.cpf
+    description: Member user CPF (from enrich member_profile / Hub Services users).
+  parent_name:
     lineage:
-      - datalake_hub_services.users.name
-    description: Parent member user display name from Hub Services users.
-  user_parent_email:
+      - datalake_hub_services.member_profile.parent_name
+    description: Parent member user display name (from enrich member_profile / Hub Services users).
+  parent_email:
     lineage:
-      - datalake_hub_services.users.email
-    description: Parent member user email from Hub Services users.
-  user_parent_phone_number:
+      - datalake_hub_services.member_profile.parent_email
+    description: Parent member user email (from enrich member_profile / Hub Services users).
+  parent_phone_number:
     lineage:
-      - datalake_hub_services.users.phone_number
-    description: Parent member primary phone from enrich users.
-  user_parent_secondary_phone_number:
+      - datalake_hub_services.member_profile.parent_phone_number
+    description: Parent member primary phone (from enrich member_profile / Hub Services users).
+  parent_secondary_phone_number:
     lineage:
-      - datalake_hub_services.users.secondary_phone_number
-    description: Parent member secondary phone from enrich users (when applicable).
-  user_parent_cpf:
+      - datalake_hub_services.member_profile.parent_secondary_phone_number
+    description: Parent member secondary phone when applicable (from enrich member_profile / Hub Services users).
+  parent_cpf:
     lineage:
-      - datalake_hub_services.users.cpf
-    description: Parent member user CPF from Hub Services users.
+      - datalake_hub_services.member_profile.parent_cpf
+    description: Parent member user CPF (from enrich member_profile / Hub Services users).
+  is_active:
+    lineage:
+      - datalake_hub_services.member_profile.is_member_active_in_period
+    description: |
+      Whether the member relationship is active on dt_reference (alias of is_member_active_in_period from enrich member_profile).
   dt_reference:
     lineage:
       - datalake_quintoandar.aux_date.date
