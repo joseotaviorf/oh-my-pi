@@ -29,12 +29,12 @@ workflow:
   layer: raw
   load_spark_job: load_databricks_usage_raw
   spark_job_arguments:
-  - "{environment}"
-  - "{bucket}"
-  - "{dag_name}"
-  - "{table_name}"
-  - "{partitions}"
-  - "{{ data_interval_start | ds }}"
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{partitions}"
+    - "{{ data_interval_start | ds }}"
   tables_customization:
     billable_usage:
       partitions: ["year", "month", "day"]
@@ -46,8 +46,7 @@ cluster:
   type: consolidation_m_memory_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
-    spark_version: 12.2.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
