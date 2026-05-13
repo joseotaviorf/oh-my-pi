@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "bi-etl-ejuice",
+  "description": "Claude Code marketplace hosted in the bi-etl-ejuice repo. Distributes the BI/data-platform plugins (Tars and friends) maintained by the QuintoAndar data team.",
+  "owner": {
+    "name": "Data Engineering"
+  },
+  "plugins": [
+    {
+      "name": "tars",
+      "source": "./plugins/tars",
+      "description": "Technical Data Analyst for QuintoAndar's Trino data lake. Executes Trino SQL, persists full query results to disk, previews <=10 rows, and appends an auditable JSONL track record to the current project folder.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Data Engineering"
+      },
+      "homepage": "https://github.com/quintoandar/bi-etl-ejuice/tree/tars-claude/plugins/tars",
+      "repository": "https://github.com/quintoandar/bi-etl-ejuice",
+      "keywords": ["trino", "data-analysis", "sql", "quintoandar", "bi"],
+      "category": "data-analysis",
+      "tags": ["trino", "analytics", "sql", "data"]
+    }
+  ]
+}

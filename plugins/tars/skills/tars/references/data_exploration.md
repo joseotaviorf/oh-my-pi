@@ -1,0 +1,122 @@
+# Data Exploration Mode — SQL Rules
+
+This document defines the SQL dialect, layer priority, common patterns, and response guidelines for Tars. Read and apply it on every activation.
+
+---
+
+## Scope vs Contribution Rules
+
+- **Sections 1–8 of `sql_conventions.md`** (formatting, naming, aliases, CTEs, JOINs, CASE, comments, line breaks) **remain valid** — they are universal style rules for any SQL.
+- **Sections 9–12 of `sql_conventions.md`** do **NOT** apply:
+  - Section 9 (SELECT *) — relaxed for Golden Queries and quick exploration
+  - Section 10 (Partition Filtering / `{load_start_date}`) — template params do not exist in ad-hoc queries
+  - Section 11 (Person Data Model / PII storage) — analysts read data, they do not write to pipeline tables
+  - Section 12 (Source Layer Policy) — "DW reads from enrich" is a pipeline build rule, not a consumption rule
+- **`databricks_conventions.mdc`** does **NOT** apply — template syntax (`{bracket}` vs `{{ Jinja }}`), `MERGE INTO`, and other Spark-specific constructs are irrelevant to ad-hoc queries.
+
+---
+
+## SQL Dialect — Trino Only
+
+All queries generated in Data Exploration mode must use **Trino SQL syntax**. Analysts run queries on Trino (via Superset, DBeaver, or ad-hoc tools), never on Databricks directly.
+
+### Constructs to convert automatically
+
+| Databricks (Spark SQL) | Trino equivalent |
+|---|---|
+| `QUALIFY ROW_NUMBER() OVER(...) = 1` | Wrap in subquery, add `WHERE rni = 1` |
+| `catalog.schema.table` | `schema.table` (Trino uses `schema.table`, same schema names as Spark — no suffix) |
+| `GROUP BY ALL` | List all non-aggregate columns explicitly |
+| `COUNT_IF(condition)` | `COUNT_IF(condition)` (supported in Trino) |
+| `MAKE_DATE(year, month, day)` | `DATE(CAST(year AS VARCHAR) \|\| '-' \|\| LPAD(CAST(month AS VARCHAR), 2, '0') \|\| '-' \|\| LPAD(CAST(day AS VARCHAR), 2, '0'))` |
+| `GROUP BY alias` / `ORDER BY alias` | Repeat the full expression — Trino does not resolve SELECT aliases in GROUP BY or ORDER BY |
+
+### Trino-specific rules
+
+- `GROUP BY` and `ORDER BY` must reference the full column expression, not a SELECT alias. Trino does not resolve aliases in these clauses.
+- Always apply partition filters (`year`, `month`, `day`) to avoid full table scans, ask user for specific date or date range
+- Date filters must target the **main entity** of the question, not secondary entities
+- Avoid `SELECT *` in final queries — select only the columns needed for the analysis. `SELECT *` is acceptable in quick exploration or when adapting Golden Queries.
+- When the user asks for a count or rate, ensure the grain matches the expected output (watch out for JOINs that multiply rows)
+
+---
+
+## Layer Priority for Analysis
+
+Always prefer the highest available layer:
+
+| Priority | Layer | Schema prefix | When to use |
+|---|---|---|---|
+| 1st | **DW (Data Warehouse)** | `dw_*` | **Default choice.** Curated, aggregated, ready for analysis. Always start here. |
+| 2nd | **Enrich** | `datalake_*` (no `_clean` suffix) | When DW doesn't have the column or granularity you need. |
+| 3rd | **Clean** | `datalake_*_clean` | Last resort. Cleaned source data, very granular, no business logic. |
+| 4th | **Metric** | `metric_*` | Pre-aggregated KPIs. Use only if specifically needed — may contain opinionated logic. |
+| Never | **Raw + Core** | `*_raw`, `core_*` | Never suggest these to users. |
+
+**Decision tree:**
+1. Does the entity file list a DW table that answers the question? → Use it.
+2. Need deeper granularity or a column not in DW? → Check Enrich tables in the entity file.
+3. Still not found? → Proceed with best judgment based on available schema and context.
+
+---
+
+## Column Verification
+
+Entity docs point you to the right tables, but they do not list every column. When you need more detail about a table recommended by an entity doc — available columns, types, or descriptions — **search the repository for the SQL and metadata files that define it**.
+
+Every table in this repo has a `.sql` file under `dags/**/queries/` and a matching `.yml` under `dags/**/metadata/`. Search for the table name (e.g., Grep for the table name in `dags/`), then Read the SQL to see available columns and the metadata YAML for column descriptions. This takes seconds and should be your default reflex before writing complex JOINs or guessing column names.
+
+---
+
+## Common SQL Patterns
+
+Entity files reference these patterns by name. Apply them whenever indicated.
+
+### Deduplication Pattern (ROW_NUMBER)
+
+Some fact tables may contain duplicates per business key. When indicated by the entity file, always apply:
+
+```sql
+SELECT
+    sub.*
+FROM (
+    SELECT
+        col_1,
+        col_2,
+        ROW_NUMBER() OVER(PARTITION BY [business_key] ORDER BY ts_updated DESC) AS rni
+    FROM
+        schema.table
+) AS sub
+WHERE
+    sub.rni = 1
+```
+
+### Type-safe JOIN Pattern (CAST)
+
+When a foreign key is VARCHAR in one table and numeric in another, always use `CAST(numeric_side AS VARCHAR)` on the numeric side. Entity files flag which keys require this.
+
+---
+
+## Entity File Routing
+
+The `references/business_entities/` folder contains one markdown file per business entity with detailed domain context (tables, metrics, JOINs, dos/don'ts, golden queries).
+
+**Always check entity files** when the user's question may relate to a known entity. Read `references/intro.md` for the full entity index and file structure. When in doubt, check — it is better to load an entity file than to miss relevant context.
+
+---
+
+## Response Guidelines
+
+When answering user questions about data:
+
+1. **Identify the entity** — map the user's terms to the correct entity using the Synonyms section in entity files
+2. **Review entity rules** — check Dos and Don'ts for mandatory patterns before producing any SQL
+3. **Pick the right table** — follow the layer priority above and the entity's Tables section
+4. **Write Trino SQL** — all queries must use Trino syntax; convert Databricks constructs automatically
+5. **Execute the SQL on Trino** — use the `trino` sibling skill and its `execute_trino.py` script (see SKILL.md §Skills to Invoke). Do not return SQL without running it unless the user explicitly asks for the query only.
+6. **Preview ≤ 10 rows** — show at most 10 rows of the result as a Markdown table in the reply, even if the query returned more. Mention the total row count.
+7. **Persist the full result** — save the raw JSON output from the script to `$TARS_DIR/tars_query_results/<session_id>__<entry_index>.json` (resolve `TARS_DIR` as shown in SKILL.md → Storage Paths).
+8. **Explain your reasoning** — briefly describe assumptions, table choices, and any caveats
+9. **Cite your sources** — mention which tables and columns you referenced so the user can verify
+
+Full execution rules, error handling, response shape, and the track-record logging protocol live in `SKILL.md`.
