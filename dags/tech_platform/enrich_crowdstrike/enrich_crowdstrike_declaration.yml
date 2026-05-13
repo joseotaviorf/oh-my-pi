@@ -1,0 +1,44 @@
+dag:
+  name: enrich_crowdstrike
+  schedule_start_date: 2026, 5, 1
+  schedule_interval: 0 4 * * *
+  owner: Tech Platform Cyber Security
+  documentation:
+    dag_purpose: |
+      Enriched current-state CrowdStrike managed devices from clean: latest ingest partition within the batch
+      window and one row per device (not a historical partition stack).
+
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: full
+  default_partitions: []
+  execution_timeout_hours: 4
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    managed_devices:
+      extraction_type: full
+      merge_on: [id_device]
+      partitions: []
+  default_table_privileges:
+    auditlogs:
+      - ALL PRIVILEGES
+
+cluster:
+  type: custom_cluster
+  access_control_list:
+    group_name: auditlogs
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    driver_node_type_id: m5d.4xlarge
+    node_type_id: m5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12

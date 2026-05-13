@@ -1,0 +1,137 @@
+database_name: datalake_crowdstrike
+table_name: managed_devices
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+description: |
+  Current-state CrowdStrike managed devices: latest ingest partition within the Airflow batch window and one row
+  per device (not a historical stack of partitions). Derived from clean by keeping MAX(year, month, day) in
+  scope and deduplicating by device with QUALIFY.
+columns:
+  id_device:
+    description: Unique device identifier in CrowdStrike.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.id_device
+  id_cid:
+    description: CrowdStrike customer ID.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.id_cid
+  nm_hostname:
+    description: Device hostname.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.nm_hostname
+  ds_platform:
+    description: Platform name (e.g. Windows, Mac, Linux).
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_platform
+  id_platform:
+    description: Platform identifier.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.id_platform
+  ds_os_version:
+    description: Operating system version.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_os_version
+  ds_os_build:
+    description: Operating system build number.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_os_build
+  ds_major_version:
+    description: OS major version.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_major_version
+  ds_minor_version:
+    description: OS minor version.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_minor_version
+  ds_agent_version:
+    description: CrowdStrike Falcon agent version.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_agent_version
+  ds_external_ip:
+    description: Device external IP address.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_external_ip
+  ds_local_ip:
+    description: Device local IP address.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_local_ip
+  ds_mac_address:
+    description: Device MAC address.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_mac_address
+  ds_machine_domain:
+    description: Machine domain.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_machine_domain
+  nm_last_login_user:
+    description: Last logged in user name.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.nm_last_login_user
+  id_last_login_uid:
+    description: Last logged in user ID.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.id_last_login_uid
+  id_last_login_user_sid:
+    description: Last logged in user SID.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.id_last_login_user_sid
+  id_config_base:
+    description: Configuration ID base.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.id_config_base
+  id_config_build:
+    description: Configuration ID build.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.id_config_build
+  id_config_platform:
+    description: Configuration ID platform.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.id_config_platform
+  ds_criticality:
+    description: Device criticality level.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_criticality
+  ds_containment_status:
+    description: Filesystem containment status.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_containment_status
+  ds_reduced_functionality_mode:
+    description: Reduced functionality mode status.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_reduced_functionality_mode
+  ds_rtr_state:
+    description: Real-time response state.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_rtr_state
+  ds_safe_mode:
+    description: Safe mode status.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ds_safe_mode
+  ts_first_seen:
+    description: Timestamp when the device was first seen.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ts_first_seen
+  ts_last_seen:
+    description: Timestamp when the device was last seen.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ts_last_seen
+  ts_last_login:
+    description: Timestamp of last user login.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ts_last_login
+  ts_agent_local_time:
+    description: Agent local time.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.ts_agent_local_time
+  year:
+    description: Year of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.year
+  month:
+    description: Month of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.month
+  day:
+    description: Day of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_crowdstrike_clean.managed_devices.day
