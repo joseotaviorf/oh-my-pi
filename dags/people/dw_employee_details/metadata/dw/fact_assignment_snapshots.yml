@@ -3,7 +3,7 @@ table_name: fact_assignment_snapshots
 owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |
-  Workforce assignments as of each calendar day: person and assignment identifiers, tenure, direct and indirect report counts, leadership and activity flags, hire and termination dates, and surrogate keys to job, cost center, contact, documentation, emergency contact, and hierarchy dimensions.
+  Workforce assignments as of each calendar day: person and assignment identifiers, tenure, direct and indirect report counts, leadership and activity flags, hire and termination dates, and surrogate keys to job, cost center, business unit, contact, documentation, emergency contact, and hierarchy dimensions.
   Supports headcount by date, tenure, admissions and exits, and org context; dimension labels and PII-heavy attributes are read via the sk_* columns on this table.
   Daily snapshot fact: one row per assignment_number and dt_reference (not an SCD table; each row is a point-in-time slice).
 columns:
@@ -31,6 +31,10 @@ columns:
     description: Org structure identifier. Use to get management hierarchy from dim_management_hierarchy.
     lineage:
       - datalake_people.assignment_snapshots.sk_hierarchy_version
+  sk_business_unit:
+    description: Business unit surrogate key. Use to join dw_organization.dim_business_unit on sk_business_unit for business unit name and organizational context.
+    lineage:
+      - datalake_people.assignment_snapshots.id_business_unit
   sk_termination_event_definition:
     description: Termination reason and type. Use to get details from dim_event_definition. Empty when still active.
     lineage:
