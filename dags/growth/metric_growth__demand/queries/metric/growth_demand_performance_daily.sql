@@ -1,4 +1,14 @@
-WITH 
+WITH qac_user AS (
+  SELECT 
+    DATE(fdtof.dt_event) AS date,
+    fdtof.sk_tof_user,
+    MAX(COALESCE(fdtof.is_qac, False)) AS is_qac
+  FROM 
+    dw_growth.fact_demand_top_of_funnel_events AS fdtof
+  WHERE
+    DATE(fdtof.dt_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+  GROUP BY ALL
+),
 daily_tof_metrics AS (
   SELECT
     dd.date,
@@ -22,20 +32,26 @@ daily_tof_metrics AS (
     fdtof.year,
     fdtof.month,
     fdtof.day,
+    qac_user.is_qac, -- QAC stands for "Quinto Andar Classifieds"
     COUNT(DISTINCT fdtof.sk_tof_user) AS tof_users, 
     COUNT(DISTINCT (CASE WHEN fdtof.is_rede_demand = TRUE THEN fdtof.sk_tof_user END)) AS tof_users_rede,
     COUNT(DISTINCT fdtof.sk_tof_event) AS tof_events, 
     COUNT(DISTINCT CASE WHEN fdtof.is_rede_demand = TRUE THEN fdtof.sk_tof_event END) AS tof_events_rede 
   FROM 
     dw_growth.fact_demand_top_of_funnel_events AS fdtof
-    INNER JOIN dw_public.dim_date AS dd 
-        ON fdtof.dt_event = dd.date
-    LEFT JOIN dw_public.dim_region AS dr
-        ON dr.sk_region = fdtof.sk_region
+  INNER JOIN 
+    dw_public.dim_date AS dd 
+      ON fdtof.dt_event = dd.date
+  LEFT JOIN 
+    dw_public.dim_region AS dr
+      ON dr.sk_region = fdtof.sk_region
+  LEFT JOIN
+    qac_user
+      ON qac_user.sk_tof_user = fdtof.sk_tof_user
+        AND qac_user.date = dd.date
   WHERE 
     DATE(fdtof.dt_event) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
   GROUP BY ALL
-
 ), 
 daily_prospect_metrics AS ( 
   SELECT
@@ -43,7 +59,7 @@ daily_prospect_metrics AS (
     dr.country_code, 
     dr.city_group, 
     fdpe.operation_channel, 
-    IFNULL(fdpe.referral_type, 'NA') as referral_type, 
+    IFNULL(fdpe.referral_type, 'NA') AS referral_type, 
     fdpe.platform,
     fdpe.utm_campaign, 
     fdpe.utm_term,
@@ -97,6 +113,7 @@ SELECT
   COALESCE(t.medium, p.medium) AS medium,
   COALESCE(t.source, p.source) AS source,
   COALESCE(t.is_cqa_demand, p.is_cqa_demand) AS is_cqa_demand,
+  t.is_qac, -- We are deliberately not bringing this concept into "Prospects" for now.
   t.tof_users,
   t.tof_users_rede,
   t.tof_events,
@@ -110,8 +127,8 @@ SELECT
   COALESCE(t.day, p.day) AS day,
   NOW() AS ts_load
 FROM 
-  daily_tof_metrics t 
-  FULL OUTER JOIN daily_prospect_metrics p
+  daily_tof_metrics AS t 
+  FULL OUTER JOIN daily_prospect_metrics AS p
     ON t.date = p.date
     AND t.city_group = p.city_group
     AND t.operation_channel = p.operation_channel

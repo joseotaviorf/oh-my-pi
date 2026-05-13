@@ -6,7 +6,7 @@ owner: isabela.matsumoto@quintoandar.com.br
 columns:
   dt_week_start:
     lineage:
-      - dw_public.dim_date.date
+      - dw_public.dim_date.week_start
     description: The week_start on which the events are recorded.
     dimension: True
   country_code:
@@ -27,7 +27,6 @@ columns:
     dimension: True
   referral_type:
     lineage:
-      - dw_growth.fact_demand_top_of_funnel_events.referral_type
       - dw_growth.fact_demand_prospect_events.referral_type
     description: Grouping of results by type of user prospecting program/initiative.
     dimension: True
@@ -117,6 +116,11 @@ columns:
     lineage:
       - dw_growth.fact_demand_prospect_events.is_cqa_demand
     description: Flag indicating if the demand is from CQA (Casa QuintoAndar) business model.
+    dimension: True
+  is_qac:
+    lineage:
+      - dw_growth.fact_demand_top_of_funnel_events.is_qac
+    description: Flag indicating if any top-of-funnel event in the period was associated with QuintoAndar Classifieds (QAC). NULL for prospect-only rows where the QAC concept does not apply.
     dimension: True
   tof_users:
     description: Count of unique top-of-funnel users.
