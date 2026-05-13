@@ -395,7 +395,10 @@ SELECT
         MAX(CASE WHEN cd.dimension_key = 'segmentation' THEN cd.ts_record_insertion END),
         MAX(CASE WHEN cd.dimension_key = 'agreement' THEN cd.ts_record_insertion END),
         MAX(cd.ts_record_insertion)
-    ) AS ts_record_insertion
+    ) AS ts_record_insertion,
+    YEAR(cd.aux_date) AS year,
+    MONTH(cd.aux_date) AS month,
+    DAY(cd.aux_date) AS day
 FROM
     calendar_dim AS cd
 GROUP BY

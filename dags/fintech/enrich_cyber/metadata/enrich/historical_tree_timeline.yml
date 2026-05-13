@@ -164,3 +164,15 @@ columns:
     description: "Calendar date for the timeline row, within the incremental load window."
     lineage:
       - datalake_quintoandar.aux_date.date
+  year:
+    description: "Year partition column for data organization"
+    lineage:
+      - datalake_quintoandar.aux_date.year
+  month:
+    description: "Month partition column for data organization"
+    lineage:
+      - datalake_quintoandar.aux_date.month
+  day:
+    description: "Day partition column for data organization"
+    lineage:
+      - datalake_quintoandar.aux_date.day

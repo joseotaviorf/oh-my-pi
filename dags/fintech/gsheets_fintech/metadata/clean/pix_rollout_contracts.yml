@@ -1,0 +1,22 @@
+---
+database_name: datalake_gsheets_clean
+table_name: pix_rollout_contracts
+description: >-
+  Manual list from Google Sheets of rental contracts (and related business
+  entities) included in the PIX payment rollout for Fintech operations. Used as
+  a reference cohort for analytics and eligibility checks.
+owner: ae-finance-fintech@quintoandar.com.br
+domain: Fintech
+columns:
+  id_contract:
+    description: QuintoAndar contract identifier for a row in the PIX rollout
+      cohort, sourced from the spreadsheet when provided.
+    lineage:
+      - datalake_gsheets_raw.pix_rollout_contracts.id_contract
+  rollout_phase:
+    description: Phase of the PIX rollout the contract is part of.
+    lineage:
+      - datalake_gsheets_raw.pix_rollout_contracts.rollout_phase
+  ts_load:
+    description: Timestamp when the sheet row was ingested into the raw layer by the
+      gsheets pipeline.

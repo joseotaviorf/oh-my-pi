@@ -22,6 +22,10 @@ workflow:
       - contract_agency_distribution
     historical_tree_timeline:
       - queue_decision_tree
+  tables_customization:
+    historical_tree_timeline:
+      extraction_type: incremental
+      partitions: [ year, month, day ]
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new_env
