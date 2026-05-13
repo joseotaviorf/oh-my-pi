@@ -17,35 +17,24 @@ dependencies = [
     "businesstimedelta",            # used by FintechUDFs.fintechops_work_min_sla pandas UDF
     "delta-spark==3.3.1",           # must match DBR 16.4 Delta Lake 3.3.1 exactly
     "dependency-injector>=4.46.0",
-    "facebook-business",
-    "ftfy",
-    "google-api-python-client",
-    "gspread",
     "hierarchical-conf>=1.0.4",
     "hive-metastore-client>=1.0.9",
     "holidays",                     # used by FintechUDFs.fintechops_work_min_sla pandas UDF
-    "hubspot-api-client",
-    "kafka-python",
-    "langfuse",
     "defusedxml",
-    "oauth2client",
     "opentelemetry-exporter-otlp-proto-http>=1.22.0",
     "paramiko",
     "pendulum",
-    "presidio-analyzer",
     "pymongo>=4.0.0",
     # pyspark is intentionally absent from Requires-Dist: DBR 16.4 bundles PySpark 3.5.2
     # directly; installing from PyPI would download a 317 MB sdist and shadow the
     # cluster-bundled copy. The pyspark==3.5.3 pin in [tool.uv].override-dependencies
     # keeps the uv resolver happy when resolving delta-spark==3.3.1 locally.
-    "pytopojson",
     # quintoandar-logger intentionally omitted from Requires-Dist: it is a private
     # GitHub package not on PyPI. pip (used by Databricks cluster libraries) cannot
     # resolve it. It is deployed to clusters via default_libraries
     # (quintoandar_logger-*.whl). For local dev / CI it is declared in
     # [dependency-groups].dev (uv installs it via the [tool.uv.sources] git entry
     # added below); production installs do not see it.
-    "spacy",
     "SQLAlchemy>=1.4.54",
     "sqlglot>=26.9.0",
     "trino>=0.305.0",
@@ -56,6 +45,37 @@ dependencies = [
     # QuintoAndar private API clients are intentionally absent from Requires-Dist.
     # See comment block below for the full explanation.
 ]
+
+# --- DAG custom_libraries only (never Requires-Dist on the published wheel) ---
+# These were never in the old monolith requirements.txt / requirements-freeze.txt;
+# each DAG installs them via `cluster.custom_libraries` on Databricks. The package
+# split import graph incorrectly promoted them to [project.dependencies], which made
+# pip install them on every cluster via default_libraries (30-minute install timeouts).
+#
+# [dependency-groups].dev below carries all of them so `uv sync` (devcontainer, CI
+# lint/type-check) resolves cleanly. The per-DBR env shims under envs/dbr-X-Y/ carry
+# only the subset that actually runs on that DBR version — matching what the cluster
+# sees — so that `make sync-dbr DBR=X` gives an accurate local mirror:
+#
+#   envs/dbr-13-3  (Python 3.10, also covers DBR 14.3):
+#     facebook-business==23.0.1  → facebook_insights_impression_device/region (13.3)
+#     google-api-python-client   → google_search_console/classified/analytics (13.3)
+#     kafka-python==2.0.3        → reverse_minority_report_ss (13.3)
+#     presidio-analyzer, spacy   → enrich_anonymization (14.3)
+#     pytopojson==1.0.0          → reverse_regions_polygon (13.3)
+#
+#   envs/dbr-16-4  (Python 3.12):
+#     ftfy                       → enrich_house_feature_inference (16.4)
+#     google-api-python-client   → reverse_reports/gsheets_cross/google_calendar/payable_accounts (16.4)
+#     gspread==5.5.0             → reverse_reports/gsheets_cross (16.4)
+#     hubspot-api-client         → hubspot_validation_suite (cluster = consolidation_s = 16.4)
+#     oauth2client==4.1.3        → google_calendar/payable_accounts_transactions (16.4)
+#
+#   envs/dbr-12-2: no heavy packages (no DAG with these libs runs on DBR 12.2)
+#
+#   langfuse (16.4): only here — conflicts with DBR-pinned grpcio in the env shims.
+#   facebook-business / gspread in this group come transitively via
+#     quintoandar-facebook-api-client / quintoandar-gsheets-api-client.
 
 # The following packages are required by production code but cannot be declared as
 # pip-resolvable Requires-Dist. They are intentionally absent from [project.dependencies]
@@ -149,10 +169,9 @@ override-dependencies = [
 ]
 
 [dependency-groups]
-# This group powers `make check-style` and `make type-check` for runtime —
-# linting and type-checking only. It deliberately does NOT install the
-# DBR-pinned libraries; those live in envs/dbr-X-Y/pyproject.toml so the
-# universal lockfile can resolve cleanly.
+# Default `uv sync` installs this group. It includes lint/type-check tools, QuintoAndar
+# git-sourced API clients, bietlejuice-core, and DAG-scoped PyPI libraries that are
+# omitted from the published wheel (installed on clusters via custom_libraries).
 #
 # To run tests against a specific DBR's pinned libs, use the env's venv:
 #   make sync-dbr DBR=16.4
@@ -190,6 +209,19 @@ dev = [
     # bietlejuice.base.airflow.enums shipped from core). Production wheels
     # never see this — Databricks installs both wheels via default_libraries.
     "bietlejuice-core",
+    # DAG-scoped libraries (see comment block "DAG custom_libraries only" above).
+    # facebook-business / gspread are transitive deps of quintoandar-facebook-api-client /
+    # quintoandar-gsheets-api-client (pinned versions in those packages).
+    "ftfy>=6.1.0",
+    "google-api-python-client>=2.48.0",
+    "hubspot-api-client>=9.0.0",
+    "kafka-python==2.0.3",
+    # langfuse: kept here only (not in envs/dbr-*/dev) — conflicts with DBR-pinned grpcio in those shims.
+    "langfuse==3.0.0",
+    "oauth2client==4.1.3",
+    "presidio-analyzer==2.2.357",
+    "pytopojson==1.0.0",
+    "spacy>=3.7.2,<4",
 ]
 
 [tool.pytest.ini_options]

@@ -73,4 +73,20 @@ dev = [
     "moto[s3]",
     "bietlejuice-core",
     "quintoandar-logger>=0.4.0",
+    # DAG-scoped packages that run on DBR 13.3 (Python 3.10) or DBR 14.3 (also Python 3.10;
+    # no separate envs/dbr-14-3 shim exists so those DAGs are covered here):
+    #
+    #   kafka-python     → reverse_minority_report_ss (13.3)
+    #   facebook-business → facebook_insights_impression_device / region (13.3, pin matches DAG)
+    #   pytopojson       → reverse_regions_polygon (13.3)
+    #   google-api-python-client → google_search_console / classified / analytics (13.3)
+    #   presidio-analyzer, spacy → enrich_anonymization (14.3, Python 3.10)
+    #
+    # langfuse / ftfy / oauth2client / gspread / hubspot-api-client live in envs/dbr-16-4.
+    "facebook-business==23.0.1",
+    "google-api-python-client>=2.48.0",
+    "kafka-python==2.0.3",
+    "presidio-analyzer==2.2.357",
+    "pytopojson==1.0.0",
+    "spacy>=3.7.2,<4",
 ]

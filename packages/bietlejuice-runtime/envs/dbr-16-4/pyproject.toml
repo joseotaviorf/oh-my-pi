@@ -88,4 +88,25 @@ dev = [
     # cluster, default_libraries installs both bietlejuice wheels.
     "bietlejuice-core",
     "quintoandar-logger>=0.4.0",
+    # DAG-scoped packages that run on DBR 16.4 (Python 3.12):
+    #
+    #   ftfy                    → enrich_house_feature_inference (16.4)
+    #   google-api-python-client → reverse_reports / gsheets_cross / google_calendar /
+    #                              payable_accounts_transactions (all 16.4)
+    #   hubspot-api-client      → hubspot_validation_suite (cluster = consolidation_s = 16.4)
+    #   oauth2client            → google_calendar / payable_accounts_transactions (16.4)
+    #   gspread                 → reverse_reports / gsheets_cross (16.4); pin matches
+    #                              quintoandar_gsheets_api_client transitive dep
+    #
+    # kafka-python / pytopojson / presidio-analyzer / spacy / facebook-business:
+    #   those DAGs run on DBR 13.3 or 14.3 — see envs/dbr-13-3.
+    # langfuse (16.4): conflicts with DBR-pinned grpcio==1.60.0; available in root dev group.
+    "ftfy>=6.1.0",
+    "google-api-python-client>=2.48.0",
+    "gspread==5.5.0",
+    "hubspot-api-client>=9.0.0",
+    "oauth2client==4.1.3",
+    # setuptools provides the distutils shim required by pyspark==3.5.3 on Python 3.12
+    # (pyspark/sql/pandas/utils.py imports distutils; removed from stdlib in 3.12).
+    "setuptools>=60.0",
 ]

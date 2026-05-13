@@ -65,4 +65,7 @@ dev = [
     "moto[s3]",
     "bietlejuice-core",
     "quintoandar-logger>=0.4.0",
+    # No DAG with any of the heavy packages (spacy/presidio/langfuse/kafka/gspread/…)
+    # runs on DBR 12.2. Those packages live in envs/dbr-13-3 (13.3/14.3 DAGs) and
+    # envs/dbr-16-4 (16.4 DAGs) only. See root pyproject.toml for the full mapping.
 ]

@@ -9,18 +9,16 @@ modules remain untouched for every other test in the same pytest run
 metastore by leaving ``MagicMock`` objects in place of the real libraries).
 """
 
-import importlib
-import sys
+import importlib.util
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[6]))
-
-_MODULE_PATH = (
-    "dags.for_rent.offboarding_categorization.spark_jobs"
-    ".load_offboarding_categorization_raw"
+_SPARK_JOB_PATH = (
+    Path(__file__).resolve().parents[6]
+    / "dags/for_rent/offboarding_categorization/spark_jobs"
+    / "load_offboarding_categorization_raw.py"
 )
 
 _IMPORT_TIME_MOCKS = {
@@ -38,7 +36,11 @@ _IMPORT_TIME_MOCKS = {
 }
 
 with patch.dict("sys.modules", _IMPORT_TIME_MOCKS):
-    _job = importlib.import_module(_MODULE_PATH)
+    _spec = importlib.util.spec_from_file_location(
+        "load_offboarding_categorization_raw", _SPARK_JOB_PATH
+    )
+    _job = importlib.util.module_from_spec(_spec)
+    _spec.loader.exec_module(_job)
 
 build_session_metadata_parquet_uri = _job.build_session_metadata_parquet_uri
 get_forno_adjusted_data_science_path = _job.get_forno_adjusted_data_science_path
