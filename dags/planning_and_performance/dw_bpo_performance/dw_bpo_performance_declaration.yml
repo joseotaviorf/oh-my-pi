@@ -9,6 +9,9 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: bpo_performance
+  inner_dependencies:
+    cases_perspective:
+      - tickets_perspective
   default_extraction_type: full
   default_partitions: [year, month, day]
   extra_query_template_params:
@@ -85,7 +88,7 @@ cluster:
   type: custom_cluster
   custom_configurations:
     driver_node_type_id: r5a.2xlarge
-    node_type_id: r5a.2xlarge
+    node_type_id: r5a.4xlarge
     spark_version: 16.4.x-scala2.12
     num_workers: 4
     spark_conf:
