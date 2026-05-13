@@ -32,3 +32,4 @@ FROM docs_demand_resend_events AS e
     ON e.uuid_person = u.uuid_person
   INNER JOIN datalake_ebdb_clean.house AS h
     ON e.id_house = h.id
+

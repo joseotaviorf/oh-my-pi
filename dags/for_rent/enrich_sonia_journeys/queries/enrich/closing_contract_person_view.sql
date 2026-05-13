@@ -63,3 +63,4 @@ FROM
 LEFT JOIN
   lake_contract_person AS lake
     ON event.id_contract_person = lake.id_contract_person
+

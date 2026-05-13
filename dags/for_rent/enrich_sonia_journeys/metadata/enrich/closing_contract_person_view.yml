@@ -33,3 +33,4 @@ columns:
       - datalake_ebdb_clean.contract_person.name
       - datalake_cdp_clean.transactional.event_properties
     description: Last name extracted from Lake contract person name with fallback to event payload name for the same contract person id.
+
