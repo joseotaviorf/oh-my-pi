@@ -27,7 +27,7 @@ So treat the canonical order as the **analytical scaffold**, not a guarantee of 
 ## Glossary and Synonyms
 
 - **3P**, **rede**, **rede de parceiros**, **marketplace** → third-party broker network — the only acquisition channel covered by this entity. In `dw_growth.obt_supply` it appears as `acquisition_origin = 'rede'`.
-- **BSP** (Broker Supply Platform), **portal do parceiro** → the partner-broker portal where leads are submitted; most BSP-side timestamps are suffixed `_in_bsp` (e.g. `ts_discarded_in_bsp`, `ts_first_not_converted_in_bsp`).
+- **BSP** (Broker Supply Processor), **portal do parceiro** → the partner-broker portal where leads are submitted; most BSP-side timestamps are suffixed `_in_bsp` (e.g. `ts_discarded_in_bsp`, `ts_first_not_converted_in_bsp`).
 - **Main** → QuintoAndar's main listing system; the lead is registered there from BSP and a listing is later published. Status and timestamps on the main side are prefixed `current_main_*` or `ts_first_listing` / `ts_availability_check_*`.
 - **Draft listing**, **listing draft**, **rascunho de anúncio** → the standard term for a 3P lead once it reaches main. After `ts_first_registered_from_bsp_to_main`, the lead is materialised on main as a draft listing whose lifecycle (availability check, publication, unpublication) is what `current_main_status` / `current_main_status_reason` describe. Tracked upstream in `datalake_3p_supply.listing_draft_status` and surfaced in `dim_current_conversion_funnel` via `sk_listing_draft_status` (`-1` when the lead never reached main).
 - **Lead 3P**, **lead da rede** → a single property submission from a partner broker (`dim_lead_3p` grain).
@@ -128,8 +128,10 @@ The enrich layer (`datalake_3p_supply.lead_3p`, `lead_3p_status_changes`, `listi
 
 ### Broker (N:1)
 
-- `f.sk_broker = core_brokers.brokers.sk_broker` (`-1` when not linked).
-- A company may have multiple brokers; each lead-flow is attributed to one.
+- `f.sk_broker = dw_brokers.dim_broker.sk_broker` (`-1` when not linked) — analytical join. The same key resolves on `core_brokers.brokers.sk_broker` upstream.
+- For full broker / partner context — Marketplace business models, broker products, status / tier / account-manager history, agents 3P, and the canonical identification of 3P records in other entities — see [`broker_xp.md`](./broker_xp.md). This entity is the rede sub-funnel under that umbrella.
+- For the **demand-side counterpart** of the Marketplace — 3P Demand (TSC) and 3P Lead Gen (CQA) funnels, Buyer Prospects (NBP / RBP), Visit → Offer → CCV sub-stages, drop reasons, broker-demand attribution — see [`3p_demand.md`](./3p_demand.md). Together, supply and demand are the two halves of the same partner business.
+- **Post-publication on the main system** (what happens *after* `ts_first_listing`) — daily snapshot of published listings with demand metrics (`dw_sale.fact_daily_ongoing_listing`), search results / LPV events (`dw_public.fact_search_session_event`), listing version timeline (`dw_sale_listings.fact_listings`), and listing status transitions (`dw_sale_listings.fact_listing_status`) — is covered in [`broker_xp.md`](./broker_xp.md), section *"Listings — Visibility and Demand on 3P Supply"*. This entity (`3p_supply.md`) stops at first listing; that section picks up the visibility-to-CCV story on the main system.
 
 ### Company (N:1)
 

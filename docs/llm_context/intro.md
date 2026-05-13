@@ -21,7 +21,9 @@ Each entity file follows a standard structure:
 
 ### Available entities
 
-- `business_entities/3p_supply.md` — Third-party (rede) lead supply chain from BSP to first listing (rede / supply 3P / leads de parceiros / marketplace)
+- `business_entities/3p_demand.md` — 3P Demand — Broker XP: 3P demand funnel (Visit → Offer → CCV) and Buyer Prospects (TSC / 3P Demand / 3P Lead Gen / CQA)
+- `business_entities/3p_supply.md` — 3P Supply — Broker XP: funnel for capturing leads from commercial partners up to the first listing, covering the entire 3P supply journey (e.g., BSP, partner leads, partner network, and marketplace). Related to partner operations (see also `broker_xp.md` for details on the real estate and partner 3P Partners ecosystem).
+- `business_entities/broker_xp.md` — Partner real estate agencies (Brokers) and 3P Partners / Marketplace operation (Rede / 3P partners / Marketplace)
 - `business_entities/chatbot_sessions.md` — AI chatbot conversation sessions (sessões de chatbot / atendimento bot)
 - `business_entities/collections.md` — Overdue payment recovery operations (cobrança)
 - `business_entities/department.md` — Support queue routing and SLA targets (departamento / fila / caixa)
@@ -34,6 +36,7 @@ Each entity file follows a standard structure:
 - `business_entities/satisfaction.md` — Customer Satisfaction scores across channels (CSAT / satisfação)
 - `business_entities/supply.md` — Property owner acquisition funnel from lead to first listing (captação / supply / aquisição de proprietários)
 - `business_entities/termination.md` — Contract terminations (rescisões / offboarding)
+- `business_entities/visits.md` — Visit requests and scheduled property visits, capturing the full journey from visit intention to completion (agendamentos e realização de visitas a imóveis)
 
 ## Company-Wide Glossary
 
