@@ -52,7 +52,7 @@ columns:
     description: Timestamp of the first time the listing was unpublished (derived from audit history revisions).
   ts_contract_signed:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
       - datalake_rent_demand_events.rent_demand_events.ts_event
     description: Timestamp representing the date the contract was signed (SALE agreement or RENT contract signed event), if it exists.
   ts_enrollment_started:

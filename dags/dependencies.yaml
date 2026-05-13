@@ -3020,7 +3020,6 @@ bietlejuice.enrich_listing_deduplication:
   - bietlejuice.enrich_ebdb_listing:load-enrich-listing-business-context:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
-  - bietlejuice.enrich_listing_contracts:load-enrich-listing-contracts:first-run-of-day
   - bietlejuice.enrich_rent_demand_events:load-enrich-rent-demand-events:first-run-of-day
   - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup:first-run-of-day

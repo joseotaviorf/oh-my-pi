@@ -12,11 +12,17 @@ columns:
   id_address_parsed_short:
     description: MD5 hash of the parsed short address used for efficient address-based grouping and indexing.
       Generated from address_parsed_short to create a unique identifier for each normalized address pattern.
+    lineage:
+      - datalake_ebdb_clean.house.address
+      - datalake_ebdb_clean.house.number
+      - datalake_ebdb_clean.house.complement
   id_house:
     description: The unique identifier for each house in the EBDB system.
     lineage:
       - datalake_ebdb_clean.house.id
   id_house_duplicated:
+    lineage:
+      - datalake_ebdb_clean.house.id
     description: ID of the house that represents the previous listing in the duplicate sequence (first_listing_order - 1).
   id_user_listing_registrant_rent:
     description: User identifier who registered the house for rent listing.
@@ -27,19 +33,23 @@ columns:
     lineage:
       - datalake_ebdb_listing.listing_business_context.user_listing_registrant_sale
   address_full:
-    description: Complete formatted address including street, number, complement, neighborhood, and zipcode.
+    description: |
+      Pipeline address string used downstream: street, number (digits only in this DAG), raw complement,
+      neighborhood, and zipcode. City is not concatenated into this column in house_parsed output.
     lineage:
       - datalake_ebdb_clean.house.address
       - datalake_ebdb_clean.house.number
       - datalake_ebdb_clean.house.complement
       - datalake_ebdb_clean.house.neighborhood
-      - datalake_ebdb_clean.house.city
       - datalake_ebdb_clean.house.zipcode
   address_parsed_short:
-    description: Shortened address format using normalized and parsed complement information for deduplication purposes.
+    description: |
+      Short deduplication key: street, digit-normalized number, and parsed complement (normalized text
+      and regex-derived parts). Excludes neighborhood, city, and zipcode.
     lineage:
       - datalake_ebdb_clean.house.address
       - datalake_ebdb_clean.house.number
+      - datalake_ebdb_clean.house.complement
   supply_source:
     description: Overall supply source prioritizing CIQ when available and aligned to the first listing.
     lineage:
@@ -53,10 +63,24 @@ columns:
     lineage:
       - datalake_supply_flows.conversion_lookup.supply_source
   first_listing_order:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+      - datalake_ebdb_clean.house.address
+      - datalake_ebdb_clean.house.number
+      - datalake_ebdb_clean.house.complement
     description: Ranking order of listing creation within duplicate address groups, ordered by ts_first_listing.
   is_duplicated:
+    lineage:
+      - datalake_ebdb_clean.house.address
+      - datalake_ebdb_clean.house.number
+      - datalake_ebdb_clean.house.complement
     description: Boolean flag indicating whether this house has duplicate listings based on parsed address matching.
   is_first_listing_in_duplicates:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context.ts_first_listing
+      - datalake_ebdb_clean.house.address
+      - datalake_ebdb_clean.house.number
+      - datalake_ebdb_clean.house.complement
     description: Boolean flag indicating if this is the first listing among duplicates (first_listing_order = 1 and is_duplicated = true).
   ts_first_listing_sale:
     description: Timestamp of the first sale listing creation for this house.

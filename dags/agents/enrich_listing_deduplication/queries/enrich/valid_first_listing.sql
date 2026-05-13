@@ -41,12 +41,15 @@ house_listing_status_by_context AS (
 ),
 draft_contract AS (
   SELECT
-    id_house,
-    ts_contract_created
+    l.id_house,
+    MIN(l.ts_state_started) FILTER(WHERE l.business_context = "RENT") AS ts_created_draft_contract_rent,
+    MIN(l.ts_state_started) FILTER(WHERE l.business_context = "SALE") AS ts_created_draft_contract_sale
   FROM
-    datalake_listing_contracts.listing_contracts
-  WHERE
-    contract_status = 'Minuta'
+    datalake_ebdb_listing.listing_business_context_status_history AS l
+  WHERE 
+    l.status_reason = 'ContractDraft'
+    AND l.ts_state_started IS NOT NULL
+  GROUP BY ALL
 ),
 rent_ongoing_contract AS (
   SELECT
@@ -76,14 +79,28 @@ indica_ai_listings AS (
 published_days AS (
   SELECT 
       id_house,
-      SUM(CASE WHEN business_context = 'RENT' THEN DATEDIFF(
-        LEAST(COALESCE(ts_state_ended, DATE(NOW())), ts_first_publication + INTERVAL 60 DAY), 
-        GREATEST(ts_state_started, ts_first_publication)
-      ) ELSE 0 END) AS total_days_published_within_60_days_rent,
-      SUM(CASE WHEN business_context = 'SALE' THEN DATEDIFF(
-        LEAST(COALESCE(ts_state_ended, DATE(NOW())), ts_first_publication + INTERVAL 60 DAY), 
-        GREATEST(ts_state_started, ts_first_publication)
-      ) ELSE 0 END) AS total_days_published_within_60_days_sale,
+      SUM(
+        CASE 
+          WHEN business_context = 'RENT' 
+            THEN TIMESTAMPDIFF(
+              DAY,
+              GREATEST(ts_state_started, ts_first_publication),
+              LEAST(COALESCE(ts_state_ended, DATE(NOW())), ts_first_publication + INTERVAL 60 DAY)
+            ) 
+          ELSE 0 
+        END
+      ) AS total_days_published_within_60_days_rent,
+      SUM(
+        CASE 
+          WHEN business_context = 'SALE' 
+            THEN TIMESTAMPDIFF(
+              DAY,
+              GREATEST(ts_state_started, ts_first_publication),
+              LEAST(COALESCE(ts_state_ended, DATE(NOW())), ts_first_publication + INTERVAL 60 DAY)
+            ) 
+          ELSE 0 
+        END
+      ) AS total_days_published_within_60_days_sale,
       MIN(ts_first_publication) FILTER(WHERE business_context = 'RENT') AS ts_first_publication_rent,
       ts_first_publication_rent + INTERVAL 60 DAY AS ts_60_days_after_first_publication_rent,
       MIN(ts_first_publication) FILTER(WHERE business_context = 'SALE') AS ts_first_publication_sale,
@@ -93,6 +110,7 @@ published_days AS (
   WHERE 
     status = 'PUBLISHED'
     AND ts_state_started < ts_first_publication + INTERVAL 60 DAY
+    AND is_last_state_of_day IS TRUE
   GROUP BY 1
 ),
 accumulated_published_days AS (
@@ -146,9 +164,9 @@ SELECT
   ld.id_house AS id_house_duplicated,
   ld.id_user_listing_registrant_rent AS id_user_listing_registrant_rent_duplicated,
   ld.id_user_listing_registrant_sale AS id_user_listing_registrant_sale_duplicated,
-  DATEDIFF(DATE(h.ts_contract_signed_rent), DATE(h.ts_first_listing_rent)) AS days_between_fl_to_cs,
-  DATEDIFF(DATE(h.ts_contract_signed_sale), DATE(h.ts_first_listing_sale)) AS days_between_fl_to_ccv,
-  ABS(DATEDIFF(h.ts_first_listing_rent, h.ts_first_listing_sale)) AS days_between_fl_hybrid,
+  TIMESTAMPDIFF(DAY, h.ts_first_listing_rent, h.ts_contract_signed_rent) AS days_between_fl_to_cs,
+  TIMESTAMPDIFF(DAY, h.ts_first_listing_sale, h.ts_contract_signed_sale) AS days_between_fl_to_ccv,
+  ABS(TIMESTAMPDIFF(DAY, h.ts_first_listing_rent, h.ts_first_listing_sale)) AS days_between_fl_hybrid,
   pd.total_days_published_within_60_days_rent,
   pd.total_days_published_within_60_days_sale,
   CASE
@@ -190,14 +208,15 @@ SELECT
   roc.is_ongoing_contract IS TRUE AS is_house_rented,
   h.ts_contract_signed_sale IS NOT NULL AS is_house_sold,
   h.is_hybrid_house,
-  dc.id_house IS NOT NULL AND dc.ts_contract_created < (h.ts_first_listing_rent + INTERVAL 15 DAY) AS is_draft_contract,
-  DATEDIFF(h.ts_contract_signed_rent, h.ts_first_listing_rent) <= 60 AS is_signed_cs_within_60_days,
-  DATEDIFF(h.ts_contract_signed_sale, h.ts_first_listing_sale) <= 60 AS is_signed_ccv_within_60_days,
+  dc.id_house IS NOT NULL AND dc.ts_created_draft_contract_rent < (h.ts_first_listing_rent + INTERVAL 15 DAY) AS is_draft_contract_rent,
+  h.ts_contract_signed_rent <= h.ts_first_listing_rent + INTERVAL 60 DAYS AS is_signed_cs_within_60_days,
+  h.ts_contract_signed_sale <= h.ts_first_listing_sale + INTERVAL 60 DAYS AS is_signed_ccv_within_60_days,
   ia.is_indica_ai,
   roc.is_ongoing_contract AS is_ongoing_rent_contract,
   apd.dt_15_published_accumulated_days_rent,
   apd.dt_15_published_accumulated_days_sale,
-  dc.ts_contract_created AS ts_created_draft_contract_rent,
+  dc.ts_created_draft_contract_rent,
+  dc.ts_created_draft_contract_sale,
   h.ts_contract_signed_rent AS ts_first_contract_signed_rent,
   h.ts_contract_signed_sale AS ts_first_contract_signed_sale,
   LEAST(h.ts_first_listing_rent, h.ts_first_listing_sale) AS ts_first_listing,

@@ -34,7 +34,6 @@ WITH first_listing_conditions AS (
         CASE
             WHEN t.days_between_fl_to_cs <= 15 
                 OR t.dt_15_published_accumulated_days_rent IS NOT NULL 
-                OR t.is_draft_contract IS TRUE
                 THEN TRUE
             ELSE FALSE
         END AS is_compliance_general_rule_rent,
@@ -50,7 +49,7 @@ WITH first_listing_conditions AS (
                 THEN FALSE
             WHEN t2.house_listing_status IN ('RENTED', 'PUBLISHED') THEN FALSE
             WHEN DATE_DIFF(t.ts_first_listing, t2.ts_last_depublication) <= 7 AND t2.supply_source = '3P' THEN FALSE
-            WHEN DATE_DIFF(t.ts_first_listing, t2.ts_last_depublication) <= 180 AND t2.supply_source <> '3P' THEN FALSE
+            WHEN DATE_DIFF(t.ts_first_listing, t2.ts_last_depublication) <= 60 AND t2.supply_source <> '3P' THEN FALSE
             ELSE TRUE
         END AS is_valid_duplicated,
         --- HYBRID RULE + SUPPLY SOURCE RULE FOR RENT
@@ -91,7 +90,7 @@ WITH first_listing_conditions AS (
         ) AS reason_invalidation_general_rule_sale,
         IF(
             is_compliance_general_rule_rent IS FALSE,
-            "[General rule] The listing does not comply with the general rule: it must remain published for at least 15 days or have a signed or draft contract within that period.",
+            "[General rule] The listing does not comply with the general rule: it must remain published for at least 15 days or have a signed contract within that period.",
             NULL
         ) AS reason_invalidation_general_rule_rent,
 
@@ -107,8 +106,8 @@ WITH first_listing_conditions AS (
                 THEN "[Duplicate listing] A previous house listing is still active or rented."
             WHEN DATE_DIFF(t.ts_first_listing, t2.ts_last_depublication) <= 7 AND t2.supply_source = '3P'
                 THEN "[Duplicate listing] The last depublication for a 3P listing occurred less than 7 days ago."
-            WHEN DATE_DIFF(t.ts_first_listing, t2.ts_last_depublication) <= 180 AND t2.supply_source <> '3P'
-                THEN "[Duplicate listing] The last depublication for a CIQ listing occurred less than 180 days ago."
+            WHEN DATE_DIFF(t.ts_first_listing, t2.ts_last_depublication) <= 60 AND t2.supply_source <> '3P'
+                THEN "[Duplicate listing] The last depublication for a CIQ listing occurred less than 60 days ago."
         END AS reason_invalidation_duplicated,
 
         --- INVALIDATION REASON HYBRID RULE (RENT)
@@ -170,8 +169,11 @@ WITH first_listing_conditions AS (
         datalake_listing_deduplication.valid_first_listing AS t2
             ON t2.id_house = t.id_house_duplicated
     WHERE
-        t.consultant_type_rent IN ('CIQ_FULL', 'CIQ_MANAGER')
-        AND COALESCE(t.id_user_listing_registrant_rent, t.id_user_listing_registrant_sale) IS NOT NULL
+        COALESCE(t.id_user_listing_registrant_rent, t.id_user_listing_registrant_sale) IS NOT NULL
+        AND (
+            t.consultant_type_rent IN ('CIQ_FULL', 'CIQ_MANAGER')
+            OR t.consultant_type_sale IN ('CIQ_FULL', 'CIQ_MANAGER')
+        )
 ),
 union_first_listing AS (
     SELECT

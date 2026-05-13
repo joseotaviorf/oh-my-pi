@@ -8,6 +8,9 @@ WITH house_listing_consultant AS (
         hslc.ts_enrollment_started
     FROM
         datalake_big_agent.house_sale_listing_consultant AS hslc
+    WHERE
+        hslc.id_user IS NOT NULL
+        OR hslc.consultant_type = 'Core'
     UNION
     SELECT 
         hrlc.id_house,
@@ -24,6 +27,9 @@ WITH house_listing_consultant AS (
         ) AS ts_enrollment_started
     FROM
         datalake_big_agent.house_rent_listing_consultant AS hrlc
+    WHERE
+        hrlc.id_user IS NOT NULL
+        OR hrlc.consultant_type = 'Core'
 ),
 unpublished AS (
     SELECT 
@@ -127,11 +133,8 @@ house_first_listing AS (
         datalake_ebdb_clean.partner_agent AS pa
             ON pa.id_user = cfl.id_user
     WHERE
-        DATE(cfl.ts_updated) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
-        AND (
-            fcs.id_house IS NULL
-            OR fcs.ts_contract_signed = cfl.ts_contract_signed
-        )
+        fcs.id_house IS NULL
+        OR fcs.ts_contract_signed = cfl.ts_contract_signed
     GROUP BY ALL
 )
 SELECT 

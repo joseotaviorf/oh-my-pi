@@ -17,7 +17,7 @@ columns:
     lineage:
       - datalake_listing_deduplication.first_listing.id_user
     description: CIQ user identifier responsible for the SALE listing registration.
-  id_uuid_person_sale:
+  uuid_person_sale:
     lineage:
       - datalake_listing_deduplication.first_listing.uuid_person
     description: Person-level UUID of the CIQ user for the SALE context.
@@ -33,7 +33,7 @@ columns:
     lineage:
       - datalake_listing_deduplication.first_listing.id_user
     description: CIQ user identifier responsible for the RENT listing registration.
-  id_uuid_person_rent:
+  uuid_person_rent:
     lineage:
       - datalake_listing_deduplication.first_listing.uuid_person
     description: Person-level UUID of the CIQ user for the RENT context.
@@ -142,7 +142,7 @@ columns:
     description: Boolean flag indicating if the house currently has an ongoing rent contract.
   is_house_sold:
     lineage:
-      - datalake_offer.sale_offer.dt_sale_agreement_signed
+      - datalake_listing_deduplication.first_listing.ts_contract_signed
     description: Boolean flag indicating if the house has a signed sale agreement.
   is_hybrid_house:
     lineage:
@@ -153,12 +153,12 @@ columns:
     lineage:
       - datalake_ebdb_contract.contract.is_ongoing_contract
     description: Whether there is any ongoing rent contract for the house.
-  is_draft_contract:
+  is_draft_contract_rent:
     lineage:
-      - datalake_listing_contracts.listing_contracts.ts_contract_created
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
       - datalake_listing_deduplication.first_listing.ts_first_listing
-    description: Boolean flag indicating if a draft contract ('Minuta') was created within 15 days
-      of the first rent listing publication.
+    description: Boolean flag indicating if a rent draft contract ('Minuta') state started within 15 days
+      of the first rent listing publication (ContractDraft in listing status history).
   is_signed_cs_within_60_days:
     lineage:
       - datalake_listing_deduplication.first_listing.ts_contract_signed
@@ -209,6 +209,10 @@ columns:
       - datalake_listing_deduplication.first_listing.ts_contract_signed
     description: Timestamp of the first sale agreement (CCV) signing.
       Direct mapping from the aggregated sale agreement timestamp.
+  ts_first_listing:
+    lineage:
+      - datalake_listing_deduplication.first_listing.ts_first_listing
+    description: Earliest first-listing timestamp across RENT and SALE contexts for the house (LEAST of both).
   ts_initial_first_listing_rent:
     lineage:
       - datalake_listing_deduplication.first_listing.ts_first_listing
@@ -233,6 +237,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
     description: Timestamp of the last depublication event (UNPUBLISHED, SUSPENDED, or OPTED-OUT) across contexts.
+  ts_last_depublication_duplicated:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
+    description: Timestamp of the last depublication event across contexts for the duplicated house row.
   ts_last_depublication_rent:
     lineage:
       - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
@@ -253,5 +261,9 @@ columns:
       of the duplicated house. Used to track listing lifecycle events.
   ts_created_draft_contract_rent:
     lineage:
-      - datalake_listing_contracts.listing_contracts.ts_contract_created
-    description: Timestamp when the draft rent contract ('Minuta') was created.
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
+    description: Timestamp when the rent listing entered ContractDraft (minuta) in status history.
+  ts_created_draft_contract_sale:
+    lineage:
+      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
+    description: Timestamp when the sale listing entered ContractDraft (minuta) in status history.

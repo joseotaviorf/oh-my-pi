@@ -101,6 +101,7 @@ parsing_skip_list:
 
   # Complex syntax / token parsing issues
   - dags/governance/enrich_trino/queries/enrich/trino_detractor_queries.sql
+  - dags/agents/enrich_listing_deduplication/queries/enrich/listing_deduplication.sql
 
   # 1223 lines with multiple UNION ALL - too complex for parser
   - dags/growth/enrich_semrush/queries/enrich/keywords_from_players.sql
