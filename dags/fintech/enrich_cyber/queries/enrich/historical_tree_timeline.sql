@@ -401,6 +401,4 @@ SELECT
     DAY(cd.aux_date) AS day
 FROM
     calendar_dim AS cd
-GROUP BY
-    cd.id_contract_external,
-    DATE(cd.aux_date)
+GROUP BY ALL
