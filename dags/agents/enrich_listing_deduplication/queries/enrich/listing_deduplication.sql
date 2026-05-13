@@ -44,7 +44,7 @@ WITH house as (
                                     'aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC'
                                 )
                             ),
-                            '\\p{M}', ''
+                            '\\p{{M}}', ''
                         ),
                         '[^a-z0-9\\s]', ' '
                     ),
