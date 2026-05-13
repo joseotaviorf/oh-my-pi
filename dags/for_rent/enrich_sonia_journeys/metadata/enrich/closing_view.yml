@@ -34,6 +34,16 @@ columns:
     lineage:
       - datalake_cdp_clean.transactional.ts_event
     description: Contract sent event time formatted as yyyy-MM-dd HH:mm:ss (timezone as stored in CDP source).
+  ts_canceled:
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+    description: |
+      Contract canceled event time formatted as yyyy-MM-dd HH:mm:ss when a later rent_flow_contract_canceled exists for the same rent flow.
+  ts_signed:
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+    description: |
+      Contract signed event time formatted as yyyy-MM-dd HH:mm:ss when a later rent_flow_contract_signed exists for the same rent flow.
   is_canceled:
     lineage:
       - datalake_cdp_clean.transactional.event_name

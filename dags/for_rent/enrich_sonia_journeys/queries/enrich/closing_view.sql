@@ -61,7 +61,9 @@ WITH
     SELECT
       c_sent.*,
       c_canceled.id_event IS NOT NULL AS is_canceled,
-      c_signed.id_event IS NOT NULL AS is_signed
+      c_signed.id_event IS NOT NULL AS is_signed,
+      c_canceled.ts_canceled,
+      c_signed.ts_signed
     FROM
       contract_sent_events AS c_sent
       LEFT JOIN contract_canceled_events AS c_canceled
@@ -94,6 +96,8 @@ SELECT
   concat_ws(', ', CAST(h.address AS STRING), CAST(h.number AS STRING)) AS address_text,
   s.id_rent_flow,
   date_format(s.ts_sent, 'yyyy-MM-dd HH:mm:ss') AS ts_sent,
+  date_format(s.ts_canceled, 'yyyy-MM-dd HH:mm:ss') AS ts_canceled,
+  date_format(s.ts_signed, 'yyyy-MM-dd HH:mm:ss') AS ts_signed,
   s.is_canceled,
   s.is_signed,
   s.user_role,
