@@ -20,6 +20,8 @@ workflow:
       - contracts
     agency_timeline:
       - contract_agency_distribution
+    historical_tree_timeline:
+      - queue_decision_tree
 cluster:
   type: custom_cluster
   databricks_conn_id: databricks_new_env

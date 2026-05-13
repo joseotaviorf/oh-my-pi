@@ -2200,6 +2200,7 @@ bietlejuice.enrich_cyber:
   - bietlejuice.cyber:load-clean-eviction-decision-tree:first-run-of-day
   - bietlejuice.cyber:load-clean-evictions-label-decision-tree:first-run-of-day
   - bietlejuice.cyber:load-clean-historical-agreements:first-run-of-day
+  - bietlejuice.cyber_historical_tree:load-clean-historical-tree-decision:first-run-of-day
   - bietlejuice.cyber:load-clean-history-contract-distribution:first-run-of-day
   - bietlejuice.cyber:load-clean-logs-code-description:first-run-of-day
   - bietlejuice.cyber:load-clean-logs-valid-result-code:first-run-of-day

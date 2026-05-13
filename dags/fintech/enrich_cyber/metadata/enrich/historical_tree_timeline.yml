@@ -1,0 +1,166 @@
+---
+database_name: datalake_cyber
+table_name: historical_tree_timeline
+owner: juliana.hocihara@quintoandar.com.br
+domain: Fintech
+description: One row per contract and calendar day, built from
+  datalake_cyber_clean.historical_tree_decision using each dimension last-change
+  date (HIQCHGDT and HILCHGDT mapped to dt_*_update) as interval starts with
+  LEAD for the next change, analogous to queue_timeline queue timestamps.
+columns:
+  id_contract_external:
+    description: "External contract identifier derived from Cyber contract number,
+      consistent with other Cyber enrich timelines."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.id_contract
+  id:
+    description: "Client document or party identifier from the historical tree
+      snapshot (HISSNUM)."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.id
+  id_contract:
+    description: "Cyber internal contract number including version suffix when present."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.id_contract
+  contract_group:
+    description: "Cyber contract group code for the snapshot."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.contract_group
+  segmentation_queue:
+    description: "Segmentation queue code effective for the reference date, keyed by
+      dt_segmentation_queue_update from Cyber."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.segmentation_queue
+  segmentation_queue_description:
+    description: "Human-readable segmentation queue name from queue_decision_tree."
+    lineage:
+      - datalake_cyber.queue_decision_tree.queue_name
+  commission_queue:
+    description: "Commission queue code effective for the reference date, keyed by
+      dt_commission_queue_update from Cyber."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.commission_queue
+  commission_queue_description:
+    description: "Reserved description column for commission queue; not joined to
+      decision tree in this model."
+  agreement_queue:
+    description: "Agreement queue code effective for the reference date, keyed by
+      dt_agreement_queue_update from Cyber."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.agreement_queue
+  agreement_queue_description:
+    description: "Human-readable agreement queue name from queue_decision_tree."
+    lineage:
+      - datalake_cyber.queue_decision_tree.queue_name
+  digital_channel_queue:
+    description: "Digital channel queue code effective for the reference date, keyed
+      by dt_digital_channel_queue_update from Cyber."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.digital_channel_queue
+  digital_channel_queue_description:
+    description: "Human-readable digital channel queue name from queue_decision_tree."
+    lineage:
+      - datalake_cyber.queue_decision_tree.queue_name
+  eviction_queue:
+    description: "Eviction queue code effective for the reference date, keyed by
+      dt_eviction_queue_update from Cyber."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.eviction_queue
+  eviction_queue_description:
+    description: "Human-readable eviction queue name from queue_decision_tree."
+    lineage:
+      - datalake_cyber.queue_decision_tree.queue_name
+  credit_denial_queue:
+    description: "Credit denial queue code effective for the reference date, keyed
+      by dt_credit_denial_queue_update from Cyber."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.credit_denial_queue
+  credit_denial_queue_description:
+    description: "Human-readable credit denial queue name from queue_decision_tree."
+    lineage:
+      - datalake_cyber.queue_decision_tree.queue_name
+  olos_dialer_label:
+    description: "OLOS dialer label code effective on the reference date, keyed by
+      dt_olos_dialer_label_update."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.olos_dialer_label
+  olos_dialer_label_description:
+    description: "Human-readable OLOS dialer label from queue_decision_tree when a
+      matching code exists."
+    lineage:
+      - datalake_cyber.queue_decision_tree.queue_name
+  evictions_reason:
+    description: "Evictions reason label code effective on the reference date, keyed
+      by dt_evictions_reason_update."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.evictions_reason
+  evictions_reason_description:
+    description: "Reserved label description; no matching Cyber decision tree is
+      joined for this slot in enrich."
+  campaign_label:
+    description: "Campaign label code effective on the reference date, keyed by
+      dt_campaign_label_update."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.campaign_label
+  campaign_label_description:
+    description: "Human-readable campaign label from queue_decision_tree when a
+      matching code exists."
+    lineage:
+      - datalake_cyber.queue_decision_tree.queue_name
+  serasa_limpa_nome_label:
+    description: "Serasa limpa nome label code effective on the reference date,
+      keyed by dt_serasa_limpa_nome_label_update."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.serasa_limpa_nome_label
+  serasa_limpa_nome_label_description:
+    description: "Human-readable Serasa limpa nome label from queue_decision_tree
+      when a matching code exists."
+    lineage:
+      - datalake_cyber.queue_decision_tree.queue_name
+  evictions_label:
+    description: "Evictions label code effective on the reference date, keyed by
+      dt_evictions_label_update."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.evictions_label
+  evictions_label_description:
+    description: "Human-readable evictions label from queue_decision_tree when a
+      matching code exists."
+    lineage:
+      - datalake_cyber.queue_decision_tree.queue_name
+  label_6:
+    description: "Sixth label slot code effective on the reference date, keyed by
+      dt_not_collection_label_update."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.label_6
+  label_6_description:
+    description: "Reserved label description; no matching Cyber decision tree is
+      joined for label 6 in enrich."
+  days_delayed:
+    description: "Days delinquent from the preferred historical row for that day
+      (segmentation, then agreement, then any matching dimension)."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.days_delayed
+  outstanding_balance:
+    description: "Outstanding balance from the preferred historical row for that day
+      (segmentation, then agreement, then any matching dimension)."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.outstanding_balance
+  total_delayed_amount:
+    description: "Total delayed amount from the preferred historical row for that
+      day (segmentation, then agreement, then any matching dimension)."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.total_delayed_amount
+  dt_due_date:
+    description: "Contract due date from the preferred historical row for that day
+      (segmentation, then agreement, then any matching dimension)."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.dt_due_date
+  ts_record_insertion:
+    description: "Cyber insertion timestamp from the preferred historical row for
+      that day (segmentation, then agreement, then any matching dimension)."
+    lineage:
+      - datalake_cyber_clean.historical_tree_decision.ts_record_insertion
+  dt_reference:
+    description: "Calendar date for the timeline row, within the incremental load window."
+    lineage:
+      - datalake_quintoandar.aux_date.date
