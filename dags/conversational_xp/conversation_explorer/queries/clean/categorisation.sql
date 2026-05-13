@@ -1,0 +1,21 @@
+SELECT
+    id_langfuse_session,
+    session_date,
+    channel,
+    is_escalated,
+    first_queue,
+    last_queue,
+    category,
+    subcategory,
+    resolution_category,
+    resolution_refinement_category,
+    ai_resistance,
+    frustration,
+    summary,
+    year,
+    month,
+    day
+FROM
+    datalake_conversational_explorer_raw.categorisation
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL 1 DAY AND DATE('{load_end_date}')

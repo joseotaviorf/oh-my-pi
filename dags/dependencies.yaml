@@ -1,6 +1,8 @@
 ---
 bietlejuice.amplitude_subpartitioned:
   - bietlejuice.amplitude_new:load-clean-events:first-run-of-day
+bietlejuice.conversation_explorer:
+  - quintoml.chatbot.wall_e_session_categoriser.inference:first-run-of-day
 bietlejuice.core_aux_listing:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house-aud
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context-aud

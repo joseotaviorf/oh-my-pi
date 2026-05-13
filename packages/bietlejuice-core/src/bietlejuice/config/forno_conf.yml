@@ -35,6 +35,7 @@ dags_out_of_pattern:
         "enrich_lost_listings",
         "enrich_table_dependency_tree",
         "enrich_vespucio_pipeline",
+        "quintoml.chatbot.wall_e_session_categoriser.inference",
         "quintoml.copilot.text2filter_evals.inference",
         "quintoml.post_contract.wall_e_offboarding_categoriser.inference",
         "quintoml.recs.house_user_embeddings.inference",

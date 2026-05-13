@@ -1,0 +1,39 @@
+---
+database_name: datalake_conversational_explorer_raw
+table_name: categorisation
+description: "Daily session-level chatbot categorization stats produced by the Wall-E session categoriser model. Each row represents one Langfuse session with its category, resolution, escalation, and sentiment metadata."
+domain: "Conversational XP"
+owner: "joao.padrao@quintoandar.com.br"
+columns:
+  id_langfuse_session:
+    description: "Unique identifier for the Langfuse tracing session."
+  session_date:
+    description: "Date (YYYY-MM-DD) when the chatbot session occurred."
+  channel:
+    description: "Communication channel of the session (e.g. in app, whatsapp)."
+  is_escalated:
+    description: "Whether the session was escalated to a human agent."
+  first_queue:
+    description: "First support queue the session was routed to, if escalated."
+  last_queue:
+    description: "Last support queue the session was routed to, if escalated."
+  category:
+    description: "High-level conversation category assigned by the model (e.g. pagamentos, visitas, rescisao)."
+  subcategory:
+    description: "Detailed subcategory within the main category."
+  resolution_category:
+    description: "How the session was resolved (no_resolution, informational_resolution, action_resolution)."
+  resolution_refinement_category:
+    description: "Refinement of the resolution (general_info, specific_info)."
+  ai_resistance:
+    description: "User resistance level toward the AI assistant (no_resistance, delayed_escalation, immediate_rejection)."
+  frustration:
+    description: "User frustration level during the session (no_frustration, external_frustration_only, bot_directed_frustration)."
+  summary:
+    description: "AI-generated natural language summary of the conversation."
+  year:
+    description: "Partition column: year extracted from session_date."
+  month:
+    description: "Partition column: month extracted from session_date."
+  day:
+    description: "Partition column: day extracted from session_date."

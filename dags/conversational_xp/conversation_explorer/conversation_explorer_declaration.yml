@@ -1,0 +1,49 @@
+dag:
+  name: conversation_explorer
+  schedule_start_date: 2026, 5, 7
+  catchup: false
+  owner: Data Conversational XP
+  documentation:
+    dag_purpose: |
+      Ingests the daily session categorisation parquet produced by the Wall-E
+      session categoriser model. Raw lands in datalake_conversational_explorer_raw, clean in datalake_conversational_explorer_clean.
+
+      The source file lives at s3://conversation-explorer-prod/session-metadata/YYYY-MM-DD.parquet
+      and is always yesterday's date relative to the execution date.
+
+      Scheduling: dataset-driven (no cron). Triggered after
+      quintoml.chatbot.wall_e_session_categoriser.inference emits its :first-run-of-day dataset.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_conversation_explorer
+  default_extraction_type: full
+  default_partitions: [year, month, day]
+
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{table_name}"
+    - "{partitions}"
+    - "{{ dag_run.conf.get('date', '') }}"
+
+  tables_customization:
+    categorisation:
+      partitions:
+        - year
+        - month
+        - day
+
+cluster:
+  type: databricks_16_4_med_general_cluster
+  access_control_list:
+    group_name: data-products
+    permission_level: CAN_MANAGE
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new_env
