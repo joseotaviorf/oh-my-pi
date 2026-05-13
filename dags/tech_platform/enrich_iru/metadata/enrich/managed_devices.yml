@@ -1,0 +1,121 @@
+database_name: datalake_iru
+table_name: managed_devices
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+description: |
+  Current-state IRU/Kandji managed devices: latest ingest partition within the Airflow batch window and one row
+  per device (not a historical stack of partitions). Derived from clean by keeping MAX(year, month, day) in
+  scope and deduplicating by device with QUALIFY.
+columns:
+  id_device:
+    description: Unique device identifier in IRU/Kandji (UUID format).
+    lineage:
+      - datalake_iru_clean.managed_devices.id_device
+  ds_serial_number:
+    description: Device serial number.
+    lineage:
+      - datalake_iru_clean.managed_devices.ds_serial_number
+  id_udid:
+    description: Device unique identifier (UDID).
+    lineage:
+      - datalake_iru_clean.managed_devices.id_udid
+  nm_device:
+    description: Device display name in IRU.
+    lineage:
+      - datalake_iru_clean.managed_devices.nm_device
+  nm_model:
+    description: Device model name (e.g. MacBook Pro 14-inch).
+    lineage:
+      - datalake_iru_clean.managed_devices.nm_model
+  ds_platform:
+    description: Device platform (e.g. Mac, iPhone, iPad).
+    lineage:
+      - datalake_iru_clean.managed_devices.ds_platform
+  ds_os_version:
+    description: Operating system version.
+    lineage:
+      - datalake_iru_clean.managed_devices.ds_os_version
+  ds_supplemental_build_version:
+    description: Supplemental build version for the OS.
+    lineage:
+      - datalake_iru_clean.managed_devices.ds_supplemental_build_version
+  id_blueprint:
+    description: Blueprint identifier associated with the device.
+    lineage:
+      - datalake_iru_clean.managed_devices.id_blueprint
+  nm_blueprint:
+    description: Blueprint name associated with the device.
+    lineage:
+      - datalake_iru_clean.managed_devices.nm_blueprint
+  ds_asset_tag:
+    description: Asset tag assigned to the device.
+    lineage:
+      - datalake_iru_clean.managed_devices.ds_asset_tag
+  id_user:
+    description: User identifier associated with the device.
+    lineage:
+      - datalake_iru_clean.managed_devices.id_user
+  nm_user:
+    description: User display name associated with the device.
+    lineage:
+      - datalake_iru_clean.managed_devices.nm_user
+  ds_user_email:
+    description: User email address associated with the device.
+    lineage:
+      - datalake_iru_clean.managed_devices.ds_user_email
+  is_user_archived:
+    description: Indicates if the user is archived in IRU.
+    lineage:
+      - datalake_iru_clean.managed_devices.is_user_archived
+  is_user_active:
+    description: Indicates if the user is active in IRU.
+    lineage:
+      - datalake_iru_clean.managed_devices.is_user_active
+  ds_agent_version:
+    description: Version of the IRU/Kandji agent installed on the device.
+    lineage:
+      - datalake_iru_clean.managed_devices.ds_agent_version
+  ds_lost_mode_status:
+    description: Lost mode status for the device.
+    lineage:
+      - datalake_iru_clean.managed_devices.ds_lost_mode_status
+  is_mdm_enabled:
+    description: Indicates if the device has MDM enabled.
+    lineage:
+      - datalake_iru_clean.managed_devices.is_mdm_enabled
+  is_agent_installed:
+    description: Indicates if the IRU agent is installed on the device.
+    lineage:
+      - datalake_iru_clean.managed_devices.is_agent_installed
+  is_missing:
+    description: Indicates if the device is marked as missing.
+    lineage:
+      - datalake_iru_clean.managed_devices.is_missing
+  is_removed:
+    description: Indicates if the device has been removed from management.
+    lineage:
+      - datalake_iru_clean.managed_devices.is_removed
+  ts_first_enrollment:
+    description: Timestamp when the device was first enrolled.
+    lineage:
+      - datalake_iru_clean.managed_devices.ts_first_enrollment
+  ts_last_enrollment:
+    description: Timestamp when the device was last enrolled.
+    lineage:
+      - datalake_iru_clean.managed_devices.ts_last_enrollment
+  ts_last_check_in:
+    description: Timestamp of the last device check-in.
+    lineage:
+      - datalake_iru_clean.managed_devices.ts_last_check_in
+  year:
+    description: Year of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_iru_clean.managed_devices.year
+  month:
+    description: Month of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_iru_clean.managed_devices.month
+  day:
+    description: Day of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_iru_clean.managed_devices.day

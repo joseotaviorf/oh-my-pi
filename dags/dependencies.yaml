@@ -2931,6 +2931,8 @@ bietlejuice.enrich_invoice:
 bietlejuice.enrich_iptu:
   - bietlejuice.iptu_bh:load-clean-iptu-bh:first-run-of-day
   - bietlejuice.iptu_poa:load-clean-iptu-poa:first-run-of-day
+bietlejuice.enrich_iru:
+  - bietlejuice.iru:load-clean-managed-devices:first-run-of-day
 bietlejuice.enrich_jira:
   - bietlejuice.jira:load-clean-issues:first-run-of-day
 bietlejuice.enrich_jira_bugs:
