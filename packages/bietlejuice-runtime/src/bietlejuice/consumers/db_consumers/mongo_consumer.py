@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timedelta
+from functools import reduce
 from multiprocessing import Pool
 
 from bson.json_util import (
@@ -17,6 +18,7 @@ from bietlejuice.services.json_service import JsonService
 logger = QuintoAndarLogger("MongoConsumer")
 NB_THREADS = 15
 NB_DOCUMENTS = 100000
+BATCH_SIZE = 20_000
 
 
 class MongoConsumer(DBConsumer):
@@ -97,28 +99,22 @@ class MongoConsumer(DBConsumer):
         return converted_data
 
     @logger(exclude_return=True)
-    def __convert_bson_documents_to_spark_dataframe(self, documents, nb_documents):
+    def __convert_batch_to_spark_dataframe(self, batch):
         """
-        Converts [a list of] bson documents to spark_dataframe using bson_dumps
-        :param documents: return get_documents method in MongoClient
-        :type documents: list of bson documents or a bson document
-        :param nb_documents: document count for the query (PyMongo 4+ has no Cursor.count)
-        :return: A Spark DataFrame with all columns of the string type
+        Converts a list of BSON documents to a Spark DataFrame.
+        :param batch: list of BSON documents (already materialised in memory)
+        :type batch: list
+        :return: A Spark DataFrame with all columns of string type, or None if empty
         """
-        # documents are a list of Bson (Mongo format), it's necessary to convert to dict.
         # convert  bson -> json_string -> dict
-
-        if nb_documents > NB_DOCUMENTS:
+        if len(batch) > NB_DOCUMENTS:
             # 2 = datetime ISO8601
             DEFAULT_JSON_OPTIONS.datetime_representation = 2
-            pool = Pool(processes=NB_THREADS)
-            data = []
-
-            bson_files = pool.map(bson_dumps, documents)
-            for i in bson_files:
-                data.append(json.loads(i))
+            with Pool(processes=NB_THREADS) as pool:
+                bson_files = pool.map(bson_dumps, batch)
+            data = [json.loads(i) for i in bson_files]
         else:
-            data = json.loads(bson_dumps(documents, json_options=RELAXED_JSON_OPTIONS))
+            data = json.loads(bson_dumps(batch, json_options=RELAXED_JSON_OPTIONS))
 
         converted_data = self.__convert_columns_to_string_type(data)
 
@@ -126,7 +122,7 @@ class MongoConsumer(DBConsumer):
             df = self.spark_client.create_dataframe(converted_data)
         except ValueError:
             logger.warning(
-                "m=__convert_bson_documents_to_spark_dataframe, msg=Spark DataFrame is empty"
+                "m=__convert_batch_to_spark_dataframe, msg=Spark DataFrame is empty"
             )
             df = None
 
@@ -220,9 +216,23 @@ class MongoConsumer(DBConsumer):
         :return: A Spark DataFrame with the query results.
         OBS: ALL fields are converted to string type
         """
-        documents, nb_documents = self.mongo_client.get_documents(table_name, query)
-        df = self.__convert_bson_documents_to_spark_dataframe(documents, nb_documents)
-        return df
+        dfs = []
+        for batch, nb_documents in self.mongo_client.get_documents_batched(
+            table_name, query, BATCH_SIZE
+        ):
+            logger.info(
+                f"m=get_data_from_query, table_name={table_name}, "
+                f"nb_documents={nb_documents}, batch_size={len(batch)}, "
+                f"msg=Processing batch..."
+            )
+            df = self.__convert_batch_to_spark_dataframe(batch)
+            if df is not None:
+                dfs.append(df)
+
+        if not dfs:
+            return None
+
+        return reduce(lambda a, b: a.unionByName(b, allowMissingColumns=True), dfs)
 
     @logger
     def get_table_schema(self, query, table_name=None):
@@ -258,6 +268,3 @@ class MongoConsumer(DBConsumer):
                 f"There are no values for '{column_name}' in '{table_name}' table"
             )
         return record_sample
-
-
-# Force deploy

@@ -85,6 +85,38 @@ class MongoClient(DBClient):
             )
             return documents, nb_documents
 
+    def get_documents_batched(self, mongo_collection, query, batch_size, **kwargs):
+        """
+        Yield successive batches of documents from a collection while the connection
+        is open. Unlike ``get_documents``, this never materialises the full result set
+        into memory — only ``batch_size`` documents are held at a time.
+
+        :param mongo_collection: Name of the collection
+        :param query: Filter query
+        :type query: dict
+        :param batch_size: Number of documents per yielded batch
+        :type batch_size: int
+        :yields: ``(batch: list[dict], nb_documents: int)`` — one chunk of documents
+            and the total document count for the query (constant across yields).
+        """
+        with self.conn as conn:
+            collection = conn[self.db][mongo_collection]
+            count_kwargs = {
+                k: v
+                for k, v in kwargs.items()
+                if k in ("skip", "limit", "hint", "maxTimeMS", "collation", "session")
+            }
+            nb_documents = collection.count_documents(query, **count_kwargs)
+            cursor = collection.find(query, **kwargs).batch_size(batch_size)
+            batch = []
+            for doc in cursor:
+                batch.append(doc)
+                if len(batch) >= batch_size:
+                    yield batch, nb_documents
+                    batch = []
+            if batch:
+                yield batch, nb_documents
+
     @logger(exclude_return=True)
     def run(self, command, parameters=None):
         """
