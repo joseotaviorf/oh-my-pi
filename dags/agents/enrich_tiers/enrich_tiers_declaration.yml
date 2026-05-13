@@ -35,7 +35,7 @@ workflow:
       merge_on: [id_metric_event]
       z_order_by: [id_metric_period, id_user]
     metric_period:
-      partitions: [year, bimester]
+      partitions: [year, month]
     ciq_first_listing:
       partitions: []
       extraction_type: full
