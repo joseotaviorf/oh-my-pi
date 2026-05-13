@@ -11,11 +11,11 @@ workflow:
   type: custom_ingestion
   load_spark_job: load_emlio_raw
   spark_job_arguments:
-  - "{environment}"
-  - "{bucket}"
-  - "{schema}"
-  - "{partitions}"
-  - "{{ data_interval_start | ds }}"
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{partitions}"
+    - "{{ data_interval_start | ds }}"
   execution_timeout_hours: 5
   default_extraction_type: incremental
   tables_customization:
@@ -37,8 +37,7 @@ cluster:
     permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
   custom_configurations:
-    spark_version: 12.2.x-scala2.12
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
