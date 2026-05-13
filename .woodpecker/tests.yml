@@ -12,16 +12,14 @@ steps:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
     pull: true
     commands:
-      - uv sync --directory packages/bietlejuice-core
-      - uv sync --directory packages/bietlejuice-airflow
-      # Runtime is a standalone uv project; sync it once for test steps.
-      - uv sync --directory packages/bietlejuice-runtime
-      # DBR-pinned tests run from the dbr-16-4 sub-project's venv. It mirrors
-      # DBR 16.4 LTS bundled libs (numpy, pandas, pyarrow, psycopg2, pydantic, ...)
-      # so CI imports resolve to the same versions seen on the cluster. Other
-      # DBRs (12.2 / 13.3) are not yet matrix-tested.
-      - uv sync --directory packages/bietlejuice-runtime/envs/dbr-16-4
-      - uv sync --directory packages/bietlejuice-compiler
+      # Re-link editable workspace packages and patch any new workspace deps (~1-2s).
+      # UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/workspace is set in the image.
+      - uv sync
+      # Symlink runtime venv paths into the workspace so the Makefile's
+      # `envs/dbr-16-4/.venv/bin/pytest` resolves to the pre-built image venvs at
+      # /opt/bietlejuice/venvs/ (present in images built from .container/Dockerfile).
+      - ln -sfn /opt/bietlejuice/venvs/runtime packages/bietlejuice-runtime/.venv
+      - ln -sfn /opt/bietlejuice/venvs/dbr-16-4 packages/bietlejuice-runtime/envs/dbr-16-4/.venv
     when:
       event: [push, pull_request]
 
