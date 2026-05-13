@@ -1,0 +1,113 @@
+database_name: datalake_zscaler
+table_name: managed_devices
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+description: |
+  Current-state Zscaler Client Connector managed devices: latest ingest partition within the Airflow batch window and one row
+  per device (not a historical stack of partitions). Derived from clean by keeping MAX(year, month, day) in
+  scope and deduplicating by device with QUALIFY.
+columns:
+  id_device:
+    description: Unique device identifier (UDID) in Zscaler.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.id_device
+  ds_mac_address:
+    description: Device MAC address.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.ds_mac_address
+  nm_hostname:
+    description: Machine hostname.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.nm_hostname
+  ds_user_email:
+    description: User email associated with the device.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.ds_user_email
+  nm_owner:
+    description: Device owner name.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.nm_owner
+  nm_device_model:
+    description: Device model name.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.nm_device_model
+  nm_manufacturer:
+    description: Device manufacturer.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.nm_manufacturer
+  ds_os_version:
+    description: Operating system version.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.ds_os_version
+  ds_agent_version:
+    description: Zscaler Client Connector agent version.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.ds_agent_version
+  nm_policy:
+    description: Policy name applied to the device.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.nm_policy
+  nm_company:
+    description: Company name.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.nm_company
+  ds_registration_state:
+    description: Device registration state.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.ds_registration_state
+  cd_device_type:
+    description: Device type code.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.cd_device_type
+  cd_device_state:
+    description: Device state code.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.cd_device_state
+  cd_vpn_state:
+    description: VPN state code.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.cd_vpn_state
+  ds_tunnel_version:
+    description: Tunnel version.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.ds_tunnel_version
+  ds_architecture:
+    description: Device architecture (e.g. x64, arm64).
+    lineage:
+      - datalake_zscaler_clean.managed_devices.ds_architecture
+  ds_hardware_fingerprint:
+    description: Hardware fingerprint identifier.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.ds_hardware_fingerprint
+  qt_download_count:
+    description: Number of downloads.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.qt_download_count
+  ts_registration:
+    description: Timestamp when the device was registered.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.ts_registration
+  ts_last_seen:
+    description: Timestamp when the device was last seen.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.ts_last_seen
+  ts_config_download:
+    description: Timestamp of last configuration download.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.ts_config_download
+  ts_keep_alive:
+    description: Timestamp of last keep-alive signal.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.ts_keep_alive
+  year:
+    description: Year of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.year
+  month:
+    description: Month of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.month
+  day:
+    description: Day of the latest ingest partition retained for this row.
+    lineage:
+      - datalake_zscaler_clean.managed_devices.day

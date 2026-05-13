@@ -2202,7 +2202,6 @@ bietlejuice.enrich_cyber:
   - bietlejuice.cyber:load-clean-eviction-decision-tree:first-run-of-day
   - bietlejuice.cyber:load-clean-evictions-label-decision-tree:first-run-of-day
   - bietlejuice.cyber:load-clean-historical-agreements:first-run-of-day
-  - bietlejuice.cyber_historical_tree:load-clean-historical-tree-decision:first-run-of-day
   - bietlejuice.cyber:load-clean-history-contract-distribution:first-run-of-day
   - bietlejuice.cyber:load-clean-logs-code-description:first-run-of-day
   - bietlejuice.cyber:load-clean-logs-valid-result-code:first-run-of-day
@@ -2213,6 +2212,7 @@ bietlejuice.enrich_cyber:
   - bietlejuice.cyber:load-clean-serasa-limpa-nome-label-decision-tree:first-run-of-day
   - bietlejuice.cyber:load-clean-users:first-run-of-day
   - bietlejuice.cyber_complement:load-clean-delinquent-master:first-run-of-day
+  - bietlejuice.cyber_historical_tree:load-clean-historical-tree-decision:first-run-of-day
 bietlejuice.enrich_cyber_legal:
   - bietlejuice.cyber:load-clean-agency:first-run-of-day
   - bietlejuice.cyber:load-clean-contracts:first-run-of-day
@@ -4411,6 +4411,8 @@ bietlejuice.enrich_zendesk:
   - bietlejuice.zendesk:load-clean-ticket-fields:first-run-of-day
   - bietlejuice.zendesk:load-clean-ticket-metrics:first-run-of-day
   - bietlejuice.zendesk:load-clean-tickets:first-run-of-day
+bietlejuice.enrich_zscaler:
+  - bietlejuice.zscaler:load-clean-managed-devices:first-run-of-day
 bietlejuice.metric_fintech__collections_segmentation:
   - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-features-timeline:first-run-of-day
   - bietlejuice.dw_collections_segmentation:load-dw-collections-segmentation-fact-contract-wallet-timeline:first-run-of-day
@@ -4713,10 +4715,10 @@ bietlejuice.reverse_listings_locations_access:
   - bietlejuice.reverse_listings_locations_load:load-reverse-listings-locations:first-run-of-day
 bietlejuice.reverse_listings_locations_load:
   - bietlejuice.ebdb_location:load-clean-country:first-run-of-day
-  - bietlejuice.ebdb_location:load-clean-region:first-run-of-day
-  - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
   - bietlejuice.ebdb_location:load-clean-region-config:first-run-of-day
   - bietlejuice.ebdb_location:load-clean-region-parameters:first-run-of-day
+  - bietlejuice.ebdb_location:load-clean-region:first-run-of-day
+  - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
 bietlejuice.reverse_minority_report_ss:
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_contract:load-dw-rent-fact-contract-people:first-run-of-day
