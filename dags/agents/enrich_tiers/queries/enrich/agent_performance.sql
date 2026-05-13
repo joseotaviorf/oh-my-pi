@@ -162,7 +162,8 @@ OS2CCV_BY_compound_metric AS (
         cm.partial_metric = "CCV"
         AND cm.metric = "OS2CCV_BY"
     GROUP BY ALL
-)
+),
+combined_agent_performance AS (
 SELECT
     id_user,
     id_agent,
@@ -227,3 +228,20 @@ SELECT
     dt_metric_period_ended,
     dt_last_processing
 FROM OS2CCV_BY_compound_metric
+)
+SELECT
+    id_user,
+    id_agent,
+    uuid_person,
+    id_metric_period,
+    metric_name,
+    metric_value,
+    is_valid,
+    dt_metric_period_started,
+    dt_metric_period_ended,
+    dt_last_processing,
+    -- keeping partitions immutable for the merge pipeline (aligned with metric_events / agent_allocation)
+    YEAR(dt_metric_period_started) AS year,
+    MONTH(dt_metric_period_started) AS month,
+    DAY(dt_metric_period_started) AS day
+FROM combined_agent_performance

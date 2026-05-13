@@ -43,3 +43,15 @@ columns:
     description: End date of the metric period window.
   dt_last_processing:
     description: Date on which this record was last written by the pipeline (CURRENT_DATE at job execution time).
+  year:
+    lineage:
+      - datalake_tiers.metric_period.dt_init
+    description: Partition year derived from metric period start (dt_metric_period_started).
+  month:
+    lineage:
+      - datalake_tiers.metric_period.dt_init
+    description: Partition month derived from metric period start.
+  day:
+    lineage:
+      - datalake_tiers.metric_period.dt_init
+    description: Partition day derived from metric period start.
