@@ -17,5 +17,5 @@ workflow:
     activity:
       clean_table_name: activity
 cluster:
-  type: consolidation_s_memory_single_node_cluster
+  type: consolidation_m_memory_single_node_cluster
   databricks_conn_id: databricks_new
