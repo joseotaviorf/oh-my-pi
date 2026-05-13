@@ -1,0 +1,5 @@
+database_name: datalake_zscaler_raw
+table_name: managed_devices
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+description: Raw device data from Zscaler Client Connector API.

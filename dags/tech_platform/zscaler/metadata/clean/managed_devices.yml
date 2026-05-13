@@ -1,0 +1,111 @@
+database_name: datalake_zscaler_clean
+table_name: managed_devices
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+description: Cleaned and normalized device data from Zscaler Client Connector.
+
+columns:
+  id_device:
+    description: Unique device identifier (UDID) from Zscaler.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.udid
+  ds_mac_address:
+    description: Device MAC address.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.macAddress
+  nm_hostname:
+    description: Device hostname.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.machineHostname
+  ds_user_email:
+    description: User email associated with the device.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.user
+  nm_owner:
+    description: Device owner name.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.owner
+  nm_device_model:
+    description: Device model and manufacturer details.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.detail
+  nm_manufacturer:
+    description: Device manufacturer.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.manufacturer
+  ds_os_version:
+    description: Operating system version.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.osVersion
+  ds_agent_version:
+    description: Zscaler agent version installed on the device.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.agentVersion
+  nm_policy:
+    description: Zscaler policy name applied to the device.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.policyName
+  nm_company:
+    description: Company name associated with the device.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.companyName
+  ds_registration_state:
+    description: Device registration state (Registered, etc.).
+    lineage:
+      - datalake_zscaler_raw.managed_devices.registrationState
+  cd_device_type:
+    description: Device type code.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.type
+  cd_device_state:
+    description: Device state code.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.state
+  cd_vpn_state:
+    description: VPN state code.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.vpnState
+  ds_tunnel_version:
+    description: Tunnel version.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.tunnelVersion
+  ds_architecture:
+    description: Device architecture (x64, arm, etc.).
+    lineage:
+      - datalake_zscaler_raw.managed_devices.zappArch
+  ds_hardware_fingerprint:
+    description: Hardware fingerprint hash.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.hardwareFingerprint
+  qt_download_count:
+    description: Number of configuration downloads.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.download_count
+  ts_registration:
+    description: Timestamp when device was registered.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.registration_time
+  ts_last_seen:
+    description: Timestamp when device was last seen.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.last_seen_time
+  ts_config_download:
+    description: Timestamp of last configuration download.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.config_download_time
+  ts_keep_alive:
+    description: Timestamp of last keep-alive signal.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.keepAliveTime
+  year:
+    description: Partition column - year.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.year
+  month:
+    description: Partition column - month.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.month
+  day:
+    description: Partition column - day.
+    lineage:
+      - datalake_zscaler_raw.managed_devices.day
