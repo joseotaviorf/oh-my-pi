@@ -330,6 +330,29 @@ FROM VALUES
                                 ),
            'running', True
         )
+    ),
+
+    -- Real Time Search Profile Exp
+    (
+        "AB_BEAKMAN_SEARCH_SERVICES_SEARCH_PROFILE_V2",
+        named_struct(
+            'begin_date', DATE('2026-05-04'),
+            'end_date', NULL,
+            'variants', to_json(
+                named_struct(
+                    'VARIANT_0', 'baseline',
+                    'VARIANT_1', 'treatment'
+                )
+            ),
+            'filters', NULL,
+            'metrics', to_json(
+                                    named_struct(
+                                                    'default_metrics', true,
+                                                    'experiment_metrics', array()
+                                                )
+                                ),
+           'running', True
+        )
     )
 
 AS experiment_config(experiment_name, config)
