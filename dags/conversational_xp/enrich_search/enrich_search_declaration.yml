@@ -14,32 +14,33 @@ workflow:
     "end_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   inner_dependencies:
     item_interaction:
-    - amplitude_user_device
+      - amplitude_user_device
     item_interaction_sale:
-    - amplitude_user_device
+      - amplitude_user_device
   tables_customization:
     item_interaction:
       partitions:
-      - year
-      - month
-      - day
-      - interaction_type
+        - year
+        - month
+        - day
+        - interaction_type
     item_interaction_sale:
       partitions:
-      - year
-      - month
-      - day
-      - interaction_type
+        - year
+        - month
+        - day
+        - interaction_type
 
 cluster:
   type: consolidation_m_general_cluster
   custom_configurations:
+    num_workers: 4
     spark_conf:
       spark.metrics.namespace: "data_products.enrich_search"
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     aws_attributes:
       ebs_volume_size: 200
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
   access_control_list:
     group_name: data-products
