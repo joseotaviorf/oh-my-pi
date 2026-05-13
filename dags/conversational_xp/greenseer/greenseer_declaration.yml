@@ -25,12 +25,8 @@ workflow:
       clean_table_name: session
 
 cluster:
-  type: custom_cluster
+  type: consolidation_s_general_cluster
   custom_configurations:
-    driver_node_type_id: r7a.xlarge
-    node_type_id: r7a.xlarge
-    num_workers: 3
-    spark_version: 12.2.x-scala2.12
     aws_attributes:
       availability: ON_DEMAND
     spark_conf:
@@ -38,4 +34,4 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
-  databricks_conn_id: databricks_new 
+  databricks_conn_id: databricks_new

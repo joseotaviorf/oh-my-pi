@@ -3,7 +3,7 @@ dag:
   schedule_interval: 30 21 * * *
   owner: Data Growth
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: consolidation_s_memory_single_node_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

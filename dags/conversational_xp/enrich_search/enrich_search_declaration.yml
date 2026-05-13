@@ -32,14 +32,8 @@ workflow:
       - interaction_type
 
 cluster:
-  type: custom_cluster
+  type: consolidation_m_general_cluster
   custom_configurations:
-    autotermination_minutes: 20
-    driver_node_type_id: r5d.2xlarge
-    node_type_id: r5d.4xlarge
-    runtime_engine: PHOTON
-    spark_version: 12.2.x-scala2.12
-    num_workers: 3
     spark_conf:
       spark.metrics.namespace: "data_products.enrich_search"
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -31,12 +31,8 @@ workflow:
     auditlogs: ["ALL PRIVILEGES"]
 
 cluster:
-  type: custom_cluster
+  type: consolidation_s_memory_cluster
   custom_configurations:
-    driver_node_type_id: r5a.2xlarge
-    node_type_id: c5a.xlarge
-    num_workers: 2
-    spark_version: 12.2.x-scala2.12
     spark_conf:
       spark.sql.legacy.json.allowEmptyString.enabled: "true"
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

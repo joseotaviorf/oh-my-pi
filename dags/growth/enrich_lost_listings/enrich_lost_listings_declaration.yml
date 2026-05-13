@@ -25,7 +25,7 @@ workflow:
     - month
     - day
 cluster:
-  type: databricks_12_2_med_general_photon_cluster
+  type: consolidation_m_general_cluster
   custom_libraries:
     - pypi:
         package: lightgbm>=3.3.1
@@ -33,6 +33,7 @@ cluster:
         package: scikit-learn>=0.24.0
   databricks_conn_id: databricks_new
   custom_configurations:
+    spark_version: 12.2.x-scala2.12
     single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:

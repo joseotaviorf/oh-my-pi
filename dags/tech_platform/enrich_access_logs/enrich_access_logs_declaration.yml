@@ -19,13 +19,8 @@ workflow:
   default_table_privileges:
     auditlogs: ["ALL PRIVILEGES"]
 cluster:
-  type: custom_cluster
+  type: consolidation_m_general_cluster
   custom_configurations:
-    driver_node_type_id: m5d.4xlarge
-    node_type_id: m5d.4xlarge
-    runtime_engine: PHOTON
-    num_workers: 2
-    spark_version: 12.2.x-scala2.12
     spark_conf:
       spark.sql.legacy.json.allowEmptyString.enabled: "true"
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

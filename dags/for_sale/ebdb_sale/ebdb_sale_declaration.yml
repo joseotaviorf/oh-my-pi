@@ -28,4 +28,4 @@ workflow:
   extra_query_template_params:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
 cluster:
-  type: databricks_12_2_med_general_cluster
+  type: consolidation_s_memory_cluster

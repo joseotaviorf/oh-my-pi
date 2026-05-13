@@ -18,7 +18,7 @@ workflow:
   tables_customization:
     suspected_unavailable_listings: {}
 cluster:
-  type: databricks_12_2_xmin_memory_cluster
+  type: consolidation_xs_general_single_node_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'

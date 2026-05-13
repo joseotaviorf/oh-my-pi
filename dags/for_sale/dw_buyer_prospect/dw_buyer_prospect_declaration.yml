@@ -14,7 +14,7 @@ workflow:
   layer: dw
   custom_schema: sale
 cluster:
-  type: databricks_12_2_xmin_memory_cluster
+  type: consolidation_s_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

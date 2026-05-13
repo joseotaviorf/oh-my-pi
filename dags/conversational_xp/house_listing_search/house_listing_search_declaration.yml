@@ -21,12 +21,8 @@ workflow:
     search_profile_filters: {}
 
 cluster:
-  type: custom_cluster
+  type: consolidation_m_compute_cluster
   custom_configurations:
-    driver_node_type_id: r5a.4xlarge
-    node_type_id: r5a.4xlarge
-    spark_version: 12.2.x-scala2.12
-    num_workers: 3
     single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:

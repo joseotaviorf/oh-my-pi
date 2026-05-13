@@ -31,12 +31,13 @@ workflow:
         - day
 
 cluster:
-  type: databricks_12_2_max_io-general_cluster
+  type: consolidation_s_general_cluster
   access_control_list:
     group_name: mlops
     permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
   custom_configurations:
+    spark_version: 12.2.x-scala2.12
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:

@@ -12,7 +12,7 @@ workflow:
   short_circuit_customization:
     function: CHECK_IS_SECOND_BUSINESS_DAY_OF_MONTH
 cluster:
-  type: databricks_12_2_med_general_photon_cluster
+  type: consolidation_s_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

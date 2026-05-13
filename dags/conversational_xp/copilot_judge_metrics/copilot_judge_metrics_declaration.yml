@@ -30,7 +30,7 @@ workflow:
         - day
 
 cluster:
-    type: databricks_12_2_med_memory_photon_cluster
-    access_control_list:
-      group_name: data-products
-      permission_level: CAN_MANAGE
+  type: consolidation_s_memory_single_node_cluster
+  access_control_list:
+    group_name: data-products
+    permission_level: CAN_MANAGE

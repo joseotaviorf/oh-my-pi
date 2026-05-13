@@ -2,7 +2,7 @@ dag:
   name: gsheets_static
   owner: Data Engineering
 cluster:
-  type: databricks_12_2_min_general_cluster
+  type: consolidation_xs_general_single_node_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

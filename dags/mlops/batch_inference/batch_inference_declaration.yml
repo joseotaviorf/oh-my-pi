@@ -28,7 +28,7 @@ workflow:
         - model_version
 
 cluster:
-  type: databricks_12_2_max_io-general_cluster
+  type: consolidation_xs_general_single_node_cluster
   access_control_list:
     group_name: mlops
     permission_level: CAN_MANAGE

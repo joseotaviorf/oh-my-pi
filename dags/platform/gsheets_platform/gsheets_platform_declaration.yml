@@ -9,7 +9,7 @@ workflow:
   has_hive_sync: false
   bucket_config_name: analytical_environment_costs_bucket
 cluster:
-  type: databricks_12_2_min_analytical_costs_cluster
+  type: consolidation_m_memory_cluster
   access_control_list:
     group_name: analytical-environment-costs
     permission_level: CAN_MANAGE

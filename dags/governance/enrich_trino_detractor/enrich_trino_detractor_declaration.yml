@@ -18,7 +18,7 @@ workflow:
     function_params:
       weekday: 0
 cluster:
-  type: databricks_12_2_med_general_photon_cluster
+  type: consolidation_s_general_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
