@@ -334,7 +334,7 @@ FROM VALUES
 
     -- Real Time Search Profile Exp
     (
-        "AB_BEAKMAN_SEARCH_SERVICES_SEARCH_PROFILE_V2",
+        "ab_beakman_search_services_search_profile_v2",
         named_struct(
             'begin_date', DATE('2026-05-04'),
             'end_date', NULL,
