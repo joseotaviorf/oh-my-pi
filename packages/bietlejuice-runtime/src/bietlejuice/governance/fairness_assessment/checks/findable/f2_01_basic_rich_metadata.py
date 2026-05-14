@@ -35,13 +35,13 @@ def check_f2_01_basic_rich_metadata(
     if own is not None:
         failure_codes.append(own)
 
-    dom = (str(domain).strip() if domain is not None else "")
+    dom = str(domain).strip() if domain is not None else ""
     if not dom:
         failure_codes.append("domain_missing")
     elif not METADATA_DOMAIN_CI_ALLOWLIST_RE.fullmatch(dom):
         failure_codes.append("domain_not_in_allowlist")
 
-    desc = (str(table_description).strip() if table_description is not None else "")
+    desc = str(table_description).strip() if table_description is not None else ""
     if not desc:
         failure_codes.append("table_description_missing")
 
