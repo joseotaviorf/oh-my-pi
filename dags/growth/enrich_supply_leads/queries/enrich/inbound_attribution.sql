@@ -42,7 +42,7 @@ support_sessions AS (
     AND COALESCE(s.user_phone, s.user_data:["user_phone"]) IS NOT NULL
 
   UNION ALL 
-
+  
   SELECT
     s.id AS id_session,
     s.source_env AS source_environment,
@@ -56,9 +56,13 @@ support_sessions AS (
     s.ts_updated
   FROM
     datalake_support_session_service_clean.support_session AS s
+  LEFT ANTI JOIN datalake_sauron_clean.session AS sauron
+    ON s.id = sauron.id 
+    AND s.source = 'internal_chat'
+    AND sauron.ts_created >= DATE("{load_start_date}") - INTERVAL 365 DAYS
   WHERE 1=1
     AND s.ts_created >= DATE('2025-10-11') -- hardcoded fix regarding support session migration
-    AND s.source IN ('call_in_app', 'call')
+    AND s.source IN ('call_in_app', 'call', 'internal_chat')
     AND s.ts_created >= DATE("{load_start_date}") - INTERVAL 365 DAYS
     AND COALESCE(s.user_phone, s.user_data:["user_phone"]) IS NOT NULL
 ),
