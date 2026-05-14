@@ -35,6 +35,7 @@ def get_columns_from_metastore():
         or database_name like 'dw_%'
         or database_name like 'metric_%'
         or database_name like 'reverse_%'
+        or database_name like 'core_%'
         or database_name = 'sandbox')
         """
     )
@@ -51,6 +52,8 @@ def extract_layer_from_database_name(database_name):
         return LayerEnum.DW.value
     elif database_name.startswith("metric_"):
         return LayerEnum.METRIC.value
+    elif database_name.startswith("core_"):
+        return LayerEnum.CORE.value
     elif database_name.startswith("datalake_"):
         if database_name.endswith("_raw"):
             return LayerEnum.RAW.value
