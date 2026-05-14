@@ -14,7 +14,7 @@ There are two types, determined by the `inspection_type` column in `dim_inspecti
 The lifecycle of an exit inspection typically follows these stages:
 1. **Scheduling** — an appointment is created for the inspection (`fact_inspection.ts_booking_created`)
 2. **Execution** — the inspector visits the property and documents its condition (`fact_inspection.ts_inspected`)
-3. **Repair analysis (AR)** — damages are identified and repair requests are generated, either automatically or manually (`fact_report_inspections.ts_sent_to_repair_analysis`)
+3. **Repair analysis (AR)** — damages are identified and repair requests are generated via the **Kirk AI system** (automatic) or by a human editing team (manual). Both paths can coexist: an inspection may pass through the automatic AI processing stage (`ts_automatic_repair_processing`) and then also go through manual editing (`ts_sent_to_inspection_editing`) — these timestamps are **not mutually exclusive**. (`fact_report_inspections.ts_sent_to_repair_analysis`)
 4. **Owner and tenant review (1st review)** — both parties see the report for the first time and may agree or contest items. Each party has separate access and approval tracking: `has_*_access_review` (opened the link) vs `has_*_approved_review` (clicked approve).
 5. **Contestation analysis (AC)** — if the tenant contests, a dedicated team analyzes the dispute (`fact_report_inspections.ts_sent_to_contestation_analysis`)
 6. **Budget approval (2nd review)** — after contestation (if any), a final budget is presented to both parties. Same access/approval pattern: `has_*_access_budget_approval` vs `has_*_approved_budget_approval`.
@@ -33,6 +33,10 @@ Not all inspections go through every stage. Entry inspections (onboarding) are s
 - **AC** (analise de contestacao) → Contestation Analysis stage. Columns with `_ac` suffix.
 - **VT** (vistoria tecnica) → the technical inspection execution moment.
 - **Laudo** (laudo de reparos, repair report) → the repair report. Table: `fact_report_inspections`.
+- **Kirk** → QuintoAndar's AI system that automatically identifies repair requests from inspection photos. Synonyms: IA de reparos, análise automática de reparos, fluxo automático do laudo, fluxo automático de criação do laudo.
+- **Fluxo automático do laudo / laudo automático** → inspection where Kirk successfully generated repair requests.
+- **Grupo controle (Kirk)** → inspection that was eligible for Kirk processing but deliberately excluded for A/B comparison.
+- **Wave (Kirk)** → rollout phase of Kirk. Values: `'Shadow Mode'`, `'Wave 1'`, `'Wave 2'`, `'Wave 3'`, `'Wave 4'`.
 
 ## Tables
 
@@ -49,11 +53,15 @@ Not all inspections go through every stage. Entry inspections (onboarding) are s
 | Automatic discount details | `datalake_inspections.automatic_discounts` (enrich) — JOIN via `fi.sk_client_side = ad.uuid_inspection` |
 | Repair cost at a specific stage (temporal) | `datalake_inspection_services_clean.repair_request_history` (clean) — tracks `cost` per repair over time with `origin` indicating the stage. Only source for per-stage monetary values. |
 | Assessment data | `dw_inspections.dim_assessment` — JOIN via `fi.sk_assessment` |
+| Kirk AI flow flags (automatic laudo creation, control group, wave) — **preferred for exit inspections** | `dw_offboarding.obt_offboarding` — already pre-joined. Columns: `is_automated_ar` (boolean, already cast — Kirk succeeded), `automation_group` (varchar — `TRY_CAST AS BOOLEAN` to filter control group). Use when the analysis is scoped to exit inspections tied to a termination (the most common case). |
+| Kirk AI flow flags — **when obt is not appropriate** (all exit inspections, not just terminated ones) | `dw_inspections.dim_inspection` (DW) — JOIN already needed for `inspection_type` filter. Columns: `repair_request_ai_flow` (varchar bool), `ai_repair_analysis_control_group` (varchar bool), `ai_repair_analysis_wave_name`, `ai_processing_failure_reason`. Use `TRY_CAST(col AS BOOLEAN) = TRUE`. Lineage: `datalake_inspections.inspection_booking`. |
 
 **Critical rules:**
 - **CAST rule**: `fact_inspection.sk_inspection` is **VARCHAR** — always apply `CAST(... AS VARCHAR)` on the opposite side of JOINs: `fi.sk_inspection = CAST(other.sk_inspection AS VARCHAR)`
 - **Dedup rule**: `fact_inspection` may have duplicates per contract — always apply `ROW_NUMBER() OVER(PARTITION BY fi.sk_contract ORDER BY fi.ts_updated DESC) AS rni` and filter `WHERE rni = 1`
 - Always filter by `dim_inspection.inspection_type` (`onboarding` / `offboarding`) when the query starts from inspections
+- **Kirk boolean rule**: In `obt_offboarding`, `is_automated_ar` is already a proper `boolean` — use directly. When reading from `dim_inspection` directly, `repair_request_ai_flow` and `ai_repair_analysis_control_group` are stored as `varchar` in Trino — always use `TRY_CAST(col AS BOOLEAN) = TRUE`, never `col = TRUE`. The column `automation_group` in `obt_offboarding` is also varchar — apply `TRY_CAST` there too.
+
 
 ## Key Metrics
 
@@ -72,6 +80,10 @@ Most inspection-related metrics are anchored to the **Termination** entity, not 
 - Report access rate — percentage of inspections where landlord and/or tenant accessed the report (`fact_report_inspections.has_tenant_access_review`, `fact_report_inspections.has_owner_access_review`)
 - Inspection volume per month (filter by `inspection_type` and `status`)
 - SLA compliance: time between scheduling and execution (`fact_inspection.ldt_hours_execution`, `fact_inspection.is_sla_execution`)
+
+**Kirk / automatic laudo metrics:**
+- Kirk adoption rate — `COUNT_IF(is_automated_ar) / COUNT(*)` from `dw_offboarding.obt_offboarding` 
+- Agreement rate by laudo flow type — `COUNT_IF(has_agreement) / COUNT(*)` per `fluxo_laudo` group from `obt_offboarding`. Use `has_agreement` as the primary signal (combines early, late, and discount agreements). See Golden Query 4 for the full breakdown.
 
 ## Relationships with Other Entities
 
@@ -110,6 +122,8 @@ An inspection is linked to one house: `fi.sk_house`.
 - Aggregate `fact_repair_request` when the desired grain is per inspection — the JOIN fans out to repair level
 - Use `has_agreement` in `fact_report_inspections` for the final agreement status (combines early, late, and discount agreements)
 - Consider `obt_offboarding` when you need exit inspection data already joined with terminations, reports, and repairs
+- When analyzing Kirk impact on approvals, use `obt_offboarding` with `has_agreement` as the primary metric — it consolidates early, late, and discount agreements into a single boolean. For the A/B split: `is_automated_ar = TRUE` (Kirk group) vs `TRY_CAST(automation_group AS BOOLEAN) = TRUE` (eligible control group) — same eligibility pool, cleanest comparison. See Golden Query 4.
+- When using `dim_inspection` directly (not obt), use `TRY_CAST(repair_request_ai_flow AS BOOLEAN)` and `TRY_CAST(ai_repair_analysis_control_group AS BOOLEAN)` — both are `varchar` in Trino
 
 **Don't:**
 - Don't confuse `onboarding` (entry) with `offboarding` (exit) — always filter by `inspection_type`
@@ -119,6 +133,8 @@ An inspection is linked to one house: `fi.sk_house`.
 - Don't treat "owner contestation" as a formal contestation — it refers to additional repairs requested by the landlord; owner contestation is disabled
 - Don't confuse inspection (vistoria — technical assessment) with visit (visita — prospective tenant viewing)
 - Don't confuse repair **counts** per stage (`total_tentant_repair_ar`, `_review`, `_ac`) with monetary values — these are counts, not costs. `fact_report_inspections.total_cost` and `obt_offboarding.final_tenant_inspection_cost` are the **final** report cost, not per-stage. For monetary value at a specific stage (e.g., AR exit), use `datalake_inspection_services_clean.repair_request_history` — it tracks `cost` per repair over time with an `origin` column indicating the stage
+- **Don't use `ts_automatic_repair_processing` for Kirk-related analyses** — this field tracks a separate process unrelated to Kirk. It is not a proxy for the automatic laudo flow. Use `is_automated_ar` (in `obt_offboarding`) or `repair_request_ai_flow` (in `dim_inspection`) instead.
+- Don't compare `repair_request_ai_flow = TRUE` against `sem_dados_kirk` (inspections with no Kirk data) as the primary comparison — the `sem_dados_kirk` group contains older inspections that predate Kirk rollout, creating a confounding time effect. Prefer comparing against `ai_repair_analysis_control_group = TRUE` (same eligibility, A/B controlled).
 
 ## Golden Queries
 
@@ -179,4 +195,55 @@ WHERE obt.ts_termination_finished >= DATE '2025-01-01'
     AND obt.sk_inspection IS NOT NULL
 GROUP BY obt.termination_reason
 ORDER BY total_inspections DESC
+```
+
+### Query 4 — Kirk automatic laudo flow vs IQ/PP approval rates
+
+Compare approval and agreement rates between inspections processed by Kirk (automatic) and the eligible control group (manual). Uses `obt_offboarding` — the simplest and most correct path because Kirk flags and all approval columns are already pre-joined.
+
+- `is_automated_ar` is already a proper `boolean` in the OBT — no casting needed.
+- `automation_group` is `varchar` — use `TRY_CAST(automation_group AS BOOLEAN) = TRUE` to filter the control group.
+- The cleanest A/B comparison is `is_automated_ar = TRUE` vs `TRY_CAST(automation_group AS BOOLEAN) = TRUE` (same eligibility pool).
+- Denominator for approval rates = inspections that **accessed** the stage (not total), to isolate behavioral propensity from access rate differences.
+
+```sql
+SELECT
+    CASE
+        WHEN obt.is_automated_ar = TRUE                                    THEN 'kirk_automatico'
+        WHEN TRY_CAST(obt.automation_group AS BOOLEAN) = TRUE              THEN 'controle_elegivel'
+        WHEN obt.is_automated_ar IS NOT NULL
+          OR obt.automation_group IS NOT NULL                              THEN 'kirk_nao_elegivel'
+        ELSE 'sem_dados_kirk'
+    END AS fluxo_laudo,
+    COUNT(*) AS total,
+    -- IQ (Inquilino/Tenant) — 1ª revisão
+    COUNT_IF(obt.has_tenant_access_review)    AS iq_acessou_revisao,
+    COUNT_IF(obt.has_tenant_approved_review)  AS iq_aprovou_revisao,
+    ROUND(100.0 * COUNT_IF(obt.has_tenant_approved_review)
+          / NULLIF(COUNT_IF(obt.has_tenant_access_review), 0), 1)              AS pct_iq_aprovacao_revisao,
+    -- IQ — aprovação de orçamento (2ª revisão)
+    COUNT_IF(obt.has_tenant_access_budget_approval)       AS iq_acessou_orcamento,
+    COUNT_IF(obt.has_tenant_approved_budget_approval)     AS iq_aprovou_orcamento,
+    ROUND(100.0 * COUNT_IF(obt.has_tenant_approved_budget_approval)
+          / NULLIF(COUNT_IF(obt.has_tenant_access_budget_approval), 0), 1)     AS pct_iq_aprovacao_orcamento,
+    -- PP (Proprietário/Owner) — 1ª revisão
+    COUNT_IF(obt.has_owner_access_review)    AS pp_acessou_revisao,
+    COUNT_IF(obt.has_owner_approved_review)  AS pp_aprovou_revisao,
+    ROUND(100.0 * COUNT_IF(obt.has_owner_approved_review)
+          / NULLIF(COUNT_IF(obt.has_owner_access_review), 0), 1)               AS pct_pp_aprovacao_revisao,
+    -- PP — aprovação de orçamento (2ª revisão)
+    COUNT_IF(obt.has_owner_access_budget_approval)        AS pp_acessou_orcamento,
+    COUNT_IF(obt.has_owner_approved_budget_approval)      AS pp_aprovou_orcamento,
+    ROUND(100.0 * COUNT_IF(obt.has_owner_approved_budget_approval)
+          / NULLIF(COUNT_IF(obt.has_owner_access_budget_approval), 0), 1)      AS pct_pp_aprovacao_orcamento,
+    -- Acordo final
+    COUNT_IF(obt.has_early_agreement) AS total_early_agreement,
+    COUNT_IF(obt.has_late_agreement)  AS total_late_agreement,
+    COUNT_IF(obt.has_agreement)       AS total_agreement,
+    ROUND(100.0 * COUNT_IF(obt.has_agreement) / COUNT(*), 1)                   AS pct_agreement
+FROM dw_offboarding.obt_offboarding AS obt
+WHERE obt.ts_termination_finished >= DATE '2025-01-01'
+    AND obt.sk_inspection IS NOT NULL
+GROUP BY 1
+ORDER BY total DESC
 ```
