@@ -41,7 +41,7 @@ def _generate_date_range(start_date_str, end_date_str):
 def _load_single_date(target_date, serialize_columns_from_directory, partition_cols, inmetro_bucket):
     file_path = f"{inmetro_bucket}/*/*/*/{bucket_directory}/{target_date}"
     path_attributes_pattern = (
-        f"{inmetro_bucket}\/(\w+)\/(\w+)\/(\w+)\/{bucket_directory}/{target_date}"
+        rf"{inmetro_bucket}/(\w+)/(\w+)/(\w+)/{bucket_directory}/{target_date}"
     )
 
     df = spark.read.format("json").load(file_path)
