@@ -117,5 +117,6 @@ def evaluate_mvp_checks_from_row(
                     requirement_id=rid,
                     passed=False,
                     reason=DATAHUB_UNREACHABLE_REASON,
+                    detail=None,
                 )
     return out

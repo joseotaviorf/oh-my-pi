@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import FrozenSet
+from typing import Final, FrozenSet
 
 # ---------------------------------------------------------------------------
 # Spark job: lake table FQNs (driver)
@@ -22,6 +22,21 @@ COLUMNS_METASTORE_SNAPSHOT_UNAVAILABLE_REASON = "columns_metastore_snapshot_unav
 SCHEMA_NOT_IN_COLUMNS_METASTORE_REASON = (
     "spark_schema_not_in_columns_metastore_snapshot"
 )
+
+# ---------------------------------------------------------------------------
+# Metadata YAML: ``domain`` (CI Yamale + F2-01)
+# ---------------------------------------------------------------------------
+# Must stay identical to the alternation inside ``domain: regex('...')`` in
+# ``packages/bietlejuice-compiler/scripts/services/metadata_file_schemas/*_schema.yml``.
+# Includes ``Data Platform`` (core-layer metadata) in addition to the governance allowlist.
+# F2-01 uses :func:`re.fullmatch` on the trimmed value; empty domain skips regex (``domain_missing`` only).
+
+METADATA_DOMAIN_CI_ALLOWLIST_PATTERN: Final[str] = (
+    "3P Partners|Agents|Cross|Data Ops & Governance|Data Life Cycle|Fintech|For Rent|For Sale|"
+    "Growth|International|MLOps|People|QCX|Rede|Support and Services|Tech Platform|Data Platform|"
+    "Conversational XP|DS Pricing|Atlas DB|Broker XP"
+)
+METADATA_DOMAIN_CI_ALLOWLIST_RE = re.compile(METADATA_DOMAIN_CI_ALLOWLIST_PATTERN)
 
 # ---------------------------------------------------------------------------
 # Table / column description quality (TDQ) heuristics

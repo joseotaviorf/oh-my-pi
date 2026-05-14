@@ -20,7 +20,7 @@ def _row(**overrides):
         "owner_email_normalized": "data.owner@quintoandar.com.br",
         "is_active_employee": True,
         "fqn_occurrence_count": 1,
-        "domain": "inspections",
+        "domain": "Data Ops & Governance",
         "table_description": "Some long enough description for the table.",
         "spark_table_exists": True,
         "spark_catalog_probe_status": "OK",

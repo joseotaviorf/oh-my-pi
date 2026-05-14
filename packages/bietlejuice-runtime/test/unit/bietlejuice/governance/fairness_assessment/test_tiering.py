@@ -415,7 +415,7 @@ class TestMvpChecks(unittest.TestCase):
         row = {
             "database_name": "dw_rent",
             "table_name": "fact_contract",
-            "domain": "Rent",
+            "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
             "table_description": "Contracts fact",
             "fqn_occurrence_count": 1,
@@ -434,7 +434,7 @@ class TestMvpChecks(unittest.TestCase):
         row = {
             "database_name": "a",
             "table_name": "b",
-            "domain": "d",
+            "domain": "For Rent",
             "owner": "a@quintoandar.com.br",
             "table_description": "x",
             "fqn_occurrence_count": 2,
@@ -452,7 +452,7 @@ class TestMvpChecks(unittest.TestCase):
         row = {
             "database_name": "a",
             "table_name": "b",
-            "domain": "d",
+            "domain": "For Rent",
             "owner": "a@quintoandar.com.br",
             "table_description": "x",
             "fqn_occurrence_count": 1,
@@ -470,7 +470,7 @@ class TestMvpChecks(unittest.TestCase):
         row = {
             "database_name": "dw_rent",
             "table_name": "fact_contract",
-            "domain": "Rent",
+            "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
             "table_description": "Contracts fact",
             "fqn_occurrence_count": 1,
@@ -489,7 +489,7 @@ class TestMvpChecks(unittest.TestCase):
         row = {
             "database_name": "dw_rent",
             "table_name": "fact_contract",
-            "domain": "Rent",
+            "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
             "table_description": "Contracts fact",
             "fqn_occurrence_count": 1,
@@ -509,7 +509,7 @@ class TestMvpChecks(unittest.TestCase):
         row = {
             "database_name": "dw_rent",
             "table_name": "fact_contract",
-            "domain": "Rent",
+            "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
             "table_description": "Contracts fact",
             "fqn_occurrence_count": 1,
@@ -527,7 +527,7 @@ class TestMvpChecks(unittest.TestCase):
         row = {
             "database_name": "dw_rent",
             "table_name": "fact_contract",
-            "domain": "Rent",
+            "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
             "table_description": "Contracts fact",
             "fqn_occurrence_count": 1,
@@ -545,7 +545,7 @@ class TestMvpChecks(unittest.TestCase):
         row = {
             "database_name": "dw_rent",
             "table_name": "fact_contract",
-            "domain": "Rent",
+            "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
             "table_description": "Contracts fact",
             "fqn_occurrence_count": 1,
@@ -564,7 +564,7 @@ class TestMvpChecks(unittest.TestCase):
         row = {
             "database_name": "dw_rent",
             "table_name": "fact_contract",
-            "domain": "Rent",
+            "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
             "table_description": "Contracts fact",
             "fqn_occurrence_count": 1,
@@ -589,7 +589,7 @@ class TestMvpChecks(unittest.TestCase):
         row = {
             "database_name": "dw_rent",
             "table_name": "fact_contract",
-            "domain": "Rent",
+            "domain": "For Rent",
             "owner": "Someone@quintoandar.com.br",
             "table_description": "Contracts fact",
             "fqn_occurrence_count": 1,

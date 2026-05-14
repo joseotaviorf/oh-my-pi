@@ -58,9 +58,12 @@ def _build_fairness_enrich_output_dict(d: Mapping[str, Any]) -> dict[str, Any]:
     )
     checks = evaluate_mvp_checks_from_row(d)
     tier = compute_tier_mvp(checks)
-    checks_payload: dict[str, Any] = {
-        k: {"passed": v.passed, "reason": v.reason} for k, v in checks.items()
-    }
+    checks_payload: dict[str, Any] = {}
+    for k, v in checks.items():
+        entry: dict[str, Any] = {"passed": v.passed, "reason": v.reason}
+        if v.detail is not None:
+            entry["detail"] = v.detail
+        checks_payload[k] = entry
     if (
         "I3-02" in checks_payload
         and d.get("datahub_lineage_upstream_total") is not None

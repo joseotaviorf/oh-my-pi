@@ -19,7 +19,14 @@ columns:
     description: |
       JSON map of requirement_id to {"passed": bool, "reason": string|null, optional "detail"}. **MVP gate**
       (``MVP_TIER2_SCOPED_REQUIREMENT_IDS``): F1-01, F1-02, F1-03,
-      F2-01, F4-01, A1.2-03, I1-02, **F2-02**, **I1-01**. **F2-02** — column description richness
+      F2-01, F4-01, A1.2-03, I1-02, **F2-02**, **I1-01**. **F2-01** — owner email present and valid format,
+      active employee (at most one ownership failure: ``owner_missing``, ``owner_email_invalid_format``,
+      ``owner_not_active_employee``), non-empty ``domain`` from ``tables_documentation`` matching the same
+      CI Yamale allowlist as metadata ``domain`` (``METADATA_DOMAIN_CI_ALLOWLIST_PATTERN`` in
+      ``bietlejuice.governance.fairness_assessment.constants``; empty domain → ``domain_missing`` only;
+      non-empty but not in allowlist → ``domain_not_in_allowlist``), and non-empty table description
+      (``table_description_missing``). On failure, ``reason`` is a stable comma-join of failure codes in
+      that order and ``detail`` may include ``failure_codes`` (same list). **F2-02** — column description richness
       (``assess_column_description_quality``) on rows from ``columns_documentation``; failure reasons
       no_column_docs_in_lake, column_description_not_substantive.
       **I1-01** — name coverage vs physical schema from the latest partition of

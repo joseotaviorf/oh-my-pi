@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional
 
 
 @dataclass(frozen=True)
@@ -13,6 +13,7 @@ class RequirementResult:
     requirement_id: str
     passed: bool
     reason: Optional[str] = None
+    detail: Optional[dict[str, Any]] = None
 
 
 @dataclass(frozen=True)
