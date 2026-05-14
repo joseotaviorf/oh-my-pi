@@ -109,9 +109,9 @@ LEFT JOIN
 LEFT JOIN
     datalake_hub_services.business_unit AS bu
         ON bu.id_business_unit = mpa.id_business_unit
-        AND bu.ts_region_association_created <= mre.ts_relationship_ended
+        AND bu.is_last_region_associated IS TRUE
 QUALIFY     
     1 = ROW_NUMBER() OVER(
         PARTITION BY mpa.id_revision 
-        ORDER BY mre.ts_relationship_ended DESC, bu.ts_business_unit_updated DESC
+        ORDER BY mre.ts_relationship_ended DESC
     )

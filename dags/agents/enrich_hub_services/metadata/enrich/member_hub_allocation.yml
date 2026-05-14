@@ -142,23 +142,23 @@ columns:
     lineage:
       - datalake_hub_services.member_profile.cpf
     description: Member user CPF (from enrich member_profile / Hub Services users).
-  parent_name:
+  user_parent_name:
     lineage:
       - datalake_hub_services.member_profile.parent_name
     description: Parent member user display name (from enrich member_profile / Hub Services users).
-  parent_email:
+  user_parent_email:
     lineage:
       - datalake_hub_services.member_profile.parent_email
     description: Parent member user email (from enrich member_profile / Hub Services users).
-  parent_phone_number:
+  user_parent_phone_number:
     lineage:
       - datalake_hub_services.member_profile.parent_phone_number
     description: Parent member primary phone (from enrich member_profile / Hub Services users).
-  parent_secondary_phone_number:
+  user_parent_secondary_phone_number:
     lineage:
       - datalake_hub_services.member_profile.parent_secondary_phone_number
     description: Parent member secondary phone when applicable (from enrich member_profile / Hub Services users).
-  parent_cpf:
+  user_parent_cpf:
     lineage:
       - datalake_hub_services.member_profile.parent_cpf
     description: Parent member user CPF (from enrich member_profile / Hub Services users).
