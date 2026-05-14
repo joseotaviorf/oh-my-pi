@@ -24,12 +24,12 @@ columns:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ep_house_id
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.top5_house_id
   sk_region:
-    description: 'Surrogate key for the region of the interaction. Resolved from the house region for organic traffic, and from the event region or URI fallbacks for QAC test traffic.'
+    description: 'Surrogate key for the region of the interaction. Resolved from the house region for organic traffic, and from the event region or a dynamic QAC region lookup via classifieds/vespucio data for QAC test traffic.'
     lineage:
       - datalake_ebdb_clean.house.id_region
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_region
-      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.uri
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.is_qac
+      - datalake_ebdb_clean.region.id
   mkt_category:
     description: 'Marketing taxonomy category mapped from the combination of app_type, utm_source, utm_medium and branded flag.'
     lineage:

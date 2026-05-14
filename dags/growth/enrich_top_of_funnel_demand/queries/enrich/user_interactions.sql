@@ -87,9 +87,31 @@ filtered_events AS (
 -------------------
 dim_house AS (
     SELECT DISTINCT
-        substr(CAST(h.id AS STRING), 1, 9) AS id_house,
-        CAST(h.id_region AS STRING) AS sk_region
-    from datalake_ebdb_clean.house h
+        substr(CAST(house_dim.id AS STRING), 1, 9) AS id_house,
+        CAST(house_dim.id_region AS STRING) AS sk_region
+    FROM datalake_ebdb_clean.house AS house_dim
+),
+qac_region AS (
+    SELECT 
+        qac_plugin.house_id AS id_house,
+        MAX(region_city.id) AS id_region
+    FROM
+        vespucio_classifieds.classifieds_house_id AS qac_plugin
+    INNER JOIN
+        vespucio_prod_delta.listings AS listings
+            ON qac_plugin.source_id = listings.source_id
+    INNER JOIN
+        vespucio_prod_delta.house_compounds AS compounds
+            ON listings.dejavuid = compounds.dejavuid
+    INNER JOIN
+        datalake_ebdb_clean.state AS state_dim
+            ON state_dim.abbreviation = compounds.address.state_code
+    INNER JOIN
+        datalake_ebdb_clean.region AS region_city
+            ON LOWER(region_city.name) = LOWER(compounds.address.city)
+                AND region_city.id_state = state_dim.id
+    GROUP BY 
+        qac_plugin.house_id
 )
 SELECT
     BIGINT(year*10000 + month*100 + day || ROW_NUMBER() OVER (ORDER BY evt.dt_event)) AS id,
@@ -97,12 +119,9 @@ SELECT
     COALESCE(evt.id_house, -1) AS id_house,
     CASE
         WHEN evt.is_qac = FALSE THEN dh.sk_region
-        WHEN evt.is_qac = TRUE AND dh.sk_region IS NOT NULL THEN dh.sk_region -- QAC Test region with parsed region
-        WHEN evt.is_qac = TRUE AND evt.id_region IS NOT NULL THEN evt.id_region -- QAC Test region with parsed region
-        WHEN evt.is_qac = TRUE AND LOWER(uri) LIKE '%belo-horizonte-mg%' THEN '1535' -- QAC Test Region with fallback for region
-        WHEN evt.is_qac = TRUE AND LOWER(uri) LIKE '%rio-de-janeiro-rj%' THEN '1507' -- QAC Test Region with fallback for region
-        WHEN evt.is_qac = TRUE AND LOWER(uri) LIKE '%porto-alegre-rs%' THEN '1842' -- QAC Test Region with fallback for region
-        WHEN evt.is_qac = TRUE AND LOWER(uri) LIKE '%campinas-sp%' THEN '1' -- QAC Test Region with fallback for region
+        WHEN evt.is_qac = TRUE AND dh.sk_region IS NOT NULL THEN dh.sk_region -- QAC event with house region
+        WHEN evt.is_qac = TRUE AND evt.id_region IS NOT NULL THEN evt.id_region -- QAC event with infered region
+        WHEN evt.is_qac = TRUE AND qac_region.id_region IS NOT NULL THEN qac_region.id_region -- QAC event with infered region
         ELSE '-1'
     END AS sk_region,
     COALESCE(td.mkt_category, 'Not Mapped') AS mkt_category,
@@ -132,8 +151,13 @@ SELECT
     evt.ts_event
 FROM
     filtered_events AS evt
-LEFT JOIN dim_house AS dh
-    ON evt.id_house = dh.id_house
+LEFT JOIN 
+    dim_house AS dh
+        ON evt.id_house = dh.id_house
+LEFT JOIN
+    qac_region
+        ON evt.id_house = qac_region.id_house
+            AND evt.is_qac = TRUE
 LEFT JOIN taxonomy_demand AS td
     ON LOWER(COALESCE(td.app_type, '')) = LOWER(COALESCE(evt.app_type, ''))
     AND LOWER(COALESCE(td.utm_source, '')) = LOWER(COALESCE(evt.utm_source, ''))

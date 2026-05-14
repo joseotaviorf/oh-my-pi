@@ -4218,6 +4218,8 @@ bietlejuice.enrich_top_of_funnel_affiliates:
   - bietlejuice.amplitude_subpartitioned:load-clean-205027-intro-page-viewed-events:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-affiliates:first-run-of-day
 bietlejuice.enrich_top_of_funnel_demand:
+  - bietlejuice.ebdb_location:load-clean-region:first-run-of-day
+  - bietlejuice.ebdb_location:load-clean-state:first-run-of-day
   - bietlejuice.enrich_amplitude_page_viewed_events:load-enrich-schedule-search-listing-events:first-run-of-day
 bietlejuice.enrich_top_of_funnel_supply:
   - bietlejuice.amplitude_subpartitioned:load-clean-183047-landing-page-viewed-events:first-run-of-day
