@@ -57,10 +57,6 @@ columns:
     lineage:
       - datalake_ebdb_listing.house_status.id_house_status
     description: The Id of the status and status_reason related to the house.
-  id_price_change:
-    lineage:
-      - datalake_ebdb_pricing.listing_price_change.id_price_change
-    description: The Id of the price change related to the house.
   uuid_company:
     lineage:
       - datalake_ebdb_listing.house.uuid_company
