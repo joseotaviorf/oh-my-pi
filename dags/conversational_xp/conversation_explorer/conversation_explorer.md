@@ -6,8 +6,8 @@ Ingests daily session categorization data produced by the **Wall-E session categ
 
 | Property | Value |
 |----------|-------|
-| **Raw table** | `datalake_conversational_explorer_raw.categorisation` |
-| **Clean table** | `datalake_conversational_explorer_clean.categorisation` |
+| **Raw table** | `datalake_conversation_explorer_raw.categorisation` |
+| **Clean table** | `datalake_conversation_explorer_clean.categorisation` |
 | **Source** | `s3://conversation-explorer-prod/session-metadata/<YYYY-MM-DD>.parquet` |
 | **Trigger** | Dataset: `quintoml.chatbot.wall_e_session_categoriser.inference:first-run-of-day` |
 | **Extraction** | Full load (picks the most recently uploaded file) |

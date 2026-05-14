@@ -1,5 +1,5 @@
 ---
-database_name: datalake_conversational_explorer_raw
+database_name: datalake_conversation_explorer_raw
 table_name: categorisation
 description: "Daily session-level chatbot categorization stats produced by the Wall-E session categoriser model. Each row represents one Langfuse session with its category, resolution, escalation, and sentiment metadata."
 domain: "Conversational XP"

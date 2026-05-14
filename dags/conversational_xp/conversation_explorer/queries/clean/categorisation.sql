@@ -16,6 +16,6 @@ SELECT
     month,
     day
 FROM
-    datalake_conversational_explorer_raw.categorisation
+    datalake_conversation_explorer_raw.categorisation
 WHERE
     MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL 1 DAY AND DATE('{load_end_date}')

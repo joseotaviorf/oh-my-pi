@@ -6,7 +6,7 @@ dag:
   documentation:
     dag_purpose: |
       Ingests the daily session categorisation parquet produced by the Wall-E
-      session categoriser model. Raw lands in datalake_conversational_explorer_raw, clean in datalake_conversational_explorer_clean.
+      session categoriser model. Raw lands in datalake_conversation_explorer_raw, clean in datalake_conversation_explorer_clean.
 
       The source file lives at s3://conversation-explorer-prod/session-metadata/YYYY-MM-DD.parquet
       and is always yesterday's date relative to the execution date.

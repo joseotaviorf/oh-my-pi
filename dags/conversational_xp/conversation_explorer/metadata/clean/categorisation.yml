@@ -1,5 +1,5 @@
 ---
-database_name: datalake_conversational_explorer_clean
+database_name: datalake_conversation_explorer_clean
 table_name: categorisation
 description: "Clean layer for daily chatbot session categorization stats. Reads from raw and applies schema enforcement."
 domain: "Conversational XP"
@@ -7,65 +7,65 @@ owner: "joao.padrao@quintoandar.com.br"
 columns:
   id_langfuse_session:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.id_langfuse_session
+      - datalake_conversation_explorer_raw.categorisation.id_langfuse_session
     description: "Unique identifier for the Langfuse tracing session."
   session_date:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.session_date
+      - datalake_conversation_explorer_raw.categorisation.session_date
     description: "Date (YYYY-MM-DD) when the chatbot session occurred."
   channel:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.channel
+      - datalake_conversation_explorer_raw.categorisation.channel
     description: "Communication channel of the session (e.g. in app, whatsapp)."
   is_escalated:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.is_escalated
+      - datalake_conversation_explorer_raw.categorisation.is_escalated
     description: "Whether the session was escalated to a human agent."
   first_queue:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.first_queue
+      - datalake_conversation_explorer_raw.categorisation.first_queue
     description: "First support queue the session was routed to, if escalated."
   last_queue:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.last_queue
+      - datalake_conversation_explorer_raw.categorisation.last_queue
     description: "Last support queue the session was routed to, if escalated."
   category:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.category
+      - datalake_conversation_explorer_raw.categorisation.category
     description: "High-level conversation category assigned by the model (e.g. pagamentos, visitas, rescisao)."
   subcategory:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.subcategory
+      - datalake_conversation_explorer_raw.categorisation.subcategory
     description: "Detailed subcategory within the main category."
   resolution_category:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.resolution_category
+      - datalake_conversation_explorer_raw.categorisation.resolution_category
     description: "How the session was resolved (no_resolution, informational_resolution, action_resolution)."
   resolution_refinement_category:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.resolution_refinement_category
+      - datalake_conversation_explorer_raw.categorisation.resolution_refinement_category
     description: "Refinement of the resolution (general_info, specific_info)."
   ai_resistance:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.ai_resistance
+      - datalake_conversation_explorer_raw.categorisation.ai_resistance
     description: "User resistance level toward the AI assistant (no_resistance, delayed_escalation, immediate_rejection)."
   frustration:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.frustration
+      - datalake_conversation_explorer_raw.categorisation.frustration
     description: "User frustration level during the session (no_frustration, external_frustration_only, bot_directed_frustration)."
   summary:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.summary
+      - datalake_conversation_explorer_raw.categorisation.summary
     description: "AI-generated natural language summary of the conversation."
   year:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.year
+      - datalake_conversation_explorer_raw.categorisation.year
     description: "Partition column: year extracted from session_date."
   month:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.month
+      - datalake_conversation_explorer_raw.categorisation.month
     description: "Partition column: month extracted from session_date."
   day:
     lineage:
-      - datalake_conversational_explorer_raw.categorisation.day
+      - datalake_conversation_explorer_raw.categorisation.day
     description: "Partition column: day extracted from session_date."
