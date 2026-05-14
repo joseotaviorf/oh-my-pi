@@ -73,7 +73,7 @@ columns:
         demand_type — opens the buyer's funnel in the 3P demand context.
       'Recovery Buyer Prospect': Reactivation episode — the buyer already had
         a previous prospect event in this demand_type but became idle for at
-        least 180 days before the current event, opening a new window.
+        least 90 days before the current event, opening a new window.
   event_source:
     description: Origin of the prospect event. Hardcoded literal value indicating
       which upstream stream produced the row.

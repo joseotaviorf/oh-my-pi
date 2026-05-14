@@ -86,7 +86,7 @@ classified AS (
     ob.ts_event_start,
     CASE
       WHEN ob.rn_episode = 1 THEN 'NBP'
-      WHEN ob.prev_ts_start IS NOT NULL AND DATEDIFF(TO_DATE(ob.ts_event_start), TO_DATE(ob.prev_ts_start)) >= 180
+      WHEN ob.prev_ts_start IS NOT NULL AND DATEDIFF(TO_DATE(ob.ts_event_start), TO_DATE(ob.prev_ts_start)) >= 90
         THEN 'RBP'
     END AS buyer_prospect_type
   FROM
