@@ -2,92 +2,79 @@ WITH
   last_visit AS (
     SELECT
       id_visitor,
-      MAX(dt_scheduling) last_dt_scheduling
+      MAX(ts_schedule_visit) last_dt_scheduling
     FROM
-      dw_public.dim_booking
+      datalake_visit.visit_schedules
     WHERE
-      dt_scheduling >= CURRENT_DATE - INTERVAL '30' DAY
+      ts_schedule_visit >= CURRENT_DATE - INTERVAL '30' DAY
     GROUP BY
       1
   ),
   first_ AS (
     SELECT
       first_visit.id_visitor,
-      first_visit.sk_booking,
+      first_visit.id_schedule AS sk_booking,
       last_visit.last_dt_scheduling
     FROM
-      dw_public.dim_booking first_visit
-    INNER JOIN 
-      last_visit 
+      datalake_visit.visit_schedules first_visit
+    INNER JOIN
+      last_visit
         ON last_visit.id_visitor = first_visit.id_visitor
-        AND last_visit.last_dt_scheduling = first_visit.dt_scheduling
-    LEFT JOIN 
-      dw_public.dim_booking second_visit 
-        ON first_visit.id_visitor = second_visit.id_visitor
-        AND second_visit.dt_scheduling > first_visit.dt_scheduling
+        AND last_visit.last_dt_scheduling = first_visit.ts_schedule_visit
     WHERE
-      first_visit.visit_intent = 'SALE'
-      AND first_visit.type = 'Visita'
-      AND first_visit.country_code = 'BR'
-      AND first_visit.status = 'Cancelado'
-      AND first_visit.rescheduled_from_id IS NULL
-      AND second_visit.dt_scheduling IS NULL
-      AND date_diff (CURRENT_DATE, DATE(first_visit.dt_scheduling)) = 7
+      first_visit.business_context = 'SALE'
+      AND (first_visit.is_canceled OR first_visit.id_succeed_schedule IS NOT NULL) -- canceled booking
+      AND first_visit.schedule_origin = 'REQUEST'
+      AND date_diff (CURRENT_DATE, DATE(first_visit.ts_schedule_visit)) = 7
   ),
   second_ AS (
     SELECT
       first_visit.id_visitor,
-      first_visit.sk_booking,
+      first_visit.id_schedule AS sk_booking,
       last_visit.last_dt_scheduling
     FROM
-      dw_public.dim_booking first_visit
-    INNER JOIN 
-      last_visit 
+      datalake_visit.visit_schedules first_visit
+    INNER JOIN
+      last_visit
         ON last_visit.id_visitor = first_visit.id_visitor
-        AND last_visit.last_dt_scheduling = first_visit.dt_scheduling
+        AND last_visit.last_dt_scheduling = first_visit.ts_schedule_visit
     WHERE
-      first_visit.visit_intent = 'SALE'
-      AND first_visit.type = 'Visita'
-      AND first_visit.country_code = 'BR'
-      AND first_visit.status NOT IN ('Cancelado', 'Realizado')
-      AND rescheduled_from_id IS NULL
-      AND date_diff (CURRENT_DATE, DATE(first_visit.dt_scheduling)) = 2
+      first_visit.business_context = 'SALE'
+      AND NOT (first_visit.id_succeed_schedule IS NOT NULL OR first_visit.is_canceled OR first_visit.is_completed OR first_visit.is_unsuccessful) -- not canceled or realized booking
+      AND first_visit.schedule_origin = 'REQUEST'
+      AND date_diff (CURRENT_DATE, DATE(first_visit.ts_schedule_visit)) = 2
   ),
   third_ AS (
     SELECT
       first_visit.id_visitor,
-      first_visit.sk_booking,
+      first_visit.id_schedule AS sk_booking,
       last_visit.last_dt_scheduling
     FROM
-      dw_public.dim_booking first_visit
-    INNER JOIN 
-      last_visit 
+      datalake_visit.visit_schedules first_visit
+    INNER JOIN
+      last_visit
         ON last_visit.id_visitor = first_visit.id_visitor
-        AND last_visit.last_dt_scheduling = first_visit.dt_scheduling
-    LEFT JOIN 
-      dw_sale.fact_offers o 
+        AND last_visit.last_dt_scheduling = first_visit.ts_schedule_visit
+    LEFT JOIN
+      dw_sale.fact_offers o
         ON first_visit.id_visitor = o.sk_buyer
-        AND o.ts_offer_submitted > first_visit.dt_scheduling
+        AND o.ts_offer_submitted > first_visit.ts_schedule_visit
     WHERE
-      first_visit.visit_intent = 'SALE'
-      AND first_visit.type = 'Visita'
-      AND first_visit.country_code = 'BR'
-      AND first_visit.status IN ('Realizado')
-      AND rescheduled_from_id IS NULL
+      first_visit.business_context = 'SALE'
+      AND (first_visit.is_completed OR first_visit.is_unsuccessful) -- realized booking
+      AND first_visit.schedule_origin = 'REQUEST'
       AND o.ts_offer_submitted IS NULL
-      AND date_diff (CURRENT_DATE, DATE(first_visit.dt_scheduling)) = 8
+      AND date_diff (CURRENT_DATE, DATE(first_visit.ts_schedule_visit)) = 8
   ),
   rent_visits AS (
     SELECT
       id_visitor,
-      MAX(dt_scheduling) AS dt_visit_rent
+      MAX(ts_visit) AS dt_visit_rent
     FROM
-      dw_public.dim_booking
+      datalake_visit.visits
     WHERE
-      visit_intent = 'RENT'
-      AND TYPE = 'Visita'
-      AND visit_follow_up = 'VaiNegociar'
-      AND country_code = 'BR'
+      business_context = 'RENT'
+      AND is_completed
     GROUP BY
       1
   ),
@@ -124,10 +111,10 @@ SELECT
   END AS business_context
 FROM
   union_ v
-JOIN 
-  dw_public.dim_user du 
+JOIN
+  dw_public.dim_user du
     ON du.sk_user = v.id_visitor
-LEFT JOIN 
+LEFT JOIN
   rent_visits rv
     ON rv.id_visitor = v.id_visitor
     AND rv.dt_visit_rent BETWEEN (v.last_dt_scheduling - INTERVAL '30' DAY) AND (v.last_dt_scheduling + INTERVAL '30' DAY)

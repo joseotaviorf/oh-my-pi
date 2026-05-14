@@ -4824,7 +4824,6 @@ bietlejuice.reverse_supply_access:
   - bietlejuice.reverse_supply:load-reverse-supply-affiliates-volumetry:first-run-of-day
 bietlejuice.reverse_tracksale:
   - bietlejuice.docx_fast_lane:load-clean-credit-evaluation:first-run-of-day
-  - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
   - bietlejuice.dw_contract:load-dw-rent-dim-contract:first-run-of-day
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-department:first-run-of-day
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket:first-run-of-day
@@ -4852,6 +4851,8 @@ bietlejuice.reverse_tracksale:
   - bietlejuice.enrich_sale_offer_flows:load-enrich-sale-offer-flows:first-run-of-day
   - bietlejuice.enrich_tracksale_dispatches:load-enrich-true-offboarding-iq-dispatches:first-run-of-day
   - bietlejuice.enrich_tracksale_dispatches:load-enrich-true-offboarding-pp-dispatches:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visit-schedules:first-run-of-day
+  - bietlejuice.enrich_visit:load-enrich-visits:first-run-of-day
 bietlejuice.reverse_webhelp:
   - bietlejuice.bigfone:load-clean-call:first-run-of-day
   - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day

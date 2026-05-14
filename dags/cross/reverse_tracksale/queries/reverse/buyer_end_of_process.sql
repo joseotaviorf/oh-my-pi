@@ -20,7 +20,7 @@ WITH closing_infos AS (
     LEFT JOIN
         dw_sale.dim_sale_agreement AS ds
             ON ds.sk_offer = cf.sk_offer
-    LEFT JOIN 
+    LEFT JOIN
         datalake_sale_offer_flows.sale_offer_flows AS sof
             ON cf.sk_offer = sof.id_offer
 ),
@@ -56,13 +56,12 @@ ev AS (
 rent_visits AS (
     SELECT
         id_visitor,
-        MAX(dt_scheduling) AS dt_visit_rent
+        MAX(ts_visit) AS dt_visit_rent
     FROM
-        dw_public.dim_booking
+        datalake_visit.visits
     WHERE
-        visit_intent = 'RENT'
-        AND type = 'Visita'
-        AND visit_follow_up = 'VaiNegociar'
+        business_context = 'RENT'
+        AND is_completed
     GROUP BY 1
 ),
 base AS (

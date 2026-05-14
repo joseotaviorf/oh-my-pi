@@ -17,10 +17,10 @@ visits_scheduled AS (
     SELECT DISTINCT
         id_visitor AS id_user
     FROM
-        dw_public.dim_booking AS db
+        datalake_visit.visit_schedules AS db
     WHERE
-        status <> 'Cancelado'
-        AND DATE(dt_scheduling) >= CURRENT_DATE
+        NOT (is_canceled OR id_succeed_schedule IS NOT NULL) -- not Canceled booking
+        AND DATE(ts_schedule_visit) >= CURRENT_DATE
 ),
 credit_evaluation AS (
     SELECT

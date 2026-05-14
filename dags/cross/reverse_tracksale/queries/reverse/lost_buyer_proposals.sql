@@ -11,15 +11,13 @@ WITH
   ),
   rent_visits AS (
     SELECT
-      Id_visitor,
-      MAX(dt_scheduling) AS dt_visit_rent
+      id_visitor,
+      MAX(ts_visit) AS dt_visit_rent
     FROM
-      dw_public.dim_booking
+      datalake_visit.visits
     WHERE
-      visit_intent = 'RENT'
-      AND TYPE = 'Visita'
-      AND visit_follow_up = 'VaiNegociar'
-      AND country_code = 'BR'
+      business_context = 'RENT'
+      AND is_completed
     GROUP BY
       1
   ),
@@ -58,21 +56,21 @@ WITH
       END AS business_context
     FROM
       dw_sale.fact_sale_flows sf
-    INNER JOIN 
-      brazil_houses dh 
+    INNER JOIN
+      brazil_houses dh
         ON sf.sk_house = dh.id_house
-    LEFT JOIN 
-      dw_sale.fact_offers fo 
+    LEFT JOIN
+      dw_sale.fact_offers fo
         ON sf.sk_sale_flow = concat(fo.sk_buyer,'_',fo.sk_house)
-    LEFT JOIN 
-      dw_sale.dim_offer dof 
+    LEFT JOIN
+      dw_sale.dim_offer dof
         ON dof.sk_offer = fo.sk_offer
-    LEFT JOIN 
-      ccv 
+    LEFT JOIN
+      ccv
         ON ccv.sk_buyer = sf.sk_buyer
         AND dt_last_sale_agreement_signed >= fo.ts_offer_submitted
-    LEFT JOIN 
-      rent_visits rv 
+    LEFT JOIN
+      rent_visits rv
         ON rv.id_visitor = sf.sk_buyer
         AND rv.dt_visit_rent BETWEEN (fo.ts_offer_dismissed - INTERVAL '30' DAY) AND (fo.ts_offer_dismissed + INTERVAL '30' DAY)
     WHERE
@@ -141,6 +139,6 @@ SELECT
   v.business_context
 FROM
   union_ v
-JOIN 
-  dw_public.dim_user du 
+JOIN
+  dw_public.dim_user du
     ON du.sk_user = v.sk_buyer
