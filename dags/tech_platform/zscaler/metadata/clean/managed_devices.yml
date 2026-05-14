@@ -6,7 +6,7 @@ description: Cleaned and normalized device data from Zscaler Client Connector.
 
 columns:
   id_device:
-    description: Unique device identifier (UDID) from Zscaler.
+    description: UDID from Zscaler (trimmed), merge key device id alongside partition.
     lineage:
       - datalake_zscaler_raw.managed_devices.udid
   ds_mac_address:

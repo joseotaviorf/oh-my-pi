@@ -1,5 +1,5 @@
 SELECT
-    udid AS id_device,
+    TRIM(udid) AS id_device,
     macAddress AS ds_mac_address,
     machineHostname AS nm_hostname,
     user AS ds_user_email,
@@ -29,3 +29,14 @@ FROM
     datalake_zscaler_raw.managed_devices
 WHERE
     MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+QUALIFY
+    ROW_NUMBER() OVER (
+        PARTITION BY
+            year,
+            month,
+            day,
+            TRIM(udid)
+        ORDER BY
+            TRY_CAST(last_seen_time AS BIGINT) DESC NULLS LAST,
+            TRY_CAST(machineHostname AS STRING) ASC NULLS LAST
+    ) = 1
