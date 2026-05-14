@@ -34,7 +34,7 @@ workflow:
 cluster:
   type: consolidation_l_general_cluster
   custom_configurations:
-    driver_node_type_id: c6g.xlarge
+    driver_node_type_id: m6gd.xlarge
     node_type_id: m6gd.4xlarge
     runtime_engine: PHOTON
     num_workers: 4
