@@ -21,6 +21,10 @@ workflow:
     - "{load_end_date}"
     - "prod"
   tables_customization:
+    dim_pricing:
+      load_spark_job: load_dim_pricing
+    fact_price_changes:
+      load_spark_job: load_fact_price_changes
     dim_price_suggested:
       load_spark_job: load_dim_price_suggested
       merge_on: ['sk_price_suggested']

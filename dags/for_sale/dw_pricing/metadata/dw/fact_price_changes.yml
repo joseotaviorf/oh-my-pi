@@ -1,45 +1,60 @@
 database_name: dw_listing
 table_name: fact_price_changes
-description: This fact table consolidates all the price changes of a house listing and the respective prediction that
-  occurred right after. Each line is a price change (sk_pricing).
+description: >
+  Fact table with one row per price change (sk_pricing), enriched with the prediction
+  and suggestion that were active during the price validity window.
+  sk_price_predicted and sk_price_suggested default to -1 when no matching record exists.
 domain: Cross
 owner: bruna.prates@quintoandar.com.br
 columns:
   sk_pricing:
-    description: Key referring to a price change.
+    description: Primary key referring to a price change. Joins to dw_listing.dim_pricing.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.id_price_change
   sk_price_predicted:
-    description: Key referring to the the listing price predicted by calculator.
+    description: >
+      Key referring to the earliest calculator prediction whose validity window overlaps
+      the price change period, scoped to the same (sk_house, sk_house_listing, business_context).
+      Defaults to -1 if no matching prediction exists.
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.id_prediction_change
   sk_price_suggested:
-    description: Key referring to the the price suggested.
+    description: >
+      Key referring to the most recent price suggestion active at the moment the price change
+      started, scoped to (sk_house, business_context) regardless of listing version.
+      Defaults to -1 if no matching suggestion exists.
     lineage:
       - datalake_ebdb_pricing.house_suggestion_changes.id_suggestion_change
   sk_house:
-    description: Key referring to the house ID.
+    description: Key referring to the house. Consistent across all listing versions.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.id_house
   sk_house_listing:
-    description: Key referring to the house listing ID (the last 3 numbers indicate the version of the listing) that was active when the referred price change occurred.
+    description: >
+      Key referring to the listing version that was active when this price change occurred.
+      The last 3 digits indicate the listing version.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.id_house_listing
   sk_user:
-    description: Key referring to the author who made the price change.
+    description: Key referring to the user who authored the price change. Defaults to -1 if unknown.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.id_user_revision
   days_with_pricing_scheme:
-    description: Number of days the listing remained at the price. If it's the most recent price, it counts up to D-1.
+    description: >
+      Number of days the listing remained at this price. For the current active price
+      (ts_price_ended IS NULL), this counts up to D-1.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.days_with_pricing_scheme
   ts_price_started:
-    description: Timestamp of when the price scheme started.
+    description: Timestamp of when this price became effective.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.ts_price_started
   ts_price_ended:
-    description: Timestamp of when the price scheme ended.
+    description: >
+      Timestamp of when this price was superseded by the next price change for the same
+      (sk_house, business_context), regardless of listing version (id_house_listing).
+      NULL if this is the currently active price.
     lineage:
       - datalake_ebdb_pricing.listing_price_change.ts_price_ended
   ts_load:
-    description: Timestamp of when the table was loaded.
+    description: Timestamp of when the row was last written by the ETL job.
