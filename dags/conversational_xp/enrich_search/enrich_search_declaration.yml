@@ -35,7 +35,9 @@ cluster:
   type: consolidation_l_general_cluster
   custom_configurations:
     driver_node_type_id: c6g.xlarge
-    num_workers: 5
+    node_type_id: m6gd.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 4
     spark_conf:
       spark.metrics.namespace: "data_products.enrich_search"
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
