@@ -4,6 +4,7 @@ SELECT
     COALESCE(ct.sk_contact_version, '-1') AS sk_contact_version,
     COALESCE(doc.sk_documentation_version, '-1') AS sk_documentation_version,
     COALESCE(ec.sk_emergency_contact_version, '-1') AS sk_emergency_contact_version,
+    COALESCE(asn.id_person, -1) AS sk_employee,
     COALESCE(asn.sk_hierarchy_version, '-1') AS sk_hierarchy_version,
     COALESCE(asn.id_business_unit, '-1') AS sk_business_unit,
     asn.sk_termination_event_definition,
