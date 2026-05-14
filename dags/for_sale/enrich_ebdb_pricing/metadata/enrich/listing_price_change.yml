@@ -6,6 +6,13 @@ description: Enrich table that handles sale and rental listing price change info
 domain: For Rent
 owner: bruna.prates@quintoandar.com.br
 columns:
+  id_price_change:
+    lineage:
+      - datalake_ebdb_clean.house_aud.id_house
+      - datalake_ebdb_clean.house_aud.rev
+      - datalake_ebdb_clean.listing_business_context.business_context
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+    description: Surrogate key for the price change record, derived as a deterministic hash of (id_house, id_revision, business_context, ts_price_started).
   id_house:
     lineage:
       - datalake_ebdb_clean.house_aud.id_house
@@ -41,9 +48,9 @@ columns:
       - datalake_ebdb_clean.house_aud.rent
     description: Price previous to the price of the referenced row.
   last_price_variation:
-    description: Percent difference between the published price for the row and the previous published price.
+    description: Percent difference between the published price for the row and the previous published price for the house within the same business context (RENT or SALE), across all listing versions.
   first_price_variation:
-    description: Percent difference between the published price for the row and the first published price.
+    description: Percent difference between the published price for the row and the first published price ever recorded for the house within the same business context (RENT or SALE), across all listing versions.
   change_type:
     description: Describes the type of price change.
     categories:
@@ -51,15 +58,15 @@ columns:
       Price increase: Price of the listing went up.
       Price decrease: Price of the listing went down.
   change_number:
-    description: Tells the number of listing price changes.
+    description: Sequential number of the price change for the house within a given business context (RENT or SALE), across all listing versions.
   days_with_pricing_scheme:
-    description: Count how many days the listing stayed at that publication price. If it is the most recent price, it counts up to D-1.
+    description: Count how many days the house stayed at that publication price within a given business context (RENT or SALE). If it is the most recent price, it counts up to D-1.
   is_first_price:
-    description: Boolean that tells if the price is the first publication price of the listing.
+    description: Boolean that tells if the price is the first publication price ever recorded for the house within a given business context (RENT or SALE), across all listing versions.
   is_last_price:
-    description: Boolean that tells if the price is the most recent publication price of the listing.
+    description: Boolean that tells if the price is the most recent publication price of the house within a given business context (RENT or SALE), across all listing versions.
   is_last_price_of_day:
-    description: Boolean that tells if the price is the listing's most recent publication price of the day.
+    description: Boolean that tells if the price is the house's most recent publication price of the day within a given business context (RENT or SALE), across all listing versions.
   ts_price_started:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision

@@ -22,7 +22,7 @@ workflow:
     - "prod"
   tables_customization:
     listing_price_change:
-      merge_on: [ 'id_house', 'id_revision', 'business_context', 'ts_price_started' ]
+      load_spark_job: load_listing_price_change
     listing_prediction_changes:
       merge_on: [ 'id_house', 'id_revision', 'business_context', 'ts_calculator_result_started' ]
     house_suggestion_changes:

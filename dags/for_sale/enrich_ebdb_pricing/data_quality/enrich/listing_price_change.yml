@@ -1,6 +1,17 @@
 ---
 table_name: datalake_ebdb_pricing.listing_price_change
 alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -5
+    less_than_or_equal_to: 15
+    severity_level: Warning
+
 column_level_validations:
   id_price_change:
     is_complete:
@@ -26,15 +37,73 @@ column_level_validations:
   price:
     is_complete:
       severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Error
+    custom:
+      # A non-zero price appearing in both RENT and SALE contexts for the same house is
+      # suspicious: rental (monthly) and sale (total) prices are of different magnitudes.
+      constraint: |-
+        (SELECT COUNT(DISTINCT id_house)
+         FROM datalake_ebdb_pricing.listing_price_change
+         WHERE price > 0
+           AND (id_house, price) IN (
+             SELECT id_house, price
+             FROM datalake_ebdb_pricing.listing_price_change
+             WHERE business_context = 'RENT' AND price > 0
+             INTERSECT
+             SELECT id_house, price
+             FROM datalake_ebdb_pricing.listing_price_change
+             WHERE business_context = 'SALE' AND price > 0
+           )
+        ) = 0
+      severity_level: Warning
   is_first_price:
     is_complete:
       severity_level: Error
   is_last_price:
     is_complete:
       severity_level: Error
+    custom:
+      # Each (id_house, business_context) pair must have exactly one row with is_last_price=TRUE.
+      # More than one TRUE indicates the incremental MERGE left stale flags after a new price was added.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT id_house, business_context
+           FROM datalake_ebdb_pricing.listing_price_change
+           WHERE is_last_price = TRUE
+           GROUP BY id_house, business_context
+           HAVING COUNT(*) > 1
+         )
+        ) = 0
+      severity_level: Error
   is_last_price_of_day:
     is_complete:
+      severity_level: Error
+    custom:
+      # Each (id_house, business_context, day) must have at most one row with is_last_price_of_day=TRUE.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+           SELECT id_house, business_context, DATE(ts_price_started) AS dt
+           FROM datalake_ebdb_pricing.listing_price_change
+           WHERE is_last_price_of_day = TRUE
+           GROUP BY id_house, business_context, DATE(ts_price_started)
+           HAVING COUNT(*) > 1
+         )
+        ) = 0
       severity_level: Error
   ts_price_started:
     is_complete:
       severity_level: Error
+  ts_price_ended:
+    custom:
+      # is_last_price=TRUE must align with ts_price_ended=NULL (no subsequent price change).
+      # Violations indicate stale flags or orphaned records from historical loads.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_ebdb_pricing.listing_price_change
+         WHERE is_last_price = TRUE AND ts_price_ended IS NOT NULL
+        ) = 0
+      severity_level: Warning
