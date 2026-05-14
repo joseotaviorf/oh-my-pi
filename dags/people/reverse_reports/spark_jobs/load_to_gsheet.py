@@ -23,7 +23,7 @@ from gspread.exceptions import WorksheetNotFound
 from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
 from quintoandar_gsheets_api_client.producer import GoogleSheetsWriter
 
-from bietlejuice.base.api import APIEnum
+from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient
 
