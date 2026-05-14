@@ -2,7 +2,9 @@ import logging
 import ast
 
 from argparse import ArgumentParser
-from datetime import datetime
+from datetime import datetime, timedelta
+from functools import reduce
+
 from pyspark.sql.functions import input_file_name, regexp_extract, to_json, struct
 
 from quintoandar_logger import QuintoAndarLogger
@@ -27,52 +29,75 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def get_inmetro_data(serialize_columns_from_directory, partition_cols, execution_date):
+def _generate_date_range(start_date_str, end_date_str):
+    start = datetime.strptime(start_date_str, "%Y-%m-%d")
+    end = datetime.strptime(end_date_str, "%Y-%m-%d")
+    if start > end:
+        raise ValueError(f"load_start_date ({start_date_str}) must be <= load_end_date ({end_date_str})")
+    days = (end - start).days
+    return [(start + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(days + 1)]
+
+
+def _load_single_date(target_date, serialize_columns_from_directory, partition_cols, inmetro_bucket):
+    file_path = f"{inmetro_bucket}/*/*/*/{bucket_directory}/{target_date}"
+    path_attributes_pattern = (
+        f"{inmetro_bucket}\/(\w+)\/(\w+)\/(\w+)\/{bucket_directory}/{target_date}"
+    )
+
+    df = spark.read.format("json").load(file_path)
+
+    if serialize_columns_from_directory:
+        df = df.withColumn(
+            "inmetro_info", to_json(struct([df[x] for x in df.columns]))
+        ).select("inmetro_info")
+
+    df = (
+        df.withColumn(
+            "repo", regexp_extract(input_file_name(), path_attributes_pattern, 1)
+        )
+        .withColumn(
+            "database",
+            regexp_extract(input_file_name(), path_attributes_pattern, 2),
+        )
+        .withColumn(
+            "table", regexp_extract(input_file_name(), path_attributes_pattern, 3)
+        )
+    )
+
+    df = (
+        SparkDataFrameService()
+        .input(df)
+        .create_year_month_day_columns_from_date(
+            datetime.strptime(target_date, "%Y-%m-%d")
+        )
+        .optimize_partitions_by_partition_columns(partition_cols)
+        .output()
+    )
+
+    return df
+
+
+def get_inmetro_data(serialize_columns_from_directory, partition_cols, load_start_date, load_end_date):
+    dates = _generate_date_range(load_start_date, load_end_date)
+    logger.info(f"m={JOB_NAME}, dates={dates}, msg=Loading date range")
 
     config_service = ConfigurationService(source)
     inmetro_bucket = config_service.get_config("inmetro_bucket")
 
-    file_path = f"{inmetro_bucket}/*/*/*/{bucket_directory}/{execution_date}"
-    path_attributes_pattern = (
-        f"{inmetro_bucket}\/(\w+)\/(\w+)\/(\w+)\/{bucket_directory}/{execution_date}"
-    )
+    dfs = []
+    for target_date in dates:
+        try:
+            df = _load_single_date(target_date, serialize_columns_from_directory, partition_cols, inmetro_bucket)
+            dfs.append(df)
+            logger.info(f"m={JOB_NAME}, date={target_date}, msg=Loaded successfully")
+        except Exception as e:
+            logger.warning(f"m={JOB_NAME}, date={target_date}, msg=No data found, skipping. error={e}")
+            continue
 
-    try:
-        df = spark.read.format("json").load(file_path)
-
-        if serialize_columns_from_directory:
-            df = df.withColumn(
-                "inmetro_info", to_json(struct([df[x] for x in df.columns]))
-            ).select("inmetro_info")
-
-        df = (
-            df.withColumn(
-                "repo", regexp_extract(input_file_name(), path_attributes_pattern, 1)
-            )
-            .withColumn(
-                "database",
-                regexp_extract(input_file_name(), path_attributes_pattern, 2),
-            )
-            .withColumn(
-                "table", regexp_extract(input_file_name(), path_attributes_pattern, 3)
-            )
-        )
-
-        df = (
-            SparkDataFrameService()
-            .input(df)
-            .create_year_month_day_columns_from_date(
-                datetime.strptime(execution_date, "%Y-%m-%d")
-            )
-            .optimize_partitions_by_partition_columns(partition_cols)
-            .output()
-        )
-
-    except Exception as e:
-        logger.error(f"m={JOB_NAME}, error={e}")
+    if not dfs:
         return None
 
-    return df
+    return reduce(lambda a, b: a.unionByName(b), dfs)
 
 
 if __name__ == "__main__":
@@ -85,6 +110,7 @@ if __name__ == "__main__":
     parser.add_argument("partition_cols")
     parser.add_argument("bucket_directory")
     parser.add_argument("serialize_columns_from_directory")
+    parser.add_argument("load_end_date", nargs="?", default=None)
     args = parser.parse_args()
 
     environment = args.environment
@@ -95,12 +121,13 @@ if __name__ == "__main__":
     partition_cols = ast.literal_eval(args.partition_cols)
     bucket_directory = args.bucket_directory
     serialize_columns_from_directory = ast.literal_eval(args.serialize_columns_from_directory)
+    load_end_date = args.load_end_date or execution_date
 
     logger.info(
         f"""
         m={JOB_NAME}, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
         table_name={table_name}, bucket_directory={bucket_directory}, partition_cols={partition_cols},
-        execution_date={execution_date}, msg=Starting spark job...
+        load_start_date={execution_date}, load_end_date={load_end_date}, msg=Starting spark job...
         """
     )
 
@@ -120,7 +147,7 @@ if __name__ == "__main__":
     database_location = datalake_info["db_raw_path"]
     database_name = datalake_info["db_raw_databricks"]
 
-    df = get_inmetro_data(serialize_columns_from_directory, partition_cols, execution_date)
+    df = get_inmetro_data(serialize_columns_from_directory, partition_cols, execution_date, load_end_date)
 
     if not df:
         logger.warning(
