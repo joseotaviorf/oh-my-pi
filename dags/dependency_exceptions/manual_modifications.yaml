@@ -1282,6 +1282,7 @@ bietlejuice.payable_accounts_transactions:
 bietlejuice.dw_pricing:
   add:
     - bietlejuice.enrich_ebdb_pricing:load-enrich-house-suggestion-changes:first-run-of-day
+    - bietlejuice.enrich_ebdb_pricing:load-enrich-listing-price-change:first-run-of-day
 bietlejuice.dw_pipeline:
   remove:
     - bietlejuice.enrich_pipeline:load-enrich-dag-run:first-run-of-day
