@@ -14,7 +14,7 @@ WITH raw_contract_person_event AS (
 event_contract_person AS (
   SELECT
     id_contract_person,
-    NULLIF(TRIM(user_email), '') AS user_email,
+    NULLIF(LOWER(TRIM(user_email)), '') AS user_email,
     NULLIF(user_phone, '') AS user_phone,
     split(TRIM(full_name), ' ')[0] AS first_name,
     TRIM(SUBSTRING(TRIM(full_name), LENGTH(split(TRIM(full_name), ' ')[0]) + 1)) AS last_name,
@@ -41,7 +41,7 @@ latest_event_contract_person AS (
 lake_contract_person AS (
   SELECT
     id AS id_contract_person,
-    NULLIF(TRIM(email), '') AS user_email,
+    NULLIF(LOWER(TRIM(email)), '') AS user_email,
     NULLIF(REGEXP_REPLACE(phone_number, '[^0-9]', ''), '') AS user_phone,
     split(TRIM(name), ' ')[0] AS first_name,
     TRIM(SUBSTRING(TRIM(name), LENGTH(split(TRIM(name), ' ')[0]) + 1)) AS last_name
