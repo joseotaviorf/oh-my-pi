@@ -65,6 +65,8 @@ get_first_pub_event AS (
         business_context
     FROM
         datalake_amplitude_clean.370096_property_publish_success_events
+    WHERE
+        DATE(ts_event) BETWEEN DATE('2025-07-14') AND DATE('2026-05-12')
     QUALIFY
         ROW_NUMBER() OVER(PARTITION BY id_house, business_context ORDER BY ts_event ASC) = 1
 ),
