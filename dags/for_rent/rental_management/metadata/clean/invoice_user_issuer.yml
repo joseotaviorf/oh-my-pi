@@ -46,3 +46,7 @@ columns:
     lineage:
       - datalake_rental_management_raw.boleto_user_issuer.updated_at
     description: Timestamp of the update of the invoice user issuer.
+  ts_last_received_event:
+    lineage:
+      - datalake_rental_management_raw.boleto_user_issuer.last_received_event_at
+    description: Last time a webhook event was handled for this invoice user issuer stream; used for integration silence detection.

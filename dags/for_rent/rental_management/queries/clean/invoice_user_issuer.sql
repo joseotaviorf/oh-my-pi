@@ -8,6 +8,7 @@ SELECT
     monitoring_start_date AS dt_monitoring_started,
     due_date AS dt_due,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+    last_received_event_at AS ts_last_received_event
 FROM
     datalake_rental_management_raw.boleto_user_issuer
