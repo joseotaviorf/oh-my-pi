@@ -251,7 +251,7 @@ hierarchy_union AS (
     UNION ALL
     SELECT
         ceo.assignment_number,
-        ceo.assignment_number AS manager_assignment_number_1,
+        NULL AS manager_assignment_number_1,
         NULL,
         NULL,
         NULL,
