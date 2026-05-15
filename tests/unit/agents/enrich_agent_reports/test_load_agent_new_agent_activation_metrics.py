@@ -232,6 +232,105 @@ def test_build_integration_activation_segment_and_barren_ppa(spark):
     assert all(r.agent_business_context == "UNKNOWN" for r in out.values())
 
 
+def test_is_channel_active_rollups_prior_reference_month(spark):
+    """``is_*_active_in_month`` includes activity in ``reference_month - 1``; ``total_*`` stays current."""
+    metrics_rows = [
+        (1, 11, date(2024, 12, 1), 1, 1, "ACTIVE", False, None, None),
+        (1, 11, date(2025, 1, 1), 0, 0, "ACTIVE", False, None, None),
+    ]
+    metrics_df = spark.createDataFrame(metrics_rows, _METRICS_INPUT_SCHEMA)
+    status_schema = StructType([
+        StructField("id_user", LongType(), True),
+        StructField("id_agent", LongType(), True),
+        StructField("reference_month", DateType(), True),
+        StructField("agent_status", StringType(), True),
+        StructField("ciq_status", StringType(), True),
+        StructField("is_passive_lead_receiver", BooleanType(), True),
+        StructField("agent_status_start", TimestampType(), True),
+    ])
+    status_df = spark.createDataFrame(
+        [(11, 1, date(2025, 1, 1), "ACTIVE", "ACTIVE", False, datetime(2025, 1, 1))],
+        status_schema,
+    )
+    agent_data_df = spark.createDataFrame(
+        [(1, datetime(2025, 1, 15, 0, 0, 0), "REGULAR")],
+        StructType([
+            StructField("id", LongType(), True),
+            StructField("ts_created", TimestampType(), True),
+            StructField("agent_type", StringType(), True),
+        ]),
+    )
+    partner_df = spark.createDataFrame(
+        [(11, datetime(2025, 1, 1))],
+        StructType([
+            StructField("id_user", LongType(), True),
+            StructField("ts_created", TimestampType(), True),
+        ]),
+    )
+    empty_ppa = spark.createDataFrame(
+        [],
+        StructType([
+            StructField("id_agent", LongType(), True),
+            StructField("reference_month", DateType(), True),
+            StructField("total_ppa_count", LongType(), False),
+            StructField("ts_first_ppa_activation", TimestampType(), True),
+        ]),
+    )
+    empty_city = spark.createDataFrame(
+        [],
+        StructType([
+            StructField("id_agent", LongType(), True),
+            StructField("name_city", StringType(), True),
+        ]),
+    )
+    empty_da = spark.createDataFrame(
+        [],
+        StructType([
+            StructField("id_agent", LongType(), True),
+            StructField("is_sale_agent", BooleanType(), True),
+            StructField("is_rent_agent", BooleanType(), True),
+        ]),
+    )
+    args = Namespace(
+        env="forno",
+        datalake_bucket="5a-datalake-prod",
+        database_base_name="agent_reports",
+        dag_name="enrich_agent_reports",
+        table_name="agent_new_agent_activation_metrics",
+        load_end_date="2025-01-31",
+        months_window=1,
+        run_mode="dev",
+    )
+
+    def _table_side_effect(table_name):
+        if table_name == _job.TABLE_STATUS_BY_MONTH:
+            return status_df
+        if table_name == _job.TABLE_AGENT_DATA:
+            return agent_data_df
+        if table_name == _job.TABLE_PARTNER_AGENT:
+            return partner_df
+        raise ValueError(table_name)
+
+    mock_spark = MagicMock()
+    mock_spark.table.side_effect = _table_side_effect
+    _job.spark = mock_spark
+
+    with ExitStack() as stack:
+        stack.enter_context(patch.object(_job, "_tqc_first_date_df", return_value=metrics_df))
+        stack.enter_context(patch.object(_job, "_valid_first_listing_df", return_value=metrics_df))
+        stack.enter_context(patch.object(_job, "_ppa_visits_df", return_value=empty_ppa))
+        stack.enter_context(patch.object(_job, "_agent_city_df", return_value=empty_city))
+        stack.enter_context(
+            patch.object(_job, "_dim_agent_business_context_df", return_value=empty_da)
+        )
+        row_out = _job.build_agent_new_agent_activation_metrics(args).collect()[0]
+
+    assert row_out.reference_month == date(2025, 1, 1)
+    assert row_out.total_listings_count == 0 and row_out.total_tqc_count == 0
+    assert row_out.is_ciq_active_in_month is True and row_out.is_tqc_active_in_month is True
+    assert row_out.is_activated is True
+
+
 def test_agent_business_context_from_clean_layer(spark):
     """Flags from mocked ``_dim_agent_business_context_df`` map to string context."""
     row = (1, 11, date(2025, 1, 1), 0, 0, "ACTIVE", False, None, None)

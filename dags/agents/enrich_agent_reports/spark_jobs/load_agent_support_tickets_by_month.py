@@ -178,7 +178,7 @@ def _qualified_active_ciqs_by_month(load_end_date: str, months_window: int = 18)
         .select(
             col("id_user"),
             date_trunc("month", col("ts_original_first_listing")).alias("listing_month_start"),
-            add_months(date_trunc("month", col("ts_original_first_listing")), 2).alias("listing_month_end"),
+            add_months(date_trunc("month", col("ts_original_first_listing")), 11).alias("listing_month_end"),
         )
     )
     qualified_user_months = _month_expanded(

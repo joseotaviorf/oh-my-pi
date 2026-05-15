@@ -21,8 +21,9 @@
 #   6. Join activations — valid first listing (`ciq_first_listing`), TQC self-referral
 #      (`offer_specialists`), PPA visits (`visit_schedules` × `preferred_property_agent_relation_history`),
 #      optional `name_city` from region hierarchy (`region`, `agent_region_data`).
-#   7. Derive activation and segment flags; three ``days_since_*`` columns (demand creation, CIQ
-#      creation, independent registration) all vs ``last_day(reference_month)``; ``validate_before_write`` then Delta load.
+#   7. Derive activation and segment flags; ``is_*_active_in_month`` / ``is_activated`` use activity in
+#      ``reference_month`` **or** the prior calendar month (single-month ``total_*_count`` unchanged).
+#      Three ``days_since_*`` vs ``last_day(reference_month)``; ``validate_before_write`` then Delta load.
 #
 # How to run unit tests (repo root; use project pyenv env `bi-etl-ejuice`):
 #   python -m pytest tests/unit/agents/enrich_agent_reports/test_load_agent_new_agent_activation_metrics.py -v
@@ -32,12 +33,13 @@
 from __future__ import annotations
 
 from argparse import ArgumentParser, Namespace
-from datetime import date, timedelta, datetime
-from dateutil.relativedelta import relativedelta
+from datetime import date, datetime, timedelta
 from typing import Optional
 
+from dateutil.relativedelta import relativedelta
 from pyspark.sql import Column, DataFrame, Window
 from pyspark.sql.functions import (
+    add_months,
     coalesce,
     col,
     count,
@@ -47,10 +49,14 @@ from pyspark.sql.functions import (
     last_day,
     least,
     lit,
-    max as spark_max,
-    min as spark_min,
     to_date,
     when,
+)
+from pyspark.sql.functions import (
+    max as spark_max,
+)
+from pyspark.sql.functions import (
+    min as spark_min,
 )
 from pyspark.sql.types import (
     BooleanType,
@@ -62,15 +68,14 @@ from pyspark.sql.types import (
     StructType,
     TimestampType,
 )
+from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from quintoandar_logger import QuintoAndarLogger
 
 # COMMAND ----------
 
@@ -297,6 +302,8 @@ def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
     """Nationwide new-agent activation metrics: within 60 days of each row's ``reference_month`` month-end."""
     months_window = int(getattr(args, "months_window", MONTHS_WINDOW_DEFAULT))
     month_start, month_end = _month_range(args.load_end_date, months_window)
+    # Pull one extra month before the status window so prior-month activity joins exist at window start.
+    activity_month_start = month_start - relativedelta(months=1)
 
     status = (
         spark.table(TABLE_STATUS_BY_MONTH)
@@ -315,6 +322,9 @@ def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
         .when((col("s.ciq_status") == "ACTIVE") & (col("s.agent_status") != "ACTIVE"), lit("CIQ_ONLY"))
         .otherwise(lit("OTHER"))
     )
+    tqc_by_month = _tqc_first_date_df(activity_month_start, month_end)
+    vfl_by_month = _valid_first_listing_df(activity_month_start, month_end)
+    ppa_by_month = _ppa_visits_df(activity_month_start, month_end)
     return (
         status.alias("s")
         .join(
@@ -333,18 +343,36 @@ def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
             col("s.id_user") == col("pa_id_user"), "left",
         )
         .join(
-            _tqc_first_date_df(month_start, month_end).alias("tqc"),
-            (col("s.id_user") == col("tqc.id_user")) & (col("s.reference_month") == col("tqc.reference_month")),
+            tqc_by_month.alias("tqc_curr"),
+            (col("s.id_user") == col("tqc_curr.id_user")) & (col("s.reference_month") == col("tqc_curr.reference_month")),
             "left",
         )
         .join(
-            _valid_first_listing_df(month_start, month_end).alias("vfl"),
-            (col("s.id_user") == col("vfl.id_user")) & (col("s.reference_month") == col("vfl.reference_month")),
+            tqc_by_month.alias("tqc_prev"),
+            (col("s.id_user") == col("tqc_prev.id_user"))
+            & (col("tqc_prev.reference_month") == add_months(col("s.reference_month"), -1)),
             "left",
         )
         .join(
-            _ppa_visits_df(month_start, month_end).alias("ppa"),
-            (col("s.id_agent") == col("ppa.id_agent")) & (col("s.reference_month") == col("ppa.reference_month")),
+            vfl_by_month.alias("vfl_curr"),
+            (col("s.id_user") == col("vfl_curr.id_user")) & (col("s.reference_month") == col("vfl_curr.reference_month")),
+            "left",
+        )
+        .join(
+            vfl_by_month.alias("vfl_prev"),
+            (col("s.id_user") == col("vfl_prev.id_user"))
+            & (col("vfl_prev.reference_month") == add_months(col("s.reference_month"), -1)),
+            "left",
+        )
+        .join(
+            ppa_by_month.alias("ppa_curr"),
+            (col("s.id_agent") == col("ppa_curr.id_agent")) & (col("s.reference_month") == col("ppa_curr.reference_month")),
+            "left",
+        )
+        .join(
+            ppa_by_month.alias("ppa_prev"),
+            (col("s.id_agent") == col("ppa_prev.id_agent"))
+            & (col("ppa_prev.reference_month") == add_months(col("s.reference_month"), -1)),
             "left",
         )
         .join(
@@ -362,20 +390,36 @@ def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
             coalesce(col("dt_independent_agent_registered"), to_date(least(col("brk.brk_ts_created"), col("ts_ciq_created")))).alias("dt_independent_agent_registered"),
             col("brk.brk_ts_created").alias("ts_agent_created"),
             col("ts_ciq_created"),
-            col("tqc.ts_first_activation_tqc_referral"),
-            coalesce(col("tqc.total_tqc_count"), lit(0)).alias("total_tqc_count"),
-            col("vfl.ts_valid_activation_first_listing"),
-            coalesce(col("vfl.total_listings_count"), lit(0)).alias("total_listings_count"),
-            coalesce(col("ppa.total_ppa_count"), lit(0)).alias("total_ppa_count"),
-            col("ppa.ts_first_ppa_activation"),
+            col("tqc_curr.ts_first_activation_tqc_referral"),
+            coalesce(col("tqc_curr.total_tqc_count"), lit(0)).alias("total_tqc_count"),
+            coalesce(col("tqc_prev.total_tqc_count"), lit(0)).alias("_prior_month_tqc_count"),
+            col("vfl_curr.ts_valid_activation_first_listing"),
+            coalesce(col("vfl_curr.total_listings_count"), lit(0)).alias("total_listings_count"),
+            coalesce(col("vfl_prev.total_listings_count"), lit(0)).alias("_prior_month_listings_count"),
+            coalesce(col("ppa_curr.total_ppa_count"), lit(0)).alias("total_ppa_count"),
+            coalesce(col("ppa_prev.total_ppa_count"), lit(0)).alias("_prior_month_ppa_count"),
+            col("ppa_curr.ts_first_ppa_activation"),
             col("city.name_city"),
             col("da.is_sale_agent").alias("_bctx_is_sale"),
             col("da.is_rent_agent").alias("_bctx_is_rent"),
         )
-        .withColumn("is_ciq_active_in_month", col("total_listings_count") > 0)
-        .withColumn("is_tqc_active_in_month", col("total_tqc_count") > 0)
-        .withColumn("is_ppa_active_in_month", col("total_ppa_count") > 0)
-        .withColumn("is_activated", (col("total_listings_count") > 0) | (col("total_tqc_count") > 0) | (col("total_ppa_count") > 0))
+        .withColumn(
+            "is_ciq_active_in_month",
+            (col("total_listings_count") + col("_prior_month_listings_count")) > 0,
+        )
+        .withColumn(
+            "is_tqc_active_in_month",
+            (col("total_tqc_count") + col("_prior_month_tqc_count")) > 0,
+        )
+        .withColumn(
+            "is_ppa_active_in_month",
+            (col("total_ppa_count") + col("_prior_month_ppa_count")) > 0,
+        )
+        .withColumn(
+            "is_activated",
+            col("is_ciq_active_in_month") | col("is_tqc_active_in_month") | col("is_ppa_active_in_month"),
+        )
+        .drop("_prior_month_listings_count", "_prior_month_tqc_count", "_prior_month_ppa_count")
         .withColumn("is_ciq_only", (col("ciq_status") == "ACTIVE") & (col("agent_status") == "INACTIVE"))
         .withColumn("is_independent_agent", (col("ciq_status") == "ACTIVE") & (col("agent_status") == "ACTIVE") & ~col("is_passive_lead_receiver"))
         .withColumn("agent_type_segment", agent_type_segment)
