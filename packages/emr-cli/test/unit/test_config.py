@@ -146,6 +146,7 @@ def test_load_settings_file_rejects_unknown_keys(tmp_path: Path) -> None:
             action_on_failure: TERMINATE_CLUSTER
             deploy_mode: cluster
             log_uri: s3://b/l/
+            dump_logs_base_uri: s3://b/emr/logs/cli/
             staging_uri: s3://b/emr/staging/cli/
             visible_to_all_users: true
             master_instance_type: m5.xlarge
@@ -179,6 +180,7 @@ def test_load_settings_file_ok(tmp_path: Path) -> None:
             action_on_failure: TERMINATE_CLUSTER
             deploy_mode: cluster
             log_uri: s3://b/l/
+            dump_logs_base_uri: s3://b/emr/logs/cli/
             staging_uri: s3://b/emr/staging/cli/
             visible_to_all_users: true
             master_instance_type: m5.xlarge
@@ -200,6 +202,7 @@ def test_load_settings_file_ok(tmp_path: Path) -> None:
     assert cfg["visible_to_all_users"] is True
     assert cfg["use_spot"] is False
     assert cfg["staging_uri"] == "s3://b/emr/staging/cli/"
+    assert cfg["dump_logs_base_uri"] == "s3://b/emr/logs/cli/"
     assert cfg["applications"] == [{"Name": "Hadoop"}, {"Name": "Spark"}]
     assert cfg["configurations"] == []
 
@@ -322,6 +325,7 @@ def _write_minimal_settings(path: Path) -> Path:
             action_on_failure: TERMINATE_CLUSTER
             deploy_mode: cluster
             log_uri: s3://b/l/
+            dump_logs_base_uri: s3://b/emr/logs/cli/
             staging_uri: s3://b/emr/staging/cli/
             visible_to_all_users: true
             master_instance_type: m5.xlarge

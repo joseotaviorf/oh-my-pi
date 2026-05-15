@@ -33,7 +33,8 @@ _STDOUT_KEYS = ("stdout.gz", "stdout")
 _STDERR_KEYS = ("stderr.gz", "stderr")
 
 
-def _decode_log_body(body: bytes, *, name: str) -> str:
+def decode_log_body(body: bytes, *, name: str) -> str:
+    """Decode EMR log object bytes (gzip if ``name`` ends with ``.gz``)."""
     if not body:
         return ""
     if name.endswith(".gz"):
@@ -75,7 +76,7 @@ class StepLogTailer:
                     continue
                 raise
             body = resp["Body"].read()
-            text = _decode_log_body(body, name=rel)
+            text = decode_log_body(body, name=rel)
             prev = self._last_len.get(stream_id, 0)
             if len(text) < prev:
                 prev = 0

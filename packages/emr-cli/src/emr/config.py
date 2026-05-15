@@ -44,6 +44,7 @@ SETTINGS_FILE_KEYS = frozenset[str](
         "deploy_mode",
         "region",
         "log_uri",
+        "dump_logs_base_uri",
         "staging_uri",
         "visible_to_all_users",
         "master_instance_type",
@@ -240,7 +241,7 @@ def load_settings_file(path: str | Path) -> dict[str, Any]:
             out[key] = _validate_instance_type(key, str(val))
         elif key == "idle_timeout_sec":
             out[key] = validate_idle_timeout_sec(int(val))
-        elif key == "staging_uri":
+        elif key in ("staging_uri", "dump_logs_base_uri"):
             out[key] = validate_staging_uri(str(val))
         elif key == "applications":
             out[key] = validate_emr_applications(val)

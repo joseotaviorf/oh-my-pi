@@ -1,7 +1,7 @@
 COMPOSE ?= docker compose
 
 .PHONY: build shell run weep-auth weep-install lint check-style file-upload file-download \
-	app-run transient create-cluster submit-step terminate
+	app-run transient create-cluster submit-step terminate dump-logs
 
 build:
 	$(COMPOSE) build app
@@ -36,7 +36,7 @@ file-download:
 # Same as: docker compose run --rm app <subcommand> [OPTIONS]
 # Usage: make app-run args='transient --name my-flow --uri s3://bucket/j.py --wait'
 app-run:
-	@test -n "$(args)" || (echo 'Usage: make app-run args="transient|create-cluster|submit-step|terminate ..."' >&2; exit 1)
+	@test -n "$(args)" || (echo 'Usage: make app-run args="transient|create-cluster|submit-step|terminate|dump-logs ..."' >&2; exit 1)
 	$(COMPOSE) run --rm app $(args)
 
 # Transient cluster + step (README §3). Optional: step_name, bootstrap_script_uri, bootstrap_arg (single artifacts URI),
@@ -80,3 +80,8 @@ terminate:
 	@test -n "$(cluster_id)" || (echo 'Usage: make terminate cluster_id=...' >&2; exit 1)
 	$(COMPOSE) run --rm app terminate \
 		--cluster-id "$(cluster_id)"
+
+# Print S3 logs under dump_logs_base_uri + relative path (README dump-logs). Example: path=j-XXX/steps/s-YYY/
+dump-logs:
+	@test -n "$(path)" || (echo 'Usage: make dump-logs path=j-CLUSTER/steps/s-STEP/ [or single object key suffix]' >&2; exit 1)
+	$(COMPOSE) run --rm app dump-logs "$(path)"

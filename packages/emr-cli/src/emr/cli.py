@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sys
 
+import boto3
 import click
 
 from emr import __version__, emr_ops
@@ -16,6 +17,7 @@ from emr.config import (
     validate_transient,
 )
 from emr.job_args import merged_job_script_args
+from emr.log_dump import dump_logs
 from emr.staging import resolve_local_uris_in_cfg
 
 
@@ -33,7 +35,7 @@ def _tags_from_kv_pairs(pairs: tuple[str, ...]) -> dict[str, str]:
 @click.version_option(__version__, prog_name="emr")
 @click.pass_context
 def main(ctx: click.Context) -> None:
-    """AWS EMR helpers: transient cluster+step, persistent cluster, terminate, add Spark step."""
+    """AWS EMR helpers: transient cluster+step, persistent cluster, terminate, add Spark step, dump S3 logs."""
     ctx.ensure_object(dict)
     try:
         ctx.obj["settings_path"] = resolve_settings_path()
@@ -286,7 +288,6 @@ def cmd_create_cluster(
         raise SystemExit(1) from e
 
 
-@main.command("terminate")
 @click.pass_context
 @click.option(
     "--cluster-id", required=True, help="EMR cluster / job flow id (e.g. j-XXXXXXXX)."
@@ -385,6 +386,38 @@ def cmd_submit_step(
         emr_ops.submit_step_to_cluster(
             cfg, cluster_id=cluster_id.strip(), wait=wait, follow_logs=follow_logs
         )
+    except Exception as e:
+        print(str(e), file=sys.stderr)
+        raise SystemExit(1) from e
+
+
+@main.command("dump-logs")
+@click.pass_context
+@click.argument(
+    "relative_path",
+    type=str,
+    required=True,
+    metavar="RELATIVE_PATH",
+)
+def cmd_dump_logs(ctx: click.Context, relative_path: str) -> None:
+    """Print S3 log objects under ``dump_logs_base_uri`` + RELATIVE_PATH (from the env YAML only).
+
+    RELATIVE_PATH is a key suffix after the configured prefix, e.g.
+    ``j-1AB2C3D4E5F6/steps/s-ABCDEF123456/stderr.gz`` or a step directory prefix.
+    """
+    settings_path = str(ctx.obj["settings_path"])
+    try:
+        cfg = load_settings_file(settings_path)
+        base = str(cfg["dump_logs_base_uri"])
+        region = str(cfg["region"]).strip()
+    except ValueError as e:
+        raise click.ClickException(str(e)) from e
+
+    s3 = boto3.client("s3", region_name=region or None)
+    try:
+        dump_logs(s3, dump_logs_base_uri=base, relative_path=relative_path)
+    except ValueError as e:
+        raise click.ClickException(str(e)) from e
     except Exception as e:
         print(str(e), file=sys.stderr)
         raise SystemExit(1) from e
