@@ -403,8 +403,8 @@ upload-local-init-scripts:
 	@aws s3 cp $(COMPILER_SCRIPTS)/wonka/get_credentials_from_vault.sh \
 		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/get_credentials_from_vault.sh \
 		--acl bucket-owner-full-control
-	@aws s3 cp $(COMPILER_SCRIPTS)/wonka/install_spark_metrics_plugin.sh \
-		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/install_spark_metrics_plugin.sh \
+	@aws s3 cp $(COMPILER_SCRIPTS)/wonka/configure_spark.sh \
+		s3://artifacts.s3.forno.data.quintoandar.com.br/bi-etl-ejuice/configure_spark.sh \
 		--acl bucket-owner-full-control
 
 .PHONY: upload-forno-release

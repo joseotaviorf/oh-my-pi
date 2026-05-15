@@ -218,7 +218,7 @@ steps:
     image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.forno.data.quintoandar.com.br
-      source: packages/bietlejuice-compiler/scripts/wonka/install_spark_metrics_plugin.sh
+      source: packages/bietlejuice-compiler/scripts/wonka/configure_spark.sh
       target: bi-etl-ejuice/
       strip_prefix: packages/bietlejuice-compiler/scripts/wonka/
       acl: bucket-owner-full-control
@@ -228,7 +228,7 @@ steps:
       branch: forno
       path:
         include:
-          - "packages/bietlejuice-compiler/scripts/wonka/install_spark_metrics_plugin.sh"
+          - "packages/bietlejuice-compiler/scripts/wonka/configure_spark.sh"
         on_empty: false
 
   export-init-script-to-s3-prod:
@@ -303,7 +303,7 @@ steps:
     image: plugins/s3:1.4.0
     settings:
       bucket: artifacts.s3.data.quintoandar.com.br
-      source: packages/bietlejuice-compiler/scripts/wonka/install_spark_metrics_plugin.sh
+      source: packages/bietlejuice-compiler/scripts/wonka/configure_spark.sh
       target: bi-etl-ejuice/
       strip_prefix: packages/bietlejuice-compiler/scripts/wonka/
       acl: bucket-owner-full-control
@@ -313,7 +313,7 @@ steps:
       branch: [master, hotfix/*]
       path:
         include:
-          - "packages/bietlejuice-compiler/scripts/wonka/install_spark_metrics_plugin.sh"
+          - "packages/bietlejuice-compiler/scripts/wonka/configure_spark.sh"
         on_empty: false
 
   # Single source of truth for the entire DAG-bag delivery chain

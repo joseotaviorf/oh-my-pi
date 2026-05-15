@@ -16,6 +16,15 @@ echo "=== END: Modify Spark config settings ==="
 
 echo "=== BEGIN: Copying jar files for spark metrics plugins ==="
 /databricks/python/bin/pip install -q awscli
+
+if [ -n "$DATABRICKS_S3_BUCKET" ] && [ -n "$AIRFLOW_DAG_ID" ]; then
+  echo "=== BEGIN: Create Spark event-log directory ==="
+  aws s3api put-object \
+    --bucket "$DATABRICKS_S3_BUCKET" \
+    --key "spark-event-logs/$AIRFLOW_DAG_ID/"
+  echo "=== END: Create Spark event-log directory ==="
+fi
+
 aws s3 cp ${ARTIFACTS_BUCKET}/jars/spark-measure_2.12-0.21.jar $spark_jars_path/spark-measure_2.12-0.21.jar
 aws s3 cp ${ARTIFACTS_BUCKET}/jars/spark-plugins_2.12-0.2.jar $spark_jars_path/spark-plugins_2.12-0.2.jar
 # Custom QuintoAndar plugin
