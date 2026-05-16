@@ -1,9 +1,10 @@
 # Container image builds — CI images published to ECR, devcontainer build-only.
 #
-# All images (ci-base, ci-jdk, devcontainer) are built for linux/amd64 + linux/arm64
-# via the ECR-hosted kaniko plugin (plugins/docker) with privileged: true for QEMU
-# binfmt registration. The plugin pushes a manifest list per tag so consumers get
-# the right arch automatically.
+# Interim layout (until multi-arch Kaniko + crane is reliable on master):
+#   - ci-base / ci-jdk: linux/amd64 only (Woodpecker runners are x86_64; single-arch avoids
+#     crane manifest merge and the plugins/docker ECR auth edge case for multi-arch).
+#   - devcontainer: linux/arm64 only (local / Codespaces target); validate via manual step.
+#   Plugin: ECR-hosted Kaniko (plugins/docker). privileged only where cross-arch QEMU is needed.
 #
 # Tag convention (env prefix required by ECR tagging policy):
 #   master → prod-<target>-latest   + prod-<target>-<sha7>
@@ -11,21 +12,17 @@
 # No custom clone: default plugin-git shallow clone is enough (Docker build only; no git diff).
 
 steps:
-  # Validates the ci-jdk image (linux/amd64 + linux/arm64) on feature branches — same graph as
-  # tests (ci-base → ci-jdk). No push. Devcontainer is validated separately / locally for now.
-  # Runs on push to non-master branches (workaround: pull_request events are not enabled
-  # for this repo in Woodpecker). Add event: pull_request here once enabled.
-  validate-multi-arch-pr:
+  # Validates ci-jdk (linux/amd64) on feature branches — same graph as tests (ci-base → ci-jdk).
+  # No push. Runs on push to non-master branches (pull_request events are not enabled in
+  # Woodpecker for this repo). Add event: pull_request here once enabled.
+  validate-ci-jdk-pr:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker
     pull: true
-    privileged: true
     settings:
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
       dockerfile: .container/Dockerfile
       target: ci-jdk
-      platforms:
-        - linux/amd64
-        - linux/arm64
+      platform: linux/amd64
       no_push: true
       secret: id=GITHUB_TOKEN,env=GITHUB_TOKEN
     environment:
@@ -54,7 +51,6 @@ steps:
   publish-ci-base-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker
     pull: true
-    privileged: true
     settings:
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
       dockerfile: .container/Dockerfile
@@ -62,9 +58,7 @@ steps:
       tag:
         - prod-ci-base-latest
         - prod-ci-base-${CI_COMMIT_SHA:0:7}
-      platforms:
-        - linux/amd64
-        - linux/arm64
+      platform: linux/amd64
       secret: id=GITHUB_TOKEN,env=GITHUB_TOKEN
     environment:
       GITHUB_TOKEN:
@@ -85,7 +79,6 @@ steps:
   publish-ci-jdk-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker
     pull: true
-    privileged: true
     settings:
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
       dockerfile: .container/Dockerfile
@@ -93,9 +86,7 @@ steps:
       tag:
         - prod-ci-jdk-latest
         - prod-ci-jdk-${CI_COMMIT_SHA:0:7}
-      platforms:
-        - linux/amd64
-        - linux/arm64
+      platform: linux/amd64
       secret: id=GITHUB_TOKEN,env=GITHUB_TOKEN
     environment:
       GITHUB_TOKEN:
@@ -113,7 +104,7 @@ steps:
       - branch: [master]
         event: manual
 
-  # Build-only (no push) — validates the Dockerfile builds on both amd64 and arm64.
+  # Build-only (no push) — validates devcontainer target for linux/arm64 (QEMU on amd64 runners).
   # ECR push for devcontainer is done locally via `make publish-devcontainer`.
   build-devcontainer-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker
@@ -123,9 +114,7 @@ steps:
       dockerfile: .container/Dockerfile
       target: devcontainer
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
-      platforms:
-        - linux/amd64
-        - linux/arm64
+      platform: linux/arm64
       no_push: true
       secret: id=GITHUB_TOKEN,env=GITHUB_TOKEN
     environment:
