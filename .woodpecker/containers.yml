@@ -11,8 +11,8 @@
 # No custom clone: default plugin-git shallow clone is enough (Docker build only; no git diff).
 
 steps:
-  # Validates that all Dockerfile targets build for both amd64 and arm64 on feature branches.
-  # No push — build-only smoke test.
+  # Validates the ci-jdk image (linux/amd64 + linux/arm64) on feature branches — same graph as
+  # tests (ci-base → ci-jdk). No push. Devcontainer is validated separately / locally for now.
   # Runs on push to non-master branches (workaround: pull_request events are not enabled
   # for this repo in Woodpecker). Add event: pull_request here once enabled.
   validate-multi-arch-pr:
@@ -27,8 +27,6 @@ steps:
         - linux/amd64
         - linux/arm64
       no_push: true
-      build_args:
-        - UV_VERSION=0.11.7
       secret: id=GITHUB_TOKEN,env=GITHUB_TOKEN
     environment:
       GITHUB_TOKEN:
@@ -38,13 +36,9 @@ steps:
           include:
             - '.woodpecker/containers.yml'
             - '.container/Dockerfile'
-            - 'pyproject.toml'
-            - 'uv.lock'
-            - 'packages/*/pyproject.toml'
-            - 'packages/bietlejuice-runtime/uv.lock'
+            - '**/pyproject.toml'
+            - '**/uv.lock'
             - 'packages/bietlejuice-runtime/hatch_build.py'
-            - 'packages/bietlejuice-runtime/envs/*/pyproject.toml'
-            - 'packages/bietlejuice-runtime/envs/*/uv.lock'
         event: push
         branch:
           exclude: [master]
@@ -52,13 +46,9 @@ steps:
           include:
             - '.woodpecker/containers.yml'
             - '.container/Dockerfile'
-            - 'pyproject.toml'
-            - 'uv.lock'
-            - 'packages/*/pyproject.toml'
-            - 'packages/bietlejuice-runtime/uv.lock'
+            - '**/pyproject.toml'
+            - '**/uv.lock'
             - 'packages/bietlejuice-runtime/hatch_build.py'
-            - 'packages/bietlejuice-runtime/envs/*/pyproject.toml'
-            - 'packages/bietlejuice-runtime/envs/*/uv.lock'
         event: pull_request
 
   publish-ci-base-prod:
@@ -75,8 +65,6 @@ steps:
       platforms:
         - linux/amd64
         - linux/arm64
-      build_args:
-        - UV_VERSION=0.11.7
       secret: id=GITHUB_TOKEN,env=GITHUB_TOKEN
     environment:
       GITHUB_TOKEN:
@@ -84,13 +72,15 @@ steps:
     when:
       - path:
           include:
+            - '.woodpecker/containers.yml'
             - '.container/Dockerfile'
-            - 'pyproject.toml'
-            - 'uv.lock'
-            - 'packages/*/pyproject.toml'
+            - '**/pyproject.toml'
+            - '**/uv.lock'
+            - 'packages/bietlejuice-runtime/hatch_build.py'
         branch: [master]
         event: push
-      - event: manual
+      - branch: [master]
+        event: manual
 
   publish-ci-jdk-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker
@@ -106,8 +96,6 @@ steps:
       platforms:
         - linux/amd64
         - linux/arm64
-      build_args:
-        - UV_VERSION=0.11.7
       secret: id=GITHUB_TOKEN,env=GITHUB_TOKEN
     environment:
       GITHUB_TOKEN:
@@ -115,17 +103,15 @@ steps:
     when:
       - path:
           include:
+            - '.woodpecker/containers.yml'
             - '.container/Dockerfile'
-            - 'pyproject.toml'
-            - 'uv.lock'
-            - 'packages/*/pyproject.toml'
-            - 'packages/bietlejuice-runtime/uv.lock'
+            - '**/pyproject.toml'
+            - '**/uv.lock'
             - 'packages/bietlejuice-runtime/hatch_build.py'
-            - 'packages/bietlejuice-runtime/envs/*/pyproject.toml'
-            - 'packages/bietlejuice-runtime/envs/*/uv.lock'
         branch: [master]
         event: push
-      - event: manual
+      - branch: [master]
+        event: manual
 
   # Build-only (no push) — validates the Dockerfile builds on both amd64 and arm64.
   # ECR push for devcontainer is done locally via `make publish-devcontainer`.
@@ -141,9 +127,6 @@ steps:
         - linux/amd64
         - linux/arm64
       no_push: true
-      build_args:
-        - UV_VERSION=0.11.7
-        - ASTRO_CLI_VERSION=1.41.0
       secret: id=GITHUB_TOKEN,env=GITHUB_TOKEN
     environment:
       GITHUB_TOKEN:
