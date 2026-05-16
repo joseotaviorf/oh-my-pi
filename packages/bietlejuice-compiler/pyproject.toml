@@ -44,11 +44,7 @@ dev = [
     "pytest==8.3.5",   # airflow constraints-2-10
     "pytest-cov",
     "pytest-testmon",
-    "ruff==0.5.5",     # airflow constraints-2-10
-    "sqlfluff",
-    "ty",              # no constraint available
 ]
-
 
 [tool.pytest.ini_options]
 testpaths = ["test"]
@@ -60,9 +56,6 @@ markers = [
     "sql_transpiler: SQL transpiler tests",
     "schema_validation: schema validation tests",
 ]
-
-[tool.ty.environment]
-python-version = "3.10"
 
 [tool.coverage.run]
 source = ["bietlejuice"]

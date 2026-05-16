@@ -63,9 +63,9 @@ class LoadCustomTaskCreator(LoadTaskCreator):
         table_load_spark_job = table_attributes.table_customization.get(
             "load_spark_job", default_load_spark_job
         )
-        assert (
-            table_load_spark_job is not None
-        ), "load_spark_job is required in workflow_args or tables_customization"
+        assert table_load_spark_job is not None, (
+            "load_spark_job is required in workflow_args or tables_customization"
+        )
         return table_load_spark_job.format(
             dag_name=self.dag_execution_context.dag_args["name"],
             schema=table_attributes.schema,

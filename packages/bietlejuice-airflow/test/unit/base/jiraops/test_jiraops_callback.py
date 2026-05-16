@@ -471,9 +471,9 @@ def test_multiple_enrichers_run_in_order_and_chain_output(
     class SecondEnricher(IncidentContextEnricher):
         def enrich(self, context, extra_properties, description):
             extra_properties = dict(extra_properties)
-            assert (
-                "First" in extra_properties
-            ), "Second enricher should see First enricher output"
+            assert "First" in extra_properties, (
+                "Second enricher should see First enricher output"
+            )
             extra_properties["Second"] = "2"
             return extra_properties, description + "\nSecond"
 

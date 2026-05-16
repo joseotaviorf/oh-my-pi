@@ -44,17 +44,11 @@ dev = [
     "pytest==8.3.5",   # airflow constraints-2-10
     "pytest-cov",
     "pytest-testmon",
-    "ruff==0.5.5",     # airflow constraints-2-10
-    "ty",              # no constraint available
     # quintoandar-logger lives here (not in [project.dependencies]) so the
     # published wheel stays installable by pip on Databricks; uv sync picks it
     # up for tests via the [tool.uv.sources] git entry above.
     "quintoandar-logger>=0.4.0",
 ]
-
-
-[tool.ty.environment]
-python-version = "3.10"
 
 [tool.coverage.run]
 source = ["bietlejuice"]

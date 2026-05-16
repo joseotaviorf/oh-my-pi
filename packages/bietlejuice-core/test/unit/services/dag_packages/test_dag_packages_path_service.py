@@ -383,10 +383,13 @@ class TestDAGPackagesPathService:
         mock_conf_instance.get_config.side_effect = lambda k: (
             volume if k == "volume_databricks_bucket" else prefix
         )
-        mock_isdir.side_effect = lambda p: p in {
-            dags_root,
-            path.join(dags_root, "people", "oitchau_api"),
-        }
+        mock_isdir.side_effect = lambda p: (
+            p
+            in {
+                dags_root,
+                path.join(dags_root, "people", "oitchau_api"),
+            }
+        )
 
         people_entry = Mock()
         people_entry.name = "people"

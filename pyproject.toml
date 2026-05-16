@@ -1,6 +1,8 @@
 # Root pyproject.toml — not a buildable package.
 # Per-package configuration (pytest, coverage, uv) lives in packages/*/pyproject.toml.
-# Shared tool configuration (ruff, sqlfluff) lives here so every package inherits it.
+# Shared tool configuration (ruff, sqlfluff, ty) lives here so every package inherits it.
+# Workspace-wide dev tools (ruff, ty, sqlfluff) are declared in [dependency-groups].dev
+# so they are installed once at a consistent version for all members.
 #
 # bietlejuice-runtime is INTENTIONALLY NOT a workspace member. It is a
 # standalone uv project (its own pyproject.toml + uv.lock + .venv) because
@@ -8,6 +10,13 @@
 # apache-airflow 2.11 (Astro Runtime 13.4) requires; a single workspace
 # lockfile cannot satisfy both worlds. See packages/bietlejuice-runtime/README.md
 # for the full rationale and IDE setup.
+
+[dependency-groups]
+dev = [
+    "ruff",       # linter/formatter — no runtime footprint, consistent version across all packages
+    "ty",         # type checker — no runtime footprint
+    "sqlfluff",   # SQL linter — config lives in [tool.sqlfluff.*] below
+]
 
 [tool.uv.workspace]
 members = [
@@ -36,6 +45,12 @@ override-dependencies = [
 quintoandar-logger = { git = "https://github.com/quintoandar/python-logger", tag = "0.8.1" }
 
 # ---------------------------------------------------------------------------
+# ty — shared across all packages.
+# ---------------------------------------------------------------------------
+[tool.ty.environment]
+python-version = "3.10"
+
+# ---------------------------------------------------------------------------
 # Ruff — shared across all packages (ruff walks up the directory tree).
 # ---------------------------------------------------------------------------
 [tool.ruff]
@@ -44,7 +59,7 @@ target-version = "py310"
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "I", "UP"]
-ignore = ["UP006", "UP007", "UP035", "UP038"]  # keep Optional, Union, List, Dict; allow isinstance(x, (a, b))
+ignore = ["UP006", "UP007", "UP035", "UP045"]  # DBR 10.4 compat: keep Optional, Union, List, Dict (UP007/UP045 need ≥3.10; UP006/UP035 need ≥3.9)
 
 [tool.ruff.lint.isort]
 known-first-party = ["bietlejuice"]
