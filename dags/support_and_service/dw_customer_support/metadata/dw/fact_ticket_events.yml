@@ -1,124 +1,120 @@
 database_name: dw_customer_support
 table_name: fact_ticket_events
-description: Fact table that contains all update events on a ticket, with one row per ticket state change sourced from Zendesk.
+description: Fact table that contains all update events on a ticket, with one row per ticket update (ts_updated), tracking status changes, assignments, and other ticket lifecycle events.
 domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   sk_ticket:
     lineage:
       - datalake_zendesk.tickets.id_ticket
-    description: Surrogate key of the ticket, corresponding to the Zendesk ticket number.
+    description: Surrogate key of the ticket, corresponding to the Zendesk ticket number cast to BIGINT.
   sk_problem_ticket:
     lineage:
       - datalake_zendesk.tickets.id_problem_ticket
-    description: Surrogate key of the parent problem ticket linked to this incident ticket.
+    description: Surrogate key of the problem ticket linked to this ticket. Defaults to -1 when not associated with a problem ticket.
   sk_assignee:
     lineage:
       - datalake_zendesk.tickets.id_assignee
-    description: Surrogate key of the agent currently assigned to the ticket at the time of the event.
+    description: Surrogate key of the agent assigned to handle the ticket. Defaults to -1 when no assignee is set.
   sk_requester:
     lineage:
       - datalake_zendesk.tickets.id_requester
-    description: Surrogate key of the user who requested the ticket.
+    description: Surrogate key of the user who requested the ticket. Defaults to -1 when not available.
   sk_submitter:
     lineage:
       - datalake_zendesk.tickets.id_submitter
-    description: Surrogate key of the user who submitted the ticket.
+    description: Surrogate key of the user who submitted the ticket. Defaults to -1 when not available.
   sk_group:
     lineage:
       - datalake_zendesk.tickets.id_group
-    description: Surrogate key of the Zendesk group (department) assigned to the ticket at the time of the event.
+    description: Surrogate key of the support group assigned to the ticket. Defaults to -1 when no group is assigned.
   sk_house:
     lineage:
       - datalake_zendesk.tickets.id_house
-    description: Surrogate key of the property (house) associated with the ticket.
+    description: Surrogate key of the house associated with the ticket. Defaults to -1 when not associated with a house.
   sk_contract:
     lineage:
       - datalake_zendesk.tickets.id_contract
-    description: Surrogate key of the contract registered in QA, corresponding to the contract ID inputted by the agent in the Zendesk ticket form.
+    description: Key of contract registered in QA that corresponds to the contract ID inputted by agent in Zendesk ticket form.
   sk_session:
     lineage:
       - datalake_zendesk.tickets.id_session
-    description: Surrogate key for the Sauron session linked to the ticket.
-  sk_sss_session:
-    lineage:
-      - datalake_zendesk.tickets.id_sss_session
-    description: Surrogate key for the Support Session Service (SSS) session linked to the ticket. Defaults to -1 when no SSS session is associated.
+    description: Sauron ID session associated with the ticket.
   sk_call:
     lineage:
       - datalake_zendesk.tickets.id_call
-    description: Surrogate key for the Twilio call linked to the ticket.
+    description: Twilio ID call associated with the ticket.
   sk_job:
     lineage:
-      - datalake_zendesk.tickets.id_job
-    description: Surrogate key derived from a specific ticket custom field identifying the related job.
+      - datalake_zendesk.ticket_funnel.id_job
+    description: ID Job from a specific ticket custom_field.
   sk_agent:
     lineage:
-      - datalake_zendesk.tickets.analyst_email
-    description: Identification key of the analyst assigned to the ticket, generated as an MD5 hash of the analyst's email.
+      - datalake_zendesk.ticket_funnel.agent_email
+    description: Identification key of the analyst assigned to the ticket, generated as an MD5 hash from the analyst's email.
   sk_ticket_created_date:
     lineage:
       - datalake_zendesk.tickets.ts_created
-    description: Date surrogate key (YYYYMMDD integer) for the ticket creation date, used to join with date dimension.
+    description: Date key in format yMMdd representing the date the ticket was created. Defaults to -1 when the creation timestamp is null.
   sk_event_date:
     lineage:
       - datalake_zendesk.tickets.ts_updated
-    description: Date surrogate key (YYYYMMDD integer) for the ticket update event date, used to join with date dimension.
+    description: Date key in format yMMdd representing the date of the ticket update event. Defaults to -1 when the update timestamp is null.
   taxonomy_tags:
     lineage:
       - datalake_zendesk.tickets.taxonomy_tags
-    description: Array of taxonomy tags attached to the ticket describing its category and journey step.
+    description: Taxonomy tags associated with the ticket used for classification and reporting purposes.
   status:
     lineage:
       - datalake_zendesk.tickets.status
-    description: Status of the ticket at the time of the update event (e.g. open, pending, solved, closed).
+    description: Status of the ticket at the time of the event.
   channel:
     lineage:
       - datalake_zendesk.tickets.channel
-    description: The source channel where the ticket was created from the company perspective (e.g. call, chat, email).
+    description: The source channel where the ticket was created from the company perspective.
   subject:
     lineage:
       - datalake_zendesk.tickets.subject
-    description: Ticket subject filled by the creator. Tickets created via API or email without a required subject will have the same value as the description.
+    description: Ticket subject filled by the creator. Tickets created via API or email may have the same value as description when no subject is provided.
   type:
     lineage:
       - datalake_zendesk.tickets.type
-    description: Type of the ticket (e.g. question, incident, problem, task).
+    description: Type of the ticket, such as question, incident, problem, or task.
   via_channel:
     lineage:
       - datalake_zendesk.tickets.via_channel
-    description: The Zendesk default source channel through which the ticket was created or updated.
+    description: The specific channel through which the ticket was created according to Zendesk's via source metadata.
   tags:
     lineage:
       - datalake_zendesk.tickets.tags
-    description: Array of tags added to the ticket for classification and routing.
+    description: Tags added to the ticket for categorization and routing purposes.
   custom_fields:
     lineage:
       - datalake_zendesk.tickets.custom_fields
-    description: JSON representation of the ticket custom fields containing domain-specific metadata such as client type, journey step, and contact motivation.
+    description: Custom fields associated with the ticket serialized as a JSON string, containing taxonomy and classification data from Zendesk forms.
   is_public:
     lineage:
       - datalake_zendesk.tickets.is_public
-    description: Boolean flag indicating whether the ticket event (comment) is public and visible to the end user.
+    description: Boolean flag indicating whether the ticket event is publicly visible to the requester.
   ts_ticket_created:
     lineage:
       - datalake_zendesk.tickets.ts_created
-    description: Timestamp (UTC) of when the ticket was originally created in Zendesk.
+    description: Timestamp of ticket creation in UTC timezone.
   ts_event:
     lineage:
       - datalake_zendesk.tickets.ts_updated
-    description: Timestamp (UTC) of when the ticket was updated, representing the event that this row captures.
+    description: Timestamp of when the ticket was updated, which constitutes the event this table represents.
   ts_load:
-    description: Timestamp (UTC) indicating when this record was loaded into the data warehouse.
+    description: Timestamp indicating when the data was loaded into the datalake.
   year:
     lineage:
       - datalake_zendesk.tickets.year
-    description: Partition year of the source record, used for incremental loading.
+    description: Year partition component of the ticket event date, used for data partitioning.
   month:
     lineage:
       - datalake_zendesk.tickets.month
-    description: Partition month of the source record, used for incremental loading.
+    description: Month partition component of the ticket event date, used for data partitioning.
   day:
     lineage:
       - datalake_zendesk.tickets.day
-    description: Partition day of the source record, used for incremental loading.
+    description: Day partition component of the ticket event date, used for data partitioning.

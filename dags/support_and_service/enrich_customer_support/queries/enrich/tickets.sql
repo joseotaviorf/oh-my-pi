@@ -93,14 +93,13 @@ incoming_tickets AS (
 chat_tickets AS (
   SELECT
     it.id_ticket,
-    it.twilio_task AS id_task,
+    it.id_session,
     'chat' AS channel
   FROM
     incoming_tickets AS it
   INNER JOIN
     datalake_customer_support.chats AS ch
-      ON ch.id_task = it.twilio_task
-  WHERE ch.id_task IS NOT NULL
+      ON ch.id_session = it.id_session
 ),
 call_tickets AS (
   SELECT
@@ -154,7 +153,7 @@ non_twilio_tickets AS (
 ),
 unique_twilio_tickets AS (
   SELECT
-    id_task,
+    id_session,
     channel,
     MAX(id_ticket) AS id_ticket
   FROM
@@ -195,7 +194,6 @@ tickets_per_task AS (
     t.id_contract,
     t.id_call,
     COALESCE(ch.id_session, ca1.id_session, ca2.id_session, t.id_session) AS id_session,
-    COALESCE(ch.id_sss_session, ca1.id_sss_session, ca2.id_sss_session) AS id_sss_session,
     COALESCE(
       FIRST(ch.id_task) OVER(PARTITION BY ch.id_session ORDER BY ch.ts_created DESC),
       ca1.id_task,
@@ -272,9 +270,8 @@ tickets_per_task AS (
       ON ut.id_ticket = t.id_ticket
   LEFT JOIN
     datalake_customer_support.chats AS ch
-      ON ch.id_task = t.twilio_task
+      ON ch.id_session = t.id_session
       AND ch.task_status NOT IN ('pending', 'canceled')
-      AND ch.id_task IS NOT NULL
   LEFT JOIN
     datalake_customer_support.calls AS ca1
       ON ca1.id_task = t.id_call
@@ -350,7 +347,6 @@ tickets AS (
     t.id_contract,
     t.id_call,
     t.id_session,
-    t.id_sss_session,
     t.id_twilio,
     tq.first_queue,
     tq.last_queue,
@@ -423,7 +419,7 @@ back_tickets AS (
     tickets AS bt
   LEFT JOIN
     tickets AS ft_chat
-      ON ft_chat.id_twilio = bt.id_twilio
+      ON ft_chat.id_session = bt.id_session
       AND ft_chat.is_back_ticket IS FALSE
   LEFT JOIN
     tickets AS ft_call
@@ -555,7 +551,6 @@ ticket_metrics AS (
     t.id_contract,
     t.id_call,
     t.id_session,
-    t.id_sss_session,
     t.id_twilio,
     t.first_queue,
     t.last_queue,
@@ -668,7 +663,6 @@ SELECT
   COALESCE(sc.id_contract, tc.id_contract) AS id_contract,
   tc.id_call,
   tc.id_session,
-  tc.id_sss_session,
   tc.id_twilio,
   tc.first_queue,
   tc.last_queue,

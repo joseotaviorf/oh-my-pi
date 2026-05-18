@@ -70,10 +70,6 @@ columns:
     lineage:
       - datalake_customer_support.tickets.id_session
     description: Session ID from Sauron
-  sk_sss_session:
-    lineage:
-      - datalake_customer_support.tickets.id_sss_session
-    description: Surrogate key for the Support Session Service (SSS) session linked to the ticket. Defaults to -1 when no SSS session is associated.
   channel:
     lineage:
       - datalake_customer_support.tickets.channel
@@ -81,7 +77,7 @@ columns:
   direction:
     lineage:
       - datalake_customer_support.tickets.direction
-    description: Direction of the ticket contact (e.g. inbound, outbound). Relevant primarily for call and chat channels.
+    description: Direction of the communication for this ticket, either inbound (customer-initiated) or outbound (analyst-initiated).
   ticket_origin:
     description: It is the source channel of the chat ticket, which can be whatsapp or chat5A.
     lineage:
@@ -120,6 +116,14 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.assignee_stations
     description: Number of agents assigned to the ticket
+  reply_time_min_business:
+    lineage:
+      - datalake_zendesk.tickets_current.reply_time_min_business
+    description: Number of minutes to the first reply during business hours, measuring initial analyst response speed.
+  reply_time_min_calendar:
+    lineage:
+      - datalake_zendesk.tickets_current.reply_time_min_calendar
+    description: Number of minutes to the first reply during calendar hours, measuring initial analyst response speed without excluding off-hours.
   first_resolution_time_min_business:
     lineage:
       - datalake_zendesk.tickets_current.first_resolution_time_min_business
@@ -168,30 +172,22 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.replies
     description: Number of public replies the agent added to the ticket
-  reply_time_min_business:
-    lineage:
-      - datalake_zendesk.tickets_current.reply_time_min_business
-    description: Number of minutes until the first reply during business hours.
-  reply_time_min_calendar:
-    lineage:
-      - datalake_zendesk.tickets_current.reply_time_min_calendar
-    description: Number of minutes until the first reply during calendar hours.
   sla_target:
     lineage:
       - datalake_customer_support.tickets.sla_target
-    description: SLA target in minutes defined for the ticket based on its channel and department configuration.
+    description: Service Level Agreement target in days for resolving the ticket, determined by taxonomy, tags, and queue rules.
   days_elapsed_calendar:
     lineage:
       - datalake_customer_support.tickets.days_elapsed_calendar
-    description: Number of calendar days elapsed from ticket creation to resolution.
+    description: Number of calendar days elapsed from the SLA start timestamp to the ticket solve date, including weekends and holidays.
   days_elapsed_business:
     lineage:
       - datalake_customer_support.tickets.days_elapsed_business
-    description: Number of business days elapsed from ticket creation to resolution.
+    description: Number of business days elapsed from the SLA start timestamp to the ticket solve date, excluding weekends and holidays.
   days_off:
     lineage:
       - datalake_customer_support.tickets.days_off
-    description: Number of non-business days (weekends and holidays) elapsed during the ticket's open period.
+    description: Number of non-working days (weekends and national holidays) within the SLA period, used to compute business elapsed days.
   total_public_comments:
     description: Total number of public comments in a ticket
   total_private_comments:
@@ -199,11 +195,11 @@ columns:
   is_backlog_in_time:
     lineage:
       - datalake_customer_support.tickets.is_backlog_in_time
-    description: Boolean flag indicating whether the ticket was resolved within the expected SLA backlog target time.
+    description: Boolean flag indicating whether the ticket was solved within the SLA target, computed as days_elapsed_business <= sla_target.
   is_back_ticket:
     lineage:
       - datalake_customer_support.tickets.is_back_ticket
-    description: Boolean flag indicating whether the ticket is classified as a back-office (internal) ticket rather than a front-office (customer-facing) ticket.
+    description: Boolean flag indicating whether the ticket is a back-office ticket, determined by tags and department classification.
   is_ticket_rate:
     lineage:
       - datalake_customer_support.tickets.is_ticket_rate
