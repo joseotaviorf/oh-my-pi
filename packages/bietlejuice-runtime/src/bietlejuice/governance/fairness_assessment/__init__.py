@@ -3,7 +3,7 @@ FAIRness assessment: tiering, checks, table/column description quality, schema v
 """
 
 from bietlejuice.governance.fairness_assessment.adapters.columns_metastore import (  # noqa: E501
-    resolve_columns_metastore_snapshot,
+    resolve_physical_columns_from_information_schema,
 )
 from bietlejuice.governance.fairness_assessment.checks import (
     evaluate_mvp_checks_from_row,
@@ -123,5 +123,5 @@ __all__ = [
     "resolve_datahub_gms_base_url",
     "resolve_datahub_graphql_url",
     "resolve_datahub_urn_flags",
-    "resolve_columns_metastore_snapshot",
+    "resolve_physical_columns_from_information_schema",
 ]

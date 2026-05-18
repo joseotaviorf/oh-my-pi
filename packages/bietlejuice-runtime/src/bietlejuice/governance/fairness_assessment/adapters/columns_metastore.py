@@ -1,4 +1,4 @@
-"""Read physical column names from the daily ``columns_metastore`` snapshot (clean layer)."""
+"""Resolve physical column names for assessed FQNs from Unity Catalog ``information_schema``."""
 
 from __future__ import annotations
 
@@ -6,69 +6,15 @@ from typing import Any, Optional, Set, Tuple
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.governance.fairness_assessment.constants import COLUMNS_METASTORE
-
 LOGGER = QuintoAndarLogger(__name__)
 
+INFORMATION_SCHEMA_COLUMNS_TABLE_NAME = "system.information_schema.columns"
 
-def resolve_columns_metastore_snapshot(
-    spark: Any,
-    environment: str,
-    td_df: Any,
-) -> Tuple[Set[Tuple[str, str]], dict[Tuple[str, str], frozenset[str]], Optional[str]]:
-    """Load latest partition of ``columns_metastore`` and aggregate physical column names per FQN.
 
-    Joins to distinct (database_name, table_name) from ``td_df`` so only assessed FQNs are processed.
-
-    Returns:
-        exists_set: FQNs present in the snapshot for the latest partition (inner join with td).
-        field_map: lowercased Spark field names per FQN (may be empty if column_name rows are null).
-        snapshot_partition_iso: ``YYYY-MM-DD`` for the partition read, or ``None`` if the table is
-        empty/unreadable (caller should treat all FQNs as snapshot unavailable).
-
-    Replaces per-FQN ``spark.catalog.tableExists`` + ``spark.table`` probes for F1-03 / I1-01.
-    """
-
-    db, tbl = COLUMNS_METASTORE
-    fqn = f"quintoandar_{environment}.{db}.{tbl}"
-    try:
-        cm = spark.table(fqn)
-    except Exception as e:
-        LOGGER.warning(
-            "m=columns_metastore_read_failed,"
-            f"table={fqn},exception_type={type(e).__name__},msg=falling back to empty snapshot"
-        )
-        return set(), {}, None
-
-    from pyspark.sql import functions as F
-
-    snap_expr = F.make_date(
-        F.col("year").cast("int"),
-        F.col("month").cast("int"),
-        F.col("day").cast("int"),
-    )
-    max_row = cm.select(F.max(snap_expr).alias("snap")).first()
-    if max_row is None or max_row[0] is None:
-        LOGGER.warning(
-            "m=columns_metastore_empty_partition,table=%s,msg=no dated rows", fqn
-        )
-        return set(), {}, None
-
-    snap = max_row[0]
-    cm_snap = cm.filter(snap_expr == F.lit(snap))
-
-    distinct_td = td_df.select("database_name", "table_name").distinct()
-    joined = cm_snap.join(
-        distinct_td,
-        on=["database_name", "table_name"],
-        how="inner",
-    )
-
-    agg = joined.groupBy("database_name", "table_name").agg(
-        F.collect_set(F.lower(F.trim(F.col("column_name")))).alias("cols")
-    )
-    rows = agg.collect()
-
+def _exists_set_and_field_map_from_collect_rows(
+    rows: list[Any],
+) -> Tuple[Set[Tuple[str, str]], dict[Tuple[str, str], frozenset[str]]]:
+    """Build ``exists_set`` and per-FQN lowercased physical column names from aggregate rows."""
     exists_set: Set[Tuple[str, str]] = set()
     field_map: dict[Tuple[str, str], frozenset[str]] = {}
     for r in rows:
@@ -80,13 +26,70 @@ def resolve_columns_metastore_snapshot(
         if raw_cols is None:
             field_map[key] = frozenset()
         else:
-            field_map[key] = frozenset(c for c in raw_cols if c)
+            field_map[key] = frozenset(
+                str(c).lower().strip()
+                for c in raw_cols
+                if c is not None and str(c).strip() != ""
+            )
+    return exists_set, field_map
 
-    partition_str = (
-        snap.strftime("%Y-%m-%d") if hasattr(snap, "strftime") else str(snap)
+
+def resolve_physical_columns_from_information_schema(
+    spark: Any,
+    td_df: Any,
+) -> Tuple[Set[Tuple[str, str]], dict[Tuple[str, str], frozenset[str]], Optional[str]]:
+    """Load column names from ``system.information_schema.columns`` for FQNs in ``td_df`` only.
+
+    Inner-joins Information Schema to ``distinct(database_name, table_name)`` from ``td_df``
+    (broadcast on the key side when possible) so work scales with assessed tables, not the full
+    catalog. Used for F1-03 / I1-01 instead of the ``columns_metastore`` Delta snapshot.
+
+    Returns:
+        exists_set: FQNs that have at least one row in ``information_schema.columns`` after join.
+        field_map: lowercased Spark field names per FQN (may be empty if column_name rows are null).
+        catalog_resolution_tag: ``information_schema:{catalog}`` when the read succeeds,
+            or ``None`` if the Information Schema could not be read (caller should treat all FQNs
+            as catalog-unavailable).
+
+    """
+    from pyspark.sql import functions as F
+    from pyspark.sql.functions import broadcast
+
+    distinct_td = td_df.select("database_name", "table_name").distinct()
+
+    try:
+        catalog = str(spark.catalog.currentCatalog())
+        catalog_sql = catalog.replace("'", "''")
+        isc = (
+            spark.table(INFORMATION_SCHEMA_COLUMNS_TABLE_NAME)
+            .filter(f"table_catalog = '{catalog_sql}'")
+            .select(
+                F.col("table_schema").alias("database_name"),
+                F.col("table_name"),
+                F.col("column_name"),
+            )
+        )
+        joined = isc.join(
+            broadcast(distinct_td),
+            on=["database_name", "table_name"],
+            how="inner",
+        )
+    except Exception as e:
+        LOGGER.warning(
+            "m=information_schema_columns_read_failed,"
+            f"exception_type={type(e).__name__},msg=falling back to empty catalog resolution"
+        )
+        return set(), {}, None
+
+    agg = joined.groupBy("database_name", "table_name").agg(
+        F.collect_set(F.col("column_name")).alias("cols")
     )
+    rows = agg.collect()
+    exists_set, field_map = _exists_set_and_field_map_from_collect_rows(rows)
+
+    tag = f"information_schema:{catalog}"
     LOGGER.info(
-        "m=columns_metastore_snapshot_loaded,"
-        f"partition={partition_str},fqn_count={len(exists_set)}"
+        "m=information_schema_columns_loaded,"
+        f"catalog={catalog},fqn_count={len(exists_set)}"
     )
-    return exists_set, field_map, partition_str
+    return exists_set, field_map, tag

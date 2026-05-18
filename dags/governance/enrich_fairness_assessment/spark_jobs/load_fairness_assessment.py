@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from typing import Any, Mapping, Optional
 
 from bietlejuice.governance.fairness_assessment.adapters.columns_metastore import (
-    resolve_columns_metastore_snapshot,
+    resolve_physical_columns_from_information_schema,
 )
 from bietlejuice.governance.fairness_assessment.constants import (
     COLUMNS_DOC,
@@ -292,18 +292,18 @@ def main() -> None:
         F.lit(True),
     )
 
-    exists_set, phys_map, snapshot_partition = resolve_columns_metastore_snapshot(
-        spark, args.environment, td
+    exists_set, phys_map, catalog_resolution_tag = (
+        resolve_physical_columns_from_information_schema(spark, td)
     )
     logger.info(
-        f"m=columns_metastore_snapshot_used,snapshot_partition={snapshot_partition}"
+        f"m=information_schema_catalog_used,catalog_resolution_tag={catalog_resolution_tag}"
     )
-    snapshot_ok = snapshot_partition is not None
+    catalog_resolution_ok = catalog_resolution_tag is not None
     exists_map: dict[tuple[str, str], Optional[bool]] = {}
     spark_probe_status_map: dict[tuple[str, str], str] = {}
     for r in td.select("database_name", "table_name").distinct().collect():
         k = (str(r["database_name"] or "").strip(), str(r["table_name"] or "").strip())
-        if not snapshot_ok:
+        if not catalog_resolution_ok:
             exists_map[k] = None
             spark_probe_status_map[k] = "snapshot_unavailable"
         elif k in exists_set:
