@@ -34,6 +34,10 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.id_session
     description: Session identifier related to the ticket.
+  id_sss_session:
+    lineage:
+      - datalake_customer_support.chats.id_sss_session
+    description: Support Session Service public session identifier linked to the ticket when originated from an SSS chat.
   id_twilio:
     lineage:
       - datalake_customer_support.chats.id_task
@@ -156,54 +160,34 @@ columns:
       - datalake_gsheets_clean.tag_sla_target.sla
       - datalake_gsheets_clean.taxonomy_sla.sla_in_days
     description: Service Level Agreement target time for resolving the ticket.
-  days_worked:
+  days_elapsed_business:
     lineage:
       - datalake_zendesk.tickets_current.ts_solved
-      - datalake_zendesk.tickets_current.ts_sla_started
-      - datalake_quintoandar.aux_date.dt_non_working
+      - datalake_zendesk.tickets_current.ts_created
+      - datalake_quintoandar.aux_date.date
       - datalake_gsheets_clean.service_city_holidays.dt_holiday
-    description: Number of business days worked on the ticket.
+    description: Number of business days elapsed since the SLA started, excluding weekends and national holidays.
+  days_elapsed_calendar:
+    lineage:
+      - datalake_zendesk.tickets_current.ts_solved
+      - datalake_zendesk.tickets_current.ts_created
+    description: Total number of calendar days elapsed since the SLA started, including weekends and holidays.
   days_off:
     lineage:
       - datalake_quintoandar.aux_date.dt_non_working
       - datalake_gsheets_clean.service_city_holidays.dt_holiday
     description: Number of non-working days during the SLA period.
-  time_spent_solved_in_time:
+  is_backlog_in_time:
     lineage:
       - datalake_zendesk.tickets_current.ts_solved
-      - datalake_zendesk.tickets_current.ts_sla_started
+      - datalake_zendesk.tickets_current.ts_created
       - datalake_gsheets_clean.tag_sla_target.sla
-      - datalake_gsheets_clean.taxonomy_sla.sla_in_days
-      - datalake_quintoandar.aux_date.dt_non_working
+      - datalake_customer_support.sla_theme_detail.sla
+      - datalake_customer_support.sla_theme.sla
+      - datalake_customer_support.sla_journey.sla
+      - datalake_quintoandar.aux_date.date
       - datalake_gsheets_clean.service_city_holidays.dt_holiday
-    description: Time spent solving the ticket within the SLA target.
-  time_spent_not_solved_in_time:
-    lineage:
-      - datalake_zendesk.tickets_current.ts_solved
-      - datalake_zendesk.tickets_current.ts_sla_started
-      - datalake_gsheets_clean.tag_sla_target.sla
-      - datalake_gsheets_clean.taxonomy_sla.sla_in_days
-      - datalake_quintoandar.aux_date.dt_non_working
-      - datalake_gsheets_clean.service_city_holidays.dt_holiday
-    description: Time spent solving the ticket outside the SLA target.
-  is_ticket_solved_in_time:
-    lineage:
-      - datalake_zendesk.tickets_current.ts_solved
-      - datalake_zendesk.tickets_current.ts_sla_started
-      - datalake_gsheets_clean.tag_sla_target.sla
-      - datalake_gsheets_clean.taxonomy_sla.sla_in_days
-      - datalake_quintoandar.aux_date.dt_non_working
-      - datalake_gsheets_clean.service_city_holidays.dt_holiday
-    description: Indicates if the ticket was solved within the SLA target.
-  is_ticket_not_solved_in_time:
-    lineage:
-      - datalake_zendesk.tickets_current.ts_solved
-      - datalake_zendesk.tickets_current.ts_sla_started
-      - datalake_gsheets_clean.tag_sla_target.sla
-      - datalake_gsheets_clean.taxonomy_sla.sla_in_days
-      - datalake_quintoandar.aux_date.dt_non_working
-      - datalake_gsheets_clean.service_city_holidays.dt_holiday
-    description: Indicates if the ticket was not solved within the SLA target.
+    description: Indicates whether the number of business days elapsed is within the SLA target for this ticket.
   context:
     lineage:
       - datalake_gsheets_clean.ticket_rate_classification.sub_journey

@@ -70,36 +70,22 @@ columns:
     lineage:
       - datalake_customer_support.tickets.id_session
     description: Session ID from Sauron
+  sk_sss_session:
+    lineage:
+      - datalake_customer_support.tickets.id_sss_session
+    description: Surrogate key for the Support Session Service (SSS) session linked to the ticket. Defaults to -1 when no SSS session is associated.
   channel:
     lineage:
       - datalake_customer_support.tickets.channel
     description: Identify the channel for this ticket (call, chat, email).
+  direction:
+    lineage:
+      - datalake_customer_support.tickets.direction
+    description: Direction of the ticket contact (e.g. inbound, outbound). Relevant primarily for call and chat channels.
   ticket_origin:
     description: It is the source channel of the chat ticket, which can be whatsapp or chat5A.
     lineage:
       - datalake_customer_support.tickets.ticket_origin
-  context:
-    description: Context of the ticket.
-    categories:
-      "ForRent":
-        Ticket is considered from the ForRent context because has subjourney 'Contract to Entrance',
-        'Listing & Search', 'Offboarding', 'Onboarding' or 'Visits to Offer'.
-      "ForSale": Ticket is considered from the ForSale context because has subjourney 'For Sale'.
-      "Partners": Ticket is considered from the Partners context because has subjourney 'Partners'.
-    lineage:
-      - datalake_customer_support.tickets.context
-  csat_score:
-    lineage:
-      - datalake_customer_support.tickets.csat_score
-    description: Last CSAT score (value goes from 1 to 5).
-  first_csat_score:
-    lineage:
-      - datalake_customer_support.tickets.first_csat_score
-    description: First CSAT score (value goes from 1 to 5).
-  status:
-    lineage:
-      - datalake_customer_support.tickets.status
-    description: Ticket status.
   front_or_back:
     lineage:
       - datalake_customer_support.tickets.front_or_back
@@ -182,10 +168,42 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.replies
     description: Number of public replies the agent added to the ticket
+  reply_time_min_business:
+    lineage:
+      - datalake_zendesk.tickets_current.reply_time_min_business
+    description: Number of minutes until the first reply during business hours.
+  reply_time_min_calendar:
+    lineage:
+      - datalake_zendesk.tickets_current.reply_time_min_calendar
+    description: Number of minutes until the first reply during calendar hours.
+  sla_target:
+    lineage:
+      - datalake_customer_support.tickets.sla_target
+    description: SLA target in minutes defined for the ticket based on its channel and department configuration.
+  days_elapsed_calendar:
+    lineage:
+      - datalake_customer_support.tickets.days_elapsed_calendar
+    description: Number of calendar days elapsed from ticket creation to resolution.
+  days_elapsed_business:
+    lineage:
+      - datalake_customer_support.tickets.days_elapsed_business
+    description: Number of business days elapsed from ticket creation to resolution.
+  days_off:
+    lineage:
+      - datalake_customer_support.tickets.days_off
+    description: Number of non-business days (weekends and holidays) elapsed during the ticket's open period.
   total_public_comments:
     description: Total number of public comments in a ticket
   total_private_comments:
     description: Total number of private comments in a ticket
+  is_backlog_in_time:
+    lineage:
+      - datalake_customer_support.tickets.is_backlog_in_time
+    description: Boolean flag indicating whether the ticket was resolved within the expected SLA backlog target time.
+  is_back_ticket:
+    lineage:
+      - datalake_customer_support.tickets.is_back_ticket
+    description: Boolean flag indicating whether the ticket is classified as a back-office (internal) ticket rather than a front-office (customer-facing) ticket.
   is_ticket_rate:
     lineage:
       - datalake_customer_support.tickets.is_ticket_rate
@@ -212,10 +230,6 @@ columns:
     description:
       Boolean that indicates if any of the related backoffice tickets have
       a status different than closed.
-  total_backoffice_minutes_time:
-    lineage:
-      - datalake_customer_support.tickets.total_backoffice_minutes_time
-    description: Time in minutes to close all related backoffice tickets.
   ts_created:
     lineage:
       - datalake_customer_support.tickets.ts_created

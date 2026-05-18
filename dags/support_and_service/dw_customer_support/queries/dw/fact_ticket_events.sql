@@ -8,6 +8,7 @@ SELECT DISTINCT
   COALESCE(id_house, -1) AS sk_house,
   COALESCE(id_contract, -1) AS sk_contract,
   COALESCE(id_session, -1) AS sk_session,
+  COALESCE(id_sss_session, -1) AS sk_sss_session,
   COALESCE(id_call, -1) AS sk_call,
   COALESCE(id_job, -1) AS sk_job,
   MD5(analyst_email) AS sk_agent,

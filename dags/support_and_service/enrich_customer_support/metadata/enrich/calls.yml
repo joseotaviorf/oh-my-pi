@@ -1,124 +1,168 @@
 database_name: datalake_customer_support
 table_name: calls
-description: Test table for call data
+description: >
+  Enrich-layer table consolidating customer support phone call events from Bigfone (Twilio) and session data from Sauron and Support Session Service. 
+  One row per call reservation, with one additional row per unanswered task. Grain is id_call + id_reservation. Used for support operational analysis,
+  SLA monitoring, BPO performance tracking, and call routing quality reporting.
 domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_call:
     lineage:
       - datalake_bigfone_clean.event.id_call
-    description:
-      The Twilio call ID is a unique identifier that represents a single phone call
-      initiated on the Twilio platform.
+    description: >
+      Unique identifier of the Twilio call, assigned by the Twilio platform. Represents a single phone call session end-to-end.
   id_session:
     lineage:
       - datalake_sauron_clean.session.id
-      - datalake_support_session_service_clean.support_session.id_session
-    description: Session ID from Sauron or Support Session Service
-  id_task:
+      - datalake_support_session_service_clean.support_session.id
+    description: >
+      Session identifier from Sauron or Support Session Service, matched to the call via the source_identity field. Nullable when no session is linked to the call.
+  id_sss_session:
     lineage:
-      - datalake_bigfone_clean.event.id_task
-    description: Twilio's ID Segment
-  id_reservation:
-    lineage:
-      - datalake_bigfone_clean.event.id_reservation
-    description: Twilio's ID Reservation
-  id_queue:
-    lineage:
-      - datalake_bigfone_clean.event.id_queue
-    description:
-      A queue in Twilio is identified by a unique identifier called Queue SID, and it
-      serves as a holding area for tasks that are waiting to be assigned to workers for
-      processing. Typically, the name of the queue in Twilio corresponds to the
-      department for which the task reservation is intended to be routed.
+      - datalake_support_session_service_clean.support_session.public_id
+    description: >
+      Public identifier of the session in the Support Session Service (SSS). Null for Sauron-originated sessions or older sessions from SSS.
   id_user:
     lineage:
       - datalake_sauron_clean.session.user_data
       - datalake_support_session_service_clean.support_session.user_data
-    description: Unique identifier for the user associated with the session from Sauron or Support Session Service
+    description: >
+      Unique identifier for the QuintoAndar user associated with the call session, extracted from the user_data JSON field in Sauron or SSS. Nullable when no session is linked.
+  id_task:
+    lineage:
+      - datalake_bigfone_clean.event.id_task
+    description: >
+      Twilio TaskRouter task identifier that groups all reservations belonging to the same inbound or outbound call attempt. A single call task can have multiple reservations.
+  id_reservation:
+    lineage:
+      - datalake_bigfone_clean.event.id_reservation
+    description: >
+      Twilio TaskRouter reservation identifier, representing one assignment attempt of a task to a specific worker. Null for unanswered tasks that never generated a reservation.
+  id_queue:
+    lineage:
+      - datalake_bigfone_clean.event.id_queue
+    description: >
+      Twilio queue identifier where the task was routed. Resolved from the reservation queue when available, otherwise from the task-level queue. Typically maps to a support department.
   id_worker:
     lineage:
       - datalake_bigfone_clean.event.id_worker
-    description: Twilio's worker ID
+    description: >
+      Twilio TaskRouter worker identifier of the agent who accepted or last handled the reservation. Null for unanswered calls.
   origin:
-    description: Used to segmented which channel the call originated from
+    lineage:
+      - datalake_bigfone_clean.event.channel_type
+      - datalake_bigfone_clean.event.direction
+    description: >
+      Derived call origin channel. Set to "in app" when channel_type is "call-in-app" or direction is "outbound-api"; otherwise equals the raw direction value. Used for segmenting call volume by contact channel.
+    categories:
+      in app: Call originated or received through the QuintoAndar mobile or web application.
+      inbound: Call received from an external phone line.
+      outbound: Call placed to an external phone line.
   direction:
     lineage:
       - datalake_bigfone_clean.event.direction
-    description: It is the support direction.
+    description: >
+      Direction of the phone call as reported by Twilio. Indicates whether the call was initiated by the customer (inbound) or by the support agent or system (outbound).
     categories:
-      inbound:
-        An inbound call is a call that is initiated by an external party, such as a
-        customer or a client, and is received by the Twilio application.
-      outbound:
-        An outbound call is a call that is initiated by the Twilio application to an
-        external party, such as a customer or a client.
+      inbound: Call was initiated by the customer and received by the support platform.
+      outbound: Call was initiated by the support platform or agent toward the customer.
+      outbound-api: Automated outbound call initiated via the Twilio API.
   channel_type:
     lineage:
       - datalake_bigfone_clean.event.channel_type
-    description: Column used to identify Call InApp records
+    description: >
+      Twilio channel type associated with the call task. Used to distinguish in-app calls (call-in-app) from traditional telephony calls.
   bpo_name:
     lineage:
       - datalake_bigfone_clean.event.bpo_name
-    description: Which BPO the task was assigned to
+    description: >
+      Name of the BPO (Business Process Outsourcer) to which the call task was assigned. Identifies the external service provider handling the support interaction.
   queue_name:
     lineage:
       - datalake_bigfone_clean.event.queue_name
-    description: Name of the queue the task is assigned to
+    description: >
+      Human-readable name of the Twilio queue where the task was routed. Typically corresponds to the support department or specialty team (e.g. "rental", "legal").
   worker_email:
     lineage:
       - datalake_bigfone_clean.event.worker_email
-    description: Last worker email that answered the last reservation.
+    description: >
+      Email address of the last Twilio worker (support agent) who accepted the final reservation of the task. Null for unanswered calls.
   from_phone_number:
     lineage:
       - datalake_bigfone_clean.event.from_phone_number
-    description: Caller phone number
+    description: >
+      Phone number that originated the call (caller). For inbound calls this is the customer's phone number; for outbound calls this is the support platform's outgoing number.
   to_phone_number:
     lineage:
       - datalake_bigfone_clean.event.to_phone_number
       - datalake_bigfone_clean.event.outbound_to_phone_number
-    description: Receiver phone number
+    description: >
+      Phone number that received the call (callee). For inbound calls this is the support platform's incoming number; for outbound calls this is the customer's phone number. Resolved from outbound_to_phone_number when direction is outbound.
   waiting_time_sec:
     lineage:
       - datalake_bigfone_clean.event.waiting_time_sec
-    description: Time elapsed between the start of the call and the first reservation, in seconds
+    description: >
+      Time in seconds elapsed between the creation of the first reservation and the moment the call was connected to a worker. Computed as the maximum waiting_time_sec across all events of the same reservation.
   is_call_answered:
-    description: Boolean that indicates if the call was answered
+    lineage:
+      - datalake_bigfone_clean.event.event_type
+    description: >
+      Boolean flag indicating whether at least one reservation of the call task was accepted or completed by a worker. False for fully unanswered calls.
   ends_in_abandon:
-    description: Boolean describing if the call ends in an abandoned reservation
+    lineage:
+      - datalake_bigfone_clean.event.event_type
+    description: >
+      Boolean flag indicating whether the call ended in an abandoned reservation. True when a task had reservations across multiple queues and none of the subsequent reservations were answered by a worker.
   is_reservation_answered:
-    description: Boolean that indicates if the reservation was answered
+    lineage:
+      - datalake_bigfone_clean.event.event_type
+    description: >
+      Boolean flag indicating whether this specific reservation was accepted or completed by a worker, based on the presence of a reservation.accepted or reservation.completed event.
   is_reservation_timeout:
-    description: If the reservation timed out
+    lineage:
+      - datalake_bigfone_clean.event.event_type
+    description: >
+      Boolean flag indicating whether this reservation timed out before being accepted by a worker, based on the presence of a reservation.timeout event.
   is_reservation_rejected:
-    description: If the reservation was rejected
+    lineage:
+      - datalake_bigfone_clean.event.event_type
+    description: >
+      Boolean flag indicating whether a worker explicitly rejected this reservation, based on the presence of a reservation.rejected event.
   is_reservation_canceled:
-    description: If the reservation was canceled
+    lineage:
+      - datalake_bigfone_clean.event.event_type
+    description: >
+      Boolean flag indicating whether this reservation was canceled before being assigned to or accepted by a worker, based on the presence of a reservation.canceled event.
   ts_task_created:
     lineage:
       - datalake_bigfone_clean.event.ts_created
-    description: Timestamp of task creation
+    description: >
+      Timestamp of when the Twilio task was first created, corresponding to the earliest reservation.created event for the task. Used as the primary time dimension for partitioning and analysis.
   ts_reservation_created:
     lineage:
       - datalake_bigfone_clean.event.ts_created
-    description: Timestamp of reservation creation
+    description: >
+      Timestamp of when this specific reservation was created by Twilio TaskRouter, extracted from the reservation.created event.
   ts_reservation_accepted:
     lineage:
       - datalake_bigfone_clean.event.ts_created
-    description: Timestamp of when the reservartion was accepted
+    description: >
+      Timestamp of when this reservation was accepted by a worker, extracted from the reservation.accepted event. Null when the reservation was not answered.
   ts_reservation_ended:
     lineage:
       - datalake_bigfone_clean.event.ts_created
-    description: Timestamp of when the reservartion ended
+    description: >
+      Timestamp of when this reservation ended (any terminal state), computed as the maximum ts_created across all events of the same reservation.
   year:
     lineage:
       - datalake_bigfone_clean.event.ts_created
-    description: Represents the year of ts_task_created, used as a partition
+    description: Year extracted from ts_task_created, used as a partition column for incremental storage.
   month:
     lineage:
       - datalake_bigfone_clean.event.ts_created
-    description: Represents the month of ts_task_created, used as a partition
+    description: Month extracted from ts_task_created, used as a partition column for incremental storage.
   day:
     lineage:
       - datalake_bigfone_clean.event.ts_created
-    description: Represents the day of ts_task_created, used as a partition
+    description: Day of month extracted from ts_task_created, used as a partition column for incremental storage.

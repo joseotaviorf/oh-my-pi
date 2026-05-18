@@ -19,7 +19,8 @@ workflow:
   custom_schema: support_session_service
   dbutils_secret_key: SUPPORT_SESSION_SERVICE_DB
   tables_customization:
-    support_session: {}
+    support_session:
+      z_order_by: [ts_updated]
 
 cluster:
   type: custom_cluster
