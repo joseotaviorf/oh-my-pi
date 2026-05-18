@@ -11,6 +11,8 @@ INMETRO_VERSION="${INMETRO_VERSION:-2.3.0}"
 KAFKA_CLIENTS_JAR="${KAFKA_CLIENTS_JAR:-kafka-clients-3.5.0.jar}"
 MYSQL_JDBC_JAR="${MYSQL_JDBC_JAR:-mysql-connector-java-8.0.30.jar}"
 QUINTOANDAR_LOGGER_WHEEL="${QUINTOANDAR_LOGGER_WHEEL:-quintoandar_logger-0.8.0-py3-none-any.whl}"
+REQUESTS_VERSION="${REQUESTS_VERSION:-2.32.5}"
+DATABRICKS_SDK_VERSION="${DATABRICKS_SDK_VERSION:-0.102.0}"
 
 echo "BEGIN: Install QuintoAndar internal libs"
 
@@ -49,7 +51,8 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         "${TMP_DIR}/wheels/inmetro-${INMETRO_VERSION}-py3-none-any.whl"
 
     # Pin urllib3 / requests for awscli before resolving the big stack.
-    $PIP_EXEC install --upgrade --ignore-installed 'requests==2.32.5' 'urllib3>=1.25.4,<1.27'
+    $PIP_EXEC install --upgrade --ignore-installed \
+        "requests==${REQUESTS_VERSION}" 'urllib3>=1.25.4,<1.27'
 
     echo "Installing quintoandar-logger wheel (with deps)..."
     if ! $PIP_EXEC install --no-cache-dir "${TMP_DIR}/wheels/${QUINTOANDAR_LOGGER_WHEEL}"; then
@@ -122,7 +125,10 @@ EOF
 fi
 
 if [ "${PROVIDER:-}" = "databricks" ]; then
-    $PIP_EXEC install --upgrade --ignore-installed requests==2.32.5
+    echo "Pinning requests..."
+    $PIP_EXEC install --no-cache-dir --ignore-installed "requests==${REQUESTS_VERSION}"
+    echo "Installing databricks-sdk for UC REST API sync..."
+    $PIP_EXEC install --no-cache-dir "databricks-sdk==${DATABRICKS_SDK_VERSION}"
 fi
 
 if [ "${PROVIDER:-}" != "databricks" ]; then
@@ -143,7 +149,7 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
     echo "Installing delta-spark 3.3.2 to match EMR 7.12 native Delta (no-deps; cluster PySpark)..."
     $PIP_EXEC install --no-cache-dir --no-deps 'delta-spark==3.3.2'
     echo "Installing databricks-sdk for UC REST API sync..."
-    $PIP_EXEC install --no-cache-dir 'databricks-sdk'
+    $PIP_EXEC install --no-cache-dir "databricks-sdk==${DATABRICKS_SDK_VERSION}"
     echo "Pinning urllib3 for EMR awscli/botocore compatibility..."
     $PIP_EXEC install 'urllib3>=1.25.4,<1.27'
 
@@ -189,11 +195,14 @@ fi
 
 echo "Validating installation..."
 
-$PIP_EXEC show bietlejuice-core
-$PIP_EXEC show bietlejuice-runtime
-$PIP_EXEC show quintoandar-logger
-$PIP_EXEC show inmetro
-if [ "${PROVIDER:-}" != "databricks" ]; then
+$PIP_EXEC show databricks-sdk
+if [ "${PROVIDER:-}" = "databricks" ]; then
+    :
+else
+    $PIP_EXEC show bietlejuice-core
+    $PIP_EXEC show bietlejuice-runtime
+    $PIP_EXEC show quintoandar-logger
+    $PIP_EXEC show inmetro
     python3 -c 'import psycopg2; print("psycopg2", psycopg2.__version__)'
 fi
 
