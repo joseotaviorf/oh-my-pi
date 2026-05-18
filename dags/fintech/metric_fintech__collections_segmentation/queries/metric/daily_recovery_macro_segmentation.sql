@@ -3,6 +3,7 @@ WITH contract_features_normalized AS (
         sk_contract,
         dt_reference,
         CASE
+            WHEN macro_segmentation IN ('active-new-defaulter-special') THEN 'active-new-defaulter'
             WHEN macro_segmentation IN ('ended-had-forgiveness') THEN
                 CASE
                     WHEN reference_contract_status = 'Finalizado'

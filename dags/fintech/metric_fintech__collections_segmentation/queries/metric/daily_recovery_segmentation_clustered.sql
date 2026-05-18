@@ -11,6 +11,9 @@ WITH contract_features_normalized AS (
                 'active-new-defaulter-early-low',
                 'active-new-defaulter-late-low'
             ) THEN 'active-new-defaulter-low'
+            WHEN segmentation IN (
+                'active-new-defaulter-good-payers'
+            ) THEN 'active-new-defaulter-high'
             WHEN segmentation IN ('ended-had-forgiveness') THEN
                 CASE
                     WHEN reference_contract_status = 'Finalizado'
