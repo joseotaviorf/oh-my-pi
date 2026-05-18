@@ -251,10 +251,14 @@ error_macro AS (
             WHEN vf = vs AND dt_bank_paid = dt_sap_paid THEN TRUE
             WHEN last_occurrence_code = 'DV' AND (sap_paid_amount = 0 OR sap_paid_amount IS NULL) THEN TRUE
             WHEN id_company_use LIKE '%MLRA%' THEN FALSE
+            WHEN id_company_use like '%MIP%' THEN FALSE
+            WHEN id_company_use like '%MCI%' THEN FALSE
+            WHEN id_company_use like '%!%' OR hash like 'm%' THEN FALSE
+            WHEN dt_sap_tax IS NOT NULL AND dt_sap_tax < dt_sap_paid THEN FALSE
             WHEN bank_paid_amount  IS NULL AND vs>=0 THEN FALSE
             WHEN vf>0 AND sap_paid_amount IS NULL THEN FALSE
-            WHEN vf>0 AND sap_paid_amount = 0 AND num_entries_sap>0 THEN TRUE
-            WHEN MOD(vs,vf) = 0 THEN TRUE
+            WHEN vf>0 AND vc=0 AND sap_paid_amount = 0 AND num_entries_sap>0 THEN TRUE
+            WHEN MOD(vs,vf) = 0 THEN FALSE
             WHEN vf <> vs THEN FALSE
             ELSE FALSE
         END is_bank_concilied,
