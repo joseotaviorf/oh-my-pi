@@ -119,7 +119,10 @@ assignments_daily AS (
         awd.dt_started,
         awd.dt_actual_termination,
         awd.dt_notified,
-        dt_reference
+        dt_reference,
+        (
+            dt_reference < awd.dt_started
+        ) AS is_future_hire
     FROM
         assignments_with_dates AS awd
     LATERAL VIEW EXPLODE(dt_reference_array) dt_ref AS dt_reference
@@ -137,6 +140,10 @@ primary_assignment_per_person_day AS (
                 ad.id_person,
                 ad.dt_reference
             ORDER BY
+                CASE
+                    WHEN NOT ad.is_future_hire THEN 0
+                    ELSE 1
+                END ASC,
                 ad.dt_started DESC
         ) = 1
 ),
@@ -165,6 +172,8 @@ hierarchy_with_direct_manager AS (
                 NULLIF(mh.dt_valid_to, DATE('4712-12-31')),
                 DATE('9999-12-31')
             )
+    WHERE
+        NOT ad.is_future_hire
 ),
 direct_report_counts AS (
     SELECT
@@ -334,6 +343,7 @@ SELECT
     pei.id_person IS NOT NULL AS has_emergency_contact,
     fh.dt_original_hire IS NOT NULL
         AND fh.dt_original_hire < ad.dt_started AS is_internal_transfer,
+    ad.is_future_hire,
     fh.dt_original_hire,
     ad.dt_started AS dt_hired,
     COALESCE(

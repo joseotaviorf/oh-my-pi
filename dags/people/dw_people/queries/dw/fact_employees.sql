@@ -26,3 +26,4 @@ FROM
 WHERE
     asn.is_monthly_snapshot
     AND asn.is_primary_assignment_for_snapshot
+    AND NOT COALESCE(asn.is_future_hire, FALSE)

@@ -35,11 +35,12 @@ column_level_validations:
       severity_level: Error
   count_direct_report:
     custom:
-      # Top-of-hierarchy reports (L0 / no manager) must equal total employees per dt_reference
+      # Top-of-hierarchy reports (L0 / no manager) must equal total employees per dt_reference (excluding is_future_hire).
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT dt_reference
           FROM datalake_people.assignment_snapshots
+          WHERE COALESCE(is_future_hire, FALSE) = FALSE
           GROUP BY dt_reference
           HAVING
             MAX(

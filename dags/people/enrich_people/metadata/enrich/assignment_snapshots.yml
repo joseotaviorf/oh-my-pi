@@ -5,7 +5,7 @@ domain: People
 description: |
   Work assignments as of each calendar day: identifiers, manager and hierarchy context, tenure metrics, report counts, LT/ET and manager flags, lifecycle dates, and surrogate keys for job, cost center, and management hierarchy effective on that date.
   dt_original_hire is the earliest observed assignment start per person and is meant for company-level tenure only, not as the legal hire date of a specific assignment.
-  Enrich snapshot table: one row per id_assignment and dt_reference (assignment state on that calendar day, not an SCD dimension).
+  Enrich snapshot table: one row per id_assignment and dt_reference (assignment state on that calendar day, not an SCD dimension). Only assignment types E and C are included (not pending-worker type P); use is_future_hire where pre-start rows must be excluded for dt_reference.
 columns:
   id_assignment:
     description: Unique identifier for the work assignment.
@@ -139,6 +139,8 @@ columns:
     description: True when the employee was already at the company before this assignment.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_started
+  is_future_hire:
+    description: Indicates if this assignment is a future hire for the current dt_reference.
   dt_original_hire:
     description: Date of the employee's first hire at the company. Derived from MIN(dt_started) over periods_of_service per person (approximation). PER_SENIORITY_DATES_F will provide assignment-level value when available.
     lineage:
@@ -168,7 +170,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_started
   is_primary_assignment_for_snapshot:
-    description: Indicates the current assignment for the employee on the reference date, based on the assignment start date (latest dt_started for id_person and dt_reference).
+    description: Indicates the current assignment for the employee on the reference date, based on the assignment start date (latest dt_started for id_person and dt_reference). If a person has both pending and effective assignments, the effective one takes priority.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_started
   ts_load:
