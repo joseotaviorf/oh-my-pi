@@ -5,13 +5,16 @@ domain: Growth
 owner: "@data-growth"
 description: |
   Materialized intermediate table that maintains chronological history of touchpoints per id_device.
-  Each row represents a unique combination of id_device + UTM parameters (source/medium/campaign/content/term),
-  with the earliest and latest tracking timestamps for that combination plus an MD5 utm_hash surrogate key
-  over the device + UTM tuple. UTM values are reconciled between the explicit egw_utm_* columns and the
-  referrer_domain extracted from user_properties: when the referrer matches a known search engine (google,
-  bing, yahoo) the touchpoint is classified as SEO; when it matches a known LLM domain (chatgpt, gemini,
-  copilot, perplexity, claude, you.com, poe.com, deepseek) it is classified as LLM. This table is optimized
-  for efficient joins with lead data and chronological ordering of touchpoints for journey analysis.
+  Each row represents a consecutive run of the same utm_hash for a device (gap-and-island grouping): a new
+  row is created whenever the utm_hash changes chronologically, even if the same UTM combination appeared
+  before. The grain is id_device + utm_hash + contiguous group, so the same UTM combination can appear as
+  multiple rows if it was interrupted by a different UTM hash in between. The earliest and latest tracking
+  timestamps of each consecutive run are stored as ts_utm_attribution_start and ts_utm_attribution_end.
+  UTM values are reconciled between the explicit egw_utm_* columns and the referrer_domain extracted from
+  user_properties: when the referrer matches a known search engine (google, bing, yahoo) the touchpoint is
+  classified as SEO; when it matches a known LLM domain (chatgpt, gemini, copilot, perplexity, claude,
+  you.com, poe.com, deepseek) it is classified as LLM. This table is optimized for efficient joins with
+  lead data and chronological ordering of touchpoints for journey analysis.
 columns:
   id_device:
     description: Device identifier from user_tracking (id_anonymous). Primary key component for joins with lead data.
@@ -59,11 +62,11 @@ columns:
   utm_hash:
     description: |
       MD5 hash of the concatenation of utm_source, utm_medium, utm_campaign, utm_content and utm_term (each
-      NULL replaced by a placeholder string). This hash is used as part of the merge key instead of the
-      individual UTM columns because the merge operation on the delta table relies on the rule
-      'source.column = target.column', which does not match rows when either the source or target value is
-      NULL. Replacing NULLs with a placeholder before hashing produces a deterministic, non-null surrogate
-      key that allows the merge to correctly identify unique UTM combinations.
+      NULL replaced by a placeholder string). Drives the gap-and-island grouping logic: a new group (and
+      therefore a new row) is opened whenever the utm_hash value changes chronologically for a given
+      id_device, even if the same hash appeared earlier. The hash is also used as the merge key instead of
+      the individual UTM columns because NULL values would prevent the delta merge from matching rows;
+      replacing NULLs with placeholders before hashing produces a deterministic, non-null surrogate key.
     lineage:
       - datalake_cdp_clean.user_tracking.egw_utm_source
       - datalake_cdp_clean.user_tracking.egw_utm_medium
@@ -73,15 +76,17 @@ columns:
       - datalake_cdp_clean.user_tracking.user_properties
   ts_utm_attribution_start:
     description: |
-      Earliest tracking timestamp (MIN of ts_tracking) for the id_device + UTM combination. Marks when this
-      touchpoint combination first appeared for the device. This column is not updated when new touchpoints
-      are detected for the same UTM combination because the start time is static once it's set.
+      Earliest tracking timestamp (MIN of ts_tracking) within the consecutive group. Marks when this
+      particular run of the utm_hash started for the device. Because the same UTM combination can generate
+      multiple groups (if interrupted by a different utm_hash), this value reflects the first time that UTM
+      was seen within this consecutive run, not across all historical occurrences for the device.
     lineage:
       - datalake_cdp_clean.user_tracking.ts_event
   ts_utm_attribution_end:
     description: |
-      Latest tracking timestamp (MAX of ts_tracking) for the id_device + UTM combination, resolved with the
-      same logic as ts_utm_attribution_start. Marks the most recent occurrence of this touchpoint combination
-      for the device. This column is updated when new touchpoints are detected for the same UTM combination.
+      Latest tracking timestamp (MAX of ts_tracking) within the consecutive group. Marks when this particular
+      run of the utm_hash ended for the device. Follows the same consecutive-run scope as
+      ts_utm_attribution_start: it reflects the last time that UTM was seen within this consecutive run,
+      not across all historical occurrences for the device. Updated when new tracking events extend the run.
     lineage:
       - datalake_cdp_clean.user_tracking.ts_event

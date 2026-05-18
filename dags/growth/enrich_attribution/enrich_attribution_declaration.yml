@@ -17,7 +17,7 @@ workflow:
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   tables_customization:
     tracking_by_device:
-      merge_on: [id_device, utm_hash]
+      merge_on: [id_device, utm_hash, ts_utm_attribution_start]
       when_matched_update_condition: "source.ts_utm_attribution_end > target.ts_utm_attribution_end"
       when_matched_operation:
         # Update only the ts_utm_attribution_end column
