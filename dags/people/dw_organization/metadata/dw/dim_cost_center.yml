@@ -28,6 +28,18 @@ columns:
     description: Person identifier of the HRBP responsible for the cost center in this version.
     lineage:
       - datalake_people.cost_center_history.sk_business_partner
+  hrbp_person_number:
+    description: Person number (natural key) of the HRBP responsible for this cost center version.
+    lineage:
+      - datalake_people.identifier_mapping.person_number
+  hrbp_name:
+    description: Full name of the HRBP responsible for this cost center version.
+    lineage:
+      - datalake_people.identifier_mapping.name
+  hrbp_work_email:
+    description: Work email of the HRBP responsible for this cost center version.
+    lineage:
+      - datalake_people.identifier_mapping.work_email
   cost_center_name:
     description: Cost center name.
     lineage:

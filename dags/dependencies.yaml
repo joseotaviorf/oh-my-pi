@@ -922,6 +922,7 @@ bietlejuice.dw_offer:
 bietlejuice.dw_organization:
   - bietlejuice.enrich_people:load-enrich-business-unit:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-cost-center-history:first-run-of-day
+  - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-job-with-salary-table:first-run-of-day
 bietlejuice.dw_payments_platform:
   - bietlejuice.enrich_payments_platform:load-enrich-payment-timeline:first-run-of-day
