@@ -38,10 +38,6 @@ columns:
       - core_brokers.brokers.broker_trade_name_tag
     description: |
       Normalized broker trade name (no accents, no whitespace; case preserved).
-  broker_status:
-    lineage:
-      - core_brokers.brokers.broker_status
-    description: Current broker status in the core brokers model.
   broker_address:
     lineage:
       - core_brokers.brokers.broker_address

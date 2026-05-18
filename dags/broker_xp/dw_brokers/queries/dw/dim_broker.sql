@@ -43,7 +43,6 @@ SELECT
   cb.broker_trade_name,
   cb.broker_name_tag,
   cb.broker_trade_name_tag,
-  cb.broker_status,
   cb.broker_address,
   cb.broker_number,
   cb.broker_complement,
