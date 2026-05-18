@@ -48,8 +48,9 @@ class DateRangePartitionReader:
                 f"{base_path}/{current_load_date.strftime(self.partition_format)}"
             )
             try:
-                self.dbutils.fs.ls(load_path)
-                load_date_paths.append(load_path)
+                entries = self.dbutils.fs.ls(load_path)
+                if entries:
+                    load_date_paths.append(load_path)
             except Exception as e:
                 if "java.io.FileNotFoundException" not in str(e):
                     raise e
