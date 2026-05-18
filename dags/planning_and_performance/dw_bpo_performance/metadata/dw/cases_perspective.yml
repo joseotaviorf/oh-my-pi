@@ -209,6 +209,39 @@ columns:
     lineage:
       - datalake_salesforce_clean.cases.supplied_email
     description: Return email associated with the requester in Salesforce.
+  client_type:
+    lineage:
+      - datalake_salesforce_clean.events_case.client_type__c
+      - dw_bpo_performance.tickets_perspective.tipo_de_cliente
+    description: Returns the type of client related to the case (e.g., tenant, owner).
+  id_inspection:
+    lineage:
+      - datalake_salesforce_clean.events_case.inspection_external_id__c
+    description: External inspection ID that is manually entered by the analyst in Salesforce.
+  id_house:
+    lineage:
+      - datalake_salesforce_clean.events_case.property_id__c
+    description: Property ID related to the contract being mediated on Salesforce during customer service.
+  is_eviction:
+    lineage:
+      - datalake_salesforce_clean.events_case.is_eviction__c
+    description: Indicates whether the contract related to the case is part of the eviction process when in Offboarding.
+  is_kirk:
+    lineage:
+      - datalake_salesforce_clean.events_case.is_kirk__c
+    description: Indicates whether the contract related to the case is part of Kirk's process.
+  is_high_value:
+    lineage:
+      - datalake_salesforce_clean.events_case.is_high_value__c
+    description: Indicates whether the contract related to the case involves a rental agreement above 2500 reais.
+  criticidade_sla:
+    lineage:
+      - datalake_salesforce_clean.events_case.criticality_sla__c
+    description: Indicates the SLA by criticality when repairs are being carried out.
+  event_type:
+    lineage:
+      - datalake_salesforce_clean.events_case.event_type
+    description: Indicates case status.
   platform:
     categories:
         Salesforce: Salesforce Platform

@@ -191,6 +191,7 @@ bietlejuice.dw_bpo_performance:
   - bietlejuice.quinto_messenger:load-clean-channel-event:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-channel:first-run-of-day
   - bietlejuice.repairs:load-clean-repair-request-tenant-negotiation-follow-up:first-run-of-day
+  - bietlejuice.salesforce:load-clean-case-milestones:first-run-of-day
   - bietlejuice.salesforce:load-clean-cases:first-run-of-day
   - bietlejuice.salesforce:load-clean-email-message:first-run-of-day
   - bietlejuice.salesforce:load-clean-record-types:first-run-of-day
@@ -4920,6 +4921,7 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.quinto_messenger:load-clean-channel-event:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-channel:first-run-of-day
   - bietlejuice.repairs:load-clean-repair-request-tenant-negotiation-follow-up:first-run-of-day
+  - bietlejuice.salesforce:load-clean-case-milestones:first-run-of-day
   - bietlejuice.salesforce:load-clean-cases:first-run-of-day
   - bietlejuice.salesforce:load-clean-email-message:first-run-of-day
   - bietlejuice.salesforce:load-clean-record-types:first-run-of-day

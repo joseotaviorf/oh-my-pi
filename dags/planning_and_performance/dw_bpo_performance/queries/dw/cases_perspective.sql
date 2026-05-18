@@ -28,17 +28,6 @@ csat AS (
     WHERE satisfaction_score IS NOT NULL
         QUALIFY ROW_NUMBER() OVER (PARTITION BY sk_case ORDER BY fa.ts_submitted ASC) = 1  
 ),
-     
-pp_multi AS (
-    SELECT
-        dt_houses_owned as date,
-        id_owner as sk_owner,
-        ongoing_houses,
-        is_pp_multi_active,
-        CASE WHEN is_pp_multi_active = TRUE or ongoing_houses >= 5 THEN true ELSE false END AS is_pp_multi
-    FROM datalake_pro_owners.daily_owner_houses_quantity_history ppm
-    WHERE (ongoing_houses >= 5 OR is_pp_multi_active = TRUE)
-),
 
 spoc AS (
   SELECT 
@@ -153,6 +142,7 @@ tickets_perspective AS (
         IF(dt.group_name = 'Rescisão por Inadimplência [OFF][POS][BACK]' 
             AND tp.tipo_de_cliente LIKE '%proprietário%' AND tp.tipo_de_demanda IN ('demanda_de_processos') 
             AND tp.tipo_de_processo IN ('despejo/fraude') AND dt.subject LIKE '%Rescisão do contrato%', 'despejo', NULL ) as tkt_despejo,
+            tp.tipo_de_cliente,
         'Zendesk' as Platform
     FROM dw_bpo_performance.tickets_perspective as tp
     LEFT JOIN spoc ON tp.sk_contract = spoc.sk_contract
@@ -183,6 +173,31 @@ case_non_working_days AS (
     GROUP BY c.id_case
 ),
 
+ events as (
+
+SELECT 
+
+CAST(case_number as INT) AS case_number,
+reason as case_reason,
+omni_channel_queue__c as fila_omni_channel,
+fr_case_reopen_count__c as reopens,
+inspection_external_id__c as id_inspection,
+property_id__c as id_house,
+is_eviction__c as is_eviction,
+is_pp_multi__c as is_pp_multi,
+is_kirk__c as is_kirk,
+is_high_value__c as is_high_value,
+client_type__c as client_type,
+criticality__c as criticidade,
+criticality_sla__c AS criticidade_sla,
+sla_due_days__c as sla_target,
+event_type  as event_type
+
+FROM datalake_salesforce_clean.events_case
+QUALIFY ROW_NUMBER() OVER (PARTITION BY case_number ORDER BY last_modified_date DESC) = 1 
+),
+
+
 cases_perspective AS (
     SELECT DISTINCT
         c.id_case,
@@ -212,11 +227,11 @@ cases_perspective AS (
         fr.minutes_first_reply_time_business AS minutes_first_reply_time_business,
         fr.replies,
         datediff(c.ts_closed, c.ts_created) as ldt_ticket,
-        CAST(sla.sla_tgt as INT) as sla_tgt,
+        COALESCE(cm.target_response_in_days,CAST(sla.sla_tgt as INT)) as sla_tgt,
 
 CASE 
             WHEN ts_closed IS NULL THEN NULL 
-            WHEN (datediff(CAST(COALESCE(c.ts_closed, sd.ts_event) AS DATE), CAST(c.ts_created AS DATE)) - COALESCE(cnw.total_non_working, 0)) <= CAST(sla.sla_tgt as INT) THEN TRUE 
+            WHEN (datediff(CAST(COALESCE(c.ts_closed, sd.ts_event) AS DATE), CAST(c.ts_created AS DATE)) - COALESCE(cnw.total_non_working, 0)) <=  COALESCE(cm.target_response_in_days,CAST(sla.sla_tgt as INT)) THEN TRUE 
             ELSE FALSE 
         END as is_ticket_solved_within_sla,
         u.email as agent_email,
@@ -232,12 +247,25 @@ CASE
         spoc.spoc_team,
         spoc.spoc_class,
         CASE WHEN spoc.is_spoc_contract = TRUE AND spoc.spoc_class IN ('before_wave_6_lab_test', 'lab_test', 'rollout') THEN TRUE ELSE FALSE END as is_spoc_test,
-        ppm.is_pp_multi as is_pp_multi,
         c.case_origin, 
         fr_res.first_resolution,
         CASE WHEN c.case_type LIKE '%Mediation%' THEN 'MED' END as off_area,
         CASE WHEN COALESCE(date(spoc.ts_termination_finished), current_date()) >= ww_backlog.dt_end_9 THEN 0 ELSE 1 END as flag_sla_med,
         c.supplied_email,
+        e.case_reason,
+        e.fila_omni_channel,
+        e.reopens,
+        e.id_inspection,
+        e.id_house,
+        e.is_eviction,
+        e.is_pp_multi,
+        e.is_kirk,
+        e.is_high_value,
+        e.client_type,
+        e.criticidade,
+        e.criticidade_sla,
+        e.event_type,
+        CASE WHEN c.omni_channel_queue = 'Squad 7 - Mediação' THEN 'despejo' ELSE NULL END as tkt_despejo,
         'email' as channel,
         'SalesForce' as Platform 
 
@@ -248,7 +276,6 @@ CASE
     LEFT JOIN datalake_salesforce_clean.users as u on u.id_user_salesforce = c.id_owner
     LEFT JOIN datalake_salesforce_clean.account as a on a.id_account = c.id_account
     LEFT JOIN spoc ON CAST(c.id_contract AS STRING) = CAST(spoc.sk_contract AS STRING)
-    LEFT JOIN pp_multi AS ppm ON ppm.sk_owner = a.id_external 
     LEFT JOIN first_reply_sf AS fr ON fr.id_case = c.id_case
     LEFT JOIN first_resolution AS fr_res on fr_res.last_agent_email = u.email
     LEFT JOIN datalake_date.workday_window AS ww_backlog ON date(C.ts_created) = ww_backlog.dt_ref AND ww_backlog.id_city = 39
@@ -256,6 +283,8 @@ CASE
     LEFT JOIN datalake_salesforce_clean.events_case_member as cm on cm.case__c = c.id_Case AND type__c = 'Service requester'
     LEFT JOIN dw_public.dim_user as du on du.uuid_person = split(cm.external_id__c, '_')[2] 
     LEFT JOIN case_non_working_days cnw ON cnw.id_case = c.id_case 
+    LEFT JOIN datalake_salesforce_clean.case_milestones  as cm on cm.id_case = c.id_case
+    LEFT JOIN events AS e on e.case_number = c.case_number
     QUALIFY ROW_NUMBER() OVER (PARTITION BY c.case_number ORDER BY c.TS_LAST_MODIFIED DESC) = 1
 )
 
@@ -268,10 +297,10 @@ SELECT
     sk_user as sk_user,
     channel,
     case_status as status,
-    team as last_team,
+    fila_omni_channel as last_team,
     Area as last_area,
     front_or_back,
-    COALESCE(ops, record_type_name, case_type) as last_department,
+    COALESCE(fila_omni_channel, record_type_name) as last_department,
     first_csat_ts_response,
     first_csat_score,
     first_csat_comment,
@@ -285,21 +314,29 @@ SELECT
     is_ticket_solved_within_sla,
     agent_email as last_agent_email,
     agent_organization as last_agent_organization,
-    NULL AS reopens,
+    reopens AS reopens,
     is_spoc_test,
     is_pp_multi,
     off_area,
     NULL AS tags,
     replies,
     NULL AS ticket_type,
+    client_type,
     case_origin AS canal_de_entrada,
     NULL AS is_auto_reparo,
     NULL AS group_name_ro,
-    NULL AS criticidade_ro,
+    criticidade AS criticidade_ro,
     NULL AS flag_sla_reparos,
     flag_sla_med,
-    NULL AS tkt_despejo,
+    tkt_despejo AS tkt_despejo,
     first_resolution as first_resolution_last_agent,
+    id_inspection,
+    id_house,
+    is_eviction, 
+    is_kirk,
+    is_high_value,
+    criticidade_sla,
+    event_type,
     supplied_email,
     Platform,
     YEAR(CURRENT_DATE) AS year,
@@ -343,6 +380,7 @@ SELECT
     tags,
     replies,
     ticket_type,
+    tipo_de_cliente as client_type,
     canal_de_entrada,
     is_auto_reparo,
     group_name_ro,
@@ -351,7 +389,14 @@ SELECT
     flag_sla_med,
     tkt_despejo,
     first_resolution as first_resolution_last_agent,
+    NULL AS id_inspection,
+    NULL AS id_house, 
+    NULL AS is_eviction,
     NULL AS supplied_email,
+    NULL AS is_kirk,
+    NULL AS is_high_value,
+    NULL AS criticidade_sla,
+    NULL AS event_type,
     Platform,
     YEAR(CURRENT_DATE) AS year,
     MONTH(CURRENT_DATE) AS month,
