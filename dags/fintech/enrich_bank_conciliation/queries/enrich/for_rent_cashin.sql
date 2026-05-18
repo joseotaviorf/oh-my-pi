@@ -197,7 +197,7 @@ vans_checkout_union AS (
         END AS payment_method,
         b.status AS payment_status,
         b.paid_amount,
-        NULLIF(CAST(TRIM(b.your_number) AS INTEGER), '') AS our_number
+        NULLIF(b.our_number, '') AS our_number
     FROM
       datalake_checkout_clean.bolecode b
     INNER JOIN datalake_checkout_clean.charge c 
