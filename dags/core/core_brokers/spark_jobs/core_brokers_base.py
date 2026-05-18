@@ -6,10 +6,8 @@ from pyspark.sql.functions import (
     dayofmonth,
     lit,
     month,
-    row_number,
     year,
 )
-from pyspark.sql.window import Window
 
 from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
 from bietlejuice.base.pipeline import LayerEnum
@@ -24,8 +22,8 @@ class CoreBrokersBaseSparkJob(BaseCoreModelSparkJob):
     """Shared base for all core_brokers Spark jobs.
 
     Provides reusable helpers for data loading, partition columns,
-    is_current flag computation, and pipeline execution that are
-    common across the brokers and brokers_product jobs.
+    and pipeline execution that are common across the brokers,
+    brokers_product, and brokers_profile jobs.
     """
 
     def __init__(self):
@@ -75,19 +73,6 @@ class CoreBrokersBaseSparkJob(BaseCoreModelSparkJob):
             df.withColumn("year", year(col(source_col)))
             .withColumn("month", month(col(source_col)))
             .withColumn("day", dayofmonth(col(source_col)))
-        )
-
-    def _add_is_current(self, df, partition_key):
-        """Add ``is_current`` boolean: True for the latest transaction per entity.
-
-        Uses a window partitioned by *partition_key* and ordered by
-        ``ts_database_transaction DESC``; the first row gets ``True``.
-        """
-        window = Window.partitionBy(partition_key).orderBy(
-            col("ts_database_transaction").desc()
-        )
-        return df.withColumn(
-            "is_current", (row_number().over(window) == 1)
         )
 
     # ── pipeline execution ──────────────────────────────────────────

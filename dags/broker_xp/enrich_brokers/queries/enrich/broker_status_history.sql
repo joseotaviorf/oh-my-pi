@@ -16,18 +16,20 @@ WITH status_changes AS (
   UNION ALL
 
   SELECT
-    bph.sk_broker,
-    bph.sk_broker_product,
-    bph.product_status AS broker_status,
-    bph.product_name,
+    bph.id_company AS sk_broker,
+    bph.sk_company_product AS sk_broker_product,
+    bph.value AS broker_status,
+    bp.product_name,
     'Company' AS status_origin,
-    bph.ts_database_transaction AS ts_updated,
-    LAG(bph.product_status) OVER (PARTITION BY bph.sk_broker, bph.product_name ORDER BY bph.ts_database_transaction) AS prev_status
+    bph.ts_transaction AS ts_updated,
+    LAG(bph.value) OVER (PARTITION BY bph.id_company, bph.id_product ORDER BY bph.ts_transaction) AS prev_status
   FROM
-    core_brokers.brokers_product_historical AS bph
+    core_brokers.broker_products_history AS bph
+    LEFT JOIN core_brokers.brokers_product AS bp ON bph.sk_company_product = bp.sk_broker_product
   WHERE
-    bph.ts_database_transaction >= '2026-02-01'
-      AND bph.product_status IS NOT NULL
+    bph.ts_transaction >= '2026-02-01'
+      AND bph.event_name = 'ev_status'
+      AND bph.value IS NOT NULL
 ),
 status_cohorts AS (
   SELECT

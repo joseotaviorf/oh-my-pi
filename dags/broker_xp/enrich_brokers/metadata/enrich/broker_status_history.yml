@@ -6,30 +6,30 @@ owner: vitor.musachio@quintoandar.com.br
 columns:
   id_status_change:
     lineage:
-      - core_brokers.brokers_product_historical.sk_broker_product
+      - core_brokers.broker_products_history.sk_company_product
       - datalake_brokers.hubspot_brokers_history.sk_broker
       - datalake_hubspot.company_history.ts_updated
-      - core_brokers.brokers_product_historical.ts_database_transaction
+      - core_brokers.broker_products_history.ts_transaction
     description: Primary key of the table, composed of the combination of sk_broker_product and ts_start.
   sk_broker:
     lineage:
       - core_brokers.brokers.sk_broker
-      - core_brokers.brokers_product_historical.sk_broker
+      - core_brokers.broker_products_history.id_company
     description: Surrogate key identifying the broker.
   broker_status:
     lineage:
       - datalake_brokers.hubspot_brokers_history.broker_status
-      - core_brokers.brokers_product_historical.product_status
+      - core_brokers.broker_products_history.value
     description: Status of the broker during the period (e.g. ACTIVE, INACTIVE).
   product_name:
     lineage:
-      - core_brokers.brokers_product_historical.product_name
+      - core_brokers.brokers_product.product_name
     description: Name of the product associated with the broker status. 'Rede Sale' for Hubspot-sourced records.
   status_origin:
     description: Origin system of the status record.
     categories:
       Hubspot: Status sourced from Hubspot company history (up to 2026-01-31).
-      Company: Status sourced from Company brokers_product_historical (from 2026-02-01).
+      Company: Status sourced from Company broker_products_history (from 2026-02-01).
   is_current:
     description: True if the status is the broker's current status for the given product, otherwise false.
   has_3p_access_control:
@@ -39,12 +39,12 @@ columns:
   ts_start:
     lineage:
       - datalake_hubspot.company_history.ts_updated
-      - core_brokers.brokers_product_historical.ts_database_transaction
+      - core_brokers.broker_products_history.ts_transaction
     description: Start timestamp of the status period.
   ts_end:
     lineage:
       - datalake_hubspot.company_history.ts_updated
-      - core_brokers.brokers_product_historical.ts_database_transaction
+      - core_brokers.broker_products_history.ts_transaction
     description: End timestamp of the status period. NULL if this is the current status.
   ts_load:
     description: Timestamp of when the record was loaded or last updated by the ETL process.

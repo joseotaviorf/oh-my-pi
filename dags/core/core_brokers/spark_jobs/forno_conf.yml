@@ -11,12 +11,8 @@ REVENUE_SHARE_TABLE: "datalake_company_clean.revenue_share"
 BANKING_INFORMATION_TABLE: "datalake_company_clean.banking_information"
 TIER_TABLE: "datalake_company_clean.tier"
 COMPANY_PRODUCT_TIER_TABLE: "datalake_company_clean.company_product_tier"
-COMPANY_TRANSACTIONAL_TABLE: "datalake_company_transactional.company"
-COMPANY_PRODUCT_TRANSACTIONAL_TABLE: "datalake_company_transactional.company_product"
 MEMBER_PROFILE_TABLE: "datalake_company_clean.member_profile"
 PROFILE_TABLE: "datalake_company_clean.profile"
 merge_on: ["sk_broker"]
-merge_on_historical: ["sk_broker", "ts_database_transaction"]
 merge_on_brokers_product: ["sk_broker_product"]
-merge_on_brokers_product_historical: ["sk_broker_product", "ts_database_transaction"]
 merge_on_brokers_profile: ["sk_broker_profile"]

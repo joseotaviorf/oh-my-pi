@@ -1821,8 +1821,9 @@ bietlejuice.enrich_brokerage:
   - bietlejuice.nazare:load-clean-offer:first-run-of-day
   - bietlejuice.nazare:load-clean-revenue-share-by-participant:first-run-of-day
 bietlejuice.enrich_brokers:
-  - bietlejuice.core_brokers:load-core-brokers-product-historical:first-run-of-day
+  - bietlejuice.core_brokers:load-core-brokers-product:first-run-of-day
   - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
+  - bietlejuice.core_brokers_history:load-core-broker-products-history:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-history:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company:first-run-of-day
 bietlejuice.enrich_brokers_supply_processor:

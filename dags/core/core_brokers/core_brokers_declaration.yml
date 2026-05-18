@@ -28,18 +28,7 @@ workflow:
       z_order_by: [sk_broker]
       table_properties:
         "delta.enableChangeDataFeed": "true"
-    brokers_historical:
-      partitions: [year, month, day]
-      z_order_by: [sk_broker]
-      table_properties:
-        "delta.enableChangeDataFeed": "true"
     brokers_product:
-      load_spark_job: load_core_brokers_product
-      partitions: [year, month, day]
-      z_order_by: [sk_broker_product]
-      table_properties:
-        "delta.enableChangeDataFeed": "true"
-    brokers_product_historical:
       load_spark_job: load_core_brokers_product
       partitions: [year, month, day]
       z_order_by: [sk_broker_product]

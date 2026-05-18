@@ -13,7 +13,6 @@ from pyspark.sql.functions import (
 from bietlejuice.base.core_models.core_brokers_base import (
     CoreBrokersBaseSparkJob,
 )
-from bietlejuice.base.core_models.helpers.historical_helper import HistoricalHelper
 
 _BROKER_STRING_TAG_ACCENT_FROM = (
     "áàâãäéèêëíìîïóòôõöúùûüçÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇ"
@@ -33,19 +32,14 @@ def _broker_string_tag(column):
         )
     )
 
-HISTORICAL_TABLE = "brokers_historical"
-
 
 class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
     """Core Brokers Spark job implementation.
 
     Consolidates broker partner data from the 3P Partners operation,
     joining company, address, document and product information into
-    a single denormalized view of each broker.
-
-    Supports two output tables:
-      - ``brokers`` (current state from clean layer)
-      - ``brokers_historical`` (all CDC transactions from transactional layer)
+    a single denormalized view of each broker (current state from the
+    clean layer).
     """
 
     def get_brokers_config(self):
@@ -60,19 +54,8 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
             "ADDRESS_TABLE": self.get_config("ADDRESS_TABLE"),
         }
 
-    # ── create_core_model dispatch ──────────────────────────────────
-
     def create_core_model(self, spark: SparkSession, args) -> DataFrame:
-        """Dispatch to the appropriate model builder based on table_name."""
-        if args.table_name == HISTORICAL_TABLE:
-            return self._create_historical_model(spark, args)
-        return self._create_current_state_model(spark, args)
-
-    # ── current-state model (brokers) ───────────────────────────────
-
-    def _create_current_state_model(self, spark: SparkSession, args) -> DataFrame:
         """Create the current-state brokers model from clean layer data."""
-
         config = self.get_brokers_config()
 
         company_df = self._load_data(
@@ -101,58 +84,6 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
 
         result_df = self._select_final_columns(result_df)
         return self._add_partition_columns(result_df, "ts_broker_updated")
-
-    # ── historical model (brokers_historical) ───────────────────────
-
-    def _create_historical_model(self, spark: SparkSession, args) -> DataFrame:
-        """Create the historical brokers model from transactional + clean data.
-
-        Company transactions come from the transactional layer (every insert,
-        update, delete). Related entities (address, document, product) are
-        joined from the clean layer to provide the latest context for each
-        transaction.
-        """
-        config = self.get_brokers_config()
-
-        transactional_table = self.get_config("COMPANY_TRANSACTIONAL_TABLE")
-        company_df = HistoricalHelper.load_transactional_data(
-            spark,
-            transactional_table,
-            args,
-        )
-        company_df = (
-            company_df.withColumnRenamed("company_uuid", "uuid_company")
-            .withColumnRenamed("created_at", "ts_created")
-            .withColumnRenamed("updated_at", "ts_updated")
-        )
-
-        company_address_df = self._load_data(
-            spark, config["COMPANY_ADDRESS_TABLE"], args
-        )
-        company_document_df = self._load_data(
-            spark, config["COMPANY_DOCUMENT_TABLE"], args
-        )
-        document_df = self._load_data(spark, config["DOCUMENT_TABLE"], args)
-        company_product_df = self._load_data(
-            spark, config["COMPANY_PRODUCT_TABLE"], args
-        )
-        address_df = self._load_data(spark, config["ADDRESS_TABLE"], args)
-
-        result_df = self._transform_and_join(
-            company_df,
-            company_address_df,
-            company_document_df,
-            document_df,
-            company_product_df,
-            address_df,
-        )
-
-        cdc_cols = HistoricalHelper.select_cdc_columns(company_df, "c")
-        result_df = self._select_final_columns(result_df, extra_columns=cdc_cols)
-        result_df = self._add_is_current(result_df, "sk_broker")
-        return self._add_partition_columns(result_df, "ts_database_transaction")
-
-    # ── shared transformation logic ─────────────────────────────────
 
     def _transform_and_join(
         self,
@@ -283,15 +214,9 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
 
         return result_df
 
-    def _select_final_columns(self, result_df, extra_columns=None):
-        """Select and alias the final output columns.
-
-        Args:
-            result_df: Joined DataFrame
-            extra_columns: Optional list of additional Column expressions
-                to append (e.g. CDC metadata columns for historical table)
-        """
-        columns = [
+    def _select_final_columns(self, result_df):
+        """Select and alias the final output columns."""
+        return result_df.select(
             col("c.id").cast("string").alias("sk_broker"),
             col("c.id").alias("id_company"),
             col("c.uuid_company"),
@@ -323,32 +248,7 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
             col("c.ts_created").alias("ts_broker_created"),
             col("c.ts_updated").alias("ts_broker_updated"),
             current_timestamp().alias("ts_load"),
-        ]
-
-        if extra_columns:
-            columns.extend(extra_columns)
-
-        return result_df.select(*columns)
-
-    # ── run_pipeline override ───────────────────────────────────────
-
-    def run_pipeline(self, dataframe: DataFrame, args, spark: SparkSession) -> None:
-        """Override to use table-specific merge config for historical table.
-
-        The historical table does NOT use the base class's "preserve non-null"
-        when_matched_operation because each row is a complete snapshot of a
-        CDC transaction, not a partial update.
-        """
-        if args.table_name == HISTORICAL_TABLE:
-            self._run_pipeline_with_config(
-                dataframe,
-                args,
-                spark,
-                merge_on_key="merge_on_historical",
-                update_condition_key="when_matched_update_condition_historical",
-            )
-        else:
-            super().run_pipeline(dataframe, args, spark)
+        )
 
 
 if __name__ == "__main__":
