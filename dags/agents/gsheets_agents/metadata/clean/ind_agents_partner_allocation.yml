@@ -1,0 +1,41 @@
+---
+database_name: datalake_gsheets_clean
+table_name: ind_agents_partner_allocation
+description: >-
+  Partner (pessoa física) records from Google Sheets tab Partners_PF: agent and user ids,
+  broker company name, registration contact dates and high-touch distribution periods.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_agent:
+    description: Agent identifier aligned with Ebdb/agent dimensions (spreadsheet column sk_agent).
+    lineage:
+      - datalake_gsheets_raw.ind_agents_partner_allocation.sk_agent
+  id_user:
+    description: User identifier for the broker person (spreadsheet column sk_user).
+    lineage:
+      - datalake_gsheets_raw.ind_agents_partner_allocation.sk_user
+  real_estate_agency_name:
+    description: Legal/trade name of the partner real estate intermediary (column imobiliaria).
+    lineage:
+      - datalake_gsheets_raw.ind_agents_partner_allocation.imobiliaria
+  dt_contact_started:
+    description: Date at which outbound contact registration started per sheet (Contact started).
+    lineage:
+      - datalake_gsheets_raw.ind_agents_partner_allocation.contact_started
+  dt_contract_ended:
+    description: Broker contract ended date where filled (Contract ended).
+    lineage:
+      - datalake_gsheets_raw.ind_agents_partner_allocation.contract_ended
+  dt_ht_distrib_started:
+    description: Start date for high-touch distribution window when populated (HT Distrib. started).
+    lineage:
+      - datalake_gsheets_raw.ind_agents_partner_allocation.ht_distrib_started
+  dt_ht_distrib_ended:
+    description: End date for high-touch distribution window when populated (HT Distrib. ended).
+    lineage:
+      - datalake_gsheets_raw.ind_agents_partner_allocation.ht_distrib_ended
+  ts_load:
+    description: Timestamp when the row batch was landed on datalake_gsheets_raw for this ingest.
+    lineage:
+      - datalake_gsheets_raw.ind_agents_partner_allocation.ts_load
