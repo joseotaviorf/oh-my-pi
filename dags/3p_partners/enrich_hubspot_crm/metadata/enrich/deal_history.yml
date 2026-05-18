@@ -342,6 +342,14 @@ columns:
     lineage:
       - datalake_hubspot_clean.deal.properties
     description: Informs if the user answered the first Conrado message after actively sending the first message on the click to whatsapp flow.
+  consorcio_user_first_message_reply:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: It shows the reply message of the user to the first template message sent by Conrado.
+  consorcio_conrado_qualificador_responses:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: It shows all the responses of the users to the questions made by Conrado Qualificador. Not all questions are asked to the users, it depends on their interaction with the AI agent.
   consorcio_entered_rehabilitation:
     lineage:
       - datalake_hubspot_clean.deal.properties

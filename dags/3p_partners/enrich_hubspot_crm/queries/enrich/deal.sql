@@ -77,6 +77,8 @@ SELECT
     consorcio_transbordo_conrado,
     consorcio_group,
     consorcio_c2w_message,
+    consorcio_user_first_message_reply,
+    consorcio_conrado_qualificador_responses,
     consorcio_entered_rehabilitation,
     consorcio_rehabilitation_exit_reason,
     consorcio_rehabilitation_variant,

@@ -262,6 +262,8 @@ deal:
       - cons_template_last_sent_at
       - cons_saiu_repescagem_em
       - qual_grupo
+      - cons_user_first_message_reply
+      - cons_qualificacao
     propertiesWithHistory:
       - dealstage
       - pipeline

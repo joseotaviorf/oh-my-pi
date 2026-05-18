@@ -97,6 +97,8 @@ SELECT
     NULLIF(GET_JSON_OBJECT(properties, '$.cons_transbordo_conrado'), '') AS consorcio_transbordo_conrado,
     NULLIF(GET_JSON_OBJECT(properties, '$.qual_grupo'), '') AS consorcio_group,
     NULLIF(GET_JSON_OBJECT(properties, '$.cons_mensagem_c2w'), '') AS consorcio_c2w_message,
+    NULLIF(GET_JSON_OBJECT(properties, '$.cons_user_first_message_reply'), '') AS consorcio_user_first_message_reply,
+    NULLIF(GET_JSON_OBJECT(properties, '$.cons_qualificacao'), '') AS consorcio_conrado_qualificador_responses,
     NULLIF(GET_JSON_OBJECT(properties, '$.cons_entrou_repescagem'), '') AS consorcio_entered_rehabilitation,
     NULLIF(GET_JSON_OBJECT(properties, '$.cons_motivo_saida_repescagem'), '') AS consorcio_rehabilitation_exit_reason,
     NULLIF(GET_JSON_OBJECT(properties, '$.cons_variante_repescagem'), '') AS consorcio_rehabilitation_variant,
