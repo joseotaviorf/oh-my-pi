@@ -1,0 +1,38 @@
+---
+database_name: datalake_rental_management_clean
+table_name: boleto_audit_log
+description: |
+  Audit log of invoice status changes in rental-management, with one row per recorded status transition
+  or initial invoice status insertion. Used to analyze Condo Monitoring invoice lifecycle events and the
+  channel or automated flow that produced each change.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    description: Primary key of the invoice audit log entry.
+    lineage:
+      - datalake_rental_management_raw.boleto_audit_log.id
+  id_invoice:
+    description: Foreign key to the invoice associated with this audit event.
+    lineage:
+      - datalake_rental_management_raw.boleto_audit_log.boleto_id
+  previous_boleto_status:
+    description: Previous invoice status before the audited change, null when the entry represents initial insertion.
+    lineage:
+      - datalake_rental_management_raw.boleto_audit_log.previous_boleto_status
+  new_boleto_status:
+    description: New invoice status after the audited change or the initial status recorded on insertion.
+    lineage:
+      - datalake_rental_management_raw.boleto_audit_log.new_boleto_status
+  channel:
+    description: Entry path or automated flow that produced the audited invoice status event.
+    lineage:
+      - datalake_rental_management_raw.boleto_audit_log.channel
+  author_identifier:
+    description: Optional identifier of the automated flow or service responsible for the audited status change.
+    lineage:
+      - datalake_rental_management_raw.boleto_audit_log.author_identifier
+  ts_created:
+    description: Timestamp when the invoice audit log entry was created.
+    lineage:
+      - datalake_rental_management_raw.boleto_audit_log.created_at

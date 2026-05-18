@@ -18,6 +18,7 @@ workflow:
   tables_customization:
     boleto:
       clean_table_name: invoice
+    boleto_audit_log: {}
     boleto_address:
       clean_table_name: invoice_address
     boleto_identification:
