@@ -43,6 +43,10 @@ workflow:
       clean_table_name: user_contacts
       raw_primary_keys: [id]
       clean_primary_keys: [id]
+    notifications:
+      clean_table_name: notifications
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
 
 cluster:
   type: consolidation_m_memory_cluster

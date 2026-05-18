@@ -1,0 +1,88 @@
+---
+database_name: datalake_jaiminho_clean
+table_name: notifications
+description: This table consolidates notifications from Jaiminho.
+domain: Support and Services
+owner: gabriel.fonseca@quintoandar.com.br
+columns:
+  id:
+    description: The unique identifier for the notification.
+    lineage:
+      - datalake_jaiminho_raw.notifications.id
+  id_event:
+    description: Identifier of the event that triggered this notification.
+    lineage:
+      - datalake_jaiminho_raw.notifications.eventId
+  id_user:
+    description: Identifier of the user who will receive or has received the notification.
+    lineage:
+      - datalake_jaiminho_raw.notifications.userId
+  action:
+    description: Action or operation associated with the notification.
+    lineage:
+      - datalake_jaiminho_raw.notifications.action
+  status:
+    description: Current status of the notification (e.g., pending, sent, delivered, failed).
+    lineage:
+      - datalake_jaiminho_raw.notifications.status
+  channel:
+    description: Communication channel used for the notification (e.g., email, SMS, push, in-app).
+    lineage:
+      - datalake_jaiminho_raw.notifications.channel
+  tags:
+    description: Tags or labels associated with the notification for categorization.
+    lineage:
+      - datalake_jaiminho_raw.notifications.tags
+  profile:
+    description: User profile or segment information relevant to the notification.
+    lineage:
+      - datalake_jaiminho_raw.notifications.profile
+  scope:
+    description: Scope or context of the notification (e.g., global, regional, user-specific).
+    lineage:
+      - datalake_jaiminho_raw.notifications.scope
+  template:
+    description: Template identifier used for formatting the notification body.
+    lineage:
+      - datalake_jaiminho_raw.notifications.templateName
+      - datalake_jaiminho_raw.notifications.payload:bodyTemplate
+  error_code:
+    description: Code of the error associated with the failure status.
+    lineage:
+      - datalake_jaiminho_raw.notifications.errorCode
+  error_info:
+    description: Description of the error associated with the failure status.
+    lineage:
+      - datalake_jaiminho_raw.notifications.errorInfo
+  state:
+    description: Current state of the notification (e.g., processing_at_gateway, build_failed, delivered, failed).
+    lineage:
+      - datalake_jaiminho_raw.notifications.state
+  retry:
+    description: Number of retry attempts made to deliver the notification.
+    lineage:
+      - datalake_jaiminho_raw.notifications.retry
+  payload:
+    description: Raw payload data containing the notification content and metadata.
+    lineage:
+      - datalake_jaiminho_raw.notifications.payload
+  ts_sent:
+    description: Timestamp when the notification was sent to the user.
+    lineage:
+      - datalake_jaiminho_raw.notifications.sentAt
+  ts_created:
+    description: Timestamp when the notification record was created.
+    lineage:
+      - datalake_jaiminho_raw.notifications.createdAt
+  year:
+    description: Year when the notification record was last updated.
+    lineage:
+      - datalake_jaiminho_raw.notifications.updatedAt
+  month:
+    description: Month when the notification record was last updated.
+    lineage:
+      - datalake_jaiminho_raw.notifications.updatedAt
+  day:
+    description: Day when the notification record was last updated.
+    lineage:
+      - datalake_jaiminho_raw.notifications.updatedAt
