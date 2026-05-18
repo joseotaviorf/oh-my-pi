@@ -101,14 +101,17 @@ EOS
 ###############################################################################
 FROM ci-base AS ci-jdk
 
-ARG TARGETARCH
-
+# Kaniko (CI) does not always expand BuildKit TARGETARCH for ENV, which left
+# JAVA_HOME as /usr/lib/jvm/java-17-openjdk- (broken). Resolve the JRE path
+# after install and point JAVA_HOME at a stable symlink (works amd64 + arm64).
 RUN apt-get update -qq \
   && apt-get install -y --no-install-recommends \
   openjdk-17-jre-headless \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  && jhome="$(dirname "$(dirname "$(readlink -f /usr/bin/java)")")" \
+  && ln -sfn "$jhome" /usr/lib/jvm/ci-openjdk-17
 
-ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-${TARGETARCH}
+ENV JAVA_HOME=/usr/lib/jvm/ci-openjdk-17
 
 # Pre-install the runtime venvs at build time.
 # bietlejuice-runtime (standalone project, separate lockfile) and
