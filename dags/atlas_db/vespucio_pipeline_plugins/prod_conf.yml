@@ -18,6 +18,9 @@ custom_cluster:
     ebs_volume_size: 200
     instance_profile_arn: "{{ var.value.instance_profile_secret_arn_vespucio }}"
   spark_conf:
+    # Temporary: Vespúcio instance profile lacks S3 on the Databricks workspace bucket for
+    # spark-event-logs/. Re-enable after IAM allows that prefix (same as default DE profile).
+    spark.eventLog.enabled: "false"
     spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
     spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
     spark.executor.heartbeatInterval: "100s"
