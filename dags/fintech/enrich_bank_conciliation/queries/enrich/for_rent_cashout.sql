@@ -264,11 +264,11 @@ error_macro AS (
             WHEN id_company_use LIKE '%MLRA%' THEN 'Not Concilied - LRA single entry'
             WHEN id_company_use like '%MIP%' THEN 'Not Concilied - MPI single entry'
             WHEN id_company_use like '%MCI%' THEN 'Not Concilied - MCI single entry'
-            WHEN id_company_use like '%!%' AND hash like 'm%' THEN 'Not Concilied - manual accounting'
+            WHEN id_company_use like '%!%' OR hash like 'm%' THEN 'Not Concilied - manual accounting'
             WHEN dt_sap_tax IS NOT NULL AND dt_sap_tax < dt_sap_paid THEN 'Not Concilied - retroactive adjustment'
             WHEN bank_paid_amount  IS NULL AND vs>=0 THEN 'Not Concilied - Fracesinha missing'
             WHEN vf>0 AND sap_paid_amount IS NULL THEN 'Not Concilied - SAP missing'
-            WHEN vf>0 AND sap_paid_amount = 0 AND num_entries_sap>0 THEN 'Concilied - SAP zeroed by chargeback'
+            WHEN vf>0 AND vc=0 AND sap_paid_amount = 0 AND num_entries_sap>0 THEN 'Concilied - SAP zeroed by chargeback'
             WHEN MOD(vs,vf) = 0 THEN 'Not Concilied - SAP duplicated'
             WHEN vf <> vs THEN 'Not Concilied - SAP <> Francesinha'
         END is_bank_concilied_detail
