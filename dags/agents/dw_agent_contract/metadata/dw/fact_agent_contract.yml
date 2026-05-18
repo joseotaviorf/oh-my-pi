@@ -19,7 +19,7 @@ columns:
   sk_company:
     lineage:
       - datalake_company.company_sks.sk_company
-    description: Foreign key of the company. Can be joined with dw_public.dim_company or dw_public.dim_company_3p_partners.
+    description: Foreign key of the company. Can be joined with dw_public.dim_company. For 3P partner attributes prefer dw_brokers.dim_broker (resolve sk_broker via core_brokers.brokers.uuid_company).
   sk_last_contract_changed_date:
     lineage:
       - datalake_ebdb_agents.agents_activations_suspensions_contracts_changes.ts_revision

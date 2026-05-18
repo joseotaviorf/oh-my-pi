@@ -90,12 +90,14 @@ columns:
     description: Business unit/hub associated with the offer.
   supply_3p_partner:
     lineage:
+      - dw_brokers.dim_broker.broker_name
       - dw_rent.dim_house_listing.partner_3p_supply
       - dw_public.dim_booking.partner_3p_supply
       - dw_sale.dim_offer.partner_3p_supply
     description: Name of the 3P supply partner.
   demand_3p_partner:
     lineage:
+      - dw_brokers.dim_broker.broker_name
       - dw_public.dim_booking.partner_3p_demand
       - dw_sale.dim_offer.partner_3p_demand
     description: Name of the 3P demand partner.

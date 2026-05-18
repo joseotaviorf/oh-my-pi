@@ -579,8 +579,8 @@ bietlejuice.dw_datamarts_for_sale:
   - bietlejuice.kodak:load-clean-video:first-run-of-day
 bietlejuice.dw_datamarts_for_sale_cross:
   - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
+  - bietlejuice.dw_brokers:load-dw-brokers-dim-broker:first-run-of-day
   - bietlejuice.dw_business_unit_region:load-dw-sale-fact-business-unit-region:first-run-of-day
-  - bietlejuice.dw_company:load-dw-public-dim-company-3p-partners:first-run-of-day
   - bietlejuice.dw_datamarts_cross:load-dw-datamarts-affiliates-clusters:first-run-of-day
   - bietlejuice.dw_datamarts_cross:load-dw-datamarts-lead-listing-flows:first-run-of-day
   - bietlejuice.dw_listing:load-dw-rent-dim-house-listing:first-run-of-day
@@ -4800,7 +4800,7 @@ bietlejuice.reverse_reports:
 bietlejuice.reverse_robbyson_access:
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-analysts-performance:first-run-of-day
 bietlejuice.reverse_sale_listings_report:
-  - bietlejuice.dw_company:load-dw-public-dim-company-3p-partners:first-run-of-day
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
   - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type:first-run-of-day
   - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event:first-run-of-day
   - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing:first-run-of-day

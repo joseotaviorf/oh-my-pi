@@ -93,12 +93,14 @@ columns:
   supply_3p_partner:
     description: 3P partner name for supply side
     lineage:
+      - dw_brokers.dim_broker.broker_name
       - dw_rent.dim_house_listing.partner_3p_supply
       - dw_public.dim_booking.partner_3p_supply
       - dw_sale.dim_offer.partner_3p_supply
   demand_3p_partner:
     description: 3P partner name for demand side
     lineage:
+      - dw_brokers.dim_broker.broker_name
       - dw_public.dim_booking.partner_3p_demand
       - dw_sale.dim_offer.partner_3p_demand
   is_3pbh_supply:

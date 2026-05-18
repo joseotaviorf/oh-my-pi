@@ -8,11 +8,11 @@ columns:
   broker:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.broker
-    description: The broker related to the target. In some cases won't be specified because the target is related to a go to market operation. Is analogous to the hubspot_company_tag in the table dw_public.dim_company_3p_partners.
+    description: The broker related to the target. In some cases won't be specified because the target is related to a go to market operation. Is analogous to broker_name_tag in dw_brokers.dim_broker (use that column for fuzzy matching of partner names).
   company_cluster:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.company_cluster
-    description: This column is related to the company_cluster present in dw_public.dim_company_3p_partners. it corresponds to the clusterization of brokers in the marketplace operations.
+    description: Clusterization of brokers in the marketplace operations. Sourced from a legacy HubSpot-derived attribute (still exposed by dw_public.dim_company_3p_partners.company_cluster); there is no direct equivalent in the canonical dw_brokers.dim_broker yet.
   account_manager:
     lineage:
       - datalake_gsheets_raw.3p_partners_performance_targets.account_manager

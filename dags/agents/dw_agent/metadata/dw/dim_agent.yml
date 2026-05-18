@@ -55,7 +55,7 @@ columns:
   rede_partner:
     lineage:
     - datalake_company.company_sks.extracted_3p_tag
-    description: Name of the partner if this is a Rede contract. DEPRECATED, use sk_company to get the partner name in dw_company.dim_company_3p_partners.
+    description: Name of the partner if this is a Rede contract. DEPRECATED, use sk_broker to join dw_brokers.dim_broker and read broker_name.
   is_agent_active:
     lineage:
     - datalake_ebdb_clean.agent_data.is_active
