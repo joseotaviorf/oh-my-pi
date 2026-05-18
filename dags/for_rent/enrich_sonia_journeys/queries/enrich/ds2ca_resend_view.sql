@@ -9,11 +9,11 @@ WITH docs_demand_resend_events AS (
   WHERE
     event_name = 'rent_flow_tenant_documentation_resend'
     -- SFMC handover cutover: this view feeds the SFMC pipeline only for events
-    -- at/after 2026-05-18 13:00 BRT. Events strictly before that are still
+    -- at/after 2026-05-19 08:30 BRT. Events strictly before that are still
     -- handled by the legacy Hightouch query. The malformed-payload window
     -- (Jan/Feb 2026) is well before the cutover, so no extra lower bound
     -- is needed.
-    AND ts_event >= to_utc_timestamp(TIMESTAMP '2026-05-18 13:00:00', 'America/Sao_Paulo')
+    AND ts_event >= TIMESTAMP '2026-05-19 08:30:00'
 )
 SELECT
   CONCAT(CAST(e.id_event AS STRING), '-', e.uuid_person) AS pk_event_user,
