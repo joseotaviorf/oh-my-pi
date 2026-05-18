@@ -115,8 +115,6 @@ dev = [
     { name = "pytest-cov" },
     { name = "pytest-testmon" },
     { name = "quintoandar-logger", git = "https://github.com/quintoandar/python-logger?tag=0.8.1" },
-    { name = "ruff", specifier = "==0.5.5" },
-    { name = "ty" },
 ]
 
 [[package]]
@@ -188,7 +186,7 @@ dev = [
     { name = "quintoandar-survicate-api-client", git = "https://github.com/quintoandar/survicate-api-client-python?tag=0.1.0" },
     { name = "quintoandar-tracksale-api-client", git = "https://github.com/quintoandar/tracksale-api-client-python?tag=0.2.0" },
     { name = "quintoandar-velo-neurotech-api-client", git = "https://github.com/quintoandar/velo-neurotech-api-client-python?tag=0.3.2" },
-    { name = "ruff", specifier = "==0.5.5" },
+    { name = "ruff", specifier = "==0.15.13" },
     { name = "spacy", specifier = ">=3.7.2,<4" },
     { name = "ty" },
 ]

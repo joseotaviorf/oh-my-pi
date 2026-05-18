@@ -445,7 +445,7 @@ class DegreedAPI:
         url = f"{self.base_url}{self.endpoint_for_id_list}/{resource_id}"
         try:
             LOGGER.info(
-                f"Fetching resource by id: {url} ({(index)}/{(total)}: {(index/total)*100:.2f}%)"
+                f"Fetching resource by id: {url} ({(index)}/{(total)}: {(index / total) * 100:.2f}%)"
             )
             response = self._session.get(url, headers=auth_headers, timeout=60)
             if response.status_code == 404:

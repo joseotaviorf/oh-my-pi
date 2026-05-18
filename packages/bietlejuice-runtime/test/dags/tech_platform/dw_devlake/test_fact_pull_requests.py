@@ -582,9 +582,9 @@ class TestActionableComments:
         """For every PR, actionable_comment_count <= human_diff_comment_count."""
         rows = fact_df.collect()
         for row in rows:
-            assert (
-                row["actionable_comment_count"] <= row["human_diff_comment_count"]
-            ), f"Mismatch for {row['id_pr']}"
+            assert row["actionable_comment_count"] <= row["human_diff_comment_count"], (
+                f"Mismatch for {row['id_pr']}"
+            )
 
     def test_zero_actionable_no_comments(self, fact_df):
         """PR-J: no comments → actionable_comment_count=0."""
@@ -714,9 +714,9 @@ class TestReviewQualityIndex:
         """For every PR, human_diff_comment_count <= diff_comment_count."""
         rows = fact_df.collect()
         for row in rows:
-            assert (
-                row["human_diff_comment_count"] <= row["diff_comment_count"]
-            ), f"Mismatch for {row['id_pr']}"
+            assert row["human_diff_comment_count"] <= row["diff_comment_count"], (
+                f"Mismatch for {row['id_pr']}"
+            )
 
 
 # ────────────────────────────────────────────────────────────────

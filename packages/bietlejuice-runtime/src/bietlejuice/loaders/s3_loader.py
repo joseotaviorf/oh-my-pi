@@ -236,10 +236,10 @@ class S3Loader:
             )
             df_writer.saveAsTable(full_table_name, path=s3_path)
         else:
-            logger.info(f"m=load_df, s3_path={s3_path}, " "msg=loading files into S3.")
+            logger.info(f"m=load_df, s3_path={s3_path}, msg=loading files into S3.")
             df_writer.save(path=s3_path)
 
-        logger.info(f"m=load_df, s3_path={s3_path}, " "msg=loaded files into S3.")
+        logger.info(f"m=load_df, s3_path={s3_path}, msg=loaded files into S3.")
 
     @logger(exclude="df", exclude_return=True)
     def _optimize_dataframe_partitions(

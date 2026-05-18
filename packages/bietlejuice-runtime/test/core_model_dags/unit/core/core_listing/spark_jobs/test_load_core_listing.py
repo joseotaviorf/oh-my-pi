@@ -111,9 +111,9 @@ class TestCoreListingSparkJob:
         """Test that id_house_listing is correctly formatted: id_house || '000'."""
         for row in sale_listings_df.collect():
             expected_id = int(f"{row['id_house']}000")
-            assert (
-                row["id_house_listing"] == expected_id
-            ), f"id_house_listing should be {expected_id}, got {row['id_house_listing']}"
+            assert row["id_house_listing"] == expected_id, (
+                f"id_house_listing should be {expected_id}, got {row['id_house_listing']}"
+            )
 
     def test_sale_listings_filters_old_data(self, sale_listings_df):
         """Test that old SALE listings (ts_created <= 2022 AND ts_updated IS NULL) are filtered."""
@@ -134,40 +134,40 @@ class TestCoreListingSparkJob:
         id_house_listings = [
             row["id_house_listing"] for row in rent_listings_df.collect()
         ]
-        assert len(id_house_listings) == len(
-            set(id_house_listings)
-        ), "id_house_listing should be unique after deduplication"
+        assert len(id_house_listings) == len(set(id_house_listings)), (
+            "id_house_listing should be unique after deduplication"
+        )
 
     def test_rent_listings_is_last_listing_version(self, rent_listings_df):
         """Test is_last_listing_version calculation for RENT listings."""
         for row in rent_listings_df.collect():
             if row["id_house"] == 1001:
                 if row["version"] == 3:
-                    assert (
-                        row["is_last_listing_version"] is True
-                    ), "Version 3 should be last version for house 1001"
+                    assert row["is_last_listing_version"] is True, (
+                        "Version 3 should be last version for house 1001"
+                    )
                     assert row["status"] == "PUBLISHED"
                 elif row["version"] == 2:
-                    assert (
-                        row["is_last_listing_version"] is False
-                    ), "Version 2 should not be last version for house 1001"
+                    assert row["is_last_listing_version"] is False, (
+                        "Version 2 should not be last version for house 1001"
+                    )
                     assert row["status"] == "UNPUBLISHED"
 
     def test_rent_listings_category_na_for_version_zero(self, rent_listings_df):
         """Test that category is 'NA' when version=0 and listing_category is NULL."""
         for row in rent_listings_df.collect():
             if row["id_house"] == 1001 and row["version"] == 0:
-                assert (
-                    row["category"] == "NA"
-                ), "Category should be 'NA' for version 0 with NULL listing_category"
+                assert row["category"] == "NA", (
+                    "Category should be 'NA' for version 0 with NULL listing_category"
+                )
 
     def test_rent_listings_recovered_category(self, rent_listings_df):
         """Test Recovered category for listings unpublished 84+ days then republished."""
         for row in rent_listings_df.collect():
             if row["id_house"] == 1001 and row["version"] == 3:
-                assert (
-                    row["category"] == "Recovered"
-                ), "House 1001 version 3 should have category 'Recovered'"
+                assert row["category"] == "Recovered", (
+                    "House 1001 version 3 should have category 'Recovered'"
+                )
                 assert row["status"] == "PUBLISHED"
                 assert row["is_last_listing_version"] is True
 
@@ -180,9 +180,9 @@ class TestCoreListingSparkJob:
         # House 1002 should appear twice: once for RENT and once for SALE
         house_1002_records = [row for row in result_data if row["id_house"] == 1002]
 
-        assert (
-            len(house_1002_records) == 2
-        ), f"House 1002 should have 2 records (RENT + SALE), got {len(house_1002_records)}"
+        assert len(house_1002_records) == 2, (
+            f"House 1002 should have 2 records (RENT + SALE), got {len(house_1002_records)}"
+        )
 
         # Verify both contexts exist
         contexts = [row["business_context"] for row in house_1002_records]
@@ -234,9 +234,9 @@ class TestCoreListingSparkJob:
             if r["business_context"] == "SALE"
         ][0]
 
-        assert (
-            rent_id != sale_id
-        ), "id_listing should be different for RENT and SALE contexts"
+        assert rent_id != sale_id, (
+            "id_listing should be different for RENT and SALE contexts"
+        )
 
     # ==================== Price Fields Tests ====================
 
@@ -244,22 +244,22 @@ class TestCoreListingSparkJob:
         """Test that RENT listings get price from house.rent."""
         for row in rent_listings_df.collect():
             if row["id_house"] == 1001:
-                assert (
-                    row["price"] == 2500.0
-                ), "House 1001 should have rent price 2500.0"
+                assert row["price"] == 2500.0, (
+                    "House 1001 should have rent price 2500.0"
+                )
             elif row["id_house"] == 1002:
-                assert (
-                    row["price"] == 3000.0
-                ), "House 1002 should have rent price 3000.0"
+                assert row["price"] == 3000.0, (
+                    "House 1002 should have rent price 3000.0"
+                )
 
     def test_sale_listings_have_price_from_house_sale_price(self, sale_listings_df):
         """Test that SALE listings get price from house.sale_price."""
         for row in sale_listings_df.collect():
             if row["id_house"] == 2001:
-                assert (
-                    row["price"] == 800000.0
-                ), "House 2001 should have sale price 800000.0"
+                assert row["price"] == 800000.0, (
+                    "House 2001 should have sale price 800000.0"
+                )
             elif row["id_house"] == 1002:
-                assert (
-                    row["price"] == 500000.0
-                ), "House 1002 should have sale price 500000.0"
+                assert row["price"] == 500000.0, (
+                    "House 1002 should have sale price 500000.0"
+                )

@@ -164,15 +164,15 @@ class TestCreateKafkaHeaders:
 
         for header in result["headers"]:
             # Verify key format
-            assert isinstance(
-                header["key"], str
-            ), f"Header key {header['key']} is not a string"
+            assert isinstance(header["key"], str), (
+                f"Header key {header['key']} is not a string"
+            )
             assert header["key"], "Header key cannot be empty"
 
             # Verify value format
-            assert isinstance(
-                header["value"], bytearray
-            ), f"Header {header['key']} value is not binary (bytearray)"
-            assert (
-                len(header["value"]) > 0
-            ), f"Header {header['key']} value cannot be empty"
+            assert isinstance(header["value"], bytearray), (
+                f"Header {header['key']} value is not binary (bytearray)"
+            )
+            assert len(header["value"]) > 0, (
+                f"Header {header['key']} value cannot be empty"
+            )

@@ -131,60 +131,60 @@ class TestCoreCreditEvaluationSparkJob:
 
             # Test case 1: Regular evaluation (has id_proposal and id_group) - positive result
             eval_1 = [row for row in result_data if row["id_credit_evaluation"] == 1][0]
-            assert (
-                eval_1["is_early_credit"] is False
-            ), "Should not be early credit (has id_proposal and id_group)"
-            assert (
-                eval_1["is_credit_passport"] is False
-            ), "Should not be credit passport (scope=HOUSE)"
-            assert (
-                eval_1["is_bypass"] is False
-            ), "Should not be bypass (result=PRE_APPROVED_WITH_GUARANTEE)"
-            assert (
-                eval_1["reason"] is None
-            ), "Should have NULL reason for positive result"
-            assert (
-                eval_1["result"] == "PRE_APPROVED_WITH_GUARANTEE"
-            ), "Should have PRE_APPROVED_WITH_GUARANTEE result"
+            assert eval_1["is_early_credit"] is False, (
+                "Should not be early credit (has id_proposal and id_group)"
+            )
+            assert eval_1["is_credit_passport"] is False, (
+                "Should not be credit passport (scope=HOUSE)"
+            )
+            assert eval_1["is_bypass"] is False, (
+                "Should not be bypass (result=PRE_APPROVED_WITH_GUARANTEE)"
+            )
+            assert eval_1["reason"] is None, (
+                "Should have NULL reason for positive result"
+            )
+            assert eval_1["result"] == "PRE_APPROVED_WITH_GUARANTEE", (
+                "Should have PRE_APPROVED_WITH_GUARANTEE result"
+            )
 
             # Test case 2: Early credit evaluation (NULL id_proposal and id_group) with negative result
             eval_2 = [row for row in result_data if row["id_credit_evaluation"] == 2][0]
-            assert (
-                eval_2["is_early_credit"] is True
-            ), "Should be early credit (NULL id_proposal and id_group)"
-            assert (
-                eval_2["is_credit_passport"] is False
-            ), "Should not be credit passport (scope=HOUSE)"
-            assert (
-                eval_2["is_bypass"] is False
-            ), "Should not be bypass (result=PRE_REJECTED)"
-            assert (
-                eval_2["reason"] == "INSUFFICIENT_INCOME"
-            ), "Should have INSUFFICIENT_INCOME reason for negative result"
+            assert eval_2["is_early_credit"] is True, (
+                "Should be early credit (NULL id_proposal and id_group)"
+            )
+            assert eval_2["is_credit_passport"] is False, (
+                "Should not be credit passport (scope=HOUSE)"
+            )
+            assert eval_2["is_bypass"] is False, (
+                "Should not be bypass (result=PRE_REJECTED)"
+            )
+            assert eval_2["reason"] == "INSUFFICIENT_INCOME", (
+                "Should have INSUFFICIENT_INCOME reason for negative result"
+            )
             assert eval_2["result"] == "PRE_REJECTED", "Should have PRE_REJECTED result"
 
             # Test case 3: Credit passport with bypass - positive result
             eval_3 = [row for row in result_data if row["id_credit_evaluation"] == 3][0]
-            assert (
-                eval_3["is_early_credit"] is True
-            ), "Should be early credit (NULL id_proposal and id_group)"
-            assert (
-                eval_3["is_credit_passport"] is True
-            ), "Should be credit passport (scope=CITY)"
+            assert eval_3["is_early_credit"] is True, (
+                "Should be early credit (NULL id_proposal and id_group)"
+            )
+            assert eval_3["is_credit_passport"] is True, (
+                "Should be credit passport (scope=CITY)"
+            )
             assert eval_3["is_bypass"] is True, "Should be bypass (result=BYPASSED)"
-            assert (
-                eval_3["reason"] is None
-            ), "Should have NULL reason for positive bypass"
+            assert eval_3["reason"] is None, (
+                "Should have NULL reason for positive bypass"
+            )
             assert eval_3["result"] == "BYPASSED", "Should have BYPASSED result"
 
             # Test case 4: Regular evaluation with negative result
             eval_4 = [row for row in result_data if row["id_credit_evaluation"] == 4][0]
-            assert (
-                eval_4["reason"] == "BAD_SCORE"
-            ), "Should have BAD_SCORE reason for negative result"
-            assert (
-                eval_4["result"] == "PRE_REJECTED"
-            ), "Should have PRE_REJECTED result for negative case"
+            assert eval_4["reason"] == "BAD_SCORE", (
+                "Should have BAD_SCORE reason for negative result"
+            )
+            assert eval_4["result"] == "PRE_REJECTED", (
+                "Should have PRE_REJECTED result for negative case"
+            )
 
     def test_create_core_model_with_date_filtering(
         self,
@@ -432,19 +432,19 @@ class TestCoreCreditEvaluationSparkJob:
 
             # Check credit passport logic
             eval_1 = [row for row in result_data if row["id_credit_evaluation"] == 1][0]
-            assert (
-                eval_1["is_credit_passport"] is True
-            ), "Should be credit passport (scope=CITY)"
+            assert eval_1["is_credit_passport"] is True, (
+                "Should be credit passport (scope=CITY)"
+            )
 
             eval_2 = [row for row in result_data if row["id_credit_evaluation"] == 2][0]
-            assert (
-                eval_2["is_credit_passport"] is False
-            ), "Should not be credit passport (scope=HOUSE)"
+            assert eval_2["is_credit_passport"] is False, (
+                "Should not be credit passport (scope=HOUSE)"
+            )
 
             eval_3 = [row for row in result_data if row["id_credit_evaluation"] == 3][0]
-            assert (
-                eval_3["is_credit_passport"] is False
-            ), "Should not be credit passport (scope=NULL)"
+            assert eval_3["is_credit_passport"] is False, (
+                "Should not be credit passport (scope=NULL)"
+            )
 
     def test_result_values_edge_cases(
         self,
@@ -589,9 +589,9 @@ class TestCoreCreditEvaluationSparkJob:
             assert eval_1["is_bypass"] is True, "Should be bypass (result=BYPASSED)"
 
             eval_2 = [row for row in result_data if row["id_credit_evaluation"] == 2][0]
-            assert (
-                eval_2["is_bypass"] is False
-            ), "Should not be bypass (result=PRE_APPROVED)"
+            assert eval_2["is_bypass"] is False, (
+                "Should not be bypass (result=PRE_APPROVED)"
+            )
 
             eval_3 = [row for row in result_data if row["id_credit_evaluation"] == 3][0]
             assert eval_3["is_bypass"] is False, "Should not be bypass (result=NULL)"
@@ -842,21 +842,21 @@ class TestCoreCreditEvaluationSparkJob:
                 eval_row = [
                     row for row in result_data if row["id_credit_evaluation"] == eval_id
                 ][0]
-                assert (
-                    eval_row["result"] in positive_results
-                ), f"Evaluation {eval_id} should have positive result"
-                assert (
-                    eval_row["reason"] is None
-                ), f"Evaluation {eval_id} should have NULL reason for positive result"
+                assert eval_row["result"] in positive_results, (
+                    f"Evaluation {eval_id} should have positive result"
+                )
+                assert eval_row["reason"] is None, (
+                    f"Evaluation {eval_id} should have NULL reason for positive result"
+                )
 
             # Verify negative results have specific rejection reasons
             for eval_id in [5, 6, 7, 8]:
                 eval_row = [
                     row for row in result_data if row["id_credit_evaluation"] == eval_id
                 ][0]
-                assert (
-                    eval_row["result"] in negative_results
-                ), f"Evaluation {eval_id} should have negative result"
+                assert eval_row["result"] in negative_results, (
+                    f"Evaluation {eval_id} should have negative result"
+                )
                 assert eval_row["reason"] in [
                     "INSUFFICIENT_INCOME",
                     "BAD_SCORE",
@@ -868,26 +868,26 @@ class TestCoreCreditEvaluationSparkJob:
             bypass_eval = [
                 row for row in result_data if row["id_credit_evaluation"] == 4
             ][0]
-            assert (
-                bypass_eval["is_bypass"] is True
-            ), "Should be bypass (result=BYPASSED)"
-            assert (
-                bypass_eval["is_credit_passport"] is True
-            ), "Should be credit passport (scope=CITY)"
-            assert (
-                bypass_eval["reason"] is None
-            ), "Bypassed evaluation should have NULL reason"
+            assert bypass_eval["is_bypass"] is True, (
+                "Should be bypass (result=BYPASSED)"
+            )
+            assert bypass_eval["is_credit_passport"] is True, (
+                "Should be credit passport (scope=CITY)"
+            )
+            assert bypass_eval["reason"] is None, (
+                "Bypassed evaluation should have NULL reason"
+            )
 
             # Test specific negative cases
             rejected_eval = [
                 row for row in result_data if row["id_credit_evaluation"] == 5
             ][0]
-            assert (
-                rejected_eval["is_bypass"] is False
-            ), "Should not be bypass (result=PRE_REJECTED)"
-            assert (
-                rejected_eval["result"] == "PRE_REJECTED"
-            ), "Should have PRE_REJECTED result"
-            assert (
-                rejected_eval["reason"] == "INSUFFICIENT_INCOME"
-            ), "Should have INSUFFICIENT_INCOME reason for rejection"
+            assert rejected_eval["is_bypass"] is False, (
+                "Should not be bypass (result=PRE_REJECTED)"
+            )
+            assert rejected_eval["result"] == "PRE_REJECTED", (
+                "Should have PRE_REJECTED result"
+            )
+            assert rejected_eval["reason"] == "INSUFFICIENT_INCOME", (
+                "Should have INSUFFICIENT_INCOME reason for rejection"
+            )

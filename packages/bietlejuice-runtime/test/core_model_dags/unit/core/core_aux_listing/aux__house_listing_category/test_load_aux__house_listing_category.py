@@ -50,9 +50,9 @@ class TestAuxHouseListingCategoryQuery:
             # Calculate expected id_house_listing
             expected = int(f"{id_house}{version:03d}")
 
-            assert (
-                id_house_listing == expected
-            ), f"id_house_listing should be {expected} for id_house={id_house}, version={version}, got {id_house_listing}"
+            assert id_house_listing == expected, (
+                f"id_house_listing should be {expected} for id_house={id_house}, version={version}, got {id_house_listing}"
+            )
 
     def test_version_sequence(self, aux__house_listing_category_result_data):
         """Test that versions are sequential for each house."""
@@ -92,14 +92,14 @@ class TestAuxHouseListingCategoryQuery:
 
         for row in result_data:
             # ts_listing_version_start should be set
-            assert (
-                row["ts_listing_version_start"] is not None
-            ), f"ts_listing_version_start should not be NULL for house {row['id_house']}, version {row['version']}"
+            assert row["ts_listing_version_start"] is not None, (
+                f"ts_listing_version_start should not be NULL for house {row['id_house']}, version {row['version']}"
+            )
 
             # ts_status_changed should be set
-            assert (
-                row["ts_status_changed"] is not None
-            ), f"ts_status_changed should not be NULL for house {row['id_house']}, version {row['version']}"
+            assert row["ts_status_changed"] is not None, (
+                f"ts_status_changed should not be NULL for house {row['id_house']}, version {row['version']}"
+            )
 
             # ts_listing_version_start should be <= ts_status_changed
             if row["ts_listing_version_start"] and row["ts_status_changed"]:
@@ -129,9 +129,9 @@ class TestAuxHouseListingCategoryQuery:
 
         # Version 0 may or may not exist in test data
         for row in version_0_records:
-            assert (
-                row["listing_category"] is None
-            ), f"Version 0 should have NULL category, got {row['listing_category']}"
+            assert row["listing_category"] is None, (
+                f"Version 0 should have NULL category, got {row['listing_category']}"
+            )
 
     def test_first_listing_category(self, aux__house_listing_category_result_data):
         """Test that version 1 is categorized as 'First Listing'."""
@@ -143,9 +143,9 @@ class TestAuxHouseListingCategoryQuery:
         assert len(version_1_records) > 0, "Should have at least one version 1 record"
 
         for row in version_1_records:
-            assert (
-                row["listing_category"] == "First Listing"
-            ), f"Version 1 should be categorized as 'First Listing', got {row['listing_category']} for house {row['id_house']}"
+            assert row["listing_category"] == "First Listing", (
+                f"Version 1 should be categorized as 'First Listing', got {row['listing_category']} for house {row['id_house']}"
+            )
 
     def test_recovered_category(
         self, aux__house_listing_category_result_data, aux__lbc_status_version_order_df
@@ -169,9 +169,9 @@ class TestAuxHouseListingCategoryQuery:
                 unpublished_record = row
                 break
 
-        assert (
-            unpublished_record is not None
-        ), "Should find the UNPUBLISHED record that triggered version 2"
+        assert unpublished_record is not None, (
+            "Should find the UNPUBLISHED record that triggered version 2"
+        )
 
         # Get the PUBLISHED record that occurred after UNPUBLISHED (version 2)
         published_record = None
@@ -185,9 +185,9 @@ class TestAuxHouseListingCategoryQuery:
                 published_record = row
                 break
 
-        assert (
-            published_record is not None
-        ), "Should find the PUBLISHED record that started version 2"
+        assert published_record is not None, (
+            "Should find the PUBLISHED record that started version 2"
+        )
 
         # Find house 1, version 1 record
         house_1_version_1 = [
@@ -196,9 +196,9 @@ class TestAuxHouseListingCategoryQuery:
             if row["id_house"] == 1001 and row["version"] == 1
         ]
 
-        assert (
-            len(house_1_version_1) == 1
-        ), "House 1 should have exactly one version 1 record"
+        assert len(house_1_version_1) == 1, (
+            "House 1 should have exactly one version 1 record"
+        )
 
         version_1_record = house_1_version_1[0]
 
@@ -209,16 +209,16 @@ class TestAuxHouseListingCategoryQuery:
             if row["id_house"] == 1001 and row["version"] == 2
         ]
 
-        assert (
-            len(house_1_version_2) == 1
-        ), "House 1 should have exactly one version 2 record"
+        assert len(house_1_version_2) == 1, (
+            "House 1 should have exactly one version 2 record"
+        )
 
         version_2_record = house_1_version_2[0]
 
         # Verify version 2 is categorized as Recovered
-        assert (
-            version_2_record["listing_category"] == "Recovered"
-        ), f"Version 2 after UNPUBLISHED for 84+ days should be 'Recovered', got {version_2_record['listing_category']}"
+        assert version_2_record["listing_category"] == "Recovered", (
+            f"Version 2 after UNPUBLISHED for 84+ days should be 'Recovered', got {version_2_record['listing_category']}"
+        )
 
         # Verify ts_status_changed in version 1 equals the timestamp of UNPUBLISHED status (84+ days)
         expected_ts_status_changed_v1 = unpublished_record["ts_state_started"]
@@ -273,9 +273,9 @@ class TestAuxHouseListingCategoryQuery:
                 suspended_rented_record = row
                 break
 
-        assert (
-            suspended_rented_record is not None
-        ), "Should find the SUSPENDED with RENTED record that triggered version 3"
+        assert suspended_rented_record is not None, (
+            "Should find the SUSPENDED with RENTED record that triggered version 3"
+        )
 
         # Get the PUBLISHED record that occurred after SUSPENDED + RENTED (version 3)
         published_record = None
@@ -289,9 +289,9 @@ class TestAuxHouseListingCategoryQuery:
                 published_record = row
                 break
 
-        assert (
-            published_record is not None
-        ), "Should find the PUBLISHED record that started version 3"
+        assert published_record is not None, (
+            "Should find the PUBLISHED record that started version 3"
+        )
 
         # Find house 1, version 2 record
         house_1_version_2 = [
@@ -300,9 +300,9 @@ class TestAuxHouseListingCategoryQuery:
             if row["id_house"] == 1001 and row["version"] == 2
         ]
 
-        assert (
-            len(house_1_version_2) == 1
-        ), "House 1 should have exactly one version 2 record"
+        assert len(house_1_version_2) == 1, (
+            "House 1 should have exactly one version 2 record"
+        )
 
         version_2_record = house_1_version_2[0]
 
@@ -313,14 +313,14 @@ class TestAuxHouseListingCategoryQuery:
             if row["id_house"] == 1001 and row["version"] == 3
         ]
 
-        assert (
-            len(house_1_version_3) == 1
-        ), "House 1 should have exactly one version 3 record"
+        assert len(house_1_version_3) == 1, (
+            "House 1 should have exactly one version 3 record"
+        )
 
         relisting_record = house_1_version_3[0]
-        assert (
-            relisting_record["listing_category"] == "Re-Listing"
-        ), f"Version 3 after being rented should be 'Re-Listing', got {relisting_record['listing_category']}"
+        assert relisting_record["listing_category"] == "Re-Listing", (
+            f"Version 3 after being rented should be 'Re-Listing', got {relisting_record['listing_category']}"
+        )
 
         # Verify ts_status_changed in version 2 equals the timestamp of SUSPENDED with RENTED
         expected_ts_status_changed_v2 = suspended_rented_record["ts_state_started"]
@@ -366,9 +366,9 @@ class TestAuxHouseListingCategoryQuery:
                 suspended_rented_record = row
                 break
 
-        assert (
-            suspended_rented_record is not None
-        ), "Should find the SUSPENDED with RENTED record in version 1 for house 1002"
+        assert suspended_rented_record is not None, (
+            "Should find the SUSPENDED with RENTED record in version 1 for house 1002"
+        )
 
         # Get the PUBLISHED record that started version 2 (after UNPUBLISHED)
         published_record = None
@@ -381,9 +381,9 @@ class TestAuxHouseListingCategoryQuery:
                 published_record = row
                 break
 
-        assert (
-            published_record is not None
-        ), "Should find the PUBLISHED record that started version 2 for house 1002"
+        assert published_record is not None, (
+            "Should find the PUBLISHED record that started version 2 for house 1002"
+        )
 
         # Get the UNPUBLISHED record from aux__lbc_status_version_order (version 1, 84+ days)
         # This is the UNPUBLISHED that occurred before the PUBLISHED that started version 2
@@ -400,9 +400,9 @@ class TestAuxHouseListingCategoryQuery:
                 unpublished_record = row
                 break
 
-        assert (
-            unpublished_record is not None
-        ), "Should find the UNPUBLISHED record (84+ days) that preceded version 2 for house 1002"
+        assert unpublished_record is not None, (
+            "Should find the UNPUBLISHED record (84+ days) that preceded version 2 for house 1002"
+        )
 
         # Find house 2, version 1 record
         house_2_version_1 = [
@@ -411,9 +411,9 @@ class TestAuxHouseListingCategoryQuery:
             if row["id_house"] == 1002 and row["version"] == 1
         ]
 
-        assert (
-            len(house_2_version_1) == 1
-        ), "House 2 should have exactly one version 1 record"
+        assert len(house_2_version_1) == 1, (
+            "House 2 should have exactly one version 1 record"
+        )
 
         version_1_record = house_2_version_1[0]
 
@@ -424,16 +424,16 @@ class TestAuxHouseListingCategoryQuery:
             if row["id_house"] == 1002 and row["version"] == 2
         ]
 
-        assert (
-            len(house_2_version_2) == 1
-        ), "House 2 should have exactly one version 2 record"
+        assert len(house_2_version_2) == 1, (
+            "House 2 should have exactly one version 2 record"
+        )
 
         relisting_record = house_2_version_2[0]
 
         # Verify it's categorized as Re-Listing (not Recovered, because it was rented)
-        assert (
-            relisting_record["listing_category"] == "Re-Listing"
-        ), f"Version 2 of house 1002 after being rented should be 'Re-Listing', got {relisting_record['listing_category']}"
+        assert relisting_record["listing_category"] == "Re-Listing", (
+            f"Version 2 of house 1002 after being rented should be 'Re-Listing', got {relisting_record['listing_category']}"
+        )
 
         # Verify ts_status_changed in version 1 equals the timestamp of UNPUBLISHED status (84+ days)
         expected_ts_status_changed_v1 = unpublished_record["ts_state_started"]

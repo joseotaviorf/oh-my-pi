@@ -65,9 +65,9 @@ class TestCoreHouseSparkJob:
 
     def test_create_core_model_adds_surrogate_key(self, core_model_df):
         """Test that create_core_model adds sk_core_house column."""
-        assert (
-            "sk_core_house" in core_model_df.columns
-        ), "sk_core_house column should exist"
+        assert "sk_core_house" in core_model_df.columns, (
+            "sk_core_house column should exist"
+        )
 
         for row in core_model_df.select("sk_core_house").collect():
             assert row["sk_core_house"] is not None, "sk_core_house should not be null"
@@ -97,9 +97,9 @@ class TestCoreHouseSparkJob:
         house_ids = [row["id"] for row in filtered_houses_df.collect()]
 
         # House 1004 should be filtered out (dt_creation <= 2015 AND ts_updated IS NULL)
-        assert (
-            1004 not in house_ids
-        ), "House 1004 should be filtered out (legacy record)"
+        assert 1004 not in house_ids, (
+            "House 1004 should be filtered out (legacy record)"
+        )
 
         # House 1005 should be included (has ts_updated even though old)
         assert 1005 in house_ids, "House 1005 should be included (has ts_updated)"
@@ -129,17 +129,17 @@ class TestCoreHouseSparkJob:
         ][0]
 
         # Should select id_related = 202 (latest ts_updated)
-        assert (
-            house_1001_row["id_related"] == 202
-        ), "Should select the latest relation (id_related=202)"
+        assert house_1001_row["id_related"] == 202, (
+            "Should select the latest relation (id_related=202)"
+        )
 
     def test_latest_hlr_is_unique_per_house(self, latest_hlr_df):
         """Test that there's only one relation per house after deduplication."""
         house_ids = [row["id_house"] for row in latest_hlr_df.collect()]
 
-        assert len(house_ids) == len(
-            set(house_ids)
-        ), "Each house should have at most one relation"
+        assert len(house_ids) == len(set(house_ids)), (
+            "Each house should have at most one relation"
+        )
 
     # ==================== Owner Resolution Tests ====================
 
@@ -150,24 +150,24 @@ class TestCoreHouseSparkJob:
         ][0]
 
         # House 1001 should use id_related from house_listing_relation (202)
-        assert (
-            house_1001_row["id_owner"] == 202
-        ), "id_owner should be from house_listing_relation (202)"
-        assert (
-            house_1001_row["uuid_owner"] == "uuid-person-202"
-        ), "uuid_owner should be from the owner user (uuid-person-202)"
+        assert house_1001_row["id_owner"] == 202, (
+            "id_owner should be from house_listing_relation (202)"
+        )
+        assert house_1001_row["uuid_owner"] == "uuid-person-202", (
+            "uuid_owner should be from the owner user (uuid-person-202)"
+        )
 
         house_1002_row = [
             row for row in core_model_df.collect() if row["id_house"] == 1002
         ][0]
 
         # House 1002 should use id_related from house_listing_relation (203)
-        assert (
-            house_1002_row["id_owner"] == 203
-        ), "id_owner should be from house_listing_relation (203)"
-        assert (
-            house_1002_row["uuid_owner"] == "uuid-person-203"
-        ), "uuid_owner should be from the owner user (uuid-person-203)"
+        assert house_1002_row["id_owner"] == 203, (
+            "id_owner should be from house_listing_relation (203)"
+        )
+        assert house_1002_row["uuid_owner"] == "uuid-person-203", (
+            "uuid_owner should be from the owner user (uuid-person-203)"
+        )
 
     def test_owner_fallback_to_id_user(self, core_model_df):
         """Test that owner falls back to house.id_user when no relation exists or
@@ -180,18 +180,18 @@ class TestCoreHouseSparkJob:
         ][0]
 
         # House 1003 has no PROPERTY_OWNER with MAIN_USER, should use id_user (103)
-        assert (
-            house_1003_row["id_owner"] == 103
-        ), "id_owner should fallback to house.id_user (103)"
-        assert (
-            house_1003_row["uuid_owner"] == "uuid-person-103"
-        ), "uuid_owner should be from the fallback user (uuid-person-103)"
-        assert (
-            house_1005_row["id_owner"] == 105
-        ), "id_owner should fallback to house.id_user (105)"
-        assert (
-            house_1005_row["uuid_owner"] == "uuid-person-105"
-        ), "uuid_owner should be from the fallback user (uuid-person-105)"
+        assert house_1003_row["id_owner"] == 103, (
+            "id_owner should fallback to house.id_user (103)"
+        )
+        assert house_1003_row["uuid_owner"] == "uuid-person-103", (
+            "uuid_owner should be from the fallback user (uuid-person-103)"
+        )
+        assert house_1005_row["id_owner"] == 105, (
+            "id_owner should fallback to house.id_user (105)"
+        )
+        assert house_1005_row["uuid_owner"] == "uuid-person-105", (
+            "uuid_owner should be from the fallback user (uuid-person-105)"
+        )
 
     # ==================== Timestamp Test ====================
 
@@ -204,9 +204,9 @@ class TestCoreHouseSparkJob:
         ][0]
 
         expected_ts_created = datetime(2020, 3, 15, 10, 0)
-        assert (
-            house_1001_row["ts_created"] == expected_ts_created
-        ), "ts_created should be mapped from dt_creation"
+        assert house_1001_row["ts_created"] == expected_ts_created, (
+            "ts_created should be mapped from dt_creation"
+        )
 
     # ==================== Record Count Tests ====================
 

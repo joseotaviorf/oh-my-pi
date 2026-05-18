@@ -44,9 +44,11 @@ class MetricsCollector:
                 F.aggregate(
                     F.col("headers"),
                     F.lit(0),
-                    lambda acc, header: acc
-                    + F.length(header.key.cast("binary"))
-                    + F.length(header.value),
+                    lambda acc, header: (
+                        acc
+                        + F.length(header.key.cast("binary"))
+                        + F.length(header.value)
+                    ),
                 ),
                 F.lit(0),
             ),

@@ -28,15 +28,15 @@ class TestSchemaValidatorWithoutPySpark:
 
         import bietlejuice.base.core_models.helpers.schema_validator as sv_no_spark
 
-        assert (
-            sv_no_spark.PYSPARK_AVAILABLE is False
-        ), "PYSPARK_AVAILABLE must be False when pyspark is not installed"
-        assert (
-            sv_no_spark.DataFrame is None
-        ), "DataFrame must be None when pyspark is not installed"
-        assert (
-            sv_no_spark.DataType is None
-        ), "DataType must be None when pyspark is not installed"
+        assert sv_no_spark.PYSPARK_AVAILABLE is False, (
+            "PYSPARK_AVAILABLE must be False when pyspark is not installed"
+        )
+        assert sv_no_spark.DataFrame is None, (
+            "DataFrame must be None when pyspark is not installed"
+        )
+        assert sv_no_spark.DataType is None, (
+            "DataType must be None when pyspark is not installed"
+        )
 
     def test_schema_validator_can_be_instantiated_without_pyspark(self, monkeypatch):
         sv_module_key = "bietlejuice.base.core_models.helpers.schema_validator"

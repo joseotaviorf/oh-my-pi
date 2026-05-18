@@ -102,7 +102,7 @@ def map_uc_type_to_glue(uc_type: str) -> str:
     if m:
         kv = _split_top_level(m.group(1), max_splits=1)
         if len(kv) == 2:
-            return f"map<{map_uc_type_to_glue(kv[0])}," f"{map_uc_type_to_glue(kv[1])}>"
+            return f"map<{map_uc_type_to_glue(kv[0])},{map_uc_type_to_glue(kv[1])}>"
         return "string"
 
     m = _STRUCT_RE.match(trimmed)
@@ -140,7 +140,7 @@ def map_glue_type_to_uc(glue_type: str) -> str:
     if m:
         kv = _split_top_level(m.group(1), max_splits=1)
         if len(kv) == 2:
-            return f"MAP<{map_glue_type_to_uc(kv[0])}," f"{map_glue_type_to_uc(kv[1])}>"
+            return f"MAP<{map_glue_type_to_uc(kv[0])},{map_glue_type_to_uc(kv[1])}>"
         return "STRING"
 
     m = _STRUCT_RE.match(trimmed)

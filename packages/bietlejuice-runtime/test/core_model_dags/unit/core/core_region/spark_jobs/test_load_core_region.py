@@ -121,13 +121,13 @@ class TestLoadRegionData:
         assert 1 in result_ids, "Region 1 (ts_updated 2025-01-15) should be included"
         assert 2 in result_ids, "Region 2 (ts_updated 2025-01-20) should be included"
         assert 6 in result_ids, "Region 6 (ts_updated 2025-01-10) should be included"
-        assert (
-            3 in result_ids and 5 in result_ids
-        ), "Parents with Jan ts_updated included"
+        assert 3 in result_ids and 5 in result_ids, (
+            "Parents with Jan ts_updated included"
+        )
 
-        assert (
-            4 not in result_ids
-        ), "Region 4 (ts_updated 2022-12-25) should be excluded"
+        assert 4 not in result_ids, (
+            "Region 4 (ts_updated 2022-12-25) should be excluded"
+        )
 
     def test_empty_string_dates_treated_as_full_load(
         self, spark_session, region_df, mock_configuration_service
@@ -186,9 +186,9 @@ class TestCreateCoreModelBasic:
             "test.state",
             "test.country",
         }
-        assert expected_tables == set(
-            read_tables
-        ), f"Expected tables {expected_tables}, got {set(read_tables)}"
+        assert expected_tables == set(read_tables), (
+            f"Expected tables {expected_tables}, got {set(read_tables)}"
+        )
 
 
 class TestCreateCoreModelFilters:
@@ -272,12 +272,12 @@ class TestCreateCoreModelBusinessContext:
                 core_model_df["id_region"] == region_id
             ).collect()
             assert len(row) == 1, f"Region {region_id} should be in the output"
-            assert (
-                row[0]["has_rent_operation"] is False
-            ), f"Region {region_id} should have has_rent_operation=False"
-            assert (
-                row[0]["has_sale_operation"] is False
-            ), f"Region {region_id} should have has_sale_operation=False"
+            assert row[0]["has_rent_operation"] is False, (
+                f"Region {region_id} should have has_rent_operation=False"
+            )
+            assert row[0]["has_sale_operation"] is False, (
+                f"Region {region_id} should have has_sale_operation=False"
+            )
 
 
 class TestCreateCoreModelHierarchy:
@@ -316,41 +316,41 @@ class TestCreateCoreModelJoins:
         """State and country attributes must be populated for all output rows."""
         for row in core_model_df.collect():
             region_id = row["id_region"]
-            assert (
-                row["state_name"] is not None
-            ), f"Region {region_id}: state_name is null"
-            assert (
-                row["state_abbreviation"] is not None
-            ), f"Region {region_id}: state_abbreviation is null"
-            assert (
-                row["country_code"] is not None
-            ), f"Region {region_id}: country_code is null"
-            assert (
-                row["country_name"] is not None
-            ), f"Region {region_id}: country_name is null"
+            assert row["state_name"] is not None, (
+                f"Region {region_id}: state_name is null"
+            )
+            assert row["state_abbreviation"] is not None, (
+                f"Region {region_id}: state_abbreviation is null"
+            )
+            assert row["country_code"] is not None, (
+                f"Region {region_id}: country_code is null"
+            )
+            assert row["country_name"] is not None, (
+                f"Region {region_id}: country_name is null"
+            )
 
     def test_id_state_propagated_from_hierarchy(self, core_model_df):
         """id_state must be resolved through the parent hierarchy for SubRegiao rows."""
         # SubRegiao (id=1) has id_state=None; it inherits id_state=10 via MacroRegiao → Cidade
         row = core_model_df.filter(core_model_df["id_region"] == 1).collect()
         assert len(row) == 1
-        assert (
-            row[0]["id_state"] == 10
-        ), "SubRegiao should inherit id_state=10 from the Cidade ancestor"
+        assert row[0]["id_state"] == 10, (
+            "SubRegiao should inherit id_state=10 from the Cidade ancestor"
+        )
 
     def test_country_code_value(self, core_model_df):
         """country_code must match the value from the country table."""
         for row in core_model_df.collect():
-            assert (
-                row["country_code"] == "BR"
-            ), f"Region {row['id_region']}: expected country_code='BR'"
+            assert row["country_code"] == "BR", (
+                f"Region {row['id_region']}: expected country_code='BR'"
+            )
 
     def test_country_name_normalized_like_enrich_region(self, core_model_df):
         """Brazil/Mexico labels match enrich_region (English), not raw country.name."""
         for row in core_model_df.collect():
-            assert (
-                row["country_name"] == "Brazil"
-            ), f"Region {row['id_region']}: expected country_name='Brazil'"
+            assert row["country_name"] == "Brazil", (
+                f"Region {row['id_region']}: expected country_name='Brazil'"
+            )
 
     def test_country_name_mexico_when_state_id_country_is_two(
         self,
@@ -440,9 +440,9 @@ class TestCreateCoreModelDateFilter:
             row["id_region"] for row in result_df.select("id_region").collect()
         ]
 
-        assert (
-            4 not in result_ids
-        ), "Region 4 (ts_updated 2022-12-25) should be excluded by the date filter"
+        assert 4 not in result_ids, (
+            "Region 4 (ts_updated 2022-12-25) should be excluded by the date filter"
+        )
 
     def test_date_filter_keeps_regions_in_window(
         self,
@@ -464,9 +464,9 @@ class TestCreateCoreModelDateFilter:
 
         assert 1 in result_ids, "Region 1 should be included"
         assert 2 in result_ids, "Region 2 should be included"
-        assert (
-            6 in result_ids
-        ), "Region 6 included via ts_updated though CDC date is old"
+        assert 6 in result_ids, (
+            "Region 6 included via ts_updated though CDC date is old"
+        )
 
     def test_incremental_resolves_parents_when_only_child_ts_updated_in_window(
         self,
@@ -509,9 +509,9 @@ class TestCreateCoreModelDateFilter:
         ]
 
         for expected_id in (1, 2, 3, 4, 5, 6):
-            assert (
-                expected_id in result_ids
-            ), f"Region {expected_id} should be present in the full load"
+            assert expected_id in result_ids, (
+                f"Region {expected_id} should be present in the full load"
+            )
 
 
 class TestCreateCoreModelPartitions:
@@ -521,15 +521,15 @@ class TestCreateCoreModelPartitions:
         """year, month, day columns must match the date parts of ts_region_updated for every row."""
         for row in core_model_df.collect():
             ts = row["ts_region_updated"]
-            assert (
-                row["year"] == ts.year
-            ), f"Region {row['id_region']}: year={row['year']}, expected {ts.year}"
-            assert (
-                row["month"] == ts.month
-            ), f"Region {row['id_region']}: month={row['month']}, expected {ts.month}"
-            assert (
-                row["day"] == ts.day
-            ), f"Region {row['id_region']}: day={row['day']}, expected {ts.day}"
+            assert row["year"] == ts.year, (
+                f"Region {row['id_region']}: year={row['year']}, expected {ts.year}"
+            )
+            assert row["month"] == ts.month, (
+                f"Region {row['id_region']}: month={row['month']}, expected {ts.month}"
+            )
+            assert row["day"] == ts.day, (
+                f"Region {row['id_region']}: day={row['day']}, expected {ts.day}"
+            )
 
     def test_ts_load_is_not_null(self, core_model_df):
         """ts_load must be populated (set to current_timestamp) for all rows."""

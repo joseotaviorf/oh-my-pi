@@ -179,7 +179,7 @@ override-dependencies = [
 dev = [
     "pytest==8.3.5",   # airflow constraints-2-10
     "pytest-cov",
-    "ruff==0.5.5",     # airflow constraints-2-10
+    "ruff==0.15.13",   # align with workspace root uv.lock; dev-only (not Airflow/DBR runtime)
     "ty",              # no constraint available
     "moto[s3]",        # AWS service mocking for s3_service tests
     # quintoandar-logger lives here (not in [project.dependencies]) so the

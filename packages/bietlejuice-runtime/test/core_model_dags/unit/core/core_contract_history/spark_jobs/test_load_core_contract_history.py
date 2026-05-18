@@ -178,9 +178,9 @@ class TestCoreContractHistoryEventDetection:
         ]
         update_event_names = {r["event_name"] for r in update_events}
         assert "ev_status" in update_event_names
-        assert (
-            "ev_id_house" not in update_event_names
-        ), "id_house did not change in the update row — should not emit an event"
+        assert "ev_id_house" not in update_event_names, (
+            "id_house did not change in the update row — should not emit an event"
+        )
 
 
 class TestCoreContractHistoryIdempotency:
@@ -228,9 +228,9 @@ class TestCoreContractHistoryIdempotency:
 
         for row in result.collect():
             assert row["id_event"] is not None
-            assert (
-                len(row["id_event"]) == 64
-            ), f"Expected SHA-256 hex (64 chars), got {len(row['id_event'])}"
+            assert len(row["id_event"]) == 64, (
+                f"Expected SHA-256 hex (64 chars), got {len(row['id_event'])}"
+            )
 
 
 class TestMergeStrategyConfig:

@@ -342,9 +342,9 @@ class TestCreateOfferCoreModel:
                 # Assert - Check that deleted records are filtered out
                 # Original test data has 4 records, but 1 has op_cdc = 'd', so should have 3
                 result_count = result_df.count()
-                assert (
-                    result_count == 3
-                ), f"Expected 3 records after filtering, got {result_count}"
+                assert result_count == 3, (
+                    f"Expected 3 records after filtering, got {result_count}"
+                )
 
                 # Verify that the deleted record (offer_4) is not in the result
                 result_ids = [
@@ -404,12 +404,12 @@ class TestCreateOfferCoreModel:
                 offer_1_data = [row for row in result_data if row["id_offer"] == 1][0]
                 assert offer_1_data["id_tenant"] == 101, "Tenant JOIN failed"
                 assert offer_1_data["id_owner"] == 102, "Owner JOIN failed"
-                assert (
-                    offer_1_data["id_tenant_external"] == "tenant_uuid_1"
-                ), "External tenant ID missing"
-                assert (
-                    offer_1_data["id_owner_external"] == "owner_uuid_1"
-                ), "External owner ID missing"
+                assert offer_1_data["id_tenant_external"] == "tenant_uuid_1", (
+                    "External tenant ID missing"
+                )
+                assert offer_1_data["id_owner_external"] == "owner_uuid_1", (
+                    "External owner ID missing"
+                )
 
     def test_create_core_model_adds_year_month_day_columns(
         self, spark_session, rental_transact_offer_df, ebdb_user_df
@@ -467,15 +467,15 @@ class TestCreateOfferCoreModel:
                     expected_month = ts_created.month
                     expected_day = ts_created.day
 
-                    assert (
-                        row["year"] == expected_year
-                    ), f"Year should be {expected_year}, got {row['year']}"
-                    assert (
-                        row["month"] == expected_month
-                    ), f"Month should be {expected_month}, got {row['month']}"
-                    assert (
-                        row["day"] == expected_day
-                    ), f"Day should be {expected_day}, got {row['day']}"
+                    assert row["year"] == expected_year, (
+                        f"Year should be {expected_year}, got {row['year']}"
+                    )
+                    assert row["month"] == expected_month, (
+                        f"Month should be {expected_month}, got {row['month']}"
+                    )
+                    assert row["day"] == expected_day, (
+                        f"Day should be {expected_day}, got {row['day']}"
+                    )
 
     def test_create_core_model_with_date_filtering(
         self, spark_session, rental_transact_offer_df, ebdb_user_df
@@ -522,17 +522,17 @@ class TestCreateOfferCoreModel:
                 result_data = result_df.select("id_offer", "ts_updated").collect()
 
                 # Should have 3 records (offers 1, 2, 3) - offer_4 excluded by both date and CDC filter
-                assert (
-                    len(result_data) == 3
-                ), f"Expected 3 records with date filtering, got {len(result_data)}"
+                assert len(result_data) == 3, (
+                    f"Expected 3 records with date filtering, got {len(result_data)}"
+                )
 
                 result_ids = [row["id_offer"] for row in result_data]
                 assert 1 in result_ids, "offer_1 should be included (within date range)"
                 assert 2 in result_ids, "offer_2 should be included (within date range)"
                 assert 3 in result_ids, "offer_3 should be included (within date range)"
-                assert (
-                    4 not in result_ids
-                ), "offer_4 should be excluded (outside date range and deleted)"
+                assert 4 not in result_ids, (
+                    "offer_4 should be excluded (outside date range and deleted)"
+                )
 
     def test_create_core_model_has_all_expected_columns(
         self, spark_session, rental_transact_offer_df, ebdb_user_df
@@ -602,13 +602,13 @@ class TestCreateOfferCoreModel:
                 missing_columns = expected_columns - result_columns
                 extra_columns = result_columns - expected_columns
 
-                assert (
-                    not missing_columns
-                ), f"Missing expected columns: {missing_columns}"
+                assert not missing_columns, (
+                    f"Missing expected columns: {missing_columns}"
+                )
                 assert not extra_columns, f"Unexpected extra columns: {extra_columns}"
-                assert (
-                    len(result_columns) == 22
-                ), f"Expected 22 columns, got {len(result_columns)}"
+                assert len(result_columns) == 22, (
+                    f"Expected 22 columns, got {len(result_columns)}"
+                )
 
     def test_create_core_model_uuid_offer_mapping(
         self, spark_session, rental_transact_offer_df, ebdb_user_df
@@ -652,9 +652,9 @@ class TestCreateOfferCoreModel:
                 result_data = result_df.select("id_offer", "uuid_offer").collect()
 
                 # Check that uuid_offer column exists and has correct values
-                assert (
-                    len(result_data) == 3
-                ), "Should have 3 records (excluding deleted)"
+                assert len(result_data) == 3, (
+                    "Should have 3 records (excluding deleted)"
+                )
 
                 # Verify uuid_offer values are correctly mapped from source
                 expected_mappings = {
@@ -668,9 +668,9 @@ class TestCreateOfferCoreModel:
                     uuid_offer = row["uuid_offer"]
 
                     # Verify uuid_offer is not null
-                    assert (
-                        uuid_offer is not None
-                    ), f"uuid_offer should not be null for id_offer={id_offer}"
+                    assert uuid_offer is not None, (
+                        f"uuid_offer should not be null for id_offer={id_offer}"
+                    )
 
                     # Verify uuid_offer has correct value from source
                     assert uuid_offer == expected_mappings[id_offer], (
@@ -680,9 +680,9 @@ class TestCreateOfferCoreModel:
 
                 # Verify uuid_offer values are unique
                 uuid_values = [row["uuid_offer"] for row in result_data]
-                assert len(uuid_values) == len(
-                    set(uuid_values)
-                ), "uuid_offer values should be unique"
+                assert len(uuid_values) == len(set(uuid_values)), (
+                    "uuid_offer values should be unique"
+                )
 
     def test_create_core_model_uuid_offer_completeness(
         self, spark_session, rental_transact_offer_df, ebdb_user_df
@@ -724,9 +724,9 @@ class TestCreateOfferCoreModel:
 
                 # Assert - Check that uuid_offer has no null values
                 null_count = result_df.filter(col("uuid_offer").isNull()).count()
-                assert (
-                    null_count == 0
-                ), f"uuid_offer should not have null values, found {null_count} nulls"
+                assert null_count == 0, (
+                    f"uuid_offer should not have null values, found {null_count} nulls"
+                )
 
                 # Verify total count matches expected (3 non-deleted records)
                 total_count = result_df.count()

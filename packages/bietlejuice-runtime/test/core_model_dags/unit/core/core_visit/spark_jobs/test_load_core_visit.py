@@ -204,9 +204,9 @@ class TestCoreVisitSparkJob:
             assert 1 in result_ids, "visit_1 should be included (within date range)"
             assert 2 in result_ids, "visit_2 should be included (within date range)"
             assert 3 in result_ids, "visit_3 should be included (within date range)"
-            assert (
-                4 not in result_ids
-            ), "visit_4 should be excluded (outside date range)"
+            assert 4 not in result_ids, (
+                "visit_4 should be excluded (outside date range)"
+            )
 
     def test_join_all_data_complex_owner_logic(
         self,
@@ -242,24 +242,24 @@ class TestCoreVisitSparkJob:
         # Visit 3: id_house=1003 → id_related="5003" → user.id=5003
         # Visit 4: id_house=1004 → no house_listing_relation → fallback to house.id_user=4004
         visit_1_data = [row for row in result_data if row["id_visit"] == 1][0]
-        assert (
-            visit_1_data["id_owner"] == 5001
-        ), "Visit 1 should get owner via numeric id match"
+        assert visit_1_data["id_owner"] == 5001, (
+            "Visit 1 should get owner via numeric id match"
+        )
 
         visit_2_data = [row for row in result_data if row["id_visit"] == 2][0]
-        assert (
-            visit_2_data["id_owner"] == 5002
-        ), "Visit 2 should get owner via uuid_person match"
+        assert visit_2_data["id_owner"] == 5002, (
+            "Visit 2 should get owner via uuid_person match"
+        )
 
         visit_3_data = [row for row in result_data if row["id_visit"] == 3][0]
-        assert (
-            visit_3_data["id_owner"] == 5003
-        ), "Visit 3 should get owner via numeric id match"
+        assert visit_3_data["id_owner"] == 5003, (
+            "Visit 3 should get owner via numeric id match"
+        )
 
         visit_4_data = [row for row in result_data if row["id_visit"] == 4][0]
-        assert (
-            visit_4_data["id_owner"] == 4004
-        ), "Visit 4 should get owner from house.id_user (fallback)"
+        assert visit_4_data["id_owner"] == 4004, (
+            "Visit 4 should get owner from house.id_user (fallback)"
+        )
 
     def test_load_methods_call_correct_tables(
         self, spark_session, mock_configuration_service

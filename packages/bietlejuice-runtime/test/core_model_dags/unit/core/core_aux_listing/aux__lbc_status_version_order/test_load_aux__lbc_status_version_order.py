@@ -72,9 +72,9 @@ class TestAuxLbcStatusVersionOrderQuery:
                 ]
             )
             # All rows for the same house should have the same first publication date
-            assert (
-                len(first_publications) <= 1
-            ), f"House 1 should have consistent ts_first_publication, got {first_publications}"
+            assert len(first_publications) <= 1, (
+                f"House 1 should have consistent ts_first_publication, got {first_publications}"
+            )
 
     def test_state_order_sequence(self, aux__lbc_status_version_order_result_data):
         """Test that state_order creates a sequential ascending order."""
@@ -91,9 +91,9 @@ class TestAuxLbcStatusVersionOrderQuery:
         if len(state_orders) > 1:
             # Verify that state_order follows ascending order
             for i in range(len(state_orders) - 1):
-                assert (
-                    state_orders[i] < state_orders[i + 1]
-                ), f"state_order should be ascending: got {state_orders}"
+                assert state_orders[i] < state_orders[i + 1], (
+                    f"state_order should be ascending: got {state_orders}"
+                )
 
     def test_lbc_state_order(self, aux__lbc_status_version_order_result_data):
         """Test that lbc_state_order is set correctly for LBC states."""
@@ -124,17 +124,17 @@ class TestAuxLbcStatusVersionOrderQuery:
 
         # All rows should have ts_state_started
         for row in result_data:
-            assert (
-                row["ts_state_started"] is not None
-            ), f"All rows should have ts_state_started, got None for house {row['id_house']}, rev {row['rev']}"
+            assert row["ts_state_started"] is not None, (
+                f"All rows should have ts_state_started, got None for house {row['id_house']}, rev {row['rev']}"
+            )
 
         # Verify that ts_state_ended is NULL for the last state of each house
         # or that ts_state_ended >= ts_state_started when not NULL
         for row in result_data:
             if row["ts_state_ended"] is not None:
-                assert (
-                    row["ts_state_ended"] >= row["ts_state_started"]
-                ), f"ts_state_ended should be >= ts_state_started for house {row['id_house']}, rev {row['rev']}"
+                assert row["ts_state_ended"] >= row["ts_state_started"], (
+                    f"ts_state_ended should be >= ts_state_started for house {row['id_house']}, rev {row['rev']}"
+                )
 
     def test_first_listing_trigger(self, aux__lbc_status_version_order_result_data):
         """Test that first listing (EDITING -> PUBLISHED) triggers a new version."""
@@ -166,19 +166,19 @@ class TestAuxLbcStatusVersionOrderQuery:
                 published_row = house_1_sorted[i]
                 break
 
-        assert (
-            published_row is not None
-        ), "House 1 should have a PUBLISHED status after EDITING"
+        assert published_row is not None, (
+            "House 1 should have a PUBLISHED status after EDITING"
+        )
 
         # The EDITING row that comes right before PUBLISHED should have trigger_new_version = 1
-        assert (
-            editing_row["trigger_new_version"] == 1
-        ), "EDITING status before PUBLISHED should trigger a new version"
+        assert editing_row["trigger_new_version"] == 1, (
+            "EDITING status before PUBLISHED should trigger a new version"
+        )
 
         # The PUBLISHED row that comes right after EDITING should have listing_version = 1
-        assert (
-            published_row["listing_version"] == 1
-        ), "First listing (EDITING -> PUBLISHED) should have version 1"
+        assert published_row["listing_version"] == 1, (
+            "First listing (EDITING -> PUBLISHED) should have version 1"
+        )
 
     def test_recovered_trigger(self, aux__lbc_status_version_order_result_data):
         """Test that recovered (UNPUBLISHED for 84+ days -> PUBLISHED) triggers a new version."""
@@ -207,13 +207,13 @@ class TestAuxLbcStatusVersionOrderQuery:
                 break
 
         assert unpublished_row is not None, "House 1 should have an UNPUBLISHED status"
-        assert (
-            republished_row is not None
-        ), "House 1 should have a PUBLISHED status after UNPUBLISHED"
+        assert republished_row is not None, (
+            "House 1 should have a PUBLISHED status after UNPUBLISHED"
+        )
 
-        assert (
-            unpublished_row["trigger_new_version"] == 1
-        ), "Recovered (UNPUBLISHED for 84+ days -> PUBLISHED) should trigger a new version"
+        assert unpublished_row["trigger_new_version"] == 1, (
+            "Recovered (UNPUBLISHED for 84+ days -> PUBLISHED) should trigger a new version"
+        )
         assert (
             republished_row["listing_version"] == unpublished_row["listing_version"] + 1
         ), "Recovered should have incremented version"
@@ -245,17 +245,17 @@ class TestAuxLbcStatusVersionOrderQuery:
                 relisting_row = row
                 break
 
-        assert (
-            suspended_row is not None
-        ), "House 1 should have a SUSPENDED status with RENTED reason"
-        assert (
-            relisting_row is not None
-        ), "House 1 should have a PUBLISHED status after SUSPENDED with RENTED"
+        assert suspended_row is not None, (
+            "House 1 should have a SUSPENDED status with RENTED reason"
+        )
+        assert relisting_row is not None, (
+            "House 1 should have a PUBLISHED status after SUSPENDED with RENTED"
+        )
 
         # The relisting row should have trigger_new_version = 1
-        assert (
-            suspended_row["trigger_new_version"] == 1
-        ), "Relisting (SUSPENDED with RENTED -> PUBLISHED) should trigger a new version"
+        assert suspended_row["trigger_new_version"] == 1, (
+            "Relisting (SUSPENDED with RENTED -> PUBLISHED) should trigger a new version"
+        )
         assert (
             relisting_row["listing_version"] == suspended_row["listing_version"] + 1
         ), "Relisting (SUSPENDED with RENTED -> PUBLISHED) should increment version"
@@ -344,17 +344,17 @@ class TestAuxLbcStatusVersionOrderQuery:
                 if published_row is not None:
                     break
 
-        assert (
-            suspended_row is not None
-        ), "House 2 should have a SUSPENDED status with status_reason != RENTED"
-        assert (
-            published_row is not None
-        ), "House 2 should have a PUBLISHED status after SUSPENDED with status_reason != RENTED"
+        assert suspended_row is not None, (
+            "House 2 should have a SUSPENDED status with status_reason != RENTED"
+        )
+        assert published_row is not None, (
+            "House 2 should have a PUBLISHED status after SUSPENDED with status_reason != RENTED"
+        )
 
         # This should NOT trigger a new version
-        assert (
-            suspended_row["trigger_new_version"] == 0
-        ), "SUSPENDED with status_reason != RENTED should NOT trigger a new version"
+        assert suspended_row["trigger_new_version"] == 0, (
+            "SUSPENDED with status_reason != RENTED should NOT trigger a new version"
+        )
 
         # The PUBLISHED row should NOT have an incremented listing_version
         suspended_listing_version = (
@@ -405,14 +405,14 @@ class TestAuxLbcStatusVersionOrderQuery:
                     break
 
         assert unpublished_row is not None, "House 2 should have an UNPUBLISHED status"
-        assert (
-            published_row is not None
-        ), "House 2 should have a PUBLISHED status after UNPUBLISHED"
+        assert published_row is not None, (
+            "House 2 should have a PUBLISHED status after UNPUBLISHED"
+        )
 
         # This should NOT trigger a new version
-        assert (
-            unpublished_row["trigger_new_version"] == 0
-        ), "UNPUBLISHED for less than 84 days should NOT trigger a new version"
+        assert unpublished_row["trigger_new_version"] == 0, (
+            "UNPUBLISHED for less than 84 days should NOT trigger a new version"
+        )
 
         # The PUBLISHED row should NOT have an incremented listing_version
         unpublished_listing_version = (
@@ -469,9 +469,9 @@ class TestAuxLbcStatusVersionOrderQuery:
                 if row["listing_version"] is not None
             ]
         )
-        assert (
-            len(listing_versions) == 3
-        ), "House 3 should have 3 different listing_version"
+        assert len(listing_versions) == 3, (
+            "House 3 should have 3 different listing_version"
+        )
 
         # Verify that ts_first_publication is consistent across all records
         first_publications = set(

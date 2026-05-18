@@ -69,9 +69,9 @@ class TestAuxHouseStatusVersionOrderQuery:
                 ]
             )
             # All rows for the same house should have the same first publication date
-            assert (
-                len(first_publications) <= 1
-            ), f"House 1 should have consistent ts_first_publication, got {first_publications}"
+            assert len(first_publications) <= 1, (
+                f"House 1 should have consistent ts_first_publication, got {first_publications}"
+            )
 
     def test_events_change_status(self, aux__house_status_version_order_result_data):
         """Test that version change events ('alugado' or 'despublicado' for 84+ days) are identified correctly."""
@@ -98,9 +98,9 @@ class TestAuxHouseStatusVersionOrderQuery:
         # Check that order_status is sequential
         order_statuses = [row["order_status"] for row in house_1_data]
         expected_sequence = list(range(1, len(order_statuses) + 1))
-        assert (
-            order_statuses == expected_sequence
-        ), f"order_status should be sequential: got {order_statuses}, expected {expected_sequence}"
+        assert order_statuses == expected_sequence, (
+            f"order_status should be sequential: got {order_statuses}, expected {expected_sequence}"
+        )
 
         # Verify that order_status follows the same ascending order as ts_status_changed
         house_1_sorted_by_time = sorted(
@@ -123,9 +123,9 @@ class TestAuxHouseStatusVersionOrderQuery:
 
         # All rows for house 3 should have order_version = 0
         for row in house_3_data:
-            assert (
-                row["order_version"] == 0
-            ), f"House 3 (never published) should have order_version = 0, got {row['order_version']}"
+            assert row["order_version"] == 0, (
+                f"House 3 (never published) should have order_version = 0, got {row['order_version']}"
+            )
 
     def test_initial_version(self, aux__house_status_version_order_result_data):
         """Test that the change to initial version works correctly."""
@@ -140,15 +140,15 @@ class TestAuxHouseStatusVersionOrderQuery:
         ]
 
         assert len(edition_row) > 0, "House 1 should have the started status 'edicao'"
-        assert (
-            len(published_row) > 0
-        ), "House 1 should have a change status to 'publicado'"
-        assert (
-            edition_row[0]["order_version"] == 0
-        ), "House 1 initial version should be 0"
-        assert (
-            published_row[0]["order_version"] == 1
-        ), "House 1 version should be updated to 1"
+        assert len(published_row) > 0, (
+            "House 1 should have a change status to 'publicado'"
+        )
+        assert edition_row[0]["order_version"] == 0, (
+            "House 1 initial version should be 0"
+        )
+        assert published_row[0]["order_version"] == 1, (
+            "House 1 version should be updated to 1"
+        )
 
     def test_multiple_versions(self, aux__house_status_version_order_result_data):
         """Test multiple versions for a house."""
@@ -174,9 +174,9 @@ class TestAuxHouseStatusVersionOrderQuery:
         unpublished_rows = [
             row for row in house_2_data if row["status_history"] == "despublicado"
         ]
-        assert (
-            len(unpublished_rows) > 0
-        ), "House 2 should have an unpublished status row"
+        assert len(unpublished_rows) > 0, (
+            "House 2 should have an unpublished status row"
+        )
 
         # Sort by ts_status_changed to find the status after unpublishing
         house_2_sorted = sorted(house_2_data, key=lambda x: x["ts_status_changed"])
@@ -202,9 +202,9 @@ class TestAuxHouseStatusVersionOrderQuery:
         # Verify we have all the necessary rows
         assert initial_pub is not None, "House 2 should have an initial publication"
         assert unpublished is not None, "House 2 should have an unpublished status row"
-        assert (
-            republished is not None
-        ), "House 2 should have a republished row after being unpublished"
+        assert republished is not None, (
+            "House 2 should have a republished row after being unpublished"
+        )
 
         # Get the version
         initial_version = initial_pub["order_version"]
@@ -229,9 +229,9 @@ class TestAuxHouseStatusVersionOrderQuery:
         unpublished_rows = [
             row for row in house_5_data if row["status_history"] == "despublicado"
         ]
-        assert (
-            len(unpublished_rows) > 0
-        ), "House 5 should have an unpublished status row"
+        assert len(unpublished_rows) > 0, (
+            "House 5 should have an unpublished status row"
+        )
 
         # Sort by ts_status_changed to find the chronological order
         house_5_sorted = sorted(house_5_data, key=lambda x: x["ts_status_changed"])
@@ -257,9 +257,9 @@ class TestAuxHouseStatusVersionOrderQuery:
         # Verify we have all the necessary rows
         assert initial_pub is not None, "House 5 should have an initial publication"
         assert unpublished is not None, "House 5 should have an unpublished status row"
-        assert (
-            republished is not None
-        ), "House 5 should have a republished row after being unpublished"
+        assert republished is not None, (
+            "House 5 should have a republished row after being unpublished"
+        )
 
         # Verify that republished version does NOT change (because it was unpublished for < 84 days)
         # The order_version should be the same as the initial publication
@@ -301,9 +301,9 @@ class TestAuxHouseStatusVersionOrderQuery:
                 break
 
         assert suspended_row is not None, "Should have found suspended row"
-        assert (
-            row_before_suspension is not None
-        ), "Should have found row before suspension"
+        assert row_before_suspension is not None, (
+            "Should have found row before suspension"
+        )
 
         # Verify that suspended status does not change order_version
         # The order_version should be the same as the row before suspension
@@ -324,14 +324,14 @@ class TestAuxHouseStatusVersionOrderQuery:
         alugado_rows = [
             row for row in result_data if row["status_history"] == "alugado"
         ]
-        assert (
-            len(alugado_rows) > 0
-        ), "Should have rows with 'alugado' as version change event"
+        assert len(alugado_rows) > 0, (
+            "Should have rows with 'alugado' as version change event"
+        )
 
         for row in alugado_rows:
-            assert (
-                row["order_version"] > 0
-            ), f"'alugado' events should have order_version > 0, got {row['order_version']}"
+            assert row["order_version"] > 0, (
+                f"'alugado' events should have order_version > 0, got {row['order_version']}"
+            )
 
     def test_publication_version_date(
         self, aux__house_status_version_order_result_data

@@ -208,8 +208,7 @@ class BasicAuthOAuth2ClientCredentials(AuthBase, RequestsAuthBase):
                 )
 
             LOGGER.info(
-                "New token obtained. Expires at: "
-                f"{time.ctime(self._token_expires_at)}"
+                f"New token obtained. Expires at: {time.ctime(self._token_expires_at)}"
             )
 
         except requests.RequestException as e:

@@ -113,7 +113,7 @@ class GsheetsValidationSuitesExecutor(BaseValidationSuitesExecutor):
 
             if sheet_id in self.delta or sheet_id in import_range_gsheets:
                 validate_sheet_method_name = (
-                    f'validate_sheet_{str(sheet["clean_table_name"]).lower()}'
+                    f"validate_sheet_{str(sheet['clean_table_name']).lower()}"
                 )
 
                 # The method validate_sheet_<sheet_name> will be called by the self.run() method.

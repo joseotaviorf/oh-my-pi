@@ -96,7 +96,7 @@ class UnityCatalogRestMetastoreService(MetastoreService):
         location = self._normalise_location(table_location)
 
         logger.info(
-            f"m=create_external_table, table={full_name}, " "msg=creating table in UC"
+            f"m=create_external_table, table={full_name}, msg=creating table in UC"
         )
         self._client.create_table(
             catalog_name=self._catalog,

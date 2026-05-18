@@ -11,10 +11,11 @@ from datetime import date, datetime
 from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
-from dags.people.reverse_reports.spark_jobs import load_to_gsheet as job
 from tests.dags.people.reverse_reports.spark_jobs.conftest import (
     MOCK_WORKSHEET_NOT_FOUND,
 )
+
+from dags.people.reverse_reports.spark_jobs import load_to_gsheet as job
 
 MODULE_UNDER_TEST = "dags.people.reverse_reports.spark_jobs.load_to_gsheet"
 

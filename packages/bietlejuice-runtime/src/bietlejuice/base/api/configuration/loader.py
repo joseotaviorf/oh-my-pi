@@ -86,7 +86,7 @@ class APIConfigurationLoader:
         if isinstance(api_base_url, dict):
             if len(api_base_url) == 0:
                 raise ValueError(
-                    "Base URL not found for environment. " "Available environments: []"
+                    "Base URL not found for environment. Available environments: []"
                 )
             environment = os.environ.get("ENVIRONMENT", "forno").lower()
             base_url = api_base_url.get(environment)

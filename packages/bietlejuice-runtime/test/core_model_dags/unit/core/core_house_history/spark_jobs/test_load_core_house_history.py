@@ -283,9 +283,9 @@ class TestCoreHouseHistoryOwnerEvents:
 
         owner_events = [r for r in result.collect() if r["event_name"] == "ev_id_owner"]
         owner_values = {r["value"] for r in owner_events}
-        assert (
-            "100" in owner_values or "150" in owner_values
-        ), "Without HLR, id_owner should fallback to usuario_id"
+        assert "100" in owner_values or "150" in owner_values, (
+            "Without HLR, id_owner should fallback to usuario_id"
+        )
 
     def test_owner_from_hlr_when_user_exists(
         self,
@@ -305,9 +305,9 @@ class TestCoreHouseHistoryOwnerEvents:
 
         owner_events = [r for r in result.collect() if r["event_name"] == "ev_id_owner"]
         owner_values = {r["value"] for r in owner_events}
-        assert (
-            "200" in owner_values
-        ), "HLR relatedId=200 exists as usuario, should become id_owner"
+        assert "200" in owner_values, (
+            "HLR relatedId=200 exists as usuario, should become id_owner"
+        )
 
     def test_uuid_owner_resolved_from_usuario(
         self,
@@ -329,9 +329,9 @@ class TestCoreHouseHistoryOwnerEvents:
             r for r in result.collect() if r["event_name"] == "ev_uuid_owner"
         ]
         uuid_values = {r["value"] for r in uuid_events}
-        assert (
-            "uuid-ccc" in uuid_values
-        ), "uuid_owner for id_owner=200 should be uuid-ccc"
+        assert "uuid-ccc" in uuid_values, (
+            "uuid_owner for id_owner=200 should be uuid-ccc"
+        )
 
     def test_hlr_delete_causes_fallback_to_usuario_id(
         self,
@@ -356,9 +356,9 @@ class TestCoreHouseHistoryOwnerEvents:
         values_over_time = [r["value"] for r in owner_events]
         assert "200" in values_over_time, "HLR create should set owner to 200"
         last_non_200 = [v for v in values_over_time if v != "200"]
-        assert (
-            len(last_non_200) > 0
-        ), "After HLR delete, owner should revert to fallback (usuario_id)"
+        assert len(last_non_200) > 0, (
+            "After HLR delete, owner should revert to fallback (usuario_id)"
+        )
 
     def test_id_owner_event_origin_reflects_source(
         self,
@@ -382,9 +382,9 @@ class TestCoreHouseHistoryOwnerEvents:
             "test_transactional_imovel",
             "test_hlr",
         }
-        assert origins.issubset(
-            valid_origins
-        ), f"id_owner event_origin must be house or HLR table, got {origins}"
+        assert origins.issubset(valid_origins), (
+            f"id_owner event_origin must be house or HLR table, got {origins}"
+        )
 
     def test_uuid_owner_event_origin_is_usuario_table(
         self,
@@ -431,9 +431,9 @@ class TestCoreHouseHistoryAsOfJoin:
 
         owner_events = [r for r in result.collect() if r["event_name"] == "ev_id_owner"]
         owner_values = {r["value"] for r in owner_events}
-        assert (
-            "200" not in owner_values
-        ), "User 200 did not exist during the events — should not appear as id_owner"
+        assert "200" not in owner_values, (
+            "User 200 did not exist during the events — should not appear as id_owner"
+        )
 
 
 class TestCoreHouseHistoryIdempotency:
@@ -482,9 +482,9 @@ class TestCoreHouseHistoryIdempotency:
 
         for row in result.collect():
             assert row["id_event"] is not None
-            assert (
-                len(row["id_event"]) == 64
-            ), f"Expected SHA-256 hex (64 chars), got {len(row['id_event'])}"
+            assert len(row["id_event"]) == 64, (
+                f"Expected SHA-256 hex (64 chars), got {len(row['id_event'])}"
+            )
 
 
 class TestMergeStrategyConfig:

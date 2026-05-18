@@ -79,8 +79,7 @@ class DBConsumer(ABC):
             # todo: move the database existence check from this method to the children'
             #  constructors.
             raise RuntimeError(
-                "m=is_db_empty, msg=Database of this consumer does not exist., "
-                f"e={e}"
+                f"m=is_db_empty, msg=Database of this consumer does not exist., e={e}"
             )
         if result and result.count():
             return False

@@ -598,7 +598,7 @@ def _load_single_dimension(
     try:
         return load_table(spark, path, env=env)
     except Exception as e:
-        logger.warning(f"Dimension table not found, skipping: {path}\n" f"Error: {e}")
+        logger.warning(f"Dimension table not found, skipping: {path}\nError: {e}")
         return None
 
 
@@ -646,7 +646,7 @@ def _load_single_measure(
     try:
         return load_table(spark, path, env=env)
     except Exception as e:
-        logger.warning(f"Measure table not found, skipping: {path}\n" f"Error: {e}")
+        logger.warning(f"Measure table not found, skipping: {path}\nError: {e}")
         return None
 
 

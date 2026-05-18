@@ -211,11 +211,11 @@ if __name__ == "__main__":
                     continue
 
         # Print summary
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print(f"Registration Summary for {base_table_name}:")
         print(f"  Successfully registered: {registered_count}/{len(windows)} tables")
         print(f"  Skipped (not found): {skipped_count}/{len(windows)} tables")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
     else:
         # Single table registration (non-windowed)
         # Build full table name with catalog prefix if available
@@ -247,9 +247,9 @@ if __name__ == "__main__":
                 base_table_name,
                 table_location,
             )
-            print(f"\n{'='*60}")
+            print(f"\n{'=' * 60}")
             print(f"Successfully registered table: {base_table_name}")
-            print(f"{'='*60}")
+            print(f"{'=' * 60}")
         except Exception as e:
             error_message = str(e)
             # Check if table doesn't exist (was skipped during build due to empty dataframe)

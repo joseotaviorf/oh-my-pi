@@ -515,9 +515,9 @@ class TestSchemaValidatorTypeMappings:
         # Act & Assert
         for spark_type, expected in test_cases:
             result = validator._spark_type_to_simple(spark_type)
-            assert (
-                result == expected
-            ), f"Failed for {spark_type}: expected {expected}, got {result}"
+            assert result == expected, (
+                f"Failed for {spark_type}: expected {expected}, got {result}"
+            )
 
     def test_is_compatible_numeric_type(self):
         """Test numeric type compatibility checking."""
