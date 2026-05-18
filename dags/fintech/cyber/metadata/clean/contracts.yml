@@ -6,7 +6,8 @@ domain: Fintech
 description: Table with user-defined load interface fields.
 columns:
   id_contract:
-    description: "ID contract = ID Contract (TF: contract.external-id) + Contract Group (ID Product debtor.product-code) + Revision"
+    description: "ID contract = ID Contract (TF: contract.external-id) + Contract
+      Group (ID Product debtor.product-code) + Revision"
     lineage:
       - datalake_cyber_raw.uda1.U1ACCT
   id_contract_external:
@@ -18,11 +19,13 @@ columns:
     lineage:
       - datalake_cyber_raw.uda1.U1CODIMO
   id_client:
-    description: "Client ID (CPF/CNPJ). TF: client.document Number where client-type = 'main-tenant'"
+    description: "Client ID (CPF/CNPJ). TF: client.document Number where client-type
+      = 'main-tenant'"
     lineage:
       - datalake_cyber_raw.uda1.U1SSNUM
   id_oldest_negative_invoice:
-    description: "ID of the oldest negative invoice (used in the negative and rehabilitation rules)"
+    description: "ID of the oldest negative invoice (used in the negative and
+      rehabilitation rules)"
     lineage:
       - datalake_cyber_raw.uda1.U1IDFMAN
   id_client_legacy:
@@ -220,7 +223,8 @@ columns:
     lineage:
       - datalake_cyber_raw.uda1.U1NEGAVAINT
   has_negative_cyb:
-    description: "indicates that there is a Deny action for the CYB Bureau – Internal - (0-unchecked 1 -checked) - Default 0;"
+    description: "indicates that there is a Deny action for the CYB Bureau –
+      Internal - (0-unchecked 1 -checked) - Default 0;"
     lineage:
       - datalake_cyber_raw.uda1.U1FLACNEGCYB
   ts_negative_cyb:
@@ -228,7 +232,11 @@ columns:
     lineage:
       - datalake_cyber_raw.uda1.U1DTACNEGCYB
   has_rehabilitation_all_credit_bureaus:
-    description: "Indicates that there is a Rehabilitation action (for all credit bureaus);will always be marked (=1) when there is a Rehabilitation action promoted by the Negative/Rehabilitation module, whether resulting from the discharge or administrative event.After confirmation of the Rehabilitation action sent by the Credit Bureaux, the flag will be unmarked '0'"
+    description: "Indicates that there is a Rehabilitation action (for all credit
+      bureaus);will always be marked (=1) when there is a Rehabilitation action
+      promoted by the Negative/Rehabilitation module, whether resulting from the
+      discharge or administrative event.After confirmation of the Rehabilitation
+      action sent by the Credit Bureaux, the flag will be unmarked '0'"
     lineage:
       - datalake_cyber_raw.uda1.U1FLACREAB
   ts_rehabilitation_all_credit_bureaus:
@@ -236,7 +244,8 @@ columns:
     lineage:
       - datalake_cyber_raw.uda1.U1DTACREAB
   has_none_negative_bureau:
-    description: "identifies that the contract is without Negative action for any Bureau (SERASA/CYB)."
+    description: "identifies that the contract is without Negative action for any
+      Bureau (SERASA/CYB)."
     lineage:
       - datalake_cyber_raw.uda1.U1FLATISEMAC
   has_guarantor_denial:
@@ -332,7 +341,8 @@ columns:
     lineage:
       - datalake_cyber_raw.uda1.U1BCPHONE
   ts_contract_start:
-    description: "Contract start date or Contract Signing Date, in the case of 5C. TF: contract.start-date"
+    description: "Contract start date or Contract Signing Date, in the case of 5C.
+      TF: contract.start-date"
     lineage:
       - datalake_cyber_raw.uda1.U1DTINIVIG
   contract_score:
@@ -372,7 +382,8 @@ columns:
     lineage:
       - datalake_cyber_raw.uda1.U1DTRESC
   eviction_step:
-    description: "Process step in Evictions. TF: eviction.sub_status WHERE eviction.status = 'EVICTION'"
+    description: "Process step in Evictions. TF: eviction.sub_status WHERE
+      eviction.status = 'EVICTION'"
     lineage:
       - datalake_cyber_raw.uda1.U1SITEVIC
   ts_distribution_eviction:
@@ -388,19 +399,26 @@ columns:
     lineage:
       - datalake_cyber_raw.uda1.U1ESCEVI
   percentage_debt_to_rent:
-    description: "Percentage of debt in relation to rent. TF: sum(select total-amount from bill where contract-id = contract.external-id)/contract.rental-amount"
+    description: "Percentage of debt in relation to rent. TF: sum(select
+      total-amount from bill where contract-id =
+      contract.external-id)/contract.rental-amount"
     lineage:
       - datalake_cyber_raw.uda1.U1PERDIV
   reason_eviction:
-    description: "Reason for the charge/collection (delinquency / breach of agreement), used in the listing for Evic (tombamento para eviction). TF: evictions.status-reason"
+    description: "Reason for the charge/collection (delinquency / breach of
+      agreement), used in the listing for Evic (tombamento para eviction). TF:
+      evictions.status-reason"
     lineage:
       - datalake_cyber_raw.uda1.U1MOTCOB
   oldest_negative_invoice_amount:
-    description: "Value of the oldest negative invoice (used in the negative and rehabilitation rules). TF: select total amount from bill where contract_id = contract.external id order by due-date"
+    description: "Value of the oldest negative invoice (used in the negative and
+      rehabilitation rules). TF: select total amount from bill where contract_id
+      = contract.external id order by due-date"
     lineage:
       - datalake_cyber_raw.uda1.U1VLRFMAN
   ts_due_oldest_negative_invoice:
-    description: "Due date of the oldest negative invoice (used in the negative and rehabilitation rules)"
+    description: "Due date of the oldest negative invoice (used in the negative and
+      rehabilitation rules)"
     lineage:
       - datalake_cyber_raw.uda1.U1VEFMAN
   real_state_agency:
@@ -416,23 +434,34 @@ columns:
     lineage:
       - datalake_cyber_raw.uda1.U1CT1
   bpo_segmentation:
-    description: "This field represents the segmentation of BPOs (partners). Starting March 11, 2025, a new test was launched to evaluate the impact of delaying the assignment of delinquent accounts to BPOs. The experiment will compare three similarly sized groups, enabling an analysis of how this change affects credit recovery and operational efficiency."
+    description: "This field represents the segmentation of BPOs (partners).
+      Starting March 11, 2025, a new test was launched to evaluate the impact of
+      delaying the assignment of delinquent accounts to BPOs. The experiment
+      will compare three similarly sized groups, enabling an analysis of how
+      this change affects credit recovery and operational efficiency."
     lineage:
       - datalake_cyber_raw.uda1.U1CT2
   probability_group:
-    description: "To indicate the probability of recovery of a contract (High/Medium/Low/Very Low), a marking will be uploaded via a spreadsheet, storing key contract indicators in Cyber. These indicators will be used to assign contracts to specific queues for each group."
+    description: "To indicate the probability of recovery of a contract
+      (High/Medium/Low/Very Low), a marking will be uploaded via a spreadsheet,
+      storing key contract indicators in Cyber. These indicators will be used to
+      assign contracts to specific queues for each group."
     lineage:
       - datalake_cyber_raw.uda1.U1INDCOR23
   collection_strategy:
-    description: "Code representing the customer’s collection flow, based on collection_classification + probability_group, activation delay + BPO postponement."
+    description: "Code representing the customer’s collection flow, based on
+      collection_classification + probability_group, activation delay + BPO
+      postponement."
     lineage:
       - datalake_cyber_raw.uda1.U1INDCOR25
   contract_segment_strategy:
-    description: "This field segments contracts for internal collections strategies. It's designed to be flexible for future segmentation profiles."
+    description: "This field segments contracts for internal collections strategies.
+      It's designed to be flexible for future segmentation profiles."
     lineage:
       - datalake_cyber_raw.uda1.U1INDCOR27
   reason_pause:
-    description: "Pause reason.Possible reasons: fraud, legal proceedings, operational errors, friction"
+    description: "Pause reason.Possible reasons: fraud, legal proceedings,
+      operational errors, friction"
     lineage:
       - datalake_cyber_raw.uda1.U1INDMOTPA
   subset:
@@ -487,6 +516,14 @@ columns:
     description: "Cost amount"
     lineage:
       - datalake_cyber_raw.uda1.U1VLCUSTASAG
+  fees_amount:
+    description: "Fees amount"
+    lineage:
+      - datalake_cyber_raw.uda1.U1VLRHONAG
+  legal_costs_amount:
+    description: "Legal costs amount"
+    lineage:
+      - datalake_cyber_raw.uda1.U1VLRDESPJUD
   week_day:
     description: "week day - monday, tuesday.."
     lineage:
@@ -524,7 +561,8 @@ columns:
     lineage:
       - datalake_cyber_raw.uda1.U1LCHGDT3
   dt_evictions_label_update:
-    description: "Data da última mudança da Label 5 (Label de Despejos - Contexto Pré-Jurídico)"
+    description: "Data da última mudança da Label 5 (Label de Despejos - Contexto
+      Pré-Jurídico)"
     lineage:
       - datalake_cyber_raw.uda1.U1LCHGDT5
   dt_not_collection_label_update:

@@ -97,6 +97,8 @@ SELECT
     U1VLRPRJUAG AS residual_interest_amount,
     U1VLVENC AS debt_balance,
     U1VLCUSTASAG AS cost_amount,
+    U1VLRHONAG AS fees_amount,
+    U1VLRDESPJUD AS legal_costs_amount,
     U1DIASEMANA AS week_day,
     U1QTDFAVENC AS open_invoices,
     U1TPCOB AS collection_flow,
