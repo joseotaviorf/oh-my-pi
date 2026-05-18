@@ -20,9 +20,9 @@ SELECT
     COALESCE(codex_owner_l2_name, '-') AS `l2Cc(PER_ORGANIZATION_UNIT_DFF=Global Data Elements)`,
     COALESCE(codex_owner_l3_name, '-') AS `l3Cc(PER_ORGANIZATION_UNIT_DFF=Global Data Elements)`,
     COALESCE(codex_headcount_type, '-') AS `headcountType(PER_ORGANIZATION_UNIT_DFF=Global Data Elements)`,
-    YEAR(CURRENT_DATE()) AS year,
-    MONTH(CURRENT_DATE()) AS month,
-    DAY(CURRENT_DATE()) AS day
+    YEAR(DATE('{load_start_date}')) AS year,
+    MONTH(DATE('{load_start_date}')) AS month,
+    DAY(DATE('{load_start_date}')) AS day
 FROM
     datalake_people.codex_pin_sync_drift
 WHERE

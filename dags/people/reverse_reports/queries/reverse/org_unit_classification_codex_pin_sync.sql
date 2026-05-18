@@ -8,9 +8,9 @@ SELECT
     'DEPARTMENT' AS ClassificationCode,
     pin_organization_status AS Status,
     'COMMON' AS SetCode,
-    YEAR(CURRENT_DATE()) AS year,
-    MONTH(CURRENT_DATE()) AS month,
-    DAY(CURRENT_DATE()) AS day
+    YEAR(DATE('{load_start_date}')) AS year,
+    MONTH(DATE('{load_start_date}')) AS month,
+    DAY(DATE('{load_start_date}')) AS day
 FROM
     datalake_people.codex_pin_sync_drift
 WHERE

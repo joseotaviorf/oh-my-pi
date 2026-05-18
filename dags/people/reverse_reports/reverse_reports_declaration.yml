@@ -10,6 +10,10 @@ dag:
       To add a new export:
         1. Create queries/reverse/{table_name}.sql
         2. Add the table to tables_customization with extra_spark_job_arguments: [sheet_id, sheet_tab]
+        3. In the SQL, set `year` / `month` / `day` from `{load_start_date}`. Never use
+           `CURRENT_DATE()` for those partitions — `load_to_gsheet` reads only the
+           `load_start_date` slice; mismatch → empty sheet. Those columns are not sent to
+           Google Sheets. Example: `queries/reverse/organization_codex_pin_sync.sql`.
 
       Share each target sheet (Editor permission) with:
         gsheets-people-access@airflow-186119.iam.gserviceaccount.com

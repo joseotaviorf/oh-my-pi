@@ -15,9 +15,9 @@ SELECT
     st.total_active_jobs,
     st.has_headcount_exceptions,
     st.has_job_exceptions,
-    YEAR(CURRENT_DATE()) AS year,
-    MONTH(CURRENT_DATE()) AS month,
-    DAY(CURRENT_DATE()) AS day
+    YEAR(DATE('{load_start_date}')) AS year,
+    MONTH(DATE('{load_start_date}')) AS month,
+    DAY(DATE('{load_start_date}')) AS day
 FROM
     dw_compensation.fact_salary_table_targets AS st
 LEFT JOIN
