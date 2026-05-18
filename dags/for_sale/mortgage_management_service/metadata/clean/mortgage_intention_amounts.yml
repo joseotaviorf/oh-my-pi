@@ -3,33 +3,61 @@ database_name: datalake_mortgage_management_service_clean
 table_name: mortgage_intention_amounts
 owner: thiago.bueno@quintoandar.com.br
 domain: For Sale
-description: "The primary purpose of the mortgage_intention_amounts table is to store financial amount details associated with mortgage intentions, including property value, loan amount, and down payment information."
+description: "Financial breakdown rows linked to a mortgage intention, including financed amount, down payment, property value, and currency from Mortgage Management Service."
 columns:
   id:
-    description: 'Id of the mortgage intention amounts.'
+    description: "Primary key of the mortgage intention amounts row in the source service database."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_amounts.id
+      - datalake_mortgage_management_service_raw.mortgage_intention_amounts.id
   id_mortgage_intention:
-    description: 'Id of the mortgage intention.'
+    description: "Foreign key to the parent mortgage_intention aggregate that owns this amounts snapshot."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_amounts.mortgage_intention_id
+      - datalake_mortgage_management_service_raw.mortgage_intention_amounts.mortgage_intention_id
+  source_name:
+    description: "Label identifying which upstream calculation or channel produced this amounts record."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_amounts.source
+  currency_code:
+    description: "ISO-like currency code in which the monetary amounts on this row are expressed."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_amounts.currency
+  event_source_reference_id:
+    description: "Opaque identifier from the originating event or integration used to correlate or deduplicate updates."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_amounts.event_source_id
+  financed_amount:
+    description: "Financed principal amount associated with this intention amounts row, in the stated currency."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_amounts.financed_amount
+  down_payment:
+    description: "Down payment amount associated with this intention amounts row, in the stated currency."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_amounts.down_payment
+  property_value:
+    description: "Property value amount used in this amounts snapshot, in the stated currency."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_amounts.property_value
+  version:
+    description: "Optimistic locking version counter maintained by the application for this row."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_amounts.version
   ts_created:
-    description: 'Timestamp of the creation of the record.'
+    description: "Timestamp when this amounts row was first created in the operational database."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_amounts.created_at
+      - datalake_mortgage_management_service_raw.mortgage_intention_amounts.created_at
   ts_updated:
-    description: 'Timestamp of the last update of the record.'
+    description: "Timestamp of the last update applied to this amounts row in the operational database."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_amounts.updated_at
+      - datalake_mortgage_management_service_raw.mortgage_intention_amounts.updated_at
   year:
-    description: 'Year of the record.'
+    description: "Partition year of the CDC snapshot row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_amounts.year
+      - datalake_mortgage_management_service_raw.mortgage_intention_amounts.year
   month:
-    description: 'Month of the record.'
+    description: "Partition month of the CDC snapshot row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_amounts.month
+      - datalake_mortgage_management_service_raw.mortgage_intention_amounts.month
   day:
-    description: 'Day of the record.'
+    description: "Partition day of the CDC snapshot row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_amounts.day
+      - datalake_mortgage_management_service_raw.mortgage_intention_amounts.day

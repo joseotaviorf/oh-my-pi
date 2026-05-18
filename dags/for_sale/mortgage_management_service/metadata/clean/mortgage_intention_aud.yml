@@ -6,34 +6,150 @@ domain: For Sale
 description: "Audit table for mortgage_intention, tracking all historical changes made to mortgage intention records using Hibernate Envers for audit trail purposes."
 columns:
   id:
-    description: 'Id of the mortgage intention.'
+    description: "Primary key of the mortgage intention row that was revised, matching mortgage_intention.id."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_aud.id
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.id
   rev:
-    description: 'Revision number for audit tracking.'
+    description: "Envers revision identifier linking this audit row to the revinfo metadata table in the source database."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_aud.rev
-  revtype:
-    description: 'Revision type indicating the operation (0=insert, 1=update, 2=delete).'
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.rev
+  rev_type:
+    description: "Envers revision type code for the row change, such as insert, update, or delete, as defined by Envers (0=insert, 1=update, 2=delete)."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_aud.revtype
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.revtype
+  rev_end:
+    description: "Envers revision at which this audit snapshot was superseded, when the source records end of validity."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.revend
+  uuid_mortgage_intention:
+    description: "Business UUID of the mortgage intention as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.mortgage_intention_uuid
+  uuid_person:
+    description: "Person UUID associated with the mortgage intention as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.person_uuid
+  source_name:
+    description: "Intention source label as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.source
+  status_name:
+    description: "Intention status as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.status
+  mortgage_rules_country_code:
+    description: "Mortgage rules country code as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.mortgage_rules_country
+  cancellation_reason:
+    description: "Cancellation reason text as observed at this audit revision, when present."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.canceled_reason
+  mortgage_term:
+    description: "Mortgage term value as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.mortgage_term
+  expenses_amount:
+    description: "Expenses-related monetary amount as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.expenses_amount
+  savings_amount:
+    description: "Savings monetary amount as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.savings_amount
+  is_will_finance_expenses:
+    description: "Flag for financing expenses as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.will_finance_expenses
+  is_will_use_savings:
+    description: "Flag for using savings as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.will_use_savings
+  version:
+    description: "Aggregate version number as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.version
+  mod_uuid_mortgage_intention:
+    description: "Envers flag indicating whether mortgage_intention_uuid changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.mortgage_intention_uuid_mod
+  mod_uuid_person:
+    description: "Envers flag indicating whether person_uuid changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.person_uuid_mod
+  mod_source_name:
+    description: "Envers flag indicating whether source changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.source_mod
+  mod_status_name:
+    description: "Envers flag indicating whether status changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.status_mod
+  mod_mortgage_rules_country_code:
+    description: "Envers flag indicating whether mortgage_rules_country changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.mortgage_rules_country_mod
+  mod_cancellation_reason:
+    description: "Envers flag indicating whether canceled_reason changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.canceled_reason_mod
+  mod_mortgage_term:
+    description: "Envers flag indicating whether mortgage_term changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.mortgage_term_mod
+  mod_expenses_amount:
+    description: "Envers flag indicating whether expenses_amount changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.expenses_amount_mod
+  mod_savings_amount:
+    description: "Envers flag indicating whether savings_amount changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.savings_amount_mod
+  mod_is_will_finance_expenses:
+    description: "Envers flag indicating whether will_finance_expenses changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.will_finance_expenses_mod
+  mod_is_will_use_savings:
+    description: "Envers flag indicating whether will_use_savings changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.will_use_savings_mod
+  mod_version:
+    description: "Envers flag indicating whether version changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.version_mod
+  mod_ts_canceled:
+    description: "Envers flag indicating whether canceled_at changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.canceled_at_mod
+  mod_ts_created:
+    description: "Envers flag indicating whether created_at changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.created_at_mod
+  mod_ts_updated:
+    description: "Envers flag indicating whether updated_at changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.updated_at_mod
+  ts_canceled:
+    description: "Cancellation timestamp as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.canceled_at
   ts_created:
-    description: 'Timestamp of the creation of the record.'
+    description: "Row creation timestamp as observed at this audit revision."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_aud.created_at
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.created_at
   ts_updated:
-    description: 'Timestamp of the last update of the record.'
+    description: "Row last-update timestamp as observed at this audit revision."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_aud.updated_at
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.updated_at
   year:
-    description: 'Year of the record.'
+    description: "Partition year of the CDC audit row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_aud.year
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.year
   month:
-    description: 'Month of the record.'
+    description: "Partition month of the CDC audit row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_aud.month
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.month
   day:
-    description: 'Day of the record.'
+    description: "Partition day of the CDC audit row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_aud.day
+      - datalake_mortgage_management_service_raw.mortgage_intention_aud.day

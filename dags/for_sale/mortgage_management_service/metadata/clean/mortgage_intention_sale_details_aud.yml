@@ -3,41 +3,89 @@ database_name: datalake_mortgage_management_service_clean
 table_name: mortgage_intention_sale_details_aud
 owner: thiago.bueno@quintoandar.com.br
 domain: For Sale
-description: "Audit table for mortgage_intention_sale_details, tracking all historical changes made to mortgage intention sale detail records using Hibernate Envers for audit trail purposes."
+description: "Hibernate Envers audit history for mortgage_intention_sale_details, including revision keys and modification flags for each revised column."
 columns:
   id:
-    description: 'Id of the mortgage intention sale details.'
+    description: "Primary key of the sale details row that was revised, matching mortgage_intention_sale_details.id."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.id
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.id
   rev:
-    description: 'Revision number for audit tracking.'
+    description: "Envers revision identifier linking this audit row to revinfo in the source database."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.rev
-  revtype:
-    description: 'Revision type indicating the operation (0=insert, 1=update, 2=delete).'
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.rev
+  rev_type:
+    description: "Revision type indicating the operation (0=insert, 1=update, 2=delete)."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.revtype
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.revtype
+  rev_end:
+    description: "Envers revision at which this audit snapshot was superseded, when recorded by the source."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.revend
   id_mortgage_intention:
-    description: 'Id of the mortgage intention.'
+    description: "Parent mortgage intention identifier as observed at this audit revision."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.mortgage_intention_id
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.mortgage_intention_id
+  sale_reference_id:
+    description: "Sale reference identifier as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.sale_reference_id
+  inspection_companion_person_name:
+    description: "Inspection companion name as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.inspection_companion_name
+  inspection_companion_phone_number:
+    description: "Inspection companion phone as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.inspection_companion_phone
+  version:
+    description: "Row version as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.version
+  mod_id_mortgage_intention:
+    description: "Envers flag indicating whether mortgage_intention_id changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.mortgage_intention_id_mod
+  mod_sale_reference_id:
+    description: "Envers flag indicating whether sale_reference_id changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.sale_reference_id_mod
+  mod_inspection_companion_person_name:
+    description: "Envers flag indicating whether inspection_companion_name changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.inspection_companion_name_mod
+  mod_inspection_companion_phone_number:
+    description: "Envers flag indicating whether inspection_companion_phone changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.inspection_companion_phone_mod
+  mod_version:
+    description: "Envers flag indicating whether version changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.version_mod
+  mod_ts_created:
+    description: "Envers flag indicating whether created_at changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.created_at_mod
+  mod_ts_updated:
+    description: "Envers flag indicating whether updated_at changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.updated_at_mod
   ts_created:
-    description: 'Timestamp of the creation of the record.'
+    description: "Created-at timestamp as observed at this audit revision."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.created_at
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.created_at
   ts_updated:
-    description: 'Timestamp of the last update of the record.'
+    description: "Updated-at timestamp as observed at this audit revision."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.updated_at
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.updated_at
   year:
-    description: 'Year of the record.'
+    description: "Partition year of the CDC audit row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.year
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.year
   month:
-    description: 'Month of the record.'
+    description: "Partition month of the CDC audit row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.month
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.month
   day:
-    description: 'Day of the record.'
+    description: "Partition day of the CDC audit row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.day
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details_aud.day

@@ -3,33 +3,49 @@ database_name: datalake_mortgage_management_service_clean
 table_name: mortgage_intention_sale_details
 owner: thiago.bueno@quintoandar.com.br
 domain: For Sale
-description: "The primary purpose of the mortgage_intention_sale_details table is to store property sale-specific information linked to mortgage intentions, including property characteristics and sale conditions."
+description: "Sale-flow details linked to a mortgage intention, such as sale reference and inspection companion contact data from Mortgage Management Service."
 columns:
   id:
-    description: 'Id of the mortgage intention sale details.'
+    description: "Primary key of the mortgage intention sale details row in the source service database."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.id
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.id
   id_mortgage_intention:
-    description: 'Id of the mortgage intention.'
+    description: "Foreign key to the parent mortgage_intention that this sale details row extends."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.mortgage_intention_id
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.mortgage_intention_id
+  sale_reference_id:
+    description: "External sale or listing reference identifier tying the intention to a concrete sale process."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.sale_reference_id
+  inspection_companion_person_name:
+    description: "Full name of the person expected to accompany the property inspection, when provided by the user."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.inspection_companion_name
+  inspection_companion_phone_number:
+    description: "Phone number for the inspection companion contact, when provided by the user."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.inspection_companion_phone
+  version:
+    description: "Optimistic locking version counter maintained by the application for this row."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.version
   ts_created:
-    description: 'Timestamp of the creation of the record.'
+    description: "Timestamp when this sale details row was first created in the operational database."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.created_at
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.created_at
   ts_updated:
-    description: 'Timestamp of the last update of the record.'
+    description: "Timestamp of the last update applied to this sale details row in the operational database."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.updated_at
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.updated_at
   year:
-    description: 'Year of the record.'
+    description: "Partition year of the CDC snapshot row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.year
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.year
   month:
-    description: 'Month of the record.'
+    description: "Partition month of the CDC snapshot row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.month
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.month
   day:
-    description: 'Day of the record.'
+    description: "Partition day of the CDC snapshot row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.day
+      - datalake_mortgage_management_service_raw.mortgage_intention_sale_details.day

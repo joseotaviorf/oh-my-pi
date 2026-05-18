@@ -3,37 +3,89 @@ database_name: datalake_mortgage_management_service_clean
 table_name: mortgage_proposal_aux_aud
 owner: thiago.bueno@quintoandar.com.br
 domain: For Sale
-description: "Audit table for mortgage_proposal_aux, tracking all historical changes made to mortgage proposal auxiliary records using Hibernate Envers for audit trail purposes."
+description: "Hibernate Envers audit history for mortgage_proposal_aux, capturing each revision of bridge identifiers and Envers modification flags."
 columns:
   id:
-    description: 'Id of the mortgage proposal auxiliary data.'
+    description: "Primary key of the auxiliary row that was revised, matching mortgage_proposal_aux.id."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.id
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.id
   rev:
-    description: 'Revision number for audit tracking.'
+    description: "Envers revision identifier linking this audit row to revinfo in the source database."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.rev
-  revtype:
-    description: 'Revision type indicating the operation (0=insert, 1=update, 2=delete).'
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.rev
+  rev_type:
+    description: "Revision type indicating the operation (0=insert, 1=update, 2=delete)."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.revtype
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.revtype
+  rev_end:
+    description: "Envers revision at which this audit snapshot was superseded, when recorded by the source."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.revend
+  id_mortgage_intention:
+    description: "Mortgage intention identifier as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.mortgage_intention_id
+  id_mortgage_application:
+    description: "Mortgage application identifier as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.mortgage_application_id
+  id_proposal_reference:
+    description: "External proposal reference as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.proposal_reference_id
+  id_pre_analysis_reference:
+    description: "External pre-analysis reference as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.pre_analysis_reference_id
+  version:
+    description: "Row version as observed at this audit revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.version
+  mod_id_mortgage_intention:
+    description: "Envers flag indicating whether mortgage_intention_id changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.mortgage_intention_id_mod
+  mod_id_mortgage_application:
+    description: "Envers flag indicating whether mortgage_application_id changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.mortgage_application_id_mod
+  mod_id_proposal_reference:
+    description: "Envers flag indicating whether proposal_reference_id changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.proposal_reference_id_mod
+  mod_id_pre_analysis_reference:
+    description: "Envers flag indicating whether pre_analysis_reference_id changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.pre_analysis_reference_id_mod
+  mod_version:
+    description: "Envers flag indicating whether version changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.version_mod
+  mod_ts_created:
+    description: "Envers flag indicating whether created_at changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.created_at_mod
+  mod_ts_updated:
+    description: "Envers flag indicating whether updated_at changed in this revision."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.updated_at_mod
   ts_created:
-    description: 'Timestamp of the creation of the record.'
+    description: "Created-at timestamp as observed at this audit revision."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.created_at
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.created_at
   ts_updated:
-    description: 'Timestamp of the last update of the record.'
+    description: "Updated-at timestamp as observed at this audit revision."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.updated_at
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.updated_at
   year:
-    description: 'Year of the record.'
+    description: "Partition year of the CDC audit row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.year
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.year
   month:
-    description: 'Month of the record.'
+    description: "Partition month of the CDC audit row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.month
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.month
   day:
-    description: 'Day of the record.'
+    description: "Partition day of the CDC audit row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.day
+      - datalake_mortgage_management_service_raw.mortgage_proposal_aux_aud.day

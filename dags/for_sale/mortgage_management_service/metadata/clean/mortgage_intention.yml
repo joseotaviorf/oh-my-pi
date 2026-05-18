@@ -3,29 +3,81 @@ database_name: datalake_mortgage_management_service_clean
 table_name: mortgage_intention
 owner: thiago.bueno@quintoandar.com.br
 domain: For Sale
-description: "The primary purpose of the mortgage_intention table is to store mortgage intention records created by users interested in obtaining mortgage financing for property purchases."
+description: "Mortgage intention records for users interested in financing a property purchase, including status, amounts, and cancellation context from Mortgage Management Service."
 columns:
   id:
-    description: 'Id of the mortgage intention.'
+    description: "Primary key of the mortgage intention row in the source service database."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention.id
+      - datalake_mortgage_management_service_raw.mortgage_intention.id
+  uuid_mortgage_intention:
+    description: "Business UUID that uniquely identifies the mortgage intention across systems."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention.mortgage_intention_uuid
+  uuid_person:
+    description: "UUID of the person associated with this mortgage intention."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention.person_uuid
+  source_name:
+    description: "Channel from which the mortgage intention was created."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention.source
+  status_name:
+    description: "Current lifecycle status of the mortgage intention as stored in the operational database."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention.status
+  mortgage_rules_country_code:
+    description: "Country code used to select which mortgage rules or product constraints apply to this intention."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention.mortgage_rules_country
+  cancellation_reason:
+    description: "Enumerated reason to why the mortgage intention was canceled, when applicable."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention.canceled_reason
+  mortgage_term:
+    description: "Requested mortgage term length in months."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention.mortgage_term
+  expenses_amount:
+    description: "Monetary amount related to expenses the user may finance as part of the intention, in source currency."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention.expenses_amount
+  savings_amount:
+    description: "Monetary amount of savings (FGTS) the user declared for the mortgage intention, in source currency."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention.savings_amount
+  is_will_finance_expenses:
+    description: "Flag indicating whether the user intends to finance related expenses within the mortgage product."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention.will_finance_expenses
+  is_will_use_savings:
+    description: "Flag indicating whether the user intends to apply declared savings (FGTS) toward the mortgage intention."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention.will_use_savings
+  version:
+    description: "Optimistic locking version counter maintained by the application for this aggregate row."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention.version
+  ts_canceled:
+    description: "Timestamp when the mortgage intention was marked as canceled in the operational database."
+    lineage:
+      - datalake_mortgage_management_service_raw.mortgage_intention.canceled_at
   ts_created:
-    description: 'Timestamp of the creation of the record.'
+    description: "Timestamp when the mortgage intention row was first created in the operational database."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention.created_at
+      - datalake_mortgage_management_service_raw.mortgage_intention.created_at
   ts_updated:
-    description: 'Timestamp of the last update of the record.'
+    description: "Timestamp of the last update applied to this mortgage intention in the operational database."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention.updated_at
+      - datalake_mortgage_management_service_raw.mortgage_intention.updated_at
   year:
-    description: 'Year of the record.'
+    description: "Partition year of the CDC snapshot row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention.year
+      - datalake_mortgage_management_service_raw.mortgage_intention.year
   month:
-    description: 'Month of the record.'
+    description: "Partition month of the CDC snapshot row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention.month
+      - datalake_mortgage_management_service_raw.mortgage_intention.month
   day:
-    description: 'Day of the record.'
+    description: "Partition day of the CDC snapshot row ingested into the data lake raw layer."
     lineage:
-    - datalake_mortgage_management_service_raw.mortgage_intention.day
+      - datalake_mortgage_management_service_raw.mortgage_intention.day
