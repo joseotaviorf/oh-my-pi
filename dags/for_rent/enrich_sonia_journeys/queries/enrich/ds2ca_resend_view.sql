@@ -8,11 +8,12 @@ WITH docs_demand_resend_events AS (
   FROM datalake_cdp_clean.transactional
   WHERE
     event_name = 'rent_flow_tenant_documentation_resend'
-    -- When we start using sfmc for this journey we need to change this datetime
-    -- to a point right after the last hightouch execution will take place.
-    -- Cutoff bumped from 2026-01-01 to 2026-03-01: malformed events with null
-    -- id_person / id_house / id_rent_flow payloads only landed in Jan/Feb 2026.
-    AND ts_event >= TIMESTAMP '2026-03-01 00:00:00'
+    -- SFMC handover cutover: this view feeds the SFMC pipeline only for events
+    -- at/after 2026-05-18 13:00 BRT. Events strictly before that are still
+    -- handled by the legacy Hightouch query. The malformed-payload window
+    -- (Jan/Feb 2026) is well before the cutover, so no extra lower bound
+    -- is needed.
+    AND ts_event >= to_utc_timestamp(TIMESTAMP '2026-05-18 13:00:00', 'America/Sao_Paulo')
 )
 SELECT
   CONCAT(CAST(e.id_event AS STRING), '-', e.uuid_person) AS pk_event_user,
