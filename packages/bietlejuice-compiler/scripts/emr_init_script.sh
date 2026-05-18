@@ -9,6 +9,7 @@ DEEQU_JAR_VERSION="${DEEQU_JAR_VERSION:-2.0.8}"
 SPARK_VERSION="${SPARK_VERSION:-3.5}"
 INMETRO_VERSION="${INMETRO_VERSION:-2.3.0}"
 KAFKA_CLIENTS_JAR="${KAFKA_CLIENTS_JAR:-kafka-clients-3.5.0.jar}"
+OPENLINEAGE_JAR="${OPENLINEAGE_JAR:-openlineage-spark_2.12-1.46.0.jar}"
 MYSQL_JDBC_JAR="${MYSQL_JDBC_JAR:-mysql-connector-java-8.0.30.jar}"
 QUINTOANDAR_LOGGER_WHEEL="${QUINTOANDAR_LOGGER_WHEEL:-quintoandar_logger-0.8.0-py3-none-any.whl}"
 REQUESTS_VERSION="${REQUESTS_VERSION:-2.32.5}"
@@ -49,7 +50,7 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         "${TMP_DIR}/wheels/${QUINTOANDAR_LOGGER_WHEEL}"
     aws s3 cp "${ARTIFACTS_BUCKET}/inmetro/inmetro-${INMETRO_VERSION}-py3-none-any.whl" \
         "${TMP_DIR}/wheels/inmetro-${INMETRO_VERSION}-py3-none-any.whl"
-
+    
     # Pin urllib3 / requests for awscli before resolving the big stack.
     $PIP_EXEC install --upgrade --ignore-installed \
         "requests==${REQUESTS_VERSION}" 'urllib3>=1.25.4,<1.27'
@@ -141,7 +142,8 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         "spark-plugins_2.12-0.2.jar" \
         "spark-cluster-metrics_2.12-0.1-SNAPSHOT.jar" \
         "${KAFKA_CLIENTS_JAR}" \
-        "${MYSQL_JDBC_JAR}"; do
+        "${MYSQL_JDBC_JAR}" \
+        "${OPENLINEAGE_JAR}"; do
         aws s3 cp "${ARTIFACTS_BUCKET}/jars/${jar}" "${TMP_DIR}/${jar}" \
             || echo "  WARN: ${jar} not found in S3, skipping"
     done
@@ -180,7 +182,8 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
         "spark-plugins_2.12-0.2.jar" \
         "spark-cluster-metrics_2.12-0.1-SNAPSHOT.jar" \
         "${KAFKA_CLIENTS_JAR}" \
-        "${MYSQL_JDBC_JAR}"; do
+        "${MYSQL_JDBC_JAR}" \
+        "${OPENLINEAGE_JAR}"; do
         if [ -f "${TMP_DIR}/${jar}" ]; then
             for jdir in ${SPARK_JARS_DIRS}; do
                 sudo cp "${TMP_DIR}/${jar}" "${jdir}/${jar}"

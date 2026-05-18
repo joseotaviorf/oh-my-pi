@@ -305,7 +305,13 @@ class EmrJobClusterEngine(JobClusterEngine):
             name=task_id,
             script_uri=spark_job_path,
             args=[str(p) for p in job_parameters],
-            extra_spark_args=list(_EMR_EXTRA_SPARK_SUBMIT_ARGS),
+            extra_spark_args=list(_EMR_EXTRA_SPARK_SUBMIT_ARGS)
+            + [
+                "--conf",
+                f"spark.openlineage.parentJobName={{{{ dag.dag_id }}}}.{task_id}",
+                "--conf",
+                "spark.openlineage.parentJobNamespace=airflow",
+            ],
         )
         return QuintoAndarEmrSubmitStepsOperator(
             task_id=task_id,

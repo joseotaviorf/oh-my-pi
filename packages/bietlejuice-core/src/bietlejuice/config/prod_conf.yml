@@ -1684,6 +1684,10 @@ emr_cluster_base: &emr_cluster_anchor
         spark.yarn.appMasterEnv.SPARK_VERSION: "3.5"
         spark.yarn.appMasterEnv.DATABRICKS_UC_HOST: "{{ conn.databricks_new.host }}"
         spark.yarn.appMasterEnv.DATABRICKS_UC_TOKEN: "{{ conn.databricks_new.extra_dejson.token }}"
+        spark.extraListeners: "io.openlineage.spark.agent.OpenLineageSparkListener"
+        spark.openlineage.transport.type: "http"
+        spark.openlineage.transport.url: "https://metadata-propagator.apps.data-prd-blue.habitat.zone"
+        spark.openlineage.transport.endpoint: "/openlineage/events"
     spark_env_vars:
         ENVIRONMENT: "{{ var.value.environment }}"
         ARTIFACTS_BUCKET: *artifacts_bucket
