@@ -1233,14 +1233,15 @@ bietlejuice.dw_sale_offers:
   - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
 bietlejuice.dw_sale_ongoing_listings:
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
   - bietlejuice.dw_sale_events:load-dw-sale-dim-sale-event-type:first-run-of-day
   - bietlejuice.dw_sale_events:load-dw-sale-fact-sale-demand-event:first-run-of-day
   - bietlejuice.dw_sale_listing_price_changes:load-dw-sale-dim-sale-price-segment:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context-aud:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user-revision-entity:first-run-of-day
-  - bietlejuice.enrich_rede_house_history:load-enrich-rede-house-history:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing-price-changes:first-run-of-day
   - bietlejuice.enrich_sale_listings:load-enrich-sale-listing:first-run-of-day
   - bietlejuice.enrich_search_session_event:load-enrich-search-session-event:first-run-of-day
@@ -1285,9 +1286,9 @@ bietlejuice.dw_satisfaction_rating:
   - bietlejuice.enrich_satisfaction_rating:load-enrich-satisfaction-answers:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-single-station-surveys:first-run-of-day
 bietlejuice.dw_search_session_event:
-  - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
+  - bietlejuice.core_brokers:load-core-brokers:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
-  - bietlejuice.enrich_rede_house_history:load-enrich-rede-house-history:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_search_session_event:load-enrich-search-session-event:first-run-of-day
 bietlejuice.dw_secretariat_user:
   - bietlejuice.enrich_hub_services:load-enrich-secretariat-allocation-history:first-run-of-day

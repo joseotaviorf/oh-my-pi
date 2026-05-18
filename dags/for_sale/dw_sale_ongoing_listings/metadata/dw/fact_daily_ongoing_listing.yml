@@ -35,6 +35,10 @@ columns:
     description: Key of the company in Rede QuintoAndar associated with the house. Can be joined with dw_rede.dim_company.
     lineage:
       - datalake_company.company_sks.sk_company
+  sk_broker:
+    description: Surrogate key of the 3P broker partner for the supply-side company of the house. Joinable with dw_brokers.dim_broker. Returns -1 when the house is not associated with a 3P broker (i.e. 1P listings or companies without active 3P products).
+    lineage:
+      - core_brokers.brokers.sk_broker
   sk_sale_price_segment:
     description: Key of the sale price segment. Can be joined with dw_sale.dim_sale_price_segment.
     lineage:

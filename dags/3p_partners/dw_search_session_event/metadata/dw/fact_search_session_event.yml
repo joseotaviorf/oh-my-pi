@@ -32,6 +32,10 @@ columns:
     description: Unique identifier of the company in Rede QuintoAndar associated with the listing. Can be joined with dw_rede.dim_company
     lineage:
       - datalake_search_session_event.search_session_event.sk_company
+  sk_broker:
+    description: Surrogate key of the 3P broker partner for the supply-side company of the listing. Joinable with dw_brokers.dim_broker. Returns -1 when the listing is not associated with a 3P broker (i.e. 1P listings or companies without active 3P products).
+    lineage:
+      - core_brokers.brokers.sk_broker
   sk_session:
     description: Unique identifier of the search session. A session starts after 5 minutes of no events, or a change in business context.
     lineage:
