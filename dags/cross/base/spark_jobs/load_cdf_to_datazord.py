@@ -82,7 +82,7 @@ def main():
             "kafka.security.protocol": "SASL_SSL",
             "kafka.sasl.mechanism": "PLAIN",
             "kafka.sasl.jaas.config": f'org.apache.kafka.common.security.plain.PlainLoginModule required username="{kafka_api_key}" password="{kafka_api_secret}";',
-            "kafka.max.request.size": "2097152" # 2 MB
+            "kafka.max.request.size": "4194304" # 4 MB
         },
         checkpoint_location=args.checkpoint_location,
         entity=args.entity,
