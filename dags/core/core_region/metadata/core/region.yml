@@ -4,7 +4,12 @@ domain: Data Platform
 owner: gustavo.alencar@quintoandar.com.br
 description: Region Core Model that provides a consolidated view of regions with business context.
   It only contains regions that have country information associated with it.
- 
+context_defining_tables:
+  - datalake_ebdb_clean.region
+  - datalake_ebdb_clean.state
+  - datalake_ebdb_clean.country
+  - datalake_ebdb_clean.region_business_contexts_served
+  - datalake_ebdb_clean.region_config
 columns:
   sk_core_region:
     lineage:

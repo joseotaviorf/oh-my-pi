@@ -7,6 +7,7 @@ from scripts.ci_cd.source_layer_validation.dag_source_paths import (  # noqa: E4
     dag_has_new_declaration,
     dag_requires_strict_validation,
     is_source_artifact_rel_path,
+    list_added_metadata_files,
     list_added_source_artifacts,
 )
 
@@ -28,6 +29,17 @@ def test_list_added_source_artifacts():
     }
     got = list_added_source_artifacts(dag, changed)
     assert got == ["dags/domain/my_dag/queries/clean/a.sql"]
+
+
+def test_list_added_metadata_files():
+    dag = "dags/domain/my_dag"
+    changed = {
+        "dags/domain/my_dag/metadata/clean/x.yml": "A",
+        "dags/domain/my_dag/metadata/clean/old.yml": "M",
+        "dags/domain/my_dag/queries/clean/a.sql": "A",
+    }
+    got = list_added_metadata_files(dag, changed)
+    assert got == ["dags/domain/my_dag/metadata/clean/x.yml"]
 
 
 def test_new_declaration_triggers_strict():

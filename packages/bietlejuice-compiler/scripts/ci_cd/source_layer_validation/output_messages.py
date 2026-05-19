@@ -101,3 +101,73 @@ def print_warning_footer():
     print(MATRIX_POINTER)
     print("")
     print_separator()
+
+
+CORE_COVERAGE_POINTER = (
+    "Use the Core Model output column instead of reading directly from the clean source."
+)
+
+
+def _print_core_coverage_violations(
+    violations_by_file: Mapping[str, List[Tuple[str, str, str]]],
+) -> None:
+    for path in sorted(violations_by_file.keys()):
+        print("File: {}".format(path))
+        for output_col, clean_lineage, core_fqn in violations_by_file[path]:
+            print(
+                "- Column `{}` has lineage from `{}`, which is already covered"
+                " by Core Model as `{}`. Use the Core Model output instead.".format(
+                    output_col, clean_lineage, core_fqn
+                )
+            )
+        print("")
+
+
+def print_core_coverage_failure_opening(
+    dag_name: str,
+    violations_by_file: Mapping[str, List[Tuple[str, str, str]]],
+) -> None:
+    print("")
+    print_separator()
+    print("")
+    print("❌ Core Model coverage check failed.")
+    print(
+        "   New metadata file(s) declare lineage from clean source columns that are"
+        " already modelled by a Core Model."
+    )
+    print("")
+    print("DAG: {}".format(dag_name))
+    print_separator()
+    print("")
+    _print_core_coverage_violations(violations_by_file)
+
+
+def print_core_coverage_failure_footer() -> None:
+    print(RESOLVE_LINE)
+    print("")
+    print(CORE_COVERAGE_POINTER)
+    print("")
+    print_separator()
+
+
+def print_core_coverage_warning_opening(
+    dag_name: str,
+    violations_by_file: Mapping[str, List[Tuple[str, str, str]]],
+) -> None:
+    print("")
+    print_separator()
+    print(
+        "⚠️ Core Model coverage warning: existing metadata file(s) declare lineage"
+        " from clean source columns already modelled by a Core Model."
+    )
+    print("")
+    print("DAG: {}".format(dag_name))
+    print_separator()
+    print("")
+    _print_core_coverage_violations(violations_by_file)
+
+
+def print_core_coverage_warning_footer() -> None:
+    print(CORE_COVERAGE_POINTER)
+    print("")
+    print_separator()

@@ -31,8 +31,13 @@ from scripts.ci_cd.source_layer_validation.dag_reference_extractors import (
     extract_tables_by_source_file,
 )
 from scripts.ci_cd.source_layer_validation import output_messages
+from scripts.ci_cd.source_layer_validation.core_model_registry import (
+    build_core_model_registry,
+    CoreColumnEntry,
+)
 from scripts.ci_cd.source_layer_validation.dag_source_paths import (
     dag_requires_strict_validation,
+    list_added_metadata_files,
     list_added_source_artifacts,
 )
 from scripts.ci_cd.source_layer_validation.layer_classifier import (
@@ -148,6 +153,35 @@ def find_all_dag_roots() -> List[str]:
     return sorted(roots)
 
 
+def _core_coverage_violations_by_metadata_file(
+    dag_root: Path,
+    registry: Dict[str, CoreColumnEntry],
+) -> Dict[str, List[Tuple[str, str, str]]]:
+    """
+    Scan ``metadata/**/*.yml`` under dag_root and return:
+        metadata_file_path -> [(output_col, clean_lineage_fqn, core_fqn)]
+    for columns whose lineage entries appear in the core model registry.
+    """
+    out: Dict[str, List[Tuple[str, str, str]]] = {}
+    for meta_file in sorted(dag_root.glob("metadata/**/*.yml")):
+        try:
+            raw = yaml.safe_load(meta_file.read_text()) or {}
+        except Exception as e:
+            print(f"Warning: Failed to read or parse metadata file {meta_file}: {e}")
+            continue
+        violations: List[Tuple[str, str, str]] = []
+        for col_name, col_data in (raw.get("columns") or {}).items():
+            for lineage_entry in (col_data or {}).get("lineage") or []:
+                if not isinstance(lineage_entry, str):
+                    continue
+                entry = registry.get(lineage_entry)
+                if entry:
+                    violations.append((col_name, lineage_entry, entry.core_fqn))
+        if violations:
+            out[str(meta_file)] = violations
+    return out
+
+
 def _violations_by_source_file(
     tables_by_file: Dict[str, Set[str]], allowed_layers: Iterable[str]
 ) -> Dict[str, List[Tuple[str, str]]]:
@@ -188,6 +222,8 @@ def run_validation(
 
     any_strict_fail = False
     had_warnings = False
+
+    core_registry = build_core_model_registry()
 
     for dag_root in dag_roots:
         dag_name = Path(dag_root).name
@@ -286,6 +322,45 @@ def run_validation(
                 violations_by_path,
             )
             output_messages.print_warning_footer()
+
+        # Core model coverage check — skip core DAGs (they ARE the core models)
+        if layer != "core" and core_registry:
+            core_violations = _core_coverage_violations_by_metadata_file(
+                dr, core_registry
+            )
+            if core_violations:
+                meta_added = list_added_metadata_files(dag_root, changed_files)
+                meta_added_set = {_normalize_repo_rel_path(p) for p in meta_added}
+
+                core_violations_new = {
+                    k: core_violations[k]
+                    for k in core_violations
+                    if _normalize_repo_rel_path(k) in meta_added_set
+                }
+                core_violations_pre = {
+                    k: core_violations[k]
+                    for k in core_violations
+                    if _normalize_repo_rel_path(k) not in meta_added_set
+                }
+
+                if core_violations_new:
+                    any_strict_fail = True
+                    output_messages.print_core_coverage_failure_opening(
+                        dag_name, core_violations_new
+                    )
+                    output_messages.print_core_coverage_failure_footer()
+                    if core_violations_pre:
+                        had_warnings = True
+                        output_messages.print_core_coverage_warning_opening(
+                            dag_name, core_violations_pre
+                        )
+                        output_messages.print_core_coverage_warning_footer()
+                elif core_violations_pre:
+                    had_warnings = True
+                    output_messages.print_core_coverage_warning_opening(
+                        dag_name, core_violations_pre
+                    )
+                    output_messages.print_core_coverage_warning_footer()
 
     return not any_strict_fail, had_warnings
 

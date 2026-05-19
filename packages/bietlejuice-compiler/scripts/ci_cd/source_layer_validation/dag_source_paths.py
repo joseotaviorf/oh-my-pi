@@ -58,6 +58,31 @@ def dag_has_new_declaration(dag_root: str, changed_files: dict) -> bool:
     return changed_files.get(decl) == "A"
 
 
+def list_added_metadata_files(
+    dag_root: str, changed_files: dict, added_status: str = "A"
+) -> List[str]:
+    """
+    Repo-relative paths that are newly added (status ``A``) metadata YAMLs
+    under dag_root.
+
+    Mirrors ``list_added_source_artifacts`` but targets ``metadata/**/*.yml``
+    — kept separate because the existing added_set never contains metadata
+    paths (``is_source_artifact_rel_path`` explicitly excludes them).
+    """
+    prefix = _norm_dag_root_prefix(dag_root)
+    out: List[str] = []
+    for path, status in changed_files.items():
+        if status != added_status:
+            continue
+        if not path.startswith(prefix):
+            continue
+        rel = path[len(prefix):]
+        p = Path(rel)
+        if p.parts and p.parts[0] == "metadata" and p.suffix.lower() in (".yml", ".yaml"):
+            out.append(path)
+    return sorted(out)
+
+
 def dag_requires_strict_validation(dag_root: str, changed_files: dict) -> bool:
     """
     Strict CI failure path: new DAG (new declaration) or any new source artifact.
