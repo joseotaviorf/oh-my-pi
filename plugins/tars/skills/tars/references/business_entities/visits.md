@@ -78,14 +78,13 @@ Before answering any visit question, decide which lens applies:
 - Join **`dim_post_visit_demand`** to understand why a completed visit did not generate a proposal (qualitative feedback).
 - Check the **`dw_visit.dim_visit.computed_status`** to distinguish between "DONE" visits and "UNSUCCESSFUL" visits (where a visit was attempted but failed).
 - Include a partition guard (e.g., `ts_visit >= CURRENT_DATE - INTERVAL '6' MONTHS`) to optimize query performance.
-- Use the **`dw_visit.dim_visit`** to enrich the schedule tables for fields that don't change between schedules (e.g., visit_code, business_context).
+- Use the **`dw_visit.dim_visit`** to enrich the schedule tables for fields that don't have change between schedules (e.g., visit_code, business_context).
 
 **Don't:**
 
 - Don't count `sk_schedule` as unique visits; a user may reschedule the same visit 3 times, generating 4 schedules but only 1 `sk_visit`.
 - Don't assume `visit_status = 'cancelled'` implies a system error; use `cancel_reason` to distinguish between demand-led, supply-led, or broker-led cancellations.
 - Don't mix `house_entrance` data with visit status without validating if the entrance model was available at the time of the visit.
-- Don't use the **`dw_visit.dim_visit`** to enrich the schedule tables when the fields from dim_visit can change between the schedules (e.g., each schedule can be confirmed while the confirmation field from dim_visit is about the last schedule).
 
 ## Golden queries
 
@@ -153,12 +152,12 @@ SELECT
     SUM(fv.num_visit_completed) AS vc_by_agent,
     SUM(fv.num_visit_unsuccessful_by_demand) AS vu_by_demand,
     SUM(CAST(fv.num_visit_unsuccessful_by_demand AS DOUBLE)) / SUM(CAST(fv.num_visit_completed AS DOUBLE)) AS vc_contested_rate
-FROM dw_visits.fact_visits AS fv
+FROM dw_visit.fact_visits AS fv
 JOIN dw_visit.dim_visit AS dv
   ON fv.sk_visit = dv.sk_visit
 JOIN dw_visit.dim_post_visit_demand AS pvd
   ON fv.sk_post_visit_demand = pvd.sk_visit
 WHERE dv.ts_visit >= CURRENT_DATE - INTERVAL '60' DAY
 AND dv.is_visit_completed
-GROUP BY 1
+GROUP BY 1;
 ```
