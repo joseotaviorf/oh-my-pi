@@ -182,6 +182,26 @@ columns:
     description: Number of contract signed.
     lineage:
       - datalake_visit.dim_visit_funnel.sk_visit_funnel
+  num_post_visit_demand:
+    description: Number of post visit demand.
+    lineage:
+      - datalake_visit.dim_post_visit_demand.sk_visit
+  num_visit_completed_by_demand:
+    description: Number of visit completed by demand.
+    lineage:
+      - datalake_visit.dim_post_visit_demand.is_visit_completed_by_demand
+  num_visit_unsuccessful_by_demand:
+    description: Number of visit unsuccessful by demand.
+    lineage:
+      - datalake_visit.dim_post_visit_demand.is_visit_unsuccessful_by_demand
+  num_visit_canceled_by_demand:
+    description: Number of visit canceled by demand.
+    lineage:
+      - datalake_visit.dim_post_visit_demand.is_visit_canceled_by_demand
+  num_visit_not_canceled_by_demand:
+    description: Number of visit not canceled by demand.
+    lineage:
+      - datalake_visit.dim_post_visit_demand.is_visit_not_canceled_by_demand
   is_confirmed:
     description: If the visit is confirmed. Will be deprecated.
     lineage:
