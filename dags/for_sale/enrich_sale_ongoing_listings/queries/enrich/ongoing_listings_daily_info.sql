@@ -220,26 +220,24 @@ LEFT JOIN
         AND pred.is_last_prediction_of_day
         AND pred.business_context = 'SALE'
 LEFT JOIN
-    datalake_rede_house_history.rede_house_history AS rhh
-        ON dol.id_house = rhh.id_house
-        AND rhh.is_3p_supply
-        AND rhh.business_context = 'SALE'
-        AND dol.dt_snapshot BETWEEN rhh.ts_status_started AND COALESCE(rhh.ts_status_ended, NOW())
+    datalake_ebdb_listing.house AS h
+        ON dol.id_house = h.id
+        AND h.is_sale_3p_supply
 LEFT JOIN
     datalake_company.company_sks AS cs_supply
         ON (
-            rhh.uuid_company IS NOT NULL
-            AND rhh.uuid_company = cs_supply.uuid_company
+            h.uuid_company IS NOT NULL
+            AND h.uuid_company = cs_supply.uuid_company
         )
         OR (
-            rhh.uuid_company IS NULL
-            AND rhh.id_company_hubspot IS NOT NULL
-            AND rhh.id_company_hubspot = cs_supply.id_hubspot
+            h.uuid_company IS NULL
+            AND h.id_company_hubspot IS NOT NULL
+            AND h.id_company_hubspot = cs_supply.id_hubspot
         )
         OR (
-            rhh.uuid_company IS NULL
-            AND rhh.id_company_hubspot IS NULL
-            AND rhh.partner_3p_supply = cs_supply.extracted_3p_tag
+            h.uuid_company IS NULL
+            AND h.id_company_hubspot IS NULL
+            AND h.partner_3p_supply = cs_supply.extracted_3p_tag
         )
 QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY dol.id_sale_listing, dol.id_snapshot_date ORDER BY lpc.ts_price_started DESC, rhh.ts_status_started DESC) = 1
+    ROW_NUMBER() OVER(PARTITION BY dol.id_sale_listing, dol.id_snapshot_date ORDER BY lpc.ts_price_started DESC) = 1

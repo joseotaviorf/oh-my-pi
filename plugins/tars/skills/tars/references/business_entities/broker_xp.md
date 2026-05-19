@@ -443,7 +443,7 @@ Mixing the two without splitting hides which effect (server default vs ranking) 
 | `dw_rede_supply` | `dw_3p_supply` |
 | `enrich_rede_supply` | `enrich_3p_supply` |
 | `enrich_brokers_supply_processor` | `enrich_3p_supply` |
-| `dags/3p_partners/enrich_rede_house_history` | (deprecated — bridge supply via `dw_3p_supply.fact_lead_3p_flows.sk_house` to House facts) |
+| `dags/3p_partners/enrich_rede_house_history` | (removed — use `datalake_ebdb_listing.house` for current 3P attribution; bridge supply via `dw_3p_supply.fact_lead_3p_flows.sk_house` for funnel/ts analytics) |
 | `sk_company` (as broker identifier) | `sk_broker` |
 | `hubspot_member_category` (HubSpot tier) | `dim_broker_products.tier_name` / `dim_broker_tier_history` |
 | `is_active_company_rede_partner` | `dim_broker.is_3p_active_broker` |
