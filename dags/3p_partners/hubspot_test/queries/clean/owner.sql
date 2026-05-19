@@ -15,3 +15,5 @@ SELECT
     DAY(updated_at) AS day
 FROM
     datalake_hubspot_test_raw.owner
+WHERE
+    ts_load BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

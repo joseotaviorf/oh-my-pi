@@ -1,0 +1,23 @@
+---
+table_name: datalake_hubspot_test_clean.communication
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -50
+    less_than_or_equal_to: 100
+    severity_level: Warning
+
+column_level_validations:
+  id_communication:
+    is_complete:
+      severity_level: Error
+    custom:
+      # Composite uniqueness (id_communication, ts_updated): clean preserves every raw
+      # update, so the pair must remain unique even across reprocesses.
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_hubspot_test_clean.communication GROUP BY id_communication, ts_updated HAVING COUNT(*) > 1)) = 0"
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error

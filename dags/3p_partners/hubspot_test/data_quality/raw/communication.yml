@@ -1,0 +1,23 @@
+---
+table_name: datalake_hubspot_test_raw.communication
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -50
+    less_than_or_equal_to: 100
+    severity_level: Warning
+
+column_level_validations:
+  id:
+    is_complete:
+      severity_level: Error
+    custom:
+      # Composite uniqueness (id, updated_at): the raw layer is append-only and
+      # merge_on=[id, updated_at] must prevent duplicates per ingestion run.
+      constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_hubspot_test_raw.communication GROUP BY id, updated_at HAVING COUNT(*) > 1)) = 0"
+      severity_level: Error
+  updated_at:
+    is_complete:
+      severity_level: Error
