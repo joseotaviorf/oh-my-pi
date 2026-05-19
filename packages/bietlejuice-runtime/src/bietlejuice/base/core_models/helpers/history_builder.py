@@ -63,10 +63,24 @@ class HistoryBuilder:
         HistoryBuilder._validate_event_configs(event_configs)
 
         tracked_cols = [ec["tracked_col"] for ec in event_configs]
+        json_derived_columns = HistoryBuilder._extract_json_derived_columns(
+            event_configs
+        )
+        raw_tracked_cols = [
+            col_name
+            for col_name in tracked_cols
+            if col_name not in json_derived_columns
+        ]
+        source_cols = [source_col for source_col, _ in json_derived_columns.values()]
         id_entity_col = f"id_{entity_name}"
 
-        cols_to_select = list({id_col, ts_col, op_col} | set(tracked_cols))
+        cols_to_select = list(
+            {id_col, ts_col, op_col} | set(raw_tracked_cols) | set(source_cols)
+        )
         df_source = df.select(*[F.col(c) for c in cols_to_select])
+        df_source = HistoryBuilder._materialize_json_derived_columns(
+            df_source, json_derived_columns
+        )
 
         spark = df_source.sparkSession
         shuffle_partitions = int(spark.conf.get("spark.sql.shuffle.partitions", "200"))
@@ -117,7 +131,42 @@ class HistoryBuilder:
             missing = HistoryBuilder.REQUIRED_EVENT_CONFIG_KEYS - set(ec.keys())
             if missing:
                 raise ValueError(f"event_configs[{i}] missing required keys: {missing}")
+            has_json_path = "json_path" in ec
+            has_source_col = "source_col" in ec
+            if has_json_path != has_source_col:
+                raise ValueError(
+                    f"event_configs[{i}] must declare both 'source_col' and "
+                    f"'json_path' when using JSON-derived tracking"
+                )
             resolve_event_name(ec, index=i)
+
+    @staticmethod
+    def _extract_json_derived_columns(
+        event_configs: List[Dict[str, str]],
+    ) -> Dict[str, Tuple[str, str]]:
+        """Extract JSON-derived tracked columns declared in event_configs.
+
+        Returns a dict mapping tracked_col → (source_col, json_path).
+        Only entries that explicitly declare both ``source_col`` and ``json_path``
+        are included.
+        """
+        return {
+            ec["tracked_col"]: (ec["source_col"], ec["json_path"])
+            for ec in event_configs
+            if "source_col" in ec and "json_path" in ec
+        }
+
+    @staticmethod
+    def _materialize_json_derived_columns(
+        df: DataFrame,
+        json_derived_columns: Dict[str, Tuple[str, str]],
+    ) -> DataFrame:
+        """Materialize tracked columns derived from JSON payload fields."""
+        for tracked_col, (source_col, json_path) in json_derived_columns.items():
+            df = df.withColumn(
+                tracked_col, F.get_json_object(F.col(source_col), json_path)
+            )
+        return df
 
     @staticmethod
     def _extract_default_values(

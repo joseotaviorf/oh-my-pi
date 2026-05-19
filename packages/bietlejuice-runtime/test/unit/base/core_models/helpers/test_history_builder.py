@@ -37,6 +37,26 @@ DEFAULT_VALUE_EVENT_CONFIGS = [
     }
 ]
 
+JSON_DERIVED_SCHEMA = StructType(
+    [
+        StructField("id", StringType(), True),
+        StructField("contractRentModel", StringType(), True),
+        StructField("op_cdc", StringType(), True),
+        StructField("ts_database_transaction", TimestampType(), True),
+    ]
+)
+
+JSON_DERIVED_EVENT_CONFIGS = [
+    {
+        "tracked_col": "rentalAdministrator",
+        "source_col": "contractRentModel",
+        "json_path": "$.rentalAdministrator",
+        "target_col": "rental_administrator",
+        "target_type": "string",
+        "default_value": "QUINTOANDAR",
+    }
+]
+
 
 EXPECTED_COLUMNS = {
     "id_event",
@@ -457,6 +477,29 @@ class TestHistoryBuilderEdgeCases:
                 event_configs=[{"tracked_col": "status"}],
             )
 
+    def test_json_derived_config_requires_source_col_and_json_path(
+        self, transactional_insert_df
+    ):
+        # act / assert -- json_path without source_col should fail fast
+        with pytest.raises(
+            ValueError, match="must declare both 'source_col' and 'json_path'"
+        ):
+            HistoryBuilder.build_history_for_columns(
+                transactional_insert_df,
+                entity_name="contract",
+                id_col="id",
+                ts_col="ts_database_transaction",
+                op_col="op_cdc",
+                event_configs=[
+                    {
+                        "tracked_col": "rentalAdministrator",
+                        "json_path": "$.rentalAdministrator",
+                        "target_col": "rental_administrator",
+                        "target_type": "string",
+                    }
+                ],
+            )
+
     def test_event_name_derived_from_target_col_when_omitted(
         self, transactional_insert_df
     ):
@@ -705,3 +748,103 @@ class TestHistoryBuilderDefaultValue:
         assert rows["ev_is_relisting_enabled"]["value"] == "false"
         # rent: null stays null, no default applied
         assert rows["ev_rent"]["value"] is None
+
+
+class TestHistoryBuilderJsonDerivedField:
+    """Tests for event_configs entries that derive tracked values from JSON paths."""
+
+    def _build(self, spark_session, data):
+        df = spark_session.createDataFrame(data, JSON_DERIVED_SCHEMA)
+        return HistoryBuilder.build_history_for_columns(
+            df,
+            entity_name="contract",
+            id_col="id",
+            ts_col="ts_database_transaction",
+            op_col="op_cdc",
+            event_configs=JSON_DERIVED_EVENT_CONFIGS,
+            event_type="cdc",
+            event_origin=SOURCE_TABLE,
+        )
+
+    def test_create_with_missing_json_path_uses_default_value(self, spark_session):
+        # arrange -- missing rentalAdministrator path should fallback to QUINTOANDAR
+        data = [("10", '{"anotherField":"x"}', "c", datetime(2026, 1, 1, 8, 0, 0))]
+        result = self._build(spark_session, data)
+
+        # assert
+        rows = result.collect()
+        assert len(rows) == 1
+        assert rows[0]["event_name"] == "ev_rental_administrator"
+        assert rows[0]["value"] == "QUINTOANDAR"
+
+    def test_update_changing_json_path_value_emits_event(self, spark_session):
+        # arrange -- update changes rentalAdministrator from default to explicit value
+        data = [
+            (
+                "11",
+                '{"rentalAdministrator":"QUINTOANDAR","anotherField":"x"}',
+                "c",
+                datetime(2026, 1, 1, 8, 0, 0),
+            ),
+            (
+                "11",
+                '{"rentalAdministrator":"IMOBILIARIA","anotherField":"x"}',
+                "u",
+                datetime(2026, 1, 2, 8, 0, 0),
+            ),
+        ]
+        result = self._build(spark_session, data)
+
+        # assert
+        update_rows = [
+            r
+            for r in result.collect()
+            if r["ts_transaction"] == datetime(2026, 1, 2, 8, 0, 0)
+        ]
+        assert len(update_rows) == 1
+        assert update_rows[0]["event_name"] == "ev_rental_administrator"
+        assert update_rows[0]["value"] == "IMOBILIARIA"
+
+    def test_update_changing_other_json_fields_emits_no_event(self, spark_session):
+        # arrange -- payload changes but tracked JSON path keeps the same value
+        data = [
+            (
+                "12",
+                '{"rentalAdministrator":"QUINTOANDAR","anotherField":"x"}',
+                "c",
+                datetime(2026, 1, 1, 8, 0, 0),
+            ),
+            (
+                "12",
+                '{"rentalAdministrator":"QUINTOANDAR","anotherField":"y"}',
+                "u",
+                datetime(2026, 1, 2, 8, 0, 0),
+            ),
+        ]
+        result = self._build(spark_session, data)
+
+        # assert -- only create event, no update event for derived field
+        update_rows = [
+            r
+            for r in result.collect()
+            if r["ts_transaction"] == datetime(2026, 1, 2, 8, 0, 0)
+        ]
+        assert len(update_rows) == 0
+
+    def test_update_missing_json_path_to_missing_json_path_emits_no_event(
+        self, spark_session
+    ):
+        # arrange -- both rows fallback to QUINTOANDAR after default coalesce
+        data = [
+            ("13", '{"anotherField":"x"}', "c", datetime(2026, 1, 1, 8, 0, 0)),
+            ("13", '{"anotherField":"y"}', "u", datetime(2026, 1, 2, 8, 0, 0)),
+        ]
+        result = self._build(spark_session, data)
+
+        # assert -- effective value unchanged (QUINTOANDAR -> QUINTOANDAR)
+        update_rows = [
+            r
+            for r in result.collect()
+            if r["ts_transaction"] == datetime(2026, 1, 2, 8, 0, 0)
+        ]
+        assert len(update_rows) == 0

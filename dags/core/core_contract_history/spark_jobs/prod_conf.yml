@@ -18,6 +18,12 @@ event_configs:
   - tracked_col: contractRentModel
     target_col: contract_rent_model
     target_type: string
+  - tracked_col: rentalAdministrator
+    source_col: contractRentModel
+    json_path: "$.rentalAdministrator"
+    target_col: rental_administrator
+    target_type: string
+    default_value: "QUINTOANDAR"
   - tracked_col: paganteCondominio
     target_col: paying_condo
     target_type: string
