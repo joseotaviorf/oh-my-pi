@@ -99,6 +99,22 @@ columns:
     lineage:
       - core_brokers.brokers_product.has_opt_in_navent
     description: Navent opt-in indicator from core brokers product.
+  has_general_operation_area:
+    lineage:
+      - core_brokers.brokers_product.general_region_list
+    description: |
+      Boolean flag indicating that this broker-product relationship has at least one region
+      registered with purpose GENERAL_OPERATION_AREA in company_product_region — i.e. the
+      imobiliaria is allowed to publish listings in some region for this product. True when
+      general_region_list from core brokers_product is non-empty.
+  has_agent_operation_area:
+    lineage:
+      - core_brokers.brokers_product.agent_region_list
+    description: |
+      Boolean flag indicating that this broker-product relationship has at least one region
+      registered with purpose AGENT_OPERATION_AREA in company_product_region — i.e. the
+      imobiliaria's agents are allowed to operate in some region for this product. True when
+      agent_region_list from core brokers_product is non-empty.
   has_3p_access_control:
     description: |
       Boolean flag indicating that this row is subject to 3P Partners access control policies;

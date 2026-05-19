@@ -1,4 +1,4 @@
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import (
     array_distinct,
     array_join,
@@ -145,12 +145,42 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
         )
 
     def _process_company_product_region(self, company_product_region_df):
-        """Aggregate regions into a comma-separated string per company-product pair."""
+        """Aggregate regions per company-product pair into three comma-separated lists.
+
+        - region_list: distinct regions for any purpose (backward compatible).
+        - general_region_list: distinct regions where purpose = GENERAL_OPERATION_AREA
+          (i.e. regions where the imobiliaria is allowed to publish listings).
+        - agent_region_list: distinct regions where purpose = AGENT_OPERATION_AREA
+          (i.e. regions where the imobiliaria's agents are allowed to operate).
+        """
+        region_str = col("id_region").cast("string")
         return company_product_region_df.groupBy("id_company", "id_product").agg(
             array_join(
-                array_distinct(collect_list(col("id_region").cast("string"))),
+                array_distinct(collect_list(region_str)),
                 ",",
-            ).alias("region_list")
+            ).alias("region_list"),
+            array_join(
+                array_distinct(
+                    collect_list(
+                        when(
+                            col("purpose") == "GENERAL_OPERATION_AREA",
+                            region_str,
+                        )
+                    )
+                ),
+                ",",
+            ).alias("general_region_list"),
+            array_join(
+                array_distinct(
+                    collect_list(
+                        when(
+                            col("purpose") == "AGENT_OPERATION_AREA",
+                            region_str,
+                        )
+                    )
+                ),
+                ",",
+            ).alias("agent_region_list"),
         )
 
     def _join_all_data(
@@ -259,6 +289,8 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
             col("cp.is_3p_active_sale_broker"),
             col("cp.has_opt_in_navent"),
             col("cpr.region_list"),
+            col("cpr.general_region_list"),
+            col("cpr.agent_region_list"),
             lit(True).alias("has_3p_access_control"),
             col("c.ts_created").alias("ts_product_created"),
             col("c.ts_updated").alias("ts_product_updated"),

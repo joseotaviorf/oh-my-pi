@@ -118,6 +118,52 @@ columns:
       - core_brokers.brokers.uuid_company
     description: |
       True when at least one matching passive lead-receiver agent row exists in agent_data for the broker uuid_company.
+  has_general_operation_area:
+    lineage:
+      - core_brokers.brokers_product.general_region_list
+    description: |
+      Broker-level flag, independent of product. True when this broker has at least one region
+      registered with purpose GENERAL_OPERATION_AREA in company_product_region for any of its
+      products — i.e. the imobiliaria is allowed to publish listings in at least one region.
+  has_agent_operation_area:
+    lineage:
+      - core_brokers.brokers_product.agent_region_list
+    description: |
+      Broker-level flag, independent of product. True when this broker has at least one region
+      registered with purpose AGENT_OPERATION_AREA in company_product_region for any of its
+      products — i.e. the imobiliaria's agents are allowed to operate in at least one region.
+  has_rent_general_operation_area:
+    lineage:
+      - core_brokers.brokers_product.business_context
+      - core_brokers.brokers_product.general_region_list
+    description: |
+      True when this broker has at least one region registered with purpose
+      GENERAL_OPERATION_AREA on a RENT product — i.e. the imobiliaria is allowed to publish
+      RENT listings in at least one region.
+  has_rent_agent_operation_area:
+    lineage:
+      - core_brokers.brokers_product.business_context
+      - core_brokers.brokers_product.agent_region_list
+    description: |
+      True when this broker has at least one region registered with purpose
+      AGENT_OPERATION_AREA on a RENT product — i.e. the imobiliaria's agents are allowed to
+      operate on RENT in at least one region.
+  has_sale_general_operation_area:
+    lineage:
+      - core_brokers.brokers_product.business_context
+      - core_brokers.brokers_product.general_region_list
+    description: |
+      True when this broker has at least one region registered with purpose
+      GENERAL_OPERATION_AREA on a SALE product — i.e. the imobiliaria is allowed to publish
+      SALE listings in at least one region.
+  has_sale_agent_operation_area:
+    lineage:
+      - core_brokers.brokers_product.business_context
+      - core_brokers.brokers_product.agent_region_list
+    description: |
+      True when this broker has at least one region registered with purpose
+      AGENT_OPERATION_AREA on a SALE product — i.e. the imobiliaria's agents are allowed to
+      operate on SALE in at least one region.
   has_3p_access_control:
     description: |
       Boolean flag indicating that this row is subject to 3P Partners access control policies;

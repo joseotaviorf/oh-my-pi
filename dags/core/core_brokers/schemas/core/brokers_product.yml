@@ -125,6 +125,14 @@ columns:
     type: string
     required: false
 
+  general_region_list:
+    type: string
+    required: false
+
+  agent_region_list:
+    type: string
+    required: false
+
   has_3p_access_control:
     type: boolean
     required: true
@@ -157,6 +165,6 @@ columns:
     required: true
 
 # Schema constraints
-min_columns: 35
-max_columns: 35
+min_columns: 37
+max_columns: 37
 strict: true

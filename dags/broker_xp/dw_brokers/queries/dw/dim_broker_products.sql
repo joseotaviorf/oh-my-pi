@@ -22,6 +22,8 @@ SELECT
   cbp.is_3p_active_rent_broker,
   cbp.is_3p_active_sale_broker,
   cbp.has_opt_in_navent,
+  COALESCE(cbp.general_region_list, '') <> '' AS has_general_operation_area,
+  COALESCE(cbp.agent_region_list, '') <> '' AS has_agent_operation_area,
   TRUE AS has_3p_access_control,
   cbp.ts_product_created,
   cbp.ts_product_updated,

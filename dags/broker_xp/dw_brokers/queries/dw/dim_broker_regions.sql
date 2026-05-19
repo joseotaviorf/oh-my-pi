@@ -19,6 +19,8 @@ SELECT
   cr.state_abbreviation,
   cr.country_name,
   cr.country_default_timezone,
+  ARRAY_CONTAINS(SPLIT(COALESCE(cbp.general_region_list, ''), ','), br.sk_region) AS has_general_operation_area,
+  ARRAY_CONTAINS(SPLIT(COALESCE(cbp.agent_region_list, ''), ','), br.sk_region) AS has_agent_operation_area,
   TRUE AS has_3p_access_control,
   CURRENT_TIMESTAMP() AS ts_load
 FROM

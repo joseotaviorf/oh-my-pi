@@ -169,6 +169,25 @@ columns:
     description: >
       Array of distinct region IDs where this broker-product relationship
       operates, aggregated from the company_product_region table.
+  general_region_list:
+    lineage:
+      - datalake_company_clean.company_product_region.id_region
+      - datalake_company_clean.company_product_region.purpose
+    description: >
+      Comma-separated list of distinct region IDs where this broker-product
+      relationship has a GENERAL_OPERATION_AREA purpose registered — i.e.
+      regions where the imobiliaria is allowed to publish listings. Aggregated
+      from company_product_region filtered by purpose = GENERAL_OPERATION_AREA.
+  agent_region_list:
+    lineage:
+      - datalake_company_clean.company_product_region.id_region
+      - datalake_company_clean.company_product_region.purpose
+    description: >
+      Comma-separated list of distinct region IDs where this broker-product
+      relationship has an AGENT_OPERATION_AREA purpose registered — i.e.
+      regions where the imobiliaria's agents are allowed to operate.
+      Aggregated from company_product_region filtered by
+      purpose = AGENT_OPERATION_AREA.
   has_3p_access_control:
     description: >
       Indicates whether the broker-product row is subject to third-party access

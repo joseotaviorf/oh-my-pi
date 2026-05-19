@@ -35,6 +35,20 @@ broker_membership AS (
     datalake_brokers.broker_status_history
   GROUP BY
     sk_broker
+),
+broker_operation_areas AS (
+  SELECT
+    cbp.sk_broker,
+    MAX(CASE WHEN COALESCE(cbp.general_region_list, '') <> '' THEN TRUE ELSE FALSE END) AS has_general_operation_area,
+    MAX(CASE WHEN COALESCE(cbp.agent_region_list, '') <> '' THEN TRUE ELSE FALSE END) AS has_agent_operation_area,
+    MAX(CASE WHEN cbp.business_context = 'RENT' AND COALESCE(cbp.general_region_list, '') <> '' THEN TRUE ELSE FALSE END) AS has_rent_general_operation_area,
+    MAX(CASE WHEN cbp.business_context = 'RENT' AND COALESCE(cbp.agent_region_list, '') <> '' THEN TRUE ELSE FALSE END) AS has_rent_agent_operation_area,
+    MAX(CASE WHEN cbp.business_context = 'SALE' AND COALESCE(cbp.general_region_list, '') <> '' THEN TRUE ELSE FALSE END) AS has_sale_general_operation_area,
+    MAX(CASE WHEN cbp.business_context = 'SALE' AND COALESCE(cbp.agent_region_list, '') <> '' THEN TRUE ELSE FALSE END) AS has_sale_agent_operation_area
+  FROM
+    core_brokers.brokers_product AS cbp
+  GROUP BY
+    cbp.sk_broker
 )
 SELECT
   cb.sk_broker,
@@ -61,6 +75,12 @@ SELECT
   cb.is_3p_active_rent_broker,
   cb.is_3p_active_sale_broker,
   lga.uuid_company IS NOT NULL AS has_active_agents_in_lead_gen,
+  COALESCE(boa.has_general_operation_area, FALSE) AS has_general_operation_area,
+  COALESCE(boa.has_agent_operation_area, FALSE) AS has_agent_operation_area,
+  COALESCE(boa.has_rent_general_operation_area, FALSE) AS has_rent_general_operation_area,
+  COALESCE(boa.has_rent_agent_operation_area, FALSE) AS has_rent_agent_operation_area,
+  COALESCE(boa.has_sale_general_operation_area, FALSE) AS has_sale_general_operation_area,
+  COALESCE(boa.has_sale_agent_operation_area, FALSE) AS has_sale_agent_operation_area,
   TRUE AS has_3p_access_control,
   bm.ts_last_membership_start,
   bm.ts_last_membership_end,
@@ -95,3 +115,6 @@ LEFT JOIN
 LEFT JOIN
   broker_membership AS bm
   ON bm.sk_broker = cb.sk_broker
+LEFT JOIN
+  broker_operation_areas AS boa
+  ON boa.sk_broker = cb.sk_broker
