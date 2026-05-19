@@ -19,9 +19,9 @@ Run `git diff --name-only origin/master...HEAD` (or against `HEAD` if not yet co
 - `metadata/**/*.yml` → Metadata content check
 - `bietlejuice/**/*.py` → Style check
 
-## Step 2 — Launch four subagents in parallel
+## Step 2 — Launch subagents in parallel
 
-Use the Task tool for all seven simultaneously.
+Use the Task tool for all eight simultaneously.
 
 **Subagent A — Style check (shell):**
 ```bash
@@ -78,6 +78,16 @@ make lint
 ```
 Return: exit code, all warning/error lines. Classify as **blocking** if exit code is non-zero.
 
+**Subagent H — Source layer policy check (shell):**
+```bash
+make validate-source-layer-policy CI_COMMIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+```
+- Exit code `1` → **blocking** (new files violate layer policy or core model coverage)
+- Exit code `0` with violation output → **non-blocking but should fix** (warnings on existing files)
+- Exit code `0` with no output → clean
+
+Return: exit code, full output. Note: this check only runs when the branch touches files under `dags/`; if no DAG files are changed, the script exits 0 with a skip message.
+
 ## Step 2b — PR scope check (manual, no subagent)
 
 After gathering the changed files list from Step 1, assess whether the PR is **tightly scoped**:
@@ -107,6 +117,7 @@ Group all issues by severity:
 - DAG declaration schema errors
 - `sensitive` column in enrich/dw without `table_privileges` in the declaration
 - `sensitive` column exposed in a metric/qube output without `privacy.k_anonymity ≥ 5`
+- Source layer policy violation in **new** files (wrong layer read or clean column already covered by a Core Model) — exit code 1 from Subagent H
 
 **Non-blocking but should fix:**
 - Python convention violations
@@ -116,6 +127,7 @@ Group all issues by severity:
 - PR includes unrelated changes to shared base classes or loaders (scope creep)
 - New `SparkSession` or `SparkContext` creation instead of `getOrCreate()`
 - PR mixes multiple unrelated themes — suggest splitting into one PR per theme
+- Source layer policy warning in **existing** files (exit code 0 with output from Subagent H)
 
 For each issue: file path, line (if available), what is wrong, exact fix.
 

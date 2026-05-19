@@ -277,6 +277,38 @@ When creating SQL for new DAGs, prioritize upstream layers as follows:
 | **dw** | **`enrich` first** | `raw` / `clean` direct reads | Other `dw` only for explicit datamart DAGs |
 | **metric** | **`dw` first** | datamart `dw` tables as primary source | Use non-datamart DW models as the default source |
 
+### Core Model registry check (enrich / dw layers only)
+
+**Skip this check for `raw`, `clean`, `core`, `metric`, and `reverse` layers** — Core Model coverage only applies when the DAG reads from the `clean` layer.
+
+For `enrich` and `dw` DAGs, before writing any `FROM` clause, verify the intended clean source tables are not already fully modelled by a Core Model:
+
+```bash
+PYTHONPATH=. python3 -c "
+import json
+from scripts.ci_cd.source_layer_validation.core_model_registry import build_core_model_registry
+r = build_core_model_registry()
+tables = sorted({'.'.join(k.split('.')[:2]) for k in r})
+print(json.dumps(tables))
+"
+```
+
+This outputs the `db.table` pairs currently registered (i.e. clean tables whose columns are fully re-exposed by a `core_*` DAG). Cross-reference against the intended source tables:
+
+- **No overlap** → proceed with the SQL skeleton below.
+- **Overlap found** → present an advisory for each match before writing any SQL, e.g.:
+
+  > `datalake_ebdb_clean.region` is already modelled by Core Model `core_region`
+  > (output: `core_region.region`). Consider reading from `core_region.region` instead.
+
+  Then ask the user:
+  - **Use Core Model source** — revise the `FROM` clause to read from `core_*`; proceed with updated SQL.
+  - **Proceed with clean source** — user acknowledges; note the deviation and continue. New metadata files referencing these columns will produce a CI failure on `validate-source-layer-policy`.
+
+> **Note:** The registry only contains Core Models annotated with `context_defining_tables`
+> in their metadata YAML. An empty registry output means no Core Models are registered yet
+> and this check is a no-op.
+
 ### Skeleton for `query_delta` — enrich layer
 ```sql
 SELECT
@@ -394,6 +426,7 @@ columns:
 ```bash
 make validate-dag-declaration-files dag_name={normalized_dag_name}
 make validate-metadata-files-content
+make validate-source-layer-policy CI_COMMIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 ```
 
 Fix any errors before proceeding.
@@ -456,6 +489,7 @@ When invoking the skill:
 - [ ] Task count under 100 (job cluster workflows)
 - [ ] `default_extraction_type: full` included in workflow section (only for query_delta, custom_ingestion, core_model workflows; user can change to `incremental` if needed)
 - [ ] `default_partitions: []` included in workflow section (only for query_delta, custom_ingestion, core_model workflows; user informed to update if tables are partitioned)
+- [ ] Source layer pre-flight check passed or deviation explicitly acknowledged by user
 - [ ] Cluster right-sized via `right-size-cluster` skill (Step 7)
 
 **Additional checks for CDC DAGs:**
