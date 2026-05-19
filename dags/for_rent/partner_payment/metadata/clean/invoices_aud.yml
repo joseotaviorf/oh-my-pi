@@ -1,0 +1,74 @@
+---
+database_name: datalake_partner_payment_clean
+table_name: invoices_aud
+description: |
+  Audit history table for the invoices entity in the Partner Payment service.
+  Tracks all data changes to invoice records, with one row per revision.
+  Composite primary key: (id, rev). Used to reconstruct the historical state of any invoice at a given revision.
+owner: data-for-rent@quintoandar.com.br
+domain: For Rent
+columns:
+  id:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.id
+    description: Identifier of the audited invoice. Together with rev, forms the composite primary key.
+  uuid_blobvault_invoice:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.blobvault_invoice_id
+    description: State of the BlobVault invoice UUID captured during this specific revision.
+  uuid_blobvault_invoice_mod:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.blobvault_invoice_id_mod
+    description: State of the blobvault_invoice_id field captured during this specific revision.
+  rev:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.rev
+    description: Revision number of the audit record. Together with id, forms the composite primary key.
+  revend:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.revend
+    description: Revision number when this historical state was superseded by a newer revision. Null if this is the current state.
+  revtype:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.revtype
+    description: Type of revision action performed on the invoice record. 0 = ADD, 1 = MOD, 2 = DEL.
+  status:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.status
+    description: State of the invoice status field captured during this specific revision.
+  version:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.version
+    description: State of the record version field captured during this specific revision.
+  status_mod:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.status_mod
+    description: Boolean flag indicating whether the status field was modified in this revision.
+  version_mod:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.version_mod
+    description: Boolean flag indicating whether the version field was modified in this revision.
+  dt_upload:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.upload_date
+    description: State of the upload_date field captured during this specific revision.
+  dt_upload_mod:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.upload_date_mod
+    description: State of the upload_date field from the previous revision, used to track changes.
+  ts_created:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.created_at
+    description: State of the created_at timestamp captured during this specific revision.
+  ts_created_mod:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.created_at_mod
+    description: State of the created_at timestamp from the previous revision, used to track changes.
+  ts_updated:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.updated_at
+    description: State of the updated_at timestamp captured during this specific revision.
+  ts_updated_mod:
+    lineage:
+      - datalake_partner_payment_raw.invoices_aud.updated_at_mod
+    description: State of the updated_at timestamp from the previous revision, used to track changes.
