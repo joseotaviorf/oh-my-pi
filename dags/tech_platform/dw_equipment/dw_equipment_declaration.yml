@@ -1,0 +1,56 @@
+dag:
+  name: dw_equipment
+  owner: Tech Platform Workforce Productivity
+  catchup: false
+  schedule_interval: 0 8 * * *
+  schedule_start_date: "2026, 5, 14"
+  documentation:
+    dag_purpose: |
+      Kimball dimensional model for computer equipment leasing and allocation at QuintoAndar.
+      Source: datalake_plugify_clean (device_inventory, available_device, ticket) from plugify_api DAG.
+      Output schema: dw_equipment (custom_schema: equipment).
+      Tables:
+        - dim_equipment: Current-state device dimension (one row per serial). Hardware specs,
+          allocation state (stock_subheading, employee_email), and leasing contract details.
+          No history — always today's snapshot from clean.
+        - dim_available_device: Devices currently available for new allocation (from the
+          /tickets/available-devices endpoint). One row per available serial.
+        - fact_ticket: All ticket types. Grain: one row per ticket (current status).
+      PII: employee_tax_id (CPF) stripped at this layer. employee_email (corporate) kept as
+      join key to the people domain.
+      employee_registration_number (PIN) is always null in Plugify — employee_email is the
+      only reliable join key.
+      Cost center coverage: ~22% (Plugify data quality gap — documented in metadata).
+      Consumer note: schema is standalone; people-domain access not required.
+
+cluster:
+  type: databricks_16_4_med_general_photon_cluster
+  databricks_conn_id: databricks_new_env
+
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: equipment
+  bucket_config_name: datalake_bucket
+  has_hive_sync: false
+  default_extraction_type: full
+  default_partitions:
+    - year
+    - month
+    - day
+  inner_dependencies:
+    fact_ticket:
+      - dim_equipment
+  default_table_privileges:
+    people-analytics:
+      - ALL PRIVILEGES
+  tables_customization:
+    dim_equipment:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    dim_available_device:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    fact_ticket:
+      vacuum_retention_hours: 168
+      vacuum_lite: true

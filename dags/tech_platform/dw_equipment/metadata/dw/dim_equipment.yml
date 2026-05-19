@@ -1,0 +1,144 @@
+---
+database_name: dw_equipment
+table_name: dim_equipment
+description: >
+  Current-state dimension for physical computer devices managed through Plugify leasing.
+  Grain: one row per device (id_serial). Always reflects today's state from the daily ingestion run.
+  No history tracking — can be extended to SCD2 later if required.
+  Join key to people domain: employee_email (97% populated for allocated devices; NULL when in stock).
+  employee_registration_number (PIN) is always null in Plugify — employee_email is the only join key.
+  tax_id (CPF) stripped — not present in DW.
+  Source: datalake_plugify_clean.device_inventory.
+domain: Tech Platform
+owner: pedro.prates@quintoandar.com.br
+columns:
+  sk_equipment:
+    description: "Surrogate key. MD5 of id_serial — stable and deterministic across re-runs."
+    lineage:
+      - datalake_plugify_clean.device_inventory.serial
+  id_serial:
+    description: "Natural key. Device serial number uniquely identifying a physical hardware unit."
+    lineage:
+      - datalake_plugify_clean.device_inventory.serial
+  sku:
+    description: "Plugify SKU code identifying the device model configuration."
+    lineage:
+      - datalake_plugify_clean.device_inventory.sku
+  model:
+    description: "Full device model description (e.g. MacBook Pro 14 M3 Pro 36GB 512GB)."
+    lineage:
+      - datalake_plugify_clean.device_inventory.model
+  operating_system:
+    description: "Operating system installed on the device (e.g. macOS, Microsoft Windows 11 Pro)."
+    lineage:
+      - datalake_plugify_clean.device_inventory.operating_system
+  operating_system_version:
+    description: "Installed OS version string."
+    lineage:
+      - datalake_plugify_clean.device_inventory.operating_system_version
+  processor:
+    description: "CPU model description."
+    lineage:
+      - datalake_plugify_clean.device_inventory.processor
+  memory_gb:
+    description: "RAM size in gigabytes."
+    lineage:
+      - datalake_plugify_clean.device_inventory.memory_gb
+  hostname:
+    description: "Network hostname assigned to the device."
+    lineage:
+      - datalake_plugify_clean.device_inventory.hostname
+  device_owner:
+    description: "Legal owner of the hardware. Always Plugify for leased devices (QuintoAndar does not own the assets)."
+    lineage:
+      - datalake_plugify_clean.device_inventory.device_owner
+  contract_number:
+    description: "Leasing contract ID linking this device to a specific Plugify leasing agreement."
+    lineage:
+      - datalake_plugify_clean.device_inventory.contract_number
+  stock_subheading:
+    description: >
+      Current allocation and logistics status of the device.
+      Values: Com Cliente (allocated to employee), Em Estoque - Retornado (returned/available),
+      Em Estoque - Novo (new/available), Em Processo - Triagem, Em Processo - Retorno,
+      Em Processo - Preparacao, Em Processo - Envio (in logistics), Declarado Incidente (broken/lost).
+    lineage:
+      - datalake_plugify_clean.device_inventory.stock_subheading
+  location:
+    description: "Physical location bucket: Cliente (at employee site) or Plugify (at Plugify stock or logistics)."
+    lineage:
+      - datalake_plugify_clean.device_inventory.location
+  tracked_by:
+    description: "MDM tracking method used for this device (e.g. Geolocalizado)."
+    lineage:
+      - datalake_plugify_clean.device_inventory.tracked_by
+  document_country:
+    description: "ISO 3166-1 alpha-2 country code of the identification document associated with the assigned employee (e.g. BR). NULL when device is not allocated."
+    lineage:
+      - datalake_plugify_clean.device_inventory.document_country
+  employee_email:
+    description: >
+      Corporate email of the employee currently holding the device.
+      Primary join key to people-domain schemas. NULL when device is not allocated.
+      97% populated for allocated (Com Cliente) devices; 3% gap is a Plugify data quality issue.
+      employee_registration_number (PIN) is always null in Plugify — this is the only reliable join key.
+    lineage:
+      - datalake_plugify_clean.device_inventory.employee_email
+  employee_name:
+    description: "Display name of the employee holding the device. NULL when device is not allocated."
+    lineage:
+      - datalake_plugify_clean.device_inventory.employee_name
+  employee_cost_center_code:
+    description: "Cost center code from Plugify for the employee holding the device. Only 22% populated for allocated devices (Plugify data quality gap). Consumers needing full coverage must join to people-domain schemas."
+    lineage:
+      - datalake_plugify_clean.device_inventory.employee_cost_center_code
+  employee_department:
+    description: "Department string from Plugify for the employee. Sparsely populated."
+    lineage:
+      - datalake_plugify_clean.device_inventory.employee_department
+  employee_group:
+    description: "Group or squad string from Plugify for the employee. Sparsely populated."
+    lineage:
+      - datalake_plugify_clean.device_inventory.employee_group
+  term_contract_months:
+    description: "Duration of the leasing contract term in months."
+    lineage:
+      - datalake_plugify_clean.device_inventory.term_contract_months
+  rent_price:
+    description: "Monthly leasing cost for this device in BRL."
+    lineage:
+      - datalake_plugify_clean.device_inventory.rent_price
+  dt_contract_signed:
+    description: "Date the leasing contract was signed."
+    lineage:
+      - datalake_plugify_clean.device_inventory.dt_contract_signed
+  dt_contract_started:
+    description: "Start date of the leasing contract period."
+    lineage:
+      - datalake_plugify_clean.device_inventory.dt_contract_started
+  dt_contract_ended:
+    description: "End date of the leasing contract period."
+    lineage:
+      - datalake_plugify_clean.device_inventory.dt_contract_ended
+  dt_term_started:
+    description: "Start date of the current leasing term (may differ from contract start on renewal)."
+    lineage:
+      - datalake_plugify_clean.device_inventory.dt_term_started
+  dt_term_ended:
+    description: "End date of the current leasing term."
+    lineage:
+      - datalake_plugify_clean.device_inventory.dt_term_ended
+  dt_last_contacted:
+    description: "Date of last MDM check-in for this device, as reported by Plugify."
+    lineage:
+      - datalake_plugify_clean.device_inventory.dt_last_contacted
+  dt_last_updated:
+    description: "Date when the Plugify record for this device was last updated."
+    lineage:
+      - datalake_plugify_clean.device_inventory.dt_last_updated
+  year:
+    description: "Partition column: year of the DW run that wrote this record. Derived from CURRENT_DATE at load time."
+  month:
+    description: "Partition column: month of the DW run that wrote this record. Derived from CURRENT_DATE at load time."
+  day:
+    description: "Partition column: day of the DW run that wrote this record. Derived from CURRENT_DATE at load time."

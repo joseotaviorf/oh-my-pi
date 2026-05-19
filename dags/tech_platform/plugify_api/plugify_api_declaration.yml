@@ -1,0 +1,97 @@
+dag:
+  name: plugify_api
+  owner: Tech Platform Workforce Productivity
+  callback_by_task: False
+  schedule_interval: 0 6 * * *
+  schedule_start_date: "2026, 5, 14"
+  documentation:
+    dag_purpose: |
+      Ingests Plugify computer leasing and allocation data into raw and clean layers.
+      Three endpoints: full device inventory snapshot, paginated ticket history,
+      and available-devices stock list.
+      Secret: PLUGIFY_API_KEY in the quintoandar Databricks scope, JSON format {"api_key": "..."}.
+      Raw tables are access-restricted to people-analytics. tax_id (CPF) is kept in clean
+      and will be stripped at the DW layer.
+
+cluster:
+  type: custom_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.xlarge
+    num_workers: 1
+    spark_version: 16.4.x-scala2.12
+
+workflow:
+  layer: raw
+  type: api_ingestion
+  custom_schema: plugify
+  api_base_url: https://api.plugify.com.br
+  bucket_config_name: datalake_bucket
+  credentials_scope: quintoandar
+  has_hive_sync: false
+  default_extraction_type: full
+  default_raw_partitions:
+    - year
+    - month
+    - day
+  default_clean_extraction_type: full
+  default_clean_partitions:
+    - year
+    - month
+    - day
+  default_table_privileges:
+    people-analytics:
+      - ALL PRIVILEGES
+
+  authentication:
+    strategy: api_key
+    secret_key: PLUGIFY_API_KEY
+    api_key_field: api_key
+    location: header
+    header_name: x-api-key
+
+  api_policies:
+    pagination:
+      strategy: none
+    rate_limiting:
+      strategy: none
+
+  tables_customization:
+    device_inventory:
+      endpoint_path: customers/reports/get_report
+      results_response_path: "response"
+      extraction_type: full
+      params: {}
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
+    ticket:
+      endpoint_path: tickets/list
+      extraction_type: full
+      params: {}
+      api_policies:
+        pagination:
+          strategy: page_per_page
+          page_param: page
+          per_page_param: size
+          page_size: 100
+          results_response_path: "items"
+        rate_limiting:
+          strategy: none
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+
+    available_device:
+      endpoint_path: tickets/available-devices
+      extraction_type: full
+      params: {}
+      vacuum_retention_hours: 168
+      vacuum_lite: true

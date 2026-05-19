@@ -1,0 +1,26 @@
+SELECT
+    CAST(ticket_id AS INT) AS id_ticket,
+    CAST(employee.id AS INT) AS id_employee_plugify,
+    ticket_type,
+    status,
+    schedule_status,
+    cancellation_type,
+    cancellation_description,
+    requested_by_name,
+    employee.name AS employee_name,
+    employee.tax_id AS employee_tax_id,
+    delivery_equipment.serial_number AS delivery_serial,
+    pickup_equipment.serial_number AS pickup_serial,
+    delivery_tracking_number,
+    pickup_tracking_number,
+    CAST(kit_onboarding AS BOOLEAN) AS is_kit_onboarding,
+    DATE(agreed_date) AS dt_agreed,
+    DATE(contact_date) AS dt_contacted,
+    CAST(created_at AS TIMESTAMP) AS ts_created,
+    CAST(updated_at AS TIMESTAMP) AS ts_updated,
+    ts_load,
+    year,
+    month,
+    day
+FROM
+    datalake_plugify_raw.ticket

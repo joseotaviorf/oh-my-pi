@@ -1,0 +1,48 @@
+---
+database_name: dw_equipment
+table_name: dim_available_device
+description: >
+  Current snapshot of devices available for new employee allocation in Plugify.
+  Grain: one row per available device (id_serial). Daily full refresh.
+  This table is the direct answer to what machines do we have available today.
+  The id_serial column is a FK to dim_equipment.id_serial for hardware spec enrichment.
+  Note: not all available serials are guaranteed to appear in dim_equipment.
+  Use LEFT JOIN when enriching with hardware specs.
+  Source: datalake_plugify_clean.available_device (GET /tickets/available-devices endpoint).
+domain: Tech Platform
+owner: pedro.prates@quintoandar.com.br
+columns:
+  sk_available_device:
+    description: "Surrogate key. MD5 of id_serial — stable and deterministic across re-runs."
+    lineage:
+      - datalake_plugify_clean.available_device.serial
+  id_serial:
+    description: "Natural key. Device serial number. FK to dw_equipment.dim_equipment.id_serial for hardware spec enrichment."
+    lineage:
+      - datalake_plugify_clean.available_device.serial
+  description:
+    description: "Full model description of the available device including accessories (e.g. MacBook Air 13, M2, 8GB, 256GB SSD, +Gali Pro)."
+    lineage:
+      - datalake_plugify_clean.available_device.description
+  stock_type:
+    description: "Stock classification: NOVO (new unit never allocated) or RETORNADO (returned/refurbished unit)."
+    lineage:
+      - datalake_plugify_clean.available_device.stock_type
+  is_galipro:
+    description: "Indicates whether the device is bundled with the Gali Pro protection or insurance plan."
+    lineage:
+      - datalake_plugify_clean.available_device.is_galipro
+  dt_validity_started:
+    description: "Start date of the device validity or coverage period in Plugify stock."
+    lineage:
+      - datalake_plugify_clean.available_device.dt_validity_started
+  dt_validity_ended:
+    description: "End date of the device validity or coverage period in Plugify stock."
+    lineage:
+      - datalake_plugify_clean.available_device.dt_validity_ended
+  year:
+    description: "Partition column: year of the DW run that wrote this record. Derived from CURRENT_DATE at load time."
+  month:
+    description: "Partition column: month of the DW run that wrote this record. Derived from CURRENT_DATE at load time."
+  day:
+    description: "Partition column: day of the DW run that wrote this record. Derived from CURRENT_DATE at load time."

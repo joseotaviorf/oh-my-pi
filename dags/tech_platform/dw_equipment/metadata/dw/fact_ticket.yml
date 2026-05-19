@@ -1,0 +1,104 @@
+---
+database_name: dw_equipment
+table_name: fact_ticket
+description: >
+  Equipment service ticket fact table. Grain: one row per Plugify ticket (current status,
+  fully rebuilt on each daily run). Covers all ticket types: admission, offboarding,
+  profile_change, reposition, support, stock_return.
+  Employee linkage: delivery_serial / pickup_serial -> dim_equipment.id_serial ->
+  dim_equipment.employee_email. employee_tax_id (CPF) stripped — not present in DW.
+  Source: datalake_plugify_clean.ticket (GET /tickets/list endpoint).
+domain: Tech Platform
+owner: pedro.prates@quintoandar.com.br
+columns:
+  id_ticket:
+    description: "Plugify ticket ID. Natural primary key uniquely identifying a service request."
+    lineage:
+      - datalake_plugify_clean.ticket.id_ticket
+  id_employee_plugify:
+    description: "Plugify internal employee identifier linked to this ticket. Non-PII opaque ID. Use delivery_serial to dim_equipment.employee_email to join to the people domain."
+    lineage:
+      - datalake_plugify_clean.ticket.id_employee_plugify
+  ticket_type:
+    description: "Category of the service request. Confirmed types: admission, offboarding, profile_change, reposition, support, stock_return. new_order may also appear in historical production data."
+    lineage:
+      - datalake_plugify_clean.ticket.ticket_type
+    categories:
+      admission: "New employee receiving a device for onboarding."
+      offboarding: "Employee departure — device retrieval."
+      profile_change: "Hardware swap triggered by role or team transfer."
+      reposition: "Device reposition between employees or locations."
+      support: "Technical support ticket for a device issue."
+      stock_return: "Device returned to Plugify stock."
+      new_order: "Additional device order not tied to onboarding (historical, may not appear in current data)."
+  status:
+    description: "Current ticket lifecycle status: opened, in_progress, closed, or cancelled."
+    lineage:
+      - datalake_plugify_clean.ticket.status
+    categories:
+      opened: "Ticket has been created but not yet in progress."
+      in_progress: "Ticket is being processed by Plugify."
+      closed: "Ticket has been successfully completed."
+      cancelled: "Ticket was cancelled before completion."
+  schedule_status:
+    description: "Operational scheduling status for logistics coordination within Plugify."
+    lineage:
+      - datalake_plugify_clean.ticket.schedule_status
+  cancellation_type:
+    description: "Reason category for ticket cancellation. NULL for non-cancelled tickets."
+    lineage:
+      - datalake_plugify_clean.ticket.cancellation_type
+  cancellation_description:
+    description: "Free-text description of why the ticket was cancelled. NULL for non-cancelled tickets."
+    lineage:
+      - datalake_plugify_clean.ticket.cancellation_description
+  requested_by_name:
+    description: "Name of the person who requested or opened the ticket (may be HR, manager, or employee)."
+    lineage:
+      - datalake_plugify_clean.ticket.requested_by_name
+  employee_name:
+    description: "Display name of the employee associated with this ticket. For display purposes only."
+    lineage:
+      - datalake_plugify_clean.ticket.employee_name
+  delivery_serial:
+    description: "Serial number of the device being delivered in this ticket. FK to dim_equipment.id_serial. NULL for tickets with no delivery component."
+    lineage:
+      - datalake_plugify_clean.ticket.delivery_serial
+  pickup_serial:
+    description: "Serial number of the device being picked up in this ticket. FK to dim_equipment.id_serial. NULL for delivery-only tickets."
+    lineage:
+      - datalake_plugify_clean.ticket.pickup_serial
+  delivery_tracking_number:
+    description: "Logistics carrier tracking number for the outbound delivery shipment."
+    lineage:
+      - datalake_plugify_clean.ticket.delivery_tracking_number
+  pickup_tracking_number:
+    description: "Logistics carrier tracking number for the inbound pickup shipment."
+    lineage:
+      - datalake_plugify_clean.ticket.pickup_tracking_number
+  is_kit_onboarding:
+    description: "Boolean flag indicating whether the ticket is part of a structured onboarding kit delivery."
+    lineage:
+      - datalake_plugify_clean.ticket.is_kit_onboarding
+  dt_agreed:
+    description: "Agreed date for device delivery or collection as coordinated with the employee."
+    lineage:
+      - datalake_plugify_clean.ticket.dt_agreed
+  dt_contacted:
+    description: "Date of actual contact or collection for retrieval tickets. NULL when not yet scheduled."
+    lineage:
+      - datalake_plugify_clean.ticket.dt_contacted
+  ts_created:
+    description: "Timestamp when the ticket was first created in Plugify."
+    lineage:
+      - datalake_plugify_clean.ticket.ts_created
+  ts_updated:
+    description: "Timestamp of the most recent update to the ticket in Plugify."
+    lineage:
+      - datalake_plugify_clean.ticket.ts_updated
+  year:
+    description: "Partition column: year of the DW run that wrote this record. Derived from CURRENT_DATE at load time."
+  month:
+    description: "Partition column: month of the DW run that wrote this record. Derived from CURRENT_DATE at load time."
+  day:
+    description: "Partition column: day of the DW run that wrote this record. Derived from CURRENT_DATE at load time."

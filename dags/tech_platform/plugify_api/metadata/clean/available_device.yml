@@ -1,0 +1,51 @@
+---
+database_name: datalake_plugify_clean
+table_name: available_device
+description: >
+  Clean snapshot of devices currently available for allocation in the Plugify stock.
+  One row per available device. Daily full refresh.
+  Primary key: serial (sourced as serial_number from the API).
+  Source: GET /tickets/available-devices.
+domain: Tech Platform
+owner: pedro.prates@quintoandar.com.br
+columns:
+  serial:
+    description: "Unique hardware serial number (source field: serial_number). Natural key; FK to datalake_plugify_clean.device_inventory.serial."
+    lineage:
+      - datalake_plugify_raw.available_device.serial_number
+  description:
+    description: "Full model description of the device, including accessories (e.g. MacBook Air 13, M2, 8GB, 256GB SSD, +Gali Pro)."
+    lineage:
+      - datalake_plugify_raw.available_device.description
+  stock_type:
+    description: "Stock classification of the available device: NOVO (new unit) or RETORNADO (returned/refurbished unit)."
+    lineage:
+      - datalake_plugify_raw.available_device.stock_type
+  is_galipro:
+    description: "Indicates whether the device is bundled with the Gali Pro protection/insurance plan."
+    lineage:
+      - datalake_plugify_raw.available_device.galipro
+  dt_validity_started:
+    description: "Start date of the device's active validity/coverage period in the Plugify stock."
+    lineage:
+      - datalake_plugify_raw.available_device.begin_validity_date
+  dt_validity_ended:
+    description: "End date of the device's active validity/coverage period in the Plugify stock."
+    lineage:
+      - datalake_plugify_raw.available_device.end_validity_date
+  ts_load:
+    description: "UTC timestamp when this record was loaded into the data lake."
+    lineage:
+      - datalake_plugify_raw.available_device.ts_load
+  year:
+    description: "Partition year derived from the load timestamp."
+    lineage:
+      - datalake_plugify_raw.available_device.year
+  month:
+    description: "Partition month derived from the load timestamp."
+    lineage:
+      - datalake_plugify_raw.available_device.month
+  day:
+    description: "Partition day derived from the load timestamp."
+    lineage:
+      - datalake_plugify_raw.available_device.day

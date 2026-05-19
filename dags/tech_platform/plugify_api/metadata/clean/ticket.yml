@@ -1,0 +1,105 @@
+---
+database_name: datalake_plugify_clean
+table_name: ticket
+description: >
+  Clean snapshot of all Plugify logistics and support tickets. One row per ticket,
+  latest status from daily full dump. Covers all ticket types: admission, offboarding,
+  new_order, profile_change, support, and stock_return.
+  Primary key: id_ticket. Employee linkage flows through delivery_serial / pickup_serial
+  -> datalake_plugify_clean.device_inventory.serial.
+  Source: GET /tickets/list (paginated).
+domain: Tech Platform
+owner: pedro.prates@quintoandar.com.br
+columns:
+  id_ticket:
+    description: "Plugify internal ticket identifier. Natural primary key for this table."
+    lineage:
+      - datalake_plugify_raw.ticket.ticket_id
+  id_employee_plugify:
+    description: "Plugify internal employee identifier linked to this ticket. Non-PII; used for Plugify-internal lookups."
+    lineage:
+      - datalake_plugify_raw.ticket.employee.id
+  ticket_type:
+    description: "Category of the ticket. Values: admission, offboarding, new_order, profile_change, support, stock_return."
+    lineage:
+      - datalake_plugify_raw.ticket.ticket_type
+  status:
+    description: "Current processing status of the ticket. Values: opened, in_progress, closed, cancelled."
+    lineage:
+      - datalake_plugify_raw.ticket.status
+  schedule_status:
+    description: "Operational scheduling status used by the Plugify logistics team."
+    lineage:
+      - datalake_plugify_raw.ticket.schedule_status
+  cancellation_type:
+    description: "Reason category for cancellation. NULL when ticket is not cancelled."
+    lineage:
+      - datalake_plugify_raw.ticket.cancellation_type
+  cancellation_description:
+    description: "Free-text description of the cancellation reason. NULL when ticket is not cancelled."
+    lineage:
+      - datalake_plugify_raw.ticket.cancellation_description
+  requested_by_name:
+    description: "Full name of the person who requested the ticket (usually an HR or IT team member)."
+    lineage:
+      - datalake_plugify_raw.ticket.requested_by_name
+  employee_name:
+    description: "Display name of the employee associated with this ticket."
+    lineage:
+      - datalake_plugify_raw.ticket.employee.name
+  employee_tax_id:
+    description: "Brazilian CPF (taxpayer ID) of the employee associated with this ticket. Stripped at DW layer."
+    lineage:
+      - datalake_plugify_raw.ticket.employee.tax_id
+  delivery_serial:
+    description: "Serial number of the device to be delivered in this ticket. FK to datalake_plugify_clean.device_inventory.serial. NULL for pickup-only tickets."
+    lineage:
+      - datalake_plugify_raw.ticket.delivery_equipment.serial_number
+  pickup_serial:
+    description: "Serial number of the device to be picked up in this ticket. FK to datalake_plugify_clean.device_inventory.serial. NULL for single-device delivery tickets."
+    lineage:
+      - datalake_plugify_raw.ticket.pickup_equipment.serial_number
+  delivery_tracking_number:
+    description: "Carrier tracking number for the outbound delivery shipment."
+    lineage:
+      - datalake_plugify_raw.ticket.delivery_tracking_number
+  pickup_tracking_number:
+    description: "Carrier tracking number for the inbound pickup shipment."
+    lineage:
+      - datalake_plugify_raw.ticket.pickup_tracking_number
+  is_kit_onboarding:
+    description: "Boolean flag indicating whether the ticket is for an onboarding equipment kit."
+    lineage:
+      - datalake_plugify_raw.ticket.kit_onboarding
+  dt_agreed:
+    description: "Agreed delivery or pickup date scheduled with the employee."
+    lineage:
+      - datalake_plugify_raw.ticket.agreed_date
+  dt_contacted:
+    description: "Date when contact was made for retrieval or delivery. NULL when not yet scheduled."
+    lineage:
+      - datalake_plugify_raw.ticket.contact_date
+  ts_created:
+    description: "UTC timestamp when the ticket was first created in Plugify."
+    lineage:
+      - datalake_plugify_raw.ticket.created_at
+  ts_updated:
+    description: "UTC timestamp of the most recent update to this ticket in Plugify."
+    lineage:
+      - datalake_plugify_raw.ticket.updated_at
+  ts_load:
+    description: "UTC timestamp when this record was loaded into the data lake."
+    lineage:
+      - datalake_plugify_raw.ticket.ts_load
+  year:
+    description: "Partition year derived from the load timestamp."
+    lineage:
+      - datalake_plugify_raw.ticket.year
+  month:
+    description: "Partition month derived from the load timestamp."
+    lineage:
+      - datalake_plugify_raw.ticket.month
+  day:
+    description: "Partition day derived from the load timestamp."
+    lineage:
+      - datalake_plugify_raw.ticket.day
