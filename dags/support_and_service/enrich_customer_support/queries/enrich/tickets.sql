@@ -23,16 +23,6 @@ departments AS (
   FROM
     datalake_gsheets_clean.department_control
 ),
-session_contracts AS (
-  SELECT
-      id_session,
-      CAST(GET_JSON_OBJECT(memory, "$.basic.user.contract.deeplink.contract_id") AS BIGINT) AS id_contract
-  FROM
-    datalake_greenseer_clean.session
-  WHERE
-    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') - INTERVAL 90 DAY AND DATE('{load_end_date}')
-    AND GET_JSON_OBJECT(memory, "$.basic.user.contract.deeplink.contract_id") IS NOT NULL
-),
 incoming_tickets AS (
   SELECT
     id_ticket,
@@ -93,13 +83,15 @@ incoming_tickets AS (
 chat_tickets AS (
   SELECT
     it.id_ticket,
-    it.id_session,
+    it.twilio_task AS id_task,
     'chat' AS channel
   FROM
     incoming_tickets AS it
   INNER JOIN
     datalake_customer_support.chats AS ch
-      ON ch.id_session = it.id_session
+      ON ch.id_task = it.twilio_task
+      AND ch.ts_created >= DATE('{load_start_date}') - INTERVAL 1 MONTH
+  WHERE ch.id_task IS NOT NULL
 ),
 call_tickets AS (
   SELECT
@@ -112,10 +104,12 @@ call_tickets AS (
     datalake_customer_support.calls AS ca1
       ON ca1.id_call = it.id_call
       AND STARTSWITH(it.id_call, "CA")
+      AND ca1.ts_task_created >= DATE('{load_start_date}') - INTERVAL 1 MONTH
   LEFT JOIN
     datalake_customer_support.calls AS ca2
       ON ca2.id_task = it.id_call
       AND STARTSWITH(it.id_call, "WT")
+      AND ca2.ts_task_created >= DATE('{load_start_date}') - INTERVAL 1 MONTH
   WHERE
     ca1.id_call IS NOT NULL
     OR ca2.id_task IS NOT NULL
@@ -153,7 +147,7 @@ non_twilio_tickets AS (
 ),
 unique_twilio_tickets AS (
   SELECT
-    id_session,
+    id_task,
     channel,
     MAX(id_ticket) AS id_ticket
   FROM
@@ -194,6 +188,7 @@ tickets_per_task AS (
     t.id_contract,
     t.id_call,
     COALESCE(ch.id_session, ca1.id_session, ca2.id_session, t.id_session) AS id_session,
+    COALESCE(ch.id_sss_session, ca1.id_sss_session, ca2.id_sss_session) AS id_sss_session,
     COALESCE(
       FIRST(ch.id_task) OVER(PARTITION BY ch.id_session ORDER BY ch.ts_created DESC),
       ca1.id_task,
@@ -270,43 +265,53 @@ tickets_per_task AS (
       ON ut.id_ticket = t.id_ticket
   LEFT JOIN
     datalake_customer_support.chats AS ch
-      ON ch.id_session = t.id_session
+      ON ch.id_task = t.twilio_task
       AND ch.task_status NOT IN ('pending', 'canceled')
+      AND ch.id_task IS NOT NULL
+      AND ch.ts_created >= DATE('{load_start_date}') - INTERVAL 1 MONTH
   LEFT JOIN
     datalake_customer_support.calls AS ca1
       ON ca1.id_task = t.id_call
       AND STARTSWITH(t.id_call, "WT")
       AND ca1.is_reservation_answered IS TRUE
+      AND ca1.ts_task_created >= DATE('{load_start_date}') - INTERVAL 1 MONTH
   LEFT JOIN
     datalake_customer_support.calls AS ca2
       ON ca2.id_call = t.id_call
       AND STARTSWITH(t.id_call, "CA")
       AND ca2.is_reservation_answered IS TRUE
+      AND ca2.ts_task_created >= DATE('{load_start_date}') - INTERVAL 1 MONTH
 ), 
 twilio_attr AS (
-    SELECT DISTINCT
-      id_ticket,
-      CASE WHEN channel NOT IN ('call', 'chat')
-        THEN FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_created)
-        ELSE FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created)
-      END AS first_queue,
-      CASE WHEN channel NOT IN ('call', 'chat')
-        THEN FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_created DESC)
-        ELSE FIRST(queue) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created DESC)
-      END AS last_queue,
-      CASE WHEN channel NOT IN ('call', 'chat')
-        THEN FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_created)
-        ELSE FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created)
-      END AS first_analyst_email,
-      CASE WHEN channel NOT IN ('call', 'chat')
-        THEN FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_created DESC)
-        ELSE FIRST(analyst_email) OVER(PARTITION BY id_ticket ORDER BY ts_twilio_task_created DESC)
-      END AS last_analyst_email,
-      MAX(ts_created_twilio) OVER(PARTITION BY id_ticket) AS ts_created_twilio
-    FROM
-      tickets_per_task
-  ), 
-  ticket_twilio_data AS (
+  SELECT
+    id_ticket,
+    -- For call/chat channels, sort by ts_twilio_task_created; otherwise by ts_created.
+    -- We compute both and pick at the end based on the ticket's channel.
+    CASE
+      WHEN MAX(CASE WHEN channel IN ('call', 'chat') THEN 1 ELSE 0 END) = 1
+        THEN MIN_BY(queue, ts_twilio_task_created)
+      ELSE MIN_BY(queue, ts_created)
+    END AS first_queue,
+    CASE
+      WHEN MAX(CASE WHEN channel IN ('call', 'chat') THEN 1 ELSE 0 END) = 1
+        THEN MAX_BY(queue, ts_twilio_task_created)
+      ELSE MAX_BY(queue, ts_created)
+    END AS last_queue,
+    CASE
+      WHEN MAX(CASE WHEN channel IN ('call', 'chat') THEN 1 ELSE 0 END) = 1
+        THEN MIN_BY(analyst_email, ts_twilio_task_created)
+      ELSE MIN_BY(analyst_email, ts_created)
+    END AS first_analyst_email,
+    CASE
+      WHEN MAX(CASE WHEN channel IN ('call', 'chat') THEN 1 ELSE 0 END) = 1
+        THEN MAX_BY(analyst_email, ts_twilio_task_created)
+      ELSE MAX_BY(analyst_email, ts_created)
+    END AS last_analyst_email,
+    MAX(ts_created_twilio) AS ts_created_twilio
+  FROM tickets_per_task
+  GROUP BY id_ticket
+),
+ticket_twilio_data AS (
   SELECT DISTINCT
     ta.id_ticket,
     CASE WHEN tp.channel IN ('call', 'chat') 
@@ -333,7 +338,7 @@ twilio_attr AS (
   FROM
     twilio_attr AS ta
   LEFT JOIN tickets_per_task as tp
-ON ta.id_ticket = tp.id_ticket
+    ON ta.id_ticket = tp.id_ticket
   LEFT JOIN
     departments AS dc
       ON dc.department = ta.last_queue
@@ -347,6 +352,7 @@ tickets AS (
     t.id_contract,
     t.id_call,
     t.id_session,
+    t.id_sss_session,
     t.id_twilio,
     tq.first_queue,
     tq.last_queue,
@@ -419,7 +425,7 @@ back_tickets AS (
     tickets AS bt
   LEFT JOIN
     tickets AS ft_chat
-      ON ft_chat.id_session = bt.id_session
+      ON ft_chat.id_twilio = bt.id_twilio
       AND ft_chat.is_back_ticket IS FALSE
   LEFT JOIN
     tickets AS ft_call
@@ -543,7 +549,7 @@ ticket_sla_metrics AS (
     ticket_days_elapsed
 ),
 ticket_metrics AS (
-  SELECT DISTINCT
+  SELECT
     t.id_ticket,
     t.id_problem_ticket,
     t.id_user_main,
@@ -551,6 +557,7 @@ ticket_metrics AS (
     t.id_contract,
     t.id_call,
     t.id_session,
+    t.id_sss_session,
     t.id_twilio,
     t.first_queue,
     t.last_queue,
@@ -660,9 +667,10 @@ SELECT
   tc.id_problem_ticket,
   tc.id_user_main,
   tc.id_house,
-  COALESCE(sc.id_contract, tc.id_contract) AS id_contract,
+  tc.id_contract,
   tc.id_call,
   tc.id_session,
+  tc.id_sss_session,
   tc.id_twilio,
   tc.first_queue,
   tc.last_queue,
@@ -737,8 +745,5 @@ SELECT
   tc.day
 FROM
   ticket_metrics AS tc
-LEFT JOIN
-  session_contracts AS sc
-    ON sc.id_session = tc.id_session
 QUALIFY
   ROW_NUMBER() OVER(PARTITION BY id_ticket ORDER BY ts_updated DESC) = 1

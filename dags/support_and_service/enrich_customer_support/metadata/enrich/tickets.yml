@@ -34,6 +34,10 @@ columns:
     lineage:
       - datalake_zendesk.tickets_current.id_session
     description: Session identifier related to the ticket.
+  id_sss_session:
+    lineage:
+      - datalake_customer_support.chats.id_sss_session
+    description: Support Session Service public session identifier linked to the ticket when originated from an SSS chat.
   id_twilio:
     lineage:
       - datalake_customer_support.chats.id_task

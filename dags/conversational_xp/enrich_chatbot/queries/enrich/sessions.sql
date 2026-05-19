@@ -3,6 +3,7 @@ WITH orchestrator_sessions AS (
     cs.id AS id_session,
     cs.id_external AS id_langfuse_session,
     s.id AS id_sauron_session,
+    sss.public_id AS id_sss_session,
     cs.id_user,
     CASE
       WHEN m.channel = 'WHATSAPP_SONIA_CHAT' THEN 'sonia'
@@ -31,6 +32,10 @@ WITH orchestrator_sessions AS (
   INNER JOIN
     datalake_copilot_service_clean.message AS m
       ON m.id_session = cs.id
+  LEFT JOIN
+    datalake_support_session_service_clean.support_session AS sss
+      ON sss.id = s.id
+      AND sss.ts_updated >= DATE('{load_start_date}') - INTERVAL 1 YEAR
   WHERE
     s.ts_updated >= '{load_start_date}'
   QUALIFY
@@ -45,6 +50,7 @@ old_bot_sessions AS (
     ss.source_environment,
     ss.status,
     COALESCE(ss.user_phone, ss.user_data:["user_phone"]) AS user_phone_number,
+    sss.public_id AS id_sss_session,
     ss.ts_created,
     ss.ts_updated
   FROM
@@ -55,6 +61,10 @@ old_bot_sessions AS (
   LEFT JOIN
     datalake_copilot_service_clean.session AS cs
       ON cs.id_sauron_session = ss.id
+  LEFT JOIN
+    datalake_support_session_service_clean.support_session AS sss
+      ON sss.id = ss.id
+      AND sss.ts_updated >= DATE('{load_start_date}') - INTERVAL 1 YEAR
   WHERE
     ss.ts_updated >= '{load_start_date}'
     AND cs.id_sauron_session IS NULL
@@ -70,6 +80,7 @@ sessions AS (
     NULL AS id_session,
     id_session AS id_sauron_session,
     NULL AS id_langfuse_session,
+    id_sss_session,
     id_user,
     user_phone_number,
     bot,
@@ -85,6 +96,7 @@ sessions AS (
     id_session,
     id_sauron_session,
     id_langfuse_session,
+    id_sss_session,
     id_user,
     user_phone_number,
     bot,
@@ -154,6 +166,7 @@ SELECT
   s.id_session,
   s.id_sauron_session,
   s.id_langfuse_session,
+  s.id_sss_session,
   t.id_ticket,
   s.id_user,
   s.user_phone_number,
