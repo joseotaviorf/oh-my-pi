@@ -31,5 +31,5 @@ WHERE
     (DATE(v.ts_created) >= DATE('2026-04-13') AND (RIGHT(NULLIF(u.main_phone, ''), 3) >= 500 OR RIGHT(NULLIF(u.main_phone, ''), 3) <= 499))
     )   
     AND ( --Experiment end
-    (v.ts_created::DATE >= DATE('2026-03-20') AND business_context = 'SALE'))
+    (v.ts_created::DATE < DATE('2026-05-19') AND business_context = 'SALE'))
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11
