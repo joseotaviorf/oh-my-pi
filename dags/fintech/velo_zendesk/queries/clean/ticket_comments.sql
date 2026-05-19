@@ -6,7 +6,6 @@ SELECT
     attachments,
     body,
     plain_body,
-    event_type,
     type,
     via,
     public AS is_public,
