@@ -1,11 +1,15 @@
 """Ingest Spark event logs from S3 → Delta.
 
 Source path layout (written by every bietlejuice cluster after PR 1):
-    s3a://<databricks_bucket>/spark-event-logs/<dag_id>/eventlog-v2-<spark_app_id>/
-        <one or more gzipped JSONL files, one event per line>
+    s3a://<databricks_bucket>/spark-event-logs/<dag_id>/eventlog…<spark_app_attempt>/
+        JSONL shards (often zstd-compressed per ``spark.eventLog.compress``).
 
-The event log file format is JSONL (one JSON object per line), gzipped on the
-executor side via `spark.eventLog.compress=true`. Each line has an `Event`
+    Typical directory names include ``eventlog_v2_<id>/`` (underscore, Databricks
+    local / driver apps) and ``eventlog-v2-<id>/`` (hyphen). Parsed with
+    ``EVENTLOG_APP_ID_SEGMENT_PATTERN``.
+
+The event log file format is JSONL (one JSON object per line), compressed on the
+executor side when ``spark.eventLog.compress=true`` (often zstd in prod). Each line has an `Event`
 discriminator string identifying the event type. We extract three event types
 and join them at the (id_spark_app, id_stage, id_stage_attempt) grain:
 
@@ -46,10 +50,15 @@ from pyspark.sql.types import (
     StructField,
     StructType,
 )
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from quintoandar_logger import QuintoAndarLogger
+
+# Java regex for ``regexp_extract`` (capture group 1 = Spark application / attempt id).
+# Databricks RollingEventLogFilesWriter uses ``eventlog_v2_<id>/``; hyphenated
+# ``eventlog-v2-<id>/`` and legacy ``eventlog-<id>/`` also occur.
+EVENTLOG_APP_ID_SEGMENT_PATTERN = r"eventlog(?:[_-]v\d+)?[_-]([^/]+)/"
 
 JOB_NAME = "load_spark_stage_metrics"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -123,16 +132,16 @@ EVENT_SCHEMA = StructType(
 # These names are stable across DBR versions (Spark 3.x onward) and live in
 # org.apache.spark.executor.TaskMetrics.
 STAGE_ACCUMULATORS = {
-    "internal.metrics.executorRunTime":                  "executor_run_time_ms",
-    "internal.metrics.executorCpuTime":                  "executor_cpu_time_ns",
-    "internal.metrics.shuffle.read.localBytesRead":      "shuffle_read_local_bytes",
-    "internal.metrics.shuffle.read.remoteBytesRead":     "shuffle_read_remote_bytes",
-    "internal.metrics.shuffle.write.bytesWritten":       "shuffle_write_bytes",
-    "internal.metrics.input.bytesRead":                  "input_bytes_read",
-    "internal.metrics.output.bytesWritten":              "output_bytes_written",
-    "internal.metrics.peakExecutionMemory":              "peak_execution_memory_bytes",
-    "internal.metrics.diskBytesSpilled":                 "disk_bytes_spilled",
-    "internal.metrics.memoryBytesSpilled":               "memory_bytes_spilled",
+    "internal.metrics.executorRunTime": "executor_run_time_ms",
+    "internal.metrics.executorCpuTime": "executor_cpu_time_ns",
+    "internal.metrics.shuffle.read.localBytesRead": "shuffle_read_local_bytes",
+    "internal.metrics.shuffle.read.remoteBytesRead": "shuffle_read_remote_bytes",
+    "internal.metrics.shuffle.write.bytesWritten": "shuffle_write_bytes",
+    "internal.metrics.input.bytesRead": "input_bytes_read",
+    "internal.metrics.output.bytesWritten": "output_bytes_written",
+    "internal.metrics.peakExecutionMemory": "peak_execution_memory_bytes",
+    "internal.metrics.diskBytesSpilled": "disk_bytes_spilled",
+    "internal.metrics.memoryBytesSpilled": "memory_bytes_spilled",
 }
 
 
@@ -162,16 +171,30 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod")
     parser.add_argument("bucket", type=str, help="datalake bucket name")
-    parser.add_argument("dag_name", type=str, help="Airflow DAG name without bietlejuice prefix")
-    parser.add_argument("database_base_name", type=str, help="custom_schema (databricks_health)")
-    parser.add_argument("table_name", type=str, help="target table name (spark_stage_metrics)")
-    parser.add_argument("load_start_date", type=str, help="inclusive lower bound, ISO date")
-    parser.add_argument("load_end_date", type=str, help="exclusive upper bound, ISO date")
-    parser.add_argument("databricks_bucket", type=str, help="bucket where event logs are written")
+    parser.add_argument(
+        "dag_name", type=str, help="Airflow DAG name without bietlejuice prefix"
+    )
+    parser.add_argument(
+        "database_base_name", type=str, help="custom_schema (databricks_health)"
+    )
+    parser.add_argument(
+        "table_name", type=str, help="target table name (spark_stage_metrics)"
+    )
+    parser.add_argument(
+        "load_start_date", type=str, help="inclusive lower bound, ISO date"
+    )
+    parser.add_argument(
+        "load_end_date", type=str, help="exclusive upper bound, ISO date"
+    )
+    parser.add_argument(
+        "databricks_bucket", type=str, help="bucket where event logs are written"
+    )
     return parser.parse_args()
 
 
-def read_stage_metrics(databricks_bucket: str, load_start_date: str, load_end_date: str) -> DataFrame:
+def read_stage_metrics(
+    databricks_bucket: str, load_start_date: str, load_end_date: str
+) -> DataFrame:
     """Read Spark event logs from S3 and project per-stage-attempt metrics.
 
     Three event types contribute. SparkListenerStageCompleted is the source of
@@ -187,13 +210,21 @@ def read_stage_metrics(databricks_bucket: str, load_start_date: str, load_end_da
     raw = (
         spark.read.option("recursiveFileLookup", "true")
         .text(source_path)
-        .filter(F.col("_metadata.file_modification_time") >= F.lit(load_start_date).cast("date"))
-        .filter(F.col("_metadata.file_modification_time") < F.lit(load_end_date).cast("date"))
+        .filter(
+            F.col("_metadata.file_modification_time")
+            >= F.lit(load_start_date).cast("date")
+        )
+        .filter(
+            F.col("_metadata.file_modification_time")
+            < F.lit(load_end_date).cast("date")
+        )
         .withColumn("file_path", F.col("_metadata.file_path"))
-        .withColumn("dag_id", F.regexp_extract("file_path", r"spark-event-logs/([^/]+)/", 1))
+        .withColumn(
+            "dag_id", F.regexp_extract("file_path", r"spark-event-logs/([^/]+)/", 1)
+        )
         .withColumn(
             "id_spark_app",
-            F.regexp_extract("file_path", r"eventlog-(?:v\d+-)?([^/]+)/", 1),
+            F.regexp_extract("file_path", EVENTLOG_APP_ID_SEGMENT_PATTERN, 1),
         )
     )
 
@@ -207,8 +238,7 @@ def read_stage_metrics(databricks_bucket: str, load_start_date: str, load_end_da
     ]
 
     df_stage_completed = (
-        parsed
-        .filter(F.col("event.Event") == F.lit("SparkListenerStageCompleted"))
+        parsed.filter(F.col("event.Event") == F.lit("SparkListenerStageCompleted"))
         .filter(F.col("event.`Stage Info`").isNotNull())
         .select(
             F.col("id_spark_app"),
@@ -219,9 +249,13 @@ def read_stage_metrics(databricks_bucket: str, load_start_date: str, load_end_da
             F.col("event.`Stage Info`.`Failure Reason`").alias("stage_failure_reason"),
             F.col("event.`Stage Info`.`Number of Tasks`").alias("task_count"),
             *metric_columns,
-            F.col("event.`Stage Info`.`Failure Reason`").isNotNull().alias("is_stage_failed"),
+            F.col("event.`Stage Info`.`Failure Reason`")
+            .isNotNull()
+            .alias("is_stage_failed"),
             F.to_date(
-                F.from_unixtime(F.col("event.`Stage Info`.`Completion Time`") / F.lit(1000))
+                F.from_unixtime(
+                    F.col("event.`Stage Info`.`Completion Time`") / F.lit(1000)
+                )
             ).alias("dt_stage_completed"),
             F.from_unixtime(F.col("event.`Stage Info`.`Submission Time`") / F.lit(1000))
             .cast("timestamp")
@@ -238,8 +272,9 @@ def read_stage_metrics(databricks_bucket: str, load_start_date: str, load_end_da
     # and SUM of GC times across executors. Requires
     # spark.eventLog.logStageExecutorMetrics=true on the cluster (PR #23078).
     df_executor_metrics = (
-        parsed
-        .filter(F.col("event.Event") == F.lit("SparkListenerStageExecutorMetrics"))
+        parsed.filter(
+            F.col("event.Event") == F.lit("SparkListenerStageExecutorMetrics")
+        )
         .select(
             F.col("id_spark_app"),
             F.col("event.`Stage ID`").alias("id_stage"),
@@ -277,8 +312,7 @@ def read_stage_metrics(databricks_bucket: str, load_start_date: str, load_end_da
     # GC pause. `task_skew_ratio` collapses to NULL when the median is 0/null
     # so we don't surface a misleading "infinite skew" on near-empty stages.
     df_task_metrics = (
-        parsed
-        .filter(F.col("event.Event") == F.lit("SparkListenerTaskEnd"))
+        parsed.filter(F.col("event.Event") == F.lit("SparkListenerTaskEnd"))
         .select(
             F.col("id_spark_app"),
             F.col("event.`Stage ID`").alias("id_stage"),
@@ -310,8 +344,7 @@ def read_stage_metrics(databricks_bucket: str, load_start_date: str, load_end_da
 
     join_keys = ["id_spark_app", "id_stage", "id_stage_attempt"]
     return (
-        df_stage_completed
-        .join(df_executor_metrics, on=join_keys, how="left")
+        df_stage_completed.join(df_executor_metrics, on=join_keys, how="left")
         .join(df_task_metrics, on=join_keys, how="left")
         .select(
             F.col("id_spark_app"),
