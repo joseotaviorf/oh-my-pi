@@ -29,6 +29,10 @@ columns:
     description: "Communication type (enum, e.g., COMMS_PLATFORM)"
     lineage:
       - datalake_trato_feito_raw.communication_step.type
+  is_active:
+    description: "Indicates if the step is currently active"
+    lineage:
+      - datalake_trato_feito_raw.communication_step.active
   ts_created:
     description: "Timestamp when the step was created"
     lineage:

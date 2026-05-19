@@ -5,6 +5,7 @@ SELECT
     version,
     config,
     type,
+    CAST(COALESCE(active, FALSE) AS BOOLEAN) AS is_active,
     created_at AS ts_created,
     updated_at AS ts_updated,
     NOW() AS ts_load
