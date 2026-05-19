@@ -13,9 +13,16 @@ JOB_NAME = "load_fairness_assessment"
 
 TABLES_DOC = "datalake_documentation_metrics_clean.tables_documentation"
 COLUMNS_DOC = "datalake_documentation_metrics_clean.columns_documentation"
+COLUMNS_METASTORE = ("datalake_documentation_metrics_clean", "columns_metastore")
 ORG_CHART = "datalake_people_public.org_chart"
 
-# F1-03 / I1-01 — physical catalog via ``information_schema.columns`` (see adapters.columns_metastore).
+DAG_INVENTORY = "datalake_dag_inventory_clean.table"
+DAG_INVENTORY_DAG_PREFIX = "bietlejuice"
+DAG_INVENTORY_PRODUCTIVE_LAYERS: FrozenSet[str] = frozenset(
+    {"raw", "clean", "enrich", "dw", "core", "metric"}
+)
+
+# F1-03 / I1-01 — snapshot-based catalog signals (see adapters.columns_metastore).
 # Reason *values* kept for dashboards / SQL reports that key off these strings.
 FQN_NOT_IN_COLUMNS_METASTORE_REASON = "fqn_not_in_columns_metastore_snapshot"
 COLUMNS_METASTORE_SNAPSHOT_UNAVAILABLE_REASON = "columns_metastore_snapshot_unavailable"
@@ -301,7 +308,7 @@ MVP_IMPLEMENTED_REQUIREMENT_IDS: FrozenSet[str] = frozenset(
 PARTITION_COLUMN_NAMES_LOWERCASE: FrozenSet[str] = frozenset({"year", "month", "day"})
 
 # Bump when FAIR tiering requirement ID sets from governance change
-TIERING_RULES_VERSION = "fairness-tiering-spike-2026-04-v9"
+TIERING_RULES_VERSION = "fairness-tiering-spike-2026-04-v10"
 
 # ---------------------------------------------------------------------------
 # DataHub GraphQL: default endpoints by environment

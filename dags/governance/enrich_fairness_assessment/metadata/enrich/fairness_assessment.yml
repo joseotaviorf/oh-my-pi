@@ -4,22 +4,30 @@ table_name: fairness_assessment
 owner: vitor.carneiro@quintoandar.com.br
 domain: Data Ops & Governance
 description: >
-  Per-table FAIRness MVP assessment from documentation_metrics, columns_metastore snapshot, org_chart,
-  and DataHub GraphQL; grain one row per (database_name, table_name, year, month, day). See column descriptions below.
+  Per-table FAIRness MVP assessment scoped to productive bi-etl-ejuice tables in
+  ``datalake_dag_inventory_clean.table`` (dag like ``bietlejuice%``, layers raw/clean/enrich/dw/core/metric),
+  joined to ``documentation_metrics`` (``tables_documentation``, ``columns_documentation``),
+  ``columns_metastore`` snapshot, ``org_chart``, and DataHub GraphQL; grain one row per
+  (database_name, table_name, year, month, day). See column descriptions below.
 columns:
   database_name:
     lineage:
+      - datalake_dag_inventory_clean.table.table
       - datalake_documentation_metrics_clean.tables_documentation.database_name
-    description: Spark metastore schema name of the documented table.
+    description: Spark metastore schema name of the assessed table (from dag inventory FQN).
   table_name:
     lineage:
+      - datalake_dag_inventory_clean.table.table
       - datalake_documentation_metrics_clean.tables_documentation.table_name
-    description: Table name in the metastore schema.
+    description: Table name in the metastore schema (from dag inventory FQN).
   checks_result_json:
     description: |
       JSON map of requirement_id to {"passed": bool, "reason": string|null, optional "detail"}. **MVP gate**
       (``MVP_TIER2_SCOPED_REQUIREMENT_IDS``): F1-01, F1-02, F1-03,
-      F2-01, F4-01, A1.2-03, I1-02, **F2-02**, **I1-01**. **F2-01** — owner email present and valid format,
+      F2-01, F4-01, A1.2-03, I1-02, **F2-02**, **I1-01**. **F1-02** — detects multiple (dag, task) rows in
+      ``datalake_dag_inventory_clean.table`` producing the same FQN on the inventory partition for
+      ``load_start_date``; fails with ``duplicate_fqn_in_assessment_universe`` when ``fqn_occurrence_count > 1``.
+      **F2-01** — owner email present and valid format,
       active employee (at most one ownership failure: ``owner_missing``, ``owner_email_invalid_format``,
       ``owner_not_active_employee``), non-empty ``domain`` from ``tables_documentation`` matching the same
       CI Yamale allowlist as metadata ``domain`` (``METADATA_DOMAIN_CI_ALLOWLIST_PATTERN`` in
@@ -30,7 +38,7 @@ columns:
       (``assess_column_description_quality``) on rows from ``columns_documentation``; failure reasons
       no_column_docs_in_lake, column_description_not_substantive.
       **I1-01** — name coverage vs physical schema from the latest partition of
-      ``datalake_documentation_metrics_clean.columns_metastore`` (Information Schema snapshot); reason
+      ``datalake_documentation_metrics_clean.columns_metastore``; reason
       ``undocumented_columns`` when any non-partition field is missing from the lake; reason
       ``spark_schema_not_in_columns_metastore_snapshot`` when the FQN is absent from that snapshot;
       optional detail ``undocumented_column_names`` (business fields), ``undocumented_partition_column_names``,
@@ -46,8 +54,12 @@ columns:
       Values 3 and 4 are reserved for a future full cumulative tiering mode when the engine emits them.
   fqn_occurrence_count:
     description: |
-      Count of rows for the same (database_name, table_name) on the latest doc_dt per FQN within
-      the DAG load window (after filtering doc_dt to [load_start, load_end]); must be 1 for F1-02.
+      Number of rows in ``datalake_dag_inventory_clean.table`` (dag, task pairs) that produce this FQN on
+      the inventory partition for ``load_start_date``. Expected ``1`` (single producing pipeline); ``>1``
+      indicates conflicting ingestion tasks.
+    lineage:
+      - datalake_dag_inventory_clean.table.dag
+      - datalake_dag_inventory_clean.table.task
   is_active_employee:
     description: |
       True when normalized owner email matches org_chart.work_email for a row with assignment_status_type = 'ACTIVE'.
@@ -77,13 +89,13 @@ columns:
     description: UTC timestamp when the assessment row was produced in the Spark job.
   year:
     lineage:
-      - datalake_documentation_metrics_clean.tables_documentation.year
-    description: Partition — documentation_metrics documentation day (year).
+      - datalake_dag_inventory_clean.table.year
+    description: Partition — FAIR assessment run day (year), aligned to ``load_start_date``.
   month:
     lineage:
-      - datalake_documentation_metrics_clean.tables_documentation.month
-    description: Partition — documentation_metrics documentation day (month).
+      - datalake_dag_inventory_clean.table.month
+    description: Partition — FAIR assessment run day (month), aligned to ``load_start_date``.
   day:
     lineage:
-      - datalake_documentation_metrics_clean.tables_documentation.day
-    description: Partition — documentation_metrics documentation day (day of month).
+      - datalake_dag_inventory_clean.table.day
+    description: Partition — FAIR assessment run day (day of month), aligned to ``load_start_date``.

@@ -53,9 +53,8 @@ def compute_f2_02_and_i1_01_for_fqn(
 ) -> tuple[RequirementResult, RequirementResult, str, bool]:
     """Return (F2-02, I1-01, JSON for ``i1_01_undocumented_json``, columns_description_is_substantive).
 
-    ``spark_table_exists``: ``True`` if the FQN appears in ``information_schema.columns`` for the
-    current catalog (after join to assessed FQNs); ``False`` if absent; ``None`` if catalog resolution
-    failed (I1-01 → ``i1_01_not_assessed``).
+    ``spark_table_exists``: ``True`` if the FQN is present in the ``columns_metastore`` snapshot;
+    ``False`` if absent; ``None`` if the snapshot could not be loaded (I1-01 → ``i1_01_not_assessed``).
     """
 
     has_physical = spark_table_exists is True and len(physical_field_names_lower) > 0

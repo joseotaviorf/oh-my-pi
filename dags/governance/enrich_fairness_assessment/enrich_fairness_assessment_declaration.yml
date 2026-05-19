@@ -9,8 +9,11 @@ dag:
       on Databricks and Trino dataset URNs; interim OR: pass if indexed
       on at least one platform),
       I1-02 and A1.2-03 (A1.2-03 interim: pass iff assigned data contract on Databricks entity, same signal
-      as I1-02; future: evaluate access-policy metadata published to DataHub), on documentation_metrics
-      tables_documentation joined to org_chart; writes enrich Delta. R1.3-01/R1.3-02 are not scored from
+      as I1-02; future: evaluate access-policy metadata published to DataHub). Assessment universe is
+      ``datalake_dag_inventory_clean.table`` (``dag`` like ``bietlejuice%``, layers raw/clean/enrich/dw/core/metric),
+      left-joined to ``documentation_metrics`` ``tables_documentation`` / ``columns_documentation`` and
+      ``org_chart``; F1-02 counts (dag, task) producers per FQN in the inventory partition; F1-03 / I1-01 use
+      the ``columns_metastore`` daily snapshot (not ``information_schema``). Writes enrich Delta. R1.3-01/R1.3-02 are not scored from
       Woodpecker (no FQN join yet); proxy assumption and backlog to land CI validation results in the
       lake are documented in table metadata for this DAG.
 

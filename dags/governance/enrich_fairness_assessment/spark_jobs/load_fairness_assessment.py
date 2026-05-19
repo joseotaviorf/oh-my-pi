@@ -1,6 +1,7 @@
 """
-Spark job: FAIR assessment — ``tables_documentation`` + ``columns_documentation`` + ``org_chart``;
-``columns_metastore`` snapshot (F1-03 / I1-01), DataHub GraphQL; writes enrich Delta.
+Spark job: FAIR assessment — ``dag_inventory`` universe + ``tables_documentation`` /
+``columns_documentation`` + ``org_chart``; ``columns_metastore`` snapshot (F1-03 / I1-01),
+DataHub GraphQL; writes enrich Delta.
 
 Business rules live in :mod:`bietlejuice.governance.fairness_assessment`; this module is
 orchestration and PySpark I/O. PySpark imports stay in ``main()`` and ``_eval_partition`` so the
@@ -17,10 +18,13 @@ from datetime import datetime, timezone
 from typing import Any, Mapping, Optional
 
 from bietlejuice.governance.fairness_assessment.adapters.columns_metastore import (
-    resolve_physical_columns_from_information_schema,
+    resolve_columns_metastore_snapshot,
 )
 from bietlejuice.governance.fairness_assessment.constants import (
     COLUMNS_DOC,
+    DAG_INVENTORY,
+    DAG_INVENTORY_DAG_PREFIX,
+    DAG_INVENTORY_PRODUCTIVE_LAYERS,
     JOB_NAME,
     ORG_CHART,
     TABLES_DOC,
@@ -238,16 +242,54 @@ def main() -> None:
         F.col("month").cast("int"),
         F.col("day").cast("int"),
     )
+    load_start_dt = datetime.strptime(args.load_start_date, "%Y-%m-%d")
     load_start = F.to_date(F.lit(args.load_start_date))
     load_end = F.to_date(F.lit(args.load_end_date))
 
-    td_all = spark.table(TABLES_DOC).withColumn("doc_dt", doc_dt)
-    td = td_all.filter(F.col("doc_dt") >= load_start).filter(
+    inv_rows = (
+        spark.table(DAG_INVENTORY)
+        .filter(F.col("year") == load_start_dt.year)
+        .filter(F.col("month") == load_start_dt.month)
+        .filter(F.col("day") == load_start_dt.day)
+        .filter(F.col("dag").like(f"{DAG_INVENTORY_DAG_PREFIX}%"))
+        .filter(F.col("layer").isin(list(DAG_INVENTORY_PRODUCTIVE_LAYERS)))
+        .filter(F.col("table").isNotNull() & (F.length(F.trim(F.col("table"))) > 0))
+        .withColumn("_fqn_parts", F.split(F.col("table"), r"\."))
+        .filter(F.size(F.col("_fqn_parts")) == 2)
+        .withColumn("database_name", F.col("_fqn_parts").getItem(0))
+        .withColumn("table_name", F.col("_fqn_parts").getItem(1))
+    )
+
+    inv = (
+        inv_rows.groupBy("database_name", "table_name")
+        .agg(F.count(F.lit(1)).alias("fqn_occurrence_count"))
+        .withColumn("year", F.lit(load_start_dt.year))
+        .withColumn("month", F.lit(load_start_dt.month))
+        .withColumn("day", F.lit(load_start_dt.day))
+    )
+
+    td_docs = spark.table(TABLES_DOC).withColumn("doc_dt", doc_dt)
+    td_docs = td_docs.filter(F.col("doc_dt") >= load_start).filter(
         F.col("doc_dt") <= load_end
     )
-    per_fqn_max_dt = td.groupBy("database_name", "table_name").agg(
+    per_fqn_max_dt = td_docs.groupBy("database_name", "table_name").agg(
         F.max("doc_dt").alias("max_doc_dt"),
     )
+    td_latest_docs = (
+        td_docs.join(per_fqn_max_dt, on=["database_name", "table_name"], how="inner")
+        .filter(F.col("doc_dt") == F.col("max_doc_dt"))
+        .drop("max_doc_dt", "doc_dt")
+        .select(
+            "database_name",
+            "table_name",
+            "owner",
+            "domain",
+            "table_description",
+        )
+    )
+
+    td = inv.join(td_latest_docs, on=["database_name", "table_name"], how="left")
+
     cd_all = spark.table(COLUMNS_DOC).withColumn("doc_dt", doc_dt)
     cd_f = (
         cd_all.filter(F.col("doc_dt") >= load_start)
@@ -256,14 +298,7 @@ def main() -> None:
         .filter(F.col("doc_dt") == F.col("max_doc_dt"))
         .drop("max_doc_dt")
     )
-    td = (
-        td.join(per_fqn_max_dt, on=["database_name", "table_name"], how="inner")
-        .filter(F.col("doc_dt") == F.col("max_doc_dt"))
-        .drop("max_doc_dt")
-    )
 
-    w = Window.partitionBy("database_name", "table_name")
-    td = td.withColumn("fqn_occurrence_count", F.count(F.lit(1)).over(w))
     td = td.withColumn(
         "owner_email_normalized",
         F.lower(F.trim(F.col("owner"))),
@@ -292,18 +327,18 @@ def main() -> None:
         F.lit(True),
     )
 
-    exists_set, phys_map, catalog_resolution_tag = (
-        resolve_physical_columns_from_information_schema(spark, td)
+    exists_set, phys_map, snapshot_partition = resolve_columns_metastore_snapshot(
+        spark, args.environment, td
     )
     logger.info(
-        f"m=information_schema_catalog_used,catalog_resolution_tag={catalog_resolution_tag}"
+        f"m=columns_metastore_snapshot_used,snapshot_partition={snapshot_partition}"
     )
-    catalog_resolution_ok = catalog_resolution_tag is not None
+    snapshot_ok = snapshot_partition is not None
     exists_map: dict[tuple[str, str], Optional[bool]] = {}
     spark_probe_status_map: dict[tuple[str, str], str] = {}
     for r in td.select("database_name", "table_name").distinct().collect():
         k = (str(r["database_name"] or "").strip(), str(r["table_name"] or "").strip())
-        if not catalog_resolution_ok:
+        if not snapshot_ok:
             exists_map[k] = None
             spark_probe_status_map[k] = "snapshot_unavailable"
         elif k in exists_set:

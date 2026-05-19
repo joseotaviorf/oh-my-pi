@@ -3,7 +3,7 @@ FAIRness assessment: tiering, checks, table/column description quality, schema v
 """
 
 from bietlejuice.governance.fairness_assessment.adapters.columns_metastore import (  # noqa: E501
-    resolve_physical_columns_from_information_schema,
+    resolve_columns_metastore_snapshot,
 )
 from bietlejuice.governance.fairness_assessment.checks import (
     evaluate_mvp_checks_from_row,
@@ -22,6 +22,10 @@ from bietlejuice.governance.fairness_assessment.checks.interoperable.i1_02_data_
 )
 from bietlejuice.governance.fairness_assessment.constants import (
     COLUMNS_DOC,
+    COLUMNS_METASTORE,
+    DAG_INVENTORY,
+    DAG_INVENTORY_DAG_PREFIX,
+    DAG_INVENTORY_PRODUCTIVE_LAYERS,
     DATAHUB_CHECK_FAILED,
     DATAHUB_DATA_CONTRACT_URN_MARKER,
     DATAHUB_DATASET_FAIR_SIGNALS_QUERY,
@@ -77,6 +81,10 @@ from bietlejuice.governance.fairness_assessment.tiering import (  # noqa: E501
 
 __all__ = [
     "COLUMNS_DOC",
+    "COLUMNS_METASTORE",
+    "DAG_INVENTORY",
+    "DAG_INVENTORY_DAG_PREFIX",
+    "DAG_INVENTORY_PRODUCTIVE_LAYERS",
     "DATAHUB_CHECK_FAILED",
     "DATAHUB_DATASET_FAIR_SIGNALS_QUERY",
     "DATAHUB_DATA_CONTRACT_URN_MARKER",
@@ -123,5 +131,5 @@ __all__ = [
     "resolve_datahub_gms_base_url",
     "resolve_datahub_graphql_url",
     "resolve_datahub_urn_flags",
-    "resolve_physical_columns_from_information_schema",
+    "resolve_columns_metastore_snapshot",
 ]

@@ -17,14 +17,14 @@ def check_f1_03_addressable_fqn(
     spark_catalog_hit: Optional[bool] = None,
     spark_catalog_probe_status: Optional[str] = None,
 ) -> RequirementResult:
-    """F1-03: addressable FQN — valid Hive/Spark identifier shape and table exists in catalog.
+    """F1-03: addressable FQN — valid Hive/Spark identifier shape and table exists in catalog snapshot.
 
-    ``spark_catalog_hit`` reflects presence in ``information_schema.columns`` for this FQN
-    (joined to assessed documentation FQNs). ``True`` when columns exist for the FQN;
-    ``False`` when absent; ``None`` when catalog resolution failed (fail closed).
+    ``spark_catalog_hit`` reflects presence in the latest ``columns_metastore`` partition joined to this FQN:
+    ``True`` when the FQN appears in the snapshot; ``False`` when absent; ``None`` when the snapshot
+    could not be loaded (fail closed).
 
     ``spark_catalog_probe_status`` disambiguates: ``in_snapshot``, ``missing_in_snapshot``,
-    ``snapshot_unavailable`` (legacy labels retained for downstream consumers).
+    ``snapshot_unavailable``.
     """
     if database_name is None or table_name is None:
         return RequirementResult(
