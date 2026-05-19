@@ -1,0 +1,5 @@
+database_name: datalake_idn_raw
+table_name: identities
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+description: "Raw SailPoint IdentityNow identity export from REST API (flattened fields and JSON attributes)."

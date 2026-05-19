@@ -1,0 +1,100 @@
+database_name: datalake_idn_clean
+table_name: identities
+domain: Tech Platform
+owner: identityplatform-team@quintoandar.com.br
+description: |
+  Clean IdentityNow identities normalized from raw with typed dates/timestamps; one row per identity per ingest
+  partition (year, month, day).
+columns:
+  id_identity:
+    description: Unique identity identifier in SailPoint IdentityNow.
+    lineage:
+      - datalake_idn_raw.identities.id_identity
+  nm_identity:
+    description: Technical or login-oriented identity name in IdentityNow.
+    lineage:
+      - datalake_idn_raw.identities.nm_identity
+  nm_display:
+    description: Human-readable display name for the identity.
+    lineage:
+      - datalake_idn_raw.identities.nm_display
+  ds_work_email:
+    description: Primary work email associated with the identity.
+    lineage:
+      - datalake_idn_raw.identities.ds_work_email
+  ds_lifecycle_state:
+    description: Lifecycle state label for the identity in IdentityNow.
+    lineage:
+      - datalake_idn_raw.identities.ds_lifecycle_state
+  ds_identity_status:
+    description: Platform-reported identity status (e.g. active states).
+    lineage:
+      - datalake_idn_raw.identities.ds_identity_status
+  ds_employee_number:
+    description: Employee or workforce identifier merged from attributes when present.
+    lineage:
+      - datalake_idn_raw.identities.ds_employee_number
+  ds_cost_center:
+    description: Cost center code from identity attributes when available.
+    lineage:
+      - datalake_idn_raw.identities.ds_cost_center
+  ds_last_login_sso:
+    description: Last SSO login indicator as provided by source attributes (string form).
+    lineage:
+      - datalake_idn_raw.identities.ds_last_login_sso
+  nm_manager:
+    description: Manager name resolved from manager reference or attributes.
+    lineage:
+      - datalake_idn_raw.identities.nm_manager
+  nm_department:
+    description: Department name from identity attributes.
+    lineage:
+      - datalake_idn_raw.identities.nm_department
+  ds_worker_type:
+    description: Worker or employment type from attributes.
+    lineage:
+      - datalake_idn_raw.identities.ds_worker_type
+  nm_company:
+    description: Company name from identity attributes.
+    lineage:
+      - datalake_idn_raw.identities.nm_company
+  nm_job:
+    description: Job title or role name from attributes.
+    lineage:
+      - datalake_idn_raw.identities.nm_job
+  ds_location:
+    description: Location string from identity attributes.
+    lineage:
+      - datalake_idn_raw.identities.ds_location
+  dt_start:
+    description: Parsed employment or identity start date when provided by source.
+    lineage:
+      - datalake_idn_raw.identities.dt_start
+  dt_end:
+    description: Parsed employment or identity end date when provided by source.
+    lineage:
+      - datalake_idn_raw.identities.dt_end
+  ts_created:
+    description: Source creation timestamp for the identity record when available.
+    lineage:
+      - datalake_idn_raw.identities.ts_created
+  ts_modified:
+    description: Source last-modified timestamp for the identity record when available.
+    lineage:
+      - datalake_idn_raw.identities.ts_modified
+  js_raw_attributes:
+    description: JSON string of raw IdentityNow attributes for lineage and debugging.
+    lineage:
+      - datalake_idn_raw.identities.js_raw_attributes
+  year:
+    description: Year partition of the ingest date.
+    lineage:
+      - datalake_idn_raw.identities.year
+  month:
+    description: Month partition of the ingest date.
+    lineage:
+      - datalake_idn_raw.identities.month
+  day:
+    description: Day partition of the ingest date.
+    lineage:
+      - datalake_idn_raw.identities.day
