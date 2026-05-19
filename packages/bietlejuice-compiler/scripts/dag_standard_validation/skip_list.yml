@@ -53,6 +53,7 @@ dags_not_using_builder:
   - tech_platform/dw_devlake/tools/generate_lineage_diagram.py
   - tech_platform/dw_devlake/validation/test_with_fixtures.py
   - tech_platform/dw_devlake/validation/validate_structure.py
+  - platform/notify_stale_dags/notify_stale_dags.py
 
 database_ingestion_without_cdc:
   - brokers_supply_processor

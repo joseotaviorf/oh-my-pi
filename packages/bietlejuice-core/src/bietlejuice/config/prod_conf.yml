@@ -2011,6 +2011,7 @@ consolidation_xl_memory_single_node_cluster:
 ### Notification Configs ###
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_PROD_WEBHOOK
+    stale_dag: GCHAT_STALE_DAG_WEBHOOK
 
 vespucio_pipeline_version: "latest"
 vespucio_output_path: "s3://5a-vespucio-prod"

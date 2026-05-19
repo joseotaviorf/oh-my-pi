@@ -4014,6 +4014,10 @@ bietlejuice.enrich_ss_logic_model:
   - bietlejuice.enrich_customer_support:load-enrich-csat:first-run-of-day
   - bietlejuice.enrich_user:load-enrich-persona-type:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-department-control:first-run-of-day
+bietlejuice.enrich_stale_dags:
+  - bietlejuice.astro:load-clean-dag-run:first-run-of-day
+  - bietlejuice.astro:load-clean-dag:first-run-of-day
+  - bietlejuice.astro:load-clean-serialized-dag:first-run-of-day
 bietlejuice.enrich_superset:
   - bietlejuice.dag_inventory:load-clean-table:first-run-of-day
   - bietlejuice.superset_entities:load-clean-dashboard-slices:first-run-of-day

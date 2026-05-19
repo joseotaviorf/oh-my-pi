@@ -1,0 +1,50 @@
+---
+database_name: enrich_stale_dags
+table_name: stale_dags
+description: >
+  Active, unpaused Airflow DAGs with no successful run in the last month,
+  or whose DAG file has not been modified in 1+ months. Used as a periodic
+  tech-debt signal for the stale DAG detector (DPLT-860).
+domain: Data Life Cycle
+owner: aurelio.nogueira@quintoandar.com.br
+columns:
+  id_dag:
+    description: Unique identifier of the DAG as registered in Airflow.
+    lineage:
+      - datalake_astro_clean.dag.id_dag
+  owners:
+    description: Owner team(s) of the DAG as declared in the Airflow metadata.
+    lineage:
+      - datalake_astro_clean.dag.owners
+  schedule_interval:
+    description: Schedule interval of the DAG (cron, Dataset trigger, or null for manually triggered DAGs).
+    lineage:
+      - datalake_astro_clean.dag.schedule_interval
+  fileloc:
+    description: Absolute file path of the DAG on the Airflow worker filesystem.
+    lineage:
+      - datalake_astro_clean.dag.fileloc
+  ts_last_success:
+    description: Timestamp of the most recent successful DAG run. Null if the DAG has never completed successfully.
+    lineage:
+      - datalake_astro_clean.dag_run.ts_started
+  ts_last_serialized:
+    description: Timestamp of the last time Airflow re-serialized the DAG file, which reflects the last file modification detected by the scheduler.
+    lineage:
+      - datalake_astro_clean.serialized_dag.ts_last_updated
+  months_since_last_success:
+    description: Number of full months elapsed since the last successful run. Null if the DAG has never run successfully.
+    lineage:
+      - datalake_astro_clean.dag_run.ts_started
+  months_since_last_change:
+    description: Number of full months elapsed since the DAG file was last modified in Airflow.
+    lineage:
+      - datalake_astro_clean.serialized_dag.ts_last_updated
+  is_stale_no_recent_success:
+    description: True if the DAG has never had a successful run or its last success was more than 1 month ago.
+    lineage:
+      - datalake_astro_clean.dag_run.ts_started
+  is_stale_old_serialization:
+    description: True if the DAG file has not been updated in Airflow for more than 1 month, indicating possible git inactivity.
+    lineage:
+      - datalake_astro_clean.serialized_dag.ts_last_updated

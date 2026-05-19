@@ -1,0 +1,24 @@
+dag:
+  name: enrich_stale_dags
+  owner: Data Life Cycle
+  schedule_interval: "0 6 * * 1"
+  documentation:
+    dag_purpose: |
+      Identifies active, unpaused Airflow DAGs that have never had a successful run or
+      whose last successful run was more than 1 month ago. Surfaces tech-debt candidates
+      for the stale DAG detector (DPLT-860). Sources data from datalake_astro_clean.
+
+workflow:
+  layer: enrich
+  type: query_delta
+  custom_schema: stale_dags
+  default_extraction_type: full
+  default_partitions: []
+  tables_customization:
+    stale_dags:
+      merge_on:
+        - id_dag
+
+cluster:
+  type: databricks_16_4_small_general_fleet_xlarge_single_node
+  databricks_conn_id: databricks_new_env
