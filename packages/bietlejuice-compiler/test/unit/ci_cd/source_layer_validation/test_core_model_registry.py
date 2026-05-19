@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Unit tests for core_model_registry.build_core_model_registry.
 
@@ -16,7 +15,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[6]))
 from scripts.ci_cd.source_layer_validation.core_model_registry import (  # noqa: E402
     build_core_model_registry,
 )
-
 
 # ---------------------------------------------------------------------------
 # helpers
