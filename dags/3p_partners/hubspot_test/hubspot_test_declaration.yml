@@ -461,7 +461,7 @@ cluster:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
   custom_libraries:
-    - whl: "{artifacts_bucket}/hubspot-api-client-python/quintoandar_hubspot_api_client-0.4.0-py2.py3-none-any.whl"
+    - whl: "{artifacts_bucket}/hubspot-api-client-python/quintoandar_hubspot_api_client-0.4.1-py2.py3-none-any.whl"
   databricks_conn_id: databricks_new
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
