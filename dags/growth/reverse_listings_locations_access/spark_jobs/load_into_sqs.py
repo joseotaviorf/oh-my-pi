@@ -106,7 +106,7 @@ def row_to_dict(row) -> Dict:
         "country": row.country,
         "centroid_lat": float(row.centroid_lat),
         "centroid_lng": float(row.centroid_lng),
-        "prices": row.prices.to_json() if row.prices else None,
+        "prices": row.prices.asDict(recursive=True) if row.prices else None,
         "featured_rank": int(row.featured_rank) if row.featured_rank else None,
         "ebdb_enabled_business_contexts": row.ebdb_enabled_business_contexts if row.ebdb_enabled_business_contexts else None,
     }
