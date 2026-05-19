@@ -11,6 +11,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
+from bietlejuice.base.spark.base_spark import BaseDBUtils
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -18,6 +19,7 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "Hightouch Sync Runs Trino Load"
 RAW_PARTITION_COLUMNS = ["year", "month", "day"]
+MAX_SYNC_RUN_IDS_PER_SYNC = 100
 logger = QuintoAndarLogger(JOB_NAME)
 spark_client = SparkClient()
 spark = spark_client.conn
@@ -26,8 +28,45 @@ spark = spark_client.conn
 def _read_sync_runs_input(
     base_path: str, load_start_date: str, load_end_date: str
 ) -> Optional[DataFrame]:
-    """Reads parquet day-by-day using sync_id=*/sync_run_id=*/{YYYYMMDD}* glob to avoid
-    full partition listing across the sync_id/sync_run_id dimensions."""
+    """Reads parquet day-by-day from the most recent sync_run_id partitions per sync_id.
+
+    Lists sync_id and sync_run_id directories explicitly (capped at the latest run ids per
+    sync) instead of globbing across all partition values, then filters files by YYYYMMDD
+    prefix under each sync_run_id path.
+    """
+    dbutils = BaseDBUtils().get_dbutils()
+    sync_dirs = [
+        sync_dir.path
+        for sync_dir in dbutils.fs.ls(base_path)
+        if sync_dir.name.startswith("sync_id=")
+    ]
+    sync_run_paths = [
+        sync_run_path
+        for sync_path in sync_dirs
+        for sync_run_path in sorted(
+            [
+                run_dir.path
+                for run_dir in dbutils.fs.ls(sync_path)
+                if run_dir.name.startswith("sync_run_id=")
+            ],
+            key=lambda path: int(path.rstrip("/").split("sync_run_id=")[-1]),
+            reverse=True,
+        )[:MAX_SYNC_RUN_IDS_PER_SYNC]
+    ]
+    logger.info(
+        "m=_read_sync_runs_input, sync_dir_count={}, sync_run_path_count={}, "
+        "max_per_sync={}, msg=discovered partitions".format(
+            len(sync_dirs), len(sync_run_paths), MAX_SYNC_RUN_IDS_PER_SYNC
+        )
+    )
+    if not sync_run_paths:
+        logger.info(
+            "m=_read_sync_runs_input, base_path={}, msg=no sync_run_id partitions found".format(
+                base_path
+            )
+        )
+        return None
+
     start = datetime.strptime(load_start_date, "%Y-%m-%d")
     end = datetime.strptime(load_end_date, "%Y-%m-%d")
 
@@ -35,13 +74,18 @@ def _read_sync_runs_input(
     current = start
     while current <= end:
         date_str = current.strftime("%Y%m%d")
-        path_glob = f"{base_path}/sync_id=*/sync_run_id=*/{date_str}*"
+        paths = [f"{sync_run_path}{date_str}*" for sync_run_path in sync_run_paths]
+        logger.info(
+            "m=_read_sync_runs_input, date_str={}, path_count={}, msg=reading parquet paths".format(
+                date_str, len(paths)
+            )
+        )
         try:
-            day_df = spark.read.parquet(path_glob)
+            day_df = spark.read.parquet(*paths)
         except AnalysisException as exc:
             logger.info(
-                "m=_read_sync_runs_input, path_glob={}, msg=skipping day (no parquet): {}".format(
-                    path_glob, exc
+                "m=_read_sync_runs_input, date_str={}, msg=skipping day (no parquet): {}".format(
+                    date_str, exc
                 )
             )
             current += timedelta(days=1)
@@ -99,7 +143,6 @@ def parse_arguments():
     parser.add_argument("load_start_date", help="Load start date")
     parser.add_argument("load_end_date", help="Load end date")
     parser.add_argument("extraction_type", help="Extraction type")
-    parser.add_argument("incremental_column", help="Incremental column (unused, kept for interface parity)")
     parser.add_argument("input_path", help="Input path")
     parser.add_argument("format", help="Input format (unused, kept for interface parity)")
     return parser.parse_args()
@@ -129,7 +172,6 @@ def main():
     )
     if df is None:
         logger.info("m=main, msg=no sync_runs data in range, skipping write")
-        return
 
     _write_to_raw(
         df=df,

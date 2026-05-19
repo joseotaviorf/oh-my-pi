@@ -10,12 +10,6 @@ workflow:
   layer: raw
   load_spark_job: load_hightouch_logs_raw
   custom_schema: hightouch_logs
-  raw_inner_dependencies:
-    sync_runs_trino:
-      - audience_membership_databricks
-      - audience_membership_trino
-      - sync_runs_databricks
-      - sync_snapshot_trino
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
@@ -38,7 +32,7 @@ workflow:
       partitions: [year, month, day]
     sync_runs_trino:
       clean_z_order_by: [id_sync]
-      load_spark_job: load_hightouch_logs
+      load_spark_job: load_hightouch_sync_runs
       extra_spark_job_arguments:
         - "{environment}"
         - "{bucket}"
@@ -48,28 +42,10 @@ workflow:
         - "{load_start_date}"
         - "{load_end_date}"
         - "incremental"
-        - "started_at"
         - "s3://5a-cdp-processed-data-{environment}/repo/hightouch/hightouch_audit/sync_runs"
         - "parquet"
       extraction_type: incremental
       partitions: [year, month, day]
-    #sync_runs_trino_test:
-    #  clean_z_order_by: [id_sync]
-    #  load_spark_job: load_hightouch_sync_runs_trino
-    #  extra_spark_job_arguments:
-    #    - "{environment}"
-    #    - "{bucket}"
-    #    - "{schema}"
-    #    - "{dag_name}"
-    #    - "{table_name}"
-    #    - "{load_start_date}"
-    #    - "{load_end_date}"
-    #    - "incremental"
-    #    - "started_at"
-    #    - "s3://5a-cdp-processed-data-{environment}/repo/hightouch/hightouch_audit/sync_runs"
-    #    - "parquet"
-    #  extraction_type: incremental
-    #  partitions: [year, month, day]
     audience_membership_databricks:
       load_spark_job: load_hightouch_logs
       extra_spark_job_arguments:
