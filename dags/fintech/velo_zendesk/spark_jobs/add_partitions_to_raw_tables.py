@@ -16,6 +16,7 @@ TABLE_DB_MAPPING = {
     "organizations": "velo_zendesk_groups",
     "satisfaction_ratings": "velo_zendesk_satisfaction",
     "ticket_audits": "velo_zendesk_tickets",
+    "ticket_comments": "velo_zendesk_ticket_comments",
     "ticket_fields": "velo_zendesk_ticket_fields",
     "ticket_metrics": "velo_zendesk_tickets",
     "tickets": "velo_zendesk_tickets",

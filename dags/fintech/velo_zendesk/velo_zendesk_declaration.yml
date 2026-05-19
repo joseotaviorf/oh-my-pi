@@ -54,6 +54,9 @@ workflow:
     ticket_audits:
       extraction_type: incremental
       z_order_by: [id_ticket_audit]
+    ticket_comments:
+      extraction_type: incremental
+      z_order_by: [id_ticket]
 
 cluster:
   type: custom_cluster
