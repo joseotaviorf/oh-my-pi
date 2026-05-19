@@ -47,19 +47,19 @@ workflow:
         - "{load_start_date}"
         - "{load_end_date}"
         - "{{ var.value.databricks_s3_bucket }}"
-      partitions: [ dt_stage_completed ]
+      partitions: [dt_stage_completed]
       table_privileges:
         data-platform-engineers:
           - ALL PRIVILEGES
   extra_query_template_params:
-    load_start_date:   "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
-    load_end_date:     "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds,  1), 'load_end_date') }}"
-    environment:       "{{ var.value.environment }}"
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds,  1), 'load_end_date') }}"
+    environment: "{{ var.value.environment }}"
 cluster:
-  type: consolidation_s_general_single_node_cluster
+  type: consolidation_m_compute_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
