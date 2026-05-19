@@ -11,7 +11,7 @@ WITH concierge_direct_vb_code AS (
         ON c.id_langfuse_session = t.id_session
     JOIN datalake_langfuse_clean.observations AS o
         ON t.id_trace = o.id_trace
-    WHERE o.name = 'schedule_visit_node'
+    WHERE o.name in('schedule_visit_node', 'schedule_visit_v1')
         AND c.ts_concierge_contact BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
 
