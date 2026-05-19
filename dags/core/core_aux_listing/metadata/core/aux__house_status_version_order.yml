@@ -1,6 +1,6 @@
 database_name: core_listing
 table_name: aux__house_status_version_order
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 description:
   Auxiliary table for Listing Core model that tracks house status changes and versions over time. This table provides a chronological

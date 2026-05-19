@@ -1,6 +1,6 @@
 database_name: core_listing
 table_name: listing
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 description: Listing Core Model that provides a consolidated view of RENT and SALE house listings, with their current
   status, version history and business context information. It contains history from the House table, but only includes

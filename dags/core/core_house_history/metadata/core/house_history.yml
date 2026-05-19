@@ -1,6 +1,6 @@
 database_name: core_house
 table_name: house_history
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 description: >
   Historical core model for house properties. Each row represents a single field-level

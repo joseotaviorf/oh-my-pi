@@ -17,6 +17,7 @@ class DAGOwnerEnum:
     DATA_FINTECH = "Data Fintech"
     DATA_FOR_RENT = "Data ForRent"
     DATA_FOR_SALE = "Data ForSale"
+    DATA_HOUSE_AND_LISTING = "Data House and Listing"
     DATA_GOVERNANCE = "Data Governance"
     DATA_GROWTH = "Data Growth"
     DATA_PEOPLE = "Data People"

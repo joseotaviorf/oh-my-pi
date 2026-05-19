@@ -1,7 +1,7 @@
 dag:
   name: core_listing
   schedule_start_date: 2025, 1, 1
-  owner: Data ForSale
+  owner: Data House and Listing
   documentation:
     dag_purpose: |
       Creates the Listing Core Model by processing listing data from both RENT and SALE business contexts.

@@ -1,6 +1,6 @@
 database_name: core_house
 table_name: house
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 description: House Core Model that provides a consolidated view of house properties with their
   associated information. It filters out legacy records (created before 2016 with no updates).

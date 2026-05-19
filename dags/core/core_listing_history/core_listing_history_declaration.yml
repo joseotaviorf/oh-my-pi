@@ -1,7 +1,7 @@
 dag:
   name: core_listing_history
   schedule_start_date: 2025, 1, 1
-  owner: Data ForSale
+  owner: Data House and Listing
   documentation:
     dag_purpose: |
       Creates the Listing Historical Core Model (narrow event-log). Each row

@@ -1,6 +1,6 @@
 database_name: core_listing
 table_name: aux__house_listing_category
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 description: |
   Auxiliary table for Listing Core model that categorizes listing versions based on their lifecycle events.

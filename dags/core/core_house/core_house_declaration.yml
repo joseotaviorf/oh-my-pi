@@ -1,7 +1,7 @@
 dag:
   name: core_house
   schedule_start_date: 2025, 1, 1
-  owner: Data ForSale
+  owner: Data House and Listing
   documentation:
     dag_purpose: |
       Creates the House Core Model by processing house data from EBDB. This model provides
