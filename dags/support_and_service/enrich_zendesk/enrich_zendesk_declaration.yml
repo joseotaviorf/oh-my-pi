@@ -16,7 +16,10 @@ workflow:
   tables_customization:
     tickets_current:
       merge_on: [id_ticket]
-      z_order_by: [ts_created, id_ticket]
+      z_order_by: [ts_updated, ts_created, id_ticket]
+      table_properties:
+        "delta.dataSkippingNumIndexedCols": "0"
+        "delta.dataSkippingStatsColumns": "ts_updated,ts_created,id_ticket"
     ticket_metrics:
       merge_on: [id_ticket]
       z_order_by: [id_ticket, ts_created]
