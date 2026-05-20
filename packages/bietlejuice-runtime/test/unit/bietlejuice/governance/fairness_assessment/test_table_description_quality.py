@@ -13,6 +13,7 @@ from bietlejuice.governance.fairness_assessment.checks.interoperable.i1_01_docum
     check_i1_01_documented_physical_fields,
 )
 from bietlejuice.governance.fairness_assessment.constants import (
+    DOCUMENTED_NOT_IN_PHYSICAL_REASON,
     SCHEMA_NOT_IN_COLUMNS_METASTORE_REASON,
 )
 
@@ -96,7 +97,7 @@ class TestAssessTableDescriptionQuality(unittest.TestCase):
 
 class TestF2I1ColumnInteroperability(unittest.TestCase):
     def test_f2_fails_missing_docs_when_physical(self):
-        f2, i1, detail_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
+        f2, i1, f2_json, i1_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
             "a",
             "b",
             {},
@@ -107,13 +108,13 @@ class TestF2I1ColumnInteroperability(unittest.TestCase):
         self.assertFalse(f2.passed)
         self.assertEqual(f2.reason, "no_column_docs_in_lake")
         self.assertFalse(i1.passed)
-        d = json.loads(detail_json)
-        self.assertEqual(d["undocumented_business_names"], ["x", "y"])
-        self.assertEqual(d["undocumented_partition_names"], [])
+        d = json.loads(i1_json)
+        self.assertEqual(d["undocumented_columns"], ["x", "y"])
+        self.assertEqual(d["documented_not_in_physical"], [])
 
     def test_i1_fails_when_fqn_absent_from_columns_metastore_snapshot(self):
         long_desc = "This column stores the user identifier for cross-referencing with other dimensions."
-        f2, i1, detail_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
+        f2, i1, _f2_json, i1_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
             "a",
             "b",
             {"c": long_desc},
@@ -124,11 +125,11 @@ class TestF2I1ColumnInteroperability(unittest.TestCase):
         self.assertFalse(i1.passed)
         self.assertEqual(i1.reason, SCHEMA_NOT_IN_COLUMNS_METASTORE_REASON)
         self.assertTrue(f2.passed)
-        self.assertEqual(detail_json, "{}")
+        self.assertEqual(i1_json, "{}")
 
-    def test_i1_passes_with_warning_when_only_partition_columns_undocumented(self):
+    def test_i1_fails_when_partition_columns_undocumented(self):
         long = "Identifier column used in joins; stable surrogate key for the business entity in this table."
-        f2, i1, detail_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
+        f2, i1, _f2_json, i1_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
             "a",
             "b",
             {"id": long},
@@ -136,16 +137,30 @@ class TestF2I1ColumnInteroperability(unittest.TestCase):
             physical_field_names_lower=frozenset({"id", "year", "month"}),
         )
         self.assertTrue(cols_sub)
-        self.assertTrue(i1.passed)
-        d = json.loads(detail_json)
-        self.assertEqual(d["undocumented_business_names"], [])
-        self.assertEqual(d["undocumented_partition_names"], ["month", "year"])
-        self.assertIn("warnings", d)
-        self.assertIn("undocumented_partition_columns", d["warnings"][0])
+        self.assertFalse(i1.passed)
+        self.assertEqual(i1.reason, "undocumented_columns")
+        d = json.loads(i1_json)
+        self.assertEqual(set(d["undocumented_columns"]), {"month", "year"})
+        self.assertEqual(d["documented_not_in_physical"], [])
+
+    def test_i1_fails_documented_not_in_physical(self):
+        long = "Identifier column used in joins; stable surrogate key for the business entity in this table."
+        f2, i1, _f2_json, i1_json, _cols_sub = compute_f2_02_and_i1_01_for_fqn(
+            "a",
+            "b",
+            {"id": long, "legacy_col": "Old column removed from lake"},
+            spark_table_exists=True,
+            physical_field_names_lower=frozenset({"id"}),
+        )
+        self.assertFalse(i1.passed)
+        self.assertEqual(i1.reason, DOCUMENTED_NOT_IN_PHYSICAL_REASON)
+        d = json.loads(i1_json)
+        self.assertEqual(d["undocumented_columns"], [])
+        self.assertEqual(d["documented_not_in_physical"], ["legacy_col"])
 
     def test_i1_fails_when_business_and_partition_missing(self):
         long = "Identifier column used in joins; stable surrogate key for the business entity in this table."
-        f2, i1, detail_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
+        f2, i1, _f2_json, i1_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
             "a",
             "b",
             {"id": long},
@@ -155,13 +170,13 @@ class TestF2I1ColumnInteroperability(unittest.TestCase):
         self.assertTrue(cols_sub)
         self.assertFalse(i1.passed)
         self.assertEqual(i1.reason, "undocumented_columns")
-        d = json.loads(detail_json)
-        self.assertEqual(d["undocumented_business_names"], ["extra_col"])
-        self.assertEqual(set(d["undocumented_partition_names"]), {"day", "year"})
-        self.assertNotIn("warnings", d)
+        d = json.loads(i1_json)
+        self.assertIn("extra_col", d["undocumented_columns"])
+        self.assertIn("day", d["undocumented_columns"])
+        self.assertIn("year", d["undocumented_columns"])
 
     def test_columns_sub_false_when_no_column_docs_in_batch(self):
-        f2, i1, _detail, cols_sub = compute_f2_02_and_i1_01_for_fqn(
+        f2, i1, _f2, _i1, cols_sub = compute_f2_02_and_i1_01_for_fqn(
             "a",
             "b",
             {},
@@ -175,7 +190,7 @@ class TestF2I1ColumnInteroperability(unittest.TestCase):
 
     def test_i1_not_assessed_when_columns_metastore_snapshot_unavailable(self):
         long_desc = "Identifier column used in joins; stable surrogate key for the business entity in this table."
-        f2, i1, detail_json, _cols_sub = compute_f2_02_and_i1_01_for_fqn(
+        f2, i1, _f2, i1_json, _cols_sub = compute_f2_02_and_i1_01_for_fqn(
             "a",
             "b",
             {"x": long_desc},
@@ -184,23 +199,40 @@ class TestF2I1ColumnInteroperability(unittest.TestCase):
         )
         self.assertFalse(i1.passed)
         self.assertEqual(i1.reason, "i1_01_not_assessed")
-        self.assertEqual(detail_json, "{}")
+        self.assertEqual(i1_json, "{}")
         self.assertTrue(f2.passed)
 
-    def test_columns_sub_false_when_one_column_not_substantive(self):
+    def test_f2_passes_when_only_partition_column_has_bad_description(self):
+        f2, i1, f2_json, _i1, cols_sub = compute_f2_02_and_i1_01_for_fqn(
+            "a",
+            "b",
+            {"year": "year", "month": "month"},
+            spark_table_exists=True,
+            physical_field_names_lower=frozenset({"year", "month"}),
+        )
+        self.assertTrue(f2.passed)
+        self.assertEqual(f2_json, "{}")
+        self.assertTrue(cols_sub)
+
+    def test_f2_lists_all_insufficient_business_columns(self):
         long = "Identifier column used in joins; stable surrogate key for the business entity in this table."
-        f2, i1, _detail, cols_sub = compute_f2_02_and_i1_01_for_fqn(
+        f2, i1, f2_json, _i1, cols_sub = compute_f2_02_and_i1_01_for_fqn(
             "a",
             "b",
             {
                 "id": long,
                 "bad": "id",
+                "amount_paid": "amount paid",
             },
             spark_table_exists=True,
-            physical_field_names_lower=frozenset({"id", "bad"}),
+            physical_field_names_lower=frozenset({"id", "bad", "amount_paid"}),
         )
         self.assertFalse(cols_sub)
         self.assertFalse(f2.passed)
+        self.assertEqual(f2.reason, "column_description_not_substantive")
+        d = json.loads(f2_json)
+        self.assertEqual(set(d["insufficient_column_names"]), {"amount_paid", "bad"})
+        self.assertTrue(i1.passed)
 
 
 class TestRowBackedF2I1Checks(unittest.TestCase):

@@ -29,6 +29,7 @@ COLUMNS_METASTORE_SNAPSHOT_UNAVAILABLE_REASON = "columns_metastore_snapshot_unav
 SCHEMA_NOT_IN_COLUMNS_METASTORE_REASON = (
     "spark_schema_not_in_columns_metastore_snapshot"
 )
+DOCUMENTED_NOT_IN_PHYSICAL_REASON = "documented_not_in_physical"
 
 # ---------------------------------------------------------------------------
 # Metadata YAML: ``domain`` (CI Yamale + F2-01)
@@ -304,11 +305,11 @@ MVP_IMPLEMENTED_REQUIREMENT_IDS: FrozenSet[str] = frozenset(
     MVP_TIER2_SCOPED_REQUIREMENT_IDS
 )
 
-# I1-01: technical partition column names in Spark (lowercase) — lack of documentation alone does not fail
+# F2-02: partition column names excluded from substantive description checks (lowercase)
 PARTITION_COLUMN_NAMES_LOWERCASE: FrozenSet[str] = frozenset({"year", "month", "day"})
 
 # Bump when FAIR tiering requirement ID sets from governance change
-TIERING_RULES_VERSION = "fairness-tiering-spike-2026-04-v11"
+TIERING_RULES_VERSION = "fairness-tiering-spike-2026-04-v12"
 
 # ---------------------------------------------------------------------------
 # DataHub GraphQL: default endpoints by environment

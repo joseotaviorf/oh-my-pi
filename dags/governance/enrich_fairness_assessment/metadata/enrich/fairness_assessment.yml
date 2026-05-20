@@ -34,15 +34,16 @@ columns:
       ``bietlejuice.governance.fairness_assessment.constants``; empty domain → ``domain_missing`` only;
       non-empty but not in allowlist → ``domain_not_in_allowlist``), and non-empty table description
       (``table_description_missing``). On failure, ``reason`` is a stable comma-join of failure codes in
-      that order and ``detail`` may include ``failure_codes`` (same list). **F2-02** — column description richness
-      (``assess_column_description_quality``) on rows from ``columns_documentation``; failure reasons
-      no_column_docs_in_lake, column_description_not_substantive.
-      **I1-01** — name coverage vs physical schema from the latest partition of
-      ``datalake_documentation_metrics_clean.columns_metastore``; reason
-      ``undocumented_columns`` when any non-partition field is missing from the lake; reason
-      ``spark_schema_not_in_columns_metastore_snapshot`` when the FQN is absent from that snapshot;
-      optional detail ``undocumented_column_names`` (business fields), ``undocumented_partition_column_names``,
-      and ``warnings`` when only partition columns are undocumented. **I3-01** / **I3-02** (DataHub) are emitted
+      that order and ``detail`` may include ``failure_codes`` (same list).       **F2-02** — column description richness (``assess_column_description_quality``) on
+      ``columns_documentation`` rows excluding partition fields ``year``, ``month``, ``day``; failure reasons
+      ``no_column_docs_in_lake``, ``column_description_not_substantive``; optional detail
+      ``insufficient_column_names`` and ``insufficient_columns`` (per-column ``reason_code``).
+      **I1-01** — bidirectional name alignment vs the latest ``columns_metastore`` snapshot; reasons
+      ``undocumented_columns`` (physical name missing from documentation), ``documented_not_in_physical``
+      (documented name absent from physical snapshot), or comma-joined when both; optional detail arrays
+      ``undocumented_columns`` and ``documented_not_in_physical``; reason
+      ``spark_schema_not_in_columns_metastore_snapshot`` when the FQN is absent from that snapshot.
+      **I3-01** / **I3-02** (DataHub) are emitted
       for observability when GraphQL is configured; they do not affect the MVP tier score. F1-03 uses the same
       ``columns_metastore`` snapshot (presence of FQN); F4-01 uses DataHub ``dataset.exists``. I1-02 and A1.2-03 use the assigned
       datacontract URN signal on the Databricks entity. See the historical spike doc for F4-01 and A1-03

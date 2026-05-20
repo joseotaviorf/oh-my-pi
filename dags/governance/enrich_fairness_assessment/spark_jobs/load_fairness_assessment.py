@@ -78,27 +78,38 @@ def _build_fairness_enrich_output_dict(d: Mapping[str, Any]) -> dict[str, Any]:
         }
     if "I1-01" in checks_payload and d.get("i1_01_undocumented_json") is not None:
         raw = d.get("i1_01_undocumented_json") or ""
-        if raw:
+        if raw and raw != "{}":
             try:
                 uj: Any = json.loads(raw)
             except (json.JSONDecodeError, TypeError, ValueError):
                 uj = None
-            if uj is not None:
-                detail: dict[str, Any] = {}
-                if isinstance(uj, list) and uj:
-                    detail["undocumented_column_names"] = uj
-                elif isinstance(uj, dict):
-                    bus = uj.get("undocumented_business_names") or []
-                    part = uj.get("undocumented_partition_names") or []
-                    warns = uj.get("warnings")
-                    if bus:
-                        detail["undocumented_column_names"] = bus
-                    if part:
-                        detail["undocumented_partition_column_names"] = part
-                    if warns:
-                        detail["warnings"] = warns
-                if detail:
-                    checks_payload["I1-01"]["detail"] = detail
+            if isinstance(uj, dict):
+                detail_i1: dict[str, Any] = {}
+                undoc = uj.get("undocumented_columns") or []
+                stale = uj.get("documented_not_in_physical") or []
+                if undoc:
+                    detail_i1["undocumented_columns"] = undoc
+                if stale:
+                    detail_i1["documented_not_in_physical"] = stale
+                if detail_i1:
+                    checks_payload["I1-01"]["detail"] = detail_i1
+    if "F2-02" in checks_payload and d.get("f2_02_insufficient_json") is not None:
+        raw_f2 = d.get("f2_02_insufficient_json") or ""
+        if raw_f2 and raw_f2 != "{}":
+            try:
+                fj: Any = json.loads(raw_f2)
+            except (json.JSONDecodeError, TypeError, ValueError):
+                fj = None
+            if isinstance(fj, dict):
+                detail_f2: dict[str, Any] = {}
+                names = fj.get("insufficient_column_names") or []
+                cols = fj.get("insufficient_columns")
+                if names:
+                    detail_f2["insufficient_column_names"] = names
+                if cols:
+                    detail_f2["insufficient_columns"] = cols
+                if detail_f2:
+                    checks_payload["F2-02"]["detail"] = detail_f2
     ts = datetime.now(timezone.utc)
     return {
         "database_name": d.get("database_name"),
@@ -361,7 +372,7 @@ def main() -> None:
         cdesc = col_by_fqn.get(k, {})
         ex = exists_map.get(k)
         ph = phys_map.get(k, frozenset()) if ex is True else frozenset()
-        f2r, i1r, i1_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
+        f2r, i1r, f2_json, i1_json, cols_sub = compute_f2_02_and_i1_01_for_fqn(
             k[0],
             k[1],
             cdesc,
@@ -371,6 +382,7 @@ def main() -> None:
         f2_i1_by_fqn[k] = {
             "f2_02_pass": f2r.passed,
             "f2_02_failure_reason": f2r.reason,
+            "f2_02_insufficient_json": f2_json,
             "i1_01_pass": i1r.passed,
             "i1_01_failure_reason": i1r.reason,
             "i1_01_undocumented_json": i1_json,
@@ -407,6 +419,7 @@ def main() -> None:
         [
             StructField("f2_02_pass", BooleanType(), False),
             StructField("f2_02_failure_reason", StringType(), True),
+            StructField("f2_02_insufficient_json", StringType(), True),
             StructField("i1_01_pass", BooleanType(), False),
             StructField("i1_01_failure_reason", StringType(), True),
             StructField("i1_01_undocumented_json", StringType(), True),
@@ -416,14 +429,15 @@ def main() -> None:
 
     def _lookup_f2_i1_row(db: Any, tbl: Any) -> Any:
         if db is None or tbl is None:
-            return (False, None, False, None, "{}", False)
+            return (False, None, "{}", False, None, "{}", False)
         key = (str(db).strip(), str(tbl).strip())
         m = bc_f2_i1.value.get(key)
         if m is None:
-            return (False, None, False, None, "{}", False)
+            return (False, None, "{}", False, None, "{}", False)
         return (
             bool(m["f2_02_pass"]),
             m.get("f2_02_failure_reason"),
+            m.get("f2_02_insufficient_json") or "{}",
             bool(m["i1_01_pass"]),
             m.get("i1_01_failure_reason"),
             m.get("i1_01_undocumented_json") or "{}",
@@ -435,6 +449,7 @@ def main() -> None:
         td.withColumn("_f2i1", f2i1_udf(F.col("database_name"), F.col("table_name")))
         .withColumn("f2_02_pass", F.col("_f2i1.f2_02_pass"))
         .withColumn("f2_02_failure_reason", F.col("_f2i1.f2_02_failure_reason"))
+        .withColumn("f2_02_insufficient_json", F.col("_f2i1.f2_02_insufficient_json"))
         .withColumn("i1_01_pass", F.col("_f2i1.i1_01_pass"))
         .withColumn("i1_01_failure_reason", F.col("_f2i1.i1_01_failure_reason"))
         .withColumn("i1_01_undocumented_json", F.col("_f2i1.i1_01_undocumented_json"))
