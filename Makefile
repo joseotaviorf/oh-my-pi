@@ -489,45 +489,56 @@ sync-dbr:
 ###############################################################################
 ###################### Style handling #########################################
 ###############################################################################
+##
+RUFF_UV := uv run --project packages/bietlejuice-compiler
+CHECK_STYLE_PY := packages/bietlejuice-compiler/scripts/ci_cd/check_style.py
+RUFF_CI_DIFF ?= origin/master...HEAD
+RUFF_LOCAL_DIFF ?= HEAD
+
 .PHONY: lint
-## run ruff to fix code style
+
 lint:
 	@echo ""
-	@echo "Running lint in all files from <packages/>"
+	@echo "Running Ruff format on package trees (packages/*/src + test/, emr-cli)"
 	@echo "=========="
 	@echo ""
-	@uv run --directory packages/bietlejuice-core     ruff format src/ test/
-	@uv run --directory packages/bietlejuice-airflow  ruff format src/ test/
-	@uv run --directory packages/bietlejuice-runtime  ruff format src/ test/
-	@uv run --directory packages/bietlejuice-compiler ruff format src/ test/
+	@$(RUFF_UV) ruff format \
+	  packages/bietlejuice-core/src \
+	  packages/bietlejuice-core/test \
+	  packages/bietlejuice-airflow/src \
+	  packages/bietlejuice-airflow/test \
+	  packages/bietlejuice-runtime/src \
+	  packages/bietlejuice-runtime/test \
+	  packages/bietlejuice-compiler/src \
+	  packages/bietlejuice-compiler/test \
+	  packages/emr-cli/src \
+	  packages/emr-cli/test
 
 .PHONY: check-style
-## check style with ruff
+
 check-style:
-	@echo ""
-	@echo "Running Check Style"
-	@echo "=========="
-	@echo ""
-	@uv run --directory packages/bietlejuice-core     ruff format --check src/ test/
-	@uv run --directory packages/bietlejuice-core     ruff check src/ test/
-	@uv run --directory packages/bietlejuice-airflow  ruff format --check src/ test/
-	@uv run --directory packages/bietlejuice-airflow  ruff check src/ test/
-	@uv run --directory packages/bietlejuice-runtime  ruff format --check src/ test/
-	@uv run --directory packages/bietlejuice-runtime  ruff check src/ test/
-	@uv run --directory packages/bietlejuice-compiler ruff format --check src/ test/
-	@uv run --directory packages/bietlejuice-compiler ruff check src/ test/
+	@$(RUFF_UV) python $(CHECK_STYLE_PY) $(if $(strip $(CI)),ci,full)
 
 .PHONY: fix-style
-## fix style with ruff using check --fix
+## autofix lint issues repo-wide; does not rewrite formatting outside package trees
 fix-style:
 	@echo ""
 	@echo "Running Style Fix (ruff --fix)"
 	@echo "=========="
 	@echo ""
-	@uv run --directory packages/bietlejuice-core     ruff check --fix src/ test/
-	@uv run --directory packages/bietlejuice-airflow  ruff check --fix src/ test/
-	@uv run --directory packages/bietlejuice-runtime  ruff check --fix src/ test/
-	@uv run --directory packages/bietlejuice-compiler ruff check --fix src/ test/
+	@$(RUFF_UV) ruff check --fix .
+
+.PHONY: lint-local
+## apply ruff format only to changed `.py` files vs RUFF_LOCAL_DIFF (default HEAD)
+## Compare whole branch: make lint-local RUFF_LOCAL_DIFF='origin/master...HEAD'
+lint-local:
+	@RUFF_LOCAL_DIFF="$(RUFF_LOCAL_DIFF)" $(RUFF_UV) python $(CHECK_STYLE_PY) local-format
+
+.PHONY: check-style-local
+## ruff format --check on `.py` in diff vs RUFF_LOCAL_DIFF; ruff check on those files only.
+## Repo-wide lint (matches CI strictness): make check-style-local RUFF_LOCAL_FULL_LINT=1
+check-style-local:
+	@RUFF_LOCAL_DIFF="$(RUFF_LOCAL_DIFF)" $(RUFF_UV) python $(CHECK_STYLE_PY) local-check
 
 .PHONY: type-check
 ## run ty type checker across all packages (informative; use failure:ignore in CI)

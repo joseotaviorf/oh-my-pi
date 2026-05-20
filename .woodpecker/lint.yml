@@ -1,65 +1,35 @@
-# Steps run only when Python sources change (step-level when).
-# event: [push, pull_request] — pull_request is required so that when.path
-# evaluates the full PR diff, not just the last pushed commit. See
-# validations.yml header for the full rationale.
+# Lint runs on push + pull_request so PRs use the full diff for when.path (not just the
+# last commit). The pipeline always starts so dependents (e.g. release) are not blocked
+# when no Python files change in a push.
 #
-# Pipeline is always triggered so downstream pipelines
-# (e.g. release depends_on: lint) are not blocked when no .py files change.
-#
-# FALSE-POSITIVE GUARD (feature branch pushes):
-# `when.path` on `push` events evaluates only the LAST commit diff. A
-# "retrigger" commit that touches no .py files (e.g. a YAML-only bump) causes
-# all lint/validation steps to be skipped, yielding a green pipeline even when
-# an earlier commit in the same branch introduced a lint violation.
-#
-# Fix: for push events on feature branches a second `when` clause (no path
-# filter) always triggers the step. The commands then run `git diff
-# origin/master...HEAD` to decide whether any Python files changed in the
-# FULL branch — if not, they exit 0 cheaply. For pull_request events the
-# existing path filter already evaluates the full PR diff (correct), so no
-# change is needed for that event type. Master/hotfix/forno pushes are also
-# unaffected: their merge-commit diff represents the full set of merged changes.
+# Guard: on feature-branch push, Woodpecker's path filter only sees the latest commit; a
+# YAML-only retrigger could skip steps while an earlier commit still has lint issues. Those
+# steps run unconditionally for excluded branches, then exit early if origin/master...HEAD
+# has no .py changes. PR / master / forno / hotfix: path filter or merge diff is enough.
 
 steps:
   setup:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
     commands:
-      # The image ships a pre-built workspace venv at /opt/bietlejuice/venvs/workspace
-      # (UV_PROJECT_ENVIRONMENT default). This re-links editable packages from the
-      # checked-out workspace and installs any new deps introduced by this PR (~1-2s).
+      # Relink editable install from checkout (~1–2s); image venv default is /opt/bietlejuice/venvs/workspace
       - uv sync
 
   check-style-python:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
     commands:
-      - |
-        # For push events on feature branches, `when.path` only checks the last
-        # commit diff. Evaluate the full branch diff vs origin/master instead so
-        # a non-Python "retrigger" commit cannot hide a prior lint failure.
-        if [ "$CI_PIPELINE_EVENT" = "push" ]; then
-          case "$CI_COMMIT_BRANCH" in
-            master|forno|hotfix/*) ;;
-            *)
-              PY_DIFF=$(git diff origin/master...HEAD --name-only 2>/dev/null | grep '\.py$' || true)
-              if [ -z "$PY_DIFF" ]; then
-                echo "No Python files in full branch diff vs master — lint skipped"
-                exit 0
-              fi
-              ;;
-          esac
-        fi
+      - git fetch --no-tags origin +refs/heads/master
+      # CI env is set by Woodpecker; check-style auto-selects diff-scoped mode.
+      # check_style.py ci already handles "no .py in full branch diff" gracefully.
+      # Strict mode (format + ruff check on all changed .py): RUFF_CI_FULL_STRICT=1 make check-style
       - make check-style
     when:
-      # pull_request: `when.path` already evaluates the full PR diff — keep as-is.
-      # push (master/hotfix): merge-commit diff covers all merged changes — keep as-is.
       - event: [push, pull_request]
         path:
           include: ['**/*.py']
           on_empty: false
-      # push (feature branches): no path filter so the step always runs;
-      # the commands above perform the full-diff check internally.
+      # Feature pushes: always enter step; shell guard above applies full-branch .py check
       - event: push
         branch:
           exclude: [master, forno, hotfix/*]
@@ -70,20 +40,13 @@ steps:
     pull: true
     commands:
       - |
-        # Same full-branch-diff guard as check-style-python (see header comment).
-        if [ "$CI_PIPELINE_EVENT" = "push" ]; then
-          case "$CI_COMMIT_BRANCH" in
-            master|forno|hotfix/*) ;;
-            *)
-              PY_DIFF=$(git diff origin/master...HEAD --name-only 2>/dev/null | grep '\.py$' || true)
-              if [ -z "$PY_DIFF" ]; then
-                echo "No Python files in full branch diff vs master — files-validation skipped"
-                exit 0
-              fi
-              ;;
-          esac
-        fi
-      - make files-validation
+        # Feature-branch push guard: ci_branch_py_guard.py exits 1 when the full
+        # branch diff vs master has no .py changes; `|| exit 0` converts that into
+        # a clean step exit, skipping files-validation for Python-free pushes.
+        uv run --project packages/bietlejuice-compiler \
+          python packages/bietlejuice-compiler/scripts/ci_cd/ci_branch_py_guard.py \
+          files-validation || exit 0
+        make files-validation
     when:
       - event: [push, pull_request]
         path:

@@ -84,8 +84,8 @@ This is what you want for day-to-day development. After it finishes:
 
 | Path | Contents | Used by |
 | ---- | -------- | ------- |
-| `<repo>/.venv` (or `/home/vscode/.venv` in the devcontainer) | Workspace: core + airflow + compiler + dev tools | IDE, `make lint`, `make check-style` for those packages |
-| `packages/bietlejuice-runtime/.venv` | Runtime broad versions + ruff/ty/pytest | `make check-style`, `make type-check` for runtime |
+| `<repo>/.venv` (or `/home/vscode/.venv` in the devcontainer) | Workspace: core + airflow + compiler + dev tools | IDE; **`make check-style`** (**`ruff check`** repo-wide + **`ruff format --check`** only on **`packages/*/src`** + **`test/`**) runs via **`uv run --project packages/bietlejuice-compiler`** |
+| `packages/bietlejuice-runtime/.venv` | Runtime broad versions + ruff/ty/pytest | **`make type-check`** for runtime (`ty check src/`); **`make lint`** formats runtime **`src/`/`test/`**; **`make check-style`** runs **`ruff check`** over the whole repo including runtime sources |
 | `packages/bietlejuice-runtime/envs/dbr-16-4/.venv` | Runtime + DBR 16.4 LTS pinned libs + pytest | `make unit-tests` for runtime |
 
 ### Switching DBR
@@ -137,7 +137,7 @@ You have two options:
    intellisense for runtime's own modules works. Some third-party imports
    (`spacy`, `presidio-analyzer`, `delta-spark`, ...) will be flagged
    unresolved unless you also do option 2 — they will not affect linting via
-   ruff or type-checking via ty.
+   **`make check-style`** / **`make lint`** (**`ruff check`** repo-wide, including **`packages/bietlejuice-runtime/src`**; **`ruff format`** only on **`packages/*/src`** + **`test/`**) or type-checking via **`make type-check`**.
 
 2. **Recommended when running runtime tests interactively:** override the
    interpreter for the `packages/bietlejuice-runtime/` folder. In
