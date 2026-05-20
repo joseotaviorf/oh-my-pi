@@ -34,3 +34,21 @@ columns:
       business_stage: Demand
       hierarchy: Growth
       approved_by: uilson.bonfim@quintoandar.com.br
+  year:
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.ts_event
+      - datalake_top_of_funnel_demand.quintoandar_classifieds_events.ts_event
+    description: Year of the reference date, used as table partition.
+    dimension: false
+  month:
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.ts_event
+      - datalake_top_of_funnel_demand.quintoandar_classifieds_events.ts_event
+    description: Month of the reference date, used as table partition.
+    dimension: false
+  day:
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.ts_event
+      - datalake_top_of_funnel_demand.quintoandar_classifieds_events.ts_event
+    description: Day of the reference date, used as table partition.
+    dimension: false
