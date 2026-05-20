@@ -308,7 +308,7 @@ MVP_IMPLEMENTED_REQUIREMENT_IDS: FrozenSet[str] = frozenset(
 PARTITION_COLUMN_NAMES_LOWERCASE: FrozenSet[str] = frozenset({"year", "month", "day"})
 
 # Bump when FAIR tiering requirement ID sets from governance change
-TIERING_RULES_VERSION = "fairness-tiering-spike-2026-04-v10"
+TIERING_RULES_VERSION = "fairness-tiering-spike-2026-04-v11"
 
 # ---------------------------------------------------------------------------
 # DataHub GraphQL: default endpoints by environment
