@@ -1,61 +1,204 @@
 WITH region_settings AS (
-  SELECT 
-  region_config.id_region, 
-  region_config.featured_rank, 
-  COLLECT_SET(region_parameters.business_context) AS ebdb_enabled_business_contexts,
-  STRUCT(
+  SELECT
+    region_config.id_region,
+    region_config.featured_rank,
+    COLLECT_SET(region_parameters.business_context) AS ebdb_enabled_business_contexts,
     STRUCT(
-      MAX(
-        CASE 
-          WHEN region_parameters.business_context = "RENT" 
-            THEN region_parameters.min_price 
-          ELSE 0 
-        END
-      ) AS min, 
-      MAX(
-        CASE 
-          WHEN region_parameters.business_context = "RENT" 
-            THEN region_parameters.max_price 
-          ELSE 0 
-        END
-      ) AS max
-    ) AS rent,
-    STRUCT(
-      MAX(
-        CASE 
-          WHEN region_parameters.business_context = "SALE" 
-            THEN region_parameters.min_price 
-          ELSE 0 
-        END
-      ) AS min, 
-      MAX(
-        CASE 
-          WHEN region_parameters.business_context = "SALE" 
-            THEN region_parameters.max_price 
-          ELSE 0 
-        END
-      ) AS max
-    ) AS sale
-  ) AS prices  
-FROM 
-  datalake_ebdb_clean.region_config AS region_config
-LEFT JOIN 
-  datalake_ebdb_clean.region_parameters AS region_parameters 
-    ON region_config.id = region_parameters.id_region_config
-WHERE 
-  region_parameters.is_search_enabled = TRUE
-GROUP BY 
-  region_config.id_region, 
-  region_config.featured_rank
-), 
+      STRUCT(
+        MAX(
+          CASE
+            WHEN region_parameters.business_context = 'RENT'
+              THEN region_parameters.min_price
+            ELSE 0
+          END
+        ) AS min,
+        MAX(
+          CASE
+            WHEN region_parameters.business_context = 'RENT'
+              THEN region_parameters.max_price
+            ELSE 0
+          END
+        ) AS max
+      ) AS rent,
+      STRUCT(
+        MAX(
+          CASE
+            WHEN region_parameters.business_context = 'SALE'
+              THEN region_parameters.min_price
+            ELSE 0
+          END
+        ) AS min,
+        MAX(
+          CASE
+            WHEN region_parameters.business_context = 'SALE'
+              THEN region_parameters.max_price
+            ELSE 0
+          END
+        ) AS max
+      ) AS sale
+    ) AS prices
+  FROM
+    datalake_ebdb_clean.region_config AS region_config
+  LEFT JOIN
+    datalake_ebdb_clean.region_parameters AS region_parameters
+      ON region_config.id = region_parameters.id_region_config
+  WHERE
+    region_parameters.is_search_enabled = TRUE
+  GROUP BY
+    region_config.id_region,
+    region_config.featured_rank
+),
+deduplicated_cities AS (
+  SELECT
+    id_state,
+    LOWER(name) AS city_name_lower,
+    MIN(id) AS city_id
+  FROM
+    dw_public.dim_region
+  WHERE
+    level = 'Cidade'
+  GROUP BY
+    id_state,
+    LOWER(name)
+),
+deduplicated_neighborhoods AS (
+  SELECT
+    parent_city.id AS city_id,
+    LOWER(neighborhood.name) AS neighborhood_name_lower,
+    MIN(neighborhood.id) AS neighborhood_id
+  FROM
+    dw_public.dim_region AS neighborhood
+  INNER JOIN
+    dw_public.dim_region AS parent_city
+      ON neighborhood.id_city = parent_city.id
+      AND parent_city.level = 'Cidade'
+  WHERE
+    neighborhood.level = 'SubRegiao'
+  GROUP BY
+    parent_city.id,
+    LOWER(neighborhood.name)
+),
+normalized_addresses AS (
+  SELECT
+    compounds.address.state_code,
+    compounds.address.city AS original_city,
+    compounds.address.neighborhood AS original_neighborhood,
+    compounds.address.street AS original_street,
+    TRANSLATE(
+      LOWER(compounds.address.city),
+      'áàâãäéèêëíìîïóòôõöúùûüçñ',
+      'aaaaaeeeeiiiiooooouuuucn'
+    ) AS normalized_city,
+    TRANSLATE(
+      LOWER(compounds.address.neighborhood),
+      'áàâãäéèêëíìîïóòôõöúùûüçñ',
+      'aaaaaeeeeiiiiooooouuuucn'
+    ) AS normalized_neighborhood,
+    TRANSLATE(
+      LOWER(compounds.address.street),
+      'áàâãäéèêëíìîïóòôõöúùûüçñ',
+      'aaaaaeeeeiiiiooooouuuucn'
+    ) AS normalized_street
+  FROM
+    vespucio_prod_delta.house_compounds AS compounds
+  WHERE
+    compounds.address.country_code = 'BR'
+    AND compounds.address.city IS NOT NULL
+    AND TRIM(compounds.address.city) != ''
+    AND compounds.address.neighborhood IS NOT NULL
+    AND TRIM(compounds.address.neighborhood) != ''
+    AND compounds.address.street IS NOT NULL
+    AND TRIM(compounds.address.street) != ''
+),
+city_mode AS (
+  SELECT
+    state_code,
+    normalized_city,
+    original_city AS mode_city
+  FROM (
+    SELECT
+      state_code,
+      normalized_city,
+      original_city,
+      ROW_NUMBER() OVER (
+        PARTITION BY state_code, normalized_city
+        ORDER BY COUNT(*) DESC, original_city
+      ) AS rn
+    FROM
+      normalized_addresses
+    GROUP BY
+      state_code,
+      normalized_city,
+      original_city
+  ) AS ranked
+  WHERE
+    rn = 1
+),
+neighborhood_mode AS (
+  SELECT
+    state_code,
+    normalized_city,
+    normalized_neighborhood,
+    original_neighborhood AS mode_neighborhood
+  FROM (
+    SELECT
+      state_code,
+      normalized_city,
+      normalized_neighborhood,
+      original_neighborhood,
+      ROW_NUMBER() OVER (
+        PARTITION BY state_code, normalized_city, normalized_neighborhood
+        ORDER BY COUNT(*) DESC, original_neighborhood
+      ) AS rn
+    FROM
+      normalized_addresses
+    GROUP BY
+      state_code,
+      normalized_city,
+      normalized_neighborhood,
+      original_neighborhood
+  ) AS ranked
+  WHERE
+    rn = 1
+),
+street_mode AS (
+  SELECT
+    state_code,
+    normalized_city,
+    normalized_neighborhood,
+    normalized_street,
+    original_street AS mode_street
+  FROM (
+    SELECT
+      state_code,
+      normalized_city,
+      normalized_neighborhood,
+      normalized_street,
+      original_street,
+      ROW_NUMBER() OVER (
+        PARTITION BY state_code, normalized_city, normalized_neighborhood, normalized_street
+        ORDER BY COUNT(*) DESC, original_street
+      ) AS rn
+    FROM
+      normalized_addresses
+    GROUP BY
+      state_code,
+      normalized_city,
+      normalized_neighborhood,
+      normalized_street,
+      original_street
+  ) AS ranked
+  WHERE
+    rn = 1
+),
 base_listings AS (
   SELECT
     listings.dejavuid,
-    region_neighborhood.id AS neighborhood_id,
-    region_city.id AS city_id,
-    compounds.address.street,
-    compounds.address.neighborhood,
-    compounds.address.city,
+    dn.neighborhood_id,
+    dc.city_id,
+    sm.mode_street AS street,
+    nm.mode_neighborhood AS neighborhood,
+    cm.mode_city AS city,
     compounds.address.state_code,
     state_dim.name AS state,
     compounds.address.country_code,
@@ -106,37 +249,76 @@ base_listings AS (
     datalake_ebdb_clean.state AS state_dim
       ON state_dim.abbreviation = compounds.address.state_code
   INNER JOIN
-    datalake_ebdb_clean.region AS region_city
-      ON LOWER(region_city.name) = LOWER(compounds.address.city)
-      AND region_city.id_state = state_dim.id
-  LEFT JOIN
-    datalake_ebdb_clean.region AS region_sub
-      ON region_sub.id_parent_region = region_city.id
-  LEFT JOIN
-    datalake_ebdb_clean.region AS region_neighborhood
-      ON LOWER(region_neighborhood.name) = LOWER(compounds.address.neighborhood)
-      AND (
-        region_neighborhood.id_parent_region = region_city.id
-        OR region_neighborhood.id_parent_region = region_sub.id
-      )
-  INNER JOIN
     datalake_ebdb_clean.country AS country_dim
       ON country_dim.id = state_dim.id_country
-  LEFT JOIN 
+  LEFT JOIN
+    deduplicated_cities AS dc
+      ON dc.city_name_lower = LOWER(compounds.address.city)
+      AND dc.id_state = state_dim.id
+  LEFT JOIN
+    deduplicated_neighborhoods AS dn
+      ON dn.neighborhood_name_lower = LOWER(compounds.address.neighborhood)
+      AND dn.city_id = dc.city_id
+  LEFT JOIN
     region_settings
-      ON region_settings.id_region = region_city.id
+      ON region_settings.id_region = dc.city_id
+  LEFT JOIN
+    city_mode AS cm
+      ON cm.state_code = compounds.address.state_code
+      AND cm.normalized_city = TRANSLATE(
+        LOWER(compounds.address.city),
+        'áàâãäéèêëíìîïóòôõöúùûüçñ',
+        'aaaaaeeeeiiiiooooouuuucn'
+      )
+  LEFT JOIN
+    neighborhood_mode AS nm
+      ON nm.state_code = compounds.address.state_code
+      AND nm.normalized_city = TRANSLATE(
+        LOWER(compounds.address.city),
+        'áàâãäéèêëíìîïóòôõöúùûüçñ',
+        'aaaaaeeeeiiiiooooouuuucn'
+      )
+      AND nm.normalized_neighborhood = TRANSLATE(
+        LOWER(compounds.address.neighborhood),
+        'áàâãäéèêëíìîïóòôõöúùûüçñ',
+        'aaaaaeeeeiiiiooooouuuucn'
+      )
+  LEFT JOIN
+    street_mode AS sm
+      ON sm.state_code = compounds.address.state_code
+      AND sm.normalized_city = TRANSLATE(
+        LOWER(compounds.address.city),
+        'áàâãäéèêëíìîïóòôõöúùûüçñ',
+        'aaaaaeeeeiiiiooooouuuucn'
+      )
+      AND sm.normalized_neighborhood = TRANSLATE(
+        LOWER(compounds.address.neighborhood),
+        'áàâãäéèêëíìîïóòôõöúùûüçñ',
+        'aaaaaeeeeiiiiooooouuuucn'
+      )
+      AND sm.normalized_street = TRANSLATE(
+        LOWER(compounds.address.street),
+        'áàâãäéèêëíìîïóòôõöúùûüçñ',
+        'aaaaaeeeeiiiiooooouuuucn'
+      )
   WHERE
-    (listings.source_name = 'ebdb_houses' OR listings.source_name = 'navent_houses')
+    listings.source_name IN ('ebdb_houses', 'navent_houses')
     AND compounds.address.country_code = 'BR'
     AND listings.status = 'PUBLISHED'
     AND listings.business_context IN ('RENT', 'SALE')
+    AND compounds.address.city IS NOT NULL
+    AND TRIM(compounds.address.city) != ''
+    AND compounds.address.neighborhood IS NOT NULL
+    AND TRIM(compounds.address.neighborhood) != ''
+    AND compounds.address.street IS NOT NULL
+    AND TRIM(compounds.address.street) != ''
   GROUP BY
     listings.dejavuid,
-    region_neighborhood.id,
-    region_city.id,
-    compounds.address.street,
-    compounds.address.neighborhood,
-    compounds.address.city,
+    dn.neighborhood_id,
+    dc.city_id,
+    sm.mode_street,
+    nm.mode_neighborhood,
+    cm.mode_city,
     compounds.address.state_code,
     state_dim.name,
     compounds.address.country_code,
