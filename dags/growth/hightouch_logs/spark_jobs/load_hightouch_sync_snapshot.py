@@ -1,6 +1,5 @@
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
-from functools import reduce
 from typing import Optional
 
 import pyspark.sql.functions as F
@@ -11,6 +10,7 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
+from bietlejuice.base.spark.base_spark import BaseDBUtils
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -23,46 +23,106 @@ spark_client = SparkClient()
 spark = spark_client.conn
 
 
+def _load_window_timestamps_ms(load_start_date: str, load_end_date: str) -> tuple[int, int]:
+    start_ts = int(datetime.strptime(load_start_date, "%Y-%m-%d").timestamp() * 1000)
+    end_ts = int(
+        (datetime.strptime(load_end_date, "%Y-%m-%d") + timedelta(days=1)).timestamp()
+        * 1000
+    )
+    return start_ts, end_ts
+
+
+def _fetch_parquet_paths_modified_in_window(
+    sync_snapshot_path: str, start_ts: int, end_ts: int
+) -> list[str]:
+    """Returns parquet file paths under sync_snapshot_path modified in [start_ts, end_ts)."""
+    return [
+        file.path
+        for file in dbutils.fs.ls(sync_snapshot_path)
+        if start_ts <= file.modificationTime < end_ts
+    ]
+
+
+def _discover_snapshot_paths(
+    base_path: str,
+    load_start_date: str,
+    load_end_date: str,
+) -> list[str]:
+    """Lists sync_id partitions and collects snapshot parquet paths by modification time."""
+    start_ts, end_ts = _load_window_timestamps_ms(load_start_date, load_end_date)
+
+    sync_dirs = [
+        sync_dir.path
+        for sync_dir in dbutils.fs.ls(base_path)
+        if sync_dir.name.startswith("sync_id=")
+    ]
+
+    paths: list[str] = []
+    for sync_path in sync_dirs:
+        paths.extend(
+            _fetch_parquet_paths_modified_in_window(sync_path, start_ts, end_ts)
+        )
+
+    logger.info(
+        "m=_discover_snapshot_paths, sync_dir_count={}, parquet_file_count={}, "
+        "load_start_date={}, load_end_date={}, msg=discovered source files".format(
+            len(sync_dirs),
+            len(paths),
+            load_start_date,
+            load_end_date,
+        )
+    )
+    return paths
+
+
+def _add_partitions_from_file_path(df: DataFrame) -> DataFrame:
+    """Derives year, month, day from the YYYYMMDD segment in the snapshot file path."""
+    return (
+        df.withColumn("_file_path", F.input_file_name())
+        .withColumn("snapshot_date", F.regexp_extract("_file_path", r"(\d{8})", 1))
+        .withColumn("year", F.substring("snapshot_date", 1, 4).cast("int"))
+        .withColumn("month", F.substring("snapshot_date", 5, 2).cast("int"))
+        .withColumn("day", F.substring("snapshot_date", 7, 2).cast("int"))
+        .drop("_file_path", "snapshot_date")
+    )
+
+
 def _read_snapshot_input(
     base_path: str, load_start_date: str, load_end_date: str
 ) -> Optional[DataFrame]:
-    """Reads parquet per YYYYMMDD path segment and adds year, month, day from that calendar day."""
-    start = datetime.strptime(load_start_date, "%Y-%m-%d")
-    end = datetime.strptime(load_end_date, "%Y-%m-%d")
+    """Reads snapshot parquet files discovered by modification time.
 
-    dfs = []
-    current = start
-    while current <= end:
-        date_str = current.strftime("%Y%m%d")
-        path_glob = f"{base_path}/sync_id=*/{date_str}*"
-        try:
-            day_df = spark.read.parquet(path_glob)
-        except AnalysisException as exc:
-            logger.info(
-                "m=_read_snapshot_input, path_glob={}, msg=skipping day (no parquet): {}".format(
-                    path_glob, exc
-                )
-            )
-            current += timedelta(days=1)
-            continue
-
-        day_df = (
-            day_df.withColumn("year", F.lit(current.year))
-            .withColumn("month", F.lit(current.month))
-            .withColumn("day", F.lit(current.day))
-        )
-        dfs.append(day_df)
-        current += timedelta(days=1)
-
-    if not dfs:
+    Raw partitions (year, month, day) are derived from the YYYYMMDD segment in each
+    file path. sync_id is recovered via basePath partition discovery.
+    """
+    paths = _discover_snapshot_paths(base_path, load_start_date, load_end_date)
+    if not paths:
         logger.info(
-            "m=_read_snapshot_input, load_start_date={}, load_end_date={}, msg=no parquet in range, nothing to load".format(
-                load_start_date, load_end_date
+            "m=_read_snapshot_input, base_path={}, load_start_date={}, load_end_date={}, "
+            "msg=no parquet files modified in range".format(
+                base_path, load_start_date, load_end_date
             )
         )
         return None
 
-    return reduce(lambda a, b: a.unionByName(b), dfs)
+    logger.info(
+        "m=_read_snapshot_input, path_count={}, msg=reading parquet files".format(
+            len(paths)
+        )
+    )
+    try:
+        df = (
+            spark.read.option("ignoreMissingFiles", "true")
+            .option("basePath", base_path)
+            .parquet(*paths)
+        )
+    except AnalysisException as exc:
+        logger.info(
+            "m=_read_snapshot_input, msg=failed to read parquet: {}".format(exc)
+        )
+        return None
+
+    return _add_partitions_from_file_path(df)
 
 
 def _write_to_raw(df, environment: str, source: str, datalake_bucket: str, table_name: str):

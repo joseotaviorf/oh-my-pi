@@ -141,7 +141,12 @@ def _read_sync_runs_input(
         )
     )
     try:
-        df = spark.read.option("ignoreMissingFiles", "true").parquet(*paths)
+        df = (
+            spark.read
+            .option("ignoreMissingFiles", "true")
+            .option("basePath", base_path)
+            .parquet(*paths)
+        )
     except AnalysisException as exc:
         logger.info(
             "m=_read_sync_runs_input, msg=failed to read parquet: {}".format(exc)
