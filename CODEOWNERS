@@ -14,7 +14,7 @@ dags/platform/**                                                        @quintoa
 dags/primitives/**                                                      @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/data-primitives
 dags/support_and_service/**                                             @luisarodriguees @GabriellRodrigues @domus123
 packages/**                                                             @quintoandar/data-ingestion-code-owners
-packages/bietlejuice-runtime/src/bietlejuice/governance/**              @quintoandar/data-ops-governance @quintoandar/data-ingestion-code-owners
+packages/bietlejuice-runtime/**/governance/**                             @quintoandar/data-ops-governance
 packages/bietlejuice-runtime/src/bietlejuice/base/sst/**                @luisarodriguees @GabriellRodrigues @domus123
 packages/bietlejuice-runtime/test/unit/base/sst/**                      @luisarodriguees @GabriellRodrigues @domus123
 packages/bietlejuice-airflow/src/bietlejuice/base/sst/**                @luisarodriguees @GabriellRodrigues @domus123
