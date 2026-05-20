@@ -1986,7 +1986,7 @@ emr_7_12_min_memory_3_workers_cluster:
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
-        availability: SPOT_WITH_FALLBACK
+        availability: ON_DEMAND
 
 ##### Consolidation Cluster Presets #####
 # Naming: consolidation_{size}_{family}_cluster

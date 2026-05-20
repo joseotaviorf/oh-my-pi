@@ -1735,31 +1735,10 @@ emr_7_12_min_memory_3_workers_cluster:
     node_type_id: r7a.xlarge
     driver_node_type_id: r7a.xlarge
     num_workers: 3
-    custom_tags:
-        - key: app
-          value: airflow
-        - key: resource-name
-          value: emr
-        - key: environment
-          value: "{{ var.value.environment }}"
-        - key: owner
-          value: "{{ task.owner.lower().replace(' ', '-') }}"
-        - key: ecosystem
-          value: data-engineering
-        - key: data-classification
-          value: private
-        - key: sensitive-data
-          value: "true"
-        - key: cost-center
-          value: c052
-        - key: provisioner
-          value: emr
-        - key: for-use-with-amazon-emr-managed-policies
-          value: "true"
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
-        availability: SPOT_WITH_FALLBACK
+        availability: ON_DEMAND
 
 emr_7_12_med_general_2_workers_cluster:
     <<: *emr_cluster_anchor
