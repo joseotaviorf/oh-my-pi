@@ -13,7 +13,7 @@ workflow:
     - zendesk_users
   tables_customization:
     zendesk_users:
-      z_order_by: [id_user_main, id_user_zendesk]
+      z_order_by: [id_user_main]
 cluster:
   type: custom_cluster
   custom_configurations:

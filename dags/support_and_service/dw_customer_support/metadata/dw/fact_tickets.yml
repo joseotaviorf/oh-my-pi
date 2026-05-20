@@ -70,10 +70,6 @@ columns:
     lineage:
       - datalake_customer_support.tickets.id_session
     description: Session ID from Sauron
-  sk_sss_session:
-    lineage:
-      - datalake_customer_support.tickets.id_sss_session
-    description: Surrogate key for the Support Session Service (SSS) session linked to the ticket. Defaults to -1 when no SSS session is associated.
   channel:
     lineage:
       - datalake_customer_support.tickets.channel

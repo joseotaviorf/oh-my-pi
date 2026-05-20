@@ -10,78 +10,42 @@ WITH task_queues AS (
   QUALIFY
     ROW_NUMBER() OVER(PARTITION BY id_task ORDER BY ts_updated DESC) = 1
 ),
-sauron_session_data AS (
+-- mas tem whastapp aqui dentro também
+inapp_sessions AS (
+  SELECT DISTINCT
+    id_chat,
+    attributes:["channel_type"] AS channel_type,
+    CAST(id_session AS INTEGER) AS id_session
+  FROM
+    datalake_quinto_messenger_clean.chat
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE("{load_start_date}") - INTERVAL 7 DAY AND DATE("{load_end_date}")
+),
+-- em breve essa cte poderá ser removida, ja que whatsapp vai migrar pra chat
+whatsapp_sessions AS (
+  SELECT DISTINCT
+    id_channel,
+    CAST(id_session AS INTEGER) AS id_session
+  FROM
+    datalake_quinto_messenger_clean.channel
+  WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE("{load_start_date}") - INTERVAL 7 DAY AND DATE("{load_end_date}")
+),
+sauron_sessions AS (
   SELECT
     id AS id_session,
-    get_json_object(user_data, '$.user_id') AS id_user,
-    get_json_object(user_data, '$.user_phone') AS user_phone,
-    get_json_object(user_data, '$.user_email') AS user_email,
+    user_data:["user_id"] AS id_user,
+    user_data:["user_phone"] AS user_phone,
+    user_data:["user_email"] AS user_email,
     created_by,
     source,
     source_environment
   FROM
     datalake_sauron_clean.session
   WHERE
-    year >= YEAR(DATE("{load_start_date}") - INTERVAL 3 MONTH) -- we need to check all sessions as they do not have a fixed lifetime
-),
-sss_session_data AS (
-  SELECT
-    public_id AS id_session,
-    get_json_object(user_data, '$.user_id') AS id_user,
-    get_json_object(user_data, '$.user_phone') AS user_phone,
-    get_json_object(user_data, '$.user_email') AS user_email,
-    created_by,
-    source,
-    source_env AS source_environment
-  FROM
-    datalake_support_session_service_clean.support_session
-  WHERE
-    DATE(ts_updated) BETWEEN DATE("{load_start_date}") - INTERVAL 7 DAY AND DATE("{load_end_date}")
-),
--- mas tem whastapp aqui dentro também
-inapp_sessions AS (
-  SELECT DISTINCT
-    c.id_chat,
-    c.id_session, -- sessões do sauron OU sessões do SSS
-    s.id_session AS id_sauron_session,
-    ss.id_session AS id_sss_session,
-    get_json_object(c.attributes, '$.channel_type') AS channel_type,
-    COALESCE(ss.id_user, s.id_user) AS id_user,
-    COALESCE(ss.user_phone, s.user_phone) AS user_phone,
-    COALESCE(ss.user_email, s.user_email) AS user_email,
-    COALESCE(ss.created_by, s.created_by) AS created_by,
-    COALESCE(ss.source, s.source) AS source,
-    COALESCE(ss.source_environment, s.source_environment) AS source_environment
-  FROM
-    datalake_quinto_messenger_clean.chat AS c
-  LEFT JOIN
-    sss_session_data AS ss
-      ON ss.id_session = c.id_session
-  LEFT JOIN
-    sauron_session_data AS s
-      ON s.id_session = c.id_session
-  WHERE
-    MAKE_DATE(c.year, c.month, c.day) BETWEEN DATE("{load_start_date}") - INTERVAL 7 DAY AND DATE("{load_end_date}")
-),
--- em breve essa cte poderá ser removida, ja que whatsapp vai migrar pra chat
-whatsapp_sessions AS (
-  SELECT DISTINCT
-    c.id_channel,
-    CAST(c.id_session AS INTEGER) AS id_session,
-    s.id_session AS id_sauron_session,
-    s.id_user,
-    s.user_phone,
-    s.user_email,
-    s.created_by,
-    s.source,
-    s.source_environment
-  FROM
-    datalake_quinto_messenger_clean.channel AS c
-  LEFT JOIN
-    sauron_session_data AS s
-      ON s.id_session = c.id_session
-  WHERE
-    MAKE_DATE(c.year, c.month, c.day) BETWEEN DATE("{load_start_date}") - INTERVAL 7 DAY AND DATE("{load_end_date}")
+    year >= YEAR(DATE("{load_start_date}") - INTERVAL 1 YEAR) -- we need to check all sessions as they do not have a fixed lifetime
+  QUALIFY
+    ROW_NUMBER() OVER(PARTITION BY id_session ORDER BY ts_updated DESC) = 1
 ),
 tasks AS (
   SELECT
@@ -127,23 +91,22 @@ tasks AS (
 SELECT
   t.id_channel,
   t.id_task,
-  CAST(COALESCE(ias.id_sauron_session, ws.id_session) AS STRING) AS id_session,
-  ias.id_sss_session AS id_sss_session,
-  COALESCE(ias.id_user, ws.id_user) AS id_user,
+  CAST(COALESCE(ias.id_session, ws.id_session) AS STRING) AS id_session,
+  ss.id_user,
   t.id_worker,
   tq.id_queue,
   t.id_source_ctwa,
   tq.queue_name,
-  COALESCE(ias.user_email, ws.user_email, t.customer_email) AS customer_email,
-  COALESCE(ias.user_phone, ws.user_phone, t.from_phone_number) AS customer_phone_number,
+  COALESCE(ss.user_email, t.customer_email) AS customer_email,
+  COALESCE(ss.user_phone, t.from_phone_number) AS customer_phone_number,
   t.twilio_phone_number,
   CASE WHEN
-    COALESCE(ias.source, ws.source) = 'internal_chat' THEN 'in app'
-    ELSE COALESCE(ias.source, ws.source)
+    ss.source = 'internal_chat' THEN 'in app'
+    ELSE ss.source
     END AS origin,
   CASE
-    WHEN t.is_spoc_task IS TRUE AND COALESCE(ias.created_by, ws.created_by) = 'human_support' THEN 'inbound'
-    WHEN t.is_spoc_task IS TRUE AND COALESCE(ias.created_by, ws.created_by) = 'user' THEN 'outbound'
+    WHEN t.is_spoc_task IS TRUE AND ss.created_by = 'human_support' THEN 'inbound'
+    WHEN t.is_spoc_task IS TRUE AND ss.created_by = 'user' THEN 'outbound'
     ELSE 'inbound'
   END AS direction,
   t.worker_email,
@@ -158,7 +121,7 @@ SELECT
   t.is_per_team_task,
   t.is_spoc_task,
   CASE 
-    WHEN COALESCE(ias.source_environment, ws.source_environment) IN ('isaias_inbound', 'isaias_inbound_main') THEN TRUE
+    WHEN ss.source_environment IN ('isaias_inbound', 'isaias_inbound_main') THEN TRUE
     ELSE FALSE
   END AS is_isaias_session,
   t.url_source_ctwa,
@@ -182,5 +145,9 @@ LEFT JOIN
 LEFT JOIN
   task_queues AS tq
     ON tq.id_task = t.id_task
+LEFT JOIN
+  sauron_sessions AS ss
+    ON ss.id_session = ias.id_session
+    OR ss.id_session = ws.id_session
 WHERE
   COALESCE(ias.id_session, ws.id_session) IS NOT NULL

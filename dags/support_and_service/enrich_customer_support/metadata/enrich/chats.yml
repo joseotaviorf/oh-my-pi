@@ -1,95 +1,83 @@
 database_name: datalake_customer_support
-table_name: chats
-description: Task-level customer support chat interactions with one row per Twilio task linked to a valid session, including queue assignment, communication channel context, and response/inactivity metrics.
+table_name: chat
+description: Test table for chat data
 domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
   id_channel:
     lineage:
       - datalake_quinto_messenger_clean.task.id_channel
-    description: Twilio channel identifier associated with the support task.
+    description: Twilio channel ID
   id_task:
     lineage:
       - datalake_quinto_messenger_clean.task.id_task
-    description: Unique identifier of the Twilio task used as the chat task key.
+    description: Twilio task ID
   id_session:
     lineage:
-      - datalake_sauron_clean.session.id
+      - datalake_quinto_messenger_clean.chat.id_session
       - datalake_quinto_messenger_clean.channel.id_session
-    description: Canonical session identifier resolved from in-app or WhatsApp session sources.
-  id_sss_session:
-    lineage:
-      - datalake_support_session_service_clean.support_session.public_id
-    description: Support Session Service public session identifier linked to the chat when available.
+    description: Session identifier associated with the task, derived from chat or channel sessions.
   id_user:
     lineage:
-      - datalake_support_session_service_clean.support_session.user_data
-      - datalake_sauron_clean.session.user_data
-    description: User identifier linked to the session, resolved across Support Session Service and Sauron sources.
+      - datalake_sauron_clean.session.id_user
+    description: ID for the user associated with the session.
   id_worker:
     lineage:
       - datalake_quinto_messenger_clean.task.id_worker
-    description: Twilio worker identifier responsible for handling the task.
+    description: Twilio worker ID
   id_queue:
     lineage:
       - datalake_quinto_messenger_clean.task_event.id_queue
-    description: Queue identifier of the latest routing queue associated with the task.
+    description: Twilio queue ID
   id_source_ctwa:
     lineage:
-      - datalake_quinto_messenger_clean.task.id_source_ctwa
-    description: Identifier of the click-to-WhatsApp campaign source tied to the task.
+      - datalake_quinto_messenger_clean.task.ctwa_source_id
+    description: The Id for the campaign related to the click to whatsapp identifier.
   queue_name:
     lineage:
       - datalake_quinto_messenger_clean.task_event.queue_name
-    description: Name of the latest queue where the task was routed.
+    description: Name of the queue to which the task is assigned.
   customer_email:
     lineage:
-      - datalake_support_session_service_clean.support_session.user_data
-      - datalake_sauron_clean.session.user_data
+      - datalake_sauron_clean.session.user_email
       - datalake_quinto_messenger_clean.task.customer_email
-    description: Customer email resolved from session payloads with fallback to the task-level customer email.
+    description: Email address of the customer associated with the task, from session or task data.
   customer_phone_number:
     lineage:
-      - datalake_support_session_service_clean.support_session.user_data
-      - datalake_sauron_clean.session.user_data
-      - datalake_quinto_messenger_clean.task.customer_phone_number
+      - datalake_sauron_clean.session.user_phone
       - datalake_quinto_messenger_clean.task.customer_contact_info
-    description: Customer phone number resolved from session payloads with fallback to task-level contact information.
+      - datalake_quinto_messenger_clean.task.customer_phone_number
+    description: Phone number of the customer associated with the task, from session or task contact info.
   twilio_phone_number:
     lineage:
       - datalake_quinto_messenger_clean.task.twilio_phone_number
-    description: Twilio phone number used by the support operation to interact with the customer.
+    description: Twilio phone number used for the task communication.
   origin:
     lineage:
-      - datalake_support_session_service_clean.support_session.source
       - datalake_sauron_clean.session.source
-    description: Conversation origin channel, preserving source labels and normalizing internal_chat to in app.
+    description: Origin of the task communication, either 'in app' or 'whatsapp'.
   direction:
-    lineage:
-      - datalake_quinto_messenger_clean.task.is_spoc_task
-      - datalake_support_session_service_clean.support_session.created_by
-      - datalake_sauron_clean.session.created_by
-    description: Contact direction classification built from SPOC flag and who created the original session.
+    description: If the task was originated from the customer (outbound) or by an analyst (inbound).
   worker_email:
     lineage:
       - datalake_quinto_messenger_clean.task.worker_email
-    description: Email address of the support worker currently associated with the task.
+    description: Email address of the worker handling the task.
   channel_type:
     lineage:
       - datalake_quinto_messenger_clean.task.channel_type
-    description: Communication channel type used by the task, such as whatsapp or in-app chat.
+    description: Type of communication channel, such as 'whatsapp'.
   task_status:
     lineage:
       - datalake_quinto_messenger_clean.task.task_status
-    description: Current operational status of the Twilio task.
+    description: Current status of the task.
   task_outcome:
     lineage:
-      - datalake_quinto_messenger_clean.task.task_outcome
-    description: Final outcome reported for the task according to Twilio task data.
+      - datalake_quinto_messenger_clean.task.conversation_attributes
+    description: Outcome of the task derived from conversation attributes.
   task_completion_reason:
     lineage:
       - datalake_quinto_messenger_clean.task.completion_reason
-    description: Reason code that explains why the task was completed.
+    description: Reason for the task completion status.
   bpo_name:
     lineage:
       - datalake_quinto_messenger_clean.task.bpo_name
@@ -101,61 +89,60 @@ columns:
   seconds_to_first_response:
     lineage:
       - datalake_quinto_messenger_clean.task.seconds_to_first_response
-    description: Time in seconds between task creation and the first worker response.
+    description: Time in seconds taken to provide the first response to the task.
   is_forwarded:
     lineage:
       - datalake_quinto_messenger_clean.task.is_forwarded
-    description: Boolean flag indicating whether the task was forwarded to another queue or handler.
+    description: Indicates if the task was forwarded to another team or worker.
   is_per_team_task:
     lineage:
-      - datalake_quinto_messenger_clean.task.is_per_team_task
-    description: Boolean flag indicating whether the task is configured with team-based assignment.
+      - datalake_quinto_messenger_clean.task.conversation_attributes
+    description: Indicates if the task is assigned per team based on conversation attributes.
   is_spoc_task:
     lineage:
       - datalake_quinto_messenger_clean.task.is_spoc_task
-    description: Boolean flag indicating whether the task belongs to a SPOC workflow.
-  is_isaias_session:
-    lineage:
-      - datalake_support_session_service_clean.support_session.source_env
-      - datalake_sauron_clean.session.source_environment
-    description: Boolean flag that marks sessions created in Isaias inbound environments.
+    description: Indicates if the task is part of a SPOC
   url_source_ctwa:
     lineage:
-      - datalake_quinto_messenger_clean.task.url_source_ctwa
-    description: URL reference for the click-to-WhatsApp campaign source linked to the task.
-  type_source_ctwa:
-    lineage:
-      - datalake_quinto_messenger_clean.task.type_source_ctwa
-    description: Type of click-to-WhatsApp campaign source linked to the task.
+      - datalake_quinto_messenger_clean.task.ctwa_source_url
+    description: The url for the campaign related to the click to whatsapp identifier.
   total_inactivity_time:
     lineage:
       - datalake_quinto_messenger_clean.task.total_inactivity_time
-    description: Total accumulated inactivity time registered during the task lifecycle.
+    description: The total inactivity time of the task.
   last_inactivity_time:
     lineage:
       - datalake_quinto_messenger_clean.task.last_inactivity_time
-    description: Most recent inactivity duration measured before the task ended.
+    description: The last inactivity time of the task.
+  type_source_ctwa:
+    lineage:
+      - datalake_quinto_messenger_clean.task.ctwa_source_type
+    description: The type of the campaign related to the click to whatsapp identifier.
+  is_isaias_session:
+    lineage:
+      - datalake_sauron_clean.session.source_environment
+    description: Indicates if the session is part of an ISAIAS AI Agent interaction
   ts_created:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
-    description: Timestamp when the task was created in Twilio.
+    description: Timestamp when the task was created.
   ts_ended:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_updated
-    description: Timestamp used as the task end reference based on the latest task update.
+    description: Timestamp when the task was ended.
   task_attributes:
     lineage:
       - datalake_quinto_messenger_clean.task.task_attributes
-    description: Structured task attributes payload with additional operational metadata from Twilio.
+    description: Attributes associated with the task in JSON format.
   year:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
-    description: Year partition derived from the task creation timestamp.
+    description: Year component of the task creation date.
   month:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
-    description: Month partition derived from the task creation timestamp.
+    description: Month component of the task creation date.
   day:
     lineage:
       - datalake_quinto_messenger_clean.task.ts_created
-    description: Day partition derived from the task creation timestamp.
+    description: Day component of the task creation date.

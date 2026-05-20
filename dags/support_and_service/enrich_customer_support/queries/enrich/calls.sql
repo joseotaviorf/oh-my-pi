@@ -1,8 +1,7 @@
 WITH sss_and_sauron_call_sessions AS (
   SELECT 
     id AS id_session,
-    get_json_object(user_data, '$.user_id') AS id_user,
-    NULL AS id_sss_session,
+    user_data:["user_id"] AS id_user,
     source_identity
   FROM 
     datalake_sauron_clean.session
@@ -12,8 +11,7 @@ WITH sss_and_sauron_call_sessions AS (
   UNION 
   SELECT 
     id AS id_session,
-    get_json_object(user_data, '$.user_id') AS id_user,
-    public_id AS id_sss_session,
+    user_data:["user_id"] AS id_user,
     source_identity
   FROM 
     datalake_support_session_service_clean.support_session
@@ -25,8 +23,7 @@ WITH sss_and_sauron_call_sessions AS (
   SELECT
     source_identity,
     id_session,
-    id_user,
-    id_sss_session
+    id_user
   FROM
     sss_and_sauron_call_sessions
   QUALIFY
@@ -292,7 +289,6 @@ calls AS (
 SELECT DISTINCT
   c.id_call,
   cs.id_session,
-  cs.id_sss_session,
   cs.id_user,
   c.id_task,
   c.id_reservation,
