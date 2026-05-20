@@ -13,7 +13,7 @@ Thin ``RequirementResult`` wrappers for row fields live in
 from __future__ import annotations
 
 import json
-from typing import Any, Mapping, Optional
+from typing import Mapping, Optional
 
 from bietlejuice.governance.fairness_assessment.constants import (
     DOCUMENTED_NOT_IN_PHYSICAL_REASON,
