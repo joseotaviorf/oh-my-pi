@@ -1,0 +1,25 @@
+SELECT
+    element_type_id AS id_element_type,
+    classification_id AS id_classification,
+    legislative_data_group_id AS id_legislative_data_group,
+    enterprise_id AS id_enterprise,
+    base_element_name AS element_name,
+    legislation_code,
+    input_currency_code,
+    output_currency_code,
+    processing_type,
+    category,
+    created_by,
+    last_updated_by AS updated_by,
+    CAST(object_version_number AS INT) AS object_version_number,
+    CAST(processing_priority AS INT) AS processing_priority,
+    TO_DATE(effective_start_date) AS dt_effective_started,
+    TO_DATE(effective_end_date) AS dt_effective_ended,
+    TO_TIMESTAMP(creation_date) AS ts_created,
+    TO_TIMESTAMP(last_update_date) AS ts_updated,
+    NOW() AS ts_load,
+    year,
+    month,
+    day
+FROM
+    datalake_pin_compensation_raw.pay_element_types_f

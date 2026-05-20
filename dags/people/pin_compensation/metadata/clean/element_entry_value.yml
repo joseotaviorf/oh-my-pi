@@ -1,0 +1,89 @@
+database_name: datalake_pin_compensation_clean
+table_name: element_entry_value
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Values of payroll element entries from Oracle HCM (`pay_element_entry_values_f`).
+  Each `element_entry` may have one or more values — one per input value of the
+  element type.
+
+  Example: an entry for the element `PLR - Salary Multiple` has three values:
+  - `Amount` — the target multiplier, e.g. `2.5`
+  - `Periodicity` — e.g. `PRD`
+  - `Full Time Equivalent` — e.g. `N`
+
+  To pick the actual numeric value of interest, join with `element_input_value`
+  and filter by `input_value_name = 'Amount'`.
+columns:
+  id_element_entry_value:
+    description: Unique identifier for the element entry value. Primary key.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.element_entry_value_id
+  id_element_entry:
+    description: Identifier of the parent element entry. Foreign key to `element_entry`.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.element_entry_id
+  id_input_value:
+    description: Identifier of the input value definition. Foreign key to `element_input_value`.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.input_value_id
+  id_enterprise:
+    description: Oracle HCM enterprise identifier (always `1` at QuintoAndar; no analytical use).
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.enterprise_id
+  screen_entry_value:
+    description: |
+      Raw string value as entered on the source UI. Interpretation depends on the
+      `uom` of the associated `element_input_value`:
+      - `N` (Number) → numeric value (e.g. `2.5`)
+      - `C` (Character) → categorical/string (e.g. `Year`, `PRD`)
+      - `D` (Date) → date in source format
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.screen_entry_value
+  created_by:
+    description: User who created the entry value.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.created_by
+  updated_by:
+    description: User who made the last update to the entry value.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.last_updated_by
+  object_version_number:
+    description: |
+      Source-system optimistic-locking version. Useful as part of the natural
+      key for deduplication of late-arriving records; otherwise ignore in
+      analytical queries.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.object_version_number
+  dt_effective_started:
+    description: Start date of the validity interval for this value (effective dating).
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.effective_start_date
+  dt_effective_ended:
+    description: |
+      End date of the validity interval for this value (effective dating).
+      Open-ended values have `4712-12-31` (Oracle's far future).
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.effective_end_date
+  ts_created:
+    description: Timestamp of when the record was created in the source system.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.creation_date
+  ts_updated:
+    description: Timestamp of the last update to the record in the source system.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.last_update_date
+  ts_load:
+    description: Timestamp recording when data was loaded into the clean table.
+  year:
+    description: Partitioning column representing the year of the last update.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.year
+  month:
+    description: Partitioning column representing the month of the last update.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.month
+  day:
+    description: Partitioning column representing the day of the last update.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entry_values_f.day

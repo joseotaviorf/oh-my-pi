@@ -1,0 +1,116 @@
+database_name: datalake_pin_compensation_clean
+table_name: element_entry
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Payroll element entries from Oracle HCM (`pay_element_entries_f`). Each row represents
+  an entry assigned to a person for a given element type during a validity period
+  (effective dating).
+
+  This is the core table for Individual Compensation Plans (ICP, also known as
+  "Remuneração Adicional"). When Comp registers a value for a person in plans like
+  "PLR Plan", "Hiring Bonus" or "Stock Option", the value is materialized as one
+  row in this table plus one row per input value in `element_entry_value`.
+
+  Common values of `creator_type`:
+  - `F`: Fast Formula — typical for Individual Compensation Plans (ICP/ICD)
+  - `SP`: Salary Proposal — created by salary management
+  - `EE`: Manual entry
+columns:
+  id_element_entry:
+    description: Unique identifier for the element entry. Primary key.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.element_entry_id
+  id_person:
+    description: Identifier of the person to whom the entry is assigned.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.person_id
+  id_element_type:
+    description: Identifier of the element type for this entry. Foreign key to `element_type`.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.element_type_id
+  id_creator:
+    description: |
+      Foreign key to the source object that created this entry; meaning depends on
+      `creator_type` (e.g. `SP` → salary proposal id). Typically null for
+      formula-driven entries. Rarely needed downstream — most consumers start
+      from `id_person` and `id_element_type`.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.creator_id
+  id_enterprise:
+    description: Oracle HCM enterprise identifier (always `1` at QuintoAndar; no analytical use).
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.enterprise_id
+  entry_type:
+    description: |
+      Type of the entry. Common values:
+      - `E`: Element entry (standard recurring/non-recurring element)
+      - `R`: Reversal
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.entry_type
+  creator_type:
+    description: |
+      Origin of the entry. Most relevant values:
+      - `F`: Fast Formula (used by Individual Compensation Plans)
+      - `SP`: Salary Proposal (created by salary management flow)
+      - `EE`: Element Entry created manually
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.creator_type
+  reason:
+    description: Free-text reason for the entry, when filled by the requester in the source UI.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.reason
+  created_by:
+    description: User who created the entry.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.created_by
+  updated_by:
+    description: User who made the last update to the entry.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.last_updated_by
+  object_version_number:
+    description: |
+      Source-system optimistic-locking version. Useful as part of the natural
+      key for deduplication of late-arriving records; otherwise ignore in
+      analytical queries.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.object_version_number
+  multiple_entry_count:
+    description: |
+      Sequential counter for cases where the same `person_id` + `element_type_id`
+      has more than one entry on overlapping validity periods. Used by the source
+      system to keep them distinguishable.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.multiple_entry_count
+  dt_effective_started:
+    description: Start date of the validity interval for this entry (effective dating).
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.effective_start_date
+  dt_effective_ended:
+    description: |
+      End date of the validity interval for this entry (effective dating).
+      Open-ended entries have `4712-12-31` (Oracle's far future).
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.effective_end_date
+  ts_created:
+    description: Timestamp of when the record was created in the source system.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.creation_date
+  ts_updated:
+    description: Timestamp of the last update to the record in the source system.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.last_update_date
+  ts_load:
+    description: Timestamp recording when data was loaded into the clean table.
+  year:
+    description: Partitioning column representing the year of the last update.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.year
+  month:
+    description: Partitioning column representing the month of the last update.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.month
+  day:
+    description: Partitioning column representing the day of the last update.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_entries_f.day

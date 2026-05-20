@@ -1,0 +1,124 @@
+database_name: datalake_pin_compensation_clean
+table_name: element_type
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Definitions of payroll element types from Oracle HCM (`pay_element_types_f`).
+  Each row represents an element type used to register element entries for people.
+
+  Element types relevant to additional compensation include:
+  - `PLR - Salary Multiple` — PLR target expressed as a multiplier of the salary
+  - `Annual Target - PLR` — PLR target expressed as a fixed annual amount in local currency
+  - `Annual Target - PLR (Dolar)` — PLR target expressed as a fixed annual amount in USD
+  - `Hiring Bonus`, `Stock Option`, and others
+
+  The same `element_name` may appear in multiple `element_type_id`s — typically
+  one per country / Legislative Data Group. Use `id_legislative_data_group` or
+  `legislation_code` to disambiguate, no need to look up the person's job.
+columns:
+  id_element_type:
+    description: Unique identifier for the element type. Primary key.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.element_type_id
+  id_classification:
+    description: Identifier of the element classification (e.g. earnings, allowance).
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.classification_id
+  id_legislative_data_group:
+    description: |
+      Identifier of the Legislative Data Group (LDG) this element type belongs to.
+      LDGs are per-country in Oracle HCM (BR, MX, PT, US, etc.), so this field
+      uniquely identifies the country variant of an element type without joining
+      to job or person tables.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.legislative_data_group_id
+  id_enterprise:
+    description: Oracle HCM enterprise identifier (always `1` at QuintoAndar; no analytical use).
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.enterprise_id
+  element_name:
+    description: |
+      Internal English name of the element type, stable across countries and
+      locales. **Prefer this over `element_type_translation.element_name` for
+      filtering** (e.g. `element_name = 'PLR - Salary Multiple'`). In Oracle the
+      source column is `base_element_name`.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.base_element_name
+  legislation_code:
+    description: |
+      ISO-style code of the legislation (country) this element type belongs to
+      (e.g. `BR`, `MX`, `PT`, `US`). Together with `id_legislative_data_group`,
+      makes country attribution explicit at the element-type level.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.legislation_code
+  input_currency_code:
+    description: |
+      ISO currency code used when entering values for this element type
+      (e.g. `BRL`, `USD`, `EUR`).
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.input_currency_code
+  output_currency_code:
+    description: ISO currency code used by payroll outputs for this element type.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.output_currency_code
+  processing_type:
+    description: |
+      Processing type of the element. Common values:
+      - `R`: Recurring (the entry is processed in every payroll run during validity)
+      - `N`: Non-recurring (the entry is processed only once)
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.processing_type
+  category:
+    description: |
+      Category of the element in the source system (e.g. `ORA_STANDARD`).
+      Used by Oracle templates to group standard vs custom element types.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.category
+  processing_priority:
+    description: Priority used by the payroll engine to order the processing of element entries.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.processing_priority
+  object_version_number:
+    description: Source-system optimistic-locking version; ignore in analytical queries.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.object_version_number
+  created_by:
+    description: User who created the element type.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.created_by
+  updated_by:
+    description: User who made the last update to the element type.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.last_updated_by
+  dt_effective_started:
+    description: Start date of the validity interval for this element type (effective dating).
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.effective_start_date
+  dt_effective_ended:
+    description: |
+      End date of the validity interval for this element type (effective dating).
+      Open-ended types have `4712-12-31` (Oracle's far future).
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.effective_end_date
+  ts_created:
+    description: Timestamp of when the record was created in the source system.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.creation_date
+  ts_updated:
+    description: Timestamp of the last update to the record in the source system.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.last_update_date
+  ts_load:
+    description: Timestamp recording when data was loaded into the clean table.
+  year:
+    description: Partitioning column representing the year of the last update.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.year
+  month:
+    description: Partitioning column representing the month of the last update.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.month
+  day:
+    description: Partitioning column representing the day of the last update.
+    lineage:
+    - datalake_pin_compensation_raw.pay_element_types_f.day

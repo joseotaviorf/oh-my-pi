@@ -1,0 +1,116 @@
+database_name: datalake_pin_compensation_clean
+table_name: element_input_value
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |-
+  Definitions of input values for payroll element types from Oracle HCM
+  (`pay_input_values_f`). Each element type has one or more input values that
+  define the fields filled when an entry is created for a person.
+
+  Example: the element type `PLR - Salary Multiple` has 3 input values:
+  - `Amount` (UOM `M` — the actual numeric target, e.g. `2.5`)
+  - `Periodicity` (UOM `C` — categorical)
+  - `Full Time Equivalent` (UOM `C` — Y/N flag)
+columns:
+  id_input_value:
+    description: Unique identifier for the input value definition. Primary key.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.input_value_id
+  id_element_type:
+    description: Identifier of the parent element type. Foreign key to `element_type`.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.element_type_id
+  id_enterprise:
+    description: Oracle HCM enterprise identifier (always `1` at QuintoAndar; no analytical use).
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.enterprise_id
+  input_value_name:
+    description: |
+      Internal English name of the input value, stable across countries and
+      locales. **Prefer this over `element_input_value_translation.input_value_name`
+      for filtering** (e.g. `input_value_name = 'Amount'` to pick the numeric
+      target of an element entry). In Oracle the source column is `base_name`.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.base_name
+  uom:
+    description: |
+      Unit of measure of the input value. Tells consumers how to interpret the
+      raw `screen_entry_value` in `element_entry_value`:
+      - `N` Number — numeric (e.g. `2.5`)
+      - `M` Money — monetary amount in the element type's currency
+      - `C` Character — categorical / string
+      - `D` Date
+      - `H` Hours
+      - `T` Time
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.uom
+  lookup_type:
+    description: |
+      Lookup type used to constrain the allowed values for this input
+      (when the value is selected from a lookup list).
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.lookup_type
+  default_value:
+    description: Default value pre-filled for this input on the source UI.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.default_value
+  display_sequence:
+    description: Order in which input values are displayed on the source UI for the element.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.display_sequence
+  object_version_number:
+    description: Source-system optimistic-locking version; ignore in analytical queries.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.object_version_number
+  created_by:
+    description: User who created the input value definition.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.created_by
+  updated_by:
+    description: User who made the last update to the input value definition.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.last_updated_by
+  is_mandatory:
+    description: Boolean flag indicating whether the input value must be filled when an entry is created.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.mandatory_flag
+  is_user_enterable:
+    description: Boolean flag indicating whether the value can be entered/edited by an end user.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.user_enterable_flag
+  is_user_displayed:
+    description: Boolean flag indicating whether the input value is shown on the source UI.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.user_display_flag
+  dt_effective_started:
+    description: Start date of the validity interval for this input value (effective dating).
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.effective_start_date
+  dt_effective_ended:
+    description: |
+      End date of the validity interval for this input value (effective dating).
+      Open-ended values have `4712-12-31` (Oracle's far future).
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.effective_end_date
+  ts_created:
+    description: Timestamp of when the record was created in the source system.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.creation_date
+  ts_updated:
+    description: Timestamp of the last update to the record in the source system.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.last_update_date
+  ts_load:
+    description: Timestamp recording when data was loaded into the clean table.
+  year:
+    description: Partitioning column representing the year of the last update.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.year
+  month:
+    description: Partitioning column representing the month of the last update.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.month
+  day:
+    description: Partitioning column representing the day of the last update.
+    lineage:
+    - datalake_pin_compensation_raw.pay_input_values_f.day

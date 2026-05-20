@@ -1,0 +1,25 @@
+SELECT
+    input_value_id AS id_input_value,
+    element_type_id AS id_element_type,
+    enterprise_id AS id_enterprise,
+    base_name AS input_value_name,
+    uom,
+    lookup_type,
+    default_value,
+    created_by,
+    last_updated_by AS updated_by,
+    CAST(object_version_number AS INT) AS object_version_number,
+    CAST(display_sequence AS INT) AS display_sequence,
+    COALESCE(mandatory_flag = 'Y', FALSE) AS is_mandatory,
+    COALESCE(user_enterable_flag = 'Y', FALSE) AS is_user_enterable,
+    COALESCE(user_display_flag = 'Y', FALSE) AS is_user_displayed,
+    TO_DATE(effective_start_date) AS dt_effective_started,
+    TO_DATE(effective_end_date) AS dt_effective_ended,
+    TO_TIMESTAMP(creation_date) AS ts_created,
+    TO_TIMESTAMP(last_update_date) AS ts_updated,
+    NOW() AS ts_load,
+    year,
+    month,
+    day
+FROM
+    datalake_pin_compensation_raw.pay_input_values_f
