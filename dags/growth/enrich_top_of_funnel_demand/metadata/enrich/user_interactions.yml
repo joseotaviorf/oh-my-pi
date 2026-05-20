@@ -23,6 +23,10 @@ columns:
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.ep_house_id
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.top5_house_id
+  id_amplitude:
+    description: 'Unique Amplitude identifier for the page-viewed event, used to deduplicate users across funnel steps.'
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.id_amplitude
   sk_region:
     description: 'Surrogate key for the region of the interaction. Resolved from the house region for organic traffic, and from the event region or a dynamic QAC region lookup via classifieds/vespucio data for QAC test traffic.'
     lineage:

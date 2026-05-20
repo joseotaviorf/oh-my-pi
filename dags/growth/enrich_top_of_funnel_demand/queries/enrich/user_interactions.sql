@@ -60,6 +60,7 @@ filtered_events AS (
             CAST(id_user AS STRING),
             CAST(id_device AS STRING)
         ) AS id_tof_user,
+        id_amplitude,
         CASE
             WHEN (UPPER(CAST(utm_campaign AS STRING)) LIKE '%BRANDED%'
                   OR UPPER(CAST(utm_campaign AS STRING)) LIKE '%INSTITUCIONAL%')
@@ -117,6 +118,7 @@ SELECT
     BIGINT(year*10000 + month*100 + day || ROW_NUMBER() OVER (ORDER BY evt.dt_event)) AS id,
     evt.id_tof_user,
     COALESCE(evt.id_house, -1) AS id_house,
+    evt.id_amplitude,
     CASE
         WHEN evt.is_qac = FALSE THEN dh.sk_region
         WHEN evt.is_qac = TRUE AND dh.sk_region IS NOT NULL THEN dh.sk_region -- QAC event with house region
