@@ -39,9 +39,11 @@ workflow:
         - "{schema}"
         - "{dag_name}"
         - "{table_name}"
+        - "false"
         - "{load_start_date}"
         - "{load_end_date}"
         - "incremental"
+        - "started_at"
         - "s3://5a-cdp-processed-data-{environment}/repo/hightouch/hightouch_audit/sync_runs"
         - "parquet"
       extraction_type: incremental
