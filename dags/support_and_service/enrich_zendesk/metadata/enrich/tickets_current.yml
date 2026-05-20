@@ -16,6 +16,18 @@ columns:
     description: ID of the user assigned to the ticket
     lineage:
       - datalake_zendesk.tickets.id_assignee
+  id_requester:
+    description: Zendesk user id of the ticket requester
+    lineage:
+      - datalake_zendesk.tickets.id_requester
+  id_user_main:
+    description: QuintoAndar main user id resolved from the Zendesk requester
+    lineage:
+      - datalake_support_users.zendesk_users.id_user_main
+  id_submitter:
+    description: Zendesk user id of the ticket submitter
+    lineage:
+      - datalake_zendesk.tickets.id_submitter
   id_group:
     description: ID of the group of the ticket
     lineage:
@@ -60,6 +72,12 @@ columns:
     description: Another custom field that holds a Twilio ID
     lineage:
       - datalake_zendesk.tickets.custom_fields
+  twilio_task:
+    description: Resolved Twilio task identifier for the ticket, preferring task_sid_twilio when present and otherwise extracting a WT-prefixed task id from contact_ticket or description.
+    lineage:
+      - datalake_zendesk.tickets.task_sid_twilio
+      - datalake_zendesk.tickets.contact_ticket
+      - datalake_zendesk.tickets.description
   group_name:
     lineage:
       - datalake_zendesk.groups.name
@@ -180,6 +198,10 @@ columns:
     description: Customer satisfaction data
     lineage:
       - datalake_zendesk.tickets.satisfaction_rating
+  request_type:
+    description: Type of request related to the customer, from custom field Tipo de Solicitação
+    lineage:
+      - datalake_zendesk.tickets.custom_fields
   client_type:
     description: Type of client, from custom_fields like 'Tipo de Cliente'
     lineage:
@@ -468,10 +490,10 @@ columns:
     lineage:
       - datalake_zendesk.ticket_metrics.ts_solved
     description: Timestamp of when the ticket was solved
-  ts_analysts_started:
+  ts_analyst_started:
+    description: Timestamp when the assigned analyst started handling the ticket
     lineage:
-      - datalake_support_users.analysts.ts_created
-    description: Timestamp that indicates when the analyst was first registered.
+      - datalake_zendesk.tickets.ts_analyst_started
   ts_created:
     description: Timestamp of ticket creation
     lineage:
@@ -484,10 +506,6 @@ columns:
     description: Date in timestamp format that indicates when the ticket was closed.
     lineage:
       - datalake_zendesk.tickets.ts_updated
-  ts_load:
-    description: Timestamp of when data was loaded
-    lineage:
-      - datalake_zendesk.tickets.ts_load
   year:
     description: Partition column
     lineage:

@@ -179,6 +179,11 @@ SELECT
   t.last_group_name,
   t.custom_fields,
   t.task_sid_twilio,
+  COALESCE(
+    t.task_sid_twilio,
+    NULLIF(REGEXP_EXTRACT(t.contact_ticket, '(WT[a-z0-9]{{20,40}})'), ''),
+    NULLIF(REGEXP_EXTRACT(t.description, '(WT[a-z0-9]{{20,40}})'), '')
+  ) AS twilio_task,
   t.contact_ticket,
   t.offer_ids,
   t.taxonomy_tags,
