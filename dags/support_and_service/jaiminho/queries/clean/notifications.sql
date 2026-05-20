@@ -17,7 +17,7 @@ SELECT
   CAST(sentAt AS TIMESTAMP) AS ts_sent,
   CAST(createdAt AS TIMESTAMP) AS ts_created,
   YEAR(updatedAt) AS year,
-  YEAR(updatedAt) AS month,
-  YEAR(updatedAt) AS day
+  MONTH(updatedAt) AS month,
+  DAY(updatedAt) AS day
 FROM
   datalake_jaiminho_raw.notifications
