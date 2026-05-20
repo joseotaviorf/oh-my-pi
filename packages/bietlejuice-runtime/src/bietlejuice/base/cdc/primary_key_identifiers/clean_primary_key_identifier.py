@@ -1,12 +1,15 @@
 from typing import List
 
+import boto3
 import yaml
+from botocore.exceptions import ClientError
 from delta.tables import DeltaTable
 
 from bietlejuice.base.cdc.primary_key_identifiers.primary_key_identifier import (
     PrimaryKeyIdentifier,
 )
 from bietlejuice.base.spark.base_spark import BaseSparkContext
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.services.storage_services import VolumeMapper, VolumeService
 
 
@@ -40,6 +43,38 @@ class CleanPrimaryKeyIdentifier(PrimaryKeyIdentifier):
 
     def _read_table_metadata(self, schema: str, table_name: str):
         """Returns the metadata of a clean table from the data documentation bucket."""
+
+        if RuntimeDetector.is_emr():
+            metadata_dir = f"metadata/datalake_{schema}_clean"
+            s3 = boto3.resource("s3")
+            for extension in (".yml", ".yaml"):
+                object_key = f"{metadata_dir}/{table_name}{extension}"
+                try:
+                    content = (
+                        s3.Object(self.data_documentation_bucket, object_key)
+                        .get()["Body"]
+                        .read()
+                        .decode("utf-8")
+                    )
+                    return yaml.safe_load(content)
+                except ClientError as exc:
+                    if exc.response.get("Error", {}).get("Code") not in (
+                        "404",
+                        "NoSuchKey",
+                        "NotFound",
+                    ):
+                        raise
+                except yaml.YAMLError:
+                    raise ValueError(
+                        f"The primary keys of the table {schema}.{table_name} could not be automatically identified, because "
+                        f"s3://{self.data_documentation_bucket}/{object_key} is not a valid YAML file. Please, fix the lineage file or "
+                        "provide the primary keys manually in DAG Declaration file."
+                    )
+            raise ValueError(
+                f"The primary keys of the table {schema}.{table_name} could not be automatically identified, because the metadata file was not found in expected "
+                f"paths: s3://{self.data_documentation_bucket}/{metadata_dir}/{table_name}.yml or "
+                f"s3://{self.data_documentation_bucket}/{metadata_dir}/{table_name}.yaml. Please, create the lineage file or provide the primary keys manually in DAG Declaration file."
+            )
 
         try:
             # ".y" in the end of the prefix to include both ".yaml" and ".yml" files
