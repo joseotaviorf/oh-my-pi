@@ -1,7 +1,7 @@
 # EMR submit settings.
 
 region: us-east-1
-release_label: emr-7.5.0
+release_label: emr-7.12.0
 subnet_id: subnet-05cb5b20def7300c3
 job_flow_role: emr-prod
 service_role: arn:aws:iam::206390561754:role/EMR_DefaultRole_V2
@@ -28,7 +28,8 @@ configurations:
       delta.enabled: "true"
   - Classification: spark-hive-site
     Properties:
-      hive.metastore.client.factory.class: "com.amazonaws.glue.catalog.metastore.AWSG\
+      hive.metastore.client.factory.class:
+        "com.amazonaws.glue.catalog.metastore.AWSG\
         lueDataCatalogHiveClientFactory"
 
 # Overridable per run (CLI args).
