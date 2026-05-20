@@ -186,6 +186,21 @@ workflow:
     170698_profiling_complete_clicked_events:
       run_optimize: false
       run_vacuum: false
+    170698_classifieds_viewed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_contact_broker_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_edit_account_info_clicked_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_lead_intent_confirmed_events:
+      run_optimize: false
+      run_vacuum: false
+    170698_lead_intent_events:
+      run_optimize: false
+      run_vacuum: false
     170698_rm_invoice_page_viewed_events:
       run_optimize: false
       run_vacuum: false

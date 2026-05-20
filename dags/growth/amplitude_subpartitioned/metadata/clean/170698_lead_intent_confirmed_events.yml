@@ -1,0 +1,113 @@
+database_name: datalake_amplitude_clean
+table_name: 170698_lead_intent_confirmed_events
+owner: vinicius.araujo@quintoandar.com.br
+domain: Growth
+description: This table contains lead_intent_confirmed events from app 170698 in the QuintoAndar Classifieds (QAC) funnel when a user confirms lead intent.
+columns:
+  id_amplitude:
+    lineage:
+    - datalake_amplitude_clean.events.id_amplitude
+    description: Unique identifier of the Amplitude event record.
+  id_app:
+    lineage:
+    - datalake_amplitude_clean.events.id_app
+    description: Amplitude application identifier where the event was triggered.
+  id_device:
+    lineage:
+    - datalake_amplitude_clean.events.id_device
+    description: Identifier of the device used when the event was triggered.
+  id_event:
+    lineage:
+    - datalake_amplitude_clean.events.id_event
+    description: Unique identifier of the event instance within Amplitude.
+  id_session:
+    lineage:
+    - datalake_amplitude_clean.events.id_session
+    description: Identifier of the user session when the event was triggered.
+  id_user:
+    lineage:
+    - datalake_amplitude_clean.events.id_user
+    description: Identifier of the logged-in user when the event was triggered.
+  id_region:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Sub-region identifier extracted from event properties for the classifieds interaction.
+  id_house:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: House identifier extracted from event properties for the classifieds interaction.
+  id_search:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Search identifier associated with the classifieds interaction.
+  id_lead:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Lead identifier associated with the classifieds interaction.
+  id_source:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Source identifier associated with the classifieds interaction.
+  id_publisher:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Publisher identifier associated with the classifieds listing.
+  search_rank:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Rank position of the listing in search results for the classifieds interaction.
+  publisher_name:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Name of the publisher associated with the classifieds listing.
+  city:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: City associated with the classifieds interaction extracted from event properties.
+  origin:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Origin context of the classifieds interaction extracted from event properties.
+  uri:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: URI associated with the classifieds interaction extracted from event properties.
+  business_context:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Business context of the classifieds interaction, defaulting to rent when not provided.
+  is_qac:
+    description: Flag indicating the event belongs to QuintoAndar Classifieds (QAC) traffic. Always true for this table.
+  event_type:
+    lineage:
+    - datalake_amplitude_clean.events.event_type
+    description: Name of the Amplitude event triggered in the classifieds funnel. Always lead_intent_confirmed for this table.
+  platform:
+    lineage:
+    - datalake_amplitude_clean.events.platform
+    description: Platform where the classifieds event was triggered.
+  event_properties:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Raw JSON event properties payload from Amplitude.
+  user_properties:
+    lineage:
+    - datalake_amplitude_clean.events.user_properties
+    description: Raw JSON user properties payload from Amplitude.
+  ts_event:
+    lineage:
+    - datalake_amplitude_clean.events.ts_event
+    description: Timestamp when the classifieds event occurred on the client.
+  year:
+    lineage:
+    - datalake_amplitude_clean.events.year
+    description: Partition year of the classifieds event.
+  month:
+    lineage:
+    - datalake_amplitude_clean.events.month
+    description: Partition month of the classifieds event.
+  day:
+    lineage:
+    - datalake_amplitude_clean.events.day
+    description: Partition day of the classifieds event.
+
