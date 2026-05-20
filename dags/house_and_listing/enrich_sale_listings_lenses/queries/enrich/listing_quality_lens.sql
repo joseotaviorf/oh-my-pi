@@ -154,26 +154,26 @@ house_changes AS (
 ),
 visits AS (
     SELECT
-        id,
+        id_last_schedule,
         id_house,
-        ts_visit_fup
+        ts_visit_fup_collected
     FROM
-        datalake_booking.booking
+        datalake_visit.visits
     WHERE
-        ts_visit_fup IS NOT NULL
+        has_fup_collected IS NOT NULL
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY id_house, ts_visit_fup ORDER BY id DESC) = 1
+        ROW_NUMBER() OVER (PARTITION BY id_house, ts_visit_fup_collected ORDER BY id_last_schedule DESC) = 1
 ),
 review_visits AS (
     SELECT
         v.id_house,
         BOOL_AND(r.is_listing_accurate) AS is_listing_accurate,
-        DATE(DATE_TRUNC('DAY', v.ts_visit_fup)) AS dt_visit
+        DATE(DATE_TRUNC('DAY', v.ts_visit_fup_collected)) AS dt_visit
     FROM
         visits AS v
     INNER JOIN
         datalake_booking.booking_review AS r
-            ON v.id = r.id_booking
+            ON v.id_last_schedule = r.id_booking
     WHERE
         r.is_listing_accurate IS NOT NULL
     GROUP BY

@@ -10,16 +10,16 @@ columns:
       - datalake_ebdb_clean.info_amenities_aud.id_house
       - datalake_ebdb_clean.info_condo_amenities_aud.id_house
       - datalake_ebdb_clean.house_aud.id_house
-      - datalake_booking.booking.id_house
+      - datalake_visit.visits.id_house
       - datalake_ebdb_listing.house_entrance_history.id_house
       - datalake_ebdb_house.maintenance_condition_history.id_house
-    description: > 
+    description: >
        Column referring to the house ID. Can be joined with dw_house.dim_house and all other sale modeling tables.
   tier:
-    description: > 
+    description: >
       We use the entire history of changes to a property's features and condominiums to create a tier that tracks the level of completeness of a house's information.
       We believe that a house with complete information performs much better on the platform. With this in mind, we used several variables and created a completeness score.
-    categories: 
+    categories:
       Q5: Represents listings with full information on amenities and features. There is no penalty, i.e. all the information we considered was filled in.
       Q4: Represents listings with almost complete information on amenities and features. There is a small penalty, i.e. some of the amenities or features that are not so critical have not been filled.
         To be placed into this tier you must have a score between -1 and -500.
@@ -29,68 +29,68 @@ columns:
         To be placed into this tier you must have a score less than -1500.
       Q1: Represents listings with no information on amenities and features. Represents listings that are missing one or more critical information. To be considered in this tier, we have a problem identifying its sale price and/or its condo value and/or its number of bedrooms and/or its total area.
   tier_name:
-    description: > 
+    description: >
       Just a full name of the listing quality tier.
-    categories: 
+    categories:
       Great Accuracy: It represents the Q5 tier. Listings with full information on amenities and features.
       Good Accuracy: It represents the Q4 tier. Listings with almost complete information on amenities and features.
       Moderate Accuracy: It represents the Q3 tier. Listings with incomplete information on amenities and features.
       Low Accuracy: It represents the Q2 tier. Listings with very incomplete information on amenities and features.
       Critical Accuracy: It represents the Q1 tier. Listings with critical information missing, like sale price, condo, bedrooms and total area.
   tier_disclaimer:
-    description: > 
+    description: >
       Column describing the tier for that row. In other words, it describes why that tier was classified in that house over a certain period of time.
   tier_drill_down:
-    description: > 
+    description: >
       Drill down of the tier_disclaimer column, where we can see the reason why the listing is in that tier.
   listing_quality_score:
-    description: > 
+    description: >
       Score that represents the quality of the listing. It is calculated as the sum of all the other scores and their respective completenesses.
   component_completeness:
-    description: > 
+    description: >
       Percentage of completeness of all variables taken into account to calculate the listing quality score. A variable is considered complete when it is not null.
   price_score:
-    description: > 
+    description: >
       Score based on the sale price information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. We know the sale price and it is greater than R$120K and less than R$20M.
       "-10000": Either we don't know the sale price or it's outside QuintoAndar's standards.
   bedrooms_score:
-    description: > 
+    description: >
       Score based on the number of bedrooms. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. We know the number of bedrooms.
       "-10000": No information, we don't know how many bedrooms there are or it is marked that there are no bedrooms.
   bathrooms_score:
-    description: > 
+    description: >
       Score based on the number of bathrooms. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. We know the number of bathrooms.
       "-10000": No information, we don't know how many bathrooms there are or it is marked that there are no bathrooms.
   total_area_score:
-    description: > 
-      Score based on the total area information. If the information on whether there is such an amenity is not filled in, we deduct points from the score. 
+    description: >
+      Score based on the total area information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. We know th total area of the house and it is greater than 5 and less than 1000.
       "-10000": Either we don't know the total area or it's outside QuintoAndar's standards.
   floor_score:
-    description: > 
+    description: >
       Score based on the floor information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
-    categories: 
+    categories:
       "0": Existing information. We know where the house is.
       "-100": No information, we don't know the floor of the house. We only deduct points if the house type is "Apartamento" or "StudioOrKitchenette".
   condo_score:
-    description: > 
+    description: >
       Score based on the condo price value information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. We know the condo price value and it is greater than 10.
       "-10000": If the condo price value of the house is less than or equal to 10 or null. But it only affects houses whose type is 'Apartamento', 'CasaCondominio' or 'StudioOuKitchenette'.
   house_condition_score:
-    description: > 
+    description: >
       Score based on the house condition. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
-    categories: 
+    categories:
       "0": Existing information. We know the house condition.
-      "-200": No information, we don't know the house condition. 
+      "-200": No information, we don't know the house condition.
   iptu_score:
     description: >
       Score based on the IPTU value information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
@@ -98,13 +98,13 @@ columns:
       "0": Existing information. We know the IPTU value and it seems to make sense.
       "-50": If the IPTU value of the house is less than or equal to 0 or null. But it only affects houses whose IPTU type is 'NaoInformado' or 'Normal'.
   parking_slots_score:
-    description: > 
+    description: >
       Score based on the number of parking slots. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. We know the number of parking slots.
       "-400": No information, we don't know how many parking slots there are.
   type_score:
-    description: > 
+    description: >
       Score based on the house type. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. We know the type of house.
@@ -122,19 +122,19 @@ columns:
       "0": The keys to the house have a definite location.
       "-400": We don't know where the keys to the house are or it's pointed out that there is no location.
   listing_accuracy_score:
-    description: > 
+    description: >
       Score based on the listing accuracy. If the house has received a review of a visit where the visitor pointed out that the house information was inaccurate.
     categories:
       "0": The listing didn't receive a visit, or didn't receive a review or only reviews noting that the information was correct.
       "-1000": The house has received a review of a visit where the visitor pointed out that the house information was inaccurate.
   penthouse_score:
-    description: > 
+    description: >
       Score based if house is penthouse. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. The house may or may not be a penthouse.
       "-50": No information, we don't know if it's a penthouse or not.
   elevator_score:
-    description: > 
+    description: >
       Score based on the condo elevator information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. The house may or may not have the amenity.
@@ -152,13 +152,13 @@ columns:
       "0": Existing information. The house may or may not have the amenity.
       "-50": No information, we don't know if there's an amenity or not.
   bathroom_cabinet_score:
-    description: > 
+    description: >
       Score based on the house bathroom cabinet information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. The house may or may not have the amenity.
       "-50": No information, we don't know if there's an amenity or not.
   air_conditioning_score:
-    description: > 
+    description: >
       Score based on the house air conditioning information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. The house may or may not have the amenity.
@@ -166,7 +166,7 @@ columns:
   toy_library_score:
     description: >
       Score based on the condo toy library information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
-    categories: 
+    categories:
       "0": Existing information. The house may or may not have the amenity.
       "-100": No information, we don't know if there's an amenity or not. We only deduct points if the house type is "Apartamento", "CasaCondominio" or "StudioOrKitchenette".
   grill_score:
@@ -182,7 +182,7 @@ columns:
       "0": Existing information. The house may or may not have the amenity.
       "-50": No information, we don't know if there's an amenity or not.
   natural_light_score:
-    description: > 
+    description: >
       Score based on the house natural light information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. The house may or may not have the amenity.
@@ -206,41 +206,41 @@ columns:
       "0": Existing information. The house may or may not have the amenity.
       "-200": No information, we don't know if there's an amenity or not. We only deduct points if the house type is "Apartamento", "CasaCondominio" or "StudioOrKitchenette".
   sports_court_score:
-    description: > 
+    description: >
       Score based on the condo sports court information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. The house may or may not have the amenity.
       "-200": No information, we don't know if there's an amenity or not. We only deduct points if the house type is "Apartamento", "CasaCondominio" or "StudioOrKitchenette".
   party_hall_score:
-    description: > 
+    description: >
       Score based on the condominium party hall information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. The house may or may not have the amenity.
       "-200": No information, we don't know if there's an amenity or not. We only deduct points if the house type is "Apartamento", "CasaCondominio" or "StudioOrKitchenette".
   sauna_score:
-    description: > 
+    description: >
       Score based on the condominium sauna information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. The house may or may not have the amenity.
       "-200": No information, we don't know if there's an amenity or not. We only deduct points if the house type is "Apartamento", "CasaCondominio" or "StudioOrKitchenette".
   balcony_score:
-    description: > 
+    description: >
       Score based on the house balcony information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
     categories:
       "0": Existing information. The house may or may not have the amenity.
       "-200": No information, we don't know if there's an amenity or not.
   ceiling_fan_score:
-    description: > 
+    description: >
       Score based on the house ceiling fan information. If the information on whether there is such an amenity is not filled in, we deduct points from the score.
-    categories: 
+    categories:
       "0": Existing information. The house may or may not have the amenity.
       "-50": No information, we don't know if there's an amenity or not.
   is_last_tier:
-    description: > 
+    description: >
       This column represents a Boolean flag that indicates whether the tier referring to the observed row is the current tier or a tier that is part of a listing's history.
   ts_tier_started:
-    description: 
+    description:
             Date of tier change. It is linked to some change in the scores that make up the listing quality score. It will change to a new status and create a new row when any of these scores change the listing tier.
   ts_tier_ended:
-    description: > 
+    description: >
       Termination date of the tier. It is strictly linked to the beginning of the next tier.

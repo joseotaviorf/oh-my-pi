@@ -9,7 +9,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id_house
       - datalake_ebdb_clean.listing_business_context_aud.id_house
-      - datalake_ebdb_clean.booking.id_house
+      - datalake_visit.visit_schedules.id_house
       - datalake_sale_offer.sale_offer.id_house
     description:  >
       Column referring to the house ID. Can be joined with dw_house.dim_house and all other sale modeling tables.

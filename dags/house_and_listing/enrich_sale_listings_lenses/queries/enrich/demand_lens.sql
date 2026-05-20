@@ -1,36 +1,14 @@
-WITH visit_fup_vsl AS ( -- This is to handle the case where the visit_fup is not in the booking table (missing data from visit finalization rollout) so the visit finalization is enriched temporarily from visit_status_log table.
+WITH bookings AS (
   SELECT
-    id_visit,
-    id_schedule,
-    CASE
-      WHEN event_type = 'VISIT_DONE' THEN 'VaiNegociar'
-      WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('DEMAND_DID_NOT_ATTEND_VISIT', 'AGENT_DID_NOT_ATTEND_VISIT', 'SUPPLY_DID_NOT_ATTEND_VISIT') THEN 'NaoCompareceu'
-      WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('ACCESS_TO_HOUSE_NOT_AUTHORIZED', 'HOUSE_KEYS_NOT_AVAILABLE', 'HOUSE_NO_LONGER_AVAILABLE_FOR_RENT', 'TENANT_LIVING_DID_NOT_ALLOW_VISIT', 'HOUSE_NO_LONGER_AVAILABLE_FOR_SALE') THEN 'EntradaNaoAutorizada'
-    END AS visit_fup,
-    ts_created AS ts_visit_fup
+    id_schedule AS id,
+    id_house,
+    is_completed,
+    TO_DATE(ts_schedule_created) AS dt_booking,
+    TO_DATE(ts_schedule_completed) AS dt_visit_completed
   FROM
-    datalake_ebdb_clean.visit_status_log
+    datalake_visit.visit_schedules
   WHERE
-    ts_created::DATE >= '2025-01-01'
-    AND event_type IN ('VISIT_DONE', 'VISIT_UNSUCCESSFUL')
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY id_visit_status_log DESC) = 1
-),
-bookings AS (
-  SELECT
-    b.id,
-    b.id_house,
-    COALESCE(b.visit_fup, fup_vsl.visit_fup) AS visit_fup,
-    TO_DATE(b.ts_created) AS dt_booking,
-    TO_DATE(CAST(b.dt_booking AS TIMESTAMP) + FLOOR((b.slot_day * 15 / 60)+8) * INTERVAL 1 HOURS + ABS(b.slot_day * 15 % 60) * INTERVAL 1 MINUTES) AS dt_visit_completed
-  FROM
-    datalake_ebdb_clean.booking AS b
-  LEFT JOIN
-    visit_fup_vsl AS fup_vsl
-      ON b.id = fup_vsl.id_schedule
-  WHERE
-    b.business_context = 'SALE'
-    AND b.ts_created IS NOT NULL
+    business_context = 'SALE'
 ),
 offers AS (
   SELECT
@@ -59,7 +37,7 @@ events AS (
   FROM
     bookings
   WHERE
-    visit_fup IN ('NaoGostou', 'Talvez', 'VaiNegociar', 'VisitouSozinho')
+    is_completed
     AND dt_visit_completed IS NOT NULL
   GROUP BY
     1, 2, 3
