@@ -1883,7 +1883,6 @@ bietlejuice.enrich_chatbot:
   - bietlejuice.quinto_messenger:load-clean-channel:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-chat:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day
-  - bietlejuice.support_session_service:load-clean-support-session:first-run-of-day
 bietlejuice.enrich_ciq:
   - bietlejuice.amplitude_subpartitioned:load-clean-440441-home-page-viewed-events:first-run-of-day
   - bietlejuice.enrich_agent_accreditation:load-enrich-agent-profile:first-run-of-day
