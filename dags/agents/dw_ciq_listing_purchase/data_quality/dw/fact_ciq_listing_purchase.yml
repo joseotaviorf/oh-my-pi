@@ -1,0 +1,16 @@
+---
+table_name: dw_ciq.fact_ciq_listing_purchase
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  sk_house:
+    is_complete:
+      severity_level: Error
+  sk_contract:
+    is_complete:
+      severity_level: Error
+  sk_partner:
+    is_complete:
+      severity_level: Error
+  sk_user:
+    is_complete:
+      severity_level: Warning

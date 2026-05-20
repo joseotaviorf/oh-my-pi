@@ -6,6 +6,7 @@ WITH agency_enrollment_aud AS (
         aud.rev,
         aud.rev_type,
         aud.ts_deleted,
+        aud.ts_created,
         -- The relationship Angency:enrollment has cardinality N:1
         -- One agency has one enrollment per time, but one enrollment might have multiple agencies.
         LEAD(FROM_UNIXTIME(ure.ts_revision/1000)) OVER (PARTITION BY aud.id ORDER BY rev) AS ts_enrollment_ended,
@@ -28,6 +29,7 @@ agency_enrollment_history AS (
         id_house,
         rev,
         COALESCE(MAX(rev) OVER(PARTITION BY id_agency, DATE(ts_updated)) = rev, False) AS is_last_status_of_day,
+        ts_created AS ts_agency_created,
         ts_updated AS ts_enrollment_started,
         ts_enrollment_ended
     FROM
@@ -49,6 +51,7 @@ last_status_agency AS (
 SELECT
     aeh.id_agency,
     aeh.id_enrollment,
+    e.id_agent AS id_internal_agent,
     GET_JSON_OBJECT(h.details, '$.houseExternalId') AS id_house,
     pa.id_partner,
     GET_JSON_OBJECT(ag.details, '$.userExternalId') AS id_user,
@@ -57,6 +60,7 @@ SELECT
     aeh.is_last_status_of_day,
     lsa.dt_consultant_started,
     lsa.ts_consultant_deleted,
+    aeh.ts_agency_created,
     aeh.ts_enrollment_started,
     aeh.ts_enrollment_ended
 FROM

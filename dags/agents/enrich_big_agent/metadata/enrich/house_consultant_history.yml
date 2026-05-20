@@ -12,6 +12,10 @@ columns:
     lineage:
     - datalake_big_agent_clean.agency_aud.id_enrollment
     description: Version of the enrollment also coming from agency_aud
+  id_internal_agent:
+    lineage:
+    - datalake_big_agent.enrollment.id_agent
+    description: Big-agent internal agent id linked to the enrollment for this agency-house assignment.
   id_house:
     lineage:
     - datalake_big_agent.house.details
@@ -44,6 +48,10 @@ columns:
     lineage:
     - datalake_big_agent_clean.agency.ts_deleted
     description: removed date of the consultant
+  ts_agency_created:
+    lineage:
+    - datalake_big_agent_clean.agency_aud.ts_created
+    description: Timestamp when the agency revision row was created in agency_aud.
   ts_enrollment_started:
     lineage:
     - datalake_big_agent_clean.user_revision_entity.ts_revision

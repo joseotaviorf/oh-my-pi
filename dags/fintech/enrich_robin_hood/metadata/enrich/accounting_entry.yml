@@ -12,15 +12,15 @@ columns:
   id_external:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.id_external
-    description: External id.
+    description: External identifier for the accounting entry in upstream systems.
   id_source:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.id_source
-    description: Source id.
+    description: Internal source identifier linking the entry to accounting_entry_source.
   id_payee:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.id_payee
-    description: Payee id.
+    description: Payee identifier for the party receiving the accounting entry payment.
   id_payee_external:
     lineage:
       - datalake_robin_hood_clean.payee.id_payee.id_external
@@ -28,19 +28,19 @@ columns:
   id_lead:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.metadata
-    description: Lead id.
+    description: Lead identifier parsed from accounting entry metadata when present.
   id_house:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.metadata
-    description: House id.
+    description: House identifier parsed from accounting entry metadata when present.
   id_contract:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.metadata
-    description: Contract id.
+    description: Contract identifier parsed from accounting entry metadata when present.
   id_offer:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.metadata
-    description: Offer id.
+    description: Offer identifier parsed from accounting entry metadata when present.
   cost_center_code:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.cost_center_code
@@ -49,26 +49,30 @@ columns:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.source_bill_item
     description: Source bill item.
+  source_code:
+    lineage:
+      - datalake_robin_hood_clean.accounting_entry_source.code
+    description: Accounting entry source code from accounting_entry_source (e.g. ciq-listing-purchase).
   source_name:
     lineage:
       - datalake_robin_hood_clean.accounting_entry_source.source_name
-    description: Source name.
+    description: Human-readable accounting entry source name from accounting_entry_source.
   description:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.description
-    description: Description.
+    description: Free-text description of the accounting entry from Robin Hood.
   type:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.type
-    description: Type.
+    description: Accounting entry type classification from Robin Hood.
   locale:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.locale
-    description: Locale.
+    description: Locale or market code associated with the accounting entry.
   due_amount:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.due_amount
-    description: Due amount.
+    description: Monetary amount due for this accounting entry.
   accrual_year_month:
     lineage:
       - datalake_robin_hood_clean.accounting_entry.accrual_year_month

@@ -271,6 +271,9 @@ bietlejuice.dw_charging_payment_quintocred:
   - bietlejuice.rental_guarantee_platform:load-clean-rev-info:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-feature:first-run-of-day
   - bietlejuice.sap_gateway:load-clean-sync-sap-job:first-run-of-day
+bietlejuice.dw_ciq_listing_purchase:
+  - bietlejuice.enrich_ciq:load-enrich-ciq-listing-purchase:first-run-of-day
+  - bietlejuice.enrich_ciq:load-enrich-listing-purchase-exclusion:first-run-of-day
 bietlejuice.dw_ciq_supply:
   - bietlejuice.enrich_ciq:load-enrich-ciq-supply-events-tracking:first-run-of-day
 bietlejuice.dw_collection_ai_agents:
@@ -1882,14 +1885,24 @@ bietlejuice.enrich_chatbot:
   - bietlejuice.sauron:load-clean-session:first-run-of-day
 bietlejuice.enrich_ciq:
   - bietlejuice.amplitude_subpartitioned:load-clean-440441-home-page-viewed-events:first-run-of-day
+  - bietlejuice.core_contract:load-core-contract:first-run-of-day
+  - bietlejuice.core_house:load-core-house:first-run-of-day
+  - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
   - bietlejuice.enrich_agent_accreditation:load-enrich-agent-profile:first-run-of-day
   - bietlejuice.enrich_agent_accreditation:load-enrich-agent-registration-actions-log:first-run-of-day
   - bietlejuice.enrich_agent_accreditation:load-enrich-business-context:first-run-of-day
+  - bietlejuice.enrich_big_agent:load-enrich-house-consultant-history:first-run-of-day
   - bietlejuice.enrich_ebdb_agents:load-enrich-ciq-users:first-run-of-day
+  - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
+  - bietlejuice.enrich_listing_deduplication:load-enrich-atlas-house-deduplication:first-run-of-day
+  - bietlejuice.enrich_listing_deduplication:load-enrich-listing-deduplication:first-run-of-day
+  - bietlejuice.enrich_listing_deduplication:load-enrich-valid-first-listing:first-run-of-day
+  - bietlejuice.enrich_robin_hood:load-enrich-accounting-entry:first-run-of-day
   - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking:first-run-of-day
   - bietlejuice.gsheets_agents:done-clean-ciq-portfolio:first-run-of-day
+  - bietlejuice.gsheets_growth:done-clean-ciq-costs:first-run-of-day
 bietlejuice.enrich_ciq_comissioning:
   - bietlejuice.enrich_ebdb_listing:load-enrich-house-listing:first-run-of-day
   - bietlejuice.enrich_ebdb_listing:load-enrich-house:first-run-of-day
@@ -3038,6 +3051,8 @@ bietlejuice.enrich_listing_deduplication:
   - bietlejuice.enrich_sale_offer:load-enrich-sale-offer:first-run-of-day
   - bietlejuice.enrich_supply_acquisition:load-enrich-conversion-lookup:first-run-of-day
   - bietlejuice.enrich_supply_tracking:load-enrich-supply-events-tracking:first-run-of-day
+  - bietlejuice.property_dedup:load-clean-duplicity-output:first-run-of-day
+  - bietlejuice.property_dedup:load-clean-similar-property:first-run-of-day
 bietlejuice.enrich_listing_flow:
   - bietlejuice.ebdb_lead:load-clean-lead-aud:first-run-of-day
   - bietlejuice.ebdb_partner:load-clean-affiliate-data:first-run-of-day

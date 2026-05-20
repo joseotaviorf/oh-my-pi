@@ -13,6 +13,7 @@ SELECT
     ae.description,
     ae.type,
     ae.locale,
+    aes.code AS source_code,
     aes.source_name,
     ae.due_amount,
     ae.accrual_year_month,

@@ -1,0 +1,165 @@
+---
+database_name: datalake_ciq
+table_name: ciq_listing_purchase
+description: >
+  Enrich grain per house in RENT with CIQ_FULL: house listing and contract path, Robin Hood listing-purchase
+  payment, address-parsed and Atlas duplicity keys, ciq_costs purchase value, pricing segment, and
+  inactivity days derived from house_listing version windows.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_house:
+    description: House identifier in CIQ capture context.
+    lineage:
+      - datalake_big_agent.house_consultant_history.id_house
+  id_partner:
+    description: CIQ partner id from house consultant history.
+    lineage:
+      - datalake_big_agent.house_consultant_history.id_partner
+  id_house_listing:
+    description: House listing id from the rent listing version joined to contract.
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_house_listing
+  id_contract:
+    description: Rent contract id when present on the house listing row.
+    lineage:
+      - datalake_ebdb_listing.house_listing.id_contract
+  id_owner:
+    description: Owner user id from core contract.
+    lineage:
+      - core_contract.contract.id_owner
+  id_ciq_user:
+    description: CIQ user id from house consultant history.
+    lineage:
+      - datalake_big_agent.house_consultant_history.id_user
+  id_internal_agent:
+    description: Big-agent internal agent id linked to CIQ enrollment.
+    lineage:
+      - datalake_big_agent.house_consultant_history.id_internal_agent
+  id_enrollment:
+    description: Big-agent enrollment id for CIQ_FULL assignment.
+    lineage:
+      - datalake_big_agent.house_consultant_history.id_enrollment
+  id_accounting_entry:
+    description: Robin Hood accounting entry id when matched on house, contract, and ciq-listing-purchase source.
+    lineage:
+      - datalake_robin_hood.accounting_entry.id
+  id_address_parsed_duplicity:
+    description: Parsed address duplicity key from listing deduplication (id_address_parsed_short).
+    lineage:
+      - datalake_listing_deduplication.listing_deduplication.id_address_parsed_short
+  id_atlas_duplicity:
+    description: Property-dedup duplicity output id when Atlas marks a similar house for this listing.
+    lineage:
+      - datalake_listing_deduplication.atlas_house_deduplication.id_duplicity
+  address:
+    description: Full parsed address string from listing deduplication.
+    lineage:
+      - datalake_listing_deduplication.listing_deduplication.address_full
+  parsed_first_listing_order:
+    description: First listing order from address-parsed deduplication for ordering captures on the same key.
+    lineage:
+      - datalake_listing_deduplication.listing_deduplication.first_listing_order
+  contract_status:
+    description: Contract status from core contract.
+    lineage:
+      - core_contract.contract.status
+  payment_status:
+    description: >
+      Derived lifecycle: cancelled, paid when accounting entry exists, not_eligible without signed contract,
+      otherwise pending.
+    lineage:
+      - core_contract.contract.status
+      - datalake_robin_hood.accounting_entry.id
+      - datalake_ebdb_listing.house_listing.ts_contract_signed
+  pricing_type:
+    description: >
+      Commercial segment from valid_first_listing and contract dates
+      (hybrid, new-listings, ongoing-rentals, ongoing-listings).
+    lineage:
+      - datalake_listing_deduplication.valid_first_listing.hybrid_creation_order
+      - datalake_listing_deduplication.valid_first_listing.ts_first_listing_rent
+      - datalake_ebdb_listing.house_listing.ts_contract_signed
+      - datalake_ebdb_listing.house_listing.ts_next_contract_signed
+      - datalake_ebdb_listing.house_listing.id_contract
+  purchase_value:
+    description: Reference listing-purchase amount from ciq_costs for city and contract signature month.
+    lineage:
+      - datalake_gsheets_clean.ciq_costs.total_costs_ciq_full_for_rent
+  amount_paid:
+    description: Due amount on the matched Robin Hood accounting entry when present.
+    lineage:
+      - datalake_robin_hood.accounting_entry.due_amount
+  total_days_since_house_inactived:
+    description: >
+      Days between listing version start and end when the listing version is in a qualifying inactive state;
+      zero when not inactive.
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
+      - datalake_ebdb_listing.house_listing.ts_listing_version_end
+      - datalake_ebdb_listing.house_listing.status
+      - datalake_ebdb_listing.house_listing.status_reason
+  has_similiar_house_by_address_parsed:
+    description: True when listing deduplication flags the house as duplicated on parsed address.
+    lineage:
+      - datalake_listing_deduplication.listing_deduplication.is_duplicated
+  has_similiar_house_by_atlas:
+    description: True when an Atlas house deduplication row exists for this house.
+    lineage:
+      - datalake_listing_deduplication.atlas_house_deduplication.id_duplicity
+  is_house_inactive:
+    description: >
+      True when the house listing version is OPTED_OUT or UNPUBLISHED with status_reason different from RENTED.
+    lineage:
+      - datalake_ebdb_listing.house_listing.status
+      - datalake_ebdb_listing.house_listing.status_reason
+  is_eligible:
+    description: True when the house has a signed rent contract timestamp.
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_contract_signed
+  is_paid:
+    description: True when a non-blocked Robin Hood payment occurrence exists.
+    lineage:
+      - datalake_robin_hood.accounting_entry.dt_occurrence
+  dt_paid:
+    description: Payment occurrence date from Robin Hood when paid.
+    lineage:
+      - datalake_robin_hood.accounting_entry.dt_occurrence
+  dt_contract_termination:
+    description: Contract termination date from core contract when present.
+    lineage:
+      - core_contract.contract.dt_termination
+  ts_contract_signed:
+    description: Contract signature timestamp from house listing.
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_contract_signed
+  ts_next_contract_signed:
+    description: Next contract signature timestamp on the same house listing when present.
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_next_contract_signed
+  ts_house_inactived:
+    description: Listing version start timestamp when the version is in qualifying inactive state; null otherwise.
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_listing_version_start
+  ts_house_registration:
+    description: Timestamp when the CIQ agency row was created for the house.
+    lineage:
+      - datalake_big_agent.house_consultant_history.ts_agency_created
+  ts_first_listing:
+    description: First rent listing timestamp from valid_first_listing when available.
+    lineage:
+      - datalake_listing_deduplication.valid_first_listing.ts_first_listing_rent
+  ts_load:
+    description: Timestamp when this enrich row was materialized.
+  year:
+    description: Partition year from agency registration timestamp.
+    lineage:
+      - datalake_big_agent.house_consultant_history.ts_agency_created
+  month:
+    description: Partition month from agency registration timestamp.
+    lineage:
+      - datalake_big_agent.house_consultant_history.ts_agency_created
+  day:
+    description: Partition day from agency registration timestamp.
+    lineage:
+      - datalake_big_agent.house_consultant_history.ts_agency_created

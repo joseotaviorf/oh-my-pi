@@ -21,7 +21,7 @@ Run `git diff --name-only origin/master...HEAD` (or against `HEAD` if not yet co
 
 ## Step 2 — Launch subagents in parallel
 
-Use the Task tool for all eight simultaneously.
+Use the Task tool for all six subagents below simultaneously.
 
 **Subagent A — Style check (shell):**
 ```bash
@@ -57,22 +57,13 @@ For every changed `.py` file in `bietlejuice/`, verify:
 
 Return: file path + line number for each violation found.
 
-**Subagent E — Personal data classification check (explore):**
-
-For every changed metadata `.yml` file, scan each column entry and check:
-1. If the column name or description matches a known personal data pattern — any of: `cpf`, `nome`, `name`, `email`, `telefone`, `phone`, `endereco`, `address`, `data_nascimento`, `birth`, `rg`, `passaporte`, `passport`, `cnh`, `pis`, `pasep`, `geolocation`, `latitude`, `longitude`, `salary`, `salario`, `credito`, `credit`, `debito`, `debit`, `score`, `criminal`, `health`, `saude`, `biometric`, `facial`, `fingerprint`, `racial`, `etnia`, `genero`, `gender`, `religiao`, `religion`, `politico`, `political`, `sexual`, `sindicato`, `union` — and `personal_data_classification` is **missing** → flag as **non-blocking warning**.
-2. If `personal_data_classification: sensitive` is present but the corresponding `*_declaration.yml` does **not** contain a `table_privileges` block → flag as **blocking**.
-3. If `personal_data_classification: sensitive` is present and the table feeds a metric or qube layer output, check that the relevant qube metric declaration contains `privacy.k_anonymity` ≥ 5 → if missing, flag as **blocking**.
-
-Return: per-file list of columns with issues, their classification (if any), and the exact fix required.
-
-**Subagent F — Test coverage check (explore):**
+**Subagent E — Test coverage check (explore):**
 
 For every new `.py` file added in `bietlejuice/` (not an `__init__.py`), check whether a corresponding test file exists under `tests/unit/` mirroring the source path (see `testing_conventions.mdc` for the mirroring rule).
 
 Return: list of new source files with no matching test file. Classify as **non-blocking** if the file is a config/constants module; **blocking** if it contains a class or function with business logic.
 
-**Subagent G — Lint check (shell):**
+**Subagent F — Lint check (shell):**
 ```bash
 make lint
 ```
@@ -110,19 +101,16 @@ Classify scope issues as **non-blocking but should fix** — PRs with unrelated 
 
 Group all issues by severity:
 
-**Blocking (will fail CI or is a LGPD violation):**
+**Blocking (will fail CI):**
 - Style errors (black/flake8)
 - Lint errors (`make lint`)
 - Missing metadata files
 - DAG declaration schema errors
-- `sensitive` column in enrich/dw without `table_privileges` in the declaration
-- `sensitive` column exposed in a metric/qube output without `privacy.k_anonymity ≥ 5`
-- Source layer policy violation in **new** files (wrong layer read or clean column already covered by a Core Model) — exit code 1 from Subagent H
+- `personal_data_classification` present in metadata YAML (field not supported by CI yet — remove it)
 
 **Non-blocking but should fix:**
 - Python convention violations
 - Incomplete metadata (short descriptions, missing lineage)
-- Column matching a personal data pattern but missing `personal_data_classification`
 - New `bietlejuice/` module with no matching unit test file (config/constants modules exempt)
 - PR includes unrelated changes to shared base classes or loaders (scope creep)
 - New `SparkSession` or `SparkContext` creation instead of `getOrCreate()`

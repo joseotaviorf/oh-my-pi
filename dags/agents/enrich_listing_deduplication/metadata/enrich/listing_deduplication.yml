@@ -103,3 +103,5 @@ columns:
     description: Timestamp when the sale agreement was signed.
     lineage:
       - datalake_sale_offer.sale_offer.ts_sale_agreement_signed
+  ts_load:
+    description: Timestamp when this enrich row was materialized.

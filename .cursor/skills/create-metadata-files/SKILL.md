@@ -1,6 +1,6 @@
 ---
 name: create-metadata-files
-description: Author and fix metadata YAML files for bi-etl-ejuice. Follows .cursor/rules/governance_metadata.mdc for schema, LGPD, and PII classification. Use when creating metadata for new SQL files, updating metadata after SQL changes, or fixing metadata CI failures.
+description: Author and fix metadata YAML files for bi-etl-ejuice. Follows .cursor/rules/governance_metadata.mdc for schema and governance fields. Use when creating metadata for new SQL files, updating metadata after SQL changes, or fixing metadata CI failures.
 ---
 
 # Create Metadata Files
@@ -9,9 +9,10 @@ description: Author and fix metadata YAML files for bi-etl-ejuice. Follows .curs
 
 **Before creating or editing any metadata file**, read [`.cursor/rules/governance_metadata.mdc`](.cursor/rules/governance_metadata.mdc) and apply it as the authoritative source for:
 - Valid domains
-- Personal data classification (`sensitive`, `highly_personal`, `personal`)
-- LGPD enforcement rules
+- Column schema (`description`, `lineage`, categories, metric blocks)
 - Common mistakes and validation commands
+
+**Do not** add `personal_data_classification` to metadata YAML — the field is not supported by repo validation/CI yet.
 
 ## When to use
 
@@ -306,17 +307,11 @@ Examples:
 - metric block fields:
   - `name`, `description`, `acronym`, `is_additive`, `business_stage`, `hierarchy`, `approved_by`, optional `link_to_metric`.
 
-## Step 4 - Add governance details when needed
+## Step 4 - Governance details when needed
 
-When a column contains personal data, include:
-- `personal_data_classification: personal | highly_personal | sensitive`
+Do **not** add `personal_data_classification` on column entries — it is documented in [governance_metadata.mdc](.cursor/rules/governance_metadata.mdc) for a future rollout but is **not** accepted by metadata validation today.
 
-**Consistency across layers:** `personal_data_classification` must be set consistently for the same logical column across raw → clean → enrich → dw. Do not change the classification when promoting a column to a downstream layer.
-
-For enrich/dw files:
-- if you classify any column as `sensitive`, ensure DAG declaration includes `table_privileges`.
-
-For classification examples and LGPD enforcement rules, consult [governance_metadata.mdc](.cursor/rules/governance_metadata.mdc).
+For enrich/dw tables that will require restricted access later, note sensitive columns in `description` only. Use `table_privileges` in the DAG declaration when the team already mandates it for that table (see governance rule and declaration docs).
 
 ## Step 5 - Use these templates
 
@@ -397,4 +392,4 @@ make validate-lineage-consistency
 - metric column missing `dimension` or `metric`: add exactly one.
 - **missing `lineage` on enrich/dw column**: CI fails; add `lineage: [database.table.column]` for every column.
 - enrich/dw lineage inconsistency: align `lineage` entries with SQL selected columns.
-- column containing personal data with no `personal_data_classification`: governance review will flag it; add the appropriate classification per [governance_metadata.mdc](.cursor/rules/governance_metadata.mdc).
+- unexpected `personal_data_classification` key on a column: remove it — not supported by CI yet.

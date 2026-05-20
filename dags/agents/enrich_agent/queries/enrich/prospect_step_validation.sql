@@ -35,7 +35,7 @@ union_validation_branches AS (
     FROM 
         prospect_validation AS pv
     WHERE
-        pv.qualification_state = "ON_GOING"
+        pv.qualification_state = "ONGOING"
         AND pv.step_name = "CRECI_VALIDATION"
         AND pv.step_status = "WAITING_ACTION"
     UNION ALL
@@ -95,7 +95,7 @@ union_validation_branches AS (
         AND pv.step_name = "CONTRACT_SIGNATURE"
         AND acp.signature_status IN ("CANCELLED", "AUTO_RESPONDED", "DECLINED")
 )
-SELECT
+SELECT DISTINCT
     uv.id_prospect_agent,
     uv.id_user,
     uv.id_negotiation_executive_user,

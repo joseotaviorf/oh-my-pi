@@ -1,0 +1,101 @@
+---
+database_name: dw_ciq
+table_name: fact_ciq_listing_purchase
+description: >
+  Fact for eligible CIQ listing purchase rows from datalake_ciq.ciq_listing_purchase with sk_* keys.
+  Incremental load on the greatest of contract signed and payment timestamps; merge on house, contract,
+  and partner per declaration.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  sk_house:
+    description: House surrogate key.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_house
+  sk_house_listing:
+    description: House listing surrogate key.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_house_listing
+  sk_contract:
+    description: Rent contract surrogate key.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_contract
+  sk_accounting_entry:
+    description: Robin Hood accounting entry id when paid; null while pending.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_accounting_entry
+  sk_partner:
+    description: CIQ partner surrogate key.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_partner
+  sk_user:
+    description: CIQ user surrogate key (id_ciq_user in enrich).
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_ciq_user
+  sk_internal_agent:
+    description: Big-agent internal agent surrogate key.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_internal_agent
+  sk_enrollment:
+    description: Enrollment surrogate key for CIQ_FULL.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_enrollment
+  sk_owner:
+    description: Owner user surrogate key.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_owner
+  payment_status:
+    description: Payment lifecycle from enrich.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.payment_status
+  pricing_type:
+    description: Pricing segment from enrich.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.pricing_type
+  purchase_value:
+    description: Reference purchase amount from enrich.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.purchase_value
+  amount_paid:
+    description: Paid amount from enrich when Robin Hood matches.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.amount_paid
+  is_paid:
+    description: Payment presence flag from enrich.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.is_paid
+  dt_paid:
+    description: Payment date from enrich.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.dt_paid
+  ts_contract_signed:
+    description: Contract signature timestamp from enrich.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_contract_signed
+  ts_house_registration:
+    description: CIQ agency registration timestamp for the house.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_house_registration
+  ts_first_listing:
+    description: First rent listing timestamp from enrich.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_first_listing
+  ts_updated:
+    description: Greatest of contract signed and payment timestamps used as incremental activity driver.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_contract_signed
+      - datalake_ciq.ciq_listing_purchase.dt_paid
+  ts_load:
+    description: Timestamp when this DW row was materialized.
+  year:
+    description: Partition year passed through from enrich.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.year
+  month:
+    description: Partition month passed through from enrich.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.month
+  day:
+    description: Partition day passed through from enrich.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.day

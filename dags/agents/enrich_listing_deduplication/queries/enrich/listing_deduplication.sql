@@ -350,7 +350,8 @@ SELECT
   lfi.ts_first_listing_rent,
   lfi.ts_first_listing,
   lfi.ts_contract_signed_rent,
-  lfi.ts_contract_signed_sale
+  lfi.ts_contract_signed_sale,
+  NOW() AS ts_load
 FROM 
   listings_full_info AS lfi
 LEFT JOIN

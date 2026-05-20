@@ -1,0 +1,114 @@
+---
+database_name: datalake_ciq
+table_name: listing_purchase_exclusion
+description: >
+  Ops-facing enrich table: new CIQ listing purchase registrations matched to a prior paid capture on the
+  same property via Atlas property-dedup and/or address-parsed duplicity. Methods can coalesce when both
+  rules apply to the same new house and paid house pair.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_house:
+    description: House id of the new registration being evaluated for exclusion.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_house
+  id_ciq_user:
+    description: CIQ user id on the new registration row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_ciq_user
+  id_owner:
+    description: Owner user id on the new registration row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_owner
+  id_similar_paid_house:
+    description: House id of the matched prior paid capture (Atlas similar house or address-parsed peer).
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_house
+      - datalake_listing_deduplication.atlas_house_deduplication.id_similar_house
+  id_paid_ciq_user:
+    description: CIQ user id on the matched paid row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_ciq_user
+  id_paid_owner:
+    description: Owner user id on the matched paid row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_owner
+  id_paid_contract:
+    description: Contract id on the matched paid row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_contract
+  id_accounting_entry:
+    description: Robin Hood accounting entry id on the matched paid row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_accounting_entry
+  id_atlas_duplicity:
+    description: Atlas duplicity output id when the match used property-dedup; null for address-parsed-only matches.
+    lineage:
+      - datalake_listing_deduplication.atlas_house_deduplication.id_duplicity
+  id_address_parsed_duplicity:
+    description: Address-parsed duplicity key when the match used listing deduplication; null for Atlas-only matches.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_address_parsed_duplicity
+  address:
+    description: Full address string from the new registration row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.address
+  duplicity_method_applied:
+    description: >
+      Array of methods that flagged the pair: ATLAS_DEDUP and/or ADDRESS_PARSED when both rules match the
+      same new and paid houses.
+  total_days_since_house_inactived:
+    description: Inactive days on the paid row carried from ciq_listing_purchase at match time.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.total_days_since_house_inactived
+  total_days_inactive_since_contract_termination:
+    description: Days from paid house inactivity start to contract termination date on the paid row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_house_inactived
+      - datalake_ciq.ciq_listing_purchase.dt_contract_termination
+  total_days_inactive_since_paid:
+    description: Days from paid house inactivity start to payment date on the paid row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_house_inactived
+      - datalake_ciq.ciq_listing_purchase.dt_paid
+  is_paid_house_inactive:
+    description: Whether the paid capture row was in qualifying inactive listing state.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.is_house_inactive
+  is_same_ciq:
+    description: True when new and paid rows share the same CIQ user id.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_ciq_user
+  is_same_owner:
+    description: True when new and paid rows share the same owner id (address-parsed path) or Atlas same-owner flag.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.id_owner
+      - datalake_listing_deduplication.atlas_house_deduplication.is_same_property_owner
+  is_address_parsed_similar_house:
+    description: True when the match was produced or reinforced by the address-parsed duplicity path.
+  is_atlas_similar_house:
+    description: True when the match was produced or reinforced by the Atlas property-dedup path.
+  is_blocked_by_atlas:
+    description: True when Atlas duplicity action_type is BLOCK on the similar-house match.
+    lineage:
+      - datalake_listing_deduplication.atlas_house_deduplication.action_type
+  dt_paid:
+    description: Payment date on the matched paid row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.dt_paid
+  dt_paid_contract_termination:
+    description: Contract termination date on the matched paid row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.dt_contract_termination
+  ts_paid_house_inactived:
+    description: Timestamp when inactivity started on the paid house listing version.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_house_inactived
+  ts_house_registration:
+    description: CIQ agency registration timestamp for the new house row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_house_registration
+  ts_paid_house_registration:
+    description: CIQ agency registration timestamp for the matched paid house row.
+    lineage:
+      - datalake_ciq.ciq_listing_purchase.ts_house_registration

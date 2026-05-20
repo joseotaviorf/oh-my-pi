@@ -1,0 +1,28 @@
+SELECT
+    re.id_house AS sk_house,
+    re.id_ciq_user AS sk_ciq_user,
+    re.id_owner AS sk_owner,
+    re.id_similar_paid_house AS sk_similar_paid_house,
+    re.id_paid_ciq_user AS sk_paid_ciq_user,
+    re.id_paid_owner AS sk_paid_owner,
+    re.id_paid_contract AS sk_paid_contract,
+    re.id_accounting_entry AS sk_accounting_entry,
+    re.id_atlas_duplicity AS sk_atlas_duplicity,
+    re.id_address_parsed_duplicity AS sk_address_parsed_duplicity,
+    re.total_days_since_house_inactived,
+    re.total_days_inactive_since_contract_termination,
+    re.total_days_inactive_since_paid,
+    re.is_paid_house_inactive,  
+    re.is_same_ciq,
+    re.is_same_owner,
+    re.is_address_parsed_similar_house,
+    re.is_atlas_similar_house,
+    re.is_blocked_by_atlas,
+    re.dt_paid,
+    re.dt_paid_contract_termination,
+    re.ts_paid_house_inactived,
+    re.ts_house_registration,
+    re.ts_paid_house_registration,
+    NOW() AS ts_load
+FROM
+    datalake_ciq.listing_purchase_exclusion AS re

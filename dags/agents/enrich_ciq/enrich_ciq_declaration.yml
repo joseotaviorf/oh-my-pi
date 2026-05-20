@@ -12,6 +12,9 @@ workflow:
     daily_ciq_info:
       extraction_type: incremental
       partitions: [year, month, day]
+    ciq_listing_purchase:
+      extraction_type: full
+      partitions: [year, month, day]
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
