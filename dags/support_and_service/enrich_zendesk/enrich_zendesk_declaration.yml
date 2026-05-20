@@ -23,9 +23,15 @@ workflow:
     ticket_metrics:
       merge_on: [id_ticket]
       z_order_by: [id_ticket, ts_created]
+      table_properties:
+        "delta.dataSkippingNumIndexedCols": "0"
+        "delta.dataSkippingStatsColumns": "ts_updated,ts_created,id_ticket"
     tickets:
       merge_on: [id_ticket, ts_updated]
       z_order_by: [ts_updated, id_ticket]
+      table_properties:
+        "delta.dataSkippingNumIndexedCols": "0"
+        "delta.dataSkippingStatsColumns": "ts_updated,ts_created,id_ticket"
 
 cluster:
   type: custom_cluster
