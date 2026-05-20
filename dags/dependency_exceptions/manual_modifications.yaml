@@ -902,6 +902,13 @@ bietlejuice.enrich_survicate:
   remove:
     - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
 bietlejuice.enrich_top_of_funnel_demand:
+  add:
+    - bietlejuice.core_region:load-core-region:first-run-of-day
+    - bietlejuice.amplitude_subpartitioned:load-clean-170698-classifieds-viewed-events:first-run-of-day
+    - bietlejuice.amplitude_subpartitioned:load-clean-170698-contact-broker-clicked-events:first-run-of-day
+    - bietlejuice.amplitude_subpartitioned:load-clean-170698-edit-account-info-clicked-events:first-run-of-day
+    - bietlejuice.amplitude_subpartitioned:load-clean-170698-lead-intent-confirmed-events:first-run-of-day
+    - bietlejuice.amplitude_subpartitioned:load-clean-170698-lead-intent-events:first-run-of-day
   remove:
     - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
     - bietlejuice.gsheets_growth:done-clean-taxonomy-demand:first-run-of-day
