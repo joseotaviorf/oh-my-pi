@@ -4452,6 +4452,8 @@ bietlejuice.metric_growth__demand:
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-prospect-events:first-run-of-day
   - bietlejuice.dw_demand:load-dw-growth-fact-demand-top-of-funnel-events:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
+  - bietlejuice.enrich_top_of_funnel_demand:load-enrich-quintoandar-classifieds-events:first-run-of-day
+  - bietlejuice.enrich_top_of_funnel_demand:load-enrich-user-interactions:first-run-of-day
 bietlejuice.metric_observability__dags:
   - bietlejuice.dw_databricks_health:load-dw-databricks-health-fact-databricks-dag-run:first-run-of-day
 bietlejuice.metric_rent__bookings:

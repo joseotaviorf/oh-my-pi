@@ -1,0 +1,36 @@
+database_name: growth
+table_name: growth_demand_qac_funnel
+description: Daily QuintoAndar Classifieds (QAC) funnel metrics by business context and city group, combining top-of-funnel page views and classifieds-specific Amplitude events.
+domain: Growth
+owner: vinicius.araujo@quintoandar.com.br
+columns:
+  dt_reference:
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.ts_event
+      - datalake_top_of_funnel_demand.quintoandar_classifieds_events.ts_event
+    description: Reference date of the funnel metric, derived from the event timestamp.
+    dimension: true
+  metric_name:
+    description: Name of the funnel step or conversion metric (e.g. ToF, ToF QAC, Impression, Lead Intent).
+    dimension: true
+  business_context:
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.business_context
+      - datalake_top_of_funnel_demand.quintoandar_classifieds_events.business_context
+    description: Business context of the events aggregated in the metric (rent, sale, etc).
+    dimension: true
+  city_group:
+    lineage:
+      - dw_public.dim_region.city_group
+    description: City group classification of the event region used to slice the funnel metrics.
+    dimension: true
+  metric_value:
+    description: Count of distinct Amplitude users (id_amplitude) for the funnel step on the reference date.
+    metric:
+      name: QAC Funnel Users
+      description: Distinct Amplitude users reaching each QuintoAndar Classifieds funnel step per day, business context, and city group.
+      acronym: qac_funnel_users
+      is_additive: true
+      business_stage: Demand
+      hierarchy: Growth
+      approved_by: uilson.bonfim@quintoandar.com.br

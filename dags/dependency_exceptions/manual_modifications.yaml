@@ -1064,6 +1064,9 @@ bietlejuice.vespucio_pipeline_plugins:
     - bietlejuice.enrich_vespucio_pipeline:vespucio-core-pipeline-complete:first-run-of-day
 bietlejuice.enrich_visit_agent_performance:
   override: []
+bietlejuice.metric_growth__demand:
+  add:
+    - bietlejuice.enrich_top_of_funnel_demand:load-enrich-quintoandar-classifieds-events:first-run-of-day
 bietlejuice.metric_agents__performance:
   override: []
 bietlejuice.enrich_viva_real_crawler_listings:
