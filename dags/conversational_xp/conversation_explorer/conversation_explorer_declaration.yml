@@ -5,14 +5,17 @@ dag:
   owner: Data Conversational XP
   documentation:
     dag_purpose: |
-      Ingests the daily session categorisation parquet produced by the Wall-E
-      session categoriser model. Raw lands in datalake_conversation_explorer_raw, clean in datalake_conversation_explorer_clean.
+      Ingests the daily session categorisation parquet and human annotations produced by the
+      Wall-E session categoriser model. Raw lands in datalake_conversation_explorer_raw,
+      clean in datalake_conversation_explorer_clean.
 
-      The source file lives at s3://conversation-explorer-prod/session-metadata/YYYY-MM-DD.parquet
-      and is always yesterday's date relative to the execution date.
+      Categorisation source: s3://conversation-explorer-prod/session-metadata/YYYY-MM-DD.parquet
+      Annotations source: s3://conversation-explorer-prod/annotations-index/YYYY-MM-DD/*.json
+      (each index entry resolves to s3://conversation-explorer-prod/annotations/...)
 
       Scheduling: dataset-driven (no cron). Triggered after
       quintoml.chatbot.wall_e_session_categoriser.inference emits its :first-run-of-day dataset.
+      Annotations run after categorisation completes (raw_inner_dependencies).
 
 workflow:
   layer: raw
@@ -29,8 +32,17 @@ workflow:
     - "{partitions}"
     - "{{ dag_run.conf.get('date', '') }}"
 
+  raw_inner_dependencies:
+    annotations:
+      - categorisation
+
   tables_customization:
     categorisation:
+      partitions:
+        - year
+        - month
+        - day
+    annotations:
       partitions:
         - year
         - month

@@ -1,0 +1,39 @@
+---
+database_name: datalake_conversation_explorer_clean
+table_name: annotations
+description: "Clean layer for human annotations on chatbot sessions. Reads from raw and applies schema enforcement."
+domain: "Conversational XP"
+owner: "joao.padrao@quintoandar.com.br"
+columns:
+  annotation_id:
+    lineage:
+      - datalake_conversation_explorer_raw.annotations.annotation_id
+    description: "Unique identifier for the annotation record."
+  id_langfuse_session:
+    lineage:
+      - datalake_conversation_explorer_raw.annotations.id_langfuse_session
+    description: "Langfuse session identifier that the annotation refers to."
+  annotation_text:
+    lineage:
+      - datalake_conversation_explorer_raw.annotations.annotation_text
+    description: "Free-text content of the annotation written by the reviewer."
+  author:
+    lineage:
+      - datalake_conversation_explorer_raw.annotations.author
+    description: "Email address of the person who created the annotation."
+  created_at:
+    lineage:
+      - datalake_conversation_explorer_raw.annotations.created_at
+    description: "Timestamp (UTC) when the annotation was created."
+  year:
+    lineage:
+      - datalake_conversation_explorer_raw.annotations.year
+    description: "Partition column: year extracted from created_at."
+  month:
+    lineage:
+      - datalake_conversation_explorer_raw.annotations.month
+    description: "Partition column: month extracted from created_at."
+  day:
+    lineage:
+      - datalake_conversation_explorer_raw.annotations.day
+    description: "Partition column: day extracted from created_at."

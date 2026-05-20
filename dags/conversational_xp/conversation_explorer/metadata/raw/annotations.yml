@@ -1,0 +1,23 @@
+---
+database_name: datalake_conversation_explorer_raw
+table_name: annotations
+description: "Human annotations on chatbot conversation sessions. Each row is a single annotation linking a reviewer comment to a Langfuse session via the annotations-index S3 bucket."
+domain: "Conversational XP"
+owner: "joao.padrao@quintoandar.com.br"
+columns:
+  annotation_id:
+    description: "Unique identifier for the annotation record."
+  id_langfuse_session:
+    description: "Langfuse session identifier that the annotation refers to."
+  annotation_text:
+    description: "Free-text content of the annotation written by the reviewer."
+  author:
+    description: "Email address of the person who created the annotation."
+  created_at:
+    description: "Timestamp (UTC) when the annotation was created."
+  year:
+    description: "Partition column: year extracted from created_at."
+  month:
+    description: "Partition column: month extracted from created_at."
+  day:
+    description: "Partition column: day extracted from created_at."
