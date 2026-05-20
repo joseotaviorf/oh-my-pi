@@ -20,31 +20,60 @@ composer_task_fails AS (
             AND tf.ts_executed = dr.ts_executed
     WHERE
         DATE(GREATEST(tf.ts_started, tf.ts_ended)) BETWEEN '{load_start_date}' AND '{load_end_date}'
+),
+unioned AS (
+    SELECT
+        id_fail + 1000000 AS id_fail, -- This is to avoid conflicts with IDs from composer
+        id_dag,
+        id_task,
+        id_run,
+        'Astro' AS source_provider,
+        map_index,
+        duration,
+        ts_ended,
+        ts_started,
+        ts_executed
+    FROM
+        astro_task_fails
+    UNION ALL
+    SELECT
+        id_fail,
+        id_dag,
+        id_task,
+        id_run,
+        'Composer' AS source_provider,
+        NULL AS map_index,
+        duration,
+        ts_ended,
+        ts_started,
+        ts_executed
+    FROM
+        composer_task_fails
+),
+deduplicated AS (
+
+    SELECT
+        *,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_fail
+            ORDER BY ts_executed DESC
+        ) AS rn
+    FROM
+        unioned
 )
+
 SELECT
-    id_fail + 1000000 AS id_fail, -- This is to avoid conflicts with IDs from composer
+    id_fail,
     id_dag,
     id_task,
     id_run,
-    'Astro' AS source_provider,
+    source_provider,
     map_index,
     duration,
     ts_ended,
     ts_started,
     ts_executed
 FROM
-    astro_task_fails
-UNION ALL
-SELECT
-    id_fail,
-    id_dag,
-    id_task,
-    id_run,
-    'Composer' AS source_provider,
-    NULL AS map_index,
-    duration,
-    ts_ended,
-    ts_started,
-    ts_executed
-FROM
-    composer_task_fails
+    deduplicated
+WHERE
+    rn = 1;
