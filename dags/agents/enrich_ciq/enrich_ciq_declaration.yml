@@ -8,6 +8,9 @@ dag:
 workflow:
   type: query_delta
   layer: enrich
+  inner_dependencies:
+    listing_purchase_exclusion:
+      - ciq_listing_purchase
   tables_customization:
     daily_ciq_info:
       extraction_type: incremental
