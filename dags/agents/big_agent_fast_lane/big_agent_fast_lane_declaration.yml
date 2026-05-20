@@ -76,4 +76,4 @@ workflow:
     unresolved_earnings: {}
     user_revision_entity: {}
 cluster:
-  type: emr_7_12_small_general_2xlarge_single_node_cluster
+  type: emr_7_12_small_general_2xlarge_2_workers_cluster
