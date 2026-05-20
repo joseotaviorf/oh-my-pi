@@ -19,7 +19,7 @@ SELECT
     clp.ts_first_listing,
     GREATEST(
         clp.ts_contract_signed, 
-        clp.dt_paid,
+        clp.dt_paid
     ) AS ts_updated,
     NOW() AS ts_load,
     clp.year,
@@ -31,5 +31,5 @@ WHERE
     clp.is_eligible IS TRUE
     AND DATE(GREATEST(
         clp.ts_contract_signed, 
-        clp.dt_paid,
+        clp.dt_paid
     )) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
