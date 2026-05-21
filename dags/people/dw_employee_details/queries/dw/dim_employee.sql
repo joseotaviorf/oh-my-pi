@@ -4,7 +4,8 @@ employees AS (
         im.id_person,
         im.person_number,
         im.name,
-        im.work_email
+        im.work_email,
+        im.legacy_registration AS employee_tmf_code
     FROM
         datalake_people.identifier_mapping AS im
     WHERE
@@ -48,6 +49,7 @@ SELECT
     emp.person_number,
     emp.name AS name,
     emp.work_email,
+    emp.employee_tmf_code,
     ce.highest_education_level,
     CASE
         WHEN p.dt_of_birth IS NULL THEN NULL
