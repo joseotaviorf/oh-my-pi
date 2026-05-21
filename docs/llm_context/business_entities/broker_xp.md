@@ -53,6 +53,7 @@ The authoritative model is `dw_brokers` (DAG `dags/broker_xp/dw_brokers`). All e
 | 3P supply funnel (BSP → first listing) for partner-submitted properties | `dw_3p_supply.fact_lead_3p_flows` + `dw_3p_supply.dim_current_conversion_funnel` — full coverage in [`3p_supply.md`](./3p_supply.md). |
 | 3P agents (corretores da Rede) — current snapshot | `dw_public.dim_agent` filtered by `is_3p_agent = TRUE` / `agent_type = 'CORRETOR_REDE'`. |
 | 3P agents — historical revisions (SCD2) | `dw_agent.dim_agent_3p_history`. |
+| Agents App activity (Amplitude events from the agents' mobile app, used for engagement/login analyses) | `datalake_amplitude_agents_app.agents_native_events` — 1 row per event. **No `sk_agent` / `sk_broker`** — bridge to 3P via `id_user` → `dw_public.dim_agent.id_user`. Filter `has_login_status = TRUE` for activity inside the logged-in area. Partitions: `year` / `month` / `day` (INT). |
 | Buyer prospect (For Sale 3P demand) NBP/RBP windows | `dw_sale.dim_buyer_prospect_3p_history`. Full demand-side coverage in [`3p_demand.md`](./3p_demand.md). |
 
 **Critical rules:**
@@ -186,6 +187,28 @@ Daily aggregated performance per agent (`dw_agent.fact_visit_agent_performance`,
 - **Supply hint** — `total_supply_first_listing` (first listings the agent added — useful to cross with `3p_supply.md` agent-level analyses).
 - **Performance availability flags** — `has_schedule_performance`, `has_offer_performance`, `has_lead_performance` — filter to TRUE before averaging the corresponding blocks to avoid diluting medians with rows that simply have no data.
 
+### `agents_native_events` — Agents App activity (engagement / login)
+
+Event-level activity from the **Agents App** (the corretores' mobile app), sourced from Amplitude (`datalake_amplitude_agents_app.agents_native_events`). One row per app event. Use it to measure how 3P agents engage with the app — daily activity, login behaviour, screens visited, business context (Sale/Rent), Lead Gen events. The table is layer **enrich** (not DW) — there is no DW-curated equivalent today.
+
+- **Grain** — 1 row per `(user, event)`. Partitioned by `year` / `month` / `day` (INT). Always filter partitions to avoid full scans; `MAKE_DATE` in Databricks / string-built date in Trino — see `data_exploration.mdc`.
+- **Identification** — `id_user` (the bridge key — see below), `id_app` (Amplitude app id), `event_type` (event name), `action_type` / `current_page` / `uri` (event detail), `ts_event` (event timestamp).
+- **Logged-area filter — `has_login_status`** — TRUE when the event happened inside the **logged-in area** of the app. **Always filter `has_login_status = TRUE`** when measuring actual app usage by an authenticated agent; FALSE events come from unauthenticated screens (landing, login, password reset) and dilute engagement metrics.
+- **3P / Lead Gen context** — `is_cqa_event` (TRUE when the event is part of the CQA / Lead Gen flow), `is_sale_agent` / `is_rent_agent` (modality flags of the agent at event time — derived from `user_properties`). Note: these flags come from Amplitude payload, not from `dim_agent` — they are useful for fast filtering but **`dim_agent` is the source of truth** for agent modality.
+- **Bridge to the Agents model** — `agents_native_events.id_user` → `dw_public.dim_agent.id_user`. From `dim_agent` you can then route to `sk_agent` (current snapshot) or `dim_agent_3p_history.sk_agent` (historically-correct 3P attribution via `ts_started` / `ts_ended` overlap). The table has **no `sk_agent`, no `sk_broker`, no `is_3p_agent`** directly — always go through `dim_agent` for 3P/broker attribution.
+- **Caveat — not 3P-specific.** The table covers **all agents** (1P and 3P). To restrict to 3P, filter `dim_agent.is_3p_agent = TRUE` after the JOIN, or bridge through `dim_agent_3p_history` for the historical 3P state at the event date.
+
+### Canonical pattern — "% of active 3P agents engaged in the Agents App per month"
+
+Two complementary metrics, both anchored on the monthly universe of active 3P agents (`dim_agent_3p_history` any-overlap — see next canonical pattern):
+
+1. **Monthly app activity rate** — share of monthly-active 3P agents with at least one `has_login_status = TRUE` event **in that same month**. Captures *touch-frequency*: who is currently using the app.
+2. **3-month rolling engagement** — share of monthly-active 3P agents with at least one `has_login_status = TRUE` event in **any of the last 3 months** (`[M-2, M-1, M]`). Captures *retention*: agents who use the app regularly but not necessarily every month.
+
+Both metrics share the same numerator pattern (count distinct 3P agents with app activity in a window) but differ in window width — 1 month vs 3 months. The 3M version is consistently higher and far more stable than the monthly version, which is sensitive to app-release cycles and seasonality. Fully worked SQL in **Query 16** below.
+
+Bridge — `dim_agent_3p_history.sk_agent → dw_public.dim_agent.sk_agent → dim_agent.id_user → agents_native_events.id_user`. Use `LEFT JOIN dim_agent` (not `INNER`) so agents without a linked `id_user` still count in the denominator (they cannot have app activity, so the numerator stays at 0 for them — correct).
+
 ### Canonical pattern — "active 3P agents per month"
 
 The right source is `dim_agent_3p_history` (the SCD2 dim), **not** the snapshot count on `dim_broker.qt_active_agents` (which only reflects "now"). The default definition uses the **any-overlap** rule:
@@ -249,6 +272,7 @@ Detailed demand-side funnel (Visit → Offer → CCV), sub-stages, bridges, reas
 | Visit business model source | `datalake_visit.visit_business_model` (enrich) | Source of `business_model`, `sk_broker_supply`, `sk_broker_demand`, `is_3p_*` flags propagated downstream |
 | Agents — current snapshot | `dw_public.dim_agent` | `is_3p_agent = TRUE` / `agent_type = 'CORRETOR_REDE'`; broker via `sk_broker <> -1` |
 | Agents — history | `dw_agent.dim_agent_3p_history` | Table is 3P-only by construction; broker via `sk_broker` |
+| Agents App activity (Amplitude events — engagement / login) | `datalake_amplitude_agents_app.agents_native_events` | No `sk_agent` / `sk_broker` / `is_3p_agent` — bridge `id_user → dim_agent.id_user` and then filter `is_3p_agent = TRUE` (or bridge to `dim_agent_3p_history` for historical 3P attribution). Always filter `has_login_status = TRUE` for activity inside the logged-in area. |
 
 **Caveats:**
 - For Sale: prefer `dw_sale_visits` / `dw_sale_offers` / `dw_sale_listings` (Sale-specific paths) over the combined legacy paths in `dw_visit` / `dw_listing`.
@@ -331,6 +355,8 @@ Mixing the two without splitting hides which effect (server default vs ranking) 
 - **Time since last activation** — `DATE_DIFF('day', CAST(ts_last_membership_start AS DATE), CURRENT_DATE)` on `dim_broker`; per modality use `ts_last_sale_membership_start` / `ts_last_rent_membership_start`.
 - **3P supply volume per broker** — JOIN `dim_broker` ↔ `dw_3p_supply.fact_lead_3p_flows` on `sk_broker`. For funnel-stage breakdown (Opportunity, First Listing, etc.) follow [`3p_supply.md`](./3p_supply.md).
 - **3P transactions per broker (Visits / Offers)** — `COUNT(*) WHERE is_3p_supply OR is_3p_demand OR is_3p_lead_gen` on `dw_sale_visits.fact_visits` / `dw_sale_offers.fact_offers`, grouped by `sk_broker_supply` or `sk_broker_demand` as required.
+- **% of monthly-active 3P agents using the Agents App** — denominator: monthly-active 3P agents from `dim_agent_3p_history` (any-overlap). Numerator: same agents with at least one `has_login_status = TRUE` event in `datalake_amplitude_agents_app.agents_native_events` **in that same month**. Bridge via `dim_agent.id_user`. Full pattern in **Query 16**.
+- **3P agent engagement in the Agents App (3-month rolling)** — same denominator as above; numerator counts agents with `has_login_status = TRUE` activity in **any of the last 3 months** (`[M-2, M-1, M]`). More stable than the monthly rate — captures users who use the app but not necessarily every month. Full pattern in **Query 16**.
 - **L2FL** and other supply-funnel conversion metrics: see [`3p_supply.md`](./3p_supply.md) — not duplicated here.
 
 ## Relationships with Other Entities
@@ -1006,4 +1032,80 @@ FROM monthly_perf AS mp
 INNER JOIN dw_brokers.dim_broker AS b ON b.sk_broker = mp.sk_broker
 WHERE mp.active_3p_agents_with_data > 0
 ORDER BY mp.month DESC, mp.total_contract_signed DESC NULLS LAST
+```
+
+### Query 16 — % of active 3P agents using the Agents App (monthly + 3-month rolling engagement)
+
+Two metrics in a single result, both anchored on the monthly universe of active 3P agents (`dim_agent_3p_history` any-overlap from Query 11):
+
+- `pct_active_in_app_in_month` — share of monthly-active 3P agents with `has_login_status = TRUE` activity **in that same month**.
+- `pct_engaged_last_3m` — share of monthly-active 3P agents with `has_login_status = TRUE` activity in **any of the last 3 months** (`[M-2, M-1, M]`).
+
+The bridge to the Agents App data is `dim_agent_3p_history.sk_agent → dw_public.dim_agent.sk_agent → dim_agent.id_user → agents_native_events.id_user`. Uses `LEFT JOIN dim_agent` so 3P agents without a linked `id_user` stay in the denominator (the numerator is naturally 0 for them — they can't have app activity). Partition filter on `agents_native_events` covers the spine plus 2 extra months at the start to fill the 3M lookback window.
+
+Adjust the `params` CTE to widen / shift the time window. To split by Lead Gen eligibility, add `is_passive_lead_receiver` (from `dim_agent_3p_history`) to the `active_3p_per_month` projection and to the final `GROUP BY`. To split by broker, add `sk_broker` from `dim_agent_3p_history` and JOIN to `dw_brokers.dim_broker` for the name.
+
+```sql
+WITH params AS (
+    SELECT
+        date '2025-05-01'                       AS start_month,
+        date_trunc('month', current_date)       AS current_month
+),
+monthly_spine AS (
+    SELECT month_start
+    FROM params,
+         UNNEST(SEQUENCE(start_month, current_month, interval '1' month)) AS t (month_start)
+),
+spine_bounds AS (
+    SELECT
+        month_start,
+        date_add('day', -1, date_add('month', 1, month_start)) AS month_end
+    FROM monthly_spine
+),
+active_3p_per_month AS (
+    SELECT DISTINCT
+        s.month_start,
+        h.sk_agent,
+        a.id_user
+    FROM spine_bounds AS s
+    INNER JOIN dw_agent.dim_agent_3p_history AS h
+        ON h.is_active = TRUE
+       AND CAST(h.ts_started AS DATE) <= s.month_end
+       AND (h.ts_ended IS NULL OR CAST(h.ts_ended AS DATE) > s.month_start)
+    LEFT JOIN dw_public.dim_agent AS a
+        ON a.sk_agent = h.sk_agent
+),
+monthly_app_activity AS (
+    SELECT
+        DATE(CAST(e.year AS VARCHAR) || '-' || LPAD(CAST(e.month AS VARCHAR), 2, '0') || '-01') AS month_start,
+        e.id_user
+    FROM datalake_amplitude_agents_app.agents_native_events AS e
+    WHERE e.has_login_status = TRUE
+      AND e.id_user IS NOT NULL
+      AND ( CAST(e.year AS INTEGER) > 2025
+            OR (CAST(e.year AS INTEGER) = 2025 AND CAST(e.month AS INTEGER) >= 3) )
+    GROUP BY 1, 2
+),
+agent_activity_per_month AS (
+    SELECT
+        ap.month_start,
+        ap.sk_agent,
+        MAX(CASE WHEN m.month_start = ap.month_start THEN 1 ELSE 0 END) AS active_in_month,
+        MAX(CASE WHEN m.month_start BETWEEN date_add('month', -2, ap.month_start) AND ap.month_start THEN 1 ELSE 0 END) AS engaged_last_3m
+    FROM active_3p_per_month AS ap
+    LEFT JOIN monthly_app_activity AS m
+        ON m.id_user = ap.id_user
+       AND m.month_start BETWEEN date_add('month', -2, ap.month_start) AND ap.month_start
+    GROUP BY ap.month_start, ap.sk_agent
+)
+SELECT
+    month_start,
+    COUNT(DISTINCT sk_agent)                                                              AS total_active_3p_agents,
+    SUM(active_in_month)                                                                  AS active_in_app_in_month,
+    SUM(engaged_last_3m)                                                                  AS engaged_last_3m,
+    ROUND(CAST(SUM(active_in_month) AS DOUBLE) / NULLIF(COUNT(DISTINCT sk_agent), 0), 4)  AS pct_active_in_app_in_month,
+    ROUND(CAST(SUM(engaged_last_3m) AS DOUBLE) / NULLIF(COUNT(DISTINCT sk_agent), 0), 4)  AS pct_engaged_last_3m
+FROM agent_activity_per_month
+GROUP BY month_start
+ORDER BY month_start
 ```
