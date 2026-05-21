@@ -158,8 +158,8 @@ retsuko_adm_service_fee AS (
 
 retsuko AS (
   SELECT * FROM retsuko_brokerage
-  UNION ALL
-  SELECT * FROM retsuko_adm_service_fee
+  -- UNION ALL
+  -- SELECT * FROM retsuko_adm_service_fee
 ),
 
 sap_entity AS (
