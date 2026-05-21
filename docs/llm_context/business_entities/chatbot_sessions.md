@@ -42,6 +42,7 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 | Isaias lead qualification funnel | `datalake_chatbot.isaias_conversational_flow` (`icf`) — one row per Langfuse session with boolean flags for each qualification step. |
 | Raw LLM traces (latency, model, input/output) | `datalake_langfuse_clean.traces` (`t`) — one row per trace. JOIN to sessions via `t.id_session = s.id_langfuse_session`. |
 | LLM span/generation details (model, tokens, cost), specific sub agent or tool calling | `datalake_langfuse_clean.observations` (`o`) — one row per observation. JOIN via `o.id_trace = t.id_trace`. Filter specific observations for exact sub agent or tool via `o.name`|
+| Sampled Wall-E taxonomy on chatbot sessions (daily Conversation Explorer extract) | `datalake_conversation_explorer_clean.categorisation` (`ce_cat`) — JOIN `ce_cat.id_langfuse_session = s.id_langfuse_session` and **`s.bot = 'wall-e'`** (CE is Wall-E-only for now). Daily sample (~7.5K sessions); percentages must use Conversation Explorer denominators only (`business_entities/conversation_explorer.md`). |
 
 **Critical rules:**
 - **Three session IDs**: `id_sauron_session` (always present — stable key), `id_session` (Copilot, NULL for old bot), `id_langfuse_session` (Langfuse, NULL for old bot). Prefer JOIN through `id_langfuse_session` for session-level analysis, fallback to `id_sauron_session` if `id_langfuse_session` is missing in the table, e.g. `datalake_chatbot.messages`

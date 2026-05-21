@@ -27,6 +27,7 @@ Each entity file follows a standard structure:
 - `business_entities/chatbot_sessions.md` — AI chatbot conversation sessions (sessões de chatbot / atendimento bot)
 - `business_entities/closing.md` — For Rent contract closing / CC2CS journey: draft → sent → signed (fechamento, assinatura de contrato)
 - `business_entities/collections.md` — Overdue payment recovery operations (cobrança)
+- `business_entities/conversation_explorer.md` — Conversation Explorer sampled Wall-E chatbot sessions only (~7.5K/day): taxonomy (`category`/`subcategory`) and human annotations (produto Conversation Explorer / domínio–problema do usuário)
 - `business_entities/department.md` — Support queue routing and SLA targets (departamento / fila / caixa)
 - `business_entities/inspection.md` — Property inspections (vistorias)
 - `business_entities/losses.md` — Accounting write-offs and provisioning (perdas / PDD)

@@ -31,6 +31,7 @@ Each entity file follows a standard structure:
 - `business_entities/satisfaction.md` — Customer Satisfaction scores across channels (CSAT / satisfação)
 - `business_entities/termination.md` — Contract terminations (rescisões / offboarding)
 - `business_entities/ticket.md` — Zendesk support tickets (chamado / solicitação / demanda)
+- `business_entities/conversation_explorer.md` — Conversation Explorer sampled Wall-E chatbot sessions only (~7.5K/day): taxonomy (`category`/`subcategory`) and human annotations (produto Conversation Explorer / domínio–problema do usuário)
 
 ## Company-Wide Glossary
 
