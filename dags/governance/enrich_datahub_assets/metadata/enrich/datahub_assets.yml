@@ -1,0 +1,41 @@
+---
+database_name: datalake_datahub
+table_name: datahub_assets
+description: >
+  Daily snapshot of all datasets indexed in DataHub across Databricks, Glue, Hive, and Trino platforms.
+  One row per dataset URN per day. Used for data governance observability — tracks schema coverage,
+  lineage completeness, and load job attribution across the data lake.
+domain: Data Ops & Governance
+owner: gustavo.akashi@quintoandar.com.br
+columns:
+  urn:
+    description: >
+      Unique DataHub URN identifying the dataset, in the format
+      urn:li:dataset:(urn:li:dataPlatform:{platform},{schema}.{table},PROD).
+  dataset_name:
+    description: >
+      Fully qualified name of the dataset in the metastore, e.g. datalake_airflow.task_fail.
+      Sourced from the DatasetKey aspect of the DataHub REST API.
+  platform_name:
+    description: >
+      Name of the data platform where the dataset is registered (databricks, glue, hive, or trino).
+      Parsed from the platform URN in the DatasetKey aspect.
+  num_cols:
+    description: >
+      Number of columns declared in the dataset's schema metadata in DataHub.
+      Zero when the SchemaMetadata aspect is absent or the schema has not been ingested yet.
+  has_table_lineage:
+    description: >
+      Boolean flag indicating whether the dataset has at least one upstream dataset registered
+      in DataHub via a DownstreamOf relationship. False means no table-level lineage is tracked.
+  has_load_job_lineage:
+    description: >
+      Boolean flag indicating whether the dataset is produced by an Airflow load job registered
+      in DataHub. True when a DataJob with "load-" in its URN and "airflow" in its URN is linked
+      via a Produces relationship.
+  year:
+    description: Partition — year of the load date when this snapshot was collected.
+  month:
+    description: Partition — month of the load date when this snapshot was collected.
+  day:
+    description: Partition — day of the load date when this snapshot was collected.

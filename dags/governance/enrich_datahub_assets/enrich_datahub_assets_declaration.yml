@@ -1,0 +1,47 @@
+dag:
+  name: enrich_datahub_assets
+  owner: Data Governance
+  schedule_start_date: 2026, 4, 1
+  schedule_interval: "0 6 * * *"
+  documentation:
+    dag_purpose: |
+      Daily snapshot of all datasets indexed in DataHub across Databricks, Glue, Hive, and Trino platforms.
+      For each dataset, collects schema coverage (number of columns), upstream table lineage presence,
+      and whether the dataset is produced by an Airflow load job. Outputs to datalake_datahub.datahub_assets
+      (enrich layer, partitioned by year/month/day) for governance observability and data quality monitoring.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: datahub
+  default_partitions:
+    - year
+    - month
+    - day
+  default_extraction_type: incremental
+  execution_timeout_hours: 2
+  has_hive_sync: true
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    datahub_assets:
+      load_spark_job: load_datahub_assets
+      spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{schema}"
+        - "{table_name}"
+        - "{load_start_date}"
+        - "{load_end_date}"
+        - "{partitions}"
+cluster:
+  type: databricks_16_4_med_general_cluster
+  custom_libraries:
+    - pypi:
+        package: "acryl-datahub==1.4.0"
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
