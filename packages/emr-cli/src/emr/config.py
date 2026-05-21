@@ -7,29 +7,70 @@ from urllib.parse import urlparse
 
 import yaml
 
-# Paths inside the container (Compose mounts ./config → /config).
-SETTINGS_PATH_PROD = "/config/prod.yml"
-SETTINGS_PATH_FORNO = "/config/forno.yaml"
+from emr.paths import package_root
+
 DEFAULT_ENVIRONMENT = "prod"
 
 
-def resolve_settings_path() -> str:
-    """Resolve settings file from ``EMR_ENVIRONMENT`` (``prod`` or ``forno``).
-
-    Empty or unset ``EMR_ENVIRONMENT`` defaults to ``prod`` → ``SETTINGS_PATH_PROD``.
-    """
+def _normalized_emr_environment() -> str:
+    """Return canonical ``prod`` or ``forno`` from ``EMR_ENVIRONMENT``."""
     raw = os.environ.get("EMR_ENVIRONMENT", "")
     env = raw.strip().lower()
     if not env:
         env = DEFAULT_ENVIRONMENT
-    if env == "prod":
-        return SETTINGS_PATH_PROD
-    if env == "forno":
-        return SETTINGS_PATH_FORNO
-    raise ValueError(
-        "EMR_ENVIRONMENT must be 'prod' or 'forno' "
-        f"(empty defaults to prod); got {raw!r}"
-    )
+    if env not in ("prod", "forno"):
+        raise ValueError(
+            "EMR_ENVIRONMENT must be 'prod' or 'forno' "
+            f"(empty defaults to prod); got {raw!r}"
+        )
+    return env
+
+
+def _settings_filename_for_env(env: str) -> str:
+    return "forno.yaml" if env == "forno" else "prod.yml"
+
+
+def resolve_settings_path() -> str:
+    """Resolve the EMR settings YAML path.
+
+    Precedence:
+
+    1. ``EMR_SETTINGS_FILE`` — explicit file (must exist). Does not require
+       ``EMR_ENVIRONMENT``.
+    2. ``EMR_CONFIG_DIR`` — directory containing ``prod.yml`` or ``forno.yaml``
+       (from ``EMR_ENVIRONMENT``).
+    3. Default: ``<packages/emr-cli>/config/prod.yml`` or ``forno.yaml``.
+
+    ``EMR_ENVIRONMENT`` selects ``prod`` vs ``forno`` for (2) and (3).
+    """
+    explicit = os.environ.get("EMR_SETTINGS_FILE", "").strip()
+    if explicit:
+        p = Path(explicit).expanduser()
+        if not p.is_file():
+            raise ValueError(f"EMR_SETTINGS_FILE must be an existing file: {p}")
+        return str(p.resolve())
+
+    env = _normalized_emr_environment()
+
+    config_dir = os.environ.get("EMR_CONFIG_DIR", "").strip()
+    if config_dir:
+        d = Path(config_dir).expanduser().resolve()
+        if not d.is_dir():
+            raise ValueError(f"EMR_CONFIG_DIR must be an existing directory: {d}")
+        candidate = d / _settings_filename_for_env(env)
+        if not candidate.is_file():
+            raise ValueError(
+                f"Settings file not found under EMR_CONFIG_DIR: {candidate}"
+            )
+        return str(candidate.resolve())
+
+    default_path = package_root() / "config" / _settings_filename_for_env(env)
+    if not default_path.is_file():
+        raise ValueError(
+            f"Default settings file missing: {default_path}. "
+            "Set EMR_CONFIG_DIR or EMR_SETTINGS_FILE, or use a full checkout."
+        )
+    return str(default_path.resolve())
 
 
 # Required YAML keys (see ``config/*.yml``).

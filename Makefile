@@ -464,6 +464,7 @@ install:
 	@env -u UV_PROJECT_ENVIRONMENT uv sync --directory packages/bietlejuice-runtime
 	@env -u UV_PROJECT_ENVIRONMENT uv sync --directory packages/bietlejuice-runtime/envs/dbr-16-4
 	@uv sync --directory packages/bietlejuice-compiler
+	@uv sync --directory packages/emr-cli
 
 DBR ?= 16.4
 .PHONY: sync-dbr
@@ -596,10 +597,11 @@ unit-tests:
 	@uv run --directory packages/bietlejuice-airflow  pytest -W ignore::DeprecationWarning
 	@cd packages/bietlejuice-runtime && DBR_PY=$$(uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && PYSPARK_PYTHON=$$DBR_PY PYSPARK_DRIVER_PYTHON=$$DBR_PY uv run --project envs/dbr-16-4 pytest -W ignore::DeprecationWarning
 	@uv run --directory packages/bietlejuice-compiler pytest -W ignore::DeprecationWarning
+	@uv run --directory packages/emr-cli pytest -W ignore::DeprecationWarning
 
 .PHONY: unit-tests-changed
 ## run unit tests scoped to packages changed since origin/master using pytest-testmon.
-## Detects which packages (core, airflow, runtime, compiler) have changes and runs
+## Detects which packages (core, airflow, runtime, compiler, emr-cli) have changes and runs
 ## only their test suites. Falls back to all packages for framework-level changes.
 unit-tests-changed:
 	@echo ""
@@ -624,6 +626,7 @@ unit-tests-changed:
 	         PYSPARK_DRIVER_PYTHON=$$DBR_PY \
 	         uv run --project envs/dbr-16-4 pytest --testmon -W ignore::DeprecationWarning && cd ../.. || { cd ../..; FAILED=1; } ;; \
 	       compiler) uv run --directory packages/bietlejuice-compiler pytest --testmon -W ignore::DeprecationWarning || FAILED=1 ;; \
+	       emr-cli) uv run --directory packages/emr-cli pytest --testmon -W ignore::DeprecationWarning || FAILED=1 ;; \
 	     esac; \
 	   done && \
 	   [ $$FAILED -eq 0 ] || exit 1; \

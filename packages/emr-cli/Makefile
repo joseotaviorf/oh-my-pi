@@ -1,10 +1,25 @@
-COMPOSE ?= docker compose
+DIST ?= dist
+WHEEL_DIR ?= $(DIST)/wheels
+EXECUTABLE ?= $(DIST)/emr-cli
+export PEX_ROOT ?= $(CURDIR)/.pex-root
 
-.PHONY: build shell run weep-auth weep-install lint check-style file-upload file-download \
-	app-run transient create-cluster submit-step terminate dump-logs
+.PHONY: sync install test build-executable weep-auth weep-install lint check-style
 
-build:
-	$(COMPOSE) build app
+# Install dependencies and the ``emr-cli`` console script into ``.venv``.
+sync install:
+	uv sync
+
+# Self-contained executable (PEX). uv has no native single-file bundler; we invoke pex via uv.
+# Output: ``dist/emr-cli`` (run directly; needs a Python 3.10–3.12 interpreter on PATH).
+build-executable: sync
+	@mkdir -p "$(WHEEL_DIR)"
+	uv build --wheel --out-dir "$(WHEEL_DIR)"
+	uv run pex "$(WHEEL_DIR)"/*.whl -c emr-cli -o "$(EXECUTABLE)" \
+		--python="$(shell uv python find 3.12 2>/dev/null || uv python find)"
+	@echo "Built $(EXECUTABLE)"
+
+test:
+	uv run pytest test/unit -v -W ignore::DeprecationWarning
 
 # Authenticate with weep/consoleme and refresh credentials
 weep-auth:
@@ -15,73 +30,8 @@ weep-install:
 	./scripts/install-weep.sh
 
 lint:
-	@python -m black src/emr/
+	uv run ruff format src/ test/
 
 check-style:
-	@python -m black --check src/emr/ && echo "\n\nSuccess\n" || (echo "\n\nFailure\n\nRun \"make lint\" in packages/emr-cli to fix\n" && exit 1)
-
-# Makefile vars mirror CLI flags: replace "--foo-bar" with "foo_bar" (see README).
-# Upload: local file + S3 prefix (same as s3-file-upload.sh positional args).
-# Usage: make file-upload local=path/to/file s3_prefix=s3://bucket/prefix/
-file-upload:
-	@test -n "$(local)" && test -n "$(s3_prefix)" || (echo 'Usage: make file-upload local=path/to/file s3_prefix=s3://bucket/prefix/' >&2; exit 1)
-	./scripts/s3-file-upload.sh "$(local)" "$(s3_prefix)"
-
-# Download: full object URI + local path.
-# Usage: make file-download s3_uri=s3://bucket/key dest=./local-file
-file-download:
-	@test -n "$(s3_uri)" && test -n "$(dest)" || (echo 'Usage: make file-download s3_uri=s3://bucket/key dest=./local-file' >&2; exit 1)
-	./scripts/s3-file-download.sh "$(s3_uri)" "$(dest)"
-
-# Same as: docker compose run --rm app <subcommand> [OPTIONS]
-# Usage: make app-run args='transient --name my-flow --uri s3://bucket/j.py --wait'
-app-run:
-	@test -n "$(args)" || (echo 'Usage: make app-run args="transient|create-cluster|submit-step|terminate|dump-logs ..."' >&2; exit 1)
-	$(COMPOSE) run --rm app $(args)
-
-# Transient cluster + step (README §3). Optional: step_name, bootstrap_script_uri, bootstrap_arg (single artifacts URI),
-# JOB_ARGS (shell-style string → --job-args), wait=1, follow_logs=1, use_spot=1|0.
-# Extra CLI-only flags: make app-run args='transient ...'.
-transient:
-	@test -n "$(name)" && test -n "$(uri)" || (echo 'Usage: make transient name=... uri=... [step_name=...] [bootstrap_script_uri=...] [bootstrap_arg=...] [JOB_ARGS=...] [wait=1] [follow_logs=1] [use_spot=1|0]' >&2; exit 1)
-	$(COMPOSE) run --rm app transient \
-		--name "$(name)" \
-		$(if $(strip $(step_name)),--step-name "$(step_name)") \
-		--uri "$(uri)" \
-		$(if $(strip $(bootstrap_script_uri)),--bootstrap-script-uri "$(bootstrap_script_uri)") \
-		$(if $(strip $(bootstrap_arg)),--bootstrap-arg "$(bootstrap_arg)") \
-		$(if $(strip $(JOB_ARGS)),--job-args "$(JOB_ARGS)") \
-		$(if $(filter 1 true yes,$(use_spot)),--use-spot,$(if $(filter 0 false no,$(use_spot)),--no-use-spot,)) \
-		$(if $(filter 1 true yes,$(wait)),--wait) \
-		$(if $(filter 1 true yes,$(follow_logs)),--follow-logs,)
-
-# Persistent cluster (README §4). Optional: bootstrap_script_uri, bootstrap_arg, use_spot=1|0
-create-cluster:
-	@test -n "$(name)" || (echo 'Usage: make create-cluster name=... [bootstrap_script_uri=...] [bootstrap_arg=...] [use_spot=1|0]' >&2; exit 1)
-	$(COMPOSE) run --rm app create-cluster \
-		--name "$(name)" \
-		$(if $(strip $(bootstrap_script_uri)),--bootstrap-script-uri "$(bootstrap_script_uri)") \
-		$(if $(strip $(bootstrap_arg)),--bootstrap-arg "$(bootstrap_arg)") \
-		$(if $(filter 1 true yes,$(use_spot)),--use-spot,$(if $(filter 0 false no,$(use_spot)),--no-use-spot,))
-
-# Add Spark step to a running cluster (README §4). Optional: step_name, JOB_ARGS, wait=1, follow_logs=1
-submit-step:
-	@test -n "$(cluster_id)" && test -n "$(uri)" || (echo 'Usage: make submit-step cluster_id=... uri=... [step_name=...] [JOB_ARGS=...] [wait=1] [follow_logs=1]' >&2; exit 1)
-	$(COMPOSE) run --rm app submit-step \
-		--cluster-id "$(cluster_id)" \
-		$(if $(strip $(step_name)),--step-name "$(step_name)") \
-		--uri "$(uri)" \
-		$(if $(strip $(JOB_ARGS)),--job-args "$(JOB_ARGS)") \
-		$(if $(filter 1 true yes,$(wait)),--wait) \
-		$(if $(filter 1 true yes,$(follow_logs)),--follow-logs,)
-
-# Terminate cluster (README §4)
-terminate:
-	@test -n "$(cluster_id)" || (echo 'Usage: make terminate cluster_id=...' >&2; exit 1)
-	$(COMPOSE) run --rm app terminate \
-		--cluster-id "$(cluster_id)"
-
-# Print S3 logs under dump_logs_base_uri + relative path (README dump-logs). Example: path=j-XXX/steps/s-YYY/
-dump-logs:
-	@test -n "$(path)" || (echo 'Usage: make dump-logs path=j-CLUSTER/steps/s-STEP/ [or single object key suffix]' >&2; exit 1)
-	$(COMPOSE) run --rm app dump-logs "$(path)"
+	uv run ruff format --check src/ test/
+	uv run ruff check src/ test/

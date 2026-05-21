@@ -24,8 +24,9 @@
     "UV_LINK_MODE": "copy"
   },
   "mounts": [
-    "source=${localEnv:HOME}/.aws,target=/home/vscode/.aws,type=bind,readonly",
+    "source=${localEnv:HOME}/.aws,target=/home/vscode/.aws,type=bind",
     "source=${localEnv:HOME}/.databrickscfg,target=/home/vscode/.databrickscfg,type=bind,readonly",
+    "source=${localEnv:HOME}/.weep,target=/home/vscode/.weep,type=bind",
     "source=bi-etl-ejuice-uv-cache,target=/home/vscode/.cache/uv,type=volume"
   ],
   "forwardPorts": [

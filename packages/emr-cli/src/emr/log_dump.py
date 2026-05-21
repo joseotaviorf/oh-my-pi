@@ -8,7 +8,7 @@ from typing import Any, TextIO
 
 from botocore.exceptions import ClientError
 
-from emr.log_follow import decode_log_body, parse_s3_uri
+from emr.log_follow import decode_log_body, list_object_keys, parse_s3_uri
 
 
 def sanitize_log_relative_path(raw: str) -> str:
@@ -36,18 +36,6 @@ def bucket_and_key_prefix(dump_logs_base_uri: str, relative: str) -> tuple[str, 
     return bucket, prefix
 
 
-def _list_all_keys(s3_client: Any, bucket: str, prefix: str) -> list[str]:
-    keys: list[str] = []
-    paginator = s3_client.get_paginator("list_objects_v2")
-    for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
-        for obj in page.get("Contents") or []:
-            k = obj.get("Key")
-            if k:
-                keys.append(str(k))
-    keys.sort()
-    return keys
-
-
 def dump_logs(
     s3_client: Any,
     *,
@@ -62,15 +50,13 @@ def dump_logs(
     """
     out = stream if stream is not None else sys.stdout
     bucket, prefix = bucket_and_key_prefix(dump_logs_base_uri, relative_path)
-    keys = _list_all_keys(s3_client, bucket, prefix)
+    keys = list_object_keys(s3_client, bucket, prefix)
     if not keys:
         raise ValueError(
             f"No S3 objects found under s3://{bucket}/{prefix} "
             "(check dump_logs_base_uri in config and the relative path)"
         )
     for key in keys:
-        if key.endswith("/"):
-            continue
         try:
             resp = s3_client.get_object(Bucket=bucket, Key=key)
         except ClientError as e:

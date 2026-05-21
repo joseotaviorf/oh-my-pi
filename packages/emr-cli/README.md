@@ -1,60 +1,79 @@
-# EMR CLI (experimental)
+# EMR CLI
 
-Containerized CLI that handles AWS EMR job submissions, as well as clusters initialization and and termination.
+Local CLI for AWS EMR: transient and persistent clusters, **`submit-step`**, **`terminate`**, and **`dump-logs`**.
 
-It supports a **transient** flow (**`transient`** → cluster is created and ends when the step finishes), a **persistent** flow (**`create-cluster`** → **`submit-step`** one or more times → **`terminate`**), and **`dump-logs`** to print objects already stored under the configured S3 log prefix.
+It supports a **transient** flow (**`transient`** → cluster ends when the step finishes), a **persistent** flow (**`create-cluster`** → **`submit-step`** one or more times → **`terminate`**), and **`dump-logs`** to print objects already stored under the configured S3 log prefix.
 
 ## Settings
 
-**Global settings** come from YAML under **`config/`**, mounted at **`/config/`** in the container.
+**Global settings** are YAML files under **`packages/emr-cli/config/`** (or a path you override).
 
-Use **`EMR_ENVIRONMENT`** to select the configuration file: **`prod`** (default if unset or empty) → **`config/prod.yml`**, or **`forno`** → **`config/forno.yaml`**.
+Use **`EMR_ENVIRONMENT`** to select the file when using defaults: **`prod`** (default if unset or empty) → **`config/prod.yml`**, or **`forno`** → **`config/forno.yaml`**.
+
+Overrides (optional):
+
+| Variable | Effect |
+| -------- | ------ |
+| **`EMR_SETTINGS_FILE`** | Absolute path to a YAML file (skips **`EMR_ENVIRONMENT`** file name logic). |
+| **`EMR_CONFIG_DIR`** | Directory that contains **`prod.yml`** / **`forno.yaml`** (selected by **`EMR_ENVIRONMENT`**). |
 
 Per-run options are passed on the **command line** (subcommand name, script URI, cluster id, wait flags, tags, instance overrides, etc.).
 
 ## Prerequisites
 
-- Docker and Docker Compose.
+- **[uv](https://docs.astral.sh/uv/)**.
 - AWS cli.
 - Weep (see **`make weep-install`** and **`make weep-auth`** helpers).
 
+## Install
+
+```bash
+cd packages/emr-cli
+make build-executable
+./dist/emr-cli --help
+```
+It bundles Python dependencies and ships **`config/`** (and **`samples/`**) inside the wheel.
+
+It still needs a **Python 3.10–3.12** interpreter on the machine (the PEX embeds deps, not the CPython runtime). Override the interpreter with **`PEX_PYTHON`** or rebuild after **`uv python install 3.12`** if needed.
+
 ## Layout
 
-| Path                                  | Purpose                                                                                                                                                                                                                                           |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/emr/`                            | CLI app (installable package)                                                                                                                                                                                                                     |
-| `pyproject.toml`                      | PEP 621 project (dependencies; used by Docker build)                                                                                                                                                                                              |
-| `docker-compose.yml`                  | Mounts `~/.aws`, **`./config` → `/config`**, **`./samples` → `/app/samples`** (matches **`WORKDIR /app`**)                                                                                                                                        |
-| `Makefile`                            | `build`, `weep-install`, `weep-auth`, `file-upload`, `file-download`, `app-run`, `transient`, `create-cluster`, `submit-step`, `terminate`, `dump-logs`, `lint`                                                                                |
-| `config/prod.yml`                     | **Production** settings (default); **`/config/prod.yml`** in Docker.                                                                                                                                                                              |
-| `config/forno.yaml`                   | **Forno** settings; **`/config/forno.yaml`** in Docker.                                                                                                                                                                                           |
-| `samples/job/sample_pi.py`            | Minimal PySpark Pi example                                                                                                                                                                                                                        |
-| `samples/job/sample_delta_loader.py`  | Uses the **bi-etl-ejuice** package on the cluster: **`DeltaLoader`**, **`create_emr_spark_session`**, **`QuintoAndarLogger`**; registers **`--target-table`** via **`saveAsTable`** (see [Samples and bi-etl-ejuice](#samples-and-bi-etl-ejuice)) |
-| `samples/init/worker_init_example.sh` | Example **bootstrap** script (upload to S3; use **`--bootstrap-script-uri`**)                                                                                                                                                                     |
-| `samples/init/emr_init_minimal.sh`    | Minimal bootstrap: install **bi-etl-ejuice** + **python-logger** wheels and validate imports (pass **`--bootstrap-arg`** with artifacts bucket URI)                                                                                               |
-| `scripts/s3-file-upload.sh`           | Upload a local file to an S3 prefix from the **host** (see **`make file-upload`**)                                                                                                                                                                |
-| `scripts/s3-file-download.sh`         | Download one S3 object to a local path (see **`make file-download`**)                                                                                                                                                                             |
+| Path                                  | Purpose |
+| ------------------------------------- | ------- |
+| `src/emr/`                            | CLI package |
+| `pyproject.toml`                      | Project + **`uv`** lock |
+| `config/prod.yml`                     | **Production** defaults |
+| `config/forno.yaml`                   | **Forno** defaults |
+| `Makefile`                            | **`sync`**, **`install`**, **`build-executable`**, **`test`**, **`weep-*`**, **`lint`**, **`check-style`** |
+| `dist/emr-cli`                        | **PEX** output from **`make build-executable`** (not committed) |
+| `samples/job/sample_pi.py`            | Minimal PySpark Pi example |
+| `samples/init/worker_init_example.sh` | Minimal bootstrap example |
+| `samples/job/sample_delta_loader.py`  | Example using **bi-etl-ejuice** on the cluster |
+| `samples/init/emr_init_minimal.sh`    | Minimal bootstrap (wheels from artifacts) |
+| `scripts/s3-file-upload.sh`           | Upload a local file to S3 (see script usage) |
+| `scripts/s3-file-download.sh`         | Download an S3 object to a local path |
 
-**Docker `app` container:** **`WORKDIR`** is **`/app`**. Host **`cli/emr/samples`** is mounted at **`/app/samples`**.
+**Working directory:** relative **`--uri`** paths resolve from the **current working directory**. For repo samples, run commands from **`packages/emr-cli`** (e.g. **`samples/job/sample_pi.py`**).
 
 ### Samples and bi-etl-ejuice
 
-| Sample                                   | Depends on **bi-etl-ejuice**? | Notes                                                                                                                                                                                                |
-| ---------------------------------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`samples/job/sample_pi.py`**           | No                            | Plain **`pyspark`** only; runs without installing the monorepo wheel.                                                                                                                                |
-| **`samples/job/sample_delta_loader.py`** | **Yes**                       | Imports **`bietlejuice...spark_session_factory`**, **`bietlejuice...DeltaLoader`**, and **`quintoandar_logger`**. The EMR cluster must have those packages on **`PYTHONPATH`** before the step runs. |
+| Sample                                   | Depends on **bi-etl-ejuice**? | Notes |
+| ---------------------------------------- | ----------------------------- | ----- |
+| **`samples/job/sample_pi.py`**           | No                            | Plain **`pyspark`** only. |
+| **`samples/job/sample_delta_loader.py`** | **Yes**                       | Cluster must have wheels on **`PYTHONPATH`** (bootstrap). |
 
-For **`sample_delta_loader.py`**, use a **bootstrap** that downloads and **`pip install`s** the wheels from your **artifacts** bucket (same layout as production: **`…/bi-etl-ejuice/bi_etl_ejuice-…whl`**, **`…/python-logger/…quintoandar_logger…whl`**). This repo ships **[`samples/init/emr_init_minimal.sh`](samples/init/emr_init_minimal.sh)** for a small POC; production uses **[`scripts/emr_init_script.sh`](../../../scripts/emr_init_script.sh)**. 
+For **`sample_delta_loader.py`**, this repo ships **[`samples/init/emr_init_minimal.sh`](samples/init/emr_init_minimal.sh)** as a minimal required bootstrap.
 
 ## Authentication
 
-Authentication uses the **standard AWS credential chain** from the local machine mounted inside the CLI (**`${HOME}/.aws`** is mounted read-only).
+Uses the **standard AWS credential chain** on your machine (e.g. **`~/.aws`**, env vars, or SSO).
 
 ## Code style
 
 ```bash
 cd packages/emr-cli
 make lint
+make check-style
 ```
 
 ## Settings file
@@ -89,10 +108,8 @@ The settings file contains "global" settings that should be fined for most runs.
 ## Command-line reference
 
 ```bash
-docker compose run --rm app <subcommand> [OPTIONS]
+emr-cli <subcommand> [OPTIONS]
 ```
-
-
 
 
 ### Top-level
@@ -106,7 +123,7 @@ docker compose run --rm app <subcommand> [OPTIONS]
 
 | Option                               | Required | Default             | Description                                                                                                                                                                                              |
 | ------------------------------------ | -------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--uri`                              | **yes**  | —                   | PySpark script: **`s3://…`** or a **bare filesystem path** (must exist). Relative paths resolve from **cwd** — in Docker **`samples/job/...`** with **`WORKDIR /app`** (see Layout).                     |
+| `--uri`                              | **yes**  | —                   | PySpark script: **`s3://…`** or a **bare filesystem path** (must exist). Relative paths resolve from **cwd** — run from **`packages/emr-cli`** for **`samples/job/...`**.                     |
 | `--name`                             | **yes**  | —                   | Job flow **`Name`**.                                                                                                                                                                                     |
 | `--step-name`                        | no       | `Spark application` | EMR step name for this job.                                                                                                                                                                              |
 | `--tag`                              | no       | _(none)_            | Repeatable **`Key=Value`** → EMR tags.                                                                                                                                                                   |
@@ -115,7 +132,7 @@ docker compose run --rm app <subcommand> [OPTIONS]
 | `--core-instance-count`              | no       | 2                   | Core instance count for this run (**≥ 1**).                                                                                                                                                              |
 | `--bootstrap-script-uri`             | no       | _(none)_            | Same as **`--uri`**: **`s3://…`** or bare path (relative → cwd).                                                                                                                                         |
 | `--bootstrap-arg`                    | no       | _(none)_            | Repeatable; forwarded as **`ScriptBootstrapAction.Args`** after **`Path`** (e.g. artifacts bucket **`s3://…`**).                                                                                         |
-| `--job-args`                         | no       | _(none)_            | Shell-style string (**`shlex`**) of **Python driver** arguments after the **`.py`** URI (**`sys.argv`**); not **`spark-submit`** flags such as **`--conf`**. Preferred for **`make`** (**`JOB_ARGS=`**). |
+| `--job-args`                         | no       | _(none)_            | Shell-style string (**`shlex`**) of **Python driver** arguments after the **`.py`** URI (**`sys.argv`**); not **`spark-submit`** flags such as **`--conf`**. |
 | `--job-arg`                          | no       | _(none)_            | Repeatable driver argument after the **`.py`** URI; after **`--job-args`** when both set. Not for **`spark-submit`** options before the script.                                                          |
 | `--use-spot` / `--no-use-spot`       | no       | from YAML           | Override **`use_spot`**.                                                                                                                                                                                 |
 | `--wait` / `--no-wait`               | no       | `--no-wait`         | Block until the step completes.                                                                                                                                                                          |
@@ -157,101 +174,92 @@ docker compose run --rm app <subcommand> [OPTIONS]
 | Argument            | Required | Description                                                                                                                                                                                          |
 | ------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **`RELATIVE_PATH`** | **yes**  | S3 key suffix after **`dump_logs_base_uri`** (from the env YAML), e.g. **`cli/j-1AB2C3D4E5F6/steps/s-ABCDEF123456/`** to print every object under that prefix, or a single object path ending in **`stderr.gz`**. |
- 
-
-## Make
-
-Same command line options are supported via **`make`**.
-
-**Makefile ↔ CLI:** GNU Make cannot use hyphens in variable names, so each **`--long-option`** is spelled as a **`make`** variable with **hyphens replaced by underscores**.
-
-For a full passthrough, use **`make app-run args='…'`** and keep the real **`--flags`** inside **`args`**.
-
-| Make target                 | Role                                                                                                                                                                                                                       |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`make app-run args='…'`** | Forwards any subcommand and options, identical to **`docker compose run --rm app …`**: e.g. **`args='transient --name … --uri … --wait'`**                                                                                 |
-| **`make transient`**        | **`name=`**, **`uri=`**; optional **`step_name=`**, **`bootstrap_script_uri=`**, **`bootstrap_arg=`**, **`JOB_ARGS=`** (maps to **`--job-args`**), **`wait=1`**, **`follow_logs=1`**, **`use_spot=1`** or **`use_spot=0`** |
-| **`make create-cluster`**   | **`name=`**; optional **`bootstrap_script_uri=`**, **`bootstrap_arg=`**, **`use_spot=1`** or **`use_spot=0`**                                                                                                              |
-| **`make submit-step`**      | **`cluster_id=`**, **`uri=`**; optional **`step_name=`**, **`JOB_ARGS=`**, **`wait=1`**, **`follow_logs=1`**                                                                                                               |
-| **`make terminate`**        | **`cluster_id=`**                                                                                                                                                                                                          |
-| **`make dump-logs`**        | **`path=`** — S3 suffix after **`dump_logs_base_uri`** (same as **`dump-logs RELATIVE_PATH`**)                                                                                                                                  |
-| **`make file-upload`**      | **`local=`** (file), **`s3_prefix=`** (S3 directory; same as the upload script’s two positional args)                                                                                                                      |
-| **`make file-download`**    | **`s3_uri=`**, **`dest=`** (local path)                                                                                                                                                                                    |
 
 
+## Makefile (utilities only)
 
-## Usage
+| Target                 | Role |
+| ---------------------- | ---- |
+| **`make sync` / `make install`** | **`uv sync`** — dependencies + **`emr-cli`** in **`.venv`**. |
+| **`make build-executable`** | **`dist/emr-cli`** PEX (see [Standalone executable](#standalone-executable)). |
+| **`make test`**        | **`pytest test/unit`**. |
+| **`make weep-auth`** / **`make weep-install`** | Weep helpers. |
+| **`make lint`** / **`make check-style`** | Ruff. |
 
-### 1. Setup Environment (optional, defaults to "prod").
+
+## Example Usage
+
+### 1. Environment (optional; defaults to prod)
 
 ```bash
-export EMR_ENVIRONMENT="forno"  # prod
+export EMR_ENVIRONMENT=forno
 ```
 
-### 2. Auth, build.
+Changing this variable requires re-authentication.
+
+### 2. Install and auth
 
 ```bash
 cd packages/emr-cli
+make build-executable
+make weep-install
 make weep-auth
-make build
 ```
 
+If using **devcontainers**, run the weep authentication on the host. The credentials will be visible in the container.
 
-### 3. Transient workflow.
+### 3. Transient workflow
 
 ```bash
-make transient \
-  name=my-test-flow \
-  step_name=my-test-flow-step \
-  uri=samples/job/sample_pi.py \
-  bootstrap_script_uri=samples/init/worker_init_example.sh \
-  wait=1 \
-  follow_logs=1
+dist/emr-cli transient \
+  --name my-test-flow \
+  --step-name my-test-flow-step \
+  --uri samples/job/sample_pi.py \
+  --bootstrap-script-uri samples/init/worker_init_example.sh \
+  --wait \
+  --follow-logs
 ```
 
-
-
-### 4. Persistent workflow.
+### 4. Persistent workflow
 
 ```bash
-make create-cluster \
-  use_spot=0 \
-  name=my-test-flow \
-  bootstrap_script_uri=samples/init/worker_init_example.sh
+dist/emr-cli create-cluster \
+  --no-use-spot \
+  --name my-test-flow \
+  --bootstrap-script-uri samples/init/worker_init_example.sh
 ```
 
-Wait for cluster to be created.
+Wait for the cluster to be ready, then:
 
 ```bash
-make submit-step \
-  cluster_id=j-xxx \
-  step_name=my-test-flow-step \
-  uri=samples/job/sample_pi.py \
-  wait=1 \
-  follow_logs=1
+dist/emr-cli submit-step \
+  --cluster-id j-xxx \
+  --step-name my-test-flow-step \
+  --uri samples/job/sample_pi.py \
+  --wait \
+  --follow-logs
 
-make terminate cluster_id=j-xxx
+dist/emr-cli terminate --cluster-id j-xxx
 ```
 
-### 5. Dump logs from a folder.
-
+### 5. Dump logs from S3:
 
 ```bash
-make dump-logs path=cli/j-16G15MMFKF7B4/steps/s-08173765NJH35345HN8/
+dist/emr-cli dump-logs cli/j-16G15MMFKF7B4/steps/s-08173765NJH35345HN8/
 
-make dump-logs path=dags/bietlejuice.enrich_airflow/j-U1T1K7WLM08Z/steps/s-00722212VHMT0ZDYH6IQ/
+dist/emr-cli dump-logs dags/bietlejuice.enrich_airflow/j-U1T1K7WLM08Z/steps/s-00722212VHMT0ZDYH6IQ/
 
-make dump-logs path=dags/bietlejuice.enrich_airflow/j-U1T1K7WLM08Z/steps/s-00722212VHMT0ZDYH6IQ/stderr.gz
+dist/emr-cli dump-logs dags/bietlejuice.enrich_airflow/j-U1T1K7WLM08Z/steps/s-00722212VHMT0ZDYH6IQ/stderr.gz
 ```
 
 
-# Airflow EMR vs this CLI
+# Airflow EMR vs CLI
 
 DAG-defined clusters in **`forno_conf.yml`** (**`emr_cluster_base`**) install **Hadoop, Hive, JupyterEnterpriseGateway, Livy, Spark**, bootstrap **`bi-etl-ejuice/emr_init_script.sh`**, and pass Spark/Databricks env via **`yarn-env`**. This CLI YAML mirrors **applications** and a **subset** of **configurations** so **`RunJobFlow`** matches production EMR software; **complete** bi-etl-ejuice parity (inmetro, JDBC jars, Deequ, UC sync) still requires the **full** init script from artifacts and the Airflow **`yarn-env`** block where applicable.
 
 For a light POC, **`samples/init/emr_init_minimal.sh`** installs only wheels needed for **`DeltaLoader`** / **`create_emr_spark_session`**.
 
-Details on **default Spark `--conf`** vs **`--job-args`** are in **Important nuances** under [Command-line reference](#command-line-reference).
+Details on **default Spark `--conf`** vs **`--job-args`** are in **important nuances** under [Command-line reference](#command-line-reference).
 
 ## Important nuances: default `--conf` vs `--job-args`
 
@@ -294,14 +302,14 @@ For PySpark script arguments (everything **`spark-submit`** passes after the **`
 
 Examples below use **Forno** (**`export EMR_ENVIRONMENT=forno`** → **`config/forno.yaml`**). **`bootstrap-arg`** is the artifacts **bucket base** where **`emr_init_minimal.sh`** pulls wheels (`…/bi-etl-ejuice/…`, `…/python-logger/…`). **`--target-path`** is the Delta prefix; **`--target-table`** is registered in Glue/Hive via **`DeltaLoader.saveAsTable`**.
 
-### Full command line: `sample_delta_loader.py` via EMR CLI (Docker)
+### Full command line: `sample_delta_loader.py` via EMR CLI
 
-Run from **`cli/emr`** (so Compose and **`./samples`** resolve). Authenticate AWS first (**`make weep-auth`** if you use Weep).
+Run from **`packages/emr-cli`** so **`samples/...`** paths resolve. Authenticate AWS first (**`make weep-auth`** if you use Weep).
 
 ```bash
 cd packages/emr-cli
 export EMR_ENVIRONMENT=forno
-docker compose run --rm app transient \
+uv run emr-cli transient \
   --name emr-delta-sample \
   --uri samples/job/sample_delta_loader.py \
   --bootstrap-script-uri samples/init/emr_init_minimal.sh \
@@ -310,23 +318,9 @@ docker compose run --rm app transient \
   --wait
 ```
 
-#### Same flow with **Make**
-
-```bash
-cd packages/emr-cli
-export EMR_ENVIRONMENT=forno
-make transient \
-  name=emr-delta-sample \
-  uri=samples/job/sample_delta_loader.py \
-  bootstrap_script_uri=samples/init/emr_init_minimal.sh \
-  bootstrap_arg='s3://artifacts.s3.forno.data.quintoandar.com.br' \
-  JOB_ARGS='--target-table emr_cli_samples.emr_delta_sample --target-path s3://artifacts.s3.forno.data.quintoandar.com.br/emr/cli/samples/emr_delta_sample/' \
-  wait=1
-```
-
 ### Full command line: run **`sample_delta_loader.py` manually on the EMR master
 
-Node must already have **bi-etl-ejuice** installed (bootstrap). Upload **`samples/job/sample_delta_loader.py`** to S3 (**`make file-upload`** into **`staging_uri`**, or your own key). Set **`S3_URI_TO_SCRIPT`** to that **`s3://`** object.
+Node must already have **bi-etl-ejuice** installed (bootstrap). Upload **`samples/job/sample_delta_loader.py`** to S3 (**`./scripts/s3-file-upload.sh`** or **`aws s3 cp`**, under **`staging_uri`** or your own key). Set **`S3_URI_TO_SCRIPT`** to that **`s3://`** object.
 
 ```bash
 /usr/lib/spark/bin/spark-submit \

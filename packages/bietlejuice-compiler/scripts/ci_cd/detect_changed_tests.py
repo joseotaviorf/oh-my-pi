@@ -2,7 +2,8 @@
 """
 Detects which packages have test-relevant Python changes vs a base branch.
 
-Outputs one package identifier per line (core, airflow, runtime, compiler).
+Outputs one package identifier per line (core, airflow, runtime, compiler,
+emr-cli).
 The Makefile unit-tests-changed target reads this and dispatches per-package
 pytest invocations with --testmon.
 
@@ -23,13 +24,14 @@ import argparse
 import subprocess
 import sys
 
-PACKAGES = ("core", "airflow", "runtime", "compiler")
+PACKAGES = ("core", "airflow", "runtime", "compiler", "emr-cli")
 
 _PACKAGE_SRC_PREFIXES = {
     "packages/bietlejuice-core/": "core",
     "packages/bietlejuice-airflow/": "airflow",
     "packages/bietlejuice-runtime/": "runtime",
     "packages/bietlejuice-compiler/": "compiler",
+    "packages/emr-cli/": "emr-cli",
 }
 
 

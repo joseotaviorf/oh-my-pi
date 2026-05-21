@@ -8,7 +8,12 @@ import boto3
 from botocore.exceptions import ClientError
 
 from emr.config import normalize_tags
-from emr.log_follow import StepLogTailer, step_logs_prefix
+from emr.log_follow import (
+    StepLogTailer,
+    flush_step_logs_after_terminal,
+    parse_s3_uri,
+    step_logs_prefix,
+)
 from emr.steps import build_spark_step
 
 
@@ -95,18 +100,29 @@ def wait_for_step_terminal(
     if follow_logs and log_uri and s3_client:
         tailer = StepLogTailer()
         log_bucket, log_prefix = step_logs_prefix(log_uri, cluster_id, step_id)
-        print(f"Polling logs from S3: {log_bucket}/{log_prefix}")
-
-    def _tail_once() -> None:
-        if tailer and log_bucket and log_prefix and s3_client:
-            tailer.poll(s3_client, log_bucket, log_prefix)
+        print(f"Polling logs from S3: {log_bucket}/{log_prefix}", flush=True)
 
     while True:
-        _tail_once()
+        if tailer and log_bucket and log_prefix and s3_client:
+            tailer.poll_with_stall_warning(s3_client, log_bucket, log_prefix)
         resp = client.describe_step(ClusterId=cluster_id, StepId=step_id)
         state = resp["Step"]["Status"]["State"]
         if state in terminal:
-            _tail_once()
+            if tailer and log_bucket and log_prefix and s3_client:
+                tailer.poll_with_stall_warning(s3_client, log_bucket, log_prefix)
+                flush_step_logs_after_terminal(
+                    s3_client, tailer, log_bucket, log_prefix
+                )
+                if not tailer.saw_any_key and log_uri:
+                    _, log_base = parse_s3_uri(log_uri)
+                    leaf = log_base.rstrip("/").rsplit("/", 1)[-1]
+                    dump_rel = f"{leaf}/{cluster_id}/steps/{step_id}/"
+                    print(
+                        "No step logs appeared under the prefix above. After the run, "
+                        f"try: emr-cli dump-logs {dump_rel}",
+                        file=sys.stderr,
+                        flush=True,
+                    )
             return state
         time.sleep(poll_sec)
 

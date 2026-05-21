@@ -8,8 +8,6 @@ from pathlib import Path
 import pytest
 
 from emr.config import (
-    SETTINGS_PATH_FORNO,
-    SETTINGS_PATH_PROD,
     cli_emr_script_uri,
     load_settings_file,
     normalize_job_or_bootstrap_uri,
@@ -21,48 +19,132 @@ from emr.config import (
     validate_step_submit,
     validate_transient,
 )
+from emr.paths import package_root
+
+
+def _expected_default_path(env: str) -> str:
+    name = "forno.yaml" if env == "forno" else "prod.yml"
+    return str((package_root() / "config" / name).resolve())
 
 
 def test_resolve_settings_path_unset_uses_prod(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.delenv("EMR_ENVIRONMENT", raising=False)
-    assert resolve_settings_path() == SETTINGS_PATH_PROD
+    monkeypatch.delenv("EMR_SETTINGS_FILE", raising=False)
+    monkeypatch.delenv("EMR_CONFIG_DIR", raising=False)
+    assert resolve_settings_path() == _expected_default_path("prod")
 
 
 def test_resolve_settings_path_empty_env_uses_prod(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("EMR_ENVIRONMENT", "")
-    assert resolve_settings_path() == SETTINGS_PATH_PROD
+    monkeypatch.delenv("EMR_SETTINGS_FILE", raising=False)
+    monkeypatch.delenv("EMR_CONFIG_DIR", raising=False)
+    assert resolve_settings_path() == _expected_default_path("prod")
 
 
 def test_resolve_settings_path_whitespace_only_env_uses_prod(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("EMR_ENVIRONMENT", "   ")
-    assert resolve_settings_path() == SETTINGS_PATH_PROD
+    monkeypatch.delenv("EMR_SETTINGS_FILE", raising=False)
+    monkeypatch.delenv("EMR_CONFIG_DIR", raising=False)
+    assert resolve_settings_path() == _expected_default_path("prod")
 
 
 def test_resolve_settings_path_forno(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("EMR_ENVIRONMENT", "forno")
-    assert resolve_settings_path() == SETTINGS_PATH_FORNO
+    monkeypatch.delenv("EMR_SETTINGS_FILE", raising=False)
+    monkeypatch.delenv("EMR_CONFIG_DIR", raising=False)
+    assert resolve_settings_path() == _expected_default_path("forno")
 
 
 def test_resolve_settings_path_prod_explicit(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("EMR_ENVIRONMENT", "prod")
-    assert resolve_settings_path() == SETTINGS_PATH_PROD
+    monkeypatch.delenv("EMR_SETTINGS_FILE", raising=False)
+    monkeypatch.delenv("EMR_CONFIG_DIR", raising=False)
+    assert resolve_settings_path() == _expected_default_path("prod")
 
 
 def test_resolve_settings_path_invalid_raises(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("EMR_ENVIRONMENT", "staging")
+    monkeypatch.delenv("EMR_SETTINGS_FILE", raising=False)
+    monkeypatch.delenv("EMR_CONFIG_DIR", raising=False)
     with pytest.raises(ValueError, match="prod.*forno"):
+        resolve_settings_path()
+
+
+def test_resolve_settings_path_emr_settings_file_overrides_env(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    p = tmp_path / "custom.yml"
+    p.write_text("x: 1\n", encoding="utf-8")
+    monkeypatch.setenv("EMR_SETTINGS_FILE", str(p))
+    monkeypatch.setenv("EMR_ENVIRONMENT", "invalid-would-fail-if-used")
+    assert resolve_settings_path() == str(p.resolve())
+
+
+def test_resolve_settings_path_emr_settings_file_missing_raises(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    missing = tmp_path / "nope.yml"
+    monkeypatch.setenv("EMR_SETTINGS_FILE", str(missing))
+    with pytest.raises(ValueError, match="EMR_SETTINGS_FILE"):
+        resolve_settings_path()
+
+
+def test_resolve_settings_path_emr_config_dir(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    d = tmp_path / "cfg"
+    d.mkdir()
+    f = d / "forno.yaml"
+    f.write_text("x: 1\n", encoding="utf-8")
+    monkeypatch.setenv("EMR_CONFIG_DIR", str(d))
+    monkeypatch.setenv("EMR_ENVIRONMENT", "forno")
+    monkeypatch.delenv("EMR_SETTINGS_FILE", raising=False)
+    assert resolve_settings_path() == str(f.resolve())
+
+
+def test_package_root_resolves_checkout_config() -> None:
+    """Default checkout layout: ``packages/emr-cli/config/*.yml`` exists."""
+    from emr.paths import package_root
+
+    root = package_root()
+    assert (root / "config" / "prod.yml").is_file()
+    assert (root / "config" / "forno.yaml").is_file()
+
+
+def test_resolve_settings_path_default_missing_raises(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    empty_root = tmp_path / "emr-cli"
+    (empty_root / "config").mkdir(parents=True)
+    monkeypatch.setattr("emr.config.package_root", lambda: empty_root)
+    monkeypatch.delenv("EMR_SETTINGS_FILE", raising=False)
+    monkeypatch.delenv("EMR_CONFIG_DIR", raising=False)
+    monkeypatch.delenv("EMR_ENVIRONMENT", raising=False)
+    with pytest.raises(ValueError, match="Default settings file missing"):
+        resolve_settings_path()
+
+
+def test_resolve_settings_path_emr_config_dir_missing_file_raises(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    d = tmp_path / "cfg"
+    d.mkdir()
+    monkeypatch.setenv("EMR_CONFIG_DIR", str(d))
+    monkeypatch.setenv("EMR_ENVIRONMENT", "prod")
+    monkeypatch.delenv("EMR_SETTINGS_FILE", raising=False)
+    with pytest.raises(ValueError, match="EMR_CONFIG_DIR"):
         resolve_settings_path()
 
 

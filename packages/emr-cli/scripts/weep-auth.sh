@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_WEEP_BIN="${_SCRIPT_DIR}/../dist/weep"
+
+if [ ! -x "${_WEEP_BIN}" ]; then
+	echo "Error: weep not found at ${_WEEP_BIN}. Run 'make weep-install' first." >&2
+	exit 1
+fi
+
 _WEEP_ROLE_FORNO_DEFAULT="${WEEP_ROLE_ARN_FORNO:-arn:aws:iam::713278628093:role/sso_DataAndAnalyticsEMRUser_staff}"
 _WEEP_ROLE_PROD_DEFAULT="${WEEP_ROLE_ARN_PROD:-arn:aws:iam::206390561754:role/sso_DataAndAnalyticsEMRUser_staff}"
 
@@ -19,6 +27,7 @@ esac
 
 # Creating Weep config file
 if ! [ -e ~/.weep/weep.yaml ]; then
+	mkdir -p ~/.weep
 	read -rp "Please enter your QuintoAndar email: " QA_EMAIL
 
 	echo \
@@ -42,6 +51,11 @@ if ! [ -e ~/.aws/config ]; then
 	echo -e "[default]\nregion = us-east-1" >~/.aws/config
 fi
 
+if [ "${REMOTE_CONTAINERS:-}" = "true" ]; then
+	echo "Copy the URL and open it in your host browser to finish SSO." >&2
+	echo >&2
+fi
+
 # Use Weep CLI to authenticate (ConsoleMe role for this environment)
-weep file -f "${WEEP_ROLE}"
-weep whoami
+"${_WEEP_BIN}" file -f "${WEEP_ROLE}"
+"${_WEEP_BIN}" whoami

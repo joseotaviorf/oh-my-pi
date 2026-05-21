@@ -32,7 +32,7 @@ def _tags_from_kv_pairs(pairs: tuple[str, ...]) -> dict[str, str]:
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
-@click.version_option(__version__, prog_name="emr")
+@click.version_option(__version__, prog_name="emr-cli")
 @click.pass_context
 def main(ctx: click.Context) -> None:
     """AWS EMR helpers: transient cluster+step, persistent cluster, terminate, add Spark step, dump S3 logs."""
@@ -288,6 +288,7 @@ def cmd_create_cluster(
         raise SystemExit(1) from e
 
 
+@main.command("terminate")
 @click.pass_context
 @click.option(
     "--cluster-id", required=True, help="EMR cluster / job flow id (e.g. j-XXXXXXXX)."

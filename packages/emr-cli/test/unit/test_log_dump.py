@@ -21,12 +21,17 @@ def test_sanitize_log_relative_path_rejects(raw: str) -> None:
 
 
 def test_sanitize_log_relative_path_ok() -> None:
-    assert sanitize_log_relative_path("  j-1/steps/s-1/stderr.gz  ") == "j-1/steps/s-1/stderr.gz"
+    assert (
+        sanitize_log_relative_path("  j-1/steps/s-1/stderr.gz  ")
+        == "j-1/steps/s-1/stderr.gz"
+    )
     assert sanitize_log_relative_path("./x/y") == "x/y"
 
 
 def test_bucket_and_key_prefix() -> None:
-    b, p = bucket_and_key_prefix("s3://my-bucket/emr/logs/cli/", "j-ABC/steps/s-XYZ/stderr.gz")
+    b, p = bucket_and_key_prefix(
+        "s3://my-bucket/emr/logs/cli/", "j-ABC/steps/s-XYZ/stderr.gz"
+    )
     assert b == "my-bucket"
     assert p == "emr/logs/cli/j-ABC/steps/s-XYZ/stderr.gz"
 

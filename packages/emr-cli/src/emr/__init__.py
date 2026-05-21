@@ -1,3 +1,3 @@
-"""Container-friendly CLI for PySpark on AWS EMR."""
+"""CLI for PySpark job submission and cluster lifecycle on AWS EMR."""
 
-__version__ = "0.0.1"
+__version__ = "0.1.0"

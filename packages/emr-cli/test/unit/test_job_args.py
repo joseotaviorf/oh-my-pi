@@ -15,7 +15,7 @@ def test_merged_job_script_args_none_when_empty() -> None:
 
 def test_merged_job_script_args_shlex_only() -> None:
     out = merged_job_script_args(
-        '--target-table db.t --target-path s3://b/p/',
+        "--target-table db.t --target-path s3://b/p/",
         (),
     )
     assert out == ["--target-table", "db.t", "--target-path", "s3://b/p/"]
