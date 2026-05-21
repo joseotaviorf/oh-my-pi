@@ -176,6 +176,7 @@ bietlejuice.dw_bpo_performance:
   - bietlejuice.enrich_chatbot:load-enrich-sessions:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-calls:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-chat-aht:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-chats:first-run-of-day
   - bietlejuice.enrich_date:load-enrich-workday-window:first-run-of-day
   - bietlejuice.enrich_hefesto:load-enrich-spoc-offboarding-contracts:first-run-of-day
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla:first-run-of-day
@@ -494,6 +495,7 @@ bietlejuice.dw_customer_support:
   - bietlejuice.bigfone:load-clean-ivr-closed-history:first-run-of-day
   - bietlejuice.enrich_customer_demand:load-enrich-backlog-metrics-tasks:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-calls:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-chats:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-csat:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-ivr-interactions:first-run-of-day
   - bietlejuice.enrich_ebdb_customer_contact_identification:load-enrich-customer-contact-identification:first-run-of-day
@@ -1874,6 +1876,7 @@ bietlejuice.enrich_cdp_personas:
 bietlejuice.enrich_chatbot:
   - bietlejuice.copilot_service:load-clean-message:first-run-of-day
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-chats:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
   - bietlejuice.greenseer:load-clean-session:first-run-of-day
@@ -1885,6 +1888,7 @@ bietlejuice.enrich_chatbot:
   - bietlejuice.quinto_messenger:load-clean-channel:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-chat:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day
+  - bietlejuice.support_session_service:load-clean-support-session:first-run-of-day
 bietlejuice.enrich_ciq:
   - bietlejuice.amplitude_subpartitioned:load-clean-440441-home-page-viewed-events:first-run-of-day
   - bietlejuice.core_contract:load-core-contract:first-run-of-day
@@ -2192,7 +2196,6 @@ bietlejuice.enrich_customer_support:
   - bietlejuice.enrich_support_users:load-enrich-analysts:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-zendesk-email-surveys:first-run-of-day
   - bietlejuice.enrich_zendesk:load-enrich-tickets-current:first-run-of-day
-  - bietlejuice.greenseer:load-clean-session:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-department-control:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-service-city-holidays:first-run-of-day
   - bietlejuice.gsheets_support_and_service:done-clean-tag-sla-target:first-run-of-day
@@ -4107,6 +4110,7 @@ bietlejuice.enrich_supply_leads:
   - bietlejuice.enrich_amplitude_lead:load-enrich-lead-origin:first-run-of-day
   - bietlejuice.enrich_attribution:load-enrich-online-attribution:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-calls:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-chats:first-run-of-day
   - bietlejuice.enrich_growth_media_platform_metrics:load-enrich-facebook-metrics:first-run-of-day
   - bietlejuice.quinto_messenger:load-clean-channel:first-run-of-day
   - bietlejuice.rene_descartes:load-clean-acquisition-misc-data:first-run-of-day
@@ -4273,6 +4277,7 @@ bietlejuice.enrich_tracked_events:
   - bietlejuice.copilot_service:load-clean-session:first-run-of-day
   - bietlejuice.demand_contact_submission:load-clean-contact-submissions:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-chats:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-ivr-interactions:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
   - bietlejuice.enrich_online_attribution:load-enrich-online-attribution:first-run-of-day
@@ -4916,6 +4921,7 @@ bietlejuice.reverse_webhelp:
   - bietlejuice.dw_user:load-dw-public-dim-user:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-calls:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-chat-aht:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-chats:first-run-of-day
   - bietlejuice.enrich_date:load-enrich-workday-window:first-run-of-day
   - bietlejuice.enrich_hefesto:load-enrich-spoc-offboarding-contracts:first-run-of-day
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla:first-run-of-day
@@ -5004,6 +5010,7 @@ bietlejuice.reverse_webhelp_test:
   - bietlejuice.dw_satisfaction_rating:load-dw-satisfaction-rating-fact-ticket-csat:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-calls:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-chat-aht:first-run-of-day
+  - bietlejuice.enrich_customer_support:load-enrich-chats:first-run-of-day
   - bietlejuice.enrich_date:load-enrich-workday-window:first-run-of-day
   - bietlejuice.enrich_hefesto:load-enrich-spoc-offboarding-contracts:first-run-of-day
   - bietlejuice.enrich_listing_jobs:load-enrich-listing-quality-sla:first-run-of-day

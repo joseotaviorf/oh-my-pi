@@ -18,6 +18,10 @@ columns:
     description: 'Langfuse session ID (external session ID in Copilot). NULL for old bot (Greenseer) sessions'
     lineage:
     - datalake_copilot_service_clean.session.id_external
+  id_sss_session:
+    description: 'Support Session Service public session identifier linked to the session when orchestrated through SSS; NULL when unavailable or for legacy Greenseer-only sessions.'
+    lineage:
+    - datalake_support_session_service_clean.support_session.public_id
   id_ticket:
     description: 'Latest support ticket ID'
     lineage:
