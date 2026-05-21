@@ -31,6 +31,13 @@ columns:
       evaluation ID depending on external_source.
     lineage:
       - datalake_sorting_hat_clean.policy_report.id_external
+  id_house:
+    description: >
+      House ID from the credit evaluation linked to this policy run. Resolved via
+      id_credit_evaluation (direct for CREDIT_EVALUATION source, or the linked
+      evaluation for PROPOSAL source).
+    lineage:
+      - datalake_docx_clean.credit_evaluation.id_house
   external_source:
     description: "Source that triggered the policy report."
     categories:
@@ -133,6 +140,17 @@ columns:
     description: "Name of the policy matrix applied to the proposal."
     lineage:
       - datalake_sorting_hat_clean.policy_report.result.execution_context.policy_matrix
+  house_rent_liquidity_retrieval_status:
+    description: >
+      Outcome of the rent liquidity feature fetch at policy run time. Distinguishes a
+      successful fetch (OK), an empty source (NO_DATA), and retrieval errors (FAILED).
+      NULL if the feature was not fetched.
+    categories:
+      OK: "Feature was successfully fetched and holds a usable value."
+      NO_DATA: "Data source responded but holds no value for this house."
+      FAILED: "Retrieval failed (timeout, transport, or parse error)."
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.house_rent_liquidity_retrieval_status
   is_error_present:
     description: "True if the policy result contained one or more errors."
     lineage:
@@ -169,6 +187,12 @@ columns:
     description: "Integer screening score (0-100) from the policy result."
     lineage:
       - datalake_sorting_hat_clean.policy_report.result.score
+  house_rent_liquidity_score:
+    description: >
+      Rent liquidity score fetched from the feature store at policy run time. NULL when
+      retrieval did not succeed or the source had no value.
+    lineage:
+      - datalake_sorting_hat_clean.policy_report.raw_data.house_rent_liquidity_score
   total_income:
     description: "Sum of monthly income of all proponents, as provided to the policy."
     lineage:

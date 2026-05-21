@@ -15,7 +15,9 @@ WITH credit_policy_report_parse_json AS (
             passport_city: STRING,
             passport_state: STRING,
             package_value: DOUBLE,
-            total_income: DOUBLE
+            total_income: DOUBLE,
+            house_rent_liquidity_score: DOUBLE,
+            house_rent_liquidity_retrieval_status: STRING
         >') AS raw_data_parsed,
         FROM_JSON(result, 'STRUCT<
             analysis_category: INT,
@@ -62,6 +64,8 @@ credit_policy_report AS (
         raw_data_parsed.calibrated_score,
         raw_data_parsed.total_income,
         raw_data_parsed.package_value,
+        raw_data_parsed.house_rent_liquidity_score,
+        raw_data_parsed.house_rent_liquidity_retrieval_status,
         result_parsed.analysis_category,
         result_parsed.rejection_reason,
         result_parsed.policy_dti,
@@ -125,6 +129,7 @@ SELECT
     ) AS id_credit_evaluation,
     credit_policy_report.id_proposal,
     credit_policy_report.id_external,
+    credit_evaluation.id_house,
     credit_policy_report.external_source,
     credit_policy_report.version,
     credit_policy_report.variant,
@@ -150,6 +155,7 @@ SELECT
     credit_policy_report.policy_dti,
     credit_policy_report.city_group,
     credit_policy_report.policy_matrix,
+    credit_policy_report.house_rent_liquidity_retrieval_status,
     credit_policy_report.is_error_present,
     credit_policy_report.analysis_category,
     CASE
@@ -227,6 +233,7 @@ SELECT
     END AS experiment_groups,
     credit_policy_report.calibrated_score,
     credit_policy_report.score,
+    credit_policy_report.house_rent_liquidity_score,
     credit_policy_report.total_income,
     credit_policy_report.package_value,
     credit_policy_report.house_random_percentage,
@@ -252,3 +259,8 @@ FROM
     LEFT JOIN retenant_policy_report
         ON retenant_policy_report.external_source = credit_policy_report.external_source
         AND retenant_policy_report.id_external = credit_policy_report.id_external
+    LEFT JOIN datalake_docx_clean.credit_evaluation AS credit_evaluation
+        ON credit_evaluation.id = COALESCE(
+            credit_policy_report.id_credit_evaluation,
+            link_credit_evaluation_proposal.id_credit_evaluation
+        )
