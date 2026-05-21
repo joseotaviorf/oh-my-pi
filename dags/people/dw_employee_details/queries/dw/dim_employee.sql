@@ -5,7 +5,7 @@ employees AS (
         im.person_number,
         im.name,
         im.work_email,
-        im.legacy_registration AS employee_tmf_code
+        im.employee_tmf_code
     FROM
         datalake_people.identifier_mapping AS im
     WHERE

@@ -333,10 +333,9 @@ When **filtering** source tables (clean/enrich) that still contain `4712-12-31`,
 - **Greenhouse v1** (`greenhouse` DAG) — being deprecated; prefer v3 (`greenhouse_v3`).
 - **Degreed** (current DAG/API) — being deprecated; prefer v3 when available.
 - **`hr_system` schema** and tables derived from it — being deprecated
-- **`hr_system_custom`** — being deprecated
 - **`dw_employee`** DAG — being deprecated
 - **`datalake_employment.employee_details`** — being deprecated
-- **Enrich DAGs** (see Enrich Layer table below): `enrich_employee`, `enrich_hr_system`, `enrich_hr_system_custom`, `enrich_product_tech`, `enrich_pin`
+- **Enrich DAGs** (see Enrich Layer table below): `enrich_employee`, `enrich_hr_system`, `enrich_product_tech`, `enrich_pin`
 
 Prefer `pin_core` clean tables and `datalake_people` enrich tables instead. For assignment and termination data, use `datalake_people.identifier_mapping` together with `datalake_people.assignment_termination` (for terminated assignments).
 
@@ -346,7 +345,7 @@ Prefer `pin_core` clean tables and `datalake_people` enrich tables instead. For 
 
 **Rule:** When adding new queries or modifying existing ones in People DAGs, do **not** reference:
 
-- `datalake_hr_system`, `datalake_hr_system_clean`, `datalake_hr_system_custom`, `datalake_hr_system_custom_clean`
+- `datalake_hr_system`, `datalake_hr_system_clean`
 - `datalake_employment`
 - `greenhouse` (v1) raw/clean — prefer `greenhouse_v3`
 
@@ -368,7 +367,6 @@ Enrich DAGs should be named by **domain**, not by source system. Avoid source-dr
 | `enrich_pin` | `enrich_compensation`, `enrich_demographics` |
 | `enrich_employee` | `enrich_people`, domain-specific enrich |
 | `enrich_hr_system` | `enrich_people`, `pin_core` clean |
-| `enrich_hr_system_custom` | `enrich_people`, domain-specific enrich |
 | `enrich_product_tech` | Domain-focused enrich (e.g., `enrich_compensation`) |
 
 Each enrich DAG focuses on a business domain (compensation, demographics, etc.), even when the underlying source is pin_core.

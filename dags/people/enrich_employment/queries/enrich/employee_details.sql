@@ -65,7 +65,7 @@ SELECT
   ids.id_period_of_service,
   ids.id_assignment,
   ids.assignment_number,
-  ids.legacy_registration,
+  ids.employee_tmf_code AS legacy_registration,
   ca.legislation_code,
   ids.assignment_type,
   ca.assignment_status_type,

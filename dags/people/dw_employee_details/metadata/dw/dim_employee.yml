@@ -36,7 +36,7 @@ columns:
   employee_tmf_code:
     description: TMF code for the employee.
     lineage:
-      - datalake_people.identifier_mapping.legacy_registration
+      - datalake_people.identifier_mapping.employee_tmf_code
   highest_education_level:
     description: |
       Human-readable description of the highest education level attained by the employee

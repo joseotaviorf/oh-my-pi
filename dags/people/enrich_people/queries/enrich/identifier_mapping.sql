@@ -78,6 +78,76 @@ test_users AS (
         type_external_identifier = 'ID_ONDA1'
         AND dt_ended IS NULL
 ),
+person_tmf_ranked AS (
+    SELECT
+        id_person,
+        TRIM(CAST(number_external_identifier AS STRING)) AS employee_tmf_code,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_person
+            ORDER BY dt_started DESC NULLS LAST
+        ) AS rn_employee_tmf_pin
+    FROM
+        datalake_pin_core_clean.external_application_identifier
+    WHERE
+        type_external_identifier = 'ID_MATRICULA'
+        AND (dt_ended IS NULL OR dt_ended >= DATE('{load_end_date}'))
+        AND TRIM(CAST(number_external_identifier AS STRING)) <> ''
+),
+person_tmf AS (
+    SELECT
+        id_person,
+        employee_tmf_code
+    FROM
+        person_tmf_ranked
+    WHERE
+        rn_employee_tmf_pin = 1
+),
+person_salu_ranked AS (
+    SELECT
+        id_person,
+        TRIM(CAST(number_external_identifier AS STRING)) AS employee_salu_code_raw,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_person
+            ORDER BY dt_started DESC NULLS LAST
+        ) AS rn_employee_salu_pin
+    FROM
+        datalake_pin_core_clean.external_application_identifier
+    WHERE
+        type_external_identifier = 'ID_SALU'
+        AND (dt_ended IS NULL OR dt_ended >= DATE('{load_end_date}'))
+        AND TRIM(CAST(number_external_identifier AS STRING)) <> ''
+),
+person_salu AS (
+    SELECT
+        id_person,
+        NULLIF(NULLIF(employee_salu_code_raw, ''), '-') AS employee_salu_code
+    FROM
+        person_salu_ranked
+    WHERE
+        rn_employee_salu_pin = 1
+),
+person_legacy_code AS (
+    SELECT
+        cp.id_person,
+        CASE
+            WHEN TRY_CAST(lr.legacy_registration AS BIGINT) IS NOT NULL
+                 AND TRY_CAST(ptmf.employee_tmf_code AS BIGINT) IS DISTINCT FROM TRY_CAST(
+                     lr.legacy_registration AS BIGINT
+                 )
+            THEN lr.legacy_registration
+        END AS legacy_code
+    FROM
+        current_people AS cp
+    LEFT JOIN
+        work_emails AS we
+            ON cp.id_person = we.id_person
+    LEFT JOIN
+        person_tmf AS ptmf
+            ON cp.id_person = ptmf.id_person
+    LEFT JOIN
+        datalake_gsheets_people_clean.legacy_registration AS lr
+            ON LOWER(TRIM(lr.work_email)) = LOWER(TRIM(we.email_address))
+),
 latest_periods_of_service AS (
     SELECT
         id_period_of_service,
@@ -199,7 +269,9 @@ SELECT
     ca.id_period_of_service,
     pcec.id_continuous_employment_cycle,
     ca.id_person,
-    COALESCE(wr.registration, lr.legacy_registration) AS legacy_registration,
+    ptmf.employee_tmf_code AS employee_tmf_code,
+    plc.legacy_code,
+    psalu.employee_salu_code,
     ca.assignment_number,
     ca.legislation_code,
     cp.person_number,
@@ -258,11 +330,17 @@ LEFT JOIN
     test_users AS tu
         ON cp.id_person = tu.id_person
 LEFT JOIN
-    datalake_hr_system_custom_clean.workers_registration AS wr
-        ON ca.assignment_number = wr.assignment_number
-LEFT JOIN
     datalake_gsheets_people_clean.legacy_registration AS lr
         ON LOWER(lr.work_email) = LOWER(we.email_address)
+LEFT JOIN
+    person_tmf AS ptmf
+        ON cp.id_person = ptmf.id_person
+LEFT JOIN
+    person_salu AS psalu
+        ON cp.id_person = psalu.id_person
+LEFT JOIN
+    person_legacy_code AS plc
+        ON cp.id_person = plc.id_person
 LEFT JOIN
     datalake_pin_core_clean.periods_of_service AS pp
         ON pp.id_period_of_service = ca.id_period_of_service

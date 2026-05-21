@@ -17,87 +17,95 @@ columns:
   id_assignment:
     description: Unique identifier for the work contract.
     lineage:
-    - datalake_pin_core_clean.all_assignments.id_assignment
+      - datalake_pin_core_clean.all_assignments.id_assignment
   id_period_of_service:
     description: Identifier that groups all contracts for the same period of service.
     lineage:
-    - datalake_pin_core_clean.all_assignments.id_period_of_service
+      - datalake_pin_core_clean.all_assignments.id_period_of_service
   id_continuous_employment_cycle:
     description: Stable identifier of the person's current continuous employment cycle. Computed only for employment periods (assignments of type E or C); pension / pre-hire (P) rows have NULL cycle. GLB_TRANSFER between assignment types E or C only keeps the same cycle id; non-transfer rehiring starts a new cycle id.
     lineage:
-    - datalake_pin_core_clean.periods_of_service.id_period_of_service
-    - datalake_pin_core_clean.periods_of_service.id_person
-    - datalake_pin_core_clean.all_assignments.action_code
-    - datalake_pin_core_clean.all_assignments.assignment_sequence
-    - datalake_pin_core_clean.all_assignments.assignment_type
+      - datalake_pin_core_clean.periods_of_service.id_period_of_service
+      - datalake_pin_core_clean.periods_of_service.id_person
+      - datalake_pin_core_clean.all_assignments.action_code
+      - datalake_pin_core_clean.all_assignments.assignment_sequence
+      - datalake_pin_core_clean.all_assignments.assignment_type
   id_person:
     description: Unique identifier for the person, shared across all their contracts.
     lineage:
-    - datalake_pin_core_clean.all_people.id_person
-  legacy_registration:
-    description: Employee registration number, unified from new and legacy systems.
+      - datalake_pin_core_clean.all_people.id_person
+  employee_tmf_code:
+    description: TMF code for the employee.
     lineage:
-    - datalake_hr_system_custom_clean.workers_registration.registration
-    - datalake_gsheets_people_clean.legacy_registration.legacy_registration
+      - datalake_pin_core_clean.external_application_identifier.number_external_identifier
+  legacy_code:
+    description: Convenia/GSheets legacy registration code.
+    lineage:
+      - datalake_gsheets_people_clean.legacy_registration.legacy_registration
+      - datalake_pin_core_clean.external_application_identifier.number_external_identifier
+  employee_salu_code:
+    description: SALU code for the employee.
+    lineage:
+      - datalake_pin_core_clean.external_application_identifier.number_external_identifier
   assignment_number:
     description: The assignment registration number.
     lineage:
-    - datalake_pin_core_clean.all_assignments.assignment_number
+      - datalake_pin_core_clean.all_assignments.assignment_number
   legislation_code:
     description: Legislation code applicable to the work assignment.
     lineage:
-    - datalake_pin_core_clean.all_assignments.legislation_code
+      - datalake_pin_core_clean.all_assignments.legislation_code
   person_number:
     description: The person's identification number in the main HR system.
     lineage:
-    - datalake_pin_core_clean.all_people.person_number
+      - datalake_pin_core_clean.all_people.person_number
   assignment_type:
     description: Type of assignment (E for Employee, C for Contingent, P for Pending).
     lineage:
-    - datalake_pin_core_clean.all_assignments.assignment_type
+      - datalake_pin_core_clean.all_assignments.assignment_type
   assignment_status_type:
     description: Current status of the work assignment (e.g., ACTIVE, INACTIVE).
     lineage:
-    - datalake_pin_core_clean.all_assignments.assignment_status_type
+      - datalake_pin_core_clean.all_assignments.assignment_status_type
   documented_first_name:
     description: Official / document-aligned first name from HCM (GLOBAL name). Not necessarily the preferred name for addressing the person.
     lineage:
-    - datalake_pin_core_clean.person_name.documented_first_name
+      - datalake_pin_core_clean.person_name.documented_first_name
   documented_last_name:
     description: Official / document-aligned last name from HCM (GLOBAL name). Not necessarily the preferred name for addressing the person.
     lineage:
-    - datalake_pin_core_clean.person_name.documented_last_name
+      - datalake_pin_core_clean.person_name.documented_last_name
   documented_full_name:
     description: Official / document-aligned full name from HCM (GLOBAL name). For compliance and formal records; prefer name for dashboards and communications.
     lineage:
-    - datalake_pin_core_clean.person_name.documented_full_name
+      - datalake_pin_core_clean.person_name.documented_full_name
   display_name:
     description: HCM display name from person_name (GLOBAL). Retained for traceability; prefer name for report-facing preferred full name.
     lineage:
-    - datalake_pin_core_clean.person_name.display_name
+      - datalake_pin_core_clean.person_name.display_name
   name:
     description: Preferred full name for reporting and communications, derived in this query from person_name (GLOBAL) social names, display_name, and documented_full_name.
     lineage:
-    - datalake_pin_core_clean.person_name.first_social_name
-    - datalake_pin_core_clean.person_name.last_social_name
-    - datalake_pin_core_clean.person_name.display_name
-    - datalake_pin_core_clean.person_name.documented_full_name
+      - datalake_pin_core_clean.person_name.first_social_name
+      - datalake_pin_core_clean.person_name.last_social_name
+      - datalake_pin_core_clean.person_name.display_name
+      - datalake_pin_core_clean.person_name.documented_full_name
   work_email:
     description: The employee's primary work email (W1), in lowercase.
     lineage:
-    - datalake_pin_core_clean.email_address.email_address
+      - datalake_pin_core_clean.email_address.email_address
   personal_email:
     description: The employee's personal email (H1), in lowercase.
     lineage:
-    - datalake_pin_core_clean.email_address.email_address
+      - datalake_pin_core_clean.email_address.email_address
   is_user_test:
     description: Boolean flag indicating if the employee is a test user (has an ID_ONDA1 identifier).
     lineage:
-    - datalake_pin_core_clean.external_application_identifier.id_person
+      - datalake_pin_core_clean.external_application_identifier.id_person
   is_active:
     description: Boolean flag indicating if the assignment is currently active (TRUE) or not (FALSE).
     lineage:
-    - datalake_pin_core_clean.all_assignments.assignment_status_type
+      - datalake_pin_core_clean.all_assignments.assignment_status_type
   is_person_latest_assignment:
     description: |
       True when this row represents the most recent assignment for the person (by dt_started / hire date).
@@ -105,7 +113,7 @@ columns:
   dt_projected_started:
     description: Projected start date for the employee's activities, usually for future hires.
     lineage:
-    - datalake_pin_core_clean.all_assignments.dt_projected_started
+      - datalake_pin_core_clean.all_assignments.dt_projected_started
   dt_original_hired:
     description: |
       Original hire date for the current continuous employment cycle.
@@ -120,23 +128,23 @@ columns:
       - resets tenure on rehire
       - may differ from PIN seniority_date.dt_seniority
     lineage:
-    - datalake_pin_core_clean.periods_of_service.dt_started
-    - datalake_pin_core_clean.periods_of_service.id_period_of_service
-    - datalake_pin_core_clean.periods_of_service.id_person
-    - datalake_pin_core_clean.all_assignments.assignment_sequence
-    - datalake_pin_core_clean.all_assignments.action_code
-    - datalake_pin_core_clean.all_assignments.assignment_status_type
+      - datalake_pin_core_clean.periods_of_service.dt_started
+      - datalake_pin_core_clean.periods_of_service.id_period_of_service
+      - datalake_pin_core_clean.periods_of_service.id_person
+      - datalake_pin_core_clean.all_assignments.assignment_sequence
+      - datalake_pin_core_clean.all_assignments.action_code
+      - datalake_pin_core_clean.all_assignments.assignment_status_type
   dt_started:
     description: Effective start date of the work assignment.
     lineage:
-    - datalake_pin_core_clean.periods_of_service.dt_started
+      - datalake_pin_core_clean.periods_of_service.dt_started
   dt_actual_termination:
     description: Actual termination date of the work assignment.
     lineage:
-    - datalake_pin_core_clean.periods_of_service.dt_actual_termination
+      - datalake_pin_core_clean.periods_of_service.dt_actual_termination
   dt_notified_termination:
     description: Date on which the termination was notified.
     lineage:
-    - datalake_pin_core_clean.periods_of_service.dt_notified_termination
+      - datalake_pin_core_clean.periods_of_service.dt_notified_termination
   ts_load:
     description: Timestamp indicating when the data was loaded into this table.

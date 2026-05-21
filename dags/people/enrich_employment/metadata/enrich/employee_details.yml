@@ -19,9 +19,9 @@ columns:
     lineage:
     - datalake_people.identifier_mapping.assignment_number
   legacy_registration:
-    description: Legacy employee registration number, if applicable.
+    description: TMF code for the employee.
     lineage:
-    - datalake_people.identifier_mapping.legacy_registration
+    - datalake_people.identifier_mapping.employee_tmf_code
   legislation_code:
     description: Legislation code applicable to the work assignment.
     lineage:
