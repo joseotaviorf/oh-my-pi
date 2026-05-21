@@ -6,7 +6,7 @@ Conversation Explorer is a **daily sampled subset** of AI chatbot sessions (targ
 
 **Scope (for now):** Conversation Explorer data exists **only for the Wall-E chatbot** (`datalake_chatbot.sessions.bot = 'wall-e'`). Do not assume Sonia, Matthew, Concierge, or other bots appear in these tables unless product expands coverage.
 
-The pipeline is dataset-triggered after Wall-E inference completes (see `dags/conversational_xp/conversation_explorer/`). Tables are partitioned by `year`, `month`, `day` derived from session activity / annotation time — **always constrain partitions** when querying large ranges.
+Tables are partitioned by `year`, `month`, `day` derived from session activity / annotation time — **always constrain partitions** when querying large ranges.
 
 This domain is **not a census** of chatbot traffic. Any metric framed as “share of all bot sessions” or “% of chatbot volume” using `datalake_chatbot.*` totals is **wrong** unless the question explicitly scopes to Conversation Explorer rows only.
 
