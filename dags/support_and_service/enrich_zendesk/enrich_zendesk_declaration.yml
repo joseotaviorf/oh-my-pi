@@ -22,6 +22,7 @@ workflow:
         "delta.dataSkippingStatsColumns": "ts_updated,ts_created,id_ticket"
     ticket_metrics:
       merge_on: [id_ticket]
+      when_matched_update_condition: "source.ts_updated > target.ts_updated OR (source.ts_updated = target.ts_updated AND source.ts_solved IS NOT NULL AND target.ts_solved IS NULL)"
       z_order_by: [id_ticket, ts_created]
       table_properties:
         "delta.dataSkippingNumIndexedCols": "0"
