@@ -33,6 +33,8 @@ workflow:
       clean_table_name: agent_with_keys_allocation_parameters_aud
     Capability:
       clean_table_name: capability
+    ClientPortfolio:
+      clean_table_name: client_portfolio
     DadosAgente:
       clean_table_name: agent_data
     DadosAgente_AUD:

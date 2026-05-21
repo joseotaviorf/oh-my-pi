@@ -1,0 +1,43 @@
+---
+database_name: datalake_ebdb_clean
+table_name: client_portfolio
+domain: Agents
+owner: gustavo.guerra@quintoandar.com.br
+description: Client portfolio records linking agents to clients by capability type, with activity and expiration timestamps.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.clientportfolio.id
+    description: Unique identifier for the client portfolio record.
+  uuid_agent:
+    lineage:
+      - datalake_ebdb_raw.clientportfolio.agent_uuid
+    description: UUID of the agent who owns the client portfolio entry.
+  uuid_client_person:
+    lineage:
+      - datalake_ebdb_raw.clientportfolio.client_person_uuid
+    description: UUID of the client person associated with the portfolio entry.
+  capability_type:
+    lineage:
+      - datalake_ebdb_raw.clientportfolio.capability_type
+    description: Capability type that defines the agent-client portfolio relationship.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.clientportfolio.created_at
+    description: Timestamp when the client portfolio record was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.clientportfolio.updated_at
+    description: Timestamp when the client portfolio record was last updated.
+  ts_last_activity:
+    lineage:
+      - datalake_ebdb_raw.clientportfolio.last_activity_at
+    description: Timestamp of the last recorded activity for this portfolio entry.
+  ts_client_since:
+    lineage:
+      - datalake_ebdb_raw.clientportfolio.client_since
+    description: Timestamp when the client relationship started for this portfolio entry.
+  ts_expiration:
+    lineage:
+      - datalake_ebdb_raw.clientportfolio.expiration_at
+    description: Timestamp when the portfolio entry expires.
