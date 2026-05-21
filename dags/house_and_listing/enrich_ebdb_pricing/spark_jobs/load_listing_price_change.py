@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 
+from delta.tables import DeltaTable
 from pyspark.sql import DataFrame, functions as F
 from pyspark.sql.window import Window
 
@@ -46,16 +47,14 @@ def _get_candidates(start_date, end_date) -> DataFrame:
     )
 
 
-def _build_house_aud(candidates: DataFrame) -> DataFrame:
+def _build_house_aud(candidates: DataFrame, end_date) -> DataFrame:
     """
     Joins house audit, revision and listing business context tables for candidate houses.
 
-    Loads the FULL audit history for each candidate (no date ceiling), because window
-    functions like is_last_price and ts_price_ended depend on the complete per-house
-    history to produce correct values. Applying a date ceiling would cause boundary
-    records to become inconsistent with records beyond that date already in the table
-    (e.g. ts_price_ended set to NULL when a future record exists).
-    The candidates DataFrame is broadcast-joined as a filter seed.
+    Loads the full audit history for each candidate up to end_date (inclusive), so that
+    the output reflects the state of the world as of D-1. Revisions with ts_revision > end_date
+    are excluded so that ts_price_ended and is_last_price are computed relative to the same
+    date boundary. The candidates DataFrame is broadcast-joined as a filter seed.
     Price validity filtering is deferred to _build_price_interval per business context.
     """
     h_aud = spark.table(TABLE_HOUSE_AUD)
@@ -68,6 +67,7 @@ def _build_house_aud(candidates: DataFrame) -> DataFrame:
         .join(r.alias("r"), F.col("h.rev") == F.col("r.id"))
         .join(lbc.alias("lbc"), F.col("h.id_house") == F.col("lbc.id_house"))
         .filter((F.col("h.rent") > 1) | (F.col("h.sale_price") > 1))
+        .filter(F.to_date(F.col("r.ts_revision")) <= end_date)
         .select(
             F.col("h.id_house"),
             F.col("lbc.business_context"),
@@ -97,7 +97,7 @@ def _build_price_interval(
     business_context: 'RENT' or 'SALE'.
     price_col: source price column name ('rent_price' or 'sale_price').
     """
-    house_window = Window.partitionBy("id_house").orderBy("ts_revision")
+    house_window = Window.partitionBy("id_house").orderBy("ts_revision", "id_revision")
 
     lag_df = house_aud_df.filter(
         (F.col("business_context") == business_context) & F.col(price_col).isNotNull()
@@ -238,7 +238,7 @@ def _build_price_changes_listing(
         )
     )
 
-    house_ts_window = Window.partitionBy("id_house").orderBy("ts_price_started")
+    house_ts_window = Window.partitionBy("id_house").orderBy("ts_price_started", "id_revision")
 
     # ts_price_ended is recomputed here (post-JOIN) so it only references events
     # that survived the listing-version filter. Computing it from the pre-JOIN
@@ -261,11 +261,13 @@ def _build_variation(listing_df: DataFrame) -> DataFrame:
     independently before the union so that change_number is scoped per business context.
     """
     first_price_window = Window.partitionBy("id_house")
-    last_price_window = Window.partitionBy("id_house").orderBy(F.desc("ts_price_started"))
+    last_price_window = Window.partitionBy("id_house").orderBy(
+        F.desc("ts_price_started"), F.desc("id_revision")
+    )
     last_price_of_day_window = (
         Window
         .partitionBy("id_house", F.to_date("ts_price_started"))
-        .orderBy(F.desc("ts_price_started"))
+        .orderBy(F.desc("ts_price_started"), F.desc("id_revision"))
     )
 
     # MIN(IF(lag_price IS NULL, price, NULL)) OVER (PARTITION BY id_house)
@@ -274,7 +276,9 @@ def _build_variation(listing_df: DataFrame) -> DataFrame:
         F.when(F.col("lag_price").isNull(), F.col("price"))
     ).over(first_price_window)
 
-    change_number_window = Window.partitionBy("id_house").orderBy(F.asc("ts_price_started"))
+    change_number_window = Window.partitionBy("id_house").orderBy(
+        F.asc("ts_price_started"), F.asc("id_revision")
+    )
 
     return (
         listing_df
@@ -416,7 +420,7 @@ if __name__ == "__main__":
             "m=__main__, msg=No candidate houses found in date range, skipping"
         )
     else:
-        house_aud = _build_house_aud(candidates)
+        house_aud = _build_house_aud(candidates, end_date)
         house_aud.persist()
 
         try:
@@ -434,11 +438,39 @@ if __name__ == "__main__":
             full_table_name = f"{database_name}.{args.table_name}"
             s3_path = f"{database_location}{args.table_name}"
 
+            # Temp views used in the DELETE condition below.
+            # _current_price_changes_in_run: all id_price_change values produced
+            #   by this run — the authoritative set for processed houses.
+            # _processed_houses_in_run: distinct id_house values in this run —
+            #   used to scope the DELETE only to houses the run touched, leaving
+            #   all other houses' records untouched.
+            result_df.createOrReplaceTempView("_current_price_changes_in_run")
+            result_df.select("id_house").distinct().createOrReplaceTempView(
+                "_processed_houses_in_run"
+            )
+
             DeltaLoader().load_table(
                 table_name=full_table_name,
                 path=s3_path,
                 source_df=result_df,
                 merge_on=["id_price_change"],
+            )
+
+            # Step 2: DELETE stale rows — for each processed house, remove any
+            # id_price_change that did not appear in this run's result. Without
+            # this step those rows would keep their outdated flags indefinitely
+            # The condition has two parts:
+            #   id_house IN (...):          restrict to houses processed this run;
+            #                               records for untouched houses are preserved.
+            #   id_price_change NOT IN (...): within those houses, delete only the
+            #                               price changes absent from the current result.
+            DeltaTable.forName(spark, full_table_name).delete(
+                """
+                id_house IN (SELECT id_house FROM _processed_houses_in_run)
+                AND id_price_change NOT IN (
+                    SELECT id_price_change FROM _current_price_changes_in_run
+                )
+                """
             )
 
             SparkMetastoreService(spark_client).refresh_table(

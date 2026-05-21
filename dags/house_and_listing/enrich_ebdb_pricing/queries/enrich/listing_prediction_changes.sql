@@ -76,6 +76,7 @@ calculator_changes AS (
             ON hpp_aud.rev = r.id
     WHERE
         DATE(r.ts_revision) >= DATE('2022-04-01') -- removing very old predictions, where the certainty field was not filled in
+        AND DATE(r.ts_revision) <= DATE('{load_end_date}')
 )
 SELECT
     cc.id_house,
