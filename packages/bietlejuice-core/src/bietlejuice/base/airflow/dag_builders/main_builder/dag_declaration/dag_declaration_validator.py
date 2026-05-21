@@ -60,6 +60,16 @@ class DAGDeclarationValidator(Validator):
                     "allowed": LayerEnum.get_available_enum_values(),
                 },
                 "execution_timeout_hours": {"type": "float", "empty": False},
+                "max_tables_per_optimize_tasks": {
+                    "type": "integer",
+                    "min": 1,
+                    "required": False,
+                },
+                "optimize_parallelism": {
+                    "type": "integer",
+                    "min": 1,
+                    "required": False,
+                },
                 "source_schema": {"type": "string", "empty": False},
                 "source_database": {"type": "string", "empty": False},
                 "has_soft_delete": {"type": "boolean", "empty": False},
