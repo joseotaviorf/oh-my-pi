@@ -135,6 +135,7 @@ def main() -> None:
     records = fetch_dataset_records(datahub_client)
 
     spark = SparkSession.builder.getOrCreate()
+    
     df = (
         spark.createDataFrame(records)
         .withColumn("year", F.lit(load_date.year))
