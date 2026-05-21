@@ -1658,6 +1658,8 @@ emr_cluster_base: &emr_cluster_anchor
               hive.metastore.client.factory.class: "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
     spark_conf:
         spark.rpc.message.maxSize: "2000"
+        spark.sql.parquet.int96RebaseModeInWrite: "LEGACY"
+        spark.sql.parquet.datetimeRebaseModeInWrite: "LEGACY"
         spark.sql.sources.partitionOverwriteMode: dynamic
         spark.sql.parquet.filterPushdown: "true"
         spark.sql.sources.default: parquet
@@ -1688,6 +1690,7 @@ emr_cluster_base: &emr_cluster_anchor
         spark.openlineage.transport.type: "http"
         spark.openlineage.transport.url: "https://metadata-propagator.apps.data-prd-blue.habitat.zone"
         spark.openlineage.transport.endpoint: "/openlineage/events"
+
     spark_env_vars:
         ENVIRONMENT: "{{ var.value.environment }}"
         ARTIFACTS_BUCKET: *artifacts_bucket
@@ -1709,7 +1712,7 @@ emr_7_12_med_general_3_workers_cluster:
         ebs_volume_size: 100
         availability: ON_DEMAND
 
-# DBR databricks_16_4_med_general_photon_cluster → m5d.xlarge × 3 workers, SPOT_WITH_FALLBACK
+# DBR databricks_16_4_med_general_photon_cluster → m5d.xlarge × 3 workers, ON_DEMAND
 emr_7_12_med_general_photon_cluster:
     <<: *emr_cluster_anchor
     node_type_id: m7a.xlarge
@@ -1720,7 +1723,7 @@ emr_7_12_med_general_photon_cluster:
         ebs_volume_size: 200
         availability: ON_DEMAND
 
-# DBR databricks_16_4_med_memory_general_cluster → r5a.xlarge × 3 workers, SPOT_WITH_FALLBACK
+# DBR databricks_16_4_med_memory_general_cluster → r5a.xlarge × 3 workers, ON_DEMAND
 emr_7_12_med_memory_general_cluster:
     <<: *emr_cluster_anchor
     node_type_id: r7a.xlarge
@@ -1731,7 +1734,7 @@ emr_7_12_med_memory_general_cluster:
         ebs_volume_size: 200
         availability: ON_DEMAND
 
-# DBR databricks_16_4_med_memory_cluster → r5a.2xlarge driver + m5a.2xlarge × 3 workers, SPOT_WITH_FALLBACK
+# DBR databricks_16_4_med_memory_cluster → r5a.2xlarge driver + m5a.2xlarge × 3 workers, ON_DEMAND
 emr_7_12_med_memory_cluster:
     <<: *emr_cluster_anchor
     driver_node_type_id: r7a.2xlarge

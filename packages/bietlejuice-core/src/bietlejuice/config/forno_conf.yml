@@ -1851,6 +1851,8 @@ emr_cluster_base: &emr_cluster_anchor
               hive.metastore.client.factory.class: "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
     spark_conf:
         spark.rpc.message.maxSize: "2000"
+        spark.sql.parquet.int96RebaseModeInWrite: "LEGACY"
+        spark.sql.parquet.datetimeRebaseModeInWrite: "LEGACY"
         spark.sql.sources.partitionOverwriteMode: dynamic
         spark.sql.parquet.filterPushdown: "true"
         spark.sql.sources.default: parquet
