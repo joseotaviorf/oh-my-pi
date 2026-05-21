@@ -50,7 +50,7 @@ WITH region_settings AS (
 ),
 deduplicated_cities AS (
   SELECT
-    id_state,
+    short_region_name,
     LOWER(name) AS city_name_lower,
     MIN(id) AS city_id
   FROM
@@ -58,7 +58,7 @@ deduplicated_cities AS (
   WHERE
     level = 'Cidade'
   GROUP BY
-    id_state,
+    short_region_name,
     LOWER(name)
 ),
 deduplicated_neighborhoods AS (
@@ -70,7 +70,7 @@ deduplicated_neighborhoods AS (
     dw_public.dim_region AS neighborhood
   INNER JOIN
     dw_public.dim_region AS parent_city
-      ON neighborhood.id_city = parent_city.id
+      ON neighborhood.city_id = parent_city.id
       AND parent_city.level = 'Cidade'
   WHERE
     neighborhood.level = 'SubRegiao'
@@ -254,7 +254,7 @@ base_listings AS (
   LEFT JOIN
     deduplicated_cities AS dc
       ON dc.city_name_lower = LOWER(compounds.address.city)
-      AND dc.id_state = state_dim.id
+      AND dc.short_region_name = state_dim.abbreviation
   LEFT JOIN
     deduplicated_neighborhoods AS dn
       ON dn.neighborhood_name_lower = LOWER(compounds.address.neighborhood)
