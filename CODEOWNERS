@@ -5,6 +5,7 @@ Makefile                                                                @quintoa
 dags/*/metric_*                                                         @quintoandar/bi-etl-ejuice-metric-layer-code-owners
 dags/atlas_db/**                                                        @quintoandar/atlas-db-code-owners
 dags/conversational_xp/**                                               @quintoandar/personalization @quintoandar/copilot-ds @quintoandar/bi-etl-ejuice-code-owners
+dags/publisher_xp/**                                                    @quintoandar/publisher-xp
 dags/dependencies.yaml                                                  @quintoandar/bi-etl-ejuice-code-owners @quintoandar/personalization @quintoandar/copilot-ds
 dags/mlops/**                                                           @quintoandar/mlcops
 dags/ops_poc/**                                                         @luisarodriguees @GabriellRodrigues @henriquedepaulo

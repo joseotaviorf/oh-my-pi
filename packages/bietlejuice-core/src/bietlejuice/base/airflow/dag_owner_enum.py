@@ -13,6 +13,7 @@ class DAGOwnerEnum:
     DATA_ATLAS_DB = "Data Atlas DB"
     DATA_BROKER_XP = "Data Broker XP"
     DATA_CONVERSATIONAL_XP = "Data Conversational XP"
+    DATA_PUBLISHER_XP = "Data Publisher XP"
     DATA_DS_PRICING = "Data DS Pricing"
     DATA_FINTECH = "Data Fintech"
     DATA_FOR_RENT = "Data ForRent"

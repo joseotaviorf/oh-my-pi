@@ -1,0 +1,22 @@
+dag_documentation:
+  dag_purpose:
+    "Alias Classifieds pipeline (prod). Runs alias_classifieds and alias_classifieds_publisher
+    tasks from the vespucio Databricks Job 'plugins'. Supports on-demand trigger with
+    company_uuid to process a specific real-estate company; omit it to process all companies."
+kafka_bootstrap_servers: lkc-256gpm-jv0e34.us-east-1.aws.glb.confluent.cloud:9092
+kafka_topic: prod_alias.listing.ingest.event
+
+custom_cluster:
+  driver_node_type_id: r-fleet.4xlarge
+  node_type_id: r-fleet.4xlarge
+  num_workers: 4
+  spark_version: 16.4.x-scala2.12
+  aws_attributes:
+    ebs_volume_size: 200
+    instance_profile_arn: "{{ var.value.instance_profile_secret_arn_vespucio }}"
+  spark_conf:
+    spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
+    spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
+    spark.executor.heartbeatInterval: "100s"
+    spark.network.timeout: "600s"
+    spark.metrics.appStatusSource.enabled: "true"

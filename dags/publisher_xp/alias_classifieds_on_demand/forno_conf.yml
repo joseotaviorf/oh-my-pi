@@ -1,0 +1,8 @@
+dag_documentation:
+  dag_purpose:
+    "Alias Classifieds on-demand pipeline (forno). Runs alias_classifieds and
+    alias_classifieds_publisher for a specific company or publisher. Requires
+    'company_uuid' or 'publisher_id' in dag_run.conf. Triggered manually via
+    the Airflow UI or REST API — never runs automatically."
+kafka_bootstrap_servers: lkc-256gpm-jv0e34.us-east-1.aws.glb.confluent.cloud:9092
+kafka_topic: prod_alias.listing.ingest.event

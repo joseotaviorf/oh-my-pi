@@ -551,6 +551,7 @@ expected_times_to_finish:
   bietlejuice.velo_neurotech: 07:21
   bietlejuice.velo_neurotech_pj: 07:20
   bietlejuice.velo_zendesk: 06:29
+  bietlejuice.alias_classifieds: "14:30"
   bietlejuice.vespucio_pipeline_plugins: "13:30"
   bietlejuice.vespucio_service: 04:45
   bietlejuice.wall_street: "10:24"

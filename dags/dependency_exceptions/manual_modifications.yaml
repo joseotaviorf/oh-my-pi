@@ -1059,6 +1059,11 @@ bietlejuice.enrich_vespucio_pipeline:
     - bietlejuice.enrich_ebdb_condo:load-enrich-condo-amenities:first-run-of-day
     - bietlejuice.enrich_house_feature_inference:load-enrich-description-features:first-run-of-day
     - bietlejuice.enrich_kodak:load-enrich-image-inspection-amenities:first-run-of-day
+bietlejuice.alias_classifieds:
+  add:
+    - bietlejuice.enrich_vespucio_pipeline:vespucio-core-pipeline-complete:first-run-of-day
+bietlejuice.alias_classifieds_on_demand:
+  override: []
 bietlejuice.vespucio_pipeline_plugins:
   add:
     - bietlejuice.enrich_vespucio_pipeline:vespucio-core-pipeline-complete:first-run-of-day
