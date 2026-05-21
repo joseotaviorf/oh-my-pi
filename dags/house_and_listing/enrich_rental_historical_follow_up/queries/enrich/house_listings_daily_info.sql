@@ -234,6 +234,7 @@ listings_states_per_day AS (
         h.id_region,
         hs.id_house_status,
         lpc.id_price_change,
+        hsc.id_suggestion_change,
         IF(h.is_rent_3p_supply, h.uuid_company, NULL) AS uuid_company,
         IF(h.is_rent_3p_supply, h.id_company_hubspot, NULL) AS id_company_hubspot,
         IF(h.is_rent_3p_supply, h.partner_3p_supply, NULL) AS partner_3p_supply,
@@ -254,6 +255,12 @@ listings_states_per_day AS (
         pred.calculator_p80_price AS p_80,
         pred.calculator_max_price AS p_90,
         pred.calculator_certainty AS certainty,
+        hsc.lower_bound_limit,
+        hsc.suggested_lower_bound_price,
+        hsc.suggested_price,
+        hsc.suggested_upper_bound_price,
+        hsc.upper_bound_limit,
+        hsc.suggestion_certainty,
         lpv.listing_page_viewed AS listing_page_views,
         srpv.search_results_page_viewed AS search_results_page_views,
         f.favorites,
@@ -369,6 +376,13 @@ listings_states_per_day AS (
             AND pred.is_last_prediction_of_day
             AND pred.business_context = 'RENT'
     LEFT JOIN
+        datalake_ebdb_pricing.house_suggestion_changes AS hsc
+            ON COALESCE(pled.id_house, hl.id_house) = hsc.id_house
+            AND dbase.dt_day >= DATE(hsc.ts_suggestion_started)
+            AND dbase.dt_day < COALESCE(DATE(hsc.ts_suggestion_ended), '2100-01-01')
+            AND hsc.is_last_suggestion_of_day
+            AND hsc.business_context = 'RENT'
+    LEFT JOIN
         lpv
             ON COALESCE(pled.id_house_listing, hl.id_house_listing) = lpv.id_house_listing
             AND dbase.dt_day = lpv.dt_day
@@ -414,6 +428,7 @@ SELECT
     id_region,
     id_house_status,
     id_price_change,
+    id_suggestion_change,
     uuid_company,
     id_company_hubspot,
     partner_3p_supply,
@@ -434,6 +449,12 @@ SELECT
     p_80,
     p_90,
     certainty,
+    lower_bound_limit,
+    suggested_lower_bound_price,
+    suggested_price,
+    suggested_upper_bound_price,
+    upper_bound_limit,
+    suggestion_certainty,
     listing_page_views,
     search_results_page_views,
     favorites,

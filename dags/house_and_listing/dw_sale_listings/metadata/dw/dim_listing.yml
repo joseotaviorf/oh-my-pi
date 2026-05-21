@@ -20,6 +20,11 @@ columns:
     - datalake_ebdb_listing.house.id_company_hubspot
     description: >
       Foreign key referring to the company ID on Hubspot. Can be joined with dw_quintoandar.dim_company and all other sale modeling tables.
+  sk_suggestion_change:
+    lineage:
+    - datalake_ebdb_pricing.house_suggestion_changes.id_suggestion_change
+    description: >
+      The Id of the current suggestion change record from the pricing model.
   consultant_type:
     lineage:
     - datalake_big_agent.house_sale_listing_consultant.consultant_type
@@ -89,6 +94,36 @@ columns:
         It means that we have medium confidence in the prediction, and the result can reflect reality.
       HIGH: >
         It means that we have a high prediction, and the result probably reflects the reality.
+  lower_bound_limit:
+    lineage:
+    - datalake_ebdb_pricing.house_suggestion_changes.lower_bound_limit
+    description: >
+      The lowest allowed price (floor) for the sale pricing suggestion.
+  suggested_lower_bound_price:
+    lineage:
+    - datalake_ebdb_pricing.house_suggestion_changes.suggested_lower_bound_price
+    description: >
+      The minimum value of the price range suggested by the pricing model.
+  suggested_price:
+    lineage:
+    - datalake_ebdb_pricing.house_suggestion_changes.suggested_price
+    description: >
+      The exact anchor value suggested by the pricing model.
+  suggested_upper_bound_price:
+    lineage:
+    - datalake_ebdb_pricing.house_suggestion_changes.suggested_upper_bound_price
+    description: >
+      The maximum value of the price range suggested by the pricing model.
+  upper_bound_limit:
+    lineage:
+    - datalake_ebdb_pricing.house_suggestion_changes.upper_bound_limit
+    description: >
+      The highest allowed price (ceiling) for the sale pricing suggestion.
+  suggestion_certainty:
+    lineage:
+    - datalake_ebdb_pricing.house_suggestion_changes.suggestion_certainty
+    description: >
+      Level of certainty or confidence associated with the pricing suggestion from the pricing model.
   closing_status:
     lineage:
     - datalake_ebdb_listing.listing_business_context.status_closing

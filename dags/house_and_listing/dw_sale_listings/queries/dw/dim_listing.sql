@@ -10,6 +10,7 @@ SELECT
   sl.id_sale_listing AS sk_sale_listing,
   lbc.id_house AS sk_house,
   h.id_company_hubspot AS sk_company_hubspot,
+  hsc.id_suggestion_change AS sk_suggestion_change,
   hslc.consultant_type,
   hslc.first_consultant_type,
   lbc.status AS status,
@@ -18,6 +19,12 @@ SELECT
   hpp.p_70 AS predicted_price_70,
   hpp.p_50 AS predicted_price,
   hpp.certainty AS predicted_price_certainty,
+  hsc.lower_bound_limit,
+  hsc.suggested_lower_bound_price,
+  hsc.suggested_price,
+  hsc.suggested_upper_bound_price,
+  hsc.upper_bound_limit,
+  hsc.suggestion_certainty,
   lbc.status_closing AS closing_status,
   COALESCE(ssl.stranded_status, 'NA') AS stranded_status,
   hrs.registration_abandoned_reason,
@@ -95,13 +102,18 @@ LEFT JOIN
       ON hpp.id_house = lbc.id_house
       AND hpp.business_context = 'SALE'
 LEFT JOIN
+    datalake_ebdb_pricing.house_suggestion_changes AS hsc
+      ON hsc.id_house = lbc.id_house
+      AND hsc.business_context = 'SALE'
+      AND hsc.is_last_suggestion
+LEFT JOIN
   datalake_sale_stranded_listings.stranded_status AS ssl
     ON ssl.id_sale_listing = sl.id_sale_listing
     AND ssl.is_last_status = True
 LEFT JOIN
   datalake_sale_listings_lenses.listing_lenses AS ll
     ON ll.id_house = lbc.id_house
-LEFT JOIN 
+LEFT JOIN
   currentHLR AS hlr
     ON lbc.id_house = hlr.id_house AND hlr.ordenacao = 1
 WHERE

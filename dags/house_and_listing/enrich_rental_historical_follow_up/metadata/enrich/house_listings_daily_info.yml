@@ -61,6 +61,10 @@ columns:
     lineage:
       - datalake_ebdb_pricing.listing_price_change.id_price_change
     description: The Id of the price change related to the house.
+  id_suggestion_change:
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.id_suggestion_change
+    description: The Id of the suggestion change record from the pricing model.
   uuid_company:
     lineage:
       - datalake_ebdb_listing.house.uuid_company
@@ -145,6 +149,30 @@ columns:
     lineage:
       - datalake_ebdb_pricing.listing_prediction_changes.calculator_certainty
     description: Calculator column. Tells the certainty level of the prediction calculated by the calculator. It is strongly related to the intensity of the QuintoAndar performance with the listing region.
+  lower_bound_limit:
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.lower_bound_limit
+    description: The lowest allowed price (floor) for the rental pricing suggestion.
+  suggested_lower_bound_price:
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.suggested_lower_bound_price
+    description: The minimum value of the price range suggested by the pricing model.
+  suggested_price:
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.suggested_price
+    description: The exact anchor value suggested by the pricing model.
+  suggested_upper_bound_price:
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.suggested_upper_bound_price
+    description: The maximum value of the price range suggested by the pricing model.
+  upper_bound_limit:
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.upper_bound_limit
+    description: The highest allowed price (ceiling) for the rental pricing suggestion.
+  suggestion_certainty:
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.suggestion_certainty
+    description: Level of certainty or confidence associated with the pricing suggestion from the pricing model.
   listing_page_views:
     description: Number of views of the house listing page.
   search_results_page_views:

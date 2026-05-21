@@ -43,10 +43,38 @@ columns:
     description: Key of the sale price segment. Can be joined with dw_sale.dim_sale_price_segment.
     lineage:
       - datalake_sale_listings.sale_listing_price_changes.price_segment
+  sk_suggestion_change:
+    description: The Id of the suggestion change record from the pricing model.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.id_suggestion_change
   sale_price:
     description: Price of the sale listing at the end of that day.
     lineage:
       - datalake_sale_listings.sale_listing_price_changes.sale_price
+  lower_bound_limit:
+    description: The lowest allowed price (floor) for the sale pricing suggestion.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.lower_bound_limit
+  suggested_lower_bound_price:
+    description: The minimum value of the price range suggested by the pricing model.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.suggested_lower_bound_price
+  suggested_price:
+    description: The exact anchor value suggested by the pricing model.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.suggested_price
+  suggested_upper_bound_price:
+    description: The maximum value of the price range suggested by the pricing model.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.suggested_upper_bound_price
+  upper_bound_limit:
+    description: The highest allowed price (ceiling) for the sale pricing suggestion.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.upper_bound_limit
+  suggestion_certainty:
+    description: Level of certainty or confidence associated with the pricing suggestion from the pricing model.
+    lineage:
+      - datalake_ebdb_pricing.house_suggestion_changes.suggestion_certainty
   qt_search_result_page_viewed:
     description: Amount of times the house was shown in the search results in that day.
   qt_listing_page_viewed:

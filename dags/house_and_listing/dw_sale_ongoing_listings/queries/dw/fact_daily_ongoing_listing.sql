@@ -97,7 +97,7 @@ daily_ongoing_listings AS (
         ROW_NUMBER() OVER (PARTITION BY sc.sk_house, dd.`date` ORDER BY sc.ts_status_started DESC)
 )
 SELECT
-    dol.sk_house * 100000000 + dol.sk_snapshot_date AS sk_snapshot, 
+    dol.sk_house * 100000000 + dol.sk_snapshot_date AS sk_snapshot,
     dol.sk_snapshot_date,
     dol.sk_sale_listing,
     dol.sk_house,
@@ -111,7 +111,14 @@ SELECT
         -1
     ) AS sk_broker,
     COALESCE(dsps.sk_sale_price_segment, -1) AS sk_sale_price_segment,
+    COALESCE(hsc.id_suggestion_change, -1) AS sk_suggestion_change,
     slpc.sale_price,
+    hsc.lower_bound_limit,
+    hsc.suggested_lower_bound_price,
+    hsc.suggested_price,
+    hsc.suggested_upper_bound_price,
+    hsc.upper_bound_limit,
+    hsc.suggestion_certainty,
     COALESCE(ad.qt_search_result_page_viewed, 0) AS qt_search_result_page_viewed,
     COALESCE(ad.qt_listing_page_viewed, 0) AS qt_listing_page_viewed,
     COALESCE(dd.qt_visits_booked, 0) AS qt_visits_booked,
@@ -145,6 +152,13 @@ LEFT JOIN
 LEFT JOIN
     dw_sale.dim_sale_price_segment AS dsps
         ON slpc.price_segment = dsps.price_segment
+LEFT JOIN
+    datalake_ebdb_pricing.house_suggestion_changes AS hsc
+        ON dol.sk_house = hsc.id_house
+        AND dol.dt_snapshot >= DATE(hsc.ts_suggestion_started)
+        AND dol.dt_snapshot < COALESCE(DATE(hsc.ts_suggestion_ended), '2100-01-01')
+        AND hsc.is_last_suggestion_of_day
+        AND hsc.business_context = 'SALE'
 LEFT JOIN
     datalake_ebdb_listing.house AS h
         ON dol.sk_house = h.id

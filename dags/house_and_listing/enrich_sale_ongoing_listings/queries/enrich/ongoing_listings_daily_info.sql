@@ -154,6 +154,7 @@ SELECT
     dol.id_house,
     dol.id_region,
     cs_supply.sk_company,
+    hsc.id_suggestion_change,
     lpc.price AS sale_price,
     pred.calculator_min_price,
     pred.calculator_p20_price,
@@ -164,6 +165,12 @@ SELECT
     pred.calculator_p70_price,
     pred.calculator_p80_price,
     pred.calculator_max_price,
+    hsc.lower_bound_limit,
+    hsc.suggested_lower_bound_price,
+    hsc.suggested_price,
+    hsc.suggested_upper_bound_price,
+    hsc.upper_bound_limit,
+    hsc.suggestion_certainty,
     srpv.search_results_page_viewed AS qt_search_results_page_viewed,
     lpv.listing_page_viewed AS qt_listing_page_viewed,
     fav.favorites AS qt_favorites,
@@ -219,6 +226,13 @@ LEFT JOIN
         AND dol.dt_snapshot < COALESCE(DATE(pred.ts_calculator_result_ended), '2100-01-01')
         AND pred.is_last_prediction_of_day
         AND pred.business_context = 'SALE'
+LEFT JOIN
+    datalake_ebdb_pricing.house_suggestion_changes AS hsc
+        ON dol.id_house = hsc.id_house
+        AND dol.dt_snapshot >= DATE(hsc.ts_suggestion_started)
+        AND dol.dt_snapshot < COALESCE(DATE(hsc.ts_suggestion_ended), '2100-01-01')
+        AND hsc.is_last_suggestion_of_day
+        AND hsc.business_context = 'SALE'
 LEFT JOIN
     datalake_ebdb_listing.house AS h
         ON dol.id_house = h.id
