@@ -1718,7 +1718,7 @@ emr_7_12_med_general_photon_cluster:
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
-        availability: SPOT_WITH_FALLBACK
+        availability: ON_DEMAND
 
 # DBR databricks_16_4_med_memory_general_cluster → r5a.xlarge × 3 workers, SPOT_WITH_FALLBACK
 emr_7_12_med_memory_general_cluster:
@@ -1729,7 +1729,7 @@ emr_7_12_med_memory_general_cluster:
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
-        availability: SPOT_WITH_FALLBACK
+        availability: ON_DEMAND
 
 # DBR databricks_16_4_med_memory_cluster → r5a.2xlarge driver + m5a.2xlarge × 3 workers, SPOT_WITH_FALLBACK
 emr_7_12_med_memory_cluster:
@@ -1740,7 +1740,7 @@ emr_7_12_med_memory_cluster:
     aws_attributes:
         <<: *emr_aws_anchor
         ebs_volume_size: 200
-        availability: SPOT_WITH_FALLBACK
+        availability: ON_DEMAND
 
 emr_7_12_min_general_2_workers_cluster:
     <<: *emr_cluster_anchor
