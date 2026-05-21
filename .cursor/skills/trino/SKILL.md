@@ -37,7 +37,7 @@ Default Trino host for this repository: **`trino.apps.data-prd.habitat.zone`**. 
 
 ### 3. LIMIT safeguard
 
-Before executing, inspect the SQL. If it has no `LIMIT` clause, append `LIMIT 1000` purely as an execution safeguard so results stay bounded. Aggregates and counts may use a smaller bound. This is an **execution-only** safeguard — the SQL returned to the user in the reply is the original SQL without the safeguard LIMIT (call it out in prose if added).
+Before executing, inspect the SQL. If it has no `LIMIT` clause, append `LIMIT 100000` purely as an execution safeguard so results stay bounded. Aggregates and counts may use a smaller bound. This is an **execution-only** safeguard — the SQL returned to the user in the reply is the original SQL without the safeguard LIMIT (call it out in prose if added).
 
 ### 4. Invoke the bundled script
 

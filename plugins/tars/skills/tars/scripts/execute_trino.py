@@ -275,7 +275,7 @@ def run_query(query, host, port, user, catalog=None, schema=None,
     When `csv_output_path` is set, the full result rows are written as CSV to
     that path and the returned JSON envelope contains only a `preview` (first
     `PREVIEW_ROWS` rows) plus `csv_file`, instead of the full `data` array.
-    This keeps stdout small for large result sets (the LIMIT default is 20000)
+    This keeps stdout small for large result sets (the LIMIT default is 100000)
     while still giving the agent enough rows to render a Markdown preview.
 
     On error, no CSV file is created — the envelope only contains
@@ -633,7 +633,7 @@ def _build_parser() -> argparse.ArgumentParser:
         help=("If set, write the full query result rows as CSV to PATH "
               "(header row + data). Stdout JSON omits the bulky 'data' array "
               "and instead returns 'preview' (first 10 rows) plus 'csv_file'. "
-              "Recommended for the default LIMIT 20000 result size — keeps "
+              "Recommended for the default LIMIT 100000 result size — keeps "
               "stdout small. On error, no CSV file is created."),
     )
     return parser
