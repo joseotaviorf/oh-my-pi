@@ -362,9 +362,6 @@ wonka_cluster:
         availability: SPOT_WITH_FALLBACK
     init_scripts:
         - s3:
-              destination: "{{ var.value.artifacts_bucket }}/openlineage/init_script_openlineage.sh"
-              region: ""
-        - s3:
               destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/configure_spark.sh"
               region: ""
         - s3:
