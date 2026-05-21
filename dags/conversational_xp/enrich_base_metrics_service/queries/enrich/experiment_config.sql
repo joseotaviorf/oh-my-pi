@@ -340,8 +340,8 @@ FROM VALUES
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
-                    'VARIANT_0', 'baseline',
-                    'VARIANT_1', 'treatment'
+                    'VARIANT_A', 'baseline',
+                    'VARIANT_B', 'treatment'
                 )
             ),
             'filters', NULL,
