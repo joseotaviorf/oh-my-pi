@@ -10,6 +10,8 @@ dag:
 workflow:
   type: cdc
   layer: raw
+  max_tables_per_optimize_tasks: 5
+  optimize_parallelism: 2
   database_type: postgres
   dbutils_secret_key: BIG_AGENT_DB
   lineage_product_database_name: bigagent
