@@ -135,8 +135,8 @@ retsuko_adm_service_fee AS (
     datalake_retsuko_clean.contract ct
       ON ct.id = i.id_contract
   WHERE
-    DATE(e.ts_created) >= '2026-03-01'
-    AND IF(o.id_invoice IS NOT NULL,DATE(o.ts_due_original),DATE(i.ts_due)) >= '2026-03-01'
+    DATE(e.ts_created) >= '2026-07-01'
+    AND IF(o.id_invoice IS NOT NULL,DATE(o.ts_due_original),DATE(i.ts_due)) >= '2026-07-01'
     AND ct.country_code = 'BR'
     AND af.type IN ('contract', 'tenant', 'landlord')
     AND at.type IN ('contract', 'tenant','landlord')

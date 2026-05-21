@@ -49,8 +49,8 @@ retsuko AS (
     (
       e.bill_item IN ('entry.bill-item/brokerage-quinto-andar', 'entry.bill-item/brokerage-installment-fee')
       OR (ct.landlord_legal_person = 'juridical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
-      OR (DATE(e.ts_created) >= '2026-03-01' AND ct.landlord_legal_person = 'physical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
-      OR (DATE(e.ts_created) >= '2026-03-01' AND e.bill_item IN ('entry.bill-item/service-fee'))
+      OR (DATE(e.ts_created) >= '2026-07-01' AND ct.landlord_legal_person = 'physical' AND e.bill_item IN ('entry.bill-item/adm-fee', 'entry.bill-item/igpm-adm-fee', 'entry.bill-item/ipca-adm-fee', 'entry.bill-item/adjustment-agreement-adm-fee', 'entry.bill-item/lockin'))
+      OR (DATE(e.ts_created) >= '2026-07-01' AND e.bill_item IN ('entry.bill-item/service-fee'))
     )
     AND DATE(e.ts_created) >= '2024-01-01'
     AND af.type IN ('contract', 'tenant','landlord')
