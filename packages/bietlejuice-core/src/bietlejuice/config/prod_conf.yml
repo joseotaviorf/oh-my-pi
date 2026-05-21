@@ -1709,6 +1709,17 @@ emr_7_12_med_general_3_workers_cluster:
         ebs_volume_size: 100
         availability: ON_DEMAND
 
+# DBR databricks_16_4_med_general_photon_cluster → m5d.xlarge × 3 workers, SPOT_WITH_FALLBACK
+emr_7_12_med_general_photon_cluster:
+    <<: *emr_cluster_anchor
+    node_type_id: m7a.xlarge
+    driver_node_type_id: m7a.xlarge
+    num_workers: 3
+    aws_attributes:
+        <<: *emr_aws_anchor
+        ebs_volume_size: 200
+        availability: SPOT_WITH_FALLBACK
+
 emr_7_12_min_general_2_workers_cluster:
     <<: *emr_cluster_anchor
     node_type_id: m7a.xlarge
