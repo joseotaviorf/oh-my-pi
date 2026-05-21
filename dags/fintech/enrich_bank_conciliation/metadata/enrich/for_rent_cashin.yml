@@ -86,6 +86,29 @@ columns:
       - datalake_checkout_clean.boleto
       - datalake_vans_clean.boleto
       - datalake_retsuko.invoice
+  is_bank_concilied_detail:
+    description: >-
+      Text reason for bank conciliation outcome (concilied, missing bank or SAP,
+      SAP duplication, missing Vans checkout or Retsuko, or SAP paid before bank).
+    lineage:
+      - datalake_nexxera.cnab_charges
+      - datalake_itau_statements_clean.statement_067000392216
+      - datalake_retsuko.invoice
+      - datalake_checkout_clean.boleto
+      - datalake_checkout_clean.bolecode
+      - datalake_vans_clean.boleto
+      - datalake_pas.ledger
+  sap_error_detail:
+    description: >-
+      When SAP is not recorded, explains diagnosis from Retsuko invoice presence,
+      sap_entity status, and SAP gateway sync or webhook errors.
+    lineage:
+      - datalake_retsuko.invoice.id_external
+      - datalake_retsuko_clean.sap_entity.status
+      - datalake_retsuko_clean.sap_entity.failed_reason
+      - datalake_sap_gateway_clean.feature
+      - datalake_sap_gateway_clean.sync_sap_job.status
+      - datalake_sap_gateway_clean.webhook_log.errors
   dt_bank_paid:
     description: "Date when the payment was received in bank statements"
     lineage:
@@ -105,3 +128,16 @@ columns:
     description: "Date when the payment was recorded in SAP system"
     lineage:
       - datalake_pas.ledger.dt_tax
+  dt_paid:
+    description: >-
+      Consolidated payment date (first non-null among bank, SAP, Retsuko, and
+      Vans or Checkout sources).
+    lineage:
+      - datalake_nexxera.cnab_charges.dt_credit
+      - datalake_itau_statements_clean.statement_067000392216.date_accounting
+      - datalake_pas.ledger.dt_tax
+      - datalake_retsuko.invoice.ts_paid
+      - dw_public.dim_date.next_brz_fintech_business_day
+      - datalake_checkout_clean.boleto.ts_paid
+      - datalake_checkout_clean.bolecode.ts_paid
+      - datalake_vans_clean.boleto.dt_paid
