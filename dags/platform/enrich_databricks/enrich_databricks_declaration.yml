@@ -88,6 +88,36 @@ workflow:
         display_name: "source.display_name"
         dt_updated: "source.dt_updated"
         dt_deleted: "source.dt_deleted"
+    daily_service_principals:
+      load_spark_job: load_daily_service_principals
+      spark_job_arguments:
+      - "{environment}"
+      - "{bucket}"
+      - "{dag_name}"
+      - "{schema}"
+      - "{table_name}"
+      - "{partitions}"
+      partitions: [ year, month, day ]
+      extraction_type: incremental
+    unique_service_principals:
+      merge_on: [ id_service_principal ]
+      # Only update when there is a change and the row is not marked as deleted
+      when_matched_update_condition: |
+        target.dt_deleted IS NULL AND (
+          target.id_service_principal_external IS DISTINCT FROM source.id_service_principal_external
+          OR target.display_name IS DISTINCT FROM source.display_name
+          OR target.application_id IS DISTINCT FROM source.application_id
+          OR target.is_active IS DISTINCT FROM source.is_active
+          OR target.dt_deleted IS DISTINCT FROM source.dt_deleted
+        )
+      # Update everything except dt_created
+      when_matched_operation:
+        id_service_principal_external: "source.id_service_principal_external"
+        display_name: "source.display_name"
+        application_id: "source.application_id"
+        is_active: "source.is_active"
+        dt_updated: "source.dt_updated"
+        dt_deleted: "source.dt_deleted"
     daily_group_members:
       load_spark_job: load_daily_group_members
       spark_job_arguments:
@@ -121,9 +151,12 @@ workflow:
       - daily_users
     unique_groups:
       - daily_groups
+    unique_service_principals:
+      - daily_service_principals
     daily_table_privileges:
       - daily_users
       - daily_groups
+      - daily_service_principals
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"

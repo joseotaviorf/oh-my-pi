@@ -1,0 +1,35 @@
+---
+database_name: datalake_databricks
+table_name: unique_service_principals
+description: Every row is a service principal that has ever existed in the Databricks account. This table is
+  updated incrementally based on daily snapshots from the daily_service_principals table.
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_service_principal:
+    description: Unique identifier for the service principal on the Databricks account.
+    lineage:
+      - datalake_databricks.daily_service_principals.id_service_principal
+  id_service_principal_external:
+    description: External identifier for the service principal, typically corresponding to an identity provider's ID.
+    lineage:
+      - datalake_databricks.daily_service_principals.id_service_principal_external
+  display_name:
+    description: Display name of the service principal.
+    lineage:
+      - datalake_databricks.daily_service_principals.display_name
+  application_id:
+    description: UUID application ID of the service principal, used as the grantee identifier in Unity Catalog table privileges.
+    lineage:
+      - datalake_databricks.daily_service_principals.application_id
+  is_active:
+    description: Indicates whether the service principal is currently active in the Databricks account.
+    lineage:
+      - datalake_databricks.daily_service_principals.is_active
+  dt_created:
+    description: Date when the service principal was first seen in the Databricks account.
+  dt_updated:
+    description: Date when the service principal record was last updated.
+  dt_deleted:
+    description: If the service principal was deleted, this column contains the date of deletion. If the
+      service principal is active, this column is NULL.

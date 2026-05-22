@@ -1,0 +1,23 @@
+---
+database_name: datalake_databricks
+table_name: daily_service_principals
+description: Takes daily snapshots of service principals in the Databricks account.
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+columns:
+  id_service_principal:
+    description: Unique identifier for the service principal on the Databricks account.
+  id_service_principal_external:
+    description: External identifier for the service principal on the Databricks account.
+  display_name:
+    description: Display name of the service principal.
+  application_id:
+    description: UUID application ID of the service principal, used as the grantee identifier in Unity Catalog table privileges.
+  is_active:
+    description: Indicates whether the service principal is currently active in the Databricks account.
+  year:
+    description: Year of the snapshot.
+  month:
+    description: Month of the snapshot.
+  day:
+    description: Day of the snapshot.

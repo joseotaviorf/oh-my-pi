@@ -17,17 +17,30 @@ columns:
     description: If the grantee is a group, this column contains the internal group ID.
     lineage:
       - datalake_databricks.daily_groups.id_group
+  id_service_principal:
+    description: If the grantee is a service principal, this column contains the internal service principal ID.
+    lineage:
+      - datalake_databricks.daily_service_principals.id_service_principal
   grantee:
     description: If the grantee is a service principal, this column contains the service principal id. If the grantee is a user,
       this column contains the email. If the grantee is a group, this column contains the group name.
     lineage:
       - system.information_schema.table_privileges.grantee
+  privileges:
+    description: The privileges granted to the grantee. This column is an array of strings, each string is a privilege type. For example, ['SELECT', 'ALL_PRIVILEGES'].
+    lineage:
+      - system.information_schema.table_privileges.privileges
   grantee_type:
     description: Indicates whether the grantee is a user, group, or service principal.
     categories:
       User: A user account.
       Group: A group account.
       Service principal: A service principal account.
+  grant_type:
+    description: Indicates whether the privilege is granted by grant or the table owner.
+    categories:
+      grant: The privilege is granted by a grant.
+      table_owner: The privilege is granted by the table owner (the owner of the table has all privileges).
   table_schema:
     description: Schema of the table on which the privilege is granted.
     lineage:
