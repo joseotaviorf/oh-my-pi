@@ -27,12 +27,15 @@ class DateRangePartitionReader:
     ) -> DataFrame:
         """Reads data from S3 into a Spark dataframe using a date range."""
 
-        load_date_paths = self._find_existing_paths(base_path, start_date, end_date)
+        normalized_base = base_path.rstrip("/")
+        load_date_paths = self._find_existing_paths(
+            normalized_base, start_date, end_date
+        )
         if not load_date_paths:
             raise FileNotFoundError(
-                f"No data found in {base_path} for the given date range"
+                f"No data found in {normalized_base} for the given date range"
             )
-        return self.dataframe_reader.option("basePath", base_path).load(
+        return self.dataframe_reader.option("basePath", normalized_base).load(
             load_date_paths, format=format
         )
 

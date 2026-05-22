@@ -94,6 +94,65 @@ class TestDateRangePartitionReader:
             format="format",
         )
 
+    @pytest.mark.parametrize(
+        "base_path",
+        [
+            "s3://bucket/table/",
+            "s3://bucket/table///",
+        ],
+    )
+    def test_load_normalizes_trailing_slashes_on_base_path(
+        self, spark_reader, ls_entry, base_path
+    ):
+        mock_dbutils = mock.Mock()
+        mock_dbutils.fs.ls.return_value = [ls_entry]
+        reader = DateRangePartitionReader(spark_reader, mock_dbutils)
+        spark_reader.load.return_value = "data"
+
+        reader.load(base_path, datetime(2024, 1, 1), datetime(2024, 1, 1), "json")
+
+        mock_dbutils.fs.ls.assert_called_once_with(
+            "s3://bucket/table/year=2024/month=01/day=01"
+        )
+        spark_reader.option.assert_called_once_with("basePath", "s3://bucket/table")
+        spark_reader.load.assert_called_once_with(
+            ["s3://bucket/table/year=2024/month=01/day=01"],
+            format="json",
+        )
+
+    def test_load_file_not_found_error_uses_normalized_base_path(self, spark_reader):
+        mock_dbutils = mock.Mock()
+        mock_dbutils.fs.ls.side_effect = Exception("java.io.FileNotFoundException")
+        reader = DateRangePartitionReader(spark_reader, mock_dbutils)
+
+        with pytest.raises(
+            FileNotFoundError,
+            match=r"No data found in s3://bucket/table for the given date range",
+        ):
+            reader.load(
+                "s3://bucket/table/",
+                datetime(2024, 1, 1),
+                datetime(2024, 1, 1),
+                "json",
+            )
+
+    def test_find_existing_paths_does_not_strip_base_path(self, spark_reader, ls_entry):
+        """Normalization is owned by load(); the helper joins paths as given."""
+        mock_dbutils = mock.Mock()
+        mock_dbutils.fs.ls.return_value = [ls_entry]
+        reader = DateRangePartitionReader(spark_reader, mock_dbutils)
+
+        paths = reader._find_existing_paths(
+            "s3://bucket/table/",
+            datetime(2024, 1, 1),
+            datetime(2024, 1, 1),
+        )
+
+        mock_dbutils.fs.ls.assert_called_once_with(
+            "s3://bucket/table//year=2024/month=01/day=01"
+        )
+        assert paths == ["s3://bucket/table//year=2024/month=01/day=01"]
+
     def test_load_should_apply_custom_partition_format(self, spark_reader, ls_entry):
         mock_dbutils = mock.Mock()
         mock_dbutils.fs.ls.return_value = [ls_entry]
