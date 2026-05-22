@@ -19,6 +19,7 @@ workflow:
     recommendation_use_case: {}
     search_profile: {}
     search_profile_filters: {}
+    search_profile_description: {}
 
 cluster:
   type: consolidation_m_compute_cluster
