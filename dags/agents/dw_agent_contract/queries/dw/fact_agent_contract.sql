@@ -9,7 +9,7 @@ WITH all_changes AS (
         NULL AS is_agent_for_rent,
         has_changed_activated,
         has_changed_work_contract,
-        NULL::BOOLEAN AS has_changed_business_context,
+        CAST(NULL AS BOOLEAN) AS has_changed_business_context,
         ts_revision AS ts_status_started
     FROM
         datalake_ebdb_agents.agents_activations_suspensions_contracts_changes
@@ -22,8 +22,8 @@ WITH all_changes AS (
         NULL AS is_agent_active,
         is_agent_for_sale,
         is_agent_for_rent,
-        NULL::BOOLEAN AS has_changed_activated,
-        NULL::BOOLEAN AS has_changed_work_contract,
+        CAST(NULL AS BOOLEAN) AS has_changed_activated,
+        CAST(NULL AS BOOLEAN) AS has_changed_work_contract,
         TRUE AS has_changed_business_context,
         ts_agent_business_context_started AS ts_status_started
     FROM
