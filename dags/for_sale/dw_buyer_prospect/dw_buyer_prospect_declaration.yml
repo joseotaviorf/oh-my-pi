@@ -14,4 +14,8 @@ workflow:
   layer: dw
   custom_schema: sale
 cluster:
-  type: emr_7_12_min_general_3_workers_cluster
+  type: emr_7_12_min_general_2_workers_cluster
+  custom_configurations:
+    driver_node_type_id: m7a.xlarge
+    node_type_id: m7a.2xlarge
+    num_workers: 2
