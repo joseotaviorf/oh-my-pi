@@ -2,9 +2,11 @@
 #
 # Interim layout (until multi-arch Kaniko + crane is reliable on master):
 #   - ci-base / ci-jdk: linux/amd64 only (Woodpecker runners are x86_64; single-arch avoids
-#     crane manifest merge and the plugins/docker ECR auth edge case for multi-arch).
+#     crane manifest merge until stack layer 3 re-enables multi-arch).
 #   - devcontainer: linux/arm64 only (local / Codespaces target); validate via manual step.
-#   Plugin: ECR-hosted Kaniko (plugins/docker). privileged only where cross-arch QEMU is needed.
+#   Plugin: ECR-hosted Kaniko (plugins/docker). GITHUB_TOKEN is passed via environment;
+#   the plugin stages /kaniko/run/secrets/GITHUB_TOKEN for Dockerfile RUN steps.
+#   privileged only where cross-arch QEMU is needed.
 #
 # Tag convention (env prefix required by ECR tagging policy):
 #   master → prod-<target>-latest   + prod-<target>-<sha7>
@@ -16,7 +18,7 @@ steps:
   # No push. Runs on push to non-master branches (pull_request events are not enabled in
   # Woodpecker for this repo). Add event: pull_request here once enabled.
   validate-ci-jdk-pr:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
     pull: true
     settings:
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
@@ -24,7 +26,6 @@ steps:
       target: ci-jdk
       platform: linux/amd64
       no_push: true
-      secret: id=GITHUB_TOKEN,env=GITHUB_TOKEN
     environment:
       GITHUB_TOKEN:
         from_secret: github_token
@@ -49,7 +50,7 @@ steps:
         event: pull_request
 
   publish-ci-base-prod:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
     pull: true
     settings:
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
@@ -59,7 +60,6 @@ steps:
         - prod-ci-base-latest
         - prod-ci-base-${CI_COMMIT_SHA:0:7}
       platform: linux/amd64
-      secret: id=GITHUB_TOKEN,env=GITHUB_TOKEN
     environment:
       GITHUB_TOKEN:
         from_secret: github_token
@@ -77,7 +77,7 @@ steps:
         event: manual
 
   publish-ci-jdk-prod:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
     pull: true
     settings:
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
@@ -87,7 +87,6 @@ steps:
         - prod-ci-jdk-latest
         - prod-ci-jdk-${CI_COMMIT_SHA:0:7}
       platform: linux/amd64
-      secret: id=GITHUB_TOKEN,env=GITHUB_TOKEN
     environment:
       GITHUB_TOKEN:
         from_secret: github_token
@@ -107,7 +106,7 @@ steps:
   # Build-only (no push) — validates devcontainer target for linux/arm64 (QEMU on amd64 runners).
   # ECR push for devcontainer is done locally via `make publish-devcontainer`.
   build-devcontainer-prod:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
     pull: true
     privileged: true
     settings:
@@ -116,7 +115,6 @@ steps:
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
       platform: linux/arm64
       no_push: true
-      secret: id=GITHUB_TOKEN,env=GITHUB_TOKEN
     environment:
       GITHUB_TOKEN:
         from_secret: github_token
