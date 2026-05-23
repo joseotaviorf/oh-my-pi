@@ -68,6 +68,9 @@ RUN apt-get update -qq \
   rsync \
   && rm -rf /var/lib/apt/lists/*
 
+# Kaniko and BuildKit execute RUN via SHELL; use bash (not dash) for secret/token handling.
+SHELL ["/bin/bash", "-c"]
+
 # Pre-install the workspace venv (core + airflow + compiler) at build time.
 # Only pyproject.toml + uv.lock are COPYed (no src/), so this layer is only
 # invalidated by dependency changes, not source changes.
@@ -82,19 +85,11 @@ COPY packages/bietlejuice-airflow/pyproject.toml /tmp/workspace/packages/bietlej
 COPY packages/bietlejuice-compiler/pyproject.toml /tmp/workspace/packages/bietlejuice-compiler/pyproject.toml
 COPY packages/bietlejuice-runtime/pyproject.toml /tmp/workspace/packages/bietlejuice-runtime/pyproject.toml
 
-RUN --mount=type=secret,id=GITHUB_TOKEN,required=false <<'EOS'
-set -e
-TOKEN=""
-if [ -f /run/secrets/GITHUB_TOKEN ] && [ -s /run/secrets/GITHUB_TOKEN ]; then
-  TOKEN=$(tr -d '\n' < /run/secrets/GITHUB_TOKEN)
-  git config --global url."https://${TOKEN}:@github.com/".insteadOf "https://github.com/"
-fi
-cd /tmp/workspace && uv sync --python 3.12 --no-editable
-rm -rf /tmp/workspace
-if [ -n "$TOKEN" ]; then
-  git config --global --remove-section url."https://${TOKEN}:@github.com/" || true
-fi
-EOS
+# Kaniko (plugins/docker) does not execute heredoc RUN. Exec-form bash -c avoids shell-form $$ escaping
+# ($$TOKEN in bash is PID+TOKEN, not the secret; use JSON array so $TOKEN is passed through to bash).
+# Read GITHUB_TOKEN from BuildKit /run/secrets/ (local) or /kaniko/run/secrets/ (CI plugin staging).
+RUN --mount=type=secret,id=GITHUB_TOKEN,required=false \
+  ["/bin/bash", "-c", "set -e; TOKEN=; if [ -f /run/secrets/GITHUB_TOKEN ] && [ -s /run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /run/secrets/GITHUB_TOKEN); elif [ -f /kaniko/run/secrets/GITHUB_TOKEN ] && [ -s /kaniko/run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /kaniko/run/secrets/GITHUB_TOKEN); fi; if [ -n \"${TOKEN}\" ]; then git config --global url.\"https://${TOKEN}:@github.com/\".insteadOf \"https://github.com/\"; fi; cd /tmp/workspace && uv sync --python 3.12 --no-editable; if [ -n \"${TOKEN}\" ]; then git config --global --remove-section url.\"https://${TOKEN}:@github.com/\" || true; fi; rm -rf /tmp/workspace"]
 
 ###############################################################################
 # Target: ci-jdk — ci-base + JRE for PySpark + runtime venvs
@@ -126,23 +121,8 @@ COPY packages/bietlejuice-runtime/envs/dbr-16-4/pyproject.toml /tmp/workspace/pa
 COPY packages/bietlejuice-runtime/envs/dbr-16-4/uv.lock /tmp/workspace/packages/bietlejuice-runtime/envs/dbr-16-4/uv.lock
 COPY packages/bietlejuice-core/pyproject.toml /tmp/workspace/packages/bietlejuice-core/pyproject.toml
 
-RUN --mount=type=secret,id=GITHUB_TOKEN,required=false <<'EOS'
-set -e
-TOKEN=""
-if [ -f /run/secrets/GITHUB_TOKEN ] && [ -s /run/secrets/GITHUB_TOKEN ]; then
-  TOKEN=$(tr -d '\n' < /run/secrets/GITHUB_TOKEN)
-  git config --global url."https://${TOKEN}:@github.com/".insteadOf "https://github.com/"
-fi
-cd /tmp/workspace
-UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/runtime \
-  uv sync --directory packages/bietlejuice-runtime --python 3.12 --no-editable
-UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/dbr-16-4 \
-  uv sync --directory packages/bietlejuice-runtime/envs/dbr-16-4 --python 3.12 --no-editable
-rm -rf /tmp/workspace
-if [ -n "$TOKEN" ]; then
-  git config --global --remove-section url."https://${TOKEN}:@github.com/" || true
-fi
-EOS
+RUN --mount=type=secret,id=GITHUB_TOKEN,required=false \
+  ["/bin/bash", "-c", "set -e; TOKEN=; if [ -f /run/secrets/GITHUB_TOKEN ] && [ -s /run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /run/secrets/GITHUB_TOKEN); elif [ -f /kaniko/run/secrets/GITHUB_TOKEN ] && [ -s /kaniko/run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /kaniko/run/secrets/GITHUB_TOKEN); fi; if [ -n \"${TOKEN}\" ]; then git config --global url.\"https://${TOKEN}:@github.com/\".insteadOf \"https://github.com/\"; fi; cd /tmp/workspace && UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/runtime uv sync --directory packages/bietlejuice-runtime --python 3.12 --no-editable && UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/dbr-16-4 uv sync --directory packages/bietlejuice-runtime/envs/dbr-16-4 --python 3.12 --no-editable; if [ -n \"${TOKEN}\" ]; then git config --global --remove-section url.\"https://${TOKEN}:@github.com/\" || true; fi; rm -rf /tmp/workspace"]
 
 ###############################################################################
 # Target: devcontainer — ci-jdk + dev tooling
