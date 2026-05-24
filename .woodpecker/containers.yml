@@ -1,12 +1,10 @@
 # Container image builds — CI images published to ECR, devcontainer build-only.
 #
-# Interim layout (until multi-arch Kaniko + crane is reliable on master):
-#   - ci-base / ci-jdk: linux/amd64 only (Woodpecker runners are x86_64; single-arch avoids
-#     crane manifest merge until stack layer 3 re-enables multi-arch).
-#   - devcontainer: linux/arm64 only (local / Codespaces target); validate via manual step.
-#   Plugin: ECR-hosted Kaniko (plugins/docker). GITHUB_TOKEN is passed via environment;
-#   the plugin stages /kaniko/run/secrets/GITHUB_TOKEN for Dockerfile RUN steps.
-#   privileged only where cross-arch QEMU is needed.
+# All images (ci-base, ci-jdk, devcontainer) are built for linux/amd64 + linux/arm64
+# via the ECR-hosted Kaniko plugin (plugins/docker) with privileged: true for QEMU
+# binfmt registration. GITHUB_TOKEN is passed via environment; the plugin stages
+# /kaniko/run/secrets/GITHUB_TOKEN for Dockerfile RUN steps. The plugin pushes a
+# manifest list per tag so consumers get the right arch automatically.
 #
 # Tag convention (env prefix required by ECR tagging policy):
 #   master → prod-<target>-latest   + prod-<target>-<sha7>
@@ -14,17 +12,21 @@
 # No custom clone: default plugin-git shallow clone is enough (Docker build only; no git diff).
 
 steps:
-  # Validates ci-jdk (linux/amd64) on feature branches — same graph as tests (ci-base → ci-jdk).
-  # No push. Runs on push to non-master branches (pull_request events are not enabled in
+  # Validates that ci-jdk builds for both amd64 and arm64 on feature branches.
+  # No push — build-only smoke test.
+  # Runs on push to non-master branches (pull_request events are not enabled in
   # Woodpecker for this repo). Add event: pull_request here once enabled.
-  validate-ci-jdk-pr:
+  validate-multi-arch-pr:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
     pull: true
+    privileged: true
     settings:
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
       dockerfile: .container/Dockerfile
       target: ci-jdk
-      platform: linux/amd64
+      platforms:
+        - linux/amd64
+        - linux/arm64
       no_push: true
     environment:
       GITHUB_TOKEN:
@@ -52,6 +54,7 @@ steps:
   publish-ci-base-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
     pull: true
+    privileged: true
     settings:
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
       dockerfile: .container/Dockerfile
@@ -59,7 +62,9 @@ steps:
       tag:
         - prod-ci-base-latest
         - prod-ci-base-${CI_COMMIT_SHA:0:7}
-      platform: linux/amd64
+      platforms:
+        - linux/amd64
+        - linux/arm64
     environment:
       GITHUB_TOKEN:
         from_secret: github_token
@@ -79,6 +84,7 @@ steps:
   publish-ci-jdk-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
     pull: true
+    privileged: true
     settings:
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
       dockerfile: .container/Dockerfile
@@ -86,7 +92,9 @@ steps:
       tag:
         - prod-ci-jdk-latest
         - prod-ci-jdk-${CI_COMMIT_SHA:0:7}
-      platform: linux/amd64
+      platforms:
+        - linux/amd64
+        - linux/arm64
     environment:
       GITHUB_TOKEN:
         from_secret: github_token
@@ -103,7 +111,7 @@ steps:
       - branch: [master]
         event: manual
 
-  # Build-only (no push) — validates devcontainer target for linux/arm64 (QEMU on amd64 runners).
+  # Build-only (no push) — validates devcontainer for linux/amd64 + linux/arm64.
   # ECR push for devcontainer is done locally via `make publish-devcontainer`.
   build-devcontainer-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
@@ -113,7 +121,9 @@ steps:
       dockerfile: .container/Dockerfile
       target: devcontainer
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
-      platform: linux/arm64
+      platforms:
+        - linux/amd64
+        - linux/arm64
       no_push: true
     environment:
       GITHUB_TOKEN:
