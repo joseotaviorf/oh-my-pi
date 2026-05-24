@@ -10,13 +10,14 @@
 #                      Used by lint, validation, and release CI steps.
 #
 #   ci-jdk           — ci-base + openjdk-17-jre-headless +
-#                      runtime venvs at /opt/bietlejuice/venvs/{runtime,dbr-16-4}.
+#                      dbr-16-4 venv at /opt/bietlejuice/venvs/dbr-16-4.
 #                      Used by test CI steps (PySpark needs a JVM).
 #
-#   devcontainer     — ci-jdk + dev tooling (vscode user, sudo, zsh,
-#                      Starship prompt, gh, AWS CLI v2, Databricks CLI,
-#                      yq, jq, ripgrep, astro-cli, weep, woodpecker-cli, QLI).
-#                      Inherits all three venvs from ci-jdk.
+#   devcontainer     — ci-jdk + runtime venv at /opt/bietlejuice/venvs/runtime +
+#                      dev tooling (vscode user, sudo, zsh, Starship prompt, gh,
+#                      AWS CLI v2, Databricks CLI, yq, jq, ripgrep, astro-cli,
+#                      weep, woodpecker-cli, QLI).
+#                      Inherits workspace + dbr-16-4 from ci-jdk; adds runtime.
 #
 # Why slim-bookworm?
 #   The full python:3.12-bookworm image (~1 GB) inherits the entire
@@ -89,10 +90,10 @@ COPY packages/bietlejuice-runtime/pyproject.toml /tmp/workspace/packages/bietlej
 # ($$TOKEN in bash is PID+TOKEN, not the secret; use JSON array so $TOKEN is passed through to bash).
 # Read GITHUB_TOKEN from BuildKit /run/secrets/ (local) or /kaniko/run/secrets/ (CI plugin staging).
 RUN --mount=type=secret,id=GITHUB_TOKEN,required=false \
-  ["/bin/bash", "-c", "set -e; TOKEN=; if [ -f /run/secrets/GITHUB_TOKEN ] && [ -s /run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /run/secrets/GITHUB_TOKEN); elif [ -f /kaniko/run/secrets/GITHUB_TOKEN ] && [ -s /kaniko/run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /kaniko/run/secrets/GITHUB_TOKEN); fi; if [ -n \"${TOKEN}\" ]; then git config --global url.\"https://${TOKEN}:@github.com/\".insteadOf \"https://github.com/\"; fi; cd /tmp/workspace && uv sync --python 3.12 --no-editable; if [ -n \"${TOKEN}\" ]; then git config --global --remove-section url.\"https://${TOKEN}:@github.com/\" || true; fi; rm -rf /tmp/workspace"]
+  ["/bin/bash", "-c", "set -e; TOKEN=; if [ -f /run/secrets/GITHUB_TOKEN ] && [ -s /run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /run/secrets/GITHUB_TOKEN); elif [ -f /kaniko/run/secrets/GITHUB_TOKEN ] && [ -s /kaniko/run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /kaniko/run/secrets/GITHUB_TOKEN); fi; if [ -n \"${TOKEN}\" ]; then git config --global url.\"https://${TOKEN}:@github.com/\".insteadOf \"https://github.com/\"; fi; cd /tmp/workspace && uv sync --python 3.12 --no-editable; rm -rf /root/.cache/uv; find /opt/bietlejuice/venvs -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true; find /opt/bietlejuice/venvs -name '*.pyc' -delete 2>/dev/null || true; if [ -n \"${TOKEN}\" ]; then git config --global --remove-section url.\"https://${TOKEN}:@github.com/\" || true; fi; rm -rf /tmp/workspace"]
 
 ###############################################################################
-# Target: ci-jdk — ci-base + JRE for PySpark + runtime venvs
+# Target: ci-jdk — ci-base + JRE for PySpark + dbr-16-4 venv
 ###############################################################################
 FROM ci-base AS ci-jdk
 
@@ -108,11 +109,10 @@ RUN apt-get update -qq \
 
 ENV JAVA_HOME=/usr/lib/jvm/ci-openjdk-17
 
-# Pre-install the runtime venvs at build time.
-# bietlejuice-runtime (standalone project, separate lockfile) and
-# bietlejuice-runtime/envs/dbr-16-4 (mirrors DBR 16.4 LTS pinned libs).
-# UV_PROJECT_ENVIRONMENT is overridden inline per venv; the inherited
-# /opt/bietlejuice/venvs/workspace value from ci-base is not used here.
+# Pre-install the dbr-16-4 venv at build time (mirrors DBR 16.4 LTS pinned libs).
+# Runtime venv is baked in the devcontainer target only (local dev / lint).
+# UV_PROJECT_ENVIRONMENT is overridden inline; the inherited workspace value
+# from ci-base is not used here.
 COPY packages/bietlejuice-runtime/pyproject.toml /tmp/workspace/packages/bietlejuice-runtime/pyproject.toml
 # [tool.hatch.build.hooks.custom] points here; Hatchling validates the path before wheel build.
 COPY packages/bietlejuice-runtime/hatch_build.py /tmp/workspace/packages/bietlejuice-runtime/hatch_build.py
@@ -122,12 +122,21 @@ COPY packages/bietlejuice-runtime/envs/dbr-16-4/uv.lock /tmp/workspace/packages/
 COPY packages/bietlejuice-core/pyproject.toml /tmp/workspace/packages/bietlejuice-core/pyproject.toml
 
 RUN --mount=type=secret,id=GITHUB_TOKEN,required=false \
-  ["/bin/bash", "-c", "set -e; TOKEN=; if [ -f /run/secrets/GITHUB_TOKEN ] && [ -s /run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /run/secrets/GITHUB_TOKEN); elif [ -f /kaniko/run/secrets/GITHUB_TOKEN ] && [ -s /kaniko/run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /kaniko/run/secrets/GITHUB_TOKEN); fi; if [ -n \"${TOKEN}\" ]; then git config --global url.\"https://${TOKEN}:@github.com/\".insteadOf \"https://github.com/\"; fi; cd /tmp/workspace && UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/runtime uv sync --directory packages/bietlejuice-runtime --python 3.12 --no-editable && UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/dbr-16-4 uv sync --directory packages/bietlejuice-runtime/envs/dbr-16-4 --python 3.12 --no-editable; if [ -n \"${TOKEN}\" ]; then git config --global --remove-section url.\"https://${TOKEN}:@github.com/\" || true; fi; rm -rf /tmp/workspace"]
+  ["/bin/bash", "-c", "set -e; TOKEN=; if [ -f /run/secrets/GITHUB_TOKEN ] && [ -s /run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /run/secrets/GITHUB_TOKEN); elif [ -f /kaniko/run/secrets/GITHUB_TOKEN ] && [ -s /kaniko/run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /kaniko/run/secrets/GITHUB_TOKEN); fi; if [ -n \"${TOKEN}\" ]; then git config --global url.\"https://${TOKEN}:@github.com/\".insteadOf \"https://github.com/\"; fi; cd /tmp/workspace && UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/dbr-16-4 uv sync --directory packages/bietlejuice-runtime/envs/dbr-16-4 --python 3.12 --no-editable; rm -rf /root/.cache/uv; find /opt/bietlejuice/venvs -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true; find /opt/bietlejuice/venvs -name '*.pyc' -delete 2>/dev/null || true; if [ -n \"${TOKEN}\" ]; then git config --global --remove-section url.\"https://${TOKEN}:@github.com/\" || true; fi; rm -rf /tmp/workspace"]
 
 ###############################################################################
 # Target: devcontainer — ci-jdk + dev tooling
 ###############################################################################
 FROM ci-jdk AS devcontainer
+
+# Pre-install the runtime venv for local dev (not needed in prod-ci-jdk-latest).
+COPY packages/bietlejuice-runtime/pyproject.toml /tmp/workspace/packages/bietlejuice-runtime/pyproject.toml
+COPY packages/bietlejuice-runtime/hatch_build.py /tmp/workspace/packages/bietlejuice-runtime/hatch_build.py
+COPY packages/bietlejuice-runtime/uv.lock /tmp/workspace/packages/bietlejuice-runtime/uv.lock
+COPY packages/bietlejuice-core/pyproject.toml /tmp/workspace/packages/bietlejuice-core/pyproject.toml
+
+RUN --mount=type=secret,id=GITHUB_TOKEN,required=false \
+  ["/bin/bash", "-c", "set -e; TOKEN=; if [ -f /run/secrets/GITHUB_TOKEN ] && [ -s /run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /run/secrets/GITHUB_TOKEN); elif [ -f /kaniko/run/secrets/GITHUB_TOKEN ] && [ -s /kaniko/run/secrets/GITHUB_TOKEN ]; then TOKEN=$(tr -d '\\n' < /kaniko/run/secrets/GITHUB_TOKEN); fi; if [ -n \"${TOKEN}\" ]; then git config --global url.\"https://${TOKEN}:@github.com/\".insteadOf \"https://github.com/\"; fi; cd /tmp/workspace && UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/runtime uv sync --directory packages/bietlejuice-runtime --python 3.12 --no-editable; rm -rf /root/.cache/uv; find /opt/bietlejuice/venvs -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true; find /opt/bietlejuice/venvs -name '*.pyc' -delete 2>/dev/null || true; if [ -n \"${TOKEN}\" ]; then git config --global --remove-section url.\"https://${TOKEN}:@github.com/\" || true; fi; rm -rf /tmp/workspace"]
 
 ARG YQ_VERSION
 ARG AWSCLI_VERSION

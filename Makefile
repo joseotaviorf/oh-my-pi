@@ -157,6 +157,13 @@ build-devcontainer:
 COMPILER_SCRIPTS := packages/bietlejuice-compiler/scripts
 export PYTHONPATH := .:packages/bietlejuice-compiler$(if $(PYTHONPATH),:$(PYTHONPATH),)
 
+# CI/devcontainer images bake dbr at /opt/bietlejuice/venvs/dbr-16-4; local installs use envs/dbr-16-4/.venv.
+ifeq ($(wildcard /opt/bietlejuice/venvs/dbr-16-4/bin/python3),)
+DBR_UV_ENV :=
+else
+DBR_UV_ENV := UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/dbr-16-4
+endif
+
 ###############################################################################
 ###################### Local Airflow Docker environment #######################
 ###############################################################################
@@ -595,7 +602,7 @@ unit-tests:
 	@echo ""
 	@uv run --directory packages/bietlejuice-core     pytest -W ignore::DeprecationWarning
 	@uv run --directory packages/bietlejuice-airflow  pytest -W ignore::DeprecationWarning
-	@cd packages/bietlejuice-runtime && DBR_PY=$$(uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && PYSPARK_PYTHON=$$DBR_PY PYSPARK_DRIVER_PYTHON=$$DBR_PY uv run --project envs/dbr-16-4 pytest -W ignore::DeprecationWarning
+	@cd packages/bietlejuice-runtime && DBR_PY=$$($(DBR_UV_ENV) uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && PYSPARK_PYTHON=$$DBR_PY PYSPARK_DRIVER_PYTHON=$$DBR_PY $(DBR_UV_ENV) uv run --project envs/dbr-16-4 pytest -W ignore::DeprecationWarning
 	@uv run --directory packages/bietlejuice-compiler pytest -W ignore::DeprecationWarning
 	@uv run --directory packages/emr-cli pytest -W ignore::DeprecationWarning
 
@@ -621,10 +628,10 @@ unit-tests-changed:
 	       core) uv run --directory packages/bietlejuice-core pytest --testmon -W ignore::DeprecationWarning || FAILED=1 ;; \
 	       airflow) uv run --directory packages/bietlejuice-airflow pytest --testmon -W ignore::DeprecationWarning || FAILED=1 ;; \
 	       runtime) cd packages/bietlejuice-runtime && \
-	         DBR_PY=$$(uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && \
+	         DBR_PY=$$($(DBR_UV_ENV) uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && \
 	         PYSPARK_PYTHON=$$DBR_PY \
 	         PYSPARK_DRIVER_PYTHON=$$DBR_PY \
-	         uv run --project envs/dbr-16-4 pytest --testmon -W ignore::DeprecationWarning && cd ../.. || { cd ../..; FAILED=1; } ;; \
+	         $(DBR_UV_ENV) uv run --project envs/dbr-16-4 pytest --testmon -W ignore::DeprecationWarning && cd ../.. || { cd ../..; FAILED=1; } ;; \
 	       compiler) uv run --directory packages/bietlejuice-compiler pytest --testmon -W ignore::DeprecationWarning || FAILED=1 ;; \
 	       emr-cli) uv run --directory packages/emr-cli pytest --testmon -W ignore::DeprecationWarning || FAILED=1 ;; \
 	     esac; \
@@ -659,7 +666,7 @@ core-model-tests:
 	@echo "=========="
 	@echo ""
 	@git fetch --no-tags origin +refs/heads/master
-	@cd packages/bietlejuice-runtime && DBR_PY=$$(uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && PYSPARK_PYTHON=$$DBR_PY PYSPARK_DRIVER_PYTHON=$$DBR_PY uv run --project envs/dbr-16-4 pytest -W ignore::DeprecationWarning test/core_model_dags/ src/bietlejuice/base/core_models/
+	@cd packages/bietlejuice-runtime && DBR_PY=$$($(DBR_UV_ENV) uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && PYSPARK_PYTHON=$$DBR_PY PYSPARK_DRIVER_PYTHON=$$DBR_PY $(DBR_UV_ENV) uv run --project envs/dbr-16-4 pytest -W ignore::DeprecationWarning test/core_model_dags/ src/bietlejuice/base/core_models/
 
 .PHONY: core-model-coverage
 ## check test coverage for core model source code (CI/CD only - only runs if core model changes detected)

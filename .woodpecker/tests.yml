@@ -15,10 +15,11 @@ steps:
       # Re-link editable workspace packages and patch any new workspace deps (~1-2s).
       # UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/workspace is set in the image.
       - uv sync
-      # Symlink runtime venv paths into the workspace so the Makefile's
-      # `envs/dbr-16-4/.venv/bin/pytest` resolves to the pre-built image venvs at
-      # /opt/bietlejuice/venvs/ (present in images built from .container/Dockerfile).
-      - ln -sfn /opt/bietlejuice/venvs/runtime packages/bietlejuice-runtime/.venv
+      # Re-link dbr-16-4 editables into the pre-baked image venv (~1-2s, no wheel downloads).
+      # Must target /opt/bietlejuice/venvs/dbr-16-4 explicitly — symlink-only setup makes uv
+      # recreate a local .venv and re-fetch private git deps (quintoandar-logger).
+      - UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/dbr-16-4 uv sync --directory packages/bietlejuice-runtime/envs/dbr-16-4 --python 3.12
+      # Optional: symlink for anything resolving envs/dbr-16-4/.venv/bin/* directly.
       - ln -sfn /opt/bietlejuice/venvs/dbr-16-4 packages/bietlejuice-runtime/envs/dbr-16-4/.venv
     when:
       event: [push, pull_request]
