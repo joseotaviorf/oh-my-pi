@@ -1,10 +1,11 @@
-# Container image builds — CI images published to ECR, devcontainer build-only.
+# Container image builds — CI images published to ECR.
 #
 # All images (ci-base, ci-jdk, devcontainer) are built for linux/amd64 + linux/arm64
 # via the ECR-hosted Kaniko plugin (plugins/docker) with privileged: true for QEMU
 # binfmt registration. GITHUB_TOKEN is passed via environment; the plugin stages
 # /kaniko/run/secrets/GITHUB_TOKEN for Dockerfile RUN steps. The plugin pushes a
 # manifest list per tag so consumers get the right arch automatically.
+# Layer 5 adds prod-devcontainer-* ECR publish on master.
 #
 # Tag convention (env prefix required by ECR tagging policy):
 #   master → prod-<target>-latest   + prod-<target>-<sha7>
@@ -111,9 +112,7 @@ steps:
       - branch: [master]
         event: manual
 
-  # Build-only (no push) — validates devcontainer for linux/amd64 + linux/arm64.
-  # ECR push for devcontainer is done locally via `make publish-devcontainer`.
-  build-devcontainer-prod:
+  publish-devcontainer-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
     pull: true
     privileged: true
@@ -121,12 +120,25 @@ steps:
       dockerfile: .container/Dockerfile
       target: devcontainer
       repo: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice
+      tag:
+        - prod-devcontainer-latest
+        - prod-devcontainer-${CI_COMMIT_SHA:0:7}
       platforms:
         - linux/amd64
         - linux/arm64
-      no_push: true
     environment:
       GITHUB_TOKEN:
         from_secret: github_token
     when:
-      - event: manual
+      - path:
+          include:
+            - '.woodpecker/containers.yml'
+            - '.container/Dockerfile'
+            - '.devcontainer/**'
+            - '**/pyproject.toml'
+            - '**/uv.lock'
+            - 'packages/bietlejuice-runtime/hatch_build.py'
+        branch: [master]
+        event: push
+      - branch: [master]
+        event: manual

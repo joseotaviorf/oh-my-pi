@@ -1,16 +1,36 @@
 #!/usr/bin/env bash
 # Installs devcontainer CLIs (astro, yq, aws, databricks, starship, weep,
 # woodpecker-cli, QLI).
-# Usage: install_devcontainer_tools.sh TARGETARCH ASTRO_CLI_VERSION YQ_VERSION \
+#
+# First argument is the Docker / OCI platform CPU segment (same names as Dockerfile
+# ARG TARGETARCH and `dpkg --print-architecture` on Debian): amd64 or arm64.
+# It is NOT necessarily the same as `uname -m` (e.g. aarch64 on arm64 hardware).
+#
+# Upstream download naming differs by vendor; this script maps:
+#   - Most GitHub tarballs/zip: linux_${TARGETARCH} (amd64 | arm64)
+#   - AWS CLI v2 installer zip: linux-${AWS_ARCH} (x86_64 | aarch64)
+#   - Starship musl tarball: ${AWS_ARCH}-unknown-linux-musl (x86_64 | aarch64)
+#   - Weep tarball: linux_${WEEP_ARCH} (x86_64 | arm64 — Netflix uses arm64, not aarch64)
+#
+# Usage: install_devcontainer_tools.sh <cpu> ASTRO_CLI_VERSION YQ_VERSION \
 #   AWSCLI_VERSION DATABRICKS_CLI_VERSION STARSHIP_VERSION WEEP_VERSION WOODPECKER_CLI_VERSION
 set -euo pipefail
 
 if [[ "$#" -ne 8 ]]; then
-  echo "usage: $0 TARGETARCH ASTRO_CLI_VERSION YQ_VERSION AWSCLI_VERSION DATABRICKS_CLI_VERSION STARSHIP_VERSION WEEP_VERSION WOODPECKER_CLI_VERSION" >&2
+  echo "usage: $0 <cpu> ASTRO_CLI_VERSION YQ_VERSION AWSCLI_VERSION DATABRICKS_CLI_VERSION STARSHIP_VERSION WEEP_VERSION WOODPECKER_CLI_VERSION" >&2
+  echo "  <cpu>: amd64|arm64 (also accepts x86_64 -> amd64, aarch64 -> arm64)" >&2
   exit 1
 fi
 
-TARGETARCH="$1"
+_raw_cpu="${1}"
+case "${_raw_cpu}" in
+  amd64 | x86_64) TARGETARCH=amd64 ;;
+  arm64 | aarch64) TARGETARCH=arm64 ;;
+  *)
+    echo "unsupported cpu (expected amd64|arm64, got: ${_raw_cpu})" >&2
+    exit 1
+    ;;
+esac
 ASTRO_CLI_VERSION="$2"
 YQ_VERSION="$3"
 AWSCLI_VERSION="$4"
@@ -19,11 +39,16 @@ STARSHIP_VERSION="$6"
 WEEP_VERSION="$7"
 WOODPECKER_CLI_VERSION="$8"
 
-case "${TARGETARCH}" in
-  amd64) AWS_ARCH=x86_64; WEEP_ARCH=x86_64 ;;
-  arm64) AWS_ARCH=aarch64; WEEP_ARCH=arm64 ;;
-  *) echo "unsupported TARGETARCH: ${TARGETARCH}" >&2; exit 1 ;;
-esac
+if [[ "${TARGETARCH}" == amd64 ]]; then
+  AWS_ARCH=x86_64
+  WEEP_ARCH=x86_64
+elif [[ "${TARGETARCH}" == arm64 ]]; then
+  AWS_ARCH=aarch64
+  WEEP_ARCH=arm64
+else
+  echo "internal error: unexpected TARGETARCH=${TARGETARCH}" >&2
+  exit 1
+fi
 
 curl -fsSL "https://github.com/astronomer/astro-cli/releases/download/v${ASTRO_CLI_VERSION}/astro_${ASTRO_CLI_VERSION}_linux_${TARGETARCH}.tar.gz" \
   | tar -xz -C /usr/local/bin astro
