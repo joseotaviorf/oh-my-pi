@@ -23,7 +23,8 @@ SELECT
   c.row_id,
   c.op_type,
   c.status,
-  c.failure_reason
+  c.failure_reason,
+  SPLIT(c.failure_reason,':')[0] AS failure_type
 FROM filtered_runs AS r
 INNER JOIN hightouch_audit.sync_changelog AS c
   ON r.id_sync = c.sync_id

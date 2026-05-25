@@ -17,6 +17,10 @@ columns:
     description: Timestamp when the parent sync run was initiated, inherited from the sync run execution
     lineage:
       - datalake_hightouch.sync_runs.ts_started
+  ts_finished:
+    description: Timestamp when the parent sync run completed, inherited from the sync run execution
+    lineage:
+      - datalake_hightouch.sync_runs.ts_finished
   year:
     description: Partition column representing the year of the sync run start date
     lineage:
@@ -43,5 +47,9 @@ columns:
       - hightouch_audit.sync_changelog.status
   failure_reason:
     description: Detailed error message or reason explaining why the row operation failed, null if successful
+    lineage:
+      - hightouch_audit.sync_changelog.failure_reason
+  failure_type:
+    description: High-level failure category for the row operation. Built by extracting the substring before the first colon in failure_reason.
     lineage:
       - hightouch_audit.sync_changelog.failure_reason
