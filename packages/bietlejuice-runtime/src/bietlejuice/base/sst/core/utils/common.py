@@ -6,8 +6,8 @@ from collections import Counter
 from functools import wraps
 from typing import Callable, List, Optional, Tuple, Union
 
-import pyspark.sql.functions as F
 from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import functions as F
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -240,9 +240,7 @@ def _require_qualified_table_name(target_table: str) -> None:
 
 @logger(exclude=["df", "current"], exclude_return=True)
 def safe_column_union(
-    df: DataFrame,
-    current: Union[str, DataFrame],
-    spark: SparkSession = None,
+    df: DataFrame, current: Union[str, DataFrame], spark: SparkSession = None
 ) -> DataFrame:
     """
     Union of columns from df and current: result has all columns from both.
@@ -539,8 +537,7 @@ def compare_schema_types(left_df: DataFrame, right_df: DataFrame) -> DataFrame:
     ]
 
     return left_df.sparkSession.createDataFrame(
-        rows,
-        ["column_name", "left_type", "right_type", "same_type"],
+        rows, ["column_name", "left_type", "right_type", "same_type"]
     )
 
 
@@ -627,11 +624,143 @@ def retrieve_spark_session(job_name: str) -> SparkSession:
     )
 
 
+def get_latest_version_from_df(
+    df: DataFrame, key_cols: List[str], cols: List[str], sort_col: Union[str, List[str]]
+) -> DataFrame:
+    """
+    Deduplicate a DataFrame by keeping the latest row per key group.
+
+    Groups ``df`` by ``key_cols`` and, for each group, selects the row whose
+    ``sort_col`` value is greatest. Non-key columns from that row are returned
+    via ``F.max_by``; when ``sort_col`` is a list, ordering uses a struct of those
+    columns (lexicographic comparison).
+
+    Parameters
+    ----------
+    df : DataFrame
+        Input DataFrame, typically containing multiple versions of the same
+        entity keyed by ``key_cols``.
+    key_cols : list of str
+        Column names that define the deduplication grain (group-by keys).
+    cols : list of str
+        Columns to consider when building the output. When empty, all columns
+        in ``df`` are used. ``key_cols`` and ``sort_col`` entries are excluded
+        from the payload passed to ``max_by`` and re-added from the group keys.
+    sort_col : str or list of str
+        Column(s) used to rank rows within each group; the row with the
+        maximum value is kept. A list enables multi-column tie-breaking.
+
+    Returns
+    -------
+    DataFrame
+        One row per distinct combination of ``key_cols``, with value columns
+        taken from the latest version according to ``sort_col``.
+
+    Raises
+    ------
+    ValueError
+        If ``sort_col`` is neither a string nor a list of strings.
+    """
+    if not cols:
+        cols = list(df.columns)
+
+    if isinstance(sort_col, str):
+        sort_cols_list = [sort_col]
+        order_expr = F.col(sort_col)
+    elif isinstance(sort_col, list):
+        sort_cols_list = list(sort_col)
+        order_expr = F.struct(*[F.col(c) for c in sort_col])
+    else:
+        raise ValueError(f"Incorrect value for sort_col = {sort_col!r}")
+
+    exclude = set(key_cols) | set(sort_cols_list)
+    value_cols = [c for c in cols if c not in exclude]
+    cols_expr = F.struct(*[F.col(c) for c in value_cols])
+
+    return (
+        df.groupBy(*key_cols)
+        .agg(F.max_by(cols_expr, order_expr).alias("latest"))
+        .select(*key_cols, "latest.*")
+    )
+
+
+def _complete_dataframe_schema(df: DataFrame, target_schema: List[str]) -> DataFrame:
+    """
+    Align a DataFrame to an expected column list, filling gaps with nulls.
+
+    For each name in ``target_schema`` that is absent from ``df``, adds a
+    column set to SQL NULL (``F.lit(None)``). Then projects ``df`` to exactly
+    ``target_schema`` in that order, dropping any extra columns. Intended as a
+    shared SST helper (e.g. before ``unionByName``) whenever two DataFrames must
+    share the same layout but only one side has all fields populated.
+
+    Parameters
+    ----------
+    df : DataFrame
+        Input DataFrame to normalize.
+    target_schema : list of str
+        Desired column names and order. Existing columns are kept as-is;
+        missing names are added as null.
+
+    Returns
+    -------
+    DataFrame
+        ``df`` with one column per entry in ``target_schema``, in the same order.
+        Columns not listed in ``target_schema`` are omitted.
+
+    See Also
+    --------
+    safe_union_with_target_schema : Completes both sides then unions by name.
+    """
+    missing_cols = [column for column in target_schema if column not in df.columns]
+    for column in missing_cols:
+        df = df.withColumn(column, F.lit(None))
+    return df.select(*target_schema)
+
+
+def safe_union_with_target_schema(
+    left_df: DataFrame, right_df: DataFrame, target_schema: List[str]
+) -> DataFrame:
+    """
+    Union two DataFrames after aligning both to the same column layout.
+
+    Each input is passed through :func:`_complete_dataframe_schema` so missing
+    columns are added as null and column order matches ``target_schema``. The
+    result is ``left_df.unionByName(right_df)``, which stacks rows by column
+    name instead of position. Use this whenever two SST sources (e.g. a new
+    batch and historical rows) must be combined but do not share identical
+    schemas.
+
+    Parameters
+    ----------
+    left_df : DataFrame
+        First DataFrame in the union (row order preserved relative to Spark's
+        ``unionByName`` semantics).
+    right_df : DataFrame
+        Second DataFrame in the union.
+    target_schema : list of str
+        Canonical column names and order applied to both sides before the union.
+
+    Returns
+    -------
+    DataFrame
+        All rows from ``left_df`` followed by all rows from ``right_df``, with
+        columns exactly ``target_schema``.
+
+    See Also
+    --------
+    _complete_dataframe_schema : Adds null columns and projects to ``target_schema``.
+    """
+    left_df = _complete_dataframe_schema(left_df, target_schema).select(*target_schema)
+    right_df = _complete_dataframe_schema(right_df, target_schema).select(
+        *target_schema
+    )
+    return left_df.unionByName(right_df)
+
+
 @logger(exclude=["spark"], exclude_return=True)
 def validate_partition_readability(
-    spark,
-    target_table: str,
-    partition_date: str,
+    spark, target_table: str, partition_date: str
 ) -> None:
     (
         spark.read.table(target_table)

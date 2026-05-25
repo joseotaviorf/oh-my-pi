@@ -1,0 +1,217 @@
+target_schema: core_support_journey
+target_table: cases
+partition_cols: ["partition_date", "partition_hour"]
+merge_on: ["id_event"]
+when_matched_update_condition: "source.partition_date = target.partition_date AND source.partition_hour = target.partition_hour"
+
+sources:
+  case:
+    table_name: "datalake_salesforce_clean.events_case"
+    key_cols: ["id_record"]
+    sort_col: ["committed_at"]
+    cols:
+      [
+        "id_case",
+        "id_account",
+        "id_owner",
+        "id_created_by",
+        "id_last_modified_by",
+        "case_number",
+        "event_type",
+        "type",
+        "status",
+        "reason",
+        "origin",
+        "subject",
+        "priority",
+        "description",
+        "is_closed",
+        "created_date",
+        "last_modified_date",
+        "closed_date",
+        "committed_at",
+        "partition_date",
+        "partition_hour",
+        "ts_load",
+      ]
+  record_types:
+    table_name: "datalake_salesforce_clean.record_types"
+    key_cols: ["id_record_type"]
+    sort_col: ["ts_last_modified"]
+    cols: ["record_type_name", "developer_name"]
+  case_milestones:
+    table_name: "datalake_salesforce_clean.case_milestones"
+    key_cols: ["id_case"]
+    sort_col: ["ts_last_modified"]
+    cols:
+      [
+        "id_case_milestone",
+        "target_response_in_mins",
+        "target_response_in_hrs",
+        "target_response_in_days",
+        "time_remaining_in_mins",
+        "time_remaining_in_hrs",
+        "time_remaining_in_days",
+        "elapsed_time_in_mins",
+        "elapsed_time_in_hrs",
+        "elapsed_time_in_days",
+        "time_since_target_in_mins",
+        "time_since_target_in_hrs",
+        "time_since_target_in_days",
+        "dt_start",
+        "dt_target",
+        "dt_completion",
+      ]
+
+schema:
+  columns:
+    id_case:
+      type: string
+      required: true
+    id_event:
+      type: string
+      required: true
+    bk_case_event:
+      type: string
+      required: true
+    id_account:
+      type: string
+      required: true
+    id_owner:
+      type: string
+      required: true
+    id_created_by:
+      type: string
+      required: true
+    id_last_modified_by:
+      type: string
+      required: true
+    commit_number:
+      type: bigint
+      required: true
+    case_number:
+      type: int
+      required: true
+    event_type:
+      type: string
+      required: true
+    type:
+      type: string
+      required: true
+    status:
+      type: string
+      required: true
+    reason:
+      type: string
+      required: true
+    origin:
+      type: string
+      required: true
+    subject:
+      type: string
+      required: true
+    priority:
+      type: string
+      required: true
+    description:
+      type: string
+      required: true
+    is_closed:
+      type: boolean
+      required: true
+    is_deleted:
+      type: boolean
+      required: true
+    created_date:
+      type: timestamp
+      required: true
+    last_modified_date:
+      type: timestamp
+      required: true
+    closed_date:
+      type: timestamp
+      required: true
+    committed_at:
+      type: timestamp
+      required: true
+    record_type_name:
+      type: string
+      required: true
+    developer_name:
+      type: string
+      required: true
+    id_case_milestone:
+      type: string
+      required: true
+    target_response_in_mins:
+      type: int
+      required: true
+    target_response_in_hrs:
+      type: int
+      required: true
+    target_response_in_days:
+      type: int
+      required: true
+    time_remaining_in_mins:
+      type: int
+      required: true
+    time_remaining_in_hrs:
+      type: int
+      required: true
+    time_remaining_in_days:
+      type: int
+      required: true
+    elapsed_time_in_mins:
+      type: int
+      required: true
+    elapsed_time_in_hrs:
+      type: int
+      required: true
+    elapsed_time_in_days:
+      type: int
+      required: true
+    time_since_target_in_mins:
+      type: int
+      required: true
+    time_since_target_in_hrs:
+      type: int
+      required: true
+    time_since_target_in_days:
+      type: int
+      required: true
+    dt_start:
+      type: timestamp
+      required: true
+    dt_target:
+      type: timestamp
+      required: true
+    dt_completion:
+      type: timestamp
+      required: true
+    partition_date:
+      type: string
+      required: true
+    partition_hour:
+      type: int
+      required: true
+    _created_at:
+      type: timestamp
+      required: true
+    _updated_at:
+      type: timestamp
+      required: true
+    _effective_timestamp:
+      type: timestamp
+      required: true
+    _expired_timestamp:
+      type: timestamp
+      required: true
+    _is_current:
+      type: boolean
+      required: true
+    _ts_load:
+      type: timestamp
+      required: true
+min_columns: 49
+max_columns: 49
+strict: true

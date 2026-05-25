@@ -1,0 +1,21 @@
+webhook_salesforce_cdc: WEBHOOK_SALESFORCE_CDC_PROD
+
+dag_documentation:
+  dag_purpose: |
+    Builds Support Journey core model tables from Salesforce clean sources.
+    One Databricks task per YAML spec under ``tables/``.
+
+datalake_bucket: "5a-datalake-prod"
+
+dependencies:
+  bietlejuice.salesforce:
+    - load-clean-record-types
+    - load-clean-case-milestones
+  bietlejuice.salesforce_cdc:
+    - load_datalake_salesforce_clean_events_case
+
+cluster:
+  type: databricks_16_4_min_general_2_workers_cluster
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE

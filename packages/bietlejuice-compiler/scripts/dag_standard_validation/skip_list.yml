@@ -20,6 +20,7 @@ dags_not_using_builder:
   - for_sale/reverse_dsat_report_load/reverse_dsat_report_load.py
   - governance/composer/composer.py
   - governance/dataset_profiling/dataset_profiling.py
+  - core/core_support_journey/core_support_journey.py
   - growth/amplitude_demand/amplitude_demand.py
   - growth/amplitude_supply/amplitude_supply.py
   - growth/amplitude/amplitude.py

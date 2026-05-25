@@ -13,6 +13,7 @@ dags_out_of_pattern:
         "core_house",
         "core_offer",
         "core_region",
+        "core_support_journey",
         "core_visit",
         "cyber",
         "cyber_complement",
