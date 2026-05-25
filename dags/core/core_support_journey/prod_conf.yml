@@ -14,8 +14,18 @@ dependencies:
   bietlejuice.salesforce_cdc:
     - load_datalake_salesforce_clean_events_case
 
-cluster:
-  type: databricks_16_4_min_general_2_workers_cluster
+custom_cluster:
+  driver_node_type_id: c5a.2xlarge
+  node_type_id: c5a.2xlarge
+  num_workers: 2
+  spark_version: 16.4.x-scala2.12
+
+  spark_conf:
+    spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
+    spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
+    spark.executor.heartbeatInterval: "100s"
+    spark.network.timeout: "600s"
+    spark.metrics.appStatusSource.enabled: "true"
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
