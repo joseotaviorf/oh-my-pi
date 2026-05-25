@@ -26,6 +26,6 @@ cluster:
   type: emr_7_12_min_general_2_workers_cluster
   custom_configurations:
     driver_node_type_id: m7a.xlarge
-    num_task_workers: 1
+    node_type_id: m7a.2xlarge
     spark_conf:
       spark.driver.maxResultSize: "0"
