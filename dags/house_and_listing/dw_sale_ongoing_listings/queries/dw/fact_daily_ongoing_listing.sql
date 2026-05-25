@@ -9,10 +9,8 @@ WITH amplitude_data AS (
     FROM
         datalake_search_session_event.search_session_event AS sse
     WHERE
-        sse.business_context = 'sale'
-        AND sse.year = {year}
-        AND sse.month = {month}
-        AND sse.day = {day}
+        MAKE_DATE(sse.year, sse.month, sse.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND sse.business_context = 'sale'
     GROUP BY
         1, 2, 3, 4
 ),
@@ -34,9 +32,7 @@ demand_data AS (
         dw_sale.dim_sale_event_type AS dset
             ON fsde.sk_event_type = dset.sk_event_type
     WHERE
-        fsde.year = {year}
-        AND fsde.month = {month}
-        AND fsde.day = {day}
+        MAKE_DATE(fsde.year, fsde.month, fsde.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     GROUP BY 1, 2, 3, 4
 ),
 status_changes_aux AS (
@@ -89,10 +85,8 @@ daily_ongoing_listings AS (
         dw_public.dim_date AS dd
             ON dd.`date` BETWEEN sc.ts_status_started::DATE AND COALESCE(sc.ts_status_ended::DATE, NOW())
     WHERE
-        sc.status = 'PUBLISHED'
-        AND dd.year = {year}
-        AND dd.month = {month}
-        AND dd.day = {day}
+        MAKE_DATE(dd.year, dd.month, dd.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND sc.status = 'PUBLISHED'
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY sc.sk_house, dd.`date` ORDER BY sc.ts_status_started DESC)
 )
