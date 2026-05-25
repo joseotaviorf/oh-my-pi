@@ -397,6 +397,12 @@ Mixing the two without splitting hides which effect (server default vs ranking) 
 - **Fanout warning**: 1 row per house in each search event; SSR searches return ~11 houses each. Use `COUNT(DISTINCT sk_search)` or `COUNT(DISTINCT sk_session)` for "distinct searches / sessions" rather than `COUNT(*)`.
 - For the SSR vs Client Search distinction and its impact on ranking-vs-exposure analytics, see the "Listings — Visibility and Demand on 3P Supply" section.
 
+### Recs (N:N via listing visibility and downstream demand)
+
+- Recommendation exposures live in `datalake_search.recs_impressions_processed` and can be connected by house grain to listing visibility analyses in this entity (`sk_house` on Marketplace/search-side tables).
+- Use the recs entity doc for recommendation-specific routing, attribution windows, and metric-table usage: [`recs.md`](./recs.md).
+- When comparing recs visibility against search visibility, keep grain explicit: recs is impression-level by recset/listing, while search tables fan out by search result events.
+
 ### Visits (1:N — two paths: supply broker and demand broker)
 
 - `dim_broker.sk_broker = dw_sale_visits.fact_visits.sk_broker_supply` or `... = .sk_broker_demand` (filter `<> -1`).

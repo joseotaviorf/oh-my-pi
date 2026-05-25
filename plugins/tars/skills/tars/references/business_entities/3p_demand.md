@@ -403,6 +403,12 @@ Use this to assess broker-demand operational quality on 3P transactions (cross w
 - `fact_visits.sk_broker_supply = dw_brokers.dim_broker.sk_broker` for cross-broker transactions (`is_3p_demand AND is_3p_supply`).
 - Full broker context — products, status / tier / account-manager / profile / integrator history, agents 3P, the eight-row business-model matrix — lives in [`broker_xp.md`](./broker_xp.md).
 
+### Recs (N:1 via user-house pre-funnel exposure)
+
+- Recommendation exposure and attribution live in `datalake_search` tables and can be bridged to demand outcomes using user-house keys before/alongside this funnel.
+- Use [`recs.md`](./recs.md) when the question starts at recommendation exposure/click and then asks about downstream Demand funnel stages (visit, offer, CCV).
+- Keep attribution semantics explicit: recs conversion windows (for example 14-day flags) are recommendation-attributed metrics, not the full demand-side funnel denominator.
+
 ### 3P Supply (N:1 — same Marketplace, opposite side)
 
 - The supply-side counterpart of this funnel. Bridge via `sk_house` between `fact_visits` / `fact_offers` and `dw_3p_supply.fact_lead_3p_flows`.
