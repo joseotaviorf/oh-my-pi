@@ -76,5 +76,4 @@ workflow:
     unresolved_earnings: {}
     user_revision_entity: {}
 cluster:
-  type: databricks_16_4_small_general_fleet_2xlarge_single_node
-  databricks_conn_id: databricks_new
+  type: emr_7_12_min_driver_2xlarge_workers_1_task_cluster

@@ -1968,6 +1968,18 @@ emr_7_12_small_general_2xlarge_2_workers_cluster:
         ebs_volume_size: 200
         availability: ON_DEMAND
 
+# m7a.xlarge driver + m7a.2xlarge workers; 1 CORE + 1 TASK (SPOT)
+emr_7_12_min_driver_2xlarge_workers_1_task_cluster:
+    <<: *emr_cluster_anchor
+    driver_node_type_id: m7a.xlarge
+    node_type_id: m7a.2xlarge
+    num_workers: 2
+    num_task_workers: 1
+    aws_attributes:
+        <<: *emr_aws_anchor
+        ebs_volume_size: 200
+        availability: ON_DEMAND
+
 emr_7_12_min_general_2_workers_cluster:
     <<: *emr_cluster_anchor
     node_type_id: m7a.xlarge
