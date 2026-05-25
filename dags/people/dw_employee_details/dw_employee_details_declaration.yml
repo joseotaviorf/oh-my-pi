@@ -39,9 +39,6 @@ workflow:
     dim_event_definition:
       vacuum_retention_hours: 168
       vacuum_lite: true
-    dim_absence_type:
-      vacuum_retention_hours: 168
-      vacuum_lite: true
     dim_contact:
       vacuum_retention_hours: 168
       vacuum_lite: true
@@ -55,11 +52,5 @@ workflow:
       vacuum_retention_hours: 168
       vacuum_lite: true
     dim_employee:
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-    fact_vacation_balances:
-      vacuum_retention_hours: 168
-      vacuum_lite: true
-    fact_absence_requests:
       vacuum_retention_hours: 168
       vacuum_lite: true

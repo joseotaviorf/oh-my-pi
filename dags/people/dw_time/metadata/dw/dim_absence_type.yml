@@ -1,4 +1,4 @@
-database_name: dw_employee_details
+database_name: dw_time
 table_name: dim_absence_type
 owner: isabella.araujo@quintoandar.com.br
 domain: People

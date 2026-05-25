@@ -23,7 +23,7 @@
 
 ## Description
 
-The **`dw_time`** schema is the People Data Warehouse home for **workforce time and attendance** facts sourced from the company’s **time integration** (requests, approvals, hours-bank balances, and salary-rate segments used for operational analytics). It is built for **approval SLAs**, **hours-bank** reporting, and **cross-functional** views that combine **who** (PIN), **where** (cost center and vertical from the org model), and **who approves** (management hierarchy)—without replacing **payroll** or **PIN** as the systems of record for pay and master data.
+The **`dw_time`** schema is the People Data Warehouse home for **workforce time and attendance** analytics. It combines the **time integration** (Oitchau requests, approvals, hours-bank balances, salary-rate segments) with **Oracle HCM PIN absence** models (absence types, absence requests, vacation balances). It is built for **approval SLAs**, **hours-bank** reporting, **absence and vacation** analytics, and **cross-functional** views that combine **who** (PIN), **where** (cost center and vertical from the org model), and **who approves** (management hierarchy)—without replacing **payroll** or **PIN** as the systems of record for pay and master data.
 
 ## Scope
 
@@ -35,13 +35,15 @@ The **`dw_time`** schema is the People Data Warehouse home for **workforce time 
 
 **✅ Hourly cost windows from the time product** — **`fact_employee_hourly_cost_windows`** for **order-of-magnitude** cost context tied to the integration’s salary segments (**compensation-sensitive**).
 
+**✅ PIN absence reference and facts** — **`dim_absence_type`** for absence category labels and policy flags (paid leave, performance protection); **`fact_absence_requests`** for Oracle HCM absence requests (vacation, sick leave, parental leave, etc.); **`fact_vacation_balances`** for vacation period balances (accrued, taken, available).
+
 **✅ People in scope** — **Employees** who appear in the **time integration** and are matched to **PIN**, so **approval pendencies** (volume, hierarchy, cost center) and **hours bank** (balances and estimated cost by org) both combine cleanly with **`dw_people`** and **`dw_organization`**—same idea as other People marts. **Test accounts** are excluded.
 
 ## Out of scope
 
 **❌ Official payroll results** — Gross pay, deductions, and final DSR calculations remain in **payroll** systems and downstream finance marts; use **`dw_time`** for **operational** and **estimated** views only.
 
-**❌ PIN absence workflows not mirrored in the time product** — Some absences or benefits may exist only in **PIN** or other HR flows; see **`dw_employee`** / **`dw_employee_details`** when the question is **PIN absence entries**, not Oitchau request lines.
+**❌ Legacy `dw_employee` absence copies** — The deprecated **`dw_employee`** mart still exposes absence tables for backward compatibility; prefer **`dw_time`** for new PIN absence analytics (see [DBP-1409](https://quintoandar.atlassian.net/browse/DBP-1409) for consumer migration).
 
 **❌ Full compensation history** — Salary bands, equity, and compensation policy history live in **`dw_compensation`**; join there only when the analysis explicitly requires compensation tables beyond the **hourly segment** in **`dw_time`**.
 
@@ -55,11 +57,14 @@ Explore schemas and column-level detail in **DataHub** (lineage and definitions)
 
 | Table | Explore in DataHub | Explore in GitHub |
 |-------|-------------------|-------------------|
+| `dim_absence_type` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.dim_absence_type,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/dim_absence_type.sql) |
 | `dim_hours_bank_rule` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.dim_hours_bank_rule,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/dim_hours_bank_rule.sql) |
 | `dim_request` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.dim_request,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/dim_request.sql) |
+| `fact_absence_requests` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_absence_requests,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_absence_requests.sql) |
 | `fact_employee_hourly_cost_windows` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_employee_hourly_cost_windows,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_employee_hourly_cost_windows.sql) |
 | `fact_hours_bank_rule_totals` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_hours_bank_rule_totals,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_hours_bank_rule_totals.sql) |
 | `fact_time_attendance_requests` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_time_attendance_requests,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_time_attendance_requests.sql) |
+| `fact_vacation_balances` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_vacation_balances,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_vacation_balances.sql) |
 
 ---
 
@@ -69,6 +74,9 @@ Explore schemas and column-level detail in **DataHub** (lineage and definitions)
 
 - **`fact_time_attendance_requests`:** One row per **request identifier** from the time product for employees in scope; each row carries **approval outcome**, **interval timestamps**, and keys to **subtype** and **employee**.
 - **`dim_request`:** One row per **request subtype** configuration (labels and defaults used for grouping “abono” vs “manual marking” style categories in the product).
+- **`dim_absence_type`:** One row per **Oracle HCM absence type** (labels, max duration, paid-leave and performance-protection flags).
+- **`fact_absence_requests`:** One row per **PIN absence request** (vacation, sick leave, parental leave, etc.) for employees in scope.
+- **`fact_vacation_balances`:** One row per **employee assignment per vacation period** with accrued, taken, and available days.
 - **`fact_hours_bank_rule_totals`:** One row per **employee** per **balance date** per **rule segment**; optional **estimated cost** when a matching **hourly rate window** exists.
 - **`fact_employee_hourly_cost_windows`:** One row per **hourly salary segment** per employee from the integration.
 - **`dim_hours_bank_rule`:** One row per **rule segment** reference for **labels** and policy metadata.

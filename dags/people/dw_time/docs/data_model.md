@@ -14,6 +14,9 @@ This file is the **technical companion** to [`dw_time.md`](dw_time.md). It is me
 |--------|------------------|
 | `fact_time_attendance_requests` | One row per workforce time **request** after mapping the employee to **PIN**; includes approval fields and interval timestamps. |
 | `dim_request` | One row per **request subtype** from the time product (labels, paid default, DSR-related default). |
+| `dim_absence_type` | One row per **Oracle HCM absence type** (name, max duration, paid-leave and performance-protection flags). |
+| `fact_absence_requests` | One row per **PIN absence request** for employees in scope (approval and validity flags, date range). |
+| `fact_vacation_balances` | One row per **employee assignment per vacation period** (accrued, taken, balance). |
 | `fact_employee_hourly_cost_windows` | One row per **hourly salary segment** from the time integration (valid between segment dates). |
 | `fact_hours_bank_rule_totals` | One row per employee per **balance date** per **hours-bank rule key**; optional **estimated cost** when a rate window applies. |
 | `dim_hours_bank_rule` | One row per **rule segment** reference for labeling hours-bank lines. |
@@ -36,6 +39,25 @@ erDiagram
         string subtype_name
         boolean is_discount_dsr
     }
+    dim_absence_type {
+        string sk_absence_type
+        string absence_type
+        boolean is_paid_leave
+        boolean is_performa_protected
+    }
+    fact_absence_requests {
+        string sk_absence_request
+        string sk_absence_type
+        string person_number
+        date dt_absence_started
+        date dt_absence_ended
+    }
+    fact_vacation_balances {
+        string sk_vacation_balance
+        string person_number
+        string assignment_number
+        decimal days_balance
+    }
     fact_hours_bank_rule_totals {
         string sk_employee
         date dt_hours_bank_balanced
@@ -53,6 +75,7 @@ erDiagram
         date dt_hourly_cost_segment_ended
     }
     fact_time_attendance_requests ||--o{ dim_request : "subtype"
+    fact_absence_requests ||--o{ dim_absence_type : "absence type"
     fact_hours_bank_rule_totals ||--o{ dim_hours_bank_rule : "rule label"
     fact_hours_bank_rule_totals }o--o| fact_employee_hourly_cost_windows : "optional rate"
 ```
@@ -76,6 +99,8 @@ erDiagram
 
 - **Approvals with org slice for the request month:** `fact_time_attendance_requests` → **`dw_people.fact_employees`** on **`sk_employee`** and **`dt_reference = LAST_DAY(TO_DATE(ts_interval_started))`** → **`dw_organization.dim_cost_center`** on **`sk_cost_center_version`**.
 - **Approvals with direct manager:** `fact_time_attendance_requests` → **`dw_people.dim_management_hierarchy`** on **`person_number`**.
+- **PIN absence requests with type labels:** `fact_absence_requests` → **`dim_absence_type`** on **`sk_absence_type`**; join **`dw_people`** on **`person_number`** for employee context.
+- **Vacation balance by assignment:** `fact_vacation_balances` on **`person_number`** and **`assignment_number`**; filter **`is_latest_period = TRUE`** for current period.
 - **Order-of-magnitude payroll risk from bank balances:** `fact_hours_bank_rule_totals` **LEFT JOIN** **`dim_hours_bank_rule`** on **`sk_hours_bank_rule`**; use **`estimated_balance_cost_amount`** and subtype flags from **`dim_request`** only when the analysis is explicitly tied to **request lines**, not as a substitute for payroll.
 
 ---

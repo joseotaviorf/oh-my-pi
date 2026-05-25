@@ -4,11 +4,11 @@ dag:
   schedule_start_date: 2026, 4, 29
   documentation:
     dag_purpose: |
-      People Data Warehouse schema dw_time for time-and-attendance facts (hours-bank balances and operational request
-      lines sourced from the workforce time integration). Dimensions cover hours-bank rule slices and request subtypes;
-      facts expose balances (with optional hourly rate and estimated cost denormalized on fact_hours_bank_rule_totals),
-      fact_employee_hourly_cost_windows for Oitchau salary-rate segments sourced from datalake_oitchau_clean.employee_costs
-      (Integrations API costs endpoint), and fact_time_attendance_requests for approvals and scheduling analytics.
+      People Data Warehouse schema dw_time for workforce time and attendance analytics. Covers Oitchau integration
+      (hours-bank balances, operational request lines, hourly cost windows) and Oracle HCM PIN absence models
+      (dim_absence_type, fact_absence_requests, fact_vacation_balances). Dimensions include hours-bank rule slices,
+      request subtypes, and absence type reference; facts expose balances, approval workflows, vacation balances,
+      and optional estimated cost on fact_hours_bank_rule_totals.
 
 cluster:
   type: databricks_16_4_small_memory_people_cluster
@@ -40,7 +40,12 @@ workflow:
       - fact_employee_hourly_cost_windows
     fact_time_attendance_requests:
       - dim_request
+    fact_absence_requests:
+      - dim_absence_type
   tables_customization:
+    dim_absence_type:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
     dim_hours_bank_rule:
       vacuum_retention_hours: 168
       vacuum_lite: true
@@ -54,5 +59,11 @@ workflow:
       vacuum_retention_hours: 168
       vacuum_lite: true
     fact_time_attendance_requests:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    fact_vacation_balances:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    fact_absence_requests:
       vacuum_retention_hours: 168
       vacuum_lite: true

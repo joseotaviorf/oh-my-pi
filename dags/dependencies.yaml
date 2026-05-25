@@ -715,12 +715,8 @@ bietlejuice.dw_employee_details:
   - bietlejuice.enrich_people:load-enrich-event-definition:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-management-hierarchy:first-run-of-day
-  - bietlejuice.pin_absence:load-clean-person-entry:first-run-of-day
-  - bietlejuice.pin_absence:load-clean-type-translation:first-run-of-day
-  - bietlejuice.pin_absence:load-clean-type:first-run-of-day
   - bietlejuice.pin_core:load-clean-address:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-people:first-run-of-day
-  - bietlejuice.pin_core:load-clean-assignment-extra-info:first-run-of-day
   - bietlejuice.pin_core:load-clean-email-address:first-run-of-day
   - bietlejuice.pin_core:load-clean-foundation-lookup-value:first-run-of-day
   - bietlejuice.pin_core:load-clean-national-identifiers:first-run-of-day
@@ -1361,6 +1357,10 @@ bietlejuice.dw_time:
   - bietlejuice.oitchau_api:load-clean-hoursbank-totals:first-run-of-day
   - bietlejuice.oitchau_api:load-clean-requests-types-subtypes:first-run-of-day
   - bietlejuice.oitchau_api:load-clean-requests:first-run-of-day
+  - bietlejuice.pin_absence:load-clean-person-entry:first-run-of-day
+  - bietlejuice.pin_absence:load-clean-type-translation:first-run-of-day
+  - bietlejuice.pin_absence:load-clean-type:first-run-of-day
+  - bietlejuice.pin_core:load-clean-assignment-extra-info:first-run-of-day
 bietlejuice.dw_user:
   - bietlejuice.amplitude_subpartitioned:load-clean-283048-register-form-completed-events:first-run-of-day
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day

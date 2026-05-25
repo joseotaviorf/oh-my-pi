@@ -1,5 +1,5 @@
 ---
-table_name: dw_employee_details.dim_absence_type
+table_name: dw_time.dim_absence_type
 alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
