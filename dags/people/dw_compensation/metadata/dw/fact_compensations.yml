@@ -12,8 +12,11 @@ description: |
   - Tracks salary changes over time with full history
   - Splits rows when assignment job changes, even without salary change
   - Links to dim_employee and dim_assignment (contract) for employee context
-  - Links to dim_job for job-level compensation targets based on assignment job at date
+  - Links to dim_job (via sk_job_version) for downstream joins; job attributes are read from
+    datalake_people.job_with_salary_table (RVV, SOP, hiring SOP, exceptional bonus, band)
   - Links to dim_event_definition for action/reason context
+  - Reads PLR targets (multiplier or fixed amount) exclusively from person-level Oracle HCM
+    ICP entries; employees without an ICP entry have NULL PLR (no fallback to dim_job)
   - Calculates amount_total_cash including PLR targets (RVV and SOP to be included)
   - Identifies promotion movements based on action codes
   Use cases:
@@ -42,14 +45,18 @@ columns:
     lineage:
       - datalake_pin_compensation_clean.salary.id_assignment
   sk_job_version:
-    description: Foreign key to dim_job. References the job version at the time of the salary record.
+    description: |
+      Foreign key to dim_job. References the job version at the time of the salary record.
+      Computed with the same MD5(id_job, dt_valid_from) formula as dim_job from
+      datalake_people.job_with_salary_table.
     lineage:
-      - dw_compensation.dim_job.sk_job_version
+      - datalake_people.job_with_salary_table.id_job
+      - datalake_people.job_with_salary_table.dt_valid_from
   sk_event_definition:
     description: |
       Foreign key to dim_event_definition.
       Unified identifier for the action and reason that triggered this compensation change.
-      NULL on rows created by dim_job or assignment history version splits
+      NULL on rows created by job-version or assignment history version splits
       (only populated on the originating row where the salary actually changed).
     lineage:
       - datalake_people.event_definition.id_event_definition
@@ -65,6 +72,15 @@ columns:
     description: Currency code for salary amounts (e.g., BRL, USD, MXN).
     lineage:
       - datalake_pin_compensation_clean.salary.currency_code
+  plr_target_currency_code:
+    description: |
+      Currency of the fixed-amount PLR target (target_plr) when sourced from a
+      person-level "Annual Target - PLR" / "Annual Target - PLR (Dolar)" ICP entry.
+      NULL when the PLR target is a multiplier ("PLR - Salary Multiple", which is
+      dimensionless) or when the employee has no active ICP entry. Useful to flag
+      currency mismatch against currency_code.
+    lineage:
+      - datalake_pin_compensation_clean.element_type.input_currency_code
   amount_salary:
     description: Salary amount based on the salary basis frequency (e.g., monthly salary).
     lineage:
@@ -75,28 +91,35 @@ columns:
       - datalake_pin_compensation_clean.salary.annual_salary
   amount_total_cash:
     description: |
-      Total cash compensation including annual salary and PLR.
-      Calculated as: 
-        annual_salary 
-        + (salary_amount × target_plr_salary_multiplier) for LATAM
-        + target_plr for Brasil
-      Note: SOP, RVV and exceptional bonus are excluded for now.
+      Total cash compensation including annual salary and PLR target.
+      Calculated as:
+        annual_salary
+        + (salary_amount × target_plr_salary_multiplier) when the person has a
+          "PLR - Salary Multiple" ICP entry (current model)
+        + target_plr when the person has an "Annual Target - PLR(*)" ICP entry
+          (legacy model, kept for older contracts)
+      PLR target is read exclusively from person-level Oracle HCM ICP entries
+      (datalake_pin_compensation_clean.element_*); employees without an ICP entry
+      have NULL PLR and amount_total_cash equals annual_salary.
+      Note: SOP, RVV and exceptional bonus are excluded for now. Currency mismatch
+      between PLR target and salary (e.g. "Annual Target - PLR (Dolar)" in USD vs
+      salary in ARS) is not reconciled in this calculation; see plr_target_currency_code.
     lineage:
       - datalake_pin_compensation_clean.salary.annual_salary
       - datalake_pin_compensation_clean.salary.salary_amount
-      - dw_compensation.dim_job.target_plr
-      - dw_compensation.dim_job.target_plr_salary_multiplier
+      - datalake_pin_compensation_clean.element_entry_value.screen_entry_value
+      - datalake_pin_compensation_clean.element_type.element_name
   amount_adjustment:
     description: |
       Monetary amount of the salary adjustment (difference from previous salary).
-      NULL on rows created by dim_job or assignment history version splits
+      NULL on rows created by job-version or assignment history version splits
       (only populated on the originating row where the salary actually changed).
     lineage:
       - datalake_pin_compensation_clean.salary.adjustment_amount
   pct_adjustment:
     description: |
       Percentage increase of the salary adjustment over the base salary value.
-      NULL on rows created by dim_job or assignment history version splits
+      NULL on rows created by job-version or assignment history version splits
       (only populated on the originating row where the salary actually changed).
     lineage:
       - datalake_pin_compensation_clean.salary.adjustment_percent
@@ -123,7 +146,7 @@ columns:
       Based on reason_code = 'CMP_PROM' from event_definition, which is more
       precise than the broad action_code = 'PROMOTION' (which also includes
       lateral moves, internal recruitment, and other non-promotion movements).
-      Always FALSE on rows created by dim_job or assignment history version splits
+      Always FALSE on rows created by job-version or assignment history version splits
       (event metadata is only attributed to the originating salary change row).
     lineage:
       - datalake_people.event_definition.reason_code
@@ -156,7 +179,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_assignments.dt_effective_started
       - datalake_people.identifier_mapping.id_continuous_employment_cycle
-      - dw_compensation.dim_job.band
+      - datalake_people.job_with_salary_table.band
   months_tenure_in_company:
     description: |
       Tenure in the company in whole months.
@@ -175,7 +198,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_assignments.dt_effective_started
       - datalake_people.identifier_mapping.id_continuous_employment_cycle
-      - dw_compensation.dim_job.band
+      - datalake_people.job_with_salary_table.band
   dt_valid_from:
     description: Start date of validity for this salary record (SCD Type 2).
     lineage:

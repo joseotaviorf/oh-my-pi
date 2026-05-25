@@ -28,7 +28,6 @@ workflow:
     people-team: ["ALL PRIVILEGES"]
   inner_dependencies:
     fact_compensations:
-      - dim_job
       - dim_event_definition
     fact_salary_table_targets:
       - dim_job

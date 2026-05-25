@@ -374,6 +374,10 @@ bietlejuice.dw_compensation:
   - bietlejuice.enrich_people:load-enrich-event-definition:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-job-with-salary-table:first-run-of-day
+  - bietlejuice.pin_compensation:load-clean-element-entry-value:first-run-of-day
+  - bietlejuice.pin_compensation:load-clean-element-entry:first-run-of-day
+  - bietlejuice.pin_compensation:load-clean-element-input-value:first-run-of-day
+  - bietlejuice.pin_compensation:load-clean-element-type:first-run-of-day
   - bietlejuice.pin_compensation:load-clean-salary:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
 bietlejuice.dw_condo_monitoring:

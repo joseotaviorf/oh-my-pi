@@ -1,9 +1,9 @@
 /*
  * fact_compensations — grain and design notes
  *
- * Grain: one row per approved salary record × assignment job period × dim_job validity window.
+ * Grain: one row per approved salary record × assignment job period × job validity window.
  * A single salary entry can produce multiple rows when the employee's job changes mid-salary
- * or when dim_job receives a new SCD2 version while the salary is still open.
+ * or when job_with_salary_table receives a new SCD2 version while the salary is still open.
  *
  * Transfer-continuation:
  *   All GLB_TRANSFER continuity logic lives in datalake_people.identifier_mapping.
@@ -16,8 +16,18 @@
  *   - Position: start of the current job stint within the cycle (gaps-and-islands on id_job).
  *               A→B→A returns a stint from the return date, not the original start.
  *   - Band    : start of the current band stint within the cycle (gaps-and-islands on band
- *               from dim_job). Band can be < position when a job is reclassified to a
- *               different band without the employee changing roles (dim_job SCD2 update).
+ *               from job_with_salary_table). Band can be < position when a job is reclassified
+ *               to a different band without the employee changing roles (job SCD2 update).
+ *
+ * PLR target source:
+ *   target_plr and target_plr_salary_multiplier are read exclusively from person-level
+ *   Oracle HCM ICP element entries (datalake_pin_compensation_clean.element_*). A person
+ *   without an active ICP entry has NULL targets — there is no fallback to dim_job, since
+ *   the ICP migration is complete and the dim_job columns only carry the legacy default
+ *   for the job, not whether a specific person should receive it. Two PLR shapes coexist:
+ *   "PLR - Salary Multiple" (multiplier of salary, current model) and
+ *   "Annual Target - PLR" / "Annual Target - PLR (Dolar)" (fixed annual amount, legacy
+ *   model kept for employees on contracts created before the multiplier rollout).
  *
  * CTE pipeline:
  *   [assignment chain]
@@ -25,16 +35,31 @@
  *     assignment_history_base         — all_assignments deduplicated per (assignment, date range)
  *     assignment_job_groups           — detect job changes within an assignment (gaps-and-islands)
  *     assignment_history              — one row per continuous job period per assignment
- *     assignment_history_with_band    — enrich assignment history with band from dim_job
+ *     job_with_salary_table_effective — job SCD2 versions from enrich (sk_job_version aligned with dim_job)
+ *     assignment_history_with_band    — enrich assignment history with band from job_with_salary_table
  *     assignment_job_stint_groups     — detect job change across assignments within same cycle
  *     job_tenure_start                — one row per (person, cycle, job, stint)
  *     assignment_band_stint_groups    — detect band change across assignments within same cycle
  *     band_tenure_start               — one row per (person, cycle, band, stint)
  *
+ *   [person-level PLR chain]
+ *     person_plr_base                 — ICP element entries joined to type/input; intersected validity
+ *     person_plr_multiplier_ranked    — row_number by (id_person, dt_valid_from) for multiplier
+ *     person_plr_multiplier           — base filtered to "PLR - Salary Multiple" (new model)
+ *     person_plr_amount_ranked        — row_number by (id_person, dt_valid_from) for fixed amount
+ *     person_plr_amount               — base filtered to "Annual Target - PLR(*)" (legacy fixed amount)
+ *
  *   [salary chain]
  *     salary_with_person              — approved salaries joined to identifier_mapping
  *     salary_with_assignment_job      — split salary periods by job changes
- *     salary_with_job_version         — split salary periods by dim_job SCD2 windows
+ *     salary_with_job_version         — split salary periods by job_with_salary_table SCD2 windows
+ *     salary_plr_boundary_salary_starts    — salary sub-period start dates
+ *     salary_plr_boundary_multiplier_*    — PLR multiplier validity edges
+ *     salary_plr_boundary_amount_*        — PLR fixed-amount validity edges
+ *     salary_plr_boundary_union           — all boundary rows combined
+ *     salary_plr_period_boundaries        — distinct boundary set per salary sub-period
+ *     salary_plr_periods              — rebuild contiguous sub-periods from boundaries
+ *     salary_with_plr_target          — attach multiplier and amount PLR via independent joins
  *     salary_enriched                 — attach event_definition; null adjustments on split rows
  *     salary_consolidation_base       — normalise NULL dt_ended to 4712-12-31
  *     salary_consolidation_groups     — detect consecutive identical salary records (gaps-and-islands)
@@ -178,26 +203,47 @@ assignment_history AS (
         id_job,
         change_group
 ),
+job_with_salary_table_effective AS (
+    -- Job SCD2 versions from enrich. sk_job_version uses the same MD5(id_job, dt_valid_from)
+    -- formula as dw_compensation.dim_job so downstream FK semantics stay unchanged.
+    SELECT
+        MD5(CONCAT_WS('|',
+            CAST(id_job AS STRING),
+            CAST(dt_valid_from AS STRING)
+        )) AS sk_job_version,
+        id_job,
+        band,
+        target_rvv,
+        target_sop,
+        target_hiring_sop,
+        target_exceptional_bonus,
+        dt_valid_from,
+        COALESCE(dt_valid_to, DATE('4712-12-31')) AS dt_valid_to
+    FROM
+        datalake_people.job_with_salary_table
+    WHERE
+        dt_valid_from <= CURRENT_DATE
+),
 assignment_history_with_band AS (
-    -- Enrich assignment history with the band from dim_job (SCD2).
-    -- Intersect date ranges so that a job reclassification (band change in dim_job without
-    -- the employee moving) creates a separate period for each band version.
+    -- Enrich assignment history with the band from job_with_salary_table (SCD2).
+    -- Intersect date ranges so that a job reclassification (band change without the employee
+    -- moving) creates a separate period for each band version.
     -- This means band tenure can be shorter than position tenure when the job is reclassified.
     SELECT
         ah.id_person,
         ah.id_continuous_employment_cycle,
-        GREATEST(ah.dt_effective_started, dj.dt_valid_from) AS dt_effective_started,
-        LEAST(ah.dt_effective_ended, dj.dt_valid_to) AS dt_effective_ended,
-        dj.band
+        GREATEST(ah.dt_effective_started, jst.dt_valid_from) AS dt_effective_started,
+        LEAST(ah.dt_effective_ended, jst.dt_valid_to) AS dt_effective_ended,
+        jst.band
     FROM
         assignment_history AS ah
     INNER JOIN
-        dw_compensation.dim_job AS dj
-            ON ah.id_job = dj.id_job
-            AND dj.dt_valid_from <= ah.dt_effective_ended
-            AND dj.dt_valid_to >= ah.dt_effective_started
+        job_with_salary_table_effective AS jst
+            ON ah.id_job = jst.id_job
+            AND jst.dt_valid_from <= ah.dt_effective_ended
+            AND jst.dt_valid_to >= ah.dt_effective_started
     WHERE
-        dj.band IS NOT NULL
+        jst.band IS NOT NULL
 ),
 assignment_job_max_end AS (
     -- Running MAX of dt_effective_ended across all preceding rows within the same
@@ -317,6 +363,109 @@ band_tenure_start AS (
         band,
         stint_group
 ),
+person_plr_base AS (
+    -- Person-level PLR target from Oracle HCM ICP (Individual Compensation Plans).
+    -- Filters by element_name to keep only PLR-related entries and by input_value_name = 'Amount'
+    -- to keep the numeric value (other input values like Periodicity and Full-Time Equivalent
+    -- carry orthogonal metadata, not the target value itself).
+    -- Validity = intersection of element_entry and element_entry_value effective dating;
+    -- Oracle's open-ended sentinel 4712-12-31 is normalised to 9999-12-31.
+    SELECT
+        ee.id_person,
+        et.element_name,
+        et.input_currency_code AS currency_code,
+        CAST(eev.screen_entry_value AS DECIMAL(18, 4)) AS plr_value,
+        GREATEST(ee.dt_effective_started, eev.dt_effective_started) AS dt_valid_from,
+        CASE
+            WHEN LEAST(ee.dt_effective_ended, eev.dt_effective_ended) >= DATE('4712-12-31')
+            THEN DATE('9999-12-31')
+            ELSE LEAST(ee.dt_effective_ended, eev.dt_effective_ended)
+        END AS dt_valid_to,
+        eev.ts_updated
+    FROM
+        datalake_pin_compensation_clean.element_entry AS ee
+    INNER JOIN
+        datalake_pin_compensation_clean.element_type AS et
+            ON ee.id_element_type = et.id_element_type
+            AND et.element_name IN (
+                'PLR - Salary Multiple',
+                'Annual Target - PLR',
+                'Annual Target - PLR (Dolar)'
+            )
+    INNER JOIN
+        datalake_pin_compensation_clean.element_entry_value AS eev
+            ON ee.id_element_entry = eev.id_element_entry
+            AND eev.dt_effective_started <= ee.dt_effective_ended
+            AND eev.dt_effective_ended >= ee.dt_effective_started
+    INNER JOIN
+        datalake_pin_compensation_clean.element_input_value AS eiv
+            ON eev.id_input_value = eiv.id_input_value
+            AND eiv.input_value_name = 'Amount'
+),
+person_plr_multiplier_ranked AS (
+    -- Rank PLR multiplier entries by (id_person, dt_valid_from) keeping the latest update.
+    -- Subquery + WHERE row_num = 1 instead of QUALIFY for EMR/Spark compatibility.
+    SELECT
+        id_person,
+        dt_valid_from,
+        dt_valid_to,
+        plr_value AS target_plr_salary_multiplier,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_person, dt_valid_from
+            ORDER BY ts_updated DESC
+        ) AS row_num
+    FROM
+        person_plr_base
+    WHERE
+        element_name = 'PLR - Salary Multiple'
+),
+person_plr_multiplier AS (
+    -- Salary-multiplier PLR target (new model). Defensive de-dup by (id_person, dt_valid_from)
+    -- keeping the latest update; overlapping entries with different element_name would be a
+    -- data error in PIN and should be corrected at the source by People Systems.
+    SELECT
+        id_person,
+        dt_valid_from,
+        dt_valid_to,
+        target_plr_salary_multiplier
+    FROM
+        person_plr_multiplier_ranked
+    WHERE
+        row_num = 1
+),
+person_plr_amount_ranked AS (
+    -- Rank PLR fixed-amount entries by (id_person, dt_valid_from) keeping the latest update.
+    -- Subquery + WHERE row_num = 1 instead of QUALIFY for EMR/Spark compatibility.
+    SELECT
+        id_person,
+        currency_code,
+        dt_valid_from,
+        dt_valid_to,
+        plr_value AS target_plr,
+        ROW_NUMBER() OVER (
+            PARTITION BY id_person, dt_valid_from
+            ORDER BY ts_updated DESC
+        ) AS row_num
+    FROM
+        person_plr_base
+    WHERE
+        element_name IN ('Annual Target - PLR', 'Annual Target - PLR (Dolar)')
+),
+person_plr_amount AS (
+    -- Fixed-amount PLR target (legacy model). currency_code follows the element_type
+    -- input_currency_code (BRL/EUR/MXN/ARS for "Annual Target - PLR"; USD for "Annual Target - PLR (Dolar)").
+    -- Currency mismatch against the salary currency is not reconciled here.
+    SELECT
+        id_person,
+        currency_code,
+        dt_valid_from,
+        dt_valid_to,
+        target_plr
+    FROM
+        person_plr_amount_ranked
+    WHERE
+        row_num = 1
+),
 salary_with_assignment_job AS (
     -- Split salary periods by assignment job changes.
     -- When an employee changes job mid-salary, the salary row is split so each sub-period
@@ -366,9 +515,10 @@ salary_with_assignment_job AS (
             AND assignment_history.dt_effective_ended > sal.dt_started
 ),
 salary_with_job_version AS (
-    -- Split salary periods by dim_job validity windows to keep current job-version attributes.
-    -- Each dim_job SCD2 version carries its own compensation targets (PLR, RVV, SOP),
-    -- so a salary open across multiple dim_job versions must be split accordingly.
+    -- Split salary periods by job_with_salary_table validity windows to keep current job-version
+    -- attributes. Each job SCD2 version carries its own compensation targets (RVV, SOP, hiring
+    -- SOP, exceptional bonus), so a salary open across multiple job versions must be split
+    -- accordingly. PLR targets come from person-level ICP entries in salary_with_plr_target.
     SELECT
         sal.id_salary,
         sal.id_person,
@@ -392,33 +542,235 @@ salary_with_job_version AS (
         sal.dt_salary_original_started,
         sal.id_job,
         CASE
-            WHEN dj.sk_job_version IS NULL
+            WHEN jst.sk_job_version IS NULL
             THEN sal.dt_started
-            ELSE GREATEST(sal.dt_started, dj.dt_valid_from)
+            ELSE GREATEST(sal.dt_started, jst.dt_valid_from)
         END AS dt_started,
         CASE
-            WHEN dj.sk_job_version IS NULL
+            WHEN jst.sk_job_version IS NULL
             THEN sal.dt_ended
-            ELSE LEAST(COALESCE(sal.dt_ended, DATE('4712-12-31')), dj.dt_valid_to)
+            ELSE LEAST(COALESCE(sal.dt_ended, DATE('4712-12-31')), jst.dt_valid_to)
         END AS dt_ended,
-        dj.sk_job_version,
-        dj.target_plr,
-        dj.target_plr_salary_multiplier,
-        dj.target_rvv,
-        dj.target_sop,
-        dj.target_hiring_sop,
-        dj.target_exceptional_bonus
+        jst.sk_job_version,
+        jst.target_rvv,
+        jst.target_sop,
+        jst.target_hiring_sop,
+        jst.target_exceptional_bonus
     FROM
         salary_with_assignment_job AS sal
     LEFT JOIN
-        dw_compensation.dim_job AS dj
-            ON sal.id_job = dj.id_job
-            AND dj.dt_valid_from <= COALESCE(sal.dt_ended, DATE('4712-12-31'))
-            AND dj.dt_valid_to >= sal.dt_started
+        job_with_salary_table_effective AS jst
+            ON sal.id_job = jst.id_job
+            AND jst.dt_valid_from <= COALESCE(sal.dt_ended, DATE('4712-12-31'))
+            AND jst.dt_valid_to >= sal.dt_started
+),
+salary_plr_boundary_salary_starts AS (
+    SELECT
+        id_salary,
+        id_assignment,
+        dt_started AS salary_period_start,
+        dt_started AS dt_boundary
+    FROM
+        salary_with_job_version
+),
+salary_plr_boundary_multiplier_starts AS (
+    SELECT
+        sal.id_salary,
+        sal.id_assignment,
+        sal.dt_started AS salary_period_start,
+        plr_mult.dt_valid_from AS dt_boundary
+    FROM
+        salary_with_job_version AS sal
+    INNER JOIN
+        person_plr_multiplier AS plr_mult
+            ON sal.id_person = plr_mult.id_person
+            AND plr_mult.dt_valid_from > sal.dt_started
+            AND plr_mult.dt_valid_from <= COALESCE(sal.dt_ended, DATE('4712-12-31'))
+),
+salary_plr_boundary_multiplier_ends AS (
+    SELECT
+        sal.id_salary,
+        sal.id_assignment,
+        sal.dt_started AS salary_period_start,
+        DATE_ADD(plr_mult.dt_valid_to, 1) AS dt_boundary
+    FROM
+        salary_with_job_version AS sal
+    INNER JOIN
+        person_plr_multiplier AS plr_mult
+            ON sal.id_person = plr_mult.id_person
+            AND plr_mult.dt_valid_to >= sal.dt_started
+            AND plr_mult.dt_valid_to < COALESCE(sal.dt_ended, DATE('4712-12-31'))
+),
+salary_plr_boundary_amount_starts AS (
+    SELECT
+        sal.id_salary,
+        sal.id_assignment,
+        sal.dt_started AS salary_period_start,
+        plr_amt.dt_valid_from AS dt_boundary
+    FROM
+        salary_with_job_version AS sal
+    INNER JOIN
+        person_plr_amount AS plr_amt
+            ON sal.id_person = plr_amt.id_person
+            AND plr_amt.dt_valid_from > sal.dt_started
+            AND plr_amt.dt_valid_from <= COALESCE(sal.dt_ended, DATE('4712-12-31'))
+),
+salary_plr_boundary_amount_ends AS (
+    SELECT
+        sal.id_salary,
+        sal.id_assignment,
+        sal.dt_started AS salary_period_start,
+        DATE_ADD(plr_amt.dt_valid_to, 1) AS dt_boundary
+    FROM
+        salary_with_job_version AS sal
+    INNER JOIN
+        person_plr_amount AS plr_amt
+            ON sal.id_person = plr_amt.id_person
+            AND plr_amt.dt_valid_to >= sal.dt_started
+            AND plr_amt.dt_valid_to < COALESCE(sal.dt_ended, DATE('4712-12-31'))
+),
+salary_plr_boundary_union AS (
+    SELECT
+        id_salary,
+        id_assignment,
+        salary_period_start,
+        dt_boundary
+    FROM
+        salary_plr_boundary_salary_starts
+    UNION ALL
+    SELECT
+        id_salary,
+        id_assignment,
+        salary_period_start,
+        dt_boundary
+    FROM
+        salary_plr_boundary_multiplier_starts
+    UNION ALL
+    SELECT
+        id_salary,
+        id_assignment,
+        salary_period_start,
+        dt_boundary
+    FROM
+        salary_plr_boundary_multiplier_ends
+    UNION ALL
+    SELECT
+        id_salary,
+        id_assignment,
+        salary_period_start,
+        dt_boundary
+    FROM
+        salary_plr_boundary_amount_starts
+    UNION ALL
+    SELECT
+        id_salary,
+        id_assignment,
+        salary_period_start,
+        dt_boundary
+    FROM
+        salary_plr_boundary_amount_ends
+),
+salary_plr_period_boundaries AS (
+    -- Collect every date boundary where a salary sub-period may start or end: the salary
+    -- window itself plus each overlapping PLR validity edge from multiplier and amount
+    -- timelines independently. Unlike assignment_history and job_with_salary_table (gapless
+    -- SCD2), PLR ICP entries can leave uncovered gaps inside a salary window — e.g. a hire
+    -- with salary from Jan but PLR ICP starting in Mar. Rebuilding periods from boundaries
+    -- keeps those pre-PLR days as separate rows with NULL targets.
+    SELECT DISTINCT
+        id_salary,
+        id_assignment,
+        salary_period_start,
+        dt_boundary
+    FROM
+        salary_plr_boundary_union
+),
+salary_plr_periods AS (
+    SELECT
+        b.id_salary,
+        b.id_assignment,
+        b.salary_period_start,
+        b.dt_boundary AS dt_started,
+        COALESCE(
+            DATE_ADD(
+                LEAD(b.dt_boundary) OVER (
+                    PARTITION BY b.id_salary, b.id_assignment, b.salary_period_start
+                    ORDER BY b.dt_boundary
+                ),
+                -1
+            ),
+            COALESCE(sal.dt_ended, DATE('4712-12-31'))
+        ) AS dt_ended
+    FROM
+        salary_plr_period_boundaries AS b
+    INNER JOIN
+        salary_with_job_version AS sal
+            ON b.id_salary = sal.id_salary
+            AND b.id_assignment = sal.id_assignment
+            AND b.salary_period_start = sal.dt_started
+),
+salary_with_plr_target AS (
+    -- Attach person-level PLR targets via independent joins on multiplier and amount timelines.
+    -- Each shape is mutually exclusive by design at the source; sub-periods with no overlapping
+    -- ICP entry keep target_plr / target_plr_salary_multiplier as NULL. salary_consolidation_*
+    -- downstream merges consecutive rows that share the same compensation attributes.
+    SELECT
+        sal.id_salary,
+        sal.id_person,
+        sal.id_assignment,
+        sal.id_period_of_service,
+        sal.id_continuous_employment_cycle,
+        sal.person_number,
+        sal.assignment_number,
+        sal.dt_original_hired,
+        sal.currency_code,
+        sal.salary_amount,
+        sal.annual_salary,
+        sal.adjustment_amount,
+        sal.adjustment_percent,
+        sal.compa_ratio,
+        sal.range_position,
+        sal.is_salary_approved,
+        sal.id_action,
+        sal.id_action_reason,
+        sal.id_action_occurrence,
+        sal.dt_salary_original_started,
+        sal.id_job,
+        sal.sk_job_version,
+        per.dt_started,
+        CASE
+            WHEN per.dt_ended >= DATE('4712-12-31')
+            THEN NULL
+            ELSE per.dt_ended
+        END AS dt_ended,
+        plr_mult.target_plr_salary_multiplier,
+        plr_amt.target_plr,
+        plr_amt.currency_code AS target_plr_currency_code,
+        sal.target_rvv,
+        sal.target_sop,
+        sal.target_hiring_sop,
+        sal.target_exceptional_bonus
+    FROM
+        salary_plr_periods AS per
+    INNER JOIN
+        salary_with_job_version AS sal
+            ON per.id_salary = sal.id_salary
+            AND per.id_assignment = sal.id_assignment
+            AND per.salary_period_start = sal.dt_started
+    LEFT JOIN
+        person_plr_multiplier AS plr_mult
+            ON sal.id_person = plr_mult.id_person
+            AND plr_mult.dt_valid_from <= per.dt_ended
+            AND plr_mult.dt_valid_to >= per.dt_started
+    LEFT JOIN
+        person_plr_amount AS plr_amt
+            ON sal.id_person = plr_amt.id_person
+            AND plr_amt.dt_valid_from <= per.dt_ended
+            AND plr_amt.dt_valid_to >= per.dt_started
 ),
 salary_enriched AS (
     -- Attach event_definition for the salary change event.
-    -- Adjustment fields are zeroed on rows that were created by a job or dim_job split
+    -- Adjustment fields are zeroed on rows that were created by a job, job-version or PLR split
     -- (dt_started != dt_salary_original_started) since the adjustment belongs only
     -- to the originating row where the actual salary change occurred.
     SELECT
@@ -455,12 +807,13 @@ salary_enriched AS (
         sal.sk_job_version,
         sal.target_plr,
         sal.target_plr_salary_multiplier,
+        sal.target_plr_currency_code,
         sal.target_rvv,
         sal.target_sop,
         sal.target_hiring_sop,
         sal.target_exceptional_bonus
     FROM
-        salary_with_job_version AS sal
+        salary_with_plr_target AS sal
     LEFT JOIN
         datalake_people.event_definition AS ed
             ON sal.dt_started = sal.dt_salary_original_started
@@ -496,6 +849,7 @@ salary_consolidation_base AS (
         sk_job_version,
         target_plr,
         target_plr_salary_multiplier,
+        target_plr_currency_code,
         target_rvv,
         target_sop,
         target_hiring_sop,
@@ -505,7 +859,7 @@ salary_consolidation_base AS (
 ),
 salary_consolidation_groups AS (
     -- Detect consecutive rows that are identical in every compensation attribute.
-    -- Such rows are artefacts of the job/dim_job splits above and should be merged.
+    -- Such rows are artefacts of the job/job-version splits above and should be merged.
     -- A new group starts when any attribute changes or there is a date gap.
     -- The <=> operator handles NULL-safe equality (NULL <=> NULL is TRUE).
     SELECT
@@ -568,6 +922,10 @@ salary_consolidation_groups AS (
                         PARTITION BY id_person, id_assignment, id_period_of_service
                         ORDER BY dt_started, dt_ended_normalized
                     ) <=> target_plr_salary_multiplier)
+                    OR NOT (LAG(target_plr_currency_code) OVER (
+                        PARTITION BY id_person, id_assignment, id_period_of_service
+                        ORDER BY dt_started, dt_ended_normalized
+                    ) <=> target_plr_currency_code)
                     OR NOT (LAG(target_rvv) OVER (
                         PARTITION BY id_person, id_assignment, id_period_of_service
                         ORDER BY dt_started, dt_ended_normalized
@@ -626,6 +984,7 @@ salary_consolidated AS (
         sk_job_version,
         target_plr,
         target_plr_salary_multiplier,
+        target_plr_currency_code,
         target_rvv,
         target_sop,
         target_hiring_sop,
@@ -650,6 +1009,7 @@ salary_consolidated AS (
         sk_job_version,
         target_plr,
         target_plr_salary_multiplier,
+        target_plr_currency_code,
         target_rvv,
         target_sop,
         target_hiring_sop,
@@ -688,6 +1048,7 @@ SELECT
     sal.assignment_number,
     -- Non-metrics
     sal.currency_code,
+    sal.target_plr_currency_code AS plr_target_currency_code,
     -- Metrics - Salary fields
     sal.salary_amount AS amount_salary,
     sal.annual_salary AS amount_annual_salary,
@@ -733,8 +1094,8 @@ SELECT
 FROM
     salary_with_reference AS sal
 LEFT JOIN
-    dw_compensation.dim_job AS dj_band
-        ON sal.sk_job_version = dj_band.sk_job_version
+    job_with_salary_table_effective AS jst_band
+        ON sal.sk_job_version = jst_band.sk_job_version
 LEFT JOIN
     job_tenure_start AS jts
         ON sal.id_person = jts.id_person
@@ -745,7 +1106,7 @@ LEFT JOIN
 LEFT JOIN
     band_tenure_start AS bts
         ON sal.id_person = bts.id_person
-        AND dj_band.band = bts.band
+        AND jst_band.band = bts.band
         AND sal.id_continuous_employment_cycle = bts.id_continuous_employment_cycle
         AND sal.dt_reference >= bts.dt_stint_start
         AND sal.dt_reference <= bts.dt_stint_ended
