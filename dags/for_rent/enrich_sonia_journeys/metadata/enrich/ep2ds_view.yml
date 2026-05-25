@@ -1,0 +1,95 @@
+database_name: datalake_sonia_journeys
+table_name: ep2ds_view
+description: |
+  Enrich view for Sonia ep2ds journey, returning proposals that got evaluation positive
+  with user contact data and house context, filtered to non-credit-passport and non-bypass cases.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  pk_proposal_user:
+    lineage:
+      - datalake_ebdb_clean.offer.id_client
+      - datalake_ebdb_clean.proposal.id
+    description: Primary key concatenating id_user and id_proposal.
+  id_user:
+    lineage:
+      - datalake_ebdb_clean.offer.id_client
+    description: EBDB user identifier associated with the active proposal.
+  uuid_user:
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+    description: EBDB user UUID associated with the active proposal.
+  id_proposal:
+    lineage:
+      - datalake_ebdb_clean.proposal.id
+    description: EBDB proposal identifier.
+  documentation_url:
+    lineage:
+      - datalake_ebdb_clean.proposal.id
+    description: Sonia documentation link built from id_proposal with fixed Sonia tracking parameters.
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.house.id
+    description: EBDB house identifier associated with the proposal.
+  is_active_flow:
+    lineage:
+      - datalake_ebdb_clean.offer.ts_expired
+      - datalake_ebdb_clean.offer.rejection_reason
+      - datalake_ebdb_clean.offer.status
+      - datalake_ebdb_clean.proposal.rejection_reason
+      - datalake_ebdb_clean.proposal.ts_created
+      - datalake_ebdb_clean.proposal.ts_expired
+      - datalake_sorting_hat_clean.credit_analysis.result
+      - datalake_sorting_hat_clean.credit_analysis.category
+      - datalake_sorting_hat_clean.credit_analysis.automatic_decision_reason
+      - datalake_sorting_hat_clean.credit_analysis.bypass
+      - datalake_ebdb_clean.contract.status
+      - datalake_ebdb_clean.contract.ts_minuta_approved
+      - datalake_ebdb_clean.contract.ts_updated
+    description: Indicates whether the offer/proposal/contract flow is currently active for the journey.
+  documentation_sent:
+    lineage:
+      - datalake_cdp_clean.transactional.event_name
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional.ts_event
+      - datalake_sorting_hat_clean.credit_analysis.ts_created
+      - datalake_ebdb_clean.proposal.id
+    description: Indicates whether tenant documentation completed event happened after positive evaluation.
+  has_answered:
+    lineage:
+      - datalake_copilot_service_clean.session.id_user
+      - datalake_copilot_service_clean.message.channel
+    description: Indicates whether the user has answered Sonia WhatsApp after the positive evaluation timestamp.
+  user_email:
+    lineage:
+      - datalake_ebdb_clean.user.email
+    description: User email address.
+  user_phone:
+    lineage:
+      - datalake_ebdb_clean.user.main_phone
+    description: User phone number.
+  user_first_name:
+    lineage:
+      - datalake_ebdb_clean.user.name
+    description: User first name extracted from the full EBDB user name.
+  address_text:
+    lineage:
+      - datalake_ebdb_clean.house.address
+      - datalake_ebdb_clean.house.number
+    description: Concatenated house street address and number.
+  binning_value:
+    lineage:
+      - datalake_ebdb_clean.offer.id_client
+    description: Deterministic 0-99 hash bucket of id_user for experiment split assignment.
+  ts_evaluation_positive:
+    lineage:
+      - datalake_sorting_hat_clean.credit_analysis.ts_created
+    description: Latest timestamp of positive credit evaluation.
+  ts_documentation_sent:
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+      - datalake_cdp_clean.transactional.event_name
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_sorting_hat_clean.credit_analysis.ts_created
+      - datalake_ebdb_clean.proposal.id
+    description: Latest documentation completed event timestamp after positive evaluation.
