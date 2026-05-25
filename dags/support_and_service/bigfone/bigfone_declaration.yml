@@ -24,14 +24,4 @@ workflow:
       clean_table_name: event
 
 cluster:
-  type: custom_cluster
-  custom_configurations:
-    driver_node_type_id: r5a.2xlarge
-    node_type_id: r5a.2xlarge
-    num_workers: 6
-    spark_version: 16.4.x-scala2.12
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-  databricks_conn_id: databricks_new
+  type: emr_7_12_min_driver_2xlarge_6_workers_cluster
