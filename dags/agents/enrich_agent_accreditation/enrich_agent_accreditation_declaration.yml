@@ -5,7 +5,7 @@ dag:
   owner: Data Agents
   documentation:
     dag_purpose: |
-      O pipeline process tracks and enriches data related to agent operations, covering business context assignments, regional coverage, and registration actions. 
+      O pipeline process tracks and enriches data related to agent operations, covering business context assignments, regional coverage, and registration actions.
       It integrates multiple data sources to generate insights into an agent’s predominant region, active periods within a business context, and key changes to their registration over time.
 
       This workflow consists of three main stages:

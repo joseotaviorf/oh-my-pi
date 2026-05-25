@@ -9,6 +9,8 @@ column_level_validations:
   id_contract_process:
     is_complete:
       severity_level: Error
+    is_unique:
+      severity_level: Error
   id_prospect_agent:
     is_complete:
       severity_level: Error

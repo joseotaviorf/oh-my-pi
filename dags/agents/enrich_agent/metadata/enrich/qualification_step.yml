@@ -5,6 +5,10 @@ domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 description: Qualification workflow for agent prospects, joining EBDB qualification, step progress, and step definitions with parsed user responsible when the author is a user.
 columns:
+  id_qualification_step_progress:
+    lineage:
+      - datalake_ebdb_clean.qualification_step_progress.id
+    description: Unique identifier of the qualification step progress event (primary key).
   id_prospect_agent:
     lineage:
       - datalake_ebdb_clean.qualification.id_agent_prospect
@@ -17,10 +21,6 @@ columns:
     lineage:
       - datalake_ebdb_clean.qualification_step_progress.qualification_step_id
     description: Qualification step identifier for the progress row.
-  id_qualification_step_progress:
-    lineage:
-      - datalake_ebdb_clean.qualification_step_progress.id
-    description: Unique identifier of the qualification step progress event.
   id_user_step_responsible:
     lineage:
       - datalake_ebdb_clean.qualification_step_progress.id_author_identifier
@@ -42,6 +42,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.qualification_step.name
     description: Name of the qualification step definition.
+  step_description:
+    lineage:
+      - datalake_ebdb_clean.qualification_step.description
+    description: Description of the qualification step definition.
   step_status:
     lineage:
       - datalake_ebdb_clean.qualification_step_progress.status
@@ -50,6 +54,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.qualification_step_progress.reason
     description: Reason or notes for the step progress event.
+  step_author_type:
+    lineage:
+      - datalake_ebdb_clean.qualification_step_progress.author_type
+    description: Type of author who performed the step progress event.
   ts_step_changed:
     lineage:
       - datalake_ebdb_clean.qualification_step_progress.ts_changed

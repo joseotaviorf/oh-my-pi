@@ -249,12 +249,15 @@ bietlejuice.enrich_access_logs:
   remove:
     - bietlejuice.istio:load-clean-istio:first-run-of-day
     - bietlejuice.opa:load-clean-opa:first-run-of-day
-bietlejuice.enrich_agent: 
+bietlejuice.enrich_agent:
   add:
-    - bietlejuice.ebdb_agent:load-clean-accreditation-contract-process 
+    - bietlejuice.ebdb_agent:load-clean-accreditation-contract-process
     - bietlejuice.ebdb_agent:load-clean-agent
     - bietlejuice.ebdb_agent:load-clean-prospect-agent
     - bietlejuice.ebdb_agent:load-clean-qualification-step-progress
+    - bietlejuice.ebdb_agent:load-clean-capability
+    - bietlejuice.ebdb_agent:load-clean-demand-visit-management-capability-settings
+    - bietlejuice.ebdb_agent:load-clean-agent-event-log
   remove:
     - bietlejuice.company:load-clean-company:first-run-of-day
     - bietlejuice.company:load-clean-member-profile:first-run-of-day
@@ -275,6 +278,9 @@ bietlejuice.enrich_agent:
     - bietlejuice.person:load-clean-person:first-run-of-day
     - bietlejuice.signatures:load-clean-agreement-document:first-run-of-day
     - bietlejuice.signatures:load-clean-signature:first-run-of-day
+    - bietlejuice.ebdb_agent:load-clean-capability:first-run-of-day
+    - bietlejuice.ebdb_agent:load-clean-demand-visit-management-capability-settings:first-run-of-day
+    - bietlejuice.ebdb_agent:load-clean-agent-event-log:first-run-of-day
 bietlejuice.enrich_agent_reports:
   add:
     - bietlejuice.ebdb_agent:load-clean-agent-data-aud:first-run-of-day

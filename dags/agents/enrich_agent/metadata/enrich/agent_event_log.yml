@@ -1,0 +1,69 @@
+---
+database_name: datalake_agent_accreditation
+table_name: agent_event_log
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+description: |
+  Enriched agent event log per agent or per agent-capability partition.
+  Each row is one capability or agent-level event with actor, channel, and audit timestamps.
+columns:
+  id_event_log:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.id
+    description: Unique identifier of the agent event log.
+  id_agent:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.id_agent
+    description: Agent identifier associated with the event.
+  id_capability:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.id_capability
+    description: Capability identifier related to the event; null for agent-level events only.
+  id_author_user:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.author_identifier
+    description: Identifier of the actor who triggered the event in the source system.
+  author_type:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.author_type
+    description: Type of actor who triggered the event.
+  author_role:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.author_role
+    description: Role of the actor who triggered the event.
+  channel:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.channel
+    description: Channel where the action occurred.
+  reason:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.reason
+    description: Reason provided for the action or change in the source system.
+  on_behalf_of_role:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.on_behalf_of_role
+    description: Role on whose behalf the action was performed, when applicable.
+  event_type:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.event_type
+    description: Type of event that occurred in the agent or capability lifecycle.
+  ts_created:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.ts_created
+    description: Timestamp when the event was created.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.ts_updated
+    description: Timestamp when the event was last updated.
+  year:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.ts_updated
+    description: Year from the last update timestamp.
+  month:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.ts_updated
+    description: Month from the last update timestamp.
+  day:
+    lineage:
+      - datalake_ebdb_clean.agent_event_log.ts_updated
+    description: Day from the last update timestamp.

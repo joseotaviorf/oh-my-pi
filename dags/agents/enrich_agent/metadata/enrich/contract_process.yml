@@ -5,6 +5,10 @@ domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 description: Agent accreditation contract process joined to QuintoAndar partnership agreement documents and signatures in the Signatures service, restricted to QUINTOANDAR_AGENT / QUINTOANDAR_PARTNERSHIP_CONTRACT flows with author person UUID when the EBDB author is a person.
 columns:
+  id_contract_process:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_process.id
+    description: Unique identifier of the accreditation contract process record in EBDB.
   id_prospect_agent:
     lineage:
       - datalake_ebdb_clean.qualification.id_agent_prospect
@@ -13,10 +17,6 @@ columns:
     lineage:
       - datalake_ebdb_clean.accreditation_contract_process.qualification_id
     description: Qualification instance identifier associated with the contract process.
-  id_contract_process:
-    lineage:
-      - datalake_ebdb_clean.accreditation_contract_process.id
-    description: Unique identifier of the accreditation contract process record in EBDB.
   id_contract_template:
     lineage:
       - datalake_ebdb_clean.accreditation_contract_process.contract_template_id
@@ -42,14 +42,31 @@ columns:
     lineage:
       - datalake_ebdb_clean.accreditation_contract_template.business_association
     description: Business association context from the active contract template.
+  contract_template_name:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_template.name
+    description: Name of the contract template.
+  contract_template_description:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_template.description
+    description: Description of the contract template.
   contract_process_status:
     lineage:
       - datalake_ebdb_clean.accreditation_contract_process.status
     description: Workflow status of the accreditation contract process in EBDB.
+  contract_process_author_type:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_process.author_type
+    description: Type of author who performed the contract process.
   signature_status:
     lineage:
       - datalake_signatures_clean.signature.status
     description: Status of the signature in the Signatures service for the partnership contract document.
+  is_last_contract:
+    lineage:
+      - datalake_ebdb_clean.accreditation_contract_process.ts_created
+      - datalake_ebdb_clean.qualification.id_agent_prospect
+    description: True when this row is the most recent contract process for the prospect agent.
   ts_initiated:
     lineage:
       - datalake_ebdb_clean.accreditation_contract_process.ts_initiated
