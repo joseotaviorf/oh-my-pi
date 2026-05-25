@@ -15,18 +15,6 @@ columns:
       - datalake_big_agent.house_sale_listing_consultant.id_user
       - datalake_big_agent.house_rent_listing_consultant.id_user
     description: Unique identifier of the CIQ consultant user attached to the listing.
-  id_partner:
-    lineage:
-      - datalake_ebdb_clean.partner_agent.id_partner
-    description: Partner identifier associated with the CIQ user, if any.
-  id_agent:
-    lineage:
-      - datalake_ebdb_user.user.id_agent
-    description: Agent identifier of the CIQ consultant.
-  uuid_person:
-    lineage:
-      - datalake_ebdb_user.user.uuid_person
-    description: Person-level UUID from main/admin (ebdb) for the CIQ consultant user.
   consultant_type:
     lineage:
       - datalake_big_agent.house_sale_listing_consultant.consultant_type

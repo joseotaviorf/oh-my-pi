@@ -1,7 +1,8 @@
 database_name: datalake_ebdb_agents
 table_name: ciq_users
-description: Each line represents a change in the ciq status, if it has changed between active or inactive,
-  or has had any change in its user in main.
+description: >
+  Each row represents a CIQ partner-user status version: active or inactive transitions and user
+  changes on Main, with SCD-style validity windows.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:

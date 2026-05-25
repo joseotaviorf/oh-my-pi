@@ -104,9 +104,6 @@ house_first_listing AS (
     SELECT
         cfl.id_house,
         cfl.id_user,
-        pa.id_partner,
-        u.id_agent,
-        u.uuid_person,
         cfl.consultant_type,
         cfl.business_context,
         cfl.status,
@@ -126,12 +123,6 @@ house_first_listing AS (
             ON fcs.id_house = cfl.id_house
             AND fcs.id_user = cfl.id_user
             AND fcs.business_context = cfl.business_context
-    LEFT JOIN
-        datalake_ebdb_user.user AS u
-            ON u.id = cfl.id_user
-    LEFT JOIN
-        datalake_ebdb_clean.partner_agent AS pa
-            ON pa.id_user = cfl.id_user
     WHERE
         fcs.id_house IS NULL
         OR fcs.ts_contract_signed = cfl.ts_contract_signed
@@ -140,9 +131,6 @@ house_first_listing AS (
 SELECT 
     hfl.id_house,
     hfl.id_user,
-    hfl.id_partner,
-    hfl.id_agent,
-    hfl.uuid_person,
     hfl.consultant_type,
     hfl.business_context,
     hfl.status,

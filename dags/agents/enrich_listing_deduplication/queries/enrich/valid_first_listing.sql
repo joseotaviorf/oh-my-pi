@@ -2,13 +2,7 @@ WITH house_agregation_dates AS (
   SELECT
     id_house,
     FIRST(id_user) FILTER(WHERE cfl.business_context = 'SALE' AND id_user <> -1) AS id_ciq_user_sale,
-    FIRST(id_partner) FILTER(WHERE cfl.business_context = 'SALE') AS id_partner_sale,
-    FIRST(id_agent) FILTER(WHERE cfl.business_context = 'SALE') AS id_agent_sale,
-    FIRST(uuid_person) FILTER(WHERE cfl.business_context = 'SALE') AS uuid_person_sale,
     FIRST(id_user) FILTER(WHERE cfl.business_context = 'RENT' AND id_user <> -1) AS id_ciq_user_rent,
-    FIRST(id_partner) FILTER(WHERE cfl.business_context = 'RENT') AS id_partner_rent,
-    FIRST(id_agent) FILTER(WHERE cfl.business_context = 'RENT') AS id_agent_rent,
-    FIRST(uuid_person) FILTER(WHERE cfl.business_context = 'RENT') AS uuid_person_rent,
     FIRST(consultant_type) FILTER(WHERE cfl.business_context = 'SALE') AS consultant_type_sale,
     FIRST(consultant_type) FILTER(WHERE cfl.business_context = 'RENT') AS consultant_type_rent,
     COUNT(DISTINCT cfl.business_context) FILTER(WHERE cfl.has_first_listing IS TRUE) = 2 AS is_hybrid_house,
@@ -129,12 +123,12 @@ accumulated_published_days AS (
       bcsh.status = 'PUBLISHED'
       AND bcsh.ts_state_started < bcsh.ts_first_publication + INTERVAL 60 DAY
     QUALIFY
-      ROW_NUMBER() OVER (PARTITION BY bcsh.id_house, bcsh.business_context ORDER BY ad.date) = 15
+      ROW_NUMBER() OVER (PARTITION BY bcsh.id_house, bcsh.business_context ORDER BY ad.date) = 2
   )
   SELECT 
     id_house,
-    MAX(dt_rent) AS dt_15_published_accumulated_days_rent,
-    MAX(dt_sale) AS dt_15_published_accumulated_days_sale
+    MAX(dt_rent) AS dt_min_published_accumulated_days_rent,
+    MAX(dt_sale) AS dt_min_published_accumulated_days_sale
   FROM 
     accumulated_days
   GROUP BY ALL
@@ -153,17 +147,10 @@ last_depub_dates AS (
 )
 SELECT
   h.id_house,
-  h.id_ciq_user_sale AS id_user_listing_registrant_sale,
-  h.uuid_person_sale,
-  h.id_partner_sale,
-  h.id_agent_sale,
-  h.id_ciq_user_rent AS id_user_listing_registrant_rent,
-  h.uuid_person_rent,
-  h.id_partner_rent,
-  h.id_agent_rent,
-  ld.id_house AS id_house_duplicated,
-  ld.id_user_listing_registrant_rent AS id_user_listing_registrant_rent_duplicated,
-  ld.id_user_listing_registrant_sale AS id_user_listing_registrant_sale_duplicated,
+  h.id_ciq_user_sale,
+  h.id_ciq_user_rent,
+  ld.id_similar_previous_house,
+  ld.id_similar_first_house,
   TIMESTAMPDIFF(DAY, h.ts_first_listing_rent, h.ts_contract_signed_rent) AS days_between_fl_to_cs,
   TIMESTAMPDIFF(DAY, h.ts_first_listing_sale, h.ts_contract_signed_sale) AS days_between_fl_to_ccv,
   ABS(TIMESTAMPDIFF(DAY, h.ts_first_listing_rent, h.ts_first_listing_sale)) AS days_between_fl_hybrid,
@@ -178,12 +165,9 @@ SELECT
       END
     ELSE NULL
   END AS hybrid_creation_order,
-  ld_source.supply_source AS supply_source,
-  ld_source.supply_source_rent AS supply_source_rent,
-  ld_source.supply_source_sale AS supply_source_sale,
-  ld.supply_source AS supply_source_duplicated,
-  ld.supply_source_rent AS supply_source_rent_duplicated,
-  ld.supply_source_sale AS supply_source_sale_duplicated,
+  ld.supply_source,
+  ld.supply_source_rent,
+  ld.supply_source_sale,
   h.consultant_type_rent,
   h.consultant_type_sale,
   hls.last_house_listing_status_rent,
@@ -208,13 +192,13 @@ SELECT
   roc.is_ongoing_contract IS TRUE AS is_house_rented,
   h.ts_contract_signed_sale IS NOT NULL AS is_house_sold,
   h.is_hybrid_house,
-  dc.id_house IS NOT NULL AND dc.ts_created_draft_contract_rent < (h.ts_first_listing_rent + INTERVAL 15 DAY) AS is_draft_contract_rent,
+  dc.id_house IS NOT NULL AND dc.ts_created_draft_contract_rent < (h.ts_first_listing_rent + INTERVAL 2 DAY) AS is_draft_contract_rent,
   h.ts_contract_signed_rent <= h.ts_first_listing_rent + INTERVAL 60 DAYS AS is_signed_cs_within_60_days,
   h.ts_contract_signed_sale <= h.ts_first_listing_sale + INTERVAL 60 DAYS AS is_signed_ccv_within_60_days,
   ia.is_indica_ai,
   roc.is_ongoing_contract AS is_ongoing_rent_contract,
-  apd.dt_15_published_accumulated_days_rent,
-  apd.dt_15_published_accumulated_days_sale,
+  apd.dt_min_published_accumulated_days_rent,
+  apd.dt_min_published_accumulated_days_sale,
   dc.ts_created_draft_contract_rent,
   dc.ts_created_draft_contract_sale,
   h.ts_contract_signed_rent AS ts_first_contract_signed_rent,
@@ -230,10 +214,7 @@ SELECT
   h.ts_first_listing_rent,
   ldd.ts_last_depub AS ts_last_depublication,
   ldd.ts_last_depub_rent AS ts_last_depublication_rent,
-  ldd.ts_last_depub_sale AS ts_last_depublication_sale,
-  ldd_duplicated.ts_last_depub AS ts_last_depublication_duplicated,
-  ldd_duplicated.ts_last_depub_rent AS ts_last_depublication_rent_duplicated,
-  ldd_duplicated.ts_last_depub_sale AS ts_last_depublication_sale_duplicated
+  ldd.ts_last_depub_sale AS ts_last_depublication_sale
 FROM
   house_agregation_dates AS h
 LEFT JOIN
@@ -258,12 +239,5 @@ LEFT JOIN
   last_depub_dates AS ldd
     ON h.id_house = ldd.id_house
 LEFT JOIN
-  datalake_listing_deduplication.listing_deduplication AS ld_source
-    ON h.id_house = ld_source.id_house
-LEFT JOIN
   datalake_listing_deduplication.listing_deduplication AS ld
-    ON h.id_house = ld.id_house_duplicated
-    AND ld.is_duplicated
-LEFT JOIN
-  last_depub_dates AS ldd_duplicated
-    ON ld.id_house = ldd_duplicated.id_house
+    ON h.id_house = ld.id_house

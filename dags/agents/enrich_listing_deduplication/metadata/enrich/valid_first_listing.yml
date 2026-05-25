@@ -13,53 +13,22 @@ columns:
     lineage:
       - datalake_listing_deduplication.first_listing.id_house
     description: Unique identifier of the house.
-  id_user_listing_registrant_sale:
+  id_ciq_user_sale:
     lineage:
       - datalake_listing_deduplication.first_listing.id_user
-    description: CIQ user identifier responsible for the SALE listing registration.
-  uuid_person_sale:
-    lineage:
-      - datalake_listing_deduplication.first_listing.uuid_person
-    description: Person-level UUID of the CIQ user for the SALE context.
-  id_partner_sale:
-    lineage:
-      - datalake_listing_deduplication.first_listing.id_partner
-    description: Partner identifier associated with the SALE CIQ user, when available.
-  id_agent_sale:
-    lineage:
-      - datalake_listing_deduplication.first_listing.id_agent
-    description: Agent identifier associated with the SALE CIQ user.
-  id_user_listing_registrant_rent:
+    description: CIQ user identifier responsible for the SALE first listing when present.
+  id_ciq_user_rent:
     lineage:
       - datalake_listing_deduplication.first_listing.id_user
-    description: CIQ user identifier responsible for the RENT listing registration.
-  uuid_person_rent:
+    description: CIQ user identifier responsible for the RENT first listing when present.
+  id_similar_previous_house:
     lineage:
-      - datalake_listing_deduplication.first_listing.uuid_person
-    description: Person-level UUID of the CIQ user for the RENT context.
-  id_partner_rent:
+      - datalake_listing_deduplication.listing_deduplication.id_similar_previous_house
+    description: House id of the previous listing on the same parsed address (order minus one).
+  id_similar_first_house:
     lineage:
-      - datalake_listing_deduplication.first_listing.id_partner
-    description: Partner identifier associated with the RENT CIQ user, when available.
-  id_agent_rent:
-    lineage:
-      - datalake_listing_deduplication.first_listing.id_agent
-    description: Agent identifier associated with the RENT CIQ user.
-  id_house_duplicated:
-    lineage:
-      - datalake_listing_deduplication.listing_deduplication.id_house
-    description: Identifier of the duplicated house when the current house is identified as a duplicate.
-      Only populated when the house is marked as duplicated in the deduplication process.
-  id_user_listing_registrant_rent_duplicated:
-    lineage:
-      - datalake_listing_deduplication.listing_deduplication.id_user_listing_registrant_rent
-    description: User identifier who registered the rent listing for the duplicated house.
-      Tracks the original registrant for accountability and analysis.
-  id_user_listing_registrant_sale_duplicated:
-    lineage:
-      - datalake_listing_deduplication.listing_deduplication.id_user_listing_registrant_sale
-    description: User identifier who registered the sale listing for the duplicated house.
-      Tracks the original registrant for accountability and analysis.
+      - datalake_listing_deduplication.listing_deduplication.id_similar_first_house
+    description: House id of the first listing on the same parsed address when the row belongs to a duplicate group.
   days_between_fl_to_cs:
     lineage:
       - datalake_listing_deduplication.first_listing.ts_contract_signed
@@ -112,20 +81,6 @@ columns:
     lineage:
       - datalake_listing_deduplication.listing_deduplication.supply_source_sale
     description: Supply source for the sale context of the current house.
-  supply_source_duplicated:
-    lineage:
-      - datalake_listing_deduplication.listing_deduplication.supply_source
-    description: Overall supply source of the duplicated house.
-  supply_source_rent_duplicated:
-    lineage:
-      - datalake_listing_deduplication.listing_deduplication.supply_source_rent
-    description: Supply source for the rent context of the duplicated house.
-      Indicates how the duplicated rent listing was originally sourced.
-  supply_source_sale_duplicated:
-    lineage:
-      - datalake_listing_deduplication.listing_deduplication.supply_source_sale
-    description: Supply source for the sale context of the duplicated house.
-      Indicates how the duplicated sale listing was originally sourced.
   last_house_listing_status_rent:
     lineage:
       - datalake_listing_deduplication.first_listing.status
@@ -157,8 +112,9 @@ columns:
     lineage:
       - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
       - datalake_listing_deduplication.first_listing.ts_first_listing
-    description: Boolean flag indicating if a rent draft contract ('Minuta') state started within 15 days
-      of the first rent listing publication (ContractDraft in listing status history).
+    description: >
+      True when a rent ContractDraft (minuta) state started within 2 days after the first rent
+      listing publication, per listing_business_context_status_history.
   is_signed_cs_within_60_days:
     lineage:
       - datalake_listing_deduplication.first_listing.ts_contract_signed
@@ -187,18 +143,20 @@ columns:
     lineage:
       - datalake_listing_deduplication.first_listing.consultant_type
     description: CIQ profile for the SALE context (e.g., CIQ_FULL, CIQ_MANAGER).
-  dt_15_published_accumulated_days_rent:
+  dt_min_published_accumulated_days_rent:
     lineage:
       - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
       - datalake_quintoandar.aux_date.date
-    description: Date when the rent listing reached 15 accumulated published days within
-      the first 60 days after initial publication.
-  dt_15_published_accumulated_days_sale:
+    description: >
+      Calendar date of the second accumulated published day for RENT within 60 days after
+      first publication (used as minimum published-days compliance signal downstream).
+  dt_min_published_accumulated_days_sale:
     lineage:
       - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
       - datalake_quintoandar.aux_date.date
-    description: Date when the sale listing reached 15 accumulated published days within
-      the first 60 days after initial publication.
+    description: >
+      Calendar date of the second accumulated published day for SALE within 60 days after
+      first publication (used as minimum published-days compliance signal downstream).
   ts_first_contract_signed_rent:
     lineage:
       - datalake_listing_deduplication.first_listing.ts_contract_signed
@@ -237,10 +195,6 @@ columns:
     lineage:
       - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
     description: Timestamp of the last depublication event (UNPUBLISHED, SUSPENDED, or OPTED-OUT) across contexts.
-  ts_last_depublication_duplicated:
-    lineage:
-      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
-    description: Timestamp of the last depublication event across contexts for the duplicated house row.
   ts_last_depublication_rent:
     lineage:
       - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
@@ -249,16 +203,6 @@ columns:
     lineage:
       - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
     description: Timestamp of the last depublication event for the SALE context.
-  ts_last_depublication_rent_duplicated:
-    lineage:
-      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
-    description: Timestamp of the last depublication (UNPUBLISHED, SUSPENDED, or OPTED-OUT) for the rent context
-      of the duplicated house. Used to track listing lifecycle events.
-  ts_last_depublication_sale_duplicated:
-    lineage:
-      - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started
-    description: Timestamp of the last depublication (UNPUBLISHED, SUSPENDED, or OPTED-OUT) for the sale context
-      of the duplicated house. Used to track listing lifecycle events.
   ts_created_draft_contract_rent:
     lineage:
       - datalake_ebdb_listing.listing_business_context_status_history.ts_state_started

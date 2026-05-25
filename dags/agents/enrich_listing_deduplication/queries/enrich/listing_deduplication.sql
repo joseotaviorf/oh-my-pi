@@ -335,7 +335,8 @@ listings_full_info AS (
 SELECT
   MD5(lfi.address_parsed_short) AS id_address_parsed_short,
   lfi.id_house,
-  lfi_dup.id_house AS id_house_duplicated,
+  previous_house.id_house AS id_similar_previous_house,
+  first_house.id_house AS id_similar_first_house,
   lfi.user_listing_registrant_rent AS id_user_listing_registrant_rent,
   lfi.user_listing_registrant_sale AS id_user_listing_registrant_sale,
   lfi.address_full,
@@ -355,6 +356,10 @@ SELECT
 FROM 
   listings_full_info AS lfi
 LEFT JOIN
-  listings_full_info AS lfi_dup
-    ON lfi_dup.address_parsed_short = lfi.address_parsed_short
-    AND lfi_dup.first_listing_order - 1 = lfi.first_listing_order 
+  listings_full_info AS previous_house
+    ON previous_house.address_parsed_short = lfi.address_parsed_short
+    AND previous_house.first_listing_order = lfi.first_listing_order - 1
+LEFT JOIN
+  listings_full_info AS first_house
+    ON first_house.address_parsed_short = lfi.address_parsed_short
+    AND first_house.first_listing_order = 1

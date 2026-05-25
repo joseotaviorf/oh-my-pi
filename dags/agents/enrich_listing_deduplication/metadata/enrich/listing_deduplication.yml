@@ -20,10 +20,14 @@ columns:
     description: The unique identifier for each house in the EBDB system.
     lineage:
       - datalake_ebdb_clean.house.id
-  id_house_duplicated:
+  id_similar_previous_house:
     lineage:
       - datalake_ebdb_clean.house.id
-    description: ID of the house that represents the previous listing in the duplicate sequence (first_listing_order - 1).
+    description: House id of the immediately previous listing on the same parsed address (first_listing_order minus one).
+  id_similar_first_house:
+    lineage:
+      - datalake_ebdb_clean.house.id
+    description: House id of the first listing (order 1) on the same parsed address when this row is part of a duplicate group.
   id_user_listing_registrant_rent:
     description: User identifier who registered the house for rent listing.
     lineage:
