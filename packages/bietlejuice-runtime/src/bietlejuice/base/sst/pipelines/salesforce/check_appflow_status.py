@@ -157,4 +157,3 @@ def salesforce_check_appflow_status_pipeline(cfg):
 
 if __name__ == "__main__":
     salesforce_check_appflow_status_pipeline()
-    

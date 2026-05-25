@@ -149,4 +149,3 @@ class AppFlowStatusBranchOperator(BranchPythonOperator):
             f"Cannot process {self.target_table}. "
             f"A handler for non-Active statuses will be added in a future sprint."
         )
-        

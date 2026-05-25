@@ -175,4 +175,3 @@ def save_status_marker_as_table(
         append=False,
         sync_hive=sync_hive,
     )
-    
