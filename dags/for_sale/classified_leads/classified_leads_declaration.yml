@@ -31,10 +31,8 @@ workflow:
       clean_table_name: lead_reply
       clean_primary_keys: [id]
 cluster:
-  type: consolidation_s_memory_cluster
-  databricks_conn_id: databricks_new
+  type: emr_7_12_min_general_2_workers_cluster
   custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    driver_node_type_id: m7a.xlarge
+    node_type_id: r7a.xlarge
+    num_task_workers: 1
