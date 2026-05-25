@@ -49,6 +49,12 @@ columns:
     description: Name of the table on which the privilege is granted.
     lineage:
       - system.information_schema.table_privileges.table_name
+  inherited_from:
+    description: Kind of object that the privilege is inherited from. For example, 'CATALOG', 'SCHEMA', 'NONE'.
+    lineage:
+      - system.information_schema.table_privileges.inherited_from
+  inherited_object:
+    description: Name of object that the privilege is inherited from. If the privilege is inherited from a catalog, this column contains the catalog name. If the privilege is inherited from a schema, this column contains the schema name. If the privilege is not inherited from any object, this column is null.
   year:
     description: Year of the snapshot.
   month:

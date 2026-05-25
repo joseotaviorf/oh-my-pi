@@ -5,6 +5,12 @@ WITH table_privileges AS (
         table_name,
         collect_set(privilege_type) AS privileges,
         'grant' as grant_type,
+        inherited_from,
+        case
+          when inherited_from = 'CATALOG' then table_catalog
+          when inherited_from = 'SCHEMA' then table_schema
+          when inherited_from = 'NONE' then null
+        end as inherited_object,
         -- We use current_date because the data in information_schema is always current
         -- We can't process historical data
         YEAR(CURRENT_DATE) AS year,
@@ -22,6 +28,8 @@ WITH table_privileges AS (
         table_name,
         array('ALL_PRIVILEGES') AS privileges,
         'table_owner' as grant_type,
+        null as inherited_from,
+        null as inherited_object,
         YEAR(CURRENT_DATE) AS year,
         MONTH(CURRENT_DATE) AS month,
         DAY(CURRENT_DATE) AS day
@@ -35,7 +43,7 @@ SELECT
     dg.id_group,
     dsp.id_service_principal,
     tp.grantee,
-    privileges,
+    tp.privileges,
     CASE
         WHEN du.id_user IS NOT NULL THEN 'User'
         WHEN dg.id_group IS NOT NULL THEN 'Group'
@@ -45,6 +53,8 @@ SELECT
     tp.grant_type,
     tp.table_schema,
     tp.table_name,
+    tp.inherited_from,
+    tp.inherited_object,
     tp.year,
     tp.month,
     tp.day

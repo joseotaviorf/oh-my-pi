@@ -6,4 +6,4 @@ CREATE TABLE datalake_databricks.unique_users (
     dt_created DATE,
     dt_updated DATE,
     dt_deleted DATE
-) USING DELTA LOCATION "s3://5a-datalake-prod/databricks/unique_users"
+) USING DELTA LOCATION "s3://5a-datalake-prod/enrich/databricks/unique_users"
