@@ -49,7 +49,7 @@ def list_table_specs_from_dir(tables_dir: Path) -> List[Tuple[str, Dict[str, Any
         raise ValueError(f"Tables directory {tables_dir} does not exist")
     out: List[Tuple[str, Dict[str, Any]]] = []
     for path in sorted(tables_dir.glob("*.yml")):
-        with open(path, "r", encoding="utf-8") as handle:
+        with open(path, encoding="utf-8") as handle:
             loaded = yaml.safe_load(handle) or {}
         out.append((path.stem, loaded))
     return out

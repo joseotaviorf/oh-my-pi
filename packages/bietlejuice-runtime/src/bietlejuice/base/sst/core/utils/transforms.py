@@ -175,7 +175,7 @@ def get_rows_to_update(
         distinct ``context_col_name`` value in ``update_df``. Schema matches the
         target table projection used in the join (all target columns).
     """
-    target_historical_df = spark.table(table_name).where((F.col("_is_current") == True))
+    target_historical_df = spark.table(table_name).where(F.col("_is_current"))
     unique_rows = update_df.select(context_col_name).distinct()
     return target_historical_df.join(unique_rows, on=context_col_name, how="inner")
 
