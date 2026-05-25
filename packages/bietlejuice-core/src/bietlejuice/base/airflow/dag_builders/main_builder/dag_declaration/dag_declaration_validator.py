@@ -18,8 +18,14 @@ from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissio
 from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
+from bietlejuice.base.airflow.cluster_config_resolver import is_airflow_emr_cluster
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.udfs.udf_enum import UDFEnum
+
+_EMR_TASK_AVAILABILITY_VALUES = frozenset({"SPOT", "ON_DEMAND"})
+_EMR_ONLY_CUSTOM_CONFIG_KEYS = frozenset(
+    {"num_task_workers", "task_node_type_id", "task_availability"}
+)
 
 
 class DAGDeclarationValidator(Validator):
@@ -539,6 +545,93 @@ class DAGDeclarationValidator(Validator):
         workflow_type = dag_declaration.get("workflow", {}).get("type")
         if workflow_type == WorkflowEnum.API_INGESTION_WORKFLOW.value:
             self._validate_api_ingestion_workflow(dag_declaration)
+
+        self._check_emr_cluster_configuration(dag_declaration.get("cluster", {}))
+
+    @staticmethod
+    def _is_emr_cluster_declaration(cluster: dict) -> bool:
+        cluster_type = cluster.get("type", "")
+        if isinstance(cluster_type, str) and cluster_type.startswith("emr_"):
+            return True
+        custom = cluster.get("custom_configurations") or {}
+        spark_version = custom.get("spark_version", "")
+        return is_airflow_emr_cluster(str(spark_version))
+
+    def _check_emr_cluster_configuration(self, cluster: dict) -> None:
+        if not cluster:
+            return
+
+        custom = cluster.get("custom_configurations") or {}
+        if not isinstance(custom, dict):
+            return
+
+        is_emr = self._is_emr_cluster_declaration(cluster)
+        aws_attrs = custom.get("aws_attributes") or {}
+        if not isinstance(aws_attrs, dict):
+            aws_attrs = {}
+
+        emr_only_in_custom = _EMR_ONLY_CUSTOM_CONFIG_KEYS.intersection(custom.keys())
+        task_availability = aws_attrs.get("task_availability")
+        if task_availability is not None:
+            emr_only_in_custom = emr_only_in_custom | {"task_availability"}
+
+        if not is_emr:
+            if emr_only_in_custom:
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    f"msg=EMR-only cluster keys in custom_configurations: "
+                    f"{sorted(emr_only_in_custom)}"
+                )
+            return
+
+        num_task_workers = custom.get("num_task_workers")
+        if num_task_workers is not None:
+            if not isinstance(num_task_workers, int) or isinstance(num_task_workers, bool):
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    "msg='num_task_workers' must be an integer"
+                )
+            if num_task_workers < 0:
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    "msg='num_task_workers' must be >= 0"
+                )
+
+        task_node_type_id = custom.get("task_node_type_id")
+        if task_node_type_id is not None:
+            if not isinstance(task_node_type_id, str) or not task_node_type_id.strip():
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    "msg='task_node_type_id' must be a non-empty string"
+                )
+
+        if task_availability is not None:
+            if (
+                not isinstance(task_availability, str)
+                or task_availability not in _EMR_TASK_AVAILABILITY_VALUES
+            ):
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    "msg='aws_attributes.task_availability' must be SPOT or ON_DEMAND"
+                )
+
+        if num_task_workers is None or num_task_workers == 0:
+            return
+
+        num_workers = custom.get("num_workers")
+        if num_workers is not None:
+            if not isinstance(num_workers, int) or isinstance(num_workers, bool):
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    "msg='num_workers' must be an integer when validating task split"
+                )
+            if num_task_workers >= num_workers:
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    f"msg='num_task_workers' ({num_task_workers}) must be less than "
+                    f"'num_workers' ({num_workers}) so at least 1 CORE node remains "
+                    f"({num_workers - num_task_workers} CORE + {num_task_workers} TASK)"
+                )
 
     def _validate_api_ingestion_workflow(self, dag_declaration: dict) -> None:
         """

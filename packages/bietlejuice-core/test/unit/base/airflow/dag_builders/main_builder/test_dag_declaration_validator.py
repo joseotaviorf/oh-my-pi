@@ -640,3 +640,105 @@ class TestDAGDeclarationValidatorIdExpansion:
         )
 
         dag_declaration_validator.validate(dag_declaration=declaration)
+
+
+class TestEmrClusterConfiguration:
+    @pytest.fixture
+    def dag_declaration_validator(self):
+        from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_declaration_validator import (
+            DAGDeclarationValidator,
+        )
+
+        return DAGDeclarationValidator()
+
+    def _base_declaration(self, cluster):
+        return {
+            "dag": {"name": "test_emr_dag", "owner": "Data Engineering"},
+            "workflow": {"type": "query_delta", "layer": "enrich"},
+            "cluster": cluster,
+        }
+
+    def test_emr_cluster_valid_task_split_passes(self, dag_declaration_validator):
+        declaration = self._base_declaration(
+            {
+                "type": "emr_7_12_med_general_cluster",
+                "custom_configurations": {
+                    "num_workers": 5,
+                    "num_task_workers": 3,
+                },
+            }
+        )
+        dag_declaration_validator.validate(dag_declaration=declaration)
+
+    def test_emr_cluster_custom_spark_version_valid_split_passes(
+        self, dag_declaration_validator
+    ):
+        declaration = self._base_declaration(
+            {
+                "type": "custom_cluster",
+                "custom_configurations": {
+                    "spark_version": "emr-7.12.0",
+                    "num_workers": 4,
+                    "num_task_workers": 2,
+                    "aws_attributes": {"task_availability": "ON_DEMAND"},
+                },
+            }
+        )
+        dag_declaration_validator.validate(dag_declaration=declaration)
+
+    def test_emr_cluster_num_task_workers_equals_num_workers_raises(
+        self, dag_declaration_validator
+    ):
+        declaration = self._base_declaration(
+            {
+                "type": "emr_7_12_med_general_cluster",
+                "custom_configurations": {
+                    "num_workers": 3,
+                    "num_task_workers": 3,
+                },
+            }
+        )
+        with pytest.raises(AssertionError, match="must be less than"):
+            dag_declaration_validator.validate(dag_declaration=declaration)
+
+    def test_databricks_cluster_num_task_workers_raises(
+        self, dag_declaration_validator
+    ):
+        declaration = self._base_declaration(
+            {
+                "type": "databricks_16_4_med_general_cluster",
+                "custom_configurations": {"num_task_workers": 1},
+            }
+        )
+        with pytest.raises(AssertionError, match="EMR-only cluster keys"):
+            dag_declaration_validator.validate(dag_declaration=declaration)
+
+    def test_databricks_cluster_task_availability_raises(
+        self, dag_declaration_validator
+    ):
+        declaration = self._base_declaration(
+            {
+                "type": "databricks_16_4_med_general_cluster",
+                "custom_configurations": {
+                    "aws_attributes": {"task_availability": "SPOT"},
+                },
+            }
+        )
+        with pytest.raises(AssertionError, match="EMR-only cluster keys"):
+            dag_declaration_validator.validate(dag_declaration=declaration)
+
+    def test_emr_cluster_invalid_task_availability_raises(
+        self, dag_declaration_validator
+    ):
+        declaration = self._base_declaration(
+            {
+                "type": "emr_7_12_med_general_cluster",
+                "custom_configurations": {
+                    "num_workers": 3,
+                    "num_task_workers": 1,
+                    "aws_attributes": {"task_availability": "SPOT_WITH_FALLBACK"},
+                },
+            }
+        )
+        with pytest.raises(AssertionError, match="task_availability"):
+            dag_declaration_validator.validate(dag_declaration=declaration)

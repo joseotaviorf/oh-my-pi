@@ -192,6 +192,24 @@ cluster:
         permission_level: "CAN_MANAGE"
 ```
 
+#### EMR task instance groups (EMR clusters only)
+
+Use `type: emr_7_12_*` (or `custom_cluster` with `spark_version: emr-*`). Keep **`num_workers`** as the total worker count (same as Databricks). Optionally set **`num_task_workers`** to how many of those workers run as EMR **TASK** nodes (spot-friendly); the remainder are **CORE**. If omitted, all workers are CORE (legacy behavior).
+
+- `num_task_workers` must be `< num_workers` when both are set in `custom_configurations` (at least 1 CORE).
+- TASK nodes default to **SPOT**; override with `aws_attributes.task_availability`: `SPOT` or `ON_DEMAND`.
+- Optional `task_node_type_id` (defaults to `node_type_id`).
+- Deploy updated `airflow-plugins` before using `num_task_workers` in production.
+
+```yaml
+cluster:
+    type: emr_7_12_min_general_2_workers_cluster
+    custom_configurations:
+        num_workers: 5          # total workers
+        num_task_workers: 3     # 3 TASK (SPOT) + 2 CORE
+        node_type_id: m7g.2xlarge
+```
+
 #### Metric layer cluster specifics
 
 Metric DAGs always use `USER_ISOLATION` (not `SINGLE_USER`) and `databricks_new`:
