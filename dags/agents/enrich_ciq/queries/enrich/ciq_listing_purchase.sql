@@ -29,6 +29,20 @@ signed_contracts AS(
         core_contract.contract AS c
             ON hl.id_house = c.id_house
             AND hl.id_contract = c.id_contract
+),
+house_consultant_history AS (
+    SELECT
+        hch.id_house,
+        hch.id_enrollment,
+        hch.id_partner,
+        hch.id_internal_agent,
+        hch.id_user,
+        MIN(ts_agency_created) AS ts_house_registration
+    FROM
+        datalake_big_agent.house_consultant_history AS hch
+    WHERE
+        hch.consultant_type = 'CIQ_FULL'
+    GROUP BY ALL
 )
 SELECT
     hch.id_house,
@@ -78,12 +92,12 @@ SELECT
     c.ts_contract_signed,
     c.ts_next_contract_signed,
     IF(c.is_house_inactive IS TRUE, c.ts_listing_version_start, NULL) AS ts_house_inactived,
-    hch.ts_agency_created AS ts_house_registration,
+    hch.ts_house_registration,
     vfl.ts_first_listing_rent AS ts_first_listing,
     NOW() AS ts_load,
-    YEAR(hch.ts_agency_created) AS year,
-    MONTH(hch.ts_agency_created) AS month,
-    DAY(hch.ts_agency_created) AS day
+    YEAR(hch.ts_house_registration) AS year,
+    MONTH(hch.ts_house_registration) AS month,
+    DAY(hch.ts_house_registration) AS day
 FROM
     core_house.house AS h
 JOIN
@@ -91,9 +105,8 @@ JOIN
         ON lbc.id_house = h.id_house
         AND lbc.business_context = "RENT"
 JOIN
-    datalake_big_agent.house_consultant_history AS hch
+    house_consultant_history AS hch
         ON hch.id_house = h.id_house
-        AND hch.consultant_type = 'CIQ_FULL'
 JOIN
     datalake_listing_deduplication.listing_deduplication AS ld
         ON ld.id_house = h.id_house

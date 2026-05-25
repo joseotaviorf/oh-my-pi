@@ -33,3 +33,8 @@ WHERE
         clp.ts_contract_signed, 
         clp.dt_paid
     )) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+QUALIFY
+    ROW_NUMBER() OVER (
+        PARTITION BY clp.id_house, clp.id_contract, clp.id_partner
+        ORDER BY GREATEST(clp.ts_contract_signed, clp.dt_paid) DESC NULLS LAST
+    ) = 1
