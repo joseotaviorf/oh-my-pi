@@ -113,6 +113,7 @@ def _load_categorisation(spark_client, s3_consumer, s3_loader, args, partition_c
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     df = s3_consumer.get_data_from_file(path=source_path, format="parquet")
+    df = df.withColumn("last_queue", F.col("last_queue").cast("string"))
 
     df = (
         SparkDataFrameService()

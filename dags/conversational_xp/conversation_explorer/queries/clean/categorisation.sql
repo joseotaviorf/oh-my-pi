@@ -4,7 +4,7 @@ SELECT
     channel,
     is_escalated,
     first_queue,
-    last_queue,
+    CAST(last_queue AS STRING) AS last_queue,
     category,
     subcategory,
     resolution_category,
