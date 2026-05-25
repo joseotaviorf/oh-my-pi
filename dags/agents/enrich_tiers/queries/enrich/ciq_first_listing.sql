@@ -81,12 +81,12 @@ WITH first_listing_conditions AS (
         --- INVALIDATION REASON GENERAL RULE
         IF(
             is_valid_compliance_general_rule_sale IS FALSE,
-            "[General rule] The listing does not comply with the general rule: it must remain published for at least 15 days or have a signed contract within that period.",
+            "[General rule] The listing does not comply with the general rule: it must remain published for at least 2 days or have a signed contract within 60 days of the first publication.",
             NULL
         ) AS reason_invalidation_general_rule_sale,
         IF(
             is_valid_compliance_general_rule_rent IS FALSE,
-            "[General rule] The listing does not comply with the general rule: it must remain published for at least 15 days or have a signed contract within that period.",
+            "[General rule] The listing does not comply with the general rule: it must remain published for at least 2 days or have a signed contract within 60 days of the first publication.",
             NULL
         ) AS reason_invalidation_general_rule_rent,
 
