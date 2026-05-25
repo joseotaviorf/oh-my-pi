@@ -10,6 +10,11 @@ SELECT
     job_code,
     job_name,
     job_family,
+    CASE
+        WHEN job_family = 'Jovem Aprendiz' THEN 'young apprentice'
+        WHEN job_family = 'Estagiario' THEN 'intern'
+        WHEN job_family IS NOT NULL THEN 'clt'
+    END AS employment_type,
     band,
     job_business_unit_group,
     salary_table,

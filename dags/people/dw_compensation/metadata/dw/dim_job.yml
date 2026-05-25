@@ -38,6 +38,18 @@ columns:
     description: Job family name grouping similar jobs (e.g., Analistas, Gerentes).
     lineage:
       - datalake_pin_core_clean.job_family_translation.job_family_name
+  employment_type:
+    description: |
+      Employment relationship type derived from job_family for PLR and workforce analytics.
+      Maps Jovem Aprendiz to young apprentice, Estagiario to intern, and all other non-null families to clt.
+      NULL when job_family is NULL (unknown dimension row).
+      Replaces the legacy vinculo field without reading the enrich layer.
+    lineage:
+      - datalake_pin_core_clean.job_family_translation.job_family_name
+    categories:
+      clt: Standard CLT employment (default for non-apprentice, non-intern job families).
+      intern: Internship (job_family = Estagiario).
+      young apprentice: Young apprentice program (job_family = Jovem Aprendiz).
   band:
     description: |
       Salary/seniority band for the job (e.g., "5", "6", "7", "Assist", "JA").
