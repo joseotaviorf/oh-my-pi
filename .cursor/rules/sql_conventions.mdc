@@ -657,3 +657,4 @@ For the full distinction between `{param}`, `{{ jinja }}`, and literal escapes, 
 - [ ] DW queries prioritize enrich sources and avoid DW-to-DW reads (except explicit datamarts)
 - [ ] Metric queries prioritize DW sources and avoid datamart DW tables as primary inputs
 - [ ] Literal `{` / `}` inside strings (regex, JSON, etc.) use `{{` / `}}` where pipeline SQL is passed through Python `str.format`; placeholders use only allowed `{param}` keys (see §13 and `databricks_conventions.mdc`)
+- [ ] Query is dual-runtime safe (Databricks DBR 16.4 + EMR Spark 3.5): no `QUALIFY`, no `GROUP BY ALL`, no `IFF(`, no Oracle-style `DECODE(`, no 3-arg `DATEDIFF(unit, ...)`, no variant access `column:key` / `column:["k"]`. The `databricks-emr-sql-lint` skill (auto-loaded via `emr_compatibility.mdc`) catches these; see `.cursor/skills/databricks-emr-sql-lint/RECIPES.md` for the rewrites.

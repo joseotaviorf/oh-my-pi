@@ -61,3 +61,28 @@ These are used throughout the codebase and are valid Databricks SQL but not stan
 | `MAKE_DATE(year, month, day)` | Reconstruct a date from partition columns | `MAKE_DATE(year, month, day) AS dt_partition` |
 | `column:["key"]` or `column:key` | Semi-structured (variant/JSON) column access | `payload:["event_type"] AS event_type` |
 | `ADD_MONTHS(date, n)` | Date arithmetic by month | `ADD_MONTHS(dt_created, 1) AS dt_next_month` |
+
+## ⚠️ EMR Migration — Dual-Runtime Constraints
+
+The pipeline is being migrated from Databricks (DBR 16.4 / Spark 3.5 + Photon) to EMR Spark 3.5. During the migration window, every `.sql` file in `dags/` must run **identically on both runtimes**. The constructs in the table above are valid on Databricks today; some of them are **not valid on plain EMR Spark 3.5** and must be avoided in new code.
+
+The **`databricks-emr-sql-lint`** skill (loaded automatically via `emr_compatibility.mdc`) catches these and reports dual-runtime-safe rewrites. See `.cursor/skills/databricks-emr-sql-lint/RECIPES.md` for the per-construct translations.
+
+| Construct (above) | Status on EMR Spark 3.5 | Dual-runtime alternative |
+|-------------------|--------------------------|---------------------------|
+| `GROUP BY ALL` | ❌ ParseException (Spark 4.0+ only) | List the non-aggregated expressions explicitly. |
+| `QUALIFY ROW_NUMBER() OVER(...) = 1` | ❌ ParseException (Spark 4.0+ only) | Wrap in a CTE that materializes `rn`; filter `WHERE rn = 1` outside. |
+| `column:["key"]` / `column:key` | ❌ ParseException (variant operator is Spark 4.0+) | `GET_JSON_OBJECT(col, '$.key')` for STRING JSON columns; dot notation `col.key` for STRUCT; bracket `col['key']` for MAP. The skill consults the database MCP to pick the right form. |
+| `ADD_MONTHS(date, n)` | ✅ Works on both | OK — keep. |
+| `COUNT_IF(condition)` | ✅ Works on both (Spark 3.0+) | OK — keep. |
+| `MAKE_DATE(year, month, day)` | ✅ Works on both (Spark 3.0+) | OK — keep. |
+
+Two more constructs not in the table above are also incompatible and must be avoided:
+
+| Construct | Status on EMR Spark 3.5 | Dual-runtime alternative |
+|-----------|--------------------------|---------------------------|
+| `IFF(cond, t, f)` | ❌ Unknown function | `IF(cond, t, f)` — works on both. |
+| `DECODE(expr, k1, v1, ...)` (Oracle-style multi-arg) | ❌ Unknown function | `CASE WHEN expr = k1 THEN v1 ... ELSE default END`. Watch NULL semantics — see RECIPES.md §4. |
+| `DATEDIFF(unit, start, end)` (3-arg) | ❌ Wrong arity (Spark 3.5 only has 2-arg `DATEDIFF(end, start)`) | For DAY: `DATEDIFF(end, start)` — note args reversed. For other units: `TIMESTAMPDIFF(unit, start, end)` — works on both (Spark 3.4+). |
+
+> **In short:** use the constructs above only when authoring code that will run **only on Databricks** (which, during the migration window, should be no new code). For everything in `dags/`, default to the dual-runtime alternative and let the lint skill confirm compliance after each edit.

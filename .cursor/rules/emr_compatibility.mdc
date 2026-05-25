@@ -1,0 +1,52 @@
+---
+description: Loads the databricks-emr-sql-lint skill on every SQL file under bi-etl-ejuice dags/. Pipeline SQL must run on both Databricks DBR 16.4 (Spark 3.5 + Photon) and plain EMR Spark 3.5 during the migration window. The skill detects QUALIFY, GROUP BY ALL, IFF, DECODE, DATEDIFF 3-arg, variant column:key access, and legacy DATE_FORMAT pattern letters; reports findings with severity, line numbers, and dual-runtime-safe rewrite suggestions; never edits the SQL unless the user explicitly requests a rewrite.
+globs: "**/*.sql"
+alwaysApply: true
+---
+
+# EMR Spark 3.5 Compatibility (Dual-Runtime Pipeline SQL)
+
+When editing or reviewing any `.sql` file under `bi-etl-ejuice/dags/`, treat it as **dual-runtime code**: it must run identically on Databricks DBR 16.4 and on plain EMR Spark 3.5.
+
+## Rule
+
+Apply the **`databricks-emr-sql-lint`** skill (`.cursor/skills/databricks-emr-sql-lint/SKILL.md`) to every SQL file you edit, create, or review in `dags/`. Run the lint immediately after each `.sql` edit; emit the report in the same agent turn, right after the edit's tool result. Stay silent when the lint produces zero findings.
+
+## What the lint catches (do not author these in new code)
+
+🔴 **Critical** — break or change behavior on EMR Spark 3.5:
+
+- `QUALIFY` clause
+- `GROUP BY ALL`
+- `IFF(...)` function
+- `DECODE(expr, k1, v1, ...)` (Oracle-style conditional, **not** the binary `DECODE(bin, charset)`)
+- `DATEDIFF(unit, start, end)` — the 3-argument form
+- Variant accessor `column:key`, `column:["k"]`, `column:a:b.c`
+
+🟡 **Attention** — works but watch out:
+
+- `DATE_FORMAT(ts, fmt)` with pattern letters whose semantics changed in Spark 3.0 (`u`, `U`, `L`, `F`, `c`)
+
+## Out of scope (framework-level, not SQL)
+
+The lint must **not** touch or report:
+
+- `MERGE INTO`, `OPTIMIZE`, `ZORDER BY`, `VACUUM`, `CREATE TABLE ... USING DELTA` — these live in `<dag>_declaration.yml` (`tables_customization`, `run_vacuum`, etc.).
+- `spark.databricks.*` configs — these live in `cluster.custom_configurations.spark_conf`.
+- UDF registration via `spark_session_configs.udfs` — Python-level concern.
+
+## Variant access requires a schema lookup
+
+Rewriting `column:key` depends on the column's Spark type (STRING vs STRUCT vs MAP). The skill consults the database MCP per `database_schema_mcp_priority.mdc` before suggesting a rewrite. If the MCP is unavailable, the skill falls back to flagging only and emits a `-- TODO: verify column type` comment in the suggestion.
+
+## Style preservation
+
+When the user asks for an explicit rewrite, follow `sql_conventions.mdc`: UPPERCASE keywords, snake_case columns, joins on new lines, no `SELECT *`, CTEs over subqueries. Preserve `{load_start_date}` / `{load_end_date}` placeholders and `{{` / `}}` literal-brace escapes (see `databricks_conventions.mdc` §"Literal Braces" and §13).
+
+## See also
+
+- `.cursor/skills/databricks-emr-sql-lint/SKILL.md` — full lint workflow.
+- `.cursor/skills/databricks-emr-sql-lint/RECIPES.md` — per-construct rewrite recipes with before/after examples.
+- `.cursor/skills/databricks-emr-sql-lint/COMPATIBLE.md` — allow-list of constructs that work on both runtimes (do not flag).
+- `databricks_conventions.mdc` — current Databricks dialect (the source of truth for what exists today).
+- `sql_conventions.mdc` — style rules.
