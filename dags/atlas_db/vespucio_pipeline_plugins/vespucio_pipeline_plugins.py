@@ -136,21 +136,35 @@ def create_task(entry_point: str, parameters: List[str], task_id: str = None):
     )
 
 
+property_search_indexer_task = create_task(
+    entry_point="plugins_property_search_indexer",
+    parameters=[
+        f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
+        f"--update_alias",
+        f"--delete_old_indices",
+        f"--input_house_compounds={Tables.house_compounds}",
+        f"--output_index_prefix=vespucio_prod",
+        "--number_of_shards=3",
+        "--number_of_replicas=2",
+    ],
+)
+
+compound_indexer_task = create_task(
+    entry_point="plugins_compound_indexer",
+    parameters=[
+        f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
+        f"--update_alias",
+        f"--delete_old_indices",
+        f"--input_condo_compounds={Tables.condo_compounds}",
+        f"--input_house_compounds={Tables.house_compounds}",
+        f"--input_geocode_cache={Tables.geocode_step_cache}",
+        f"--output_index_prefix=vespucio_prod",
+        "--number_of_shards=3",
+        "--number_of_replicas=2",
+    ],
+)
+
 plugin_tasks = [
-    create_task(
-        entry_point="plugins_compound_indexer",
-        parameters=[
-            f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
-            f"--update_alias",
-            f"--delete_old_indices",
-            f"--input_condo_compounds={Tables.condo_compounds}",
-            f"--input_house_compounds={Tables.house_compounds}",
-            f"--input_geocode_cache={Tables.geocode_step_cache}",
-            f"--output_index_prefix=vespucio_prod",
-            "--number_of_shards=3",
-            "--number_of_replicas=2",
-        ],
-    ),
     create_task(
         entry_point="plugins_rede_house_enrichment_consolidate",
         parameters=[
@@ -180,18 +194,6 @@ plugin_tasks = [
             f"--output_price_by_neighborhood_slug=price_by_neighborhood_slug",
             f"--env={ENV}",
             f"--overwrite_schema",
-        ],
-    ),
-    create_task(
-        entry_point="plugins_property_search_indexer",
-        parameters=[
-            f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
-            f"--update_alias",
-            f"--delete_old_indices",
-            f"--input_house_compounds={Tables.house_compounds}",
-            f"--output_index_prefix=vespucio_prod",
-            "--number_of_shards=3",
-            "--number_of_replicas=2",
         ],
     ),
 ]
@@ -291,6 +293,8 @@ join_plugins = DummyOperator(task_id="join_plugins", dag=dag)
 execute_job_cluster_task >> join_plugins
 
 join_plugins >> plugin_tasks
+join_plugins >> property_search_indexer_task
+property_search_indexer_task >> compound_indexer_task
 join_plugins >> classifieds_tasks[0]
 chain(*classifieds_tasks)
 join_plugins >> zordominium_tasks[0]
