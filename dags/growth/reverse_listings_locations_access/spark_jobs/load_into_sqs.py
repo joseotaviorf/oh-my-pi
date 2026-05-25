@@ -4,9 +4,9 @@ from argparse import ArgumentParser
 from typing import Dict, List, Tuple
 
 import boto3
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.services.configuration_service import ConfigurationService
-from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_into_sqs"
 
@@ -108,7 +108,9 @@ def row_to_dict(row) -> Dict:
         "centroid_lng": float(row.centroid_lng),
         "prices": row.prices.asDict(recursive=True) if row.prices else None,
         "featured_rank": int(row.featured_rank) if row.featured_rank else None,
-        "ebdb_enabled_business_contexts": row.ebdb_enabled_business_contexts if row.ebdb_enabled_business_contexts else None,
+        "ebdb_enabled_business_contexts": row.ebdb_enabled_business_contexts
+        if row.ebdb_enabled_business_contexts
+        else None,
     }
 
 

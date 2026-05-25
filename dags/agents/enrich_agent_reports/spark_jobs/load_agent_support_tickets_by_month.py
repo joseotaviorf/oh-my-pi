@@ -22,18 +22,17 @@
 #   6. Schema/key validation, Delta merge to enrich.
 #
 # How to run unit tests (repo root; pyenv activate bi-etl-ejuice):
-#   python -m pytest tests/unit/agents/enrich_agent_reports/test_load_agent_support_tickets_by_month.py -v
+#   cd packages/bietlejuice-runtime && PYTHONPATH=src:../.. uv run --project envs/dbr-16-4 pytest test/dags/agents/enrich_agent_reports/spark_jobs/test_load_agent_support_tickets_by_month.py -v
 #
 
 # DBTITLE 1,Import libs
 from __future__ import annotations
 
 from argparse import ArgumentParser, Namespace
-from datetime import date, timedelta, datetime
-from dateutil.relativedelta import relativedelta
-import os
+from datetime import date, datetime, timedelta
 from typing import Optional
 
+from dateutil.relativedelta import relativedelta
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import (
     add_months,
@@ -49,10 +48,11 @@ from pyspark.sql.functions import (
     row_number,
     sequence,
     struct,
-    sum as spark_sum,
     to_date,
 )
-
+from pyspark.sql.functions import (
+    sum as spark_sum,
+)
 from pyspark.sql.types import (
     ArrayType,
     BooleanType,
@@ -61,17 +61,15 @@ from pyspark.sql.types import (
     StringType,
     StructField,
     StructType,
-    TimestampType,
 )
+from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from quintoandar_logger import QuintoAndarLogger
 
 # COMMAND ----------
 
@@ -83,18 +81,18 @@ logger = QuintoAndarLogger(JOB_NAME)
 MIN_LISTINGS_FOR_ACTIVE_CIQ = 1
 
 
-TABLE_CIQ_FIRST_LISTING   = "datalake_tiers.ciq_first_listing"
-TABLE_VISIT_SCHEDULES     = "datalake_visit.visit_schedules"
-TABLE_PARTNER             = "datalake_ebdb_clean.partner"
-TABLE_PARTNER_AGENT       = "datalake_ebdb_clean.partner_agent"
-TABLE_DIM_USER            = "dw_public.dim_user"
-TABLE_AGENT_DATA          = "datalake_ebdb_clean.agent_data"
-TABLE_CIQ_AGENTS          = "datalake_ebdb_agents.ciq_agents"
-TABLE_DIM_AGENT           = "dw_public.dim_agent"
-TABLE_FACT_TICKETS        = "dw_customer_support.fact_tickets"
-TABLE_DIM_TAXONOMY        = "dw_customer_support.dim_taxonomy"
+TABLE_CIQ_FIRST_LISTING = "datalake_tiers.ciq_first_listing"
+TABLE_VISIT_SCHEDULES = "datalake_visit.visit_schedules"
+TABLE_PARTNER = "datalake_ebdb_clean.partner"
+TABLE_PARTNER_AGENT = "datalake_ebdb_clean.partner_agent"
+TABLE_DIM_USER = "dw_public.dim_user"
+TABLE_AGENT_DATA = "datalake_ebdb_clean.agent_data"
+TABLE_CIQ_AGENTS = "datalake_ebdb_agents.ciq_agents"
+TABLE_DIM_AGENT = "dw_public.dim_agent"
+TABLE_FACT_TICKETS = "dw_customer_support.fact_tickets"
+TABLE_DIM_TAXONOMY = "dw_customer_support.dim_taxonomy"
 
-TABLE_STATUS_BY_MONTH     = "datalake_agent_reports.agent_status_by_month"
+TABLE_STATUS_BY_MONTH = "datalake_agent_reports.agent_status_by_month"
 
 EXCLUDED_AGENT_TYPES = ["Vistoria", "VistoriaQuarteirizada", "SessaoFotos"]
 
@@ -107,26 +105,44 @@ ARG_SPEC = [
     ("database_base_name", str, "agent_reports", "Base name for database (schema)"),
     ("dag_name", str, "enrich_agent_reports", "DAG name"),
     ("table_name", str, "agent_support_tickets_by_month", "Target enrich table name"),
-    ("load_start_date", str, lambda: (date.today() - timedelta(days=30)).isoformat(), "Interval start YYYY-MM-DD"),
-    ("load_end_date", str, lambda: date.today().isoformat(), "Interval end YYYY-MM-DD (window end date)"),
+    (
+        "load_start_date",
+        str,
+        lambda: (date.today() - timedelta(days=30)).isoformat(),
+        "Interval start YYYY-MM-DD",
+    ),
+    (
+        "load_end_date",
+        str,
+        lambda: date.today().isoformat(),
+        "Interval end YYYY-MM-DD (window end date)",
+    ),
     ("run_mode", str, "dev", "Run mode: prod/dev"),
     ("months_window", int, 18, "Number of months in the lookback window"),
 ]
 
+
 def _defaults():
     return [d() if callable(d) else d for _, _, d, _ in ARG_SPEC]
+
 
 def parse_args() -> Namespace:
     """Parse CLI args. Each positional is optional (nargs='?') so notebook runs with no args use defaults.
     Uses parse_known_args() so kernel flags (e.g. -f) are ignored when run from Databricks notebook."""
     parser = ArgumentParser(description=JOB_NAME)
     default_values = _defaults()
-    for (name, type_, _default, help_text), default_val in zip(ARG_SPEC, default_values):
-        parser.add_argument(name, nargs="?", type=type_, default=default_val, help=help_text)
+    for (name, type_, _default, help_text), default_val in zip(
+        ARG_SPEC, default_values
+    ):
+        parser.add_argument(
+            name, nargs="?", type=type_, default=default_val, help=help_text
+        )
     namespace, _ = parser.parse_known_args()
     return namespace
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,Helper functions
 def _month_range(load_end_date: str, months_window: int = 18) -> tuple[date, date]:
@@ -156,6 +172,7 @@ def _month_expanded(
         ),
     )
 
+
 def _filter_in_month_window(
     source_df: DataFrame, month_col: str, month_start: date, month_end: date
 ) -> DataFrame:
@@ -165,10 +182,14 @@ def _filter_in_month_window(
         (month_col_ref >= month_start) & (month_col_ref <= month_end)
     )
 
+
 # COMMAND ----------
 
+
 # DBTITLE 1,Business rules
-def _qualified_active_ciqs_by_month(load_end_date: str, months_window: int = 18) -> DataFrame:
+def _qualified_active_ciqs_by_month(
+    load_end_date: str, months_window: int = 18
+) -> DataFrame:
     """Agent-months where the agent has a valid first listing in a 3-month window (first listing month + 2 following)."""
     month_start, month_end = _month_range(load_end_date, months_window)
     first_listing = (
@@ -177,8 +198,12 @@ def _qualified_active_ciqs_by_month(load_end_date: str, months_window: int = 18)
         .filter(col("ts_original_first_listing").isNotNull())
         .select(
             col("id_user"),
-            date_trunc("month", col("ts_original_first_listing")).alias("listing_month_start"),
-            add_months(date_trunc("month", col("ts_original_first_listing")), 11).alias("listing_month_end"),
+            date_trunc("month", col("ts_original_first_listing")).alias(
+                "listing_month_start"
+            ),
+            add_months(date_trunc("month", col("ts_original_first_listing")), 11).alias(
+                "listing_month_end"
+            ),
         )
     )
     qualified_user_months = _month_expanded(
@@ -187,7 +212,9 @@ def _qualified_active_ciqs_by_month(load_end_date: str, months_window: int = 18)
         col("listing_month_end"),
     )
     return (
-        _filter_in_month_window(qualified_user_months, "month_ref", month_start, month_end)
+        _filter_in_month_window(
+            qualified_user_months, "month_ref", month_start, month_end
+        )
         .select(col("id_user"), to_date(col("month_ref")).alias("reference_month"))
         .distinct()
     )
@@ -213,15 +240,14 @@ def _all_listings_by_month(load_end_date: str, months_window: int = 18) -> DataF
 
 
 # --- Visits: each completed visit counts for its month and the next (2-month window) ---
-def _all_agents_visits_by_month(load_end_date: str, months_window: int = 18) -> DataFrame:
+def _all_agents_visits_by_month(
+    load_end_date: str, months_window: int = 18
+) -> DataFrame:
     """Count distinct visits per (id_agent, reference_month); visits counts for the month that they were made and the following month"""
     month_start, month_end = _month_range(load_end_date, months_window)
     completed_visits = (
         spark.table(TABLE_VISIT_SCHEDULES)
-        .filter(
-            (col("is_completed") == True)
-            & col("ts_schedule_visit").isNotNull()
-        )
+        .filter((col("is_completed") == True) & col("ts_schedule_visit").isNotNull())
         .withColumn(
             "visit_month",
             date_trunc("month", col("ts_schedule_visit")),
@@ -240,12 +266,12 @@ def _all_agents_visits_by_month(load_end_date: str, months_window: int = 18) -> 
         visits_expanded["month_ref"] <= month_end
     )
     return (
-        visits_with_reference_months
-        .groupBy("id_agent", "month_ref")
+        visits_with_reference_months.groupBy("id_agent", "month_ref")
         .agg(countDistinct("id_schedule").alias("total_visits_count"))
         .withColumn("reference_month", to_date(col("month_ref")))
         .drop("month_ref")
     )
+
 
 def _excluded_agent_users() -> DataFrame:
     """Returns distinct id_user for fotógrafo/vistoriador agents to exclude from broker reports."""
@@ -260,8 +286,16 @@ def _excluded_agent_users() -> DataFrame:
 
 def _independent_agent_eligible() -> DataFrame:
     """Service criteria for eligibility for independent agents. This is how the services see independent agent, not how Operations define (they use a sheet-based control)"""
-    partner = spark.table(TABLE_PARTNER).filter(col("uuid_company").isNotNull()).alias("partner")
-    partner_agent = spark.table(TABLE_PARTNER_AGENT).filter(col("status") == "ACTIVE").alias("partner_agent")
+    partner = (
+        spark.table(TABLE_PARTNER)
+        .filter(col("uuid_company").isNotNull())
+        .alias("partner")
+    )
+    partner_agent = (
+        spark.table(TABLE_PARTNER_AGENT)
+        .filter(col("status") == "ACTIVE")
+        .alias("partner_agent")
+    )
     dim_user = spark.table(TABLE_DIM_USER).alias("dim_user")
     agent_data = (
         spark.table(TABLE_AGENT_DATA)
@@ -273,9 +307,13 @@ def _independent_agent_eligible() -> DataFrame:
         .alias("agent_data")
     )
     return (
-        partner.join(partner_agent, col("partner.id") == col("partner_agent.id_partner"), "left")
+        partner.join(
+            partner_agent, col("partner.id") == col("partner_agent.id_partner"), "left"
+        )
         .join(dim_user, col("partner_agent.id_user") == col("dim_user.sk_user"), "left")
-        .join(agent_data, col("dim_user.dados_agente_id") == col("agent_data.id"), "left")
+        .join(
+            agent_data, col("dim_user.dados_agente_id") == col("agent_data.id"), "left"
+        )
         .select(
             col("dim_user.sk_user").alias("id_user"),
             col("agent_data.is_passive_lead_receiver"),
@@ -286,7 +324,9 @@ def _independent_agent_eligible() -> DataFrame:
 
 def _business_context() -> DataFrame:
     """Return the current business context for an agent. Dedupes by id_user: keep latest by ts_updated; if tied, one arbitrary."""
-    window_by_user = Window.partitionBy("id_user").orderBy(col("ts_updated").desc_nulls_last(), col("id_agent"))
+    window_by_user = Window.partitionBy("id_user").orderBy(
+        col("ts_updated").desc_nulls_last(), col("id_agent")
+    )
 
     ciq_agents = (
         spark.table(TABLE_CIQ_AGENTS)
@@ -312,17 +352,24 @@ def _business_context() -> DataFrame:
         )
         .alias("dim_agent")
     )
-    return (
-        ciq_agents.join(dim_agent, col("ciq_agents.id_user") == col("dim_agent.id_user"), "full_outer")
-        .select(
-            coalesce(col("ciq_agents.id_user"), col("dim_agent.id_user")).alias("id_user"),
-            coalesce(col("ciq_agents.id_agent"), col("dim_agent.id_agent")).alias("id_agent"),
-            coalesce(col("ciq_agents.is_sale_agent"), col("dim_agent.is_sale_agent")).alias("is_sale_agent"),
-            coalesce(col("ciq_agents.is_rent_agent"), col("dim_agent.is_rent_agent")).alias("is_rent_agent"),
-        )
+    return ciq_agents.join(
+        dim_agent, col("ciq_agents.id_user") == col("dim_agent.id_user"), "full_outer"
+    ).select(
+        coalesce(col("ciq_agents.id_user"), col("dim_agent.id_user")).alias("id_user"),
+        coalesce(col("ciq_agents.id_agent"), col("dim_agent.id_agent")).alias(
+            "id_agent"
+        ),
+        coalesce(col("ciq_agents.is_sale_agent"), col("dim_agent.is_sale_agent")).alias(
+            "is_sale_agent"
+        ),
+        coalesce(col("ciq_agents.is_rent_agent"), col("dim_agent.is_rent_agent")).alias(
+            "is_rent_agent"
+        ),
     )
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,Tickets related to agents
 def _tickets_by_user_monthly(load_end_date: str, months_window: int = 18) -> DataFrame:
@@ -331,7 +378,11 @@ def _tickets_by_user_monthly(load_end_date: str, months_window: int = 18) -> Dat
     fact_tickets = spark.table(TABLE_FACT_TICKETS).alias("fact_tickets")
     dim_taxonomy = spark.table(TABLE_DIM_TAXONOMY).alias("dim_taxonomy")
     tickets_with_taxonomy = (
-        fact_tickets.join(dim_taxonomy, col("fact_tickets.sk_taxonomy") == col("dim_taxonomy.sk_taxonomy"), "left")
+        fact_tickets.join(
+            dim_taxonomy,
+            col("fact_tickets.sk_taxonomy") == col("dim_taxonomy.sk_taxonomy"),
+            "left",
+        )
         .filter(
             (col("fact_tickets.sk_user") != -1)
             & (col("fact_tickets.direction") == "inbound")
@@ -352,14 +403,15 @@ def _tickets_by_user_monthly(load_end_date: str, months_window: int = 18) -> Dat
         col("fact_tickets.channel"),
         col("dim_taxonomy.step_tag"),
         col("dim_taxonomy.theme_detail"),
-        to_date(date_trunc("month", col("fact_tickets.ts_solved"))).alias("reference_month"),
+        to_date(date_trunc("month", col("fact_tickets.ts_solved"))).alias(
+            "reference_month"
+        ),
     )
-    tickets_by_channel_step_theme = (
-        tickets_with_taxonomy.groupBy("sk_user", "reference_month", "channel", "step_tag", "theme_detail")
-        .agg(
-            countDistinct("sk_ticket").alias("total_tickets"),
-            spark_sum("reopens").alias("sum_reopens"),
-        )
+    tickets_by_channel_step_theme = tickets_with_taxonomy.groupBy(
+        "sk_user", "reference_month", "channel", "step_tag", "theme_detail"
+    ).agg(
+        countDistinct("sk_ticket").alias("total_tickets"),
+        spark_sum("reopens").alias("sum_reopens"),
     )
     return tickets_by_channel_step_theme.groupBy("sk_user", "reference_month").agg(
         spark_sum("total_tickets").alias("total_tickets"),
@@ -375,7 +427,9 @@ def _tickets_by_user_monthly(load_end_date: str, months_window: int = 18) -> Dat
         ).alias("ticket_breakdown_aggregated"),
     )
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,Eligibility criterias
 def _join_base_with_metrics(
@@ -429,10 +483,14 @@ def _join_base_with_metrics(
         col("base.id_user"),
         col("base.id_agent"),
         col("base.reference_month"),
-        coalesce(col("listings.total_listings_count"), lit(0)).alias("total_listings_count"),
+        coalesce(col("listings.total_listings_count"), lit(0)).alias(
+            "total_listings_count"
+        ),
         coalesce(col("visits.total_visits_count"), lit(0)).alias("total_visits_count"),
         col("qualified.id_user").isNotNull().alias("is_ciq_qualified_active"),
-        col("independent.is_passive_lead_receiver").alias("is_passive_lead_receiver_current"),
+        col("independent.is_passive_lead_receiver").alias(
+            "is_passive_lead_receiver_current"
+        ),
         col("context.is_sale_agent"),
         col("context.is_rent_agent"),
         col("base.agent_status"),
@@ -452,15 +510,15 @@ def _add_eligibility_flags(base_with_metrics: DataFrame) -> DataFrame:
     ciq_status = coalesce(col("ciq_status"), lit("INACTIVE"))
     is_passive = coalesce(col("is_passive_lead_receiver_current"), lit(True))
 
-    is_demand_agent_eligible = (agent_status == "ACTIVE")
-    is_ciq_eligible = (ciq_status == "ACTIVE")
+    is_demand_agent_eligible = agent_status == "ACTIVE"
+    is_ciq_eligible = ciq_status == "ACTIVE"
     is_independent_agent = (
-        (is_passive == False)
-        & (ciq_status == "ACTIVE")
-        & (agent_status == "ACTIVE")
+        (is_passive == False) & (ciq_status == "ACTIVE") & (agent_status == "ACTIVE")
     )
     is_agent_active = is_passive & (agent_status == "ACTIVE")
-    is_ciq_active = (ciq_status == "ACTIVE") & (col("total_listings_count") > MIN_LISTINGS_FOR_ACTIVE_CIQ)
+    is_ciq_active = (ciq_status == "ACTIVE") & (
+        col("total_listings_count") > MIN_LISTINGS_FOR_ACTIVE_CIQ
+    )
     is_ineligible = (agent_status == "INACTIVE") & (ciq_status == "INACTIVE")
 
     return base_with_metrics.select(
@@ -501,12 +559,18 @@ def build_agent_support_tickets_by_month(args: Namespace) -> DataFrame:
         excluded_users, on="id_user", how="left_anti"
     )
 
-    qualified_ciq_user_months       = _qualified_active_ciqs_by_month(args.load_end_date, months_window)
-    listings_count_by_user_month    = _all_listings_by_month(args.load_end_date, months_window)
-    visits_count_by_agent_month     = _all_agents_visits_by_month(args.load_end_date, months_window)
-    independent_agent_eligibility   = _independent_agent_eligible()
-    business_context                = _business_context()
-    tickets_by_user_month           = _tickets_by_user_monthly(args.load_end_date, months_window)
+    qualified_ciq_user_months = _qualified_active_ciqs_by_month(
+        args.load_end_date, months_window
+    )
+    listings_count_by_user_month = _all_listings_by_month(
+        args.load_end_date, months_window
+    )
+    visits_count_by_agent_month = _all_agents_visits_by_month(
+        args.load_end_date, months_window
+    )
+    independent_agent_eligibility = _independent_agent_eligible()
+    business_context = _business_context()
+    tickets_by_user_month = _tickets_by_user_monthly(args.load_end_date, months_window)
 
     base_with_metrics = _join_base_with_metrics(
         status_by_month_in_window,
@@ -519,36 +583,43 @@ def build_agent_support_tickets_by_month(args: Namespace) -> DataFrame:
     )
     return _add_eligibility_flags(base_with_metrics)
 
+
 # COMMAND ----------
 
 # DBTITLE 1,Pre-write validations
-TICKET_BREAKDOWN_STRUCT = StructType([
-    StructField("channel", StringType(), True),
-    StructField("step_tag", StringType(), True),
-    StructField("theme_detail", StringType(), True),
-    StructField("total_tickets", LongType(), True),
-    StructField("sum_reopens", LongType(), True),
-])
+TICKET_BREAKDOWN_STRUCT = StructType(
+    [
+        StructField("channel", StringType(), True),
+        StructField("step_tag", StringType(), True),
+        StructField("theme_detail", StringType(), True),
+        StructField("total_tickets", LongType(), True),
+        StructField("sum_reopens", LongType(), True),
+    ]
+)
 
-EXPECTED_SCHEMA = StructType([
-    StructField("id_user", LongType(), True),
-    StructField("id_agent", LongType(), True),
-    StructField("reference_month", DateType(), True),
-    StructField("total_listings_count", LongType(), False),
-    StructField("total_visits_count", LongType(), False),
-    StructField("is_sale_agent", BooleanType(), True),
-    StructField("is_rent_agent", BooleanType(), True),
-    StructField("total_tickets", LongType(), True),
-    StructField("sum_reopens", LongType(), True),
-    StructField("ticket_breakdown_aggregated", ArrayType(TICKET_BREAKDOWN_STRUCT), True),
-    StructField("is_demand_agent_eligible", BooleanType(), False),
-    StructField("is_ciq_eligible", BooleanType(), False),
-    StructField("is_independent_agent", BooleanType(), False),
-    StructField("is_agent_active", BooleanType(), False),
-    StructField("is_ciq_active", BooleanType(), False),
-    StructField("is_ciq_qualified_active", BooleanType(), False),
-    StructField("is_ineligible", BooleanType(), False),
-])
+EXPECTED_SCHEMA = StructType(
+    [
+        StructField("id_user", LongType(), True),
+        StructField("id_agent", LongType(), True),
+        StructField("reference_month", DateType(), True),
+        StructField("total_listings_count", LongType(), False),
+        StructField("total_visits_count", LongType(), False),
+        StructField("is_sale_agent", BooleanType(), True),
+        StructField("is_rent_agent", BooleanType(), True),
+        StructField("total_tickets", LongType(), True),
+        StructField("sum_reopens", LongType(), True),
+        StructField(
+            "ticket_breakdown_aggregated", ArrayType(TICKET_BREAKDOWN_STRUCT), True
+        ),
+        StructField("is_demand_agent_eligible", BooleanType(), False),
+        StructField("is_ciq_eligible", BooleanType(), False),
+        StructField("is_independent_agent", BooleanType(), False),
+        StructField("is_agent_active", BooleanType(), False),
+        StructField("is_ciq_active", BooleanType(), False),
+        StructField("is_ciq_qualified_active", BooleanType(), False),
+        StructField("is_ineligible", BooleanType(), False),
+    ]
+)
 
 
 def _schema_mismatches(actual: StructType, expected: StructType) -> list[str]:
@@ -560,8 +631,13 @@ def _schema_mismatches(actual: StructType, expected: StructType) -> list[str]:
             mismatch_list.append(f"missing: {name}")
         elif name not in expected_by_name:
             mismatch_list.append(f"unexpected: {name}")
-        elif actual_by_name[name].dataType.simpleString() != expected_by_name[name].dataType.simpleString():
-            mismatch_list.append(f"{name}: expected {expected_by_name[name].dataType.simpleString()}, got {actual_by_name[name].dataType.simpleString()}")
+        elif (
+            actual_by_name[name].dataType.simpleString()
+            != expected_by_name[name].dataType.simpleString()
+        ):
+            mismatch_list.append(
+                f"{name}: expected {expected_by_name[name].dataType.simpleString()}, got {actual_by_name[name].dataType.simpleString()}"
+            )
     return mismatch_list
 
 
@@ -595,7 +671,9 @@ def validate_before_write(source_df: DataFrame) -> int:
     )
     return row_count
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,Writing
 def _save_to_enrich(
@@ -626,7 +704,10 @@ def _save_to_enrich(
 
 
 def save_df(
-    spark_client: SparkClient, result_df: DataFrame, args: Namespace, row_count: Optional[int] = None
+    spark_client: SparkClient,
+    result_df: DataFrame,
+    args: Namespace,
+    row_count: Optional[int] = None,
 ) -> None:
     """Dispatch to dev (temp view) or prod (Delta merge to enrich). row_count from validate_before_write avoids recount in prod."""
     run_mode = getattr(args, "run_mode", "dev")
@@ -641,11 +722,18 @@ def save_df(
         )
         return
     elif run_mode == "prod":
-        _save_to_enrich(spark_client, result_df, args, row_count if row_count is not None else result_df.count())
+        _save_to_enrich(
+            spark_client,
+            result_df,
+            args,
+            row_count if row_count is not None else result_df.count(),
+        )
     else:
         raise ValueError(f"Invalid run mode: {run_mode}")
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,Main
 def main(args: Namespace | None = None) -> None:
@@ -656,11 +744,12 @@ def main(args: Namespace | None = None) -> None:
         f"m=main, run_mode={run_mode}, table={args.table_name}, "
         f"interval_end={args.load_end_date}, msg=Starting"
     )
-    
+
     support_tickets_by_month = build_agent_support_tickets_by_month(args)
     row_count = validate_before_write(support_tickets_by_month)
     save_df(SparkClient(), support_tickets_by_month, args, row_count=row_count)
     logger.info("m=main, msg=Job finished successfully")
+
 
 # COMMAND ----------
 

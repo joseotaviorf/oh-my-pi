@@ -1,16 +1,14 @@
-import boto3
 import json
 import logging
-
 from argparse import ArgumentParser
-from datetime import datetime, date, timezone
+from datetime import date, datetime, timezone
 from uuid import uuid4
+
+import boto3
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.services.configuration_service import ConfigurationService
-
-from quintoandar_logger import QuintoAndarLogger
-
 
 JOB_NAME = "load_into_sns"
 
@@ -32,7 +30,9 @@ def parse_arguments() -> dict:
     parser.add_argument("table_name", help="Name of the table to be loaded")
     parser.add_argument("event_type", help="Type of event to be sent to SNS")
     parser.add_argument("sns_topic_arn", help="ARN of the SNS topic")
-    parser.add_argument("chunk_size", type=int, help="Chunk Size used for each table message")
+    parser.add_argument(
+        "chunk_size", type=int, help="Chunk Size used for each table message"
+    )
 
     args = parser.parse_args()
 
@@ -49,21 +49,24 @@ def parse_arguments() -> dict:
         "table_name": table_name,
         "event_type": event_type,
         "sns_topic_arn": sns_topic_arn,
-        "chunk_size": chunk_size
+        "chunk_size": chunk_size,
     }
+
 
 def json_serial(obj):
     """JSON serializer for objects not serializable by default json code"""
 
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
-    raise TypeError("Type %s not serializable" % type(obj))
+    raise TypeError(f"Type {type(obj)} not serializable")
+
 
 def format_sns_message(message: dict):
     """
     Format a message to SNS.
     """
-    return {'Id': message['id'], 'Message': json.dumps(message, default=json_serial)}
+    return {"Id": message["id"], "Message": json.dumps(message, default=json_serial)}
+
 
 def publish_message_to_sns(region: str, sns_topic_arn: str, message: dict):
     """
@@ -71,15 +74,18 @@ def publish_message_to_sns(region: str, sns_topic_arn: str, message: dict):
     """
     sns_client = boto3.client("sns", region_name=region)
     sns_client.publish(
-        TopicArn=sns_topic_arn, Message=json.dumps(message, default=json_serial, ensure_ascii=False)
+        TopicArn=sns_topic_arn,
+        Message=json.dumps(message, default=json_serial, ensure_ascii=False),
     )
+
 
 def split_in_chunks(list_of_elements: list, chunk_size: int):
     """
     Yield successive n-sized chunks from list.
     """
     for i in range(0, len(list_of_elements), chunk_size):
-        yield list_of_elements[i:i + chunk_size]
+        yield list_of_elements[i : i + chunk_size]
+
 
 def load_table_into_sns(
     database_name: str,
@@ -101,27 +107,23 @@ def load_table_into_sns(
     message_chunks = split_in_chunks(message_contents, chunk_size)
 
     messages = [
-      {
-          "id_message": str(uuid4()),
-          "ts_message": datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S'),
-          "event_type": event_type,
-          "payload": chunk
-      } for chunk in message_chunks
+        {
+            "id_message": str(uuid4()),
+            "ts_message": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S"),
+            "event_type": event_type,
+            "payload": chunk,
+        }
+        for chunk in message_chunks
     ]
 
-    messages_batches_rdd = spark_client.conn.sparkContext.parallelize(
-        messages
-    )
+    messages_batches_rdd = spark_client.conn.sparkContext.parallelize(messages)
 
     responses = messages_batches_rdd.map(
-        lambda batch: publish_message_to_sns(
-            region, sns_topic_arn, batch
-        )
+        lambda batch: publish_message_to_sns(region, sns_topic_arn, batch)
     ).collect()
 
-    logger.info(
-        "msg=events requests responses={}".format(responses)
-    )
+    logger.info(f"msg=events requests responses={responses}")
+
 
 def main():
     """
@@ -141,8 +143,9 @@ def main():
         table_name=job_args_dict["table_name"],
         event_type=job_args_dict["event_type"],
         sns_topic_arn=sns_topic_arn,
-        chunk_size=job_args_dict["chunk_size"]
+        chunk_size=job_args_dict["chunk_size"],
     )
+
 
 if __name__ == "__main__":
     main()

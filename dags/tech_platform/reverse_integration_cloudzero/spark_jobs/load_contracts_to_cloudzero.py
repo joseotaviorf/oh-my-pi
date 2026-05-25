@@ -1,14 +1,12 @@
 import json
 import logging
 from argparse import ArgumentParser
-from datetime import datetime
 
 import requests
 from quintoandar_logger import QuintoAndarLogger
 from requests import RequestException
 from requests.adapters import HTTPAdapter, Retry
 
-from bietlejuice.base.service.service_enum import ServiceEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient
 
@@ -19,7 +17,9 @@ logging.getLogger("py4j").setLevel(logging.INFO)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def get_contracts_count_from_trino(spark_client: SparkClient, execution_date: str) -> int:
+def get_contracts_count_from_trino(
+    spark_client: SparkClient, execution_date: str
+) -> int:
     """
     This function gets the contracts count from the reverse table and returns the total count
 
@@ -35,15 +35,21 @@ def get_contracts_count_from_trino(spark_client: SparkClient, execution_date: st
 
     if rows:
         # Get the contracts count from the first row
-        contracts_count = rows[0].get('contracts_count', 0)
-        logger.info(f"m=get_contracts_count_from_trino, execution_date={execution_date}, contracts_count={contracts_count}")
+        contracts_count = rows[0].get("contracts_count", 0)
+        logger.info(
+            f"m=get_contracts_count_from_trino, execution_date={execution_date}, contracts_count={contracts_count}"
+        )
         return contracts_count
     else:
-        logger.info(f"m=get_contracts_count_from_trino, execution_date={execution_date}, no_contracts_found")
+        logger.info(
+            f"m=get_contracts_count_from_trino, execution_date={execution_date}, no_contracts_found"
+        )
         return 0
 
 
-def send_to_cloudzero(contracts_count: int, execution_date: str, cloudzero_token: str) -> None:
+def send_to_cloudzero(
+    contracts_count: int, execution_date: str, cloudzero_token: str
+) -> None:
     """
     Send contracts count to CloudZero API.
 
@@ -59,7 +65,7 @@ def send_to_cloudzero(contracts_count: int, execution_date: str, cloudzero_token
             {
                 "granularity": "MONTHLY",
                 "timestamp": execution_date,
-                "value": contracts_count
+                "value": contracts_count,
             }
         ]
     }
@@ -68,15 +74,12 @@ def send_to_cloudzero(contracts_count: int, execution_date: str, cloudzero_token
     url = "https://api.cloudzero.com/unit-cost/v1/telemetry/metric/quintoandar_contracts_ongoing_rentals/replace"
 
     # Headers
-    headers = {
-        'Authorization': cloudzero_token,
-        'content-type': 'application/json'
-    }
+    headers = {"Authorization": cloudzero_token, "content-type": "application/json"}
 
     # Setup session with retries
     session = requests.Session()
     retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504])
-    session.mount('https://', HTTPAdapter(max_retries=retries))
+    session.mount("https://", HTTPAdapter(max_retries=retries))
 
     # Add SSL configuration to handle potential SSL issues
     session.verify = True
@@ -110,7 +113,9 @@ if __name__ == "__main__":
     environment = args.environment
     execution_date = args.execution_date
 
-    logger.info(f"m=__main__, environment={environment}, execution_date={execution_date}")
+    logger.info(
+        f"m=__main__, environment={environment}, execution_date={execution_date}"
+    )
 
     try:
         # Get CloudZero token from Databricks secrets
@@ -118,7 +123,7 @@ if __name__ == "__main__":
         if base_dbutils.get_dbutils() is not None:
             dbutils = base_dbutils.get_dbutils()
 
-        logger.info(f"m=__main__, Getting credentials from Databricks secrets")
+        logger.info("m=__main__, Getting credentials from Databricks secrets")
         json_credentials = dbutils.secrets.get(
             scope=DATABRICKS_SCOPE, key="CLOUDZERO_API_TOKEN"
         )
@@ -129,8 +134,10 @@ if __name__ == "__main__":
             raise RuntimeError(f"Error parsing CLOUDZERO_API_TOKEN secret as JSON: {e}")
 
         if not isinstance(credentials_dict, dict) or "token" not in credentials_dict:
-            logger.error(f"m=__main__, missing_token_key_in_credentials")
-            raise RuntimeError("CLOUDZERO_API_TOKEN secret does not contain a 'token' key.")
+            logger.error("m=__main__, missing_token_key_in_credentials")
+            raise RuntimeError(
+                "CLOUDZERO_API_TOKEN secret does not contain a 'token' key."
+            )
         cloudzero_token = credentials_dict["token"]
 
         # Initialize Spark client

@@ -11,11 +11,11 @@ This script:
 """
 
 import argparse
-import os
 import sys
-import yaml
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
+from typing import List, Set, Tuple
+
+import yaml
 
 # Import GitService for git-based validation
 sys.path.append(str(Path(__file__).parent.parent))
@@ -56,7 +56,7 @@ def validate_and_sanitize_file_path(file_path: str) -> Path:
         raise ValueError(f"File path must be within project directory: {file_path}")
 
     # Check if it's a YAML file
-    if not path.suffix.lower() in ['.yml', '.yaml']:
+    if path.suffix.lower() not in [".yml", ".yaml"]:
         raise ValueError(f"File must be a YAML file (.yml or .yaml): {file_path}")
 
     return path
@@ -79,7 +79,9 @@ def find_core_model_dags() -> List[Path]:
     return core_dags
 
 
-def extract_tables_from_declaration(declaration_file: Path) -> Tuple[str, str, Set[str]]:
+def extract_tables_from_declaration(
+    declaration_file: Path,
+) -> Tuple[str, str, Set[str]]:
     """
     Extract table names from a declaration file.
 
@@ -87,13 +89,13 @@ def extract_tables_from_declaration(declaration_file: Path) -> Tuple[str, str, S
         Tuple of (dag_name, layer, set_of_table_names)
     """
     try:
-        with open(declaration_file, 'r') as f:
+        with open(declaration_file) as f:
             declaration = yaml.safe_load(f)
 
-        dag_name = declaration.get('dag', {}).get('name', '')
-        workflow = declaration.get('workflow', {})
-        layer = workflow.get('layer', '')
-        tables_customization = workflow.get('tables_customization', {})
+        dag_name = declaration.get("dag", {}).get("name", "")
+        workflow = declaration.get("workflow", {})
+        layer = workflow.get("layer", "")
+        tables_customization = workflow.get("tables_customization", {})
 
         # Extract table names from tables_customization
         table_names = set(tables_customization.keys())
@@ -102,7 +104,7 @@ def extract_tables_from_declaration(declaration_file: Path) -> Tuple[str, str, S
 
     except Exception as e:
         print(f"❌ Error reading declaration file {declaration_file}: {e}")
-        return '', '', set()
+        return "", "", set()
 
 
 def check_schema_file_exists(dag_dir: Path, layer: str, table_name: str) -> bool:
@@ -163,7 +165,9 @@ def get_schema_files_to_validate(mode, input) -> List[Tuple[Path, str]]:
         core_dags = find_core_model_dags()
         for dag_dir in core_dags:
             declaration_file = dag_dir / f"{dag_dir.name}_declaration.yml"
-            dag_name, layer, table_names = extract_tables_from_declaration(declaration_file)
+            dag_name, layer, table_names = extract_tables_from_declaration(
+                declaration_file
+            )
             if dag_name and layer and table_names:
                 for table_name in table_names:
                     schema_file = dag_dir / "schemas" / layer / f"{table_name}.yml"
@@ -185,17 +189,21 @@ def get_schema_files_to_validate(mode, input) -> List[Tuple[Path, str]]:
         for file_path, status in changed_files.items():
             if status in GitService.UPSERT_STATUS_CODES:
                 # Check if it's a schema file
-                if file_path.endswith('.yml') and '/schemas/' in file_path:
+                if file_path.endswith(".yml") and "/schemas/" in file_path:
                     schema_files_set.add((Path(file_path), status))
                 # Check if it's a declaration file (which might affect schema requirements)
-                elif file_path.endswith('_declaration.yml') and '/core/' in file_path:
+                elif file_path.endswith("_declaration.yml") and "/core/" in file_path:
                     # If declaration file changed, we need to validate all schemas for that DAG
                     dag_dir = Path(file_path).parent
                     declaration_file = dag_dir / f"{dag_dir.name}_declaration.yml"
-                    dag_name, layer, table_names = extract_tables_from_declaration(declaration_file)
+                    dag_name, layer, table_names = extract_tables_from_declaration(
+                        declaration_file
+                    )
                     if dag_name and layer and table_names:
                         for table_name in table_names:
-                            schema_file = dag_dir / "schemas" / layer / f"{table_name}.yml"
+                            schema_file = (
+                                dag_dir / "schemas" / layer / f"{table_name}.yml"
+                            )
                             schema_files_set.add((schema_file, status))
 
         # Convert set back to list
@@ -244,21 +252,23 @@ def validate_core_model_schemas(mode="all_files", input=None, verbose=False) -> 
             print(f"   ❌ {schema_file.name} - MISSING")
             missing_schemas.append(str(schema_file))
 
-    print(f"\n📊 Validation Summary:")
+    print("\n📊 Validation Summary:")
     print(f"   Total files: {len(files_to_validate)}")
     print(f"   Validated: {validated_tables}")
     print(f"   Missing: {len(missing_schemas)}")
 
     if missing_schemas:
-        print(f"\n❌ Missing schema files:")
+        print("\n❌ Missing schema files:")
         for schema_path in sorted(missing_schemas):
             print(f"   - {schema_path}")
 
-        print(f"\n💡 To fix this, create the missing schema files with the expected structure:")
-        print(f"   Example: dags/core/{{dag_name}}/schemas/{{layer}}/{{table_name}}.yml")
+        print(
+            "\n💡 To fix this, create the missing schema files with the expected structure:"
+        )
+        print("   Example: dags/core/{dag_name}/schemas/{layer}/{table_name}.yml")
         return False
     else:
-        print(f"\n✅ All core model schema files exist!")
+        print("\n✅ All core model schema files exist!")
         return True
 
 
@@ -268,10 +278,10 @@ def main():
     success = validate_core_model_schemas(mode, input, verbose)
 
     if not success:
-        print(f"\n❌ Schema validation failed!")
+        print("\n❌ Schema validation failed!")
         sys.exit(1)
     else:
-        print(f"\n✅ Schema validation passed!")
+        print("\n✅ Schema validation passed!")
         sys.exit(0)
 
 

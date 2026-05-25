@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from datetime import datetime
-from quintoandar_logger import QuintoAndarLogger
 
+from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_reverse_kyc"
 

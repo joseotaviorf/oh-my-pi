@@ -3,7 +3,6 @@ from argparse import ArgumentParser
 import pandas as pd
 import yaml
 from pyspark.sql import functions as F
-
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -150,7 +149,9 @@ if __name__ == "__main__":
         dag_dependencies = dag_dependencies.union(update_dag_dependency)
 
         if (
-            level_dependencies.where(F.col("up_level_dag_dependency").isNotNull()).count()
+            level_dependencies.where(
+                F.col("up_level_dag_dependency").isNotNull()
+            ).count()
             == 0
         ):
             break

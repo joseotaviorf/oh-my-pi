@@ -1,25 +1,24 @@
-from argparse import ArgumentParser, Namespace
 import json
 import re
+from argparse import ArgumentParser, Namespace
 from typing import List
+
+from pyspark.sql.functions import col
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.cdc.primary_key_identifiers.clean_primary_key_identifier import (
     CleanPrimaryKeyIdentifier,
 )
 from bietlejuice.base.databricks.row_filter import RowFilter
-
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark.delta_secondary_catalog_sync import (
     partition_columns_present,
     sync_delta_write_to_secondary_catalog,
 )
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.base.spark.runtime_detector import RuntimeDetector
-from pyspark.sql.functions import col
-
-from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_cdc_clean"
 
@@ -109,7 +108,9 @@ def insert_columns_into_query(query, columns):
 def main():
     global spark
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
 
         spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
@@ -145,9 +146,7 @@ def main():
     )
 
     clean_query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
-        dag_name=dag_name,
-        layer="clean",
-        table_name=table_name
+        dag_name=dag_name, layer="clean", table_name=table_name
     )
 
     cdc_columns = ["op_cdc", "ts_cdc_transaction", "ts_database_transaction"]

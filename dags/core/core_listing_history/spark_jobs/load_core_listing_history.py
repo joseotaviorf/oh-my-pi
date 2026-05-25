@@ -4,8 +4,8 @@ from typing import Any, Dict, List
 
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
-from pyspark.sql.window import Window
 from pyspark.sql.utils import AnalysisException
+from pyspark.sql.window import Window
 
 from bietlejuice.base.core_models.helpers.historical_helper import HistoricalHelper
 from bietlejuice.base.core_models.helpers.surrogate_keys import SurrogateKeysHelper
@@ -34,7 +34,6 @@ _OUTPUT_COLUMNS = [
     "month",
     "day",
 ]
-
 
 
 class CoreListingHistorySparkJob(BaseCoreModelSparkJob):
@@ -137,7 +136,9 @@ class CoreListingHistorySparkJob(BaseCoreModelSparkJob):
                 F.concat(
                     F.col("id_house").cast("string"),
                     F.lpad(F.col("listing_version").cast("string"), 3, "0"),
-                ).cast("bigint").alias("_version_range__id_house_listing"),
+                )
+                .cast("bigint")
+                .alias("_version_range__id_house_listing"),
                 F.col("_version_range__ts_start"),
                 F.col("_version_range__ts_end"),
             )
@@ -165,20 +166,17 @@ class CoreListingHistorySparkJob(BaseCoreModelSparkJob):
             "left",
         )
 
-        resolved = (
-            joined.withColumn(
-                "id_house_listing",
-                F.when(
-                    F.col("business_context") == "SALE",
-                    F.concat(F.col("id_house"), F.lit("000")).cast("bigint"),
-                ).otherwise(F.col("_version_range__id_house_listing")),
-            )
-            .drop(
-                "_version_range__id_house",
-                "_version_range__id_house_listing",
-                "_version_range__ts_start",
-                "_version_range__ts_end",
-            )
+        resolved = joined.withColumn(
+            "id_house_listing",
+            F.when(
+                F.col("business_context") == "SALE",
+                F.concat(F.col("id_house"), F.lit("000")).cast("bigint"),
+            ).otherwise(F.col("_version_range__id_house_listing")),
+        ).drop(
+            "_version_range__id_house",
+            "_version_range__id_house_listing",
+            "_version_range__ts_start",
+            "_version_range__ts_end",
         )
 
         return resolved.filter(F.col("id_house_listing").isNotNull())
@@ -210,9 +208,8 @@ class CoreListingHistorySparkJob(BaseCoreModelSparkJob):
             spark, lbc_transactional_table, args
         )
 
-        df = (
-            df.withColumn("id_house", F.col("imovelId").cast("string"))
-            .withColumn("business_context", F.col("businessContext"))
+        df = df.withColumn("id_house", F.col("imovelId").cast("string")).withColumn(
+            "business_context", F.col("businessContext")
         )
 
         df = self._resolve_version(df, version_ranges)
@@ -247,9 +244,7 @@ class CoreListingHistorySparkJob(BaseCoreModelSparkJob):
                 )
                 event_dfs.append(events)
 
-            sale_source = df_source.filter(
-                F.col("business_context") == "SALE"
-            )
+            sale_source = df_source.filter(F.col("business_context") == "SALE")
             for ec in sale_configs:
                 events = self._detect_changes_and_emit(
                     sale_source, ec, lbc_transactional_table, event_type="cdc"
@@ -283,9 +278,7 @@ class CoreListingHistorySparkJob(BaseCoreModelSparkJob):
         rent_configs = self.get_config("rent_price_event_configs")
         sale_configs = self.get_config("sale_price_event_configs")
 
-        house_df = HistoricalHelper.load_transactional_data(
-            spark, house_table, args
-        )
+        house_df = HistoricalHelper.load_transactional_data(spark, house_table, args)
 
         event_dfs: List[DataFrame] = []
 
@@ -395,9 +388,7 @@ class CoreListingHistorySparkJob(BaseCoreModelSparkJob):
         )
 
         aux_df = (
-            aux_df.withColumn(
-                "id_house", F.col("id_house").cast("string")
-            )
+            aux_df.withColumn("id_house", F.col("id_house").cast("string"))
             .withColumn("business_context", F.lit("RENT"))
             .withColumn(
                 "id_house_listing",
@@ -419,8 +410,7 @@ class CoreListingHistorySparkJob(BaseCoreModelSparkJob):
         aux_df = aux_df.withColumn(
             "listing_category",
             F.when(
-                (F.col("listing_version") == 0)
-                & F.col("listing_category").isNull(),
+                (F.col("listing_version") == 0) & F.col("listing_category").isNull(),
                 F.lit("NA"),
             ).otherwise(F.col("listing_category")),
         )
@@ -433,15 +423,13 @@ class CoreListingHistorySparkJob(BaseCoreModelSparkJob):
             "business_context",
             "ts_state_started",
         ] + tracked_cols
-        aux_source = aux_df.select(
-            *[F.col(c) for c in cols_to_keep]
-        ).withColumnRenamed("ts_state_started", "ts_database_transaction")
+        aux_source = aux_df.select(*[F.col(c) for c in cols_to_keep]).withColumnRenamed(
+            "ts_state_started", "ts_database_transaction"
+        )
 
         aux_source = aux_source.withColumn("op_cdc", F.lit("u"))
 
-        w = Window.partitionBy("id_house_listing").orderBy(
-            "ts_database_transaction"
-        )
+        w = Window.partitionBy("id_house_listing").orderBy("ts_database_transaction")
         for col_name in tracked_cols:
             aux_source = aux_source.withColumn(
                 f"_prev_{col_name}", F.lag(F.col(col_name)).over(w)
@@ -553,9 +541,7 @@ class CoreListingHistorySparkJob(BaseCoreModelSparkJob):
             and args.load_end_date != ""
         )
 
-    def _is_target_table_empty(
-        self, spark: SparkSession, full_table_name: str
-    ) -> bool:
+    def _is_target_table_empty(self, spark: SparkSession, full_table_name: str) -> bool:
         try:
             if not spark.catalog.tableExists(full_table_name):
                 return True
@@ -563,9 +549,7 @@ class CoreListingHistorySparkJob(BaseCoreModelSparkJob):
         except AnalysisException:
             return True
 
-    def run_pipeline(
-        self, dataframe: DataFrame, args, spark: SparkSession
-    ) -> None:
+    def run_pipeline(self, dataframe: DataFrame, args, spark: SparkSession) -> None:
         """Partition-scoped insert-only merge for idempotent event-log writes.
 
         On the first run (empty target table) the merge is skipped and a direct
@@ -585,9 +569,7 @@ class CoreListingHistorySparkJob(BaseCoreModelSparkJob):
         )
 
         table_privileges = self.setup_table_privileges(args)
-        database_location = (
-            f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
-        )
+        database_location = f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
 
         full_table_name = f"{args.schema}.{args.table_name}"
         target_is_empty = self._is_target_table_empty(spark, full_table_name)
@@ -627,8 +609,7 @@ class CoreListingHistorySparkJob(BaseCoreModelSparkJob):
 
         pipeline.run()
         self.logger.info(
-            f"m=run_pipeline, "
-            f"msg=History loading completed for table={args.table_name}"
+            f"m=run_pipeline, msg=History loading completed for table={args.table_name}"
         )
 
 

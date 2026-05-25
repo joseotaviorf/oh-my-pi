@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import time
-from datetime import datetime
 from typing import Any
 from urllib.parse import urlparse
 
@@ -69,7 +67,9 @@ def _get_secret(dbutils, scope: str, key: str) -> str:
 
 
 def _load_zscaler_credentials(dbutils) -> tuple[str, str, str]:
-    raw_secret = _get_secret(dbutils, DATABRICKS_SECRET_SCOPE, SECRET_KEY_ZSCALER_CREDENTIALS)
+    raw_secret = _get_secret(
+        dbutils, DATABRICKS_SECRET_SCOPE, SECRET_KEY_ZSCALER_CREDENTIALS
+    )
     try:
         payload = json.loads(raw_secret)
     except json.JSONDecodeError as e:
@@ -119,7 +119,10 @@ class ZscalerTokenManager:
         return self.token
 
     def ensure_token(self, timeout_seconds: int = 60) -> str:
-        if not self.token or (time.time() - self.token_time) > TOKEN_REFRESH_THRESHOLD_SECONDS:
+        if (
+            not self.token
+            or (time.time() - self.token_time) > TOKEN_REFRESH_THRESHOLD_SECONDS
+        ):
             LOGGER.info("m=ensure_token, msg=Token expired or missing, refreshing...")
             return self.authenticate(timeout_seconds)
         return self.token
@@ -176,7 +179,9 @@ def fetch_all_zscaler_devices(
 
         page += 1
 
-    LOGGER.info(f"m=fetch_all_zscaler_devices, msg=Finished, total_devices={len(all_devices)}")
+    LOGGER.info(
+        f"m=fetch_all_zscaler_devices, msg=Finished, total_devices={len(all_devices)}"
+    )
     return all_devices
 
 
@@ -190,7 +195,9 @@ class ZscalerJobArgumentParser:
         parser.add_argument("table_name", help="Target table name")
         parser.add_argument("ds", help="Execution date (YYYY-MM-DD)")
         parser.add_argument("partitions", help="Partition columns as JSON list")
-        parser.add_argument("extraction_type", help="Extraction type (full/incremental)")
+        parser.add_argument(
+            "extraction_type", help="Extraction type (full/incremental)"
+        )
         parser.add_argument("load_start_date", help="Start date (YYYY-MM-DD)")
         parser.add_argument("load_end_date", help="End date (YYYY-MM-DD)")
         parser.add_argument(

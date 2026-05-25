@@ -9,8 +9,9 @@ of parametrized permutations — same predicates, fewer collection cycles.
 
 ::
 
-    pytest tests/unit/agents/enrich_agent_reports/test_load_agent_support_tickets_by_month.py -q
+    pytest packages/bietlejuice-runtime/test/dags/agents/enrich_agent_reports/spark_jobs/test_load_agent_support_tickets_by_month.py -q
 """
+
 import importlib
 from datetime import date
 from unittest.mock import MagicMock, patch
@@ -26,8 +27,7 @@ from pyspark.sql.types import (
 )
 
 _MODULE_PATH = (
-    "dags.agents.enrich_agent_reports.spark_jobs"
-    ".load_agent_support_tickets_by_month"
+    "dags.agents.enrich_agent_reports.spark_jobs.load_agent_support_tickets_by_month"
 )
 
 _IMPORT_TIME_MOCKS = {

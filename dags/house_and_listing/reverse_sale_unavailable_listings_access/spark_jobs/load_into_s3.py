@@ -1,16 +1,15 @@
 import json
-import boto3
 import logging
-
-from typing import Tuple
-from datetime import datetime, timedelta
 from argparse import ArgumentParser
+from datetime import datetime, timedelta
 from http.client import HTTPException
+from typing import Tuple
 
-from bietlejuice.services.storage_services import S3Service
-from bietlejuice.clients.db_clients import SparkClient
-
+import boto3
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.services.storage_services import S3Service
 
 JOB_NAME = "load_into_s3"
 
@@ -25,10 +24,9 @@ buckets = {
     "forno": "5a-sale-unavailable-listings-forno",
 }
 
+
 def main():
-    env, database_name, table_name, execution_date = (
-        parse_arguments()
-    )
+    env, database_name, table_name, execution_date = parse_arguments()
     bucket = buckets[env]
     logger.info(
         f"""m=__main__, bucket= {bucket}, database_name={database_name}, 
@@ -41,7 +39,7 @@ def main():
 
 
 def parse_arguments() -> Tuple[str, str, str, datetime]:
-    
+
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("env", help="Environment where the job is running")
@@ -60,6 +58,7 @@ def parse_arguments() -> Tuple[str, str, str, datetime]:
 
     return env, database_name, table_name, execution_date
 
+
 def prepare_table(database_name: str, table_name: str, execution_date: datetime):
     """
     Retrieves a table from Spark, filters it by a specified execution date, and prepares its payload as a JSON string.
@@ -76,13 +75,18 @@ def prepare_table(database_name: str, table_name: str, execution_date: datetime)
         & (df.day == execution_date.day)
     ).drop("year", "month", "day")
 
-    houses = [row['sk_house'] for row in filtered_df.collect()]
-    
-    logger.info(
-        f"m=__main__, message=Table retrieved: {len(houses)} rows"
+    houses = [row["sk_house"] for row in filtered_df.collect()]
+
+    logger.info(f"m=__main__, message=Table retrieved: {len(houses)} rows")
+
+    return json.dumps(
+        {
+            "table": table_name,
+            "dt_load": (execution_date + timedelta(days=1)).strftime("%Y-%m-%d"),
+            "payload": houses,
+        }
     )
 
-    return json.dumps({"table": table_name, "dt_load": (execution_date + timedelta(days=1)).strftime('%Y-%m-%d'), "payload": houses})
 
 def create_s3_path(bucket: str, table_name: str, execution_date: datetime):
     """
@@ -97,6 +101,7 @@ def create_s3_path(bucket: str, table_name: str, execution_date: datetime):
     path = f"s3://{bucket}/reverse/{table_name}/year={tomorrow.year}/month={tomorrow.month}/day={tomorrow.day}"
     return path
 
+
 def send_to_s3_bucket(file: str, table_name: str, path: str):
     """
     Uploads a specified file to an S3 bucket.
@@ -106,16 +111,15 @@ def send_to_s3_bucket(file: str, table_name: str, path: str):
     - table_name (str): The name of the table, used mainly for logging purposes.
     - path (str): The S3 bucket path where the file will be uploaded.
     """
-    
+
     try:
         s3_service.upload_file(file, path)
 
         logger.info(
             f"m=__main__, message=successful S3 put_object for table {table_name}"
-            )
-        
-    except Exception as e:
+        )
 
+    except Exception as e:
         raise HTTPException(
             f"m=__main__, message=UNSUCCESSFULL S3 put_object for table {table_name}, error={e}"
         )

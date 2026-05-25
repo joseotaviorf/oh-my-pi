@@ -6,19 +6,16 @@ from pyspark.sql.functions import lit
 from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkTableStorageFormat
-from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services.metastore_services import SparkMetastoreService
-
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_crawler_listings_into_datalake"
 
@@ -61,9 +58,7 @@ if __name__ == "__main__":
         "data_quality"
     ]
 
-    gchat_webhook = dbutils.secrets.get(
-        scope="quintoandar", key=webhook_key
-    )
+    gchat_webhook = dbutils.secrets.get(scope="quintoandar", key=webhook_key)
 
     logger.info(
         f"""

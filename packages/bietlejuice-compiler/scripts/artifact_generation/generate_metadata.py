@@ -136,12 +136,16 @@ class LineageResolver:
             ):
                 field_path_expr = field_path_expr.parent
 
-            field_sql = field_path_expr.sql(
-                dialect="spark", comments=False
-            ).replace('`', "")
-            
-            if table_alias and table_alias in aliases_in_scope and field_sql.startswith(f"{table_alias}."):
-                field_name = field_sql[len(table_alias) + 1:]
+            field_sql = field_path_expr.sql(dialect="spark", comments=False).replace(
+                "`", ""
+            )
+
+            if (
+                table_alias
+                and table_alias in aliases_in_scope
+                and field_sql.startswith(f"{table_alias}.")
+            ):
+                field_name = field_sql[len(table_alias) + 1 :]
             else:
                 field_name = field_sql
 
@@ -182,11 +186,15 @@ class LineageResolver:
                   Ex: {"my_column": {"lineage": ["db.table.source_col"]}}
         """
         lineage_map = {}
-        
+
         query_body = self.expression.find(exp.Union)
-        
+
         if not query_body:
-            query_body = self.expression if isinstance(self.expression, exp.Select) else self.expression.find(exp.Select)
+            query_body = (
+                self.expression
+                if isinstance(self.expression, exp.Select)
+                else self.expression.find(exp.Select)
+            )
 
         if not query_body:
             return {}
@@ -229,26 +237,28 @@ class LineageResolver:
 def normalize_sql(sql):
     """
     Normalizes SQL to handle edge cases like reserved keywords used as column names.
-    
+
     Args:
         sql (str): The original SQL query.
-    
+
     Returns:
         str: Normalized SQL query.
     """
     import re
-    
+
     normalized = sql
-    
+
     patterns = [
-        (r'\bvalues\s*,', r'`values`,'),
-        (r',\s*values\s*,', r', `values`,'),
-        (r',\s*values\s+AS\s+', r', `values` AS '),
+        (r"\bvalues\s*,", r"`values`,"),
+        (r",\s*values\s*,", r", `values`,"),
+        (r",\s*values\s+AS\s+", r", `values` AS "),
     ]
-    
+
     for pattern, replacement in patterns:
-        normalized = re.sub(pattern, replacement, normalized, flags=re.IGNORECASE | re.MULTILINE)
-    
+        normalized = re.sub(
+            pattern, replacement, normalized, flags=re.IGNORECASE | re.MULTILINE
+        )
+
     return normalized
 
 
@@ -323,7 +333,7 @@ def save_yml(file_path, new_yml_body, update_mode=False):
 
     class IndentListsDumper(yaml.SafeDumper):
         def increase_indent(self, flow=False, indentless=False):
-            return super(IndentListsDumper, self).increase_indent(flow, False)
+            return super().increase_indent(flow, False)
 
     def literal_str_representer(dumper, data):
         """Custom representer to use literal block style for multiline strings."""
@@ -340,7 +350,7 @@ def save_yml(file_path, new_yml_body, update_mode=False):
 
     if update_mode and os.path.exists(filename):
         print(f"  -> Updating existing metadata file: {filename}")
-        with open(filename, "r", encoding="utf-8") as f:
+        with open(filename, encoding="utf-8") as f:
             try:
                 existing_yml_body = yaml.safe_load(f)
                 if not existing_yml_body:
@@ -475,11 +485,9 @@ if __name__ == "__main__":
             table_name = match.group(4)
             final_database_name = get_database_name(layer, database_from_path)
             if not final_database_name:
-                raise Exception(
-                    f"ERROR finding database template for layer '{layer}'."
-                )
+                raise Exception(f"ERROR finding database template for layer '{layer}'.")
 
-            with open(file_path, "r", encoding="utf-8") as stream:
+            with open(file_path, encoding="utf-8") as stream:
                 sql = stream.read()
                 yml_body = create_yml_for_table(
                     sql,
@@ -494,4 +502,3 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"\n--- ERROR processing file: {file_path} ---")
             print(f"Error details: {e}\n")
-

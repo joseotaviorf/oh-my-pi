@@ -10,6 +10,7 @@ from databricks_plugin import (
     QuintoAndarDatabricksCheckJobTaskOperator,
     QuintoAndarDatabricksExecuteJobClusterOperator,
 )
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
@@ -20,7 +21,6 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
 from bietlejuice.base.notification.gchat_callback import GchatCallback
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.dataset_service import DatasetService
-
 from dags.atlas_db.vespucio_pipeline_table_names import Tables
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
@@ -140,10 +140,10 @@ property_search_indexer_task = create_task(
     entry_point="plugins_property_search_indexer",
     parameters=[
         f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
-        f"--update_alias",
-        f"--delete_old_indices",
+        "--update_alias",
+        "--delete_old_indices",
         f"--input_house_compounds={Tables.house_compounds}",
-        f"--output_index_prefix=vespucio_prod",
+        "--output_index_prefix=vespucio_prod",
         "--number_of_shards=3",
         "--number_of_replicas=2",
     ],
@@ -153,12 +153,12 @@ compound_indexer_task = create_task(
     entry_point="plugins_compound_indexer",
     parameters=[
         f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
-        f"--update_alias",
-        f"--delete_old_indices",
+        "--update_alias",
+        "--delete_old_indices",
         f"--input_condo_compounds={Tables.condo_compounds}",
         f"--input_house_compounds={Tables.house_compounds}",
         f"--input_geocode_cache={Tables.geocode_step_cache}",
-        f"--output_index_prefix=vespucio_prod",
+        "--output_index_prefix=vespucio_prod",
         "--number_of_shards=3",
         "--number_of_replicas=2",
     ],
@@ -169,9 +169,9 @@ plugin_tasks = [
         entry_point="plugins_rede_house_enrichment_consolidate",
         parameters=[
             f"--sqs_queue_url={config_service.get_config('sqs_url_house_enrichment')}",
-            f"--sqs_region=us-east-1",
-            f"--sqs_batch_size=10",
-            f"--sqs_num_writers=10",
+            "--sqs_region=us-east-1",
+            "--sqs_batch_size=10",
+            "--sqs_num_writers=10",
             f"--input_ebdb_house_enrichment={Tables.ebdb_clean_house_enrichment}",
             f"--input_condo_compounds={Tables.condo_compounds}",
             f"--input_house_compounds={Tables.house_compounds}",
@@ -184,16 +184,16 @@ plugin_tasks = [
             f"--input_houses={Tables.ebdb_clean_house}",
             f"--input_regions={Tables.ebdb_clean_region}",
             f"--input_map_regions={Tables.ebdb_clean_map_region}",
-            f"--output_database=neighborhood_recommendation_vespucio_plugin",
-            f"--output_listings_agg_by_neighborhood=listings_agg_by_neighborhood",
-            f"--output_listings_agg_by_city=listings_agg_by_city",
-            f"--output_listings_agg_ordered_by_count=listings_agg_ordered_by_count",
-            f"--output_nearest_neighborhoods=nearest_neighborhoods",
-            f"--output_keys_and_values_to_city_slug=keys_and_values_to_city_slug",
-            f"--output_keys_and_values_to_neighborhood_slug=keys_and_values_to_neighborhood_slug",
-            f"--output_price_by_neighborhood_slug=price_by_neighborhood_slug",
+            "--output_database=neighborhood_recommendation_vespucio_plugin",
+            "--output_listings_agg_by_neighborhood=listings_agg_by_neighborhood",
+            "--output_listings_agg_by_city=listings_agg_by_city",
+            "--output_listings_agg_ordered_by_count=listings_agg_ordered_by_count",
+            "--output_nearest_neighborhoods=nearest_neighborhoods",
+            "--output_keys_and_values_to_city_slug=keys_and_values_to_city_slug",
+            "--output_keys_and_values_to_neighborhood_slug=keys_and_values_to_neighborhood_slug",
+            "--output_price_by_neighborhood_slug=price_by_neighborhood_slug",
             f"--env={ENV}",
-            f"--overwrite_schema",
+            "--overwrite_schema",
         ],
     ),
 ]
@@ -202,10 +202,10 @@ zordominium_tasks = [
     create_task(
         entry_point="plugins_zordominium",
         parameters=[
-            f"--operation=both",
+            "--operation=both",
             f"--env={ENV}",
-            f"--stage_db=zordominium_vespucio_plugin",
-            f"--remove_old_condos=False",
+            "--stage_db=zordominium_vespucio_plugin",
+            "--remove_old_condos=False",
         ],
     ),
     create_task(
@@ -213,7 +213,7 @@ zordominium_tasks = [
         parameters=[
             f"--input_condos={Tables.zordominium_compounds}",
             f"--input_listings={Tables.listings}",
-            f"--output_database=condos_by_region_plugin",
+            "--output_database=condos_by_region_plugin",
             "--operation=all",
             f"--env={ENV}",
         ],
@@ -232,7 +232,7 @@ classifieds_tasks = [
     create_task(
         entry_point="plugins_classifieds",
         parameters=[
-            f"--overwrite_schema",
+            "--overwrite_schema",
             f"--input_condo_compound={Tables.condo_compounds}",
             f"--input_house_compound={Tables.house_compounds}",
             f"--input_listing_compound={Tables.listings}",
@@ -244,13 +244,13 @@ classifieds_tasks = [
         entry_point="plugins_classified_indexer",
         parameters=[
             f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
-            f"--update_alias",
-            f"--delete_old_indices",
+            "--update_alias",
+            "--delete_old_indices",
             f"--input_classifieds={Tables.classified_compounds}",
-            f"--output_index_prefix=vespucio_prod",
-            f"--number_of_shards=4",
-            f"--number_of_replicas=2",
-            f"--refresh_interval=60",
+            "--output_index_prefix=vespucio_prod",
+            "--number_of_shards=4",
+            "--number_of_replicas=2",
+            "--refresh_interval=60",
         ],
     ),
 ]

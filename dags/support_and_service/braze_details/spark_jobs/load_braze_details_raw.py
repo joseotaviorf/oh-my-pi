@@ -1,20 +1,17 @@
-import ast
 import logging
-
 from argparse import ArgumentParser
+
 from quintoandar_braze_api_client.clients import BrazeClient
 from quintoandar_braze_api_client.factories import EndpointFactory
-
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkTableStorageFormat, BaseDBUtils, sc
-
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat, sc
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_braze_details_raw"
 
@@ -23,61 +20,63 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def _schema_enforcement(identifier: str, results: list):
-  try:
-    if identifier == 'canvas':
-      logger.info("Creating DataFrame for 'canvas' identifier")
-      df = spark.createDataFrame(
-        [
-          {
-            "created_at": str(row['created_at']),
-            "updated_at": str(row['updated_at']),
-            "name": str(row['name']),
-            "description": str(row['description']),
-            "archived": str(row['archived']),
-            "draft": str(row['draft']),
-            "enabled": str(row['enabled']),
-            "schedule_type": str(row['schedule_type']),
-            "first_entry": str(row['first_entry']),
-            "last_entry": str(row['last_entry']),
-            "channels": str(row['channels']),
-            "variants": str(row['variants']),
-            "tags": str(row['tags']),
-            "teams": str(row['teams']),
-            "steps": str(row['steps']),
-            "canvas_id": str(row['canvas_id'])
-          } for row in results
-        ]
-      )
-    elif identifier == 'campaign':
-      logger.info("Creating DataFrame for 'campaign' identifier")
-      df = spark.createDataFrame(
-        [
-          {
-            "created_at": str(row['created_at']),
-            "updated_at": str(row["updated_at"]),
-            "name": str(row["name"]),
-            "description": str(row["description"]),
-            "archived": str(row["archived"]),
-            "enabled": str(row["enabled"]),
-            "draft": str(row["draft"]),
-            "schedule_type": str(row["schedule_type"]),
-            "channels": str(row["channels"]),
-            "first_sent": str(row["first_sent"]),
-            "last_sent": str(row["last_sent"]),
-            "tags": str(row["tags"]),
-            "teams": str(row["teams"]),
-            "messages": str(row["messages"]),
-            "conversion_behaviors": str(row["conversion_behaviors"]),
-            "campaign_id": str(row["campaign_id"])
-          } for row in results
-        ]
-      )
-  except Exception as exception:
-      logging.error(f"Fail to transform data. Schema error:{exception}")
-      raise exception
+    try:
+        if identifier == "canvas":
+            logger.info("Creating DataFrame for 'canvas' identifier")
+            df = spark.createDataFrame(
+                [
+                    {
+                        "created_at": str(row["created_at"]),
+                        "updated_at": str(row["updated_at"]),
+                        "name": str(row["name"]),
+                        "description": str(row["description"]),
+                        "archived": str(row["archived"]),
+                        "draft": str(row["draft"]),
+                        "enabled": str(row["enabled"]),
+                        "schedule_type": str(row["schedule_type"]),
+                        "first_entry": str(row["first_entry"]),
+                        "last_entry": str(row["last_entry"]),
+                        "channels": str(row["channels"]),
+                        "variants": str(row["variants"]),
+                        "tags": str(row["tags"]),
+                        "teams": str(row["teams"]),
+                        "steps": str(row["steps"]),
+                        "canvas_id": str(row["canvas_id"]),
+                    }
+                    for row in results
+                ]
+            )
+        elif identifier == "campaign":
+            logger.info("Creating DataFrame for 'campaign' identifier")
+            df = spark.createDataFrame(
+                [
+                    {
+                        "created_at": str(row["created_at"]),
+                        "updated_at": str(row["updated_at"]),
+                        "name": str(row["name"]),
+                        "description": str(row["description"]),
+                        "archived": str(row["archived"]),
+                        "enabled": str(row["enabled"]),
+                        "draft": str(row["draft"]),
+                        "schedule_type": str(row["schedule_type"]),
+                        "channels": str(row["channels"]),
+                        "first_sent": str(row["first_sent"]),
+                        "last_sent": str(row["last_sent"]),
+                        "tags": str(row["tags"]),
+                        "teams": str(row["teams"]),
+                        "messages": str(row["messages"]),
+                        "conversion_behaviors": str(row["conversion_behaviors"]),
+                        "campaign_id": str(row["campaign_id"]),
+                    }
+                    for row in results
+                ]
+            )
+    except Exception as exception:
+        logging.error(f"Fail to transform data. Schema error:{exception}")
+        raise exception
 
-  logger.info("Returning DataFrame for context")
-  return df
+    logger.info("Returning DataFrame for context")
+    return df
 
 
 if __name__ == "__main__":
@@ -134,10 +133,13 @@ if __name__ == "__main__":
 
     chunk_size = 100
     id_chunks = [
-        id_list[x: x + chunk_size] for x in range(0, len(id_list), chunk_size)
+        id_list[x : x + chunk_size] for x in range(0, len(id_list), chunk_size)
     ]
 
-    raw_results = [consumer.sync(id_values=chunk, executor_type="spark", spark_context=sc) for chunk in id_chunks]
+    raw_results = [
+        consumer.sync(id_values=chunk, executor_type="spark", spark_context=sc)
+        for chunk in id_chunks
+    ]
     results = [item for sublist in raw_results for item in sublist]
 
     if len(results) > 0:

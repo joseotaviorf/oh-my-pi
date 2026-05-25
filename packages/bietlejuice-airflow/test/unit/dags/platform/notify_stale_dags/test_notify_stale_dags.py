@@ -7,6 +7,7 @@ from unittest import mock
 import pytest
 
 from dags.platform.notify_stale_dags.notify_stale_dags import (
+    _AUTO_PAUSE_DISABLED_VARIABLE_KEY,
     STALE_THRESHOLD_MONTHS,
     _build_card,
     _environment_suffix_for_card,
@@ -91,11 +92,15 @@ class TestEnvironmentSuffixForCard:
 class TestNotifyStaleDagsCallable:
     @mock.patch("dags.platform.notify_stale_dags.notify_stale_dags.requests.post")
     @mock.patch("dags.platform.notify_stale_dags.notify_stale_dags.Variable.get")
-    @mock.patch("dags.platform.notify_stale_dags.notify_stale_dags.ConfigurationService")
+    @mock.patch(
+        "dags.platform.notify_stale_dags.notify_stale_dags.ConfigurationService"
+    )
     def test_exits_early_when_no_notifiable_rows(
         self, mock_cfg_cls, mock_var_get, mock_post
     ):
-        mock_cfg_cls.return_value.get_config.return_value = _MOCK_NOTIFICATION_WEBHOOK_KEYS
+        mock_cfg_cls.return_value.get_config.return_value = (
+            _MOCK_NOTIFICATION_WEBHOOK_KEYS
+        )
         mock_var_get.return_value = "https://chat.example.com/hook"
         mock_session = mock.MagicMock()
         mock_session.execute.return_value.fetchall.return_value = []
@@ -106,12 +111,24 @@ class TestNotifyStaleDagsCallable:
 
     @mock.patch("dags.platform.notify_stale_dags.notify_stale_dags.requests.post")
     @mock.patch("dags.platform.notify_stale_dags.notify_stale_dags.Variable.get")
-    @mock.patch("dags.platform.notify_stale_dags.notify_stale_dags.ConfigurationService")
+    @mock.patch(
+        "dags.platform.notify_stale_dags.notify_stale_dags.ConfigurationService"
+    )
     def test_skips_post_when_webhook_missing_but_stale_rows_exist(
         self, mock_cfg_cls, mock_var_get, mock_post
     ):
-        mock_cfg_cls.return_value.get_config.return_value = _MOCK_NOTIFICATION_WEBHOOK_KEYS
-        mock_var_get.return_value = None
+        mock_cfg_cls.return_value.get_config.return_value = (
+            _MOCK_NOTIFICATION_WEBHOOK_KEYS
+        )
+
+        def variable_get(key, default_var=None):
+            if key == _MOCK_NOTIFICATION_WEBHOOK_KEYS["stale_dag"]:
+                return None
+            if key == _AUTO_PAUSE_DISABLED_VARIABLE_KEY:
+                return "false"
+            return default_var
+
+        mock_var_get.side_effect = variable_get
         mock_session = mock.MagicMock()
         stale = SimpleNamespace(
             dag_id="acme.stale_cron",
@@ -128,11 +145,15 @@ class TestNotifyStaleDagsCallable:
 
     @mock.patch("dags.platform.notify_stale_dags.notify_stale_dags.requests.post")
     @mock.patch("dags.platform.notify_stale_dags.notify_stale_dags.Variable.get")
-    @mock.patch("dags.platform.notify_stale_dags.notify_stale_dags.ConfigurationService")
+    @mock.patch(
+        "dags.platform.notify_stale_dags.notify_stale_dags.ConfigurationService"
+    )
     def test_posts_cards_payload_when_stale_and_webhook_configured(
         self, mock_cfg_cls, mock_var_get, mock_post
     ):
-        mock_cfg_cls.return_value.get_config.return_value = _MOCK_NOTIFICATION_WEBHOOK_KEYS
+        mock_cfg_cls.return_value.get_config.return_value = (
+            _MOCK_NOTIFICATION_WEBHOOK_KEYS
+        )
         mock_var_get.return_value = "https://chat.example.com/hook"
         mock_resp = mock.MagicMock()
         mock_resp.raise_for_status = mock.MagicMock()

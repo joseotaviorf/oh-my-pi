@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Discover metastore table references (schema.table) under a DAG folder.
 
@@ -36,7 +35,7 @@ def _collect_yaml_strings(obj: Any, skip_keys: Set[str], out: Set[str]) -> None:
         parsed = parse_table_fqn(obj)
         if parsed:
             schema, table = parsed
-            out.add("{}.{}".format(schema, table))
+            out.add(f"{schema}.{table}")
 
 
 def extract_tables_from_spark_confs(
@@ -58,7 +57,7 @@ def extract_tables_from_spark_confs(
         path = sub / name
         if not path.is_file():
             continue
-        with open(path, "r") as f:
+        with open(path) as f:
             data = yaml.safe_load(f)
         if data is None:
             continue
@@ -145,7 +144,7 @@ def extract_tables_by_source_file(
             path = sub / name
             if not path.is_file():
                 continue
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 data = yaml.safe_load(f)
             if data is None:
                 continue

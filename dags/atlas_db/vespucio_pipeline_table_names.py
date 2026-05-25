@@ -30,7 +30,9 @@ class Tables:
     address_details_hash = "vespucio_pipeline_delta.address_details_hash"
     address_details_hasher_link = "vespucio_pipeline_delta.address_details_hasher_link"
     staged_parsed_complements = "vespucio_pipeline_delta.staged_parsed_complements"
-    address_details_parser_join_houses = "vespucio_pipeline_delta.address_details_parser_join_houses"
+    address_details_parser_join_houses = (
+        "vespucio_pipeline_delta.address_details_parser_join_houses"
+    )
     source_adapter_step_condos = "vespucio_pipeline_delta.source_adapter_step_condos"
     source_adapter_step_houses = "vespucio_pipeline_delta.source_adapter_step_houses"
     extract_step_condos = "vespucio_pipeline_delta.extract_step_condos"
@@ -62,7 +64,9 @@ class Tables:
     classified_compounds = "vespucio_classifieds.classifieds_compound"
     classified_v2_compounds = "vespucio_classifieds.classifieds_v2"
     classified_logging_table = "vespucio_classifieds.classifieds_publish_log"
-    classified_published_listings = "vespucio_classifieds.classifieds_published_listings"
+    classified_published_listings = (
+        "vespucio_classifieds.classifieds_published_listings"
+    )
     classifieds_to_delete = "vespucio_classifieds.classifieds_to_delete"
 
     # golden_set_condo_compounds = (

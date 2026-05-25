@@ -1,22 +1,21 @@
-import logging
 import json
-
+import logging
 from argparse import ArgumentParser
 
-from quintoandar_logger import QuintoAndarLogger
 from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.consumers.api_consumers.gsheets_consumer import GsheetsConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.consumers.api_consumers.gsheets_consumer import GsheetsConsumer
 from bietlejuice.services.gsheets_service import GsheetsService
-from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_gsheets_by_context_into_datalake"
 
@@ -73,7 +72,9 @@ if __name__ == "__main__":
     )
     parser.add_argument("dag_name", help="DAG name")
     parser.add_argument("credentials_key", help="credentials to access gsheets API")
-    parser.add_argument("credentials_scope", help="credentials scope to access gsheets API")
+    parser.add_argument(
+        "credentials_scope", help="credentials scope to access gsheets API"
+    )
 
     args = parser.parse_args()
 
@@ -147,14 +148,12 @@ if __name__ == "__main__":
     except Exception as e:
         is_able_to_load = False
 
-        if environment == 'prod':
+        if environment == "prod":
             key = GchatWebhooksEnum.AE_ALERTS_PROD
         else:
             key = GchatWebhooksEnum.AE_ALERTS_FORNO
 
-        gchat_webhook = dbutils.secrets.get(
-            scope="quintoandar", key=key
-        )
+        gchat_webhook = dbutils.secrets.get(scope="quintoandar", key=key)
 
         message_sent = __alert_not_ingesting_sheet(sheet_details, e, gchat_webhook)
         logger.error(

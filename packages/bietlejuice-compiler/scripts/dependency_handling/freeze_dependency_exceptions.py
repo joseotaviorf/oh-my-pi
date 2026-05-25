@@ -1,21 +1,22 @@
-from collections import defaultdict
-import yaml
 import os
 import sys
+from collections import defaultdict
+
+import yaml
 
 BI_ETL_EJUICE_ROOT = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
-from dags import DAG_PACKAGES_ROOT
-from bietlejuice.base.dependencies.file_dependency_generator import (
-    FileDependencyGenerator,
-)
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     DAGS_CROSS_DEPENDENCIES_FILE_NAME,
     BietlejuiceDependencyHelper,
 )
+from bietlejuice.base.dependencies.file_dependency_generator import (
+    FileDependencyGenerator,
+)
+from dags import DAG_PACKAGES_ROOT
 
 DAGS_CROSS_DEPENDENCIES_FILE_PATH = os.path.join(
     DAG_PACKAGES_ROOT, DAGS_CROSS_DEPENDENCIES_FILE_NAME

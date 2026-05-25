@@ -1,18 +1,20 @@
 import argparse
 import json
+from collections import deque
+from datetime import datetime
+
 import pyspark.sql.functions as F
+from pyspark.sql import DataFrame
+from pyspark.sql.types import (
+    IntegerType,
+    StringType,
+    StructField,
+    StructType,
+)
+
 from bietlejuice.base.db.datalake_metastore_service import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseSparkContext
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from collections import deque
-from datetime import datetime
-from pyspark.sql import DataFrame
-from pyspark.sql.types import (
-    StructType,
-    StructField,
-    StringType,
-    IntegerType,
-)
 
 
 def main() -> None:
@@ -85,7 +87,7 @@ def get_all_direct_and_indirect_dependencies_df(dependencies: DataFrame) -> Data
                 StructField("dependency_table_name", StringType(), False),
                 StructField("level", IntegerType(), False),
             ]
-        )
+        ),
     )
 
 

@@ -6,14 +6,16 @@ BI_ETL_EJUICE_ROOT = os.path.dirname(
 )
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
-import yaml
-import re
-import datetime
 import argparse
+import datetime
+import re
+import textwrap
 from collections import defaultdict
 from pathlib import Path
-from typing import List, Dict, Tuple, Any, Union
-import textwrap
+from typing import Any, Dict, List, Tuple, Union
+
+import yaml
+
 from bietlejuice.base.db.metastore_mapping_factory import MetastoreMappingFactory
 from bietlejuice.base.pipeline import LayerEnum
 
@@ -115,7 +117,7 @@ def clean_suffix(name: str, suffix: str) -> str:
 def get_dag_metadata_from_file(declaration_path: Path) -> Union[Dict[str, Any], None]:
     """Extracts global metadata from the _declaration.yml file."""
     try:
-        with open(declaration_path, "r", encoding="utf-8") as f:
+        with open(declaration_path, encoding="utf-8") as f:
             data = yaml.safe_load(f)
 
         if not data:
@@ -323,9 +325,9 @@ info:
   5ASubdomain: {subdomain_5a}
 
 5AMetadata:
-  createdBy: {config['creator_email']}
+  createdBy: {config["creator_email"]}
   createdAt: "{timestamp}"
-  updatedBy: {config['creator_email']}
+  updatedBy: {config["creator_email"]}
   updatedAt: "{timestamp}"
 
 models:
@@ -334,7 +336,7 @@ models:
 servers:
   databricks:
     type: databricks
-    catalog: {config['catalog_name'].format(environment=environment)}
+    catalog: {config["catalog_name"].format(environment=environment)}
     schema: {schema_name}
 """
     return template
@@ -387,11 +389,9 @@ def process_raw_contract_from_clean(
     print(f"    -> Generating {raw_layer} contracts from CLEAN data...")
 
     for custom_schema, clean_tables_list in clean_tables_data_by_schema.items():
-
         raw_tables_data: List[Tuple[str, Dict[str, Any]]] = []
 
         for clean_table_name, metadata in clean_tables_list:
-
             raw_table_name = metadata.get("lineage_raw_table")
             if not raw_table_name:
                 raw_table_name = clean_table_name
@@ -480,7 +480,7 @@ def process_single_dag(config: Dict[str, str], declaration_path: Path):
     if clean_tables_data_by_schema:
         raw_metadata_exist = (declaration_path.parent / "metadata" / "raw").is_dir()
         if not raw_metadata_exist:
-            print(f"  - Clean layer detected and no primary RAW metadata found.")
+            print("  - Clean layer detected and no primary RAW metadata found.")
             process_raw_contract_from_clean(
                 config, dag_metadata, clean_tables_data_by_schema
             )
@@ -525,7 +525,7 @@ def main():
         return
 
     total_dags = len(dag_declaration_files)
-    print(f"\n--- Unified Data Contract Process ---")
+    print("\n--- Unified Data Contract Process ---")
     print(f"Found {total_dags} DAG declarations to process.")
 
     for declaration_path in dag_declaration_files:

@@ -1,23 +1,25 @@
-from datetime import datetime
-from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from pendulum import timezone
 import os
-from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from datetime import datetime
 
-from airflow.utils.helpers import chain
 from airflow.models import DAG
+from airflow.utils.helpers import chain
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from pendulum import timezone
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import DatabricksGroupNameEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
+from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.dataset_service import DatasetService
-from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 
 ENV = os.environ.get("ENVIRONMENT")
 SOURCE = "tracksale"
@@ -42,12 +44,16 @@ REVERSE_SPARK_JOB_PATH = (
 )
 
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_12_2_med_2xlarge_general_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config(
+    "databricks_12_2_med_2xlarge_general_cluster"
+)
 
 
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
+    "quintoandar_{{ var.value.environment }}"
+)
 custom_libraries = [
     {
         "whl": f"{artifacts_bucket}/tracksale-api-client-python/"
@@ -81,7 +87,9 @@ dag = DAG(
     params=BaseDAG.get_default_trigger_form_params(),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
@@ -90,7 +98,8 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn
 # Reprocessing guard task to ensure that the DAG does not run multiple times unnecessarily
 DatasetAdder.attach_reprocessing_guard(create_cluster_task)
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
 campaigns = config_service.get_config("campaigns")
@@ -105,18 +114,28 @@ for campaign in campaigns:
     table_name = campaign_query
     slugged_table_name = table_name.replace("_", "-")
 
-    load_campaing_targets_into_datalake = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=f"load-{slugged_table_name}-in-datalake",
+    load_campaing_targets_into_datalake = QuintoAndarDatabricksSubmitRunOperator(
+        databricks_conn_id="databricks_new",
+        task_id=f"load-{slugged_table_name}-in-datalake",
         dag=dag,
         json={
             "spark_python_task": {
                 "python_file": REVERSE_SPARK_JOB_PATH
                 + "load_incremental_data_into_datalake_reverse.py",
-                "parameters": [ENV, datalake_bucket, SOURCE, table_name, "{{ data_interval_start | ds}}"],
+                "parameters": [
+                    ENV,
+                    datalake_bucket,
+                    SOURCE,
+                    table_name,
+                    "{{ data_interval_start | ds}}",
+                ],
             }
         },
     )
 
-    load_targets_into_tracksale = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=f"load-{slugged_table_name}-into-tracksale",
+    load_targets_into_tracksale = QuintoAndarDatabricksSubmitRunOperator(
+        databricks_conn_id="databricks_new",
+        task_id=f"load-{slugged_table_name}-into-tracksale",
         dag=dag,
         json={
             "spark_python_task": {

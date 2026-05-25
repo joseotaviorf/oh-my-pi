@@ -1,38 +1,34 @@
 import ast
 import logging
 import re
-
 from argparse import ArgumentParser
 from datetime import date, datetime, timedelta
 from functools import reduce
 from typing import List, Tuple
 
-from pyspark.sql import DataFrame
 import pyspark.sql.functions as F
+from pyspark.sql import DataFrame
 from pyspark.sql.utils import AnalysisException
+from quintoandar_logger import QuintoAndarLogger  # type: ignore
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-from quintoandar_logger import QuintoAndarLogger  # type: ignore
-
 logging.getLogger("py4j").setLevel(logging.ERROR)
 
 
 def dates_in_range(
-    source_root_path: str,
-    origin: str,
-    date_interval: List[date]
+    source_root_path: str, origin: str, date_interval: List[date]
 ) -> List[Tuple[date, str]]:
     path_origin = f"{source_root_path}origin={origin}/"
     found_dates = []
@@ -62,12 +58,8 @@ def dates_in_range(
     return found_dates
 
 
-def load_from_s3(
-    ingestion_path: str,
-    origin: str,
-    dt_path: date
-) -> DataFrame:
-    cities_path = (ingestion_path + "city=*/")
+def load_from_s3(ingestion_path: str, origin: str, dt_path: date) -> DataFrame:
+    cities_path = ingestion_path + "city=*/"
 
     logger.info(
         f"m=load_from_s3, origin={origin}, execution_date={dt_path}, "
@@ -79,24 +71,15 @@ def load_from_s3(
 
     raw_df = s3_consumer.get_data_from_file(path=cities_path, format="json")
 
-    logger.info(
-        f"m=load_from_s3, origin={origin}"
-        f"msg=Successfully read data from S3"
-    )
+    logger.info(f"m=load_from_s3, origin={origin}msg=Successfully read data from S3")
 
-    return (
-        raw_df.select(
-            F.col("*"),
-            F.col("address.city").alias("city"),
-            F.lit(dt_path.year).alias("year"),
-            F.lit(dt_path.month).alias("month"),
-            F.lit(dt_path.day).alias("day")
-        )
-        .filter(
-            (F.col("city").isNotNull())
-            & (F.col("city") != "")
-        )
-    )
+    return raw_df.select(
+        F.col("*"),
+        F.col("address.city").alias("city"),
+        F.lit(dt_path.year).alias("year"),
+        F.lit(dt_path.month).alias("month"),
+        F.lit(dt_path.day).alias("day"),
+    ).filter((F.col("city").isNotNull()) & (F.col("city") != ""))
 
 
 def save_to_datalake(
@@ -146,10 +129,7 @@ def save_to_datalake(
 
     full_raw_table_name = f"datalake_{source}_raw.{table_name}"
     table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
-    if (
-            table_privileges
-            and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-    ):
+    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
 
 
@@ -178,23 +158,16 @@ def main(
     load_start_date = datetime.strptime(load_start_date, "%Y-%m-%d").date()
     load_end_date = datetime.strptime(load_end_date, "%Y-%m-%d").date()
     range_date: List[date] = [
-        load_start_date + timedelta(days=x) for x in range(
-            (load_end_date - load_start_date).days + 1
-        )
+        load_start_date + timedelta(days=x)
+        for x in range((load_end_date - load_start_date).days + 1)
     ]
 
     dfs = []
     for dt_ref, path in dates_in_range(
-        source_root_path=source_root_path,
-        origin=origin,
-        date_interval=range_date
+        source_root_path=source_root_path, origin=origin, date_interval=range_date
     ):
         try:
-            df = load_from_s3(
-                ingestion_path=path,
-                origin=origin,
-                dt_path=dt_ref
-            )
+            df = load_from_s3(ingestion_path=path, origin=origin, dt_path=dt_ref)
             dfs.append(df)
         except AnalysisException as e:
             logger.info(
@@ -213,7 +186,9 @@ def main(
             GChatService.send_message(message)
 
     if dfs:
-        full_df = reduce(lambda df1, df2: df1.unionByName(df2, allowMissingColumns=True), dfs)
+        full_df = reduce(
+            lambda df1, df2: df1.unionByName(df2, allowMissingColumns=True), dfs
+        )
         logger.info(
             f"""
             m=__main__,
@@ -248,7 +223,9 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="Generic crawler raw data loader")
     parser.add_argument("env", help="Forno/Prod values")
     parser.add_argument("datalake_bucket", help="Bucket value in forno/prod")
-    parser.add_argument("source", help="Source name (e.g., crawler_olx, crawler_zap_imoveis)")
+    parser.add_argument(
+        "source", help="Source name (e.g., crawler_olx, crawler_zap_imoveis)"
+    )
     parser.add_argument("table_name", help="Name of the table to store data into")
     parser.add_argument("partitions", help="Partition columns name")
     parser.add_argument("load_start_date", help="Start date to load data")
@@ -265,16 +242,13 @@ if __name__ == "__main__":
     config_service = ConfigurationService(args.source)
     webhook_key = config_service.get_config("notification_webhooks_keys")[
         "data_quality"
-    ] # type: ignore
+    ]  # type: ignore
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    gchat_webhook = dbutils.secrets.get(
-        scope="quintoandar",
-        key=webhook_key
-    )
+    gchat_webhook = dbutils.secrets.get(scope="quintoandar", key=webhook_key)
 
     main(
         datalake_bucket=args.datalake_bucket,

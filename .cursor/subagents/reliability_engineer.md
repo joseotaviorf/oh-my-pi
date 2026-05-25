@@ -24,7 +24,7 @@ Specialist in performance, cluster configuration, Delta optimizations, and test 
 ## Coverage
 
 - **Minimum**: 80% for any module touched in the current diff; 90% for `bietlejuice/base/`, `bietlejuice/services/`, `bietlejuice/qube/jobs/`
-- **Command**: `pytest tests/unit/ --cov=bietlejuice --cov-report=term-missing --cov-fail-under=80`
+- **Command**: `make tests` (or per package: `uv run --directory packages/bietlejuice-{core,airflow,runtime,compiler,emr-cli} pytest … --cov=bietlejuice --cov-report=term-missing`)
 - **Anti-patterns to flag**: mock-heavy tests without output assertions; `# pragma: no cover` without documented reason; `MagicMock()` where a real value is expected (masks type errors)
 - When coverage drops: identify uncovered lines with `--cov-report=term-missing`; add parametrized tests; re-run with `--cov-fail-under=80`
 

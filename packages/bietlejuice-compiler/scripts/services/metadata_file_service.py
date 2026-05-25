@@ -1,26 +1,27 @@
 import os
 import re
 from pathlib import Path
-from typing import List, Dict, Any, Tuple
+from typing import Any, Dict, List, Tuple
 
 import yaml
-from yamale import yamale, YamaleError
-from sqlglot import parse_one, exp
+from sqlglot import exp, parse_one
+from yamale import yamale
 
 from bietlejuice.services.file_service import FileService
-from scripts.services.metadata_file_info import MetadataFileInfo
 from dags import DAG_PACKAGES_ROOT
+from scripts.services.metadata_file_info import MetadataFileInfo
 
 
 class ReverseMetadataFileException(Exception):
     def __init__(self, file, layer):
         self.data = file
         self.errors = [
-            f"Error: Reverse layer do not need metadata files. Remove this file"
+            "Error: Reverse layer do not need metadata files. Remove this file"
         ]
         super().__init__(
             f"file={file}, layer={layer}, msg=Reverse layer do not need metadata files. Remove this file"
         )
+
 
 class MetricValidateLayerException(Exception):
     def __init__(self, file, table, layer):
@@ -155,7 +156,7 @@ class MetadataFileService:
             for column_name, column_data in content["columns"].items():
                 try:
                     keys = column_data.keys()
-                except AttributeError as err:
+                except AttributeError:
                     print(
                         f"m=_get_info_from_content, db={database_name}, table={table_name}, column={column_name}, msg=Column is not a map, this file content might not be correctly validated"
                     )
@@ -197,7 +198,7 @@ class MetadataFileService:
         dag = path_info["dag"]
         layer = path_info["layer"]
 
-        with open(path, "r") as fp:
+        with open(path) as fp:
             content = yaml.safe_load(fp)
 
         file_info = MetadataFileService._get_info_from_content(content, layer)
@@ -228,7 +229,7 @@ class MetadataFileService:
         elif re.match(r"^dw_.*", schema):
             return "dw"
         elif re.match(r"^metric_.*", schema):
-            return "metric" 
+            return "metric"
         else:
             return "enrich"
 
@@ -243,12 +244,13 @@ class MetadataFileService:
         :rtype: List[Any]
         """
 
-        sql_file_path = file_path.replace("metadata", "queries").replace(".ymal", ".sql").replace(".yml", ".sql")
-        with open(sql_file_path, "r") as sql_file:
-            tables = [
-                table
-                for table in parse_one(sql_file.read()).find_all(exp.Table)
-            ]
+        sql_file_path = (
+            file_path.replace("metadata", "queries")
+            .replace(".ymal", ".sql")
+            .replace(".yml", ".sql")
+        )
+        with open(sql_file_path) as sql_file:
+            tables = [table for table in parse_one(sql_file.read()).find_all(exp.Table)]
 
         for table in tables:
             if self.get_table_layer(table.db) in ["raw", "clean", "dw_datamarts"]:
@@ -258,10 +260,7 @@ class MetadataFileService:
                     "metric",
                 )
 
-
         return yamale.validate(self.schemas["metric"], yaml_data)
-
-
 
     def validate_file(self, file_path: str, status: str) -> List[Any]:
         """

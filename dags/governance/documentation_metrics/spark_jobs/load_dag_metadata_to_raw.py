@@ -1,23 +1,21 @@
+import ast
+import json
+import logging
+from argparse import ArgumentParser
+from datetime import datetime
 from typing import Dict, List, Set
 
-import json
-import ast
-import logging
-
-from datetime import datetime
-from argparse import ArgumentParser
 from pyspark.sql import Row
 from pyspark.sql.dataframe import DataFrame
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.clients.db_clients import SparkClient
+
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageFormat
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-
-from bietlejuice.services.file_service import FileService
-
 from bietlejuice.services.dag_metadata_service import DAGMetadataService
+from bietlejuice.services.file_service import FileService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_dag_metadata_to_raw"
@@ -88,7 +86,9 @@ if __name__ == "__main__":
     execution_date_str = args.execution_date_str
     execution_date = datetime.strptime(execution_date_str, "%Y-%m-%d")
     partition_cols = ast.literal_eval(args.partitions)
-    lineage_from_product_source_skip_list = set(ast.literal_eval(args.lineage_from_product_source_skip_list))
+    lineage_from_product_source_skip_list = set(
+        ast.literal_eval(args.lineage_from_product_source_skip_list)
+    )
     dag_manual_mapping = json.loads(args.dag_manual_mapping)
 
     logger.info(

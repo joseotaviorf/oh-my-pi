@@ -12,11 +12,11 @@ This script:
 """
 
 import argparse
-import os
 import sys
-import yaml
 from pathlib import Path
-from typing import Dict, List, Set, Tuple, Any
+from typing import Dict, List, Set, Tuple
+
+import yaml
 
 # Import GitService for git-based validation
 sys.path.append(str(Path(__file__).parent.parent))
@@ -68,7 +68,7 @@ def validate_and_sanitize_file_path(file_path: str) -> Path:
         raise ValueError(f"File path must be within project directory: {file_path}")
 
     # Check if it's a YAML file
-    if not path.suffix.lower() in ['.yml', '.yaml']:
+    if path.suffix.lower() not in [".yml", ".yaml"]:
         raise ValueError(f"File must be a YAML file (.yml or .yaml): {file_path}")
 
     return path
@@ -91,7 +91,9 @@ def find_core_model_dags() -> List[Path]:
     return core_dags
 
 
-def extract_tables_from_declaration(declaration_file: Path) -> Tuple[str, str, Set[str]]:
+def extract_tables_from_declaration(
+    declaration_file: Path,
+) -> Tuple[str, str, Set[str]]:
     """
     Extract table names from a declaration file.
 
@@ -99,13 +101,13 @@ def extract_tables_from_declaration(declaration_file: Path) -> Tuple[str, str, S
         Tuple of (dag_name, layer, set_of_table_names)
     """
     try:
-        with open(declaration_file, 'r') as f:
+        with open(declaration_file) as f:
             declaration = yaml.safe_load(f)
 
-        dag_name = declaration.get('dag', {}).get('name', '')
-        workflow = declaration.get('workflow', {})
-        layer = workflow.get('layer', '')
-        tables_customization = workflow.get('tables_customization', {})
+        dag_name = declaration.get("dag", {}).get("name", "")
+        workflow = declaration.get("workflow", {})
+        layer = workflow.get("layer", "")
+        tables_customization = workflow.get("tables_customization", {})
 
         # Extract table names from tables_customization
         table_names = set(tables_customization.keys())
@@ -114,7 +116,7 @@ def extract_tables_from_declaration(declaration_file: Path) -> Tuple[str, str, S
 
     except Exception as e:
         print(f"❌ Error reading declaration file {declaration_file}: {e}")
-        return '', '', set()
+        return "", "", set()
 
 
 def validate_yaml_syntax(schema_file: Path) -> Tuple[bool, str, Dict]:
@@ -125,7 +127,7 @@ def validate_yaml_syntax(schema_file: Path) -> Tuple[bool, str, Dict]:
         Tuple of (is_valid, error_message, parsed_content)
     """
     try:
-        with open(schema_file, 'r') as f:
+        with open(schema_file) as f:
             content = yaml.safe_load(f)
         return True, "", content
     except yaml.YAMLError as e:
@@ -149,81 +151,113 @@ def validate_schema_structure(content: Dict, schema_file: Path) -> List[str]:
         return errors
 
     # Check required top-level fields
-    required_fields = ['columns']
+    required_fields = ["columns"]
     for field in required_fields:
         if field not in content:
             errors.append(f"Missing required field: '{field}'")
 
     # Check min_columns and max_columns - they should be present for documentation and validation
-    if 'min_columns' not in content:
-        errors.append("Missing required field: 'min_columns' (required for column count validation)")
-    if 'max_columns' not in content:
-        errors.append("Missing required field: 'max_columns' (required for column count validation)")
+    if "min_columns" not in content:
+        errors.append(
+            "Missing required field: 'min_columns' (required for column count validation)"
+        )
+    if "max_columns" not in content:
+        errors.append(
+            "Missing required field: 'max_columns' (required for column count validation)"
+        )
 
     # Validate columns structure
-    if 'columns' in content:
-        columns = content['columns']
+    if "columns" in content:
+        columns = content["columns"]
         if not isinstance(columns, dict):
             errors.append("'columns' must be a dictionary")
         else:
             # Validate each column definition
             for col_name, col_def in columns.items():
                 if not isinstance(col_def, dict):
-                    errors.append(f"Column '{col_name}' definition must be a dictionary")
+                    errors.append(
+                        f"Column '{col_name}' definition must be a dictionary"
+                    )
                     continue
 
                 # Check required column fields
-                required_col_fields = ['type', 'required']
+                required_col_fields = ["type", "required"]
                 for field in required_col_fields:
                     if field not in col_def:
-                        errors.append(f"Column '{col_name}' missing required field: '{field}'")
+                        errors.append(
+                            f"Column '{col_name}' missing required field: '{field}'"
+                        )
 
                 # Validate field types and values
-                if 'type' in col_def:
+                if "type" in col_def:
                     valid_types = VALID_SCHEMA_TYPES
-                    if col_def['type'] not in valid_types:
-                        errors.append(f"Column '{col_name}' has invalid type '{col_def['type']}'. Valid types: {', '.join(valid_types)}")
+                    if col_def["type"] not in valid_types:
+                        errors.append(
+                            f"Column '{col_name}' has invalid type '{col_def['type']}'. Valid types: {', '.join(valid_types)}"
+                        )
 
-                if 'required' in col_def:
-                    if not isinstance(col_def['required'], bool):
-                        errors.append(f"Column '{col_name}' 'required' field must be a boolean")
+                if "required" in col_def:
+                    if not isinstance(col_def["required"], bool):
+                        errors.append(
+                            f"Column '{col_name}' 'required' field must be a boolean"
+                        )
 
     # Validate min_columns and max_columns
-    if 'min_columns' in content:
-        if not isinstance(content['min_columns'], int) or content['min_columns'] < 0:
+    if "min_columns" in content:
+        if not isinstance(content["min_columns"], int) or content["min_columns"] < 0:
             errors.append("'min_columns' must be a non-negative integer")
 
-    if 'max_columns' in content:
-        if not isinstance(content['max_columns'], int) or content['max_columns'] < 0:
+    if "max_columns" in content:
+        if not isinstance(content["max_columns"], int) or content["max_columns"] < 0:
             errors.append("'max_columns' must be a non-negative integer")
 
     # Validate min_columns <= max_columns (only if both are integers)
-    if 'min_columns' in content and 'max_columns' in content:
-        if isinstance(content['min_columns'], int) and isinstance(content['max_columns'], int):
-            if content['min_columns'] > content['max_columns']:
+    if "min_columns" in content and "max_columns" in content:
+        if isinstance(content["min_columns"], int) and isinstance(
+            content["max_columns"], int
+        ):
+            if content["min_columns"] > content["max_columns"]:
                 errors.append("'min_columns' cannot be greater than 'max_columns'")
 
     # Validate strict field if present
-    if 'strict' in content:
-        if not isinstance(content['strict'], bool):
+    if "strict" in content:
+        if not isinstance(content["strict"], bool):
             errors.append("'strict' field must be a boolean")
 
     # Validate column count matches min/max constraints
-    if 'columns' in content and isinstance(content['columns'], dict):
-        column_count = len(content['columns'])
-        if 'min_columns' in content and isinstance(content['min_columns'], int) and column_count < content['min_columns']:
-            errors.append(f"Column count ({column_count}) is less than min_columns ({content['min_columns']})")
-        if 'max_columns' in content and isinstance(content['max_columns'], int) and column_count > content['max_columns']:
-            errors.append(f"Column count ({column_count}) is greater than max_columns ({content['max_columns']})")
+    if "columns" in content and isinstance(content["columns"], dict):
+        column_count = len(content["columns"])
+        if (
+            "min_columns" in content
+            and isinstance(content["min_columns"], int)
+            and column_count < content["min_columns"]
+        ):
+            errors.append(
+                f"Column count ({column_count}) is less than min_columns ({content['min_columns']})"
+            )
+        if (
+            "max_columns" in content
+            and isinstance(content["max_columns"], int)
+            and column_count > content["max_columns"]
+        ):
+            errors.append(
+                f"Column count ({column_count}) is greater than max_columns ({content['max_columns']})"
+            )
 
         # Additional validation for strict mode
-        if content.get('strict', False):
-            if 'min_columns' in content and 'max_columns' in content:
-                if isinstance(content['min_columns'], int) and isinstance(content['max_columns'], int):
-                    if content['min_columns'] != content['max_columns']:
-                        errors.append(f"In strict mode, min_columns ({content['min_columns']}) should equal max_columns ({content['max_columns']}) since exact column count is enforced")
-                    if column_count != content['min_columns']:
-                        errors.append(f"In strict mode, actual column count ({column_count}) should equal min_columns ({content['min_columns']})")
+        if content.get("strict", False):
+            if "min_columns" in content and "max_columns" in content:
+                if isinstance(content["min_columns"], int) and isinstance(
+                    content["max_columns"], int
+                ):
+                    if content["min_columns"] != content["max_columns"]:
+                        errors.append(
+                            f"In strict mode, min_columns ({content['min_columns']}) should equal max_columns ({content['max_columns']}) since exact column count is enforced"
+                        )
+                    if column_count != content["min_columns"]:
+                        errors.append(
+                            f"In strict mode, actual column count ({column_count}) should equal min_columns ({content['min_columns']})"
+                        )
 
     return errors
 
@@ -307,7 +341,9 @@ def get_schema_files_to_validate(mode, input) -> List[Tuple[Path, str]]:
         core_dags = find_core_model_dags()
         for dag_dir in core_dags:
             declaration_file = dag_dir / f"{dag_dir.name}_declaration.yml"
-            dag_name, layer, table_names = extract_tables_from_declaration(declaration_file)
+            dag_name, layer, table_names = extract_tables_from_declaration(
+                declaration_file
+            )
             if dag_name and layer and table_names:
                 for table_name in table_names:
                     schema_file = dag_dir / "schemas" / layer / f"{table_name}.yml"
@@ -329,17 +365,21 @@ def get_schema_files_to_validate(mode, input) -> List[Tuple[Path, str]]:
         for file_path, status in changed_files.items():
             if status in GitService.UPSERT_STATUS_CODES:
                 # Check if it's a schema file
-                if file_path.endswith('.yml') and '/schemas/' in file_path:
+                if file_path.endswith(".yml") and "/schemas/" in file_path:
                     schema_files_set.add((Path(file_path), status))
                 # Check if it's a declaration file (which might affect schema requirements)
-                elif file_path.endswith('_declaration.yml') and '/core/' in file_path:
+                elif file_path.endswith("_declaration.yml") and "/core/" in file_path:
                     # If declaration file changed, we need to validate all schemas for that DAG
                     dag_dir = Path(file_path).parent
                     declaration_file = dag_dir / f"{dag_dir.name}_declaration.yml"
-                    dag_name, layer, table_names = extract_tables_from_declaration(declaration_file)
+                    dag_name, layer, table_names = extract_tables_from_declaration(
+                        declaration_file
+                    )
                     if dag_name and layer and table_names:
                         for table_name in table_names:
-                            schema_file = dag_dir / "schemas" / layer / f"{table_name}.yml"
+                            schema_file = (
+                                dag_dir / "schemas" / layer / f"{table_name}.yml"
+                            )
                             schema_files_set.add((schema_file, status))
 
         # Convert set back to list
@@ -348,7 +388,9 @@ def get_schema_files_to_validate(mode, input) -> List[Tuple[Path, str]]:
     return files
 
 
-def validate_core_model_schema_content(mode="all_files", input=None, verbose=False) -> bool:
+def validate_core_model_schema_content(
+    mode="all_files", input=None, verbose=False
+) -> bool:
     """
     Validate that all core model schema files have correct content structure.
 
@@ -394,31 +436,37 @@ def validate_core_model_schema_content(mode="all_files", input=None, verbose=Fal
             print(f"   ✅ {schema_file.name} - Valid")
             valid_schemas += 1
 
-    print(f"\n📊 Validation Summary:")
+    print("\n📊 Validation Summary:")
     print(f"   Total files: {len(files_to_validate)}")
     print(f"   Valid: {valid_schemas}")
     print(f"   Invalid: {len(all_errors)}")
 
     if all_errors:
-        print(f"\n❌ Schema content validation errors:")
+        print("\n❌ Schema content validation errors:")
         for error in sorted(all_errors):
             print(f"   • {error}")
 
-        print(f"\n💡 Schema file structure should follow this format:")
-        print(f"   columns:")
-        print(f"     column_name:")
+        print("\n💡 Schema file structure should follow this format:")
+        print("   columns:")
+        print("     column_name:")
         print(f"       type: {'|'.join(VALID_SCHEMA_TYPES)}")
-        print(f"       required: true|false")
-        print(f"       nullable: true|false  # Optional: not validated (Spark auto-infers)")
-        print(f"   min_columns: <number>  # Required: minimum column count")
-        print(f"   max_columns: <number>  # Required: maximum column count")
-        print(f"   strict: true|false     # Optional: if true, only exact columns allowed")
-        print(f"   ")
-        print(f"   Note: In strict mode, min_columns should equal max_columns and actual column count")
-        print(f"   Note: nullable field is not validated since Spark auto-infers schema")
+        print("       required: true|false")
+        print(
+            "       nullable: true|false  # Optional: not validated (Spark auto-infers)"
+        )
+        print("   min_columns: <number>  # Required: minimum column count")
+        print("   max_columns: <number>  # Required: maximum column count")
+        print(
+            "   strict: true|false     # Optional: if true, only exact columns allowed"
+        )
+        print("   ")
+        print(
+            "   Note: In strict mode, min_columns should equal max_columns and actual column count"
+        )
+        print("   Note: nullable field is not validated since Spark auto-infers schema")
         return False
     else:
-        print(f"\n✅ All core model schema files have valid content!")
+        print("\n✅ All core model schema files have valid content!")
         return True
 
 
@@ -428,10 +476,10 @@ def main():
     success = validate_core_model_schema_content(mode, input, verbose)
 
     if not success:
-        print(f"\n❌ Schema content validation failed!")
+        print("\n❌ Schema content validation failed!")
         sys.exit(1)
     else:
-        print(f"\n✅ Schema content validation passed!")
+        print("\n✅ Schema content validation passed!")
         sys.exit(0)
 
 

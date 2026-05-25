@@ -1,32 +1,32 @@
 import json
 import logging
-
 from argparse import ArgumentParser
 from datetime import datetime
 
+from pyspark.sql.types import (
+    ArrayType,
+    LongType,
+    MapType,
+    StringType,
+    StructField,
+    StructType,
+)
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_tracksale_api_client.clients import TracksaleClient
 from quintoandar_tracksale_api_client.consumers import CONSUMERS
 
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
-from bietlejuice.clients.db_clients import SparkClient
-from pyspark.sql.types import (
-    ArrayType,
-    LongType,
-    StructField,
-    MapType,
-    StringType,
-    StructType,
-)
-
-from bietlejuice.services.json_service import JsonService
-from bietlejuice.base.spark import SparkDataFrameService
-from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.api.api_enum import APIEnum
-from bietlejuice.services.metastore_services import SparkMetastoreService
-
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+)
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.json_service import JsonService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_incremental_data_into_datalake_raw"
@@ -43,14 +43,17 @@ def get_api_response(token, table_name, params):
 
     return api_response
 
+
 def get_parameters(table_name):
-    campaign_string = "[{'answer': 'campaign_code','campaign': 'code','dispatch': 'campaign.code'}]"
+    campaign_string = (
+        "[{'answer': 'campaign_code','campaign': 'code','dispatch': 'campaign.code'}]"
+    )
     campaign_column = eval(campaign_string)[0][table_name]
     campaigns_to_block = "['248', '326', '327', '356']"
-    return campaign_column, campaigns_to_block 
+    return campaign_column, campaigns_to_block
+
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
@@ -73,7 +76,7 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     bucket = args.bucket
     table_name = args.table_name
-    
+
     campaign_column, campaigns_to_block = get_parameters(table_name)
     campaign_column = campaign_column.split(".")
     campaigns_to_block = list(map(int, eval(campaigns_to_block)))
@@ -108,7 +111,6 @@ if __name__ == "__main__":
         schema = None
 
     if api_response:
-
         if schema is not None:
             df = spark_client.create_dataframe(api_response, schema=schema)
         else:

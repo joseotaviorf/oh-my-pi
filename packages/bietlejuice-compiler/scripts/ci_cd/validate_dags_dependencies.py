@@ -1,13 +1,12 @@
 import argparse
 import collections
-import glob
 import json
 import os.path
 import re
 import sys
 from itertools import chain
-from os.path import join, isfile
-from typing import List, Optional, Tuple, Dict
+from os.path import isfile, join
+from typing import Dict, List, Optional, Tuple
 
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 
@@ -22,9 +21,7 @@ from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
 from bietlejuice.base.paths import QUERIES_DATALAKE_PATH
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.file_service import FileService
-
 from dags import DAG_PACKAGES_ROOT
-
 from scripts.ci_cd.domain_cli import domain_arg_type
 
 LAYERS = ["clean", "core", "enrich", "dw", "metric", "raw"]
@@ -100,7 +97,7 @@ class CrossDAGDependenciesValidator:
         else:
             dag_name = self.build_dag_name(dag_items[:-1])
             layer = dag_items[1]
-            table_name = f'{layer}:{dag_items[-1].replace(".sql", "")}'
+            table_name = f"{layer}:{dag_items[-1].replace('.sql', '')}"
         return dag_name, table_name
 
     def load_tables_from_db_folder(self):
@@ -175,10 +172,11 @@ class CrossDAGDependenciesValidator:
         tables_by_dag = {}
         for dependency_group in dependencies.values():
             for dependency_name in dependency_group:
-
                 if self.is_task(dependency_name):
-                    dag_name, table_name = BietlejuiceDependencyHelper.extract_dag_and_table_from_task_name(
-                        dependency_name
+                    dag_name, table_name = (
+                        BietlejuiceDependencyHelper.extract_dag_and_table_from_task_name(
+                            dependency_name
+                        )
                     )
                     if table_name is None:
                         self.register_into_invalid_list(dag_name)
@@ -204,8 +202,8 @@ class CrossDAGDependenciesValidator:
         """
         dependencies = BietlejuiceDependencyHelper.read_dependencies()
 
-        dags_without_tasks_in_dependencies_file = self.extract_dependent_dags_from_dependencies(
-            dependencies
+        dags_without_tasks_in_dependencies_file = (
+            self.extract_dependent_dags_from_dependencies(dependencies)
         )
 
         dags, tables_by_dag = self.extract_dependency_dags_and_tables_from_dependencies(
@@ -317,10 +315,14 @@ class CrossDAGDependenciesValidator:
 
                 tables_customization = workflow.get("tables_customization") or {}
                 for table_name, table_config in tables_customization.items():
-                    if isinstance(table_config, dict) and table_config.get("load_spark_job"):
+                    if isinstance(table_config, dict) and table_config.get(
+                        "load_spark_job"
+                    ):
                         formatted_table = f"{layer}:{table_name}"
                         self.all_spark_job_tables_by_dag.setdefault(dag_name, [])
-                        self.all_spark_job_tables_by_dag[dag_name].append(formatted_table)
+                        self.all_spark_job_tables_by_dag[dag_name].append(
+                            formatted_table
+                        )
             except Exception:
                 continue
 
@@ -397,7 +399,7 @@ class CrossDAGDependenciesValidator:
 
     @staticmethod
     def get_duplicate_dependencies(
-        dependencies: List[Tuple[str, str]]
+        dependencies: List[Tuple[str, str]],
     ) -> List[Tuple[str, str]]:
         """
         Receives the dependencies list and returns the dependency names which appear more than once.
@@ -416,7 +418,7 @@ class CrossDAGDependenciesValidator:
 
     @staticmethod
     def list_dependencies_to_dict(
-        dependencies: List[Tuple[str, str]]
+        dependencies: List[Tuple[str, str]],
     ) -> Dict[str, List[str]]:
         """
         Transform a list of dependencies into a dictionary
@@ -490,7 +492,7 @@ class CrossDAGDependenciesValidator:
         """
 
         self.log_msg(msg=f"\n{VALIDATION_LOG_SEPARATOR}", force_log=True)
-        starting_validaton_message = f"Validation to check if there are dependencies without tasks defined is running..."
+        starting_validaton_message = "Validation to check if there are dependencies without tasks defined is running..."
         self.log_msg(msg=f"msg={starting_validaton_message}", force_log=True)
 
         dag_dependencies_without_tasks = {}
@@ -504,9 +506,9 @@ class CrossDAGDependenciesValidator:
             if dependencies_without_tasks and not self.is_dag_out_of_pattern(
                 dependent_name
             ):
-                dag_dependencies_without_tasks[
-                    dependent_name
-                ] = dependencies_without_tasks
+                dag_dependencies_without_tasks[dependent_name] = (
+                    dependencies_without_tasks
+                )
                 [
                     self.register_into_invalid_list(dag=dependent_name, table=table)
                     for table in dependencies_without_tasks
@@ -524,7 +526,7 @@ class CrossDAGDependenciesValidator:
         """
         self.log_msg(msg=f"\n{VALIDATION_LOG_SEPARATOR}", force_log=True)
         starting_validaton_message = (
-            f"Validation to check if there are repeated dependencies is running..."
+            "Validation to check if there are repeated dependencies is running..."
         )
         self.log_msg(msg=f"msg={starting_validaton_message}", force_log=True)
 
@@ -570,7 +572,7 @@ class CrossDAGDependenciesValidator:
         Validates if there are any task names in the dependencies file that has non-alphanumeric characters or hyphens.
         """
         self.log_msg(msg=f"\n{VALIDATION_LOG_SEPARATOR}", force_log=True)
-        starting_validaton_message = f"Validation to check if there are invalids characters in task_name is running..."
+        starting_validaton_message = "Validation to check if there are invalids characters in task_name is running..."
         self.log_msg(msg=f"msg={starting_validaton_message}", force_log=True)
 
         validation_message = "The DAG/Table '{dependent}' has invalid characters for dependency '{dependency}'."
@@ -622,7 +624,7 @@ class CrossDAGDependenciesValidator:
         :rtype: int
         """
         self.log_msg(
-            msg=f"msg=Validating dependencies from dependencies.yaml", force_log=True
+            msg="msg=Validating dependencies from dependencies.yaml", force_log=True
         )
         if domain:
             self.log_msg(

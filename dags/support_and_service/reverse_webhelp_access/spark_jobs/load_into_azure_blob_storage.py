@@ -1,23 +1,30 @@
-import logging
 import json
-from datetime import datetime
+import logging
 from argparse import ArgumentParser
+from datetime import datetime
 from typing import Tuple
-from bietlejuice.base.spark import BaseDBUtils
-from bietlejuice.services.configuration_service import ConfigurationService
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_into_azure_blob_storage"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
+
 def main():
-    environment, dag_name, database_name, table_name, azure_container_name, table_context, execution_date = (
-        parse_arguments()
-    )
+    (
+        environment,
+        dag_name,
+        database_name,
+        table_name,
+        azure_container_name,
+        table_context,
+        execution_date,
+    ) = parse_arguments()
     logger.info(
         f"""m=__main__, environment={environment}, dag_name={dag_name}, database_name={database_name},
         table_name={table_name}, azure_container_name={azure_container_name}, execution_date={execution_date}
@@ -25,11 +32,21 @@ def main():
     )
 
     storage_account_name, storage_account_access_key = get_azure_credentials()
-    spark.conf.set(f"fs.azure.account.key.{storage_account_name}.blob.core.windows.net", f"{storage_account_access_key}")
-    blob_storage_path = f"wasbs://{azure_container_name}@{storage_account_name}.blob.core.windows.net/"
+    spark.conf.set(
+        f"fs.azure.account.key.{storage_account_name}.blob.core.windows.net",
+        f"{storage_account_access_key}",
+    )
+    blob_storage_path = (
+        f"wasbs://{azure_container_name}@{storage_account_name}.blob.core.windows.net/"
+    )
 
     load_table_in_azure_blob_storage(
-        dag_name, database_name, table_name, blob_storage_path, table_context, execution_date
+        dag_name,
+        database_name,
+        table_name,
+        blob_storage_path,
+        table_context,
+        execution_date,
     )
 
 
@@ -58,11 +75,20 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime]:
     table_name = args.table_name
     execution_date = datetime.fromisoformat(args.execution_date)
     table_context = args.table_context
-    
+
     config_service = ConfigurationService(dag_name)
     azure_container_name = config_service.get_config("azure_container_name")
 
-    return environment, dag_name, database_name, table_name, azure_container_name, table_context, execution_date
+    return (
+        environment,
+        dag_name,
+        database_name,
+        table_name,
+        azure_container_name,
+        table_context,
+        execution_date,
+    )
+
 
 def get_azure_credentials():
     DATABRICKS_SCOPE = "quintoandar"
@@ -71,12 +97,13 @@ def get_azure_credentials():
         global dbutils
         dbutils = base_dbutils.get_dbutils()
 
-    json_credentials = dbutils.secrets.get(
-        scope=DATABRICKS_SCOPE, key="AZURE_WEBHELP"
-    )
+    json_credentials = dbutils.secrets.get(scope=DATABRICKS_SCOPE, key="AZURE_WEBHELP")
     credentials = json.loads(json_credentials)
 
-    return credentials['storage_account_name'], credentials['storage_account_access_key']
+    return credentials["storage_account_name"], credentials[
+        "storage_account_access_key"
+    ]
+
 
 def load_table_in_azure_blob_storage(
     dag_name: str,
@@ -104,16 +131,16 @@ def load_table_in_azure_blob_storage(
     )
 
     if table_context in ["cx", "services", "speech_analytics"]:
-        path_to_save = f"{blob_storage_path}/quinto_andar/{table_context}/to_webhelp_{table_name}/"
+        path_to_save = (
+            f"{blob_storage_path}/quinto_andar/{table_context}/to_webhelp_{table_name}/"
+        )
     else:
         path_to_save = f"{blob_storage_path}/quinto_andar/to_webhelp_{table_name}/"
 
-    df.coalesce(1) \
-        .write.partitionBy('year', 'month', 'day') \
-        .mode('overwrite') \
-        .format('parquet') \
-        .option("partitionOverwriteMode", "dynamic") \
-        .save(path_to_save)
+    df.coalesce(1).write.partitionBy("year", "month", "day").mode("overwrite").format(
+        "parquet"
+    ).option("partitionOverwriteMode", "dynamic").save(path_to_save)
+
 
 if __name__ == "__main__":
     main()

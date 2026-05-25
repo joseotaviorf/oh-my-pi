@@ -2,12 +2,11 @@ from argparse import ArgumentParser
 
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_fact_price_changes"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -44,8 +43,9 @@ def get_affected_price_changes(spark, start_date, end_date):
     # New price changes: use house-level key so that ts_price_ended updates in
     # prior listing versions are correctly reprocessed.
     affected_houses_from_price = (
-        price_changes
-        .filter(F.to_date(F.col("ts_price_started")).between(start_date, end_date))
+        price_changes.filter(
+            F.to_date(F.col("ts_price_started")).between(start_date, end_date)
+        )
         .select("id_house", "business_context")
         .distinct()
     )
@@ -53,7 +53,11 @@ def get_affected_price_changes(spark, start_date, end_date):
     # New predictions: scoped to listing version.
     affected_listing_versions_from_prediction = (
         spark.table(PREDICTION_CHANGES_TABLE)
-        .filter(F.to_date(F.col("ts_calculator_result_started")).between(start_date, end_date))
+        .filter(
+            F.to_date(F.col("ts_calculator_result_started")).between(
+                start_date, end_date
+            )
+        )
         .select("id_house", "id_house_listing", "business_context")
         .distinct()
     )
@@ -67,18 +71,21 @@ def get_affected_price_changes(spark, start_date, end_date):
     )
 
     return (
-        price_changes
-        .join(F.broadcast(affected_houses_from_price), ["id_house", "business_context"])
+        price_changes.join(
+            F.broadcast(affected_houses_from_price), ["id_house", "business_context"]
+        )
         .select("id_price_change")
         .unionByName(
-            price_changes
-            .join(F.broadcast(affected_listing_versions_from_prediction), ["id_house", "id_house_listing", "business_context"])
-            .select("id_price_change")
+            price_changes.join(
+                F.broadcast(affected_listing_versions_from_prediction),
+                ["id_house", "id_house_listing", "business_context"],
+            ).select("id_price_change")
         )
         .unionByName(
-            price_changes
-            .join(F.broadcast(affected_houses_from_suggestion), ["id_house", "business_context"])
-            .select("id_price_change")
+            price_changes.join(
+                F.broadcast(affected_houses_from_suggestion),
+                ["id_house", "business_context"],
+            ).select("id_price_change")
         )
         .distinct()
     )
@@ -123,7 +130,9 @@ def build_fact_price_changes(spark, pri_df):
         .filter(F.col("rn") == 1)
         .select(
             F.col("pri.id_price_change").alias("sk_pricing"),
-            F.coalesce(F.col("pre.id_prediction_change"), F.lit(-1)).alias("sk_price_predicted"),
+            F.coalesce(F.col("pre.id_prediction_change"), F.lit(-1)).alias(
+                "sk_price_predicted"
+            ),
             F.col("pri.id_house").alias("sk_house"),
             F.col("pri.id_house_listing").alias("sk_house_listing"),
             F.coalesce(F.col("pri.id_user_revision"), F.lit(-1)).alias("sk_user"),
@@ -159,7 +168,9 @@ def build_fact_price_changes(spark, pri_df):
         .select(
             F.col("p.sk_pricing"),
             F.col("p.sk_price_predicted"),
-            F.coalesce(F.col("hsc.id_suggestion_change"), F.lit(-1)).alias("sk_price_suggested"),
+            F.coalesce(F.col("hsc.id_suggestion_change"), F.lit(-1)).alias(
+                "sk_price_suggested"
+            ),
             F.col("p.sk_house"),
             F.col("p.sk_house_listing"),
             F.col("p.sk_user"),
@@ -203,7 +214,9 @@ if __name__ == "__main__":
     logger.info(f"m=__main__, affected_price_changes={affected_count:,}")
 
     if affected_count == 0:
-        logger.warning("m=__main__, msg=No affected price changes found in date range, skipping")
+        logger.warning(
+            "m=__main__, msg=No affected price changes found in date range, skipping"
+        )
     else:
         pri = (
             spark.table(PRICE_CHANGE_TABLE)
@@ -236,7 +249,11 @@ if __name__ == "__main__":
             merge_on=["sk_pricing"],
         )
 
-        SparkMetastoreService(spark_client).refresh_table(database_name, args.table_name)
-        logger.info(f"m=__main__, table={full_table_name}, msg=Load completed successfully")
+        SparkMetastoreService(spark_client).refresh_table(
+            database_name, args.table_name
+        )
+        logger.info(
+            f"m=__main__, table={full_table_name}, msg=Load completed successfully"
+        )
 
     affected_ids.unpersist()

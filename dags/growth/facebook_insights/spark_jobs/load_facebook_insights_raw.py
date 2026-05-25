@@ -1,23 +1,24 @@
 import json
 import logging
-
 from argparse import ArgumentParser
+
 from pyspark.sql.functions import udf
-
-from quintoandar_logger import QuintoAndarLogger
 from quintoandar_facebook_api_client.clients import FacebookClient
+from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.formatters import StringFormatter
-from bietlejuice.base.spark import SparkTableStorageFormat, BaseDBUtils
-from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkDataFrameService
-from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.services.configuration_service import ConfigurationService
-
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+)
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.formatters import StringFormatter
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_incremental_data_into_datalake_raw"
 
@@ -26,7 +27,6 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
@@ -94,7 +94,6 @@ if __name__ == "__main__":
     client_response = fb_client.get_data(**configs)
 
     if len(client_response):
-
         spark_client = SparkClient()
         df = spark_client.create_dataframe(client_response)
 

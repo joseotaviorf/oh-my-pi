@@ -4,10 +4,11 @@ Sessions are module-scoped and use local[1] for fast unit evaluation of Column l
 
 Run::
 
-    pytest tests/unit/agents/enrich_agent_reports/ -q
+    pytest packages/bietlejuice-runtime/test/dags/agents/enrich_agent_reports/spark_jobs/ -q
 
 Keeps a tight set of Spark Column regression tests for agent_reports jobs (not full ETL coverage).
 """
+
 import pytest
 from pyspark.sql import SparkSession
 

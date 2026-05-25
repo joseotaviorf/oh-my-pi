@@ -1,12 +1,11 @@
 from argparse import ArgumentParser
 
 from pyspark.sql import functions as F
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_fact_price_suggested"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -21,10 +20,7 @@ def get_affected_suggestions(spark, start_date, end_date):
     """
     return (
         spark.table(SOURCE_TABLE)
-        .filter(
-            F.to_date(F.col("ts_suggestion_started"))
-            .between(start_date, end_date)
-        )
+        .filter(F.to_date(F.col("ts_suggestion_started")).between(start_date, end_date))
         .select("id_house_suggestion", "business_context")
         .distinct()
     )
@@ -40,29 +36,26 @@ def build_fact_price_suggested(spark, affected_suggestions):
     filtered_df = source_df.join(
         F.broadcast(affected_suggestions),
         ["id_house_suggestion", "business_context"],
-        "inner"
+        "inner",
     )
 
-    return (
-        filtered_df
-        .select(
-            F.col("id_suggestion_change").alias("sk_price_suggested"),
-            F.col("id_house").alias("sk_house"),
-            F.col("id_prediction").alias("sk_prediction"),
-            "deal_objective_lower_anchor",
-            "deal_objective_upper_anchor",
-            "lower_bound_limit",
-            "upper_bound_limit",
-            "suggested_lower_bound_price",
-            "suggested_price",
-            "suggested_upper_bound_price",
-            "change_number",
-            "is_last_suggestion",
-            "is_last_suggestion_of_day",
-            "ts_suggestion_started",
-            "ts_suggestion_ended",
-            F.current_timestamp().alias("ts_load"),
-        )
+    return filtered_df.select(
+        F.col("id_suggestion_change").alias("sk_price_suggested"),
+        F.col("id_house").alias("sk_house"),
+        F.col("id_prediction").alias("sk_prediction"),
+        "deal_objective_lower_anchor",
+        "deal_objective_upper_anchor",
+        "lower_bound_limit",
+        "upper_bound_limit",
+        "suggested_lower_bound_price",
+        "suggested_price",
+        "suggested_upper_bound_price",
+        "change_number",
+        "is_last_suggestion",
+        "is_last_suggestion_of_day",
+        "ts_suggestion_started",
+        "ts_suggestion_ended",
+        F.current_timestamp().alias("ts_load"),
     )
 
 
@@ -98,7 +91,9 @@ if __name__ == "__main__":
     logger.info(f"m=__main__, affected_suggestions={affected_count:,}")
 
     if affected_count == 0:
-        logger.warning("m=__main__, msg=No affected suggestions found in date range, skipping")
+        logger.warning(
+            "m=__main__, msg=No affected suggestions found in date range, skipping"
+        )
     else:
         result_df = build_fact_price_suggested(spark, affected_suggestions)
 
@@ -116,5 +111,9 @@ if __name__ == "__main__":
             merge_on=["sk_price_suggested"],
         )
 
-        SparkMetastoreService(spark_client).refresh_table(database_name, args.table_name)
-        logger.info(f"m=__main__, table={full_table_name}, msg=Load completed successfully")
+        SparkMetastoreService(spark_client).refresh_table(
+            database_name, args.table_name
+        )
+        logger.info(
+            f"m=__main__, table={full_table_name}, msg=Load completed successfully"
+        )

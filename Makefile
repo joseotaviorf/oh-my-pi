@@ -453,11 +453,12 @@ build:
 
 .PHONY: install
 ## install all package dependencies via uv
-## Note: runtime is a standalone uv project (not a workspace member). Its venv
-## holds the broad-version deps for lint/type-check; the DBR-pinned libs that
-## tests need live in dedicated sub-projects under packages/bietlejuice-runtime/envs/.
+## Workspace members (shared uv.lock): core, airflow, compiler, emr-cli — see root pyproject.toml.
+## Runtime is standalone (not a workspace member). Its venv holds broad-version deps for
+## lint/type-check; DBR-pinned libs live under packages/bietlejuice-runtime/envs/.
 ## We sync envs/dbr-16-4 by default so `make unit-tests` works out of the box.
 ## Switch to another DBR's env with `make sync-dbr DBR=12.2|13.3`.
+## dags/ is not uv-managed; use `make check-style-dags`. Packages + compiler scripts: `make check-style`.
 install:
 	@echo ""
 	@echo "Installing all packages"
@@ -465,13 +466,13 @@ install:
 	@echo ""
 	@uv sync --directory packages/bietlejuice-core
 	@uv sync --directory packages/bietlejuice-airflow
+	@uv sync --directory packages/bietlejuice-compiler
+	@uv sync --directory packages/emr-cli
 	@# `env -u UV_PROJECT_ENVIRONMENT` is a no-op locally but inside the devcontainer
 	@# it stops uv from redirecting runtime's / the env's .venv into the shared
 	@# workspace venv at /home/vscode/.venv (which would clobber it).
 	@env -u UV_PROJECT_ENVIRONMENT uv sync --directory packages/bietlejuice-runtime
 	@env -u UV_PROJECT_ENVIRONMENT uv sync --directory packages/bietlejuice-runtime/envs/dbr-16-4
-	@uv sync --directory packages/bietlejuice-compiler
-	@uv sync --directory packages/emr-cli
 
 DBR ?= 16.4
 .PHONY: sync-dbr
@@ -499,57 +500,78 @@ sync-dbr:
 ###############################################################################
 ##
 RUFF_UV := uv run --project packages/bietlejuice-compiler
-CHECK_STYLE_PY := packages/bietlejuice-compiler/scripts/ci_cd/check_style.py
-RUFF_CI_DIFF ?= origin/master...HEAD
-RUFF_LOCAL_DIFF ?= HEAD
+RUFF_EXCLUDE := packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/__dags_template__.py
+RUFF_FORMAT_PATHS := \
+	packages/bietlejuice-core/src \
+	packages/bietlejuice-core/test \
+	packages/bietlejuice-airflow/src \
+	packages/bietlejuice-airflow/test \
+	packages/bietlejuice-runtime/src \
+	packages/bietlejuice-runtime/test \
+	packages/bietlejuice-compiler/src \
+	packages/bietlejuice-compiler/test \
+	packages/bietlejuice-compiler/scripts \
+	packages/emr-cli/src \
+	packages/emr-cli/test
+RUFF_CHECK_PATHS := $(RUFF_FORMAT_PATHS)
+RUFF_DAGS_PATHS := dags/
 
 .PHONY: lint
-
 lint:
 	@echo ""
-	@echo "Running Ruff format on package trees (packages/*/src + test/, emr-cli)"
+	@echo "Running Ruff format on packages + compiler scripts"
 	@echo "=========="
 	@echo ""
-	@$(RUFF_UV) ruff format \
-	  packages/bietlejuice-core/src \
-	  packages/bietlejuice-core/test \
-	  packages/bietlejuice-airflow/src \
-	  packages/bietlejuice-airflow/test \
-	  packages/bietlejuice-runtime/src \
-	  packages/bietlejuice-runtime/test \
-	  packages/bietlejuice-compiler/src \
-	  packages/bietlejuice-compiler/test \
-	  packages/emr-cli/src \
-	  packages/emr-cli/test
+	@$(RUFF_UV) ruff format --exclude $(RUFF_EXCLUDE) $(RUFF_FORMAT_PATHS)
+
+.PHONY: lint-dags
+lint-dags:
+	@echo ""
+	@echo "Running Ruff format on dags/"
+	@echo "=========="
+	@echo ""
+	@$(RUFF_UV) ruff format $(RUFF_DAGS_PATHS)
 
 .PHONY: check-style
-
+## Ruff format check + lint on packages and compiler scripts
 check-style:
-	@$(RUFF_UV) python $(CHECK_STYLE_PY) $(if $(strip $(CI)),ci,full)
-
-.PHONY: fix-style
-## autofix lint issues repo-wide; does not rewrite formatting outside package trees
-fix-style:
 	@echo ""
-	@echo "Running Style Fix (ruff --fix)"
+	@echo "Running Check Style (packages + compiler scripts)"
 	@echo "=========="
 	@echo ""
-	@$(RUFF_UV) ruff check --fix .
+	@$(RUFF_UV) ruff format --check --exclude $(RUFF_EXCLUDE) $(RUFF_CHECK_PATHS)
+	@$(RUFF_UV) ruff check --exclude $(RUFF_EXCLUDE) $(RUFF_CHECK_PATHS)
 
-.PHONY: lint-local
-## apply ruff format only to changed `.py` files vs RUFF_LOCAL_DIFF (default HEAD)
-## Compare whole branch: make lint-local RUFF_LOCAL_DIFF='origin/master...HEAD'
-lint-local:
-	@RUFF_LOCAL_DIFF="$(RUFF_LOCAL_DIFF)" $(RUFF_UV) python $(CHECK_STYLE_PY) local-format
+.PHONY: check-style-dags
+## Ruff format check + lint on dags/ (Woodpecker: check-style-dags-python)
+check-style-dags:
+	@echo ""
+	@echo "Running Check Style (dags/)"
+	@echo "=========="
+	@echo ""
+	@$(RUFF_UV) ruff format --check $(RUFF_DAGS_PATHS)
+	@$(RUFF_UV) ruff check $(RUFF_DAGS_PATHS)
 
-.PHONY: check-style-local
-## ruff format --check on `.py` in diff vs RUFF_LOCAL_DIFF; ruff check on those files only.
-## Repo-wide lint (matches CI strictness): make check-style-local RUFF_LOCAL_FULL_LINT=1
-check-style-local:
-	@RUFF_LOCAL_DIFF="$(RUFF_LOCAL_DIFF)" $(RUFF_UV) python $(CHECK_STYLE_PY) local-check
+.PHONY: fix-style
+## autofix lint issues on packages + compiler scripts (same scope as check-style)
+fix-style:
+	@echo ""
+	@echo "Running Style Fix (packages + compiler scripts, ruff --fix)"
+	@echo "=========="
+	@echo ""
+	@$(RUFF_UV) ruff check --fix --exclude $(RUFF_EXCLUDE) $(RUFF_CHECK_PATHS)
+
+.PHONY: fix-style-dags
+## autofix lint issues on dags/ (same scope as check-style-dags)
+fix-style-dags:
+	@echo ""
+	@echo "Running Style Fix (dags/, ruff --fix)"
+	@echo "=========="
+	@echo ""
+	@$(RUFF_UV) ruff check --fix $(RUFF_DAGS_PATHS)
 
 .PHONY: type-check
-## run ty type checker across all packages (informative; use failure:ignore in CI)
+## run ty type checker on packages/*/src (core, airflow, runtime, compiler, emr-cli; informative; CI failure:ignore)
 type-check:
 	@echo ""
 	@echo "Type Check"
@@ -559,6 +581,8 @@ type-check:
 	@uv run --directory packages/bietlejuice-airflow  ty check src/
 	@uv run --directory packages/bietlejuice-runtime  ty check src/
 	@uv run --directory packages/bietlejuice-compiler ty check src/
+	@# emr-cli has no workspace `ty` dev dep; run via compiler project (same as Ruff).
+	@$(RUFF_UV) ty check packages/emr-cli/src
 
 .PHONY: lint-sql
 ## run sqlfluff to fix SQL style in dags/
@@ -583,9 +607,10 @@ check-sql:
 ###############################################################################
 
 .PHONY: tests
-## run all tests across all packages
+## run all tests across all packages (unit-tests + unit-tests-dags)
 tests:
 	@make unit-tests
+	@make unit-tests-dags
 
 .PHONY: unit-tests
 ## Runtime tests run from the dbr-16-4 env's venv so the resolved
@@ -600,44 +625,48 @@ unit-tests:
 	@echo "Unit Tests"
 	@echo "=========="
 	@echo ""
+	@# Woodpecker runs setup and unit-tests in separate steps; only the git checkout is
+	@# shared, not /opt/bietlejuice/venvs/workspace. Sync here so workspace members (core
+	@# tests import airflow from bietlejuice-airflow) resolve against the full workspace.
+	@# Use --directory (not --package) so pytest rootdir/testpaths stay per-package; --package
+	@# runs from the repo root and collects runtime/dag tests without the dbr-16-4 venv.
+	@uv sync
 	@uv run --directory packages/bietlejuice-core     pytest -W ignore::DeprecationWarning
 	@uv run --directory packages/bietlejuice-airflow  pytest -W ignore::DeprecationWarning
-	@cd packages/bietlejuice-runtime && DBR_PY=$$($(DBR_UV_ENV) uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && PYSPARK_PYTHON=$$DBR_PY PYSPARK_DRIVER_PYTHON=$$DBR_PY $(DBR_UV_ENV) uv run --project envs/dbr-16-4 pytest -W ignore::DeprecationWarning
+	@cd packages/bietlejuice-runtime && DBR_PY=$$($(DBR_UV_ENV) uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && PYSPARK_PYTHON=$$DBR_PY PYSPARK_DRIVER_PYTHON=$$DBR_PY $(DBR_UV_ENV) uv run --project envs/dbr-16-4 pytest test/unit -W ignore::DeprecationWarning
 	@uv run --directory packages/bietlejuice-compiler pytest -W ignore::DeprecationWarning
 	@uv run --directory packages/emr-cli pytest -W ignore::DeprecationWarning
 
-.PHONY: unit-tests-changed
-## run unit tests scoped to packages changed since origin/master using pytest-testmon.
-## Detects which packages (core, airflow, runtime, compiler, emr-cli) have changes and runs
-## only their test suites. Falls back to all packages for framework-level changes.
-unit-tests-changed:
+.PHONY: unit-tests-dags
+## DAG spark-job tests under packages/bietlejuice-runtime/test/dags.
+## Each top-level domain runs in its own pytest process so conftest sys.modules mocks
+## (e.g. agents, cross) cannot leak into people/tech_platform suites.
+unit-tests-dags:
 	@echo ""
-	@echo "Unit Tests (changed packages only)"
+	@echo "DAG spark job tests (runtime/test/dags)"
 	@echo "=========="
 	@echo ""
-	@git fetch --no-tags origin +refs/heads/master
-	@PKGS=$$(uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/detect_changed_tests.py origin/master | tr '\n' ' ') && \
-	 if [ -z "$$PKGS" ]; then \
-	   echo "No Python changes detected — skipping unit tests."; \
-	 else \
-	   echo "Affected packages: $$PKGS" && \
-	   FAILED=0 && \
-	   for pkg in $$PKGS; do \
-	     echo "" && echo "--- $$pkg ---" && \
-	     case $$pkg in \
-	       core) uv run --directory packages/bietlejuice-core pytest --testmon -W ignore::DeprecationWarning || FAILED=1 ;; \
-	       airflow) uv run --directory packages/bietlejuice-airflow pytest --testmon -W ignore::DeprecationWarning || FAILED=1 ;; \
-	       runtime) cd packages/bietlejuice-runtime && \
-	         DBR_PY=$$($(DBR_UV_ENV) uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && \
-	         PYSPARK_PYTHON=$$DBR_PY \
-	         PYSPARK_DRIVER_PYTHON=$$DBR_PY \
-	         $(DBR_UV_ENV) uv run --project envs/dbr-16-4 pytest --testmon -W ignore::DeprecationWarning && cd ../.. || { cd ../..; FAILED=1; } ;; \
-	       compiler) uv run --directory packages/bietlejuice-compiler pytest --testmon -W ignore::DeprecationWarning || FAILED=1 ;; \
-	       emr-cli) uv run --directory packages/emr-cli pytest --testmon -W ignore::DeprecationWarning || FAILED=1 ;; \
-	     esac; \
-	   done && \
-	   [ $$FAILED -eq 0 ] || exit 1; \
-	 fi
+	@uv sync
+	@cd packages/bietlejuice-runtime && DBR_PY=$$($(DBR_UV_ENV) uv run --project envs/dbr-16-4 python -c "import sys; print(sys.executable)") && \
+	 export PYSPARK_PYTHON=$$DBR_PY PYSPARK_DRIVER_PYTHON=$$DBR_PY PYTHONPATH=src:../.. && \
+	 FAILED=0 && \
+	 _run_dag_suite() { \
+	   local dir="$$1"; \
+	   if [ ! -d "$$dir" ]; then return 0; fi; \
+	   if ! find "$$dir" -name 'test_*.py' -print -quit | grep -q .; then \
+	     echo "Skipping $$dir (no test_*.py)"; return 0; \
+	   fi; \
+	   echo "" && echo "--- $$dir ---" && \
+	   $(DBR_UV_ENV) uv run --project envs/dbr-16-4 pytest "$$dir" -W ignore::DeprecationWarning || FAILED=1; \
+	 }; \
+	 for suite in test/dags/*/; do \
+	   if [ "$$suite" = "test/dags/tech_platform/" ] || [ "$$suite" = "test/dags/mlops/" ]; then \
+	     for nested in "$$suite"*/; do _run_dag_suite "$$nested"; done; \
+	   else \
+	     _run_dag_suite "$$suite"; \
+	   fi; \
+	 done && \
+	 [ $$FAILED -eq 0 ]
 
 .PHONY: integration-tests
 ## run integration tests
@@ -646,6 +675,7 @@ integration-tests:
 	@echo "Integration Tests"
 	@echo "================="
 	@echo ""
+	@uv sync
 	@uv run --directory packages/bietlejuice-core pytest test/integration -W ignore::DeprecationWarning
 
 .PHONY: files-validation

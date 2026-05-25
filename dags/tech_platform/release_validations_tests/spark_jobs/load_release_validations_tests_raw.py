@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 import argparse
 import ast
-from dateutil import parser
 
-from quintoandar_logger import QuintoAndarLogger
+from dateutil import parser
 from pyspark.sql.utils import AnalysisException
-from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.loaders.s3_loader import S3Loader
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.spark import SparkTableStorageFormat, spark
 from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.base.spark import (
-    spark,
-    SparkTableStorageFormat
-)
 
 JOB_NAME = "playwright_release_validations_tests_load"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -22,8 +20,12 @@ DAG_NAME = "release_validations_tests"
 def parse_args() -> argparse.Namespace:
     arg_parser = argparse.ArgumentParser(description=JOB_NAME)
     arg_parser.add_argument("environment", help="forno or prod")
-    arg_parser.add_argument("bucket", help="5a-datalake-<env> bucket name or full s3:// path")
-    arg_parser.add_argument("schema", help="Schema name without datalake_ prefix or _raw suffix")
+    arg_parser.add_argument(
+        "bucket", help="5a-datalake-<env> bucket name or full s3:// path"
+    )
+    arg_parser.add_argument(
+        "schema", help="Schema name without datalake_ prefix or _raw suffix"
+    )
     arg_parser.add_argument("table_name", help="Raw table name")
     arg_parser.add_argument("partitions", help="e.g. ['year','month','day']")
     arg_parser.add_argument("execution_date", help="YYYY-MM-DD (data_interval_start)")
@@ -32,6 +34,7 @@ def parse_args() -> argparse.Namespace:
     args.partition_cols = ast.literal_eval(args.partitions)
     args.execution_date = parser.parse(args.execution_date)
     return args
+
 
 def main():
     args = parse_args()
@@ -50,23 +53,23 @@ def main():
 
     try:
         df_raw = (
-            spark.read
-                .format("text")
-                .option("wholetext", True)
-                .option("recursiveFileLookup", "true")
-                .option("pathGlobFilter", "{results,report}.json")
-                .load(source_path)
-                .selectExpr(
-                    "_metadata.file_path AS file_path",
-                    "value AS content"
-                )
+            spark.read.format("text")
+            .option("wholetext", True)
+            .option("recursiveFileLookup", "true")
+            .option("pathGlobFilter", "{results,report}.json")
+            .load(source_path)
+            .selectExpr("_metadata.file_path AS file_path", "value AS content")
         )
     except AnalysisException as e:
         if "PATH_NOT_FOUND" in str(e):
-            logger.info(f"[EXECUTION LOGGING] -  source_path={source_path}, msg=No data found for this date. Exiting gracefully.")
+            logger.info(
+                f"[EXECUTION LOGGING] -  source_path={source_path}, msg=No data found for this date. Exiting gracefully."
+            )
             return
         else:
-            logger.error(f"[EXECUTION LOGGING] -  source_path={source_path}, msg=Unexpected AnalysisException, error={e}")
+            logger.error(
+                f"[EXECUTION LOGGING] -  source_path={source_path}, msg=Unexpected AnalysisException, error={e}"
+            )
 
     # Pattern for e2e: includes service after ci_build_id
     # s3://bucket/e2e/repository/deploy_group/YYYY-MM-DD/ci_build_id/service/artifacts/results.json
@@ -91,7 +94,7 @@ def main():
         f"CAST(substr(COALESCE(NULLIF(regexp_extract(file_path, '{pattern_e2e}', 4), ''), NULLIF(regexp_extract(file_path, '{pattern_hermetic}', 4), '')), 1, 4) AS INT) AS year",
         f"CAST(substr(COALESCE(NULLIF(regexp_extract(file_path, '{pattern_e2e}', 4), ''), NULLIF(regexp_extract(file_path, '{pattern_hermetic}', 4), '')), 6, 2) AS INT) AS month",
         f"CAST(substr(COALESCE(NULLIF(regexp_extract(file_path, '{pattern_e2e}', 4), ''), NULLIF(regexp_extract(file_path, '{pattern_hermetic}', 4), '')), 9, 2) AS INT) AS day",
-        f"((file_path RLIKE '{pattern_e2e}') OR (file_path RLIKE '{pattern_hermetic}')) AS _matched"
+        f"((file_path RLIKE '{pattern_e2e}') OR (file_path RLIKE '{pattern_hermetic}')) AS _matched",
     )
 
     # Create database if not exists
@@ -99,7 +102,9 @@ def main():
     spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_service.create_database(database_name)
-    logger.info(f"[EXECUTION LOGGING] -  database={database_name}, msg=database created or already exists")
+    logger.info(
+        f"[EXECUTION LOGGING] -  database={database_name}, msg=database created or already exists"
+    )
 
     bucket = args.bucket.replace("s3://", "")
     raw_path = f"s3://{bucket}/raw/{args.schema}/{args.table_name}/"
@@ -110,9 +115,10 @@ def main():
         s3_path=raw_path,
         format_options=SparkTableStorageFormat.DEFAULT_RAW,
         full_table_name=f"{database_name}.{args.table_name}",
-        )
+    )
 
     logger.info("[EXECUTION LOGGING] -  msg=raw load completed")
+
 
 if __name__ == "__main__":
     main()

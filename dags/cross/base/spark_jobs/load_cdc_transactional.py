@@ -1,9 +1,11 @@
-import logging
 import json
+import logging
 from argparse import ArgumentParser
-from bietlejuice.base.databricks.table_privileges import TablePrivileges
-from bietlejuice.base.spark.base_spark import BaseDBUtils
+from datetime import datetime
+
+from pyspark.sql.functions import col, lit, struct, to_timestamp
 from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
 from bietlejuice.base.cdc.reader.date_range_partition_reader import (
     DateRangePartitionReader,
@@ -17,18 +19,16 @@ from bietlejuice.base.cdc.schema_treatment.cdc_schema_treatment_factory import (
 from bietlejuice.base.cdc.schema_treatment.schema_changes_notifier import (
     SchemaChangesNotifier,
 )
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
-
-
-from bietlejuice.base.spark.runtime_detector import RuntimeDetector
+from bietlejuice.base.spark.base_spark import BaseDBUtils
 from bietlejuice.base.spark.delta_secondary_catalog_sync import (
     partition_columns_present,
     sync_delta_write_to_secondary_catalog,
 )
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from datetime import datetime
-from pyspark.sql.functions import col, to_timestamp, lit, struct
 
 JOB_NAME = "load_cdc_transactional"
 
@@ -81,7 +81,7 @@ def load_df_into_transactional(df, datalake_bucket, schema, table_name, partitio
     :return:
     """
     logger.info(
-        f"m=load_df_into_transactional, file_format=delta, msg=Loading DataFrame into transactional layer..."
+        "m=load_df_into_transactional, file_format=delta, msg=Loading DataFrame into transactional layer..."
     )
 
     loader = DeltaLoader(spark)
@@ -159,7 +159,7 @@ def format_and_deduplicate_df(
     :return transactional_df:
     """
     logger.info(
-        f"m=format_incoming_df, msg=Transforming Debezium payload into Transactional layer table..."
+        "m=format_incoming_df, msg=Transforming Debezium payload into Transactional layer table..."
     )
     df_without_delete_op = df.filter(df.op != lit("d")).select(
         col("after").alias("data"), "op", "ts_ms", "source", *partitions
@@ -226,8 +226,10 @@ def format_and_deduplicate_df(
 def main():
     global spark
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
-    
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
+
         spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
     environment = args.env
@@ -302,7 +304,7 @@ def main():
             )
 
         logger.info(
-            f"m=__main__, msg=Incoming Dataframe is None, there is no change to propagate."
+            "m=__main__, msg=Incoming Dataframe is None, there is no change to propagate."
         )
         return
 

@@ -56,9 +56,7 @@ def _validate_idn_url(url: str, tenant: str) -> str:
     if parsed.scheme != IDN_ALLOWED_SCHEME:
         raise ValueError(f"IDN URL must use HTTPS, got: {parsed.scheme}")
     if parsed.netloc != expected_host:
-        raise ValueError(
-            f"IDN URL host '{parsed.netloc}' must be '{expected_host}'"
-        )
+        raise ValueError(f"IDN URL host '{parsed.netloc}' must be '{expected_host}'")
     return url
 
 
@@ -235,11 +233,17 @@ def get_all_identities(
         try:
             if http_method == "GET":
                 response = requests.get(
-                    test_url, headers=headers, params={"limit": 1}, timeout=timeout_seconds
+                    test_url,
+                    headers=headers,
+                    params={"limit": 1},
+                    timeout=timeout_seconds,
                 )
             else:
                 response = requests.post(
-                    test_url, headers=headers, params={"limit": 1}, timeout=timeout_seconds
+                    test_url,
+                    headers=headers,
+                    params={"limit": 1},
+                    timeout=timeout_seconds,
                 )
             if response.status_code == 200:
                 working_path = endpoint
@@ -257,7 +261,9 @@ def get_all_identities(
             )
 
     if not working_path or not method:
-        raise RuntimeError("No working IdentityNow identity endpoint; check API scopes.")
+        raise RuntimeError(
+            "No working IdentityNow identity endpoint; check API scopes."
+        )
 
     all_identities: list[dict[str, Any]] = []
     offset = 0
@@ -266,9 +272,7 @@ def get_all_identities(
     while True:
         url = f"{base}/{working_path}"
         params = {"limit": limit, "offset": offset}
-        LOGGER.info(
-            f"m=get_all_identities, msg=Fetching page={page}, offset={offset}"
-        )
+        LOGGER.info(f"m=get_all_identities, msg=Fetching page={page}, offset={offset}")
         if method == "GET":
             response = requests.get(
                 url, headers=headers, params=params, timeout=timeout_seconds

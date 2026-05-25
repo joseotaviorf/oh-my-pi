@@ -1,25 +1,25 @@
+import ast
 import json
 import logging
-import ast
-
 from argparse import ArgumentParser
 from datetime import datetime
 
-from quintoandar_logger import QuintoAndarLogger
 from quintoandar_jira_api_client.clients import JiraClient
 from quintoandar_jira_api_client.consumers.jira_jql_consumer import JiraJQLConsumer
+from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
-from bietlejuice.clients.db_clients import SparkClient
-
-from bietlejuice.services.json_service import JsonService
-from bietlejuice.base.spark import SparkDataFrameService
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.services.metastore_services import SparkMetastoreService
-
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+)
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.json_service import JsonService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_incremental_data_into_datalake_raw"
@@ -29,7 +29,6 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
@@ -51,7 +50,7 @@ if __name__ == "__main__":
     endpoint_params = json.loads(args.endpoint_params)
     load_start_date = args.load_start_date
     load_end_date = args.load_end_date
-    
+
     endpoint_enum = endpoint_params.get("endpoint_enum")
 
     dt_start_execution = datetime.strptime(load_start_date, "%Y-%m-%d").date()
@@ -76,15 +75,15 @@ if __name__ == "__main__":
     jql_query_filter = f'updated >= "{dt_start_execution} 00:00" and updated <= "{dt_end_execution} 23:59"'
 
     params = {
-        'jql': jql_query_filter,
-        'fields': '*all',
-        'expand': 'changelog',
+        "jql": jql_query_filter,
+        "fields": "*all",
+        "expand": "changelog",
     }
 
     jira_client = JiraClient(
-        username=credentials["username"], 
-        token=credentials["token"], 
-        server=credentials["server"]
+        username=credentials["username"],
+        token=credentials["token"],
+        server=credentials["server"],
     )
 
     consumer_instance = JiraJQLConsumer(jira_client)
@@ -122,7 +121,7 @@ if __name__ == "__main__":
 
         database_location = datalake_info["db_raw_path"]
         format_options = SparkTableStorageFormat.DEFAULT_RAW
-        
+
         # loaders
         s3_loader = S3Loader()
         s3_loader.load_incremental_table(

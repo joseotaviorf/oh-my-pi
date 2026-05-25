@@ -276,7 +276,9 @@ class CoreBrokersProductSparkJob(CoreBrokersBaseSparkJob):
             round(col("rs.commission"), 5).cast("decimal(38,5)").alias("commission"),
             round(col("rs.demand_fee"), 5).cast("decimal(38,5)").alias("demand_fee"),
             round(col("rs.supply_fee"), 5).cast("decimal(38,5)").alias("supply_fee"),
-            round(col("rs.platform_fee"), 5).cast("decimal(38,5)").alias("platform_fee"),
+            round(col("rs.platform_fee"), 5)
+            .cast("decimal(38,5)")
+            .alias("platform_fee"),
             col("bi.bank"),
             col("bi.agency_number"),
             col("bi.account_number"),

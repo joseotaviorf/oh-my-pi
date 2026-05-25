@@ -3,7 +3,10 @@ import json
 import logging
 from argparse import ArgumentParser
 
+from pyspark.sql.functions import col, when
 from quintoandar_logger import QuintoAndarLogger
+from quintoandar_omie_api_client.clients.omie_client import OmieClient
+from quintoandar_omie_api_client.consumers import CONSUMERS
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -12,11 +15,6 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from quintoandar_omie_api_client.clients.omie_client import OmieClient
-from quintoandar_omie_api_client.consumers import CONSUMERS
-
-from pyspark.sql.functions import col, when
 
 JOB_NAME = "load_full_velo_omie_into_datalake"
 

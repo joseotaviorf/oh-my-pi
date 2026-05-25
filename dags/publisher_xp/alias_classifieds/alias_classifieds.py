@@ -6,12 +6,12 @@ from databricks_plugin import (
     QuintoAndarDatabricksCheckJobTaskOperator,
     QuintoAndarDatabricksExecuteJobClusterOperator,
 )
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.dataset_service import DatasetService
-
 from dags.publisher_xp.alias_classifieds_common import (
     BASE_ALIAS_CLASSIFIEDS_PARAMS,
     BASE_ALIAS_CLASSIFIEDS_PUBLISHER_PARAMS,

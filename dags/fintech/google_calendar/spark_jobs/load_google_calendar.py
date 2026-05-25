@@ -1,9 +1,12 @@
 import ast
 import json
 import logging
-import requests
 from argparse import ArgumentParser
 from datetime import datetime
+
+import requests
+from oauth2client.service_account import ServiceAccountCredentials
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -16,10 +19,6 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from quintoandar_logger import QuintoAndarLogger
-
-from oauth2client.service_account import ServiceAccountCredentials
 
 JOB_NAME = "load_google_calendar"
 

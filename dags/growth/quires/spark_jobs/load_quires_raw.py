@@ -1,28 +1,33 @@
 import json
 import logging
-import requests
 from argparse import ArgumentParser
+
+import requests
+from pyspark.sql.functions import coalesce, col, lit
+from pyspark.sql.types import StructType
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
-from bietlejuice.base.spark import SparkTableStorageFormat
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+)
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.base.api.api_enum import APIEnum
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkDataFrameService
+from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.base.spark import BaseDBUtils
-from quintoandar_logger import QuintoAndarLogger
-from pyspark.sql.functions import lit, coalesce, col
-from pyspark.sql.types import StructType, StructField, StringType
 
-JOB_NAME = f"load_quires_raw"
+JOB_NAME = "load_quires_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 spark_client = SparkClient()
+
 
 def api_request(api_url, table_name, start_date, end_date, cursor=None):
     """
@@ -43,20 +48,19 @@ def api_request(api_url, table_name, start_date, end_date, cursor=None):
         dbutils = base_dbutils.get_dbutils()
 
     headers = {
-        'X-API-Key': json.loads(dbutils.secrets.get(scope="quintoandar", key=APIEnum.QUIRES))['token'],
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        "X-API-Key": json.loads(
+            dbutils.secrets.get(scope="quintoandar", key=APIEnum.QUIRES)
+        )["token"],
+        "Content-Type": "application/json",
+        "Accept": "application/json",
     }
 
     url = f"{api_url}/{table_name.lstrip('/')}"
 
-    params = {
-        'start': start_date,
-        'end': end_date
-    }
+    params = {"start": start_date, "end": end_date}
 
     if cursor:
-        params['cursor'] = cursor
+        params["cursor"] = cursor
 
     try:
         response = requests.get(url, headers=headers, params=params)
@@ -86,10 +90,10 @@ def get_all_data(api_url, table_name, start_date, end_date):
     while True:
         response = api_request(api_url, table_name, start_date, end_date, cursor)
 
-        page_data = response.get('data', [])
+        page_data = response.get("data", [])
         all_data.extend(page_data)
 
-        cursor = response.get('cursor')
+        cursor = response.get("cursor")
         if cursor is None:
             break
 
@@ -97,7 +101,6 @@ def get_all_data(api_url, table_name, start_date, end_date):
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
@@ -118,8 +121,16 @@ if __name__ == "__main__":
     api_url = config_service.get_config("api_url")
     raw_partition_cols = config_service.get_config("raw_partition_cols")
 
-    schema_config = config_service.get_config("table_schemas")[table_name] if table_name in config_service.get_config("table_schemas") else None
-    schema = StructType.fromJson(json.loads(schema_config.get("schema"))) if schema_config else None
+    schema_config = (
+        config_service.get_config("table_schemas")[table_name]
+        if table_name in config_service.get_config("table_schemas")
+        else None
+    )
+    schema = (
+        StructType.fromJson(json.loads(schema_config.get("schema")))
+        if schema_config
+        else None
+    )
 
     logger.info(
         f"m={JOB_NAME}, environment={env}, datalake_bucket={datalake_bucket}, table_name={table_name}, "
@@ -130,7 +141,6 @@ if __name__ == "__main__":
     client_response = get_all_data(api_url, table_name, load_start_date, load_end_date)
 
     if client_response:
-
         spark_client = SparkClient()
         if schema:
             df = spark_client.create_dataframe(client_response, schema=schema)
@@ -147,7 +157,9 @@ if __name__ == "__main__":
             )
         elif table_name == "urls":
             # New records in URLs don't have an updatedAt, so we use the createdAt
-            df = df.withColumn('updatedAt', coalesce(col('updatedAt'), col('createdAt')))
+            df = df.withColumn(
+                "updatedAt", coalesce(col("updatedAt"), col("createdAt"))
+            )
             df = (
                 SparkDataFrameService()
                 .input(df)
@@ -198,10 +210,7 @@ if __name__ == "__main__":
 
         full_raw_table_name = f"datalake_{source}_raw.{table_name}"
         table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
-        if (
-                table_privileges
-                and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-        ):
+        if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
             table_privileges.apply()
 
         spark_metastore_service.refresh_table(database_name, table_name)

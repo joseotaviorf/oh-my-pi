@@ -1,7 +1,8 @@
 """
-    This Spark Job executes every validation suite placed in path
-     bietlejuice/validation_suites/**/*_validation_suite.py
+This Spark Job executes every validation suite placed in path
+ bietlejuice/validation_suites/**/*_validation_suite.py
 """
+
 import json
 import logging
 from json import JSONDecodeError

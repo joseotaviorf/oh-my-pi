@@ -2,18 +2,18 @@ import json
 import logging
 import time
 from datetime import date, datetime, timedelta
-from typing import List, Dict, Any, Optional, Generator, Tuple, Callable
+from typing import Any, Callable, Dict, Generator, List, Optional, Tuple
 
 from pyspark.sql import SparkSession
 
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.base.api.common.client import BaseAPIClient
-from bietlejuice.base.api.parser.argument_parser import BaseJobArgumentParser
-from bietlejuice.base.api.auth.oauth2 import BasicAuthOAuth2ClientCredentials
-from bietlejuice.base.api.pagination.cursor import CursorPaginator
-from bietlejuice.jobs.common.helpers import json_to_dataframe, insert_partitions
-from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
 from bietlejuice.base.api.api_enum import APIEnum
+from bietlejuice.base.api.auth.oauth2 import BasicAuthOAuth2ClientCredentials
+from bietlejuice.base.api.common.client import BaseAPIClient
+from bietlejuice.base.api.pagination.cursor import CursorPaginator
+from bietlejuice.base.api.parser.argument_parser import BaseJobArgumentParser
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.jobs.common.helpers import insert_partitions, json_to_dataframe
+from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
 
 LOGGER = logging.getLogger(__name__)
 

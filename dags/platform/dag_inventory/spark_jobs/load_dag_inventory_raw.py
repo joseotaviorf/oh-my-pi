@@ -12,29 +12,27 @@ Steps 2 and 4 are separate because some enrichments are easier to be done before
 """
 
 import json
-import re
-import boto3
-import botocore
 import logging
+import re
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 from multiprocessing.pool import ThreadPool
 
+import boto3
+import botocore
 import pyspark.sql.functions as SF
+from pyspark.sql import DataFrame, Row
 from pyspark.sql.utils import AnalysisException
-from pyspark.sql import Row, DataFrame
-
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_dag_inventory_raw"
 THREAD_NUMBER = 8
@@ -166,7 +164,6 @@ def find_recently_modified_files_by_prefix(
     object_tuples = []
     try:
         for obj in objects:
-
             if obj is not None and obj[0].endswith(
                 (".json", ".parquet", ".txt", ".csv")
             ):

@@ -14,19 +14,17 @@ import time
 from argparse import ArgumentParser
 from datetime import date, datetime
 from decimal import Decimal
-from math import isnan, isinf
+from math import isinf, isnan
 
 import gspread
 from google.oauth2.service_account import Credentials as ServiceAccountCredentials
 from gspread.exceptions import WorksheetNotFound
-
 from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
 from quintoandar_gsheets_api_client.producer import GoogleSheetsWriter
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient
-
 
 CREDENTIALS_SCOPE = "people"
 FORNO_SHEET_ID = "10p4xUfeoTKxJB3RtrO8-Jf8O7sdnll8fT_PXZPB-EgU"
@@ -37,7 +35,9 @@ SCHEMA = "reverse_reports"
 logger = logging.getLogger(JOB_NAME)
 
 WRITE_RETRY_DELAYS_SECONDS = [60, 60, 60, 60, 60, 120, 180]
-GSHEETS_SERVICE_ACCOUNT_EMAIL = "gsheets-people-access@airflow-186119.iam.gserviceaccount.com"
+GSHEETS_SERVICE_ACCOUNT_EMAIL = (
+    "gsheets-people-access@airflow-186119.iam.gserviceaccount.com"
+)
 
 
 def _is_retriable_gsheets_error(e: Exception) -> bool:
@@ -47,9 +47,17 @@ def _is_retriable_gsheets_error(e: Exception) -> bool:
     Retriable: 429 rate limit, 503 unavailable, resource exhausted, deadline exceeded.
     """
     error_msg = str(e).upper()
-    if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg or "RATE_LIMIT_EXCEEDED" in error_msg:
+    if (
+        "429" in error_msg
+        or "RESOURCE_EXHAUSTED" in error_msg
+        or "RATE_LIMIT_EXCEEDED" in error_msg
+    ):
         return True
-    if "503" in error_msg or "UNAVAILABLE" in error_msg or "DEADLINE_EXCEEDED" in error_msg:
+    if (
+        "503" in error_msg
+        or "UNAVAILABLE" in error_msg
+        or "DEADLINE_EXCEEDED" in error_msg
+    ):
         return True
     if hasattr(e, "code") and e.code in (429, 503):
         return True

@@ -1,27 +1,25 @@
 import ast
-from datetime import datetime
 import json
 import logging
 from argparse import ArgumentParser
+from datetime import datetime
 
+from pyspark.sql.types import ArrayType, StringType, StructField, StructType
 from quintoandar_logger import QuintoAndarLogger
+from quintoandar_omie_api_client.clients.omie_client import OmieClient
+from quintoandar_omie_api_client.consumers import CONSUMERS
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
     BaseDBUtils,
-    SparkTableStorageFormat,
     SparkDataFrameService,
+    SparkTableStorageFormat,
 )
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from quintoandar_omie_api_client.clients.omie_client import OmieClient
-from quintoandar_omie_api_client.consumers import CONSUMERS
-
-from pyspark.sql.types import StructType, StructField, StringType, ArrayType
 
 JOB_NAME = "load_incremental_velo_omie_into_datalake"
 

@@ -29,13 +29,13 @@ dags/core/core_{entity}/
     └── core/
         └── {entity}.yml             # Great Expectations assertions
 
-tests/core_model_dags/unit/core/core_{entity}/
+packages/bietlejuice-runtime/test/core_model_dags/unit/core/core_{entity}/
 └── spark_jobs/
     ├── conftest.py                   # session-scoped SparkSession + data fixtures + mock_configuration_service
     └── test_load_core_{entity}.py   # unit tests (mandatory alongside implementation)
 ```
 
-The test file **must be committed in the same diff** as the implementation. A PR that adds `spark_jobs/load_core_{entity}.py` without `tests/core_model_dags/unit/core/core_{entity}/spark_jobs/test_load_core_{entity}.py` must be rejected.
+The test file **must be committed in the same diff** as the implementation. A PR that adds `spark_jobs/load_core_{entity}.py` without `packages/bietlejuice-runtime/test/core_model_dags/unit/core/core_{entity}/spark_jobs/test_load_core_{entity}.py` must be rejected.
 
 ---
 
@@ -229,9 +229,9 @@ strict: true
 
 ## 7. Testing (mandatory)
 
-Tests for core model Spark jobs live under `tests/core_model_dags/unit/core/core_{entity}/spark_jobs/`, mirroring the `dags/core/` structure. They use a **session-scoped real SparkSession** (not `BaseSparkContext`) and import via the dotted `dags.*` namespace (the project root is on `sys.path` when pytest runs).
+Tests for core model Spark jobs live under `packages/bietlejuice-runtime/test/core_model_dags/unit/core/core_{entity}/spark_jobs/`, mirroring the `dags/core/` structure. They use a **session-scoped real SparkSession** (not `BaseSparkContext`) and import via the dotted `dags.*` namespace (the project root is on `sys.path` when pytest runs).
 
-### `tests/core_model_dags/unit/core/core_{entity}/spark_jobs/conftest.py`
+### `packages/bietlejuice-runtime/test/core_model_dags/unit/core/core_{entity}/spark_jobs/conftest.py`
 
 ```python
 """Pytest fixtures for core_{entity} Spark job tests."""
@@ -284,7 +284,7 @@ def mock_configuration_service():
         yield mock_get_config
 ```
 
-### `tests/core_model_dags/unit/core/core_{entity}/spark_jobs/test_load_core_{entity}.py`
+### `packages/bietlejuice-runtime/test/core_model_dags/unit/core/core_{entity}/spark_jobs/test_load_core_{entity}.py`
 
 ```python
 """Unit tests for Core{Entity}SparkJob."""
@@ -378,4 +378,4 @@ class TestCore{Entity}SparkJob:
 - Mock `get_config` via `patch("dags.core.core_{entity}.spark_jobs.load_core_{entity}.Core{Entity}SparkJob.get_config")` in `conftest.py`'s `mock_configuration_service` fixture.
 - Patch `_load_{entity}_data` with a real `spark_session.createDataFrame(...)` to isolate `create_core_model` from I/O — do not mock PySpark functions.
 - Test at minimum: happy path columns, surrogate key format (64-char SHA-256 hex), partition integers match today's date, empty input edge case, config keys, `spark.table` called with correct table name.
-- Run with: `pytest tests/core_model_dags/unit/core/core_{entity}/spark_jobs/test_load_core_{entity}.py -v`.
+- Run with: `pytest packages/bietlejuice-runtime/test/core_model_dags/unit/core/core_{entity}/spark_jobs/test_load_core_{entity}.py -v`.

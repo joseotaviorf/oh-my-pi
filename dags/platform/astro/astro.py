@@ -1,10 +1,11 @@
+from bietlejuice_plugin.transfer_data_plugin import QuintoAndarPostgresToS3Operator
+
 from bietlejuice.base.airflow.dag_builders.main_builder.factories.factory_dispatcher import (
     FactoryDispatcher,
 )
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.formatters import StringFormatter
-from bietlejuice_plugin.transfer_data_plugin import QuintoAndarPostgresToS3Operator
 
 SOURCE = "astro"
 QUERY_PATH = DAGPackagesPathService.get_dag_path(SOURCE) + "/queries/raw/"
@@ -97,7 +98,7 @@ def create_extraction_task(
     if sql:
         sql = sql.format(
             load_start_date=dag_workflow.dag_execution_context.load_start_date,
-            load_end_date=dag_workflow.dag_execution_context.load_end_date
+            load_end_date=dag_workflow.dag_execution_context.load_end_date,
         )
 
     raw_task = QuintoAndarPostgresToS3Operator(
@@ -107,9 +108,7 @@ def create_extraction_task(
         task_id=f"load-raw-to-s3-{slugged_table_name}",
         bucket=dag_workflow.dag_execution_context.bucket,
         filename="data.json",
-        s3_file_path="raw/astro/{table_name}{s3_suffix}".format(
-            table_name=table_name, s3_suffix=s3_suffix
-        ),
+        s3_file_path=f"raw/astro/{table_name}{s3_suffix}",
         database_conn_id="airflow_db",
         s3_acl_policy="bucket-owner-full-control",
     )

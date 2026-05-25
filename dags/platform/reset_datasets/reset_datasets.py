@@ -5,8 +5,6 @@ import pendulum
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 
-from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-
 DAG_NAME = "reset_datasets"
 
 
@@ -18,21 +16,16 @@ def reset_dataset_queues(**kwargs):
     logging.info("Starting reset of DatasetDagRunQueue")
     try:
         with create_session() as session:
-            stmt = (
-                select(
-                    DatasetDagRunQueue.target_dag_id,
-                    DatasetModel.uri,
-                    DatasetDagRunQueue.created_at,
-                )
-                .join(
-                    DatasetModel,
-                    DatasetDagRunQueue.dataset_id == DatasetModel.id,
-                )
+            stmt = select(
+                DatasetDagRunQueue.target_dag_id,
+                DatasetModel.uri,
+                DatasetDagRunQueue.created_at,
+            ).join(
+                DatasetModel,
+                DatasetDagRunQueue.dataset_id == DatasetModel.id,
             )
             rows = session.execute(stmt).all()
-            logging.info(
-                f"DatasetDagRunQueue snapshot: {len(rows)} entries"
-            )
+            logging.info(f"DatasetDagRunQueue snapshot: {len(rows)} entries")
             for target_dag_id, uri, created_at in rows:
                 logging.info(
                     f"  queue entry: target_dag_id={target_dag_id}, "
@@ -40,16 +33,12 @@ def reset_dataset_queues(**kwargs):
                 )
 
             result = session.execute(delete(DatasetDagRunQueue))
-            logging.info(
-                f"Deleted {result.rowcount} rows from DatasetDagRunQueue"
-            )
+            logging.info(f"Deleted {result.rowcount} rows from DatasetDagRunQueue")
 
             remaining = session.execute(
                 select(func.count()).select_from(DatasetDagRunQueue)
             ).scalar()
-            logging.info(
-                f"DatasetDagRunQueue remaining rows: {remaining}"
-            )
+            logging.info(f"DatasetDagRunQueue remaining rows: {remaining}")
             if remaining != 0:
                 logging.warning(
                     f"Expected 0 rows in DatasetDagRunQueue after "
@@ -90,25 +79,18 @@ def reset_dataset_events(**kwargs):
                 f"{total} total events"
             )
             for uri, count in dataset_counts:
-                logging.info(
-                    f"  dataset_uri={uri}, events={count}"
-                )
+                logging.info(f"  dataset_uri={uri}, events={count}")
 
             result = session.execute(delete(DatasetEvent))
-            logging.info(
-                f"Deleted {result.rowcount} rows from DatasetEvent"
-            )
+            logging.info(f"Deleted {result.rowcount} rows from DatasetEvent")
 
             remaining = session.execute(
                 select(func.count()).select_from(DatasetEvent)
             ).scalar()
-            logging.info(
-                f"DatasetEvent remaining rows: {remaining}"
-            )
+            logging.info(f"DatasetEvent remaining rows: {remaining}")
             if remaining != 0:
                 logging.warning(
-                    f"Expected 0 rows in DatasetEvent after "
-                    f"delete, found {remaining}"
+                    f"Expected 0 rows in DatasetEvent after delete, found {remaining}"
                 )
     except Exception as e:
         logging.error(f"Failed to reset DatasetEvent: {e}")

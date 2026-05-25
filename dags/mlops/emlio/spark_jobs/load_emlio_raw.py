@@ -1,21 +1,17 @@
-from datetime import datetime
 import json
 from argparse import ArgumentParser
+from datetime import datetime
 
-from bietlejuice.base.spark.base_spark import BaseDBUtils
+from pyspark.sql.functions import col, from_json, get_json_object, struct
+from pyspark.sql.types import StringType, StructField, StructType
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.services.configuration_service import ConfigurationService
-
 from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageFormat
-
-from pyspark.sql.functions import from_json, get_json_object
-from pyspark.sql.functions import col, struct
-from pyspark.sql.types import StructType, StructField, StringType
-
+from bietlejuice.base.spark.base_spark import BaseDBUtils
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_emlio_raw"
 
@@ -30,16 +26,14 @@ def explode_json_column(df, column, json_schema):
             df = df.withColumn(
                 field.name,
                 from_json(
-                    get_json_object(df[column], "$.{}".format(field.name)),
+                    get_json_object(df[column], f"$.{field.name}"),
                     schema=field.dataType,
                 ),
             )
         else:  # non-collection data types
             df = df.withColumn(
                 field.name,
-                get_json_object(df[column], "$.{}".format(field.name)).cast(
-                    field.dataType
-                ),
+                get_json_object(df[column], f"$.{field.name}").cast(field.dataType),
             )
     return df
 
@@ -106,7 +100,7 @@ if __name__ == "__main__":
         "spark.sql.adaptive.enabled": "true",
         "spark.databricks.delta.retentionDurationCheck.enabled": "false",
         "spark.sql.streaming.schemaInference": "true",
-        "spark.sql.streaming.adaptiveQueryExecution.enabled": "true"
+        "spark.sql.streaming.adaptiveQueryExecution.enabled": "true",
     }
 
     spark_client = SparkClient(session_params=session_params)
@@ -119,13 +113,17 @@ if __name__ == "__main__":
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     database_location = datalake_info["db_raw_path"]
     database_name = datalake_info["db_raw_databricks"]
-    
+
     base_dbutils = BaseDBUtils()
     dbutils = base_dbutils.get_dbutils()
     kafka_api_key = dbutils.secrets.get(scope="quintoandar", key="EMLIO_KAFKA_API_KEY")
-    kafka_api_secret = dbutils.secrets.get(scope="quintoandar", key="EMLIO_KAFKA_API_SECRET")
+    kafka_api_secret = dbutils.secrets.get(
+        scope="quintoandar", key="EMLIO_KAFKA_API_SECRET"
+    )
 
-    logger.info(f"m={JOB_NAME}, msg=Retrieved Kafka credentials, key_length={len(kafka_api_key) if kafka_api_key else 0}, secret_length={len(kafka_api_secret) if kafka_api_secret else 0}")
+    logger.info(
+        f"m={JOB_NAME}, msg=Retrieved Kafka credentials, key_length={len(kafka_api_key) if kafka_api_key else 0}, secret_length={len(kafka_api_secret) if kafka_api_secret else 0}"
+    )
 
     kafka_options = {
         "kafka.bootstrap.servers": kafka_brokers,

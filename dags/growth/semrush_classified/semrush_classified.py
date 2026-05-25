@@ -1,26 +1,29 @@
 import os
-import re
 from datetime import datetime
-from pendulum import timezone
 
 from airflow.models import DAG
-from airflow.utils.helpers import cross_downstream
 from airflow.operators.python_operator import ShortCircuitOperator
+from airflow.utils.helpers import cross_downstream
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
-    QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
+    QuintoAndarDatabricksTerminateClusterOperator,
 )
+from pendulum import timezone
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
-from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import DatabricksGroupNameEnum
 from bietlejuice.base.airflow.dag_builders.main_builder.short_circuit_functions.dag_run_date_validators import (
     DAGRunDateValidators,
 )
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.services.configuration_service import ConfigurationService
+
 
 ## fuction to fetch toggles
 def get_toggle_param(dag_run, toggle_param_name):
@@ -28,6 +31,7 @@ def get_toggle_param(dag_run, toggle_param_name):
     if toggle_param:
         return toggle_param
     return False
+
 
 SOURCE = "semrush_classified"
 DAG_ID = f"bietlejuice.{SOURCE}"
@@ -56,8 +60,12 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
 cluster_configuration["data_security_mode"] = "SINGLE_USER"
-cluster_configuration["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-cluster_configuration["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+cluster_configuration["single_user_name"] = (
+    "{{ var.value.databricks_single_user_name }}"
+)
+cluster_configuration["spark_conf"][
+    "spark.databricks.sql.initial.catalog.namespace"
+] = "quintoandar_{{ var.value.environment }}"
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -85,22 +93,27 @@ dag = DAG(
 )
 
 skip_run_task = ShortCircuitOperator(
-    task_id=f"check-day-to-skip-execution",
+    task_id="check-day-to-skip-execution",
     python_callable=DAGRunDateValidators.check_is_specific_day_of_month,
     op_args=["{{ macros.ds_add(data_interval_start | ds, 1) }}", 1],
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     task_id="create-cluster",
     cluster_configuration=cluster_configuration,
     libraries=default_libraries,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
-datalake_task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
+datalake_task_group = DatalakeTaskGroup(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=SOURCE,
@@ -109,7 +122,9 @@ datalake_task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag
 )
 
 # TODO: Refactor using the new DatalakeTaskGroup to decouple functions.
-load_semrush_transient_task = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=f"load-transient-{SOURCE}",
+load_semrush_transient_task = QuintoAndarDatabricksSubmitRunOperator(
+    databricks_conn_id="databricks_new",
+    task_id=f"load-transient-{SOURCE}",
     pool="default_pool",
     dag=dag,
     json={
@@ -139,7 +154,6 @@ raw_task_group = datalake_task_group.build_raw_task_group_for_all_tables(
 )
 
 for table_name in tables:
-
     domain = tables[table_name]
 
     clean_task_group = datalake_task_group.build_clean_task_group(
@@ -149,16 +163,16 @@ for table_name in tables:
         is_incremental=True,
         has_create_external_table_task=False,
         partitions=partition_cols,
-        extra_query_template_params={
-            "domain": domain
-        },
+        extra_query_template_params={"domain": domain},
     )
 
     skip_run_task.set_downstream(create_cluster_task)
 
     create_cluster_task.set_downstream(load_semrush_transient_task)
 
-    load_semrush_transient_task.set_downstream(DatalakeTaskGroup.first_tasks(raw_task_group))
+    load_semrush_transient_task.set_downstream(
+        DatalakeTaskGroup.first_tasks(raw_task_group)
+    )
 
     cross_downstream(
         DatalakeTaskGroup.last_tasks(raw_task_group),

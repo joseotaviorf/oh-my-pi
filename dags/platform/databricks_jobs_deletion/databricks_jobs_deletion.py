@@ -1,11 +1,12 @@
-from datetime import timedelta, datetime
-from multiprocessing.pool import ThreadPool
 import re
-from pendulum import timezone
+from datetime import datetime, timedelta
+from multiprocessing.pool import ThreadPool
 
 from airflow.models import DAG
 from airflow.operators.python_operator import PythonOperator
 from databricks_plugin.hooks.databricks_hook import QuintoAndarDatabricksHook
+from pendulum import timezone
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
@@ -15,7 +16,10 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 MAIN_START_DATE = datetime(2023, 7, 15, tzinfo=timezone("America/Sao_Paulo"))
 MAIN_SCHEDULE_INTERVAL = "0 */8 * * *"
 
-PROJECT_TO_JOB_NAME_REGEX_MAPPING = {"bietlejuice": "^bietlejuice-", "wonka": "^quintoml-wonka-"}
+PROJECT_TO_JOB_NAME_REGEX_MAPPING = {
+    "bietlejuice": "^bietlejuice-",
+    "wonka": "^quintoml-wonka-",
+}
 JOBS_REMOVAL_TIMEDELTA = timedelta(days=1)
 
 
@@ -33,12 +37,13 @@ def delete_databricks_jobs(
         and re.search(job_name_regex, job["settings"]["name"])
     }
     databricks_hook.log.info(
-        "Quantity of jobs filtered to be deleted: {}".format(len(jobs_id_list))
+        f"Quantity of jobs filtered to be deleted: {len(jobs_id_list)}"
     )
     databricks_hook.log.info(
         "Jobs to be deleted:\n{}".format("\n".join(list(jobs_id_list.values())))
     )
     ThreadPool(processes=5).map(databricks_hook.delete_job, list(jobs_id_list.keys()))
+
 
 jiraops_callback = JiraOpsCallback()
 dag = DAG(

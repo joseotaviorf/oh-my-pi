@@ -1,17 +1,18 @@
-from collections import defaultdict
-import logging
 import json
+import logging
 import re
 from argparse import ArgumentParser, Namespace
+from collections import defaultdict
+
 import pyspark.sql.functions as F
 from pyspark.sql import DataFrame
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
+from bietlejuice.base.spark.base_spark import BaseDBUtils
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
-from bietlejuice.base.spark.base_spark import BaseDBUtils
-from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
-
 
 THRESHOLD_IN_SECONDS = 1200
 JOB_NAME = "load_cdc_replication_metrics"
@@ -35,9 +36,9 @@ def parse_arguments() -> Namespace:
 
 def get_df_with_metrics(df: DataFrame, table: str, database_name: str) -> DataFrame:
     """
-    Generates a df with cdc metrics: count_of_hard_deletes and timestamp_diff_in_seconds. 
+    Generates a df with cdc metrics: count_of_hard_deletes and timestamp_diff_in_seconds.
     Quantify hard_delete operations (op_cdc = "d")
-    and uses the difference in seconds from the ts_cdc_transaction(CDC replication) 
+    and uses the difference in seconds from the ts_cdc_transaction(CDC replication)
     and the ts_database_transaction (Database operation) to identify if the table is
     being replicated with delays.
     """
@@ -131,9 +132,9 @@ def trigger_gchat_alerts(
     df: DataFrame, start_date: str, end_date: str, gchat_channel_customizations: dict
 ) -> None:
     """
-  Checks if the timestamp_diff_in_seconds column reaches the threshold.
-  If so, calls the function that sends the Gchat Alert
-  """
+    Checks if the timestamp_diff_in_seconds column reaches the threshold.
+    If so, calls the function that sends the Gchat Alert
+    """
     logger.info(
         "m=trigger_gchat_alerts, msg=Checking if the timestamp_diff_in_seconds reached the threshold..."
     )
@@ -171,7 +172,11 @@ def get_metrics_df(start_date: str, end_date: str) -> DataFrame:
     ]
 
     for database_name in database_names:
-        tables = [table.name for table in spark.catalog.listTables(database_name) if not table.name.endswith("temp_df")]
+        tables = [
+            table.name
+            for table in spark.catalog.listTables(database_name)
+            if not table.name.endswith("temp_df")
+        ]
         for table in tables:
             logger.info(
                 f"m=get_metrics_df, msg=Generating table {database_name}.{table} metrics based on start_date={start_date} and end_date={end_date}..."
@@ -221,7 +226,7 @@ def main() -> None:
     df.cache()
     if df.isEmpty():
         logger.info(
-            f"""
+            """
             m=__main__, msg=Metrics Dataframe is empty, there is no changes to propagate.
             """
         )

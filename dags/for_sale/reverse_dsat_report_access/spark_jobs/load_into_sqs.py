@@ -1,11 +1,10 @@
-import logging
 import json
-from datetime import datetime
+import logging
 from argparse import ArgumentParser
-from datetime import datetime, date
+from datetime import datetime
 from typing import Tuple
-import boto3
 
+import boto3
 from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_into_sqs"
@@ -15,17 +14,13 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def main():
-    database_name, table_name, queue_url, execution_date = (
-        parse_arguments()
-    )
+    database_name, table_name, queue_url, execution_date = parse_arguments()
     logger.info(
         f"""m=__main__, database_name={database_name}, table_name={table_name},
         queue_url={queue_url}, execution_date={execution_date}"""
     )
 
-    load_table_into_sqs(
-        database_name, table_name, queue_url, execution_date
-    )
+    load_table_into_sqs(database_name, table_name, queue_url, execution_date)
 
 
 def parse_arguments() -> Tuple[str, str, str, datetime]:
@@ -72,21 +67,24 @@ def load_table_into_sqs(
     message_contents = filtered_df.collect()
     payload = [{"payload": row.asDict()} for row in message_contents]
 
-    sqs = boto3.client('sqs', region_name='us-east-1')
+    sqs = boto3.client("sqs", region_name="us-east-1")
     for message in payload:
         try:
             message_body = json.dumps({"payload": message})
-            response = sqs.send_message(
+            sqs.send_message(
                 QueueUrl=queue_url,
                 MessageBody=message_body,
-                MessageAttributes={"contentType": {
-                    "DataType": "String",
-                    "StringValue": "application/json"
-                }}
+                MessageAttributes={
+                    "contentType": {
+                        "DataType": "String",
+                        "StringValue": "application/json",
+                    }
+                },
             )
             print("Mensagem enviada com sucesso para a fila SQS.")
         except Exception as e:
             print(f"Erro ao enviar mensagem para a fila SQS: {e}")
+
 
 if __name__ == "__main__":
     main()

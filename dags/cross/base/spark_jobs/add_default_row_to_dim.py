@@ -37,7 +37,9 @@ def main():
 
     global spark
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
 
         spark = create_emr_spark_session(JOB_NAME)
 

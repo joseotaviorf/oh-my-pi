@@ -5,17 +5,16 @@ from argparse import ArgumentParser
 from datetime import date, datetime, timedelta
 from typing import List, Optional, Set
 
+from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql.functions import lit
+from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql.functions import lit
-
-from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_clustering_image_model_raw"
 
@@ -157,7 +156,9 @@ def main():
     parser.add_argument("source", help="DAG name")
     parser.add_argument("table_name", help="Name of the table to store data into")
     parser.add_argument("partitions", help="Partition columns name")
-    parser.add_argument("base_path", help="S3 prefix containing YYYY-MM-DD dated folders")
+    parser.add_argument(
+        "base_path", help="S3 prefix containing YYYY-MM-DD dated folders"
+    )
     parser.add_argument("load_start_date", help="Start date to load data")
     parser.add_argument("load_end_date", help="End date to load data")
 
@@ -224,8 +225,7 @@ def main():
             )
         else:
             logger.info(
-                "m=main, "
-                f"msg=No parquet data loaded for dated folder {read_path}."
+                f"m=main, msg=No parquet data loaded for dated folder {read_path}."
             )
 
 

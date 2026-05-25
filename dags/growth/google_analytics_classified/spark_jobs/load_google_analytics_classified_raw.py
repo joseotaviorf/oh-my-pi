@@ -1,26 +1,23 @@
+import base64
+import json
 from argparse import ArgumentParser
+
+from google.oauth2 import service_account
+from pyspark.sql import SparkSession
+from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat, SparkDataFrameService
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
-from quintoandar_logger import QuintoAndarLogger
-
-from pyspark.sql import SparkSession
-from google.cloud import bigquery
-from google.cloud import bigquery_storage_v1
-from google.oauth2 import service_account
-
-from bietlejuice.base.databricks.table_privileges import TablePrivileges
-from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
-
-
-import json
-import base64
-import ast
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_google_analytics_classified_raw"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -34,7 +31,7 @@ if __name__ == "__main__":
     parser.add_argument("source")
     parser.add_argument("load_start_date")
     parser.add_argument("load_end_date")
-  
+
     args = parser.parse_args()
 
     env = args.env
@@ -44,19 +41,21 @@ if __name__ == "__main__":
     load_end_date = args.load_end_date
 
     config_service = ConfigurationService(source)
-    
+
     project = config_service.get_config("project")
     raw_partition_cols = config_service.get_config("raw_partition_cols")
     source_table_name = config_service.get_config("source_table_name")
     table_name = config_service.get_config("table_name")
-    source_database_name = config_service.get_config('source_database_name')
-    source_table_name = config_service.get_config('source_table_name')
+    source_database_name = config_service.get_config("source_database_name")
+    source_table_name = config_service.get_config("source_table_name")
 
     credentials_json = dbutils.secrets.get("quintoandar", APIEnum.CLASSIFIEDS_BIGQUERY)
 
     credentials_dict = json.loads(credentials_json)
     credentials_b64 = base64.b64encode(credentials_json.encode("utf-8")).decode("utf-8")
-    credentials = service_account.Credentials.from_service_account_info(credentials_dict)
+    credentials = service_account.Credentials.from_service_account_info(
+        credentials_dict
+    )
 
     query = f"""
     SELECT * 
@@ -70,13 +69,12 @@ if __name__ == "__main__":
     spark = SparkSession.builder.getOrCreate()
 
     df = (
-        spark.read
-        .format("bigquery")
+        spark.read.format("bigquery")
         .option("credentials", credentials_b64)
         .option("project", project)
         .option("parentProject", project)
         .option("query", query)
-        .option("materializationDataset", source_database_name) 
+        .option("materializationDataset", source_database_name)
         .load()
     )
 
@@ -102,7 +100,7 @@ if __name__ == "__main__":
         df=df,
         format_options=SparkTableStorageFormat.DEFAULT_RAW,
         s3_path=f"{database_location}{table_name}",
-        partitions=raw_partition_cols
+        partitions=raw_partition_cols,
     )
 
     spark_metastore_loader.update_metastore(
@@ -111,12 +109,12 @@ if __name__ == "__main__":
         table_name=table_name,
         format_options=SparkTableStorageFormat.DEFAULT_RAW,
         database_location=database_location,
-        partitions=raw_partition_cols
+        partitions=raw_partition_cols,
     )
 
     spark_metastore_service.create_new_partitions_from_df(
         df=df,
         database_name=database_name,
         table_name=table_name,
-        partition_cols=raw_partition_cols
+        partition_cols=raw_partition_cols,
     )

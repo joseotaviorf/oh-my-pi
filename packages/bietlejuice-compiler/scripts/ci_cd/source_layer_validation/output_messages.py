@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
 """
 User-facing stdout for source-layer policy validation (banners, grouped violations).
 """
-
-from __future__ import print_function
 
 from typing import Iterable, List, Mapping, Tuple
 
@@ -40,9 +37,9 @@ def format_allowed_layers_line(allowed_layers: Iterable[str]) -> str:
 def _print_dag_context(
     dag_name: str, workflow_layer: str, allowed_layers: Iterable[str]
 ) -> None:
-    print("DAG: {}".format(dag_name))
+    print(f"DAG: {dag_name}")
     print("DAG Layer: {}".format((workflow_layer or "").upper()))
-    print("Allowed layers: {}".format(format_allowed_layers_line(allowed_layers)))
+    print(f"Allowed layers: {format_allowed_layers_line(allowed_layers)}")
     print("")
 
 
@@ -83,9 +80,9 @@ def print_grouped_invalid_table_usage(
     print(heading)
     print("")
     for path in sorted(violations_by_file.keys()):
-        print("Table with error: {}".format(path))
+        print(f"Table with error: {path}")
         for fqn, lyr in violations_by_file[path]:
-            print("- {} (layer: {})".format(fqn, lyr))
+            print(f"- {fqn} (layer: {lyr})")
         print("")
 
 
@@ -103,22 +100,18 @@ def print_warning_footer():
     print_separator()
 
 
-CORE_COVERAGE_POINTER = (
-    "Use the Core Model output column instead of reading directly from the clean source."
-)
+CORE_COVERAGE_POINTER = "Use the Core Model output column instead of reading directly from the clean source."
 
 
 def _print_core_coverage_violations(
     violations_by_file: Mapping[str, List[Tuple[str, str, str]]],
 ) -> None:
     for path in sorted(violations_by_file.keys()):
-        print("File: {}".format(path))
+        print(f"File: {path}")
         for output_col, clean_lineage, core_fqn in violations_by_file[path]:
             print(
-                "- Column `{}` has lineage from `{}`, which is already covered"
-                " by Core Model as `{}`. Use the Core Model output instead.".format(
-                    output_col, clean_lineage, core_fqn
-                )
+                f"- Column `{output_col}` has lineage from `{clean_lineage}`, which is already covered"
+                f" by Core Model as `{core_fqn}`. Use the Core Model output instead."
             )
         print("")
 
@@ -136,7 +129,7 @@ def print_core_coverage_failure_opening(
         " already modelled by a Core Model."
     )
     print("")
-    print("DAG: {}".format(dag_name))
+    print(f"DAG: {dag_name}")
     print_separator()
     print("")
     _print_core_coverage_violations(violations_by_file)
@@ -161,7 +154,7 @@ def print_core_coverage_warning_opening(
         " from clean source columns already modelled by a Core Model."
     )
     print("")
-    print("DAG: {}".format(dag_name))
+    print(f"DAG: {dag_name}")
     print_separator()
     print("")
     _print_core_coverage_violations(violations_by_file)

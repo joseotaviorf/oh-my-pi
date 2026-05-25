@@ -1,52 +1,72 @@
 import json
-
-from concurrent.futures import ThreadPoolExecutor
 from argparse import ArgumentParser
-from quintoandar_logger import QuintoAndarLogger
+from concurrent.futures import ThreadPoolExecutor
 
-from pyspark.sql.functions import lit, col
+from pyspark.sql.functions import col, lit
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
     BaseDBUtils,
-    SparkTableStorageFormat,
     SparkDataFrameService,
+    SparkTableStorageFormat,
 )
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
 
-from pyspark.sql.functions import col
-
 JOB_NAME = "load_amplitude_new_raw"
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def process_key(key, environment, source, datalake_bucket, execution_date, partition_cols, table_name, transient_location, transient_data_schema, transient_expected_cols):
+def process_key(
+    key,
+    environment,
+    source,
+    datalake_bucket,
+    execution_date,
+    partition_cols,
+    table_name,
+    transient_location,
+    transient_data_schema,
+    transient_expected_cols,
+):
     try:
         spark_client = SparkClient()
         dataframe_service = SparkDataFrameService()
 
-        db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+        db_info = DatalakeMetastoreService.get_db_info(
+            environment, source, datalake_bucket
+        )
         database_location = db_info["db_raw_path"]
 
-        transient_path = f'{transient_location}{key["app_id"]}/{key["app_id"]}_{execution_date}_*/'
-        logger.info(f'Starting events processing for app_id={key["app_id"]}, path={transient_path}')
+        transient_path = (
+            f"{transient_location}{key['app_id']}/{key['app_id']}_{execution_date}_*/"
+        )
+        logger.info(
+            f"Starting events processing for app_id={key['app_id']}, path={transient_path}"
+        )
 
-        df = spark_client.conn.read.json(transient_path, schema=transient_data_schema).filter(~col('event_type').contains('Exposure'))
+        df = spark_client.conn.read.json(
+            transient_path, schema=transient_data_schema
+        ).filter(~col("event_type").contains("Exposure"))
 
         if not df.isEmpty():
             df = (
                 dataframe_service.input(df)
                 .format_column_names()
                 .convert_struct_type_to_json()
-                .create_columns_from_dict({'app': key["app_id"]})
-                .create_year_month_day_columns_from_dataframe_column("server_upload_time")
+                .create_columns_from_dict({"app": key["app_id"]})
+                .create_year_month_day_columns_from_dataframe_column(
+                    "server_upload_time"
+                )
                 .output()
             )
 
-            missing_cols = [col for col in transient_expected_cols if col not in df.columns]
+            missing_cols = [
+                col for col in transient_expected_cols if col not in df.columns
+            ]
             for table_col in missing_cols:
                 df = df.withColumn(table_col, lit(None))
 
@@ -61,9 +81,12 @@ def process_key(key, environment, source, datalake_bucket, execution_date, parti
                 optimize_dataframe=False,
             )
         else:
-            logger.info(f'No events received from App ID {key["app_id"]} for this day.')
+            logger.info(f"No events received from App ID {key['app_id']} for this day.")
     except Exception as error:
-        logger.error(f"Failed to process events for App ID {key['app_id']}, error={error}")
+        logger.error(
+            f"Failed to process events for App ID {key['app_id']}, error={error}"
+        )
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -88,5 +111,21 @@ if __name__ == "__main__":
 
     # Process keys in parallel
     with ThreadPoolExecutor() as executor:
-        list(executor.map(lambda key: process_key(key, environment, source, datalake_bucket, execution_date, partition_cols, table_name, transient_location, transient_data_schema, transient_expected_cols), all_keys))
+        list(
+            executor.map(
+                lambda key: process_key(
+                    key,
+                    environment,
+                    source,
+                    datalake_bucket,
+                    execution_date,
+                    partition_cols,
+                    table_name,
+                    transient_location,
+                    transient_data_schema,
+                    transient_expected_cols,
+                ),
+                all_keys,
+            )
+        )
         print(f"Processed {len(all_keys)} keys.")

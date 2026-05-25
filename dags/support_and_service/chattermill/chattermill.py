@@ -1,25 +1,27 @@
 import json
 import os
-import pendulum
 from datetime import datetime
 
+import pendulum
 from airflow.models import DAG
 from airflow.utils.helpers import chain, cross_downstream
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import DatabricksGroupNameEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
 from bietlejuice.base.incident_context_enrichers.databricks.databricks_enricher import (
     DatabricksIncidentContextEnricher,
 )
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
-
+from bietlejuice.services.configuration_service import ConfigurationService
 
 # ENV setup
 ENV = os.environ.get("ENVIRONMENT")
@@ -57,7 +59,9 @@ cluster_description = config_service.get_config(cluster_type)
 
 cluster_description["data_security_mode"] = "SINGLE_USER"
 cluster_description["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-cluster_description["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+cluster_description["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
+    "quintoandar_{{ var.value.environment }}"
+)
 default_libraries = config_service.get_config("default_libraries")
 
 partition_cols = config_service.get_config("partition_cols")
@@ -80,20 +84,18 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     }
 ]
 DAG_OWNER = DAGOwnerEnum.DATA_SS
-jiraops_callback = (
-    JiraOpsCallback(
-        dag_args={
-            "name": DAG_NAME,
-            "schedule_start_date": MAIN_START_DATE,
-            "schedule_interval": MAIN_SCHEDULE_INTERVAL,
-            "owner": DAG_OWNER,
-            "documentation": dag_documentation,
-        },
-        cluster_args={
-            "type": cluster_type,
-            "custom_configurations": cluster_description,
-        },
-    )
+jiraops_callback = JiraOpsCallback(
+    dag_args={
+        "name": DAG_NAME,
+        "schedule_start_date": MAIN_START_DATE,
+        "schedule_interval": MAIN_SCHEDULE_INTERVAL,
+        "owner": DAG_OWNER,
+        "documentation": dag_documentation,
+    },
+    cluster_args={
+        "type": cluster_type,
+        "custom_configurations": cluster_description,
+    },
 )
 jiraops_callback.add_context_enricher(
     DatabricksIncidentContextEnricher(databricks_conn_id="databricks_new")
@@ -119,17 +121,22 @@ dag = DAG(
 )
 
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     task_id="create-cluster",
     cluster_configuration=cluster_description,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries + CUSTOM_LIBRARIES,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
-task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
+task_group = DatalakeTaskGroup(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=CONTEXT,
@@ -137,7 +144,6 @@ task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
 )
 
 for table_name, table_details in tables.items():
-
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,

@@ -151,7 +151,7 @@ make validate-metadata-files-exist && make validate-metadata-files-content && ma
 
 **Subagent C:**
 ```bash
-make validate-dependency-file-correctness && make check-style
+make validate-dependency-file-correctness && make check-style && make check-style-dags
 ```
 
 All three must exit with code 0 before the PR is ready. If any still fail, return to Step 3.

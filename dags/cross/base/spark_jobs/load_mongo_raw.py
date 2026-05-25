@@ -6,14 +6,17 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+)
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
-from bietlejuice.clients.db_clients import SparkClient, MongoClient
+from bietlejuice.clients.db_clients import MongoClient, SparkClient
 from bietlejuice.consumers.db_consumers import MongoConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.base.spark import SparkDataFrameService
 
 JOB_NAME = "load_mongo_raw"
 
@@ -32,9 +35,7 @@ def _load_dataframe_in_datalake(
     @param force_recreate: bool. Indicates if it must force table recreation in metastore.
     """
     if not df.isEmpty():
-        logger.info(
-            f"m=_load_dataframe_in_datalake, msg=Loading data into s3 bucket..."
-        )
+        logger.info("m=_load_dataframe_in_datalake, msg=Loading data into s3 bucket...")
 
         s3_loader.load_df(
             df=df,
@@ -55,7 +56,7 @@ def _load_dataframe_in_datalake(
         )
     else:
         logger.info(
-            f"m=_load_dataframe_in_datalake, msg=Dataframe is empty, no data has been loaded to the datalake"
+            "m=_load_dataframe_in_datalake, msg=Dataframe is empty, no data has been loaded to the datalake"
         )
 
 
@@ -77,12 +78,12 @@ def _extract_table_from_database(
     @param execution_date: airflow execution date.
     """
     logger.info(
-        f"m=_extract_table_from_database, msg=Extracting data from Mongo database..."
+        "m=_extract_table_from_database, msg=Extracting data from Mongo database..."
     )
 
     if extraction_type == "incremental":
         logger.info(
-            f"m=_extract_table_from_database, msg=Performing incremental load..."
+            "m=_extract_table_from_database, msg=Performing incremental load..."
         )
         df = mongo_consumer.get_incremental_data_from_table(
             table_name=table_name,
@@ -113,7 +114,7 @@ def _extract_table_from_database(
             partition_cols=partition_cols,
         )
     else:
-        logger.info(f"m=_extract_table_from_database, msg=Performing full load...")
+        logger.info("m=_extract_table_from_database, msg=Performing full load...")
         df = mongo_consumer.get_data_from_table(table_name=table_name)
 
         _load_dataframe_in_datalake(
@@ -158,7 +159,9 @@ def get_conn_config(dbutils_secret_key: str, dbutils_secret_scope: str) -> dict:
         global dbutils
         dbutils = base_dbutils.get_dbutils()
 
-    conn_config_json = dbutils.secrets.get(scope=dbutils_secret_scope, key=dbutils_secret_key)
+    conn_config_json = dbutils.secrets.get(
+        scope=dbutils_secret_scope, key=dbutils_secret_key
+    )
 
     return json.loads(conn_config_json)
 
@@ -205,14 +208,12 @@ if __name__ == "__main__":
     database_location = db_info["db_raw_path"]
     spark_metastore_service = SparkMetastoreService(spark_client)
 
-    logger.info(
-        f"m=__main__, msg=Creating database in Spark Metastore if not exists..."
-    )
+    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service.create_database(databricks_database_name)
 
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
-    
+
     full_raw_table_name = f"{databricks_database_name}.{table_name}"
     if table_privileges_dict is not None:
         table_privileges = TablePrivileges.from_input_dict(
@@ -229,9 +230,6 @@ if __name__ == "__main__":
         execution_date=execution_date,
         **load_options,
     )
-    
-    if (
-        table_privileges
-        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-    ):
+
+    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()

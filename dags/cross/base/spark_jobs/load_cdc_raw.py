@@ -1,6 +1,12 @@
 import json
 from argparse import ArgumentParser
 
+from delta.tables import DeltaTable
+from pyspark.sql.functions import col, make_date, row_number
+from pyspark.sql.utils import AnalysisException
+from pyspark.sql.window import Window
+from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.airflow.enums.database_type_enum import DatabaseTypeEnum
 from bietlejuice.base.cdc.primary_key_identifiers.raw_primary_key_identifier import (
     RawPrimaryKeyIdentifier,
@@ -9,21 +15,14 @@ from bietlejuice.base.cdc.schema_treatment.cdc_schema_finder_factory import (
     CdcSchemaFinderFactory,
 )
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
-from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.delta_secondary_catalog_sync import (
     partition_columns_present,
     sync_delta_write_to_secondary_catalog,
 )
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from quintoandar_logger import QuintoAndarLogger
-
-from delta.tables import DeltaTable
-
-from pyspark.sql.functions import row_number, col, make_date
-from pyspark.sql.window import Window
-from pyspark.sql.utils import AnalysisException
 
 JOB_NAME = "load_cdc_raw"
 
@@ -116,7 +115,9 @@ def dml_processor(transactional_df, primary_keys):
 def main():
     global spark
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
 
         spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
@@ -172,7 +173,7 @@ def main():
 
     if not transactional_df:
         logger.info(
-            f"""
+            """
             m=__main__, msg=Transactional Dataframe is empty, there is no changes to propagate.
             """
         )

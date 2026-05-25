@@ -4,17 +4,18 @@ import pendulum
 from airflow.models import DAG
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
-    QuintoAndarDatabricksTerminateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
+    QuintoAndarDatabricksTerminateClusterOperator,
 )
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import DatabricksGroupNameEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
-
+from bietlejuice.services.configuration_service import ConfigurationService
 
 DAG_NAME = "services_integration_validations"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -24,11 +25,15 @@ MAIN_START_DATE = datetime(
 MAIN_SCHEDULE_INTERVAL = "0 13,16,18,20 * * *"
 
 config_service = ConfigurationService()
-CLUSTER_DESCRIPTION = config_service.get_config("consolidation_s_general_single_node_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config(
+    "consolidation_s_general_single_node_cluster"
+)
 
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
+    "quintoandar_{{ var.value.environment }}"
+)
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -60,9 +65,7 @@ custom_libraries = [
         "whl": f"{artifacts_bucket}/survicate-api-client-python/"
         f"quintoandar_survicate_api_client-0.1.0-py2.py3-none-any.whl"
     },
-    {
-        "jar": f"{artifacts_bucket}/jars/ojdbc8.jar"
-    },
+    {"jar": f"{artifacts_bucket}/jars/ojdbc8.jar"},
 ]
 jiraops_callback = JiraOpsCallback()
 dag = DAG(
@@ -78,17 +81,22 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(DAG_NAME),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=default_libraries + custom_libraries,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
-run_validations_suites = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=f"run-validations-suites",
+run_validations_suites = QuintoAndarDatabricksSubmitRunOperator(
+    databricks_conn_id="databricks_new",
+    task_id="run-validations-suites",
     dag=dag,
     retries=0,
     json={

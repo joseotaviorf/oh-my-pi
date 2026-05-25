@@ -43,7 +43,10 @@ S3_SST_PIPELINES_PREFIX = path.join(
 )
 
 if not path.isdir(SST_PIPELINES_ROOT):
-    print(f"ERROR: SST pipelines directory not found: {SST_PIPELINES_ROOT}", file=sys.stderr)
+    print(
+        f"ERROR: SST pipelines directory not found: {SST_PIPELINES_ROOT}",
+        file=sys.stderr,
+    )
     sys.exit(1)
 
 config = Config(retries={"max_attempts": 5, "mode": "standard"})

@@ -1,9 +1,10 @@
 import argparse
-from os import path
-import yaml
 import os
 import sys
+from os import path
+
 import boto3
+import yaml
 
 _COMPILER_ROOT = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -13,12 +14,12 @@ for _p in (BI_ETL_EJUICE_ROOT, _COMPILER_ROOT):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
+from hierarchical_conf.hierarchical_conf import HierarchicalConf
+
+from bietlejuice.base.paths import BIETLEJUICE_CONFIG_ROOT
 from scripts.services.metadata_file_service import (
     MetadataFileService,
 )
-from bietlejuice.base.paths import BIETLEJUICE_CONFIG_ROOT
-from hierarchical_conf.hierarchical_conf import HierarchicalConf
-
 
 session = boto3.Session()
 client = session.client("s3")

@@ -20,6 +20,9 @@ from typing import Any, Mapping, Optional
 from bietlejuice.governance.fairness_assessment.adapters.columns_metastore import (
     resolve_columns_metastore_snapshot,
 )
+from bietlejuice.governance.fairness_assessment.checks.evaluation import (  # noqa: E501
+    evaluate_mvp_checks_from_row,
+)
 from bietlejuice.governance.fairness_assessment.constants import (
     COLUMNS_DOC,
     DAG_INVENTORY,
@@ -37,9 +40,6 @@ from bietlejuice.governance.fairness_assessment.datahub_graphql import (  # noqa
     compute_i3_lineage_pass_and_totals_by_fqn,
     compute_i3_ownership_pass_by_fqn,
     resolve_datahub_urn_flags,
-)
-from bietlejuice.governance.fairness_assessment.checks.evaluation import (  # noqa: E501
-    evaluate_mvp_checks_from_row,
 )
 from bietlejuice.governance.fairness_assessment.description_quality import (  # noqa: E501
     assess_table_description_quality,

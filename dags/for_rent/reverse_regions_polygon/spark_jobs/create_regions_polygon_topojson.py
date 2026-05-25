@@ -3,9 +3,9 @@ from argparse import ArgumentParser
 from datetime import datetime
 
 import boto3
-from sedona.register import SedonaRegistrator
 from pytopojson import topology
 from quintoandar_logger import QuintoAndarLogger
+from sedona.register import SedonaRegistrator
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
@@ -34,7 +34,6 @@ def parse_json_from_json_string(geojson_str):
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")

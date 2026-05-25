@@ -17,7 +17,8 @@ JOB_NAME = "load_data_assets_into_mp"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-def remove_nulls(row_dict:dict) -> dict:
+
+def remove_nulls(row_dict: dict) -> dict:
     """
     Removes null values from a dictionary
 
@@ -28,7 +29,7 @@ def remove_nulls(row_dict:dict) -> dict:
     return {k: v for k, v in row_dict.items() if v is not None}
 
 
-def _get_payloads_from_datalake(spark_client:SparkClient, data_asset:str) -> list:
+def _get_payloads_from_datalake(spark_client: SparkClient, data_asset: str) -> list:
     """
     This function gets the data from the reverse tables and transforms it into a list of payloads
 
@@ -45,7 +46,8 @@ def _get_payloads_from_datalake(spark_client:SparkClient, data_asset:str) -> lis
 
     return [{**remove_nulls(row)} for row in rows]
 
-def _send_requests(endpoint:str, payloads:list, chunk_size:int=30) -> None:
+
+def _send_requests(endpoint: str, payloads: list, chunk_size: int = 30) -> None:
     """
     Sends requests with payload with 5 retries and breaks the payload into chunks if needed
 
@@ -61,8 +63,10 @@ def _send_requests(endpoint:str, payloads:list, chunk_size:int=30) -> None:
 
     for idx in range(0, len(payloads), chunk_size):
         chunk_number = idx // chunk_size + 1
-        chunk = payloads[idx: idx + chunk_size]
-        logger.info(f"m=_send_requests, message=Chunk: {chunk_number}, sending {len(chunk)} items")
+        chunk = payloads[idx : idx + chunk_size]
+        logger.info(
+            f"m=_send_requests, message=Chunk: {chunk_number}, sending {len(chunk)} items"
+        )
         response = session.post(endpoint, json=chunk)
 
         try:
@@ -84,13 +88,17 @@ def _send_requests(endpoint:str, payloads:list, chunk_size:int=30) -> None:
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
     all_data_assets = ["dashboard", "chart", "dataset"]
 
     parser.add_argument("environment", help="forno/prod values ")
-    parser.add_argument("--data_assets", type=str, nargs="+",choices=all_data_assets,
-                        help="list of data assets to be loaded into Metadata Propagator. Options are dashboard, chart, dataset")
+    parser.add_argument(
+        "--data_assets",
+        type=str,
+        nargs="+",
+        choices=all_data_assets,
+        help="list of data assets to be loaded into Metadata Propagator. Options are dashboard, chart, dataset",
+    )
 
     args = parser.parse_args()
 

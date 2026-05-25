@@ -4,15 +4,15 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from itertools import chain
 
-from bietlejuice.base.databricks.table_privileges import TablePrivileges
-from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from datahub.ingestion.graph.client import DatahubClientConfig, DataHubGraph
 from datahub.metadata.schema_classes import DatasetKeyClass, SchemaMetadataClass
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
 
 JOB_NAME = "load_datahub_datasets"
@@ -64,7 +64,9 @@ def get_lineage_flags(datahub_client: DataHubGraph, urn: str) -> tuple[bool, boo
         )
     )
 
-    has_table_lineage = any(e.relationship_type == "DownstreamOf" for e in all_upstreams)
+    has_table_lineage = any(
+        e.relationship_type == "DownstreamOf" for e in all_upstreams
+    )
     has_load_job_lineage = any(
         e.relationship_type == "Produces" and "load-" in e.urn and "airflow" in e.urn
         for e in all_upstreams
@@ -100,15 +102,19 @@ def process_urn(datahub_client: DataHubGraph, urn: str) -> dict | None:
 
 
 def fetch_dataset_records(datahub_client: DataHubGraph) -> list[dict]:
-    urns = list(datahub_client.get_urns_by_filter(
-        entity_types=["dataset"],
-        platform=["databricks", "glue", "hive", "trino"],
-    ))
+    urns = list(
+        datahub_client.get_urns_by_filter(
+            entity_types=["dataset"],
+            platform=["databricks", "glue", "hive", "trino"],
+        )
+    )
     logger.info(f"m=fetch_dataset_records,total_urns={len(urns)}")
 
     records = []
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        futures = {executor.submit(process_urn, datahub_client, urn): urn for urn in urns}
+        futures = {
+            executor.submit(process_urn, datahub_client, urn): urn for urn in urns
+        }
         for future in as_completed(futures):
             result = future.result()
             if result is not None:
@@ -135,7 +141,7 @@ def main() -> None:
     records = fetch_dataset_records(datahub_client)
 
     spark = SparkSession.builder.getOrCreate()
-    
+
     df = (
         spark.createDataFrame(records)
         .withColumn("year", F.lit(load_date.year))

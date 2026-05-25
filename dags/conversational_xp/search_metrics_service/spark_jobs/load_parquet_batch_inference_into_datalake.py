@@ -2,6 +2,7 @@ import json
 import logging
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
+
 from pyspark.sql.functions import col
 from quintoandar_logger import QuintoAndarLogger
 
@@ -26,7 +27,9 @@ def get_source_in_forno(environment, source):
     return source
 
 
-def load_raw_data(df, environment, source, datalake_bucket, table_name, raw_partition_cols):
+def load_raw_data(
+    df, environment, source, datalake_bucket, table_name, raw_partition_cols
+):
     spark_client = SparkClient()
     s3_loader = S3Loader()
 
@@ -68,25 +71,37 @@ def get_df_raw(table_name, source_root_path, date_to_ingest):
 
     dt_start = datetime.strptime(date_to_ingest, "%Y-%m-%d") - timedelta(days=90)
 
-    if table_name == 'search_metrics':
-        df = spark_client.conn.read.option("mergeSchema", "true").parquet(f"{source_root_path}/metrics").filter(col('date') >= dt_start)
-    elif table_name == 'search_contamination':
-        df = spark_client.conn.read.option("mergeSchema", "true").parquet(f"{source_root_path}/contamination").filter(
-            col('date') >= dt_start)
-    elif table_name == 'search_experiments':
+    if table_name == "search_metrics":
+        df = (
+            spark_client.conn.read.option("mergeSchema", "true")
+            .parquet(f"{source_root_path}/metrics")
+            .filter(col("date") >= dt_start)
+        )
+    elif table_name == "search_contamination":
+        df = (
+            spark_client.conn.read.option("mergeSchema", "true")
+            .parquet(f"{source_root_path}/contamination")
+            .filter(col("date") >= dt_start)
+        )
+    elif table_name == "search_experiments":
         list_experiments = (
-            spark_client.conn.read.option("mergeSchema", "true").parquet(f"{source_root_path}/experiments")
-            .filter(col('date') >= dt_start)
-            .select('exp_name')
+            spark_client.conn.read.option("mergeSchema", "true")
+            .parquet(f"{source_root_path}/experiments")
+            .filter(col("date") >= dt_start)
+            .select("exp_name")
             .distinct()
             .collect()
         )
         list_experiments = [row[0] for row in list_experiments]
         logger.info(f"loaded experiments: {list_experiments}")
 
-        df = spark_client.conn.read.option("mergeSchema", "true").parquet(f"{source_root_path}/experiments").filter(col('exp_name').isin(list_experiments))
+        df = (
+            spark_client.conn.read.option("mergeSchema", "true")
+            .parquet(f"{source_root_path}/experiments")
+            .filter(col("exp_name").isin(list_experiments))
+        )
     else:
-        raise ValueError(f'table_name: {table_name} not valid')
+        raise ValueError(f"table_name: {table_name} not valid")
     return df
 
 
@@ -124,7 +139,9 @@ def main():
 
     df_raw = get_df_raw(table_name, source_root_path, date_to_ingest)
 
-    load_raw_data(df_raw, environment, source, datalake_bucket, table_name, raw_partition_cols)
+    load_raw_data(
+        df_raw, environment, source, datalake_bucket, table_name, raw_partition_cols
+    )
 
 
 if __name__ == "__main__":

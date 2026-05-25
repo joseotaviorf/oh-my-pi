@@ -2,22 +2,21 @@ import logging
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 
+from pyspark.sql import functions as F
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkTableStorageFormat, SparkDataFrameService
+from bietlejuice.base.spark import SparkDataFrameService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
-from pyspark.sql import functions as F
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_batch_inference_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
 
 def main():
     parser = ArgumentParser(description=JOB_NAME)
@@ -112,8 +111,7 @@ def main():
     logger.info(f"m=__main__, msg=Loading data into {path}...")
 
     (
-        df.write
-        .format("parquet")
+        df.write.format("parquet")
         .mode("overwrite")
         .option("path", path)
         .partitionBy(raw_partition_cols)

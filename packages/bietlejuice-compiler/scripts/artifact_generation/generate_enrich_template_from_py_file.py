@@ -1,12 +1,13 @@
 import argparse
 import glob
-from typing import Tuple
-import yaml
-from os.path import join
-from pathlib import Path
+import os
 import re
 import sys
-import os
+from os.path import join
+from pathlib import Path
+from typing import Tuple
+
+import yaml
 
 NOT_IDENTIFIED_TEXT = "<NOT IDENTIFIED, INFORM MANUALLY>"
 
@@ -17,6 +18,7 @@ BI_ETL_EJUICE_ROOT = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
 sys.path.append(BI_ETL_EJUICE_ROOT)
+
 
 class DAGOwnerEnum:
     """
@@ -56,14 +58,16 @@ def main(dag_name: str) -> None:
     dag_declaration = generate_dag_declaration(dag_name, dag_file_content, conf_file)
     write_to_dag_package(dag_path, dag_declaration)
 
+
 def read_dag_file(dag_name: str) -> Tuple[str, str]:
     """Returns the full path of the dag file and its content"""
 
     dag_path = list(
         glob.iglob(f"{DAG_PACKAGES_ROOT}/**/{dag_name}/*.py", recursive=True)
     )[0]
-    with open(dag_path, "r") as f:
+    with open(dag_path) as f:
         return dag_path, f.read()
+
 
 def read_prod_conf_file(dag_name: str) -> dict:
     """Returns the content of the prod_conf.yml file in the DAG package, if it exists."""
@@ -74,8 +78,9 @@ def read_prod_conf_file(dag_name: str) -> dict:
     if len(conf_paths) == 0:
         return None
     conf_path = conf_paths[0]
-    with open(conf_path, "r") as f:
+    with open(conf_path) as f:
         return yaml.safe_load(f)
+
 
 def read_markdown_file(dag_name: str) -> str:
     md_paths = list(
@@ -84,20 +89,22 @@ def read_markdown_file(dag_name: str) -> str:
     if len(md_paths) == 0:
         return None
     md_path = md_paths[0]
-    with open(md_path, "r") as f:
+    with open(md_path) as f:
         return f.read()
+
 
 def generate_dag_declaration(dag_name: str, dag_file: str, conf_file: dict) -> dict:
     """Generates the content of the DAG declaration file"""
 
     return {
         "ATTENTION!": "This file was generated automatically. Please, check if the content is correct, then delete this key, the Python file and the other ymls. "
-            "Pay special attention to custom schemas, which are not identified automatically, and table customizations, like partitions and extraction type. "
-            "This is a template generator with a few automatic extractions, but you shouldn't fully trust it.",
+        "Pay special attention to custom schemas, which are not identified automatically, and table customizations, like partitions and extraction type. "
+        "This is a template generator with a few automatic extractions, but you shouldn't fully trust it.",
         "dag": extract_dag_key_content_for_declaration(dag_name, dag_file, conf_file),
         "workflow": extract_workflow_key_content_for_declaration(dag_file, conf_file),
         "cluster": extract_cluster_key_content_for_declaration(dag_file, conf_file),
     }
+
 
 def write_to_dag_package(dag_path: str, dag_declaration: dict) -> None:
     """Writes the DAG declaration to the DAG package"""
@@ -107,7 +114,10 @@ def write_to_dag_package(dag_path: str, dag_declaration: dict) -> None:
     with open(declaration_path, "w") as f:
         yaml.dump(dag_declaration, f, sort_keys=False, explicit_start=True)
 
-def extract_dag_key_content_for_declaration(dag_name: str, dag_file: str, conf_file: dict) -> dict:
+
+def extract_dag_key_content_for_declaration(
+    dag_name: str, dag_file: str, conf_file: dict
+) -> dict:
     """Extracts the content of the DAG key for the declaration file, using regexes in the python file and the config file"""
 
     start_date_pattern = r"START_DATE\s=\sdatetime\(\s*(?P<year>\d+)\s*,\s*(?P<month>\d+)\s*,\s*(?P<day>\d+)"
@@ -139,19 +149,22 @@ def extract_dag_documentation_from_md(dag_name: str) -> str:
     if not md_content:
         return None
     # Anything between the ### Purpose and <details> tags
-    documentation_match = re.search(r"### Purpose\s*([^<]*)<details>", md_content, flags=re.IGNORECASE)
+    documentation_match = re.search(
+        r"### Purpose\s*([^<]*)<details>", md_content, flags=re.IGNORECASE
+    )
     if not documentation_match:
         return None
-    return documentation_match.group(1).replace("\u200B", "").strip() # Some documentation files have zero width spaces
+    return (
+        documentation_match.group(1).replace("\u200b", "").strip()
+    )  # Some documentation files have zero width spaces
 
 
-def extract_workflow_key_content_for_declaration(dag_file: str, conf_file: dict) -> dict:
+def extract_workflow_key_content_for_declaration(
+    dag_file: str, conf_file: dict
+) -> dict:
     """Extracts the content of the workflow key for the declaration file, using regexes in the python file and the config file"""
 
-    content = {
-        "type": "query",
-        "layer": "enrich"
-    }
+    content = {"type": "query", "layer": "enrich"}
     if conf_file and conf_file.get("inner_dependencies"):
         content["inner_dependencies"] = conf_file["inner_dependencies"]
 
@@ -162,13 +175,23 @@ def extract_workflow_key_content_for_declaration(dag_file: str, conf_file: dict)
     # Matches strings like
     # partition_cols = ["year", "month", "day"]
     # partitions = ["year", "month", "day"]
-    partition_match_in_file = re.search(r"partition\w+\s*=\s*(\[(?:\"\w+\",?\s?)+\])", dag_file, flags=re.IGNORECASE)
+    partition_match_in_file = re.search(
+        r"partition\w+\s*=\s*(\[(?:\"\w+\",?\s?)+\])", dag_file, flags=re.IGNORECASE
+    )
     if partition_match_in_file:
         content["default_partitions"] = yaml.safe_load(partition_match_in_file.group(1))
 
-    if conf_file and "partition_cols" in conf_file and isinstance(conf_file["partition_cols"], list):
+    if (
+        conf_file
+        and "partition_cols" in conf_file
+        and isinstance(conf_file["partition_cols"], list)
+    ):
         content["default_partitions"] = conf_file["partition_cols"]
-    if conf_file and "partitions" in conf_file and isinstance(conf_file["partitions"], list):
+    if (
+        conf_file
+        and "partitions" in conf_file
+        and isinstance(conf_file["partitions"], list)
+    ):
         content["default_partitions"] = conf_file["partitions"]
 
     if "extra_query_template_params" in dag_file:
@@ -179,6 +202,7 @@ def extract_workflow_key_content_for_declaration(dag_file: str, conf_file: dict)
         content["tables_customization"] = tables_customization
 
     return content
+
 
 def extract_tables_customization(conf_file: dict) -> dict:
     """Extracts the content of the tables_customization key for the declaration file, using the config file"""
@@ -241,6 +265,7 @@ def extract_tables_customization(conf_file: dict) -> dict:
 
     return tables_customization
 
+
 def extract_cluster_key_content_for_declaration(dag_file: str, conf_file: dict) -> dict:
     """Extracts the content of the cluster key for the declaration file, using regexes in the python file and the config file"""
 
@@ -261,12 +286,14 @@ def extract_cluster_key_content_for_declaration(dag_file: str, conf_file: dict) 
 
     return content
 
+
 def parse_dag_name() -> str:
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("--dag", "-d", required=True, help="dag name folder")
     args = arg_parser.parse_args()
     return args.dag
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     dag_name = parse_dag_name()
     main(dag_name)

@@ -4,35 +4,34 @@ from argparse import ArgumentParser
 from datetime import datetime
 from enum import Enum
 
-from quintoandar_logger import QuintoAndarLogger
-
+from pyspark.sql.functions import col, greatest
 from pyspark.sql.types import (
-    StructType,
-    StructField,
-    StringType,
-    IntegerType,
-    TimestampType,
-    BooleanType,
-    MapType,
     ArrayType,
+    BooleanType,
+    IntegerType,
+    MapType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
 )
+from quintoandar_hubspot_api_client.clients.hubspot_client import HubspotClient
+from quintoandar_hubspot_api_client.factories.endpoint_factory import EndpointFactory
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import (
     BaseDBUtils,
-    SparkTableStorageFormat,
     SparkDataFrameService,
+    SparkTableStorageFormat,
 )
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
+from bietlejuice.pipeline import FullTableLoaderPipeline, IncrementalTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.json_service import JsonService
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from pyspark.sql.functions import greatest, col
-from quintoandar_hubspot_api_client.factories.endpoint_factory import EndpointFactory
-from quintoandar_hubspot_api_client.clients.hubspot_client import HubspotClient
 
 JOB_NAME = "load_hubspot_raw"
 
@@ -40,12 +39,14 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 spark_client = SparkClient()
 
+
 class HubSpotEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, datetime):
             return o.isoformat()
 
         return json.JSONEncoder.default(self, o)
+
 
 class HubSpotSchemaEnum(Enum):
     """This class contains the Spark schemas for the tables loaded by the HubSpot Consumer."""
@@ -128,7 +129,6 @@ class HubSpotSchemaEnum(Enum):
     )
 
 
-
 def main():
     environment, datalake_bucket, source, execution_date, table = parse_arguments()
     logger.info(
@@ -175,9 +175,9 @@ def get_tables(config_service, execution_date, table):
 
     hubspot_client = HubspotClient(get_token())
     factory = EndpointFactory(hubspot_client)
-    
+
     tables = config_service.get_config(table)
-    
+
     if "params" in tables:
         tables = {table: tables}
 
@@ -185,7 +185,9 @@ def get_tables(config_service, execution_date, table):
     for table_name, table_configs in tables.items():
         kwargs = table_configs.get("params", {})
         if "ids_list" in table_configs:
-            ids_list_results = factory.build(table_configs["ids_list"]["endpoint"], execution_date).sync()
+            ids_list_results = factory.build(
+                table_configs["ids_list"]["endpoint"], execution_date
+            ).sync()
             key = table_configs["ids_list"]["key"]
             kwargs["ids_list"] = [result[key] for result in ids_list_results]
 
@@ -195,7 +197,9 @@ def get_tables(config_service, execution_date, table):
             "content": consumer.sync(**kwargs),
             "is_incremental": table_configs["is_incremental"],
             "schema": table_configs.get("schema", None),
-            "encode_inner_dictionaries": table_configs.get("encode_inner_dictionaries", False),
+            "encode_inner_dictionaries": table_configs.get(
+                "encode_inner_dictionaries", False
+            ),
             "date_filter_column": table_configs.get("date_filter_column", None),
         }
         if table_configs.get("bring_archived"):
@@ -232,14 +236,18 @@ def transform_tables_into_dataframes(tables: dict) -> None:
         else:
             schema = HubSpotSchemaEnum[table["schema"].upper() + "_SCHEMA"].value
 
-        table["dataframe"] = create_dataframe_with_schema(table["content"], schema, table["encode_inner_dictionaries"])
-        
+        table["dataframe"] = create_dataframe_with_schema(
+            table["content"], schema, table["encode_inner_dictionaries"]
+        )
+
         if table["dataframe"] is None:
             continue
-        
+
         if "archived_content" in table:
-            archived_df = create_dataframe_with_schema(table["archived_content"], schema, table["encode_inner_dictionaries"])
-            
+            archived_df = create_dataframe_with_schema(
+                table["archived_content"], schema, table["encode_inner_dictionaries"]
+            )
+
             if archived_df is not None:
                 table["dataframe"] = (
                     table["dataframe"]
@@ -250,16 +258,18 @@ def transform_tables_into_dataframes(tables: dict) -> None:
                 )
 
 
-def create_dataframe_with_schema(table_content: dict, schema: StructType, encode_inner_dictionaries: bool):
+def create_dataframe_with_schema(
+    table_content: dict, schema: StructType, encode_inner_dictionaries: bool
+):
     """Receives the raw content returned by the consumer, and returns a Spark Dataframe"""
-    
+
     if not table_content:  # Verifies if the data frame is empty
         logger.info("No data to convert into dataframe.")
         return None
 
     if encode_inner_dictionaries:
         table_content = JsonService.transform_json_list_terms(
-          table_content, cls=HubSpotEncoder
+            table_content, cls=HubSpotEncoder
         )
     return spark_client.create_dataframe(table_content, schema)
 

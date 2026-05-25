@@ -1,24 +1,24 @@
+import os
 from datetime import datetime, timedelta
 from typing import Dict, Optional
 
 from airflow import DAG
+from databricks_plugin import (
+    QuintoAndarDatabricksCheckJobTaskOperator,
+    QuintoAndarDatabricksExecuteJobClusterOperator,
+)
 
-from bietlejuice.base.sst.airflow.operators.base import SStPlaceholderOperator
+from bietlejuice.base.notification.gchat_callback import GchatCallback
 from bietlejuice.base.sst.airflow.common.common import (
-    get_libs,
     get_cluster_config,
+    get_libs,
     parse_parameters,
 )
 from bietlejuice.base.sst.airflow.common.configs import (
     DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
-from bietlejuice.base.notification.gchat_callback import GchatCallback
+from bietlejuice.base.sst.airflow.operators.base import SStPlaceholderOperator
 from bietlejuice.services.configuration_service import ConfigurationService
-from databricks_plugin import (
-    QuintoAndarDatabricksCheckJobTaskOperator,
-    QuintoAndarDatabricksExecuteJobClusterOperator,
-)
-import os
 
 DAG_NAME = "salesforce_marketing_cloud"
 DAG_ID = f"bietlejuice.{DAG_NAME.replace('.', '_')}"

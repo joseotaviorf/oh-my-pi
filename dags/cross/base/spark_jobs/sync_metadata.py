@@ -5,8 +5,8 @@ from argparse import ArgumentParser
 from functools import partial
 
 from hive_metastore_client import HiveMetastoreClient
+from pyspark.sql.types import StringType, StructField, StructType
 from quintoandar_logger import QuintoAndarLogger
-from pyspark.sql.types import StructType, StructField, StringType
 
 from bietlejuice.base.db import DatalakeMetastoreMapping, MetricMetastoreMapping
 from bietlejuice.base.db.database_enum import DatabaseEnum
@@ -14,20 +14,20 @@ from bietlejuice.base.db.dw_metastore_mapping import DwMetastoreMapping
 from bietlejuice.base.hive import TableStorageDescriptorEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
-from bietlejuice.base.spark.base_spark import BaseSparkContext, BaseDBUtils
+from bietlejuice.base.service.service_enum import ServiceEnum
+from bietlejuice.base.spark.base_spark import BaseDBUtils
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
-from bietlejuice.base.service.service_enum import ServiceEnum
 from bietlejuice.loaders.hive_metastore_loader import HiveMetastoreLoader
-from bietlejuice.services.dag_metadata_service import DAGMetadataService
-from bietlejuice.services.metastore_services.hive_metastore_service import (
-    HiveMetastoreService,
-)
 from bietlejuice.metadata_propagator_pipeline.lineage_tags_pipeline import (
     LineageTagsPipeline,
 )
 from bietlejuice.metadata_propagator_pipeline.raw_lineage_pipeline import (
     RawLineagePipeline,
+)
+from bietlejuice.services.dag_metadata_service import DAGMetadataService
+from bietlejuice.services.metastore_services.hive_metastore_service import (
+    HiveMetastoreService,
 )
 
 JOB_NAME = "sync_metadata"
@@ -94,7 +94,6 @@ def update_table_structure(
         source_schema=columns,
     )
 
-
     logger.info(
         f"m={logger.name}, database_name={database_name}, table_name={table_name}, "
         f"columns={columns}, partition_keys={partition_keys}, "
@@ -132,7 +131,6 @@ def update_table_partitions(
         table_name=table_name,
         partition_values=partition_values,
     )
-
 
     logger.info(
         f"m={logger.name}, database_name={database_name}, table_name={table_name}, "
@@ -200,7 +198,6 @@ def sync_metastore_table_partitions(bucket, layer, schema, table_name, all_table
 
     for table in tables_partition_values:
         if not tables_partition_values[table]:
-
             logger.info(
                 f"m={logger.name}, table_name={table}, "
                 f"partition_values={tables_partition_values[table]}, msg=Table partition values are empty"
@@ -265,17 +262,18 @@ def propagate_metadata(layer, metadata_type, db_name_part, table_name):
 
 
 # propagate RAW metadata helper function
-def _get_all_tables_metadata(spark_metastore_helper, metadata_type, relative_file_path, layer):
+def _get_all_tables_metadata(
+    spark_metastore_helper, metadata_type, relative_file_path, layer
+):
     """
     Fetches all database tables metadata for the specified metadata type (tags or lineage)
     This metadata will be shared during the parallelized processing of table names RDD.
     """
     tables_spark_metadata = dict()
     for table_name in spark_metastore_helper.get_table_names():
-
         if metadata_type == MetadataTypeEnum.FULL_CONTENT_LINEAGE:
-            spark_ms_table_columns = spark_metastore_helper.get_spark_metastore_table_columns(
-                table_name
+            spark_ms_table_columns = (
+                spark_metastore_helper.get_spark_metastore_table_columns(table_name)
             )
             tables_spark_metadata[table_name] = dict()
             tables_spark_metadata[table_name]["name"] = table_name
@@ -390,9 +388,7 @@ def propagate_raw_metadata(
     schema = StructType([StructField("table_name", StringType(), True)])
     df = spark.createDataFrame([(name,) for name in spark_table_names], schema)
     df.foreach(
-        lambda row: func(
-            tables_metadata.get(row.table_name), product_database_name
-        )
+        lambda row: func(tables_metadata.get(row.table_name), product_database_name)
     )
 
     logger.info(f"m={logger.name}, msg=Job finished.")
@@ -459,7 +455,9 @@ def main():
     args = parser.parse_args()
     global spark
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
 
         spark = create_emr_spark_session(JOB_NAME)
     bucket = args.bucket

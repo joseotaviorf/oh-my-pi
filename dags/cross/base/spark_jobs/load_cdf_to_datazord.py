@@ -8,14 +8,15 @@ the Delta table is updated.
 """
 
 import argparse
-import json
 import logging
 import os
 
 from pyspark.sql import SparkSession
 
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
-from bietlejuice.services.cdf_services.cdf_to_kafka.service import DeltaCDFToKafkaService
+from bietlejuice.services.cdf_services.cdf_to_kafka.service import (
+    DeltaCDFToKafkaService,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +32,9 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "--key-columns", required=True, help="List of column names to use as primary keys, separated by commas"
+        "--key-columns",
+        required=True,
+        help="List of column names to use as primary keys, separated by commas",
     )
 
     parser.add_argument(
@@ -47,12 +50,13 @@ def parse_arguments():
         help="Checkpoint location for streaming (default: STREAM_CHECKPOINT_PATH env var)",
     )
 
-    parser.add_argument(
-        "--entity", required=True, help="Entity name"
-    )
+    parser.add_argument("--entity", required=True, help="Entity name")
 
     parser.add_argument(
-        "--extra-metadata", required=False, default="{}", help="Extra metadata to be added to the payload"
+        "--extra-metadata",
+        required=False,
+        default="{}",
+        help="Extra metadata to be added to the payload",
     )
 
     return parser.parse_args()
@@ -63,7 +67,9 @@ def main():
     args = parse_arguments()
 
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
 
         spark = create_emr_spark_session("load_cdf_to_datazord")
     else:
@@ -82,7 +88,7 @@ def main():
             "kafka.security.protocol": "SASL_SSL",
             "kafka.sasl.mechanism": "PLAIN",
             "kafka.sasl.jaas.config": f'org.apache.kafka.common.security.plain.PlainLoginModule required username="{kafka_api_key}" password="{kafka_api_secret}";',
-            "kafka.max.request.size": "4194304" # 4 MB
+            "kafka.max.request.size": "4194304",  # 4 MB
         },
         checkpoint_location=args.checkpoint_location,
         entity=args.entity,

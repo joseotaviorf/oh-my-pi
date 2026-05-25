@@ -1,17 +1,15 @@
 import io
 import logging
-from datetime import datetime
 from argparse import ArgumentParser
+from datetime import datetime
 from http.client import HTTPException
-
-from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.consumers.s3_consumer import S3Consumer
-from bietlejuice.base.spark import BaseDBUtils
-from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
 
 import boto3
 from pyspark.sql.utils import AnalysisException
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.consumers.s3_consumer import S3Consumer
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_s3_data_into_external_bucket"
@@ -47,7 +45,6 @@ def __build_warning_messages(environment, s3_path_prefix, table_list):
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values ")
@@ -79,10 +76,12 @@ if __name__ == "__main__":
     tables_to_send_warning = []
 
     for table in tables:
-        if table not in ['business_unit', 'offer_agent']:
+        if table not in ["business_unit", "offer_agent"]:
             datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table}/year={execution_date.year}/month={execution_date.month}/day={execution_date.day}"
             try:
-                df = s3_consumer.get_data_from_file(path=datalake_path, format="parquet")
+                df = s3_consumer.get_data_from_file(
+                    path=datalake_path, format="parquet"
+                )
             except AnalysisException:
                 tables_to_send_warning.append(table)
                 df = None
@@ -92,7 +91,7 @@ if __name__ == "__main__":
 
                 destination_path = f"v1/{table}/"
                 file_name = (
-                    f'{table}_{(execution_date.strftime("%Y_%m_%d_%H_%M_%S%z"))}.csv'
+                    f"{table}_{(execution_date.strftime('%Y_%m_%d_%H_%M_%S%z'))}.csv"
                 )
                 with io.StringIO() as csv_buffer:
                     df.toPandas().convert_dtypes().to_csv(
@@ -126,5 +125,7 @@ if __name__ == "__main__":
         messages_status = []
         for message in messages:
             logger.info(f"m=__main__, message=sending slack message: {message}")
-            logger.warning(f"m=__main__, Slack is deprecated on QuintoAndar! No message sent")
+            logger.warning(
+                "m=__main__, Slack is deprecated on QuintoAndar! No message sent"
+            )
             # messenger.send_message(message)

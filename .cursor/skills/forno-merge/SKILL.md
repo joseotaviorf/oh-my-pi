@@ -46,7 +46,7 @@ If neither query returns results, skip checks entirely (nothing to run) and proc
 
 **2.2 — Run checks**
 
-If `*.py` changed: run `make check-style` and `make unit-tests` in parallel.
+If `*.py` changed: run `make check-style`, `make check-style-dags`, and `make tests` in parallel (`make tests` = `unit-tests` + `unit-tests-dags`).
 If new `*_declaration.yml` detected: run `make validate-dag-declaration-files dag_name={dag_name}` for each newly added DAG (can run in parallel with the above).
 
 **2.3 — Evaluate results and proceed**

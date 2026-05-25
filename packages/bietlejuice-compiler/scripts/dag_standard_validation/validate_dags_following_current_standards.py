@@ -1,16 +1,19 @@
 import argparse
-from collections import defaultdict
 import os
-import sys
 import re
-import yaml
+import sys
+from collections import defaultdict
 from glob import glob
 from typing import Dict, List, Set
+
+import yaml
 
 BI_ETL_EJUICE_ROOT = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
 sys.path.append(BI_ETL_EJUICE_ROOT)
+
+from quintoandar_logger import QuintoAndarLogger
 
 from dags import DAG_PACKAGES_ROOT
 from scripts.ci_cd.domain_cli import domain_arg_type
@@ -18,11 +21,10 @@ from scripts.dag_standard_validation.dag_builder import (
     BaseDagBuilderStandardValidationRule,
     CDCValidationRule,
 )
-from quintoandar_logger import QuintoAndarLogger
 
 DAG_BUILDER_VALIDATION_RULES = [CDCValidationRule]
 
-SKIP_LIST_PATH_REGEX = re.compile(rf"(?:.*/)?dags/(?P<path>.*)")
+SKIP_LIST_PATH_REGEX = re.compile(r"(?:.*/)?dags/(?P<path>.*)")
 
 logger = QuintoAndarLogger("ValidateDagStandardRules")
 
@@ -66,7 +68,7 @@ def read_skip_list() -> Dict[str, List[str]]:
     parent_directory = os.path.dirname(os.path.abspath(__file__))
     skip_list_path = os.path.join(parent_directory, "skip_list.yml")
 
-    with open(skip_list_path, "r") as file:
+    with open(skip_list_path) as file:
         skip_list = yaml.safe_load(file)
     return skip_list
 
@@ -115,7 +117,7 @@ def find_unstandard_dags_in_builder(
     results = defaultdict(set)
 
     for dag_path in find_dag_declaration_file_paths(domain=domain):
-        with open(dag_path, "r") as file:
+        with open(dag_path) as file:
             dag_declaration = yaml.safe_load(file)
         dag_name = dag_declaration["dag"]["name"]
 

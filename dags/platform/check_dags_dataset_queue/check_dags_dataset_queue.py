@@ -1,21 +1,18 @@
 import json
+from datetime import datetime
+from urllib.parse import quote
+
 import pendulum
+import requests
 from airflow import DAG
 from airflow.configuration import conf
 from airflow.models import Variable
 from airflow.operators.python import PythonOperator
-from airflow.utils.db import provide_session
 from airflow.settings import engine
-import requests
-from urllib.parse import quote
+from airflow.utils.db import provide_session
+from sqlalchemy import MetaData, select
 
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.services.messaging_services.gchat_service import GChatService
-from bietlejuice.services.messaging_services.message import Message
-
-from sqlalchemy import select, MetaData
-
-from datetime import datetime
 
 AIRFLOW_URL = conf.get("webserver", "base_url")
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
@@ -158,7 +155,7 @@ with DAG(
         for row in rows:
             dag_id = row.target_dag_id
             dataset_uri = row.dataset_uri
-            if not dag_id in dag_dataset_map.keys():
+            if dag_id not in dag_dataset_map.keys():
                 dag_dataset_map[dag_id] = set()
             dag_dataset_map[dag_id].add(dataset_uri)
 

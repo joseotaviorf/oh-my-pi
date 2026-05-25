@@ -1,20 +1,19 @@
+import json
 import logging
 from argparse import ArgumentParser
-import json
+from datetime import datetime, timedelta
 
+import pyspark.sql.functions as F
+from pyspark.sql.functions import regexp_extract
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.base.spark import SparkTableStorageFormat, SparkDataFrameService
-from datetime import datetime, timedelta
-import pyspark.sql.functions as F
-from pyspark.sql.functions import regexp_extract
-
 
 JOB_NAME = "load_copilot_judge_metrics_into_datalake"
 
@@ -71,7 +70,7 @@ def main() -> None:
     spark_metastore_service = SparkMetastoreService(spark_client)
 
     logger.info(
-        f"m=__main__, msg=Creating database in Spark Metastore if it does not exist"
+        "m=__main__, msg=Creating database in Spark Metastore if it does not exist"
     )
     spark_metastore_service.create_database(database_name=db_info["db_raw_databricks"])
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)

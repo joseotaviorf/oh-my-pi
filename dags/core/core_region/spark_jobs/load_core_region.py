@@ -1,18 +1,21 @@
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import (
-    col,
     coalesce,
-    when,
-    sum as F_sum,
+    col,
+    current_timestamp,
+    dayofmonth,
     first,
     lit,
-    current_timestamp,
-    year,
     month,
-    dayofmonth,
+    when,
+    year,
 )
-from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
+from pyspark.sql.functions import (
+    sum as F_sum,
+)
+
 from bietlejuice.base.core_models.helpers.surrogate_keys import SurrogateKeysHelper
+from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
 
 JOB_NAME = "core_region"
 
@@ -28,7 +31,9 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
         return {
             "ENTITY_TYPE": self.get_config("ENTITY_TYPE"),
             "REGION_TABLE": self.get_config("REGION_TABLE"),
-            "REGION_BUSINESS_CONTEXTS_TABLE": self.get_config("REGION_BUSINESS_CONTEXTS_TABLE"),
+            "REGION_BUSINESS_CONTEXTS_TABLE": self.get_config(
+                "REGION_BUSINESS_CONTEXTS_TABLE"
+            ),
             "REGION_CONFIG_TABLE": self.get_config("REGION_CONFIG_TABLE"),
             "STATE_TABLE": self.get_config("STATE_TABLE"),
             "COUNTRY_TABLE": self.get_config("COUNTRY_TABLE"),
@@ -63,7 +68,9 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
         # Full region dimension for parent joins; incremental filter applies to fact rows (r) only
         region_full_df = spark.table(config["REGION_TABLE"])
         region_r_df = self._apply_region_incremental_window(region_full_df, args)
-        region_business_contexts_df = spark.table(config["REGION_BUSINESS_CONTEXTS_TABLE"])
+        region_business_contexts_df = spark.table(
+            config["REGION_BUSINESS_CONTEXTS_TABLE"]
+        )
         region_config_df = spark.table(config["REGION_CONFIG_TABLE"])
         state_df = spark.table(config["STATE_TABLE"])
         country_df = spark.table(config["COUNTRY_TABLE"])
@@ -73,16 +80,13 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
         )
 
         # CTE business_context:
-        business_context_df = (
-            region_business_contexts_df.groupBy("id_region")
-            .agg(
-                F_sum(
-                    when(col("business_context") == "RENT", 1).otherwise(0)
-                ).alias("has_rent_operation_cnt"),
-                F_sum(
-                    when(col("business_context") == "SALE", 1).otherwise(0)
-                ).alias("has_sale_operation_cnt"),
-            )
+        business_context_df = region_business_contexts_df.groupBy("id_region").agg(
+            F_sum(when(col("business_context") == "RENT", 1).otherwise(0)).alias(
+                "has_rent_operation_cnt"
+            ),
+            F_sum(when(col("business_context") == "SALE", 1).otherwise(0)).alias(
+                "has_sale_operation_cnt"
+            ),
         )
 
         # Region hierarchy: r respects incremental window; mr/sr use full table so parents resolve
@@ -90,25 +94,20 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
         mr = region_full_df.alias("mr")
         sr = region_full_df.alias("sr")
 
-        joined_df = (
-            r
-            .join(mr, col("mr.id") == col("r.id_parent_region"), "left")
-            .join(sr, col("sr.id") == col("mr.id_parent_region"), "left")
+        joined_df = r.join(mr, col("mr.id") == col("r.id_parent_region"), "left").join(
+            sr, col("sr.id") == col("mr.id_parent_region"), "left"
         )
 
         # State / country joins
         s = state_df.alias("s")
         c = country_df.alias("c")
 
-        joined_df = (
-            joined_df
-            .join(
-                s,
-                col("s.id") == coalesce(col("r.id_state"), col("mr.id_state"), col("sr.id_state")),
-                "left",
-            )
-            .join(c, col("c.id") == col("s.id_country"), "left")
-        )
+        joined_df = joined_df.join(
+            s,
+            col("s.id")
+            == coalesce(col("r.id_state"), col("mr.id_state"), col("sr.id_state")),
+            "left",
+        ).join(c, col("c.id") == col("s.id_country"), "left")
 
         # Cidade id along parent chain (same key as id_state propagation); region_config is keyed by Cidade only
         id_city_region = coalesce(col("sr.id"), col("mr.id"), col("r.id"))
@@ -119,7 +118,9 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
         joined_df = joined_df.join(bc, col("bc.id_region") == col("r.id"), "left")
 
         rcfg = region_config_by_region.alias("rcfg")
-        joined_df = joined_df.join(rcfg, col("rcfg.id_region") == id_city_region, "left")
+        joined_df = joined_df.join(
+            rcfg, col("rcfg.id_region") == id_city_region, "left"
+        )
 
         # Apply WHERE c.code IS NOT NULL
         filtered_df = joined_df.filter(col("c.code").isNotNull())
@@ -161,7 +162,9 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
             col("r.name").alias("region_name"),
             city_region_name.alias("city_region_name"),
             col("r.level"),
-            coalesce(col("r.id_state"), col("mr.id_state"), col("sr.id_state")).alias("id_state"),
+            coalesce(col("r.id_state"), col("mr.id_state"), col("sr.id_state")).alias(
+                "id_state"
+            ),
             col("s.name").alias("state_name"),
             col("s.abbreviation").alias("state_abbreviation"),
             col("s.id_country"),
@@ -189,8 +192,7 @@ class CoreRegionSparkJob(BaseCoreModelSparkJob):
 
         # ts_load + partitions (based on ts_region_updated)
         core_region_df = (
-            core_region_df
-            .withColumn("ts_load", current_timestamp())
+            core_region_df.withColumn("ts_load", current_timestamp())
             .withColumn("year", year(col("ts_region_updated")))
             .withColumn("month", month(col("ts_region_updated")))
             .withColumn("day", dayofmonth(col("ts_region_updated")))

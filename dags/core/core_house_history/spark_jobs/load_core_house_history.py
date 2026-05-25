@@ -1,15 +1,15 @@
 import ast
 
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
-from pyspark.sql.window import Window
 from pyspark.sql.utils import AnalysisException
+from pyspark.sql.window import Window
 
-from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
 from bietlejuice.base.core_models.helpers.historical_helper import HistoricalHelper
 from bietlejuice.base.core_models.helpers.history_builder import HistoryBuilder
 from bietlejuice.base.core_models.helpers.surrogate_keys import SurrogateKeysHelper
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
 from bietlejuice.pipeline.dataframe_delta_table_loader_pipeline import (
     DataFrameDeltaTableLoaderPipeline,
 )
@@ -68,9 +68,9 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
     ) -> DataFrame:
         """Build ``ev_id_owner`` and ``ev_uuid_owner`` narrow events.
 
-        Creates a unified timeline per house from both house CDC and HLR CDC
-        events,     carries forward the HLR owner and ``usuario_id`` state via
-    ``last(ignorenulls)`` window, then applies LAG change-detection.
+            Creates a unified timeline per house from both house CDC and HLR CDC
+            events,     carries forward the HLR owner and ``usuario_id`` state via
+        ``last(ignorenulls)`` window, then applies LAG change-detection.
         """
         house_table = self.get_config("HOUSE_TRANSACTIONAL_TABLE")
         hlr_table = self.get_config("HLR_TRANSACTIONAL_TABLE")
@@ -89,10 +89,14 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
         hlr_in_range = hlr_owners_all
         if self._has_date_range(args):
             hlr_in_range = hlr_owners_all.filter(
-                (F.col("ts_database_transaction").cast("date")
-                 >= F.lit(args.load_start_date).cast("date"))
-                & (F.col("ts_database_transaction").cast("date")
-                   <= F.lit(args.load_end_date).cast("date"))
+                (
+                    F.col("ts_database_transaction").cast("date")
+                    >= F.lit(args.load_start_date).cast("date")
+                )
+                & (
+                    F.col("ts_database_transaction").cast("date")
+                    <= F.lit(args.load_end_date).cast("date")
+                )
             )
 
         hlr_house_ids = hlr_in_range.select(
@@ -138,16 +142,12 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
 
         w = Window.partitionBy("house_id").orderBy("event_ts")
 
-        combined = (
-            combined
-            .withColumn(
-                "_carried_hlr",
-                F.last("_hlr_state", ignorenulls=True).over(w),
-            )
-            .withColumn(
-                "_carried_usuario",
-                F.last("_usuario_id", ignorenulls=True).over(w),
-            )
+        combined = combined.withColumn(
+            "_carried_hlr",
+            F.last("_hlr_state", ignorenulls=True).over(w),
+        ).withColumn(
+            "_carried_usuario",
+            F.last("_usuario_id", ignorenulls=True).over(w),
         )
 
         # -- As-of join: resolve user existence at the time of each event --
@@ -168,16 +168,13 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
             "left",
         )
 
-        hlr_asof_w = Window.partitionBy(
-            "house_id", "event_ts"
-        ).orderBy(F.col("_hlr_user_ts").desc())
+        hlr_asof_w = Window.partitionBy("house_id", "event_ts").orderBy(
+            F.col("_hlr_user_ts").desc()
+        )
 
         combined = (
-            hlr_user_join
-            .withColumn("_hlr_rn", F.row_number().over(hlr_asof_w))
-            .filter(
-                F.col("_hlr_rn").isNull() | (F.col("_hlr_rn") == 1)
-            )
+            hlr_user_join.withColumn("_hlr_rn", F.row_number().over(hlr_asof_w))
+            .filter(F.col("_hlr_rn").isNull() | (F.col("_hlr_rn") == 1))
             .drop("_hlr_rn", "_hlr_user_ts")
         )
 
@@ -186,8 +183,9 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
             F.coalesce(F.col("_hlr_uid"), F.col("_carried_usuario")),
         ).withColumn(
             "_id_owner_origin",
-            F.when(F.col("_hlr_uid").isNotNull(), F.lit(hlr_table))
-            .otherwise(F.lit(house_table)),
+            F.when(F.col("_hlr_uid").isNotNull(), F.lit(hlr_table)).otherwise(
+                F.lit(house_table)
+            ),
         )
 
         # Resolve uuid_owner from _id_owner via as-of join
@@ -202,22 +200,17 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
             "left",
         )
 
-        owner_asof_w = Window.partitionBy(
-            "house_id", "event_ts"
-        ).orderBy(F.col("_owner_user_ts").desc())
+        owner_asof_w = Window.partitionBy("house_id", "event_ts").orderBy(
+            F.col("_owner_user_ts").desc()
+        )
 
         combined = (
-            owner_user_join
-            .withColumn("_owner_rn", F.row_number().over(owner_asof_w))
-            .filter(
-                F.col("_owner_rn").isNull() | (F.col("_owner_rn") == 1)
-            )
+            owner_user_join.withColumn("_owner_rn", F.row_number().over(owner_asof_w))
+            .filter(F.col("_owner_rn").isNull() | (F.col("_owner_rn") == 1))
             .drop("_owner_rn", "_owner_user_ts", "_owner_uid")
         )
 
-        combined = combined.withColumn(
-            "_prev_id_owner", F.lag("_id_owner").over(w)
-        )
+        combined = combined.withColumn("_prev_id_owner", F.lag("_id_owner").over(w))
 
         owner_changed = combined.filter(
             F.col("_prev_id_owner").isNull()
@@ -226,18 +219,27 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
 
         if self._has_date_range(args):
             owner_changed = owner_changed.filter(
-                (F.col("event_ts").cast("date")
-                 >= F.lit(args.load_start_date).cast("date"))
-                & (F.col("event_ts").cast("date")
-                   <= F.lit(args.load_end_date).cast("date"))
+                (
+                    F.col("event_ts").cast("date")
+                    >= F.lit(args.load_start_date).cast("date")
+                )
+                & (
+                    F.col("event_ts").cast("date")
+                    <= F.lit(args.load_end_date).cast("date")
+                )
             )
 
         ev_id_owner = self._format_owner_event(
-            owner_changed, "ev_id_owner", "_id_owner",
-            "_id_owner_origin", is_column=True,
+            owner_changed,
+            "ev_id_owner",
+            "_id_owner",
+            "_id_owner_origin",
+            is_column=True,
         )
         ev_uuid_owner = self._format_owner_event(
-            owner_changed, "ev_uuid_owner", "_uuid_person",
+            owner_changed,
+            "ev_uuid_owner",
+            "_uuid_person",
             user_table,
         )
 
@@ -253,9 +255,7 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
     ) -> DataFrame:
         """Shape an owner-change DataFrame into the standard 13-col schema."""
         origin_expr = (
-            F.col(origin_col_or_literal)
-            if is_column
-            else F.lit(origin_col_or_literal)
+            F.col(origin_col_or_literal) if is_column else F.lit(origin_col_or_literal)
         )
         events = df.select(
             F.col("house_id").alias("id_house"),
@@ -284,16 +284,24 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
         ).withColumnRenamed("surrogate_key", "sk_core_house")
 
         return (
-            events
-            .withColumn("ts_load", F.current_timestamp())
+            events.withColumn("ts_load", F.current_timestamp())
             .withColumn("year", F.year(F.col("ts_transaction")))
             .withColumn("month", F.month(F.col("ts_transaction")))
             .withColumn("day", F.dayofmonth(F.col("ts_transaction")))
             .select(
-                "id_event", "id_house", "sk_core_house",
-                "event_name", "event_type", "value", "payload",
-                "ts_transaction", "event_origin", "ts_load",
-                "year", "month", "day",
+                "id_event",
+                "id_house",
+                "sk_core_house",
+                "event_name",
+                "event_type",
+                "value",
+                "payload",
+                "ts_transaction",
+                "event_origin",
+                "ts_load",
+                "year",
+                "month",
+                "day",
             )
         )
 
@@ -306,7 +314,6 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
             and args.load_end_date != ""
         )
 
-
     def create_core_model(self, spark: SparkSession, args) -> DataFrame:
         """Build the house history DataFrame."""
         house_table = self.get_config("HOUSE_TRANSACTIONAL_TABLE")
@@ -318,9 +325,7 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
             f"date_range={args.load_start_date}..{args.load_end_date}"
         )
 
-        house_df = HistoricalHelper.load_transactional_data(
-            spark, house_table, args
-        )
+        house_df = HistoricalHelper.load_transactional_data(spark, house_table, args)
         house_df = self._align_registrant_column(house_df)
 
         field_events_df = HistoryBuilder.build_history_for_columns(
@@ -338,10 +343,7 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
 
         return field_events_df.unionByName(owner_events_df)
 
-
-    def _is_target_table_empty(
-        self, spark: SparkSession, full_table_name: str
-    ) -> bool:
+    def _is_target_table_empty(self, spark: SparkSession, full_table_name: str) -> bool:
         try:
             if not spark.catalog.tableExists(full_table_name):
                 return True
@@ -364,9 +366,7 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
         )
 
         table_privileges = self.setup_table_privileges(args)
-        database_location = (
-            f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
-        )
+        database_location = f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
 
         full_table_name = f"{args.schema}.{args.table_name}"
         target_is_empty = self._is_target_table_empty(spark, full_table_name)
@@ -406,8 +406,7 @@ class CoreHouseHistorySparkJob(BaseCoreModelSparkJob):
 
         pipeline.run()
         self.logger.info(
-            f"m=run_pipeline, "
-            f"msg=History loading completed for table={args.table_name}"
+            f"m=run_pipeline, msg=History loading completed for table={args.table_name}"
         )
 
 

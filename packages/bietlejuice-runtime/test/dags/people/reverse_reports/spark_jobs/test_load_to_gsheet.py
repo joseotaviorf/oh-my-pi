@@ -11,10 +11,6 @@ from datetime import date, datetime
 from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
-from tests.dags.people.reverse_reports.spark_jobs.conftest import (
-    MOCK_WORKSHEET_NOT_FOUND,
-)
-
 from dags.people.reverse_reports.spark_jobs import load_to_gsheet as job
 
 MODULE_UNDER_TEST = "dags.people.reverse_reports.spark_jobs.load_to_gsheet"
@@ -247,7 +243,7 @@ class TestEnsureWorksheetExists(unittest.TestCase):
     @patch(f"{MODULE_UNDER_TEST}.ServiceAccountCredentials")
     def test_creates_worksheet_when_not_found(self, mock_creds_cls, mock_gspread):
         mock_spreadsheet = MagicMock()
-        mock_spreadsheet.worksheet.side_effect = MOCK_WORKSHEET_NOT_FOUND("Tab1")
+        mock_spreadsheet.worksheet.side_effect = job.WorksheetNotFound("Tab1")
         mock_gspread.authorize.return_value.open_by_key.return_value = mock_spreadsheet
 
         job._ensure_worksheet_exists(

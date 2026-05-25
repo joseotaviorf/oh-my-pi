@@ -1,7 +1,5 @@
-from datetime import datetime
-from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from pendulum import timezone
 import os
+from datetime import datetime
 
 from airflow.models import DAG
 from airflow.utils.helpers import chain
@@ -10,15 +8,19 @@ from databricks_plugin import (
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from pendulum import timezone
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
-from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import DatabricksGroupNameEnum
-from bietlejuice.formatters import StringFormatter
-from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
-from bietlejuice.services.dataset_service import DatasetService
+from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
+from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
+from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.formatters import StringFormatter
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.dataset_service import DatasetService
 
 ENV = os.environ.get("ENVIRONMENT")
 
@@ -42,7 +44,9 @@ cluster_description = config_service.get_config("databricks_12_2_med_general_clu
 
 cluster_description["data_security_mode"] = "SINGLE_USER"
 cluster_description["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-cluster_description["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+cluster_description["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
+    "quintoandar_{{ var.value.environment }}"
+)
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -71,7 +75,9 @@ dag = DAG(
     params=BaseDAG.get_default_trigger_form_params(),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     task_id="create-cluster",
     cluster_configuration=cluster_description,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
@@ -81,13 +87,16 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn
 # Reprocessing guard task to ensure that the DAG does not run multiple times unnecessarily
 DatasetAdder.attach_reprocessing_guard(create_cluster_task)
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
 load_to_sqs_tasks = []
 for table_name in tables:
     load_to_sqs_tasks.append(
-        QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=StringFormatter.slugify(f"load-{table_name}-into_sqs"),
+        QuintoAndarDatabricksSubmitRunOperator(
+            databricks_conn_id="databricks_new",
+            task_id=StringFormatter.slugify(f"load-{table_name}-into_sqs"),
             dag=dag,
             json={
                 "spark_python_task": {

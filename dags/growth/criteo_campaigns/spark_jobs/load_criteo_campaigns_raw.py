@@ -1,18 +1,17 @@
 import json
-
 from argparse import ArgumentParser
 
-from quintoandar_logger import QuintoAndarLogger
 from quintoandar_criteo_api_client.clients import CriteoClient
+from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
-from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.api.api_enum import APIEnum
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_criteo_campaigns_raw"
 
@@ -20,7 +19,6 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment")

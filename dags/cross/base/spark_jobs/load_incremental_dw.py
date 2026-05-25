@@ -30,7 +30,6 @@ def build_query(extra_query_template_params, dw_staging_database_name, table_nam
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("dw_bucket")

@@ -3,7 +3,6 @@ import json
 import logging
 import math
 from argparse import ArgumentParser
-from multiprocessing.dummy import Pool
 
 from quintoandar_logger import QuintoAndarLogger
 
@@ -13,9 +12,8 @@ from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import MySqlConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
-
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 SOURCE = "ebdb"
 config_service = ConfigurationService(SOURCE)
@@ -33,7 +31,16 @@ def load_relation_into_datalake(args):
     """
     Loads tables and views into datalake
     """
-    s3_loader, metastore_service, spark_metastore_loader, consumer, rel, db_info, partition_columns, partition_size = args
+    (
+        s3_loader,
+        metastore_service,
+        spark_metastore_loader,
+        consumer,
+        rel,
+        db_info,
+        partition_columns,
+        partition_size,
+    ) = args
     num_partitions = int(math.ceil(float(rel.size) / partition_size))
     max_records_per_file = s3_loader.MAX_RECORDS_PER_FILE
 
@@ -60,19 +67,19 @@ def load_relation_into_datalake(args):
     )
 
     spark_metastore_loader.update_metastore(
-        df, 
-        database_name, 
-        rel.name.lower(), 
-        format_options, 
-        database_location, 
+        df,
+        database_name,
+        rel.name.lower(),
+        format_options,
+        database_location,
         force_recreate=True,
     )
 
     metastore_service.refresh_table(database_name, rel.name.lower())
 
     logger.info(
-        "m=load_relation_into_datalake, relation={}, msg=Finished loading "
-        "relation.".format(rel.name)
+        f"m=load_relation_into_datalake, relation={rel.name}, msg=Finished loading "
+        "relation."
     )
 
 
@@ -110,16 +117,15 @@ if __name__ == "__main__":
     # create database if not exists
     metastore_service.create_database(db_info["db_raw_databricks"])
 
-
     tables_df = mysql_consumer.get_single_table_names_and_sizes(args.table_name)
 
     tables = tables_df.collect()
 
-    logger.info(
-        "m=Tables to be loaded: %s", tables
-    )
+    logger.info("m=Tables to be loaded: %s", tables)
 
-    rel = Relation(name=tables[0].table_name, size=tables[0].size, rows_count=tables[0].rows_count)
+    rel = Relation(
+        name=tables[0].table_name, size=tables[0].size, rows_count=tables[0].rows_count
+    )
 
     partition_columns = mysql_consumer.get_partition_columns_from_all_tables()
 

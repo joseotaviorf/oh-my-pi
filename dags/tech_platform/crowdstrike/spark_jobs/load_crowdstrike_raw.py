@@ -222,7 +222,9 @@ def get_crowdstrike_access_token(
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     data = {"client_id": client_id, "client_secret": client_secret}
 
-    response = requests.post(token_url, headers=headers, data=data, timeout=timeout_seconds)
+    response = requests.post(
+        token_url, headers=headers, data=data, timeout=timeout_seconds
+    )
     response.raise_for_status()
 
     token_data = response.json()

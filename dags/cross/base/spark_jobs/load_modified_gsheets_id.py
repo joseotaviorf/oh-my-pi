@@ -1,20 +1,16 @@
-import logging
 import json
-import os
-from typing import Any
+import logging
 from argparse import ArgumentParser
+from typing import Any
 
-from bietlejuice.base.api.api_enum import APIEnum
-from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from google.oauth2.service_account import Credentials
+from googleapiclient.discovery import build
+from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
+from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.gsheets_service import GsheetsService
-
-from quintoandar_logger import QuintoAndarLogger
-from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
-
-from googleapiclient.discovery import build
-from google.oauth2.service_account import Credentials
 
 JOB_NAME = "load_ingested_gsheets_id_info"
 
@@ -28,7 +24,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive.appdata",
     "https://www.googleapis.com/auth/drive.file",
     "https://www.googleapis.com/auth/drive.metadata",
-    "https://www.googleapis.com/auth/drive.metadata.readonly"
+    "https://www.googleapis.com/auth/drive.metadata.readonly",
 ]
 
 
@@ -58,12 +54,13 @@ def __get_auth(dbutils, credentials_scope, credentials_key):
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket")
     parser.add_argument("dag_name")
-    parser.add_argument("credentials_key", help="Credentials to access the Google Sheets API")
+    parser.add_argument(
+        "credentials_key", help="Credentials to access the Google Sheets API"
+    )
     parser.add_argument("credentials_scope", help="Databricks secret scope")
 
     args = parser.parse_args()
@@ -94,7 +91,7 @@ if __name__ == "__main__":
 
     for raw_table_name, sheet_info in sheet_details.items():
         sheet_details_dict[raw_table_name] = sheet_info
-        sheet_details_dict[raw_table_name]['dag_name'] = dag_name
+        sheet_details_dict[raw_table_name]["dag_name"] = dag_name
 
     success_run = True
 

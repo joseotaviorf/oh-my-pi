@@ -1,23 +1,22 @@
 import json
-import boto3
 from argparse import ArgumentParser
 
+import boto3
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatabaseEnum, DWMetastoreService
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils
-from bietlejuice.clients.db_clients import SparkClient, PostgresClient
+from bietlejuice.clients.db_clients import PostgresClient, SparkClient
 from bietlejuice.loaders.redshift_loader import RedshiftLoader
-from bietlejuice.services.storage_services.s3_service import S3Service
 from bietlejuice.services.metastore_services import SparkMetastoreService
+from bietlejuice.services.storage_services.s3_service import S3Service
 
 JOB_NAME = "load_redshift_dw"
 
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("spectrum_iam_role")

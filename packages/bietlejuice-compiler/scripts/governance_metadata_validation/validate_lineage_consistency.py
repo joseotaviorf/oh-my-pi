@@ -95,7 +95,9 @@ def parse_args():
     if args.file:
         mode = "file"
         input_value = args.file
-    elif args.branch is not None:  # detect via presence, not truthiness (value may be "")
+    elif (
+        args.branch is not None
+    ):  # detect via presence, not truthiness (value may be "")
         mode = "branch"
         input_value = args.branch
     elif args.all_files:
@@ -109,8 +111,8 @@ def normalize_sql(sql: str) -> str:
     """
     Normalizes SQL by removing Jinja2 templates and replacing with safe values.
     This ensures the SQL can be parsed by sqlglot.
-    
-    Note: SQL files may have regex patterns like {{2}} (escaped for Jinja2) which 
+
+    Note: SQL files may have regex patterns like {{2}} (escaped for Jinja2) which
     should become {2} after normalization, not 'DUMMY_VALUE'.
     """
     # Remove comments first (before processing templates)
@@ -162,14 +164,14 @@ def normalize_sql(sql: str) -> str:
 def extract_columns_from_sql(sql_file_path: str) -> Tuple[Set[str], bool]:
     """
     Parses a SQL file and extracts the column names from the final SELECT statement.
-    
+
     Args:
         sql_file_path: Path to the SQL file
-        
+
     Returns:
         Tuple of (Set of column names (lowercase for comparison), has_select_star)
         has_select_star is True if the final SELECT uses SELECT *
-        
+
     Raises:
         Exception: If SQL cannot be parsed
     """
@@ -178,7 +180,7 @@ def extract_columns_from_sql(sql_file_path: str) -> Tuple[Set[str], bool]:
         _resolved_sql = os.path.realpath(sql_file_path)
         if not _resolved_sql.startswith(_project_root + os.sep):
             raise ValueError(f"Path {sql_file_path!r} escapes the project root")
-        with open(_resolved_sql, "r", encoding="utf-8") as f:
+        with open(_resolved_sql, encoding="utf-8") as f:
             sql = f.read()
 
         normalized_sql = normalize_sql(sql)
@@ -212,13 +214,13 @@ def extract_columns_from_sql(sql_file_path: str) -> Tuple[Set[str], bool]:
 def extract_columns_from_metadata(metadata_file_path: str) -> Set[str]:
     """
     Reads a metadata file and extracts the documented column names.
-    
+
     Args:
         metadata_file_path: Path to the metadata YAML file
-        
+
     Returns:
         Set of column names (lowercase for comparison)
-        
+
     Raises:
         Exception: If metadata file cannot be read or parsed
     """
@@ -227,7 +229,7 @@ def extract_columns_from_metadata(metadata_file_path: str) -> Set[str]:
         _resolved_meta = os.path.realpath(metadata_file_path)
         if not _resolved_meta.startswith(_project_root + os.sep):
             raise ValueError(f"Path {metadata_file_path!r} escapes the project root")
-        with open(_resolved_meta, "r", encoding="utf-8") as f:
+        with open(_resolved_meta, encoding="utf-8") as f:
             metadata = yaml.safe_load(f)
 
         if not metadata or "columns" not in metadata:
@@ -271,11 +273,11 @@ def get_metadata_path_from_sql(sql_path: str) -> str:
 def validate_lineage_consistency(sql_path: str, metadata_path: str) -> Dict:
     """
     Validates that a metadata file is consistent with its SQL query.
-    
+
     Args:
         sql_path: Path to SQL file
         metadata_path: Path to metadata file
-        
+
     Returns:
         Dict with validation results:
         {
@@ -404,7 +406,9 @@ def _find_file_pair_by_user_input(user_input: str) -> List[Tuple[str, str, str]]
             print(f"⚠️ Warning: Could not find SQL for {meta_str}")
             return []
 
-    print(f"⚠️ Warning: File {user_input!r} not found under dags/ (queries/ or metadata/)")
+    print(
+        f"⚠️ Warning: File {user_input!r} not found under dags/ (queries/ or metadata/)"
+    )
     return []
 
 
@@ -572,7 +576,7 @@ def output_results(results: Dict, verbose: bool):
         for sql_path, metadata_path, validation_result in results["failed"]:
             error_type = validation_result.get("error_type", "unknown")
             has_select_star = validation_result.get("has_select_star", False)
-            
+
             if error_type == "parsing":
                 parsing_errors.append((sql_path, metadata_path, validation_result))
             elif error_type == "consistency" and has_select_star:
@@ -593,9 +597,7 @@ def output_results(results: Dict, verbose: bool):
             print(
                 "    📝 ACTION: Add these files to parsing_skip_list if the SQL is valid in Databricks."
             )
-            print(
-                "    📖 See: scripts/governance_metadata_validation/skip_list.yml"
-            )
+            print("    📖 See: scripts/governance_metadata_validation/skip_list.yml")
             for sql_path, metadata_path, validation_result in parsing_errors:
                 print(f"\n    File: {metadata_path}")
                 print(f"    SQL:  {sql_path}")
@@ -610,7 +612,9 @@ def output_results(results: Dict, verbose: bool):
         if select_star_errors:
             print(f"\n⚠️  SELECT * ERRORS: {len(select_star_errors)} file(s)")
             print("    ⚠️  SQL queries use SELECT * which prevents column validation.")
-            print("    📝 ACTION: Replace SELECT * with explicit column names to enable metadata validation.")
+            print(
+                "    📝 ACTION: Replace SELECT * with explicit column names to enable metadata validation."
+            )
             for sql_path, metadata_path, validation_result in select_star_errors:
                 print(f"\n    File: {metadata_path}")
                 print(f"    SQL:  {sql_path}")
@@ -654,11 +658,12 @@ def main():
 
     if mode == "branch" and not input_value:
         import subprocess
+
         input_value = subprocess.check_output(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
         ).strip()
 
-    print(f"\nValidating lineage consistency...")
+    print("\nValidating lineage consistency...")
     print(f"Mode: {mode}")
     if domain:
         print(f"Domain filter: {domain}")
@@ -679,9 +684,7 @@ def main():
                     allowed_sql.add(str(_sql).replace("\\", "/"))
                 break
         files_to_validate = [
-            (sql, meta, st)
-            for sql, meta, st in files_to_validate
-            if sql in allowed_sql
+            (sql, meta, st) for sql, meta, st in files_to_validate if sql in allowed_sql
         ]
 
     results = {"passed": [], "failed": [], "skipped": [], "skipped_parsing": []}
@@ -713,7 +716,9 @@ def main():
         print("Please update the metadata files to match the query columns.\n")
         exit(1)
     else:
-        print("\nResult: All metadata files are consistent with their SQL queries! ✅\n")
+        print(
+            "\nResult: All metadata files are consistent with their SQL queries! ✅\n"
+        )
         exit(0)
 
 

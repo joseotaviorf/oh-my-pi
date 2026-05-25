@@ -1,28 +1,28 @@
-import boto3
-import logging
-import yaml
 import ast
-
-from datetime import datetime
+import logging
 from argparse import ArgumentParser
+from datetime import datetime
+
+import boto3
+import yaml
 from pyspark.sql import Row
 from pyspark.sql.functions import (
-    udf,
-    lit,
+    coalesce,
     explode_outer,
+    lit,
     map_keys,
     map_values,
-    coalesce,
+    udf,
 )
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.clients.db_clients import SparkClient
+
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageFormat
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
 
 JOB_NAME = "load_categories_documentation_to_raw"
 
@@ -146,7 +146,11 @@ if __name__ == "__main__":
     documentation_bucket = args.documentation_bucket
     documentation_prefix = args.documentation_prefix
 
-    bucket_suffix = ".data.quintoandar.com.br" if env == "prod" else ".forno.data.quintoandar.com.br"
+    bucket_suffix = (
+        ".data.quintoandar.com.br"
+        if env == "prod"
+        else ".forno.data.quintoandar.com.br"
+    )
     documentation_bucket = documentation_bucket + bucket_suffix
 
     logger.info(

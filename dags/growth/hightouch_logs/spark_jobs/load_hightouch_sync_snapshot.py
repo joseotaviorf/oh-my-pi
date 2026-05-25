@@ -5,12 +5,10 @@ from typing import Optional
 import pyspark.sql.functions as F
 from pyspark.sql import DataFrame
 from pyspark.sql.utils import AnalysisException
-
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
-from bietlejuice.base.spark.base_spark import BaseDBUtils
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -23,7 +21,9 @@ spark_client = SparkClient()
 spark = spark_client.conn
 
 
-def _load_window_timestamps_ms(load_start_date: str, load_end_date: str) -> tuple[int, int]:
+def _load_window_timestamps_ms(
+    load_start_date: str, load_end_date: str
+) -> tuple[int, int]:
     start_ts = int(datetime.strptime(load_start_date, "%Y-%m-%d").timestamp() * 1000)
     end_ts = int(
         (datetime.strptime(load_end_date, "%Y-%m-%d") + timedelta(days=1)).timestamp()
@@ -64,13 +64,8 @@ def _discover_snapshot_paths(
         )
 
     logger.info(
-        "m=_discover_snapshot_paths, sync_dir_count={}, parquet_file_count={}, "
-        "load_start_date={}, load_end_date={}, msg=discovered source files".format(
-            len(sync_dirs),
-            len(paths),
-            load_start_date,
-            load_end_date,
-        )
+        f"m=_discover_snapshot_paths, sync_dir_count={len(sync_dirs)}, parquet_file_count={len(paths)}, "
+        f"load_start_date={load_start_date}, load_end_date={load_end_date}, msg=discovered source files"
     )
     return paths
 
@@ -98,17 +93,13 @@ def _read_snapshot_input(
     paths = _discover_snapshot_paths(base_path, load_start_date, load_end_date)
     if not paths:
         logger.info(
-            "m=_read_snapshot_input, base_path={}, load_start_date={}, load_end_date={}, "
-            "msg=no parquet files modified in range".format(
-                base_path, load_start_date, load_end_date
-            )
+            f"m=_read_snapshot_input, base_path={base_path}, load_start_date={load_start_date}, load_end_date={load_end_date}, "
+            "msg=no parquet files modified in range"
         )
         return None
 
     logger.info(
-        "m=_read_snapshot_input, path_count={}, msg=reading parquet files".format(
-            len(paths)
-        )
+        f"m=_read_snapshot_input, path_count={len(paths)}, msg=reading parquet files"
     )
     try:
         df = (
@@ -117,15 +108,15 @@ def _read_snapshot_input(
             .parquet(*paths)
         )
     except AnalysisException as exc:
-        logger.info(
-            "m=_read_snapshot_input, msg=failed to read parquet: {}".format(exc)
-        )
+        logger.info(f"m=_read_snapshot_input, msg=failed to read parquet: {exc}")
         return None
 
     return _add_partitions_from_file_path(df)
 
 
-def _write_to_raw(df, environment: str, source: str, datalake_bucket: str, table_name: str):
+def _write_to_raw(
+    df, environment: str, source: str, datalake_bucket: str, table_name: str
+):
     if UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         current_catalog = UnityCatalogHelper.get_current_catalog()
         spark.sql(f"USE CATALOG {current_catalog}")
@@ -169,16 +160,8 @@ def main():
     input_path = args.input_path.format(environment=args.environment)
 
     logger.info(
-        "m=main, environment={}, datalake_bucket={}, source={}, table_name={}, "
-        "load_start_date={}, load_end_date={}, input_path={}, msg=starting spark job".format(
-            args.environment,
-            args.datalake_bucket,
-            args.source,
-            args.table_name,
-            args.load_start_date,
-            args.load_end_date,
-            input_path,
-        )
+        f"m=main, environment={args.environment}, datalake_bucket={args.datalake_bucket}, source={args.source}, table_name={args.table_name}, "
+        f"load_start_date={args.load_start_date}, load_end_date={args.load_end_date}, input_path={input_path}, msg=starting spark job"
     )
 
     df = _read_snapshot_input(
@@ -198,7 +181,7 @@ def main():
         table_name=args.table_name,
     )
 
-    logger.info("m=main, row_count={}, msg=spark job finished".format(df.count()))
+    logger.info(f"m=main, row_count={df.count()}, msg=spark job finished")
 
 
 if __name__ == "__main__":

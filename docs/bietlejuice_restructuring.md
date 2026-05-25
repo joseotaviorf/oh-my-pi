@@ -102,7 +102,7 @@ A **single** uv lockfile cannot satisfy **old DBR-bundled libraries** and **Apac
 - Steps use **`pip install uv`** and **`uv sync --directory packages/...`**. The **tests** `setup` step, on the tip branch, also **`uv sync` `packages/bietlejuice-runtime` and `packages/bietlejuice-runtime/envs/dbr-16-4`** so `make unit-tests` matches **DBR 16.4**-like imports.
 - **`event: [push, pull_request]`** on `when.path` so path filters use the **full PR diff** (not only the last commit); documented in pipeline headers.
 - **Unit and integration** test steps also run on changes to **root/ package `pyproject.toml`** or **`uv.lock`**.
-- **Lint** includes **`type-check-python`** with **`failure: ignore`** (informative only).
+- **Lint** runs **`check-style-python`** (packages, compiler scripts, repo-root tests) and **`check-style-dags-python`** (`dags/`); **`type-check-python`** uses **`failure: ignore`** (informative only).
 - Shared **setup** steps before parallel jobs reduce venv **race** issues.
 - **`release.yml`:** unified **path anchors** for the **wheel** pipeline and the **DAG-bundle** chain so a change only in library code still runs the full deploy tail; `make build` → two wheels in `dist/`; **stage** step merges `packages/bietlejuice-core` and `packages/bietlejuice-airflow` **`bietlejuice` trees** for the S3 path Astronomer expects; Forno/Prod **`*-latest-*` wheel** aliasing. Images generally use **Python 3.12** on **Debian bookworm**-class bases.
 
@@ -118,8 +118,10 @@ A **single** uv lockfile cannot satisfy **old DBR-bundled libraries** and **Apac
 
 ## 7. Ruff
 
-- Per-package **`[tool.ruff]`** in `packages/*/pyproject.toml` (e.g. line length 88, `target-version` aligned with the package, selected rules E4/E7/E9/F/I/UP with some UP ignores, `known-first-party = ["bietlejuice"]`).
-- **Makefile** runs **`ruff format`** and **`ruff check`** on **`src/` and `test/`** inside each package. The restructure included a **wide format pass** across the new layout, not a single monolithic `bietlejuice/` directory.
+- **Single config:** root **`pyproject.toml`** `[tool.ruff]` (line length 88, `py310`, rules E4/E7/E9/F/I/UP, DBR-related UP ignores, Databricks `builtins`, per-file ignores for `dags/` and compiler `scripts/`). See **[`docs/ruff.md`](ruff.md)** for the full audit table and Makefile scope.
+- **`make check-style`:** `packages/*/src`, `packages/*/test`, `packages/bietlejuice-compiler/scripts` — enforced in Woodpecker (`check-style-dags` covers `dags/` separately).
+- **`make check-style-dags`:** **`dags/`** Spark jobs and DAG Python — enforced in Woodpecker (`check-style-dags-python`).
+- **`make lint`** / **`make fix-style`** and **`make lint-dags`** / **`make fix-style-dags`** apply format and safe autofix for the same paths.
 
 ---
 

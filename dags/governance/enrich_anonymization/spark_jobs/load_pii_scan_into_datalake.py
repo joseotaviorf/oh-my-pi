@@ -3,9 +3,6 @@ import ast
 from datetime import datetime
 from typing import Dict, Iterable, Iterator, List, Tuple
 
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.services.configuration_service import ConfigurationService
 from presidio_analyzer import (
     AnalyzerEngine,
     BatchAnalyzerEngine,
@@ -23,6 +20,10 @@ from pyspark.sql.types import (
     StructType,
 )
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.loaders.delta_loader import DeltaLoader
+from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_pii_scan_into_datalake"
 logger = QuintoAndarLogger(JOB_NAME)

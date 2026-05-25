@@ -1,13 +1,14 @@
-import logging
 import json
-from datetime import datetime
+import logging
 from argparse import ArgumentParser
-from datetime import datetime, date
-from typing import Tuple, List
+from datetime import date, datetime
+from typing import Tuple
+
 import boto3
-from bietlejuice.services.configuration_service import ConfigurationService
 from pyspark.sql.functions import make_date
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_into_sns"
 BATCH_SIZE = 1000
@@ -17,9 +18,15 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def main():
-    dag_name, database_name, table_name, event_type, load_start_date, load_end_date, sns_topic_arn = (
-        parse_arguments()
-    )
+    (
+        dag_name,
+        database_name,
+        table_name,
+        event_type,
+        load_start_date,
+        load_end_date,
+        sns_topic_arn,
+    ) = parse_arguments()
     config_service = ConfigurationService(dag_name)
     sns_topic_arn = config_service.get_config(sns_topic_arn)
     logger.info(
@@ -29,7 +36,12 @@ def main():
     )
 
     load_table_into_sns(
-        database_name, table_name, event_type, sns_topic_arn, load_start_date, load_end_date
+        database_name,
+        table_name,
+        event_type,
+        sns_topic_arn,
+        load_start_date,
+        load_end_date,
     )
 
 
@@ -45,7 +57,9 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime, datetime, str]:
         "load_end_date", help="End date of the load in the format YYYY-MM-DD"
     )
     parser.add_argument("event_type", help="Type of event to be sent to SNS")
-    parser.add_argument("sns_topic_arn", help="ARN of the SNS topic to send the messages to")
+    parser.add_argument(
+        "sns_topic_arn", help="ARN of the SNS topic to send the messages to"
+    )
 
     args = parser.parse_args()
 
@@ -57,7 +71,15 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime, datetime, str]:
     load_end_date = args.load_end_date
     sns_topic_arn = args.sns_topic_arn
 
-    return dag_name, database_name, table_name, event_type, load_start_date, load_end_date, sns_topic_arn
+    return (
+        dag_name,
+        database_name,
+        table_name,
+        event_type,
+        load_start_date,
+        load_end_date,
+        sns_topic_arn,
+    )
 
 
 def load_table_into_sns(
@@ -113,7 +135,7 @@ def json_serial(obj):
 
     if isinstance(obj, (datetime, date)):
         return obj.isoformat()
-    raise TypeError("Type %s not serializable" % type(obj))
+    raise TypeError(f"Type {type(obj)} not serializable")
 
 
 if __name__ == "__main__":

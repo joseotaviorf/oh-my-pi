@@ -1,11 +1,11 @@
 from argparse import ArgumentParser
 from datetime import date, timedelta
-from typing import Optional
 
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 from pyspark.sql import types as T
 from pyspark.sql.window import Window
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -13,7 +13,6 @@ from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "interaction_state_tracker"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -49,7 +48,9 @@ EXPECTED_SCHEMA = T.StructType(
         T.StructField("interaction_state", T.StringType(), True),
         T.StructField("dt_state", T.DateType(), True),
         T.StructField("hsm_count", T.LongType(), True),
-        T.StructField("hsm_detailed_count", T.MapType(T.StringType(), T.LongType()), True),
+        T.StructField(
+            "hsm_detailed_count", T.MapType(T.StringType(), T.LongType()), True
+        ),
     ]
 )
 
@@ -73,10 +74,14 @@ def _build_langfuse_classifications(load_start_date: str) -> DataFrame:
             F.col("metadata").getField("house_ownership").alias("house_ownership"),
             F.col("metadata").getField("first_message_ts").alias("first_message_ts"),
             F.col("metadata").getField("token_usage").alias("token_usage"),
-            F.col("metadata").getField("calculator_p70_price").alias("calculator_p70_price"),
+            F.col("metadata")
+            .getField("calculator_p70_price")
+            .alias("calculator_p70_price"),
             F.col("metadata").getField("sale_price").alias("sale_price"),
             F.col("metadata").getField("rent_price").alias("rent_price"),
-            F.col("metadata").getField("calculator_p90_price").alias("calculator_p90_price"),
+            F.col("metadata")
+            .getField("calculator_p90_price")
+            .alias("calculator_p90_price"),
         )
     )
 
@@ -104,7 +109,13 @@ def _build_hsm_counts(load_start_date: str) -> DataFrame:
         .filter(F.col("ts_created").cast("date") <= F.lit(load_start_date))
         .filter(F.col("channel") == "WHATSAPP_PRICING_AI_CHAT")
         .filter(F.col("role") == "HARDCODED")
-        .select(F.col("id").alias("id_message"), "id_session", "message_index", "role", "content")
+        .select(
+            F.col("id").alias("id_message"),
+            "id_session",
+            "message_index",
+            "role",
+            "content",
+        )
         .dropDuplicates()
     )
 
@@ -112,8 +123,12 @@ def _build_hsm_counts(load_start_date: str) -> DataFrame:
         "id_session",
         "id_message",
         F.get_json_object(F.col("state"), "$.payload.userId").alias("id_user"),
-        F.get_json_object(F.col("state"), "$.payload.metadata.houseId").alias("id_house"),
-        F.get_json_object(F.col("state"), "$.payload.metadata.businessContext").alias("business_context"),
+        F.get_json_object(F.col("state"), "$.payload.metadata.houseId").alias(
+            "id_house"
+        ),
+        F.get_json_object(F.col("state"), "$.payload.metadata.businessContext").alias(
+            "business_context"
+        ),
         F.get_json_object(F.col("state"), "$.ruleId").alias("last_template"),
     )
 
@@ -136,7 +151,11 @@ def _build_hsm_counts(load_start_date: str) -> DataFrame:
             "id_house",
             "id_user",
             F.from_json(
-                F.to_json(F.struct(*[F.coalesce(F.col(t), F.lit(0)).alias(t) for t in templates])),
+                F.to_json(
+                    F.struct(
+                        *[F.coalesce(F.col(t), F.lit(0)).alias(t) for t in templates]
+                    )
+                ),
                 HSM_DETAILED_COUNT_SCHEMA,
             ).alias("hsm_detailed_count"),
         )
@@ -175,10 +194,16 @@ def build_interaction_state(load_start_date: str) -> DataFrame:
         "rent_price",
         "calculator_p90_price",
         F.col("first_message_ts").cast("date").alias("dt_state"),
-    ).join(_build_hsm_counts(load_start_date), how="left", on=["business_context", "id_house", "id_user"])
+    ).join(
+        _build_hsm_counts(load_start_date),
+        how="left",
+        on=["business_context", "id_house", "id_user"],
+    )
 
     asp_allocation_df = spark.table("datalake_gsheets_clean.asp_for_sale_alocated")  # noqa: F821
-    return fup_state_df.join(asp_allocation_df.select("id_house"), on=["id_house"], how="leftanti")
+    return fup_state_df.join(
+        asp_allocation_df.select("id_house"), on=["id_house"], how="leftanti"
+    )
 
 
 def _schema_mismatches(actual: T.StructType, expected: T.StructType) -> list:
@@ -191,14 +216,19 @@ def _schema_mismatches(actual: T.StructType, expected: T.StructType) -> list:
             return f"missing column: {n} (expected {expected_by_name[n].dataType.simpleString()})"
         if n not in expected_by_name:
             return f"unexpected column: {n}"
-        if actual_by_name[n].dataType.simpleString() != expected_by_name[n].dataType.simpleString():
+        if (
+            actual_by_name[n].dataType.simpleString()
+            != expected_by_name[n].dataType.simpleString()
+        ):
             return (
                 f"column '{n}': expected {expected_by_name[n].dataType.simpleString()}, "
                 f"got {actual_by_name[n].dataType.simpleString()}"
             )
         return None
 
-    return list(filter(None, (msg(n) for n in actual_by_name.keys() | expected_by_name.keys())))
+    return list(
+        filter(None, (msg(n) for n in actual_by_name.keys() | expected_by_name.keys()))
+    )
 
 
 def validate_schema_and_return_row_count(df: DataFrame) -> int:
@@ -214,17 +244,19 @@ def validate_schema_and_return_row_count(df: DataFrame) -> int:
         )
 
     row_count = df.count()
-    logger.info(f"m=validate_before_write, rows={row_count:,}, msg=Pre-write checks OK, schema match")
+    logger.info(
+        f"m=validate_before_write, rows={row_count:,}, msg=Pre-write checks OK, schema match"
+    )
     return row_count
 
 
 def save_to_enrich(
-    spark_client: SparkClient, 
-    result_df: DataFrame, 
-    env: str, 
-    datalake_bucket: str, 
-    database_base_name: str, 
-    table_name: str, 
+    spark_client: SparkClient,
+    result_df: DataFrame,
+    env: str,
+    datalake_bucket: str,
+    database_base_name: str,
+    table_name: str,
     row_count: int,
 ) -> None:
     """Write DataFrame to enrich layer (Delta merge), refresh table, apply privileges."""
@@ -249,7 +281,6 @@ def save_to_enrich(
     if priv and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         priv.apply()
     logger.info(f"m=save_df, table={full_table_name}, rows={row_count:,}")
-
 
 
 if __name__ == "__main__":
@@ -281,15 +312,17 @@ if __name__ == "__main__":
     output_df = build_interaction_state(load_start_date)
     row_count = validate_schema_and_return_row_count(output_df)
     if row_count == 0:
-        logger.info("m=main, msg=Empty dataset — no write performed, job finished successfully")
+        logger.info(
+            "m=main, msg=Empty dataset — no write performed, job finished successfully"
+        )
     else:
         save_to_enrich(
-            SparkClient(), 
-            output_df, 
-            env, 
-            datalake_bucket, 
-            database_base_name, 
-            table_name, 
-            row_count
+            SparkClient(),
+            output_df,
+            env,
+            datalake_bucket,
+            database_base_name,
+            table_name,
+            row_count,
         )
         logger.info("m=main, msg=Job finished successfully")

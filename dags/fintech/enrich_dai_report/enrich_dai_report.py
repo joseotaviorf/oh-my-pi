@@ -1,10 +1,10 @@
-from airflow.utils.helpers import chain
-from datetime import datetime
-import pendulum
 import os
+from datetime import datetime
 
-from airflow.models import DAG, Variable
+import pendulum
+from airflow.models import DAG
 from airflow.operators.python_operator import ShortCircuitOperator
+from airflow.utils.helpers import chain
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
@@ -16,15 +16,16 @@ from bietlejuice.base.airflow.dag_builders.main_builder.short_circuit_functions.
     DAGRunDateValidators,
 )
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
+from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import DatabricksGroupNameEnum
-from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
 from bietlejuice.services.dataset_service import DatasetService
-from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
-
 
 LOCAL_TZ = pendulum.timezone("America/Sao_Paulo")
 MAIN_START_DATE = datetime(2020, 7, 1, 0, 0, 0, tzinfo=LOCAL_TZ)
@@ -53,7 +54,9 @@ CLUSTER_DESCRIPTION = config_service.get_config("databricks_16_4_min_memory_clus
 
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
+    "quintoandar_{{ var.value.environment }}"
+)
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -68,7 +71,6 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
         "on_failure_callback": jiraops_callback.task_failure_alert,
-
     },
     start_date=MAIN_START_DATE,
     schedule_interval=DatasetService.get_dag_datasets(DAG_ID),
@@ -78,7 +80,9 @@ dag = DAG(
     params=BaseDAG.get_default_trigger_form_params(),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
@@ -88,16 +92,19 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn
 # Reprocessing guard task to ensure that the DAG does not run multiple times unnecessarily
 DatasetAdder.attach_reprocessing_guard(create_cluster_task)
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
 skip_run_task = ShortCircuitOperator(
-    task_id=f"check-day-to-skip-execution",
+    task_id="check-day-to-skip-execution",
     python_callable=DAGRunDateValidators.check_is_specific_day_of_month,
     op_args=["{{ macros.ds_add(data_interval_start | ds, 1) }}", 10],
 )
 
-datalake_task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
+datalake_task_group = DatalakeTaskGroup(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,
@@ -114,7 +121,9 @@ enrich_task_groups = datalake_task_group.build_task_group_from_sql_files(
 query_export_xlsx = config_service.get_config("query_export_xlsx")
 format_options = config_service.get_config("format_options")
 out_path = config_service.get_config("out_path")
-load_data_into_s3 = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=f"load-{SOURCE}-in-s3",
+load_data_into_s3 = QuintoAndarDatabricksSubmitRunOperator(
+    databricks_conn_id="databricks_new",
+    task_id=f"load-{SOURCE}-in-s3",
     dag=dag,
     json={
         "spark_python_task": {
@@ -131,7 +140,7 @@ load_data_into_s3 = QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="d
     },
 )
 
-chain(    #skip_run_task,
+chain(  # skip_run_task,
     create_cluster_task,
     DatalakeTaskGroup.all_first_tasks(enrich_task_groups),
 )

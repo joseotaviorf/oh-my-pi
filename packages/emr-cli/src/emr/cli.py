@@ -135,8 +135,7 @@ def main(ctx: click.Context) -> None:
     "use_spot",
     default=None,
     help=(
-        "Override use_spot from settings: SPOT for core nodes (master stays "
-        "ON_DEMAND)."
+        "Override use_spot from settings: SPOT for core nodes (master stays ON_DEMAND)."
     ),
 )
 def cmd_transient(
@@ -244,8 +243,7 @@ def cmd_transient(
     "use_spot",
     default=None,
     help=(
-        "Override use_spot from settings: SPOT for core nodes (master stays "
-        "ON_DEMAND)."
+        "Override use_spot from settings: SPOT for core nodes (master stays ON_DEMAND)."
     ),
 )
 def cmd_create_cluster(

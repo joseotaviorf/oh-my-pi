@@ -8,25 +8,23 @@ from functools import reduce
 
 import boto3
 from pyspark.sql import DataFrame, functions
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.spark import (
-    SparkTableStorageFormat,
     BaseDBUtils,
     SparkDataFrameService,
+    SparkTableStorageFormat,
 )
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
+from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.storage_services.s3_service import S3Service
-
-from quintoandar_logger import QuintoAndarLogger
-
 
 JOB_NAME = "load_invoice_preview_into_datalake"
 
@@ -37,7 +35,10 @@ logger = QuintoAndarLogger(JOB_NAME)
 def _generate_date_range(load_start_date, load_end_date):
     start_date = datetime.strptime(load_start_date, "%Y-%m-%d")
     end_date = datetime.strptime(load_end_date, "%Y-%m-%d")
-    date_index = [start_date + timedelta(days=x) for x in range(0, (end_date - start_date).days + 1)]
+    date_index = [
+        start_date + timedelta(days=x)
+        for x in range(0, (end_date - start_date).days + 1)
+    ]
     return date_index
 
 
@@ -57,14 +58,19 @@ def __build_warning_messages(environment, s3_path_prefix, table_name, dates):
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")
     parser.add_argument("source", help="name of the source")
     parser.add_argument("source_root_path", help="source root path")
-    parser.add_argument("load_start_date", help="Start of date range to be used in filtering the files. Format: '%Y-%m-%d'")
-    parser.add_argument("load_end_date", help="End of date range to be used in filtering the files. Format: '%Y-%m-%d'")
+    parser.add_argument(
+        "load_start_date",
+        help="Start of date range to be used in filtering the files. Format: '%Y-%m-%d'",
+    )
+    parser.add_argument(
+        "load_end_date",
+        help="End of date range to be used in filtering the files. Format: '%Y-%m-%d'",
+    )
     parser.add_argument("table_name", help="name of the output table")
     parser.add_argument("file_format", help="file format")
     parser.add_argument("file_options", help="file options")
@@ -122,7 +128,9 @@ if __name__ == "__main__":
             days_to_send_warning.append(date_ingested)
         else:
             for csv in by_day_files[date_ingested]:
-                df = s3_consumer.get_data_from_file(path=csv, format=format, options=options)
+                df = s3_consumer.get_data_from_file(
+                    path=csv, format=format, options=options
+                )
                 df = df.withColumn("invoice_filename", functions.lit(csv))
                 dfs.append(df)
 
@@ -178,19 +186,17 @@ if __name__ == "__main__":
             )
 
     if days_to_send_warning:
-        if environment == 'prod':
+        if environment == "prod":
             key = GchatWebhooksEnum.FINTECH_ALERTS_PROD
         else:
             key = GchatWebhooksEnum.AE_ALERTS_FORNO
 
-        gchat_webhook = dbutils.secrets.get(
-            scope="quintoandar", key=key
-        )
+        gchat_webhook = dbutils.secrets.get(scope="quintoandar", key=key)
         messages = __build_warning_messages(
             environment=environment,
             s3_path_prefix=f"s3://{source_root_path}",
             table_name=table_name,
-            dates=days_to_send_warning
+            dates=days_to_send_warning,
         )
         for message_content in messages:
             message = Message(content=message_content, destination=gchat_webhook)

@@ -1,14 +1,14 @@
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
-from dateutil.relativedelta import relativedelta
 
+from dateutil.relativedelta import relativedelta
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.spark import SparkDataFrameService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.base.spark import SparkDataFrameService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_data_into_xlsx_s3"
@@ -18,7 +18,6 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")

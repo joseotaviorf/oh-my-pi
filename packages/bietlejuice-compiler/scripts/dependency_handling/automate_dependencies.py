@@ -1,19 +1,20 @@
-import yaml
 import os
 import sys
+
+import yaml
 
 BI_ETL_EJUICE_ROOT = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 )
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
-from dags import DAG_PACKAGES_ROOT
-from bietlejuice.base.dependencies.file_dependency_generator import (
-    FileDependencyGenerator,
-)
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     DAGS_CROSS_DEPENDENCIES_FILE_NAME,
 )
+from bietlejuice.base.dependencies.file_dependency_generator import (
+    FileDependencyGenerator,
+)
+from dags import DAG_PACKAGES_ROOT
 
 DAGS_CROSS_DEPENDENCIES_FILE_PATH = os.path.join(
     DAG_PACKAGES_ROOT, DAGS_CROSS_DEPENDENCIES_FILE_NAME
@@ -34,8 +35,9 @@ class DependencyFileDumper(yaml.Dumper):
     A custom dumper that indents lists. Many people have black configured to indent lists with 2 spaces, but the default
     yaml dumper does not indent lists. This is to change that, avoiding conflicts.
     """
+
     def increase_indent(self, flow=False, indentless=False):
-        return super(DependencyFileDumper, self).increase_indent(flow, False)
+        return super().increase_indent(flow, False)
 
 
 def main():
@@ -46,7 +48,9 @@ def main():
 def generate_dependencies():
     unstandard_dags = get_unstandard_dags_file_content(UNSTANDARD_DAGS_PATH)
     dependency_generator = FileDependencyGenerator(unstandard_dags)
-    manual_modifications = get_manual_modifications_file_content(MANUAL_MODIFICATIONS_PATH)
+    manual_modifications = get_manual_modifications_file_content(
+        MANUAL_MODIFICATIONS_PATH
+    )
 
     dependencies = dependency_generator.generate_dependencies(manual_modifications)
 
@@ -60,8 +64,9 @@ def write_to_yml(table_dependencies: dict):
             stream=file_stream,
             Dumper=DependencyFileDumper,
             explicit_start=True,
-            default_flow_style=False
+            default_flow_style=False,
         )
+
 
 def get_unstandard_dags_file_content(unstandard_dags_file_path: str):
     return read_from_yml(

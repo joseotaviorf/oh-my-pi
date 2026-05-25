@@ -1,17 +1,16 @@
-import logging
 import json
+import logging
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 
 from quintoandar_logger import QuintoAndarLogger
-
 from quintoandar_tracksale_api_client.clients import TracksaleClient
 from quintoandar_tracksale_api_client.requesters import REQUESTERS
 
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.consumers.s3_consumer import S3Consumer
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_targets_into_tracksale"
@@ -36,7 +35,6 @@ def send_targets_to_tracksale(token, campaign_code, payload):
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
@@ -45,8 +43,12 @@ if __name__ == "__main__":
     parser.add_argument("campaign_code", help="source name")
     parser.add_argument("campaign_query", help="campaign query")
     parser.add_argument("tags", help="campaign tags")
-    parser.add_argument("trigger_at_hour", help="hour that the campaign should be triggered")
-    parser.add_argument("trigger_at_minute", help="minute that the campaign should be triggered")
+    parser.add_argument(
+        "trigger_at_hour", help="hour that the campaign should be triggered"
+    )
+    parser.add_argument(
+        "trigger_at_minute", help="minute that the campaign should be triggered"
+    )
     parser.add_argument("execution_date")
 
     args = parser.parse_args()
@@ -77,7 +79,12 @@ if __name__ == "__main__":
 
     schedule_time = int(
         datetime(
-            schedule_date.year, schedule_date.month, schedule_date.day, int(trigger_at_hour), int(trigger_at_minute), 0
+            schedule_date.year,
+            schedule_date.month,
+            schedule_date.day,
+            int(trigger_at_hour),
+            int(trigger_at_minute),
+            0,
         ).timestamp()
     )
     end_time = int(
@@ -96,11 +103,10 @@ if __name__ == "__main__":
             .collect()
         )
     except Exception as e:
-        logger.error("m=There's no data here yet, message_error={}".format(e))
+        logger.error(f"m=There's no data here yet, message_error={e}")
         df = []
 
     if len(df) > 0:
-
         tags = json.loads(tags)
 
         payload = {

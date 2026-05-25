@@ -1,25 +1,23 @@
 import logging
-
 from argparse import ArgumentParser
 from collections import OrderedDict
 from datetime import datetime
-from pyspark.sql.functions import to_json, struct
 
+from pyspark.sql.functions import struct, to_json
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
-    SparkTableStorageFormat,
-    SparkDataFrameService,
     BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
     spark,
 )
-
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_braze_events_raw"
 
@@ -34,7 +32,8 @@ def get_events_from_app_group(app_group_path, dbutils):
     events = []
     for folder in data_export_folders:
         events_in_folder = [
-            partition_value[0] for partition_value in base_dbutils.discover_partition_values_in_path(
+            partition_value[0]
+            for partition_value in base_dbutils.discover_partition_values_in_path(
                 f"{app_group_path}/{folder}", dbutils, max_recursive_depth=1
             )
         ]
@@ -63,8 +62,8 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("execution_date")
-    #parser.add_argument("load_start_date")
-    #parser.add_argument("load_end_date")
+    # parser.add_argument("load_start_date")
+    # parser.add_argument("load_end_date")
     parser.add_argument("app_group")
     args = parser.parse_args()
 
@@ -72,8 +71,8 @@ if __name__ == "__main__":
     datalake_bucket = args.datalake_bucket
     source = args.source
     execution_date = args.execution_date
-    #load_start_date = args.load_start_date
-    #load_end_date = args.load_end_date
+    # load_start_date = args.load_start_date
+    # load_end_date = args.load_end_date
     app_group = args.app_group
 
     config_service = ConfigurationService(source)

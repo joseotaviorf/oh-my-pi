@@ -12,9 +12,7 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.formatters.string_formatter import StringFormatter
 
 
-def _chunk_table_attributes(
-    table_attributes: List, batch_size: int
-) -> List[List]:
+def _chunk_table_attributes(table_attributes: List, batch_size: int) -> List[List]:
     if batch_size < 1:
         raise ValueError("batch_size must be at least 1")
     return [

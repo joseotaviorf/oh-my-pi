@@ -13,7 +13,6 @@ JOB_NAME = "load_full_dw_staging"
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("dw_bucket")

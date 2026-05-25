@@ -1,19 +1,17 @@
 import ast
 import json
 from argparse import ArgumentParser
-from dateutil import parser
 
+from dateutil import parser
+from pyspark.sql.functions import col, dayofmonth, hour, month, to_timestamp, year
+from pyspark.sql.types import ArrayType, StringType, StructField, StructType
 from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.spark import spark
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from pyspark.sql.functions import col, dayofmonth, hour, month, to_timestamp, year
-from pyspark.sql.types import ArrayType, StructType, StructField, StringType
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.spark import (
-    spark
-)
-
 
 JOB_NAME = "identitynow_account_activities_load"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -47,92 +45,190 @@ def parse_arguments():
 
     return args
 
+
 def load_df(input_path):
-    account_activities_schema = StructType([
-        StructField("id", StringType(), True),
-        StructField("trackingNumber", StringType(), True),
-        StructField("type", StringType(), True),
-        StructField("sources", StringType(), True),
-        StructField("action", StringType(), True),
-        StructField("status", StringType(), True),
-        StructField("stage", StringType(), True),
-        StructField("requester", StructType([
+    account_activities_schema = StructType(
+        [
             StructField("id", StringType(), True),
-            StructField("name", StringType(), True),
-            StructField("type", StringType(), True)
-        ]), True),
-        StructField("recipient", StructType([
-            StructField("id", StringType(), True),
-            StructField("name", StringType(), True),
-            StructField("type", StringType(), True)
-        ]), True),
-        StructField("accountRequests", ArrayType(StructType([
-            StructField("result", StructType([
-                StructField("status", StringType(), True)
-            ]), True),
-            StructField("accountId", StringType(), True),
-            StructField("op", StringType(), True),
-            StructField("provisioningTarget", StructType([
-                StructField("name", StringType(), True),
-                StructField("id", StringType(), True),
-                StructField("type", StringType(), True)
-            ]), True),
-            StructField("source", StructType([
-                StructField("name", StringType(), True),
-                StructField("id", StringType(), True),
-                StructField("type", StringType(), True)
-            ]), True),
-            StructField("attributeRequests", ArrayType(StructType([
-                StructField("op", StringType(), True),
-                StructField("name", StringType(), True),
-                StructField("value", StringType(), True),
-                StructField("result", StructType([
-                    StructField("status", StringType(), True)
-                ]), True)
-            ])), True)
-        ])), True),
-        StructField("originalRequests", ArrayType(StructType([
-            StructField("result", StructType([
-                StructField("status", StringType(), True)
-            ]), True),
-            StructField("accountId", StringType(), True),
-            StructField("op", StringType(), True),
-            StructField("source", StructType([
-                StructField("name", StringType(), True),
-                StructField("id", StringType(), True)
-            ]), True),
-            StructField("attributeRequests", ArrayType(StructType([
-                StructField("op", StringType(), True),
-                StructField("name", StringType(), True),
-                StructField("value", StringType(), True)
-            ])), True)
-        ])), True),
-        StructField("expansionItems", ArrayType(StructType([
-            StructField("attributeRequest", StructType([
-                StructField("op", StringType(), True),
-                StructField("name", StringType(), True),
-                StructField("value", StringType(), True)
-            ]), True),
-            StructField("accountId", StringType(), True),
-            StructField("name", StringType(), True),
-            StructField("cause", StringType(), True),
-            StructField("source", StructType([
-                StructField("name", StringType(), True),
-                StructField("id", StringType(), True),
-                StructField("type", StringType(), True)
-            ]), True),
-            StructField("id", StringType(), True),
-            StructField("state", StringType(), True)
-        ])), True),
-        StructField("org", StringType(), True),
-        StructField("pod", StringType(), True),
-        StructField("_type", StringType(), True),
-        StructField("_version", StringType(), True),
-        StructField("created", StringType(), True),
-        StructField("modified", StringType(), True),
-        StructField("synced", StringType(), True)
-    ])
+            StructField("trackingNumber", StringType(), True),
+            StructField("type", StringType(), True),
+            StructField("sources", StringType(), True),
+            StructField("action", StringType(), True),
+            StructField("status", StringType(), True),
+            StructField("stage", StringType(), True),
+            StructField(
+                "requester",
+                StructType(
+                    [
+                        StructField("id", StringType(), True),
+                        StructField("name", StringType(), True),
+                        StructField("type", StringType(), True),
+                    ]
+                ),
+                True,
+            ),
+            StructField(
+                "recipient",
+                StructType(
+                    [
+                        StructField("id", StringType(), True),
+                        StructField("name", StringType(), True),
+                        StructField("type", StringType(), True),
+                    ]
+                ),
+                True,
+            ),
+            StructField(
+                "accountRequests",
+                ArrayType(
+                    StructType(
+                        [
+                            StructField(
+                                "result",
+                                StructType([StructField("status", StringType(), True)]),
+                                True,
+                            ),
+                            StructField("accountId", StringType(), True),
+                            StructField("op", StringType(), True),
+                            StructField(
+                                "provisioningTarget",
+                                StructType(
+                                    [
+                                        StructField("name", StringType(), True),
+                                        StructField("id", StringType(), True),
+                                        StructField("type", StringType(), True),
+                                    ]
+                                ),
+                                True,
+                            ),
+                            StructField(
+                                "source",
+                                StructType(
+                                    [
+                                        StructField("name", StringType(), True),
+                                        StructField("id", StringType(), True),
+                                        StructField("type", StringType(), True),
+                                    ]
+                                ),
+                                True,
+                            ),
+                            StructField(
+                                "attributeRequests",
+                                ArrayType(
+                                    StructType(
+                                        [
+                                            StructField("op", StringType(), True),
+                                            StructField("name", StringType(), True),
+                                            StructField("value", StringType(), True),
+                                            StructField(
+                                                "result",
+                                                StructType(
+                                                    [
+                                                        StructField(
+                                                            "status", StringType(), True
+                                                        )
+                                                    ]
+                                                ),
+                                                True,
+                                            ),
+                                        ]
+                                    )
+                                ),
+                                True,
+                            ),
+                        ]
+                    )
+                ),
+                True,
+            ),
+            StructField(
+                "originalRequests",
+                ArrayType(
+                    StructType(
+                        [
+                            StructField(
+                                "result",
+                                StructType([StructField("status", StringType(), True)]),
+                                True,
+                            ),
+                            StructField("accountId", StringType(), True),
+                            StructField("op", StringType(), True),
+                            StructField(
+                                "source",
+                                StructType(
+                                    [
+                                        StructField("name", StringType(), True),
+                                        StructField("id", StringType(), True),
+                                    ]
+                                ),
+                                True,
+                            ),
+                            StructField(
+                                "attributeRequests",
+                                ArrayType(
+                                    StructType(
+                                        [
+                                            StructField("op", StringType(), True),
+                                            StructField("name", StringType(), True),
+                                            StructField("value", StringType(), True),
+                                        ]
+                                    )
+                                ),
+                                True,
+                            ),
+                        ]
+                    )
+                ),
+                True,
+            ),
+            StructField(
+                "expansionItems",
+                ArrayType(
+                    StructType(
+                        [
+                            StructField(
+                                "attributeRequest",
+                                StructType(
+                                    [
+                                        StructField("op", StringType(), True),
+                                        StructField("name", StringType(), True),
+                                        StructField("value", StringType(), True),
+                                    ]
+                                ),
+                                True,
+                            ),
+                            StructField("accountId", StringType(), True),
+                            StructField("name", StringType(), True),
+                            StructField("cause", StringType(), True),
+                            StructField(
+                                "source",
+                                StructType(
+                                    [
+                                        StructField("name", StringType(), True),
+                                        StructField("id", StringType(), True),
+                                        StructField("type", StringType(), True),
+                                    ]
+                                ),
+                                True,
+                            ),
+                            StructField("id", StringType(), True),
+                            StructField("state", StringType(), True),
+                        ]
+                    )
+                ),
+                True,
+            ),
+            StructField("org", StringType(), True),
+            StructField("pod", StringType(), True),
+            StructField("_type", StringType(), True),
+            StructField("_version", StringType(), True),
+            StructField("created", StringType(), True),
+            StructField("modified", StringType(), True),
+            StructField("synced", StringType(), True),
+        ]
+    )
     return spark.read.format("json").load(input_path, schema=account_activities_schema)
+
 
 def clean_df(df):
     ts = to_timestamp(col("created"))
@@ -164,8 +260,9 @@ def clean_df(df):
         year(ts).alias("year"),
         month(ts).alias("month"),
         dayofmonth(ts).alias("day"),
-        hour(ts).alias("hour")
+        hour(ts).alias("hour"),
     ).where(col("created").isNotNull())
+
 
 def main():
     """
@@ -200,18 +297,17 @@ def main():
             table_privileges_dict, full_clean_table_name
         )
     else:
-        table_privileges = TablePrivileges.from_environment_default(full_clean_table_name)
+        table_privileges = TablePrivileges.from_environment_default(
+            full_clean_table_name
+        )
     loader = DeltaLoader()
     loader.load_table(
         table_name=full_clean_table_name,
         path=f"{args.output_path}/clean/{args.schema}/{args.table_name}/",
         source_df=df,
-        partition_by=args.partition_cols
+        partition_by=args.partition_cols,
     )
-    if (
-        table_privileges
-        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-    ):
+    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
 
 

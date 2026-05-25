@@ -1,24 +1,27 @@
 import os
 from datetime import datetime
-from pendulum import timezone
 
 from airflow.models import DAG
+from airflow.utils.helpers import chain
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.utils.helpers import chain
+from pendulum import timezone
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
+from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
+from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.dataset_service import DatasetService
-from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import DatabricksGroupNameEnum
-from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
-from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 
 # Pipeline inputs
 CONTEXT = "marketing_costs_sharing_rules"
@@ -40,8 +43,12 @@ doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 cluster_configuration = config_service.get_config(CLUSTER_DESCRIPTION)
 default_libraries = config_service.get_config("default_libraries")
 cluster_configuration["data_security_mode"] = "SINGLE_USER"
-cluster_configuration["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-cluster_configuration["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+cluster_configuration["single_user_name"] = (
+    "{{ var.value.databricks_single_user_name }}"
+)
+cluster_configuration["spark_conf"][
+    "spark.databricks.sql.initial.catalog.namespace"
+] = "quintoandar_{{ var.value.environment }}"
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -67,7 +74,9 @@ dag = DAG(
     params=BaseDAG.get_default_trigger_form_params(),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     task_id="create-cluster",
     cluster_configuration=cluster_configuration,
     libraries=default_libraries,
@@ -77,10 +86,13 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn
 # Reprocessing guard task to ensure that the DAG does not run multiple times unnecessarily
 DatasetAdder.attach_reprocessing_guard(create_cluster_task)
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
-datalake_task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
+datalake_task_group = DatalakeTaskGroup(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=DAG_NAME,

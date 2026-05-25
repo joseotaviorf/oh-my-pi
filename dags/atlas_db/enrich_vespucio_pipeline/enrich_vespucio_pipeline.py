@@ -9,19 +9,18 @@ from databricks_plugin import (
     QuintoAndarDatabricksCheckJobTaskOperator,
     QuintoAndarDatabricksExecuteJobClusterOperator,
 )
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
+from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
 from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
 from bietlejuice.base.notification.gchat_callback import GchatCallback
-
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.dataset_service import DatasetService
-from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
-
 from dags.atlas_db.vespucio_pipeline_table_names import Tables
 
 VESPUCIO_PACKAGE_NAME = "vespucio"
@@ -153,7 +152,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=clustering_image_model.sql",
+            "--script=clustering_image_model.sql",
             f"--output_table={Tables.source_clustering_image_model}",
         ],
         task_id="clustering_image_model",
@@ -161,7 +160,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=ebdb_condo.sql",
+            "--script=ebdb_condo.sql",
             f"--output_table={Tables.source_ebdb_condo}",
         ],
         task_id="ebdb_condo",
@@ -169,7 +168,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=navent_condo.sql",
+            "--script=navent_condo.sql",
             f"--output_table={Tables.source_navent_condo}",
         ],
         task_id="navent_condo",
@@ -177,7 +176,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=kodak_metadata_condo.sql",
+            "--script=kodak_metadata_condo.sql",
             f"--output_table={Tables.source_kodak_metadata_condo}",
         ],
         task_id="kodak_metadata_condo",
@@ -185,7 +184,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=union_condo.sql",
+            "--script=union_condo.sql",
             f"--output_table={Tables.source_union_condo}",
         ],
         task_id="union_condo",
@@ -193,7 +192,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=iptu_condo.sql",
+            "--script=iptu_condo.sql",
             f"--output_table={Tables.source_iptu_condo}",
         ],
         task_id="iptu_condo",
@@ -201,7 +200,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=ebdb_house.sql",
+            "--script=ebdb_house.sql",
             f"--output_table={Tables.source_ebdb_house}",
         ],
         task_id="ebdb_house",
@@ -209,7 +208,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=union_house.sql",
+            "--script=union_house.sql",
             f"--output_table={Tables.source_union_houses}",
         ],
         task_id="union_house",
@@ -217,7 +216,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=idactum_house.sql",
+            "--script=idactum_house.sql",
             f"--output_table={Tables.source_idactum_houses}",
         ],
         task_id="idactum_house",
@@ -225,7 +224,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=idactum_transactions.sql",
+            "--script=idactum_transactions.sql",
             f"--output_table={Tables.source_idactum_transactions}",
         ],
         task_id="idactum_transactions",
@@ -233,7 +232,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=itbi_house.sql",
+            "--script=itbi_house.sql",
             f"--output_table={Tables.source_itbi_houses}",
         ],
         task_id="itbi_house",
@@ -241,7 +240,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=iptu_house.sql",
+            "--script=iptu_house.sql",
             f"--output_table={Tables.source_iptu_houses}",
         ],
         task_id="iptu_house",
@@ -249,7 +248,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=cnefe_house.sql",
+            "--script=cnefe_house.sql",
             f"--output_table={Tables.source_cnefe_houses}",
         ],
         task_id="cnefe_house",
@@ -257,7 +256,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=loft_house.sql",
+            "--script=loft_house.sql",
             f"--output_table={Tables.source_loft_houses}",
         ],
         task_id="loft_house",
@@ -265,7 +264,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=viva_real_house.sql",
+            "--script=viva_real_house.sql",
             f"--output_table={Tables.source_viva_real_houses}",
         ],
         task_id="vivareal_house",
@@ -273,7 +272,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=zap_imoveis_house.sql",
+            "--script=zap_imoveis_house.sql",
             f"--output_table={Tables.source_zap_imoveis_houses}",
         ],
         task_id="zap_house",
@@ -281,7 +280,7 @@ source_tasks = [
     create_task(
         entry_point="sources_sql_job",
         parameters=[
-            f"--script=navent_house_composed.sql",
+            "--script=navent_house_composed.sql",
             f"--output_table={Tables.source_navent_houses_composed}",
         ],
         task_id="navent_house_composed",
@@ -299,7 +298,7 @@ stage_step_task = create_task(
         f"--input_source_union_houses={Tables.source_union_houses}",
         f"--input_source_idactum_houses={Tables.source_idactum_houses}",
         f"--input_source_idactum_transactions={Tables.source_idactum_transactions}",
-        f"--overwrite_schema",
+        "--overwrite_schema",
         f"--output_staged_condos={Tables.stage_step_condos}",
         f"--output_staged_houses={Tables.stage_step_houses}",
     ],
@@ -308,10 +307,10 @@ stage_step_task = create_task(
 address_details_hasher_step_task = create_task(
     entry_point="core_address_details_hasher_step",
     parameters=[
-    "--overwrite_schema",
-    f"--input_staged_houses={Tables.stage_step_houses}",
-    f"--output_address_details_hash={Tables.address_details_hash}",
-    f"--output_address_details_hasher_link={Tables.address_details_hasher_link}"
+        "--overwrite_schema",
+        f"--input_staged_houses={Tables.stage_step_houses}",
+        f"--output_address_details_hash={Tables.address_details_hash}",
+        f"--output_address_details_hasher_link={Tables.address_details_hasher_link}",
     ],
 )
 
@@ -320,7 +319,7 @@ source_adapter_step_task = create_task(
     parameters=[
         f"--input_staged_condos={Tables.stage_step_condos}",
         f"--input_staged_houses={Tables.stage_step_houses}",
-        f"--overwrite_schema",
+        "--overwrite_schema",
         f"--output_source_condos={Tables.source_adapter_step_condos}",
         f"--output_source_houses={Tables.source_adapter_step_houses}",
     ],
@@ -333,7 +332,7 @@ extract_step_task = create_task(
         f"--input_source_houses={Tables.source_adapter_step_houses}",
         f"--input_address_adjusted_condos={Tables.address_adjusted_step_condos}",
         f"--input_address_adjusted_houses={Tables.address_adjusted_step_houses}",
-        f"--overwrite_schema",
+        "--overwrite_schema",
         f"--output_extracted_condos={Tables.extract_step_condos}",
         f"--output_extracted_houses={Tables.extract_step_houses}",
     ],
@@ -356,16 +355,16 @@ address_tasks = [
     create_task(
         entry_point="core_geocode_step",
         parameters=[
-            f"--enable_online_geocoder",
-            f"--geocode_username=vespucio_prod_pipeline",
+            "--enable_online_geocoder",
+            "--geocode_username=vespucio_prod_pipeline",
             f"--google_geocode_api_keys_from_secret={APIEnum.GOOGLE_GEOCODING}",
             f"--geocode_cache_table={Tables.geocode_step_cache}",
-            f"--update_cache",
+            "--update_cache",
             f"--max_partitions={_GEOCODE_MAX_PARTITIONS}",
             f"--max_requests_per_partition={_GEOCODE_MAX_REQUESTS_PER_PARTITION}",
             f"--input_staged_condos={Tables.stage_step_condos}",
             f"--input_staged_houses={Tables.stage_step_houses}",
-            f"--overwrite_schema",
+            "--overwrite_schema",
             f"--output_geocoded_condos={Tables.geocode_step_condos}",
             f"--output_geocoded_houses={Tables.geocode_step_houses}",
         ],
@@ -376,7 +375,7 @@ address_tasks = [
             f"--input_address_details_hasher_link={Tables.address_details_hasher_link}",
             f"--input_geocoded_houses={Tables.geocode_step_houses}",
             f"--input_staged_parsed_complements={Tables.staged_parsed_complements}",
-            f"--overwrite_schema",
+            "--overwrite_schema",
             f"--output_address_details_parser_join_houses={Tables.address_details_parser_join_houses}",
         ],
     ),
@@ -387,7 +386,7 @@ address_tasks = [
             f"--input_address_details_parser_join_houses={Tables.address_details_parser_join_houses}",
             f"--input_source_cnefe_houses={Tables.source_cnefe_houses}",
             f"--input_source_iptu_houses={Tables.source_iptu_houses}",
-            f"--overwrite_schema",
+            "--overwrite_schema",
             f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
             f"--output_address_adjusted_condos={Tables.address_adjusted_step_condos}",
             f"--output_address_adjusted_houses={Tables.address_adjusted_step_houses}",
@@ -398,7 +397,7 @@ address_tasks = [
         parameters=[
             f"--input_address_adjusted_houses={Tables.address_adjusted_step_houses}",
             f"--input_source_clustering_image_model={Tables.source_clustering_image_model}",
-            f"--overwrite_schema",
+            "--overwrite_schema",
             f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
             f"--output_address_adjusted_houses={Tables.address_adjusted_step_houses}",
         ],
@@ -408,7 +407,7 @@ address_tasks = [
         parameters=[
             f"--input_address_adjusted_houses={Tables.address_adjusted_step_houses}",
             f"--input_source_clustering_image_model={Tables.source_clustering_image_model}",
-            f"--overwrite_schema",
+            "--overwrite_schema",
             f"--configcat_sdk_key_path={APIEnum.VESPUCIO_CONFIGCAT_SDK_KEY_PATH}",
             f"--output_address_adjusted_houses={Tables.address_adjusted_step_houses}",
         ],
@@ -420,7 +419,7 @@ cluster_task = create_task(
     parameters=[
         f"--input_address_adjusted_condos={Tables.address_adjusted_step_condos}",
         f"--input_indirect_matches_clustering_image={Tables.address_adjusted_step_houses}",
-        f"--overwrite_schema",
+        "--overwrite_schema",
         f"--output_clustered_condos={Tables.cluster_step_condos}",
         f"--output_clustered_houses={Tables.cluster_step_houses}",
     ],
@@ -432,22 +431,22 @@ source_predict_task = create_task(
         f"--input_staged_houses={Tables.stage_step_houses}",
         f"--input_clustered_houses={Tables.cluster_step_houses}",
         f"--input_source_itbi_houses={Tables.source_itbi_houses}",
-        f"--overwrite_schema",
+        "--overwrite_schema",
         f"--output_source_predicted_houses={Tables.source_predict_step_houses}",
     ],
 )
 
 link_task = create_task(
-        entry_point="core_link_step",
-        parameters=[
-            f"--input_staged_condos={Tables.stage_step_condos}",
-            f"--input_staged_houses={Tables.stage_step_houses}",
-            f"--input_clustered_condos={Tables.cluster_step_condos}",
-            f"--input_clustered_houses={Tables.cluster_step_houses}",
-            f"--overwrite_schema",
-            f"--output_linked={Tables.link_step}",
-        ],
-    ),
+    entry_point="core_link_step",
+    parameters=[
+        f"--input_staged_condos={Tables.stage_step_condos}",
+        f"--input_staged_houses={Tables.stage_step_houses}",
+        f"--input_clustered_condos={Tables.cluster_step_condos}",
+        f"--input_clustered_houses={Tables.cluster_step_houses}",
+        "--overwrite_schema",
+        f"--output_linked={Tables.link_step}",
+    ],
+)
 
 images_tasks = [
     create_task(
@@ -483,25 +482,25 @@ images_tasks = [
             f"--kodak_photo_sns_arn={config_service.get_config('kodak_photo_sns_arn')}",
             "--kodak_photo_sns_region=us-east-1",
         ],
-    )
+    ),
 ]
 
 join_and_predict_task = [
     create_task(
-            entry_point="core_join_compound_step",
-            parameters=[
-                "--overwrite_schema",
-                f"--input_staged_houses={Tables.stage_step_houses}",
-                f"--input_staged_condos={Tables.stage_step_condos}",
-                f"--input_images_houses={Tables.images_step_houses}",
-                f"--input_prioritized_houses={Tables.prioritize_step_houses}",
-                f"--input_prioritized_condos={Tables.prioritize_step_condos}",
-                f"--input_linked={Tables.link_step}",
-                f"--input_joined_condos={Tables.join_step_condos}",
-                f"--output_joined_houses={Tables.join_step_houses}",
-                f"--output_joined_condos={Tables.join_step_condos}",
-            ],
-        ),
+        entry_point="core_join_compound_step",
+        parameters=[
+            "--overwrite_schema",
+            f"--input_staged_houses={Tables.stage_step_houses}",
+            f"--input_staged_condos={Tables.stage_step_condos}",
+            f"--input_images_houses={Tables.images_step_houses}",
+            f"--input_prioritized_houses={Tables.prioritize_step_houses}",
+            f"--input_prioritized_condos={Tables.prioritize_step_condos}",
+            f"--input_linked={Tables.link_step}",
+            f"--input_joined_condos={Tables.join_step_condos}",
+            f"--output_joined_houses={Tables.join_step_houses}",
+            f"--output_joined_condos={Tables.join_step_condos}",
+        ],
+    ),
     create_task(
         entry_point="core_compound_predict_step",
         parameters=[

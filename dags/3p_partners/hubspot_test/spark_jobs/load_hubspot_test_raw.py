@@ -34,6 +34,8 @@ from pyspark.sql.types import (
     StructType,
     TimestampType,
 )
+from quintoandar_hubspot_api_client.clients.hubspot_client import HubspotClient
+from quintoandar_hubspot_api_client.factories.endpoint_factory import EndpointFactory
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
@@ -42,8 +44,6 @@ from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.json_service import JsonService
-from quintoandar_hubspot_api_client.clients.hubspot_client import HubspotClient
-from quintoandar_hubspot_api_client.factories.endpoint_factory import EndpointFactory
 
 JOB_NAME = "load_hubspot_test_raw"
 
@@ -179,9 +179,7 @@ class HubSpotTableConfig:
             schema=data.get("schema", "object"),
             use_search=bool(data.get("use_search", True)),
             bring_archived=bool(data.get("bring_archived", False)),
-            encode_inner_dictionaries=bool(
-                data.get("encode_inner_dictionaries", True)
-            ),
+            encode_inner_dictionaries=bool(data.get("encode_inner_dictionaries", True)),
             properties=list(data.get("properties") or []),
             properties_with_history=list(data.get("properties_with_history") or []),
             associations=list(data.get("associations") or []),
@@ -379,9 +377,7 @@ class HubspotIngestionService:
         if not records:
             return None
         if config.encode_inner_dictionaries:
-            records = JsonService.transform_json_list_terms(
-                records, cls=HubSpotEncoder
-            )
+            records = JsonService.transform_json_list_terms(records, cls=HubSpotEncoder)
         return self.spark_client.create_dataframe(records, schema)
 
     def _merge_into_delta(
@@ -463,10 +459,7 @@ def parse_arguments():
     parser.add_argument("table")
     parser.add_argument(
         "table_config",
-        help=(
-            "JSON-encoded per-table HubSpot config "
-            "(see HubSpotTableConfig)."
-        ),
+        help=("JSON-encoded per-table HubSpot config (see HubSpotTableConfig)."),
     )
     return parser.parse_args()
 

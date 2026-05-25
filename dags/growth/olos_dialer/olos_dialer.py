@@ -1,7 +1,6 @@
 import os
 import re
 from datetime import datetime
-from pendulum import timezone
 from functools import reduce
 
 from airflow.models import DAG
@@ -10,14 +9,18 @@ from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+from pendulum import timezone
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
 from bietlejuice.base.databricks.cluster_env_vars_helper import ClusterEnvVarsHelper
-from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import DatabricksGroupNameEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.services.configuration_service import ConfigurationService
 
 # Pipeline inputs
 SOURCE = "olos_dialer"
@@ -48,11 +51,13 @@ cluster_configuration["kind"] = "CLASSIC_PREVIEW"
 cluster_configuration["num_workers"] = 0
 cluster_configuration["is_single_node"] = "true"
 cluster_configuration["data_security_mode"] = "SINGLE_USER"
-cluster_configuration["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-cluster_configuration["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
-cluster_configuration = ClusterEnvVarsHelper.input_spark_env_vars(
-    cluster_configuration
+cluster_configuration["single_user_name"] = (
+    "{{ var.value.databricks_single_user_name }}"
 )
+cluster_configuration["spark_conf"][
+    "spark.databricks.sql.initial.catalog.namespace"
+] = "quintoandar_{{ var.value.environment }}"
+cluster_configuration = ClusterEnvVarsHelper.input_spark_env_vars(cluster_configuration)
 
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -69,12 +74,15 @@ def get_date_param(dag_run, execution_date, date_param_name):
         return date_param
     return execution_date
 
+
 def change_case(table_name, list_out_of_pattern=LIST_OUT_OF_PATTERN):
     for table_dict in list_out_of_pattern:
-      if table_name in table_dict:
-        return table_dict[table_name]
-    table_name = table_name.replace('_', '')
-    return reduce(lambda x, y: x + ('_' if y.isupper() else '') + y, table_name).lower()
+        if table_name in table_dict:
+            return table_dict[table_name]
+    table_name = table_name.replace("_", "")
+    return reduce(lambda x, y: x + ("_" if y.isupper() else "") + y, table_name).lower()
+
+
 jiraops_callback = JiraOpsCallback()
 dag = DAG(
     dag_id=DAG_ID,
@@ -90,24 +98,26 @@ dag = DAG(
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
         chart_url=doc_md_chart_url, dag_id=DAG_ID
     ),
-    user_defined_macros={
-        "get_date_param": get_date_param,
-        "change_case": change_case
-    },
+    user_defined_macros={"get_date_param": get_date_param, "change_case": change_case},
     params=BaseDAG.get_default_trigger_form_params(),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     task_id="create-cluster",
     cluster_configuration=cluster_configuration,
     libraries=default_libraries,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
-datalake_task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
+datalake_task_group = DatalakeTaskGroup(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=SOURCE,
@@ -116,7 +126,6 @@ datalake_task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag
 )
 
 for table_name in TABLES_LIST:
-
     raw_task_group = datalake_task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
         target_database_base_name=SOURCE,

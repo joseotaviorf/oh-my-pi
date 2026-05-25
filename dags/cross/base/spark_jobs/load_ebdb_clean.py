@@ -27,9 +27,7 @@ if __name__ == "__main__":
     env = args.env
     datalake_bucket = args.datalake_bucket
 
-    logger.info(
-        "m=running load-to-clean"
-    )
+    logger.info("m=running load-to-clean")
 
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
         dag_name=source, layer=LayerEnum.CLEAN.value, table_name=table_name

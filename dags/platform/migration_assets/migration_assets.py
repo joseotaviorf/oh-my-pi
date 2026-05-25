@@ -1,13 +1,11 @@
+import json
+from datetime import datetime
+
+from airflow.exceptions import AirflowSkipException
 from airflow.models import DAG, DagBag, DagModel
 from airflow.operators.python_operator import PythonOperator
-from airflow.exceptions import AirflowSkipException
 
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-
-import boto3
-from datetime import datetime
-import json
-
 
 DAG_ID = "bietlejuice.migration_assets"
 
@@ -77,19 +75,19 @@ dag = DAG(
 )
 
 print_current_state = PythonOperator(
-    task_id=f"print_current_state",
+    task_id="print_current_state",
     dag=dag,
     python_callable=print_current_state,
     provide_context=True,
 )
 
 pause_all_dags = PythonOperator(
-    task_id=f"pause_all_dags",
+    task_id="pause_all_dags",
     dag=dag,
     python_callable=pause_all_dags,
     provide_context=True,
 )
 
 set_state = PythonOperator(
-    task_id=f"set_state", dag=dag, python_callable=set_state, provide_context=True
+    task_id="set_state", dag=dag, python_callable=set_state, provide_context=True
 )

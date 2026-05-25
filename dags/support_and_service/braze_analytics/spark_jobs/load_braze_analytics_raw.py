@@ -1,25 +1,23 @@
 import logging
 from argparse import ArgumentParser
-from pyspark.sql.types import DateType
 
+from pyspark.sql.types import DateType
 from quintoandar_braze_api_client.clients import BrazeClient
 from quintoandar_braze_api_client.factories import EndpointFactory
-
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
-    SparkTableStorageFormat,
-    SparkDataFrameService,
     BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
     sc,
 )
-
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_braze_analytis_raw"
 
@@ -83,10 +81,15 @@ if __name__ == "__main__":
 
     chunk_size = 100
     id_chunks = [
-        id_list[x: x + chunk_size] for x in range(0, len(id_list), chunk_size)
+        id_list[x : x + chunk_size] for x in range(0, len(id_list), chunk_size)
     ]
 
-    raw_results = [consumer_analytics.sync(id_values=chunk, executor_type="spark", spark_context=sc, length=1) for chunk in id_chunks]
+    raw_results = [
+        consumer_analytics.sync(
+            id_values=chunk, executor_type="spark", spark_context=sc, length=1
+        )
+        for chunk in id_chunks
+    ]
     results = [item for sublist in raw_results for item in sublist]
 
     if identifier == "campaign":

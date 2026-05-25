@@ -1,62 +1,60 @@
 import logging
-from functools import reduce
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
+from functools import reduce
 
-from pyspark.sql.functions import lit
+import boto3
 from pyspark.sql import DataFrame
-
+from pyspark.sql.functions import lit
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import spark
 from bietlejuice.base.spark import (
-#     BaseDBUtils,
-    SparkTableStorageFormat,
     SparkDataFrameService,
+    #     BaseDBUtils,
+    SparkTableStorageFormat,
+    spark,
 )
-
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
-
-from quintoandar_logger import QuintoAndarLogger
-
-import boto3
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_olos_dialer_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-def create_dataframe(source_bucket: str, s3_folder: str, table: str, dt: datetime) -> DataFrame:
-  file_path = f"{s3_folder}/{table}/{dt.year}/{dt.month:02}/{dt.day:02}"
-  if checkPath(source_bucket, file_path):
-    df = (
-      spark
-      .read
-      .json(f"s3://{source_bucket}/{file_path}")
-    )
-    
-    if len(df.head(1)) == 0:
-      logger.warning(f"m=__main__, msg=Empty dataframe for {table}.")
-      return None
-    
-    return (
-      df
-      .withColumn("year", lit(dt.year))
-      .withColumn("month", lit(dt.month))
-      .withColumn("day", lit(dt.day))
-    )
-  
-client = boto3.client('s3')
+
+def create_dataframe(
+    source_bucket: str, s3_folder: str, table: str, dt: datetime
+) -> DataFrame:
+    file_path = f"{s3_folder}/{table}/{dt.year}/{dt.month:02}/{dt.day:02}"
+    if checkPath(source_bucket, file_path):
+        df = spark.read.json(f"s3://{source_bucket}/{file_path}")
+
+        if len(df.head(1)) == 0:
+            logger.warning(f"m=__main__, msg=Empty dataframe for {table}.")
+            return None
+
+        return (
+            df.withColumn("year", lit(dt.year))
+            .withColumn("month", lit(dt.month))
+            .withColumn("day", lit(dt.day))
+        )
+
+
+client = boto3.client("s3")
+
+
 def checkPath(source_bucket: str, file_path: str) -> DataFrame:
-  result = client.list_objects(Bucket=source_bucket, Prefix=file_path)
-  exists=False
-  if 'Contents' in result:
-      exists=True
-  return exists
+    result = client.list_objects(Bucket=source_bucket, Prefix=file_path)
+    exists = False
+    if "Contents" in result:
+        exists = True
+    return exists
+
 
 logger = QuintoAndarLogger(JOB_NAME)
 
@@ -92,19 +90,22 @@ if __name__ == "__main__":
     s3_folder = config_service.get_config("s3_folder")
     raw_partition_cols = config_service.get_config("raw_partition_cols")
 
-    times_range = [(start_date + timedelta(n)) for n in range((end_date - start_date).days + 1)]
+    times_range = [
+        (start_date + timedelta(n)) for n in range((end_date - start_date).days + 1)
+    ]
 
-    table_data = [create_dataframe(s3_source_bucket, s3_folder, raw_table_name, dt) for dt in times_range]
+    table_data = [
+        create_dataframe(s3_source_bucket, s3_folder, raw_table_name, dt)
+        for dt in times_range
+    ]
     table_data = [i for i in table_data if i is not None]
-  
 
     if len(table_data) > 0:
-        
-        df = reduce(
-            DataFrame.unionAll, table_data
-        )
+        df = reduce(DataFrame.unionAll, table_data)
 
-        logger.info(f"m=__main__, msg={len(table_data)} of {len(times_range)} requested dates returned data for {raw_table_name}.")
+        logger.info(
+            f"m=__main__, msg={len(table_data)} of {len(times_range)} requested dates returned data for {raw_table_name}."
+        )
 
         """
         Load data to datalake.
@@ -151,4 +152,6 @@ if __name__ == "__main__":
         )
 
     else:
-        logger.warning(f"m=__main__, msg=No data found for table {raw_table_name} from {start_date} to {end_date}.")
+        logger.warning(
+            f"m=__main__, msg=No data found for table {raw_table_name} from {start_date} to {end_date}."
+        )

@@ -1,19 +1,17 @@
 import ast
 import json
 from argparse import ArgumentParser
-from dateutil import parser
 
+from dateutil import parser
+from pyspark.sql.functions import col, dayofmonth, hour, month, to_timestamp, year
+from pyspark.sql.types import ArrayType, MapType, StringType, StructField, StructType
 from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.spark import spark
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from pyspark.sql.functions import col, dayofmonth, hour, month, to_timestamp, year
-from pyspark.sql.types import ArrayType, MapType, StructType, StructField, StringType
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.spark import (
-    spark
-)
-
 
 JOB_NAME = "vault_request_load"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -47,72 +45,132 @@ def parse_arguments():
 
     return args
 
+
 def load_df(input_path):
-    events_schema = StructType([
-        StructField("auth", StructType([
-            StructField("accessor", StringType(), True),
-            StructField("client_token", StringType(), True),
-            StructField("display_name", StringType(), True),
-            StructField("entity_id", StringType(), True),
-            StructField("metadata", MapType(StringType(), StringType()), True),
-            StructField("policies", ArrayType(StringType()), True),
-            StructField("policy_results", StructType([
-                StructField("allowed", StringType(), True),
-                StructField("granting_policies", ArrayType(StructType([
-                    StructField("name", StringType(), True),
-                    StructField("namespace_id", StringType(), True),
-                    StructField("type", StringType(), True)
-                ])), True)
-            ]), True),
-            StructField("token_issue_time", StringType(), True),
-            StructField("token_policies", ArrayType(StringType()), True),
-            StructField("token_ttl", StringType(), True),
-            StructField("token_type", StringType(), True)
-        ]), True),
-        StructField("request", StructType([
-            StructField("client_id", StringType(), True),
-            StructField("client_token", StringType(), True),
-            StructField("client_token_accessor", StringType(), True),
-            StructField("id", StringType(), True),
-            StructField("mount_accessor", StringType(), True),
-            StructField("mount_point", StringType(), True),
-            StructField("mount_type", StringType(), True),
-            StructField("namespace", StructType([
-                StructField("id", StringType(), True)
-            ]), True),
-            StructField("operation", StringType(), True),
-            StructField("path", StringType(), True),
-            StructField("remote_address", StringType(), True),
-            StructField("remote_port", StringType(), True)
-        ]), True),
-        StructField("response", StructType([
-            StructField("data", StructType([
-                StructField("accessor", StringType(), True),
-                StructField("creation_time", StringType(), True),
-                StructField("creation_ttl", StringType(), True),
-                StructField("display_name", StringType(), True),
-                StructField("entity_id", StringType(), True),
-                StructField("expire_time", StringType(), True),
-                StructField("explicit_max_ttl", StringType(), True),
-                StructField("id", StringType(), True),
-                StructField("issue_time", StringType(), True),
-                StructField("meta", MapType(StringType(), StringType()), True),
-                StructField("num_uses", StringType(), True),
-                StructField("orphan", StringType(), True),
-                StructField("path", StringType(), True),
-                StructField("policies", ArrayType(StringType()), True),
-                StructField("renewable", StringType(), True),
-                StructField("ttl", StringType(), True),
-                StructField("type", StringType(), True)
-            ]), True),
-            StructField("mount_accessor", StringType(), True),
-            StructField("mount_point", StringType(), True),
-            StructField("mount_type", StringType(), True)
-        ]), True),
-        StructField("time", StringType(), True),
-        StructField("type", StringType(), True)
-    ])
+    events_schema = StructType(
+        [
+            StructField(
+                "auth",
+                StructType(
+                    [
+                        StructField("accessor", StringType(), True),
+                        StructField("client_token", StringType(), True),
+                        StructField("display_name", StringType(), True),
+                        StructField("entity_id", StringType(), True),
+                        StructField(
+                            "metadata", MapType(StringType(), StringType()), True
+                        ),
+                        StructField("policies", ArrayType(StringType()), True),
+                        StructField(
+                            "policy_results",
+                            StructType(
+                                [
+                                    StructField("allowed", StringType(), True),
+                                    StructField(
+                                        "granting_policies",
+                                        ArrayType(
+                                            StructType(
+                                                [
+                                                    StructField(
+                                                        "name", StringType(), True
+                                                    ),
+                                                    StructField(
+                                                        "namespace_id",
+                                                        StringType(),
+                                                        True,
+                                                    ),
+                                                    StructField(
+                                                        "type", StringType(), True
+                                                    ),
+                                                ]
+                                            )
+                                        ),
+                                        True,
+                                    ),
+                                ]
+                            ),
+                            True,
+                        ),
+                        StructField("token_issue_time", StringType(), True),
+                        StructField("token_policies", ArrayType(StringType()), True),
+                        StructField("token_ttl", StringType(), True),
+                        StructField("token_type", StringType(), True),
+                    ]
+                ),
+                True,
+            ),
+            StructField(
+                "request",
+                StructType(
+                    [
+                        StructField("client_id", StringType(), True),
+                        StructField("client_token", StringType(), True),
+                        StructField("client_token_accessor", StringType(), True),
+                        StructField("id", StringType(), True),
+                        StructField("mount_accessor", StringType(), True),
+                        StructField("mount_point", StringType(), True),
+                        StructField("mount_type", StringType(), True),
+                        StructField(
+                            "namespace",
+                            StructType([StructField("id", StringType(), True)]),
+                            True,
+                        ),
+                        StructField("operation", StringType(), True),
+                        StructField("path", StringType(), True),
+                        StructField("remote_address", StringType(), True),
+                        StructField("remote_port", StringType(), True),
+                    ]
+                ),
+                True,
+            ),
+            StructField(
+                "response",
+                StructType(
+                    [
+                        StructField(
+                            "data",
+                            StructType(
+                                [
+                                    StructField("accessor", StringType(), True),
+                                    StructField("creation_time", StringType(), True),
+                                    StructField("creation_ttl", StringType(), True),
+                                    StructField("display_name", StringType(), True),
+                                    StructField("entity_id", StringType(), True),
+                                    StructField("expire_time", StringType(), True),
+                                    StructField("explicit_max_ttl", StringType(), True),
+                                    StructField("id", StringType(), True),
+                                    StructField("issue_time", StringType(), True),
+                                    StructField(
+                                        "meta",
+                                        MapType(StringType(), StringType()),
+                                        True,
+                                    ),
+                                    StructField("num_uses", StringType(), True),
+                                    StructField("orphan", StringType(), True),
+                                    StructField("path", StringType(), True),
+                                    StructField(
+                                        "policies", ArrayType(StringType()), True
+                                    ),
+                                    StructField("renewable", StringType(), True),
+                                    StructField("ttl", StringType(), True),
+                                    StructField("type", StringType(), True),
+                                ]
+                            ),
+                            True,
+                        ),
+                        StructField("mount_accessor", StringType(), True),
+                        StructField("mount_point", StringType(), True),
+                        StructField("mount_type", StringType(), True),
+                    ]
+                ),
+                True,
+            ),
+            StructField("time", StringType(), True),
+            StructField("type", StringType(), True),
+        ]
+    )
     return spark.read.format("json").load(input_path, schema=events_schema)
+
 
 def clean_df(df):
     ts = to_timestamp(col("time"))
@@ -143,8 +201,9 @@ def clean_df(df):
         year(ts).alias("year"),
         month(ts).alias("month"),
         dayofmonth(ts).alias("day"),
-        hour(ts).alias("hour")
+        hour(ts).alias("hour"),
     ).where(col("time").isNotNull())
+
 
 def main():
     """
@@ -178,7 +237,9 @@ def main():
             table_privileges_dict, full_clean_table_name
         )
     else:
-        table_privileges = TablePrivileges.from_environment_default(full_clean_table_name)
+        table_privileges = TablePrivileges.from_environment_default(
+            full_clean_table_name
+        )
     loader = DeltaLoader()
     loader.load_table(
         table_name=full_clean_table_name,
@@ -186,10 +247,7 @@ def main():
         source_df=df,
         partition_by=args.partition_cols,
     )
-    if (
-        table_privileges
-        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-    ):
+    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
 
 

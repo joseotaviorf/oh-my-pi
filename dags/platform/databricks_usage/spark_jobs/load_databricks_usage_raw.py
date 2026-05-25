@@ -1,18 +1,17 @@
 import json
 import logging
-
 from argparse import ArgumentParser
 from datetime import datetime
 
+from pyspark.sql.functions import *
 from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from pyspark.sql.functions import *
 
 JOB_NAME = "load_databricks_usage_raw"
 
@@ -60,14 +59,25 @@ if __name__ == "__main__":
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     if proxy_path:
-        df = spark.read.format("csv") \
-            .option("header", "true") \
-            .option("quote", "\"") \
-            .option("escape", "\"") \
-            .load(proxy_path.format(execution_date.year, str(execution_date.month).zfill(2)))
+        df = (
+            spark.read.format("csv")
+            .option("header", "true")
+            .option("quote", '"')
+            .option("escape", '"')
+            .load(
+                proxy_path.format(
+                    execution_date.year, str(execution_date.month).zfill(2)
+                )
+            )
+        )
 
-        df = df.alias("df").select("df.*", year(df.timestamp).alias('year'), month(df.timestamp).alias('month'), dayofmonth(df.timestamp).alias('day'))
-    
+        df = df.alias("df").select(
+            "df.*",
+            year(df.timestamp).alias("year"),
+            month(df.timestamp).alias("month"),
+            dayofmonth(df.timestamp).alias("day"),
+        )
+
         s3_loader.load_df(
             df=df,
             s3_path=f"{database_location}{table_name}",
@@ -93,6 +103,4 @@ if __name__ == "__main__":
             partition_cols=partition_cols,
         )
     else:
-        logger.info(
-            f"m=load_databricks_usage_raw, msg=S3 path does not exist."
-        )
+        logger.info("m=load_databricks_usage_raw, msg=S3 path does not exist.")

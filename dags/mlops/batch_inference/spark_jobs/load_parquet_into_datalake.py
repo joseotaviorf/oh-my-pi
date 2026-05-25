@@ -5,18 +5,17 @@ from datetime import datetime
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkTableStorageFormat, SparkDataFrameService
+from bietlejuice.base.spark import SparkDataFrameService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_batch_inference_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
 
 def main():
     parser = ArgumentParser(description=JOB_NAME)
@@ -64,7 +63,7 @@ def main():
     dt_execution = datetime.strptime(date_to_ingest, "%Y-%m-%d")
     df = s3_consumer.get_data_from_file(
         f"{source_root_path}/year={dt_execution.year}/month={dt_execution.month}/day={dt_execution.day}/",
-        format
+        format,
     )
 
     path = f"{database_location}{table_name}"
@@ -78,12 +77,11 @@ def main():
     )
 
     (
-        df.write
-          .format("parquet")
-          .mode("overwrite")
-          .option("path", path)
-          .partitionBy(raw_partition_cols)
-          .saveAsTable(database_name + "." + table_name)
+        df.write.format("parquet")
+        .mode("overwrite")
+        .option("path", path)
+        .partitionBy(raw_partition_cols)
+        .saveAsTable(database_name + "." + table_name)
     )
 
 

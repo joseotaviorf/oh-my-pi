@@ -1,10 +1,9 @@
+import json
+import os
 from datetime import datetime
 
-import json
 import pendulum
-import os
-
-from airflow.models import DAG, Variable
+from airflow.models import DAG
 from airflow.utils.helpers import chain, cross_downstream
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
@@ -13,12 +12,14 @@ from databricks_plugin import (
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import DatabricksGroupNameEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.services.configuration_service import ConfigurationService
 
 ENV = os.environ.get("ENVIRONMENT")
 SOURCE = "casa_mineira_crm"
@@ -43,11 +44,15 @@ RAW_SPARK_JOB_PATH = (
     f"{S3_PREFIX}/spark_jobs/{CONTEXT}/load_{CONTEXT}_into_datalake_raw.py"
 )
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_13_3_med_memory_general_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config(
+    "databricks_13_3_med_memory_general_cluster"
+)
 
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
+    "quintoandar_{{ var.value.environment }}"
+)
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -69,17 +74,22 @@ dag = DAG(
     params=BaseDAG.get_default_trigger_form_params(),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     libraries=default_libraries,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
-task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
+task_group = DatalakeTaskGroup(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     env=ENV,
     datalake_bucket=DATALAKE_BUCKET,
     relative_query_path=CONTEXT,

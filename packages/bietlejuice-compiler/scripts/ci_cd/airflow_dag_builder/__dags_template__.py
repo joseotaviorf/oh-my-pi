@@ -1,7 +1,7 @@
 """
-    airflow parsing enforcement
+airflow parsing enforcement
 
-    Note: this line above forces Airflow to parse this file for implemented DAGs
+Note: this line above forces Airflow to parse this file for implemented DAGs
 """
 
 from os.path import basename, dirname
@@ -19,7 +19,9 @@ from bietlejuice.base.pipeline import LayerEnum
 datasets = {datasets}
 dag_name = basename(dirname(__file__))
 dag_declaration = DAGYamlParser(dag_name=dag_name).dag_declaration()
-factory = FactoryDispatcher(layer=LayerEnum(dag_declaration["workflow"]["layer"])).get_factory(
+factory = FactoryDispatcher(
+    layer=LayerEnum(dag_declaration["workflow"]["layer"])
+).get_factory(
     dag_args=dag_declaration["dag"],
     workflow_args=dag_declaration["workflow"],
     cluster_args=dag_declaration["cluster"],

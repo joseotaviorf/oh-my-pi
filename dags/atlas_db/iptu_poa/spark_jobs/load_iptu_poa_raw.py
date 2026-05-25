@@ -1,23 +1,21 @@
 import ast
 import logging
-
 from argparse import ArgumentParser
-from datetime import datetime, date
+from datetime import date, datetime
 from typing import List
+
+from pyspark.sql import DataFrame
+from pyspark.sql import functions as F
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
-from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-
-from pyspark.sql import DataFrame
-from pyspark.sql import functions as F
-
-from quintoandar_logger import QuintoAndarLogger
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 SOURCE = "iptu_poa"
 JOB_NAME = f"load_{SOURCE}_raw"
@@ -42,7 +40,7 @@ def save_to_datalake(
     environment: str,
     datalake_bucket: str,
     table_name: str,
-    partitions: List[str]
+    partitions: List[str],
 ) -> None:
     spark_client = SparkClient()
 
@@ -83,8 +81,7 @@ def save_to_datalake(
 
 def transform_data(dataframe: DataFrame) -> DataFrame:
     return (
-        dataframe
-        .select("response.*")
+        dataframe.select("response.*")
         .withColumn("dt_load", F.lit(date.today()))
         .withColumn("year", F.col("ano_exercicio"))
     )
@@ -104,7 +101,9 @@ if __name__ == "__main__":
     base_s3_ingestion_path = config_service.get_config("base_s3_ingestion_path")
 
     partition_year = datetime.strptime(args.execution_date, "%Y-%m-%d").year
-    dataframe_to_save = transform_data(load_from_s3(base_path=base_s3_ingestion_path, year=partition_year))
+    dataframe_to_save = transform_data(
+        load_from_s3(base_path=base_s3_ingestion_path, year=partition_year)
+    )
 
     save_to_datalake(
         dataframe=dataframe_to_save,

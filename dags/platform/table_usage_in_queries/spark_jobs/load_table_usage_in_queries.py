@@ -1,20 +1,22 @@
-import boto3
 import json
 import os
-import pyspark.sql.functions as F
 import re
 from argparse import ArgumentParser, Namespace
-from bietlejuice.base.paths import BIETLEJUICE_CONFIG_ROOT
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import BaseSparkContext, SparkTableStorageFormat
-from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.pipeline import IncrementalTableLoaderPipeline
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from datetime import datetime
+
+import boto3
+import pyspark.sql.functions as F
 from hierarchical_conf.hierarchical_conf import HierarchicalConf
 from pyspark.sql.dataframe import DataFrame
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.paths import BIETLEJUICE_CONFIG_ROOT
+from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.spark import BaseSparkContext, SparkTableStorageFormat
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.pipeline import IncrementalTableLoaderPipeline
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_table_usage_in_queries"
 REGEX_TABLE_PATTERN_IN_SQL = r"(?i)(?:FROM|JOIN)\s*(`?\w+`?\.`?\w+`?)"
@@ -25,9 +27,13 @@ def main() -> None:
     args = parse_arguments()
     query_files_bucket, query_files_prefix = get_query_bucket_and_prefix_in_s3()
 
-    query_files, query_modified_dates = read_all_files_with_prefix(query_files_bucket, query_files_prefix)
+    query_files, query_modified_dates = read_all_files_with_prefix(
+        query_files_bucket, query_files_prefix
+    )
     tables_per_query = find_tables_in_queries(query_files)
-    df_table_usage_in_queries = generate_dataframe(tables_per_query, query_modified_dates)
+    df_table_usage_in_queries = generate_dataframe(
+        tables_per_query, query_modified_dates
+    )
     final_df = generate_relevant_columns(
         df_table_usage_in_queries, datetime.strptime(args.execution_date, "%Y-%m-%d")
     )
@@ -68,7 +74,9 @@ def parse_arguments() -> Namespace:
     return args
 
 
-def read_all_files_with_prefix(bucket: str, prefix: str) -> tuple[dict[str, str], dict[str, datetime]]:
+def read_all_files_with_prefix(
+    bucket: str, prefix: str
+) -> tuple[dict[str, str], dict[str, datetime]]:
     """
     Returns a tuple of:
     - a dictionary in which the key is the object key, and the value is the object content.
@@ -100,11 +108,18 @@ def find_tables_in_queries(queries: dict[str, str]) -> dict[str, list[str]]:
 
 
 def find_tables_in_query(query: str) -> list[str]:
-    return list({t.lower().replace("`", "") for t in re.findall(REGEX_TABLE_PATTERN_IN_SQL, query)})
+    return list(
+        {
+            t.lower().replace("`", "")
+            for t in re.findall(REGEX_TABLE_PATTERN_IN_SQL, query)
+        }
+    )
 
 
-def generate_dataframe(tables_per_query: dict[str, list[str]], query_modified_dates: dict[str, datetime]) -> DataFrame:
-    logger.info(f"Generating dataframe")
+def generate_dataframe(
+    tables_per_query: dict[str, list[str]], query_modified_dates: dict[str, datetime]
+) -> DataFrame:
+    logger.info("Generating dataframe")
     values = []
     for query_path, tables in tables_per_query.items():
         for table in tables:

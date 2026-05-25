@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 PR-scoped validation: referenced tables must belong to layers allowed for the DAG
 output layer (from ``workflow.layer`` in the declaration).
@@ -13,27 +12,26 @@ output layer (from ``workflow.layer`` in the declaration).
 CI uses profile ``dags`` (``profiles/dags.yml``), path_prefix ``dags/``.
 """
 
-from __future__ import print_function
-
 import argparse
-import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 import yaml
 
-# Repo root on path (Makefile uses PYTHONPATH=.)
-from scripts.services.git_service import GitService
-
-from scripts.ci_cd.source_layer_validation.dag_reference_extractors import (
-    _normalize_repo_rel_path,
-    extract_tables_by_source_file,
+from scripts.ci_cd.domain_cli import (
+    branch_name_arg_type,
+    domain_arg_type,
+    source_layer_profile_arg_type,
 )
 from scripts.ci_cd.source_layer_validation import output_messages
 from scripts.ci_cd.source_layer_validation.core_model_registry import (
-    build_core_model_registry,
     CoreColumnEntry,
+    build_core_model_registry,
+)
+from scripts.ci_cd.source_layer_validation.dag_reference_extractors import (
+    _normalize_repo_rel_path,
+    extract_tables_by_source_file,
 )
 from scripts.ci_cd.source_layer_validation.dag_source_paths import (
     dag_requires_strict_validation,
@@ -47,21 +45,19 @@ from scripts.ci_cd.source_layer_validation.layer_classifier import (
 from scripts.ci_cd.source_layer_validation.layer_policy_matrix import (
     allowed_layers_for_output,
 )
-from scripts.ci_cd.domain_cli import (
-    branch_name_arg_type,
-    domain_arg_type,
-    source_layer_profile_arg_type,
-)
 from scripts.ci_cd.source_layer_validation.read_dag_declaration import (
     get_workflow_layer_and_type,
 )
+
+# Repo root on path (Makefile uses PYTHONPATH=.)
+from scripts.services.git_service import GitService
 
 
 def load_profile(cli_profile_name: str) -> Dict[str, Any]:
     """Load profiles/<file>.yml where cli_profile matches."""
     prof_dir = Path(__file__).resolve().parent / "profiles"
     for path in sorted(prof_dir.glob("*.yml")):
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             data = yaml.safe_load(f)
         if not data:
             continue
@@ -69,9 +65,7 @@ def load_profile(cli_profile_name: str) -> Dict[str, Any]:
             data["_profile_file"] = str(path)
             return data
     sys.stderr.write(
-        "Unknown profile {!r}. Add profiles/*.yml with matching cli_profile.\n".format(
-            cli_profile_name
-        )
+        f"Unknown profile {cli_profile_name!r}. Add profiles/*.yml with matching cli_profile.\n"
     )
     sys.exit(2)
 
@@ -97,7 +91,7 @@ def is_valid_dag_root(dag_root_str: str) -> bool:
     p = Path(dag_root_str)
     if not p.is_dir():
         return False
-    decl = p / "{}_declaration.yml".format(p.name)
+    decl = p / f"{p.name}_declaration.yml"
     return decl.is_file()
 
 
@@ -125,14 +119,14 @@ def get_branch_mode_affected_roots(
     touched = [p for p in upsert if p.startswith(prefix)]
     if not touched:
         return (
-            "No changes under {} — skipping source-layer policy check.".format(prefix),
+            f"No changes under {prefix} — skipping source-layer policy check.",
             [],
         )
     dag_roots = dag_roots_from_changed_files(touched, profile)
     dag_roots = [r for r in dag_roots if is_valid_dag_root(r)]
     if not dag_roots:
         return (
-            "No DAG declaration folders affected under {} — skipping.".format(prefix),
+            f"No DAG declaration folders affected under {prefix} — skipping.",
             [],
         )
     return None, dag_roots
@@ -234,9 +228,7 @@ def run_validation(
             if verbose:
                 print("")
                 print(
-                    "DAG: {} (profile {}) — skipped (workflow.type {!r}).".format(
-                        dag_name, profile_id, wtype
-                    )
+                    f"DAG: {dag_name} (profile {profile_id}) — skipped (workflow.type {wtype!r})."
                 )
             continue
 
@@ -245,9 +237,7 @@ def run_validation(
             if verbose:
                 print("")
                 print(
-                    "DAG: {} (profile {}) — skipped (missing workflow.layer: {!r}).".format(
-                        dag_name, profile_id, layer
-                    )
+                    f"DAG: {dag_name} (profile {profile_id}) — skipped (missing workflow.layer: {layer!r})."
                 )
             continue
 
@@ -271,7 +261,7 @@ def run_validation(
 
         if verbose and violations_by_path:
             print("")
-            print("DAG: {} (profile {})".format(dag_name, profile_id))
+            print(f"DAG: {dag_name} (profile {profile_id})")
             print(
                 "  Mode: {}".format(
                     "strict (new DAG or new source files)"
@@ -279,8 +269,8 @@ def run_validation(
                     else "lenient (warnings only)"
                 )
             )
-            print("  workflow.layer={!r} workflow.type={!r}".format(layer, wtype))
-            print("  Files with policy violations: {}".format(len(violations_by_path)))
+            print(f"  workflow.layer={layer!r} workflow.type={wtype!r}")
+            print(f"  Files with policy violations: {len(violations_by_path)}")
 
         if strict and violations_new:
             any_strict_fail = True
@@ -377,9 +367,7 @@ def _dag_roots_resolved_under_dags(roots: List[str]) -> List[str]:
             resolved.relative_to(dags)
         except (ValueError, OSError):
             sys.stderr.write(
-                "Refusing unsafe DAG root path {!r} (must resolve under dags/).\n".format(
-                    r
-                )
+                f"Refusing unsafe DAG root path {r!r} (must resolve under dags/).\n"
             )
             sys.exit(2)
         safe.append(rel)
@@ -434,11 +422,7 @@ def main() -> None:
             print("No DAG roots found under dags/")
             sys.exit(0)
         if args.verbose:
-            print(
-                "Validating all {} DAG(s) (profile: {})".format(
-                    len(dag_roots), args.profile
-                )
-            )
+            print(f"Validating all {len(dag_roots)} DAG(s) (profile: {args.profile})")
     else:
         branch = args.branch
         if branch is None:

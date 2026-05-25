@@ -1,12 +1,11 @@
 from argparse import ArgumentParser
 
 from pyspark.sql import functions as F
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_dim_pricing"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -32,15 +31,17 @@ def get_affected_price_changes(spark, start_date, end_date):
     price_changes = spark.table(SOURCE_TABLE)
 
     affected_houses = (
-        price_changes
-        .filter(F.to_date(F.col("ts_price_started")).between(start_date, end_date))
+        price_changes.filter(
+            F.to_date(F.col("ts_price_started")).between(start_date, end_date)
+        )
         .select("id_house", "business_context")
         .distinct()
     )
 
     return (
-        price_changes
-        .join(F.broadcast(affected_houses), ["id_house", "business_context"])
+        price_changes.join(
+            F.broadcast(affected_houses), ["id_house", "business_context"]
+        )
         .select("id_price_change")
         .distinct()
     )
@@ -102,7 +103,9 @@ if __name__ == "__main__":
     logger.info(f"m=__main__, affected_price_changes={affected_count:,}")
 
     if affected_count == 0:
-        logger.warning("m=__main__, msg=No affected price changes found in date range, skipping")
+        logger.warning(
+            "m=__main__, msg=No affected price changes found in date range, skipping"
+        )
     else:
         result_df = build_dim_pricing(spark, affected_ids)
 
@@ -120,7 +123,11 @@ if __name__ == "__main__":
             merge_on=["sk_pricing"],
         )
 
-        SparkMetastoreService(spark_client).refresh_table(database_name, args.table_name)
-        logger.info(f"m=__main__, table={full_table_name}, msg=Load completed successfully")
+        SparkMetastoreService(spark_client).refresh_table(
+            database_name, args.table_name
+        )
+        logger.info(
+            f"m=__main__, table={full_table_name}, msg=Load completed successfully"
+        )
 
     affected_ids.unpersist()

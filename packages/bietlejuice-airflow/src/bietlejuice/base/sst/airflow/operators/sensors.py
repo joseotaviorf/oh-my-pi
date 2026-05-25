@@ -6,7 +6,6 @@ from airflow.models import DagModel
 from airflow.sensors.external_task import ExternalTaskSensor
 from airflow.utils.session import provide_session
 
-
 """
 ## SStExternalTaskSensor parameters and working mode
 

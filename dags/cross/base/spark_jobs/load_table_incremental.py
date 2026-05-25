@@ -1,5 +1,5 @@
-import logging
 import json
+import logging
 from argparse import ArgumentParser
 from datetime import datetime
 
@@ -72,7 +72,9 @@ def main():
 
     global spark
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
 
         spark = create_emr_spark_session(JOB_NAME)
 
@@ -100,7 +102,7 @@ def main():
         f"m={JOB_NAME}, env={env}, datalake_bucket={datalake_bucket}, layer={layer}, "
         + f"database_base_name={database_base_name}, relative_query_path={relative_query_path}, "
         + f"table_name={table_name}, schema={schema}, tree_path={tree_path}, "
-        + f"msg=Job execution started"
+        + "msg=Job execution started"
     )
     if execution_date:
         dt_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
@@ -157,7 +159,9 @@ def main():
             table_privileges_dict, f"{database_name}.{table_name}"
         )
     else:
-        table_privileges = TablePrivileges.from_environment_default(f"{database_name}.{table_name}")
+        table_privileges = TablePrivileges.from_environment_default(
+            f"{database_name}.{table_name}"
+        )
 
     table_loader_pipeline = IncrementalTableLoaderPipeline(
         database_name=database_name,

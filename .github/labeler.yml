@@ -11,7 +11,8 @@ documentation:
 lineage:
   - "**/metadata/**/*(*.yml|*.yaml)"
 tests:
-  - "/tests/**"
+  - "**/test/**"
+  - "**/tests/**"
 
 ## Line labels
 data-atlas-db:

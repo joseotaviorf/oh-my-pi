@@ -7,10 +7,10 @@ from databricks_plugin import (
     QuintoAndarDatabricksCheckJobTaskOperator,
     QuintoAndarDatabricksExecuteJobClusterOperator,
 )
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.services.configuration_service import ConfigurationService
-
 from dags.publisher_xp.alias_classifieds_common import (
     BASE_ALIAS_CLASSIFIEDS_PARAMS,
     BASE_ALIAS_CLASSIFIEDS_PUBLISHER_PARAMS,
@@ -100,11 +100,13 @@ def _build_run_params(**context):
     if not company_uuid and not publisher_id:
         raise ValueError(
             "On-demand run requires 'company_uuid' or 'publisher_id' in dag_run.conf. "
-            "Example: {\"company_uuid\": \"<UUID>\"} or {\"publisher_id\": \"<ID>\"}"
+            'Example: {"company_uuid": "<UUID>"} or {"publisher_id": "<ID>"}'
         )
 
     alias_classifieds_params = list(BASE_ALIAS_CLASSIFIEDS_PARAMS)
-    alias_classifieds_publisher_params = list(BASE_ALIAS_CLASSIFIEDS_PUBLISHER_PARAMS) + [
+    alias_classifieds_publisher_params = list(
+        BASE_ALIAS_CLASSIFIEDS_PUBLISHER_PARAMS
+    ) + [
         f"--bootstrap_servers={kafka_bootstrap_servers}",
         f"--topic={kafka_topic}",
     ]
@@ -158,4 +160,9 @@ alias_classifieds_publisher_task = QuintoAndarDatabricksCheckJobTaskOperator(
     execution_timeout=timedelta(hours=EXECUTION_HOURS_TIMEOUT),
 )
 
-execute_job_cluster_task >> build_run_params_task >> alias_classifieds_task >> alias_classifieds_publisher_task
+(
+    execute_job_cluster_task
+    >> build_run_params_task
+    >> alias_classifieds_task
+    >> alias_classifieds_publisher_task
+)

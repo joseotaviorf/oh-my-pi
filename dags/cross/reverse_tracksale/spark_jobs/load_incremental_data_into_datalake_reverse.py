@@ -2,14 +2,14 @@ import logging
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 
-from pyspark.sql.functions import when, count, lit, col
+from pyspark.sql.functions import col, count, lit, when
 from pyspark.sql.window import Window as w
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-from bietlejuice.base.spark import SparkTableStorageFormat, SparkDataFrameService
+from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -24,7 +24,6 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
@@ -58,7 +57,9 @@ if __name__ == "__main__":
 
     # We need to drop the duplicates here the first time, because some queries might return duplicates.
     # Otherwise, is_dispatched will be True even if we have never sent them the email before.
-    df = spark_client.get_records(query).dropDuplicates(["customer_name", "customer_email"])
+    df = spark_client.get_records(query).dropDuplicates(
+        ["customer_name", "customer_email"]
+    )
 
     execution_date = datetime.strptime(execution_date, "%Y-%m-%d") + timedelta(days=1)
 
@@ -70,7 +71,7 @@ if __name__ == "__main__":
             allowMissingColumns=True,
         )
     except Exception as e:
-        logger.error("m=There's no data here yet, message_error={}".format(e))
+        logger.error(f"m=There's no data here yet, message_error={e}")
 
     df = df.withColumn(
         "is_dispatched",

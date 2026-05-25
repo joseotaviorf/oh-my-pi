@@ -1,15 +1,13 @@
-import json
 import logging
-import requests
 import time
 from argparse import ArgumentParser
+
+import requests
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.services.configuration_service import ConfigurationService
-
-from quintoandar_logger import QuintoAndarLogger
-
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_into_robbyson_api"
@@ -17,9 +15,23 @@ JOB_NAME = "load_into_robbyson_api"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-def create_results_payload(results_table_path, agent_table_path, key_join_tables_fact, key_join_tables_dim, analyst_key_column, start_date, end_date, context):
-    indicators_df = spark.sql(f"SELECT * FROM datalake_static_files_ss.robbyson_indicators WHERE context = '{context}'")
-    indicators_content = {row['id_indicator']: row['attributes'] for row in indicators_df.collect()}
+
+def create_results_payload(
+    results_table_path,
+    agent_table_path,
+    key_join_tables_fact,
+    key_join_tables_dim,
+    analyst_key_column,
+    start_date,
+    end_date,
+    context,
+):
+    indicators_df = spark.sql(
+        f"SELECT * FROM datalake_static_files_ss.robbyson_indicators WHERE context = '{context}'"
+    )
+    indicators_content = {
+        row["id_indicator"]: row["attributes"] for row in indicators_df.collect()
+    }
 
     results_df = spark.sql(f"""
         SELECT
@@ -37,26 +49,33 @@ def create_results_payload(results_table_path, agent_table_path, key_join_tables
     results_list = []
 
     for key, value in indicators_content.items():
-        columns_used, = value.values()
+        (columns_used,) = value.values()
 
         for row in results_df.collect():
             results_json = {
                 "collaboratorIdentification": row[analyst_key_column],
                 "indicadorId": int(key),
                 "resultado": 0,
-                "date": row['date'],
-                "factors": [row[column] for column in columns_used if row[column] is not None]
+                "date": row["date"],
+                "factors": [
+                    row[column] for column in columns_used if row[column] is not None
+                ],
             }
             results_list.append(results_json)
     return results_list
+
 
 def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("dag_name", help="Name of the DAG")
     parser.add_argument("environment", help="forno/prod values")
-    parser.add_argument("start_date", help="Date of the execution in the format YYYY-MM-DD")
-    parser.add_argument("end_date", help="End date of the execution in the format YYYY-MM-DD")
+    parser.add_argument(
+        "start_date", help="Date of the execution in the format YYYY-MM-DD"
+    )
+    parser.add_argument(
+        "end_date", help="End date of the execution in the format YYYY-MM-DD"
+    )
     parser.add_argument("dispatch_limits", help="Dispatch limits")
     parser.add_argument("endpoint", help="Api endpoint, where we will send the data")
     parser.add_argument("context", help="Line responsible for processing")
@@ -70,37 +89,51 @@ def parse_arguments():
 
     return vars(args)
 
-def send_payload_in_batches(api_url, endpoint, transaction_id, headers, payload, batch_size):
+
+def send_payload_in_batches(
+    api_url, endpoint, transaction_id, headers, payload, batch_size
+):
     total_batches = len(payload)
     successful_batches = 0
 
     for i in range(0, total_batches, batch_size):
-        batch = payload[i:i + batch_size]
+        batch = payload[i : i + batch_size]
         retry = 2  # Allow a resend attempt
 
         while retry > 0:
             response = requests.post(
-                f'{api_url}/{endpoint}/?transaction_id={transaction_id}',
+                f"{api_url}/{endpoint}/?transaction_id={transaction_id}",
                 headers=headers,
-                json=batch
+                json=batch,
             )
 
             if response.status_code == 200:
                 successful_batches += len(batch)
-                logger.info(f"m=Batch sent successfully. Batch_index={i // batch_size}, size={len(batch)}")
+                logger.info(
+                    f"m=Batch sent successfully. Batch_index={i // batch_size}, size={len(batch)}"
+                )
                 break
             else:
-                logger.error(f"m=Error sending batch. Retrying... Batch_index={i // batch_size}, status_code={response.status_code}")
+                logger.error(
+                    f"m=Error sending batch. Retrying... Batch_index={i // batch_size}, status_code={response.status_code}"
+                )
                 retry -= 1
                 time.sleep(1)  # 1 second delay between attempts
 
     if successful_batches != total_batches:
-        logger.error(f"m=Mismatch in batches sent. Expected={total_batches}, Sent={successful_batches}")
+        logger.error(
+            f"m=Mismatch in batches sent. Expected={total_batches}, Sent={successful_batches}"
+        )
     else:
         logger.info(f"m=All batches sent successfully. Total_batches={total_batches}")
-        response = requests.post(f'{api_url}/transactions/{transaction_id}', headers=headers)
+        response = requests.post(
+            f"{api_url}/transactions/{transaction_id}", headers=headers
+        )
         result_request = response.status_code
-        logger.info(f"m=Transaction completed successfully, transaction_status={result_request}")
+        logger.info(
+            f"m=Transaction completed successfully, transaction_status={result_request}"
+        )
+
 
 def main():
     job_arguments_dict = parse_arguments()
@@ -120,11 +153,13 @@ def main():
         "accept": "application/json",
     }
 
-    transaction_response = requests.post(f'{api_url}/transactions/', headers=headers)
+    transaction_response = requests.post(f"{api_url}/transactions/", headers=headers)
 
     if transaction_response.status_code == 200:
-        transaction_id = transaction_response.json()['data']['_id']
-        logger.info(f"m=Transaction started successfully, transaction_id={transaction_id}")
+        transaction_id = transaction_response.json()["data"]["_id"]
+        logger.info(
+            f"m=Transaction started successfully, transaction_id={transaction_id}"
+        )
     else:
         logger.error("m=Failed to start transaction.")
         raise SystemExit("Transaction setup failed.")
@@ -137,10 +172,19 @@ def main():
         job_arguments_dict["analyst_key_column"],
         job_arguments_dict["start_date"],
         job_arguments_dict["end_date"],
-        job_arguments_dict["context"])
+        job_arguments_dict["context"],
+    )
 
     dispatch_limits = int(job_arguments_dict["dispatch_limits"])
-    send_payload_in_batches(api_url, job_arguments_dict["endpoint"], transaction_id, headers, results_payload, dispatch_limits)
+    send_payload_in_batches(
+        api_url,
+        job_arguments_dict["endpoint"],
+        transaction_id,
+        headers,
+        results_payload,
+        dispatch_limits,
+    )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

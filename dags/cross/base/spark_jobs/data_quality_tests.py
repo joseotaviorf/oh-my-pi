@@ -1,5 +1,5 @@
-import logging
 import json
+import logging
 from argparse import ArgumentParser, Namespace
 
 from quintoandar_logger import QuintoAndarLogger
@@ -9,7 +9,6 @@ from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.pipeline.data_quality_tests_pipeline import DataQualityTestsPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
-
 
 JOB_NAME = "data_quality_tests"
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -103,7 +102,9 @@ def publish_data_quality_request_to_kafka(args: Namespace) -> None:
         raise
 
 
-def publish_message(message: str, topic: str, broker: str, key: str, secret: str) -> None:
+def publish_message(
+    message: str, topic: str, broker: str, key: str, secret: str
+) -> None:
     """
     Publishes a message to a Kafka topic using Spark's Kafka integration.
 
@@ -114,7 +115,7 @@ def publish_message(message: str, topic: str, broker: str, key: str, secret: str
     df = spark.createDataFrame([(message,)], ["value"])
 
     jaas_config = (
-        f'org.apache.kafka.common.security.plain.PlainLoginModule required '
+        f"org.apache.kafka.common.security.plain.PlainLoginModule required "
         f'username="{key}" password="{secret}";'
     )
 
@@ -134,7 +135,9 @@ def publish_message(message: str, topic: str, broker: str, key: str, secret: str
 def main() -> None:
     global spark
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
 
         spark = create_emr_spark_session(JOB_NAME)
 

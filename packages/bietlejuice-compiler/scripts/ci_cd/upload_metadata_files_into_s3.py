@@ -1,11 +1,11 @@
+import argparse
+import json
 import os
 import sys
-import argparse
-from typing import List, Dict
+from typing import Dict, List
 
 import boto3
 import requests
-import json
 import yaml
 
 _COMPILER_ROOT = os.path.dirname(
@@ -157,7 +157,7 @@ def metric_qualculation_method(metric_path: str) -> str:
             f"common_base = {common_base}, base_path = {base_path}, safe_path = {safe_path}"
         )
         raise ValueError("Invalid commom path")
-    with open(sql_file_path, "r") as sql_file:
+    with open(sql_file_path) as sql_file:
         return json.dumps(sql_file.read())
 
 
@@ -174,7 +174,7 @@ def generate_metric_payload(file_info: MetadataFileInfo) -> List[Dict]:
         "observations",
     ]
 
-    with open(file_info.local_path, "r") as metric_file:
+    with open(file_info.local_path) as metric_file:
         metric_data = yaml.safe_load(metric_file)
 
     payload = []

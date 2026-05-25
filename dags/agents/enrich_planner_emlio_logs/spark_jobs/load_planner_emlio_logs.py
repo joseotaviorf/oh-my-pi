@@ -5,6 +5,7 @@
 
 # DBTITLE 1,Imports
 import json as _json
+import re as _re
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass, field
 from datetime import date, timedelta
@@ -23,6 +24,7 @@ from pyspark.sql.types import (
     StructType,
     TimestampType,
 )
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -30,8 +32,6 @@ from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from quintoandar_logger import QuintoAndarLogger
 
 # COMMAND ----------
 
@@ -54,7 +54,7 @@ print(
     "│                                                                 │\n"
     "│    export JAVA_HOME=<path-to-jdk-11>                            │\n"
     "│    PYTHONPATH=. /path/to/python3.9 -m pytest \\                 │\n"
-    "│      tests/dags/agents/enrich_planner_emlio_logs/ -v            │\n"
+    "│  packages/bietlejuice-runtime/test/dags/agents/enrich_planner_emlio_logs/ -v │\n"
     "│                                                                 │\n"
     "└─────────────────────────────────────────────────────────────────┘\n"
 )
@@ -62,8 +62,6 @@ print(
 # COMMAND ----------
 
 # DBTITLE 1,Argument Parsing
-import re as _re
-
 _SAFE_IDENTIFIER_RE = _re.compile(r"^[a-zA-Z0-9_.]+$")
 
 
@@ -82,11 +80,31 @@ def _sql_identifier(value: str) -> str:
 ARG_SPEC = [
     ("env", str, "forno", "Environment: forno/prod"),
     ("datalake_bucket", str, "5a-datalake-prod", "Datalake bucket"),
-    ("database_base_name", _sql_identifier, "curated_agents_planner", "Base name for the target schema"),
-    ("dag_name", str, "enrich_planner_emlio_logs", "DAG name (for alignment with Airflow)"),
+    (
+        "database_base_name",
+        _sql_identifier,
+        "curated_agents_planner",
+        "Base name for the target schema",
+    ),
+    (
+        "dag_name",
+        str,
+        "enrich_planner_emlio_logs",
+        "DAG name (for alignment with Airflow)",
+    ),
     ("table_name", _sql_identifier, "planner_emlio_logs", "Target enrich table name"),
-    ("load_start_date", str, lambda: (date.today() - timedelta(days=1)).isoformat(), "Inclusive start date, format %Y-%m-%d"),
-    ("load_end_date", str, lambda: date.today().isoformat(), "Inclusive end date, format %Y-%m-%d"),
+    (
+        "load_start_date",
+        str,
+        lambda: (date.today() - timedelta(days=1)).isoformat(),
+        "Inclusive start date, format %Y-%m-%d",
+    ),
+    (
+        "load_end_date",
+        str,
+        lambda: date.today().isoformat(),
+        "Inclusive end date, format %Y-%m-%d",
+    ),
     ("run_mode", str, "dev", "Run mode: prod/dev"),
 ]
 
@@ -99,7 +117,9 @@ def parse_args() -> Namespace:
     """Parse CLI args with notebook-safe defaults (parse_known_args ignores kernel flags)."""
     parser = ArgumentParser(description=JOB_NAME)
     for (name, type_, _default, help_text), default_val in zip(ARG_SPEC, _defaults()):
-        parser.add_argument(name, nargs="?", type=type_, default=default_val, help=help_text)
+        parser.add_argument(
+            name, nargs="?", type=type_, default=default_val, help=help_text
+        )
     namespace, _ = parser.parse_known_args()
     return namespace
 
@@ -107,6 +127,7 @@ def parse_args() -> Namespace:
 # COMMAND ----------
 
 # DBTITLE 1,JSON Extraction Helpers
+
 
 # get_json_object only accepts a literal string as the path argument — it cannot
 # accept a Column expression. We therefore extract each envelope JSON string once
@@ -151,9 +172,7 @@ def _nested_response_observability_json_path(relative_path: str) -> F.Column:
         raise ValueError(f"Invalid observability JSON relative_path: {relative_path!r}")
     escaped = relative_path.replace("'", "''")
     return F.expr(
-        "get_json_object(outputs, concat('$.', response_type, '.observability_data.', '{}'))".format(
-            escaped
-        )
+        f"get_json_object(outputs, concat('$.', response_type, '.observability_data.', '{escaped}'))"
     )
 
 
@@ -185,14 +204,26 @@ def _build_payload_envelope(df: DataFrame) -> DataFrame:
     return (
         df.withColumn("payload_type", F.element_at(F.map_keys(payload_map_input), 1))
         .withColumn("response_type", F.element_at(F.map_keys(payload_map_response), 1))
-        .withColumn("observability_type", F.element_at(F.map_keys(payload_map_observability), 1))
-        .withColumn("_input_envelope_json", _envelope_json(F.col("inputs"), F.col("payload_type")))
-        .withColumn("_response_envelope_json", _envelope_json(F.col("outputs"), F.col("response_type")))
-        .withColumn("_observability_envelope_json", _envelope_json(F.col("outputs"), F.col("observability_type")))
+        .withColumn(
+            "observability_type", F.element_at(F.map_keys(payload_map_observability), 1)
+        )
+        .withColumn(
+            "_input_envelope_json",
+            _envelope_json(F.col("inputs"), F.col("payload_type")),
+        )
+        .withColumn(
+            "_response_envelope_json",
+            _envelope_json(F.col("outputs"), F.col("response_type")),
+        )
+        .withColumn(
+            "_observability_envelope_json",
+            _envelope_json(F.col("outputs"), F.col("observability_type")),
+        )
     )
 
 
 # COMMAND ----------
+
 
 # DBTITLE 1,Field Specs
 @dataclass(frozen=True)
@@ -349,6 +380,7 @@ def _extract_observability_derived(df: DataFrame) -> DataFrame:
 
 # COMMAND ----------
 
+
 # DBTITLE 1,Deduplication & Build
 def _deduplicate(df: DataFrame) -> DataFrame:
     """Keep one row per (uuid, ts_log). When a log appears in multiple partitions,
@@ -453,7 +485,9 @@ def _schema_mismatches(actual: StructType, expected: StructType) -> list:
             return f"column '{name}': expected {expected_type}, got {actual_type}"
         return None
 
-    return list(filter(None, (_msg(n) for n in actual_by_name.keys() | expected_by_name.keys())))
+    return list(
+        filter(None, (_msg(n) for n in actual_by_name.keys() | expected_by_name.keys()))
+    )
 
 
 def validate_before_write(df: DataFrame) -> int:
@@ -464,11 +498,14 @@ def validate_before_write(df: DataFrame) -> int:
     mismatches = _schema_mismatches(df.schema, EXPECTED_SCHEMA)
     if mismatches:
         raise ValueError(f"Schema mismatch — {'; '.join(mismatches)}.")
-    logger.info(f"m=validate_before_write, rows={row_count:,}, msg=Pre-write checks passed")
+    logger.info(
+        f"m=validate_before_write, rows={row_count:,}, msg=Pre-write checks passed"
+    )
     return row_count
 
 
 # COMMAND ----------
+
 
 # DBTITLE 1,Persistence
 def _save_to_enrich(
@@ -537,6 +574,7 @@ def save_df(
 
 
 # COMMAND ----------
+
 
 # DBTITLE 1,Entry Point
 def main(args: Optional[Namespace] = None) -> None:

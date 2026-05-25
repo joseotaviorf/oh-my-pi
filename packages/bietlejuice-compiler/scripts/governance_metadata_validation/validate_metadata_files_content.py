@@ -5,18 +5,17 @@ from pathlib import Path
 import yaml
 from yamale import YamaleError
 
-from scripts.services.metadata_file_service import (
-    MetadataFileService,
-    ReverseMetadataFileException,
-    MetricValidateLayerException,
-)
-
 from scripts.ci_cd.domain_cli import (
     branch_name_arg_type,
     domain_arg_type,
     repo_relative_file_arg_type,
 )
 from scripts.services.git_service import GitService
+from scripts.services.metadata_file_service import (
+    MetadataFileService,
+    MetricValidateLayerException,
+    ReverseMetadataFileException,
+)
 
 with open(f"{Path(__file__).parent}/skip_list.yml") as f:
     SKIP_LIST = yaml.safe_load(f)["metadata_files_out_of_pattern"]
@@ -24,7 +23,7 @@ with open(f"{Path(__file__).parent}/skip_list.yml") as f:
 metadata_file_service = MetadataFileService()
 
 
-SKIP_LIST_PATH_REGEX = re.compile(rf"(?:.*/)?dags/(?P<path>.*)")
+SKIP_LIST_PATH_REGEX = re.compile(r"(?:.*/)?dags/(?P<path>.*)")
 
 
 def _sanitized_domain(value):
@@ -99,6 +98,7 @@ def get_metadata_file_paths(mode, input, domain=None):
         git_service = GitService()
         if not input:
             import subprocess
+
             input = subprocess.check_output(
                 ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
             ).strip()
@@ -124,12 +124,12 @@ def get_metadata_file_paths(mode, input, domain=None):
 def output_results(results, verbose):
     print(f"Validated {len(results['passed']) + len(results['failed'])} files\n")
     if results["passed"]:
-        print(f"Files that passed the validation:")
+        print("Files that passed the validation:")
         for result in results["passed"]:
             print(f"{result}")
         print()
     if results["failed"]:
-        print(f"Files that failed the validation:")
+        print("Files that failed the validation:")
         for result in results["failed"]:
             print(f"{result}")
         print()

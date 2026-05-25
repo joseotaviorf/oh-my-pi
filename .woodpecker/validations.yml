@@ -1,31 +1,6 @@
-# Path filters use Woodpecker `when.path` with `event: [push, pull_request]`.
-#
-# The pull_request event is critical for correctness: Woodpecker evaluates
-# when.path against the full PR diff (via GitHub PullRequests.ListFiles API),
-# not just the last pushed commit. Without it, a trivial final commit (e.g.
-# touching only pyproject.toml) would skip all validation steps even when
-# earlier commits in the PR changed DAGs or Python modules.
-#
-# Domain-level parallelisation is handled dynamically by
-# packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py (the "runner").
-# For each validation step the runner compares the branch against master to find which
-# domains changed, then invokes `make <target> domain=<d>` for every affected domain
-# in parallel (ThreadPoolExecutor).
-#
-# Change-detection rules applied by the runner:
-#   - All changed files are under dags/{known_domain}/ -> validate only those domains.
-#   - Any changed file is outside a known domain folder -> validate ALL domains
-#     (framework / shared-file change that may affect every domain).
-#
-# Diff base by branch type:
-#   - master, forno, hotfix/* -> HEAD~1..HEAD (only the current push commit)
-#   - feature branches        -> origin/master..HEAD (all changes since branching)
-#
-# Adding a new domain: update ALL_DOMAINS in
-# packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py.
-# No YAML change needed.
-#
-# Locally callable: make validate-<step> domain=for_rent
+# Validations use when.path so steps run only when relevant files change.
+# pull_request evaluates the full PR diff; push uses the commit diff.
+
 clone:
   - name: clone
     image: woodpeckerci/plugin-git
@@ -37,16 +12,9 @@ steps:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
     commands:
-      # The image ships a pre-built workspace venv at /opt/bietlejuice/venvs/workspace
-      # (UV_PROJECT_ENVIRONMENT default). This re-links editable packages from the
-      # checked-out workspace and installs any new deps introduced by this PR (~1-2s).
       - uv sync
     when:
       event: [push, pull_request]
-
-  # ---------------------------------------------------------------------------
-  # Domain-fanning steps — runner detects changed domains and parallelises
-  # ---------------------------------------------------------------------------
 
   validate-dag-declaration-files:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
@@ -57,11 +25,11 @@ steps:
       event: [push, pull_request]
       path:
         include:
-          - 'dags/**/*.yml'
-          - 'packages/bietlejuice-airflow/src/bietlejuice/base/airflow/dag_builders/**/*.py'
-          - 'packages/bietlejuice-core/src/bietlejuice/base/airflow/dag_builders/**/*.py'
-          - 'packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/**/*.py'
-          - 'packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py'
+          - "dags/**/*.yml"
+          - "packages/bietlejuice-airflow/src/bietlejuice/base/airflow/dag_builders/**/*.py"
+          - "packages/bietlejuice-core/src/bietlejuice/base/airflow/dag_builders/**/*.py"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/**/*.py"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
         on_empty: false
     depends_on: [setup]
 
@@ -74,11 +42,11 @@ steps:
       event: [push, pull_request]
       path:
         include:
-          - 'dags/**/*'
-          - 'packages/bietlejuice-compiler/scripts/dag_standard_validation/**'
-          - 'packages/bietlejuice-airflow/src/bietlejuice/base/airflow/dag_builders/**/*.py'
-          - 'packages/bietlejuice-core/src/bietlejuice/base/airflow/dag_builders/**/*.py'
-          - 'packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py'
+          - "dags/**/*"
+          - "packages/bietlejuice-compiler/scripts/dag_standard_validation/**"
+          - "packages/bietlejuice-airflow/src/bietlejuice/base/airflow/dag_builders/**/*.py"
+          - "packages/bietlejuice-core/src/bietlejuice/base/airflow/dag_builders/**/*.py"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
         on_empty: false
     depends_on: [setup]
 
@@ -93,9 +61,9 @@ steps:
         exclude: [forno, hotfix/*]
       path:
         include:
-          - 'dags/**/*.yml'
-          - 'packages/bietlejuice-compiler/scripts/governance_metadata_validation/**'
-          - 'packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py'
+          - "dags/**/*.yml"
+          - "packages/bietlejuice-compiler/scripts/governance_metadata_validation/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
         on_empty: false
     depends_on: [setup]
 
@@ -110,9 +78,9 @@ steps:
         exclude: [forno, hotfix/*]
       path:
         include:
-          - 'dags/**/*.sql'
-          - 'packages/bietlejuice-compiler/scripts/governance_metadata_validation/**'
-          - 'packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py'
+          - "dags/**/*.sql"
+          - "packages/bietlejuice-compiler/scripts/governance_metadata_validation/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
         on_empty: false
     depends_on: [setup]
 
@@ -127,10 +95,10 @@ steps:
         exclude: [forno, hotfix/*]
       path:
         include:
-          - 'dags/**/*.sql'
-          - 'dags/**/*.yml'
-          - 'packages/bietlejuice-compiler/scripts/governance_metadata_validation/**'
-          - 'packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py'
+          - "dags/**/*.sql"
+          - "dags/**/*.yml"
+          - "packages/bietlejuice-compiler/scripts/governance_metadata_validation/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
         on_empty: false
     depends_on: [setup]
 
@@ -143,9 +111,9 @@ steps:
       event: [push, pull_request]
       path:
         include:
-          - 'dags/**/*'
-          - 'packages/bietlejuice-compiler/scripts/ci_cd/source_layer_validation/**'
-          - 'packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py'
+          - "dags/**/*"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/source_layer_validation/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
         on_empty: false
     depends_on: [setup]
 
@@ -169,14 +137,14 @@ steps:
           - hotfix/*
       path: &validate_dags_dependencies_paths
         include:
-          - 'dags/**/*'
-          - 'packages/bietlejuice-core/src/bietlejuice/base/dependencies/**/*.py'
-          - 'packages/bietlejuice-airflow/src/bietlejuice/base/airflow/**/*.py'
-          - 'packages/bietlejuice-core/src/bietlejuice/base/airflow/**/*.py'
-          - 'packages/bietlejuice-runtime/src/bietlejuice/base/db/**/*.py'
-          - 'packages/bietlejuice-compiler/scripts/ci_cd/validate_dags_dependencies.py'
-          - 'packages/bietlejuice-compiler/scripts/dependency_handling/**'
-          - 'packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py'
+          - "dags/**/*"
+          - "packages/bietlejuice-core/src/bietlejuice/base/dependencies/**/*.py"
+          - "packages/bietlejuice-airflow/src/bietlejuice/base/airflow/**/*.py"
+          - "packages/bietlejuice-core/src/bietlejuice/base/airflow/**/*.py"
+          - "packages/bietlejuice-runtime/src/bietlejuice/base/db/**/*.py"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/validate_dags_dependencies.py"
+          - "packages/bietlejuice-compiler/scripts/dependency_handling/**"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
         on_empty: false
     depends_on: [setup]
 
@@ -192,10 +160,6 @@ steps:
       path: *validate_dags_dependencies_paths
     depends_on: [setup]
 
-  # ---------------------------------------------------------------------------
-  # Global steps — not domain-scoped
-  # ---------------------------------------------------------------------------
-
   validate-dependency-file-correctness:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
@@ -205,14 +169,14 @@ steps:
       event: [push, pull_request]
       path:
         include:
-          - 'dags/dependencies.yaml'
-          - 'dags/**/*'
-          - 'packages/bietlejuice-core/src/bietlejuice/base/dependencies/**/*.py'
-          - 'packages/bietlejuice-airflow/src/bietlejuice/base/airflow/**/*.py'
-          - 'packages/bietlejuice-core/src/bietlejuice/base/airflow/**/*.py'
-          - 'packages/bietlejuice-runtime/src/bietlejuice/base/db/**/*.py'
-          - 'packages/bietlejuice-compiler/scripts/ci_cd/validate_dags_dependencies.py'
-          - 'packages/bietlejuice-compiler/scripts/dependency_handling/**'
+          - "dags/dependencies.yaml"
+          - "dags/**/*"
+          - "packages/bietlejuice-core/src/bietlejuice/base/dependencies/**/*.py"
+          - "packages/bietlejuice-airflow/src/bietlejuice/base/airflow/**/*.py"
+          - "packages/bietlejuice-core/src/bietlejuice/base/airflow/**/*.py"
+          - "packages/bietlejuice-runtime/src/bietlejuice/base/db/**/*.py"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/validate_dags_dependencies.py"
+          - "packages/bietlejuice-compiler/scripts/dependency_handling/**"
         on_empty: false
     depends_on: [setup]
 
@@ -225,8 +189,8 @@ steps:
       event: [push, pull_request]
       path:
         include:
-          - 'dags/core/**/*'
-          - 'packages/bietlejuice-compiler/scripts/ci_cd/validate_core_model_schemas.py'
+          - "dags/core/**/*"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/validate_core_model_schemas.py"
         on_empty: false
     depends_on: [setup]
 
@@ -239,10 +203,10 @@ steps:
       event: [push, pull_request]
       path:
         include:
-          - 'dags/core/**/*'
-          - 'packages/bietlejuice-compiler/scripts/ci_cd/validate_core_model_schema_content.py'
-          - 'packages/bietlejuice-runtime/src/bietlejuice/base/core_models/**/*.py'
-          - 'packages/bietlejuice-airflow/src/bietlejuice/base/core_models/**/*.py'
-          - 'packages/bietlejuice-core/src/bietlejuice/base/core_models/**/*.py'
+          - "dags/core/**/*"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/validate_core_model_schema_content.py"
+          - "packages/bietlejuice-runtime/src/bietlejuice/base/core_models/**/*.py"
+          - "packages/bietlejuice-airflow/src/bietlejuice/base/core_models/**/*.py"
+          - "packages/bietlejuice-core/src/bietlejuice/base/core_models/**/*.py"
         on_empty: false
     depends_on: [setup]

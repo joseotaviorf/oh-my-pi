@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Build a registry mapping clean source column FQNs to Core Model output columns.
 

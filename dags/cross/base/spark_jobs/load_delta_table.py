@@ -1,17 +1,16 @@
-import logging
 import json
+import logging
 from argparse import ArgumentParser, Namespace
 from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.databricks.row_filter import RowFilter
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 from bietlejuice.pipeline.delta_table_loader_pipeline import DeltaTableLoaderPipeline
-from bietlejuice.base.databricks.row_filter import RowFilter
-
 
 JOB_NAME = "load_delta_table"
 
@@ -22,7 +21,9 @@ logger = QuintoAndarLogger(JOB_NAME)
 def main():
     global spark
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
 
         spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
@@ -51,18 +52,26 @@ def main():
 
     query_template_params = get_query_template_params(
         execution_date=args.execution_date,
-        additional_query_template_params=json.loads(args.additional_query_template_params),
+        additional_query_template_params=json.loads(
+            args.additional_query_template_params
+        ),
     )
 
-    spark_ms = SparkMetastoreHelper(args.bucket, args.layer, args.database_base_name, args.table_name, all_tables=False)
+    spark_ms = SparkMetastoreHelper(
+        args.bucket,
+        args.layer,
+        args.database_base_name,
+        args.table_name,
+        all_tables=False,
+    )
     database_name = spark_ms.spark_database_name
-    database_location = spark_ms.database_location.replace("s3a://", "s3://")  # Seems to be faster
+    database_location = spark_ms.database_location.replace(
+        "s3a://", "s3://"
+    )  # Seems to be faster
     full_table_name = f"{database_name}.{args.table_name}"
 
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
-        dag_name=args.relative_query_path,
-        layer=args.layer,
-        table_name=args.table_name
+        dag_name=args.relative_query_path, layer=args.layer, table_name=args.table_name
     )
 
     if table_privileges_dict is not None:
@@ -85,14 +94,20 @@ def main():
         spark_session_configs=json.loads(args.spark_session_configs),
         merge_schema=(args.extraction_type == "incremental"),
         merge_on=merge_on,
-        when_not_matched_insert_condition=json.loads(args.when_not_matched_insert_condition),
+        when_not_matched_insert_condition=json.loads(
+            args.when_not_matched_insert_condition
+        ),
         when_matched_update_condition=json.loads(args.when_matched_update_condition),
         when_matched_delete_condition=json.loads(args.when_matched_delete_condition),
-        when_not_matched_by_source_delete_condition=json.loads(args.when_not_matched_by_source_delete_condition),
+        when_not_matched_by_source_delete_condition=json.loads(
+            args.when_not_matched_by_source_delete_condition
+        ),
         when_matched_operation=json.loads(args.when_matched_operation),
         when_not_matched_operation=json.loads(args.when_not_matched_operation),
         table_privileges=table_privileges,
-        table_properties=json.loads(args.table_properties) if args.table_properties else None,
+        table_properties=json.loads(args.table_properties)
+        if args.table_properties
+        else None,
         column_mapping_mode=column_mapping_mode,
         spark=spark,
     )
@@ -122,8 +137,12 @@ def parse_arguments() -> Namespace:
         help="relative query path for sql file to create table",
     )
     parser.add_argument("table_name", type=str, help="table name that will be created")
-    parser.add_argument("partitions", type=str, help="JSON string with list of partitions")
-    parser.add_argument("execution_date", type=str, help="execution date in format YYYY-MM-DD")
+    parser.add_argument(
+        "partitions", type=str, help="JSON string with list of partitions"
+    )
+    parser.add_argument(
+        "execution_date", type=str, help="execution date in format YYYY-MM-DD"
+    )
     parser.add_argument("extraction_type", type=str, help="full/incremental")
     parser.add_argument(
         "spark_session_configs",
@@ -223,7 +242,9 @@ def parse_arguments() -> Namespace:
     return parser.parse_args()
 
 
-def get_query_template_params(execution_date: str, additional_query_template_params: dict) -> dict:
+def get_query_template_params(
+    execution_date: str, additional_query_template_params: dict
+) -> dict:
     dt_datetime = datetime.strptime(execution_date, "%Y-%m-%d")
     query_template_params = {
         "year": dt_datetime.year,

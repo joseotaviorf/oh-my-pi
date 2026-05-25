@@ -1,6 +1,6 @@
 import ast
 
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import (
     col,
     dayofmonth,
@@ -9,8 +9,8 @@ from pyspark.sql.functions import (
     year,
 )
 
-from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
 from bietlejuice.pipeline.dataframe_delta_table_loader_pipeline import (
     DataFrameDeltaTableLoaderPipeline,
 )
@@ -105,9 +105,7 @@ class CoreBrokersBaseSparkJob(BaseCoreModelSparkJob):
         )
 
         table_privileges = self.setup_table_privileges(args)
-        database_location = (
-            f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
-        )
+        database_location = f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
 
         self.logger.info(
             f"m=_run_pipeline_with_config, "

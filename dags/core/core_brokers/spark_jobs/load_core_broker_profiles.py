@@ -1,4 +1,4 @@
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import col, current_timestamp, lit, when
 
 from bietlejuice.base.core_models.core_brokers_base import CoreBrokersBaseSparkJob
@@ -32,16 +32,14 @@ class CoreBrokerProfilesSparkJob(CoreBrokersBaseSparkJob):
         filtered_mp = member_profile_df.filter(col("id_product").isin(27, 30)).alias(
             "mp"
         )
-        joined = (
-            filtered_mp.join(
-                profile_df.alias("pf"),
-                col("mp.id_profile") == col("pf.id"),
-                "left",
-            ).join(
-                product_df.alias("pd"),
-                col("mp.id_product") == col("pd.id"),
-                "left",
-            )
+        joined = filtered_mp.join(
+            profile_df.alias("pf"),
+            col("mp.id_profile") == col("pf.id"),
+            "left",
+        ).join(
+            product_df.alias("pd"),
+            col("mp.id_product") == col("pd.id"),
+            "left",
         )
 
         return joined.select(

@@ -1,14 +1,13 @@
 from argparse import ArgumentParser
 
-from pyspark.sql import DataFrame, functions as F
+from pyspark.sql import functions as F
 from pyspark.sql.window import Window
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_house_suggestion_changes"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -48,10 +47,8 @@ CHANGE_COLUMNS = [
     "suggested_upper_bound_price",
 ]
 
-HOUSE_WINDOW = (
-    Window
-    .partitionBy("id_house", "business_context")
-    .orderBy("ts_updated", "id_cdc_transaction")
+HOUSE_WINDOW = Window.partitionBy("id_house", "business_context").orderBy(
+    "ts_updated", "id_cdc_transaction"
 )
 
 
@@ -60,8 +57,9 @@ def _get_candidates(start_date, end_date):
     return (
         spark.table(SOURCE_TABLE)
         .filter(
-            F.make_date(F.col("year"), F.col("month"), F.col("day"))
-            .between(start_date, end_date)
+            F.make_date(F.col("year"), F.col("month"), F.col("day")).between(
+                start_date, end_date
+            )
         )
         .select("id_house", "business_context")
         .distinct()
@@ -81,8 +79,7 @@ def _build_all_changes(candidates):
     change_hash = F.xxhash64(*[F.col(c) for c in CHANGE_COLUMNS])
 
     return (
-        history
-        .withColumn("_hash", change_hash)
+        history.withColumn("_hash", change_hash)
         .withColumn("_prev_hash", F.lag("_hash").over(HOUSE_WINDOW))
         .filter(
             (F.col("_prev_hash").isNull())  # first record per house
@@ -95,10 +92,10 @@ def _build_all_changes(candidates):
 def _get_affected_houses(all_changes, start_date, end_date):
     """Subset of houses whose real changes fall within the load window."""
     return (
-        all_changes
-        .filter(
-            F.make_date(F.col("year"), F.col("month"), F.col("day"))
-            .between(start_date, end_date)
+        all_changes.filter(
+            F.make_date(F.col("year"), F.col("month"), F.col("day")).between(
+                start_date, end_date
+            )
         )
         .select("id_house", "business_context")
         .distinct()
@@ -107,23 +104,30 @@ def _get_affected_houses(all_changes, start_date, end_date):
 
 def _apply_window_columns(changes_df):
     """Add change_number, suggestion time boundaries, and surrogate key."""
-    window_by_house_day = (
-        Window
-        .partitionBy("id_house", "business_context", F.to_date("ts_updated"))
-        .orderBy("ts_updated", "id_cdc_transaction")
-    )
+    window_by_house_day = Window.partitionBy(
+        "id_house", "business_context", F.to_date("ts_updated")
+    ).orderBy("ts_updated", "id_cdc_transaction")
 
     return (
-        changes_df
-        .withColumn("change_number", F.row_number().over(HOUSE_WINDOW))
+        changes_df.withColumn("change_number", F.row_number().over(HOUSE_WINDOW))
         .withColumn("ts_suggestion_ended", F.lead("ts_updated").over(HOUSE_WINDOW))
         .withColumn("_ts_next_same_day", F.lead("ts_updated").over(window_by_house_day))
         .withColumn("is_last_suggestion", F.col("ts_suggestion_ended").isNull())
         .withColumn("is_last_suggestion_of_day", F.col("_ts_next_same_day").isNull())
-        .withColumn("id_suggestion_change", F.abs(F.xxhash64(F.col("id"), F.col("id_cdc_transaction"))))
+        .withColumn(
+            "id_suggestion_change",
+            F.abs(F.xxhash64(F.col("id"), F.col("id_cdc_transaction"))),
+        )
         .withColumnRenamed("id", "id_house_suggestion")
         .withColumnRenamed("ts_updated", "ts_suggestion_started")
-        .drop("id_cdc_transaction", "ts_cdc_transaction", "year", "month", "day", "_ts_next_same_day")
+        .drop(
+            "id_cdc_transaction",
+            "ts_cdc_transaction",
+            "year",
+            "month",
+            "day",
+            "_ts_next_same_day",
+        )
         .select(
             "id_suggestion_change",
             "id_house_suggestion",
@@ -216,8 +220,7 @@ if __name__ == "__main__":
                 database_name, args.table_name
             )
             logger.info(
-                f"m=__main__, table={full_table_name}, "
-                f"msg=Load completed successfully"
+                f"m=__main__, table={full_table_name}, msg=Load completed successfully"
             )
     finally:
         all_changes.unpersist()

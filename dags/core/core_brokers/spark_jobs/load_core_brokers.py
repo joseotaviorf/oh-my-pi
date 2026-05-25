@@ -1,32 +1,32 @@
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import (
     col,
     current_timestamp,
     last,
     lit,
-    max as spark_max,
     regexp_replace,
     translate,
     when,
+)
+from pyspark.sql.functions import (
+    max as spark_max,
 )
 
 from bietlejuice.base.core_models.core_brokers_base import (
     CoreBrokersBaseSparkJob,
 )
 
-_BROKER_STRING_TAG_ACCENT_FROM = (
-    "áàâãäéèêëíìîïóòôõöúùûüçÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇ"
-)
-_BROKER_STRING_TAG_ACCENT_TO = (
-    "aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC"
-)
+_BROKER_STRING_TAG_ACCENT_FROM = "áàâãäéèêëíìîïóòôõöúùûüçÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇ"
+_BROKER_STRING_TAG_ACCENT_TO = "aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC"
 
 
 def _broker_string_tag(column):
     """Remove accents and whitespace; preserve letter case; NULL in yields NULL out."""
     return when(column.isNull(), lit(None).cast("string")).otherwise(
         regexp_replace(
-            translate(column, _BROKER_STRING_TAG_ACCENT_FROM, _BROKER_STRING_TAG_ACCENT_TO),
+            translate(
+                column, _BROKER_STRING_TAG_ACCENT_FROM, _BROKER_STRING_TAG_ACCENT_TO
+            ),
             r"\s+",
             "",
         )

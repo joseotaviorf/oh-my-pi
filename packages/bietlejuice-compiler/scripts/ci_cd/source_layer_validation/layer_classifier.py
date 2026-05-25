@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Map metastore schema names to logical data layers.
 

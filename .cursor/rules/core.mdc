@@ -129,7 +129,7 @@ cluster:
 
 - **`bietlejuice/`** — Python package: `base/airflow/dag_builders/` (~28 workflow types), `base/spark/` (`BaseCoreModelSparkJob`), `qube/jobs/` (Qube Spark jobs), `services/configuration_service.py` (env-aware config).
 - **`dags/{domain}/{dag_name}/`** — every DAG has `{dag_name}_declaration.yml`, `queries/{layer}/*.sql`, `metadata/{layer}/*.yml` (CI-enforced), and optionally `data_quality/{layer}/*.yml` and `spark_jobs/` (core-model DAGs).
-- **`tests/unit/`** — mirrors `bietlejuice/` paths.
+- **`packages/*/test/`** — unit tests mirror each package’s `src/bietlejuice/` tree (`test/unit/…`). DAG Spark jobs: `packages/bietlejuice-runtime/test/dags/…`; core models: `packages/bietlejuice-runtime/test/core_model_dags/…`; Airflow DAG modules under `dags/`: `packages/bietlejuice-airflow/test/unit/dags/…`.
 
 **24 business domains**: `core`, `for_rent`, `for_sale`, `fintech`, `agents`, `growth`, `people`, `platform`, `qcx`, `3p_partners`, `cross`, `ds_pricing`, `governance`, `mlops`, `qube`, `support_and_service`, `tech_platform`, and others.
 
@@ -198,7 +198,7 @@ Never mix bracket params (`{load_start_date}`) with Jinja expressions (`{{ ds }}
 | Rule file | Covers | Glob trigger |
 |---|---|---|
 | `sql_conventions.mdc` | SQL style, no `SELECT *`, partition filters, PII/Person Data Model | `**/*.sql` |
-| `testing_conventions.mdc` | TDD Red→Green→Refactor, Pattern A (Qube) vs Pattern B (pytest) | `tests/**` |
+| `testing_conventions.mdc` | TDD Red→Green→Refactor, Pattern A (Qube) vs Pattern B (pytest) | `packages/**/test/**` |
 | `governance_metadata.mdc` | Metadata YAML schema, LGPD/PII classification | `**/metadata/**/*.yml` |
 | `dag_build.mdc` | Full DAG Builder reference: all cluster presets, complete workflow parameter schemas | — |
 | `databricks_conventions.mdc` | Databricks-specific SQL: Delta syntax, `{bracket}` vs `{{ Jinja }}` templating | — |

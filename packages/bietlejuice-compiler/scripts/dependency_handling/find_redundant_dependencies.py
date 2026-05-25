@@ -1,7 +1,7 @@
 import argparse
-from csv import DictWriter
 import os
 import sys
+from csv import DictWriter
 
 BI_ETL_EJUICE_ROOT = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

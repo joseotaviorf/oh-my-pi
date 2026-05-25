@@ -1,27 +1,24 @@
-import logging
 import ast
-
+import logging
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 from functools import reduce
 
-from pyspark.sql.functions import input_file_name, regexp_extract, to_json, struct
-
+from pyspark.sql.functions import input_file_name, regexp_extract, struct, to_json
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
-    SparkTableStorageFormat,
-    SparkDataFrameService,
     BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
     spark,
 )
-
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_inmetro_raw"
 
@@ -33,12 +30,16 @@ def _generate_date_range(start_date_str, end_date_str):
     start = datetime.strptime(start_date_str, "%Y-%m-%d")
     end = datetime.strptime(end_date_str, "%Y-%m-%d")
     if start > end:
-        raise ValueError(f"load_start_date ({start_date_str}) must be <= load_end_date ({end_date_str})")
+        raise ValueError(
+            f"load_start_date ({start_date_str}) must be <= load_end_date ({end_date_str})"
+        )
     days = (end - start).days
     return [(start + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(days + 1)]
 
 
-def _load_single_date(target_date, serialize_columns_from_directory, partition_cols, inmetro_bucket):
+def _load_single_date(
+    target_date, serialize_columns_from_directory, partition_cols, inmetro_bucket
+):
     file_path = f"{inmetro_bucket}/*/*/*/{bucket_directory}/{target_date}"
     path_attributes_pattern = (
         rf"{inmetro_bucket}/(\w+)/(\w+)/(\w+)/{bucket_directory}/{target_date}"
@@ -77,7 +78,9 @@ def _load_single_date(target_date, serialize_columns_from_directory, partition_c
     return df
 
 
-def get_inmetro_data(serialize_columns_from_directory, partition_cols, load_start_date, load_end_date):
+def get_inmetro_data(
+    serialize_columns_from_directory, partition_cols, load_start_date, load_end_date
+):
     dates = _generate_date_range(load_start_date, load_end_date)
     logger.info(f"m={JOB_NAME}, dates={dates}, msg=Loading date range")
 
@@ -87,11 +90,18 @@ def get_inmetro_data(serialize_columns_from_directory, partition_cols, load_star
     dfs = []
     for target_date in dates:
         try:
-            df = _load_single_date(target_date, serialize_columns_from_directory, partition_cols, inmetro_bucket)
+            df = _load_single_date(
+                target_date,
+                serialize_columns_from_directory,
+                partition_cols,
+                inmetro_bucket,
+            )
             dfs.append(df)
             logger.info(f"m={JOB_NAME}, date={target_date}, msg=Loaded successfully")
         except Exception as e:
-            logger.warning(f"m={JOB_NAME}, date={target_date}, msg=No data found, skipping. error={e}")
+            logger.warning(
+                f"m={JOB_NAME}, date={target_date}, msg=No data found, skipping. error={e}"
+            )
             continue
 
     if not dfs:
@@ -120,7 +130,9 @@ if __name__ == "__main__":
     execution_date = args.execution_date
     partition_cols = ast.literal_eval(args.partition_cols)
     bucket_directory = args.bucket_directory
-    serialize_columns_from_directory = ast.literal_eval(args.serialize_columns_from_directory)
+    serialize_columns_from_directory = ast.literal_eval(
+        args.serialize_columns_from_directory
+    )
     load_end_date = args.load_end_date or execution_date
 
     logger.info(
@@ -147,7 +159,9 @@ if __name__ == "__main__":
     database_location = datalake_info["db_raw_path"]
     database_name = datalake_info["db_raw_databricks"]
 
-    df = get_inmetro_data(serialize_columns_from_directory, partition_cols, execution_date, load_end_date)
+    df = get_inmetro_data(
+        serialize_columns_from_directory, partition_cols, execution_date, load_end_date
+    )
 
     if not df:
         logger.warning(

@@ -1,26 +1,24 @@
 import ast
 import logging
-import unicodedata
 import re
-
+import unicodedata
 from argparse import ArgumentParser
-from datetime import datetime, date
+from datetime import date, datetime
 from typing import List, Optional
 
-from pyspark.sql import DataFrame, functions as F
-from pyspark.sql.types import StructType, StructField, StringType, ArrayType
+from pyspark.sql import DataFrame
+from pyspark.sql import functions as F
+from pyspark.sql.types import ArrayType, StringType, StructField, StructType
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
-from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-
-from quintoandar_logger import QuintoAndarLogger
-
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 SOURCE = "iptu_bh"
 JOB_NAME = f"load_{SOURCE}_raw"
@@ -87,8 +85,8 @@ def save_to_datalake(
 def filter_data(dataframe: DataFrame) -> DataFrame:
     # When we have an error field it means that the taxpayer was not found for the year
     return dataframe.where(
-        (F.col("response.Dados Cadastrais Gerais").getItem(0).getItem(0) != "Erro") &
-        (F.col("response.Dados Cadastrais Gerais").getItem(0).getItem(1) != "")
+        (F.col("response.Dados Cadastrais Gerais").getItem(0).getItem(0) != "Erro")
+        & (F.col("response.Dados Cadastrais Gerais").getItem(0).getItem(1) != "")
     )
 
 

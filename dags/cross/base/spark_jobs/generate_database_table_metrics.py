@@ -50,8 +50,10 @@ def get_conn_config(dbutils_secret_key: str) -> dict:
 def main():
     global spark
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
-    
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
+
         spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
     environment = args.env
@@ -59,7 +61,7 @@ def main():
     dbutils_secret_key = args.dbutils_secret_key
     schema = args.schema
     table_name = args.table_name
-    partition_cols = ['year', 'month', 'day', 'dag_id']
+    partition_cols = ["year", "month", "day", "dag_id"]
     execution_date = args.execution_date
     db_schema = args.db_schema
     get_table_metrics = json.loads(args.get_table_metrics)
@@ -135,9 +137,19 @@ def main():
     for db_table_name, table_information in get_table_metrics.items():
         clean_table_name = table_information["clean_table_name"]
         for metric_name, metric_value in table_information["metrics"].items():
-            query.append(query_template.format(execution_date=execution_date, db_name=db_name, product_table_name=db_table_name, clean_table_name=clean_table_name, metric_value=f'{metric_name}({metric_value})', metric_name=f'{metric_name}_{metric_value}', dag_id=dag_id))
+            query.append(
+                query_template.format(
+                    execution_date=execution_date,
+                    db_name=db_name,
+                    product_table_name=db_table_name,
+                    clean_table_name=clean_table_name,
+                    metric_value=f"{metric_name}({metric_value})",
+                    metric_name=f"{metric_name}_{metric_value}",
+                    dag_id=dag_id,
+                )
+            )
 
-    union_all_query = '\nUNION ALL\n'.join(query)
+    union_all_query = "\nUNION ALL\n".join(query)
     df_metrics = consumer.get_data_from_query(union_all_query)
 
     DeltaTableLoaderPipeline(
@@ -147,7 +159,7 @@ def main():
         LayerEnum.CLEAN,
         None,
         partition_cols,
-        spark=spark
+        spark=spark,
     ).load_and_register(df_metrics, format_options)
 
 

@@ -25,9 +25,9 @@ Use the Task tool for all six subagents below simultaneously.
 
 **Subagent A — Style check (shell):**
 ```bash
-make check-style
+make check-style && make check-style-dags
 ```
-Return: exit code, any lines with `E[0-9]+` (flake8 codes) or `would reformat` (black).
+Return: exit code, any Ruff error lines or `would reformat`.
 
 **Subagent B — DAG declaration validation (shell):**
 
@@ -59,7 +59,7 @@ Return: file path + line number for each violation found.
 
 **Subagent E — Test coverage check (explore):**
 
-For every new `.py` file added in `bietlejuice/` (not an `__init__.py`), check whether a corresponding test file exists under `tests/unit/` mirroring the source path (see `testing_conventions.mdc` for the mirroring rule).
+For every new `.py` file under `packages/*/src/bietlejuice/` (not an `__init__.py`), check whether a companion test exists under that package’s `test/unit/` mirroring the source path (see `testing_conventions.mdc`). Spark jobs under `dags/**/spark_jobs/` → `packages/bietlejuice-runtime/test/dags/…`; core model jobs → `packages/bietlejuice-runtime/test/core_model_dags/…`.
 
 Return: list of new source files with no matching test file. Classify as **non-blocking** if the file is a config/constants module; **blocking** if it contains a class or function with business logic.
 
@@ -137,6 +137,7 @@ If all checks pass (or after fixes are applied), draft the PR description using 
 - make validate-dag-declaration-files dag_name={dag_name} ✅
 - make validate-metadata-files-content ✅
 - make check-style ✅
+- make check-style-dags ✅
 - make lint ✅
 - [Screenshot of DAG run if applicable]
 

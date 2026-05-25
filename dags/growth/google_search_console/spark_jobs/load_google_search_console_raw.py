@@ -1,14 +1,13 @@
 import json
 import tempfile
-from functools import reduce
 from argparse import ArgumentParser
-from pyspark.sql import DataFrame
-from pyspark.sql.functions import lit, element_at, to_date
-from pyspark.sql.types import StructType, StructField, StringType, ArrayType
+from functools import reduce
 
 import googleapiclient.discovery
 from google.oauth2.credentials import Credentials
-
+from pyspark.sql import DataFrame
+from pyspark.sql.functions import element_at, lit, to_date
+from pyspark.sql.types import ArrayType, StringType, StructField, StructType
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
@@ -17,8 +16,8 @@ from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_google_search_console_raw"
 
@@ -61,7 +60,7 @@ if __name__ == "__main__":
 
     config_service = ConfigurationService(source)
     raw_partition_cols = config_service.get_config("raw_partition_cols")
-    site_url_list = config_service.get_config(f"site_url_list")
+    site_url_list = config_service.get_config("site_url_list")
     query_request_body = config_service.get_config(report_type)
 
     base_dbutils = BaseDBUtils()
@@ -85,7 +84,6 @@ if __name__ == "__main__":
 
     spark_client = SparkClient()
 
-
     schema = StructType(
         [
             StructField("keys", ArrayType(StringType())),
@@ -101,7 +99,7 @@ if __name__ == "__main__":
         for type in query_request_body["type_list"]:
             maxRows = 25000  # Maximum 25K per call
             numRows = 0  # Start at Row Zero
-            finished = False # Initialize status of extraction
+            finished = False  # Initialize status of extraction
             while not finished:  # As long as data have not been fully extracted.
                 request_body = {
                     "startDate": load_start_date,
@@ -111,9 +109,9 @@ if __name__ == "__main__":
                     "type": type,
                     "rowLimit": maxRows,  # Set number of rows to extract at once (max 25k)
                     "startRow": numRows,  # Start at row 0, then row 25k, then row 50k... until with all.
-                    "dimensionFilterGroups": [{
-                    'filters': query_request_body["filters"]
-                  }],
+                    "dimensionFilterGroups": [
+                        {"filters": query_request_body["filters"]}
+                    ],
                 }
 
                 query_result = (
@@ -194,4 +192,4 @@ if __name__ == "__main__":
             partition_cols=raw_partition_cols,
         )
     else:
-        logger.info(f"m=__main__, msg=df empty.")
+        logger.info("m=__main__, msg=df empty.")

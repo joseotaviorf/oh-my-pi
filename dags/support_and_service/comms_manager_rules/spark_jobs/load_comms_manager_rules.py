@@ -7,20 +7,20 @@ recently updated version file and processing it for data pipeline consumption.
 Author: Data Engineering Team
 """
 
-import logging
 import ast
+import logging
 from argparse import ArgumentParser
-from pyspark.sql.functions import explode, col, to_timestamp, year, month, dayofmonth
 
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
-from bietlejuice.base.spark import spark
+from pyspark.sql.functions import col, dayofmonth, explode, month, to_timestamp, year
+
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat, spark
 from bietlejuice.loaders.s3_loader import S3Loader
 
 # Job configuration
 JOB_NAME = "Load Comms Manager Rules"
 
 
-def collect_all_files(path, file_extension='.json'):
+def collect_all_files(path, file_extension=".json"):
     """
     Recursively collect all files with specified extension from the given path and subdirectories.
 
@@ -89,9 +89,11 @@ def get_last_version(comms_manager_rules_path):
         # Find the file with the most recent modification time
         # Sort by modification time in descending order and take the first record
         last_updated = (
-            df.orderBy(col("modificationTime").desc())  # Sort by modification time (newest first)
-            .limit(1)                                   # Take only the most recent file
-            .collect()[0]                              # Collect and get the first (only) row
+            df.orderBy(
+                col("modificationTime").desc()
+            )  # Sort by modification time (newest first)
+            .limit(1)  # Take only the most recent file
+            .collect()[0]  # Collect and get the first (only) row
         )
 
         # Log the details of the most recently updated file using proper f-string formatting
@@ -102,8 +104,11 @@ def get_last_version(comms_manager_rules_path):
         return last_updated.path
 
     except Exception as e:
-        logging.error(f"Failed to get last version from {comms_manager_rules_path}: {str(e)}")
+        logging.error(
+            f"Failed to get last version from {comms_manager_rules_path}: {str(e)}"
+        )
         raise
+
 
 def read_communication_rules_json(file_path):
     """
@@ -123,11 +128,9 @@ def read_communication_rules_json(file_path):
     try:
         logging.info(f"Reading communication rules from: {file_path}")
 
-        df = (
-            spark.read
-            .option("multiline", "true")  # Enable multiline JSON parsing for complex structures
-            .json(file_path)
-        )
+        df = spark.read.option("multiline", "true").json(
+            file_path
+        )  # Enable multiline JSON parsing for complex structures
 
         logging.info(f"Successfully loaded JSON file with {df.count()} root records")
         return df
@@ -154,7 +157,7 @@ def explode_rules(df):
 
     rules_df = df.select(
         to_timestamp(col("metadata.generated_at")).alias("generated_at"),
-        explode("rules").alias("rule")
+        explode("rules").alias("rule"),
     )
     logging.info(f"Exploded to {rules_df.count()} individual rules")
     return rules_df
@@ -192,7 +195,7 @@ def explode_and_flatten_actions(rules_df):
         col("rule.scope.line").alias("line"),
         col("rule.scope.profile").alias("rule_profile"),
         col("rule.scope.team").alias("team"),
-        explode("rule.actions").alias("action")
+        explode("rule.actions").alias("action"),
     )
 
     # Step 2: Flatten all action fields into the final structure
@@ -222,7 +225,7 @@ def explode_and_flatten_actions(rules_df):
         col("action.templates.body_template").alias("body_template"),
         col("action.templates.body_template_path").alias("body_template_path"),
         col("action.templates.subject_content").alias("subject_content"),
-        col("action.templates.body_content").alias("body_content")
+        col("action.templates.body_content").alias("body_content"),
     )
 
     flat_df = flat_df.withColumn("year", year(col("generated_at")))
@@ -301,11 +304,17 @@ def write_dataframe_with_s3_loader(df, s3_path, partitions=None):
                     logging.info(f"Using partitions: {partition_cols}")
                 else:
                     partition_cols = None
-                    logging.info("No valid partition columns found, writing without partitioning")
+                    logging.info(
+                        "No valid partition columns found, writing without partitioning"
+                    )
             except (ValueError, SyntaxError) as e:
-                logging.warning(f"Invalid partition format '{partitions}': {e}. Expected Python list format like ['year', 'month', 'day']")
+                logging.warning(
+                    f"Invalid partition format '{partitions}': {e}. Expected Python list format like ['year', 'month', 'day']"
+                )
                 partition_cols = None
-                logging.info("Writing without partitioning due to invalid partition format")
+                logging.info(
+                    "Writing without partitioning due to invalid partition format"
+                )
         else:
             logging.info("No partitions specified, writing without partitioning")
 
@@ -318,13 +327,12 @@ def write_dataframe_with_s3_loader(df, s3_path, partitions=None):
             optimize_dataframe=False,  # Same as amplitude job
         )
 
-        logging.info(f"Successfully wrote DataFrame using S3Loader")
+        logging.info("Successfully wrote DataFrame using S3Loader")
         logging.info(f"Total records written: {df.count()}")
 
     except Exception as e:
         logging.error(f"Failed to write DataFrame using S3Loader: {str(e)}")
         raise
-
 
 
 def parse_arguments():
@@ -337,22 +345,18 @@ def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
 
     # Define required command-line arguments in the exact order from declaration file
-    parser.add_argument("environment",
-                       help="Target environment (e.g., prod, forno)")
-    parser.add_argument("datalake_bucket",
-                       help="S3 bucket name for the data lake")
-    parser.add_argument("dag_name",
-                       help="DAG name identifier")
-    parser.add_argument("schema",
-                       help="Database schema name")
-    parser.add_argument("table_name",
-                       help="Table name")
-    parser.add_argument("partitions",
-                       help="Partition information", nargs="?", default=None)
-    parser.add_argument("comms_manager_rules_path",
-                       help="S3 path for communication manager rules")
-    parser.add_argument("execution_date",
-                       help="Execution date in YYYY-MM-DD format")
+    parser.add_argument("environment", help="Target environment (e.g., prod, forno)")
+    parser.add_argument("datalake_bucket", help="S3 bucket name for the data lake")
+    parser.add_argument("dag_name", help="DAG name identifier")
+    parser.add_argument("schema", help="Database schema name")
+    parser.add_argument("table_name", help="Table name")
+    parser.add_argument(
+        "partitions", help="Partition information", nargs="?", default=None
+    )
+    parser.add_argument(
+        "comms_manager_rules_path", help="S3 path for communication manager rules"
+    )
+    parser.add_argument("execution_date", help="Execution date in YYYY-MM-DD format")
 
     return parser.parse_args()
 
@@ -375,21 +379,23 @@ def main():
     args = parse_arguments()
 
     # Extract and assign parsed arguments to variables
-    environment = args.environment                    # Target environment
-    datalake_bucket = args.datalake_bucket           # Data lake S3 bucket
-    dag_name = args.dag_name                         # DAG name identifier
-    schema = args.schema                             # Database schema name
-    table_name = args.table_name                     # Table name
-    partitions = args.partitions                     # Partition information
-    execution_date = args.execution_date             # Job execution date
+    environment = args.environment  # Target environment
+    datalake_bucket = args.datalake_bucket  # Data lake S3 bucket
+    dag_name = args.dag_name  # DAG name identifier
+    schema = args.schema  # Database schema name
+    table_name = args.table_name  # Table name
+    partitions = args.partitions  # Partition information
+    execution_date = args.execution_date  # Job execution date
 
     # Format the S3 path with the environment parameter
-    comms_manager_rules_path = args.comms_manager_rules_path.format(environment=environment)
+    comms_manager_rules_path = args.comms_manager_rules_path.format(
+        environment=environment
+    )
 
     # Configure logging
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
     try:
@@ -406,7 +412,9 @@ def main():
         latest_file_path = get_last_version(comms_manager_rules_path)
 
         if latest_file_path is None:
-            logging.warning("No files to process. Job completed without processing data.")
+            logging.warning(
+                "No files to process. Job completed without processing data."
+            )
             logging.info(f"{JOB_NAME} completed successfully (no files to process)")
             return  # Return instead of exit(0) for better testability
 
@@ -420,7 +428,7 @@ def main():
         write_dataframe_with_s3_loader(processed_df, output_path, partitions)
 
         # Show the schema for verification
-        logging.info(f"Processed DataFrame schema:")
+        logging.info("Processed DataFrame schema:")
         processed_df.printSchema()
 
         logging.info(f"{JOB_NAME} completed successfully")

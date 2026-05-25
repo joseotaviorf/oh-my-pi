@@ -1,26 +1,29 @@
-import json
 import argparse
+import json
 from multiprocessing import Pool
 
 try:
     from importlib.metadata import version
+
     HR_SYSTEM_CLIENT_VERSION = version("quintoandar-hr-system-api-client")
 except Exception:
     HR_SYSTEM_CLIENT_VERSION = "unknown"
 from datetime import datetime, timedelta
+
+from pyspark.sql.functions import col, current_timestamp, date_format, lit
 from pyspark.sql.types import StructType
-from pyspark.sql.functions import current_timestamp, date_format, col, lit
-from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.base.api.api_enum import APIEnum
-from quintoandar_hr_system_api_client.services import EndPointService
 from quintoandar_hr_system_api_client.clients.hr_system_client import HrSystemClient
 from quintoandar_hr_system_api_client.consumers import get_consumer
+from quintoandar_hr_system_api_client.services import EndPointService
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.api.api_enum import APIEnum
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 DATABRICKS_SCOPE = "people"
 JOB_NAME = "load_hr_system_raw"
@@ -252,7 +255,9 @@ if __name__ == "__main__":
     dfs = ingestion.get_df(json_data)
     for i, df in enumerate(dfs):
         record_count = df.count()
-        logger.info(f"m={JOB_NAME}, msg=DataFrame {i} has {record_count} rows before load")
+        logger.info(
+            f"m={JOB_NAME}, msg=DataFrame {i} has {record_count} rows before load"
+        )
     ingestion.clear_directory("raw")
     for df in dfs:
         ingestion.load_raw(df, spark_client)

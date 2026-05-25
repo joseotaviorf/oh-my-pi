@@ -1,22 +1,19 @@
 import ast
 import json
 import logging
-
 from argparse import ArgumentParser
 from datetime import datetime
-import pyspark.sql.functions as F
 
-from quintoandar_logger import QuintoAndarLogger
+import pyspark.sql.functions as F
 from quintoandar_jira_api_client.clients import JiraClient
 from quintoandar_jira_api_client.consumers import CONSUMERS
-
-from bietlejuice.clients.db_clients import SparkClient
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import BaseSparkContext, BaseDBUtils
+from bietlejuice.base.spark import BaseDBUtils, BaseSparkContext
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
-
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_jira_ops_data_into_datalake_raw"
@@ -25,7 +22,6 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
@@ -79,7 +75,7 @@ if __name__ == "__main__":
     credentials = json.loads(json_credentials)
 
     if credentials.get("cloud_id") and params.get("cloud_id"):
-        params["cloud_id"] = credentials.get("cloud_id")    
+        params["cloud_id"] = credentials.get("cloud_id")
 
     jira_client = JiraClient(
         username=credentials["username"],
@@ -143,7 +139,6 @@ if __name__ == "__main__":
         response = jira_consumer.sync(endpoint_enum=endpoint_enum, params=params)
 
     if response:
-
         spark_client = SparkClient()
 
         json_lines = [json.dumps(item) for item in response]

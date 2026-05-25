@@ -32,7 +32,6 @@ import tempfile
 from pathlib import Path
 from typing import List, Tuple
 
-
 REPO_ROOT = Path(__file__).resolve().parents[5]
 RUNTIME_PROJECT = REPO_ROOT / "packages" / "bietlejuice-runtime" / "envs" / "dbr-16-4"
 
@@ -110,7 +109,9 @@ def get_threshold(args) -> float:
         try:
             return float(env_threshold)
         except ValueError:
-            print(f"Warning: Invalid COVERAGE_THRESHOLD value '{env_threshold}', using default {DEFAULT_THRESHOLD}%")
+            print(
+                f"Warning: Invalid COVERAGE_THRESHOLD value '{env_threshold}', using default {DEFAULT_THRESHOLD}%"
+            )
             return DEFAULT_THRESHOLD
     return DEFAULT_THRESHOLD
 
@@ -158,7 +159,7 @@ def run_coverage_check(threshold: float, verbose: bool) -> Tuple[int, str]:
         return 1, ""
 
     # Create temporary file for JSON coverage report
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
         json_report_path = f.name
 
     try:
@@ -166,11 +167,13 @@ def run_coverage_check(threshold: float, verbose: bool) -> Tuple[int, str]:
         pytest_args: List[str] = ["-W", "ignore::DeprecationWarning"]
         for source in coverage_sources:
             pytest_args.extend(["--cov", source])
-        pytest_args.extend([
-            "--cov-report=term-missing",
-            "--cov-report=term",  # Show all files, including those with 100% coverage
-            f"--cov-report=json:{json_report_path}",
-        ])
+        pytest_args.extend(
+            [
+                "--cov-report=term-missing",
+                "--cov-report=term",  # Show all files, including those with 100% coverage
+                f"--cov-report=json:{json_report_path}",
+            ]
+        )
         pytest_args.extend(TEST_PATHS)
 
         cmd = _runtime_pytest_cmd(pytest_args)
@@ -215,9 +218,11 @@ def run_coverage_check(threshold: float, verbose: bool) -> Tuple[int, str]:
             # Check if JSON file exists and has content
             if not os.path.exists(json_report_path):
                 if verbose:
-                    print(f"Warning: JSON coverage report file not found: {json_report_path}")
+                    print(
+                        f"Warning: JSON coverage report file not found: {json_report_path}"
+                    )
             else:
-                with open(json_report_path, 'r') as f:
+                with open(json_report_path) as f:
                     content = f.read().strip()
                     if not content:
                         if verbose:
@@ -225,7 +230,9 @@ def run_coverage_check(threshold: float, verbose: bool) -> Tuple[int, str]:
                     else:
                         coverage_data = json.loads(content)
                         # Get total coverage percentage
-                        coverage_percent = coverage_data.get('totals', {}).get('percent_covered', None)
+                        coverage_percent = coverage_data.get("totals", {}).get(
+                            "percent_covered", None
+                        )
         except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
             if verbose:
                 print(f"Warning: Could not read JSON coverage report: {e}")
@@ -273,10 +280,14 @@ def run_coverage_check(threshold: float, verbose: bool) -> Tuple[int, str]:
 
         # Check threshold
         if coverage_percent < threshold:
-            print(f"❌ Coverage check failed: {coverage_percent:.2f}% < {threshold:.2f}%")
+            print(
+                f"❌ Coverage check failed: {coverage_percent:.2f}% < {threshold:.2f}%"
+            )
             return 1, output
         else:
-            print(f"✅ Coverage check passed: {coverage_percent:.2f}% >= {threshold:.2f}%")
+            print(
+                f"✅ Coverage check passed: {coverage_percent:.2f}% >= {threshold:.2f}%"
+            )
             return 0, output
 
     except Exception as e:

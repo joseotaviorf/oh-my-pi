@@ -1,19 +1,17 @@
 import ast
 import json
 from argparse import ArgumentParser
+
 from dateutil import parser
+from pyspark.sql.functions import col, from_json, get_json_object, to_timestamp
+from pyspark.sql.types import StringType, StructField, StructType
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.spark import spark
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
-from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from pyspark.sql.functions import col, from_json, to_timestamp, get_json_object
-from pyspark.sql.types import StructType, StructField, StringType
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.spark import (
-    spark
-)
-
 
 JOB_NAME = "application_audit_logs_load"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -26,7 +24,9 @@ def clean_cf(df):
     The payload is stored as a JSON string to support any structure (nested objects, arrays).
     """
     # Parse the message field as JSON
-    df = df.withColumn("data", from_json(col("message"), get_application_audit_logs_schema()))
+    df = df.withColumn(
+        "data", from_json(col("message"), get_application_audit_logs_schema())
+    )
 
     # Use the timestamp from the message data
     ts_event = to_timestamp(col("data.timestamp"))
@@ -35,7 +35,9 @@ def clean_cf(df):
         ts_event.alias("ts_event"),
         col("data.trace_id").alias("id_trace"),
         col("data.id").alias("id_log"),
-        get_json_object(col("data.payload"), "$.transaction_id").alias("id_transaction"),
+        get_json_object(col("data.payload"), "$.transaction_id").alias(
+            "id_transaction"
+        ),
         col("data.payload").alias("payload"),
         col("app"),
         col("namespace"),
@@ -43,10 +45,11 @@ def clean_cf(df):
         col("log_year").alias("year"),
         col("log_month").alias("month"),
         col("log_day").alias("day"),
-        col("log_hour").alias("hour")
+        col("log_hour").alias("hour"),
     ).where(col("data.timestamp").isNotNull())
 
     return df
+
 
 def get_table_privileges(args):
     """
@@ -59,11 +62,10 @@ def get_table_privileges(args):
 
     full_table_name = f"datalake_{args.schema}_clean.{args.table_name}"
     if table_privileges_dict is not None:
-        return TablePrivileges.from_input_dict(
-            table_privileges_dict, full_table_name
-        )
+        return TablePrivileges.from_input_dict(table_privileges_dict, full_table_name)
     else:
         return TablePrivileges.from_environment_default(full_table_name)
+
 
 def parse_arguments():
     arg_parser = ArgumentParser(description=JOB_NAME)
@@ -92,6 +94,7 @@ def parse_arguments():
 
     return args
 
+
 def main():
     """
     This DAG loads and cleans application audit logs.
@@ -108,12 +111,14 @@ def main():
         """
     )
 
-    df = spark.read.format("json").load(args.path.format(
-                args.execution_date.year,
-                str(args.execution_date.month).zfill(2),
-                str(args.execution_date.day).zfill(2),
-                str(args.execution_date.hour).zfill(2)
-    ))
+    df = spark.read.format("json").load(
+        args.path.format(
+            args.execution_date.year,
+            str(args.execution_date.month).zfill(2),
+            str(args.execution_date.day).zfill(2),
+            str(args.execution_date.hour).zfill(2),
+        )
+    )
     df = clean_cf(df)
 
     DeltaLoader().load_table(
@@ -128,18 +133,22 @@ def main():
     if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
 
+
 def get_application_audit_logs_schema():
     """
     Schema for application audit logs.
     The payload field is kept as a raw string to handle any JSON structure (nested objects, arrays, etc).
     It will be stored as a JSON string that can be queried using get_json_object() or from_json().
     """
-    return StructType([
-        StructField('trace_id', StringType(), True),
-        StructField('id', StringType(), True),
-        StructField('timestamp', StringType(), True),
-        StructField('payload', StringType(), True)
-    ])
+    return StructType(
+        [
+            StructField("trace_id", StringType(), True),
+            StructField("id", StringType(), True),
+            StructField("timestamp", StringType(), True),
+            StructField("payload", StringType(), True),
+        ]
+    )
+
 
 if __name__ == "__main__":
     main()

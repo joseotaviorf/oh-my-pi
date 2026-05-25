@@ -1,11 +1,10 @@
+import ast
 import json
 import logging
-import ast
-
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
-from pyspark.sql.types import StructType, StructField, StringType
 
+from pyspark.sql.types import StringType, StructField, StructType
 from quintoandar_airtable_api_client.clients import AirtableClient
 from quintoandar_airtable_api_client.consumers import AirtableConsumer
 from quintoandar_logger import QuintoAndarLogger
@@ -14,9 +13,9 @@ from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
     BaseDBUtils,
+    BaseSparkContext,
     SparkDataFrameService,
     SparkTableStorageFormat,
-    BaseSparkContext,
 )
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.formatters import StringFormatter
@@ -167,7 +166,6 @@ if __name__ == "__main__":
     records = airtable_consumer.sync(params=extended_params)
 
     if records:
-
         logger.info(
             f"""
                     m=__main__, table_name={table_name}, base_id={base_id}, table_id={table_id},

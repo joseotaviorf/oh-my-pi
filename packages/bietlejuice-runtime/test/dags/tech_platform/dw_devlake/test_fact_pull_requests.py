@@ -32,6 +32,12 @@ import pytest
 CLEAN_DB = "datalake_devlake_clean"
 
 
+def _register_clean_table(spark, df, table_name: str) -> None:
+    """Register fixture data as hive tables (SQL uses schema-qualified names)."""
+    spark.sql(f"CREATE DATABASE IF NOT EXISTS `{CLEAN_DB}`")
+    df.write.mode("overwrite").saveAsTable(table_name)
+
+
 @pytest.fixture(autouse=True)
 def register_source_tables(
     spark,
@@ -41,13 +47,15 @@ def register_source_tables(
     pull_request_commits_df,
     pull_request_comments_df,
 ):
-    """Register fixture DataFrames as temp views matching the SQL's source tables."""
-    pull_requests_df.createOrReplaceTempView(f"{CLEAN_DB}.pull_requests")
-    pr_custom_metrics_df.createOrReplaceTempView(f"{CLEAN_DB}.pr_custom_metrics")
-    pull_request_team_df.createOrReplaceTempView(f"{CLEAN_DB}.pull_request_team")
-    pull_request_commits_df.createOrReplaceTempView(f"{CLEAN_DB}.pull_request_commits")
-    pull_request_comments_df.createOrReplaceTempView(
-        f"{CLEAN_DB}.pull_request_comments"
+    """Register fixture DataFrames as tables matching the SQL's source tables."""
+    _register_clean_table(spark, pull_requests_df, f"{CLEAN_DB}.pull_requests")
+    _register_clean_table(spark, pr_custom_metrics_df, f"{CLEAN_DB}.pr_custom_metrics")
+    _register_clean_table(spark, pull_request_team_df, f"{CLEAN_DB}.pull_request_team")
+    _register_clean_table(
+        spark, pull_request_commits_df, f"{CLEAN_DB}.pull_request_commits"
+    )
+    _register_clean_table(
+        spark, pull_request_comments_df, f"{CLEAN_DB}.pull_request_comments"
     )
 
 
@@ -142,9 +150,13 @@ class TestTimeToFirstApproval:
 
     def test_slow_approval(self, fact_df):
         """PR-A: 10 days to first approval → large value."""
+        import datetime as dt
+
+        utc = dt.timezone.utc
         row = _row(fact_df, "pr-A")
         expected = int(
-            1741286062 - 1740404407  # 2026-03-06 18:34:22 - 2026-02-24 14:40:07
+            dt.datetime(2026, 3, 6, 18, 34, 22, tzinfo=utc).timestamp()
+            - dt.datetime(2026, 2, 24, 14, 40, 7, tzinfo=utc).timestamp()
         )
         assert row["first_approval_seconds"] == expected
 

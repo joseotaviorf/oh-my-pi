@@ -4,14 +4,13 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.spark import SparkTableStorageFormat, BaseDBUtils
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_casa_mineira_crm_into_datalake_raw"
 
@@ -19,7 +18,6 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("datalake_bucket", help="bucket value in forno/prod")

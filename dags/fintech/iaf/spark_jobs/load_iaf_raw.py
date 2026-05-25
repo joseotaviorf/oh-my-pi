@@ -4,17 +4,16 @@ from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DatabaseEnum
-from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.db import DatabaseEnum, DatalakeMetastoreService
+from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import PostgresConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.pipeline import FullTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
-from bietlejuice.base.pipeline import LayerEnum
 
 JOB_NAME = "load_iaf_raw"
 
@@ -68,9 +67,7 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    conn_config_json = dbutils.secrets.get(
-        scope="quintoandar", key=DatabaseEnum.IAF
-    )
+    conn_config_json = dbutils.secrets.get(scope="quintoandar", key=DatabaseEnum.IAF)
 
     conn_config = json.loads(conn_config_json)
     spark_client = SparkClient()

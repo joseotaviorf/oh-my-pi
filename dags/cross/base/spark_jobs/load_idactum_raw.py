@@ -1,20 +1,21 @@
 from argparse import ArgumentParser
 from datetime import date
+from typing import List
 
+from pyspark.sql import DataFrame
+from pyspark.sql import functions as F
+
+from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
-from bietlejuice.base.databricks.table_privileges import TablePrivileges
-from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
-from pyspark.sql import DataFrame
-from pyspark.sql import functions as F
-from typing import List
 
 def load_from_s3(path: str) -> DataFrame:
     spark_client = SparkClient()
@@ -61,26 +62,23 @@ def save_to_datalake(
     )
     full_raw_table_name = f"datalake_{source}_raw.{table_name}"
     table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
-    if (
-            table_privileges
-            and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-    ):
+    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
 
     spark_metastore_service.refresh_table(database_name, table_name)
 
 
 def transform_data(
-    dataframe: DataFrame,
-    timestamp_ntz_fields: List[str] = []
+    dataframe: DataFrame, timestamp_ntz_fields: List[str] = []
 ) -> DataFrame:
     df = dataframe.withColumn("dt_load", F.lit(date.today()))
-    
+
     for field in timestamp_ntz_fields:
         if field in df.columns:
             df = df.withColumn(field, F.col(field).cast("timestamp"))
-    
+
     return df
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="Load Idactum raw data")
@@ -89,7 +87,9 @@ if __name__ == "__main__":
     parser.add_argument("table_name", help="Name of the table to store data into")
     parser.add_argument("execution_date", help="DAG execution_date")
     parser.add_argument("source", help="Source name(e.g., idactum_houses)")
-    parser.add_argument("timestamp_ntz_fields", help="Timestamp NTZ field names split by comma.")
+    parser.add_argument(
+        "timestamp_ntz_fields", help="Timestamp NTZ field names split by comma."
+    )
 
     args = parser.parse_args()
     source = args.source
@@ -100,9 +100,13 @@ if __name__ == "__main__":
     timestamp_ntz_fields_list = []
     if args.timestamp_ntz_fields:
         timestamp_ntz_fields_list = [
-            field.strip() for field in args.timestamp_ntz_fields.split(",") if field.strip()
+            field.strip()
+            for field in args.timestamp_ntz_fields.split(",")
+            if field.strip()
         ]
-    dataframe_to_save = transform_data(load_from_s3(path=s3_ingestion_path), timestamp_ntz_fields_list)
+    dataframe_to_save = transform_data(
+        load_from_s3(path=s3_ingestion_path), timestamp_ntz_fields_list
+    )
 
     save_to_datalake(
         dataframe=dataframe_to_save,

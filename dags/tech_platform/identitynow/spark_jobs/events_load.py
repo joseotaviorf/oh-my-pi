@@ -1,19 +1,17 @@
 import ast
 import json
 from argparse import ArgumentParser
-from dateutil import parser
 
+from dateutil import parser
+from pyspark.sql.functions import col, dayofmonth, hour, month, to_timestamp, year
+from pyspark.sql.types import ArrayType, MapType, StringType, StructField, StructType
 from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.spark import spark
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from pyspark.sql.functions import col, dayofmonth, hour, month, to_timestamp, year
-from pyspark.sql.types import ArrayType, MapType, StructType, StructField, StringType
 from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.spark import (
-    spark
-)
-
 
 JOB_NAME = "identitynow_events_load"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -47,35 +45,39 @@ def parse_arguments():
 
     return args
 
+
 def load_df(input_path):
-    events_schema = StructType([
-        StructField("id", StringType(), True),
-        StructField("trackingNumber", StringType(), True),
-        StructField("name", StringType(), True),
-        StructField("technicalName", StringType(), True),
-        StructField("type", StringType(), True),
-        StructField("operation", StringType(), True),
-        StructField("status", StringType(), True),
-        StructField("action", StringType(), True),
-        StructField("actor", StructType([
-            StructField("name", StringType(), True)
-        ]), True),
-        StructField("target", StructType([
-            StructField("name", StringType(), True)
-        ]), True),
-        StructField("stack", StringType(), True),
-        StructField("details", StringType(), True),
-        StructField("attributes", MapType(StringType(), StringType()), True),
-        StructField("objects", ArrayType(StringType()), True),
-        StructField("org", StringType(), True),
-        StructField("pod", StringType(), True),
-        StructField("ipAddress", StringType(), True),
-        StructField("_type", StringType(), True),
-        StructField("_version", StringType(), True),
-        StructField("created", StringType(), True),
-        StructField("synced", StringType(), True)
-    ])
+    events_schema = StructType(
+        [
+            StructField("id", StringType(), True),
+            StructField("trackingNumber", StringType(), True),
+            StructField("name", StringType(), True),
+            StructField("technicalName", StringType(), True),
+            StructField("type", StringType(), True),
+            StructField("operation", StringType(), True),
+            StructField("status", StringType(), True),
+            StructField("action", StringType(), True),
+            StructField(
+                "actor", StructType([StructField("name", StringType(), True)]), True
+            ),
+            StructField(
+                "target", StructType([StructField("name", StringType(), True)]), True
+            ),
+            StructField("stack", StringType(), True),
+            StructField("details", StringType(), True),
+            StructField("attributes", MapType(StringType(), StringType()), True),
+            StructField("objects", ArrayType(StringType()), True),
+            StructField("org", StringType(), True),
+            StructField("pod", StringType(), True),
+            StructField("ipAddress", StringType(), True),
+            StructField("_type", StringType(), True),
+            StructField("_version", StringType(), True),
+            StructField("created", StringType(), True),
+            StructField("synced", StringType(), True),
+        ]
+    )
     return spark.read.format("json").load(input_path, schema=events_schema)
+
 
 def clean_df(df):
     ts = to_timestamp(col("created"))
@@ -104,8 +106,9 @@ def clean_df(df):
         year(ts).alias("year"),
         month(ts).alias("month"),
         dayofmonth(ts).alias("day"),
-        hour(ts).alias("hour")
+        hour(ts).alias("hour"),
     ).where(col("created").isNotNull())
+
 
 def main():
     """
@@ -140,7 +143,9 @@ def main():
             table_privileges_dict, full_clean_table_name
         )
     else:
-        table_privileges = TablePrivileges.from_environment_default(full_clean_table_name)
+        table_privileges = TablePrivileges.from_environment_default(
+            full_clean_table_name
+        )
     loader = DeltaLoader()
     loader.load_table(
         table_name=full_clean_table_name,
@@ -148,10 +153,7 @@ def main():
         source_df=df,
         partition_by=args.partition_cols,
     )
-    if (
-        table_privileges
-        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-    ):
+    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
 
 

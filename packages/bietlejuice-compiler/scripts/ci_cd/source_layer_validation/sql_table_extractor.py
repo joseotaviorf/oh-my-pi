@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Extract metastore-style table references (schema.table) from SQL text.
 
@@ -10,8 +9,6 @@ Limitations:
 - Heavy Jinja/bracket templating may require extending normalize_sql_for_table_extraction.
 - Single-name FROM clauses (CTEs without schema) are skipped; inner CTE bodies are still walked.
 """
-
-from __future__ import print_function
 
 import re
 from pathlib import Path
@@ -60,7 +57,7 @@ def _table_node_to_fqn(table: exp.Table) -> Optional[str]:
         return None
     db = db.replace("`", "").strip('"')
 
-    fqn = "{}.{}".format(db, name)
+    fqn = f"{db}.{name}"
     if parse_table_fqn(fqn):
         return fqn
     return None

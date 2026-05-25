@@ -3,26 +3,27 @@ from datetime import datetime
 
 import pendulum
 from airflow.models import DAG
+from airflow.utils.helpers import chain, cross_downstream
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from airflow.utils.helpers import chain, cross_downstream
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import DatabricksGroupNameEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
-
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.services.configuration_service import ConfigurationService
 from dags import DAG_PACKAGES_ROOT
 
 SOURCE = "crawlers"
-CONTEXT = f"listings"
-ORIGIN = f"viva_real"
+CONTEXT = "listings"
+ORIGIN = "viva_real"
 DAG_NAME = f"{CONTEXT}.{ORIGIN}"
 SOURCE_WITH_CONTEXT = f"{SOURCE}_{CONTEXT}"
 DAG_ID = f"bietlejuice.{DAG_NAME}"
@@ -56,7 +57,9 @@ cluster_description = config_service.get_config("custom_cluster")
 
 cluster_description["data_security_mode"] = "SINGLE_USER"
 cluster_description["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-cluster_description["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+cluster_description["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
+    "quintoandar_{{ var.value.environment }}"
+)
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
         "group_name": DatabricksGroupNameEnum.ANALYTICS_ENGINEERS,
@@ -81,17 +84,22 @@ dag = DAG(
     params=BaseDAG.get_default_trigger_form_params(),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     task_id="create-cluster",
     cluster_configuration=cluster_description,
     libraries=default_libraries,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
-task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
+task_group = DatalakeTaskGroup(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=SOURCE,

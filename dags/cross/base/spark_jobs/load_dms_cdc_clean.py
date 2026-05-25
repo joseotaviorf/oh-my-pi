@@ -1,8 +1,10 @@
 import json
 import re
-
 from argparse import ArgumentParser, Namespace
 from typing import List
+
+from pyspark.sql.functions import col
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.cdc.primary_key_identifiers.clean_primary_key_identifier import (
     CleanPrimaryKeyIdentifier,
@@ -16,11 +18,6 @@ from bietlejuice.base.spark.delta_secondary_catalog_sync import (
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
-
-from pyspark.sql.functions import col
-
-from quintoandar_logger import QuintoAndarLogger
-
 
 JOB_NAME = "load_dms_cdc_clean"
 
@@ -37,7 +34,9 @@ def parse_arguments():
     parser.add_argument("table_name")
     parser.add_argument("start_date")
     parser.add_argument("end_date")
-    parser.add_argument("primary_keys", help="Comma separated list of primary keys for the clean table")
+    parser.add_argument(
+        "primary_keys", help="Comma separated list of primary keys for the clean table"
+    )
     parser.add_argument(
         "-tp",
         "--table-privileges",
@@ -57,7 +56,7 @@ def get_primary_keys_from_args(args: Namespace) -> List[str]:
     """
 
     if args.primary_keys:
-       return [key.strip() for key in args.primary_keys.split(",")]
+        return [key.strip() for key in args.primary_keys.split(",")]
 
     clean_pk_identifier = CleanPrimaryKeyIdentifier(
         args.data_documentation_bucket,
@@ -65,7 +64,7 @@ def get_primary_keys_from_args(args: Namespace) -> List[str]:
     return clean_pk_identifier.find_primary_keys(args.schema, args.table_name)
 
 
-def insert_columns_into_query(query:str, columns:List[str]) -> str:
+def insert_columns_into_query(query: str, columns: List[str]) -> str:
     """
     Insert CDC columns to persist those informations
     through clean table.
@@ -84,8 +83,10 @@ def insert_columns_into_query(query:str, columns:List[str]) -> str:
 def main():
     global spark
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
-    
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
+
         spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
     dag_name = args.dag_name
@@ -120,7 +121,9 @@ def main():
     cdc_columns = ["Op", "event_timestamp"]
 
     query_with_cdc_columns = insert_columns_into_query(clean_query, cdc_columns)
-    clean_updates_df = spark.sql(query_with_cdc_columns).filter(col("event_timestamp").cast("date").between(start_date, end_date))
+    clean_updates_df = spark.sql(query_with_cdc_columns).filter(
+        col("event_timestamp").cast("date").between(start_date, end_date)
+    )
 
     full_clean_table_name = f"datalake_{schema}_clean.{table_name}"
     if table_privileges_dict is not None:
@@ -128,7 +131,9 @@ def main():
             table_privileges_dict, full_clean_table_name
         )
     else:
-        table_privileges = TablePrivileges.from_environment_default(full_clean_table_name)
+        table_privileges = TablePrivileges.from_environment_default(
+            full_clean_table_name
+        )
 
     clean_table_s3_path = f"s3://{datalake_bucket}/clean/{schema}/{table_name}/"
     loader = DeltaLoader()
@@ -149,10 +154,7 @@ def main():
         partition_columns_present(clean_updates_df, ("year", "month", "day")),
     )
 
-    if (
-        table_privileges
-        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-    ):
+    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
 
 

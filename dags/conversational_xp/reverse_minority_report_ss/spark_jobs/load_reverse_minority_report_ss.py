@@ -5,24 +5,25 @@ import queue
 import threading
 import time
 from argparse import ArgumentParser
-from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 
 from kafka import KafkaProducer
-
 from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.clients.db_clients import SparkClient
 
-
 JOB_NAME = "load_minority_report_ss"
+
 
 def json_serializer(data):
     return json.dumps(data).encode("utf-8")
 
+
 def get_payload_context_fields(api_type, item):
-    if api_type == 'CUSTOMER_DATA':
+    if api_type == "CUSTOMER_DATA":
         return {
             "ts_user_updated": item.get("ts_user_updated"),
             "ts_user_created": item.get("ts_user_created"),
@@ -50,7 +51,9 @@ def get_payload_context_fields(api_type, item):
                     "ts_most_recent_csi_ticket_solved_date"
                 ),
                 "total_csi_tickets_created": item.get("total_csi_tickets_created"),
-                "last_bot_csat_answered_score": item.get("last_bot_csat_answered_score"),
+                "last_bot_csat_answered_score": item.get(
+                    "last_bot_csat_answered_score"
+                ),
                 "bot_csat_detractor_percentage_within_three_months": item.get(
                     "bot_csat_detractor_percentage_within_three_months"
                 ),
@@ -114,7 +117,9 @@ def get_payload_context_fields(api_type, item):
                     "is_tenant_contract_to_entrance"
                 ),
                 "is_tenant_visits_to_offer": item.get("is_tenant_visits_to_offer"),
-                "is_tenant_listing_and_search": item.get("is_tenant_listing_and_search"),
+                "is_tenant_listing_and_search": item.get(
+                    "is_tenant_listing_and_search"
+                ),
                 "is_tenant_pre_contract": item.get("is_tenant_pre_contract"),
                 "is_tenant_post_contract": item.get("is_tenant_post_contract"),
                 "landlord_journey_step": item.get("landlord_journey_step"),
@@ -144,7 +149,9 @@ def get_payload_context_fields(api_type, item):
                 "total_approved_evaluation_proposals": item.get(
                     "total_approved_evaluation_proposals"
                 ),
-                "total_sent_document_proposals": item.get("total_sent_document_proposals"),
+                "total_sent_document_proposals": item.get(
+                    "total_sent_document_proposals"
+                ),
                 "total_approved_credit_proposals": item.get(
                     "total_approved_credit_proposals"
                 ),
@@ -187,10 +194,12 @@ def get_payload_context_fields(api_type, item):
                 "ts_last_proposal_rejected": item.get("ts_last_proposal_rejected"),
                 "ts_last_contract_signed": item.get("ts_last_contract_signed"),
                 "ts_last_termination_created": item.get("ts_last_termination_created"),
-                "ts_last_termination_finished": item.get("ts_last_termination_finished"),
+                "ts_last_termination_finished": item.get(
+                    "ts_last_termination_finished"
+                ),
             },
         }
-    elif api_type == 'BPO_PERFORMANCE':
+    elif api_type == "BPO_PERFORMANCE":
         return {
             "csatKey": item.get("key_csat"),
             "reference_date": item.get("reference_date"),
@@ -202,7 +211,7 @@ def get_payload_context_fields(api_type, item):
             "resolution_rate_7_day": item.get("resolution_rate_7_day"),
             "resolution_rate_30_day": item.get("resolution_rate_30_day"),
         }
-    elif api_type == 'CUSTOMER_PHONE_NUMBER_WHITELIST':
+    elif api_type == "CUSTOMER_PHONE_NUMBER_WHITELIST":
         return {
             "id_user_list": item.get("users"),
             "is_tenant_post_contract": item.get("is_tenant_post_contract"),
@@ -210,13 +219,14 @@ def get_payload_context_fields(api_type, item):
             "has_published_listings": item.get("has_published_listings"),
             "whitelist_group": item.get("whitelist_group"),
         }
-    elif api_type == 'INSPECTORS_PERFORMANCE':
+    elif api_type == "INSPECTORS_PERFORMANCE":
         return {
             "inspectionsConversion": item.get("inspections_conversion"),
             "eligibleInspections": item.get("eligible_inspections"),
         }
     else:
         raise Exception(f"Value api_type={api_type} is invalid")
+
 
 def serialize_item(item):
     """
@@ -234,6 +244,7 @@ def serialize_item(item):
         serialized_item = item
     return serialized_item
 
+
 def create_payload(item):
     """
     Create the data payload based on the original spark dataframe.
@@ -246,6 +257,7 @@ def create_payload(item):
     context_fields = {key: serialize_item(str(value)) for key, value in item.items()}
     data["contextFields"] = get_payload_context_fields(api_type, context_fields)
     return data
+
 
 def send_messages_worker(q, producer, kafka_topic):
     """
@@ -260,15 +272,16 @@ def send_messages_worker(q, producer, kafka_topic):
             break
         try:
             future = producer.send(kafka_topic, value=message)
-            record_metadata = future.get(timeout=10)
+            future.get(timeout=10)
 
             # this sleep was added to avoid driver overhead when
             # this process was done sequentially  - not sure if still necessary
-            time.sleep(0.01) 
+            time.sleep(0.01)
         except Exception as e:
             logger.error(f"Error sending message: {message} {e}")
         finally:
             q.task_done()
+
 
 def monitor_queue(q, total):
     """
@@ -286,7 +299,8 @@ def monitor_queue(q, total):
                 break
             time.sleep(0.1)
     else:
-        logger.info('m=empty queue!')
+        logger.info("m=empty queue!")
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -300,7 +314,6 @@ if __name__ == "__main__":
     parser.add_argument("key_name")
     parser.add_argument("key_value")
     parser.add_argument("api_type")
-    
 
     args = parser.parse_args()
 
@@ -337,7 +350,8 @@ if __name__ == "__main__":
         logger.info("m=Empty Dataframe!")
 
     message_list = [
-        create_payload({key: value for key, value in row.asDict().items()}) for row in df.collect()
+        create_payload({key: value for key, value in row.asDict().items()})
+        for row in df.collect()
     ]
 
     q = queue.Queue()
@@ -345,8 +359,7 @@ if __name__ == "__main__":
         q.put(message)
 
     producer = KafkaProducer(
-        bootstrap_servers=kafka_servers,
-        value_serializer=json_serializer
+        bootstrap_servers=kafka_servers, value_serializer=json_serializer
     )
 
     # single thread for monitoring the queue and logging

@@ -1,23 +1,23 @@
 import json
 import logging
 from argparse import ArgumentParser
-from pyspark.sql.functions import unix_timestamp, to_timestamp, to_date
 
+from pyspark.sql.functions import to_date, to_timestamp, unix_timestamp
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_twilio_flex_insights_api_client.clients import TwilioFlexInsightsClient
-from quintoandar_twilio_flex_insights_api_client.consumers import (
-    TwilioFlexInsightsConsumer,
-)
 from quintoandar_twilio_flex_insights_api_client.constants.endpoint_enum import (
     EndpointEnum,
+)
+from quintoandar_twilio_flex_insights_api_client.consumers import (
+    TwilioFlexInsightsConsumer,
 )
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
     BaseDBUtils,
-    SparkTableStorageFormat,
     SparkDataFrameService,
+    SparkTableStorageFormat,
 )
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.formatters import StringFormatter
@@ -34,7 +34,6 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
@@ -99,11 +98,7 @@ if __name__ == "__main__":
     response = twilio_flex_insights_consumer.sync(report_link).splitlines()
 
     # Remove empty lines and format as list of lists
-    rows = [
-        line.replace('"', "").split(",")
-        for line in response
-        if line.strip()
-    ]
+    rows = [line.replace('"', "").split(",") for line in response if line.strip()]
 
     # Get header and data rows
     if rows:
@@ -112,7 +107,8 @@ if __name__ == "__main__":
 
         # Convert header to snake_case and rename if startswith 'total_activity_'
         header = [
-            "total_activity_time" if StringFormatter.set_snake_case(column_name).startswith("total_activity_")
+            "total_activity_time"
+            if StringFormatter.set_snake_case(column_name).startswith("total_activity_")
             else StringFormatter.set_snake_case(column_name)
             for column_name in header
         ]

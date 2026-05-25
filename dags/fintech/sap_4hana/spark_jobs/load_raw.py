@@ -1,36 +1,31 @@
+import ast
 import json
 import logging
-import ast
-from datetime import datetime
 from argparse import ArgumentParser
-from functools import reduce
+from datetime import datetime
 
 import pandas as pd
-from pyspark.sql.types import StructType
 from pyspark.sql import functions as F
-from pyspark.sql import DataFrame
-
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.api.api_enum import APIEnum
-from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.spark import (
-    BaseDBUtils,
-    SparkTableStorageFormat,
-    SparkDataFrameService,
-)
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.pipeline import IncrementalTableLoaderPipeline
-from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.services.configuration_service import ConfigurationService
-
+from pyspark.sql.types import StructType
 from quintoandar_logger import QuintoAndarLogger
-
 from quintoandar_sap_4hana_api_client.clients import Sap4HanaClient
 from quintoandar_sap_4hana_api_client.consumers.sap_4hana_consumer import (
     Sap4HanaConsumer,
 )
 
+from bietlejuice.base.api.api_enum import APIEnum
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+)
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.pipeline import IncrementalTableLoaderPipeline
+from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_raw_sap_4hana"
 
@@ -143,4 +138,4 @@ if __name__ == "__main__":
         except Exception as e:
             logger.info(f"{e}, m=Error loading data for {load_dt}")
     else:
-        logger.info(f"m=No data to load for this period!")
+        logger.info("m=No data to load for this period!")

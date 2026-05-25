@@ -2,24 +2,21 @@ import ast
 import json
 import logging
 from argparse import ArgumentParser
-from dateutil import parser
 
+from pyspark.sql.functions import col, current_timestamp, greatest, lit
 from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
-from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
-from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.db import DatabaseEnum
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkDataFrameService
+from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import OracleConsumer
+from bietlejuice.loaders.delta_loader import DeltaLoader
+from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
-from pyspark.sql.functions import col, current_timestamp, greatest, lit
-
-
-
 
 JOB_NAME = "load_cyber_audit_log_into_datalake"
 
@@ -35,11 +32,16 @@ def parse_arguments():
     arg_parser.add_argument("table_name", help="name of the output table")
     arg_parser.add_argument("load_start_date", help="Start of date range: '%Y-%m-%d'")
     arg_parser.add_argument("load_end_date", help="End of date range: '%Y-%m-%d'")
-    arg_parser.add_argument("extraction_type", help="extraction_type - full or incremental")
+    arg_parser.add_argument(
+        "extraction_type", help="extraction_type - full or incremental"
+    )
     arg_parser.add_argument("partitions", help="partition columns")
     arg_parser.add_argument("date_filter_columns", help="date filter columns")
     arg_parser.add_argument("purge_table", help="purge_table - True or False")
-    arg_parser.add_argument("excluded_fields", help="List of table fields that should not be ingested into the datalake")
+    arg_parser.add_argument(
+        "excluded_fields",
+        help="List of table fields that should not be ingested into the datalake",
+    )
     arg_parser.add_argument(
         "-tp",
         "--table-privileges",
@@ -62,21 +64,17 @@ def parse_arguments():
 
 
 def _get_conn_config(dbutils, dbutils_secret_key):
-    conn_config_json = dbutils.secrets.get(
-        scope="quintoandar", key=dbutils_secret_key
-    )
+    conn_config_json = dbutils.secrets.get(scope="quintoandar", key=dbutils_secret_key)
     return json.loads(conn_config_json)
 
 
 def _send_warning(dbutils, environment, table_name):
-    if environment == 'prod':
+    if environment == "prod":
         key = GchatWebhooksEnum.FINTECH_ALERTS_PROD
     else:
         key = GchatWebhooksEnum.AE_ALERTS_FORNO
 
-    gchat_webhook = dbutils.secrets.get(
-        scope="quintoandar", key=key
-    )
+    gchat_webhook = dbutils.secrets.get(scope="quintoandar", key=key)
 
     message_content = (
         f"⚠️\n"
@@ -92,8 +90,16 @@ def _send_warning(dbutils, environment, table_name):
     GChatService.send_message(message)
 
 
-def load_df_from_oracle(oracle_consumer, table_name, extraction_type, date_filter_columns,
-                       load_start_date, load_end_date, excluded_fields, purge_table):
+def load_df_from_oracle(
+    oracle_consumer,
+    table_name,
+    extraction_type,
+    date_filter_columns,
+    load_start_date,
+    load_end_date,
+    excluded_fields,
+    purge_table,
+):
     """
     Loads data from Oracle database, handling purge table logic specific to Cyber system
     """
@@ -101,7 +107,11 @@ def load_df_from_oracle(oracle_consumer, table_name, extraction_type, date_filte
 
     if extraction_type == "incremental" and date_filter_columns:
         df = oracle_consumer.get_incremental_data_from_table(
-            oracle_table_name, date_filter_columns, load_start_date, load_end_date, excluded_fields
+            oracle_table_name,
+            date_filter_columns,
+            load_start_date,
+            load_end_date,
+            excluded_fields,
         )
     else:
         df = oracle_consumer.get_data_from_table(oracle_table_name, excluded_fields)
@@ -109,14 +119,22 @@ def load_df_from_oracle(oracle_consumer, table_name, extraction_type, date_filte
     df = df.withColumn("source", lit("Original Table"))
 
     if purge_table:
-        logger.info(f"m=load_df_from_oracle, msg=Loading purge table for {oracle_table_name}")
+        logger.info(
+            f"m=load_df_from_oracle, msg=Loading purge table for {oracle_table_name}"
+        )
 
         if extraction_type == "incremental" and date_filter_columns:
             df_purge = oracle_consumer.get_incremental_data_from_table(
-                f'{oracle_table_name}_ESP', date_filter_columns, load_start_date, load_end_date, excluded_fields
+                f"{oracle_table_name}_ESP",
+                date_filter_columns,
+                load_start_date,
+                load_end_date,
+                excluded_fields,
             )
         else:
-            df_purge = oracle_consumer.get_data_from_table(f'{oracle_table_name}_ESP', excluded_fields)
+            df_purge = oracle_consumer.get_data_from_table(
+                f"{oracle_table_name}_ESP", excluded_fields
+            )
 
         df_purge = df_purge.withColumn("source", lit("Purge Table"))
 
@@ -133,7 +151,9 @@ def load_df_from_oracle(oracle_consumer, table_name, extraction_type, date_filte
             df_purge = df_purge.withColumn(column_missing_new, lit(None))
 
         df = df.unionByName(df_purge)
-        logger.info("m=load_df_from_oracle, msg=Successfully merged main and purge tables")
+        logger.info(
+            "m=load_df_from_oracle, msg=Successfully merged main and purge tables"
+        )
 
     return df
 
@@ -147,10 +167,11 @@ def add_partition(df, date_filter_columns):
 
     df = df.withColumn("ts_ingestion", current_timestamp())
 
-
     if date_filter_columns:
         if len(date_filter_columns) > 1:
-            df = df.withColumn("table_partition", (greatest(*[col(c) for c in date_filter_columns])))
+            df = df.withColumn(
+                "table_partition", (greatest(*[col(c) for c in date_filter_columns]))
+            )
         else:
             df = df.withColumn("table_partition", (col(date_filter_columns[0])))
         partition = "table_partition"
@@ -195,9 +216,14 @@ def main():
     oracle_consumer = OracleConsumer(conn_config, spark_client)
 
     raw_df = load_df_from_oracle(
-        oracle_consumer, args.table_name, args.extraction_type,
-        args.date_filter_columns, args.load_start_date, args.load_end_date,
-        args.excluded_fields, args.purge_table
+        oracle_consumer,
+        args.table_name,
+        args.extraction_type,
+        args.date_filter_columns,
+        args.load_start_date,
+        args.load_end_date,
+        args.excluded_fields,
+        args.purge_table,
     )
 
     if raw_df.count() == 0:
@@ -222,10 +248,7 @@ def main():
         partition_by=args.partitions,
     )
 
-    if (
-        table_privileges
-        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-    ):
+    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
 
     logger.info(f"m=__main__, msg=Successfully loaded table {full_raw_table_name}")

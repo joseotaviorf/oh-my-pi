@@ -65,9 +65,7 @@ class CoreBrokersHistorySparkJob(BaseCoreModelSparkJob):
             f"date_range={args.load_start_date}..{args.load_end_date}"
         )
 
-        df = HistoricalHelper.load_transactional_data(
-            spark, transactional_table, args
-        )
+        df = HistoricalHelper.load_transactional_data(spark, transactional_table, args)
         if args.table_name == "brokers_history":
             df = self._semi_join_companies_with_three_p_products(spark, df, args)
 
@@ -102,25 +100,20 @@ class CoreBrokersHistorySparkJob(BaseCoreModelSparkJob):
             "BROKER_PRODUCTS_HISTORY_TRANSACTIONAL_TABLE", required=True
         )
         cp_df = HistoricalHelper.load_transactional_data(spark, cp_table, args)
-        cp_df = self._align_transactional_fk_columns(
-            cp_df, "broker_products_history"
-        )
+        cp_df = self._align_transactional_fk_columns(cp_df, "broker_products_history")
         cp_df = cp_df.filter(
             F.col("id_product").cast("long").isin(list(THREE_P_BROKER_PRODUCT_IDS))
         )
-        allowed = (
-            cp_df.select(F.col("id_company").cast("string").alias("_sk_company"))
-            .distinct()
-        )
+        allowed = cp_df.select(
+            F.col("id_company").cast("string").alias("_sk_company")
+        ).distinct()
         return company_df.join(
             allowed,
             F.col("id").cast("string") == F.col("_sk_company"),
             "left_semi",
         ).drop("_sk_company")
 
-    def _filter_three_p_product_rows(
-        self, df: DataFrame, table_name: str
-    ) -> DataFrame:
+    def _filter_three_p_product_rows(self, df: DataFrame, table_name: str) -> DataFrame:
         if table_name not in ("broker_products_history", "broker_tiers_history"):
             return df
         return df.filter(
@@ -164,9 +157,7 @@ class CoreBrokersHistorySparkJob(BaseCoreModelSparkJob):
     def _filter_value_filled(self, df: DataFrame) -> DataFrame:
         """Drop rows with null or blank ``value`` (history rows must carry a value)."""
         v = F.col("value").cast("string")
-        return df.filter(
-            F.col("value").isNotNull() & (F.length(F.trim(v)) > 0)
-        )
+        return df.filter(F.col("value").isNotNull() & (F.length(F.trim(v)) > 0))
 
     def _reshape_composite_history_output(
         self, df: DataFrame, table_name: str
@@ -256,9 +247,7 @@ class CoreBrokersHistorySparkJob(BaseCoreModelSparkJob):
         )
 
         table_privileges = self.setup_table_privileges(args)
-        database_location = (
-            f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
-        )
+        database_location = f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
 
         self.logger.info(
             f"m=run_pipeline, "
@@ -283,8 +272,7 @@ class CoreBrokersHistorySparkJob(BaseCoreModelSparkJob):
 
         pipeline.run()
         self.logger.info(
-            f"m=run_pipeline, "
-            f"msg=History loading completed for table={args.table_name}"
+            f"m=run_pipeline, msg=History loading completed for table={args.table_name}"
         )
 
 

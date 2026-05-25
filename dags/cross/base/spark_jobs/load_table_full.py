@@ -1,5 +1,5 @@
-import logging
 import json
+import logging
 from argparse import ArgumentParser
 from datetime import datetime
 
@@ -11,7 +11,6 @@ from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.pipeline.full_table_loader_pipeline import FullTableLoaderPipeline
-
 
 JOB_NAME = "load_table"
 
@@ -71,7 +70,9 @@ def main():
 
     global spark
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
 
         spark = create_emr_spark_session(JOB_NAME)
 
@@ -155,7 +156,9 @@ def main():
             table_privileges_dict, f"{database_name}.{table_name}"
         )
     else:
-        table_privileges = TablePrivileges.from_environment_default(f"{database_name}.{table_name}")
+        table_privileges = TablePrivileges.from_environment_default(
+            f"{database_name}.{table_name}"
+        )
 
     table_loader_pipeline = FullTableLoaderPipeline(
         database_name=database_name,

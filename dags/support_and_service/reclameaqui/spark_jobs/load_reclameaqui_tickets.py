@@ -1,26 +1,25 @@
 import json
 import logging
 from argparse import ArgumentParser
-from pyspark.sql.functions import to_timestamp, col
 
+from pyspark.sql.functions import col, to_timestamp
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_reclameaqui_api_client.clients import ReclameaquiClient
 from quintoandar_reclameaqui_api_client.constants import EndpointEnum
 from quintoandar_reclameaqui_api_client.consumers import ReclameaquiTicketConsumer
 
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
     BaseDBUtils,
-    SparkTableStorageFormat,
     SparkDataFrameService,
+    SparkTableStorageFormat,
 )
-
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_reclameaqui_tickets"
@@ -31,7 +30,6 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
@@ -88,7 +86,6 @@ if __name__ == "__main__":
     response = consumer.sync(execution_date, 50)
 
     if response:
-
         df = spark_client.create_dataframe(data=response, schema=schema)
         df = df.withColumn("ts_load", to_timestamp(col("last_modification_date")))
         df = df.where(f"date(ts_load) = '{execution_date}'")

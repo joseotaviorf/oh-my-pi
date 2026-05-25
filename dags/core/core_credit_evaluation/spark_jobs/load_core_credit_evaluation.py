@@ -1,17 +1,17 @@
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import (
-    col,
     coalesce,
+    col,
     current_timestamp,
+    dayofmonth,
     lit,
+    month,
     when,
     year,
-    month,
-    dayofmonth,
 )
 
-from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
 from bietlejuice.base.core_models.helpers.surrogate_keys import SurrogateKeysHelper
+from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
 
 JOB_NAME = "core_credit_evaluation"
 

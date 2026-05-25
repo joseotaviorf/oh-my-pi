@@ -1,25 +1,26 @@
-from argparse import ArgumentParser
-from google.api_core.retry import Retry, exponential_sleep_generator
-from google.cloud.pubsub_v1 import SubscriberClient
-from tempfile import NamedTemporaryFile
-from time import sleep
 import json
 import os
+from argparse import ArgumentParser
+from tempfile import NamedTemporaryFile
+from time import sleep
 
+from google.api_core.retry import Retry, exponential_sleep_generator
+from google.cloud.pubsub_v1 import SubscriberClient
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkDataFrameService
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
-
-from bietlejuice.services.json_service import JsonService
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
-
+from bietlejuice.services.json_service import JsonService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_firestore_raw"
 
@@ -108,10 +109,7 @@ if __name__ == "__main__":
 
             for received_message in response.received_messages:
                 logger.info(
-                    "m=__main__, msg=Received message published at {} after {} attempts.".format(
-                        received_message.message.publish_time,
-                        received_message.delivery_attempt or 0,
-                    )
+                    f"m=__main__, msg=Received message published at {received_message.message.publish_time} after {received_message.delivery_attempt or 0} attempts."
                 )
 
                 ack_ids.append(received_message.ack_id)
@@ -176,9 +174,7 @@ if __name__ == "__main__":
                 )
 
             logger.info(
-                "m=__main__, msg=Received and acknowledged {} messages from {}.".format(
-                    len(ack_ids), subscription_id
-                )
+                f"m=__main__, msg=Received and acknowledged {len(ack_ids)} messages from {subscription_id}."
             )
         else:
             logger.info(

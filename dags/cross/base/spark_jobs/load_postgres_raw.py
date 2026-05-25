@@ -13,7 +13,7 @@ from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import PostgresConsumer
-from bietlejuice.pipeline import IncrementalTableLoaderPipeline, FullTableLoaderPipeline
+from bietlejuice.pipeline import FullTableLoaderPipeline, IncrementalTableLoaderPipeline
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_postgres_raw"
@@ -64,7 +64,9 @@ def get_conn_config(dbutils_secret_key: str, dbutils_secret_scope: str) -> dict:
         global dbutils
         dbutils = base_dbutils.get_dbutils()
 
-    conn_config_json = dbutils.secrets.get(scope=dbutils_secret_scope, key=dbutils_secret_key)
+    conn_config_json = dbutils.secrets.get(
+        scope=dbutils_secret_scope, key=dbutils_secret_key
+    )
 
     return json.loads(conn_config_json)
 
@@ -72,8 +74,10 @@ def get_conn_config(dbutils_secret_key: str, dbutils_secret_scope: str) -> dict:
 def main():
     global spark
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
-    
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
+
         spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
     environment = args.env
@@ -117,7 +121,7 @@ def main():
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
-    
+
     full_raw_table_name = f"{database_name}.{table_name}"
     if table_privileges_dict is not None:
         table_privileges = TablePrivileges.from_input_dict(
@@ -168,10 +172,7 @@ def main():
             database_name, table_name.lower(), database_location, LayerEnum.RAW, None
         ).load_and_register(df, format_options, **load_options)
 
-    if (
-        table_privileges
-        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-    ):
+    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
 
 

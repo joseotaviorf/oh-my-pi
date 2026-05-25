@@ -262,7 +262,9 @@ def fetch_all_iru_devices(
     query_params = _parse_query_params(base_filters)
     limit = int(query_params.get("limit", 300))
 
-    base_url = f"https://{safe_tenant}/api/{IRU_API_VERSION}/{safe_endpoint.lstrip('/')}"
+    base_url = (
+        f"https://{safe_tenant}/api/{IRU_API_VERSION}/{safe_endpoint.lstrip('/')}"
+    )
     _validate_iru_request_url(base_url)
 
     results: list[dict[str, Any]] = []
@@ -318,9 +320,7 @@ def main() -> None:
         LOGGER.info(f"m=main, msg=Running IRU raw load, summary={safe_log}")
 
         if not job_args.get(ENDPOINT_KEY):
-            raise ValueError(
-                "Job requires 'endpoint' in extra_details (e.g. devices)."
-            )
+            raise ValueError("Job requires 'endpoint' in extra_details (e.g. devices).")
 
         base_dbutils = BaseDBUtils()
         dbutils = base_dbutils.get_dbutils()

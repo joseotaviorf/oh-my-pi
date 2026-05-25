@@ -1,12 +1,10 @@
-import requests
-
 import pendulum
+import requests
 from airflow.models import DAG
 from airflow.models.param import Param
 from airflow.operators.python import PythonOperator
 
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-
 
 DAG_ID = "bietlejuice.datahub_connection_test"
 
@@ -49,7 +47,9 @@ def test_datahub_connection(**context) -> None:
             )
             status = response.status_code
             # 400/422 on the ingest endpoint is fine — it means we reached the server
-            reachable = status < 500 or (path == "/aspects?action=ingestProposal" and status in (400, 422))
+            reachable = status < 500 or (
+                path == "/aspects?action=ingestProposal" and status in (400, 422)
+            )
             icon = "✅" if reachable else "❌"
             print(f"{icon}  {method} {url}  →  HTTP {status}")
             if not reachable:

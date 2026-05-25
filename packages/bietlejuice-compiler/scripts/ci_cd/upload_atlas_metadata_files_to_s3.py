@@ -2,8 +2,8 @@ import argparse
 import glob
 import os
 
-from yaml import safe_load
 import boto3
+from yaml import safe_load
 
 ABS_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
@@ -33,7 +33,7 @@ def get_remote_path_from_yml_file(yml_path: str) -> str:
             lineage/atlas/datalake_monopoly_clean/person_sale.yml
             tags/atlas/datalake_metabase_raw/metabase_table.yml
     """
-    with open(yml_path, "r") as fp:
+    with open(yml_path) as fp:
         data = safe_load(fp)
         db_name = data["database_name"]
         table_name = data["table_name"]
@@ -93,7 +93,7 @@ def main():
                     f"local_path={file_path}, remote_path={remote_path}, msg=Metadata file saved to S3"
                 )
         else:
-            print(f"msg=No files found!")
+            print("msg=No files found!")
 
 
 if __name__ == "__main__":

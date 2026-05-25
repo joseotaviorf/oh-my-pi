@@ -1,33 +1,27 @@
+import os
 from datetime import datetime, timedelta
-
+from typing import Dict
 
 from airflow import DAG
-from typing import List, Dict
-
-from bietlejuice.base.sst.airflow.operators.base import SStPlaceholderOperator
-from bietlejuice.base.sst.airflow.common.common import (
-    get_libs,
-    get_cluster_config,
-    parse_parameters,
-)
-
-from bietlejuice.base.sst.airflow.common.configs import DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST
-
-from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import (
-    DatabricksGroupNameEnum,
-)
-from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
-from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.base.notification.gchat_callback import GchatCallback
-from bietlejuice.services.configuration_service import ConfigurationService
 from databricks_plugin import (
     QuintoAndarDatabricksCheckJobTaskOperator,
     QuintoAndarDatabricksExecuteJobClusterOperator,
 )
-import os
 
-#TODO: Move to only salesforce
+from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.base.notification.gchat_callback import GchatCallback
+from bietlejuice.base.sst.airflow.common.common import (
+    get_cluster_config,
+    get_libs,
+    parse_parameters,
+)
+from bietlejuice.base.sst.airflow.common.configs import (
+    DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
+)
+from bietlejuice.base.sst.airflow.operators.base import SStPlaceholderOperator
+from bietlejuice.services.configuration_service import ConfigurationService
+
+# TODO: Move to only salesforce
 DAG_NAME = "salesforce_cdc"
 DAG_ID = f"bietlejuice.{DAG_NAME.replace('.', '_')}"
 ENV = os.environ.get("ENVIRONMENT")
@@ -57,7 +51,7 @@ def create_sst_task(
     target_table: str,
     entry_point: str,
     parameters: Dict[str, str],
-    task_id: str = None
+    task_id: str = None,
 ):
 
     task_id = f"load_{target_schema}_{target_table}" if not task_id else task_id
@@ -66,9 +60,9 @@ def create_sst_task(
         "target_schema": target_schema,
         "target_table": target_table,
         "job_name": task_id,
-        **parameters
+        **parameters,
     }
-    #override task_id if provided
+    # override task_id if provided
     entry_point = entry_point if entry_point.endswith(".py") else f"{entry_point}.py"
     base_parameters = parse_parameters(base_parameters)
     return QuintoAndarDatabricksCheckJobTaskOperator(
@@ -84,6 +78,7 @@ def create_sst_task(
         execution_timeout=timedelta(hours=1),
     )
 
+
 def create_execute_job_cluster_task(dag: DAG, task_id: str):
     return QuintoAndarDatabricksExecuteJobClusterOperator(
         databricks_conn_id="databricks_new",
@@ -95,9 +90,9 @@ def create_execute_job_cluster_task(dag: DAG, task_id: str):
     )
 
 
-def build_metrics_tasks(event_table): 
+def build_metrics_tasks(event_table):
 
-    return [ 
+    return [
         create_sst_task(
             target_schema="",
             target_table=event_table,
@@ -124,12 +119,8 @@ def build_metrics_tasks(event_table):
 
 def create_start_end_operator(task_id: str):
 
-    start = SStPlaceholderOperator(
-        task_id=f"start_{task_id}"
-    )
-    end = SStPlaceholderOperator(
-        task_id=f"end_{task_id}"
-    )
+    start = SStPlaceholderOperator(task_id=f"start_{task_id}")
+    end = SStPlaceholderOperator(task_id=f"end_{task_id}")
     return start, end
 
 
@@ -143,7 +134,7 @@ default_args = {
     "retries": 3,
     "depends_on_past": True,
     "on_failure_callback": gchat_callback.task_failure_alert,
-    #TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
+    # TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
     # "on_failure_callback": jiraops_callback.task_failure_alert,
 }
 with DAG(
@@ -154,15 +145,13 @@ with DAG(
     catchup=True,
     tags=["SST", "SF", "salesforce"],  # better formatting
     on_failure_callback=gchat_callback.dag_failure_alert,
-    #TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
+    # TODO: Uncomment callback when the dag is ready with all events and quality checks are implemented
     # on_failure_callback=jiraops_callback.dag_failure_alert,
     max_active_runs=1,
- ) as dag:
-
+) as dag:
     start, end = create_start_end_operator("salesforce")
     execute_job_cluster = create_execute_job_cluster_task(
-            dag=dag,
-            task_id="execute_cdc_cluster"
+        dag=dag, task_id="execute_cdc_cluster"
     )
 
     for event, parameters in EVENTS_CONFIG.items():
@@ -175,7 +164,7 @@ with DAG(
             entry_point="salesforce/cdc_raw",
             parameters=parameters,
         )
-        
+
         clean_task = create_sst_task(
             target_schema="datalake_salesforce_clean",
             target_table=event_table,
@@ -188,13 +177,7 @@ with DAG(
 
         metrics_tasks = build_metrics_tasks(event_table)
         if parameters.get("skip_quality_contracts", False):
-            (
-                execute_job_cluster 
-                >> raw_task 
-                >> clean_task 
-                >> metrics_tasks
-                >> end
-            )
+            (execute_job_cluster >> raw_task >> clean_task >> metrics_tasks >> end)
         else:
             quality_contract_raw = create_sst_task(
                 target_schema="datalake_salesforce_raw",
@@ -215,11 +198,11 @@ with DAG(
                 task_id=f"quality_contract_checks_clean_{event_table}",
             )
             (
-                execute_job_cluster 
-                >> raw_task 
-                >> quality_contract_raw 
-                >> clean_task 
-                >> quality_contract_clean 
+                execute_job_cluster
+                >> raw_task
+                >> quality_contract_raw
+                >> clean_task
+                >> quality_contract_clean
                 >> metrics_tasks
                 >> end
             )

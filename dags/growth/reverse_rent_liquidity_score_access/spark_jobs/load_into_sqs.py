@@ -5,9 +5,9 @@ from decimal import Decimal
 from typing import Any, Dict, List, Tuple
 
 import boto3
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.services.configuration_service import ConfigurationService
-from quintoandar_logger import QuintoAndarLogger
 
 # Masterfeed SQS export for reverse_rent_liquidity_score.rent_liquidity_score (rent liquidity score to Masterfeed).
 # In dw_liquidity.fact_house_rent_liquidity you will find house_liquidity_score as the value stored in
@@ -66,7 +66,9 @@ def transform_payload(database_name: str, table_name: str) -> List[Dict[str, Any
     ]
 
 
-def send_messages(sqs_client: Any, queue_url: str, messages: List[Dict[str, Any]]) -> None:
+def send_messages(
+    sqs_client: Any, queue_url: str, messages: List[Dict[str, Any]]
+) -> None:
     logger.info("Sending messages to SQS queue %s", queue_url)
     message_attributes = {
         "contentType": {"DataType": "String", "StringValue": "application/json"},

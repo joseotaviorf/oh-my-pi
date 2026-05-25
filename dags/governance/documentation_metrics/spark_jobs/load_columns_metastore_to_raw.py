@@ -1,9 +1,9 @@
+import ast
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
-import ast
 
-from pyspark.sql.functions import udf, col
+from pyspark.sql.functions import col, udf
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -15,7 +15,7 @@ from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_columns_metastore_to_raw"
-INFORMATION_SCHEMA_COLUMNS_TABLE_NAME =  "system.information_schema.columns"
+INFORMATION_SCHEMA_COLUMNS_TABLE_NAME = "system.information_schema.columns"
 
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -24,12 +24,15 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 def get_columns_from_metastore():
     df_columns = spark.table(INFORMATION_SCHEMA_COLUMNS_TABLE_NAME)
-    final_df = df_columns.filter(f"table_catalog = '{spark.catalog.currentCatalog()}'").select(
-       col("column_name"),
-       col("table_schema").alias("database_name"),
-       col("table_name")
-    ).where(
-        """database_name not like '%_staging%'
+    final_df = (
+        df_columns.filter(f"table_catalog = '{spark.catalog.currentCatalog()}'")
+        .select(
+            col("column_name"),
+            col("table_schema").alias("database_name"),
+            col("table_name"),
+        )
+        .where(
+            """database_name not like '%_staging%'
         and database_name not like '%_temp%'
         and (database_name like 'datalake_%'
         or database_name like 'dw_%'
@@ -38,6 +41,7 @@ def get_columns_from_metastore():
         or database_name like 'core_%'
         or database_name = 'sandbox')
         """
+        )
     )
 
     final_df = final_df.coalesce(4)  # reducing number of partitions
@@ -88,7 +92,11 @@ if __name__ == "__main__":
     documentation_bucket = args.documentation_bucket
     documentation_prefix = args.documentation_prefix
 
-    bucket_suffix = ".data.quintoandar.com.br" if env == "prod" else ".forno.data.quintoandar.com.br"
+    bucket_suffix = (
+        ".data.quintoandar.com.br"
+        if env == "prod"
+        else ".forno.data.quintoandar.com.br"
+    )
     documentation_bucket = documentation_bucket + bucket_suffix
 
     logger.info(

@@ -1,33 +1,34 @@
 import json
 import logging
 from argparse import ArgumentParser
-from bs4 import BeautifulSoup
 from datetime import datetime
+
+from bs4 import BeautifulSoup
 from pyspark.sql.functions import lit
-
-from bietlejuice.base.api.api_enum import APIEnum
-from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import (
-    BaseDBUtils,
-    SparkTableStorageFormat,
-    SparkDataFrameService,
-)
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.pipeline import IncrementalTableLoaderPipeline
-
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_survicate_api_client.clients import SurvicateClient
 from quintoandar_survicate_api_client.consumers.survicate_consumer import (
     SurvicateConsumer,
 )
 
+from bietlejuice.base.api.api_enum import APIEnum
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+)
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.pipeline import IncrementalTableLoaderPipeline
+from bietlejuice.services.metastore_services import SparkMetastoreService
+
 job_name = "load_survicate_surveys_raw"
 scope = "quintoandar"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(job_name)
+
 
 def workspace_mapping_key(workspace_list: list) -> dict:
     """
@@ -41,10 +42,11 @@ def workspace_mapping_key(workspace_list: list) -> dict:
             api_key_mapping[workspace] = APIEnum.SURVICATE
         elif workspace == "P&T | Prod":
             api_key_mapping[workspace] = APIEnum.SURVICATE_PET
-        else: 
-            logger.error('Could not retrieve API Key for workspace: {}'.format(workspace))
+        else:
+            logger.error(f"Could not retrieve API Key for workspace: {workspace}")
 
     return api_key_mapping
+
 
 def get_api_token(workspace_api_token):
     """
@@ -61,6 +63,7 @@ def get_api_token(workspace_api_token):
 
     return api_token_object["api_token"]
 
+
 def table_configs(table_name: str):
     """
     Method for defining, for each table_name, the values for endpoint_enum, feedback_parameters_query
@@ -74,31 +77,28 @@ def table_configs(table_name: str):
     start = "{execution_date}T23:59:59.000000Z"
     end = "{execution_date}T00:00:00.000000Z"
 
-    if table_name == 'surveys':
-        endpoint_enum = 'SURVEYS'
+    if table_name == "surveys":
+        endpoint_enum = "SURVEYS"
         feedback_parameters_query = None
-        optional_parameters = {"items_per_page": 100,
-                               "start": start,
-                               "end": end}
-        
-    elif table_name == 'survey_questions':
-        endpoint_enum = 'SURVEY_QUESTIONS'
+        optional_parameters = {"items_per_page": 100, "start": start, "end": end}
+
+    elif table_name == "survey_questions":
+        endpoint_enum = "SURVEY_QUESTIONS"
         feedback_parameters_query = "SELECT DISTINCT id AS survey_id FROM datalake_survicate_raw.surveys WHERE workspace_name = '{workspace}'"
         optional_parameters = {"items_per_page": 100}
-  
-    elif table_name == 'survey_responses':
-        endpoint_enum = 'SURVEY_RESPONSES'
+
+    elif table_name == "survey_responses":
+        endpoint_enum = "SURVEY_RESPONSES"
         feedback_parameters_query = "SELECT DISTINCT id AS survey_id FROM datalake_survicate_raw.surveys WHERE workspace_name = '{workspace}'"
-        optional_parameters = {"items_per_page": 100,
-                               "start": start,
-                               "end": end}
-    
+        optional_parameters = {"items_per_page": 100, "start": start, "end": end}
+
     elif table_name == "respondent_attributes":
-        endpoint_enum = 'RESPONDENT_ATTRIBUTES'
+        endpoint_enum = "RESPONDENT_ATTRIBUTES"
         feedback_parameters_query = "SELECT DISTINCT GET_JSON_OBJECT(respondent, '$.uuid') AS respondent_uuid FROM datalake_survicate_raw.survey_responses WHERE DATE(dt_load) = DATE('{execution_date}') and workspace_name = '{workspace}'"
-        optional_parameters = {"items_per_page": 100} 
-           
+        optional_parameters = {"items_per_page": 100}
+
     return endpoint_enum, feedback_parameters_query, optional_parameters
+
 
 def _load_dataframe_into_datalake(args, force_recreate=True):
     """
@@ -111,12 +111,11 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
     environment = args.environment
     bucket = args.bucket
     execution_date = args.execution_date
-    dag_name = args.dag_name
     table_name = args.table_name
     schema = args.schema
 
     dt_execution = datetime.strptime(execution_date, "%Y-%m-%d")
-    
+
     spark_client = SparkClient()
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, bucket)
@@ -125,8 +124,8 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
     spark_metastore_service = SparkMetastoreService(spark_client)
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    spark_metastore_service.create_database(database_name) 
-    
+    spark_metastore_service.create_database(database_name)
+
     partitions = ["year", "month", "day"]
     workspace_list = ["Production", "P&T | Prod"]
 
@@ -135,7 +134,9 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
     for workspace in api_key_mapping:
         workspace_api_token = api_key_mapping[workspace]
 
-        endpoint_enum, feedback_parameters_query, optional_parameters = table_configs(table_name)
+        endpoint_enum, feedback_parameters_query, optional_parameters = table_configs(
+            table_name
+        )
 
         if optional_parameters.get("start"):
             logger.info("m=__main__, msg=Format start date...")
@@ -154,8 +155,7 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
             logger.info("m=__main__, msg=This table has feedback parameters...")
             logger.info("m=__main__, msg=Format feedback parameters...")
             feedback_parameters_query = feedback_parameters_query.format(
-                execution_date=execution_date,
-                workspace = workspace
+                execution_date=execution_date, workspace=workspace
             )
 
             df = spark.sql(feedback_parameters_query)
@@ -217,21 +217,21 @@ def _load_dataframe_into_datalake(args, force_recreate=True):
             )
     if unioned_df:
         IncrementalTableLoaderPipeline(
-                database_name=database_name,
-                table_name=table_name,
-                database_location=database_location,
-                layer=LayerEnum.RAW,
-                query=None,
-                partitions=partitions,
-                ).load_and_register(unioned_df, format_options, force_recreate)
+            database_name=database_name,
+            table_name=table_name,
+            database_location=database_location,
+            layer=LayerEnum.RAW,
+            query=None,
+            partitions=partitions,
+        ).load_and_register(unioned_df, format_options, force_recreate)
     else:
-       logger.warning(
-                f"""
+        logger.warning(
+            f"""
                 m={job_name},
                 environment={environment}, dag_execution_date={args.execution_date}, table_name={table_name}
                 msg=No data to feed back to the API, so no data was loaded for the current execution date.
                 """
-            )
+        )
 
 
 if __name__ == "__main__":

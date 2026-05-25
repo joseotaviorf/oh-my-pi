@@ -2,12 +2,13 @@ import json
 import logging
 from argparse import ArgumentParser, Namespace
 
-from bietlejuice.clients.db_clients.trino_client import TrinoClient
+from trino.exceptions import TrinoUserError
+
 from bietlejuice.base.db.database_enum import DatabaseEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
-from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
 from bietlejuice.base.spark.base_spark import BaseDBUtils
-from trino.exceptions import TrinoUserError
+from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
+from bietlejuice.clients.db_clients.trino_client import TrinoClient
 
 JOB_NAME = "register_delta_table"
 DELTA_CATALOG = "delta"
@@ -40,7 +41,7 @@ def get_trino_client() -> TrinoClient:
         user=trino_credentials["user"],
         password=trino_credentials["pwd"],
         catalog=DELTA_CATALOG,
-        client_tags=["pipeline"]
+        client_tags=["pipeline"],
     )
 
 
@@ -58,10 +59,12 @@ def register_table(
 
     try:
         table_ddl = trino_client.get_table_ddl(database_name, table_name)
-        is_delta = f"{DELTA_CATALOG}.{database_name}.{table_name}" in table_ddl.replace("\"", "")
-        if not is_delta: # The table exists but is not in Delta, so we need to drop it
+        is_delta = f"{DELTA_CATALOG}.{database_name}.{table_name}" in table_ddl.replace(
+            '"', ""
+        )
+        if not is_delta:  # The table exists but is not in Delta, so we need to drop it
             trino_client.drop_table(database_name, table_name)
-        else: # Already registered as Delta, nothing to be done
+        else:  # Already registered as Delta, nothing to be done
             return
     except TrinoUserError as e:
         if e.error_name != "TABLE_NOT_FOUND":
@@ -91,4 +94,6 @@ if __name__ == "__main__":
         "s3://", "s3a://"
     )  # Required by Trino
 
-    register_table(trino_client, spark_ms.spark_database_name, table_name, table_location)
+    register_table(
+        trino_client, spark_ms.spark_database_name, table_name, table_location
+    )

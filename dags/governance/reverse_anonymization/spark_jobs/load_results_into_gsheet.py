@@ -4,19 +4,14 @@ from argparse import ArgumentParser
 from datetime import datetime
 from typing import List, Union
 
-from quintoandar_logger import QuintoAndarLogger
-
-from pyspark.sql import functions, DataFrame
-from pyspark.sql.types import StructField, StructType, StringType
-
-from quintoandar_gsheets_api_client.producer import GoogleSheetsWriter
 from quintoandar_gsheets_api_client.clients import GoogleSheetsClient
+from quintoandar_gsheets_api_client.producer import GoogleSheetsWriter
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.api_consumers.gsheets_consumer import GsheetsConsumer
-
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_scan_results_into_gsheet"
@@ -24,6 +19,7 @@ TIMEOUT_LIMIT = 5 * 60
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
 
 @logger(exclude_return=True)
 def write_data_on_sheet(
@@ -42,14 +38,10 @@ def write_data_on_sheet(
     if header:
         data.insert(0, header)
 
-    client.write(
-        sheet_name=sheet_name,
-        sheet_id=sheet_id,
-        data=data
-    )
+    client.write(sheet_name=sheet_name, sheet_id=sheet_id, data=data)
 
 
-def _get_payloads_from_datalake(spark_client:SparkClient, execution_date:str) -> list:
+def _get_payloads_from_datalake(spark_client: SparkClient, execution_date: str) -> list:
     """
     This function gets the data from the reverse tables and transforms it into a list of payloads
 
@@ -63,7 +55,9 @@ def _get_payloads_from_datalake(spark_client:SparkClient, execution_date:str) ->
     month = execution_date_dt.month
     day = execution_date_dt.day
 
-    logger.info(f"m=_get_payloads_from_datalake, message=Fetching data from datalake, year={year}, month={month}, day={day}")
+    logger.info(
+        f"m=_get_payloads_from_datalake, message=Fetching data from datalake, year={year}, month={month}, day={day}"
+    )
 
     query = f"""
     SELECT
@@ -85,8 +79,11 @@ def _get_payloads_from_datalake(spark_client:SparkClient, execution_date:str) ->
     df = spark_client.get_records(query)
     rows = df.rdd.map(lambda row: [str(x) for x in row]).collect()
 
-    logger.info(f"m=_get_payloads_from_datalake, message=Fetched {len(rows)} rows from datalake")
+    logger.info(
+        f"m=_get_payloads_from_datalake, message=Fetched {len(rows)} rows from datalake"
+    )
     return rows
+
 
 def __get_auth(dbutils, credentials_scope, credentials_key):
     """
@@ -116,7 +113,9 @@ def main():
     sheet_id = args.sheet_id
     execution_date = args.execution_date
 
-    logger.info(f"m=main, message=Starting job. sheet_name={sheet_name}, sheet_id={sheet_id}, execution_date= {execution_date}")
+    logger.info(
+        f"m=main, message=Starting job. sheet_name={sheet_name}, sheet_id={sheet_id}, execution_date= {execution_date}"
+    )
 
     header = [
         "id_entity",
@@ -127,7 +126,7 @@ def main():
         "col_summary",
         "initial_eval",
         "manual_eval",
-        "is_pii"
+        "is_pii",
     ]
 
     base_dbutils = BaseDBUtils()
@@ -144,14 +143,28 @@ def main():
 
     gsheets_consumer = GsheetsConsumer(gsheets_client, spark_client)
 
-    logger.info(f"m=main, message=Fetching data from gsheets. sheet_name={sheet_name}, sheet_id={sheet_id}")
-    gsheet_current_data = gsheets_consumer.get_sheet_df(sheet_name, sheet_id, "pii_scan_results_validation")
-    logger.info(f"m=main, message=Found {len(gsheet_current_data.collect())} rows on gsheets.")
+    logger.info(
+        f"m=main, message=Fetching data from gsheets. sheet_name={sheet_name}, sheet_id={sheet_id}"
+    )
+    gsheet_current_data = gsheets_consumer.get_sheet_df(
+        sheet_name, sheet_id, "pii_scan_results_validation"
+    )
+    logger.info(
+        f"m=main, message=Found {len(gsheet_current_data.collect())} rows on gsheets."
+    )
 
-    gsheet_current_data_list = gsheet_current_data.filter("manual_eval == ''").rdd.map(lambda row: [str(x) for x in row]).collect()
+    gsheet_current_data_list = (
+        gsheet_current_data.filter("manual_eval == ''")
+        .rdd.map(lambda row: [str(x) for x in row])
+        .collect()
+    )
 
-    logger.info(f"m=main, message= {len(gsheet_current_data_list)} still need validation from owners. Keeping on gsheets.")
-    logger.info(f"m=main, message= {len(new_data_scan)} new data to be written on gsheets.")
+    logger.info(
+        f"m=main, message= {len(gsheet_current_data_list)} still need validation from owners. Keeping on gsheets."
+    )
+    logger.info(
+        f"m=main, message= {len(new_data_scan)} new data to be written on gsheets."
+    )
 
     payload = new_data_scan + gsheet_current_data_list
     payload.insert(0, header)

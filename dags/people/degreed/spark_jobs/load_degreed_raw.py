@@ -1,12 +1,12 @@
-from bietlejuice.clients.db_clients import SparkClient
-from quintoandar_logger import QuintoAndarLogger
 from pyspark.sql import SparkSession
-from bietlejuice.base.spark import BaseDBUtils
+from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.jobs.common.helpers import json_to_dataframe
+from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
 from bietlejuice.jobs.degreed.argument_parser import JobArgumentParser
 from bietlejuice.jobs.degreed.degreed_api import DegreedAPI
-from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
-from bietlejuice.jobs.common.helpers import json_to_dataframe
 
 LOGGER = QuintoAndarLogger(__name__)
 

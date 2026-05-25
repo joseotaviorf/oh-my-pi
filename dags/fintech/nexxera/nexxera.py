@@ -1,22 +1,25 @@
-from datetime import datetime
 import json
-import pendulum
 import os
+from datetime import datetime
 
+import pendulum
 from airflow.models import DAG
-from airflow.utils.helpers import chain, cross_downstream
+from airflow.utils.helpers import chain
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.helpers import TaskFlowHelper
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import DatabricksGroupNameEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.services.configuration_service import ConfigurationService
 
 SOURCE = "nexxera"
 CONTEXT = SOURCE
@@ -44,7 +47,9 @@ CLUSTER_DESCRIPTION = config_service.get_config("custom_cluster")
 
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
+    "quintoandar_{{ var.value.environment }}"
+)
 LIBRARIES_DESCRIPTION = config_service.get_config("default_libraries")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -56,7 +61,6 @@ DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
 CONSUMER_EXTRA_ARGS = config_service.get_config("consumer_extra_args")
 
 
-
 dag = DAG(
     dag_id=DAG_ID,
     default_args={
@@ -64,8 +68,7 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
         "on_failure_callback": jiraops_callback.task_failure_alert,
-
-     },
+    },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
     doc_md=BaseDAG.get_dag_doc(SOURCE).format(
@@ -74,7 +77,9 @@ dag = DAG(
     params=BaseDAG.get_default_trigger_form_params(),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
@@ -82,10 +87,13 @@ create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn
 )
 
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
-task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
+task_group = DatalakeTaskGroup(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=CONTEXT,
@@ -120,7 +128,7 @@ for table in tables:
                 table_name,
                 json.dumps(CONSUMER_EXTRA_ARGS),
                 format,
-                json.dumps(col_names)
+                json.dumps(col_names),
             ],
         )
 

@@ -4,12 +4,17 @@ import logging
 from argparse import ArgumentParser
 
 from pyspark.sql.functions import col, current_timestamp, greatest, lit
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatabaseEnum, DatalakeMetastoreService
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.spark import BaseDBUtils, SparkDataFrameService, SparkTableStorageFormat
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import OracleConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -18,32 +23,25 @@ from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-from quintoandar_logger import QuintoAndarLogger
-
-
-
 JOB_NAME = "load_cyber_legal_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-def _get_conn_config(dbutils, dbutils_secret_key):
-      conn_config_json = dbutils.secrets.get(
-          scope="quintoandar", key=dbutils_secret_key
-      )
 
-      return json.loads(conn_config_json)
+def _get_conn_config(dbutils, dbutils_secret_key):
+    conn_config_json = dbutils.secrets.get(scope="quintoandar", key=dbutils_secret_key)
+
+    return json.loads(conn_config_json)
 
 
 def _send_warning(dbutils, environment, table_name):
-    if environment == 'prod':
+    if environment == "prod":
         key = GchatWebhooksEnum.FINTECH_ALERTS_PROD
     else:
         key = GchatWebhooksEnum.AE_ALERTS_FORNO
 
-    gchat_webhook = dbutils.secrets.get(
-        scope="quintoandar", key=key
-    )
+    gchat_webhook = dbutils.secrets.get(scope="quintoandar", key=key)
 
     message_content = (
         f"⚠️\n"
@@ -58,6 +56,7 @@ def _send_warning(dbutils, environment, table_name):
     logger.info(f"m=__main__, message=sending slack message: {message}")
     GChatService.send_message(message)
 
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
@@ -70,8 +69,10 @@ if __name__ == "__main__":
     parser.add_argument("partitions", help="partition columns")
     parser.add_argument("date_filter_columns", help="partition columns")
     parser.add_argument("purge_table", help="purge_table - True or False")
-    parser.add_argument("excluded_fields", help="List of table fields that should not be ingested into the datalake")
-
+    parser.add_argument(
+        "excluded_fields",
+        help="List of table fields that should not be ingested into the datalake",
+    )
 
     args = parser.parse_args()
 
@@ -89,11 +90,10 @@ if __name__ == "__main__":
     date_filter_columns = ast.literal_eval(args.date_filter_columns)
     excluded_fields = ast.literal_eval(args.excluded_fields)
 
-    if environment == 'prod':
+    if environment == "prod":
         conn_var = DatabaseEnum.CYBER
     else:
-       conn_var = DatabaseEnum.CYBER
-
+        conn_var = DatabaseEnum.CYBER
 
     spark_client = SparkClient()
     base_dbutils = BaseDBUtils()
@@ -117,17 +117,30 @@ if __name__ == "__main__":
     oracle_table_name = table_name.upper()
 
     if extraction_type == "incremental" and date_filter_columns:
-        df = oracle_consumer.get_incremental_data_from_table(oracle_table_name, date_filter_columns, load_start_date, load_end_date, excluded_fields)
+        df = oracle_consumer.get_incremental_data_from_table(
+            oracle_table_name,
+            date_filter_columns,
+            load_start_date,
+            load_end_date,
+            excluded_fields,
+        )
     else:
         df = oracle_consumer.get_data_from_table(oracle_table_name, excluded_fields)
 
     df = df.withColumn("source", lit("Original Table"))
     if purge_table:
-
         if extraction_type == "incremental" and date_filter_columns:
-            df_purge = oracle_consumer.get_incremental_data_from_table(f'{oracle_table_name}_ESP', date_filter_columns, load_start_date, load_end_date, excluded_fields)
+            df_purge = oracle_consumer.get_incremental_data_from_table(
+                f"{oracle_table_name}_ESP",
+                date_filter_columns,
+                load_start_date,
+                load_end_date,
+                excluded_fields,
+            )
         else:
-            df_purge = oracle_consumer.get_data_from_table(f'{oracle_table_name}_ESP', excluded_fields)
+            df_purge = oracle_consumer.get_data_from_table(
+                f"{oracle_table_name}_ESP", excluded_fields
+            )
         df_purge = df_purge.withColumn("source", lit("Purge Table"))
 
         # Get the columns from both DataFrames
@@ -147,7 +160,6 @@ if __name__ == "__main__":
 
         df = df.unionByName(df_purge)
 
-
     if df.count() == 0:
         _send_warning(dbutils, environment, table_name)
     else:
@@ -156,7 +168,10 @@ if __name__ == "__main__":
         if extraction_type == "incremental":
             if date_filter_columns:
                 if len(date_filter_columns) > 1:
-                    df = df.withColumn("table_partition", (greatest(*[col(c) for c in date_filter_columns])))
+                    df = df.withColumn(
+                        "table_partition",
+                        (greatest(*[col(c) for c in date_filter_columns])),
+                    )
                 else:
                     df = df.withColumn("table_partition", (col(date_filter_columns[0])))
                 partition = "table_partition"
@@ -173,7 +188,9 @@ if __name__ == "__main__":
         if purge_table:
             df.groupBy("source").count().orderBy("source", ascending=False).show()
 
-        db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+        db_info = DatalakeMetastoreService.get_db_info(
+            environment, source, datalake_bucket
+        )
         spark_metastore_service = SparkMetastoreService(SparkClient())
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
@@ -183,9 +200,9 @@ if __name__ == "__main__":
         database_location = db_info["db_raw_path"]
         spark_metastore_service.create_database(database_name)
 
-        table_privileges = TablePrivileges.from_environment_default(f"{database_name}.{table_name}")
-
-
+        table_privileges = TablePrivileges.from_environment_default(
+            f"{database_name}.{table_name}"
+        )
 
         if extraction_type == "incremental":
             IncrementalTableLoaderPipeline(

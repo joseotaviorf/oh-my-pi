@@ -1,24 +1,20 @@
 from argparse import ArgumentParser
-
-import json
 from datetime import datetime, timedelta
-
-from pyspark.sql import DataFrame
 from functools import reduce
 
-import logging
+from pyspark.sql import DataFrame
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
-    SparkTableStorageFormat,
     SparkDataFrameService,
+    SparkTableStorageFormat,
 )
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_alert_manager_raw"
 
@@ -52,17 +48,23 @@ if __name__ == "__main__":
     """
     path_template = "s3://{}/raw/{}/year={}/month={}/day={}"
 
-    times_range = [start_date + timedelta(n) for n in range((end_date - start_date).days + 1)]
-    dates_range = [[str(dt.year),str(dt.month).zfill(2),str(dt.day).zfill(2)] for dt in times_range]
-    paths_range = [path_template.format(datalake_bucket,alert_manager_folder,*dt) for dt in dates_range]
+    times_range = [
+        start_date + timedelta(n) for n in range((end_date - start_date).days + 1)
+    ]
+    dates_range = [
+        [str(dt.year), str(dt.month).zfill(2), str(dt.day).zfill(2)]
+        for dt in times_range
+    ]
+    paths_range = [
+        path_template.format(datalake_bucket, alert_manager_folder, *dt)
+        for dt in dates_range
+    ]
 
     dfs_range = [spark.read.json(path) for path in paths_range]
 
-    dfs_filtered = filter(lambda df: df.rdd.isEmpty,dfs_range)
+    dfs_filtered = filter(lambda df: df.rdd.isEmpty, dfs_range)
 
-    df = reduce(
-        DataFrame.unionAll, dfs_filtered
-    )
+    df = reduce(DataFrame.unionAll, dfs_filtered)
 
     """
     Creating dataframe.
@@ -72,7 +74,7 @@ if __name__ == "__main__":
         .input(df)
         .create_year_month_day_columns_from_dataframe_column("@timestamp")
         .output()
-    )        
+    )
 
     df = df.na.drop(subset=raw_partition_cols)
 

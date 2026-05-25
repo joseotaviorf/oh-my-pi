@@ -6,7 +6,7 @@ Tests the workflow class that orchestrates DAG creation for API ingestion workfl
 Uses lazy import of RawAPIIngestionWorkflow to avoid loading BaseWorkflow, JiraOpsCallback,
 TaskCreatorFactory, ReprocessingGuardTaskCreator, and DatasetService during test collection.
 That prevents test order sensitivity in test_reprocessing_guard_task_creator,
-test_jiraops_callback, and test_dataset_service (see tests/unit/conftest.py).
+test_jiraops_callback, and test_dataset_service (see packages/bietlejuice-airflow/test/unit/conftest.py).
 """
 
 from unittest.mock import Mock, patch

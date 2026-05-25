@@ -1,12 +1,12 @@
 import ast
 
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.utils import AnalysisException
 
-from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
 from bietlejuice.base.core_models.helpers.historical_helper import HistoricalHelper
 from bietlejuice.base.core_models.helpers.history_builder import HistoryBuilder
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
 from bietlejuice.pipeline.dataframe_delta_table_loader_pipeline import (
     DataFrameDeltaTableLoaderPipeline,
 )
@@ -45,9 +45,7 @@ class CoreContractHistorySparkJob(BaseCoreModelSparkJob):
             f"date_range={args.load_start_date}..{args.load_end_date}"
         )
 
-        df = HistoricalHelper.load_transactional_data(
-            spark, transactional_table, args
-        )
+        df = HistoricalHelper.load_transactional_data(spark, transactional_table, args)
 
         # HistoryBuilder caches only the narrow, repartitioned slice of the
         # source data internally. Caching the full wide source here would
@@ -82,9 +80,7 @@ class CoreContractHistorySparkJob(BaseCoreModelSparkJob):
 
         return result_df
 
-    def _is_target_table_empty(
-        self, spark: SparkSession, full_table_name: str
-    ) -> bool:
+    def _is_target_table_empty(self, spark: SparkSession, full_table_name: str) -> bool:
         """Check if the target Delta table is missing or has zero rows."""
         try:
             if not spark.catalog.tableExists(full_table_name):
@@ -113,9 +109,7 @@ class CoreContractHistorySparkJob(BaseCoreModelSparkJob):
         )
 
         table_privileges = self.setup_table_privileges(args)
-        database_location = (
-            f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
-        )
+        database_location = f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
 
         full_table_name = f"{args.schema}.{args.table_name}"
         target_is_empty = self._is_target_table_empty(spark, full_table_name)
@@ -155,8 +149,7 @@ class CoreContractHistorySparkJob(BaseCoreModelSparkJob):
 
         pipeline.run()
         self.logger.info(
-            f"m=run_pipeline, "
-            f"msg=History loading completed for table={args.table_name}"
+            f"m=run_pipeline, msg=History loading completed for table={args.table_name}"
         )
 
 

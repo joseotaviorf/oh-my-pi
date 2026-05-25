@@ -1,20 +1,15 @@
 import io
 import logging
-from datetime import datetime
 from argparse import ArgumentParser
+from datetime import datetime
 from http.client import HTTPException
-
-from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.consumers.s3_consumer import S3Consumer
-from bietlejuice.base.spark import BaseDBUtils
-from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.services.messaging_services.gchat_service import GChatService
-from bietlejuice.services.messaging_services.message import Message
 
 import boto3
 from pyspark.sql.utils import AnalysisException
+from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.services.configuration_service import ConfigurationService
 
 DATABRICKS_SCOPE = "quintoandar"
@@ -52,7 +47,6 @@ def __build_warning_messages(environment, s3_path_prefix, table_list):
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("dag_name", help="Name of the DAG")
@@ -69,7 +63,6 @@ if __name__ == "__main__":
 
     config_service = ConfigurationService(dag_name)
     external_bucket = config_service.get_config("external_s3_bucket")
-
 
     logger.info(
         f"""m=__main__, environment={environment}, source={source},
@@ -92,9 +85,9 @@ if __name__ == "__main__":
         try:
             data = s3_consumer.get_data_from_file(path=datalake_path, format="delta")
             df = data.filter(
-                (data.year == execution_date.year) &
-                (data.month == execution_date.month) &
-                (data.day == execution_date.day)
+                (data.year == execution_date.year)
+                & (data.month == execution_date.month)
+                & (data.day == execution_date.day)
             )
         except AnalysisException:
             tables_to_send_warning.append(table)
@@ -102,10 +95,10 @@ if __name__ == "__main__":
 
         if df is not None:
             df = df.drop("year", "month", "day")
-           
-            destination_path = f"quinto_output/sale_bypass/"
 
-            file_name = f'{table}_{(execution_date.strftime("%Y%m%d"))}.csv'
+            destination_path = "quinto_output/sale_bypass/"
+
+            file_name = f"{table}_{(execution_date.strftime('%Y%m%d'))}.csv"
             with io.StringIO() as csv_buffer:
                 df.toPandas().to_csv(csv_buffer, index=False, header=True)
 

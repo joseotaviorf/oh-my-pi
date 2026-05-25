@@ -6,13 +6,12 @@
 
 # DBTITLE 1,Import libs
 from argparse import ArgumentParser, Namespace
-from datetime import date, timedelta, datetime
-from dateutil.relativedelta import relativedelta
+from datetime import date, datetime, timedelta
 from typing import Optional
 
+from dateutil.relativedelta import relativedelta
 from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import (
-    add_months,
     coalesce,
     col,
     count,
@@ -20,29 +19,23 @@ from pyspark.sql.functions import (
     datediff,
     least,
     lit,
-    max as spark_max,
-    min as spark_min,
     to_date,
     when,
 )
-from pyspark.sql.types import (
-    BooleanType,
-    DateType,
-    LongType,
-    StringType,
-    StructField,
-    StructType,
-    TimestampType,
+from pyspark.sql.functions import (
+    max as spark_max,
 )
+from pyspark.sql.functions import (
+    min as spark_min,
+)
+from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from quintoandar_logger import QuintoAndarLogger
 
 # COMMAND ----------
 
@@ -54,13 +47,13 @@ CAMPINAS_CITY_ID = 1
 MONTHS_WINDOW_DEFAULT = 2
 MAX_REGION_DEPTH = 10
 
-TABLE_STATUS_BY_MONTH   = "datalake_agent_reports.agent_status_by_month"
+TABLE_STATUS_BY_MONTH = "datalake_agent_reports.agent_status_by_month"
 TABLE_OFFER_SPECIALISTS = "datalake_sale_offer_flows.offer_specialists"
 TABLE_CIQ_FIRST_LISTING = "datalake_tiers.ciq_first_listing"
-TABLE_PARTNER           = "datalake_ebdb_clean.partner"
-TABLE_PARTNER_AGENT     = "datalake_ebdb_clean.partner_agent"
-TABLE_AGENT_DATA        = "datalake_ebdb_clean.agent_data"
-TABLE_REGION            = "datalake_ebdb_clean.region"
+TABLE_PARTNER = "datalake_ebdb_clean.partner"
+TABLE_PARTNER_AGENT = "datalake_ebdb_clean.partner_agent"
+TABLE_AGENT_DATA = "datalake_ebdb_clean.agent_data"
+TABLE_REGION = "datalake_ebdb_clean.region"
 TABLE_AGENT_REGION_DATA = "datalake_ebdb_clean.agent_region_data"
 
 # COMMAND ----------
@@ -68,27 +61,54 @@ TABLE_AGENT_REGION_DATA = "datalake_ebdb_clean.agent_region_data"
 # DBTITLE 1,Argument parsing
 # Order must match DAG spark_job_arguments + extra_spark_job_arguments (load_start_date for alignment).
 ARG_SPEC = [
-    ("env",                 str, "forno", "Environment: forno/prod"),
-    ("datalake_bucket",     str, "5a-datalake-prod", "Datalake bucket"),
-    ("database_base_name",  str, "agent_reports", "Base name for database (schema)"),
-    ("dag_name",            str, "enrich_agent_reports", "DAG name"),
-    ("table_name",          str, "agent_independent_campinas_metrics", "Target enrich table name"),
-    ("load_start_date",     str, lambda: (date.today() - timedelta(days=30)).isoformat(), "Interval start (alignment with DAG; window uses load_end_date + months_window)"),
-    ("load_end_date",       str, lambda: date.today().isoformat(), "Interval end YYYY-MM-DD (window end)"),
-    ("run_mode",            str, "dev", "Run mode: prod/dev"),
-    ("months_window",       int, MONTHS_WINDOW_DEFAULT, "Number of months in the lookback window"),
+    ("env", str, "forno", "Environment: forno/prod"),
+    ("datalake_bucket", str, "5a-datalake-prod", "Datalake bucket"),
+    ("database_base_name", str, "agent_reports", "Base name for database (schema)"),
+    ("dag_name", str, "enrich_agent_reports", "DAG name"),
+    (
+        "table_name",
+        str,
+        "agent_independent_campinas_metrics",
+        "Target enrich table name",
+    ),
+    (
+        "load_start_date",
+        str,
+        lambda: (date.today() - timedelta(days=30)).isoformat(),
+        "Interval start (alignment with DAG; window uses load_end_date + months_window)",
+    ),
+    (
+        "load_end_date",
+        str,
+        lambda: date.today().isoformat(),
+        "Interval end YYYY-MM-DD (window end)",
+    ),
+    ("run_mode", str, "dev", "Run mode: prod/dev"),
+    (
+        "months_window",
+        int,
+        MONTHS_WINDOW_DEFAULT,
+        "Number of months in the lookback window",
+    ),
 ]
+
 
 def _defaults():
     return [d() if callable(d) else d for _, _, d, _ in ARG_SPEC]
 
+
 def parse_args() -> Namespace:
     parser = ArgumentParser(description=JOB_NAME)
     default_values = _defaults()
-    for (name, type_, _default, help_text), default_val in zip(ARG_SPEC, default_values):
-        parser.add_argument(name, nargs="?", type=type_, default=default_val, help=help_text)
+    for (name, type_, _default, help_text), default_val in zip(
+        ARG_SPEC, default_values
+    ):
+        parser.add_argument(
+            name, nargs="?", type=type_, default=default_val, help=help_text
+        )
     namespace, _ = parser.parse_known_args()
     return namespace
+
 
 def _month_range(load_end_date: str, months_window: int) -> tuple[date, date]:
     """Return (month_start, month_end) as Python dates for the lookback window."""
@@ -98,8 +118,8 @@ def _month_range(load_end_date: str, months_window: int) -> tuple[date, date]:
     return month_start, month_end
 
 
-
 # COMMAND ----------
+
 
 # DBTITLE 1,TQX first lead referral by user/month
 def _tqx_first_date_df(month_start: date, month_end: date) -> DataFrame:
@@ -124,19 +144,18 @@ def _tqx_first_date_df(month_start: date, month_end: date) -> DataFrame:
     )
     window = Window.partitionBy("id_user")
     first_activation = by_month.withColumn(
-            "ts_first_activation_TQX_referral",
-            spark_min("ts_first_activation_TQX_referral").over(window),
-        )
-
-    return (
-        first_activation
-        .filter(
-            (col("reference_month") >= lit(month_start))
-            & (col("reference_month") <= lit(month_end))
-        )
+        "ts_first_activation_TQX_referral",
+        spark_min("ts_first_activation_TQX_referral").over(window),
     )
 
+    return first_activation.filter(
+        (col("reference_month") >= lit(month_start))
+        & (col("reference_month") <= lit(month_end))
+    )
+
+
 # COMMAND ----------
+
 
 # DBTITLE 1,Valid first listing by user/month
 def _valid_first_listing_df(month_start: date, month_end: date) -> DataFrame:
@@ -160,22 +179,20 @@ def _valid_first_listing_df(month_start: date, month_end: date) -> DataFrame:
     )
     window = Window.partitionBy("id_user")
     first_activation = first_listing.withColumn(
-            "ts_valid_activation_first_listing",
-            spark_min("ts_valid_activation_first_listing").over(window),
-        )
-
-
-    return (
-        first_activation
-        .filter(
-            (col("reference_month") >= lit(month_start))
-            & (col("reference_month") <= lit(month_end))
-        )
+        "ts_valid_activation_first_listing",
+        spark_min("ts_valid_activation_first_listing").over(window),
     )
+
+    return first_activation.filter(
+        (col("reference_month") >= lit(month_start))
+        & (col("reference_month") <= lit(month_end))
+    )
+
 
 # COMMAND ----------
 
 # DBTITLE 1,Campinas region mapping (city + all descendants, recursive)
+
 
 def _region_subtree_ids(
     region: DataFrame, included_ids: DataFrame, depth: int = 0
@@ -226,7 +243,9 @@ def _resolve_id_original_parent(region: DataFrame) -> DataFrame:
         col("name").alias("parent_name"),
     )
     for _ in range(MAX_REGION_DEPTH - 1):
-        ancestor = ancestor.join(parent_cols, col("current_parent") == col("pid"), "left").select(
+        ancestor = ancestor.join(
+            parent_cols, col("current_parent") == col("pid"), "left"
+        ).select(
             col("region_id"),
             coalesce(col("pid_parent"), col("current_parent")).alias("current_parent"),
             coalesce(
@@ -290,7 +309,9 @@ def _resolve_id_original_parent(region: DataFrame) -> DataFrame:
         col("name").alias("parent_name"),
     )
     for _ in range(MAX_REGION_DEPTH - 1):
-        ancestor = ancestor.join(parent_cols, col("current_parent") == col("pid"), "left").select(
+        ancestor = ancestor.join(
+            parent_cols, col("current_parent") == col("pid"), "left"
+        ).select(
             col("region_id"),
             coalesce(col("pid_parent"), col("current_parent")).alias("current_parent"),
             coalesce(
@@ -368,7 +389,9 @@ def _campinas_agents_df(region_mapping: DataFrame) -> DataFrame:
         .distinct()
     )
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,Main builder
 def build_agent_independent_campinas_metrics(args: Namespace) -> DataFrame:
@@ -379,12 +402,9 @@ def build_agent_independent_campinas_metrics(args: Namespace) -> DataFrame:
     months_window = int(getattr(args, "months_window", MONTHS_WINDOW_DEFAULT))
     month_start, month_end = _month_range(args.load_end_date, months_window)
 
-    status = (
-        spark.table(TABLE_STATUS_BY_MONTH)
-        .filter(
-            (col("reference_month") >= lit(month_start))
-            & (col("reference_month") <= lit(month_end))
-        )
+    status = spark.table(TABLE_STATUS_BY_MONTH).filter(
+        (col("reference_month") >= lit(month_start))
+        & (col("reference_month") <= lit(month_end))
     )
     # Last date per agent when is_passive_lead_receiver went from true to false (most recent registration as independent).
     last_independent = (
@@ -395,11 +415,13 @@ def build_agent_independent_campinas_metrics(args: Namespace) -> DataFrame:
             "dt_independent_agent_registered",
             to_date(col("ts_independent_agent_registered")),
         )
-        .select(col("id_agent").alias("fi_id_agent"), col("dt_independent_agent_registered"))
+        .select(
+            col("id_agent").alias("fi_id_agent"), col("dt_independent_agent_registered")
+        )
     )
-    tqx             = _tqx_first_date_df(month_start, month_end)
-    first_listing   = _valid_first_listing_df(month_start, month_end)
-    region_mapping  = _cities_region_mapping(ancestor_ids=[CAMPINAS_CITY_ID])
+    tqx = _tqx_first_date_df(month_start, month_end)
+    first_listing = _valid_first_listing_df(month_start, month_end)
+    region_mapping = _cities_region_mapping(ancestor_ids=[CAMPINAS_CITY_ID])
     campinas_agents = _campinas_agents_df(region_mapping)
 
     agent_data = spark.table(TABLE_AGENT_DATA).select(
@@ -413,7 +435,11 @@ def build_agent_independent_campinas_metrics(args: Namespace) -> DataFrame:
 
     main = (
         status.alias("s")
-        .join(campinas_agents.alias("ca"), col("s.id_agent") == col("ca.id_agent"), "inner")
+        .join(
+            campinas_agents.alias("ca"),
+            col("s.id_agent") == col("ca.id_agent"),
+            "inner",
+        )
         .join(last_independent, col("s.id_agent") == col("fi_id_agent"), "left")
         .join(agent_data, col("s.id_agent") == col("ad_id"), "left")
         .join(
@@ -435,50 +461,63 @@ def build_agent_independent_campinas_metrics(args: Namespace) -> DataFrame:
         )
     )
 
-    result = main.select(
-        col("s.id_user"),
-        col("s.id_agent"),
-        col("s.reference_month"),
-        col("s.ciq_status"),
-        col("s.agent_status"),
-        col("s.is_passive_lead_receiver"),
-        coalesce(
-            col("dt_independent_agent_registered"),
-            to_date(least(col("ts_agent_created"), col("ts_ciq_created"))),
-        ).alias("dt_independent_agent_registered"),
-        col("ts_agent_created"),
-        col("ts_ciq_created"),
-        col("tqx.ts_first_activation_TQX_referral"),
-        coalesce(col("tqx.total_tqx_count"), lit(0)).alias("total_tqx_count"),
-        col("vfl.ts_valid_activation_first_listing"),
-        coalesce(col("vfl.total_listings_count"), lit(0)).alias("total_listings_count"),
-    ).withColumn(
-        "is_ciq_active_in_month",
-        coalesce(col("total_listings_count"), lit(0)) > 0,
-    ).withColumn(
-        "is_tqx_active_in_month",
-        coalesce(col("total_tqx_count"), lit(0)) > 0,
-    ).withColumn(
-        "is_ciq_only",
-        (col("ciq_status") == "ACTIVE") & (col("agent_status") == "INACTIVE"),
-    ).withColumn(
-        "is_independent_agent",
-        (col("ciq_status") == "ACTIVE")
-        & (col("agent_status") == "ACTIVE")
-        & (col("is_passive_lead_receiver") == False),
-    ).withColumn(
-        "days_since_agent_created",
-        datediff(col("reference_month"), least(col("ts_agent_created"), col("ts_ciq_created")))
-    ).withColumn(
-        "days_since_independent_agent_registered",
-        datediff(col("reference_month"), col("dt_independent_agent_registered"))
+    result = (
+        main.select(
+            col("s.id_user"),
+            col("s.id_agent"),
+            col("s.reference_month"),
+            col("s.ciq_status"),
+            col("s.agent_status"),
+            col("s.is_passive_lead_receiver"),
+            coalesce(
+                col("dt_independent_agent_registered"),
+                to_date(least(col("ts_agent_created"), col("ts_ciq_created"))),
+            ).alias("dt_independent_agent_registered"),
+            col("ts_agent_created"),
+            col("ts_ciq_created"),
+            col("tqx.ts_first_activation_TQX_referral"),
+            coalesce(col("tqx.total_tqx_count"), lit(0)).alias("total_tqx_count"),
+            col("vfl.ts_valid_activation_first_listing"),
+            coalesce(col("vfl.total_listings_count"), lit(0)).alias(
+                "total_listings_count"
+            ),
+        )
+        .withColumn(
+            "is_ciq_active_in_month",
+            coalesce(col("total_listings_count"), lit(0)) > 0,
+        )
+        .withColumn(
+            "is_tqx_active_in_month",
+            coalesce(col("total_tqx_count"), lit(0)) > 0,
+        )
+        .withColumn(
+            "is_ciq_only",
+            (col("ciq_status") == "ACTIVE") & (col("agent_status") == "INACTIVE"),
+        )
+        .withColumn(
+            "is_independent_agent",
+            (col("ciq_status") == "ACTIVE")
+            & (col("agent_status") == "ACTIVE")
+            & (col("is_passive_lead_receiver") == False),
+        )
+        .withColumn(
+            "days_since_agent_created",
+            datediff(
+                col("reference_month"),
+                least(col("ts_agent_created"), col("ts_ciq_created")),
+            ),
+        )
+        .withColumn(
+            "days_since_independent_agent_registered",
+            datediff(col("reference_month"), col("dt_independent_agent_registered")),
+        )
     )
 
     return result
 
 
-
 # COMMAND ----------
+
 
 # DBTITLE 1,Pre-write checks
 def validate_before_write(df: DataFrame) -> int:
@@ -539,8 +578,8 @@ def save_df(
     )
 
 
-
 # COMMAND ----------
+
 
 # DBTITLE 1,Main
 def main(args: Namespace | None = None) -> None:

@@ -1,14 +1,11 @@
-import json
 import logging
-import multiprocessing
-import concurrent.futures
 from argparse import ArgumentParser
 from datetime import datetime
 
 import boto3
 from pyspark.sql.functions import lit
-
 from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
@@ -17,7 +14,6 @@ from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.storage_services import S3Service
-
 
 JOB_NAME = "add_data_from_airbyte_to_raw"
 SOURCE = "zendesk"
@@ -54,14 +50,23 @@ if __name__ == "__main__":
     database_location = db_info["db_raw_path"]
     spark_metastore_service.create_database(database_name)
 
-    objs = s3_service.list_objects(f"s3://5a-datalake-incoming-prod/airbyte/zendesk_{table_name}/{table_name}")
-    valid_files = [filename for filename in objs if f"{execution_date_str.replace('-', '_')}" in filename]
+    objs = s3_service.list_objects(
+        f"s3://5a-datalake-incoming-prod/airbyte/zendesk_{table_name}/{table_name}"
+    )
+    valid_files = [
+        filename
+        for filename in objs
+        if f"{execution_date_str.replace('-', '_')}" in filename
+    ]
     if valid_files:
-
-        df = s3_consumer.get_data_from_file(
-            valid_files,
-            format="json",
-        ).select("_airbyte_data.*").drop('metadata') # this column exists on ticket_audits and causes schema errors
+        df = (
+            s3_consumer.get_data_from_file(
+                valid_files,
+                format="json",
+            )
+            .select("_airbyte_data.*")
+            .drop("metadata")
+        )  # this column exists on ticket_audits and causes schema errors
 
         df = df.withColumn("dt", lit(execution_date_str))
 

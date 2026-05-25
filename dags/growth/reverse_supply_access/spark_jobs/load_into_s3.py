@@ -1,12 +1,12 @@
 import logging
-import pandas as pd
-import boto3
-from io import StringIO
-from http.client import HTTPException
 from argparse import ArgumentParser
-from bietlejuice.services.storage_services import S3Service
+from http.client import HTTPException
+from io import StringIO
 
+import boto3
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.services.storage_services import S3Service
 
 JOB_NAME = "load_into_s3"
 
@@ -30,7 +30,6 @@ def parse_arguments() -> dict:
     database_name = args.database_name
     table_name = args.table_name
     s3_path = args.s3_path
-
 
     return {
         "database_name": database_name,
@@ -65,13 +64,13 @@ def load_table_into_s3(
 
         logger.info(
             f"m=__main__, message=successful S3 put_object for table {table_name}"
-            )
-        
-    except Exception as e:
+        )
 
+    except Exception as e:
         raise HTTPException(
             f"m=__main__, message=UNSUCCESSFULL S3 put_object for table {table_name}, error={e}"
         )
+
 
 if __name__ == "__main__":
     """
@@ -91,4 +90,3 @@ if __name__ == "__main__":
         table_name=job_args_dict["table_name"],
         s3_path=job_args_dict["s3_path"],
     )
-

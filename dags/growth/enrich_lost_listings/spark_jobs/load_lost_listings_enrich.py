@@ -1,15 +1,13 @@
-import joblib
-from datetime import datetime
 from argparse import ArgumentParser
 
+import joblib
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
-
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_lost_listings_enrich"
 
@@ -76,9 +74,7 @@ if __name__ == "__main__":
     s3_path = database_location + table_name
     full_table_name = f"{database_name}.{table_name}"
 
-    logger.info(
-        f"Table {full_table_name} will be loaded as Delta."
-    )
+    logger.info(f"Table {full_table_name} will be loaded as Delta.")
 
     delta_loader.load_table(
         table_name=full_table_name,
@@ -87,6 +83,4 @@ if __name__ == "__main__":
         partition_by=enrich_partition_cols,
     )
 
-    spark_metastore_service.refresh_table(
-        database_name, table_name
-    )
+    spark_metastore_service.refresh_table(database_name, table_name)

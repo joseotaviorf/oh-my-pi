@@ -1,13 +1,14 @@
-from bietlejuice.base.sst.pipelines.sfmc.clean import (
-    sfmc_clean_pipeline,
-)
+import logging
+
+from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.sst.core.utils.common import (
     default_args,
     retrieve_spark_session,
 )
-
-import logging
-from quintoandar_logger import QuintoAndarLogger
+from bietlejuice.base.sst.pipelines.sfmc.clean import (
+    sfmc_clean_pipeline,
+)
 
 
 @default_args(

@@ -3,9 +3,8 @@ import logging
 from argparse import ArgumentParser
 from datetime import datetime
 
-from quintoandar_logger import QuintoAndarLogger
-
 from pyspark.sql import functions as F
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
@@ -14,7 +13,6 @@ from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
 
 JOB_NAME = "load_text2filter_evals_into_datalake"
 

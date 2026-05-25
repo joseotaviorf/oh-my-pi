@@ -1,14 +1,22 @@
 import ast
 from argparse import ArgumentParser
-from dateutil import parser
 
-from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.loaders.delta_loader import DeltaLoader
-from pyspark.sql.functions import col, to_timestamp, concat, to_timestamp, year, month, dayofmonth, hour, lit
-from bietlejuice.services.configuration_service import ConfigurationService
-from bietlejuice.base.spark import (
-    spark
+from dateutil import parser
+from pyspark.sql.functions import (
+    col,
+    concat,
+    dayofmonth,
+    hour,
+    lit,
+    month,
+    to_timestamp,
+    year,
 )
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.spark import spark
+from bietlejuice.loaders.delta_loader import DeltaLoader
+from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "cloudfront_logs_load"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -20,24 +28,25 @@ def clean_cf(df):
     """
 
     ts = to_timestamp(concat(col("date"), lit(" "), col("time")))
-    df = df.select(ts.alias("ts_event"), 
-                col("time_taken").alias("request_duration_s"),
-                col("x_edge_location").alias("edge_location"),
-                col("c_ip").alias("principal_ip"),
-                col("c_port").alias("principal_port"),
-                col("cs_method").alias("request_method"),
-                col("cs_host").alias("request_host"),
-                col("cs_uri_stem").alias("request_path"),
-                col("cs_user_agent").alias("request_user_agent"),
-                col("cs_uri_query").alias("request_query"),
-                col("sc_status").alias("response_code"),
-                col("x_edge_result_type").alias("request_result_type"),
-                col("x_edge_request_id").alias("id_request"),
-                year(ts).alias("year"),
-                month(ts).alias("month"),
-                dayofmonth(ts).alias("day"),
-                hour(ts).alias("hour")                
-              ).where(col("date").isNotNull())
+    df = df.select(
+        ts.alias("ts_event"),
+        col("time_taken").alias("request_duration_s"),
+        col("x_edge_location").alias("edge_location"),
+        col("c_ip").alias("principal_ip"),
+        col("c_port").alias("principal_port"),
+        col("cs_method").alias("request_method"),
+        col("cs_host").alias("request_host"),
+        col("cs_uri_stem").alias("request_path"),
+        col("cs_user_agent").alias("request_user_agent"),
+        col("cs_uri_query").alias("request_query"),
+        col("sc_status").alias("response_code"),
+        col("x_edge_result_type").alias("request_result_type"),
+        col("x_edge_request_id").alias("id_request"),
+        year(ts).alias("year"),
+        month(ts).alias("month"),
+        dayofmonth(ts).alias("day"),
+        hour(ts).alias("hour"),
+    ).where(col("date").isNotNull())
 
     return df
 
@@ -61,6 +70,7 @@ def parse_arguments():
 
     return args
 
+
 def main():
     """
     This DAG loads and cleans Cloudfront logs.
@@ -79,24 +89,56 @@ def main():
     )
 
     schema = [
-        "date", "time", "x_edge_location", "sc_bytes", "c_ip", "cs_method", "cs_host",
-        "cs_uri_stem", "sc_status", "cs_referer", "cs_user_agent", "cs_uri_query",
-        "cs_cookie", "x_edge_result_type", "x_edge_request_id", "x_host_header",
-        "cs_protocol", "cs_bytes", "time_taken", "x_forwarded_for", "ssl_protocol",
-        "ssl_cipher", "x_edge_response_result_type", "cs_protocol_version", "fle_status",
-        "fle_encrypted_fields", "c_port", "time_to_first_byte", "x_edge_detailed_result_type",
-        "sc_content_type", "sc_content_len", "sc_range_start", "sc_range_end"
+        "date",
+        "time",
+        "x_edge_location",
+        "sc_bytes",
+        "c_ip",
+        "cs_method",
+        "cs_host",
+        "cs_uri_stem",
+        "sc_status",
+        "cs_referer",
+        "cs_user_agent",
+        "cs_uri_query",
+        "cs_cookie",
+        "x_edge_result_type",
+        "x_edge_request_id",
+        "x_host_header",
+        "cs_protocol",
+        "cs_bytes",
+        "time_taken",
+        "x_forwarded_for",
+        "ssl_protocol",
+        "ssl_cipher",
+        "x_edge_response_result_type",
+        "cs_protocol_version",
+        "fle_status",
+        "fle_encrypted_fields",
+        "c_port",
+        "time_to_first_byte",
+        "x_edge_detailed_result_type",
+        "sc_content_type",
+        "sc_content_len",
+        "sc_range_start",
+        "sc_range_end",
     ]
 
-    df = spark.read.format("csv")\
-        .option("sep", "\t").option("comment", "#")\
-        .option("nullValue", "-")\
-        .load(args.path.format(
+    df = (
+        spark.read.format("csv")
+        .option("sep", "\t")
+        .option("comment", "#")
+        .option("nullValue", "-")
+        .load(
+            args.path.format(
                 args.execution_date.year,
                 str(args.execution_date.month).zfill(2),
                 str(args.execution_date.day).zfill(2),
-                str(args.execution_date.hour).zfill(2)
-        )).toDF(*schema)
+                str(args.execution_date.hour).zfill(2),
+            )
+        )
+        .toDF(*schema)
+    )
     df = clean_cf(df)
 
     DeltaLoader().load_table(
@@ -105,6 +147,7 @@ def main():
         source_df=df,
         partition_by=args.partition_cols,
     )
+
 
 if __name__ == "__main__":
     main()

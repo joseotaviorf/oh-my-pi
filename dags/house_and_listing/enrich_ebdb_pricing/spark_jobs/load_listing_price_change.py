@@ -1,15 +1,15 @@
 from argparse import ArgumentParser
 
 from delta.tables import DeltaTable
-from pyspark.sql import DataFrame, functions as F
+from pyspark.sql import DataFrame
+from pyspark.sql import functions as F
 from pyspark.sql.window import Window
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_listing_price_change"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -33,10 +33,9 @@ def _get_candidates(start_date, end_date) -> DataFrame:
     r = spark.table(TABLE_USER_REVISION)
     h_aud = spark.table(TABLE_HOUSE_AUD)
 
-    active_revisions = (
-        r.filter(F.to_date("ts_revision").between(start_date, end_date))
-        .select(F.col("id").alias("rev_id"))
-    )
+    active_revisions = r.filter(
+        F.to_date("ts_revision").between(start_date, end_date)
+    ).select(F.col("id").alias("rev_id"))
 
     return (
         h_aud.alias("h")
@@ -63,7 +62,10 @@ def _build_house_aud(candidates: DataFrame, end_date) -> DataFrame:
 
     return (
         h_aud.alias("h")
-        .join(F.broadcast(candidates).alias("c"), F.col("h.id_house") == F.col("c.id_house"))
+        .join(
+            F.broadcast(candidates).alias("c"),
+            F.col("h.id_house") == F.col("c.id_house"),
+        )
         .join(r.alias("r"), F.col("h.rev") == F.col("r.id"))
         .join(lbc.alias("lbc"), F.col("h.id_house") == F.col("lbc.id_house"))
         .filter((F.col("h.rent") > 1) | (F.col("h.sale_price") > 1))
@@ -99,20 +101,26 @@ def _build_price_interval(
     """
     house_window = Window.partitionBy("id_house").orderBy("ts_revision", "id_revision")
 
-    lag_df = house_aud_df.filter(
-        (F.col("business_context") == business_context) & F.col(price_col).isNotNull()
-    ).select(
-        "id_house", "business_context", "id_user_revision", "id_revision",
-        "change_reason", price_col, "ts_revision",
-    ).withColumn(
-        "lag_price", F.lag(price_col).over(house_window)
-    ).filter(
-        F.col("lag_price").isNull() | (F.col("lag_price") != F.col(price_col))
+    lag_df = (
+        house_aud_df.filter(
+            (F.col("business_context") == business_context)
+            & F.col(price_col).isNotNull()
+        )
+        .select(
+            "id_house",
+            "business_context",
+            "id_user_revision",
+            "id_revision",
+            "change_reason",
+            price_col,
+            "ts_revision",
+        )
+        .withColumn("lag_price", F.lag(price_col).over(house_window))
+        .filter(F.col("lag_price").isNull() | (F.col("lag_price") != F.col(price_col)))
     )
 
     return (
-        lag_df
-        .withColumn("ts_price_started", F.col("ts_revision"))
+        lag_df.withColumn("ts_price_started", F.col("ts_revision"))
         .withColumn("ts_price_ended", F.lead("ts_revision").over(house_window))
         .drop("ts_revision", "lag_price")
     )
@@ -136,7 +144,8 @@ def _build_rent_listing_versions() -> DataFrame:
     )
 
     versions = (
-        hl.filter(F.col("id_house_listing").isNotNull()).alias("hl")
+        hl.filter(F.col("id_house_listing").isNotNull())
+        .alias("hl")
         .join(bch.filter(F.col("business_context") == "RENT").alias("bch"), join_cond)
         .select(
             F.col("hl.id_house"),
@@ -147,7 +156,9 @@ def _build_rent_listing_versions() -> DataFrame:
         .distinct()
     )
 
-    house_window = Window.partitionBy("id_house").orderBy(F.asc("ts_listing_version_start"))
+    house_window = Window.partitionBy("id_house").orderBy(
+        F.asc("ts_listing_version_start")
+    )
 
     return versions.withColumn(
         "is_first_version",
@@ -167,17 +178,22 @@ def _build_sale_listing_versions() -> DataFrame:
 
     listing_window = Window.partitionBy("id_sale_listing")
     latest_end_window = (
-        Window
-        .partitionBy("id_sale_listing")
+        Window.partitionBy("id_sale_listing")
         .orderBy(F.desc(F.coalesce(F.col("ts_status_ended"), F.current_timestamp())))
         .rowsBetween(Window.unboundedPreceding, Window.unboundedFollowing)
     )
-    house_window = Window.partitionBy("id_house").orderBy(F.asc("ts_listing_version_start"))
+    house_window = Window.partitionBy("id_house").orderBy(
+        F.asc("ts_listing_version_start")
+    )
 
     return (
         sale_status.filter(F.col("id_sale_listing").isNotNull())
-        .withColumn("ts_listing_version_start", F.min("ts_status_started").over(listing_window))
-        .withColumn("ts_listing_version_end", F.first("ts_status_ended").over(latest_end_window))
+        .withColumn(
+            "ts_listing_version_start", F.min("ts_status_started").over(listing_window)
+        )
+        .withColumn(
+            "ts_listing_version_end", F.first("ts_status_ended").over(latest_end_window)
+        )
         .select(
             F.col("id_house"),
             F.col("id_sale_listing").alias("id_house_listing"),
@@ -211,44 +227,38 @@ def _build_price_changes_listing(
         F.col("lv.ts_listing_version_end"), F.current_timestamp()
     )
 
-    join_cond = (
-        (F.col("lv.id_house") == F.col("pi.id_house"))
-        & F.when(
-            F.col("lv.is_first_version")
-            & (F.col("pi.ts_price_started") < F.col("lv.ts_listing_version_start")),
-            (F.col("lv.ts_listing_version_start") >= F.col("pi.ts_price_started"))
-            & (F.col("lv.ts_listing_version_start") <= ts_price_ended_coalesced),
-        ).otherwise(
-            (F.col("pi.ts_price_started") >= F.col("lv.ts_listing_version_start"))
-            & (F.col("pi.ts_price_started") < ts_version_end_coalesced),
-        )
+    join_cond = (F.col("lv.id_house") == F.col("pi.id_house")) & F.when(
+        F.col("lv.is_first_version")
+        & (F.col("pi.ts_price_started") < F.col("lv.ts_listing_version_start")),
+        (F.col("lv.ts_listing_version_start") >= F.col("pi.ts_price_started"))
+        & (F.col("lv.ts_listing_version_start") <= ts_price_ended_coalesced),
+    ).otherwise(
+        (F.col("pi.ts_price_started") >= F.col("lv.ts_listing_version_start"))
+        & (F.col("pi.ts_price_started") < ts_version_end_coalesced),
     )
 
-    joined = (
-        pi.join(lv, join_cond)
-        .select(
-            F.col("pi.id_house"),
-            F.col("lv.id_house_listing"),
-            F.col("pi.id_user_revision"),
-            F.col("pi.id_revision"),
-            F.col("pi.business_context"),
-            F.col("pi.change_reason"),
-            F.col(f"pi.{price_col}").alias("price"),
-            F.col("pi.ts_price_started"),
-        )
+    joined = pi.join(lv, join_cond).select(
+        F.col("pi.id_house"),
+        F.col("lv.id_house_listing"),
+        F.col("pi.id_user_revision"),
+        F.col("pi.id_revision"),
+        F.col("pi.business_context"),
+        F.col("pi.change_reason"),
+        F.col(f"pi.{price_col}").alias("price"),
+        F.col("pi.ts_price_started"),
     )
 
-    house_ts_window = Window.partitionBy("id_house").orderBy("ts_price_started", "id_revision")
+    house_ts_window = Window.partitionBy("id_house").orderBy(
+        "ts_price_started", "id_revision"
+    )
 
     # ts_price_ended is recomputed here (post-JOIN) so it only references events
     # that survived the listing-version filter. Computing it from the pre-JOIN
     # LEAD in _build_price_interval would let it point to audit events excluded
     # by the JOIN, producing a non-null ts_price_ended for the last effective price.
-    return (
-        joined
-        .withColumn("lag_price", F.lag("price").over(house_ts_window))
-        .withColumn("ts_price_ended", F.lead("ts_price_started").over(house_ts_window))
-    )
+    return joined.withColumn(
+        "lag_price", F.lag("price").over(house_ts_window)
+    ).withColumn("ts_price_ended", F.lead("ts_price_started").over(house_ts_window))
 
 
 def _build_variation(listing_df: DataFrame) -> DataFrame:
@@ -264,25 +274,22 @@ def _build_variation(listing_df: DataFrame) -> DataFrame:
     last_price_window = Window.partitionBy("id_house").orderBy(
         F.desc("ts_price_started"), F.desc("id_revision")
     )
-    last_price_of_day_window = (
-        Window
-        .partitionBy("id_house", F.to_date("ts_price_started"))
-        .orderBy(F.desc("ts_price_started"), F.desc("id_revision"))
-    )
+    last_price_of_day_window = Window.partitionBy(
+        "id_house", F.to_date("ts_price_started")
+    ).orderBy(F.desc("ts_price_started"), F.desc("id_revision"))
 
     # MIN(IF(lag_price IS NULL, price, NULL)) OVER (PARTITION BY id_house)
     # gives the initial (first) price for each house within the current business context.
-    first_price_col = F.min(
-        F.when(F.col("lag_price").isNull(), F.col("price"))
-    ).over(first_price_window)
+    first_price_col = F.min(F.when(F.col("lag_price").isNull(), F.col("price"))).over(
+        first_price_window
+    )
 
     change_number_window = Window.partitionBy("id_house").orderBy(
         F.asc("ts_price_started"), F.asc("id_revision")
     )
 
     return (
-        listing_df
-        .withColumn("previous_price", F.col("lag_price"))
+        listing_df.withColumn("previous_price", F.col("lag_price"))
         .withColumn("is_first_price", F.col("lag_price").isNull())
         .withColumn(
             "change_type",
@@ -358,12 +365,14 @@ def _build_result(house_aud_df: DataFrame) -> DataFrame:
         rent_final.unionAll(sale_final)
         .withColumn(
             "id_price_change",
-            F.abs(F.xxhash64(
-                F.col("id_house"),
-                F.col("id_revision"),
-                F.col("business_context"),
-                F.col("ts_price_started"),
-            )),
+            F.abs(
+                F.xxhash64(
+                    F.col("id_house"),
+                    F.col("id_revision"),
+                    F.col("business_context"),
+                    F.col("ts_price_started"),
+                )
+            ),
         )
         .select(
             "id_price_change",
@@ -477,8 +486,7 @@ if __name__ == "__main__":
                 database_name, args.table_name
             )
             logger.info(
-                f"m=__main__, table={full_table_name}, "
-                f"msg=Load completed successfully"
+                f"m=__main__, table={full_table_name}, msg=Load completed successfully"
             )
         finally:
             house_aud.unpersist()

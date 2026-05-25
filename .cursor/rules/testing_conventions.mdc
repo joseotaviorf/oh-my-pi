@@ -132,7 +132,7 @@ def spark():
 
 ## Runtime tests and PySpark
 
-Runtime tests run with the **dbr-16-4** venv. `PYSPARK_PYTHON` and `PYSPARK_DRIVER_PYTHON` point at that venv's interpreter so Spark workers use the correct Python. `make unit-tests` handles this automatically.
+Runtime tests run with the **dbr-16-4** venv. `PYSPARK_PYTHON` and `PYSPARK_DRIVER_PYTHON` point at that venv's interpreter so Spark workers use the correct Python. `make unit-tests` and `make unit-tests-dags` handle this automatically (CI runs them as separate Woodpecker steps; `make tests` runs both locally). Woodpecker **`unit-tests-dags`** is merge-blocking (no `failure: ignore`).
 
 ## File Structure — mirror the source
 ```
@@ -144,10 +144,11 @@ packages/bietlejuice-airflow/src/bietlejuice/base/airflow/dag_builders/main_buil
 ```
 
 ## General Rules
+- CI: `make check-style` (packages `src/`/`test/`, compiler `scripts/`); `make check-style-dags` on `dags/` Spark jobs (`check-style-dags-python`). DAG spark-job tests live under `packages/bietlejuice-runtime/test/dags/` (see `make unit-tests-dags`).
 - Use **Arrange / Act / Assert** comment structure inside each test method.
 - Use `@pytest.mark.parametrize` for table-driven valid/invalid cases.
 - Combine `contextlib.nullcontext()` and `pytest.raises()` in parametrize for error-path testing.
-- Run tests: `make unit-tests` or `uv run --directory packages/bietlejuice-{pkg} pytest test/unit/path/to/test_file.py -v`.
+- Run tests: `make tests` (full suite), or `make unit-tests` / `make unit-tests-dags` separately, or `uv run --directory packages/bietlejuice-{pkg} pytest test/unit/path/to/test_file.py -v`.
 
 ## TDD Checklist (run before every PR)
 
@@ -157,4 +158,4 @@ packages/bietlejuice-airflow/src/bietlejuice/base/airflow/dag_builders/main_buil
 - [ ] All `@pytest.mark.xfail(strict=True)` stubs have been converted to real assertions before merge
 - [ ] Every bug fix has a regression test with the broken input pinned as a parametrized case
 - [ ] Public interface changes are covered by updated tests for all affected call sites
-- [ ] `make unit-tests` passes locally before pushing
+- [ ] `make tests` (or `make unit-tests` and `make unit-tests-dags`) passes locally before pushing

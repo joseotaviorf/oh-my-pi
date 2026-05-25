@@ -1,6 +1,7 @@
-from pyspark.sql.functions import from_json, col
-from pyspark.sql.types import StructType, StructField, StringType
 import logging
+
+from pyspark.sql.functions import col, from_json
+from pyspark.sql.types import StringType, StructField, StructType
 
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.pipeline.data_quality_tests_pipeline import DataQualityTestsPipeline

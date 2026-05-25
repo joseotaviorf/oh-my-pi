@@ -5,22 +5,11 @@
 # COMMAND ----------
 
 # DBTITLE 1,Import Libs
-import os
 from argparse import ArgumentParser, Namespace
 from datetime import date, timedelta
 from typing import Optional
 
-from pyspark.sql import Column, DataFrame, Window
-from pyspark.sql.types import (
-    BooleanType,
-    DateType,
-    IntegerType,
-    LongType,
-    StringType,
-    StructField,
-    StructType,
-    TimestampType,
-)
+from pyspark.sql import DataFrame, Window
 from pyspark.sql.functions import (
     add_months,
     coalesce,
@@ -37,15 +26,24 @@ from pyspark.sql.functions import (
     to_date,
     when,
 )
+from pyspark.sql.types import (
+    BooleanType,
+    DateType,
+    IntegerType,
+    LongType,
+    StringType,
+    StructField,
+    StructType,
+    TimestampType,
+)
+from quintoandar_logger import QuintoAndarLogger
 
-from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
+from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from quintoandar_logger import QuintoAndarLogger
 
 # COMMAND ----------
 
@@ -62,26 +60,43 @@ ARG_SPEC = [
     ("database_base_name", str, "agent_reports", "Base name for database (schema)"),
     ("dag_name", str, "enrich_agent_reports", "DAG name (for alignment with Airflow)"),
     ("table_name", str, "agent_status_by_month", "Target enrich table name"),
-    ("load_start_date", str, lambda: (date.today() - timedelta(days=7)).isoformat(), "Date interval start, format %Y-%m-%d"),
-    ("load_end_date", str, lambda: date.today().isoformat(), "Date interval end, format %Y-%m-%d"),
+    (
+        "load_start_date",
+        str,
+        lambda: (date.today() - timedelta(days=7)).isoformat(),
+        "Date interval start, format %Y-%m-%d",
+    ),
+    (
+        "load_end_date",
+        str,
+        lambda: date.today().isoformat(),
+        "Date interval end, format %Y-%m-%d",
+    ),
     ("run_mode", str, "dev", "Run mode: prod/dev"),
 ]
 
+
 def _defaults():
     return [d() if callable(d) else d for _, _, d, _ in ARG_SPEC]
+
 
 def parse_args() -> Namespace:
     """Parse CLI args. Each positional is optional (nargs='?') so notebook runs with no args use defaults.
     Uses parse_known_args() so kernel flags (e.g. -f) are ignored when run from Databricks notebook."""
     parser = ArgumentParser(description=JOB_NAME)
     default_values = _defaults()
-    for (name, type_, _default, help_text), default_val in zip(ARG_SPEC, default_values):
-        parser.add_argument(name, nargs="?", type=type_, default=default_val, help=help_text)
+    for (name, type_, _default, help_text), default_val in zip(
+        ARG_SPEC, default_values
+    ):
+        parser.add_argument(
+            name, nargs="?", type=type_, default=default_val, help=help_text
+        )
     namespace, _ = parser.parse_known_args()
     return namespace
 
 
 # COMMAND ----------
+
 
 # DBTITLE 1,Expand dataframe by month
 def _expand_status_by_month(
@@ -104,17 +119,18 @@ def _expand_status_by_month(
     month_end = last_day(to_date(lit(load_end_date)))
 
     expanded = (
-        filtered
-        .withColumn("_month_start", month_start)
+        filtered.withColumn("_month_start", month_start)
         .withColumn("_month_end", month_end)
         .withColumn(
             "month_ref",
             explode(
-                expr(f"sequence("
-                     f"date_trunc('month', {ts_start_col}), "
-                     f"date_trunc('month', {end_expr}), "
-                     f"interval 1 month)")
-            )
+                expr(
+                    f"sequence("
+                    f"date_trunc('month', {ts_start_col}), "
+                    f"date_trunc('month', {end_expr}), "
+                    f"interval 1 month)"
+                )
+            ),
         )
         .filter(
             (col("month_ref") >= col("_month_start"))
@@ -124,10 +140,12 @@ def _expand_status_by_month(
             "days_in_status",
             greatest(
                 lit(0),
-                expr(f"datediff("
-                     f"least(last_day(month_ref), date({end_expr})), "
-                     f"greatest(date(month_ref), date({ts_start_col}))) + 1")
-            )
+                expr(
+                    f"datediff("
+                    f"least(last_day(month_ref), date({end_expr})), "
+                    f"greatest(date(month_ref), date({ts_start_col}))) + 1"
+                ),
+            ),
         )
     )
     window = Window.partitionBy(*partition_by).orderBy(*order_by)
@@ -142,13 +160,20 @@ def _expand_status_by_month(
     partition_out = [p if p != "month_ref" else "reference_month" for p in partition_by]
     seen = set()
     final_cols = []
-    for c in [ts_start_col, ts_end_col] + partition_out + order_by_columns + ["reference_month", "days_in_status"]:
+    for c in (
+        [ts_start_col, ts_end_col]
+        + partition_out
+        + order_by_columns
+        + ["reference_month", "days_in_status"]
+    ):
         if c not in seen and c in result.columns:
             seen.add(c)
             final_cols.append(c)
     return result.select(final_cols)
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,CIQ by Month
 def _build_ciq_status_by_month(
@@ -158,9 +183,8 @@ def _build_ciq_status_by_month(
     """CIQ path: ciq_users -> expand by month -> one row per (id_user, reference_month) with ciq_* columns."""
     month_start = add_months(to_date(lit(load_start_date)), -1)
     month_end = last_day(to_date(lit(load_end_date)))
-    ciq = (
-        spark.table("datalake_ebdb_agents.ciq_users")
-        .filter(col("ts_agent_status_start").isNotNull())
+    ciq = spark.table("datalake_ebdb_agents.ciq_users").filter(
+        col("ts_agent_status_start").isNotNull()
     )
     expanded = _expand_status_by_month(
         ciq,
@@ -173,8 +197,7 @@ def _build_ciq_status_by_month(
         order_by_columns=["days_in_status", "status"],
     )
     return (
-        expanded.withColumn("id_agent", lit(None).cast("bigint"))
-        .select(
+        expanded.withColumn("id_agent", lit(None).cast("bigint")).select(
             col("id_user"),
             col("id_agent"),
             col("status").alias("ciq_status"),
@@ -184,11 +207,12 @@ def _build_ciq_status_by_month(
             col("days_in_status").alias("ciq_days_in_status"),
         )
     ).filter(
-        (col("reference_month") >= month_start)
-        & (col("reference_month") <= month_end)
-        )
+        (col("reference_month") >= month_start) & (col("reference_month") <= month_end)
+    )
+
 
 # COMMAND ----------
+
 
 # DBTITLE 1,Agent by Month
 def _build_agents_status_by_month(
@@ -226,15 +250,25 @@ def _build_agents_status_by_month(
     status_changed = (
         events.filter(
             col("prev_active").isNull()
-            | (coalesce(col("prev_active").cast("string"), lit("unknown"))
-              != coalesce(col("is_active").cast("string"), lit("unknown")))
-            | (coalesce(col("prev_passive").cast("string"), lit("unknown"))
-              != coalesce(col("is_passive_lead_receiver").cast("string"), lit("unknown")))
+            | (
+                coalesce(col("prev_active").cast("string"), lit("unknown"))
+                != coalesce(col("is_active").cast("string"), lit("unknown"))
+            )
+            | (
+                coalesce(col("prev_passive").cast("string"), lit("unknown"))
+                != coalesce(
+                    col("is_passive_lead_receiver").cast("string"), lit("unknown")
+                )
+            )
         )
-        .withColumn("status", when(col("is_active"), lit("ACTIVE")).otherwise(lit("INACTIVE")))
+        .withColumn(
+            "status", when(col("is_active"), lit("ACTIVE")).otherwise(lit("INACTIVE"))
+        )
         .withColumn(
             "ts_agent_status_end",
-            lead("ts_database_transaction").over(Window.partitionBy("id_user").orderBy("ts_database_transaction")),
+            lead("ts_database_transaction").over(
+                Window.partitionBy("id_user").orderBy("ts_database_transaction")
+            ),
         )
         .select(
             col("id_user"),
@@ -252,8 +286,18 @@ def _build_agents_status_by_month(
         "ts_agent_status_start",
         "ts_agent_status_end",
         partition_by=["id_user", "month_ref"],
-        order_by=[col("days_in_status").desc(), col("status"), col("is_passive_lead_receiver"), col("id_agent")],
-        order_by_columns=["days_in_status", "status", "is_passive_lead_receiver", "id_agent"],
+        order_by=[
+            col("days_in_status").desc(),
+            col("status"),
+            col("is_passive_lead_receiver"),
+            col("id_agent"),
+        ],
+        order_by_columns=[
+            "days_in_status",
+            "status",
+            "is_passive_lead_receiver",
+            "id_agent",
+        ],
     )
     return expanded.select(
         col("id_user"),
@@ -265,11 +309,12 @@ def _build_agents_status_by_month(
         col("reference_month"),
         col("days_in_status").alias("agent_days_in_status"),
     ).filter(
-        (col("reference_month") >= month_start)
-        & (col("reference_month") <= month_end)
-        )
+        (col("reference_month") >= month_start) & (col("reference_month") <= month_end)
+    )
+
 
 # COMMAND ----------
+
 
 # DBTITLE 1,Build all agent status
 def build_agents_status(
@@ -282,25 +327,31 @@ def build_agents_status(
     """
     ciq_monthly = _build_ciq_status_by_month(load_start_date, load_end_date)
     agents_monthly = _build_agents_status_by_month(load_start_date, load_end_date)
-    return ciq_monthly.alias("ciq").join(
-              agents_monthly.alias("el"),
-              (col("ciq.id_user") == col("el.id_user"))
-              & (col("ciq.reference_month") == col("el.reference_month")),
-              "full_outer",
-          ).select(
-              coalesce(col("ciq.id_user"), col("el.id_user")).alias("id_user"),
-              coalesce(col("ciq.id_agent"), col("el.id_agent")).alias("id_agent"),
-              coalesce(col("ciq.reference_month"), col("el.reference_month")).alias("reference_month"),
-              col("ciq.ciq_status"),
-              col("ciq.ciq_days_in_status"),
-              col("ciq.ciq_status_start"),
-              col("ciq.ciq_status_end"),
-              col("el.agent_status"),
-              col("el.is_passive_lead_receiver"),
-              col("el.agent_days_in_status"),
-              col("el.agent_status_start"),
-              col("el.agent_status_end"),
-          )
+    return (
+        ciq_monthly.alias("ciq")
+        .join(
+            agents_monthly.alias("el"),
+            (col("ciq.id_user") == col("el.id_user"))
+            & (col("ciq.reference_month") == col("el.reference_month")),
+            "full_outer",
+        )
+        .select(
+            coalesce(col("ciq.id_user"), col("el.id_user")).alias("id_user"),
+            coalesce(col("ciq.id_agent"), col("el.id_agent")).alias("id_agent"),
+            coalesce(col("ciq.reference_month"), col("el.reference_month")).alias(
+                "reference_month"
+            ),
+            col("ciq.ciq_status"),
+            col("ciq.ciq_days_in_status"),
+            col("ciq.ciq_status_start"),
+            col("ciq.ciq_status_end"),
+            col("el.agent_status"),
+            col("el.is_passive_lead_receiver"),
+            col("el.agent_days_in_status"),
+            col("el.agent_status_start"),
+            col("el.agent_status_end"),
+        )
+    )
 
 
 # COMMAND ----------
@@ -328,15 +379,22 @@ def _schema_mismatches(actual: StructType, expected: StructType) -> list[str]:
     """Return list of mismatch messages between actual and expected schema (single pass)."""
     actual_by_name = {f.name: f for f in actual.fields}
     expected_by_name = {f.name: f for f in expected.fields}
+
     def msg(n: str) -> str | None:
         if n not in actual_by_name:
             return f"missing column: {n} (expected {expected_by_name[n].dataType.simpleString()})"
         if n not in expected_by_name:
             return f"unexpected column: {n}"
-        if actual_by_name[n].dataType.simpleString() != expected_by_name[n].dataType.simpleString():
+        if (
+            actual_by_name[n].dataType.simpleString()
+            != expected_by_name[n].dataType.simpleString()
+        ):
             return f"column '{n}': expected {expected_by_name[n].dataType.simpleString()}, got {actual_by_name[n].dataType.simpleString()}"
         return None
-    return list(filter(None, (msg(n) for n in actual_by_name.keys() | expected_by_name.keys())))
+
+    return list(
+        filter(None, (msg(n) for n in actual_by_name.keys() | expected_by_name.keys()))
+    )
 
 
 def validate_before_write(df: DataFrame) -> int:
@@ -349,11 +407,14 @@ def validate_before_write(df: DataFrame) -> int:
         raise ValueError(
             f"Schema mismatch: {'; '.join(mismatches)}. Expected schema: {EXPECTED_SCHEMA.simpleString()}."
         )
-    logger.info(f"m=validate_before_write, rows={row_count:,}, msg=Pre-write checks OK, schema match")
+    logger.info(
+        f"m=validate_before_write, rows={row_count:,}, msg=Pre-write checks OK, schema match"
+    )
     return row_count
 
 
 # COMMAND ----------
+
 
 def _save_to_enrich(
     spark_client: SparkClient, result_df: DataFrame, args: Namespace, row_count: int
@@ -383,7 +444,10 @@ def _save_to_enrich(
 
 
 def save_df(
-    spark_client: SparkClient, result_df: DataFrame, args: Namespace, row_count: Optional[int] = None
+    spark_client: SparkClient,
+    result_df: DataFrame,
+    args: Namespace,
+    row_count: Optional[int] = None,
 ) -> None:
     """Dispatch to dev (temp view) or prod (Delta merge to enrich). row_count from validate_before_write avoids recount in prod."""
     run_mode = getattr(args, "run_mode", "dev")
@@ -398,11 +462,18 @@ def save_df(
         )
         return
     if run_mode == "prod":
-        _save_to_enrich(spark_client, result_df, args, row_count if row_count is not None else result_df.count())
+        _save_to_enrich(
+            spark_client,
+            result_df,
+            args,
+            row_count if row_count is not None else result_df.count(),
+        )
         return
     raise ValueError(f"Invalid run mode: {run_mode}")
 
+
 # COMMAND ----------
+
 
 def main(args: Namespace | None = None) -> None:
     """Orchestrate ETL: build -> validate (not empty + schema) -> write."""
@@ -414,13 +485,14 @@ def main(args: Namespace | None = None) -> None:
         f"table_name={args.table_name}, data_interval=[{args.load_start_date}, {args.load_end_date}], msg=Starting Spark job"
     )
 
-    logger.info(f"m=build_agents_status, load_start_date={args.load_start_date}, load_end_date={args.load_end_date}, msg=Building CIQ + agents status by month")
-    output_dataframe = build_agents_status(
-        args.load_start_date, args.load_end_date
+    logger.info(
+        f"m=build_agents_status, load_start_date={args.load_start_date}, load_end_date={args.load_end_date}, msg=Building CIQ + agents status by month"
     )
+    output_dataframe = build_agents_status(args.load_start_date, args.load_end_date)
     row_count = validate_before_write(output_dataframe)
     save_df(SparkClient(), output_dataframe, args, row_count=row_count)
     logger.info("m=main, msg=Job finished successfully")
+
 
 # COMMAND ----------
 

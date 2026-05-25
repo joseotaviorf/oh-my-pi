@@ -1,13 +1,18 @@
 import ast
+import io
+import json
+import logging
+import operator
+from argparse import ArgumentParser
 from datetime import datetime, timedelta
 from functools import reduce
-import logging
-import json
-import io
 
-from argparse import ArgumentParser
-import operator
-
+import pandas as pd
+from googleapiclient.discovery import build
+from googleapiclient.http import HttpError, MediaIoBaseDownload
+from oauth2client.service_account import ServiceAccountCredentials
+from pyspark.sql import DataFrame, functions
+from pyspark.sql.types import StringType, StructField, StructType
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
@@ -18,13 +23,6 @@ from bietlejuice.formatters import StringFormatter
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from pyspark.sql import functions, DataFrame
-from pyspark.sql.types import StructField, StructType, StringType
-import pandas as pd
-from googleapiclient.discovery import build
-from oauth2client.service_account import ServiceAccountCredentials
-from googleapiclient.http import MediaIoBaseDownload, HttpError
 
 JOB_NAME = "load_sheets_into_datalake"
 TEMPORARY_DRIVE_FOLDER_ID = "1J_V6VFE0bVO7iMhxVc8rzg4E-oHhc-D_"
@@ -162,9 +160,11 @@ def __get_drive_file_ownership(drive_client, file_id):
 
 def __clear_temporary_drive_folder(drive_client, folder_id):
     query = f"'{folder_id}' in parents and trashed=false"
-    results = drive_client.files().list(q=query, fields='files(id, name, mimeType)').execute()
-    file_ids_to_delete = results.get('files', [])
-    
+    results = (
+        drive_client.files().list(q=query, fields="files(id, name, mimeType)").execute()
+    )
+    file_ids_to_delete = results.get("files", [])
+
     def delete_callback(request_id, response, exception):
         if exception:
             print(f"Error deleting file {request_id}: {exception}")
@@ -172,7 +172,11 @@ def __clear_temporary_drive_folder(drive_client, folder_id):
             print(f"File {request_id} deleted successfully.")
 
     for file_id in file_ids_to_delete:
-        batch.add(drive_client.files().delete(fileId=file_id["id"]), callback=delete_callback, request_id=file_id["id"])
+        batch.add(
+            drive_client.files().delete(fileId=file_id["id"]),
+            callback=delete_callback,
+            request_id=file_id["id"],
+        )
 
     batch.execute()
 
@@ -183,7 +187,8 @@ def __drive_file_download(drive_client, file_id):
     new_id = __get_drive_file_ownership(drive_client, file_id)
     file = __download_drive_file_as_bytes(drive_client, new_id)
     return file
-  
+
+
 def __create_dataframes_for_items(items):
     """
     This method creates the dataframe from the data returned by the API.
@@ -222,10 +227,7 @@ def __create_dataframes_for_items(items):
         )
         df = spark_client.create_dataframe(df, __generate_schema(df))
         dfs.append(df)
-        df = (
-                  reduce(DataFrame.unionAll, dfs)
-                  .drop("")
-              )
+        df = reduce(DataFrame.unionAll, dfs).drop("")
 
     # Fix columns format and ordinal excel dates
     df = __columns_to_alphanumeric_snake_case(df)
@@ -237,6 +239,7 @@ def __create_dataframes_for_items(items):
 
     # Add ts_load column
     return df.withColumn("ts_load", functions.current_timestamp())
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -261,7 +264,6 @@ if __name__ == "__main__":
     table_name = args.table_name
     root_folder_id = args.root_folder_id
     columns_to_read = ast.literal_eval(args.columns_to_read)
-
 
     logger.info(
         f"""
@@ -299,8 +301,8 @@ if __name__ == "__main__":
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
 
-    # Google Drive folder listing of new items - old items in payable_accounts_transactions_history static ingestion: 
-    #https://dbc-931ee6e0-6803.cloud.databricks.com/editor/notebooks/2020209387599480?o=4531937035440038
+    # Google Drive folder listing of new items - old items in payable_accounts_transactions_history static ingestion:
+    # https://dbc-931ee6e0-6803.cloud.databricks.com/editor/notebooks/2020209387599480?o=4531937035440038
     root_query = f"'{root_folder_id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
     items = __list_files_gdrive(gdrive_client, root_query)
     new_items = []

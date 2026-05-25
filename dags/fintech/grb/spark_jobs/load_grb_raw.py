@@ -4,12 +4,17 @@ import logging
 from argparse import ArgumentParser
 
 from pyspark.sql.functions import col, current_timestamp, greatest
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
-from bietlejuice.base.db import DatabaseEnum,DatalakeMetastoreService
+from bietlejuice.base.db import DatabaseEnum, DatalakeMetastoreService
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.pipeline import LayerEnum
-from bietlejuice.base.spark import BaseDBUtils, SparkDataFrameService, SparkTableStorageFormat
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import SQLServerConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -18,32 +23,25 @@ from bietlejuice.services.messaging_services.gchat_service import GChatService
 from bietlejuice.services.messaging_services.message import Message
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-from quintoandar_logger import QuintoAndarLogger
-
-
-
 JOB_NAME = "load_grb_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
-def _get_conn_config(dbutils, dbutils_secret_key):
-      conn_config_json = dbutils.secrets.get(
-          scope="quintoandar", key=dbutils_secret_key
-      )
 
-      return json.loads(conn_config_json)
+def _get_conn_config(dbutils, dbutils_secret_key):
+    conn_config_json = dbutils.secrets.get(scope="quintoandar", key=dbutils_secret_key)
+
+    return json.loads(conn_config_json)
 
 
 def _send_warning(dbutils, environment, table_name):
-    if environment == 'prod':
+    if environment == "prod":
         key = GchatWebhooksEnum.FINTECH_ALERTS_PROD
     else:
         key = GchatWebhooksEnum.AE_ALERTS_FORNO
 
-    gchat_webhook = dbutils.secrets.get(
-        scope="quintoandar", key=key
-    )
+    gchat_webhook = dbutils.secrets.get(scope="quintoandar", key=key)
 
     message_content = (
         f"⚠️\n"
@@ -57,6 +55,7 @@ def _send_warning(dbutils, environment, table_name):
     message = Message(content=message_content, destination=gchat_webhook)
     logger.info(f"m=__main__, message=sending slack message: {message}")
     GChatService.send_message(message)
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -82,7 +81,6 @@ if __name__ == "__main__":
     partitions = ast.literal_eval(args.partitions)
     date_filter_columns = ast.literal_eval(args.date_filter_columns)
 
-
     logger.info(
         f"""
                 m=__main__, environment={environment}, source={source}, datalake_bucket={datalake_bucket},
@@ -97,16 +95,15 @@ if __name__ == "__main__":
     base_dbutils = BaseDBUtils()
     dbutils = base_dbutils.get_dbutils()
 
-
-
-
     conn_config = _get_conn_config(dbutils, DatabaseEnum.GRB)
 
     sqlserver_consumer = SQLServerConsumer(conn_config, spark_client)
 
     grb_table_name = table_name.upper()
     if extraction_type == "incremental" and date_filter_columns:
-        df = sqlserver_consumer.get_incremental_data_from_table(grb_table_name, date_filter_columns, load_start_date, load_end_date)
+        df = sqlserver_consumer.get_incremental_data_from_table(
+            grb_table_name, date_filter_columns, load_start_date, load_end_date
+        )
     else:
         df = sqlserver_consumer.get_data_from_table(grb_table_name)
 
@@ -118,7 +115,10 @@ if __name__ == "__main__":
         if extraction_type == "incremental":
             if date_filter_columns:
                 if len(date_filter_columns) > 1:
-                    df = df.withColumn("table_partition", (greatest(*[col(c) for c in date_filter_columns])))
+                    df = df.withColumn(
+                        "table_partition",
+                        (greatest(*[col(c) for c in date_filter_columns])),
+                    )
                 else:
                     df = df.withColumn("table_partition", (col(date_filter_columns[0])))
                 partition = "table_partition"
@@ -132,8 +132,9 @@ if __name__ == "__main__":
                 .output()
             )
 
-
-        db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+        db_info = DatalakeMetastoreService.get_db_info(
+            environment, source, datalake_bucket
+        )
         spark_metastore_service = SparkMetastoreService(SparkClient())
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
@@ -142,9 +143,9 @@ if __name__ == "__main__":
         database_location = db_info["db_raw_path"]
         spark_metastore_service.create_database(database_name)
 
-
-        table_privileges = TablePrivileges.from_environment_default(f"{database_name}.{table_name}")
-
+        table_privileges = TablePrivileges.from_environment_default(
+            f"{database_name}.{table_name}"
+        )
 
         if extraction_type == "incremental":
             IncrementalTableLoaderPipeline(

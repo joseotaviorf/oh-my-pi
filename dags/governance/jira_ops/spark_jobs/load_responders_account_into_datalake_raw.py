@@ -1,16 +1,14 @@
 import ast
 import json
 import logging
-
 from argparse import ArgumentParser
-import pyspark.sql.functions as F
 
+import pyspark.sql.functions as F
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseSparkContext
 from bietlejuice.loaders.delta_loader import DeltaLoader
-
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_jira_ops_data_into_datalake_raw"
@@ -19,7 +17,6 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
@@ -56,60 +53,35 @@ if __name__ == "__main__":
     )
 
     # --- schedules timeline data processing ---
-    df_schedules_timeline = (
-        BaseSparkContext.spark.table(schedules_timeline_table_name)
-        .where(
-            F.col(date_column)
-            .between(load_start_date, load_end_date)
-        )
-    )
+    df_schedules_timeline = BaseSparkContext.spark.table(
+        schedules_timeline_table_name
+    ).where(F.col(date_column).between(load_start_date, load_end_date))
 
     df_base_responders = (
         df_schedules_timeline.select(
-            F.explode("baseTimeline.rotations").alias("rotation"),
-            *select_columns
+            F.explode("baseTimeline.rotations").alias("rotation"), *select_columns
         )
-        .select(
-            F.explode("rotation.periods").alias("period"),
-            *select_columns
-        )
+        .select(F.explode("rotation.periods").alias("period"), *select_columns)
         .filter(F.col("period.responder.type") == "user")
-        .select(
-            F.col("period.responder.id").alias("id_account"),
-            *select_columns
-        )
+        .select(F.col("period.responder.id").alias("id_account"), *select_columns)
     )
 
-    df_final_period = (
-        df_schedules_timeline.select(
-            F.explode("finalTimeline.rotations").alias("rotation"),
-            *select_columns
-        )
-        .select(
-            F.explode("rotation.periods").alias("period"),
-            *select_columns
-        )
-    )
+    df_final_period = df_schedules_timeline.select(
+        F.explode("finalTimeline.rotations").alias("rotation"), *select_columns
+    ).select(F.explode("rotation.periods").alias("period"), *select_columns)
 
-    df_final_responders = (
-        df_final_period.filter(F.col("period.responder.type") == "user")
-        .select(
-            F.col("period.responder.id").alias("id_account"),
-            *select_columns
-        )
-    )
+    df_final_responders = df_final_period.filter(
+        F.col("period.responder.type") == "user"
+    ).select(F.col("period.responder.id").alias("id_account"), *select_columns)
 
     if "flattenedResponders" in df_final_period.select("period.*").columns:
         df_final_responders = df_final_responders.unionByName(
             df_final_period.select(
                 F.explode_outer("period.flattenedResponders").alias("responder"),
-                *select_columns
+                *select_columns,
             )
             .filter(F.col("responder.type") == "user")
-            .select(
-                F.col("responder.id").alias("id_account"),
-                *select_columns
-            )
+            .select(F.col("responder.id").alias("id_account"), *select_columns)
         )
 
     df_responders = df_final_responders.unionByName(df_base_responders)
@@ -117,29 +89,16 @@ if __name__ == "__main__":
     # --- schedules override data processing ---
     df_schedules_override_responders = (
         BaseSparkContext.spark.table(schedules_override_table_name)
-        .where(
-            F.col(date_column)
-            .between(load_start_date, load_end_date)
-        )
+        .where(F.col(date_column).between(load_start_date, load_end_date))
         .filter(F.col("responder.type") == "user")
-        .select(
-            F.col("responder.id").alias("id_account"),
-            *select_columns
-        )
+        .select(F.col("responder.id").alias("id_account"), *select_columns)
     )
 
     df_responders = df_responders.unionByName(df_schedules_override_responders)
 
-    df_final = (
-        df_responders.filter(
-            (F.col("id_account").isNotNull())
-        )
-        .distinct()
-    )
+    df_final = df_responders.filter(F.col("id_account").isNotNull()).distinct()
 
-    db_info = DatalakeMetastoreService.get_db_info(
-        environment, source, datalake_bucket
-    )
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
 

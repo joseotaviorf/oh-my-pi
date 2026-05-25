@@ -138,7 +138,7 @@ From the **repository root**:
 
    ```bash
    make check-style
-   make unit-tests
+   make tests   # unit-tests + unit-tests-dags
    ```
 
 3. **Optional —** switch the DBR mirror venv (default **16.4**):
@@ -178,9 +178,11 @@ Install the [**Astro CLI**](https://www.astronomer.io/docs/astro/cli/install-cli
 | Command                                      | Purpose                                                                   |
 | -------------------------------------------- | ------------------------------------------------------------------------- |
 | `make install`                               | Sync all packages + default **dbr-16-4** env for runtime tests.           |
-| `make check-style` / `make fix-style`        | Ruff format + check (see Makefile for `lint` vs fix).                     |
+| `make check-style` / `make fix-style`        | Ruff format + lint on packages `src/`/`test/` and compiler `scripts/`. |
+| `make check-style-dags` / `make fix-style-dags` | Ruff format + lint on `dags/` (CI: `check-style-dags-python`). |
 | `make type-check`                            | `ty` on each package (optional local signal; CI is non-blocking).         |
-| `make unit-tests` / `make integration-tests` | Pytest per package; runtime uses the **dbr-16-4** venv.                   |
+| `make unit-tests` / `make unit-tests-dags` / `make tests` | Package pytest (`unit-tests`); DAG spark-job tests under `runtime/test/dags` (`unit-tests-dags`, separate Woodpecker step); `tests` runs both. Runtime uses **dbr-16-4**. |
+| `make integration-tests` | Integration pytest (core). |
 | `make build`                                 | Build **bietlejuice-core** and **bietlejuice-runtime** wheels to `dist/`. |
 | `make run-local-environment`                 | Start local Airflow via Astro.                                            |
 
@@ -188,11 +190,11 @@ For SQL style on `dags/`, see `make check-sql` / `make lint-sql` in the **Makefi
 
 ---
 
-To run only a subdirectory of `tests/unit/`, pass `component`:
+To run a single package or DAG test folder:
 
 ```bash
-    make unit-tests component=qube
-    make unit-tests component=base/api
+    uv run --directory packages/bietlejuice-runtime pytest test/dags/agents/enrich_agent_reports/spark_jobs/ -q
+    uv run --directory packages/bietlejuice-core pytest test/unit/services/test_configuration_service.py -v
 ```
 
 ---

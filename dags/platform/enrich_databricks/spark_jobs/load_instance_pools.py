@@ -1,14 +1,16 @@
 import argparse
-import requests
 import json
 from base64 import b64encode
+
+import requests
 from databricks.sdk import WorkspaceClient
-from pyspark.sql.functions import current_timestamp, lit
 from pyspark.sql.dataframe import DataFrame
+from pyspark.sql.functions import current_timestamp, lit
+from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.configuration_service import ConfigurationService
-from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_instance_pools"
 COLUMNS = {
@@ -28,10 +30,17 @@ COLUMNS = {
 
 logger = QuintoAndarLogger(JOB_NAME)
 
+
 def main() -> None:
     args = parse_args()
     df_instance_pools = find_instance_pools(args.dag_name)
-    load_table(df_instance_pools, args.env, args.bucket, args.database_base_name, args.table_name)
+    load_table(
+        df_instance_pools,
+        args.env,
+        args.bucket,
+        args.database_base_name,
+        args.table_name,
+    )
 
 
 def parse_args() -> argparse.Namespace:
@@ -59,19 +68,24 @@ def find_instance_pools(dag_name: str) -> DataFrame:
 
     df = None
     for workspace_id, workspace_url in workspaces.items():
-        df_workspace = find_instance_pools_in_workspace(account_id, workspace_id, workspace_url)
+        df_workspace = find_instance_pools_in_workspace(
+            account_id, workspace_id, workspace_url
+        )
         if df is None:
             df = df_workspace
         else:
             df = df.unionByName(df_workspace, allowMissingColumns=True)
     return df
-  
 
-def find_instance_pools_in_workspace(account_id: str, workspace_id: str, workspace_url: str) -> DataFrame:
-    logger.info(f"m=find_instance_pools,msg='finding instance pools in workspace {workspace_url}'")
+
+def find_instance_pools_in_workspace(
+    account_id: str, workspace_id: str, workspace_url: str
+) -> DataFrame:
+    logger.info(
+        f"m=find_instance_pools,msg='finding instance pools in workspace {workspace_url}'"
+    )
     workspace_client = WorkspaceClient(
-        host=workspace_url,
-        token=get_databricks_token(account_id)
+        host=workspace_url, token=get_databricks_token(account_id)
     )
     pools = workspace_client.instance_pools.list()
     dict_pools = [
@@ -80,30 +94,31 @@ def find_instance_pools_in_workspace(account_id: str, workspace_id: str, workspa
     ]
     print(dict_pools)
     df = spark.createDataFrame(dict_pools)
-    return df.withColumns({
-        "id_workspace": lit(workspace_id),
-        "ts_load": current_timestamp()
-    })
+    return df.withColumns(
+        {"id_workspace": lit(workspace_id), "ts_load": current_timestamp()}
+    )
 
 
 def get_databricks_token(account_id: str) -> str:
     """get databricks token for a service principal"""
-    
-    credentials = json.loads(dbutils.secrets.get(scope="data-ingestion", key="data-ingestion-5a"))
+
+    credentials = json.loads(
+        dbutils.secrets.get(scope="data-ingestion", key="data-ingestion-5a")
+    )
     client_id = credentials["client_id"]
     client_secret = credentials["secret"]
 
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": "Basic " + b64encode(f"{client_id}:{client_secret}".encode()).decode()
+        "Authorization": "Basic "
+        + b64encode(f"{client_id}:{client_secret}".encode()).decode(),
     }
-    payload = {
-        "grant_type": "client_credentials",
-        "scope": "all-apis"
-    }
-    url_endpoint = f"https://accounts.cloud.databricks.com/oidc/accounts/{account_id}/v1/token"
-    response = requests.post(url_endpoint, headers = headers, data = payload)
-    response_data = json.loads(response.text) 
+    payload = {"grant_type": "client_credentials", "scope": "all-apis"}
+    url_endpoint = (
+        f"https://accounts.cloud.databricks.com/oidc/accounts/{account_id}/v1/token"
+    )
+    response = requests.post(url_endpoint, headers=headers, data=payload)
+    response_data = json.loads(response.text)
     if "access_token" in response_data:
         return response_data["access_token"]
     else:

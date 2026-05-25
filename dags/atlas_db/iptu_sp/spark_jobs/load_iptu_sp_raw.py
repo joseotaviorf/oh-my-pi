@@ -1,15 +1,15 @@
-import io
-import re
 import ast
+import io
 import json
 import logging
+import re
 import zipfile
-import requests
+from argparse import ArgumentParser
 
 import pandas as pd
-from argparse import ArgumentParser
+import requests
+from pyspark.sql.functions import current_date, lit
 from quintoandar_logger import QuintoAndarLogger
-from pyspark.sql.functions import lit, current_date
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
@@ -25,6 +25,7 @@ JOB_NAME = f"load_{IPTU_REGION}_raw"
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 spark_client = SparkClient()
+
 
 def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
@@ -42,28 +43,33 @@ def parse_arguments():
         args.execution_date,
     )
 
+
 def get_most_recent_year(json_string):
     data_dict = json.loads(json_string)
-    files_list = data_dict["d"].split('|')
+    files_list = data_dict["d"].split("|")
     most_recent_file = sorted(files_list)[-1]
-    year_regex = re.search(r'\d{4}', most_recent_file)
+    year_regex = re.search(r"\d{4}", most_recent_file)
     return int(year_regex.group())
+
 
 def get_last_iptu_available(path, headers, data):
     response = requests.post(path, headers=headers, data=data)
     return get_most_recent_year(response.text)
 
+
 def standardize_column_names(name):
     standardized_name = name.lower().replace(" ", "_").replace("/", "_")
     return standardized_name
+
 
 def get_zip_files_content(url, year, format):
     response = requests.get(url.format(year=year))
     response.raise_for_status()
     return response.content
 
+
 def process_zip_file(content, year, format):
-    with zipfile.ZipFile(io.BytesIO(content), 'r') as zip_ref:
+    with zipfile.ZipFile(io.BytesIO(content), "r") as zip_ref:
         zip_files = zip_ref.namelist()
         csv_files = [file for file in zip_files if file.endswith(format)]
 
@@ -71,10 +77,12 @@ def process_zip_file(content, year, format):
             raise Exception("No CSV files found in the ZIP.")
 
         if len(csv_files) > 1:
-            raise Exception(f"More than one CSV file found. Total CSV files: {len(csv_files)}. Processing only the first one.")
+            raise Exception(
+                f"More than one CSV file found. Total CSV files: {len(csv_files)}. Processing only the first one."
+            )
 
         with zip_ref.open(csv_files[0]) as f:
-            df = pd.read_csv(f, encoding='ISO-8859-1', delimiter=';')
+            df = pd.read_csv(f, encoding="ISO-8859-1", delimiter=";")
             df = df.rename(columns=standardize_column_names)
             df = spark.createDataFrame(df.astype(str))
             df = df.replace("nan", None)
@@ -83,13 +91,13 @@ def process_zip_file(content, year, format):
             logger.info(f"Processed file: {csv_files[0]}")
             return df
 
+
 def get_data(url, year, format):
     zip_files = get_zip_files_content(url, year, format)
     return process_zip_file(zip_files, year, format)
 
-def load_dataframe_into_datalake(
-    df, table_name, environment, source, datalake_bucket
-):
+
+def load_dataframe_into_datalake(df, table_name, environment, source, datalake_bucket):
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
@@ -146,20 +154,30 @@ def main():
         """
     )
 
-    last_iptu_available_year = get_last_iptu_available(path=source_url + source_years_path, headers=source_headers, data=source_data)
-    last_ingested_year = spark.sql(f"SELECT MAX(year) AS year FROM datalake_iptu_raw.{table_name}").select("year").rdd.flatMap(lambda x: x).collect()[0]
+    last_iptu_available_year = get_last_iptu_available(
+        path=source_url + source_years_path, headers=source_headers, data=source_data
+    )
+    last_ingested_year = (
+        spark.sql(f"SELECT MAX(year) AS year FROM datalake_iptu_raw.{table_name}")
+        .select("year")
+        .rdd.flatMap(lambda x: x)
+        .collect()[0]
+    )
 
     if last_iptu_available_year <= last_ingested_year:
-
         logger.info(
-            f"""
+            """
             msg= This year's IPTU has already been downloaded, we're leaving the spark job.
             """
         )
 
         return None
 
-    dataframe = get_data(url=source_url + source_url_to_download, year=last_iptu_available_year, format=source_format)
+    dataframe = get_data(
+        url=source_url + source_url_to_download,
+        year=last_iptu_available_year,
+        format=source_format,
+    )
 
     if dataframe:
         logger.info(
@@ -176,6 +194,7 @@ def main():
             source,
             datalake_bucket,
         )
+
 
 if __name__ == "__main__":
     main()

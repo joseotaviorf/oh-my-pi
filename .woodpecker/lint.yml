@@ -1,60 +1,38 @@
-# Lint runs on push + pull_request so PRs use the full diff for when.path (not just the
-# last commit). The pipeline always starts so dependents (e.g. release) are not blocked
-# when no Python files change in a push.
-#
-# Guard: on feature-branch push, Woodpecker's path filter only sees the latest commit; a
-# YAML-only retrigger could skip steps while an earlier commit still has lint issues. Those
-# steps run unconditionally for excluded branches, then exit early if origin/master...HEAD
-# has no .py changes. PR / master / forno / hotfix: path filter or merge diff is enough.
 
 steps:
   setup:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
     commands:
-      # Relink editable install from checkout (~1–2s); image venv default is /opt/bietlejuice/venvs/workspace
       - uv sync
+    when:
+      event: [push, pull_request]
 
   check-style-python:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
     commands:
-      - git fetch --no-tags origin +refs/heads/master
-      # CI env is set by Woodpecker; check-style auto-selects diff-scoped mode.
-      # check_style.py ci already handles "no .py in full branch diff" gracefully.
-      # Strict mode (format + ruff check on all changed .py): RUFF_CI_FULL_STRICT=1 make check-style
       - make check-style
     when:
-      - event: [push, pull_request]
-        path:
-          include: ['**/*.py']
-          on_empty: false
-      # Feature pushes: always enter step; shell guard above applies full-branch .py check
-      - event: push
-        branch:
-          exclude: [master, forno, hotfix/*]
+      event: [push, pull_request]
+    depends_on: [setup]
+
+  check-style-dags-python:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - make check-style-dags
+    when:
+      event: [push, pull_request]
     depends_on: [setup]
 
   files-validation-python:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
     commands:
-      - |
-        # Feature-branch push guard: ci_branch_py_guard.py exits 1 when the full
-        # branch diff vs master has no .py changes; `|| exit 0` converts that into
-        # a clean step exit, skipping files-validation for Python-free pushes.
-        uv run --project packages/bietlejuice-compiler \
-          python packages/bietlejuice-compiler/scripts/ci_cd/ci_branch_py_guard.py \
-          files-validation || exit 0
-        make files-validation
+      - make files-validation
     when:
-      - event: [push, pull_request]
-        path:
-          include: ['**/*.py']
-          on_empty: false
-      - event: push
-        branch:
-          exclude: [master, forno, hotfix/*]
+      event: [push, pull_request]
     depends_on: [setup]
 
   type-check-python:
@@ -65,7 +43,4 @@ steps:
       - make type-check
     when:
       event: [push, pull_request]
-      path:
-        include: ['**/*.py']
-        on_empty: false
     depends_on: [setup]

@@ -68,16 +68,27 @@ Read the target source file. Identify:
 
 ## Step 3 — Determine the test file path
 
-Mirror the source structure under `tests/unit/`:
+Pick the **package** from the source path, then mirror under that package’s `test/unit/` (or `test/dags/` / `test/core_model_dags/` for DAG jobs):
+
+| Source lives in… | Test root |
+|------------------|-----------|
+| `packages/bietlejuice-runtime/src/bietlejuice/` (qube, api, pipeline, most `base/`) | `packages/bietlejuice-runtime/test/unit/` |
+| `packages/bietlejuice-core/src/bietlejuice/` (services, some `base/airflow/dag_builders/`) | `packages/bietlejuice-core/test/unit/` |
+| `packages/bietlejuice-airflow/src/bietlejuice/` (task creators, task groups, datasets) | `packages/bietlejuice-airflow/test/unit/` |
+| `dags/{domain}/…/spark_jobs/load_*.py` | `packages/bietlejuice-runtime/test/dags/{domain}/…/spark_jobs/` |
+| `dags/core/core_{entity}/spark_jobs/` | `packages/bietlejuice-runtime/test/core_model_dags/unit/core/core_{entity}/spark_jobs/` |
+| `dags/{domain}/…/*.py` (Airflow DAG module, not a Spark job) | `packages/bietlejuice-airflow/test/unit/dags/{domain}/…/` |
+
+Examples:
 ```
-bietlejuice/qube/jobs/metrics/build_metric.py
-→ tests/unit/qube/test_build_metric_unit.py
+packages/bietlejuice-runtime/src/bietlejuice/qube/jobs/metrics/build_metric.py
+→ packages/bietlejuice-runtime/test/unit/qube/test_build_metric_unit.py
 
-bietlejuice/base/airflow/dag_builders/main_builder/dag_yaml_parser.py
-→ tests/unit/base/airflow/dag_builders/main_builder/test_dag_yaml_parser.py
+packages/bietlejuice-airflow/src/bietlejuice/base/airflow/dag_builders/main_builder/dag_yaml_parser.py
+→ packages/bietlejuice-airflow/test/unit/base/airflow/dag_builders/main_builder/test_dag_yaml_parser.py
 
-bietlejuice/services/configuration_service.py
-→ tests/unit/services/test_configuration_service.py
+packages/bietlejuice-core/src/bietlejuice/services/configuration_service.py
+→ packages/bietlejuice-core/test/unit/services/test_configuration_service.py
 ```
 
 ## Step 4 — Write the test file
@@ -158,7 +169,7 @@ class Test{ClassName}:
 If a `conftest.py` doesn't exist in the test folder, check the parent. For Qube tests, ensure a session-scoped real Spark fixture exists:
 
 ```python
-# tests/unit/qube/conftest.py
+# packages/bietlejuice-runtime/test/unit/qube/conftest.py
 import pytest
 from pyspark.sql import SparkSession
 
@@ -177,7 +188,7 @@ def spark():
 
 For DAG builder tests, add fixtures for the class under test:
 ```python
-# tests/unit/base/airflow/.../conftest.py
+# packages/bietlejuice-airflow/test/unit/base/airflow/.../conftest.py
 import pytest
 from bietlejuice.base.airflow... import {ClassName}
 
@@ -189,7 +200,8 @@ def {instance_name}():
 ## Step 6 — Verify
 
 ```bash
-pytest tests/unit/path/to/test_file.py -v
+uv run --directory packages/bietlejuice-runtime pytest test/unit/path/to/test_file.py -v
+# (use bietlejuice-core | bietlejuice-airflow | bietlejuice-compiler | emr-cli as appropriate)
 ```
 
 Fix any import errors (usually missing `sys.modules` mocks at the top-level conftest).
@@ -202,11 +214,11 @@ Fix any import errors (usually missing `sys.modules` mocks at the top-level conf
 
 ## TDD Checklist — verify before finishing
 
-- [ ] Test file path mirrors source path under `tests/unit/` (Step 3 naming)
+- [ ] Test file path mirrors source path under the correct package `test/` tree (Step 3 naming)
 - [ ] Test file was created before or alongside the implementation (Step 0 — not as a follow-up)
 - [ ] All `@pytest.mark.xfail(strict=True)` stubs have been converted to real assertions before the PR is merged
 - [ ] Every public method/function has a happy-path test AND at least one error/edge-case test
 - [ ] Bug fixes include a regression parametrize case pinning the broken input
 - [ ] Public interface changes are covered by updated tests for all affected call sites
 - [ ] `conftest.py` exists and includes required `sys.modules` mocks (Step 5)
-- [ ] `make unit-tests` (or `pytest tests/unit/path/to/test_file.py -v`) passes locally
+- [ ] `make tests` (or targeted `uv run --directory packages/bietlejuice-{pkg} pytest … -v`) passes locally

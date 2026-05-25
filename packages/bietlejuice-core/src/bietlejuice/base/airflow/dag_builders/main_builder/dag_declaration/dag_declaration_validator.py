@@ -2,6 +2,7 @@ import json
 
 from cerberus import Validator
 
+from bietlejuice.base.airflow.cluster_config_resolver import is_airflow_emr_cluster
 from bietlejuice.base.airflow.dag_builders.main_builder.workflows.api_ingestion_enums import (
     AuthenticationStrategyEnum,
     PaginationStrategyEnum,
@@ -18,7 +19,6 @@ from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissio
 from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
-from bietlejuice.base.airflow.cluster_config_resolver import is_airflow_emr_cluster
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.udfs.udf_enum import UDFEnum
 
@@ -586,7 +586,9 @@ class DAGDeclarationValidator(Validator):
 
         num_task_workers = custom.get("num_task_workers")
         if num_task_workers is not None:
-            if not isinstance(num_task_workers, int) or isinstance(num_task_workers, bool):
+            if not isinstance(num_task_workers, int) or isinstance(
+                num_task_workers, bool
+            ):
                 raise AssertionError(
                     "m=_check_emr_cluster_configuration, "
                     "msg='num_task_workers' must be an integer"

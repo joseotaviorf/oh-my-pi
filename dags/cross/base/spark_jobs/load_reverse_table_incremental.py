@@ -1,5 +1,5 @@
-import logging
 import json
+import logging
 from argparse import ArgumentParser
 from datetime import datetime
 
@@ -7,7 +7,6 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db.reverse_metastore_mapping import ReverseMetastoreMapping
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
-
 from bietlejuice.pipeline.incremental_table_loader_pipeline import (
     IncrementalTableLoaderPipeline,
 )
@@ -18,7 +17,6 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env", type=str, help="forno/prod values")
     parser.add_argument("datalake_bucket", type=str, help="datalake bucket")

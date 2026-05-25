@@ -1,25 +1,22 @@
-from typing import List, Dict, Any, Set
+import ast
+import json
+import logging
+from argparse import ArgumentParser
+from datetime import datetime
+from json.decoder import JSONDecodeError
+from typing import Any, Dict, List, Set
 
 import boto3
-import logging
-import json
-import ast
-
-from json.decoder import JSONDecodeError
-
-from datetime import datetime
-from argparse import ArgumentParser
-
 from botocore.client import BaseClient
-from pyspark.sql import Row, DataFrame
+from pyspark.sql import DataFrame, Row
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.clients.db_clients import SparkClient
+
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageFormat
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_metrics_registration_to_raw"
 
@@ -104,10 +101,10 @@ if __name__ == "__main__":
     parser.add_argument("source", type=str)
     parser.add_argument("table_name", type=str)
     parser.add_argument("execution_date_str", type=str)
-    parser.add_argument("metrics_bucket",type=str)
-    parser.add_argument("metrics_path",type=str)
-    parser.add_argument('partition_cols',type= str)
-    parser.add_argument('metric_cols',type= str)
+    parser.add_argument("metrics_bucket", type=str)
+    parser.add_argument("metrics_path", type=str)
+    parser.add_argument("partition_cols", type=str)
+    parser.add_argument("metric_cols", type=str)
 
     args = parser.parse_args()
     env = args.env
@@ -121,7 +118,11 @@ if __name__ == "__main__":
     partition_cols = ast.literal_eval(args.partition_cols)
     metric_cols = ast.literal_eval(args.metric_cols)
 
-    bucket_suffix = ".data.quintoandar.com.br" if env == "prod" else ".forno.data.quintoandar.com.br"
+    bucket_suffix = (
+        ".data.quintoandar.com.br"
+        if env == "prod"
+        else ".forno.data.quintoandar.com.br"
+    )
     metrics_bucket = metrics_bucket + bucket_suffix
 
     logger.info(

@@ -1,16 +1,13 @@
-from datetime import datetime
 from argparse import ArgumentParser
 
+from pyspark.sql.functions import col, lit
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
-
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, lit
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_management_hierarchy_enrich"
 
@@ -61,7 +58,7 @@ if __name__ == "__main__":
 
     df = spark_client.conn.sql(managers_query)
     df = df.filter(df.id_manager_assignment.isNotNull())
-    
+
     # Filter out test users (both employees and managers)
     test_users_query = """
         SELECT DISTINCT id_period_of_service
@@ -70,33 +67,51 @@ if __name__ == "__main__":
     """
     df_test_users = spark_client.conn.sql(test_users_query)
     # Filter employees who are test users
-    df = df.join(df_test_users, 
-                  df.id_period_of_service == df_test_users.id_period_of_service, 
-                  how="left_anti")
+    df = df.join(
+        df_test_users,
+        df.id_period_of_service == df_test_users.id_period_of_service,
+        how="left_anti",
+    )
     # Filter managers who are test users
-    df = df.join(df_test_users, 
-                  df.id_manager_assignment == df_test_users.id_period_of_service, 
-                  how="left_anti")
+    df = df.join(
+        df_test_users,
+        df.id_manager_assignment == df_test_users.id_period_of_service,
+        how="left_anti",
+    )
 
-    df_degree = df.withColumn("separation_degree", lit(1))\
-                  .withColumn("is_direct_manager", lit(True))\
-                  .select("id_assignment", "id_manager_assignment", "separation_degree", "is_direct_manager", "id_period_of_service", "id_manager_period_of_service")
+    df_degree = (
+        df.withColumn("separation_degree", lit(1))
+        .withColumn("is_direct_manager", lit(True))
+        .select(
+            "id_assignment",
+            "id_manager_assignment",
+            "separation_degree",
+            "is_direct_manager",
+            "id_period_of_service",
+            "id_manager_period_of_service",
+        )
+    )
 
     df_result = df_degree
 
     max_iterations = 10
 
     for i in range(2, max_iterations + 1):
-        df_next_degree = df.alias("df1")\
-            .join(df_degree.alias("df2"), col("df1.id_manager_assignment") == col("df2.id_assignment"))\
+        df_next_degree = (
+            df.alias("df1")
+            .join(
+                df_degree.alias("df2"),
+                col("df1.id_manager_assignment") == col("df2.id_assignment"),
+            )
             .select(
                 col("df1.id_assignment"),
                 col("df2.id_manager_assignment"),
                 lit(i).alias("separation_degree"),
                 lit(False).alias("is_direct_manager"),
                 col("df1.id_period_of_service"),
-                col("df2.id_manager_period_of_service")
+                col("df2.id_manager_period_of_service"),
             )
+        )
 
         df_result = df_result.union(df_next_degree)
         df_degree = df_next_degree
@@ -108,7 +123,7 @@ if __name__ == "__main__":
         lit(0).alias("separation_degree"),
         lit(False).alias("is_direct_manager"),
         col("id_period_of_service"),
-        col("id_period_of_service").alias("id_manager_period_of_service")
+        col("id_period_of_service").alias("id_manager_period_of_service"),
     ).distinct()
 
     df_result = df_result.union(df_employee_as_self)
@@ -127,9 +142,7 @@ if __name__ == "__main__":
     s3_path = database_location + table_name
     full_table_name = f"{database_name}.{table_name}"
 
-    logger.info(
-        f"Table {full_table_name} will be loaded as Delta."
-    )
+    logger.info(f"Table {full_table_name} will be loaded as Delta.")
 
     delta_loader.load_table(
         table_name=full_table_name,
@@ -137,6 +150,4 @@ if __name__ == "__main__":
         source_df=df_separation,
     )
 
-    spark_metastore_service.refresh_table(
-        database_name, table_name
-    )
+    spark_metastore_service.refresh_table(database_name, table_name)

@@ -5,11 +5,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkDataFrameService
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.services.configuration_service import ConfigurationService
 from pyspark.errors import AnalysisException
 from pyspark.sql import DataFrame, Row
 from pyspark.sql.types import (
@@ -19,6 +14,12 @@ from pyspark.sql.types import (
     StructType,
     TimestampType,
 )
+
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.spark import SparkDataFrameService
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders.delta_loader import DeltaLoader
+from bietlejuice.services.configuration_service import ConfigurationService
 
 DELTA_TABLE_NOT_FOUND = "DELTA_TABLE_NOT_FOUND"
 TABLE_OR_VIEW_NOT_FOUND = "TABLE_OR_VIEW_NOT_FOUND"

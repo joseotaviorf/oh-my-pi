@@ -13,14 +13,14 @@ def get_dependencies_data_from_yaml() -> list:
     """This function will return all data readed in the dependencies yaml file"""
 
     dependencies_file = join(DAG_PACKAGES_ROOT, "dependencies.yaml")
-    with open(dependencies_file, "r") as stream:
+    with open(dependencies_file) as stream:
         dags = yaml.safe_load(stream)
 
     return dags
 
 
 def adjust_dag_name(dag_name: str) -> str:
-    """ This function will insert the `:` char in the end of dag_name"""
+    """This function will insert the `:` char in the end of dag_name"""
 
     if ":" not in dag_name:
         dag_name += ":"
@@ -30,12 +30,12 @@ def adjust_dag_name(dag_name: str) -> str:
 
 def find_dependence_dags(dag_name: str, yaml_data, deep=False) -> list:
     """
-        This function will find all the DAGs that use the data from the DAG sent by parameter
-        Params:
-            dag_name: name of the dag to find the dependencies;
-            yaml_data: data content of the yaml dependecie file;
-            deep: whit this flag will return the dependence of DAG depedences,
-                  mapping the all depencies of the main DAG.
+    This function will find all the DAGs that use the data from the DAG sent by parameter
+    Params:
+        dag_name: name of the dag to find the dependencies;
+        yaml_data: data content of the yaml dependecie file;
+        deep: whit this flag will return the dependence of DAG depedences,
+              mapping the all depencies of the main DAG.
     """
 
     dags = yaml_data
@@ -63,7 +63,6 @@ def find_dependence_dags(dag_name: str, yaml_data, deep=False) -> list:
 
 
 if __name__ == "__main__":
-
     # get dag name by paramns
     DAG_NAME = sys.argv[1]
 

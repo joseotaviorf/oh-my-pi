@@ -1,10 +1,10 @@
-import json
-from functools import reduce
 from argparse import ArgumentParser
-from pyspark.sql import DataFrame, SparkSession
-from pyspark.sql.functions import lit, col, to_date, element_at
-from pyspark.sql.types import StructType, StructField, StringType, DoubleType, IntegerType
+from functools import reduce
 
+from profound import Client
+from profound.types import Pagination, ReportResponse, ReportResult
+from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql.functions import col, element_at, to_date
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
@@ -13,11 +13,8 @@ from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
-
-from profound import Client
-from profound.types import ReportResponse, ReportResult, Pagination
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_profound_raw"
 
@@ -25,7 +22,16 @@ CATEGORY_ID = "92504126-efe7-4f21-b17a-344f300a685d"
 
 logger = QuintoAndarLogger(JOB_NAME)
 
-def get_profound_data(profound_client: Client, metrics: list[str], dimensions: list[str], filters: list[str], start_date: str, end_date: str, offset: int = 0) -> ReportResponse:
+
+def get_profound_data(
+    profound_client: Client,
+    metrics: list[str],
+    dimensions: list[str],
+    filters: list[str],
+    start_date: str,
+    end_date: str,
+    offset: int = 0,
+) -> ReportResponse:
     response = profound_client.reports.visibility(
         category_id=CATEGORY_ID,
         start_date=start_date,
@@ -33,9 +39,10 @@ def get_profound_data(profound_client: Client, metrics: list[str], dimensions: l
         metrics=metrics,
         dimensions=dimensions,
         filters=filters,
-        pagination=Pagination(limit=10000, offset=offset)
+        pagination=Pagination(limit=10000, offset=offset),
     )
     return response
+
 
 def generate_dataframe(spark: SparkSession, response: ReportResult) -> DataFrame:
     if response and hasattr(response, "data") and response.data:
@@ -47,6 +54,7 @@ def generate_dataframe(spark: SparkSession, response: ReportResult) -> DataFrame
         df = df.drop("dimensions", "metrics")
         df = df.withColumn("date", to_date(col("date"), "yyyy-MM-dd"))
         return df
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -82,7 +90,9 @@ if __name__ == "__main__":
     report_config = tables_config.get(report_type)
 
     if not report_config:
-        raise ValueError(f"Report type '{report_type}' not found in tables configuration")
+        raise ValueError(
+            f"Report type '{report_type}' not found in tables configuration"
+        )
 
     metrics = config_service.get_config("metrics")
     dimensions = report_config["dimensions"]
@@ -92,24 +102,29 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    credentials = dbutils.secrets.get(
-        scope="quintoandar", key=APIEnum.PROFOUND
-    )
+    credentials = dbutils.secrets.get(scope="quintoandar", key=APIEnum.PROFOUND)
 
     profound_client = Client(
         api_key=credentials,
     )
 
     spark_client = SparkClient()
-    spark = SparkSession.builder.getOrCreate() 
+    spark = SparkSession.builder.getOrCreate()
 
     dfs = []
-    
+
     try:
-        response = get_profound_data(profound_client, metrics, dimensions, filters, load_start_date, load_end_date)
+        response = get_profound_data(
+            profound_client,
+            metrics,
+            dimensions,
+            filters,
+            load_start_date,
+            load_end_date,
+        )
 
         df = generate_dataframe(spark, response)
-        
+
         dfs.append(df)
 
         total_rows = response.info.total_rows
@@ -117,18 +132,26 @@ if __name__ == "__main__":
         offset = limit
 
         while offset < total_rows:
-            response = get_profound_data(profound_client, metrics, dimensions, filters, load_start_date, load_end_date, offset)
+            response = get_profound_data(
+                profound_client,
+                metrics,
+                dimensions,
+                filters,
+                load_start_date,
+                load_end_date,
+                offset,
+            )
             df = generate_dataframe(spark, response)
             dfs.append(df)
             offset += limit
-                
+
         logger.info(
             f"""
                 m={JOB_NAME}, {total_rows} rows extracted
                 for the period {load_start_date} to {load_end_date}.
             """
         )
-            
+
     except Exception as e:
         logger.error(
             f"""
@@ -174,4 +197,3 @@ if __name__ == "__main__":
         )
     else:
         logger.info("m=__main__, msg=df empty.")
-

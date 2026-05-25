@@ -35,7 +35,9 @@ PERSISTED_COLUMNS = [
 ]
 
 
-def get_forno_adjusted_data_science_path(environment: str, source_root_path: str) -> str:
+def get_forno_adjusted_data_science_path(
+    environment: str, source_root_path: str
+) -> str:
     """Resolve data-science bucket host for forno vs prod."""
     if environment == "forno":
         return source_root_path.replace(
@@ -44,7 +46,9 @@ def get_forno_adjusted_data_science_path(environment: str, source_root_path: str
     return source_root_path
 
 
-def build_session_metadata_parquet_uri(source_root_path: str, date_to_ingest: str) -> str:
+def build_session_metadata_parquet_uri(
+    source_root_path: str, date_to_ingest: str
+) -> str:
     """Build S3 URI for one daily parquet (session-metadata/{yyyy-MM-dd}.parquet)."""
     base = source_root_path.rstrip("/")
     return f"{base}/{date_to_ingest}.parquet"

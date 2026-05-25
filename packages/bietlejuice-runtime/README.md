@@ -84,8 +84,8 @@ This is what you want for day-to-day development. After it finishes:
 
 | Path | Contents | Used by |
 | ---- | -------- | ------- |
-| `<repo>/.venv` (or `/home/vscode/.venv` in the devcontainer) | Workspace: core + airflow + compiler + dev tools | IDE; **`make check-style`** (**`ruff check`** repo-wide + **`ruff format --check`** only on **`packages/*/src`** + **`test/`**) runs via **`uv run --project packages/bietlejuice-compiler`** |
-| `packages/bietlejuice-runtime/.venv` | Runtime broad versions + ruff/ty/pytest | **`make type-check`** for runtime (`ty check src/`); **`make lint`** formats runtime **`src/`/`test/`**; **`make check-style`** runs **`ruff check`** over the whole repo including runtime sources |
+| `<repo>/.venv` (or `/home/vscode/.venv` in the devcontainer) | Workspace: core + airflow + compiler + dev tools | IDE; **`make check-style`** (**`ruff format --check`** + **`ruff check`** on **`packages/*/src`** + **`test/`** only) runs via **`uv run --project packages/bietlejuice-compiler`** |
+| `packages/bietlejuice-runtime/.venv` | Runtime broad versions + ruff/ty/pytest | **`make type-check`** for runtime (`ty check src/`); **`make lint`** / **`make check-style`** format and lint runtime **`src/`** + **`test/`** (same package scope as other workspace packages) |
 | `packages/bietlejuice-runtime/envs/dbr-16-4/.venv` | Runtime + DBR 16.4 LTS pinned libs + pytest | `make unit-tests` for runtime |
 
 ### Switching DBR
@@ -137,7 +137,7 @@ You have two options:
    intellisense for runtime's own modules works. Some third-party imports
    (`spacy`, `presidio-analyzer`, `delta-spark`, ...) will be flagged
    unresolved unless you also do option 2 — they will not affect linting via
-   **`make check-style`** / **`make lint`** (**`ruff check`** repo-wide, including **`packages/bietlejuice-runtime/src`**; **`ruff format`** only on **`packages/*/src`** + **`test/`**) or type-checking via **`make type-check`**.
+   **`make check-style`** / **`make lint`** / **`make fix-style`** (Ruff on **`packages/*/src`** + **`test/`** only, including runtime) or type-checking via **`make type-check`** (`ty check src/` per package).
 
 2. **Recommended when running runtime tests interactively:** override the
    interpreter for the `packages/bietlejuice-runtime/` folder. In

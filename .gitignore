@@ -48,6 +48,7 @@ ENV/
 
 # Spark
 metastore_db/
+spark-warehouse/
 
 # Airflow
 airflow/*

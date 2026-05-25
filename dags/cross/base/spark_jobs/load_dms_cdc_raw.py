@@ -1,26 +1,25 @@
+import json
 from argparse import ArgumentParser, Namespace
 from datetime import datetime
-import json
-from typing import List, Any
+from typing import Any, List
 
-from bietlejuice.base.cdc.reader.date_range_partition_reader import DateRangePartitionReader
+from pyspark.sql import DataFrame
+from pyspark.sql.functions import row_number
+from pyspark.sql.window import Window
+from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.base.cdc.reader.date_range_partition_reader import (
+    DateRangePartitionReader,
+)
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.spark.base_spark import BaseDBUtils
 from bietlejuice.base.spark.delta_secondary_catalog_sync import (
     sync_delta_write_to_secondary_catalog,
 )
-from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
-
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
+from bietlejuice.base.spark.spark_table_property_helper import SparkTablePropertyHelper
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.loaders.delta_loader import DeltaLoader
-
-from pyspark.sql import DataFrame
-from pyspark.sql.window import Window
-from pyspark.sql.functions import row_number
-
-from quintoandar_logger import QuintoAndarLogger
-
 
 JOB_NAME = "load_dms_cdc_raw"
 
@@ -62,10 +61,8 @@ def get_df_from_dms_bucket(
     """
     base_path = f"s3://{incoming_bucket}/{table_name}/"
     reader = DateRangePartitionReader(
-        dataframe_reader=spark.read,
-        dbutils=dbutils,
-        partition_format="%Y/%m/%d"
-        )
+        dataframe_reader=spark.read, dbutils=dbutils, partition_format="%Y/%m/%d"
+    )
     try:
         logger.info(
             f"m=get_df_from_dms_bucket, start_date={start_date}, end_date={end_date}, path={base_path}, msg=reading DMS data..."
@@ -82,12 +79,16 @@ def get_df_from_dms_bucket(
         )
         return None
 
+
 def get_primary_key(args: Namespace, df: DataFrame) -> List[str]:
     if args.primary_keys:
         primary_keys = [key.strip() for key in args.primary_keys.split(",")]
     else:
-        primary_keys = [col_name for col_name in df.columns if col_name.startswith("pk")]
+        primary_keys = [
+            col_name for col_name in df.columns if col_name.startswith("pk")
+        ]
     return primary_keys
+
 
 def dml_processor(df_dms: DataFrame, primary_keys: List) -> DataFrame:
     """
@@ -96,24 +97,25 @@ def dml_processor(df_dms: DataFrame, primary_keys: List) -> DataFrame:
     a register.
     """
     logger.info(
-        f"m=dml_processor, msg=Applying deduplication and preserving the latest operation of DMS Bucket..."
+        "m=dml_processor, msg=Applying deduplication and preserving the latest operation of DMS Bucket..."
     )
     window_spec = Window.partitionBy(*primary_keys).orderBy(
         df_dms["event_timestamp"].desc()
     )
-    df_dms = df_dms.withColumn(
-        "row_number", row_number().over(window_spec)
-    )
+    df_dms = df_dms.withColumn("row_number", row_number().over(window_spec))
     df_dms_processor = df_dms.where(df_dms["row_number"] == 1)
     df_dms_processor = df_dms_processor.drop("row_number")
 
     return df_dms_processor
 
+
 def main():
     global spark
     if RuntimeDetector.is_emr():
-        from bietlejuice.base.spark.spark_session_factory import create_emr_spark_session
-    
+        from bietlejuice.base.spark.spark_session_factory import (
+            create_emr_spark_session,
+        )
+
         spark = create_emr_spark_session(JOB_NAME)
     args = parse_arguments()
     environment = args.env
@@ -149,7 +151,7 @@ def main():
 
     if not df_dms:
         logger.info(
-            f"""
+            """
             m=__main__, msg=DMS Dataframe is empty, there is no changes to propagate.
             """
         )
@@ -159,7 +161,7 @@ def main():
 
     if not primary_keys:
         raise Exception(
-            f"""
+            """
             m=__main__, msg=No primary keys detected, please provide the primary keys manually in the DAG declaration file,
             or review the values informed"""
         )
@@ -181,7 +183,7 @@ def main():
         path=raw_table_s3_path,
         source_df=df_dms_processor,
         merge_on=primary_keys,
-        when_matched_update_condition="source.event_timestamp >= target.event_timestamp"
+        when_matched_update_condition="source.event_timestamp >= target.event_timestamp",
     )
     sync_delta_write_to_secondary_catalog(
         spark,
@@ -190,13 +192,13 @@ def main():
         df_dms_processor,
         [],
     )
-    SparkTablePropertyHelper.set_property(full_raw_table_name, "primary_keys", ",".join(primary_keys))
+    SparkTablePropertyHelper.set_property(
+        full_raw_table_name, "primary_keys", ",".join(primary_keys)
+    )
 
-    if (
-        table_privileges
-        and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
-    ):
+    if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
+
 
 if __name__ == "__main__":
     try:

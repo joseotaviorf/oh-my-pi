@@ -2,15 +2,16 @@
 Sends listing_quality table rows to the MainListingQuality SQS queue.
 Consumed by main-sqs-consumers application.
 """
+
 import json
 import logging
 from argparse import ArgumentParser
 from typing import Any, Dict, Tuple, Type, TypeVar
 
 import boto3
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.services.configuration_service import ConfigurationService
-from quintoandar_logger import QuintoAndarLogger
 
 JOB_NAME = "load_into_sqs"
 
@@ -19,8 +20,10 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 T = TypeVar("T")
 
+
 def safe_cast(value: str | None, target_type: Type[T]) -> T | None:
     return target_type(value) if value is not None else None
+
 
 def parse_arguments() -> Tuple[str, str, str]:
     parser = ArgumentParser(description=JOB_NAME)
@@ -54,9 +57,7 @@ def main() -> None:
     config_service = ConfigurationService(dag_name)
     queue_url = config_service.get_config("sqs_queue_url")
     if not queue_url:
-        raise ValueError(
-            "sqs_queue_url must be set in prod_conf.yml or forno_conf.yml"
-        )
+        raise ValueError("sqs_queue_url must be set in prod_conf.yml or forno_conf.yml")
 
     logger.info(f"Loading {database_name}.{table_name} into SQS")
 

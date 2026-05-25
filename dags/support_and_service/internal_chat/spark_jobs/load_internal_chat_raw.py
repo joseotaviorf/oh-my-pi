@@ -1,27 +1,26 @@
+import concurrent.futures
 import json
 import logging
 import multiprocessing
-import concurrent.futures
-
 from argparse import ArgumentParser
-from datetime import datetime, timedelta
+from datetime import datetime
 
+from pyspark.sql.functions import lit
 from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkTableStorageFormat, BaseDBUtils
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
-from pyspark.sql.functions import lit
-
-
 JOB_NAME = "load_chat5a_messages_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
 
 def _parse_arguments():
     """
@@ -36,6 +35,7 @@ def _parse_arguments():
     parser.add_argument("partition_cols")
 
     return parser.parse_args()
+
 
 def _load_partitions_into_datalake(hour):
     """
@@ -82,8 +82,8 @@ def _load_partitions_into_datalake(hour):
         partition_cols=partition_cols,
     )
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     args = _parse_arguments()
 
     execution_date = datetime.strptime(args.execution_date, "%Y-%m-%d")
@@ -103,7 +103,9 @@ if __name__ == "__main__":
 
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-    db_info = DatalakeMetastoreService.get_db_info(args.env, args.source, args.datalake_bucket)
+    db_info = DatalakeMetastoreService.get_db_info(
+        args.env, args.source, args.datalake_bucket
+    )
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
 
@@ -116,7 +118,7 @@ if __name__ == "__main__":
     if base_dbutils.get_dbutils() is not None:
         dbutils = base_dbutils.get_dbutils()
 
-    table_name_proxy = args.table_name.replace('_', '-')
+    table_name_proxy = args.table_name.replace("_", "-")
     year_proxy = execution_date.year
     month_proxy = str(execution_date.month).zfill(2)
     day = str(execution_date.day).zfill(2)
@@ -128,7 +130,8 @@ if __name__ == "__main__":
     max_cores = int(multiprocessing.cpu_count() * 0.6)
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_cores) as executor:
         future_to_hour = {
-            executor.submit(_load_partitions_into_datalake, hour): hour for hour in hour_list
+            executor.submit(_load_partitions_into_datalake, hour): hour
+            for hour in hour_list
         }
         for future in concurrent.futures.as_completed(future_to_hour):
             hour = future_to_hour[future]

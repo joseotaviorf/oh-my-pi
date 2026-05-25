@@ -6,7 +6,7 @@ alwaysApply: false
 
 ## Formatting & Tooling
 - **Ruff** line length: **88** (format + lint). Python **>=3.10** (workspace packages: airflow, compiler) / **>=3.9** (core, runtime).
-- Run `make check-style` to lint before committing.
+- Run `make check-style` (packages + compiler scripts) and `make check-style-dags` (`dags/`) before committing when you touch the matching paths (both enforced in Woodpecker CI).
 
 ## Imports
 - Always use **absolute imports** from `bietlejuice.*`. Never relative imports.

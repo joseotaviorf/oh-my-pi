@@ -233,13 +233,13 @@ class TestOptimizeDeltaTableTaskCreator:
         )
 
         creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
-        creator.create_optimize_tasks(
-            [_table("t1", LayerEnum.CLEAN)], parallelism=16
-        )
+        creator.create_optimize_tasks([_table("t1", LayerEnum.CLEAN)], parallelism=16)
 
         assert mock_create_spark.call_args[0][2][2] == 4
 
-    def test_chain_optimize_tasks_sequentially_links_in_order(self, dag_execution_context):
+    def test_chain_optimize_tasks_sequentially_links_in_order(
+        self, dag_execution_context
+    ):
         ops = [
             EmptyOperator(task_id=f"batch-{i}", dag=dag_execution_context.dag)
             for i in range(1, 4)

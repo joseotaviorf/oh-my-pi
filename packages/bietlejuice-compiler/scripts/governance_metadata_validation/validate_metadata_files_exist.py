@@ -1,10 +1,8 @@
 import argparse
-import os
 import re
+from pathlib import Path
 
 import yaml
-
-from pathlib import Path
 
 from scripts.ci_cd.domain_cli import (
     branch_name_arg_type,
@@ -12,13 +10,12 @@ from scripts.ci_cd.domain_cli import (
     repo_relative_file_arg_type,
 )
 from scripts.services.git_service import GitService
-
 from scripts.services.metadata_file_service import MetadataFileService
 
 with open(f"{Path(__file__).parent}/skip_list.yml") as f:
     SKIP_LIST = yaml.safe_load(f)["queries_without_metadata_files"]
 
-SKIP_LIST_PATH_REGEX = re.compile(rf"(?:.*/)?dags/(?P<path>.*)")
+SKIP_LIST_PATH_REGEX = re.compile(r"(?:.*/)?dags/(?P<path>.*)")
 
 metadata_file_service = MetadataFileService()
 
@@ -95,6 +92,7 @@ def get_query_file_paths(mode, input, domain=None):
         git_service = GitService()
         if not input:
             import subprocess
+
             input = subprocess.check_output(
                 ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
             ).strip()
@@ -124,12 +122,12 @@ def remove_prefix(input_string):
 def output_results(results):
     print(f"Validated {len(results['passed']) + len(results['failed'])} files\n")
     if results["passed"]:
-        print(f"Queries that have a corresponding metadata file:")
+        print("Queries that have a corresponding metadata file:")
         for result in results["passed"]:
             print(f"file={result}")
         print()
     if results["failed"]:
-        print(f"Queries that don't have a corresponding metadata file:")
+        print("Queries that don't have a corresponding metadata file:")
         for result in results["failed"]:
             print(f"file={result}")
         print()

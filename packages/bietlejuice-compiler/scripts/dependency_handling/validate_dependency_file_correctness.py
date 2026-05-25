@@ -1,8 +1,9 @@
 from collections import defaultdict
-from scripts.dependency_handling.automate_dependencies import generate_dependencies
+
 from bietlejuice.base.dependencies.bietlejuice_dependency_helper import (
     BietlejuiceDependencyHelper,
 )
+from scripts.dependency_handling.automate_dependencies import generate_dependencies
 
 
 def main():
@@ -14,13 +15,17 @@ def main():
         expected_dependencies_file, existing_dependencies_file
     )
     if differences:
-        print("Differences were found between the committed and the expected versions of 'dependencies.yaml'.")
+        print(
+            "Differences were found between the committed and the expected versions of 'dependencies.yaml'."
+        )
         print_differences(differences)
-        print("Run locally the following command to generate a valid version:\n\n"
-              "make dependencies-file\n\n"
-              "If the current committed version has to be considered correct, add the differences as exceptions in one of the following files:\n"
-              "\t- 'dags/dependency_exceptions/unstandard_dags.yaml' for DAGs out of standard;\n"
-              "\t- 'dags/dependency_exceptions/manual_modifications.yaml' for manual task IDs modifications.")
+        print(
+            "Run locally the following command to generate a valid version:\n\n"
+            "make dependencies-file\n\n"
+            "If the current committed version has to be considered correct, add the differences as exceptions in one of the following files:\n"
+            "\t- 'dags/dependency_exceptions/unstandard_dags.yaml' for DAGs out of standard;\n"
+            "\t- 'dags/dependency_exceptions/manual_modifications.yaml' for manual task IDs modifications."
+        )
         return 1
     else:
         print("dependencies.yaml file is correct")
@@ -71,10 +76,10 @@ def print_differences(differences: dict):
     for dag_name, difference in differences.items():
         print(f"==== Dag {dag_name} has the following differences: ====")
         if "missing" in difference:
-            print(f"Missing dependencies:")
+            print("Missing dependencies:")
             print(" - " + "\n - ".join(difference["missing"]))
         if "extra" in difference:
-            print(f"Extra dependencies:")
+            print("Extra dependencies:")
             print(" - " + "\n - ".join(difference["extra"]))
         print("========================================")
 

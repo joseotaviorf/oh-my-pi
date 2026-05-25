@@ -1,5 +1,5 @@
-import logging
 import json
+import logging
 from argparse import ArgumentParser
 
 from quintoandar_logger import QuintoAndarLogger
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         + f"relative_query_path={relative_query_path}, "
         + f"execution_date={execution_date}, "
         + f"has_hive_sync={has_hive_sync}, "
-        + f"msg=Job execution started"
+        + "msg=Job execution started"
     )
 
     metastore_mapping = MetastoreMappingFactory.get_mapper_by_layer(

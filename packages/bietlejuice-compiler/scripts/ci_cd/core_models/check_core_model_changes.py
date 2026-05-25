@@ -25,7 +25,6 @@ from typing import List, Tuple
 sys.path.append(str(Path(__file__).parent.parent.parent))
 from services.git_service import GitService
 
-
 # Path patterns to check for changes (matched via str.startswith against git-diff paths)
 CORE_MODEL_PATHS = [
     "dags/core/",
@@ -48,9 +47,7 @@ def parse_args():
         required=False,
     )
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument(
-        "-b", "--branch", help="Branch to be checked", required=False
-    )
+    group.add_argument("-b", "--branch", help="Branch to be checked", required=False)
     group.add_argument(
         "-a",
         "--all-files",

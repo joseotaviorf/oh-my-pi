@@ -1,6 +1,5 @@
-# Path filters use Woodpecker `when.path` with `event: [push, pull_request]`.
-# See validations.yml header for the full rationale — pull_request is required
-# so that when.path evaluates the full PR diff, not just the last pushed commit.
+# Domain validation and core-model coverage use git diff origin/master...HEAD;
+# partial: false ensures the merge base exists (see validations.yml).
 clone:
   - name: clone
     image: woodpeckerci/plugin-git
@@ -12,8 +11,6 @@ steps:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
     pull: true
     commands:
-      # Re-link editable workspace packages and patch any new workspace deps (~1-2s).
-      # UV_PROJECT_ENVIRONMENT=/opt/bietlejuice/venvs/workspace is set in the image.
       - uv sync
       # Re-link dbr-16-4 editables into the pre-baked image venv (~1-2s, no wheel downloads).
       # Must target /opt/bietlejuice/venvs/dbr-16-4 explicitly — symlink-only setup makes uv
@@ -24,28 +21,6 @@ steps:
     when:
       event: [push, pull_request]
 
-  # PR pushes: scope tests to changed modules via pytest-testmon + path detection.
-  # master/forno pushes run the full suite via unit-tests-python instead.
-  changed-unit-tests-python:
-    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
-    pull: true
-    commands:
-      - export AWS_DEFAULT_REGION=us-east-1
-      - make unit-tests-changed
-    when:
-      event: [push, pull_request]
-      branch:
-        exclude: [master, forno]
-      path:
-        include:
-          - '**/*.py'
-          - 'pyproject.toml'
-          - 'packages/*/pyproject.toml'
-          - 'uv.lock'
-        on_empty: false
-    depends_on: [setup]
-
-  # master/forno pushes: run the full suite and rebuild .testmondata as the CI baseline.
   unit-tests-python:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
     pull: true
@@ -54,14 +29,16 @@ steps:
       - make unit-tests
     when:
       event: [push, pull_request]
-      branch: [master, forno]
-      path:
-        include:
-          - '**/*.py'
-          - 'pyproject.toml'
-          - 'packages/*/pyproject.toml'
-          - 'uv.lock'
-        on_empty: false
+    depends_on: [setup]
+
+  unit-tests-dags:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
+    pull: true
+    commands:
+      - export AWS_DEFAULT_REGION=us-east-1
+      - make unit-tests-dags
+    when:
+      event: [push, pull_request]
     depends_on: [setup]
 
   integration-tests-python:
@@ -72,13 +49,6 @@ steps:
       - make integration-tests
     when:
       event: [push, pull_request]
-      path:
-        include:
-          - '**/*.py'
-          - 'pyproject.toml'
-          - 'packages/*/pyproject.toml'
-          - 'uv.lock'
-        on_empty: false
     depends_on: [setup]
 
   core-model-tests-and-coverage:
@@ -89,12 +59,4 @@ steps:
       - make core-model-coverage
     when:
       event: [push, pull_request]
-      path:
-        include:
-          - 'dags/core/**/*.py'
-          - 'packages/bietlejuice-runtime/test/**/*.py'
-          - 'packages/bietlejuice-runtime/src/bietlejuice/base/core_models/**/*.py'
-          - 'packages/bietlejuice-airflow/src/bietlejuice/base/core_models/**/*.py'
-          - 'packages/bietlejuice-core/src/bietlejuice/base/core_models/**/*.py'
-        on_empty: false
     depends_on: [setup]

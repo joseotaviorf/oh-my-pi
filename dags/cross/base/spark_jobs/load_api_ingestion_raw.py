@@ -17,14 +17,14 @@ from typing import Any, Dict, List
 
 from pyspark.sql import SparkSession
 
-from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.api.configuration.declaration_loader import (
     load_api_ingestion_declaration,
     validate_api_ingestion_dag_name,
 )
 from bietlejuice.base.api.configuration.loader import APIConfigurationLoader
+from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.jobs.common.helpers import json_to_dataframe, insert_partitions
+from bietlejuice.jobs.common.helpers import insert_partitions, json_to_dataframe
 from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
 
 JOB_NAME = "load_api_ingestion_raw"
@@ -428,7 +428,7 @@ def main() -> None:
 
     if not all_results:
         LOGGER.warning(
-            "m=main, table_name=%s msg=No data returned from API. " "Skipping load.",
+            "m=main, table_name=%s msg=No data returned from API. Skipping load.",
             args.table_name,
         )
         return

@@ -17,7 +17,6 @@ from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_decl
 )
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.file_service import FileService
-
 from scripts.ci_cd.domain_cli import domain_arg_type
 
 logger = QuintoAndarLogger("ValidateDAGDeclarationFiles")
@@ -84,7 +83,9 @@ if __name__ == "__main__":
         )
         with ThreadPoolExecutor(max_workers=64) as executor:
             futures = {
-                executor.submit(validate_one_dag, dag_declaration_file): dag_declaration_file
+                executor.submit(
+                    validate_one_dag, dag_declaration_file
+                ): dag_declaration_file
                 for dag_declaration_file in dag_declaration_files
             }
             processed = 0
@@ -92,9 +93,7 @@ if __name__ == "__main__":
                 if future.exception():
                     exc = future.exception()
                     error_msg = exc.args[1] if len(exc.args) > 1 else str(exc)
-                    dag_declaration_fails_msg += "\n- Path: {}\n- Validation errors:\n{}".format(
-                        futures[future], error_msg
-                    )
+                    dag_declaration_fails_msg += f"\n- Path: {futures[future]}\n- Validation errors:\n{error_msg}"
                 processed += 1
                 if processed % 50 == 0 or processed == len(dag_declaration_files):
                     logger.info(

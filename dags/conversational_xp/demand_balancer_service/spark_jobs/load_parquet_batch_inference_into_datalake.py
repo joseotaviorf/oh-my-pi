@@ -1,24 +1,23 @@
 import json
 import logging
 from argparse import ArgumentParser
-from datetime import datetime, timedelta
-from pyspark.sql.utils import AnalysisException
+from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.spark import SparkTableStorageFormat, SparkDataFrameService
+from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_parquet_batch_inference_into_datalake"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
 
 def get_source_in_forno(environment, source):
     prod_string = "s3://data-science.s3.data"
@@ -49,9 +48,8 @@ def main():
     source_root_path = get_source_in_forno(environment, args.source_root_path)
     date_to_ingest = args.date_to_ingest
     table_name = args.table_name
-    raw_partition_cols =  json.loads(args.raw_partition_cols.replace("'", '"'))
+    raw_partition_cols = json.loads(args.raw_partition_cols.replace("'", '"'))
     format = args.format
-
 
     logger.info(
         f"""
@@ -80,7 +78,7 @@ def main():
 
     df = s3_consumer.get_data_from_file(
         f"{source_root_path}/year={dt_execution.year}/month={dt_execution.month}/day={dt_execution.day}/",
-        format
+        format,
     )
 
     df = (
@@ -110,6 +108,7 @@ def main():
         table_name=table_name,
         partition_cols=raw_partition_cols,
     )
+
 
 if __name__ == "__main__":
     main()

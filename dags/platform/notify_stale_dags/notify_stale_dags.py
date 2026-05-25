@@ -1,7 +1,7 @@
 """
-    airflow parsing enforcement
+airflow parsing enforcement
 
-    Note: this line above forces Airflow to parse this file for implemented DAGs
+Note: this line above forces Airflow to parse this file for implemented DAGs
 """
 
 import os
@@ -27,7 +27,8 @@ STALE_THRESHOLD_MONTHS = 1
 # Auto-pause is ON by default. Set Airflow Variable "notify_stale_dags_auto_pause_disabled" to "true" to opt out.
 _AUTO_PAUSE_DISABLED_VARIABLE_KEY = "notify_stale_dags_auto_pause_disabled"
 
-_STALE_QUERY = text("""
+_STALE_QUERY = text(
+    """
     WITH last_success AS (
         SELECT dag_id, MAX(start_date) AS ts_last_success
         FROM dag_run
@@ -49,7 +50,8 @@ _STALE_QUERY = text("""
           OR ls.ts_last_success < NOW() - INTERVAL ':threshold months'
       )
     ORDER BY ls.ts_last_success ASC NULLS FIRST
-""".replace(":threshold months", f"{STALE_THRESHOLD_MONTHS} months"))
+""".replace(":threshold months", f"{STALE_THRESHOLD_MONTHS} months")
+)
 
 _EXCLUDED_SCHEDULE_INTERVALS = {"Dataset", None}
 _EXCLUDED_DAG_ID_PREFIXES = ("quintoml.",)
@@ -79,18 +81,22 @@ def _environment_suffix_for_card() -> str:
 def _build_card(stale_rows) -> dict:
     widgets = []
     for row in stale_rows:
-        last_run = row.ts_last_success.strftime("%Y-%m-%d") if row.ts_last_success else "never"
+        last_run = (
+            row.ts_last_success.strftime("%Y-%m-%d") if row.ts_last_success else "never"
+        )
         dag_url = f"{AIRFLOW_URL}/dags/{row.dag_id}/graph"
-        widgets.append({
-            "decoratedText": {
-                "text": f"<b>{row.dag_id}</b>",
-                "bottomLabel": f"owner: {row.owners} | schedule: {row.schedule_interval} | last success: {last_run}",
-                "button": {
-                    "text": "Open in Airflow",
-                    "onClick": {"openLink": {"url": dag_url}},
-                },
+        widgets.append(
+            {
+                "decoratedText": {
+                    "text": f"<b>{row.dag_id}</b>",
+                    "bottomLabel": f"owner: {row.owners} | schedule: {row.schedule_interval} | last success: {last_run}",
+                    "button": {
+                        "text": "Open in Airflow",
+                        "onClick": {"openLink": {"url": dag_url}},
+                    },
+                }
             }
-        })
+        )
 
     return {
         "cardsV2": [
@@ -137,7 +143,12 @@ def notify_stale_dags(session=None, **_):
     config = ConfigurationService()
     webhook_variable_key = config.get_config("notification_webhooks_keys")["stale_dag"]
     webhook_url = Variable.get(webhook_variable_key, default_var=None)
-    auto_pause = Variable.get(_AUTO_PAUSE_DISABLED_VARIABLE_KEY, default_var="false").strip().lower() != "true"
+    auto_pause = (
+        Variable.get(_AUTO_PAUSE_DISABLED_VARIABLE_KEY, default_var="false")
+        .strip()
+        .lower()
+        != "true"
+    )
     print(
         "notify_stale_dags diagnostics: "
         f"ENVIRONMENT={os.environ.get('ENVIRONMENT', '(unset)')}, "
@@ -162,7 +173,9 @@ def notify_stale_dags(session=None, **_):
 
     print(f"🕸️ {len(notifiable)} stale DAG(s) to report:")
     for row in notifiable:
-        last_run = row.ts_last_success.strftime("%Y-%m-%d") if row.ts_last_success else "never"
+        last_run = (
+            row.ts_last_success.strftime("%Y-%m-%d") if row.ts_last_success else "never"
+        )
         print(f"  • {row.dag_id} | owner: {row.owners} | last success: {last_run}")
 
     if auto_pause:
@@ -207,12 +220,13 @@ with DAG(
         "(Airflow Variable from notification_webhooks_keys.stale_dag in env YAML; DPLT-860)."
     ),
     schedule=[
-        Dataset("bietlejuice.enrich_stale_dags:load-enrich-stale-dags:first-run-of-day"),
+        Dataset(
+            "bietlejuice.enrich_stale_dags:load-enrich-stale-dags:first-run-of-day"
+        ),
     ],
     catchup=False,
     tags=["monitoring", "platform", "stale-dags"],
 ) as dag:
-
     PythonOperator(
         task_id="notify_stale_dags",
         python_callable=notify_stale_dags,

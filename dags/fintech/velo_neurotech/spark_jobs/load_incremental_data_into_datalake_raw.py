@@ -1,27 +1,27 @@
+import ast
 import json
 import logging
-import ast
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 
+from pyspark.sql.types import StringType, StructField, StructType
 from quintoandar_logger import QuintoAndarLogger
-
-from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
-from bietlejuice.base.spark import SparkDataFrameService
-from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
-from bietlejuice.base.api.api_enum import APIEnum
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.services.messaging_services.slack_service import SlackService
-
 from quintoandar_velo_neurotech_api_client.clients import VeloNeurotechClient
 from quintoandar_velo_neurotech_api_client.consumers import VeloNeurotechConsumer
 
-from pyspark.sql.types import StructField, StructType, StringType
-
+from bietlejuice.base.api.api_enum import APIEnum
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
+from bietlejuice.base.spark import (
+    BaseDBUtils,
+    SparkDataFrameService,
+    SparkTableStorageFormat,
+)
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.messaging_services.slack_service import SlackService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_incremental_data_into_datalake_raw"
@@ -78,7 +78,6 @@ def __generate_schema(dataframe):
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
@@ -87,7 +86,9 @@ if __name__ == "__main__":
     parser.add_argument("execution_date", help="execution date in str format %Y-%m-%d")
     parser.add_argument("table_name", help="Name of the table to store data into")
     parser.add_argument("partitions", help="Partition columns name")
-    parser.add_argument("report_name", help="Name of the report to load data from Neurotech")
+    parser.add_argument(
+        "report_name", help="Name of the report to load data from Neurotech"
+    )
     args = parser.parse_args()
 
     args.partition_cols = ast.literal_eval(args.partitions)
@@ -137,7 +138,7 @@ if __name__ == "__main__":
         )
 
         logger.info(f"m=__main__, message=sending slack message: {message}")
-        SlackService.send_slack_errors([(message,slack_webhook)])
+        SlackService.send_slack_errors([(message, slack_webhook)])
 
     else:
         spark_client = SparkClient()

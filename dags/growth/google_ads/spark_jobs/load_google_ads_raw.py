@@ -1,28 +1,27 @@
-from argparse import ArgumentParser
-from itertools import product
-from pyspark.sql.functions import lit, udf
 import json
 import time
+from argparse import ArgumentParser
+from itertools import product
 
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
 from google.protobuf.json_format import MessageToDict
-
+from pyspark.sql.functions import lit, udf
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
     BaseDBUtils,
-    SparkTableStorageFormat,
     BaseSparkContext,
+    SparkTableStorageFormat,
 )
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.formatters import StringFormatter
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.configuration_service import ConfigurationService
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_google_ads_raw"
 
@@ -146,7 +145,7 @@ if __name__ == "__main__":
         googleads_client, login_customer_id, customer_filter
     )
 
-    logger.info(f'm=__main__, msg="Starting to run requests"')
+    logger.info('m=__main__, msg="Starting to run requests"')
 
     query_str = gaql_query.format(
         load_start_date=load_start_date, load_end_date=load_end_date
@@ -158,7 +157,7 @@ if __name__ == "__main__":
         [query_str],
     )
 
-    logger.info(f'm=__main__, msg="Collecting requests"')
+    logger.info('m=__main__, msg="Collecting requests"')
 
     results = BaseSparkContext.sc.parallelize(args).map(_issue_search_request).collect()
 
@@ -187,7 +186,7 @@ if __name__ == "__main__":
     spark_client = SparkClient()
     df = spark_client.conn.read.json(BaseSparkContext.sc.parallelize(successes))
 
-    logger.info(f'm=__main__, msg="Dataframe created with successfull results"')
+    logger.info('m=__main__, msg="Dataframe created with successfull results"')
 
     if not df.rdd.isEmpty():
         if report_type == "geo_target_constant":

@@ -26,7 +26,7 @@
 #      Three ``days_since_*`` vs ``last_day(reference_month)``; ``validate_before_write`` then Delta load.
 #
 # How to run unit tests (repo root; use project pyenv env `bi-etl-ejuice`):
-#   python -m pytest tests/unit/agents/enrich_agent_reports/test_load_agent_new_agent_activation_metrics.py -v
+#   cd packages/bietlejuice-runtime && PYTHONPATH=src:../.. uv run --project envs/dbr-16-4 pytest test/dags/agents/enrich_agent_reports/spark_jobs/test_load_agent_new_agent_activation_metrics.py -v
 #
 
 # DBTITLE 1,Import libs
@@ -86,16 +86,16 @@ logger = QuintoAndarLogger(JOB_NAME)
 MONTHS_WINDOW_DEFAULT = 18
 NEW_AGENT_MAX_DAYS = 60
 
-TABLE_STATUS_BY_MONTH   = "datalake_agent_reports.agent_status_by_month"
+TABLE_STATUS_BY_MONTH = "datalake_agent_reports.agent_status_by_month"
 TABLE_OFFER_SPECIALISTS = "datalake_sale_offer_flows.offer_specialists"
 TABLE_CIQ_FIRST_LISTING = "datalake_tiers.ciq_first_listing"
-TABLE_PARTNER_AGENT     = "datalake_ebdb_clean.partner_agent"
-TABLE_AGENT_DATA        = "datalake_ebdb_clean.agent_data"
-TABLE_VISIT_SCHEDULES   = "datalake_visit.visit_schedules"
-TABLE_PPA_HISTORY       = "datalake_ebdb_agents.preferred_property_agent_relation_history"
-TABLE_REGION            = "datalake_ebdb_clean.region"
+TABLE_PARTNER_AGENT = "datalake_ebdb_clean.partner_agent"
+TABLE_AGENT_DATA = "datalake_ebdb_clean.agent_data"
+TABLE_VISIT_SCHEDULES = "datalake_visit.visit_schedules"
+TABLE_PPA_HISTORY = "datalake_ebdb_agents.preferred_property_agent_relation_history"
+TABLE_REGION = "datalake_ebdb_clean.region"
 TABLE_AGENT_REGION_DATA = "datalake_ebdb_clean.agent_region_data"
-TABLE_AGENT_BIZ_CTX     = "datalake_ebdb_clean.agent_data_business_contexts_served"
+TABLE_AGENT_BIZ_CTX = "datalake_ebdb_clean.agent_data_business_contexts_served"
 
 EXCLUDED_AGENT_TYPES = ["Vistoria", "VistoriaQuarteirizada", "SessaoFotos"]
 MAX_REGION_DEPTH = 10
@@ -104,29 +104,57 @@ MAX_REGION_DEPTH = 10
 
 # DBTITLE 1,Argument parsing
 ARG_SPEC = [
-    ("env",                 str, "forno", "Environment: forno/prod"),
-    ("datalake_bucket",     str, "5a-datalake-prod", "Datalake bucket"),
-    ("database_base_name",  str, "agent_reports", "Base name for database (schema)"),
-    ("dag_name",            str, "enrich_agent_reports", "DAG name"),
-    ("table_name",          str, "agent_new_agent_activation_metrics", "Target enrich table name"),
-    ("load_start_date",     str, lambda: (date.today() - timedelta(days=30)).isoformat(), "Interval start (alignment with DAG; window uses load_end_date + months_window)"),
-    ("load_end_date",       str, lambda: date.today().isoformat(), "Interval end YYYY-MM-DD (window end)"),
-    ("run_mode",            str, "dev", "Run mode: prod/dev"),
-    ("months_window",       int, MONTHS_WINDOW_DEFAULT, "Number of months in the lookback window"),
+    ("env", str, "forno", "Environment: forno/prod"),
+    ("datalake_bucket", str, "5a-datalake-prod", "Datalake bucket"),
+    ("database_base_name", str, "agent_reports", "Base name for database (schema)"),
+    ("dag_name", str, "enrich_agent_reports", "DAG name"),
+    (
+        "table_name",
+        str,
+        "agent_new_agent_activation_metrics",
+        "Target enrich table name",
+    ),
+    (
+        "load_start_date",
+        str,
+        lambda: (date.today() - timedelta(days=30)).isoformat(),
+        "Interval start (alignment with DAG; window uses load_end_date + months_window)",
+    ),
+    (
+        "load_end_date",
+        str,
+        lambda: date.today().isoformat(),
+        "Interval end YYYY-MM-DD (window end)",
+    ),
+    ("run_mode", str, "dev", "Run mode: prod/dev"),
+    (
+        "months_window",
+        int,
+        MONTHS_WINDOW_DEFAULT,
+        "Number of months in the lookback window",
+    ),
 ]
+
 
 def _defaults():
     return [d() if callable(d) else d for _, _, d, _ in ARG_SPEC]
 
+
 def parse_args() -> Namespace:
     parser = ArgumentParser(description=JOB_NAME)
     default_values = _defaults()
-    for (name, type_, _default, help_text), default_val in zip(ARG_SPEC, default_values):
-        parser.add_argument(name, nargs="?", type=type_, default=default_val, help=help_text)
+    for (name, type_, _default, help_text), default_val in zip(
+        ARG_SPEC, default_values
+    ):
+        parser.add_argument(
+            name, nargs="?", type=type_, default=default_val, help=help_text
+        )
     namespace, _ = parser.parse_known_args()
     return namespace
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,Helper functions
 def _month_range(load_end_date: str, months_window: int) -> tuple[date, date]:
@@ -162,16 +190,15 @@ def _agent_city_df() -> DataFrame:
         col("name").alias("p_name"),
     )
     for _ in range(MAX_REGION_DEPTH - 1):
-        ancestor = (
-            ancestor.join(parent, col("current_parent") == col("p_id"), "left")
-            .select(
-                col("region_id"),
-                coalesce(col("p_parent"), col("current_parent")).alias("current_parent"),
-                coalesce(
-                    col("name_city"),
-                    when(col("p_level") == "Cidade", col("p_name")),
-                ).alias("name_city"),
-            )
+        ancestor = ancestor.join(
+            parent, col("current_parent") == col("p_id"), "left"
+        ).select(
+            col("region_id"),
+            coalesce(col("p_parent"), col("current_parent")).alias("current_parent"),
+            coalesce(
+                col("name_city"),
+                when(col("p_level") == "Cidade", col("p_name")),
+            ).alias("name_city"),
         )
     return (
         spark.table(TABLE_AGENT_REGION_DATA)
@@ -181,7 +208,9 @@ def _agent_city_df() -> DataFrame:
         .agg(spark_min("name_city").alias("name_city"))
     )
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,TQC first lead referral by user/month
 def _tqc_first_date_df(month_start: date, month_end: date) -> DataFrame:
@@ -189,17 +218,32 @@ def _tqc_first_date_df(month_start: date, month_end: date) -> DataFrame:
     return (
         spark.table(TABLE_OFFER_SPECIALISTS)
         .filter(col("id_user_agent_lead_referral") == col("id_user_agent"))
-        .withColumn("reference_month", to_date(date_trunc("month", col("ts_agent_lead_referral_updated"))))
+        .withColumn(
+            "reference_month",
+            to_date(date_trunc("month", col("ts_agent_lead_referral_updated"))),
+        )
         .groupBy(col("id_user_agent").alias("id_user"), "reference_month")
         .agg(
             count("id_offer").alias("total_tqc_count"),
-            spark_min("ts_agent_lead_referral_updated").alias("ts_first_activation_tqc_referral"),
+            spark_min("ts_agent_lead_referral_updated").alias(
+                "ts_first_activation_tqc_referral"
+            ),
         )
-        .withColumn("ts_first_activation_tqc_referral", spark_min("ts_first_activation_tqc_referral").over(Window.partitionBy("id_user")))
-        .filter((col("reference_month") >= lit(month_start)) & (col("reference_month") <= lit(month_end)))
+        .withColumn(
+            "ts_first_activation_tqc_referral",
+            spark_min("ts_first_activation_tqc_referral").over(
+                Window.partitionBy("id_user")
+            ),
+        )
+        .filter(
+            (col("reference_month") >= lit(month_start))
+            & (col("reference_month") <= lit(month_end))
+        )
     )
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,Valid first listing by user/month
 def _valid_first_listing_df(month_start: date, month_end: date) -> DataFrame:
@@ -207,17 +251,32 @@ def _valid_first_listing_df(month_start: date, month_end: date) -> DataFrame:
     return (
         spark.table(TABLE_CIQ_FIRST_LISTING)
         .filter(col("is_first_listing_valid") == True)
-        .withColumn("reference_month", to_date(date_trunc("month", col("ts_original_first_listing"))))
+        .withColumn(
+            "reference_month",
+            to_date(date_trunc("month", col("ts_original_first_listing"))),
+        )
         .groupBy("id_agent", "id_user", "reference_month")
         .agg(
             count("*").alias("total_listings_count"),
-            spark_min("ts_original_first_listing").alias("ts_valid_activation_first_listing"),
+            spark_min("ts_original_first_listing").alias(
+                "ts_valid_activation_first_listing"
+            ),
         )
-        .withColumn("ts_valid_activation_first_listing", spark_min("ts_valid_activation_first_listing").over(Window.partitionBy("id_user")))
-        .filter((col("reference_month") >= lit(month_start)) & (col("reference_month") <= lit(month_end)))
+        .withColumn(
+            "ts_valid_activation_first_listing",
+            spark_min("ts_valid_activation_first_listing").over(
+                Window.partitionBy("id_user")
+            ),
+        )
+        .filter(
+            (col("reference_month") >= lit(month_start))
+            & (col("reference_month") <= lit(month_end))
+        )
     )
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,New-broker cohort (row-level vs reference_month)
 def _new_broker_within_reference_month(
@@ -237,7 +296,9 @@ def _eligible_broker_agent_profiles_df() -> DataFrame:
         spark.table(TABLE_AGENT_DATA)
         .filter(col("ts_created").isNotNull())
         .filter(~col("agent_type").isin(EXCLUDED_AGENT_TYPES))
-        .select(col("id").alias("brk_id_agent"), col("ts_created").alias("brk_ts_created"))
+        .select(
+            col("id").alias("brk_id_agent"), col("ts_created").alias("brk_ts_created")
+        )
     )
 
 
@@ -249,6 +310,7 @@ def _dim_agent_business_context_df() -> DataFrame:
       is_rent_agent = has RENT context
     """
     from pyspark.sql.functions import array_contains, collect_list
+
     ctx = (
         spark.table(TABLE_AGENT_BIZ_CTX)
         .groupBy(col("id_agent_data").alias("id_agent"))
@@ -256,11 +318,16 @@ def _dim_agent_business_context_df() -> DataFrame:
     )
     return ctx.select(
         col("id_agent"),
-        (array_contains(col("contexts"), "SALE") | array_contains(col("contexts"), "SALE_PRIMARY_MARKET")).alias("is_sale_agent"),
+        (
+            array_contains(col("contexts"), "SALE")
+            | array_contains(col("contexts"), "SALE_PRIMARY_MARKET")
+        ).alias("is_sale_agent"),
         array_contains(col("contexts"), "RENT").alias("is_rent_agent"),
     )
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,PPA visits by agent/month
 def _ppa_visits_df(month_start: date, month_end: date) -> DataFrame:
@@ -278,14 +345,22 @@ def _ppa_visits_df(month_start: date, month_end: date) -> DataFrame:
         spark.table(TABLE_VISIT_SCHEDULES)
         .filter(col("is_completed") == True)
         .filter(col("ts_schedule_visit").isNotNull())
-        .withColumn("reference_month", to_date(date_trunc("month", col("ts_schedule_visit"))))
-        .filter((col("reference_month") >= lit(month_start)) & (col("reference_month") <= lit(month_end)))
+        .withColumn(
+            "reference_month", to_date(date_trunc("month", col("ts_schedule_visit")))
+        )
+        .filter(
+            (col("reference_month") >= lit(month_start))
+            & (col("reference_month") <= lit(month_end))
+        )
         .join(
             ppa,
             (col("id_agent") == col("ppa_id_agent"))
             & (col("id_house") == col("ppa_id_house"))
             & (dt_visit >= to_date(col("ts_relation_started")))
-            & (col("ts_relation_ended").isNull() | (dt_visit <= to_date(col("ts_relation_ended")))),
+            & (
+                col("ts_relation_ended").isNull()
+                | (dt_visit <= to_date(col("ts_relation_ended")))
+            ),
             "inner",
         )
         .groupBy("id_agent", "reference_month")
@@ -295,7 +370,9 @@ def _ppa_visits_df(month_start: date, month_end: date) -> DataFrame:
         )
     )
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,Main builder
 def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
@@ -305,21 +382,34 @@ def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
     # Pull one extra month before the status window so prior-month activity joins exist at window start.
     activity_month_start = month_start - relativedelta(months=1)
 
-    status = (
-        spark.table(TABLE_STATUS_BY_MONTH)
-        .filter((col("reference_month") >= lit(month_start)) & (col("reference_month") <= lit(month_end)))
+    status = spark.table(TABLE_STATUS_BY_MONTH).filter(
+        (col("reference_month") >= lit(month_start))
+        & (col("reference_month") <= lit(month_end))
     )
     last_independent = (
         status.filter(~col("is_passive_lead_receiver"))
         .groupBy("id_agent")
-        .agg(to_date(spark_max("agent_status_start")).alias("dt_independent_agent_registered"))
+        .agg(
+            to_date(spark_max("agent_status_start")).alias(
+                "dt_independent_agent_registered"
+            )
+        )
         .select(col("id_agent").alias("fi_id_agent"), "dt_independent_agent_registered")
     )
 
     agent_type_segment = (
-        when((col("s.agent_status") == "ACTIVE") & ~col("s.is_passive_lead_receiver"), lit("INDEPENDENT"))
-        .when((col("s.agent_status") == "ACTIVE") & col("s.is_passive_lead_receiver"), lit("FR_FS"))
-        .when((col("s.ciq_status") == "ACTIVE") & (col("s.agent_status") != "ACTIVE"), lit("CIQ_ONLY"))
+        when(
+            (col("s.agent_status") == "ACTIVE") & ~col("s.is_passive_lead_receiver"),
+            lit("INDEPENDENT"),
+        )
+        .when(
+            (col("s.agent_status") == "ACTIVE") & col("s.is_passive_lead_receiver"),
+            lit("FR_FS"),
+        )
+        .when(
+            (col("s.ciq_status") == "ACTIVE") & (col("s.agent_status") != "ACTIVE"),
+            lit("CIQ_ONLY"),
+        )
         .otherwise(lit("OTHER"))
     )
     tqc_by_month = _tqc_first_date_df(activity_month_start, month_end)
@@ -332,47 +422,71 @@ def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
             col("s.id_agent") == col("da.id_agent"),
             "left",
         )
-        .join(_eligible_broker_agent_profiles_df().alias("brk"), col("s.id_agent") == col("brk.brk_id_agent"), "inner")
+        .join(
+            _eligible_broker_agent_profiles_df().alias("brk"),
+            col("s.id_agent") == col("brk.brk_id_agent"),
+            "inner",
+        )
         .join(last_independent, col("s.id_agent") == col("fi_id_agent"), "left")
         .filter(
-            _new_broker_within_reference_month(col("s.reference_month"), col("brk.brk_ts_created"))
-            | _new_broker_within_reference_month(col("s.reference_month"), col("dt_independent_agent_registered"))
+            _new_broker_within_reference_month(
+                col("s.reference_month"), col("brk.brk_ts_created")
+            )
+            | _new_broker_within_reference_month(
+                col("s.reference_month"), col("dt_independent_agent_registered")
+            )
         )
         .join(
-            spark.table(TABLE_PARTNER_AGENT).select(col("id_user").alias("pa_id_user"), col("ts_created").alias("ts_ciq_created")),
-            col("s.id_user") == col("pa_id_user"), "left",
+            spark.table(TABLE_PARTNER_AGENT).select(
+                col("id_user").alias("pa_id_user"),
+                col("ts_created").alias("ts_ciq_created"),
+            ),
+            col("s.id_user") == col("pa_id_user"),
+            "left",
         )
         .join(
             tqc_by_month.alias("tqc_curr"),
-            (col("s.id_user") == col("tqc_curr.id_user")) & (col("s.reference_month") == col("tqc_curr.reference_month")),
+            (col("s.id_user") == col("tqc_curr.id_user"))
+            & (col("s.reference_month") == col("tqc_curr.reference_month")),
             "left",
         )
         .join(
             tqc_by_month.alias("tqc_prev"),
             (col("s.id_user") == col("tqc_prev.id_user"))
-            & (col("tqc_prev.reference_month") == add_months(col("s.reference_month"), -1)),
+            & (
+                col("tqc_prev.reference_month")
+                == add_months(col("s.reference_month"), -1)
+            ),
             "left",
         )
         .join(
             vfl_by_month.alias("vfl_curr"),
-            (col("s.id_user") == col("vfl_curr.id_user")) & (col("s.reference_month") == col("vfl_curr.reference_month")),
+            (col("s.id_user") == col("vfl_curr.id_user"))
+            & (col("s.reference_month") == col("vfl_curr.reference_month")),
             "left",
         )
         .join(
             vfl_by_month.alias("vfl_prev"),
             (col("s.id_user") == col("vfl_prev.id_user"))
-            & (col("vfl_prev.reference_month") == add_months(col("s.reference_month"), -1)),
+            & (
+                col("vfl_prev.reference_month")
+                == add_months(col("s.reference_month"), -1)
+            ),
             "left",
         )
         .join(
             ppa_by_month.alias("ppa_curr"),
-            (col("s.id_agent") == col("ppa_curr.id_agent")) & (col("s.reference_month") == col("ppa_curr.reference_month")),
+            (col("s.id_agent") == col("ppa_curr.id_agent"))
+            & (col("s.reference_month") == col("ppa_curr.reference_month")),
             "left",
         )
         .join(
             ppa_by_month.alias("ppa_prev"),
             (col("s.id_agent") == col("ppa_prev.id_agent"))
-            & (col("ppa_prev.reference_month") == add_months(col("s.reference_month"), -1)),
+            & (
+                col("ppa_prev.reference_month")
+                == add_months(col("s.reference_month"), -1)
+            ),
             "left",
         )
         .join(
@@ -387,17 +501,28 @@ def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
             col("s.ciq_status"),
             col("s.agent_status"),
             col("s.is_passive_lead_receiver"),
-            coalesce(col("dt_independent_agent_registered"), to_date(least(col("brk.brk_ts_created"), col("ts_ciq_created")))).alias("dt_independent_agent_registered"),
+            coalesce(
+                col("dt_independent_agent_registered"),
+                to_date(least(col("brk.brk_ts_created"), col("ts_ciq_created"))),
+            ).alias("dt_independent_agent_registered"),
             col("brk.brk_ts_created").alias("ts_agent_created"),
             col("ts_ciq_created"),
             col("tqc_curr.ts_first_activation_tqc_referral"),
             coalesce(col("tqc_curr.total_tqc_count"), lit(0)).alias("total_tqc_count"),
-            coalesce(col("tqc_prev.total_tqc_count"), lit(0)).alias("_prior_month_tqc_count"),
+            coalesce(col("tqc_prev.total_tqc_count"), lit(0)).alias(
+                "_prior_month_tqc_count"
+            ),
             col("vfl_curr.ts_valid_activation_first_listing"),
-            coalesce(col("vfl_curr.total_listings_count"), lit(0)).alias("total_listings_count"),
-            coalesce(col("vfl_prev.total_listings_count"), lit(0)).alias("_prior_month_listings_count"),
+            coalesce(col("vfl_curr.total_listings_count"), lit(0)).alias(
+                "total_listings_count"
+            ),
+            coalesce(col("vfl_prev.total_listings_count"), lit(0)).alias(
+                "_prior_month_listings_count"
+            ),
             coalesce(col("ppa_curr.total_ppa_count"), lit(0)).alias("total_ppa_count"),
-            coalesce(col("ppa_prev.total_ppa_count"), lit(0)).alias("_prior_month_ppa_count"),
+            coalesce(col("ppa_prev.total_ppa_count"), lit(0)).alias(
+                "_prior_month_ppa_count"
+            ),
             col("ppa_curr.ts_first_ppa_activation"),
             col("city.name_city"),
             col("da.is_sale_agent").alias("_bctx_is_sale"),
@@ -417,11 +542,25 @@ def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
         )
         .withColumn(
             "is_activated",
-            col("is_ciq_active_in_month") | col("is_tqc_active_in_month") | col("is_ppa_active_in_month"),
+            col("is_ciq_active_in_month")
+            | col("is_tqc_active_in_month")
+            | col("is_ppa_active_in_month"),
         )
-        .drop("_prior_month_listings_count", "_prior_month_tqc_count", "_prior_month_ppa_count")
-        .withColumn("is_ciq_only", (col("ciq_status") == "ACTIVE") & (col("agent_status") == "INACTIVE"))
-        .withColumn("is_independent_agent", (col("ciq_status") == "ACTIVE") & (col("agent_status") == "ACTIVE") & ~col("is_passive_lead_receiver"))
+        .drop(
+            "_prior_month_listings_count",
+            "_prior_month_tqc_count",
+            "_prior_month_ppa_count",
+        )
+        .withColumn(
+            "is_ciq_only",
+            (col("ciq_status") == "ACTIVE") & (col("agent_status") == "INACTIVE"),
+        )
+        .withColumn(
+            "is_independent_agent",
+            (col("ciq_status") == "ACTIVE")
+            & (col("agent_status") == "ACTIVE")
+            & ~col("is_passive_lead_receiver"),
+        )
         .withColumn("agent_type_segment", agent_type_segment)
         .withColumn(
             "agent_business_context",
@@ -435,43 +574,59 @@ def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
             .otherwise(lit("UNKNOWN")),
         )
         .drop("_bctx_is_sale", "_bctx_is_rent")
-        .withColumn("days_since_demand_agent_created", datediff(last_day(col("reference_month")), to_date(col("ts_agent_created"))))
-        .withColumn("days_since_ciq_created", datediff(last_day(col("reference_month")), to_date(col("ts_ciq_created"))))
-        .withColumn("days_since_independent_agent_registered", datediff(last_day(col("reference_month")), col("dt_independent_agent_registered")))
+        .withColumn(
+            "days_since_demand_agent_created",
+            datediff(
+                last_day(col("reference_month")), to_date(col("ts_agent_created"))
+            ),
+        )
+        .withColumn(
+            "days_since_ciq_created",
+            datediff(last_day(col("reference_month")), to_date(col("ts_ciq_created"))),
+        )
+        .withColumn(
+            "days_since_independent_agent_registered",
+            datediff(
+                last_day(col("reference_month")), col("dt_independent_agent_registered")
+            ),
+        )
     )
+
 
 # COMMAND ----------
 
 # DBTITLE 1,Pre-write validations
-EXPECTED_SCHEMA = StructType([
-    StructField("id_user", LongType(), True),
-    StructField("id_agent", LongType(), True),
-    StructField("reference_month", DateType(), True),
-    StructField("ciq_status", StringType(), True),
-    StructField("agent_status", StringType(), True),
-    StructField("is_passive_lead_receiver", BooleanType(), True),
-    StructField("dt_independent_agent_registered", DateType(), True),
-    StructField("ts_agent_created", TimestampType(), True),
-    StructField("ts_ciq_created", TimestampType(), True),
-    StructField("ts_first_activation_tqc_referral", TimestampType(), True),
-    StructField("total_tqc_count", LongType(), False),
-    StructField("ts_valid_activation_first_listing", TimestampType(), True),
-    StructField("total_listings_count", LongType(), False),
-    StructField("total_ppa_count", LongType(), False),
-    StructField("ts_first_ppa_activation", TimestampType(), True),
-    StructField("is_ciq_active_in_month", BooleanType(), False),
-    StructField("is_tqc_active_in_month", BooleanType(), False),
-    StructField("is_ppa_active_in_month", BooleanType(), False),
-    StructField("is_activated", BooleanType(), False),
-    StructField("is_ciq_only", BooleanType(), False),
-    StructField("is_independent_agent", BooleanType(), False),
-    StructField("agent_type_segment", StringType(), True),
-    StructField("agent_business_context", StringType(), True),
-    StructField("name_city", StringType(), True),
-    StructField("days_since_demand_agent_created", IntegerType(), True),
-    StructField("days_since_ciq_created", IntegerType(), True),
-    StructField("days_since_independent_agent_registered", IntegerType(), True),
-])
+EXPECTED_SCHEMA = StructType(
+    [
+        StructField("id_user", LongType(), True),
+        StructField("id_agent", LongType(), True),
+        StructField("reference_month", DateType(), True),
+        StructField("ciq_status", StringType(), True),
+        StructField("agent_status", StringType(), True),
+        StructField("is_passive_lead_receiver", BooleanType(), True),
+        StructField("dt_independent_agent_registered", DateType(), True),
+        StructField("ts_agent_created", TimestampType(), True),
+        StructField("ts_ciq_created", TimestampType(), True),
+        StructField("ts_first_activation_tqc_referral", TimestampType(), True),
+        StructField("total_tqc_count", LongType(), False),
+        StructField("ts_valid_activation_first_listing", TimestampType(), True),
+        StructField("total_listings_count", LongType(), False),
+        StructField("total_ppa_count", LongType(), False),
+        StructField("ts_first_ppa_activation", TimestampType(), True),
+        StructField("is_ciq_active_in_month", BooleanType(), False),
+        StructField("is_tqc_active_in_month", BooleanType(), False),
+        StructField("is_ppa_active_in_month", BooleanType(), False),
+        StructField("is_activated", BooleanType(), False),
+        StructField("is_ciq_only", BooleanType(), False),
+        StructField("is_independent_agent", BooleanType(), False),
+        StructField("agent_type_segment", StringType(), True),
+        StructField("agent_business_context", StringType(), True),
+        StructField("name_city", StringType(), True),
+        StructField("days_since_demand_agent_created", IntegerType(), True),
+        StructField("days_since_ciq_created", IntegerType(), True),
+        StructField("days_since_independent_agent_registered", IntegerType(), True),
+    ]
+)
 
 
 def _schema_mismatches(actual: StructType, expected: StructType) -> list[str]:
@@ -483,7 +638,10 @@ def _schema_mismatches(actual: StructType, expected: StructType) -> list[str]:
             mismatch_list.append(f"missing: {name}")
         elif name not in expected_by_name:
             mismatch_list.append(f"unexpected: {name}")
-        elif actual_by_name[name].dataType.simpleString() != expected_by_name[name].dataType.simpleString():
+        elif (
+            actual_by_name[name].dataType.simpleString()
+            != expected_by_name[name].dataType.simpleString()
+        ):
             mismatch_list.append(
                 f"{name}: expected {expected_by_name[name].dataType.simpleString()}, "
                 f"got {actual_by_name[name].dataType.simpleString()}"
@@ -521,7 +679,9 @@ def validate_before_write(source_df: DataFrame) -> int:
     )
     return row_count
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,Writing
 def _save_to_enrich(
@@ -573,7 +733,9 @@ def save_df(
         f"Dev mode: temp view '{view_name}' ({n:,} rows). SELECT * FROM {view_name}"
     )
 
+
 # COMMAND ----------
+
 
 # DBTITLE 1,Main
 def main(args: Namespace | None = None) -> None:

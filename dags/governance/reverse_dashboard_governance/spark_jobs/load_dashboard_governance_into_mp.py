@@ -63,7 +63,7 @@ def _send_requests(endpoint, payloads, chunk_size=30):
     session.mount(endpoint, HTTPAdapter(max_retries=retries))
 
     for idx in range(0, len(payloads), chunk_size):
-        chunk = payloads[idx: idx + chunk_size]
+        chunk = payloads[idx : idx + chunk_size]
         response = session.post(endpoint, json=chunk)
 
         try:
@@ -83,7 +83,6 @@ def _send_requests(endpoint, payloads, chunk_size=30):
 
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("execution_date_str")

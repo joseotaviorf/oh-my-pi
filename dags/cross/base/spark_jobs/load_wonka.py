@@ -16,8 +16,7 @@ def main():
     parser = argparse.ArgumentParser(description="Run a Wonka pipeline.")
     parser.add_argument(
         "pipeline_runner",
-        help="The path to the runner of the pipeline, e.g., "
-        "dummy_feature_set.runner",
+        help="The path to the runner of the pipeline, e.g., dummy_feature_set.runner",
     )
 
     args = parser.parse_args()

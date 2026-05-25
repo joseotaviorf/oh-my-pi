@@ -6,17 +6,17 @@ from quintoandar_logger import QuintoAndarLogger
 from quintoandar_tracksale_api_client.clients import TracksaleClient
 from quintoandar_tracksale_api_client.consumers import CONSUMERS
 
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.loaders import SparkMetastoreLoader
-from bietlejuice.loaders.s3_loader import S3Loader
-from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.api.api_enum import APIEnum
+from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import (
     BaseDBUtils,
-    SparkTableStorageFormat,
     SparkDataFrameService,
+    SparkTableStorageFormat,
 )
+from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.loaders import SparkMetastoreLoader
+from bietlejuice.loaders.s3_loader import S3Loader
+from bietlejuice.services.metastore_services import SparkMetastoreService
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_full_data_into_datalake_raw"
@@ -33,14 +33,17 @@ def get_api_response(token, table_name):
 
     return api_response
 
+
 def get_parameters(table_name):
-    campaign_string = "[{'answer': 'campaign_code','campaign': 'code','dispatch': 'campaign.code'}]"
+    campaign_string = (
+        "[{'answer': 'campaign_code','campaign': 'code','dispatch': 'campaign.code'}]"
+    )
     campaign_column = eval(campaign_string)[0][table_name]
     campaigns_to_block = "['248', '326', '327', '356']"
-    return campaign_column, campaigns_to_block 
+    return campaign_column, campaigns_to_block
+
 
 if __name__ == "__main__":
-
     parser = ArgumentParser(description=JOB_NAME)
 
     parser.add_argument("environment", help="forno/prod values")
@@ -48,7 +51,7 @@ if __name__ == "__main__":
     parser.add_argument("dag_name", help="name of the API")
     parser.add_argument("table_name", help="endpoint to call the API")
     parser.add_argument("execution_date", help="execution date in str format")
-    
+
     args = parser.parse_args()
 
     environment = args.environment
@@ -76,7 +79,6 @@ if __name__ == "__main__":
     api_response = get_api_response(credentials["token"], table_name)
 
     if api_response:
-
         # Currently, dispatch_limits field has all its values as None, so df can't infer the data type
         for resp in api_response:
             if "dispatch_limits" in api_response:
@@ -96,9 +98,7 @@ if __name__ == "__main__":
 
         df = SparkDataFrameService().input(df).convert_array_type_to_json().output()
 
-        db_info = DatalakeMetastoreService.get_db_info(
-            environment, dag_name, bucket
-        )
+        db_info = DatalakeMetastoreService.get_db_info(environment, dag_name, bucket)
         metastore_service = SparkMetastoreService(spark_client)
         spark_metastore_loader = SparkMetastoreLoader(metastore_service)
         s3_loader = S3Loader()

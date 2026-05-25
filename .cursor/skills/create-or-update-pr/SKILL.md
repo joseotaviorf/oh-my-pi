@@ -127,7 +127,7 @@ Keep the title **under ~72 characters** when possible. Titles must be **English*
 
 1. Open **`.cursor/rules/pr_template.mdc`** and build **`/tmp/pr_body.md`** (or the body file used in Step 10) from its structure: **Why?** = first bullet purpose, second bullet `Jira: [link]` only if a ticket exists; then **What?** and the rest.
 2. Apply the numbered **Guidelines** at the top of the rule (**English** for all PR prose; omit empty sections; no filler “N/A” outside **Screenshots**; remove bracketed instructional hints from the final text except the rule’s **Screenshots** placeholder).
-3. For commands/tests relevant to this repo (when applicable), examples include `make check-style`, `make validate-dag-declaration-files dag_name=<name>` — only list what was run or what CI will run.
+3. For commands/tests relevant to this repo (when applicable), examples include `make check-style`, `make check-style-dags` (CI runs both on every push/PR), `make validate-dag-declaration-files dag_name=<name>` — only list what was run or what CI will run.
 
 ### 5.3 — Screenshots subsection
 

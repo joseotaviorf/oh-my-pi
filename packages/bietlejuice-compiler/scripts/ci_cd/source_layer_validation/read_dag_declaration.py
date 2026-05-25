@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Read workflow.layer and workflow.type from a DAG declaration YAML."""
 
 from pathlib import Path
@@ -10,7 +9,7 @@ import yaml
 def declaration_path_for_dag_root(dag_root: Path) -> Path:
     """``dags/<domain>/<name>`` -> ``.../<name>/<name>_declaration.yml``."""
     name = dag_root.name
-    return dag_root / "{}_declaration.yml".format(name)
+    return dag_root / f"{name}_declaration.yml"
 
 
 def load_declaration_dict(dag_root: Path) -> Optional[Dict[str, Any]]:
@@ -19,7 +18,7 @@ def load_declaration_dict(dag_root: Path) -> Optional[Dict[str, Any]]:
     if not path.is_file():
         return None
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             data = yaml.safe_load(f)
     except (OSError, yaml.YAMLError):
         return None

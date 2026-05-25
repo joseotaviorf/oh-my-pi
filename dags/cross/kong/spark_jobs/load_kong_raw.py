@@ -1,12 +1,13 @@
+import concurrent.futures
 import json
 import logging
 import multiprocessing
-import concurrent.futures
-
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 
+from pyspark.sql.functions import col, lit, to_json
 from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
@@ -14,8 +15,6 @@ from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
-
-from pyspark.sql.functions import lit, to_json, col
 
 JOB_NAME = "load_kong_raw"
 SOURCE = "kong"
@@ -43,7 +42,10 @@ if __name__ == "__main__":
     load_start_date = datetime.strptime(load_start_date, "%Y-%m-%d")
     load_end_date = datetime.strptime(load_end_date, "%Y-%m-%d")
 
-    date_list = [(load_start_date + timedelta(days=i)).strftime("%Y-%m-%d") for i in range((load_end_date - load_start_date).days + 1)]
+    date_list = [
+        (load_start_date + timedelta(days=i)).strftime("%Y-%m-%d")
+        for i in range((load_end_date - load_start_date).days + 1)
+    ]
 
     proxy_path = "s3://auditlogs.s3.sre.quintoandar.com.br/proxy/k8s.core-prd-*/{}/{}/{}/{}/proxy/*/*.gz"
 
@@ -83,8 +85,8 @@ if __name__ == "__main__":
         )
 
         df = df.where("NOT RLIKE(message, 'error')")
-            
-            # Check if kubernetes column exists and convert it to string if present
+
+        # Check if kubernetes column exists and convert it to string if present
         if "kubernetes" in df.columns:
             logger.info("Converting 'kubernetes' column to JSON string")
             df = df.withColumn("kubernetes", to_json(col("kubernetes")))

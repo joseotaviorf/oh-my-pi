@@ -7,6 +7,8 @@ columns must handle correctly.
 """
 
 import datetime as dt
+import shutil
+from pathlib import Path
 
 import pytest
 from pyspark.sql import SparkSession
@@ -20,14 +22,19 @@ from pyspark.sql.types import (
     TimestampType,
 )
 
+_SPARK_WAREHOUSE = Path("/tmp/spark-warehouse-dw-devlake")
+
 
 @pytest.fixture(scope="session")
-def spark(tmp_path_factory):
-    warehouse = str(tmp_path_factory.mktemp("spark-warehouse"))
+def spark():
+    shutil.rmtree(_SPARK_WAREHOUSE, ignore_errors=True)
+    _SPARK_WAREHOUSE.mkdir(parents=True, exist_ok=True)
+    warehouse = str(_SPARK_WAREHOUSE)
     spark = (
         SparkSession.builder.appName("dw_devlake_tests")
         .master("local[1]")
         .config("spark.sql.warehouse.dir", warehouse)
+        .config("spark.sql.session.timeZone", "UTC")
         .config("spark.sql.shuffle.partitions", "1")
         .config("spark.default.parallelism", "1")
         .config("spark.driver.bindAddress", "127.0.0.1")
@@ -35,6 +42,7 @@ def spark(tmp_path_factory):
     )
     yield spark
     spark.stop()
+    shutil.rmtree(_SPARK_WAREHOUSE, ignore_errors=True)
 
 
 # ---------- schemas (matching datalake_devlake_clean) ----------

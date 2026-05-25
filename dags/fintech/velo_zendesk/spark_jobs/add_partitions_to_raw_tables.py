@@ -1,8 +1,9 @@
-import boto3
 import logging
 from argparse import ArgumentParser
 
+import boto3
 from quintoandar_logger import QuintoAndarLogger
+
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.services.metastore_services import SparkMetastoreService

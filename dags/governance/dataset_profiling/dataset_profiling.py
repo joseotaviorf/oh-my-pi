@@ -1,19 +1,19 @@
 import os
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
-from airflow.utils.helpers import chain
 from airflow.models import DAG
+from airflow.utils.helpers import chain
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksSubmitRunOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
-from datetime import datetime
-from zoneinfo import ZoneInfo
 
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
-from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
+from bietlejuice.services.configuration_service import ConfigurationService
 
 # ENV setup
 ENV = os.environ.get("ENVIRONMENT")
@@ -41,7 +41,9 @@ CLUSTER_DESCRIPTION = config_service.get_config("databricks_13_3_med_general_clu
 
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
+    "quintoandar_{{ var.value.environment }}"
+)
 default_libraries = config_service.get_config("default_libraries")
 
 if not schemas_list:
@@ -65,25 +67,35 @@ dag = DAG(
     params=BaseDAG.get_default_trigger_form_params(),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     libraries=default_libraries,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
 
 run_data_profiling_tasks = []
 for schema in schemas_list:
     run_data_profiling_tasks.append(
-        QuintoAndarDatabricksSubmitRunOperator(databricks_conn_id="databricks_new", task_id=f"run-data-profiling-{schema}",
+        QuintoAndarDatabricksSubmitRunOperator(
+            databricks_conn_id="databricks_new",
+            task_id=f"run-data-profiling-{schema}",
             dag=dag,
             json={
                 "spark_python_task": {
                     "python_file": profiling_spark_job_path,
-                    "parameters": [ENV, "{{ data_interval_start | ds }}", inmetro_bucket, schema],
+                    "parameters": [
+                        ENV,
+                        "{{ data_interval_start | ds }}",
+                        inmetro_bucket,
+                        schema,
+                    ],
                 }
             },
         )

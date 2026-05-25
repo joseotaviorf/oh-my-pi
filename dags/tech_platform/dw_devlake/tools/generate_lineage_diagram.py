@@ -53,8 +53,16 @@ LAYER_TITLE = {
 }
 
 TABLE_EDGE_COLORS = [
-    "#0891b2", "#2563eb", "#7c3aed", "#059669", "#d97706", "#dc2626",
-    "#be185d", "#4f46e5", "#0d9488", "#ca8a04",
+    "#0891b2",
+    "#2563eb",
+    "#7c3aed",
+    "#059669",
+    "#d97706",
+    "#dc2626",
+    "#be185d",
+    "#4f46e5",
+    "#0d9488",
+    "#ca8a04",
 ]
 
 
@@ -115,17 +123,21 @@ def load_tables_from_dir(meta_dir: Path) -> list[TableNode]:
         for col_name, col_data in (data.get("columns") or {}).items():
             if col_data is None:
                 col_data = {}
-            cols.append(ColumnMeta(
-                name=col_name,
-                description=col_data.get("description", ""),
-                lineage=col_data.get("lineage") or [],
-            ))
-        tables.append(TableNode(
-            db=db,
-            table=data["table_name"],
-            layer=db_to_layer(db),
-            columns=cols,
-        ))
+            cols.append(
+                ColumnMeta(
+                    name=col_name,
+                    description=col_data.get("description", ""),
+                    lineage=col_data.get("lineage") or [],
+                )
+            )
+        tables.append(
+            TableNode(
+                db=db,
+                table=data["table_name"],
+                layer=db_to_layer(db),
+                columns=cols,
+            )
+        )
     return tables
 
 
@@ -157,10 +169,16 @@ def build_graph(
                         ColumnMeta(name=src_col, description="", lineage=[])
                     )
 
-                edges.append(LineageEdge(
-                    src_db=src_db, src_table=src_table, src_col=src_col,
-                    dst_db=table.db, dst_table=table.table, dst_col=col.name,
-                ))
+                edges.append(
+                    LineageEdge(
+                        src_db=src_db,
+                        src_table=src_table,
+                        src_col=src_col,
+                        dst_db=table.db,
+                        dst_table=table.table,
+                        dst_col=col.name,
+                    )
+                )
 
     return nodes, edges
 
@@ -183,16 +201,15 @@ def barycenter_order(
 
     layer_order = [LAYER_RAW, LAYER_CLEAN, LAYER_DW]
 
-    edge_pairs = [(e.src_db + "." + e.src_table, e.dst_db + "." + e.dst_table)
-                  for e in edges]
+    edge_pairs = [
+        (e.src_db + "." + e.src_table, e.dst_db + "." + e.dst_table) for e in edges
+    ]
 
     for _ in range(iterations):
         for i in range(1, len(layer_order)):
             prev_layer = layer_order[i - 1]
             curr_layer = layer_order[i]
-            prev_pos = {
-                n.key: idx for idx, n in enumerate(layers[prev_layer])
-            }
+            prev_pos = {n.key: idx for idx, n in enumerate(layers[prev_layer])}
 
             edge_counts: dict[str, list[int]] = defaultdict(list)
             for src_key, dst_key in edge_pairs:
@@ -213,9 +230,7 @@ def barycenter_order(
         for i in range(len(layer_order) - 2, -1, -1):
             next_layer = layer_order[i + 1]
             curr_layer = layer_order[i]
-            next_pos = {
-                n.key: idx for idx, n in enumerate(layers[next_layer])
-            }
+            next_pos = {n.key: idx for idx, n in enumerate(layers[next_layer])}
 
             edge_counts: dict[str, list[int]] = defaultdict(list)
             for src_key, dst_key in edge_pairs:

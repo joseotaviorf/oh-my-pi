@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Allowed metastore input layers by DAG output layer (workflow.layer).
 

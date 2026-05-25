@@ -1,21 +1,19 @@
 import logging
-import ast
 from argparse import ArgumentParser
+
 import pyspark.sql.functions as F
-from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.base.spark import (
-    SparkTableStorageFormat
-)
+
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.pipeline import FullTableLoaderPipeline
 from bietlejuice.services.metastore_services import SparkMetastoreService
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.pipeline import LayerEnum
 
 JOB_NAME = "Hightouch Logs Load"
 spark_client = SparkClient()
-
 
 
 def read_input(input_path, format, **params):
@@ -29,7 +27,7 @@ def read_input(input_path, format, **params):
     Returns:
         DataFrame: Spark DataFrame with the loaded data
     """
-    if format.lower() == 'table':
+    if format.lower() == "table":
         # Read from catalog table
         logging.info(f"Reading from catalog table: {input_path}")
         df = spark.table(input_path)
@@ -40,7 +38,19 @@ def read_input(input_path, format, **params):
 
     return df
 
-def load_table_into_datalake(df, table_name, environment, source, datalake_bucket, load_start_date, load_end_date, extraction_type, incremental_column, **params):
+
+def load_table_into_datalake(
+    df,
+    table_name,
+    environment,
+    source,
+    datalake_bucket,
+    load_start_date,
+    load_end_date,
+    extraction_type,
+    incremental_column,
+    **params,
+):
     """
     Writes a DataFrame using S3Loader for raw layer data.
 
@@ -63,14 +73,18 @@ def load_table_into_datalake(df, table_name, environment, source, datalake_bucke
             # Explicitly set catalog to ensure functions are resolved correctly
             spark.sql(f"USE CATALOG {current_catalog}")
 
-        db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+        db_info = DatalakeMetastoreService.get_db_info(
+            environment, source, datalake_bucket
+        )
         database_name = db_info["db_raw_databricks"]
         database_location = db_info["db_raw_path"]
         format_options = SparkTableStorageFormat.DEFAULT_RAW
 
         spark_metastore_service = SparkMetastoreService(spark_client)
 
-        logging.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
+        logging.info(
+            "m=__main__, msg=Creating database in Spark Metastore if not exists..."
+        )
         spark_metastore_service.create_database(database_name)
         df.printSchema()
         if extraction_type == "incremental":
@@ -78,15 +92,22 @@ def load_table_into_datalake(df, table_name, environment, source, datalake_bucke
 
             # Filter between dates
             df = df.filter(
-                (F.col(incremental_column).cast("date") >= F.to_date(F.lit(load_start_date))) &
-                (F.col(incremental_column).cast("date") <= F.to_date(F.lit(load_end_date)))
+                (
+                    F.col(incremental_column).cast("date")
+                    >= F.to_date(F.lit(load_start_date))
+                )
+                & (
+                    F.col(incremental_column).cast("date")
+                    <= F.to_date(F.lit(load_end_date))
+                )
             )
 
             # Extract partitions
-            df = df.selectExpr("*",
+            df = df.selectExpr(
+                "*",
                 f"year({incremental_column}) AS year",
                 f"month({incremental_column}) AS month",
-                f"dayofmonth({incremental_column}) AS day"
+                f"dayofmonth({incremental_column}) AS day",
             )
 
             partition_cols = ["year", "month", "day"]
@@ -106,13 +127,13 @@ def load_table_into_datalake(df, table_name, environment, source, datalake_bucke
             ).load_and_register(df, format_options)
         # Initialize S3Loader
 
-
-        logging.info(f"Successfully wrote DataFrame using S3Loader")
+        logging.info("Successfully wrote DataFrame using S3Loader")
         logging.info(f"Total records written: {df.count()}")
 
     except Exception as e:
         logging.error(f"Failed to write DataFrame using S3Loader: {str(e)}")
         raise
+
 
 def parse_arguments():
     """
@@ -123,59 +144,48 @@ def parse_arguments():
     """
     parser = ArgumentParser(description=JOB_NAME)
 
-    parser.add_argument("environment",
-                       help="Target environment")
-    parser.add_argument("datalake_bucket",
-                       help="Data lake S3 bucket")
-    parser.add_argument("schema",
-                       help="Database schema name")
-    parser.add_argument("source",
-                       help="Source name")
-    parser.add_argument("table_name",
-                       help="Table name")
-    parser.add_argument("load_start_date",
-                       help="Load start date")
-    parser.add_argument("load_end_date",
-                       help="Load end date")
-    parser.add_argument("extraction_type",
-                       help="Extraction type")
-    parser.add_argument("incremental_column",
-                       help="Incremental column")
-    parser.add_argument("input_path",
-                       help="Input path")
-    parser.add_argument("format",
-                       help="Input format")
-
-
+    parser.add_argument("environment", help="Target environment")
+    parser.add_argument("datalake_bucket", help="Data lake S3 bucket")
+    parser.add_argument("schema", help="Database schema name")
+    parser.add_argument("source", help="Source name")
+    parser.add_argument("table_name", help="Table name")
+    parser.add_argument("load_start_date", help="Load start date")
+    parser.add_argument("load_end_date", help="Load end date")
+    parser.add_argument("extraction_type", help="Extraction type")
+    parser.add_argument("incremental_column", help="Incremental column")
+    parser.add_argument("input_path", help="Input path")
+    parser.add_argument("format", help="Input format")
 
     return parser.parse_args()
+
 
 def main():
 
     # Configure logging
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
 
     # Suppress verbose py4j logging
-    logging.getLogger('py4j').setLevel(logging.WARNING)
+    logging.getLogger("py4j").setLevel(logging.WARNING)
 
     args = parse_arguments()
 
     params = {
-        "environment": args.environment,                    # Target environment
-        "datalake_bucket": args.datalake_bucket,          # Data lake S3 bucket"
-        "schema": args.schema,                             # Database schema name
-        "source": args.source,                             # Source name
-        "table_name": args.table_name,                    # Table name
-        "input_path": args.input_path.format(environment=args.environment),          # Input path
-        "format": args.format,         # Input path
+        "environment": args.environment,  # Target environment
+        "datalake_bucket": args.datalake_bucket,  # Data lake S3 bucket"
+        "schema": args.schema,  # Database schema name
+        "source": args.source,  # Source name
+        "table_name": args.table_name,  # Table name
+        "input_path": args.input_path.format(
+            environment=args.environment
+        ),  # Input path
+        "format": args.format,  # Input path
         "load_start_date": args.load_start_date,
         "load_end_date": args.load_end_date,
         "extraction_type": args.extraction_type,
-        "incremental_column": args.incremental_column
-
+        "incremental_column": args.incremental_column,
     }
     logging.info(
         f"""
@@ -189,6 +199,7 @@ def main():
     )
     df = read_input(**params)
     load_table_into_datalake(df, **params)
+
 
 if __name__ == "__main__":
     main()

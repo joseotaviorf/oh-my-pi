@@ -142,11 +142,11 @@ If your auth requires additional YAML keys (recommended), add validations so err
 
 Add tests in:
 
-- [`tests/unit/base/api/configuration/test_loader.py`](../../tests/unit/base/api/configuration/test_loader.py)  
+- [`packages/bietlejuice-runtime/test/unit/base/api/configuration/test_loader.py`](../../packages/bietlejuice-runtime/test/unit/base/api/configuration/test_loader.py)  
   - loader wires the new strategy
   - required key validation is enforced
-- OAuth2 variants (JSON token body, camelCase token fields): [`tests/unit/base/api/auth/test_oauth2_json_body.py`](../../tests/unit/base/api/auth/test_oauth2_json_body.py)
-- Add a new file like `test_<your_auth>.py` under [`tests/unit/base/api/`](../../tests/unit/base/api/) (or extend existing auth tests)
+- OAuth2 variants (JSON token body, camelCase token fields): [`packages/bietlejuice-runtime/test/unit/base/api/auth/test_oauth2_json_body.py`](../../packages/bietlejuice-runtime/test/unit/base/api/auth/test_oauth2_json_body.py)
+- Add a new file like `test_<your_auth>.py` under [`packages/bietlejuice-runtime/test/unit/base/api/`](../../packages/bietlejuice-runtime/test/unit/base/api/) (or extend existing auth tests)
 
 ### 6) Update docs
 
@@ -193,8 +193,8 @@ Then update:
 
 Add tests in:
 
-- Add a new `test_<your_paginator>.py` under [`tests/unit/base/api/`](../../tests/unit/base/api/)
-- [`tests/unit/base/api/configuration/test_loader.py`](../../tests/unit/base/api/configuration/test_loader.py) (loader creates the paginator)
+- Add a new `test_<your_paginator>.py` under [`packages/bietlejuice-runtime/test/unit/base/api/`](../../packages/bietlejuice-runtime/test/unit/base/api/)
+- [`packages/bietlejuice-runtime/test/unit/base/api/configuration/test_loader.py`](../../packages/bietlejuice-runtime/test/unit/base/api/configuration/test_loader.py) (loader creates the paginator)
 
 ---
 
@@ -220,8 +220,8 @@ If you add a new strategy (e.g., `header_based`, `token_bucket`, etc.):
 
 3) Add tests:
 
-- [`tests/unit/base/api/test_rate_limit.py`](../../tests/unit/base/api/test_rate_limit.py) (if applicable)
-- [`tests/unit/base/api/configuration/test_loader.py`](../../tests/unit/base/api/configuration/test_loader.py)
+- [`packages/bietlejuice-runtime/test/unit/base/api/test_rate_limit.py`](../../packages/bietlejuice-runtime/test/unit/base/api/test_rate_limit.py) (if applicable)
+- [`packages/bietlejuice-runtime/test/unit/base/api/configuration/test_loader.py`](../../packages/bietlejuice-runtime/test/unit/base/api/configuration/test_loader.py)
 
 ---
 
@@ -234,8 +234,8 @@ Whenever you add new YAML keys for `api_ingestion`, update **both**:
 
 And add/adjust tests:
 
-- [`tests/unit/base/airflow/dag_builders/main_builder/test_dag_declaration_validator.py`](../../tests/unit/base/airflow/dag_builders/main_builder/test_dag_declaration_validator.py)
-- [`tests/unit/base/api/configuration/test_loader.py`](../../tests/unit/base/api/configuration/test_loader.py)
+- [`packages/bietlejuice-core/test/unit/base/airflow/dag_builders/main_builder/test_dag_declaration_validator.py`](../../packages/bietlejuice-core/test/unit/base/airflow/dag_builders/main_builder/test_dag_declaration_validator.py)
+- [`packages/bietlejuice-runtime/test/unit/base/api/configuration/test_loader.py`](../../packages/bietlejuice-runtime/test/unit/base/api/configuration/test_loader.py)
 
 ---
 
@@ -256,9 +256,9 @@ Some unit tests assert **explicit expected values** (e.g., enum value lists, cou
 
 Common places to adjust:
 
-- [`tests/unit/base/airflow/dag_builders/main_builder/workflows/test_api_ingestion_enums.py`](../../tests/unit/base/airflow/dag_builders/main_builder/workflows/test_api_ingestion_enums.py) (enum values / counts)
-- [`tests/unit/base/airflow/dag_builders/main_builder/test_dag_declaration_validator.py`](../../tests/unit/base/airflow/dag_builders/main_builder/test_dag_declaration_validator.py) (Cerberus schema + validation rules)
-- [`tests/unit/base/api/configuration/test_loader.py`](../../tests/unit/base/api/configuration/test_loader.py) (loader defaults + wiring)
+- [`packages/bietlejuice-core/test/unit/base/airflow/dag_builders/main_builder/workflows/test_api_ingestion_enums.py`](../../packages/bietlejuice-core/test/unit/base/airflow/dag_builders/main_builder/workflows/test_api_ingestion_enums.py) (enum values / counts)
+- [`packages/bietlejuice-core/test/unit/base/airflow/dag_builders/main_builder/test_dag_declaration_validator.py`](../../packages/bietlejuice-core/test/unit/base/airflow/dag_builders/main_builder/test_dag_declaration_validator.py) (Cerberus schema + validation rules)
+- [`packages/bietlejuice-runtime/test/unit/base/api/configuration/test_loader.py`](../../packages/bietlejuice-runtime/test/unit/base/api/configuration/test_loader.py) (loader defaults + wiring)
 
 ### **Reuse before you create**
 
@@ -278,7 +278,7 @@ When changing param behavior, keep these aligned:
 - [`dags/cross/base/spark_jobs/load_api_ingestion_raw.py`](../../dags/cross/base/spark_jobs/load_api_ingestion_raw.py)
 - [`bietlejuice/base/api/configuration/loader.py`](../../bietlejuice/base/api/configuration/loader.py)
 - [`bietlejuice/base/airflow/task_creators/load_api_raw_task_creator.py`](../../bietlejuice/base/airflow/task_creators/load_api_raw_task_creator.py)
-- [`tests/unit/base/airflow/task_creators/test_load_api_raw_task_creator.py`](../../tests/unit/base/airflow/task_creators/test_load_api_raw_task_creator.py) (argument order contract)
+- [`packages/bietlejuice-airflow/test/unit/base/airflow/task_creators/test_load_api_raw_task_creator.py`](../../packages/bietlejuice-airflow/test/unit/base/airflow/task_creators/test_load_api_raw_task_creator.py) (argument order contract)
 
 ---
 
@@ -287,14 +287,14 @@ When changing param behavior, keep these aligned:
 - Unit tests for loader/pagination/auth:
 
 ```bash
-pytest tests/unit/base/api -q
+uv run --directory packages/bietlejuice-runtime pytest test/unit/base/api -q
 ```
 
 - Validator + workflow wiring:
 
 ```bash
-pytest tests/unit/base/airflow/dag_builders/main_builder -q
-pytest tests/unit/airflow/dag_builders/factories -q
+uv run --directory packages/bietlejuice-core pytest test/unit/base/airflow/dag_builders/main_builder -q
+uv run --directory packages/bietlejuice-airflow pytest test/unit/airflow/dag_builders/factories -q
 ```
 
 ---
@@ -326,6 +326,6 @@ pytest tests/unit/airflow/dag_builders/factories -q
 | Fan-out loop, path substitution, row stamping, paginator wiring | [`dags/cross/base/spark_jobs/load_api_ingestion_raw.py`](../../dags/cross/base/spark_jobs/load_api_ingestion_raw.py) — `_fetch_with_id_expansion()` |
 | Loader helpers (`get_id_expansion_config`, paginator factory) | [`bietlejuice/base/api/configuration/loader.py`](../../bietlejuice/base/api/configuration/loader.py) |
 | Declaration validation (`source_table`, `id_field`, exactly one of `param_name` / `path_param` / `json_body_field`, `correlation_field`) | [`bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py`](../../bietlejuice/base/airflow/dag_builders/main_builder/dag_declaration/dag_declaration_validator.py) |
-| Regression tests | [`tests/dags/cross/base/spark_jobs/test_load_api_ingestion_raw.py`](../../tests/dags/cross/base/spark_jobs/test_load_api_ingestion_raw.py) |
+| Regression tests | [`packages/bietlejuice-runtime/test/dags/cross/base/spark_jobs/test_load_api_ingestion_raw.py`](../../packages/bietlejuice-runtime/test/dags/cross/base/spark_jobs/test_load_api_ingestion_raw.py) |
 
 **Further extensions** (multiple independent path placeholders, POST with pagination, cross-DAG id sources): treat as a **custom Spark job** or extend `_fetch_with_id_expansion` with new tests and validator rules; update [`docs/api_ingestion/user_guide.md`](user_guide.md) in the same PR.

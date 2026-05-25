@@ -3,7 +3,6 @@ from typing import Dict
 
 
 class GitService:
-
     # list of status that indicate files being created or updated
     UPSERT_STATUS_CODES = ["M", "A"]
 
@@ -25,7 +24,9 @@ class GitService:
         """
         diff_branches = f"{from_branch}...{to_branch}"
 
-        bash_command = f"git diff --no-commit-id --name-status --no-renames -r {diff_branches}"
+        bash_command = (
+            f"git diff --no-commit-id --name-status --no-renames -r {diff_branches}"
+        )
         process = subprocess.Popen(bash_command.split(), stdout=subprocess.PIPE)
         output, _ = process.communicate()
         decoded_output = output.decode("utf-8").splitlines()
@@ -36,9 +37,10 @@ class GitService:
             result[filename] = status
 
         return result
-    
+
     def fetch(
-        self, branch: str,
+        self,
+        branch: str,
     ) -> None:
         """
         Fetches the latest changes from the remote repository

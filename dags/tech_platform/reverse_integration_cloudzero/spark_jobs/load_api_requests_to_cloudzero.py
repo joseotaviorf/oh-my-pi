@@ -4,6 +4,7 @@ Spark job that queries Prometheus (via Grafana datasource) for API request count
 Uses Grafana's datasource proxy to run a PromQL instant query (Grafana backend can be Thanos/Prometheus).
 Fetches the number of requests per app, then posts each series to CloudZero with a configurable dimension (default custom:API; create Custom Dimension "API" in CloudZero).
 """
+
 import json
 import logging
 import os
@@ -26,7 +27,7 @@ DEFAULT_GRAFANA_URL = "https://grafana.apps.shared-prd.habitat.zone"
 # Default Grafana datasource name (Prometheus/Thanos); auth is via Grafana service account
 DEFAULT_GRAFANA_DATASOURCE_NAME = "metrics-prod"
 # Default PromQL (instant): total requests in the last 24h grouped by label 'app'
-DEFAULT_PROMQL = 'sum(increase(http_server_requests_seconds_count[24h])) by (app)'
+DEFAULT_PROMQL = "sum(increase(http_server_requests_seconds_count[24h])) by (app)"
 # Query step for range queries: always automatic (~110 points max per day)
 DEFAULT_DIMENSION_LABEL = "app"
 # CloudZero dimension key in associated_cost. CZ:K8s:Workload is not accepted by Unit Cost Telemetry API in many accounts;
@@ -77,7 +78,10 @@ def get_grafana_api_token(dbutils) -> str:
 
 
 def resolve_datasource_uid_by_name(
-    grafana_base_url: str, datasource_name: str, api_token: str, timeout_seconds: int = 30
+    grafana_base_url: str,
+    datasource_name: str,
+    api_token: str,
+    timeout_seconds: int = 30,
 ) -> str:
     """
     Resolve Grafana datasource UID from name via GET /api/datasources/name/:name.
@@ -126,7 +130,9 @@ def get_dimension_label(dbutils) -> str:
         ).strip()
     except Exception:
         pass
-    return os.environ.get("PROMETHEUS_REQUESTS_DIMENSION_LABEL", DEFAULT_DIMENSION_LABEL)
+    return os.environ.get(
+        "PROMETHEUS_REQUESTS_DIMENSION_LABEL", DEFAULT_DIMENSION_LABEL
+    )
 
 
 def get_cloudzero_dimension_key(dbutils) -> str:
@@ -307,12 +313,14 @@ def send_api_requests_to_cloudzero(
             or labels.get("uri")
             or "unknown"
         )
-        payload_records.append({
-            "granularity": "DAILY",
-            "timestamp": execution_date,
-            "value": int(round(value)),
-            "associated_cost": {dimension_key: str(elem)},
-        })
+        payload_records.append(
+            {
+                "granularity": "DAILY",
+                "timestamp": execution_date,
+                "value": int(round(value)),
+                "associated_cost": {dimension_key: str(elem)},
+            }
+        )
 
     if not payload_records:
         logger.info("m=send_api_requests_to_cloudzero, no_records_skipping")
@@ -365,7 +373,9 @@ if __name__ == "__main__":
     environment = args.environment
     execution_date = args.execution_date
 
-    logger.info(f"m=__main__, environment={environment}, execution_date={execution_date}")
+    logger.info(
+        f"m=__main__, environment={environment}, execution_date={execution_date}"
+    )
 
     try:
         base_dbutils = BaseDBUtils()
@@ -382,9 +392,7 @@ if __name__ == "__main__":
             credentials_dict = json.loads(json_credentials)
         except Exception as e:
             logger.error(f"m=__main__, error_parsing_json_credentials, error={e}")
-            raise RuntimeError(
-                f"Error parsing CLOUDZERO_API_TOKEN secret as JSON: {e}"
-            )
+            raise RuntimeError(f"Error parsing CLOUDZERO_API_TOKEN secret as JSON: {e}")
         if not isinstance(credentials_dict, dict) or "token" not in credentials_dict:
             raise RuntimeError(
                 "CLOUDZERO_API_TOKEN secret does not contain a 'token' key."
@@ -413,9 +421,7 @@ if __name__ == "__main__":
         step_seconds = auto_step_seconds(range_seconds)
         step_dur = promql_duration_from_step_seconds(step_seconds)
         # Range PromQL: increase per step, then we sum all points per series
-        range_promql = (
-            f"sum(increase(http_server_requests_seconds_count[{step_dur}])) by ({dimension_label})"
-        )
+        range_promql = f"sum(increase(http_server_requests_seconds_count[{step_dur}])) by ({dimension_label})"
 
         records = query_range_via_grafana(
             grafana_url,

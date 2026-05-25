@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Classify paths under a DAG folder for strict-mode (new file) validation.
 """
@@ -76,9 +75,13 @@ def list_added_metadata_files(
             continue
         if not path.startswith(prefix):
             continue
-        rel = path[len(prefix):]
+        rel = path[len(prefix) :]
         p = Path(rel)
-        if p.parts and p.parts[0] == "metadata" and p.suffix.lower() in (".yml", ".yaml"):
+        if (
+            p.parts
+            and p.parts[0] == "metadata"
+            and p.suffix.lower() in (".yml", ".yaml")
+        ):
             out.append(path)
     return sorted(out)
 

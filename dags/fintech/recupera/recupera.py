@@ -1,23 +1,24 @@
-from datetime import datetime
 import json
+import os
+from datetime import datetime
 
 import pendulum
-import os
-
 from airflow.models import DAG
 from airflow.utils.helpers import chain, cross_downstream
 from databricks_plugin import (
     QuintoAndarDatabricksCreateClusterOperator,
     QuintoAndarDatabricksTerminateClusterOperator,
 )
+
 from bietlejuice.base.airflow.base_dag import BaseDAG
 from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.task_groups.datalake_task_group import DatalakeTaskGroup
-from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
-from bietlejuice.base.databricks.databricks_group_name_enum import DatabricksGroupNameEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
 from bietlejuice.base.jiraops.jiraops_callback import JiraOpsCallback
-
+from bietlejuice.services.configuration_service import ConfigurationService
 
 SOURCE = "recupera"
 CONTEXT = SOURCE
@@ -37,11 +38,15 @@ MAIN_SCHEDULE_INTERVAL = "0 4 * * *"
 
 BASE_SPARK_JOBS_PATH = f"{databricks_bietlejuice_repo_path}/spark_jobs/base/"
 
-CLUSTER_DESCRIPTION = config_service.get_config("databricks_12_2_med_4xlarge_general_cluster")
+CLUSTER_DESCRIPTION = config_service.get_config(
+    "databricks_12_2_med_4xlarge_general_cluster"
+)
 
 CLUSTER_DESCRIPTION["data_security_mode"] = "SINGLE_USER"
 CLUSTER_DESCRIPTION["single_user_name"] = "{{ var.value.databricks_single_user_name }}"
-CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = "quintoandar_{{ var.value.environment }}"
+CLUSTER_DESCRIPTION["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
+    "quintoandar_{{ var.value.environment }}"
+)
 LIBRARIES_DESCRIPTION = config_service.get_config("default_libraries")
 DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST = [
     {
@@ -60,7 +65,6 @@ dag = DAG(
         "wait_for_downstream": False,
         "depends_on_past": False,
         "on_failure_callback": jiraops_callback.task_failure_alert,
-
     },
     start_date=MAIN_START_DATE,
     schedule_interval=MAIN_SCHEDULE_INTERVAL,
@@ -70,17 +74,22 @@ dag = DAG(
     params=BaseDAG.get_default_trigger_form_params(),
 )
 
-create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(databricks_conn_id="databricks_new", dag=dag,
+create_cluster_task = QuintoAndarDatabricksCreateClusterOperator(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     task_id="create-cluster",
     cluster_configuration=CLUSTER_DESCRIPTION,
     access_control_list=DATABRICKS_CLUSTER_ACCESS_CONTROL_LIST,
     libraries=LIBRARIES_DESCRIPTION,
 )
 
-terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
+terminate_cluster_task = QuintoAndarDatabricksTerminateClusterOperator(
+    databricks_conn_id="databricks_new", dag=dag, task_id="terminate-cluster"
 )
 
-task_group = DatalakeTaskGroup(databricks_conn_id="databricks_new", dag=dag,
+task_group = DatalakeTaskGroup(
+    databricks_conn_id="databricks_new",
+    dag=dag,
     env=ENV,
     datalake_bucket=datalake_bucket,
     relative_query_path=CONTEXT,
@@ -95,7 +104,9 @@ for table in TABLES:
     load_incremental = table["load_incremental"]
     original_table_name = table["original_table_name"]
 
-    extraction_spark_job_file = f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
+    extraction_spark_job_file = (
+        f"{databricks_bietlejuice_repo_path}/spark_jobs/{SOURCE}/load_{SOURCE}_raw.py"
+    )
 
     raw_task_group = task_group.build_raw_task_group_for_single_table(
         source=SOURCE,
@@ -110,18 +121,22 @@ for table in TABLES:
             original_table_name,
             json.dumps(load_incremental),
             json.dumps(column_names),
-            json.dumps(partition_columns)
+            json.dumps(partition_columns),
         ],
     )
 
-    clean_load_incremental = table["clean_load_incremental"] if "clean_load_incremental" in table else load_incremental
+    clean_load_incremental = (
+        table["clean_load_incremental"]
+        if "clean_load_incremental" in table
+        else load_incremental
+    )
     partitions = partition_columns if load_incremental else None
     clean_task_group = task_group.build_clean_task_group(
         source_database_base_name=SOURCE,
         target_database_base_name=SOURCE,
         table_name=table_name,
         is_incremental=clean_load_incremental,
-        partitions=partitions
+        partitions=partitions,
     )
 
     chain(create_cluster_task, DatalakeTaskGroup.first_tasks(raw_task_group))

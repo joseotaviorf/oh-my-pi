@@ -1,12 +1,14 @@
 import json
-import pyspark.sql.functions as F
-from pyspark.sql import DataFrame
-from pyspark.sql.types import StructType, StructField, StringType, BooleanType
 from argparse import ArgumentParser, Namespace
-from bietlejuice.loaders.delta_loader import DeltaLoader
-from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.services.configuration_service import ConfigurationService
+
+import pyspark.sql.functions as F
 from databricks.sdk import AccountClient
+from pyspark.sql import DataFrame
+from pyspark.sql.types import BooleanType, StringType, StructField, StructType
+
+from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.loaders.delta_loader import DeltaLoader
+from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_daily_users"
 

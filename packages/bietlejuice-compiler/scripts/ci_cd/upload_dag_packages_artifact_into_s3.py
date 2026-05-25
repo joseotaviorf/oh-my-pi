@@ -73,7 +73,9 @@ for root, dirs, files in os.walk(DAG_PACKAGES_ROOT):
         )
 
         spark_job_local_path = path.join(root, file_name)
-        spark_job_s3_path = path.join(S3_DAGS_PACKAGES_PATH_PREFIX, dag_name, artifact_path.strip("/"), file_name)
+        spark_job_s3_path = path.join(
+            S3_DAGS_PACKAGES_PATH_PREFIX, dag_name, artifact_path.strip("/"), file_name
+        )
         files_to_upload.append((spark_job_local_path, spark_job_s3_path))
 
 with tqdm(

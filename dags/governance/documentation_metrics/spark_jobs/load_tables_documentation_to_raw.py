@@ -1,16 +1,17 @@
-import boto3
-import logging
-import yaml
 import ast
-
-from datetime import datetime
+import logging
 from argparse import ArgumentParser
-from pyspark.sql import Row
+from datetime import datetime
+
+import boto3
+import yaml
 from botocore.exceptions import IncompleteReadError
+from pyspark.sql import Row
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.clients.db_clients import SparkClient
+
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageFormat
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
@@ -32,10 +33,14 @@ def get_documentation_from_bucket(bucket, prefix, spark_client):
 
     # creates df from documentation dict
     if not documentation_content:
+        return spark_client.create_dataframe(
+            [],
+            schema="database_name string, table_name string, domain string, owner string, table_description string",
+        )
 
-        return spark_client.create_dataframe([], schema="database_name string, table_name string, domain string, owner string, table_description string")
-
-    documentation_df = spark_client.create_dataframe(Row(**doc) for doc in documentation_content)
+    documentation_df = spark_client.create_dataframe(
+        Row(**doc) for doc in documentation_content
+    )
 
     # reducing number of partitions
     documentation_df = documentation_df.coalesce(1)
@@ -57,8 +62,8 @@ def get_documentation_paths_from_bucket(bucket, prefix, s3_client):
         obj["Key"]
         for obj in bucket_objects
         if "documentation/" in obj["Key"]
-           and "/categories/" not in obj["Key"]
-           and "documentation/atlas/" not in obj["Key"]
+        and "/categories/" not in obj["Key"]
+        and "documentation/atlas/" not in obj["Key"]
     ]
 
     return documentation_paths
@@ -68,14 +73,15 @@ def get_content_from_paths(bucket, documentation_paths, s3_client):
     documentation_contents = []
     for file_path in documentation_paths:
         try:
-
-            documentation_contents.append(load_yaml_from_bucket(bucket, file_path, s3_client))
+            documentation_contents.append(
+                load_yaml_from_bucket(bucket, file_path, s3_client)
+            )
         except IncompleteReadError as e:
             logger.error(f"Error getting stream for {file_path}")
             logger.error(e)
             raise e
         except Exception as e:
-             logger.warning(f"Failed to load or parse {file_path}: {e}")
+            logger.warning(f"Failed to load or parse {file_path}: {e}")
 
     return documentation_contents
 
@@ -96,22 +102,24 @@ def extract_table_rows_from_docs(docs):
         if not doc:
             continue
 
-        doc_database_name = doc.get('database_name')
-        doc_table_name = doc.get('name') or doc.get('table_name')
+        doc_database_name = doc.get("database_name")
+        doc_table_name = doc.get("name") or doc.get("table_name")
 
-        doc_domain = doc.get('domain') 
-        
-        doc_owner = doc.get('owner')
-        doc_description = doc.get('description')
+        doc_domain = doc.get("domain")
+
+        doc_owner = doc.get("owner")
+        doc_description = doc.get("description")
 
         if doc_database_name and doc_table_name:
-            rows.append({
-                "database_name": doc_database_name,  # Schema
-                "table_name": doc_table_name,        # Table
-                "domain": doc_domain,                # Domain
-                "owner": doc_owner,
-                "table_description": doc_description
-            })
+            rows.append(
+                {
+                    "database_name": doc_database_name,  # Schema
+                    "table_name": doc_table_name,  # Table
+                    "domain": doc_domain,  # Domain
+                    "owner": doc_owner,
+                    "table_description": doc_description,
+                }
+            )
 
     return rows
 
@@ -138,7 +146,11 @@ if __name__ == "__main__":
     documentation_bucket = args.documentation_bucket
     documentation_prefix = args.documentation_prefix
 
-    bucket_suffix = ".data.quintoandar.com.br" if env == "prod" else ".forno.data.quintoandar.com.br"
+    bucket_suffix = (
+        ".data.quintoandar.com.br"
+        if env == "prod"
+        else ".forno.data.quintoandar.com.br"
+    )
     documentation_bucket = documentation_bucket + bucket_suffix
 
     logger.info(
@@ -158,14 +170,16 @@ if __name__ == "__main__":
     database_name = datalake_info["db_raw_databricks"]
     spark_metastore_service.create_database(database_name)
 
-    documentation_df = get_documentation_from_bucket(documentation_bucket, documentation_prefix, spark_client)
+    documentation_df = get_documentation_from_bucket(
+        documentation_bucket, documentation_prefix, spark_client
+    )
 
     documentation_df = (
         SparkDataFrameService()
-            .input(documentation_df)
-            .create_year_month_day_columns_from_date(execution_date)
-            .optimize_partitions_by_partition_columns(partition_cols)
-            .output()
+        .input(documentation_df)
+        .create_year_month_day_columns_from_date(execution_date)
+        .optimize_partitions_by_partition_columns(partition_cols)
+        .output()
     )
 
     # loaders

@@ -1,11 +1,11 @@
-from bietlejuice.jobs.oracle_integration_cloud.main import OICPipeline
 from quintoandar_logger import QuintoAndarLogger
+
+from bietlejuice.jobs.oracle_integration_cloud.main import OICPipeline
 
 JOB_NAME = "load_pin_absence_raw"
 DATABRICKS_SCOPE = "people"
 LOGGER = QuintoAndarLogger(JOB_NAME)
 
 if __name__ == "__main__":
-
     pipeline = OICPipeline()
     pipeline.run()

@@ -1,33 +1,32 @@
 from __future__ import annotations
 
-from typing import Union
 import json
 import logging
-from datetime import datetime
-
 from argparse import ArgumentParser
-from pyspark.sql.utils import AnalysisException
+from datetime import datetime
+from typing import Union
 
 from inmetro.clients import (
-    SparkClient as InmetroSparkClient,
     S3Client as InmetroS3Client,
 )
-
+from inmetro.clients import (
+    SparkClient as InmetroSparkClient,
+)
 from inmetro.loaders import S3Loader as InmetroS3Loader
 from inmetro.parsers.profiles import PyDeequProfileParser
+from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
-from bietlejuice.base.spark import BaseDBUtils
-from bietlejuice.base.service.service_enum import ServiceEnum
+
+from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
 from bietlejuice.base.pipeline import MetadataTypeEnum
+from bietlejuice.base.service.service_enum import ServiceEnum
+from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.base.udfs.udf_enum import UDFEnum
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.metadata_propagator_pipeline.dataset_profiling_pipeline import (
     DatasetProfilingPipeline,
 )
-from bietlejuice.base.udfs.udf_enum import UDFEnum
-
-from bietlejuice.base.notification.slack_webhooks_enum import SlackWebhooksEnum
 from bietlejuice.services.messaging_services.slack_service import SlackService
-
 
 JOB_NAME = "dataset_profiling"
 EXTRACTION_QUERY = r"""
@@ -77,10 +76,9 @@ def parse_args():
 def get_tables_from_schema(
     spark_client: SparkClient, query: str, query_params: dict[str : Union(str, int)]
 ) -> list[dict[str:str]]:
-
-    """"
+    """ "
     This function takes the query so defined as variable and its parameters and checks the data quality files to return only the valid tables.
-    
+
     :param spark_client: folder name in which is the queries and specifics spark jobs
     :type spark_client: str
     :param query: query to get table list from dag_inventory
@@ -110,10 +108,9 @@ def get_tables_from_schema(
 def send_result_to_inmetro_s3(
     inmetro_bucket: str, database_name: str, table_name: str, result: dict[str]
 ) -> None:
-
-    """"
+    """ "
     This function gets the result json and sends to the correct inmetro bucket
-    
+
     :param inmetro_bucket: inmetro bucket address
     :type inmetro_bucket: str
     :param database_name: schema name, such as metri_rent, dw_credit, etc
@@ -165,15 +162,12 @@ if __name__ == "__main__":
         spark_client=spark_client, query=EXTRACTION_QUERY, query_params=query_params
     )
     logger.info(
-        "m={}, msg=Got table list from schema {}, {} tables.".format(
-            JOB_NAME, schema, len(table_list)
-        )
+        f"m={JOB_NAME}, msg=Got table list from schema {schema}, {len(table_list)} tables."
     )
 
     inmetro_spark_client = InmetroSparkClient()
 
     for table in table_list:
-
         database_name, table_name = table["database_name"], table["table_name"]
         try:
             input_df = inmetro_spark_client.read_table(
@@ -228,7 +222,5 @@ if __name__ == "__main__":
         metadata_pipeline.run()
 
         logger.info(
-            "m={}, msg=Dataset profiling executed for table {} with {} status.".format(
-                JOB_NAME, table_name, metadata_pipeline.quality_check_status
-            )
+            f"m={JOB_NAME}, msg=Dataset profiling executed for table {table_name} with {metadata_pipeline.quality_check_status} status."
         )
