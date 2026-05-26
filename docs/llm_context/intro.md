@@ -37,6 +37,7 @@ Each entity file follows a standard structure:
 - `business_entities/repairs.md` — Offboarding and ongoing property repairs (reparos)
 - `business_entities/recs.md` — Recommendation exposures and downstream journey attribution (recomendacoes / carrossel de recomendacao)
 - `business_entities/satisfaction.md` — Customer Satisfaction scores across channels (CSAT / satisfação)
+- `business_entities/seo.md` — SEO performance, keyword clusters and demand top-of-funnel metrics (SEO / Search Engine Optimization)
 - `business_entities/supply.md` — Property owner acquisition funnel from lead to first listing (captação / supply / aquisição de proprietários)
 - `business_entities/termination.md` — Contract terminations (rescisões / offboarding)
 - `business_entities/visits.md` — Visit requests and scheduled property visits, capturing the full journey from visit intention to completion (agendamentos e realização de visitas a imóveis)
