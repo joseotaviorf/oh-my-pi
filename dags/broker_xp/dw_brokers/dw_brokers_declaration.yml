@@ -130,3 +130,8 @@ workflow:
           - ALL PRIVILEGES
 cluster:
   type: emr_7_12_med_memory_cluster
+  custom_configurations:
+    spark_conf:
+      spark.driver.memory: 6g
+      spark.driver.memoryOverhead: 2g
+      spark.yarn.am.memory: 6g
