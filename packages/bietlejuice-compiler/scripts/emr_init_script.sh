@@ -7,7 +7,9 @@ TMP_DIR="/tmp"
 
 DEEQU_JAR_VERSION="${DEEQU_JAR_VERSION:-2.0.8}"
 SPARK_VERSION="${SPARK_VERSION:-3.5}"
-INMETRO_VERSION="${INMETRO_VERSION:-2.3.0}"
+# Wheel metadata declares Requires-Python >=3.10; EMR default pip3 is 3.9 and installs with
+# --ignore-requires-python (validated on EMR 7.12).
+INMETRO_VERSION="${INMETRO_VERSION:-4.10.1}"
 KAFKA_CLIENTS_JAR="${KAFKA_CLIENTS_JAR:-kafka-clients-3.5.0.jar}"
 OPENLINEAGE_JAR="${OPENLINEAGE_JAR:-openlineage-spark_2.12-1.46.0.jar}"
 MYSQL_JDBC_JAR="${MYSQL_JDBC_JAR:-mysql-connector-java-8.0.30.jar}"
@@ -155,10 +157,18 @@ if [ "${PROVIDER:-}" != "databricks" ]; then
     echo "Pinning urllib3 for EMR awscli/botocore compatibility..."
     $PIP_EXEC install 'urllib3>=1.25.4,<1.27'
 
-    echo "Installing inmetro + missing deps (pydeequ, yamale)..."
-    $PIP_EXEC install --no-cache-dir --no-deps \
+    echo "Installing inmetro ${INMETRO_VERSION} on EMR Python 3.9 (pydeequ, yamale, typing-extensions)..."
+    $PIP_EXEC install --no-cache-dir --no-deps --ignore-requires-python \
         "${TMP_DIR}/wheels/inmetro-${INMETRO_VERSION}-py3-none-any.whl"
-    $PIP_EXEC install --no-cache-dir 'pydeequ==1.4.0' 'yamale==5.2.1'
+    $PIP_EXEC install --no-cache-dir \
+        'pydeequ==1.4.0' \
+        'yamale==5.2.1' \
+        'typing-extensions==4.12.2'
+
+    if ! python3 -c 'import pandas; major, minor, *_ = (int(x) for x in pandas.__version__.split(".")[:2]); raise SystemExit(0 if (major, minor) >= (2, 0) else 1)' 2>/dev/null; then
+        echo "Installing pandas>=2.0.0,<3 for inmetro ${INMETRO_VERSION}..."
+        $PIP_EXEC install --no-cache-dir 'pandas>=2.0.0,<3'
+    fi
 
     echo "Restoring python-dateutil for awscli compatibility..."
     $PIP_EXEC install 'python-dateutil>=2.1,<=2.9.0'
@@ -207,6 +217,8 @@ else
     $PIP_EXEC show quintoandar-logger
     $PIP_EXEC show inmetro
     python3 -c 'import psycopg2; print("psycopg2", psycopg2.__version__)'
+    echo "Smoke-testing inmetro ${INMETRO_VERSION} on python3..."
+    python3 -c "import inmetro; from inmetro.config_reader import ConfigReader; import inspect; assert 'content' in inspect.signature(ConfigReader.__init__).parameters; print('inmetro', inmetro.__version__)"
 fi
 
 echo "DONE: bootstrap finished."
