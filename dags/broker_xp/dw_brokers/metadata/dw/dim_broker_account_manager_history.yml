@@ -3,27 +3,36 @@ table_name: dim_broker_account_manager_history
 description: |
   Data warehouse dimension of HubSpot account manager (owner) assignment periods per broker. Rows are
   derived from distinct id_hubspot_owner changes in datalake_brokers.hubspot_brokers_history, versioned
-  per broker and resolved to person SK via datalake_hubspot.owner and datalake_person.person_sks.
+  per broker and resolved to the enrich user via datalake_hubspot.owner.uuid_person ↔
+  datalake_ebdb_user.user.uuid_person; the account manager email is exposed directly from the HubSpot
+  owner.
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_broker_account_manager_history:
     lineage:
       - datalake_brokers.hubspot_brokers_history.sk_broker
-      - datalake_person.person_sks.id_person
+      - datalake_ebdb_user.user.id
     description: |
-      Surrogate string key for the broker-owner assignment period, built from sk_broker, COALESCE(id_person, -1),
-      and sequential version within the broker.
+      Surrogate string key for the broker-owner assignment period, built from sk_broker,
+      COALESCE(id_user, -1), and sequential version within the broker.
   sk_broker:
     lineage:
       - datalake_brokers.hubspot_brokers_history.sk_broker
     description: Surrogate key of the broker for this account manager period.
-  sk_person_account_manager:
+  sk_user_account_manager:
     lineage:
-      - datalake_person.person_sks.sk_person
+      - datalake_ebdb_user.user.id
     description: |
-      Surrogate key of the HubSpot owner mapped to Person when available; -1 when no mapping exists,
-      consistent with dim_broker.
+      Surrogate key of the HubSpot account manager resolved to the enrich user (datalake_ebdb_user.user)
+      via owner.uuid_person ↔ user.uuid_person; -1 when no mapping exists.
+  account_manager:
+    lineage:
+      - datalake_hubspot.owner.email
+    description: |
+      Email of the QuintoAndar internal account manager assigned to this broker during the period,
+      sourced from datalake_hubspot.owner. Null when there is no owner mapping. Expected domain is
+      quintoandar.com.br (validated via the table's data quality check).
   version:
     lineage:
       - datalake_brokers.hubspot_brokers_history.ts_updated

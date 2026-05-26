@@ -6,11 +6,14 @@ dag:
     dag_purpose: |
       DW layer for 3P brokers: dim_broker (broker attributes, Hubspot cluster, active profile counts
       from brokers_profile, passive lead-gen agent counts from agent_data, last membership timestamps from
-      broker_status_history, account manager SK; no per-business-context SALE/RENT agent counts on this table),
+      broker_status_history, account manager email from the current HubSpot owner; no per-business-context
+      SALE/RENT agent counts on this table),
       dim_broker_products (product and fee attributes),
       dim_broker_regions (broker product to region bridge from region_list), dim_broker_status_history
       (status periods from enrich broker_status_history), dim_broker_account_manager_history (HubSpot
-      owner change periods per broker from hubspot_brokers_history, resolved to person SK),
+      owner change periods per broker from hubspot_brokers_history, resolved to enrich user
+      datalake_ebdb_user.user via owner.uuid_person ↔ user.uuid_person and exposing the account manager
+      email),
       dim_broker_profile_history (member profiles from core brokers_profile with person SK and effective
       intervals per person and profile type), dim_broker_tier_history (tier assignment periods per
       broker product from core_brokers.broker_tiers_history joined to datalake_company_clean.tier),
@@ -21,8 +24,8 @@ dag:
       the DAG outputs to dw_brokers).
       Upstreams: core_brokers, core_brokers_history (broker_tiers_history, broker_products_history),
       core_region, datalake_brokers (hubspot_brokers_history, broker_status_history),
-      datalake_company (company_sks), datalake_company_clean (tier, company, address),
-      datalake_hubspot (owner, company_members, membership_updates), datalake_person.person_sks,
+      datalake_company_clean (tier, company), datalake_hubspot.owner, datalake_ebdb_user.user,
+      datalake_person.person_sks (consumed by dim_broker_profile_history),
       datalake_ebdb_clean.agent_data.
       Schedule after enrich_brokers, core_brokers_history, and core upstreams in Airflow.
 workflow:

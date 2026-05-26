@@ -1,8 +1,9 @@
 database_name: dw_brokers
 table_name: dim_broker
 description: |
-  Data warehouse dimension for 3P broker companies from core_brokers.brokers, enriched with HubSpot
-  current owner mapped to person SK, active profile counts from core_brokers.brokers_profile
+  Data warehouse dimension for 3P broker companies from core_brokers.brokers, enriched with the email of
+  the current HubSpot account manager (from datalake_hubspot.owner via the current
+  hubspot_brokers_history row), active profile counts from core_brokers.brokers_profile
   (third_party_agent and company_admin), passive lead-gen agent counts from datalake_ebdb_clean.agent_data,
   and last membership transition timestamps derived from datalake_brokers.broker_status_history
   (overall and Rede Rent / Rede Sale product lanes). Per-business-context SALE/RENT agent counts from
@@ -14,12 +15,6 @@ columns:
     lineage:
       - core_brokers.brokers.sk_broker
     description: Surrogate key identifying the broker; primary key of this dimension.
-  sk_person_account_manager:
-    lineage:
-      - datalake_person.person_sks.sk_person
-    description: |
-      Surrogate key of the HubSpot owner (current hubspot_brokers_history row) mapped to Person when
-      available; -1 when there is no owner or no person mapping.
   broker_name:
     lineage:
       - core_brokers.brokers.broker_name
@@ -38,6 +33,14 @@ columns:
       - core_brokers.brokers.broker_trade_name_tag
     description: |
       Normalized broker trade name (no accents, no whitespace; case preserved).
+  account_manager:
+    lineage:
+      - datalake_hubspot.owner.email
+    description: |
+      Email of the QuintoAndar internal account manager currently assigned to this broker in HubSpot,
+      sourced from the current row of datalake_brokers.hubspot_brokers_history joined to
+      datalake_hubspot.owner. Null when there is no current owner mapping. Expected domain is
+      quintoandar.com.br (validated via the table's data quality check).
   broker_address:
     lineage:
       - core_brokers.brokers.broker_address

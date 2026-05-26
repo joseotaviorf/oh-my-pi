@@ -52,11 +52,11 @@ broker_operation_areas AS (
 )
 SELECT
   cb.sk_broker,
-  COALESCE(p.sk_person, -1) AS sk_person_account_manager,
   cb.broker_name,
   cb.broker_trade_name,
   cb.broker_name_tag,
   cb.broker_trade_name_tag,
+  ho.email AS account_manager,
   cb.broker_address,
   cb.broker_number,
   cb.broker_complement,
@@ -103,9 +103,6 @@ LEFT JOIN
 LEFT JOIN
   datalake_hubspot.owner AS ho
   ON hb.id_hubspot_owner = ho.id_owner
-LEFT JOIN
-  datalake_person.person_sks AS p
-  ON ho.uuid_person = p.uuid_person
 LEFT JOIN
   broker_profiles AS bp
   ON cb.sk_broker = bp.sk_broker

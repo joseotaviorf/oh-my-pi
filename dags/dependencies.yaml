@@ -230,6 +230,7 @@ bietlejuice.dw_brokers:
   - bietlejuice.enrich_brokers:load-enrich-broker-status-history:first-run-of-day
   - bietlejuice.enrich_brokers:load-enrich-hubspot-brokers-history:first-run-of-day
   - bietlejuice.enrich_company:load-enrich-company-sks:first-run-of-day
+  - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
   - bietlejuice.enrich_hubspot_crm:load-enrich-company-members:first-run-of-day
   - bietlejuice.enrich_hubspot_management:load-enrich-owner:first-run-of-day
   - bietlejuice.enrich_person:load-enrich-person-sks:first-run-of-day

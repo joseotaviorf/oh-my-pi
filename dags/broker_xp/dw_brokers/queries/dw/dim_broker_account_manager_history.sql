@@ -22,11 +22,12 @@ filtered_changes AS (
 SELECT
   CONCAT(
     CAST(fc.sk_broker AS STRING),
-    CAST(COALESCE(ps.id_person, -1) AS STRING),
+    CAST(COALESCE(u.id, -1) AS STRING),
     CAST(fc.version AS STRING)
   ) AS sk_broker_account_manager_history,
   fc.sk_broker AS sk_broker,
-  COALESCE(ps.sk_person, -1) AS sk_person_account_manager,
+  COALESCE(u.id, -1) AS sk_user_account_manager,
+  ho.email AS account_manager,
   fc.version,
   LEAD(fc.ts_updated) OVER (PARTITION BY fc.sk_broker ORDER BY fc.ts_updated) IS NULL AS is_current,
   TRUE AS has_3p_access_control,
@@ -42,5 +43,5 @@ LEFT JOIN
   datalake_hubspot.owner AS ho
     ON fc.id_hubspot_owner = ho.id_owner
 LEFT JOIN
-  datalake_person.person_sks AS ps
-    ON ho.uuid_person = ps.uuid_person
+  datalake_ebdb_user.user AS u
+    ON ho.uuid_person = u.uuid_person

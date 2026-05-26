@@ -13,6 +13,16 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
+  account_manager:
+    custom:
+      # Ensure account_manager emails belong to the @quintoandar domain (NULLs are ignored — no owner mapping).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_brokers.dim_broker
+         WHERE account_manager IS NOT NULL
+           AND LOWER(account_manager) NOT LIKE '%@quintoandar.%'
+        ) = 0
+      severity_level: Warning
   has_3p_access_control:
     is_complete:
       severity_level: Error

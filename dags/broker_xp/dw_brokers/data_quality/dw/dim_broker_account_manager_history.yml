@@ -34,9 +34,19 @@ column_level_validations:
   ts_start:
     is_complete:
       severity_level: Error
-  sk_person_account_manager:
+  sk_user_account_manager:
     is_complete:
       severity_level: Error
+  account_manager:
+    custom:
+      # Ensure account_manager emails belong to the @quintoandar domain (NULLs are ignored — no owner mapping).
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_brokers.dim_broker_account_manager_history
+         WHERE account_manager IS NOT NULL
+           AND LOWER(account_manager) NOT LIKE '%@quintoandar.%'
+        ) = 0
+      severity_level: Warning
   version:
     is_complete:
       severity_level: Error
