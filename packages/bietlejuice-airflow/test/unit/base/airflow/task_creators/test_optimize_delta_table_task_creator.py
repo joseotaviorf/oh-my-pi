@@ -248,3 +248,97 @@ class TestOptimizeDeltaTableTaskCreator:
         assert ops[0].downstream_list == [ops[1]]
         assert ops[1].downstream_list == [ops[2]]
         assert ops[2].downstream_list == []
+
+
+class TestPartitionFilterWiring:
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_transactional_layer_sets_partition_filter_and_date_args(
+        self, mock_create_spark, dag_execution_context
+    ):
+        import json
+
+        dag_execution_context.use_airflow_emr = False
+        dag_execution_context.load_start_date = "{{ load_start }}"
+        dag_execution_context.load_end_date = "{{ load_end }}"
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-transactional-all", dag=dag_execution_context.dag
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([_table("t1", LayerEnum.TRANSACTIONAL)])
+
+        parameters = mock_create_spark.call_args[0][2]
+        tables_config = json.loads(parameters[1])
+        assert tables_config["t1"]["apply_partition_filter"] is True
+        assert parameters[3:] == [
+            "--load-start-date",
+            "{{ load_start }}",
+            "--load-end-date",
+            "{{ load_end }}",
+        ]
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_raw_layer_does_not_set_partition_filter_or_date_args(
+        self, mock_create_spark, dag_execution_context
+    ):
+        import json
+
+        dag_execution_context.use_airflow_emr = False
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-raw-all", dag=dag_execution_context.dag
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([_table("t1", LayerEnum.RAW)])
+
+        parameters = mock_create_spark.call_args[0][2]
+        tables_config = json.loads(parameters[1])
+        assert "apply_partition_filter" not in tables_config["t1"]
+        assert "--load-start-date" not in parameters
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_clean_layer_does_not_set_partition_filter_or_date_args(
+        self, mock_create_spark, dag_execution_context
+    ):
+        import json
+
+        dag_execution_context.use_airflow_emr = False
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-clean-all", dag=dag_execution_context.dag
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([_table("t1", LayerEnum.CLEAN)])
+
+        parameters = mock_create_spark.call_args[0][2]
+        tables_config = json.loads(parameters[1])
+        assert "apply_partition_filter" not in tables_config["t1"]
+        assert "--load-start-date" not in parameters
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_transactional_opt_out_disables_partition_filter_and_skips_date_args(
+        self, mock_create_spark, dag_execution_context
+    ):
+        import json
+
+        dag_execution_context.use_airflow_emr = False
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-transactional-all", dag=dag_execution_context.dag
+        )
+        table = TableAttributes(
+            dag_args={"name": "test_dag"},
+            workflow_args={
+                "custom_schema": "my_schema",
+                "tables_customization": {"t1": {"optimize_partition_filter": False}},
+            },
+            layer=LayerEnum.TRANSACTIONAL,
+            table_name="t1",
+        )
+
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        creator.create_optimize_tasks([table])
+
+        parameters = mock_create_spark.call_args[0][2]
+        tables_config = json.loads(parameters[1])
+        assert tables_config["t1"]["apply_partition_filter"] is False
+        assert "--load-start-date" not in parameters

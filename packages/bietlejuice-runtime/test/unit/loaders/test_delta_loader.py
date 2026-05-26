@@ -463,6 +463,28 @@ class TestDeltaLoader:
         with pytest.raises(ValueError, match="Invalid SQL identifier"):
             delta_loader.optimize_table("test_table", ["column1", "'; evil --"])
 
+    def test_optimize_table_with_where_predicate(self, mock_spark_context):
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        delta_loader.optimize_table(
+            "test_table",
+            where_predicate="year = 2026 AND month = 5 AND day = 26",
+        )
+        mock_spark_context.spark.sql.assert_called_once_with(
+            "OPTIMIZE test_table WHERE year = 2026 AND month = 5 AND day = 26"
+        )
+
+    def test_optimize_table_with_where_predicate_and_z_order(self, mock_spark_context):
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        delta_loader.optimize_table(
+            "test_table",
+            z_order_by=["column1", "column2"],
+            where_predicate="year = 2026 AND month = 5 AND day = 26",
+        )
+        mock_spark_context.spark.sql.assert_called_once_with(
+            "OPTIMIZE test_table WHERE year = 2026 AND month = 5 AND day = 26 "
+            "ZORDER BY column1,column2"
+        )
+
     @pytest.mark.parametrize(
         "identifier",
         ["test_table", "db.table", "datalake_ebdb_raw.contract"],

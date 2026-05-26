@@ -146,7 +146,8 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
             batch_index,
             num_batches,
         )
-        tables_json = self._get_tables_parameter(table_attributes)
+        tables_config = self._build_tables_config(table_attributes)
+        tables_json = json.dumps(tables_config, separators=(",", ":"))
         if self.dag_execution_context.use_airflow_emr:
             tables_json = encode_tables_json_for_emr_cli(tables_json)
         layer_value = table_attributes[0].layer.value if table_attributes else "raw"
@@ -155,6 +156,13 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
             tables_json,
             parallelism,
         ]
+        if any(cfg.get("apply_partition_filter") for cfg in tables_config.values()):
+            parameters += [
+                "--load-start-date",
+                self.dag_execution_context.load_start_date,
+                "--load-end-date",
+                self.dag_execution_context.load_end_date,
+            ]
         return self._create_spark_job_task(spark_job_name, task_id, parameters)
 
     def _build_optimize_task_group_id(
@@ -194,7 +202,7 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
         )
         return StringFormatter.slugify(f"optimize-{layer}-{table_name}")
 
-    def _get_tables_parameter(self, tables_attributes: list) -> str:
+    def _build_tables_config(self, tables_attributes: list) -> dict:
         default_vacuum_retention_hours = self.dag_execution_context.workflow_args.get(
             "vacuum_retention_hours", 48
         )
@@ -223,7 +231,7 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
             else:
                 z_order_by = default_z_order_by
 
-            tables_config[table.table_name] = {
+            table_config = {
                 "schema": table.schema,
                 "vacuum_retention_hours": table.table_customization.get(
                     "vacuum_retention_hours", default_vacuum_retention_hours
@@ -239,8 +247,13 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
                 ),
                 "z_order_by": z_order_by,
             }
+            if table.layer == LayerEnum.TRANSACTIONAL:
+                table_config["apply_partition_filter"] = table.table_customization.get(
+                    "optimize_partition_filter", True
+                )
+            tables_config[table.table_name] = table_config
 
-        return json.dumps(tables_config, separators=(",", ":"))
+        return tables_config
 
 
 def _chain_optimize_tasks_sequentially(tasks: List[BaseOperator]) -> None:

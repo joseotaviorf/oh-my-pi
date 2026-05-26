@@ -334,11 +334,23 @@ class DeltaLoader:
         self.spark.sql(command)
         logger.info(f"Vacuum lite successful for table {table_name}")
 
-    def optimize_table(self, table_name: str, z_order_by: list = None) -> None:
-        """Optimize a Delta table, optionally using ZORDER BY"""
+    def optimize_table(
+        self,
+        table_name: str,
+        z_order_by: list = None,
+        where_predicate: str = None,
+    ) -> None:
+        """Optimize a Delta table, optionally restricted by a partition predicate and/or ZORDER BY.
+
+        The ``where_predicate`` must reference partition columns only and is the
+        responsibility of the caller to construct safely (do not interpolate
+        user input). Delta SQL grammar: ``OPTIMIZE table [WHERE pred] [ZORDER BY (...)]``.
+        """
         table_name = _check_identifier_safety(table_name)
 
         command = f"OPTIMIZE {table_name}"
+        if where_predicate:
+            command += f" WHERE {where_predicate}"
         if z_order_by:
             z_cols = [_check_identifier_safety(c) for c in z_order_by]
             command += f" ZORDER BY {','.join(z_cols)}"
