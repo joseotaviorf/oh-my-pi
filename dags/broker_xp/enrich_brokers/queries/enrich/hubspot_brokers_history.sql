@@ -1,15 +1,23 @@
-WITH brokers_members AS (
+WITH brokers_members_ranked AS (
   SELECT
     c.id_company,
-    c.cnpj
+    c.cnpj,
+    ROW_NUMBER() OVER(PARTITION BY c.cnpj ORDER BY c.ts_updated DESC) AS rn
   FROM
     datalake_hubspot.company AS c
   WHERE
     c.has_been_sale_member
       AND NOT(c.is_archived)
       AND NOT(c.is_merged_into_other_company)
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY c.cnpj ORDER BY c.ts_updated DESC) = 1
+),
+brokers_members AS (
+  SELECT
+    bmr.id_company,
+    bmr.cnpj
+  FROM
+    brokers_members_ranked AS bmr
+  WHERE
+    bmr.rn = 1
 ),
 broker_history AS (
   SELECT
@@ -32,7 +40,8 @@ broker_history AS (
       END
     ) OVER (PARTITION BY cb.sk_broker ORDER BY ch.ts_updated) AS prev_broker_status,
     LAG(ch.company_cluster) OVER (PARTITION BY cb.sk_broker ORDER BY ch.ts_updated) AS prev_company_cluster,
-    LAG(ch.cluster_performance) OVER (PARTITION BY cb.sk_broker ORDER BY ch.ts_updated) AS prev_cluster_performance
+    LAG(ch.cluster_performance) OVER (PARTITION BY cb.sk_broker ORDER BY ch.ts_updated) AS prev_cluster_performance,
+    LAG(ch.id_hubspot_owner) OVER (PARTITION BY cb.sk_broker ORDER BY ch.ts_updated) AS prev_id_hubspot_owner
   FROM
     datalake_hubspot.company_history AS ch
   INNER JOIN
@@ -61,4 +70,5 @@ WHERE
   bh.broker_status != bh.prev_broker_status
   OR bh.company_cluster != bh.prev_company_cluster
   OR bh.cluster_performance != bh.prev_cluster_performance
+  OR bh.id_hubspot_owner IS DISTINCT FROM bh.prev_id_hubspot_owner
   OR bh.prev_broker_status IS NULL

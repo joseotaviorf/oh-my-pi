@@ -1,6 +1,11 @@
 database_name: datalake_brokers
 table_name: hubspot_brokers_history
-description: Enriched Hubspot company history with broker surrogate keys, mapping sale_lead_status to ACTIVE/INACTIVE broker status. Filters to companies that have been Rede Sale members.
+description: >
+  Enriched HubSpot company history with broker surrogate keys, mapping sale_lead_status to ACTIVE/INACTIVE
+  broker_status. One row per detected change event per HubSpot company. A change event is emitted whenever
+  broker_status, company_cluster, cluster_performance, or id_hubspot_owner transitions (NULL-safe for owner
+  changes), plus the first observed revision per sk_broker. Source companies are deduplicated by CNPJ keeping
+  the most recently updated record that is a Rede Sale member, not archived and not merged into another company.
 domain: Broker XP
 owner: vitor.musachio@quintoandar.com.br
 columns:
@@ -15,7 +20,10 @@ columns:
   id_hubspot_owner:
     lineage:
       - datalake_hubspot.company_history.id_hubspot_owner
-    description: Identification of the HubSpot owner associated with the company.
+    description: >
+      Identification of the HubSpot owner (account manager) associated with the company on this revision.
+      A change in this field across consecutive HubSpot company_history records triggers a new row in this
+      table, even when broker_status, company_cluster and cluster_performance are unchanged.
   cnpj:
     lineage:
       - datalake_hubspot.company_history.cnpj
@@ -36,9 +44,13 @@ columns:
       - datalake_hubspot.company_history.cluster_performance
     description: Performance classification of the company cluster.
   broker_version:
-    description: Version of the broker record.
+    description: >
+      Sequential version of the change event within the same id_hubspot_company, ordered by ts_updated DESC.
+      Version 1 is the most recent revision; higher numbers are older.
   is_current:
-    description: True if the record is the current record for the broker, otherwise false.
+    description: >
+      True for the most recent revision per id_hubspot_company (broker_version = 1), otherwise false. Use this
+      flag to retrieve the current account manager and broker status from this table.
   has_3p_access_control:
     description: >
       Boolean flag indicating that this event is subject to 3P Partners access control policies.
