@@ -2,6 +2,7 @@ dag:
   name: enrich_employment
   schedule_start_date: 2025, 7, 18
   owner: Data People
+  callback_by_task: False
   documentation:
     dag_purpose: >
       Responsible for processing and enriching core employment data. 

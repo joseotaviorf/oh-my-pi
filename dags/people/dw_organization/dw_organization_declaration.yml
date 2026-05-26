@@ -1,6 +1,7 @@
 dag:
   name: dw_organization
   owner: Data People
+  callback_by_task: False
   schedule_start_date: 2026, 2, 11
   documentation:
     dag_purpose: |

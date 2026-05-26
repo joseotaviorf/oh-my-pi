@@ -1,6 +1,7 @@
 dag:
   name: enrich_people
   owner: Data People
+  callback_by_task: False
   schedule_start_date: 2026, 1, 29
   documentation:
     dag_purpose: |

@@ -2,6 +2,7 @@ dag:
   name: enrich_learning
   schedule_start_date: 2025, 9, 22
   owner: Data People
+  callback_by_task: False
   documentation:
     dag_purpose: |-
       Enrich learning data with flattened and derived columns (mainly from Degreed/Learning Hub).

@@ -1,6 +1,7 @@
 dag:
   name: reverse_reports
   owner: Data People
+  callback_by_task: False
   documentation:
     dag_purpose: |
       Generic reverse DAG for People domain. Exports data from the lake to multiple Google Sheets.

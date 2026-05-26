@@ -1,6 +1,7 @@
 dag:
   name: dw_employee_details
   owner: Data People
+  callback_by_task: False
   schedule_start_date: 2026, 2, 13
   documentation:
     dag_purpose: Data Warehouse with employee personal details and related dimensions.

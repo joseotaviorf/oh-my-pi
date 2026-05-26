@@ -1,6 +1,7 @@
 dag:
   name: dw_compensation
   owner: Data People
+  callback_by_task: False
   schedule_start_date: 2026, 1, 21
   documentation:
     dag_purpose: Data Warehouse with historical compensation records including salary changes, adjustments, and related dimensions.

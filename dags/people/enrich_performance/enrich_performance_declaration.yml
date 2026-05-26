@@ -1,6 +1,7 @@
 dag:
   name: enrich_performance
   owner: Data People
+  callback_by_task: False
   schedule_start_date: 2025, 7, 3
   documentation:
     dag_purpose: This DAG brings enriched PIN data about Performance and Talent Reviews. 
