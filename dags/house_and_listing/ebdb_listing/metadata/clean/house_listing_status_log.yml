@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: house_listing_status_log
 owner: camila.stenico@quintoandar.com.br
-domain: For Sale
+domain: House and Listing
 description: 'Table for tracking status change events for house listings, recording status and sub-status transitions, along with the reason and additional context. It can be joined to the `HouseEventLog` table to capture detailed event information (house ID, business context, actor information, etc.).'
 columns:
   id:

@@ -1,7 +1,7 @@
 database_name: dw_listing
 table_name: dim_price_suggested
 description: Dimensional table containing descriptive attributes for price suggestions.
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   sk_price_suggested:

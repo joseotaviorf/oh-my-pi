@@ -1,7 +1,7 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: listing_sale_model
-domain: For Sale
+domain: House and Listing
 description: Table containing sale model information for listing properties.
 columns:
   id:

@@ -1,7 +1,7 @@
 database_name: dw_quintoandar
 table_name: dim_listing_owner
 description: Dimension table containing information about the house listing owner.
-domain: For Rent
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   sk_listing_owner:

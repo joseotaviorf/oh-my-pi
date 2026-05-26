@@ -1,7 +1,7 @@
 dag:
   name: enrich_sale_stranded_listings_thresholds
   schedule_start_date: 2021, 7, 20
-  owner: Data ForSale
+  owner: Data House and Listing
   documentation:
     dag_purpose: This DAG creates the enriched tables for Stranded Listings context.
 workflow:

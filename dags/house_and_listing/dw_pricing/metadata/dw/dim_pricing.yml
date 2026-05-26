@@ -7,7 +7,7 @@ description: >
   house-and-business-context level (sk_house + business_context), so a new price change
   on any listing version of the same house updates the flags of all prior price changes
   for that house in that context.
-domain: Cross
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   sk_pricing:

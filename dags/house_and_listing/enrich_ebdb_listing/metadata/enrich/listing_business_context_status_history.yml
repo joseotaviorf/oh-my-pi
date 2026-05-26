@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_listing
 table_name: listing_business_context_status_history
 description: Enrich table that contains the state (status and status reason) change history of rental and sale listings. Each row is a state change for each property's business context.
-domain: For Rent
+domain: House and Listing
 owner: matheus.baroni@quintoandar.com.br
 columns:
   id_house:

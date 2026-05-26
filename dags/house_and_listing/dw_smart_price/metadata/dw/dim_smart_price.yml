@@ -1,7 +1,7 @@
 database_name: dw_quintoandar
 table_name: dim_smart_price
 description: dim table containing all information to listing smart price
-domain: For Rent
+domain: House and Listing
 owner: pedro.domingos@quintoandar.com.br
 columns:
   sk_smart_price:

@@ -2,7 +2,7 @@
 database_name: datalake_listing_temp
 table_name: house_listing_status_house
 description: Information related to ForRent listings status. Each line represents a listing status change.
-domain: For Rent
+domain: House and Listing
 owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_house_listing:

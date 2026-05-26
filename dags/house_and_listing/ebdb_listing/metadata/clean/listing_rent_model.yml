@@ -1,7 +1,7 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: listing_rent_model
-domain: For Rent
+domain: House and Listing
 description: Table containing rental model information for listing properties.
 columns:
   id:

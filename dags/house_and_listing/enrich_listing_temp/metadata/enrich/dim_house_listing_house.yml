@@ -1,7 +1,7 @@
 database_name: datalake_listing_temp
 table_name: dim_house_listing_house
 description: "Information about property listings and some properties may be only available for sale. Each line is a listing version."
-domain: For Rent
+domain: House and Listing
 owner: jonas.fiorini@quintoandar.com.br
 columns:
   sk_house_listing:

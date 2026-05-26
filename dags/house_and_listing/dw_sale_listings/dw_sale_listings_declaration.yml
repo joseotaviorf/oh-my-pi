@@ -1,6 +1,6 @@
 dag:
   name: dw_sale_listings
-  owner: Data ForSale
+  owner: Data House and Listing
 workflow:
   type: query_delta
   layer: dw

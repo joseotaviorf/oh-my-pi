@@ -6,7 +6,7 @@ description:
   related to a house in a specific date with it's information about the agents, contract, account manager (PP Multi).
   The sk_house_listing is not unique in this table, but the sk_house_listing_day is unique. This column is the
   concatenation of sk_house_listing + sk_day.
-domain: For Rent
+domain: House and Listing
 owner: kleber.inoue@quintoandar.com.br
 columns:
   sk_house_listing_day:

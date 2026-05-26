@@ -1,6 +1,6 @@
 database_name: datalake_ebdb_clean
 table_name: house_aud
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 description: >
   Comprehensive audit table for house registry from EBDB database, containing historical changes and modification tracking for all house records.

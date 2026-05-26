@@ -3,7 +3,7 @@ database_name: datalake_ebdb_listing
 table_name: house_listing_status
 description: Information related to ForRent listings. 
   Each line is a listing status, status_reason and version (listing state) with start and end timestamps.
-domain: For Rent
+domain: House and Listing
 owner: jonas.fiorini@quintoandar.com.br
 columns:
   country_code:

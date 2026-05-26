@@ -2,7 +2,7 @@ database_name: datalake_ebdb_listing
 table_name: house_listing_special_conditions
 description: Information related to ForRent listings special conditions. 
   Each line is an unique tuple of listing and special condition type and opt-in and/or opt-out of the special condition.
-domain: For Rent
+domain: House and Listing
 owner: jonas.fiorini@quintoandar.com.br
 columns:
   country_code:

@@ -1,6 +1,6 @@
 dag:
   name: ebdb_house_historical
-  owner: Data ForSale
+  owner: Data House and Listing
   documentation:
     dag_purpose: |
       Creates historical tracking tables for House domain from CDC transactional layer.

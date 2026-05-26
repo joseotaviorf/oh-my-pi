@@ -5,7 +5,7 @@ description: Fact table that centralizes all the useful information of a listing
   By valid, we mean that we only keep the information from the last price change of
   the day when there was a price change (if the selling price of this change is different
   from the first price of the day. If not, it will not count as a price change).
-domain: For Sale
+domain: House and Listing
 owner: ata-for-sale@quintoandar.com.br
 columns:
   sk_price_change:

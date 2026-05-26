@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: house_description
 owner: bruna.prates@quintoandar.com.br
-domain: For Sale
+domain: House and Listing
 description: Stores house descriptions, including long and short descriptions for rent and sale listings.
   Tracks whether descriptions have been manually overwritten and controls description visibility.
 columns:

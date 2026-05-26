@@ -2,7 +2,7 @@ database_name: datalake_ebdb_clean
 table_name: listing_business_context
 description: Information about house listings for both Rent and Sale business contexts in the fast lane processing.
   This table contains the core listing configuration, status information, and business context that drives property availability and marketplace behavior.
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   id:

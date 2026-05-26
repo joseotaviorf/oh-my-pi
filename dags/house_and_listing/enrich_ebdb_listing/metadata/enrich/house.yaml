@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_listing
 table_name: house
 description: 'Each row in this table is a house in QuintoAndar.'
-domain: For Rent
+domain: House and Listing
 owner: jonas.fiorini@quintoandar.com.br
 columns:
   id:

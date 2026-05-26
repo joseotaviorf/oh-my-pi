@@ -5,7 +5,7 @@ description: >
   Enrich table that tracks all price suggestion changes from house_price_suggestion_historical.
   Each row represents a suggestion change for a given house and business context, enriched with
   change ordering and temporal fields to identify when each suggestion was active.
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   id_suggestion_change:

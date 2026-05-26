@@ -1,7 +1,7 @@
 dag:
   name: enrich_listing_temp
   schedule_start_date: 2022, 10, 18
-  owner: Data ForSale
+  owner: Data House and Listing
   documentation:
     dag_purpose: |
       Creates enriched tables for the context `Listing` of EBDB.

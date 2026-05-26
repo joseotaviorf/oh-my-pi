@@ -2,7 +2,7 @@ database_name: dw_sale
 table_name: dim_listing
 description: This table contains the information of all the listings we have had in QuintoAndar ForSale. It shows the current information of features such as price, status, consultant type, etc.
   It also shows whether the listing is a primary market listing, or a migration listing. Each row represents a different listing.
-domain: For Sale
+domain: House and Listing
 owner: data-for-sale@quintoandar.com.br
 columns:
   sk_sale_listing:

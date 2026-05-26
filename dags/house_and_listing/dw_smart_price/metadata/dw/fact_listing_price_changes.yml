@@ -1,7 +1,7 @@
 database_name: dw_quintoandar
 table_name: fact_listing_price_changes
 description: fact table containing each linsting price change
-domain: For Rent
+domain: House and Listing
 owner: pedro.domingos@quintoandar.com.br
 columns:
   sk_smart_price:

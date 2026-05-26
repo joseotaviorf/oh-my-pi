@@ -3,7 +3,7 @@ database_name: datalake_ebdb_listing
 table_name: house_listing_early_demand
 description: Information related to ForRent listings. Each line is an unique listing
   with early demand information.
-domain: For Rent
+domain: House and Listing
 owner: jonas.fiorini@quintoandar.com.br
 columns:
   country_code:

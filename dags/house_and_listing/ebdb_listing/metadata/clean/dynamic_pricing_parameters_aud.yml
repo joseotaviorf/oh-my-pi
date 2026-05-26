@@ -1,6 +1,6 @@
 database_name: datalake_ebdb_clean
 table_name: dynamic_pricing_parameters_aud
-domain: For Rent
+domain: House and Listing
 description: Audit table containing the history of changes for dynamic pricing parameters records.
 columns:
   id:

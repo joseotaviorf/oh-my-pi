@@ -3,7 +3,7 @@ database_name: datalake_ebdb_house
 table_name: maintenance_condition_history
 description: Table showing the history of changes in the conservation condition of the house. 
     Each row is a status for a property in a certain period of time (when is_last_condition is true, it becomes one row per house)
-domain: Cross
+domain: House and Listing
 owner: guilherme.ventura@quintoandar.com.br
 columns:
   id_house:

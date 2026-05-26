@@ -3,7 +3,7 @@ table_name: business_context_history
 description: Information about listing's status and suspension_reason. Each line has
   the initial and final date where a house had a specific status and suspension_reason
   in listing_business_context_aud table.
-domain: For Rent
+domain: House and Listing
 owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_house:

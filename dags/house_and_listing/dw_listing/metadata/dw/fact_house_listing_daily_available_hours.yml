@@ -3,7 +3,7 @@ table_name: fact_house_listing_daily_available_hours
 description: Daily available hours of house listings whose latest status of the day is published. Each row is a listing
   related to a house on a specific date and the most recent available hours for that date. The sk_house_listing is not
   unique in this table, but the sk_house_listing_date is unique. This column is the concatenation of sk_house_listing + sk_date.
-domain: For Rent
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   sk_house_listing_date:

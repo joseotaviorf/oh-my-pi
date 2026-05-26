@@ -3,7 +3,7 @@ database_name: metric_rent
 table_name: new_first_listings_daily
 description: Table to count new first listings on a daily basis. Here, we use the
   event milestone registered on the table fact_house_listing_flows - sk_first_listing_date.
-domain: For Rent
+domain: House and Listing
 owner: kleber.inoue@quintoandar.com.br
 columns:
   day:

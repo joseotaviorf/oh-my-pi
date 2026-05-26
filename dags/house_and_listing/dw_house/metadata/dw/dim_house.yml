@@ -1,7 +1,7 @@
 database_name: dw_house
 table_name: dim_house
 description: Table that contains the information about the house. Each row in this table is a house in QuintoAndar.
-domain: For Rent
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   address:

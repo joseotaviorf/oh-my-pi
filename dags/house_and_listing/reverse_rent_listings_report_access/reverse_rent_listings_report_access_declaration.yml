@@ -1,7 +1,7 @@
 dag:
   name: reverse_rent_listings_report_access
   schedule_start_date: 2022,7,12
-  owner: Data ForSale
+  owner: Data House and Listing
   documentation:
     dag_purpose: This DAG collects data saved in the schema "reverse_listings_report" by the DAG reverse_rent_listings_report_load, and sends them via SNS.
 workflow:

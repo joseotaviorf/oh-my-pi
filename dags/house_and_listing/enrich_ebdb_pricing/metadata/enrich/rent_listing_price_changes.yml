@@ -4,7 +4,7 @@ table_name: rent_listing_price_changes
 description: Enrich table that handles the rental price change information and enriches it with some comparison columns and pricing scheme information, as well as calculator and status information. 
   Where, each row represents a valid price exchange for the listing. By valid, we mean that we only keep the information from the last price change of the day when there was a price change 
   (if the rental price of this change is different from the first price of the day. If not, it will not count as a price change).
-domain: For Rent
+domain: House and Listing
 owner: guilherme.ventura@quintoandar.com.br
 columns:
   id_house: 

@@ -3,7 +3,7 @@ table_name: house_listing_relation
 description:
   This table manages the relationship between physical properties (houses) and their business configurations (listings),
   tracking how properties are connected to different listing contexts and external systems.
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   id:

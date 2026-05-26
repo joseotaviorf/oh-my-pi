@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: house_price_suggestion_historical
 owner: bruna.prates@quintoandar.com.br
-domain: For Sale
+domain: House and Listing
 description: >
   Tracks changes in price suggestion fields from HousePriceSuggestion table.
   Each row represents a change, identified by composite key (id, id_cdc_transaction).

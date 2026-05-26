@@ -3,7 +3,7 @@ database_name: dw_rent
 table_name: dim_house_status
 description: Information related to house status. Each line is an unique status
   related to a house. The SK of this table is created by our pipeline and does not come from product databases.
-domain: For Rent
+domain: House and Listing
 owner: kleber.inoue@quintoandar.com.br
 columns:
   sk_house_status:

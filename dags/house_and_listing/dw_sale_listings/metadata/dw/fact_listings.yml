@@ -3,7 +3,7 @@ table_name: fact_listings
 description: "This table shows us the publication information and metrics of a listing. We can find information such as region, price, owner, publication information, number of days between first events. 
   Where each row is a different listing. Listings might not be published any longer or even not having been published at all. Currently we don't have a very complex versioning of a listing, just versioning it if it is published.
   More infos (https://docs.google.com/presentation/d/15L6waXFmhbG8hf7bjnMsu1UcSAE3sQw5PtpH5bOn6mE/edit#slide=id.g1de71583189_0_0)'"
-domain: For Sale
+domain: House and Listing
 owner: data-for-sale@quintoandar.com.br
 columns:
   sk_sale_listing:

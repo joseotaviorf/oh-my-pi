@@ -4,7 +4,7 @@ description: >
   Fact table with one row per price change (sk_pricing), enriched with the prediction
   and suggestion that were active during the price validity window.
   sk_price_predicted and sk_price_suggested default to -1 when no matching record exists.
-domain: Cross
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   sk_pricing:

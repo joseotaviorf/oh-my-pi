@@ -2,7 +2,7 @@ database_name: datalake_sale_listings_lenses
 table_name: sellability_lens
 description: 'An enrich table that has the purpose of creating ranking tiers of ForSale listings, where we can understand the level of sellability of a listing.. With this, we will abstract a lot of the analysis.
   Given the typology by the listing and the fluctuation of QuintoAndar sellability factors, it can transition between tiers, and when the tier is changed, it creates a new row in the table, with the new tier.'
-domain: For Sale
+domain: House and Listing
 owner: data-for-sale@quintoandar.com.br
 columns:
   id_house:

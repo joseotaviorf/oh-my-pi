@@ -2,7 +2,7 @@
 database_name: metric_rent
 table_name: ongoing_listings_weekly
 description: Weekly table that has the amount of listings with status published at the last day of the week.
-domain: For Rent
+domain: House and Listing
 owner: kleber.inoue@quintoandar.com.br
 columns:
   week:

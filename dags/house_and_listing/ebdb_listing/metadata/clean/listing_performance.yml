@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: listing_performance
 description: Table related to the Performance & Score project, which brings information about the Demand Score, created by the OwnerXP team.
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   id:

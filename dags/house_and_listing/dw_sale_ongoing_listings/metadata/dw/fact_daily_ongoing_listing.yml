@@ -7,7 +7,7 @@ description: 'Every row of this table is a snapshot of one sale ongoing listing 
   if you add up the metrics from this table such as visit booked or visit completed, they might not be equal to the total that actually happened. This
   is because some events happen when the listing is unpublished, so the rows will not appear in this table. To see all ForSale demand events, please use
   the table dw_sale.fact_sale_demand_event.'
-domain: For Sale
+domain: House and Listing
 owner: gustavo.miller@quintoandar.com.br
 columns:
   sk_snapshot:

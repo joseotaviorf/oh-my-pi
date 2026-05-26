@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_listing
 table_name: listing_business_context
 description: Each row is a house associated with a business context (SALE or RENT)
-domain: For Rent
+domain: House and Listing
 owner: jonas.fiorini@quintoandar.com.br
 columns:
   id:

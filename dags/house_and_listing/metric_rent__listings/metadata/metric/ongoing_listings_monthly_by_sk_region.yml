@@ -2,7 +2,7 @@
 database_name: metric_rent
 table_name: ongoing_listings_monthly_by_sk_region
 description: Monthly table that has the amount of listings with status published at the last day of the month segmented by sk_region.
-domain: For Rent
+domain: House and Listing
 owner: kleber.inoue@quintoandar.com.br
 columns:
   month_start:

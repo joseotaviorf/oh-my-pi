@@ -1,7 +1,7 @@
 database_name: dw_listing
 table_name: fact_price_predicted
 description: This fact table consolidates all the prices predicted by the calculator to a house listing.
-domain: Cross
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   sk_price_predicted:

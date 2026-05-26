@@ -3,7 +3,7 @@ table_name: listing_business_context_aud
 description: Audit table tracking historical changes to listing business context records. This table captures all modifications
   to house listings configuration, status and business context over time, enabling change tracking, compliance, and historical analysis.
   Each record represents a specific revision of a listing business context entry.
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   id_listing_business_context:

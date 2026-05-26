@@ -3,7 +3,7 @@ table_name: fact_listing_status
 description: This table keeps track of every status change of For Sale listings. 
   Therefore, a listing can have multiple rows in this table, one for each status change, with its start and end date (if any). 
   An example would be the first row of a listing where the first status is editing (pre-publication) and the second is published (post-publication).
-domain: For Sale
+domain: House and Listing
 owner: data-for-sale@quintoandar.com.br
 columns:
   sk_sale_listing:

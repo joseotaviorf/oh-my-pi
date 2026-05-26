@@ -2,7 +2,7 @@
 database_name: datalake_sale_listings
 table_name: sale_status_version_order
 description: Table with the publication versioning for all ForSale listings. Used to track the status changes of a listing within the platform. At each status change, a new row will be created for that listing.
-domain: For Sale
+domain: House and Listing
 owner: data-for-sale@quintoandar.com.br
 columns:
   id_house:

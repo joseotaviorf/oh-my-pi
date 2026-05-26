@@ -1,7 +1,7 @@
 dag:
   name: enrich_similarity_score
   schedule_start_date: 2025, 5, 1
-  owner: Data ForSale
+  owner: Data House and Listing
   documentation:
     dag_purpose: This DAG creates enriched tables for house score, calculated based on the similarity between houses.
 workflow:

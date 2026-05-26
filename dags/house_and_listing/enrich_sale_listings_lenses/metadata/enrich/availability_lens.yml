@@ -3,7 +3,7 @@ table_name: availability_lens
 description: 'An enrich table that has the purpose of showing the level of availability for a listings visit based on some factors that directly impact this aspect.
   With this, we can abstract a lot of analysis and understand exactly why the liquidity of a listing is low.
   For this table, factors such as location of the key, hours available for the visit, if the listing is on a rent contract, visits cancelled by the owner, etc. If any of these factors change and alter the tier of a listing, it will create a new row in the table.'
-domain: For Sale
+domain: House and Listing
 owner: data-for-sale@quintoandar.com.br
 columns:
   id_house:

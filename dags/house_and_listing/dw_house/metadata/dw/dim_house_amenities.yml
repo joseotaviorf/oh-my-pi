@@ -1,7 +1,7 @@
 database_name: dw_house
 table_name: dim_house_amenities
 description: Information about house amenities. Each line has all the most recent amenities of a house.
-domain: For Rent
+domain: House and Listing
 owner: jonas.fiorini@quintoandar.com.br
 columns:
   sk_house:

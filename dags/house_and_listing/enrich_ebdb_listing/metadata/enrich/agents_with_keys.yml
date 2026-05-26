@@ -1,8 +1,8 @@
 ---
 database_name: datalake_ebdb_listing
 table_name: agents_with_keys
-description: Information related to Agents. Information  about key location, agents and listings.
-domain: For Rent
+description: Information related to Agents. Information about key location, agents and listings.
+domain: House and Listing
 owner: gustavo.geiger@quintoandar.com.br
 columns:
   id_agent:

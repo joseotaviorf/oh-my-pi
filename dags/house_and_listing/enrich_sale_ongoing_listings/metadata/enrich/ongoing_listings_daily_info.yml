@@ -4,7 +4,7 @@ table_name: ongoing_listings_daily_info
 description: Every row of this table is a snapshot of one sale ongoing listing per day. If it had the status="PUBLISHED" at that day, no matter
   for how long, it will appear here, along with some metrics such as search, listing page viewed, visit booked, and other demand data.
   DO NOT PERFORM HISTORICAL REPROCESSING PRIOR TO JUNE 15, 2025. Data before this date was obtained through the fact table, whose code is not the same.
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   id_snapshot:

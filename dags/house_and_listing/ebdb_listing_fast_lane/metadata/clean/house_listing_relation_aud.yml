@@ -3,7 +3,7 @@ table_name: house_listing_relation_aud
 description: Audit table tracking historical changes to house-listing relationship records. This table captures all modifications
   to the connections between houses and their listing business contexts over time, enabling change tracking, compliance, and historical
   analysis of property-to-listing mappings. Each record represents a specific revision of a house-listing relationship entry.
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   id_house_listing_relation:

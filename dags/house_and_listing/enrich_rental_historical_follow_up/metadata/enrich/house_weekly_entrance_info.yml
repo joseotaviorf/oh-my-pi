@@ -1,7 +1,7 @@
 database_name: datalake_rental_historical_follow_up
 table_name: house_weekly_entrance_info
 description: Every line is a week for a property with entry history information.
-domain: For Rent
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   id_house:

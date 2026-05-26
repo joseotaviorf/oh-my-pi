@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_listing
 table_name: lbc_status_version_order
 description: Information related to ForRent listings. Each line represent a state of a house in time and identify the states that should trigger a new listing version.
-domain: For Rent
+domain: House and Listing
 owner: jonas.fiorini@quintoandar.com.br
 columns:
   id_house_rev:

@@ -2,7 +2,7 @@ database_name: datalake_ebdb_listing
 table_name: house_listing_fees
 description: Information related to ForRent listings. Each line is an unique listing
   with the information about the administration fee.
-domain: For Rent
+domain: House and Listing
 owner: kleber.inoue@quintoandar.com.br
 columns:
   id_house_listing:

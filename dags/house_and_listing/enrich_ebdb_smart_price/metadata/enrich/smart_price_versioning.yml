@@ -3,7 +3,7 @@ table_name: smart_price_versioning
 description: Information about smart price status for each listing.
   Each row represents a listing and a dynamic price id with its corresponding status and
   timestamps of start and finish.
-domain: For Rent
+domain: House and Listing
 owner: gustavo.alencar@quintoandar.com.br
 columns:
   id_smart_price:

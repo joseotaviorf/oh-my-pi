@@ -2,7 +2,7 @@
 database_name: dw_house
 table_name: fact_house_information_filling
 description: Every time a particular information changes, such as a house or condo amenity, a new row is inserted in this table.
-domain: For Sale
+domain: House and Listing
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_house_information_change:

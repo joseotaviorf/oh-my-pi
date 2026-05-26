@@ -1,7 +1,7 @@
 database_name: datalake_similarity_score
 table_name: similar_houses
 owner: bruna.prates@quintoandar.com.br
-domain: For Sale
+domain: House and Listing
 description: Enrich table that contains a "base" house and its daily list of similar houses, for both Rent and Sale.
     A "base" house will only appear if it has been published for, at least, one day. The similar houses list is generated
     based in specific rules applied in the SQL code. Each row of this table is a "base" house and its list of similar

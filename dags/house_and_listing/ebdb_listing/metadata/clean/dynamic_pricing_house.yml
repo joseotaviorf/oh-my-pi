@@ -1,6 +1,6 @@
 database_name: datalake_ebdb_clean
 table_name: dynamic_pricing_house
-domain: For Rent
+domain: House and Listing
 description: Table containing dynamic pricing configuration for rental properties.
 columns:
   id:

@@ -3,7 +3,7 @@ table_name: new_first_listings_weekly
 description:
   Table to count new first listings on a weekly basis. Here, we use the
   event milestone registered on the table fact_house_listing_flows - sk_first_listing_date.
-domain: For Rent
+domain: House and Listing
 owner: data-for-rent@quintoandar.com.br
 columns:
   week:

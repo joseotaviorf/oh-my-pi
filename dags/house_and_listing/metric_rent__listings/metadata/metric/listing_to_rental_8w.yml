@@ -2,7 +2,7 @@
 database_name: metric_rent
 table_name: listing_to_rental_8w
 description: Weekly metric of listings with signed contract within 8 weeks after publication.
-domain: For Rent
+domain: House and Listing
 owner: marcus.pinto@quintoandar.com.br
 columns:
   dt_week_started:

@@ -7,7 +7,7 @@ description: Number of the listings in a week segmented by sk_region which
   related to the publication date. The filter for Days Published
   to Contract Signed uses the less or equal sign to calculate the conversion time.
   If multiplied by 100 we get the percentage of this metric.
-domain: For Rent
+domain: House and Listing
 owner: kleber.inoue@quintoandar.com.br
 columns:
   publication_week:

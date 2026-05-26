@@ -3,7 +3,7 @@ table_name: house_listings_daily_info
 description: Enriched table for store the last status of the day of the last house's listing and other
   historical informations like CIQ, entrance, and who is living.
   Due to Early Demand and corner cases, duplicated houses, but with different listings are expect in this table for the same reference date (dt_day column).
-domain: For Rent
+domain: House and Listing
 owner: data-for-rent@quintoandar.com.br
 columns:
   id_house_listing_day:

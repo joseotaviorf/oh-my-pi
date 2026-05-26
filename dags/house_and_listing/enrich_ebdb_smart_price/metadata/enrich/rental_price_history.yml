@@ -3,7 +3,7 @@ database_name: datalake_ebdb_smart_price
 table_name: rental_price_history
 description:
   Enrich table that contains the rental cost change history of rental properties. Each row is a change in rental cost for a property.
-domain: For Rent
+domain: House and Listing
 owner: matheus.baroni@quintoandar.com.br
 columns:
   id_house:

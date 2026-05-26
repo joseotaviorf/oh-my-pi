@@ -1,7 +1,7 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: listing_rent_model_aud
-domain: For Rent
+domain: House and Listing
 description: Audit table containing the history of changes for listing rent model records.
 columns:
   id:

@@ -4,7 +4,7 @@ table_name: dim_house_information
 description: Each row corresponds to a combination of a house information category and possible value it might assume. For example,
   "PISCINA" + "TRUE" is a valid row, same as  "PISCINA" + "FALSE" or ""PISCINA" + "Unknown". For now, it includes house and
   condo amenities.
-domain: For Sale
+domain: House and Listing
 owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_information:

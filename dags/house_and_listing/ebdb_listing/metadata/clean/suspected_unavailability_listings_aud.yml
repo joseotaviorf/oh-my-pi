@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: suspected_unavailability_listings_aud
 description: Audit table for all HSM submissions of sanitization of ongoing listings. This HSM consists in sending a message via Whatsapp to listings potentially unavailable for the visit in ForSale. Each row is a different send .
-domain: For Sale
+domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
   id:

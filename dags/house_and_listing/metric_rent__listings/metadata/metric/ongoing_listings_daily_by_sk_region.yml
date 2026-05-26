@@ -2,7 +2,7 @@
 database_name: metric_rent
 table_name: ongoing_listings_daily_by_sk_region
 description: Daily table that has the amount of listings with status published segmented by sk_region.
-domain: For Rent
+domain: House and Listing
 owner: kleber.inoue@quintoandar.com.br
 columns:
   date:

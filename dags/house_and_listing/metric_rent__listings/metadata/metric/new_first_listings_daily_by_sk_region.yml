@@ -4,7 +4,7 @@ description: Table to count new first listings on a daily basis segmented by sk_
   event milestone registered on the table fact_house_listing_flows - sk_first_listing_date.
   In addition, we have the region dimension embedded here on the column sk_region
   to segment this metric.
-domain: For Rent
+domain: House and Listing
 owner: data-for-rent@quintoandar.com.br
 columns:
   first_listing_date:

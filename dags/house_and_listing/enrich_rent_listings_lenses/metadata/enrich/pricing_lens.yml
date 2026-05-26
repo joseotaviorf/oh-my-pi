@@ -2,7 +2,7 @@ database_name: datalake_rent_listings_lenses
 table_name: pricing_lens
 description: This table contains the lens information regarding Listing pricing. Each tier is a pricing status, and each pricing status can have several price changes in the same status, if it doesn't leave the same tier..
   This tier is assembled based on the owner pricing relative to the price from QuintoAndar For Rent calculator (Casio).
-domain: For Rent
+domain: House and Listing
 owner: guilherme.ventura@quintoandar.com.br
 columns:
   id_house:

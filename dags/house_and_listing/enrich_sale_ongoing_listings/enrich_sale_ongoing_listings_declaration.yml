@@ -2,7 +2,7 @@
 dag:
   name: enrich_sale_ongoing_listings
   schedule_start_date: 2021, 1, 1
-  owner: Data ForSale
+  owner: Data House and Listing
   documentation:
     dag_purpose: This DAG uploads a periodic snapshot table about ForSale ongoing listings.
       DO NOT PERFORM HISTORICAL REPROCESSING PRIOR TO JUNE 15, 2025. Data before this date was obtained through the fact table,

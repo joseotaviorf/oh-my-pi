@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: house_enrichment
 owner: gustavo.miller@quintoandar.com.br
-domain: Rede
+domain: House and Listing
 description: The enrichment service is responsible for enriching house information, especially amenities, using Vespúcio as source. These are the houses that were or will be enriched.
 columns:
   id:
