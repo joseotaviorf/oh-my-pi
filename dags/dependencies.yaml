@@ -4750,11 +4750,12 @@ bietlejuice.reverse_kyc:
 bietlejuice.reverse_listing_quality_access:
   - bietlejuice.reverse_listing_quality_load:load-reverse-listing-quality:first-run-of-day
 bietlejuice.reverse_listing_quality_load:
-  - bietlejuice.dw_kodak:load-dw-public-fact-kodak-image-inspection:first-run-of-day
   - bietlejuice.dw_supply:load-dw-growth-obt-supply:first-run-of-day
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_photo_job_fast_lane:load-clean-photographer-job:first-run-of-day
   - bietlejuice.kodak:load-clean-group-analysis:first-run-of-day
+  - bietlejuice.kodak:load-clean-image-inspection-group:first-run-of-day
+  - bietlejuice.kodak:load-clean-image-inspection:first-run-of-day
   - bietlejuice.kodak:load-clean-video:first-run-of-day
 bietlejuice.reverse_listings_locations_access:
   - bietlejuice.reverse_listings_locations_load:load-reverse-listings-locations:first-run-of-day

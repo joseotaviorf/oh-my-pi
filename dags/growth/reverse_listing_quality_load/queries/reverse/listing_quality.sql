@@ -107,12 +107,44 @@ WITH
 GROUP BY a.id_house, a.id_job, a.ts_photos_uploaded, e.bathrooms, e.bedrooms, e.type, e.internal_admin_info
     ), -- reune as informações dos imóveis como quantidade de quartos e banheiros (informados pelo pp), a descrição do im, informação interna vindo do admin, contagem de vídeos por imóvel, dados do fotógrado e do proprietário
 
+    -- Core join kodak clean tables
+    kodak_inspection_houses AS (
+        SELECT
+            id,
+            id_external
+        FROM
+            datalake_ebdb_clean.house
+        WHERE
+            id_external IS NOT NULL
+        QUALIFY
+            ROW_NUMBER() OVER(PARTITION BY id_external ORDER BY dt_creation) = 1
+    ),
+    fact_kodak_image_inspection_inline AS (
+        SELECT
+            im.id AS sk_image_inspection,
+            im.id_group,
+            h.id AS id_house,
+            im.house_place,
+            im.room_type,
+            ig.property_condition,
+            im.ts_created
+        FROM
+            datalake_kodak_clean.image_inspection AS im
+        INNER JOIN
+            datalake_kodak_clean.image_inspection_group AS ig
+                ON ig.id = im.id_group
+        LEFT JOIN
+            kodak_inspection_houses AS h
+            ON (ig.external_domain = 'LEAD3P' AND ig.id_external_domain = h.id_external
+                OR ig.external_domain != 'LEAD3P' AND ig.id_external_domain = h.id)
+    ),
 
     last_inspection AS (
         SELECT
             id_house,
             MAX(id_group) AS last_id_group
-        FROM dw_public.fact_kodak_image_inspection
+        FROM
+                fact_kodak_image_inspection_inline
         GROUP BY id_house
     ), -- id_group mais recente para cada id_house inspecionado (que passou pelo restb)
 
@@ -124,9 +156,11 @@ GROUP BY a.id_house, a.id_job, a.ts_photos_uploaded, e.bathrooms, e.bedrooms, e.
             b.room_type,
             b.sk_image_inspection,
             b.ts_created AS inspection_restb
-        FROM last_inspection a
-            LEFT JOIN dw_public.fact_kodak_image_inspection b
-        ON a.last_id_group = b.id_group
+        FROM
+            last_inspection AS a
+        LEFT JOIN
+            fact_kodak_image_inspection_inline AS b
+            ON a.last_id_group = b.id_group
             AND b.house_place = 'INTERNAL'
     ), -- ids das imagens inspecionadas identificadas como de ambiente interno, seu respectivo cômodo identificado, e o score (property_condition) do im, de acordo com o id_group mais recente de cada imóvel inspecionado pelo restb
 
