@@ -1,7 +1,7 @@
 dag:
   name: hub_services_fast_lane
   schedule_start_date: 2026, 4, 1
-  schedule_interval: 0 20,0,7,11 * * *
+  schedule_interval: 0 0,6,10,14,20 * * *
   owner: Data Agents
   documentation:
     dag_purpose: |
