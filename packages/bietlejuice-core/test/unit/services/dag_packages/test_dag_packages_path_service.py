@@ -401,3 +401,19 @@ class TestDAGPackagesPathService:
 
         # assert — resolved to the Volume-mounted path
         assert result == path.join(dags_root, "people", "oitchau_api")
+
+    @mock.patch.object(DAGPackagesPathService, "generate_artifact_file_path")
+    def test_resolve_artifact_file_path_checks_all_extensions(
+        self, mock_generate, tmp_path
+    ):
+        base_path = tmp_path / "dags" / "my_dag" / "my_dag_cluster"
+        base_path.parent.mkdir(parents=True)
+        yaml_path = base_path.with_suffix(".yaml")
+        yaml_path.write_text("cluster:\n  type: test\n", encoding="utf-8")
+        mock_generate.return_value = str(base_path)
+
+        resolved = DAGPackagesPathService.resolve_artifact_file_path(
+            artifact_type="dag_cluster", dag_name="my_dag"
+        )
+
+        assert resolved == str(yaml_path)

@@ -12,8 +12,8 @@ BI_ETL_EJUICE_ROOT = os.path.dirname(
 )
 sys.path.append(BI_ETL_EJUICE_ROOT)
 
-from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_declaration_validator import (
-    DAGDeclarationValidator,
+from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser import (
+    DAGYamlParser,
 )
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.services.file_service import FileService
@@ -34,19 +34,26 @@ def dag_python_file_exists(dag_declaration_file_path):
             )
 
 
+def _dag_name_from_declaration_path(dag_declaration_file_path: str) -> str:
+    basename = os.path.basename(dag_declaration_file_path)
+    for suffix in ("_declaration.yml", "_declaration.yaml"):
+        if basename.endswith(suffix):
+            return basename[: -len(suffix)]
+    raise ValueError(
+        f"Cannot parse dag_name from declaration path: {dag_declaration_file_path!r}"
+    )
+
+
 def validate_one_dag(dag_declaration_file_path: str):
     """
-    Validates a single DAG, by validating its DAG declaration YAML file structure
-    and the absence of the Python DAG file. Used for multiple concurrent validations
-    which share the same DAGDeclarationValidator object.
+    Validates a single DAG: declaration YAML, optional ``*_cluster.yml`` (or legacy
+    ``cluster`` in declaration), and the absence of a Python DAG file in the folder.
 
-    :param dag_declaration_file_path: Local dir where the DAG Delcaration file is placed
-    :type dag_declaration_file_path: str
+    :param dag_declaration_file_path: Path to the ``*_declaration.yml`` file.
     """
     logger.debug(f"Validating file '{dag_declaration_file_path}'")
-    dag_declaration = FileService.get_dict_from_yaml_file(dag_declaration_file_path)
-    # instantiate a fresh validator per file to ensure thread-safety
-    DAGDeclarationValidator().validate(dag_declaration=dag_declaration)
+    dag_name = _dag_name_from_declaration_path(dag_declaration_file_path)
+    DAGYamlParser(dag_name=dag_name).dag_declaration()
     dag_python_file_exists(dag_declaration_file_path)
     logger.debug(f"Successfully validated file '{dag_declaration_file_path}'")
 

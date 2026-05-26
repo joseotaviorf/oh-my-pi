@@ -47,6 +47,7 @@ class DAGPackagesPathService:
 
     __EXTENSIONS = {
         "dag_declaration": ["yml", "yaml"],
+        "dag_cluster": ["yml", "yaml"],
         "data_quality": ["yml", "yaml"],
         "metadata": ["yml", "yaml"],
         "configuration_file": ["yml", "yaml"],
@@ -54,10 +55,15 @@ class DAGPackagesPathService:
         "query": ["sql"],
     }
 
-    __FILE_SUFFIXES = {"dag_declaration": "_declaration", "configuration_file": "_conf"}
+    __FILE_SUFFIXES = {
+        "dag_declaration": "_declaration",
+        "dag_cluster": "_cluster",
+        "configuration_file": "_conf",
+    }
 
     __FILE_NAME_TEMPLATES = {
         "dag_declaration": "{dag_name}{file_suffix}",
+        "dag_cluster": "{dag_name}{file_suffix}",
         "data_quality": "{table_name}",
         "metadata": "{table_name}",
         "configuration_file": "{dag_name}{file_suffix}",
@@ -563,6 +569,25 @@ class DAGPackagesPathService:
             extensions_validation.append(path.isfile(file_path_ext))
 
         return any(extensions_validation)
+
+    @classmethod
+    def resolve_artifact_file_path(
+        cls, artifact_type: str, dag_name: str, layer: str = "", table_name: str = ""
+    ) -> str | None:
+        """
+        Returns the on-disk path for an artifact when it exists, checking all
+        supported extensions in ``__EXTENSIONS`` order.
+
+        :return: Resolved file path, or ``None`` when no matching file exists.
+        """
+        for ext in cls.__EXTENSIONS[artifact_type]:
+            file_path = cls.generate_artifact_file_path(
+                artifact_type, dag_name, layer, table_name, add_default_ext=False
+            )
+            file_path_ext = f"{file_path}.{ext}"
+            if path.isfile(file_path_ext):
+                return file_path_ext
+        return None
 
     @classmethod
     def generate_artifact_file_name(

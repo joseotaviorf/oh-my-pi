@@ -11,49 +11,6 @@ class TestDAGDeclarationValidator:
                 {
                     "workflow": {"type": "query", "layer": "dw"},
                     "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
-                    "cluster": {
-                        "type": "any_cluster_type",
-                        "access_control_list": {
-                            "group_name": "admins",
-                            "permission_level": "CAN_MANAGE",
-                        },
-                    },
-                },
-                does_not_raise(),
-            ),
-            (
-                {
-                    "workflow": {"type": "query", "layer": "dw"},
-                    "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
-                    "cluster": {
-                        "type": "any_cluster_type",
-                        "access_control_list": [
-                            {
-                                "group_name": "admins",
-                                "permission_level": "CAN_MANAGE",
-                            },
-                        ],
-                    },
-                },
-                does_not_raise(),
-            ),
-            (
-                {
-                    "workflow": {"type": "query", "layer": "dw"},
-                    "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
-                    "cluster": {
-                        "type": "any_cluster_type",
-                        "access_control_list": [
-                            {
-                                "group_name": "admins",
-                                "permission_level": "CAN_MANAGE",
-                            },
-                            {
-                                "group_name": "analytics-engineers",
-                                "permission_level": "CAN_ATTACH_TO",
-                            },
-                        ],
-                    },
                 },
                 does_not_raise(),
             ),
@@ -61,13 +18,6 @@ class TestDAGDeclarationValidator:
                 {
                     "workflow": {"type": "", "layer": ""},
                     "dag": {"name": "", "owner": ""},
-                    "cluster": {
-                        "type": "",
-                        "access_control_list": {
-                            "group_name": "",
-                            "permission_level": "",
-                        },
-                    },
                 },
                 pytest.raises(AssertionError),
             ),
@@ -75,13 +25,6 @@ class TestDAGDeclarationValidator:
                 {
                     "workflow": {},
                     "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
-                    "cluster": {
-                        "type": "any_cluster_type",
-                        "access_control_list": {
-                            "group_name": "admins",
-                            "permission_level": "CAN_MANAGE",
-                        },
-                    },
                 },
                 pytest.raises(AssertionError),
             ),
@@ -89,25 +32,10 @@ class TestDAGDeclarationValidator:
                 {
                     "workflow": {"type": "query", "layer": "dw"},
                     "dag": {},
-                    "cluster": {
-                        "type": "any_cluster_type",
-                        "access_control_list": {
-                            "group_name": "admins",
-                            "permission_level": "CAN_MANAGE",
-                        },
-                    },
                 },
                 pytest.raises(AssertionError),
             ),
-            (
-                {
-                    "workflow": {"type": "query", "layer": "dw"},
-                    "dag": {"name": "any_dag_name", "owner": "Data Engineering"},
-                    "cluster": {},
-                },
-                pytest.raises(AssertionError),
-            ),
-            ({"workflow": {}, "dag": {}, "cluster": {}}, pytest.raises(AssertionError)),
+            ({"workflow": {}, "dag": {}}, pytest.raises(AssertionError)),
         ],
     )
     def test_validate(self, dag_declaration_validator, dag_declaration, expectation):
@@ -142,13 +70,6 @@ class TestDAGDeclarationValidatorAPIIngestionWorkflow:
                 "authentication": {"strategy": "oauth2_client_credentials"},
                 "tables_customization": {"events": {"endpoint_path": "events"}},
             },
-            "cluster": {
-                "type": "test_cluster",
-                "access_control_list": {
-                    "group_name": "admins",
-                    "permission_level": "CAN_MANAGE",
-                },
-            },
         }
 
         dag_declaration_validator.validate(dag_declaration=dag_declaration)
@@ -172,13 +93,6 @@ class TestDAGDeclarationValidatorAPIIngestionWorkflow:
                 },
                 "tables_customization": {"events": {"endpoint_path": "events"}},
             },
-            "cluster": {
-                "type": "test_cluster",
-                "access_control_list": {
-                    "group_name": "admins",
-                    "permission_level": "CAN_MANAGE",
-                },
-            },
         }
 
         dag_declaration_validator.validate(dag_declaration=dag_declaration)
@@ -194,13 +108,6 @@ class TestDAGDeclarationValidatorAPIIngestionWorkflow:
                 "layer": "raw",
                 "authentication": {"strategy": "oauth2_client_credentials"},
                 "tables_customization": {"events": {"endpoint_path": "events"}},
-            },
-            "cluster": {
-                "type": "test_cluster",
-                "access_control_list": {
-                    "group_name": "admins",
-                    "permission_level": "CAN_MANAGE",
-                },
             },
         }
 
@@ -223,13 +130,6 @@ class TestDAGDeclarationValidatorAPIIngestionWorkflow:
                 "authentication": {"strategy": "oauth2_client_credentials"},
                 "tables_customization": {"events": {"endpoint_path": "events"}},
             },
-            "cluster": {
-                "type": "test_cluster",
-                "access_control_list": {
-                    "group_name": "admins",
-                    "permission_level": "CAN_MANAGE",
-                },
-            },
         }
 
         with pytest.raises(AssertionError):
@@ -248,13 +148,6 @@ class TestDAGDeclarationValidatorAPIIngestionWorkflow:
                 "authentication": {"strategy": "oauth2_client_credentials"},
                 "tables_customization": {"events": {"endpoint_path": "events"}},
             },
-            "cluster": {
-                "type": "test_cluster",
-                "access_control_list": {
-                    "group_name": "admins",
-                    "permission_level": "CAN_MANAGE",
-                },
-            },
         }
 
         with pytest.raises(AssertionError):
@@ -271,13 +164,6 @@ class TestDAGDeclarationValidatorAPIIngestionWorkflow:
                 "layer": "raw",
                 "api_base_url": "https://api.example.com/",
                 "tables_customization": {"events": {"endpoint_path": "events"}},
-            },
-            "cluster": {
-                "type": "test_cluster",
-                "access_control_list": {
-                    "group_name": "admins",
-                    "permission_level": "CAN_MANAGE",
-                },
             },
         }
 
@@ -300,13 +186,6 @@ class TestDAGDeclarationValidatorAPIIngestionWorkflow:
                 "authentication": {"strategy": "oauth2_client_credentials"},
                 "tables_customization": {"events": {}},
             },
-            "cluster": {
-                "type": "test_cluster",
-                "access_control_list": {
-                    "group_name": "admins",
-                    "permission_level": "CAN_MANAGE",
-                },
-            },
         }
 
         with pytest.raises(
@@ -327,13 +206,6 @@ class TestDAGDeclarationValidatorAPIIngestionWorkflow:
                 "api_base_url": "https://api.example.com/",
                 "authentication": {"strategy": "oauth2_client_credentials"},
                 "tables_customization": {"events": {"endpoint_path": "events"}},
-            },
-            "cluster": {
-                "type": "test_cluster",
-                "access_control_list": {
-                    "group_name": "admins",
-                    "permission_level": "CAN_MANAGE",
-                },
             },
         }
 
@@ -358,13 +230,6 @@ class TestDAGDeclarationValidatorAPIIngestionWorkflow:
                     "sessions": {"endpoint_path": "sessions"},
                 },
             },
-            "cluster": {
-                "type": "test_cluster",
-                "access_control_list": {
-                    "group_name": "admins",
-                    "permission_level": "CAN_MANAGE",
-                },
-            },
         }
 
         dag_declaration_validator.validate(dag_declaration=dag_declaration)
@@ -385,13 +250,6 @@ class TestDAGDeclarationValidatorAPIIngestionWorkflow:
                 "authentication": {"strategy": "oauth2_client_credentials"},
                 "tables_customization": {"events": {"endpoint_path": "events"}},
             },
-            "cluster": {
-                "type": "test_cluster",
-                "access_control_list": {
-                    "group_name": "admins",
-                    "permission_level": "CAN_MANAGE",
-                },
-            },
         }
 
         dag_declaration_validator.validate(dag_declaration=dag_declaration)
@@ -409,13 +267,6 @@ class TestDAGDeclarationValidatorAPIIngestionWorkflow:
                 "payload_column_name": "raw_payload",
                 "authentication": {"strategy": "oauth2_client_credentials"},
                 "tables_customization": {"events": {"endpoint_path": "events"}},
-            },
-            "cluster": {
-                "type": "test_cluster",
-                "access_control_list": {
-                    "group_name": "admins",
-                    "permission_level": "CAN_MANAGE",
-                },
             },
         }
 
@@ -435,13 +286,6 @@ class TestDAGDeclarationValidatorAPIIngestionWorkflow:
                 "api_base_url": "https://api.example.com/",
                 "authentication": {"strategy": "oauth2_client_credentials"},
                 "tables_customization": {"events": {"endpoint_path": "events"}},
-            },
-            "cluster": {
-                "type": "test_cluster",
-                "access_control_list": {
-                    "group_name": "admins",
-                    "permission_level": "CAN_MANAGE",
-                },
             },
         }
 
@@ -463,13 +307,6 @@ class TestDAGDeclarationValidatorAPIIngestionWorkflow:
                 "payload_column_name": "",
                 "authentication": {"strategy": "oauth2_client_credentials"},
                 "tables_customization": {"events": {"endpoint_path": "events"}},
-            },
-            "cluster": {
-                "type": "test_cluster",
-                "access_control_list": {
-                    "group_name": "admins",
-                    "permission_level": "CAN_MANAGE",
-                },
             },
         }
 
@@ -497,13 +334,6 @@ class TestDAGDeclarationValidatorIdExpansion:
                 "api_base_url": "https://api.example.com/",
                 "authentication": {"strategy": "oauth2_client_credentials"},
                 "tables_customization": {"hoursbank_totals": table_config},
-            },
-            "cluster": {
-                "type": "test_cluster",
-                "access_control_list": {
-                    "group_name": "admins",
-                    "permission_level": "CAN_MANAGE",
-                },
             },
         }
 
@@ -640,105 +470,3 @@ class TestDAGDeclarationValidatorIdExpansion:
         )
 
         dag_declaration_validator.validate(dag_declaration=declaration)
-
-
-class TestEmrClusterConfiguration:
-    @pytest.fixture
-    def dag_declaration_validator(self):
-        from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_declaration_validator import (
-            DAGDeclarationValidator,
-        )
-
-        return DAGDeclarationValidator()
-
-    def _base_declaration(self, cluster):
-        return {
-            "dag": {"name": "test_emr_dag", "owner": "Data Engineering"},
-            "workflow": {"type": "query_delta", "layer": "enrich"},
-            "cluster": cluster,
-        }
-
-    def test_emr_cluster_valid_task_split_passes(self, dag_declaration_validator):
-        declaration = self._base_declaration(
-            {
-                "type": "emr_7_12_med_general_cluster",
-                "custom_configurations": {
-                    "num_workers": 5,
-                    "num_task_workers": 3,
-                },
-            }
-        )
-        dag_declaration_validator.validate(dag_declaration=declaration)
-
-    def test_emr_cluster_custom_spark_version_valid_split_passes(
-        self, dag_declaration_validator
-    ):
-        declaration = self._base_declaration(
-            {
-                "type": "custom_cluster",
-                "custom_configurations": {
-                    "spark_version": "emr-7.12.0",
-                    "num_workers": 4,
-                    "num_task_workers": 2,
-                    "aws_attributes": {"task_availability": "ON_DEMAND"},
-                },
-            }
-        )
-        dag_declaration_validator.validate(dag_declaration=declaration)
-
-    def test_emr_cluster_num_task_workers_equals_num_workers_raises(
-        self, dag_declaration_validator
-    ):
-        declaration = self._base_declaration(
-            {
-                "type": "emr_7_12_med_general_cluster",
-                "custom_configurations": {
-                    "num_workers": 3,
-                    "num_task_workers": 3,
-                },
-            }
-        )
-        with pytest.raises(AssertionError, match="must be less than"):
-            dag_declaration_validator.validate(dag_declaration=declaration)
-
-    def test_databricks_cluster_num_task_workers_raises(
-        self, dag_declaration_validator
-    ):
-        declaration = self._base_declaration(
-            {
-                "type": "databricks_16_4_med_general_cluster",
-                "custom_configurations": {"num_task_workers": 1},
-            }
-        )
-        with pytest.raises(AssertionError, match="EMR-only cluster keys"):
-            dag_declaration_validator.validate(dag_declaration=declaration)
-
-    def test_databricks_cluster_task_availability_raises(
-        self, dag_declaration_validator
-    ):
-        declaration = self._base_declaration(
-            {
-                "type": "databricks_16_4_med_general_cluster",
-                "custom_configurations": {
-                    "aws_attributes": {"task_availability": "SPOT"},
-                },
-            }
-        )
-        with pytest.raises(AssertionError, match="EMR-only cluster keys"):
-            dag_declaration_validator.validate(dag_declaration=declaration)
-
-    def test_emr_cluster_invalid_task_availability_raises(
-        self, dag_declaration_validator
-    ):
-        declaration = self._base_declaration(
-            {
-                "type": "emr_7_12_med_general_cluster",
-                "custom_configurations": {
-                    "num_workers": 3,
-                    "num_task_workers": 1,
-                    "aws_attributes": {"task_availability": "SPOT_WITH_FALLBACK"},
-                },
-            }
-        )
-        with pytest.raises(AssertionError, match="task_availability"):
-            dag_declaration_validator.validate(dag_declaration=declaration)

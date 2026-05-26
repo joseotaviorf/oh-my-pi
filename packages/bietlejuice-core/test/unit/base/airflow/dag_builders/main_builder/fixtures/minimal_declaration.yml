@@ -1,0 +1,6 @@
+dag:
+  name: minimal
+  owner: Data Engineering
+workflow:
+  type: query
+  layer: dw
