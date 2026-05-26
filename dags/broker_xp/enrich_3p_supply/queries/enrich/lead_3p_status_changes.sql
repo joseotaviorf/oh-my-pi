@@ -83,7 +83,21 @@ SELECT
         st.status_reason)) >= 1
     THEN 'OWNER_INFO'
     WHEN CARDINALITY(ARRAY_INTERSECT(
-      ARRAY('incompleteLocation', 'numberOfSuitesGreaterThanBedroomsOrBathrooms', 'outHouseMinSize', 'numberOfRoomsNotValid', 'wrongIptuValue', 'oldUpdated', 'locationInformationMissing'),
+      ARRAY(
+        'incompleteLocation',
+        'numberOfSuitesGreaterThanBedroomsOrBathrooms',
+        'outHouseMinSize',
+        'numberOfRoomsNotValid',
+        'wrongIptuValue',
+        'oldUpdated',
+        'locationInformationMissing',
+        'unparseableAddressComplement',
+        'addressComplementStructMismatch',
+        'incompletelocation_street',
+        'incompletelocation_number',
+        'incompletelocation_complement',
+        'incompletelocation_zipcode'
+      ),
         st.status_reason)) >= 1
     THEN 'LISTING_INFO'
     WHEN SIZE(st.status_reason) > 0 THEN 'OTHER'

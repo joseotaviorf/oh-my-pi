@@ -129,6 +129,26 @@ columns:
     lineage:
       - datalake_3p_supply.lead_3p.tower
     description: Tower identifier from lead location data.
+  sale_recurrency_type:
+    lineage:
+      - datalake_3p_supply.broker_lead_relationship.recurrency_type
+    description: Classification of the SALE lead relative to the first lead sent after the partner's latest active contract start. Equals N/A when the lead has no SALE flow with a matching active contract.
+    categories:
+      FIRST_BATCH: Lead sent on the first batch after the partner's latest contract activation.
+      FIRST_MONTH_BATCH: Lead sent within 30 days after the first batch following the latest contract activation.
+      RECURRENT: Lead sent more than 30 days after the first batch following the latest contract activation.
+      COMPLEMENTARY: Lead sent before the first batch of the latest contract activation.
+      'N/A': Lead has no matching active contract for SALE.
+  rent_recurrency_type:
+    lineage:
+      - datalake_3p_supply.broker_lead_relationship.recurrency_type
+    description: Classification of the RENT lead relative to the first lead sent after the partner's latest active contract start. Equals N/A when the lead has no RENT flow with a matching active contract.
+    categories:
+      FIRST_BATCH: Lead sent on the first batch after the partner's latest contract activation.
+      FIRST_MONTH_BATCH: Lead sent within 30 days after the first batch following the latest contract activation.
+      RECURRENT: Lead sent more than 30 days after the first batch following the latest contract activation.
+      COMPLEMENTARY: Lead sent before the first batch of the latest contract activation.
+      'N/A': Lead has no matching active contract for RENT.
   is_out_of_area:
     lineage:
       - datalake_3p_supply.lead_3p.is_out_of_area

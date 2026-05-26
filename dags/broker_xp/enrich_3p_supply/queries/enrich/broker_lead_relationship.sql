@@ -39,37 +39,66 @@ leads_matched_to_latest_contract AS (
       ON partner.sk_broker = cb.sk_broker
       AND partner.business_context = lsc.business_context
       AND partner.ts_partner_contract_start <= lsc.ts_business_context_created
+),
+latest_contract_per_lead AS (
+  SELECT
+    lm.sk_lead_3p_flow,
+    lm.id_lead_3p,
+    lm.lead_hash,
+    lm.uuid_company,
+    lm.sk_broker,
+    lm.business_context,
+    lm.ts_business_context_created,
+    lm.ts_partner_contract_start,
+    MIN(lm.ts_business_context_created) OVER (
+      PARTITION BY lm.uuid_company, lm.business_context, lm.ts_partner_contract_start
+    ) AS ts_first_lead_after_activation
+  FROM
+    leads_matched_to_latest_contract AS lm
+  WHERE
+    lm.rn_contract = 1
 )
 SELECT
-  lm.sk_lead_3p_flow,
-  lm.id_lead_3p,
-  lm.business_context,
-  lm.sk_broker,
-  lm.ts_partner_contract_start,
-  lm.ts_business_context_created,
-  MIN(lm.ts_business_context_created) OVER (
-    PARTITION BY lm.lead_hash, lm.uuid_company, lm.business_context
+  lc.sk_lead_3p_flow,
+  lc.id_lead_3p,
+  lc.business_context,
+  lc.sk_broker,
+  lc.ts_partner_contract_start,
+  lc.ts_business_context_created,
+  MIN(lc.ts_business_context_created) OVER (
+    PARTITION BY lc.lead_hash, lc.uuid_company, lc.business_context
   ) AS ts_valid_first_lead,
-  MIN(lm.ts_business_context_created) OVER (
-    PARTITION BY lm.lead_hash, lm.uuid_company, lm.business_context, lm.ts_partner_contract_start
+  MIN(lc.ts_business_context_created) OVER (
+    PARTITION BY lc.lead_hash, lc.uuid_company, lc.business_context, lc.ts_partner_contract_start
   ) AS ts_current_valid_first_lead,
   CASE
-    WHEN lm.ts_business_context_created = MIN(lm.ts_business_context_created) OVER (
-        PARTITION BY lm.lead_hash, lm.uuid_company, lm.business_context
+    WHEN lc.ts_business_context_created = MIN(lc.ts_business_context_created) OVER (
+        PARTITION BY lc.lead_hash, lc.uuid_company, lc.business_context
       )
     THEN TRUE
     ELSE FALSE
   END AS is_valid_first_lead,
   CASE
-    WHEN lm.ts_partner_contract_start IS NOT NULL
-      AND lm.ts_business_context_created = MIN(lm.ts_business_context_created) OVER (
-        PARTITION BY lm.lead_hash, lm.uuid_company, lm.business_context, lm.ts_partner_contract_start
+    WHEN lc.ts_partner_contract_start IS NOT NULL
+      AND lc.ts_business_context_created = MIN(lc.ts_business_context_created) OVER (
+        PARTITION BY lc.lead_hash, lc.uuid_company, lc.business_context, lc.ts_partner_contract_start
       )
     THEN TRUE
     ELSE FALSE
   END AS is_current_valid_first_lead,
+  CASE
+    WHEN lc.ts_business_context_created IS NULL
+      OR lc.ts_first_lead_after_activation IS NULL
+    THEN 'N/A'
+    WHEN lc.ts_business_context_created = lc.ts_first_lead_after_activation
+    THEN 'FIRST_BATCH'
+    WHEN lc.ts_business_context_created BETWEEN lc.ts_first_lead_after_activation
+        AND lc.ts_first_lead_after_activation + INTERVAL 30 DAYS
+    THEN 'FIRST_MONTH_BATCH'
+    WHEN lc.ts_business_context_created < lc.ts_first_lead_after_activation
+    THEN 'COMPLEMENTARY'
+    ELSE 'RECURRENT'
+  END AS recurrency_type,
   CURRENT_TIMESTAMP() AS ts_load
 FROM
-  leads_matched_to_latest_contract AS lm
-WHERE
-  lm.rn_contract = 1
+  latest_contract_per_lead AS lc

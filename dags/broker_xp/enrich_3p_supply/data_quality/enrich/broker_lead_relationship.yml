@@ -24,6 +24,12 @@ column_level_validations:
     is_contained_in:
       values: ["SALE", "RENT", "SALE_PRIMARY_MARKET"]
       severity_level: Error
+  recurrency_type:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values: ["FIRST_BATCH", "FIRST_MONTH_BATCH", "RECURRENT", "COMPLEMENTARY", "N/A"]
+      severity_level: Error
   ts_load:
     is_complete:
       severity_level: Error

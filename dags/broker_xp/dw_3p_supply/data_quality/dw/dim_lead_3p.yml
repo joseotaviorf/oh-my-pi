@@ -14,6 +14,20 @@ column_level_validations:
   sk_house:
     is_complete:
       severity_level: Error
+  sale_recurrency_type:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+    is_contained_in:
+      values: ["FIRST_BATCH", "FIRST_MONTH_BATCH", "RECURRENT", "COMPLEMENTARY", "N/A"]
+      severity_level: Error
+  rent_recurrency_type:
+    has_null_count:
+      less_than_or_equal_to: 1
+      severity_level: Error
+    is_contained_in:
+      values: ["FIRST_BATCH", "FIRST_MONTH_BATCH", "RECURRENT", "COMPLEMENTARY", "N/A"]
+      severity_level: Error
   has_3p_access_control:
     is_complete:
       severity_level: Error
