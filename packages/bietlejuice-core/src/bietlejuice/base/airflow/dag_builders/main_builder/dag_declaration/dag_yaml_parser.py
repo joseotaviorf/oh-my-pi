@@ -1,3 +1,5 @@
+from typing import Optional, Tuple
+
 from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_cluster_validator import (
     DAGClusterValidator,
 )
@@ -15,7 +17,7 @@ class DAGYamlParser:
         self.__dag_name = dag_name
 
     @staticmethod
-    def _load_cluster_file(cluster_file_path: str) -> tuple[dict, dict | None]:
+    def _load_cluster_file(cluster_file_path: str) -> Tuple[dict, Optional[dict]]:
         cluster_doc = FileService.get_dict_from_yaml_file(cluster_file_path)
         if not isinstance(cluster_doc, dict):
             raise AssertionError(

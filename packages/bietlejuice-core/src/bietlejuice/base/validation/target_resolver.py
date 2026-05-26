@@ -1,3 +1,5 @@
+from typing import Optional
+
 from bietlejuice.base.db.datalake_metastore_mapping import DatalakeMetastoreMapping
 from bietlejuice.base.db.dw_metastore_mapping import DwMetastoreMapping
 from bietlejuice.base.db.metric_metastore_mapping import MetricMetastoreMapping
@@ -25,8 +27,8 @@ def get_prod_database_name(layer: LayerEnum, schema: str, bucket: str = "") -> s
 def managed_table_fqn(
     prod_database: str,
     prod_table: str,
-    target_database: str | None = None,
-    target_table: str | None = None,
+    target_database: Optional[str] = None,
+    target_table: Optional[str] = None,
 ) -> str:
     """Fully qualified table for privileges/row-filter side effects (prod or validation)."""
     if target_database and target_table:

@@ -2,7 +2,7 @@ import re
 from functools import lru_cache
 from glob import glob
 from os import path, scandir
-from typing import Dict, Set
+from typing import Dict, Optional, Set
 
 import boto3
 from hierarchical_conf.hierarchical_conf import HierarchicalConf
@@ -573,7 +573,7 @@ class DAGPackagesPathService:
     @classmethod
     def resolve_artifact_file_path(
         cls, artifact_type: str, dag_name: str, layer: str = "", table_name: str = ""
-    ) -> str | None:
+    ) -> Optional[str]:
         """
         Returns the on-disk path for an artifact when it exists, checking all
         supported extensions in ``__EXTENSIONS`` order.
