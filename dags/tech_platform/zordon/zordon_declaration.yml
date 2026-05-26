@@ -30,7 +30,3 @@ workflow:
       clean_table_name: oncall_work_hours
       raw_primary_keys: [id]
       clean_primary_keys: [id]
-cluster:
-  type: databricks_16_4_med_general_cluster
-  custom_configurations:
-      driver_node_type_id: m5a.2xlarge
