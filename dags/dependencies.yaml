@@ -2020,6 +2020,7 @@ bietlejuice.enrich_concierge_health_metrics:
   - bietlejuice.langfuse:load-clean-traces:first-run-of-day
   - bietlejuice.person:load-clean-contact-info:first-run-of-day
   - bietlejuice.person:load-clean-credential-reference:first-run-of-day
+  - bietlejuice.request_logging:load-clean-visits:first-run-of-day
   - bietlejuice.sauron:load-clean-session:first-run-of-day
 bietlejuice.enrich_concierge_ranking_metrics:
   - bietlejuice.amplitude_subpartitioned:load-clean-170698-listing-page-viewed-events:first-run-of-day

@@ -5,12 +5,14 @@ WITH concierge_direct_vb_code AS (
         c.concierge_flow_type,
         c.ts_concierge_contact,
         c.ts_message_sent,
-        regexp_extract(get_json_object(o.output, '$.answer'), 'Visit code ([A-Z0-9]+)', 1) AS visit_code
+        COALESCE(v.visit_code, regexp_extract(get_json_object(o.output, '$.answer'), 'Visit code ([A-Z0-9]+)', 1)) as visit_code
     FROM datalake_search.concierge_messages AS c
-    JOIN datalake_langfuse_clean.traces AS t
+    INNER JOIN datalake_langfuse_clean.traces AS t
         ON c.id_langfuse_session = t.id_session
-    JOIN datalake_langfuse_clean.observations AS o
+    INNER JOIN datalake_langfuse_clean.observations AS o
         ON t.id_trace = o.id_trace
+    LEFT JOIN datalake_request_logging_clean.visits as v
+        ON o.id_trace = v.id_trace
     WHERE o.name in('schedule_visit_node', 'schedule_visit_v1')
         AND c.ts_concierge_contact BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
