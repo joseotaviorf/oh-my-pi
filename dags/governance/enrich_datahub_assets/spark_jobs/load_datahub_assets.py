@@ -3,6 +3,7 @@ import ast
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from itertools import chain
+from typing import Optional
 
 from datahub.ingestion.graph.client import DatahubClientConfig, DataHubGraph
 from datahub.metadata.schema_classes import DatasetKeyClass, SchemaMetadataClass
@@ -77,7 +78,7 @@ def get_lineage_flags(datahub_client: DataHubGraph, urn: str) -> tuple[bool, boo
 MAX_WORKERS = 20
 
 
-def process_urn(datahub_client: DataHubGraph, urn: str) -> dict | None:
+def process_urn(datahub_client: DataHubGraph, urn: str) -> Optional[dict]:
     try:
         entity = datahub_client.get_entity_semityped(entity_urn=urn)
         dataset_aspect = entity.get(DatasetKeyClass.ASPECT_NAME)

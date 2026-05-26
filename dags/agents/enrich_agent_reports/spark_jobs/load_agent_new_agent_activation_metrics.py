@@ -738,7 +738,7 @@ def save_df(
 
 
 # DBTITLE 1,Main
-def main(args: Namespace | None = None) -> None:
+def main(args: Optional[Namespace] = None) -> None:
     if args is None:
         args = parse_args()
     logger.info(

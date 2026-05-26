@@ -55,14 +55,17 @@ python-version = "3.10"
 # ---------------------------------------------------------------------------
 [tool.ruff]
 line-length = 88
-target-version = "py310"
+target-version = "py39"
 extend-exclude = [".cursor"]
 # Databricks notebook / Spark job globals (injected at runtime, not imported).
 builtins = ["spark", "dbutils", "udf"]
 
 [tool.ruff.lint]
 select = ["E4", "E7", "E9", "F", "I", "UP"]
-ignore = ["UP006", "UP007", "UP035", "UP045"]  # DBR 10.4 compat: keep Optional, Union, List, Dict (UP007/UP045 need ≥3.10; UP006/UP035 need ≥3.9)
+ignore = ["UP006", "UP007", "UP035", "UP045"]  # EMR Python 3.9: keep Optional/Union/List/Dict; block PEP 604 (UP007/UP045 need >=3.10)
+
+[tool.ruff.lint.pyupgrade]
+keep-runtime-typing = true
 
 [tool.ruff.lint.per-file-ignores]
 "dags/**/*.py" = ["F403", "F405", "E712", "E722"]

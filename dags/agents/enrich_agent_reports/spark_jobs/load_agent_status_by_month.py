@@ -380,7 +380,7 @@ def _schema_mismatches(actual: StructType, expected: StructType) -> list[str]:
     actual_by_name = {f.name: f for f in actual.fields}
     expected_by_name = {f.name: f for f in expected.fields}
 
-    def msg(n: str) -> str | None:
+    def msg(n: str) -> Optional[str]:
         if n not in actual_by_name:
             return f"missing column: {n} (expected {expected_by_name[n].dataType.simpleString()})"
         if n not in expected_by_name:
@@ -475,7 +475,7 @@ def save_df(
 # COMMAND ----------
 
 
-def main(args: Namespace | None = None) -> None:
+def main(args: Optional[Namespace] = None) -> None:
     """Orchestrate ETL: build -> validate (not empty + schema) -> write."""
     if args is None:
         args = parse_args()

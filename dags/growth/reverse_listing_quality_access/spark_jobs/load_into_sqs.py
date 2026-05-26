@@ -6,7 +6,7 @@ Consumed by main-sqs-consumers application.
 import json
 import logging
 from argparse import ArgumentParser
-from typing import Any, Dict, Tuple, Type, TypeVar
+from typing import Any, Dict, Optional, Tuple, Type, TypeVar
 
 import boto3
 from quintoandar_logger import QuintoAndarLogger
@@ -21,7 +21,7 @@ logger = QuintoAndarLogger(JOB_NAME)
 T = TypeVar("T")
 
 
-def safe_cast(value: str | None, target_type: Type[T]) -> T | None:
+def safe_cast(value: Optional[str], target_type: Type[T]) -> Optional[T]:
     return target_type(value) if value is not None else None
 
 

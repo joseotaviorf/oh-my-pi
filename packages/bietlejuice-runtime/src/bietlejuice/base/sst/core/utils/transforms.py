@@ -1,3 +1,5 @@
+from typing import List, Optional, Union
+
 from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.sql import functions as F
 
@@ -9,7 +11,7 @@ from bietlejuice.base.sst.domains.salesforce.api.transform import (
 
 
 def nullify_fields_on_delete(
-    df: DataFrame, non_null_cols: list[str] | None = None
+    df: DataFrame, non_null_cols: Optional[List[str]] = None
 ) -> DataFrame:
     """
     Null out payload columns on DELETE rows while keeping key/metadata columns.
@@ -183,7 +185,7 @@ def get_rows_to_update(
 def apply_schema_remaps(
     spark: SparkSession,
     df: DataFrame,
-    target_table: str | DataFrame,
+    target_table: Union[str, DataFrame],
     accept_new_cols: bool = False,
 ) -> DataFrame:
     """

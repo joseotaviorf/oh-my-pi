@@ -552,6 +552,11 @@ check-style-dags:
 	@$(RUFF_UV) ruff format --check $(RUFF_DAGS_PATHS)
 	@$(RUFF_UV) ruff check $(RUFF_DAGS_PATHS)
 
+.PHONY: validate-py39-runtime-typing
+## Fail on PEP 604 type annotations unsafe at import time on EMR Python 3.9
+validate-py39-runtime-typing:
+	@python3 scripts/validate_py39_runtime_typing.py
+
 .PHONY: fix-style
 ## autofix lint issues on packages + compiler scripts (same scope as check-style)
 fix-style:

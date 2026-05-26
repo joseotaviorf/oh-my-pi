@@ -26,6 +26,15 @@ steps:
       event: [push, pull_request]
     depends_on: [setup]
 
+  validate-py39-runtime-typing:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - make validate-py39-runtime-typing
+    when:
+      event: [push, pull_request]
+    depends_on: [setup]
+
   files-validation-python:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true

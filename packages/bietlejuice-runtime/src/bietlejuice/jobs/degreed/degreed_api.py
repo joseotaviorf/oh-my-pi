@@ -2,6 +2,7 @@ import json
 import re
 import time
 from datetime import date, timedelta
+from typing import Optional
 
 import requests
 from pyspark.sql import SparkSession
@@ -199,8 +200,8 @@ class DegreedAPI:
         self,
         params: dict,
         auth_headers: dict,
-        start_date_override: date | None = None,
-        end_date_override: date | None = None,
+        start_date_override: Optional[date] = None,
+        end_date_override: Optional[date] = None,
     ) -> list:
         """
         Fetches all paginated data for a given set of URL parameters.
@@ -415,7 +416,7 @@ class DegreedAPI:
             )
         return all_results
 
-    def get_by_id(self, resource_id: str, index: int, total: int) -> dict | None:
+    def get_by_id(self, resource_id: str, index: int, total: int) -> Optional[dict]:
         """
         Fetches a single resource by ID from the API.
 

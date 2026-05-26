@@ -1,6 +1,7 @@
 import base64
 import json
 import time
+from typing import Optional
 
 import requests
 from quintoandar_logger import QuintoAndarLogger
@@ -62,7 +63,7 @@ class GreenhouseAPI:
         }
 
     def _make_request_with_rate_limit_handling(
-        self, url: str, params: dict | None = None
+        self, url: str, params: Optional[dict] = None
     ) -> requests.Response:
         """
         Executes a GET request to the API, handling rate limiting reactively.
@@ -118,7 +119,7 @@ class GreenhouseAPI:
         )
 
     @staticmethod
-    def _parse_next_link_from_header(headers: dict) -> str | None:
+    def _parse_next_link_from_header(headers: dict) -> Optional[str]:
         """Parses the 'Link' header from the response to find the next page URL."""
         link_header = headers.get("Link")
         if not link_header:

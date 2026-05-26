@@ -5,7 +5,8 @@ alwaysApply: false
 # Python Conventions — bietlejuice
 
 ## Formatting & Tooling
-- **Ruff** line length: **88** (format + lint). Python **>=3.10** (workspace packages: airflow, compiler) / **>=3.9** (core, runtime).
+- **Ruff** line length: **88** (format + lint), **`target-version = py39`** (EMR Python 3.9 floor). Workspace packages may declare higher `requires-python` (Airflow/compiler >=3.10), but Ruff uses the shared root config.
+- Do **not** use PEP 604 unions (`X | Y`) in EMR-deployed code unless the file has `from __future__ import annotations`; CI enforces this via `make validate-py39-runtime-typing`.
 - Run `make check-style` (packages + compiler scripts) and `make check-style-dags` (`dags/`) before committing when you touch the matching paths (both enforced in Woodpecker CI).
 
 ## Imports
