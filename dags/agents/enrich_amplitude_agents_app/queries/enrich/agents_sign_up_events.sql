@@ -30,10 +30,19 @@ WHERE
     MAKE_DATE(e.year, e.month, e.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND e.id_app IN (233592, 233591)
     AND e.event_type IN (
-      'submit_error_screen_viewed',
-      'pending_analysis_success_screen_viewed',
-      'welcome_screen_viewed',
-      'agent_pending_status_viewed',
-      'agent_inactive_status_viewed',
-      'partner_agent_active_status_viewed'
+        'submit_error_screen_viewed',
+        'pending_analysis_success_screen_viewed',
+        'welcome_screen_viewed',
+        'agent_pending_status_viewed',
+        'agent_inactive_status_viewed',
+        'partner_agent_active_status_viewed',
+        'start_registration_button_clicked',
+        'personal_data_screen_viewed',
+        'professional_data_screen_viewed',
+        'address_screen_viewed',
+        'bank_account_screen_viewed',
+        'business_context_screen_viewed',
+        'region_screen_viewed',
+        'document_screen_viewed',
+        'acquisition_channel_screen_viewed'
     )
