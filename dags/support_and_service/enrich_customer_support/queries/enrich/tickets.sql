@@ -77,6 +77,13 @@ incoming_tickets AS (
 ),
 -- The following CTEs are needed because a single call/chat can create multiple tickets.
 chat_tickets AS (
+  -- Restore the explicit channel='chat' filter that was implicit before PR #23798.
+  -- The previous JOIN by id_session naturally filtered out non-chat tickets
+  -- (web/email/etc have id_session IS NULL). After the JOIN was changed to
+  -- ch.id_task = it.twilio_task, non-chat tickets with a populated twilio_task
+  -- started matching here and getting consolidated under chat_tickets, which
+  -- then caused them to be dropped by MAX(id_ticket) in unique_twilio_tickets
+  -- whenever they collided with a real chat ticket sharing the same id_task.
   SELECT
     it.id_ticket,
     it.twilio_task AS id_task,
@@ -87,7 +94,9 @@ chat_tickets AS (
     datalake_customer_support.chats AS ch
       ON ch.id_task = it.twilio_task
       AND ch.ts_created >= DATE('{load_start_date}') - INTERVAL 1 MONTH
-  WHERE ch.id_task IS NOT NULL
+  WHERE
+    ch.id_task IS NOT NULL
+    AND it.channel = 'chat'
 ),
 call_tickets AS (
   SELECT
@@ -184,11 +193,10 @@ unique_tickets AS (
     t.id_call,
     COALESCE(ch.id_session, ca1.id_session, ca2.id_session, t.id_session) AS id_session,
     COALESCE(ch.id_sss_session, ca1.id_sss_session, ca2.id_sss_session) AS id_sss_session,
-    COALESCE(
-      FIRST(ch.id_task) OVER(PARTITION BY ch.id_session ORDER BY ch.ts_created DESC),
-      ca1.id_task,
-      ca2.id_call
-    ) AS id_twilio,
+    CASE
+      WHEN ut.channel = 'chat' THEN ch.id_task
+      WHEN ut.channel = 'call' THEN COALESCE(ca1.id_task, ca2.id_call)
+    END AS id_twilio,
     CASE
       WHEN ut.channel = 'chat' THEN ch.queue_name
       WHEN ut.channel = 'call' THEN COALESCE(ca1.queue_name, ca2.queue_name)
