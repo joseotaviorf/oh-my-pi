@@ -92,9 +92,9 @@ def _build_price_interval(
     Isolates genuine price changes for a single business context and adds
     ts_price_started / ts_price_ended boundaries.
 
-    Filters out NULL prices upfront so the lag is always computed on recorded
-    price values (including zero, which is a valid first price). Keeps rows
-    where the price differs from the previous one (or is the first).
+    Filters out NULL and negative prices upfront so the lag is always computed
+    on recorded price values (including zero, which is a valid first price).
+    Keeps rows where the price differs from the previous one (or is the first).
 
     business_context: 'RENT' or 'SALE'.
     price_col: source price column name ('rent_price' or 'sale_price').
@@ -105,6 +105,7 @@ def _build_price_interval(
         house_aud_df.filter(
             (F.col("business_context") == business_context)
             & F.col(price_col).isNotNull()
+            & (F.col(price_col) >= 0)
         )
         .select(
             "id_house",
