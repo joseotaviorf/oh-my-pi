@@ -118,7 +118,10 @@ SELECT
   sa.last_salary_increase_type,
   ROW_NUMBER() OVER (
     PARTITION BY im.id_person
-    ORDER BY CASE WHEN ed.assignment_type <> 'P' THEN ps.dt_started ELSE NULL END DESC NULLS LAST
+    ORDER BY
+      CASE WHEN ed.assignment_type = 'P' THEN 1 ELSE 0 END ASC,
+      ps.dt_started DESC NULLS LAST,
+      NULLIF(ps.dt_actual_termination, DATE('4712-12-31')) DESC NULLS FIRST
   ) = 1 AS is_last_valid_work_relationship,
   IF(ed.assignment_status_type = 'ACTIVE', TRUE, FALSE) AS is_active,
   IF(ed.assignment_type = 'P', TRUE, FALSE) AS is_pending_worker,
