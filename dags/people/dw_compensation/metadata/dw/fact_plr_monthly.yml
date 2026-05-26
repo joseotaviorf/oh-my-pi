@@ -80,27 +80,27 @@ columns:
   days_unpaid_leave:
     description: Number of unpaid leave days in the month. Not counted as worked days.
     lineage:
-      - dw_employee.fact_absence_requests.dt_absence_started
-      - dw_employee.fact_absence_requests.dt_absence_ended
-      - dw_employee.dim_absence_type.is_paid_leave
+      - dw_time.fact_absence_requests.dt_absence_started
+      - dw_time.fact_absence_requests.dt_absence_ended
+      - dw_time.dim_absence_type.is_paid_leave
   days_protected_leave:
     description: Number of protected leave days in the month (maternity, INSS, health). IPA guaranteed at least 100%.
     lineage:
-      - dw_employee.fact_absence_requests.dt_absence_started
-      - dw_employee.fact_absence_requests.dt_absence_ended
-      - dw_employee.dim_absence_type.is_performa_protected
+      - dw_time.fact_absence_requests.dt_absence_started
+      - dw_time.fact_absence_requests.dt_absence_ended
+      - dw_time.dim_absence_type.is_performa_protected
   total_unpaid_absence_days_in_the_year:
     description: Total unpaid absence days in the reference year. Subtracted from days worked for eligibility.
     lineage:
-      - dw_employee.fact_absence_requests.dt_absence_started
-      - dw_employee.fact_absence_requests.dt_absence_ended
-      - dw_employee.dim_absence_type.is_paid_leave
+      - dw_time.fact_absence_requests.dt_absence_started
+      - dw_time.fact_absence_requests.dt_absence_ended
+      - dw_time.dim_absence_type.is_paid_leave
   total_protected_absence_days_in_the_year:
     description: Total protected absence days in the year. If >= 15, IPA is at least 100%.
     lineage:
-      - dw_employee.fact_absence_requests.dt_absence_started
-      - dw_employee.fact_absence_requests.dt_absence_ended
-      - dw_employee.dim_absence_type.is_performa_protected
+      - dw_time.fact_absence_requests.dt_absence_started
+      - dw_time.fact_absence_requests.dt_absence_ended
+      - dw_time.dim_absence_type.is_performa_protected
   amount_salary:
     description: Monthly salary amount for the month. Used for PLR target in core countries.
     lineage:
@@ -124,9 +124,9 @@ columns:
     lineage:
       - datalake_people.identifier_mapping.dt_started
       - datalake_people.identifier_mapping.dt_actual_termination
-      - dw_employee.fact_absence_requests.dt_absence_started
-      - dw_employee.fact_absence_requests.dt_absence_ended
-      - dw_employee.dim_absence_type.is_paid_leave
+      - dw_time.fact_absence_requests.dt_absence_started
+      - dw_time.fact_absence_requests.dt_absence_ended
+      - dw_time.dim_absence_type.is_paid_leave
   days_worked_in_year:
     description: |
       Days worked in the reference year minus total unpaid absence.
@@ -135,9 +135,9 @@ columns:
     lineage:
       - datalake_people.identifier_mapping.dt_started
       - datalake_people.identifier_mapping.dt_actual_termination
-      - dw_employee.fact_absence_requests.dt_absence_started
-      - dw_employee.fact_absence_requests.dt_absence_ended
-      - dw_employee.dim_absence_type.is_paid_leave
+      - dw_time.fact_absence_requests.dt_absence_started
+      - dw_time.fact_absence_requests.dt_absence_ended
+      - dw_time.dim_absence_type.is_paid_leave
   performa_ipa:
     description: |
       IPA multiplier from Performa score. Outstanding 1.5, Above 1.2, Meets 1.0, Partially 0.7, Insufficient 0.0.

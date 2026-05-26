@@ -144,12 +144,12 @@ absence_days_by_assignment_month AS (
     FROM
         plr_reference_months AS mc
     INNER JOIN
-        dw_employee.fact_absence_requests AS far
+        dw_time.fact_absence_requests AS far
             ON far.dt_absence_started <= mc.dt_month_ended
             AND COALESCE(far.dt_absence_ended, mc.dt_month_ended) >= mc.dt_month_started
             AND far.is_approved = TRUE
     INNER JOIN
-        dw_employee.dim_absence_type AS dat
+        dw_time.dim_absence_type AS dat
             ON far.sk_absence_type = dat.sk_absence_type
     GROUP BY
         far.sk_assignment,
@@ -277,11 +277,11 @@ base_calculations AS (
             ON comp.sk_contract = ab.sk_contract
     LEFT JOIN
         absence_days_by_assignment_month AS abs_m
-            ON abs_m.sk_assignment = ab.sk_period_of_service
+            ON abs_m.sk_assignment = ab.sk_contract
             AND comp.dt_month_started = abs_m.dt_month_started
     LEFT JOIN
         absence_days_by_assignment_year AS abs_y
-            ON abs_y.sk_assignment = ab.sk_period_of_service
+            ON abs_y.sk_assignment = ab.sk_contract
 )
 SELECT
     MD5(CONCAT_WS('|', CAST(sk_period_of_service AS STRING), CAST(sk_reference_month AS STRING))) AS sk_plr_monthly,

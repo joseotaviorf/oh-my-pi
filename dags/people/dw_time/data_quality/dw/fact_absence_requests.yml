@@ -18,6 +18,12 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
+  sk_period_of_service:
+    is_complete:
+      severity_level: Warning
+  sk_assignment:
+    is_complete:
+      severity_level: Warning
   person_number:
     is_complete:
       severity_level: Warning

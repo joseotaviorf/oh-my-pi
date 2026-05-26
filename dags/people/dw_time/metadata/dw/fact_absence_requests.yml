@@ -4,8 +4,8 @@ owner: isabella.araujo@quintoandar.com.br
 domain: People
 description: |-
   Tracks all employee absence requests (vacation, sick leave, parental leave, etc.).
-  One row per request. Use person_number and assignment_number to link to employee data.
-  Join sk_absence_type to dim_absence_type for the absence category name (e.g. Vacation, Sick Leave).
+  One row per request. Join on sk_assignment (id_assignment from identifier_mapping) for assignment-level facts such as PLR.
+  sk_period_of_service is also available for period-of-service-level joins. Join sk_absence_type to dim_absence_type for the absence category name (e.g. Vacation, Sick Leave).
 columns:
   sk_absence_request:
     description: Unique identifier for each absence request.
@@ -23,6 +23,14 @@ columns:
     description: Absence category (vacation, sick leave, etc.). Join to dim_absence_type for the type name.
     lineage:
       - datalake_pin_absence_clean.person_entry.id_absence_type
+  sk_period_of_service:
+    description: Period of service associated with the absence request. Available for period-of-service-level joins.
+    lineage:
+      - datalake_pin_absence_clean.person_entry.id_period_of_service
+  sk_assignment:
+    description: Assignment identifier (id_assignment from identifier_mapping) associated with the absence request. Use to join assignment-level facts such as fact_plr_monthly.
+    lineage:
+      - datalake_people.identifier_mapping.id_assignment
   person_number:
     description: Employee registration number. Use to link to other employee tables.
     lineage:

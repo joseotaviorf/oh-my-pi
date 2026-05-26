@@ -366,10 +366,10 @@ bietlejuice.dw_company:
   - bietlejuice.rede_platform:load-clean-buyer-company-event:first-run-of-day
   - bietlejuice.rede_platform:load-clean-buyer-company:first-run-of-day
 bietlejuice.dw_compensation:
-  - bietlejuice.dw_employee:load-dw-employee-dim-absence-type:first-run-of-day
-  - bietlejuice.dw_employee:load-dw-employee-fact-absence-requests:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-dim-committee-meeting:first-run-of-day
   - bietlejuice.dw_performance:load-dw-performance-fact-performance-calibrations:first-run-of-day
+  - bietlejuice.dw_time:load-dw-time-dim-absence-type:first-run-of-day
+  - bietlejuice.dw_time:load-dw-time-fact-absence-requests:first-run-of-day
   - bietlejuice.enrich_employment:load-enrich-employee-details:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-event-definition:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
