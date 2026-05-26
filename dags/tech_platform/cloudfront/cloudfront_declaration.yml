@@ -28,11 +28,4 @@ workflow:
     auditlogs: ["ALL PRIVILEGES"]
 
 cluster:
-  type: consolidation_s_memory_single_node_cluster
-  custom_configurations:
-    spark_conf:
-      spark.sql.legacy.json.allowEmptyString.enabled: "true"
-  access_control_list:
-    group_name: auditlogs
-    permission_level: CAN_MANAGE
-  databricks_conn_id: databricks_new
+  type: emr_7_12_consolidation_s_memory_single_node_cluster
