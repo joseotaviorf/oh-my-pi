@@ -93,6 +93,14 @@ workflow:
       clean_table_name: pricing_table_configuration
       clean_primary_keys: [id_pricing_table_configuration]
       raw_primary_keys: [id]
+    repair_analysis:
+      clean_table_name: repair_analysis
+      clean_primary_keys: [id_repair_analysis]
+      raw_primary_keys: [id]
+    repair_analysis_aud:
+      clean_table_name: repair_analysis_aud
+      clean_primary_keys: [id_repair_analysis, rev]
+      raw_primary_keys: [id, rev]
     repair_city:
       clean_table_name: repair_city
       clean_primary_keys: [id_repair_city]

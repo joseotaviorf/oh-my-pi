@@ -1,0 +1,69 @@
+---
+database_name: datalake_inspection_services_clean
+table_name: repair_analysis
+description: Stores repair analysis records linked to inspections, tracking automated and manual analysis status and pricing information for property repairs.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
+columns:
+  id_repair_analysis:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.id
+    description: Unique identifier for the repair analysis record.
+  id_inspection:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.inspection_id
+    description: Foreign key referencing the inspection associated with this repair analysis.
+  id_pricing_table_configuration:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.pricing_table_configuration_id
+    description: Foreign key referencing the pricing table configuration used for this repair analysis. Nullable when no pricing configuration has been assigned yet.
+  id_region:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.region
+    description: Identifier of the pricing region (city group) applied during the repair analysis pricing step.
+  status:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.status
+    description: Current status of the repair analysis state machine workflow.
+    categories:
+      START: Analysis has been initiated and is awaiting processing.
+      AI_ANALYSIS: Automated AI analysis is in progress via the Kirk service.
+      MANUAL_REPAIR_ANALYSIS: Manual analysis is being performed by a specialist.
+      AUTOMATIC_REPAIR_PRICING: Automated pricing is being applied to the identified repairs.
+      END: Repair analysis has been completed.
+  property_area:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.property_area
+    description: Area of the property in square meters, used as input for repair pricing calculation.
+  rent_value:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.rent_value
+    description: Monthly rent value of the property in BRL, used as input for the rent-based pricing multiplier.
+  city_group_multiplier:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.city_group_multiplier
+    description: Pricing multiplier based on the city group (region) of the property, with up to 2 decimal places and a maximum of 99.99.
+  rent_multiplier:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.rent_multiplier
+    description: Pricing multiplier based on the rent value of the property, with up to 2 decimal places and a maximum of 99.99.
+  ts_created:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.created_at
+    description: Timestamp when the repair analysis record was created.
+  ts_updated:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.updated_at
+    description: Timestamp when the repair analysis record was last updated.
+  year:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.year
+    description: Year of the update date, used for partitioning.
+  month:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.month
+    description: Month of the update date, used for partitioning.
+  day:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.day
+    description: Day of the update date, used for partitioning.
