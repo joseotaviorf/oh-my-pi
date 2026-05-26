@@ -32,12 +32,16 @@ from bietlejuice.services.configuration_service import ConfigurationService
 
 
 class BaseWorkflow(BuilderInterface):
+    VALIDATION_DAG_SUFFIX = "__validation"
+
     def __init__(
         self,
         dag_args,
         workflow_args,
         cluster_args,
         dataset_dependencies: BaseDataset = None,
+        is_validation: bool = False,
+        validation_config: dict = None,
     ) -> None:
         """
         This class must be a component that all workflows must inherit to have the dag instance.
@@ -50,13 +54,18 @@ class BaseWorkflow(BuilderInterface):
         self.env = os.environ.get("ENVIRONMENT")
 
         self.dag_args = dag_args
+        self.is_validation = is_validation
+        self.validation_config = validation_config or {}
         self.dag_name = self.dag_args["name"]
-        self.dag_id = f"bietlejuice.{self.dag_name}"
+        if self.is_validation:
+            self.dag_id = f"bietlejuice.{self.dag_name}{self.VALIDATION_DAG_SUFFIX}"
+        else:
+            self.dag_id = f"bietlejuice.{self.dag_name}"
         self.config_service = ConfigurationService(self.dag_name)
 
         self.workflow_args = workflow_args
         self.cluster_args = cluster_args
-        self.dataset_dependencies = dataset_dependencies
+        self.dataset_dependencies = [] if is_validation else dataset_dependencies
 
         self._dq_cache = DataQualityLayerCache(self.dag_name)
         self.local_tz = timezone("America/Sao_Paulo")
@@ -87,6 +96,15 @@ class BaseWorkflow(BuilderInterface):
 
         callback_by_task = self.dag_args.get("callback_by_task", True)
 
+        schedule = (
+            None
+            if self.is_validation
+            else self.dag_args.get("schedule_interval", self.dataset_dependencies)
+        )
+        dag_tags = list(self.dag_args.get("tags", []))
+        if self.is_validation and "cluster_validation" not in dag_tags:
+            dag_tags.append("cluster_validation")
+
         dag = DAG(
             dag_id=self.dag_id,
             catchup=self.dag_args.get("catchup", False),
@@ -99,13 +117,14 @@ class BaseWorkflow(BuilderInterface):
                 ),
             },
             start_date=schedule_start_date,
-            schedule=self.dag_args.get("schedule_interval", self.dataset_dependencies),
+            schedule=schedule,
             doc_md=doc_md,
             user_defined_macros=user_defined_macros,
             params=BaseDAG.get_default_trigger_form_params(),
             on_failure_callback=(
                 jiraops_callback.dag_failure_alert if not callback_by_task else None
             ),
+            tags=dag_tags or None,
             **kwargs,
         )
 
@@ -156,6 +175,8 @@ class BaseWorkflow(BuilderInterface):
             self.dag_args,
             self.workflow_args,
             self.cluster_args,
+            is_validation=self.is_validation,
+            validation_config=self.validation_config,
             **kwargs,
         )
         attach_job_cluster_engine_to_context(ctx, self.config_service)

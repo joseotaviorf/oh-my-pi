@@ -30,10 +30,22 @@ class WonkaWorkflow(BaseWorkflow):
     _WONKA_CUSTOM_SCHEMA = "wonka"
     _WONKA_CLUSTER_CONFIG_KEY = "wonka_cluster"
 
-    def __init__(self, dag_args, workflow_args, cluster_args, dataset_dependencies):
-        super().__init__(dag_args, workflow_args, cluster_args, dataset_dependencies)
+    def __init__(
+        self, dag_args, workflow_args, cluster_args, dataset_dependencies, **kwargs
+    ):
+        super().__init__(
+            dag_args,
+            workflow_args,
+            cluster_args,
+            dataset_dependencies,
+            **kwargs,
+        )
 
-        self.dag_id = f"quintoml.wonka.{self.dag_name.replace('-', '_')}"
+        wonka_dag_id = f"quintoml.wonka.{self.dag_name.replace('-', '_')}"
+        if self.is_validation:
+            self.dag_id = f"{wonka_dag_id}{self.VALIDATION_DAG_SUFFIX}"
+        else:
+            self.dag_id = wonka_dag_id
 
         # Merge prod `wonka_cluster` preset with the DAG declaration `cluster:` block into
         # `self.cluster_args` (non-mutating; does not alter ConfigurationService caches).

@@ -68,8 +68,10 @@ class TestDAGYAMLParser:
             mock.call(cluster_path),
         ]
         mocked_dag_declaration_validator.assert_called_once()
-        mocked_dag_declaration_validator().validate.assert_called_once_with(
-            dag_declaration=declaration
+        validator_instance = mocked_dag_declaration_validator.return_value
+        validator_instance.validate.assert_called_once_with(dag_declaration=declaration)
+        validator_instance.validate_cluster_validation_cluster_diff.assert_called_once_with(
+            dag_declaration=merged
         )
         mocked_dag_cluster_validator.assert_called_once()
         mocked_dag_cluster_validator().validate_cluster.assert_called_once_with(
@@ -102,24 +104,62 @@ class TestDAGYAMLParser:
         with pytest.raises(AssertionError, match="YAML mapping"):
             dag_yaml_parser.dag_declaration()
 
-        mocked_dag_declaration_validator().validate.assert_called_once()
+        mocked_dag_declaration_validator().validate.assert_not_called()
+
+    @mock.patch(
+        "bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser.DAGClusterValidator"
+    )
+    @mock.patch(
+        "bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_yaml_parser.DAGDeclarationValidator"
+    )
+    @mock.patch.object(FileService, "get_dict_from_yaml_file")
+    @mock.patch.object(DAGPackagesPathService, "resolve_artifact_file_path")
+    @mock.patch.object(DAGPackagesPathService, "generate_artifact_file_path")
+    def test_validation_section_in_cluster_file(
+        self,
+        mocked_generate_artifact_file_path,
+        mocked_resolve_artifact_file_path,
+        mocked_get_dict_from_yaml_file,
+        mocked_dag_declaration_validator,
+        mocked_dag_cluster_validator,
+        dag_yaml_parser,
+    ):
+        """validation: block in *_cluster.yml is merged into the declaration."""
+        decl_path = "dag/declaration/path.yml"
+        cluster_path = "dag/cluster/path.yml"
+        expected_cluster_base = "dag/cluster/path"
+        mocked_generate_artifact_file_path.side_effect = [
+            decl_path,
+            expected_cluster_base,
+        ]
+        mocked_resolve_artifact_file_path.return_value = cluster_path
+        validation_block = {
+            "cluster": {"type": "consolidation_s_general_single_node_cluster"}
+        }
+        declaration = {"dag": {"a": 1}, "workflow": {"b": 2}}
+        cluster_file_body = {
+            "cluster": {"type": "databricks_16_4_med_general_cluster"},
+            "validation": validation_block,
+        }
+        mocked_get_dict_from_yaml_file.side_effect = [declaration, cluster_file_body]
+
+        result = dag_yaml_parser.dag_declaration()
+
+        assert result["validation"] == validation_block
+        validator_instance = mocked_dag_declaration_validator.return_value
+        validator_instance.validate.assert_called_once_with(
+            dag_declaration={**declaration, "validation": validation_block}
+        )
 
     def test_non_existent_dag(self, dag_yaml_parser):
-        # arrange
         dag_name = "non_existent_dag"
         dag_yaml_parser._DAGYamlParser__dag_name = dag_name
 
-        # act & assert
         with pytest.raises(FileNotFoundError):
             dag_yaml_parser.dag_declaration()
 
     def test_dag_declaration_loads_valid_yaml_from_disk(self, monkeypatch, tmp_path):
-        """Integration: real YAML files, both validators, merged result.
-
-        Static fixtures under ``fixtures/``; tree under ``tmp_path`` with
-        ``DAG_PACKAGES_ROOT`` redirected. ``clear_path_caches`` avoids leaking
-        ``get_dag_path`` entries.
-        """
+        """Integration: real YAML files, both validators, merged result."""
         dag_name = "minimal"
         line = "platform"
         decl_name = f"{dag_name}_declaration.yml"
@@ -145,8 +185,6 @@ class TestDAGYAMLParser:
         assert result["dag"]["owner"] == "Data Engineering"
         assert result["workflow"]["type"] == "query"
         assert result["workflow"]["layer"] == "dw"
-        # Cluster shape and ACL rules are covered in test_dag_cluster_validator; here we
-        # only assert merge + successful validation of the real fixtures.
         assert result["cluster"]["type"] == "databricks_16_4_med_general_cluster"
 
     def test_dag_declaration_loads_cluster_yaml_extension_from_disk(

@@ -91,7 +91,16 @@ class LoadDeltaTableTaskCreator(LoadTaskCreator):
                     table_attributes.row_filter_function_name,
                 ]
             )
-        return parameters
+        validation_target_args: list = []
+        if getattr(self.dag_execution_context, "is_validation", False):
+            target_db, target_table = table_attributes.get_validation_write_target()
+            validation_target_args = [
+                "--target-database-name",
+                target_db,
+                "--target-table-name",
+                target_table,
+            ]
+        return parameters + validation_target_args
 
     def _get_extra_query_template_params(
         self, table_attributes: TableAttributes

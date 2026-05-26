@@ -10,6 +10,7 @@ from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.base.spark.runtime_detector import RuntimeDetector
 from bietlejuice.base.spark.spark_metastore_helper import SparkMetastoreHelper
+from bietlejuice.base.validation.target_resolver import managed_table_fqn
 from bietlejuice.pipeline.delta_table_loader_pipeline import DeltaTableLoaderPipeline
 
 JOB_NAME = "load_delta_table"
@@ -65,10 +66,27 @@ def main():
         all_tables=False,
     )
     database_name = spark_ms.spark_database_name
-    database_location = spark_ms.database_location.replace(
-        "s3a://", "s3://"
-    )  # Seems to be faster
-    full_table_name = f"{database_name}.{args.table_name}"
+    database_location = spark_ms.database_location.replace("s3a://", "s3://")
+    source_table_name = args.table_name
+    write_table_name = args.table_name
+    target_database_name = database_name
+    target_database_location = database_location
+    if args.target_database_name and args.target_table_name:
+        from bietlejuice.base.validation.target_resolver import (
+            validation_database_location,
+        )
+
+        target_database_name = args.target_database_name
+        write_table_name = args.target_table_name
+        target_database_location = validation_database_location(
+            args.bucket, database_name
+        ).replace("s3a://", "s3://")
+    privileges_table = managed_table_fqn(
+        database_name,
+        source_table_name,
+        args.target_database_name,
+        args.target_table_name,
+    )
 
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
         dag_name=args.relative_query_path, layer=args.layer, table_name=args.table_name
@@ -76,17 +94,19 @@ def main():
 
     if table_privileges_dict is not None:
         table_privileges = TablePrivileges.from_input_dict(
-            table_privileges_dict, full_table_name
+            table_privileges_dict, privileges_table
         )
     else:
-        table_privileges = TablePrivileges.from_environment_default(full_table_name)
+        table_privileges = TablePrivileges.from_environment_default(privileges_table)
 
     column_mapping_mode = json.loads(args.column_mapping_mode)
 
     table_loader_pipeline = DeltaTableLoaderPipeline(
         database_name=database_name,
-        table_name=args.table_name,
+        table_name=write_table_name,
         database_location=database_location,
+        target_database_name=target_database_name,
+        target_database_location=target_database_location,
         layer=args.layer,
         query=query,
         partitions=json.loads(args.partitions),
@@ -115,9 +135,9 @@ def main():
 
     rowfilter = RowFilter(spark)
 
-    if row_filter_column_key and not rowfilter.has_row_filter(full_table_name):
+    if row_filter_column_key and not rowfilter.has_row_filter(privileges_table):
         rowfilter.apply_row_filter(
-            full_table_name, row_filter_column_key, row_filter_function_name
+            privileges_table, row_filter_column_key, row_filter_function_name
         )
 
 
@@ -235,6 +255,20 @@ def parse_arguments() -> Namespace:
         "--row-filter-function-name",
         type=lambda arg: None if not arg else arg,
         help="Name of the function to be used in row filter",
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-tdn",
+        "--target-database-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-ttn",
+        "--target-table-name",
+        type=lambda arg: None if not arg else arg,
         required=False,
         default=None,
     )

@@ -30,6 +30,8 @@ class DagExecutionContext:
     aws_conn_id: str = "aws_default"
     emr_active_create_cluster_task_id: Optional[str] = None
     job_cluster_engine: Optional[JobClusterEngine] = None  # noqa: F821
+    is_validation: bool = False
+    validation_config: Optional[dict] = None
 
     def __post_init__(self):
         assert self.dag is not None, "DAG is required"

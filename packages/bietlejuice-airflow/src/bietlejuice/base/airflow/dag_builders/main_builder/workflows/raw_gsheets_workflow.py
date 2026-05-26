@@ -56,12 +56,21 @@ class RawGsheetsWorkflow(BaseWorkflow):
         workflow_args,
         cluster_args,
         dataset_dependencies: BaseDataset = None,
+        **kwargs,
     ):
-        super().__init__(dag_args, workflow_args, cluster_args, dataset_dependencies)
-        self.dag_args["documentation"] = self.DEFAULT_DAG_DOCUMENTATION
-        self.dag_args["documentation"]["dag_purpose"] = self.DEFAULT_DAG_DOCUMENTATION[
-            "dag_purpose"
-        ].format(dag_context=self.dag_name.replace("gsheets_", ""))
+        super().__init__(
+            dag_args,
+            workflow_args,
+            cluster_args,
+            dataset_dependencies,
+            **kwargs,
+        )
+        self.dag_args["documentation"] = {
+            **self.DEFAULT_DAG_DOCUMENTATION,
+            "dag_purpose": self.DEFAULT_DAG_DOCUMENTATION["dag_purpose"].format(
+                dag_context=self.dag_name.replace("gsheets_", "")
+            ),
+        }
         self.env = os.environ.get("ENVIRONMENT")
         bucket_config = workflow_args.get("bucket_config_name", "datalake_bucket")
         self.datalake_bucket = self.config_service.get_config(bucket_config)
@@ -116,6 +125,7 @@ class RawGsheetsWorkflow(BaseWorkflow):
             spark_jobs_path=self.base_spark_jobs_path,
             databricks_conn_id=self.databricks_conn_id,
             default_table_privileges=default_table_privileges,
+            is_validation=self.is_validation,
         )
 
         load_ids_to_be_ingested_task_group = self._set_load_ingestion_ids_info_task(

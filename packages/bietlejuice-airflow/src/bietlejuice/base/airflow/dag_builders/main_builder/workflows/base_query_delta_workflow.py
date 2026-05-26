@@ -42,8 +42,17 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
         cluster_args,
         layer: LayerEnum,
         dataset_dependencies: BaseDataset = None,
+        is_validation: bool = False,
+        validation_config: dict = None,
     ):
-        super().__init__(dag_args, workflow_args, cluster_args, dataset_dependencies)
+        super().__init__(
+            dag_args,
+            workflow_args,
+            cluster_args,
+            dataset_dependencies,
+            is_validation=is_validation,
+            validation_config=validation_config,
+        )
         self.layer = layer
 
     def build_dag(self):

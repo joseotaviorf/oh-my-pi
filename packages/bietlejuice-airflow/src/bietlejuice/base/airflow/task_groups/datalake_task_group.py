@@ -9,6 +9,7 @@ from databricks_plugin import QuintoAndarDatabricksSubmitRunOperator
 from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
+from bietlejuice.base.airflow.validation_aware import validation_spark_extra_args
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import (
@@ -37,6 +38,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         execution_timeout_hours=BaseTaskGroup.DEFAULT_EXECUTION_TIMEOUT_HOURS,
         databricks_conn_id="databricks_default",
         default_table_privileges=None,
+        is_validation: bool = False,
     ):
         """
         :param dag: main dag instance
@@ -62,6 +64,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
         self.inmetro_bucket = config_service.get_config("inmetro_bucket")
         self.databricks_conn_id = databricks_conn_id
         self.default_table_privileges = default_table_privileges
+        self.is_validation = is_validation
         self._config_services: Dict[str, ConfigurationService] = {}
         self._metadata_tables_cache: Dict[str, Set[str]] = {}
         self._dq_cache = DataQualityLayerCache(self.relative_query_path)
@@ -118,7 +121,8 @@ class DatalakeTaskGroup(BaseTaskGroup):
             execution_timeout=timedelta(hours=self.execution_timeout_hours),
             databricks_conn_id=self.databricks_conn_id,
         )
-        DatasetAdder.attach_dataset_to_task(load_table_task)
+        if not self.is_validation:
+            DatasetAdder.attach_dataset_to_task(load_table_task)
 
         return load_table_task
 
@@ -408,6 +412,27 @@ class DatalakeTaskGroup(BaseTaskGroup):
         table_privileges = (
             table_customization.get("table_privileges") or self.default_table_privileges
         )
+        spark_job_extra_args = [
+            layer,
+            source_database_base_name,
+            target_database_base_name,
+            self.relative_query_path,
+            table_name,
+            str(partitions),
+            execution_date,
+            json.dumps(spark_session_configs),
+            str(extra_query_template_params),
+            schema,
+            tree_path,
+        ]
+        spark_job_extra_args.extend(
+            validation_spark_extra_args(
+                self.is_validation, layer_enum, target_database_base_name, table_name
+            )
+        )
+        spark_job_extra_args.extend(
+            ["--table-privileges", json.dumps(table_privileges)]
+        )
 
         load_table_task = self._build_load_task(
             task_id=self.generate_default_task_id(
@@ -418,21 +443,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
             ),
             extraction_spark_job_file=extraction_spark_job_file,
             do_output_xcom_push=do_output_xcom_push,
-            spark_job_extra_args=[
-                layer,
-                source_database_base_name,
-                target_database_base_name,
-                self.relative_query_path,
-                table_name,
-                str(partitions),
-                execution_date,
-                json.dumps(spark_session_configs),
-                str(extra_query_template_params),
-                schema,
-                tree_path,
-                "--table-privileges",
-                json.dumps(table_privileges),
-            ],
+            spark_job_extra_args=spark_job_extra_args,
         )
         load_table_task.params.update(
             {

@@ -27,6 +27,20 @@ if __name__ == "__main__":
     parser.add_argument("relative_query_path")
     parser.add_argument("spark_session_configs")
     parser.add_argument("tree_path")
+    parser.add_argument(
+        "-tdn",
+        "--target-database-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-ttn",
+        "--target-table-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
 
     args = parser.parse_args()
 
@@ -59,21 +73,38 @@ if __name__ == "__main__":
         env=env, schema=dw_schema, bucket=dw_bucket, layer=LayerEnum.DW_STAGING.value
     )
 
+    source_table_name = table_name
+    write_table_name = table_name
+    target_database_name = dw_staging_db_name
+    target_database_location = dw_staging_db_location
+    if args.target_database_name and args.target_table_name:
+        from bietlejuice.base.validation.target_resolver import (
+            validation_dw_database_location,
+        )
+
+        target_database_name = args.target_database_name
+        write_table_name = args.target_table_name
+        target_database_location = validation_dw_database_location(
+            dw_bucket, dw_staging_db_name
+        )
+
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
         dag_name=relative_query_path,
         layer=LayerEnum.DW.value,
         intermediate_path=tree_path,
-        table_name=table_name,
+        table_name=source_table_name,
     )
 
     table_loader_pipeline = IncrementalTableLoaderPipeline(
         database_name=dw_staging_db_name,
-        table_name=table_name,
+        table_name=write_table_name,
         database_location=dw_staging_db_location,
         layer=LayerEnum.DW_STAGING.value,
         query=query,
         spark_session_configs=spark_session_configs,
         partitions=partitions,
         query_template_params=extra_query_template_params,
+        target_database_name=target_database_name,
+        target_database_location=target_database_location,
     )
     table_loader_pipeline.run()

@@ -9,6 +9,7 @@ from databricks_plugin import QuintoAndarDatabricksCheckJobTaskOperator
 from bietlejuice.base.airflow.base_task_group import BaseTaskGroup
 from bietlejuice.base.airflow.datasets.dataset_adder import DatasetAdder
 from bietlejuice.base.airflow.enums.storage_format_enum import StorageFormatEnum
+from bietlejuice.base.airflow.validation_aware import validation_spark_extra_args
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.pipeline.metadata_type_enum import MetadataTypeEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
@@ -30,6 +31,7 @@ class DWTaskGroup(BaseTaskGroup):
         spark_jobs_path,
         execution_timeout_hours=BaseTaskGroup.DEFAULT_EXECUTION_TIMEOUT_HOURS,
         databricks_conn_id="databricks_job_cluster",
+        is_validation: bool = False,
     ):
         super().__init__(
             dag, env, relative_query_path, spark_jobs_path, execution_timeout_hours
@@ -37,6 +39,7 @@ class DWTaskGroup(BaseTaskGroup):
         self.dw_bucket = dw_bucket
         self.dw_schema = dw_schema
         self.databricks_conn_id = databricks_conn_id
+        self.is_validation = is_validation
 
     def __get_schema(self, table_customization):
         table_schema = table_customization.get("custom_schema", self.dw_schema)
@@ -96,11 +99,12 @@ class DWTaskGroup(BaseTaskGroup):
                 "schema": schema,
                 "table_name": table_name,
                 "layer": layer,
-                "bucket": self.datalake_bucket,
+                "bucket": self.dw_bucket,
                 "storage_format": StorageFormatEnum.PARQUET.value,
             },
         )
-        DatasetAdder.attach_dataset_to_task(load_table_task)
+        if not self.is_validation:
+            DatasetAdder.attach_dataset_to_task(load_table_task)
 
         return load_table_task
 
@@ -288,14 +292,22 @@ class DWTaskGroup(BaseTaskGroup):
             else []
         )
 
+        layer_enum = LayerEnum(layer)
+        spark_job_extra_args = (
+            [json.dumps(partitions)] + incremental_args + staging_args
+        )
+        spark_job_extra_args.extend(
+            validation_spark_extra_args(
+                self.is_validation, layer_enum, schema, table_name
+            )
+        )
+
         load_table_task = self._set_load_task(
             layer=layer,
             schema=schema,
             table_name=table_name,
             extraction_type=extraction_type,
-            spark_job_extra_args=[json.dumps(partitions)]
-            + incremental_args
-            + staging_args,
+            spark_job_extra_args=spark_job_extra_args,
         )
         sync_metadata_task = self._build_metadata_sync_task(
             schema=schema,

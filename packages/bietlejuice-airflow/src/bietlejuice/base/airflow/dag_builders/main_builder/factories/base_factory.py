@@ -17,6 +17,8 @@ class BaseFactory(ABC):
         workflow_conf: dict,
         cluster_conf: dict,
         dataset_dependencies: BaseDataset = None,
+        is_validation: bool = False,
+        validation_config: dict = None,
     ):
         super().__init__()
         self.dag_conf = dag_conf
@@ -24,6 +26,8 @@ class BaseFactory(ABC):
         self.workflow_type = workflow_conf["type"]
         self.cluster_conf = cluster_conf
         self.dataset_dependencies = dataset_dependencies
+        self.is_validation = is_validation
+        self.validation_config = validation_config
 
     @abstractmethod
     def get_workflow(self):
@@ -44,6 +48,12 @@ class BaseFactory(ABC):
         if not isinstance(wokflow_mapping, dict):
             raise TypeError("Workflow mapping must be a dict.")
         self.__WORKFLOW_ENUM_TO_CLASS_MAPPING = wokflow_mapping
+
+    def _workflow_validation_kwargs(self) -> dict:
+        return {
+            "is_validation": self.is_validation,
+            "validation_config": self.validation_config,
+        }
 
     def _dispatch_workflow_class(self, workflow_enum: WorkflowEnum):
         """

@@ -18,6 +18,20 @@ if __name__ == "__main__":
     parser.add_argument("dw_schema")
     parser.add_argument("table_name")
     parser.add_argument("partitions")
+    parser.add_argument(
+        "-tdn",
+        "--target-database-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-ttn",
+        "--target-table-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
 
     args = parser.parse_args()
 
@@ -40,14 +54,37 @@ if __name__ == "__main__":
         env=env, schema=dw_schema, bucket=dw_bucket, layer=LayerEnum.DW_STAGING.value
     )
 
-    query = f"SELECT * FROM {dw_staging_db_name}.{table_name}"
+    source_table_name = table_name
+    write_table_name = table_name
+    target_database_name = dw_db_name
+    target_database_location = dw_db_location
+    read_database_name = dw_staging_db_name
+    read_table_name = source_table_name
+    if args.target_database_name and args.target_table_name:
+        from bietlejuice.base.validation.target_resolver import (
+            resolve_validation_target,
+            validation_dw_database_location,
+        )
+
+        read_database_name, read_table_name = resolve_validation_target(
+            dw_staging_db_name, source_table_name
+        )
+        target_database_name = args.target_database_name
+        write_table_name = args.target_table_name
+        target_database_location = validation_dw_database_location(
+            dw_bucket, dw_db_name
+        )
+
+    query = f"SELECT * FROM {read_database_name}.{read_table_name}"
 
     table_loader_pipeline = FullTableLoaderPipeline(
         database_name=dw_db_name,
-        table_name=table_name,
+        table_name=write_table_name,
         database_location=dw_db_location,
         layer=LayerEnum.DW.value,
         query=query,
+        target_database_name=target_database_name,
+        target_database_location=target_database_location,
         # partitions=partitions,
     )
     table_loader_pipeline.run()

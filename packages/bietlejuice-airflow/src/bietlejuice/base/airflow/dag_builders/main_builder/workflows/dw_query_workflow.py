@@ -69,6 +69,7 @@ class DWQueryWorkflow(BaseWorkflow):
             relative_query_path=self.dag_name,
             spark_jobs_path=base_spark_jobs_path,
             databricks_conn_id=dag_execution_context.databricks_conn_id,
+            is_validation=self.is_validation,
         )
 
         dw_staging_task_groups = task_group.build_task_group_from_sql_files(

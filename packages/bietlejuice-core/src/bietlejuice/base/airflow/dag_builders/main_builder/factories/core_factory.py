@@ -39,4 +39,5 @@ class CoreFactory(BaseFactory):
             self.workflow_conf,
             self.cluster_conf,
             self.dataset_dependencies,
+            **(self._workflow_validation_kwargs() or {}),
         )

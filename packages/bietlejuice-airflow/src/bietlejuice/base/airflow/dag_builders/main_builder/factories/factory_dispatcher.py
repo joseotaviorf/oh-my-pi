@@ -60,12 +60,17 @@ class FactoryDispatcher:
         workflow_args: dict,
         cluster_args: dict,
         dataset_dependencies: BaseDataset = None,
+        **kwargs,
     ):
         """Gets the factory class based on the DAG layer."""
 
         factory_class = self.__dispatch_factory_class()
         return factory_class(
-            dag_args, workflow_args, cluster_args, dataset_dependencies
+            dag_args,
+            workflow_args,
+            cluster_args,
+            dataset_dependencies,
+            **kwargs,
         )
 
     def __dispatch_factory_class(self) -> BaseFactory:

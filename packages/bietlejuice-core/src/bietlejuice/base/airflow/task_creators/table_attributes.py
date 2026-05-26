@@ -1,4 +1,8 @@
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.validation.target_resolver import (
+    get_prod_database_name,
+    resolve_validation_target,
+)
 
 _VALID_COLUMN_MAPPING_MODES = {None, "none", "name", "id"}
 
@@ -214,3 +218,9 @@ class TableAttributes:
         if isinstance(table_has_soft_delete, str):
             return table_has_soft_delete.lower() == "true"
         return bool(table_has_soft_delete)
+
+    def get_prod_database_name(self) -> str:
+        return get_prod_database_name(self.layer, self.schema)
+
+    def get_validation_write_target(self) -> tuple[str, str]:
+        return resolve_validation_target(self.get_prod_database_name(), self.table_name)

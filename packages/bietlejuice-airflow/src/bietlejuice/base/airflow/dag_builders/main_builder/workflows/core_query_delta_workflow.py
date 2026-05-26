@@ -20,7 +20,13 @@ class CoreQueryDeltaWorkflow(BaseQueryDeltaWorkflow):
         workflow_args,
         cluster_args,
         dataset_dependencies: BaseDataset = None,
+        **kwargs,
     ):
         super().__init__(
-            dag_args, workflow_args, cluster_args, LayerEnum.CORE, dataset_dependencies
+            dag_args,
+            workflow_args,
+            cluster_args,
+            LayerEnum.CORE,
+            dataset_dependencies,
+            **kwargs,
         )

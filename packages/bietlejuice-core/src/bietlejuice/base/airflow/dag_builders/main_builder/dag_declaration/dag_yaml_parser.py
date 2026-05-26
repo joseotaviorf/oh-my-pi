@@ -15,7 +15,7 @@ class DAGYamlParser:
         self.__dag_name = dag_name
 
     @staticmethod
-    def _cluster_section_from_file(cluster_file_path: str) -> dict:
+    def _load_cluster_file(cluster_file_path: str) -> tuple[dict, dict | None]:
         cluster_doc = FileService.get_dict_from_yaml_file(cluster_file_path)
         if not isinstance(cluster_doc, dict):
             raise AssertionError(
@@ -28,7 +28,7 @@ class DAGYamlParser:
                 "m=dag_declaration, msg=Expected top-level 'cluster' key in "
                 f"cluster file {cluster_file_path!r}"
             )
-        return cluster_section
+        return cluster_section, cluster_doc.get("validation")
 
     def dag_declaration(self) -> dict:
         dag_declaration_file_path = DAGPackagesPathService.generate_artifact_file_path(
@@ -43,10 +43,10 @@ class DAGYamlParser:
         raw_declaration = FileService.get_dict_from_yaml_file(dag_declaration_file_path)
         legacy_cluster = raw_declaration.pop("cluster", None)
 
-        DAGDeclarationValidator().validate(dag_declaration=raw_declaration)
-
         if dag_cluster_file_path is not None:
-            cluster_section = self._cluster_section_from_file(dag_cluster_file_path)
+            cluster_section, validation_from_cluster = self._load_cluster_file(
+                dag_cluster_file_path
+            )
         else:
             cluster_section = legacy_cluster
             if cluster_section is None:
@@ -55,7 +55,20 @@ class DAGYamlParser:
                     f"{expected_cluster_path}.yml (or .yaml) or define 'cluster' in "
                     "the declaration file"
                 )
+            validation_from_cluster = None
 
-        merged = {**raw_declaration, "cluster": cluster_section}
+        # validation: may live in the cluster file (preferred) or inline in the declaration
+        # (legacy). Cluster-file value takes precedence when both are present.
+        declaration_to_validate = {**raw_declaration}
+        if validation_from_cluster is not None:
+            declaration_to_validate["validation"] = validation_from_cluster
+
+        declaration_validator = DAGDeclarationValidator()
+        declaration_validator.validate(dag_declaration=declaration_to_validate)
+
+        merged = {**declaration_to_validate, "cluster": cluster_section}
+        declaration_validator.validate_cluster_validation_cluster_diff(
+            dag_declaration=merged
+        )
         DAGClusterValidator().validate_cluster(dag_declaration=merged)
         return merged

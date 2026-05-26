@@ -67,6 +67,20 @@ def main():
         required=False,
         default=None,
     )
+    parser.add_argument(
+        "-tdn",
+        "--target-database-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-ttn",
+        "--target-table-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
 
     args = parser.parse_args()
 
@@ -145,27 +159,44 @@ def main():
             env, target_database_base_name, datalake_bucket, layer
         )
 
+    source_table_name = table_name
+    write_table_name = table_name
+    if args.target_database_name and args.target_table_name:
+        from bietlejuice.base.validation.target_resolver import (
+            validation_database_location,
+        )
+
+        prod_database = target_database_name
+        target_database_name = args.target_database_name
+        write_table_name = args.target_table_name
+        target_database_location = validation_database_location(
+            datalake_bucket, prod_database
+        )
+
     intermediate_path = schema if schema else tree_path
 
     query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
         dag_name=relative_query_path,
         layer=layer,
         intermediate_path=intermediate_path,
-        table_name=table_name,
+        table_name=source_table_name,
     )
 
+    privileges_table = (
+        f"{target_database_name}.{write_table_name}"
+        if args.target_database_name and args.target_table_name
+        else f"{database_name}.{source_table_name}"
+    )
     if table_privileges_dict is not None:
         table_privileges = TablePrivileges.from_input_dict(
-            table_privileges_dict, f"{database_name}.{table_name}"
+            table_privileges_dict, privileges_table
         )
     else:
-        table_privileges = TablePrivileges.from_environment_default(
-            f"{database_name}.{table_name}"
-        )
+        table_privileges = TablePrivileges.from_environment_default(privileges_table)
 
     table_loader_pipeline = IncrementalTableLoaderPipeline(
         database_name=database_name,
-        table_name=table_name,
+        table_name=write_table_name,
         database_location=database_location,
         layer=layer,
         query=query,

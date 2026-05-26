@@ -14,6 +14,10 @@ from bietlejuice.base.airflow.dag_owner_enum import DAGOwnerEnum
 from bietlejuice.base.airflow.short_circuit_function_enum import (
     ShortCircuitFunctionEnum,
 )
+from bietlejuice.base.databricks.cluster_permission_enum import ClusterPermissionEnum
+from bietlejuice.base.databricks.databricks_group_name_enum import (
+    DatabricksGroupNameEnum,
+)
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.udfs.udf_enum import UDFEnum
 
@@ -443,6 +447,83 @@ class DAGDeclarationValidator(Validator):
                 },
             },
         },
+        "validation": {
+            "type": "dict",
+            "required": False,
+            "empty": False,
+            "schema": {
+                "cluster": {
+                    "type": "dict",
+                    "required": True,
+                    "empty": False,
+                    "schema": {
+                        "type": {"type": "string", "required": True, "empty": False},
+                        "custom_configurations": {
+                            "type": "dict",
+                            "required": False,
+                            "empty": False,
+                        },
+                        "custom_libraries": {
+                            "type": "list",
+                            "required": False,
+                            "empty": False,
+                        },
+                        "databricks_conn_id": {"type": "string", "empty": False},
+                        "access_control_list": {
+                            "empty": False,
+                            "required": False,
+                            "anyof": [
+                                {
+                                    "type": "dict",
+                                    "schema": {
+                                        "group_name": {
+                                            "type": "string",
+                                            "empty": False,
+                                            "allowed": DatabricksGroupNameEnum.get_available_enum_values(),
+                                        },
+                                        "permission_level": {
+                                            "type": "string",
+                                            "empty": False,
+                                            "allowed": ClusterPermissionEnum.get_available_enum_values(),
+                                        },
+                                    },
+                                },
+                                {
+                                    "type": "list",
+                                    "schema": {
+                                        "type": "dict",
+                                        "schema": {
+                                            "group_name": {
+                                                "type": "string",
+                                                "empty": False,
+                                                "allowed": DatabricksGroupNameEnum.get_available_enum_values(),
+                                            },
+                                            "permission_level": {
+                                                "type": "string",
+                                                "empty": False,
+                                                "allowed": ClusterPermissionEnum.get_available_enum_values(),
+                                            },
+                                        },
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                },
+                "allow_custom_spark_job": {
+                    "type": "boolean",
+                    "required": False,
+                    "empty": False,
+                },
+            },
+        },
+        # Defensive: validate() is called on raw_declaration (cluster already popped),
+        # but allows direct calls with a merged dict without Cerberus rejecting the key.
+        "cluster": {
+            "type": "dict",
+            "required": False,
+            "allow_unknown": True,
+        },
     }
 
     def __init__(self, *args, **kwargs) -> None:
@@ -472,9 +553,66 @@ class DAGDeclarationValidator(Validator):
                 f"{json.dumps(self.errors, indent=2)}",
             )
 
+        self._check_cluster_validation_config(dag_declaration)
+        if dag_declaration.get("cluster"):
+            self.validate_cluster_validation_cluster_diff(
+                dag_declaration=dag_declaration
+            )
+
         workflow_type = dag_declaration.get("workflow", {}).get("type")
         if workflow_type == WorkflowEnum.API_INGESTION_WORKFLOW.value:
             self._validate_api_ingestion_workflow(dag_declaration)
+
+    def validate_cluster_validation_cluster_diff(self, dag_declaration: dict) -> None:
+        """Validate prod vs consolidation cluster types after cluster YAML is merged."""
+        validation = dag_declaration.get("validation")
+        if not validation:
+            return
+
+        validation_cluster_type = validation.get("cluster", {}).get("type")
+        if not validation_cluster_type:
+            return
+
+        prod_cluster_type = dag_declaration.get("cluster", {}).get("type")
+        if validation_cluster_type == prod_cluster_type:
+            raise AssertionError(
+                "m=_check_cluster_validation_config, "
+                "msg='validation.cluster.type' must differ from prod 'cluster.type'"
+            )
+
+    @staticmethod
+    def _check_cluster_validation_config(dag_declaration: dict) -> None:
+        validation = dag_declaration.get("validation")
+        if not validation:
+            return
+
+        cluster = validation.get("cluster")
+        if not cluster or not cluster.get("type"):
+            raise AssertionError(
+                "m=_check_cluster_validation_config, "
+                "msg='validation.cluster.type' is required when 'validation' is set"
+            )
+
+        validation_cluster_type = cluster["type"]
+        if not validation_cluster_type.startswith("consolidation_"):
+            raise AssertionError(
+                "m=_check_cluster_validation_config, "
+                "msg='validation.cluster.type' must start with 'consolidation_'"
+            )
+
+        workflow = dag_declaration.get("workflow", {})
+        tables_customization = workflow.get("tables_customization")
+        if not isinstance(tables_customization, dict):
+            tables_customization = {}
+        has_custom_spark_job = bool(workflow.get("load_spark_job")) or any(
+            isinstance(cfg, dict) and cfg.get("load_spark_job")
+            for cfg in tables_customization.values()
+        )
+        if has_custom_spark_job and not validation.get("allow_custom_spark_job"):
+            raise AssertionError(
+                "m=_check_cluster_validation_config, "
+                "msg=DAGs with load_spark_job require validation.allow_custom_spark_job: true"
+            )
 
     def _validate_api_ingestion_workflow(self, dag_declaration: dict) -> None:
         """

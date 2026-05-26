@@ -39,13 +39,12 @@ class LoadQueryTaskCreator(LoadTaskCreator):
         )
 
     def _get_parameters(self, table_attributes: TableAttributes) -> list:
-        return [
+        parameters = [
             self.dag_execution_context.environment,
             self.dag_execution_context.bucket,
             table_attributes.layer.value,
-            table_attributes.schema,  # Source
-            table_attributes.schema,  # Target. It might be interesting to evaluate if we can refactor the Spark Job to accept
-            # a single one, since they seem to be the same every time
+            table_attributes.schema,
+            table_attributes.schema,
             self.dag_execution_context.dag_args["name"],
             table_attributes.table_name,
             str(table_attributes.partitions),
@@ -56,11 +55,23 @@ class LoadQueryTaskCreator(LoadTaskCreator):
                 )
             ),
             json.dumps(self._get_extra_query_template_params(table_attributes)),
-            "",  # Schema. This is out of pattern, and used in very few DAGs. We're going to force it to be empty to require a refactor
-            "",  # Tree path. This is out of pattern, and used in very few DAGs. We're going to force it to be empty to require a refactor
-            "--table-privileges",
-            json.dumps(table_attributes.table_privileges),
+            "",
+            "",
         ]
+        if getattr(self.dag_execution_context, "is_validation", False):
+            target_db, target_table = table_attributes.get_validation_write_target()
+            parameters.extend(
+                [
+                    "--target-database-name",
+                    target_db,
+                    "--target-table-name",
+                    target_table,
+                ]
+            )
+        parameters.extend(
+            ["--table-privileges", json.dumps(table_attributes.table_privileges)]
+        )
+        return parameters
 
     def _get_extra_query_template_params(
         self, table_attributes: TableAttributes

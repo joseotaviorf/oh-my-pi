@@ -27,7 +27,13 @@ class CleanQueryDeltaWorkflow(BaseQueryDeltaWorkflow):
         workflow_args,
         cluster_args,
         dataset_dependencies: BaseDataset = None,
+        **kwargs,
     ):
         super().__init__(
-            dag_args, workflow_args, cluster_args, LayerEnum.CLEAN, dataset_dependencies
+            dag_args,
+            workflow_args,
+            cluster_args,
+            LayerEnum.CLEAN,
+            dataset_dependencies,
+            **kwargs,
         )

@@ -30,8 +30,15 @@ class MetricQueryWorkflow(BaseWorkflow):
         workflow_args,
         cluster_args,
         dataset_dependencies: BaseDataset = None,
+        **kwargs,
     ):
-        super().__init__(dag_args, workflow_args, cluster_args, dataset_dependencies)
+        super().__init__(
+            dag_args,
+            workflow_args,
+            cluster_args,
+            dataset_dependencies,
+            **kwargs,
+        )
         self.databricks_conn_id = self.cluster_args.get(
             "databricks_conn_id", "databricks_default"
         )
@@ -60,6 +67,7 @@ class MetricQueryWorkflow(BaseWorkflow):
         dag = self.dag_instance()
 
         task_group = DatalakeTaskGroup(
+            is_validation=self.is_validation,
             dag=dag,
             env=self.env,
             datalake_bucket=metrics_bucket,

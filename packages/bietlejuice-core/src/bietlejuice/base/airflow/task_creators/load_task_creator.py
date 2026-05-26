@@ -30,8 +30,11 @@ class LoadTaskCreator(BaseTaskCreator, ABC):
         """
 
     def create_task(self, table_attributes: TableAttributes) -> BaseOperator:
+        produce_datasets = self.produce_datasets and not getattr(
+            self.dag_execution_context, "is_validation", False
+        )
         task = self._create_base_load_task(table_attributes)
-        if self.produce_datasets:
+        if produce_datasets:
             dataset_adder.DatasetAdder.attach_dataset_to_task(task)
             # Used as metadata to track which table this task is responsible for
             task.params.update(

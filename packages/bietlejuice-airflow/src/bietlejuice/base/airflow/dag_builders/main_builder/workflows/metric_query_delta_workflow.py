@@ -20,6 +20,7 @@ class MetricQueryDeltaWorkflow(BaseQueryDeltaWorkflow):
         workflow_args,
         cluster_args,
         dataset_dependencies: BaseDataset = None,
+        **kwargs,
     ):
         super().__init__(
             dag_args,
@@ -27,4 +28,5 @@ class MetricQueryDeltaWorkflow(BaseQueryDeltaWorkflow):
             cluster_args,
             LayerEnum.METRIC,
             dataset_dependencies,
+            **kwargs,
         )

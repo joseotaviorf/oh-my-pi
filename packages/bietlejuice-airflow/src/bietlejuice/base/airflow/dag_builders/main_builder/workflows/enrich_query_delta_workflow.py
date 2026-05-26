@@ -20,6 +20,7 @@ class EnrichQueryDeltaWorkflow(BaseQueryDeltaWorkflow):
         workflow_args,
         cluster_args,
         dataset_dependencies: BaseDataset = None,
+        **kwargs,
     ):
         super().__init__(
             dag_args,
@@ -27,4 +28,5 @@ class EnrichQueryDeltaWorkflow(BaseQueryDeltaWorkflow):
             cluster_args,
             LayerEnum.ENRICH,
             dataset_dependencies,
+            **kwargs,
         )
