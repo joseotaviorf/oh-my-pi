@@ -1396,3 +1396,6 @@ bietlejuice.enrich_fairness_assessment:
     - bietlejuice.documentation_metrics:load-clean-tables-documentation:first-run-of-day
     - bietlejuice.documentation_metrics:load-clean-columns-documentation:first-run-of-day
     - bietlejuice.enrich_people_public:load-enrich-org-chart:first-run-of-day
+bietlejuice.dw_brokers:
+  remove:
+    - bietlejuice.enrich_hubspot_events:load-enrich-membership-updates:first-run-of-day

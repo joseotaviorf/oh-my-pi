@@ -1,6 +1,6 @@
 database_name: dw_public
 table_name: dim_company_3p_partners
-description: Table that describes all QuintoAndar's Rede Companies enriched HubSpot information.
+description: Table that describes all QuintoAndar's Rede Companies enriched HubSpot information. This table is deprecated and will be removed in 2026-06-20, use dw_brokers.dim_broker instead.
 domain: 3P Partners
 owner: vitor.musachio@quintoandar.com.br
 columns:
@@ -24,7 +24,7 @@ columns:
     lineage: 
       - datalake_company.company_sks.uuid_company
     description: External unique identifier for the company in Company entity.
-  company_cnpj:
+  cnpj:
     lineage: 
       - datalake_company.company_sks.cnpj
     description: Company's CNPJ document, registered in the company's document entity.
@@ -36,7 +36,7 @@ columns:
     lineage: 
       - datalake_hubspot.company_members.company_cluster
     description: Company's cluster, registered in the HubSpot's entity, according Rede Operations Team classification.
-  company_cluster_performance:
+  company_performance_cluster:
     lineage: 
       - datalake_hubspot.company_members.company_cluster_performance
     description: Company's cluster, registered in the HubSpot's entity, according Rede Performance Team classification.
@@ -82,7 +82,7 @@ columns:
     description: Company's name registered in Hubspot.
   hubspot_crm:
     lineage: 
-      - datalake_hubspot.company_members.hubspot_crm
+      - datalake_hubspot.company_members.crm
     description: Company's CRM registered in Hubspot. This column was previously identified as crm.
   hubspot_member_category:
     lineage: 
@@ -94,13 +94,13 @@ columns:
     description: Company's status registered in Hubspot. Through this column we identify whether a real estate agency is a member or not. This column was previously identified as sale_lead_status.
   hubspot_company_tag:
     lineage:
-      - datalake_hubspot.company_members.extract_3p_tag
-    description: Company's tag name registered in Hubspot. This column was previously identified as extract_3p_tag.
+      - datalake_hubspot.company_members.extracted_3p_tag
+    description: Company's tag name registered in Hubspot. This column was previously identified as extracted_3p_tag.
   is_active_company_rede_partner:
     lineage: 
         - datalake_hubspot.company_members.sale_lead_status
     description: Flag indicating whether the company is an active Rede Partner (True if sale_lead_status = 'Membro'), used to obtain the total active Rede Brokers.
-  is_flagged_as_leadgen:
+  is_flagged_as_leadgen_in_hubspot:
     lineage:
       - datalake_hubspot.company_members.is_flagged_as_leadgen
     description: Flag indicating whether the company is flagged as leadgen in Hubspot.
@@ -115,6 +115,7 @@ columns:
     description: Date when the company started its membership in Hubspot.
   ts_membership_end:
     lineage: 
+      - datalake_hubspot.company_members.sale_lead_status
       - datalake_hubspot.membership_updates.hubspot_status
       - datalake_hubspot.membership_updates.ts_end
     description: Date when the company ended its membership in Hubspot.

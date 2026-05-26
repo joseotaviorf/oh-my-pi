@@ -15,10 +15,14 @@ dag:
       intervals per person and profile type), dim_broker_tier_history (tier assignment periods per
       broker product from core_brokers.broker_tiers_history joined to datalake_company_clean.tier),
       dim_broker_integrator_partner_history (integrator partner UUID periods from
-      core_brokers.broker_products_history resolved to company name via datalake_company_clean.company).
+      core_brokers.broker_products_history resolved to company name via datalake_company_clean.company),
+      and dim_company_3p_partners (legacy partner-company dimension in dw_public describing QuintoAndar's
+      Rede Companies enriched with HubSpot information; kept in the dw_public schema while the rest of
+      the DAG outputs to dw_brokers).
       Upstreams: core_brokers, core_brokers_history (broker_tiers_history, broker_products_history),
       core_region, datalake_brokers (hubspot_brokers_history, broker_status_history),
-      datalake_company_clean (tier, company), datalake_hubspot.owner, datalake_person.person_sks,
+      datalake_company (company_sks), datalake_company_clean (tier, company, address),
+      datalake_hubspot (owner, company_members, membership_updates), datalake_person.person_sks,
       datalake_ebdb_clean.agent_data.
       Schedule after enrich_brokers, core_brokers_history, and core upstreams in Airflow.
 workflow:
@@ -114,6 +118,13 @@ workflow:
           - ALL PRIVILEGES
       row_filter_column_key: has_3p_access_control
       row_filter: has_3p_access
+    dim_company_3p_partners:
+      custom_schema: public
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
 cluster:
   type: databricks_16_4_med_memory_cluster
   access_control_list:
