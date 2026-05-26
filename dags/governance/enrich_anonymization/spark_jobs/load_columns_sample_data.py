@@ -82,7 +82,7 @@ def load_table(
 
 
 def _column_non_null_predicate(column_name: str) -> str:
-    return f"({column_name} IS NOT NULL OR CAST({column_name} AS STRING) != '')"
+    return f"({column_name} IS NOT NULL AND CAST({column_name} AS STRING) != '')"
 
 
 def _build_union_all_column_samples(
