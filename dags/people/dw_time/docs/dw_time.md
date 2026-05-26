@@ -1,176 +1,250 @@
-# DW Time - Workforce time and attendance: dw_time
+# DW Time — Workforce time, absence, and attendance
+
+**Metastore schema:** `dw_time`
+
+> Describes vacation, time-offs, absences, hour-banks, attendance requests, hourly cost windows, and the reference dimensions that describe them—one integrated dataset.
 
 ## People Data Catalog
 
-[People Data Catalog database](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/database/4638474284?contentId=4638474284&entryId=ee0b4dc1-56e4-4947-be5e-d50e02efd4f9&savedViewId=136c293b-f5c1-48d6-a161-9586a403e181)
+This schema is indexed in the [People Data Catalog](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/pages/4635951235/People+Data+Catalog).
+
+[Link to Catalog Row](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/pages/4635951235/People+Data+Catalog)
 
 ## Contents
 
-- [People Data Catalog](#people-data-catalog)
-- [Description](#description)
-- [Scope](#scope)
-- [Out of scope](#out-of-scope)
-- [Tables](#tables)
-- [Data model](#data-model)
-- [Full data model on GitHub](#full-data-model-on-github)
-- [Executive summary](#executive-summary)
-- [Business logic](#business-logic)
-- [Data dictionary](#data-dictionary)
-- [How to use](#how-to-use)
-- [Sensitivity and access](#sensitivity-and-access)
+* [In Scope](#in-scope)
+* [Data Model and Tables](#data-model-and-tables)
+* [Core Features and Business Logic](#core-features-and-business-logic)
+* [Attention and limitations](#attention-and-limitations)
+* [How to use](#how-to-use)
+* [Operational analytics patterns](#operational-analytics-approvals-and-exposure)
+* [Glossary](#glossary)
+* [Related Scopes](#related-scopes)
 
----
+***
 
-## Description
+## In Scope
 
-The **`dw_time`** schema is the People Data Warehouse home for **workforce time and attendance** analytics. It combines the **time integration** (Oitchau requests, approvals, hours-bank balances, salary-rate segments) with **Oracle HCM PIN absence** models (absence types, absence requests, vacation balances). It is built for **approval SLAs**, **hours-bank** reporting, **absence and vacation** analytics, and **cross-functional** views that combine **who** (PIN), **where** (cost center and vertical from the org model), and **who approves** (management hierarchy)—without replacing **payroll** or **PIN** as the systems of record for pay and master data.
+**✅ Vacation period balances** : Accrued, used, and remaining vacation days by employee assignment and vacation period from Oracle HCM context.
 
-## Scope
+**✅ Absence events** : Absence events with status and approval-related attributes.
 
-**✅ Time requests and approvals** — Line-level **requests** (intervals, adjustments, configured subtypes) with **approval status**, **stage**, and **flow** payload for dashboards such as **manager approval backlog**.
+**✅ Hour-bank balances** : Hour-bank balance values per employee in minutes for each reference date.
 
-**✅ Request subtype reference** — **`dim_request`** for subtype labels and defaults (**paid**, **DSR-related** flags) aligned to the integration catalog.
+**✅ Time requests** : Workforce requests spanning clock corrections, hour-bank adjustments, and categorized justification or time-off approvals, each with status, subtype, and interval-related attributes.
 
-**✅ Hours bank** — **`fact_hours_bank_rule_totals`** with balances per rule segment and optional **estimated monetary** amount when an **hourly rate window** matches; **`dim_hours_bank_rule`** for segment labels.
-
-**✅ Hourly cost windows from the time product** — **`fact_employee_hourly_cost_windows`** for **order-of-magnitude** cost context tied to the integration’s salary segments (**compensation-sensitive**).
-
-**✅ PIN absence reference and facts** — **`dim_absence_type`** for absence category labels and policy flags (paid leave, performance protection); **`fact_absence_requests`** for Oracle HCM absence requests (vacation, sick leave, parental leave, etc.); **`fact_vacation_balances`** for vacation period balances (accrued, taken, available).
-
-**✅ People in scope** — **Employees** who appear in the **time integration** and are matched to **PIN**, so **approval pendencies** (volume, hierarchy, cost center) and **hours bank** (balances and estimated cost by org) both combine cleanly with **`dw_people`** and **`dw_organization`**—same idea as other People marts. **Test accounts** are excluded.
-
-## Out of scope
-
-**❌ Official payroll results** — Gross pay, deductions, and final DSR calculations remain in **payroll** systems and downstream finance marts; use **`dw_time`** for **operational** and **estimated** views only.
-
-**❌ Legacy `dw_employee` absence copies** — The deprecated **`dw_employee`** mart still exposes absence tables for backward compatibility; prefer **`dw_time`** for new PIN absence analytics (see [DBP-1409](https://quintoandar.atlassian.net/browse/DBP-1409) for consumer migration).
-
-**❌ Full compensation history** — Salary bands, equity, and compensation policy history live in **`dw_compensation`**; join there only when the analysis explicitly requires compensation tables beyond the **hourly segment** in **`dw_time`**.
-
-**❌ Demographics and performance** — DE&I attributes in **`dw_demographics`**; performance cycles in **`dw_performance`**.
-
----
-
-## Tables
-
-Explore schemas and column-level detail in **DataHub** (lineage and definitions). **View SQL** opens the **query used to build each table** on GitHub (`queries/dw/{table}.sql`).
-
-| Table | Explore in DataHub | Explore in GitHub |
-|-------|-------------------|-------------------|
-| `dim_absence_type` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.dim_absence_type,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/dim_absence_type.sql) |
-| `dim_hours_bank_rule` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.dim_hours_bank_rule,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/dim_hours_bank_rule.sql) |
-| `dim_request` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.dim_request,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/dim_request.sql) |
-| `fact_absence_requests` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_absence_requests,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_absence_requests.sql) |
-| `fact_employee_hourly_cost_windows` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_employee_hourly_cost_windows,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_employee_hourly_cost_windows.sql) |
-| `fact_hours_bank_rule_totals` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_hours_bank_rule_totals,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_hours_bank_rule_totals.sql) |
-| `fact_time_attendance_requests` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_time_attendance_requests,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_time_attendance_requests.sql) |
-| `fact_vacation_balances` | [Open schema](<https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_vacation_balances,PROD)/Schema?is_lineage_mode=false&schemaFilter=>) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_vacation_balances.sql) |
-
----
-
-## Data model
-
-**Grain**
-
-- **`fact_time_attendance_requests`:** One row per **request identifier** from the time product for employees in scope; each row carries **approval outcome**, **interval timestamps**, and keys to **subtype** and **employee**.
-- **`dim_request`:** One row per **request subtype** configuration (labels and defaults used for grouping “abono” vs “manual marking” style categories in the product).
-- **`dim_absence_type`:** One row per **Oracle HCM absence type** (labels, max duration, paid-leave and performance-protection flags).
-- **`fact_absence_requests`:** One row per **PIN absence request** (vacation, sick leave, parental leave, etc.) for employees in scope.
-- **`fact_vacation_balances`:** One row per **employee assignment per vacation period** with accrued, taken, and available days.
-- **`fact_hours_bank_rule_totals`:** One row per **employee** per **balance date** per **rule segment**; optional **estimated cost** when a matching **hourly rate window** exists.
-- **`fact_employee_hourly_cost_windows`:** One row per **hourly salary segment** per employee from the integration.
-- **`dim_hours_bank_rule`:** One row per **rule segment** reference for **labels** and policy metadata.
-
-**Joins in plain language:** Attach **subtype names** to request lines on **`sk_request`**. Attach **manager names** and the **reporting chain** with **`dw_people.dim_management_hierarchy`**. Attach **cost center**, **vertical**, **job**, and **business unit** for the **month of the request** by going through **`dw_people.fact_employees`** on **`sk_employee`** and **month-end `dt_reference`**, then **`dw_organization`** dimensions.
-
-### Full data model on GitHub
-
-For a **relationship overview and join patterns** (for example when **People Insights** prepares analyses for **DP**), open **[data_model.md](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/docs/data_model.md)**.
-
----
-
-## Executive summary
-
-**`dw_time`** supports **operational time** analytics: **pending and decided requests**, **hours-bank** positions with optional **rough cost**, and **hourly rate windows** from the time stack. For **approval dashboards**, combine **`fact_time_attendance_requests`** with **`dw_people`** (employee, **monthly assignment snapshot**, hierarchy) and **`dw_organization`** (cost center, vertical, job, business unit). **Near-real-time** pendency in the UI may still read the **API**; the warehouse follows the **People DW** refresh cadence.
-
-### Key concepts
-
-- **Approval labels** in the data are **English** (`pending`, `approved`, `declined`, `ignored`); map to Portuguese in Looker Studio if needed (**Pendente / Aprovado / Reprovado / Inválido or ignorado**).
-- **Org slice for a request month** uses **`dw_people.fact_employees`** with **`dt_reference`** equal to the **last calendar day** of the month containing **`ts_interval_started`** (primary assignment on that snapshot).
-- **Payroll close** and **countdown** are not native columns here—model them with a **calendar** or **parameters** maintained by HR and join by month or company.
-
-### Refresh and availability
-
-People warehouse **DW layer SLA**: data is expected to be **available by 8:00** (once per day). This pipeline runs after upstream People and time clean tables have loaded.
-
-### Granularity
-
-See [Data model](#data-model).
-
-### Where to find the data
-
-**Schema:** `dw_time` · **Airflow pipeline:** `bietlejuice.dw_time`
-
----
-
-## Business logic
+**✅ Hourly-rate windows** : Hourly pay windows paired with balance facts, used to estimate workforce time related costs.
 
 ### Who is included
 
-**Request lines** include employees whose **registration** in the time product maps to a **current PIN assignment** in **`identifier_mapping`**, excluding **test users**. Rows without a successful mapping are dropped at build time.
+* **Vacations and absence events**
+  * Employees with vacation-period or absence-event data.
 
-### Request and approval fields
+* **Hour banks and time tracking**
+  * Employees enrolled in punch-driven time tracking and consolidated hour banks.
+  * **Exclusions:** Policy exclusions such as managerial roles or high-band compensation groups; teammates who do not punch the clock—or who sit outside tracked Oitchau hour-bank coverage—normally show no hourly-bank or punch-driven attendance facts while vacation balances and PIN-backed absence submissions can still reflect them where applicable.
 
-**`approval_status`** reflects the integration state (**pending** still in flow, **approved** / **declined** decided, **ignored** bypassed or treated as ignored). Use **`approval_stage`** and **`approval_flow`** when the dashboard must show **where** the case sits in the configured workflow. Pair with **`dim_management_hierarchy`** to attribute backlog to **direct managers** or **L1** leaders.
+## Data Model and Tables
 
-### Financial and DSR context
+### Data Sources and System Context
 
-**`dim_request.is_discount_dsr`** and **`is_paid_subtype`** describe **subtype defaults**; line-level flags such as **`is_paid_request`** and **`hours_calculation_type`** can differ for a given booking. **`fact_hours_bank_rule_totals.estimated_balance_cost_amount`** combines **minutes** with a matched **hourly rate** for **bank** lines—use as **supporting insight**, not payroll truth.
+* **Oitchau** : Workforce time and attendance product that holds requests, approvals, employee registrations, hourly-bank snapshots, salary-rate segments and configurations that describe how hour-bank totals are categorized.
 
-**Reporting tip:** When the business question is **“impact if approvals slip”**, prefer a **defined payroll rule** (hours × rate × policy) agreed with HR; the examples below show **patterns** using **`dw_time`** and **`dw_people`** keys.
+* **Oracle HCM Cloud (PIN)** : Defines how vacation and absence programs operate; captures submissions and approval outcomes together with their balances.
 
----
+### About the data
 
-## Data dictionary
+Detailed definitions for every column, metric, and flag are maintained in DataHub.
 
-Summary columns only. **Authoritative** definitions: **DataHub** (links in [Tables](#tables)).
+* **Airflow DAG:** `bietlejuice.dw_time`
+* **SLA:** D-1 available by 08:00 BRT
 
-### `dw_time.fact_time_attendance_requests`
+| Table | Grain | Links |
+| :--- | :--- | :--- |
+| `dim_absence_type` | One row per absence type (current reference) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.dim_absence_type,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/dim_absence_type.sql) |
+| `dim_hours_bank_rule` | One row per hours-bank rule segment (current reference) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.dim_hours_bank_rule,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/dim_hours_bank_rule.sql) |
+| `dim_request` | One row per time request subtype (current reference) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.dim_request,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/dim_request.sql) |
+| `fact_absence_requests` | One row per PIN absence submission (Latest state for that submission) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_absence_requests,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_absence_requests.sql) |
+| `fact_employee_hourly_cost_windows` | One row per salary-rate segment per employee | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_employee_hourly_cost_windows,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_employee_hourly_cost_windows.sql) |
+| `fact_hours_bank_rule_totals` | One row per employee and date (Tied to an hourly-bank bucket) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_hours_bank_rule_totals,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_hours_bank_rule_totals.sql) |
+| `fact_time_attendance_requests` | One row per time request | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_time_attendance_requests,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_time_attendance_requests.sql) |
+| `fact_vacation_balances` | One row per employee vacation period | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_vacation_balances,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_vacation_balances.sql) |
 
-| Column | Business definition | Notes |
-|--------|---------------------|-------|
-| `sk_time_request` | Internal key for one request row in analytics. | Stable for counts. |
-| `sk_employee` | Employee key shared with **`dw_people`**. | Join **`dim_employee`**, **`fact_employees`**. |
-| `person_number` | PIN person number. | Join hierarchy and spreadsheets. |
-| `approval_status` | Outcome state from the time product (**English** labels). | Map to dashboard language in Looker. |
-| `approval_stage` | Step index in the approval flow. | SLA analytics. |
-| `request_type` | High-level family (for example medical, vacation, custom). | Volume split. |
-| `ts_interval_started` / `ts_interval_ended` | Booked interval. | Month attribution for org join. |
+> **Note:** VPN connection is required to access DataHub.
 
-### `dw_time.dim_request`
+**Documentation on GitHub:** This **`dw_time.md`** file is the only maintained narrative companion for **`dw_time`** in the repo—we removed legacy **`docs/data_model.md`** to avoid conflicting ER appendixes. Relationships and keys are summarized in **[How to use](#how-to-use)** (join patterns); column truth lives in **DataHub** and `metadata/`.
 
-| Column | Business definition | Notes |
-|--------|---------------------|-------|
-| `subtype_name` | Human-readable subtype. | Group “abonos” vs manual marks when labels match operations language. |
-| `is_paid_subtype` / `is_discount_dsr` | Defaults from configuration. | Pair with line-level flags on the fact. |
+**Main join identifiers:**
 
----
+* `sk_employee` : Preferred surrogate key.
+* `person_number` : PIN-aligned business key for the employee.
+* `assignment_number` : PIN-aligned business key for the assignment.
+
+## Core Features and Business Logic
+
+### Domain logic and core concepts
+
+* **Time request line** : Each row is one time request, subtype keys point to the time catalog.
+
+* **Time catalog** : Each row is one subtype from the Oitchau catalog regarding why a workforce-time request is opened, including labels plus policy-oriented defaults (paid subtype, hourly-bank treatment, weekly-rest discount, active versus retired menu items).
+
+* **Hourly-bank balance line** : Each row is one employee on a calendar balance date within one hourly-bank bucket.
+
+* **Hourly-rate window** : Each row is one salary-rate segment with start and end dates; Latest periods use an empty end date.
+
+* **Balance cost overlay** : Indicative cost multiplies bank minutes by the hourly rate whose window covers the balance date.
+
+* **Absence catalog line** : Each row is one absence category with descriptive label, ceiling on duration, paid-leave treatment, and performance-protection tagging for qualifying leave types under company policies.
+
+* **Absence submission line** : Each row reflects one PIN absence submission with flags for approval, withdrawal, validity, and “in effect today” planning use.
+
+* **Vacation period snapshot** : Each row summarizes one assignment vacation cycle with accrued days, absence-based usage, optional cash-out usage, residual balance, sequencing across periods, and simple indicators such as latest open period.
+
+### Business Assumptions
+
+* **Hourly-rate pairing rule** : When several ACTIVE salary-rate windows cover the same balance date for an employee, enrichment maps **exactly one** window per hourly-bank balance row—that is modeled join logic, not a reconciliation failure when overlaps exist.
+
+## Attention and limitations
+
+* **Product vs payroll** : Costs and rates shown here are estimates for analysis only, payroll and finance systems decide actual pay.
+
+* **Hourly-bank rule labels** : Bucket keys occasionally fail to resolve to the rule catalog when formatting diverges; the fact still exposes the bucket key for investigation while the rule key may appear empty.
+
+* **Vacation helper metrics** : Negative residual balances can appear when submissions exceed accrued amounts in upstream data; reconcile with upstream HR investigation when needed.
 
 ## How to use
 
-The bullets below mirror the **business questions** for the **time approval dashboard** (reducing **HR operations** rework and payroll risk). They intentionally combine **`dw_time`** with **`dw_people`** and **`dw_organization`**, matching the **Looker Studio** approach (integration plus **org chart**).
+### Standard Join Pattern
 
-**Cross-schema keys:** **`sk_employee`**, **`person_number`**, **`fact_employees.sk_cost_center_version`**, **`dim_management_hierarchy.person_number`**.
+When joining this schema's tables with other People DW domains:
 
-**Example SQL** targets **Databricks SQL** (adjust **`date_trunc` / `last_day`** if your engine differs). Add **stricter date or partition filters** in production; examples use **`CURRENT_DATE()`** for illustration only.
+1. Prefer `sk_employee` when the fact provides it; otherwise join on `person_number`, and use `assignment_number` together with `person_number` when you need assignment-level grain on PIN facts.
+2. Use `dw_people.dim_employee` for canonical People attributes and hierarchy.
+
+### Wide Join (Exploratory Query)
+
+**Question:** How do recent time requests look with subtype labels and employee keys?
+
+```sql
+SELECT
+    req.sk_time_request,
+    req.approval_status,
+    req.approval_stage,
+    req.ts_interval_started,
+    req.ts_interval_ended,
+    subtype.subtype_name,
+    emp.sk_employee,
+    emp.person_number
+FROM
+    dw_time.fact_time_attendance_requests AS req
+LEFT JOIN
+    dw_time.dim_request AS subtype
+        ON req.sk_request = subtype.sk_request
+LEFT JOIN
+    dw_people.dim_employee AS emp
+        ON req.sk_employee = emp.sk_employee
+WHERE
+    DATE(req.ts_interval_started) >= DATE_TRUNC('MONTH', CURRENT_DATE())
+LIMIT 100
+```
+
+### Analytical Snapshot (Fact + All Related Dims)
+
+**Question:** For last month's balance dates, how do minutes and indicative cost break down by rule segment labels?
+
+```sql
+SELECT
+    bal.person_number,
+    bal.dt_hours_bank_balanced,
+    bal.minutes_balance_rule,
+    bal.hourly_rate_applied,
+    bal.estimated_balance_cost_amount,
+    rules.segment_label,
+    rules.group_name
+FROM
+    dw_time.fact_hours_bank_rule_totals AS bal
+LEFT JOIN
+    dw_time.dim_hours_bank_rule AS rules
+        ON bal.sk_hours_bank_rule = rules.sk_hours_bank_rule
+WHERE
+    bal.dt_hours_bank_balanced BETWEEN ADD_MONTHS(CURRENT_DATE(), -1)
+        AND DATE_SUB(CURRENT_DATE(), 1)
+LIMIT 100
+```
+
+### Vacation balance exploration (Exploratory Query)
+
+**Question:** How do accrued, used, and remaining vacation days look for the latest modeled vacation period per assignment?
+
+```sql
+SELECT
+    vb.person_number,
+    vb.assignment_number,
+    vb.vacation_status,
+    vb.days_accrued,
+    vb.days_taken_total,
+    vb.days_balance,
+    vb.dt_vacation_period_started,
+    vb.dt_vacation_period_ended,
+    emp.sk_employee
+FROM
+    dw_time.fact_vacation_balances AS vb
+LEFT JOIN
+    dw_people.dim_employee AS emp
+        ON vb.person_number = emp.person_number
+WHERE
+    vb.is_latest_period = TRUE
+LIMIT 100
+```
+
+### Vacation absence requests (Exploratory Query)
+
+**Question:** What do recent vacation-type absence submissions look like beside catalog labels and approval flags?
+
+```sql
+SELECT
+    ar.sk_absence_request,
+    ar.person_number,
+    ar.assignment_number,
+    ar.dt_absence_started,
+    ar.dt_absence_ended,
+    ar.days_requested,
+    ar.is_approved,
+    ar.is_effective,
+    cat.absence_type,
+    cat.is_paid_leave,
+    emp.sk_employee
+FROM
+    dw_time.fact_absence_requests AS ar
+LEFT JOIN
+    dw_time.dim_absence_type AS cat
+        ON ar.sk_absence_type = cat.sk_absence_type
+LEFT JOIN
+    dw_people.dim_employee AS emp
+        ON ar.person_number = emp.person_number
+WHERE
+    (
+        LOWER(cat.absence_type) LIKE '%vacation%'
+        OR LOWER(cat.absence_type) LIKE '%ferias%'
+        OR LOWER(cat.absence_type) LIKE '%férias%'
+    )
+    AND ar.dt_absence_started >= ADD_MONTHS(CURRENT_DATE(), -3)
+LIMIT 100
+```
+
+### Operational analytics — approvals and exposure
+
+The snippets below anchor on **`dw_time.fact_time_attendance_requests`** and joins to **`dw_organization`**, **`dw_people.fact_employees`** (month-end snapshot keyed to the request interval month), **`dim_management_hierarchy`**, and **`fact_employee_hourly_cost_windows`**. Interpretations are exploratory; payroll and product systems remain authoritative where they disagree.
+
+Where the text says **payroll cutoff**, replace placeholder dates (`2099-12-31`) with the official cutoff for the month under analysis, or drive the cutoff from a governed payroll-calendar table instead of literals.
 
 ---
 
-### Volume and operational efficiency — pending items (warehouse view)
+#### Volume — pending items (warehouse view)
 
-**Question:** What is the **total volume of manager approval pendencies** for a recent window (warehouse refresh), and how does it compare to all requests in the same window?
+**Question:** What is the total volume of manager approval pendencies for a recent window (warehouse refresh), and how does it compare to all requests in the same window?
 
-**Pattern:** True **real-time** counts may come from the **time product API** in Looker Studio; the warehouse reflects the **latest daily** load.
+**Pattern:** True real-time counts may come from the time product API or Looker Studio; the warehouse reflects the latest daily load.
 
 ```sql
 WITH request_window AS (
@@ -195,11 +269,9 @@ FROM
     request_window
 ```
 
----
+#### Volume — share of pendencies by management and cost center
 
-### Volume and operational efficiency — share of pendencies by management and cost center
-
-**Question:** What **percentage of requests in the calendar month** are **pending**, broken down by **direct manager** and **cost center**?
+**Question:** What percentage of requests in the calendar month are pending, broken down by direct manager and cost center?
 
 ```sql
 WITH monthly_requests AS (
@@ -265,13 +337,11 @@ GROUP BY
     requests_with_org.vertical
 ```
 
----
+#### Volume — distribution by approval status and request family
 
-### Volume and operational efficiency — distribution by approval status and request family
+**Question:** How are requests (including abonos and manual-mark-style flows) distributed across pending, approved, declined, and ignored?
 
-**Question:** How are **requests** (including **abonos** and **manual marks** style flows) distributed across **pending**, **approved**, **declined**, and **ignored**?
-
-**Pattern:** Map **`ignored`** to the business label **Inválido / ignorado** only if your HR glossary agrees; otherwise treat **ignored** as its own category.
+**Pattern:** Map **`ignored`** to the business label *Inválido / ignorado* only if your HR glossary agrees; otherwise treat **`ignored`** as its own category.
 
 ```sql
 SELECT
@@ -294,21 +364,17 @@ ORDER BY
     request_count DESC
 ```
 
----
+#### Volume — countdown to payroll close
 
-### Volume and operational efficiency — countdown to payroll close
+**Question:** How much time remains until payroll close?
 
-**Question:** How much time remains until **payroll close**?
+**Pattern:** This is **not stored in `dw_time`**. Implement a parameter or a small calendar table in Looker Studio (or a governed reference table) with **cutoff timestamp per month and legal entity**, then compute `cutoff_ts - current_timestamp()` in the presentation layer. Join warehouse facts on the calendar month of `ts_interval_started` when aligning pendencies to the same close month.
 
-**Pattern:** This is **not** stored in **`dw_time`**. Implement a **parameter** or a **small calendar table** in Looker Studio (or a governed reference table) with **cutoff timestamp per month and legal entity**, then compute **`cutoff_ts - current_timestamp()`** in the presentation layer. Join warehouse facts on **calendar month** of **`ts_interval_started`** when you need to align pendencies to the same **close month**.
+#### Management — top backlog after payroll close
 
----
+**Question:** Which managers, verticals, and cost centers have the largest open backlog after the close deadline?
 
-### Management and performance — top backlog after payroll close (managers and cost centers)
-
-**Question:** Which **managers**, **verticals**, and **cost centers** have the **largest open backlog after the close deadline**?
-
-**Pattern:** Replace **`DATE '2099-12-31'`** with your **official cutoff date** for the month under analysis (or join a **payroll calendar** table).
+**Pattern:** Replace `DATE '2099-12-31'` with your official cutoff date for the month under analysis (or join a payroll calendar table).
 
 ```sql
 WITH payroll_cutoff AS (
@@ -354,13 +420,11 @@ ORDER BY
     open_request_count_after_close DESC
 ```
 
----
+#### Management — agility by vertical (time to decision)
 
-### Management and performance — agility by vertical (time to decision)
+**Question:** Which verticals show the slowest approval behaviour?
 
-**Question:** Which **verticals** show the **slowest approval** behaviour?
-
-**Pattern:** **Median or average hours** from **`ts_created`** to **`ts_updated`** for rows that reached **`approved`** or **`declined`**; segment by **`dim_cost_center.vertical`** on the request month snapshot.
+**Pattern:** Median or average hours from **`ts_created`** to **`ts_updated`** for rows that reached **approved** or **declined**; segment by **`dim_cost_center.vertical`** on the request-month snapshot (`fact_employees` keyed to **`LAST_DAY`** of the interval started month).
 
 ```sql
 WITH decided_requests AS (
@@ -403,11 +467,9 @@ ORDER BY
     avg_hours_created_to_decision DESC
 ```
 
----
+#### Management — correlation with job and business unit
 
-### Management and performance — correlation of pendencies with job and business unit
-
-**Question:** Is there a **concentration** of **pending** requests by **job** or **business unit**?
+**Question:** Is there a concentration of pending requests by job or business unit?
 
 ```sql
 WITH monthly_pending AS (
@@ -445,13 +507,11 @@ ORDER BY
     pending_request_count DESC
 ```
 
----
+#### Finance — rough exposure for pending requests (hours × rate)
 
-### Financial impact and risk — rough exposure for pending requests (hours × rate)
+**Question:** What is the estimated financial exposure from unresolved lines where payroll-relevant flags apply?
 
-**Question:** What is the **estimated financial exposure** from **unresolved** lines where **payroll-relevant** flags apply?
-
-**Pattern:** This uses **integration hourly rate** windows and **booked duration**; **payroll** remains authoritative. Elapsed hours use **`UNIX_TIMESTAMP`** differences (Databricks / Spark SQL).
+**Pattern:** Uses hourly-rate windows and booked duration from integration; payroll remains authoritative. Elapsed hours use **`UNIX_TIMESTAMP`** differences (Databricks / Spark SQL).
 
 ```sql
 WITH pending_requests AS (
@@ -475,7 +535,7 @@ WITH pending_requests AS (
             OR attendance_request.is_paid_request = TRUE
         )
 ),
-pending_with_rate AS (
+pending_with_rate_ranked AS (
     SELECT
         pending_requests.sk_time_request,
         cost_window.hourly_rate_amount,
@@ -485,7 +545,13 @@ pending_with_rate AS (
                 - UNIX_TIMESTAMP(pending_requests.ts_interval_started)
             ) / 3600.0,
             0.0
-        ) AS booked_hours
+        ) AS booked_hours,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                pending_requests.sk_time_request
+            ORDER BY
+                cost_window.dt_hourly_cost_segment_started DESC NULLS LAST
+        ) AS rate_rank
     FROM
         pending_requests
     LEFT JOIN
@@ -496,13 +562,16 @@ pending_with_rate AS (
                 cost_window.dt_hourly_cost_segment_ended IS NULL
                 OR TO_DATE(pending_requests.ts_interval_started) <= cost_window.dt_hourly_cost_segment_ended
             )
-    QUALIFY
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                pending_requests.sk_time_request
-            ORDER BY
-                cost_window.dt_hourly_cost_segment_started DESC NULLS LAST
-        ) = 1
+),
+pending_with_rate AS (
+    SELECT
+        pending_with_rate_ranked.sk_time_request,
+        pending_with_rate_ranked.hourly_rate_amount,
+        pending_with_rate_ranked.booked_hours
+    FROM
+        pending_with_rate_ranked
+    WHERE
+        pending_with_rate_ranked.rate_rank = 1
 )
 SELECT
     ROUND(
@@ -513,13 +582,11 @@ FROM
     pending_with_rate
 ```
 
----
+#### Finance — confirmed backlog after close
 
-### Financial impact and risk — confirmed backlog after close
+**Question:** What is the confirmed impact bucket: pendencies still pending after the payroll close instant?
 
-**Question:** What is the **confirmed impact bucket**: pendencies that were **still pending after** the **payroll close** instant?
-
-**Pattern:** Same **`payroll_cutoff`** substitution as above; the metric is a **count** or the **financial pattern** query restricted to **`ts_updated > cutoff`**.
+**Pattern:** Same **`payroll_cutoff`** substitution as above; alternatively restrict the financial-pattern query with **`ts_updated > cutoff_ts`**.
 
 ```sql
 WITH payroll_cutoff AS (
@@ -536,21 +603,15 @@ WHERE
     AND attendance_request.ts_updated > cutoff_rule.ts_payroll_close
 ```
 
----
+#### Finance — HR rework estimate
 
-### Financial impact and risk — HR rework estimate
+**Question:** What rework effort should HR operations plan for corrections linked to approval delays?
 
-**Question:** What **rework effort** should the **HR operations** team plan for corrections linked to approval delays?
+**Pattern:** The warehouse does not store ticket minutes. Typical approach: **`pending_request_count_after_close * assumed_minutes_per_case`**, with **`assumed_minutes_per_case`** owned by HR as a parameter in Looker Studio. Combine with the count examples in **Finance — confirmed backlog after close**.
 
-**Pattern:** The warehouse does **not** store **ticket minutes**. Common approach: **`pending_request_count_after_close * assumed_minutes_per_case`**, with **`assumed_minutes_per_case`** owned by **HR** as a **parameter** in Looker Studio. Combine with the **count** example in the previous subsection.
+#### Behaviour — managers with pendencies in three consecutive months
 
----
-
-### Behaviour and recurrence — managers with pendencies in three consecutive months
-
-**Question:** Which **managers** (or **employees**) appear with **open pendencies** in **three consecutive months**?
-
-**Managers (direct manager person number):**
+**Question:** Which managers appear with open pendencies in three consecutive calendar months (**direct managers**, by **`person_number_manager`**)?
 
 ```sql
 WITH monthly_manager_pending AS (
@@ -599,22 +660,15 @@ WHERE
     AND manager_month_streak.dt_prev_month = ADD_MONTHS(manager_month_streak.dt_prev_prev_month, 1)
 ```
 
-**Collaborators (employee `person_number`):** reuse the same pattern with **`attendance_request.person_number`** in the **`GROUP BY`** and window **`PARTITION BY`** instead of **`person_number_manager`**.
+**Pattern (collaborators / employees):** Reuse the same windowed pattern but aggregate and partition by **`attendance_request.person_number`** instead of **`person_number_manager`**.
 
----
+## Glossary
 
-### Behaviour and recurrence — punctual spike versus systematic recurrence
+* **Validity Window** : A period of time during which specific attributes of an entity remain constant and true.
+* **Snapshot** : A representation of data as it existed at a specific, frozen point in time, such as daily or monthly intervals.
+* **Current State** : The latest, real time version of the data representing only the active status of an entity without historical records.
+* **SCD (Slowly Changing Dimension)** : A database design pattern used to store and manage both current and historical data over time.
 
-**Question:** Is the approval problem **one-off** or **recurring**?
+## Related Scopes
 
-**Pattern:** Compare **`pending_request_count` by month** for the **same manager** or **vertical** using **`monthly_manager_pending`** (above); **one sharp month** suggests a **punctual** driver, **flat or rising multi-month series** suggests **systemic** behaviour. Combine with **process changes** or **headcount changes** from **`dw_people.fact_employees`** if needed.
-
----
-
-## Sensitivity and access
-
-**Personal data:** **`person_number`**, **employee names** (via **`dw_people`** joins), and **hourly rate** fields are **sensitive**; follow **LGPD** and **internal People data** policy. Limit extracts to **least privilege** roles.
-
-**Financial disclaimers:** **Hourly** amounts from the **time integration** support **operational** estimates only; **payroll** and **finance** systems decide **actual** discounts, **DSR**, and **reimbursements**.
-
-Engineering detail (lineage, full column text) lives in **DataHub** and **`metadata/dw/*.yml`** for this DAG.
+* **Lifecycle and Employee attributes** : Use `dw_employee_details` when combining time-off views with broader employee documentation or lifecycle context.

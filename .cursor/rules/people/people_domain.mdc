@@ -19,6 +19,8 @@ Optional agent skills that complement this rule file (invoke by each skill’s Y
 |--------------|------|----------------|
 | **`people-jira-branch-setup`** | `.cursor/skills/people/jira-branch-setup/SKILL.md` | Starting **non–local-only** ticketed work: Jira + Git branch from `origin/master` / `origin/HEAD` — **before** heavy edits to People SQL/metadata. **Policies, naming, English on Jira** → **`dbp-jira-reference.md`**; **`.cursor/temp/`** mirror → **Delivery artifact folder** above. |
 | **`review-pr`** | `.cursor/skills/review-pr/SKILL.md` | Full local CI-style checks before merge (style, declarations, metadata pairs, etc.). |
+| **`sync-dw-documentation`** | `.cursor/skills/people/sync-dw-documentation/SKILL.md` | Authoring or refreshing **People DW** business Markdown under `dags/people/dw_*/docs/` from **`REFERENCE_TEMPLATE.md`** (SQL + `metadata/dw` synergy). |
+| **`publish-confluence-markdown`** | `.cursor/skills/people/publish-confluence-markdown/SKILL.md` | Syncing `dags/people/**/docs/dw_*.md` to Confluence via Atlassian MCP (**draft-first**, title hygiene, **`people_domain.mdc`** IDs). |
 
 For **`workflow.type: api_ingestion`** under **`dags/people/`**, follow **`docs/api_ingestion/user_guide.md`** (and **`contributing.md`** for code changes) plus the **New DAGs in People** / **Mandatory Declaration** sections in this file (bucket, `*_people_cluster`, ACL, `credentials_scope`, etc.).
 
@@ -63,6 +65,10 @@ Data is organized by functional domain for schema-level governance and access co
 | `dw_hiring` | Talent Acquisition (TA) data |
 | `dw_equity` | Equity data |
 | `dw_survey` | Survey data |
+
+### Query preference — `dw_employee_details` vs `dw_people` (People Data)
+
+**People Data:** prefer **`dw_employee_details`** (and sibling domain `dw_*`) for internal queries — fuller model. **`dw_people`** is a slimmer, **public** schema for **non–People** consumers. **Avoid `dw_people`** internally when the need is covered by `dw_employee_details`, unless there is an explicit exception.
 
 When adding new tables, place them in the schema that matches the business domain.
 
