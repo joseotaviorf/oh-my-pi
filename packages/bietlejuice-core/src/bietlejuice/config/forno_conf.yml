@@ -1850,7 +1850,35 @@ emr_cluster_base: &emr_cluster_anchor
         - Classification: spark-hive-site
           Properties:
               hive.metastore.client.factory.class: "com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory"
+        - Classification: yarn-site
+          Properties:
+              yarn.resourcemanager.scheduler.enable-preemption: "true"
+              yarn.scheduler.capacity.maximum-am-resource-percent: "0.2"
+              yarn.scheduler.capacity.resource-calculator: org.apache.hadoop.yarn.util.resource.DominantResourceCalculator
+              yarn.nodemanager.vmem-check-enabled: "false"
+              yarn.nodemanager.pmem-check-enabled: "false"
+        - Classification: capacity-scheduler
+          Properties:
+              yarn.scheduler.capacity.root.queues: "default"
+              yarn.scheduler.capacity.root.default.capacity: "100"
+              yarn.scheduler.capacity.root.default.maximum-capacity: "100"
+              yarn.scheduler.capacity.root.default.ordering-policy: fair
+              yarn.scheduler.capacity.root.default.maximum-am-resource-percent: "0.2"
+              yarn.scheduler.capacity.maximum-am-resource-percent: "0.2"
+              yarn.scheduler.capacity.maximum-applications: "2000"
+              yarn.scheduler.capacity.minimum-user-limit-percent: "10"
     spark_conf:
+        spark.dynamicAllocation.enabled: "true"
+        spark.shuffle.service.enabled: "true"
+        spark.dynamicAllocation.minExecutors: "1"
+        spark.dynamicAllocation.maxExecutors: "6"
+        spark.executor.memory: 3g
+        spark.executor.cores: "2"
+        spark.executor.memoryOverhead: 1g
+        spark.driver.memory: 2g
+        spark.driver.memoryOverhead: 1g
+        spark.yarn.am.memory: 2g
+        spark.yarn.am.cores: "1"
         spark.sql.adaptive.enabled: "true"
         spark.sql.adaptive.coalescePartitions.enabled: "true"
         spark.sql.adaptive.skewJoin.enabled: "true"
@@ -1858,7 +1886,6 @@ emr_cluster_base: &emr_cluster_anchor
         spark.sql.shuffle.partitions: "100"
         spark.sql.autoBroadcastJoinThreshold: "104857600"
         spark.serializer: "org.apache.spark.serializer.KryoSerializer"
-        spark.driver.memory: "4g"
         spark.speculation: "true"
         spark.hadoop.mapreduce.input.fileinputformat.list-status.num-threads: "64"
         spark.sql.sources.parallelPartitionDiscovery.threshold: "32"

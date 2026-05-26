@@ -36,6 +36,36 @@ configurations:
       hive.metastore.client.factory.class:
         "com.amazonaws.glue.catalog.metastore.AWSG\
         lueDataCatalogHiveClientFactory"
+  - Classification: yarn-site
+    Properties:
+      yarn.resourcemanager.scheduler.enable-preemption: "true"
+      yarn.scheduler.capacity.maximum-am-resource-percent: "0.2"
+      yarn.scheduler.capacity.resource-calculator: org.apache.hadoop.yarn.util.resource.DominantResourceCalculator
+      yarn.nodemanager.vmem-check-enabled: "false"
+      yarn.nodemanager.pmem-check-enabled: "false"
+  - Classification: capacity-scheduler
+    Properties:
+      yarn.scheduler.capacity.root.queues: "default"
+      yarn.scheduler.capacity.root.default.capacity: "100"
+      yarn.scheduler.capacity.root.default.maximum-capacity: "100"
+      yarn.scheduler.capacity.root.default.ordering-policy: fair
+      yarn.scheduler.capacity.root.default.maximum-am-resource-percent: "0.2"
+      yarn.scheduler.capacity.maximum-am-resource-percent: "0.2"
+      yarn.scheduler.capacity.maximum-applications: "2000"
+      yarn.scheduler.capacity.minimum-user-limit-percent: "10"
+  - Classification: spark-defaults
+    Properties:
+      spark.dynamicAllocation.enabled: "true"
+      spark.shuffle.service.enabled: "true"
+      spark.dynamicAllocation.minExecutors: "1"
+      spark.dynamicAllocation.maxExecutors: "6"
+      spark.executor.memory: 3g
+      spark.executor.cores: "2"
+      spark.executor.memoryOverhead: 1g
+      spark.driver.memory: 2g
+      spark.driver.memoryOverhead: 1g
+      spark.yarn.am.memory: 2g
+      spark.yarn.am.cores: "1"
 
 # Overridable per run (CLI args).
 master_instance_type: m5.xlarge
