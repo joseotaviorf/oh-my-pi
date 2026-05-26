@@ -55,6 +55,15 @@ def list_table_specs_from_dir(tables_dir: Path) -> List[Tuple[str, Dict[str, Any
     return out
 
 
+def _get_latest_available_daily_6am_utc(logical_date):
+    target = logical_date.replace(hour=6, minute=0, second=0, microsecond=0)
+
+    if logical_date < target:
+        target = target - timedelta(days=1)
+
+    return target
+
+
 BASE_PARAMETERS = {
     "env": ENV,
     "dag_name": DAG_NAME,
@@ -105,6 +114,9 @@ def external_sensors():
             task_id=f"sensor_{external_dag_id.replace('.', '_')}",
             external_dag_id=external_dag_id,
             external_task_ids=external_task_ids,
+            execution_date_fn=_get_latest_available_daily_6am_utc
+            if external_dag_id == "bietlejuice.salesforce"
+            else None,
         )
 
 
