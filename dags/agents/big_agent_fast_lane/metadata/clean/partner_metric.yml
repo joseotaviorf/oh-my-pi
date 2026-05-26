@@ -27,6 +27,14 @@ columns:
     lineage:
       - datalake_big_agent_raw.partner_metric.partner_external_type
     description: External partner type discriminator.
+  ingestion_source:
+    lineage:
+      - datalake_big_agent_raw.partner_metric.ingestion_source
+    description: Origin system or pipeline that produced the partner metric row in Big Agent.
+  status:
+    lineage:
+      - datalake_big_agent_raw.partner_metric.status
+    description: Lifecycle or processing status of the partner metric record in Big Agent.
   total:
     lineage:
       - datalake_big_agent_raw.partner_metric.total

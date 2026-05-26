@@ -4,6 +4,8 @@ SELECT
     metric_period_history_id AS id_metric_period_history,
     partner_external_id AS id_partner_external,
     partner_external_type,
+    ingestion_source,
+    status,
     total,
     TIMESTAMP(created_at) AS ts_created,
     year,
