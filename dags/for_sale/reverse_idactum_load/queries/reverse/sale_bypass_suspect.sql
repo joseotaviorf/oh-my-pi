@@ -401,7 +401,7 @@ consolidated AS (
     agg_sales_flow AS asf
       ON l.sk_house = asf.sk_house
   LEFT JOIN
-    dw_rede.fact_lead_3p_flows AS fl3p
+    dw_3p_supply.fact_lead_3p_flows AS fl3p
       ON l.sk_house = fl3p.sk_house
       AND fl3p.sk_house != -1
   LEFT JOIN

@@ -1,60 +1,18 @@
-WITH listings_1p AS (
-    SELECT 
-        sk_house,
-        sk_region,
-        "1P" AS flag,
-        CAST(ts_first_publication AS DATE) dt_first_publication,
-        CAST(ts_last_publication AS DATE)  AS dt_last_quintoandar_publication
-    FROM 
-        dw_sale.fact_listings
-    INNER JOIN 
-        dw_sale.dim_listing
-          USING(sk_house)
-    WHERE
-        is_3p_supply = FALSE
-        AND status = 'PUBLISHED'
-),
-listings_3p AS (
-    SELECT 
-        sk_house,
-        sk_region,
-        "3P" AS flag,
-        CAST(ts_house_created AS DATE) AS dt_first_publication,
-        CAST(ts_last_publication AS DATE) AS dt_last_quintoandar_publication
-    FROM 
-        dw_rede.dim_lead_3p
-    INNER JOIN 
-        dw_rede.fact_lead_3p_flows
-            USING(sk_lead_3p)
-    INNER JOIN 
-        dw_rede.dim_lead_3p_context
-            USING(sk_lead_3p_context)
-    INNER JOIN 
-        dw_sale.dim_listing
-            USING(sk_house)
-    WHERE 
-        status = 'PUBLISHED' 
-        AND business_context = 'SALE'
-),
-published_listings AS (
+WITH published_listings AS (
     SELECT
-        sk_house,
-        sk_region,
-        flag,
-        dt_first_publication,
-        dt_last_quintoandar_publication
-    FROM 
-        listings_1p
-    UNION ALL 
-    SELECT 
-        sk_house,
-        sk_region,
-        flag,
-        dt_first_publication,
-        dt_last_quintoandar_publication
+        fl.sk_house,
+        fl.sk_region,
+        IF(dl.is_3p_supply, '3P', '1P') AS flag,
+        CAST(dl.ts_first_publication AS DATE) AS dt_first_publication,
+        CAST(dl.ts_last_publication AS DATE) AS dt_last_quintoandar_publication
     FROM
-        listings_3p
-), 
+        dw_sale.fact_listings AS fl
+    INNER JOIN
+        dw_sale.dim_listing AS dl
+            ON fl.sk_house = dl.sk_house
+    WHERE
+        dl.status = 'PUBLISHED'
+),
 listings_without_bookings AS (
     SELECT
         sk_house, 

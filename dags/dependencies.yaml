@@ -4720,11 +4720,11 @@ bietlejuice.reverse_dsat_report_load:
   - bietlejuice.enrich_survicate:load-enrich-survey-questions:first-run-of-day
   - bietlejuice.enrich_survicate:load-enrich-survey-responses:first-run-of-day
 bietlejuice.reverse_idactum_load:
+  - bietlejuice.dw_3p_supply:load-dw-3p-supply-fact-lead-3p-flows:first-run-of-day
   - bietlejuice.dw_booking:load-dw-public-dim-booking:first-run-of-day
   - bietlejuice.dw_customer_support:load-dw-customer-support-dim-ticket:first-run-of-day
   - bietlejuice.dw_customer_support:load-dw-customer-support-fact-tickets:first-run-of-day
   - bietlejuice.dw_listing_temp:load-dw-public-dim-house-listing:first-run-of-day
-  - bietlejuice.dw_rede_supply:load-dw-rede-fact-lead-3p-flows:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing:first-run-of-day
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings:first-run-of-day
@@ -4857,9 +4857,6 @@ bietlejuice.reverse_sale_listings_report:
 bietlejuice.reverse_sale_unavailable_listings_access:
   - bietlejuice.reverse_sale_unavailable_listings_load:load-reverse-suspected-unavailable-listings:first-run-of-day
 bietlejuice.reverse_sale_unavailable_listings_load:
-  - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p-context:first-run-of-day
-  - bietlejuice.dw_rede_supply:load-dw-rede-dim-lead-3p:first-run-of-day
-  - bietlejuice.dw_rede_supply:load-dw-rede-fact-lead-3p-flows:first-run-of-day
   - bietlejuice.dw_region:load-dw-public-dim-region:first-run-of-day
   - bietlejuice.dw_sale_listings:load-dw-sale-dim-listing:first-run-of-day
   - bietlejuice.dw_sale_listings:load-dw-sale-fact-listings:first-run-of-day
