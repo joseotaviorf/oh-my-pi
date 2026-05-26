@@ -1,7 +1,7 @@
 dag:
   name: signatures
   schedule_start_date: 2020, 7, 27
-  schedule_interval: 0 6,8,12 * * *
+  schedule_interval: 0 6,8,11,15 * * *
   owner: Data ForRent
   documentation:
     dag_purpose: Extraction of Signatures tables into data lake. Signatures is the service responsible for documents signature operations.
