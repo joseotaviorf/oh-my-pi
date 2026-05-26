@@ -223,6 +223,13 @@ Not all leads follow every stage. Leads may be discarded at any step, reprocesse
   )
   ```
   `TRUE` = Full Process (end-to-end). `FALSE` or `NULL` = SDR mode. Always segment by this flag — SDR and Full Process have different expected funnel depths.
+- **Querying flags and observations in Langfuse — three patterns.** All Isaias session behavior and feature flags live in `datalake_langfuse_clean.observations` (integer partitions: `year`, `month`) joined to `datalake_langfuse_clean.traces`. Always apply `o.year`, `o.month` partition filters and base trace filters `CONTAINS(t.tags, 'isaias')` and `t.environment = 'prod'`.
+  1. **Feature flags from `orchestrator_init`** — scalar flags in the JSON `output` of the `orchestrator_init` observation. Extract with `json_extract_scalar(o.output, '$.flag_name')` and aggregate per session with `BOOL_OR(... = 'true')`. Known flags:
+     - `is_draft_enabled` → Full Process mode (`TRUE` = FP, `FALSE`/`NULL` = SDR) — authoritative source for `is_full_process`
+     - `is_pricing_negotiator_enabled` → new pricing negotiator agent active in session
+     - `is_property_details_agent_enabled` → new property details agent active in session
+  2. **Node presence / step detection** — whether a graph node was visited in the session. Use `BOOL_OR(o.name = 'NodeName.event_type')` aggregated by session. Always include a full `o.name IN (...)` whitelist to prevent full table scans. See Query 9 for the complete node list and their funnel step mappings.
+  3. **Bridge to Sauron and supply** — `datalake_copilot_service_clean.session` is the required bridge: join `cs.id_external = t.id_session` (Langfuse side) and `cs.id_sauron_session = CAST(sau.id AS VARCHAR)` (Sauron side). For scoping by session window, pre-filter `datalake_copilot_service_clean.session` by `ts_created` and join to Langfuse traces via `t.id_session = cs.id_external`.
 - **`is_valid_attribution` uses `last_session_retrieved`, not ROW_NUMBER.** For the session path (lead created in session): `TRUE` when `lsr.last_session IS NULL` (no retrieval ever recorded, so the originating session is always valid) OR when `lsr.last_session = id_sauron_session_varchar`. For the lead path (retrieved lead): `TRUE` only when `lsr.last_session = id_sauron_session_varchar`. The `last_session_retrieved` CTE is: `SELECT id_lead_retrieved, MAX(id_sauron_session) AS last_session FROM isaias_conversational_flow LEFT JOIN datalake_copilot_service_clean.session ON id_external = id_langfuse_session GROUP BY 1`.
 - **`is_converted_within_24h` uses the QUALIFIED event timestamp from `supply_events_tracking`, not `obt.ts_event`.** CTE: `SELECT id_lead_ebdb, business_context, MIN(ts_event_adjusted) FROM datalake_supply_flows.supply_events_tracking WHERE funnel_step = 'QUALIFIED' GROUP BY 1, 2`. Compare: `ct.ts_event_adjusted <= bs.ts_created_session + INTERVAL '24' HOUR`.
 - `id_lead_retrieved` in `isaias_conversational_flow` is NULL when Isaias didn't retrieve a lead. Use LEFT JOIN to keep all supply rows and INNER JOIN only when requiring a matched lead.
@@ -823,3 +830,206 @@ FROM fct_session_supply_base
 GROUP BY DATE(ts_created_session)
 ORDER BY data_referencia DESC
 ```
+
+### Query 9 — Full Isaias session extraction from Langfuse traces
+
+> **Heavy query — keep the window short (days to a few weeks, not months).** Scanning `datalake_langfuse_clean.observations` is expensive; wide windows will time out or queue for a long time.
+
+Produces one row per Langfuse session with: feature flags extracted from `orchestrator_init`, boolean step-detection flags for every funnel node, supply funnel context from `obt_supply`, and chat metrics from `fact_chat_metrics`. Demonstrates: (1) extracting flags from `orchestrator_init` output; (2) detecting node visits via `BOOL_OR(o.name = '...')`; (3) splitting `obt_supply` into two separate CTEs (`obt_agg_chat` / `obt_agg_lead`) to prevent Cartesian fan-out when `sk_chat_session` and `sk_lead` are not in a strict 1:1 relationship; (4) the full join chain `copilot_service → Langfuse → Sauron → obt_supply → fact_chat_metrics`.
+
+Set `{start_year}` and `{start_month}` to the integer year and month of `{start_date}`.
+
+```sql
+WITH
+filtered_session AS (
+  SELECT
+    id_external,
+    id_sauron_session,
+    ts_created
+  FROM datalake_copilot_service_clean.session
+  WHERE ts_created >= DATE '{start_date}'
+),
+
+-- Split into two CTEs: grouping by both sk_chat_session and sk_lead in the same CTE
+-- risks a fan-out Cartesian product if they are not perfectly 1:1.
+obt_agg_chat AS (
+  SELECT
+    CAST(sk_chat_session AS VARCHAR) AS sk_chat_session,
+    MAX(CAST(sk_lead AS VARCHAR)) AS sk_lead,
+    MAX(funnel_order) AS max_funnel_step,
+    BOOL_OR(
+      (discard_funnel_step = 'lead' OR discard_funnel_step = 'prospect')
+      AND discard_opp_user = -1
+    ) AS disqualified
+  FROM dw_growth.obt_supply
+  WHERE sk_chat_session IS NOT NULL
+    AND CAST(sk_chat_session AS VARCHAR) != '-1'
+  GROUP BY 1
+),
+
+obt_agg_lead AS (
+  SELECT
+    CAST(sk_lead AS VARCHAR) AS sk_lead,
+    MAX(funnel_order) AS max_funnel_step,
+    BOOL_OR(
+      (discard_funnel_step = 'lead' OR discard_funnel_step = 'prospect')
+      AND discard_opp_user = -1
+    ) AS disqualified
+  FROM dw_growth.obt_supply
+  WHERE sk_lead IS NOT NULL
+    AND CAST(sk_lead AS VARCHAR) != '-1'
+  GROUP BY 1
+),
+
+-- Pre-cast Sauron session IDs to avoid repeated casting during joins.
+sauron_sessions AS (
+  SELECT
+    CAST(id AS VARCHAR) AS id_varchar,
+    source_environment
+  FROM datalake_sauron_clean.session
+),
+
+sessions AS (
+  SELECT
+    t.id_session,
+    -- Feature flags from orchestrator_init output (pattern 1)
+    COALESCE(BOOL_OR(json_extract_scalar(o.output, '$.is_draft_enabled') = 'true'), FALSE)                   AS is_full_process,
+    COALESCE(BOOL_OR(json_extract_scalar(o.output, '$.is_pricing_negotiator_enabled') = 'true'), FALSE)      AS is_new_pricing_agent,
+    COALESCE(BOOL_OR(json_extract_scalar(o.output, '$.is_property_details_agent_enabled') = 'true'), FALSE)  AS is_new_draft_agent,
+    -- Node presence / step detection (pattern 2)
+    BOOL_OR(o.name = 'UserNameQualification.post_clarification'  AND json_extract_scalar(o.output, '$.user_name_verified') = 'true')          AS user_name_step,
+    BOOL_OR(o.name = 'LeadCreation.pre_clarification')                                                                                        AS address_step,
+    BOOL_OR(o.name = 'PropertySubtype.post_clarification'        AND json_extract_scalar(o.output, '$.property_subtype') IS NOT NULL)          AS property_type_step,
+    BOOL_OR(o.name = 'DraftConfirmation.post_clarification'      AND json_extract_scalar(o.output, '$.DraftConfirmation_confirmation') = 'true') AS draft_step,
+    BOOL_OR(o.name = 'RentPricingSuggestion.post_clarification'  AND json_extract_scalar(o.output, '$.pricing.chosen_rent_price') IS NOT NULL)  AS pricing_rent_step,
+    BOOL_OR(o.name = 'SalePricingSuggestion.post_clarification'  AND json_extract_scalar(o.output, '$.pricing.chosen_sale_price') IS NOT NULL)  AS pricing_sale_step,
+    BOOL_OR(o.name = 'ListAvailablePhotoTimeNode.post_clarification' AND json_extract_scalar(o.output, '$.photo_schedule_date') IS NOT NULL)    AS photo_step,
+    BOOL_OR(o.name = 'Submission.post_clarification'             AND json_extract_scalar(o.output, '$.photo_session_successfully_scheduled') = 'true') AS submission_step,
+    BOOL_OR(o.name = 'escalate_when_qualified')                  AS escalated_qualified,
+    BOOL_OR(o.name = 'PropertyDetailsAgent.pre_clarification')   AS new_draft_agent,
+    BOOL_OR(o.name = 'PricingNegotiatorAgent.pre_clarification') AS new_pricing_agent,
+    BOOL_OR(o.name = 'FAQAgentInputState')                       AS has_faq_agent_interaction,
+    BOOL_OR(o.name = 'escalation_node')                          AS escalated_non_qualified,
+    MAX(json_extract_scalar(o.output, '$.lead_id'))                                              AS lead_retrieved,
+    MAX(json_extract_scalar(o.output, '$.additional_kwargs.parsed.reason'))                      AS reason_escalated,
+    MAX(json_extract_scalar(o.output, '$.last_bot_message.metadata.escalation_reason'))          AS reason_escalated_detail,
+    MAX(CASE WHEN o.name = 'Submission.post_clarification' THEN json_extract_scalar(o.output, '$.property_dedup_action') END)  AS property_dedup_action,
+    MAX(CASE WHEN o.name = 'Submission.post_clarification' THEN json_extract_scalar(o.output, '$.property_dedup_reason') END)  AS property_dedup_reason,
+    MAX(CASE WHEN o.name = 'Submission.clarification'      THEN json_extract_scalar(o.output, '$.early_exit.answer') END)      AS property_submission_error,
+    -- Last node reached (integer rank → decoded in data_modeled)
+    MAX(CASE
+      WHEN o.name = 'AddressCollectorAgent.pre_clarification' THEN 1
+      WHEN o.name IN ('ListingType.pre_clarification', 'PropertyAvailability.pre_clarification') THEN 2
+      WHEN o.name = 'PropertySubtype.pre_clarification' THEN 3
+      WHEN o.name = 'PropertyVacancy.pre_clarification' THEN 4
+      WHEN o.name IN ('PropertyDetailsNode.pre_clarification', 'PropertyDetailsAgent.pre_clarification') THEN 5
+      WHEN o.name = 'DraftConfirmation.pre_clarification' THEN 6
+      WHEN o.name IN ('SalePricingSuggestion.pre_clarification', 'RentPricingSuggestion.pre_clarification', 'PricingNegotiatorAgent.pre_clarification') THEN 7
+      WHEN o.name = 'ListAvailablePhotoTimeNode.pre_clarification' THEN 8
+      WHEN o.name = 'PhotoSessionSchedulingAuth.pre_clarification' THEN 9
+      WHEN o.name = 'EntryAccessModelNode.pre_clarification' THEN 10
+      ELSE 0
+    END) AS last_step
+  FROM datalake_langfuse_clean.observations o
+  INNER JOIN datalake_langfuse_clean.traces t ON o.id_trace = t.id_trace
+  INNER JOIN filtered_session fs              ON t.id_session = fs.id_external
+  WHERE o.year = {start_year}          -- integer partition; must match {start_date}
+    AND o.month >= {start_month}       -- integer partition; must match {start_date}
+    AND o.id_trace IS NOT NULL
+    AND t.id_session IS NOT NULL
+    AND t.environment = 'prod'
+    AND CONTAINS(t.tags, 'isaias')
+    AND o.name IN (
+      'orchestrator_init',
+      'PropertyAvailability.pre_clarification', 'ChatOpenAI', 'LeadCreation.pre_clarification',
+      'FAQAgentInputState', 'Submission.pre_clarification', 'Submission.clarification',
+      'RetrieveProspect.pre_clarification', 'escalation_node', 'escalate_when_qualified',
+      'Submission.post_clarification', 'ListAvailablePhotoTimeNode.post_clarification',
+      'RentPricingSuggestion.post_clarification', 'DraftConfirmation.post_clarification',
+      'UserNameQualification.post_clarification', 'AddressCollectorAgent.post_clarification',
+      'PropertySubtype.post_clarification', 'AddressCollectorAgent.pre_clarification',
+      'ListingType.pre_clarification', 'PropertySubtype.pre_clarification',
+      'PropertyVacancy.pre_clarification', 'SalePricingSuggestion.post_clarification',
+      'PropertyDetailsNode.pre_clarification', 'DraftConfirmation.pre_clarification',
+      'SalePricingSuggestion.pre_clarification', 'RentPricingSuggestion.pre_clarification',
+      'ListAvailablePhotoTimeNode.pre_clarification', 'PhotoSessionSchedulingAuth.pre_clarification',
+      'EntryAccessModelNode.pre_clarification', 'PropertyDetailsAgent.pre_clarification',
+      'PricingNegotiatorAgent.pre_clarification'
+    )
+  GROUP BY t.id_session
+),
+
+data_modeled AS (
+  SELECT
+    s.*,
+    fcm.*,
+    ss.source_environment,
+    cs.ts_created AS ts_session,
+    COALESCE(obt_chat.disqualified, obt_lead.disqualified) AS disqualified,
+    COALESCE(obt_chat.max_funnel_step, obt_lead.max_funnel_step, 0) AS max_funnel_step,
+    COALESCE(obt_chat.sk_lead, obt_lead.sk_lead, s.lead_retrieved, s.id_session) AS id_lead,
+    CASE
+      WHEN s.submission_step                           THEN 'SUBMISSION'
+      WHEN s.photo_step                                THEN 'PHOTO'
+      WHEN s.pricing_rent_step OR s.pricing_sale_step  THEN 'PRICING'
+      WHEN s.draft_step                                THEN 'DRAFT'
+      WHEN s.property_type_step                        THEN 'PROPERTY TYPE'
+      WHEN s.address_step                              THEN 'ADDRESS'
+      WHEN s.user_name_step                            THEN 'NAME'
+      ELSE 'NO INTERACTION'
+    END AS user_max_step,
+    CASE COALESCE(obt_chat.max_funnel_step, obt_lead.max_funnel_step, 0)
+      WHEN 1 THEN 'LEAD'
+      WHEN 2 THEN 'PROSPECT'
+      WHEN 3 THEN 'QUALIFIED'
+      WHEN 4 THEN 'AV QUALIFIED'
+      WHEN 5 THEN 'OPPORTUNITY'
+      WHEN 6 THEN 'FIRST LISTING'
+    END AS max_step_supply,
+    CASE s.last_step
+      WHEN 0  THEN 'NAME'
+      WHEN 1  THEN 'ADDRESS'
+      WHEN 2  THEN 'BUSINESS CONTEXT'
+      WHEN 3  THEN 'PROPERTY TYPE'
+      WHEN 4  THEN 'PROPERTY VACANCY'
+      WHEN 5  THEN 'PROPERTY DETAILS'
+      WHEN 6  THEN 'PROPERTY DETAILS CONFIRMATION'
+      WHEN 7  THEN 'PRICING'
+      WHEN 8  THEN 'PHOTO'
+      WHEN 9  THEN 'AUTH'
+      WHEN 10 THEN 'ENTRY MODEL'
+    END AS last_step_name
+  FROM sessions s
+  INNER JOIN filtered_session cs ON s.id_session = cs.id_external
+  LEFT JOIN sauron_sessions ss
+    ON ss.id_varchar = cs.id_sauron_session
+  LEFT JOIN dw_customer_support.fact_chat_metrics fcm
+    ON fcm.sk_session = cs.id_sauron_session
+   AND cs.id_sauron_session IS NOT NULL
+  LEFT JOIN obt_agg_chat obt_chat
+    ON obt_chat.sk_chat_session = cs.id_sauron_session
+   AND cs.id_sauron_session IS NOT NULL
+  LEFT JOIN obt_agg_lead obt_lead
+    ON obt_lead.sk_lead = s.lead_retrieved
+   AND s.lead_retrieved IS NOT NULL
+   AND obt_chat.sk_chat_session IS NULL  -- avoid double-counting when both paths match
+)
+
+SELECT * FROM data_modeled
+```
+
+**`last_step` node-to-label mapping:**
+
+| `last_step` | Node(s) reached | `last_step_name` |
+|---|---|---|
+| 0 | (no node matched) | NAME |
+| 1 | `AddressCollectorAgent.pre_clarification` | ADDRESS |
+| 2 | `ListingType.pre_clarification` / `PropertyAvailability.pre_clarification` | BUSINESS CONTEXT |
+| 3 | `PropertySubtype.pre_clarification` | PROPERTY TYPE |
+| 4 | `PropertyVacancy.pre_clarification` | PROPERTY VACANCY |
+| 5 | `PropertyDetailsNode.pre_clarification` / `PropertyDetailsAgent.pre_clarification` | PROPERTY DETAILS |
+| 6 | `DraftConfirmation.pre_clarification` | PROPERTY DETAILS CONFIRMATION |
+| 7 | `RentPricingSuggestion.pre_clarification` / `SalePricingSuggestion.pre_clarification` / `PricingNegotiatorAgent.pre_clarification` | PRICING |
+| 8 | `ListAvailablePhotoTimeNode.pre_clarification` | PHOTO |
+| 9 | `PhotoSessionSchedulingAuth.pre_clarification` | AUTH |
+| 10 | `EntryAccessModelNode.pre_clarification` | ENTRY MODEL |
