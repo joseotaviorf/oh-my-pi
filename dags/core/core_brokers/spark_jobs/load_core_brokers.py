@@ -4,6 +4,7 @@ from pyspark.sql.functions import (
     current_timestamp,
     last,
     lit,
+    max_by,
     regexp_replace,
     translate,
     when,
@@ -116,22 +117,41 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
         )
 
     @staticmethod
-    def _extract_document_number(doc_type, alias_name, digits_only: bool):
-        """Build an aggregate expression that extracts a cleaned document number.
+    def _extract_latest_document_number(doc_type, alias_name, digits_only: bool):
+        """Aggregate expression that returns the cleaned identification number
+        of the most-recent document of ``doc_type`` per group.
 
-        CNPJ uses digits-only; CRECI and RFC keep alphanumeric characters.
+        Among rows of ``document_type = doc_type``, picks the one with the
+        largest ``d.ts_updated`` and cleans its ``identification_number``.
+        Rows of any other ``document_type`` (and rows where the LEFT JOIN to
+        ``document`` produced NULLs) are ignored because both arguments to
+        ``max_by`` are NULL — and ``max_by`` skips NULL ordering keys.
 
-        Returns a ``Column`` expression suitable for use inside ``.agg()``.
+        ``digits_only=True`` keeps decimal digits only (CNPJ); the alphanumeric
+        path (CRECI / RFC) keeps letters + digits. Returns NULL when there is
+        no matching row or the cleaned string ends up empty.
         """
         pattern = "[^0-9]" if digits_only else "[^0-9A-Za-z]"
-        cleaned = regexp_replace(col("d.identification_number"), pattern, "")
-        agg_expr = spark_max(when(col("d.document_type") == doc_type, cleaned))
-        return when(agg_expr != "", agg_expr).alias(alias_name)
+        latest_id_number = max_by(
+            when(
+                col("d.document_type") == doc_type,
+                col("d.identification_number"),
+            ),
+            when(col("d.document_type") == doc_type, col("d.ts_updated")),
+        )
+        cleaned = regexp_replace(latest_id_number, pattern, "")
+        return when(cleaned != "", cleaned).alias(alias_name)
 
     def _process_company_document(self, company_document_df, document_df):
-        """Pivot document types to extract CRECI, CNPJ, and RFC per company."""
+        """Pivot document types to extract CRECI, CNPJ, and RFC per company.
+
+        For each ``(id_company, document_type)`` we keep the document with the
+        largest ``ts_updated``, **regardless of ``document.status``** — i.e.
+        archived / deleted revisions are still considered when they are the
+        latest known number for that company × type.
+        """
         cd_with_doc = company_document_df.alias("cd").join(
-            document_df.alias("d").filter(col("status") == "ACTIVE"),
+            document_df.alias("d"),
             col("cd.id_document") == col("d.id"),
             "left",
         )
@@ -139,9 +159,11 @@ class CoreBrokersSparkJob(CoreBrokersBaseSparkJob):
         return (
             cd_with_doc.groupBy("cd.id_company")
             .agg(
-                self._extract_document_number("CRECI", "creci", digits_only=False),
-                self._extract_document_number("CNPJ", "cnpj", digits_only=True),
-                self._extract_document_number("RFC", "rfc", digits_only=False),
+                self._extract_latest_document_number(
+                    "CRECI", "creci", digits_only=False
+                ),
+                self._extract_latest_document_number("CNPJ", "cnpj", digits_only=True),
+                self._extract_latest_document_number("RFC", "rfc", digits_only=False),
             )
             .withColumnRenamed("id_company", "doc_id_company")
         )

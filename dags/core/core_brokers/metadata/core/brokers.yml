@@ -94,22 +94,34 @@ columns:
   creci:
     lineage:
       - datalake_company_clean.document.identification_number
+      - datalake_company_clean.document.document_type
+      - datalake_company_clean.document.ts_updated
     description: >
       CRECI (Conselho Regional de Corretores de Imoveis) registration number.
       Professional license number for real estate brokers in Brazil, normalized
-      to alphanumeric characters (letters and digits).
+      to alphanumeric characters (letters and digits). Picked from the most
+      recent CRECI document of the company (max ts_updated) regardless of
+      document.status.
   cnpj:
     lineage:
       - datalake_company_clean.document.identification_number
+      - datalake_company_clean.document.document_type
+      - datalake_company_clean.document.ts_updated
     description: >
       CNPJ (Cadastro Nacional da Pessoa Juridica) number. Brazilian federal
-      tax ID for companies, containing only numeric characters.
+      tax ID for companies, containing only numeric characters. Picked from
+      the most recent CNPJ document of the company (max ts_updated)
+      regardless of document.status.
   rfc:
     lineage:
       - datalake_company_clean.document.identification_number
+      - datalake_company_clean.document.document_type
+      - datalake_company_clean.document.ts_updated
     description: >
       RFC (Registro Federal de Contribuyentes) number. Mexican federal tax ID
-      for companies, normalized to alphanumeric characters (letters and digits).
+      for companies, normalized to alphanumeric characters (letters and
+      digits). Picked from the most recent RFC document of the company
+      (max ts_updated) regardless of document.status.
   is_3p_rent_broker:
     lineage:
       - datalake_company_clean.company_product.id_product
