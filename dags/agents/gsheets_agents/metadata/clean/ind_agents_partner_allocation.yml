@@ -3,7 +3,7 @@ database_name: datalake_gsheets_clean
 table_name: ind_agents_partner_allocation
 description: >-
   Partner (pessoa física) records from Google Sheets tab Partners_PF: agent and user ids,
-  broker company name, registration contact dates and high-touch distribution periods.
+  broker company name, contract start/end dates and high-touch distribution periods.
 domain: Agents
 owner: data-ae-agents@quintoandar.com.br
 columns:
@@ -19,10 +19,10 @@ columns:
     description: Legal/trade name of the partner real estate intermediary (column imobiliaria).
     lineage:
       - datalake_gsheets_raw.ind_agents_partner_allocation.imobiliaria
-  dt_contact_started:
-    description: Date at which outbound contact registration started per sheet (Contact started).
+  dt_contract_started:
+    description: Broker contract start date where filled (Contract started on the sheet).
     lineage:
-      - datalake_gsheets_raw.ind_agents_partner_allocation.contact_started
+      - datalake_gsheets_raw.ind_agents_partner_allocation.contract_started
   dt_contract_ended:
     description: Broker contract ended date where filled (Contract ended).
     lineage:
