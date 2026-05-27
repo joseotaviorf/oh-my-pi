@@ -1,64 +1,56 @@
 database_name: datalake_sonia_journeys
 table_name: ep2ds_view
 description: |
-  Enrich view for Sonia ep2ds journey, returning proposals that got evaluation positive
-  with user contact data and house context, filtered to non-credit-passport and non-bypass cases.
+  Enrich view for Sonia ep2ds journey, returning users with positive rent flow credit
+  events that still do not have documentation submitted or documentation canceled.
 domain: For Rent
 owner: data-for-rent@quintoandar.com.br
 columns:
-  pk_proposal_user:
+  pk_event_user:
     lineage:
-      - datalake_ebdb_clean.offer.id_client
-      - datalake_ebdb_clean.proposal.id
-    description: Primary key concatenating id_user and id_proposal.
+      - datalake_cdp_clean.transactional.id_event
+      - datalake_cdp_clean.transactional.id_person
+    description: Primary key concatenating id_event and uuid_user.
+  id_event:
+    lineage:
+      - datalake_cdp_clean.transactional.id_event
+    description: CDP event identifier from rent flow credit positive events.
   id_user:
     lineage:
-      - datalake_ebdb_clean.offer.id_client
-    description: EBDB user identifier associated with the active proposal.
+      - datalake_cdp_clean.transactional.id_user
+    description: User identifier associated with the rent flow event.
+    personal_data_classification: personal
   uuid_user:
     lineage:
-      - datalake_ebdb_clean.user.uuid_person
-    description: EBDB user UUID associated with the active proposal.
+      - datalake_cdp_clean.transactional.id_person
+    description: User UUID (id_person) associated with the rent flow event.
+    personal_data_classification: personal
   id_proposal:
     lineage:
-      - datalake_ebdb_clean.proposal.id
-    description: EBDB proposal identifier.
+      - datalake_cdp_clean.transactional.event_properties.id_documentation
+    description: Proposal documentation identifier from credit positive event properties.
   documentation_url:
     lineage:
-      - datalake_ebdb_clean.proposal.id
+      - datalake_cdp_clean.transactional.event_properties.id_documentation
     description: Sonia documentation link built from id_proposal with fixed Sonia tracking parameters.
   id_house:
     lineage:
-      - datalake_ebdb_clean.house.id
-    description: EBDB house identifier associated with the proposal.
-  is_active_flow:
+      - datalake_cdp_clean.transactional.event_properties.id_house
+    description: House identifier associated with the rent flow.
+  is_active_rent_flow:
     lineage:
-      - datalake_ebdb_clean.offer.ts_expired
-      - datalake_ebdb_clean.offer.rejection_reason
-      - datalake_ebdb_clean.offer.status
-      - datalake_ebdb_clean.proposal.rejection_reason
-      - datalake_ebdb_clean.proposal.ts_created
-      - datalake_ebdb_clean.proposal.ts_expired
-      - datalake_sorting_hat_clean.credit_analysis.result
-      - datalake_sorting_hat_clean.credit_analysis.category
-      - datalake_sorting_hat_clean.credit_analysis.automatic_decision_reason
-      - datalake_sorting_hat_clean.credit_analysis.bypass
-      - datalake_ebdb_clean.contract.status
-      - datalake_ebdb_clean.contract.ts_minuta_approved
-      - datalake_ebdb_clean.contract.ts_updated
-    description: Indicates whether the offer/proposal/contract flow is currently active for the journey.
+      - datalake_cdp_clean.transactional.event_name
+    description: Indicates whether the rent flow is active based on absence of documentation canceled event.
   documentation_sent:
     lineage:
       - datalake_cdp_clean.transactional.event_name
-      - datalake_cdp_clean.transactional.event_properties
-      - datalake_cdp_clean.transactional.ts_event
-      - datalake_sorting_hat_clean.credit_analysis.ts_created
-      - datalake_ebdb_clean.proposal.id
-    description: Indicates whether tenant documentation completed event happened after positive evaluation.
+    description: Indicates whether documentation submitted event exists for the rent flow.
   has_answered:
     lineage:
       - datalake_copilot_service_clean.session.id_user
+      - datalake_copilot_service_clean.session.ts_created
       - datalake_copilot_service_clean.message.channel
+      - datalake_cdp_clean.transactional.ts_event
     description: Indicates whether the user has answered Sonia WhatsApp after the positive evaluation timestamp.
   user_email:
     lineage:
@@ -79,17 +71,16 @@ columns:
     description: Concatenated house street address and number.
   binning_value:
     lineage:
-      - datalake_ebdb_clean.offer.id_client
-    description: Deterministic 0-99 hash bucket of id_user for experiment split assignment.
+      - datalake_cdp_clean.transactional.id_person
+    description: Deterministic 0-99 hash bucket of uuid_user for experiment split assignment.
   ts_evaluation_positive:
     lineage:
-      - datalake_sorting_hat_clean.credit_analysis.ts_created
-    description: Latest timestamp of positive credit evaluation.
+      - datalake_cdp_clean.transactional.ts_event
+      - datalake_cdp_clean.transactional.event_name
+    description: Latest timestamp of rent flow credit positive event.
   ts_documentation_sent:
     lineage:
       - datalake_cdp_clean.transactional.ts_event
       - datalake_cdp_clean.transactional.event_name
-      - datalake_cdp_clean.transactional.event_properties
-      - datalake_sorting_hat_clean.credit_analysis.ts_created
-      - datalake_ebdb_clean.proposal.id
-    description: Latest documentation completed event timestamp after positive evaluation.
+      - datalake_cdp_clean.transactional.event_properties.id_rent_flow
+    description: Latest documentation submitted event timestamp for the rent flow.

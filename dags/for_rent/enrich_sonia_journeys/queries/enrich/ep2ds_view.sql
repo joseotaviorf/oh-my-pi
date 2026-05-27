@@ -1,169 +1,167 @@
-WITH all_flows_base AS (
-   SELECT
-    CAST(CONCAT(of_ebdb.id, '02') AS BIGINT) AS id_offer,
-    of_ebdb.id_client AS id_user,
-    of_ebdb.id_house,
-    CASE
-      WHEN cav_sh.category IS NULL
-        AND (
-          cav_sh.bypass IS NULL
-          OR TRY_CAST(cav_sh.bypass AS BOOLEAN) = FALSE
-        )
-        AND cav_sh.automatic_decision_reason <> 'INSUFFICIENT_INCOME'
-        AND cav_sh.result = 'REJECTED'
-        THEN TRUE
-      ELSE FALSE
-    END AS is_clear_no,
-    CASE
-      WHEN of_ebdb.ts_expired > NOW()
-        AND of_ebdb.rejection_reason IS NULL
-        AND of_ebdb.status != 'Rejeitada' THEN TRUE
-      ELSE FALSE
-    END AS is_offer_active,
-    pr_ebdb.id AS id_proposal,
-    pr_ebdb.status AS proposal_status,
-    pr_ebdb.tenant_documentation_status,
-    ct_ebdb.id AS id_contract,
-    COALESCE(ct_ebdb.ts_minuta_approved, ct_ebdb.ts_updated) + INTERVAL '7 days' AS expiration_date,
-    pr_ebdb.rejection_reason AS proposal_rejection_reason,
-    pr_ebdb.ts_created AS ts_proposal_created,
-    pr_ebdb.ts_expired AS ts_proposal_expired,
-    cav_sh.result AS credit_analysis_result,
-    cav_sh.automatic_decision_reason,
-    ct_ebdb.status AS contract_status,
-    cav_sh.ts_created AS ts_evaluation_positive,
-    COALESCE(TRY_CAST(cav_sh.bypass AS BOOLEAN), FALSE) AS is_bypass
-  FROM datalake_ebdb_clean.offer AS of_ebdb
-  LEFT JOIN datalake_ebdb_clean.proposal AS pr_ebdb
-    ON of_ebdb.id = pr_ebdb.id_offer
-  LEFT JOIN datalake_ebdb_clean.contract AS ct_ebdb
-    ON pr_ebdb.id = ct_ebdb.id_proposal
-  LEFT JOIN datalake_sorting_hat_clean.credit_analysis AS cav_sh
-    ON pr_ebdb.id = cav_sh.id_proposal
-  WHERE cav_sh.ts_created >= TIMESTAMP '2026-05-26 00:00:00'
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY pr_ebdb.id ORDER BY cav_sh.ts_created DESC) = 1
-),
-all_flows_status AS (
-  SELECT
-    afb.*,
-    CASE
-      WHEN afb.id_proposal IS NULL THEN NULL
-      WHEN afb.proposal_rejection_reason = 'CreditEvaluationRejected'
-        AND afb.credit_analysis_result = 'APPROVED'
-        AND afb.ts_proposal_created + INTERVAL '5 days' < NOW() THEN FALSE
-      WHEN afb.proposal_rejection_reason = 'CreditEvaluationRejected'
-        AND afb.credit_analysis_result = 'APPROVED'
-        AND afb.ts_proposal_created + INTERVAL '5 days' > NOW() THEN TRUE
-      WHEN afb.proposal_rejection_reason = 'CreditEvaluationRejected'
-        AND afb.credit_analysis_result = 'REJECTED'
-        AND afb.is_clear_no = FALSE
-        AND afb.ts_proposal_created + INTERVAL '5 days' > NOW() THEN TRUE
-      WHEN afb.proposal_rejection_reason IS NULL
-        AND (afb.ts_proposal_expired IS NULL OR afb.ts_proposal_expired > NOW()) THEN TRUE
-      ELSE FALSE
-    END AS is_proposal_active,
-    CASE
-      WHEN afb.id_contract IS NULL THEN NULL
-      WHEN afb.contract_status IN ('PreAssinaturas', 'Minuta')
-        AND afb.expiration_date > NOW() THEN TRUE
-      ELSE FALSE
-    END AS is_contract_waiting_sign
-  FROM all_flows_base AS afb
-),
-all_flows AS (
-  SELECT
-    afs.id_offer,
-    afs.id_user,
-    afs.id_house,
-    afs.is_clear_no,
-    afs.is_offer_active,
-    afs.id_proposal,
-    afs.proposal_status,
-    afs.tenant_documentation_status,
-    afs.is_proposal_active,
-    afs.id_contract,
-    afs.expiration_date,
-    afs.is_contract_waiting_sign,
-    COALESCE(afs.is_contract_waiting_sign, afs.is_proposal_active, afs.is_offer_active) AS is_active_flow,
-    afs.ts_evaluation_positive,
-    afs.is_bypass
-  FROM all_flows_status AS afs
-),
-documentation_completed_events AS (
-  SELECT
-    TRY_CAST(cdp_tx.event_properties:proposal_id AS INT) AS id_proposal,
-    MAX(cdp_tx.ts_event) AS ts_documentation_completed
-  FROM datalake_cdp_clean.transactional AS cdp_tx
-  WHERE cdp_tx.event_name = 'tenant_documentation_completed_event'
-    AND TRY_CAST(cdp_tx.event_properties:proposal_id AS INT) IS NOT NULL
-  GROUP BY TRY_CAST(cdp_tx.event_properties:proposal_id AS INT)
-),
-getting_ep_cases AS (
-  SELECT
-    af.*,
-    hs.address,
-    hs.number,
-    hs.complement,
-    hs.neighborhood,
-    hs.city,
-    DECODE(pr_sh.proposal_source, 'DEFAULT', FALSE, TRUE) AS is_credit_passport,
-    us_ebdb.uuid_person AS uuid_user,
-    us_ebdb.email AS user_email,
-    REPLACE(us_ebdb.main_phone, '+', '') AS user_phone,
-    us_ebdb.name AS user_name,
-    (dce.id_proposal IS NOT NULL) AS documentation_sent,
-    dce.ts_documentation_completed AS ts_documentation_sent,
-    EXISTS (
-      SELECT 1
-      FROM datalake_copilot_service_clean.session s
-      INNER JOIN datalake_copilot_service_clean.message m
-        ON m.id_session = s.id
-      WHERE TRY_CAST(s.id_user AS BIGINT) = af.id_user
-        AND s.ts_created >= af.ts_evaluation_positive
-        AND m.channel = 'WHATSAPP_SONIA_CHAT'
-    ) AS has_answered
-  FROM all_flows AS af
-  INNER JOIN datalake_sorting_hat_clean.proposal AS pr_sh
-    ON af.id_proposal = pr_sh.id
-  INNER JOIN datalake_ebdb_clean.user AS us_ebdb
-    ON af.id_user = us_ebdb.id
-  LEFT JOIN documentation_completed_events AS dce
-    ON af.id_proposal = dce.id_proposal
-    AND dce.ts_documentation_completed >= af.ts_evaluation_positive
-  LEFT JOIN datalake_ebdb_clean.house AS hs
-    ON af.id_house = hs.id
-  WHERE af.proposal_status = 'EmAnalise'
-    AND af.tenant_documentation_status IN ('AnaliseCredito', 'RecusadoCredito')
-)
+WITH
+  rent_flow_events AS (
+    SELECT
+      CAST(cdp_tx.id_event AS STRING) AS id_event,
+      TRY_CAST(cdp_tx.id_user AS BIGINT) AS id_user,
+      CAST(cdp_tx.id_person AS STRING) AS uuid_user,
+      TRY_CAST(cdp_tx.event_properties: id_house AS BIGINT) AS id_house,
+      CAST(cdp_tx.event_properties: id_rent_flow AS STRING) AS id_rent_flow,
+      TRY_CAST(cdp_tx.event_properties: id_documentation AS BIGINT) AS id_proposal,
+      cdp_tx.event_name,
+      cdp_tx.ts_event
+    FROM
+      datalake_cdp_clean.transactional AS cdp_tx
+    WHERE
+      cdp_tx.event_name IN (
+        'rent_flow_tenant_credit_positive',
+        'rent_flow_tenant_credit_positive_with_guarantee',
+        'rent_flow_tenant_documentation_submitted',
+        'rent_flow_tenant_documentation_canceled'
+      )
+      AND TRY_CAST(cdp_tx.id_user AS BIGINT) IS NOT NULL
+      AND cdp_tx.id_person IS NOT NULL
+      AND cdp_tx.event_properties: id_rent_flow IS NOT NULL
+      AND cdp_tx.ts_event >= TIMESTAMP '2026-05-27 00:00:00'
+  ),
+  credit_positive_ranked AS (
+    SELECT
+      rfe.id_event,
+      rfe.id_user,
+      rfe.uuid_user,
+      rfe.id_house,
+      rfe.id_rent_flow,
+      rfe.id_proposal,
+      rfe.ts_event AS ts_credit_positive,
+      ROW_NUMBER() OVER (
+        PARTITION BY rfe.uuid_user,
+        rfe.id_rent_flow
+        ORDER BY
+          rfe.ts_event DESC
+      ) AS rn
+    FROM
+      rent_flow_events AS rfe
+    WHERE
+      rfe.event_name IN (
+        'rent_flow_tenant_credit_positive',
+        'rent_flow_tenant_credit_positive_with_guarantee'
+      )
+      AND rfe.id_event IS NOT NULL
+      AND rfe.id_proposal IS NOT NULL
+  ),
+  credit_positive_flows AS (
+    SELECT
+      cpr.id_event,
+      cpr.id_user,
+      cpr.uuid_user,
+      cpr.id_house,
+      cpr.id_rent_flow,
+      cpr.id_proposal,
+      cpr.ts_credit_positive
+    FROM
+      credit_positive_ranked AS cpr
+    WHERE
+      cpr.rn = 1
+  ),
+  rent_flow_flags AS (
+    SELECT
+      rfe.uuid_user,
+      rfe.id_rent_flow,
+      MAX(
+        CASE
+          WHEN rfe.event_name = 'rent_flow_tenant_documentation_submitted' THEN TRUE
+          ELSE FALSE
+        END
+      ) AS documentation_sent,
+      MAX(
+        CASE
+          WHEN rfe.event_name = 'rent_flow_tenant_documentation_canceled' THEN TRUE
+          ELSE FALSE
+        END
+      ) AS has_documentation_canceled,
+      MAX(
+        CASE
+          WHEN rfe.event_name = 'rent_flow_tenant_documentation_submitted' THEN rfe.ts_event
+          ELSE NULL
+        END
+      ) AS ts_documentation_sent
+    FROM
+      rent_flow_events AS rfe
+    GROUP BY
+      rfe.uuid_user,
+      rfe.id_rent_flow
+  ),
+  eligible_flows AS (
+    SELECT
+      cpf.id_event,
+      cpf.id_user,
+      cpf.uuid_user,
+      cpf.id_house,
+      cpf.id_rent_flow,
+      cpf.id_proposal,
+      cpf.ts_credit_positive,
+      COALESCE(rff.documentation_sent, FALSE) AS documentation_sent,
+      COALESCE(rff.has_documentation_canceled, FALSE) AS has_documentation_canceled,
+      rff.ts_documentation_sent
+    FROM
+      credit_positive_flows AS cpf
+      LEFT JOIN rent_flow_flags AS rff ON cpf.uuid_user = rff.uuid_user
+      AND cpf.id_rent_flow = rff.id_rent_flow
+  ),
+  enriched_flows AS (
+    SELECT
+      ef.id_event,
+      ef.id_user,
+      ef.uuid_user,
+      ef.id_house,
+      ef.id_rent_flow,
+      ef.id_proposal,
+      ef.ts_credit_positive AS ts_evaluation_positive,
+      ef.ts_documentation_sent,
+      ef.documentation_sent,
+      COALESCE(ef.has_documentation_canceled, FALSE) = FALSE AS is_active_rent_flow,
+      us_ebdb.email AS user_email,
+      REPLACE(us_ebdb.main_phone, '+', '') AS user_phone,
+      SPLIT_PART(us_ebdb.name, ' ', 1) AS user_first_name,
+      hs.address,
+      hs.number,
+      EXISTS (
+        SELECT
+          1
+        FROM
+          datalake_copilot_service_clean.session AS session_cp
+          INNER JOIN datalake_copilot_service_clean.message AS message_cp ON message_cp.id_session = session_cp.id
+        WHERE
+          TRY_CAST(session_cp.id_user AS BIGINT) = ef.id_user
+          AND session_cp.ts_created >= ef.ts_credit_positive
+          AND message_cp.channel = 'WHATSAPP_SONIA_CHAT'
+      ) AS has_answered
+    FROM
+      eligible_flows AS ef
+      INNER JOIN datalake_ebdb_clean.user AS us_ebdb ON ef.id_user = us_ebdb.id
+      LEFT JOIN datalake_ebdb_clean.house AS hs ON ef.id_house = hs.id
+  )
 SELECT
-  CONCAT(CAST(gec.id_proposal AS STRING), '_', CAST(gec.uuid_user AS STRING)) AS pk_proposal_user,
-  gec.id_user,
-  gec.uuid_user,
-  gec.id_proposal,
+  CONCAT(ef.id_event, '_', ef.uuid_user) AS pk_event_user,
+  ef.id_event,
+  ef.id_user,
+  ef.uuid_user,
+  ef.id_proposal,
   CONCAT(
     'https://www.quintoandar.com.br/documentacao/',
-    CAST(gec.id_proposal AS STRING),
+    CAST(ef.id_proposal AS STRING),
     '?source_platform=sonia&utm_source=sonia'
   ) AS documentation_url,
-  gec.id_house,
-  MAX(gec.is_active_flow) AS is_active_flow,
-  MAX(gec.documentation_sent) AS documentation_sent,
-  MAX(gec.has_answered) AS has_answered,
-  gec.user_email,
-  gec.user_phone,
-  MAX(split_part(gec.user_name, ' ', 1)) AS user_first_name,
-  MAX(CONCAT_WS(', ', gec.address, CAST(gec.number AS STRING))) AS address_text,
-  ABS(CRC32(ENCODE(CAST(gec.uuid_user AS STRING), 'utf-8'))) % 100 AS binning_value,
-  MAX(gec.ts_evaluation_positive) AS ts_evaluation_positive,
-  MAX(gec.ts_documentation_sent) AS ts_documentation_sent
-FROM getting_ep_cases AS gec
-WHERE gec.is_credit_passport IS FALSE
-  AND gec.is_bypass IS FALSE
-GROUP BY
-  CONCAT(CAST(gec.id_proposal AS STRING), '_', CAST(gec.uuid_user AS STRING)),
-  gec.id_user,
-  gec.uuid_user,
-  gec.id_proposal,
-  gec.id_house,
-  gec.user_email,
-  gec.user_phone;
+  ef.id_house,
+  ef.is_active_rent_flow,
+  ef.documentation_sent,
+  ef.has_answered,
+  ef.user_email,
+  ef.user_phone,
+  ef.user_first_name,
+  CONCAT_WS(', ', ef.address, CAST(ef.number AS STRING)) AS address_text,
+  ABS(CRC32(ENCODE(ef.uuid_user, 'utf-8'))) % 100 AS binning_value,
+  ef.ts_evaluation_positive,
+  ef.ts_documentation_sent
+FROM
+  enriched_flows AS ef;
+  
