@@ -15,6 +15,31 @@ This entity drills **For Sale** (Visit → Offer → CCV) where the data model i
 
 For the umbrella view of Marketplace, broker modelling, agents 3P, business-model matrix, and cross-entity 3P identification, see [`broker_xp.md`](./broker_xp.md). For the supply-side counterpart (3P partner inventory from BSP to first listing), see [`3p_supply.md`](./3p_supply.md). This entity is the demand sub-funnel of the same Marketplace.
 
+## Default scope rule — three flags by default
+
+**When the user asks for "3P Demand indicators" without specifying a subset, the default analytical scope spans the three Marketplace flags:**
+
+```sql
+is_3p_demand = TRUE OR is_3p_lead_gen = TRUE OR is_3p_supply = TRUE
+```
+
+Operationally, the team treats the 3P Demand funnel as **any Marketplace-touched transaction** — whether the partner brought the buyer (`is_3p_demand` / TSC), QuintoAndar handed off a 1P-sourced lead to the partner (`is_3p_lead_gen` / CQA), or the listing itself is from a partner and the demand was worked by a 1P agent (`is_3p_supply` / `BM_3P_SUPPLY_1P_DEMAND_AGENT`). Restricting to only `is_3p_demand OR is_3p_lead_gen` (i.e. dropping `is_3p_supply`) excludes the supply-only configurations and **underestimates** every demand-funnel headline metric (visits, offers, CCVs).
+
+### When to broaden vs. narrow
+
+- **Default (broaden)** — apply the three-flag `OR` whenever the question is phrased generically: "% de visitas 3P", "CCVs do 3P", "funil de demanda 3P do mês". No further qualification means all three.
+- **Narrow only when the user is explicit** — "só Lead Gen", "apenas TSC / 3P Demand", "excluir is_3p_supply", "comparar Demand vs Lead Gen": apply only the requested flag(s).
+- **Two-flag legacy default (`is_3p_demand OR is_3p_lead_gen`) is the strict demand-broker side** — keep it only when the question requires attribution to the demand-side broker that brought the buyer. See structural exceptions below.
+
+### Structural exceptions — when the broad scope does not apply mechanically
+
+Two analyses cannot mechanically include `is_3p_supply`-only rows, even under the default scope:
+
+1. **Buyer Prospect Window analyses** (`dw_sale.dim_buyer_prospect_3p_history`). The table is constructed only from demand-side events — `demand_type ∈ {'3P_DEMAND', '3P_LEAD_GEN'}`. There is **no `3P_SUPPLY` demand_type**, so NBP / RBP / window-anchored metrics are inherently demand-broker-side. Do not try to bolt `is_3p_supply` on top of this table; instead, when an analysis genuinely needs the broader scope, anchor on `fact_visits` / `fact_offers` rather than on the prospect window.
+2. **Demand-broker-side aggregations** (`GROUP BY sk_broker_demand`). Rows that are `is_3p_supply = TRUE AND is_3p_demand = FALSE AND is_3p_lead_gen = FALSE` carry `sk_broker_demand = -1` by construction (the demand side is 1P — there is no demand-side broker). Including those rows in a per-broker-demand aggregation collapses them under the sentinel `-1` group, which is meaningless. Two valid responses: either keep the demand-side scope (two flags) and document the choice in the answer, or shift the aggregation grain to `sk_broker_supply` / `business_model` when the question genuinely needs the broader matrix.
+
+When in doubt, default to the **broad three-flag scope at transaction grain**, and explicitly call out in the answer whether the analysis required dropping back to the two-flag scope (with the structural reason). The Identifying section below restates this rule operationally.
+
 ## Glossary and Synonyms
 
 - **3P Demand**, **TSC**, **Traga Seus Clientes** → partner brings the buyer/tenant. Flag: `is_3p_demand = TRUE`.
@@ -295,12 +320,14 @@ The Buyer Prospect 3P entity is `dw_sale.dim_buyer_prospect_3p_history` — an S
 
 ## Identifying 3P Demand transactions
 
-Apply the same matrix as in [`broker_xp.md`](./broker_xp.md), restricted to the demand side:
+Apply the same matrix as in [`broker_xp.md`](./broker_xp.md). **Default scope = three flags `OR`** (see "Default scope rule" above); narrow only when the user is explicit.
 
-- **3P Demand only**: `is_3p_demand = TRUE` (and optionally `sk_broker_demand <> -1`).
-- **3P Lead Gen only**: `is_3p_lead_gen = TRUE` (and optionally `sk_broker_demand <> -1`).
-- **3P Demand OR 3P Lead Gen** (full demand-side scope): `is_3p_demand = TRUE OR is_3p_lead_gen = TRUE`.
-- **3P Demand × 3P Supply combinations** (cross-broker transactions): `is_3p_demand = TRUE AND is_3p_supply = TRUE` — these carry both `sk_broker_supply` and `sk_broker_demand`.
+- **Default scope — full 3P Demand funnel** (broadest, the team's working definition): `is_3p_demand = TRUE OR is_3p_lead_gen = TRUE OR is_3p_supply = TRUE`. Captures every Marketplace-touched transaction.
+- **Two-flag demand-broker side only** (use only when the question requires attribution to the demand-side broker that brought the buyer): `is_3p_demand = TRUE OR is_3p_lead_gen = TRUE`. Equivalent to `sk_broker_demand <> -1`.
+- **3P Demand only** (TSC): `is_3p_demand = TRUE`.
+- **3P Lead Gen only** (CQA): `is_3p_lead_gen = TRUE`.
+- **3P Supply only — partner listing, 1P-worked demand** (`BM_3P_SUPPLY_1P_DEMAND_AGENT`): `is_3p_supply = TRUE AND is_3p_demand = FALSE AND is_3p_lead_gen = FALSE`. **Only meaningful at transaction grain** — these rows have `sk_broker_demand = -1` (no demand-side broker), so they cannot be attributed in a `GROUP BY sk_broker_demand` analysis.
+- **3P Demand × 3P Supply combinations** (cross-broker transactions, `BM_3P_DEMAND_3P_SUPPLY` / `BM_3P_DEMAND_3P_SUPPLY_6P`): `is_3p_demand = TRUE AND is_3p_supply = TRUE` — carry both `sk_broker_supply` and `sk_broker_demand`. Same pattern for Lead Gen × Supply (`BM_3P_LEAD_GEN_3P_SUPPLY` / `_6P`).
 
 **Where the flags live:**
 
@@ -313,6 +340,74 @@ Apply the same matrix as in [`broker_xp.md`](./broker_xp.md), restricted to the 
 - `dw_public.dim_booking` — flags present (`is_3p_demand`, `is_3p_lead_gen`).
 
 **CCV of 3P Lead Gen.** `dim_sale_agreement` does not carry `is_3p_lead_gen`. To list CCVs of 3P Lead Gen origin, JOIN `dim_sale_agreement.sk_offer = fact_offers.sk_offer` and filter `fact_offers.is_3p_lead_gen = TRUE AND dim_sale_agreement.sale_agreement_status = 'Assinado'`.
+
+## Coincident vs Cohort views of conversion
+
+Every conversion metric in 3P Demand has **two valid measurement modes**. Pick the one that matches the business question — answers can differ dramatically, especially on recent periods.
+
+### Coincident view (default for volume / operational dashboards)
+
+Numerator and denominator events are counted **in the same calendar period** (month, week, day). Example for VB2VC in month X:
+
+```
+VB2VC_coincident(X) = COUNT(visits_completed in X) / COUNT(visits_booked in X)
+```
+
+- ✔ Fast, easy to read, lines up with operational reporting cycles.
+- ✘ **Distorts conversion** when the stage transition crosses the period boundary — a visit booked on 31 Jan and completed on 1 Feb shows up in the denominator of January and the numerator of February, inflating Feb conversion and deflating Jan.
+- Most current queries in this doc (Queries 1, 2, 5, 6, 7, 8) use this view. Use it for **share, volume, and per-broker dashboards** where the question is "what happened in the period".
+
+### Cohort view (default for true conversion / retention behaviour)
+
+Bucket the denominator by its **origin month** (the month in which the denominator event fired) and track the numerator as it accumulates across subsequent months from that origin. Example for VB2VC anchored on the booking month:
+
+```
+VB2VC_cohort(origin=X, by M_N) = COUNT(visits booked in X, where ts_visit_completed by end of X + N months) / COUNT(visits booked in X)
+```
+
+- ✔ True conversion behaviour — each origin cohort has a fixed denominator and the rate matures monotonically (cumulative) over M0, M1, M2, ...
+- ✔ Reveals **time-to-convert** patterns and **stage-throughput stability** that the coincident view hides.
+- ✘ More expensive to compute; output is a 2-D matrix instead of a single column.
+- Use it for **conversion-rate analyses, A/B comparisons across cohorts, and any question of the form "of the X that happened in month M, what % converted by month M+N"**.
+
+### Result-matrix layout
+
+The canonical cohort output is a wide table: **rows = origin month of the denominator**, **columns = M0, M1, M2, ... (cumulative conversion by N months after origin)**, optional grouping dimension (3P configuration, broker, demand_type) stacks vertically next to origin month.
+
+| origin_month | total_<denominator> | <metric>_m0 | <metric>_m1 | <metric>_m2 | <metric>_m3 | ... |
+|---|---|---|---|---|---|---|
+| 2025-10-01 | 1,200 | 0.65 | 0.78 | 0.82 | 0.83 | ... |
+| 2025-11-01 | 1,350 | 0.62 | 0.75 | 0.80 | 0.82 | ... |
+| 2025-12-01 | 1,420 | 0.61 | 0.74 | 0.79 | NULL | |
+| 2026-01-01 | 1,500 | 0.63 | 0.76 | NULL | NULL | |
+| 2026-02-01 | 1,580 | 0.64 | NULL | NULL | NULL | |
+
+`M_N` semantics — **cumulative by default** (`M_N` = stage reached within N months after origin, inclusive). When the analysis explicitly needs the incremental contribution of a single month, use `M_N (incremental)` = `M_N − M_(N−1)` and label it as such.
+
+### Right-censoring caveat (always disclose)
+
+Recent cohorts cannot have their later columns populated yet — for an origin month M with N months between M and `current_date − 1 month`, only columns `M0..M_(N−1)` are observable; `M_N` and beyond are `NULL`. Always:
+
+- Set `M_N` columns to `NULL` when `current_date < origin_month + N + 1 months`, not zero. A zero would falsely flatten the rate.
+- Truncate the denominator window to **completed origin months** (`CAST(ts_<origin_event> AS DATE) < date_trunc('month', current_date)`) so the most recent in-flight month does not appear with an inflated 0% conversion.
+
+### Stage transitions where the cohort view applies
+
+The cohort pattern applies to **every conversion metric in the funnel**. The common transitions:
+
+| Transition | Denominator | Numerator timestamp | Origin month source |
+|---|---|---|---|
+| **BP2VB** | NBP windows opened (`dim_buyer_prospect_3p_history` filtered to `buyer_prospect_type = 'NBP'`) | First `fact_visits.ts_booking_created` for the buyer after `ts_started` | `ts_started` |
+| **VB2VC** | Visits booked (`fact_visits` filtered to `ts_booking_created IS NOT NULL`) | `fact_visits.ts_visit_completed` | `ts_booking_created` |
+| **VC2OS** | Visits completed (`fact_visits` filtered to `ts_visit_completed IS NOT NULL`) | First `fact_offers.ts_offer_submitted` joined by `sk_booking` | `ts_visit_completed` |
+| **OS2OA** | Offers submitted (`fact_offers`) | `fact_offers.ts_offer_accepted` | `ts_offer_submitted` |
+| **OA2CCV** | Offers accepted (`fact_offers` filtered to `ts_offer_accepted IS NOT NULL`) | `fact_offers.ts_sale_agreement_signed` | `ts_offer_accepted` |
+| **VB2CCV** (end-to-end) | Visits booked | `fact_offers.ts_sale_agreement_signed` joined by `sk_booking` | `ts_booking_created` |
+| **NBP2CCV** (ToF end-to-end) | NBP windows | First `fact_offers.ts_sale_agreement_signed` for the buyer after `ts_started` | `ts_started` |
+
+Apply the **default three-flag filter** (`is_3p_demand OR is_3p_lead_gen OR is_3p_supply`) on the source fact, exactly as in the coincident view. Demand-broker-grain cohorts retain the two-flag structural exception. **BP-anchored cohorts (BP2VB, NBP2CCV) inherit the demand-side-only construction of `dim_buyer_prospect_3p_history`** — no `is_3p_supply` scope there.
+
+Worked SQL: **Query 10** (single-stage VB2VC cohort matrix as a template) and **Query 11** (NBP-anchored multi-stage cohort matrix VC / OS / CCV).
 
 ## Reasons, Cancellations and Drop Reasons
 
@@ -384,16 +479,26 @@ Use this to assess broker-demand operational quality on 3P transactions (cross w
 
 ## Key Metrics
 
-- **B2V (Booking-to-Visit)** — `visits_completed / bookings_created`. Restrict to `is_3p_demand OR is_3p_lead_gen` for 3P Demand; aggregate from `fact_visits` or `fact_buyer_prospects`.
-- **V2O (Visit-to-Offer)** — `offers_submitted / visits_completed`.
-- **O2C (Offer-to-CCV)** — `sale_agreements_signed / offers_submitted` (or `/ offers_accepted` for the post-acceptance conversion). Pick the denominator that matches the business question.
-- **B2CCV (Booking-to-CCV)** — full end-to-end conversion. Often computed via `fact_buyer_prospects` (`sale_agreements_signed / bookings_created`).
-- **NBP→VC**, **NBP→CCV** — ToF-anchored conversion: `visits_completed / NBP windows opened`, `sale_agreements_signed / NBP windows opened`. Use `dim_buyer_prospect_3p_history` filtered by `buyer_prospect_type = 'NBP'` as the denominator, LEFT JOIN downstream facts with window match.
-- **Share of 3P Demand on demand-side activity** — `COUNT(*) WHERE is_3p_demand OR is_3p_lead_gen / COUNT(*)` per stage (`fact_visits` / `fact_offers`).
-- **Volume per demand-side broker** — `COUNT(*) GROUP BY sk_broker_demand` filtering 3P flags; join `dw_brokers.dim_broker` for partner names.
-- **Volume NBP vs RBP** — `COUNT(*) GROUP BY buyer_prospect_type, demand_type` on `dim_buyer_prospect_3p_history` (filtered to current windows or by cohort).
+Default 3P filter for every transaction-grain metric below: `is_3p_demand = TRUE OR is_3p_lead_gen = TRUE OR is_3p_supply = TRUE` (the broad scope from "Default scope rule"). Narrow only when the user asks for a specific flag.
+
+**Two measurement modes per conversion metric** (see "Coincident vs Cohort views of conversion"):
+- **Coincident** — same-period numerator and denominator. Default for volume / share / per-broker dashboards.
+- **Cohort (M0, M1, M2, ...)** — denominator bucketed by origin month; numerator accumulates cumulatively across subsequent months. Default for true conversion-rate analyses. **Always disclose right-censoring on recent cohorts** (NULL the unobservable columns; truncate the last in-flight origin month). Worked patterns in Queries 10 and 11.
+
+- **BP2VB (Buyer Prospect → first Visit Booked)** — denominator: NBP windows opened. Numerator: first `ts_booking_created` for the buyer after `ts_started`. **Cohort variant only meaningful for windows where `event_source = 'BUYER_COMPANY_RELATION'`** (VISIT-originated windows have `BP2VB = 100%` at M0 by construction — the window is materialised by the first booking). Demand-side only by table construction.
+- **VB2VC (Booking-to-Visit, Visit Booked → Visit Completed)** — `visits_completed / bookings_created`. Coincident: `fact_visits` filtered by month. Cohort: origin = `ts_booking_created` month; numerator = `ts_visit_completed`. **Most common cohort metric for operational quality.**
+- **VC2OS (Visit Completed → Offer Submitted)** — `offers_submitted / visits_completed`. Cohort: origin = `ts_visit_completed` month; numerator = first `fact_offers.ts_offer_submitted` joined by `sk_booking`. A booking can yield multiple offers — take the first per `sk_booking` to avoid fanout.
+- **OS2OA (Offer Submitted → Offer Accepted)** — `offers_accepted / offers_submitted`. Cohort: origin = `ts_offer_submitted` month; numerator = `ts_offer_accepted` on the same `sk_offer`.
+- **OA2CCV (Offer Accepted → CCV signed)** — `sale_agreements_signed / offers_accepted`. Cohort: origin = `ts_offer_accepted` month; numerator = `ts_sale_agreement_signed` on the same `sk_offer`.
+- **O2C / O2CCV (Offer Submitted → CCV signed, alias)** — `sale_agreements_signed / offers_submitted` — the merged version of OS2OA × OA2CCV. Useful when the OA stage is not the analytical pivot.
+- **VB2CCV / B2CCV (Booking-to-CCV, end-to-end transaction)** — full end-to-end conversion at transaction grain. Coincident: often computed via `fact_buyer_prospects.sale_agreements_signed / bookings_created`. Cohort: origin = `ts_booking_created` month; numerator = `ts_sale_agreement_signed` joined via `sk_booking → fact_offers`. Expect long tails — M3..M12 columns are still meaningful.
+- **NBP2VC / NBP2CCV (ToF-anchored end-to-end)** — buyer-prospect-anchored conversion: `visits_completed (or sale_agreements_signed) / NBP windows opened`. Coincident: `fact_buyer_prospects` cross with `dim_buyer_prospect_3p_history` per period. Cohort: origin = `dim_buyer_prospect_3p_history.ts_started` month for `buyer_prospect_type = 'NBP'`; numerator = first `fact_visits.ts_visit_completed` (or `fact_offers.ts_sale_agreement_signed`) for the same buyer after `ts_started`. **Structural exception**: NBP windows are demand-side only (no `3P_SUPPLY` demand_type) — these metrics do not include `is_3p_supply`-only configurations by construction, so they read narrower than the headline transaction metrics. Call this out explicitly when reporting NBP-anchored conversion next to headline volumes.
+- **Share of 3P on the full demand funnel** — `COUNT(*) FILTER (WHERE is_3p_demand OR is_3p_lead_gen OR is_3p_supply) / COUNT(*)` per stage on `fact_visits` / `fact_offers`. The narrower "share of buyer-attributed 3P demand" (excluding supply-only) is a separate metric — `COUNT(*) FILTER (WHERE is_3p_demand OR is_3p_lead_gen)` — name it explicitly when delivered.
+- **Volume per demand-side broker** — `COUNT(*) GROUP BY sk_broker_demand` filtering `is_3p_demand OR is_3p_lead_gen` (two-flag scope) **and** `sk_broker_demand <> -1`; join `dw_brokers.dim_broker` for partner names. **Structural exception**: cannot mechanically include `is_3p_supply`-only rows (their `sk_broker_demand = -1`). If the question needs the broader scope at broker grain, group by `sk_broker_supply` or `business_model` instead.
+- **Volume per supply-side broker on the demand funnel** — `COUNT(*) GROUP BY sk_broker_supply` filtering `is_3p_supply = TRUE` and `sk_broker_supply <> -1`; covers both `BM_3P_DEMAND_3P_SUPPLY` (partner brokers on both sides) and `BM_3P_SUPPLY_1P_DEMAND_AGENT` (partner listing, 1P-worked demand). Use this when the question is "how is the demand funnel performing on partner inventory".
+- **Volume NBP vs RBP** — `COUNT(*) GROUP BY buyer_prospect_type, demand_type` on `dim_buyer_prospect_3p_history` (filtered to current windows or by cohort). Demand-side only by table construction.
 - **Time-to-close (booking → CCV signed)** — `DATE_DIFF('day', ts_booking_created, ts_sale_agreement_signed)` per closed CCV; or use `fact_buyer_prospects.days_first_booking_created_to_first_sale_agreement_signed`.
-- **Average brokerage fee on 3P CCVs** — `AVG(brokerage_fee)` on `fact_offers` where `ts_sale_agreement_signed IS NOT NULL` and `is_3p_demand OR is_3p_lead_gen OR is_3p_supply`.
+- **Average brokerage fee on 3P CCVs** — `AVG(brokerage_fee)` on `fact_offers` where `ts_sale_agreement_signed IS NOT NULL` and the default three-flag filter applies.
 
 ## Relationships with Other Entities
 
@@ -444,7 +549,8 @@ Use this to assess broker-demand operational quality on 3P transactions (cross w
 - Treat `dw_sale.dim_buyer_prospect_3p_history` as the **top of funnel**. Every "per-prospect" or "per-broker-demand" analysis must start there, with window match to downstream facts.
 - Always bridge Visits ↔ Offers via `sk_booking` (1:N), not `sk_visit`.
 - For For Sale 3P Demand, always prefer `dw_sale.fact_visits` and `dw_sale.fact_offers` (DAGs `dw_sale_visits` / `dw_sale_offers`).
-- Filter `is_3p_demand = TRUE OR is_3p_lead_gen = TRUE` (or `sk_broker_demand <> -1`) to isolate 3P Demand transactions.
+- **Default 3P filter at transaction grain** = `is_3p_demand = TRUE OR is_3p_lead_gen = TRUE OR is_3p_supply = TRUE` (three flags). See "Default scope rule" at the top of the doc. Use the narrower demand-broker-side filter (`is_3p_demand OR is_3p_lead_gen`, equivalent to `sk_broker_demand <> -1`) only when the question requires attribution to the demand-side broker that brought the buyer, or when the user explicitly asks for that subset.
+- **Pick the right view between coincident and cohort** for every conversion metric. Coincident (same-period numerator and denominator) for volume / share / operational dashboards; cohort (denominator bucketed by origin month, numerator cumulative across M0/M1/M2/...) for true conversion-rate analyses. When the user says "conversão", "taxa de", "% de" without qualifier, lean cohort if the question is about rates, lean coincident if the question is about period volumes. **Always disclose** which view is being used in the response and **NULL** the right-censored cells on recent cohorts (do not zero-fill). Queries 10 and 11 are the canonical cohort templates.
 - For cross-stage conversion analyses, **prefer JOINing `dw_sale.fact_visits` and `dw_sale.fact_offers` on `sk_booking` (or `sk_buyer`) and counting per-stage timestamps directly** (`COUNT(*) FILTER (WHERE ts_<event> IS NOT NULL)`). Both facts already carry `is_3p_supply/demand/lead_gen` and `sk_broker_supply/demand`, so 3P attribution requires no extra JOIN. Fall back to `fact_sale_demand_event` only when the analysis genuinely benefits from an unpivoted event-grain layout (e.g. many stages at once, or time-between-events scans across heterogeneous event types).
 - For NBP / RBP analyses, always start from `dim_buyer_prospect_3p_history` — never reconstruct from `is_buyer_first_offer` (it answers a different question).
 - For CCVs of 3P Lead Gen origin, bridge `dim_sale_agreement.sk_offer = fact_offers.sk_offer` and use `fact_offers.is_3p_lead_gen`. `dim_sale_agreement` does not carry that flag.
@@ -454,6 +560,7 @@ Use this to assess broker-demand operational quality on 3P transactions (cross w
 - Decide upfront whether the question is about the **supply side** (`sk_broker_supply`) or **demand side** (`sk_broker_demand`); they answer different broker-performance questions.
 
 **Don't:**
+- ❌ **Don't drop `is_3p_supply` from the default 3P Demand filter.** Filtering only on `is_3p_demand OR is_3p_lead_gen` excludes `BM_3P_SUPPLY_1P_DEMAND_AGENT` (partner listing, 1P-worked demand) and underestimates headline volumes (visits, offers, CCVs) on Marketplace-touched transactions. Use the two-flag filter only when the question genuinely requires demand-broker attribution (see Default scope rule).
 - ❌ **Don't use `dw_rent.fact_offers` to isolate 3P Demand.** That table does not carry `is_3p_*` or `sk_broker_*` columns — it focuses on the rent-negotiation iterations (`original_rent_value`, `last_proposed_rent_value`, `days_of_negotiation`). Same for `dw_rent.fact_rent_demand_events`, `dw_rent.fact_listing_rent_flows`, and `dw_rent.fact_rent_flows` — none of them carry 3P broker attribution. For For Rent 3P Demand, route through the combined `dw_visit.fact_visits` / `dw_visit.dim_visit` filtered by `business_context = 'RENT'`, or `dw_public.dim_booking` filtered by `visit_intent = 'RENT' AND type = 'Visita'`. See the For Rent appendix.
 - ❌ Don't use `dim_sale_agreement.is_3p_supply` / `is_3p_demand` to identify **3P Lead Gen** CCVs — `is_3p_lead_gen` is absent from that dim. Bridge via `fact_offers`.
 - ❌ Don't conflate `is_buyer_first_offer` (offer-grain, first-ever offer of the buyer) with **NBP** (window-grain, first appearance of the buyer for that `demand_type`). They answer different questions.
@@ -470,7 +577,7 @@ Use this to assess broker-demand operational quality on 3P transactions (cross w
 
 ### Query 1 — Stage-conversion rates split by 3P configuration
 
-Conversion across the canonical funnel (Visit Booked → Visit Completed → Offer Submitted → Offer Accepted → CCV) per 3P configuration. Counts come directly from `fact_visits` and `fact_offers` — each per-stage count is a `COUNT(*) FILTER (WHERE ts_<event> IS NOT NULL)` on the row's own fact, with the 3P configuration label derived from the same row's `is_3p_supply` / `is_3p_demand` / `is_3p_lead_gen` flags. The configuration label mirrors the eight-row `business_model` matrix from [`broker_xp.md`](./broker_xp.md), reduced to the demand-relevant rows.
+Conversion across the canonical funnel (Visit Booked → Visit Completed → Offer Submitted → Offer Accepted → CCV) per 3P configuration. Counts come directly from `fact_visits` and `fact_offers` — each per-stage count is a `COUNT(*) FILTER (WHERE ts_<event> IS NOT NULL)` on the row's own fact, with the 3P configuration label derived from the same row's `is_3p_supply` / `is_3p_demand` / `is_3p_lead_gen` flags. The configuration label covers the **five** Marketplace-touched rows of the eight-row `business_model` matrix from [`broker_xp.md`](./broker_xp.md) — the default three-flag scope.
 
 ```sql
 WITH config AS (
@@ -483,15 +590,16 @@ WITH config AS (
         ts_booking_created,
         ts_visit_completed
     FROM dw_sale.fact_visits
-    WHERE is_3p_demand = TRUE OR is_3p_lead_gen = TRUE
+    WHERE is_3p_demand = TRUE OR is_3p_lead_gen = TRUE OR is_3p_supply = TRUE
 ),
 visit_metrics AS (
     SELECT
         CASE
-            WHEN is_3p_demand   AND is_3p_supply THEN '3P_DEMAND + 3P_SUPPLY'
-            WHEN is_3p_demand                     THEN '3P_DEMAND + 1P_SUPPLY'
-            WHEN is_3p_lead_gen AND is_3p_supply THEN '3P_LEAD_GEN + 3P_SUPPLY'
-            WHEN is_3p_lead_gen                   THEN '3P_LEAD_GEN + 1P_SUPPLY'
+            WHEN is_3p_demand   AND     is_3p_supply  THEN '3P_DEMAND + 3P_SUPPLY'
+            WHEN is_3p_demand   AND NOT is_3p_supply  THEN '3P_DEMAND + 1P_SUPPLY'
+            WHEN is_3p_lead_gen AND     is_3p_supply  THEN '3P_LEAD_GEN + 3P_SUPPLY'
+            WHEN is_3p_lead_gen AND NOT is_3p_supply  THEN '3P_LEAD_GEN + 1P_SUPPLY'
+            WHEN is_3p_supply   AND NOT is_3p_demand AND NOT is_3p_lead_gen THEN '3P_SUPPLY + 1P_DEMAND'
         END                                                              AS three_p_configuration,
         COUNT(*) FILTER (WHERE ts_booking_created  IS NOT NULL)          AS visits_booked,
         COUNT(*) FILTER (WHERE ts_visit_completed  IS NOT NULL)          AS visits_completed
@@ -501,16 +609,17 @@ visit_metrics AS (
 offer_metrics AS (
     SELECT
         CASE
-            WHEN o.is_3p_demand   AND o.is_3p_supply THEN '3P_DEMAND + 3P_SUPPLY'
-            WHEN o.is_3p_demand                       THEN '3P_DEMAND + 1P_SUPPLY'
-            WHEN o.is_3p_lead_gen AND o.is_3p_supply THEN '3P_LEAD_GEN + 3P_SUPPLY'
-            WHEN o.is_3p_lead_gen                     THEN '3P_LEAD_GEN + 1P_SUPPLY'
+            WHEN o.is_3p_demand   AND     o.is_3p_supply  THEN '3P_DEMAND + 3P_SUPPLY'
+            WHEN o.is_3p_demand   AND NOT o.is_3p_supply  THEN '3P_DEMAND + 1P_SUPPLY'
+            WHEN o.is_3p_lead_gen AND     o.is_3p_supply  THEN '3P_LEAD_GEN + 3P_SUPPLY'
+            WHEN o.is_3p_lead_gen AND NOT o.is_3p_supply  THEN '3P_LEAD_GEN + 1P_SUPPLY'
+            WHEN o.is_3p_supply   AND NOT o.is_3p_demand AND NOT o.is_3p_lead_gen THEN '3P_SUPPLY + 1P_DEMAND'
         END                                                              AS three_p_configuration,
         COUNT(*) FILTER (WHERE o.ts_offer_submitted       IS NOT NULL)   AS offers_submitted,
         COUNT(*) FILTER (WHERE o.ts_offer_accepted        IS NOT NULL)   AS offers_accepted,
         COUNT(*) FILTER (WHERE o.ts_sale_agreement_signed IS NOT NULL)   AS ccvs_signed
     FROM dw_sale.fact_offers AS o
-    WHERE o.is_3p_demand = TRUE OR o.is_3p_lead_gen = TRUE
+    WHERE o.is_3p_demand = TRUE OR o.is_3p_lead_gen = TRUE OR o.is_3p_supply = TRUE
     GROUP BY 1
 )
 SELECT
@@ -530,6 +639,8 @@ ORDER BY v.visits_booked DESC NULLS LAST
 ### Query 2 — Performance per demand-side broker
 
 Volume of visits, offers, and CCVs attributed to each demand-side broker. Joins `dim_broker` for partner names.
+
+> **Structural exception — two-flag filter here is correct.** This query groups by `sk_broker_demand`, so `is_3p_supply`-only rows (where `sk_broker_demand = -1`) cannot be meaningfully attributed and would collapse under the sentinel. Keep the `is_3p_demand OR is_3p_lead_gen` filter. For the broader scope on partner inventory, pair this with **Query 2b** (group by `sk_broker_supply` filtering `is_3p_supply = TRUE`) — same shape, supply-side broker grain.
 
 ```sql
 WITH visits AS (
@@ -611,63 +722,53 @@ GROUP BY demand_type, buyer_prospect_type
 ORDER BY demand_type, buyer_prospect_type
 ```
 
-### Query 5 — 3P Demand vs 3P Lead Gen — comparison across the funnel
+### Query 5 — 3P Demand vs 3P Lead Gen vs 3P Supply — comparison across the funnel
 
-Side-by-side counts of each stage by demand modality.
+Side-by-side counts of each stage by the three default 3P flags. **The three columns are not mutually exclusive**: a `BM_3P_DEMAND_3P_SUPPLY` transaction is counted once under `DEMAND` and once under `SUPPLY`. Read the result as "share of each flag on the funnel", not as a partition.
 
 ```sql
-WITH demand_visits AS (
+WITH visits AS (
     SELECT
-        'DEMAND' AS modality,
-        COUNT(*) FILTER (WHERE ts_visit_completed IS NOT NULL) AS visits_completed
+        flag                                                          AS flag,
+        COUNT(*) FILTER (WHERE ts_visit_completed IS NOT NULL)        AS visits_completed
     FROM dw_sale.fact_visits
-    WHERE is_3p_demand = TRUE
+    CROSS JOIN UNNEST(ARRAY[
+        CASE WHEN is_3p_demand   THEN 'DEMAND'   END,
+        CASE WHEN is_3p_lead_gen THEN 'LEAD_GEN' END,
+        CASE WHEN is_3p_supply   THEN 'SUPPLY'   END
+    ]) AS t (flag)
+    WHERE flag IS NOT NULL
+    GROUP BY flag
 ),
-lead_gen_visits AS (
+offers AS (
     SELECT
-        'LEAD_GEN' AS modality,
-        COUNT(*) FILTER (WHERE ts_visit_completed IS NOT NULL) AS visits_completed
-    FROM dw_sale.fact_visits
-    WHERE is_3p_lead_gen = TRUE
-),
-demand_offers AS (
-    SELECT
-        'DEMAND' AS modality,
-        COUNT(*)                                                     AS offers_submitted,
-        COUNT(*) FILTER (WHERE ts_offer_accepted IS NOT NULL)        AS offers_accepted,
-        COUNT(*) FILTER (WHERE ts_sale_agreement_signed IS NOT NULL) AS ccvs_signed
+        flag                                                          AS flag,
+        COUNT(*) FILTER (WHERE ts_offer_submitted IS NOT NULL)        AS offers_submitted,
+        COUNT(*) FILTER (WHERE ts_offer_accepted IS NOT NULL)         AS offers_accepted,
+        COUNT(*) FILTER (WHERE ts_sale_agreement_signed IS NOT NULL)  AS ccvs_signed
     FROM dw_sale.fact_offers
-    WHERE is_3p_demand = TRUE
-),
-lead_gen_offers AS (
-    SELECT
-        'LEAD_GEN' AS modality,
-        COUNT(*)                                                     AS offers_submitted,
-        COUNT(*) FILTER (WHERE ts_offer_accepted IS NOT NULL)        AS offers_accepted,
-        COUNT(*) FILTER (WHERE ts_sale_agreement_signed IS NOT NULL) AS ccvs_signed
-    FROM dw_sale.fact_offers
-    WHERE is_3p_lead_gen = TRUE
+    CROSS JOIN UNNEST(ARRAY[
+        CASE WHEN is_3p_demand   THEN 'DEMAND'   END,
+        CASE WHEN is_3p_lead_gen THEN 'LEAD_GEN' END,
+        CASE WHEN is_3p_supply   THEN 'SUPPLY'   END
+    ]) AS t (flag)
+    WHERE flag IS NOT NULL
+    GROUP BY flag
 )
 SELECT
-    v.modality,
+    v.flag,
     v.visits_completed,
     o.offers_submitted,
     o.offers_accepted,
     o.ccvs_signed
-FROM (
-    SELECT * FROM demand_visits
-    UNION ALL SELECT * FROM lead_gen_visits
-) AS v
-INNER JOIN (
-    SELECT * FROM demand_offers
-    UNION ALL SELECT * FROM lead_gen_offers
-) AS o ON v.modality = o.modality
-ORDER BY v.modality
+FROM       visits AS v
+INNER JOIN offers AS o ON v.flag = o.flag
+ORDER BY v.flag
 ```
 
 ### Query 6 — Average time booking → offer and visit_completed → offer per business_model
 
-Time-to-stage metrics, split by `business_model`. Uses pre-computed columns on `fact_offers` and bridges to `dim_visit.business_model` via the visit linked to the offer's booking (`fact_offers.sk_booking → fact_visits.sk_booking → fact_visits.sk_visit → dim_visit.sk_visit`).
+Time-to-stage metrics, split by `business_model`. Uses pre-computed columns on `fact_offers` and bridges to `dim_visit.business_model` via the visit linked to the offer's booking (`fact_offers.sk_booking → fact_visits.sk_booking → fact_visits.sk_visit → dim_visit.sk_visit`). Filter uses the default three-flag scope so all five Marketplace-touched business models appear in the breakdown.
 
 ```sql
 WITH offer_with_visit AS (
@@ -680,7 +781,7 @@ WITH offer_with_visit AS (
         fv.sk_visit
     FROM dw_sale.fact_offers AS o
     LEFT JOIN dw_sale.fact_visits AS fv ON o.sk_booking = fv.sk_booking
-    WHERE (o.is_3p_demand = TRUE OR o.is_3p_lead_gen = TRUE)
+    WHERE (o.is_3p_demand = TRUE OR o.is_3p_lead_gen = TRUE OR o.is_3p_supply = TRUE)
 )
 SELECT
     v.business_model,
@@ -723,7 +824,7 @@ ORDER BY ccvs_signed DESC
 
 ### Query 8 — Post-visit ratings per demand-side broker
 
-Quality signal per partner — average rating and operational categorical splits.
+Quality signal per partner — average rating and operational categorical splits. Same structural exception as Query 2: grouped by `sk_broker_demand`, so the two-flag filter is correct (rows that are only `is_3p_supply` have `sk_broker_demand = -1` and cannot be attributed).
 
 ```sql
 SELECT
@@ -793,6 +894,217 @@ LEFT JOIN buyer_journey AS bj ON w.sk_buyer = bj.sk_buyer
 LEFT JOIN dw_brokers.dim_broker AS b ON w.demand_broker = b.sk_broker
 ORDER BY w.ts_started DESC
 ```
+
+### Query 10 — VB2VC cohort matrix (template for any single-stage cohort)
+
+Cohort version of the Visit Booked → Visit Completed conversion. Each row is one origin month (the month the booking was created), each `vb2vc_m_N` column is the **cumulative conversion rate** by N months after the origin. `M_N` is set to `NULL` for cohorts that are not yet observable, never to zero.
+
+This query is the **canonical template** for every single-stage cohort in the funnel — to compute VC2OS / OS2OA / OA2CCV, swap the origin timestamp (`ts_booking_created` → `ts_visit_completed` / `ts_offer_submitted` / `ts_offer_accepted`) and the numerator timestamp (`ts_visit_completed` → `ts_offer_submitted` / `ts_offer_accepted` / `ts_sale_agreement_signed`). The 3P filter and right-censoring logic are unchanged.
+
+```sql
+WITH params AS (
+    SELECT
+        date '2025-01-01'                         AS first_origin_month,
+        date_trunc('month', current_date)         AS current_month_start,
+        6                                          AS horizon_months
+),
+bookings AS (
+    SELECT
+        f.sk_booking,
+        f.sk_visit,
+        f.is_3p_demand,
+        f.is_3p_lead_gen,
+        f.is_3p_supply,
+        CAST(date_trunc('month', CAST(f.ts_booking_created AS DATE)) AS DATE) AS origin_month,
+        f.ts_booking_created,
+        f.ts_visit_completed
+    FROM dw_sale.fact_visits AS f
+    CROSS JOIN params AS p
+    WHERE (f.is_3p_demand = TRUE OR f.is_3p_lead_gen = TRUE OR f.is_3p_supply = TRUE)
+      AND CAST(f.ts_booking_created AS DATE) >= p.first_origin_month
+      AND CAST(f.ts_booking_created AS DATE) <  p.current_month_start
+),
+cohort AS (
+    SELECT
+        b.origin_month,
+        COUNT(*) AS total_visits_booked,
+        COUNT(*) FILTER (
+            WHERE b.ts_visit_completed IS NOT NULL
+              AND date_diff('month', b.origin_month,
+                            CAST(date_trunc('month', CAST(b.ts_visit_completed AS DATE)) AS DATE)) <= 0
+        ) AS vc_by_m0,
+        COUNT(*) FILTER (
+            WHERE b.ts_visit_completed IS NOT NULL
+              AND date_diff('month', b.origin_month,
+                            CAST(date_trunc('month', CAST(b.ts_visit_completed AS DATE)) AS DATE)) <= 1
+        ) AS vc_by_m1,
+        COUNT(*) FILTER (
+            WHERE b.ts_visit_completed IS NOT NULL
+              AND date_diff('month', b.origin_month,
+                            CAST(date_trunc('month', CAST(b.ts_visit_completed AS DATE)) AS DATE)) <= 2
+        ) AS vc_by_m2,
+        COUNT(*) FILTER (
+            WHERE b.ts_visit_completed IS NOT NULL
+              AND date_diff('month', b.origin_month,
+                            CAST(date_trunc('month', CAST(b.ts_visit_completed AS DATE)) AS DATE)) <= 3
+        ) AS vc_by_m3,
+        COUNT(*) FILTER (
+            WHERE b.ts_visit_completed IS NOT NULL
+              AND date_diff('month', b.origin_month,
+                            CAST(date_trunc('month', CAST(b.ts_visit_completed AS DATE)) AS DATE)) <= 6
+        ) AS vc_by_m6
+    FROM bookings AS b
+    GROUP BY b.origin_month
+),
+censored AS (
+    SELECT
+        c.origin_month,
+        c.total_visits_booked,
+        CASE WHEN date_diff('month', c.origin_month, p.current_month_start) >= 1 THEN c.vc_by_m0 END AS vc_by_m0,
+        CASE WHEN date_diff('month', c.origin_month, p.current_month_start) >= 2 THEN c.vc_by_m1 END AS vc_by_m1,
+        CASE WHEN date_diff('month', c.origin_month, p.current_month_start) >= 3 THEN c.vc_by_m2 END AS vc_by_m2,
+        CASE WHEN date_diff('month', c.origin_month, p.current_month_start) >= 4 THEN c.vc_by_m3 END AS vc_by_m3,
+        CASE WHEN date_diff('month', c.origin_month, p.current_month_start) >= 7 THEN c.vc_by_m6 END AS vc_by_m6
+    FROM cohort AS c
+    CROSS JOIN params AS p
+)
+SELECT
+    origin_month,
+    total_visits_booked,
+    ROUND(CAST(vc_by_m0 AS DOUBLE) / NULLIF(total_visits_booked, 0), 4) AS vb2vc_m0,
+    ROUND(CAST(vc_by_m1 AS DOUBLE) / NULLIF(total_visits_booked, 0), 4) AS vb2vc_m1,
+    ROUND(CAST(vc_by_m2 AS DOUBLE) / NULLIF(total_visits_booked, 0), 4) AS vb2vc_m2,
+    ROUND(CAST(vc_by_m3 AS DOUBLE) / NULLIF(total_visits_booked, 0), 4) AS vb2vc_m3,
+    ROUND(CAST(vc_by_m6 AS DOUBLE) / NULLIF(total_visits_booked, 0), 4) AS vb2vc_m6
+FROM censored
+ORDER BY origin_month
+```
+
+The `censored` CTE is the **right-censoring guard** — it sets a column to `NULL` when there is not enough elapsed time to observe the full cohort window. The condition `date_diff('month', origin_month, current_month_start) >= N + 1` says: "M_N is observable only if at least N+1 full calendar months have elapsed since `origin_month`". Adjust horizons (`m0`, `m1`, ... `m6` here) to the granularity the analysis needs.
+
+**To split by a dimension** (3P configuration, demand-side broker, demand_type), add the dimension column to the `bookings` CTE, propagate through `cohort` / `censored`, and add it to the final `GROUP BY` and `SELECT`. The matrix shape stays the same — origin months stack vertically, M_N columns extend horizontally.
+
+### Query 11 — NBP-anchored multi-stage cohort matrix (NBP → VC, OS, CCV)
+
+ToF-anchored cohort: every row in `dim_buyer_prospect_3p_history` with `buyer_prospect_type = 'NBP'` is a denominator unit. Three numerators track the buyer's first downstream event after `ts_started` — visit completed, offer submitted, CCV signed — and conversion rates are emitted at M0, M3, M6 cumulative. Inherits the demand-side-only construction of the NBP table (no `is_3p_supply`-only scope here — see structural exception).
+
+```sql
+WITH params AS (
+    SELECT
+        date '2025-01-01'                         AS first_origin_month,
+        date_trunc('month', current_date)         AS current_month_start
+),
+nbp_windows AS (
+    SELECT
+        h.sk_buyer,
+        h.demand_type,
+        h.sk_broker AS sk_broker_demand,
+        h.ts_started,
+        CAST(date_trunc('month', CAST(h.ts_started AS DATE)) AS DATE) AS origin_month
+    FROM dw_sale.dim_buyer_prospect_3p_history AS h
+    CROSS JOIN params AS p
+    WHERE h.buyer_prospect_type = 'NBP'
+      AND h.sk_broker <> -1
+      AND CAST(h.ts_started AS DATE) >= p.first_origin_month
+      AND CAST(h.ts_started AS DATE) <  p.current_month_start
+),
+buyer_first_events AS (
+    SELECT
+        v.sk_buyer,
+        MIN(v.ts_visit_completed)         AS ts_first_visit_completed,
+        MIN(o.ts_offer_submitted)         AS ts_first_offer_submitted,
+        MIN(o.ts_sale_agreement_signed)   AS ts_first_sale_agreement_signed
+    FROM dw_sale.fact_visits AS v
+    LEFT JOIN dw_sale.fact_offers AS o ON v.sk_booking = o.sk_booking
+    WHERE v.sk_buyer IS NOT NULL
+    GROUP BY v.sk_buyer
+),
+joined AS (
+    SELECT
+        n.origin_month,
+        n.sk_buyer,
+        n.ts_started,
+        be.ts_first_visit_completed,
+        be.ts_first_offer_submitted,
+        be.ts_first_sale_agreement_signed
+    FROM nbp_windows AS n
+    LEFT JOIN buyer_first_events AS be ON be.sk_buyer = n.sk_buyer
+),
+cohort AS (
+    SELECT
+        j.origin_month,
+        COUNT(*) AS total_nbp_windows,
+        COUNT(*) FILTER (
+            WHERE j.ts_first_visit_completed IS NOT NULL
+              AND j.ts_first_visit_completed >= j.ts_started
+              AND date_diff('month', j.origin_month,
+                            CAST(date_trunc('month', CAST(j.ts_first_visit_completed AS DATE)) AS DATE)) <= 0
+        ) AS vc_by_m0,
+        COUNT(*) FILTER (
+            WHERE j.ts_first_visit_completed IS NOT NULL
+              AND j.ts_first_visit_completed >= j.ts_started
+              AND date_diff('month', j.origin_month,
+                            CAST(date_trunc('month', CAST(j.ts_first_visit_completed AS DATE)) AS DATE)) <= 3
+        ) AS vc_by_m3,
+        COUNT(*) FILTER (
+            WHERE j.ts_first_offer_submitted IS NOT NULL
+              AND j.ts_first_offer_submitted >= j.ts_started
+              AND date_diff('month', j.origin_month,
+                            CAST(date_trunc('month', CAST(j.ts_first_offer_submitted AS DATE)) AS DATE)) <= 3
+        ) AS os_by_m3,
+        COUNT(*) FILTER (
+            WHERE j.ts_first_offer_submitted IS NOT NULL
+              AND j.ts_first_offer_submitted >= j.ts_started
+              AND date_diff('month', j.origin_month,
+                            CAST(date_trunc('month', CAST(j.ts_first_offer_submitted AS DATE)) AS DATE)) <= 6
+        ) AS os_by_m6,
+        COUNT(*) FILTER (
+            WHERE j.ts_first_sale_agreement_signed IS NOT NULL
+              AND j.ts_first_sale_agreement_signed >= j.ts_started
+              AND date_diff('month', j.origin_month,
+                            CAST(date_trunc('month', CAST(j.ts_first_sale_agreement_signed AS DATE)) AS DATE)) <= 6
+        ) AS ccv_by_m6,
+        COUNT(*) FILTER (
+            WHERE j.ts_first_sale_agreement_signed IS NOT NULL
+              AND j.ts_first_sale_agreement_signed >= j.ts_started
+              AND date_diff('month', j.origin_month,
+                            CAST(date_trunc('month', CAST(j.ts_first_sale_agreement_signed AS DATE)) AS DATE)) <= 12
+        ) AS ccv_by_m12
+    FROM joined AS j
+    GROUP BY j.origin_month
+),
+censored AS (
+    SELECT
+        c.origin_month,
+        c.total_nbp_windows,
+        CASE WHEN date_diff('month', c.origin_month, p.current_month_start) >= 1  THEN c.vc_by_m0   END AS vc_by_m0,
+        CASE WHEN date_diff('month', c.origin_month, p.current_month_start) >= 4  THEN c.vc_by_m3   END AS vc_by_m3,
+        CASE WHEN date_diff('month', c.origin_month, p.current_month_start) >= 4  THEN c.os_by_m3   END AS os_by_m3,
+        CASE WHEN date_diff('month', c.origin_month, p.current_month_start) >= 7  THEN c.os_by_m6   END AS os_by_m6,
+        CASE WHEN date_diff('month', c.origin_month, p.current_month_start) >= 7  THEN c.ccv_by_m6  END AS ccv_by_m6,
+        CASE WHEN date_diff('month', c.origin_month, p.current_month_start) >= 13 THEN c.ccv_by_m12 END AS ccv_by_m12
+    FROM cohort AS c
+    CROSS JOIN params AS p
+)
+SELECT
+    origin_month,
+    total_nbp_windows,
+    ROUND(CAST(vc_by_m0   AS DOUBLE) / NULLIF(total_nbp_windows, 0), 4) AS nbp2vc_m0,
+    ROUND(CAST(vc_by_m3   AS DOUBLE) / NULLIF(total_nbp_windows, 0), 4) AS nbp2vc_m3,
+    ROUND(CAST(os_by_m3   AS DOUBLE) / NULLIF(total_nbp_windows, 0), 4) AS nbp2os_m3,
+    ROUND(CAST(os_by_m6   AS DOUBLE) / NULLIF(total_nbp_windows, 0), 4) AS nbp2os_m6,
+    ROUND(CAST(ccv_by_m6  AS DOUBLE) / NULLIF(total_nbp_windows, 0), 4) AS nbp2ccv_m6,
+    ROUND(CAST(ccv_by_m12 AS DOUBLE) / NULLIF(total_nbp_windows, 0), 4) AS nbp2ccv_m12
+FROM censored
+ORDER BY origin_month
+```
+
+**Reading the result** — `nbp2vc_m0` is "of NBP windows opened in this month, the share that had a completed visit within the origin month itself"; `nbp2ccv_m12` is "...within 12 months". The metrics are **buyer-grain** (`MIN(ts_*) GROUP BY sk_buyer`), so a buyer with multiple bookings only contributes once per stage — matching the NBP semantics (windows per `(sk_buyer, demand_type)`).
+
+**Tuning**:
+- Add `demand_type` (3P_DEMAND / 3P_LEAD_GEN) to the `nbp_windows` projection and final `GROUP BY` to split by demand modality.
+- Replace `MIN(ts_*)` with a window-bounded variant (only events within `(ts_started, ts_ended)`) if the analysis must attribute conversion **only inside the NBP window** rather than to any future event by the buyer.
+- For broker-level cohort breakdown, group by `sk_broker_demand` as well; remember the demand-side structural exception (Query 2 / Query 8 pattern).
 
 ## Appendix — For Rent
 

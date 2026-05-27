@@ -18,21 +18,29 @@ Each entity file follows a standard structure:
 | **Dos and Don'ts** | Critical rules, common traps, and mandatory patterns (CAST, ROW_NUMBER, filters) — **always check this before writing SQL** |
 | **Golden Queries** | Validated query patterns ready to adapt — `SELECT *` is used for brevity; always select specific columns in production queries |
 
+
 ### Available entities
 
+- `business_entities/3p_demand.md` — 3P Demand — Broker XP: 3P demand funnel (Visit → Offer → CCV) and Buyer Prospects (TSC / 3P Demand / 3P Lead Gen / CQA)
+- `business_entities/3p_supply.md` — 3P Supply — Broker XP: funnel for capturing leads from commercial partners up to the first listing, covering the entire 3P supply journey (e.g., BSP, partner leads, partner network, and marketplace). Related to partner operations (see also `broker_xp.md` for details on the real estate and partner 3P Partners ecosystem).
+- `business_entities/broker_xp.md` — Partner real estate agencies (Brokers) and 3P Partners / Marketplace operation (Rede / 3P partners / Marketplace)
 - `business_entities/chatbot_sessions.md` — AI chatbot conversation sessions (sessões de chatbot / atendimento bot)
+- `business_entities/closing.md` — For Rent contract closing / CC2CS journey: draft → sent → signed (fechamento, assinatura de contrato)
 - `business_entities/collections.md` — Overdue payment recovery operations (cobrança)
-- `business_entities/contact.md` — Contact and support interactions: calls, chats, IVR (contato / atendimento / ligação)
+- `business_entities/conversation_explorer.md` — Conversation Explorer sampled Wall-E chatbot sessions only (~7.5K/day): taxonomy (`category`/`subcategory`) and human annotations (produto Conversation Explorer / domínio–problema do usuário)
 - `business_entities/department.md` — Support queue routing and SLA targets (departamento / fila / caixa)
 - `business_entities/inspection.md` — Property inspections (vistorias)
 - `business_entities/losses.md` — Accounting write-offs and provisioning (perdas / PDD)
+- `business_entities/matthew.md` — Collections AI agent for tenants with open balances (agente Matthew / cobrança IA)
 - `business_entities/nps.md` — Net Promoter Score campaigns via Tracksale (NPS)
+- `business_entities/payments.md` — Payment transactions across Checkout, Wall Street, and Vans (pagamentos / cobrança checkout)
 - `business_entities/repairs.md` — Offboarding and ongoing property repairs (reparos)
 - `business_entities/recs.md` — Recommendation exposures and downstream journey attribution (recomendacoes / carrossel de recomendacao)
 - `business_entities/satisfaction.md` — Customer Satisfaction scores across channels (CSAT / satisfação)
+- `business_entities/seo.md` — SEO performance, keyword clusters and demand top-of-funnel metrics (SEO / Search Engine Optimization)
+- `business_entities/supply.md` — Property owner acquisition funnel from lead to first listing (captação / supply / aquisição de proprietários)
 - `business_entities/termination.md` — Contract terminations (rescisões / offboarding)
-- `business_entities/ticket.md` — Zendesk support tickets (chamado / solicitação / demanda)
-- `business_entities/conversation_explorer.md` — Conversation Explorer sampled Wall-E chatbot sessions only (~7.5K/day): taxonomy (`category`/`subcategory`) and human annotations (produto Conversation Explorer / domínio–problema do usuário)
+- `business_entities/visits.md` — Visit requests and scheduled property visits, capturing the full journey from visit intention to completion (agendamentos e realização de visitas a imóveis)
 
 ## Company-Wide Glossary
 
@@ -53,4 +61,4 @@ If no entity file is relevant, proceed normally using your general knowledge of 
 
 ## SQL Conventions, Layer Priority, and Response Guidelines
 
-These topics are defined in `references/data_exploration.md` and `references/sql_conventions.md` (sections 1–8 only), which are loaded on Tars activation. Consult them for all SQL generation decisions.
+These topics are defined in `.cursor/rules/data_exploration.mdc`, which is loaded automatically when the Data Analyst (TARS) subagent is active. Use `@tars` to activate exploration mode.

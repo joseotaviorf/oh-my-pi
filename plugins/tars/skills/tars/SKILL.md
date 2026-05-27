@@ -86,6 +86,7 @@ To provide accurate answers, consult the entity files when the user's question r
     - [references/business_entities/chatbot_sessions.md](references/business_entities/chatbot_sessions.md) — AI chatbot conversation sessions.
     - [references/business_entities/closing.md](references/business_entities/closing.md) — Closing (CC2CS, "Contract Created to Contract Signed"): For Rent contract draft → signature pipeline; the bridge between an accepted proposal and an active rental contract.
     - [references/business_entities/collections.md](references/business_entities/collections.md) — Overdue payment recovery operations.
+    - [references/business_entities/conversation_explorer.md](references/business_entities/conversation_explorer.md) — Conversation Explorer sampled Wall-E chatbot sessions (~7.5K/day): taxonomy (`category`/`subcategory`) and human annotations.
     - [references/business_entities/contact.md](references/business_entities/contact.md) — Contact and support interactions (calls, chats).
     - [references/business_entities/department.md](references/business_entities/department.md) — Support queue routing and SLA targets.
     - [references/business_entities/inspection.md](references/business_entities/inspection.md) — Property inspections.
@@ -94,8 +95,10 @@ To provide accurate answers, consult the entity files when the user's question r
     - [references/business_entities/nps.md](references/business_entities/nps.md) — Net Promoter Score campaigns.
     - [references/business_entities/payments.md](references/business_entities/payments.md) — Payments transactional domain (Checkout, BOLETO/CREDIT_CARD/PIX, settlement, refunds).
     - [references/business_entities/recovery_collections_fr_tenants.md](references/business_entities/recovery_collections_fr_tenants.md) — Recovery analytics for For-Rent tenants (overdue debt collection performance).
+    - [references/business_entities/recs.md](references/business_entities/recs.md) — Recommendation exposures and downstream journey attribution (recomendações / carrossel de recomendação).
     - [references/business_entities/repairs.md](references/business_entities/repairs.md) — Property repairs (offboarding and ongoing).
     - [references/business_entities/satisfaction.md](references/business_entities/satisfaction.md) — Customer Satisfaction scores (CSAT).
+    - [references/business_entities/seo.md](references/business_entities/seo.md) — SEO performance, keyword clusters, and demand top-of-funnel metrics (organic search / GSC / SEMrush).
     - [references/business_entities/supply.md](references/business_entities/supply.md) — Supply funnel: owner acquisition and listing creation across the six-stage lifecycle.
     - [references/business_entities/termination.md](references/business_entities/termination.md) — Contract terminations.
     - [references/business_entities/ticket.md](references/business_entities/ticket.md) — Zendesk support tickets.
