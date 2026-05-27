@@ -23,7 +23,7 @@ BUR_EVENT_CONFIGS = [
 ]
 
 BU_EVENT_CONFIGS = [
-    {"tracked_col": "hub_name", "target_col": "hub_name", "target_type": "string"},
+    {"tracked_col": "name", "target_col": "hub_name", "target_type": "string"},
     {"tracked_col": "sdr_type", "target_col": "sdr_type", "target_type": "string"},
     {"tracked_col": "lead_types", "target_col": "lead_types", "target_type": "string"},
     {
@@ -181,7 +181,7 @@ def transactional_bu_df(spark_session):
     schema = StructType(
         [
             StructField("id", StringType(), True),
-            StructField("hub_name", StringType(), True),
+            StructField("name", StringType(), True),
             StructField("sdr_type", StringType(), True),
             StructField("lead_types", StringType(), True),
             StructField("negotiation_type", StringType(), True),

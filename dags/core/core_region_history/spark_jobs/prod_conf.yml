@@ -10,7 +10,7 @@ business_unit_region_history_event_configs:
 
 BUSINESS_UNIT_HISTORY_TRANSACTIONAL_TABLE: "datalake_hub_services_transactional.business_unit"
 business_unit_history_event_configs:
-  - tracked_col: hub_name
+  - tracked_col: name
     target_col: hub_name
     target_type: string
   - tracked_col: sdr_type

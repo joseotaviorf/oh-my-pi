@@ -1,4 +1,5 @@
 ---
+# core_region.business_unit_history
 table_name: core_region.business_unit_history
 alert_channel: GCHAT_CORE_MODEL_SCHEMA_VALIDATION
 is_incremental:
