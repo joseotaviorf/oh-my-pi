@@ -89,6 +89,13 @@ columns:
       Pansexual: Self-declared pansexual orientation.
       "I'd rather not answer": Respondent declined to answer.
       '-1': Empty, null, or unmapped after reference matching.
+  legal_sex:
+    description: Sex assigned at birth and registered in official documents. Distinct from self-declared gender_identity.
+    lineage:
+      - datalake_pin_core_clean.people_legislative.legal_sex
+    categories:
+      Female: Female
+      Male: Male
   is_underrepresented_race:
     description: |
       DE&I glossary — BIM (Black, Indigenous, and Mixed-race): true when legislation is Brazil and the person’s primary

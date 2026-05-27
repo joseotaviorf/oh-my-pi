@@ -6,7 +6,7 @@ SELECT
   last_updated_by AS updated_by,
   legislation_code,
   marital_status,
-  sex,
+  sex AS legal_sex,
   highest_education_level,
   attribute16 AS highest_education_level_description,
   attribute_category AS citizenship_context,

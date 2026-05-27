@@ -87,6 +87,7 @@ pl_periods AS (
       rel.religion_code,
       pl.gender_identity,
       pl.sexual_orientation,
+      pl.legal_sex,
       pl.neurodiversity,
       pl.disability_answer,
       DATE(pl.dt_effective_started) AS dt_period_start,
@@ -118,6 +119,7 @@ missing_people_legislative AS (
       CAST(NULL AS STRING) AS religion_code,
       CAST(NULL AS STRING) AS gender_identity,
       CAST(NULL AS STRING) AS sexual_orientation,
+      CAST(NULL AS STRING) AS legal_sex,
       CAST(NULL AS STRING) AS neurodiversity,
       CAST(NULL AS STRING) AS disability_answer,
       DATE('1900-01-01') AS dt_period_start,
@@ -144,6 +146,7 @@ pl_periods_all AS (
       religion_code,
       gender_identity,
       sexual_orientation,
+      legal_sex,
       neurodiversity,
       disability_answer,
       dt_period_start,
@@ -160,6 +163,7 @@ pl_periods_all AS (
       religion_code,
       gender_identity,
       sexual_orientation,
+      legal_sex,
       neurodiversity,
       disability_answer,
       dt_period_start,
@@ -187,6 +191,11 @@ normalized AS (
         ELSE COALESCE(NULLIF(TRIM(lk_rel.meaning), ''), pp.religion_code)
       END AS religion,
       pp.gender_identity AS gender_identity_reported,
+      CASE
+        WHEN pp.legal_sex = 'F' THEN 'Female'
+        WHEN pp.legal_sex = 'M' THEN 'Male'
+        ELSE pp.legal_sex
+      END AS legal_sex,
       CASE
         WHEN pp.gender_identity IN (
           'Mulher cisgênero',
@@ -295,6 +304,7 @@ with_medical_disability_record AS (
       n.gender_identity_reported,
       n.gender_identity,
       n.sexual_orientation,
+      n.legal_sex,
       n.neurodiversity,
       n.has_self_declared_pwd_raw,
       EXISTS (
@@ -328,6 +338,7 @@ with_flags AS (
       gender_identity_reported,
       gender_identity,
       sexual_orientation,
+      legal_sex,
       neurodiversity,
       ethnicity_code,
       CASE
@@ -440,6 +451,7 @@ with_sig AS (
         gender_identity_reported,
         gender_identity,
         sexual_orientation,
+        legal_sex,
         neurodiversity,
         CAST(is_underrepresented_race AS STRING),
         CAST(is_lgbtqia AS STRING),
@@ -466,6 +478,7 @@ with_prev AS (
       gender_identity_reported,
       gender_identity,
       sexual_orientation,
+      legal_sex,
       neurodiversity,
       ethnicity_code,
       is_underrepresented_race,
@@ -501,6 +514,7 @@ with_grp AS (
       gender_identity_reported,
       gender_identity,
       sexual_orientation,
+      legal_sex,
       neurodiversity,
       ethnicity_code,
       is_underrepresented_race,
@@ -540,6 +554,7 @@ SELECT
     ANY_VALUE(gender_identity_reported) AS gender_identity_reported,
     ANY_VALUE(gender_identity) AS gender_identity,
     ANY_VALUE(sexual_orientation) AS sexual_orientation,
+    ANY_VALUE(legal_sex) AS legal_sex,
     ANY_VALUE(is_underrepresented_race) AS is_underrepresented_race,
     ANY_VALUE(is_lgbtqia) AS is_lgbtqia,
     ANY_VALUE(is_underrepresented_gender) AS is_underrepresented_gender,

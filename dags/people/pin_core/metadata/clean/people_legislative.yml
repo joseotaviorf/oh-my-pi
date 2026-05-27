@@ -33,10 +33,13 @@ columns:
     description: Marital status of the person, as defined by the applicable legal code.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.marital_status
-  sex:
-    description: Sex of the person, as defined by the applicable legal code.
+  legal_sex:
+    description: Sex assigned at birth and registered in official documents. Distinct from self-declared gender_identity.
     lineage:
     - datalake_pin_core_raw.per_people_legislative_f.sex
+    categories:
+      F: Female.
+      M: Male.
   highest_education_level:
     description: Highest education level code.
     lineage:
