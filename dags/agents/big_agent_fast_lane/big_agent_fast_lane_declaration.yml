@@ -75,5 +75,3 @@ workflow:
     tier_aud: {}
     unresolved_earnings: {}
     user_revision_entity: {}
-cluster:
-  type: emr_7_12_min_driver_2xlarge_workers_1_task_cluster
