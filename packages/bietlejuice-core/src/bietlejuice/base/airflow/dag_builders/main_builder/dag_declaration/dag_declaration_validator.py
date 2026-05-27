@@ -70,6 +70,11 @@ class DAGDeclarationValidator(Validator):
                     "min": 1,
                     "required": False,
                 },
+                "incremental_optimize": {
+                    "type": "boolean",
+                    "empty": False,
+                    "required": False,
+                },
                 "source_schema": {"type": "string", "empty": False},
                 "source_database": {"type": "string", "empty": False},
                 "has_soft_delete": {"type": "boolean", "empty": False},

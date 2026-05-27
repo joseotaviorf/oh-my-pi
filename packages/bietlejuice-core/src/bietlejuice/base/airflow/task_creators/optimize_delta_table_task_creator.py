@@ -251,6 +251,16 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
                 table_config["apply_partition_filter"] = table.table_customization.get(
                     "optimize_partition_filter", True
                 )
+            else:
+                workflow_incremental_optimize = (
+                    self.dag_execution_context.workflow_args.get(
+                        "incremental_optimize", False
+                    )
+                )
+                if table.table_customization.get(
+                    "incremental_optimize", workflow_incremental_optimize
+                ):
+                    table_config["apply_partition_filter"] = True
             tables_config[table.table_name] = table_config
 
         return tables_config
