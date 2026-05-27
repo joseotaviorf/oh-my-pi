@@ -1,0 +1,99 @@
+database_name: datalake_journey_optimizer_clean
+table_name: evaluations
+description: >
+  Clean copy of the evaluations audit log table from Journey Optimizer.
+  One row per policy evaluation run, capturing the chosen action, the unconstrained best action,
+  the full candidate set, and constraint firing details.
+  Column names follow lake naming conventions (id_*, ts_* prefixes).
+  Primary key: id_evaluation (ULID, varchar 26).
+domain: For Sale
+owner: vinicius.valves@quintoandar.com.br
+columns:
+  id_evaluation:
+    description: Primary key. ULID (varchar 26) uniquely identifying this policy evaluation run.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.evaluation_id
+  id_trigger_event:
+    description: FK to triggers. UUID of the trigger event that initiated this evaluation.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.trigger_event_id
+  id_trigger_binding:
+    description: FK to business_case_trigger_events. UUID of the binding that matched the trigger event.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.trigger_binding_id
+  id_subject:
+    description: Identifier of the subject (e.g. user or listing) for whom the policy was evaluated.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.subject_id
+  id_action_registry:
+    description: FK to business_case_actions. UUID of the action chosen by the policy after constraint application.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.action_registry_id
+  id_best_action_registry:
+    description: FK to business_case_actions. UUID of the best unconstrained action before constraint application.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.best_action_registry_id
+  id_policy:
+    description: FK to business_case_policies. UUID of the policy version that ran this evaluation.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.policy_id
+  id_business_case:
+    description: FK to business_case. UUID of the business case under which this evaluation ran.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.business_case_id
+  trigger_event_code:
+    description: Code of the trigger event that initiated this evaluation, denormalized for query convenience.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.trigger_event_code
+  subject_type:
+    description: Type of the subject entity referenced by id_subject (e.g. USER, LISTING).
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.subject_type
+  state_snapshot:
+    description: JSON snapshot of the subject entity state at evaluation time, used as policy input features.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.state_snapshot
+  trigger_context:
+    description: Optional JSON with additional context extracted from the trigger event payload.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.trigger_context
+  metadata:
+    description: Optional JSON with additional evaluation metadata (e.g. model scores, debug info).
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.metadata
+  action_payload:
+    description: JSON payload of the chosen action to be dispatched, defaults to empty object.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.action_payload
+  best_action_payload:
+    description: JSON payload of the best unconstrained action before constraint application, defaults to empty object.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.best_action_payload
+  policy_action_candidate_scope:
+    description: Scope of candidate actions visible to the policy during evaluation (e.g. LIBERATED_ONLY).
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.policy_action_candidate_scope
+  policy_spec_hash:
+    description: SHA hash of the policy specification at evaluation time, used for reproducibility and change detection.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.policy_spec_hash
+  candidate_actions_snapshot:
+    description: JSON snapshot of the full set of candidate actions evaluated by the policy, defaults to empty object.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.candidate_actions_snapshot
+  constraint_application_result:
+    description: Optional JSON documenting which constraints were evaluated and how they affected the final action choice.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.constraint_application_result
+  constraint_ids:
+    description: Optional JSON array of constraint UUIDs that fired and influenced the final action choice.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.constraint_ids
+  is_constrained:
+    description: Boolean flag indicating whether a constraint overrode the best unconstrained action in this evaluation.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.is_constrained
+  ts_created:
+    description: Timestamp (with timezone) when this evaluation record was created.
+    lineage:
+      - datalake_journey_optimizer_raw.evaluations.created_at

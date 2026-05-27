@@ -1,0 +1,52 @@
+dag:
+  name: journey_optimizer
+  schedule_start_date: 2026, 1, 1
+  schedule_interval: 0 0 * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      Ingests Journey Optimizer (contextual bandit / decision-engine) tables
+      from PostgreSQL into the data lake (raw + clean layers).
+
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_schema: public
+  dbutils_secret_key: JOURNEY_OPTIMIZER_DB
+  lineage_product_database_name: journey_optimizer
+  tables_customization:
+    triggers:
+      raw_primary_keys: [trigger_event_id]
+      clean_primary_keys: [id_trigger_event]
+    business_case_trigger_events:
+      raw_primary_keys: [trigger_binding_id]
+      clean_primary_keys: [id_trigger_binding]
+    outbox:
+      raw_primary_keys: [id]
+      clean_primary_keys: [id]
+    evaluations:
+      raw_primary_keys: [evaluation_id]
+      clean_primary_keys: [id_evaluation]
+    business_case_policies:
+      raw_primary_keys: [policy_id]
+      clean_primary_keys: [id_policy]
+    actions:
+      raw_primary_keys: [action_id]
+      clean_primary_keys: [id_action]
+    business_case_actions:
+      raw_primary_keys: [action_registry_id]
+      clean_primary_keys: [id_action_registry]
+    business_case_constraints:
+      raw_primary_keys: [constraint_id]
+      clean_primary_keys: [id_constraint]
+    rewards:
+      raw_primary_keys: [reward_id]
+      clean_primary_keys: [id_reward]
+    business_case_rewards:
+      raw_primary_keys: [reward_registry_id]
+      clean_primary_keys: [id_reward_registry]
+
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new_env

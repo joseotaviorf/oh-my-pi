@@ -1,0 +1,66 @@
+database_name: datalake_journey_optimizer_clean
+table_name: rewards
+description: >
+  Clean copy of the rewards table from Journey Optimizer.
+  Recorded reward observations used as feedback for bandit or RL policy updates.
+  Column names follow lake naming conventions (id_*, ts_* prefixes).
+  Primary key: id_reward (ULID, varchar 26).
+domain: For Sale
+owner: vinicius.valves@quintoandar.com.br
+columns:
+  id_reward:
+    description: Primary key. ULID (varchar 26) uniquely identifying this reward observation.
+    lineage:
+      - datalake_journey_optimizer_raw.rewards.reward_id
+  id_trigger_event:
+    description: Optional FK to triggers. UUID of the original trigger event this reward responds to.
+    lineage:
+      - datalake_journey_optimizer_raw.rewards.trigger_event_id
+  id_business_case:
+    description: FK to business_case. UUID of the business case this reward is attributed to.
+    lineage:
+      - datalake_journey_optimizer_raw.rewards.business_case_id
+  id_reward_registry:
+    description: Optional FK to business_case_rewards. UUID of the reward signal definition this observation matches.
+    lineage:
+      - datalake_journey_optimizer_raw.rewards.reward_registry_id
+  id_subject:
+    description: Identifier of the subject (e.g. user ID) who generated this reward outcome.
+    lineage:
+      - datalake_journey_optimizer_raw.rewards.subject_id
+  trigger_event_code:
+    description: Code of the trigger event associated with this reward observation.
+    lineage:
+      - datalake_journey_optimizer_raw.rewards.trigger_event_code
+  subject_type:
+    description: Type of the subject entity referenced by id_subject (e.g. USER, LISTING).
+    lineage:
+      - datalake_journey_optimizer_raw.rewards.subject_type
+  state_snapshot:
+    description: JSON snapshot of the subject entity state at the time the reward outcome occurred.
+    lineage:
+      - datalake_journey_optimizer_raw.rewards.state_snapshot
+  trigger_context:
+    description: Optional JSON with additional context from the reward trigger event payload.
+    lineage:
+      - datalake_journey_optimizer_raw.rewards.trigger_context
+  reward_type:
+    description: Type classification of the reward signal (e.g. CONVERSION, CLICK, REVENUE).
+    lineage:
+      - datalake_journey_optimizer_raw.rewards.reward_type
+  reward_metadata:
+    description: Optional JSON with supplementary metadata about the reward observation (e.g. source event details).
+    lineage:
+      - datalake_journey_optimizer_raw.rewards.reward_metadata
+  reward_value:
+    description: Numeric value of the reward observation with high precision (up to 10 decimal places). Null for binary rewards.
+    lineage:
+      - datalake_journey_optimizer_raw.rewards.reward_value
+  ts_occurred:
+    description: Timestamp (with timezone) when the reward-generating outcome occurred in the source system.
+    lineage:
+      - datalake_journey_optimizer_raw.rewards.occurred_at
+  ts_created:
+    description: Timestamp (with timezone) when this reward record was created.
+    lineage:
+      - datalake_journey_optimizer_raw.rewards.created_at

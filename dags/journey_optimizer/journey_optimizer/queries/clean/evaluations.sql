@@ -1,0 +1,25 @@
+SELECT
+    evaluation_id AS id_evaluation,
+    trigger_event_id AS id_trigger_event,
+    trigger_binding_id AS id_trigger_binding,
+    subject_id AS id_subject,
+    action_registry_id AS id_action_registry,
+    best_action_registry_id AS id_best_action_registry,
+    policy_id AS id_policy,
+    business_case_id AS id_business_case,
+    trigger_event_code,
+    subject_type,
+    state_snapshot,
+    trigger_context,
+    metadata,
+    action_payload,
+    best_action_payload,
+    policy_action_candidate_scope,
+    policy_spec_hash,
+    candidate_actions_snapshot,
+    constraint_application_result,
+    constraint_ids,
+    is_constrained,
+    created_at AS ts_created
+FROM
+    datalake_journey_optimizer_raw.evaluations

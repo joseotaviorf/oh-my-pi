@@ -1,0 +1,46 @@
+database_name: datalake_journey_optimizer_clean
+table_name: business_case_trigger_events
+description: >
+  Clean copy of the business_case_trigger_events configuration table from Journey Optimizer.
+  Defines the M:N binding between business cases and trigger event codes.
+  Column names follow lake naming conventions (id_*, ts_* prefixes).
+  Primary key: id_trigger_binding.
+domain: For Sale
+owner: vinicius.valves@quintoandar.com.br
+columns:
+  id_trigger_binding:
+    description: Primary key. UUID uniquely identifying this (business_case, trigger_event_code) binding.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_trigger_events.trigger_binding_id
+  id_business_case:
+    description: FK to business_case. UUID identifying the business case activated by this binding.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_trigger_events.business_case_id
+  trigger_event_code:
+    description: Code of the trigger event that activates the referenced business case.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_trigger_events.trigger_event_code
+  trigger_type:
+    description: Classification of the trigger binding type (e.g. IMMEDIATE, SCHEDULED).
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_trigger_events.trigger_type
+  trigger_context_extractors:
+    description: Optional JSON defining rules to extract structured context fields from incoming trigger payloads.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_trigger_events.trigger_context_extractors
+  condition:
+    description: Optional JSON expression that must evaluate to true for this binding to fire.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_trigger_events.condition
+  priority:
+    description: Integer priority ordering for this binding when multiple cases match the same event code.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_trigger_events.priority
+  is_active:
+    description: Boolean flag indicating whether this trigger binding is currently active.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_trigger_events.is_active
+  ts_created:
+    description: Timestamp (with timezone) when this binding row was created.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_trigger_events.created_at

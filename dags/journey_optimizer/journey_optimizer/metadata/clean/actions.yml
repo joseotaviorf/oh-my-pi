@@ -1,0 +1,78 @@
+database_name: datalake_journey_optimizer_clean
+table_name: actions
+description: >
+  Clean copy of the actions table from Journey Optimizer.
+  Dispatched action instances tracking the full lifecycle from PENDING through confirmed.
+  Column names follow lake naming conventions (id_*, ts_* prefixes).
+  Primary key: id_action (ULID, varchar 26).
+domain: For Sale
+owner: vinicius.valves@quintoandar.com.br
+columns:
+  id_action:
+    description: Primary key. ULID (varchar 26) uniquely identifying this dispatched action instance.
+    lineage:
+      - datalake_journey_optimizer_raw.actions.action_id
+  id_action_registry:
+    description: FK to business_case_actions. UUID of the catalog entry for the chosen action template.
+    lineage:
+      - datalake_journey_optimizer_raw.actions.action_registry_id
+  id_business_case:
+    description: FK to business_case. UUID of the business case that produced this action.
+    lineage:
+      - datalake_journey_optimizer_raw.actions.business_case_id
+  id_subject:
+    description: Identifier of the subject (e.g. user ID) who is the target of this dispatched action.
+    lineage:
+      - datalake_journey_optimizer_raw.actions.subject_id
+  id_confirmation:
+    description: Optional external identifier returned by the downstream consumer upon confirmation of the action.
+    lineage:
+      - datalake_journey_optimizer_raw.actions.confirmation_id
+  action_type:
+    description: Type classification of the action (e.g. SEND_EMAIL, PUSH_NOTIFICATION, WHATSAPP_MESSAGE).
+    lineage:
+      - datalake_journey_optimizer_raw.actions.action_type
+  channel_type:
+    description: Communication channel through which the action is dispatched (e.g. EMAIL, PUSH, SMS). Nullable.
+    lineage:
+      - datalake_journey_optimizer_raw.actions.channel_type
+  action_payload:
+    description: JSON payload with action-specific parameters to be delivered to the consumer, defaults to empty object.
+    lineage:
+      - datalake_journey_optimizer_raw.actions.action_payload
+  evaluation_ids:
+    description: JSON array of evaluation IDs (ULIDs) that contributed to producing this action, defaults to empty array.
+    lineage:
+      - datalake_journey_optimizer_raw.actions.evaluation_ids
+  status:
+    description: "Current lifecycle status of the action: PENDING, PUBLISHED, CONFIRMED, or CANCELLED."
+    lineage:
+      - datalake_journey_optimizer_raw.actions.status
+  execution_status:
+    description: Optional status reported by the downstream consumer after executing the action (e.g. SUCCESS, FAILED).
+    lineage:
+      - datalake_journey_optimizer_raw.actions.execution_status
+  constraint_resolution:
+    description: Optional JSON documenting the constraint resolution details applied when producing this action.
+    lineage:
+      - datalake_journey_optimizer_raw.actions.constraint_resolution
+  is_aggregated:
+    description: Boolean flag indicating whether this action was produced by aggregating multiple evaluation firings.
+    lineage:
+      - datalake_journey_optimizer_raw.actions.is_aggregated
+  ts_aggregation_deadline:
+    description: Timestamp (with timezone) until which further evaluations can be aggregated into this action. Null if not aggregatable.
+    lineage:
+      - datalake_journey_optimizer_raw.actions.aggregation_deadline
+  ts_created:
+    description: Timestamp (with timezone) when this action record was created.
+    lineage:
+      - datalake_journey_optimizer_raw.actions.created_at
+  ts_published:
+    description: Timestamp (with timezone) when this action was published to the downstream consumer. Null if not yet published.
+    lineage:
+      - datalake_journey_optimizer_raw.actions.published_at
+  ts_confirmed:
+    description: Timestamp (with timezone) when the downstream consumer confirmed receipt of this action. Null if not yet confirmed.
+    lineage:
+      - datalake_journey_optimizer_raw.actions.confirmed_at

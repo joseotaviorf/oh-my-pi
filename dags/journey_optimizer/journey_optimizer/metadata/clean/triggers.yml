@@ -1,0 +1,46 @@
+database_name: datalake_journey_optimizer_clean
+table_name: triggers
+description: >
+  Clean copy of the triggers table from Journey Optimizer (decision-engine service).
+  One row per incoming trigger event.
+  Column names follow lake naming conventions (id_*, ts_* prefixes).
+  Primary key: id_trigger_event.
+domain: For Sale
+owner: vinicius.valves@quintoandar.com.br
+columns:
+  id_trigger_event:
+    description: Primary key. UUID uniquely identifying this trigger event instance.
+    lineage:
+      - datalake_journey_optimizer_raw.triggers.trigger_event_id
+  id_business_case:
+    description: FK to business_case. UUID identifying the business case this trigger belongs to.
+    lineage:
+      - datalake_journey_optimizer_raw.triggers.business_case_id
+  id_subject:
+    description: Identifier of the subject (e.g. user ID, listing ID) for whom the trigger fired.
+    lineage:
+      - datalake_journey_optimizer_raw.triggers.subject_id
+  trigger_event_code:
+    description: Code identifying the type of event that fired this trigger (e.g. user_signed_up, listing_activated).
+    lineage:
+      - datalake_journey_optimizer_raw.triggers.trigger_event_code
+  subject_type:
+    description: Type of the subject entity referenced by id_subject (e.g. USER, LISTING).
+    lineage:
+      - datalake_journey_optimizer_raw.triggers.subject_type
+  state_snapshot:
+    description: JSON snapshot of the subject entity state at the moment the trigger event occurred.
+    lineage:
+      - datalake_journey_optimizer_raw.triggers.state_snapshot
+  trigger_context:
+    description: Optional JSON with additional context provided alongside the trigger event payload.
+    lineage:
+      - datalake_journey_optimizer_raw.triggers.trigger_context
+  ts_occurred:
+    description: Timestamp (with timezone) when the trigger event occurred in the source system.
+    lineage:
+      - datalake_journey_optimizer_raw.triggers.occurred_at
+  ts_created:
+    description: Timestamp (with timezone) when this row was inserted into the triggers table.
+    lineage:
+      - datalake_journey_optimizer_raw.triggers.created_at

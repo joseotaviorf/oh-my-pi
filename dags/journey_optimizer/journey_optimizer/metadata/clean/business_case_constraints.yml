@@ -1,0 +1,58 @@
+database_name: datalake_journey_optimizer_clean
+table_name: business_case_constraints
+description: >
+  Clean copy of the business_case_constraints configuration table from Journey Optimizer.
+  Rules that suppress or redirect actions before or after policy evaluation, ordered by priority.
+  Column names follow lake naming conventions (id_*, ts_* prefixes).
+  Primary key: id_constraint.
+domain: For Sale
+owner: vinicius.valves@quintoandar.com.br
+columns:
+  id_constraint:
+    description: Primary key. UUID uniquely identifying this constraint rule.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_constraints.constraint_id
+  id_business_case:
+    description: FK to business_case. UUID of the business case this constraint applies to.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_constraints.business_case_id
+  constraint_name:
+    description: Human-readable name identifying the constraint rule in configuration UIs.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_constraints.name
+  description:
+    description: Optional text describing the business rationale and expected behavior of this constraint.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_constraints.description
+  condition:
+    description: JSON expression that must evaluate to true for this constraint to fire during evaluation.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_constraints.condition
+  excluded_action_codes:
+    description: Optional JSON array of action codes to suppress when this constraint fires.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_constraints.excluded_action_codes
+  fallback_action_by_excluded_code:
+    description: Optional JSON mapping from excluded action code to the fallback action code to substitute instead.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_constraints.fallback_action_by_excluded_code
+  evaluation_phase:
+    description: "Phase during which this constraint is applied: pre (before policy), post (after policy), or both."
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_constraints.evaluation_phase
+  priority:
+    description: Integer ordering priority; lower values are evaluated first when multiple constraints apply.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_constraints.priority
+  is_active:
+    description: Boolean flag indicating whether this constraint is currently active and enforced during evaluation.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_constraints.is_active
+  ts_created:
+    description: Timestamp (with timezone) when this constraint rule was created.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_constraints.created_at
+  ts_updated:
+    description: Timestamp (with timezone) when this constraint rule was last updated.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_constraints.updated_at

@@ -1,0 +1,62 @@
+database_name: datalake_journey_optimizer_clean
+table_name: outbox
+description: >
+  Clean copy of the transactional outbox table from Journey Optimizer.
+  Each row represents a domain event queued for reliable publishing to Kafka.
+  Column names follow lake naming conventions (id_*, ts_* prefixes).
+  Primary key: id (serial integer).
+domain: For Sale
+owner: vinicius.valves@quintoandar.com.br
+columns:
+  id:
+    description: Primary key. Serial integer auto-incremented per outbox entry.
+    lineage:
+      - datalake_journey_optimizer_raw.outbox.id
+  id_event:
+    description: UUID uniquely identifying the domain event carried by this outbox entry.
+    lineage:
+      - datalake_journey_optimizer_raw.outbox.event_id
+  id_aggregate:
+    description: Identifier of the aggregate (e.g. action ID, evaluation ID) that produced this event.
+    lineage:
+      - datalake_journey_optimizer_raw.outbox.aggregate_id
+  aggregate_type:
+    description: Type name of the aggregate that produced this event (e.g. Action, Evaluation).
+    lineage:
+      - datalake_journey_optimizer_raw.outbox.aggregate_type
+  event_type:
+    description: Classification of the domain event type (e.g. ActionCreated, EvaluationCompleted).
+    lineage:
+      - datalake_journey_optimizer_raw.outbox.event_type
+  event_data:
+    description: JSON payload of the domain event to be published to Kafka.
+    lineage:
+      - datalake_journey_optimizer_raw.outbox.event_data
+  topic:
+    description: Kafka topic name where this event should be published by the relay process.
+    lineage:
+      - datalake_journey_optimizer_raw.outbox.topic
+  status:
+    description: "Current lifecycle status of this outbox entry: PENDING, PUBLISHED, or FAILED."
+    lineage:
+      - datalake_journey_optimizer_raw.outbox.status
+  last_error:
+    description: Text of the last error encountered when attempting to publish this entry. Null on success.
+    lineage:
+      - datalake_journey_optimizer_raw.outbox.last_error
+  retry_count:
+    description: Number of publish attempts made for this outbox entry; incremented on each retry.
+    lineage:
+      - datalake_journey_optimizer_raw.outbox.retry_count
+  ts_created:
+    description: Timestamp (with timezone) when this outbox entry was created alongside the domain change.
+    lineage:
+      - datalake_journey_optimizer_raw.outbox.created_at
+  ts_processing_started:
+    description: Timestamp (with timezone) when the relay process started processing this entry. Null if not yet started.
+    lineage:
+      - datalake_journey_optimizer_raw.outbox.processing_started_at
+  ts_published:
+    description: Timestamp (with timezone) when the event was successfully published to Kafka. Null if not yet published.
+    lineage:
+      - datalake_journey_optimizer_raw.outbox.published_at

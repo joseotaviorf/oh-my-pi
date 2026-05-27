@@ -1,0 +1,78 @@
+database_name: datalake_journey_optimizer_clean
+table_name: business_case_actions
+description: >
+  Clean copy of the business_case_actions configuration table from Journey Optimizer.
+  Action registry for each business case: the set of candidate actions available to the policy.
+  Column names follow lake naming conventions (id_*, ts_* prefixes).
+  Primary key: id_action_registry.
+domain: For Sale
+owner: vinicius.valves@quintoandar.com.br
+columns:
+  id_action_registry:
+    description: Primary key. UUID uniquely identifying this candidate action entry in the registry.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.action_registry_id
+  id_business_case:
+    description: FK to business_case. UUID of the business case this action belongs to.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.business_case_id
+  code:
+    description: Short code uniquely identifying the action within the business case (e.g. SEND_PROMO_EMAIL).
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.code
+  display_name:
+    description: Human-readable name for the action shown in configuration UIs and dashboards.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.display_name
+  description:
+    description: Optional text describing the purpose and expected outcome of this action.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.description
+  action_type:
+    description: Type classification of the action (e.g. SEND_EMAIL, PUSH_NOTIFICATION, WHATSAPP_MESSAGE).
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.action_type
+  agent_name:
+    description: Optional name of the agent or service responsible for executing this action.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.agent_name
+  instructions:
+    description: JSON with execution instructions passed to the agent when this action is dispatched.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.instructions
+  aggregation_key_template:
+    description: Template string used to compute the aggregation key for grouping firings of this action. Null if not aggregatable.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.aggregation_key_template
+  aggregation_strategy:
+    description: Strategy applied when aggregating multiple firings (e.g. KEEP_FIRST, KEEP_LAST). Null if not aggregatable.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.aggregation_strategy
+  is_aggregatable:
+    description: Boolean flag indicating whether multiple firings of this action can be aggregated within a time window.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.is_aggregatable
+  aggregation_window_seconds:
+    description: Duration in seconds defining the aggregation window for collapsing repeated action firings. Null if not aggregatable.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.aggregation_window_seconds
+  display_order:
+    description: Integer controlling the display order of this action in configuration UIs.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.display_order
+  is_default:
+    description: Boolean flag indicating whether this action is the default fallback choice for the business case.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.is_default
+  is_active:
+    description: Boolean flag indicating whether this action is currently available for policy selection.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.is_active
+  ts_created:
+    description: Timestamp (with timezone) when this action entry was created in the registry.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.created_at
+  ts_updated:
+    description: Timestamp (with timezone) when this action entry was last updated.
+    lineage:
+      - datalake_journey_optimizer_raw.business_case_actions.updated_at
