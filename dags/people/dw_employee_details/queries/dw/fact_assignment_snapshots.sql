@@ -25,6 +25,8 @@ SELECT
     asn.is_terminated,
     asn.has_emergency_contact,
     asn.is_internal_transfer,
+    asn.is_primary_assignment_for_snapshot,
+    asn.is_monthly_snapshot,
     asn.dt_reference = CURRENT_DATE() AS is_current,
     asn.dt_original_hire,
     asn.dt_hired,

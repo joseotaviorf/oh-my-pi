@@ -111,6 +111,14 @@ columns:
     description: True when the employee was already at the company before this assignment (e.g., moved between teams).
     lineage:
       - datalake_people.assignment_snapshots.is_internal_transfer
+  is_primary_assignment_for_snapshot:
+    description: True when this is the primary assignment for the employee on this snapshot date (the latest assignment when multiple assignments overlap for the same person and date).
+    lineage:
+      - datalake_people.assignment_snapshots.is_primary_assignment_for_snapshot
+  is_monthly_snapshot:
+    description: True when dt_reference is the last day of the month or the most recent day (current date). Use to filter for monthly snapshots only.
+    lineage:
+      - datalake_people.assignment_snapshots.is_monthly_snapshot
   is_current:
     description: True when this row is the most recent snapshot for the assignment (dt_reference = current date).
     lineage:
