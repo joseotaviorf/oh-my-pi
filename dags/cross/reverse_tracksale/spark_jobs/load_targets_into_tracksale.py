@@ -3,12 +3,13 @@ import logging
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 
+from pyspark.sql.functions import col, lit, when
 from quintoandar_logger import QuintoAndarLogger
 from quintoandar_tracksale_api_client.clients import TracksaleClient
 from quintoandar_tracksale_api_client.requesters import REQUESTERS
 
 from bietlejuice.base.api.api_enum import APIEnum
-from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 
@@ -32,6 +33,24 @@ def send_targets_to_tracksale(token, campaign_code, payload):
     requester_instance = REQUESTERS["dispatch"](tracksale_client)
     send_data = requester_instance.sync(campaign_code, payload)
     return send_data
+
+
+def mark_campaign_targets_as_dispatched(full_df, partition_path):
+    updated_df = full_df.withColumn(
+        "is_dispatched",
+        when(col("is_dispatched") == lit(False), lit(True)).otherwise(
+            col("is_dispatched")
+        ),
+    )
+    try:
+        updated_df.write.mode("overwrite").format(
+            SparkTableStorageFormat.DEFAULT_DW
+        ).save(partition_path)
+    except Exception as e:
+        logger.error(
+            f"m=Error marking campaign targets as dispatched, message_error={e}, partition_path={partition_path}"
+        )
+        raise e
 
 
 if __name__ == "__main__":
@@ -97,16 +116,14 @@ if __name__ == "__main__":
     s3_consumer = S3Consumer(spark_client)
 
     try:
-        df = (
-            s3_consumer.get_data_from_file(path=path, format="parquet")
-            .filter("is_dispatched = false")
-            .collect()
-        )
+        full_df = s3_consumer.get_data_from_file(path=path, format="parquet").cache()
+        pending_rows = full_df.filter(col("is_dispatched") == lit(False)).collect()
     except Exception as e:
         logger.error(f"m=There's no data here yet, message_error={e}")
-        df = []
+        full_df = None
+        pending_rows = []
 
-    if len(df) > 0:
+    if len(pending_rows) > 0:
         tags = json.loads(tags)
 
         payload = {
@@ -114,7 +131,7 @@ if __name__ == "__main__":
             "schedule_time": schedule_time,
             "finish_time": end_time,
         }
-        for row in df:
+        for row in pending_rows:
             payload["customers"].append(
                 {
                     "name": row.customer_name,
@@ -133,8 +150,12 @@ if __name__ == "__main__":
         )
         credentials = json.loads(json_credentials)
 
-        api_response = send_targets_to_tracksale(
-            credentials["token"], campaign_code, payload
+        send_targets_to_tracksale(credentials["token"], campaign_code, payload)
+
+        mark_campaign_targets_as_dispatched(full_df, path)
+        logger.info(
+            f"m={JOB_NAME}, campaign_query={campaign_query}, path={path}, "
+            "msg=Campaign targets marked as dispatched in datalake reverse."
         )
 
     else:
