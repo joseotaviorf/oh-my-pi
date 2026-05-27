@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: condo_manager
 owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+domain: Growth
 description: 'Condominium management companies and administrators responsible for building operations, maintenance, and resident services. This table contains contact information and system access details for property management entities that oversee condominiums in the QuintoAndar network. Essential for operational coordination, maintenance requests, and building administration workflows.'
 columns:
   id:

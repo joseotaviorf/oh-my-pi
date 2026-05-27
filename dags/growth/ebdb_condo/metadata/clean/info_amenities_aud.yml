@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: info_amenities_aud
 owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+domain: Growth
 description: 'Audit trail table for property-amenity relationship changes. This table maintains a complete historical record of all modifications to property amenity assignments, including additions, removals, and characteristic updates. Essential for compliance, data lineage tracking, understanding property feature evolution, and debugging data quality issues. Each record represents a change event with full change context and metadata.'
 columns:
   id_info_amenity:

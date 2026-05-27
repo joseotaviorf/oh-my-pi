@@ -4,7 +4,7 @@ table_name: listing_accuracy_history
 description: |
   At every visit the listing can receive a review indicating whether the property has the exact information described in the listing. This table is a daily history of the listing's information accuracy status.
   If there is more than one review on the same day, if there is a false one, the information is not accurate
-domain: 3P Partners
+domain: House and Listing
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_house:

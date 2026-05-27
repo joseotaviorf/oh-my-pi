@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_amenities
 table_name: pivotted_amenities
 description: This table has one row per house version, with all the amenities pivotted.
-domain: 3P Partners
+domain: House and Listing
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_house:

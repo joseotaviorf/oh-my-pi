@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: condo
 owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+domain: Growth
 description: 'Core condominium master data table containing location, management, and operational information for apartment buildings and housing complexes in QuintoAndar platform. This table serves as the foundation for property grouping, location-based analytics, and condominium management operations. Each record represents a unique condominium building or complex that may contain multiple individual properties (units).'
 columns:
   id:

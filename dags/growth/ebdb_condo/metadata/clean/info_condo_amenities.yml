@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: info_condo_amenities
 owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+domain: Growth
 description: 'Property-installation relationship table that associates individual properties with building-level installations and amenities. This junction table enables tracking which properties have access to specific condominium features like pools, gyms, elevators, and party halls. Unlike property-specific amenities, these installations are shared building features that benefit multiple units. Critical for property search filtering by building amenities and lifestyle-based recommendations.'
 columns:
   id_info_condo_amenity:

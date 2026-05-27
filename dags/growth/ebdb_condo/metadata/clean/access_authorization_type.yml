@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: access_authorization_type
 owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+domain: Growth
 description: 'Reference table defining the standardized types of access authorization methods available for property entry. This master table catalogs different authorization approaches such as doorman approval, electronic access, key collection, or direct access. Used to classify and standardize property access procedures across the platform for operational consistency and security management.'
 columns:
   id:

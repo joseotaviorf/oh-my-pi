@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: access_type_aud
 owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+domain: Growth
 description: 'Comprehensive audit trail table for property access management changes. This table maintains a complete historical record of all modifications to property access arrangements, security details, key management procedures, and authorization changes. Critical for security compliance, access control auditing, troubleshooting access issues, and maintaining detailed logs of property entry procedure changes over time.'
 columns:
   id:

@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: condo_amenities
 owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+domain: Growth
 description: 'Master catalog of building-level installations and amenities available in condominium complexes. Unlike property-specific amenities, these represent shared facilities and features available to all residents of a building (e.g., swimming pools, gyms, elevators, party halls). This reference table powers condominium feature searches, building comparisons, and lifestyle-based property recommendations. Each installation can be associated with multiple condominiums through relationship tables.'
 columns:
   id_condo_amenity:

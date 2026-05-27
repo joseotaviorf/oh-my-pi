@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_amenities
 table_name: amenity_change_history
 description: This table has one row per amenity change, be it a house or a condo amenity.
-domain: 3P Partners
+domain: House and Listing
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_house:

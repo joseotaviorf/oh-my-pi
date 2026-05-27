@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: info_amenities
 owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+domain: Growth
 description: 'Property-amenity relationship table that associates specific amenities with individual properties (houses/apartments). This junction table enables many-to-many relationships between properties and amenities, supporting complex property feature descriptions. Each record represents one amenity being present or absent in a specific property, with additional boolean fields for nuanced amenity characteristics. Critical for property search filtering, recommendation systems, and feature-based analytics.'
 columns:
   id:

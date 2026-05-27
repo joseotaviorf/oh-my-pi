@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: info_condo_amenities_aud
 owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+domain: Growth
 description: 'Audit trail table for property-installation relationship changes. This table maintains a complete historical record of all modifications to property access to building-level amenities and installations. Tracks changes in access rights to shared facilities like pools, gyms, elevators, and party halls. Critical for compliance, access control auditing, and understanding the evolution of building amenity availability for specific units.'
 columns:
   id_info_condo_amenity:

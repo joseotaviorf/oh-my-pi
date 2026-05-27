@@ -2,7 +2,7 @@ dag:
   name: ebdb_condo
   schedule_start_date: 2021, 2, 20
   schedule_interval: 45 21,8,12 * * *
-  owner: Data 3P Partners
+  owner: Data Growth
   documentation:
     dag_purpose: |
       **Business Context:**

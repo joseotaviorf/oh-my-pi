@@ -2,7 +2,7 @@
 database_name: datalake_listing_accuracy_review
 table_name: listing_accuracy
 description: Table with information on the last review received for the house. In other words, it shows if the information is accurate with the listing.
-domain: 3P Partners
+domain: House and Listing
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_house:

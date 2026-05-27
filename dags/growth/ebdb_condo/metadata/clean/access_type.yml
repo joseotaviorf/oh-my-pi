@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: access_type
 owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+domain: Growth
 description: 'Property access management table containing detailed information about how tenants, agents, and visitors can access specific properties. This table captures key storage locations, entry procedures, security arrangements, and access restrictions for operational and security purposes. Essential for property showing coordination, tenant onboarding, maintenance operations, and security management workflows.'
 columns:
   id:

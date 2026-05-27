@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: amenities
 owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+domain: Growth
 description: 'Master catalog of property amenities available in the QuintoAndar platform. Contains standardized amenity definitions used to describe property features across comfort and practicality categories. This reference table powers property search filters, recommendation algorithms, and feature-based pricing models. Each amenity can be associated with individual properties through the info_amenities relationship table.'
 columns:
   id:

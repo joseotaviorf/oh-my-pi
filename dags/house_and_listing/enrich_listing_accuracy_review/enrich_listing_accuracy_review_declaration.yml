@@ -1,7 +1,7 @@
 dag:
   name: enrich_listing_accuracy_review
   schedule_start_date: 2020, 8, 29
-  owner: Data 3P Partners
+  owner: Data House and Listing
   documentation:
     dag_purpose: This DAG is responsible for creating enriched tables for the feature where the Buyer reviews whether or not the listing visited has the correct information displayed on the platform.
 workflow:

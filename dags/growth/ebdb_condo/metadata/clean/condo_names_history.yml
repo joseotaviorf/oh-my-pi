@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_clean
 table_name: condo_names_history
 owner: vitor.musachio@quintoandar.com.br
-domain: 3P Partners
+domain: Growth
 description: 'Historical tracking table for condominium name changes and registrations. This table maintains a complete audit trail of all name variations, corrections, and updates for condominium buildings over time. Essential for data lineage, maintaining historical accuracy, understanding property branding evolution, and ensuring consistent identification across different time periods and data sources.'
 columns:
   id:
