@@ -24,9 +24,9 @@ BASE_ALIAS_CLASSIFIEDS_PARAMS = [
     "--input_navent_source_table=vespucio_sources_delta.source_navent_houses",
     "--input_classified_house_id_table=vespucio_classifieds.classifieds_house_id",
     "--input_navent_publisher_reputation_table=vespucio_sources_delta.source_navent_publisher_reputation",
-    "--input_ebdb_region_table=datalake_ebdb_clean.region",
-    "--input_ebdb_state_table=datalake_ebdb_clean.state",
-    "--input_ebdb_country_table=datalake_ebdb_clean.country",
+    "--input_region_table=datalake_ebdb_clean.region",
+    "--input_state_table=datalake_ebdb_clean.state",
+    "--input_country_table=datalake_ebdb_clean.country",
     "--input_publisher_scope_table=vespucio_alias.alias_publisher_scope",
     "--output_alias_compound=vespucio_alias.alias_classifieds_compound",
 ]

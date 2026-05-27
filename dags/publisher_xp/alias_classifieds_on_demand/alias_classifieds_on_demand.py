@@ -27,7 +27,6 @@ DAG_ID = f"bietlejuice.{DAG_NAME}"
 EXECUTION_HOURS_TIMEOUT = 3.0
 
 config_service = ConfigurationService(DAG_NAME)
-global_config_service = ConfigurationService()
 artifacts_bucket = config_service.get_config("artifacts_bucket")
 doc_md_chart_url = config_service.get_config("doc_md_chart_url")
 output_location = config_service.get_config("vespucio_output_path")
@@ -37,9 +36,7 @@ VESPUCIO_WHEEL_FILE = (
     f"{VESPUCIO_PACKAGE_NAME}-{VESPUCIO_PACKAGE_VERSION}-py3-none-any.whl"
 )
 
-CLUSTER_DESCRIPTION = global_config_service.get_config(
-    "consolidation_m_general_single_node_cluster"
-)
+CLUSTER_DESCRIPTION = config_service.get_config("custom_cluster")
 CLUSTER_DESCRIPTION["spark_conf"].update(
     {"spark.metrics.namespace": "data_products.alias_classifieds_on_demand"}
 )
