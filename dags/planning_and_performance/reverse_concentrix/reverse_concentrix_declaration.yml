@@ -1,6 +1,6 @@
 dag:
   name: reverse_concentrix
-  schedule_start_date: 2026,5,7
+  schedule_start_date: 2026,5,26
   owner: Data Planning and Performance
   documentation:
     dag_purpose: |
