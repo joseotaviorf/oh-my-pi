@@ -61,7 +61,6 @@ class Tables:
 
     zordominium_compounds = "zordominium_vespucio_plugin.zordominium_official_condos"
     classifieds_house_id = "vespucio_classifieds.classifieds_house_id"
-    classified_compounds = "vespucio_classifieds.classifieds_compound"
     classified_v2_compounds = "vespucio_classifieds.classifieds_v2"
     classified_logging_table = "vespucio_classifieds.classifieds_publish_log"
     classified_published_listings = (

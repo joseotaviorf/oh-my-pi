@@ -230,33 +230,6 @@ classifieds_tasks = [
         ],
     ),
     create_task(
-        entry_point="plugins_classifieds",
-        parameters=[
-            "--overwrite_schema",
-            f"--input_condo_compound={Tables.condo_compounds}",
-            f"--input_house_compound={Tables.house_compounds}",
-            f"--input_listing_compound={Tables.listings}",
-            f"--input_zordominium_compound={Tables.zordominium_compounds}",
-            f"--output_classified_compound={Tables.classified_compounds}",
-        ],
-    ),
-    create_task(
-        entry_point="plugins_classified_indexer",
-        parameters=[
-            f"--elasticsearch_url={config_service.get_config('elastic_search_url')}",
-            "--update_alias",
-            "--delete_old_indices",
-            f"--input_classifieds={Tables.classified_compounds}",
-            "--output_index_prefix=vespucio_prod",
-            "--number_of_shards=4",
-            "--number_of_replicas=2",
-            "--refresh_interval=60",
-        ],
-    ),
-]
-
-classifieds_v2_tasks = [
-    create_task(
         entry_point="plugins_classifieds_v2",
         parameters=[
             f"--input_condo_compound={Tables.condo_compounds}",
@@ -296,10 +269,8 @@ join_plugins >> plugin_tasks
 join_plugins >> property_search_indexer_task
 property_search_indexer_task >> compound_indexer_task
 join_plugins >> classifieds_tasks[0]
-chain(*classifieds_tasks)
 join_plugins >> zordominium_tasks[0]
 chain(*zordominium_tasks)
 
-classifieds_tasks[0] >> classifieds_v2_tasks[0]
-zordominium_tasks[0] >> classifieds_v2_tasks[0]
-chain(*classifieds_v2_tasks)
+zordominium_tasks[0] >> classifieds_tasks[1]
+chain(*classifieds_tasks)
