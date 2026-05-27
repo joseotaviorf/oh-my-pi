@@ -1,0 +1,44 @@
+---
+table_name: core_region.business_unit_region_history
+alert_channel: GCHAT_CORE_MODEL_SCHEMA_VALIDATION
+is_incremental:
+  incremental_date_column: ts_transaction
+  incremental_date_mask: yyyy-MM-dd
+column_level_validations:
+  id_event:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_region:
+    is_complete:
+      severity_level: Error
+  id_business_unit:
+    is_complete:
+      severity_level: Error
+  sk_core_business_unit_region:
+    is_complete:
+      severity_level: Error
+  event_name:
+    is_complete:
+      severity_level: Error
+    is_in:
+      severity_level: Error
+      values:
+        - ev_business_context
+  event_type:
+    is_complete:
+      severity_level: Error
+    is_in:
+      severity_level: Error
+      values:
+        - cdc
+  ts_transaction:
+    is_complete:
+      severity_level: Error
+  event_origin:
+    is_complete:
+      severity_level: Error
+  value:
+    is_complete:
+      severity_level: Error

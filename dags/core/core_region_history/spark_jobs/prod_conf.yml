@@ -1,0 +1,30 @@
+ENTITY_TYPE: "HUB_REGION_HISTORY"
+merge_on_historical: ["id_event"]
+
+BUSINESS_UNIT_REGION_HISTORY_TRANSACTIONAL_TABLE: "datalake_hub_services_transactional.business_unit_region"
+# tracked_col = column name in transactional CDC; target_col = core convention (ev_{target_col}).
+business_unit_region_history_event_configs:
+  - tracked_col: business_context
+    target_col: business_context
+    target_type: string
+
+BUSINESS_UNIT_HISTORY_TRANSACTIONAL_TABLE: "datalake_hub_services_transactional.business_unit"
+business_unit_history_event_configs:
+  - tracked_col: hub_name
+    target_col: hub_name
+    target_type: string
+  - tracked_col: sdr_type
+    target_col: sdr_type
+    target_type: string
+  - tracked_col: lead_types
+    target_col: lead_types
+    target_type: string
+  - tracked_col: negotiation_type
+    target_col: negotiation_type
+    target_type: string
+  - tracked_col: operational_context
+    target_col: operational_context
+    target_type: string
+  - tracked_col: business_context
+    target_col: business_context
+    target_type: string

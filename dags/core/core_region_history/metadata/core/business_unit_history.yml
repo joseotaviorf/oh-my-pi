@@ -1,0 +1,76 @@
+database_name: core_region
+table_name: business_unit_history
+domain: Data Platform
+owner: gustavo.alencar@quintoandar.com.br
+description: >
+  Narrow field-level history for the business_unit (hub) entity from Debezium CDC.
+  Each row represents a single field-level change in a hub's attributes from
+  datalake_hub_services_transactional.business_unit. Tracks hub_name, sdr_type,
+  lead_types, negotiation_type, operational_context, and business_context changes.
+  Standard 13-column event log schema with id_business_unit as the entity key.
+columns:
+  id_event:
+    lineage:
+      - datalake_hub_services_transactional.business_unit.id
+      - datalake_hub_services_transactional.business_unit.ts_database_transaction
+    description: SHA256 hash of id_business_unit, event_name, and ts_transaction.
+      Used as the idempotent merge key.
+  id_business_unit:
+    lineage:
+      - datalake_hub_services_transactional.business_unit.id
+    description: Business unit (Hub) primary key (string) from transactional id.
+  sk_core_business_unit:
+    lineage:
+      - datalake_hub_services_transactional.business_unit.id
+    description: Surrogate key for the business_unit entity, derived from id_business_unit.
+  event_name:
+    lineage:
+      - datalake_hub_services_transactional.business_unit.hub_name
+      - datalake_hub_services_transactional.business_unit.sdr_type
+      - datalake_hub_services_transactional.business_unit.lead_types
+      - datalake_hub_services_transactional.business_unit.negotiation_type
+      - datalake_hub_services_transactional.business_unit.operational_context
+      - datalake_hub_services_transactional.business_unit.business_context
+    description: Resolved event name (ev_{target_col}) for the changed field.
+    categories:
+      ev_hub_name: Change in hub_name.
+      ev_sdr_type: Change in sdr_type.
+      ev_lead_types: Change in lead_types (arrives as string due to transactional_datatype_overrides).
+      ev_negotiation_type: Change in negotiation_type.
+      ev_operational_context: Change in operational_context.
+      ev_business_context: Change in business_context.
+  event_type:
+    lineage:
+      - datalake_hub_services_transactional.business_unit.op_cdc
+    description: CDC-sourced event type (cdc).
+  value:
+    lineage:
+      - datalake_hub_services_transactional.business_unit.hub_name
+      - datalake_hub_services_transactional.business_unit.sdr_type
+      - datalake_hub_services_transactional.business_unit.lead_types
+      - datalake_hub_services_transactional.business_unit.negotiation_type
+      - datalake_hub_services_transactional.business_unit.operational_context
+      - datalake_hub_services_transactional.business_unit.business_context
+    description: New value of the changed column as string.
+  payload:
+    description: Reserved; null for CDC in this pipeline.
+  ts_transaction:
+    lineage:
+      - datalake_hub_services_transactional.business_unit.ts_database_transaction
+    description: Source database transaction timestamp from Debezium CDC.
+  event_origin:
+    description: Fully qualified transactional source table name for this job.
+  ts_load:
+    description: Load timestamp into the core history table.
+  year:
+    lineage:
+      - datalake_hub_services_transactional.business_unit.ts_database_transaction
+    description: Partition year derived from ts_transaction.
+  month:
+    lineage:
+      - datalake_hub_services_transactional.business_unit.ts_database_transaction
+    description: Partition month derived from ts_transaction.
+  day:
+    lineage:
+      - datalake_hub_services_transactional.business_unit.ts_database_transaction
+    description: Partition day derived from ts_transaction.

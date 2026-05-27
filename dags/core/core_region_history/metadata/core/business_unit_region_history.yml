@@ -1,0 +1,69 @@
+database_name: core_region
+table_name: business_unit_region_history
+domain: Data Platform
+owner: gustavo.alencar@quintoandar.com.br
+description: >
+  Narrow field-level history for the business_unit_region entity from Debezium CDC.
+  Each row represents a single field-level change in a region-business_unit (hub) association
+  from datalake_hub_services_transactional.business_unit_region. The entity grain is
+  the region-business_ unit (hub) pair (composite id_region||id_business_unit); association
+  lifecycle events (INSERT/DELETE) and business_context changes are all captured.
+  14-column schema: the standard 13-column base with the composite entity id replaced by
+  the split id_region and id_business_unit columns.
+columns:
+  id_event:
+    lineage:
+      - datalake_hub_services_transactional.business_unit_region.region_id
+      - datalake_hub_services_transactional.business_unit_region.business_unit_id
+      - datalake_hub_services_transactional.business_unit_region.ts_database_transaction
+    description: SHA256 hash of composite id (id_region||id_business_unit), event_name, and
+      ts_transaction. Used as the idempotent merge key.
+  id_region:
+    lineage:
+      - datalake_hub_services_transactional.business_unit_region.region_id
+    description: Region identifier (string) from transactional region_id. Primary entity for this region core model.
+  id_business_unit:
+    lineage:
+      - datalake_hub_services_transactional.business_unit_region.business_unit_id
+    description: Hub (business unit) identifier (string) from transactional business_unit_id.
+  sk_core_business_unit_region:
+    lineage:
+      - datalake_hub_services_transactional.business_unit_region.region_id
+      - datalake_hub_services_transactional.business_unit_region.business_unit_id
+    description: Surrogate key for the region-hub pair, derived from the composite id_region||id_business_unit.
+  event_name:
+    lineage:
+      - datalake_hub_services_transactional.business_unit_region.business_context
+    description: Resolved event name for the changed field.
+    categories:
+      ev_business_context: Change in business_context (SALE or RENT), including association creation and deletion.
+  event_type:
+    lineage:
+      - datalake_hub_services_transactional.business_unit_region.op_cdc
+    description: CDC-sourced event type (cdc).
+  value:
+    lineage:
+      - datalake_hub_services_transactional.business_unit_region.business_context
+    description: New value of the changed column as string (e.g. SALE or RENT).
+  payload:
+    description: Reserved; null for CDC in this pipeline.
+  ts_transaction:
+    lineage:
+      - datalake_hub_services_transactional.business_unit_region.ts_database_transaction
+    description: Source database transaction timestamp from Debezium CDC.
+  event_origin:
+    description: Fully qualified transactional source table name for this job.
+  ts_load:
+    description: Load timestamp into the core history table.
+  year:
+    lineage:
+      - datalake_hub_services_transactional.business_unit_region.ts_database_transaction
+    description: Partition year derived from ts_transaction.
+  month:
+    lineage:
+      - datalake_hub_services_transactional.business_unit_region.ts_database_transaction
+    description: Partition month derived from ts_transaction.
+  day:
+    lineage:
+      - datalake_hub_services_transactional.business_unit_region.ts_database_transaction
+    description: Partition day derived from ts_transaction.
