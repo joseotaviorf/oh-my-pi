@@ -139,10 +139,18 @@ def clean_cf(df):
         col("data.response_flags").alias("response_flags"),
         col("data.response_code").alias("response_code"),
         col("data.request_id").alias("id_request"),
-        coalesce(col("direct.personUUID"), col("wrapped.personUUID")).alias(
-            "uuid_person_principal_user"
-        ),
-        coalesce(col("direct.id"), col("wrapped.id")).alias("id_principal_user"),
+        coalesce(
+            col("direct.personUUID"),
+            col("wrapped.personUUID"),
+            col("direct.person_uuid"),
+            col("wrapped.person_uuid"),
+        ).alias("uuid_person_principal_user"),
+        coalesce(
+            col("direct.id"),
+            col("wrapped.id"),
+            col("direct.main_user_id").cast(LongType()),
+            col("wrapped.main_user_id").cast(LongType()),
+        ).alias("id_principal_user"),
         coalesce(col("direct.email"), col("wrapped.email")).alias(
             "principal_user_email"
         ),
@@ -236,11 +244,13 @@ def get_claims_schema():
     return StructType(
         [
             StructField("id", LongType(), True),
+            StructField("main_user_id", StringType(), True),
             StructField("sub", StringType(), True),
             StructField("act", act_schema, True),
             StructField("aud", StringType(), True),
             StructField("email", StringType(), True),
             StructField("personUUID", StringType(), True),
+            StructField("person_uuid", StringType(), True),
             StructField("name", StringType(), True),
             StructField("firstname", StringType(), True),
             StructField("iss", StringType(), True),
