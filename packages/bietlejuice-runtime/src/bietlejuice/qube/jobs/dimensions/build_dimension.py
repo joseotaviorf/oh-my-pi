@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.sql import functions as F
 
+from bietlejuice.base.validation.target_resolver import validation_database_location
 from bietlejuice.pipeline.dataframe_delta_table_loader_pipeline import (
     DataFrameDeltaTableLoaderPipeline,
 )
@@ -120,6 +121,8 @@ def build_dimension(args: Namespace) -> None:
                     core_df_full=core_df_full,
                     window_days=window_days,
                     fixed_hi=fixed_hi,
+                    target_database_name=getattr(args, "target_database_name", None),
+                    target_table_name=getattr(args, "target_table_name", None),
                 )
                 logger.info(f"Window {window_days}d completed successfully")
             except Exception as e:
@@ -286,6 +289,8 @@ def _process_window(
     core_df_full: DataFrame,
     window_days: int,
     fixed_hi: int,
+    target_database_name: Optional[str] = None,
+    target_table_name: Optional[str] = None,
 ) -> None:
     """Process a single time window."""
     hi, lo = _calculate_window_range(fixed_hi, window_days)
@@ -328,7 +333,16 @@ def _process_window(
     metrics = validate_output(final_df, dim_config.entity, dim_config.name, window_days)
     logger.info(f"Output metrics: {metrics.to_dict()}")
 
-    _write_output(final_df, conf, dim_config.entity, dim_config.name, window_days, hi)
+    _write_output(
+        final_df,
+        conf,
+        dim_config.entity,
+        dim_config.name,
+        window_days,
+        hi,
+        target_database_name=target_database_name,
+        target_table_name=target_table_name,
+    )
     logger.info(f"Output written successfully: {metrics.row_count} rows")
 
 
@@ -457,7 +471,14 @@ def _prepare_output_dataframe(
 
 
 def _write_output(
-    final_df: DataFrame, conf: Config, entity: str, name: str, window_days: int, hi: int
+    final_df: DataFrame,
+    conf: Config,
+    entity: str,
+    name: str,
+    window_days: int,
+    hi: int,
+    target_database_name: Optional[str] = None,
+    target_table_name: Optional[str] = None,
 ) -> None:
     """Write output dataframe to table using DataFrameDeltaTableLoaderPipeline."""
     # Remove entity prefix from name if it already starts with it
@@ -485,20 +506,36 @@ def _write_output(
         table_name = parts[2]
     elif len(parts) == 2:
         # Format: schema.table
+        catalog = ""
         schema = parts[0]
         table_name = parts[1]
     else:
         # No dots, just table name
+        catalog = ""
+        schema = ""
         table_name = output_table_name
 
     # Use schema-only names to avoid Unity Catalog CREATE DATABASE errors
     database_name = "qube_dimensions"
-    target_database_name = "qube_dimensions"
+    write_database_name = "qube_dimensions"
 
     # Construct database location using schema name (without catalog prefix)
     # schema_name = conf.get_schema_name("dim")
     # Note: database_location should NOT include table name - the pipeline will append it
     database_location = f"{conf.warehouse_path}/qube/dimensions/"
+
+    # Redirect writes to cluster_validation schema when validation args are provided
+    if target_database_name and target_table_name:
+        write_database_name = target_database_name
+        # Derive per-window validation table name so each window writes to a distinct table
+        table_name = f"{database_name}___{output_table_name}"
+        # Extract bucket name from warehouse_path (e.g. "s3a://5a-datalake-prod" → "5a-datalake-prod")
+        bucket = conf.warehouse_path.split("//", 1)[-1].split("/")[0]
+        database_location = validation_database_location(bucket, database_name)
+        output_path = f"{write_database_name}.{table_name}"
+        logger.info(
+            f"Validation mode: redirecting write to {write_database_name}.{table_name}"
+        )
 
     logger.info(
         f"Writing output to: Catalog{catalog}Schema{schema}Table{table_name} (location: {database_location})"
@@ -528,7 +565,7 @@ def _write_output(
             spark = create_emr_spark_session("build_dimension")
         else:
             spark = SparkSession.builder.getOrCreate()
-        full_table_name = f"{database_name}.{table_name}"
+        full_table_name = f"{write_database_name}.{table_name}"
         expected_location_s3a = f"{database_location}{table_name}"
         expected_location_s3 = expected_location_s3a.replace("s3a://", "s3://")
 
@@ -564,13 +601,13 @@ def _write_output(
 
     # Use DataFrameDeltaTableLoaderPipeline for writing
     pipeline = DataFrameDeltaTableLoaderPipeline(
-        database_name=database_name,
+        database_name=write_database_name,
         table_name=table_name,
         database_location=database_location,
         layer="enriched",
         dataframe=final_df,
         partitions=["date"],
-        target_database_name=target_database_name,
+        target_database_name=write_database_name,
         target_database_location=database_location,
         merge_schema=True,
         spark_session_configs={"udfs": []},

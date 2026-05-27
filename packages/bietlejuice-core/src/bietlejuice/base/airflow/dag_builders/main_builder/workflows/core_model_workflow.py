@@ -99,9 +99,12 @@ class CoreModelWorkflow(BaseWorkflow):
             None,
         )
         core_delta_tables = self._get_core_model_tables()
-        optimize_delta_tables_task = self.optimize_delta_table_task_creator.create_task(
-            core_delta_tables
-        )
+        if not self.is_validation:
+            optimize_last_task = self.optimize_delta_table_task_creator.create_task(
+                core_delta_tables
+            )
+        else:
+            optimize_last_task = cluster_completion_sink
 
         core_model_first_tasks = {}
         core_model_last_tasks = {}
@@ -112,7 +115,7 @@ class CoreModelWorkflow(BaseWorkflow):
         ].items():
             core_model_initial_task, core_model_final_task = (
                 self._create_core_model_tasks(
-                    table_name=table_name, last_task=optimize_delta_tables_task
+                    table_name=table_name, last_task=optimize_last_task
                 )
             )
 
@@ -124,11 +127,12 @@ class CoreModelWorkflow(BaseWorkflow):
             table_first_tasks=core_model_first_tasks,
             table_last_tasks=core_model_last_tasks,
             previous_task_if_no_dependencies=execute_job_cluster_task,
-            next_task_if_no_dependents=optimize_delta_tables_task,
+            next_task_if_no_dependents=optimize_last_task,
             inner_dependencies_key="inner_dependencies",
         )
 
-        optimize_delta_tables_task >> cluster_completion_sink
+        if not self.is_validation:
+            optimize_last_task >> cluster_completion_sink
         attach_emr_job_cluster_finished_work_prerequisites(
             self.dag_execution_context,
             dummy_terminate_job_cluster_task,
@@ -140,6 +144,8 @@ class CoreModelWorkflow(BaseWorkflow):
         """
         Checks if sync hive structure task should be added into the workflow.
         """
+        if self.is_validation:
+            return False
         default_has_hive_sync = self.workflow_args.get("has_hive_sync", False)
         return table_attributes.table_customization.get(
             "has_hive_sync", default_has_hive_sync

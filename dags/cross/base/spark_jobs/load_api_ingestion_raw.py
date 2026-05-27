@@ -49,6 +49,20 @@ def parse_arguments() -> Namespace:
     )
     parser.add_argument("load_start_date", help="Start date (YYYY-MM-DD)")
     parser.add_argument("load_end_date", help="End date (YYYY-MM-DD)")
+    parser.add_argument(
+        "-tdn",
+        "--target-database-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-ttn",
+        "--target-table-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
     return parser.parse_args()
 
 
@@ -462,6 +476,19 @@ def main() -> None:
         partition_cols=partition_cols,
         extraction_type=args.extraction_type,
     )
+    if args.target_database_name and args.target_table_name:
+        from bietlejuice.base.validation.target_resolver import (
+            validation_database_location,
+        )
+
+        prod_database_name = raw_loader.database_name
+        write_table_name = args.target_table_name
+        raw_loader.database_name = args.target_database_name
+        raw_loader.table_name = write_table_name
+        raw_loader.database_location = validation_database_location(
+            args.datalake_bucket, prod_database_name
+        ).replace("s3a://", "s3://")
+
     LOGGER.info(
         "m=main, table_name=%s, source=%s, bucket=%s, extraction_type=%s "
         "msg=Loading to raw layer",

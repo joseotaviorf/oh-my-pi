@@ -75,6 +75,20 @@ if __name__ == "__main__":
     parser.add_argument(
         "credentials_scope", help="credentials scope to access gsheets API"
     )
+    parser.add_argument(
+        "-tdn",
+        "--target-database-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-ttn",
+        "--target-table-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
 
     args = parser.parse_args()
 
@@ -114,6 +128,18 @@ if __name__ == "__main__":
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     database_location = datalake_info["db_raw_path"]
+    if args.target_database_name and args.target_table_name:
+        from bietlejuice.base.validation.target_resolver import (
+            validation_database_location,
+        )
+
+        write_table_name = args.target_table_name
+        database_location = validation_database_location(
+            datalake_bucket, database_name
+        ).replace("s3a://", "s3://")
+        database_name = args.target_database_name
+        table_name = write_table_name
+        spark_metastore_service.create_database(database_name)
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
     s3_loader = S3Loader()

@@ -37,7 +37,7 @@ class LoadAPIRawTaskCreator(LoadTaskCreator):
         Must stay in sync with ``dags/cross/base/spark_jobs/load_api_ingestion_raw.py``
         positional arguments (no ``--table-privileges`` on that job).
         """
-        return [
+        parameters = [
             self.dag_execution_context.environment,
             self.dag_execution_context.bucket,
             self.dag_execution_context.dag_args["name"],
@@ -48,6 +48,17 @@ class LoadAPIRawTaskCreator(LoadTaskCreator):
             self.dag_execution_context.load_start_date,
             self.dag_execution_context.load_end_date,
         ]
+        if getattr(self.dag_execution_context, "is_validation", False):
+            target_db, target_table = table_attributes.get_validation_write_target()
+            parameters.extend(
+                [
+                    "--target-database-name",
+                    target_db,
+                    "--target-table-name",
+                    target_table,
+                ]
+            )
+        return parameters
 
     def _create_base_load_task(
         self, table_attributes: TableAttributes

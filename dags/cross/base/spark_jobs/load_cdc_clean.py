@@ -71,6 +71,20 @@ def parse_arguments():
         const=True,
         help="Whether the Spark job should apply soft delete instead of hard delete for the clean layer",
     )
+    parser.add_argument(
+        "-tdn",
+        "--target-database-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-ttn",
+        "--target-table-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
     return parser.parse_args()
 
 
@@ -157,6 +171,16 @@ def main():
     )
 
     full_clean_table_name = f"datalake_{schema}_clean.{table_name}"
+    clean_table_s3_path = f"s3://{datalake_bucket}/clean/{schema}/{table_name}/"
+    if args.target_database_name and args.target_table_name:
+        from bietlejuice.base.validation.target_resolver import (
+            validation_database_location,
+        )
+
+        prod_db = f"datalake_{schema}_clean"
+        write_table_name = args.target_table_name
+        full_clean_table_name = f"{args.target_database_name}.{write_table_name}"
+        clean_table_s3_path = f"{validation_database_location(datalake_bucket, prod_db)}{write_table_name}/"
     if table_privileges_dict is not None:
         table_privileges = TablePrivileges.from_input_dict(
             table_privileges_dict, full_clean_table_name
@@ -165,8 +189,6 @@ def main():
         table_privileges = TablePrivileges.from_environment_default(
             full_clean_table_name
         )
-
-    clean_table_s3_path = f"s3://{datalake_bucket}/clean/{schema}/{table_name}/"
     loader = DeltaLoader(spark)
     if has_soft_delete:
         loader.load_table(

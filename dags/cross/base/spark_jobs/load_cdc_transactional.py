@@ -66,11 +66,33 @@ def parse_arguments():
         required=False,
         default=None,
     )
+    parser.add_argument(
+        "-tdn",
+        "--target-database-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-ttn",
+        "--target-table-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
 
     return parser.parse_args()
 
 
-def load_df_into_transactional(df, datalake_bucket, schema, table_name, partitions):
+def load_df_into_transactional(
+    df,
+    datalake_bucket,
+    schema,
+    table_name,
+    partitions,
+    write_name=None,
+    write_path=None,
+):
     """
     Load DataFrame into Transactional Layer using Delta format
 
@@ -78,6 +100,8 @@ def load_df_into_transactional(df, datalake_bucket, schema, table_name, partitio
     :param schema: Database schema.
     :param table_name: Table name.
     :param ts_ms: Timestamp of when the operation was made into database.
+    :param write_name: Optional override for the fully-qualified table name (validation DAGs).
+    :param write_path: Optional override for the S3 path (validation DAGs).
     :return:
     """
     logger.info(
@@ -86,8 +110,10 @@ def load_df_into_transactional(df, datalake_bucket, schema, table_name, partitio
 
     loader = DeltaLoader(spark)
 
-    full_transactional_name = f"datalake_{schema}_transactional.{table_name}"
-    transactional_s3_path = (
+    full_transactional_name = (
+        write_name or f"datalake_{schema}_transactional.{table_name}"
+    )
+    transactional_s3_path = write_path or (
         f"s3://{datalake_bucket}/transactional/{schema}/{table_name}/"
     )
     loader.load_table(
@@ -251,6 +277,7 @@ def main():
     else:
         table_privileges_dict = None
     full_table_name = f"datalake_{schema}_transactional.{table_name}"
+    prod_full_table_name = full_table_name
     if table_privileges_dict is not None:
         table_privileges = TablePrivileges.from_input_dict(
             table_privileges_dict, full_table_name
@@ -297,7 +324,7 @@ def main():
     )
 
     if df is None:
-        if not spark.catalog.tableExists(full_table_name):
+        if not spark.catalog.tableExists(prod_full_table_name):
             raise FileNotFoundError(
                 "No data was found in the incoming bucket, and the table does not exist in the datalake. Since this is the first execution, "
                 "please make sure to trigger a snapshot of the table in the source database."
@@ -341,8 +368,25 @@ def main():
     )
 
     logger.info("m=__main__, msg=Load table into transactional layer...")
+    write_name = None
+    write_path = None
+    if args.target_database_name and args.target_table_name:
+        from bietlejuice.base.validation.target_resolver import (
+            validation_database_location,
+        )
+
+        prod_db = f"datalake_{schema}_transactional"
+        write_table_name = args.target_table_name
+        write_name = f"{args.target_database_name}.{write_table_name}"
+        write_path = f"{validation_database_location(datalake_bucket, prod_db)}{write_table_name}/"
     load_df_into_transactional(
-        transactional_df, datalake_bucket, schema, table_name.lower(), partitions
+        transactional_df,
+        datalake_bucket,
+        schema,
+        table_name.lower(),
+        partitions,
+        write_name=write_name,
+        write_path=write_path,
     )
 
     if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():

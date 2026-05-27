@@ -15,7 +15,6 @@ DAGS_ROOT = REPO_ROOT / "dags"
 PHASE1_WORKFLOWS = {
     "query_delta",
     "query",
-    "query_view",
     "dw_query",
     "metric_query",
 }
@@ -32,10 +31,10 @@ PHASE2_WORKFLOWS = {
     "access",
     "load",
     "load_access",
+    "reverse",
     "qube_measure",
     "qube_dimension",
     "qube_metric",
-    "wonka",
 }
 
 SKIP_CLUSTER_PREFIXES = ("emr_",)

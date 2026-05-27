@@ -201,7 +201,7 @@ class RawAPIIngestionWorkflow(BaseWorkflow):
         execute_job_cluster_task = self.execute_job_cluster_task_creator.create_task()
         dag_final_tasks = self._set_dag_final_tasks()
 
-        if all_clean_tables:
+        if all_clean_tables and not self.is_validation:
             optimize_clean_task = self.optimize_delta_table_task_creator.create_task(
                 all_clean_tables
             )

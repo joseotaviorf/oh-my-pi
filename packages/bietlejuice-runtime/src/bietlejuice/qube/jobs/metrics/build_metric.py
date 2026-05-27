@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql import functions as F
 
+from bietlejuice.base.validation.target_resolver import validation_database_location
 from bietlejuice.pipeline.dataframe_delta_table_loader_pipeline import (
     DataFrameDeltaTableLoaderPipeline,
 )
@@ -111,6 +112,8 @@ def build_metric(args: Namespace) -> None:
                     window_days=window_days,
                     fixed_hi=fixed_hi,
                     env=args.env,
+                    target_database_name=getattr(args, "target_database_name", None),
+                    target_table_name=getattr(args, "target_table_name", None),
                 )
                 logger.info(f"Window {window_days}d completed successfully")
             except Exception as e:
@@ -239,6 +242,8 @@ def _process_window(
     window_days: int,
     fixed_hi: int,
     env: str,
+    target_database_name: Optional[str] = None,
+    target_table_name: Optional[str] = None,
 ) -> None:
     """Process a single time window."""
     hi = fixed_hi
@@ -297,7 +302,14 @@ def _process_window(
 
     # Validate and write output
     _write_metric_output(
-        result_df, conf, metric_config.entity, metric_config.name, window_days, hi
+        result_df,
+        conf,
+        metric_config.entity,
+        metric_config.name,
+        window_days,
+        hi,
+        target_database_name=target_database_name,
+        target_table_name=target_table_name,
     )
 
 
@@ -456,6 +468,8 @@ def _write_metric_output(
     name: str,
     window_days: int,
     hi: int,
+    target_database_name: Optional[str] = None,
+    target_table_name: Optional[str] = None,
 ) -> None:
     """Write metric output to table using DataFrameDeltaTableLoaderPipeline."""
     # Validate output
@@ -495,12 +509,25 @@ def _write_metric_output(
 
     # Use schema-only names to avoid Unity Catalog CREATE DATABASE errors
     database_name = "qube_metrics"
-    target_database_name = "qube_metrics"
+    write_database_name = "qube_metrics"
 
     # Construct database location using schema name (without catalog prefix)
     # schema_name = conf.get_schema_name("met")
     # Note: database_location should NOT include table name - the pipeline will append it
     database_location = f"{conf.warehouse_path}/qube/metrics/"
+
+    # Redirect writes to cluster_validation schema when validation args are provided
+    if target_database_name and target_table_name:
+        write_database_name = target_database_name
+        # Derive per-window validation table name so each window writes to a distinct table
+        table_name = f"{database_name}___{output_table_name}"
+        # Extract bucket name from warehouse_path (e.g. "s3a://5a-datalake-prod" → "5a-datalake-prod")
+        bucket = conf.warehouse_path.split("//", 1)[-1].split("/")[0]
+        database_location = validation_database_location(bucket, database_name)
+        output_path = f"{write_database_name}.{table_name}"
+        logger.info(
+            f"Validation mode: redirecting write to {write_database_name}.{table_name}"
+        )
 
     logger.info(f"Writing output to: {output_path} (location: {database_location})")
     # date_str = timestamp_to_date_string(hi)
@@ -530,7 +557,7 @@ def _write_metric_output(
             spark = create_emr_spark_session("build_metric")
         else:
             spark = SparkSession.builder.getOrCreate()
-        full_table_name = f"{database_name}.{table_name}"
+        full_table_name = f"{write_database_name}.{table_name}"
         expected_location_s3a = f"{database_location}{table_name}"
         expected_location_s3 = expected_location_s3a.replace("s3a://", "s3://")
 
@@ -566,13 +593,13 @@ def _write_metric_output(
 
     # Use DataFrameDeltaTableLoaderPipeline for writing
     pipeline = DataFrameDeltaTableLoaderPipeline(
-        database_name=database_name,
+        database_name=write_database_name,
         table_name=table_name,
         database_location=database_location,
         layer="enriched",
         dataframe=result_df,
         partitions=["date"],
-        target_database_name=target_database_name,
+        target_database_name=write_database_name,
         target_database_location=database_location,
         merge_schema=True,
         spark_session_configs={"udfs": []},

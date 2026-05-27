@@ -24,6 +24,7 @@ class TestLoadAPIRawTaskCreator:
         ctx.load_start_date = "2025-01-01"
         ctx.load_end_date = "2025-01-16"
         ctx.workflow_args = {"spark_job_prefix": "base"}
+        ctx.is_validation = False
         return ctx
 
     @pytest.fixture

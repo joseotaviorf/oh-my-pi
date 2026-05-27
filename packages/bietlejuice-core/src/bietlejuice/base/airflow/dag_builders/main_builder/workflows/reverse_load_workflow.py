@@ -49,15 +49,18 @@ class ReverseLoadWorkflow(BaseWorkflow):
         tables = self._get_tables()
         for table in tables:
             load_reverse_task = self.load_reverse_task_creator.create_task(table)
-            optimize_delta_table_task = (
-                self.optimize_delta_table_task_creator.create_task([table])
-            )
-            (
-                execute_job_cluster_task
-                >> load_reverse_task
-                >> optimize_delta_table_task
-                >> cluster_completion_sink
-            )
+            if not self.is_validation:
+                optimize_delta_table_task = (
+                    self.optimize_delta_table_task_creator.create_task([table])
+                )
+                (
+                    execute_job_cluster_task
+                    >> load_reverse_task
+                    >> optimize_delta_table_task
+                    >> cluster_completion_sink
+                )
+            else:
+                execute_job_cluster_task >> load_reverse_task >> cluster_completion_sink
 
         if self._check_include_skip_run_task():
             skip_run_task = self.skip_run_task_creator.create_task()

@@ -132,14 +132,17 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
             execute_job_cluster_local_id if execute_job_cluster_local_id > 1 else None
         )
 
-        optimize_delta_tables = self.optimize_delta_table_task_creator.create_task(
-            cluster_tables,
-            optimize_delta_table_local_id=(
-                execute_job_cluster_local_id
-                if execute_job_cluster_local_id > 1
-                else None
-            ),
-        )
+        if not self.is_validation:
+            optimize_delta_tables = self.optimize_delta_table_task_creator.create_task(
+                cluster_tables,
+                optimize_delta_table_local_id=(
+                    execute_job_cluster_local_id
+                    if execute_job_cluster_local_id > 1
+                    else None
+                ),
+            )
+        else:
+            optimize_delta_tables = None
 
         table_first_tasks = {}
         table_last_tasks = {}
@@ -200,7 +203,9 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
             (load >> register_table >> sync_metadata >> last_task)
         if self._check_include_data_quality_task(table):
             data_quality = self.data_quality_tests_task_creator.create_task(table)
-            load >> data_quality >> last_task
+            load >> data_quality
+            if last_task is not None:
+                data_quality >> last_task
         return load, load
 
     def _set_dependencies(
@@ -213,13 +218,6 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
         dag_execution_context: DagExecutionContext,
         execute_job_cluster_local_id: int,
     ) -> None:
-        self._set_inner_dependencies(
-            table_first_tasks,
-            table_last_tasks,
-            previous_task_if_no_dependencies=execute_job_cluster_task,
-            next_task_if_no_dependents=optimize_delta_tables_task,
-        )
-
         if self._check_include_skip_run_task():
             skip_run_task = self.skip_run_task_creator.create_task()
             skip_run_task >> execute_job_cluster_task
@@ -230,7 +228,23 @@ class BaseQueryDeltaWorkflow(BaseWorkflow):
             job_cluster_finished_task,
             execute_job_cluster_local_id,
         )
-        optimize_delta_tables_task >> cluster_completion_sink
+
+        if optimize_delta_tables_task is not None:
+            self._set_inner_dependencies(
+                table_first_tasks,
+                table_last_tasks,
+                previous_task_if_no_dependencies=execute_job_cluster_task,
+                next_task_if_no_dependents=optimize_delta_tables_task,
+            )
+            optimize_delta_tables_task >> cluster_completion_sink
+        else:
+            self._set_inner_dependencies(
+                table_first_tasks,
+                table_last_tasks,
+                previous_task_if_no_dependencies=execute_job_cluster_task,
+                next_task_if_no_dependents=cluster_completion_sink,
+            )
+
         attach_emr_job_cluster_finished_work_prerequisites(
             dag_execution_context,
             job_cluster_finished_task,

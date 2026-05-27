@@ -26,7 +26,7 @@ class LoadDMSCDCRawTaskCreator(LoadTaskCreator):
             table_attributes.table_customization.get("raw_primary_keys", [])
         )
 
-        return [
+        parameters = [
             self.dag_execution_context.environment,
             self.dag_execution_context.incoming_bucket,
             self.dag_execution_context.bucket,
@@ -35,9 +35,21 @@ class LoadDMSCDCRawTaskCreator(LoadTaskCreator):
             self.dag_execution_context.load_start_date,
             self.dag_execution_context.load_end_date,
             primary_keys,
-            "--table-privileges",
-            json.dumps(table_attributes.table_privileges),
         ]
+        if getattr(self.dag_execution_context, "is_validation", False):
+            target_db, target_table = table_attributes.get_validation_write_target()
+            parameters.extend(
+                [
+                    "--target-database-name",
+                    target_db,
+                    "--target-table-name",
+                    target_table,
+                ]
+            )
+        parameters.extend(
+            ["--table-privileges", json.dumps(table_attributes.table_privileges)]
+        )
+        return parameters
 
     def _create_base_load_task(self, table_attributes: TableAttributes) -> BaseOperator:
         task_id = self.generate_task_id(table_attributes)

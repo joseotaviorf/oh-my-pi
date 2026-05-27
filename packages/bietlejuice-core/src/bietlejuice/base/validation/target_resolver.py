@@ -3,6 +3,7 @@ from typing import Optional
 from bietlejuice.base.db.datalake_metastore_mapping import DatalakeMetastoreMapping
 from bietlejuice.base.db.dw_metastore_mapping import DwMetastoreMapping
 from bietlejuice.base.db.metric_metastore_mapping import MetricMetastoreMapping
+from bietlejuice.base.db.reverse_metastore_mapping import ReverseMetastoreMapping
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 
 CLUSTER_VALIDATION_SCHEMA = "cluster_validation"
@@ -19,6 +20,10 @@ def get_prod_database_name(layer: LayerEnum, schema: str, bucket: str = "") -> s
         return DwMetastoreMapping(bucket=bucket, source=schema).get_full_database_name(
             layer
         )
+    if layer == LayerEnum.REVERSE:
+        return ReverseMetastoreMapping(
+            bucket=bucket, source=schema
+        ).get_full_database_name()
     return DatalakeMetastoreMapping(
         bucket=bucket, source=schema
     ).get_full_database_name(layer)

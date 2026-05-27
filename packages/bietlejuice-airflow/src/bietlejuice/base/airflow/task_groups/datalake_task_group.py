@@ -292,6 +292,12 @@ class DatalakeTaskGroup(BaseTaskGroup):
         layer = layer_enum.value
         sync_mode = self.SINGLE_TABLE if table_name else self.ALL_TABLES
 
+        if self.is_validation:
+            raw_spark_job_extra_args = list(raw_spark_job_extra_args or [])
+            raw_spark_job_extra_args.extend(
+                validation_spark_extra_args(True, LayerEnum.RAW, source, table_name)
+            )
+
         load_table_task = self._build_load_task(
             pool=pool,
             task_id=self.generate_default_task_id(
@@ -314,16 +320,19 @@ class DatalakeTaskGroup(BaseTaskGroup):
             }
         )
 
-        sync_metadata_task = self._build_metadata_sync_task(
-            source=source,
-            sync_mode=sync_mode,
-            layer=layer,
-            database_name=database_name,
-            table_name=table_name,
-            bypass="" if has_hive_sync else "--bypass-hive",
-        )
-
-        chain(load_table_task, sync_metadata_task)
+        if not self.is_validation:
+            sync_metadata_task = self._build_metadata_sync_task(
+                source=source,
+                sync_mode=sync_mode,
+                layer=layer,
+                database_name=database_name,
+                table_name=table_name,
+                bypass="" if has_hive_sync else "--bypass-hive",
+            )
+            chain(load_table_task, sync_metadata_task)
+            raw_final_tasks = [load_table_task, sync_metadata_task]
+        else:
+            raw_final_tasks = [load_table_task]
 
         quality_tasks = self._build_data_quality_tasks(
             layer=layer,
@@ -338,7 +347,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         return self.format_tasks_boundaries(
             initial_tasks=[load_table_task],
-            final_tasks=[load_table_task, sync_metadata_task],
+            final_tasks=raw_final_tasks,
             independent_tasks=quality_tasks,
         )
 
@@ -455,17 +464,20 @@ class DatalakeTaskGroup(BaseTaskGroup):
             }
         )
 
-        metadata_sync_task = self._build_metadata_sync_task(
-            source=source_database_base_name,
-            sync_mode=self.SINGLE_TABLE,
-            layer=layer,
-            database_name=target_database_base_name,
-            table_name=table_name,
-            metadata_file_type=MetadataTypeEnum.LINEAGE.value,
-            bypass="" if has_hive_sync else "--bypass-hive",
-        )
-
-        chain(load_table_task, metadata_sync_task)
+        if not self.is_validation:
+            metadata_sync_task = self._build_metadata_sync_task(
+                source=source_database_base_name,
+                sync_mode=self.SINGLE_TABLE,
+                layer=layer,
+                database_name=target_database_base_name,
+                table_name=table_name,
+                metadata_file_type=MetadataTypeEnum.LINEAGE.value,
+                bypass="" if has_hive_sync else "--bypass-hive",
+            )
+            chain(load_table_task, metadata_sync_task)
+            sql_final_tasks = [load_table_task, metadata_sync_task]
+        else:
+            sql_final_tasks = [load_table_task]
 
         quality_tasks = []
         lookup_key = path.normpath(path.join(tree_path, table_name))
@@ -482,7 +494,7 @@ class DatalakeTaskGroup(BaseTaskGroup):
 
         return self.format_tasks_boundaries(
             initial_tasks=[load_table_task],
-            final_tasks=[load_table_task, metadata_sync_task],
+            final_tasks=sql_final_tasks,
             independent_tasks=quality_tasks,
         )
 

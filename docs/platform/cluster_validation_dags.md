@@ -38,6 +38,9 @@ The compiler emits a second DAG: `bietlejuice.{dag_name}__validation`
 | `datalake_{schema}.{table}` | `cluster_validation.datalake_{schema}___{table}` |
 | `dw_{schema}.{table}` | `cluster_validation.dw_{schema}___{table}` |
 | `metric_{schema}.{table}` | `cluster_validation.metric_{schema}___{table}` |
+| `qube_dimensions.{table}` | `cluster_validation.qube_dimensions___{table}` |
+| `qube_measures.{table}` | `cluster_validation.qube_measures___{table}` |
+| `qube_metrics.{table}` | `cluster_validation.qube_metrics___{table}` |
 
 SQL reads stay on prod-qualified sources. Phase 1 does not rewrite `inner_dependencies`.
 
@@ -56,9 +59,21 @@ S3 path: `s3a://{datalake_bucket}/validation/cluster_validation/{prod_database}/
 python scripts/list_cluster_validation_eligible_dags.py
 ```
 
-Phase 1: `query_delta`, `query`, `query_view`, `dw_query`, `metric_query` without unsupported `load_spark_job` (unless opted in).
+Phase 1: `query_delta`, `query`, `dw_query`, `metric_query` without unsupported `load_spark_job` (unless opted in).
 
-Phase 2: CDC clean layer, gsheets, database_pull, API ingestion, reverse, qube (via task groups).
+Phase 2 (implemented, PR2–PR5): `cdc`, `dms_cdc`, `gsheets`, `database_pull`, `api_ingestion`, `reverse`, `core_model`, `qube_dimension`, `qube_measure`, `qube_metric`.
+
+Phase 2 (excluded / future work): `wonka`, `query_view` — see [Exclusions](#exclusions) below.
+
+## Exclusions
+
+### wonka
+
+`load_wonka` is a pipeline runner that dispatches to other jobs at runtime. It cannot redirect table output without changes to the Wonka runner itself. `cluster_validation` DAGs for `wonka` workflow types are currently **not supported** — the validator will raise if `validation:` is set on a wonka DAG.
+
+### query_view
+
+`query_view` creates Trino/Spark views only; it does not materialise any table. There are no write-target rows to redirect, and no `cluster_validation` tables are emitted. View creation on a validation cluster is harmless but does not test compute behaviour, so `query_view` is **excluded** from Phase 2 write-target wiring (future work if view DDL compatibility testing is needed).
 
 ## UC grants
 

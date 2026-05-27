@@ -1,8 +1,6 @@
 import sys
 from pathlib import Path
 
-import pytest
-
 REPO_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO_ROOT))
 
@@ -27,15 +25,17 @@ class TestClassify:
             },
         }
 
-        assert eligibility.classify(declaration) == "phase1_needs_allow_custom_spark_job"
+        assert (
+            eligibility.classify(declaration) == "phase1_needs_allow_custom_spark_job"
+        )
 
-    def test_phase2_wonka(self):
+    def test_wonka_is_unsupported(self):
         declaration = {
             "cluster": {"type": "databricks_16_4_med_general_cluster"},
             "workflow": {"type": "wonka"},
         }
 
-        assert eligibility.classify(declaration) == "phase2"
+        assert eligibility.classify(declaration) == "unsupported"
 
     def test_skips_emr_cluster(self):
         declaration = {

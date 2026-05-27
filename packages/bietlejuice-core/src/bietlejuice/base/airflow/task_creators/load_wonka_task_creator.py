@@ -12,14 +12,25 @@ class LoadWonkaTaskCreator(LoadTaskCreator):
     _TASK_ID_TEMPLATE = "load-wonka-{table_name}"
     SPARK_JOB_NAME = "load_wonka"
 
-    def _get_parameters(self) -> list:
-        return [
+    def _get_parameters(self, table_attributes: TableAttributes) -> list:
+        parameters = [
             self.dag_execution_context.workflow_args["wonka_config"]["pipeline_runner"]
         ]
+        if getattr(self.dag_execution_context, "is_validation", False):
+            target_db, target_table = table_attributes.get_validation_write_target()
+            parameters.extend(
+                [
+                    "--target-database-name",
+                    target_db,
+                    "--target-table-name",
+                    target_table,
+                ]
+            )
+        return parameters
 
     def _create_base_load_task(self, table_attributes: TableAttributes) -> BaseOperator:
         task_id = self.generate_task_id(table_attributes)
-        parameters = self._get_parameters()
+        parameters = self._get_parameters(table_attributes)
 
         return self._create_spark_job_task(
             self.SPARK_JOB_NAME,

@@ -60,6 +60,20 @@ def parse_arguments():
         const=True,
         help="Whether the Spark job should apply soft delete instead of hard delete for the raw layer",
     )
+    parser.add_argument(
+        "-tdn",
+        "--target-database-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-ttn",
+        "--target-table-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
 
     return parser.parse_args()
 
@@ -182,14 +196,22 @@ def main():
     transactional_df = dml_processor(transactional_df, primary_keys)
 
     full_raw_table_name = f"datalake_{schema}_raw.{table_name}"
+    raw_table_s3_path = f"s3://{datalake_bucket}/raw/{schema}/{table_name}/"
+    if args.target_database_name and args.target_table_name:
+        from bietlejuice.base.validation.target_resolver import (
+            validation_database_location,
+        )
+
+        prod_db = f"datalake_{schema}_raw"
+        write_table_name = args.target_table_name
+        full_raw_table_name = f"{args.target_database_name}.{write_table_name}"
+        raw_table_s3_path = f"{validation_database_location(datalake_bucket, prod_db)}{write_table_name}/"
     if table_privileges_dict is not None:
         table_privileges = TablePrivileges.from_input_dict(
             table_privileges_dict, full_raw_table_name
         )
     else:
         table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
-
-    raw_table_s3_path = f"s3://{datalake_bucket}/raw/{schema}/{table_name}/"
     loader = DeltaLoader(spark)
     if has_soft_delete:
         loader.load_table(

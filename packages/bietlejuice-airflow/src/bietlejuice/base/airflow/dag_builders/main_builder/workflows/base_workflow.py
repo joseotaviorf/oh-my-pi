@@ -298,6 +298,8 @@ class BaseWorkflow(BuilderInterface):
         by verifying if its file exists for the provided table.
         Uses batch-loaded data quality table paths for parse-time performance.
         """
+        if self.is_validation:
+            return False
         return os_path.normpath(
             table_attributes.table_name
         ) in self._get_data_quality_tables(table_attributes.layer.value)
@@ -326,6 +328,8 @@ class BaseWorkflow(BuilderInterface):
         """
         Checks if sync hive structure task should be added into the workflow.
         """
+        if self.is_validation:
+            return False
         default_has_hive_sync = self.workflow_args.get("has_hive_sync", True)
         return table_attributes.table_customization.get(
             "has_hive_sync", default_has_hive_sync

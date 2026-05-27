@@ -139,3 +139,125 @@ class TestDatalakeTaskGroupValidation:
             )
 
         attach_dataset.assert_called_once()
+
+    def test_validation_raw_task_group_skips_sync_metadata(self):
+        # Arrange
+        group = self._task_group(is_validation=True)
+        with (
+            mock.patch.object(group, "_build_load_task", return_value=mock.MagicMock()),
+            mock.patch.object(group, "_build_metadata_sync_task") as build_sync,
+            mock.patch.object(group, "_build_data_quality_tasks", return_value=[]),
+            mock.patch(
+                "bietlejuice.base.airflow.task_groups.datalake_task_group.chain"
+            ),
+            mock.patch.object(group, "format_tasks_boundaries", return_value={}),
+        ):
+            # Act
+            group._build_raw_task_group(
+                source="payments",
+                database_name="datalake_payments_raw",
+                table_name="charge",
+                extraction_spark_job_file="/spark_jobs/load_cdc_raw.py",
+            )
+
+        # Assert
+        build_sync.assert_not_called()
+
+    def test_validation_raw_task_group_appends_target_spark_args(self):
+        # Arrange
+        group = self._task_group(is_validation=True)
+        with (
+            mock.patch.object(
+                group, "_build_load_task", return_value=mock.MagicMock()
+            ) as build_load_task,
+            mock.patch.object(group, "_build_data_quality_tasks", return_value=[]),
+            mock.patch(
+                "bietlejuice.base.airflow.task_groups.datalake_task_group.chain"
+            ),
+            mock.patch.object(group, "format_tasks_boundaries", return_value={}),
+        ):
+            # Act
+            group._build_raw_task_group(
+                source="payments",
+                database_name="datalake_payments_raw",
+                table_name="charge",
+                extraction_spark_job_file="/spark_jobs/load_cdc_raw.py",
+            )
+
+        # Assert
+        spark_job_extra_args = build_load_task.call_args.kwargs["spark_job_extra_args"]
+        assert "--target-database-name" in spark_job_extra_args
+        assert "cluster_validation" in spark_job_extra_args
+
+    def test_prod_raw_task_group_builds_sync_metadata(self):
+        # Arrange
+        group = self._task_group(is_validation=False)
+        with (
+            mock.patch.object(group, "_build_load_task", return_value=mock.MagicMock()),
+            mock.patch.object(
+                group, "_build_metadata_sync_task", return_value=mock.MagicMock()
+            ) as build_sync,
+            mock.patch.object(group, "_build_data_quality_tasks", return_value=[]),
+            mock.patch(
+                "bietlejuice.base.airflow.task_groups.datalake_task_group.chain"
+            ),
+            mock.patch.object(group, "format_tasks_boundaries", return_value={}),
+        ):
+            # Act
+            group._build_raw_task_group(
+                source="payments",
+                database_name="datalake_payments_raw",
+                table_name="charge",
+                extraction_spark_job_file="/spark_jobs/load_cdc_raw.py",
+            )
+
+        # Assert
+        build_sync.assert_called_once()
+
+    def test_validation_sql_files_path_skips_sync_metadata(self):
+        # Arrange
+        group = self._task_group(is_validation=True)
+        with (
+            mock.patch(
+                "bietlejuice.base.airflow.task_groups.datalake_task_group.chain"
+            ),
+            mock.patch.object(group, "_build_load_task", return_value=mock.MagicMock()),
+            mock.patch.object(group, "_build_metadata_sync_task") as build_sync,
+            mock.patch.object(group, "_get_data_quality_tables", return_value=set()),
+        ):
+            # Act
+            group._build_task_group(
+                layer=LayerEnum.ENRICH,
+                source_database_base_name="enrich",
+                target_database_base_name="enrich",
+                table_name="my_table",
+                partitions=["year"],
+            )
+
+        # Assert
+        build_sync.assert_not_called()
+
+    def test_prod_sql_files_path_builds_sync_metadata(self):
+        # Arrange
+        group = self._task_group(is_validation=False)
+        with (
+            mock.patch(
+                "bietlejuice.base.airflow.task_groups.datalake_task_group.chain"
+            ),
+            mock.patch.object(group, "_build_load_task", return_value=mock.MagicMock()),
+            mock.patch.object(
+                group, "_build_metadata_sync_task", return_value=mock.MagicMock()
+            ) as build_sync,
+            mock.patch.object(group, "_get_data_quality_tables", return_value=set()),
+        ):
+            # Act
+            group._build_task_group(
+                layer=LayerEnum.ENRICH,
+                source_database_base_name="enrich",
+                target_database_base_name="enrich",
+                table_name="my_table",
+                partitions=["year"],
+            )
+
+        # Assert
+        build_sync.assert_called_once()

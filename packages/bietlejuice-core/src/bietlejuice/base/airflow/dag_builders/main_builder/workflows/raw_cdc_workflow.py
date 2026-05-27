@@ -219,20 +219,25 @@ class RawCDCWorkflow(BaseWorkflow):
         dag_final_tasks = self._set_dag_final_tasks(
             execute_job_cluster_local_id, cluster_completion_sink
         )
-        optimize_transactional_task = self.optimize_delta_table_task_creator.create_task(
-            transactional_tables,
-            parallelism=2,  # Lower because we don't want to overload the cluster while the next layers are being loaded
-            optimize_delta_table_local_id=execute_job_cluster_local_id,
-        )
-        optimize_raw_task = self.optimize_delta_table_task_creator.create_task(
-            cluster_raw_tables,
-            parallelism=2,  # Lower because we don't want to overload the cluster while the next layer is being loaded
-            optimize_delta_table_local_id=execute_job_cluster_local_id,
-        )
-        optimize_clean_task = self.optimize_delta_table_task_creator.create_task(
-            cluster_clean_tables,
-            optimize_delta_table_local_id=execute_job_cluster_local_id,
-        )
+        if not self.is_validation:
+            optimize_transactional_task = self.optimize_delta_table_task_creator.create_task(
+                transactional_tables,
+                parallelism=2,  # Lower because we don't want to overload the cluster while the next layers are being loaded
+                optimize_delta_table_local_id=execute_job_cluster_local_id,
+            )
+            optimize_raw_task = self.optimize_delta_table_task_creator.create_task(
+                cluster_raw_tables,
+                parallelism=2,  # Lower because we don't want to overload the cluster while the next layer is being loaded
+                optimize_delta_table_local_id=execute_job_cluster_local_id,
+            )
+            optimize_clean_task = self.optimize_delta_table_task_creator.create_task(
+                cluster_clean_tables,
+                optimize_delta_table_local_id=execute_job_cluster_local_id,
+            )
+        else:
+            optimize_transactional_task = dag_final_tasks
+            optimize_raw_task = dag_final_tasks
+            optimize_clean_task = dag_final_tasks
 
         for transactional_table, raw_table, clean_table in zip(
             transactional_tables, cluster_raw_tables, cluster_clean_tables
@@ -253,9 +258,10 @@ class RawCDCWorkflow(BaseWorkflow):
             raw_final_task >> clean_initial_task
             clean_final_task >> dag_final_tasks
 
-        optimize_transactional_task >> dag_final_tasks
-        optimize_raw_task >> dag_final_tasks
-        optimize_clean_task >> dag_final_tasks
+        if not self.is_validation:
+            optimize_transactional_task >> dag_final_tasks
+            optimize_raw_task >> dag_final_tasks
+            optimize_clean_task >> dag_final_tasks
 
         attach_emr_job_cluster_finished_work_prerequisites(
             self.dag_execution_context,

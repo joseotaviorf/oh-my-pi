@@ -61,6 +61,18 @@ class BaseCoreModelSparkJob(ABC):
         parser.add_argument(
             "load_end_date", type=str, help="Load end date", nargs="?", default=None
         )
+        parser.add_argument(
+            "--target-database-name",
+            type=lambda arg: None if not arg else arg,
+            required=False,
+            default=None,
+        )
+        parser.add_argument(
+            "--target-table-name",
+            type=lambda arg: None if not arg else arg,
+            required=False,
+            default=None,
+        )
 
         return parser.parse_args()
 
@@ -583,24 +595,42 @@ class BaseCoreModelSparkJob(ABC):
             "when_not_matched_operation", required=False, default=None
         )
 
-        # Setup table privileges
-        table_privileges = self.setup_table_privileges(args)
-
         # Setup database location
         database_location = f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
+
+        write_database_name = args.schema
+        write_table_name = args.table_name
+        write_database_location = database_location
+        if getattr(args, "target_database_name", None) and getattr(
+            args, "target_table_name", None
+        ):
+            from bietlejuice.base.validation.target_resolver import (
+                validation_database_location,
+            )
+
+            write_database_name = args.target_database_name
+            write_table_name = args.target_table_name
+            write_database_location = validation_database_location(
+                args.bucket, args.schema
+            )
+
+        # Privileges use write target in validation mode, prod table otherwise
+        table_privileges = TablePrivileges.from_environment_default(
+            f"{write_database_name}.{write_table_name}"
+        )
 
         self.logger.info(
             f"m=run_pipeline, msg=Loading data using DataFrameDeltaTableLoaderPipeline with partitions: {partitions}"
         )
         pipeline = DataFrameDeltaTableLoaderPipeline(
-            database_name=args.schema,
-            table_name=args.table_name,
-            database_location=database_location,
+            database_name=write_database_name,
+            table_name=write_table_name,
+            database_location=write_database_location,
             layer=LayerEnum.CORE.value,
             dataframe=dataframe,
             partitions=partitions,
-            target_database_name=args.schema,
-            target_database_location=database_location,
+            target_database_name=write_database_name,
+            target_database_location=write_database_location,
             merge_on=merge_on,
             when_matched_update_condition=when_matched_update_condition,
             when_not_matched_insert_condition=when_not_matched_insert_condition,

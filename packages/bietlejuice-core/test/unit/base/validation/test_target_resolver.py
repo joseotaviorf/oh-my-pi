@@ -48,6 +48,22 @@ class TestGetProdDatabaseName:
     def test_dw_staging_uses_dw_metastore_mapping(self):
         assert get_prod_database_name(LayerEnum.DW_STAGING, "foo").endswith("_staging")
 
+    @pytest.mark.parametrize(
+        "layer,schema,expected",
+        [
+            (LayerEnum.TRANSACTIONAL, "payments", "datalake_payments_transactional"),
+            (LayerEnum.RAW, "payments", "datalake_payments_raw"),
+            (LayerEnum.CLEAN, "payments", "datalake_payments_clean"),
+            (LayerEnum.ENRICH, "payments", "datalake_payments"),
+            (LayerEnum.CORE, "payments", "payments"),
+            (LayerEnum.DW, "payments", "dw_payments"),
+            (LayerEnum.METRIC, "payments", "metric_payments"),
+            (LayerEnum.REVERSE, "payments", "reverse_payments"),
+        ],
+    )
+    def test_all_layers_resolve_prod_database_name(self, layer, schema, expected):
+        assert get_prod_database_name(layer, schema) == expected
+
 
 class TestValidationDatabaseLocation:
     def test_under_validation_prefix(self):

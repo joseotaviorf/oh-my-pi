@@ -85,6 +85,16 @@ class LoadCustomTaskCreator(LoadTaskCreator):
         for unprocessed_argument in unprocessed_arguments:
             argument = self._parse_argument(unprocessed_argument, table_attributes)
             arguments.append(argument)
+        if getattr(self.dag_execution_context, "is_validation", False):
+            target_db, target_table = table_attributes.get_validation_write_target()
+            arguments.extend(
+                [
+                    "--target-database-name",
+                    target_db,
+                    "--target-table-name",
+                    target_table,
+                ]
+            )
         return arguments
 
     def _get_unprocessed_arguments_list(

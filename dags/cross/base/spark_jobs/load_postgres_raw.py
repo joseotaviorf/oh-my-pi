@@ -52,6 +52,20 @@ def parse_arguments() -> Namespace:
         required=False,
         default=None,
     )
+    parser.add_argument(
+        "-tdn",
+        "--target-database-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
+    parser.add_argument(
+        "-ttn",
+        "--target-table-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+    )
 
     return parser.parse_args()
 
@@ -123,6 +137,19 @@ def main():
     database_location = db_info["db_raw_path"]
 
     full_raw_table_name = f"{database_name}.{table_name}"
+    original_table_name = table_name
+    if args.target_database_name and args.target_table_name:
+        from bietlejuice.base.validation.target_resolver import (
+            validation_database_location,
+        )
+
+        write_table_name = args.target_table_name
+        full_raw_table_name = f"{args.target_database_name}.{write_table_name}"
+        database_location = validation_database_location(
+            datalake_bucket, database_name
+        ).replace("s3a://", "s3://")
+        database_name = args.target_database_name
+        table_name = write_table_name
     if table_privileges_dict is not None:
         table_privileges = TablePrivileges.from_input_dict(
             table_privileges_dict, full_raw_table_name
@@ -137,7 +164,7 @@ def main():
 
     if read_from_sql:
         query = DAGPackagesPathService.get_query_file_content_in_spark_jobs(
-            dag_name=schema, layer=LayerEnum.RAW.value, table_name=table_name
+            dag_name=schema, layer=LayerEnum.RAW.value, table_name=original_table_name
         )
 
     if is_incremental:
@@ -147,7 +174,7 @@ def main():
             )
         else:
             df = postgres_consumer.get_incremental_data_by_processing_window(
-                table_name=table_name,
+                table_name=original_table_name,
                 date_filter_column=date_filter_column,
                 load_start_date=load_start_date,
                 load_end_date=load_end_date,
@@ -166,7 +193,7 @@ def main():
         if read_from_sql:
             df = postgres_consumer.get_data_from_query(query)
         else:
-            df = postgres_consumer.get_data_from_table(table_name)
+            df = postgres_consumer.get_data_from_table(original_table_name)
 
         FullTableLoaderPipeline(
             database_name, table_name.lower(), database_location, LayerEnum.RAW, None

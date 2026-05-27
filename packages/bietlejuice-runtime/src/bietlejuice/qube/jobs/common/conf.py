@@ -195,5 +195,24 @@ def parse_common_args(description: str) -> argparse.Namespace:
         choices=["standard", "json"],
         help="Log format. Default: %(default)s",
     )
+    parser.add_argument(
+        "-tdn",
+        "--target-database-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+        help="Validation target database (cluster_validation). When set together with "
+        "--target-table-name, writes are redirected to the validation schema instead "
+        "of the production qube_* database.",
+    )
+    parser.add_argument(
+        "-ttn",
+        "--target-table-name",
+        type=lambda arg: None if not arg else arg,
+        required=False,
+        default=None,
+        help="Validation target table name (prod_database___table). When set together "
+        "with --target-database-name, writes are redirected to the validation schema.",
+    )
 
     return parser.parse_args()

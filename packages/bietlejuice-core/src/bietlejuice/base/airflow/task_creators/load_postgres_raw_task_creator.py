@@ -57,7 +57,7 @@ class LoadPostgresRawTaskCreator(LoadTaskCreator):
         load_options = self._get_load_options(table_attributes)
         read_from_sql = table_attributes.table_customization.get("read_from_sql", "")
 
-        return [
+        parameters = [
             self.dag_execution_context.environment,
             self.dag_execution_context.bucket,
             dbutils_secret_key,
@@ -74,6 +74,18 @@ class LoadPostgresRawTaskCreator(LoadTaskCreator):
             self.dag_execution_context.load_start_date,
             self.dag_execution_context.load_end_date,
             dbutils_secret_scope,
-            "--table-privileges",
-            json.dumps(table_attributes.table_privileges),
         ]
+        if getattr(self.dag_execution_context, "is_validation", False):
+            target_db, target_table = table_attributes.get_validation_write_target()
+            parameters.extend(
+                [
+                    "--target-database-name",
+                    target_db,
+                    "--target-table-name",
+                    target_table,
+                ]
+            )
+        parameters.extend(
+            ["--table-privileges", json.dumps(table_attributes.table_privileges)]
+        )
+        return parameters
