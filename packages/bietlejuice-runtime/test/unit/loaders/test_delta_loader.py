@@ -434,7 +434,7 @@ class TestDeltaLoader:
                 mock.call(
                     "ALTER TABLE test_table SET TBLPROPERTIES ('delta.deletedFileRetentionDuration'='24 hours')"
                 ),
-                mock.call("VACUUM test_table"),
+                mock.call("VACUUM `test_table`"),
             ]
         )
 
@@ -444,7 +444,7 @@ class TestDeltaLoader:
         delta_loader = DeltaLoader(spark=mock_spark_context.spark)
         delta_loader.optimize_table(table_name)
 
-        mock_spark_context.spark.sql.assert_called_once_with("OPTIMIZE test_table")
+        mock_spark_context.spark.sql.assert_called_once_with("OPTIMIZE `test_table`")
 
     def test_optimize_table_with_z_order(self, mock_spark_context):
         table_name = "test_table"
@@ -455,7 +455,7 @@ class TestDeltaLoader:
         delta_loader.optimize_table(table_name, z_order_by)
 
         mock_spark_context.spark.sql.assert_called_once_with(
-            "OPTIMIZE test_table ZORDER BY column1,column2"
+            "OPTIMIZE `test_table` ZORDER BY column1,column2"
         )
 
     def test_optimize_table_rejects_malicious_z_order_column(self, mock_spark_context):
@@ -470,7 +470,26 @@ class TestDeltaLoader:
             where_predicate="year = 2026 AND month = 5 AND day = 26",
         )
         mock_spark_context.spark.sql.assert_called_once_with(
-            "OPTIMIZE test_table WHERE year = 2026 AND month = 5 AND day = 26"
+            "OPTIMIZE `test_table` WHERE year = 2026 AND month = 5 AND day = 26"
+        )
+
+    def test_optimize_table_quotes_reserved_word_table_name(self, mock_spark_context):
+        # arrange
+        delta_loader = DeltaLoader(spark=mock_spark_context.spark)
+        table_name = "datalake_bob_transactional.location"
+        where_predicate = (
+            "(year = 2026 AND month = 5 AND day = 26) OR "
+            "(year = 2026 AND month = 5 AND day = 27)"
+        )
+
+        # act
+        delta_loader.optimize_table(table_name, where_predicate=where_predicate)
+
+        # assert
+        mock_spark_context.spark.sql.assert_called_once_with(
+            "OPTIMIZE `datalake_bob_transactional`.`location` WHERE "
+            "(year = 2026 AND month = 5 AND day = 26) OR "
+            "(year = 2026 AND month = 5 AND day = 27)"
         )
 
     def test_optimize_table_with_where_predicate_and_z_order(self, mock_spark_context):
@@ -481,7 +500,7 @@ class TestDeltaLoader:
             where_predicate="year = 2026 AND month = 5 AND day = 26",
         )
         mock_spark_context.spark.sql.assert_called_once_with(
-            "OPTIMIZE test_table WHERE year = 2026 AND month = 5 AND day = 26 "
+            "OPTIMIZE `test_table` WHERE year = 2026 AND month = 5 AND day = 26 "
             "ZORDER BY column1,column2"
         )
 

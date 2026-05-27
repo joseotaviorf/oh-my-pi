@@ -19,6 +19,7 @@ _VALID_COLUMN_MAPPING_MODES = {"none", "name", "id"}
 # instead of a frozenset to allow static-analysis tools to recognise it as a
 # sanitizer and avoid false-positive SQL-injection findings.
 _SAFE_IDENTIFIER_RE = re.compile(r"^[a-zA-Z0-9_.]+$")
+_SAFE_IDENTIFIER_SEGMENT_RE = re.compile(r"^[a-zA-Z0-9_]+$")
 
 
 def _check_identifier_safety(value: str) -> str:
@@ -35,6 +36,24 @@ def _check_identifier_safety(value: str) -> str:
     if not value or not _SAFE_IDENTIFIER_RE.match(value):
         raise ValueError(f"Invalid SQL identifier: {value!r}")
     return value
+
+
+def _quote_sql_table_name(qualified_name: str) -> str:
+    """Return a backtick-quoted ``db`.`table`` name for Delta SQL commands.
+
+    Reserved words (e.g. ``location``) must be quoted when followed by ``WHERE``
+    in ``OPTIMIZE`` statements on Spark SQL parsers (EMR Delta OSS).
+    """
+    qualified_name = _check_identifier_safety(qualified_name)
+    parts = qualified_name.split(".")
+    if not parts:
+        raise ValueError(f"Invalid SQL identifier: {qualified_name!r}")
+    quoted_parts = []
+    for part in parts:
+        if not part or not _SAFE_IDENTIFIER_SEGMENT_RE.match(part):
+            raise ValueError(f"Invalid SQL identifier segment: {part!r}")
+        quoted_parts.append(f"`{part}`")
+    return ".".join(quoted_parts)
 
 
 class DeltaLoader:
@@ -307,7 +326,8 @@ class DeltaLoader:
             spark=self.spark,
         )
 
-        command = f"VACUUM {table_name}"
+        quoted_table = _quote_sql_table_name(table_name)
+        command = f"VACUUM {quoted_table}"
         logger.info(
             f"Running vacuum with command {command}, and retention hours {retention_hours}"
         )
@@ -327,7 +347,8 @@ class DeltaLoader:
             spark=self.spark,
         )
 
-        command = f"VACUUM {table_name} LITE"
+        quoted_table = _quote_sql_table_name(table_name)
+        command = f"VACUUM {quoted_table} LITE"
         logger.info(
             f"Running vacuum lite with command {command}, and retention hours {retention_hours}"
         )
@@ -347,8 +368,9 @@ class DeltaLoader:
         user input). Delta SQL grammar: ``OPTIMIZE table [WHERE pred] [ZORDER BY (...)]``.
         """
         table_name = _check_identifier_safety(table_name)
+        quoted_table = _quote_sql_table_name(table_name)
 
-        command = f"OPTIMIZE {table_name}"
+        command = f"OPTIMIZE {quoted_table}"
         if where_predicate:
             command += f" WHERE {where_predicate}"
         if z_order_by:

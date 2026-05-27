@@ -17,7 +17,6 @@ workflow:
   source_database: bob-o-construtor
   dbutils_secret_key: BOB-O-CONSTRUTOR_DB
   lineage_product_database_name: boboconstrutor
-  optimize_parallelism: 8
   tables_customization:
     attribution_progress_aud: {}
     attribution_progress: {}
