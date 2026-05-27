@@ -26,6 +26,7 @@ Not all impressions lead to user interaction or conversion. Some recommendation 
 - **usuario outlier** → high-activity users flagged in `dimensions.is_outlier_user`
 - **conversao de recs** → downstream outcomes after recommendation contact from `metrics.visit_booked`, `metrics.direct_offer`, `metrics.offer`, `metrics.contract_signed`, and matching timestamp fields in `timestamps`
 - **variant**, **AB test** → experiment assignment from `variants.<experiment_name>`
+- **search**, **busca**, **resultado de busca** → active search-result discovery tracked in [`search.md`](./search.md), not recommendation carousel exposure
 
 ## Tables
 
@@ -121,6 +122,12 @@ Prompt-to-query mapping for this specific active test:
 
 - Recs impressions expose listing/house identifiers in `ids.id_house`; use that key to reason about listing visibility context before joining to house or search visibility entities.
 - Keep event grain in mind: recs is impression-per-listing-per-recset, while search events can fan out per search result.
+
+### Search (Parallel discovery surface)
+
+- Use [`search.md`](./search.md) when the request is about search result pages, search ranking, search CTR, or `datalake_search.search_impressions`.
+- Use this recs guide when the request is about recommendation carousels, recommendation sets, showcase, or `datalake_search.recs_impressions_processed`.
+- Both entities expose JSON payloads named `ids`, `dimensions`, `variants`, `metrics`, and `timestamps`, but the grains are different: recs is listing impression per recommendation set; search is listing impression per search result.
 
 ### Visits (N:1 via user-house journey keys)
 

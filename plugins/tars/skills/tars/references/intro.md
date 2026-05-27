@@ -36,6 +36,7 @@ Each entity file follows a standard structure:
 - `business_entities/payments.md` — Payment transactions across Checkout, Wall Street, and Vans (pagamentos / cobrança checkout)
 - `business_entities/repairs.md` — Offboarding and ongoing property repairs (reparos)
 - `business_entities/recs.md` — Recommendation exposures and downstream journey attribution (recomendacoes / carrossel de recomendacao)
+- `business_entities/search.md` — Search result impressions, CTR, ranking, and downstream journey attribution (busca / resultado de busca)
 - `business_entities/satisfaction.md` — Customer Satisfaction scores across channels (CSAT / satisfação)
 - `business_entities/seo.md` — SEO performance, keyword clusters and demand top-of-funnel metrics (SEO / Search Engine Optimization)
 - `business_entities/supply.md` — Property owner acquisition funnel from lead to first listing (captação / supply / aquisição de proprietários)
