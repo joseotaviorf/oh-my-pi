@@ -205,9 +205,7 @@ class CoreRegionHistorySparkJob(BaseCoreModelSparkJob):
         )
 
         table_privileges = self.setup_table_privileges(args)
-        database_location = (
-            f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
-        )
+        database_location = f"s3a://{args.bucket}/{LayerEnum.CORE.value}/{args.schema}/"
 
         full_table_name = f"{args.schema}.{args.table_name}"
         target_is_empty = self._is_target_table_empty(spark, full_table_name)
@@ -247,8 +245,7 @@ class CoreRegionHistorySparkJob(BaseCoreModelSparkJob):
 
         pipeline.run()
         self.logger.info(
-            f"m=run_pipeline, "
-            f"msg=History loading completed for table={args.table_name}"
+            f"m=run_pipeline, msg=History loading completed for table={args.table_name}"
         )
 
 
