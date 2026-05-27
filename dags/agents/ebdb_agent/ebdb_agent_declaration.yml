@@ -59,6 +59,10 @@ workflow:
       clean_table_name: agent_region_data_aud
     DemandVisitManagementCapabilitySettings:
       clean_table_name: demand_visit_management_capability_settings
+    OfferAgentLink:
+      clean_table_name: offer_agent_link
+    OfferAgentLink_AUD:
+      clean_table_name: offer_agent_link_aud
     PreferredFixedAgent:
       clean_table_name: preferred_fixed_agent
     PreferredFixedAgent_AUD:

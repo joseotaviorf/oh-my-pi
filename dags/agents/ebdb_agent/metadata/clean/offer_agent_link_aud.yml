@@ -1,0 +1,51 @@
+---
+database_name: datalake_ebdb_clean
+table_name: offer_agent_link_aud
+domain: Agents
+owner: gustavo.guerra@quintoandar.com.br
+description: Audit history (Hibernate Envers) of the offer-agent link table, recording each revision and which fields were modified.
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.offeragentlink_aud.id
+    description: Unique identifier for the offer-agent link record.
+  id_offer:
+    lineage:
+      - datalake_ebdb_raw.offeragentlink_aud.offer_id
+    description: Identifier of the offer associated with the agent at this revision.
+  uuid_agent:
+    lineage:
+      - datalake_ebdb_raw.offeragentlink_aud.agent_uuid
+    description: UUID of the agent linked to the offer at this revision.
+  rev:
+    lineage:
+      - datalake_ebdb_raw.offeragentlink_aud.rev
+    description: Envers revision number for this audit entry.
+  rev_type:
+    lineage:
+      - datalake_ebdb_raw.offeragentlink_aud.revtype
+    description: Envers revision type (0 = insert, 1 = update, 2 = delete).
+  offer_source:
+    lineage:
+      - datalake_ebdb_raw.offeragentlink_aud.offer_source
+    description: Source system or channel from which the offer originated at this revision.
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.offeragentlink_aud.created_at
+    description: Timestamp when the offer-agent link was created at this revision.
+  mod_id:
+    lineage:
+      - datalake_ebdb_raw.offeragentlink_aud.id_mod
+    description: Flag indicating whether the id was modified in this revision.
+  mod_id_offer:
+    lineage:
+      - datalake_ebdb_raw.offeragentlink_aud.offer_id_mod
+    description: Flag indicating whether offer_id was modified in this revision.
+  mod_uuid_agent:
+    lineage:
+      - datalake_ebdb_raw.offeragentlink_aud.agent_uuid_mod
+    description: Flag indicating whether agent_uuid was modified in this revision.
+  mod_offer_source:
+    lineage:
+      - datalake_ebdb_raw.offeragentlink_aud.offer_source_mod
+    description: Flag indicating whether offer_source was modified in this revision.
