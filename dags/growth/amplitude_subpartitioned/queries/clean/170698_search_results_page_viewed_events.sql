@@ -74,6 +74,10 @@ SELECT
         WHEN nbr_listed_classifieds > 0 THEN True 
         ELSE False 
     END AS is_qac,
+    CASE 
+        WHEN nbr_search_classifieds > 0 THEN True 
+        ELSE False 
+    END AS is_qac_region,
     is_paying,
     is_attribution_event,
     ts_server_received,

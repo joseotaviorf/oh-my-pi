@@ -121,6 +121,12 @@ columns:
       - datalake_amplitude_clean.170698_search_page_viewed_events.is_qac
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.is_qac
       - datalake_amplitude_clean.170698_listing_page_viewed_events.is_qac
+  is_qac_region:
+    description: Flag indicating if the page view event is from a QAC region. Always False for schedule_page_viewed events; for search and search_results events derives from nbr_search_classifieds > 0; for listing events derived from is_qac (region-level signal).
+    lineage:
+      - datalake_amplitude_clean.170698_search_page_viewed_events.is_qac_region
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.is_qac_region
+      - datalake_amplitude_clean.170698_listing_page_viewed_events.is_qac_region
   uri:
     description: URI of the page viewed by the user. NULL for schedule_page_viewed events; populated for search, search_results and listing branches.
     lineage:

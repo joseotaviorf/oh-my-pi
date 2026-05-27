@@ -297,6 +297,10 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.event_properties
     description: Flag indicating if the listing page view event came from QuintoAndar Classifieds (QAC).
+  is_qac_region:
+    lineage:
+    - datalake_amplitude_clean.events.event_properties
+    description: Flag indicating if the listing page view event is from a QAC region. Derived from is_qac (same signal at region level for listing events).
 owner: eduardo.soares@quintoandar.com.br
 domain: Growth
 description: This table contains listing_page_viewed events from app 170698. It tracks
