@@ -3,6 +3,7 @@ WITH clean_events AS (
     ui.id_amplitude,
     dr.city_group,
     ui.is_qac,
+    ui.is_qac_region,
     ui.business_context,
     ui.tof_event_type AS event_type,
     ui.ts_event
@@ -21,6 +22,7 @@ WITH clean_events AS (
     qac.id_amplitude,
     dr.city_group,
     qac.is_qac,
+    TRUE AS is_qac_region,
     qac.business_context,
     qac.event_type,
     qac.ts_event
@@ -57,7 +59,7 @@ funnel_metrics AS (
   FROM
     clean_events
   WHERE
-    is_qac = TRUE
+    is_qac_region = TRUE
     AND event_type IN ('search_page_viewed', 'search_results_page_viewed', 'listing_page_viewed')
   GROUP BY ALL
 
@@ -65,7 +67,7 @@ funnel_metrics AS (
 
   SELECT
     DATE(ts_event) AS dt_reference,
-    '3. Impression' AS metric_name,
+    '3. ToF QAC Listed' AS metric_name,
     business_context,
     city_group,
     COUNT(DISTINCT id_amplitude) AS metric_value
@@ -73,7 +75,7 @@ funnel_metrics AS (
     clean_events
   WHERE
     is_qac = TRUE
-    AND event_type IN ('classifieds_viewed', 'listing_page_viewed')
+    AND event_type IN ('search_page_viewed', 'search_results_page_viewed', 'listing_page_viewed')
   GROUP BY ALL
 
   UNION ALL

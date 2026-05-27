@@ -11,7 +11,7 @@ columns:
     description: Reference date of the funnel metric, derived from the event timestamp.
     dimension: true
   metric_name:
-    description: Name of the funnel step or conversion metric (e.g. ToF, ToF QAC, Impression, Lead Intent).
+    description: Name of the funnel step or conversion metric (1. ToF, 2. ToF QAC, 3. ToF QAC Listed, 4. Listing, 5. Lead Intent, 6. Lead Confirmed, Search, Search > LPV).
     dimension: true
   business_context:
     lineage:
