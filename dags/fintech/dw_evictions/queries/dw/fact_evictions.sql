@@ -4,7 +4,7 @@ region AS (
         d.sk_contract,
         g.short_region_name AS region,
         g.city_name AS city
-    FROM dw_public.fact_listing_rent_flows d
+    FROM dw_rent.fact_listing_rent_flows d
     LEFT JOIN dw_public.dim_house_listing f
         ON f.sk_house_listing = d.sk_house_listing
     LEFT JOIN dw_public.dim_region g
