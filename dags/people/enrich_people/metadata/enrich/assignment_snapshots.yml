@@ -16,7 +16,7 @@ columns:
     lineage:
       - datalake_people.identifier_mapping.id_person
   id_organization:
-    description: Organization identifier. 
+    description: Organization identifier.
     lineage:
       - datalake_pin_core_clean.all_assignments.id_organization
   id_business_unit:
@@ -24,7 +24,7 @@ columns:
     lineage:
       - datalake_pin_core_clean.all_assignments.id_business_unit
   id_job:
-    description: Job identifier. 
+    description: Job identifier.
     lineage:
       - datalake_pin_core_clean.all_assignments.id_job
   sk_job_version:
@@ -86,6 +86,26 @@ columns:
     description: Numeric level in the org chart (0 to 9).
     lineage:
       - datalake_people.management_hierarchy.hierarchy_depth
+  employment_status:
+    description: |
+      Human-readable employment status derived from assignment_status_type.
+    categories:
+      "Active": Employee has an active assignment on the reference date.
+      "Terminated": Employee's assignment has ended on or before the reference date.
+    lineage:
+      - datalake_people.identifier_mapping.assignment_status_type
+  tenure_range:
+    description: |
+      Tenure band based on months_tenure_in_company (months between original hire date and reference date).
+      Null when the hire date is unknown.
+    categories:
+      "< 3 months": Less than 3 months of tenure.
+      "3-11 months": Between 3 and 11 months of tenure.
+      "1-2 years": Between 1 and 2 years of tenure.
+      "3-4 years": Between 3 and 4 years of tenure.
+      "5+ years": 5 or more years of tenure.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
   days_tenure_in_company:
     description: Days since the employee's first hire at the company.
     lineage:
@@ -108,6 +128,11 @@ columns:
     lineage:
       - datalake_people.management_hierarchy.assignment_number_l0
       - datalake_people.management_hierarchy.assignment_number_l7
+  count_total_report:
+    description: Total number of reports (direct + indirect) under this assignment. Zero when no reports exist.
+    lineage:
+      - datalake_people.assignment_snapshots.count_direct_report
+      - datalake_people.assignment_snapshots.count_indirect_report
   is_manager:
     description: True when the employee has leadership career track (L) or has at least one direct report.
     lineage:
@@ -141,6 +166,22 @@ columns:
       - datalake_pin_core_clean.periods_of_service.dt_started
   is_future_hire:
     description: Indicates if this assignment is a future hire for the current dt_reference.
+  is_primary_assignment_for_snapshot:
+    description: Indicates the current assignment for the employee on the reference date, based on the assignment start date (latest dt_started for id_person and dt_reference). If a person has both pending and effective assignments, the effective one takes priority.
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+  is_reorganization_termination:
+    description: True when the employee's termination was part of an organizational restructuring (layoff/reorg), as recorded in the gsheets layoffs tracker. False for active employees or non-reorg terminations.
+    lineage:
+      - datalake_gsheets_people_clean.layoffs.is_layoff
+  is_monthly_snapshot:
+    description: True when dt_reference is the last day of the month or the most recent day (current date).
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
+  is_current:
+    description: True when dt_reference equals the current date (most recent day available).
+    lineage:
+      - datalake_pin_core_clean.periods_of_service.dt_started
   dt_original_hire:
     description: Date of the employee's first hire at the company. Derived from MIN(dt_started) over periods_of_service per person (approximation). PER_SENIORITY_DATES_F will provide assignment-level value when available.
     lineage:
@@ -159,18 +200,6 @@ columns:
       - datalake_pin_core_clean.periods_of_service.dt_notified_termination
   dt_reference:
     description: Snapshot date.
-    lineage:
-      - datalake_pin_core_clean.periods_of_service.dt_started
-  is_monthly_snapshot:
-    description: True when dt_reference is the last day of the month or the most recent day (current date).
-    lineage:
-      - datalake_pin_core_clean.periods_of_service.dt_started
-  is_current:
-    description: True when dt_reference equals the current date (most recent day available).
-    lineage:
-      - datalake_pin_core_clean.periods_of_service.dt_started
-  is_primary_assignment_for_snapshot:
-    description: Indicates the current assignment for the employee on the reference date, based on the assignment start date (latest dt_started for id_person and dt_reference). If a person has both pending and effective assignments, the effective one takes priority.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_started
   ts_load:

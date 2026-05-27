@@ -311,11 +311,21 @@ SELECT
     mh.manager_assignment_number,
     mh.hierarchy_level,
     mh.hierarchy_depth,
+    CASE WHEN ad.assignment_status_type = 'ACTIVE' THEN 'Active' ELSE 'Terminated' END AS employment_status,
+    CASE
+        WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, fh.dt_original_hire)) IS NULL THEN CAST(NULL AS STRING)
+        WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, fh.dt_original_hire)) < 3  THEN '< 3 months'
+        WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, fh.dt_original_hire)) < 12 THEN '3-11 months'
+        WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, fh.dt_original_hire)) < 36 THEN '1-2 years'
+        WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, fh.dt_original_hire)) < 60 THEN '3-4 years'
+        ELSE '5+ years'
+    END AS tenure_range,
     DATEDIFF(ad.dt_reference, fh.dt_original_hire) AS days_tenure_in_company,
     FLOOR(MONTHS_BETWEEN(ad.dt_reference, fh.dt_original_hire)) AS months_tenure_in_company,
     DATEDIFF(ad.dt_reference, ad.dt_started) AS days_tenure_in_assignment,
     COALESCE(drc.count_direct_report, 0) AS count_direct_report,
     COALESCE(irc.count_indirect_report, 0) AS count_indirect_report,
+    COALESCE(drc.count_direct_report, 0) + COALESCE(irc.count_indirect_report, 0) AS count_total_report,
     (
         ca.career_track = 'L'
         OR COALESCE(drc.count_direct_report, 0) > 0
@@ -344,6 +354,13 @@ SELECT
     fh.dt_original_hire IS NOT NULL
         AND fh.dt_original_hire < ad.dt_started AS is_internal_transfer,
     ad.is_future_hire,
+    COALESCE(pap.id_assignment = ad.id_assignment, FALSE) AS is_primary_assignment_for_snapshot,
+    COALESCE(LOWER(TRIM(lo.is_layoff)) = 'sim', FALSE) AS is_reorganization_termination,
+    (
+        LAST_DAY(ad.dt_reference) = ad.dt_reference
+        OR ad.dt_reference = CURRENT_DATE()
+    ) AS is_monthly_snapshot,
+    ad.dt_reference = CURRENT_DATE() AS is_current,
     fh.dt_original_hire,
     ad.dt_started AS dt_hired,
     COALESCE(
@@ -355,12 +372,6 @@ SELECT
         DATE('9999-12-31')
     ) AS dt_notified,
     ad.dt_reference AS dt_reference,
-    (
-        LAST_DAY(ad.dt_reference) = ad.dt_reference
-        OR ad.dt_reference = CURRENT_DATE()
-    ) AS is_monthly_snapshot,
-    ad.dt_reference = CURRENT_DATE() AS is_current,
-    COALESCE(pap.id_assignment = ad.id_assignment, FALSE) AS is_primary_assignment_for_snapshot,
     CURRENT_TIMESTAMP() AS ts_load
 FROM
     assignments_daily AS ad
@@ -418,6 +429,9 @@ LEFT JOIN
     primary_assignment_per_person_day AS pap
         ON pap.id_person = ad.id_person
         AND pap.dt_reference = ad.dt_reference
+LEFT JOIN
+    datalake_gsheets_people_clean.layoffs AS lo
+        ON ad.assignment_number = UPPER(lo.id_employee)
 QUALIFY
     ROW_NUMBER() OVER (
         PARTITION BY
