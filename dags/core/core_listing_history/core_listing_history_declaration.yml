@@ -34,14 +34,3 @@ workflow:
       z_order_by: [id_house_listing, business_context, ts_transaction]
       table_properties:
         "delta.enableChangeDataFeed": "true"
-cluster:
-  type: databricks_16_4_rfleet_instance_cluster
-  databricks_conn_id: databricks_new
-  custom_configurations:
-    spark_conf:
-      spark.sql.shuffle.partitions: "8"
-      spark.databricks.delta.merge.enableLowShuffle: "true"
-      spark.databricks.adaptive.autoOptimizeShuffle.enabled: "true"
-      spark.memory.fraction: "0.8"
-      spark.memory.storageFraction: "0.3"
-      spark.sql.adaptive.skewJoin.enabled: "true"
