@@ -132,6 +132,10 @@ columns:
     lineage:
       - datalake_access_logs_clean.opa.app
     description: App that handled the request
+  pod_name:
+    lineage:
+      - datalake_access_logs_clean.istio.pod_name
+    description: Kubernetes pod name that served the request (from Istio sidecar)
   year:
     lineage:
       - datalake_access_logs_clean.opa.year

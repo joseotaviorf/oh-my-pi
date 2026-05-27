@@ -44,6 +44,7 @@ OUTER_SCHEMA = StructType(
     [
         StructField("timestamp", StringType(), True),
         StructField("message", StringType(), True),
+        StructField("pod_name", StringType(), True),
         StructField("app", StringType(), True),
     ]
 )
@@ -126,6 +127,7 @@ def clean_cf(df):
         ),
         col("data.result.principalinfo.service.id").alias("principal_service"),
         col("app"),
+        col("pod_name"),
         year(ts).alias("year"),
         month(ts).alias("month"),
         dayofmonth(ts).alias("day"),
