@@ -165,6 +165,8 @@ cluster_template:
                   destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
                   region: ""
         spark_conf: &spark_conf_base_anchor
+            spark.scheduler.mode: FAIR
+            spark.speculation: "false"
             spark.rpc.message.maxSize: "2000"
             spark.sql.sources.partitionOverwriteMode: dynamic
             spark.sql.parquet.filterPushdown: "true"
@@ -1696,7 +1698,8 @@ emr_cluster_base: &emr_cluster_anchor
         spark.sql.shuffle.partitions: "100"
         spark.sql.autoBroadcastJoinThreshold: "104857600"
         spark.serializer: "org.apache.spark.serializer.KryoSerializer"
-        spark.speculation: "true"
+        spark.scheduler.mode: FAIR
+        spark.speculation: "false"
         spark.hadoop.mapreduce.input.fileinputformat.list-status.num-threads: "64"
         spark.sql.sources.parallelPartitionDiscovery.threshold: "32"
         spark.hadoop.fs.s3a.fast.upload: "true"
