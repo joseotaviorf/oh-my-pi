@@ -46,6 +46,20 @@ workflow:
       z_order_by: [id]
     owner_phone_refresh_tracking:
       z_order_by: [id]
+    lead_property_change_tracking:
+      raw_z_order_by: [lead_id]
+      clean_z_order_by: [id_lead]
+      clean_primary_keys: [id_lead_property_change_tracking]
+    lead_price_protection_analytics:
+      raw_z_order_by: [lead_id]
+      clean_z_order_by: [id_lead]
+      clean_primary_keys: [id_lead_price_protection_analytics]
+    lead_merge_event:
+      extraction_type: incremental
+      partitions: [year, month, day]
+      raw_z_order_by: [existing_lead_uuid]
+      clean_z_order_by: [uuid_existing_lead]
+      clean_primary_keys: [id_lead_merge_event]
     revinfo:
       clean_table_name: rev_info
   extra_query_template_params:

@@ -1,0 +1,108 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: lead_merge_event
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: >
+  Audit log of lead merge operations in brokers-supply-processor. Each row is created when an incoming
+  create payload is merged into an existing lead instead of creating a new one. Captures which identity
+  criterion matched (cnpj + idByRealEstate and/or cnpj + leadHash), the business contexts involved,
+  and the processing flow that triggered the merge.
+
+  BUSINESS CONTEXT: Enables post-hoc analysis of false-positive merges in the lead identity-matching
+  logic. Used to monitor deduplication quality, investigate incorrect upserts, and validate changes
+  to merge rules in HouseCreate and HouseDeduplicate flows.
+
+  RELATED TABLES: lead_3p (join via uuid_existing_lead = uuid_lead or via cnpj + id_by_real_estate /
+  lead_hash fields).
+columns:
+  id_lead_merge_event:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.id
+    description: >
+      Auto-increment primary key for the merge event record (BIGINT, Primary Key, Not Nullable).
+  uuid_existing_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.existing_lead_uuid
+    description: >
+      UUID of the existing lead that received the merged contexts (UUID, Not Nullable). Joins to
+      lead_3p.uuid_lead.
+  cnpj:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.cnpj
+    description: >
+      CNPJ of the partner company shared by both the existing lead and the incoming payload
+      (STRING, Not Nullable, length 14). Part of the identity matching criteria.
+  id_by_real_estate_existing:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.existing_id_by_real_estate
+    description: >
+      Partner external identifier on the existing lead (STRING, Nullable). Compared against the
+      incoming payload during ID_BY_REAL_ESTATE matching.
+  id_by_real_estate_payload:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.payload_id_by_real_estate
+    description: >
+      Partner external identifier on the incoming create payload (STRING, Nullable). Compared against
+      the existing lead during ID_BY_REAL_ESTATE matching.
+  lead_hash_existing:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.existing_lead_hash
+    description: >
+      Lead hash computed for the existing lead (STRING, Nullable, length 32). Compared during
+      LEAD_HASH matching.
+  lead_hash_payload:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.payload_lead_hash
+    description: >
+      Lead hash computed for the incoming create payload (STRING, Nullable, length 32). Compared
+      during LEAD_HASH matching.
+  match_criterion:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.match_criterion
+    description: >
+      Identity criterion that triggered the merge (STRING, Not Nullable). Possible values are
+      ID_BY_REAL_ESTATE (cnpj + idByRealEstate matched), LEAD_HASH (cnpj + leadHash matched), and
+      BOTH (both criteria matched simultaneously).
+  source:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.source
+    description: >
+      Processing flow that triggered the merge (STRING, Not Nullable, max length 40). Known values
+      include HOUSE_CREATE (HouseCreateUseCase upsert path) and UPSERT_ONE (HouseDeduplicateUseCase).
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.created_at
+    description: >
+      Timestamp when the merge event was recorded (TIMESTAMP, Not Nullable). Immutable after insert
+      in source.
+  existing_contexts:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.existing_contexts
+    description: >
+      Comma-separated, sorted list of business contexts already present on the existing lead before
+      the merge (STRING, Not Nullable). Example: RENT,SALE.
+  incoming_contexts:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.incoming_contexts
+    description: >
+      Comma-separated, sorted list of business contexts present on the incoming create payload
+      (STRING, Not Nullable).
+  new_contexts:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.new_contexts
+    description: >
+      Comma-separated, sorted list of business contexts added to the existing lead by this merge
+      operation (STRING, Not Nullable).
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.year
+    description: 'Partition column: year for data lake partitioning (INTEGER, Partition Key).'
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.month
+    description: 'Partition column: month for data lake partitioning (INTEGER, Partition Key).'
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_merge_event.day
+    description: 'Partition column: day for data lake partitioning (INTEGER, Partition Key).'

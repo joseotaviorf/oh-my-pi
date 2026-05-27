@@ -1,0 +1,84 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: lead_price_protection_analytics
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: >
+  Aggregated analytics for price protection blocks on converted 3P leads. Each row represents a
+  unique combination of lead, business context, Main price, brokerage price, and protection reason.
+  When the same scenario repeats, occurrence_count is incremented and ts_last_occurred is updated
+  instead of inserting a new row.
+
+  BUSINESS CONTEXT: Enables monitoring of how often price syncs are blocked, which protection rules
+  trigger most frequently, and how Main vs brokerage prices diverge over time. Complements
+  lead_property_change_tracking by storing historical blocked-sync scenarios rather than the current
+  operational snapshot.
+
+  RELATED TABLES: lead_3p (foreign key: id_lead), lead_property_change_tracking (current price and
+  change-source state used during protection evaluation).
+columns:
+  id_lead_price_protection_analytics:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_price_protection_analytics.id
+    description: >
+      Auto-increment primary key for the analytics record (BIGINT, Primary Key, Not Nullable).
+  id_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_price_protection_analytics.lead_id
+    description: >
+      Reference to the converted 3P lead in lead_3p (BIGINT, Not Nullable). Part of the unique key
+      together with business_context, main_price, brokerage_price, and protection_reason.
+  business_context:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_price_protection_analytics.business_context
+    description: >
+      Business context where protection was evaluated (STRING, Not Nullable). Typically SALE or RENT
+      from the BSP BusinessContext enum.
+  main_price:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_price_protection_analytics.main_price
+    description: >
+      Main platform price at the time protection blocked the sync (DECIMAL, Not Nullable). Part of
+      the unique analytics key.
+  brokerage_price:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_price_protection_analytics.brokerage_price
+    description: >
+      Partner-submitted brokerage price at the time protection blocked the sync (DECIMAL, Not Nullable).
+      Part of the unique analytics key.
+  protection_reason:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_price_protection_analytics.protection_reason
+    description: >
+      Reason the sync was blocked (STRING, Not Nullable). Known values include SYNC_SAME_PRICE
+      (brokerage price matches the last BSP sync) and EXTERNAL_CHANGE_WITHIN_WINDOW (external Main
+      change detected inside the protection window). The source schema also documents
+      EXTERNAL_CHANGE_HIGHER_PRICE as a possible value.
+  occurrence_count:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_price_protection_analytics.occurrence_count
+    description: >
+      Number of times this exact price/reason scenario recurred (INTEGER, Not Nullable, default 1).
+      Incremented on upsert when the same unique key matches again.
+  ts_first_occurred:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_price_protection_analytics.first_occurred_at
+    description: >
+      Timestamp of the first time this analytics scenario was recorded (TIMESTAMP, Not Nullable).
+  ts_last_occurred:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_price_protection_analytics.last_occurred_at
+    description: >
+      Timestamp of the most recent recurrence of this analytics scenario (TIMESTAMP, Not Nullable).
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_price_protection_analytics.year
+    description: 'Partition column: year for data lake partitioning (INTEGER, Partition Key).'
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_price_protection_analytics.month
+    description: 'Partition column: month for data lake partitioning (INTEGER, Partition Key).'
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_price_protection_analytics.day
+    description: 'Partition column: day for data lake partitioning (INTEGER, Partition Key).'

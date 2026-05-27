@@ -1,0 +1,107 @@
+---
+database_name: datalake_brokers_supply_processor_clean
+table_name: lead_property_change_tracking
+owner: vitor.musachio@quintoandar.com.br
+domain: Broker XP
+description: >
+  Stores the current price snapshot and change-source metadata for each converted 3P lead under
+  price protection. One row per lead tracks Main (QuintoAndar platform) prices, the last prices
+  BSP successfully sent to Main, who originated the latest sale/rent price change (BSP or EXTERNAL),
+  and when external changes were detected. Updated on HOUSE_CHANGE events from Main and during
+  outbound price sync from BSP.
+
+  BUSINESS CONTEXT: Supports the price protection feature that prevents brokerage price updates from
+  overwriting Main prices when external changes occur within a protection window or when prices are
+  already synchronized. Enables operational monitoring, backfill workflows, and reconciliation between
+  partner-submitted prices and Main property data.
+
+  RELATED TABLES: lead_3p (foreign key: id_lead), lead_price_protection_analytics (analytics when
+  protection blocks a sync), business_context_detail (lead status and business context).
+columns:
+  id_lead_property_change_tracking:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.id
+    description: >
+      Auto-increment primary key for the price tracking record (BIGINT, Primary Key, Not Nullable).
+  id_lead:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.lead_id
+    description: >
+      Reference to the converted 3P lead in lead_3p (BIGINT, Foreign Key, Not Nullable, Unique).
+      At most one tracking row exists per lead.
+  main_rent_price:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.main_rent_price
+    description: >
+      Latest rent price observed on Main for this lead (DECIMAL, Nullable). Updated on each
+      HOUSE_CHANGE event received from Main.
+  main_sale_price:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.main_sale_price
+    description: >
+      Latest sale price observed on Main for this lead (DECIMAL, Nullable). Updated on each
+      HOUSE_CHANGE event received from Main.
+  main_condo_price:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.main_condo_price
+    description: >
+      Latest condominium fee observed on Main for this lead (DECIMAL, Nullable). Updated on each
+      HOUSE_CHANGE event received from Main.
+  last_bsp_rent_price:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.last_bsp_rent_price
+    description: >
+      Last rent price that BSP successfully published to Main (DECIMAL, Nullable). Used to detect
+      whether a new brokerage rent price matches a BSP-originated sync.
+  last_bsp_sale_price:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.last_bsp_sale_price
+    description: >
+      Last sale price that BSP successfully published to Main (DECIMAL, Nullable). Used to detect
+      whether a new brokerage sale price matches a BSP-originated sync.
+  last_sale_price_change_source:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.last_sale_price_change_source
+    description: >
+      Actor that made the most recent sale price change on Main (STRING, Nullable). Possible values
+      are BSP (change originated from BSP sync) and EXTERNAL (change detected from Main outside BSP).
+  last_rent_price_change_source:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.last_rent_price_change_source
+    description: >
+      Actor that made the most recent rent price change on Main (STRING, Nullable). Possible values
+      are BSP (change originated from BSP sync) and EXTERNAL (change detected from Main outside BSP).
+  ts_sale_price_external_change:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.sale_price_external_change_at
+    description: >
+      Timestamp when the last external sale price change was detected on Main (TIMESTAMP, Nullable).
+      Used by the protection policy to evaluate whether updates fall within the protection window.
+  ts_rent_price_external_change:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.rent_price_external_change_at
+    description: >
+      Timestamp when the last external rent price change was detected on Main (TIMESTAMP, Nullable).
+      Used by the protection policy to evaluate whether updates fall within the protection window.
+  ts_created:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.created_at
+    description: >
+      Timestamp when the tracking row was first created (TIMESTAMP, Not Nullable).
+  ts_updated:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.updated_at
+    description: >
+      Timestamp when the tracking row was last updated (TIMESTAMP, Not Nullable).
+  year:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.year
+    description: 'Partition column: year for data lake partitioning (INTEGER, Partition Key).'
+  month:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.month
+    description: 'Partition column: month for data lake partitioning (INTEGER, Partition Key).'
+  day:
+    lineage:
+      - datalake_brokers_supply_processor_raw.lead_property_change_tracking.day
+    description: 'Partition column: day for data lake partitioning (INTEGER, Partition Key).'
