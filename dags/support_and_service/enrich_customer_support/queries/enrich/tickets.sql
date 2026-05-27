@@ -222,6 +222,8 @@ unique_tickets AS (
       WHEN t.tags LIKE '%"ticket_ativo"%' THEN 'outbound'
       WHEN COALESCE(ca1.direction, ca2.direction) IS NOT NULL
         THEN COALESCE(ca1.direction, ca2.direction)
+      WHEN ch.direction IS NOT NULL
+        THEN ch.direction
       ELSE 'inbound'
     END AS direction,
     CASE
