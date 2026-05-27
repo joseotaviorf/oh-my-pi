@@ -109,6 +109,7 @@ company:
       - expert_demand_responsavel
       - pessoas_de_ops_supply_responsavel
       - esta_no_leadgen_
+      - cnpj_unico
     propertiesWithHistory:
       - hs_lead_status
       - categoria_do_membro
