@@ -103,7 +103,7 @@ alias_classifieds_task = QuintoAndarDatabricksCheckJobTaskOperator(
     json={
         "python_wheel_task": {
             "package_name": VESPUCIO_PACKAGE_NAME,
-            "entry_point": "alias_classifieds",
+            "entry_point": "plugins_alias_classifieds",
             "parameters": ALIAS_CLASSIFIEDS_PARAMS,
         }
     },
@@ -117,7 +117,7 @@ alias_classifieds_publisher_task = QuintoAndarDatabricksCheckJobTaskOperator(
     json={
         "python_wheel_task": {
             "package_name": VESPUCIO_PACKAGE_NAME,
-            "entry_point": "alias_classifieds_publisher",
+            "entry_point": "plugins_alias_classifieds_publisher",
             "parameters": ALIAS_CLASSIFIEDS_PUBLISHER_PARAMS,
         }
     },
