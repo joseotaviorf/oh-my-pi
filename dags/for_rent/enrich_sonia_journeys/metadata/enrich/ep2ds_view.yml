@@ -15,16 +15,18 @@ columns:
     lineage:
       - datalake_cdp_clean.transactional.id_event
     description: CDP event identifier from rent flow credit positive events.
+  id_rent_flow:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: Rent flow identifier from rent flow credit positive events.
   id_user:
     lineage:
       - datalake_cdp_clean.transactional.id_user
     description: User identifier associated with the rent flow event.
-    personal_data_classification: personal
   uuid_user:
     lineage:
       - datalake_cdp_clean.transactional.id_person
     description: User UUID (id_person) associated with the rent flow event.
-    personal_data_classification: personal
   id_proposal:
     lineage:
       - datalake_cdp_clean.transactional.event_properties.id_documentation

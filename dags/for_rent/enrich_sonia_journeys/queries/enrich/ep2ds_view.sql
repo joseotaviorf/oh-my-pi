@@ -4,9 +4,9 @@ WITH
       CAST(cdp_tx.id_event AS STRING) AS id_event,
       TRY_CAST(cdp_tx.id_user AS BIGINT) AS id_user,
       CAST(cdp_tx.id_person AS STRING) AS uuid_user,
-      TRY_CAST(cdp_tx.event_properties: id_house AS BIGINT) AS id_house,
-      CAST(cdp_tx.event_properties: id_rent_flow AS STRING) AS id_rent_flow,
-      TRY_CAST(cdp_tx.event_properties: id_documentation AS BIGINT) AS id_proposal,
+      TRY_CAST(cdp_tx.event_properties:id_house AS BIGINT) AS id_house,
+      CAST(cdp_tx.event_properties:id_rent_flow AS STRING) AS id_rent_flow,
+      TRY_CAST(cdp_tx.event_properties:id_documentation AS BIGINT) AS id_proposal,
       cdp_tx.event_name,
       cdp_tx.ts_event
     FROM
@@ -20,8 +20,8 @@ WITH
       )
       AND TRY_CAST(cdp_tx.id_user AS BIGINT) IS NOT NULL
       AND cdp_tx.id_person IS NOT NULL
-      AND cdp_tx.event_properties: id_rent_flow IS NOT NULL
-      AND cdp_tx.ts_event >= TIMESTAMP '2026-05-27 00:00:00'
+      AND cdp_tx.event_properties:id_rent_flow IS NOT NULL
+      AND cdp_tx.ts_event >= TIMESTAMP '2026-05-28 00:00:00'
   ),
   credit_positive_ranked AS (
     SELECT
@@ -143,6 +143,7 @@ WITH
 SELECT
   CONCAT(ef.id_event, '_', ef.uuid_user) AS pk_event_user,
   ef.id_event,
+  ef.id_rent_flow,
   ef.id_user,
   ef.uuid_user,
   ef.id_proposal,
@@ -164,4 +165,3 @@ SELECT
   ef.ts_documentation_sent
 FROM
   enriched_flows AS ef;
-  
