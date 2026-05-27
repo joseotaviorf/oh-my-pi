@@ -114,6 +114,10 @@ columns:
     description: 'Flag indicating if the user interaction event is associated with QuintoAndar Classifieds (QAC).'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.is_qac
+  is_qac_region:
+    description: 'Flag indicating if the user interaction event is from a QAC region where classifieds inventory is available.'
+    lineage:
+      - datalake_amplitude_page_viewed_events.schedule_search_listing_events.is_qac_region
   year:
     description: 'Year partition of the event.'
     lineage:

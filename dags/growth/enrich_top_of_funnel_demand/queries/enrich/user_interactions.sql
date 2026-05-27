@@ -69,6 +69,7 @@ filtered_events AS (
             ELSE 'Outro'
         END AS branded,
         is_qac,
+        is_qac_region,
         uri,
         CAST(id_region AS STRING) AS id_region,
         year,
@@ -146,6 +147,7 @@ SELECT
     evt.utm_term,
     evt.utm_content,
     evt.is_qac,
+    evt.is_qac_region,
     year,
     month,
     day,
