@@ -1049,6 +1049,22 @@ SELECT
     -- Non-metrics
     sal.currency_code,
     sal.target_plr_currency_code AS plr_target_currency_code,
+    CASE
+        WHEN sal.salary_amount IS NULL OR sal.currency_code IS NULL OR sal.currency_code <> 'BRL'
+            THEN '-1'
+        WHEN sal.salary_amount < 3000
+            THEN 'Below R$3,000'
+        WHEN sal.salary_amount < 5000
+            THEN 'R$3,000 - R$4,999'
+        WHEN sal.salary_amount < 8000
+            THEN 'R$5,000 - R$7,999'
+        WHEN sal.salary_amount < 12000
+            THEN 'R$8,000 - R$11,999'
+        WHEN sal.salary_amount < 20000
+            THEN 'R$12,000 - R$19,999'
+        ELSE
+            'R$20,000+'
+    END AS salary_range,
     -- Metrics - Salary fields
     sal.salary_amount AS amount_salary,
     sal.annual_salary AS amount_annual_salary,
@@ -1069,6 +1085,10 @@ SELECT
         THEN TRUE
         ELSE FALSE
     END AS is_promotion_movement,
+    CASE
+        WHEN sal.currency_code = 'BRL' AND sal.salary_amount IS NOT NULL
+            THEN sal.salary_amount < 10000
+    END AS is_eligible_internet_reimbursement,
     -- Metrics - Tenure (reference date = LEAST(CURRENT_DATE, dt_valid_to); current stint for band/job)
     DATEDIFF(sal.dt_reference, sal.dt_original_hired) AS days_tenure_in_company,
     DATEDIFF(sal.dt_reference, jts.dt_stint_start) AS days_tenure_in_position,
