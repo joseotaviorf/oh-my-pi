@@ -2673,6 +2673,7 @@ bietlejuice.enrich_fintech_snapshot:
 bietlejuice.enrich_firestore:
   - bietlejuice.firestore:load-clean-rent-offer:first-run-of-day
 bietlejuice.enrich_for_sale_experiment:
+  - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
   - bietlejuice.ebdb_user_fast_lane:load-clean-user:first-run-of-day
   - bietlejuice.ebdb_visit_fast_lane:load-clean-visit:first-run-of-day
 bietlejuice.enrich_goal:

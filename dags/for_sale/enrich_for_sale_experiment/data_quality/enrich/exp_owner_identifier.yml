@@ -1,0 +1,9 @@
+---
+table_name: datalake_for_sale_experiment.exp_owner_identifier
+alert_channel: "#alerts-de-airflow-dags"
+column_level_validations:
+  id_element_exp:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error

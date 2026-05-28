@@ -1,0 +1,70 @@
+---
+database_name: datalake_for_sale_experiment
+table_name: exp_owner_identifier
+owner: guilherme.rocha@quintoandar.com.br
+domain: For Sale
+description:
+  Consolidated experiment identifier table that combines all experiments with owner
+  identifiers. Each owner identifier appears with their respective experiment
+  assignment and participation timeline for comprehensive A/B testing analysis.
+columns:
+  id_element_exp:
+    description: Unique identifier of the experiment and owner participating in the experiment.
+    lineage:
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.identifier_bc
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.id_neotribe
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.id_experiment
+  identifier:
+    description: Unique identifier of the owner participating in the experiment (same as id_user).
+    lineage:
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.identifier
+  id_neotribe:
+    description: Identifier for the neotribe conducting the experiment (1 for VISITS XP).
+    lineage:
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.id_neotribe
+  id_experiment:
+    description: Unique identifier for the specific experiment (16 for visits_triangulation_owner).
+    lineage:
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.id_experiment
+  name_neotribe:
+    description: Name of the neotribe conducting the experiments (VISITS XP).
+    lineage:
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.name_neotribe
+  name_experiment:
+    description: Name of the specific experiment variant.
+    lineage:
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.name_experiment
+    categories:
+      visits_triangulation_owner: Visits triangulation owner experiment.
+  identifier_type:
+    description: Type of identifier used for the experiments (OWNER).
+    lineage:
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.identifier_type
+  business_context:
+    description: Business context for the experiments.
+    lineage:
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.business_context
+  test_group:
+    description: Experiment group assignment for the owner (CONTROL or TREATMENT). Assignment logic varies by experiment.
+    lineage:
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.test_group
+    categories:
+      CONTROL: Control group participants.
+      TREATMENT: Treatment group participants.
+      ERROR: Invalid or unmapped phone patterns.
+  documentation_link:
+    description: Link to experiment documentation (may be null).
+    lineage:
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.documentation_link
+  additional_information:
+    description: Additional context about experiment methodology and owner segmentation logic.
+    lineage:
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.additional_information
+  dt_identifier_started:
+    description: Earliest date when this specific owner started participating in the experiment.
+    lineage:
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.dt_identifier_started
+  dt_identifier_ended:
+    description: Latest date when this specific owner participated in the experiment.
+    lineage:
+      - datalake_for_sale_experiment.exp_1_16_visits_triangulation_owner.dt_identifier_ended

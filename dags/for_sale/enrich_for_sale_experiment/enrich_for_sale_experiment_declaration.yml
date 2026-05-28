@@ -18,9 +18,12 @@ workflow:
       - exp_1_14_visits_confirmation_agent_reconfirmation_hsm_sale
     exp_visit_identifier:
       - exp_1_15_visits_reconfirmation_hsm_rent
+    exp_owner_identifier:
+      - exp_1_16_visits_triangulation_owner
     exp_identifier_unified:
       - exp_visitor_identifier
       - exp_visit_identifier
+      - exp_owner_identifier
 cluster:
   type: databricks_16_4_med_memory_cluster
   databricks_conn_id: databricks_new_env
