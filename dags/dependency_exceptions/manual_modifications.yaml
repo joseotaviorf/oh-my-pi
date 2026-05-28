@@ -515,9 +515,6 @@ bietlejuice.enrich_expected_contribution_margin:
 bietlejuice.enrich_golden_set:
   remove:
     - bietlejuice.enrich_vespucio:load-enrich-dejavu:first-run-of-day
-bietlejuice.enrich_greenhouse:
-  remove:
-    - bietlejuice.greenhouse_audit_log:load-clean-events:first-run-of-day
 bietlejuice.enrich_hiring:
   remove:
     - bietlejuice.greenhouse_audit_log:load-clean-events:first-run-of-day
