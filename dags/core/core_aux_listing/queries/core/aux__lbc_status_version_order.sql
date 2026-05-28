@@ -33,20 +33,32 @@ lbc_history AS (
         OR suspension_reason IS DISTINCT FROM previous_suspension_reason
         OR status_reason IS DISTINCT FROM previous_status_reason
 ),
-first_lbc_state AS (
+first_lbc_state_ranked AS (
     SELECT
         bch.id_house,
         bch.status,
         bch.status_reason,
         bch.ts_state_started,
         bch.ts_state_ended,
-        DATEDIFF(bch.ts_state_ended, bch.ts_state_started) AS days_in_status
+        DATEDIFF(bch.ts_state_ended, bch.ts_state_started) AS days_in_status,
+        ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC, bch.ts_state_ended ASC) AS rn
     FROM
         lbc_history AS bch
     WHERE
         bch.business_context = 'RENT'
-    QUALIFY
-        ROW_NUMBER() OVER(PARTITION BY bch.id_house ORDER BY bch.ts_state_started ASC, bch.ts_state_ended ASC) = 1
+),
+first_lbc_state AS (
+    SELECT
+        id_house,
+        status,
+        status_reason,
+        ts_state_started,
+        ts_state_ended,
+        days_in_status
+    FROM
+        first_lbc_state_ranked
+    WHERE
+        rn = 1
 ),
 house AS (
     SELECT

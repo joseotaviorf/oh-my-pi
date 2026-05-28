@@ -77,3 +77,4 @@ tars_track_record.jsonl
 
 # Legacy contracts directory
 /contracts/
+.tars/
