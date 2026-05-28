@@ -32,6 +32,12 @@ columns:
       - datalake_ebdb_clean.entry_access.access_type
       - datalake_ebdb_clean.key_holder.holder_role
     description: Location of the houses's key.
+  first_key_location:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.first_key_location
+      - datalake_ebdb_clean.entry_access.key_location
+      - datalake_ebdb_clean.entry_access.is_first_status
+    description: First key location of the house.
   access_model:
     lineage:
       - datalake_ebdb_clean.entry_access.access_model
@@ -91,6 +97,12 @@ columns:
     lineage:
       - datalake_ebdb_clean.entry_access.ts_created
     description: Timestamp that indicates when the entry record was created.
+  ts_first_event:
+    lineage:
+      - datalake_ebdb_listing.house_entrance_history.ts_entrance_started
+      - datalake_ebdb_clean.entry_access.ts_created
+      - datalake_ebdb_clean.entry_access.is_first_status
+    description: Timestamp of the first event of the house.
   ts_updated:
     lineage:
       - datalake_ebdb_clean.entry_access.ts_updated

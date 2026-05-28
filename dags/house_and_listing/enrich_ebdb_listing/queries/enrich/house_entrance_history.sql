@@ -397,6 +397,7 @@ window_model AS (
         ts_entrance_started,
         LEAD(ts_entrance_started) OVER(PARTITION BY id_house ORDER BY ts_entrance_started) AS ts_entrance_ended,
         IF(ts_entrance_ended IS NULL, TRUE, FALSE) AS is_last_status,
+        ROW_NUMBER() OVER(PARTITION BY id_house ORDER BY ts_entrance_started) = 1 AS is_first_status,
         COALESCE(MAX(ts_entrance_started) OVER(PARTITION BY id_house, DATE(ts_entrance_started)) = ts_entrance_started, FALSE) AS is_last_status_of_day
     FROM
         enriched_model
@@ -477,6 +478,7 @@ SELECT
     wm.mod_has_opted_keys_with_agent,
     wm.is_last_status_of_day,
     wm.is_last_status,
+    wm.is_first_status,
     wm.ts_entrance_started,
     wm.ts_entrance_ended
 FROM

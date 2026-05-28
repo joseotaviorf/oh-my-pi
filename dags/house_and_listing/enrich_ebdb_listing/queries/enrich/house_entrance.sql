@@ -74,6 +74,7 @@ SELECT
     old.restriction_type,
     old.authorization_type,
     new.key_location,
+    COALESCE(first_event.key_location, new.key_location) AS first_key_location,
     new.access_model,
     new.access_code,
     new.access_details,
@@ -87,6 +88,7 @@ SELECT
     IF(ae.has_agent_validated, ts_last_agent_validated, NULL) AS ts_last_agent_validated,
     IF(ae.has_agent_deallocated, ts_last_agent_deallocation, NULL) AS ts_last_agent_deallocation,
     new.ts_created,
+    COALESCE(first_event.ts_entrance_started, new.ts_created) AS ts_first_event,
     new.ts_updated
 FROM
     new_entry_model AS new
@@ -100,3 +102,7 @@ LEFT JOIN
     agent_events AS ae
         ON new.id_house = ae.id_house
         AND new.key_location = 'AGENT'
+LEFT JOIN
+    datalake_ebdb_listing.house_entrance_history AS first_event
+        ON new.id_house = first_event.id_house
+        AND first_event.is_first_status

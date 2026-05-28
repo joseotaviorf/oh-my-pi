@@ -140,6 +140,8 @@ columns:
     description: Flag to indicate if the entry condition status is the last one of the day.
   is_last_status:
     description: Flag to indicate if the entry condition status is the last one of the house.
+  is_first_status:
+    description: Flag to indicate if the entry condition status is the first one of the house.
   ts_entrance_started:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
