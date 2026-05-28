@@ -1,147 +1,199 @@
+---
 database_name: datalake_ebdb_clean
 table_name: proposal_aud
+description: Audit history table for rental proposal changes from EBDB Proposta_AUD.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
 columns:
   id_proposal:
     lineage:
       - datalake_ebdb_raw.proposta_aud.id
+    description: Foreign key to the proposal record being audited.
   rev:
     lineage:
       - datalake_ebdb_raw.proposta_aud.rev
+    description: Foreign key of the RevInfo table indicating when the record was changed.
   rev_type:
     lineage:
       - datalake_ebdb_raw.proposta_aud.revtype
+    description: Type of revision operation performed on the proposal record.
   ts_approved:
     lineage:
       - datalake_ebdb_raw.proposta_aud.dataaprovacao
+    description: Timestamp of proposal approval on EBDB at this revision.
   ts_documentation_sent:
     lineage:
       - datalake_ebdb_raw.proposta_aud.datadocumentosenviados
+    description: Timestamp when tenant documentation was sent at this revision.
   ts_owner_documentation_sent:
     lineage:
       - datalake_ebdb_raw.proposta_aud.datadocumentosproprietarioenviados
+    description: Timestamp when owner documentation was sent at this revision.
   guarantee_description:
     lineage:
       - datalake_ebdb_raw.proposta_aud.descricaogarantia
+    description: Text description of the guarantee at this revision.
   has_tenant_accepted_contract:
     lineage:
       - datalake_ebdb_raw.proposta_aud.inquilinoaceitoucontrato
+    description: Flag indicating whether the tenant accepted the contract at this revision.
   mod_has_tenant_accepted_contract:
     lineage:
       - datalake_ebdb_raw.proposta_aud.inquilinoaceitoucontrato_mod
+    description: Boolean flag indicating whether has_tenant_accepted_contract was modified in this revision.
   has_tenant_sent_documentation:
     lineage:
       - datalake_ebdb_raw.proposta_aud.inquilinoenvioudocumentos
+    description: Flag indicating whether the tenant sent documentation at this revision.
   mod_has_tenant_sent_documentation:
     lineage:
       - datalake_ebdb_raw.proposta_aud.inquilinoenvioudocumentos_mod
+    description: Boolean flag indicating whether has_tenant_sent_documentation was modified in this revision.
   tenant_gdrive_folder:
     lineage:
       - datalake_ebdb_raw.proposta_aud.inquilinopastagdrive
+    description: Google Drive folder path for tenant documentation at this revision.
   has_owner_accepted_contract:
     lineage:
       - datalake_ebdb_raw.proposta_aud.proprietarioaceitoucontrato
+    description: Flag indicating whether the owner accepted the contract at this revision.
   mod_has_owner_accepted_contract:
     lineage:
       - datalake_ebdb_raw.proposta_aud.proprietarioaceitoucontrato_mod
+    description: Boolean flag indicating whether has_owner_accepted_contract was modified in this revision.
   has_owner_sent_documentation:
     lineage:
       - datalake_ebdb_raw.proposta_aud.proprietarioenvioudocumentos
+    description: Flag indicating whether the owner sent documentation at this revision.
   mod_has_owner_sent_documentation:
     lineage:
       - datalake_ebdb_raw.proposta_aud.proprietarioenvioudocumentos_mod
+    description: Boolean flag indicating whether has_owner_sent_documentation was modified in this revision.
   owner_gdrive_folder:
     lineage:
       - datalake_ebdb_raw.proposta_aud.proprietariopastagdrive
+    description: Google Drive folder path for owner documentation at this revision.
   status:
     lineage:
       - datalake_ebdb_raw.proposta_aud.status
+    description: Proposal status on EBDB at this revision.
   mod_status:
     lineage:
       - datalake_ebdb_raw.proposta_aud.status_mod
+    description: Boolean flag indicating whether status was modified in this revision.
   tenant_documentation_status:
     lineage:
       - datalake_ebdb_raw.proposta_aud.statusdocumentacaoinq
+    description: Tenant documentation status on EBDB at this revision.
   mod_tenant_documentation_status:
     lineage:
       - datalake_ebdb_raw.proposta_aud.statusdocumentacaoinq_mod
+    description: Boolean flag indicating whether tenant_documentation_status was modified in this revision.
   owner_documentation_status:
     lineage:
       - datalake_ebdb_raw.proposta_aud.statusdocumentacaoprop
+    description: Owner documentation status on EBDB at this revision.
   mod_owner_documentation_status:
     lineage:
       - datalake_ebdb_raw.proposta_aud.statusdocumentacaoprop_mod
+    description: Boolean flag indicating whether owner_documentation_status was modified in this revision.
   id_ticket:
     lineage:
       - datalake_ebdb_raw.proposta_aud.ticketid
+    description: Support ticket identifier linked to the proposal at this revision.
   id_proponent:
     lineage:
       - datalake_ebdb_raw.proposta_aud.proponente_id
+    description: Foreign key to the proponent at this revision.
   id_house:
     lineage:
       - datalake_ebdb_raw.proposta_aud.imovel_id
+    description: Foreign key to the house related to the proposal at this revision.
   id_negotiation:
     lineage:
       - datalake_ebdb_raw.proposta_aud.negociacao_id
+    description: Foreign key to the negotiation related to the proposal at this revision.
   id_pre_proposal:
     lineage:
       - datalake_ebdb_raw.proposta_aud.preproposta_id
+    description: Foreign key to the pre-proposal record at this revision.
   has_additive_term:
     lineage:
       - datalake_ebdb_raw.proposta_aud.fazertermoaditivo
+    description: Flag indicating whether an additive contract term is required at this revision.
   mod_has_additive_term:
     lineage:
       - datalake_ebdb_raw.proposta_aud.fazertermoaditivo_mod
+    description: Boolean flag indicating whether has_additive_term was modified in this revision.
   ts_owner_visualized:
     lineage:
       - datalake_ebdb_raw.proposta_aud.visualizeddateowner
+    description: Timestamp when the owner viewed the proposal at this revision.
   mod_ts_owner_visualized:
     lineage:
       - datalake_ebdb_raw.proposta_aud.visualizeddateowner_mod
+    description: Boolean flag indicating whether ts_owner_visualized was modified in this revision.
   ts_tenant_visualized:
     lineage:
       - datalake_ebdb_raw.proposta_aud.visualizeddatetenant
+    description: Timestamp when the tenant viewed the proposal at this revision.
   mod_ts_tenant_visualized:
     lineage:
       - datalake_ebdb_raw.proposta_aud.visualizeddatetenant_mod
+    description: Boolean flag indicating whether ts_tenant_visualized was modified in this revision.
   id_offer:
     lineage:
       - datalake_ebdb_raw.proposta_aud.offer_id
+    description: Foreign key to the offer related to the proposal at this revision.
   mod_resident:
     lineage:
       - datalake_ebdb_raw.proposta_aud.moradores_mod
+    description: Boolean flag indicating whether proposal residents were modified in this revision.
   ts_expired:
     lineage:
       - datalake_ebdb_raw.proposta_aud.expiresat
+    description: Timestamp when the proposal expires at this revision.
   mod_ts_expired:
     lineage:
       - datalake_ebdb_raw.proposta_aud.expiresat_mod
+    description: Boolean flag indicating whether ts_expired was modified in this revision.
   id_portability:
     lineage:
       - datalake_ebdb_raw.proposta_aud.portability_id
+    description: Foreign key to the portability record at this revision.
   mod_portability:
     lineage:
       - datalake_ebdb_raw.proposta_aud.portability_mod
+    description: Boolean flag indicating whether id_portability was modified in this revision.
   rejection_reason:
     lineage:
       - datalake_ebdb_raw.proposta_aud.rejectionreason
+    description: Reason code or text for proposal rejection at this revision.
   mod_rejection_reason:
     lineage:
       - datalake_ebdb_raw.proposta_aud.rejectionreason_mod
+    description: Boolean flag indicating whether rejection_reason was modified in this revision.
   is_tenant_auto_submission:
     lineage:
       - datalake_ebdb_raw.proposta_aud.istenantautomaticsubmission
+    description: Flag indicating if documentation was auto-submitted by the tenant at this revision.
   mod_is_tenant_auto_submission:
     lineage:
       - datalake_ebdb_raw.proposta_aud.istenantautomaticsubmission_mod
+    description: Boolean flag indicating whether is_tenant_auto_submission was modified in this revision.
   is_pre_analyze:
     lineage:
       - datalake_ebdb_raw.proposta_aud.bypasspreanalysis
+    description: Flag indicating if the proposal bypasses pre-analysis at this revision.
   mod_is_pre_analyze:
     lineage:
       - datalake_ebdb_raw.proposta_aud.bypasspreanalysis_mod
+    description: Boolean flag indicating whether is_pre_analyze was modified in this revision.
   guarantee:
     lineage:
       - datalake_ebdb_raw.proposta_aud.garantia
+    description: Proposal guarantee type name on EBDB at this revision.
   mod_guarantee:
     lineage:
       - datalake_ebdb_raw.proposta_aud.garantia_mod
+    description: Boolean flag indicating whether guarantee was modified in this revision.

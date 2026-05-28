@@ -23,10 +23,6 @@ workflow:
       clean_table_name: proponent_info_resend_request
     ProponentInfoResendRequest_AUD:
       clean_table_name: proponent_info_resend_request_aud
-    Proposta:
-      clean_table_name: proposal
-    Proposta_AUD:
-      clean_table_name: proposal_aud
     PropostaMorador:
       clean_table_name: proposal_resident
     CondicaoProposta:

@@ -1,117 +1,159 @@
+---
 database_name: datalake_ebdb_clean
 table_name: proposal
+description: Clean table with rental proposal data from EBDB Proposta, loaded every 30 minutes.
+domain: For Rent
+owner: data-ae-for-rent@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_ebdb_raw.proposta.id
+    description: Proposal unique identifier on EBDB.
   ts_to_scheduling:
     lineage:
       - datalake_ebdb_raw.proposta.dataparamudanca
+    description: Timestamp of rescheduling or expected move date for the proposal.
   ts_proposal:
     lineage:
       - datalake_ebdb_raw.proposta.dataproposta
+    description: Timestamp of proposal creation on EBDB.
   guarantee:
     lineage:
       - datalake_ebdb_raw.proposta.garantia
+    description: Proposal guarantee type name on EBDB.
   ts_guarantee_paid:
     lineage:
       - datalake_ebdb_raw.proposta.garantiapagaem
+    description: Timestamp when the paid guarantee was paid.
   motivation:
     lineage:
       - datalake_ebdb_raw.proposta.motivacao
+    description: Location or move motivation declared on the proposal.
   rent_proposal:
     lineage:
       - datalake_ebdb_raw.proposta.propostaaluguel
+    description: Rent value proposed by the tenant in BRL.
   status:
     lineage:
       - datalake_ebdb_raw.proposta.status
+    description: Current proposal status on EBDB.
   id_house:
     lineage:
       - datalake_ebdb_raw.proposta.imovel_id
+    description: Foreign key to the house related to the proposal.
   id_proponent:
     lineage:
       - datalake_ebdb_raw.proposta.proponente_id
+    description: Foreign key to the proponent who submitted the proposal.
   explanation:
     lineage:
       - datalake_ebdb_raw.proposta.explicacao
+    description: Text explanation provided for the proposal.
   id_ticket:
     lineage:
       - datalake_ebdb_raw.proposta.ticketid
+    description: Support ticket identifier linked to the proposal.
   guarantee_description:
     lineage:
       - datalake_ebdb_raw.proposta.descricaogarantia
+    description: Text description of the guarantee chosen for the proposal.
   ts_updated:
     lineage:
       - datalake_ebdb_raw.proposta.atualizadoem
+    description: Timestamp of the last update on the proposal record.
   ts_created:
     lineage:
       - datalake_ebdb_raw.proposta.criadoem
+    description: Timestamp of proposal creation on EBDB.
   ts_approved:
     lineage:
       - datalake_ebdb_raw.proposta.dataaprovacao
+    description: Timestamp of proposal approval on EBDB.
   ts_documentation_sent:
     lineage:
       - datalake_ebdb_raw.proposta.datadocumentosenviados
+    description: Timestamp when tenant documentation was sent.
   id_negotiation:
     lineage:
       - datalake_ebdb_raw.proposta.negociacao_id
+    description: Foreign key to the negotiation related to the proposal.
   ts_owner_documentation_sent:
     lineage:
       - datalake_ebdb_raw.proposta.datadocumentosproprietarioenviados
+    description: Timestamp when owner documentation was sent.
   has_owner_sent_documentation:
     lineage:
       - datalake_ebdb_raw.proposta.proprietarioenvioudocumentos
+    description: Flag indicating whether the owner sent documentation.
   has_tenant_sent_documentation:
     lineage:
       - datalake_ebdb_raw.proposta.inquilinoenvioudocumentos
+    description: Flag indicating whether the tenant sent documentation.
   has_owner_accepted_contract:
     lineage:
       - datalake_ebdb_raw.proposta.proprietarioaceitoucontrato
+    description: Flag indicating whether the owner accepted the contract.
   has_tenant_accepted_contract:
     lineage:
       - datalake_ebdb_raw.proposta.inquilinoaceitoucontrato
+    description: Flag indicating whether the tenant accepted the contract.
   tenant_gdrive_folder:
     lineage:
       - datalake_ebdb_raw.proposta.inquilinopastagdrive
+    description: Google Drive folder path for tenant documentation.
   owner_gdrive_folder:
     lineage:
       - datalake_ebdb_raw.proposta.proprietariopastagdrive
+    description: Google Drive folder path for owner documentation.
   tenant_documentation_status:
     lineage:
       - datalake_ebdb_raw.proposta.statusdocumentacaoinq
+    description: Current tenant documentation status on EBDB.
   owner_documentation_status:
     lineage:
       - datalake_ebdb_raw.proposta.statusdocumentacaoprop
+    description: Current owner documentation status on EBDB.
   id_pre_proposal:
     lineage:
       - datalake_ebdb_raw.proposta.preproposta_id
+    description: Foreign key to the pre-proposal record on EBDB.
   has_additive_term:
     lineage:
       - datalake_ebdb_raw.proposta.fazertermoaditivo
+    description: Flag indicating whether an additive contract term is required.
   ts_owner_visualized:
     lineage:
       - datalake_ebdb_raw.proposta.visualizeddateowner
+    description: Timestamp when the owner first viewed the proposal.
   ts_tenant_visualized:
     lineage:
       - datalake_ebdb_raw.proposta.visualizeddatetenant
+    description: Timestamp when the tenant first viewed the proposal.
   id_offer:
     lineage:
       - datalake_ebdb_raw.proposta.offer_id
+    description: Foreign key to the offer related to the proposal on EBDB.
   ts_expired:
     lineage:
       - datalake_ebdb_raw.proposta.expiresat
+    description: Timestamp when the proposal expires.
   id_portability:
     lineage:
       - datalake_ebdb_raw.proposta.portability_id
+    description: Foreign key to the portability record, if applicable.
   rejection_reason:
     lineage:
       - datalake_ebdb_raw.proposta.rejectionreason
+    description: Reason code or text for proposal rejection on EBDB.
   is_tenant_auto_submission:
     lineage:
       - datalake_ebdb_raw.proposta.istenantautomaticsubmission
+    description: Flag indicating if documentation was auto-submitted by the tenant.
   is_pre_analyze:
     lineage:
       - datalake_ebdb_raw.proposta.bypasspreanalysis
+    description: Flag indicating if the proposal bypasses pre-analysis.
   ts_entrance:
     lineage:
       - datalake_ebdb_raw.proposta.dataVigencia
+    description: Expected entrance or move-in date for the proposal.

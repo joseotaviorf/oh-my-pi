@@ -1,0 +1,26 @@
+dag:
+  name: ebdb_proposal_fast_lane
+  schedule_start_date: 2026, 5, 26
+  schedule_interval: 0,30 * * * *
+  owner: Data ForRent
+  documentation:
+    dag_purpose: |
+      Fast lane DAG for Proposta tables, running every 30 minutes.
+      It loads only Proposta and Proposta_AUD, which require higher cadence than the main ebdb_proposal DAG.
+workflow:
+  type: cdc
+  layer: raw
+  custom_schema: ebdb
+  database_type: mysql
+  source_database: ebdb
+  source_schema: ebdb
+  execution_timeout_hours: 0.5
+  tables_customization:
+    Proposta:
+      clean_table_name: proposal
+    Proposta_AUD:
+      clean_table_name: proposal_aud
+  extra_query_template_params:
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+cluster:
+  type: emr_7_12_med_general_cluster
