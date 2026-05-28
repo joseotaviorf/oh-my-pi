@@ -45,7 +45,7 @@ LEFT JOIN
     dw_house.dim_house_information AS dhi
         ON ah.id_amenity = dhi.id_amenity
         AND ah.is_condo_amenity = (dhi.information_type = 'CONDO_AMENITY')
-        AND COALESCE(UPPER(ah.has_feature::STRING), 'Unknown') = dhi.value
+        AND COALESCE(UPPER(CAST(ah.has_feature AS STRING)), 'Unknown') = dhi.value
 LEFT JOIN
     dw_house.dim_house_amenities_version AS dhav
         ON ah.id_house = dhav.sk_house

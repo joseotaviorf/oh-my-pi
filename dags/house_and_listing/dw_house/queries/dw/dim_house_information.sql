@@ -33,7 +33,7 @@ WITH exploded_amenities AS (
         datalake_ebdb_amenities.amenity
 )
 SELECT
-    (id_amenity || is_condo_amenity::INT || IF(value = 'Unknown', 2, (value='TRUE')::INT))::INT AS sk_information,
+    CAST((id_amenity || CAST(is_condo_amenity AS INT) || IF(value = 'Unknown', 2, CAST((value = 'TRUE') AS INT))) AS INT) AS sk_information,
     id_amenity,
     information_type,
     value,

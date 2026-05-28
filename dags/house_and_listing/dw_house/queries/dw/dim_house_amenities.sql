@@ -1,17 +1,21 @@
 WITH amenities AS (
-    WITH most_recent_amenities AS (
+    WITH most_recent_amenities_ranked AS (
         SELECT
             i.id_house,
             i.id_amenities,
             i.has_characteristic,
-            a.slug
+            a.slug,
+            ROW_NUMBER() OVER(PARTITION BY i.id_house, i.id_amenities ORDER BY i.ts_updated DESC) AS rn
         FROM
             datalake_ebdb_clean.info_amenities AS i
         JOIN
             datalake_ebdb_clean.amenities AS a
                 ON i.id_amenities = a.id
-        QUALIFY
-            ROW_NUMBER() OVER(PARTITION BY i.id_house, i.id_amenities ORDER BY i.ts_updated DESC) = 1
+    ),
+    most_recent_amenities AS (
+        SELECT id_house, id_amenities, has_characteristic, slug
+        FROM most_recent_amenities_ranked
+        WHERE rn = 1
     )
     SELECT
         id_house,
@@ -33,19 +37,23 @@ WITH amenities AS (
         1
 ),
 condo_amenities AS (
-    WITH most_recent_condo_amenities AS (
+    WITH most_recent_condo_amenities_ranked AS (
         SELECT
             i.id_house,
             i.id_condo_amenities,
             i.has_characteristic,
-            a.slug
+            a.slug,
+            ROW_NUMBER() OVER(PARTITION BY i.id_house, i.id_condo_amenities ORDER BY i.ts_updated DESC) AS rn
         FROM
             datalake_ebdb_clean.info_condo_amenities AS i
         JOIN
             datalake_ebdb_clean.condo_amenities AS a
                 ON i.id_condo_amenities = a.id_condo_amenity
-        QUALIFY
-            ROW_NUMBER() OVER(PARTITION BY i.id_house, i.id_condo_amenities ORDER BY i.ts_updated DESC) = 1
+    ),
+    most_recent_condo_amenities AS (
+        SELECT id_house, id_condo_amenities, has_characteristic, slug
+        FROM most_recent_condo_amenities_ranked
+        WHERE rn = 1
     )
     SELECT
         id_house,
