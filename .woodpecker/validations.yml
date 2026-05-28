@@ -131,10 +131,7 @@ steps:
       - make run-domain-validation MAKE_TARGET=validate-dags-dependencies
     when:
       event: [push, pull_request]
-      branch:
-        exclude:
-          - master
-          - hotfix/*
+      branch: [forno]
       path: &validate_dags_dependencies_paths
         include:
           - "dags/**/*"
@@ -156,7 +153,8 @@ steps:
     commands: *validate_dags_dependencies_commands
     when:
       event: [push, pull_request]
-      branch: [master, hotfix/*]
+      branch:
+        exclude: [forno]
       path: *validate_dags_dependencies_paths
     depends_on: [setup]
 
