@@ -4,7 +4,7 @@ WITH room_types AS (
             WHEN iig.external_domain = 'HOUSE' THEN iig.id_external_domain
             ELSE h.id
         END AS id_house,
-        l.id AS id_lead_3p,
+        l.id_lead_3p,
         ii.room_type
     FROM
         datalake_kodak_clean.image_inspection AS ii
@@ -12,7 +12,7 @@ WITH room_types AS (
         datalake_kodak_clean.image_inspection_group AS iig
             ON ii.id_group = iig.id
     LEFT JOIN
-        datalake_brokers_supply_processor.lead_3p AS l
+        datalake_3p_supply.lead_3p AS l
             ON iig.id_external_domain = l.uuid_lead
             AND iig.external_domain = 'LEAD3P'
     LEFT JOIN

@@ -21,7 +21,7 @@ dag:
       **Data Sources Integrated:**
       - `datalake_kodak_clean.image_inspection`: Individual image analysis results
       - `datalake_kodak_clean.image_inspection_group`: Property-level inspection groups
-      - `datalake_brokers_supply_processor.lead_3p`: Third-party partner lead data
+      - `datalake_3p_supply.lead_3p`: Third-party partner lead data (enriched from broker_xp/enrich_3p_supply)
       - `datalake_ebdb_clean.house`: QuintoAndar property master data
       
       **Business Value:**

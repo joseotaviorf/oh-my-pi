@@ -2962,7 +2962,7 @@ bietlejuice.enrich_kill_queue:
   - bietlejuice.kill_queue_fast_lane:load-clean-reservation:first-run-of-day
 bietlejuice.enrich_kodak:
   - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
-  - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p:first-run-of-day
+  - bietlejuice.enrich_3p_supply:load-enrich-lead-3p:first-run-of-day
   - bietlejuice.kodak:load-clean-image-inspection-group:first-run-of-day
   - bietlejuice.kodak:load-clean-image-inspection:first-run-of-day
 bietlejuice.enrich_kong:

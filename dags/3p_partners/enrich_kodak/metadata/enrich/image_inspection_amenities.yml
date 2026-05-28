@@ -13,7 +13,7 @@ columns:
   id_lead_3p:
     description: Id of the lead 3P.
     lineage:
-      - datalake_brokers_supply_processor.lead_3p.id
+      - datalake_3p_supply.lead_3p.id_lead_3p
   has_pool:
     description: True if there is any image with room_type = pool.
   has_gym:
