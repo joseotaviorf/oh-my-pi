@@ -272,6 +272,14 @@ columns:
       - dw_collection_recovery_quintoandar.bridge_map_debt_negotiation.sk_debt
       - dw_collection_recovery_quintoandar.fact_debt.dt_due
     description: "The due date of the anchor invoice, which is the minimum due date among all original invoices included in the negotiation."
+  contact_type:
+    lineage:
+      - datalake_collections_quintoandar.negotiation.contact_type
+    description: "Contact channel used during the negotiation."
+  ts_promisse:
+    lineage:
+      - datalake_collections_quintoandar.negotiation.ts_promisse
+    description: "Timestamp when the negotiation promise was made."
   dt_promisse:
     lineage:
       - datalake_collections_quintoandar.negotiation.dt_promisse

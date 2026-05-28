@@ -1,17 +1,20 @@
 WITH
 nexxera_confirmation AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   SELECT
       dt_due,
       dt_occurrence_code AS dt_paid,
       substr(our_number, 1,8) AS our_number,
       net_amount AS paid_amount,
-      due_amount
+      due_amount,
+        ROW_NUMBER() OVER (PARTITION BY our_number, occurrence_code ORDER BY dt_occurrence_code DESC) AS _rn
   FROM
       datalake_nexxera.cnab_charges_recupera
   WHERE
       occurrence_code = '06'
-  QUALIFY
-      ROW_NUMBER() OVER(PARTITION BY our_number, occurrence_code ORDER BY dt_occurrence_code DESC) = 1
+    )
+    WHERE _rn = 1
 ),
 calculate_discounts AS (
 SELECT DISTINCT

@@ -1,17 +1,21 @@
 WITH
 negotiation_data AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
 SELECT DISTINCT
     ip.id_invoice,
     ip.id_contract,
     n.sk_negotiation,
     CAST(n.net_paid_amount / n.original_debt_amount AS DECIMAL(14,2))  AS net_rate,
-    IF(n.origin_agreement = "Portal Auto Negociação", TRUE, FALSE) AS is_ssn_boletao
+    IF(n.origin_agreement = "Portal Auto Negociação", TRUE, FALSE) AS is_ssn_boletao,
+        ROW_NUMBER() OVER (PARTITION BY ip.id_invoice, ip.id_contract ORDER BY ABS(DATE_DIFF(n.dt_down_payment, ip.ts_paid))) AS _rn
   FROM datalake_collections_quintoandar.invoice_portfolio AS ip
   LEFT JOIN dw_collection_recovery_quintoandar.fact_negotiation AS n
     ON ip.id_negotiation_child = n.id_negotiation
   WHERE
     n.down_payment_net_amount_paid != 0
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY ip.id_invoice, ip.id_contract ORDER BY ABS(DATE_DIFF(n.dt_down_payment, ip.ts_paid))) = 1
+    )
+    WHERE _rn = 1
 ),
 add_all_dimensions AS (
 SELECT
@@ -90,6 +94,8 @@ LEFT JOIN
       AND o.id_contract = n.id_contract
 ),
 get_last_valid_partner AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   -- Get the last valid partner per invoice, to freeze the partner after the invoice payment date
   SELECT
     id_contract,
@@ -101,11 +107,13 @@ get_last_valid_partner AS (
     agreement_queue,
     agreement_queue_description,
     eviction_queue,
-    eviction_queue_description
+    eviction_queue_description,
+        ROW_NUMBER() OVER (PARTITION BY id_contract, id_invoice ORDER BY dt_reference DESC) AS _rn
   FROM add_all_dimensions
   WHERE dt_reference >= DATE_ADD(max_dt_invoice_paid,-1) AND dt_reference <= max_dt_invoice_paid
   AND (advisory IS NULL OR advisory NOT IN ("DBAIXAS", "DCARGA")) -- ignore DBAIXAS, because it references to the paid invoices, and we want the last valid partner before the invoice payment.
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_invoice ORDER BY dt_reference DESC) = 1
+    )
+    WHERE _rn = 1
 )
 SELECT
     a.sk_overdue_portfolio_timeline,
