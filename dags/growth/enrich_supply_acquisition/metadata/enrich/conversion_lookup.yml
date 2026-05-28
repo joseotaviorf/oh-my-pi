@@ -17,7 +17,7 @@ columns:
     lineage:
       - datalake_rene_descartes_clean.house_lead_conversion.id_lead
       - datalake_ebdb_clean.conversion_lead.id_converted_lead
-      - datalake_brokers_supply_processor.lead_3p.id
+      - datalake_3p_supply.lead_3p.id_lead_3p
       - datalake_bob.house_draft_business_context.id_draft
   id_house:
     description: 'Identifier of the house in QuintoAndar, if it has already been created.'
@@ -48,7 +48,7 @@ columns:
     lineage:
       - datalake_rene_descartes_clean.house_lead_conversion.ts_created
       - datalake_ebdb_clean.conversion_lead.ts_conversion
-      - datalake_brokers_supply_processor.lead_3p.ts_created
+      - datalake_3p_supply.lead_3p.ts_lead_created
   db_source:
     description: 'Database source of the event'
     categories:

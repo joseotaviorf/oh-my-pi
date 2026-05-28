@@ -6,13 +6,13 @@ WITH tb_aux AS (
     lsc.growth_status,
     lsc.status,
     l.city,
-    l.id_region,
+    l.region_id AS id_region,
     l.uuid_lead,
-    lsc.ts_status_started AS ts_event
+    lsc.ts_start AS ts_event
   FROM
-    datalake_rede_supply.lead_3p_status_changes AS lsc
-  LEFT JOIN datalake_brokers_supply_processor.lead_3p AS l
-      ON (lsc.id_lead_3p = l.id)
+    datalake_3p_supply.lead_3p_status_changes AS lsc
+  LEFT JOIN datalake_3p_supply.lead_3p AS l
+      ON (lsc.id_lead_3p = l.id_lead_3p)
 ),
 discards AS (
   -- Getting the discards reasons
@@ -24,7 +24,7 @@ discards AS (
     status_when_reason_started AS status,
     growth_status_when_reason_started AS growth_status
   FROM
-    datalake_rede_supply.lead_3p_reason_changes
+    datalake_3p_supply.lead_3p_reason_changes
 ),
 pivot_table AS (
   -- Pivot the timestamps to get the first timestamp of each status

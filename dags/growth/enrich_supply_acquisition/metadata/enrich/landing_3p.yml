@@ -7,7 +7,7 @@ columns:
     id_lead_3p:
       description: 'Unique identifier of the lead.'
       lineage: 
-        - datalake_rede_supply.lead_3p_status_changes.id_lead_3p
+        - datalake_3p_supply.lead_3p_status_changes.id_lead_3p
     id_house:
       description: 'Identifier of the house in QuintoAndar, if it has already been created.'
       lineage:
@@ -15,17 +15,17 @@ columns:
     id_region:
       description: 'Identifier of the lead region.'
       lineage:
-        - datalake_brokers_supply_processor.lead_3p.id_region
+        - datalake_3p_supply.lead_3p.region_id
     business_context:
       description: 'The business context of the lead, referring to the business context where the lead originated.'
       categories: 
         SALE: The 3P prospect is for sale.
         RENT: The 3P prospect is for rent.
       lineage:
-        - datalake_rede_supply.lead_3p_status_changes.business_context
+        - datalake_3p_supply.lead_3p_status_changes.business_context
     growth_status:
       lineage:
-        - datalake_rede_supply.lead_3p_status_changes.growth_status
+        - datalake_3p_supply.lead_3p_status_changes.growth_status
       description: 'Status of the lead in the growth funnel'
       categories:
         LEAD: First stage. The lead was just created, but was not approved in the eligibility analysis. 
@@ -35,7 +35,7 @@ columns:
         FIRST_LISTING: Fifth and final stage. The opportunity was approved, and registered in Main for publication.
     status:
       lineage:
-        - datalake_rede_supply.lead_3p_status_changes.status
+        - datalake_3p_supply.lead_3p_status_changes.status
       description: 'Status of the lead in Brokers Supply Processor, in the context of 3P.'
       categories:
         REGISTERED: 'Registered in Main for publication'
@@ -47,11 +47,11 @@ columns:
     city:
       description: 'City of the lead.'
       lineage:
-        - datalake_brokers_supply_processor.lead_3p.city
+        - datalake_3p_supply.lead_3p.city
     reason:
       description: 'Name of the reason of non-conversion.'
       lineage:
-        - datalake_rede_supply.lead_3p_reason_changes.reason
+        - datalake_3p_supply.lead_3p_reason_changes.reason
     reason_type:
       description: 'Type of reason of non-conversion.'
       categories:
@@ -59,7 +59,7 @@ columns:
         DISCARD_REASON: 'Lead is eligible, but was discarded afterwards'
         ENRICHMENT_REASON: 'Lead can convert, as long as an information is enriched'
       lineage:
-        - datalake_rede_supply.lead_3p_reason_changes.reason_type    
+        - datalake_3p_supply.lead_3p_reason_changes.reason_type    
     aux_round_number:
       description: 'Auxiliary column to deduplicate the data.'    
     aux_hash:
@@ -67,4 +67,4 @@ columns:
     ts_event:
       description: 'Timestamp of the event.'
       lineage:
-        - datalake_rede_supply.lead_3p_status_changes.ts_status_started
+        - datalake_3p_supply.lead_3p_status_changes.ts_start

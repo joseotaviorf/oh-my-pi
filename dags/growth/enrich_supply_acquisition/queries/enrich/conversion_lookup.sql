@@ -107,21 +107,21 @@ lead_conversion_1p AS (
 lead_conversion_3p AS (
     SELECT 
         lbca.id_listing_business_context AS id,
-        l.id AS id_lead,
+        l.id_lead_3p AS id_lead,
         lbca.id_house,
         lbca.business_context,
         (lbca.business_context IS NOT NULL) AS has_listing,
         (lbca.business_context IS NOT NULL) AS has_draft,
-        l.ts_created AS ts_conversion,
+        l.ts_lead_created AS ts_conversion,
         4 AS db_source,
         '3P' AS supply_source
     FROM
-        datalake_brokers_supply_processor.lead_3p AS l
+        datalake_3p_supply.lead_3p AS l
     JOIN datalake_ebdb_clean.house AS h
         ON h.id_external = l.uuid_lead
     JOIN datalake_ebdb_clean.listing_business_context_aud AS lbca
         ON lbca.id_house = h.id
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY l.id, lbca.id_house, lbca.business_context ORDER BY l.ts_created) = 1
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY l.id_lead_3p, lbca.id_house, lbca.business_context ORDER BY l.ts_lead_created) = 1
 ),
 lead_conversion_ciq AS (
     SELECT 
