@@ -230,6 +230,10 @@ columns:
     lineage:
       - datalake_salesforce_clean.events_case.is_kirk__c
     description: Indicates whether the contract related to the case is part of Kirk's process.
+  case_reason:
+    lineage:
+      - datalake_salesforce_clean.events_case.reason
+    description: Reason for opening or closing the case.
   is_high_value:
     lineage:
       - datalake_salesforce_clean.events_case.is_high_value__c
