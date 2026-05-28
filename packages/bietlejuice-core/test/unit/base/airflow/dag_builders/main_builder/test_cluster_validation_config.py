@@ -1,9 +1,14 @@
+import os
+from unittest import mock
+
 import pytest
 
+from bietlejuice.base.airflow.cluster_config_resolver import merge_cluster_configuration
 from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_declaration_validator import (
     DAGDeclarationValidator,
 )
 from bietlejuice.base.validation.cluster_args import merge_validation_cluster_args
+from bietlejuice.services.configuration_service import ConfigurationService
 
 
 @pytest.fixture
@@ -81,3 +86,58 @@ class TestMergeValidationClusterArgs:
             "spark.executor.memory": "4g",
             "spark.sql.shuffle.partitions": "200",
         }
+
+    def test_strips_prod_instance_topology_for_consolidation_validation(self):
+        prod = {
+            "type": "custom_cluster",
+            "custom_configurations": {
+                "spark_conf": {"spark.sql.caseSensitive": "true"},
+                "node_type_id": "m5a.large",
+                "driver_node_type_id": "m5a.xlarge",
+                "num_workers": 1,
+                "spark_version": "13.3.x-scala2.12",
+            },
+        }
+        validation = {
+            "type": "consolidation_xs_general_cluster",
+            "custom_configurations": {
+                "spark_version": "13.3.x-scala2.12",
+                "num_workers": 1,
+                "driver_node_type_id": "m6g.xlarge",
+            },
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert merged["type"] == "consolidation_xs_general_cluster"
+        assert merged["custom_configurations"] == {
+            "spark_conf": {"spark.sql.caseSensitive": "true"},
+            "spark_version": "13.3.x-scala2.12",
+            "num_workers": 1,
+            "driver_node_type_id": "m6g.xlarge",
+        }
+        assert "node_type_id" not in merged["custom_configurations"]
+        assert merged["custom_configurations"]["driver_node_type_id"] == "m6g.xlarge"
+
+    @mock.patch.dict(os.environ, {"ENVIRONMENT": "prod"})
+    def test_resolved_alert_manager_validation_cluster_uses_graviton_topology(self):
+        prod = {
+            "type": "custom_cluster",
+            "custom_configurations": {
+                "spark_conf": {"spark.sql.caseSensitive": "true"},
+                "node_type_id": "m5a.large",
+                "driver_node_type_id": "m5a.xlarge",
+                "num_workers": 1,
+                "spark_version": "13.3.x-scala2.12",
+            },
+        }
+        validation = {
+            "type": "consolidation_xs_general_cluster",
+            "custom_configurations": {
+                "spark_version": "13.3.x-scala2.12",
+                "num_workers": 1,
+                "driver_node_type_id": "m6g.xlarge",
+            },
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        resolved = merge_cluster_configuration(merged, ConfigurationService())
+        assert resolved["node_type_id"].startswith("m6g.")
+        assert resolved["driver_node_type_id"].startswith("m6g.")
