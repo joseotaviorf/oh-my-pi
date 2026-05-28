@@ -56,7 +56,7 @@ def _fetch_filtered_paths(paths: list, is_backfill: str) -> list[str]:
             paths,
             key=lambda path: int(path.rstrip("/").split("sync_run_id=")[-1]),
             reverse=True,
-        )[0:100]
+        )[:720]
         return sorted_paths
 
 

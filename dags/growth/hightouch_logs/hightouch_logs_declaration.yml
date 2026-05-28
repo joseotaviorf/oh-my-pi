@@ -48,6 +48,26 @@ workflow:
         - "parquet"
       extraction_type: incremental
       partitions: [year, month, day]
+    sync_changelog_trino:
+      clean_z_order_by: [id_sync, id_sync_run]
+      load_spark_job: load_hightouch_sync_changelog
+      extra_spark_job_arguments:
+        - "{environment}"
+        - "{bucket}"
+        - "{schema}"
+        - "{dag_name}"
+        - "{table_name}"
+        - "false"
+        - "{load_start_date}"
+        - "{load_end_date}"
+        - "incremental"
+        - "started_at"
+        - "s3://5a-cdp-processed-data-{environment}/repo/hightouch/hightouch_audit/sync_changelog"
+        - "parquet"
+      extraction_type: incremental
+      clean_extraction_type: incremental
+      partitions: [year, month, day]
+      merge_on: [id_sync, id_sync_run, id_row]
     audience_membership_databricks:
       load_spark_job: load_hightouch_logs
       extra_spark_job_arguments:
