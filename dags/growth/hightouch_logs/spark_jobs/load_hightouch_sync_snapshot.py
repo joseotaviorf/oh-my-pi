@@ -1,5 +1,7 @@
 from argparse import ArgumentParser
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
+from time import monotonic
 from typing import Optional
 
 import pyspark.sql.functions as F
@@ -48,24 +50,43 @@ def _discover_snapshot_paths(
     load_start_date: str,
     load_end_date: str,
 ) -> list[str]:
-    """Lists sync_id partitions and collects snapshot parquet paths by modification time."""
+    """Lists sync_id partitions and collects snapshot parquet paths by modification time.
+
+    Each sync_id directory is listed in parallel to minimise wall-clock time on
+    the I/O-bound dbutils.fs.ls calls.
+    """
     start_ts, end_ts = _load_window_timestamps_ms(load_start_date, load_end_date)
 
+    t0 = monotonic()
     sync_dirs = [
         sync_dir.path
         for sync_dir in dbutils.fs.ls(base_path)
         if sync_dir.name.startswith("sync_id=")
     ]
+    logger.info(
+        f"m=_discover_snapshot_paths, sync_dir_count={len(sync_dirs)}, "
+        f"elapsed_s={monotonic() - t0:.2f}, msg=listed sync_id directories"
+    )
 
-    paths: list[str] = []
-    for sync_path in sync_dirs:
-        paths.extend(
-            _fetch_parquet_paths_modified_in_window(sync_path, start_ts, end_ts)
+    if not sync_dirs:
+        logger.info(
+            f"m=_discover_snapshot_paths, base_path={base_path}, "
+            "msg=no sync_id directories found, returning empty path list"
         )
+        return []
+
+    def _list_sync_dir(sync_path: str) -> list[str]:
+        return _fetch_parquet_paths_modified_in_window(sync_path, start_ts, end_ts)
+
+    t1 = monotonic()
+    with ThreadPoolExecutor(max_workers=min(len(sync_dirs), 16)) as executor:
+        results = list(executor.map(_list_sync_dir, sync_dirs))
+    paths = [path for sublist in results for path in sublist]
 
     logger.info(
-        f"m=_discover_snapshot_paths, sync_dir_count={len(sync_dirs)}, parquet_file_count={len(paths)}, "
-        f"load_start_date={load_start_date}, load_end_date={load_end_date}, msg=discovered source files"
+        f"m=_discover_snapshot_paths, sync_dir_count={len(sync_dirs)}, "
+        f"parquet_file_count={len(paths)}, elapsed_s={monotonic() - t1:.2f}, "
+        "msg=listed sync_id directories in parallel"
     )
     return paths
 
