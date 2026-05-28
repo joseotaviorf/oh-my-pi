@@ -38,9 +38,11 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 Closely related employee topics that live in sibling schemas, not in `dw_employee_details`:
 
-* **❌ Compensation** : Salary history, job levels, pay tables, and variable pay are in `dw_compensation`.
-* **❌ Organization** : Business unit, cost center, team definitions, and Codex are in `dw_organization`.
-* **❌ DE&I** : Sensitive self-declared attributes (ethnicity, gender identity, sexual orientation, religion, disability category, neurodiversity) are in `dw_demographics`, under stricter access controls.
+**❌ Compensation** : Salary history, job levels, pay tables, and variable pay are in `dw_compensation`.
+
+**❌ Organization** : Business unit, cost center, team definitions, and Codex are in `dw_organization`.
+
+**❌ DE&I** : Sensitive self-declared attributes (ethnicity, gender identity, sexual orientation, religion, disability category, neurodiversity) are in `dw_demographics`, under stricter access controls.
 
 ### Who is included
 
@@ -95,6 +97,7 @@ Closely related employee topics that live in sibling schemas, not in `dw_employe
 
 ## Attention and Limitations
 
+* **`sk_*_version` keys are point-in-time, not fixed** : Foreign keys like `sk_contact_version`, `sk_documentation_version`, and `sk_hierarchy_version` in the fact table do not identify a single, stable record for an entity. They identify the version of that attribute that was valid on a specific `dt_reference`. The same employee will have different `sk_contact_version` values across dates if their contact info changed. Treat these as temporal join keys, not as permanent identifiers.
 * **Always scope `dt_reference`** : `fact_assignment_snapshots` contains one row per assignment per calendar day. Querying without a date filter will return every historical day for every assignment, multiplying row counts and producing inflated totals. Use `is_current = TRUE` to get today's state (equivalent to the former *base completa*), or filter to a specific `dt_reference` value. Use `is_monthly_snapshot = TRUE` for monthly headcount, replacing the former *base fotografias* pattern.
 * **Multi-assignment employees** : An employee who transferred internally may hold more than one `assignment_number`. Use `is_primary_assignment_for_snapshot = TRUE` to identify the canonical assignment per employee per snapshot date.
 * **Work email history not available** : Each assignment has an associated work email, but the current model exposes only the email from the person's most recent assignment. Emails from previous assignments are not accessible through this schema.

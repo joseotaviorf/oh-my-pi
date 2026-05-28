@@ -30,7 +30,7 @@ This schema is indexed in the [{data_catalog_name}]({data_catalog_url}).
 
 *{Include this subsection only when there are closely related topics with high overlap potential — e.g. sibling DW schemas covering compensation, DE&I, or org structure. Omit if there is no close overlap risk.}*
 
-* **❌ {Topic}** : {What it covers and where to find it instead.}
+**❌ {Topic}** : {What it covers and where to find it instead.}
 
 ### Who is included
 
