@@ -46,16 +46,18 @@ def _get_candidates(start_date, end_date) -> DataFrame:
     )
 
 
-def _build_house_aud(candidates: DataFrame, end_date) -> DataFrame:
+def _build_house_aud(candidates: DataFrame) -> DataFrame:
     """
     Joins house audit, revision and listing business context tables for candidate houses.
 
-    Loads the full audit history for each candidate up to end_date (inclusive), so that
-    the output reflects the state of the world as of D-1. Revisions with ts_revision > end_date
-    are excluded so that ts_price_ended and is_last_price are computed relative to the same
-    date boundary. The candidates DataFrame is broadcast-joined as a filter seed.
-    Price validity filtering is deferred to _build_price_interval per business context.
+    Loads the full audit history for each candidate up to CURRENT_DATE - 1 (inclusive),
+    independent of the load_start_date / load_end_date window used to select candidates.
+    Revisions with ts_revision after that cutoff are excluded so that ts_price_ended and
+    is_last_price reflect the state of the world as of D-1. The candidates DataFrame is
+    broadcast-joined as a filter seed. Price validity filtering is deferred to
+    _build_price_interval per business context.
     """
+    history_end_date = F.date_sub(F.current_date(), 1)
     h_aud = spark.table(TABLE_HOUSE_AUD)
     r = spark.table(TABLE_USER_REVISION)
     lbc = spark.table(TABLE_LISTING_BUSINESS_CONTEXT)
@@ -69,7 +71,7 @@ def _build_house_aud(candidates: DataFrame, end_date) -> DataFrame:
         .join(r.alias("r"), F.col("h.rev") == F.col("r.id"))
         .join(lbc.alias("lbc"), F.col("h.id_house") == F.col("lbc.id_house"))
         .filter((F.col("h.rent") > 1) | (F.col("h.sale_price") > 1))
-        .filter(F.to_date(F.col("r.ts_revision")) <= end_date)
+        .filter(F.to_date(F.col("r.ts_revision")) <= history_end_date)
         .select(
             F.col("h.id_house"),
             F.col("lbc.business_context"),
@@ -430,7 +432,7 @@ if __name__ == "__main__":
             "m=__main__, msg=No candidate houses found in date range, skipping"
         )
     else:
-        house_aud = _build_house_aud(candidates, end_date)
+        house_aud = _build_house_aud(candidates)
         house_aud.persist()
 
         try:
