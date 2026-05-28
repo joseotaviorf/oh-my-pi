@@ -14,10 +14,10 @@ This schema is indexed in the [{data_catalog_name}]({data_catalog_url}).
 * [In Scope](#in-scope)
 * [Data Model and Tables](#data-model-and-tables)
 * [Core Features and Business Logic](#core-features-and-business-logic)
-* [Attention and limitations](#attention-and-limitations)
-* [How to use](#how-to-use)
+* [Attention and Limitations](#attention-and-limitations)
+* [How to Use](#how-to-use)
 * [Glossary](#glossary)
-* [Related Scopes](#related-scopes) *{optional : remove if unused}*
+* [See Also](#see-also)
 
 ***
 
@@ -26,16 +26,16 @@ This schema is indexed in the [{data_catalog_name}]({data_catalog_url}).
 **✅ {Topic}** : {Short explanation}
 **✅ {Topic}** : {Short explanation}
 
+### Out of Scope
+
+*{Include this subsection only when there are closely related topics with high overlap potential — e.g. sibling DW schemas covering compensation, DE&I, or org structure. Omit if there is no close overlap risk.}*
+
+* **❌ {Topic}** : {What it covers and where to find it instead.}
+
 ### Who is included
 
 * **Target Population:** {State who IS included using strictly affirmative, positive statements in natural business language. E.g. All active records in the domain. Do NOT reference table names, database schemas, or technical SQL filters.}
 * **Exclusions:** {State who IS NOT included using simple, negative statements. E.g. Inactive or test accounts. Avoid double negatives and do NOT reference technical field codes or database objects.}
-
-### Future scope (Roadmap) *(Optional)*
-
-*{Note: Delete this section if there is no planned roadmap or known gaps to be addressed in the future.}*
-
-* **⏳ {Extension}** : {Brief gap description}
 
 ## Data Model and Tables
 
@@ -73,20 +73,20 @@ This schema is indexed in the [{data_catalog_name}]({data_catalog_url}).
 
 * **{Concept/Logic Topic}** : {Detailed business logic or calculation rule in plain language.}
 
-### Business Assumptions *(Optional)*
+### Business Assumptions
 
 *{Note: Include this section ONLY if there are specific business rules or premises that lead to unexpected results or are not clear by reading the SQL queries alone. Do NOT list technical pipeline rules, Airflow triggers, or obvious synchronization details. If the SQL query logic is fully self explanatory, delete this entire subsection.}*
 
 * **{Assumption Label}** : {One or two sentences explaining the not obvious business logic applied.}
 
-## Attention and limitations
+## Attention and Limitations
 
 *{Only highlight limitations or exclusions when there is a close, potential overlap or high risk of confusion for the analysts. Omit far off or unrelated domains.}*
 
 * **{Gotcha Label}** : {What might be misread and which column clarifies it}
 * **{Data Gap}** : {Known issues or specific table behavior}
 
-## How to use
+## How to Use
 
 ### Standard Join Pattern
 
@@ -126,7 +126,7 @@ SELECT
     dim.{status_column}
 FROM
     {metastore_schema}.{table_name} AS fact
-INNER JOIN {main_dimension} AS dim 
+INNER JOIN {main_dimension} AS dim
     ON fact.{primary_key} = dim.{primary_key}
 WHERE
     dim.{status_column} = {active_value}
@@ -139,8 +139,8 @@ WHERE
 * **Current State** : The latest, real time version of the data representing only the active status of an entity without historical records.
 * **SCD (Slowly Changing Dimension)** : A database design pattern used to store and manage both current and historical data over time.
 
-## Related Scopes *(Optional)*
+## See Also
 
-*{Note: Include this section ONLY if there are highly relevant or useful sibling scopes. If there are no clear, useful relationships, delete this entire section and its entry from the Contents.}*
+*{Note: Include this section only for highly relevant companion resources — analytics pages, OBTs, or curated query collections built on top of this schema. If there are no clear, useful pointers, delete this section and its entry from the Contents.}*
 
-* **{Use Case}** : Use `{related_schema}` for {reason}.
+* **{Resource Name}** : {What it is and why it is useful.}
