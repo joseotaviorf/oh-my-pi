@@ -13,91 +13,121 @@ subordinates AS (
     mh.id_manager_period_of_service
 ),
 current_salaries AS (
-  SELECT 
-    s.id_assignment,
-    s.currency_code,
-    s.salary_amount
-  FROM 
-    datalake_pin_compensation_clean.salary AS s
-  WHERE 
-    s.dt_started <= DATE('{load_start_date}')
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY s.id_assignment ORDER BY s.dt_ended DESC) = 1
+    SELECT
+        id_assignment,
+        currency_code,
+        salary_amount
+    FROM (
+        SELECT
+            s.id_assignment,
+            s.currency_code,
+            s.salary_amount,
+            ROW_NUMBER() OVER (PARTITION BY s.id_assignment ORDER BY s.dt_ended DESC) AS _rn
+        FROM
+            datalake_pin_compensation_clean.salary AS s
+        WHERE
+            s.dt_started <= DATE('{load_start_date}')
+    )
+    WHERE _rn = 1
 ),
 valid_salary_adjustments AS (
-  SELECT 
-    s.id_assignment,
-    s.adjustment_amount,
-    s.adjustment_percent,
-    s.dt_started,
-    art.action_reason AS last_salary_increase_type
-  FROM 
-    datalake_pin_compensation_clean.salary AS s
-  INNER JOIN
-    datalake_pin_core_clean.action_base AS ab
-      ON ab.id_action = s.id_action
-      AND ab.dt_ended = DATE('4712-12-31')
-  LEFT JOIN
-    datalake_pin_core_clean.action_reason_translation AS art
-      ON art.id_action_reason = s.id_action_reason
-      AND art.language = 'PTB'
-  WHERE 
-    s.dt_started <= DATE('{load_start_date}')
-    AND ab.action_code IN ('CHANGE_SALARY', 'PROMOTION', 'GLB_TRANSFER')
-    AND (
-      (s.adjustment_amount IS NOT NULL AND s.adjustment_amount <> 0)
-      OR (s.adjustment_percent IS NOT NULL AND s.adjustment_percent <> 0)
+    SELECT
+        id_assignment,
+        adjustment_amount,
+        adjustment_percent,
+        dt_started,
+        last_salary_increase_type
+    FROM (
+        SELECT
+            s.id_assignment,
+            s.adjustment_amount,
+            s.adjustment_percent,
+            s.dt_started,
+            art.action_reason AS last_salary_increase_type,
+            ROW_NUMBER() OVER (PARTITION BY s.id_assignment ORDER BY s.dt_started DESC) AS _rn
+        FROM
+            datalake_pin_compensation_clean.salary AS s
+        INNER JOIN
+            datalake_pin_core_clean.action_base AS ab
+                ON ab.id_action = s.id_action
+                AND ab.dt_ended = DATE('4712-12-31')
+        LEFT JOIN
+            datalake_pin_core_clean.action_reason_translation AS art
+                ON art.id_action_reason = s.id_action_reason
+                AND art.language = 'PTB'
+        WHERE
+            s.dt_started <= DATE('{load_start_date}')
+            AND ab.action_code IN ('CHANGE_SALARY', 'PROMOTION', 'GLB_TRANSFER')
+            AND (
+                (s.adjustment_amount IS NOT NULL AND s.adjustment_amount <> 0)
+                OR (s.adjustment_percent IS NOT NULL AND s.adjustment_percent <> 0)
+            )
+            AND art.action_reason IN ('Mérito', 'Promoção', 'Recrutamento Interno')
     )
-    AND art.action_reason IN ('Mérito', 'Promoção', 'Recrutamento Interno')
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY s.id_assignment ORDER BY s.dt_started DESC) = 1
+    WHERE _rn = 1
 ),
 current_assignments AS (
-  SELECT 
-    id_period_of_service, 
-    id_job,
-    id_organization,
-    id_business_unit,
-    legislation_code, 
-    assignment_status_type,
-    dt_projected_started,
-    target_plr,
-    career_track
-  FROM 
-    datalake_pin_core_clean.all_assignments
-  WHERE
-    (
-      (
-        dt_effective_started <= DATE('{load_start_date}')
-        AND assignment_type IN ('E', 'C')
-      )
-      OR (
-        dt_projected_started > DATE('{load_start_date}')
-        AND assignment_type = 'P'
-      )
+    SELECT
+        id_period_of_service,
+        id_job,
+        id_organization,
+        id_business_unit,
+        legislation_code,
+        assignment_status_type,
+        dt_projected_started,
+        target_plr,
+        career_track
+    FROM (
+        SELECT
+            id_period_of_service,
+            id_job,
+            id_organization,
+            id_business_unit,
+            legislation_code,
+            assignment_status_type,
+            dt_projected_started,
+            target_plr,
+            career_track,
+            ROW_NUMBER() OVER (PARTITION BY id_period_of_service ORDER BY dt_effective_ended ASC) AS _rn
+        FROM
+            datalake_pin_core_clean.all_assignments
+        WHERE
+            (
+                (
+                    dt_effective_started <= DATE('{load_start_date}')
+                    AND assignment_type IN ('E', 'C')
+                )
+                OR (
+                    dt_projected_started > DATE('{load_start_date}')
+                    AND assignment_type = 'P'
+                )
+            )
+            AND dt_effective_ended >= DATE('{load_start_date}')
     )
-    AND dt_effective_ended >= DATE('{load_start_date}')
-  QUALIFY
-    ROW_NUMBER() OVER (
-      PARTITION BY id_period_of_service 
-      ORDER BY dt_effective_ended ASC
-    ) = 1
+    WHERE _rn = 1
 ),
 managers AS (
-  SELECT
-    ma.id_manager_period_of_service,
-    ma.id_assignment,
-    ma.id_manager,
-    COALESCE(ed_manager.assignment_status_type = 'ACTIVE', FALSE) AS has_active_manager
-  FROM
-    datalake_pin.managers_history AS ma
-  LEFT JOIN
-    datalake_employment.employee_details AS ed_manager
-      ON ed_manager.id_period_of_service = ma.id_manager_period_of_service
-  WHERE
-    ma.dt_effective_started <= DATE('{load_start_date}')
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY ma.id_assignment ORDER BY ma.dt_effective_started DESC) = 1
+    SELECT
+        id_manager_period_of_service,
+        id_assignment,
+        id_manager,
+        has_active_manager
+    FROM (
+        SELECT
+            ma.id_manager_period_of_service,
+            ma.id_assignment,
+            ma.id_manager,
+            COALESCE(ed_manager.assignment_status_type = 'ACTIVE', FALSE) AS has_active_manager,
+            ROW_NUMBER() OVER (PARTITION BY ma.id_assignment ORDER BY ma.dt_effective_started DESC) AS _rn
+        FROM
+            datalake_pin.managers_history AS ma
+        LEFT JOIN
+            datalake_employment.employee_details AS ed_manager
+                ON ed_manager.id_period_of_service = ma.id_manager_period_of_service
+        WHERE
+            ma.dt_effective_started <= DATE('{load_start_date}')
+    )
+    WHERE _rn = 1
 )
 SELECT
   im.id_period_of_service AS sk_assignment,

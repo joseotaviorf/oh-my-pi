@@ -1,26 +1,29 @@
 WITH
 terminated_for_transfer AS (
-  SELECT
-    aa_next.id_period_of_service AS id_period_of_service_next,
-    ps_prev.dt_started AS previous_dt_started,
-    (aa.action_code = 'GLB_TRANSFER') AS is_transfered
-  FROM
-    datalake_pin_core_clean.all_assignments AS aa
-  INNER JOIN
-    datalake_pin_core_clean.all_assignments AS aa_next
-      ON aa_next.id_person = aa.id_person
-      AND aa_next.assignment_sequence = aa.assignment_sequence + 1
-  LEFT JOIN
-    datalake_pin_core_clean.periods_of_service AS ps_prev
-      ON ps_prev.id_period_of_service = aa.id_period_of_service
-  WHERE
-    aa.assignment_status_type = 'INACTIVE'
-    AND aa.action_code = 'GLB_TRANSFER'
-  QUALIFY
-    ROW_NUMBER() OVER(
-      PARTITION BY aa.id_period_of_service
-      ORDER BY aa.dt_effective_started ASC
-      ) = 1
+    SELECT
+        id_period_of_service_next,
+        previous_dt_started,
+        is_transfered
+    FROM (
+        SELECT
+            aa_next.id_period_of_service AS id_period_of_service_next,
+            ps_prev.dt_started AS previous_dt_started,
+            (aa.action_code = 'GLB_TRANSFER') AS is_transfered,
+            ROW_NUMBER() OVER (PARTITION BY aa.id_period_of_service ORDER BY aa.dt_effective_started ASC) AS _rn
+        FROM
+            datalake_pin_core_clean.all_assignments AS aa
+        INNER JOIN
+            datalake_pin_core_clean.all_assignments AS aa_next
+                ON aa_next.id_person = aa.id_person
+                AND aa_next.assignment_sequence = aa.assignment_sequence + 1
+        LEFT JOIN
+            datalake_pin_core_clean.periods_of_service AS ps_prev
+                ON ps_prev.id_period_of_service = aa.id_period_of_service
+        WHERE
+            aa.assignment_status_type = 'INACTIVE'
+            AND aa.action_code = 'GLB_TRANSFER'
+    )
+    WHERE _rn = 1
 )
 
 SELECT

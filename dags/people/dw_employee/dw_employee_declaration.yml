@@ -5,24 +5,6 @@ dag:
   schedule_start_date: 2024, 4, 1
   documentation:
     dag_purpose: DataWarehouse with information about QuintoAndar Group employees.
-cluster:
-  type: custom_cluster
-  access_control_list:
-    group_name: people-analytics
-    permission_level: CAN_MANAGE
-  databricks_conn_id: databricks_new_env
-  custom_configurations:
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    driver_node_type_id: r5a.2xlarge
-    node_type_id: r5a.xlarge
-    num_workers: 3
-    spark_version: 16.4.x-scala2.12
-    aws_attributes:
-      ebs_volume_size: 200
-      instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
 workflow:
   type: query_delta
   layer: dw
