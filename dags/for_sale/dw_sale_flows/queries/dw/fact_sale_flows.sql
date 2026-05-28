@@ -43,7 +43,7 @@ events_taxonomy AS (
     */
 -- UTM's from booking events
   SELECT
-    CONCAT(b.id_visitor, '_', b.id_house) AS id_sale_flow,
+    CONCAT(v.id_visitor, '_', v.id_house) AS id_sale_flow,
     CASE
       WHEN acc.visit_code IS NOT NULL THEN acc.final_attribution_source
       ELSE av.utm_source
@@ -75,14 +75,10 @@ events_taxonomy AS (
     datalake_tracked_events.attribution_cross_channel AS acc
       ON av.id_visit = acc.visit_code
   JOIN
-    datalake_ebdb_clean.visit AS v
+    datalake_visit.visits AS v
       ON v.code = av.id_visit
-  JOIN
-    datalake_booking.booking AS b
-      ON b.id_visit = v.id
   WHERE
-    b.visit_intent = 'SALE'
-    AND b.type = 'Visita'
+    v.business_context = 'SALE'
   UNION
 -- UTM's from offer events
   SELECT

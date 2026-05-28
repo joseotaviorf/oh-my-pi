@@ -1,38 +1,5 @@
 -- RELATION BOOKING OFFER
  WITH
-    first_booking_author AS (
-        WITH old_source AS (
-            SELECT DISTINCT
-                bsc.id_booking,
-                FIRST_VALUE(id_user) OVER (PARTITION BY bsc.id_booking ORDER BY id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS id_user_creation
-            FROM
-                datalake_ebdb_clean.booking_status_change AS bsc
-            WHERE
-                ts_created::date < '2025-01-01'
-        ),
-        new_source AS (
-            SELECT
-                id_schedule as id_booking,
-                MIN_BY(id_author_user, id_visit_status_log) as id_user_creation
-            FROM
-                datalake_ebdb_clean.visit_status_log
-            WHERE
-                ts_created::date >= '2025-01-01'
-                AND event_type IN ('VISIT_REQUESTED', 'VISIT_RESCHEDULED')
-            GROUP BY 1
-        )
-        SELECT
-            id_booking,
-            id_user_creation
-        FROM
-            old_source
-        UNION ALL
-        SELECT
-            id_booking,
-            id_user_creation
-        FROM
-            new_source
-    ),
     agent_contract_aud AS (
         SELECT
             adaud.id AS id_agent,
@@ -60,30 +27,12 @@
             previous_id_work_contract <> id_work_contract
             OR previous_id_work_contract IS NULL
     ),
-    visit_fup_vsl AS ( -- This is to handle the case where the visit_fup is not in the booking table (missing data from visit finalization rollout) so the visit finalization is enriched temporarily from visit_status_log table.
-        SELECT
-            id_visit,
-            id_schedule,
-            CASE
-                WHEN event_type = 'VISIT_DONE' THEN 'VaiNegociar'
-                WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('DEMAND_DID_NOT_ATTEND_VISIT', 'AGENT_DID_NOT_ATTEND_VISIT', 'SUPPLY_DID_NOT_ATTEND_VISIT') THEN 'NaoCompareceu'
-                WHEN event_type = 'VISIT_UNSUCCESSFUL' AND reason IN ('ACCESS_TO_HOUSE_NOT_AUTHORIZED', 'HOUSE_KEYS_NOT_AVAILABLE', 'HOUSE_NO_LONGER_AVAILABLE_FOR_RENT', 'TENANT_LIVING_DID_NOT_ALLOW_VISIT', 'HOUSE_NO_LONGER_AVAILABLE_FOR_SALE') THEN 'EntradaNaoAutorizada'
-            END AS visit_fup,
-            ts_created AS ts_visit_fup
-        FROM
-            datalake_ebdb_clean.visit_status_log
-        WHERE
-            ts_created::DATE >= '2025-01-01'
-            AND event_type IN ('VISIT_DONE', 'VISIT_UNSUCCESSFUL')
-        QUALIFY
-            ROW_NUMBER() OVER(PARTITION BY id_visit ORDER BY id_visit_status_log DESC) = 1
-    ),
     base_booking AS (
       SELECT
-        b.id,
-        b.id_house,
-        b.id_visitor,
-        b.id_agent,
+        vs.id_schedule AS id,
+        vs.id_house,
+        vs.id_visitor,
+        vs.id_agent,
         su.id_user_5a AS id_user_sale_attendence_5a,
         vbm.sk_broker_supply,
         vbm.sk_broker_demand,
@@ -91,43 +40,24 @@
         vbm.id_company_demand,
         vbm.partner_3p_supply,
         vbm.partner_3p_demand,
-        COALESCE(b.visit_fup, fup_vsl.visit_fup) AS visit_fup,
+        vs.is_completed,
         vbm.is_3p_supply,
         vbm.is_3p_demand,
         vbm.is_3p_lead_gen,
         vbm.has_3p_access_control,
-        (b.status = 'Cancelado') AS is_canceled,
-        CAST(b.dt_booking AS TIMESTAMP)
-          + FLOOR((b.slot_day * 15 / 60)+8) * INTERVAL 1 HOURS
-          + ABS(b.slot_day * 15 % 60) * INTERVAL 1 MINUTES
-        AS ts_booking_local_tz,
-        TO_UTC_TIMESTAMP(CAST(b.dt_booking AS TIMESTAMP)
-          + FLOOR((b.slot_day * 15 / 60)+8) * INTERVAL 1 HOURS
-          + ABS(b.slot_day * 15 % 60) * INTERVAL 1 MINUTES, ct.default_timezone) AS ts_booking_utc,
-        b.ts_created
+        (vs.is_canceled OR vs.id_succeed_schedule IS NOT NULL) AS is_canceled,
+        vs.ts_schedule_visit AS ts_booking_utc,
+        vs.ts_schedule_created AS ts_created
       FROM
-        datalake_ebdb_clean.booking AS b
-      LEFT JOIN
-        visit_fup_vsl AS fup_vsl
-              ON b.id = fup_vsl.id_schedule
-      LEFT JOIN
-          first_booking_author AS fba
-              ON fba.id_booking = b.id
+        datalake_visit.visit_schedules AS vs
       LEFT JOIN
           datalake_hub_services.secretariat_hierarchy AS su
-              ON su.id_user_5a = fba.id_user_creation
+              ON su.id_user_5a = vs.id_user_creation
       LEFT JOIN
           datalake_visit.visit_business_model AS vbm
-              ON b.id_visit = vbm.id_visit
-      LEFT JOIN
-        datalake_ebdb_listing.house AS hl
-            ON b.id_house = hl.id
-      LEFT JOIN
-          datalake_ebdb_clean.country AS ct
-              ON ct.code = hl.country_code
+              ON vs.id_visit = vbm.id_visit
       WHERE
-          b.business_context = 'SALE'
-          AND b.type = 'Visita'
+          vs.business_context = 'SALE'
     ),
   visit_before_offer AS (
     WITH vc_aux AS (
@@ -172,7 +102,7 @@
                 ON bs.id_agent = du.id_agent
         WHERE
             bs.ts_booking_utc < COALESCE(vo.ts_offer_created, g.ts_created)
-            AND bs.visit_fup ='VaiNegociar'
+            AND bs.is_completed
     )
     SELECT
         vc.*

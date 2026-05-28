@@ -44,7 +44,7 @@ columns:
     description: Identification key of the region where the house in question is located.
   id_agent:
     lineage:
-      - datalake_ebdb_clean.booking.id_agent
+      - datalake_visit.visit_schedules.id_agent
     description: Broker identification key linked to the offer.
   id_team_lead:
     lineage:
@@ -94,7 +94,7 @@ columns:
     description: Id of the last secretariat user associated with the buyer
   id_booking:
     lineage:
-      - datalake_ebdb_clean.booking.id
+      - datalake_visit.visit_schedules.id_schedule
     description: Booking identification key linked to an offer.
   id_closing_specialist:
     lineage:
@@ -116,15 +116,15 @@ columns:
     description: Identification key of the business unit where the buyer was served.
   sk_broker_supply:
     lineage:
-      - datalake_booking.booking.sk_broker_supply
+      - datalake_visit.visit_business_model.sk_broker_supply
     description: Surrogate key of the supply-side broker (core_brokers) when the business model implies 3P supply. Propagated from booking, sourced from visit_business_model.
   sk_broker_demand:
     lineage:
-      - datalake_booking.booking.sk_broker_demand
+      - datalake_visit.visit_business_model.sk_broker_demand
     description: Surrogate key of the demand-side broker (core_brokers) when the business model implies 3P demand or lead gen. Propagated from booking, sourced from visit_business_model.
   id_company_supply:
     lineage:
-      - datalake_booking.booking.id_company_supply
+      - datalake_visit.visit_business_model.id_company_supply
     description: ID of the supply partner from the company domain. Obtained from booking table which gets it from visit_business_model.
   uuid_company_supply:
     lineage:
@@ -132,13 +132,13 @@ columns:
     description: UUID of the supply partner in the company domain
   sk_company_supply:
     lineage:
-      - datalake_booking.booking.id_company_supply
+      - datalake_visit.visit_business_model.id_company_supply
     description:
       Surrogate Key of the company in Rede QuintoAndar associated with
       the house. Can be joined with dw_rede.dim_company. Obtained from booking table which gets it from visit_business_model.
   sk_company_demand:
     lineage:
-      - datalake_booking.booking.id_company_demand
+      - datalake_visit.visit_business_model.id_company_demand
     description:
       Surrogate Key of the company in Rede QuintoAndar associated with
       the agent. Can be joined with dw_rede.dim_company. Obtained from booking table which gets it from visit_business_model.
@@ -312,27 +312,27 @@ columns:
     description: Reason why a diligence appointment was scheduled.
   partner_3p_supply:
     lineage:
-      - datalake_booking.booking.partner_3p_supply
+      - datalake_visit.visit_business_model.partner_3p_supply
     description: Name of the Rede partner that supplied the property. Obtained from booking table which gets it from visit_business_model.
   partner_3p_demand:
     lineage:
-      - datalake_booking.booking.partner_3p_demand
+      - datalake_visit.visit_business_model.partner_3p_demand
     description: Name of the Rede partner that demanded the property. Obtained from booking table which gets it from visit_business_model.
   is_3p_supply:
     lineage:
-      - datalake_booking.booking.is_3p_supply
+      - datalake_visit.visit_business_model.is_3p_supply
     description: Boolean flag indicating if the offer has 3P supply partner. Obtained from booking table which gets it from visit_business_model.
   is_3p_demand:
     lineage:
-      - datalake_booking.booking.is_3p_demand
+      - datalake_visit.visit_business_model.is_3p_demand
     description: Boolean flag indicating if the offer has 3P demand partner. Obtained from booking table which gets it from visit_business_model.
   is_3p_lead_gen:
     lineage:
-      - datalake_booking.booking.is_3p_lead_gen
+      - datalake_visit.visit_business_model.is_3p_lead_gen
     description: Boolean flag indicating if the offer has 3P lead generation partner. Obtained from booking table which gets it from visit_business_model.
   has_3p_access_control:
     lineage:
-      - datalake_booking.booking.has_3p_access_control
+      - datalake_visit.visit_business_model.has_3p_access_control
     description: Boolean flag indicating if the offer has any 3P access control (supply, demand, or lead gen). Obtained from booking table which gets it from visit_business_model.
   current_payment_method:
     lineage:
@@ -423,15 +423,13 @@ columns:
     lineage:
       - datalake_firestore.sale_offer.ts_created
       - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
-      - datalake_ebdb_clean.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
     description: Hours difference between booking event and offer created
   hours_visit_to_offer:
     lineage:
       - datalake_firestore.sale_offer.ts_created
       - datalake_sale_offer_flows.sale_offer_flows.ts_offer_created
-      - datalake_ebdb_clean.booking.dt_booking
-      - datalake_ebdb_clean.booking.slot_day
-      - datalake_ebdb_clean.country.default_timezone
+      - datalake_visit.visit_schedules.ts_schedule_visit
     description: Hours difference between visit event and offer created
   has_credit_pre_analysis:
     description:
@@ -616,7 +614,7 @@ columns:
     description: Date when the Closing Analyst sent a message to the Buyer.
   ts_booking_created:
     lineage:
-      - datalake_ebdb_clean.booking.ts_created
+      - datalake_visit.visit_schedules.ts_schedule_created
     description: Timestamp when the booking or visit that preceded this offer was created.
   ts_updated:
     lineage:
