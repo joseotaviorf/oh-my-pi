@@ -213,11 +213,14 @@ renewal_mob_0 AS (
         agg_data
 ),
 contact AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   SELECT 
     p.sk_propose,
     per.name,
     per.phone,
-    per.email
+    per.email,
+        ROW_NUMBER() OVER (PARTITION BY p.sk_propose ORDER BY per.sk_person) AS _rn
   FROM 
     dw_velo.fact_velo_propose p 
   LEFT JOIN 
@@ -227,9 +230,9 @@ contact AS (
       dw_velo.dim_velo_propose_person per 
         ON per.sk_person = bp.sk_person 
   WHERE 
-    bp.is_primary_person = true 
-  QUALIFY 
-    ROW_NUMBER() OVER (PARTITION BY p.sk_propose ORDER BY per.sk_person) = 1
+    bp.is_primary_person = true
+    )
+    WHERE _rn = 1
 ),
 payment_cleaned AS (
   SELECT
@@ -301,6 +304,8 @@ link_report_view AS (
   GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
 ),
 clean_link_payment_table AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   SELECT 
     id_link_checkout, 
     CASE 
@@ -309,11 +314,12 @@ clean_link_payment_table AS (
     END AS LINK_STATUS,
     dt_created_payment, 
     gateway_payment, 
-    billing_type 
+    billing_type ,
+        ROW_NUMBER() OVER (PARTITION BY id_link_checkout ORDER BY dt_created_checkout DESC) AS _rn
   FROM 
-    link_report_view 
-  QUALIFY
-    ROW_NUMBER() OVER(PARTITION BY id_link_checkout ORDER BY dt_created_checkout DESC) = 1
+    link_report_view
+    )
+    WHERE _rn = 1
 ),
 base_renewal AS (
   SELECT DISTINCT 
@@ -417,12 +423,15 @@ base_renewal AS (
     AND p.dt_contract_started IS NOT NULL 
 ),
 renewal AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   SELECT 
     m.*, 
     f.link_status AS renewal_link_status, 
     f.dt_created_payment AS dt_paid_link_renewal,
     ff.link_status AS partial_link_status, 
-    ff.dt_created_payment AS dt_paid_link_partial
+    ff.dt_created_payment AS dt_paid_link_partial,
+        ROW_NUMBER() OVER (PARTITION BY sk_propose, year_of_renewal, cycle ORDER BY id_link_renewal DESC, id_partial_link DESC, dt_due_link_checkout_propose DESC) AS _rn
   FROM 
     base_renewal m
   LEFT JOIN 
@@ -431,8 +440,8 @@ renewal AS (
   LEFT JOIN 
     clean_link_payment_table ff 
       ON m.id_partial_link = ff.id_link_checkout
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY sk_propose, year_of_renewal, cycle ORDER BY id_link_renewal DESC, id_partial_link DESC, dt_due_link_checkout_propose DESC) = 1
+    )
+    WHERE _rn = 1
 )
 SELECT 
   COALESCE(m.sk_propose, F.sk_propose_append) AS sk_propose_official,

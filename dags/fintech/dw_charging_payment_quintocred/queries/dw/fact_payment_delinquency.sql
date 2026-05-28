@@ -16,7 +16,7 @@ base AS (
     dt_paid,
     dt_created,
     dt_due
-  FROM 
+  FROM
     dw_charging_payment_quintocred.fact_direct_billing
 
   UNION ALL
@@ -42,14 +42,32 @@ base AS (
 ),
 base_payment as (
   SELECT
-    *
-  FROM 
-    base
-  QUALIFY
-    ROW_NUMBER() OVER( 
-      PARTITION BY id_propose, date_trunc( 'MONTH', dt_due ) 
-      ORDER BY order_status ASC, origin_table ASC 
-    ) = 1
+    id_propose,
+    id,
+    id_bill,
+    origin_table,
+    status,
+    order_status,
+    gateway,
+    billing_type,
+    category,
+    value,
+    value_paid,
+    is_overdue,
+    dt_paid,
+    dt_created,
+    dt_due
+  FROM (
+    SELECT
+      *,
+      ROW_NUMBER() OVER(
+        PARTITION BY id_propose, date_trunc( 'MONTH', dt_due )
+        ORDER BY order_status ASC, origin_table ASC
+      ) AS _rn
+    FROM
+      base
+  ) ranked
+  WHERE _rn = 1
 )
 SELECT 
   p.id_propose AS sk_propose_payment,

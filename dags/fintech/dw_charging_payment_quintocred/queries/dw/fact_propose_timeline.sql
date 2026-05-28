@@ -1,12 +1,15 @@
 WITH
 base_omie AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   SELECT 
     fvte.*,
     CASE 
       WHEN sk_category = '1.01.01' 
         THEN 'monthly'
       ELSE 'annual'
-    END AS subscription_type
+    END AS subscription_type,
+        ROW_NUMBER() OVER (PARTITION BY sk_propose ORDER BY dt_due DESC) AS _rn
   FROM 
     dw_velo.fact_velo_transaction_entries AS fvte
   LEFT JOIN 
@@ -16,11 +19,8 @@ base_omie AS (
     sk_category IN ( '1.01.02', '1.01.01' )
     AND extract( YEAR FROM dt_due ) = 2024
     AND is_occurency = FALSE
-  QUALIFY
-    ROW_NUMBER() OVER ( 
-      PARTITION BY sk_propose 
-      ORDER BY dt_due DESC 
-    ) = 1
+    )
+    WHERE _rn = 1
 ),
 mensalidade_omie AS (
   SELECT DISTINCT
