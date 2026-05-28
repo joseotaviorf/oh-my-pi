@@ -33,5 +33,3 @@ workflow:
       - dag_run
     task_instance:
       - dag_run
-cluster:
-  type: emr_7_12_med_general_2_workers_cluster

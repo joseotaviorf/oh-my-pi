@@ -1,0 +1,2 @@
+cluster:
+  type: emr_7_12_min_general_3_workers_cluster

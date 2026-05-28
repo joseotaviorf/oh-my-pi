@@ -1,0 +1,10 @@
+cluster:
+  # Graviton general-purpose consolidation preset (16.4); +1 worker vs legacy m5a.xlarge×3
+  type: consolidation_s_general_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    num_workers: 4
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

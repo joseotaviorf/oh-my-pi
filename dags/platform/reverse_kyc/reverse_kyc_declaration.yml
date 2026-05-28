@@ -22,5 +22,3 @@ workflow:
     sellers: {}
     tenants: {}
     thirdparty_payment: {}
-cluster:
-  type: databricks_13_3_med_general_cluster
