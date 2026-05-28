@@ -88,6 +88,8 @@ SELECT
   NULLIF(TRIM(GET_JSON_OBJECT(l.brokers, '$.constructionYear')), '') AS construction_year,
   NULLIF(TRIM(GET_JSON_OBJECT(l.brokers, '$.block')), '') AS block,
   NULLIF(TRIM(GET_JSON_OBJECT(l.brokers, '$.tower')), '') AS tower,
+  -- details
+  NULLIF(TRIM(GET_JSON_OBJECT(l.details, '$.description')), '') AS house_description,
   -- raw JSON columns
   l.details,
   l.photos,

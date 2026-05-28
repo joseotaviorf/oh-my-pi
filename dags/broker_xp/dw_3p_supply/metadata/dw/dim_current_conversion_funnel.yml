@@ -31,6 +31,16 @@ columns:
       - datalake_3p_supply.lead_3p_status_changes.status
       - datalake_3p_supply.listing_draft_status.ts_first_listing
     description: Current funnel stage (FIRST_LISTING, AVAILABILITY_CHECK_START, AVAILABILITY_CHECK_END, PROCESSING_PHOTOS, OPPORTUNITY, or *_BSP).
+  growth_status:
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.growth_status
+    description: Growth funnel status of the lead at the current status_changes row (LEAD, PROSPECT, QUALIFIED, OPPORTUNITY, FIRST_LISTING).
+    categories:
+      LEAD: Lead has not yet reached WAITING in this business context.
+      PROSPECT: Lead has reached WAITING in this business context.
+      QUALIFIED: Lead has reached NOT_CONVERTED with owner info available in this business context.
+      OPPORTUNITY: Lead has reached PROCESSING in this business context.
+      FIRST_LISTING: Lead has reached REGISTERED or UNPUBLISHED (was published to main) in this business context.
   reason_macro:
     lineage:
       - datalake_3p_supply.lead_3p_status_changes.reason_macro

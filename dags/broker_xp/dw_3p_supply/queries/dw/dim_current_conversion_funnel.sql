@@ -10,6 +10,7 @@ WITH max_ts_value AS (
     lds.current_main_status,
     lds.current_main_status_reason,
     lsc.is_opportunity,
+    lsc.growth_status,
     lsc.reason_macro,
     lds.ts_availability_check_start,
     lds.ts_availability_check_end,
@@ -53,6 +54,7 @@ SELECT
     WHEN current_bsp_status IN ('NOT_CONVERTED', 'UNPUBLISHED', 'REGISTERED', 'SUSPENDED', 'DISCARDED') THEN CONCAT(current_bsp_status, '_BSP')
     ELSE 'OTHER'
   END AS current_conversion_funnel,
+  growth_status,
   reason_macro,
   current_bsp_status,
   current_bsp_status_reason,

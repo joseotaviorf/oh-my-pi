@@ -10,10 +10,17 @@ dag:
       Tables:
       - lead_3p: Flattened lead data with all JSON columns (location, pricing, blueprint,
         owner, access, brokers, details, owner_agent) exploded into individual columns,
-        joined with house and business context detail (SALE/RENT).
+        joined with house and business context detail (SALE/RENT). Includes
+        house_description extracted from the details JSON.
       - lead_3p_status_changes: Status change history per lead and business context,
         with start/end timestamps, parsed status reasons, macro reason classification,
-        is_opportunity flag, and BSP-stage timestamps (ts_first_registered_from_bsp_to_main, etc.).
+        is_opportunity flag, BSP-stage timestamps (ts_first_registered_from_bsp_to_main, etc.),
+        owner-info awareness (has_owner_info), reason-type flags
+        (is_waiting_for_enrichment / is_ineligible / is_discarded), and growth_status
+        funnel classification (LEAD/PROSPECT/QUALIFIED/OPPORTUNITY/FIRST_LISTING).
+      - lead_3p_reason_changes: Reason lifecycle per lead, business context and reason key,
+        with start/end timestamps, reason_type, days_in_reason, and status/growth_status/reason-flags
+        snapshots at both ends. Used to power detailed funnel and on-call diagnostics downstream.
       - listing_draft_status: House-to-listing mapping via EBDB with current main status,
         availability start/end timestamps, first listing events, and portfolio manager publishing.
       - broker_lead_relationship: Maps each lead flow to the most recent active broker
@@ -27,6 +34,8 @@ workflow:
     broker_lead_relationship:
       - lead_3p
       - lead_3p_status_changes
+    lead_3p_reason_changes:
+      - lead_3p_status_changes
   tables_customization:
     lead_3p:
       merge_on: ["id_lead_3p"]
@@ -35,6 +44,10 @@ workflow:
       z_order_by: ["id_lead_3p"]
     lead_3p_status_changes:
       merge_on: ["id_lead_3p", "business_context", "ts_start"]
+      partitions: ["year", "month", "day"]
+      z_order_by: ["id_lead_3p"]
+    lead_3p_reason_changes:
+      merge_on: ["id_lead_3p", "business_context", "reason", "ts_reason_started"]
       partitions: ["year", "month", "day"]
       z_order_by: ["id_lead_3p"]
     listing_draft_status:

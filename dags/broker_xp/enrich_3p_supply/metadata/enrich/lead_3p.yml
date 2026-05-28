@@ -128,6 +128,10 @@ columns:
     description: "Building block identifier, extracted from brokers JSON (string)"
   tower:
     description: "Building tower name, extracted from brokers JSON (string)"
+  house_description:
+    description: "Free-text description of the property provided by the partner, extracted from details JSON ($.description)."
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p.details
   details:
     description: "Raw JSON with property features/amenities list (string)"
     lineage:

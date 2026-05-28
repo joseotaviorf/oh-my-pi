@@ -57,6 +57,25 @@ columns:
     description: "Whether the status has at least one not-eligible pending reason (boolean)"
   is_eligible_pending:
     description: "Whether the status has at least one eligible pending reason (boolean)"
+  is_waiting_for_enrichment:
+    description: "Whether the status_reason array contains any reason of type ENRICHMENT_REASON from datalake_gsheets_clean.supply_processor_status_reasons (boolean)"
+    lineage:
+      - datalake_gsheets_clean.supply_processor_status_reasons.reason_name
+      - datalake_gsheets_clean.supply_processor_status_reasons.reason_type
+  is_ineligible:
+    description: "Whether the status_reason array contains any reason of type INELIGIBLE_REASON from datalake_gsheets_clean.supply_processor_status_reasons (boolean)"
+    lineage:
+      - datalake_gsheets_clean.supply_processor_status_reasons.reason_name
+      - datalake_gsheets_clean.supply_processor_status_reasons.reason_type
+  is_discarded:
+    description: "Whether the status_reason array contains any reason of type DISCARD_REASON from datalake_gsheets_clean.supply_processor_status_reasons (boolean)"
+    lineage:
+      - datalake_gsheets_clean.supply_processor_status_reasons.reason_name
+      - datalake_gsheets_clean.supply_processor_status_reasons.reason_type
+  has_owner_info:
+    description: "Whether the lead has owner contact info (owner.phone is not null) at the time of this status change, derived from lead_3p_aud (boolean)"
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.owner
   is_opportunity:
     description: "Whether the lead is an opportunity: NOT_CONVERTED with eligible pendings and no not-eligible pendings (boolean)"
   is_first_sale_status:
@@ -89,6 +108,18 @@ columns:
     description: "Latest timestamp when status was PROCESSING within this lead and business context"
   ts_suspended_in_bsp:
     description: "Earliest timestamp when status was SUSPENDED within this lead and business context"
+  ts_first_waiting:
+    description: "Earliest timestamp when status was WAITING within this lead and business context (used to mark PROSPECT in growth_status)"
+  ts_first_not_converted_w_owner:
+    description: "Earliest timestamp when status was NOT_CONVERTED AND the lead had owner info (used to mark QUALIFIED in growth_status)"
+  growth_status:
+    description: "Growth funnel status of the lead at this point in time, derived from the temporal sequence of statuses. Possible values: LEAD, PROSPECT (reached WAITING), QUALIFIED (reached NOT_CONVERTED with owner info), OPPORTUNITY (reached PROCESSING), FIRST_LISTING (reached REGISTERED/UNPUBLISHED)."
+    categories:
+      LEAD: Lead has not yet reached WAITING in this business context.
+      PROSPECT: Lead has reached WAITING in this business context.
+      QUALIFIED: Lead has reached NOT_CONVERTED with owner info (phone) available in this business context.
+      OPPORTUNITY: Lead has reached PROCESSING in this business context.
+      FIRST_LISTING: Lead has reached REGISTERED or UNPUBLISHED (was published to main) in this business context.
   ts_load:
     description: "Timestamp when the record was processed by this DAG"
   ts_business_context_created:

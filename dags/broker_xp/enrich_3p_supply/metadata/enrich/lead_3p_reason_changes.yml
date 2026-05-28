@@ -1,0 +1,125 @@
+---
+database_name: datalake_3p_supply
+table_name: lead_3p_reason_changes
+owner: patrick.nasser@quintoandar.com.br
+domain: Broker XP
+description: |
+  Reason change timeline for 3P leads, built from the Hibernate Envers audit trail.
+  Each row represents the lifecycle of a single reason key for a lead within a business context:
+  when it became active (ts_reason_started) and when it stopped being active (ts_reason_ended).
+  Status and growth_status are looked up from lead_3p_status_changes at both timestamps.
+
+  **Sources**:
+  - datalake_brokers_supply_processor_clean.lead_3p_aud (legacy SALE-only reason changes)
+  - datalake_brokers_supply_processor_clean.business_context_detail_aud (reason changes per business context)
+  - datalake_brokers_supply_processor_clean.business_context_detail (id_file lookup)
+  - datalake_gsheets_clean.supply_processor_status_reasons (reason_name → reason_type catalog)
+  - datalake_3p_supply.lead_3p_status_changes (status / growth_status / reason flags at start and end)
+
+  **Key features**:
+  - One row per (lead, business_context, reason) lifecycle, deduplicated by ts_reason_started.
+  - is_requirement_met indicates whether the reason was ever resolved (ts_reason_ended IS NOT NULL).
+  - days_in_reason measures the duration of the reason in days.
+  - Status / growth_status / waiting / ineligible / discarded flags at both start and end provide funnel context.
+
+columns:
+  id_lead_3p:
+    description: "Lead ID (long), references lead_3p.id_lead_3p"
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.id
+      - datalake_brokers_supply_processor_clean.business_context_detail.id_lead
+  id_file:
+    description: "File ID associated with the lead/business_context that owned the reason change"
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.id_file
+      - datalake_brokers_supply_processor_clean.business_context_detail.id_file
+  business_context:
+    description: "Business context (SALE, RENT) — SALE for entries derived from lead_3p_aud, otherwise from business_context_detail"
+    lineage:
+      - datalake_brokers_supply_processor_clean.business_context_detail.business_context
+  reason:
+    description: "Reason key from the status_reason JSON map"
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.status_reason
+      - datalake_brokers_supply_processor_clean.business_context_detail_aud.status_reason
+  reason_type:
+    description: "Reason type (e.g. INELIGIBLE_REASON, DISCARD_REASON, ENRICHMENT_REASON) from supply_processor_status_reasons"
+    lineage:
+      - datalake_gsheets_clean.supply_processor_status_reasons.reason_type
+  status_when_reason_started:
+    description: "Status of the lead when this reason became active"
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.status
+  growth_status_when_reason_started:
+    description: "Growth status (LEAD/PROSPECT/QUALIFIED/OPPORTUNITY/FIRST_LISTING) when this reason became active"
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.growth_status
+  status_when_reason_ended:
+    description: "Status of the lead when this reason stopped being active; falls back to the next discard/ineligible status for enrichment reasons that never ended"
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.status
+  growth_status_when_reason_ended:
+    description: "Growth status when this reason stopped being active; falls back to the next discard/ineligible status for enrichment reasons that never ended"
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.growth_status
+  days_in_reason:
+    description: "Number of whole days between ts_reason_started and ts_reason_ended (computed via DATEDIFF, 2-arg form)"
+  has_3p_access_control:
+    description: "Access control flag for 3P data (boolean, always true)"
+  is_ineligible_reason:
+    description: "Whether reason_type = 'INELIGIBLE_REASON' (boolean)"
+    lineage:
+      - datalake_gsheets_clean.supply_processor_status_reasons.reason_type
+  is_discard_reason:
+    description: "Whether reason_type = 'DISCARD_REASON' (boolean)"
+    lineage:
+      - datalake_gsheets_clean.supply_processor_status_reasons.reason_type
+  is_enrichment_reason:
+    description: "Whether reason_type = 'ENRICHMENT_REASON' (boolean)"
+    lineage:
+      - datalake_gsheets_clean.supply_processor_status_reasons.reason_type
+  is_waiting_for_enrichment_when_reason_started:
+    description: "is_waiting_for_enrichment from lead_3p_status_changes at ts_reason_started"
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.is_waiting_for_enrichment
+  is_ineligible_when_reason_started:
+    description: "is_ineligible from lead_3p_status_changes at ts_reason_started"
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.is_ineligible
+  is_discarded_when_reason_started:
+    description: "is_discarded from lead_3p_status_changes at ts_reason_started"
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.is_discarded
+  is_waiting_for_enrichment_when_reason_ended:
+    description: "is_waiting_for_enrichment from lead_3p_status_changes at ts_reason_ended"
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.is_waiting_for_enrichment
+  is_ineligible_when_reason_ended:
+    description: "is_ineligible from lead_3p_status_changes at ts_reason_ended"
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.is_ineligible
+  is_discarded_when_reason_ended:
+    description: "is_discarded from lead_3p_status_changes at ts_reason_ended"
+    lineage:
+      - datalake_3p_supply.lead_3p_status_changes.is_discarded
+  is_requirement_met:
+    description: "Whether the reason was resolved before the current row (ts_reason_ended IS NOT NULL at the source level, boolean)"
+  ts_reason_started:
+    description: "Timestamp (UTC) when this reason became active"
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.ts_updated
+      - datalake_brokers_supply_processor_clean.business_context_detail_aud.ts_updated
+  ts_reason_ended:
+    description: "Timestamp (UTC) when this reason stopped being active; falls back to the next discard/ineligible status_change for enrichment reasons that never ended"
+    lineage:
+      - datalake_brokers_supply_processor_clean.lead_3p_aud.ts_updated
+      - datalake_brokers_supply_processor_clean.business_context_detail_aud.ts_updated
+      - datalake_3p_supply.lead_3p_status_changes.ts_start
+  ts_load:
+    description: "Timestamp when the record was processed by this DAG"
+  year:
+    description: "Partition column: year derived from ts_reason_started"
+  month:
+    description: "Partition column: month derived from ts_reason_started"
+  day:
+    description: "Partition column: day derived from ts_reason_started"

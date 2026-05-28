@@ -93,6 +93,10 @@ columns:
     lineage:
       - datalake_3p_supply.lead_3p.house_type
     description: Type of property (e.g. APARTAMENTO, CASA) from lead blueprint data.
+  house_description:
+    lineage:
+      - datalake_3p_supply.lead_3p.house_description
+    description: Free-text description of the property provided by the partner.
   owner_person_type:
     lineage:
       - datalake_3p_supply.lead_3p.owner_person_type

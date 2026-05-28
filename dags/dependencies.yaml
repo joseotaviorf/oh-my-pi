@@ -1413,6 +1413,7 @@ bietlejuice.ebdb_house_historical:
 bietlejuice.enrich_3p_supply:
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail-aud:first-run-of-day
   - bietlejuice.brokers_supply_processor:load-clean-business-context-detail:first-run-of-day
+  - bietlejuice.brokers_supply_processor:load-clean-lead-3p-aud:first-run-of-day
   - bietlejuice.brokers_supply_processor:load-clean-lead-3p:first-run-of-day
   - bietlejuice.brokers_supply_processor:load-clean-rev-info:first-run-of-day
   - bietlejuice.core_brokers:load-core-brokers:first-run-of-day

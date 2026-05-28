@@ -21,6 +21,7 @@ SELECT
   l.bathrooms,
   l.garages,
   l.house_type,
+  l.house_description,
   l.owner_person_type,
   l.owner_agent_relationship,
   l.access_type,
