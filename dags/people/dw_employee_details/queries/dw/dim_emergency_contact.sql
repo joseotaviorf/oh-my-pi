@@ -49,56 +49,41 @@ emergency_contacts AS (
         pei.information_type = 'Contatos de Emergência'
 )
 SELECT
-    sk_emergency_contact_version,
-    person_number,
-    contact_name,
-    contact_relationship,
-    phone_country_code,
-    phone_area_code,
-    phone_number,
-    full_phone_number,
-    dt_valid_from,
-    dt_valid_to,
-    is_current,
-    ts_load
-FROM (
-    SELECT
-        MD5(
-            CONCAT_WS(
-                '|',
-                CAST(emp.id_person AS STRING),
-                CAST(ec.contact_priority AS STRING),
-                CAST(ec.dt_effective_started AS STRING)
-            )
-        ) AS sk_emergency_contact_version,
-        emp.person_number,
-        ec.contact_name,
-        ec.contact_relationship,
-        ec.phone_country_code,
-        ec.phone_area_code,
-        ec.phone_number,
-        CONCAT_WS(' ', ec.phone_country_code, ec.phone_area_code, ec.phone_number) AS full_phone_number,
-        ec.dt_effective_started AS dt_valid_from,
-        COALESCE(ec.dt_effective_ended_normalized, DATE '9999-12-31') AS dt_valid_to,
-        (
-            ec.dt_effective_ended_normalized IS NULL
-            OR ec.dt_effective_ended_normalized > CURRENT_DATE()
-        ) AS is_current,
-        CURRENT_TIMESTAMP() AS ts_load,
-        ROW_NUMBER() OVER (
-            PARTITION BY
-                emp.id_person,
-                ec.contact_priority,
-                ec.dt_effective_started
-            ORDER BY
-                emp.dt_assignment_started DESC
-        ) AS _rn
-    FROM
-        employees AS emp
-    INNER JOIN
-        emergency_contacts AS ec
-            ON emp.id_person = ec.id_person
-            AND COALESCE(emp.dt_assignment_ended, DATE '9999-12-31') >= ec.dt_effective_started
-            AND COALESCE(ec.dt_effective_ended_normalized, DATE '9999-12-31') >= emp.dt_assignment_started
-) ranked
-WHERE _rn = 1
+    MD5(
+        CONCAT_WS(
+            '|',
+            CAST(emp.id_person AS STRING),
+            CAST(ec.contact_priority AS STRING),
+            CAST(ec.dt_effective_started AS STRING)
+        )
+    ) AS sk_emergency_contact_version,
+    emp.person_number,
+    ec.contact_name,
+    ec.contact_relationship,
+    ec.phone_country_code,
+    ec.phone_area_code,
+    ec.phone_number,
+    CONCAT_WS(' ', ec.phone_country_code, ec.phone_area_code, ec.phone_number) AS full_phone_number,
+    ec.dt_effective_started AS dt_valid_from,
+    COALESCE(ec.dt_effective_ended_normalized, DATE '9999-12-31') AS dt_valid_to,
+    (
+        ec.dt_effective_ended_normalized IS NULL
+        OR ec.dt_effective_ended_normalized > CURRENT_DATE()
+    ) AS is_current,
+    CURRENT_TIMESTAMP() AS ts_load
+FROM
+    employees AS emp
+INNER JOIN
+    emergency_contacts AS ec
+        ON emp.id_person = ec.id_person
+        AND COALESCE(emp.dt_assignment_ended, DATE '9999-12-31') >= ec.dt_effective_started
+        AND COALESCE(ec.dt_effective_ended_normalized, DATE '9999-12-31') >= emp.dt_assignment_started
+QUALIFY
+    ROW_NUMBER() OVER (
+        PARTITION BY
+            emp.id_person,
+            ec.contact_priority,
+            ec.dt_effective_started
+        ORDER BY
+            emp.dt_assignment_started DESC
+    ) = 1
