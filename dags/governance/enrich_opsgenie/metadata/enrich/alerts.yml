@@ -39,7 +39,7 @@ columns:
     lineage:
       - datalake_opsgenie.jira_alert_actions.closed_by
   status:
-    description: The status of the alert
+    description: Current operational status of the Opsgenie alert (open, closed, etc.).
     lineage:
       - datalake_jira_ops_clean.alerts.status
   is_seen:

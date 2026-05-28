@@ -9,7 +9,7 @@ columns:
   sk_event_type:
     description: Primary key of the dimension table, representing the combination of characteristics of a search session event.
   event_type:
-    description: Type of the event.
+    description: Classification label describing the search session event type.
     categories:
       'Search': The row represents a house associated with a search
       'Listing Page Viewed': The row represents listing page viewed

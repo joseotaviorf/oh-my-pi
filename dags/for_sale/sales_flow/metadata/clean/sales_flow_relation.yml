@@ -46,14 +46,14 @@ columns:
     lineage:
       - datalake_sales_flow_raw.sales_flow_relation.updated_at
   year:
-    description: Year partition value.
+    description: Calendar year used as a partition key for incremental table loads.
     lineage:
       - datalake_sales_flow_raw.sales_flow_relation.year
   month:
-    description: Month partition value.
+    description: Calendar month used as a partition key for incremental table loads.
     lineage:
       - datalake_sales_flow_raw.sales_flow_relation.month
   day:
-    description: Day partition value.
+    description: Calendar day used as a partition key for incremental table loads.
     lineage:
       - datalake_sales_flow_raw.sales_flow_relation.day

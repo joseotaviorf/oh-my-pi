@@ -3,7 +3,7 @@ database_name: dw_3p_supply
 table_name: dim_lead_3p
 description: Dimension of 3P leads with property attributes, location, pricing, blueprint, owner and access info. One row per lead from datalake_3p_supply.lead_3p.
 domain: Broker XP
-owner: patrick.nasser@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_lead_3p:
     lineage:

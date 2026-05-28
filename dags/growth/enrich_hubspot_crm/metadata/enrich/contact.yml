@@ -85,23 +85,23 @@ columns:
   address:
     lineage:
     - datalake_hubspot.contact_history.address
-    description: Address of the contact.
+    description: Street address of the HubSpot contact as stored in the CRM.
   city:
     lineage:
     - datalake_hubspot.contact_history.city
-    description: City of the contact.
+    description: City of residence for the HubSpot contact record.
   state:
     lineage:
     - datalake_hubspot.contact_history.state
-    description: State of the contact.
+    description: State or province of residence for the HubSpot contact record.
   company:
     lineage:
     - datalake_hubspot.contact_history.company
-    description: Company of the contact.
+    description: Name of the company associated with the HubSpot contact.
   email:
     lineage:
     - datalake_hubspot.contact_history.email
-    description: Email of the contact.
+    description: Primary email address of the HubSpot contact record.
   hs_email_domain:
     lineage:
     - datalake_hubspot.contact_history.hs_email_domain
@@ -117,11 +117,11 @@ columns:
   phone:
     lineage:
     - datalake_hubspot.contact_history.phone
-    description: Phone of the contact.
+    description: Primary phone number of the HubSpot contact record.
   website:
     lineage:
     - datalake_hubspot.contact_history.website
-    description: Website of the contact.
+    description: Website URL associated with the HubSpot contact record.
   first_name:
     lineage:
     - datalake_hubspot.contact_history.first_name

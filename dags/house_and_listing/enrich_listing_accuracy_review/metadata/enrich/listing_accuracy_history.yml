@@ -8,7 +8,7 @@ domain: House and Listing
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_house:
-    description: Id of the house.
+    description: Unique identifier of the property (house) in the EBDB system.
     lineage:
       - datalake_booking.booking.id_house
   is_listing_accurate:
@@ -21,5 +21,5 @@ columns:
       Used by data governance tools and access control systems to apply 3P-specific security policies.
   dt_change:
     description: The day a review happened. If there is more than one review on the same day, if there is a false one, the information is not accurate.
-  dt_next_change:
-    description: Date of the next change (if any).
+  ts_next_change:
+    description: Timestamp of the next accuracy status change for this house, if any.

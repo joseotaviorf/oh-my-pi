@@ -20,7 +20,7 @@ columns:
   id_pipeline:
     lineage:
       - datalake_hubspot.pipeline_history.id_pipeline
-    description: ID of the pipeline.
+    description: Unique identifier of the HubSpot sales pipeline in the CRM.
   label:
     lineage:
       - datalake_hubspot.pipeline_history.label
@@ -48,12 +48,12 @@ columns:
   year:
     lineage:
       - datalake_hubspot.pipeline_history.year
-    description: Year of the update.
+    description: Calendar year used as a partition key for incremental table loads.
   month:
     lineage:
       - datalake_hubspot.pipeline_history.month
-    description: Month of the update.
+    description: Calendar month used as a partition key for incremental table loads.
   day:
     lineage:
       - datalake_hubspot.pipeline_history.day
-    description: Day of the update.
+    description: Calendar day used as a partition key for incremental table loads.

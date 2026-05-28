@@ -26,7 +26,7 @@ columns:
     lineage:
       - datalake_jira.issues.incident_owner
   layer:
-    description: Data layer of the DAG
+    description: Data lake processing layer (raw, clean, enrich, dw) of the affected DAG.
     lineage:
       - datalake_pipeline.dag.layer
   current_status:

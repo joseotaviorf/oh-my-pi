@@ -28,13 +28,13 @@ columns:
       - datalake_ebdb_clean.house_aud.rev
       - datalake_ebdb_clean.info_amenities_aud.rev
       - datalake_ebdb_clean.info_condo_amenities_aud.rev
-    description: Revision number.
+    description: Sequential revision number from the Hibernate Envers audit trail.
   rev_type:
     lineage:
       - datalake_ebdb_clean.house_aud.rev_type
       - datalake_ebdb_clean.info_amenities_aud.rev_type
       - datalake_ebdb_clean.info_condo_amenities_aud.rev_type
-    description: Type of revision.
+    description: Envers revision type code indicating insert, update, or delete.
     categories:
       '0': Insert
       '1': Update

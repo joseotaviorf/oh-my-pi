@@ -3,7 +3,7 @@ database_name: dw_3p_supply
 table_name: dim_current_conversion_funnel
 description: Dimension of current conversion funnel stage per 3P lead and business context. One row per lead flow with funnel stage, BSP/main status, and last change timestamp.
 domain: Broker XP
-owner: patrick.nasser@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_lead_3p_flow:
     lineage:

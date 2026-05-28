@@ -6,7 +6,7 @@ domain: House and Listing
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_house:
-    description: Id of the house
+    description: Unique identifier of the property (house) in the EBDB system.
     lineage:
       - datalake_ebdb_amenities.amenity_change_history
   has_bathtub:
@@ -334,7 +334,7 @@ columns:
   is_current_version:
     description: "Whether this row represents the current version of the house."
   version:
-    description: "Version of the house."
+    description: Version number of the house amenities snapshot at this point in time.
   ts_version_started:
     lineage:
       - datalake_ebdb_amenities.amenity_change_history.ts_change

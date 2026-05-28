@@ -20,7 +20,7 @@ columns:
   id_company:
     lineage:
       - datalake_hubspot.company.id_company
-    description: ID of the company.
+    description: Unique identifier of the HubSpot company record in the CRM.
   id_hubspot_owner:
     lineage:
       - datalake_hubspot.company.id_hubspot_owner
@@ -40,7 +40,7 @@ columns:
   company_name:
     lineage:
       - datalake_hubspot.company.name
-    description: Name of the company.
+    description: Display name of the HubSpot company as registered in the CRM.
   company_cluster_performance:
     lineage:
       - datalake_hubspot.company.cluster_performance
@@ -84,12 +84,12 @@ columns:
   year:
     lineage:
       - datalake_hubspot.company.year
-    description: Year of the update.
+    description: Calendar year used as a partition key for incremental table loads.
   month:
     lineage:
       - datalake_hubspot.company.month
-    description: Month of the update.
+    description: Calendar month used as a partition key for incremental table loads.
   day:
     lineage:
       - datalake_hubspot.company.day
-    description: Day of the update.
+    description: Calendar day used as a partition key for incremental table loads.

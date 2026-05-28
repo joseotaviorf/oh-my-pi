@@ -3,7 +3,7 @@ database_name: dw_3p_supply
 table_name: fact_lead_3p_flows
 description: Fact table for 3P Supply lead flows. One row per lead and business context (SALE/RENT) with surrogate keys, flags, and BSP/main timestamps for funnel analysis.
 domain: Broker XP
-owner: patrick.nasser@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_lead_3p_flow:
     lineage:

@@ -473,4 +473,4 @@ columns:
   day:
     lineage:
       - datalake_hubspot_clean.deal.day
-    description: Day of the last update.
+    description: Calendar day of the most recent record update, used as partition key.

@@ -1,7 +1,7 @@
 ---
 database_name: datalake_3p_supply
 table_name: lead_3p
-owner: patrick.nasser@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 domain: Broker XP
 description: |
   Flattened 3P lead data with all JSON columns from the Brokers Supply Processor

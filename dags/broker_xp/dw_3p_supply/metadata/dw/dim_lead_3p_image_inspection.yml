@@ -8,7 +8,7 @@ description: |
   id_lead_3p is kept (QUALIFY). Used for photo quality and compliance analytics
   in the 3P Supply DW.
 domain: Broker XP
-owner: patrick.nasser@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 columns:
   sk_image_inspection:
     lineage:
@@ -83,7 +83,7 @@ columns:
   height:
     lineage:
       - datalake_kodak_clean.image_inspection.height
-    description: Image height in pixels.
+    description: Height of the inspected listing image measured in pixels.
   images_per_room:
     lineage:
       - datalake_kodak_clean.image_inspection_group.images_per_room
@@ -119,7 +119,7 @@ columns:
   width:
     lineage:
       - datalake_kodak_clean.image_inspection.width
-    description: Image width in pixels.
+    description: Width of the inspected listing image measured in pixels.
   image_inspection_version:
     lineage:
       - datalake_3p_supply.lead_3p.id_lead_3p

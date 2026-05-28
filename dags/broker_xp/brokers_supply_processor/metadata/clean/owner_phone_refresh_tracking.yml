@@ -1,7 +1,7 @@
 ---
 database_name: datalake_brokers_supply_processor_clean
 table_name: owner_phone_refresh_tracking
-owner: leonardo.dalmeida@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 domain: Broker XP
 description: >
   Tracks asynchronous refresh attempts of owner phone data for third-party (3P) property leads in the

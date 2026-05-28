@@ -19,7 +19,7 @@ columns:
   id_company:
     lineage:
       - datalake_hubspot.company_history.id_company
-    description: ID of the company.
+    description: Unique identifier of the HubSpot company record in the CRM.
   uuid_company:
     lineage:
       - datalake_company_clean.company.uuid_company
@@ -52,7 +52,7 @@ columns:
   address:
     lineage:
       - datalake_hubspot.company_history.address
-    description: Address of the company.
+    description: Street address of the HubSpot company as stored in the CRM.
   zip_code:
     lineage:
       - datalake_hubspot.company_history.zip_code
@@ -145,7 +145,7 @@ columns:
   name:
     lineage:
       - datalake_hubspot.company_history.name
-    description: Name of the company.
+    description: Display name of the HubSpot company as registered in the CRM.
   tag_real_estate_agency:
     lineage:
       - datalake_hubspot.company_history.tag_real_estate_agency
@@ -208,7 +208,7 @@ columns:
   lead_origin:
     lineage:
       - datalake_hubspot.company_history.lead_origin
-    description: Origin of the lead.
+    description: Channel or source from which the company lead was originally acquired.
   phone:
     lineage:
       - datalake_hubspot.company_history.phone
@@ -375,7 +375,7 @@ columns:
   num_managers:
     lineage:
       - datalake_hubspot.company_history.num_managers
-    description: Number of managers.
+    description: Count of property managers associated with the company in HubSpot.
   num_managed_properties:
     lineage:
       - datalake_hubspot.company_history.num_managed_properties
@@ -513,12 +513,12 @@ columns:
   year:
     lineage:
       - datalake_hubspot.company_history.year
-    description: Year of the update.
+    description: Calendar year used as a partition key for incremental table loads.
   month:
     lineage:
       - datalake_hubspot.company_history.month
-    description: Month of the update.
+    description: Calendar month used as a partition key for incremental table loads.
   day:
     lineage:
       - datalake_hubspot.company_history.day
-    description: Day of the update.
+    description: Calendar day used as a partition key for incremental table loads.

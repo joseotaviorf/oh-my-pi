@@ -19,7 +19,7 @@ columns:
   id_owner:
     lineage:
       - datalake_hubspot_clean.owner.id_owner
-    description: ID of the owner.
+    description: Unique identifier of the HubSpot owner (sales rep) in the CRM.
   id_user:
     lineage:
       - datalake_hubspot_clean.owner.id_user
@@ -27,7 +27,7 @@ columns:
   email:
     lineage:
       - datalake_hubspot_clean.owner.email
-    description: Email of the owner.
+    description: Email address of the HubSpot owner (sales representative).
   first_name:
     lineage:
       - datalake_hubspot_clean.owner.first_name
@@ -35,7 +35,7 @@ columns:
   last_name:
     lineage:
       - datalake_hubspot_clean.owner.last_name
-    description: Last name of the owner.
+    description: Last name of the HubSpot owner (sales representative).
   teams:
     lineage:
       - datalake_hubspot_clean.owner.teams
@@ -55,12 +55,12 @@ columns:
   year:
     lineage:
       - datalake_hubspot_clean.owner.year
-    description: Year of the update.
+    description: Calendar year used as a partition key for incremental table loads.
   month:
     lineage:
       - datalake_hubspot_clean.owner.month
-    description: Month of the update.
+    description: Calendar month used as a partition key for incremental table loads.
   day:
     lineage:
       - datalake_hubspot_clean.owner.day
-    description: Day of the update.
+    description: Calendar day used as a partition key for incremental table loads.

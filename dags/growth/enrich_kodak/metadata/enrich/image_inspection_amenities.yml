@@ -6,12 +6,12 @@ domain: Growth
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_house:
-    description: Id of the house.
+    description: Unique identifier of the property (house) in the EBDB system.
     lineage:
       - datalake_kodak_clean.image_inspection_group.id_external_domain
       - datalake_ebdb_clean.house.id
   id_lead_3p:
-    description: Id of the lead 3P.
+    description: Unique identifier of the third-party supply lead in the brokers pipeline.
     lineage:
       - datalake_3p_supply.lead_3p.id_lead_3p
   has_pool:

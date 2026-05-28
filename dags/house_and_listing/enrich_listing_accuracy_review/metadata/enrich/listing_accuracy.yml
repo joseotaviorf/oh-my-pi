@@ -6,7 +6,7 @@ domain: House and Listing
 owner: vitor.musachio@quintoandar.com.br
 columns:
   id_house:
-    description: Id of the house.
+    description: Unique identifier of the property (house) in the EBDB system.
     lineage:
       - datalake_listing_accuracy_review.listing_accuracy_history.id_house
   is_listing_accurate:

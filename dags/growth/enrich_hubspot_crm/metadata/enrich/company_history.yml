@@ -44,7 +44,7 @@ columns:
   address:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: Address of the company.
+    description: Street address of the HubSpot company as stored in the CRM.
   zip_code:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -135,7 +135,7 @@ columns:
   name:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: Name of the company.
+    description: Display name of the HubSpot company as registered in the CRM.
   tag_real_estate_agency:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -198,7 +198,7 @@ columns:
   lead_origin:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: Origin of the lead.
+    description: Channel or source from which the company lead was originally acquired.
   phone:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -364,7 +364,7 @@ columns:
   num_managers:
     lineage:
       - datalake_hubspot_clean.company.properties
-    description: Number of managers.
+    description: Count of property managers associated with the company in HubSpot.
   num_managed_properties:
     lineage:
       - datalake_hubspot_clean.company.properties
@@ -495,12 +495,12 @@ columns:
   year:
     lineage:
       - datalake_hubspot_clean.company.year
-    description: Year of the update.
+    description: Calendar year used as a partition key for incremental table loads.
   month:
     lineage:
       - datalake_hubspot_clean.company.month
-    description: Month of the update.
+    description: Calendar month used as a partition key for incremental table loads.
   day:
     lineage:
       - datalake_hubspot_clean.company.day
-    description: Day of the update.
+    description: Calendar day used as a partition key for incremental table loads.

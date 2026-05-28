@@ -52,11 +52,11 @@ columns:
   content:
     lineage:
       - datalake_hubspot_clean.ticket.properties
-    description: Content of the ticket.
+    description: Full text body content of the HubSpot support ticket.
   subject:
     lineage:
       - datalake_hubspot_clean.ticket.properties
-    description: Subject of the ticket.
+    description: Subject line text of the HubSpot support ticket.
   onboarding_type:
     lineage:
       - datalake_hubspot_clean.ticket.properties
@@ -83,7 +83,7 @@ columns:
   dt_term_sent:
     lineage:
       - datalake_hubspot_clean.ticket.properties
-    description: Date of the term sent.
+    description: Date when the contractual term document was sent to the contact.
   dt_documents_received:
     lineage:
       - datalake_hubspot_clean.ticket.properties
@@ -91,7 +91,7 @@ columns:
   dt_onboarding:
     lineage:
       - datalake_hubspot_clean.ticket.properties
-    description: Date of the onboarding.
+    description: Date when the company onboarding process was completed in HubSpot.
   ts_live_demand_only:
     lineage:
       - datalake_hubspot_clean.ticket.properties

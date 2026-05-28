@@ -27,7 +27,7 @@ columns:
   cnpj:
     lineage:
       - datalake_hubspot.company_history.cnpj
-    description: CNPJ of the company.
+    description: Brazilian corporate tax ID (CNPJ) of the broker company.
   broker_status:
     lineage:
       - datalake_hubspot.company_history.sale_lead_status

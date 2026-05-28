@@ -347,7 +347,7 @@ columns:
   version:
     lineage:
       - datalake_ebdb_amenities.pivotted_amenities.version
-    description: "Version of the house."
+    description: Version number of the house amenities snapshot at this point in time.
   ts_version_started:
     lineage:
       - datalake_ebdb_amenities.pivotted_amenities.ts_version_started

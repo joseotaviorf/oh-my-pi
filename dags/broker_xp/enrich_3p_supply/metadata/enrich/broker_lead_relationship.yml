@@ -1,7 +1,7 @@
 ---
 database_name: datalake_3p_supply
 table_name: broker_lead_relationship
-owner: patrick.nasser@quintoandar.com.br
+owner: vitor.musachio@quintoandar.com.br
 domain: Broker XP
 description: |
   Maps each 3P lead flow to the most recent active broker contract

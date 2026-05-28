@@ -18,7 +18,7 @@ columns:
     lineage:
       - datalake_ebdb_amenities.amenity.id_amenity
   information_type:
-    description: Type of information.
+    description: Category label describing the type of house information being tracked.
     categories:
       CONDO_AMENITY: Condo amenity, such as sauna or condo pool.
       HOUSE_AMENITY: House amenity, such as private pool or ceiling fans.
