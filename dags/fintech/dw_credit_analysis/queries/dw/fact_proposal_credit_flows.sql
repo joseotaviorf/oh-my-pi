@@ -104,15 +104,18 @@ direct_offer AS (
   GROUP BY 1,2,3
 ),
 early_demand AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   SELECT
     id_house AS sk_house,
-    ts_early_demand_started
+    ts_early_demand_started,
+        ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY sk_house_listing DESC) AS _rn
   FROM
     dw_public.dim_house_listing
   WHERE
     ts_early_demand_started IS NOT NULL
-  QUALIFY
-      ROW_NUMBER () OVER (PARTITION BY id_house ORDER BY sk_house_listing DESC) = 1
+    )
+    WHERE _rn = 1
 ),
 resend_request AS (
   SELECT
@@ -186,14 +189,14 @@ rent_flows AS (
     flrf.sk_contract,
     CAST(flrf.sk_house_listing / 1000 AS INTEGER) AS sk_house,
     flrf.sk_contract_created_date,
-    TO_DATE(flrf.sk_contract_created_date::STRING, 'yyyyMMdd') AS dt_contract_created_date,
+    TO_DATE(CAST(flrf.sk_contract_created_date AS STRING), 'yyyyMMdd') AS dt_contract_created_date,
     flrf.sk_contract_signed_date,
-    TO_DATE(flrf.sk_contract_signed_date::STRING, 'yyyyMMdd') AS dt_contract_signed_date,
+    TO_DATE(CAST(flrf.sk_contract_signed_date AS STRING), 'yyyyMMdd') AS dt_contract_signed_date,
     CAST(COALESCE(ca.id_credit_analysis, -1) AS INTEGER) AS sk_credit_analysis,
     CAST(COALESCE(ce.id_analysis_request, -1) AS INTEGER) AS sk_analysis_request,
     CAST(COALESCE(ce.id_checklist, -1) AS INTEGER) AS sk_checklist,
     flrf.sk_credit_analysis_approved_date,
-    TO_DATE(flrf.sk_credit_analysis_approved_date::STRING, 'yyyyMMdd') AS dt_credit_analysis_approved_date,
+    TO_DATE(CAST(flrf.sk_credit_analysis_approved_date AS STRING), 'yyyyMMdd') AS dt_credit_analysis_approved_date,
     COALESCE(
       NULLIF(flrf.sk_last_credit_evaluation_positive, -1),
       CASE
@@ -212,7 +215,7 @@ rent_flows AS (
     ) AS sk_last_variant_not_null,
     COALESCE(ca.category, -1) AS sk_guarantee_category,
     flrf.sk_guarantee_paid_date,
-    TO_DATE(flrf.sk_guarantee_paid_date::STRING, 'yyyyMMdd') AS dt_guarantee_paid_date,
+    TO_DATE(CAST(flrf.sk_guarantee_paid_date AS STRING), 'yyyyMMdd') AS dt_guarantee_paid_date,
     CAST(
       COALESCE(cap.id_last_credit_analysis, -1) AS INTEGER
     ) AS sk_last_credit_analysis,
@@ -222,11 +225,11 @@ rent_flows AS (
     flrf.sk_last_credit_evaluation_positive,
     flrf.sk_offer,
     flrf.sk_offer_approved_date,
-    TO_DATE(flrf.sk_offer_approved_date::STRING, 'yyyyMMdd') AS dt_offer_approved_date,
+    TO_DATE(CAST(flrf.sk_offer_approved_date AS STRING), 'yyyyMMdd') AS dt_offer_approved_date,
     flrf.sk_offer_submitted_date,
     flrf.sk_proposal,
     flrf.sk_region,
-    TO_DATE(flrf.sk_tenant_doc_complete_date::STRING, 'yyyyMMdd') AS dt_tenant_doc_complete_date,
+    TO_DATE(CAST(flrf.sk_tenant_doc_complete_date AS STRING), 'yyyyMMdd') AS dt_tenant_doc_complete_date,
     flrf.sk_tenant_doc_complete_date,
     flrf.sk_tenant_first_doc_sent_date,
     TO_DATE(ca.ts_guarantee_accepted) AS dt_guarantee_accepted_date,
@@ -338,7 +341,7 @@ proposal_credit_flows AS (
     rf.sk_analysis_request,
     rf.sk_checklist,
     rf.sk_credit_analysis_approved_date,
-    TO_DATE(rf.sk_credit_evaluation_approved_date::STRING, 'yyyyMMdd') AS dt_credit_evaluation_approved_date,
+    TO_DATE(CAST(rf.sk_credit_evaluation_approved_date AS STRING), 'yyyyMMdd') AS dt_credit_evaluation_approved_date,
     rf.sk_credit_evaluation_approved_date,
     rf.sk_first_credit_analysis,
     rf.sk_first_variant,
@@ -347,7 +350,7 @@ proposal_credit_flows AS (
     rf.sk_guarantee_paid_date,
     rf.sk_last_credit_analysis,
     rf.sk_last_credit_evaluation_init,
-    TO_DATE(rf.sk_last_credit_evaluation_init::STRING, 'yyyyMMdd') AS dt_last_credit_evaluation_init,
+    TO_DATE(CAST(rf.sk_last_credit_evaluation_init AS STRING), 'yyyyMMdd') AS dt_last_credit_evaluation_init,
     rf.sk_last_credit_evaluation_negative,
     rf.sk_last_credit_evaluation_positive,
     rf.sk_offer,
@@ -358,7 +361,7 @@ proposal_credit_flows AS (
     rf.sk_tenant_doc_complete_date,
     rf.sk_tenant_first_doc_sent_date,
     COALESCE(eca.sk_early_credit_analysis, -1) AS sk_early_credit_analysis,
-    TO_DATE(rf.sk_tenant_first_doc_sent_date::STRING, 'yyyyMMdd') AS dt_tenant_first_doc_sent_date,
+    TO_DATE(CAST(rf.sk_tenant_first_doc_sent_date AS STRING), 'yyyyMMdd') AS dt_tenant_first_doc_sent_date,
     rf.sk_guarantee_accepted_date,
     rf.sk_drop_reason,
     rf.funnel_step,
@@ -439,13 +442,17 @@ proposal_credit_flows AS (
       ON  rf.sk_offer = eca.sk_offer
 ),
 house_listing AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   SELECT
     id_house,
     country_code,
-    rental_administrator
+    rental_administrator,
+        ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY sk_house_listing DESC) AS _rn
   FROM
     dw_rent.dim_house_listing
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_house ORDER BY sk_house_listing DESC) = 1
+    )
+    WHERE _rn = 1
 ),
 early_credit_full (
   SELECT
@@ -684,18 +691,21 @@ FROM
   final_flow
 ),
 client_max_funnel_drop_step AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
 SELECT
   sk_client AS sk_client_max_funnel,
   DATE_TRUNC('month', dt_reference) AS dt_reference_user_max_funnel,
-  funnel_drop_step_ordered AS client_max_funnel_drop_step
+  funnel_drop_step_ordered AS client_max_funnel_drop_step,
+        ROW_NUMBER() OVER (PARTITION BY CASE WHEN sk_client IS NULL THEN 1 ELSE sk_client END, DATE_TRUNC('month',dt_reference) ORDER BY IF(funnel_drop_step_ordered IS NULL, "Z", funnel_drop_step_ordered) DESC) AS _rn
 FROM
   add_dt_reference
 WHERE
   country_code = 'BR' AND
 	rental_administrator = 'QUINTOANDAR' AND
   is_last_credit_evaluation = TRUE
-QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY CASE WHEN sk_client IS NULL THEN 1 ELSE sk_client END, DATE_TRUNC('month',dt_reference) ORDER BY IF(funnel_drop_step_ordered IS NULL, "Z", funnel_drop_step_ordered) DESC) = 1
+    )
+    WHERE _rn = 1
 )
 SELECT
   adr.sk_client,

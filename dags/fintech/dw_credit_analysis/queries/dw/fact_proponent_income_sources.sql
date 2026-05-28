@@ -40,22 +40,33 @@ AND cep.proponent_type IS NOT NULL
 ),
 
 get_proponent_income_data AS (
-SELECT DISTINCT
-  REPLACE(REPLACE(pd.cpf, ".", ""), "-", "") AS proponent_cpf,
-  pd.id_context_external AS id_proposal,
-  id.monthly_salary AS proponent_gross_income,
-  id.verified_income AS proponent_verified_income
-FROM
-  datalake_docx.personal_documentation AS pd
-LEFT JOIN
-  datalake_docx.income_documentation AS id
-    ON id.id_folder = pd.id_folder
-    AND id.id_context_external = pd.id_context_external
-WHERE
--- Get only tenant's data
-  pd.document_context = 'Tenant'
-QUALIFY
-  ROW_NUMBER() OVER (PARTITION BY pd.id_context_external, pd.cpf ORDER BY pd.ts_updated DESC) = 1
+    SELECT DISTINCT
+        proponent_cpf,
+        id_proposal,
+        proponent_gross_income,
+        proponent_verified_income
+    FROM (
+        SELECT
+            REPLACE(REPLACE(pd.cpf, ".", ""), "-", "") AS proponent_cpf,
+            pd.id_context_external AS id_proposal,
+            id.monthly_salary AS proponent_gross_income,
+            id.verified_income AS proponent_verified_income,
+            ROW_NUMBER() OVER (
+                PARTITION BY pd.id_context_external, pd.cpf
+                ORDER BY pd.ts_updated DESC
+            ) AS _rn
+        FROM
+            datalake_docx.personal_documentation AS pd
+        LEFT JOIN
+            datalake_docx.income_documentation AS id
+                ON id.id_folder = pd.id_folder
+                AND id.id_context_external = pd.id_context_external
+        WHERE
+            -- Get only tenant's data
+            pd.document_context = 'Tenant'
+    )
+    WHERE
+        _rn = 1
 ),
 
 get_neoway_presumed_income AS (

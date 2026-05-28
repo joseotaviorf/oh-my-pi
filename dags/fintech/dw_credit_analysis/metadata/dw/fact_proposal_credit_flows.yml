@@ -136,10 +136,6 @@ columns:
     lineage:
       - dw_credit.fact_early_credit.dt_early_credit_expired
     description: "Key of date when early credit analysis was expired. The expiration date happens 30 days after the early credit creation date."
-  sk_dim_drop_reason:
-    lineage:
-      - dw_public.dim_drop_reason.id
-    description: "Key of the drop reason. This column can be used to join with the table dw_public.dim_drop_reason to get the drop reason description."
   funnel_step:
     lineage:
       - dw_rent.fact_listing_rent_flows.funnel_step
