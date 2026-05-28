@@ -73,23 +73,37 @@ def main():
         return
 
     logger.info(
-        f"Starting vacuum and optimize for {len(tables)} tables, parallelism = {args.parallelism}."
+        f"Starting vacuum and optimize for {len(tables)} tables, "
+        f"parallelism = {args.parallelism}."
     )
+    job_args = [
+        (
+            loader,
+            table_name,
+            table_configs,
+            args.layer,
+            partition_predicate,
+        )
+        for table_name, table_configs in tables.items()
+    ]
     pool = ThreadPool(processes=args.parallelism)
-    pool.starmap(
-        run_job,
-        [
-            (
-                loader,
-                table_name,
-                table_configs,
-                args.layer,
-                partition_predicate,
-                maintenance_state,
-            )
-            for table_name, table_configs in tables.items()
-        ],
-    )
+    try:
+        async_results = [pool.apply_async(run_job, args) for args in job_args]
+        failures = _await_job_results_and_persist_markers(
+            tables, async_results, maintenance_state
+        )
+    finally:
+        pool.close()
+        pool.join()
+
+    if failures:
+        failed_names = ", ".join(table_name for table_name, _ in failures)
+        logger.error(
+            f"Vacuum and optimize failed for {len(failures)} of {len(tables)} "
+            f"table(s): {failed_names}."
+        )
+        _, first_exc = failures[0]
+        raise first_exc
 
     logger.info("Vacuum and optimize finished for all tables.")
 
@@ -108,7 +122,8 @@ def parse_arguments() -> Namespace:
     parser.add_argument(
         "parallelism",
         type=int,
-        help="Number of parallel jobs to run. Default is 16.",
+        help="Number of parallel table maintenance workers (ThreadPool). S3 marker I/O "
+        "runs on the main thread after each table finishes.",
         default=16,
     )
     parser.add_argument(
@@ -280,39 +295,80 @@ def _maintenance_marker_exists(
     )
 
 
+def _await_job_results_and_persist_markers(
+    tables: Dict[str, dict],
+    async_results,
+    maintenance_state: MaintenanceStateConfig,
+) -> list:
+    """Collect worker results, persist markers for successes, defer failures.
+
+    Returns a list of (table_name, exception) for each failed table so the caller
+    can fail the job after every successful table has recorded its S3 marker.
+    """
+    failures = []
+    for (table_name, table_configs), async_result in zip(tables.items(), async_results):
+        try:
+            full_table_name = async_result.get()
+        except Exception as exc:
+            logger.exception(f"Vacuum/optimize failed for table {table_name}.")
+            failures.append((table_name, exc))
+            continue
+        _persist_maintenance_marker(table_configs, full_table_name, maintenance_state)
+    return failures
+
+
+def _persist_maintenance_marker(
+    table_configs: dict,
+    full_table_name: Optional[str],
+    maintenance_state: MaintenanceStateConfig,
+) -> None:
+    """Write the daily S3 marker on the driver main thread after Spark work finishes."""
+    if not full_table_name:
+        return
+    if not _should_use_daily_maintenance_cap(table_configs, maintenance_state):
+        return
+    run_optimize = table_configs.get("run_optimize", True)
+    run_vacuum = table_configs.get("run_vacuum", True)
+    bucket, key = resolve_marker_location(
+        state_bucket=maintenance_state.state_bucket,
+        environment=maintenance_state.environment,
+        full_table_name=full_table_name,
+        maintenance_date=maintenance_state.maintenance_date,
+        state_prefix=maintenance_state.state_prefix,
+    )
+    payload = build_maintenance_payload(
+        full_table_name=full_table_name,
+        maintenance_date=maintenance_state.maintenance_date,
+        environment=maintenance_state.environment,
+        dag_name=maintenance_state.dag_name,
+        run_vacuum=run_vacuum,
+        run_optimize=run_optimize,
+    )
+    write_maintenance_marker(
+        bucket, key, payload, region_name=maintenance_state.region_name
+    )
+    logger.info(
+        f"Wrote maintenance marker for {full_table_name} at s3://{bucket}/{key}"
+    )
+
+
 def run_job(
     loader: DeltaLoader,
     table_name: str,
     table_configs: dict,
     layer: str,
     partition_predicate: Optional[str] = None,
-    maintenance_state: Optional[MaintenanceStateConfig] = None,
-) -> None:
-    """Runs vacuum and, optionally, optimize on a given table."""
-
-    maintenance_state = maintenance_state or MaintenanceStateConfig(
-        state_bucket=None,
-        environment=None,
-        maintenance_date=None,
-        dag_name=None,
-        state_prefix=None,
-        region_name=None,
-    )
+) -> Optional[str]:
+    """Run OPTIMIZE/VACUUM for one table. Returns full table name when maintenance ran."""
 
     full_table_name = get_full_table_name(
         table_configs.get("schema"), LayerEnum(layer), table_name
     )
 
-    if _should_use_daily_maintenance_cap(table_configs, maintenance_state):
-        if _maintenance_marker_exists(full_table_name, maintenance_state):
-            logger.info(
-                f"Skipping {full_table_name}: maintenance already completed for "
-                f"{maintenance_state.maintenance_date}."
-            )
-            return
-
     run_optimize = table_configs.get("run_optimize", True)
     run_vacuum = table_configs.get("run_vacuum", True)
+    if not run_optimize and not run_vacuum:
+        return None
 
     if run_optimize:
         apply_filter = table_configs.get("apply_partition_filter", False)
@@ -333,28 +389,7 @@ def run_job(
                 full_table_name, table_configs.get("vacuum_retention_hours", 7 * 24)
             )
 
-    if _should_use_daily_maintenance_cap(table_configs, maintenance_state):
-        bucket, key = resolve_marker_location(
-            state_bucket=maintenance_state.state_bucket,
-            environment=maintenance_state.environment,
-            full_table_name=full_table_name,
-            maintenance_date=maintenance_state.maintenance_date,
-            state_prefix=maintenance_state.state_prefix,
-        )
-        payload = build_maintenance_payload(
-            full_table_name=full_table_name,
-            maintenance_date=maintenance_state.maintenance_date,
-            environment=maintenance_state.environment,
-            dag_name=maintenance_state.dag_name,
-            run_vacuum=run_vacuum,
-            run_optimize=run_optimize,
-        )
-        write_maintenance_marker(
-            bucket, key, payload, region_name=maintenance_state.region_name
-        )
-        logger.info(
-            f"Wrote maintenance marker for {full_table_name} at s3://{bucket}/{key}"
-        )
+    return full_table_name
 
 
 def get_full_table_name(schema: str, layer: LayerEnum, table_name: str) -> str:

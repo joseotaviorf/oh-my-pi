@@ -71,7 +71,8 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
         linked with ``batch_n >> batch_n+1`` so Airflow runs them strictly in order.
 
         ``optimize_parallelism`` on ``workflow`` overrides the caller ``parallelism``
-        (driver ThreadPool size inside the optimize Spark job).
+        (ThreadPool size inside the optimize Spark job; S3 markers are written on the
+        main thread after each table completes).
         """
         if not table_attributes:
             task = self._create_single_optimize_task(

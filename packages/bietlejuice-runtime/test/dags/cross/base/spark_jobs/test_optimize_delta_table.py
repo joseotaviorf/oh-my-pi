@@ -21,8 +21,10 @@ sys.modules["bietlejuice.loaders.delta_loader"] = MagicMock()
 
 from dags.cross.base.spark_jobs.optimize_delta_table import (  # noqa: E402
     MaintenanceStateConfig,
+    _await_job_results_and_persist_markers,
     _build_maintenance_state_config,
     _filter_tables_already_maintained,
+    _persist_maintenance_marker,
     _resolve_partition_predicate,
     _should_use_daily_maintenance_cap,
     build_year_month_day_predicate,
@@ -259,66 +261,80 @@ class TestDailyMaintenanceCap:
         # assert
         assert remaining == tables
 
-    @patch(
-        "dags.cross.base.spark_jobs.optimize_delta_table._maintenance_marker_exists",
-        return_value=True,
-    )
-    @patch("dags.cross.base.spark_jobs.optimize_delta_table.write_maintenance_marker")
     @patch("dags.cross.base.spark_jobs.optimize_delta_table.get_full_table_name")
-    def test_run_job_skips_when_marker_exists(
-        self, mock_full_name, mock_write_marker, mock_marker_exists, maintenance_state
-    ):
+    def test_run_job_returns_full_table_name_after_success(self, mock_full_name):
         # arrange
         mock_full_name.return_value = "datalake_dw.fact_x"
         loader = MagicMock()
         table_configs = {
             "schema": "dw",
-            "maintenance_once_per_day": True,
             "run_optimize": True,
+            "run_vacuum": True,
         }
 
         # act
-        run_job(
-            loader,
-            "fact_x",
-            table_configs,
-            "dw",
-            maintenance_state=maintenance_state,
+        result = run_job(loader, "fact_x", table_configs, "dw")
+
+        # assert
+        assert result == "datalake_dw.fact_x"
+        loader.optimize_table.assert_called_once()
+        loader.vacuum_table.assert_called_once()
+
+    @patch(
+        "dags.cross.base.spark_jobs.optimize_delta_table._persist_maintenance_marker"
+    )
+    def test_await_results_persists_markers_for_tables_after_failure(
+        self, mock_persist_marker, maintenance_state
+    ):
+        # arrange
+        tables = {
+            "fact_fail": {
+                "schema": "dw",
+                "maintenance_once_per_day": True,
+                "run_optimize": True,
+            },
+            "fact_ok": {
+                "schema": "dw",
+                "maintenance_once_per_day": True,
+                "run_optimize": True,
+            },
+        }
+        fail_result = MagicMock()
+        fail_result.get.side_effect = RuntimeError("optimize failed")
+        ok_result = MagicMock()
+        ok_result.get.return_value = "datalake_dw.fact_ok"
+
+        # act
+        failures = _await_job_results_and_persist_markers(
+            tables,
+            [fail_result, ok_result],
+            maintenance_state,
         )
 
         # assert
-        loader.optimize_table.assert_not_called()
-        mock_write_marker.assert_not_called()
+        assert len(failures) == 1
+        assert failures[0][0] == "fact_fail"
+        mock_persist_marker.assert_called_once_with(
+            tables["fact_ok"],
+            "datalake_dw.fact_ok",
+            maintenance_state,
+        )
 
-    @patch(
-        "dags.cross.base.spark_jobs.optimize_delta_table._maintenance_marker_exists",
-        return_value=False,
-    )
     @patch("dags.cross.base.spark_jobs.optimize_delta_table.write_maintenance_marker")
-    @patch("dags.cross.base.spark_jobs.optimize_delta_table.get_full_table_name")
-    def test_run_job_writes_marker_after_success(
-        self, mock_full_name, mock_write_marker, mock_marker_exists, maintenance_state
+    def test_persist_maintenance_marker_writes_after_success(
+        self, mock_write_marker, maintenance_state
     ):
         # arrange
-        mock_full_name.return_value = "datalake_dw.fact_x"
-        loader = MagicMock()
         table_configs = {
-            "schema": "dw",
             "maintenance_once_per_day": True,
             "run_optimize": True,
             "run_vacuum": True,
         }
 
         # act
-        run_job(
-            loader,
-            "fact_x",
-            table_configs,
-            "dw",
-            maintenance_state=maintenance_state,
+        _persist_maintenance_marker(
+            table_configs, "datalake_dw.fact_x", maintenance_state
         )
 
         # assert
-        loader.optimize_table.assert_called_once()
-        loader.vacuum_table.assert_called_once()
         mock_write_marker.assert_called_once()
