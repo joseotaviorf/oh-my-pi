@@ -1,0 +1,59 @@
+---
+database_name: datalake_hubspot
+table_name: pipeline
+description: |
+  Enriched pipeline configuration table with comprehensive business process definitions and workflow analytics metadata. 
+  Each row represents a distinct business pipeline within the organization, enriched with business context and process 
+  classification logic. This table provides the foundational structure for understanding workflow definitions and 
+  process optimization across sales and support operations.
+  
+  **Key Features:**
+  - Complete pipeline taxonomy and business process classification
+  - Deal vs ticket pipeline distinction for sales and support workflow differentiation
+  - Display order and hierarchy management for user interface optimization
+  - Business context labeling for process identification and analytics segmentation
+  - Pipeline lifecycle tracking with creation and modification history
+  - Process effectiveness measurement foundation for workflow optimization
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id_pipeline:
+    lineage:
+      - datalake_hubspot.pipeline_history.id_pipeline
+    description: ID of the pipeline.
+  label:
+    lineage:
+      - datalake_hubspot.pipeline_history.label
+    description: Descriptive column on which pipeline belongs. For example, Onboardings, Signups, Services and etc.
+  display_order:
+    lineage:
+      - datalake_hubspot.pipeline_history.display_order
+    description: Order of the pipeline in the Hubspot interface.
+  is_deal_pipeline:
+    lineage:
+      - datalake_hubspot.pipeline_history.is_deal_pipeline
+    description: Boolean column that indicates if the pipeline is a deal pipeline. In other words, it is part of the process of closing deals with partnerships until the listings are listed on the platform.
+  is_ticket_pipeline:
+    lineage:
+      - datalake_hubspot.pipeline_history.is_ticket_pipeline
+    description: Boolean column that indicates if the pipeline is a ticket pipeline. In other words, it is performed via tickets. 
+  ts_created:
+    lineage:
+      - datalake_hubspot.pipeline_history.ts_created
+    description: Timestamp of when the pipeline was created.
+  ts_updated:
+    lineage:
+      - datalake_hubspot.pipeline_history.ts_updated
+    description: Timestamp of when the pipeline was updated.
+  year:
+    lineage:
+      - datalake_hubspot.pipeline_history.year
+    description: Year of the update.
+  month:
+    lineage:
+      - datalake_hubspot.pipeline_history.month
+    description: Month of the update.
+  day:
+    lineage:
+      - datalake_hubspot.pipeline_history.day
+    description: Day of the update.

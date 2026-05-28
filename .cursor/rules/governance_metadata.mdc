@@ -22,7 +22,7 @@ columns:
                                        # values: "sensitive" | "highly_personal" | "personal"
 ```
 
-**Valid domains:** `3P Partners`, `Agents`, `Cross`, `Data Science`, `For Rent`, `For Sale`, `Governance`, `Growth`, `House and Listing`, `MLOps`, `People`, `Platform`, `QCX`, `Support and Service`, `Tech Platform`
+**Valid domains:** `Agents`, `Broker XP`, `Cross`, `Data Science`, `For Rent`, `For Sale`, `Governance`, `Growth`, `House and Listing`, `MLOps`, `People`, `Platform`, `QCX`, `Support and Service`, `Tech Platform`
 
 ## Personal Data Classification
 

@@ -1,0 +1,54 @@
+---
+database_name: datalake_hubspot_clean
+table_name: communication
+description: |
+  HubSpot Communication objects represent various forms of customer interactions including emails, SMS messages, 
+  social media interactions, and other communication channels tracked in the CRM. This table captures all 
+  communication activities essential for customer engagement analysis, omnichannel interaction tracking, and communication effectiveness measurement.
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id_communication:
+    lineage:
+      - datalake_hubspot_raw.communication.id
+    description: 'Unique identifier for the communication activity record in HubSpot. Primary key used for tracking specific communication interactions and associating communications with contacts, companies, and deals.'
+  properties:
+    lineage:
+      - datalake_hubspot_raw.communication.properties
+    description: 'JSON object containing all communication properties including channel type, direction, content, duration, status, and custom fields. Contains comprehensive communication details and interaction metadata.'
+  properties_with_history:
+    lineage:
+      - datalake_hubspot_raw.communication.properties_with_history
+    description: 'JSON object containing historical values of communication properties with timestamps. Tracks modifications to communication records, status changes, and content updates for audit and analysis purposes.'
+  associations:
+    lineage:
+      - datalake_hubspot_raw.communication.associations
+    description: 'JSON object containing associations to contacts, companies, deals, and tickets. Links communications to CRM records for complete customer interaction context and relationship tracking.'
+  is_archived:
+    lineage:
+      - datalake_hubspot_raw.communication.archived
+    description: 'Boolean flag indicating whether the communication record has been archived/deleted. Archived communications are preserved for historical analysis but excluded from active reporting.'
+  ts_archived:
+    lineage:
+      - datalake_hubspot_raw.communication.archived_at
+    description: 'Timestamp when the communication record was archived. NULL for active communications. Used for data retention policies and understanding communication activity lifecycle management.'
+  ts_created:
+    lineage:
+      - datalake_hubspot_raw.communication.created_at
+    description: 'Timestamp when the communication activity was logged in HubSpot. Critical for customer engagement analysis, interaction frequency tracking, and understanding communication timing patterns.'
+  ts_updated:
+    lineage:
+      - datalake_hubspot_raw.communication.updated_at
+    description: 'Timestamp of the most recent update to any communication property. Used for incremental data loading and tracking communication record modifications for audit and analysis.'
+  year:
+    lineage:
+      - datalake_hubspot_raw.communication.year
+    description: 'Partition column: Year extracted from the data processing date. Enables annual analysis of communication activity trends and year-over-year engagement performance comparison.'
+  month:
+    lineage:
+      - datalake_hubspot_raw.communication.month
+    description: 'Partition column: Month extracted from the data processing date. Supports monthly communication volume analysis, seasonal engagement patterns, and team activity tracking.'
+  day:
+    lineage:
+      - datalake_hubspot_raw.communication.day
+    description: 'Partition column: Day extracted from the data processing date. Provides daily granularity for communication activity analysis and real-time customer engagement monitoring.'

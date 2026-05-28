@@ -1,0 +1,54 @@
+---
+database_name: datalake_hubspot_clean
+table_name: contact
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  HubSpot Contact objects represent individuals with whom the business interacts. Contacts include personal 
+  information, communication history, lifecycle stages, and behavioral data. This is the primary object for 
+  customer relationship management and contains comprehensive contact profiles for sales, marketing, and service activities.
+columns:
+  id_contact:
+    lineage:
+      - datalake_hubspot_raw.contact.id
+    description: 'Unique identifier for the contact record in HubSpot. Primary key used for associating contacts with companies, deals, tickets, and activities.'
+  properties:
+    lineage:
+      - datalake_hubspot_raw.contact.properties
+    description: 'JSON object containing all contact properties including name, email, phone, job title, lifecycle stage, lead status, and custom fields. Contains current values for contact attributes and behavioral data.'
+  properties_with_history:
+    lineage:
+      - datalake_hubspot_raw.contact.properties_with_history
+    description: 'JSON object containing historical values of contact properties with timestamps. Tracks changes over time for fields like lifecycle stage, lead score, job title, and custom properties to analyze contact evolution.'
+  associations:
+    lineage:
+      - datalake_hubspot_raw.contact.associations
+    description: 'JSON object containing associations to other HubSpot objects like companies, deals, tickets, and activities. Includes primary company assignments and relationship metadata for comprehensive contact context.'
+  is_archived:
+    lineage:
+      - datalake_hubspot_raw.contact.archived
+    description: 'Boolean flag indicating whether the contact record has been archived/deleted. Archived contacts are preserved for historical analysis while being excluded from active marketing and sales activities.'
+  ts_archived:
+    lineage:
+      - datalake_hubspot_raw.contact.archived_at
+    description: 'Timestamp when the contact record was archived. NULL for active contacts. Used for data retention policies and understanding contact lifecycle management.'
+  ts_created:
+    lineage:
+      - datalake_hubspot_raw.contact.created_at
+    description: 'Timestamp when the contact was first created in HubSpot. Essential for lead generation analysis, conversion funnel tracking, and understanding customer acquisition timelines.'
+  ts_updated:
+    lineage:
+      - datalake_hubspot_raw.contact.updated_at  
+    description: 'Timestamp of the most recent update to any contact property. Used for incremental data loading, identifying recently active contacts, and tracking engagement levels.'
+  year:
+    lineage:
+      - datalake_hubspot_raw.contact.year  
+    description: 'Partition column: Year extracted from the data processing date. Enables time-series analysis of contact data and efficient querying by year periods.'
+  month:
+    lineage:
+      - datalake_hubspot_raw.contact.month  
+    description: 'Partition column: Month extracted from the data processing date. Supports month-over-month contact analysis and seasonal trend identification.'
+  day:
+    lineage:
+      - datalake_hubspot_raw.contact.day
+    description: 'Partition column: Day extracted from the data processing date. Provides daily granularity for contact activity analysis and real-time reporting needs.'

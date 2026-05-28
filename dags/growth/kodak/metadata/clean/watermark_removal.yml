@@ -1,0 +1,63 @@
+---
+database_name: datalake_kodak_clean
+table_name: watermark_removal
+description: |
+  Contains results and tracking information for Kodak's automated watermark detection and removal processes. Each row represents an attempt to detect and remove watermarks from property images using AI-powered providers (Vanish, PixelBin). This table tracks the success rates, provider performance, and chosen results for watermark remediation workflows that ensure compliance with copyright and platform policies. Data is deduplicated using ROW_NUMBER() over partition by id ordered by ts_updated DESC to keep only the most recent record for each watermark removal attempt.
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.id
+    description: 'Unique identifier for each watermark removal attempt. Primary key used for tracking processing workflows and results.'
+  id_image_inspection:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.image_inspection_id
+    description: 'Foreign key reference to the image_inspection table. Links watermark removal results to the original image analysis that triggered the watermark detection.'
+  provider:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.provider
+    description: 'AI service provider used for watermark detection and removal processing.'
+    categories:
+      VANISH: 'Primary watermark removal provider with advanced AI capabilities'
+      PIXELBIN: 'Fallback watermark removal provider used when Vanish is unavailable'
+  url:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.url
+    description: 'URL of the processed image result after watermark removal attempt. Points to the cleaned image if successful, or original if removal failed.'
+  path:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.path
+    description: 'S3 storage path for the processed image file after watermark removal. Used for accessing the final cleaned image in cloud storage.'
+  mask_active_pixels_ratio:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.mask_active_pixels_ratio
+    description: 'Ratio of active pixels in the watermark mask compared to total image pixels. Used to measure the extent of watermark coverage on the image.'
+  is_noise_detected:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.noise_detected
+    description: 'Boolean flag indicating whether noise was detected in the image during the watermark removal preprocessing analysis.'
+  is_successful:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.successful
+    description: 'Boolean flag indicating whether the watermark detection and removal process completed successfully. True means watermarks were detected and successfully removed.'
+  is_chosen:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.chosen
+    description: 'Boolean flag indicating whether this provider result was selected as the final choice when multiple providers processed the same image. Only one result per image should be marked as chosen.'
+  failure_reason:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.failure_reason
+    description: 'Kodak WatermarkInvalidReason when watermark detection or removal did not complete successfully; null when processing succeeds and no failure applies.'
+    categories:
+      REMOVAL_UNSUCCESSFUL: 'Provider completed but the watermark could not be removed successfully.'
+      PROCESS_ERROR: 'Internal processing error during the watermark removal attempt.'
+      EXTERNAL_API_NOT_ACCESSIBLE: 'Watermark removal external provider API was not reachable.'
+  ts_created:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.created_at
+    description: 'Timestamp when the watermark removal process was initiated for this image.'
+  ts_updated:
+    lineage:
+      - datalake_kodak_raw.watermark_removal.updated_at
+    description: 'Timestamp when the watermark removal record was last updated with processing results or status changes.'

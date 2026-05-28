@@ -1,0 +1,123 @@
+---
+database_name: datalake_hubspot
+table_name: ticket
+description: |
+  Enriched support ticket entities from HubSpot CRM with comprehensive customer service analytics and resolution tracking. 
+  Each row represents a unique support case in its current state, enriched with calculated metrics, resolution 
+  analysis, and customer context. This table provides an analytics-ready view of customer support operations 
+  with business logic for SLA tracking, resolution optimization, and customer satisfaction measurement.
+  
+  **Key Enrichments:**
+  - Ticket pipeline and stage progression with resolution time calculations
+  - Customer context integration including company and contact relationships
+  - Priority and category classification with business rules
+  - Support team attribution and workload distribution analytics
+  - Resolution tracking with SLA compliance measurement
+  - Customer satisfaction correlation with support interaction quality
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id_ticket:
+    lineage:
+      - datalake_hubspot.ticket_history.id_ticket
+    description: Unique identifier of the ticket.
+  id_deal:
+    lineage:
+      - datalake_hubspot.ticket_history.id_deal
+    description: Unique identifier of the deal associated with the ticket. Can be
+      joined with datalake_hubspot.deal.id_deal.
+  id_company:
+    lineage:
+      - datalake_hubspot.ticket_history.id_company
+    description: Unique identifier of the main company associated with the ticket.
+      Can be joined with datalake_hubspot.company.id_company.
+  id_stage:
+    lineage:
+      - datalake_hubspot.ticket_history.id_stage
+    description: Unique identifier of the stage. Can be joined with datalake_hubspot.stage.id_stage.
+  id_pipeline:
+    lineage:
+      - datalake_hubspot.ticket_history.id_pipeline
+    description: Unique identifier of the pipeline. Can be joined with datalake_hubspot.pipeline.id_pipeline.
+  id_hubspot_owner:
+    lineage:
+      - datalake_hubspot.ticket_history.id_hubspot_owner
+    description: Unique identifier of the owner responsible for the ticket. Can be
+      joined with datalake_hubspot.owner.id_owner.
+  id_stage_history:
+    lineage:
+      - datalake_hubspot.ticket_history.id_stage_history
+    description: History of the the stage ID.
+  id_pipeline_history:
+    lineage:
+      - datalake_hubspot.ticket_history.id_pipeline_history
+    description: History of the the pipeline ID.
+  content:
+    lineage:
+      - datalake_hubspot.ticket_history.content
+    description: Content of the ticket.
+  subject:
+    lineage:
+      - datalake_hubspot.ticket_history.subject
+    description: Subject of the ticket.
+  onboarding_type:
+    lineage:
+      - datalake_hubspot.ticket_history.onboarding_type
+    description: Onboarding type of the company. Not used often.
+  field_sales:
+    lineage:
+      - datalake_hubspot.ticket_history.field_sales
+    description: Id of the field sales responsible for the ticket. Can be joined with
+      datalake_hubspot.owner.id_owner.
+  has_accepted_contact_with_agents:
+    lineage:
+      - datalake_hubspot.ticket_history.has_accepted_contact_with_agents
+    description: Whether the company has accepted contact with agents.
+  is_archived:
+    lineage:
+      - datalake_hubspot.ticket_history.is_archived
+    description: Whether the ticket is archived.
+  dt_term_signed:
+    lineage:
+      - datalake_hubspot.ticket_history.dt_term_signed
+    description: Date of the term signed.
+  dt_term_sent:
+    lineage:
+      - datalake_hubspot.ticket_history.dt_term_sent
+    description: Date of the term sent.
+  dt_documents_received:
+    lineage:
+      - datalake_hubspot.ticket_history.dt_documents_received
+    description: Date of the documents received.
+  dt_onboarding:
+    lineage:
+      - datalake_hubspot.ticket_history.dt_onboarding
+    description: Date of the onboarding.
+  ts_live_demand_only:
+    lineage:
+      - datalake_hubspot.ticket_history.ts_live_demand_only
+    description: Time when the demand only onboarding live was done.
+  ts_archived:
+    lineage:
+      - datalake_hubspot.ticket_history.ts_archived
+    description: Timestamp of the ticket archived.
+  ts_created:
+    lineage:
+      - datalake_hubspot.ticket_history.ts_created
+    description: Timestamp of the ticket created.
+  ts_updated:
+    lineage:
+      - datalake_hubspot.ticket_history.ts_updated
+    description: Timestamp of the ticket updated.
+  year:
+    lineage:
+      - datalake_hubspot.ticket_history.year
+    description: Year of the last update of the ticket.
+  month:
+    lineage:
+      - datalake_hubspot.ticket_history.month
+    description: Month of the last update of the ticket.
+  day:
+    lineage:
+      - datalake_hubspot.ticket_history.day
+    description: Day of the last update of the ticket.

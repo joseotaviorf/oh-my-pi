@@ -408,7 +408,7 @@ columns:
 | `people` | `People` |
 | `growth` | `Growth` |
 | `support_and_service` | `Support and Service` |
-| `3p_partners` | `3P Partners` |
+| `broker_xp` | `Broker XP` |
 | `cross` | `Cross` |
 | `governance` | `Governance` |
 | `mlops` | `MLOps` |
@@ -417,7 +417,7 @@ columns:
 | `tech_platform` | `Tech Platform` |
 | `data_science` | `Data Science` |
 
-**Valid domains:** `3P Partners`, `Agents`, `Cross`, `Data Science`, `For Rent`, `For Sale`, `Governance`, `Growth`, `MLOps`, `People`, `Platform`, `QCX`, `Support and Service`, `Tech Platform`
+**Valid domains:** `Agents`, `Broker XP`, `Cross`, `Data Science`, `For Rent`, `For Sale`, `Governance`, `Growth`, `MLOps`, `People`, `Platform`, `QCX`, `Support and Service`, `Tech Platform`
 
 ---
 

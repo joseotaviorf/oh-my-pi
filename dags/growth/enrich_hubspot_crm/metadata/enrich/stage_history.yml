@@ -1,0 +1,89 @@
+---
+database_name: datalake_hubspot
+table_name: stage_history
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  Historical tracking table for stage configuration changes in HubSpot CRM with comprehensive workflow step evolution analytics. 
+  Each row represents a daily snapshot of stage configuration changes, enabling time-series analysis of workflow 
+  optimization and stage effectiveness measurement. This table captures the complete evolution of stage definitions 
+  over time with metadata for process refinement and conversion optimization.
+  
+  **Key Features:**
+  - Daily granularity stage configuration change tracking with complete metadata preservation
+  - Stage progression logic evolution and probability calculation history
+  - Display order and hierarchy change tracking for workflow visualization optimization
+  - Stage-specific business rules evolution for process improvement analysis
+  - Closed-won and closed-lost classification history for revenue optimization tracking
+  - Pipeline association evolution for multi-pipeline workflow comparison
+columns:
+  id_stage:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+    description: 'Unique identifier for the stage configuration. Primary key used for tracking stage evolution and associating deals/tickets with their workflow positions.'
+  id_pipeline:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.id_pipeline
+      - datalake_hubspot_clean.ticket_pipeline.id_pipeline
+    description: 'Reference to the pipeline this stage belongs to. Links stages to their parent workflow for multi-pipeline analysis and process comparison.'
+  label:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+    description: 'Human-readable name of the stage (e.g., "Qualified Lead", "In Progress", "Resolved"). Used for business process identification and workflow visualization.'
+  metadata:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+    description: 'JSON object containing stage configuration metadata including probability, closed-won status, and custom properties. Historical tracking of stage behavior rules and analytics attributes.'
+  display_order:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+    description: 'Numeric order for displaying stages within the pipeline. Historical tracking of stage sequence changes for workflow visualization optimization.'
+  is_deal_stage:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+    description: 'Boolean flag indicating if this stage is used in deal pipelines. Historical tracking enables analysis of stage usage evolution across sales workflows.'
+  is_ticket_stage:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+    description: 'Boolean flag indicating if this stage is used in ticket pipelines. Historical tracking enables analysis of stage usage evolution across support workflows.'
+  is_archived:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+    description: 'Boolean flag indicating whether the stage has been archived/deactivated. Historical tracking of stage lifecycle for workflow evolution analysis.'
+  ts_archived:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+    description: 'Timestamp when the stage was archived. NULL for active stages. Historical tracking for understanding stage lifecycle and process optimization.'
+  ts_created:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+    description: 'Timestamp when the stage configuration was first created. Historical tracking for workflow development timeline and process maturity analysis.'
+  ts_updated:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+    description: 'Timestamp of the most recent update to the stage configuration. Historical tracking for change management and workflow optimization analysis.'
+  year:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+    description: 'Partition column: Year extracted from the stage update timestamp. Enables annual analysis of stage configuration evolution and workflow maturity progression.'
+  month:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+    description: 'Partition column: Month extracted from the stage update timestamp. Supports monthly tracking of stage modifications and process optimization cycles.'
+  day:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.stages
+      - datalake_hubspot_clean.ticket_pipeline.stages
+    description: 'Partition column: Day extracted from the stage update timestamp. Provides daily granularity for stage configuration change analysis and optimization tracking.'

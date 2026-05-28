@@ -1,0 +1,54 @@
+---
+database_name: datalake_hubspot_clean
+table_name: ticket
+description: |
+  HubSpot Ticket objects represent customer support cases and service requests. Tickets track issues from 
+  initiation to resolution, including priority levels, status updates, and resolution metrics. This table 
+  is essential for customer service analytics, support team performance, and customer satisfaction tracking.
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id_ticket:
+    lineage:
+      - datalake_hubspot_raw.ticket.id
+    description: 'Unique identifier for the ticket record in HubSpot. Primary key used for tracking support cases and associating tickets with contacts, companies, and activities.'
+  properties:
+    lineage:
+      - datalake_hubspot_raw.ticket.properties
+    description: 'JSON object containing all ticket properties including subject, status, priority, category, resolution, and custom fields. Contains current ticket details and support workflow information.'
+  properties_with_history:
+    lineage:
+      - datalake_hubspot_raw.ticket.properties_with_history
+    description: 'JSON object containing historical values of ticket properties with timestamps. Tracks progression through support stages, priority changes, and status updates for resolution time analysis.'
+  associations:
+    lineage:
+      - datalake_hubspot_raw.ticket.associations
+    description: 'JSON object containing associations to contacts, companies, deals, and support activities. Links tickets to customer context and related business relationships for comprehensive service view.'
+  is_archived:
+    lineage:
+      - datalake_hubspot_raw.ticket.archived
+    description: 'Boolean flag indicating whether the ticket record has been archived/deleted. Archived tickets are preserved for historical support analysis but excluded from active case management.'
+  ts_archived:
+    lineage:
+      - datalake_hubspot_raw.ticket.archived_at
+    description: 'Timestamp when the ticket record was archived. NULL for active tickets. Used for understanding ticket lifecycle management and support data retention policies.'
+  ts_created:
+    lineage:
+      - datalake_hubspot_raw.ticket.created_at
+    description: 'Timestamp when the ticket was first created in HubSpot. Critical for support volume analysis, response time tracking, and understanding customer issue patterns.'
+  ts_updated:
+    lineage:
+      - datalake_hubspot_raw.ticket.updated_at
+    description: 'Timestamp of the most recent update to any ticket property. Used for incremental data loading, identifying recently active tickets, and tracking support team activity levels.'
+  year:
+    lineage:
+      - datalake_hubspot_raw.ticket.year
+    description: 'Partition column: Year extracted from the data processing date. Enables annual support trend analysis and year-over-year customer service performance comparison.'
+  month:
+    lineage:
+      - datalake_hubspot_raw.ticket.month
+    description: 'Partition column: Month extracted from the data processing date. Supports monthly support metrics, seasonal issue tracking, and support team workload analysis.'
+  day:
+    lineage:
+      - datalake_hubspot_raw.ticket.day
+    description: 'Partition column: Day extracted from the data processing date. Provides daily support activity tracking and real-time customer service monitoring capabilities.'

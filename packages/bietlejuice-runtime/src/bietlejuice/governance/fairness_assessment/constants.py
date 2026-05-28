@@ -40,7 +40,7 @@ DOCUMENTED_NOT_IN_PHYSICAL_REASON = "documented_not_in_physical"
 # F2-01 uses :func:`re.fullmatch` on the trimmed value; empty domain skips regex (``domain_missing`` only).
 
 METADATA_DOMAIN_CI_ALLOWLIST_PATTERN: Final[str] = (
-    "3P Partners|Agents|Cross|Data Ops & Governance|Data Life Cycle|Fintech|For Rent|For Sale|"
+    "Agents|Cross|Data Ops & Governance|Data Life Cycle|Fintech|For Rent|For Sale|"
     "Growth|International|MLOps|People|QCX|Rede|Support and Services|Tech Platform|Data Platform|"
     "Conversational XP|DS Pricing|Atlas DB|Broker XP"
 )

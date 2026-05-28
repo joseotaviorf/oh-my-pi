@@ -1,0 +1,118 @@
+---
+database_name: datalake_hubspot
+table_name: call
+description: |
+  Enriched HubSpot call activity records with comprehensive engagement analytics and customer interaction intelligence. 
+  Each row represents a unique phone call interaction between team members and prospects/customers, enriched with 
+  business context, relationship mapping, and performance metrics. This table provides detailed insights into 
+  sales and support call effectiveness, customer engagement patterns, and team communication performance.
+
+  **Key Enrichments:**
+  - Call outcome classification and business result analysis with success/failure attribution
+  - Customer relationship context including associated deals, tickets, companies, and contacts
+  - Team member attribution with performance tracking and activity measurement
+  - Call timing and duration analysis for efficiency optimization and customer experience
+  - Communication effectiveness measurement with engagement scoring and follow-up tracking
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id_call:
+    lineage:
+      - datalake_hubspot.call_history.id_call
+    description: Id of the object. Not a primary key, since there is a new row for each update (limited to the most recent per day).
+  id_hubspot_owner:
+    lineage:
+      - datalake_hubspot.call_history.id_hubspot_owner
+    description: The ID of the owner associated with the call. This field determines the user listed as the call creator on the record timeline. Comes from the internal field hubspot_owner_id.
+  id_call_callee_object:
+    lineage:
+      - datalake_hubspot.call_history.id_call_callee_object
+    description: The ID of the HubSpot record associated with the call. This will be the recipient of the call for OUTBOUND calls, or the dialer of the call for INBOUND calls. Comes from the internal field hs_call_callee_object_id.
+  ids_attachments:
+    lineage:
+      - datalake_hubspot.call_history.ids_attachments
+    description: The IDs of the call''s attachments. Comes from the internal field hs_attachment_ids.
+  ids_associated_tickets:
+    lineage:
+      - datalake_hubspot.call_history.ids_associated_tickets
+    description: List of ids of associated tickets.
+  ids_associated_contacts:
+    lineage:
+      - datalake_hubspot.call_history.ids_associated_contacts
+    description: List of ids of associated contacts.
+  ids_associated_companies:
+    lineage:
+      - datalake_hubspot.call_history.ids_associated_companies
+    description: List of ids of associated companies.
+  ids_associated_deals:
+    lineage:
+      - datalake_hubspot.call_history.ids_associated_deals
+    description: List of ids of associated deals.
+  call_title:
+    lineage:
+      - datalake_hubspot.call_history.call_title
+    description: The title of the call. Comes from the internal field hs_call_title.
+  call_body:
+    lineage:
+      - datalake_hubspot.call_history.call_body
+    description: The description of the call, including any notes that you want to add. Comes from the internal field hs_call_body.
+  call_status:
+    lineage:
+      - datalake_hubspot.call_history.call_status
+    description: The status of the call. The statuses are BUSY, CALLING_CRM_USER, CANCELED, COMPLETED, CONNECTING, FAILED, IN_PROGRESS, NO_ANSWER, QUEUED, and RINGING. Comes from the internal field hs_call_status.
+  activity_type:
+    lineage:
+      - datalake_hubspot.call_history.activity_type
+    description: The type of call. Comes from the internal field hs_activity_type.
+  call_direction:
+    lineage:
+      - datalake_hubspot.call_history.call_direction
+    description: The direction of the call from the perspective of the HubSpot user. If the user is the call recipient, the direction should be set to INBOUND. If the user initiated the call, the direction should be set to OUTBOUND. Comes from the internal field hs_call_direction.
+  call_callee_object_type:
+    lineage:
+      - datalake_hubspot.call_history.call_callee_object_type
+    description: Object type of id_call_callee_object.
+  call_disposition:
+    lineage:
+      - datalake_hubspot.call_history.call_disposition
+    description: The internal GUID of the outcome of the call. Comes from the internal field hs_call_disposition.
+  call_from_number:
+    lineage:
+      - datalake_hubspot.call_history.call_from_number
+    description: The phone number that the call was made from. Comes from the internal field hs_call_from_number.
+  call_to_number:
+    lineage:
+      - datalake_hubspot.call_history.call_to_number
+    description: The phone number that received the call. Comes from the internal field hs_call_to_number.
+  call_recording_url:
+    lineage:
+      - datalake_hubspot.call_history.call_recording_url
+    description: The URL that stores the call recording. Comes from the internal field hs_call_recording_url.
+  call_duration_in_ms:
+    lineage:
+      - datalake_hubspot.call_history.call_duration_in_ms
+    description: The duration of the call in milliseconds. Comes from the internal field hs_call_duration.
+  ts_call:
+    lineage:
+      - datalake_hubspot.call_history.ts_call
+    description: This field marks the call''s time of creation and determines where the call sits on the record timeline. Comes from the internal field hs_timestamp.
+  ts_created:
+    lineage:
+      - datalake_hubspot.call_history.ts_created
+    description: Timestamp of when the object was created.
+  ts_updated:
+    lineage:
+      - datalake_hubspot.call_history.ts_updated
+    description: Timestamp of when the object was updated.
+  year:
+    lineage:
+      - datalake_hubspot.call_history.year
+    description: Year when the object was updated.
+  month:
+    lineage:
+      - datalake_hubspot.call_history.month
+    description: Month when the object was updated.
+  day:
+    lineage:
+      - datalake_hubspot.call_history.day
+    description: Day when the object was updated.

@@ -1,0 +1,107 @@
+---
+database_name: datalake_kodak_clean
+table_name: image_inspection_group_result
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  Contains business context-specific image inspection results for property-level image groups in Kodak's analysis system. Each row represents the analysis outcome for a specific property in either SALE or RENT business context, as the same property may have different quality requirements and approval thresholds depending on the intended business use. This table enables context-aware automated approval decisions and provides granular control over photo quality standards across different business scenarios.
+columns:
+  id:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.id
+    description: 'Unique identifier for each business context-specific inspection result. Primary key used for tracking approval decisions and linking to downstream business processes.'
+  id_group:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.id_group
+    description: 'Foreign key reference to the image_inspection_group table. Links this business context result to the underlying property-level image analysis group.'
+  business_context:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.business_context
+    description: 'Business context classification that determines quality standards and approval criteria for the property images.'
+    categories:
+      SALE: 'Analysis result optimized for sale listing requirements with specific quality thresholds and compliance rules'
+      RENT: 'Analysis result optimized for rental listing requirements with potentially different quality standards and approval criteria'
+  has_red_flags:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.red_flags
+    description: 'Critical aggregated flag indicating whether any blocking compliance or quality issues were detected across the property images in this business context. True typically prevents automatic approval and requires manual review.'
+  has_bonus_good_sharpness:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.bonus_good_sharpness
+    description: 'Quality enhancement bonus awarded when the property demonstrates exceptional image sharpness across multiple photos. Improves overall score and approval likelihood in this business context.'
+  has_bonus_aspect_ratio:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.bonus_aspect_ratio
+    description: 'Technical quality bonus awarded when property images consistently meet optimal aspect ratio standards for platform display in this business context. Enhances professional listing appearance.'
+  has_bonus_images_per_room:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.bonus_images_per_room
+    description: 'Coverage completeness bonus awarded when the property provides comprehensive photo documentation with adequate images per room. Indicates thorough property representation in this business context.'
+  has_bonus_view:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.bonus_view
+    description: 'Content value bonus awarded when the property includes high-quality view photos showing attractive surroundings or vistas. Adds marketing value and appeal in this business context.'
+  has_bonus_external:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.bonus_external
+    description: 'Presentation bonus awarded when the property includes professional exterior photos showing building facade, entrance, and external features. Enhances first impression in this business context.'
+  has_red_flag_images_per_room:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.red_flag_images_per_room
+    description: 'Coverage deficiency flag raised when the property has insufficient photo documentation relative to room count. May mislead users about property completeness in this business context.'
+  has_red_flag_property_condition:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.red_flag_property_condition
+    description: 'Quality concern flag raised when aggregated condition analysis indicates poor property maintenance or unsuitable state for listing in this business context. May require property improvements.'
+  has_red_flag_primary_risk:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.red_flag_primary_risk
+    description: 'High-priority compliance flag indicating critical issues detected that pose primary risks to platform integrity, legal compliance, or user safety in this business context. Typically requires immediate attention.'
+  is_approved:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.approved
+    description: 'Final approval decision for the property image set in this specific business context. True indicates the property meets all quality and compliance requirements for automated publication approval.'
+  total_faults:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.total_faults
+    description: 'Total count of quality faults detected across all property images that impact the approval decision in this business context. Includes technical and presentation issues that reduce listing quality.'
+  score:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.score
+    description: 'Calculated quality score (typically 0-100 scale) for the property image set in this business context. Higher scores indicate better photo quality, compliance, and completeness relative to business requirements.'
+  approval_score_threshold:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.approval_score_threshold
+    description: 'Minimum score threshold required for automatic approval in this specific business context. Properties scoring above this threshold are automatically approved, while lower scores require manual review.'
+  invalid_reasons:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.invalid_reasons
+    description: 'Set of Kodak GroupInvalidReason enum values persisted when the property image group is not approved in this business context (derived from photo download failures, watermark removal outcomes, score below threshold, or insufficient coverage). Serialized from the application as enum names.'
+    categories:
+      WATERMARK_REMOVAL_UNSUCCESSFUL: 'Watermark was detected but could not be removed successfully.'
+      WATERMARK_REMOVAL_PROCESS_ERROR: 'Watermark removal pipeline raised a processing error.'
+      EXTERNAL_IMAGE_URL_NOT_ACCESSIBLE: 'External photo URL could not be accessed during download or validation.'
+      EXTERNAL_API_NOT_ACCESSIBLE: 'Watermark removal external provider API was not reachable.'
+      POOR_IMAGE_QUALITY: 'Aggregated group score is below the approval threshold for this business context.'
+      IMAGE_ANALYSIS_FLOW_FAILURE: 'Fallback reason when no specific invalid reasons are recorded or the image analysis flow failed.'
+      INSUFFICIENT_PHOTOS_PER_ROOM: 'Photo coverage is insufficient relative to the property room count.'
+  ts_created:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.created_at
+    description: 'Timestamp when the business context-specific inspection result was initially created and analysis completed.'
+  ts_updated:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.updated_at
+    description: 'Timestamp when the inspection result was last modified, typically due to reprocessing, threshold changes, or manual review updates.'
+  year:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.year
+    description: 'Year partition key extracted from the creation timestamp for optimized data organization and temporal querying performance.'
+  month:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.month
+    description: 'Month partition key extracted from the creation timestamp for optimized data organization and temporal querying performance.'
+  day:
+    lineage:
+    - datalake_kodak_raw.image_inspection_group_result.day
+    description: 'Day partition key extracted from the creation timestamp for optimized data organization and temporal querying performance.'

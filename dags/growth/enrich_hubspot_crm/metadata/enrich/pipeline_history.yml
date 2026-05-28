@@ -1,0 +1,79 @@
+---
+database_name: datalake_hubspot
+table_name: pipeline_history
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  Historical tracking table for pipeline configuration changes in HubSpot CRM with comprehensive workflow evolution analytics. 
+  Each row represents a daily snapshot of pipeline configuration changes, enabling time-series analysis of business 
+  process evolution and workflow optimization. This table captures the complete evolution of pipeline definitions 
+  over time with metadata for process improvement and change impact analysis.
+  
+  **Key Features:**
+  - Daily granularity pipeline configuration change tracking
+  - Complete pipeline taxonomy evolution with business context preservation
+  - Deal vs ticket pipeline classification history for workflow analysis
+  - Display order and hierarchy change tracking for user interface optimization
+  - Pipeline lifecycle management with creation, modification, and deactivation tracking
+  - Process standardization evolution measurement for organizational development
+columns:
+  id_pipeline:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.id_pipeline
+      - datalake_hubspot_clean.ticket_pipeline.id_pipeline
+    description: 'Unique identifier for the pipeline configuration. Primary key used for tracking pipeline evolution and associating stages with their parent workflow.'
+  label:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.label
+      - datalake_hubspot_clean.ticket_pipeline.label
+    description: 'Human-readable name of the pipeline (e.g., "Sales Pipeline", "Support Pipeline"). Used for business process identification and reporting classification.'
+  display_order:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.display_order
+      - datalake_hubspot_clean.ticket_pipeline.display_order
+    description: 'Numeric order for displaying pipelines in the HubSpot interface. Determines the sequence for workflow visualization and business process prioritization.'
+  is_deal_pipeline:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.id_pipeline
+      - datalake_hubspot_clean.ticket_pipeline.id_pipeline
+    description: 'Boolean flag indicating whether the pipeline originates from deal workflows (TRUE for deal pipelines, FALSE for ticket pipelines).'
+  is_ticket_pipeline:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.id_pipeline
+      - datalake_hubspot_clean.ticket_pipeline.id_pipeline
+    description: 'Boolean flag indicating whether the pipeline originates from ticket/support workflows (TRUE for ticket pipelines, FALSE for deal pipelines).'
+  is_archived:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.is_archived
+      - datalake_hubspot_clean.ticket_pipeline.is_archived
+    description: 'Boolean flag indicating whether the pipeline has been archived/deactivated. Archived pipelines are preserved for historical analysis but excluded from active workflow.'
+  ts_archived:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.ts_archived
+      - datalake_hubspot_clean.ticket_pipeline.ts_archived
+    description: 'Timestamp when the pipeline was archived. NULL for active pipelines. Used for understanding pipeline lifecycle and business process evolution.'
+  ts_created:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.ts_created
+      - datalake_hubspot_clean.ticket_pipeline.ts_created
+    description: 'Timestamp when the pipeline configuration was first created. Used for tracking workflow establishment and business process development timeline.'
+  ts_updated:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.ts_updated
+      - datalake_hubspot_clean.ticket_pipeline.ts_updated
+    description: 'Timestamp of the most recent update to the pipeline configuration. Used for change tracking and workflow optimization analysis.'
+  year:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.year
+      - datalake_hubspot_clean.ticket_pipeline.year
+    description: 'Partition column: Year extracted from the pipeline update timestamp. Enables annual analysis of pipeline configuration evolution and organizational process maturity.'
+  month:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.month
+      - datalake_hubspot_clean.ticket_pipeline.month
+    description: 'Partition column: Month extracted from the pipeline update timestamp. Supports monthly tracking of pipeline modifications and process optimization cycles.'
+  day:
+    lineage:
+      - datalake_hubspot_clean.deal_pipeline.day
+      - datalake_hubspot_clean.ticket_pipeline.day
+    description: 'Partition column: Day extracted from the pipeline update timestamp. Provides daily granularity for pipeline configuration change analysis.'

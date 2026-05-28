@@ -131,7 +131,7 @@ cluster:
 - **`dags/{domain}/{dag_name}/`** — every DAG has `{dag_name}_declaration.yml`, `queries/{layer}/*.sql`, `metadata/{layer}/*.yml` (CI-enforced), and optionally `data_quality/{layer}/*.yml` and `spark_jobs/` (core-model DAGs).
 - **`packages/*/test/`** — unit tests mirror each package’s `src/bietlejuice/` tree (`test/unit/…`). DAG Spark jobs: `packages/bietlejuice-runtime/test/dags/…`; core models: `packages/bietlejuice-runtime/test/core_model_dags/…`; Airflow DAG modules under `dags/`: `packages/bietlejuice-airflow/test/unit/dags/…`.
 
-**24 business domains**: `core`, `for_rent`, `for_sale`, `fintech`, `agents`, `growth`, `people`, `platform`, `qcx`, `3p_partners`, `cross`, `ds_pricing`, `governance`, `mlops`, `qube`, `support_and_service`, `tech_platform`, and others.
+**24 business domains**: `core`, `for_rent`, `for_sale`, `fintech`, `agents`, `broker_xp`, `growth`, `people`, `platform`, `qcx`, `cross`, `ds_pricing`, `governance`, `mlops`, `qube`, `support_and_service`, `tech_platform`, and others.
 
 **Two special sub-structures:**
 

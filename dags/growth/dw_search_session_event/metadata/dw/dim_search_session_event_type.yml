@@ -1,0 +1,72 @@
+---
+database_name: dw_public
+table_name: dim_search_session_event_type
+description: Every row in this table is a possible combination of characteristics of an event in fact_search_session_event.
+  This includes event type (search or LPV), business context, referrer, search location type, platform, and others.
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  sk_event_type:
+    description: Primary key of the dimension table, representing the combination of characteristics of a search session event.
+  event_type:
+    description: Type of the event.
+    categories:
+      'Search': The row represents a house associated with a search
+      'Listing Page Viewed': The row represents listing page viewed
+    lineage:
+      - datalake_search_session_event.search_session_event.event_type
+  business_context:
+    description: Business context of the listing.
+    lineage:
+      - datalake_search_session_event.search_session_event.business_context
+    categories:
+      sale: 'ForSale context.'
+      rent: 'ForRent context.'
+      unknown: 'Context not informed in the event.'
+  utm_source:
+    description: UTM used to track the advertising source.
+    lineage:
+      - datalake_search_session_event.search_session_event.utm_source
+  utm_medium:
+    description: UTM used to track the advertising medium.
+    lineage:
+      - datalake_search_session_event.search_session_event.utm_medium
+  platform:
+    description: Platform where the event happened.
+    lineage:
+      - datalake_search_session_event.search_session_event.platform
+  base_referrer_url: 
+    description: Base URL of the referrer, i.e., where the user came from. By base, it means that it normalizes URLs by removing whatever comes
+      before :// (like http:// or android-app://), www., and anything after the first "/". For example, https://www.youtube.com/watch becomes youtube.com
+    lineage:
+      - datalake_search_session_event.search_session_event.base_referrer_url
+  search_rendering_type:
+    description: 'Distinguishes between client searches (170698_search_results_page_viewed_events) and server searches (170698_search_page_viewed_events)'
+    categories:
+      'Server-Side Rendering (SSR)': Also known as "Server Search". Comes from 170698_search_page_viewed_events. It happens when the user arrives in the search page from another page (homepage, google, etc).
+        In this case, the first 11 results are returned by the server and there is no effect of pclick (ranking model).
+      'Client Search': It happens when the user makes a search from the search page (moving the map, applying a filter, changing the searched location, etc). In this case the pclick has effect in the ranking of results.
+    lineage:
+      - datalake_search_session_event.search_session_event.search_rendering_type
+  search_location_type:
+    description: If the event is a Search, informs how the search was done (i.e., street, neighborhood, coordinates).
+    lineage:
+      - datalake_search_session_event.search_session_event.search_location_type
+    categories:
+      'city': 'Search by city.'
+      'neighborhood': 'Search by neighborhood.'
+      'coordinates': 'Search by coordinates.'
+      'street': 'Search by street.'
+      'poi': 'Search by point of interest.'
+      'unknown': 'Search, but by an unknown method.'
+      'N/A': 'Not a search.'
+  search_view_mode:
+    description: 'View mode of the search (i.e., list)'
+    lineage:
+      - datalake_search_session_event.search_session_event.search_view_mode
+  search_sort_order:
+    description: 'Sort order of the search (i.e., relevance)'
+    lineage:
+      - datalake_search_session_event.search_session_event.search_sort_order
+  ts_load:
+    description: Time when the table was loaded.

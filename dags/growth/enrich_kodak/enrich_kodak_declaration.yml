@@ -1,0 +1,60 @@
+dag:
+  name: enrich_kodak
+  schedule_start_date: 2020, 8, 29
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG creates enriched analytical tables focused on Kodak's image analysis data, transforming raw inspection results into business-ready datasets for property analytics and real estate insights.
+      
+      **Pipeline Purpose:**
+      This enrichment layer processes raw Kodak image inspection data to create analytical views that connect image analysis results with property and business context data. The pipeline is triggered by Mediator and performs full load operations to ensure data consistency.
+      
+      **Key Enrichments Created:**
+      
+      **1. image_inspection_amenities:**
+      - Aggregates room type analysis from property image inspections
+      - Connects Kodak image analysis with property data (houses) and 3P partner leads
+      - Maps external domain references (HOUSE, LEAD3P) to internal property IDs
+      - Provides room-level amenity detection for property classification
+      - Enables analysis of property completeness based on photographed rooms
+      
+      **Data Sources Integrated:**
+      - `datalake_kodak_clean.image_inspection`: Individual image analysis results
+      - `datalake_kodak_clean.image_inspection_group`: Property-level inspection groups
+      - `datalake_3p_supply.lead_3p`: Third-party partner lead data (enriched from broker_xp/enrich_3p_supply)
+      - `datalake_ebdb_clean.house`: QuintoAndar property master data
+      
+      **Business Value:**
+      - **Property Analytics**: Enhanced understanding of property photo coverage and room documentation
+      - **Quality Assessment**: Analysis of image inspection patterns across different property types
+      - **Partner Performance**: Evaluation of 3P partner property data quality through image analysis
+      - **Amenity Detection**: Automated identification of property features through room classification
+      
+      **Usage Patterns:**
+      - Property listing quality analysis and optimization
+      - Real estate partner performance monitoring
+      - Automated property feature detection and categorization
+      - Photo coverage completeness analysis for property listings
+      
+      **Technical Details:**
+      - Full load strategy ensures complete data consistency
+      - Triggered by Mediator for coordinated data processing
+      - Optimized for analytical queries with proper indexing and partitioning
+workflow:
+  type: query_delta
+  layer: enrich
+  tables_customization:
+    image_inspection_amenities:
+      table_privileges:
+        3p-readers:
+          - SELECT
+        data-engineers:
+          - ALL PRIVILEGES
+cluster:
+  type: databricks_16_4_med_general_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

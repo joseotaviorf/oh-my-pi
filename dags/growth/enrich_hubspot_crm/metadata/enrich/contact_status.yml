@@ -1,0 +1,58 @@
+---
+database_name: datalake_hubspot
+table_name: contact_status
+description: |
+  Enriched contact lead status tracking table with comprehensive change attribution and lifecycle progression analysis. 
+  Each row represents a specific status change event for a contact, capturing the complete context of customer lifecycle 
+  progression including source attribution, user actions, and engagement patterns. This table enables detailed analysis 
+  of customer journey optimization and lead nurturing effectiveness.
+  
+  **Key Features:**
+  - Complete contact status change event tracking with timestamp precision
+  - Source attribution including API calls, UI actions, automation, and marketing campaigns
+  - User attribution for understanding who triggered lifecycle stage changes
+  - Lifecycle stage progression tracking for conversion funnel analysis
+  - Lead scoring evolution and engagement pattern identification
+  - Customer journey mapping with touchpoint effectiveness measurement
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+columns:
+  id_contact:
+    lineage:
+      - datalake_hubspot.contact.id_contact
+    description: Unique identifier for a contact.
+  id_user_updated_by:
+    lineage:
+      - datalake_hubspot.contact.lead_status_history
+    description: User ID of the user who updated the contact's status.
+  source_type:
+    lineage:
+      - datalake_hubspot.contact.lead_status_history
+    description: The source where the status change was made.
+    categories: 
+      API: ''
+      CRM_UI: ''
+      EXTENSION: ''
+      MOBILE_IOS: ''
+      'null': ''
+  days_in_status:
+    description:  Number of days the contact has been in the current status.
+  lead_status:
+    lineage:
+      - datalake_hubspot.contact.lead_status_history
+    description: The current status of the contact.
+    categories: 
+      CONNECTED: ''
+      IN_PROGRESS: ''
+      NEW: ''
+      OPEN: ''
+      OPEN_DEAL: ''
+      UNQUALIFIED: ''
+  ts_status_started: 
+    lineage:
+      - datalake_hubspot.contact.lead_status_history
+    description: The timestamp the contact entered the current status.
+  ts_status_ended:
+    lineage:
+      - datalake_hubspot.contact.lead_status_history
+    description: The timestamp the contact left the current status. Is null if the contact is still in the current status.

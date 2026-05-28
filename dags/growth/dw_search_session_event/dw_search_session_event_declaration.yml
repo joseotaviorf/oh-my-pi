@@ -1,0 +1,33 @@
+dag:
+  name: dw_search_session_event
+  schedule_start_date: 2020,8,29
+  owner: Data Growth
+  documentation:
+    dag_purpose: 'This DAG is used to load the search session event data into the Data Warehouse.'
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: public
+  default_extraction_type: incremental
+  inner_dependencies:
+    fact_search_session_event:
+    - dim_search_session_event_type
+  tables_customization:
+    dim_search_session_event_type:
+      z_order_by: [sk_event_type]
+    fact_search_session_event:
+      partitions: [year, month, day]
+      z_order_by: [sk_house, sk_event_type]
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r5d.2xlarge
+    node_type_id: r5d.2xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: USER_ISOLATION
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  databricks_conn_id: databricks_new_env

@@ -1,0 +1,106 @@
+---
+database_name: datalake_hubspot
+table_name: meeting
+description: |
+  Enriched HubSpot meeting activity records with comprehensive engagement analytics and customer relationship intelligence. 
+  Each row represents a unique meeting interaction between team members and prospects/customers, enriched with business 
+  context, relationship mapping, and performance metrics. This table provides detailed insights into sales and support 
+  meeting effectiveness, customer engagement patterns, and team relationship-building performance.
+
+  **Key Enrichments:**
+  - Meeting outcome classification and business result analysis with success/failure attribution
+  - Customer relationship context including associated deals, tickets, companies, and contacts
+  - Team member attribution with performance tracking and meeting effectiveness measurement
+  - Meeting timing, duration, and attendance analysis for efficiency optimization
+  - Relationship development tracking through meeting frequency and engagement progression
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id_meeting:
+    lineage:
+      - datalake_hubspot.meeting_history.id_meeting
+    description: Id of the object. Not a primary key, since there is a new row for each update (limited to the most recent per day).
+  id_hubspot_owner:
+    lineage:
+      - datalake_hubspot.meeting_history.id_hubspot_owner
+    description: The ID of the owner associated with the meeting. This field determines the user listed as the meeting creator on the record timeline. Comes from the internal field hubspot_owner_id.
+  ids_attachments:
+    lineage:
+      - datalake_hubspot.meeting_history.ids_attachments
+    description: The IDs of the meeting''s attachments. Comes from the internal field hs_attachment_ids.
+  ids_associated_tickets:
+    lineage:
+      - datalake_hubspot.meeting_history.ids_associated_tickets
+    description: List of ids of associated tickets.
+  ids_associated_contacts:
+    lineage:
+      - datalake_hubspot.meeting_history.ids_associated_contacts
+    description: List of ids of associated contacts.
+  ids_associated_companies:
+    lineage:
+      - datalake_hubspot.meeting_history.ids_associated_companies
+    description: List of ids of associated companies.
+  ids_associated_deals:
+    lineage:
+      - datalake_hubspot.meeting_history.ids_associated_deals
+    description: List of ids of associated deals.
+  meeting_title:
+    lineage:
+      - datalake_hubspot.meeting_history.meeting_title
+    description: The title of the meeting. Comes from the internal field hs_meeting_title.
+  meeting_body:
+    lineage:
+      - datalake_hubspot.meeting_history.meeting_body
+    description: The meeting description. Comes from the internal field hs_meeting_body.
+  internal_meeting_notes:
+    lineage:
+      - datalake_hubspot.meeting_history.internal_meeting_notes
+    description: The internal notes you take for your team during a meeting that are not included in the attendee meeting description. Comes from the internal field hs_internal_meeting_notes.
+  meeting_external_url:
+    lineage:
+      - datalake_hubspot.meeting_history.meeting_external_url
+    description: TThe external URL for the calendar event. For example, this could be a Google calendar link or a Microsoft Outlook calendar link. Comes from the internal field hs_meeting_external_URL.
+  meeting_location:
+    lineage:
+      - datalake_hubspot.meeting_history.meeting_location
+    description: Where the meeting takes place. The value could be a physical address, a conference room, a videoconference link, or a phone number. Comes from the internal field hs_meeting_location.
+  meeting_outcome:
+    lineage:
+      - datalake_hubspot.meeting_history.meeting_outcome
+    description: The outcome of the meeting. The outcome values are scheduled, completed, rescheduled, no show, and canceled. Comes from the internal field hs_meeting_outcome.
+  activity_type:
+    lineage:
+      - datalake_hubspot.meeting_history.activity_type
+    description: The type of meeting. Comes from the internal field hs_activity_type.
+  ts_meeting:
+    lineage:
+      - datalake_hubspot.meeting_history.ts_meeting
+    description: This field marks the date and time that the meeting occurred. Comes from the internal field hs_timestamp.
+  ts_meeting_start:
+    lineage:
+      - datalake_hubspot.meeting_history.ts_meeting_start
+    description: The date and time when the meeting starts. The value for this property should match the value for ts_meeting. Comes from the internal field hs_meeting_start_time.
+  ts_meeting_end:
+    lineage:
+      - datalake_hubspot.meeting_history.ts_meeting_end
+    description: The date and time when the meeting ends. Comes from the internal field hs_meeting_end_time.
+  ts_created:
+    lineage:
+      - datalake_hubspot.meeting_history.ts_created
+    description: Timestamp of when the object was created.
+  ts_updated:
+    lineage:
+      - datalake_hubspot.meeting_history.ts_updated
+    description: Timestamp of when the object was updated.
+  year:
+    lineage:
+      - datalake_hubspot.meeting_history.year
+    description: Year when the object was updated.
+  month:
+    lineage:
+      - datalake_hubspot.meeting_history.month
+    description: Month when the object was updated.
+  day:
+    lineage:
+      - datalake_hubspot.meeting_history.day
+    description: Day when the object was updated.

@@ -1,0 +1,51 @@
+---
+database_name: datalake_hubspot
+table_name: ticket_stage
+owner: vitor.musachio@quintoandar.com.br
+domain: Growth
+description: |
+  Enriched ticket stage progression tracking table with comprehensive support pipeline analytics and resolution measurement. 
+  Each row represents a specific stage progression event for a support ticket, capturing the complete context of support 
+  pipeline movement including timing, attribution, and resolution velocity. This table enables detailed analysis of 
+  support process effectiveness and stage-level resolution optimization.
+  
+  **Key Features:**
+  - Complete ticket stage progression tracking with precise timing measurement
+  - Stage transition velocity analysis for support resolution optimization
+  - User and source attribution for understanding support workflow triggers
+  - Pipeline context integration for multi-pipeline support process comparison
+  - Stage duration calculation for support bottleneck identification and SLA optimization
+  - Resolution path analysis for customer satisfaction and efficiency improvement
+columns:
+  id_ticket:
+    lineage:
+      - datalake_hubspot.ticket.id_ticket
+    description: 'Unique identifier for the support ticket that progressed through this stage. Primary key for tracking ticket-specific stage progression and support pipeline movement.'
+  id_stage:
+    lineage:
+      - datalake_hubspot.ticket.id_stage_history
+    description: 'Unique identifier for the stage the ticket moved to. References the stage configuration and enables stage-level support performance analysis.'
+  id_pipeline:
+    lineage:
+      - datalake_hubspot.stage.id_pipeline
+    description: 'Reference to the support pipeline containing this stage. Provides context for multi-pipeline support workflow analysis and process comparison.'
+  id_user_updated_by:
+    lineage:
+      - datalake_hubspot.ticket.id_stage_history
+    description: 'User ID of the support agent who moved the ticket to this stage. Critical for support team performance analysis and case management attribution.'
+  source_type:
+    lineage:
+      - datalake_hubspot.ticket.id_stage_history
+    description: 'Source of the stage change (e.g., API, CRM_UI, AUTOMATION_PLATFORM, IMPORT). Enables analysis of support workflow triggers and automation effectiveness in case resolution.'
+  days_in_stage:
+    lineage:
+      - datalake_hubspot.ticket.id_stage_history
+    description: 'Number of days the ticket remained in this support stage, calculated as the difference between stage start and end timestamps (or current time if still in stage). Used for SLA compliance and resolution velocity analysis.'
+  ts_stage_started:
+    lineage:
+      - datalake_hubspot.ticket.id_stage_history
+    description: 'Timestamp when the ticket entered this support stage. Critical for calculating resolution time, SLA compliance, and support pipeline efficiency analysis.'
+  ts_stage_ended:
+    lineage:
+      - datalake_hubspot.ticket.id_stage_history
+    description: 'Timestamp when the ticket exited this stage (NULL if currently in this stage). Used for stage duration calculations and support resolution timing analysis.'

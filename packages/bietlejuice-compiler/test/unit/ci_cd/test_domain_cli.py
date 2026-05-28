@@ -12,7 +12,8 @@ from scripts.ci_cd.domain_cli import (
 class DomainArgTypeTest(unittest.TestCase):
     def test_accepts_typical_domain(self) -> None:
         self.assertEqual(domain_arg_type("for_rent"), "for_rent")
-        self.assertEqual(domain_arg_type("3p_partners"), "3p_partners")
+        self.assertEqual(domain_arg_type("broker_xp"), "broker_xp")
+        self.assertEqual(domain_arg_type("growth"), "growth")
 
     def test_rejects_traversal(self) -> None:
         with self.assertRaises(argparse.ArgumentTypeError):

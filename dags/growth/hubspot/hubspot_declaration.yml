@@ -1,0 +1,97 @@
+dag:
+  name: hubspot
+  schedule_start_date: 2020, 12, 21
+  schedule_interval: 0 21 * * *
+  owner: Data Growth
+  documentation:
+    dag_purpose: |
+      This DAG imports comprehensive CRM data from HubSpot, including core business objects and customer relationship data.
+
+      **Imported Objects:**
+      - **Companies**: Business organizations and their details (industry, revenue, employees, etc.)
+      - **Contacts**: Individual people and their contact information, lifecycle stages, and interactions
+      - **Deals**: Sales opportunities in the pipeline with stages, amounts, and close dates
+      - **Tickets**: Customer support cases and service requests for issue tracking
+      - **Owners**: HubSpot users who own and manage records
+      - **Marketing**: Email campaigns, events, and marketing automation data
+      - **Activities**: Customer interactions including calls, meetings, and communications
+      - **Pipelines**: Deal and ticket workflow stages and configurations
+
+      **Data Strategy:**
+      - Incremental loads using updated_at timestamps for efficient data extraction
+      - Full historical property changes captured in properties_with_history fields
+      - Associated records linked to maintain relationship integrity across objects
+      - Daily partitioning (year/month/day) for optimized query performance
+
+      **Business Value:**
+      - Complete customer 360-degree view combining sales, marketing, and service data
+      - Sales pipeline analytics and forecasting capabilities
+      - Customer journey tracking across all touchpoints
+      - Support case resolution metrics and customer satisfaction insights
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_hubspot_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{dag_name}"
+    - "{{ data_interval_start | ds }}"
+  default_partitions: [year, month, day]
+  tables_customization:
+    company:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - company
+    contact:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - contact
+    deal:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - deal
+    ticket:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - ticket
+    deal_pipeline:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - deal_pipeline
+    ticket_pipeline:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - ticket_pipeline
+    owner:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - owner
+    call:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - call
+    communication:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - communication
+    meeting:
+      extraction_type: incremental
+      date_filter_column: updated_at
+      extra_spark_job_arguments:
+        - meeting
+  execution_timeout_hours: 3
+cluster:
+  type: consolidation_s_memory_single_node_cluster
+  custom_libraries:
+    - whl: "{artifacts_bucket}/hubspot-api-client-python/quintoandar_hubspot_api_client-0.3.0-py2.py3-none-any.whl"
+  databricks_conn_id: databricks_new

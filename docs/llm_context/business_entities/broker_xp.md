@@ -312,7 +312,7 @@ Use `fact_listings` for *outcome and timing per listing*; use `fact_listing_stat
 
 ### Search and Listing Page Viewed events — `fact_search_session_event`
 
-The DAG lives under `dags/3p_partners/dw_search_session_event` — it is Marketplace-owned by construction, even though the resulting tables are in the `dw_public` schema (visible to all consumers).
+The DAG lives under `dags/growth/dw_search_session_event` — it is Marketplace-owned by construction, even though the resulting tables are in the `dw_public` schema (visible to all consumers).
 
 - **Grain**: 1 row per `(house, event)`. A single SSR search that returned 30 houses produces 30 rows. Today the table covers only **two `event_type` values**: `Search` and `Listing Page Viewed`.
 - **Identifiers**: `sk_event` (PK), `sk_event_type` (→ `dim_search_session_event_type`), `sk_amplitude` (anonymous user), `sk_user` (logged user → `dw_public.dim_user`), `sk_house`, `sk_house_region`, **`sk_company`** (legacy — do not use as broker key), `sk_session`, `sk_search`, `sk_event_date`, `nr_session_for_user_on_day`, `ts_event`.
@@ -475,7 +475,7 @@ Mixing the two without splitting hides which effect (server default vs ranking) 
 | `dw_rede_supply` | `dw_3p_supply` |
 | `enrich_rede_supply` | `enrich_3p_supply` |
 | `enrich_brokers_supply_processor` | `enrich_3p_supply` |
-| `dags/3p_partners/enrich_rede_house_history` | (removed — use `datalake_ebdb_listing.house` for current 3P attribution; bridge supply via `dw_3p_supply.fact_lead_3p_flows.sk_house` for funnel/ts analytics) |
+| `dags/growth/enrich_rede_house_history` | (removed — use `datalake_ebdb_listing.house` for current 3P attribution; bridge supply via `dw_3p_supply.fact_lead_3p_flows.sk_house` for funnel/ts analytics) |
 | `sk_company` (as broker identifier) | `sk_broker` |
 | `hubspot_member_category` (HubSpot tier) | `dim_broker_products.tier_name` / `dim_broker_tier_history` |
 | `is_active_company_rede_partner` | `dim_broker.is_3p_active_broker` |

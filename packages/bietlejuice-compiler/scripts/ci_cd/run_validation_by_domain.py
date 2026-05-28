@@ -32,7 +32,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from scripts.services.git_service import GitService
 
 ALL_DOMAINS: List[str] = [
-    "3p_partners",
     "agents",
     "atlas_db",
     "broker_xp",

@@ -1,0 +1,40 @@
+database_name: datalake_kodak_clean
+table_name: photo_sphere
+description: |
+  Contains metadata for 360-degree panoramic images (photospheres) stored in Kodak's media management system. These immersive images provide virtual tour capabilities for property listings, allowing users to explore spaces interactively. Each photosphere includes both full-resolution and preview versions, with positioning information for proper display within property virtual tours. This table supports QuintoAndar's advanced property visualization features and enhances user engagement with listings.
+domain: Growth
+owner: vitor.musachio@quintoandar.com.br
+columns:
+  id:
+    description: 'Unique identifier for each photosphere record in the Kodak system. Primary key used for referencing in virtual tour construction and display workflows.'
+    lineage:
+      - datalake_kodak_raw.photosphere.id
+  external_domain:
+    description: 'Domain classification indicating which external system this photosphere belongs to.'
+    lineage:
+      - datalake_kodak_raw.photosphere.externaldomain
+    categories:
+      HOUSE: 'Photosphere belongs to a QuintoAndar house listing'
+      BUILDING_VENTURE: 'Photosphere belongs to a building or real estate venture'
+      LEAD3P: 'Photosphere belongs to a third-party partner lead'
+      ATLAS: 'Photosphere belongs to Atlas system (internal tooling)'
+  id_external_domain:
+    description: 'External identifier linking the photosphere to records in other systems (property ID, lead ID, building ID, etc.). The interpretation depends on the external_domain value.'
+    lineage:
+      - datalake_kodak_raw.photosphere.externaldomainid
+  metadata:
+    description: 'JSON object containing flexible photosphere metadata including capture device information, resolution specifications, processing parameters, creation timestamps, and other 360° image-specific attributes that enhance virtual tour experiences.'
+    lineage:
+      - datalake_kodak_raw.photosphere.metadata
+  path:
+    description: 'S3 object key/path where the full-resolution photosphere file is stored in QuintoAndar cloud storage. Used for generating high-quality virtual tour experiences and interactive 360° viewing.'
+    lineage:
+      - datalake_kodak_raw.photosphere.path
+  path_preview:
+    description: 'S3 object key/path for the lower-resolution preview version of the photosphere. Used for faster loading in thumbnails, initial preview displays, and bandwidth-optimized viewing scenarios.'
+    lineage:
+      - datalake_kodak_raw.photosphere.pathpreview
+  position:
+    description: 'Sequential position or order number of the photosphere within a property virtual tour. Used for organizing the navigation flow and ensuring logical progression through property spaces in virtual tour experiences.'
+    lineage:
+      - datalake_kodak_raw.photosphere.position
