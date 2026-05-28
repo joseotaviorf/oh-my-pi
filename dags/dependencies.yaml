@@ -4042,6 +4042,7 @@ bietlejuice.enrich_supply_acquisition:
   - bietlejuice.ebdb_lead:load-clean-lead:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context-aud:first-run-of-day
   - bietlejuice.ebdb_listing_fast_lane:load-clean-listing-business-context:first-run-of-day
+  - bietlejuice.enrich_3p_supply:load-enrich-lead-3p-reason-changes:first-run-of-day
   - bietlejuice.enrich_3p_supply:load-enrich-lead-3p-status-changes:first-run-of-day
   - bietlejuice.enrich_3p_supply:load-enrich-lead-3p:first-run-of-day
   - bietlejuice.enrich_bob:load-enrich-house-draft-business-context:first-run-of-day
