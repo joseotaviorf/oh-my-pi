@@ -366,6 +366,46 @@ columns:
     lineage:
       - datalake_hubspot_clean.deal.properties
     description: Integer number of messages the user from that deal received while active on the rehabilitation flow.
+  consorcio_conrado_discard_classification:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Informs if Conrado discarded the deal because the client is not interested in talking about Consorcio or any other reason.
+  consorcio_fup_inatividade_version:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Version of the inactivity FUP flow.
+  consorcio_fup_inatividade_status:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Status of the latest inactivity follow up flow for that deal.
+  consorcio_fup_inatividade_stage_entered:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Snapshot of the stage of the funnel the deal entered the inactivity FUP flow.
+  consorcio_fup_inatividade_branch:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: The inactivity FUP flow has different types of messages, which depends on the branch of that deal.
+  consorcio_fup_inatividade_messages_sent:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Number of messages sent for the latest inactivity FUP flow for that deal.
+  consorcio_fup_inatividade_cadence_config_version:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Version of the template messages for the inactivity FUP flow.
+  consorcio_fup_inatividade_exit_reason:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Reason why the deal exited the inactivity FUP flow.
+  consorcio_fup_inatividade_is_recovered:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Whether the inactivity FUP was effective in recovering the deal or not.
+  consorcio_fup_inatividade_is_discarded_by_cadence:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Whether the FUP was completed without recovering the deal or not.
   is_archived:
     lineage:
       - datalake_hubspot_clean.deal.is_archived
@@ -382,6 +422,18 @@ columns:
     lineage:
       - datalake_hubspot_clean.deal.properties
     description: Timestamp of when that deal exited the rehabilitation flow.
+  ts_consorcio_fup_inatividade_entered:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Timestamp of when the deal entered the latest inactivity FUP flow.
+  ts_consorcio_fup_inatividade_exited:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Timestamp of when the deal exited the latest inactivity FUP flow.
+  ts_consorcio_fup_inatividade_recovered:
+    lineage:
+      - datalake_hubspot_clean.deal.properties
+    description: Timestamp of when the deal was recovered by the latest inactivity FUP flow.
   ts_closed:
     lineage:
       - datalake_hubspot_clean.deal.properties

@@ -265,10 +265,24 @@ deal:
       - qual_grupo
       - cons_user_first_message_reply
       - cons_qualificacao
+      - cons_conrado_discard_classification
+      - cons_fup_inatividade_version
+      - cons_fup_inatividade_status
+      - cons_fup_inatividade_entered_at
+      - cons_fup_inatividade_stage_snapshot
+      - cons_fup_inatividade_branch
+      - cons_fup_inatividade_messages_sent
+      - cons_fup_inatividade_cadence_config_version
+      - cons_fup_inatividade_exit_reason
+      - cons_fup_inatividade_exit_at
+      - cons_fup_inatividade_recovery_flag
+      - cons_fup_inatividade_recovered_at
+      - cons_fup_inatividade_discarded_by_cadence
     propertiesWithHistory:
       - dealstage
       - pipeline
       - cons_template_last_sent
+      - cons_fup_inatividade_cycle_id
     associations:
       - company
 ticket:
