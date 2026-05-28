@@ -31,6 +31,8 @@ This schema is indexed in the [People Data Catalog](https://quintoandar.atlassia
 
 **✅ Hour-bank balances** : Hour-bank balance values per employee in minutes for each reference date.
 
+**✅ Daily punches** : Punch-clock events (entry, break, exit, manual adjustment) per employee and calendar day, with creation channel, validation outcome, and adjustment audit attributes for current-month attendance follow-up.
+
 **✅ Time requests** : Workforce requests spanning clock corrections, hour-bank adjustments, and categorized justification or time-off approvals, each with status, subtype, and interval-related attributes.
 
 **✅ Hourly-rate windows** : Hourly pay windows paired with balance facts, used to estimate workforce time related costs.
@@ -66,6 +68,7 @@ Detailed definitions for every column, metric, and flag are maintained in DataHu
 | `dim_request` | One row per time request subtype (current reference) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.dim_request,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/dim_request.sql) |
 | `fact_absence_requests` | One row per PIN absence submission (Latest state for that submission) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_absence_requests,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_absence_requests.sql) |
 | `fact_employee_hourly_cost_windows` | One row per salary-rate segment per employee | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_employee_hourly_cost_windows,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_employee_hourly_cost_windows.sql) |
+| `fact_employee_punches` | One row per punch-clock event (id_punch) for an employee | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_employee_punches,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_employee_punches.sql) |
 | `fact_hours_bank_rule_totals` | One row per employee and date (Tied to an hourly-bank bucket) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_hours_bank_rule_totals,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_hours_bank_rule_totals.sql) |
 | `fact_time_attendance_requests` | One row per time request | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_time_attendance_requests,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_time_attendance_requests.sql) |
 | `fact_vacation_balances` | One row per employee vacation period | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_vacation_balances,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_vacation_balances.sql) |
@@ -89,6 +92,8 @@ Detailed definitions for every column, metric, and flag are maintained in DataHu
 * **Time catalog** : Each row is one subtype from the Oitchau catalog regarding why a workforce-time request is opened, including labels plus policy-oriented defaults (paid subtype, hourly-bank treatment, weekly-rest discount, active versus retired menu items).
 
 * **Hourly-bank balance line** : Each row is one employee on a calendar balance date within one hourly-bank bucket.
+
+* **Punch event** : Each row is one punch-clock event (entry, break, exit, manual adjustment) registered for an employee on a calendar day with the channel where the punch was created, validation outcome, and creator audit attributes.
 
 * **Hourly-rate window** : Each row is one salary-rate segment with start and end dates; Latest periods use an empty end date.
 
@@ -229,6 +234,42 @@ WHERE
         OR LOWER(cat.absence_type) LIKE '%férias%'
     )
     AND ar.dt_absence_started >= ADD_MONTHS(CURRENT_DATE(), -3)
+LIMIT 100
+```
+
+### Daily punch-clock snapshot (Exploratory Query)
+
+**Question:** How many punches did each employee register today and yesterday, including a flag for manual adjustments?
+
+```sql
+SELECT
+    fp.person_number,
+    fp.dt_punched,
+    COUNT(DISTINCT fp.id_punch) AS punches_count,
+    MIN(fp.ts_punched) AS ts_first_punch,
+    MAX(fp.ts_punched) AS ts_last_punch,
+    SUM(
+        CASE
+            WHEN fp.is_manual_adjustment THEN 1
+            ELSE 0
+        END
+    ) AS manual_adjustments_count,
+    emp.sk_employee
+FROM
+    dw_time.fact_employee_punches AS fp
+LEFT JOIN
+    dw_people.dim_employee AS emp
+        ON fp.sk_employee = emp.sk_employee
+WHERE
+    fp.dt_punched BETWEEN DATE_SUB(CURRENT_DATE(), 1)
+        AND CURRENT_DATE()
+GROUP BY
+    fp.person_number,
+    fp.dt_punched,
+    emp.sk_employee
+ORDER BY
+    fp.dt_punched DESC,
+    punches_count DESC
 LIMIT 100
 ```
 

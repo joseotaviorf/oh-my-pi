@@ -1,0 +1,187 @@
+---
+database_name: dw_time
+table_name: fact_employee_punches
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: |
+  Line-level workforce time-and-attendance punch-clock events from OiTchau. Each row is one punch event
+  (entry, break, exit, manual adjustment) registered for an employee on a given calendar day.
+
+  Grain: one row per id_punch (Oitchau punch identifier) after mapping the employee profile to PIN via
+  datalake_people.identifier_mapping (latest assignment, excluding test users). Duplicate punch
+  identifiers from raw are deduped to the latest ts_load.
+
+  Daily scheduled runs incrementally merge yesterday's punches; operator-triggered backfills (oitchau_api
+  with wider load_start_date/load_end_date) populate historical months. The fact exposes the same
+  employee join keys used by reports_detailed and other dw_time facts so dashboards can union the
+  current-month window (this fact) with closed-month consolidated reports without special-casing the
+  query: sk_employee, person_number, id_employee_profile, and dt_punched.
+
+  PII columns from the source (CPF, full name, PIS, matricula) are intentionally excluded; consumers
+  that need contact details join dw_people.dim_employee or dw_public.dim_person at query time.
+
+columns:
+  sk_employee_punch:
+    description: |
+      Surrogate key for one punch event in analytics. Stable across reloads (XXHASH64 of id_punch) so
+      counts and distinct punch metrics stay consistent.
+  sk_employee:
+    description: |
+      Employee surrogate key shared across People marts; join dw_people.dim_employee for name,
+      hierarchy, and location used in workforce reporting.
+    lineage:
+      - datalake_people.identifier_mapping.id_person
+  sk_punched_date:
+    description: |
+      Foreign key to dw_public.dim_date keyed on the calendar date the punch happened. Use this for
+      consistent date dimension joins (week, month, holiday, fiscal period).
+    lineage:
+      - dw_public.dim_date.sk_date
+  id_punch:
+    description: |
+      Natural numeric identifier (Oitchau id) for the punch event; use for reconciliation with the
+      OiTchau product, support tickets, and the source clean table.
+    lineage:
+      - datalake_oitchau_clean.punches.id_punch
+  id_punch_key:
+    description: |
+      Alternate natural key (UUID) for the punch event from OiTchau; use for joins or lookups that
+      prefer string identifiers over numeric ids.
+    lineage:
+      - datalake_oitchau_clean.punches.id_punch_key
+  id_employee_profile:
+    description: |
+      OiTchau employee profile UUID (employees.uuid); shared join key with datalake_oitchau_clean
+      tables and reports_detailed for cross-source reconciliation.
+    lineage:
+      - datalake_oitchau_clean.punches.id_employee_profile
+  id_employee:
+    description: |
+      OiTchau internal numeric employee identifier; provided for traceability to the product's REST API
+      and OiTchau-side dashboards.
+    lineage:
+      - datalake_oitchau_clean.punches.id_employee
+  id_employee_external:
+    description: |
+      OiTchau employee externalId stamped from the source matricula; equals PIN person_number for the
+      vast majority of active employees. Kept for audit and cross-system reconciliation.
+    lineage:
+      - datalake_oitchau_clean.punches.id_employee_external
+  id_created_by_profile:
+    description: |
+      OiTchau profile UUID for the actor who registered the punch (employee, manager, or HR). Use with
+      is_manual_adjustment to audit who created or adjusted the punch on behalf of the employee.
+    lineage:
+      - datalake_oitchau_clean.punches.id_created_by_profile
+  id_created_by_external:
+    description: |
+      OiTchau externalId (matricula) for the actor who registered the punch. Use with
+      is_manual_adjustment to identify the manager or HR operator behind a manual adjustment.
+    lineage:
+      - datalake_oitchau_clean.punches.id_created_by_external
+  id_created_by:
+    description: |
+      OiTchau internal numeric identifier for the actor who registered the punch; provided for
+      traceability to the product API.
+    lineage:
+      - datalake_oitchau_clean.punches.id_created_by
+  id_location:
+    description: |
+      OiTchau location identifier for the punch (workplace, branch, or custom location). Pair with
+      is_custom_location to flag punches taken outside of the registered locations.
+    lineage:
+      - datalake_oitchau_clean.punches.id_location
+  person_number:
+    description: |
+      Oracle HCM person number (PIN); natural key for filters, spreadsheets, and joins to
+      dw_people.dim_employee on person_number or sk_employee.
+    lineage:
+      - datalake_people.identifier_mapping.person_number
+  punch_key:
+    description: |
+      Shift event key from OiTchau (for example entry0, break_start0, break_end0, exit0). Used to
+      classify the punch within the configured shift schedule for attendance analytics.
+    lineage:
+      - datalake_oitchau_clean.punches.punch_key
+  timezone_name:
+    description: |
+      IANA timezone name (for example America/Sao_Paulo) the source used to compose punch_time_local;
+      preserved here so consumers know the local clock the employee saw.
+    lineage:
+      - datalake_oitchau_clean.punches.timezone_name
+  punch_type:
+    description: |
+      Punch type from OiTchau (typically marking entry, break, or exit). Use with punch_key to
+      reconstruct the shift sequence.
+    lineage:
+      - datalake_oitchau_clean.punches.punch_type
+  punch_status:
+    description: |
+      Lifecycle status from OiTchau (for example approved, pending, rejected, invalid). Pair with
+      validation_status to separate workflow approval from rule validation.
+    lineage:
+      - datalake_oitchau_clean.punches.punch_status
+  punch_reason:
+    description: |
+      Reason code from OiTchau when the punch carries an explicit justification (manual adjustment,
+      correction, exception). Null when not applicable.
+    lineage:
+      - datalake_oitchau_clean.punches.punch_reason
+  punch_source:
+    description: |
+      Channel where the punch was created (for example mobile, web, kiosk, integration). Useful for
+      diagnosing punch-collection coverage by device.
+    lineage:
+      - datalake_oitchau_clean.punches.punch_source
+  validation_status:
+    description: |
+      OiTchau business-rule validation outcome for the punch (for example valid, invalid, pending). Use
+      to filter out invalid punches before computing worked-time metrics.
+    lineage:
+      - datalake_oitchau_clean.punches.validation_status
+  late_reason:
+    description: |
+      Free-text reason captured by the employee or manager when the punch is flagged as late entry or
+      early leave. Use sparingly; populated only when the late-flow is triggered.
+    lineage:
+      - datalake_oitchau_clean.punches.late_reason
+  duration_minutes:
+    description: |
+      Minutes the punch contributes to (typically break or interval duration) when OiTchau emits a
+      duration value; null for plain entry or exit punches.
+    lineage:
+      - datalake_oitchau_clean.punches.duration_minutes
+  is_manual_adjustment:
+    description: |
+      True when the punch was created or edited manually (manager or HR operator) instead of being
+      registered directly by the employee at the device or app. Critical for audit dashboards.
+    lineage:
+      - datalake_oitchau_clean.punches.is_manual_adjustment
+  is_custom_location:
+    description: |
+      True when the punch was taken outside the standard registered locations (custom GPS, home
+      office). Pair with id_location to understand where employees punch from.
+    lineage:
+      - datalake_oitchau_clean.punches.is_custom_location
+  is_force_validated:
+    description: |
+      True when a manager or HR force-validated the punch overriding the standard business rules. Pair
+      with is_manual_adjustment to track override operations.
+    lineage:
+      - datalake_oitchau_clean.punches.is_force_validated
+  dt_punched:
+    description: |
+      Calendar date the punch was registered (local to the employee's timezone). Primary date column
+      for daily and monthly attendance analytics; join sk_punched_date for dim_date attributes.
+    lineage:
+      - datalake_oitchau_clean.punches.dt_punched
+  ts_punched:
+    description: |
+      UTC timestamp of the punch event from OiTchau (source punch_time_local field, ISO 8601 with
+      trailing Z). Use timezone_name to convert to the employee's local clock when needed.
+    lineage:
+      - datalake_oitchau_clean.punches.punch_time_local
+  ts_load:
+    description: |
+      Warehouse load timestamp set at ETL run time (CURRENT_TIMESTAMP). Use for pipeline freshness
+      monitoring, not for punch business timestamps.

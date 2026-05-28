@@ -1325,6 +1325,7 @@ bietlejuice.dw_time:
   - bietlejuice.oitchau_api:load-clean-employee-costs:first-run-of-day
   - bietlejuice.oitchau_api:load-clean-employees:first-run-of-day
   - bietlejuice.oitchau_api:load-clean-hoursbank-totals:first-run-of-day
+  - bietlejuice.oitchau_api:load-clean-punches:first-run-of-day
   - bietlejuice.oitchau_api:load-clean-requests-types-subtypes:first-run-of-day
   - bietlejuice.oitchau_api:load-clean-requests:first-run-of-day
   - bietlejuice.pin_absence:load-clean-person-entry:first-run-of-day

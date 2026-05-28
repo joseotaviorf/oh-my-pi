@@ -1,0 +1,40 @@
+---
+table_name: dw_time.fact_employee_punches
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Warning
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: 0
+    less_than_or_equal_to: 25
+    severity_level: Warning
+
+column_level_validations:
+  sk_employee_punch:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  sk_employee:
+    is_complete:
+      severity_level: Error
+  sk_punched_date:
+    is_complete:
+      severity_level: Error
+  id_punch:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_employee_profile:
+    is_complete:
+      severity_level: Error
+  person_number:
+    is_complete:
+      severity_level: Error
+  dt_punched:
+    is_complete:
+      severity_level: Error

@@ -68,3 +68,12 @@ workflow:
     fact_absence_requests:
       vacuum_retention_hours: 168
       vacuum_lite: true
+    fact_employee_punches:
+      extraction_type: incremental
+      merge_on:
+        - id_punch
+      z_order_by:
+        - sk_employee
+        - dt_punched
+      vacuum_retention_hours: 168
+      vacuum_lite: true
