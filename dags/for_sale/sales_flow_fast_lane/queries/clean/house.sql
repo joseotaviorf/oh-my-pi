@@ -1,0 +1,23 @@
+SELECT
+    id,
+    external_id AS id_external,
+    address_data_id AS id_address_data,
+    land_tenure,
+    house_registration_status,
+    has_seller_debt_payments,
+    has_chattel_mortgage,
+    registry_must_be_updated AS has_pending_registry_update,
+    chattel_mortgage_remaining_value,
+    has_debts_or_encumbrances,
+    has_instituted_usufruct,
+    has_recent_transaction,
+    has_transaction_in_family,
+    image_url,
+    is_primary_market,
+    notified_on_negotiation_at AS ts_notified_on_negotiation,
+    created_at AS ts_created,
+    updated_at AS ts_updated,
+    year,
+    month,
+    day
+FROM datalake_sales_flow_fast_lane_raw.house

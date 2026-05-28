@@ -1,0 +1,30 @@
+database_name: datalake_sales_flow_fast_lane_clean
+table_name: specialist
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Table that contains information about the specialist who is involved in the sales flow.
+columns:
+  id_specialist:
+    description: Primary key of the specialist record in the clean layer.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.specialist.id
+  id_sales_flow:
+    description: Identifier of the sales flow associated with this specialist.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.specialist.sales_flow_id
+  id_user:
+    description: Identifier of the user assigned as specialist for the sales flow.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.specialist.user_id
+  kind:
+    description: Specialist role or category within the sales flow process.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.specialist.kind
+  ts_created:
+    description: Timestamp when the specialist record was created in the source system.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.specialist.created_at
+  ts_updated:
+    description: Timestamp when the specialist record was last updated in the source system.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.specialist.updated_at

@@ -1,0 +1,55 @@
+---
+database_name: datalake_sales_flow_fast_lane_raw
+table_name: users
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Raw CDC table from Sales Flow postgres database with user records involved in sale flows.
+columns:
+  id:
+    description: Primary key of the user record in the Sales Flow source database.
+  external_id:
+    description: User identifier in QuintoAndar systems, used to join with EBDB and dim_user.
+  name:
+    description: Full name of the user as stored in Sales Flow.
+    tags:
+      - PII
+      - Confidential
+  email:
+    description: Email address of the user as stored in Sales Flow.
+    tags:
+      - PII
+      - Confidential
+  phone:
+    description: Phone number of the user as stored in Sales Flow.
+    tags:
+      - PII
+      - Confidential
+  type:
+    description: User type classification within the Sales Flow application.
+  cpf:
+    description: Brazilian individual taxpayer identification number of the user.
+    tags:
+      - PII
+      - Confidential
+  created_at:
+    description: Timestamp when the user record was created in the source database.
+  updated_at:
+    description: Timestamp when the user record was last updated in the source database.
+  op_cdc:
+    description: CDC operation type captured by Debezium (insert, update, or delete).
+  ts_cdc_transaction:
+    description: Timestamp when the change was captured by the CDC pipeline.
+  ts_database_transaction:
+    description: Timestamp of the database transaction in the source system.
+  cdc_transaction_id:
+    description: Source database transaction identifier for the CDC event.
+  cdc_binlog_position:
+    description: Postgres logical sequence number (LSN) for the CDC event ordering.
+  year:
+    description: Year partition derived from the CDC ingestion timestamp.
+  month:
+    description: Month partition derived from the CDC ingestion timestamp.
+  day:
+    description: Day partition derived from the CDC ingestion timestamp.
+  hour:
+    description: Hour partition derived from the CDC ingestion timestamp.

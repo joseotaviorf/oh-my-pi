@@ -1,0 +1,43 @@
+dag:
+  name: sales_flow_fast_lane
+  schedule_start_date: 2026, 5, 25
+  schedule_interval: 0 21,7,8,9,10,11,12,13,14,15,16,17,18,19 * * *
+  owner: Data ForSale
+  documentation:
+    dag_purpose: |
+      DAG containing high-frequency tables from Sales Flow context that run every hour.
+workflow:
+  type: cdc
+  layer: raw
+  database_type: postgres
+  source_database: salesflow
+  custom_schema: sales_flow_fast_lane
+  dbutils_secret_key: SALESFLOW_DB
+  execution_timeout_hours: 0.5
+  tables_customization:
+    specialist:
+      clean_table_name: specialist
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id_specialist"]
+    users:
+      clean_table_name: users
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    sales_flow:
+      clean_table_name: sales_flow
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    offer:
+      clean_table_name: offer
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    payment:
+      clean_table_name: payment
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+    house:
+      clean_table_name: house
+      raw_primary_keys: ["id"]
+      clean_primary_keys: ["id"]
+cluster:
+  type: emr_7_12_small_general_2xlarge_single_node_cluster

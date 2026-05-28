@@ -1,0 +1,59 @@
+---
+database_name: datalake_sales_flow_fast_lane_raw
+table_name: payment
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Raw CDC table from Sales Flow postgres database with payment records for sales flows.
+columns:
+  id:
+    description: Primary key of the payment record in the source database.
+  sales_flow_id:
+    description: Foreign key referencing the parent sales flow for this payment.
+  payment_method:
+    description: Payment method selected for the purchase such as cash or financed.
+  payment_model:
+    description: Payment model used in the property purchase such as CCV assistance.
+  down_payment_value:
+    description: Amount paid by the buyer as a down payment signal.
+  entry_amount:
+    description: Entry amount paid by the buyer at the beginning of the contract.
+  fgts_value:
+    description: FGTS balance amount applied to the property purchase payment.
+  status:
+    description: Current payment tracking status in the Sales Flow application.
+  fgts_doc_submission_finished_by:
+    description: User identifier who completed the FGTS document submission step.
+  fgts_payment_finished_by:
+    description: User identifier who completed the FGTS payment step.
+  is_down_payment_paid:
+    description: Flag indicating whether the down payment has been paid.
+  payment_type:
+    description: Payment type classification in the source Sales Flow application.
+  down_payment_paid_at:
+    description: Timestamp when the down payment was confirmed in the source system.
+  fgts_doc_submission_finished_at:
+    description: Timestamp when FGTS document submission was completed in the source system.
+  fgts_payment_finished_at:
+    description: Timestamp when FGTS payment was completed in the source system.
+  created_at:
+    description: Timestamp when the payment record was created in the source database.
+  updated_at:
+    description: Timestamp when the payment record was last updated in the source database.
+  op_cdc:
+    description: CDC operation type captured by Debezium (insert, update, or delete).
+  ts_cdc_transaction:
+    description: Timestamp when the change was captured by the CDC pipeline.
+  ts_database_transaction:
+    description: Timestamp of the database transaction in the source system.
+  cdc_transaction_id:
+    description: Source database transaction identifier for the CDC event.
+  cdc_binlog_position:
+    description: Postgres logical sequence number (LSN) for the CDC event ordering.
+  year:
+    description: Year partition derived from the CDC ingestion timestamp.
+  month:
+    description: Month partition derived from the CDC ingestion timestamp.
+  day:
+    description: Day partition derived from the CDC ingestion timestamp.
+  hour:
+    description: Hour partition derived from the CDC ingestion timestamp.

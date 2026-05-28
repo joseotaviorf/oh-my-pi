@@ -1,0 +1,54 @@
+database_name: datalake_sales_flow_fast_lane_clean
+table_name: users
+domain: For Sale
+owner: helder.rodrigues@quintoandar.com.br
+description: Table with sales flow users infos.
+columns:
+  id:
+    description: User ID on SalesFlow tables.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.users.id
+  id_external:
+    description: User ID on 5A main table (EBDB) and it's the ID used on dw_public.dim_user.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.users.external_id
+  name:
+    description: User name.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.users.name
+  email:
+    description: User e-mail.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.users.email
+  phone:
+    description: User phone.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.users.phone
+  type:
+    description: User type.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.users.type
+  cpf:
+    description: User personal document.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.users.cpf
+  ts_created:
+    description: Timestamp that indicates when this entry was created.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.users.created_at
+  ts_updated:
+    description: Timestamp that indicates when this entry was last updated.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.users.updated_at
+  year:
+    description: The Year in which the data was ingested.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.users.year
+  month:
+    description: The Month in which the data was ingested.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.users.month
+  day:
+    description: The Day in which the data was ingested.
+    lineage:
+      - datalake_sales_flow_fast_lane_raw.users.day
