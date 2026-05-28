@@ -7,15 +7,12 @@ propose AS (
         datalake_rental_guarantee_platform_clean.propose
 ),
 direct_billing AS (
-    SELECT * EXCEPT (_rn)
-    FROM (
     SELECT
         e.propose AS id_business_entity,
         br.dt_due,
         br.status AS payment_status,
         cast( br.id AS VARCHAR(10) ) AS id_finance_entity,
-        e.amount AS source_amount,
-        ROW_NUMBER() OVER (PARTITION BY e.propose , br.dt_due ORDER BY br.ts_updated DESC) AS _rn
+        e.amount AS source_amount
     FROM
         datalake_rental_guarantee_platform_clean.billing_report br
     LEFT JOIN
@@ -26,8 +23,11 @@ direct_billing AS (
         ON e.propose = p.id
     WHERE
         p.billing_model = 'BROKER'
-    )
-    WHERE _rn = 1
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY e.propose , br.dt_due
+            ORDER BY br.ts_updated DESC
+        ) = 1
 ),
 payment_no_ws AS (
     SELECT
@@ -49,8 +49,6 @@ payment_no_ws AS (
     AND p.product_type IN ( 'GUARANTEE', 'ACTIVATION')
 ),
 payment_ws AS (
-    SELECT * EXCEPT (_rn)
-    FROM (
     SELECT
         COALESCE( p.unicid, CAST( p.id AS VARCHAR(10) ) ) AS id_finance_entity,
         p.id_propose AS id_business_entity,
@@ -60,8 +58,7 @@ payment_ws AS (
         p.status AS payment_status,
         ts_due AS due_date,
         p.value AS source_amount,
-        p.product_type AS revenue_name,
-        ROW_NUMBER() OVER (PARTITION BY p.id_propose, date_trunc( 'MONTH', DATE( p.ts_due ) ) ORDER BY p.ts_updated DESC) AS _rn
+        p.product_type AS revenue_name
     FROM
         datalake_rental_guarantee_platform_clean.payment p
     LEFT JOIN
@@ -70,8 +67,11 @@ payment_ws AS (
     p.gateway = 'WALLSTREET'
     AND p.product_type IN ('GUARANTEE', 'ACTIVATION')
     AND p.billing_type <> 'ANNUAL_CREDIT_CARD'
-    )
-    WHERE _rn = 1
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY p.id_propose, date_trunc( 'MONTH', DATE( p.ts_due ) )
+            ORDER BY p.ts_updated DESC
+        ) = 1
     ),
 recurrency_delinquency AS (
     SELECT

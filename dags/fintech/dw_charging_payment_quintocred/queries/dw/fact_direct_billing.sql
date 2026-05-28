@@ -14,8 +14,6 @@ WITH
         AND debit = 0
 ),
 cobranca_billing AS (
-    SELECT * EXCEPT (_rn)
-    FROM (
     SELECT  DISTINCT
         COALESCE( sap.id_contract, e.propose ) AS id_propose,
         i.id_bill AS id_boleto,
@@ -27,8 +25,7 @@ cobranca_billing AS (
         b.status  AS status_boleto,
         DATE( b.ts_paid ) AS dt_paid,
         DATE( b.ts_created ) AS dt_boleto_created,
-        DATE( b.dt_due ) AS dt_due,
-        ROW_NUMBER() OVER (PARTITION BY COALESCE( sap.id_contract, e.propose ), dt_ref_boleto ORDER BY b.ts_paid DESC, b.ts_created DESC) AS _rn
+        DATE( b.dt_due ) AS dt_due
     FROM
         datalake_rental_guarantee_platform_clean.billing_report i
     LEFT JOIN
@@ -45,8 +42,11 @@ cobranca_billing AS (
         and sap.id_contract = cast(p.id AS varchar(10))
     WHERE
         CONCAT( b.status , i.status ) NOT IN ('WRITTEN_DOWNCANCELED')
-    )
-    WHERE _rn = 1
+    QUALIFY
+        ROW_NUMBER() OVER(
+            PARTITION BY COALESCE( sap.id_contract, e.propose ), dt_ref_boleto
+            ORDER BY b.ts_paid DESC, b.ts_created DESC
+        ) = 1
 )
 SELECT
     id_propose,

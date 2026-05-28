@@ -35,8 +35,6 @@ proposal_tenant AS (
     pt.cpf IS NOT NULL
 ),
 proposal_last_contract AS (
-    SELECT * EXCEPT (_rn)
-    FROM (
   SELECT
     plt.id_proposal,
     plt.proposal_ts_created,
@@ -48,8 +46,7 @@ proposal_last_contract AS (
     tc.contract_dt_start,
     tc.contract_dt_annulment,
     tc.contract_id_proposal,
-    tc.sk_client_flrf,
-        ROW_NUMBER() OVER (PARTITION BY plt.id_proposal, plt.proposal_cpf ORDER BY tc.contract_dt_start DESC) AS _rn
+    tc.sk_client_flrf
   FROM
     proposal_tenant AS plt
   INNER JOIN
@@ -57,8 +54,8 @@ proposal_last_contract AS (
       ON tc.contract_cpf = plt.proposal_cpf
   WHERE
     plt.proposal_ts_created > tc.contract_dt_start
-    )
-    WHERE _rn = 1
+  QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY plt.id_proposal, plt.proposal_cpf ORDER BY tc.contract_dt_start DESC) = 1
 ),
 proposal_retenant AS (
   SELECT
@@ -241,8 +238,6 @@ get_retenant_policy_report AS (
     datalake_sorting_hat.policy_report
 ),
 add_retenant_historical_tags AS (
-    SELECT * EXCEPT (_rn)
-    FROM (
   SELECT
     pcl.sk_credit_analysis,
     pcl.id_proposal,
@@ -276,14 +271,15 @@ add_retenant_historical_tags AS (
     pcl.dt_contract_annulment,
     pcl.ts_proposal_created,
     pcl.ts_last_contract_created,
-    NOW() AS ts_load,
-        ROW_NUMBER() OVER (PARTITION BY pcl.sk_credit_analysis ORDER BY pcl.ts_last_contract_created DESC) AS _rn
+    NOW() AS ts_load
   FROM
     proposal_contract_label AS pcl
     LEFT JOIN get_active_contract_per_credit_analysis AS cpca ON cpca.sk_credit_analysis = pcl.sk_credit_analysis
-    AND pcl.sk_credit_analysis IS NOT NULL
-    )
-    WHERE _rn = 1
+    AND pcl.sk_credit_analysis IS NOT NULL QUALIFY ROW_NUMBER() OVER (
+      PARTITION BY pcl.sk_credit_analysis
+      ORDER BY
+        pcl.ts_last_contract_created DESC
+    ) = 1
 )
 SELECT
   ht.sk_credit_analysis,

@@ -1,73 +1,61 @@
 WITH
 deduplicate_creditor_pending AS (
-  SELECT * EXCEPT (_rn) FROM (
-    SELECT DISTINCT
-      id_creditor,
-      id_contract,
-      id_installment AS id_invoice,
-      ROW_NUMBER() OVER (PARTITION BY id_installment ORDER BY dt_table_insertion DESC, ts_load DESC) AS _rn
-    FROM datalake_recupera_clean.creditor_pending
-    WHERE
-      installment_code IS NOT NULL
-      AND id_creditor NOT IN (3,5)
-  ) ranked
-  WHERE _rn = 1
+  SELECT DISTINCT
+    id_creditor,
+    id_contract,
+    id_installment AS id_invoice
+  FROM datalake_recupera_clean.creditor_pending
+  WHERE
+    installment_code IS NOT NULL
+    AND id_creditor NOT IN (3,5)
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY dt_table_insertion DESC, ts_load DESC) = 1
 ),
 deduplicate_complementary_records AS (
-  SELECT * EXCEPT (_rn) FROM (
-    SELECT DISTINCT
-      id_creditor,
-      id_contract,
-      id_installment AS id_invoice,
-      ROW_NUMBER() OVER (PARTITION BY id_installment ORDER BY ts_last_debt_update DESC) AS _rn
-    FROM datalake_recupera_clean.complementary_records
-    WHERE
-      installment_code IS NOT NULL
-      AND id_creditor NOT IN (3,5)
-  ) ranked
-  WHERE _rn = 1
+  SELECT DISTINCT
+    id_creditor,
+    id_contract,
+    id_installment AS id_invoice
+  FROM datalake_recupera_clean.complementary_records
+  WHERE
+    installment_code IS NOT NULL
+    AND id_creditor NOT IN (3,5)
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY ts_last_debt_update DESC) = 1
 ),
 deduplicate_complementary_records_written_down AS (
-  SELECT * EXCEPT (_rn) FROM (
-    SELECT DISTINCT
-      id_creditor,
-      id_contract,
-      id_installment AS id_invoice,
-      ROW_NUMBER() OVER (PARTITION BY id_installment ORDER BY ts_last_debt_update DESC) AS _rn
-    FROM datalake_recupera_clean.complementary_records_written_down
-    WHERE
-      IF(ASCII(TRIM(installment_code))=0, NULL, installment_code) IS NOT NULL
-      AND id_creditor NOT IN (3,5)
-  ) ranked
-  WHERE _rn = 1
+  SELECT DISTINCT
+    id_creditor,
+    id_contract,
+    id_installment AS id_invoice
+  FROM datalake_recupera_clean.complementary_records_written_down
+  WHERE
+    IF(ASCII(TRIM(installment_code))=0, NULL, installment_code) IS NOT NULL
+    AND id_creditor NOT IN (3,5)
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY ts_last_debt_update DESC) = 1
 ),
 trato_feito_debts AS (
-  SELECT * EXCEPT (_rn) FROM (
-    SELECT
-      id_invoice,
-      id_contract,
-      CASE
-        WHEN debtor = "rental_contract_landlord" THEN "PP QuintoAndar"
-        WHEN debtor = "rental_contract_tenant" THEN "IQ QuintoAndar"
-      END AS creditor,
-      external_status AS invoice_status,
-      external_sub_status AS sub_status,
-      due_amount,
-      interest_fee_amount,
-      fine_fee_amount,
-      discount_amount,
-      debt_amount,
-      paid_amount,
-      dt_due,
-      dt_paid,
-      dt_created,
-      "Trato Feito" AS source,
-      1 AS priority,
-      ROW_NUMBER() OVER (PARTITION BY id_invoice ORDER BY dt_debt_created DESC) AS _rn
-    FROM datalake_debt_recovery.debt
-    WHERE debtor != "velo_delinquency_tenant"
-  ) ranked
-  WHERE _rn = 1
+  SELECT
+    id_invoice,
+    id_contract,
+    CASE
+      WHEN debtor = "rental_contract_landlord" THEN "PP QuintoAndar"
+      WHEN debtor = "rental_contract_tenant" THEN "IQ QuintoAndar"
+    END AS creditor,
+    external_status AS invoice_status,
+    external_sub_status AS sub_status,
+    due_amount,
+    interest_fee_amount,
+    fine_fee_amount,
+    discount_amount,
+    debt_amount,
+    paid_amount,
+    dt_due,
+    dt_paid,
+    dt_created,
+    "Trato Feito" AS source,
+    1 AS priority
+  FROM datalake_debt_recovery.debt
+  WHERE debtor != "velo_delinquency_tenant"
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_invoice ORDER BY dt_debt_created DESC) = 1
 ),
 recupera_debts AS (
   SELECT DISTINCT
@@ -145,45 +133,24 @@ retsuko AS (
     ON i.id_external = ii.id_invoice
 )
 SELECT
-  sk_debt,
-  id_contract,
-  id_invoice,
-  creditor,
-  payment_status,
-  invoice_status,
-  sub_status,
-  due_amount,
-  interest_fee_amount,
-  fine_fee_amount,
-  discount_amount,
-  debt_amount,
-  paid_amount,
-  source,
-  dt_due,
-  dt_paid,
-  ts_load
-FROM (
-  SELECT
-    CONCAT(COALESCE(d.id_contract, r.id_contract), d.id_invoice) AS sk_debt,
-    COALESCE(d.id_contract, r.id_contract) AS id_contract,
-    d.id_invoice,
-    COALESCE(r.creditor, d.creditor) AS creditor,
-    r.payment_status,
-    COALESCE(r.invoice_status, d.invoice_status) AS invoice_status,
-    r.sub_status AS sub_status,
-    COALESCE(r.due_amount, d.due_amount) AS due_amount,
-    d.interest_fee_amount,
-    d.fine_fee_amount,
-    d.discount_amount,
-    d.debt_amount,
-    COALESCE(r.paid_amount, d.paid_amount) AS paid_amount,
-    IF(r.source IS NULL, d.source, CONCAT(r.source, '-', d.source)) AS source,
-    COALESCE(r.dt_due, d.dt_due) AS dt_due,
-    COALESCE(r.dt_paid, d.dt_paid) AS dt_paid,
-    NOW() AS ts_load,
-    ROW_NUMBER() OVER (PARTITION BY d.id_invoice, d.id_contract ORDER BY d.priority) AS _rn
-  FROM debts AS d
-  LEFT JOIN retsuko AS r
-    ON d.id_invoice = r.id_invoice
-) ranked
-WHERE _rn = 1
+  CONCAT(COALESCE(d.id_contract, r.id_contract), d.id_invoice) AS sk_debt,
+  COALESCE(d.id_contract, r.id_contract) AS id_contract,
+  d.id_invoice,
+  COALESCE(r.creditor, d.creditor) AS creditor,
+  r.payment_status,
+  COALESCE(r.invoice_status, d.invoice_status) AS invoice_status,
+  r.sub_status AS sub_status,
+  COALESCE(r.due_amount, d.due_amount) AS due_amount,
+  d.interest_fee_amount,
+  d.fine_fee_amount,
+  d.discount_amount,
+  d.debt_amount,
+  COALESCE(r.paid_amount, d.paid_amount) AS paid_amount,
+  IF(r.source IS NULL, d.source, CONCAT(r.source, '-', d.source)) AS source,
+  COALESCE(r.dt_due, d.dt_due) AS dt_due,
+  COALESCE(r.dt_paid, d.dt_paid) AS dt_paid,
+  NOW() AS ts_load
+FROM debts AS d
+LEFT JOIN retsuko AS r
+  ON d.id_invoice = r.id_invoice
+QUALIFY ROW_NUMBER() OVER(PARTITION BY d.id_invoice, d.id_contract ORDER BY d.priority) = 1

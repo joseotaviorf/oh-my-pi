@@ -1,4 +1,4 @@
-WITH collection_recovery_team_grouped AS (
+WITH collection_recovery_team AS (
     SELECT
         DATE(DATE_TRUNC("MONTH",FNI.dt_paid)) AS dt_month_paid,
         FN.sk_debtor AS document,
@@ -65,27 +65,14 @@ WITH collection_recovery_team_grouped AS (
     LEFT JOIN
         dw_collection_recovery_quintocred.fact_negotiation AS FN
             ON FNI.sk_negotiation = FN.sk_negotiation
-    WHERE
-        FNI.dt_paid >= "2023-08-01"
-        AND FN.creditor = 'IQ QuintoCred'
-    GROUP BY dt_month_paid, document, team
-    HAVING
-        team <> "TIME NAO LOCALIZADO"
-),
-collection_recovery_team AS (
-  SELECT
-    dt_month_paid,
-    document,
-    team,
-    original_value,
-    paid_amount
-  FROM (
-    SELECT
-      *,
-      ROW_NUMBER() OVER (PARTITION BY dt_month_paid, document ORDER BY original_value DESC) AS _rn
-    FROM collection_recovery_team_grouped
-  ) ranked
-  WHERE _rn = 1
+WHERE
+    FNI.dt_paid >= "2023-08-01"
+    AND FN.creditor = 'IQ QuintoCred'
+GROUP BY dt_month_paid, document, team
+HAVING
+    team <> "TIME NAO LOCALIZADO"
+QUALIFY
+    ROW_NUMBER() OVER (PARTITION BY dt_month_paid, document ORDER BY original_value DESC ) = 1
 ),
 
 distinct_contract_customer AS (
@@ -97,46 +84,30 @@ distinct_contract_customer AS (
 ),
 
 operational_records AS (
-  SELECT
-    id_customer,
-    distributor,
-    ts_customer_status_last_update,
-    dt_snapshot
-  FROM (
     SELECT DISTINCT
-      id_customer,
-      distributor_code AS distributor,
-      ts_customer_status_last_update,
-      MAKE_DATE(year, month, day) AS dt_snapshot,
-      ROW_NUMBER() OVER (PARTITION BY id_customer, MAKE_DATE(year, month, day) ORDER BY ts_last_update DESC) AS _rn
+        id_customer,
+        distributor_code AS distributor,
+        ts_customer_status_last_update,
+        MAKE_DATE(year, month, day) AS dt_snapshot
     FROM
         datalake_recupera_clean.operational_records
     WHERE
-        id_creditor IN ('3','5')
+        id_creditor IN ('3','5') -- filter quintocred
         AND MAKE_DATE(year, month, day) BETWEEN DATE_TRUNC("month", CURRENT_DATE - INTERVAL "48" MONTH) AND CURRENT_DATE - INTERVAL "1" DAY
-  ) ranked
-  WHERE _rn = 1
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY id_customer, MAKE_DATE(year, month, day) ORDER BY ts_last_update DESC) = 1
 ),
 
 responsible_for_contract AS (
-  SELECT
-    id_contract,
-    distributor,
-    dt_snapshot
-  FROM (
     SELECT DISTINCT
-      c.id_contract,
-      ors.distributor,
-      ors.dt_snapshot,
-      ors.ts_customer_status_last_update,
-      ROW_NUMBER() OVER (PARTITION BY c.id_contract, ors.dt_snapshot ORDER BY ors.ts_customer_status_last_update DESC) AS _rn
+        c.id_contract,
+        ors.distributor,
+        ors.dt_snapshot
     FROM
         operational_records As ors
     LEFT JOIN
         distinct_contract_customer AS c
             ON ors.id_customer = c.id_customer
-  ) ranked
-  WHERE _rn = 1
+    QUALIFY ROW_NUMBER() OVER(PARTITION BY c.id_contract, ors.dt_snapshot ORDER BY ors.ts_customer_status_last_update DESC) = 1
 )
 
 SELECT DISTINCT

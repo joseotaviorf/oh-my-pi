@@ -35,14 +35,11 @@ renegotiation AS (
   GROUP BY 1,2
 ),
 paschoalotto_operator AS (
-    SELECT * EXCEPT (_rn)
-    FROM (
   SELECT DISTINCT
     d.id_contract_quintoandar AS id_contract,
     CAST(ad.id_installment AS BIGINT) AS id_negotiation,
     CONCAT('PASC_',UPPER(u.login_name)) AS id_operator,
-    DATE(ad.dt_emission) AS dt_promisse,
-        ROW_NUMBER() OVER (PARTITION BY d.id_contract_quintoandar, ad.id_installment ORDER BY ad.ts_update DESC) AS _rn
+    DATE(ad.dt_emission) AS dt_promisse
   FROM datalake_paschoalotto_clean.agreement_detail AS ad
   LEFT JOIN datalake_paschoalotto_clean.contract AS c
     ON ad.id_contract = c.id_contract
@@ -50,8 +47,7 @@ paschoalotto_operator AS (
     ON ad.id_contract = d.id_contract
   LEFT JOIN datalake_paschoalotto_clean.user AS u
       ON ad.id_user = u.id_user
-    )
-    WHERE _rn = 1
+  QUALIFY ROW_NUMBER() OVER(PARTITION BY d.id_contract_quintoandar, ad.id_installment ORDER BY ad.ts_update DESC) = 1
 ),
 calculations AS (
   SELECT

@@ -24,7 +24,7 @@ SELECT
   COALESCE( m.is_perdao_divida, FALSE ) AS is_perdao_divida,
   m.sk_key,
   m.id_bill,
-  CAST(m.ts_load AS DATE) - INTERVAL '1 day' AS dt_closing
+  m.ts_load::DATE - INTERVAL '1 day' AS dt_closing
 FROM 
   dw_velo.quintocred_ifrs_recurring_payment AS m
 ),
@@ -134,7 +134,7 @@ SELECT *,
     WHEN is_delinquency_renovacao 
       THEN 'RENEWAL' 
     ELSE 'SIGNATURE' 
-  END AS type_delinquency,
+  END AS type_deliquency,
   CASE 
     WHEN open_amount = 0 
       THEN 0
@@ -166,8 +166,8 @@ SELECT *,
   CASE 
     WHEN origin_table = 'invoice' 
       THEN 'DIRECT BILLING' 
-    ELSE type_delinquency 
-  END AS type_delinquency_zoom
+    ELSE type_deliquency 
+  END AS type_deliquency_zoom
 FROM 
   step_4
  ),
@@ -254,8 +254,8 @@ SELECT
   client_cpf_cnpj,
   bill_item,
   provisional_group,
-  type_delinquency,
-  type_delinquency_zoom,
+  type_deliquency,
+  type_deliquency_zoom,
   payment_classification,
   due_amount,
   paid_amount,

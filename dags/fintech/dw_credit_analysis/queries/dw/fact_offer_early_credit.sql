@@ -1,6 +1,6 @@
 WITH base_offer AS (
 SELECT
-  TO_DATE(CAST(flrf.sk_offer_submitted_date AS STRING), 'yyyyMMdd')  AS dt_offer_submitted_date,
+  TO_DATE(flrf.sk_offer_submitted_date::STRING, 'yyyyMMdd')  AS dt_offer_submitted_date,
   flrf.sk_proposal,
   flrf.sk_offer,
   flrf.sk_client,
@@ -9,29 +9,24 @@ FROM
   dw_rent.fact_listing_rent_flows  flrf
 ),
 ec AS (
-    SELECT * EXCEPT (_rn)
-    FROM (
-        SELECT
-          ec.id_early_credit,
-          ec.id_credit_evaluation,
-          ec.id_user,
-          ec.id_house,
-          ec.id_variant,
-          ec.version,
-          ec.risk_category_canon,
-          ec.bypass,
-          ec.guarantee_offered,
-          ec.category,
-          ec.range_end,
-          ec.range_start,
-          ec.rejection_reason,
-          ec.ts_created,
-          ec.ts_expired,
-          ROW_NUMBER() OVER (PARTITION BY ec.id_user, ec.id_house ORDER BY ec.ts_created DESC) AS _rn
-        FROM
-          datalake_sorting_hat.early_credit_analysis ec
-    )
-    WHERE _rn = 1
+SELECT
+  ec.id_early_credit,
+  ec.id_credit_evaluation,
+  ec.id_user,
+  ec.id_house,
+  ec.id_variant,
+  ec.version,
+  ec.risk_category_canon,
+  ec.bypass,
+  ec.guarantee_offered,
+  ec.category,
+  ec.range_end,
+  ec.range_start,
+  ec.rejection_reason,
+  ec.ts_created,
+  ec.ts_expired
+FROM
+  datalake_sorting_hat.early_credit_analysis ec
 ), final_flow as (
 SELECT
   a.sk_offer,
@@ -80,3 +75,5 @@ SELECT
   NOW() AS ts_load
 FROM
   final_flow
+QUALIFY
+  ROW_NUMBER() OVER (PARTITION BY sk_offer ORDER BY ts_created DESC)  = 1

@@ -179,117 +179,99 @@ base_payment_ajustada AS (
     b.origin_table,
     b.id_propose,
     b.id,
-    CASE
-      WHEN dd.month_start IS NOT NULL
-        THEN b.value/12 ELSE b.value
+    CASE 
+      WHEN dd.month_start IS NOT NULL 
+        THEN b.value/12 ELSE b.value 
     END AS value,
-    CASE
-      WHEN dd.month_start IS NOT NULL
-        THEN b.value_paid/12
-      ELSE b.value_paid
+    CASE 
+      WHEN dd.month_start IS NOT NULL 
+        THEN b.value_paid/12 
+      ELSE b.value_paid 
     END AS value_paid,
     b.dt_created,
-    CASE
-      WHEN dd.month_start IS NOT NULL
-        THEN dd.month_start
-      ELSE b.dt_due
+    CASE 
+      WHEN dd.month_start IS NOT NULL 
+        THEN dd.month_start 
+      ELSE b.dt_due 
     END AS dt_due,
     dt_paid,
     status,
-    CASE
-      WHEN dd.month_start IS NOT NULL
-        THEN 'ASAAS Anual'
-      ELSE gateway
+    CASE 
+      WHEN dd.month_start IS NOT NULL 
+        THEN 'ASAAS Anual' 
+      ELSE gateway 
     END AS gateway,
     billing_type,
     category
-  FROM
+  FROM 
     base_payment b
-  LEFT JOIN
+  LEFT JOIN 
     dw_velo.fact_velo_propose p
     ON b.id_propose = p.sk_propose
-  LEFT JOIN
+  LEFT JOIN 
     dw_velo.dim_velo_propose_values pv
     ON p.sk_propose_values = pv.sk_propose_values
   LEFT JOIN dim_date dd
-    ON dd.month_start
-    BETWEEN
-      date_trunc( 'MONTH', b.dt_due )
+    ON dd.month_start 
+    BETWEEN 
+      date_trunc( 'MONTH', b.dt_due ) 
       AND add_months( date_trunc( 'MONTH', b.dt_due ), 11 )
-    AND b.value BETWEEN
-      ( pv.annual_guarantee + pv.activator_amount ) * 0.8
+    AND b.value BETWEEN  
+      ( pv.annual_guarantee + pv.activator_amount ) * 0.8  
       AND ( pv.annual_guarantee + pv.activator_amount ) * 1.12
-    AND ( b.gateway = 'ASAAS' OR ( b.gateway = 'ASAAS RAW' AND UPPER( b.description ) LIKE '%ASSINATURA%' ) )
+    AND ( b.gateway = 'ASAAS' OR ( b.gateway = 'ASAAS RAW' AND UPPER( b.description ) LIKE '%ASSINATURA%' ) ) 
     AND b.status IN ( 'SUCCESS','RECEIVED','RECEIVED_IN_CASH' )
 )
-SELECT
+SELECT 
   id,
   id_propose,
-  origin_table,
+  'b_payment' AS origin_table,
   status,
-  order_status,
-  gateway,
+  CASE 
+    WHEN status IN ('SUCCESS','RECEIVED_IN_CASH','RECEIVED') 
+      THEN 1
+    WHEN status = 'CONFIRMED' 
+      THEN 2
+    WHEN status = 'PROCESSING' 
+      THEN 3
+    WHEN status IN ('REVERSED','SCHEDULED_REVERSAL')  
+      THEN 4
+    WHEN status IN ('REFUNDED','REFUND_PROCESSING')  
+      THEN 5
+    WHEN status = 'CHARGEBACK' 
+      THEN 6
+    WHEN status IN ('REFUSED','EXPIRED')
+      THEN 7
+    WHEN status = 'PENDING' 
+      THEN 8
+    WHEN status = 'OVERDUE' 
+      THEN 9
+    WHEN status = 'IMPROPER_BILLING' 
+      THEN 10
+    WHEN status = 'ERROR' 
+      THEN 11
+    ELSE 99
+  END AS order_status,
+  CASE 
+    WHEN gateway = 'WALLSTREET' 
+      THEN billing_type 
+    ELSE gateway 
+  END AS gateway,
   billing_type,
   category,
   value,
   value_paid,
-  is_overdue,
+  DATE( dt_due ) < current_date() is_overdue,
   dt_paid,
   dt_created,
-  dt_due,
-  ts_load
-FROM (
-  SELECT
-    id,
-    id_propose,
-    'b_payment' AS origin_table,
-    status,
-    CASE
-      WHEN status IN ('SUCCESS','RECEIVED_IN_CASH','RECEIVED')
-        THEN 1
-      WHEN status = 'CONFIRMED'
-        THEN 2
-      WHEN status = 'PROCESSING'
-        THEN 3
-      WHEN status IN ('REVERSED','SCHEDULED_REVERSAL')
-        THEN 4
-      WHEN status IN ('REFUNDED','REFUND_PROCESSING')
-        THEN 5
-      WHEN status = 'CHARGEBACK'
-        THEN 6
-      WHEN status IN ('REFUSED','EXPIRED')
-        THEN 7
-      WHEN status = 'PENDING'
-        THEN 8
-      WHEN status = 'OVERDUE'
-        THEN 9
-      WHEN status = 'IMPROPER_BILLING'
-        THEN 10
-      WHEN status = 'ERROR'
-        THEN 11
-      ELSE 99
-    END AS order_status,
-    CASE
-      WHEN gateway = 'WALLSTREET'
-        THEN billing_type
-      ELSE gateway
-    END AS gateway,
-    billing_type,
-    category,
-    value,
-    value_paid,
-    DATE( dt_due ) < current_date() is_overdue,
-    dt_paid,
-    dt_created,
-    DATE( dt_due ) AS dt_due,
-    NOW() AS ts_load,
-    ROW_NUMBER() OVER(
-      PARTITION BY id_propose, ROUND( value ), date_trunc( 'MONTH', dt_due )
-      ORDER BY status DESC, origin_table ASC
-    ) AS _rn
-  FROM
-    base_payment_ajustada d
-  WHERE
-    id_propose > 0
-) ranked
-WHERE _rn = 1
+  DATE( dt_due ) AS dt_due,
+  NOW() AS ts_load
+FROM 
+  base_payment_ajustada d
+WHERE 
+  id_propose > 0
+QUALIFY
+  ROW_NUMBER() OVER( 
+    PARTITION BY id_propose, ROUND( value ), date_trunc( 'MONTH', dt_due ) 
+    ORDER BY status DESC, origin_table ASC 
+  ) = 1
