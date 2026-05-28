@@ -42,7 +42,7 @@ DOCUMENTED_NOT_IN_PHYSICAL_REASON = "documented_not_in_physical"
 METADATA_DOMAIN_CI_ALLOWLIST_PATTERN: Final[str] = (
     "Agents|Cross|Data Ops & Governance|Data Life Cycle|Fintech|For Rent|For Sale|"
     "Growth|International|MLOps|People|QCX|Rede|Support and Services|Tech Platform|Data Platform|"
-    "Conversational XP|DS Pricing|Atlas DB|Broker XP"
+    "Conversational XP|DS Pricing|Atlas DB|Broker XP|House and Listing"
 )
 METADATA_DOMAIN_CI_ALLOWLIST_RE = re.compile(METADATA_DOMAIN_CI_ALLOWLIST_PATTERN)
 
