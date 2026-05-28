@@ -4,7 +4,7 @@ table_name: preferred_fixed_agent_history
 description: Historical table of preferred fixed agent relationships showing the timeline of agent-visitor preferences with status changes.
   Each line represents a period when a specific agent was preferred for a visitor in a given region and business context.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_snapshot:
     description: Unique identifier for each snapshot record, generated using hash of key fields and timestamp.

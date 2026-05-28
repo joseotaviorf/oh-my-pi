@@ -2,35 +2,46 @@
 database_name: datalake_ebdb_clean
 table_name: region
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.regiao.id
+    - datalake_ebdb_raw.regiao.id
+    description: Value of id in the source record.
   id_state:
     lineage:
-      - datalake_ebdb_raw.regiao.state_id
+    - datalake_ebdb_raw.regiao.state_id
+    description: Unique identifier for state.
   id_parent_region:
     lineage:
-      - datalake_ebdb_raw.regiao.regiaopai_id
+    - datalake_ebdb_raw.regiao.regiaopai_id
+    description: Unique identifier for parent region.
   name:
     lineage:
-      - datalake_ebdb_raw.regiao.nome
+    - datalake_ebdb_raw.regiao.nome
+    description: Value of name in the source record.
   slug:
     lineage:
-      - datalake_ebdb_raw.regiao.slug
+    - datalake_ebdb_raw.regiao.slug
+    description: Value of slug in the source record.
   level:
     lineage:
-      - datalake_ebdb_raw.regiao.nivel
+    - datalake_ebdb_raw.regiao.nivel
+    description: Value of level in the source record.
   lat:
     lineage:
-      - datalake_ebdb_raw.regiao.lat
+    - datalake_ebdb_raw.regiao.lat
+    description: Value of lat in the source record.
   lng:
     lineage:
-      - datalake_ebdb_raw.regiao.lng
+    - datalake_ebdb_raw.regiao.lng
+    description: Value of lng in the source record.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.regiao.criadaem
+    - datalake_ebdb_raw.regiao.criadaem
+    description: Timestamp of created.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.regiao.atualizadoem
+    - datalake_ebdb_raw.regiao.atualizadoem
+    description: Timestamp of updated.
+description: Clean layer table for region agent domain data.

@@ -5,7 +5,7 @@ description: |
   Partner classification schedules with incentive system, status, and timestamps,
   including partitions.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

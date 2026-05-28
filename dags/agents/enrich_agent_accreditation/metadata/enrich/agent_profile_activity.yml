@@ -6,7 +6,7 @@ description: |
   breaking down intervals into active and inactive segments.
   Additionally, it calculates the total number of days the agent was active within each context.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent_profile_activity:
     lineage:

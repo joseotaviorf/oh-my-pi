@@ -9,7 +9,7 @@ description: |
   Note: While the dataset defines intervals in which an agent is associated with a dominant region code, 
   the region data does not account for the agent's activation and deactivation periods.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_major_region_code:
     lineage:
@@ -24,7 +24,7 @@ columns:
     lineage:
       - datalake_region.region.region_code
     description: Represents the region code with the highest number of associated regions for the agent during a specific period.
-  total_active_days:
+  total_days_in_region_code:
     description: Total number of days during which this region code was the agent’s majority region.
   ts_started:
     lineage:

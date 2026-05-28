@@ -7,7 +7,7 @@ description: |
   relationship-end timestamps. One row per audit revision (id_revision), deduplicated to the latest
   business unit row per revision for downstream allocation models.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_revision:
     lineage:

@@ -4,7 +4,7 @@ table_name: installment_aud
 description: Envers audit trail for installment rows, including amount, status, and
   bank send date changes.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

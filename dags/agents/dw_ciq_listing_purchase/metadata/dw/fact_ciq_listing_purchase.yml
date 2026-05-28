@@ -6,7 +6,7 @@ description: >
   Incremental load on the greatest of contract signed and payment timestamps; merge on house, contract,
   and partner per declaration.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_house:
     description: House surrogate key.

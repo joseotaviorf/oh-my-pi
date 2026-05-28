@@ -2,7 +2,7 @@ database_name: dw_public
 table_name: dim_agent
 description: Dimension table containing agent data with foreign keys to person, user, company, and 3P broker (core_brokers) dimensions. Contains only agents (users with agent_data_id not null).
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_agent:
     lineage:

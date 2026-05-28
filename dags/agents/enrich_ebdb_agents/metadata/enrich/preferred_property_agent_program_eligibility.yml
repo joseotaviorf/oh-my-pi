@@ -2,7 +2,7 @@ database_name: datalake_ebdb_agents
 table_name: preferred_property_agent_program_eligibility
 description: This table registers agents eligibility status to the PPA program
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_snapshot:
     lineage:

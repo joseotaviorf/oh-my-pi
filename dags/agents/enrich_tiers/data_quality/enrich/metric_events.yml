@@ -1,6 +1,6 @@
 ---
 table_name: datalake_tiers.metric_events
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 column_level_validations:
   id_metric_event:
     is_complete:

@@ -2,20 +2,26 @@
 database_name: datalake_ebdb_clean
 table_name: state_aud
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_state:
     lineage:
-      - datalake_ebdb_raw.estado_aud.id
+    - datalake_ebdb_raw.estado_aud.id
+    description: Unique identifier for state.
   rev:
     lineage:
-      - datalake_ebdb_raw.estado_aud.rev
+    - datalake_ebdb_raw.estado_aud.rev
+    description: Value of rev in the source record.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.estado_aud.revtype
+    - datalake_ebdb_raw.estado_aud.revtype
+    description: Value of rev type in the source record.
   abbrevation:
     lineage:
-      - datalake_ebdb_raw.estado_aud.abreviacao
+    - datalake_ebdb_raw.estado_aud.abreviacao
+    description: Value of abbrevation in the source record.
   name:
     lineage:
-      - datalake_ebdb_raw.estado_aud.nome
+    - datalake_ebdb_raw.estado_aud.nome
+    description: Value of name in the source record.
+description: Clean layer table for state aud agent domain data.

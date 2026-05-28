@@ -3,7 +3,7 @@ database_name: datalake_hub_services_clean
 table_name: visitor_aud
 description: Audit table, used to keep changes to visitors records as historical data.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

@@ -4,10 +4,13 @@ dag:
   schedule_start_date: 2020, 7, 1
   owner: Data Agents
   documentation:
-    dag_purpose: 
+    dag_purpose: |
+      Enrich tables for agent visit performance (bookings, offer flow, lead conversion, schedules)
+      plus a Spark-built daily fact from ``datalake_visit.visit_schedules``.
 workflow:
   type: query_delta
   layer: enrich
+  custom_schema: visit_agent_performance
   default_extraction_type: incremental
   inner_dependencies:
     agent_leads_performance:
@@ -24,6 +27,15 @@ workflow:
   extra_query_template_params:
       load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
       load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{dag_name}"
+    - "{table_name}"
+    - "{load_start_date}"
+    - "{load_end_date}"
+    - "prod"
   tables_customization:
     agent_leads_performance:
       merge_on: [id_agent_performance]
@@ -35,6 +47,11 @@ workflow:
     agent_schedules_performance:
       merge_on: [id_agent_performance]
       z_order_by: [id_agent, dt_reference]
+    fact_agent_visit_schedule_daily:
+      load_spark_job: load_fact_agent_visit_schedule_daily
+      merge_on: [id_agent, business_context, dt_reference]
+      z_order_by: [id_agent, dt_reference]
+      partitions: [year, month, day]
     agent_schedules:
       merge_on: [id_agent_schedule]
       z_order_by: [id_agent, ts_created]

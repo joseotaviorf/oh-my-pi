@@ -3,16 +3,16 @@ database_name: datalake_big_agent
 table_name: agent_current_program
 description: Enrich table containing the program that each agent is currently enrolled in.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent:
     lineage:
       - datalake_big_agent_clean.agent.id
-    description: Agent ID
+    description: Unique identifier of the agent in Big Agent.
   id_user:
     lineage:
       - datalake_ebdb_clean.partner_agent.id_user
-    description: User ID
+    description: Unique identifier of the user linked to the agent.
   id_partner:
     lineage:
       - datalake_ebdb_clean.partner_agent.id_partner

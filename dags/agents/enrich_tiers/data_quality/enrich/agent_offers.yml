@@ -1,6 +1,6 @@
 ---
 table_name: datalake_tiers.agent_offers
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 table_level_validations:
   has_size:
     greater_than: 85000

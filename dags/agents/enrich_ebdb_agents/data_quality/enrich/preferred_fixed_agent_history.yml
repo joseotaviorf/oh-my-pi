@@ -1,6 +1,6 @@
 ---
 table_name: datalake_ebdb_agents.preferred_fixed_agent_history
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 column_level_validations:
   id_snapshot:
     is_unique:

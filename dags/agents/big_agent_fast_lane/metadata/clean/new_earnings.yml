@@ -5,7 +5,7 @@ description: |
   Earnings computed from revenue share and sources, including external receiver,
   incentive system, monetary values, reasons and author, with timestamps and partitions.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

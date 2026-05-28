@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: qualification_step
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Catalog of qualification steps in EBDB (name, description, and identifiers) used to define the agent prospect qualification journey.
 columns:
   id:

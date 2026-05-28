@@ -4,7 +4,7 @@ table_name: installment
 description: Installment line for an external invoice, with amounts, bank send date,
   and accounting timestamps.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

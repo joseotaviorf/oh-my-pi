@@ -7,7 +7,7 @@ description: |
   submission and contract signing. Additionally, it tracks performance in relation to schedules, offers, and leads, with flags indicating whether 
   the agent is involved in rental or sale contexts. The dataset is filtered by a specific date range and focuses solely on agents involved in visits.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_agent_performance:
     lineage:

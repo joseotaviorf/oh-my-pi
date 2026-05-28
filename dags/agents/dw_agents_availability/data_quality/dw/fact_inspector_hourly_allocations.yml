@@ -1,6 +1,6 @@
 ---
 table_name: dw_agents_availability_staging.fact_inspector_hourly_allocations
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 table_level_validations:
   has_size:
     greater_than: 750000000

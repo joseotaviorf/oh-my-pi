@@ -5,7 +5,7 @@ description: 'Transactional fact table about the agent, such as the work contrac
   Every change in the agent''s contract, activation, business context, or company creates a new row in this table.
   Note that contract, activation and business context are contained in the dimension table dw_agent.dim_work_contract.'
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_agent:
     lineage:

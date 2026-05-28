@@ -1,71 +1,71 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: reminder
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
-description: 'Reminders for agents in Hub Services'
+description: Reminders for agents in Hub Services
 columns:
   id:
-    description: ''
+    description: Value of id in the source record.
     lineage:
     - datalake_hub_services_raw.reminder.id
   id_visitor:
-    description: ''
+    description: Unique identifier for visitor.
     lineage:
     - datalake_hub_services_raw.reminder.visitor_id
   id_event:
-    description: ''
+    description: Unique identifier for event.
     lineage:
     - datalake_hub_services_raw.reminder.event_id
   id_reminder_type:
-    description: ''
+    description: Unique identifier for reminder type.
     lineage:
     - datalake_hub_services_raw.reminder.reminder_type_id
   status:
-    description: ''
+    description: Value of status in the source record.
     lineage:
     - datalake_hub_services_raw.reminder.status
   created_by:
-    description: ''
+    description: Value of created by in the source record.
     lineage:
     - datalake_hub_services_raw.reminder.created_by
   closed_by:
-    description: ''
+    description: Value of closed by in the source record.
     lineage:
     - datalake_hub_services_raw.reminder.closed_by
   creation_method:
-    description: ''
+    description: Value of creation method in the source record.
     lineage:
     - datalake_hub_services_raw.reminder.creation_method
   version:
-    description: ''
+    description: Value of version in the source record.
     lineage:
     - datalake_hub_services_raw.reminder.version
   ts_reminder:
-    description: ''
+    description: Timestamp of reminder.
     lineage:
     - datalake_hub_services_raw.reminder.date
   ts_created:
-    description: ''
+    description: Timestamp of created.
     lineage:
     - datalake_hub_services_raw.reminder.created_at
   ts_updated:
-    description: ''
+    description: Timestamp of updated.
     lineage:
     - datalake_hub_services_raw.reminder.updated_at
   ts_closed:
-    description: ''
+    description: Timestamp of closed.
     lineage:
     - datalake_hub_services_raw.reminder.closed_at
   year:
-    description: ''
+    description: Partition column (year) for the table load date.
     lineage:
     - datalake_hub_services_raw.reminder.year
   month:
-    description: ''
+    description: Partition column (month) for the table load date.
     lineage:
     - datalake_hub_services_raw.reminder.month
   day:
-    description: ''
+    description: Partition column (day) for the table load date.
     lineage:
     - datalake_hub_services_raw.reminder.day

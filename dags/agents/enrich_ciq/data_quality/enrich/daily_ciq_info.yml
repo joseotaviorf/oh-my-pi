@@ -1,6 +1,6 @@
 ---
 table_name: datalake_ciq.daily_ciq_info
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 column_level_validations:
   id_partner:
     is_complete:

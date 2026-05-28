@@ -3,7 +3,7 @@ database_name: datalake_hub_services_clean
 table_name: member_profile
 description: Hub Services member profile rows (latest version per id), linking users to business units, profile type, parent profile, relationship dates, and partition columns for incremental loads.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     description: Unique identifier for the member profile record in Hub Services.

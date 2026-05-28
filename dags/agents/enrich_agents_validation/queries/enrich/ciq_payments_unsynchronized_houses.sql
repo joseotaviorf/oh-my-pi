@@ -43,7 +43,9 @@ not_synchronized_houses AS (
     r.dt_created
 )
 SELECT
-  *
+  quantity_of_houses,
+  id_house,
+  dt_created
 FROM
   not_synchronized_houses
 UNION ALL

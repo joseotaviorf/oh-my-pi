@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: quintoandar_prospect_agent
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Prospect details for QuintoAndar agents, including licensing, interests, availability, experience, referral data, and operating regions.
 columns:
   id_prospect_agent:

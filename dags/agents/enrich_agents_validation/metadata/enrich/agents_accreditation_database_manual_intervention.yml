@@ -9,7 +9,7 @@ description: |
   The data quality alert rule is configured with a threshold of 518 records, which represents the current 
   baseline count of records that exhibit this behavior (existing in the default table (DadosAgente_tipo) but not in the audit table (DadosAgente_tipo_AUD)).
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent_data:
     description: Unique identifier of the agent data record from the main agent_data_types table.

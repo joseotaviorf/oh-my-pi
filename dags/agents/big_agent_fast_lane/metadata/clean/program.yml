@@ -4,7 +4,7 @@ table_name: program
 description: Incentive program definition with name, code, JSON details, and lifecycle
   timestamps.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

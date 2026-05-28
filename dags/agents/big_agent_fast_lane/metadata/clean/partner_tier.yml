@@ -5,7 +5,7 @@ description: |
   Cleaned partner tier mapping with validity window, link to tier and incentive
   system, overwrite metadata, and partitions.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

@@ -1,6 +1,6 @@
 ---
 table_name: dw_ciq.fact_ciq_listing_purchase
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 column_level_validations:
   sk_house:
     is_complete:

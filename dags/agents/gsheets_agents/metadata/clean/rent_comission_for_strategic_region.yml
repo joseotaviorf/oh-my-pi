@@ -3,7 +3,7 @@ table_name: rent_comission_for_strategic_region
 description:
   Strategic region mapping for Rent. Identifies whether a region (city/neighborhood) is considered strategic.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_region:
     lineage:

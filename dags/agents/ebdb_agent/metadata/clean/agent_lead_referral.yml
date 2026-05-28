@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: agent_lead_referral
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Customers invited by agents to our buyers' referral program in ForSale, known as Traz Quem Compra (TQC)
 columns:
   id:

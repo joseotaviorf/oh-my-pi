@@ -4,7 +4,7 @@ table_name: enrollment_aud
 description: Envers audit rows for enrollment changes, including agent and agency
   list modification flags.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

@@ -2,7 +2,7 @@
 database_name: datalake_listing_deduplication
 table_name: listing_deduplication
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: |
   This table contains deduplication analysis of house listings based on normalized address parsing.
   It processes house data from EBDB, normalizes address complements using complex regex rules,

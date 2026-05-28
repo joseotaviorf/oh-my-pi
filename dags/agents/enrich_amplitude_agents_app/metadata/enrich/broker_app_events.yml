@@ -3,7 +3,7 @@ database_name: datalake_amplitude_agents_app
 table_name: broker_app_events
 description: Unified event feed for the Agents App, combining native app events and search-related webview events for logged-in Brazilian agents (Sale or Rent) within the selected date range.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_user:
     lineage:

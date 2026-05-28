@@ -7,7 +7,7 @@ description: 'Periodic snapshot fact table. Every day it registers every contrac
   in a single row per agent with a contract per day.
   Along with the contract, the activation and the business context can also be obtained by joining this table with dw_agent.dim_work_contract.'
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_date:
     lineage:

@@ -1,34 +1,43 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: reminder_type
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
-description: 'Types of reminders.'
+description: Types of reminders.
 columns:
   id:
     lineage:
     - datalake_hub_services_raw.reminder_type.id
+    description: Value of id in the source record.
   name:
     lineage:
     - datalake_hub_services_raw.reminder_type.name
+    description: Value of name in the source record.
   status:
     lineage:
     - datalake_hub_services_raw.reminder_type.status
+    description: Value of status in the source record.
   version:
     lineage:
     - datalake_hub_services_raw.reminder_type.version
+    description: Value of version in the source record.
   ts_created:
     lineage:
     - datalake_hub_services_raw.reminder_type.created_at
+    description: Timestamp of created.
   ts_updated:
     lineage:
     - datalake_hub_services_raw.reminder_type.updated_at
+    description: Timestamp of updated.
   year:
     lineage:
     - datalake_hub_services_raw.reminder_type.year
+    description: Partition column (year) for the table load date.
   month:
     lineage:
     - datalake_hub_services_raw.reminder_type.month
+    description: Partition column (month) for the table load date.
   day:
     lineage:
     - datalake_hub_services_raw.reminder_type.day
+    description: Partition column (day) for the table load date.

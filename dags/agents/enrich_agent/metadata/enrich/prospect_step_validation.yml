@@ -2,7 +2,7 @@
 database_name: datalake_agent_accreditation
 table_name: prospect_step_validation
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: |
   Unified prospect onboarding validation stream combining CRECI waiting rows, company association gaps for active agents
   without a parent negotiation executive user joined from enrich_agent agent, signup profile conflicts from Amplitude,

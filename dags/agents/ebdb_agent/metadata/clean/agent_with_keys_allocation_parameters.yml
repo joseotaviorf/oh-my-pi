@@ -2,35 +2,46 @@
 database_name: datalake_ebdb_clean
 table_name: agent_with_keys_allocation_parameters
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters.id
+    - datalake_ebdb_raw.agentwithkeysallocationparameters.id
+    description: Value of id in the source record.
   id_agent:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters.agent_id
+    - datalake_ebdb_raw.agentwithkeysallocationparameters.agent_id
+    description: Unique identifier for agent.
   total_houses:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters.total_houses
+    - datalake_ebdb_raw.agentwithkeysallocationparameters.total_houses
+    description: Value of total houses in the source record.
   capacity:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters.capacity
+    - datalake_ebdb_raw.agentwithkeysallocationparameters.capacity
+    description: Value of capacity in the source record.
   average_ticket:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters.average_ticket
+    - datalake_ebdb_raw.agentwithkeysallocationparameters.average_ticket
+    description: Value of average ticket in the source record.
   average_lat:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters.average_lat
+    - datalake_ebdb_raw.agentwithkeysallocationparameters.average_lat
+    description: Value of average lat in the source record.
   average_lng:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters.average_lng
+    - datalake_ebdb_raw.agentwithkeysallocationparameters.average_lng
+    description: Value of average lng in the source record.
   has_opted_out:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters.has_opted_out
+    - datalake_ebdb_raw.agentwithkeysallocationparameters.has_opted_out
+    description: Flag indicating whether the record has opted out.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters.created_at
+    - datalake_ebdb_raw.agentwithkeysallocationparameters.created_at
+    description: Timestamp of created.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters.updated_at
+    - datalake_ebdb_raw.agentwithkeysallocationparameters.updated_at
+    description: Timestamp of updated.
+description: Clean layer table for agent with keys allocation parameters agent domain data.

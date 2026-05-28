@@ -6,7 +6,7 @@ description: SCD-style history of 3P agents (agent_type = 'CORRETOR_REDE'), buil
   start/end timestamps delimiting the validity window. Restricted to agents linked to
   Marketplace 5A brokers; data of exclusive interest to the 3P team.
 domain: Agents
-owner: vitor.musachio@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent:
     lineage:

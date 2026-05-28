@@ -6,7 +6,7 @@ description: |
   domain events with metric period mapping (simple and compound), including validity,
   invalidation (when applicable), and supporting identifiers.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_metric_event:
     description: Deterministic hash identifier for the metric event row.

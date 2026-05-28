@@ -1,6 +1,6 @@
 ---
 table_name: datalake_ciq.ciq_supply_events_tracking
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 column_level_validations:
   id_supply:
     is_complete:

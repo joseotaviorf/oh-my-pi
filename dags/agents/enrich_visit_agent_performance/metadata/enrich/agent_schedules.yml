@@ -5,7 +5,7 @@ description: |
   The agent_schedules table contains information about visit bookings managed by agents, including details on cancellations, booking status, and confirmed consecutive visits. 
   It also indicates whether the agent was responsible for scheduling the visit and whether there was a direct first touchpoint in the rental flow.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent_schedule:
     lineage:

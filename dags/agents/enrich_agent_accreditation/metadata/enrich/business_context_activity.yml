@@ -7,7 +7,7 @@ description: |
   Additionally, it calculates the total number of days the agent was active within each context. 
   This table only includes data for visit agents; other operational contexts are not covered
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_business_context_activity:
     lineage:

@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: region_parameters
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Table that contains the parameters for each region.
 columns:
   id:

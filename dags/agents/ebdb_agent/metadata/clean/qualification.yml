@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: qualification
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Agent prospect qualification instance in EBDB, linking a prospect to a qualification template with current state, reason, and audit timestamps.
 columns:
   id:

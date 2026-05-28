@@ -5,7 +5,7 @@ description: |
   Hub Services user rows reconciled to main/ebdb via id_external, with agent identity (id_agent,
   uuid_person) and contact fields coalesced from clean Hub Services users and datalake_ebdb_clean.user.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_user:
     lineage:

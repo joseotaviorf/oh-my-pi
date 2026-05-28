@@ -6,7 +6,7 @@ description: SCD-style dimension with the historical changes of 3P agents (CORRE
   start/end timestamps and a flag identifying the current revision. Data of exclusive
   interest to the 3P team.
 domain: Agents
-owner: vitor.musachio@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_agent_3p_history:
     lineage:

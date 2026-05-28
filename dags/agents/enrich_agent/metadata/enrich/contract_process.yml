@@ -2,7 +2,7 @@
 database_name: datalake_agent_accreditation
 table_name: contract_process
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Agent accreditation contract process joined to QuintoAndar partnership agreement documents and signatures in the Signatures service, restricted to QUINTOANDAR_AGENT / QUINTOANDAR_PARTNERSHIP_CONTRACT flows with author person UUID when the EBDB author is a person.
 columns:
   id_contract_process:

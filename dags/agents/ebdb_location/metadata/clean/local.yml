@@ -2,44 +2,58 @@
 database_name: datalake_ebdb_clean
 table_name: local
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.local.id
+    - datalake_ebdb_raw.local.id
+    description: Value of id in the source record.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.local.atualizadoem
+    - datalake_ebdb_raw.local.atualizadoem
+    description: Timestamp of updated.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.local.criadoem
+    - datalake_ebdb_raw.local.criadoem
+    description: Timestamp of created.
   lat:
     lineage:
-      - datalake_ebdb_raw.local.lat
+    - datalake_ebdb_raw.local.lat
+    description: Value of lat in the source record.
   lat_lng:
     lineage:
-      - datalake_ebdb_raw.local.latlng
+    - datalake_ebdb_raw.local.latlng
+    description: Value of lat lng in the source record.
   lng:
     lineage:
-      - datalake_ebdb_raw.local.lng
+    - datalake_ebdb_raw.local.lng
+    description: Value of lng in the source record.
   name:
     lineage:
-      - datalake_ebdb_raw.local.nome
+    - datalake_ebdb_raw.local.nome
+    description: Value of name in the source record.
   external_reference:
     lineage:
-      - datalake_ebdb_raw.local.referenciaexterna
+    - datalake_ebdb_raw.local.referenciaexterna
+    description: Value of external reference in the source record.
   type:
     lineage:
-      - datalake_ebdb_raw.local.tipo
+    - datalake_ebdb_raw.local.tipo
+    description: Value of type in the source record.
   is_active:
     lineage:
-      - datalake_ebdb_raw.local.active
+    - datalake_ebdb_raw.local.active
+    description: Flag indicating whether active.
   comment:
     lineage:
-      - datalake_ebdb_raw.local.comment
+    - datalake_ebdb_raw.local.comment
+    description: Value of comment in the source record.
   slug:
     lineage:
-      - datalake_ebdb_raw.local.slug
+    - datalake_ebdb_raw.local.slug
+    description: Value of slug in the source record.
   id_region:
     lineage:
-      - datalake_ebdb_raw.local.region_id
+    - datalake_ebdb_raw.local.region_id
+    description: Unique identifier for region.
+description: Clean layer table for local agent domain data.

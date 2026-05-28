@@ -6,7 +6,7 @@ description: |
   such as submission, approval, contract signing, and more. This table is useful for analyzing the progression of offers and understanding agent interactions in the 
   deal process.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_offer_event:
     lineage:

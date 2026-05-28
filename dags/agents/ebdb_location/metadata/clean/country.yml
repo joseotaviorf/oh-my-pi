@@ -2,26 +2,34 @@
 database_name: datalake_ebdb_clean
 table_name: country
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.country.id
+    - datalake_ebdb_raw.country.id
+    description: Value of id in the source record.
   code:
     lineage:
-      - datalake_ebdb_raw.country.code
+    - datalake_ebdb_raw.country.code
+    description: Value of code in the source record.
   name:
     lineage:
-      - datalake_ebdb_raw.country.name
+    - datalake_ebdb_raw.country.name
+    description: Value of name in the source record.
   default_locale:
     lineage:
-      - datalake_ebdb_raw.country.default_locate
+    - datalake_ebdb_raw.country.default_locate
+    description: Value of default locale in the source record.
   default_timezone:
     lineage:
-      - datalake_ebdb_raw.country.default_timezone
+    - datalake_ebdb_raw.country.default_timezone
+    description: Value of default timezone in the source record.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.country.created_at
+    - datalake_ebdb_raw.country.created_at
+    description: Timestamp of created.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.country.updated_at
+    - datalake_ebdb_raw.country.updated_at
+    description: Timestamp of updated.
+description: Clean layer table for country agent domain data.

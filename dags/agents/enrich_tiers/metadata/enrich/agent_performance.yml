@@ -6,7 +6,7 @@ description: |
   (simple, invalid and compound metrics). Each row represents a metric value for an
   agent in a given metric period.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_user:
     lineage:

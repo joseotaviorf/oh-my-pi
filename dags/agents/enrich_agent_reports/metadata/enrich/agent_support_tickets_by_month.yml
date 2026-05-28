@@ -7,7 +7,7 @@ description: |
   ticket aggregates for OKRs and KPIs. Partitioned by reference_month; merged on
   (id_user, id_agent, reference_month).
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_user:
     lineage:

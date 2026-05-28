@@ -1,91 +1,119 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: reminder_aud
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
-description: 'Audit of reminders for agents in Hub Services'
+description: Audit of reminders for agents in Hub Services
 columns:
   id:
     lineage:
     - datalake_hub_services_raw.reminder_aud.id
+    description: Value of id in the source record.
   id_visitor:
     lineage:
     - datalake_hub_services_raw.reminder_aud.visitor_id
+    description: Unique identifier for visitor.
   id_event:
     lineage:
     - datalake_hub_services_raw.reminder_aud.event_id
+    description: Unique identifier for event.
   id_reminder_type:
     lineage:
     - datalake_hub_services_raw.reminder_aud.reminder_type_id
+    description: Unique identifier for reminder type.
   status:
     lineage:
     - datalake_hub_services_raw.reminder_aud.status
+    description: Value of status in the source record.
   created_by:
     lineage:
     - datalake_hub_services_raw.reminder_aud.created_by
+    description: Value of created by in the source record.
   closed_by:
     lineage:
     - datalake_hub_services_raw.reminder_aud.closed_by
+    description: Value of closed by in the source record.
   creation_method:
     lineage:
     - datalake_hub_services_raw.reminder_aud.creation_method
+    description: Value of creation method in the source record.
   version:
     lineage:
     - datalake_hub_services_raw.reminder_aud.version
+    description: Value of version in the source record.
   rev:
     lineage:
     - datalake_hub_services_raw.reminder_aud.rev
+    description: Value of rev in the source record.
   rev_end:
     lineage:
     - datalake_hub_services_raw.reminder_aud.revend
+    description: Value of rev end in the source record.
   rev_type:
     lineage:
     - datalake_hub_services_raw.reminder_aud.revtype
+    description: Value of rev type in the source record.
   mod_id_visitor:
     lineage:
     - datalake_hub_services_raw.reminder_aud.visitor_id_mod
+    description: Audit flag for changes to id visitor.
   mod_id_event:
     lineage:
     - datalake_hub_services_raw.reminder_aud.event_id_mod
+    description: Audit flag for changes to id event.
   mod_id_reminder_type:
     lineage:
     - datalake_hub_services_raw.reminder_aud.reminder_type_id_mod
+    description: Audit flag for changes to id reminder type.
   mod_status:
     lineage:
     - datalake_hub_services_raw.reminder_aud.status_mod
+    description: Audit flag for changes to status.
   mod_created_by:
     lineage:
     - datalake_hub_services_raw.reminder_aud.created_by_mod
+    description: Audit flag for changes to created by.
   mod_closed_by:
     lineage:
     - datalake_hub_services_raw.reminder_aud.closed_by_mod
+    description: Audit flag for changes to closed by.
   mod_creation_method:
     lineage:
     - datalake_hub_services_raw.reminder_aud.creation_method_mod
+    description: Audit flag for changes to creation method.
   mod_ts_reminder:
     lineage:
     - datalake_hub_services_raw.reminder_aud.date_mod
+    description: Audit flag for changes to ts reminder.
   mod_ts_closed:
     lineage:
     - datalake_hub_services_raw.reminder_aud.closed_at_mod
+    description: Audit flag for changes to ts closed.
   ts_reminder:
     lineage:
     - datalake_hub_services_raw.reminder_aud.date
+    description: Timestamp of reminder.
   ts_created:
     lineage:
     - datalake_hub_services_raw.reminder_aud.created_at
+    description: Timestamp of created.
   ts_updated:
     lineage:
     - datalake_hub_services_raw.reminder_aud.updated_at
+    description: Timestamp of updated.
   ts_closed:
     lineage:
     - datalake_hub_services_raw.reminder_aud.closed_at
+    description: Timestamp of closed.
   year:
     lineage:
     - datalake_hub_services_raw.reminder_aud.year
+    description: Partition column (year) for the table load date.
   month:
     lineage:
     - datalake_hub_services_raw.reminder_aud.month
+    description: Partition column (month) for the table load date.
   day:
     lineage:
     - datalake_hub_services_raw.reminder_aud.day
+    description: Partition column (day) for the table load date.

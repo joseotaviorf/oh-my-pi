@@ -2,11 +2,14 @@
 database_name: datalake_ebdb_clean
 table_name: agent_region_data
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent_data:
     lineage:
-      - datalake_ebdb_raw.dadosagente_regiao.dadosagente_id
+    - datalake_ebdb_raw.dadosagente_regiao.dadosagente_id
+    description: Unique identifier for agent data.
   id_regions:
     lineage:
-      - datalake_ebdb_raw.dadosagente_regiao.regioes_id
+    - datalake_ebdb_raw.dadosagente_regiao.regioes_id
+    description: Unique identifier for regions.
+description: Clean layer table for agent region data agent domain data.

@@ -2,60 +2,78 @@
 database_name: datalake_ebdb_clean
 table_name: agent_lead_referral_aud
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Agent Lead Referral AUD table.
 columns:
   id:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.id
+    description: Value of id in the source record.
   id_agent:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.agent_id
+    description: Unique identifier for agent.
   id_lead:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.lead_id
+    description: Unique identifier for lead.
   rev:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.rev
+    description: Value of rev in the source record.
   rev_type:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.revtype
+    description: Value of rev type in the source record.
   name:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.name
+    description: Value of name in the source record.
   status:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.status
+    description: Value of status in the source record.
   phone:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.phone
+    description: Value of phone in the source record.
   code:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.code
+    description: Value of code in the source record.
   origin:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.origin
+    description: Value of origin in the source record.
   mod_name:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.name_mod
+    description: Audit flag for changes to name.
   mod_status:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.status_mod
+    description: Audit flag for changes to status.
   mod_code:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.code_mod
+    description: Audit flag for changes to code.
   mod_phone:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.phone_mod
+    description: Audit flag for changes to phone.
   mod_origin:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.origin_mod
+    description: Audit flag for changes to origin.
   mod_id_agent:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.agent_id_mod
+    description: Audit flag for changes to id agent.
   mod_id_lead:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.lead_id_mod
+    description: Audit flag for changes to id lead.
   ts_created:
     lineage:
     - datalake_ebdb_raw.agentleadreferral_aud.createdAt
+    description: Timestamp of created.

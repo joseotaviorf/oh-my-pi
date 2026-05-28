@@ -3,7 +3,7 @@ database_name: datalake_hub_services_clean
 table_name: users
 description: Hub Services user records with latest version per id (deduplicated by partition on id and updated_at), including contact fields and load partitions for incremental processing.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     description: Unique identifier for the user within the Hub Services database.

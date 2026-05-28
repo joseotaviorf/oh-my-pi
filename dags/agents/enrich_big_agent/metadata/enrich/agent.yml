@@ -2,12 +2,12 @@ database_name: datalake_big_agent
 table_name: agent
 description: Information about agents (CIQ/ASP) registered at QuintoAndar. Each line is an unique agent. 
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_big_agent_clean.agent.id
-    description: Agent ID
+    description: Unique identifier of the agent in Big Agent.
   details:
     lineage:
       - datalake_big_agent_clean.agent.details

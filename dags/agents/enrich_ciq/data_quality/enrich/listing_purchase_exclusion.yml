@@ -1,6 +1,6 @@
 ---
 table_name: datalake_ciq.listing_purchase_exclusion
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 column_level_validations:
   id_house:
     is_complete:

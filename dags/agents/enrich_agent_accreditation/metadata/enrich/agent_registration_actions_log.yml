@@ -7,26 +7,25 @@ description: |
   The table includes details such as the work contract, CRECI number, company, profile type, visit agent classification, 
   and activity status at the time of the action. 
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
-  id_action:
+  id_action_log:
     lineage:
       - datalake_agent_accreditation.agent_accreditation.id_agent
       - datalake_agent_accreditation.agent_accreditation.ts_revision_started
     description: |
-      A unique identifier for the action performed in the Agent registration, generated using the XXHASH64 function based on the agent's ID, 
-      the action executed, and the revision date. This field maintains the history of actions taken during the Agent's registration or update process.
+      Unique identifier for the action log entry, generated with XXHASH64 from agent ID, action name, and revision date.
   id_action:
-    description: A numeric code that categorizes the actions performed in the Agent's registration and update process.
+    description: Numeric code that categorizes the action performed in the agent registration process.
     categories:
-      0: Accreditation
-      1: First activation after accreditation
-      2: De-accreditation
-      3: Re-accreditation
-      4: Business Context Update
-      5: Performance Profile Update
-      6: Record Updated
-      7: Record Removed
+      '0': Accreditation
+      '1': First activation after accreditation
+      '2': De-accreditation
+      '3': Re-accreditation
+      '4': Business Context Update
+      '5': Performance Profile Update
+      '6': Record Updated
+      '7': Record Removed
   id_agent:
     lineage:
       - datalake_agent_accreditation.agent_accreditation.id_agent
@@ -81,6 +80,10 @@ columns:
     lineage:
       - datalake_agent_accreditation.agent_accreditation.is_active
     description: Indicates whether the Agent has an active registration
+  ts_revision:
+    lineage:
+      - datalake_agent_accreditation.agent_accreditation.ts_revision_started
+    description: Timestamp when the registration action revision occurred.
   dt_action:
     lineage:
       - datalake_agent_accreditation.agent_accreditation.ts_revision_started

@@ -6,7 +6,7 @@ description: |
   across calendar days via aux_date using relationship start/end from enrich member_profile (already
   denormalized with user, agent, parent, and hub attributes). One row per member relationship and reference day.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_member_relationship:
     lineage:

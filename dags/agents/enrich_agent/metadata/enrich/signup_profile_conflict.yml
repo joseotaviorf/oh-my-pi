@@ -2,7 +2,7 @@
 database_name: datalake_agent_accreditation
 table_name: signup_profile_conflict
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Synthetic signup funnel rows for agent prospects blocked by an existing agent profile, derived from production Agents app Amplitude events only (active, inactive, or pending agent detected on signup screens).
 columns:
   uuid_person:

@@ -10,7 +10,7 @@ description: |
   total prospects of an EN equals the sum of the prospects from all brokers (CRs)
   associated to that EN within the period.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_metric_period:
     lineage:

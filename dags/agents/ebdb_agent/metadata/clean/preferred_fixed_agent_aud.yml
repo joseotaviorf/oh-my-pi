@@ -2,38 +2,50 @@
 database_name: datalake_ebdb_clean
 table_name: preferred_fixed_agent_aud
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent_aud.id
+    - datalake_ebdb_raw.preferredfixedagent_aud.id
+    description: Value of id in the source record.
   rev:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent_aud.rev
+    - datalake_ebdb_raw.preferredfixedagent_aud.rev
+    description: Value of rev in the source record.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent_aud.revtype
+    - datalake_ebdb_raw.preferredfixedagent_aud.revtype
+    description: Value of rev type in the source record.
   business_context:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent_aud.businesscontext
+    - datalake_ebdb_raw.preferredfixedagent_aud.businesscontext
+    description: Value of business context in the source record.
   origin:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent.origin
+    - datalake_ebdb_raw.preferredfixedagent.origin
+    description: Value of origin in the source record.
   is_enabled:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent_aud.isenabled
+    - datalake_ebdb_raw.preferredfixedagent_aud.isenabled
+    description: Flag indicating whether enabled.
   mod_business_context:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent_aud.businesscontext_mod
+    - datalake_ebdb_raw.preferredfixedagent_aud.businesscontext_mod
+    description: Audit flag for changes to business context.
   mod_is_enabled:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent_aud.isenabled_mod
+    - datalake_ebdb_raw.preferredfixedagent_aud.isenabled_mod
+    description: Audit flag for changes to enabled.
   mod_origin:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent_aud.origin_mod
+    - datalake_ebdb_raw.preferredfixedagent_aud.origin_mod
+    description: Audit flag for changes to origin.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent_aud.criadoem
+    - datalake_ebdb_raw.preferredfixedagent_aud.criadoem
+    description: Timestamp of created.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent_aud.atualizadoem
+    - datalake_ebdb_raw.preferredfixedagent_aud.atualizadoem
+    description: Timestamp of updated.
+description: Clean layer table for preferred fixed agent aud agent domain data.

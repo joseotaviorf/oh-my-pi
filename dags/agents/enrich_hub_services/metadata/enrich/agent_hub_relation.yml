@@ -3,7 +3,7 @@ database_name: datalake_hub_services
 table_name: agent_hub_relation
 description: Table that identifies the relation between Agent and Hub per day.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_snapshot:
     lineage:
@@ -85,7 +85,7 @@ columns:
   revision:
     lineage:
       - datalake_hub_services_clean.member_profile_aud.rev
-    description: Revision.
+    description: Revision number of the hub services record.
   ts_agent_hub_relation_date:
     lineage:
       - datalake_hub_services_clean.member_profile_aud.ts_created

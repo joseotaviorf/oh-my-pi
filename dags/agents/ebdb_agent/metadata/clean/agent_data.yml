@@ -2,65 +2,86 @@
 database_name: datalake_ebdb_clean
 table_name: agent_data
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.dadosagente.id
+    - datalake_ebdb_raw.dadosagente.id
+    description: Value of id in the source record.
   id_coordinate:
     lineage:
-      - datalake_ebdb_raw.dadosagente.coordinateid
+    - datalake_ebdb_raw.dadosagente.coordinateid
+    description: Unique identifier for coordinate.
   id_salesforce:
     lineage:
-      - datalake_ebdb_raw.dadosagente.salesforceid
+    - datalake_ebdb_raw.dadosagente.salesforceid
+    description: Unique identifier for salesforce.
   id_city:
     lineage:
-      - datalake_ebdb_raw.dadosagente.cidade_id
+    - datalake_ebdb_raw.dadosagente.cidade_id
+    description: Unique identifier for city.
   id_work_contract:
     lineage:
-      - datalake_ebdb_raw.dadosagente.workcontract_id
+    - datalake_ebdb_raw.dadosagente.workcontract_id
+    description: Unique identifier for work contract.
   id_preferred_region:
     lineage:
-      - datalake_ebdb_raw.dadosagente.preferredregion_id
+    - datalake_ebdb_raw.dadosagente.preferredregion_id
+    description: Unique identifier for preferred region.
   uuid_company:
     lineage:
-      - datalake_ebdb_raw.dadosagente.companyuuid
+    - datalake_ebdb_raw.dadosagente.companyuuid
+    description: UUID for company.
   code:
     lineage:
-      - datalake_ebdb_raw.dadosagente.code
+    - datalake_ebdb_raw.dadosagente.code
+    description: Value of code in the source record.
   profile:
     lineage:
-      - datalake_ebdb_raw.dadosagente.perfil
+    - datalake_ebdb_raw.dadosagente.perfil
+    description: Value of profile in the source record.
   agent_type:
     lineage:
-      - datalake_ebdb_raw.dadosagente.tipoagente
+    - datalake_ebdb_raw.dadosagente.tipoagente
+    description: Value of agent type in the source record.
   position_in_real_estate_agency:
     lineage:
-      - datalake_ebdb_raw.dadosagente.cargoimobiliaria
+    - datalake_ebdb_raw.dadosagente.cargoimobiliaria
+    description: Value of position in real estate agency in the source record.
   real_estate_agency:
     lineage:
-      - datalake_ebdb_raw.dadosagente.identificacaoimobiliaria
+    - datalake_ebdb_raw.dadosagente.identificacaoimobiliaria
+    description: Value of real estate agency in the source record.
   creci_number:
     lineage:
-      - datalake_ebdb_raw.dadosagente.numerocreci
+    - datalake_ebdb_raw.dadosagente.numerocreci
+    description: Value of creci number in the source record.
   is_active:
     lineage:
-      - datalake_ebdb_raw.dadosagente.ativo
+    - datalake_ebdb_raw.dadosagente.ativo
+    description: Flag indicating whether active.
   is_blocked_schedule_edition:
     lineage:
-      - datalake_ebdb_raw.dadosagente.edicaoagendabloqueada
+    - datalake_ebdb_raw.dadosagente.edicaoagendabloqueada
+    description: Flag indicating whether blocked schedule edition.
   is_passive_lead_receiver:
     lineage:
-      - datalake_ebdb_raw.dadosagente.passiveleadreceiver
+    - datalake_ebdb_raw.dadosagente.passiveleadreceiver
+    description: Flag indicating whether passive lead receiver.
   is_service_link_active:
     lineage:
-      - datalake_ebdb_raw.dadosagente.servicelinkactive
+    - datalake_ebdb_raw.dadosagente.servicelinkactive
+    description: Flag indicating whether service link active.
   has_opted_for_online_support:
     lineage:
-      - datalake_ebdb_raw.dadosagente.opted_for_online_support
+    - datalake_ebdb_raw.dadosagente.opted_for_online_support
+    description: Flag indicating whether the record has opted for online support.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.dadosagente.criadoem
+    - datalake_ebdb_raw.dadosagente.criadoem
+    description: Timestamp of created.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.dadosagente.atualizadoem
+    - datalake_ebdb_raw.dadosagente.atualizadoem
+    description: Timestamp of updated.
+description: Clean layer table for agent data agent domain data.

@@ -3,7 +3,7 @@ database_name: datalake_hub_services_clean
 table_name: business_unit
 description: With this table, we aim to keep data from the hubs where we operate in a standardized way. Since this is an incremental table, it must be filtered with a row_number to avoid duplicates.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

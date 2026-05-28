@@ -1,6 +1,6 @@
 ---
 table_name: datalake_listing_deduplication.first_listing
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 table_level_validations:
   has_size:
     greater_than: 145000

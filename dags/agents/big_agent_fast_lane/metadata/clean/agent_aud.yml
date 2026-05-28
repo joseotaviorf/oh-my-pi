@@ -4,7 +4,7 @@ table_name: agent_aud
 description: Envers audit history for agent records, including metadata and enrollment
   modification flags.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

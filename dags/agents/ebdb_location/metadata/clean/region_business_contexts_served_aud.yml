@@ -2,17 +2,22 @@
 database_name: datalake_ebdb_clean
 table_name: region_business_contexts_served_aud
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_region:
     lineage:
-      - datalake_ebdb_raw.Regiao_businessContextsServed_AUD.region_id
+    - datalake_ebdb_raw.Regiao_businessContextsServed_AUD.region_id
+    description: Unique identifier for region.
   business_context:
     lineage:
-      - datalake_ebdb_raw.Regiao_businessContextsServed_AUD.businessContext
+    - datalake_ebdb_raw.Regiao_businessContextsServed_AUD.businessContext
+    description: Value of business context in the source record.
   rev:
     lineage:
-      - datalake_ebdb_raw.Regiao_businessContextsServed_AUD.REV
+    - datalake_ebdb_raw.Regiao_businessContextsServed_AUD.REV
+    description: Value of rev in the source record.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.Regiao_businessContextsServed_AUD.REVTYPE
+    - datalake_ebdb_raw.Regiao_businessContextsServed_AUD.REVTYPE
+    description: Value of rev type in the source record.
+description: Clean layer table for region business contexts served aud agent domain data.

@@ -1,6 +1,6 @@
 ---
 table_name: datalake_agent_accreditation.agent_registration_actions_log
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 column_level_validations:
   id_action_log:
     is_complete:

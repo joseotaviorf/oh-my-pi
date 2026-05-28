@@ -3,7 +3,7 @@ database_name: datalake_amplitude_agents_app
 table_name: agents_sign_up_events
 description: Amplitude events from the Agents mobile app signup and onboarding funnel (error screens, pending analysis, welcome, and agent status views), filtered for the Agents app and selected event types within the load window.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_app:
     lineage:

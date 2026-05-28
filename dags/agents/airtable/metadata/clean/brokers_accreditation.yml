@@ -5,7 +5,7 @@ description:
   Raw data relating to lead registrations in our LP. On this basis we have various information related to the 
   accreditation process of our brokers, from the lead qualification flow to its activation and onboarding.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_airtable_record:
     lineage:
@@ -86,7 +86,7 @@ columns:
   mgm_flag:
     lineage:
       - datalake_airtable_raw.brokers_accreditation.mgm_flag
-    description: MGM Flag.
+    description: Member-get-member (MGM) program flag for the broker lead.
   region_operation:
     lineage:
       - datalake_airtable_raw.brokers_accreditation.regiao_de_atuacao

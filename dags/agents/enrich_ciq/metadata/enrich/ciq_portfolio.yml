@@ -4,7 +4,7 @@ table_name: ciq_portfolio
 description: 
   Each record brings information about a given CIQ about which cluster it belongs to and which portfolio it belongs to.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_partner:
     description: Id partner of CIQ.

@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: agent_data_programs
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: This table contains information about agent elegibility to incentive programs.
 columns:
   id:
@@ -17,10 +17,10 @@ columns:
     lineage:
       - datalake_ebdb_raw.dadosagente_programs.program
     description: Program name
-  is_elegible:
+  is_eligible:
     lineage:
       - datalake_ebdb_raw.dadosagente_programs.elegible
-    description: Program elegibility status (boolean)
+    description: Program eligibility status (boolean).
   ts_created:
     lineage:
       - datalake_ebdb_raw.dadosagente_programs.created_at

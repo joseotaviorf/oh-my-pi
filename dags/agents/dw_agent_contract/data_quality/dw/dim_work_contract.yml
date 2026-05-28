@@ -1,6 +1,6 @@
 ---
 table_name: dw_agent.dim_work_contract
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 table_level_validations:
   has_size:
     greater_than: 1700

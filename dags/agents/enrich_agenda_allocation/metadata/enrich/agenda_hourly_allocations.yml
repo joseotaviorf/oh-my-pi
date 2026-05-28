@@ -3,7 +3,7 @@ database_name: datalake_agenda_allocation
 table_name: agenda_hourly_allocations
 description: This table shows data on the agents' agenda by time slot.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent:
     lineage:

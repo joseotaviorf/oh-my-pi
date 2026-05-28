@@ -4,7 +4,7 @@ table_name: agency_aud
 description: Hibernate Envers audit rows for agency records linking enrollments to
   houses, including revision and modification flags.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

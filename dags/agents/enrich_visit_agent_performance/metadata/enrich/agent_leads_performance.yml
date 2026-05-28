@@ -6,7 +6,7 @@ description: |
   It consolidates data about the lead's journey, from visit bookings to contract signing, allowing the evaluation of an agent's effectiveness in managing and converting leads.
   This table is useful for tracking the performance of agents over time, analyzing their contribution to the progression of leads within the sales and rental funnels.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent_performance:
     lineage:

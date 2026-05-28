@@ -3,7 +3,7 @@ table_name: fact_ciq_supply_events
 description: Fact table that contains records about supply events related to the CIQ context. 
   Each record corresponds to a step within the supply funnel and its corresponding information.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_ciq_supply_event:
     description: Unique primary key that identifies each supply event.

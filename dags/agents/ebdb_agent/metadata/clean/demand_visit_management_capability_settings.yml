@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: demand_visit_management_capability_settings
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Settings for the Demand Visit Management capability, including business context and passive lead receiver flag.
 columns:
   id:

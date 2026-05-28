@@ -2,7 +2,7 @@
 database_name: datalake_agent_accreditation
 table_name: qualification_step
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Qualification workflow for agent prospects, joining EBDB qualification, step progress, and step definitions with parsed user responsible when the author is a user.
 columns:
   id_qualification_step_progress:

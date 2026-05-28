@@ -7,7 +7,7 @@ description: |
   multiple sources to provide insights into listing behavior, contract execution timing, and
   agent performance indicators.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_house:
     lineage:

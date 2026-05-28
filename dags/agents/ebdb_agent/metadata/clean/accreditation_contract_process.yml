@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: accreditation_contract_process
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Accreditation contract process instances linked to a qualification and contract template, including lifecycle status, unsigned document storage key, author metadata, and process timestamps.
 columns:
   id:

@@ -5,7 +5,7 @@ description: |
   Contains broker classifications by tiers and their brokerage values.
   Note: The source spreadsheet is generated from the datalake; it should not be used as a dependency for other tables.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_user:
     description: User unique identifier

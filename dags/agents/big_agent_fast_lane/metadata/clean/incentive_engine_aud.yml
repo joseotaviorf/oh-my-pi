@@ -5,7 +5,7 @@ description: |
   Incentive engine audit with revision metadata, modification columns, and
   audited classification and partner tier validity dates.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

@@ -2,7 +2,7 @@
 database_name: datalake_agent_accreditation
 table_name: agent_capability
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: |
   Enriched agent capabilities from EBDB joined to demand visit management settings when present.
   Each row is one capability instance with type, status, optional business context, and creation timestamp.

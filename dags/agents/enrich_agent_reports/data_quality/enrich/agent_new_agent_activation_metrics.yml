@@ -3,7 +3,7 @@
 # load_agent_new_agent_activation_metrics. Error = fail pipeline.
 ---
 table_name: datalake_agent_reports.agent_new_agent_activation_metrics
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 
 table_level_validations:
   has_size:

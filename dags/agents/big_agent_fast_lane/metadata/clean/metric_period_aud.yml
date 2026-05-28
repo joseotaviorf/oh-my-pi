@@ -5,7 +5,7 @@ description: |
   Audit view for metric period changes with revision metadata, modification flags,
   validity dates and timestamps, plus partitions.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

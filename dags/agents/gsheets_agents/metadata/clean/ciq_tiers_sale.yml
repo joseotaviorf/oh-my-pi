@@ -4,7 +4,7 @@ description: Table containing the calculation of Tiers and quarterly Revenue Sha
   The table in question may not follow the tiering rules used in the datalake. 
   It is the sole responsibility of the CIQ Experience team.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_user:
     description: Unique identifier of the user (CIQ member) in the Sale context.

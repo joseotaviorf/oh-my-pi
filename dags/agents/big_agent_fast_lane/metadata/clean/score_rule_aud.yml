@@ -5,7 +5,7 @@ description: |
   Audit view for score rule changes with revision metadata and modification flags,
   plus creation/update timestamps and partitions.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

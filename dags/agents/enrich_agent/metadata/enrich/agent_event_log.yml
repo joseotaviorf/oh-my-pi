@@ -2,7 +2,7 @@
 database_name: datalake_agent_accreditation
 table_name: agent_event_log
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: |
   Enriched agent event log per agent or per agent-capability partition.
   Each row is one capability or agent-level event with actor, channel, and audit timestamps.

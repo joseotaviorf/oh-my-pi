@@ -2,17 +2,22 @@
 database_name: datalake_ebdb_clean
 table_name: agent_data_types_aud
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent_data:
     lineage:
-      - datalake_ebdb_raw.dadosagente_tipos_aud.dadosagente_id
+    - datalake_ebdb_raw.dadosagente_tipos_aud.dadosagente_id
+    description: Unique identifier for agent data.
   rev:
     lineage:
-      - datalake_ebdb_raw.dadosagente_tipos_aud.rev
+    - datalake_ebdb_raw.dadosagente_tipos_aud.rev
+    description: Value of rev in the source record.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.dadosagente_tipos_aud.revtype
+    - datalake_ebdb_raw.dadosagente_tipos_aud.revtype
+    description: Value of rev type in the source record.
   types:
     lineage:
-      - datalake_ebdb_raw.dadosagente_tipos_aud.tipos
+    - datalake_ebdb_raw.dadosagente_tipos_aud.tipos
+    description: Value of types in the source record.
+description: Clean layer table for agent data types aud agent domain data.

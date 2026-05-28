@@ -3,7 +3,7 @@ database_name: datalake_hub_services_clean
 table_name: business_unit_region_aud
 description: Audit table, used to keep changes to business unit region records as historical data.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -60,3 +60,15 @@ columns:
     lineage:
       - datalake_hub_services_raw.business_unit_region_aud.updated_at
     description: Date the hub record was updated.
+  year:
+    description: Partition column (year) for the table load date.
+    lineage:
+      - datalake_hub_services_raw.business_unit_region_aud.year
+  month:
+    description: Partition column (month) for the table load date.
+    lineage:
+      - datalake_hub_services_raw.business_unit_region_aud.month
+  day:
+    description: Partition column (day) for the table load date.
+    lineage:
+      - datalake_hub_services_raw.business_unit_region_aud.day

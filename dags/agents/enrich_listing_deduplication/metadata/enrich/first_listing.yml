@@ -3,7 +3,7 @@ database_name: datalake_listing_deduplication
 table_name: first_listing
 description: Dataset of houses recommended by CIQ consultants (SALE and RENT) with first listing information, publication/unpublication timestamps, and contract signature checks.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_house:
     lineage:

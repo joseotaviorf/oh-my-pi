@@ -4,7 +4,7 @@ table_name: external_invoice
 description: External invoice header linked to an earning, with accrual period, due
   date, and JSON entries.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

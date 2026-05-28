@@ -2,7 +2,7 @@ database_name: dw_ciq_supply
 table_name: dim_supply_source
 description: Dimension table that provides information about the supply funnel sources.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_supply_source:
     description: Unique primary key that identifies each supply source.

@@ -6,7 +6,7 @@ description: |
   (uuid + ts_log). Extracts structured input request fields and output ranking
   fields from JSON payloads, enabling analysis of agent ranking decisions.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   uuid:
     lineage:

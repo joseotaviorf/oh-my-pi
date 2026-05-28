@@ -4,7 +4,7 @@ table_name: house_aud
 description: Envers audit rows for house records, including agency list and metadata
   modification flags.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

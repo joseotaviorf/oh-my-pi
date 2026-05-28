@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: agent_event_log
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Event log of agent capability changes and actions, including actor, channel and timestamps.
 columns:
   id:

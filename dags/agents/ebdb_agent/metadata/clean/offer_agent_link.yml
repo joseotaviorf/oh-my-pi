@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: offer_agent_link
 domain: Agents
-owner: gustavo.guerra@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Links between agents and offers, tracking which agent is associated with each offer and its source.
 columns:
   id:

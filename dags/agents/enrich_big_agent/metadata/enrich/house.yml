@@ -2,7 +2,7 @@ database_name: datalake_big_agent
 table_name: house
 description: Enrich table that contains all properties registered in big agent service and its relation with mainstream properties (Imovel table). Each row is a property.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

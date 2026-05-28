@@ -7,7 +7,7 @@ description: |
   is_ciq_only, is_independent_agent, days_since_agent_created). Incremental merge by
   month window; partitioned by reference_month, merge on (id_user, reference_month).
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_user:
     lineage:

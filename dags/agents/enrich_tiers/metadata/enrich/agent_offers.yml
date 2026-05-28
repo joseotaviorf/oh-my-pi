@@ -3,7 +3,7 @@ database_name: datalake_tiers
 table_name: agent_offers
 description: Aggregated view of RENT and SALE offer events with agent attribution (broker and negotiation executive), including prospect, CIQ attribution, TQC presence, contract status, key timestamps, and partition fields.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_offer:
     lineage:

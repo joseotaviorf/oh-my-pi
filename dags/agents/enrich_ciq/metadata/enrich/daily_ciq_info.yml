@@ -5,7 +5,7 @@ description: |
   The table described provides daily information about the CIQ status and its information related to the demand context (Visit Broker), 
   with 1 record per day for each CIQ.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_partner:
     description: Id partner of CIQ.

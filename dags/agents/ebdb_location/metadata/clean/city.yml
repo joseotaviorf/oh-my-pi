@@ -2,23 +2,30 @@
 database_name: datalake_ebdb_clean
 table_name: city
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.municipio.id
+    - datalake_ebdb_raw.municipio.id
+    description: Value of id in the source record.
   siafi_code:
     lineage:
-      - datalake_ebdb_raw.municipio.codigosiafi
+    - datalake_ebdb_raw.municipio.codigosiafi
+    description: Value of siafi code in the source record.
   name:
     lineage:
-      - datalake_ebdb_raw.municipio.nomemunicipio
+    - datalake_ebdb_raw.municipio.nomemunicipio
+    description: Value of name in the source record.
   uf:
     lineage:
-      - datalake_ebdb_raw.municipio.uf
+    - datalake_ebdb_raw.municipio.uf
+    description: Value of uf in the source record.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.municipio.atualizadoem
+    - datalake_ebdb_raw.municipio.atualizadoem
+    description: Timestamp of updated.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.municipio.criadoem
+    - datalake_ebdb_raw.municipio.criadoem
+    description: Timestamp of created.
+description: Clean layer table for city agent domain data.

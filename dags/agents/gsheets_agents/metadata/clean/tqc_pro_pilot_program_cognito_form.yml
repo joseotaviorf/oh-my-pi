@@ -6,7 +6,7 @@ description: |
   information, awareness flags, and entry lifecycle timestamps (created, submitted, updated).
   Each row represents a single form submission.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -44,6 +44,10 @@ columns:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.dadosdoassociado_dadosdocomprador_qualoimoveleouregiaodeinteressedocompradorinformeaquiocodigodoimovellinkdoanuncioenderecooubairroessainformacaoeessencialparaocadastrodocompradoreparavalidarasuaparticipacaonoprograma
     description: House code/link/address or region of interest provided by the associate.
+  additional_info:
+    description: Additional buyer or property details shared by the associate for the brokerage.
+  indicated_sale_associate:
+    description: Optional preference for a QuintoAndar sale associate to serve the registered buyer.
   entry_status:
     lineage:
       - datalake_gsheets_raw.tqc_pro_pilot_program_cognito_form.entry_status

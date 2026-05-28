@@ -2,7 +2,7 @@ database_name: datalake_ebdb_agents
 table_name: preferred_property_agent_relation_history
 description: This table registers each house-listing preferred property agent relation from start to end date.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_house_listing_relation:
     lineage:

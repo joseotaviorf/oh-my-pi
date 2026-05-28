@@ -4,7 +4,7 @@ table_name: score_rule
 description: |
   Cleaned score rule table defining minimum score thresholds, with timestamps and partitions.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

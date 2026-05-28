@@ -7,7 +7,7 @@ description: |
   region (deduplicated by latest business_unit_region update). Use is_last_region_associated
   to identify the most recent region row per business unit when multiple region associations exist over time.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_business_unit:
     lineage:

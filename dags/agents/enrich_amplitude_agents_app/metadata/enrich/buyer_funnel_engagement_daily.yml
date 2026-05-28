@@ -3,7 +3,7 @@ database_name: datalake_amplitude_agents_app
 table_name: buyer_funnel_engagement_daily
 description: Daily engagement metrics across the buyer funnel for Agents App users, aggregated from search-related events and enriched with UTM taxonomy.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_amplitude:
     lineage:

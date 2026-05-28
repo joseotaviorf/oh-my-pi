@@ -1,6 +1,6 @@
 ---
 table_name: datalake_ciq_comissioning.sale_comission_for_strategic_region
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 table_level_validations:
   has_size:
     greater_than: 700000

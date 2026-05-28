@@ -2,32 +2,42 @@
 database_name: datalake_ebdb_clean
 table_name: preferred_fixed_agent
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent.id
+    - datalake_ebdb_raw.preferredfixedagent.id
+    description: Value of id in the source record.
   id_agent_data:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent.agentdata_id
+    - datalake_ebdb_raw.preferredfixedagent.agentdata_id
+    description: Unique identifier for agent data.
   id_region:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent.region_id
+    - datalake_ebdb_raw.preferredfixedagent.region_id
+    description: Unique identifier for region.
   id_user_visit_preferences:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent.uservisitpreferences_id
+    - datalake_ebdb_raw.preferredfixedagent.uservisitpreferences_id
+    description: Unique identifier for user visit preferences.
   business_context:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent.businesscontext
+    - datalake_ebdb_raw.preferredfixedagent.businesscontext
+    description: Value of business context in the source record.
   origin:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent.origin
+    - datalake_ebdb_raw.preferredfixedagent.origin
+    description: Value of origin in the source record.
   is_enabled:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent.isenabled
+    - datalake_ebdb_raw.preferredfixedagent.isenabled
+    description: Flag indicating whether enabled.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent.criadoem
+    - datalake_ebdb_raw.preferredfixedagent.criadoem
+    description: Timestamp of created.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.preferredfixedagent.atualizadoem
+    - datalake_ebdb_raw.preferredfixedagent.atualizadoem
+    description: Timestamp of updated.
+description: Clean layer table for preferred fixed agent agent domain data.

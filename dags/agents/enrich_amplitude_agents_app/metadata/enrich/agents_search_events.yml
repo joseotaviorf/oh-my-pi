@@ -3,7 +3,7 @@ database_name: datalake_amplitude_agents_app
 table_name: agents_search_events
 description: This table contains data from Agents' property search events that were redirected from the Agents application to the Tenant application.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_user:
     lineage:

@@ -1,6 +1,6 @@
 ---
 table_name: datalake_tiers.agent_performance
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 column_level_validations:
   id_user:
     is_complete:

@@ -4,7 +4,7 @@ table_name: agents_region
 description: Enrich table that contains audit data of the agent-region relations. 
   Each row of this table is a revision.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent:
     lineage:
@@ -13,7 +13,7 @@ columns:
   id_region:
     lineage:
       - datalake_ebdb_clean.agent_region_data_aud.id_region
-    description: Region ID
+    description: Unique identifier of the region linked to the agent.
   rev_type:
     lineage:
       - datalake_ebdb_clean.agent_region_data_aud.rev_type

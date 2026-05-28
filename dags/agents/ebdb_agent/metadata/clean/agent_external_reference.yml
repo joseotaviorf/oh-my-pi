@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: agent_external_reference
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: |
   Stores the origin reference for each agent during migration to the unified Agents domain.
   Agents (brokers) are being migrated into the single Agents table; they were previously spread

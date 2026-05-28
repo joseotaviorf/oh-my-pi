@@ -1,6 +1,6 @@
 ---
 table_name: datalake_visit_agent_performance.offer_flow_performance
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 column_level_validations:
   id_agent_performance:
     is_complete:

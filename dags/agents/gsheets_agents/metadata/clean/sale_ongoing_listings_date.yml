@@ -4,7 +4,7 @@ description:
   Provides ongoing allocation dates for sale listings recorded via GSheets.
   Each row represents a listing currently in progress and its allocation date.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_listing:
     lineage:

@@ -2,56 +2,74 @@
 database_name: datalake_ebdb_clean
 table_name: region_config
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.regionconfig.id
+    - datalake_ebdb_raw.regionconfig.id
+    description: Value of id in the source record.
   id_region:
     lineage:
-      - datalake_ebdb_raw.regionconfig.region_id
+    - datalake_ebdb_raw.regionconfig.region_id
+    description: Unique identifier for region.
   id_place:
     lineage:
-      - datalake_ebdb_raw.regionconfig.placeId
+    - datalake_ebdb_raw.regionconfig.placeId
+    description: Unique identifier for place.
   id_timezone:
     lineage:
-      - datalake_ebdb_raw.regionconfig.timezoneId
+    - datalake_ebdb_raw.regionconfig.timezoneId
+    description: Unique identifier for timezone.
   max_price:
     lineage:
-      - datalake_ebdb_raw.regionconfig.maxPrice
+    - datalake_ebdb_raw.regionconfig.maxPrice
+    description: Value of max price in the source record.
   min_price:
     lineage:
-      - datalake_ebdb_raw.regionconfig.minPrice
+    - datalake_ebdb_raw.regionconfig.minPrice
+    description: Value of min price in the source record.
   phone_ddd:
     lineage:
-      - datalake_ebdb_raw.regionconfig.phoneDDD
+    - datalake_ebdb_raw.regionconfig.phoneDDD
+    description: Value of phone ddd in the source record.
   featured_photo:
     lineage:
-      - datalake_ebdb_raw.regionconfig.featuredPhoto
+    - datalake_ebdb_raw.regionconfig.featuredPhoto
+    description: Value of featured photo in the source record.
   featured_rank:
     lineage:
-      - datalake_ebdb_raw.regionconfig.featuredRank
+    - datalake_ebdb_raw.regionconfig.featuredRank
+    description: Value of featured rank in the source record.
   shelf_prime_fee:
     lineage:
-      - datalake_ebdb_raw.regionconfig.shelfPrimeFee
+    - datalake_ebdb_raw.regionconfig.shelfPrimeFee
+    description: Value of shelf prime fee in the source record.
   is_house_referral_enabled:
     lineage:
-      - datalake_ebdb_raw.regionconfig.houseReferralEnabled
+    - datalake_ebdb_raw.regionconfig.houseReferralEnabled
+    description: Flag indicating whether house referral enabled.
   is_house_registration_enabled:
     lineage:
-      - datalake_ebdb_raw.regionconfig.houseRegistrationEnabled
+    - datalake_ebdb_raw.regionconfig.houseRegistrationEnabled
+    description: Flag indicating whether house registration enabled.
   is_search_enabled:
     lineage:
-      - datalake_ebdb_raw.regionconfig.searchEnabled
+    - datalake_ebdb_raw.regionconfig.searchEnabled
+    description: Flag indicating whether search enabled.
   is_visit_enabled:
     lineage:
-      - datalake_ebdb_raw.regionconfig.visitsEnabled
+    - datalake_ebdb_raw.regionconfig.visitsEnabled
+    description: Flag indicating whether visit enabled.
   is_address_number_required:
     lineage:
-      - datalake_ebdb_raw.regionconfig.addressNumberRequired
+    - datalake_ebdb_raw.regionconfig.addressNumberRequired
+    description: Flag indicating whether address number required.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.regionconfig.criadoEm
+    - datalake_ebdb_raw.regionconfig.criadoEm
+    description: Timestamp of created.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.regionconfig.atualizadoEm
+    - datalake_ebdb_raw.regionconfig.atualizadoEm
+    description: Timestamp of updated.
+description: Clean layer table for region config agent domain data.

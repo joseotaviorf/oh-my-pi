@@ -5,7 +5,7 @@ description: |
   Earnings produced by the incentive system, including agency/program, external
   domain/receiver, monetary value, status, details and partitions.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

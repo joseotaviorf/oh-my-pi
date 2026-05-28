@@ -6,7 +6,7 @@ description: |
   Each row represents a metric label and its validity window (start/end) for a
   given month. Identifiers are deterministic hashes of (metric, dt_init).
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     description: Deterministic hash identifier of (metric, dt_init).

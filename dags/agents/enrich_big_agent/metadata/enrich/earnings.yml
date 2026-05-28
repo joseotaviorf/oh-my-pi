@@ -4,7 +4,7 @@ description: Table with big agent earnings info. It receives the
   last update of a record. We're deduplicating the repeated IDs in this table, because
   our raw/clean DAG makes the ingestion via incremental load.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -18,10 +18,6 @@ columns:
     lineage:
       - datalake_big_agent_clean.earnings.id_program
     description: ID of the program.
-  id_house_external:
-    lineage:
-      - datalake_big_agent_clean.earnings.id_house_external
-    description: ID house from EBDB source.
   id_external_receiver:
     lineage:
       - datalake_big_agent_clean.earnings.id_external_receiver

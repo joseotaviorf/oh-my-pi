@@ -6,7 +6,7 @@ description: >
   same property via Atlas property-dedup and/or address-parsed duplicity. Methods can coalesce when both
   rules apply to the same new house and paid house pair.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_house:
     description: House id of the new registration being evaluated for exclusion.

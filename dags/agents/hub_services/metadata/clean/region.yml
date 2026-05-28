@@ -3,16 +3,12 @@ database_name: datalake_hub_services_clean
 table_name: region
 description: Table that maps the operating regions of the hubs we have. Since this is an incremental table, it must be filtered with a row_number to avoid duplicates.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     description: unique identifier of regions.
     lineage:
       - datalake_hub_services_raw.region.id
-  id_business_unit:
-    description: Hub identifier, can be used in a join with the business unit table to get more accurate hub data.
-    lineage:
-      - datalake_hub_services_raw.region.business_unit_id
   version:
     description: Record version, identifies which records are older or newer.
     lineage:

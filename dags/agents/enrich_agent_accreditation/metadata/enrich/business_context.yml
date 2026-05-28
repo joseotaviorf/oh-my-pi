@@ -6,7 +6,7 @@ description: |
   This table does not contain enriched data—only the start and end dates for each assigned context. 
   It exclusively includes data for visit agents; other operational contexts are not covered.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent_business_context:
     lineage:

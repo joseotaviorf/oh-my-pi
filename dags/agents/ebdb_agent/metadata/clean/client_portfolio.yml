@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: client_portfolio
 domain: Agents
-owner: gustavo.guerra@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Client portfolio records linking agents to clients by capability type, with activity and expiration timestamps.
 columns:
   id:

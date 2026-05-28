@@ -5,7 +5,7 @@ description: |
   Revenue share condition records defining conditional rules (type and value)
   for revenue share configurations, with partitions.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

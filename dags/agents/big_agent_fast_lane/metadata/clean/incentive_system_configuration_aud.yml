@@ -5,7 +5,7 @@ description: |
   Incentive system configuration audit with revision metadata and modification
   columns, plus audited timestamps.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

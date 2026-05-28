@@ -2,7 +2,7 @@
 database_name: datalake_listing_deduplication
 table_name: atlas_house_deduplication
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: >
   Enrich join of property-dedup similar_property candidates with duplicity_output verdicts, keyed by
   house id and similar house id for Atlas-based listing purchase exclusion and CIQ deduplication flows.

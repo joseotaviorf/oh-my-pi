@@ -1,6 +1,6 @@
 ---
 table_name: datalake_amplitude_agents_app.buyer_funnel_users
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 column_level_validations:
   id_amplitude:
     is_complete:

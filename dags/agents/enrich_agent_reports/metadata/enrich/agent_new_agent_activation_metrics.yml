@@ -10,7 +10,7 @@ description: |
   the agent was the preferred property agent for the visited house at visit time).
   Partitioned by reference_month; merged on (id_user, reference_month).
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_user:
     lineage:

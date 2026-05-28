@@ -5,7 +5,7 @@ description: >
   DW fact for CIQ listing purchase exclusion alerts: new registrations matched to prior paid captures
   via Atlas and/or address-parsed duplicity, sourced from datalake_ciq.listing_purchase_exclusion enrich.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_house:
     description: House id of the new registration (exclusion candidate).

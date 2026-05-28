@@ -3,7 +3,7 @@ database_name: datalake_agent_accreditation
 table_name: agent_profile
 description: "This table contains Agents' profile data and their revisions/updates."
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent_profile:
     lineage:

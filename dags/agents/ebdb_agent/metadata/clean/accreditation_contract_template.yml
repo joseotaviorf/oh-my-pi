@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: accreditation_contract_template
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Accreditation contract template definitions per business association, including display fields, document storage key, validity window, author metadata, and audit timestamps.
 columns:
   id:

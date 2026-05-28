@@ -10,7 +10,7 @@ description: |
   which are crucial for understanding their efficiency in handling leads and appointments. The table does not consider visits where the agent 
   was the first touchpoint for the lead (as indicated by the filter on has_direct_first_touchpoint).
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent_performance:
     lineage:

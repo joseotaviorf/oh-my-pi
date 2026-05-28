@@ -1,58 +1,75 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: visitor_event
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
 description: Every event associated with a visit in Hub Services, like visit scheduled, canceled, done, or waiting confirmation.
 columns:
   id:
     lineage:
     - datalake_hub_services_raw.visitor_event.id
+    description: Value of id in the source record.
   id_visitor:
     lineage:
     - datalake_hub_services_raw.visitor_event.visitor_id
+    description: Unique identifier for visitor.
   id_house:
     lineage:
     - datalake_hub_services_raw.visitor_event.house_id
+    description: Unique identifier for house.
   id_region:
     lineage:
     - datalake_hub_services_raw.visitor_event.region_id
+    description: Unique identifier for region.
   id_user:
     lineage:
     - datalake_hub_services_raw.visitor_event.user_id
+    description: Unique identifier for user.
   id_idempotency:
     lineage:
     - datalake_hub_services_raw.visitor_event.idempotency_id
+    description: Unique identifier for idempotency.
   domain_name:
     lineage:
     - datalake_hub_services_raw.visitor_event.domain_name
+    description: Value of domain name in the source record.
   event_type:
     lineage:
     - datalake_hub_services_raw.visitor_event.event_type
+    description: Value of event type in the source record.
   event_code:
     lineage:
     - datalake_hub_services_raw.visitor_event.event_code
+    description: Value of event code in the source record.
   metadata:
     lineage:
     - datalake_hub_services_raw.visitor_event.metadata
+    description: Value of metadata in the source record.
   version:
     lineage:
     - datalake_hub_services_raw.visitor_event.version
+    description: Value of version in the source record.
   ts_event:
     lineage:
     - datalake_hub_services_raw.visitor_event.event_date
+    description: Timestamp of event.
   ts_created:
     lineage:
     - datalake_hub_services_raw.visitor_event.created_at
+    description: Timestamp of created.
   ts_updated:
     lineage:
     - datalake_hub_services_raw.visitor_event.updated_at
+    description: Timestamp of updated.
   year:
     lineage:
     - datalake_hub_services_raw.visitor_event.year
+    description: Partition column (year) for the table load date.
   month:
     lineage:
     - datalake_hub_services_raw.visitor_event.month
+    description: Partition column (month) for the table load date.
   day:
     lineage:
     - datalake_hub_services_raw.visitor_event.day
+    description: Partition column (day) for the table load date.

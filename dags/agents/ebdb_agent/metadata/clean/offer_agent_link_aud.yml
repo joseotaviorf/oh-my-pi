@@ -2,7 +2,7 @@
 database_name: datalake_ebdb_clean
 table_name: offer_agent_link_aud
 domain: Agents
-owner: gustavo.guerra@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Audit history (Hibernate Envers) of the offer-agent link table, recording each revision and which fields were modified.
 columns:
   id:

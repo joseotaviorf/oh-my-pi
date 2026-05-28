@@ -1,6 +1,6 @@
 ---
 table_name: datalake_agent_accreditation.business_context_activity
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 column_level_validations:
   id_business_context_activity:
     is_complete:

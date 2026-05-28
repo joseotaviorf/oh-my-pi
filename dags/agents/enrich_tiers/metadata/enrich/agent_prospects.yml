@@ -6,7 +6,7 @@ description: |
   Granularity is per agent, prospect and day for the first occurrence of each
   conversion event type within the flow.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent:
     lineage:

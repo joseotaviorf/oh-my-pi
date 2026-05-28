@@ -2,7 +2,7 @@ database_name: datalake_gsheets_clean
 table_name: agents_targets_tracking
 description: Clean table with information about the targets associated with each region. For each region, we can have targets for new agents and old agents.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   city_group:
     lineage:

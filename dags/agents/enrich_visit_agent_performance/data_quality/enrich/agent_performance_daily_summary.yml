@@ -1,6 +1,6 @@
 ---
 table_name: datalake_visit_agent_performance.agent_performance_daily_summary
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 column_level_validations:
   # Agent accreditation data
   id_agent_performance:

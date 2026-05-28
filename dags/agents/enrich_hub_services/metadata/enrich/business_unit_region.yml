@@ -4,7 +4,7 @@ table_name: business_unit_region
 description: Table with the BU information and its coverage periods on each region. Information from 2022-05 and previous are from a Gsheet and because of that this
   this period does not have all the information for some rows.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_business_unit:
     lineage:

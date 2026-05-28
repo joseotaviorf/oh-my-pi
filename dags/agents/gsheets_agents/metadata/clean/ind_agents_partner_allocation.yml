@@ -5,7 +5,7 @@ description: >-
   Partner (pessoa física) records from Google Sheets tab Partners_PF: agent and user ids,
   broker company name, contract start/end dates and high-touch distribution periods.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent:
     description: Agent identifier aligned with Ebdb/agent dimensions (spreadsheet column sk_agent).

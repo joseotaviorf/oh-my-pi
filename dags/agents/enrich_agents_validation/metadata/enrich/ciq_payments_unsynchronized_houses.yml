@@ -6,7 +6,7 @@ description: |
   For this relationship to be well defined, this association must exist in the big agent through the agency table. 
   Without this valid relationship, we cannot define whether that property is associated with a CIQ or not, impacting its payment.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_house:
     description: Id of the house.

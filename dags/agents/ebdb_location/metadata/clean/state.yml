@@ -2,23 +2,30 @@
 database_name: datalake_ebdb_clean
 table_name: state
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.estado.id
+    - datalake_ebdb_raw.estado.id
+    description: Value of id in the source record.
   id_country:
     lineage:
-      - datalake_ebdb_raw.estado.country_id
+    - datalake_ebdb_raw.estado.country_id
+    description: Unique identifier for country.
   abbreviation:
     lineage:
-      - datalake_ebdb_raw.estado.abreviacao
+    - datalake_ebdb_raw.estado.abreviacao
+    description: Value of abbreviation in the source record.
   name:
     lineage:
-      - datalake_ebdb_raw.estado.nome
+    - datalake_ebdb_raw.estado.nome
+    description: Value of name in the source record.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.estado.atualizadoem
+    - datalake_ebdb_raw.estado.atualizadoem
+    description: Timestamp of updated.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.estado.criadoem
+    - datalake_ebdb_raw.estado.criadoem
+    description: Timestamp of created.
+description: Clean layer table for state agent domain data.

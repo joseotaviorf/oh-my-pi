@@ -3,7 +3,7 @@ database_name: datalake_amplitude_agents_app
 table_name: agents_native_events
 description: This table contains event data from the Agent application.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_user:
     lineage:

@@ -4,7 +4,7 @@ description: >
   Each row represents a CIQ partner-user status version: active or inactive transitions and user
   changes on Main, with SCD-style validity windows.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_partner:
     lineage:

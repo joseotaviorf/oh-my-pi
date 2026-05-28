@@ -2,7 +2,7 @@
 database_name: datalake_agent_accreditation
 table_name: prospect_agent
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: Prospect agent enriched with linked EBDB agent id when the person already has an agent, hub business unit and parent region ids derived from QuintoAndar prospect region types, and questionnaire fields (CRECI, availability, context preferences).
 columns:
   id_prospect_agent:

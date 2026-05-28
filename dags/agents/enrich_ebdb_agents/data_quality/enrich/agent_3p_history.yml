@@ -1,6 +1,6 @@
 ---
 table_name: datalake_ebdb_agents.agent_3p_history
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 column_level_validations:
   id_agent:
     is_complete:

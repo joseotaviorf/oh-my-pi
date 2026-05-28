@@ -2,56 +2,74 @@
 database_name: datalake_ebdb_clean
 table_name: agent_with_keys_allocation_parameters_aud
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.id
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.id
+    description: Value of id in the source record.
   rev:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.rev
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.rev
+    description: Value of rev in the source record.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.revtype
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.revtype
+    description: Value of rev type in the source record.
   id_agent:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.agent_id
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.agent_id
+    description: Unique identifier for agent.
   mod_id_agent:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.agent_id_mod
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.agent_id_mod
+    description: Audit flag for changes to id agent.
   total_houses:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.total_houses
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.total_houses
+    description: Value of total houses in the source record.
   mod_total_houses:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.total_houses_mod
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.total_houses_mod
+    description: Audit flag for changes to total houses.
   capacity:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.capacity
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.capacity
+    description: Value of capacity in the source record.
   mod_capacity:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.capacity_mod
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.capacity_mod
+    description: Audit flag for changes to capacity.
   average_ticket:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_ticket
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_ticket
+    description: Value of average ticket in the source record.
   mod_average_ticket:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_ticket_mod
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_ticket_mod
+    description: Audit flag for changes to average ticket.
   average_lat:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_lat
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_lat
+    description: Value of average lat in the source record.
   mod_average_lat:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_lat_mod
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_lat_mod
+    description: Audit flag for changes to average lat.
   average_lng:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_lng
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_lng
+    description: Value of average lng in the source record.
   mod_average_lng:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_lng_mod
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.average_lng_mod
+    description: Audit flag for changes to average lng.
   has_opted_out:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.has_opted_out
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.has_opted_out
+    description: Flag indicating whether the record has opted out.
   mod_has_opted_out:
     lineage:
-      - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.has_opted_out_mod
+    - datalake_ebdb_raw.agentwithkeysallocationparameters_aud.has_opted_out_mod
+    description: Audit flag for changes to opted out.
+description: Clean layer table for agent with keys allocation parameters aud agent domain data.

@@ -5,7 +5,7 @@ description: |
   Incentive system configuration parameters, including performance evaluation and
   tier validity periods, with timestamps and partitions.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

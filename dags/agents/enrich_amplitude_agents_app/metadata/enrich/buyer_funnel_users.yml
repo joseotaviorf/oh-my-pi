@@ -3,7 +3,7 @@ database_name: datalake_amplitude_agents_app
 table_name: buyer_funnel_users
 description: Daily user-level state across the buyer funnel, aggregated from Agents App search events. Records first/last relevant timestamps and partitions by the processing snapshot date.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_amplitude:
     lineage:

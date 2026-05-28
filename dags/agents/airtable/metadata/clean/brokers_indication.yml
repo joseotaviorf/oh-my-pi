@@ -6,7 +6,7 @@ description:
   Consolidates all information regarding the Referrer (who indicated) and the Referee. 
   Central base for managing program participants and validity of referrals
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_airtable_record:
     lineage:

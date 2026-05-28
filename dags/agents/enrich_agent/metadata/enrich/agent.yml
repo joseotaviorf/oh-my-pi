@@ -2,7 +2,7 @@
 database_name: datalake_agent_accreditation
 table_name: agent
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 description: |
   Enriched EBDB agent profile with external references (partner and agent data IDs), main user id from person
   credentials, company UUID and negotiation-executive user id from Hub Services member profiles where applicable,

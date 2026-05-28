@@ -2,7 +2,7 @@ database_name: datalake_big_agent
 table_name: program
 description: Table with big agent programs info.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     description: ID of the program.

@@ -8,7 +8,7 @@ description: |
   audit fields. Grain is one row per earning source record; partitioned by year, month, and day
   for incremental loads.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

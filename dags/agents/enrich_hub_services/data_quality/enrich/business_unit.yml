@@ -1,6 +1,6 @@
 ---
 table_name: datalake_hub_services.business_unit
-alert_channel: "#alerts-de-airflow-dags"
+alert_channel: "#agents-data-alarms"
 column_level_validations:
   id_business_unit:
     is_complete:

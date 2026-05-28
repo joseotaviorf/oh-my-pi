@@ -1,64 +1,83 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: visitor_prospection
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
 description: Visitor prospection process in Hub Services.
 columns:
   id:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.id
+    description: Value of id in the source record.
   id_visitor:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.visitor_id
+    description: Unique identifier for visitor.
   id_responsible:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.responsible_id
+    description: Unique identifier for responsible.
   id_reminder:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.reminder_id
+    description: Unique identifier for reminder.
   id_reminder_type:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.reminder_type_id
+    description: Unique identifier for reminder type.
   priority_lead_status:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.priority_lead_status
+    description: Value of priority lead status in the source record.
   priority_lead_type:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.priority_lead_type
+    description: Value of priority lead type in the source record.
   reminder_type_name:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.reminder_type_name
+    description: Value of reminder type name in the source record.
   reminder_status:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.reminder_status
+    description: Value of reminder status in the source record.
   reminder_creation_method:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.reminder_creation_method
+    description: Value of reminder creation method in the source record.
   reminder_event_type:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.reminder_event_type
+    description: Value of reminder event type in the source record.
   sorting_order:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.sorting_order
+    description: Value of sorting order in the source record.
   version:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.version
+    description: Value of version in the source record.
   ts_reminder:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.reminder_date
+    description: Timestamp of reminder.
   ts_created:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.created_at
+    description: Timestamp of created.
   ts_updated:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.updated_at
+    description: Timestamp of updated.
   year:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.year
+    description: Partition column (year) for the table load date.
   month:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.month
+    description: Partition column (month) for the table load date.
   day:
     lineage:
     - datalake_hub_services_raw.visitor_prospection.day
+    description: Partition column (day) for the table load date.

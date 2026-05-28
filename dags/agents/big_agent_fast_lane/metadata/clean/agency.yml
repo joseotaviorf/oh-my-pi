@@ -4,7 +4,7 @@ table_name: agency
 description: Links an enrollment to a house in the Big Agent incentive system, with
   validity dates and lifecycle timestamps.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

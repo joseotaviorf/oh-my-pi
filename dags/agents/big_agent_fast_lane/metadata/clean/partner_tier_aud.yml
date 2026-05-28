@@ -5,7 +5,7 @@ description: |
   Audit view for partner tier mapping with revision metadata, modification flags,
   validity window and partitions.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

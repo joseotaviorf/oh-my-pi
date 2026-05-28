@@ -2,7 +2,7 @@ database_name: datalake_gsheets_clean
 table_name: agents_historical_quartile
 description: Clean table with information about agents according to the quartile they belong to. Each quartile has a group of agents separated by performance, with 1 being the worst and 4 being the best.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_user:
     lineage:

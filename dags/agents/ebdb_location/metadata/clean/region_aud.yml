@@ -2,47 +2,62 @@
 database_name: datalake_ebdb_clean
 table_name: region_aud
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.Regiao_AUD.id
+    - datalake_ebdb_raw.Regiao_AUD.id
+    description: Value of id in the source record.
   rev:
     lineage:
-      - datalake_ebdb_raw.Regiao_AUD.REV
+    - datalake_ebdb_raw.Regiao_AUD.REV
+    description: Value of rev in the source record.
   id_state:
     lineage:
-      - datalake_ebdb_raw.Regiao_AUD.state_id
+    - datalake_ebdb_raw.Regiao_AUD.state_id
+    description: Unique identifier for state.
   id_salesforce:
     lineage:
-      - datalake_ebdb_raw.Regiao_AUD.salesforceId
+    - datalake_ebdb_raw.Regiao_AUD.salesforceId
+    description: Unique identifier for salesforce.
   id_manager:
     lineage:
-      - datalake_ebdb_raw.Regiao_AUD.gerente_id
+    - datalake_ebdb_raw.Regiao_AUD.gerente_id
+    description: Unique identifier for manager.
   id_parent_region:
     lineage:
-      - datalake_ebdb_raw.Regiao_AUD.regiaoPai_id
+    - datalake_ebdb_raw.Regiao_AUD.regiaoPai_id
+    description: Unique identifier for parent region.
   rev_type:
     lineage:
-      - datalake_ebdb_raw.Regiao_AUD.REVTYPE
+    - datalake_ebdb_raw.Regiao_AUD.REVTYPE
+    description: Value of rev type in the source record.
   level:
     lineage:
-      - datalake_ebdb_raw.Regiao_AUD.nivel
+    - datalake_ebdb_raw.Regiao_AUD.nivel
+    description: Value of level in the source record.
   name:
     lineage:
-      - datalake_ebdb_raw.Regiao_AUD.nome
+    - datalake_ebdb_raw.Regiao_AUD.nome
+    description: Value of name in the source record.
   slug:
     lineage:
-      - datalake_ebdb_raw.Regiao_AUD.slug
+    - datalake_ebdb_raw.Regiao_AUD.slug
+    description: Value of slug in the source record.
   priority:
     lineage:
-      - datalake_ebdb_raw.Regiao_AUD.prioridade
+    - datalake_ebdb_raw.Regiao_AUD.prioridade
+    description: Value of priority in the source record.
   lat:
     lineage:
-      - datalake_ebdb_raw.Regiao_AUD.lat
+    - datalake_ebdb_raw.Regiao_AUD.lat
+    description: Value of lat in the source record.
   lng:
     lineage:
-      - datalake_ebdb_raw.Regiao_AUD.lng
+    - datalake_ebdb_raw.Regiao_AUD.lng
+    description: Value of lng in the source record.
   mod_state:
     lineage:
-      - datalake_ebdb_raw.Regiao_AUD.state_MOD
+    - datalake_ebdb_raw.Regiao_AUD.state_MOD
+    description: Audit flag for changes to state.
+description: Clean layer table for region aud agent domain data.

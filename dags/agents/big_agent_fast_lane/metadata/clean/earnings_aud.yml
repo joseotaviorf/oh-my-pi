@@ -4,7 +4,7 @@ table_name: earnings_aud
 description: Envers audit trail for earnings records, covering identifiers, monetary
   fields, status, and external domain types.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

@@ -2,11 +2,14 @@
 database_name: datalake_ebdb_clean
 table_name: agent_data_business_contexts_served
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent_data:
     lineage:
-      - datalake_ebdb_raw.dadosagente_businesscontextsserved.dadosagente_id
+    - datalake_ebdb_raw.dadosagente_businesscontextsserved.dadosagente_id
+    description: Unique identifier for agent data.
   business_context:
     lineage:
-      - datalake_ebdb_raw.dadosagente_businesscontextsserved.businesscontextsserved
+    - datalake_ebdb_raw.dadosagente_businesscontextsserved.businesscontextsserved
+    description: Value of business context in the source record.
+description: Clean layer table for agent data business contexts served agent domain data.

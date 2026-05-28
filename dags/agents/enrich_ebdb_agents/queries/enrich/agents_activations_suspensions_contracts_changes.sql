@@ -93,7 +93,24 @@ agent_action AS (
         agent_work_contract_info
 )
 SELECT
-    *,
+    id_agent,
+    id_work_contract,
+    id_previous_work_contract,
+    id_user_change,
+    rev,
+    rev_type,
+    work_contract_name,
+    previous_work_contract_name,
+    agent_name,
+    agent_type,
+    user_change_name,
+    user_change_email,
+    action,
+    is_agent_active,
+    is_previous_active,
+    has_changed_work_contract,
+    has_changed_activated,
+    ts_revision,
     YEAR(ts_revision) AS year,
     MONTH(ts_revision) AS month,
     DAY(ts_revision) AS day

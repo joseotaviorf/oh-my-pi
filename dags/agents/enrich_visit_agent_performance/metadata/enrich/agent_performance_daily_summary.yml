@@ -11,7 +11,7 @@ description: |
   as well as their schedule allocations and performance in specific regions. The data is organized by reference dates, allowing for temporal 
   analysis and comparison of agent performance across different periods.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent_performance:
     description: Unique hash generated from the agent ID and reference date, used to identify agent performance records.

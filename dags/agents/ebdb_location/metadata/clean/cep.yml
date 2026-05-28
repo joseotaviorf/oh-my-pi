@@ -2,32 +2,42 @@
 database_name: datalake_ebdb_clean
 table_name: cep
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.cep.id
+    - datalake_ebdb_raw.cep.id
+    description: Value of id in the source record.
   state:
     lineage:
-      - datalake_ebdb_raw.cep.estado
+    - datalake_ebdb_raw.cep.estado
+    description: Value of state in the source record.
   city:
     lineage:
-      - datalake_ebdb_raw.cep.cidade
+    - datalake_ebdb_raw.cep.cidade
+    description: Value of city in the source record.
   house_address_street:
     lineage:
-      - datalake_ebdb_raw.cep.logradouro
+    - datalake_ebdb_raw.cep.logradouro
+    description: Value of house address street in the source record.
   neighborhood:
     lineage:
-      - datalake_ebdb_raw.cep.bairro
+    - datalake_ebdb_raw.cep.bairro
+    description: Value of neighborhood in the source record.
   zip_code:
     lineage:
-      - datalake_ebdb_raw.cep.cep
+    - datalake_ebdb_raw.cep.cep
+    description: Value of zip code in the source record.
   house_address_street_type:
     lineage:
-      - datalake_ebdb_raw.cep.tplogradouro
+    - datalake_ebdb_raw.cep.tplogradouro
+    description: Value of house address street type in the source record.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.cep.atualizadoem
+    - datalake_ebdb_raw.cep.atualizadoem
+    description: Timestamp of updated.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.cep.criadoem
+    - datalake_ebdb_raw.cep.criadoem
+    description: Timestamp of created.
+description: Clean layer table for cep agent domain data.

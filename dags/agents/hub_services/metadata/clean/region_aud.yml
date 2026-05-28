@@ -3,16 +3,12 @@ database_name: datalake_hub_services_clean
 table_name: region_aud
 description: Audit table, used to keep changes to region records as historical data.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
       - datalake_hub_services_raw.region_aud.id
     description: Unique identifier of regions.
-  id_business_unit:
-    lineage:
-      - datalake_hub_services_raw.region_aud.business_unit_id
-    description: Identification id of the business unit that relates to the regions.
   rev:
     lineage:
       - datalake_hub_services_raw.region_aud.rev
@@ -41,10 +37,6 @@ columns:
     lineage:
       - datalake_hub_services_raw.region_aud.name_mod
     description: Boolean that tells us if the region_name record has been modified
-  mod_id_business_unit:
-    lineage:
-      - datalake_hub_services_raw.region_aud.business_unit_id_mod
-    description: Boolean that tells us if the id_business_unit record has been modified
   ts_created:
     lineage:
       - datalake_hub_services_raw.region_aud.created_at

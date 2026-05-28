@@ -2,32 +2,42 @@
 database_name: datalake_ebdb_clean
 table_name: map_region
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
-      - datalake_ebdb_raw.mapregiao.id
+    - datalake_ebdb_raw.mapregiao.id
+    description: Value of id in the source record.
   ts_created:
     lineage:
-      - datalake_ebdb_raw.mapregiao.criadaem
+    - datalake_ebdb_raw.mapregiao.criadaem
+    description: Timestamp of created.
   ts_updated:
     lineage:
-      - datalake_ebdb_raw.mapregiao.atualizadoem
+    - datalake_ebdb_raw.mapregiao.atualizadoem
+    description: Timestamp of updated.
   level:
     lineage:
-      - datalake_ebdb_raw.mapregiao.nivel
+    - datalake_ebdb_raw.mapregiao.nivel
+    description: Value of level in the source record.
   name:
     lineage:
-      - datalake_ebdb_raw.mapregiao.nome
+    - datalake_ebdb_raw.mapregiao.nome
+    description: Value of name in the source record.
   id_macro:
     lineage:
-      - datalake_ebdb_raw.mapregiao.macroid
+    - datalake_ebdb_raw.mapregiao.macroid
+    description: Unique identifier for macro.
   macro_name:
     lineage:
-      - datalake_ebdb_raw.mapregiao.macronome
+    - datalake_ebdb_raw.mapregiao.macronome
+    description: Value of macro name in the source record.
   id_city:
     lineage:
-      - datalake_ebdb_raw.mapregiao.cidadeid
+    - datalake_ebdb_raw.mapregiao.cidadeid
+    description: Unique identifier for city.
   city_name:
     lineage:
-      - datalake_ebdb_raw.mapregiao.cidadenome
+    - datalake_ebdb_raw.mapregiao.cidadenome
+    description: Value of city name in the source record.
+description: Clean layer table for map region agent domain data.

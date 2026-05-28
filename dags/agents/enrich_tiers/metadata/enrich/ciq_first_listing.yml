@@ -7,7 +7,7 @@ description: |
   15-day publication or contract rule. Includes publication/unpublication timestamps and
   contextual fields for both current and previously duplicated houses.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_house:
     lineage:

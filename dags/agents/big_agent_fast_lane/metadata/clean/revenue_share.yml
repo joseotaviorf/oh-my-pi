@@ -5,7 +5,7 @@ description: |
   Revenue share configuration and instances, linking to relations, conditions,
   amounts and status, with timestamps and partitions.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

@@ -1,49 +1,63 @@
 ---
 database_name: datalake_hub_services_clean
 table_name: reminder_type_aud
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 domain: Agents
-description: 'Audit of the types of reminders.'
+description: Audit of the types of reminders.
 columns:
   id:
     lineage:
     - datalake_hub_services_raw.reminder_type_aud.id
+    description: Value of id in the source record.
   name:
     lineage:
     - datalake_hub_services_raw.reminder_type_aud.name
+    description: Value of name in the source record.
   status:
     lineage:
     - datalake_hub_services_raw.reminder_type_aud.status
+    description: Value of status in the source record.
   version:
     lineage:
     - datalake_hub_services_raw.reminder_type_aud.version
+    description: Value of version in the source record.
   rev:
     lineage:
     - datalake_hub_services_raw.reminder_type_aud.rev
+    description: Value of rev in the source record.
   rev_end:
     lineage:
     - datalake_hub_services_raw.reminder_type_aud.revend
+    description: Value of rev end in the source record.
   rev_type:
     lineage:
     - datalake_hub_services_raw.reminder_type_aud.revtype
+    description: Value of rev type in the source record.
   mod_name:
     lineage:
     - datalake_hub_services_raw.reminder_type_aud.name_mod
+    description: Audit flag for changes to name.
   mod_status:
     lineage:
     - datalake_hub_services_raw.reminder_type_aud.status_mod
+    description: Audit flag for changes to status.
   ts_created:
     lineage:
     - datalake_hub_services_raw.reminder_type_aud.created_at
+    description: Timestamp of created.
   ts_updated:
     lineage:
     - datalake_hub_services_raw.reminder_type_aud.updated_at
+    description: Timestamp of updated.
   year:
     lineage:
     - datalake_hub_services_raw.reminder_type_aud.year
+    description: Partition column (year) for the table load date.
   month:
     lineage:
     - datalake_hub_services_raw.reminder_type_aud.month
+    description: Partition column (month) for the table load date.
   day:
     lineage:
     - datalake_hub_services_raw.reminder_type_aud.day
+    description: Partition column (day) for the table load date.

@@ -10,7 +10,7 @@ description: |
   This table provides insight into how agents are performing in managing offers, from submission to finalization, and helps evaluate their role in advancing 
   deals to completion.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_agent_performance:
     lineage:

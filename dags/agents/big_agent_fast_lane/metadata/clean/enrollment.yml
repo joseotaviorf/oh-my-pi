@@ -4,7 +4,7 @@ table_name: enrollment
 description: Enrollment of an agent into an incentive program, including JSON details
   and timestamps.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

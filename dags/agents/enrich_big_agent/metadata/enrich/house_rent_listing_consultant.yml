@@ -2,7 +2,7 @@ database_name: datalake_big_agent
 table_name: house_rent_listing_consultant
 description: History information of House and CIQ by listing version
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id_house_listing:
     lineage:

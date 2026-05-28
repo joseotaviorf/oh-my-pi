@@ -9,7 +9,7 @@ on Main, as well as the business context (Sale or Rent). That is because these l
 flags, and having them as separate dimensions or flags in fact tables would not be good for simplicity
 (in the first case) or good practice (second case).'
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   sk_work_contract:
     lineage:

@@ -4,7 +4,7 @@ table_name: user_revision_entity
 description: Maps a user revision event to a partition for audit or replay in Big
   Agent.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

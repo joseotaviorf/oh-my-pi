@@ -5,7 +5,7 @@ description: Audit table.
   This table contains data on the agent's performance requirements for each operation, enabling the calculation of cumulative points.
   These cumulative points from operations can be used to check which compensation range the agent fits into, in the share_rule table.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:

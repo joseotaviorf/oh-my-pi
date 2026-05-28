@@ -5,7 +5,7 @@ description: |
   Metric periods history with file links, status, and creation timestamp,
   including partitions.
 domain: Agents
-owner: data-ae-agents@quintoandar.com.br
+owner: gustavo.rompe@quintoandar.com.br
 columns:
   id:
     lineage:
