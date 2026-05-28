@@ -39,6 +39,53 @@ def _get_conn_config(dbutils, dbutils_secret_key):
     return json.loads(conn_config_json)
 
 
+def _format_day_errors(failed_days):
+    return "\n".join(
+        f"  - {day.strftime('%Y-%m-%d')}: {error}" for day, error in failed_days
+    )
+
+
+def _format_empty_days(empty_days):
+    return "\n".join(f"  - {day.strftime('%Y-%m-%d')}" for day in empty_days)
+
+
+def _warn_empty_days(*, empty_days, load_start_date, load_end_date):
+    if not empty_days:
+        return
+
+    logger.warning(
+        "m=load_raw, empty_days=%s, msg=SAP 4HANA raw load returned no data for "
+        "%s day(s) in [%s, %s]. Check SAP API token, QueryDatasphere availability, "
+        "and ingest_date filter.\n%s",
+        [day.strftime("%Y-%m-%d") for day in empty_days],
+        len(empty_days),
+        load_start_date,
+        load_end_date,
+        _format_empty_days(empty_days),
+    )
+
+
+def _raise_if_load_failed(
+    *,
+    failed_days,
+    loaded_days,
+    load_start_date,
+    load_end_date,
+):
+    if failed_days:
+        raise RuntimeError(
+            f"SAP 4HANA raw load failed for {len(failed_days)} day(s) "
+            f"in [{load_start_date}, {load_end_date}]:\n"
+            f"{_format_day_errors(failed_days)}"
+        )
+
+    if not loaded_days:
+        raise RuntimeError(
+            f"SAP 4HANA raw load ingested no data for [{load_start_date}, {load_end_date}]. "
+            "No days were processed successfully."
+        )
+
+
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
@@ -94,10 +141,30 @@ if __name__ == "__main__":
         pd.date_range(start=load_start_dt, end=load_end_date).to_pydatetime().tolist()
     )
 
-    dfs = []
+    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+    spark_metastore_service = SparkMetastoreService(SparkClient())
+    spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+
+    database_name = db_info["db_raw_databricks"]
+    format_options = SparkTableStorageFormat.DEFAULT_RAW
+    database_location = db_info["db_raw_path"]
+    spark_metastore_service.create_database(database_name)
+
+    failed_days = []
+    empty_days = []
+    loaded_days = []
+
     for load_dt in date_range:
         try:
             data = consumer.sync(ingest_date=load_dt)
+            if not data:
+                empty_days.append(load_dt)
+                logger.warning(
+                    "m=load_raw, load_dt=%s, msg=No data returned by SAP API for this day.",
+                    load_dt.strftime("%Y-%m-%d"),
+                )
+                continue
+
             df = spark_client.create_dataframe(data, table_schema, verify_schema=False)
             df = df.withColumn(
                 "cpudt_dt",
@@ -113,29 +180,43 @@ if __name__ == "__main__":
             )
             df = df.drop("cpudt_dt")
 
-            db_info = DatalakeMetastoreService.get_db_info(
-                environment, source, datalake_bucket
-            )
-            spark_metastore_service = SparkMetastoreService(SparkClient())
-            spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+            IncrementalTableLoaderPipeline(
+                database_name=database_name,
+                table_name=table_name,
+                database_location=database_location,
+                layer=LayerEnum.RAW,
+                query=None,
+                partitions=partitions,
+            ).load_and_register(df, format_options)
 
-            # create database if it doesn't exists
-            database_name = db_info["db_raw_databricks"]
-            format_options = SparkTableStorageFormat.DEFAULT_RAW
-            database_location = db_info["db_raw_path"]
-            spark_metastore_service.create_database(database_name)
-            if df:
-                IncrementalTableLoaderPipeline(
-                    database_name=database_name,
-                    table_name=table_name,
-                    database_location=database_location,
-                    layer=LayerEnum.RAW,
-                    query=None,
-                    partitions=partitions,
-                ).load_and_register(df, format_options)
-            else:
-                logger.info(f"m=No data to load for {load_dt}!")
+            loaded_days.append(load_dt)
+            logger.info(
+                "m=load_raw, load_dt=%s, rows=%s, msg=Successfully loaded SAP 4HANA raw data.",
+                load_dt.strftime("%Y-%m-%d"),
+                len(data),
+            )
         except Exception as e:
-            logger.info(f"{e}, m=Error loading data for {load_dt}")
-    else:
-        logger.info("m=No data to load for this period!")
+            logger.error(
+                "m=load_raw, load_dt=%s, error=%s, msg=Failed to load SAP 4HANA raw data.",
+                load_dt.strftime("%Y-%m-%d"),
+                e,
+                exc_info=True,
+            )
+            failed_days.append((load_dt, str(e)))
+
+    _warn_empty_days(
+        empty_days=empty_days,
+        load_start_date=load_start_date,
+        load_end_date=load_end_date,
+    )
+    _raise_if_load_failed(
+        failed_days=failed_days,
+        loaded_days=loaded_days,
+        load_start_date=load_start_date,
+        load_end_date=load_end_date,
+    )
+
+    logger.info(
+        "m=load_raw, loaded_days=%s, msg=SAP 4HANA raw load completed successfully.",
+        [day.strftime("%Y-%m-%d") for day in loaded_days],
+    )
