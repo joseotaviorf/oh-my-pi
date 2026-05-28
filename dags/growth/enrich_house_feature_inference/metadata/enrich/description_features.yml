@@ -12,7 +12,7 @@ columns:
   house_description:
     description: "Description of the house (or 3P lead, if it is a third party house)"
     lineage:
-      - datalake_brokers_supply_processor.lead_3p.house_description
+      - datalake_3p_supply.lead_3p.house_description
       - datalake_ebdb_clean.house.house_description
   country_code:
     description: "Country code of the house"

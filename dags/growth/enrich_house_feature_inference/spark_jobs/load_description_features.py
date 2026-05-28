@@ -79,7 +79,7 @@ def get_raw_descriptions_dataframe() -> DataFrame:
             datalake_ebdb_country.house AS ch
                 ON h.id = ch.id_house
         LEFT JOIN
-            datalake_brokers_supply_processor.lead_3p AS l
+            datalake_3p_supply.lead_3p AS l
                 ON h.id_external = l.uuid_lead
         WHERE
             NULLIF(TRIM(h.house_description), '') IS NOT NULL

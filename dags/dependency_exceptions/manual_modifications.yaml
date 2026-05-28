@@ -566,7 +566,7 @@ bietlejuice.enrich_hr_system_custom:
 bietlejuice.enrich_house_feature_inference:
   add:
     - bietlejuice.ebdb_house_fast_lane:load-clean-house:first-run-of-day
-    - bietlejuice.enrich_brokers_supply_processor:load-enrich-lead-3p:first-run-of-day
+    - bietlejuice.enrich_3p_supply:load-enrich-lead-3p:first-run-of-day
     - bietlejuice.enrich_ebdb_country:load-enrich-house:first-run-of-day
 bietlejuice.enrich_lead:
   remove:
