@@ -14,7 +14,22 @@ from bietlejuice.base.airflow.task_creators.optimize_delta_table_task_creator im
     _chunk_table_attributes,
 )
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
+from bietlejuice.base.pipeline.environment_enum import EnvironmentEnum
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+
+TEST_MAINTENANCE_DATE = "2026-05-28"
+
+
+def _load_date_cli_args(parameters: list) -> list:
+    if "--load-start-date" not in parameters:
+        return []
+    start = parameters.index("--load-start-date")
+    end = parameters.index("--load-end-date") + 2
+    return parameters[start:end]
+
+
+def _maintenance_cli_args(parameters: list) -> list:
+    return parameters[parameters.index("--environment") :]
 
 
 def _table(name: str, layer: LayerEnum = LayerEnum.RAW) -> TableAttributes:
@@ -31,7 +46,7 @@ def dag_execution_context():
     dag = DAG(dag_id="test_dag", schedule=None)
     return DagExecutionContext(
         dag=dag,
-        environment="forno",
+        environment=EnvironmentEnum.FORNO,
         bucket="test-bucket",
         base_spark_jobs_path="/dags/cross/base/spark_jobs",
         dag_args={"name": "test_dag"},
@@ -270,7 +285,7 @@ class TestPartitionFilterWiring:
         parameters = mock_create_spark.call_args[0][2]
         tables_config = json.loads(parameters[1])
         assert tables_config["t1"]["apply_partition_filter"] is True
-        assert parameters[3:] == [
+        assert _load_date_cli_args(parameters) == [
             "--load-start-date",
             "{{ load_start }}",
             "--load-end-date",
@@ -372,7 +387,7 @@ class TestPartitionFilterWiring:
         parameters = mock_create_spark.call_args[0][2]
         tables_config = json.loads(parameters[1])
         assert tables_config["t1"]["apply_partition_filter"] is True
-        assert parameters[3:] == [
+        assert _load_date_cli_args(parameters) == [
             "--load-start-date",
             "{{ load_start }}",
             "--load-end-date",
@@ -408,7 +423,7 @@ class TestPartitionFilterWiring:
         parameters = mock_create_spark.call_args[0][2]
         tables_config = json.loads(parameters[1])
         assert tables_config["t1"]["apply_partition_filter"] is True
-        assert "--load-start-date" in parameters
+        assert _load_date_cli_args(parameters)
 
     @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
     def test_raw_layer_table_override_disables_workflow_default(
@@ -460,4 +475,76 @@ class TestPartitionFilterWiring:
         parameters = mock_create_spark.call_args[0][2]
         tables_config = json.loads(parameters[1])
         assert tables_config["t1"]["apply_partition_filter"] is True
-        assert "--load-start-date" in parameters
+        assert _load_date_cli_args(parameters)
+
+
+class TestMaintenanceStateWiring:
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_tables_config_defaults_maintenance_once_per_day_true(
+        self, mock_create_spark, dag_execution_context
+    ):
+        import json
+
+        # arrange
+        dag_execution_context.use_airflow_emr = False
+        dag_execution_context.execution_date = TEST_MAINTENANCE_DATE
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-raw-t1", dag=dag_execution_context.dag
+        )
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+
+        # act
+        creator.create_optimize_tasks([_table("t1")])
+        tables_config = json.loads(mock_create_spark.call_args[0][2][1])
+
+        # assert
+        assert tables_config["t1"]["maintenance_once_per_day"] is True
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_workflow_can_disable_maintenance_once_per_day(
+        self, mock_create_spark, dag_execution_context
+    ):
+        import json
+
+        # arrange
+        dag_execution_context.use_airflow_emr = False
+        dag_execution_context.workflow_args["maintenance_once_per_day"] = False
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-raw-t1", dag=dag_execution_context.dag
+        )
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+
+        # act
+        creator.create_optimize_tasks([_table("t1")])
+        tables_config = json.loads(mock_create_spark.call_args[0][2][1])
+
+        # assert
+        assert tables_config["t1"]["maintenance_once_per_day"] is False
+
+    @patch.object(OptimizeDeltaTableTaskCreator, "_create_spark_job_task")
+    def test_passes_maintenance_cli_args_without_state_bucket(
+        self, mock_create_spark, dag_execution_context
+    ):
+        # arrange
+        dag_execution_context.use_airflow_emr = False
+        dag_execution_context.execution_date = TEST_MAINTENANCE_DATE
+        mock_create_spark.return_value = EmptyOperator(
+            task_id="optimize-raw-t1", dag=dag_execution_context.dag
+        )
+        creator = OptimizeDeltaTableTaskCreator(dag_execution_context)
+        dag_name = dag_execution_context.dag_args["name"]
+
+        # act
+        creator.create_optimize_tasks([_table("t1")])
+        parameters = mock_create_spark.call_args[0][2]
+
+        # assert
+        assert _maintenance_cli_args(parameters) == [
+            "--environment",
+            dag_execution_context.environment,
+            "--dag-name",
+            dag_name,
+            "--maintenance-date",
+            dag_execution_context.execution_date,
+        ]
+        assert "--state-bucket" not in parameters

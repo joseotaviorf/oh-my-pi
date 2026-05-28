@@ -1,5 +1,7 @@
 ---
 artifacts_bucket: &artifacts_bucket s3://artifacts.s3.data.quintoandar.com.br
+aws_s3_region: us-east-1
+delta_maintenance_state_prefix: bi-etl-ejuice/delta_maintenance
 athena_query_results_bucket: s3://5a-datalake/query_results/
 dags_out_of_pattern:
     [

@@ -10,6 +10,7 @@ from bietlejuice.base.airflow.optimize_delta_tables_cli import (
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.formatters.string_formatter import StringFormatter
+from bietlejuice.services.configuration_service import ConfigurationService
 
 
 def _chunk_table_attributes(table_attributes: List, batch_size: int) -> List[List]:
@@ -163,7 +164,27 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
                 "--load-end-date",
                 self.dag_execution_context.load_end_date,
             ]
+        parameters += self._build_maintenance_state_cli_args()
         return self._create_spark_job_task(spark_job_name, task_id, parameters)
+
+    def _build_maintenance_state_cli_args(self) -> list:
+        dag_name = self.dag_execution_context.dag_args["name"]
+        config_service = ConfigurationService(dag_name)
+        config_prefix = config_service.get_config("delta_maintenance_state_prefix")
+        state_prefix = self.dag_execution_context.workflow_args.get(
+            "maintenance_state_prefix", config_prefix
+        )
+        args = [
+            "--environment",
+            self.dag_execution_context.environment,
+            "--dag-name",
+            dag_name,
+            "--maintenance-date",
+            self.dag_execution_context.execution_date,
+        ]
+        if state_prefix != config_prefix:
+            args += ["--state-prefix", state_prefix]
+        return args
 
     def _build_optimize_task_group_id(
         self,
@@ -215,6 +236,9 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
         default_vacuum_lite = self.dag_execution_context.workflow_args.get(
             "vacuum_lite", False
         )
+        default_maintenance_once_per_day = self.dag_execution_context.workflow_args.get(
+            "maintenance_once_per_day", True
+        )
 
         tables_config = {}
         for table in tables_attributes:
@@ -244,6 +268,9 @@ class OptimizeDeltaTableTaskCreator(BaseTaskCreator):
                 ),
                 "vacuum_lite": table.table_customization.get(
                     "vacuum_lite", default_vacuum_lite
+                ),
+                "maintenance_once_per_day": table.table_customization.get(
+                    "maintenance_once_per_day", default_maintenance_once_per_day
                 ),
                 "z_order_by": z_order_by,
             }
