@@ -158,8 +158,8 @@ alias_classifieds_publisher_task = QuintoAndarDatabricksCheckJobTaskOperator(
 )
 
 (
-    execute_job_cluster_task
-    >> build_run_params_task
+    build_run_params_task
+    >> execute_job_cluster_task
     >> alias_classifieds_task
     >> alias_classifieds_publisher_task
 )
