@@ -13,7 +13,7 @@ columns:
     description: "Surrogate key of table. Propose ID from QuintoCred"
     lineage:
       - datalake_recupera.changes_debts_distribution.id_contract
-  team_distribution:
+  team:
     description: "Team that received the debt via distribution"
   dt_start_interval:
     description: "Date when the propose entered the wallet"

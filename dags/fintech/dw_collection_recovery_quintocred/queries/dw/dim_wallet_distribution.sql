@@ -37,6 +37,13 @@ GROUP BY
 )
 
 SELECT
+  document,
+  sk_contract,
+  team,
+  dt_start_interval,
+  dt_end_interval
+FROM (
+  SELECT
     pp.document,
     fr.id_contract AS sk_contract,
     CASE
@@ -45,26 +52,31 @@ SELECT
         ELSE t.partner
     END AS team,
     fr.dt_start_interval,
-    fr.dt_end_interval
-FROM
-    aux_fill_range AS fr
-JOIN aux_team AS t
-    ON fr.id_contract = t.id_contract
-    AND fr.max_dt_start_interval = t.dt_start_interval
-LEFT JOIN dw_velo.fact_velo_propose AS p
-    ON CAST(fr.id_contract AS INT) = p.sk_propose
-LEFT JOIN dw_velo.dim_velo_propose_person AS pp
-  ON p.sk_primary_person = pp.sk_person
-WHERE
-    fr.creditor = 'IQ QuintoCred'
-QUALIFY ROW_NUMBER() OVER (PARTITION BY fr.dt_start_interval, pp.document ORDER BY
-    CASE
-        WHEN t.partner
-            IN ("DVAT360","DVACOINT","DVA91180","DVAT180M","DVAT6190","INTERNO BLOQUEADO","INTERNO VELO","COBINTQC")
-                THEN 1
-        WHEN t.partner = 'IAF' THEN 2
-        WHEN t.partner = 'PASCHOALOTTO' THEN 3
-        WHEN t.partner = 'BRBOTS' THEN 4
-        WHEN t.partner = 'DIGTECH' THEN 5
-        ELSE 6
-    END) = 1
+    fr.dt_end_interval,
+    ROW_NUMBER() OVER (
+      PARTITION BY fr.dt_start_interval, pp.document
+      ORDER BY
+        CASE
+          WHEN t.partner
+              IN ("DVAT360","DVACOINT","DVA91180","DVAT180M","DVAT6190","INTERNO BLOQUEADO","INTERNO VELO","COBINTQC")
+                  THEN 1
+          WHEN t.partner = 'IAF' THEN 2
+          WHEN t.partner = 'PASCHOALOTTO' THEN 3
+          WHEN t.partner = 'BRBOTS' THEN 4
+          WHEN t.partner = 'DIGTECH' THEN 5
+          ELSE 6
+        END
+    ) AS _rn
+  FROM
+      aux_fill_range AS fr
+  JOIN aux_team AS t
+      ON fr.id_contract = t.id_contract
+      AND fr.max_dt_start_interval = t.dt_start_interval
+  LEFT JOIN dw_velo.fact_velo_propose AS p
+      ON CAST(fr.id_contract AS INT) = p.sk_propose
+  LEFT JOIN dw_velo.dim_velo_propose_person AS pp
+    ON p.sk_primary_person = pp.sk_person
+  WHERE
+      fr.creditor = 'IQ QuintoCred'
+) ranked
+WHERE _rn = 1

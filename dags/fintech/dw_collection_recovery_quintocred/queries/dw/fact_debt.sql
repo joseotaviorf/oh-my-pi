@@ -1,33 +1,47 @@
 WITH
 deduplicate_creditor_pending AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   SELECT DISTINCT
     id_creditor,
     id_contract,
-    id_installment AS id_invoice
+    id_installment AS id_invoice,
+        ROW_NUMBER() OVER (PARTITION BY id_installment ORDER BY dt_table_insertion DESC, ts_load DESC) AS _rn
   FROM datalake_recupera_clean.creditor_pending
   WHERE installment_code IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY dt_table_insertion DESC, ts_load DESC) = 1
+    )
+    WHERE _rn = 1
 ),
 deduplicate_complementary_records AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   SELECT DISTINCT
     id_creditor,
     id_contract,
-    id_installment AS id_invoice
+    id_installment AS id_invoice,
+        ROW_NUMBER() OVER (PARTITION BY id_installment ORDER BY ts_last_debt_update DESC) AS _rn
   FROM datalake_recupera_clean.complementary_records
   WHERE installment_code IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY ts_last_debt_update DESC) = 1
+    )
+    WHERE _rn = 1
 ),
 deduplicate_complementary_records_written_down AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   SELECT DISTINCT
     id_creditor,
     id_contract,
-    id_installment AS id_invoice
+    id_installment AS id_invoice,
+        ROW_NUMBER() OVER (PARTITION BY id_installment ORDER BY ts_last_debt_update DESC) AS _rn
   FROM datalake_recupera_clean.complementary_records_written_down
   WHERE
     IF(ASCII(TRIM(installment_code))=0, NULL, installment_code) IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment ORDER BY ts_last_debt_update DESC) = 1
+    )
+    WHERE _rn = 1
 ),
 trato_feito_debts AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   SELECT DISTINCT
     d.id_external AS id_invoice,
     n.id_contract,
@@ -39,12 +53,14 @@ trato_feito_debts AS (
     d.interest_fee_amount,
     d.fine_fee_amount,
     d.discount_amount,
-    d.original_amount + d.interest_fee_amount + d.fine_fee_amount - d.discount_amount AS debt_amount
+    d.original_amount + d.interest_fee_amount + d.fine_fee_amount - d.discount_amount AS debt_amount,
+        ROW_NUMBER() OVER (PARTITION BY d.id_external ORDER BY d.ts_created DESC) AS _rn
   FROM datalake_trato_feito_clean.debt AS d
   LEFT JOIN datalake_debt_recovery.negotiation AS n
     ON d.id_negotiation = n.id_negotiation
   WHERE d.id_negotiation IS NOT NULL
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY d.id_external ORDER BY d.ts_created DESC) = 1
+    )
+    WHERE _rn = 1
 ),
 recupera_debts AS (
   SELECT DISTINCT

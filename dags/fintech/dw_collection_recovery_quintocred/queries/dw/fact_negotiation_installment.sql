@@ -1,5 +1,7 @@
 WITH
 deduplicate_trato_feito_negotiation AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   SELECT
     id_contract,
     id_negotiation,
@@ -8,21 +10,27 @@ deduplicate_trato_feito_negotiation AS (
       WHEN debtor = "rental_contract_landlord" THEN "PP QuintoAndar"
       WHEN debtor = "rental_contract_tenant" THEN "IQ QuintoAndar"
       WHEN debtor = "velo_delinquency_tenant" THEN "IQ QuintoCred"
-    END AS creditor
+    END AS creditor,
+        ROW_NUMBER() OVER (PARTITION BY id_contract, id_negotiation_external ORDER BY ts_created_at DESC) AS _rn
   FROM
       datalake_debt_recovery.negotiation
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_external ORDER BY ts_created_at DESC) = 1
+    )
+    WHERE _rn = 1
 ),
 deduplicate_invoice_extra AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   SELECT
     a.id_external AS id_invoice,
-    a.id_installment
+    a.id_installment,
+        ROW_NUMBER() OVER (PARTITION BY a.id_installment ORDER BY COALESCE(i.ts_payment_confirmation, i.ts_paid) DESC, i.ts_created ASC) AS _rn
   FROM
       datalake_trato_feito_clean.accounting_installment AS a
   LEFT JOIN datalake_retsuko.invoice AS i
     ON i.id_external = a.id_external
   WHERE i.status != "canceled"
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY a.id_installment ORDER BY COALESCE(i.ts_payment_confirmation, i.ts_paid) DESC, i.ts_created ASC) = 1
+    )
+    WHERE _rn = 1
 ),
 trato_feito_installment AS (
   SELECT
@@ -53,18 +61,21 @@ trato_feito_installment AS (
         ON ai.id_installment = i.id
 ),
 nexxera_confirmation AS (
+    SELECT * EXCEPT (_rn)
+    FROM (
   SELECT
       dt_due,
       dt_occurrence_code AS dt_paid,
       substr(our_number, 1,8) AS id_receipt,
       net_amount AS paid_amount,
-      due_amount
+      due_amount,
+        ROW_NUMBER() OVER (PARTITION BY our_number, occurrence_code ORDER BY dt_occurrence_code DESC) AS _rn
   FROM
       datalake_nexxera.cnab_charges_recupera
   WHERE
       occurrence_code = '06'
-  QUALIFY
-      ROW_NUMBER() OVER(PARTITION BY our_number, occurrence_code ORDER BY dt_occurrence_code DESC) = 1
+    )
+    WHERE _rn = 1
 )
 SELECT DISTINCT
     CONCAT(COALESCE(i.id_negotiation, tfi.id_negotiation_recupera),"-",INT(COALESCE(i.installment_number, tfi.installment_number))) AS sk_negotiation_installment,

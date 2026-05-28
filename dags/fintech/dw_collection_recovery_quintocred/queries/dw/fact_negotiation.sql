@@ -11,49 +11,56 @@ trato_feito_dt_paid AS (
   GROUP BY 1
 ),
 trato_feito_negotiation AS (
-  SELECT
-    id_negotiation_external AS id_negotiation_recupera,
-    id_negotiation,
-    id_contract,
-    CASE
-      WHEN debtor = "rental_contract_landlord" THEN "PP QuintoAndar"
-      WHEN debtor = "rental_contract_tenant" THEN "IQ QuintoAndar"
-      WHEN debtor = "velo_delinquency_tenant" THEN "IQ QuintoCred"
-    END AS creditor,
-    is_contract_recurrent_debtor,
-    status,
-    has_renegotiated AS is_renegotiation,
-    IF(collector = "5A-collector", TRUE, FALSE) AS is_ssn, --SSN boletão (BOSSN)
-    IF(ts_first_payment IS NOT NULL, TRUE, FALSE) AS is_down_payment_paid,
-    qt_installments,
-    negotiation_original_amount,
-    interest_fee_amount,
-    fine_fee_amount,
-    credit_card_fee_amount,
-    ROUND(negotiation_original_amount + fine_fee_amount + interest_fee_amount, 2) AS debt_amount_without_adm_fee,
-    ROUND(negotiation_original_amount + fine_fee_amount + interest_fee_amount + credit_card_fee_amount, 2) AS total_debt_amount,
-    negotiation_discount_amount AS total_discount_amount, -- Total debt (total_debt_amount = original + fine + fee + credit card) - Negotiated amount (total_expected_amount)
-    GREATEST(ROUND((negotiation_original_amount + fine_fee_amount + interest_fee_amount) - total_expected_amount, 2), 0) AS discount_amount_without_adm_fee, -- Total debt without credit card fee (debt_amount_without_adm_fee = original + fine + fee) - Negotiated amount (total_expected_amount)
-    total_expected_amount AS negotiated_amount,
-    down_payment_amount,
-    paid_amount,
-    INT(qt_installments_paid) AS qt_installments_paid,
-    IF(breached_installment IS NOT NULL, INT(qt_installments) - INT(qt_installments_paid), 0) AS breached_installments,
-    dt_expected_end,
-    DATE(ts_created_at) AS dt_promisse,
-    DATE(ts_first_payment) AS dt_first_payment,
-    DATE(ts_paid_all) AS dt_paid_all,
-    DATE(ts_breach) AS dt_breach
-  FROM datalake_debt_recovery.negotiation
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_contract, id_negotiation_external ORDER BY ts_created_at DESC) = 1 -- removes the exception in which 1 Trato-Feito negotiation ID has more than one Recupera negotiation ID. Ex: 97080
+  -- removes the exception in which 1 Trato-Feito negotiation ID has more than one Recupera negotiation ID. Ex: 97080
+  SELECT * EXCEPT (_rn) FROM (
+    SELECT
+      id_negotiation_external AS id_negotiation_recupera,
+      id_negotiation,
+      id_contract,
+      CASE
+        WHEN debtor = "rental_contract_landlord" THEN "PP QuintoAndar"
+        WHEN debtor = "rental_contract_tenant" THEN "IQ QuintoAndar"
+        WHEN debtor = "velo_delinquency_tenant" THEN "IQ QuintoCred"
+      END AS creditor,
+      is_contract_recurrent_debtor,
+      status,
+      has_renegotiated AS is_renegotiation,
+      IF(collector = "5A-collector", TRUE, FALSE) AS is_ssn, --SSN boletão (BOSSN)
+      IF(ts_first_payment IS NOT NULL, TRUE, FALSE) AS is_down_payment_paid,
+      qt_installments,
+      negotiation_original_amount,
+      interest_fee_amount,
+      fine_fee_amount,
+      credit_card_fee_amount,
+      ROUND(negotiation_original_amount + fine_fee_amount + interest_fee_amount, 2) AS debt_amount_without_adm_fee,
+      ROUND(negotiation_original_amount + fine_fee_amount + interest_fee_amount + credit_card_fee_amount, 2) AS total_debt_amount,
+      negotiation_discount_amount AS total_discount_amount,
+      GREATEST(ROUND((negotiation_original_amount + fine_fee_amount + interest_fee_amount) - total_expected_amount, 2), 0) AS discount_amount_without_adm_fee,
+      total_expected_amount AS negotiated_amount,
+      down_payment_amount,
+      paid_amount,
+      INT(qt_installments_paid) AS qt_installments_paid,
+      IF(breached_installment IS NOT NULL, INT(qt_installments) - INT(qt_installments_paid), 0) AS breached_installments,
+      dt_expected_end,
+      DATE(ts_created_at) AS dt_promisse,
+      DATE(ts_first_payment) AS dt_first_payment,
+      DATE(ts_paid_all) AS dt_paid_all,
+      DATE(ts_breach) AS dt_breach,
+      ROW_NUMBER() OVER (PARTITION BY id_contract, id_negotiation_external ORDER BY ts_created_at DESC) AS _rn
+    FROM datalake_debt_recovery.negotiation
+  ) ranked
+  WHERE _rn = 1
 ),
 creditor_pending As (
-  SELECT
-    installment_code AS id_negotiation,
-    id_installment AS id_invoice,
-    dt_installment_due_date AS dt_due
-  FROM datalake_recupera_clean.creditor_pending
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_installment, installment_code ORDER BY dt_table_insertion DESC, year DESC, month DESC, day DESC)
+  SELECT * EXCEPT (_rn) FROM (
+    SELECT
+      installment_code AS id_negotiation,
+      id_installment AS id_invoice,
+      dt_installment_due_date AS dt_due,
+      ROW_NUMBER() OVER (PARTITION BY id_installment, installment_code ORDER BY dt_table_insertion DESC, year DESC, month DESC, day DESC) AS _rn
+    FROM datalake_recupera_clean.creditor_pending
+  ) ranked
+  WHERE _rn = 1
 ),
 original_invoices AS (
   SELECT
@@ -77,60 +84,63 @@ renegotiation AS (
   GROUP BY 1
 ),
 recupera_negotiation AS (
-  SELECT
-    id_creditor,
-    id_negotiation,
-    id_contract,
-    id_operator,
-    customer_document,
-    CASE
-      WHEN negotiation_status = "ACORDO_LIQUIDADO" THEN "finished"
-      WHEN negotiation_status = "ACORDO_CANCELADO"
-        AND down_payment IS TRUE THEN "broken"
-      WHEN negotiation_status = "ACORDO_CANCELADO"
-        AND down_payment IS FALSE THEN "canceled"
-      WHEN negotiation_status = "ACORDO_EM_ANDAMENTO"
-        AND down_payment IS TRUE THEN "offset"
-      WHEN negotiation_status = "ACORDO_EM_ANDAMENTO" THEN "started"
-    END AS negotiation_status,
-    is_special_installment,
-    origin_agreement,
-    campaign_code,
-    advisory,
-    agreement_type,
-    agreement_in_delay,
-    agreement_promise,
-    promisse_payment_method,
-    number_of_installments,
-    paid_installments,
-    breached_installments,
-    down_payment,
-    original_debt_amount,
-    interest_fee_amount,
-    adm_fee_amount AS credit_card_fee,
-    fine_fee_amount AS original_fine_amount,
-    GREATEST(ROUND(expense_amount - original_debt_amount - interest_fee_amount - adm_fee_amount - negotiation_discount_amount, 2), 0)  AS fine_fee_amount,
-    ROUND(expense_amount - adm_fee_amount, 2) AS debt_amount_without_adm_fee, -- original_debt_amount + interest_fee_amount + fine_fee_amount
-    expense_amount AS total_debt_amount, -- original_debt_amount + interest_fee_amount + fine_fee_amount + credit_card_fee
-    negotiated_to_be_due_amount,
-    negotiated_overdue_amount,
-    negotiation_discount_amount AS original_discount_amount, -- Negotiated amount (negotiated_amount) - debt amount (total_debt_amount = expense amount = original + fine + fee + credit card)
-    GREATEST(ROUND(expense_amount - negotiated_amount, 2), 0) AS discount_amount,
-    GREATEST(ROUND((expense_amount - adm_fee_amount) - negotiated_amount, 2), 0) AS discount_amount_without_adm_fee, -- Negotiated amount (negotiated_amount) - debt amount without credit card fee (debt_amount_without_adm_fee = original + fine + fee = expense_amount - adm_fee_amount)
-    negotiated_amount,
-    down_payment_amount,
-    down_payment_amount_without_fees,
-    total_amount_paid,
-    total_next_due,
-    dt_cancellation,
-    dt_next_due,
-    dt_promisse,
-    dt_due_promisse,
-    dt_negotiation_expected_end,
-    dt_down_payment,
-    dt_paid_all
-  FROM datalake_recupera.negotiation
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY id_negotiation ORDER BY ts_snapshot DESC, id_contract DESC) = 1
+  SELECT * EXCEPT (_rn) FROM (
+    SELECT
+      id_creditor,
+      id_negotiation,
+      id_contract,
+      id_operator,
+      customer_document,
+      CASE
+        WHEN negotiation_status = "ACORDO_LIQUIDADO" THEN "finished"
+        WHEN negotiation_status = "ACORDO_CANCELADO"
+          AND down_payment IS TRUE THEN "broken"
+        WHEN negotiation_status = "ACORDO_CANCELADO"
+          AND down_payment IS FALSE THEN "canceled"
+        WHEN negotiation_status = "ACORDO_EM_ANDAMENTO"
+          AND down_payment IS TRUE THEN "offset"
+        WHEN negotiation_status = "ACORDO_EM_ANDAMENTO" THEN "started"
+      END AS negotiation_status,
+      is_special_installment,
+      origin_agreement,
+      campaign_code,
+      advisory,
+      agreement_type,
+      agreement_in_delay,
+      agreement_promise,
+      promisse_payment_method,
+      number_of_installments,
+      paid_installments,
+      breached_installments,
+      down_payment,
+      original_debt_amount,
+      interest_fee_amount,
+      adm_fee_amount AS credit_card_fee,
+      fine_fee_amount AS original_fine_amount,
+      GREATEST(ROUND(expense_amount - original_debt_amount - interest_fee_amount - adm_fee_amount - negotiation_discount_amount, 2), 0)  AS fine_fee_amount,
+      ROUND(expense_amount - adm_fee_amount, 2) AS debt_amount_without_adm_fee,
+      expense_amount AS total_debt_amount,
+      negotiated_to_be_due_amount,
+      negotiated_overdue_amount,
+      negotiation_discount_amount AS original_discount_amount,
+      GREATEST(ROUND(expense_amount - negotiated_amount, 2), 0) AS discount_amount,
+      GREATEST(ROUND((expense_amount - adm_fee_amount) - negotiated_amount, 2), 0) AS discount_amount_without_adm_fee,
+      negotiated_amount,
+      down_payment_amount,
+      down_payment_amount_without_fees,
+      total_amount_paid,
+      total_next_due,
+      dt_cancellation,
+      dt_next_due,
+      dt_promisse,
+      dt_due_promisse,
+      dt_negotiation_expected_end,
+      dt_down_payment,
+      dt_paid_all,
+      ROW_NUMBER() OVER (PARTITION BY id_negotiation ORDER BY ts_snapshot DESC, id_contract DESC) AS _rn
+    FROM datalake_recupera.negotiation
+  ) ranked
+  WHERE _rn = 1
 ),
 invalid_negotiations AS (
   SELECT
@@ -151,20 +161,23 @@ invalid_negotiations AS (
   GROUP BY 1,2
 ),
 paschoalotto_operator AS (
-  SELECT DISTINCT
-    d.id_contract_quintoandar AS id_contract,
-    ad.id_installment AS id_negotiation,
-    UPPER(u.login_name) AS id_operator,
-    UPPER(u.full_name) AS operator_name,
-    DATE(ad.dt_emission) AS dt_promisse
-  FROM datalake_paschoalotto_clean.agreement_detail AS ad
-  LEFT JOIN datalake_paschoalotto_clean.contract AS c
-    ON ad.id_contract = c.id_contract
-  LEFT JOIN datalake_paschoalotto_clean.debt AS d
-    ON ad.id_contract = d.id_contract
-  LEFT JOIN datalake_paschoalotto_clean.user AS u
+  SELECT * EXCEPT (_rn) FROM (
+    SELECT DISTINCT
+      d.id_contract_quintoandar AS id_contract,
+      ad.id_installment AS id_negotiation,
+      UPPER(u.login_name) AS id_operator,
+      UPPER(u.full_name) AS operator_name,
+      DATE(ad.dt_emission) AS dt_promisse,
+      ROW_NUMBER() OVER (PARTITION BY d.id_contract_quintoandar, ad.id_installment ORDER BY ad.ts_update DESC) AS _rn
+    FROM datalake_paschoalotto_clean.agreement_detail AS ad
+    LEFT JOIN datalake_paschoalotto_clean.contract AS c
+      ON ad.id_contract = c.id_contract
+    LEFT JOIN datalake_paschoalotto_clean.debt AS d
+      ON ad.id_contract = d.id_contract
+    LEFT JOIN datalake_paschoalotto_clean.user AS u
       ON ad.id_user = u.id_user
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY d.id_contract_quintoandar, ad.id_installment ORDER BY ad.ts_update DESC) = 1
+  ) ranked
+  WHERE _rn = 1
 ),
 union_sources AS (
   SELECT
