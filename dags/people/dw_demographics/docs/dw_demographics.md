@@ -1,268 +1,183 @@
-# DW Demographics - DE&I Data: dw_demographics
+# Employee DE&I Attributes
+
+**Metastore schema:** `dw_demographics`
+
+> DE&I (diversity, equity, and inclusion) attributes for analytics: a time-aware profile of self-declared and standardized demographic fields, plus documented disability detail where it exists. Built for reporting that respects legislation, self-declaration, and how values change over time. Data originates from PIN, QuintoAndar's HR master system.
 
 ## People Data Catalog
 
-**Progress** (status) and **confidence level** for **`dw_demographics`** are maintained in the Confluence People Data Catalog Database—not in this Markdown file.
+This schema is indexed in the [People Data Catalog](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/pages/4635951235/People+Data+Catalog).
 
-[Open this schema's catalog row](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/database/4638474284?contentId=4638474284&entryId=a5f75849-69fc-4796-9540-cc6b587ed925&savedViewId=136c293b-f5c1-48d6-a161-9586a403e181).
+[Link to Catalog Row](https://quintoandar.atlassian.net/wiki/spaces/team162449f9cca34903915bfe1c1c6c507e/database/4638474284?contentId=4638474284&entryId=a5f75849-69fc-4796-9540-cc6b587ed925&savedViewId=136c293b-f5c1-48d6-a161-9586a403e181)
 
 ## Contents
 
-- [People Data Catalog](#people-data-catalog)
-- [Description](#description)
-- [Scope](#scope)
-- [Out of scope](#out-of-scope)
-- [Tables](#tables)
-- [Data model](#data-model)
-- [Full data model on GitHub](#full-data-model-on-github)
-- [Executive summary](#executive-summary)
-- [Business logic](#business-logic)
-- [Data dictionary](#data-dictionary)
-- [How to use](#how-to-use)
-- [Sensitivity and access](#sensitivity-and-access)
+* [In Scope](#in-scope)
+* [Data Model and Tables](#data-model-and-tables)
+* [Core Features and Business Logic](#core-features-and-business-logic)
+* [Attention and Limitations](#attention-and-limitations)
+* [How to Use](#how-to-use)
+* [Glossary](#glossary)
+***
 
----
+## In Scope
 
-## Description
+**✅ Demographic profile** : Ethnicity, religion, gender identity, sexual orientation, neurodiversity signals, and related inclusion flags (URG, LGBT+, Women, BIM, PwD) versioned per person and legislation, with both current and historical rows for trends and as-of reporting.
 
-The **`dw_demographics`** schema delivers **DE&I (diversity, equity, and inclusion)** attributes for People analytics: a **time-aware profile** of self-reported and standardized demographic fields, plus **documented disability** detail where it exists in **PIN** (QuintoAndar’s HR master data). It is built for reporting that respects **legislation**, **self-declaration**, and **how values change over time**.
+**✅ Documented disability** : Records for people with formal disability documentation covering categories, status, accessibility needs, and quota-related signals where applicable, linked to the same person and legislation context as the profile table.
 
-## Scope
+**✅ People in scope** : Current and former employees and contractors whose last assignment was an employee or contractor type, so both active workforce and historical profiles are available.
 
-**✅ Demographic profile** — Ethnicity, religion, gender identity, sexual orientation, neurodiversity signals, and related inclusion flags, versioned per employee and **legislation** (country/region context), with **current row** and **history** for trends and as-of reporting.
+### Out of Scope
 
-**✅ Documented disability** — Rows for **documented disability records** (categories, status, accessibility needs, quota-related signals where applicable), linked to the same **employee** and **legislation** context as the profile table.
+❌ Employment facts, headcount, FTE, org slices, and tenure on a daily or monthly grain live in `dw_people` and `dw_employee_details`.
 
-**✅ People in scope** — Active **employees and contractors** on a **current assignment** in PIN; test and non-production accounts are excluded so composition metrics reflect the real workforce.
-
-## Out of scope
-
-**❌ Organization and job catalog** — Cost centers, business units, and job definitions live in **`dw_organization`** (and related enrich sources); join through facts or shared keys, not inside this schema.
-
-**❌ Employment facts and monthly headcount** — Active counts, org slices, and tenure on a **monthly grain** are modeled in **`dw_people`** (for example **`fact_employees`**). Use **`dw_demographics`** as **attributes** joined to those facts; do not treat this schema as the place where headcount is stored.
-
-**❌ Compensation and pay** — Salary, bands, and job history for pay are in **`dw_compensation`**.
-
-**❌ Performance management** — Review cycles and ratings are in **`dw_performance`**.
-
-**❌ Extended HR operational detail** — Contract and assignment detail beyond DE&I attributes may live in **`dw_employee_details`** or **`dw_employee`** depending on the question.
-
----
-
-## Tables
-
-Explore schemas and column-level detail in **DataHub** (lineage and definitions). Use **Explore in GitHub** to open the matching **`queries/dw/{table}.sql`** on the default branch.
-
-| Table | Explore in DataHub | Explore in GitHub |
-|-------|-------------------|-------------------|
-| `dim_employee_demographic` | [Open schema](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_demographics.dim_employee_demographic,PROD)/Schema?is_lineage_mode=false&schemaFilter=) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_demographics/queries/dw/dim_employee_demographic.sql) |
-| `dim_employee_disability` | [Open schema](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_demographics.dim_employee_disability,PROD)/Schema?is_lineage_mode=false&schemaFilter=) | [View SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_demographics/queries/dw/dim_employee_disability.sql) |
-
----
-
-## Data model
-
-**Grain**
-
-- **`dim_employee_demographic`:** One row per **employee** per **legislation** per **period** where the DE&I attribute set did not change. When something in that set changes in PIN, a **new** period starts; **earlier** periods remain so you can report **as-of** a past date. Consecutive identical periods are merged into a single row.
-- **`dim_employee_disability`:** One row per employee per legislation per **documented disability record** over time. Join to the demographic table on **employee** and **legislation** so disability detail aligns with the same legal context.
-
-### Full data model on GitHub
-
-For a **relationship overview and join patterns** for technical readers, see:
-
-- **Open on GitHub:** [data_model.md on `master`](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_demographics/docs/data_model.md)
-- Same folder: [data_model.md](data_model.md)
-
----
-
-## Executive summary
-
-The **`dw_demographics`** schema supports **DE&I** reporting: a **profile table** with demographic and derived inclusion attributes, plus a **disability detail table** for documented conditions and accessibility context. Data originates from **PIN** and related People data products. Use it for analyses that respect **self-declaration**, **legislation**, and **validity over time** (today’s row vs history).
-
-### Key concepts
-
-- For **today’s profile**, filter **`dim_employee_demographic`** to **`is_current = true`** (or the row whose end date is open-ended).
-- **Legislation** groups attributes by legal context (country/region). Some indicators (for example race/ethnicity underrepresentation for Brazil) apply only when legislation is **BR**.
-- **Disability** rows are optional: not everyone has rows in **`dim_employee_disability`**. Join when you need taxonomy or medically documented fields.
-
-### Refresh and availability
-
-People warehouse **DW layer SLA**: data is expected to be **available by 8:00** (once per day). This pipeline runs when upstream People data has finished loading.
-
-### Granularity
-
-- **`dim_employee_demographic`:** One row per employee per legislation per **version window** (start/end dates of that attribute set).
-- **`dim_employee_disability`:** One row per employee per legislation per **disability record** over its validity period.
-
-### Where to find the data
-
-**Schema:** `dw_demographics` · **Airflow pipeline:** `bietlejuice.dw_demographics`
-
----
-
-## Business logic
+❌ Employee identity, contacts, documentation, hierarchy, and assignment history live in `dw_employee_details`.
 
 ### Who is included
 
-The population is **people with an active employment relationship** in PIN as **employees or contractors**, using the **current assignment** in People data. **Pending hires** and **test accounts** are excluded so metrics reflect real workforce composition.
+* **Target Population:** Current and former employees and contractors whose last assignment type was employee or contractor. This includes both active workforce and terminated employees, so DE&I profiles remain accessible after offboarding. When legislative data is missing for someone in scope, a current row is still produced with unknown placeholders so joins do not drop people silently.
+* **Exclusions:** Pending hires and test accounts. People whose only assignment type was pending are not represented.
 
-### Demographic profile (`dim_employee_demographic`)
+## Data Model and Tables
 
-- Attributes (ethnicity, religion, gender identity, sexual orientation, neurodiversity, and related fields) come from **PIN** legislative and person records, with standardized labels for reporting.
-- **History:** When an attribute set changes, a new validity window opens; older windows remain for trend and audit use.
-- If legislative data is missing for someone in scope, the pipeline still produces a row with **unknown** codes where applicable so joins do not drop people silently.
+### Data Sources and System Context
 
-### Disability detail (`dim_employee_disability`)
+* **PIN** : The HR master system. All demographic attributes, documented disability records, and legal context (legislation) originate from PIN. PIN is the single business source of truth for this schema; display labels for ethnicity, religion, and sexual orientation come from PIN's own reference lists.
 
-- Rows reflect **documented disability** records in PIN, including status (active/pending/inactive) and quota-related signals where applicable.
-- **Primary** disability per person and legislation is flagged when quota information indicates the main record.
+### About the data
 
-**Reporting tip:** For **composition today**, start from **`dim_employee_demographic`** with **`is_current`**, then **left join** **`dim_employee_disability`** only when you need disability breakdowns.
+* **Temporal coverage:** History (validity window, SCD Type 2). Each row is valid from a start date to an end date; the latest version of each person plus legislation combination is flagged as the current row. Ongoing rows use a far-future end date as the sentinel for "still valid today". Consecutive identical periods are merged into a single row.
+* **Airflow DAG:** `bietlejuice.dw_demographics`
+* **SLA:** D-1 available by 08:00 BRT
 
-### Terms and column-level rules
+| Table | Grain | Links |
+| :--- | :--- | :--- |
+| `dim_employee_demographic` | Validity window: one record per person per legislation per period where the DE&I attribute set stays the same. When something changes, a new period opens and earlier periods remain for as-of reporting. | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_demographics.dim_employee_demographic,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_demographics/queries/dw/dim_employee_demographic.sql) |
+| `dim_employee_disability` | Validity window: one record per person per legislation per documented disability record over its own validity period. A person can have zero, one, or many rows. | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_demographics.dim_employee_disability,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_demographics/queries/dw/dim_employee_disability.sql) |
 
-Official **definitions of metrics and flags** (for example BIM, LGBT+, URG, PwD) are maintained in **DataHub metadata** on each column — use those descriptions for formulas, null handling, and governance. This avoids duplicating rules that may evolve independently of this page.
+> **Note:** VPN connection is required to access DataHub.
 
----
+**Main join identifiers:**
 
-## Data dictionary
+* `sk_employee` (Standard PK/FK)
+* `person_number` (Business Key from PIN)
 
-Summary of **business meaning** only. **Authoritative** descriptions, categories, and lineage: **DataHub** (same links as [Tables](#tables)).
+## Core Features and Business Logic
 
-## `dw_demographics.dim_employee_demographic`
+### Domain logic and core concepts
 
-| Column | Business definition | Notes |
-|--------|---------------------|-------|
-| `sk_employee` | Internal employee person key for joins across People datasets. | |
-| `person_number` | Stable person identifier from HR (PIN). | |
-| `legislation_code` | Country/region legal context for the row. | Drives which diversity rules apply. |
-| `ethnicity` | Self-declared ethnicity (standardized label). | Unknown mapped for analytics. |
-| `religion` | Self-declared religion (standardized label). | |
-| `gender_identity_reported` | Value as captured in PIN before standard buckets. | Audit / exact wording. |
-| `gender_identity` | Standardized buckets for reporting. | Sensitive personal data. |
-| `sexual_orientation` | Self-declared orientation (standardized label). | Sensitive personal data. |
-| `is_underrepresented_race` | Brazil-specific underrepresented race/ethnicity signal. | See DataHub for codes and null rules. |
-| `is_lgbtqia` | LGBT+ inclusion signal from orientation and gender. | See DataHub for null rules. |
-| `is_underrepresented_gender` | Broader gender inclusion flag. | See DataHub vs `is_woman`. |
-| `is_woman` | Women signal (cis and trans per mapping). | |
-| `is_neurodivergent` | Neurodiversity vs neurotypical where declared. | |
-| `has_self_declared_pwd` | Self-declared disability (legislative answer). | |
-| `has_medical_disability_record` | Documented disability overlapping the period. | Distinct from self-declaration only. |
-| `is_urg` | Composite underrepresented-group flag. | See DataHub for composition. |
-| `is_current` | Whether this is the **current** open validity window. | |
-| `dt_valid_from` / `dt_valid_to` | Inclusive validity of this attribute set. | Open-ended uses end date sentinel. |
-| `ts_load` | When the row was loaded into the warehouse. | |
+* **Today's profile** : `is_current = TRUE` returns the latest validity-window row for each person regardless of employment status — it includes both active employees and people who have already been offboarded. To restrict to the currently active workforce, join with `dw_people.fact_employees` and filter on `is_active = TRUE`.
+* **Validity over time** : When an attribute set changes, a new validity window opens and the previous one is closed; older windows remain available for trend and audit use. For an as-of historical date, filter the validity window to that date instead of relying only on `is_current`.
+* **Legislation drives applicability** : Some flags only make sense under specific legal context. The BIM (Black, Indigenous, Mixed-race) flag, for example, is filled only under Brazilian legislation; for other countries it stays empty.
+* **Composite inclusion flags** : URG (Underrepresented Group) is derived from BIM, Women, LGBT+, and PwD with documentation. When any input is unknown, the composite may stay empty; strict metrics should treat empty as not in scope.
+* **Disability optionality** : Rows in `dim_employee_disability` are optional; not every person has them. Join only when you need disability taxonomy or medically documented fields, and prefer the primary disability per person and legislation when quota information indicates it.
 
-## `dw_demographics.dim_employee_disability`
+### Business Assumptions
 
-| Column | Business definition | Notes |
-|--------|---------------------|-------|
-| `sk_employee` | Same person key as the demographic table. | Join key. |
-| `person_number` | HR person number (PIN). | |
-| `legislation_code` | Legal context of the disability record. | Join key. |
-| `category` | High-level disability category (standardized label). | |
-| `documented_name` | Documented disability type / sub-class label. | |
-| `self_declared_name` | Self-declared type or answer when available. | |
-| `neurodiversity` | Neurodiversity detail from legislative data. | |
-| `accessibility_need` | Declared workplace accessibility need. | |
-| `disability_status` | Human-readable status (active, pending, inactive, unknown). | |
-| `is_active` | Whether the record is active. | |
-| `is_primary` | Primary disability row for that person and legislation when quota indicates. | |
-| `is_quota_eligible` | Eligibility signal from quota fields. | |
-| `dt_valid_from` / `dt_valid_to` | Validity of the disability record. | |
-| `ts_load` | Load timestamp. | |
+* **Empty BIM is intentional outside Brazil** : Race-based inclusion is meaningful only under Brazilian legislation. Outside Brazil the value is empty by design; do not treat empty as false.
+* **DataHub is the source of truth for column rules** : Authoritative definitions of metrics and flags (for example BIM, LGBT+, URG, PwD) are maintained in DataHub on each column. Use those descriptions for formulas, null handling, and governance.
+* **Reporting tip** : Start from `dim_employee_demographic` with `is_current = TRUE` to get the latest row per person, then left join `dim_employee_disability` only when you need disability breakdowns. Remember this returns both active employees and terminated ones; join with `dw_people.fact_employees` and filter `is_active = TRUE` when your analysis covers only the current workforce.
 
----
+## Attention and Limitations
 
-## How to use
+* **Disability rows are not universal** : Most people do not have rows in `dim_employee_disability`. Always use a `LEFT JOIN` when adding disability detail to a demographic query; an `INNER JOIN` will silently drop everyone without a record.
+* **Self-declaration is not the same as documentation** : `has_self_declared_pwd` captures what the person reported on the legislative form. `has_medical_disability_record` reflects whether a formal medical record overlaps the demographic period. They are independent and can disagree; choose deliberately for each metric.
+* **Avoid double-counting on disability** : A person can have multiple disability rows over time. When summarizing per person, deduplicate by `sk_employee` (or use `is_primary`) before counting.
+* **As-of reporting requires validity overlap** : To report a past month or to align demographic attributes with a fact row, compare `dt_valid_from` / `dt_valid_to` with the reference date rather than relying only on `is_current`.
+* **`is_current` does not mean active employee** : `is_current = TRUE` returns the latest validity-window row for each person regardless of employment status — it covers both active employees and terminated ones. Filtering on `is_current` alone is not enough to scope to the current workforce. Join with `dw_people.fact_employees` and add `is_active = TRUE` whenever the analysis should be restricted to people currently employed.
 
-This schema holds **dimensions** (attributes and flags), not stored **counts** or **rates**. For **headcount**, **FTE**, or **org-sliced** workforce metrics, join to **`dw_people.fact_employees`** (and org dimensions as needed) on **`sk_employee`**, then attach **`dw_demographics`** for DE&I breakdowns.
+## How to Use
 
-**Example questions:**
+### Standard Join Pattern
 
-- What does **DE&I composition** look like **today** (ethnicity, gender identity, URG, LGBT+ flags) for **current** employees?
-- How do **documented disability** categories break down among people with a **current** demographic row?
-- What was the **as-of** profile for a **past** month (validity windows vs **`fact_employees.dt_reference`**)?
-- How do I avoid **double-counting** when a person has **multiple** disability rows?
+When joining this schema's tables with other DW domains:
 
-### Current employee DE&I profile (dimension only)
+1. Always join on `sk_employee` (preferred) or `person_number`.
+2. Reference `dw_people.dim_employee` for central employee attributes and `dw_people.fact_employees` (or `dw_employee_details.fact_assignment_snapshots`) for active workforce, FTE, or org-sliced counts.
+3. When also joining `dim_employee_disability`, add `legislation_code` and the validity-window overlap to the predicate.
 
-**Question:** Who are our people **today** with DE&I attributes, without org headcount?
+### Latest DE&I attributes per person (active and terminated)
+
+**Question:** What is the latest DE&I profile for all employees and contractors, including those who have already left?
+
+> `is_current = TRUE` returns the most recent validity-window row for each person regardless of employment status. The result includes both active employees and terminated ones. To scope to active-only, join with `dw_people.fact_employees` and add `fact_employees.is_active = TRUE`.
 
 ```sql
 SELECT
-    emp_demographic.sk_employee,
-    emp_demographic.person_number,
-    emp_demographic.legislation_code,
-    emp_demographic.ethnicity,
-    emp_demographic.gender_identity,
-    emp_demographic.sexual_orientation,
-    emp_demographic.is_urg,
-    emp_demographic.is_current,
-    emp_demographic.dt_valid_from,
-    emp_demographic.dt_valid_to
+    employee_demographic.sk_employee,
+    employee_demographic.person_number,
+    employee_demographic.legislation_code,
+    employee_demographic.ethnicity,
+    employee_demographic.gender_identity,
+    employee_demographic.sexual_orientation,
+    employee_demographic.is_urg,
+    employee_demographic.is_current,
+    employee_demographic.dt_valid_from,
+    employee_demographic.dt_valid_to
 FROM
-    dw_demographics.dim_employee_demographic AS emp_demographic
+    dw_demographics.dim_employee_demographic AS employee_demographic
 WHERE
-    emp_demographic.is_current = TRUE
+    employee_demographic.is_current = TRUE
 ```
 
 ### Demographics with active documented disability rows
 
-**Question:** For **current** demographic rows, who has **active** documented disability lines aligned in time?
+**Question:** Among all people with a latest demographic row (active and terminated), who also has active documented disability lines aligned in time?
 
 ```sql
 SELECT
-    emp_demographic.sk_employee,
-    emp_demographic.legislation_code,
-    emp_demographic.gender_identity,
-    emp_disability.documented_name,
-    emp_disability.disability_status,
-    emp_disability.is_active
+    employee_demographic.sk_employee,
+    employee_demographic.legislation_code,
+    employee_demographic.gender_identity,
+    employee_disability.documented_name,
+    employee_disability.disability_status,
+    employee_disability.is_active
 FROM
-    dw_demographics.dim_employee_demographic AS emp_demographic
-LEFT JOIN
-    dw_demographics.dim_employee_disability AS emp_disability
-        ON emp_disability.sk_employee = emp_demographic.sk_employee
-        AND emp_disability.legislation_code = emp_demographic.legislation_code
-        AND emp_disability.dt_valid_from <= emp_demographic.dt_valid_to
-        AND emp_disability.dt_valid_to >= emp_demographic.dt_valid_from
+    dw_demographics.dim_employee_demographic AS employee_demographic
+LEFT JOIN dw_demographics.dim_employee_disability AS employee_disability
+    ON employee_disability.sk_employee = employee_demographic.sk_employee
+    AND employee_disability.legislation_code = employee_demographic.legislation_code
+    AND employee_disability.dt_valid_from <= employee_demographic.dt_valid_to
+    AND employee_disability.dt_valid_to >= employee_demographic.dt_valid_from
 WHERE
-    emp_demographic.is_current = TRUE
-    AND COALESCE(emp_disability.is_active, TRUE)
+    employee_demographic.is_current = TRUE
+    AND COALESCE(employee_disability.is_active, TRUE)
 ```
 
 ### Headcount by ethnicity (fact + dimension)
 
-**Question:** How many **active** employees **last month** by **ethnicity** (illustrative — align **`dt_reference`** with your reporting month)?
+**Question:** How many active employees, by ethnicity, on a reference month? Align `dt_reference` with your reporting period.
 
 ```sql
 SELECT
-    emp_demographic.ethnicity,
+    employee_demographic.ethnicity,
     COUNT(DISTINCT fact_employees.sk_employee) AS employee_count
 FROM
     dw_people.fact_employees AS fact_employees
-INNER JOIN
-    dw_demographics.dim_employee_demographic AS emp_demographic
-        ON emp_demographic.sk_employee = fact_employees.sk_employee
-        AND emp_demographic.dt_valid_from <= fact_employees.dt_reference
-        AND emp_demographic.dt_valid_to >= fact_employees.dt_reference
+INNER JOIN dw_demographics.dim_employee_demographic AS employee_demographic
+    ON employee_demographic.sk_employee = fact_employees.sk_employee
+    AND employee_demographic.dt_valid_from <= fact_employees.dt_reference
+    AND employee_demographic.dt_valid_to >= fact_employees.dt_reference
 WHERE
     fact_employees.is_current = TRUE
     AND fact_employees.is_active = TRUE
 GROUP BY
-    emp_demographic.ethnicity
+    employee_demographic.ethnicity
 ORDER BY
     employee_count DESC
 ```
 
-For an **as-of** historical date, filter validity windows to that date instead of only **`is_current`**.
+This example already restricts to active employees via `fact_employees.is_active = TRUE`. For an as-of historical date, replace `is_current = TRUE` with the validity-window overlap shown in the disability example above, and adjust the `is_active` filter to the date of reference.
 
----
+## Glossary
 
-## Sensitivity and access
+* **Validity Window** : A period of time during which specific attributes of an entity remain constant and true. A new window opens when a value changes; represented by `dt_valid_from` / `dt_valid_to` pairs.
+* **Snapshot** : A representation of data as it existed at a specific, frozen point in time.
+* **Current State** : The latest version of the data; for this schema, the row flagged as the current validity window for each person and legislation.
+* **SCD (Slowly Changing Dimension)** : A design pattern for storing both current and historical attribute values over time. Both tables in this schema use SCD Type 2 (validity windows).
+* **BIM** : Black, Indigenous, and Mixed-race. Inclusion signal under Brazilian legislation.
+* **URG** : Underrepresented Group. Composite signal combining race, gender, sexual orientation, and disability inclusion.
+* **LGBT+** : Inclusion signal derived from gender identity and sexual orientation.
+* **PwD** : Person with a Disability. Distinguished here between self-declaration and formal documentation.
 
-Gender identity, sexual orientation, ethnicity, religion, and disability are **sensitive** under LGPD and internal policy. Use only in **approved** People analytics contexts and with the access groups granted for this schema. **DataHub** metadata marks classifications and lineage for governance.
-
-Engineering detail (sources, DAG settings) lives in repository **metadata** and declarations — not required for typical business consumption.
