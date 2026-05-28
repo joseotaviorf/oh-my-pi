@@ -234,3 +234,19 @@ class TestBuildValidationClusterSpec:
             declaration=declaration,
         )
         assert spec is None
+
+    def test_excluded_dag_omits_validation(self):
+        declaration = {
+            "dag": {"name": "reverse_kyc"},
+            "workflow": {
+                "type": "load_access",
+                "layer": "reverse",
+                "load_spark_job": "load_reverse_kyc",
+            },
+            "cluster": {"type": "databricks_13_3_med_general_cluster"},
+        }
+        spec = build_validation_cluster_spec(
+            cluster_args=declaration["cluster"],
+            declaration=declaration,
+        )
+        assert spec is None

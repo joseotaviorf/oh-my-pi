@@ -14,6 +14,10 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.paths import BIETLEJUICE_CONFIG_ROOT
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import BaseSparkContext, SparkTableStorageFormat
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline
 from bietlejuice.services.metastore_services import SparkMetastoreService
@@ -44,6 +48,8 @@ def main() -> None:
         args.table_name,
         args.datalake_bucket,
         json.loads(args.partitions),
+        args.target_database_name,
+        args.target_table_name,
     )
 
 
@@ -67,6 +73,7 @@ def parse_arguments() -> Namespace:
     parser.add_argument("table_name")
     parser.add_argument("execution_date")
     parser.add_argument("partitions")
+    add_validation_target_args(parser)
     args = parser.parse_args()
     logger.info(
         f"env={args.env}, datalake_bucket={args.datalake_bucket}, schema={args.schema}, table_name={args.table_name}, execution_date={args.execution_date}, partitions={args.partitions}"
@@ -150,21 +157,33 @@ def load_table(
     table_name: str,
     datalake_bucket: str,
     partitions: list,
+    target_database_name: str = None,
+    target_table_name: str = None,
 ) -> None:
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
     spark_client = SparkClient()
     spark_metastore_service = SparkMetastoreService(spark_client)
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(write_database_name)
 
     IncrementalTableLoaderPipeline(
-        database_name,
-        table_name.lower(),
-        database_location,
+        write_database_name,
+        write_table_name.lower(),
+        write_location,
         LayerEnum.RAW,
         None,
         partitions,

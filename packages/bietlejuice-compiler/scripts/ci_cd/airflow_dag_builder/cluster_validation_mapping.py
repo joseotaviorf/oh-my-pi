@@ -39,6 +39,10 @@ PHASE2_WORKFLOWS = frozenset(
 )
 SKIP_CLUSTER_PREFIXES = ("emr_",)
 
+# DAGs opted out of generated validation.cluster (e.g. custom Spark jobs without
+# cluster_validation write support yet).
+CLUSTER_VALIDATION_EXCLUDED_DAGS = frozenset({"reverse_kyc"})
+
 INSTANCE_SUFFIX_TO_TIER = {
     "large": "xs",
     "xlarge": "s",
@@ -101,6 +105,9 @@ def _has_load_spark_job(declaration: dict) -> bool:
 
 def validation_eligibility_label(declaration: dict) -> Optional[str]:
     """Return eligibility label or None if validation block should be omitted."""
+    dag_name = (declaration.get("dag") or {}).get("name")
+    if dag_name in CLUSTER_VALIDATION_EXCLUDED_DAGS:
+        return None
     cluster_type = (declaration.get("cluster") or {}).get("type", "")
     if cluster_type.startswith(SKIP_CLUSTER_PREFIXES):
         return None

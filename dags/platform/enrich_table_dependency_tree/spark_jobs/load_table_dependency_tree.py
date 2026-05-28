@@ -14,6 +14,10 @@ from pyspark.sql.types import (
 
 from bietlejuice.base.db.datalake_metastore_service import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseSparkContext
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.loaders.delta_loader import DeltaLoader
 
 
@@ -39,6 +43,8 @@ def main() -> None:
         args.schema,
         args.table_name,
         json.loads(args.partitions),
+        args.target_database_name,
+        args.target_table_name,
     )
 
 
@@ -59,6 +65,7 @@ def parse_args() -> argparse.Namespace:
         type=str,
         help="Full name of the table that contains the dependencies between bietlejuice tables",
     )
+    add_validation_target_args(parser)
     return parser.parse_args()
 
 
@@ -193,15 +200,28 @@ def load_table(
     schema: str,
     table_name: str,
     partitions: list[str],
+    target_database_name: str = None,
+    target_table_name: str = None,
 ) -> None:
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
     database_name = db_info["db_enrich_databricks"]
     database_location = db_info["db_enrich_path"]
 
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
+
     loader = DeltaLoader()
     loader.load_table(
-        table_name=f"{database_name}.{table_name}",
-        path=f"{database_location}/{table_name}",
+        table_name=f"{write_database_name}.{write_table_name}",
+        path=f"{write_location}/{write_table_name}",
         source_df=dataframe,
         partition_by=partitions,
     )

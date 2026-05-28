@@ -7,6 +7,10 @@ from pyspark.sql import DataFrame
 from pyspark.sql.types import StringType, StructField, StructType
 
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -33,6 +37,8 @@ def main() -> None:
         datalake_bucket=args.datalake_bucket,
         table_name=args.table_name,
         partition_by=json.loads(args.partitions),
+        target_database_name=args.target_database_name,
+        target_table_name=args.target_table_name,
     )
 
 
@@ -54,6 +60,7 @@ def parse_args() -> Namespace:
     )
     parser.add_argument("table_name", type=str, help="table name that will be created")
     parser.add_argument("partitions", help="list with partition cols")
+    add_validation_target_args(parser)
 
     return parser.parse_args()
 
@@ -97,15 +104,26 @@ def load_df(
     datalake_bucket: str,
     table_name: str,
     partition_by: list[str],
+    target_database_name: str = None,
+    target_table_name: str = None,
 ) -> None:
     database_name, database_location, _ = DatalakeMetastoreService.get_layer_info(
         env, database_base_name, datalake_bucket, "enrich"
     )
-    s3_path = database_location + table_name
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
     loader = DeltaLoader(spark)
     loader.load_table(
-        table_name=f"{database_name}.{table_name}",
-        path=s3_path,
+        table_name=f"{write_database_name}.{write_table_name}",
+        path=f"{write_location}{write_table_name}",
         source_df=groups_df,
         partition_by=partition_by,
     )

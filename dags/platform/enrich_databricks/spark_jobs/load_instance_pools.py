@@ -9,6 +9,10 @@ from pyspark.sql.functions import current_timestamp, lit
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -40,6 +44,8 @@ def main() -> None:
         args.bucket,
         args.database_base_name,
         args.table_name,
+        args.target_database_name,
+        args.target_table_name,
     )
 
 
@@ -58,6 +64,7 @@ def parse_args() -> argparse.Namespace:
         help="base name for database, e.g. 'source' for raw/clean layer and 'source' and/or 'context' for enrich layer",
     )
     parser.add_argument("table_name", type=str, help="table name that will be created")
+    add_validation_target_args(parser)
     return parser.parse_args()
 
 
@@ -131,6 +138,8 @@ def load_table(
     datalake_bucket: str,
     schema: str,
     table_name: str,
+    target_database_name: str = None,
+    target_table_name: str = None,
 ) -> None:
     logger.info("m=load_table,msg='loading table'")
 
@@ -138,10 +147,21 @@ def load_table(
     database_name = db_info["db_enrich_databricks"]
     database_location = db_info["db_enrich_path"]
 
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
+
     loader = DeltaLoader(spark)
     loader.load_table(
-        table_name=f"{database_name}.{table_name}",
-        path=f"{database_location}/{table_name}",
+        table_name=f"{write_database_name}.{write_table_name}",
+        path=f"{write_location}/{write_table_name}",
         source_df=dataframe,
     )
 
