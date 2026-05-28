@@ -185,13 +185,19 @@ billing_dates AS (
 ),
 deduplicate_pipeline_dates AS (
   SELECT *
-  FROM pipeline_dates
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY dt_month ORDER BY invoices DESC) = 1
+  FROM (
+    SELECT *, ROW_NUMBER() OVER (PARTITION BY dt_month ORDER BY invoices DESC) AS _rn
+    FROM pipeline_dates
+  )
+  WHERE _rn = 1
 ),
 deduplicate_billing_dates AS (
   SELECT *
-  FROM billing_dates
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY dt_month ORDER BY invoices DESC) = 1
+  FROM (
+    SELECT *, ROW_NUMBER() OVER (PARTITION BY dt_month ORDER BY invoices DESC) AS _rn
+    FROM billing_dates
+  )
+  WHERE _rn = 1
 ),
 get_dates_billing as (
     SELECT /*+ RANGE_JOIN(d, 1) */
@@ -460,12 +466,20 @@ evictions_timeline AS (
     SELECT
         id_contract,
         id_process,
-        TRUE AS is_evictions,
+        is_evictions,
         dt_reference
-    FROM
-        status_timeline_evic
-    WHERE status_time IN ('EVEX', 'EVPD')
-    QUALIFY ROW_NUMBER() OVER (PARTITION BY id_contract, dt_reference ORDER BY id_process) = 1
+    FROM (
+        SELECT
+            id_contract,
+            id_process,
+            TRUE AS is_evictions,
+            dt_reference,
+            ROW_NUMBER() OVER (PARTITION BY id_contract, dt_reference ORDER BY id_process) AS _rn
+        FROM
+            status_timeline_evic
+        WHERE status_time IN ('EVEX', 'EVPD')
+    )
+    WHERE _rn = 1
 ),
 base_negotiations AS (
     SELECT
@@ -549,35 +563,52 @@ negotiations AS (
 ),
 contract_static_info AS (
     SELECT
-        dpdc.sk_contract,
-        COALESCE(dpdc.rent, 0) AS rent,
-        COALESCE(dpdc.condo, 0) AS condo,
-        COALESCE(dpdc.iptu, 0) AS iptu,
-        COALESCE(dpdc.rent, 0) + COALESCE(dpdc.condo, 0) + COALESCE(dpdc.iptu, 0) AS package_amount,
-        CASE
-            WHEN upper(dpdc.guarantee) = 'SEGUROFAIRFAX' THEN 'FAIRFAX'
-            WHEN upper(dpdc.guarantee) = 'PRO_GUARANTOR' THEN 'PRO_GUARANTOR'
-            WHEN upper(dpdc.guarantee) = 'RENTALGUARANTEE' THEN 'RENTAL_GUARANTEE'
-            WHEN upper(dpdc.guarantee) = 'RENTALDEPOSIT' OR dpdc.guarantee = 'DEPOSITO' THEN 'RENTAL_DEPOSIT'
-            WHEN upper(dpdc.guarantee) IN ('STANDALONE', 'THIRDPARTYGUARANTEE') THEN 'BROKERAGE_ONLY'
-        ELSE 'OTHERS' END AS contract_guarantee
-    FROM
-        dw_rent.dim_contract AS dpdc
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY dpdc.sk_contract ORDER BY dpdc.ts_updated DESC) = 1
+        sk_contract,
+        rent,
+        condo,
+        iptu,
+        package_amount,
+        contract_guarantee
+    FROM (
+        SELECT
+            dpdc.sk_contract,
+            COALESCE(dpdc.rent, 0) AS rent,
+            COALESCE(dpdc.condo, 0) AS condo,
+            COALESCE(dpdc.iptu, 0) AS iptu,
+            COALESCE(dpdc.rent, 0) + COALESCE(dpdc.condo, 0) + COALESCE(dpdc.iptu, 0) AS package_amount,
+            CASE
+                WHEN upper(dpdc.guarantee) = 'SEGUROFAIRFAX' THEN 'FAIRFAX'
+                WHEN upper(dpdc.guarantee) = 'PRO_GUARANTOR' THEN 'PRO_GUARANTOR'
+                WHEN upper(dpdc.guarantee) = 'RENTALGUARANTEE' THEN 'RENTAL_GUARANTEE'
+                WHEN upper(dpdc.guarantee) = 'RENTALDEPOSIT' OR dpdc.guarantee = 'DEPOSITO' THEN 'RENTAL_DEPOSIT'
+                WHEN upper(dpdc.guarantee) IN ('STANDALONE', 'THIRDPARTYGUARANTEE') THEN 'BROKERAGE_ONLY'
+            ELSE 'OTHERS' END AS contract_guarantee,
+            ROW_NUMBER() OVER(PARTITION BY dpdc.sk_contract ORDER BY dpdc.ts_updated DESC) AS _rn
+        FROM
+            dw_rent.dim_contract AS dpdc
+    )
+    WHERE _rn = 1
 ),
 contract_info AS (
     SELECT
-        c.sk_contract,
-        ROUND(SUM(p.monthly_income), 2) AS monthly_income
-    FROM
-        dw_rent.dim_contract c
-    LEFT JOIN dw_rent.fact_listing_rent_flows f
-        ON c.sk_contract = f.sk_contract
-        AND f.sk_contract <> -1
-    LEFT JOIN datalake_sorting_hat_clean.proponent p
-        ON p.id_proposal = f.sk_proposal
-    GROUP BY c.sk_contract, f.sk_proposal, f.sk_proposal_approved_date, c.ts_canceled, c.guarantee
-    QUALIFY ROW_NUMBER() OVER(PARTITION BY c.sk_contract ORDER BY f.sk_proposal DESC) = 1
+        sk_contract,
+        monthly_income
+    FROM (
+        SELECT
+            c.sk_contract,
+            ROUND(SUM(p.monthly_income), 2) AS monthly_income,
+            ROW_NUMBER() OVER(PARTITION BY c.sk_contract ORDER BY f.sk_proposal DESC) AS _rn,
+            f.sk_proposal AS _sk_proposal
+        FROM
+            dw_rent.dim_contract c
+        LEFT JOIN dw_rent.fact_listing_rent_flows f
+            ON c.sk_contract = f.sk_contract
+            AND f.sk_contract <> -1
+        LEFT JOIN datalake_sorting_hat_clean.proponent p
+            ON p.id_proposal = f.sk_proposal
+        GROUP BY c.sk_contract, f.sk_proposal, f.sk_proposal_approved_date, c.ts_canceled, c.guarantee
+    )
+    WHERE _rn = 1
 ),
 contract_enhanced AS (
     SELECT /*+ RANGE_JOIN(e, 1), RANGE_JOIN(be, 1), RANGE_JOIN(app, 1), RANGE_JOIN(bl, 1), RANGE_JOIN(d, 1) */
@@ -657,8 +688,8 @@ SELECT
     CAST(has_negotiation_in_contract AS BOOLEAN) AS has_negotiation_in_contract,
     CAST(sum_monthly_overdue_days_paid_t1 AS BIGINT) AS sum_monthly_overdue_days_paid_t1,
     CAST(count_monthly_overdue_invoices_paid_t1 AS BIGINT) AS count_monthly_overdue_invoices_paid_t1,
-    CASE WHEN reference_contract_status = 'Finalizado' THEN CAST(DATEDIFF(DAY, dt_contract_end, DATE(dt_reference)) AS BIGINT) ELSE NULL END AS days_since_ending,
-    CAST(DATEDIFF(DAY, dt_contract_start, DATE(dt_reference)) AS BIGINT) AS days_since_contract_start,
+    CASE WHEN reference_contract_status = 'Finalizado' THEN CAST(DATEDIFF(DATE(dt_reference), dt_contract_end) AS BIGINT) ELSE NULL END AS days_since_ending,
+    CAST(DATEDIFF(DATE(dt_reference), dt_contract_start) AS BIGINT) AS days_since_contract_start,
     CAST(n_reparos_invoices AS BIGINT) AS n_reparos_invoices,
     CAST(n_condominio_invoices AS BIGINT) AS n_condominio_invoices,
     CAST(n_condominio_open_invoices AS BIGINT) AS n_condominio_open_invoices,
