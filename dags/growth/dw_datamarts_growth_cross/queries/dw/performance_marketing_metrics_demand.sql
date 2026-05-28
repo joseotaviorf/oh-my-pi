@@ -193,10 +193,10 @@ target_sheets AS (
         NULLIF(str.mkt_medium, '') AS mkt_medium,
         NULLIF(str.mkt_source, '') AS mkt_source,
         CAST(NULL AS FLOAT) AS rent_flows_target,
-        NULLIF(str.new_rent_flows_target, '')::FLOAT AS new_rent_flows_target,
-        NULLIF(str.new_tenant_prospects_target, '')::FLOAT AS new_tenant_prospects_target,
+        CAST(NULLIF(str.new_rent_flows_target, '') AS FLOAT) AS new_rent_flows_target,
+        CAST(NULLIF(str.new_tenant_prospects_target, '') AS FLOAT) AS new_tenant_prospects_target,
         CAST(NULL AS FLOAT) AS recovered_tenant_prospects_target,
-        NULLIF(str.budget, '')::FLOAT AS budget
+        CAST(NULLIF(str.budget, '') AS FLOAT) AS budget
     FROM
         datalake_gsheets_clean.demand_targets_replanning AS str
     WHERE
@@ -224,7 +224,7 @@ target_sheets AS (
     UNION ALL
 
     SELECT
-        NULLIF(dt_target, '')::DATE AS dt_event,
+        CAST(NULLIF(dt_target, '') AS DATE) AS dt_event,
         city_group,
         'Tenants PWA' AS mkt_origin,
         CASE
@@ -246,13 +246,13 @@ target_sheets AS (
     UNION ALL
 
     SELECT
-        NULLIF(date, '')::DATE AS dt_event,
+        CAST(NULLIF(date, '') AS DATE) AS dt_event,
         city_group,
         'Tenants PWA' AS mkt_origin,
         CAST(NULL AS STRING) AS mkt_channel,
         CAST(NULL AS STRING) AS mkt_medium,
         CAST(NULL AS STRING) AS mkt_source,
-        NULLIF(rf_target, '')::FLOAT AS rent_flows_target,
+        CAST(NULLIF(rf_target, '') AS FLOAT) AS rent_flows_target,
         CAST(NULL AS FLOAT) AS new_rent_flows_target,
         CAST(NULL AS FLOAT) AS new_tenant_prospects_target,
         CAST(NULL AS FLOAT) AS recovered_tenant_prospects_target,

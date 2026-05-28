@@ -2,7 +2,7 @@
 database_name: dw_datamarts
 table_name: plaquinhas_houses
 owner: "@data-growth"
-domain: Data Growth
+domain: Growth
 description: Measures plaquinhas installs performance. It is divided in two information segments. New Installs and Cover.
 columns:
   id_house:
@@ -14,17 +14,6 @@ columns:
     description: Cover Session - This column represents the ID associated with a condo within the dataset for Ongoing Listings.
     lineage:
       - datalake_ebdb_clean.house.id_condo_parent
-  id_install:
-    description: New Installs Session - This column represents the identifier of installs in each source used to compute installs. Therefore could be same numbers referening to different installs.
-    lineage:
-      - datalake_gsheets_clean.branding_where_is_plaquinha.id_house
-      - dw_public.dim_photo_job.sk_photo_job
-      - dw_tickets.dim_ticket.custom_fields
-      - datalake_gsheets_clean.plaquinhas_installation_pp_organic.id_ticket
-  photographer_id:
-    description: New Installs Session - This columns represents Photographer ID responsible for installs
-    lineage:
-      - dw_public.dim_photo_job.photographer_id
   dt_ongoing_listing:
     description: Cover Session - Indicates the date of ongoing listing frame
     lineage:
@@ -120,7 +109,7 @@ columns:
     description: Cover & New Installs Session - This column indicates wheater the house needs a maintenance.
     lineage:
       - dw_tickets.dim_ticket.custom_fields
-  is_ready_for_maintenance:
+  not_maintenance_reason:
     description: Cover & New Installs Session - This column indicates the reason why a maintenance didn't happen.
     lineage:
       - dw_tickets.dim_ticket.custom_fields

@@ -70,7 +70,7 @@ listings AS (
     )
     SELECT
         b.year_month,
-        b.sk_user::bigint,
+        CAST(b.sk_user AS BIGINT) AS sk_user,
         dua.is_active,
         dua.type AS affiliate_type,
         COALESCE(clu.cluster,'') AS cluster,
@@ -144,7 +144,7 @@ SELECT
     CASE
         WHEN lwb.total_listings >= lwb.target_boost THEN bonus_boost
         WHEN lwb.total_listings >= lwb.target_base THEN bonus_base
-        ELSE 0::DOUBLE
+        ELSE CAST(0 AS DOUBLE)
     END AS promotional_bonus,
     lwb.total_listings*100 AS commission_listing
 FROM

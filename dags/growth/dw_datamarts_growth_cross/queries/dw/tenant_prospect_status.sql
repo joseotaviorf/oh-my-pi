@@ -7,7 +7,7 @@ tps_contracts AS (
       dc.sk_contract,
       'tenant prospect' AS contract_role,
       DATEADD(SECOND, 86399, CAST(dt_annulment AS TIMESTAMP))  AS ts_annulment, --bring time to 23:59
-      NULL::INT AS cs_order
+      CAST(NULL AS INT) AS cs_order
   FROM
       dw_rent.dim_contract AS dc
       JOIN dw_rent.fact_listing_rent_flows AS flrf
@@ -151,12 +151,12 @@ aux_churn_dates as (
         CASE
           WHEN event_type LIKE 'contract signed%' THEN ts_event
           WHEN event_type = 'contract ended' AND last_event LIKE 'contract signed%' THEN ts_event
-          WHEN event_type = 'rent_flow' AND DATEDIFF(DAY, ts_event, COALESCE(ts_next_event, CURRENT_DATE)) > 28 THEN DATEADD(DAY, 28, ts_event) END AS ts_churn,
+          WHEN event_type = 'rent_flow' AND DATEDIFF(COALESCE(ts_next_event, CURRENT_DATE), ts_event) > 28 THEN DATEADD(DAY, 28, ts_event) END AS ts_churn,
         FIRST(
         CASE
           WHEN event_type LIKE 'contract signed%' THEN ts_event
           WHEN event_type = 'contract ended' AND last_event LIKE 'contract signed%' THEN ts_event
-          WHEN event_type = 'rent_flow' AND DATEDIFF(DAY, DATE(ts_event), COALESCE(DATE(ts_next_event), CURRENT_DATE)) > 28 THEN DATEADD(DAY, 28, ts_event)END,true) OVER(PARTITION BY sk_client, city_group ORDER BY ts_event ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING) AS ts_next_churn
+          WHEN event_type = 'rent_flow' AND DATEDIFF(COALESCE(DATE(ts_next_event), CURRENT_DATE), DATE(ts_event)) > 28 THEN DATEADD(DAY, 28, ts_event)END,true) OVER(PARTITION BY sk_client, city_group ORDER BY ts_event ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING) AS ts_next_churn
     FROM
         aux_churn AS cd
 ),
@@ -183,8 +183,8 @@ churned_periods AS (
             WHEN cd.event_type = 'rent_flow'
                 THEN 'Inactivity'
         END AS status_detail,
-        NULL::TIMESTAMP AS ts_ntp,
-        NULL::INT AS activation_order
+        CAST(NULL AS TIMESTAMP) AS ts_ntp,
+        CAST(NULL AS INT) AS activation_order
     FROM
         aux_churn_dates AS cd
     WHERE
@@ -197,7 +197,7 @@ active_periods AS (
         MIN(cd.ts_event) AS ts_start,
         cd.ts_next_churn AS ts_end,
         'ACTIVE' AS status,
-        NULL::string AS status_detail
+        CAST(NULL AS STRING) AS status_detail
          -- Get first activetion by client,
 
     FROM

@@ -58,9 +58,9 @@ WITH events AS (
     UNION ALL
 --
     SELECT
-        tenant_id::INT AS sk_client,
-        tta.sk_house_listing::BIGINT,
-        house_id::INT AS id_house,
+        CAST(tenant_id AS INT) AS sk_client,
+        CAST(tta.sk_house_listing AS BIGINT) AS sk_house_listing,
+        CAST(house_id AS INT) AS id_house,
         fhl.sk_region,
         tta.mkt_origin,
         tta.mkt_channel,
@@ -71,7 +71,7 @@ WITH events AS (
         tta.utm_campaign,
         tta.utm_term,
         tta.utm_content,
-        tta.first_message_ts::timestamp AS ts_event,
+        CAST(tta.first_message_ts AS TIMESTAMP) AS ts_event,
         'Talk to Agent' AS flow_event
     FROM
         datalake_talk_to_agent.talk_to_agent AS tta

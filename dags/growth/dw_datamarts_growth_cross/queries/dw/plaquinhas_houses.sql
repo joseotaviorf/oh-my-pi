@@ -1,4 +1,4 @@
-WITH rent_ongoing_listings AS (
+WITH rent_ongoing_listings_ranked AS (
   ----------------------------
   -- Rent Ongoing Listings --
   ----------------------------
@@ -13,12 +13,14 @@ WITH rent_ongoing_listings AS (
     dr.city_group,
     dr.city_name,
     dr.name AS neighborhood,
-    h.type
+    h.type,
+    f.sk_house_listing,
+    f.ts_status_start
   FROM
     datalake_listing_temp.fact_house_listing_status_house AS f
     JOIN
       dw_public.dim_date AS d
-        ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date, -1) AND COALESCE(DATE_FORMAT(TO_DATE(NULLIF(sk_status_end_date, -1) :: STRING,'yyyyMMdd') - INTERVAL '1' day,'yyyyMMdd') :: BIGINT, DATE_FORMAT(CURRENT_DATE - INTERVAL '1' day, 'yyyyMMdd')) :: BIGINT
+        ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date, -1) AND COALESCE(CAST(DATE_FORMAT(TO_DATE(CAST(NULLIF(sk_status_end_date, -1) AS STRING), 'yyyyMMdd') - INTERVAL '1' day, 'yyyyMMdd') AS BIGINT), CAST(DATE_FORMAT(CURRENT_DATE - INTERVAL '1' day, 'yyyyMMdd') AS BIGINT))
     LEFT JOIN
       dw_public.dim_region AS dr
         ON f.sk_region = dr.sk_region
@@ -31,9 +33,35 @@ WITH rent_ongoing_listings AS (
       AND date >= CURRENT_DATE - INTERVAL '2' year -- DATE('2023-01-01') -- Month when the campaign started
       AND f.sk_region > 0
       AND dr.country_code = 'BR'
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY f.sk_house_listing, d.date ORDER BY f.ts_status_start DESC NULLS FIRST) = 1
 ),
-sale_ongoing_listings AS (
+rent_ongoing_listings AS (
+  SELECT
+    id_house, dt_ongoing_listing, weekday_name, month_end, business_context,
+    country_code, city_group, city_name, neighborhood, type
+  FROM (
+    SELECT
+      id_house,
+      dt_ongoing_listing,
+      weekday_name,
+      month_end,
+      business_context,
+      country_code,
+      city_group,
+      city_name,
+      neighborhood,
+      type,
+      sk_house_listing,
+      ts_status_start,
+      ROW_NUMBER() OVER(
+        PARTITION BY sk_house_listing, dt_ongoing_listing
+        ORDER BY ts_status_start DESC NULLS FIRST
+      ) AS rn
+    FROM
+      rent_ongoing_listings_ranked
+  )
+  WHERE rn = 1
+),
+sale_ongoing_listings_ranked AS (
   ----------------------------
   -- Sale Ongoing Listings --
   ----------------------------
@@ -47,12 +75,14 @@ sale_ongoing_listings AS (
     dr.city_group,
     dr.city_name,
     dr.name AS neighborhood,
-    h.type
+    h.type,
+    f.sk_sale_listing,
+    f.ts_status_started
   FROM
     dw_sale.fact_listing_status AS f
     JOIN
       dw_public.dim_date AS d
-        ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) AND COALESCE(DATE_FORMAT(TO_DATE(NULLIF(sk_status_end_date, -1)::STRING, 'yyyyMMdd') - INTERVAL '1' day, 'yyyyMMdd')::BIGINT, DATE_FORMAT(CURRENT_DATE - INTERVAL '1' day, 'yyyyMMdd')::BIGINT)
+        ON d.sk_date BETWEEN NULLIF(f.sk_status_start_date,-1) AND COALESCE(CAST(DATE_FORMAT(TO_DATE(CAST(NULLIF(sk_status_end_date, -1) AS STRING), 'yyyyMMdd') - INTERVAL '1' day, 'yyyyMMdd') AS BIGINT), CAST(DATE_FORMAT(CURRENT_DATE - INTERVAL '1' day, 'yyyyMMdd') AS BIGINT))
     LEFT JOIN
       dw_public.dim_region AS dr
         ON f.sk_region = dr.sk_region
@@ -64,7 +94,33 @@ sale_ongoing_listings AS (
     AND date >= CURRENT_DATE - INTERVAL '2' year -- DATE('2023-01-01') -- Month when the campaign started
     AND f.sk_region > 0
     AND dr.country_code = 'BR'
-  QUALIFY ROW_NUMBER() OVER(PARTITION BY f.sk_sale_listing, d.date ORDER BY f.ts_status_started DESC) = 1
+),
+sale_ongoing_listings AS (
+  SELECT
+    id_house, dt_ongoing_listing, weekday_name, month_end, business_context,
+    country_code, city_group, city_name, neighborhood, type
+  FROM (
+    SELECT
+      id_house,
+      dt_ongoing_listing,
+      weekday_name,
+      month_end,
+      business_context,
+      country_code,
+      city_group,
+      city_name,
+      neighborhood,
+      type,
+      sk_sale_listing,
+      ts_status_started,
+      ROW_NUMBER() OVER(
+        PARTITION BY sk_sale_listing, dt_ongoing_listing
+        ORDER BY ts_status_started DESC
+      ) AS rn
+    FROM
+      sale_ongoing_listings_ranked
+  )
+  WHERE rn = 1
 ),
 ol_detalhes AS (
   SELECT
@@ -580,11 +636,61 @@ targets AS (
 -- UNION Cover, New installed and targets --
 --------------------------------------------
 SELECT
-  *
+  dt_ongoing_listing,
+  id_house,
+  id_condo,
+  weekday_name,
+  month_end,
+  business_context,
+  country_code,
+  city_group,
+  city_name,
+  neighborhood,
+  listing_type,
+  placa_unica,
+  imovel_coberto,
+  install_not_allowed,
+  dt_install,
+  agent_install,
+  not_install_reason,
+  first_maintenance,
+  last_maintenance,
+  is_ready_for_maintenance,
+  not_maintenance_reason,
+  total_maintenances,
+  new_installed_plaquinhas_target,
+  active_plaquinhas_target,
+  cover_target,
+  timeframe
 FROM
   cover
 UNION ALL
 SELECT
-  *
+  dt_ongoing_listing,
+  id_house,
+  id_condo,
+  weekday_name,
+  month_end,
+  business_context,
+  country_code,
+  city_group,
+  city_name,
+  neighborhood,
+  listing_type,
+  placa_unica,
+  imovel_coberto,
+  install_not_allowed,
+  dt_install,
+  agent_install,
+  not_install_reason,
+  first_maintenance,
+  last_maintenance,
+  is_ready_for_maintenance,
+  not_maintenance_reason,
+  total_maintenances,
+  new_installed_plaquinhas_target,
+  active_plaquinhas_target,
+  cover_target,
+  timeframe
 FROM
   targets
