@@ -104,11 +104,6 @@ columns:
     - datalake_ebdb_pricing.house_suggestion_changes.suggested_lower_bound_price
     description: >
       The minimum value of the price range suggested by the pricing model.
-  suggested_price:
-    lineage:
-    - datalake_ebdb_pricing.house_suggestion_changes.suggested_price
-    description: >
-      The exact anchor value suggested by the pricing model.
   suggested_upper_bound_price:
     lineage:
     - datalake_ebdb_pricing.house_suggestion_changes.suggested_upper_bound_price

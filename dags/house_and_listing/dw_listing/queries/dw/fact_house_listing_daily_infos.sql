@@ -39,7 +39,6 @@ SELECT
   COALESCE(hldi.offers_sent, 0) AS offers_sent,
   hldi.lower_bound_limit,
   hldi.suggested_lower_bound_price,
-  hldi.suggested_price,
   hldi.suggested_upper_bound_price,
   hldi.upper_bound_limit,
   hldi.suggestion_certainty,

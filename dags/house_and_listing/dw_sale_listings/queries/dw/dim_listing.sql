@@ -21,7 +21,6 @@ SELECT
   hpp.certainty AS predicted_price_certainty,
   hsc.lower_bound_limit,
   hsc.suggested_lower_bound_price,
-  hsc.suggested_price,
   hsc.suggested_upper_bound_price,
   hsc.upper_bound_limit,
   hsc.suggestion_certainty,
