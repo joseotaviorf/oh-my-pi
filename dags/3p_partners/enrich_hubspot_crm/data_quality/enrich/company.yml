@@ -11,3 +11,6 @@ column_level_validations:
       severity_level: Error
     is_unique:
       severity_level: Error
+  cnpj_unique:
+    is_unique:
+      severity_level: Error

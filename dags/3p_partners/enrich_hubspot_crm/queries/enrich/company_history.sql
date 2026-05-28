@@ -105,6 +105,7 @@ SELECT
         OR NULLIF(GET_JSON_OBJECT(properties, '$.country'), '') IN ('Brasil', 'Brazil')
         OR NULLIF(GET_JSON_OBJECT(properties, '$.country'), '') IS NULL THEN NULLIF(REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9]', ''), '')
     END AS cnpj,
+    NULLIF(REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj_unico'), '[^0-9A-Za-z]', ''), '') AS cnpj_unique,
     CASE
         WHEN NULLIF(GET_JSON_OBJECT(properties, '$.country_code'), '') = 'MX' THEN NULLIF(REGEXP_REPLACE(GET_JSON_OBJECT(properties, '$.cnpj'), '[^0-9A-Za-z]', ''), '')
     END AS rfc,

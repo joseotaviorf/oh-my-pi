@@ -260,6 +260,10 @@ columns:
     lineage:
       - datalake_hubspot.company_history.cnpj
     description: CNPJ of the Brasil company, cleaned to have only numbers.
+  cnpj_unique:
+    lineage:
+      - datalake_hubspot.company_history.cnpj_unique
+    description: Unique CNPJ of the company, cleaned to have only numbers and letters. Property configured in HubSpot to be used as a unique identifier for the company, do not accept duplicate values.
   rfc:
     lineage:
       - datalake_hubspot.company_history.rfc

@@ -9,3 +9,6 @@ column_level_validations:
   id_company:
     is_complete:
       severity_level: Error
+  cnpj_unique:
+    is_unique:
+      severity_level: Error

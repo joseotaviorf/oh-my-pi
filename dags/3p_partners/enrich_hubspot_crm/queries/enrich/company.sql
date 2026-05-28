@@ -216,6 +216,7 @@ SELECT
     ch.financing_banks,
     ch.document,
     ch.cnpj,
+    ch.cnpj_unique,
     ch.rfc,
     ch.creci,
     ch.products_of_interest,
