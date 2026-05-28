@@ -22,6 +22,9 @@ from pyspark.sql.types import (
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.governance.anonymization.brazil_rg_heuristics import (
+    apply_brazil_rg_to_nested_cleaned_results,
+)
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -195,20 +198,33 @@ def make_process_partition(recognizer_dict_list):
             )
         )
         for col_result, result, row in zip(col_results, results, rows_list):
+            column_name = row["column_name"]
+            sample_cleaned = [
+                clean_result(r, matched_value)
+                for (r, matched_value) in zip(result.recognizer_results, result.value)
+            ]
+            sample_cleaned = apply_brazil_rg_to_nested_cleaned_results(
+                sample_cleaned,
+                column_name,
+                list(result.value),
+                promote_if_missing=True,
+            )
+            col_cleaned = [
+                clean_result(c, c_matched_value)
+                for (c, c_matched_value) in zip(
+                    col_result.recognizer_results, col_result.value
+                )
+            ]
+            col_cleaned = apply_brazil_rg_to_nested_cleaned_results(
+                col_cleaned,
+                column_name,
+                [column_name],
+                promote_if_missing=True,
+            )
             yield (
                 *row,
-                [
-                    clean_result(r, matched_value)
-                    for (r, matched_value) in zip(
-                        result.recognizer_results, result.value
-                    )
-                ],
-                [
-                    clean_result(c, c_matched_value)
-                    for (c, c_matched_value) in zip(
-                        col_result.recognizer_results, col_result.value
-                    )
-                ],
+                sample_cleaned,
+                col_cleaned,
             )
 
     return process_partition

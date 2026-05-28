@@ -15,15 +15,16 @@ recognizers:
     context:
       - cpf
     supported_entity: "BRAZIL_CPF"
+  # DPLT-967: weak patterns stay below SCORE_THRESHOLD (0.6); final BRAZIL_RG via brazil_rg_heuristics.
   - name: "Brazil RG Recognizer"
     supported_language: "en"
     patterns:
-      - name: "Brazil RG regex (weak)"
+      - name: "Brazil RG regex (legacy candidate)"
         regex: "(^\\d{1,2}).?(\\d{3}).?(\\d{3})-?(\\d{1}|X|x$)"
-        score: 0.85
-      - name: "Brazil RG column name Regex (weak)"
-        regex: "rg|RG|identidade|identidade_.*"
-        score: 0.85
+        score: 0.55
+      - name: "Brazil RG column name Regex (legacy candidate)"
+        regex: "(?:^|_)(rg|identidade|numero_rg|rg_numero)(?:_|$)"
+        score: 0.55
     supported_entity: "BRAZIL_RG"
   - name: "Brazil CNPJ Recognizer"
     supported_language: "en"
@@ -103,6 +104,7 @@ recognizers:
       - Aniversario
       - Birth Date
     supported_entity: "BIRTH_DATE"
+
 skip_list:
   - datalake_amplitude_clean.events
   - datalake_amplitude_events_clean.events
