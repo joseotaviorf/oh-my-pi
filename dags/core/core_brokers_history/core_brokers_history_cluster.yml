@@ -16,4 +16,7 @@ validation:
   cluster:
     type: consolidation_s_general_cluster
     databricks_conn_id: databricks_new
+    access_control_list:
+      group_name: analytics-engineers
+      permission_level: CAN_MANAGE
   allow_custom_spark_job: true

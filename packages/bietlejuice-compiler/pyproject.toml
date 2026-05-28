@@ -48,7 +48,7 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["test"]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 addopts = ["--import-mode=importlib", "--cov=bietlejuice", "--cov-report=term-missing"]
 markers = [
     "unit: unit tests",

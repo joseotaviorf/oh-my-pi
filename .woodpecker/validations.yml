@@ -33,6 +33,25 @@ steps:
         on_empty: false
     depends_on: [setup]
 
+  validate-cluster-validation-files:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    # Resolves consolidation presets from prod_conf.yml (same as validate-dags-dependencies-prod).
+    environment:
+      ENVIRONMENT: prod
+    commands:
+      - make validate-cluster-validation-files
+    when:
+      event: [push, pull_request]
+      path:
+        include:
+          - "dags/**/*_cluster.yml"
+          - "packages/bietlejuice-core/src/bietlejuice/config/prod_conf.yml"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/cluster_validation_mapping.py"
+          - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/extract_cluster_validation_files.py"
+        on_empty: false
+    depends_on: [setup]
+
   validate-dags-up-to-standard:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true

@@ -4,7 +4,9 @@ Opt-in smoke tests on Graviton consolidation cluster presets before changing pro
 
 ## Enable
 
-Add a `validation` block to the DAG declaration or cluster file (presence of `validation.cluster` opts in):
+Add a `validation` block to `{dag}_cluster.yml` (merged into the declaration at compile time). Presence of `validation.cluster` opts the DAG in.
+
+Prod `cluster:` is copied verbatim from the declaration (or kept as-is when already split). Validation is generated from **effective prod topology**, not from prod preset name alone.
 
 ```yaml
 cluster:
@@ -12,8 +14,37 @@ cluster:
 
 validation:
   cluster:
-    type: consolidation_s_general_single_node_cluster
+    type: consolidation_s_general_cluster
+    custom_configurations:
+      num_workers: 3
+      node_type_id: m6g.xlarge
 ```
+
+### How validation presets are chosen
+
+1. Resolve effective prod with `merge_cluster_configuration` (same as runtime `JobClusterEngine`).
+2. Map worker and driver `node_type_id` to Graviton (`m5`/`m5a`/`m-fleet` → `m6g`, `r*` → `r6g`, `c*` → `c6g`; size suffix preserved).
+3. **Single-node alignment:** prod single-node → validation `consolidation_*_single_node_*` only; prod multi-node → multi-node consolidation only (never flip modes).
+4. **Worker-first preset match:** pick a consolidation preset whose default `node_type_id` equals the mapped worker type.
+5. **Homogeneous driver/worker** (same instance size): preset must also match `driver_node_type_id`; overrides are only for non-default fields (`spark_version`, `num_workers`, etc.).
+6. **Heterogeneous driver/worker:** match on worker size only; override `driver_node_type_id` when it differs from the preset default (do not copy worker overrides from driver).
+7. Emit `validation.cluster.custom_configurations` only when effective prod differs from the validation preset defaults.
+
+**Skip validation** when prod is already the sole consolidation preset that matches the topology (e.g. prod `consolidation_m_memory_cluster` with `r6g.2xlarge` worker and driver). The generator omits the `validation:` block entirely.
+
+When validation is emitted, `validation.cluster.type` must still differ from prod `cluster.type` (enforced by `DAGDeclarationValidator`).
+
+### Generator and CI
+
+```bash
+# Regenerate under a subtree (optional SOURCE_REF when cluster: was removed from declarations)
+make extract-cluster-validation-files DAG_PATH=dags/platform/ SOURCE_REF=<pre-split-git-ref>
+
+# CI: fail if on-disk *_cluster.yml differs from generator output
+make validate-cluster-validation-files
+```
+
+Implementation: `packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/extract_cluster_validation_files.py` and `cluster_validation_mapping.py`.
 
 Rules enforced by `DAGDeclarationValidator`:
 

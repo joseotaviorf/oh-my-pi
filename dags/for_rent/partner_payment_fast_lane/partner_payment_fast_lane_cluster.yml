@@ -9,5 +9,7 @@ cluster:
         }}
 validation:
   cluster:
-    type: consolidation_m_general_cluster
+    type: consolidation_s_general_cluster
     databricks_conn_id: databricks_new
+    custom_configurations:
+      num_workers: 3

@@ -760,6 +760,25 @@ validate-dag-declaration-files:
 	@echo ""
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/validate_dag_declaration_files.py -l $(level) $(if $(domain),--domain $(domain),)
 
+DAG_PATH ?= dags/
+.PHONY: extract-cluster-validation-files validate-cluster-validation-files
+## Regenerate *_cluster.yml prod (verbatim) and validation blocks under DAG_PATH (default: dags/).
+## Optional: SOURCE_REF=<git-ref> when cluster: was already removed from declarations.
+extract-cluster-validation-files:
+	@echo ""
+	@echo "Extracting cluster validation files under $(DAG_PATH)"
+	@echo "=========="
+	@echo ""
+	@ENVIRONMENT=prod uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/extract_cluster_validation_files.py $(DAG_PATH) $(if $(SOURCE_REF),--source-ref $(SOURCE_REF),)
+
+## CI check: *_cluster.yml must match generator output (entire dags/ tree by default).
+validate-cluster-validation-files:
+	@echo ""
+	@echo "Validating cluster validation files"
+	@echo "=========="
+	@echo ""
+	@ENVIRONMENT=prod uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/extract_cluster_validation_files.py dags/ --check
+
 ## validates if the DAGs are using our current standards, such as using DAG Builder or CDC.
 validate-dags-up-to-standard:
 	@echo ""

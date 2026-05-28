@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 from typing import Any, Dict, Tuple
 
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -11,7 +12,7 @@ def merge_cluster_configuration(
     cluster_args: Dict[str, Any], config_service: ConfigurationService
 ) -> Dict[str, Any]:
     cluster_type = cluster_args.get("type")
-    cluster_configuration = config_service.get_config(cluster_type)
+    cluster_configuration = copy.deepcopy(config_service.get_config(cluster_type))
     return config_service._deep_update(
         cluster_configuration, cluster_args.get("custom_configurations", {})
     )

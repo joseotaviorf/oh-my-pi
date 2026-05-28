@@ -77,6 +77,8 @@ def matches_core_model_path(file_path: str) -> bool:
     Returns:
         True if the path matches any core model pattern, False otherwise
     """
+    if file_path.endswith("_cluster.yml"):
+        return False
     for pattern in CORE_MODEL_PATHS:
         if file_path.startswith(pattern):
             return True
