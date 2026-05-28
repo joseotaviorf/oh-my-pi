@@ -5,13 +5,12 @@ from time import monotonic
 from typing import Optional
 
 import pyspark.sql.functions as F
-from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql import DataFrame
 from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
-from bietlejuice.base.spark.base_core_model_spark_job import BaseCoreModelSparkJob
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -20,6 +19,8 @@ from bietlejuice.services.metastore_services import SparkMetastoreService
 JOB_NAME = "Hightouch Sync Changelog Trino Load"
 RAW_PARTITION_COLUMNS = ["year", "month", "day"]
 logger = QuintoAndarLogger(JOB_NAME)
+spark_client = SparkClient()
+spark = spark_client.conn
 
 
 def _load_window_timestamps_ms(
@@ -115,7 +116,6 @@ def _add_partitions_from_load_date(df: DataFrame, load_start_date: str) -> DataF
 
 
 def _read_sync_changelog_input(
-    spark: SparkSession,
     base_path: str,
     is_backfill: str,
     load_start_date: str,
@@ -147,17 +147,11 @@ def _read_sync_changelog_input(
 
 
 def _write_to_raw(
-    df: DataFrame,
-    environment: str,
-    source: str,
-    datalake_bucket: str,
-    table_name: str,
+    df: DataFrame, environment: str, source: str, datalake_bucket: str, table_name: str
 ) -> None:
-    spark_client = SparkClient()
-
     if UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         current_catalog = UnityCatalogHelper.get_current_catalog()
-        spark_client.conn.sql(f"USE CATALOG {current_catalog}")
+        spark.sql(f"USE CATALOG {current_catalog}")
 
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
@@ -175,87 +169,57 @@ def _write_to_raw(
     )
 
 
-class HightouchSyncChangelogSparkJob(BaseCoreModelSparkJob):
-    """Ingests Hightouch reverse ETL sync_changelog parquet data from S3 into the raw Delta layer."""
+def parse_arguments():
+    parser = ArgumentParser(description=JOB_NAME)
+    parser.add_argument("environment", help="Target environment")
+    parser.add_argument("datalake_bucket", help="Data lake S3 bucket")
+    parser.add_argument("schema", help="Database schema name")
+    parser.add_argument("source", help="Source name")
+    parser.add_argument("table_name", help="Table name")
+    parser.add_argument("is_backfill", help="Is backfill string toggle")
+    parser.add_argument("load_start_date", help="Load start date")
+    parser.add_argument("load_end_date", help="Load end date")
+    parser.add_argument("extraction_type", help="Extraction type")
+    parser.add_argument("incremental_column", help="Incremental column")
+    parser.add_argument(
+        "input_path", help="S3 path to Hightouch sync_changelog parquet data"
+    )
+    parser.add_argument(
+        "format", help="Input format (unused, kept for interface parity)"
+    )
+    return parser.parse_args()
 
-    def __init__(self):
-        super().__init__(JOB_NAME)
 
-    def parse_args(self):
-        """Parse arguments matching the declaration's extra_spark_job_arguments order."""
-        parser = ArgumentParser(description=self.job_name)
-        parser.add_argument("environment", help="Target environment")
-        parser.add_argument("datalake_bucket", help="Data lake S3 bucket")
-        parser.add_argument("schema", help="Database schema name")
-        parser.add_argument("dag_name", help="DAG / source name")
-        parser.add_argument("table_name", help="Table name")
-        parser.add_argument("is_backfill", help="Backfill toggle (true/false)")
-        parser.add_argument(
-            "load_start_date", help="Load window start date (YYYY-MM-DD)"
-        )
-        parser.add_argument("load_end_date", help="Load window end date (YYYY-MM-DD)")
-        parser.add_argument("extraction_type", help="Extraction type")
-        parser.add_argument(
-            "incremental_column",
-            help="Incremental column (unused, kept for interface parity)",
-        )
-        parser.add_argument(
-            "input_path", help="S3 path to Hightouch sync_changelog parquet data"
-        )
-        parser.add_argument(
-            "format", help="Input format (unused, kept for interface parity)"
-        )
-        return parser.parse_args()
+def main():
+    args = parse_arguments()
+    input_path = args.input_path.format(environment=args.environment)
 
-    def create_sync_changelog_df(
-        self, spark: SparkSession, args
-    ) -> Optional[DataFrame]:
-        """Discover, read, and partition-annotate sync_changelog parquet from S3."""
-        input_path = args.input_path.format(environment=args.environment)
-        return _read_sync_changelog_input(
-            spark=spark,
-            base_path=input_path,
-            is_backfill=args.is_backfill,
-            load_start_date=args.load_start_date,
-            load_end_date=args.load_end_date,
-        )
+    logger.info(
+        f"m=main, environment={args.environment}, datalake_bucket={args.datalake_bucket}, "
+        f"source={args.source}, table_name={args.table_name}, is_backfill={args.is_backfill}, "
+        f"load_start_date={args.load_start_date}, load_end_date={args.load_end_date}, "
+        f"input_path={input_path}, msg=starting spark job"
+    )
 
-    def run_pipeline(self, df: DataFrame, args, spark: SparkSession) -> None:
-        """Write the DataFrame to the raw layer using S3Loader."""
-        _write_to_raw(
-            df=df,
-            environment=args.environment,
-            source=args.dag_name,
-            datalake_bucket=args.datalake_bucket,
-            table_name=args.table_name,
-        )
+    df = _read_sync_changelog_input(
+        base_path=input_path,
+        is_backfill=args.is_backfill,
+        load_start_date=args.load_start_date,
+        load_end_date=args.load_end_date,
+    )
+    if df is None:
+        logger.info("m=main, msg=no sync_changelog data in range, skipping write")
+        return
 
-    def run(self) -> None:
-        """Main execution entry point."""
-        args = self.parse_args()
-        self.initialize_configuration(args.dag_name)
-
-        input_path = args.input_path.format(environment=args.environment)
-        self.logger.info(
-            f"m=run, environment={args.environment}, datalake_bucket={args.datalake_bucket}, "
-            f"dag_name={args.dag_name}, table_name={args.table_name}, "
-            f"is_backfill={args.is_backfill}, load_start_date={args.load_start_date}, "
-            f"load_end_date={args.load_end_date}, input_path={input_path}, "
-            "msg=starting spark job"
-        )
-
-        spark = self.initialize_spark_session()
-
-        df = self.create_sync_changelog_df(spark, args)
-        if df is None:
-            self.logger.info(
-                "m=run, msg=no sync_changelog data in range, skipping write"
-            )
-            return
-
-        self.run_pipeline(df, args, spark)
-        self.logger.info("m=run, msg=spark job finished")
+    _write_to_raw(
+        df=df,
+        environment=args.environment,
+        source=args.source,
+        datalake_bucket=args.datalake_bucket,
+        table_name=args.table_name,
+    )
+    logger.info("m=main, msg=spark job finished")
 
 
 if __name__ == "__main__":
-    HightouchSyncChangelogSparkJob().run()
+    main()
