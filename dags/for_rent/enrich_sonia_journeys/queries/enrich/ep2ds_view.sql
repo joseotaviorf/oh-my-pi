@@ -119,7 +119,7 @@ WITH
       ef.ts_documentation_sent,
       ef.documentation_sent,
       COALESCE(ef.has_documentation_canceled, FALSE) = FALSE AS is_active_rent_flow,
-      us_ebdb.email AS user_email,
+      trim(us_ebdb.email) AS user_email,
       REPLACE(us_ebdb.main_phone, '+', '') AS user_phone,
       SPLIT_PART(us_ebdb.name, ' ', 1) AS user_first_name,
       hs.address,
@@ -161,7 +161,7 @@ SELECT
   ef.user_first_name,
   CONCAT_WS(', ', ef.address, CAST(ef.number AS STRING)) AS address_text,
   ABS(CRC32(ENCODE(ef.uuid_user, 'utf-8'))) % 100 AS binning_value,
-  ef.ts_evaluation_positive,
-  ef.ts_documentation_sent
+  date_format(ef.ts_evaluation_positive, 'yyyy-MM-dd HH:mm:ss') AS ts_evaluation_positive,
+  date_format(ef.ts_documentation_sent, 'yyyy-MM-dd HH:mm:ss') AS ts_documentation_sent
 FROM
   enriched_flows AS ef;
