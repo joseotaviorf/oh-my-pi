@@ -15,6 +15,10 @@ custom_cluster:
   aws_attributes:
     ebs_volume_size: 200
     instance_profile_arn: "{{ var.value.instance_profile_secret_arn_vespucio }}"
+  init_scripts:
+    - s3:
+        destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
+        region: "us-east-1"
   spark_conf:
     spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
     spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
