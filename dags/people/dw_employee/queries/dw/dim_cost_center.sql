@@ -1,19 +1,21 @@
 WITH active_department_responsibility AS (
-    SELECT
-        id_department,
-        id_assignment
-    FROM (
-        SELECT
-            id_department,
-            id_assignment,
-            ROW_NUMBER() OVER (PARTITION BY id_department ORDER BY dt_started DESC NULLS LAST, dt_ended DESC NULLS LAST, ts_load DESC, id_assignment DESC) AS _rn
-        FROM
-            datalake_hr_system_clean.areas_of_responsibility
-        WHERE
-            active_status = 'A'
-            AND id_template IS NOT NULL
-    )
-    WHERE _rn = 1
+  SELECT
+    id_department,
+    id_assignment
+  FROM
+    datalake_hr_system_clean.areas_of_responsibility
+  WHERE
+    active_status = 'A'
+    AND id_template IS NOT NULL
+  QUALIFY
+    ROW_NUMBER() OVER (
+      PARTITION BY id_department
+      ORDER BY
+        dt_started DESC NULLS LAST,
+        dt_ended DESC NULLS LAST,
+        ts_load DESC,
+        id_assignment DESC
+    ) = 1
 )
 SELECT
   o.id_organization AS sk_cost_center,

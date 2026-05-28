@@ -1,16 +1,14 @@
 WITH hr_system_workers AS (
-  SELECT id_person, national_identifiers
-  FROM (
-    SELECT
-      id_person,
-      national_identifiers,
-      DENSE_RANK() OVER (
-        PARTITION BY id_person
-        ORDER BY dt_effective
-      ) AS _rn
-    FROM datalake_hr_system_clean.workers
-  )
-  WHERE _rn = 1
+  SELECT
+    id_person,
+    national_identifiers
+  FROM
+    datalake_hr_system_clean.workers
+  QUALIFY DENSE_RANK() OVER (
+      PARTITION BY id_person
+      ORDER BY
+        dt_effective
+    ) = 1
 ),
 national_identifiers_step1 AS (
   SELECT

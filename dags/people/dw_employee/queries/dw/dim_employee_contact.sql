@@ -5,19 +5,14 @@ WITH
       emails,
       addresses,
       phones
-    FROM (
-      SELECT
-        id_person,
-        emails,
-        addresses,
-        phones,
-        DENSE_RANK() OVER (
-          PARTITION BY id_person
-          ORDER BY dt_effective
-        ) AS _rk
-      FROM datalake_hr_system_clean.workers
-    ) ranked
-    WHERE _rk = 1
+    FROM
+      datalake_hr_system_clean.workers
+    QUALIFY 1 = DENSE_RANK() OVER (
+        PARTITION BY
+          id_person
+        ORDER BY
+          dt_effective
+      )
   ),
   emails_step1 AS (
     SELECT
@@ -29,40 +24,28 @@ WITH
   emails AS (
     SELECT
       id_person,
-      id_email_address,
-      email_type,
-      email_address,
-      primary_flag,
-      ts_last_update,
-      row_number
-    FROM (
-      SELECT
-        id_person,
-        emails['EmailAddressId'] AS id_email_address,
-        emails['EmailType'] AS email_type,
-        emails['EmailAddress'] AS email_address,
-        emails['PrimaryFlag'] AS primary_flag,
-        TO_TIMESTAMP(
-          SUBSTR(REPLACE(emails['LastUpdateDate'], 'T', ' '), 0, 19),
-          'yyyy-MM-dd HH:mm:ss'
-        ) AS ts_last_update,
-        ROW_NUMBER() OVER (
-          PARTITION BY id_person, emails['EmailType']
-          ORDER BY emails['LastUpdateDate'] DESC
-        ) AS row_number,
-        MAX(TO_TIMESTAMP(
-          SUBSTR(REPLACE(emails['LastUpdateDate'], 'T', ' '), 0, 19),
-          'yyyy-MM-dd HH:mm:ss'
-        )) OVER (
-          PARTITION BY id_person, emails['EmailType']
-        ) AS _max_ts
-      FROM
-        emails_step1
-      WHERE
-        emails['ToDate'] IS NULL
-        OR emails['ToDate'] = '4712-12-31'
-    ) ranked
-    WHERE ts_last_update = _max_ts
+      emails['EmailAddressId'] AS id_email_address,
+      emails['EmailType'] AS email_type,
+      emails['EmailAddress'] AS email_address,
+      emails['PrimaryFlag'] AS primary_flag,
+      TO_TIMESTAMP(
+        SUBSTR(REPLACE(emails['LastUpdateDate'], 'T', ' '), 0, 19),
+        'yyyy-MM-dd HH:mm:ss'
+      ) AS ts_last_update,
+      ROW_NUMBER() OVER (
+        PARTITION BY id_person, emails ['EmailType']
+        ORDER BY emails ['LastUpdateDate'] DESC
+      ) AS row_number
+    FROM
+      emails_step1
+    WHERE
+      emails['ToDate'] IS NULL
+      OR emails['ToDate'] = '4712-12-31'
+    QUALIFY emails['LastUpdateDate'] = MAX(emails['LastUpdateDate']) OVER (
+        PARTITION BY
+          id_person,
+          emails['EmailType']
+      )
   ),
   addresses_step1 AS (
     SELECT
@@ -74,41 +57,27 @@ WITH
   addresses AS (
     SELECT
       id_person,
-      id_address,
-      addl_address_attribute_3,
-      address_line_1,
-      address_line_2,
-      address_line_3,
-      address_line_4,
-      postal_code,
-      town_or_city,
-      region_2,
-      country,
-      dt_effective_start
-    FROM (
-      SELECT
-        id_person,
-        addresses['AddressId'] AS id_address,
-        addresses['AddlAddressAttribute3'] AS addl_address_attribute_3,
-        addresses['AddressLine1'] AS address_line_1,
-        addresses['AddressLine2'] AS address_line_2,
-        addresses['AddressLine3'] AS address_line_3,
-        addresses['AddressLine4'] AS address_line_4,
-        addresses['PostalCode'] AS postal_code,
-        addresses['TownOrCity'] AS town_or_city,
-        addresses['Region2'] AS region_2,
-        addresses['Country'] AS country,
-        DATE(addresses['EffectiveStartDate']) AS dt_effective_start,
-        ROW_NUMBER() OVER(
-          PARTITION BY id_person
-          ORDER BY
-            addresses['PrimaryFlag'] DESC,
-            DATE(addresses['EffectiveStartDate']) DESC
-        ) AS _rn
-      FROM
-        addresses_step1
-    ) ranked
-    WHERE _rn = 1
+      addresses['AddressId'] AS id_address,
+      addresses['AddlAddressAttribute3'] AS addl_address_attribute_3,
+      addresses['AddressLine1'] AS address_line_1,
+      addresses['AddressLine2'] AS address_line_2,
+      addresses['AddressLine3'] AS address_line_3,
+      addresses['AddressLine4'] AS address_line_4,
+      addresses['PostalCode'] AS postal_code,
+      addresses['TownOrCity'] AS town_or_city,
+      addresses['Region2'] AS region_2,
+      addresses['Country'] AS country,
+      DATE(addresses['EffectiveStartDate']) AS dt_effective_start
+    FROM
+      addresses_step1
+    QUALIFY
+      ROW_NUMBER() OVER(
+        PARTITION BY
+          id_person
+        ORDER BY
+          addresses['PrimaryFlag'] DESC,
+          DATE(addresses['EffectiveStartDate']) DESC
+      ) = 1
   ),
   phones_step1 AS (
     SELECT
