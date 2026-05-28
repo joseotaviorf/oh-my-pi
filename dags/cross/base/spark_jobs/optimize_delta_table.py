@@ -1,3 +1,5 @@
+"""VACUUM/OPTIMIZE Delta tables; optional S3 markers cap maintenance to once per day."""
+
 from argparse import ArgumentParser, Namespace
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
