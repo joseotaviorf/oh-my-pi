@@ -36,13 +36,22 @@ WITH get_all_passport_events AS (
     AND cee.is_credit_passport = TRUE
     AND cee.ts_credit_evaluation_created >= DATE '2025-06-02'
 ),
+get_user_first_touchpoint_ranked AS (
+  SELECT
+    id_user,
+    IF(credit_evaluation_source = 'PRE_OFFER_PASSPORT_FLOW', 'listing', 'offer') AS user_first_touchpoint,
+    ROW_NUMBER() OVER (PARTITION BY id_user ORDER BY ts_credit_evaluation_created ASC) AS rn
+  FROM
+    get_all_passport_events
+),
 get_user_first_touchpoint AS (
   SELECT
     id_user,
-    IF(credit_evaluation_source = 'PRE_OFFER_PASSPORT_FLOW', 'listing', 'offer') AS user_first_touchpoint
+    user_first_touchpoint
   FROM
-    get_all_passport_events
-  QUALIFY ROW_NUMBER() OVER (PARTITION BY id_user ORDER BY ts_credit_evaluation_created ASC) = 1
+    get_user_first_touchpoint_ranked
+  WHERE
+    rn = 1
 ),
 get_all_proposal_events AS (
   SELECT DISTINCT

@@ -137,17 +137,26 @@ get_credit_model_data AS (
       LEFT JOIN get_docs_policy AS dp
         ON cp.id = dp.id
 ),
-credit_analysis_variant as (
+credit_analysis_variant_ranked AS (
   SELECT
     ca.id_proposal,
     ca.category,
-    v.name AS variant_name
+    v.name AS variant_name,
+    ROW_NUMBER() OVER (PARTITION BY ca.id_proposal ORDER BY ca.ts_created DESC) AS rn
   FROM
     datalake_sorting_hat_clean.credit_analysis AS ca
       INNER JOIN datalake_sorting_hat_clean.variant AS v
         ON v.id = ca.id_variant
-  QUALIFY
-    ROW_NUMBER() OVER (PARTITION BY ca.id_proposal ORDER BY ca.ts_created DESC) = 1
+),
+credit_analysis_variant AS (
+  SELECT
+    id_proposal,
+    category,
+    variant_name
+  FROM
+    credit_analysis_variant_ranked
+  WHERE
+    rn = 1
 ),
 get_early_credit as (
   SELECT

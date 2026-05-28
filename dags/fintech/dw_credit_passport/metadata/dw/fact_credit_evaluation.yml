@@ -25,6 +25,10 @@ columns:
     description: ID house of the credit evaluation. This column is null if the scope is CITY, which means that the credit evaluation may be used within a city.
     lineage:
     - datalake_docx_clean.credit_evaluation.id_house
+  sk_city:
+    description: ID city of the credit evaluation. Identifies the city where the credit passport is valid; populated when the evaluation has city scope.
+    lineage:
+    - datalake_docx_clean.credit_evaluation.id_city
   scope:
     description: The scope of the evaluation. It could be HOUSE for the current credit model or CITY (credit passport). All credit evaluations submitted within a passport are valid within a CITY. A credit evaluation submitted after an offer is accepted refers to a proposal and its scope will be HOUSE. Early credit analysis do not have scope.
     lineage:
