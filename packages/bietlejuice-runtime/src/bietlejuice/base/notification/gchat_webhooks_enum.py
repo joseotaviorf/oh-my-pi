@@ -32,7 +32,7 @@ class GchatWebhooksEnum:
         "#alerts-de-airflow-dags": DATA_QUALITY_DEFAULT,
         "#alerts-data-quality": DATA_QUALITY_DEFAULT,
         "#data-alarms": DATA_ALARMS,
-        "#alerts-data-quality-agents": DATA_AGENTS_ALERTS,
+        "#agents-data-alarms": DATA_AGENTS_ALERTS,
         "#alerts_big_agent": BIG_AGENT_ALERTS,
     }
 

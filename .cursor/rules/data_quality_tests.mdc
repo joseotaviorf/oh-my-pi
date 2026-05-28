@@ -45,7 +45,7 @@ Use a keyword that maps to a Google Chat webhook. Common values:
 | Core models | `GCHAT_CORE_MODEL_SCHEMA_VALIDATION` |
 | Default / generic | `#alerts-de-airflow-dags` |
 
-Aliases: `#alerts-de-airflow-dags`, `#alerts-data-quality`, `#data-alarms`, `#alerts-data-quality-agents`, `#alerts_big_agent` are resolved via `GchatWebhooksEnum`. Domain-specific enums (e.g. `PEOPLE_ALERTS`, `FINTECH_INMETRO_ALERTS`) are also supported.
+Aliases: `#alerts-de-airflow-dags`, `#alerts-data-quality`, `#data-alarms`, `#agents-data-alarms`, `#alerts_big_agent` are resolved via `GchatWebhooksEnum`. Domain-specific enums (e.g. `PEOPLE_ALERTS`, `FINTECH_INMETRO_ALERTS`) are also supported.
 
 ## Common Parameters
 
