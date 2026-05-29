@@ -1,5 +1,5 @@
 cluster:
-  type: databricks_16_4_rfleet_instance_cluster
+  type: consolidation_s_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     spark_conf:
@@ -9,8 +9,3 @@ cluster:
       spark.memory.fraction: '0.8'
       spark.memory.storageFraction: '0.3'
       spark.sql.adaptive.skewJoin.enabled: 'true'
-validation:
-  cluster:
-    type: consolidation_s_general_cluster
-    databricks_conn_id: databricks_new
-  allow_custom_spark_job: true
