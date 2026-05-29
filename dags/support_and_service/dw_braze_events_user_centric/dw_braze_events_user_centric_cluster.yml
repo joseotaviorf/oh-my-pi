@@ -1,14 +1,22 @@
 cluster:
-  type: emr_7_12_min_general_2_workers_cluster
+  type: emr_7_12_consolidation_s_memory_cluster
   custom_configurations:
-    driver_node_type_id: m7g.2xlarge
-    node_type_id: m7g.xlarge
+    # Cost-saving spot/OD mix: 1 CORE on-demand + 1 TASK spot (default preset).
+    # driver_node_type_id (m7g.xlarge): EMR master / YARN RM only — not Spark driver JVM.
+    # node_type_id (r7g.2xlarge): CORE/TASK workers — Spark AM (driver) + executors run here.
     spark_conf:
-      spark.dynamicAllocation.minExecutors: "1"
-      spark.dynamicAllocation.maxExecutors: "4"
-      spark.executor.cores: "1"
-      spark.executor.memory: 5g
-      spark.executor.memoryOverhead: 2g
-      spark.driver.memory: 4g
+      # Driver JVM runs on a worker (YARN AM in cluster mode), sized for r7g.2xlarge colocation.
+      spark.driver.memory: 8g
       spark.driver.memoryOverhead: 2g
-      spark.sql.shuffle.partitions: "32"
+      spark.driver.cores: "4"
+      spark.yarn.am.memory: 8g
+      spark.yarn.am.memoryOverhead: 2g
+      spark.yarn.am.cores: "4"
+      # Executors on r7g.2xlarge (8 vCPU / 64 GB each); 2 workers (1 CORE + 1 TASK).
+      # Per-worker worst case (AM + 1 executor): 10g + 24g ≈ 34 GB containers / 8 vCPU — fits 64 GB.
+      spark.executor.memory: 20g
+      spark.executor.memoryOverhead: 4g
+      spark.executor.cores: "4"
+      spark.dynamicAllocation.minExecutors: "1"
+      spark.dynamicAllocation.maxExecutors: "2"
+      spark.sql.shuffle.partitions: "128"
