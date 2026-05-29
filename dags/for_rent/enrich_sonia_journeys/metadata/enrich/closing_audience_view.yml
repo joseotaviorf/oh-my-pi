@@ -37,7 +37,8 @@ columns:
       - datalake_cdp_clean.transactional.event_properties
     description: |
       Person UUID of the signatory parsed from the uuid_person field of the event payload. Nullable when the
-      signatory has no platform account. Null means Gate 1 cannot match; Gate 2 targets exactly this case.
+      signatory has no platform account. Nullability drives contract-level gate evaluation: a contract where
+      every signatory is non-null satisfies Gate 1; a contract with any null satisfies Gate 2.
   address_text:
     lineage:
       - datalake_ebdb_clean.house.address
@@ -84,10 +85,11 @@ columns:
     description: |
       True when the signatory meets any of the three independently-expandable Sonia Closing gates
       (OR logic): Gate 0 (number_of_signatories = 2, independently tunable threshold), Gate 1
-      (uuid_person IS NOT NULL, independently tunable threshold), or Gate 2 (uuid_person IS NULL,
-      independently tunable threshold). Thresholds are constants in the SQL (0-100, 0 = blocked,
-      100 = fully open); raise each independently to expand that audience segment without
-      retroactively changing earlier buckets.
+      (all signatories in the contract are registered, i.e. every uuid_person NOT NULL), or Gate 2
+      (the contract has at least one unregistered signatory, i.e. any uuid_person IS NULL). Gates 1
+      and 2 are evaluated at contract level — every signatory row in the contract inherits the same
+      gate result. Thresholds are constants in the SQL (0-100, 0 = blocked, 100 = fully open);
+      raise each independently to expand that audience segment without retroactively changing earlier buckets.
   n_sent:
     lineage:
       - datalake_cdp_clean.transactional.event_name

@@ -1,9 +1,9 @@
 -- Sonia Closing audience view: one row per contract signatory from per-person contract-sent events.
 -- Source: rent_flow_{tenant,owner}_contract_sent CDP events from 2026-05-01.
--- is_participant encodes two independently-expandable gates (both use the same binning_value):
---   Gate 0: number_of_signatories = 2,    threshold 0-100 (100 = fully open)
---   Gate 1: person_uuid IS NOT NULL,      threshold 0-100 (100 = fully open)
---   Gate 2: person_uuid IS NULL,          threshold 0-100 (100 = fully open)
+-- is_participant encodes three independently-expandable gates (all use the same binning_value):
+--   Gate 0: number_of_signatories = 2,                                        threshold 0-100 (100 = fully open)
+--   Gate 1: all contract signatories registered (every uuid_person NOT NULL),  threshold 0-100 (100 = fully open)
+--   Gate 2: contract has any unregistered signatory (any uuid_person IS NULL), threshold 0-100 (100 = fully open)
 -- PII note: stores contact PII (email, phone, name) as an approved reverse-DAG exception (feeds SFMC).
 WITH
 raw_sent_events AS (
@@ -46,6 +46,16 @@ contract_signatories AS (
   SELECT
     id_contract,
     COUNT(DISTINCT id_contract_person) AS number_of_signatories
+  FROM
+    contract_person_sent_events
+  GROUP BY
+    id_contract
+),
+contract_registration_status AS (
+  SELECT
+    id_contract,
+    SUM(CASE WHEN uuid_person IS NULL THEN 1 ELSE 0 END) = 0 AS all_signatories_registered,
+    SUM(CASE WHEN uuid_person IS NULL THEN 1 ELSE 0 END) > 0 AS has_unregistered_signatory
   FROM
     contract_person_sent_events
   GROUP BY
@@ -94,10 +104,10 @@ SELECT
   (
     -- Gate 0: exactly 2 signatories (main tenant and main owner)
     (sig.number_of_signatories = 2 AND sent.binning_value < 50)
-    -- Gate 1: registered signatories (any quantity)
-    OR (sent.uuid_person IS NOT NULL AND sent.binning_value < 0)
-    -- Gate 2: unregistered signatories (any quantity)
-    OR (sent.uuid_person IS NULL AND sent.binning_value < 0)
+    -- Gate 1: all signatories in this contract are registered
+    OR (crs.all_signatories_registered AND sent.binning_value < 0)
+    -- Gate 2: this contract has at least one unregistered signatory
+    OR (crs.has_unregistered_signatory AND sent.binning_value < 0)
   ) AS is_participant,
   sent.n_sent,
   DATE_FORMAT(sent.ts_first_sent, 'yyyy-MM-dd HH:mm:ss') AS ts_first_sent,
@@ -120,6 +130,9 @@ LEFT JOIN
 LEFT JOIN
   contract_signatories AS sig
     ON sent.id_contract = sig.id_contract
+LEFT JOIN
+  contract_registration_status AS crs
+    ON sent.id_contract = crs.id_contract
 INNER JOIN
   datalake_ebdb_clean.house
     ON sent.id_house = house.id
