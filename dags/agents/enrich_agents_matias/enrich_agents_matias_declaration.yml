@@ -1,0 +1,22 @@
+dag:
+  name: enrich_agents_matias
+  schedule_start_date: 2026, 5, 29
+  schedule_interval: 0 4 * * *
+  owner: Data Agents
+  documentation:
+    dag_purpose: |
+      Enrich Matias product analytics with data from Jaiminho and Chatbot sessions.
+workflow:
+  type: query_delta
+  layer: enrich
+  default_extraction_type: incremental
+  default_partitions: [year, month, day]
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
+  tables_customization:
+    outbound_messages_sessions:
+      merge_on: [id_notification]
+      z_order_by: [ts_notification_sent, id_user]
+cluster:
+  type: emr_7_12_min_memory_3_workers_cluster

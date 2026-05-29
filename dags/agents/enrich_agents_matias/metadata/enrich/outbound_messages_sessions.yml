@@ -1,0 +1,77 @@
+---
+database_name: datalake_agents_matias
+table_name: outbound_messages_sessions
+description: |
+  One row per Jaiminho WhatsApp outbound message sent via the corretores_relacionamento
+  environment, optionally linked to a Dominic broker chatbot session on the same user.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_notification:
+    description: Unique identifier of the Jaiminho notification (merge key).
+    lineage:
+      - datalake_jaiminho_clean.notifications.id
+  id_user:
+    description: Identifier of the user who received the notification.
+    lineage:
+      - datalake_jaiminho_clean.notifications.id_user
+  channel:
+    description: Communication channel of the notification (whatsapp).
+    lineage:
+      - datalake_jaiminho_clean.notifications.channel
+  status:
+    description: Current status of the notification (e.g. pending, sent, delivered, failed).
+    lineage:
+      - datalake_jaiminho_clean.notifications.status
+  template:
+    description: Jaiminho notification template name used for the outbound message body.
+    lineage:
+      - datalake_jaiminho_clean.notifications.template
+  ts_notification_sent:
+    description: Timestamp when the notification was sent (falls back to ts_created when ts_sent is null).
+    lineage:
+      - datalake_jaiminho_clean.notifications.ts_sent
+      - datalake_jaiminho_clean.notifications.ts_created
+  id_sauron_session:
+    description: Sauron session ID when a Dominic session match exists; NULL otherwise.
+    lineage:
+      - datalake_chatbot.sessions.id_sauron_session
+  id_chatbot_session:
+    description: Copilot Service session ID when matched; NULL otherwise.
+    lineage:
+      - datalake_chatbot.sessions.id_session
+  id_langfuse_session:
+    description: Langfuse external session ID when matched; NULL otherwise.
+    lineage:
+      - datalake_chatbot.sessions.id_langfuse_session
+  has_matched_session:
+    description: Whether a Dominic chatbot session was matched within 1 day after the notification was sent.
+    lineage:
+      - datalake_chatbot.sessions.id_sauron_session
+  is_escalated:
+    description: Whether the matched Dominic session was escalated to human support; NULL when unmatched.
+    lineage:
+      - datalake_chatbot.sessions.is_escalated
+  ts_session_created:
+    description: Timestamp when the matched Dominic session was created; NULL when unmatched.
+    lineage:
+      - datalake_chatbot.sessions.ts_created
+  ts_session_updated:
+    description: Timestamp when the matched Dominic session was last updated; NULL when unmatched.
+    lineage:
+      - datalake_chatbot.sessions.ts_updated
+  year:
+    description: Partition year derived from ts_notification_sent.
+    lineage:
+      - datalake_jaiminho_clean.notifications.ts_sent
+      - datalake_jaiminho_clean.notifications.ts_created
+  month:
+    description: Partition month derived from ts_notification_sent.
+    lineage:
+      - datalake_jaiminho_clean.notifications.ts_sent
+      - datalake_jaiminho_clean.notifications.ts_created
+  day:
+    description: Partition day derived from ts_notification_sent.
+    lineage:
+      - datalake_jaiminho_clean.notifications.ts_sent
+      - datalake_jaiminho_clean.notifications.ts_created
