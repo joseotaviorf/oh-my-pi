@@ -1,0 +1,42 @@
+dag:
+  name: evidently_ml_monitor
+  schedule_start_date: 2024, 1, 1
+  schedule_interval: 0 0 * * *
+  catchup: false
+  owner: MLOps
+  documentation:
+    dag_purpose: |
+      Loads Evidently ML monitoring reports from S3 into the datalake raw layer
+      (one row per dt and metric_name partition) and cleans them to one row per
+      run_id with a metric_reports map keyed by metric_name.
+
+workflow:
+  layer: raw
+  type: custom_ingestion
+  load_spark_job: load_evidently_ml_monitor_raw
+  spark_job_arguments:
+    - "{environment}"
+    - "{bucket}"
+    - "{schema}"
+    - "{{ get_date_param(dag_run, data_interval_start | ds, 'date_to_ingest') }}"
+  execution_timeout_hours: 2
+  default_extraction_type: incremental
+  default_partitions: []
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'date_to_ingest') }}"
+    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'date_to_ingest') }}"
+  tables_customization:
+    evidently_ml_monitor:
+      merge_on: [run_id]
+
+cluster:
+  type: consolidation_m_general_single_node_cluster
+  access_control_list:
+    group_name: mlops
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

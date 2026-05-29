@@ -1,0 +1,40 @@
+---
+database_name: datalake_evidently_ml_monitor_clean
+table_name: evidently_ml_monitor
+description: Evidently ML monitoring reports aggregated to one row per run with a metric-name to report JSON map.
+domain: MLOps
+owner: marco.vinha@quintoandar.com.br
+columns:
+  run_id:
+    lineage:
+      - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.run_id
+    description: Unique identifier for the monitoring pipeline run that produced the reports.
+  job_name:
+    lineage:
+      - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.job_name
+    description: Monitoring job name parsed from the source S3 path for the Evidently pipeline run.
+  model_uri:
+    lineage:
+      - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.model_uri
+    description: MLflow model URI of the monitored model (registry path and version).
+  model_registry_path:
+    lineage:
+      - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.model_uri
+    description: Registry path segment parsed from the MLflow model URI when the URI matches the expected pattern.
+  model_version:
+    lineage:
+      - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.model_uri
+    description: Model version segment parsed from the MLflow model URI when the URI matches the expected pattern.
+  execution_context_s3_path:
+    lineage:
+      - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.execution_context_s3_path
+    description: S3 URI of the execution context payload used for the monitoring run.
+  ts_report:
+    lineage:
+      - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.timestamp
+    description: Latest report generation timestamp among all metrics aggregated for the monitoring run.
+  metric_reports:
+    lineage:
+      - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.metric_name
+      - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.json_data
+    description: Map of normalized metric_name keys (lowercase, underscores) to full Evidently report JSON strings per metric.

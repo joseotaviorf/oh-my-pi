@@ -1,0 +1,25 @@
+---
+database_name: datalake_evidently_ml_monitor_raw
+table_name: evidently_ml_monitor
+owner: marco.vinha@quintoandar.com.br
+domain: MLOps
+description: Raw Evidently ML monitoring reports with one row per metric_name partition under each dt folder.
+columns:
+  run_id:
+    description: Unique identifier for the monitoring pipeline run that produced the report.
+  model_uri:
+    description: MLflow model URI of the monitored model (registry path and version).
+  execution_context_s3_path:
+    description: S3 URI of the execution context payload used for the monitoring run.
+  json_data:
+    description: JSON string with the Evidently report structure, metrics, and test outcomes for one metric.
+  html_data:
+    description: HTML rendering of the Evidently monitoring report for the metric evaluation.
+  timestamp:
+    description: Report generation timestamp as stored in the source monitoring export.
+  dt:
+    description: Hive partition date (YYYY-MM-DD) from the source S3 path dt= folder.
+  metric_name:
+    description: Normalized metric name from the source S3 path (URL-decoded, lowercase, spaces as underscores).
+  job_name:
+    description: Monitoring job folder name from the source S3 path under model-monitoring.

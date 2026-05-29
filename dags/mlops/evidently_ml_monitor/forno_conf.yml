@@ -1,0 +1,7 @@
+---
+# format: Spark reader for source files (parquet = recursive *.parquet under each metric folder)
+# Layout: {source_root}/{job}/{model_id}/{version}/dt=YYYY-MM-DD/metric_name=<name>/*.parquet
+# Ingest filters folders whose YYYYMMDD infix matches the DAG execution date (YYYY-MM-DD).
+# Top-level folder "metadata" is skipped.
+source_root_path: s3://quintoml-s3-forno-data-quintoandar-com-br/model-monitoring/
+format: parquet
