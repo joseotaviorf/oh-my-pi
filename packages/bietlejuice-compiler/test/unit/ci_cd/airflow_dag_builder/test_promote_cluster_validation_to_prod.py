@@ -101,6 +101,68 @@ class TestMergePromotedCluster:
         merged = merge_promoted_cluster(prod, validation)
         assert merged["custom_libraries"] == prod["custom_libraries"]
 
+    def test_heterogeneous_driver_only_drops_prod_worker(self):
+        prod = {
+            "type": "custom_cluster",
+            "custom_configurations": {
+                "node_type_id": "m5a.large",
+                "driver_node_type_id": "m5a.xlarge",
+                "num_workers": 1,
+                "spark_version": "13.3.x-scala2.12",
+            },
+        }
+        validation = {
+            "type": "consolidation_xs_general_cluster",
+            "custom_configurations": {
+                "driver_node_type_id": "m6g.xlarge",
+                "num_workers": 1,
+                "spark_version": "13.3.x-scala2.12",
+            },
+        }
+        merged = merge_promoted_cluster(prod, validation)
+        custom = merged["custom_configurations"]
+        assert custom["driver_node_type_id"] == "m6g.xlarge"
+        assert "node_type_id" not in custom
+
+    def test_homogeneous_topology_drops_prod_when_validation_omits(self):
+        prod = {
+            "type": "custom_cluster",
+            "custom_configurations": {
+                "driver_node_type_id": "m7a.xlarge",
+                "node_type_id": "m7a.xlarge",
+                "num_workers": 1,
+            },
+        }
+        validation = {
+            "type": "consolidation_s_general_cluster",
+            "custom_configurations": {"num_workers": 1},
+        }
+        merged = merge_promoted_cluster(prod, validation)
+        custom = merged["custom_configurations"]
+        assert custom["num_workers"] == 1
+        assert "node_type_id" not in custom
+        assert "driver_node_type_id" not in custom
+
+    def test_validation_explicit_topology_preserved(self):
+        prod = {
+            "type": "custom_cluster",
+            "custom_configurations": {
+                "node_type_id": "m5a.large",
+                "driver_node_type_id": "m5a.xlarge",
+            },
+        }
+        validation = {
+            "type": "consolidation_s_general_cluster",
+            "custom_configurations": {
+                "node_type_id": "m6g.xlarge",
+                "driver_node_type_id": "m6g.xlarge",
+            },
+        }
+        merged = merge_promoted_cluster(prod, validation)
+        custom = merged["custom_configurations"]
+        assert custom["node_type_id"] == "m6g.xlarge"
+        assert custom["driver_node_type_id"] == "m6g.xlarge"
+
 
 class TestPromoteClusterFile:
     def test_promotes_and_preserves_spark_conf(self, tmp_path: Path):
@@ -132,3 +194,39 @@ class TestPromoteClusterFile:
         )
 
         assert promote_cluster_file(cluster_path) is False
+
+    def test_promote_preserves_single_line_spark_conf_jinja(self, tmp_path: Path):
+        prod = {
+            "type": "databricks_16_4_med_general_cluster",
+            "databricks_conn_id": "databricks_new",
+            "custom_configurations": {
+                "single_user_name": "{{ var.value.databricks_single_user_name }}",
+                "data_security_mode": "SINGLE_USER",
+                "spark_conf": {
+                    "spark.databricks.sql.initial.catalog.namespace": (
+                        "quintoandar_{{ var.value.environment }}"
+                    ),
+                },
+            },
+        }
+        validation = {
+            "type": "consolidation_s_general_cluster",
+            "databricks_conn_id": "databricks_new",
+            "custom_configurations": {"num_workers": 3},
+        }
+        cluster_path = tmp_path / "enrich_databricks_cluster.yml"
+        cluster_path.write_text(
+            yaml.dump(
+                {"cluster": prod, "validation": {"cluster": validation}},
+                default_flow_style=False,
+                sort_keys=False,
+                width=10_000,
+            ),
+            encoding="utf-8",
+        )
+
+        assert promote_cluster_file(cluster_path) is True
+
+        text = cluster_path.read_text(encoding="utf-8")
+        assert "quintoandar_{{ var.value.environment }}" in text
+        assert "environment\n        }}" not in text

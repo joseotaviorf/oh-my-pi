@@ -20,6 +20,12 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 
+# Preset owns worker/driver when validation custom_configurations omits these keys.
+_TOPOLOGY_KEYS = ("node_type_id", "driver_node_type_id")
+
+# Prevent yaml.dump from folding long spark_conf keys (e.g. Jinja catalog.namespace).
+_YAML_DUMP_WIDTH = 10_000
+
 
 def _deep_merge(base: dict, overlay: dict) -> dict:
     merged = copy.deepcopy(base)
@@ -37,6 +43,9 @@ def merge_promoted_cluster(prod_cluster: dict, validation_cluster: dict) -> dict
     prod_custom = prod_cluster.get("custom_configurations") or {}
     val_custom = merged.get("custom_configurations") or {}
     merged_custom = _deep_merge(prod_custom, val_custom)
+    for key in _TOPOLOGY_KEYS:
+        if key not in val_custom and key in merged_custom:
+            del merged_custom[key]
     if merged_custom:
         merged["custom_configurations"] = merged_custom
     elif "custom_configurations" in merged:
@@ -93,6 +102,7 @@ def promote_cluster_file(cluster_path: Path, *, dry_run: bool = False) -> bool:
         default_flow_style=False,
         sort_keys=False,
         allow_unicode=True,
+        width=_YAML_DUMP_WIDTH,
     )
     if not new_text.endswith("\n"):
         new_text += "\n"
