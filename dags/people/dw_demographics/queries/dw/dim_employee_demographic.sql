@@ -11,66 +11,71 @@ WITH person_keys AS (
       AND NOT im.is_user_test
 ),
 ethnicity_primary AS (
-    SELECT id_person, legislation_code, ethnicity_code
-    FROM (
-        SELECT
+    SELECT
+      id_person,
+      legislation_code,
+      ethnicity_code
+    FROM
+      datalake_pin_core_clean.ethnicity
+    WHERE
+      is_primary
+    QUALIFY
+      ROW_NUMBER() OVER (
+        PARTITION BY
           id_person,
-          legislation_code,
-          ethnicity_code,
-          ROW_NUMBER() OVER (
-            PARTITION BY id_person, legislation_code
-            ORDER BY ts_updated DESC
-          ) AS _rn
-        FROM datalake_pin_core_clean.ethnicity
-        WHERE is_primary
-    )
-    WHERE _rn = 1
+          legislation_code
+        ORDER BY
+          ts_updated DESC
+      ) = 1
 ),
 religion_primary AS (
-    SELECT id_person, legislation_code, religion_code
-    FROM (
-        SELECT
+    SELECT
+      id_person,
+      legislation_code,
+      religion_code
+    FROM
+      datalake_pin_core_clean.religion
+    WHERE
+      is_primary
+    QUALIFY
+      ROW_NUMBER() OVER (
+        PARTITION BY
           id_person,
-          legislation_code,
-          religion_code,
-          ROW_NUMBER() OVER (
-            PARTITION BY id_person, legislation_code
-            ORDER BY ts_updated DESC
-          ) AS _rn
-        FROM datalake_pin_core_clean.religion
-        WHERE is_primary
-    )
-    WHERE _rn = 1
+          legislation_code
+        ORDER BY
+          ts_updated DESC
+      ) = 1
 ),
 lookup_fnd AS (
-    SELECT lookup_code, meaning, lookup_type
-    FROM (
-        SELECT
-          lookup_code,
-          meaning,
+    SELECT
+      lookup_code,
+      meaning,
+      lookup_type
+    FROM
+      datalake_pin_core_clean.foundation_lookup_value
+    WHERE
+      lookup_type IN (
+        'PER_ETHNICITY',
+        'ORA_PER_ETHNICITY',
+        'PER_RELIGION',
+        'QA_ORIENTACAO_SEXUAL'
+      )
+      AND language = 'US'
+      AND (
+        lookup_type IN ('PER_ETHNICITY', 'ORA_PER_ETHNICITY')
+        OR (
+          lookup_type IN ('PER_RELIGION', 'QA_ORIENTACAO_SEXUAL')
+          AND is_enabled = TRUE
+        )
+      )
+    QUALIFY
+      ROW_NUMBER() OVER (
+        PARTITION BY
           lookup_type,
-          ROW_NUMBER() OVER (
-            PARTITION BY lookup_type, lookup_code
-            ORDER BY ts_updated DESC
-          ) AS _rn
-        FROM datalake_pin_core_clean.foundation_lookup_value
-        WHERE
-          lookup_type IN (
-            'PER_ETHNICITY',
-            'ORA_PER_ETHNICITY',
-            'PER_RELIGION',
-            'QA_ORIENTACAO_SEXUAL'
-          )
-          AND language = 'US'
-          AND (
-            lookup_type IN ('PER_ETHNICITY', 'ORA_PER_ETHNICITY')
-            OR (
-              lookup_type IN ('PER_RELIGION', 'QA_ORIENTACAO_SEXUAL')
-              AND is_enabled = TRUE
-            )
-          )
-    )
-    WHERE _rn = 1
+          lookup_code
+        ORDER BY
+          ts_updated DESC
+      ) = 1
 ),
 pl_periods AS (
     SELECT

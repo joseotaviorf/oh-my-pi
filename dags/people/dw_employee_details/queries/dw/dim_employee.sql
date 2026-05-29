@@ -1,51 +1,48 @@
 WITH
 employees AS (
     SELECT
-        id_person,
-        person_number,
-        name,
-        work_email,
-        employee_tmf_code
-    FROM (
-        SELECT
-            im.id_person,
-            im.person_number,
-            im.name,
-            im.work_email,
-            im.employee_tmf_code,
-            ROW_NUMBER() OVER (PARTITION BY im.id_person ORDER BY im.assignment_number) AS _rn
-        FROM
-            datalake_people.identifier_mapping AS im
-        WHERE
-            NOT im.is_user_test
-            AND im.assignment_type IN ('C', 'E')
-    )
-    WHERE _rn = 1
+        im.id_person,
+        im.person_number,
+        im.name,
+        im.work_email,
+        im.employee_tmf_code
+    FROM
+        datalake_people.identifier_mapping AS im
+    WHERE
+        NOT im.is_user_test
+        AND im.assignment_type IN ('C', 'E')
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                im.id_person
+            ORDER BY
+                im.assignment_number
+        ) = 1
 ),
 current_education AS (
     SELECT
-        id_person,
-        highest_education_level
-    FROM (
-        SELECT
-            pl.id_person,
-            flv.meaning AS highest_education_level,
-            ROW_NUMBER() OVER (PARTITION BY pl.id_person ORDER BY pl.dt_effective_started DESC) AS _rn
-        FROM
-            datalake_pin_core_clean.people_legislative AS pl
-        LEFT JOIN
-            datalake_pin_core_clean.foundation_lookup_value AS flv
-                ON CAST(pl.highest_education_level AS STRING) = flv.lookup_code
-                AND flv.lookup_type = 'PER_HIGHEST_EDUCATION_LEVEL'
-                AND flv.language = 'US'
-        WHERE
-            pl.legislation_code = 'BR'
-            AND (
-                pl.dt_effective_ended IS NULL
-                OR pl.dt_effective_ended >= CURRENT_DATE()
-            )
-    )
-    WHERE _rn = 1
+        pl.id_person,
+        flv.meaning AS highest_education_level
+    FROM
+        datalake_pin_core_clean.people_legislative AS pl
+    LEFT JOIN
+        datalake_pin_core_clean.foundation_lookup_value AS flv
+        ON CAST(pl.highest_education_level AS STRING) = flv.lookup_code
+        AND flv.lookup_type = 'PER_HIGHEST_EDUCATION_LEVEL'
+        AND flv.language = 'US'
+    WHERE
+        pl.legislation_code = 'BR'
+        AND (
+            pl.dt_effective_ended IS NULL
+            OR pl.dt_effective_ended >= CURRENT_DATE()
+        )
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                pl.id_person
+            ORDER BY
+                pl.dt_effective_started DESC
+        ) = 1
 )
 SELECT
     emp.id_person AS sk_employee,

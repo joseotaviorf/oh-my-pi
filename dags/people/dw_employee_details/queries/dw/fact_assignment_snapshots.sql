@@ -1,45 +1,4 @@
 SELECT
-    sk_cost_center_version,
-    sk_job_version,
-    sk_contact_version,
-    sk_documentation_version,
-    sk_emergency_contact_version,
-    sk_employee,
-    sk_hierarchy_version,
-    sk_business_unit,
-    sk_termination_event_definition,
-    sk_hired_date,
-    sk_terminated_date,
-    sk_reference_date,
-    person_number,
-    assignment_number,
-    employment_status,
-    tenure_range,
-    days_tenure_in_company,
-    months_tenure_in_company,
-    days_tenure_in_assignment,
-    count_direct_report,
-    count_indirect_report,
-    count_total_report,
-    is_member_lt,
-    is_member_et,
-    is_manager,
-    is_active,
-    is_terminated,
-    has_emergency_contact,
-    is_internal_transfer,
-    is_primary_assignment_for_snapshot,
-    is_reorganization_termination,
-    is_monthly_snapshot,
-    is_current,
-    dt_original_hire,
-    dt_hired,
-    dt_terminated,
-    dt_notified,
-    dt_reference,
-    ts_load
-FROM (
-SELECT
     COALESCE(asn.sk_cost_center_version, '-1') AS sk_cost_center_version,
     COALESCE(asn.sk_job_version, '-1') AS sk_job_version,
     COALESCE(ct.sk_contact_version, '-1') AS sk_contact_version,
@@ -78,8 +37,7 @@ SELECT
     asn.dt_terminated,
     asn.dt_notified,
     asn.dt_reference,
-    CURRENT_TIMESTAMP() AS ts_load,
-  ROW_NUMBER() OVER (PARTITION BY asn.assignment_number, asn.dt_reference ORDER BY ct.sk_contact_version NULLS LAST, doc.sk_documentation_version NULLS LAST, ec.sk_emergency_contact_version NULLS LAST) AS _rn
+    CURRENT_TIMESTAMP() AS ts_load
 FROM
     datalake_people.assignment_snapshots AS asn
 LEFT JOIN
@@ -106,5 +64,13 @@ LEFT JOIN
             NULLIF(ec.dt_valid_to, DATE('4712-12-31')),
             DATE('9999-12-31')
         )
-)
-WHERE _rn = 1
+QUALIFY
+    ROW_NUMBER() OVER (
+        PARTITION BY
+            asn.assignment_number,
+            asn.dt_reference
+        ORDER BY
+            ct.sk_contact_version NULLS LAST,
+            doc.sk_documentation_version NULLS LAST,
+            ec.sk_emergency_contact_version NULLS LAST
+    ) = 1
