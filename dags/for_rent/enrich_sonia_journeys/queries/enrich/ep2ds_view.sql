@@ -16,7 +16,7 @@ WITH
         'rent_flow_tenant_credit_positive',
         'rent_flow_tenant_credit_positive_with_guarantee',
         'rent_flow_tenant_documentation_submitted',
-        'rent_flow_tenant_documentation_canceled'
+        'rent_flow_documentation_canceled'
       )
       AND TRY_CAST(cdp_tx.id_user AS BIGINT) IS NOT NULL
       AND cdp_tx.id_person IS NOT NULL
@@ -74,7 +74,7 @@ WITH
       ) AS documentation_sent,
       MAX(
         CASE
-          WHEN rfe.event_name = 'rent_flow_tenant_documentation_canceled' THEN TRUE
+          WHEN rfe.event_name = 'rent_flow_documentation_canceled' THEN TRUE
           ELSE FALSE
         END
       ) AS has_documentation_canceled,
