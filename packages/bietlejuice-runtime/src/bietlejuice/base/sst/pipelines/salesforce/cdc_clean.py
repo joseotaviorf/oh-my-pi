@@ -21,7 +21,6 @@ from bietlejuice.base.sst.core.utils.common import (
     retrieve_spark_session,
     validate_and_write,
 )
-from bietlejuice.base.sst.domains.salesforce.clean.check import check_missing_create
 from bietlejuice.base.sst.domains.salesforce.clean.transform import (
     in_memory_cdc_udpate,
     search_for_latest_record,
@@ -137,18 +136,6 @@ def salesforce_clean_pipeline(cfg):
 
     norm_events_df = normalize_df_columns(event_df)
     all_events_df = search_for_latest_record(spark, norm_events_df, target_table)
-
-    passed = check_missing_create(all_events_df, fail=False)
-    if not passed:
-        # Write only valid event, remove after dev
-        invalid_ids = all_events_df.where(
-            (~F.col("new_record"))
-            & (F.col("event_type") == "HISTORICAL")
-            & (F.col("commit_number").isNull())
-        ).select("id_record")
-        all_events_df = all_events_df.join(
-            F.broadcast(invalid_ids), "id_record", "leftanti"
-        )
 
     ts_load = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     cdc_conformed_df = (

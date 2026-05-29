@@ -12,31 +12,31 @@ logger = QuintoAndarLogger("sst.domains.salesforce.clean.transform")
 
 
 def _latest_row_for_record_id(
-    spark, records_id_df, target_table, sort_col="committed_at"
+    spark, records_id_df, target_table, sort_cols=["committed_at", "sequence_number"]
 ):
     base_ids = records_id_df.select("id_record").dropDuplicates(["id_record"])
     latest = spark.read.table(target_table)
     history = latest.join(F.broadcast(base_ids), "id_record", "right")
-    w = Window.partitionBy("id_record").orderBy(F.col(sort_col).desc_nulls_last())
+
+    order_expr = [F.col(c).desc_nulls_last() for c in sort_cols]
+    w = Window.partitionBy("id_record").orderBy(*order_expr)
+    case_when = F.when(F.col("event_type").isNotNull(), F.lit("HISTORICAL")).otherwise(
+        F.lit("MISSING")
+    )
     return (
         history.withColumn("row", F.row_number().over(w))
-        .withColumn(
-            "event_type", F.lit("HISTORICAL")
-        )  # This will be dropped downstream
+        .withColumn("event_type", case_when)
         .where(F.col("row") == 1)
         .drop("row")
     )
 
 
 @logger(exclude=["df"], exclude_return=True)
-def search_for_latest_record(spark, df, target_table):
+def search_for_latest_record(spark, df, target_table, filter_missing=True):
     has_create = check_for_create_partition(df)
-    missing_create_count = has_create.where(~F.col("has_create")).count()
+    has_missing_create = has_create.where(~F.col("has_create")).limit(1).collect()
     df = df.withColumn("new_record", F.lit(True))
-    if missing_create_count > 0:
-        logger.info(
-            f"m=_search_for_latest_record, msg= Missing create event for {missing_create_count} records"
-        )
+    if has_missing_create:
         logger.info(
             "m=_search_for_latest_record, msg= Looking for latest entry in target table"
         )
@@ -47,14 +47,20 @@ def search_for_latest_record(spark, df, target_table):
             logger.info(
                 "m=_search_for_latest_record, msg= Returning latest entry from target table"
             )
+            if filter_missing:
+                missing_ids = (
+                    latest.where(F.col("event_type") == "MISSING")
+                    .select("id_record")
+                    .distinct()
+                )
+                latest = latest.where(F.col("event_type") != "MISSING")
+                df = df.join(F.broadcast(missing_ids), "id_record", "leftanti")
             return safe_column_union(df, latest)
         else:
             logger.info(
                 "m=_search_for_latest_record, msg= Target table does not exists, failing job"
             )
-            raise ValueError(
-                f"Table {target_table} doesn't exists. {missing_create_count} UPDATES/DELETE rows found even without a previous record"
-            )
+            raise ValueError(f"Table {target_table} doesn't exists.")
     return df
 
 
