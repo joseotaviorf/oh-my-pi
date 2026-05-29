@@ -55,6 +55,41 @@ class TestMapInstanceTypeToGraviton:
         # Assert
         assert result == expected
 
+    def test_nine_and_twelve_xlarge_map_to_xl_tier(self):
+        assert size_tier_from_instance_type("m5a.9xlarge") == "xl"
+        assert size_tier_from_instance_type("m5a.12xlarge") == "xl"
+
+    def test_aberrant_sizes_map_to_valid_graviton_sizes(self):
+        assert map_instance_type_to_graviton("c5d.9xlarge") == "c6g.8xlarge"
+        assert map_instance_type_to_graviton("c5.12xlarge") == "c6g.12xlarge"
+        assert map_instance_type_to_graviton("m5a.12xlarge") == "m6g.12xlarge"
+        assert map_instance_type_to_graviton("r5.12xlarge") == "r6g.12xlarge"
+        assert map_instance_type_to_graviton("m5a.8xlarge") == "m6g.8xlarge"
+
+    def test_photon_maps_to_nvme_graviton_family(self):
+        assert (
+            map_instance_type_to_graviton("m5d.xlarge", use_nvme=True) == "m6gd.xlarge"
+        )
+        assert (
+            map_instance_type_to_graviton("r5d.2xlarge", use_nvme=True)
+            == "r6gd.2xlarge"
+        )
+        assert (
+            map_instance_type_to_graviton("c5a.2xlarge", use_nvme=True)
+            == "c6gd.2xlarge"
+        )
+        assert (
+            map_instance_type_to_graviton("m5d.xlarge", use_nvme=False) == "m6g.xlarge"
+        )
+        assert (
+            map_instance_type_to_graviton("r5d.2xlarge", use_nvme=False)
+            == "r6g.2xlarge"
+        )
+        assert (
+            map_instance_type_to_graviton("c5a.2xlarge", use_nvme=False)
+            == "c6g.2xlarge"
+        )
+
 
 class TestMatchConsolidationPreset:
     @pytest.fixture(scope="class")
@@ -250,3 +285,73 @@ class TestBuildValidationClusterSpec:
             declaration=declaration,
         )
         assert spec is None
+
+    def test_photon_declaration_overrides(self):
+        declaration = {
+            "dag": {"name": "dw_user"},
+            "workflow": {"type": "query_delta", "layer": "dw"},
+            "cluster": {
+                "type": "databricks_16_4_med_general_photon_cluster",
+                "databricks_conn_id": "databricks_new_env",
+            },
+        }
+        spec = build_validation_cluster_spec(
+            cluster_args=declaration["cluster"],
+            declaration=declaration,
+        )
+        assert spec is not None
+        assert spec.cluster_type == "consolidation_s_general_cluster"
+        assert spec.custom_configurations["node_type_id"] == "m6gd.xlarge"
+        assert spec.custom_configurations["driver_node_type_id"] == "m6gd.xlarge"
+        assert spec.custom_configurations["runtime_engine"] == "PHOTON"
+        assert spec.custom_configurations["num_workers"] == 3
+
+    def test_enrich_ebdb_contract_aberrant_compute_worker(self):
+        declaration = {
+            "dag": {"name": "enrich_ebdb_contract"},
+            "workflow": {"type": "query_delta", "layer": "enrich"},
+            "cluster": {
+                "type": "custom_cluster",
+                "custom_configurations": {
+                    "driver_node_type_id": "m5a.2xlarge",
+                    "node_type_id": "c5d.9xlarge",
+                    "num_workers": 2,
+                    "spark_version": "16.4.x-scala2.12",
+                },
+                "databricks_conn_id": "databricks_new_env",
+            },
+        }
+        spec = build_validation_cluster_spec(
+            cluster_args=declaration["cluster"],
+            declaration=declaration,
+        )
+        assert spec is not None
+        assert spec.cluster_type == "consolidation_xl_compute_cluster"
+        assert "node_type_id" not in spec.custom_configurations
+        assert spec.custom_configurations["driver_node_type_id"] == "m6g.2xlarge"
+        assert spec.custom_configurations.get("num_workers", 2) == 2
+
+    def test_enrich_visit_aberrant_compute_worker(self):
+        declaration = {
+            "dag": {"name": "enrich_visit"},
+            "workflow": {"type": "query_delta", "layer": "enrich"},
+            "cluster": {
+                "type": "custom_cluster",
+                "custom_configurations": {
+                    "driver_node_type_id": "r5.2xlarge",
+                    "node_type_id": "c5.12xlarge",
+                    "num_workers": 8,
+                    "spark_version": "16.4.x-scala2.12",
+                },
+                "databricks_conn_id": "databricks_new_env",
+            },
+        }
+        spec = build_validation_cluster_spec(
+            cluster_args=declaration["cluster"],
+            declaration=declaration,
+        )
+        assert spec is not None
+        assert spec.cluster_type == "consolidation_xl_compute_cluster"
+        assert spec.custom_configurations["node_type_id"] == "c6g.12xlarge"
+        assert spec.custom_configurations["driver_node_type_id"] == "r6g.2xlarge"
+        assert spec.custom_configurations["num_workers"] == 8

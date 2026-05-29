@@ -49,9 +49,45 @@ INSTANCE_SUFFIX_TO_TIER = {
     "2xlarge": "m",
     "4xlarge": "l",
     "8xlarge": "xl",
+    "9xlarge": "xl",
+    "12xlarge": "xl",
 }
 
-TIER_TO_SUFFIX = {value: key for key, value in INSTANCE_SUFFIX_TO_TIER.items()}
+# Valid Graviton2 gen-6 sizes (shared by m6g/r6g/c6g and m6gd/r6gd/c6gd).
+GRAVITON_VALID_SUFFIXES = frozenset(
+    {
+        "medium",
+        "large",
+        "xlarge",
+        "2xlarge",
+        "4xlarge",
+        "8xlarge",
+        "12xlarge",
+        "16xlarge",
+        "metal",
+    }
+)
+
+TIER_TO_CONSOLIDATION_GRAVITON_SUFFIX = {
+    "xs": "large",
+    "s": "xlarge",
+    "m": "2xlarge",
+    "l": "4xlarge",
+    "xl": "8xlarge",
+}
+
+GRAVITON_FAMILY_PREFIX = {
+    "general": "m6g",
+    "memory": "r6g",
+    "compute": "c6g",
+}
+
+GRAVITON_NVME_FAMILY_PREFIX = {
+    "general": "m6gd",
+    "memory": "r6gd",
+    "compute": "c6gd",
+}
+
 SIZE_TIER_ORDER = ("xs", "s", "m", "l", "xl")
 
 CONSOLIDATION_PRESET_RE = re.compile(
@@ -64,8 +100,8 @@ CONSOLIDATION_PRESET_NAMES_RE = re.compile(
 )
 
 GENERAL_PREFIXES = ("m-fleet", "m5", "m5a", "m5d", "m6g", "m6i", "m7a", "m7g", "m7i")
-MEMORY_PREFIXES = ("r5", "r5a", "r5d", "r6g", "r7a", "r7g")
-COMPUTE_PREFIXES = ("c5", "c5a", "c5n", "c6g", "c6i")
+MEMORY_PREFIXES = ("r4", "r5", "r5a", "r5d", "r6g", "r6i", "r7a", "r7g", "r7i")
+COMPUTE_PREFIXES = ("c5", "c5a", "c5n", "c6g", "c6i", "c7i")
 
 
 @dataclass(frozen=True)
@@ -149,20 +185,38 @@ def _instance_size_suffix(instance_type: str) -> str:
     return suffix
 
 
-def map_instance_type_to_graviton(instance_type: str) -> str:
+def _graviton_suffix_for_instance_type(instance_type: str) -> str:
+    """Map prod size suffix to a valid Graviton gen-6 size (snap down aberrant sizes)."""
+    prod_suffix = _instance_size_suffix(instance_type)
+    if prod_suffix in GRAVITON_VALID_SUFFIXES:
+        return prod_suffix
+    tier = INSTANCE_SUFFIX_TO_TIER[prod_suffix]
+    return TIER_TO_CONSOLIDATION_GRAVITON_SUFFIX[tier]
+
+
+def _uses_photon(effective_prod: dict, prod_cluster_type: str) -> bool:
+    if str(effective_prod.get("runtime_engine", "")).upper() == "PHOTON":
+        return True
+    return "photon" in prod_cluster_type.lower()
+
+
+def map_instance_type_to_graviton(instance_type: str, *, use_nvme: bool = False) -> str:
     """Map legacy/x86/fleet instance type to Graviton consolidation equivalent."""
     if not instance_type:
         raise ValueError("Empty instance type")
     family = _instance_family(instance_type)
-    size_suffix = _instance_size_suffix(instance_type)
-    graviton_prefix = {"general": "m6g", "memory": "r6g", "compute": "c6g"}[family]
-    return f"{graviton_prefix}.{size_suffix}"
+    graviton_suffix = _graviton_suffix_for_instance_type(instance_type)
+    prefix_map = GRAVITON_NVME_FAMILY_PREFIX if use_nvme else GRAVITON_FAMILY_PREFIX
+    graviton_prefix = prefix_map[family]
+    return f"{graviton_prefix}.{graviton_suffix}"
 
 
-def map_optional_instance_type(instance_type: Optional[str]) -> Optional[str]:
+def map_optional_instance_type(
+    instance_type: Optional[str], *, use_nvme: bool = False
+) -> Optional[str]:
     if not instance_type:
         return None
-    return map_instance_type_to_graviton(str(instance_type))
+    return map_instance_type_to_graviton(str(instance_type), use_nvme=use_nvme)
 
 
 def size_tier_from_instance_type(instance_type: str) -> str:
@@ -229,8 +283,10 @@ def _topology_from_mapped_worker(mapped_worker: str) -> Tuple[str, str]:
 def _mapped_worker_and_driver(
     effective_prod: dict, prod_cluster_type: str
 ) -> Tuple[str, Optional[str]]:
+    use_nvme = _uses_photon(effective_prod, prod_cluster_type)
     mapped_worker = map_instance_type_to_graviton(
-        _infer_logical_instance_type(effective_prod, prod_cluster_type)
+        _infer_logical_instance_type(effective_prod, prod_cluster_type),
+        use_nvme=use_nvme,
     )
     driver_raw = effective_prod.get("driver_node_type_id")
     if not driver_raw and (
@@ -239,7 +295,8 @@ def _mapped_worker_and_driver(
     ):
         driver_raw = _infer_logical_instance_type(effective_prod, prod_cluster_type)
     mapped_driver = map_optional_instance_type(
-        str(driver_raw) if driver_raw is not None else None
+        str(driver_raw) if driver_raw is not None else None,
+        use_nvme=use_nvme,
     )
     return mapped_worker, mapped_driver
 
@@ -488,6 +545,7 @@ def compute_validation_overrides(
     mapped_worker: str,
     mapped_driver: Optional[str],
     validation_resolved: dict,
+    prod_cluster_type: str = "",
 ) -> Dict[str, Any]:
     """Emit only cluster fields where effective prod differs from validation defaults."""
     overrides: Dict[str, Any] = {}
@@ -509,6 +567,11 @@ def compute_validation_overrides(
         overrides["node_type_id"] = mapped_worker
     if mapped_driver and not _values_equal(mapped_driver, preset_driver):
         overrides["driver_node_type_id"] = mapped_driver
+
+    if _uses_photon(effective_prod, prod_cluster_type) and not _values_equal(
+        "PHOTON", validation_resolved.get("runtime_engine")
+    ):
+        overrides["runtime_engine"] = "PHOTON"
 
     return overrides
 
@@ -553,6 +616,7 @@ def build_validation_cluster_spec(
         mapped_worker=mapped_worker,
         mapped_driver=mapped_driver,
         validation_resolved=validation_resolved,
+        prod_cluster_type=prod_cluster_type,
     )
 
     allow_custom_spark_job = _has_load_spark_job(declaration)

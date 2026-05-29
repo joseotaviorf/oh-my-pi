@@ -764,12 +764,13 @@ DAG_PATH ?= dags/
 .PHONY: extract-cluster-validation-files validate-cluster-validation-files
 ## Regenerate *_cluster.yml prod (verbatim) and validation blocks under DAG_PATH (default: dags/).
 ## Optional: SOURCE_REF=<git-ref> when cluster: was already removed from declarations.
+## Optional: STRIP_DECLARATION=1 to move cluster: out of *_declaration.yml into *_cluster.yml.
 extract-cluster-validation-files:
 	@echo ""
 	@echo "Extracting cluster validation files under $(DAG_PATH)"
 	@echo "=========="
 	@echo ""
-	@ENVIRONMENT=prod uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/extract_cluster_validation_files.py $(DAG_PATH) $(if $(SOURCE_REF),--source-ref $(SOURCE_REF),)
+	@ENVIRONMENT=prod uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/ci_cd/airflow_dag_builder/extract_cluster_validation_files.py $(DAG_PATH) $(if $(SOURCE_REF),--source-ref $(SOURCE_REF),) $(if $(STRIP_DECLARATION),--strip-declaration,)
 
 ## CI check: *_cluster.yml must match generator output (entire dags/ tree by default).
 validate-cluster-validation-files:
