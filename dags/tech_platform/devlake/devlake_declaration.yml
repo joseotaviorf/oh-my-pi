@@ -51,7 +51,3 @@ workflow:
       raw_primary_keys: [id]
       clean_table_name: users
       clean_primary_keys: [id_user]
-cluster:
-  type: databricks_16_4_med_general_cluster
-  custom_configurations:
-    driver_node_type_id: m5a.2xlarge

@@ -64,7 +64,7 @@ CONSOLIDATION_PRESET_NAMES_RE = re.compile(
 )
 
 GENERAL_PREFIXES = ("m-fleet", "m5", "m5a", "m5d", "m6g", "m6i", "m7a", "m7g", "m7i")
-MEMORY_PREFIXES = ("r5", "r5a", "r5d", "r6g")
+MEMORY_PREFIXES = ("r5", "r5a", "r5d", "r6g", "r7a", "r7g")
 COMPUTE_PREFIXES = ("c5", "c5a", "c5n", "c6g", "c6i")
 
 
