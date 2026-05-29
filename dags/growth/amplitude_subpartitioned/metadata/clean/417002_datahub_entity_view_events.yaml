@@ -9,19 +9,19 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.id_amplitude
   id_app:
-    description: Id from the origin app
+    description: Amplitude application ID for the DataHub frontend (417002); identifies which product surface emitted the telemetry event.
     lineage:
     - datalake_amplitude_clean.events.id_app
   id_event:
-    description: Event identifier
+    description: Unique Amplitude event instance identifier for this row; distinguishes individual UI interactions within a session.
     lineage:
     - datalake_amplitude_clean.events.id_event
   id_session:
-    description: Session identifier
+    description: Amplitude session ID grouping consecutive user actions in the same browser session before timeout.
     lineage:
     - datalake_amplitude_clean.events.id_session
   id_inserted:
-    description: Inserted identifier
+    description: Amplitude internal insertion identifier used for deduplication and ingestion ordering of exported events.
     lineage:
     - datalake_amplitude_clean.events.id_inserted
   id_user:
@@ -29,15 +29,15 @@ columns:
     lineage:
     - datalake_amplitude_clean.events.id_user
   city:
-    description: Amplitude city
+    description: City inferred by Amplitude geo-IP from the client at event time; may be null when location is unavailable.
     lineage:
     - datalake_amplitude_clean.events.city
   country:
-    description: Amplitude country
+    description: Country inferred by Amplitude geo-IP from the client at event time; ISO-style country name from SDK enrichment.
     lineage:
     - datalake_amplitude_clean.events.country
   event_type:
-    description: Event name
+    description: Amplitude event type name for the DataHub UI interaction (e.g. EntityViewEvent, SearchEvent); defines which product event schema applies.
     lineage:
     - datalake_amplitude_clean.events.event_type
   entity_urn:
