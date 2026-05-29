@@ -1,0 +1,35 @@
+---
+table_name: metric_people.employees_snapshots
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  sk_employee:
+    is_complete:
+      severity_level: Error
+    custom:
+      # Employee-day grain uniqueness after collapse from assignment-level snapshots.
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT sk_employee, dt_reference
+          FROM metric_people.employees_snapshots
+          GROUP BY sk_employee, dt_reference
+          HAVING COUNT(*) > 1
+        )) = 0
+      severity_level: Error
+  dt_reference:
+    is_complete:
+      severity_level: Error
+  person_number:
+    is_complete:
+      severity_level: Error
+  assignment_number:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Warning
