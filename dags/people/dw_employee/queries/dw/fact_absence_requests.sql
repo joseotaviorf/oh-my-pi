@@ -1,4 +1,32 @@
 SELECT
+    sk_absence_request,
+    sk_assignment,
+    sk_absence_type,
+    sk_absence_request_status,
+    sk_revision_date,
+    sk_request_date,
+    sk_notification_date,
+    sk_absence_started_date,
+    sk_absence_ended_date,
+    request_comments,
+    days_requested,
+    days_vacation_cash_out,
+    is_vacation_request,
+    is_approved,
+    is_denied,
+    is_pending,
+    is_withdrawn,
+    is_open_ended,
+    has_requested_vacation_cash_out,
+    has_requested_13th_salary_advance,
+    dt_requested,
+    dt_notificated,
+    dt_absence_started,
+    dt_absence_ended,
+    ts_approved,
+    ts_load
+FROM (
+SELECT
     id_per_absence_entry AS sk_absence_request,
     id_period_of_service AS sk_assignment,
     id_absence_type AS sk_absence_type,
@@ -31,11 +59,9 @@ SELECT
     dt_started AS dt_absence_started,
     dt_ended AS dt_absence_ended,
     ts_approved,
-    NOW() AS ts_load
+    NOW() AS ts_load,
+  ROW_NUMBER() OVER (PARTITION BY id_per_absence_entry ORDER BY object_version_number DESC) AS _rn
 FROM
     datalake_pin_absence_clean.person_entry
-QUALIFY
-    ROW_NUMBER() OVER (
-        PARTITION BY id_per_absence_entry
-        ORDER BY object_version_number DESC
-        ) = 1
+)
+WHERE _rn = 1

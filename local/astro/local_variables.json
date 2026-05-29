@@ -603,6 +603,7 @@
     "instance_profile_arn_wonka": "arn:aws:iam::713278628093:instance-profile/databricks-wonka",
     "instance_profile_secret_arn_cognito_ingestion": "arn:aws:iam::713278628093:instance-profile/databricks-cognito-ingestion",
     "instance_profile_secret_arn_people": "arn:aws:iam::713278628093:instance-profile/databricks-people",
+    "emr_instance_profile_arn_people": "arn:aws:iam::713278628093:instance-profile/emr-people-forno",
     "instance_profile_secret_arn_reverse_listings_report": "arn:aws:iam::713278628093:instance-profile/databricks-reports-service",
     "instance_profile_secret_arn_vespucio": "arn:aws:iam::713278628093:instance-profile/databricks-vespucio",
     "looker_bucket": "looker.s3.forno.data.quintoandar.com.br",

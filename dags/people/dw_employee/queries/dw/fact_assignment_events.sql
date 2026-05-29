@@ -24,8 +24,11 @@ SELECT
   UPPER(md.assignment_name) AS event_value,
   UPPER(md.action_code) AS action_reason,
   NULL AS currency_code
-FROM
-  datalake_pin.movement_details AS md
-QUALIFY
-  LEAD(UPPER(md.assignment_name))
-  OVER (PARTITION BY md.id_period_of_service ORDER BY md.dt_effective_started) <> UPPER(md.assignment_name)
+FROM (
+  SELECT
+    md.*,
+    LEAD(UPPER(md.assignment_name))
+      OVER (PARTITION BY md.id_period_of_service ORDER BY md.dt_effective_started) AS _next_assignment_name
+  FROM datalake_pin.movement_details AS md
+) AS md
+WHERE _next_assignment_name <> UPPER(md.assignment_name)

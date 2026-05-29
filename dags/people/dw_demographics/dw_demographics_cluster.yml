@@ -1,0 +1,22 @@
+cluster:
+  type: emr_7_12_consolidation_xs_memory_cluster
+  custom_configurations:
+    # Cost-saving spot/OD mix: 1 CORE on-demand + 2 TASK spot (~67% spot).
+    # num_workers is the TOTAL (CORE + TASK), so 3 = 1 CORE + 2 TASK.
+    # Master stays ON_DEMAND (m7g.xlarge) per emr_consolidation_base anchor.
+    num_workers: 3
+    num_task_workers: 2
+    aws_attributes:
+      # People EMR instance profile (data account); not Databricks-people (org account).
+      instance_profile_arn: "{{ var.value.emr_instance_profile_arn_people }}"
+    spark_conf:
+      # Driver (m7g.xlarge — 4 vCPU / 16 GB)
+      spark.driver.memory: 4g
+      spark.driver.cores: "2"
+      # Workers are r7g.2xlarge (8 vCPU / 64 GB each); 3 workers (1 CORE + 2 TASK).
+      # 2 execs/worker × 4 cores = 8 cores fully utilized.
+      spark.executor.memory: 12g
+      spark.executor.cores: "4"
+      # Small SCD2 workload; cap at 6 execs total.
+      spark.dynamicAllocation.minExecutors: "1"
+      spark.dynamicAllocation.maxExecutors: "6"
