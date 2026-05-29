@@ -1,0 +1,114 @@
+database_name: datalake_sonia_journeys
+table_name: closing_audience_view
+description: |
+  Enrich view for Sonia closing journey. One row per contract signatory
+  from rent_flow_tenant_contract_sent and rent_flow_owner_contract_sent CDP events
+  (from 2026-05-01 onward). Joins later "signed" and "canceled" related events,
+  together with contact information of `closing_contract_person_view`, besides EBDB
+  house address. Covers all signatories regardless of eligibility; the is_participant
+  flag marks those meeting Sonia entry criteria. Feeds SFMC for follow-up closing communications.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  pk_rent_flow_person:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: |
+      Synthetic primary key concatenating id_rent_flow and id_contract_person,
+      uniquely identifying one signatory row per rent flow per contract person.
+  id_house:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: House identifier parsed from the id_house field of the contract-sent event payload.
+  id_contract:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: Contract identifier parsed from the id_contract field of the contract-sent event payload.
+  id_contract_person:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: Contract person identifier from id_contract_person in the event payload. Join key to closing_contract_person_view.
+  id_rent_flow:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: Rent flow UUID string parsed from the id_rent_flow field of the contract-sent event payload.
+  uuid_person:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: |
+      Person UUID of the signatory parsed from the uuid_person field of the event payload. Nullable when the
+      signatory has no platform account. Null means Gate 1 cannot match; Gate 2 targets exactly this case.
+  address_text:
+    lineage:
+      - datalake_ebdb_clean.house.address
+      - datalake_ebdb_clean.house.number
+    description: House street address and number concatenated as a display string, sourced from EBDB house table.
+  user_role:
+    lineage:
+      - datalake_cdp_clean.transactional.event_name
+    description: Signatory role in the contract. Either tenant or owner, derived from the CDP source event name.
+  user_email:
+    lineage:
+      - datalake_sonia_journeys.closing_contract_person_view.user_email
+    description: |
+      Contact email for the signatory from closing_contract_person_view, which coalesces EBDB
+      contract_person record and CDP event payload (EBDB preferred).
+  user_phone:
+    lineage:
+      - datalake_sonia_journeys.closing_contract_person_view.user_phone
+    description: |
+      Contact phone number for the signatory in digits-only format with 55 country code prepended
+      when fewer than 12 digits. Sourced from closing_contract_person_view.
+  user_first_name:
+    lineage:
+      - datalake_sonia_journeys.closing_contract_person_view.first_name
+    description: First name token of the signatory full name, extracted in closing_contract_person_view.
+  is_canceled:
+    lineage:
+      - datalake_cdp_clean.transactional.event_name
+      - datalake_cdp_clean.transactional.ts_event
+    description: |
+      True when a rent_flow_contract_canceled event exists for the same rent flow.
+      Contract-level cancellation flag applied to all signatories.
+  is_signed:
+    lineage:
+      - datalake_cdp_clean.transactional.event_name
+      - datalake_cdp_clean.transactional.event_properties
+      - datalake_cdp_clean.transactional.ts_event
+    description: |
+      True when the MAX timestamp of rent_flow_tenant_contract_signed or rent_flow_owner_contract_signed
+      events for the same rent flow and contract person is strictly after ts_last_sent.
+  is_participant:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: |
+      True when the signatory meets any of the three independently-expandable Sonia Closing gates
+      (OR logic): Gate 0 (number_of_signatories = 2, independently tunable threshold), Gate 1
+      (uuid_person IS NOT NULL, independently tunable threshold), or Gate 2 (uuid_person IS NULL,
+      independently tunable threshold). Thresholds are constants in the SQL (0-100, 0 = blocked,
+      100 = fully open); raise each independently to expand that audience segment without
+      retroactively changing earlier buckets.
+  n_sent:
+    lineage:
+      - datalake_cdp_clean.transactional.event_name
+    description: Number of contract-sent events fired for this rent flow and contract person. Greater than 1 indicates resends.
+  ts_first_sent:
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+    description: Timestamp of the earliest contract-sent event for this signatory, formatted as yyyy-MM-dd HH:mm:ss.
+  ts_last_sent:
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+    description: Timestamp of the most recent contract-sent event for this signatory, formatted as yyyy-MM-dd HH:mm:ss.
+  ts_canceled:
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+    description: |
+      Timestamp of the rent_flow_contract_canceled event formatted as yyyy-MM-dd HH:mm:ss.
+      Null when no cancellation occurred after ts_sent.
+  ts_signed:
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+    description: |
+      Timestamp of the per-signatory contract-signed event formatted as yyyy-MM-dd HH:mm:ss.
+      Null when this signatory has not yet signed after ts_sent.
