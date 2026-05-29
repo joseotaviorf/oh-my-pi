@@ -108,7 +108,11 @@ def salesforce_raw_pipeline(cfg):
     )
 
     raw_df = read_sf_cdc_json(spark, s3_file_path)
-    raw_df = sf_cdc_mandatory_fields(raw_df).drop_duplicates()
+    raw_df = (
+        sf_cdc_mandatory_fields(raw_df)
+        .drop_duplicates(["id_record", "transaction_key", "sequence_number"])
+        .cache()
+    )
 
     # Quality checks
     # TODO: Transform this into a metric as well
@@ -129,7 +133,6 @@ def salesforce_raw_pipeline(cfg):
         .withColumn("ts_load", F.lit(datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
         .withColumn("partition_date", F.lit(cfg.partition_date))
         .withColumn("partition_hour", F.lit(cfg.partition_hour))
-        .persist()
     )
 
     raw_final_remapped = apply_schema_remaps(
@@ -178,7 +181,7 @@ def salesforce_raw_pipeline(cfg):
             partition_cols=["partition_date", "partition_hour"],
             table_location=f"s3a://{cfg.bucket}/sst_metrics/{_metric}",
         )
-    raw_final.unpersist()
+    raw_df.unpersist()
     logger.info("m=salesforce_raw_pipeline, msg=Pipeline completed")
 
 
