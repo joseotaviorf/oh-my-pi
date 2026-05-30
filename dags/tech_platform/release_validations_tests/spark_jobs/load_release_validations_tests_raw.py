@@ -6,7 +6,12 @@ from dateutil import parser
 from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat, spark
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -29,6 +34,8 @@ def parse_args() -> argparse.Namespace:
     arg_parser.add_argument("table_name", help="Raw table name")
     arg_parser.add_argument("partitions", help="e.g. ['year','month','day']")
     arg_parser.add_argument("execution_date", help="YYYY-MM-DD (data_interval_start)")
+
+    add_validation_target_args(arg_parser)
 
     args = arg_parser.parse_args()
     args.partition_cols = ast.literal_eval(args.partitions)
@@ -97,24 +104,38 @@ def main():
         f"((file_path RLIKE '{pattern_e2e}') OR (file_path RLIKE '{pattern_hermetic}')) AS _matched",
     )
 
-    # Create database if not exists
-    database_name = f"datalake_{args.schema}_raw"
-    spark_client = SparkClient()
-    spark_metastore_service = SparkMetastoreService(spark_client)
-    spark_metastore_service.create_database(database_name)
-    logger.info(
-        f"[EXECUTION LOGGING] -  database={database_name}, msg=database created or already exists"
+    bucket = args.bucket.replace("s3://", "").replace("s3a://", "")
+    db_info = DatalakeMetastoreService.get_db_info(
+        args.environment, args.schema, bucket
+    )
+    database_name = db_info["db_raw_databricks"]
+    database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=args.table_name,
+            prod_location=database_location,
+            bucket=bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
     )
 
-    bucket = args.bucket.replace("s3://", "")
-    raw_path = f"s3://{bucket}/raw/{args.schema}/{args.table_name}/"
+    spark_client = SparkClient()
+    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service.create_database(write_database_name)
+    logger.info(
+        f"[EXECUTION LOGGING] -  database={write_database_name}, msg=database created or already exists"
+    )
+
+    raw_path = f"{write_location.rstrip('/')}/{write_table_name}"
     logger.info(f"[EXECUTION LOGGING] -  raw_path={raw_path}")
 
     s3_loader.load_df(
         df=df_parsed,
         s3_path=raw_path,
         format_options=SparkTableStorageFormat.DEFAULT_RAW,
-        full_table_name=f"{database_name}.{args.table_name}",
+        full_table_name=f"{write_database_name}.{write_table_name}",
     )
 
     logger.info("[EXECUTION LOGGING] -  msg=raw load completed")

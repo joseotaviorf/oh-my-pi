@@ -16,6 +16,11 @@ from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
+from bietlejuice.base.validation.target_resolver import managed_table_fqn
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.jobs.common.helpers import insert_partitions, json_to_dataframe
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -170,6 +175,7 @@ class IruJobArgumentParser:
             default="{}",
             help="Extra details as JSON (endpoint, base_filters, …)",
         )
+        add_validation_target_args(parser)
         return parser
 
     @classmethod
@@ -365,19 +371,29 @@ def _load_to_raw(spark_client: SparkClient, job_args: dict[str, Any], df) -> Non
     )
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=job_args["table_name"],
+            prod_location=database_location,
+            bucket=job_args["datalake_bucket"],
+            target_database=job_args.get("target_database_name"),
+            target_table=job_args.get("target_table_name"),
+        )
+    )
 
     s3_loader = S3Loader()
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(write_database_name)
 
     mode = (
         "overwrite" if str(job_args["extraction_type"]).lower() == "full" else "append"
     )
     s3_loader.load_df(
         df=df,
-        s3_path=f"{database_location}{job_args['table_name']}",
+        s3_path=f"{write_location.rstrip('/')}/{write_table_name}",
         format_options=SparkTableStorageFormat.DEFAULT_RAW,
         partitions=job_args["partition_cols"],
         write_mode=mode,
@@ -385,18 +401,18 @@ def _load_to_raw(spark_client: SparkClient, job_args: dict[str, Any], df) -> Non
 
     spark_metastore_loader.update_metastore(
         df=df,
-        database_name=database_name,
-        table_name=job_args["table_name"],
+        database_name=write_database_name,
+        table_name=write_table_name,
         format_options=SparkTableStorageFormat.DEFAULT_RAW,
-        database_location=database_location,
+        database_location=write_location,
         partitions=job_args["partition_cols"],
         force_recreate=True,
     )
 
     spark_metastore_service.create_new_partitions_from_df(
         df=df,
-        database_name=database_name,
-        table_name=job_args["table_name"],
+        database_name=write_database_name,
+        table_name=write_table_name,
         partition_cols=job_args["partition_cols"],
     )
 
@@ -417,7 +433,12 @@ def _apply_table_privileges(job_args: dict[str, Any], database_name: str) -> Non
         raise
     if not privileges_dict or not UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         return
-    full_table_name = f"{database_name}.{job_args['table_name']}"
+    full_table_name = managed_table_fqn(
+        database_name,
+        job_args["table_name"],
+        target_database=job_args.get("target_database_name"),
+        target_table=job_args.get("target_table_name"),
+    )
     TablePrivileges.from_input_dict(privileges_dict, full_table_name).apply()
     LOGGER.info(
         f"m=_apply_table_privileges, msg=Privileges applied, table={full_table_name}"
