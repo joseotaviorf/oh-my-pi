@@ -681,7 +681,9 @@ integration-tests:
 	@echo "================="
 	@echo ""
 	@uv sync
-	@uv run --directory packages/bietlejuice-core pytest test/integration -W ignore::DeprecationWarning
+	@# --no-cov: unit-tests-python already collects integration coverage in parallel CI;
+	@# sharing .coverage between steps causes intermittent sqlite combine failures.
+	@uv run --directory packages/bietlejuice-core pytest test/integration -W ignore::DeprecationWarning --no-cov
 
 .PHONY: files-validation
 files-validation:

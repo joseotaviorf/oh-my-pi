@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 from argparse import ArgumentParser
@@ -7,8 +9,20 @@ from quintoandar_logger import QuintoAndarLogger
 from requests import RequestException
 from requests.adapters import HTTPAdapter, Retry
 
+from bietlejuice.base.db.reverse_metastore_mapping import ReverseMetastoreMapping
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
+from bietlejuice.base.validation.target_resolver import get_prod_database_name
 from bietlejuice.clients.db_clients import SparkClient
+from bietlejuice.services.configuration_service import ConfigurationService
+
+DAG_NAME = "reverse_integration_cloudzero"
+REVERSE_SCHEMA = "integration_cloudzero"
+REVERSE_TABLE = "contracts_count"
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_contracts_to_cloudzero"
@@ -17,8 +31,32 @@ logging.getLogger("py4j").setLevel(logging.INFO)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
+def _resolve_contracts_table_fqn(
+    datalake_bucket: str,
+    target_database: str | None,
+    target_table: str | None,
+) -> str:
+    reverse_metastore = ReverseMetastoreMapping(
+        bucket=datalake_bucket, source=REVERSE_SCHEMA
+    )
+    prod_database = get_prod_database_name(
+        LayerEnum.REVERSE, REVERSE_SCHEMA, datalake_bucket
+    )
+    read_database, read_table, _ = resolve_datalake_write_target(
+        prod_database=prod_database,
+        prod_table=REVERSE_TABLE,
+        prod_location=reverse_metastore.get_full_database_path(),
+        bucket=datalake_bucket,
+        target_database=target_database,
+        target_table=target_table,
+    )
+    return f"{read_database}.{read_table}"
+
+
 def get_contracts_count_from_trino(
-    spark_client: SparkClient, execution_date: str
+    spark_client: SparkClient,
+    execution_date: str,
+    table_fqn: str,
 ) -> int:
     """
     This function gets the contracts count from the reverse table and returns the total count
@@ -28,9 +66,9 @@ def get_contracts_count_from_trino(
 
     :return: Number of contracts for the given date
     """
-    DEFAULT_QUERY = "SELECT * FROM reverse_integration_cloudzero.contracts_count"
+    query = f"SELECT * FROM {table_fqn}"
 
-    df = spark_client.get_records(DEFAULT_QUERY)
+    df = spark_client.get_records(query)
     rows = df.rdd.map(lambda row: row.asDict()).collect()
 
     if rows:
@@ -108,10 +146,12 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("execution_date", help="Execution date in YYYY-MM-DD format")
+    add_validation_target_args(parser)
 
     args = parser.parse_args()
     environment = args.environment
     execution_date = args.execution_date
+    datalake_bucket = ConfigurationService(DAG_NAME).get_config("datalake_bucket")
 
     logger.info(
         f"m=__main__, environment={environment}, execution_date={execution_date}"
@@ -143,8 +183,16 @@ if __name__ == "__main__":
         # Initialize Spark client
         spark_client = SparkClient()
 
-        # Get contracts count from Trino
-        contracts_count = get_contracts_count_from_trino(spark_client, execution_date)
+        table_fqn = _resolve_contracts_table_fqn(
+            datalake_bucket,
+            args.target_database_name,
+            args.target_table_name,
+        )
+
+        # Get contracts count from the reverse table (prod or validation clone)
+        contracts_count = get_contracts_count_from_trino(
+            spark_client, execution_date, table_fqn
+        )
 
         # Send to CloudZero
         send_to_cloudzero(contracts_count, execution_date, cloudzero_token)

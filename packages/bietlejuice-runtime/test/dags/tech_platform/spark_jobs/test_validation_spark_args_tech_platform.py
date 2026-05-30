@@ -1,6 +1,7 @@
 """Argparse validation-flag smoke tests for tech_platform custom Spark jobs."""
 
 import sys
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
@@ -53,6 +54,9 @@ from dags.tech_platform.opa.spark_jobs.opa_logs_load import (  # noqa: E402
 )
 from dags.tech_platform.release_validations_tests.spark_jobs.load_release_validations_tests_raw import (  # noqa: E402
     parse_args as parse_release_validations_tests_args,
+)
+from dags.tech_platform.zscaler.spark_jobs.load_zscaler_raw import (  # noqa: E402
+    ZscalerJobArgumentParser,
 )
 
 _VALIDATION_DB = "cluster_validation"
@@ -142,6 +146,31 @@ _OPA_POSITIONAL = [
     '["year", "month", "day", "hour"]',
 ]
 
+_ZSCALER_POSITIONAL = [
+    _TEST_ENV,
+    _TEST_BUCKET,
+    "zscaler",
+    "managed_devices",
+    "2024-01-01",
+    '["year", "month", "day"]',
+    "full",
+    "2024-01-01",
+    "2024-01-02",
+    "null",
+    "{}",
+]
+
+_CLOUDZERO_JOB_PATHS = [
+    "dags/tech_platform/reverse_integration_cloudzero/spark_jobs/load_contracts_to_cloudzero.py",
+    "dags/tech_platform/reverse_integration_cloudzero/spark_jobs/load_api_requests_to_cloudzero.py",
+]
+
+_CLOUDZERO_JOBS_WITH_RESOLVE = {
+    "dags/tech_platform/reverse_integration_cloudzero/spark_jobs/load_contracts_to_cloudzero.py",
+}
+
+_REPO_ROOT = Path(__file__).resolve().parents[6]
+
 
 class TestTechPlatformSparkJobValidationArgs:
     @pytest.mark.parametrize(
@@ -171,6 +200,11 @@ class TestTechPlatformSparkJobValidationArgs:
                 parse_release_validations_tests_args,
                 _RELEASE_VALIDATIONS_TESTS_POSITIONAL,
                 "datalake_release_validations_tests_raw___playwright_results",
+            ),
+            (
+                ZscalerJobArgumentParser.parse_args,
+                _ZSCALER_POSITIONAL,
+                "datalake_zscaler_raw___managed_devices",
             ),
         ],
     )
@@ -209,6 +243,7 @@ class TestTechPlatformSparkJobValidationArgs:
                 parse_release_validations_tests_args,
                 _RELEASE_VALIDATIONS_TESTS_POSITIONAL,
             ),
+            (ZscalerJobArgumentParser.parse_args, _ZSCALER_POSITIONAL),
         ],
     )
     def test_dict_jobs_default_without_validation_flags(
@@ -298,3 +333,11 @@ class TestTechPlatformSparkJobValidationArgs:
 
         assert args.target_database_name is None
         assert args.target_table_name is None
+
+
+@pytest.mark.parametrize("job_path", _CLOUDZERO_JOB_PATHS)
+def test_cloudzero_jobs_register_validation_helpers(job_path: str):
+    text = (_REPO_ROOT / job_path).read_text(encoding="utf-8")
+    assert "add_validation_target_args" in text or "--target-database-name" in text
+    if job_path in _CLOUDZERO_JOBS_WITH_RESOLVE:
+        assert "resolve_datalake_write_target(" in text

@@ -28,6 +28,10 @@ from dags.tech_platform.reverse_integration_cloudzero.spark_jobs import (  # noq
     load_api_requests_to_cloudzero as job,
 )
 
+_TEST_ENVIRONMENT = "forno"
+_TEST_EXECUTION_DATE = "2025-01-15"
+_MAIN_ARGV = ["script", _TEST_ENVIRONMENT, _TEST_EXECUTION_DATE]
+
 
 class TestAutoStepSeconds(unittest.TestCase):
     """Tests for auto_step_seconds."""
@@ -379,7 +383,7 @@ class TestMain(unittest.TestCase):
         mock_requests.Session.return_value = mock_session
 
         with patch.dict("sys.modules", {"requests": mock_requests}):
-            with patch("sys.argv", ["script", "forno", "2025-01-15"]):
+            with patch("sys.argv", _MAIN_ARGV):
                 _run_job_main()
 
         self.assertEqual(mock_session.get.call_count, 2)
@@ -394,7 +398,7 @@ class TestMain(unittest.TestCase):
     @patch("bietlejuice.base.spark.BaseDBUtils")
     def test_main_raises_when_dbutils_unavailable(self, mock_base_dbutils):
         mock_base_dbutils.return_value.get_dbutils.return_value = None
-        with patch("sys.argv", ["script", "forno", "2025-01-15"]):
+        with patch("sys.argv", _MAIN_ARGV):
             with self.assertRaises(RuntimeError) as ctx:
                 _run_job_main()
         self.assertIn("dbutils", str(ctx.exception).lower())
@@ -404,7 +408,7 @@ class TestMain(unittest.TestCase):
         mock_dbutils = MagicMock()
         mock_dbutils.secrets.get.return_value = json.dumps({"invalid": "no token key"})
         mock_base_dbutils.return_value.get_dbutils.return_value = mock_dbutils
-        with patch("sys.argv", ["script", "forno", "2025-01-15"]):
+        with patch("sys.argv", _MAIN_ARGV):
             with self.assertRaises(RuntimeError) as ctx:
                 _run_job_main()
         self.assertIn("token", str(ctx.exception).lower())
@@ -431,7 +435,7 @@ class TestMain(unittest.TestCase):
         mock_requests.Session.return_value = mock_session
 
         with patch.dict("sys.modules", {"requests": mock_requests}):
-            with patch("sys.argv", ["script", "forno", "2025-01-15"]):
+            with patch("sys.argv", _MAIN_ARGV):
                 _run_job_main()
 
         mock_session.get.assert_called_once()

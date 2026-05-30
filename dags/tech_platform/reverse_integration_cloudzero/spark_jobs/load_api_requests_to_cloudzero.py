@@ -5,6 +5,8 @@ Uses Grafana's datasource proxy to run a PromQL instant query (Grafana backend c
 Fetches the number of requests per app, then posts each series to CloudZero with a configurable dimension (default custom:API; create Custom Dimension "API" in CloudZero).
 """
 
+from __future__ import annotations
+
 import json
 import logging
 import os
@@ -18,6 +20,7 @@ from requests import RequestException
 from requests.adapters import HTTPAdapter, Retry
 
 from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.base.validation.spark_args import add_validation_target_args
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_api_requests_to_cloudzero"
@@ -368,6 +371,7 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", help="forno/prod values")
     parser.add_argument("execution_date", help="Execution date in YYYY-MM-DD format")
+    add_validation_target_args(parser)
 
     args = parser.parse_args()
     environment = args.environment
