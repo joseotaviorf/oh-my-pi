@@ -23,10 +23,6 @@ dag:
       Cost center coverage: ~22% (Plugify data quality gap — documented in metadata).
       Consumer note: schema is standalone; people-domain access not required.
 
-cluster:
-  type: databricks_16_4_med_general_photon_cluster
-  databricks_conn_id: databricks_new_env
-
 workflow:
   type: query_delta
   layer: dw

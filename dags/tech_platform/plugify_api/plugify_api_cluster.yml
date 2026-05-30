@@ -1,0 +1,24 @@
+cluster:
+  type: custom_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    driver_node_type_id: m5d.xlarge
+    node_type_id: m5d.xlarge
+    num_workers: 1
+    spark_version: 16.4.x-scala2.12
+validation:
+  cluster:
+    type: consolidation_s_general_cluster
+    databricks_conn_id: databricks_new
+    access_control_list:
+      group_name: people-analytics
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      num_workers: 1

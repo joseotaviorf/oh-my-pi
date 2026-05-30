@@ -1,0 +1,28 @@
+cluster:
+  type: custom_cluster
+  access_control_list:
+    group_name: auditlogs
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    driver_node_type_id: m5d.4xlarge
+    node_type_id: m5d.4xlarge
+    runtime_engine: PHOTON
+    num_workers: 2
+    spark_version: 16.4.x-scala2.12
+validation:
+  cluster:
+    type: consolidation_l_general_cluster
+    databricks_conn_id: databricks_new
+    access_control_list:
+      group_name: auditlogs
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      node_type_id: m6gd.4xlarge
+      driver_node_type_id: m6gd.4xlarge
+      runtime_engine: PHOTON
+  allow_custom_spark_job: true
