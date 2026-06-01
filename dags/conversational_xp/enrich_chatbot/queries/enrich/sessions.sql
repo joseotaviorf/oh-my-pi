@@ -72,8 +72,7 @@ chatbot_sessions AS (
       ON sss.public_id = cs.id_sauron_session
   LEFT JOIN
     datalake_sauron_clean.session AS s
-      ON cs.id_sauron_session RLIKE '^[0-9]+$'
-      AND s.id = CAST(cs.id_sauron_session AS BIGINT)
+      ON s.id = CAST(cs.id_sauron_session AS BIGINT)
   WHERE
     cs.ts_created >= DATE('{load_start_date}') - INTERVAL 30 DAY
   QUALIFY
