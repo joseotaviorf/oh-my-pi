@@ -3,7 +3,7 @@ from typing import List, Optional, Union
 from pyspark.sql import DataFrame, SparkSession, Window
 from pyspark.sql import functions as F
 
-from bietlejuice.base.sst.core.utils.common import compare_schema_types
+from bietlejuice.base.sst.core.utils.common import _table_exists, compare_schema_types
 from bietlejuice.base.sst.domains.salesforce.api.transform import (
     cast_string_to_boolean,
     parse_struct_column,
@@ -194,7 +194,10 @@ def apply_schema_remaps(
     """
 
     if isinstance(target_table, str):
-        target_table = spark.table(target_table)
+        if _table_exists(spark, target_table):
+            target_table = spark.table(target_table)
+        else:
+            return df
 
     # This return a list of tuple with column_name, type_left, type_right and if type is matching
     type_mistmatches = compare_schema_types(df, target_table).collect()
