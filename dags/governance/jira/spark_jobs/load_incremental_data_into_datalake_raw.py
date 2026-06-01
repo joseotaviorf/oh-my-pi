@@ -15,6 +15,10 @@ from bietlejuice.base.spark import (
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -40,6 +44,7 @@ if __name__ == "__main__":
     parser.add_argument("partitions", help="Partition columns name")
     parser.add_argument("endpoint_params", help="")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     environment = args.environment
@@ -117,36 +122,45 @@ if __name__ == "__main__":
         )
         spark_metastore_service = SparkMetastoreService(spark_client)
         database_name = datalake_info["db_raw_databricks"]
-        spark_metastore_service.create_database(database_name)
-
         database_location = datalake_info["db_raw_path"]
         format_options = SparkTableStorageFormat.DEFAULT_RAW
+        write_database_name, write_table_name, write_location = (
+            resolve_datalake_write_target(
+                prod_database=database_name,
+                prod_table=table_name,
+                prod_location=database_location,
+                bucket=datalake_bucket,
+                target_database=args.target_database_name,
+                target_table=args.target_table_name,
+            )
+        )
+        spark_metastore_service.create_database(write_database_name)
 
         # loaders
         s3_loader = S3Loader()
         s3_loader.load_incremental_table(
             df=df,
-            database_name=database_name,
-            table_name=table_name,
+            database_name=write_database_name,
+            table_name=write_table_name,
             format_options=format_options,
-            database_location=database_location,
+            database_location=write_location,
             partition_cols=partitions,
         )
 
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
         spark_metastore_loader.update_metastore(
             df,
-            database_name,
-            table_name,
+            write_database_name,
+            write_table_name,
             format_options,
-            database_location,
+            write_location,
             partitions,
             force_recreate=False,
         )
         spark_metastore_service.create_new_partitions_from_df(
-            database_name=database_name,
-            table_name=table_name,
+            database_name=write_database_name,
+            table_name=write_table_name,
             df=df,
             partition_cols=partitions,
         )
-        spark_metastore_service.refresh_table(database_name, table_name)
+        spark_metastore_service.refresh_table(write_database_name, write_table_name)
