@@ -1,0 +1,18 @@
+database_name: datalake_tars_raw
+table_name: logs
+description: Raw JSON log files downloaded from Google Drive for the TARS chatbot. One row per file with the full JSON content as a string.
+domain: Cross
+owner: william.angelo@quintoandar.com.br
+columns:
+  file_name:
+    description: Original filename from Google Drive (encodes user, timestamp, session id).
+  raw_content:
+    description: Full JSON file content as a raw string. Parsed by the clean layer.
+  ts_load:
+    description: Timestamp when this row was loaded into the datalake.
+  year:
+    description: Partition column. Year of the DAG execution date that loaded this file.
+  month:
+    description: Partition column. Month of the DAG execution date that loaded this file.
+  day:
+    description: Partition column. Day of the DAG execution date that loaded this file.

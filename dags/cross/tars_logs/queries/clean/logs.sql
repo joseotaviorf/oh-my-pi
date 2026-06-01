@@ -1,0 +1,25 @@
+SELECT
+    GET_JSON_OBJECT(raw_content, '$.session_id') AS session_id,
+    GET_JSON_OBJECT(raw_content, '$.answer_id') AS answer_id,
+    GET_JSON_OBJECT(raw_content, '$.user_slug') AS user_slug,
+    CAST(GET_JSON_OBJECT(raw_content, '$.timestamp') AS TIMESTAMP) AS ts_answer,
+    GET_JSON_OBJECT(raw_content, '$.user_question') AS user_question,
+    GET_JSON_OBJECT(raw_content, '$.generated_sql') AS generated_sql,
+    GET_JSON_OBJECT(raw_content, '$.tables_referenced') AS tables_referenced,
+    GET_JSON_OBJECT(raw_content, '$.layers_used') AS layers_used,
+    GET_JSON_OBJECT(raw_content, '$.entity_files_consulted') AS entity_files_consulted,
+    CAST(GET_JSON_OBJECT(raw_content, '$.iteration_count') AS INT) AS iteration_count,
+    GET_JSON_OBJECT(raw_content, '$.iteration_errors') AS iteration_errors,
+    CAST(GET_JSON_OBJECT(raw_content, '$.had_error') AS BOOLEAN) AS had_error,
+    GET_JSON_OBJECT(raw_content, '$.error_detail') AS error_detail,
+    GET_JSON_OBJECT(raw_content, '$.mcp_tools_called') AS mcp_tools_called,
+    CAST(GET_JSON_OBJECT(raw_content, '$.query_executed') AS BOOLEAN) AS query_executed,
+    CAST(GET_JSON_OBJECT(raw_content, '$.rows_returned') AS INT) AS rows_returned,
+    GET_JSON_OBJECT(raw_content, '$.response_category') AS response_category,
+    GET_JSON_OBJECT(raw_content, '$.business_domain') AS business_domain,
+    GET_JSON_OBJECT(raw_content, '$.satisfaction_rating') AS satisfaction_rating,
+    GET_JSON_OBJECT(raw_content, '$.user_comment') AS user_comment,
+    CAST(GET_JSON_OBJECT(raw_content, '$.is_session_end') AS BOOLEAN) AS is_session_end,
+    ts_load
+FROM
+    datalake_tars_raw.logs

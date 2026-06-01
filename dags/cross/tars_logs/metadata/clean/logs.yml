@@ -1,0 +1,97 @@
+database_name: datalake_tars_clean
+table_name: logs
+description: |
+  Parsed TARS chatbot answer log. One row per answer (answer_id).
+  Raw JSON from datalake_tars_raw.logs is unpacked into typed columns.
+  Array fields (generated_sql, tables_referenced, etc.) are kept as JSON strings.
+domain: Conversational XP
+owner: william.angelo@quintoandar.com.br
+columns:
+  session_id:
+    description: Session identifier grouping all answers in a single user interaction.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  answer_id:
+    description: Unique identifier for this answer. Merge key for the clean table.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  user_slug:
+    description: Slug of the user who asked the question.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  ts_answer:
+    description: Timestamp when TARS generated this answer (from the JSON timestamp field).
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  user_question:
+    description: The natural-language question the user submitted to TARS.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  generated_sql:
+    description: JSON array of SQL strings generated during this answer (one per iteration attempt).
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  tables_referenced:
+    description: JSON array of fully-qualified table names referenced in the generated SQL.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  layers_used:
+    description: JSON array of datalake layer names (e.g. raw, clean, dw, enrich) accessed during SQL generation.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  entity_files_consulted:
+    description: JSON array of business entity reference files consulted by TARS to generate the answer.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  iteration_count:
+    description: Number of SQL generation iterations performed before returning the final answer.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  iteration_errors:
+    description: JSON array of error messages encountered across iterations, empty if no errors occurred.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  had_error:
+    description: True if any iteration produced an error during SQL generation or execution.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  error_detail:
+    description: Human-readable error description from the final failed iteration. Null if had_error is false.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  mcp_tools_called:
+    description: JSON array of MCP tool identifiers invoked during answer generation.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  query_executed:
+    description: True if the generated SQL was actually executed against the datalake.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  rows_returned:
+    description: Number of rows returned by the executed SQL. Null if query_executed is false.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  response_category:
+    description: Classification of the answer type (e.g. data_query, clarification, error).
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  business_domain:
+    description: Business domain the question relates to (e.g. For Rent, For Sale).
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  satisfaction_rating:
+    description: User-provided satisfaction rating for this answer. Null if not yet rated.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  user_comment:
+    description: Free-text feedback comment from the user. Null if not provided.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  is_session_end:
+    description: True if this answer was the last one in the session.
+    lineage:
+      - datalake_tars_raw.logs.raw_content
+  ts_load:
+    description: Timestamp when the raw file was loaded into datalake_tars_raw.logs.
+    lineage:
+      - datalake_tars_raw.logs.ts_load
