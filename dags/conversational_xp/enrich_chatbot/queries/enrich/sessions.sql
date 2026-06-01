@@ -28,14 +28,8 @@ chatbot_sessions AS (
   SELECT
     cs.id AS id_session,
     cs.id_external AS id_langfuse_session,
-    CASE
-      WHEN cs.id_sauron_session RLIKE '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
-      THEN cs.id_sauron_session
-    END AS id_sss_session,
-    CASE
-      WHEN cs.id_sauron_session RLIKE '^[0-9]+$'
-      THEN CAST(cs.id_sauron_session AS BIGINT)
-    END AS id_sauron_session,
+    sss.public_id AS id_sss_session,
+    CAST(cs.id_sauron_session AS BIGINT) AS id_sauron_session,
     cs.id_user,
     CASE
       WHEN m.channel = 'WHATSAPP_SONIA_CHAT' THEN 'sonia'
