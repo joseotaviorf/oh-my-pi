@@ -52,7 +52,7 @@ sheets_info:
     sheet_name: brazil_regions
     clean_table_name: brazilian_regions_url
     sheet_context: growth
-    
+
   ciq_costs:
     sheet_id: 1ZkPABh53UrzKn4aQudZzr5QpJsBXhCZDnJkDZob2Rqc
     sheet_name: ciq_costs
@@ -310,7 +310,13 @@ sheets_info:
     sheet_name: supply_campaign_cluster
     clean_table_name: supply_campaign_cluster
     sheet_context: growth
-  
+
+  supply_inputs_click_to_whatsapp:
+    sheet_id: 1tB4v6Yu7dYP9neSuQP-qmuVwPSuw6vpc_vTNEoaEf-M
+    sheet_name: supply_inputs_click_to_whatsapp
+    clean_table_name: supply_inputs_click_to_whatsapp
+    sheet_context: growth
+
   supply_listing_cross_historical:
     sheet_id: 1qmr2_MBz86YmvAxHzTs_oAktnbPBBqRaA9SOPsrj8NE
     sheet_name: listing_cruzado_historico

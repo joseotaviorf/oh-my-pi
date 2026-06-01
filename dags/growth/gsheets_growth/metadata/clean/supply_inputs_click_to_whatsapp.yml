@@ -1,0 +1,17 @@
+database_name: datalake_gsheets_clean
+table_name: supply_inputs_click_to_whatsapp
+domain: Growth
+description: Supply inputs for click to whatsapp campaigns.
+columns:
+  nm_campaign:
+    description: Name of the campaign.
+    lineage:
+      - datalake_gsheets_raw.supply_inputs_click_to_whatsapp.nm_campaign
+  phone_number:
+    description: 5A Phone number associated with the campaign.
+    lineage:
+      - datalake_gsheets_raw.supply_inputs_click_to_whatsapp.phone_number
+  source_environment:
+    description: The source environment associated with the support session when the lead was created.
+    lineage:
+      - datalake_gsheets_raw.supply_inputs_click_to_whatsapp.source_environment
