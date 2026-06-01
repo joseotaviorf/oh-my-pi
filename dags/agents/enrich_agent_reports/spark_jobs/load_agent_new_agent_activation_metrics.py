@@ -73,6 +73,10 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
@@ -149,6 +153,7 @@ def parse_args() -> Namespace:
         parser.add_argument(
             name, nargs="?", type=type_, default=default_val, help=help_text
         )
+    add_validation_target_args(parser)
     namespace, _ = parser.parse_known_args()
     return namespace
 
@@ -692,10 +697,20 @@ def _save_to_enrich(
     )
     database_name = db_info["db_enrich_databricks"]
     database_location = db_info["db_enrich_path"]
-    full_table_name = f"{database_name}.{args.table_name}"
-    s3_path = database_location + args.table_name
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=args.table_name,
+            prod_location=database_location,
+            bucket=args.datalake_bucket,
+            target_database=getattr(args, "target_database_name", None),
+            target_table=getattr(args, "target_table_name", None),
+        )
+    )
+    full_table_name = f"{write_database_name}.{write_table_name}"
+    s3_path = f"{write_location}{write_table_name}"
 
-    SparkMetastoreService(spark_client).create_database(database_name)
+    SparkMetastoreService(spark_client).create_database(write_database_name)
     DeltaLoader().load_table(
         table_name=full_table_name,
         path=s3_path,
@@ -703,7 +718,9 @@ def _save_to_enrich(
         partition_by=["reference_month"],
         merge_on=["id_user", "reference_month"],
     )
-    SparkMetastoreService(spark_client).refresh_table(database_name, args.table_name)
+    SparkMetastoreService(spark_client).refresh_table(
+        write_database_name, write_table_name
+    )
     priv = TablePrivileges.from_environment_default(full_table_name)
     if priv and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         priv.apply()

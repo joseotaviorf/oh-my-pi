@@ -39,6 +39,8 @@ _IMPORT_TIME_MOCKS = {
     "bietlejuice.base.spark": MagicMock(),
     "bietlejuice.base.spark.base_spark": MagicMock(),
     "bietlejuice.base.spark.unity_catalog_helper": MagicMock(),
+    "bietlejuice.base.validation": MagicMock(),
+    "bietlejuice.base.validation.spark_args": MagicMock(),
     "bietlejuice.clients": MagicMock(),
     "bietlejuice.clients.db_clients": MagicMock(),
     "bietlejuice.loaders": MagicMock(),

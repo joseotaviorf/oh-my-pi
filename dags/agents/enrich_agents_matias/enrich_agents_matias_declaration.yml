@@ -18,5 +18,3 @@ workflow:
     outbound_messages_sessions:
       merge_on: [id_notification]
       z_order_by: [ts_notification_sent, id_user]
-cluster:
-  type: emr_7_12_min_memory_3_workers_cluster

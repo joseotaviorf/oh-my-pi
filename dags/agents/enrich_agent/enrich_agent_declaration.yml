@@ -27,11 +27,3 @@ workflow:
       extraction_type: incremental
       merge_on: [id_event_log]
       partitions: [year, month, day]
-cluster:
-  type: databricks_16_4_min_memory_cluster
-  databricks_conn_id: databricks_new_env
-  custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

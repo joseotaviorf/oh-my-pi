@@ -27,6 +27,8 @@ _BIETLEJUICE_MOCKS = [
     "bietlejuice.base.db",
     "bietlejuice.base.spark",
     "bietlejuice.base.spark.unity_catalog_helper",
+    "bietlejuice.base.validation",
+    "bietlejuice.base.validation.spark_args",
     "bietlejuice.clients",
     "bietlejuice.clients.db_clients",
     "bietlejuice.loaders",

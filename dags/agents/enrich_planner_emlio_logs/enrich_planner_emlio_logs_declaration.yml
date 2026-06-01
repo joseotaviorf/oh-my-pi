@@ -29,6 +29,3 @@ workflow:
     planner_emlio_logs:
       load_spark_job: load_planner_emlio_logs
 
-cluster:
-  type: databricks_16_4_med_general_cluster
-  databricks_conn_id: databricks_new_env

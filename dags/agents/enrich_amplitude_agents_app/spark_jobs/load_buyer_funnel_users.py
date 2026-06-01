@@ -8,6 +8,10 @@ from pyspark.sql.window import Window
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
@@ -171,6 +175,7 @@ if __name__ == "__main__":
     parser.add_argument("load_start_date", help="partitions")
     parser.add_argument("load_end_date", help="partitions")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     environment = args.environment
@@ -208,10 +213,20 @@ if __name__ == "__main__":
     )
     database_name = db_info["db_enrich_databricks"]
     database_location = db_info["db_enrich_path"]
-    spark_metastore_service.create_database(database_name)
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
+    spark_metastore_service.create_database(write_database_name)
 
-    s3_path = f"{database_location}{table_name}"
-    full_table_name = f"{database_name}.{table_name}"
+    s3_path = f"{write_location}{write_table_name}"
+    full_table_name = f"{write_database_name}.{write_table_name}"
 
     for dt_snapshot in dates_by_process:
         df_state = get_agents_search_events_state(dt_snapshot)
@@ -228,7 +243,7 @@ if __name__ == "__main__":
                 source_df=df_new_state,
                 merge_on=["id_amplitude", "dt_snapshot"],
             )
-            spark_metastore_service.refresh_table(database_name, table_name)
+            spark_metastore_service.refresh_table(write_database_name, write_table_name)
         else:
             logger.error(
                 f"""msg=Error while getting data for buyer_funnel_users table.

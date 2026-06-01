@@ -26,5 +26,3 @@ workflow:
       custom_schema: agent
     fact_photographer_hourly_allocations:
       custom_schema: agent
-cluster:
-  type: emr_7_12_med_general_3_workers_cluster

@@ -16,5 +16,3 @@ workflow:
     fact_daily_accredited_agent:
       extraction_type: incremental
       partitions: [year, month, day]
-cluster:
-  type: emr_7_12_min_driver_2xlarge_workers_1_task_cluster
