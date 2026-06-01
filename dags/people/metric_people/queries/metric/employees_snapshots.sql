@@ -35,7 +35,7 @@ SELECT
     dem.gender_identity,
     dem.sexual_orientation,
     dem.religion,
-    dem.neurodiversity,
+    dis.neurodiversity,
     dis.documented_name AS documented_disability_name,
     dem.legal_sex AS registered_sex,
     job.job_name,

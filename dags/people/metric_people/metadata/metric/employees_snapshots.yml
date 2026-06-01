@@ -229,7 +229,7 @@ columns:
     description: Snapshot attribute for neurodiversity on the employees_snapshots wide metric table.
     dimension: True
     lineage:
-      - dw_demographics.dim_employee_demographic.neurodiversity
+      - dw_demographics.dim_employee_disability.neurodiversity
 
   documented_disability_name:
     description: Snapshot attribute for documented_disability_name on the employees_snapshots wide metric table.
