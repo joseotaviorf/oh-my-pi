@@ -53,6 +53,18 @@ sheets_info:
     clean_table_name: closing_analysts_hierarchy
     sheet_context: fintech
 
+  closing_quality:
+    sheet_id: 1TbW40MjXaYwSqgiLG6eKe3YORDPNMw_qOIaxk65QNeU
+    sheet_name: Qualidade Fechamento
+    clean_table_name: closing_quality
+    sheet_context: fintech
+
+  closing_ongoing:
+    sheet_id: 150z6ojSH6X97uL1twf-sO-Dpx9w0IvwoHVtuWuFHe-M
+    sheet_name: Fechamento - ongoing
+    clean_table_name: closing_ongoing
+    sheet_context: fintech
+
   cod_locale:
     sheet_id: 1GhZCQssX1zQIj1wpv5hm6iK3_4Hb2EPH251OMyOLJmQ
     sheet_name: LOC (Cidade)
