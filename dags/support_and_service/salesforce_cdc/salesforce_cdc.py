@@ -1,3 +1,4 @@
+import math
 import os
 from datetime import datetime, timedelta
 from typing import Dict
@@ -150,61 +151,83 @@ with DAG(
     max_active_runs=1,
 ) as dag:
     start, end = create_start_end_operator("salesforce")
-    execute_job_cluster = create_execute_job_cluster_task(
-        dag=dag, task_id="execute_cdc_cluster"
-    )
 
-    for event, parameters in EVENTS_CONFIG.items():
-        event_table = f"events_{event.lower()}"
-        threshold_time_hours = parameters.get("threshold_time_hours", 24)
+    NUMBER_OF_CLUSTERS = 2
+    events_lst = list(EVENTS_CONFIG.keys())
+    pool_max_size = math.ceil(len(events_lst) / NUMBER_OF_CLUSTERS) or 1
+    job_pool = [
+        events_lst[i : i + pool_max_size]
+        for i in range(0, len(events_lst), pool_max_size)
+    ]
 
-        raw_task = create_sst_task(
-            target_schema="datalake_salesforce_raw",
-            target_table=event_table,
-            entry_point="salesforce/cdc_raw",
-            parameters=parameters,
+    execute_job_clusters = []
+    for i, pool_events in enumerate(job_pool):
+        execute_job_cluster = create_execute_job_cluster_task(
+            dag=dag, task_id=f"execute_cdc_cluster_{i}"
         )
+        execute_job_clusters.append(execute_job_cluster)
+        end_pool = SStPlaceholderOperator(task_id=f"end_pool_{i}")
 
-        clean_task = create_sst_task(
-            target_schema="datalake_salesforce_clean",
-            target_table=event_table,
-            entry_point="salesforce/cdc_clean",
-            parameters={
-                "source_schema": "datalake_salesforce_raw",
-                "sync_hive": "True",
-            },
-        )
+        for event in pool_events:
+            parameters = EVENTS_CONFIG[event]
+            event_table = f"events_{event.lower()}"
+            threshold_time_hours = parameters.get("threshold_time_hours", 24)
 
-        metrics_tasks = build_metrics_tasks(event_table)
-        if parameters.get("skip_quality_contracts", False):
-            (execute_job_cluster >> raw_task >> clean_task >> metrics_tasks >> end)
-        else:
-            quality_contract_raw = create_sst_task(
+            raw_task = create_sst_task(
                 target_schema="datalake_salesforce_raw",
                 target_table=event_table,
-                entry_point="quality/contracts/generic",
-                parameters={
-                    "threshold_time_hours": threshold_time_hours,
-                },
-                task_id=f"quality_contract_checks_raw_{event_table}",
-            )
-            quality_contract_clean = create_sst_task(
-                target_schema="datalake_salesforce_clean",
-                target_table=event_table,
-                entry_point="quality/contracts/generic",
-                parameters={
-                    "threshold_time_hours": threshold_time_hours,
-                },
-                task_id=f"quality_contract_checks_clean_{event_table}",
-            )
-            (
-                execute_job_cluster
-                >> raw_task
-                >> quality_contract_raw
-                >> clean_task
-                >> quality_contract_clean
-                >> metrics_tasks
-                >> end
+                entry_point="salesforce/cdc_raw",
+                parameters=parameters,
             )
 
-    start >> execute_job_cluster
+            clean_task = create_sst_task(
+                target_schema="datalake_salesforce_clean",
+                target_table=event_table,
+                entry_point="salesforce/cdc_clean",
+                parameters={
+                    "source_schema": "datalake_salesforce_raw",
+                    "sync_hive": "True",
+                },
+            )
+
+            metrics_tasks = build_metrics_tasks(event_table)
+            if parameters.get("skip_quality_contracts", False):
+                (
+                    execute_job_cluster
+                    >> raw_task
+                    >> clean_task
+                    >> metrics_tasks
+                    >> end_pool
+                    >> end
+                )
+            else:
+                quality_contract_raw = create_sst_task(
+                    target_schema="datalake_salesforce_raw",
+                    target_table=event_table,
+                    entry_point="quality/contracts/generic",
+                    parameters={
+                        "threshold_time_hours": threshold_time_hours,
+                    },
+                    task_id=f"quality_contract_checks_raw_{event_table}",
+                )
+                quality_contract_clean = create_sst_task(
+                    target_schema="datalake_salesforce_clean",
+                    target_table=event_table,
+                    entry_point="quality/contracts/generic",
+                    parameters={
+                        "threshold_time_hours": threshold_time_hours,
+                    },
+                    task_id=f"quality_contract_checks_clean_{event_table}",
+                )
+                (
+                    execute_job_cluster
+                    >> raw_task
+                    >> quality_contract_raw
+                    >> clean_task
+                    >> quality_contract_clean
+                    >> metrics_tasks
+                    >> end_pool
+                    >> end
+                )
+
+    start >> execute_job_clusters
