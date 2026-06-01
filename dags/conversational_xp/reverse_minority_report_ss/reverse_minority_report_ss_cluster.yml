@@ -1,12 +1,10 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_l_memory_cluster
   custom_libraries:
   - pypi:
-      package: "kafka-python==2.0.3"
+      package: kafka-python==2.0.3
   custom_configurations:
     autotermination_minutes: 20
-    driver_node_type_id: r5a.4xlarge
-    node_type_id: r5a.4xlarge
     num_workers: 3
     spark_version: 13.3.x-scala2.12
     aws_attributes:
@@ -16,15 +14,4 @@ cluster:
       availability: SPOT_WITH_FALLBACK
       ebs_volume_size: 200
     spark_conf:
-      spark.driver.maxResultSize: "0"
-validation:
-  cluster:
-    type: consolidation_l_memory_cluster
-    custom_libraries:
-    - pypi:
-        package: kafka-python==2.0.3
-    custom_configurations:
-      spark_version: 13.3.x-scala2.12
-      num_workers: 3
-      driver_node_type_id: r6g.2xlarge
-  allow_custom_spark_job: true
+      spark.driver.maxResultSize: '0'

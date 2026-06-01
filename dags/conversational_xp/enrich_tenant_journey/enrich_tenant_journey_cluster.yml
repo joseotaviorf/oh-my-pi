@@ -1,9 +1,10 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_l_general_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
     autotermination_minutes: 20
-    driver_node_type_id: m5d.4xlarge
-    node_type_id: m5d.4xlarge
+    driver_node_type_id: m6gd.2xlarge
+    node_type_id: m6gd.4xlarge
     spark_version: 16.4.x-scala2.12
     runtime_engine: PHOTON
     num_workers: 4
@@ -17,13 +18,3 @@ cluster:
     data_security_mode: USER_ISOLATION
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-  databricks_conn_id: databricks_new_env
-validation:
-  cluster:
-    type: consolidation_l_general_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      num_workers: 4
-      node_type_id: m6gd.4xlarge
-      driver_node_type_id: m6gd.2xlarge
-      runtime_engine: PHOTON
