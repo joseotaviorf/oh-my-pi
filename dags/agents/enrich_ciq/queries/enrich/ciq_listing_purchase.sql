@@ -22,6 +22,7 @@ signed_contracts AS(
         hl.ts_listing_version_end,
         hl.ts_contract_signed,
         hl.ts_next_contract_signed,
+        LAG(hl.ts_contract_signed, 1) OVER (PARTITION BY hl.id_house ORDER BY hl.version) AS ts_previous_contract_signed,
         c.dt_termination
     FROM
         datalake_ebdb_listing.house_listing AS hl
@@ -69,7 +70,7 @@ SELECT
         WHEN vfl.hybrid_creation_order = 'SALE > RENT' THEN 'hybrid'
         WHEN vfl.ts_first_listing_rent >= DATE("2026-07-01") THEN 'new-listings'
         WHEN vfl.ts_first_listing_rent < DATE("2026-07-01")
-            AND c.ts_next_contract_signed IS NOT NULL
+            AND c.ts_previous_contract_signed IS NOT NULL
             THEN 'ongoing-rentals'
         WHEN vfl.ts_first_listing_rent < DATE("2026-07-01")
             AND c.id_contract IS NULL
@@ -91,6 +92,7 @@ SELECT
     c.dt_termination AS dt_contract_termination,
     c.ts_contract_signed,
     c.ts_next_contract_signed,
+    c.ts_previous_contract_signed,
     IF(c.is_house_inactive IS TRUE, c.ts_listing_version_start, NULL) AS ts_house_inactived,
     hch.ts_house_registration,
     vfl.ts_first_listing_rent AS ts_first_listing,

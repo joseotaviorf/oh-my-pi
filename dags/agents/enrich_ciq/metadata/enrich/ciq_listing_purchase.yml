@@ -80,7 +80,6 @@ columns:
       - datalake_listing_deduplication.valid_first_listing.hybrid_creation_order
       - datalake_listing_deduplication.valid_first_listing.ts_first_listing_rent
       - datalake_ebdb_listing.house_listing.ts_contract_signed
-      - datalake_ebdb_listing.house_listing.ts_next_contract_signed
       - datalake_ebdb_listing.house_listing.id_contract
   purchase_value:
     description: Reference listing-purchase amount from ciq_costs for city and contract signature month.
@@ -137,6 +136,12 @@ columns:
     description: Next contract signature timestamp on the same house listing when present.
     lineage:
       - datalake_ebdb_listing.house_listing.ts_next_contract_signed
+  ts_previous_contract_signed:
+    description: >
+      Previous contract signature timestamp on the same house (LAG by listing version),
+      used for ongoing-rentals pricing segmentation.
+    lineage:
+      - datalake_ebdb_listing.house_listing.ts_contract_signed
   ts_house_inactived:
     description: Listing version start timestamp when the version is in qualifying inactive state; null otherwise.
     lineage:
