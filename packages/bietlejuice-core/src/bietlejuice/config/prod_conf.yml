@@ -1744,6 +1744,13 @@ emr_cluster_base: &emr_cluster_anchor
         spark.openlineage.transport.type: "http"
         spark.openlineage.transport.url: "https://metadata-propagator.apps.data-prd-blue.habitat.zone"
         spark.openlineage.transport.endpoint: "/openlineage/events"
+        spark.eventLog.enabled: "true"
+        spark.eventLog.dir: "s3a://{{ var.value.databricks_s3_bucket }}/spark-event-logs/{{ dag.dag_id }}"
+        spark.eventLog.compress: "true"
+        spark.eventLog.compression.codec: "zstd"
+        spark.eventLog.logStageExecutorMetrics: "true"
+        spark.eventLog.rolling.enabled: "true"
+        spark.eventLog.rolling.maxFileSize: "128m"
 
     spark_env_vars:
         ENVIRONMENT: "{{ var.value.environment }}"
