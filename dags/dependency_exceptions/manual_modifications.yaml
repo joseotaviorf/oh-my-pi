@@ -1359,6 +1359,10 @@ bietlejuice.core_brokers_history:
     - bietlejuice.company:load-clean-member-profile
     - bietlejuice.company:load-clean-product
     - bietlejuice.company:load-clean-profile
+bietlejuice.core_region_history:
+  add:
+    - bietlejuice.hub_services:load-clean-business-unit:first-run-of-day
+    - bietlejuice.hub_services:load-clean-business-unit-region:first-run-of-day
 bietlejuice.dw_sale_closing_flows:
   add:
     - bietlejuice.dw_atta:load-dw-atta-dim-proposal-atta:first-run-of-day
