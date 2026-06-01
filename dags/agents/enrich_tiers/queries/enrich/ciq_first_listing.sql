@@ -59,7 +59,6 @@ WITH first_listing_conditions AS (
             WHEN t.hybrid_creation_order = 'SALE > RENT'
                 AND t.is_hybrid_house IS TRUE 
                 AND t.days_between_fl_hybrid <= 60 
-                AND t.is_signed_cs_within_60_days IS TRUE
                 THEN TRUE
             ELSE FALSE
         END AS is_valid_hybrid_rent,
@@ -71,7 +70,6 @@ WITH first_listing_conditions AS (
             WHEN t.hybrid_creation_order = 'RENT > SALE'
                 AND t.is_hybrid_house IS TRUE 
                 AND t.days_between_fl_hybrid <= 60 
-                AND t.is_signed_ccv_within_60_days IS TRUE
                 THEN TRUE
             ELSE FALSE
         END AS is_valid_hybrid_sale,
