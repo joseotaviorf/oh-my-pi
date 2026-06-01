@@ -1,0 +1,30 @@
+database_name: datalake_ebdb_clean
+table_name: listing_quality_analysis_request
+domain: Growth
+description: Listing quality Analysis Request records produced by the ListingQuality service from the EBDB main database, used to store/add manual analysis requests of ListingsQuality.
+owner: data.growth@quintoandar.com.br
+columns:
+  id:
+    lineage:
+      - datalake_ebdb_raw.listingqualityanalysisrequest.id
+    description: Primary key.
+  id_house:
+    lineage:
+      - datalake_ebdb_raw.listingqualityanalysisrequest.house_id
+    description: Foreign key to the house under listing quality evaluation.
+  analysis_requested:
+    lineage:
+      - datalake_ebdb_raw.listingqualityanalysisrequest.analysis_requested
+    description: Whether an analysis was explicitly requested (1|true for requested, 0|false for not requested).
+  id_listing_quality:
+    lineage:
+      - datalake_ebdb_raw.listingqualityanalysisrequest.listing_quality_id
+    description: Foreign key to the Listing Quality, only filled after the AnalysisRequest itself gets addressed (on ListingQuality service).
+  ts_created:
+    lineage:
+      - datalake_ebdb_raw.listingqualityanalysisrequest.criadoem
+    description: Timestamp when the record was created in EBDB.
+  ts_updated:
+    lineage:
+      - datalake_ebdb_raw.listingqualityanalysisrequest.atualizadoem
+    description: Timestamp of the last update applied to the record in EBDB.
