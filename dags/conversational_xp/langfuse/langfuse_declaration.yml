@@ -36,19 +36,3 @@ workflow:
       merge_on: [id_observation]
       z_order_by: [ts_started]
 
-cluster:
-  type: custom_cluster
-  custom_libraries:
-    - pypi:
-        package: "langfuse==3.0.0"
-  custom_configurations:
-    driver_node_type_id: r7a.2xlarge
-    node_type_id: m7a.2xlarge
-    num_workers: 6
-    spark_version: 16.4.x-scala2.12
-    spark_conf:
-      spark.driver.maxResultSize: "0"
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
-    data_security_mode: SINGLE_USER
-  databricks_conn_id: databricks_new

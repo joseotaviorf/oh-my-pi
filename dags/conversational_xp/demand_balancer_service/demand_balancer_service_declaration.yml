@@ -29,12 +29,3 @@ workflow:
         - day
         - model_version
 
-cluster:
-  type: consolidation_s_memory_single_node_cluster
-  access_control_list:
-    group_name: data-products
-    permission_level: CAN_MANAGE
-  custom_configurations:
-    spark_conf:
-      spark.metrics.namespace: "data_products.search"
-  databricks_conn_id: databricks_new

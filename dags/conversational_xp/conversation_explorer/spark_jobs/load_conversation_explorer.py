@@ -9,6 +9,10 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageFormat
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -92,7 +96,12 @@ def _find_most_recent_date_folder(spark_client: SparkClient, base_path: str) -> 
 
 
 def _load_categorisation(
-    spark_client, s3_consumer, s3_loader, args, partition_cols, file_date
+    spark_client,
+    s3_consumer,
+    s3_loader,
+    args,
+    partition_cols,
+    file_date,
 ):
     """Load categorisation parquet from session-metadata."""
     environment = args.environment
@@ -117,9 +126,19 @@ def _load_categorisation(
     )
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
 
     spark_metastore_service = SparkMetastoreService(spark_client)
-    spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(write_database_name)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     df = s3_consumer.get_data_from_file(path=source_path, format="parquet")
@@ -133,7 +152,8 @@ def _load_categorisation(
     )
 
     logger.info(
-        f"m=_load_categorisation, msg=Loaded {df.count()} rows, writing to {database_name}.{table_name}"
+        f"m=_load_categorisation, msg=Loaded {df.count()} rows, "
+        f"writing to {write_database_name}.{write_table_name}"
     )
 
     _write_to_datalake(
@@ -141,9 +161,9 @@ def _load_categorisation(
         s3_loader,
         spark_metastore_loader,
         spark_metastore_service,
-        database_name,
-        database_location,
-        table_name,
+        write_database_name,
+        write_location,
+        write_table_name,
         partition_cols,
     )
 
@@ -267,9 +287,19 @@ def _load_annotations(
     )
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
 
     spark_metastore_service = SparkMetastoreService(spark_client)
-    spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(write_database_name)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     _write_to_datalake(
@@ -277,9 +307,9 @@ def _load_annotations(
         s3_loader,
         spark_metastore_loader,
         spark_metastore_service,
-        database_name,
-        database_location,
-        table_name,
+        write_database_name,
+        write_location,
+        write_table_name,
         partition_cols,
     )
 
@@ -290,7 +320,7 @@ def _load_annotations(
         f"annotations_written={row_count}, "
         f"distinct_sessions={distinct_sessions}, "
         f"distinct_authors={distinct_authors}, "
-        f"target_table={database_name}.{table_name}, "
+        f"target_table={write_database_name}.{write_table_name}, "
         f"msg=Annotations backfill complete"
     )
 
@@ -350,6 +380,7 @@ def main() -> None:
         help="Optional YYYY-MM-DD to load a specific file/folder (for backfills)",
     )
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
     table_name = args.table_name
     partition_cols = json.loads(args.partitions.replace("'", '"'))

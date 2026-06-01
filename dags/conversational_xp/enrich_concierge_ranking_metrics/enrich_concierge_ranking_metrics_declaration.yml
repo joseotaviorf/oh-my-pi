@@ -13,15 +13,3 @@ workflow:
   extra_query_template_params:
     "load_start_date": "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
 
-cluster:
-  type: databricks_13_3_med_general_cluster
-  access_control_list:
-    group_name: data-products
-    permission_level: CAN_MANAGE
-  custom_configurations:
-    spark_conf:
-      spark.metrics.namespace: "data_products.conversational_xp"
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-  databricks_conn_id: databricks_new_env

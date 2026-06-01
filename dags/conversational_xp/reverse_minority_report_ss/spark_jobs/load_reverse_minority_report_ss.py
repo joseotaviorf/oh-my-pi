@@ -13,6 +13,9 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+)
 from bietlejuice.clients.db_clients import SparkClient
 
 JOB_NAME = "load_minority_report_ss"
@@ -315,6 +318,7 @@ if __name__ == "__main__":
     parser.add_argument("key_value")
     parser.add_argument("api_type")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     dag_name = args.dag_name
