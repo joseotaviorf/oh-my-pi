@@ -334,9 +334,9 @@ FROM VALUES
 
     -- Feed sequence experiment
     (
-        "ab_beakman_search_services_feed_sequence_experiment",
+        "ab_beakman_search_services_feed_sequence_experiment_v2",
         named_struct(
-            'begin_date', DATE('2026-05-07'),
+            'begin_date', DATE('2026-05-28'),
             'end_date', NULL,
             'variants', to_json(
                 named_struct(
