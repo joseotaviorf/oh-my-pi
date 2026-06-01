@@ -1,5 +1,5 @@
 -- Sonia Closing audience view: one row per contract signatory from per-person contract-sent events.
--- Source: rent_flow_{tenant,owner}_contract_sent CDP events from 2026-05-01.
+-- Source: rent_flow_[tenant|owner]_contract_sent CDP events from 2026-05-01.
 -- is_participant encodes three independently-expandable gates (all use the same binning_value):
 --   Gate 0: number_of_signatories = 2,                                        threshold 0-100 (100 = fully open)
 --   Gate 1: all contract signatories registered (every uuid_person NOT NULL),  threshold 0-100 (100 = fully open)
