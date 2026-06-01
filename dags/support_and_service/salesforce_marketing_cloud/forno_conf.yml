@@ -9,6 +9,12 @@ objects_config:
     external_identifier: "D7673084-AAF7-4F9C-8E9B-A5BE7EA45E42"
   sonia_ep2ds:
     external_identifier: "F0019893-5D1D-4462-8CB7-03D0B1980A47"
+  sonia_ep2ds_v2:
+    external_identifier: "D6CB733C-9191-45FE-A01E-F9FCB2C6F62C"
+  sonia_ds2ca_resend:
+    external_identifier: "A758F5EA-8201-483B-8F84-AFED55E5494B"
+  sonia_ds2ca_reject:
+    external_identifier: "5B45F178-957E-4DE6-BFA6-7075F1D5824A"
 custom_cluster:
   driver_node_type_id: r5.large
   node_type_id: r5.large
