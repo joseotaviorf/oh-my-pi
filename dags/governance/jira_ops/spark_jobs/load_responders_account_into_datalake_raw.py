@@ -8,6 +8,10 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseSparkContext
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.loaders.delta_loader import DeltaLoader
 
 DATABRICKS_SCOPE = "quintoandar"
@@ -28,6 +32,7 @@ if __name__ == "__main__":
     parser.add_argument("table_name", help="")
     parser.add_argument("extra_args", help="")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
     environment = args.environment
     datalake_bucket = args.datalake_bucket
@@ -101,11 +106,21 @@ if __name__ == "__main__":
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
 
     loader = DeltaLoader()
     loader.load_table(
-        table_name=f"{database_name}.{table_name}",
-        path=f"{database_location}{table_name}",
+        table_name=f"{write_database_name}.{write_table_name}",
+        path=f"{write_location}{write_table_name}",
         source_df=df_final,
         partition_by=partition_cols,
     )

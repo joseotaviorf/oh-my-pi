@@ -10,12 +10,31 @@ from requests.adapters import HTTPAdapter, Retry
 
 from bietlejuice.base.service.service_enum import ServiceEnum
 from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_dashboard_governance_into_mp"
 DASHBOARDS_PATH = "/dashboard"
-EXTRACTION_QUERY = """
+
+logging.getLogger("py4j").setLevel(logging.ERROR)
+logger = QuintoAndarLogger(JOB_NAME)
+
+
+def remove_nulls(row_dict):
+    return {k: v for k, v in row_dict.items() if v}
+
+
+def _get_payloads_from_datalake(
+    spark_client,
+    execution_date,
+    database_name="datalake_dashboard_governance",
+    table_name="dashboard_metadata",
+):
+    query = """
 SELECT
   platform,
   id_dashboard,
@@ -29,22 +48,13 @@ SELECT
   date_format(last_view, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'") as last_view,
   dashboard_url
 FROM
-  datalake_dashboard_governance.dashboard_metadata
+  {database_name}.{table_name}
 WHERE
   day == {day} and month == {month} and year == {year}
 """
-
-logging.getLogger("py4j").setLevel(logging.ERROR)
-logger = QuintoAndarLogger(JOB_NAME)
-
-
-def remove_nulls(row_dict):
-    return {k: v for k, v in row_dict.items() if v}
-
-
-def _get_payloads_from_datalake(spark_client, execution_date):
-    query = EXTRACTION_QUERY
     query_params = {
+        "database_name": database_name,
+        "table_name": table_name,
         "day": execution_date.day,
         "month": execution_date.month,
         "year": execution_date.year,
@@ -87,6 +97,7 @@ if __name__ == "__main__":
     parser.add_argument("env")
     parser.add_argument("execution_date_str")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
     env = args.env
     execution_date_str = args.execution_date_str
@@ -108,6 +119,17 @@ if __name__ == "__main__":
     host = credentials["host"]
     endpoint = f"{host}{DASHBOARDS_PATH}"
 
+    database_name, table_name, _ = resolve_datalake_write_target(
+        prod_database="datalake_dashboard_governance",
+        prod_table="dashboard_metadata",
+        prod_location="",
+        bucket="",
+        target_database=args.target_database_name,
+        target_table=args.target_table_name,
+    )
+
     spark_client = SparkClient()
-    payloads = _get_payloads_from_datalake(spark_client, execution_date)
+    payloads = _get_payloads_from_datalake(
+        spark_client, execution_date, database_name, table_name
+    )
     _send_requests(endpoint, payloads)

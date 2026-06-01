@@ -10,6 +10,10 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.api_consumers.gsheets_consumer import GsheetsConsumer
 
@@ -41,7 +45,12 @@ def write_data_on_sheet(
     client.write(sheet_name=sheet_name, sheet_id=sheet_id, data=data)
 
 
-def _get_payloads_from_datalake(spark_client: SparkClient, execution_date: str) -> list:
+def _get_payloads_from_datalake(
+    spark_client: SparkClient,
+    execution_date: str,
+    database_name: str = "reverse_anonymization",
+    table_name: str = "scan_entities_found",
+) -> list:
     """
     This function gets the data from the reverse tables and transforms it into a list of payloads
 
@@ -69,7 +78,7 @@ def _get_payloads_from_datalake(spark_client: SparkClient, execution_date: str) 
         col_summary,
         initial_eval
     FROM
-        reverse_anonymization.scan_entities_found
+        {database_name}.{table_name}
     WHERE
         year = {year}
         AND month = {month}
@@ -107,11 +116,20 @@ def main():
     parser.add_argument("sheet_id")
     parser.add_argument("execution_date")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     sheet_name = args.sheet_name
     sheet_id = args.sheet_id
     execution_date = args.execution_date
+    database_name, table_name, _ = resolve_datalake_write_target(
+        prod_database="reverse_anonymization",
+        prod_table="scan_entities_found",
+        prod_location="",
+        bucket="",
+        target_database=args.target_database_name,
+        target_table=args.target_table_name,
+    )
 
     logger.info(
         f"m=main, message=Starting job. sheet_name={sheet_name}, sheet_id={sheet_id}, execution_date= {execution_date}"
@@ -139,7 +157,9 @@ def main():
 
     gsheets_producer = GoogleSheetsWriter(gsheets_client)
 
-    new_data_scan = _get_payloads_from_datalake(spark_client, execution_date)
+    new_data_scan = _get_payloads_from_datalake(
+        spark_client, execution_date, database_name, table_name
+    )
 
     gsheets_consumer = GsheetsConsumer(gsheets_client, spark_client)
 

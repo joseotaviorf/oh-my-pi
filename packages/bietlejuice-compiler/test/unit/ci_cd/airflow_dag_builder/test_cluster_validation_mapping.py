@@ -8,6 +8,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
     build_consolidation_catalog,
     build_validation_cluster_spec,
+    cap_validation_driver_node_type,
     compute_validation_overrides,
     is_single_node_cluster,
     map_instance_type_to_graviton,
@@ -189,6 +190,22 @@ class TestComputeValidationOverrides:
             validation_resolved={"num_workers": 3, "node_type_id": "m6g.xlarge"},
         )
         assert "num_workers" not in overrides
+
+    def test_caps_oversized_validation_driver(self):
+        overrides = compute_validation_overrides(
+            effective_prod={},
+            mapped_worker="r6g.2xlarge",
+            mapped_driver="r6g.4xlarge",
+            validation_resolved={
+                "node_type_id": "r6g.2xlarge",
+                "driver_node_type_id": "r6g.2xlarge",
+            },
+        )
+        assert "driver_node_type_id" not in overrides
+
+    def test_cap_validation_driver_node_type_helper(self):
+        assert cap_validation_driver_node_type("r6g.4xlarge") == "r6g.2xlarge"
+        assert cap_validation_driver_node_type("r6g.2xlarge") == "r6g.2xlarge"
 
 
 class TestBuildValidationClusterSpec:

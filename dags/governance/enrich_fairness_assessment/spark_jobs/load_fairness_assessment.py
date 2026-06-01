@@ -176,6 +176,11 @@ def main() -> None:
 
     from bietlejuice.base.db import DatalakeMetastoreService
     from bietlejuice.base.spark import BaseDBUtils, BaseSparkContext
+    from bietlejuice.base.validation.spark_args import (
+        add_validation_target_args,
+        resolve_datalake_write_target,
+    )
+    from bietlejuice.base.validation.target_resolver import resolve_validation_target
     from bietlejuice.loaders.delta_loader import DeltaLoader
 
     def parse_args() -> argparse.Namespace:
@@ -189,6 +194,7 @@ def main() -> None:
         parser.add_argument("load_end_date")
         parser.add_argument("partitions")
         parser.add_argument("dag_name")
+        add_validation_target_args(parser)
         args = parser.parse_args()
         logger.info(
             f"m=parse_args,environment={args.environment},schema={args.schema},"
@@ -620,8 +626,18 @@ def main() -> None:
     )
     database_name = db_info["db_enrich_databricks"]
     database_location = db_info["db_enrich_path"]
-    full_table = f"{database_name}.{args.table_name}"
-    path = f"{database_location}/{args.table_name}"
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=args.table_name,
+            prod_location=database_location,
+            bucket=args.datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
+    full_table = f"{write_database_name}.{write_table_name}"
+    path = f"{write_location}/{write_table_name}"
 
     merge_on = ["database_name", "table_name", "year", "month", "day"]
     loader = DeltaLoader(spark=spark)
@@ -657,8 +673,22 @@ def main() -> None:
             "ts_assessed",
         )
     )
-    class_full = f"{database_name}.fairness_classification"
-    class_path = f"{database_location}/fairness_classification"
+    if args.target_database_name and args.target_table_name:
+        class_target_database, class_target_table = resolve_validation_target(
+            database_name, "fairness_classification"
+        )
+    else:
+        class_target_database, class_target_table = None, None
+    class_write_db, class_write_table, class_write_path = resolve_datalake_write_target(
+        prod_database=database_name,
+        prod_table="fairness_classification",
+        prod_location=database_location,
+        bucket=args.datalake_bucket,
+        target_database=class_target_database,
+        target_table=class_target_table,
+    )
+    class_full = f"{class_write_db}.{class_write_table}"
+    class_path = f"{class_write_path}{class_write_table}"
     loader.load_table(
         table_name=class_full,
         path=class_path,

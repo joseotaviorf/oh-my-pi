@@ -15,6 +15,10 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db.datalake_metastore_service import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, BaseSparkContext
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.loaders.delta_loader import DeltaLoader
 
 DATABRICKS_SCOPE = "quintoandar"
@@ -35,6 +39,8 @@ def main() -> None:
         args.datalake_bucket,
         args.schema,
         args.table_name,
+        target_database_name=args.target_database_name,
+        target_table_name=args.target_table_name,
     )
 
 
@@ -52,6 +58,7 @@ def parse_args() -> argparse.Namespace:
         "project_ids",
         help="IDs of all the projects to find deleted issues, as a JSON encoded list",
     )
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     logger.info(
@@ -125,17 +132,29 @@ def load_table(
     datalake_bucket: str,
     schema: str,
     table_name: str,
+    target_database_name: str = None,
+    target_table_name: str = None,
 ) -> None:
     logger.info("m=load_table,msg='loading table'")
 
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
     database_name = db_info["db_enrich_databricks"]
     database_location = db_info["db_enrich_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
 
     loader = DeltaLoader()
     loader.load_table(
-        table_name=f"{database_name}.{table_name}",
-        path=f"{database_location}/{table_name}",
+        table_name=f"{write_database_name}.{write_table_name}",
+        path=f"{write_location}/{write_table_name}",
         source_df=dataframe,
         merge_on=["id_issue"],
         when_matched_update_condition="FALSE",

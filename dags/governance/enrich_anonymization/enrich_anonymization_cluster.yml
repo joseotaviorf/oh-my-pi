@@ -1,0 +1,21 @@
+cluster:
+  type: consolidation_m_general_cluster
+  custom_libraries:
+    - pypi:
+        package: "presidio_analyzer==2.2.357"
+    - pypi:
+        package: "numpy==1.26.4"
+    # en_core_web_lg is not on PyPI. Databricks only installs wheels from S3/DBFS/Volumes/etc., not https://.
+    # Upload en_core_web_lg-3.7.1-py3-none-any.whl (Explosion spaCy models release) under spacy-models/ on artifacts_bucket.
+    - whl: "{artifacts_bucket}/spacy-models/en_core_web_lg-3.7.1-py3-none-any.whl"
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    num_workers: 4
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_version: 14.3.x-scala2.12
+    spark_conf:
+      spark.scheduler.mode: FAIR
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+      spark.sql.execution.arrow.pyspark.enabled: True
+      spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: True

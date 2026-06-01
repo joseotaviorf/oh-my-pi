@@ -9,6 +9,10 @@ from requests.adapters import HTTPAdapter, Retry
 
 from bietlejuice.base.service.service_enum import ServiceEnum
 from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 
 DATABRICKS_SCOPE = "quintoandar"
@@ -29,7 +33,12 @@ def remove_nulls(row_dict: dict) -> dict:
     return {k: v for k, v in row_dict.items() if v is not None}
 
 
-def _get_payloads_from_datalake(spark_client: SparkClient, data_asset: str) -> list:
+def _get_payloads_from_datalake(
+    spark_client: SparkClient,
+    data_asset: str,
+    target_database_name: str = None,
+    target_table_name: str = None,
+) -> list:
     """
     This function gets the data from the reverse tables and transforms it into a list of payloads
 
@@ -38,8 +47,15 @@ def _get_payloads_from_datalake(spark_client: SparkClient, data_asset: str) -> l
 
     :return: list of payloads
     """
-    DEAFULT_QUERY = "SELECT * FROM reverse_dashboard_governance.{asset}"
-    formatted_query = DEAFULT_QUERY.format(asset=data_asset)
+    database_name, table_name, _ = resolve_datalake_write_target(
+        prod_database="reverse_dashboard_governance",
+        prod_table=data_asset,
+        prod_location="",
+        bucket="",
+        target_database=target_database_name,
+        target_table=target_table_name,
+    )
+    formatted_query = f"SELECT * FROM {database_name}.{table_name}"
 
     df = spark_client.get_records(formatted_query)
     rows = df.rdd.map(lambda row: row.asDict()).collect()
@@ -100,6 +116,7 @@ if __name__ == "__main__":
         help="list of data assets to be loaded into Metadata Propagator. Options are dashboard, chart, dataset",
     )
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     environment = args.environment
@@ -134,7 +151,12 @@ if __name__ == "__main__":
         logger.info(f"m=__main__, sending data to {endpoint}")
 
         spark_client = SparkClient()
-        payloads = _get_payloads_from_datalake(spark_client, asset)
+        payloads = _get_payloads_from_datalake(
+            spark_client,
+            asset,
+            args.target_database_name,
+            args.target_table_name,
+        )
         try:
             _send_requests(endpoint, payloads, chunk_size)
         except Exception as e:

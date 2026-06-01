@@ -18,6 +18,8 @@ sys.modules["bietlejuice.loaders.s3_loader"] = MagicMock()
 sys.modules["bietlejuice.clients.db_clients"] = MagicMock()
 sys.modules["bietlejuice.base.db"] = MagicMock()
 sys.modules["bietlejuice.base.spark"] = MagicMock()
+sys.modules["bietlejuice.base.validation"] = MagicMock()
+sys.modules["bietlejuice.base.validation.spark_args"] = MagicMock()
 
 from dags.governance.inmetro.spark_jobs.load_inmetro_raw import _generate_date_range  # noqa: E402, I001
 

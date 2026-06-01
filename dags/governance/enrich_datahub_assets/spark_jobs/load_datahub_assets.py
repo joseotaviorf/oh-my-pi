@@ -14,6 +14,10 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.loaders.delta_loader import DeltaLoader
 
 JOB_NAME = "load_datahub_datasets"
@@ -30,6 +34,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("load_start_date")
     parser.add_argument("load_end_date")
     parser.add_argument("partitions")
+    add_validation_target_args(parser)
     args = parser.parse_args()
     logger.info(
         f"m=parse_args,environment={args.environment},schema={args.schema},"
@@ -155,8 +160,18 @@ def main() -> None:
     )
     database_name = db_info["db_enrich_databricks"]
     database_location = db_info["db_enrich_path"]
-    full_table = f"{database_name}.{args.table_name}"
-    path = f"{database_location}/{args.table_name}"
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=args.table_name,
+            prod_location=database_location,
+            bucket=args.datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
+    full_table = f"{write_database_name}.{write_table_name}"
+    path = f"{write_location}/{write_table_name}"
 
     DeltaLoader(spark=spark).load_table(
         table_name=full_table,

@@ -185,6 +185,22 @@ def _instance_size_suffix(instance_type: str) -> str:
     return suffix
 
 
+VALIDATION_DRIVER_OVERSIZED_SUFFIXES = frozenset(
+    {"4xlarge", "8xlarge", "12xlarge", "16xlarge", "metal"}
+)
+
+
+def cap_validation_driver_node_type(node_type_id: Optional[str]) -> Optional[str]:
+    """Cap validation driver to 2xlarge (64 GiB) for smoke-test cost and fleet limits."""
+    if not node_type_id:
+        return node_type_id
+    suffix = _instance_size_suffix(node_type_id)
+    if suffix not in VALIDATION_DRIVER_OVERSIZED_SUFFIXES:
+        return node_type_id
+    prefix = node_type_id.rsplit(".", 1)[0]
+    return f"{prefix}.2xlarge"
+
+
 def _graviton_suffix_for_instance_type(instance_type: str) -> str:
     """Map prod size suffix to a valid Graviton gen-6 size (snap down aberrant sizes)."""
     prod_suffix = _instance_size_suffix(instance_type)
@@ -565,8 +581,9 @@ def compute_validation_overrides(
 
     if not _values_equal(mapped_worker, preset_worker):
         overrides["node_type_id"] = mapped_worker
-    if mapped_driver and not _values_equal(mapped_driver, preset_driver):
-        overrides["driver_node_type_id"] = mapped_driver
+    capped_driver = cap_validation_driver_node_type(mapped_driver)
+    if capped_driver and not _values_equal(capped_driver, preset_driver):
+        overrides["driver_node_type_id"] = capped_driver
 
     if _uses_photon(effective_prod, prod_cluster_type) and not _values_equal(
         "PHOTON", validation_resolved.get("runtime_engine")
