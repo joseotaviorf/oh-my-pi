@@ -17,12 +17,12 @@ WITH langfuse AS (
     ) AS queue_name
   FROM
     datalake_langfuse_clean.traces AS t
-  LEFT JOIN
+  INNER JOIN
     datalake_langfuse_clean.observations AS o
       ON o.id_trace = t.id_trace
-      AND o.ts_started >= DATE('{load_start_date}') - INTERVAL 30 DAY
   WHERE
-    t.ts_created >= DATE('{load_start_date}') - INTERVAL 30 DAY
+    t.ts_created >= DATE('{load_start_date}') - INTERVAL 7 DAY
+    AND o.ts_started >= DATE('{load_start_date}') - INTERVAL 7 DAY
 ),
 chatbot_sessions AS (
   SELECT
@@ -68,7 +68,7 @@ chatbot_sessions AS (
     datalake_sauron_clean.session AS s
       ON s.id = CAST(cs.id_sauron_session AS BIGINT)
   WHERE
-    cs.ts_created >= DATE('{load_start_date}') - INTERVAL 30 DAY
+    cs.ts_created >= DATE('{load_start_date}') - INTERVAL 7 DAY
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY cs.id ORDER BY cs.ts_created DESC) = 1
 ),
@@ -80,7 +80,7 @@ chats_by_sauron AS (
   FROM
     datalake_customer_support.chats AS c
   WHERE
-    c.ts_created >= DATE('{load_start_date}') - INTERVAL 60 DAY
+    c.ts_created >= DATE('{load_start_date}') - INTERVAL 15 DAY
     AND c.id_session IS NOT NULL
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY c.id_session ORDER BY c.ts_created DESC) = 1
@@ -93,7 +93,7 @@ chats_by_sss AS (
   FROM
     datalake_customer_support.chats AS c
   WHERE
-    c.ts_created >= DATE('{load_start_date}') - INTERVAL 60 DAY
+    c.ts_created >= DATE('{load_start_date}') - INTERVAL 15 DAY
     AND c.id_sss_session IS NOT NULL
   QUALIFY
     ROW_NUMBER() OVER (PARTITION BY c.id_sss_session ORDER BY c.ts_created DESC) = 1
@@ -107,7 +107,7 @@ tickets AS (
   WHERE
     channel = 'chat'
     AND id_twilio IS NOT NULL
-    AND ts_created >= DATE('{load_start_date}') - INTERVAL 60 DAY
+    AND ts_created >= DATE('{load_start_date}') - INTERVAL 15 DAY
   GROUP BY
     id_twilio
 )
