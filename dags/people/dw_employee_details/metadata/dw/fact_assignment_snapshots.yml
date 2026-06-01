@@ -144,13 +144,13 @@ columns:
     lineage:
       - datalake_people.assignment_snapshots.is_reorganization_termination
   is_monthly_snapshot:
-    description: True when dt_reference is the last day of the month or the most recent day (current date). Use to filter for monthly snapshots only.
+    description: True when dt_reference is the last day of the month, the most recent day (current date), or the assignment's termination date. The termination-date row guarantees a monthly snapshot exists for the month an employee left, even when they were terminated mid-month. Use to filter for monthly snapshots only.
     lineage:
       - datalake_people.assignment_snapshots.is_monthly_snapshot
   is_current:
-    description: True when this row is the most recent snapshot for the assignment (dt_reference = current date).
+    description: True for the assignment's latest available snapshot. Active assignments use the current date; terminated ones use the termination date. Exactly one row per assignment_number is flagged.
     lineage:
-      - datalake_people.assignment_snapshots.dt_reference
+      - datalake_people.assignment_snapshots.is_current
   dt_original_hire:
     description: Date of the employee's first hire at the company. Stays the same when they move between teams or roles.
     lineage:

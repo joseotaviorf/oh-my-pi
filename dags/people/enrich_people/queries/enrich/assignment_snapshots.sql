@@ -356,11 +356,19 @@ SELECT
     ad.is_future_hire,
     COALESCE(pap.id_assignment = ad.id_assignment, FALSE) AS is_primary_assignment_for_snapshot,
     COALESCE(LOWER(TRIM(lo.is_layoff)) = 'sim', FALSE) AS is_reorganization_termination,
-    (
+    COALESCE(
         LAST_DAY(ad.dt_reference) = ad.dt_reference
         OR ad.dt_reference = CURRENT_DATE()
+        OR ad.dt_reference = NULLIF(ad.dt_actual_termination, DATE('4712-12-31')),
+        FALSE
     ) AS is_monthly_snapshot,
-    ad.dt_reference = CURRENT_DATE() AS is_current,
+    ad.dt_reference = LEAST(
+        COALESCE(
+            NULLIF(ad.dt_actual_termination, DATE('4712-12-31')),
+            CURRENT_DATE()
+        ),
+        CURRENT_DATE()
+    ) AS is_current,
     fh.dt_original_hire,
     ad.dt_started AS dt_hired,
     COALESCE(

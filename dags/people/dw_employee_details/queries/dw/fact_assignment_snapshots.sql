@@ -31,7 +31,7 @@ SELECT
     asn.is_primary_assignment_for_snapshot,
     asn.is_reorganization_termination,
     asn.is_monthly_snapshot,
-    asn.dt_reference = CURRENT_DATE() AS is_current,
+    asn.is_current,
     asn.dt_original_hire,
     asn.dt_hired,
     asn.dt_terminated,

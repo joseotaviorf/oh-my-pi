@@ -175,13 +175,14 @@ columns:
     lineage:
       - datalake_gsheets_people_clean.layoffs.is_layoff
   is_monthly_snapshot:
-    description: True when dt_reference is the last day of the month or the most recent day (current date).
+    description: True when dt_reference is the last day of the month, the most recent day (current date), or the assignment's termination date. The termination-date row guarantees a monthly snapshot exists for the month an employee left, even when they were terminated mid-month.
     lineage:
       - datalake_pin_core_clean.periods_of_service.dt_started
+      - datalake_pin_core_clean.periods_of_service.dt_actual_termination
   is_current:
-    description: True when dt_reference equals the current date (most recent day available).
+    description: True for the assignment's latest available snapshot. Active assignments use the current date; terminated ones use the termination date. Exactly one row per assignment_number is flagged.
     lineage:
-      - datalake_pin_core_clean.periods_of_service.dt_started
+      - datalake_pin_core_clean.periods_of_service.dt_actual_termination
   dt_original_hire:
     description: Date of the employee's first hire at the company. Derived from MIN(dt_started) over periods_of_service per person (approximation). PER_SENIORITY_DATES_F will provide assignment-level value when available.
     lineage:

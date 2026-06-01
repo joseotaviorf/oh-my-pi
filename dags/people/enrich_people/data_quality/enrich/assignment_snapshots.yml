@@ -57,6 +57,17 @@ column_level_validations:
             )
         )) = 0
       severity_level: Error
+  is_current:
+    custom:
+      # Exactly one current snapshot per assignment_number (latest day for active; termination date for terminated).
+      constraint: |-
+        (SELECT COUNT(*) FROM (
+          SELECT assignment_number
+          FROM datalake_people.assignment_snapshots
+          GROUP BY assignment_number
+          HAVING SUM(CASE WHEN is_current THEN 1 ELSE 0 END) != 1
+        )) = 0
+      severity_level: Error
   ts_load:
     is_complete:
       severity_level: Warning
