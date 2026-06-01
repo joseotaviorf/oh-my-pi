@@ -158,8 +158,8 @@ server:
 # List available roles
 /usr/local/bin/weep list
 
-# Export credentials for Forno Stag Data (account 713278628093)
-eval $(/usr/local/bin/weep export arn:aws:iam::713278628093:role/sso_DataAndAnalytics_Squad)
+# Export credentials for Forno Stag Data (account 713278628093) — EMR DAGs require EMR role
+eval $(/usr/local/bin/weep export arn:aws:iam::713278628093:role/sso_DataAndAnalyticsEMRUser_staff)
 
 # Verify
 aws sts get-caller-identity
@@ -349,7 +349,7 @@ aws s3 cp dags/{domain}/{dag_name}/spark_jobs/forno_conf.yml \
 | `DELTA_CREATE_TABLE_SCHEME_MISMATCH` | Schema change conflicts with existing Delta table on forno | Delete the old table: `aws s3 rm s3://5a-datalake-forno/{layer}/{schema}/{table}/ --recursive`, then re-trigger |
 | `DELTA_PATH_DOES_NOT_EXIST` after deleting a table | Metastore still references the old table but the S3 path was removed | Drop the metastore entry via Databricks: `spark.sql("DROP TABLE IF EXISTS {schema}.{table}")` before re-triggering |
 | Task succeeds but target table is empty | Date range does not match data available in forno | Check source table dates first, then trigger with matching dates |
-| AWS credentials expire mid-session | Weep credentials last ~1 hour | Re-run `eval $(/usr/local/bin/weep export arn:aws:iam::713278628093:role/sso_DataAndAnalytics_Squad)` before each upload step |
+| AWS credentials expire mid-session | Weep credentials last ~1 hour | Re-run `eval $(/usr/local/bin/weep export arn:aws:iam::713278628093:role/sso_DataAndAnalyticsEMRUser_staff)` or `make import-local-aws-connection` |
 | `unknown flag: --secret` during `astro dev restart` | `DOCKER_BUILDKIT` not set | `export DOCKER_BUILDKIT=1`; install buildx if missing (see setup-local-environment skill) |
 
 ---

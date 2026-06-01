@@ -291,6 +291,17 @@ setup-local-variables:
 	@echo "All variables set!"
 	@echo "~> Restart your shell to apply changes!"
 
+.PHONY: import-local-pools
+import-local-pools:
+	@echo "Importing local Airflow pools"
+	@cd ./local/astro && bash import_local_pools.sh
+
+.PHONY: import-local-aws-connection
+import-local-aws-connection:
+	@echo "Importing local Airflow AWS connection"
+	@$(load_env_vars); \
+	cd ./local/astro && bash import_local_aws_connection.sh
+
 .PHONY: import-variables-and-connections
 import-variables-and-connections:
 	@echo "Import Variables and Connections"
@@ -326,6 +337,8 @@ run-local-environment:
 	  echo "All containers are running. Proceeding..."; \
 	fi
 	@$(wait_for_scheduler)
+	@make import-local-pools
+	-@make import-local-aws-connection
 	@make import-variables-and-connections
 
 .PHONY: restart-local-environment
@@ -344,6 +357,8 @@ restart-local-environment:
 	  echo "All containers are running. Proceeding..."; \
 	fi
 	@$(wait_for_scheduler)
+	@make import-local-pools
+	-@make import-local-aws-connection
 
 .PHONY: stop-local-environment
 stop-local-environment:

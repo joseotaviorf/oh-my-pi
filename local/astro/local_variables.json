@@ -490,6 +490,9 @@
         "ssh_public_keys": []
     },
     "dw_bucket": "dw.s3.forno.data.quintoandar.com.br",
+    "emr_instance_profile_arn": "arn:aws:iam::713278628093:instance-profile/emr-forno",
+    "emr_subnet_id": "subnet-0b0dd4939e90dab1a",
+    "emr_service_role": "arn:aws:iam::713278628093:role/EMR_DefaultRole_V2",
     "emr_default_cluster_config": {
         "Applications": [
             {

@@ -1,0 +1,20 @@
+{
+  "description": "Airflow pools required for local development. Add entries here when plugins or DAG workflows introduce custom pool names.",
+  "pools": [
+    {
+      "pool_name": "emr_api",
+      "slots": 128,
+      "description": "Rate-limits concurrent EMR control-plane API calls. Default pool for emr_plugin operators."
+    },
+    {
+      "pool_name": "gsheets_pool",
+      "slots": 32,
+      "description": "Limits concurrent Google Sheets ingestion tasks from raw_gsheets_workflow."
+    },
+    {
+      "pool_name": "gsheets_several_daily_runs_pool",
+      "slots": 16,
+      "description": "Limits concurrent gsheets_several_daily_runs DAG tasks (see gsheets_several_daily_runs_task_pool variable)."
+    }
+  ]
+}

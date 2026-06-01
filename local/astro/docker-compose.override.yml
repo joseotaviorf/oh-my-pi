@@ -2,6 +2,7 @@ version: "3.1"
 # Bind sources must be paths on the machine where dockerd runs. With Docker-outside-
 # of-Docker, that is the host—not /workspaces/... inside the dev container. The
 # Makefile exports LOCAL_WORKSPACE_FOLDER (from devcontainer remoteEnv or repo root).
+# Default ../.. = repo root when running astro from local/astro (avoids empty /dags mount).
 services:
   scheduler:
     volumes:
@@ -9,24 +10,24 @@ services:
       # Both packages are implicit namespace packages (no __init__.py at bietlejuice/
       # or any shared sub-directory level), so Python merges them transparently via
       # the PYTHONPATH entries set in the Dockerfile.
-      - ${LOCAL_WORKSPACE_FOLDER}/packages/bietlejuice-core/src:/usr/local/bietlejuice/core-src
-      - ${LOCAL_WORKSPACE_FOLDER}/packages/bietlejuice-airflow/src:/usr/local/bietlejuice/airflow-src
-      - ${LOCAL_WORKSPACE_FOLDER}/packages/bietlejuice-compiler/scripts:/usr/local/airflow/scripts
-      - ${LOCAL_WORKSPACE_FOLDER}/dags:/usr/local/airflow/dags
-      - ${LOCAL_WORKSPACE_FOLDER}/local/astro/plugins:/usr/local/airflow/plugins
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/packages/bietlejuice-core/src:/usr/local/bietlejuice/core-src
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/packages/bietlejuice-airflow/src:/usr/local/bietlejuice/airflow-src
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/packages/bietlejuice-compiler/scripts:/usr/local/airflow/scripts
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/dags:/usr/local/airflow/dags
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/local/astro/plugins:/usr/local/airflow/plugins
 
   webserver:
     volumes:
-      - ${LOCAL_WORKSPACE_FOLDER}/packages/bietlejuice-core/src:/usr/local/bietlejuice/core-src
-      - ${LOCAL_WORKSPACE_FOLDER}/packages/bietlejuice-airflow/src:/usr/local/bietlejuice/airflow-src
-      - ${LOCAL_WORKSPACE_FOLDER}/packages/bietlejuice-compiler/scripts:/usr/local/airflow/scripts
-      - ${LOCAL_WORKSPACE_FOLDER}/dags:/usr/local/airflow/dags
-      - ${LOCAL_WORKSPACE_FOLDER}/local/astro/plugins:/usr/local/airflow/plugins
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/packages/bietlejuice-core/src:/usr/local/bietlejuice/core-src
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/packages/bietlejuice-airflow/src:/usr/local/bietlejuice/airflow-src
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/packages/bietlejuice-compiler/scripts:/usr/local/airflow/scripts
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/dags:/usr/local/airflow/dags
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/local/astro/plugins:/usr/local/airflow/plugins
 
   triggerer:
     volumes:
-      - ${LOCAL_WORKSPACE_FOLDER}/packages/bietlejuice-core/src:/usr/local/bietlejuice/core-src
-      - ${LOCAL_WORKSPACE_FOLDER}/packages/bietlejuice-airflow/src:/usr/local/bietlejuice/airflow-src
-      - ${LOCAL_WORKSPACE_FOLDER}/packages/bietlejuice-compiler/scripts:/usr/local/airflow/scripts
-      - ${LOCAL_WORKSPACE_FOLDER}/dags:/usr/local/airflow/dags
-      - ${LOCAL_WORKSPACE_FOLDER}/local/astro/plugins:/usr/local/airflow/plugins
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/packages/bietlejuice-core/src:/usr/local/bietlejuice/core-src
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/packages/bietlejuice-airflow/src:/usr/local/bietlejuice/airflow-src
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/packages/bietlejuice-compiler/scripts:/usr/local/airflow/scripts
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/dags:/usr/local/airflow/dags
+      - ${LOCAL_WORKSPACE_FOLDER:-../..}/local/astro/plugins:/usr/local/airflow/plugins
