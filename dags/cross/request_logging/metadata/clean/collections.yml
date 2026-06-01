@@ -1,0 +1,136 @@
+database_name: datalake_request_logging_clean
+table_name: collections
+description: Clean layer table for collections request logging. Each row
+  projects raw collections fields with stable id_* keys and ts_request derived
+  from the raw timestamp column for merge and Z-order alignment with other
+  request-logging cleans.
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  id_request:
+    lineage:
+      - datalake_request_logging_raw.collections.request
+    description: Request identifier extracted from the raw request column using JSON
+      path $.request_id; matches the DAG merge_on key for clean loads.
+  id_event:
+    lineage:
+      - datalake_request_logging_raw.collections.event_id
+    description: Source event identifier from the raw collections event_id column,
+      aliased as id_event for naming consistency.
+  id_experiment:
+    lineage:
+      - datalake_request_logging_raw.collections.experiment_ids
+    description: Experiment identifiers from the raw collections experiment_ids
+      column, aliased as id_experiment; may tie logs to user-facing experiments.
+  id_trace:
+    lineage:
+      - datalake_request_logging_raw.collections.trace_id
+    description: Distributed trace identifier from the raw collections trace_id
+      column, aliased as id_trace for naming consistency.
+  id_tracking:
+    lineage:
+      - datalake_request_logging_raw.collections.tracking_ids
+    description: Tracking identifiers from the raw collections tracking_ids column,
+      aliased as id_tracking; may include device or session correlation tokens.
+  id_user:
+    lineage:
+      - datalake_request_logging_raw.collections.auth
+    description: QuintoAndar user legacy identifier extracted from auth.user_id.legacy_id
+      in the raw collections auth JSON payload.
+  uuid_person:
+    lineage:
+      - datalake_request_logging_raw.collections.auth
+    description: Person UUID extracted from auth.user_id.person_id in the raw collections
+      auth JSON payload; authoritative person key for the MCP tool invocation.
+  application_name:
+    lineage:
+      - datalake_request_logging_raw.collections.application_name
+    description: Name of the emitting application as recorded in the raw request
+      logging ingestion.
+  tool_name:
+    lineage:
+      - datalake_request_logging_raw.collections.application_payload
+    description: BFB MCP tool name extracted from application_payload.tool_name in the
+      raw collections JSON payload (e.g. get_financial_context_v1).
+  http_status_code:
+    lineage:
+      - datalake_request_logging_raw.collections.rpc_protocol
+    description: HTTP status code of the MCP tool invocation extracted from
+      rpc_protocol.http.status_code in the raw collections JSON payload.
+  application_payload:
+    lineage:
+      - datalake_request_logging_raw.collections.application_payload
+    description: Application-specific JSON payload string from raw collections; may
+      include person or contract identifiers inside nested JSON for downstream
+      parsing only.
+  auth:
+    lineage:
+      - datalake_request_logging_raw.collections.auth
+    description: Authentication context or credentials payload from raw collections,
+      passed through without transformation; treat as sensitive in access
+      reviews.
+  headers:
+    lineage:
+      - datalake_request_logging_raw.collections.headers
+    description: HTTP or transport headers from raw collections; may include cookies
+      or client identifiers, use only with appropriate data-access controls.
+  message_key:
+    lineage:
+      - datalake_request_logging_raw.collections.message_key
+    description: Kafka or messaging key for the request log event from raw collections.
+  offset:
+    lineage:
+      - datalake_request_logging_raw.collections.offset
+    description: Kafka or log offset of the ingested message from raw collections.
+  partition:
+    lineage:
+      - datalake_request_logging_raw.collections.partition
+    description: Kafka or log partition of the ingested message from raw collections.
+  request:
+    lineage:
+      - datalake_request_logging_raw.collections.request
+    description: Request body JSON from raw collections, including request_id and
+      RPC fields; may contain contextual identifiers, restrict usage to approved
+      scopes.
+  rpc_protocol:
+    lineage:
+      - datalake_request_logging_raw.collections.rpc_protocol
+    description: RPC protocol metadata including HTTP status from raw collections.
+  s3_key_prefix:
+    lineage:
+      - datalake_request_logging_raw.collections.s3_key_prefix
+    description: S3 key prefix reference for the source batch from raw collections.
+  source:
+    lineage:
+      - datalake_request_logging_raw.collections.source
+    description: Logical source system or pipeline tag for the log record from raw
+      collections.
+  source_type:
+    lineage:
+      - datalake_request_logging_raw.collections.source_type
+    description: Type discriminator for the source of the request log from raw collections.
+  topic:
+    lineage:
+      - datalake_request_logging_raw.collections.topic
+    description: Kafka or messaging topic name for the ingested event from raw collections.
+  ts_request:
+    lineage:
+      - datalake_request_logging_raw.collections.timestamp
+    description: Event timestamp when the request was recorded, sourced from the raw
+      collections timestamp column and aliased as ts_request.
+  year:
+    lineage:
+      - datalake_request_logging_raw.collections.year
+    description: Year partition column from raw collections load.
+  month:
+    lineage:
+      - datalake_request_logging_raw.collections.month
+    description: Month partition column from raw collections load.
+  day:
+    lineage:
+      - datalake_request_logging_raw.collections.day
+    description: Day partition column from raw collections load.
+  hour:
+    lineage:
+      - datalake_request_logging_raw.collections.hour
+    description: Hour partition column from raw collections load.
