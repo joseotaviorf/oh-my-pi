@@ -156,7 +156,7 @@ columns:
   id_process_evictions:
     description: Eviction process identifier when contract has active eviction
     lineage:
-      - dw_evictions.fact_evictions.sk_process
+      - datalake_gsheets_clean.evictions_base.id_process
   has_overdue_balance_over0_t1_at_ending:
     description: Flag indicating if contract has any overdue balance using T1 methodology at ending
   has_overdue_balance_over5_t1_at_ending:
@@ -172,7 +172,7 @@ columns:
   is_evictions:
     description: Flag indicating if contract has active eviction process
     lineage:
-      - dw_evictions.fact_evictions
+      - datalake_gsheets_clean.evictions_base
   n_anchor_invoices_not_negativable:
     description: Number of anchor invoices that are not eligible for negative operations
   n_invoices_negativable:

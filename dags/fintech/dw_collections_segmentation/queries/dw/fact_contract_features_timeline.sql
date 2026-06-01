@@ -1,15 +1,10 @@
 WITH deduplication_score AS (
     SELECT *
-    FROM (
-        SELECT
-            m.*,
-            ROW_NUMBER() OVER (
-                PARTITION BY id_contract, dt_reference
-                ORDER BY ts_inference DESC
-            ) AS _rn
-        FROM datalake_collections_score_batch_inference_clean.collections_score_v3_output AS m
-    )
-    WHERE _rn = 1
+    FROM datalake_collections_score_batch_inference_clean.collections_score_v3_output AS m
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY id_contract, dt_reference
+        ORDER BY ts_inference DESC
+    ) = 1
 ),
 
 essential_features AS (
