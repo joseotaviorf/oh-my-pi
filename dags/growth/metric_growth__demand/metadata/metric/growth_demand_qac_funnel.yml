@@ -24,6 +24,12 @@ columns:
       - dw_public.dim_region.city_group
     description: City group classification of the event region used to slice the funnel metrics.
     dimension: true
+  platform:
+    lineage:
+      - datalake_top_of_funnel_demand.user_interactions.app_type
+      - datalake_top_of_funnel_demand.quintoandar_classifieds_events.platform
+    description: Platform used by the user, normalized from source fields (App Android, App iOS, Web, Lost Tracking, Other).
+    dimension: true
   metric_value:
     description: Count of distinct Amplitude users (id_amplitude) for the funnel step on the reference date.
     metric:

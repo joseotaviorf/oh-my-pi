@@ -6,6 +6,13 @@ WITH clean_events AS (
     ui.is_qac_region,
     ui.business_context,
     ui.tof_event_type AS event_type,
+    CASE
+      WHEN ui.app_type IS NULL THEN 'Lost Tracking'
+      WHEN LOWER(ui.app_type) LIKE '%android%' THEN 'App Android'
+      WHEN LOWER(ui.app_type) LIKE '%ios%' THEN 'App iOS'
+      WHEN LOWER(ui.app_type) LIKE '%web%' THEN 'Web'
+      ELSE 'Other'
+    END AS platform,
     ui.ts_event
   FROM
     datalake_top_of_funnel_demand.user_interactions AS ui
@@ -25,6 +32,13 @@ WITH clean_events AS (
     TRUE AS is_qac_region,
     qac.business_context,
     qac.event_type,
+    CASE
+      WHEN qac.platform IS NULL THEN 'Lost Tracking'
+      WHEN LOWER(qac.platform) LIKE '%android%' THEN 'App Android'
+      WHEN LOWER(qac.platform) LIKE '%ios%' THEN 'App iOS'
+      WHEN LOWER(qac.platform) LIKE '%web%' THEN 'Web'
+      ELSE 'Other'
+    END AS platform,
     qac.ts_event
   FROM
     datalake_top_of_funnel_demand.quintoandar_classifieds_events AS qac
@@ -41,12 +55,13 @@ funnel_metrics AS (
     '1. ToF' AS metric_name,
     business_context,
     city_group,
+    platform,
     COUNT(DISTINCT id_amplitude) AS metric_value
   FROM
     clean_events
   WHERE
     event_type IN ('search_page_viewed', 'search_results_page_viewed', 'listing_page_viewed', 'schedule_page_viewed')
-  GROUP BY ALL
+  GROUP BY 1, 2, 3, 4, 5
 
   UNION ALL
 
@@ -55,13 +70,14 @@ funnel_metrics AS (
     '2. ToF QAC' AS metric_name,
     business_context,
     city_group,
+    platform,
     COUNT(DISTINCT id_amplitude) AS metric_value
   FROM
     clean_events
   WHERE
     is_qac_region = TRUE
     AND event_type IN ('search_page_viewed', 'search_results_page_viewed', 'listing_page_viewed')
-  GROUP BY ALL
+  GROUP BY 1, 2, 3, 4, 5
 
   UNION ALL
 
@@ -70,13 +86,14 @@ funnel_metrics AS (
     '3. ToF QAC Listed' AS metric_name,
     business_context,
     city_group,
+    platform,
     COUNT(DISTINCT id_amplitude) AS metric_value
   FROM
     clean_events
   WHERE
     is_qac = TRUE
     AND event_type IN ('search_page_viewed', 'search_results_page_viewed', 'listing_page_viewed')
-  GROUP BY ALL
+  GROUP BY 1, 2, 3, 4, 5
 
   UNION ALL
 
@@ -85,13 +102,14 @@ funnel_metrics AS (
     '4. Listing' AS metric_name,
     business_context,
     city_group,
+    platform,
     COUNT(DISTINCT id_amplitude) AS metric_value
   FROM
     clean_events
   WHERE
     is_qac = TRUE
     AND event_type IN ('listing_page_viewed')
-  GROUP BY ALL
+  GROUP BY 1, 2, 3, 4, 5
 
   UNION ALL
 
@@ -103,12 +121,13 @@ funnel_metrics AS (
     END AS metric_name,
     business_context,
     city_group,
+    platform,
     COUNT(DISTINCT id_amplitude) AS metric_value
   FROM
     clean_events
   WHERE
     event_type IN ('lead_intent', 'lead_intent_confirmed')
-  GROUP BY ALL
+  GROUP BY 1, 2, 3, 4, 5
 
   UNION ALL
 
@@ -117,12 +136,13 @@ funnel_metrics AS (
     'Search' AS metric_name,
     business_context,
     city_group,
+    platform,
     COUNT(DISTINCT id_amplitude) AS metric_value
   FROM
     clean_events
   WHERE
     event_type IN ('search_results_page_viewed', 'search_page_viewed')
-  GROUP BY ALL
+  GROUP BY 1, 2, 3, 4, 5
 
   UNION ALL
 
@@ -131,6 +151,7 @@ funnel_metrics AS (
     'Search > LPV' AS metric_name,
     search_.business_context,
     search_.city_group,
+    search_.platform,
     COUNT(DISTINCT search_.id_amplitude) AS metric_value
   FROM
     clean_events AS search_
@@ -141,13 +162,14 @@ funnel_metrics AS (
         AND lpv_.event_type = 'listing_page_viewed'
   WHERE
     search_.event_type IN ('search_results_page_viewed', 'search_page_viewed')
-  GROUP BY ALL
+  GROUP BY 1, 2, 3, 4, 5
 )
 SELECT
   dt_reference,
   metric_name,
   business_context,
   city_group,
+  platform,
   metric_value,
   YEAR(dt_reference) AS year,
   MONTH(dt_reference) AS month,
