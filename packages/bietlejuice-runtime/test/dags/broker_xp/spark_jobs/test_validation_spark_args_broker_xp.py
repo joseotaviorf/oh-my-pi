@@ -1,0 +1,18 @@
+"""Argparse smoke tests for broker_xp custom Spark jobs (cluster validation flags)."""
+
+from pathlib import Path
+
+import pytest
+
+_REPO_ROOT = Path(__file__).resolve().parents[6]
+
+_JOB_PATHS = [
+    "dags/broker_xp/reverse_sale_listings_report/spark_jobs/load_into_sns.py",
+]
+
+
+@pytest.mark.parametrize("job_path", _JOB_PATHS)
+def test_spark_job_registers_validation_write_flags(job_path: str):
+    text = (_REPO_ROOT / job_path).read_text(encoding="utf-8")
+    assert "add_validation_target_args" in text or "--target-database-name" in text
+    assert "resolve_datalake_write_target" in text
