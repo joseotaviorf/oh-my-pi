@@ -1,5 +1,4 @@
-SELECT
-    id,
+SELECT id,
     sales_flow_id AS id_sales_flow,
     payment_method,
     payment_model,
@@ -19,4 +18,4 @@ SELECT
     year,
     month,
     day
-FROM datalake_sales_flow_fast_lane_raw.payment
+FROM datalake_sales_flow_raw.payment

@@ -1,5 +1,5 @@
 ---
-database_name: datalake_sales_flow_fast_lane_raw
+database_name: datalake_sales_flow_raw
 table_name: sales_flow
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br

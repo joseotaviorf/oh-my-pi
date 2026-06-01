@@ -1,5 +1,4 @@
-SELECT
-    id,
+SELECT id,
     external_id AS id_external,
     address_data_id AS id_address_data,
     land_tenure,
@@ -20,4 +19,4 @@ SELECT
     year,
     month,
     day
-FROM datalake_sales_flow_fast_lane_raw.house
+FROM datalake_sales_flow_raw.house

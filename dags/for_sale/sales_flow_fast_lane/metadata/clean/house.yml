@@ -1,4 +1,4 @@
-database_name: datalake_sales_flow_fast_lane_clean
+database_name: datalake_sales_flow_clean
 table_name: house
 domain: For Sale
 owner: helder.rodrigues@quintoandar.com.br
@@ -7,84 +7,84 @@ columns:
   id:
     description: Unique ID for the house record in this table.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.id
+      - datalake_sales_flow_raw.house.id
   id_external:
     description: External identifier for the house, used for integration with other systems.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.external_id
+      - datalake_sales_flow_raw.house.external_id
   id_address_data:
     description: Foreign key to the address_data table.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.address_data_id
+      - datalake_sales_flow_raw.house.address_data_id
   land_tenure:
     description: The type of land tenure (e.g., freehold, leasehold).
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.land_tenure
+      - datalake_sales_flow_raw.house.land_tenure
   house_registration_status:
     description: The current status of the house's registration.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.house_registration_status
+      - datalake_sales_flow_raw.house.house_registration_status
   has_seller_debt_payments:
     description: Flag indicating if the seller has pending debt payments related to the property.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.has_seller_debt_payments
+      - datalake_sales_flow_raw.house.has_seller_debt_payments
   has_chattel_mortgage:
     description: Flag indicating if there is a chattel mortgage on the property.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.has_chattel_mortgage
+      - datalake_sales_flow_raw.house.has_chattel_mortgage
   has_pending_registry_update:
     description: Flag indicating if the property's registry must be updated.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.registry_must_be_updated
+      - datalake_sales_flow_raw.house.registry_must_be_updated
   chattel_mortgage_remaining_value:
     description: The remaining value of the chattel mortgage.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.chattel_mortgage_remaining_value
+      - datalake_sales_flow_raw.house.chattel_mortgage_remaining_value
   has_debts_or_encumbrances:
     description: Flag indicating if the property has any debts or encumbrances.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.has_debts_or_encumbrances
+      - datalake_sales_flow_raw.house.has_debts_or_encumbrances
   has_instituted_usufruct:
     description: Flag indicating if there is an instituted usufruct on the property.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.has_instituted_usufruct
+      - datalake_sales_flow_raw.house.has_instituted_usufruct
   has_recent_transaction:
     description: Flag indicating if the property had a recent transaction.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.has_recent_transaction
+      - datalake_sales_flow_raw.house.has_recent_transaction
   has_transaction_in_family:
     description: Flag indicating if a recent transaction was within the family.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.has_transaction_in_family
+      - datalake_sales_flow_raw.house.has_transaction_in_family
   image_url:
     description: URL for an image of the property.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.image_url
+      - datalake_sales_flow_raw.house.image_url
   is_primary_market:
     description: Flag indicating if the property is from the primary market.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.is_primary_market
+      - datalake_sales_flow_raw.house.is_primary_market
   ts_notified_on_negotiation:
     description: Timestamp of when a notification was sent regarding negotiation.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.notified_on_negotiation_at
+      - datalake_sales_flow_raw.house.notified_on_negotiation_at
   ts_created:
     description: Timestamp of when the house record was created.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.created_at
+      - datalake_sales_flow_raw.house.created_at
   ts_updated:
     description: Timestamp of the last update to the house record.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.updated_at
+      - datalake_sales_flow_raw.house.updated_at
   year:
     description: The Year in which the data was ingested.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.year
+      - datalake_sales_flow_raw.house.year
   month:
     description: The Month in which the data was ingested.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.month
+      - datalake_sales_flow_raw.house.month
   day:
     description: The Day in which the data was ingested.
     lineage:
-      - datalake_sales_flow_fast_lane_raw.house.day
+      - datalake_sales_flow_raw.house.day

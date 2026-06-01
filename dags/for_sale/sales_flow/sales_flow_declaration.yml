@@ -166,10 +166,6 @@ workflow:
       clean_table_name: diligence_appointment_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id_diligence_appointment_aud", "rev"]
-    house:
-      clean_table_name: house
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]
     house_aud:
       clean_table_name: house_aud
       raw_primary_keys: ["id", "rev"]
@@ -258,10 +254,6 @@ workflow:
       clean_table_name: notary_office
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-    offer:
-      clean_table_name: offer
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]
     offer_aud:
       clean_table_name: offer_aud
       raw_primary_keys: ["id", "rev"]
@@ -274,10 +266,6 @@ workflow:
       clean_table_name: offer_fee_rule_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
-    payment:
-      clean_table_name: payment
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]
     payment_aud:
       clean_table_name: payment_aud
       raw_primary_keys: ["id", "rev"]
@@ -296,10 +284,6 @@ workflow:
       clean_primary_keys: ["id", "rev"]
     revinfo:
       clean_table_name: rev_info
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]
-    sales_flow:
-      clean_table_name: sales_flow
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
     sales_flow_aud:
@@ -394,10 +378,6 @@ workflow:
       clean_table_name: seller_documentation_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
-    specialist:
-      clean_table_name: specialist
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id_specialist"]
     specialist_aud:
       clean_table_name: specialist_aud
       raw_primary_keys: ["id", "rev"]
@@ -454,10 +434,6 @@ workflow:
       clean_table_name: task_manager_info_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
-    users:
-      clean_table_name: users
-      raw_primary_keys: ["id"]
-      clean_primary_keys: ["id"]
     users_aud:
       clean_table_name: users_aud
       raw_primary_keys: ["id", "rev"]

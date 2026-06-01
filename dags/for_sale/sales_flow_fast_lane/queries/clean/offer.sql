@@ -1,5 +1,4 @@
-SELECT
-    id,
+SELECT id,
     sales_flow_id AS id_sales_flow,
     firestore_id AS id_firestore,
     reject_reason_id AS id_reject_reason,
@@ -28,4 +27,4 @@ SELECT
     year,
     month,
     day
-FROM datalake_sales_flow_fast_lane_raw.offer
+FROM datalake_sales_flow_raw.offer

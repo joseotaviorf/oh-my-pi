@@ -1,5 +1,4 @@
-SELECT
-    id,
+SELECT id,
     external_id AS id_external,
     name,
     email,
@@ -11,5 +10,4 @@ SELECT
     year,
     month,
     day
-FROM
-    datalake_sales_flow_fast_lane_raw.users
+FROM datalake_sales_flow_raw.users
