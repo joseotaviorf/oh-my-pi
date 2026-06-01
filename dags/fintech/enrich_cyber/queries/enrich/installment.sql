@@ -5,9 +5,9 @@ campaign_discount AS (
     SUM(IF(field_name IN ("Juros Residuais", "Juros Acordo"), amount_without_discount, 0)) AS contract_interest_fees_amount,
     SUM(IF(field_name IN ("Multa Residuais", "Multa Acordo"), amount_without_discount, 0)) AS fine_amount,
     SUM(IF(field_name IN ("Parcelas Vencidas", "Parcelas a Vencer"), amount_without_discount, 0)) AS original_amount,
-    SUM(IF(field_name IN ("Custas Residuais", "Custas Acordo"), amount_without_discount, 0)) AS eviction_costs_amount,
+    SUM(IF(field_name IN ("Custas Residuais", "Custas Acordo", "Honorários Residuais", "Despesas judiciais"), amount_without_discount, 0)) AS eviction_costs_amount,
     SUM(IF(field_name IN ("Parcelas Vencidas", "Parcelas a Vencer"), discount, 0)) AS discount_to_original_amount,
-    SUM(IF(field_name IN ("Juros Residuais", "Juros Acordo", "Multa Residuais", "Multa Acordo", "Custas Residuais", "Custas Acordo"), discount, 0)) AS discount_to_fees_amount,
+    SUM(IF(field_name IN ("Juros Residuais", "Juros Acordo", "Multa Residuais", "Multa Acordo", "Custas Residuais", "Custas Acordo", "Honorários Residuais", "Despesas judiciais"), discount, 0)) AS discount_to_fees_amount,
     SUM(discount) AS discount_amount
   FROM datalake_cyber_clean.campaign_discounts
   GROUP BY 1
@@ -18,9 +18,9 @@ agreement_discount AS (
     SUM(IF(field_name IN ("Juros Residuais", "Juros Acordo"), amount_without_discount, 0)) AS contract_interest_fees_amount,
     SUM(IF(field_name IN ("Multa Residuais", "Multa Acordo"), amount_without_discount, 0)) AS fine_amount,
     SUM(IF(field_name IN ("Parcelas Vencidas", "Parcelas a Vencer"), amount_without_discount, 0)) AS original_amount,
-    SUM(IF(field_name IN ("Custas Residuais", "Custas Acordo"), amount_without_discount, 0)) AS eviction_costs_amount,
+    SUM(IF(field_name IN ("Custas Residuais", "Custas Acordo", "Honorários Residuais", "Despesas judiciais"), amount_without_discount, 0)) AS eviction_costs_amount,
     SUM(IF(field_name IN ("Parcelas Vencidas", "Parcelas a Vencer"), discount, 0)) AS discount_to_original_amount,
-    SUM(IF(field_name IN ("Juros Residuais", "Juros Acordo", "Multa Residuais", "Multa Acordo", "Custas Residuais", "Custas Acordo"), discount, 0)) AS discount_to_fees_amount,
+    SUM(IF(field_name IN ("Juros Residuais", "Juros Acordo", "Multa Residuais", "Multa Acordo", "Custas Residuais", "Custas Acordo", "Honorários Residuais", "Despesas judiciais"), discount, 0)) AS discount_to_fees_amount,
     SUM(discount) AS discount_amount
   FROM datalake_cyber_clean.agreement_discounts
   GROUP BY 1
