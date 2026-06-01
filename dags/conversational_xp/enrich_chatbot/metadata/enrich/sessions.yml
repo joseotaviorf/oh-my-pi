@@ -15,15 +15,19 @@ columns:
     - datalake_greenseer_clean.session.id_session
     - datalake_sauron_clean.session.id
   id_langfuse_session:
-    description: 'Langfuse session ID (external session ID in Copilot). NULL for old bot (Greenseer) sessions'
+    description: 'Langfuse session ID (external_id in Copilot raw layer). NULL when session has no Langfuse trace'
     lineage:
     - datalake_copilot_service_clean.session.id_external
   id_sss_session:
-    description: 'Support Session Service public session identifier linked to the session when orchestrated through SSS; NULL when unavailable or for legacy Greenseer-only sessions.'
+    description: 'Support Session Service (SSS) public_id. Populated when id_sauron_session contains a UUID v7 (SSS-backed sessions)'
     lineage:
-    - datalake_support_session_service_clean.support_session.public_id
+    - datalake_copilot_service_clean.session.id_sauron_session
+  id_task:
+    description: 'Latest Twilio task ID from the associated chat'
+    lineage:
+    - datalake_customer_support.chats.id_task
   id_ticket:
-    description: 'Latest support ticket ID'
+    description: 'Zendesk ticket ID linked to the escalated chat, kept for backwards compatibility'
     lineage:
     - datalake_customer_support.tickets.id_ticket
   id_user:
@@ -34,8 +38,10 @@ columns:
   user_phone_number:
     description: 'User phone number associated with the session'
     lineage:
-    - datalake_copilot_service_clean.session.user_phone_number
+    - datalake_support_session_service_clean.support_session.user_phone
+    - datalake_support_session_service_clean.support_session.user_data
     - datalake_sauron_clean.session.user_phone
+    - datalake_copilot_service_clean.session.user_phone_number
     - datalake_sauron_clean.session.user_data
   bot:
     description: 'Bot persona handling the session'
@@ -69,8 +75,9 @@ columns:
     - datalake_sauron_clean.session.source
     - datalake_sauron_clean.session.source_environment
   status:
-    description: 'Session status from Sauron'
+    description: 'Session status (SSS if available, otherwise Sauron)'
     lineage:
+    - datalake_support_session_service_clean.support_session.status
     - datalake_sauron_clean.session.status
   version:
     description: 'Langfuse version for the session'
@@ -80,21 +87,21 @@ columns:
     description: 'First support queue (department)'
     lineage:
     - datalake_langfuse_clean.observations.input
-    - datalake_customer_support.tickets.first_queue
   last_queue:
-    description: 'Last support queue'
+    description: 'Last support queue from the associated chat'
     lineage:
-    - datalake_customer_support.tickets.last_queue
+    - datalake_customer_support.chats.queue_name
   is_escalated:
-    description: 'True if escalated to support'
+    description: 'True if escalated to a human support agent via chat'
     lineage:
-    - datalake_customer_support.tickets.id_ticket
+    - datalake_customer_support.chats.id_task
   ts_created:
     description: 'Session creation timestamp'
     lineage:
     - datalake_copilot_service_clean.session.ts_created
     - datalake_sauron_clean.session.ts_created
   ts_updated:
-    description: 'Session last updated timestamp'
+    description: 'Session last updated timestamp (SSS if available, otherwise Sauron)'
     lineage:
+    - datalake_support_session_service_clean.support_session.ts_updated
     - datalake_sauron_clean.session.ts_updated

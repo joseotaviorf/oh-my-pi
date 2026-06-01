@@ -1849,7 +1849,6 @@ bietlejuice.enrich_chatbot:
   - bietlejuice.enrich_customer_support:load-enrich-chats:first-run-of-day
   - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
   - bietlejuice.enrich_ebdb_user:load-enrich-user:first-run-of-day
-  - bietlejuice.greenseer:load-clean-session:first-run-of-day
   - bietlejuice.internal_chat:load-clean-internal-chat-messages:first-run-of-day
   - bietlejuice.langfuse:load-clean-observations:first-run-of-day
   - bietlejuice.langfuse:load-clean-scores:first-run-of-day

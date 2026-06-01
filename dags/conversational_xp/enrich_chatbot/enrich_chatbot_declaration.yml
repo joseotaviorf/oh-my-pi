@@ -10,8 +10,8 @@ workflow:
   layer: enrich
   tables_customization:
     sessions:
-      merge_on: [id_sauron_session]
-      z_order_by: [ts_created, id_sauron_session]
+      merge_on: [id_session]
+      z_order_by: [ts_created, id_session, id_sauron_session, id_task, id_ticket]
     messages:
       merge_on: [id_message]
       z_order_by: [ts_created]
@@ -32,7 +32,7 @@ cluster:
   type: custom_cluster
   custom_configurations:
     driver_node_type_id: r7a.2xlarge
-    node_type_id: r7a.2xlarge
+    node_type_id: r7a.4xlarge
     num_workers: 4
     spark_version: 16.4.x-scala2.12
     single_user_name: '{{ var.value.databricks_single_user_name }}'
