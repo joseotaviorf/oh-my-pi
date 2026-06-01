@@ -183,6 +183,7 @@ def salesforce_clean_pipeline(cfg):
         overwrite_schema=True,
         table_location=table_location,
         sync_hive=cfg.sync_hive,
+        sync_secondary_catalog=True,
     )
 
     if new_cols:

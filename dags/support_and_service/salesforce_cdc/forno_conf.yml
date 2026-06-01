@@ -27,6 +27,8 @@ custom_cluster:
     spark.executor.heartbeatInterval: "100s"
     spark.network.timeout: "600s"
     spark.metrics.appStatusSource.enabled: "true"
+  spark_env_vars:
+    GLUE_ASSUME_ROLE_ARN: "{{ var.value.get('glue_assume_role_arn', '') }}"
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

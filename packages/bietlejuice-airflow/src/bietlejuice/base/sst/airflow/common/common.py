@@ -26,6 +26,11 @@ def get_cluster_config(config_service):
     cluster_config["spark_conf"]["spark.databricks.sql.initial.catalog.namespace"] = (
         "quintoandar_{{ var.value.environment }}"
     )
+    cluster_config.setdefault("spark_env_vars", {})
+    cluster_config["spark_env_vars"].setdefault(
+        "GLUE_ASSUME_ROLE_ARN", "{{ var.value.get('glue_assume_role_arn', '') }}"
+    )
+    cluster_config["spark_env_vars"].setdefault("SPARK_RUNTIME", "databricks")
 
     return cluster_config
 

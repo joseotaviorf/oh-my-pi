@@ -162,6 +162,7 @@ def salesforce_raw_pipeline(cfg):
         partition_cols=partition_cols,
         overwrite_schema=True,
         table_location=table_location,
+        sync_secondary_catalog=True,
     )
 
     _metric_grain = {

@@ -11,6 +11,9 @@ from pyspark.sql import functions as F
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.spark.delta_secondary_catalog_sync import (
+    sync_delta_write_to_secondary_catalog,
+)
 from bietlejuice.base.sst.core.metadata.sync_metadata import sync_trino_metadata
 
 logger = QuintoAndarLogger("sst.common")
@@ -335,6 +338,71 @@ def _safe_merge_schema(spark: SparkSession, df: DataFrame, table: str) -> DataFr
     return df.select(ordered_columns)
 
 
+def _resolve_glue_table_name(target_table: str) -> str:
+    """Return ``database.table`` for secondary catalog sync (Glue / UC REST).
+
+    Three-part UC names (``catalog.database.table``) map to ``database.table``.
+    Two-part names are returned unchanged.
+    """
+    parts = target_table.split(".")
+    if len(parts) == 2:
+        return target_table
+    if len(parts) >= 3:
+        return f"{parts[-2]}.{parts[-1]}"
+    raise ValueError(
+        f"target_table must be a qualified name (database.table), got: {target_table}"
+    )
+
+
+def _post_write_catalog_sync(
+    spark: SparkSession,
+    df: DataFrame,
+    target_table: str,
+    table_location: str,
+    partition_cols: Optional[List[str]],
+    sync_hive: bool,
+    sync_secondary_catalog: bool,
+) -> None:
+    """Register table metadata in Trino and/or the secondary catalog after a write."""
+    if sync_hive:
+        sync_trino_metadata(target_table, table_location, df)
+        logger.info(
+            f"m=validate_and_write, target_table={target_table}, "
+            "msg=Trino metadata sync completed"
+        )
+    else:
+        logger.info(
+            f"m=validate_and_write, target_table={target_table}, "
+            "msg=Trino metadata sync skipped (sync_hive=False)"
+        )
+
+    if not sync_secondary_catalog:
+        logger.info(
+            f"m=validate_and_write, target_table={target_table}, "
+            "msg=Secondary catalog sync skipped (sync_secondary_catalog=False)"
+        )
+        return
+
+    if not table_location:
+        raise ValueError(
+            f"m=validate_and_write, target_table={target_table}, "
+            "msg=table_location is required when sync_secondary_catalog=True"
+        )
+
+    glue_table_name = _resolve_glue_table_name(target_table)
+    sync_delta_write_to_secondary_catalog(
+        spark=spark,
+        full_table_name=glue_table_name,
+        table_location_s3=table_location,
+        source_df=df,
+        partition_col_names=list(partition_cols or []),
+    )
+    logger.info(
+        f"m=validate_and_write, target_table={target_table}, "
+        "msg=Secondary catalog sync completed"
+    )
+
+
 @logger(exclude=["df"], exclude_return=False)
 def validate_and_write(
     spark: SparkSession,
@@ -346,6 +414,7 @@ def validate_and_write(
     overwrite_schema: bool = False,
     append: bool = False,
     sync_hive: bool = False,
+    sync_secondary_catalog: bool = False,
 ):
     """
     Validate and write a filtered subset of columns to a Delta table using
@@ -380,6 +449,11 @@ def validate_and_write(
         When True, calls ``sync_trino_table_schema`` from ``sync_metadata`` after
         writing to register or update the table in Trino's Delta catalog.
         Requires ``table_location`` to be set. Defaults to False.
+    sync_secondary_catalog : bool, optional
+        When True, syncs table DDL to the secondary catalog after writing
+        (Glue on Databricks, UC REST on EMR) via
+        ``sync_delta_write_to_secondary_catalog``. Requires ``table_location``.
+        Defaults to False.
     """
 
     _require_qualified_table_name(target_table)
@@ -413,6 +487,15 @@ def validate_and_write(
             raise ValueError(f"Table {target_table} was not created")
         logger.info(
             f"m=validate_and_write, msg=Table {target_table} created successfully"
+        )
+        _post_write_catalog_sync(
+            spark=spark,
+            df=df,
+            target_table=target_table,
+            table_location=table_location,
+            partition_cols=partition_cols,
+            sync_hive=sync_hive,
+            sync_secondary_catalog=sync_secondary_catalog,
         )
         return
 
@@ -451,18 +534,14 @@ def validate_and_write(
         writer = writer.option("replaceWhere", partition_filter)
     writer.saveAsTable(target_table)
 
-    if not sync_hive:
-        logger.info(
-            f"m=validate_and_write, target_table={target_table}, "
-            "msg=Trino metadata sync skipped (sync_hive=False)"
-        )
-        return
-
-    sync_trino_metadata(target_table, table_location, df)
-
-    logger.info(
-        f"m=validate_and_write, target_table={target_table}, "
-        "msg=Trino metadata sync completed"
+    _post_write_catalog_sync(
+        spark=spark,
+        df=df,
+        target_table=target_table,
+        table_location=table_location,
+        partition_cols=partition_cols,
+        sync_hive=sync_hive,
+        sync_secondary_catalog=sync_secondary_catalog,
     )
 
 
