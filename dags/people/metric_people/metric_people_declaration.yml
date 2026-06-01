@@ -5,7 +5,7 @@ dag:
   documentation:
     dag_purpose: |
       People metric-layer tables sourced only from People DW models (dw_*). First
-      delivery: employees_snapshots — one row per employee (sk_employee) and
+      delivery: employee_snapshots — one row per employee (sk_employee) and
       snapshot date (dt_reference), derived from dw_employee_details.fact_assignment_snapshots
       using a DW-only tie-break when multiple assignments overlap a person-day.
 cluster:
@@ -31,6 +31,6 @@ workflow:
   default_table_privileges:
     people-team: ["ALL PRIVILEGES"]
   tables_customization:
-    employees_snapshots:
+    employee_snapshots:
       vacuum_retention_hours: 168
       vacuum_lite: true

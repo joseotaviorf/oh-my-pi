@@ -1,5 +1,5 @@
 ---
-table_name: metric_people.employees_snapshots
+table_name: metric_people.employee_snapshots
 alert_channel: PEOPLE_ALERTS
 
 table_level_validations:
@@ -16,7 +16,7 @@ column_level_validations:
       constraint: |-
         (SELECT COUNT(*) FROM (
           SELECT sk_employee, dt_reference
-          FROM metric_people.employees_snapshots
+          FROM metric_people.employee_snapshots
           GROUP BY sk_employee, dt_reference
           HAVING COUNT(*) > 1
         )) = 0

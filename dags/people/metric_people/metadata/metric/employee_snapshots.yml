@@ -1,6 +1,6 @@
 ---
-database_name: metric_people
-table_name: employees_snapshots
+database_name: people
+table_name: employee_snapshots
 owner: gabriel.berger@quintoandar.com.br
 domain: People
 description: |
@@ -10,595 +10,595 @@ description: |
   demographics, disability, job, organization, hierarchy, compensation, and access-list rollups.
 columns:
   sk_cost_center_version:
-    description: Snapshot attribute for sk_cost_center_version on the employees_snapshots wide metric table.
+    description: Snapshot attribute for sk_cost_center_version on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.sk_cost_center_version
 
   sk_job_version:
-    description: Snapshot attribute for sk_job_version on the employees_snapshots wide metric table.
+    description: Snapshot attribute for sk_job_version on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.sk_job_version
 
   sk_contact_version:
-    description: Snapshot attribute for sk_contact_version on the employees_snapshots wide metric table.
+    description: Snapshot attribute for sk_contact_version on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.sk_contact_version
 
   sk_documentation_version:
-    description: Snapshot attribute for sk_documentation_version on the employees_snapshots wide metric table.
+    description: Snapshot attribute for sk_documentation_version on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.sk_documentation_version
 
   sk_emergency_contact_version:
-    description: Snapshot attribute for sk_emergency_contact_version on the employees_snapshots wide metric table.
+    description: Snapshot attribute for sk_emergency_contact_version on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.sk_emergency_contact_version
 
   sk_hierarchy_version:
-    description: Snapshot attribute for sk_hierarchy_version on the employees_snapshots wide metric table.
+    description: Snapshot attribute for sk_hierarchy_version on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.sk_hierarchy_version
 
   sk_employee:
-    description: Snapshot attribute for sk_employee on the employees_snapshots wide metric table.
+    description: Snapshot attribute for sk_employee on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.sk_employee
 
   sk_business_unit:
-    description: Snapshot attribute for sk_business_unit on the employees_snapshots wide metric table.
+    description: Snapshot attribute for sk_business_unit on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.sk_business_unit
 
   sk_termination_event_definition:
-    description: Snapshot attribute for sk_termination_event_definition on the employees_snapshots wide metric table.
+    description: Snapshot attribute for sk_termination_event_definition on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.sk_termination_event_definition
 
   sk_hired_date:
-    description: Snapshot attribute for sk_hired_date on the employees_snapshots wide metric table.
+    description: Snapshot attribute for sk_hired_date on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.sk_hired_date
 
   sk_terminated_date:
-    description: Snapshot attribute for sk_terminated_date on the employees_snapshots wide metric table.
+    description: Snapshot attribute for sk_terminated_date on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.sk_terminated_date
 
   sk_reference_date:
-    description: Snapshot attribute for sk_reference_date on the employees_snapshots wide metric table.
+    description: Snapshot attribute for sk_reference_date on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.sk_reference_date
 
   person_number:
-    description: Snapshot attribute for person_number on the employees_snapshots wide metric table.
+    description: Snapshot attribute for person_number on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.person_number
 
   assignment_number:
-    description: Snapshot attribute for assignment_number on the employees_snapshots wide metric table.
+    description: Snapshot attribute for assignment_number on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.assignment_number
 
   name:
-    description: Snapshot attribute for name on the employees_snapshots wide metric table.
+    description: Snapshot attribute for name on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_employee.name
 
   work_email:
-    description: Snapshot attribute for work_email on the employees_snapshots wide metric table.
+    description: Snapshot attribute for work_email on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_employee.work_email
 
   generation:
-    description: Snapshot attribute for generation on the employees_snapshots wide metric table.
+    description: Snapshot attribute for generation on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_employee.generation
 
   highest_education_level:
-    description: Snapshot attribute for highest_education_level on the employees_snapshots wide metric table.
+    description: Snapshot attribute for highest_education_level on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_employee.highest_education_level
 
   personal_email:
-    description: Snapshot attribute for personal_email on the employees_snapshots wide metric table.
+    description: Snapshot attribute for personal_email on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_contact.personal_email
 
   full_phone_number:
-    description: Snapshot attribute for full_phone_number on the employees_snapshots wide metric table.
+    description: Snapshot attribute for full_phone_number on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_contact.full_phone_number
 
   address_state:
-    description: Snapshot attribute for address_state on the employees_snapshots wide metric table.
+    description: Snapshot attribute for address_state on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_contact.address_state
 
   address_city:
-    description: Snapshot attribute for address_city on the employees_snapshots wide metric table.
+    description: Snapshot attribute for address_city on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_contact.address_city
 
   address_country:
-    description: Snapshot attribute for address_country on the employees_snapshots wide metric table.
+    description: Snapshot attribute for address_country on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_contact.address_country
 
   address_street:
-    description: Snapshot attribute for address_street on the employees_snapshots wide metric table.
+    description: Snapshot attribute for address_street on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_contact.address_street
 
   address_number:
-    description: Snapshot attribute for address_number on the employees_snapshots wide metric table.
+    description: Snapshot attribute for address_number on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_contact.address_number
 
   address_complement:
-    description: Snapshot attribute for address_complement on the employees_snapshots wide metric table.
+    description: Snapshot attribute for address_complement on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_contact.address_complement
 
   address_zip_code:
-    description: Snapshot attribute for address_zip_code on the employees_snapshots wide metric table.
+    description: Snapshot attribute for address_zip_code on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_contact.address_zip_code
 
   address_district:
-    description: Snapshot attribute for address_district on the employees_snapshots wide metric table.
+    description: Snapshot attribute for address_district on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_contact.address_district
 
   cpf:
-    description: Snapshot attribute for cpf on the employees_snapshots wide metric table.
+    description: Snapshot attribute for cpf on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_documentation.cpf
 
   rg:
-    description: Snapshot attribute for rg on the employees_snapshots wide metric table.
+    description: Snapshot attribute for rg on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_documentation.rg
 
   marital_status:
-    description: Snapshot attribute for marital_status on the employees_snapshots wide metric table.
+    description: Snapshot attribute for marital_status on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_documentation.marital_status
 
   legal_name:
-    description: Snapshot attribute for legal_name on the employees_snapshots wide metric table.
+    description: Snapshot attribute for legal_name on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_documentation.legal_name
 
   ethnicity:
-    description: Snapshot attribute for ethnicity on the employees_snapshots wide metric table.
+    description: Snapshot attribute for ethnicity on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_demographics.dim_employee_demographic.ethnicity
 
   gender_identity:
-    description: Snapshot attribute for gender_identity on the employees_snapshots wide metric table.
+    description: Snapshot attribute for gender_identity on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_demographics.dim_employee_demographic.gender_identity
 
   sexual_orientation:
-    description: Snapshot attribute for sexual_orientation on the employees_snapshots wide metric table.
+    description: Snapshot attribute for sexual_orientation on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_demographics.dim_employee_demographic.sexual_orientation
 
   religion:
-    description: Snapshot attribute for religion on the employees_snapshots wide metric table.
+    description: Snapshot attribute for religion on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_demographics.dim_employee_demographic.religion
 
   neurodiversity:
-    description: Snapshot attribute for neurodiversity on the employees_snapshots wide metric table.
+    description: Snapshot attribute for neurodiversity on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_demographics.dim_employee_disability.neurodiversity
 
   documented_disability_name:
-    description: Snapshot attribute for documented_disability_name on the employees_snapshots wide metric table.
+    description: Snapshot attribute for documented_disability_name on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_demographics.dim_employee_disability.documented_name
 
   registered_sex:
-    description: Snapshot attribute for registered_sex on the employees_snapshots wide metric table.
+    description: Snapshot attribute for registered_sex on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_demographics.dim_employee_demographic.legal_sex
 
   job_name:
-    description: Snapshot attribute for job_name on the employees_snapshots wide metric table.
+    description: Snapshot attribute for job_name on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.dim_job.job_name
 
   job_family:
-    description: Snapshot attribute for job_family on the employees_snapshots wide metric table.
+    description: Snapshot attribute for job_family on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.dim_job.job_family
 
   band:
-    description: Snapshot attribute for band on the employees_snapshots wide metric table.
+    description: Snapshot attribute for band on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.dim_job.band
 
   job_code:
-    description: Snapshot attribute for job_code on the employees_snapshots wide metric table.
+    description: Snapshot attribute for job_code on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.dim_job.job_code
 
   salary_table:
-    description: Snapshot attribute for salary_table on the employees_snapshots wide metric table.
+    description: Snapshot attribute for salary_table on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.dim_job.salary_table
 
   employment_type:
-    description: Snapshot attribute for employment_type on the employees_snapshots wide metric table.
+    description: Snapshot attribute for employment_type on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.dim_job.employment_type
 
   business_unit_name:
-    description: Snapshot attribute for business_unit_name on the employees_snapshots wide metric table.
+    description: Snapshot attribute for business_unit_name on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_business_unit.business_unit_name
 
   country:
-    description: Snapshot attribute for country on the employees_snapshots wide metric table.
+    description: Snapshot attribute for country on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.dim_job.country
 
   cost_center_code:
-    description: Snapshot attribute for cost_center_code on the employees_snapshots wide metric table.
+    description: Snapshot attribute for cost_center_code on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.cost_center_code
 
   cost_center_name:
-    description: Snapshot attribute for cost_center_name on the employees_snapshots wide metric table.
+    description: Snapshot attribute for cost_center_name on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.cost_center_name
 
   vertical:
-    description: Snapshot attribute for vertical on the employees_snapshots wide metric table.
+    description: Snapshot attribute for vertical on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.vertical
 
   structure:
-    description: Snapshot attribute for structure on the employees_snapshots wide metric table.
+    description: Snapshot attribute for structure on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.structure
 
   team:
-    description: Snapshot attribute for team on the employees_snapshots wide metric table.
+    description: Snapshot attribute for team on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.team
 
   business:
-    description: Snapshot attribute for business on the employees_snapshots wide metric table.
+    description: Snapshot attribute for business on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.business
 
   product:
-    description: Snapshot attribute for product on the employees_snapshots wide metric table.
+    description: Snapshot attribute for product on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.product
 
   brand:
-    description: Snapshot attribute for brand on the employees_snapshots wide metric table.
+    description: Snapshot attribute for brand on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.brand
 
   chapter:
-    description: Snapshot attribute for chapter on the employees_snapshots wide metric table.
+    description: Snapshot attribute for chapter on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.chapter
 
   line:
-    description: Snapshot attribute for line on the employees_snapshots wide metric table.
+    description: Snapshot attribute for line on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.line
 
   owner_l1_name:
-    description: Snapshot attribute for owner_l1_name on the employees_snapshots wide metric table.
+    description: Snapshot attribute for owner_l1_name on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.owner_l1_name
 
   owner_l2_name:
-    description: Snapshot attribute for owner_l2_name on the employees_snapshots wide metric table.
+    description: Snapshot attribute for owner_l2_name on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.owner_l2_name
 
   owner_l3_name:
-    description: Snapshot attribute for owner_l3_name on the employees_snapshots wide metric table.
+    description: Snapshot attribute for owner_l3_name on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.owner_l3_name
 
   headcount_type:
-    description: Snapshot attribute for headcount_type on the employees_snapshots wide metric table.
+    description: Snapshot attribute for headcount_type on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.headcount_type
 
   hrbp_work_email:
-    description: Snapshot attribute for hrbp_work_email on the employees_snapshots wide metric table.
+    description: Snapshot attribute for hrbp_work_email on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.hrbp_work_email
 
   status:
-    description: Snapshot attribute for status on the employees_snapshots wide metric table.
+    description: Snapshot attribute for status on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.employment_status
 
   termination_reason_name:
-    description: Snapshot attribute for termination_reason_name on the employees_snapshots wide metric table.
+    description: Snapshot attribute for termination_reason_name on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_event_definition.reason_name_ptb
 
   termination_category:
-    description: Snapshot attribute for termination_category on the employees_snapshots wide metric table.
+    description: Snapshot attribute for termination_category on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_event_definition.action_name_ptb
 
   manager_assignment_number:
-    description: Snapshot attribute for manager_assignment_number on the employees_snapshots wide metric table.
+    description: Snapshot attribute for manager_assignment_number on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.manager_assignment_number
 
   manager_name:
-    description: Snapshot attribute for manager_name on the employees_snapshots wide metric table.
+    description: Snapshot attribute for manager_name on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l1
 
   manager_work_email:
-    description: Snapshot attribute for manager_work_email on the employees_snapshots wide metric table.
+    description: Snapshot attribute for manager_work_email on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l1
 
   assignment_number_l0:
-    description: Snapshot attribute for assignment_number_l0 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for assignment_number_l0 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l0
 
   assignment_number_l1:
-    description: Snapshot attribute for assignment_number_l1 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for assignment_number_l1 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l1
 
   assignment_number_l2:
-    description: Snapshot attribute for assignment_number_l2 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for assignment_number_l2 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l2
 
   assignment_number_l3:
-    description: Snapshot attribute for assignment_number_l3 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for assignment_number_l3 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l3
 
   assignment_number_l4:
-    description: Snapshot attribute for assignment_number_l4 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for assignment_number_l4 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l4
 
   assignment_number_l5:
-    description: Snapshot attribute for assignment_number_l5 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for assignment_number_l5 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l5
 
   assignment_number_l6:
-    description: Snapshot attribute for assignment_number_l6 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for assignment_number_l6 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l6
 
   assignment_number_l7:
-    description: Snapshot attribute for assignment_number_l7 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for assignment_number_l7 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l7
 
   assignment_number_l8:
-    description: Snapshot attribute for assignment_number_l8 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for assignment_number_l8 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l8
 
   assignment_number_l9:
-    description: Snapshot attribute for assignment_number_l9 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for assignment_number_l9 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.assignment_number_l9
 
   name_l0:
-    description: Snapshot attribute for name_l0 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for name_l0 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l0
 
   name_l1:
-    description: Snapshot attribute for name_l1 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for name_l1 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l1
 
   name_l2:
-    description: Snapshot attribute for name_l2 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for name_l2 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l2
 
   name_l3:
-    description: Snapshot attribute for name_l3 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for name_l3 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l3
 
   name_l4:
-    description: Snapshot attribute for name_l4 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for name_l4 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l4
 
   name_l5:
-    description: Snapshot attribute for name_l5 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for name_l5 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l5
 
   name_l6:
-    description: Snapshot attribute for name_l6 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for name_l6 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l6
 
   name_l7:
-    description: Snapshot attribute for name_l7 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for name_l7 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l7
 
   name_l8:
-    description: Snapshot attribute for name_l8 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for name_l8 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l8
 
   name_l9:
-    description: Snapshot attribute for name_l9 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for name_l9 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.name_l9
 
   email_l0:
-    description: Snapshot attribute for email_l0 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for email_l0 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l0
 
   email_l1:
-    description: Snapshot attribute for email_l1 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for email_l1 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l1
 
   email_l2:
-    description: Snapshot attribute for email_l2 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for email_l2 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l2
 
   email_l3:
-    description: Snapshot attribute for email_l3 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for email_l3 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l3
 
   email_l4:
-    description: Snapshot attribute for email_l4 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for email_l4 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l4
 
   email_l5:
-    description: Snapshot attribute for email_l5 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for email_l5 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l5
 
   email_l6:
-    description: Snapshot attribute for email_l6 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for email_l6 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l6
 
   email_l7:
-    description: Snapshot attribute for email_l7 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for email_l7 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l7
 
   email_l8:
-    description: Snapshot attribute for email_l8 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for email_l8 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l8
 
   email_l9:
-    description: Snapshot attribute for email_l9 on the employees_snapshots wide metric table.
+    description: Snapshot attribute for email_l9 on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l9
 
   access_list:
-    description: Snapshot attribute for access_list on the employees_snapshots wide metric table.
+    description: Snapshot attribute for access_list on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_employee.work_email
@@ -606,114 +606,114 @@ columns:
       - dw_employee_details.dim_management_hierarchy.email_l0
 
   access_list_no_employee:
-    description: Snapshot attribute for access_list_no_employee on the employees_snapshots wide metric table.
+    description: Snapshot attribute for access_list_no_employee on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_organization.dim_cost_center.hrbp_work_email
       - dw_employee_details.dim_management_hierarchy.email_l0
 
   access_list_no_hrbp:
-    description: Snapshot attribute for access_list_no_hrbp on the employees_snapshots wide metric table.
+    description: Snapshot attribute for access_list_no_hrbp on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_employee.work_email
       - dw_employee_details.dim_management_hierarchy.email_l0
 
   access_list_no_employee_no_hrbp:
-    description: Snapshot attribute for access_list_no_employee_no_hrbp on the employees_snapshots wide metric table.
+    description: Snapshot attribute for access_list_no_employee_no_hrbp on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.email_l0
 
   age_range:
-    description: Snapshot attribute for age_range on the employees_snapshots wide metric table.
+    description: Snapshot attribute for age_range on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_employee.dt_birth
       - dw_employee_details.fact_assignment_snapshots.dt_reference
 
   salary_range:
-    description: Snapshot attribute for salary_range on the employees_snapshots wide metric table.
+    description: Snapshot attribute for salary_range on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.fact_compensations.salary_range
 
   tenure_range:
-    description: Snapshot attribute for tenure_range on the employees_snapshots wide metric table.
+    description: Snapshot attribute for tenure_range on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.months_tenure_in_company
 
   last_raise_reason:
-    description: Snapshot attribute for last_raise_reason on the employees_snapshots wide metric table.
+    description: Snapshot attribute for last_raise_reason on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.dim_event_definition.reason_name_ptb
 
   talent_potential:
-    description: Snapshot attribute for talent_potential on the employees_snapshots wide metric table.
+    description: Snapshot attribute for talent_potential on the employee_snapshots wide metric table.
     dimension: True
 
   talent_criticality:
-    description: Snapshot attribute for talent_criticality on the employees_snapshots wide metric table.
+    description: Snapshot attribute for talent_criticality on the employee_snapshots wide metric table.
     dimension: True
 
   talent_readiness:
-    description: Snapshot attribute for talent_readiness on the employees_snapshots wide metric table.
+    description: Snapshot attribute for talent_readiness on the employee_snapshots wide metric table.
     dimension: True
 
   talent_risk_of_loss:
-    description: Snapshot attribute for talent_risk_of_loss on the employees_snapshots wide metric table.
+    description: Snapshot attribute for talent_risk_of_loss on the employee_snapshots wide metric table.
     dimension: True
 
   perf_final_range:
-    description: Snapshot attribute for perf_final_range on the employees_snapshots wide metric table.
+    description: Snapshot attribute for perf_final_range on the employee_snapshots wide metric table.
     dimension: True
 
   development_matrix:
-    description: Snapshot attribute for development_matrix on the employees_snapshots wide metric table.
+    description: Snapshot attribute for development_matrix on the employee_snapshots wide metric table.
     dimension: True
 
   hierarchy_depth:
-    description: Snapshot attribute for hierarchy_depth on the employees_snapshots wide metric table.
+    description: Snapshot attribute for hierarchy_depth on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_management_hierarchy.hierarchy_depth
 
   age_in_years:
-    description: Snapshot attribute for age_in_years on the employees_snapshots wide metric table.
+    description: Snapshot attribute for age_in_years on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_employee.dt_birth
       - dw_employee_details.fact_assignment_snapshots.dt_reference
 
   months_since_last_raise:
-    description: Snapshot attribute for months_since_last_raise on the employees_snapshots wide metric table.
+    description: Snapshot attribute for months_since_last_raise on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.fact_compensations.dt_valid_from
       - dw_employee_details.fact_assignment_snapshots.dt_reference
 
   amount_salary:
-    description: Snapshot attribute for amount_salary on the employees_snapshots wide metric table.
+    description: Snapshot attribute for amount_salary on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.fact_compensations.amount_salary
 
   range_position:
-    description: Snapshot attribute for range_position on the employees_snapshots wide metric table.
+    description: Snapshot attribute for range_position on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.fact_compensations.range_position
 
   salary_range_mid:
-    description: Snapshot attribute for salary_range_mid on the employees_snapshots wide metric table.
+    description: Snapshot attribute for salary_range_mid on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.dim_job.salary_range_mid
 
   target_variable_pay:
-    description: Snapshot attribute for target_variable_pay on the employees_snapshots wide metric table.
+    description: Snapshot attribute for target_variable_pay on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.dim_job.target_plr
@@ -721,249 +721,249 @@ columns:
       - dw_compensation.fact_compensations.amount_salary
 
   last_raise_amount:
-    description: Snapshot attribute for last_raise_amount on the employees_snapshots wide metric table.
+    description: Snapshot attribute for last_raise_amount on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.fact_compensations.amount_adjustment
 
   last_raise_pct:
-    description: Snapshot attribute for last_raise_pct on the employees_snapshots wide metric table.
+    description: Snapshot attribute for last_raise_pct on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.fact_compensations.pct_adjustment
 
   count_direct_report:
-    description: Snapshot attribute for count_direct_report on the employees_snapshots wide metric table.
+    description: Snapshot attribute for count_direct_report on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.count_direct_report
 
   count_total_report:
-    description: Snapshot attribute for count_total_report on the employees_snapshots wide metric table.
+    description: Snapshot attribute for count_total_report on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.count_total_report
 
   months_tenure_in_company:
-    description: Snapshot attribute for months_tenure_in_company on the employees_snapshots wide metric table.
+    description: Snapshot attribute for months_tenure_in_company on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.months_tenure_in_company
 
   days_tenure_in_company:
-    description: Snapshot attribute for days_tenure_in_company on the employees_snapshots wide metric table.
+    description: Snapshot attribute for days_tenure_in_company on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.days_tenure_in_company
 
   days_tenure_in_assignment:
-    description: Snapshot attribute for days_tenure_in_assignment on the employees_snapshots wide metric table.
+    description: Snapshot attribute for days_tenure_in_assignment on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.days_tenure_in_assignment
 
   days_tenure_in_band:
-    description: Snapshot attribute for days_tenure_in_band on the employees_snapshots wide metric table.
+    description: Snapshot attribute for days_tenure_in_band on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.fact_compensations.days_tenure_in_band
 
   months_tenure_in_band:
-    description: Snapshot attribute for months_tenure_in_band on the employees_snapshots wide metric table.
+    description: Snapshot attribute for months_tenure_in_band on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.fact_compensations.months_tenure_in_band
 
   count_indirect_report:
-    description: Snapshot attribute for count_indirect_report on the employees_snapshots wide metric table.
+    description: Snapshot attribute for count_indirect_report on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.count_indirect_report
 
   perf_impact_score:
-    description: Snapshot attribute for perf_impact_score on the employees_snapshots wide metric table.
+    description: Snapshot attribute for perf_impact_score on the employee_snapshots wide metric table.
     dimension: True
 
   perf_behavior_score:
-    description: Snapshot attribute for perf_behavior_score on the employees_snapshots wide metric table.
+    description: Snapshot attribute for perf_behavior_score on the employee_snapshots wide metric table.
     dimension: True
 
   perf_leadership_score:
-    description: Snapshot attribute for perf_leadership_score on the employees_snapshots wide metric table.
+    description: Snapshot attribute for perf_leadership_score on the employee_snapshots wide metric table.
     dimension: True
 
   perf_composite_score:
-    description: Snapshot attribute for perf_composite_score on the employees_snapshots wide metric table.
+    description: Snapshot attribute for perf_composite_score on the employee_snapshots wide metric table.
     dimension: True
 
   perf_ipa:
-    description: Snapshot attribute for perf_ipa on the employees_snapshots wide metric table.
+    description: Snapshot attribute for perf_ipa on the employee_snapshots wide metric table.
     dimension: True
 
   has_clock_in:
-    description: Snapshot attribute for has_clock_in on the employees_snapshots wide metric table.
+    description: Snapshot attribute for has_clock_in on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.dim_job.has_clock_in
 
   has_self_declared_pwd:
-    description: Snapshot attribute for has_self_declared_pwd on the employees_snapshots wide metric table.
+    description: Snapshot attribute for has_self_declared_pwd on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_demographics.dim_employee_demographic.has_self_declared_pwd
 
   has_medical_disability_record:
-    description: Snapshot attribute for has_medical_disability_record on the employees_snapshots wide metric table.
+    description: Snapshot attribute for has_medical_disability_record on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_demographics.dim_employee_demographic.has_medical_disability_record
 
   is_underrepresented_race:
-    description: Snapshot attribute for is_underrepresented_race on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_underrepresented_race on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_demographics.dim_employee_demographic.is_underrepresented_race
 
   is_lgbtqia:
-    description: Snapshot attribute for is_lgbtqia on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_lgbtqia on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_demographics.dim_employee_demographic.is_lgbtqia
 
   is_woman:
-    description: Snapshot attribute for is_woman on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_woman on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_demographics.dim_employee_demographic.is_woman
 
   is_neurodivergent:
-    description: Snapshot attribute for is_neurodivergent on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_neurodivergent on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_demographics.dim_employee_demographic.is_neurodivergent
 
   is_eligible_internet_reimbursement:
-    description: Snapshot attribute for is_eligible_internet_reimbursement on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_eligible_internet_reimbursement on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.fact_compensations.is_eligible_internet_reimbursement
 
   is_active:
-    description: Snapshot attribute for is_active on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_active on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_active
 
   is_layoff:
-    description: Snapshot attribute for is_layoff on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_layoff on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_reorganization_termination
 
   manager_is_active:
-    description: Snapshot attribute for manager_is_active on the employees_snapshots wide metric table.
+    description: Snapshot attribute for manager_is_active on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_active
 
   is_manager:
-    description: Snapshot attribute for is_manager on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_manager on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_manager
 
   is_member_lt:
-    description: Snapshot attribute for is_member_lt on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_member_lt on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_member_lt
 
   is_member_et:
-    description: Snapshot attribute for is_member_et on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_member_et on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_member_et
 
   is_terminated:
-    description: Snapshot attribute for is_terminated on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_terminated on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_terminated
 
   has_emergency_contact:
-    description: Snapshot attribute for has_emergency_contact on the employees_snapshots wide metric table.
+    description: Snapshot attribute for has_emergency_contact on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.has_emergency_contact
 
   is_internal_transfer:
-    description: Snapshot attribute for is_internal_transfer on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_internal_transfer on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_internal_transfer
 
   is_monthly_snapshot:
-    description: Snapshot attribute for is_monthly_snapshot on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_monthly_snapshot on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_monthly_snapshot
 
   is_primary_assignment_for_snapshot:
-    description: Snapshot attribute for is_primary_assignment_for_snapshot on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_primary_assignment_for_snapshot on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_primary_assignment_for_snapshot
 
   is_current:
-    description: Snapshot attribute for is_current on the employees_snapshots wide metric table.
+    description: Snapshot attribute for is_current on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.is_current
 
   dt_reference:
-    description: Snapshot attribute for dt_reference on the employees_snapshots wide metric table.
+    description: Snapshot attribute for dt_reference on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.dt_reference
 
   dt_birth:
-    description: Snapshot attribute for dt_birth on the employees_snapshots wide metric table.
+    description: Snapshot attribute for dt_birth on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.dim_employee.dt_birth
 
   dt_hired:
-    description: Snapshot attribute for dt_hired on the employees_snapshots wide metric table.
+    description: Snapshot attribute for dt_hired on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.dt_hired
 
   dt_terminated:
-    description: Snapshot attribute for dt_terminated on the employees_snapshots wide metric table.
+    description: Snapshot attribute for dt_terminated on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.dt_terminated
 
   dt_original_hire:
-    description: Snapshot attribute for dt_original_hire on the employees_snapshots wide metric table.
+    description: Snapshot attribute for dt_original_hire on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.dt_original_hire
 
   dt_notified:
-    description: Snapshot attribute for dt_notified on the employees_snapshots wide metric table.
+    description: Snapshot attribute for dt_notified on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.dt_notified
 
   dt_last_raise:
-    description: Snapshot attribute for dt_last_raise on the employees_snapshots wide metric table.
+    description: Snapshot attribute for dt_last_raise on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_compensation.fact_compensations.dt_valid_from
 
   ts_load:
-    description: Snapshot attribute for ts_load on the employees_snapshots wide metric table.
+    description: Snapshot attribute for ts_load on the employee_snapshots wide metric table.
     dimension: True
     lineage:
       - dw_employee_details.fact_assignment_snapshots.ts_load
