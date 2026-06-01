@@ -20,16 +20,20 @@ events_config:
     event_path: "raw/salesforce/CaseMemberEvent"
   case_plates_lockbox:
     event_path: "raw/salesforce/CasePlatesLockboxEvent"
-    skip_quality_contracts: true
   case_inspection:
     event_path: "raw/salesforce/CaseInspectionEvent"
-    skip_quality_contracts: true
   case_repair_analysis:
     event_path: "raw/salesforce/CaseRepairAnalysisEvent"
-    skip_quality_contracts: true
+  case_repair_budget:
+    event_path: "raw/salesforce/CaseRepairBudgetEvent"
+  case_repair_follow_up:
+    event_path: "raw/salesforce/CaseRepairFollowUpEvent"
+  case_repair_item:
+    event_path: "raw/salesforce/CaseRepairItemEvent"
+  case_repair_request:
+    event_path: "raw/salesforce/CaseRepairRequestEvent"
   comment:
     event_path: "raw/salesforce/CommentEvent"
-    skip_quality_contracts: true
   dynamic_form:
     event_path: "raw/salesforce/DynamicFormEvent"
   email_message:
