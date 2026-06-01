@@ -1,21 +1,14 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_xs_memory_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"
-    driver_node_type_id: r5d.large
-    node_type_id: r5d.large
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment
+        }}
+    driver_node_type_id: r6gd.large
+    node_type_id: r6gd.large
     runtime_engine: PHOTON
     num_workers: 2
     spark_version: 16.4.x-scala2.12
-  databricks_conn_id: databricks_new_env
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      node_type_id: r6gd.large
-      driver_node_type_id: r6gd.large
-      runtime_engine: PHOTON

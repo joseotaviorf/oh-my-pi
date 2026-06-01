@@ -1,7 +1,8 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_m_general_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
-    driver_node_type_id: m5a.xlarge
+    driver_node_type_id: m6g.xlarge
     node_type_id: m5a.2xlarge
     autoscale:
       min_workers: 1
@@ -10,11 +11,5 @@ cluster:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-  databricks_conn_id: databricks_new_env
-validation:
-  cluster:
-    type: consolidation_m_general_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      driver_node_type_id: m6g.xlarge
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment
+        }}
