@@ -15,6 +15,10 @@ from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -89,6 +93,8 @@ def save_to_datalake(
     table_name: str,
     partitions: List[str],
     source: str,
+    target_database_name: str = None,
+    target_table_name: str = None,
 ) -> None:  # @todo fix code duplication with /dags/growth/iptu_bh/spark_jobs/load_iptu_bh_raw.py#L43
     spark_client = SparkClient()
 
@@ -96,38 +102,48 @@ def save_to_datalake(
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
 
     s3_loader = S3Loader()
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(write_database_name)
 
     s3_loader.load_df(
         df=dataframe,
-        s3_path=f"{database_location}{table_name}",
+        s3_path=f"{write_location}{write_table_name}",
         format_options=format_options,
         partitions=partitions,
     )
 
     spark_metastore_loader.update_metastore(
         df=dataframe,
-        database_name=database_name,
-        table_name=table_name,
+        database_name=write_database_name,
+        table_name=write_table_name,
         format_options=format_options,
-        database_location=database_location,
+        database_location=write_location,
         partitions=partitions,
         force_recreate=False,
     )
 
     spark_metastore_service.create_new_partitions_from_df(
-        database_name=database_name,
-        table_name=table_name,
+        database_name=write_database_name,
+        table_name=write_table_name,
         df=dataframe,
         partition_cols=partitions,
     )
 
-    full_raw_table_name = f"datalake_{source}_raw.{table_name}"
+    full_raw_table_name = f"{write_database_name}.{write_table_name}"
     table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
     if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
@@ -144,6 +160,8 @@ def main(
     source: str,
     source_root_path: str,
     table_name: str,
+    target_database_name: str = None,
+    target_table_name: str = None,
 ) -> None:
 
     logger.info(
@@ -202,6 +220,8 @@ def main(
             table_name=table_name,
             partitions=partitions,
             source=source,
+            target_database_name=target_database_name,
+            target_table_name=target_table_name,
         )
     else:
         logger.warning(
@@ -233,6 +253,7 @@ if __name__ == "__main__":
     parser.add_argument("source_root_path", help="Base path of the s3 bucket")
     parser.add_argument("origin", help="Origin of the data")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     # Initialize logger with source-specific job name
@@ -261,4 +282,6 @@ if __name__ == "__main__":
         source=args.source,
         source_root_path=args.source_root_path,
         table_name=args.table_name,
+        target_database_name=args.target_database_name,
+        target_table_name=args.target_table_name,
     )

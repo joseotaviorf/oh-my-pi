@@ -12,6 +12,10 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 
 DATABRICKS_SCOPE = "quintoandar"
 JOB_NAME = "load_into_birdie_api"
@@ -128,15 +132,22 @@ def parse_arguments() -> Tuple[str, str, str, str, datetime, str, str, str]:
     )
     parser.add_argument("api_url", help="URL to send the data to")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     dag_name = args.dag_name
-    database_name = args.database_name
-    table_name = args.table_name
     execution_date = datetime.fromisoformat(args.execution_date)
     feedbacks_endpoint = args.feedbacks_endpoint
     accounts_endpoint = args.accounts_endpoint
     api_url = args.api_url
+    database_name, table_name, _ = resolve_datalake_write_target(
+        prod_database=args.database_name,
+        prod_table=args.table_name,
+        prod_location="",
+        bucket="",
+        target_database=args.target_database_name,
+        target_table=args.target_table_name,
+    )
 
     return (
         dag_name,

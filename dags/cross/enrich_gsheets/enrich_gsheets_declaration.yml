@@ -7,6 +7,3 @@ dag:
 workflow:
   type: query
   layer: enrich
-cluster:
-  type: consolidation_s_general_single_node_cluster
-  databricks_conn_id: databricks_new_env
