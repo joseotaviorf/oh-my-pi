@@ -1,0 +1,171 @@
+database_name: enrich_ai_collections_quintoandar
+table_name: mcp_tool_logs
+description: One row per downstream service call recorded inside BFB MCP tool-call
+  request logs (application_payload.domain_info.calls), exploded from
+  datalake_request_logging_clean.collections for Collections AI agent analytics.
+  MCP-level fields use the mcp_ prefix; per-downstream-call fields use the call_
+  prefix. Langfuse TOOL observations are sequence-paired on id_trace and tool name.
+domain: Fintech
+owner: juliana.hocihara@quintoandar.com.br
+columns:
+  id_request:
+    lineage:
+      - datalake_request_logging_clean.collections.id_request
+    description: MCP tool invocation request identifier from the parent collections log row.
+  id_trace:
+    lineage:
+      - datalake_request_logging_clean.collections.id_trace
+    description: Distributed trace identifier from the parent MCP tool invocation; joins
+      to datalake_langfuse_clean.traces and enrich_ai_collections_quintoandar.sessions.
+  id_langfuse_session:
+    lineage:
+      - datalake_langfuse_clean.traces.id_session
+    description: Langfuse session identifier resolved from the trace; joins to
+      enrich_ai_collections_quintoandar.mcp_collection_sessions.id_langfuse_session.
+      NULL when no matching trace exists for the request.
+  id_user:
+    lineage:
+      - datalake_request_logging_clean.collections.id_user
+    description: QuintoAndar user legacy identifier from the parent MCP tool invocation.
+  id_contract_mcp:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Contract identifier from application_payload.domain_info.contract_id on
+      the MCP tool input; use to filter all downstream calls for a contract even when
+      individual calls omit contract_id.
+  id_contract_call:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Contract identifier from the individual downstream service call element
+      when present in domain_info.calls (e.g. TratoFeito negotiation calls).
+  uuid_person_mcp:
+    lineage:
+      - datalake_request_logging_clean.collections.uuid_person
+    description: Person UUID from auth on the parent MCP tool invocation row.
+  environment:
+    lineage:
+      - datalake_langfuse_clean.traces.environment
+    description: Langfuse environment for the trace associated with this request (e.g.
+      prod, staging). NULL when no matching trace exists. Use to filter production-only
+      traffic (environment = 'prod').
+  mcp_tool_name:
+    lineage:
+      - datalake_request_logging_clean.collections.tool_name
+    description: BFB MCP tool name from the parent invocation (e.g. get_financial_context_v1).
+  mcp_option_key:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Negotiation option key from application_payload.domain_info.option_key on
+      the MCP tool input; populated for create_negotiation_v1 and simulate_negotiation_v1
+      (e.g. pixleto-1x-lpf, cc-lpf); NULL for all other tools.
+  mcp_payment_method:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Payment method from application_payload.domain_info.payment_method on
+      the MCP tool input; populated for create_negotiation_v1 (values BOLETO, PIX,
+      CREDIT_CARD); NULL for all other tools.
+  call_client:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Downstream service client name from the exploded call (e.g. ContractMobileAPI,
+      TratoFeito, SeuBarriga).
+  call_function_name:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Downstream function or API method name from the exploded call element.
+  call_outcome:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Outcome status of the downstream service call (e.g. success, failure).
+  call_reason:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Failure or skip reason text from the downstream service call when call_outcome
+      is not success.
+  call_order_id:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Checkout order identifier from the downstream service call when the client
+      is Checkout; NULL for all other clients.
+  call_attempt:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Polling attempt index for repeated downstream calls within a single MCP
+      tool invocation (e.g. TratoFeito.GetOngoingNegotiation polling inside
+      create_negotiation_v1); NULL for non-polling calls.
+  call_index:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Zero-based ordinal position of the downstream service call within the
+      MCP tool invocation calls array (POSEXPLODE position).
+  mcp_input:
+    lineage:
+      - datalake_langfuse_clean.observations.input
+      - datalake_langfuse_clean.observations.name
+    description: Raw Langfuse TOOL observation input string for the MCP tool, sequence-paired
+      on id_trace and lowercased tool name with the HTTP log row. NULL when no matching
+      observation exists for that sequence position.
+  mcp_tool_error_message:
+    lineage:
+      - datalake_langfuse_clean.observations.output
+      - datalake_langfuse_clean.observations.name
+    description: Langfuse TOOL observation output cast to STRING when the MCP HTTP status
+      is not 2xx; NULL on success. Sequence-paired like mcp_input; NULL when counts diverge
+      or no observation matches.
+  call_response:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Downstream call response extracted as a string from the individual call
+      element at its array position. Always a string value — either a scalar (e.g. empty,
+      empty:NOT_FOUND, empty:NO_OPTIONS_FOR_AUDIENCE, empty:ONGOING_NEGOTIATION, EVICTIONS)
+      or a JSON-stringified array (e.g. ["pixleto-1x-lpf","cc-lpf"] for GetNegotiationOptions,
+      [3990,10009,...] for GetContracts); NULL when the call element omits the response field.
+  mcp_duration_ms:
+    lineage:
+      - datalake_request_logging_clean.collections.request
+    description: Duration in milliseconds of the parent MCP tool HTTP invocation from
+      request.duration_ms.
+  mcp_http_status_code:
+    lineage:
+      - datalake_request_logging_clean.collections.http_status_code
+    description: HTTP status code of the parent MCP tool HTTP invocation from rpc_protocol.
+  call_http_status:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: HTTP status code reported by the individual downstream service call when
+      present in the call element.
+  is_mcp_success:
+    lineage:
+      - datalake_request_logging_clean.collections.http_status_code
+    description: True when the parent MCP tool HTTP status code is between 200 and 299.
+  is_call_success:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: True when the downstream service call call_outcome equals success.
+  ts_request:
+    lineage:
+      - datalake_request_logging_clean.collections.ts_request
+    description: Timestamp when the parent MCP tool invocation was recorded.
+  call_house_ids:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: Array of house identifiers returned or referenced by the downstream
+      service call when applicable.
+  call_payload_json:
+    lineage:
+      - datalake_request_logging_clean.collections.application_payload
+    description: JSON serialization of the typed call struct fields (client, function,
+      outcome, http_status, reason, contract_id, order_id, house_ids, attempt) for
+      ad-hoc exploration. Does not include the response field; use call_response instead.
+  year:
+    lineage:
+      - datalake_request_logging_clean.collections.year
+    description: Year partition from the parent collections clean row.
+  month:
+    lineage:
+      - datalake_request_logging_clean.collections.month
+    description: Month partition from the parent collections clean row.
+  day:
+    lineage:
+      - datalake_request_logging_clean.collections.day
+    description: Day partition from the parent collections clean row.

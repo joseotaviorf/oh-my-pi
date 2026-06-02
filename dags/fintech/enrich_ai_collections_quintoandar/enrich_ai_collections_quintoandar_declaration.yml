@@ -24,6 +24,10 @@ workflow:
     messages:
       merge_on: [id_sauron_session]
       z_order_by: [id_sauron_session]
+    mcp_tool_logs:
+      merge_on: [id_request, id_trace, call_index]
+      partitions: [year, month, day]
+      z_order_by: [ts_request, id_trace, mcp_tool_name]
   inner_dependencies:
     sessions:
       - observation
