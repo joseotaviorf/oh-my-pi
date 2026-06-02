@@ -1,5 +1,4 @@
 WITH 
-
 pre_francesinha AS (
     SELECT
         ext.origin_complement AS id_bank,
@@ -247,6 +246,7 @@ seu_barriga_sap AS (
         paid_via,
         reason,
         paid_amount AS amount,
+        date_trunc('month',dd.next_brz_fintech_business_day) as month_paid,
         dd.next_brz_fintech_business_day AS dt_paid
     FROM
         datalake_retsuko.invoice
@@ -267,17 +267,20 @@ seu_barriga_sap AS (
 
 df_all AS (
     SELECT DISTINCT
-        our_number
+        our_number,
+        date_trunc('month',dt_paid) as month_paid
     FROM
         checkout_union
     UNION ALL
     SELECT DISTINCT
-        our_number
+        our_number,
+        date_trunc('month',dt_paid) as month_paid
     FROM
         sap
     UNION ALL
     SELECT DISTINCT
-        our_number
+        our_number,
+        date_trunc('month',dt_paid) as month_paid
     FROM
         francesinha
 ),
@@ -339,7 +342,7 @@ df AS (
             ON tf.our_number = cs.our_number
     LEFT JOIN
         seu_barriga_sap sbs
-            ON (sbs.company_use = cs.our_number) OR (sbs.id_invoice = tf.id_invoice)
+            ON ((sbs.company_use = cs.our_number) AND (sbs.month_paid = cs.month_paid)) OR (sbs.id_invoice = tf.id_invoice)
     LEFT JOIN
         sap s
             ON (cs.our_number = s.our_number) OR (tf.id_invoice = s.id_finance_entity) 
@@ -373,6 +376,19 @@ SELECT
     status_checkout,
     status_sap,
     IF(status_bank = 'ok' AND status_sap = 'ok' AND status_checkout = 'ok' AND status_billing = 'ok', TRUE, FALSE) AS is_reconciled,
+    CASE
+        WHEN status_bank = 'ok' AND status_sap = 'ok'AND status_checkout = 'ok' AND status_billing = 'ok' THEN 'Concilied'
+        WHEN status_sap = 'not recorded' AND status_bank = 'not recorded' THEN 'Not Concilied - SAP & Bank missing'
+        WHEN status_bank = 'not recorded' THEN 'Not Concilied - Bank missing'
+        WHEN status_sap = 'not recorded' THEN 'Not Concilied - SAP missing'
+        WHEN status_billing = 'not recorded' THEN 'Not Concilied - Billing missing'
+        WHEN status_checkout = 'not recorded' THEN 'Not Concilied - Payment source missing'
+        WHEN bank_amount > 0 AND sap_amount/bank_amount = 2 THEN 'Not Concilied - SAP duplicated'
+        WHEN dt_sap_paid < dt_bank_paid OR dt_sap_paid > dt_bank_paid THEN 'Not Concilied - SAP and Bank with divergent date'
+        WHEN status_billing IN ('recorded on the wrong date and value','recorded on the wrong date','recorded on the wrong value') THEN 'Not Concilied - Billing divergent'
+        WHEN status_checkout IN ('recorded on the wrong date and value','recorded on the wrong date','recorded on the wrong value') THEN 'Not Concilied - Payment source divergent'
+        ELSE 'Not Concilied - other'
+    END AS is_bank_concilied_detail,
     dt_bank_paid,
     dt_billing_paid,
     dt_checkout_paid,

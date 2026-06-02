@@ -112,6 +112,23 @@ columns:
       - datalake_trato_feito_clean.bill
       - datalake_trato_feito_clean.installment_charges
       - datalake_retsuko.invoice
+  is_bank_concilied_detail:
+    description: >-
+      Text reason for bank conciliation outcome (concilied, missing bank or SAP,
+      billing or payment source missing, SAP duplication, divergent dates or amounts).
+    lineage:
+      - datalake_nexxera.cnab_charges_recupera
+      - datalake_itau_statements_clean.statement_879200452685
+      - datalake_pas.ledger
+      - datalake_checkout_clean.boleto
+      - datalake_checkout_clean.bolecode
+      - datalake_checkout_clean.pix
+      - datalake_trato_feito_clean.installment
+      - datalake_trato_feito_clean.payment
+      - datalake_trato_feito_clean.accounting_installment
+      - datalake_trato_feito_clean.bill
+      - datalake_trato_feito_clean.installment_charges
+      - datalake_retsuko.invoice
   dt_bank_paid:
     description: "Date when the payment was received in bank statements"
     lineage:
