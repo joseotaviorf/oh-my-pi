@@ -4,7 +4,7 @@ table_name: exp_1_16_visits_triangulation_owner
 owner: guilherme.rocha@quintoandar.com.br
 domain: For Sale
 description:
-  Experiment table for visits triangulation owner (Visits XP Team) starting from May 27, 2026.
+  Experiment table for visits triangulation owner (Visits XP Team) starting from June 1, 2026.
   This table tracks owner participation in an A/B test designed to evaluate triangulation
   for owners with visits. Owners are assigned to control or treatment groups based on the
   last digit of their main phone number, segmented by business context (rent and sale).

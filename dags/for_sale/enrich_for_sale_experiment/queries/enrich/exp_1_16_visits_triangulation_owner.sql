@@ -25,5 +25,5 @@ LEFT JOIN
     datalake_ebdb_clean.user AS u
         ON h.id_user = u.id
 WHERE
-    DATE(v.ts_created) >= DATE('2026-05-27')
+    DATE(v.ts_created) >= DATE('2026-06-01')
 GROUP BY 1,2,3,4,5,6,7,8,9,10,11
