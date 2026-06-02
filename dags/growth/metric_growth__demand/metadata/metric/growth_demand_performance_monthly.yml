@@ -1,13 +1,21 @@
 database_name: growth
 table_name: growth_demand_performance_monthly
-description: This table aggregates monthly metrics related to top-of-funnel performance, prospect engagement, and associated costs within
+description: |
+  Monthly growth demand performance metrics following the Growth marketing taxonomy. One row per month
+  start date and marketing slice (region, channel, platform, UTM parameters, media setup dimensions,
+  QAC/CQA flags). Aggregates daily growth_demand_performance_daily metrics rolled up to calendar
+  month (dt_month_start from dim_date). Used for monthly executive reporting and budget tracking.
+  Part of metric_growth__demand DAG. Partitioned by year, month, and day (month-start anchor) — always
+  filter on all three partition columns in WHERE clauses to enable partition pruning.
 domain: Growth
-owner: isabela.matsumoto@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 columns:
   dt_month_start:
     lineage:
       - dw_public.dim_date.month_start
-    description: The month_start on which the events are recorded.
+    description: |
+      First calendar day of the month being aggregated. Primary time dimension for monthly demand
+      performance analysis; all daily metrics within the month roll up to this date.
     dimension: True
   country_code:
     lineage:
@@ -112,15 +120,19 @@ columns:
       - datalake_growth_costs.daily_costs.source
     description: The source from where the event was initiated.
     dimension: True
-  is_cqa_demand:
-    lineage:
-      - dw_growth.fact_demand_prospect_events.is_cqa_demand
-    description: Flag indicating if the demand is from CQA (Casa QuintoAndar) business model.
-    dimension: True
   is_qac:
     lineage:
       - dw_growth.fact_demand_top_of_funnel_events.is_qac
-    description: Flag indicating if any top-of-funnel event in the period was associated with QuintoAndar Classifieds (QAC). NULL for prospect-only rows where the QAC concept does not apply.
+    description: |
+      Flag indicating whether any top-of-funnel event in the period was associated with QuintoAndar
+      Classifieds (QAC). NULL on prospect-only rows where the QAC concept does not apply.
+    dimension: True
+  is_cqa_demand:
+    lineage:
+      - dw_growth.fact_demand_prospect_events.is_cqa_demand
+    description: |
+      Flag indicating whether the demand originates from the CQA (Casa QuintoAndar) business model.
+      Sourced from prospect events; NULL on ToF-only rows.
     dimension: True
   tof_users:
     description: Count of unique top-of-funnel users.
@@ -129,7 +141,7 @@ columns:
       description: Total count of unique users who entered the top of the funnel.
       acronym: tof_users
       is_additive: True
-      business_stage: Demmand
+      business_stage: Demand
       hierarchy: Growth
       approved_by: uilson.bonfim@quintoandar.com.br
   tof_users_rede:
@@ -139,7 +151,7 @@ columns:
       description: Total count of unique users from Rede sources who entered the top of the funnel.
       acronym: tof_users_rede
       is_additive: True
-      business_stage: Demmand
+      business_stage: Demand
       hierarchy: Growth
       approved_by: uilson.bonfim@quintoandar.com.br
   tof_events:
@@ -149,7 +161,7 @@ columns:
       description: Total count of unique events occurring at the top of the funnel.
       acronym: tof_events
       is_additive: True
-      business_stage: Demmand
+      business_stage: Demand
       hierarchy: Growth
       approved_by: uilson.bonfim@quintoandar.com.br
   tof_events_rede:
@@ -159,7 +171,7 @@ columns:
       description: Total count of unique events from Rede sources occurring at the top of the funnel.
       acronym: tof_events_rede
       is_additive: True
-      business_stage: Demmand
+      business_stage: Demand
       hierarchy: Growth
       approved_by: uilson.bonfim@quintoandar.com.br
   new_prospects:
@@ -169,7 +181,7 @@ columns:
       description: Total number of new prospects identified during the specified period.
       acronym: new_prospects
       is_additive: True
-      business_stage: Demmand
+      business_stage: Demand
       hierarchy: Growth
       approved_by: uilson.bonfim@quintoandar.com.br
   recovered_prospects:
@@ -179,7 +191,7 @@ columns:
       description: Total number of prospects re-engaged after previously being inactive.
       acronym: recovered_prospects
       is_additive: True
-      business_stage: Demmand
+      business_stage: Demand
       hierarchy: Growth
       approved_by: uilson.bonfim@quintoandar.com.br
   flows:
@@ -189,7 +201,7 @@ columns:
       description: Total number of unique flow sessions started within the aggregation period.
       acronym: flows
       is_additive: True
-      business_stage: Demmand
+      business_stage: Demand
       hierarchy: Growth
       approved_by: uilson.bonfim@quintoandar.com.br
   cost:
@@ -201,7 +213,7 @@ columns:
       description: Aggregate cost of marketing campaigns captured daily.
       acronym: marketing_cost
       is_additive: True
-      business_stage: Demmand
+      business_stage: Demand
       hierarchy: Growth
       approved_by: uilson.bonfim@quintoandar.com.br
   year:
@@ -209,18 +221,27 @@ columns:
       - dw_growth.fact_demand_top_of_funnel_events.year
       - dw_growth.fact_demand_prospect_events.year
       - dw_public.dim_date.year
-    description: Year of the event date.
+    description: |
+      Table partition column (year). Derived from dt_month_start. Required in WHERE clauses for
+      partition pruning — always combine with month and day.
     dimension: False
   month:
     lineage:
       - dw_growth.fact_demand_top_of_funnel_events.month
       - dw_growth.fact_demand_prospect_events.month
       - dw_public.dim_date.month
-    description: Month of the event date.
+    description: |
+      Table partition column (month, 1–12). Derived from dt_month_start. Must be filtered together with
+      year and day in every query to enable partition pruning.
     dimension: False
   day:
-    description: First Day of the month of the event date.
+    lineage:
+      - dw_public.dim_date.month_start
+    description: |
+      Table partition column (day). Always set to day 1 of the month as the partition anchor for the
+      monthly aggregation period. Filter with year and month for partition pruning.
     dimension: False
   ts_load:
-    description: Timestamp when the data was loaded into the table.
+    description: |
+      Timestamp when the metric row was loaded into the table by the metric_growth__demand DAG run.
     dimension: False

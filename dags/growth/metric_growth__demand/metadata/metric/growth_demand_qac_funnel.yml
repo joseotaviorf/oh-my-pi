@@ -1,40 +1,61 @@
 database_name: growth
 table_name: growth_demand_qac_funnel
-description: Daily QuintoAndar Classifieds (QAC) funnel metrics by business context and city group, combining top-of-funnel page views and classifieds-specific Amplitude events.
 domain: Growth
-owner: vinicius.araujo@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
+description: |
+  Daily QuintoAndar Classifieds (QAC) demand funnel metrics. One row per reference date, funnel step
+  (metric_name), business context, city group, and platform. Combines top-of-funnel page views from
+  datalake_top_of_funnel_demand.user_interactions with QAC-specific Amplitude events from
+  quintoandar_classifieds_events, counting distinct Amplitude users (id_amplitude) at each funnel
+  stage (ToF, ToF QAC, listing, lead intent, search, etc.). Used by Growth to monitor classifieds
+  demand conversion and compare platforms/regions. Part of the metric_growth__demand DAG (daily).
+  Partitioned by year, month, and day — always filter on all three partition columns in WHERE clauses
+  to enable partition pruning and avoid full table scans; align filters with dt_reference.
 columns:
   dt_reference:
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.ts_event
       - datalake_top_of_funnel_demand.quintoandar_classifieds_events.ts_event
-    description: Reference date of the funnel metric, derived from the event timestamp.
+    description: |
+      Calendar date of the funnel metric, derived from the event timestamp (DATE(ts_event)). Primary
+      time dimension for daily QAC funnel analysis.
     dimension: true
   metric_name:
-    description: Name of the funnel step or conversion metric (1. ToF, 2. ToF QAC, 3. ToF QAC Listed, 4. Listing, 5. Lead Intent, 6. Lead Confirmed, Search, Search > LPV).
+    description: |
+      Funnel step or conversion stage label. Values include 1. ToF, 2. ToF QAC, 3. ToF QAC Listed,
+      4. Listing, 5. Lead Intent, 6. Lead Confirmed, Search, and Search > LPV — each representing
+      a distinct user action threshold in the QAC demand journey.
     dimension: true
   business_context:
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.business_context
       - datalake_top_of_funnel_demand.quintoandar_classifieds_events.business_context
-    description: Business context of the events aggregated in the metric (rent, sale, etc).
+    description: |
+      Business line of the aggregated events (e.g. rent, sale). Slices funnel metrics by QuintoAndar
+      product context.
     dimension: true
   city_group:
     lineage:
       - dw_public.dim_region.city_group
-    description: City group classification of the event region used to slice the funnel metrics.
+    description: |
+      Geographic city group of the event region from dim_region. Used to compare QAC funnel performance
+      across QuintoAndar operating areas.
     dimension: true
   platform:
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.app_type
       - datalake_top_of_funnel_demand.quintoandar_classifieds_events.platform
-    description: Platform used by the user, normalized from source fields (App Android, App iOS, Web, Lost Tracking, Other).
+    description: |
+      User platform normalized from source app_type/platform fields: App Android, App iOS, Web, Lost
+      Tracking, or Other.
     dimension: true
   metric_value:
-    description: Count of distinct Amplitude users (id_amplitude) for the funnel step on the reference date.
+    description: |
+      Count of distinct Amplitude users (id_amplitude) who reached the funnel step on the reference
+      date for the given business context, city group, and platform combination.
     metric:
       name: QAC Funnel Users
-      description: Distinct Amplitude users reaching each QuintoAndar Classifieds funnel step per day, business context, and city group.
+      description: Distinct Amplitude users reaching each QuintoAndar Classifieds funnel step per day, business context, city group, and platform.
       acronym: qac_funnel_users
       is_additive: true
       business_stage: Demand
@@ -44,17 +65,23 @@ columns:
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.ts_event
       - datalake_top_of_funnel_demand.quintoandar_classifieds_events.ts_event
-    description: Year of the reference date, used as table partition.
+    description: |
+      Table partition column (year). Derived from dt_reference. Required in WHERE clauses for partition
+      pruning — always combine with month and day to restrict scans to the smallest date window needed.
     dimension: false
   month:
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.ts_event
       - datalake_top_of_funnel_demand.quintoandar_classifieds_events.ts_event
-    description: Month of the reference date, used as table partition.
+    description: |
+      Table partition column (month, 1–12). Derived from dt_reference. Must be filtered together with
+      year and day in every query to enable partition pruning.
     dimension: false
   day:
     lineage:
       - datalake_top_of_funnel_demand.user_interactions.ts_event
       - datalake_top_of_funnel_demand.quintoandar_classifieds_events.ts_event
-    description: Day of the reference date, used as table partition.
+    description: |
+      Table partition column (day, 1–31). Derived from dt_reference. Always filter with year and month.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     dimension: false
