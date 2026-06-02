@@ -44,6 +44,8 @@ make extract-cluster-validation-files DAG_PATH=dags/platform/ SOURCE_REF=<pre-sp
 make validate-cluster-validation-files
 ```
 
+Keep `spark.databricks.sql.initial.catalog.namespace` Jinja on a single line in `*_cluster.yml` (no PyYAML line folding). `validate-cluster-validation-files` rejects folded `quintoandar_{{ var.value.environment }}` values.
+
 Implementation: `packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/extract_cluster_validation_files.py` and `cluster_validation_mapping.py`.
 
 Rules enforced by `DAGDeclarationValidator`:

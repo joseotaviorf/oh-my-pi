@@ -20,11 +20,13 @@ import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 
+from scripts.ci_cd.airflow_dag_builder.cluster_yaml_format import (
+    assert_no_folded_catalog_namespace,
+    dump_cluster_yaml,
+)
+
 # Preset owns worker/driver when validation custom_configurations omits these keys.
 _TOPOLOGY_KEYS = ("node_type_id", "driver_node_type_id", "master_node_type_id")
-
-# Prevent yaml.dump from folding long spark_conf keys (e.g. Jinja catalog.namespace).
-_YAML_DUMP_WIDTH = 10_000
 
 
 def _deep_merge(base: dict, overlay: dict) -> dict:
@@ -97,15 +99,8 @@ def promote_cluster_file(cluster_path: Path, *, dry_run: bool = False) -> bool:
     if "spark_session_configs" in document:
         new_document["spark_session_configs"] = document["spark_session_configs"]
 
-    new_text = yaml.dump(
-        new_document,
-        default_flow_style=False,
-        sort_keys=False,
-        allow_unicode=True,
-        width=_YAML_DUMP_WIDTH,
-    )
-    if not new_text.endswith("\n"):
-        new_text += "\n"
+    new_text = dump_cluster_yaml(new_document)
+    assert_no_folded_catalog_namespace(new_text)
 
     if dry_run:
         print(f"Would promote: {_display_path(cluster_path)}")

@@ -4,6 +4,5 @@ cluster:
   custom_configurations:
     data_security_mode: SINGLE_USER
     single_user_name: '{{ var.value.databricks_single_user_name }}'
-    spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment
-      }}
+    spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     num_workers: 3

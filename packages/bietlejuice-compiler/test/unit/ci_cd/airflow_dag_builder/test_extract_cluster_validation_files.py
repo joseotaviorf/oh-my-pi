@@ -6,6 +6,7 @@ from pathlib import Path
 
 from scripts.ci_cd.airflow_dag_builder.extract_cluster_validation_files import (
     _validate_allow_custom_spark_job_contract,
+    _validate_cluster_file_yaml_format,
     build_cluster_file_content,
     extract_cluster_section_text,
     remove_cluster_section_text,
@@ -126,3 +127,27 @@ class TestExtractClusterValidationFiles:
         )
         assert err is not None
         assert "unexpected allow_custom_spark_job" in err
+
+    def test_validate_cluster_file_yaml_format_rejects_folded_jinja(self):
+        folded = """cluster:
+  custom_configurations:
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment
+        }}
+"""
+        err = _validate_cluster_file_yaml_format(
+            Path("dags/foo/foo_cluster.yml"), folded
+        )
+        assert err is not None
+        assert "folded spark.databricks" in err
+
+    def test_validate_cluster_file_yaml_format_accepts_single_line(self):
+        ok = """cluster:
+  custom_configurations:
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+"""
+        assert (
+            _validate_cluster_file_yaml_format(Path("dags/foo/foo_cluster.yml"), ok)
+            is None
+        )

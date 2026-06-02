@@ -26,6 +26,10 @@ from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
     _has_load_spark_job,
     build_validation_cluster_spec,
 )
+from scripts.ci_cd.airflow_dag_builder.cluster_yaml_format import (
+    assert_no_folded_catalog_namespace,
+    dump_cluster_yaml,
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[5]
 DAGS_ROOT = REPO_ROOT / "dags"
@@ -67,6 +71,15 @@ def _read_text(path: Path) -> str:
 def _normalize_cluster_file_text(text: str) -> str:
     """Compare cluster files with a single trailing newline."""
     return text.rstrip("\n") + "\n"
+
+
+def _validate_cluster_file_yaml_format(cluster_path: Path, text: str) -> Optional[str]:
+    """Return an error message when cluster YAML has folded catalog.namespace Jinja."""
+    try:
+        assert_no_folded_catalog_namespace(text)
+    except ValueError as exc:
+        return f"{cluster_path}: {exc}"
+    return None
 
 
 def _read_text_from_git(git_ref: str, repo_relative: Path) -> str:
@@ -158,12 +171,7 @@ def _format_validation_yaml(spec: ValidationClusterSpec) -> str:
     if spec.allow_custom_spark_job:
         validation_doc["allow_custom_spark_job"] = True
 
-    dumped = yaml.dump(
-        validation_doc,
-        default_flow_style=False,
-        sort_keys=False,
-        allow_unicode=True,
-    )
+    dumped = dump_cluster_yaml(validation_doc)
     lines = ["validation:"]
     for line in dumped.splitlines():
         if line.strip():
@@ -320,6 +328,14 @@ def main() -> int:
     checked = 0
     checked_paths: set[Path] = set()
 
+    if args.check:
+        for cluster_path in _cluster_file_paths(root):
+            fmt_err = _validate_cluster_file_yaml_format(
+                cluster_path, _read_text(cluster_path)
+            )
+            if fmt_err:
+                errors.append(fmt_err)
+
     for declaration_path in _declaration_paths(root):
         cluster_path = _cluster_file_path(declaration_path)
         if args.check and not cluster_path.exists():
@@ -349,6 +365,10 @@ def main() -> int:
                 errors.append(contract_err)
                 continue
             on_disk = _normalize_cluster_file_text(_read_text(cluster_path))
+            fmt_err = _validate_cluster_file_yaml_format(cluster_path, on_disk)
+            if fmt_err:
+                errors.append(fmt_err)
+                continue
             expected = _normalize_cluster_file_text(cluster_content)
             if on_disk != expected:
                 errors.append(f"{cluster_path}: content differs from generator output")
@@ -411,6 +431,10 @@ def main() -> int:
                 errors.append(contract_err)
                 continue
             on_disk = _normalize_cluster_file_text(_read_text(cluster_path))
+            fmt_err = _validate_cluster_file_yaml_format(cluster_path, on_disk)
+            if fmt_err:
+                errors.append(fmt_err)
+                continue
             expected = _normalize_cluster_file_text(cluster_content)
             if on_disk != expected:
                 errors.append(f"{cluster_path}: content differs from generator output")
