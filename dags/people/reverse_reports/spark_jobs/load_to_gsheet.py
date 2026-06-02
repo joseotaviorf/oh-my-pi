@@ -24,6 +24,10 @@ from quintoandar_gsheets_api_client.producer import GoogleSheetsWriter
 
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.spark import BaseDBUtils
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 
 CREDENTIALS_SCOPE = "people"
@@ -190,7 +194,10 @@ def _get_auth(dbutils, credentials_scope: str, credentials_key: str):
 
 
 def _get_payloads_from_table(
-    spark_client: SparkClient, table_name: str, execution_date: str
+    spark_client: SparkClient,
+    table_name: str,
+    execution_date: str,
+    database_name: str = SCHEMA,
 ) -> tuple:
     """
     Fetch data from the reverse table and convert to list of rows for GSheets.
@@ -210,7 +217,7 @@ def _get_payloads_from_table(
 
     logger.info(
         "Fetching data from %s.%s (partition: %d-%02d-%02d)",
-        SCHEMA,
+        database_name,
         table_name,
         year,
         month,
@@ -219,7 +226,7 @@ def _get_payloads_from_table(
 
     query = f"""
         SELECT *
-        FROM {SCHEMA}.{table_name}
+        FROM {database_name}.{table_name}
         WHERE year = {year}
           AND month = {month}
           AND day = {day}
@@ -238,7 +245,7 @@ def _get_payloads_from_table(
         .collect()
     )
 
-    logger.info("Fetched %d rows from %s.%s", len(rows), SCHEMA, table_name)
+    logger.info("Fetched %d rows from %s.%s", len(rows), database_name, table_name)
     return output_columns, rows
 
 
@@ -274,12 +281,21 @@ def main():
     parser.add_argument("sheet_id", help="Google Sheet ID")
     parser.add_argument("sheet_tab", help="Google Sheet tab name")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
     table_name = args.table_name
     execution_date = args.execution_date
     environment = args.environment
     sheet_id = FORNO_SHEET_ID if environment == "forno" else args.sheet_id
     sheet_tab = args.sheet_tab
+    database_name, read_table_name, _ = resolve_datalake_write_target(
+        prod_database=SCHEMA,
+        prod_table=table_name,
+        prod_location="",
+        bucket="",
+        target_database=args.target_database_name,
+        target_table=args.target_table_name,
+    )
 
     logger.info(
         "Starting export: table=%s, sheet=%s, tab=%s, execution_date=%s",
@@ -303,7 +319,9 @@ def main():
     gsheets_producer = GoogleSheetsWriter(gsheets_client)
     spark_client = SparkClient()
 
-    header, rows = _get_payloads_from_table(spark_client, table_name, execution_date)
+    header, rows = _get_payloads_from_table(
+        spark_client, read_table_name, execution_date, database_name
+    )
     payload = [header] + rows
 
     _write_with_retries(gsheets_producer, sheet_tab, sheet_id, payload)

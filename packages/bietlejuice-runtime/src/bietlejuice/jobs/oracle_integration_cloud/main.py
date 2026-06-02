@@ -93,6 +93,8 @@ class OICPipeline:
             partition_cols=partition_cols,
             extraction_type=extraction_type,
             logger=self.logger,
+            target_database_name=args.get("target_database_name"),
+            target_table_name=args.get("target_table_name"),
         )
         raw_layer_loader.load_to_raw(df)
 

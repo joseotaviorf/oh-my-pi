@@ -17,6 +17,9 @@ from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
 
 LOGGER = logging.getLogger(__name__)
 
+# Cluster validation: add_validation_target_args / resolve_datalake_write_target
+# (--target-database-name, --target-table-name) via BaseJobArgumentParser + RawLayerLoader.
+
 PIT_ID_EXPIRATION_PATTERNS = ("Pit_Id", "pit_id", "expired")
 MAX_PIT_RESUME_ATTEMPTS = 3
 
@@ -593,6 +596,8 @@ def _run_load_for_window(
         table_name=job_args["table_name"],
         partition_cols=job_args["partition_cols"],
         extraction_type=job_args["extraction_type"],
+        target_database_name=job_args.get("target_database_name"),
+        target_table_name=job_args.get("target_table_name"),
     )
     date_column_to_partition = job_args.get(
         "date_column_to_partition", DEFAULT_PARTITION_COLUMN

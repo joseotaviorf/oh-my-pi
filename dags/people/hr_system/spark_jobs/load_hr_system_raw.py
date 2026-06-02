@@ -20,6 +20,10 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -57,6 +61,8 @@ class Ingestion:
         self.column_to_partition = self.endpoint_details.get(
             "column_to_partition", None
         )
+        self.target_database_name = args.target_database_name
+        self.target_table_name = args.target_table_name
 
     def treat_params(self, endpoint_details):
         endpoint_details = json.loads(endpoint_details)
@@ -136,29 +142,39 @@ class Ingestion:
         database_name = db_info["db_raw_databricks"]
         format_options = SparkTableStorageFormat.DEFAULT_RAW
         database_location = db_info["db_raw_path"]
+        write_database_name, write_table_name, write_location = (
+            resolve_datalake_write_target(
+                prod_database=database_name,
+                prod_table=self.table_name,
+                prod_location=database_location,
+                bucket=self.datalake_bucket,
+                target_database=self.target_database_name,
+                target_table=self.target_table_name,
+            )
+        )
         logger.info(
             f"m={JOB_NAME}, msg=Creating database in Spark Metastore if not exists..."
         )
         metastore_service = SparkMetastoreService(spark_client)
-        metastore_service.create_database(database_name)
+        metastore_service.create_database(write_database_name)
         s3_loader = S3Loader()
         s3_loader.load_df(
             df=df,
-            s3_path=f"{database_location}{self.table_name}",
+            s3_path=f"{write_location}{write_table_name}",
             format_options=format_options,
             partitions=self.partition_cols,
         )
         spark_metastore_loader = SparkMetastoreLoader(metastore_service)
         spark_metastore_loader.update_metastore(
             df=df,
-            database_name=database_name,
-            table_name=self.table_name,
+            database_name=write_database_name,
+            table_name=write_table_name,
             format_options=format_options,
             force_recreate=True,
-            database_location=database_location,
+            database_location=write_location,
             partitions=self.partition_cols,
         )
-        metastore_service.refresh_table(database_name, self.table_name)
+        metastore_service.refresh_table(write_database_name, write_table_name)
 
     def clear_directory(self, layer):
         if self.has_dt_effective == True:
@@ -233,6 +249,7 @@ def run_sync(ingestion_table, deduplication_key):
 
 if __name__ == "__main__":
     parser = get_parser()
+    add_validation_target_args(parser)
     args = parser.parse_args()
     url, token = get_conn_config()
     ingestion = Ingestion(args, url, token)

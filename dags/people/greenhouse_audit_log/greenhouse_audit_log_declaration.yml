@@ -10,27 +10,6 @@ dag:
       Schedule: daily at 00:30 America/Sao_Paulo (03:30 UTC while Brazil observes UTC-3).
   schedule_interval: "30 0 * * *"
 
-cluster:
-  type: custom_cluster
-  access_control_list:
-    group_name: people-analytics
-    permission_level: CAN_MANAGE
-  databricks_conn_id: databricks_new
-  custom_configurations:
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-    driver_node_type_id: r5a.xlarge
-    node_type_id: r5a.xlarge
-    num_workers: 3
-    spark_version: 16.4.x-scala2.12
-    aws_attributes:
-      ebs_volume_size: 200
-      instance_profile_arn: "{{ var.value.instance_profile_secret_arn_people }}"
-      first_on_demand: 1
-      availability: SPOT_WITH_FALLBACK
-
 workflow:
   layer: raw
   has_hive_sync: false

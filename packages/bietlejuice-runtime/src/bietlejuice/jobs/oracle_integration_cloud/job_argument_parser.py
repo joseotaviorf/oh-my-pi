@@ -4,6 +4,8 @@ from datetime import datetime
 
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.validation.spark_args import add_validation_target_args
+
 LOGGER = QuintoAndarLogger(__name__)
 
 
@@ -36,6 +38,8 @@ class JobArgumentParser:
         parser.add_argument("load_start_date", help="Start date (YYYY-MM-DD)")
         parser.add_argument("load_end_date", help="End date (YYYY-MM-DD)")
         parser.add_argument("extra_details", help="Extra details (JSON string)")
+
+        add_validation_target_args(parser)
 
         return parser
 

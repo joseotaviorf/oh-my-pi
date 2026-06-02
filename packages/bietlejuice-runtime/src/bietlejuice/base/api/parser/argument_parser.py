@@ -4,6 +4,8 @@ import logging
 from datetime import datetime
 from typing import Any, Dict
 
+from bietlejuice.base.validation.spark_args import add_validation_target_args
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -39,6 +41,8 @@ class BaseJobArgumentParser:
         parser.add_argument(
             "extra_details", nargs="?", default="{}", help="Extra details (JSON string)"
         )
+
+        add_validation_target_args(parser)
 
         return parser
 

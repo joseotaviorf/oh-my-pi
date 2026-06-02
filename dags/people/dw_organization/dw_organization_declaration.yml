@@ -7,17 +7,6 @@ dag:
     dag_purpose: |
       People Data Warehouse — organization structure. Delivers dimensions for business units, cost centers, jobs, and related org reference data for People.
       No sensitive or PII content. Access is limited to the people-analytics team until broader publication is approved.
-cluster:
-  type: databricks_16_4_small_memory_people_cluster
-  access_control_list:
-    group_name: people-analytics
-    permission_level: CAN_MANAGE
-  databricks_conn_id: databricks_new_env
-  custom_configurations:
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
 workflow:
   type: query_delta
   layer: dw

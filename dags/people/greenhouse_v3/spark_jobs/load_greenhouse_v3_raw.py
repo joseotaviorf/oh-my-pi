@@ -15,6 +15,9 @@ from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
 
 LOGGER = logging.getLogger(__name__)
 
+# Cluster validation: add_validation_target_args / resolve_datalake_write_target
+# (--target-database-name, --target-table-name) via BaseJobArgumentParser + RawLayerLoader.
+
 
 class GreenhouseAPIV3(BaseAPIClient):
     """
@@ -167,6 +170,8 @@ def main():
                 table_name=job_args["table_name"],
                 partition_cols=job_args["partition_cols"],
                 extraction_type=job_args["extraction_type"],
+                target_database_name=job_args.get("target_database_name"),
+                target_table_name=job_args.get("target_table_name"),
             )
             raw_loader.load_to_raw(df)
             LOGGER.info(

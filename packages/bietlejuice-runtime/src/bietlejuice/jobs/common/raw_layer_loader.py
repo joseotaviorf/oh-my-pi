@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from pyspark.sql import DataFrame
 from quintoandar_logger import QuintoAndarLogger
@@ -6,6 +6,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db.datalake_metastore_service import DatalakeMetastoreService
 from bietlejuice.base.spark.spark_table_storage_format import SparkTableStorageFormat
+from bietlejuice.base.validation.spark_args import resolve_datalake_write_target
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.metastore_loader_factory import MetastoreLoaderFactory
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -28,6 +29,8 @@ class RawLayerLoader:
         partition_cols: List[str],
         extraction_type: str = "full",
         logger: QuintoAndarLogger = LOGGER,
+        target_database_name: Optional[str] = None,
+        target_table_name: Optional[str] = None,
     ):
         """
         Initializes the RawLayerLoader.
@@ -59,6 +62,16 @@ class RawLayerLoader:
         )
         self.database_name = self.db_info["db_raw_databricks"]
         self.database_location = self.db_info["db_raw_path"]
+        self.write_database_name, self.write_table_name, self.write_location = (
+            resolve_datalake_write_target(
+                prod_database=self.database_name,
+                prod_table=self.table_name,
+                prod_location=self.database_location,
+                bucket=self.datalake_bucket,
+                target_database=target_database_name,
+                target_table=target_table_name,
+            )
+        )
 
     def load_to_raw(
         self,
@@ -89,9 +102,11 @@ class RawLayerLoader:
             refresh_table_after_load (bool): When True, runs ``REFRESH TABLE`` after
                 load. Defaults to True.
         """
+        write_table_fqn = f"{self.write_database_name}.{self.write_table_name}"
         if df.isEmpty():
             self.logger.warning(
-                f"Input DataFrame for table '{self.table_name}' is empty. Skipping load process."
+                f"Input DataFrame for table '{write_table_fqn}' is empty. "
+                "Skipping load process."
             )
             return
 
@@ -105,7 +120,8 @@ class RawLayerLoader:
                 self._refresh_table()
         except Exception as e:
             self.logger.error(
-                f"Failed to load data to raw layer for table '{self.table_name}'. Error: {e}",
+                f"Failed to load data to raw layer for table '{write_table_fqn}'. "
+                f"Error: {e}",
                 exc_info=True,
             )
             raise
@@ -123,11 +139,12 @@ class RawLayerLoader:
         Creates the database in the metastore if it does not already exist.
         """
         try:
-            self.logger.info(f"Ensuring database '{self.database_name}' exists.")
-            self.metastore_service.create_database(self.database_name)
+            self.logger.info(f"Ensuring database '{self.write_database_name}' exists.")
+            self.metastore_service.create_database(self.write_database_name)
         except Exception as e:
             self.logger.error(
-                f"Error creating database '{self.database_name}': {e}", exc_info=True
+                f"Error creating database '{self.write_database_name}': {e}",
+                exc_info=True,
             )
             raise
 
@@ -135,7 +152,7 @@ class RawLayerLoader:
         """
         Loads the DataFrame to the specified S3 location.
         """
-        s3_path = f"{self.database_location}{self.table_name}"
+        s3_path = f"{self.write_location}{self.write_table_name}"
         format_options = SparkTableStorageFormat.DEFAULT_RAW
         mode = "overwrite" if self.extraction_type == "full" else "append"
 
@@ -167,21 +184,22 @@ class RawLayerLoader:
         """
         format_options = SparkTableStorageFormat.DEFAULT_RAW
         self.logger.info(
-            f"Updating metastore for table '{self.database_name}.{self.table_name}'."
+            f"Updating metastore for table '{self.write_database_name}.{self.write_table_name}'."
         )
         try:
             self.metastore_loader.update_metastore(
                 df=df,
-                database_name=self.database_name,
-                table_name=self.table_name,
+                database_name=self.write_database_name,
+                table_name=self.write_table_name,
                 format_options=format_options,
                 force_recreate=force_recreate,
-                database_location=self.database_location,
+                database_location=self.write_location,
                 partitions=self.partition_cols,
             )
         except Exception as e:
             self.logger.error(
-                f"Error updating metastore for table '{self.table_name}': {e}",
+                f"Error updating metastore for table "
+                f"'{self.write_database_name}.{self.write_table_name}': {e}",
                 exc_info=True,
             )
             raise
@@ -190,12 +208,18 @@ class RawLayerLoader:
         """
         Refreshes the metadata of the specified table in the Hive metastore.
         """
-        self.logger.info(f"Refreshing table '{self.database_name}.{self.table_name}'.")
+        self.logger.info(
+            f"Refreshing table '{self.write_database_name}.{self.write_table_name}'."
+        )
         try:
-            self.metastore_service.refresh_table(self.database_name, self.table_name)
+            self.metastore_service.refresh_table(
+                self.write_database_name, self.write_table_name
+            )
         except Exception as e:
             self.logger.error(
-                f"Error refreshing table '{self.table_name}': {e}", exc_info=True
+                f"Error refreshing table "
+                f"'{self.write_database_name}.{self.write_table_name}': {e}",
+                exc_info=True,
             )
             raise
 
@@ -208,7 +232,7 @@ class RawLayerLoader:
         table_privileges_dict = {"people-analytics": ["ALL PRIVILEGES"]}
 
         try:
-            full_table_name = f"{self.database_name}.{self.table_name}"
+            full_table_name = f"{self.write_database_name}.{self.write_table_name}"
             table_privileges = TablePrivileges.from_input_dict(
                 table_privileges_dict, full_table_name
             )
