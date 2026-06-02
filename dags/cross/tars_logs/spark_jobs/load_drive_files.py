@@ -4,6 +4,7 @@ import json
 import logging
 import sys
 from argparse import ArgumentParser
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
 from googleapiclient.discovery import build
@@ -20,7 +21,6 @@ from bietlejuice.base.spark import (
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
-from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
@@ -49,21 +49,17 @@ def _get_auth(dbutils) -> dict:
     return credentials
 
 
-def _build_drive_query(folder_id: str, since_ts: str) -> str:
-    return (
-        f"'{folder_id}' in parents"
-        f" and trashed=false"
-        f" and name contains '.json'"
-        f" and modifiedTime > '{since_ts}'"
-    )
-
-
 def _preflight_check(drive_client, folder_id: str) -> None:
     drive_client.files().get(fileId=folder_id, supportsAllDrives=True).execute()
 
 
 def _list_modified_files(drive_client, folder_id: str, since_ts: str) -> list:
-    query = _build_drive_query(folder_id, since_ts)
+    query = (
+        f"'{folder_id}' in parents"
+        f" and trashed=false"
+        f" and name contains '.json'"
+        f" and modifiedTime > '{since_ts}'"
+    )
     files = []
     page_token = None
     while True:
@@ -135,7 +131,6 @@ def _clear_temp_folder(drive_client) -> None:
 def _download_file_record(
     file_info: dict, credentials: dict, temp_folder_id: str
 ) -> tuple:
-    """Worker function — safe to serialize to Spark workers. Returns (name, content, error)."""
     client = _build_drive_client(credentials)
     file_id = file_info["id"]
     file_name = file_info["name"]
@@ -190,18 +185,11 @@ if __name__ == "__main__":
         logger.info(f"m={JOB_NAME}, msg=No files to process. Exiting.")
         sys.exit(0)
 
-    spark_client = SparkClient()
-    sc = spark_client.spark.sparkContext
-    credentials_bc = sc.broadcast(credentials)
-
     def _worker(file_info):
-        return _download_file_record(
-            file_info, credentials_bc.value, TEMPORARY_DRIVE_FOLDER_ID
-        )
+        return _download_file_record(file_info, credentials, TEMPORARY_DRIVE_FOLDER_ID)
 
-    results = (
-        sc.parallelize(files, min(len(files), MAX_PARTITIONS)).map(_worker).collect()
-    )
+    with ThreadPoolExecutor(max_workers=min(len(files), MAX_PARTITIONS)) as pool:
+        results = list(pool.map(_worker, files))
 
     successes = [(name, content) for name, content, err in results if err is None]
     failures = [(name, err) for name, _, err in results if err is not None]
@@ -237,7 +225,7 @@ if __name__ == "__main__":
     df = (
         SparkDataFrameService()
         .input(
-            spark_client.create_dataframe(rows, schema).withColumn(
+            spark.createDataFrame(rows, schema).withColumn(
                 "ts_load", current_timestamp()
             )
         )
@@ -248,7 +236,7 @@ if __name__ == "__main__":
     datalake_info = DatalakeMetastoreService.get_db_info(
         args.environment, args.source, args.datalake_bucket
     )
-    spark_metastore_service = SparkMetastoreService(spark_client)
+    spark_metastore_service = SparkMetastoreService(spark)
     database_name = datalake_info["db_raw_databricks"]
     database_location = datalake_info["db_raw_path"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
