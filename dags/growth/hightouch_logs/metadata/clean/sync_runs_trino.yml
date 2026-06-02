@@ -2,105 +2,175 @@
 database_name: datalake_hightouch_logs_clean
 table_name: sync_runs_trino
 domain: Growth
-description: Clean Hightouch sync run metrics from Trino source tracking execution performance and statistics
+owner: isadora.gallerani@quintoandar.com.br
+description: |
+  Clean layer for Hightouch Warehouse Sync Logs run metadata ingested from the CDP Trino export path
+  (source: hightouch_audit.sync_runs parquet on S3). One row per sync run execution, deduplicated to
+  the latest export per (id_sync, id_sync_run, id_model). Each run represents a single execution of a
+  Hightouch reverse-ETL sync that pushes warehouse model or audience data to a marketing destination
+  (e.g. Braze, Salesforce, Google Ads). Used by Growth to monitor sync health, track planned vs
+  succeeded row counts, investigate sync-level errors, and join to sync_snapshot_trino or
+  sync_changelog_trino via id_sync for row-level debugging. Part of the hightouch_logs DAG (hourly).
+  Partitioned by year, month, and day (derived from ts_started). Always filter on year, month, and
+  day in WHERE clauses to enable partition pruning and avoid full table scans; align partition
+  filters with the ts_started date range being analyzed. When filtering by sync, combine partition
+  predicates with id_sync to benefit from Z-order clustering on id_sync.
+  Hightouch documentation: https://hightouch.com/docs/syncs/warehouse-sync-logs (Sync runs table);
+  warehouse schema reference: https://hightouch.com/docs/developer-tools/warehouse-tables.
 columns:
   id_sync:
-    description: Unique identifier for the sync configuration
+    description: |
+      Hightouch sync configuration identifier. Primary join key to sync_snapshot_trino and
+      sync_changelog_trino for linking run-level metadata with per-row sync outcomes.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.sync_id
   id_sync_run:
-    description: Unique identifier for the specific sync run execution
+    description: |
+      Unique identifier for a single sync run execution within a sync configuration. Together with
+      id_sync and id_model forms the deduplication grain of this table.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.sync_run_id
   id_model:
-    description: Unique identifier for the data model
+    description: |
+      Hightouch model identifier attached to the sync. The model defines the SQL query whose results
+      are pushed to the destination (e.g. a Customer Studio audience or a dbt model).
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.model_id
   primary_key:
-    description: Primary key configuration used for the sync
+    description: |
+      Name of the primary key column configured on the Hightouch model for this sync. Determines how
+      Hightouch matches source rows to destination records during upsert/update operations.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.primary_key
   destination:
-    description: Target destination where data is being synchronized
+    description: |
+      Target destination type for this sync run (e.g. Braze, Salesforce, Google Ads, Iterable).
+      Identifies which external marketing or CRM system received the synced data.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.destination
   model_name:
-    description: Name of the data model being synchronized
+    description: |
+      Human-readable name of the Hightouch model or audience attached to the sync. Useful for
+      filtering runs by campaign, audience, or business workflow in analytics dashboards.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.model_name
   error:
-    description: Error message if the sync run encountered issues
+    description: |
+      Sync-level error message when the entire run terminated early (status failed). Null when the
+      run completed normally; for row-level failures prefer sync_snapshot_trino.failure_reason.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.error
   status:
-    description: Overall status of the sync run (success, failed, running)
+    description: |
+      Overall outcome of the sync run. succeeded means the run finished; failed means it terminated
+      early. Per-row status in sync_snapshot_trino is a more granular indicator of sync health.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.status
+    categories:
+      succeeded: Sync run completed without a fatal error.
+      failed: Sync run terminated early due to a sync-level error.
   num_planned_add:
-    description: Number of records planned to be added
+    description: |
+      Count of rows Hightouch planned to add to the destination during this run, computed by CDC
+      diff against the previous sync run result set.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.num_planned_add
   num_planned_change:
-    description: Number of records planned to be changed
+    description: |
+      Count of rows Hightouch planned to update in the destination during this run, computed by CDC
+      diff against the previous sync run result set.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.num_planned_change
   num_planned_remove:
-    description: Number of records planned to be removed
+    description: |
+      Count of rows Hightouch planned to remove from the destination during this run, computed by CDC
+      diff when records no longer appear in the model query.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.num_planned_remove
   num_attempted_add:
-    description: Number of records attempted to be added
+    description: |
+      Count of planned add operations that Hightouch actually attempted to send to the destination
+      during this run (may be lower than num_planned_add if the run was cancelled or errored).
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.num_attempted_add
   num_attempted_change:
-    description: Number of records attempted to be changed
+    description: |
+      Count of planned change operations that Hightouch actually attempted to send to the destination
+      during this run.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.num_attempted_change
   num_attempted_remove:
-    description: Number of records attempted to be removed
+    description: |
+      Count of planned remove operations that Hightouch actually attempted to send to the destination
+      during this run.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.num_attempted_remove
   num_succeeded_add:
-    description: Number of records successfully added
+    description: |
+      Count of add operations successfully synced to the destination. Compare with num_failed_add
+      to measure add success rate per run.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.num_succeeded_add
   num_succeeded_change:
-    description: Number of records successfully changed
+    description: |
+      Count of change operations successfully synced to the destination. Compare with
+      num_failed_change to measure update success rate per run.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.num_succeeded_change
   num_succeeded_remove:
-    description: Number of records successfully removed
+    description: |
+      Count of remove operations successfully synced to the destination. Compare with
+      num_failed_remove to measure removal success rate per run.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.num_succeeded_remove
   num_failed_add:
-    description: Number of records that failed to be added
+    description: |
+      Count of add operations that were attempted but failed at the destination. Investigate via
+      sync_snapshot_trino.failure_reason for row-level error details.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.num_failed_add
   num_failed_change:
-    description: Number of records that failed to be changed
+    description: |
+      Count of change operations that were attempted but failed at the destination. Investigate via
+      sync_snapshot_trino.failure_reason for row-level error details.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.num_failed_change
   num_failed_remove:
-    description: Number of records that failed to be removed
+    description: |
+      Count of remove operations that were attempted but failed at the destination. Investigate via
+      sync_snapshot_trino.failure_reason for row-level error details.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.num_failed_remove
   ts_started:
-    description: Timestamp when the sync run was initiated
+    description: |
+      Timestamp when the Hightouch sync run started. Used for run duration analysis and ordering
+      runs chronologically per sync configuration.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.started_at
   ts_finished:
-    description: Timestamp when the sync run completed
+    description: |
+      Timestamp when the Hightouch sync run finished. Null if the run is still in progress or
+      terminated without a clean finish. Subtract ts_started for run duration metrics.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.finished_at
   year:
-    description: Partition column representing the year of the data
+    description: |
+      Table partition column (year). Derived from ts_started at raw ingestion. Required in WHERE
+      clauses for partition pruning — always combine with month and day to restrict scans to the
+      smallest date window needed. Queries without partition filters will scan the entire table.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.year
   month:
-    description: Partition column representing the month of the data
+    description: |
+      Table partition column (month, 1–12). Derived from ts_started at raw ingestion. Must be
+      filtered together with year and day in every query to enable partition pruning; omitting any
+      partition column disables pruning and forces a full scan.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.month
   day:
-    description: Partition column representing the day of the data
+    description: |
+      Table partition column (day, 1–31). Derived from ts_started at raw ingestion. Always the last
+      partition column — filter with year and month to narrow the scan to specific days. Example:
+      WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_hightouch_logs_raw.sync_runs_trino.day

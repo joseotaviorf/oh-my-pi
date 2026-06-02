@@ -2,41 +2,92 @@
 database_name: datalake_hightouch_logs_clean
 table_name: sync_snapshot_trino
 domain: Growth
-description: Clean Hightouch sync snapshot rows for export days in the load window (partitions from raw, tagged at ingest from path date)
+owner: isadora.gallerani@quintoandar.com.br
+description: |
+  Clean layer for Hightouch Warehouse Sync Logs snapshot data ingested from the CDP Trino export path
+  (source: hightouch_audit.sync_snapshot parquet on S3). One row per sync configuration and model row,
+  representing the latest known sync status for that record across all Hightouch reverse-ETL syncs.
+  Hightouch replaces snapshot rows after each sync run, so this table is deduplicated to keep only the
+  most recent export per (id_sync, id_row). Used by Growth and marketing analytics to monitor audience
+  and model membership sent to destinations (CRM, ad platforms, ESPs), debug row-level sync failures,
+  and join to sync_runs_trino via id_sync for run timing and destination context. Part of the
+  hightouch_logs DAG (hourly ingestion).
+  Partitioned by year, month, and day (derived from the export date in the source file path).
+  Always filter on year, month, and day in WHERE clauses to enable partition pruning and avoid full
+  table scans; never query without a bounded date range. When filtering by sync configuration, combine
+  partition predicates with id_sync to benefit from Z-order clustering on id_sync.
+  Hightouch documentation: https://hightouch.com/docs/syncs/warehouse-sync-logs (Snapshot table);
+  warehouse schema reference: https://hightouch.com/docs/developer-tools/warehouse-tables.
 columns:
   id_sync:
-    description: Unique identifier for the sync configuration
+    description: |
+      Hightouch sync configuration identifier. Join key to sync_runs_trino and sync_changelog_trino
+      to link row-level outcomes with run metadata (destination, model_name, timestamps).
     lineage:
       - datalake_hightouch_logs_raw.sync_snapshot_trino.sync_id
   id_row:
-    description: Primary key value of the model row as defined in Hightouch
+    description: |
+      Primary key value of the synced model row as defined in the Hightouch model. Uniquely identifies
+      the record within a given sync configuration. This is a Hightouch-internal row identifier and is
+      not joinable to QuintoAndar identity tables such as dw_public.dim_person or dim_user.
     lineage:
       - datalake_hightouch_logs_raw.sync_snapshot_trino.row_id
   op_type:
-    description: Whether the row was added, changed, or unchanged relative to the last sync run
+    description: |
+      Change type computed by Hightouch CDC when planning the sync run relative to the previous run.
+      Values include added (new row in model), changed (row updated), unchanged (row present but
+      not modified), or removed (row left the model). Useful for tracking audience entry/exit patterns.
     lineage:
       - datalake_hightouch_logs_raw.sync_snapshot_trino.op_type
+    categories:
+      added: Row is new in the model compared to the previous sync run.
+      changed: Row data changed compared to the previous sync run.
+      unchanged: Row is present in the model but was not modified since the last run.
+      removed: Row is no longer returned by the model query.
   status:
-    description: Row-level sync outcome (succeeded, failed, or aborted)
+    description: |
+      Row-level sync outcome for the most recent run. succeeded means the row was synced to the
+      destination; failed means Hightouch attempted but the destination rejected it; aborted means
+      Hightouch planned the row but did not attempt sync (e.g. run cancelled or fatal error).
     lineage:
       - datalake_hightouch_logs_raw.sync_snapshot_trino.status
+    categories:
+      succeeded: Row was successfully synced to the destination.
+      failed: Sync was attempted but the row failed at the destination.
+      aborted: Row was planned but not attempted due to run cancellation or early termination.
   failure_reason:
-    description: Error description when status is failed
+    description: |
+      Human-readable error message from Hightouch when status is failed. Null when the row synced
+      successfully or was aborted without a row-level error. Use for aggregating and categorizing
+      the most common sync failure patterns across destinations.
     lineage:
       - datalake_hightouch_logs_raw.sync_snapshot_trino.failure_reason
   model_fields_json:
-    description: JSON string of model fields for the row from warehouse sync logs
+    description: |
+      JSON string of the raw model column values for this row as read from the warehouse source
+      (not the payload sent to the destination). Reflects the Hightouch fields column; may contain
+      user attributes depending on the model field mapping.
     lineage:
       - datalake_hightouch_logs_raw.sync_snapshot_trino.fields
   year:
-    description: Partition year from raw (export path date)
+    description: |
+      Table partition column (year). Derived from the YYYYMMDD export date in the source parquet file
+      path at raw ingestion. Required in WHERE clauses for partition pruning — always combine with
+      month and day to restrict scans to the smallest date window needed. Queries without partition
+      filters will scan the entire table and incur high compute cost.
     lineage:
       - datalake_hightouch_logs_raw.sync_snapshot_trino.year
   month:
-    description: Partition month from raw (export path date)
+    description: |
+      Table partition column (month, 1–12). Derived from the export date in the source parquet file
+      path at raw ingestion. Must be filtered together with year and day in every query to enable
+      partition pruning; omitting any partition column disables pruning and forces a full scan.
     lineage:
       - datalake_hightouch_logs_raw.sync_snapshot_trino.month
   day:
-    description: Partition day from raw (export path date)
+    description: |
+      Table partition column (day, 1–31). Derived from the export date in the source parquet file
+      path at raw ingestion. Always the last partition column — filter with year and month to narrow
+      the scan to specific days. Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_hightouch_logs_raw.sync_snapshot_trino.day

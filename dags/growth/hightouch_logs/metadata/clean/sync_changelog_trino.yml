@@ -3,45 +3,96 @@ database_name: datalake_hightouch_logs_clean
 table_name: sync_changelog_trino
 domain: Growth
 owner: bruno.sbrito@quintoandar.com.br
-description: Clean Hightouch sync changelog from Trino source tracking individual row synchronization operations
+description: |
+  Clean layer for Hightouch Warehouse Sync Logs changelog data ingested from the CDP Trino export path
+  (source: hightouch_audit.sync_changelog parquet on S3). One row per sync run and model row operation,
+  deduplicated to the latest export per (id_sync, id_sync_run, id_row). Unlike sync_snapshot_trino,
+  which stores only the latest status, this table retains a historical log of every row-level operation
+  across sync runs — useful for tracking when records entered or exited models, aggregating error
+  patterns over time, and detecting flapping rows. Join to sync_runs_trino via id_sync and id_sync_run
+  for run timing, destination, and model context. Part of the hightouch_logs DAG (hourly ingestion).
+  Partitioned by year, month, and day (derived from the load date at raw ingestion). Always filter on
+  year, month, and day in WHERE clauses to enable partition pruning and avoid full table scans; never
+  query without a bounded date range. When filtering by sync or run, combine partition predicates with
+  id_sync and id_sync_run to benefit from Z-order clustering on those columns.
+  Hightouch documentation: https://hightouch.com/docs/syncs/warehouse-sync-logs (Changelog table);
+  warehouse schema reference: https://hightouch.com/docs/developer-tools/warehouse-tables.
 columns:
   id_sync:
-    description: Unique identifier for the sync configuration
+    description: |
+      Hightouch sync configuration identifier. Join key to sync_runs_trino, sync_snapshot_trino, and
+      other changelog rows to link per-row operations with run metadata (destination, model_name).
     lineage:
       - datalake_hightouch_logs_raw.sync_changelog_trino.sync_id
   id_sync_run:
-    description: Unique identifier for the specific sync run execution
+    description: |
+      Unique identifier for the sync run execution that produced this changelog entry. Together with
+      id_sync and id_row forms the deduplication grain of this table. Join to sync_runs_trino via
+      id_sync_run for run-level timestamps and volume metrics.
     lineage:
       - datalake_hightouch_logs_raw.sync_changelog_trino.sync_run_id
   id_row:
-    description: Unique identifier for the individual row being synchronized
+    description: |
+      Primary key value of the synced model row as defined in the Hightouch model. Uniquely identifies
+      the record within a given sync configuration for a specific sync run. This is a Hightouch-internal
+      row identifier and is not joinable to QuintoAndar identity tables such as dw_public.dim_person
+      or dim_user.
     lineage:
       - datalake_hightouch_logs_raw.sync_changelog_trino.row_id
   op_type:
-    description: Type of operation performed (insert, update, delete)
+    description: |
+      Change type computed by Hightouch CDC when planning the sync run relative to the previous run.
+      Values include added (new row in model), changed (row updated), or removed (row left the model).
+      Useful for reconstructing membership history and identifying rows that change frequently.
     lineage:
       - datalake_hightouch_logs_raw.sync_changelog_trino.op_type
+    categories:
+      added: Row is new in the model compared to the previous sync run.
+      changed: Row data changed compared to the previous sync run.
+      removed: Row is no longer returned by the model query.
   status:
-    description: Status of the synchronization operation (success, failed, pending)
+    description: |
+      Row-level sync outcome for this operation. succeeded means the row was synced to the destination;
+      failed means Hightouch attempted but the destination rejected it; aborted means Hightouch planned
+      the row but did not attempt sync (e.g. run cancelled or fatal error).
     lineage:
       - datalake_hightouch_logs_raw.sync_changelog_trino.status
+    categories:
+      succeeded: Row was successfully synced to the destination.
+      failed: Sync was attempted but the row failed at the destination.
+      aborted: Row was planned but not attempted due to run cancellation or early termination.
   failure_reason:
-    description: Detailed reason for failure if the operation was unsuccessful
+    description: |
+      Human-readable error message from Hightouch when status is failed. Null when the row synced
+      successfully or was aborted without a row-level error. Use for aggregating and categorizing
+      the most common sync failure patterns across destinations and sync runs.
     lineage:
       - datalake_hightouch_logs_raw.sync_changelog_trino.failure_reason
   fields:
-    description: Field data that was synchronized for this row operation
+    description: |
+      JSON object of the raw model column values for this row as read from the warehouse source
+      (not the payload sent to the destination). Reflects the Hightouch fields column; may contain
+      user attributes depending on the model field mapping.
     lineage:
       - datalake_hightouch_logs_raw.sync_changelog_trino.fields
   year:
-    description: Partition column representing the year of the data
+    description: |
+      Table partition column (year). Derived from the load date at raw ingestion. Required in WHERE
+      clauses for partition pruning — always combine with month and day to restrict scans to the
+      smallest date window needed. Queries without partition filters will scan the entire table.
     lineage:
       - datalake_hightouch_logs_raw.sync_changelog_trino.year
   month:
-    description: Partition column representing the month of the data
+    description: |
+      Table partition column (month, 1–12). Derived from the load date at raw ingestion. Must be
+      filtered together with year and day in every query to enable partition pruning; omitting any
+      partition column disables pruning and forces a full scan.
     lineage:
       - datalake_hightouch_logs_raw.sync_changelog_trino.month
   day:
-    description: Partition column representing the day of the data
+    description: |
+      Table partition column (day, 1–31). Derived from the load date at raw ingestion. Always the
+      last partition column — filter with year and month to narrow the scan to specific days. Example:
+      WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_hightouch_logs_raw.sync_changelog_trino.day
