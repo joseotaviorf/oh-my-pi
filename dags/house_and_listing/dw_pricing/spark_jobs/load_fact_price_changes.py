@@ -4,6 +4,10 @@ from pyspark.sql import functions as F
 from pyspark.sql.window import Window
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
@@ -193,6 +197,7 @@ if __name__ == "__main__":
     parser.add_argument("load_end_date", help="Load end date (YYYY-MM-DD)")
     parser.add_argument("run_mode", help="Run mode: prod/dev")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     logger.info(
@@ -236,11 +241,28 @@ if __name__ == "__main__":
         result_df = build_fact_price_changes(spark, pri)
 
         database_name = f"dw_{args.database_name}"
+        prod_location = (
+            f"s3://{args.datalake_bucket}/{args.database_name}/{args.table_name}"
+        )
+        write_database_name, write_table_name, write_location = (
+            resolve_datalake_write_target(
+                prod_database=database_name,
+                prod_table=args.table_name,
+                prod_location=prod_location,
+                bucket=args.datalake_bucket,
+                target_database=args.target_database_name,
+                target_table=args.target_table_name,
+            )
+        )
 
-        SparkMetastoreService(spark_client).create_database(database_name)
+        SparkMetastoreService(spark_client).create_database(write_database_name)
 
-        full_table_name = f"{database_name}.{args.table_name}"
-        s3_path = f"s3://{args.datalake_bucket}/{args.database_name}/{args.table_name}"
+        full_table_name = f"{write_database_name}.{write_table_name}"
+        s3_path = (
+            f"{write_location}{write_table_name}"
+            if write_location.endswith("/")
+            else write_location
+        )
 
         DeltaLoader().load_table(
             table_name=full_table_name,
@@ -250,7 +272,7 @@ if __name__ == "__main__":
         )
 
         SparkMetastoreService(spark_client).refresh_table(
-            database_name, args.table_name
+            write_database_name, write_table_name
         )
         logger.info(
             f"m=__main__, table={full_table_name}, msg=Load completed successfully"
