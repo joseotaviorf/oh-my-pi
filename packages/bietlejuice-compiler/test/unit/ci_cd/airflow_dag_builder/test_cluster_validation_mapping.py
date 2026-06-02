@@ -6,6 +6,7 @@ import pytest
 
 from bietlejuice.services.configuration_service import ConfigurationService
 from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
+    _mapped_worker_and_driver,
     build_consolidation_catalog,
     build_validation_cluster_spec,
     cap_validation_driver_node_type,
@@ -206,6 +207,26 @@ class TestComputeValidationOverrides:
     def test_cap_validation_driver_node_type_helper(self):
         assert cap_validation_driver_node_type("r6g.4xlarge") == "r6g.2xlarge"
         assert cap_validation_driver_node_type("r6g.2xlarge") == "r6g.2xlarge"
+
+    def test_mapped_worker_and_driver_prefers_master_node_type_id(self):
+        effective_prod = {
+            "node_type_id": "m7g.2xlarge",
+            "master_node_type_id": "m7g.xlarge",
+            "driver_node_type_id": "m5a.large",
+            "spark_version": "emr-7.12.0",
+        }
+        mapped_worker, mapped_driver = _mapped_worker_and_driver(
+            effective_prod, "emr_7_12_consolidation_s_memory_cluster"
+        )
+        assert mapped_worker == "m6g.2xlarge"
+        assert mapped_driver == "m6g.xlarge"
+
+    def test_emr_preset_uses_master_node_type_id(self):
+        resolved = ConfigurationService().get_config(
+            "emr_7_12_consolidation_s_memory_cluster"
+        )
+        assert resolved.get("master_node_type_id") == "m7g.xlarge"
+        assert "driver_node_type_id" not in resolved
 
 
 class TestBuildValidationClusterSpec:

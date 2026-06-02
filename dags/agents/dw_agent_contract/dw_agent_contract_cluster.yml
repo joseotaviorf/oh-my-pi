@@ -1,2 +1,2 @@
 cluster:
-  type: emr_7_12_min_driver_2xlarge_workers_1_task_cluster
+  type: emr_7_12_min_master_2xlarge_workers_1_task_cluster

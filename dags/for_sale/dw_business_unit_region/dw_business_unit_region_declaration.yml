@@ -5,5 +5,3 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: sale
-cluster:
-  type: emr_7_12_min_general_2_workers_cluster

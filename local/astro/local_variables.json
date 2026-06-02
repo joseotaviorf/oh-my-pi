@@ -557,14 +557,14 @@
                     "InstanceRole": "MASTER",
                     "InstanceType": "m3.xlarge",
                     "Market": "ON_DEMAND",
-                    "Name": "Master node"
+                    "Name": "Master nodes"
                 },
                 {
                     "InstanceCount": 1,
                     "InstanceRole": "CORE",
                     "InstanceType": "m3.2xlarge",
                     "Market": "ON_DEMAND",
-                    "Name": "Slave node"
+                    "Name": "Core nodes"
                 }
             ],
             "KeepJobFlowAliveWhenNoSteps": true

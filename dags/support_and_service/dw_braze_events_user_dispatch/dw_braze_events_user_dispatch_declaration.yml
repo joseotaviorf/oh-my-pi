@@ -18,5 +18,3 @@ workflow:
     fact_canvas_user_dispatch:
       extraction_type: incremental
       partitions: [year, month, day]
-cluster:
-  type: emr_7_12_consolidation_s_general_cluster

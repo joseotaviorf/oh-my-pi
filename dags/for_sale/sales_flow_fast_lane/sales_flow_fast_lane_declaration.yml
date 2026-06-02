@@ -39,5 +39,3 @@ workflow:
       clean_table_name: house
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id"]
-cluster:
-  type: emr_7_12_small_general_2xlarge_single_node_cluster

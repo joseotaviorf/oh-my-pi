@@ -1,0 +1,6 @@
+cluster:
+  type: emr_7_12_min_master_med_memory_3_workers_cluster
+  custom_configurations:
+    master_node_type_id: m7a.xlarge
+    task_nodes:
+        instance_count: 1

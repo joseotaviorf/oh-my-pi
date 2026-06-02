@@ -15,5 +15,3 @@ workflow:
   has_load_to_redshift_task: false
   short_circuit_customization:
     function: CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH
-cluster:
-  type: emr_7_12_med_memory_cluster

@@ -6,5 +6,3 @@ workflow:
   type: query_delta
   layer: dw
   custom_schema: payment
-cluster:
-  type: emr_7_12_med_memory_cluster

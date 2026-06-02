@@ -2,7 +2,7 @@ cluster:
   type: emr_7_12_consolidation_s_memory_cluster
   custom_configurations:
     # Cost-saving spot/OD mix: 1 CORE on-demand + 1 TASK spot (default preset).
-    # driver_node_type_id (m7g.xlarge): EMR master / YARN RM only — not Spark driver JVM.
+    # master_node_type_id (m7g.xlarge): EMR master / YARN RM only — not Spark driver JVM.
     # node_type_id (r7g.2xlarge): CORE/TASK workers — Spark AM (driver) + executors run here.
     spark_conf:
       # Driver JVM runs on a worker (YARN AM in cluster mode), sized for r7g.2xlarge colocation.

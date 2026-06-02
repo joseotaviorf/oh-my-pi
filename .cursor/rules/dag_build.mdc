@@ -196,18 +196,22 @@ cluster:
 
 Use `type: emr_7_12_*` (or `custom_cluster` with `spark_version: emr-*`). Keep **`num_workers`** as the total worker count (same as Databricks). Optionally set **`num_task_workers`** to how many of those workers run as EMR **TASK** nodes (spot-friendly); the remainder are **CORE**. If omitted, all workers are CORE (legacy behavior).
 
-- `num_task_workers` must be `< num_workers` when both are set in `custom_configurations` (at least 1 CORE).
+**EMR terminology:** `master_node_type_id` sizes the YARN master node (`InstanceRole: MASTER`). Do not use `driver_node_type_id` on EMR clusters (Databricks-only). Size CORE and TASK workers explicitly with **`core_nodes`** and **`task_nodes`** (each has `node_type_id` and `instance_count`). Legacy `node_type_id`, `num_workers`, and `num_task_workers` remain supported by the translator during rollout. The Spark driver JVM is configured via `spark.driver.*` / `spark.yarn.am.*` and typically runs on CORE/TASK workers in cluster mode—not on the master node.
+
+- `core_nodes.instance_count` must be >= 1 when `task_nodes.instance_count` > 0.
 - TASK nodes default to **SPOT**; override with `aws_attributes.task_availability`: `SPOT` or `ON_DEMAND`.
-- Optional `task_node_type_id` (defaults to `node_type_id`).
-- Deploy updated `airflow-plugins` before using `num_task_workers` in production.
+- Deploy updated `airflow-plugins` before using `core_nodes` / `task_nodes` in production.
 
 ```yaml
 cluster:
     type: emr_7_12_min_general_2_workers_cluster
     custom_configurations:
-        num_workers: 5          # total workers
-        num_task_workers: 3     # 3 TASK (SPOT) + 2 CORE
-        node_type_id: m7g.2xlarge
+        core_nodes:
+            node_type_id: m7g.2xlarge
+            instance_count: 2
+        task_nodes:
+            node_type_id: m7g.2xlarge
+            instance_count: 3
 ```
 
 #### Metric layer cluster specifics

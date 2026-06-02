@@ -10,8 +10,3 @@ workflow:
   tables_customization:
     dim_booking:
       partitions: [country_code]
-cluster:
-  type: emr_7_12_med_memory_general_cluster
-  custom_configurations:
-    spark_conf:
-      spark.sql.sources.partitionOverwriteMode: static

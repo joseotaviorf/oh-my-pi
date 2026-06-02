@@ -7,5 +7,3 @@ workflow:
   layer: dw
   custom_schema: losses
   has_load_to_redshift_task: false
-cluster:
-  type: emr_7_12_med_general_photon_cluster

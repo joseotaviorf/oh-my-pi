@@ -5,10 +5,12 @@ cluster:
     # num_workers is the TOTAL (CORE + TASK), so 3 = 1 CORE + 2 TASK.
     # Grows from 1-worker single_node to 3 workers; 2 of them are SPOT.
     # Master stays ON_DEMAND (m7g.xlarge) per emr_consolidation_base anchor.
-    num_workers: 3
-    num_task_workers: 2
+    core_nodes:
+        instance_count: 1
+    task_nodes:
+        instance_count: 2
     spark_conf:
-      # Driver (m7g.xlarge — 4 vCPU / 16 GB)
+      # Master / YARN RM (m7g.xlarge — 4 vCPU / 16 GB)
       spark.driver.memory: 8g
       spark.driver.cores: "4"
       # Workers are r7g.8xlarge (32 vCPU / 256 GB); 3 workers (1 CORE + 2 TASK).

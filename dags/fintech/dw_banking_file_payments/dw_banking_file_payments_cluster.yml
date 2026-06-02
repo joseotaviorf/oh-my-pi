@@ -1,0 +1,5 @@
+cluster:
+  type: emr_7_12_med_memory_cluster
+  custom_configurations:
+    spark_conf:
+      spark.driver.memory: 8g

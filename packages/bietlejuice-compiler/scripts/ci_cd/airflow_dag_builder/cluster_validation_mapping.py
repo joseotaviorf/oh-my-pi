@@ -112,6 +112,7 @@ class ConsolidationPreset:
     is_single_node: bool
     node_type_id: Optional[str]
     driver_node_type_id: Optional[str]
+    master_node_type_id: Optional[str]
     num_workers: Optional[int]
     spark_version: Optional[str]
 
@@ -275,6 +276,9 @@ def build_consolidation_catalog(
         resolved = service.get_config(name)
         size_tier, family = match.group(1), match.group(2)
         is_single_node = "_single_node" in name
+        topology_master = resolved.get("master_node_type_id") or resolved.get(
+            "driver_node_type_id"
+        )
         catalog.append(
             ConsolidationPreset(
                 name=name,
@@ -282,7 +286,8 @@ def build_consolidation_catalog(
                 size_tier=size_tier,
                 is_single_node=is_single_node,
                 node_type_id=resolved.get("node_type_id"),
-                driver_node_type_id=resolved.get("driver_node_type_id"),
+                driver_node_type_id=topology_master,
+                master_node_type_id=topology_master,
                 num_workers=resolved.get("num_workers"),
                 spark_version=resolved.get("spark_version"),
             )
@@ -304,7 +309,9 @@ def _mapped_worker_and_driver(
         _infer_logical_instance_type(effective_prod, prod_cluster_type),
         use_nvme=use_nvme,
     )
-    driver_raw = effective_prod.get("driver_node_type_id")
+    driver_raw = effective_prod.get("master_node_type_id") or effective_prod.get(
+        "driver_node_type_id"
+    )
     if not driver_raw and (
         effective_prod.get("driver_instance_pool_id")
         or effective_prod.get("instance_pool_id")
@@ -577,7 +584,9 @@ def compute_validation_overrides(
         overrides["num_workers"] = prod_workers
 
     preset_worker = validation_resolved.get("node_type_id")
-    preset_driver = validation_resolved.get("driver_node_type_id")
+    preset_driver = validation_resolved.get(
+        "master_node_type_id"
+    ) or validation_resolved.get("driver_node_type_id")
 
     if not _values_equal(mapped_worker, preset_worker):
         overrides["node_type_id"] = mapped_worker

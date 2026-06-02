@@ -33,8 +33,3 @@ workflow:
       raw_primary_keys: ["id"]
       clean_primary_keys: ["id_rating"]
 
-cluster:
-  type: emr_7_12_med_general_3_workers_cluster
-  custom_configurations:
-    driver_node_type_id: m7a.xlarge
-    num_task_workers: 1

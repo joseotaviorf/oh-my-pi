@@ -10,7 +10,13 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
 
 _EMR_TASK_AVAILABILITY_VALUES = frozenset({"SPOT", "ON_DEMAND"})
 _EMR_ONLY_CUSTOM_CONFIG_KEYS = frozenset(
-    {"num_task_workers", "task_node_type_id", "task_availability"}
+    {
+        "num_task_workers",
+        "task_node_type_id",
+        "task_availability",
+        "core_nodes",
+        "task_nodes",
+    }
 )
 
 
@@ -138,6 +144,25 @@ class DAGClusterValidator(Validator):
                 )
             return
 
+        core_nodes = custom.get("core_nodes")
+        task_nodes = custom.get("task_nodes")
+        if core_nodes is not None or task_nodes is not None:
+            self._validate_emr_node_group(core_nodes, "core_nodes", min_count=1)
+            if task_nodes is not None:
+                self._validate_emr_node_group(task_nodes, "task_nodes", min_count=0)
+                task_count = int((task_nodes or {}).get("instance_count", 0) or 0)
+                if task_count > 0:
+                    core_count = int((core_nodes or {}).get("instance_count", 1))
+                    if core_count < 1:
+                        raise AssertionError(
+                            "m=_check_emr_cluster_configuration, "
+                            "msg='core_nodes.instance_count' must be >= 1 when "
+                            "task_nodes.instance_count > 0"
+                        )
+            if task_availability is not None:
+                self._validate_task_availability(task_availability)
+            return
+
         num_task_workers = custom.get("num_task_workers")
         if num_task_workers is not None:
             if not isinstance(num_task_workers, int) or isinstance(
@@ -162,14 +187,7 @@ class DAGClusterValidator(Validator):
                 )
 
         if task_availability is not None:
-            if (
-                not isinstance(task_availability, str)
-                or task_availability not in _EMR_TASK_AVAILABILITY_VALUES
-            ):
-                raise AssertionError(
-                    "m=_check_emr_cluster_configuration, "
-                    "msg='aws_attributes.task_availability' must be SPOT or ON_DEMAND"
-                )
+            self._validate_task_availability(task_availability)
 
         if num_task_workers is None or num_task_workers == 0:
             return
@@ -187,4 +205,43 @@ class DAGClusterValidator(Validator):
                     f"msg='num_task_workers' ({num_task_workers}) must be less than "
                     f"'num_workers' ({num_workers}) so at least 1 CORE node remains "
                     f"({num_workers - num_task_workers} CORE + {num_task_workers} TASK)"
+                )
+
+    @staticmethod
+    def _validate_task_availability(task_availability: str) -> None:
+        if (
+            not isinstance(task_availability, str)
+            or task_availability not in _EMR_TASK_AVAILABILITY_VALUES
+        ):
+            raise AssertionError(
+                "m=_check_emr_cluster_configuration, "
+                "msg='aws_attributes.task_availability' must be SPOT or ON_DEMAND"
+            )
+
+    @staticmethod
+    def _validate_emr_node_group(block: dict, name: str, *, min_count: int) -> None:
+        if block is None:
+            return
+        if not isinstance(block, dict):
+            raise AssertionError(
+                f"m=_check_emr_cluster_configuration, msg='{name}' must be a dict"
+            )
+        instance_count = block.get("instance_count")
+        if instance_count is not None:
+            if not isinstance(instance_count, int) or isinstance(instance_count, bool):
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    f"msg='{name}.instance_count' must be an integer"
+                )
+            if instance_count < min_count:
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    f"msg='{name}.instance_count' must be >= {min_count}"
+                )
+        node_type_id = block.get("node_type_id")
+        if node_type_id is not None:
+            if not isinstance(node_type_id, str) or not node_type_id.strip():
+                raise AssertionError(
+                    "m=_check_emr_cluster_configuration, "
+                    f"msg='{name}.node_type_id' must be a non-empty string"
                 )

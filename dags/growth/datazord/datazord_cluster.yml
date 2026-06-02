@@ -1,7 +1,7 @@
 cluster:
   type: emr_7_12_consolidation_s_general_cluster
   custom_configurations:
-    driver_node_type_id: m7g.xlarge
+    master_node_type_id: m7g.xlarge
     spark_conf:
       spark.executor.memory: 5g
       spark.executor.memoryOverhead: 2g

@@ -6,6 +6,7 @@ _PROD_TOPOLOGY_KEYS_FOR_CONSOLIDATION_VALIDATION = frozenset(
     {
         "node_type_id",
         "driver_node_type_id",
+        "master_node_type_id",
         "task_node_type_id",
         "instance_pool_id",
         "driver_instance_pool_id",

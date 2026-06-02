@@ -117,6 +117,29 @@ class TestMergeValidationClusterArgs:
         assert "node_type_id" not in merged["custom_configurations"]
         assert merged["custom_configurations"]["driver_node_type_id"] == "m6g.xlarge"
 
+    def test_strips_master_node_type_id_for_consolidation_validation(self):
+        prod = {
+            "type": "custom_cluster",
+            "custom_configurations": {
+                "node_type_id": "m7g.2xlarge",
+                "master_node_type_id": "m7g.xlarge",
+                "num_workers": 2,
+            },
+        }
+        validation = {
+            "type": "consolidation_s_memory_cluster",
+            "custom_configurations": {
+                "num_workers": 2,
+                "master_node_type_id": "m6g.xlarge",
+            },
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert merged["custom_configurations"] == {
+            "num_workers": 2,
+            "master_node_type_id": "m6g.xlarge",
+        }
+        assert "node_type_id" not in merged["custom_configurations"]
+
     @mock.patch.dict(os.environ, {"ENVIRONMENT": "prod"})
     def test_resolved_alert_manager_validation_cluster_uses_graviton_topology(self):
         prod = {

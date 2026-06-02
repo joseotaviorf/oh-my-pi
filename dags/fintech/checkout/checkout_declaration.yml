@@ -59,9 +59,3 @@ workflow:
     role: {}
     role_permission: {}
     webhook: {}
-cluster:
-  type: emr_7_12_med_general_photon_cluster
-  custom_configurations:
-    driver_node_type_id: m7a.xlarge
-    node_type_id: m7a.2xlarge
-    num_task_workers: 1

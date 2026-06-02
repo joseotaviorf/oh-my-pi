@@ -21,7 +21,7 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parents[4]
 
 # Preset owns worker/driver when validation custom_configurations omits these keys.
-_TOPOLOGY_KEYS = ("node_type_id", "driver_node_type_id")
+_TOPOLOGY_KEYS = ("node_type_id", "driver_node_type_id", "master_node_type_id")
 
 # Prevent yaml.dump from folding long spark_conf keys (e.g. Jinja catalog.namespace).
 _YAML_DUMP_WIDTH = 10_000

@@ -4,10 +4,12 @@ cluster:
     # Cost-saving spot/OD mix: 1 CORE on-demand + 2 TASK spot (~67% spot).
     # num_workers is the TOTAL (CORE + TASK), so 3 = 1 CORE + 2 TASK.
     # Master stays ON_DEMAND (m7g.xlarge) per emr_consolidation_base anchor.
-    num_workers: 3
-    num_task_workers: 2
+    core_nodes:
+        instance_count: 1
+    task_nodes:
+        instance_count: 2
     spark_conf:
-      # Driver (m7g.xlarge — 4 vCPU / 16 GB)
+      # Master / YARN RM (m7g.xlarge — 4 vCPU / 16 GB)
       spark.driver.memory: 8g
       spark.driver.cores: "4"
       # Workers are r7g.4xlarge (16 vCPU / 128 GB each); 3 workers (1 CORE + 2 TASK).

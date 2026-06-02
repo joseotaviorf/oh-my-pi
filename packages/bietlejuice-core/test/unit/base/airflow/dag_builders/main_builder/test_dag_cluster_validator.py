@@ -91,6 +91,38 @@ class TestEmrClusterConfiguration:
             {
                 "type": "emr_7_12_med_general_cluster",
                 "custom_configurations": {
+                    "core_nodes": {"instance_count": 2},
+                    "task_nodes": {"instance_count": 3},
+                },
+            }
+        )
+        dag_cluster_validator.validate_cluster(dag_declaration=declaration)
+
+    def test_emr_cluster_core_task_nodes_with_types_passes(self, dag_cluster_validator):
+        declaration = self._base_declaration(
+            {
+                "type": "emr_7_12_med_general_cluster",
+                "custom_configurations": {
+                    "core_nodes": {
+                        "node_type_id": "m7g.2xlarge",
+                        "instance_count": 1,
+                    },
+                    "task_nodes": {
+                        "node_type_id": "m7g.xlarge",
+                        "instance_count": 2,
+                    },
+                },
+            }
+        )
+        dag_cluster_validator.validate_cluster(dag_declaration=declaration)
+
+    def test_emr_cluster_legacy_num_workers_split_still_passes(
+        self, dag_cluster_validator
+    ):
+        declaration = self._base_declaration(
+            {
+                "type": "emr_7_12_med_general_cluster",
+                "custom_configurations": {
                     "num_workers": 5,
                     "num_task_workers": 3,
                 },

@@ -20,9 +20,3 @@ workflow:
       clean_table_name: cart_item
       transactional_datatype_overrides:
         amount: decimal(38,20)
-cluster:
-  type: emr_7_12_min_general_3_workers_cluster
-  custom_configurations:
-    driver_node_type_id: m7a.xlarge
-    node_type_id: m7a.2xlarge
-    num_task_workers: 1

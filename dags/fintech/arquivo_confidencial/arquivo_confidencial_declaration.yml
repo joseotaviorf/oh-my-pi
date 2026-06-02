@@ -38,5 +38,3 @@ workflow:
     unico_check_process_aud:
       clean_table_name: unico_check_process_aud
       raw_primary_keys: ["id", "rev"]
-cluster:
-  type: emr_7_12_min_driver_2xlarge_workers_1_task_cluster
