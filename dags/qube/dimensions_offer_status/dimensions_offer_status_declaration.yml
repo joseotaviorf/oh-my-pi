@@ -31,6 +31,3 @@ workflow:
       nulls_last: true
     defaults:
       unknown_string: UNKNOWN
-cluster:
-  type: databricks_16_4_rfleet_instance_cluster
-  databricks_conn_id: databricks_new
