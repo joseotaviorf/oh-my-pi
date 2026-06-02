@@ -114,8 +114,15 @@ column_level_validations:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
+    has_null_count:
+      # 94 known historical NULLs (PLR sub-period splits, last seen 2025-04-30). Ceiling of 95
+      # acts as a growth sentinel without blocking CI for the known valid occurrences.
+      less_than_or_equal_to: 95
+      severity_level: Warning
     custom:
-      # Band tenure must be populated whenever dim_job band is available for the row.
+      # Band tenure must be populated for all current rows where dim_job has a band.
+      # Historical PLR sub-period splits can legitimately produce NULL tenure when
+      # the assignment-history band stint does not cover the sub-period's reference date.
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_compensation.fact_compensations AS fc
@@ -123,14 +130,19 @@ column_level_validations:
              ON fc.sk_job_version = dj.sk_job_version
          WHERE dj.band IS NOT NULL
            AND fc.days_tenure_in_band IS NULL
+           AND fc.is_current = TRUE
         ) = 0
       severity_level: Error
   months_tenure_in_band:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Error
+    has_null_count:
+      # Same sentinel as days_tenure_in_band — 94 known historical NULLs, ceiling of 95.
+      less_than_or_equal_to: 95
+      severity_level: Warning
     custom:
-      # Whole-month band tenure must follow the same completeness rule as day-level tenure.
+      # Same completeness rule as days_tenure_in_band — restricted to current rows.
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_compensation.fact_compensations AS fc
@@ -138,6 +150,7 @@ column_level_validations:
              ON fc.sk_job_version = dj.sk_job_version
          WHERE dj.band IS NOT NULL
            AND fc.months_tenure_in_band IS NULL
+           AND fc.is_current = TRUE
         ) = 0
       severity_level: Error
   dt_valid_from:

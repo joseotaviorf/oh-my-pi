@@ -102,6 +102,7 @@ WITH salary_with_person AS (
     WHERE
         sal.is_salary_approved = TRUE
         AND sal.dt_started <= CURRENT_DATE
+        AND (sal.dt_ended IS NULL OR sal.dt_started <= sal.dt_ended)
         AND im.assignment_number NOT LIKE 'P%'
 ),
 assignment_identifier_mapping AS (
@@ -856,6 +857,8 @@ salary_consolidation_base AS (
         target_exceptional_bonus
     FROM
         salary_enriched
+    WHERE
+        dt_started <= COALESCE(dt_ended, DATE('9999-12-31'))
 ),
 salary_consolidation_groups AS (
     -- Detect consecutive rows that are identical in every compensation attribute.

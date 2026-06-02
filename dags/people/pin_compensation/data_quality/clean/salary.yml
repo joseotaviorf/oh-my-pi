@@ -13,3 +13,14 @@ column_level_validations:
       # id_salary + object_version_number should be unique
       constraint: "(SELECT COUNT(*) FROM (SELECT 1 FROM datalake_pin_compensation_clean.salary GROUP BY id_salary, object_version_number HAVING COUNT(*) > 1)) = 0"
       severity_level: Warning
+  dt_started:
+    custom:
+      # Salary records must not have inverted date ranges (dt_started > dt_ended).
+      # Currently 0 in production; alerts here to catch source anomalies before they reach the DW.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_pin_compensation_clean.salary
+         WHERE dt_ended IS NOT NULL
+           AND dt_started > dt_ended
+        ) = 0
+      severity_level: Warning
