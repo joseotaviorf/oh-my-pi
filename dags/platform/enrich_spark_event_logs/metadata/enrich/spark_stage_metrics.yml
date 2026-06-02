@@ -4,7 +4,8 @@ table_name: spark_stage_metrics
 description: |
   Per-stage Spark execution metrics derived from Spark event logs emitted by
   every bietlejuice cluster (enabled by PR 1 — spark.eventLog.enabled=true,
-  spark.eventLog.dir=s3a://<bucket>/spark-event-logs/<dag_id>/).
+  spark.eventLog.dir=s3a://<bucket>/spark-event-logs/<dag_id>/ (Databricks) and
+  s3a://<bucket>/spark-event-logs-emr/<dag_id>/ (EMR).
 
   One row per Spark stage attempt. Built from three event types joined at the
   (id_spark_app, id_stage, id_stage_attempt) grain:
@@ -37,7 +38,9 @@ columns:
   id_stage_attempt:
     description: Stage attempt number (0 for first attempt, incremented on retry). Same stage_id may appear multiple times with different attempt ids if Spark retried after task failures.
   dag_id:
-    description: Airflow DAG identifier (without the `bietlejuice.` prefix), extracted from the `spark-event-logs/<dag_id>/...` S3 path. Joinable to `dag_id` in `datalake_databricks_health.daily_cluster_health` via `system.lakeflow.job_run_timeline` in the downstream DW DAG.
+    description: Airflow DAG identifier (without the `bietlejuice.` prefix), extracted from the `spark-event-logs/<dag_id>/...` or `spark-event-logs-emr/<dag_id>/...` S3 path. Joinable to `dag_id` in `datalake_databricks_health.daily_cluster_health` via `system.lakeflow.job_run_timeline` in the downstream DW DAG.
+  spark_runtime:
+    description: "`databricks` or `emr` from the S3 path prefix (`spark-event-logs/` vs `spark-event-logs-emr/`)."
   stage_name:
     description: Spark stage description string (typically the operator that produced it, e.g. `mapPartitions at MyDAG.scala:42`).
   stage_failure_reason:

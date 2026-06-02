@@ -6,7 +6,7 @@ dag:
     dag_purpose: |
       Daily ingestion of Spark event logs emitted by every bietlejuice
       cluster (enabled by PR 1 — spark.eventLog.enabled=true,
-      eventLog.dir=s3a://<bucket>/spark-event-logs/<dag_id>/). Parses
+      eventLog.dir under `spark-event-logs/` (Databricks) or `spark-event-logs-emr/` (EMR)). Parses
       SparkListenerStageCompleted, SparkListenerStageExecutorMetrics,
       and SparkListenerTaskEnd events into one row per Spark stage
       attempt at datalake_databricks_health.spark_stage_metrics.

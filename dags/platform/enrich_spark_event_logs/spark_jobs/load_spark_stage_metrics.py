@@ -1,7 +1,8 @@
 """Ingest Spark event logs from S3 → Delta.
 
 Source path layout (written by every bietlejuice cluster after PR 1):
-    s3a://<databricks_bucket>/spark-event-logs/<dag_id>/eventlog…<spark_app_attempt>/
+    s3a://<databricks_bucket>/spark-event-logs/<dag_id>/… (Databricks)
+    s3a://<databricks_bucket>/spark-event-logs-emr/<dag_id>/… (EMR)
         JSONL shards (often zstd-compressed per ``spark.eventLog.compress``).
 
     Typical directory names include ``eventlog_v2_<id>/`` (underscore, Databricks
@@ -59,6 +60,9 @@ from bietlejuice.loaders.delta_loader import DeltaLoader
 # Databricks RollingEventLogFilesWriter uses ``eventlog_v2_<id>/``; hyphenated
 # ``eventlog-v2-<id>/`` and legacy ``eventlog-<id>/`` also occur.
 EVENTLOG_APP_ID_SEGMENT_PATTERN = r"eventlog(?:[_-]v\d+)?[_-]([^/]+)/"
+# ``(?:-emr)?`` covers Databricks ``spark-event-logs/`` and EMR ``spark-event-logs-emr/``.
+# Do not use ``coalesce`` across two ``regexp_extract`` calls — no match yields ``""``, not NULL.
+EVENTLOG_DAG_ID_SEGMENT_PATTERN = r"spark-event-logs(?:-emr)?/([^/]+)/"
 
 JOB_NAME = "load_spark_stage_metrics"
 logger = QuintoAndarLogger(JOB_NAME)
@@ -204,12 +208,15 @@ def read_stage_metrics(
     (id_spark_app, id_stage, id_stage_attempt). Stage attempts missing those
     events still produce a row with NULL in the corresponding columns.
     """
-    source_path = f"s3a://{databricks_bucket}/spark-event-logs/"
-    logger.info(f"m=read_stage_metrics,msg='reading event logs from {source_path}'")
+    source_paths = [
+        f"s3a://{databricks_bucket}/spark-event-logs/",
+        f"s3a://{databricks_bucket}/spark-event-logs-emr/",
+    ]
+    logger.info(f"m=read_stage_metrics,msg='reading event logs',paths={source_paths}")
 
     raw = (
         spark.read.option("recursiveFileLookup", "true")
-        .text(source_path)
+        .text(source_paths)
         .filter(
             F.col("_metadata.file_modification_time")
             >= F.lit(load_start_date).cast("date")
@@ -220,11 +227,18 @@ def read_stage_metrics(
         )
         .withColumn("file_path", F.col("_metadata.file_path"))
         .withColumn(
-            "dag_id", F.regexp_extract("file_path", r"spark-event-logs/([^/]+)/", 1)
+            "dag_id",
+            F.regexp_extract("file_path", EVENTLOG_DAG_ID_SEGMENT_PATTERN, 1),
         )
         .withColumn(
             "id_spark_app",
             F.regexp_extract("file_path", EVENTLOG_APP_ID_SEGMENT_PATTERN, 1),
+        )
+        .withColumn(
+            "spark_runtime",
+            F.when(
+                F.col("file_path").contains("spark-event-logs-emr/"), F.lit("emr")
+            ).otherwise(F.lit("databricks")),
         )
     )
 
@@ -245,6 +259,7 @@ def read_stage_metrics(
             F.col("event.`Stage Info`.`Stage ID`").alias("id_stage"),
             F.col("event.`Stage Info`.`Stage Attempt ID`").alias("id_stage_attempt"),
             F.col("dag_id"),
+            F.col("spark_runtime"),
             F.col("event.`Stage Info`.`Stage Name`").alias("stage_name"),
             F.col("event.`Stage Info`.`Failure Reason`").alias("stage_failure_reason"),
             F.col("event.`Stage Info`.`Number of Tasks`").alias("task_count"),
@@ -351,6 +366,7 @@ def read_stage_metrics(
             F.col("id_stage"),
             F.col("id_stage_attempt"),
             F.col("dag_id"),
+            F.col("spark_runtime"),
             F.col("stage_name"),
             F.col("stage_failure_reason"),
             F.col("task_count"),

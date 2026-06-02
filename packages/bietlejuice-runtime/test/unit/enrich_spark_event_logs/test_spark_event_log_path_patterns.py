@@ -22,6 +22,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 from dags.platform.enrich_spark_event_logs.spark_jobs.load_spark_stage_metrics import (  # noqa: E402
     EVENTLOG_APP_ID_SEGMENT_PATTERN,
+    EVENTLOG_DAG_ID_SEGMENT_PATTERN,
 )
 
 
@@ -46,9 +47,37 @@ from dags.platform.enrich_spark_event_logs.spark_jobs.load_spark_stage_metrics i
             "s3://b/spark-event-logs/xdag/eventlog-legacy_attempt_only/events.zstd",
             "legacy_attempt_only",
         ),
+        (
+            "s3a://b/spark-event-logs-emr/dw_collections_segmentation/"
+            "eventlog_v2_app-20260519083350-0000/events_1.zstd",
+            "app-20260519083350-0000",
+        ),
     ],
 )
 def test_eventlog_segment_extracts_app_id(file_path: str, expected_id: str) -> None:
     matched = re.search(EVENTLOG_APP_ID_SEGMENT_PATTERN, file_path)
     assert matched is not None, file_path
     assert matched.group(1) == expected_id
+
+
+@pytest.mark.parametrize(
+    ("file_path", "expected_dag_id"),
+    [
+        (
+            "s3a://b/spark-event-logs/bietlejuice.big_agent_fast_lane/"
+            "eventlog_v2_local-1779162723207/events_4.zstd",
+            "bietlejuice.big_agent_fast_lane",
+        ),
+        (
+            "s3a://b/spark-event-logs-emr/bietlejuice.big_agent_fast_lane/"
+            "eventlog_v2_local-1779162723207/events_4.zstd",
+            "bietlejuice.big_agent_fast_lane",
+        ),
+    ],
+)
+def test_dag_id_segment_extracts_from_databricks_and_emr_paths(
+    file_path: str, expected_dag_id: str
+) -> None:
+    matched = re.search(EVENTLOG_DAG_ID_SEGMENT_PATTERN, file_path)
+    assert matched is not None, file_path
+    assert matched.group(1) == expected_dag_id
