@@ -23,6 +23,10 @@ columns:
     lineage:
       - datalake_big_agent_raw.new_earnings.external_receiver_id
     description: Identifier of the external receiver entity.
+  id_author:
+    lineage:
+      - datalake_big_agent_raw.new_earnings.author
+    description: Author identifier extracted from the author JSON payload.
   uuid_earning:
     lineage:
       - datalake_big_agent_raw.new_earnings.earning_uuid
@@ -63,6 +67,18 @@ columns:
     lineage:
       - datalake_big_agent_raw.new_earnings.author
     description: Actor metadata responsible for generating the earning.
+  author_role:
+    lineage:
+      - datalake_big_agent_raw.new_earnings.author
+    description: Author role parsed from the author JSON payload.
+  author_channel:
+    lineage:
+      - datalake_big_agent_raw.new_earnings.author
+    description: Author channel parsed from the author JSON payload.
+  author_on_behalf_of_role:
+    lineage:
+      - datalake_big_agent_raw.new_earnings.author
+    description: On-behalf-of role parsed from the author JSON payload.
   ts_created:
     lineage:
       - datalake_big_agent_raw.new_earnings.created_at

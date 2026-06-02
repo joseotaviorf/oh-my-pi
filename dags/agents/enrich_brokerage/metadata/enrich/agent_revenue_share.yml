@@ -1,0 +1,111 @@
+database_name: datalake_agent_payments
+table_name: agent_revenue_share
+description: >
+  Unified agent revenue share by user, house, business context, revenue source, and role.
+  Combines Big Agent calculated earnings (demand conversion/acquisition and supply CIQ)
+  with Nazaré revenue-share participants, aggregated per partition date.
+domain: Agents
+owner: anne.macedo@quintoandar.com.br
+columns:
+  id_user:
+    lineage:
+      - datalake_agent_accreditation.agent.id_user
+      - datalake_nazare_clean.agent.id_external
+    description: Agent user identifier (EBDB id on Big Agent path, external id on Nazaré path).
+  id_house:
+    lineage:
+      - datalake_sales_flow_clean.house.id_external
+      - datalake_ebdb_clean.contract.id_house
+      - datalake_nazare_clean.revenue_share_by_participant.id_house
+    description: House identifier from sales flow, rent contract, or Nazaré revenue share.
+  uuid_person:
+    lineage:
+      - datalake_big_agent.earnings.uuid_person
+      - datalake_nazare_clean.agent.uuid_external_person
+    description: Person UUID of the agent receiving the revenue share.
+  business_context:
+    lineage:
+      - datalake_hub_services.member_profile.business_context
+    description: Business context from the agent member profile (for example RENT or SALE).
+  revenue_source:
+    description: >
+      Origin system of the row: BIG_AGENT (incentive earnings) or NAZARE (offer revenue-share
+      calculation). Derived in SQL from the union branch, not a source column.
+  revenue_role:
+    description: >
+      Revenue role DEMAND or SUPPLY. Big Agent branches set the role explicitly; Nazaré maps
+      CIQ participants to SUPPLY and other roles to DEMAND.
+  revenue_amount:
+    lineage:
+      - datalake_big_agent.earnings.revenue_amount
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: >
+      Gross revenue amount for the share (summed on Big Agent demand branch; direct value
+      on supply and Nazaré branches).
+  revenue_percentage:
+    lineage:
+      - datalake_big_agent.earnings.revenue_percentage
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: >
+      Total revenue share percentage (summed on Big Agent demand branch; partner brokerage
+      fee percentage on Nazaré).
+  brokerage_percentage:
+    lineage:
+      - datalake_big_agent.earnings.revenue_percentage
+      - datalake_big_agent.earnings.incentive_system
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: >
+      Brokerage fee share: Big Agent demand conversion (DEMAND_CONVERSION_FS) or Nazaré
+      remuneration-baseline when participant is not CIQ.
+  tqc_percentage:
+    lineage:
+      - datalake_big_agent.earnings.revenue_percentage
+      - datalake_big_agent.earnings.incentive_system
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: >
+      TQC share: Big Agent demand acquisition (DEMAND_ACQUISITION_FS) or Nazaré tqc-bonus
+      when non-zero.
+  ciq_percentage:
+    lineage:
+      - datalake_big_agent.earnings.revenue_percentage
+      - datalake_big_agent.earnings.incentive_system
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: >
+      CIQ supply share: Big Agent SUPPLY_ACQUISITION_FS revenue percentage or Nazaré share
+      when participant_role is CIQ.
+  has_tqc_revenue_share:
+    lineage:
+      - datalake_big_agent.earnings.incentive_system
+      - datalake_nazare_clean.revenue_share_by_participant.json_output
+    description: >
+      True when a TQC component exists (Big Agent has DEMAND_ACQUISITION_FS share; Nazaré
+      has non-zero tqc-bonus).
+  dt_created:
+    lineage:
+      - datalake_big_agent.earnings.ts_created
+      - datalake_nazare_clean.revenue_share_by_participant.ts_created
+    description: Earliest reference date of the revenue share event in the aggregation window.
+  dt_updated:
+    lineage:
+      - datalake_big_agent.earnings.ts_updated
+      - datalake_nazare_clean.revenue_share_by_participant.ts_created
+      - datalake_nazare_clean.revenue_share_by_participant.ts_database_transaction
+    description: Latest activity date used for incremental load and table partitioning.
+  year:
+    lineage:
+      - datalake_big_agent.earnings.ts_updated
+      - datalake_nazare_clean.revenue_share_by_participant.ts_created
+      - datalake_nazare_clean.revenue_share_by_participant.ts_database_transaction
+    description: Partition year derived from dt_updated.
+  month:
+    lineage:
+      - datalake_big_agent.earnings.ts_updated
+      - datalake_nazare_clean.revenue_share_by_participant.ts_created
+      - datalake_nazare_clean.revenue_share_by_participant.ts_database_transaction
+    description: Partition month derived from dt_updated.
+  day:
+    lineage:
+      - datalake_big_agent.earnings.ts_updated
+      - datalake_nazare_clean.revenue_share_by_participant.ts_created
+      - datalake_nazare_clean.revenue_share_by_participant.ts_database_transaction
+    description: Partition day derived from dt_updated.

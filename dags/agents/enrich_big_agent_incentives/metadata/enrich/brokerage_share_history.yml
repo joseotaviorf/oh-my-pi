@@ -1,0 +1,49 @@
+database_name: datalake_big_agent
+table_name: brokerage_share_history
+description: |
+  Revision-level history of agent brokerage share per rent contract. Combines Big Agent
+  new_earnings_aud (DEMAND_CONVERSION_FR) with legacy contract_aud when no earning source
+  exists for the contract.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_revision:
+    lineage:
+      - datalake_big_agent_clean.new_earnings_aud.rev
+      - datalake_ebdb_clean.contract_aud.rev
+    description: Audit revision identifier from the source system.
+  id_contract:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.id_external_domain
+      - datalake_ebdb_clean.contract_aud.id_contract
+    description: EBDB contract identifier for RENT_CONTRACT earning sources.
+  agent_brokerage_share:
+    lineage:
+      - datalake_big_agent_clean.new_earnings_aud.revenue_percentage
+      - datalake_ebdb_clean.contract_aud.agent_brokerage_share
+    description: Agent brokerage share percentage at this revision.
+  ts_revision:
+    lineage:
+      - datalake_big_agent_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Timestamp when the revision was recorded in the audit trail.
+  dt_load:
+    lineage:
+      - datalake_big_agent_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Load reference date derived from the revision timestamp.
+  year:
+    lineage:
+      - datalake_big_agent_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Partition year derived from ts_revision.
+  month:
+    lineage:
+      - datalake_big_agent_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Partition month derived from ts_revision.
+  day:
+    lineage:
+      - datalake_big_agent_clean.user_revision_entity.ts_revision
+      - datalake_ebdb_clean.user_revision_entity.ts_revision
+    description: Partition day derived from ts_revision.

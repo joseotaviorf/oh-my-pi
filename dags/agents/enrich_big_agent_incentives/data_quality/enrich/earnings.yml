@@ -1,0 +1,25 @@
+---
+table_name: datalake_big_agent.earnings
+alert_channel: "#alerts-de-airflow-dags"
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+column_level_validations:
+  id_earning:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  id_earning_source:
+    is_complete:
+      severity_level: Error
+  incentive_system:
+    is_complete:
+      severity_level: Warning
+  ts_created:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error

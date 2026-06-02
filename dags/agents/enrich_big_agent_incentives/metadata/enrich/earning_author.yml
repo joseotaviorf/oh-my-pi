@@ -1,0 +1,60 @@
+database_name: datalake_big_agent
+table_name: earning_author
+description: |
+  Author context per Big Agent earning, one row per earning and author identifier after deduplication
+  to the latest update in the load window. Enriched with EBDB user identifiers when uuid_person matches.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_earning:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.id
+    description: Primary identifier of the earning record in Big Agent.
+  id_author:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.id_author
+    description: Author identifier from the earning author payload.
+  id_user:
+    lineage:
+      - datalake_ebdb_user.user.id
+    description: EBDB user identifier matched by uuid_person when the author maps to a platform user.
+  uuid_person:
+    lineage:
+      - datalake_ebdb_user.user.uuid_person
+    description: Person UUID from EBDB user matched to the author identifier.
+  author_role:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.author_role
+    description: Role of the author in the incentive system (for example agent or system roles).
+  author_channel:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.author_channel
+    description: Channel through which the author acted.
+  author_on_behalf_of_role:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.author_on_behalf_of_role
+    description: Role of the actor on whose behalf the earning was authored.
+  ts_created:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.ts_created
+    description: Timestamp when the earning was created in Big Agent.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.ts_updated
+    description: Timestamp of the earning update that defined this author snapshot.
+  dt_load:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.ts_created
+    description: Load reference date derived from the earning creation timestamp.
+  year:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.ts_created
+    description: Partition year derived from ts_created.
+  month:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.ts_created
+    description: Partition month derived from ts_created.
+  day:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.ts_created
+    description: Partition day derived from ts_created.

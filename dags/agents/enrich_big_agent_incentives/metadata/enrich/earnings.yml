@@ -1,0 +1,125 @@
+database_name: datalake_big_agent
+table_name: earnings
+description: |
+  Enriched Big Agent earnings from the incentive system (new_earnings joined to earning_sources).
+  One row per earning calculation with contract, sales flow, cart, receiver, incentive system,
+  revenue amounts, and author context. Incrementally loaded and partitioned by earning creation date.
+domain: Agents
+owner: data-ae-agents@quintoandar.com.br
+columns:
+  id_earning:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.id
+    description: Primary identifier of the earning record in Big Agent.
+  id_earning_source:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.id_earning_source
+    description: Identifier of the earning source that originated this earning.
+  id_revenue_share:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.id_revenue_share
+    description: Revenue share identifier linked to the earning calculation.
+  id_contract:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.id_external_domain
+    description: EBDB contract identifier when the earning source domain type is RENT_CONTRACT.
+  id_sales_flow:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.id_external_domain
+    description: Sales flow identifier when the earning source domain type is SALES_FLOW.
+  id_author:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.id_author
+    description: Author identifier from the earning author payload when the role is not SYSTEM.
+  id_cart:
+    lineage:
+      - datalake_cart_system_clean.cart.id
+    description: Cart identifier linked via the earning source external cart UUID, when present.
+  uuid_company:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.id_external_receiver
+    description: Company receiver UUID when external_receiver_type is COMPANY.
+  uuid_person:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.id_external_receiver
+    description: Agent receiver person UUID when external_receiver_type is AGENT.
+  business_context:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.external_domain_type
+    description: Business context derived from external domain type (RENT or SALE).
+  domain_type:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.external_domain_type
+    description: External domain type discriminator from the earning source (for example RENT_CONTRACT or SALES_FLOW).
+  incentive_system:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.incentive_system
+    description: Incentive system label that produced this earning (for example DEMAND_CONVERSION_FS).
+  calculated_from:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.calculated_from
+    description: Basis used to calculate the earning (amount or percentage).
+  currency:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.currency
+    description: Currency code applied to monetary fields on the earning.
+  earning_status:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.status
+    description: Processing status of the earning record.
+  earning_status_reason:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.reason
+    description: Business reason attached to the earning status when applicable.
+  earning_source_status:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.status
+    description: Processing status of the parent earning source.
+  earning_source_status_reason:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.failure_reason
+    description: Failure or rejection reason on the earning source when status indicates an error.
+  base_amount:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.base_amount
+    description: Base monetary amount from the earning source used as calculation input.
+  revenue_share_total_amount:
+    lineage:
+      - datalake_big_agent_clean.earning_sources.revenue_share_total_amount
+    description: Total revenue share amount configured on the earning source.
+  revenue_amount:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.revenue_amount
+    description: Revenue amount calculated for this earning.
+  revenue_percentage:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.revenue_percentage
+    description: Revenue percentage calculated for this earning (brokerage share component).
+  is_authored_by_system:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.author_role
+    description: True when author_role is SYSTEM.
+  ts_created:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.ts_created
+    description: Timestamp when the earning was created in Big Agent.
+  ts_updated:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.ts_updated
+    description: Timestamp when the earning was last updated in Big Agent.
+  dt_load:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.ts_created
+    description: Load reference date derived from the earning creation timestamp.
+  year:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.ts_created
+    description: Partition year derived from ts_created.
+  month:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.ts_created
+    description: Partition month derived from ts_created.
+  day:
+    lineage:
+      - datalake_big_agent_clean.new_earnings.ts_created
+    description: Partition day derived from ts_created.
