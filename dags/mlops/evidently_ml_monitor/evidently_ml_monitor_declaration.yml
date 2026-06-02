@@ -10,6 +10,15 @@ dag:
       (one row per dt and metric_name partition) and cleans them to one row per
       run_id with a metric_reports map keyed by metric_name.
 
+      Backfill: optional DagRun JSON conf with load_start_date (inclusive) and
+      load_end_date (exclusive). Example: start=2026-05-01 and end=2026-05-08
+      loads dt=2026-05-01 through dt=2026-05-07. Automated runs without conf use
+      load_start_date=data_interval_start and load_end_date=data_interval_start+1
+      day (single-day ingestion).
+
+      Re-backfilling the same dates appends duplicate rows to raw; clean merge on
+      run_id dedupes the Delta table.
+
 workflow:
   layer: raw
   type: custom_ingestion
@@ -18,13 +27,15 @@ workflow:
     - "{environment}"
     - "{bucket}"
     - "{schema}"
-    - "{{ get_date_param(dag_run, data_interval_start | ds, 'date_to_ingest') }}"
+    - "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    - "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
+  has_hive_sync: false
   execution_timeout_hours: 2
   default_extraction_type: incremental
   default_partitions: []
   extra_query_template_params:
-    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'date_to_ingest') }}"
-    load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'date_to_ingest') }}"
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
   tables_customization:
     evidently_ml_monitor:
       merge_on: [run_id]

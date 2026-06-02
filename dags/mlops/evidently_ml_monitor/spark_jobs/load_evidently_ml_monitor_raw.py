@@ -1,6 +1,6 @@
 import logging
 from argparse import ArgumentParser
-from datetime import datetime
+from datetime import datetime, timedelta
 from urllib.parse import unquote
 
 from pyspark.sql import DataFrame
@@ -17,6 +17,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 JOB_NAME = "load_evidently_ml_monitor_raw"
+DATE_FMT = "%Y-%m-%d"
 PATH_COLUMNS = (
     "source_path",
     "job_name",
@@ -79,8 +80,24 @@ def _enrich_path_columns(df: DataFrame) -> DataFrame:
     )
 
 
-def _filter_by_ingest_date(df: DataFrame, ingest_date: str) -> DataFrame:
-    return df.filter(col("dt") == ingest_date)
+def default_load_end_date(load_start_date: str) -> str:
+    dt_start = datetime.strptime(load_start_date, DATE_FMT).date()
+    return (dt_start + timedelta(days=1)).strftime(DATE_FMT)
+
+
+def validate_load_date_range(load_start_date: str, load_end_date: str) -> None:
+    dt_start = datetime.strptime(load_start_date, DATE_FMT).date()
+    dt_end = datetime.strptime(load_end_date, DATE_FMT).date()
+    if dt_start >= dt_end:
+        raise ValueError(
+            f"load_start_date ({load_start_date}) must be < load_end_date ({load_end_date})"
+        )
+
+
+def _filter_by_date_range(
+    df: DataFrame, load_start_date: str, load_end_date: str
+) -> DataFrame:
+    return df.filter((col("dt") >= load_start_date) & (col("dt") < load_end_date))
 
 
 def main() -> None:
@@ -88,24 +105,31 @@ def main() -> None:
     parser.add_argument("environment")
     parser.add_argument("bucket")
     parser.add_argument("schema")
-    parser.add_argument("execution_date")
+    parser.add_argument(
+        "load_start_date",
+        help="First calendar day to load (inclusive). Format: YYYY-MM-DD",
+    )
+    parser.add_argument(
+        "load_end_date",
+        nargs="?",
+        default=None,
+        help="First calendar day after the load window (exclusive). Format: YYYY-MM-DD",
+    )
     args = parser.parse_args()
 
-    # Preapration for job execution:
     environment = args.environment
     datalake_bucket = args.bucket
     schema = args.schema
-    execution_date = datetime.strptime(args.execution_date, "%Y-%m-%d")
-    ingest_date = execution_date.strftime("%Y-%m-%d")
+    load_start_date = args.load_start_date
+    load_end_date = args.load_end_date or default_load_end_date(load_start_date)
+    validate_load_date_range(load_start_date, load_end_date)
 
     table_name = "evidently_ml_monitor"
 
     logger.info(
-        f"""
-            m={JOB_NAME}, environment={environment}, schema={schema},
-            datalake_bucket={datalake_bucket}, execution_date={execution_date},
-            ingest_date={ingest_date}, msg=Starting spark job..."
-        """
+        f"m={JOB_NAME}, environment={environment}, schema={schema}, "
+        f"datalake_bucket={datalake_bucket}, load_start_date={load_start_date}, "
+        f"load_end_date={load_end_date}, msg=Starting spark job..."
     )
 
     config_service = ConfigurationService("evidently_ml_monitor")
@@ -127,17 +151,19 @@ def main() -> None:
     # Read metric files:
     df = _read_metric_files(spark_client.conn, source_root_path, file_format)
     df = _enrich_path_columns(df)
-    df = _filter_by_ingest_date(df, ingest_date)
+    df = _filter_by_date_range(df, load_start_date, load_end_date)
 
     row_count = df.count()
     logger.info(
-        f"m={JOB_NAME}, ingest_date={ingest_date}, df={row_count}, "
+        f"m={JOB_NAME}, load_start_date={load_start_date}, "
+        f"load_end_date={load_end_date}, df={row_count}, "
         f"msg=Read and filtered metric files."
     )
 
     if row_count == 0:
         logger.info(
-            f"m={JOB_NAME}, ingest_date={ingest_date}, msg=No data for ingest date; skipping load."
+            f"m={JOB_NAME}, load_start_date={load_start_date}, "
+            f"load_end_date={load_end_date}, msg=No data for date range; skipping load."
         )
         return
 

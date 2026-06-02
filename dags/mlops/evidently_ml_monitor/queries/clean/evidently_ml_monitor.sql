@@ -13,7 +13,8 @@ WITH filtered AS (
         json_data IS NOT NULL
         AND metric_name IS NOT NULL
         AND job_name IS NOT NULL
-        AND dt BETWEEN '{load_start_date}' AND '{load_end_date}'
+        AND dt >= '{load_start_date}'
+        AND dt < '{load_end_date}'
 ),
 deduped AS (
     SELECT

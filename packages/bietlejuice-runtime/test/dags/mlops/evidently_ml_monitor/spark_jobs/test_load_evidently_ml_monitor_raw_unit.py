@@ -28,7 +28,9 @@ from dags.mlops.evidently_ml_monitor.spark_jobs.load_evidently_ml_monitor_raw im
     JOB_NAME_PATH_PATTERN,
     METRIC_NAME_PATH_PATTERN,
     PATH_COLUMNS,
+    default_load_end_date,
     sanitize_metric_name,
+    validate_load_date_range,
 )
 
 SAMPLE_PATH = (
@@ -70,3 +72,24 @@ class TestSanitizeMetricName(unittest.TestCase):
 
     def test_empty_string_returns_empty(self):
         self.assertEqual(sanitize_metric_name(""), "")
+
+
+class TestValidateLoadDateRange(unittest.TestCase):
+    def test_accepts_valid_range(self):
+        validate_load_date_range("2026-05-01", "2026-05-08")
+
+    def test_accepts_single_day_window(self):
+        validate_load_date_range("2026-05-01", "2026-05-02")
+
+    def test_rejects_start_after_end(self):
+        with self.assertRaises(ValueError):
+            validate_load_date_range("2026-05-07", "2026-05-01")
+
+    def test_rejects_equal_dates(self):
+        with self.assertRaises(ValueError):
+            validate_load_date_range("2026-05-01", "2026-05-01")
+
+
+class TestDefaultLoadEndDate(unittest.TestCase):
+    def test_defaults_to_next_calendar_day(self):
+        self.assertEqual(default_load_end_date("2026-05-01"), "2026-05-02")
