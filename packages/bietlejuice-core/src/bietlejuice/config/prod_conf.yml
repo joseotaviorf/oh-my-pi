@@ -1621,6 +1621,8 @@ emr_cluster_base: &emr_cluster_anchor
               destination: "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/emr_init_script.sh"
           args:
               - "{{ var.value.artifacts_bucket }}"
+              - "{{ var.value.databricks_s3_bucket }}"
+              - "{{ dag.dag_id }}"
     custom_tags:
         - key: app
           value: airflow
@@ -1744,6 +1746,13 @@ emr_cluster_base: &emr_cluster_anchor
         spark.openlineage.transport.type: "http"
         spark.openlineage.transport.url: "https://metadata-propagator.apps.data-prd-blue.habitat.zone"
         spark.openlineage.transport.endpoint: "/openlineage/events"
+        # Spark event logs → S3; ingested by bietlejuice.enrich_spark_event_logs.
+        spark.eventLog.enabled: "true"
+        spark.eventLog.dir: "s3a://{{ var.value.databricks_s3_bucket }}/spark-event-logs-emr/{{ dag.dag_id }}"
+        spark.eventLog.compress: "true"
+        spark.eventLog.compression.codec: "zstd"
+        spark.eventLog.logStageExecutorMetrics: "true"
+        spark.eventLog.rolling.enabled: "true"
 
     spark_env_vars:
         ENVIRONMENT: "{{ var.value.environment }}"

@@ -27,15 +27,26 @@ if [ "${PROVIDER:-}" = "databricks" ]; then
 else
     echo "Using EMR environment."
 
-    if [ $# -ne 1 ]; then
-        echo "Error: This script requires exactly 1 argument."
-        echo "Usage: $0 <artifacts_bucket>"
+    if [ $# -lt 1 ]; then
+        echo "Error: This script requires at least 1 argument."
+        echo "Usage: $0 <artifacts_bucket> [databricks_s3_bucket] [airflow_dag_id]"
         exit 1
     fi
 
     ARTIFACTS_BUCKET="$1"
+    DATABRICKS_S3_BUCKET="${2:-${DATABRICKS_S3_BUCKET:-}}"
+    AIRFLOW_DAG_ID="${3:-${AIRFLOW_DAG_ID:-}}"
     PIP_EXEC="sudo pip3"
     echo "Skipping awscli installation (assumed pre-installed on EMR)."
+
+    if [ -n "$DATABRICKS_S3_BUCKET" ] && [ -n "$AIRFLOW_DAG_ID" ]; then
+        echo "BEGIN: Create Spark event-log directory"
+        aws s3api put-object \
+            --bucket "$DATABRICKS_S3_BUCKET" \
+            --key "spark-event-logs-emr/${AIRFLOW_DAG_ID}/" \
+            || echo "  WARN: failed to create Spark event-log prefix"
+        echo "END: Create Spark event-log directory"
+    fi
 fi
 
 # --- Wheel download (EMR only; Databricks uses cluster libraries / other path) ---
