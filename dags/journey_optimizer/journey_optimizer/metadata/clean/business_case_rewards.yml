@@ -5,7 +5,7 @@ description: >
   Reward signal definitions tied to a trigger binding, describing positive outcome criteria.
   Column names follow lake naming conventions (id_*, ts_* prefixes).
   Primary key: id_reward_registry.
-domain: For Sale
+domain: Journey Optimizer
 owner: vinicius.valves@quintoandar.com.br
 columns:
   id_reward_registry:

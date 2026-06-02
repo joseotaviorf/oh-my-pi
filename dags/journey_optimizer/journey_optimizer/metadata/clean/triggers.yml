@@ -5,7 +5,7 @@ description: >
   One row per incoming trigger event.
   Column names follow lake naming conventions (id_*, ts_* prefixes).
   Primary key: id_trigger_event.
-domain: For Sale
+domain: Journey Optimizer
 owner: vinicius.valves@quintoandar.com.br
 columns:
   id_trigger_event:

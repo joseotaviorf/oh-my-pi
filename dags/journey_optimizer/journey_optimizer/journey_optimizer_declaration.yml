@@ -2,7 +2,7 @@ dag:
   name: journey_optimizer
   schedule_start_date: 2026, 1, 1
   schedule_interval: 0 0 * * *
-  owner: Data ForSale
+  owner: Data Journey Optimizer
   documentation:
     dag_purpose: |
       Ingests Journey Optimizer (contextual bandit / decision-engine) tables

@@ -2,7 +2,7 @@
 database_name: str(min=1, max=280)
 table_name: str(min=1, max=280)
 owner: regex('(?:[\.-]?\w+)*@\w+(?:[\.-]?\w+)*', required=False)
-domain: regex('Agents|Cross|Data Ops & Governance|Data Life Cycle|Fintech|For Rent|For Sale|Growth|International|MLOps|People|QCX|Rede|Support and Services|Tech Platform|Data Platform|Conversational XP|DS Pricing|Atlas DB|Broker XP|House and Listing')
+domain: regex('Agents|Cross|Data Ops & Governance|Data Life Cycle|Fintech|For Rent|For Sale|Growth|International|Journey Optimizer|MLOps|People|QCX|Rede|Support and Services|Tech Platform|Data Platform|Conversational XP|DS Pricing|Atlas DB|Broker XP|House and Listing')
 description: str(min=10)
 columns: map(include("column"), key=str(min=1, max=280))
 ---
