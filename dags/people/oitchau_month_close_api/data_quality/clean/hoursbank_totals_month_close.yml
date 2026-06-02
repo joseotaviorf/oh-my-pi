@@ -1,0 +1,16 @@
+table_name: datalake_oitchau_clean.hoursbank_totals_month_close
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  id_employee_profile:
+    is_complete:
+      severity_level: Error
+
+  dt_balanced:
+    is_complete:
+      severity_level: Error

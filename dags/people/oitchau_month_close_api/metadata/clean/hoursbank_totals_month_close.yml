@@ -1,0 +1,40 @@
+database_name: datalake_oitchau_clean
+table_name: hoursbank_totals_month_close
+owner: isabella.araujo@quintoandar.com.br
+domain: People
+description: >
+  Monthly close snapshot of OiTchau hours-bank totals for the last calendar day of the
+  previous month. Populated on the 10th of each month by the oitchau_month_close_api DAG,
+  which re-fetches hours-bank totals from the Oitchau Integrations API per employee so that
+  all retroactive adjustments committed within the first 9 days of the new month are captured.
+  Each run deduplicates by (id_employee_profile, dt_balanced) keeping the most recently loaded
+  version and merges into the table, accumulating one month-end snapshot per calendar month.
+columns:
+  id_employee_profile:
+    description: UUID identifier from Oitchau used as the natural key for the employee.
+    lineage:
+    - datalake_oitchau_raw.hoursbank_totals_month_close.uuid
+  dt_balanced:
+    description: Balance date for which the hours-bank totals were computed (last calendar day of the previous month).
+    lineage:
+    - datalake_oitchau_raw.hoursbank_totals_month_close.date
+  hours_bank_totals:
+    description: Raw hours-bank totals payload from Oitchau, typically a map of rule key to minutes.
+    lineage:
+    - datalake_oitchau_raw.hoursbank_totals_month_close.totals
+  ts_load:
+    description: Timestamp of when this record was loaded into the raw layer.
+    lineage:
+    - datalake_oitchau_raw.hoursbank_totals_month_close.ts_load
+  year:
+    description: Partition column — year component of the balance date.
+    lineage:
+    - datalake_oitchau_raw.hoursbank_totals_month_close.year
+  month:
+    description: Partition column — month component of the balance date.
+    lineage:
+    - datalake_oitchau_raw.hoursbank_totals_month_close.month
+  day:
+    description: Partition column — day component of the balance date.
+    lineage:
+    - datalake_oitchau_raw.hoursbank_totals_month_close.day

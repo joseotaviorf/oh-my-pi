@@ -1,0 +1,94 @@
+dag:
+  name: oitchau_month_close_api
+  owner: Data People
+  callback_by_task: False
+  schedule_interval: '0 3 1-10 * *'
+  schedule_start_date: "2026, 6, 1"
+  documentation:
+    dag_purpose: |
+      Monthly close ingestion of OiTchau hours-bank totals for the last calendar day of the
+      previous month. Runs daily from the 1st to the 10th of each month (03:00 BRT), allowing
+      progressive tracking until the official close date. All retroactive adjustments are
+      confirmed to be finalized by the 9th.
+      The API is called with date=last_day_prev_month per employee UUID on each run.
+      The resulting datalake_oitchau_clean.hoursbank_totals_month_close table accumulates one
+      month-end snapshot per calendar month (merge_on: id_employee_profile + dt_balanced),
+      feeding closed-period hours-bank reporting.
+
+cluster:
+  type: databricks_16_4_small_memory_people_cluster
+  access_control_list:
+    group_name: people-analytics
+    permission_level: CAN_MANAGE
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+
+workflow:
+  layer: raw
+  type: api_ingestion
+  has_hive_sync: false
+  bucket_config_name: people_bucket
+  credentials_scope: people
+  custom_schema: oitchau
+  default_extraction_type: incremental
+  default_raw_partitions:
+    - year
+    - month
+    - day
+  default_clean_partitions:
+    - year
+    - month
+    - day
+  default_table_privileges:
+    people-team:
+      - ALL PRIVILEGES
+
+  # load_start_date is set to the last calendar day of the previous month
+  # (data_interval_end is the scheduled run date — e.g. Jun 10).
+  # This is passed as the `date` param to employees/hoursbank/totals per employee UUID.
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add((data_interval_end | ds)[:7] + '-01', -1), 'load_start_date') }}"
+
+  api_base_url: https://api.oitchau.com.br/v2/public/integrations_api
+  # Oitchau sits behind rules that block default python-requests User-Agent (e.g. Cloudflare).
+  http_user_agent: >-
+    Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36
+    (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36
+
+  authentication:
+    strategy: oauth2_client_credentials
+    secret_key: OITCHAU_INTEGRATIONS_API
+    token_url: https://api.oitchau.com.br/v2/public/integrations_api/token
+    token_request_format: json_body
+    access_token_field: accessToken
+    expires_at_field: accessTokenExpiresAt
+    token_payload_extras:
+      response_type: token
+
+  api_policies:
+    pagination:
+      strategy: none
+    rate_limiting:
+      strategy: none
+
+  tables_customization:
+    hoursbank_totals_month_close:
+      endpoint_path: employees/hoursbank/totals
+      extraction_type: incremental
+      id_expansion:
+        source_table: employees
+        id_field: uuid
+        param_name: employeeUuid
+      date_format: "%Y-%m-%d"
+      date_filter_column: date
+      params:
+        date: load_start_date
+      merge_on:
+        - id_employee_profile
+        - dt_balanced
+      vacuum_retention_hours: 168
+      vacuum_lite: true
