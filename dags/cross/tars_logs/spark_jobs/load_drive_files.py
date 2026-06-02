@@ -195,10 +195,10 @@ if __name__ == "__main__":
     failures = [(name, err) for name, _, err in results if err is not None]
 
     if failures:
-        failed_names = [name for name, _ in failures]
+        for name, err in failures:
+            logger.error(f"m={JOB_NAME}, file_name={name}, msg=Download failed: {err}")
         logger.error(
-            f"m={JOB_NAME}, msg=Failed to download {len(failures)} of {len(files)} files: "
-            f"{failed_names}"
+            f"m={JOB_NAME}, msg={len(failures)} of {len(files)} files failed to download"
         )
 
     try:
@@ -209,10 +209,9 @@ if __name__ == "__main__":
         )
 
     if not successes:
-        logger.error(
-            f"m={JOB_NAME}, msg=All {len(failures)} file downloads failed. Aborting."
+        raise RuntimeError(
+            f"All {len(failures)} file downloads failed; see errors above."
         )
-        sys.exit(1)
 
     schema = StructType(
         [
