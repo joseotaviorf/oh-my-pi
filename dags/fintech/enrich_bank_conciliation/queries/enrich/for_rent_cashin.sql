@@ -386,9 +386,12 @@ SELECT
         WHEN status_sap = 'not recorded' THEN 'Not Concilied - SAP missing'
         WHEN status_bank = 'not recorded' THEN 'Not Concilied - Bank missing'
         WHEN sap_amount/bank_amount = 2 THEN 'Not Concilied - SAP duplicated'
-        WHEN status_vans_checkout = 'not recorded' THEN 'Not Concilied - Vans Checkout missing'
+        WHEN status_vans_checkout = 'not recorded' THEN 'Not Concilied - Payment source missing'
         WHEN status_retsuko = 'not recorded' THEN 'Not Concilied - Retsuko missing'
-        WHEN dt_sap_paid<dt_bank_paid THEN 'Not Concilied - SAP paid before bank'
+        WHEN dt_sap_paid < dt_bank_paid OR dt_sap_paid > dt_bank_paid THEN 'Not Concilied - SAP and Bank with divergent date'
+        WHEN status_vans_checkout IN ('recorded with a divergent date and value','recorded with a divergent value','recorded with a divergent date') THEN 'Not Concilied - Payment source divergent'
+        WHEN status_retsuko IN ('recorded with a divergent date and value','recorded with a divergent value','recorded with a divergent date') THEN 'Not Concilied - Billing divergent'
+        ELSE 'Not Concilied - other'
     END AS is_bank_concilied_detail,
     CASE 
         WHEN status_sap = 'not recorded' AND id_invoice IS NULL THEN 'retsuko not found'
