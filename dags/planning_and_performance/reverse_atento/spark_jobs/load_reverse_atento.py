@@ -5,6 +5,13 @@ from pyspark.sql import functions as F
 from pyspark.sql.types import NullType
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
+from bietlejuice.base.validation.target_resolver import get_prod_database_name
+
 JOB_NAME = "load_reverse_atento"
 
 
@@ -51,6 +58,7 @@ if __name__ == "__main__":
     parser.add_argument("partner_name")
     parser.add_argument("organization_filters")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     environment = args.environment
@@ -62,6 +70,17 @@ if __name__ == "__main__":
     load_end_date = args.load_end_date
     partner_name = args.partner_name
     organization_filters = args.organization_filters
+
+    prod_database = get_prod_database_name(LayerEnum.REVERSE, partner_name, bucket)
+    prod_s3_prefix = f"s3a://{bucket}/{partner_name.lower()}/{table_name}/"
+    _, write_table_name, write_location = resolve_datalake_write_target(
+        prod_database=prod_database,
+        prod_table=table_name,
+        prod_location=prod_s3_prefix,
+        bucket=bucket,
+        target_database=args.target_database_name,
+        target_table=args.target_table_name,
+    )
 
     logger = QuintoAndarLogger(f"{dag_name}")
 
@@ -174,7 +193,13 @@ if __name__ == "__main__":
                 day = execution_date.strftime("%d")
 
                 # create partitioned S3 path
-                s3_path = f"s3a://{bucket}/{partner_name.lower()}/{table_name}/year={year}/month={month}/day={day}/"
+                if args.target_database_name and args.target_table_name:
+                    s3_path = (
+                        f"{write_location.rstrip('/')}/{write_table_name}/"
+                        f"year={year}/month={month}/day={day}/"
+                    )
+                else:
+                    s3_path = f"{prod_s3_prefix}year={year}/month={month}/day={day}/"
                 file_name = f"{table_name}_{year}_{month}_{day}.parquet"
 
                 try:
