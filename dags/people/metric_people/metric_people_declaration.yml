@@ -23,6 +23,7 @@ workflow:
   type: query_delta
   layer: metric
   bucket_config_name: people_bucket
+  custom_schema: people
   has_hive_sync: false
   default_extraction_type: full
   extra_query_template_params:
