@@ -6,6 +6,9 @@ SELECT
     MAX(CASE WHEN LOWER(obs.name) = 'handle_segments_without_proposals' THEN 1 ELSE 0 END) AS flag_handle_segments_without_proposals,
     SUM(CASE WHEN LOWER(obs.name) = 'handle_negotiation_cancelled' THEN 1 ELSE 0 END) AS handle_negotiation_cancelled_count,
     SUM(CASE WHEN LOWER(obs.name) = 'confirm_negotiation' THEN 1 ELSE 0 END) AS confirm_negotiation_count,
+    -- MCP-based confirmation count: each null-output create_negotiation_v1 TOOL observation
+    -- represents one confirmation prompt sent to the user before committing the deal.
+    SUM(CASE WHEN LOWER(obs.name) = 'create_negotiation_v1' AND obs.type = 'TOOL' AND obs.output IS NULL THEN 1 ELSE 0 END) AS confirm_negotiation_count_v3,
     MAX(CASE WHEN LOWER(obs.name) = 'create_negotiation' THEN 1 ELSE 0 END) AS flag_create_negotiation,
     -- Group 2: Matthew technical-state signals
     MAX(CASE WHEN LOWER(obs.name) = 'collectionsinput' THEN 1 ELSE 0 END) AS flag_collectionsinput_agent,
@@ -44,6 +47,20 @@ SELECT
             ELSE NULL
         END
     ) AS matthew_declared_escalation_reason,
+    -- Prorated-rent error: output of get_annual_tax_report_v1 / get_paid_invoices_annual_report_v1
+    -- mentions prorated rent when the agent cannot compute exact values.
+    MAX(
+        CASE
+            WHEN UPPER(obs.type) = 'TOOL'
+                AND LOWER(obs.name) IN ('get_annual_tax_report_v1', 'get_paid_invoices_annual_report_v1')
+                AND (
+                    LOWER(obs.output) LIKE '%prorated rent%'
+                    OR LOWER(obs.output) LIKE '%adjustments to the rent value%'
+                )
+            THEN 1
+            ELSE 0
+        END
+    ) AS has_prorated_rent_error,
     -- Temporal aggregates (over the tracked observations only)
     MIN(obs.ts_started) AS ts_first_observation,
     MAX(obs.ts_ended) AS ts_last_observation,
@@ -70,6 +87,7 @@ WHERE
         'handle_segments_without_proposals',
         'handle_negotiation_cancelled',
         'confirm_negotiation',
+        'create_negotiation_v1',
         'create_negotiation',
         'collectionsinput',
         'outbound_payload_from_dto',
@@ -91,7 +109,9 @@ WHERE
         'escalate_tool',
         'handle_finance_fetch_error',
         'collectionsagentv1input',
-        'collectionsagentv3input'
+        'collectionsagentv3input',
+        'get_annual_tax_report_v1',
+        'get_paid_invoices_annual_report_v1'
     )
 GROUP BY
     trc.id_session

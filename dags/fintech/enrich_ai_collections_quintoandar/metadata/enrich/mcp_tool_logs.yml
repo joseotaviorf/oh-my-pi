@@ -2,7 +2,7 @@ database_name: enrich_ai_collections_quintoandar
 table_name: mcp_tool_logs
 description: One row per downstream service call recorded inside BFB MCP tool-call
   request logs (application_payload.domain_info.calls), exploded from
-  datalake_request_logging_clean.collections for Collections AI agent analytics.
+  datalake_request_logging_clean.collections for Matthew V3 agent analytics.
   MCP-level fields use the mcp_ prefix; per-downstream-call fields use the call_
   prefix. Langfuse TOOL observations are sequence-paired on id_trace and tool name.
 domain: Fintech
@@ -16,12 +16,12 @@ columns:
     lineage:
       - datalake_request_logging_clean.collections.id_trace
     description: Distributed trace identifier from the parent MCP tool invocation; joins
-      to datalake_langfuse_clean.traces and enrich_ai_collections_quintoandar.sessions.
+      to datalake_langfuse_clean.traces and datalake_ai_collections_quintoandar.sessions.
   id_langfuse_session:
     lineage:
       - datalake_langfuse_clean.traces.id_session
     description: Langfuse session identifier resolved from the trace; joins to
-      enrich_ai_collections_quintoandar.mcp_collection_sessions.id_langfuse_session.
+      datalake_ai_collections_quintoandar.mcp_collection_sessions.id_langfuse_session.
       NULL when no matching trace exists for the request.
   id_user:
     lineage:

@@ -117,6 +117,24 @@ columns:
       - datalake_langfuse_clean.observations.name
       - datalake_langfuse_clean.observations.output
     description: "Free-text escalation reason declared by Matthew when the session was handed off to human support, extracted from the OUTPUT JSON of the escalate_to_human_for_collections / escalate_tool observations. Tries three known JSON paths (CHAIN format, simple TOOL format, complex TOOL artifact format) and returns the first non-null match per session; NULL when no escalation observation is recorded. When multiple distinct reasons exist in the same session, MAX() picks one lexicographically — generally rare, but not deterministic."
+  confirm_negotiation_count_v3:
+    lineage:
+      - datalake_langfuse_clean.observations.name
+      - datalake_langfuse_clean.observations.output
+    description: Count of Langfuse TOOL observations where obs.name = create_negotiation_v1
+      and obs.output IS NULL; each null output represents one confirmation prompt sent to
+      the user before the deal is committed. This is the MCP-based equivalent of
+      confirm_negotiation_count for the new BFB agent (V3+). Zero when no such observation
+      appears in the session.
+  has_prorated_rent_error:
+    lineage:
+      - datalake_langfuse_clean.observations.output
+      - datalake_langfuse_clean.observations.type
+    description: "1 if any Langfuse TOOL observation output in the session contains the
+      prorated rent error text (pattern: '%prorated rent%' or '%adjustments to the rent
+      value%'). This error is raised by the annual tax report service when a contract has
+      rent value adjustments that prevent a clean invoice summary. Sourced from a sibling
+      CTE scoped to TOOL observations only; 0 when no matching output is found."
   ts_first_observation:
     lineage:
       - datalake_langfuse_clean.observations.ts_started

@@ -27,12 +27,18 @@ workflow:
     mcp_tool_logs:
       merge_on: [id_request, id_trace, call_index]
       partitions: [year, month, day]
-      z_order_by: [ts_request, id_trace, mcp_tool_name]
+      z_order_by: [ts_request, id_trace, mcp_tool_name, id_langfuse_session]
+    matthew_mcp_observations:
+      merge_on: [id_langfuse_session]
+      partitions: [year, month, day]
+      z_order_by: [id_langfuse_session]
   inner_dependencies:
     sessions:
       - observation
     messages:
       - sessions
+    matthew_mcp_observations:
+      - mcp_tool_logs
 
 cluster:
   type: databricks_16_4_med_memory_cluster
