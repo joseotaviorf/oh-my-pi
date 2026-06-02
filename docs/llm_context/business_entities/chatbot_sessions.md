@@ -110,6 +110,10 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 - `sessions.id_ticket` links to `datalake_customer_support.tickets.id_ticket`
 - Only populated when `sessions.is_escalated = true`
 
+### Full message exchange — bot and human (DW)
+
+**`dw_customer_support.fact_chat_messages`** is the primary DW table for message-level analysis — one row per message. It covers the **entire session**: bot-side messages (pre-escalation) and human-side messages (post-escalation). Everything in `datalake_chatbot.messages` is also present here. Use `user_type` (`User`, `Analyst`, `Bot`) to filter by sender role — no join needed. Link via `sk_session` (Sauron session id) or `sk_task` (Twilio task id). To get the ticket from a session, join through `dw_customer_support.fact_tickets` using `sk_session`. See `business_entities/contact.md` for full column reference and golden queries.
+
 ### Matthew (collections AI agent)
 
 - For Matthew-specific session analysis (collections context, escalation pillars, outbound replies, tool/helper flags), use `datalake_ai_collections_quintoandar.sessions` / `observation` / `messages` and the OBT `dw_collection_ai_agents.fact_ai_agents_interaction`.
@@ -124,6 +128,8 @@ Not all sessions follow every step. Some are bypassed entirely (pre-bot routing)
 - Filter `sessions.bot` to scope analysis to a specific AI agent (e.g., `bot = 'isaias'` for landlord lead qualification)
 - Use `element_at(evals, 'score_name')` in Trino to safely access MAP entries (returns NULL if key is missing)
 - Filter on `ts_created` for time-based queries — tables are z-ordered on this column
+
+- For **any message-level analysis** (bot or human side), prefer `dw_customer_support.fact_chat_messages` — it covers the full session (bot + analyst + client messages) and is a superset of `datalake_chatbot.messages`
 
 **Don't:**
 - Don't use `id_session` as the universal session key — it is NULL for all legacy (old bot) sessions. Use `id_sauron_session` instead.

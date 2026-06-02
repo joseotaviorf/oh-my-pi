@@ -58,7 +58,7 @@ Contacts flow through the following system architecture:
 | **Bot messages** (sessions that **start** with a chatbot interaction) | `datalake_chatbot.messages` |
 | ~~`dw_customer_support.fact_sessions_chatbot`~~ | **DEPRECATED — do not use** |
 | Chat and chatbot message aggregations | `dw_customer_support.fact_chat_metrics` |
-| Message-level facts across channels | `dw_customer_support.fact_chat_messages` |
+| **Message-level exchange between client and analyst within a support session** | `dw_customer_support.fact_chat_messages` — **primary table for any analysis of client–analyst interaction content** |
 | Task-level time metrics linked to contacts | `dw_customer_support.fact_task_metrics` |
 | Average Handling Time per agent, day, department | `datalake_customer_support.chat_aht` (enrich) |
 | Unified call sessions (enrich — source for DW) | `datalake_customer_support.calls` |
@@ -97,6 +97,24 @@ Contacts flow through the following system architecture:
 | `value` | Value entered (e.g., digit pressed) |
 | `from_phone_number`, `to_phone_number` | Phone numbers |
 | `ts_event`, `ts_ivr_started` | Timestamps |
+
+### Key columns in `fact_chat_messages`
+
+**Use this table whenever the request involves analyzing the content or dynamics of the conversation between a client and an analyst** — e.g. message volume, response times, turn-taking patterns, message content per session.
+
+| Column | Description |
+|--------|-------------|
+| `sk_message` | Surrogate key for the message |
+| `sk_session` | Sauron session id — primary key to link messages back to a session |
+| `sk_task` | Twilio task id — alternative join key |
+| `sk_user_sender` | **Identifier of the sender** — use in combination with `user_type` to identify who sent the message. |
+| `user_type` | **Role of the sender**: `User` (client), `Analyst`, or `Bot`. Use this column directly to filter or segment by sender role — no join needed. |
+| `message_body` | Content of the message |
+| `channel` | Communication channel (WhatsApp, in-app chat, etc.) |
+| `direction` | Inbound (client → analyst) or outbound (analyst → client) |
+| `ts_message_created` | Timestamp when the message was sent |
+
+**Critical:** `fact_chat_messages` covers **all message interactions** — bot-side (pre-escalation) and human-side (post-escalation). Everything in `datalake_chatbot.messages` is also present here. Use `user_type` directly to segment by sender role (`User`, `Analyst`, `Bot`) — no join needed. Use `sk_user_sender` when you need to identify a specific individual.
 
 ### Chatbot enrich tables (`datalake_chatbot`)
 
@@ -166,6 +184,7 @@ Every interaction reaching a human agent creates a Sauron session. Chatbot-retai
 - Use `fact_customer_contacts` for unified call + chat analysis
 - Use `fact_ivr_interactions` for IVR step analysis — the step type is `type` and the digit pressed is `value`
 - Use **`datalake_chatbot.sessions`** for bot sessions and bot-side contact behavior; use **`datalake_chatbot.messages`** for message-level analysis when the session **started** with the chatbot
+- **Use `dw_customer_support.fact_chat_messages` for any analysis of message-by-message interactions** within a support session — covers both bot-side and human-side messages. It is a superset of `datalake_chatbot.messages`. Use `user_type` (`User`, `Analyst`, `Bot`) to filter or segment by sender role — no join needed.
 - Use `chat_aht` for agent handling time — it already adjusts for concurrency
 - Remember that one call can have multiple reservations (transfers) and one chat session can have multiple tasks
 
@@ -198,7 +217,29 @@ LEFT JOIN dw_customer_support.dim_department AS dd
 WHERE fc.ts_task_created >= TIMESTAMP '2025-01-01'
 ```
 
-### Query 2 — IVR interactions with step details
+### Query 2 — Client–analyst message exchange per session
+
+Messages exchanged within a support session, distinguishing analyst messages from client messages via `sk_user_sender`. Use this as the base for any analysis of interaction content or dynamics between client and analyst.
+
+```sql
+SELECT
+    fcm.sk_session,
+    fcm.sk_task,
+    ft.sk_ticket,   -- reach ticket via fact_tickets; fact_chat_messages has no sk_ticket
+    fcm.sk_user_sender,
+    fcm.user_type,   -- 'User', 'Analyst', or 'Bot'
+    fcm.message_body,
+    fcm.channel,
+    fcm.direction,
+    fcm.ts_message_created
+FROM dw_customer_support.fact_chat_messages AS fcm
+LEFT JOIN dw_customer_support.fact_tickets AS ft
+    ON fcm.sk_session = ft.sk_session   -- join on Sauron session id to get ticket context
+WHERE fcm.ts_message_created >= TIMESTAMP '2025-01-01'
+ORDER BY fcm.sk_session, fcm.ts_message_created
+```
+
+### Query 3 — IVR interactions with step details
 
 IVR step-by-step analysis for understanding customer navigation through the phone menu.
 
