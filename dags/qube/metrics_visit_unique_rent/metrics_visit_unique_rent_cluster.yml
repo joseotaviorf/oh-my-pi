@@ -1,7 +1,3 @@
 cluster:
-  type: databricks_16_4_rfleet_instance_cluster
+  type: consolidation_s_general_cluster
   databricks_conn_id: databricks_new
-validation:
-  cluster:
-    type: consolidation_s_general_cluster
-    databricks_conn_id: databricks_new
