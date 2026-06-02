@@ -602,6 +602,31 @@ def compute_validation_overrides(
     return overrides
 
 
+def declaration_validation_spark_conf(declaration: dict) -> Dict[str, Any]:
+    """Optional validation.cluster.custom_configurations.spark_conf from declaration."""
+    validation = declaration.get("validation") or {}
+    cluster = validation.get("cluster") or {}
+    custom_configurations = cluster.get("custom_configurations") or {}
+    spark_conf = custom_configurations.get("spark_conf") or {}
+    if not isinstance(spark_conf, dict):
+        return {}
+    return dict(spark_conf)
+
+
+def merge_declaration_validation_spark_conf(
+    declaration: dict, custom_configurations: Dict[str, Any]
+) -> Dict[str, Any]:
+    """Merge declaration validation spark_conf into generated validation overrides."""
+    extra_spark_conf = declaration_validation_spark_conf(declaration)
+    if not extra_spark_conf:
+        return custom_configurations
+    merged = dict(custom_configurations)
+    spark_conf = dict(merged.get("spark_conf") or {})
+    spark_conf.update(extra_spark_conf)
+    merged["spark_conf"] = spark_conf
+    return merged
+
+
 def build_validation_cluster_spec(
     *,
     cluster_args: dict,
@@ -643,6 +668,10 @@ def build_validation_cluster_spec(
         mapped_driver=mapped_driver,
         validation_resolved=validation_resolved,
         prod_cluster_type=prod_cluster_type,
+    )
+
+    custom_configurations = merge_declaration_validation_spark_conf(
+        declaration, custom_configurations
     )
 
     allow_custom_spark_job = _has_load_spark_job(declaration)

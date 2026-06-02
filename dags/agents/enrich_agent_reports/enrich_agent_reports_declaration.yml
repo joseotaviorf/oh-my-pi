@@ -44,4 +44,9 @@ workflow:
       load_spark_job: load_agent_new_agent_activation_metrics
       extra_spark_job_arguments:
         - "18"
+validation:
+  cluster:
+    custom_configurations:
+      spark_conf:
+        spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true
 
