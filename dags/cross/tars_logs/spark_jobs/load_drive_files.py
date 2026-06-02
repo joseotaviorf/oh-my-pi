@@ -21,6 +21,7 @@ from bietlejuice.base.spark import (
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
+from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
@@ -235,7 +236,7 @@ if __name__ == "__main__":
     datalake_info = DatalakeMetastoreService.get_db_info(
         args.environment, args.source, args.datalake_bucket
     )
-    spark_metastore_service = SparkMetastoreService(spark)
+    spark_metastore_service = SparkMetastoreService(SparkClient())
     database_name = datalake_info["db_raw_databricks"]
     database_location = datalake_info["db_raw_path"]
     format_options = SparkTableStorageFormat.DEFAULT_RAW
