@@ -242,6 +242,16 @@ columns:
     lineage:
       - datalake_salesforce_clean.events_case.criticality_sla__c
     description: Indicates the SLA by criticality when repairs are being carried out.
+  sla_tgt:
+    lineage:
+      - dw_customer_support.po_performance.fact_tickets.sla_target
+      - sandbox.sla_target_salesforce.sla_tgt
+      - datalake_salesforce_clean.case_milestones.target_response_in_days
+    description: SLA that the case must be resolved
+  record_type_name:
+    lineage:
+      - datalake_salesforce_clean.record_types.record_type_name
+    description: Taxonomy in Portuguese registered in Salesforce
   event_type:
     lineage:
       - datalake_salesforce_clean.events_case.event_type

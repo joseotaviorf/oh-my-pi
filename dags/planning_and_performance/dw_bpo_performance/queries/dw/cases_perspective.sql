@@ -24,6 +24,31 @@ WHERE event_type IN ('DELETE')
 
 ),
 
+milestones as (
+SELECT 
+id_case,
+target_response_in_days,
+ROW_NUMBER() OVER (PARTITION BY id_case ORDER BY ts_last_modified asc) rn
+
+FROM datalake_salesforce_clean.case_milestones 
+
+),
+
+status_historico AS (
+    SELECT 
+        CAST(case_number AS INT) AS case_number, 
+        status,
+        -- No Spark, a subtração de horas é feita via INTERVAL
+        CAST(last_modified_date AS TIMESTAMP) - INTERVAL 3 HOURS AS ts_event,
+        ROW_NUMBER() OVER (PARTITION BY CAST(case_number AS INT) ORDER BY CAST(last_modified_date AS TIMESTAMP) DESC) AS rn,
+        -- Pega o próximo status que o caso assumiu cronologicamente
+        LEAD(status) OVER (
+            PARTITION BY case_number 
+            ORDER BY CAST(last_modified_date AS TIMESTAMP) ASC
+        ) AS proximo_status
+    FROM datalake_salesforce_clean.events_Case
+),
+
 
 csat AS (
     SELECT 
@@ -142,6 +167,7 @@ tickets_perspective AS (
         first_resolution,
         tp.reopens,
         off_area,
+        tp.sla_target as sla_tgt,
         tp.tags,
         tp.replies,
         tp.ticket_type,
@@ -165,23 +191,39 @@ tickets_perspective AS (
 ),
 
 solved_date AS (
+    -- Simplificado para o padrão do Spark: Primeiro ordena os eventos e depois qualifica
     SELECT 
-        CAST(case_number as INT) as case_number, 
-        status, 
-        to_timestamp(last_modified_date) - INTERVAL 7 HOURS as ts_event,
-        ROW_NUMBER() OVER (PARTITION BY case_number ORDER BY to_timestamp(last_modified_date) ASC) as rn  
-    FROM datalake_salesforce_clean.events_Case AS E
+        case_number,
+        status,
+        ts_event,
+        ROW_NUMBER() OVER (PARTITION BY case_number ORDER BY ts_event ASC) AS rn
+    FROM status_historico
     WHERE status = 'Solved'
 ),
 
-case_non_working_days AS (
-    SELECT 
-        c.case_number,
-        COUNT(wh.dt_non_working) as total_non_working
-    FROM datalake_salesforce_clean.events_case c
-    LEFT JOIN solved_date sd ON sd.case_number = CAST(c.case_number AS INT)
-    LEFT JOIN weekends_and_holidays wh ON wh.dt_non_working BETWEEN CAST(to_timestamp(c.created_date) AS DATE) AND COALESCE(CAST(COALESCE(to_timestamp(c.closed_date), sd.ts_event) AS DATE), CURRENT_DATE())
-    GROUP BY c.case_number
+solved_final AS (
+SELECT DISTINCT
+    c.case_number,
+    CASE WHEN h.proximo_status IS NULL OR h.proximo_status IN ('Closed','Solved') THEN s.ts_event END as ts_solved,
+    c.closed_date,
+    CAST(c.created_date AS TIMESTAMP) - INTERVAL 3 HOURS as ts_created,
+    h.proximo_status,
+    COUNT(DISTINCT date(wh.dt_non_working)) AS total_non_working,
+  ROW_NUMBER() OVER (PARTITION BY c.case_number ORDER BY MAX(c.last_modified_date) DESC) rn
+
+FROM datalake_salesforce_clean.events_case as c
+-- Filtramos apenas o primeiro registro de 'Solved' na junção (rn_primeiro_solved = 1)
+LEFT JOIN solved_date as s on s.case_number = CAST(c.case_number as INT) and s.rn = 1 
+LEFT JOIN status_historico as h on h.case_number = CAST(c.case_number as INT) and h.rn = 1
+LEFT JOIN weekends_and_holidays wh ON wh.dt_non_working BETWEEN CAST(CAST(c.created_date AS TIMESTAMP) - INTERVAL 3 HOURS AS DATE) 
+    AND CAST(COALESCE(
+        COALESCE(
+            (CASE WHEN h.proximo_status IS NULL OR h.proximo_status IN ('Closed','Solved') THEN s.ts_event END),
+            CAST(c.closed_date AS TIMESTAMP) 
+        ), 
+        CURRENT_DATE
+    ) AS DATE)
+GROUP BY 1,2,3,4,5
 ),
 
 cases_perspective AS (
@@ -202,7 +244,7 @@ cases_perspective AS (
         rt.developer_name as theme,
         c.type as case_type, -- Ajustado do Código 2
         to_timestamp(c.created_date) as ts_created, -- Ajustado do Código 2 com conversão de data
-        sd.ts_event as ts_solved,
+        sd.ts_solved,
         to_timestamp(c.closed_date) as ts_closed, -- Ajustado do Código 2 com conversão de data
         csat.sk_answer as sk_answer_csat,
         csat.ts_submitted as first_csat_ts_response, 
@@ -213,11 +255,11 @@ cases_perspective AS (
         fr.minutes_first_reply_time_business AS minutes_first_reply_time_business,
         fr.replies,
         datediff(to_timestamp(c.closed_date), to_timestamp(c.created_date)) as ldt_ticket,
-        COALESCE(CAST(c.sla_due_days__c AS INT), CAST(sla.sla_tgt AS INT)) as sla_tgt, -- Ajustado do Código 2
+        COALESCE(CAST(sla.sla_tgt AS INT),CAST(c_ms.target_response_in_days AS INT)) as sla_tgt, 
 
         CASE 
-            WHEN c.closed_date IS NULL THEN NULL 
-            WHEN (datediff(CAST(COALESCE(to_timestamp(c.closed_date), sd.ts_event) AS DATE), CAST(to_timestamp(c.created_date) AS DATE)) - COALESCE(cnw.total_non_working, 0)) <= COALESCE(CAST(c.sla_due_days__c AS INT), CAST(sla.sla_tgt AS INT)) THEN TRUE 
+            WHEN COALESCE(sd.ts_solved,to_timestamp(c.closed_date))  IS NULL THEN NULL 
+            WHEN (datediff(CAST(COALESCE(sd.ts_solved,to_timestamp(c.closed_date)) AS DATE),CAST(to_timestamp(c.created_date) AS DATE)) - COALESCE(sd.total_non_working, 0)) <=  COALESCE(CAST(sla.sla_tgt AS INT),CAST(c_ms.target_response_in_days AS INT)) THEN TRUE 
             ELSE FALSE 
         END as is_ticket_solved_within_sla,
         u.email as agent_email,
@@ -233,11 +275,11 @@ cases_perspective AS (
         spoc.spoc_team,
         spoc.spoc_class,
         CASE WHEN spoc.is_spoc_contract = TRUE AND spoc.spoc_class IN ('before_wave_6_lab_test', 'lab_test', 'rollout') THEN TRUE ELSE FALSE END as is_spoc_test,
-        c.origin as case_origin, -- Ajustado do Código 2
+        c.origin as case_origin, 
         fr_res.first_resolution,
         CASE WHEN c.type LIKE '%Mediation%' THEN 'MED' END as off_area, -- Ajustado do Código 2
         CASE WHEN COALESCE(date(spoc.ts_termination_finished), current_date()) >= ww_backlog.dt_end_9 THEN 0 ELSE 1 END as flag_sla_med,
-        c.supplied_email, -- Mantido c.supplied_email pois existe na events_case
+        c.supplied_email, 
         c.reason as case_reason,
         c.omni_channel_queue__c as fila_omni_channel,
         c.fr_case_reopen_count__c as reopens,
@@ -267,11 +309,10 @@ cases_perspective AS (
     LEFT JOIN first_reply_sf AS fr ON fr.id_case = c.id_record 
     LEFT JOIN first_resolution AS fr_res on fr_res.last_agent_email = u.email
     LEFT JOIN datalake_date.workday_window AS ww_backlog ON date(to_timestamp(c.created_date)) = ww_backlog.dt_ref AND ww_backlog.id_city = 39
-    LEFT JOIN solved_date as sd on sd.case_number = CAST(c.case_number AS INT) AND sd.rn = 1 
+    LEFT JOIN solved_final as sd on sd.case_number = CAST(c.case_number AS INT) and sd.rn = 1
     LEFT JOIN datalake_salesforce_clean.events_case_member as cm on cm.case__c = c.id_record AND type__c = 'Service requester'
     LEFT JOIN dw_public.dim_user as du on du.uuid_person = split(cm.external_id__c, '_')[2] 
-    LEFT JOIN case_non_working_days cnw ON cnw.case_number = CAST(c.case_number AS INT)
-    LEFT JOIN datalake_salesforce_clean.case_milestones as c_ms on c_ms.id_case = c.id_record
+    LEFT JOIN milestones as c_ms on c_ms.id_case = c.id_record and c_ms.rn = 1 
 
     WHERE c.id_record NOT IN (SELECT id_record FROM deletados)
 )
@@ -295,10 +336,12 @@ SELECT
     is_solved AS resolution_survey,
     minutes_first_reply_time_business,
     subject,
+    record_type_name,
     theme,
     case_type as theme_detail,
     NULL AS theme_recontact_flag_d4,
     NULL AS theme_recontact_flag_d0,
+    sla_tgt,
     is_ticket_solved_within_sla,
     agent_email as last_agent_email,
     agent_organization as last_agent_organization,
@@ -334,6 +377,7 @@ SELECT
     NOW() AS ts_load
 FROM cases_perspective
 WHERE rn = 1 
+
 UNION ALL 
 
 SELECT 
@@ -355,10 +399,12 @@ SELECT
     resolution_survey,
     minutes_first_reply_time_business,
     subject,
+    theme as record_type_name,
     theme,
     theme_detail,
     theme_recontact_flag_d4,
     theme_recontact_flag_d0,
+    sla_tgt,
     is_ticket_solved_within_sla,
     last_agent_email,
     last_agent_organization,
