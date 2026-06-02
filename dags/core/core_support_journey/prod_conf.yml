@@ -3,29 +3,24 @@ webhook_salesforce_cdc: WEBHOOK_SALESFORCE_CDC_PROD
 dag_documentation:
   dag_purpose: |
     Builds Support Journey core model tables from Salesforce clean sources.
-    One Databricks task per YAML spec under ``tables/``.
+    One Spark task per YAML spec under ``tables/`` (EMR job cluster when ``cluster.type`` uses ``emr-*`` spark_version).
 
 datalake_bucket: "5a-datalake-prod"
 
 dependencies:
   bietlejuice.salesforce:
-    - load-clean-record-types
-    - load-clean-case-milestones
+    is_daily: true
+    execution_hour: 6
+    tasks:
+      - load-clean-record-types
+      - load-clean-case-milestones
   bietlejuice.salesforce_cdc:
-    - load_datalake_salesforce_clean_events_case
+    is_daily: false
+    tasks:
+      - load_datalake_salesforce_clean_events_case
 
-custom_cluster:
-  driver_node_type_id: c5a.2xlarge
-  node_type_id: c5a.2xlarge
-  num_workers: 2
-  spark_version: 16.4.x-scala2.12
-
-  spark_conf:
-    spark.driver.extraJavaOption: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
-    spark.executor.extraJavaOptions: "-verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseG1GC"
-    spark.executor.heartbeatInterval: "100s"
-    spark.network.timeout: "600s"
-    spark.metrics.appStatusSource.enabled: "true"
+cluster:
+  type: emr_7_12_small_general_2xlarge_single_node_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE

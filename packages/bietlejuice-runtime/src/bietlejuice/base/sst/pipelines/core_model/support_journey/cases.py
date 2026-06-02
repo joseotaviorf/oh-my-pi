@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict, Optional
 
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
@@ -58,11 +58,14 @@ _DEFAULT_CLI_OPTIONAL_ARGS = [
         help="Datalake S3 bucket; same as DAG BASE_PARAMETERS bucket.",
     ),
     dict(
-        name="table_config_json",
-        flags=["--table_config_json"],
+        name="table_config_relative_path",
+        flags=["--table_config_relative_path"],
         type=str,
         required=True,
-        help="JSON string of tables/<table>.yml (merge keys, sources, schema, etc.).",
+        help=(
+            "Path relative to astronomer/dags on artifacts S3 "
+            "(e.g. core/core_support_journey/tables/cases.yml)."
+        ),
     ),
 ]
 
@@ -70,15 +73,15 @@ _DEFAULT_CLI_OPTIONAL_ARGS = [
 class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
     """
     Core model pipeline for support journey entities. Table-specific settings are
-    passed at runtime via ``--table_config_json`` (serialized YAML from DAG ``tables/*.yml``).
+    loaded from ``tables/*.yml`` on S3 via ``--table_config_relative_path``.
     CLI flags match ``parse_parameters`` from the Airflow DAG (env, dag_name, bucket,
-    partition_*, target_*, job_name, table_config_json).
+    partition_*, target_*, job_name, table_config_relative_path).
     """
 
     def __init__(self, cfg: Any) -> None:
         super().__init__(cfg.job_name)
         self.cfg = cfg
-        self.table_spec = table_spec_from_cfg(cfg)
+        self.table_spec: Optional[Dict[str, Any]] = None
 
     def create_core_model(self, spark: SparkSession) -> None:
         """
@@ -284,6 +287,7 @@ class SupportJourneyCoreModelPipeline(BaseCoreModelSparkJob):
         self.logger.info(f"m=run, msg=Starting {self.job_name} processing")
         self.logger.info(f"m=run, msg=Config: {self.cfg=}")
         self.initialize_configuration(self.cfg.dag_name)
+        self.table_spec = table_spec_from_cfg(self.cfg)
         self.spark = self.initialize_spark_session()
         self.create_core_model(self.spark)
         self.logger.info(
