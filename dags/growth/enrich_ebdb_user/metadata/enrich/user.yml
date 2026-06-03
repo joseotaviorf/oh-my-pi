@@ -1,0 +1,303 @@
+database_name: datalake_ebdb_user
+table_name: user
+domain: Growth
+owner: isadora.gallerani@quintoandar.com.br
+description: |
+  Enrich layer consolidating EBDB Main user profiles (`Usuario`) with country mapping, classification 
+  flags, address normalization, and proposal documentation timestamps. One row per EBDB user (id).
+  Extends datalake_ebdb_clean.user with country_code from datalake_ebdb_country.user, brazilian state
+  acronym (uf) derived from id_state, phone area code (main_phone_ddd), tenant/owner booleans (is_tenant,
+  has_house, has_tenant_app, has_active_contract, is_photographer), CPF/CNPJ document type detection, and
+  proposal documentation milestones joined via user_revision_entity for insurance credit analysis events.
+  Contains PII — contact, document, address, and banking fields inherited from the clean user table.
+  Used by Growth analytics, agent_data enrich, and downstream DW/metric models. Part of the enrich_ebdb_user DAG;
+  depends on user_revision_entity.
+  Partitioned by country_code — always filter on country_code in WHERE clauses to enable partition
+  pruning and avoid full table scans; never query without a country filter.
+columns:
+  id:
+    description: |
+      EBDB user identifier (Usuario.id). Primary key of this table.
+    lineage:
+      - datalake_ebdb_clean.user.id
+  id_country:
+    description: |
+      Country identifier from EBDB Usuario (country_id). Foreign key to the country dimension.
+    lineage:
+      - datalake_ebdb_country.user.id_country
+  uuid_person:
+    description: |
+      Person UUID linking the user to the Person data model. Join key to datalake_person tables
+      (e.g. person_sks.uuid_person) for cross-domain identity resolution.
+    lineage:
+      - datalake_ebdb_clean.user.uuid_person
+  id_facebook:
+    description: |
+      Facebook account identifier associated with the user, when available (PII).
+    lineage:
+      - datalake_ebdb_clean.user.id_facebook
+  id_linkedin:
+    description: |
+      LinkedIn account identifier associated with the user, when available (PII).
+    lineage:
+      - datalake_ebdb_clean.user.id_linkedin
+  id_google:
+    description: |
+      Google account identifier associated with the user, when available (PII).
+    lineage:
+      - datalake_ebdb_clean.user.id_google
+  id_agent:
+    description: |
+      Foreign key to agent data (DadosAgente) when the user is a field agent. Join to
+      datalake_ebdb_user.agent_data via id.
+    lineage:
+      - datalake_ebdb_clean.user.id_agent
+  id_photographer_data:
+    description: |
+      Foreign key to photographer data (DadosFotografo) when the user is a photographer.
+      Non-null indicates photographer persona.
+    lineage:
+      - datalake_ebdb_clean.user.id_photographer_data
+  id_sales_rep:
+    description: |
+      Foreign key to sales representative data (DadosVendedor) when the user is a sales rep.
+      Join to datalake_ebdb_user.user_sales_rep via id_user_sales_rep.
+    lineage:
+      - datalake_ebdb_clean.user.id_sales_rep
+  id_affiliates:
+    description: |
+      Foreign key to affiliate data (DadosAfiliado) when the user is an affiliate partner.
+    lineage:
+      - datalake_ebdb_clean.user.id_affiliates
+  id_bank:
+    description: |
+      Bank identifier associated with the user's bank account data in EBDB.
+    lineage:
+      - datalake_ebdb_clean.user.id_bank
+  id_state:
+    description: |
+      EBDB state identifier for the user's address (estado_id). Mapped to uf acronym in this enrich.
+    lineage:
+      - datalake_ebdb_clean.user.id_state
+  country_code:
+    description: |
+      Table partition column. ISO country code of the user (e.g. BR, MX), sourced from
+      datalake_ebdb_country.user. Required in WHERE clauses for partition pruning — never query
+      without filtering on country_code.
+    lineage:
+      - datalake_ebdb_country.user.country_code
+    categories:
+      Undefined: '#N/A'
+      BR: 'User is from Brazil'
+      MX: 'User is from Mexico'
+  cpf:
+    description: |
+      Brazilian individual taxpayer registry (CPF) or corporate registry (CNPJ) number stored in
+      the cpf field of EBDB Usuario (PII, confidential).
+    lineage:
+      - datalake_ebdb_clean.user.cpf
+  rg:
+    description: |
+      Brazilian identity document number (RG) of the user (PII, confidential).
+    lineage:
+      - datalake_ebdb_clean.user.rg
+  personal_document_type:
+    description: |
+      Document type inferred from the cpf field format. Built by regex matching: CPF for individual
+      format (###.###.###-##) or CNPJ for corporate format (##.###.###/####-##).
+    lineage:
+      - datalake_ebdb_clean.user.cpf
+  gender:
+    description: |
+      User gender as recorded in EBDB Usuario (sexo) (PII, confidential).
+    lineage:
+      - datalake_ebdb_clean.user.gender
+  email:
+    description: |
+      Primary email address of the user in EBDB (PII, confidential).
+    lineage:
+      - datalake_ebdb_clean.user.email
+  alternative_email:
+    description: |
+      Secondary email address of the user in EBDB (PII, confidential).
+    lineage:
+      - datalake_ebdb_clean.user.alternative_email
+  name:
+    description: |
+      Full name of the user as registered in EBDB Usuario (PII, confidential).
+    lineage:
+      - datalake_ebdb_clean.user.name
+  admin_type:
+    description: |
+      Administrative profile type of the user in EBDB (tipoadmin), when applicable.
+    lineage:
+      - datalake_ebdb_clean.user.admin_type
+  address:
+    description: |
+      Street address of the user in EBDB (PII, confidential).
+    lineage:
+      - datalake_ebdb_clean.user.address
+  number:
+    description: |
+      Address street number of the user in EBDB (PII, confidential).
+    lineage:
+      - datalake_ebdb_clean.user.number
+  complement:
+    description: |
+      Address complement (apartment, suite, etc.) of the user in EBDB (PII, confidential).
+    lineage:
+      - datalake_ebdb_clean.user.complement
+  neighborhood:
+    description: |
+      Neighborhood (bairro) of the user's address in EBDB (PII, confidential).
+    lineage:
+      - datalake_ebdb_clean.user.neighborhood
+  city:
+    description: |
+      City of the user's address in EBDB (PII, confidential).
+    lineage:
+      - datalake_ebdb_clean.user.city
+  zip_code:
+    description: |
+      Postal code (CEP) of the user's address in EBDB (PII, confidential).
+    lineage:
+      - datalake_ebdb_clean.user.zip_code
+  uf:
+    description: |
+      Brazilian state acronym (e.g. SP, RJ) derived from id_state via CASE mapping of EBDB state
+      identifiers to two-letter UF codes.
+    lineage:
+      - datalake_ebdb_clean.user.id_state
+  main_phone:
+    description: |
+      Primary phone number of the user in EBDB (PII, confidential).
+    lineage:
+      - datalake_ebdb_clean.user.main_phone
+  main_phone_ddd:
+    description: |
+      Area code (DDD) extracted from main_phone. Built as SUBSTRING starting at position 4 with
+      length 2, indicating the Brazilian region of the phone number.
+    lineage:
+      - datalake_ebdb_clean.user.main_phone
+  bank_agency:
+    description: |
+      Bank agency/branch number for the user's registered bank account.
+    lineage:
+      - datalake_ebdb_clean.user.bank_agency
+  bank_account:
+    description: |
+      Bank account number for the user's registered bank account.
+    lineage:
+      - datalake_ebdb_clean.user.bank_account
+  bank_cpf_cnpj:
+    description: |
+      CPF or CNPJ of the bank account holder as registered in EBDB banking data.
+    lineage:
+      - datalake_ebdb_clean.user.bank_cpf_cnpj
+  bank_name:
+    description: |
+      Name of the bank account holder as registered in EBDB (dadosbancarios_nome). May differ from
+      the user name when bank_another_holder is true.
+    lineage:
+      - datalake_ebdb_clean.user.bank_name
+  bank_another_holder:
+    description: |
+      Flag indicating whether the registered bank account belongs to someone other than the user.
+    lineage:
+      - datalake_ebdb_clean.user.bank_another_holder
+  bank_account_type:
+    description: |
+      Type of bank account registered in EBDB (e.g. checking, savings).
+    lineage:
+      - datalake_ebdb_clean.user.bank_account_type
+  has_accepted_sms:
+    description: |
+      Flag indicating whether the user opted in to receive SMS communications in EBDB.
+    lineage:
+      - datalake_ebdb_clean.user.has_accepted_sms
+  has_house:
+    description: |
+      Flag indicating whether the user has at least one house registered in EBDB. Built by checking
+      existence of the user id in datalake_ebdb_clean.house.
+    lineage:
+      - datalake_ebdb_clean.house.id_user
+  has_tenant_app:
+    description: |
+      Flag indicating whether the user has the tenant mobile app (Inquilinos) registered in EBDB
+      device records. Built by checking existence in datalake_ebdb_clean.device.
+    lineage:
+      - datalake_ebdb_clean.device.id_user
+  has_active_contract:
+    description: |
+      Flag indicating whether the user appears in EBDB contract records. Built by checking existence
+      in datalake_ebdb_clean.contract; used as part of tenant persona classification.
+    lineage:
+      - datalake_ebdb_clean.contract.id_user
+  is_tenant:
+    description: |
+      Persona flag indicating whether the user is classified as a tenant (inquilino). Built by
+      business rules: user with no affiliate/photographer/sales-rep/agent-rep/house associations,
+      OR user with an active contract record.
+    lineage:
+      - datalake_ebdb_clean.user.id_affiliates
+      - datalake_ebdb_clean.user.id_photographer_data
+      - datalake_ebdb_clean.user.id_sales_rep
+      - datalake_ebdb_clean.user.id_agent_rep
+      - datalake_ebdb_clean.house.id_user
+      - datalake_ebdb_clean.contract.id_user
+  is_photographer:
+    description: |
+      Persona flag indicating whether the user is a photographer. Built as id_photographer_data IS
+      NOT NULL on the EBDB user record.
+    lineage:
+      - datalake_ebdb_clean.user.id_photographer_data
+  is_active:
+    description: |
+      Flag indicating whether the user account is active in EBDB (ativo in Usuario).
+    lineage:
+      - datalake_ebdb_clean.user.is_active
+  is_blocked:
+    description: |
+      Flag indicating whether the user account is blocked in EBDB (bloqueado in Usuario).
+    lineage:
+      - datalake_ebdb_clean.user.is_blocked
+  dt_birth:
+    description: |
+      User birth date with century correction for legacy EBDB date encoding errors. Built by
+      adjusting dt_birth when the year component is stored as a two- or three-digit offset.
+    lineage:
+      - datalake_ebdb_clean.user.dt_birth
+  ts_click_anuncie:
+    description: |
+      Timestamp when the user clicked the "Anuncie" (list your property) call-to-action in EBDB.
+    lineage:
+      - datalake_ebdb_clean.user.ts_click_anuncie
+  ts_first_document_sent:
+    description: |
+      Earliest timestamp when the user (as proponent) sent documentation for a rental proposal.
+      Built as MIN(ts_documentation_sent) across datalake_ebdb_clean.proposal for the user.
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_documentation_sent
+  ts_last_document_sent:
+    description: |
+      Most recent timestamp when the user (as proponent) sent documentation for a rental proposal.
+      Built as MAX(ts_documentation_sent) across datalake_ebdb_clean.proposal for the user.
+    lineage:
+      - datalake_ebdb_clean.proposal.ts_documentation_sent
+  ts_first_sent_to_insurance:
+    description: |
+      Earliest timestamp when a proposal audit revision reached insurance credit analysis status
+      (AnaliseCredito). Built by joining proposal_aud to user_revision_entity on rev and filtering
+      by tenant_documentation_status.
+    lineage:
+      - datalake_ebdb_user.user_revision_entity.ts_revision
+  ts_created:
+    description: |
+      Timestamp when the user record was created in EBDB (criadoem in Usuario).
+    lineage:
+      - datalake_ebdb_clean.user.ts_created
+  ts_updated:
+    description: |
+      Timestamp when the user record was last updated in EBDB (atualizadoem in Usuario).
+    lineage:
+      - datalake_ebdb_clean.user.ts_updated

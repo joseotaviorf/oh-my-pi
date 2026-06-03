@@ -13,8 +13,8 @@ workflow:
   default_extraction_type: incremental
   default_partitions: [country_code]
   tables_customization:
-    affiliate_date: {}
-    agent_date: {}
+    affiliate_data: {}
+    agent_data: {}
     user_doorman: {}
     user_merge:
       extraction_type: full
