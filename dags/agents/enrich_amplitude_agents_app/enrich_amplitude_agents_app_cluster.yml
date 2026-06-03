@@ -1,5 +1,5 @@
 cluster:
-  type: databricks_16_4_med_io-memory_cluster
+  type: consolidation_l_memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
@@ -10,12 +10,6 @@ cluster:
       spark.sql.adaptive.coalescePartitions.enabled: true
       spark.sql.adaptive.coalescePartitions.targetPostShuffleInputSize: 128MB
       spark.sql.shuffle.partitions: 256
-      spark.databricks.delta.targetFileSize: 134217728 # 128MB
-validation:
-  cluster:
-    type: consolidation_l_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      num_workers: 3
-      driver_node_type_id: r6g.2xlarge
-  allow_custom_spark_job: true
+      spark.databricks.delta.targetFileSize: 134217728
+    num_workers: 3
+    driver_node_type_id: r6g.2xlarge
