@@ -309,9 +309,9 @@ Examples:
 
 ## Step 4 - Governance details when needed
 
-Do **not** add `personal_data_classification` on column entries — it is documented in [governance_metadata.mdc](.cursor/rules/governance_metadata.mdc) for a future rollout but is **not** accepted by metadata validation today.
+PII classification is **not** part of metadata authoring yet. Do **not** add a `personal_data_classification` key (CI/lint fails) and do **not** record a PII tier in `description`. Describe PII columns functionally — see [governance_metadata.mdc](.cursor/rules/governance_metadata.mdc) → "Personal Data Handling".
 
-For enrich/dw tables that will require restricted access later, note sensitive columns in `description` only. Use `table_privileges` in the DAG declaration when the team already mandates it for that table (see governance rule and declaration docs).
+LGPD controls (`table_privileges`, `k_anonymity`) live in the **declaration** or qube spec, not in metadata. Infer whether they apply from domain rules and column semantics (see governance rule) — do not invent metadata classification.
 
 ## Step 5 - Use these templates
 

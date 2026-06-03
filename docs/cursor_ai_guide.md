@@ -123,7 +123,7 @@ Subagents are domain-specialist roles the AI adopts for specific types of judgme
 
 Six rules activate automatically when you open or edit a matching file type:
 
-- **`governance_metadata.mdc`** activates for any `metadata/**/*.yml` file — it already knows that `personal`, `highly_personal`, and `sensitive` are the three valid PII tiers; that `sensitive` columns need `table_privileges`; and that `k_anonymity >= 5` is required in metric/qube outputs.
+- **`governance_metadata.mdc`** activates for any `metadata/**/*.yml` file — it knows PII classification is **not** authored in metadata yet (no `personal_data_classification` key). LGPD controls (`table_privileges`, `k_anonymity`) are enforced via declaration/SQL; sensitivity is inferred from domain rules and column semantics until formal classification ships.
 - **`sql_conventions.mdc`** activates for any `.sql` file — it blocks `SELECT *`, enforces partition filters, and applies Person Data Model rules.
 - **`testing_conventions.mdc`** activates for any file under `packages/*/test/` — it enforces the TDD Red → Green → Refactor workflow and selects the correct test pattern (Pattern A vs Pattern B).
 - **`python_conventions.mdc`** activates for any `.py` file — it enforces Ruff style, `QuintoAndarLogger`, and Pydantic v2 APIs.
@@ -354,7 +354,7 @@ CHANGE PLAN:
 | Declaration validation | Invalid workflow type, missing required fields, wrong cluster conn_id |
 | Metadata pairs | `.sql` without matching `.yml`, description < 10 chars, missing lineage |
 | Python conventions | `logging.getLogger` instead of `QuintoAndarLogger`, relative imports, bare `NotImplementedError` |
-| LGPD classification | PII columns without `personal_data_classification`, `sensitive` without `table_privileges` |
+| LGPD controls | Raw PII stored in enrich/DW, special-category/financially-sensitive data without `table_privileges`, or a `personal_data_classification` key present (not accepted by CI yet — remove it) |
 | Test coverage | Missing test files for changed modules, coverage below 80% threshold |
 | Lint | Additional lint checks beyond style (`make check-style`) |
 
@@ -598,9 +598,10 @@ The Governance Officer checks:
 - Valid `domain` from the 15-item list (e.g. `For Rent`, `Platform`, `Growth`, `People`)
 - `owner` is a `@quintoandar.com.br` email
 - All enrich/DW columns have `lineage: database.table.column`
-- Columns with personal data carry `personal_data_classification: personal | highly_personal | sensitive`
-- `sensitive` columns have `table_privileges` configured in the DAG declaration
-- `sensitive` columns in metric/qube outputs require `k_anonymity >= 5`
+- No raw PII stored in enrich/DW columns (join `dim_person` instead)
+- enrich/dw tables with `sensitive` or `highly_personal` data have `table_privileges` in the declaration (infer tier from column semantics or domain rules — not from a metadata field)
+- metric/qube outputs derived from `sensitive` data require `k_anonymity >= 5`
+- No `personal_data_classification` key in metadata — CI rejects it; remove if present
 
 **Person Data Model enforcement** — the Governance Officer blocks any SQL that stores raw PII (name, CPF, email, address) in enrich or DW tables. The correct pattern is:
 
@@ -637,8 +638,8 @@ sequenceDiagram
     R-->>AI: layer=dw, workflow=query_delta, conn_id=databricks_new_env, strip dw_ prefix
     AI->>SK: invoke create-dag skill
     SK-->>AI: creates declaration + SQL skeletons + metadata YAMLs
-    AI->>GO: fraud_alerts has column cpf — classify?
-    GO-->>AI: personal_data_classification: personal — add to metadata
+    AI->>GO: fraud_alerts has column cpf — how to handle?
+    GO-->>AI: set table_privileges; do NOT classify PII in metadata (no personal_data_classification, no PII-tier text)
     AI->>RE: which cluster for join-heavy fraud SQL?
     RE-->>AI: upgrade to med_memory_cluster
     AI->>V: run make validate-* checks
@@ -674,18 +675,25 @@ dags/fintech/dw_fraud_metrics/
 
 **Step 3 — Governance Officer flags a PII column**
 
-The skill reads `fraud_alerts.sql` and notices a `cpf` column. It adopts the Governance Officer role and adds:
+The skill reads `fraud_alerts.sql` and notices a `cpf` column. It documents the column functionally — PII classification is **not** part of metadata authoring yet, so it adds **no** `personal_data_classification` key and **no** PII-tier text in the description:
 
 ```yaml
 # In metadata/dw/fraud_alerts.yml
 columns:
   cpf:
-    description: "CPF do cliente associado ao alerta de fraude"
+    description: "CPF do cliente associado ao alerta de fraude."
     lineage: ebdb.fraud_events.cpf
-    personal_data_classification: personal
 ```
 
-It also checks whether the table needs `table_privileges` (required for `sensitive`-classified columns).
+Instead, it adopts the Governance Officer role: CPF is `personal`-tier data in a fintech context, so it adds `table_privileges` in the **declaration** (the enforced control) — without classifying anything in metadata:
+
+```yaml
+# In dw_fraud_metrics_declaration.yml
+tables_customization:
+  fraud_alerts:
+    table_privileges:
+      fintech-analysts: ["SELECT"]
+```
 
 **Step 4 — Reliability Engineer recommends a cluster upgrade**
 

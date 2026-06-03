@@ -18,32 +18,47 @@ owner: str                  # email: user@quintoandar.com.br
 columns:
   column_name:
     description: str        # min 10 characters
-    personal_data_classification: str  # optional; required when column contains personal data
-                                       # values: "sensitive" | "highly_personal" | "personal"
 ```
+
+> PII classification is **not** part of metadata authoring yet — see
+> [Personal Data Handling](#personal-data-handling) below.
 
 **Valid domains:** `Agents`, `Broker XP`, `Cross`, `Data Science`, `For Rent`, `For Sale`, `Governance`, `Growth`, `House and Listing`, `MLOps`, `People`, `Platform`, `QCX`, `Support and Service`, `Tech Platform`
 
-## Personal Data Classification
+## Personal Data Handling
 
-All columns that contain data about identifiable natural persons **must** carry a `personal_data_classification` field. The three valid values map directly to the QuintoAndar Personal Data Catalog.
+### PII classification in metadata — not available yet
 
-### `sensitive` — Special-category data under LGPD Art. 11
-Requires explicit consent or a legal basis before processing. **Must never appear in metric/qube layer outputs or publicly-accessible schemas without documented LGPD approval.** The corresponding DAG declaration must set `table_privileges` to restrict access.
+Do **not** add a `personal_data_classification` key to columns — the metadata validator rejects it and CI/lint fails. Do **not** encode a column's PII tier in its `description` either. Document columns functionally, like any other column.
 
-Examples: racial or ethnic origin, political opinion, religion/religious beliefs, gender identity, sexual orientation, union membership, health information (health reports, ICD, neurodiversity, physical/mental/visual/auditory disability, pre-existing conditions, toxicological exams, body temperature, weight, height, DPS), biometric data (facial recognition, fingerprints, voice recognition).
+A formal PII-classification field in bietlejuice metadata is planned but not implemented yet.
 
-### `highly_personal` — Financially or legally sensitive data
-Not special-category under LGPD but carries high risk of harm if exposed. Downstream (enrich/dw) tables that carry these columns must set `table_privileges`. Prefer hashing or masking before promoting to enrich or dw layers.
+### Personal Data Catalog (reference only)
 
-Examples: bank statement, credit history, credit score, income tax declaration (IRPF), INSS benefit statement, criminal background, personal/corporate credit or debit card numbers, photo of person with ID document.
+These tiers come from the QuintoAndar Personal Data Catalog. They are **not** written into metadata YAML today — they inform which LGPD controls apply (below) and will become metadata fields in a future rollout.
 
-### `personal` — Standard personal data under LGPD Art. 5
-Must be labelled but has no mandatory access-control requirement beyond the default.
+- **`sensitive`** — special-category data under LGPD Art. 11: racial/ethnic origin, political opinion, religion, gender identity, sexual orientation, union membership, health information, biometric data. Must never appear in metric/qube outputs or publicly-accessible schemas without documented LGPD approval.
+- **`highly_personal`** — financially or legally sensitive data: bank statement, credit history, credit score, IRPF, INSS statement, criminal background, card numbers, photo of person with ID document. Prefer hashing or masking before promoting to enrich/dw.
+- **`personal`** — standard personal data under LGPD Art. 5: name, CPF, date of birth, email, phone, address, RG, passport, geolocation, salary, device ID, IP, cookies, etc.
 
-Examples: full name, first name, last name, CPF, date of birth, personal/corporate email, personal/corporate phone number, residential/corporate address, neighborhood, city, state, RG, passport number, driver's license (CNH), PIS/PASEP, voter ID, geolocation, contract number, QuintoAndar account information, salary/compensation, age, marital status, nationality, device ID, IP address, browsing history, cookies, image in photo or video, service history.
+### LGPD controls — enforced today
 
-### Example — column with classification
+These controls apply **independently of metadata classification**. Until `personal_data_classification` exists, determine sensitivity from:
+
+1. **Documented domain exceptions** (e.g. fintech schemas in `sql_conventions.mdc` §13)
+2. **Column semantics** in the SQL (CPF, health data, credit score, etc.)
+3. **Governance review** when uncertain — do **not** invent metadata classification to satisfy a control
+
+| Control | When it applies | Where it lives |
+|---|---|---|
+| No raw PII in enrich/DW | New tables; use `sk_person` / join `dim_person` | SQL (`sql_conventions.mdc` §13) |
+| `table_privileges` | Table carries `sensitive` or `highly_personal` data | DAG declaration |
+| `privacy.k_anonymity ≥ 5` | Metric/qube output derived from `sensitive` data | Qube/metric declaration |
+| `has_right_to_be_forgotten` guard | Reverse DAG exporting contact PII | SQL (`sql_conventions.mdc` §13) |
+
+### Examples
+
+**Metadata** — describe PII columns functionally; no classification field or PII-tier text:
 
 ```yaml
 columns:
@@ -51,24 +66,17 @@ columns:
     lineage:
       - ebdb_public.person.cpf
     description: "Brazilian individual taxpayer identification number (CPF)."
-    personal_data_classification: personal
-  racial_origin:
-    lineage:
-      - ebdb_public.person.racial_origin
-    description: "Racial or ethnic origin self-declared by the person."
-    personal_data_classification: sensitive
-  credit_score:
-    lineage:
-      - bureau_clean.score.value
-    description: "Credit bureau score indicating likelihood of debt repayment."
-    personal_data_classification: highly_personal
 ```
 
-### LGPD enforcement rules in metadata
+**Declaration** — `table_privileges` lives in the declaration, not in metadata:
 
-- Any column classified as `sensitive` in an enrich/dw table → the table's DAG declaration **must** include `table_privileges` restricting access to authorised groups only.
-- Any `sensitive` column in a metric or qube output requires `privacy.k_anonymity ≥ 5` in the qube metric declaration, and documented LGPD approval from the data owner.
-- `personal_data_classification` must be set consistently across all layers for the same logical column (raw → clean → enrich → dw).
+```yaml
+# fintech/cyber_*_declaration.yml
+tables_customization:
+  contracts:
+    table_privileges:
+      data-platform-engineers: ["SELECT"]
+```
 
 ## Enrich & DW Columns — `lineage` required
 
@@ -139,6 +147,7 @@ make validate-lineage-consistency
 - Adding `lineage` to a hardcoded literal column (e.g. `'RENT' AS business_context`) → incorrect; remove it.
 - Metric column without `dimension: true` or `metric:` block → CI fails.
 - Metric SQL referencing raw/clean tables directly → lineage validation fails.
-- Column containing personal data with no `personal_data_classification` → governance review will flag it.
-- `sensitive` column promoted to enrich/dw without `table_privileges` in the declaration → LGPD violation risk.
-- `sensitive` column exposed in a metric/qube output without `k_anonymity ≥ 5` → LGPD violation risk.
+- Adding a `personal_data_classification` key to any column → **CI/lint fails**; the validator does not accept it yet. Remove it. (Don't move the classification into `description` either — PII classification isn't part of metadata authoring yet.)
+- Storing raw PII (name, CPF, email, address, etc.) as a column in a new enrich/dw table instead of joining `dim_person` → governance review will block it.
+- `sensitive` or `highly_personal` data in enrich/dw without `table_privileges` in the declaration → LGPD violation risk (infer tier from column semantics or domain rules — not from a metadata field).
+- `sensitive` data exposed in a metric/qube output without `k_anonymity ≥ 5` → LGPD violation risk.

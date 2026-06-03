@@ -145,7 +145,7 @@ git checkout master && git pull && git checkout -b feat/add-my-table
 ```
 
 **Step 2 — Build files**  
-In the existing DAG folder, add `queries/<layer>/<new_table>.sql` and `metadata/<layer>/<new_table>.yml` with the **same base name**. Copy a sibling as a template. Set **`owner`**, descriptions, **`lineage`**, and **`personal_data_classification`** where required; include **`retention_policy`** and **`cost_center`** when the schema requires those keys (§5.4 — **no fill guidance here**). If the declaration must list tables, edit **only** `*_declaration.yml`.
+In the existing DAG folder, add `queries/<layer>/<new_table>.sql` and `metadata/<layer>/<new_table>.yml` with the **same base name**. Copy a sibling as a template. Set **`owner`**, descriptions, and **`lineage`** where required (do **not** add `personal_data_classification` — CI does not accept it yet); include **`retention_policy`** and **`cost_center`** when the schema requires those keys (§5.4 — **no fill guidance here**). If the declaration must list tables, edit **only** `*_declaration.yml`.
 
 **Step 3 — Generate Python** ⚠️ *Skip if no local `make`; contact a code owner ([§5.7](#a7-who-reviews-your-pr-codeowners)).*  
 
@@ -303,7 +303,7 @@ This section collects **merge and governance rules** in one place (allowed folde
 | Default **new tables** to **enrich** or **`dw`** per [§1](#1-introduction--concepts) | **Create** new **clean** or **raw** **outputs** as self-service business-path tables unless a **code owner** explicitly directs otherwise |
 | Use **CTEs (`WITH`)** for readability where it helps | Rely on **deep nested subqueries** when a CTE is clearer |
 | Avoid **`SELECT *`** | Ship **`SELECT *`** in production SQL |
-| Set **`personal_data_classification`** on PII columns in metadata | Ship PII without classification / required controls |
+| Restrict access to PII-bearing tables via **`table_privileges`** | Add a **`personal_data_classification`** key or any PII-tier text (classification isn't part of metadata yet — CI rejects the key) |
 | Keep **`.sql` and `.yml` paired** (same base name) | Hand-edit **`*_dag.py`** |
 | Get **green Woodpecker / GitHub Checks** before merge | Commit **passwords, tokens, API keys** |
 
@@ -327,7 +327,7 @@ Full detail: **[`sql_conventions.mdc`](../.cursor/rules/sql_conventions.mdc)**.
 
 ### 5.4 Metadata & governance
 
-**Standard fields (CI):** valid YAML, `description`, `domain`, columns, **`lineage`** where values come from other tables, **`personal_data_classification`** for personal data — see **[`governance_metadata.mdc`](../.cursor/rules/governance_metadata.mdc)**.
+**Standard fields (CI):** valid YAML, `description`, `domain`, columns, **`lineage`** where values come from other tables — see **[`governance_metadata.mdc`](../.cursor/rules/governance_metadata.mdc)**. PII classification is **not** part of metadata authoring yet (no `personal_data_classification` key, no PII-tier text in `description`). LGPD controls such as `table_privileges` are set in the **declaration**, inferred from column semantics or domain rules — see "Personal Data Handling" in that rule.
 
 **Business-path table fields** (tables under the two allowed roots):
 
