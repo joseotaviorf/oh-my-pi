@@ -25,7 +25,7 @@ Regenerate with `tools/generate_lineage_diagram.py` (requires `pyyaml`; optional
 |-------|-------|-------------|
 | `dim_repo` | 1 row per GitHub repo | Repository metadata (name, URL, language) |
 | `dim_team` | 1 row per team | Team hierarchy with parent LINE flattened |
-| `dim_user` | 1 row per engineer | Engineer identity (name, email, GitHub username) |
+| `dim_user` | 1 row per catalog user | Identity (name, email, GitHub username, `user_chapter` from Backstage) |
 
 ### Bridge
 

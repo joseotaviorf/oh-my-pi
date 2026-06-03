@@ -2,13 +2,15 @@ database_name: datalake_devlake_raw
 table_name: users
 owner: tech-platform-engprod@quintoandar.com.br
 domain: Tech Platform
-description: Raw snapshot of engineers synced daily from Backstage by the devlake-automations sync-users-and-teams cronjob. The github_user column is a custom addition that maps corporate identity to GitHub username, enabling PR authorship attribution to organizational users.
+description: Raw snapshot of catalog users synced daily from Backstage by the devlake-automations sync-users-and-teams cronjob. The github_user column is a custom addition that maps corporate identity to GitHub username, enabling PR authorship attribution. The chapter column stores Backstage spec.chapter when present.
 columns:
   id:
     description: DevLake user ID (stable identifier from Backstage)
   email:
-    description: Corporate email address of the engineer
+    description: Corporate email address from Backstage profile
   github_user:
-    description: GitHub username associated with this engineer (custom column added by devlake-automations)
+    description: GitHub username when present (custom column added by devlake-automations)
   name:
-    description: Display name of the engineer from Backstage
+    description: Display name from Backstage
+  chapter:
+    description: Backstage spec.chapter (functional chapter). Populated by sync-users-and-teams after migration adding the column.

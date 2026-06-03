@@ -21,6 +21,19 @@ column_level_validations:
     has_null_count:
       less_than_or_equal_to: 1
       severity_level: Warning
+  user_chapter:
+    has_max_length:
+      less_than_or_equal_to: 128
+      severity_level: Warning
+    custom:
+      # Must match clean users in the same pipeline (dim_user is SELECT from datalake_devlake_clean.users)
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_devlake.dim_user d
+         INNER JOIN datalake_devlake_clean.users c ON d.id_user = c.id_user
+         WHERE COALESCE(d.user_chapter, '') != COALESCE(c.user_chapter, '')
+        ) = 0
+      severity_level: Error
   ts_load:
     is_complete:
       severity_level: Warning

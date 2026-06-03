@@ -4,6 +4,7 @@ SELECT
     user_name,
     user_email,
     github_username,
+    user_chapter,
     CURRENT_TIMESTAMP() AS ts_load
 FROM
     datalake_devlake_clean.users

@@ -4,7 +4,10 @@ table_name: dim_user
 owner: tech-platform-engprod@quintoandar.com.br
 domain: Tech Platform
 description: |
-  Engineer/user dimension. Grain: one row per engineer.
+  Person dimension sourced from DevLake users (Backstage catalog). Grain: one row per
+  catalog user synced into DevLake. user_chapter is a Type 1 descriptive attribute of
+  the person (Backstage spec.chapter); a separate dim_chapter is unnecessary unless
+  chapter must be modeled as its own grain with SCD or conformed across unrelated facts.
   Role-playing dimension — the same dim_user is referenced multiple times in
   fact_pull_requests as sk_author_user (PR author) and sk_merged_by_user (PR merger).
   Future fact tables will add sk_assignee_user and sk_creator_user roles.
@@ -20,16 +23,20 @@ columns:
     lineage:
       - datalake_devlake_clean.users.id_user
   user_email:
-    description: Corporate email address of the engineer
+    description: Corporate email address
     lineage:
       - datalake_devlake_clean.users.user_email
   github_username:
-    description: GitHub username associated with this engineer
+    description: GitHub username when present
     lineage:
       - datalake_devlake_clean.users.github_username
   user_name:
-    description: Display name of the engineer
+    description: Display name from Backstage
     lineage:
       - datalake_devlake_clean.users.user_name
+  user_chapter:
+    description: Functional chapter from Backstage (engineering, data, design, etc.). Nullable.
+    lineage:
+      - datalake_devlake_clean.users.user_chapter
   ts_load:
     description: Timestamp when the row was last loaded into the DW

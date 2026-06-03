@@ -21,7 +21,7 @@ Daily ingestion of core DevLake tables from the production MySQL RDS into Databr
 | `teams` | `teams` | Org hierarchy synced from Backstage (LINE/TEAM hierarchy) |
 | `pull_request_commits` | `pull_request_commits` | Commits linked to PRs (author, date) |
 | `pull_request_comments` | `pull_request_comments` | PR comments and reviews (timestamps, type) |
-| `users` | `users` | Engineers synced from Backstage |
+| `users` | `users` | Catalog users synced from Backstage (includes `chapter` in clean layer when present upstream) |
 
 ## Downstream
 

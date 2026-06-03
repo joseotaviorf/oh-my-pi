@@ -1,0 +1,27 @@
+---
+table_name: datalake_devlake_clean.users
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  id_user:
+    is_complete:
+      severity_level: Error
+    is_unique:
+      severity_level: Error
+  user_email:
+    has_completeness:
+      greater_than_or_equal_to: 0.97
+      severity_level: Warning
+  user_name:
+    has_completeness:
+      greater_than_or_equal_to: 0.95
+      severity_level: Warning
+  user_chapter:
+    has_max_length:
+      less_than_or_equal_to: 128
+      severity_level: Error
