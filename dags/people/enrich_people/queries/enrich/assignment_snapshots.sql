@@ -6,7 +6,6 @@ assignments_base AS (
         im.id_person,
         im.person_number,
         im.assignment_number,
-        im.assignment_status_type,
         COALESCE(im.dt_started, at.dt_hired) AS dt_started,
         COALESCE(im.dt_actual_termination, at.dt_terminated) AS dt_actual_termination,
         COALESCE(im.dt_notified_termination, at.dt_notified) AS dt_notified
@@ -93,7 +92,6 @@ assignments_with_dates AS (
         ab.id_person,
         ab.person_number,
         ab.assignment_number,
-        ab.assignment_status_type,
         ab.dt_started,
         ab.dt_actual_termination,
         ab.dt_notified,
@@ -115,7 +113,6 @@ assignments_daily AS (
         awd.id_person,
         awd.person_number,
         awd.assignment_number,
-        awd.assignment_status_type,
         awd.dt_started,
         awd.dt_actual_termination,
         awd.dt_notified,
@@ -311,7 +308,11 @@ SELECT
     mh.manager_assignment_number,
     mh.hierarchy_level,
     mh.hierarchy_depth,
-    CASE WHEN ad.assignment_status_type = 'ACTIVE' THEN 'Active' ELSE 'Terminated' END AS employment_status,
+    CASE
+        WHEN all_assign.assignment_status_type = 'ACTIVE'
+            THEN 'Active'
+        ELSE 'Terminated'
+    END AS employment_status,
     CASE
         WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, fh.dt_original_hire)) IS NULL THEN CAST(NULL AS STRING)
         WHEN FLOOR(MONTHS_BETWEEN(ad.dt_reference, fh.dt_original_hire)) < 3  THEN '< 3 months'
@@ -343,7 +344,7 @@ SELECT
         AND TRY_CAST(jwst.band AS INT) >= 14,
         FALSE
     ) AS is_member_et,
-    IF(ad.assignment_status_type = 'ACTIVE', TRUE, FALSE) AS is_active,
+    IF(all_assign.assignment_status_type = 'ACTIVE', TRUE, FALSE) AS is_active,
     IF(
         ad.dt_actual_termination IS NOT NULL
         AND ad.dt_actual_termination <> DATE('4712-12-31'),
@@ -401,6 +402,15 @@ LEFT JOIN
             DATE('9999-12-31')
         )
 LEFT JOIN
+    datalake_pin_core_clean.all_assignments AS all_assign
+        ON all_assign.id_assignment = ad.id_assignment
+        AND all_assign.assignment_type IN ('E', 'C')
+        AND ad.dt_reference >= all_assign.dt_effective_started
+        AND ad.dt_reference <= COALESCE(
+            NULLIF(all_assign.dt_effective_ended, DATE('4712-12-31')),
+            DATE('9999-12-31')
+        )
+LEFT JOIN
     direct_report_counts AS drc
         ON drc.manager_assignment_number = ad.assignment_number
         AND drc.dt_reference = ad.dt_reference
@@ -448,5 +458,6 @@ QUALIFY
         ORDER BY
             cc.sk_cost_center_version NULLS LAST,
             pei.id_person_extra_info NULLS LAST,
-            jwst.dt_valid_from DESC NULLS LAST
+            jwst.dt_valid_from DESC NULLS LAST,
+            all_assign.effective_sequence DESC NULLS LAST
     ) = 1
