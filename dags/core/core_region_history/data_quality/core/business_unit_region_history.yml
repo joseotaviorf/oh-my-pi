@@ -2,9 +2,6 @@
 # core_region.business_unit_region_history
 table_name: core_region.business_unit_region_history
 alert_channel: GCHAT_CORE_MODEL_SCHEMA_VALIDATION
-is_incremental:
-  incremental_date_column: ts_transaction
-  incremental_date_mask: yyyy-MM-dd
 column_level_validations:
   id_event:
     is_unique:
