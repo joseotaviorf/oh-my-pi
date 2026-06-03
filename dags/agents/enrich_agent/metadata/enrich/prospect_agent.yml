@@ -13,6 +13,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.agent.id
     description: Agent identifier when the prospect person matches an existing EBDB agent.
+  id_qualification:
+    lineage:
+      - datalake_agent_accreditation.qualification_step.id_qualification
+    description: Qualification identifier when the prospect person matches an existing EBDB qualification.
   id_business_unit:
     lineage:
       - datalake_ebdb_clean.quintoandar_prospect_agent.id_primary_operating_region
@@ -39,6 +43,22 @@ columns:
     lineage:
       - datalake_ebdb_clean.prospect_agent.status
     description: Current status of the prospect agent onboarding workflow.
+  qualification_state:
+    lineage:
+      - datalake_agent_accreditation.qualification_step.qualification_state
+    description: Current status of the qualification workflow.
+  creci_validation_status:
+    lineage:
+      - datalake_agent_accreditation.qualification_step.step_status
+    description: Current status of the CRECI validation step.
+  contract_signature_status:
+    lineage:
+      - datalake_agent_accreditation.contract_process.signature_status
+    description: Current status of the signature contract document.
+  contract_template_name:
+    lineage:
+      - datalake_agent_accreditation.contract_process.contract_template_name
+    description: Name of the contract template used for the last contract process.
   business_association:
     lineage:
       - datalake_ebdb_clean.prospect_agent.business_association
@@ -63,6 +83,34 @@ columns:
     lineage:
       - datalake_ebdb_clean.quintoandar_prospect_agent.creci_uf
     description: State (UF) of the CRECI license.
+  commuting_method:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.commuting_method
+    description: Commuting method from the QuintoAndar prospect questionnaire.
+  referral_code:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.referral_code
+    description: Referral code from the QuintoAndar prospect questionnaire.
+  maximum_acquisition_per_month:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.maximum_acquisition_per_month
+    description: Maximum acquisition per month from the QuintoAndar prospect questionnaire.
+  minimum_acquisition_per_month:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.minimum_acquisition_per_month
+    description: Minimum acquisition per month from the QuintoAndar prospect questionnaire.
+  maximum_available_days:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.maximum_available_days
+    description: Maximum available days from the QuintoAndar prospect questionnaire.
+  minimum_available_days:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.minimum_available_days
+    description: Minimum available days from the QuintoAndar prospect questionnaire.
+  years_of_experience:
+    lineage:
+      - datalake_ebdb_clean.quintoandar_prospect_agent.maximum_years_of_experience
+    description: Maximum years of experience from the QuintoAndar prospect questionnaire.
   is_available_on_weekends:
     lineage:
       - datalake_ebdb_clean.quintoandar_prospect_agent.is_available_on_weekends
@@ -75,6 +123,27 @@ columns:
     lineage:
       - datalake_ebdb_clean.quintoandar_prospect_agent.is_accepted_alternative_region
     description: Whether the prospect accepts alternative operating regions.
+  is_last_prospect_person_converted:
+    lineage:
+      - datalake_ebdb_clean.prospect_agent.status
+      - datalake_ebdb_clean.prospect_agent.ts_created
+    description: True when the prospect is the last prospect person converted.
+  ts_creci_validation_approved:
+    lineage:
+      - datalake_agent_accreditation.qualification_step.ts_changed
+    description: Timestamp when the CRECI validation step was approved.
+  ts_contract_process_initiated:
+    lineage:
+      - datalake_agent_accreditation.contract_process.ts_initiated
+    description: Timestamp when the contract process was initiated.
+  ts_contract_signed:
+    lineage:
+      - datalake_agent_accreditation.contract_process.ts_signed
+    description: Timestamp when the contract was signed.
+  ts_contract_process_finished:
+    lineage:
+      - datalake_agent_accreditation.contract_process.ts_finished
+    description: Timestamp when the contract process was finished.
   ts_created:
     lineage:
       - datalake_ebdb_clean.prospect_agent.ts_created

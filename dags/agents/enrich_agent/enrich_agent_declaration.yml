@@ -16,6 +16,13 @@ workflow:
       - qualification_step
       - signup_profile_conflict
       - contract_process
+    prospect_agent:
+      - qualification_step
+      - contract_process
+    agent:
+      - agent_capability
+      - prospect_agent
+      - agent_event_log
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"

@@ -33,7 +33,7 @@ agent AS (
         a.affiliation_type,
         a.status,
         COALESCE(a.affiliation_type = 'AUTONOMOUS', FALSE) AS is_1p_partnership,
-        COALESCE(a.affiliation_type = 'COMPANY_MANAGED', FALSE) AS is_3_partnership,
+        COALESCE(a.affiliation_type = 'COMPANY_MANAGED', FALSE) AS is_3p_partnership,
         a.ts_created,
         a.ts_updated
     FROM
@@ -49,8 +49,13 @@ agent AS (
 agent_product AS (
     SELECT
         a.id_agent,
-        p.name AS company_product_name
-        FROM
+        p.name AS company_product_name,
+        CASE
+            WHEN p.name IN ('Rede Sale', 'Rede Rent') THEN 'REDE'
+            WHEN p.name IN ('PRO_ACQUIRER_AGENT', 'PRO_ACQUIRER_MANAGER_AGENT') THEN 'PRO_ACQUIRER'
+            ELSE p.name
+        END AS profile
+    FROM
         agent AS a
     JOIN
         datalake_company_clean.company AS c
@@ -74,7 +79,7 @@ agent_parent_user AS (
             mp.profile,
             mp.is_active,
             mp.ts_created
-        FROM 
+        FROM
             datalake_hub_services_clean.member_profile AS mp
         JOIN
             datalake_hub_services.users AS u
@@ -83,9 +88,9 @@ agent_parent_user AS (
     SELECT
         mp.id_user,
         mp_parent.id_user AS id_parent_user
-    FROM 
+    FROM
         member_profile AS mp
-    JOIN 
+    JOIN
         member_profile AS mp_parent
             ON mp_parent.id = mp.id_parent_member_profile
     WHERE
@@ -94,6 +99,35 @@ agent_parent_user AS (
         AND mp_parent.profile = "NEGOTIATION_EXECUTIVE"
     QUALIFY
         1 = ROW_NUMBER() OVER(PARTITION BY mp.id_user ORDER BY mp.ts_created DESC)
+),
+agent_log AS (
+    SELECT
+        id_agent,
+        event_type = 'AGENT_REACTIVATED' AS is_reactivated,
+        LAG(ts_created) OVER(PARTITION BY id_agent ORDER BY ts_created) AS ts_previous_event_agent,
+        ts_created AS ts_last_status_changed,
+        TIMESTAMPDIFF(DAY, ts_created, NOW()) AS days_in_current_status
+    FROM
+        datalake_agent_accreditation.agent_event_log
+    WHERE
+        id_capability IS NULL
+        AND event_type IN ('AGENT_ACTIVATED', 'AGENT_INACTIVATED', 'AGENT_REACTIVATED')
+    QUALIFY
+        ROW_NUMBER() OVER(PARTITION BY id_agent ORDER BY ts_created DESC) = 1
+),
+capability_by_agent AS (
+    SELECT
+        id_agent,
+        MAX(ts_created) FILTER(WHERE type = 'SUPPLY_ACQUISITION') IS NOT NULL AS is_allow_supply_acquisition,
+        MAX(ts_created) FILTER(WHERE type = 'DEMAND_ACQUISITION') IS NOT NULL AS is_allow_demand_acquisition,
+        MAX(ts_created) FILTER(WHERE type = 'DEMAND_VISIT_MANAGEMENT') IS NOT NULL AS is_allow_visit,
+        MAX(business_context) FILTER(WHERE type = 'DEMAND_VISIT_MANAGEMENT' AND business_context = 'SALE') IS NOT NULL AS is_allow_demand_sale,
+        MAX(business_context) FILTER(WHERE type = 'DEMAND_VISIT_MANAGEMENT' AND business_context = 'RENT') IS NOT NULL AS is_allow_demand_rent
+    FROM
+        datalake_agent_accreditation.agent_capability
+    WHERE
+        status = 'ENABLED'
+    GROUP BY 1
 )
 SELECT
     a.id_agent,
@@ -104,18 +138,39 @@ SELECT
     a.uuid_company,
     a.uuid_agent,
     a.uuid_person,
+    pa.creci,
+    pa.creci_uf,
     a.affiliation_type,
     a.status,
     ap.company_product_name,
+    ap.profile,
+    al.is_reactivated,
+    ca.is_allow_supply_acquisition,
+    ca.is_allow_demand_acquisition,
+    ca.is_allow_visit,
+    ca.is_allow_demand_sale,
+    ca.is_allow_demand_rent,
     a.is_1p_partnership,
-    a.is_3_partnership,
+    a.is_3p_partnership,
+    al.days_in_current_status,
+    al.ts_last_status_changed,
     a.ts_created,
     a.ts_updated
 FROM
     agent AS a
+LEFT JOIN
+    datalake_agent_accreditation.prospect_agent AS pa
+        ON pa.uuid_person = a.uuid_person
+        AND pa.is_last_prospect_person_converted
 LEFT JOIN
     agent_product AS ap
         ON ap.id_agent = a.id_agent
 LEFT JOIN
     agent_parent_user AS apu
         ON apu.id_user = a.id_user
+LEFT JOIN
+    capability_by_agent AS ca
+        ON ca.id_agent = a.id_agent
+LEFT JOIN
+    agent_log AS al
+        ON al.id_agent = a.id_agent

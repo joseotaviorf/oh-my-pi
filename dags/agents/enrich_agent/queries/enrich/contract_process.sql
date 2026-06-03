@@ -15,6 +15,7 @@ SELECT
     s.status AS signature_status,
     ROW_NUMBER() OVER(PARTITION BY q.id_agent_prospect ORDER BY acp.ts_created DESC) = 1 AS is_last_contract,
     acp.ts_initiated,
+    s.ts_signed,
     acp.ts_finished,
     acp.ts_created,
     acp.ts_updated

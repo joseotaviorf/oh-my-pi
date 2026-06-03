@@ -71,6 +71,10 @@ columns:
     lineage:
       - datalake_ebdb_clean.accreditation_contract_process.ts_initiated
     description: Timestamp when the contract process was initiated.
+  ts_signed:
+    lineage:
+      - datalake_signatures_clean.signature.ts_signed
+    description: Timestamp when the signature was signed.
   ts_finished:
     lineage:
       - datalake_ebdb_clean.accreditation_contract_process.ts_finished
