@@ -19,46 +19,38 @@ WITH filtered AS (
 deduped AS (
     SELECT
         run_id,
-        metric_name,
-        max_by(job_name, timestamp) AS job_name,
-        max_by(json_data, timestamp) AS json_data,
-        max_by(model_uri, timestamp) AS model_uri,
-        max_by(execution_context_s3_path, timestamp) AS execution_context_s3_path,
-        MAX(timestamp) AS timestamp
+        metric_name AS suite_name,
+        MAX_BY(job_name, timestamp) AS job_name,
+        MAX_BY(json_data, timestamp) AS json_data,
+        MAX_BY(model_uri, timestamp) AS model_uri,
+        MAX_BY(execution_context_s3_path, timestamp) AS execution_context_s3_path,
+        MAX(timestamp) AS ts_report
     FROM
         filtered
     GROUP BY
         run_id,
         metric_name
-),
-aggregated AS (
-    SELECT
-        run_id,
-        ANY_VALUE(job_name) AS job_name,
-        ANY_VALUE(model_uri) AS model_uri,
-        ANY_VALUE(execution_context_s3_path) AS execution_context_s3_path,
-        MAX(timestamp) AS ts_report,
-        map_from_entries(
-            collect_list(
-                struct(
-                    metric_name AS key,
-                    json_data AS value
-                )
-            )
-        ) AS metric_reports
-    FROM
-        deduped
-    GROUP BY
-        run_id
 )
 SELECT
-    run_id,
-    job_name,
-    model_uri,
-    regexp_extract(model_uri, '^models:/(.+)/([^/]+)$', 1) AS model_registry_path,
-    regexp_extract(model_uri, '^models:/(.+)/([^/]+)$', 2) AS model_version,
-    execution_context_s3_path,
-    CAST(ts_report AS TIMESTAMP) AS ts_report,
-    metric_reports
+    d.run_id,
+    d.job_name,
+    d.suite_name,
+    e.metric_id,
+    d.model_uri,
+    REGEXP_EXTRACT(d.model_uri, '^models:/(.+)/([^/]+)$', 1) AS model_registry_path,
+    REGEXP_EXTRACT(d.model_uri, '^models:/(.+)/([^/]+)$', 2) AS model_version,
+    d.execution_context_s3_path,
+    CAST(d.ts_report AS TIMESTAMP) AS ts_report,
+    GET_JSON_OBJECT(
+        d.json_data,
+        CONCAT('$.metric_results["', e.metric_id, '"]')
+    ) AS metric_result_json
 FROM
-    aggregated
+    deduped AS d
+    LATERAL VIEW EXPLODE(
+        JSON_OBJECT_KEYS(
+            GET_JSON_OBJECT(d.json_data, '$.metric_results')
+        )
+    ) e AS metric_id
+WHERE
+    e.metric_id IS NOT NULL

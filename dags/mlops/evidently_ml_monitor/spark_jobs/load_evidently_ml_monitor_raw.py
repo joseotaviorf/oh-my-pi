@@ -1,3 +1,4 @@
+import json
 import logging
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
@@ -43,6 +44,31 @@ def sanitize_metric_name(raw_metric_name: str) -> str:
 
 
 sanitize_metric_name_udf = udf(sanitize_metric_name, StringType())
+
+
+WIDGET_KEYS_TOP_LEVEL = ("widgets", "tests_widgets")
+
+
+def strip_widgets(json_data: str) -> str:
+    if not json_data:
+        return json_data
+    try:
+        payload = json.loads(json_data)
+    except (ValueError, TypeError):
+        return json_data
+    if not isinstance(payload, dict):
+        return json_data
+    for key in WIDGET_KEYS_TOP_LEVEL:
+        payload.pop(key, None)
+    metric_results = payload.get("metric_results")
+    if isinstance(metric_results, dict):
+        for metric in metric_results.values():
+            if isinstance(metric, dict):
+                metric.pop("widget", None)
+    return json.dumps(payload, separators=(",", ":"))
+
+
+strip_widgets_udf = udf(strip_widgets, StringType())
 
 
 def _read_metric_files(spark, source_root: str, file_format: str) -> DataFrame:
@@ -166,6 +192,8 @@ def main() -> None:
             f"load_end_date={load_end_date}, msg=No data for date range; skipping load."
         )
         return
+
+    df = df.withColumn("json_data", strip_widgets_udf(col("json_data")))
 
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 

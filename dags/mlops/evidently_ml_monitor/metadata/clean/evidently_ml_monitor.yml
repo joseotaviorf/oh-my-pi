@@ -1,18 +1,26 @@
 ---
 database_name: datalake_evidently_ml_monitor_clean
 table_name: evidently_ml_monitor
-description: Evidently ML monitoring reports aggregated to one row per run with a metric-name to report JSON map.
+description: Evidently ML monitoring reports exploded to one row per (run_id, suite_name, metric_id). Each row carries the full per-metric Evidently result JSON with Plotly widgets removed, preserving any field Evidently emits without schema lock-in.
 domain: MLOps
 owner: marco.vinha@quintoandar.com.br
 columns:
   run_id:
     lineage:
       - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.run_id
-    description: Unique identifier for the monitoring pipeline run that produced the reports.
+    description: Unique identifier for the monitoring pipeline run that produced the report.
   job_name:
     lineage:
       - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.job_name
     description: Monitoring job name parsed from the source S3 path for the Evidently pipeline run.
+  suite_name:
+    lineage:
+      - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.metric_name
+    description: Normalized Evidently monitoring suite name. One suite contains many metric_ids (one per feature plus suite-level checks).
+  metric_id:
+    lineage:
+      - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.json_data
+    description: Stable identifier (hex hash) of the individual metric result emitted by Evidently within a suite. Key of the metric_results object in the Evidently snapshot payload.
   model_uri:
     lineage:
       - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.model_uri
@@ -32,9 +40,8 @@ columns:
   ts_report:
     lineage:
       - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.timestamp
-    description: Latest report generation timestamp among all metrics aggregated for the monitoring run.
-  metric_reports:
+    description: Report generation timestamp as stored in the source monitoring export.
+  metric_result_json:
     lineage:
-      - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.metric_name
       - datalake_evidently_ml_monitor_raw.evidently_ml_monitor.json_data
-    description: Map of normalized metric_name keys (lowercase, underscores) to full Evidently report JSON strings per metric.
+    description: Full Evidently metric result payload for this metric_id within the suite, serialized as a JSON string. Plotly widget blobs are stripped upstream in the raw spark job. Contains every field Evidently emits for the metric (display_name, type, value/share/count/mean/std, tests, metric_value_location, thresholds, statuses, etc.) without schema lock-in.
