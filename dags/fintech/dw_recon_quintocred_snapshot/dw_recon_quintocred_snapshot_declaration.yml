@@ -10,14 +10,3 @@ workflow:
   default_extraction_type: incremental
   short_circuit_customization:
     function: CHECK_IS_FIRST_BUSINESS_DAY_OF_MONTH
-cluster:
-  type: databricks_13_3_med_general_cluster
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE
-  databricks_conn_id: databricks_new_env
-  custom_configurations:
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: "quintoandar_{{ var.value.environment }}"

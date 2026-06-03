@@ -22,6 +22,10 @@ from bietlejuice.base.spark import (
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline
@@ -143,6 +147,7 @@ if __name__ == "__main__":
     parser.add_argument("partitions")
     parser.add_argument("extra_args")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     environment = args.environment
@@ -223,16 +228,25 @@ if __name__ == "__main__":
         spark_metastore_service = SparkMetastoreService(SparkClient())
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-        # create database if it doesn't exists
         database_name = db_info["db_raw_databricks"]
         format_options = SparkTableStorageFormat.DEFAULT_RAW
         database_location = db_info["db_raw_path"]
-        spark_metastore_service.create_database(database_name)
+        write_database_name, write_table_name, write_location = (
+            resolve_datalake_write_target(
+                prod_database=database_name,
+                prod_table=table_name,
+                prod_location=database_location,
+                bucket=datalake_bucket,
+                target_database=args.target_database_name,
+                target_table=args.target_table_name,
+            )
+        )
+        spark_metastore_service.create_database(write_database_name)
         if df:
             IncrementalTableLoaderPipeline(
-                database_name=database_name,
-                table_name=table_name,
-                database_location=database_location,
+                database_name=write_database_name,
+                table_name=write_table_name,
+                database_location=write_location,
                 layer=LayerEnum.RAW,
                 query=None,
                 partitions=partitions,

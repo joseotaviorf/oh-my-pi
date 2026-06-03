@@ -18,6 +18,9 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.formatters import StringFormatter
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -256,6 +259,7 @@ if __name__ == "__main__":
         help="List of columns names in the sheet files that will be retrieved",
     )
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     environment = args.environment

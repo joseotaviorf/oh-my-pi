@@ -1,0 +1,15 @@
+cluster:
+  type: custom_cluster
+  custom_configurations:
+    driver_node_type_id: r6g.2xlarge
+    node_type_id: m6g.8xlarge
+    spark_version: 16.4.x-scala2.12
+    num_workers: 4
+  databricks_conn_id: databricks_new_env
+validation:
+  cluster:
+    type: consolidation_xl_general_cluster
+    databricks_conn_id: databricks_new_env
+    custom_configurations:
+      num_workers: 4
+      driver_node_type_id: r6g.2xlarge

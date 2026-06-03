@@ -541,6 +541,41 @@ class TestNormalizeDatabricksClusterTopology:
         )
         assert normalized["custom_configurations"]["node_type_id"] == "m7g.2xlarge"
 
+    def test_emr_normalizes_flat_instance_count_to_task_nodes(self):
+        from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
+            normalize_emr_cluster_topology,
+        )
+
+        cluster_args = {
+            "type": "emr_7_12_min_memory_3_workers_cluster",
+            "custom_configurations": {
+                "instance_count": 1,
+            },
+        }
+        normalized = normalize_emr_cluster_topology(cluster_args)
+        custom = normalized["custom_configurations"]
+        assert "instance_count" not in custom
+        assert custom["task_nodes"]["instance_count"] == 1
+
+    def test_emr_normalizes_num_task_workers_to_task_nodes(self):
+        from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
+            normalize_emr_cluster_topology,
+        )
+
+        cluster_args = {
+            "type": "emr_7_12_consolidation_s_general_cluster",
+            "custom_configurations": {
+                "num_workers": 3,
+                "num_task_workers": 2,
+            },
+        }
+        normalized = normalize_emr_cluster_topology(cluster_args)
+        custom = normalized["custom_configurations"]
+        assert "num_workers" not in custom
+        assert "num_task_workers" not in custom
+        assert custom["core_nodes"]["instance_count"] == 1
+        assert custom["task_nodes"]["instance_count"] == 2
+
     def test_heterogeneous_driver_and_worker_preserve_class(self):
         cluster_args = {
             "type": "consolidation_s_memory_cluster",

@@ -185,3 +185,29 @@ class TestExtractClusterValidationFiles:
             .get("custom_configurations", {})
         )
         assert "node_type_id" not in validation_custom
+
+    def test_build_cluster_file_preserves_verbatim_emr_block_with_comments(self):
+        cluster_text = """cluster:
+  type: emr_7_12_consolidation_s_general_cluster
+  custom_configurations:
+    # Cost-saving spot/OD mix: 1 CORE on-demand + 2 TASK spot (~67% spot).
+    core_nodes:
+        instance_count: 1
+    task_nodes:
+        instance_count: 2
+    spark_conf:
+      spark.driver.memory: 8g
+"""
+        declaration = {
+            "dag": {"name": "dw_agent"},
+            "workflow": {"type": "query_delta", "layer": "dw"},
+            "cluster": yaml.safe_load(cluster_text)["cluster"],
+        }
+        content = build_cluster_file_content(
+            cluster_text=cluster_text,
+            declaration=declaration,
+            cluster_args=declaration["cluster"],
+        )
+        assert "# Cost-saving spot/OD mix" in content
+        assert "task_nodes:\n        instance_count: 2" in content
+        assert "validation:" not in content

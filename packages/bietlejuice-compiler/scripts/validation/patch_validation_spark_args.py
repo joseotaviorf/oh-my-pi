@@ -57,16 +57,9 @@ def _already_patched(content: str) -> bool:
     return "resolve_datalake_write_target(" in content
 
 
-def _module_level_prefix(content: str) -> str:
-    match = re.search(r"^(def |class |if __name__)", content, re.MULTILINE)
-    return content[: match.start()] if match else content
-
-
 def _insert_imports(content: str) -> str:
     if "from bietlejuice.base.validation.spark_args import" in content:
         return content
-    prefix = _module_level_prefix(content)
-    suffix = content[len(prefix) :]
     anchor_patterns = [
         r"(from bietlejuice\.base\.db import[^\n]+\n)",
         r"(from bietlejuice\.pipeline[^\n]+\n)",
@@ -74,22 +67,17 @@ def _insert_imports(content: str) -> str:
         r"(from quintoandar_logger import[^\n]+\n)",
     ]
     for pattern in anchor_patterns:
-        match = re.search(pattern, prefix)
+        match = re.search(pattern, content)
         if match:
             insert_at = match.end()
-            new_prefix = (
-                prefix[:insert_at] + VALIDATION_IMPORT + "\n" + prefix[insert_at:]
-            )
-            return new_prefix + suffix
-    first_def = re.search(r"^(def |class )", prefix, re.MULTILINE)
-    if first_def:
-        insert_at = first_def.start()
-        head = prefix[:insert_at].rstrip("\n")
-        tail = prefix[insert_at:].lstrip("\n")
-        return head + "\n\n" + VALIDATION_IMPORT + "\n\n" + tail + suffix
-    lines = prefix.splitlines(keepends=True)
-    lines.append(VALIDATION_IMPORT + "\n")
-    return "".join(lines) + suffix
+            return content[:insert_at] + VALIDATION_IMPORT + "\n" + content[insert_at:]
+    lines = content.splitlines(keepends=True)
+    last_import = 0
+    for idx, line in enumerate(lines):
+        if line.startswith("import ") or line.startswith("from "):
+            last_import = idx + 1
+    lines.insert(last_import, VALIDATION_IMPORT + "\n")
+    return "".join(lines)
 
 
 def _add_parser_flags(content: str) -> str:
@@ -235,12 +223,12 @@ def _patch_get_db_info_block(content: str) -> str:
     )
     patched_tail = re.sub(
         r"update_metastore\(\s*([^,]+),\s*database_name,",
-        r"update_metastore(\1, write_database_name,",
+        r"update_metastore(\1, write_table_name,",
         patched_tail,
     )
     patched_tail = re.sub(
-        r"update_metastore\(\s*([^,]+),\s*write_database_name,\s*([^,]+),\s*([^,]+),\s*database_location",
-        r"update_metastore(\1, write_database_name, write_table_name, \3, write_location",
+        r"update_metastore\(\s*([^,]+),\s*write_table_name,\s*([^,]+),\s*database_location",
+        r"update_metastore(\1, write_table_name, \2, write_location",
         patched_tail,
     )
     patched_tail = re.sub(

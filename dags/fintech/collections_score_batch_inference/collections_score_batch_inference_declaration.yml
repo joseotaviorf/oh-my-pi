@@ -29,9 +29,3 @@ workflow:
         - month
         - day
 
-cluster:
-  type: consolidation_s_general_single_node_cluster
-  access_control_list:
-    group_name: mlops
-    permission_level: CAN_MANAGE
-  databricks_conn_id: databricks_new

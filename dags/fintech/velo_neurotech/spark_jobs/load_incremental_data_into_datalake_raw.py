@@ -17,6 +17,9 @@ from bietlejuice.base.spark import (
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -89,6 +92,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "report_name", help="Name of the report to load data from Neurotech"
     )
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     args.partition_cols = ast.literal_eval(args.partitions)

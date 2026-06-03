@@ -13,18 +13,3 @@ workflow:
       - 4hana_journal_entries_bank_account
     4hana_journal_entries_bank_account:
       - 4hana_journal_entries
-cluster:
-  type: custom_cluster
-  custom_configurations:
-    driver_node_type_id: r5d.4xlarge
-    node_type_id: r5d.4xlarge
-    runtime_engine: PHOTON
-    spark_version: 16.4.x-scala2.12
-    autoscale:
-      min_workers: 5
-      max_workers: 8
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-  databricks_conn_id: databricks_new_env

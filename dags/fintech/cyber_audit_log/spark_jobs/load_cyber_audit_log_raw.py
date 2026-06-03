@@ -11,6 +11,10 @@ from bietlejuice.base.db import DatabaseEnum
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkDataFrameService
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import OracleConsumer
 from bietlejuice.loaders.delta_loader import DeltaLoader
@@ -50,6 +54,7 @@ def parse_arguments():
         required=False,
         default=None,
     )
+    add_validation_target_args(arg_parser)
     args = arg_parser.parse_args()
 
     args.partitions = ast.literal_eval(args.partitions)
@@ -233,17 +238,31 @@ def main():
 
     df = add_partition(raw_df, args.date_filter_columns)
 
-    full_raw_table_name = f"datalake_{args.source}_raw.{args.table_name}"
+    prod_database = f"datalake_{args.source}_raw"
+    prod_location = f"{args.output_path}/raw/"
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=prod_database,
+            prod_table=args.table_name,
+            prod_location=prod_location,
+            bucket=args.datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
+    full_raw_table_name = f"{write_database_name}.{write_table_name}"
     if table_privileges_dict is not None:
         table_privileges = TablePrivileges.from_input_dict(
             table_privileges_dict, full_raw_table_name
         )
     else:
-        table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
+        table_privileges = TablePrivileges.from_environment_default(
+            f"{write_database_name}.{write_table_name}"
+        )
 
-    DeltaLoader(spark).load_table(
+    DeltaLoader(spark_client.conn).load_table(
         table_name=full_raw_table_name,
-        path=f"{args.output_path}/raw/{args.table_name}/",
+        path=f"{write_location}{write_table_name}/",
         source_df=df,
         partition_by=args.partitions,
     )

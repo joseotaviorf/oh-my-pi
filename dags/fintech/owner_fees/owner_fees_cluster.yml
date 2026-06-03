@@ -1,0 +1,7 @@
+cluster:
+  type: databricks_16_4_med_mem_driver_min_memory_2_nodes_cluster
+validation:
+  cluster:
+    type: consolidation_s_memory_cluster
+    custom_configurations:
+      driver_node_type_id: r6g.2xlarge

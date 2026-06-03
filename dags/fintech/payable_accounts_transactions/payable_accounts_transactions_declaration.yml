@@ -20,28 +20,3 @@ workflow:
   tables_customization:
     accounts_payable: {}
 
-cluster:
-  type: custom_cluster
-  custom_configurations:
-    driver_node_type_id: r5d.2xlarge
-    node_type_id: r5d.2xlarge
-    num_workers: 3
-    spark_version: 16.4.x-scala2.12
-
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-      spark.scheduler.taskSetBlacklistTimeout: 1200000
-
-  custom_libraries:
-    - whl: "{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.3.0-py2.py3-none-any.whl"
-    - pypi:
-        package: "google-api-python-client==2.48.0"
-    - pypi:
-        package: "google-auth==2.23.0"
-    - pypi:
-        package: "openpyxl==3.1.5"
-    - pypi:
-        package: "pyxlsb==1.0.9"
-  databricks_conn_id: databricks_new

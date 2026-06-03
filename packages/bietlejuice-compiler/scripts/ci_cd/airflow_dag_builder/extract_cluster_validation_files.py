@@ -238,13 +238,16 @@ def build_cluster_file_content(
     normalized_args = normalize_databricks_cluster_topology(
         cluster_args, config_service
     )
-    prod_block = dump_cluster_yaml({"cluster": normalized_args})
+    if normalized_args == cluster_args:
+        prod_block = cluster_text.rstrip("\n")
+    else:
+        prod_block = dump_cluster_yaml({"cluster": normalized_args}).rstrip("\n")
     spec = build_validation_cluster_spec(
         cluster_args=normalized_args,
         declaration=declaration,
         config_service=config_service,
     )
-    content = prod_block.rstrip("\n") + "\n"
+    content = prod_block + "\n"
     if spec is not None:
         content += _format_validation_yaml(spec)
     return _normalize_cluster_file_text(content)

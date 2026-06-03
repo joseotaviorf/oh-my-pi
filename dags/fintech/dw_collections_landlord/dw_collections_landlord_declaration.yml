@@ -14,11 +14,3 @@ workflow:
       - fact_invoice_landlord_portfolio
     fact_overdue_portfolio_timeline:
       - fact_landlord_deal_installment_match
-cluster:
-  type: custom_cluster
-  custom_configurations:
-    driver_node_type_id: r5d.2xlarge
-    node_type_id: m5d.8xlarge
-    spark_version: 16.4.x-scala2.12
-    num_workers: 4
-  databricks_conn_id: databricks_new_env

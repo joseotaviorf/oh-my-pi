@@ -252,6 +252,43 @@ def _map_topology_value(instance_type: str, *, use_nvme: bool) -> str:
     return map_instance_type_to_graviton(str(instance_type), use_nvme=use_nvme)
 
 
+def normalize_emr_cluster_topology(cluster_args: dict) -> dict:
+    """
+    Ensure EMR worker-count overrides live under core_nodes/task_nodes.instance_count.
+
+    EMR merge and validation read task_nodes.instance_count (task workers may be 0).
+    Legacy flat instance_count, num_workers, and num_task_workers are rewritten here.
+    """
+    normalized = copy.deepcopy(cluster_args)
+    custom = normalized.get("custom_configurations")
+    if not isinstance(custom, dict):
+        return normalized
+
+    flat_count = custom.pop("instance_count", None)
+    if flat_count is not None:
+        task_nodes = custom.setdefault("task_nodes", {})
+        if isinstance(task_nodes, dict) and "instance_count" not in task_nodes:
+            task_nodes["instance_count"] = int(flat_count)
+
+    num_workers = custom.get("num_workers")
+    num_task_workers = custom.get("num_task_workers")
+
+    if num_task_workers is not None:
+        custom.pop("num_task_workers", None)
+        task_nodes = custom.setdefault("task_nodes", {})
+        if isinstance(task_nodes, dict) and "instance_count" not in task_nodes:
+            task_nodes["instance_count"] = int(num_task_workers)
+
+    if num_workers is not None and num_task_workers is not None:
+        custom.pop("num_workers", None)
+        core_count = int(num_workers) - int(num_task_workers)
+        core_nodes = custom.setdefault("core_nodes", {})
+        if isinstance(core_nodes, dict) and "instance_count" not in core_nodes:
+            core_nodes["instance_count"] = max(core_count, 1)
+
+    return normalized
+
+
 def normalize_databricks_cluster_topology(
     cluster_args: dict,
     config_service: Optional[ConfigurationService] = None,
@@ -265,7 +302,7 @@ def normalize_databricks_cluster_topology(
     normalized = copy.deepcopy(cluster_args)
     effective = merge_cluster_configuration(normalized, service)
     if is_emr_effective_config(effective):
-        return normalized
+        return normalize_emr_cluster_topology(normalized)
 
     cluster_type = str(normalized.get("type", ""))
     use_nvme = _uses_photon(effective, cluster_type)

@@ -39,5 +39,3 @@ workflow:
       clean_table_name: offer_term
     webhook_request:
       clean_table_name: webhook_request
-cluster:
-  type: databricks_16_4_med_general_cluster

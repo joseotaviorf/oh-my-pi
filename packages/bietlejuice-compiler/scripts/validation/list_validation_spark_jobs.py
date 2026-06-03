@@ -240,7 +240,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     elif args.ref:
         entries = inventory_branch(
             args.ref if args.ref.startswith("origin/") else f"origin/{args.ref}",
-            line_filter=args.line if args.line else None,
+            line_filter=f"dags/{args.line}/" if args.line else None,
         )
     else:
         parser.error("Provide --ref or --all-validation-branches")
