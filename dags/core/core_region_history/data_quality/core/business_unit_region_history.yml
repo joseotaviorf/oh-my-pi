@@ -20,14 +20,14 @@ column_level_validations:
   event_name:
     is_complete:
       severity_level: Error
-    is_in:
+    is_contained_in:
       severity_level: Error
       values:
         - ev_business_context
   event_type:
     is_complete:
       severity_level: Error
-    is_in:
+    is_contained_in:
       severity_level: Error
       values:
         - cdc

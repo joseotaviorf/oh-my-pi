@@ -17,7 +17,7 @@ column_level_validations:
   event_name:
     is_complete:
       severity_level: Error
-    is_in:
+    is_contained_in:
       severity_level: Error
       values:
         - ev_hub_name
@@ -29,7 +29,7 @@ column_level_validations:
   event_type:
     is_complete:
       severity_level: Error
-    is_in:
+    is_contained_in:
       severity_level: Error
       values:
         - cdc
