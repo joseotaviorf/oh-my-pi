@@ -562,6 +562,29 @@ def match_consolidation_preset(
     )
 
 
+def _aws_attributes_from_config(config: dict) -> Dict[str, Any]:
+    attrs = config.get("aws_attributes") or {}
+    if not isinstance(attrs, dict):
+        return {}
+    return dict(attrs)
+
+
+def _compute_aws_attributes_validation_overrides(
+    effective_prod: dict,
+    validation_resolved: dict,
+) -> Dict[str, Any]:
+    """Emit aws_attributes keys where effective prod differs from validation preset defaults."""
+    prod_attrs = _aws_attributes_from_config(effective_prod)
+    preset_attrs = _aws_attributes_from_config(validation_resolved)
+    overrides: Dict[str, Any] = {}
+    for key, prod_value in prod_attrs.items():
+        if prod_value is not None and not _values_equal(
+            prod_value, preset_attrs.get(key)
+        ):
+            overrides[key] = prod_value
+    return overrides
+
+
 def compute_validation_overrides(
     *,
     effective_prod: dict,
@@ -598,6 +621,12 @@ def compute_validation_overrides(
         "PHOTON", validation_resolved.get("runtime_engine")
     ):
         overrides["runtime_engine"] = "PHOTON"
+
+    aws_overrides = _compute_aws_attributes_validation_overrides(
+        effective_prod, validation_resolved
+    )
+    if aws_overrides:
+        overrides["aws_attributes"] = aws_overrides
 
     return overrides
 

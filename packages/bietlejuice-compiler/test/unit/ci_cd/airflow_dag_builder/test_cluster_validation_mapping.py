@@ -204,6 +204,68 @@ class TestComputeValidationOverrides:
         )
         assert "driver_node_type_id" not in overrides
 
+    def test_emits_people_instance_profile_arn_override(self):
+        overrides = compute_validation_overrides(
+            effective_prod={
+                "aws_attributes": {
+                    "instance_profile_arn": (
+                        "{{ var.value.instance_profile_secret_arn_people }}"
+                    ),
+                },
+            },
+            mapped_worker="m6g.xlarge",
+            mapped_driver=None,
+            validation_resolved={
+                "node_type_id": "m6g.xlarge",
+                "aws_attributes": {
+                    "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
+                },
+            },
+        )
+        assert overrides["aws_attributes"] == {
+            "instance_profile_arn": "{{ var.value.instance_profile_secret_arn_people }}",
+        }
+
+    def test_emits_ebs_volume_size_when_prod_differs_from_preset(self):
+        overrides = compute_validation_overrides(
+            effective_prod={
+                "aws_attributes": {
+                    "ebs_volume_size": 200,
+                    "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
+                },
+            },
+            mapped_worker="m6g.xlarge",
+            mapped_driver=None,
+            validation_resolved={
+                "node_type_id": "m6g.xlarge",
+                "aws_attributes": {
+                    "ebs_volume_size": 100,
+                    "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
+                },
+            },
+        )
+        assert overrides["aws_attributes"] == {"ebs_volume_size": 200}
+
+    def test_omits_aws_attributes_when_prod_matches_preset(self):
+        overrides = compute_validation_overrides(
+            effective_prod={
+                "aws_attributes": {
+                    "ebs_volume_size": 100,
+                    "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
+                },
+            },
+            mapped_worker="m6g.xlarge",
+            mapped_driver=None,
+            validation_resolved={
+                "node_type_id": "m6g.xlarge",
+                "aws_attributes": {
+                    "ebs_volume_size": 100,
+                    "instance_profile_arn": "{{ var.value.instance_profile_arn }}",
+                },
+            },
+        )
+        assert "aws_attributes" not in overrides
+
     def test_cap_validation_driver_node_type_helper(self):
         assert cap_validation_driver_node_type("r6g.4xlarge") == "r6g.2xlarge"
         assert cap_validation_driver_node_type("r6g.2xlarge") == "r6g.2xlarge"

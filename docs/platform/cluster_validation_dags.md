@@ -29,6 +29,7 @@ validation:
 5. **Homogeneous driver/worker** (same instance size): preset must also match `driver_node_type_id`; overrides are only for non-default fields (`spark_version`, `num_workers`, etc.).
 6. **Heterogeneous driver/worker:** match on worker size only; override `driver_node_type_id` when it differs from the preset default (do not copy worker overrides from driver).
 7. Emit `validation.cluster.custom_configurations` only when effective prod differs from the validation preset defaults.
+8. **`aws_attributes` overrides:** when effective prod `aws_attributes` differ from the matched consolidation preset (e.g. `instance_profile_arn` from legacy `databricks_16_4_*_people_cluster` presets, or `ebs_volume_size`, `first_on_demand`, `availability`), emit the full key-level diff under `validation.cluster.custom_configurations.aws_attributes`.
 
 **Skip validation** when prod is already the sole consolidation preset that matches the topology (e.g. prod `consolidation_m_memory_cluster` with `r6g.2xlarge` worker and driver). The generator omits the `validation:` block entirely.
 
