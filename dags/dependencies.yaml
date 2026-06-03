@@ -3250,6 +3250,15 @@ bietlejuice.enrich_olos_dialer:
   - bietlejuice.olos_dialer:load-clean-info-campaign-type:first-run-of-day
   - bietlejuice.olos_dialer:load-clean-reprocessing-mailing:first-run-of-day
   - bietlejuice.olos_dialer:load-clean-users:first-run-of-day
+  - bietlejuice.olos_dialer_test:load-clean-attempts-raw-data:first-run-of-day
+  - bietlejuice.olos_dialer_test:load-clean-campaign-customer:first-run-of-day
+  - bietlejuice.olos_dialer_test:load-clean-campaign:first-run-of-day
+  - bietlejuice.olos_dialer_test:load-clean-customer:first-run-of-day
+  - bietlejuice.olos_dialer_test:load-clean-disposition:first-run-of-day
+  - bietlejuice.olos_dialer_test:load-clean-info-campaign-type:first-run-of-day
+  - bietlejuice.olos_dialer_test:load-clean-mailing:first-run-of-day
+  - bietlejuice.olos_dialer_test:load-clean-reprocessing-mailing:first-run-of-day
+  - bietlejuice.olos_dialer_test:load-clean-users:first-run-of-day
 bietlejuice.enrich_ongoing_terminations_snapshot:
   - bietlejuice.ebdb_contract_fast_lane:load-clean-contract:first-run-of-day
   - bietlejuice.enrich_crm_tasks_flows:load-enrich-tasks-actions-resolutions-flow:first-run-of-day
@@ -4062,6 +4071,9 @@ bietlejuice.enrich_supply_conversion:
   - bietlejuice.olos_dialer:load-clean-attempts-raw-data:first-run-of-day
   - bietlejuice.olos_dialer:load-clean-campaign:first-run-of-day
   - bietlejuice.olos_dialer:load-clean-users:first-run-of-day
+  - bietlejuice.olos_dialer_test:load-clean-attempts-raw-data:first-run-of-day
+  - bietlejuice.olos_dialer_test:load-clean-campaign:first-run-of-day
+  - bietlejuice.olos_dialer_test:load-clean-users:first-run-of-day
   - bietlejuice.wololo:load-clean-context-discard:first-run-of-day
   - bietlejuice.wololo:load-clean-prospect:first-run-of-day
 bietlejuice.enrich_supply_leads:

@@ -1,0 +1,35 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: customer
+owner: ana.araujo@quintoandar.com.br
+domain: Growth
+description: Contains information about customer in the olos dialer system.
+columns:
+  id_customer:
+    description: Unique identifier of the customer.
+    lineage:
+      - datalake_olos_dialer_raw.customer.customerid
+  id_customer_code:
+    description: Unique identifier of the customer code.
+    lineage:
+      - datalake_olos_dialer_raw.customer.customercode
+  name:
+    description: Name of the customer.
+    lineage:
+      - datalake_olos_dialer_raw.customer.name
+  is_activated:
+    description: Is activated information.
+    lineage:
+      - datalake_olos_dialer_raw.customer.activated
+  year:
+    description: Partition column for the year of the record.
+    lineage:
+      - datalake_olos_dialer_raw.customer.year
+  month:
+    description: Partition column for the month of the record.
+    lineage:
+      - datalake_olos_dialer_raw.customer.month
+  day:
+    description: Partition column for the day of the record.
+    lineage:
+      - datalake_olos_dialer_raw.customer.day

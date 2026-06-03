@@ -1,0 +1,27 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: mailing_information
+owner: ana.araujo@quintoandar.com.br
+domain: Growth
+description: Contains information about mailing information in the olos dialer system.
+columns:
+  id_campaign:
+    description: Unique identifier of the campaign.
+    lineage:
+      - datalake_olos_dialer_raw.mailinginformation.campaignid
+  table_name:
+    description: Name of the source table.
+    lineage:
+      - datalake_olos_dialer_raw.mailinginformation.tablename
+  year:
+    description: Partition column for the year of the record.
+    lineage:
+      - datalake_olos_dialer_raw.mailinginformation.year
+  month:
+    description: Partition column for the month of the record.
+    lineage:
+      - datalake_olos_dialer_raw.mailinginformation.month
+  day:
+    description: Partition column for the day of the record.
+    lineage:
+      - datalake_olos_dialer_raw.mailinginformation.day

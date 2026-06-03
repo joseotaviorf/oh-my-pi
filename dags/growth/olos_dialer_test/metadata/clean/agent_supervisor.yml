@@ -1,0 +1,27 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: agent_supervisor
+owner: ana.araujo@quintoandar.com.br
+domain: Growth
+description: Contains information about agent supervisor in the olos dialer system.
+columns:
+  id_agent:
+    description: Unique identifier of the agent.
+    lineage:
+      - datalake_olos_dialer_raw.agentsupervisor.agentid
+  id_supervisor:
+    description: Unique identifier of the supervisor.
+    lineage:
+      - datalake_olos_dialer_raw.agentsupervisor.supervisorid
+  year:
+    description: Partition column for the year of the record.
+    lineage:
+      - datalake_olos_dialer_raw.agentsupervisor.year
+  month:
+    description: Partition column for the month of the record.
+    lineage:
+      - datalake_olos_dialer_raw.agentsupervisor.month
+  day:
+    description: Partition column for the day of the record.
+    lineage:
+      - datalake_olos_dialer_raw.agentsupervisor.day

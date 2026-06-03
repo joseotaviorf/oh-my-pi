@@ -1,0 +1,31 @@
+SELECT  
+    BIGINT(ID_metabase_do_analista) AS id_analyst,
+    BIGINT(ID_do_PP) AS id_pp,
+    BIGINT(ID_do_Lead) AS id_lead,
+    BIGINT(OwnerAgentId) AS id_owner_agent,
+    BIGINT(McxCampaignId) AS id_campaign,
+    Nome AS name,
+    Perfil_Base AS base_profile,
+    CPF AS cpf,
+    Customer AS customer,
+    tablename AS table_name,
+    telefone1 AS phone1,
+    telefone2 AS phone2,
+    telefone3 AS phone3,
+    Link_Owner_conversion AS owner_conversion_link,
+    Tipo AS type,
+    Origem AS origin,
+    LOWER(Motivo_do_Reprocessamento) AS reprocessing_reason,
+    LOWER(E_cliente_5A) AS is_5a_customer,
+    LOWER(Esta_carteirizado_com_AM) AS is_portfolio_with_AM,
+    LOWER(PP_Ja_com_outro_Analista) AS has_another_analyst,
+    BIGINT(Qtd_IM_Alugado) AS qtd_house_rented,
+    BIGINT(Qtd_IM_Publicado) AS qtd_house_published,
+    TIMESTAMP(Data_Envio_Base) AS ts_created,
+    TIMESTAMP(Data_Importacao) AS ts_updated,
+    year,
+    month,
+    day
+FROM datalake_olos_dialer_test_raw.OPS_Mailing_LayoutId_7
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')

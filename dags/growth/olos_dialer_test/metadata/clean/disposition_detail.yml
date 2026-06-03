@@ -1,0 +1,47 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: disposition_detail
+owner: ana.araujo@quintoandar.com.br
+domain: Growth
+description: Contains information about disposition detail in the olos dialer system.
+columns:
+  id_disposition:
+    description: Unique identifier of the disposition.
+    lineage:
+      - datalake_olos_dialer_raw.dispositiondetail.dispositionid
+  id_disposition_plan:
+    description: Unique identifier of the disposition plan.
+    lineage:
+      - datalake_olos_dialer_raw.dispositiondetail.dispositionplanid
+  id_disposition_type:
+    description: Unique identifier of the disposition type.
+    lineage:
+      - datalake_olos_dialer_raw.dispositiondetail.dispositiontypeid
+  disposition_code:
+    description: Disposition code information.
+    lineage:
+      - datalake_olos_dialer_raw.dispositiondetail.dispositioncode
+  business_success:
+    description: Business success information.
+    lineage:
+      - datalake_olos_dialer_raw.dispositiondetail.businesssuccess
+  customer_finisher:
+    description: Customer finisher information.
+    lineage:
+      - datalake_olos_dialer_raw.dispositiondetail.customerfinisher
+  phone_finisher:
+    description: Contact phone number associated with the record.
+    lineage:
+      - datalake_olos_dialer_raw.dispositiondetail.phonefinisher
+  year:
+    description: Partition column for the year of the record.
+    lineage:
+      - datalake_olos_dialer_raw.dispositiondetail.year
+  month:
+    description: Partition column for the month of the record.
+    lineage:
+      - datalake_olos_dialer_raw.dispositiondetail.month
+  day:
+    description: Partition column for the day of the record.
+    lineage:
+      - datalake_olos_dialer_raw.dispositiondetail.day

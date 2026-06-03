@@ -1,0 +1,43 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: login_raw_data
+owner: ana.araujo@quintoandar.com.br
+domain: Growth
+description: Contains information about login raw data in the olos dialer system.
+columns:
+  id_login_raw_data:
+    description: Unique identifier of the login raw data.
+    lineage:
+      - datalake_olos_dialer_raw.loginrawdata.loginrawdataid
+  id_agent:
+    description: Unique identifier of the agent.
+    lineage:
+      - datalake_olos_dialer_raw.loginrawdata.agentid
+  id_campaign:
+    description: Unique identifier of the campaign.
+    lineage:
+      - datalake_olos_dialer_raw.loginrawdata.campaignid
+  insert_time:
+    description: Insert time information.
+    lineage:
+      - datalake_olos_dialer_raw.loginrawdata.inserttime
+  ts_login_started:
+    description: Timestamp when the record was login started.
+    lineage:
+      - datalake_olos_dialer_raw.loginrawdata.startlogin
+  ts_login_ended:
+    description: Timestamp when the record was login ended.
+    lineage:
+      - datalake_olos_dialer_raw.loginrawdata.endlogin
+  year:
+    description: Partition column for the year of the record.
+    lineage:
+      - datalake_olos_dialer_raw.loginrawdata.year
+  month:
+    description: Partition column for the month of the record.
+    lineage:
+      - datalake_olos_dialer_raw.loginrawdata.month
+  day:
+    description: Partition column for the day of the record.
+    lineage:
+      - datalake_olos_dialer_raw.loginrawdata.day

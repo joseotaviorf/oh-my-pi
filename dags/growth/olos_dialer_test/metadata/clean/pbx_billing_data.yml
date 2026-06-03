@@ -1,0 +1,147 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: pbx_billing_data
+owner: ana.araujo@quintoandar.com.br
+domain: Growth
+description: Contains information about pbx billing data in the olos dialer system.
+columns:
+  id_pbx_billing_data:
+    description: Unique identifier of the pbx billing data.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.pbxbillingdataid
+  id_pbx_disposition:
+    description: Unique identifier of the pbx disposition.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.pbxdispositionid
+  id_agent:
+    description: Unique identifier of the agent.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.agentid
+  id_campaign:
+    description: Unique identifier of the campaign.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.campaignid
+  id_call_direction:
+    description: Unique identifier of the call direction.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.calldirectionid
+  id_customer:
+    description: Unique identifier of the customer.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.customerid
+  id_phone_humber:
+    description: Unique identifier of the phone humber.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.phonenumberid
+  id_record:
+    description: Unique identifier of the record.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.recordid
+  id_session:
+    description: Unique identifier of the session.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.sessionid
+  id_telecom_call:
+    description: Unique identifier of the telecom call.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.telecomcallid
+  total_time:
+    description: Total time information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.totaltime
+  trunk_number:
+    description: Trunk number information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.trunknumber
+  signaling:
+    description: Signaling information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.signaling
+  signaling_extra_info:
+    description: Signaling extra info information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.signalingextrainfo
+  signaling_time:
+    description: Signaling time information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.signalingtime
+  route:
+    description: Route information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.route
+  pbx_name:
+    description: Pbx name information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.pbxname
+  campaign_code:
+    description: Campaign code information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.campaigncode
+  channel:
+    description: Communication channel used.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.channel
+  company:
+    description: Company information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.company
+  alerting_time:
+    description: Alerting time information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.alertingtime
+  analysis_time:
+    description: Analysis time information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.analysistime
+  ani:
+    description: Ani information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.ani
+  billing_code:
+    description: Billing code information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.billingcode
+  board:
+    description: Board information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.board
+  conversation_time:
+    description: Conversation time information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.conversationtime
+  device_name:
+    description: Device name information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.devicename
+  dnis:
+    description: Dnis information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.dnis
+  link:
+    description: URL link associated with the record.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.link
+  mailing_name:
+    description: Mailing name information.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.mailingname
+  original_phone_number:
+    description: Contact phone number associated with the record.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.originalphonenumber
+  ts_started:
+    description: Timestamp when the record was started.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.startdate
+  year:
+    description: Partition column for the year of the record.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.year
+  month:
+    description: Partition column for the month of the record.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.month
+  day:
+    description: Partition column for the day of the record.
+    lineage:
+      - datalake_olos_dialer_raw.pbxbillingdata.day

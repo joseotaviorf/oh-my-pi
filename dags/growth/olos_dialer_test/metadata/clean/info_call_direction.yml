@@ -1,0 +1,27 @@
+---
+database_name: datalake_olos_dialer_clean
+table_name: info_call_direction
+owner: ana.araujo@quintoandar.com.br
+domain: Growth
+description: Contains information about info call direction in the olos dialer system.
+columns:
+  id_call_direction:
+    description: Unique identifier of the call direction.
+    lineage:
+      - datalake_olos_dialer_raw.info_calldirection.calldirectionid
+  description:
+    description: Textual description of the info call direction.
+    lineage:
+      - datalake_olos_dialer_raw.info_calldirection.description
+  year:
+    description: Partition column for the year of the record.
+    lineage:
+      - datalake_olos_dialer_raw.info_calldirection.year
+  month:
+    description: Partition column for the month of the record.
+    lineage:
+      - datalake_olos_dialer_raw.info_calldirection.month
+  day:
+    description: Partition column for the day of the record.
+    lineage:
+      - datalake_olos_dialer_raw.info_calldirection.day
