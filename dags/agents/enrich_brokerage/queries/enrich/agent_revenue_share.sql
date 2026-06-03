@@ -15,6 +15,7 @@ big_agent_revenue_share AS (
     SELECT
         a.id_user,
         COALESCE(h.id_external, c.id_house) AS id_house,
+        o.id_firestore AS id_offer,
         e.id_revenue_share,
         e.uuid_person,
         e.incentive_system,
@@ -31,6 +32,9 @@ big_agent_revenue_share AS (
     LEFT JOIN
         datalake_sales_flow_clean.sales_flow AS sf
             ON sf.id = e.id_sales_flow
+    LEFT JOIN
+        datalake_sales_flow_clean.offer AS o
+            ON o.id_sales_flow = sf.id
     LEFT JOIN
         datalake_sales_flow_clean.house AS h
             ON h.id = sf.id_house
@@ -50,6 +54,7 @@ nazare_revenue_share AS (
     SELECT
         a.id_external AS id_user,
         rs.id_house,
+        o.id_external AS id_offer,
         a.uuid_external_person AS uuid_person,
         rs.participant_role,
         mp.business_context,
@@ -68,6 +73,9 @@ nazare_revenue_share AS (
         datalake_nazare_clean.agent AS a
             ON a.id_agent = oa.id_agent
     LEFT JOIN
+        datalake_nazare_clean.offer AS o
+            ON o.id_offer = oa.id_offer
+    LEFT JOIN
         member_profile AS mp
             ON mp.id_main_user = a.id_external
             AND mp.is_last_updated = TRUE
@@ -79,6 +87,7 @@ union_revenue_share AS (
     SELECT
         rs.id_user,
         rs.id_house,
+        rs.id_offer,
         rs.uuid_person,
         rs.business_context,
         'BIG_AGENT' AS revenue_source,
@@ -98,12 +107,14 @@ union_revenue_share AS (
     GROUP BY
         rs.id_user,
         rs.id_house,
+        rs.id_offer,
         rs.uuid_person,
         rs.business_context
     UNION ALL
     SELECT
         rs.id_user,
         rs.id_house,
+        rs.id_offer,
         rs.uuid_person,
         rs.business_context,
         'BIG_AGENT' AS revenue_source,
@@ -123,6 +134,7 @@ union_revenue_share AS (
     GROUP BY
         rs.id_user,
         rs.id_house,
+        rs.id_offer,
         rs.uuid_person,
         rs.business_context,
         rs.revenue_amount,
@@ -131,6 +143,7 @@ union_revenue_share AS (
     SELECT
         rs.id_user,
         rs.id_house,
+        rs.id_offer,
         rs.uuid_person,
         rs.business_context,
         'NAZARE' AS revenue_source,
@@ -149,6 +162,7 @@ union_revenue_share AS (
 SELECT
     rs.id_user,
     rs.id_house,
+    rs.id_offer,
     rs.uuid_person,
     rs.business_context,
     rs.revenue_source,

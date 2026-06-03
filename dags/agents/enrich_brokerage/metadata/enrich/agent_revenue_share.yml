@@ -1,7 +1,7 @@
 database_name: datalake_agent_payments
 table_name: agent_revenue_share
 description: >
-  Unified agent revenue share by user, house, business context, revenue source, and role.
+  Unified agent revenue share by user, house, offer, business context, revenue source, and role.
   Combines Big Agent calculated earnings (demand conversion/acquisition and supply CIQ)
   with Nazaré revenue-share participants, aggregated per partition date.
 domain: Agents
@@ -18,6 +18,11 @@ columns:
       - datalake_ebdb_clean.contract.id_house
       - datalake_nazare_clean.revenue_share_by_participant.id_house
     description: House identifier from sales flow, rent contract, or Nazaré revenue share.
+  id_offer:
+    lineage:
+      - datalake_sales_flow_clean.offer.id_firestore
+      - datalake_nazare_clean.offer.id_external
+    description: Offer identifier (Firestore id on Big Agent sales-flow path, external id on Nazaré path).
   uuid_person:
     lineage:
       - datalake_big_agent.earnings.uuid_person
