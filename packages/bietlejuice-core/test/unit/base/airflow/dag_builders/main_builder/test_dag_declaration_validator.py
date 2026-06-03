@@ -470,3 +470,88 @@ class TestDAGDeclarationValidatorIdExpansion:
         )
 
         dag_declaration_validator.validate(dag_declaration=declaration)
+
+
+class TestDAGDeclarationValidatorQueryViewWorkflow:
+    @pytest.fixture
+    def dag_declaration_validator(self):
+        from bietlejuice.base.airflow.dag_builders.main_builder.dag_declaration.dag_declaration_validator import (
+            DAGDeclarationValidator,
+        )
+
+        return DAGDeclarationValidator()
+
+    @pytest.fixture
+    def base_declaration(self):
+        return {
+            "dag": {"name": "test_query_view", "owner": "Data Engineering"},
+            "workflow": {
+                "type": "query_view",
+                "layer": "enrich",
+            },
+            "cluster": {
+                "type": "test_cluster",
+                "access_control_list": {
+                    "group_name": "admins",
+                    "permission_level": "CAN_MANAGE",
+                },
+            },
+        }
+
+    @pytest.mark.parametrize(
+        "workflow_config",
+        [
+            {"sync": ["databricks"], "sql_dialect": "databricks"},
+            {"sync": ["databricks", "trino"], "sql_dialect": "databricks"},
+            {"sync": ["trino"], "sql_dialect": "trino"},
+            {
+                "sync": ["databricks"],
+                "sql_dialect": "databricks",
+                "tables_customization": {
+                    "table_a": {"sync": ["trino"], "sql_dialect": "trino"}
+                },
+            },
+        ],
+    )
+    def test_validate_query_view_sync_config(
+        self, dag_declaration_validator, base_declaration, workflow_config
+    ):
+        # arrange
+        base_declaration["workflow"].update(workflow_config)
+
+        # act & assert
+        dag_declaration_validator.validate(dag_declaration=base_declaration)
+
+    @pytest.mark.parametrize(
+        "workflow_config, error_match",
+        [
+            ({"sync": []}, "sync"),
+            ({"sync": ["athena"], "sql_dialect": "databricks"}, "sync"),
+            ({"sync": ["databricks"], "sql_dialect": "spark"}, "sql_dialect"),
+            (
+                {"has_hive_sync": True},
+                "Invalid query_view sync configuration",
+            ),
+            (
+                {
+                    "sync": ["databricks"],
+                    "sql_dialect": "databricks",
+                    "tables_customization": {"table_a": {"sync": ["athena"]}},
+                },
+                "table 'table_a'",
+            ),
+        ],
+    )
+    def test_validate_query_view_rejects_invalid_sync_config(
+        self,
+        dag_declaration_validator,
+        base_declaration,
+        workflow_config,
+        error_match,
+    ):
+        # arrange
+        base_declaration["workflow"].update(workflow_config)
+
+        # act & assert
+        with pytest.raises(AssertionError, match=error_match):
+            dag_declaration_validator.validate(dag_declaration=base_declaration)

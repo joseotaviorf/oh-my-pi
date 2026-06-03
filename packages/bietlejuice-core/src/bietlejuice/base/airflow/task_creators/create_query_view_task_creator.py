@@ -4,6 +4,7 @@ from airflow.models.baseoperator import BaseOperator
 
 from bietlejuice.base.airflow.task_creators.base_task_creator import BaseTaskCreator
 from bietlejuice.base.airflow.task_creators.table_attributes import TableAttributes
+from bietlejuice.base.pipeline.query_view_sync import normalize_query_view_sync_config
 
 
 class CreateQueryViewTaskCreator(BaseTaskCreator):
@@ -28,11 +29,9 @@ class CreateQueryViewTaskCreator(BaseTaskCreator):
         extra_query_template_params = self._get_extra_query_template_params(
             table_attributes
         )
-        default_has_hive_sync = self.dag_execution_context.workflow_args.get(
-            "has_hive_sync", False
-        )
-        has_hive_sync = table_attributes.table_customization.get(
-            "has_hive_sync", default_has_hive_sync
+        sync_config = normalize_query_view_sync_config(
+            self.dag_execution_context.workflow_args,
+            table_attributes.table_customization,
         )
 
         return [
@@ -52,8 +51,10 @@ class CreateQueryViewTaskCreator(BaseTaskCreator):
             self.dag_execution_context.execution_date,
             "--table-privileges",
             json.dumps(table_attributes.table_privileges),
-            "--has-hive-sync",
-            str(has_hive_sync).lower(),
+            "--sync",
+            json.dumps(list(sync_config.sync)),
+            "--sql-dialect",
+            sync_config.sql_dialect,
         ]
 
     def _get_extra_query_template_params(

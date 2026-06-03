@@ -19,6 +19,11 @@ from bietlejuice.base.databricks.databricks_group_name_enum import (
     DatabricksGroupNameEnum,
 )
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.pipeline.query_view_sync import (
+    QueryViewSqlDialectEnum,
+    QueryViewSyncTargetEnum,
+    normalize_query_view_sync_config,
+)
 from bietlejuice.base.udfs.udf_enum import UDFEnum
 
 
@@ -121,6 +126,21 @@ class DAGDeclarationValidator(Validator):
                     },
                 },
                 "has_hive_sync": {"type": "boolean", "empty": False, "required": False},
+                "sync": {
+                    "type": "list",
+                    "empty": False,
+                    "required": False,
+                    "schema": {
+                        "type": "string",
+                        "allowed": QueryViewSyncTargetEnum.get_available_enum_values(),
+                    },
+                },
+                "sql_dialect": {
+                    "type": "string",
+                    "empty": False,
+                    "required": False,
+                    "allowed": QueryViewSqlDialectEnum.get_available_enum_values(),
+                },
                 "credentials_scope": {
                     "type": "string",
                     "empty": False,
@@ -567,6 +587,33 @@ class DAGDeclarationValidator(Validator):
         workflow_type = dag_declaration.get("workflow", {}).get("type")
         if workflow_type == WorkflowEnum.API_INGESTION_WORKFLOW.value:
             self._validate_api_ingestion_workflow(dag_declaration)
+        if workflow_type == WorkflowEnum.QUERY_VIEW_WORKFLOW.value:
+            self._validate_query_view_workflow(dag_declaration)
+
+    def _validate_query_view_workflow(self, dag_declaration: dict) -> None:
+        workflow = dag_declaration.get("workflow", {})
+        tables_customization = workflow.get("tables_customization", {})
+
+        try:
+            normalize_query_view_sync_config(workflow)
+        except ValueError as exc:
+            raise AssertionError(
+                "m=_validate_query_view_workflow, "
+                f"msg=Invalid query_view sync configuration: {exc}"
+            ) from exc
+
+        for table_name, table_config in tables_customization.items():
+            if not isinstance(table_config, dict):
+                continue
+
+            try:
+                normalize_query_view_sync_config(workflow, table_config)
+            except ValueError as exc:
+                raise AssertionError(
+                    "m=_validate_query_view_workflow, "
+                    f"msg=Invalid query_view sync configuration for table "
+                    f"'{table_name}': {exc}"
+                ) from exc
 
     def validate_cluster_validation_cluster_diff(self, dag_declaration: dict) -> None:
         """Validate prod vs consolidation cluster types after cluster YAML is merged."""

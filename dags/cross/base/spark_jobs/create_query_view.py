@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 from argparse import ArgumentParser
@@ -7,6 +9,7 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db.metastore_mapping_factory import MetastoreMappingFactory
 from bietlejuice.base.pipeline import LayerEnum
+from bietlejuice.base.pipeline.query_view_sync import normalize_query_view_sync_config
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 from bietlejuice.pipeline.query_view_creator_pipeline import QueryViewCreatorPipeline
 
@@ -14,6 +17,21 @@ JOB_NAME = "create_query_view"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
+
+
+def _parse_sync_arg(sync_arg: str | None) -> list[str] | None:
+    if sync_arg is None:
+        return None
+
+    try:
+        parsed_sync = json.loads(sync_arg)
+    except json.JSONDecodeError:
+        parsed_sync = [target.strip() for target in sync_arg.split(",")]
+
+    if isinstance(parsed_sync, str):
+        return [parsed_sync]
+    return parsed_sync
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description=JOB_NAME)
@@ -47,12 +65,20 @@ if __name__ == "__main__":
         dest="table_privileges",
     )
     parser.add_argument(
-        "--has-hive-sync",
+        "--sync",
         type=str,
-        default="false",
-        help="whether to create the view on Trino (default: false)",
+        default=None,
+        help="json list or comma-separated list of sync targets",
         required=False,
-        dest="has_hive_sync",
+        dest="sync",
+    )
+    parser.add_argument(
+        "--sql-dialect",
+        type=str,
+        default=None,
+        help="source SQL dialect for the view query",
+        required=False,
+        dest="sql_dialect",
     )
 
     args = parser.parse_args()
@@ -62,9 +88,11 @@ if __name__ == "__main__":
     else:
         table_privileges_dict = None
 
-    # Parse create_trino_view flag
-    has_hive_sync = (
-        args.has_hive_sync.lower() == "true" if args.has_hive_sync else False
+    sync_config = normalize_query_view_sync_config(
+        {
+            "sync": _parse_sync_arg(args.sync),
+            "sql_dialect": args.sql_dialect,
+        }
     )
 
     env = args.env
@@ -84,7 +112,8 @@ if __name__ == "__main__":
         + f"schema={schema}, table_name={table_name}, "
         + f"relative_query_path={relative_query_path}, "
         + f"execution_date={execution_date}, "
-        + f"has_hive_sync={has_hive_sync}, "
+        + f"sync={list(sync_config.sync)}, "
+        + f"sql_dialect={sync_config.sql_dialect}, "
         + "msg=Job execution started"
     )
 
@@ -119,7 +148,8 @@ if __name__ == "__main__":
         env=env,
         spark=None,  # spark parameter is not used in the pipeline
         table_privileges=table_privileges,
-        has_hive_sync=has_hive_sync,
+        sync=list(sync_config.sync),
+        sql_dialect=sync_config.sql_dialect,
     )
 
     query_view_creator_pipeline.run()

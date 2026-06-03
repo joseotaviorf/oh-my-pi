@@ -5,6 +5,10 @@ import sqlglot
 
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db.database_enum import DatabaseEnum
+from bietlejuice.base.pipeline.query_view_sync import (
+    QueryViewSyncTargetEnum,
+    normalize_query_view_sync_config,
+)
 from bietlejuice.base.spark.base_spark import BaseDBUtils
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
 from bietlejuice.clients.db_clients import SparkClient
@@ -36,7 +40,8 @@ class QueryViewCreatorPipeline(AbstractPipeline):
         env: str = None,
         spark=None,
         table_privileges: TablePrivileges = None,
-        has_hive_sync: bool = False,
+        sync: list[str] = None,
+        sql_dialect: str = None,
     ):
         """
         :param database_name: database name to create the view
@@ -48,8 +53,16 @@ class QueryViewCreatorPipeline(AbstractPipeline):
         :param env: environment (forno/prod)
         :param spark: Spark session object
         :param table_privileges: TablePrivileges object to apply view privileges after creation
-        :param has_hive_sync: whether to create the view on Trino (default: False)
+        :param sync: target systems where the view must be created
+        :param sql_dialect: source SQL dialect for the query
         """
+        sync_config = normalize_query_view_sync_config(
+            {
+                "sync": sync,
+                "sql_dialect": sql_dialect,
+            }
+        )
+
         self.database_name = database_name
         self.view_name = view_name
         self.layer = layer
@@ -59,35 +72,48 @@ class QueryViewCreatorPipeline(AbstractPipeline):
         self.env = env
         self.spark = spark
         self.table_privileges = table_privileges
-        self.has_hive_sync = has_hive_sync
+        self.sync = sync_config.sync
+        self.sql_dialect = sync_config.sql_dialect
 
     def run(self):
         """
-        Creates views on Databricks and optionally on Trino based on the provided SQL query.
+        Creates views on the configured targets based on the provided SQL query.
         The views are automatically overwritten if they already exist.
         """
-        spark_client = SparkClient()
         formatted_query = self.query.format(**self.query_template_params)
 
-        self._create_databricks_view(spark_client, formatted_query)
+        views_created = []
+        spark_client = None
 
-        if self.has_hive_sync:
-            self._create_trino_view(formatted_query)
+        for target in self.sync:
+            target_query = self._get_query_for_target(formatted_query, target)
+            if target == QueryViewSyncTargetEnum.DATABRICKS.value:
+                spark_client = spark_client or SparkClient()
+                self._create_databricks_view(spark_client, target_query)
+                views_created.append("Databricks")
+            elif target == QueryViewSyncTargetEnum.TRINO.value:
+                self._create_trino_view(target_query)
+                views_created.append("Trino")
 
         if (
             self.table_privileges
+            and QueryViewSyncTargetEnum.DATABRICKS.value in self.sync
             and UnityCatalogHelper.is_cluster_unity_catalog_enabled()
         ):
             self.table_privileges.apply()
-
-        views_created = ["Databricks"]
-        if self.has_hive_sync:
-            views_created.append("Trino")
 
         logger.info(
             f"Successfully created view {self.database_name}.{self.view_name} "
             f"on {', '.join(views_created)}"
         )
+
+    def _get_query_for_target(self, formatted_query: str, target: str) -> str:
+        if self.sql_dialect == target:
+            return formatted_query
+
+        return sqlglot.transpile(formatted_query, read=self.sql_dialect, write=target)[
+            0
+        ]
 
     def _create_databricks_database(self, spark_client: SparkClient):
         """Create the database on Databricks if it doesn't exist."""
@@ -162,20 +188,16 @@ class QueryViewCreatorPipeline(AbstractPipeline):
             raise
 
     def _create_trino_view(self, formatted_query: str):
-        """Create or replace the view on Trino using sqlglot transpilation."""
+        """Create or replace the view on Trino."""
 
         try:
             trino_client = self.get_trino_client()
 
             self._create_trino_schema(trino_client)
 
-            trino_query = sqlglot.transpile(
-                formatted_query, read="databricks", write="trino"
-            )[0]
-
             trino_create_view_statement = f"""
             CREATE OR REPLACE VIEW {self.database_name}.{self.view_name} AS
-            {trino_query}
+            {formatted_query}
             """
 
             trino_client.run(trino_create_view_statement)

@@ -17,6 +17,7 @@ from bietlejuice.base.airflow.task_creators.task_creator_factory import (
     TaskEnum,
 )
 from bietlejuice.base.pipeline.layer_enum import LayerEnum
+from bietlejuice.base.pipeline.query_view_sync import normalize_query_view_sync_config
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
 
 
@@ -145,6 +146,17 @@ class QueryViewWorkflow(BaseWorkflow):
             job_cluster_finished_task,
             cluster_completion_sink=cluster_completion_sink,
         )
+
+    def _check_include_sync_hive_tasks(self, table_attributes: TableAttributes) -> bool:
+        """
+        Checks if metadata sync should be added for views published to Trino.
+        """
+        if self.is_validation:
+            return False
+        sync_config = normalize_query_view_sync_config(
+            self.workflow_args, table_attributes.table_customization
+        )
+        return sync_config.has_trino_sync
 
     def _initialize_task_creators(self, dag_execution_context: DagExecutionContext):
         """Initialize all task creators used by this workflow."""

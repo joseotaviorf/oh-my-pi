@@ -43,7 +43,8 @@ class TestQueryViewCreatorPipeline:
             env="test",
             spark=None,
             table_privileges=None,
-            has_hive_sync=False,  # Explicitly set to False for testing
+            sync=["databricks"],
+            sql_dialect="databricks",
         )
 
     def test_init_with_defaults(self):
@@ -61,8 +62,10 @@ class TestQueryViewCreatorPipeline:
         assert pipeline.env is None
         assert pipeline.spark is None
         assert pipeline.table_privileges is None
+        assert pipeline.sync == ("databricks",)
+        assert pipeline.sql_dialect == "databricks"
 
-    def test_run_creates_views(self, pipeline, mock_spark_client):
+    def test_run_creates_databricks_view(self, pipeline, mock_spark_client):
         # Arrange
         mock_spark_client_instance = mock.MagicMock()
         mock_spark_client.return_value = mock_spark_client_instance
@@ -81,10 +84,11 @@ class TestQueryViewCreatorPipeline:
                 mock_spark_client_instance,
                 "SELECT * FROM source_table WHERE param = 'value1'",
             )
-            # With has_hive_sync=False, the Trino view should not be created
             mock_create_trino.assert_not_called()
 
-    def test_run_creates_trino_view_when_enabled(self, mock_spark_client):
+    def test_run_creates_databricks_and_trino_views(
+        self, mock_spark_client, mock_sqlglot
+    ):
         # Arrange
         pipeline = QueryViewCreatorPipeline(
             database_name="test_db",
@@ -92,7 +96,8 @@ class TestQueryViewCreatorPipeline:
             layer="enrich",
             query="SELECT * FROM source_table WHERE param = '{param1}'",
             query_template_params={"param1": "value1"},
-            has_hive_sync=True,  # Enable Trino view creation
+            sync=["databricks", "trino"],
+            sql_dialect="databricks",
         )
         mock_spark_client_instance = mock.MagicMock()
         mock_spark_client.return_value = mock_spark_client_instance
@@ -111,10 +116,68 @@ class TestQueryViewCreatorPipeline:
                 mock_spark_client_instance,
                 "SELECT * FROM source_table WHERE param = 'value1'",
             )
-            # With has_hive_sync=True, the Trino view should be created
+            mock_sqlglot.transpile.assert_called_once_with(
+                "SELECT * FROM source_table WHERE param = 'value1'",
+                read="databricks",
+                write="trino",
+            )
             mock_create_trino.assert_called_once_with(
+                "SELECT * FROM source_table -- Trino version"
+            )
+
+    def test_run_creates_trino_only_view_without_spark_client(self, mock_spark_client):
+        # Arrange
+        pipeline = QueryViewCreatorPipeline(
+            database_name="test_db",
+            view_name="test_view",
+            layer="dw",
+            query="SELECT * FROM source_table WHERE param = '{param1}'",
+            query_template_params={"param1": "value1"},
+            sync=["trino"],
+            sql_dialect="trino",
+        )
+
+        with (
+            mock.patch.object(pipeline, "_create_databricks_view") as databricks_view,
+            mock.patch.object(pipeline, "_create_trino_view") as trino_view,
+        ):
+            # Act
+            pipeline.run()
+
+            # Assert
+            databricks_view.assert_not_called()
+            trino_view.assert_called_once_with(
                 "SELECT * FROM source_table WHERE param = 'value1'"
             )
+            mock_spark_client.assert_not_called()
+
+    def test_get_query_for_target_returns_source_when_dialect_matches(
+        self, pipeline, mock_sqlglot
+    ):
+        # Arrange
+        formatted_query = "SELECT * FROM source_table"
+
+        # Act
+        result = pipeline._get_query_for_target(formatted_query, "databricks")
+
+        # Assert
+        assert result == formatted_query
+        mock_sqlglot.transpile.assert_not_called()
+
+    def test_get_query_for_target_transpiles_when_dialect_differs(
+        self, pipeline, mock_sqlglot
+    ):
+        # Arrange
+        formatted_query = "SELECT * FROM source_table"
+
+        # Act
+        result = pipeline._get_query_for_target(formatted_query, "trino")
+
+        # Assert
+        assert result == "SELECT * FROM source_table -- Trino version"
+        mock_sqlglot.transpile.assert_called_once_with(
+            formatted_query, read="databricks", write="trino"
+        )
 
     def test_create_databricks_database_success(
         self, pipeline, mock_loader_metastore_service
@@ -213,18 +276,17 @@ class TestQueryViewCreatorPipeline:
             # Assert
             mock_get_trino_client.assert_called_once()
             mock_create_schema.assert_called_once_with(mock_trino_client)
-            mock_sqlglot.transpile.assert_called_once_with(
-                formatted_query, read="databricks", write="trino"
-            )
+            mock_sqlglot.transpile.assert_not_called()
             mock_trino_client.run.assert_called_once()
             actual_sql = mock_trino_client.run.call_args[0][0]
             assert "CREATE OR REPLACE VIEW test_db.test_view AS" in actual_sql
+            assert formatted_query in actual_sql
 
-    def test_create_trino_view_failure(self, pipeline, mock_sqlglot):
+    def test_create_trino_view_failure(self, pipeline):
         # Arrange
         formatted_query = "SELECT * FROM source_table"
-        mock_sqlglot.transpile.side_effect = Exception("Transpilation failed")
         mock_trino_client = mock.MagicMock()
+        mock_trino_client.run.side_effect = Exception("Trino query failed")
 
         with (
             mock.patch.object(pipeline, "get_trino_client") as mock_get_trino_client,
@@ -233,8 +295,17 @@ class TestQueryViewCreatorPipeline:
             mock_get_trino_client.return_value = mock_trino_client
 
             # Act & Assert
-            with pytest.raises(Exception, match="Transpilation failed"):
+            with pytest.raises(Exception, match="Trino query failed"):
                 pipeline._create_trino_view(formatted_query)
+
+    def test_get_query_for_target_failure(self, pipeline, mock_sqlglot):
+        # Arrange
+        formatted_query = "SELECT * FROM source_table"
+        mock_sqlglot.transpile.side_effect = Exception("Transpilation failed")
+
+        # Act & Assert
+        with pytest.raises(Exception, match="Transpilation failed"):
+            pipeline._get_query_for_target(formatted_query, "trino")
 
     @mock.patch("bietlejuice.pipeline.query_view_creator_pipeline.UnityCatalogHelper")
     def test_run_applies_table_privileges_when_configured(
@@ -254,3 +325,26 @@ class TestQueryViewCreatorPipeline:
 
             # Assert
             mock_table_privileges.apply.assert_called_once()
+
+    @mock.patch("bietlejuice.pipeline.query_view_creator_pipeline.UnityCatalogHelper")
+    def test_run_does_not_apply_table_privileges_for_trino_only_view(
+        self, mock_unity_catalog
+    ):
+        # Arrange
+        pipeline = QueryViewCreatorPipeline(
+            database_name="test_db",
+            view_name="test_view",
+            layer="dw",
+            query="SELECT * FROM source_table",
+            table_privileges=mock.MagicMock(),
+            sync=["trino"],
+            sql_dialect="trino",
+        )
+
+        with mock.patch.object(pipeline, "_create_trino_view"):
+            # Act
+            pipeline.run()
+
+            # Assert
+            pipeline.table_privileges.apply.assert_not_called()
+            mock_unity_catalog.is_cluster_unity_catalog_enabled.assert_not_called()
