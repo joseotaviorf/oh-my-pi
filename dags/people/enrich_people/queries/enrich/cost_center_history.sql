@@ -1,10 +1,11 @@
 WITH
-base AS (
+-- Step 1: compute gapless periods from hr_organization + all_organization_units + codex_log only.
+-- assignment_responsibility (HRBP) is intentionally excluded from GREATEST/LEAST so that
+-- late HRBP assignments or gaps between consecutive HRBPs do not punch holes in coverage.
+core_periods_raw AS (
     SELECT
         a.cost_center_code,
         o.id_organization,
-        r.id_assignment AS sk_business_partner_assignment,
-        r.id_person AS sk_business_partner,
         o.name AS cost_center_name,
         c.business,
         c.product,
@@ -26,92 +27,232 @@ base AS (
         GREATEST(
             o.dt_effective_started,
             COALESCE(a.dt_effective_started, o.dt_effective_started),
-            COALESCE(c.dt_valid_from, o.dt_effective_started),
-            COALESCE(r.dt_started, o.dt_effective_started)
+            COALESCE(c.dt_valid_from, o.dt_effective_started)
         ) AS dt_valid_from,
         NULLIF(
             LEAST(
                 COALESCE(o.dt_effective_ended, DATE '4712-12-31'),
                 COALESCE(a.dt_effective_ended, DATE '4712-12-31'),
-                COALESCE(c.dt_valid_to, DATE '4712-12-31'),
-                COALESCE(r.dt_ended, DATE '4712-12-31')
+                COALESCE(c.dt_valid_to, DATE '4712-12-31')
             ),
             DATE '4712-12-31'
         ) AS dt_valid_to,
-        o.ts_created
+        o.ts_created,
+        ROW_NUMBER() OVER (
+            PARTITION BY
+                o.id_organization,
+                o.dt_effective_started,
+                COALESCE(a.dt_effective_started, o.dt_effective_started),
+                COALESCE(c.dt_valid_from, o.dt_effective_started)
+            ORDER BY
+                c.dt_valid_from DESC NULLS LAST,
+                c.dt_valid_to DESC NULLS LAST
+        ) AS rn
     FROM
         datalake_pin_core_clean.hr_organization AS o
     LEFT JOIN
         datalake_pin_core_clean.all_organization_units AS a
-        ON a.id_organization = o.id_organization
-        AND a.cost_center_code IS NOT NULL
-        AND o.dt_effective_started <= a.dt_effective_ended
-        AND (
-            a.dt_effective_ended IS NULL
-            OR a.dt_effective_ended >= o.dt_effective_started
-        )
+            ON a.id_organization = o.id_organization
+            AND a.cost_center_code IS NOT NULL
+            AND o.dt_effective_started <= a.dt_effective_ended
+            AND (
+                a.dt_effective_ended IS NULL
+                OR a.dt_effective_ended >= o.dt_effective_started
+            )
     LEFT JOIN
         datalake_people.codex_log AS c
-        ON a.cost_center_code = c.cost_center_code
-        AND c.dt_valid_from <= LEAST(
-            COALESCE(o.dt_effective_ended, DATE '4712-12-31'),
-            COALESCE(a.dt_effective_ended, DATE '4712-12-31')
-        )
-        AND (
-            c.dt_valid_to IS NULL
-            OR c.dt_valid_to >= GREATEST(
-                o.dt_effective_started,
-                COALESCE(a.dt_effective_started, o.dt_effective_started)
+            ON a.cost_center_code = c.cost_center_code
+            AND c.dt_valid_from <= LEAST(
+                COALESCE(o.dt_effective_ended, DATE '4712-12-31'),
+                COALESCE(a.dt_effective_ended, DATE '4712-12-31')
             )
-        )
-    LEFT JOIN
-        datalake_pin_core_clean.assignment_responsibility AS r
-        ON r.id_organization = o.id_organization
-        AND r.id_template IS NOT NULL
-        AND r.dt_started <= LEAST(
-            COALESCE(o.dt_effective_ended, DATE '4712-12-31'),
-            COALESCE(a.dt_effective_ended, DATE '4712-12-31'),
-            COALESCE(c.dt_valid_to, DATE '4712-12-31')
-        )
-        AND (
-            r.dt_ended IS NULL
-            OR r.dt_ended >= GREATEST(
-                o.dt_effective_started,
-                COALESCE(a.dt_effective_started, o.dt_effective_started),
-                COALESCE(c.dt_valid_from, o.dt_effective_started)
+            AND (
+                c.dt_valid_to IS NULL
+                OR c.dt_valid_to >= GREATEST(
+                    o.dt_effective_started,
+                    COALESCE(a.dt_effective_started, o.dt_effective_started)
+                )
             )
-        )
     WHERE
         o.classification_code = 'DEPARTMENT'
         AND a.cost_center_code IS NOT NULL
         AND GREATEST(
             o.dt_effective_started,
             COALESCE(a.dt_effective_started, o.dt_effective_started),
-            COALESCE(c.dt_valid_from, o.dt_effective_started),
-            COALESCE(r.dt_started, o.dt_effective_started)
+            COALESCE(c.dt_valid_from, o.dt_effective_started)
         ) <= LEAST(
             COALESCE(o.dt_effective_ended, DATE '4712-12-31'),
             COALESCE(a.dt_effective_ended, DATE '4712-12-31'),
-            COALESCE(c.dt_valid_to, DATE '4712-12-31'),
-            COALESCE(r.dt_ended, DATE '4712-12-31')
+            COALESCE(c.dt_valid_to, DATE '4712-12-31')
         )
-    QUALIFY
+),
+core_periods AS (
+    SELECT
+        cost_center_code,
+        id_organization,
+        cost_center_name,
+        business,
+        product,
+        brand,
+        vertical,
+        structure,
+        team,
+        chapter,
+        line,
+        owner_l1_name,
+        owner_l2_name,
+        owner_l3_name,
+        headcount_type,
+        is_active,
+        dt_dff_effective_started,
+        dt_valid_from,
+        dt_valid_to,
+        ts_created
+    FROM
+        core_periods_raw
+    WHERE
+        rn = 1
+),
+-- Step 2: enforce single-active-HRBP-per-org invariant. When a new HRBP starts without the
+-- previous one being explicitly closed, auto-close the previous at new_start - 1. This prevents
+-- the LEFT JOIN in `base` from returning two rows for the same boundary date, which would make
+-- the LEAD computation non-deterministic and produce inverted periods (dt_valid_to < dt_valid_from).
+normalized_hrbp AS (
+    SELECT
+        id_organization,
+        id_assignment,
+        id_person,
+        id_template,
+        dt_started,
+        LEAST(
+            dt_ended,
+            LEAD(dt_started) OVER (
+                PARTITION BY id_organization
+                ORDER BY dt_started
+            ) - 1
+        ) AS dt_ended
+    FROM
+        datalake_pin_core_clean.assignment_responsibility
+    WHERE
+        id_template IS NOT NULL
+),
+-- Step 3: collect every date boundary that HRBP transitions introduce within each core period.
+-- This produces the split points used to generate HRBP-aware sub-periods in the next CTE.
+all_boundaries AS (
+    -- Core period start is always a boundary
+    SELECT
+        cp.id_organization,
+        cp.dt_valid_from AS boundary_date,
+        cp.dt_valid_from AS core_dt_valid_from,
+        COALESCE(cp.dt_valid_to, DATE '9999-12-31') AS core_dt_valid_to
+    FROM
+        core_periods AS cp
+    UNION
+    -- HRBP start date, clamped to the core period start (in case HRBP predates the core period)
+    SELECT
+        cp.id_organization,
+        GREATEST(r.dt_started, cp.dt_valid_from) AS boundary_date,
+        cp.dt_valid_from AS core_dt_valid_from,
+        COALESCE(cp.dt_valid_to, DATE '9999-12-31') AS core_dt_valid_to
+    FROM
+        core_periods AS cp
+    INNER JOIN
+        normalized_hrbp AS r
+            ON r.id_organization = cp.id_organization
+            AND r.dt_started <= COALESCE(cp.dt_valid_to, DATE '9999-12-31')
+            AND COALESCE(r.dt_ended, DATE '9999-12-31') >= cp.dt_valid_from
+    UNION
+    -- Day after HRBP ends — opens the sub-period with no HRBP (or the next HRBP)
+    SELECT
+        cp.id_organization,
+        r.dt_ended + 1 AS boundary_date,
+        cp.dt_valid_from AS core_dt_valid_from,
+        COALESCE(cp.dt_valid_to, DATE '9999-12-31') AS core_dt_valid_to
+    FROM
+        core_periods AS cp
+    INNER JOIN
+        normalized_hrbp AS r
+            ON r.id_organization = cp.id_organization
+            AND r.dt_ended IS NOT NULL
+            AND r.dt_ended + 1 <= COALESCE(cp.dt_valid_to, DATE '9999-12-31')
+            AND r.dt_ended >= cp.dt_valid_from
+),
+-- Step 4: generate sub-periods between consecutive boundaries within each core period,
+-- then join HRBP as an attribute (nullable) for each sub-period.
+base_raw AS (
+    SELECT
+        cp.cost_center_code,
+        cp.id_organization,
+        r.id_assignment AS sk_business_partner_assignment,
+        r.id_person AS sk_business_partner,
+        cp.cost_center_name,
+        cp.business,
+        cp.product,
+        cp.brand,
+        cp.vertical,
+        cp.structure,
+        cp.team,
+        cp.chapter,
+        cp.line,
+        cp.owner_l1_name,
+        cp.owner_l2_name,
+        cp.owner_l3_name,
+        cp.headcount_type,
+        cp.is_active,
+        cp.dt_dff_effective_started,
+        ab.boundary_date AS dt_valid_from,
+        COALESCE(
+            LEAD(ab.boundary_date) OVER (
+                PARTITION BY ab.id_organization, ab.core_dt_valid_from
+                ORDER BY ab.boundary_date
+            ) - 1,
+            ab.core_dt_valid_to
+        ) AS dt_valid_to,
+        cp.ts_created,
         ROW_NUMBER() OVER (
-            PARTITION BY
-                o.id_organization,
-                o.dt_effective_started,
-                COALESCE(
-                    a.dt_effective_started,
-                    o.dt_effective_started
-                ),
-                COALESCE(
-                    c.dt_valid_from,
-                    o.dt_effective_started
-                )
-            ORDER BY
-                r.dt_started DESC NULLS LAST,
-                r.id_assignment
-        ) = 1
+            PARTITION BY ab.id_organization, ab.core_dt_valid_from, ab.boundary_date
+            ORDER BY r.dt_started DESC NULLS LAST, r.id_assignment
+        ) AS rn
+    FROM
+        all_boundaries AS ab
+    INNER JOIN
+        core_periods AS cp
+            ON cp.id_organization = ab.id_organization
+            AND cp.dt_valid_from = ab.core_dt_valid_from
+    LEFT JOIN
+        normalized_hrbp AS r
+            ON r.id_organization = ab.id_organization
+            AND r.dt_started <= ab.boundary_date
+            AND COALESCE(r.dt_ended, DATE '9999-12-31') >= ab.boundary_date
+),
+base AS (
+    SELECT
+        cost_center_code,
+        id_organization,
+        sk_business_partner_assignment,
+        sk_business_partner,
+        cost_center_name,
+        business,
+        product,
+        brand,
+        vertical,
+        structure,
+        team,
+        chapter,
+        line,
+        owner_l1_name,
+        owner_l2_name,
+        owner_l3_name,
+        headcount_type,
+        is_active,
+        dt_dff_effective_started,
+        dt_valid_from,
+        dt_valid_to,
+        ts_created
+    FROM
+        base_raw
+    WHERE
+        rn = 1
 ),
 base_with_primary AS (
     SELECT
