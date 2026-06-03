@@ -9,7 +9,6 @@ from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
     _mapped_worker_and_driver,
     build_consolidation_catalog,
     build_validation_cluster_spec,
-    cap_validation_driver_node_type,
     compute_validation_overrides,
     is_single_node_cluster,
     map_instance_type_to_graviton,
@@ -69,6 +68,18 @@ class TestMapInstanceTypeToGraviton:
         assert map_instance_type_to_graviton("r5.12xlarge") == "r6g.12xlarge"
         assert map_instance_type_to_graviton("m5a.8xlarge") == "m6g.8xlarge"
 
+    def test_memory_fleet_passes_through_to_r6g(self):
+        assert map_instance_type_to_graviton("r-fleet.4xlarge") == "r6g.4xlarge"
+
+    def test_compute_fleet_passes_through_to_c6g(self):
+        assert map_instance_type_to_graviton("c-fleet.2xlarge") == "c6g.2xlarge"
+
+    def test_valid_graviton_sizes_pass_through_unchanged(self):
+        assert map_instance_type_to_graviton("m5.16xlarge") == "m6g.16xlarge"
+        assert map_instance_type_to_graviton("r5a.metal") == "r6g.metal"
+        assert map_instance_type_to_graviton("m5a.medium") == "m6g.medium"
+        assert size_tier_from_instance_type("m6g.16xlarge") == "xl"
+
     def test_photon_maps_to_nvme_graviton_family(self):
         assert (
             map_instance_type_to_graviton("m5d.xlarge", use_nvme=True) == "m6gd.xlarge"
@@ -126,7 +137,7 @@ class TestMatchConsolidationPreset:
         assert matched is not None
         assert matched.name == "consolidation_xs_general_cluster"
 
-    def test_rfleet_pool_preset_defaults_to_xlarge(self, catalog):
+    def test_rfleet_pool_preset_preserves_memory_family(self, catalog):
         service = ConfigurationService()
         effective = service.get_config("databricks_16_4_rfleet_instance_cluster")
         matched = match_consolidation_preset(
@@ -135,7 +146,8 @@ class TestMatchConsolidationPreset:
             catalog=catalog,
         )
         assert matched is not None
-        assert matched.name == "consolidation_s_general_cluster"
+        assert matched.name == "consolidation_s_memory_cluster"
+        assert matched.node_type_id == "r6g.xlarge"
 
     def test_prod_consolidation_m_memory_skips_when_only_match(self, catalog):
         service = ConfigurationService()
@@ -193,7 +205,7 @@ class TestComputeValidationOverrides:
         )
         assert "num_workers" not in overrides
 
-    def test_caps_oversized_validation_driver(self):
+    def test_emits_uncapped_oversized_driver(self):
         overrides = compute_validation_overrides(
             effective_prod={},
             mapped_worker="r6g.2xlarge",
@@ -203,7 +215,7 @@ class TestComputeValidationOverrides:
                 "driver_node_type_id": "r6g.2xlarge",
             },
         )
-        assert "driver_node_type_id" not in overrides
+        assert overrides["driver_node_type_id"] == "r6g.4xlarge"
 
     def test_emits_people_instance_profile_arn_override(self):
         overrides = compute_validation_overrides(
@@ -267,10 +279,6 @@ class TestComputeValidationOverrides:
         )
         assert "aws_attributes" not in overrides
 
-    def test_cap_validation_driver_node_type_helper(self):
-        assert cap_validation_driver_node_type("r6g.4xlarge") == "r6g.2xlarge"
-        assert cap_validation_driver_node_type("r6g.2xlarge") == "r6g.2xlarge"
-
     def test_mapped_worker_and_driver_prefers_master_node_type_id(self):
         effective_prod = {
             "node_type_id": "m7g.2xlarge",
@@ -283,6 +291,28 @@ class TestComputeValidationOverrides:
         )
         assert mapped_worker == "m6g.2xlarge"
         assert mapped_driver == "m6g.xlarge"
+
+    def test_mapped_worker_and_driver_keeps_large_driver_uncapped(self):
+        effective_prod = {
+            "node_type_id": "r5a.xlarge",
+            "driver_node_type_id": "r5a.8xlarge",
+            "num_workers": 4,
+            "spark_version": "16.4.x-scala2.12",
+        }
+        mapped_worker, mapped_driver = _mapped_worker_and_driver(
+            effective_prod, "custom_cluster"
+        )
+        assert mapped_worker == "r6g.xlarge"
+        assert mapped_driver == "r6g.8xlarge"
+
+    def test_mapped_worker_rfleet_pool_resolves_to_memory(self):
+        service = ConfigurationService()
+        effective = service.get_config("databricks_16_4_rfleet_instance_cluster")
+        mapped_worker, mapped_driver = _mapped_worker_and_driver(
+            effective, "databricks_16_4_rfleet_instance_cluster"
+        )
+        assert mapped_worker == "r6g.xlarge"
+        assert mapped_driver == "r6g.xlarge"
 
     def test_emr_preset_uses_master_node_type_id(self):
         resolved = ConfigurationService().get_config(

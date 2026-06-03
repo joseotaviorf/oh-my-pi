@@ -45,6 +45,7 @@ SKIP_CLUSTER_PREFIXES = ("emr_",)
 CLUSTER_VALIDATION_EXCLUDED_DAGS = frozenset({"reverse_kyc"})
 
 INSTANCE_SUFFIX_TO_TIER = {
+    "medium": "xs",
     "large": "xs",
     "xlarge": "s",
     "2xlarge": "m",
@@ -52,6 +53,8 @@ INSTANCE_SUFFIX_TO_TIER = {
     "8xlarge": "xl",
     "9xlarge": "xl",
     "12xlarge": "xl",
+    "16xlarge": "xl",
+    "metal": "xl",
 }
 
 # Valid Graviton2 gen-6 sizes (shared by m6g/r6g/c6g and m6gd/r6gd/c6gd).
@@ -101,8 +104,31 @@ CONSOLIDATION_PRESET_NAMES_RE = re.compile(
 )
 
 GENERAL_PREFIXES = ("m-fleet", "m5", "m5a", "m5d", "m6g", "m6i", "m7a", "m7g", "m7i")
-MEMORY_PREFIXES = ("r4", "r5", "r5a", "r5d", "r6g", "r6i", "r7a", "r7g", "r7i")
-COMPUTE_PREFIXES = ("c5", "c5a", "c5n", "c6g", "c6i", "c7i")
+MEMORY_PREFIXES = (
+    "r-fleet",
+    "r4",
+    "r5",
+    "r5a",
+    "r5d",
+    "r6g",
+    "r6i",
+    "r7a",
+    "r7g",
+    "r7i",
+)
+COMPUTE_PREFIXES = ("c-fleet", "c5", "c5a", "c5n", "c6g", "c6i", "c7i")
+
+# Size tokens scanned (longest-first) when a fleet cluster exposes no explicit
+# node_type_id; the fleet pools default to xlarge when no token is present.
+_FLEET_SIZE_SUFFIXES = (
+    "16xlarge",
+    "12xlarge",
+    "8xlarge",
+    "4xlarge",
+    "2xlarge",
+    "xlarge",
+    "large",
+)
 
 
 @dataclass(frozen=True)
@@ -185,22 +211,6 @@ def _instance_size_suffix(instance_type: str) -> str:
     if suffix not in INSTANCE_SUFFIX_TO_TIER:
         raise ValueError(f"Unrecognized instance size suffix: {suffix!r}")
     return suffix
-
-
-VALIDATION_DRIVER_OVERSIZED_SUFFIXES = frozenset(
-    {"4xlarge", "8xlarge", "12xlarge", "16xlarge", "metal"}
-)
-
-
-def cap_validation_driver_node_type(node_type_id: Optional[str]) -> Optional[str]:
-    """Cap validation driver to 2xlarge (64 GiB) for smoke-test cost and fleet limits."""
-    if not node_type_id:
-        return node_type_id
-    suffix = _instance_size_suffix(node_type_id)
-    if suffix not in VALIDATION_DRIVER_OVERSIZED_SUFFIXES:
-        return node_type_id
-    prefix = node_type_id.rsplit(".", 1)[0]
-    return f"{prefix}.2xlarge"
 
 
 def _graviton_suffix_for_instance_type(instance_type: str) -> str:
@@ -443,25 +453,36 @@ def _presets_matching_worker_topology(
 
 
 def _infer_logical_instance_type(effective_prod: dict, prod_cluster_type: str) -> str:
-    """Resolve worker instance type when prod uses pools instead of node_type_id."""
+    """Resolve worker instance type when prod uses pools instead of node_type_id.
+
+    Fleet pools carry no node_type_id, so the family (m/r/c) and size are recovered
+    from the preset name and pool identifiers, preserving the prod family 1:1.
+    """
     worker = effective_prod.get("node_type_id")
     if worker:
         return str(worker)
-
-    preset_lower = prod_cluster_type.lower()
-    if "rfleet" in preset_lower or "fleet" in preset_lower:
-        for suffix in ("8xlarge", "4xlarge", "2xlarge", "xlarge", "large"):
-            if suffix in preset_lower:
-                return f"m-fleet.{suffix}"
-        return "m-fleet.xlarge"
 
     pool_keys = (
         effective_prod.get("instance_pool_id"),
         effective_prod.get("driver_instance_pool_id"),
     )
-    pool_blob = " ".join(str(value) for value in pool_keys if value).lower()
-    if "rfleet_xlarge" in pool_blob or "fleet_xlarge" in pool_blob:
-        return "m-fleet.xlarge"
+    pool_blob = " ".join(str(value) for value in pool_keys if value)
+    blob = f"{prod_cluster_type} {pool_blob}".lower()
+
+    if "fleet" in blob:
+        compact = blob.replace("-", "")
+        if "rfleet" in compact:
+            fleet_prefix = "r-fleet"
+        elif "cfleet" in compact:
+            fleet_prefix = "c-fleet"
+        else:
+            fleet_prefix = "m-fleet"
+        size = "xlarge"
+        for suffix in _FLEET_SIZE_SUFFIXES:
+            if suffix in blob:
+                size = suffix
+                break
+        return f"{fleet_prefix}.{size}"
 
     raise ValueError(
         f"Effective prod cluster for {prod_cluster_type!r} has no node_type_id "
@@ -702,9 +723,8 @@ def compute_validation_overrides(
 
     if not _values_equal(mapped_worker, preset_worker):
         overrides["node_type_id"] = mapped_worker
-    capped_driver = cap_validation_driver_node_type(mapped_driver)
-    if capped_driver and not _values_equal(capped_driver, preset_driver):
-        overrides["driver_node_type_id"] = capped_driver
+    if mapped_driver and not _values_equal(mapped_driver, preset_driver):
+        overrides["driver_node_type_id"] = mapped_driver
 
     if _uses_photon(effective_prod, prod_cluster_type) and not _values_equal(
         "PHOTON", validation_resolved.get("runtime_engine")
