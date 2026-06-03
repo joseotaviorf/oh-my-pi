@@ -229,14 +229,6 @@ columns:
       The volume of active contracts signed per user. It considers only events of
       type equal to 9, indicating that the contract has been signed by the user, and
       the contract status must be equal to "Ativo"
-  total_onboarding_active_contracts:
-    description:
-      Amount of active contracts in the onboarding journey. Same rule as total_active_contracts,
-      but the contract must have been signed in the last 40 days
-  total_ongoing_active_contracts:
-    description:
-      Amount of active contracts in the ongoing journey. Same rule as total_active_contracts,
-      but the contract must have been signed for more than 40 days
   total_finished_contracts:
     description:
       The volume of finished contracts that have been signed per user. It considers
@@ -356,10 +348,10 @@ columns:
       events of type equal to 4, indicating that an offer has been approved
   ts_last_booking_canceled:
     lineage:
-      - datalake_booking.booking.ts_first_canceled
+      - datalake_visit.visit_schedule.ts_schedule_canceled
     description:
-      The timestamp of the user's most recent booking canceled. It considers only events
-      of type equal to 1, indicating that a booking has been created, and the booking
+      The timestamp of the user's most recent schedule canceled. It considers only events
+      of type equal to 1, indicating that a schedule has been created, and the schedule
       status should be equal to "Cancelado"
   ts_last_visiting:
     lineage:

@@ -75,7 +75,7 @@ tenant_events_timestamp AS (
     rde.id_proposal,
     rde.id_contract,
     tm.id AS id_termination,
-    bk.status AS booking_status,
+    vs.is_canceled AS is_schedule_canceled,
     r.status AS reservation_status,
     off.status AS offer_status,
     rp.status AS proposal_status,
@@ -85,7 +85,7 @@ tenant_events_timestamp AS (
       PARTITION BY rde.id_tenant_prospect, rde.id_event_type
       ORDER BY ts_event DESC
     ) AS order_event,
-    bk.ts_first_canceled AS ts_booking_canceled,
+    vs.ts_schedule_canceled,
     off.ts_analyzed AS ts_offer_rejected,
     r.ts_created AS ts_reservation_created,
     rp.ts_revision AS ts_proposal_rejected,
@@ -105,8 +105,8 @@ tenant_events_timestamp AS (
       ON ct.id = rde.id_contract
       AND ct.status IN ('Ativo', 'Finalizado')
   LEFT JOIN
-    datalake_booking.booking AS bk
-      ON bk.id = rde.id_booking
+    datalake_visit.visit_schedules AS vs
+      ON vs.id_schedule = rde.id_booking
   LEFT JOIN
     datalake_offer.offer AS off
       ON off.id_offer_context = rde.id_offer
@@ -156,8 +156,7 @@ tenant_journey_agg AS (
     MIN(
       CASE
         WHEN tet.id_event_type = 1
-          AND tet.booking_status = 'Cancelado'
-          AND tet.ts_booking_canceled IS NOT NULL THEN DATEDIFF(DATE('{year}-{month}-{day}'), tet.ts_booking_canceled)
+          AND tet.is_schedule_canceled THEN DATEDIFF(DATE('{year}-{month}-{day}'), tet.ts_schedule_canceled)
       END
     ) AS total_days_since_last_canceled_booking,
     MAX(
@@ -249,7 +248,7 @@ tenant_journey_agg AS (
       DISTINCT
         CASE
           WHEN tet.id_event_type = 1
-            AND tet.booking_status = 'Cancelado' THEN tet.id_booking
+            AND tet.is_schedule_canceled THEN tet.id_booking
         END
     ) AS total_canceled_bookings,
     COUNT(
@@ -447,7 +446,7 @@ tenant_journey_agg AS (
     MAX(
       CASE
         WHEN tet.id_event_type = 1
-          AND tet.booking_status = 'Cancelado' THEN tet.ts_booking_canceled
+          AND tet.is_schedule_canceled THEN tet.ts_schedule_canceled
       END
     ) AS ts_last_booking_canceled,
     MAX(

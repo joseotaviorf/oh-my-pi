@@ -116,14 +116,14 @@ landlord_events_timestamp AS (
     rde.id_proposal,
     rde.id_contract,
     tm.id AS id_termination,
-    bk.status AS booking_status,
+    vs.is_canceled AS is_schedule_canceled,
     r.status AS reservation_status,
     off.status AS offer_status,
     rp.status AS proposal_status,
     ct.status AS contract_status,
     tm.status AS termination_status,
     ROW_NUMBER() OVER(PARTITION BY rde.id_owner, rde.id_event_type ORDER BY ts_event DESC) AS order_event,
-    bk.ts_first_canceled AS ts_booking_canceled,
+    vs.ts_schedule_canceled,
     off.ts_analyzed AS ts_offer_rejected,
     r.ts_created AS ts_reservation_created,
     rp.ts_revision AS ts_proposal_rejected,
@@ -141,8 +141,8 @@ landlord_events_timestamp AS (
       ON ct.id = rde.id_contract
       AND ct.status IN ('Ativo', 'Finalizado')
   LEFT JOIN
-    datalake_booking.booking AS bk
-      ON bk.id = rde.id_booking
+    datalake_visit.visit_schedules AS vs
+      ON vs.id_schedule = rde.id_booking
   LEFT JOIN
     datalake_offer.offer AS off
       ON off.id_offer_context = rde.id_offer
@@ -184,7 +184,7 @@ landlord_journey_agg AS (
     ) AS total_days_since_last_reservation_created,
     MIN(
       CASE
-        WHEN let.id_event_type = 1 AND let.booking_status = 'Cancelado' AND let.ts_booking_canceled IS NOT NULL THEN DATEDIFF(DATE('{year}-{month}-{day}'), let.ts_booking_canceled)
+        WHEN let.id_event_type = 1 AND let.is_schedule_canceled THEN DATEDIFF(DATE('{year}-{month}-{day}'), let.ts_schedule_canceled)
       END
     ) AS total_days_since_last_canceled_booking,
     MAX(
@@ -268,7 +268,7 @@ landlord_journey_agg AS (
     COUNT(
       DISTINCT
         CASE
-          WHEN let.id_event_type = 1 AND let.booking_status = 'Cancelado' THEN let.id_booking
+          WHEN let.id_event_type = 1 AND let.is_schedule_canceled THEN let.id_booking
         END
     ) AS total_canceled_bookings,
     COUNT(
@@ -466,7 +466,7 @@ landlord_journey_agg AS (
     ) AS ts_last_reservation,
     MAX(
       CASE
-        WHEN let.id_event_type = 1 AND let.booking_status = 'Cancelado' THEN let.ts_booking_canceled
+        WHEN let.id_event_type = 1 AND let.is_schedule_canceled THEN let.ts_schedule_canceled
       END
     ) AS ts_last_booking_canceled,
     MAX(
