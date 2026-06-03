@@ -1,24 +1,58 @@
-WITH concierge_direct_vb_code AS (
-    -- This CTE retrieves the visit code from the Langfuse traces (messages exchanged between user and concierge) that evoked schedule_visit_node. This node confirms the schedule/reschedule of a visit.
+WITH recent_concierge_messages AS (
+    SELECT
+        id_phone_session,
+        id_langfuse_session,
+        concierge_flow_type,
+        ts_concierge_contact,
+        ts_message_sent
+    FROM datalake_search.concierge_messages
+    WHERE MAKE_DATE(year, month, day) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+),
+
+langfuse_traces AS (
+    SELECT
+        id_trace,
+        id_session
+    FROM datalake_langfuse_clean.traces
+    WHERE DATE(ts_created) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+),
+
+langfuse_observations AS (
+    SELECT
+        id_trace,
+        REGEXP_EXTRACT(GET_JSON_OBJECT(output, '$.answer'), 'Visit code ([A-Z0-9]+)', 1) AS visit_code
+    FROM datalake_langfuse_clean.observations
+    WHERE name IN ('schedule_visit_node', 'schedule_visit_v1')
+        AND DATE(ts_started) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+),
+
+request_logs AS (
+    SELECT
+        id_trace,
+        visit_code
+    FROM datalake_request_logging_clean.visits
+    WHERE DATE(ts_request) BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
+),
+
+concierge_direct_vb_code AS (
+    -- This CTE retrieves the visit code from the Langfuse traces (messages exchanged between user and concierge) that evoked schedule_visit_node. This node confirms the schedule/reschedule of a visit. With introduction of app 1.5, the visit_code are migrated to the request logging table.
     SELECT DISTINCT
         c.id_phone_session,
         c.concierge_flow_type,
         c.ts_concierge_contact,
         c.ts_message_sent,
-        COALESCE(v.visit_code, regexp_extract(get_json_object(o.output, '$.answer'), 'Visit code ([A-Z0-9]+)', 1)) as visit_code
-    FROM datalake_search.concierge_messages AS c
-    INNER JOIN datalake_langfuse_clean.traces AS t
+        COALESCE(v.visit_code, o.visit_code) AS visit_code
+    FROM recent_concierge_messages AS c
+    INNER JOIN langfuse_traces AS t
         ON c.id_langfuse_session = t.id_session
-    INNER JOIN datalake_langfuse_clean.observations AS o
+    INNER JOIN langfuse_observations AS o
         ON t.id_trace = o.id_trace
-    LEFT JOIN datalake_request_logging_clean.visits as v
+    LEFT JOIN request_logs AS v
         ON o.id_trace = v.id_trace
-    WHERE o.name in('schedule_visit_node', 'schedule_visit_v1')
-        AND c.ts_concierge_contact BETWEEN DATE_SUB(DATE('{start_date}'), {days_past_30}) AND DATE('{end_date}')
 )
 
 SELECT
-    -- This query gets all the schedules/reschedules of the visits through the concierge from the visit_status_log table. Then it joins to concierge_messages to map the visit to the type of concierge flow (inbound/outbound).
+    -- This query gets all the schedules/reschedules of the visits through the concierge from the visit_status_events table. Then it joins to concierge_messages to map the visit to the type of concierge flow (inbound/outbound).
     fv.sk_visitor AS id_user,
     fv.sk_house AS id_house,
     dv.id_visit,
