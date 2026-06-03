@@ -4,15 +4,12 @@
 from __future__ import annotations
 
 import argparse
-import os
 import subprocess
 import sys
 from pathlib import Path
 from typing import List, Optional
 
-REPO_ROOT = Path(
-    os.environ.get("BI_ETL_REPO_ROOT", Path(__file__).resolve().parents[4])
-)
+REPO_ROOT = Path(__file__).resolve().parents[4]
 LIST_SCRIPT = (
     REPO_ROOT
     / "packages/bietlejuice-compiler/scripts/validation/list_validation_spark_jobs.py"
@@ -35,7 +32,7 @@ _JOB_PATHS = [
 def test_spark_job_registers_validation_write_flags(job_path: str):
     text = (_REPO_ROOT / job_path).read_text(encoding="utf-8")
     assert "add_validation_target_args" in text or "--target-database-name" in text
-    assert "resolve_datalake_write_target(" in text
+    assert "resolve_datalake_write_target" in text
 '''
 
 
@@ -76,7 +73,7 @@ def _patched_jobs_under_line(line: str) -> List[str]:
         if path.name.startswith("test_"):
             continue
         text = path.read_text(encoding="utf-8")
-        if "resolve_datalake_write_target(" in text and (
+        if "resolve_datalake_write_target" in text and (
             "add_validation_target_args" in text or "--target-database-name" in text
         ):
             paths.append(path.relative_to(REPO_ROOT).as_posix())
@@ -102,7 +99,7 @@ def generate(line: str, ref: str, *, use_disk: bool = True) -> str:
     if not paths:
         paths = _inventory(ref, line)
 
-    job_lines = "\n".join(f'    "{p}",' for p in paths)
+    job_lines = ",\n".join(f'    "{p}",' for p in paths)
     return TEST_TEMPLATE.format(line=line, job_paths=job_lines)
 
 

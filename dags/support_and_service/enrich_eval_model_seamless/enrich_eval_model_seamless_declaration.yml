@@ -24,11 +24,3 @@ workflow:
     eval_model_seamless_offboarding:
       z_order_by: [id_contract, id_request, ts_created, tipo_ticket]
 
-cluster:
-  type: databricks_16_4_med_2xlarge_general_cluster
-  databricks_conn_id: databricks_new_env
-  custom_configurations:
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

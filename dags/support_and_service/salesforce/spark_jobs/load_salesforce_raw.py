@@ -15,6 +15,10 @@ from bietlejuice.base.spark import (
     BaseDBUtils,
     SparkTableStorageFormat,
 )
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.pipeline import IncrementalTableLoaderPipeline
 from bietlejuice.services.metastore_services import SparkMetastoreService
@@ -44,6 +48,7 @@ def parse_arguments():
     parser.add_argument("query")
     parser.add_argument("source_partition_column")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     environment = args.env
@@ -70,6 +75,8 @@ def parse_arguments():
         prod_endpoint,
         query,
         source_partition_column,
+        args.target_database_name,
+        args.target_table_name,
     )
 
 
@@ -1037,6 +1044,8 @@ def main():
         prod_endpoint,
         query,
         source_partition_column,
+        target_database_name,
+        target_table_name,
     ) = parse_arguments()
 
     load_start_timstamp = f"{load_start_date}T00:00:00.000000Z"
@@ -1059,10 +1068,20 @@ def main():
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
     spark_metastore_service = SparkMetastoreService(spark_client)
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(write_database_name)
 
     is_done = False
     next_url = None
@@ -1086,9 +1105,9 @@ def main():
             unioned_df = unioned_df.unionByName(df, allowMissingColumns=True)
 
     IncrementalTableLoaderPipeline(
-        database_name=database_name,
-        table_name=table_name,
-        database_location=database_location,
+        database_name=write_database_name,
+        table_name=write_table_name,
+        database_location=write_location,
         layer=LayerEnum.RAW,
         query=None,
         partitions=partitions,

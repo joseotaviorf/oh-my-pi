@@ -10,6 +10,10 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -33,6 +37,8 @@ def _parse_arguments():
     parser.add_argument("execution_date")
     parser.add_argument("table_name")
     parser.add_argument("partition_cols")
+
+    add_validation_target_args(parser)
 
     return parser.parse_args()
 
@@ -59,7 +65,7 @@ def _load_partitions_into_datalake(hour):
 
     s3_loader.load_df(
         df=df,
-        s3_path=f"{database_location}{args.table_name}",
+        s3_path=f"{database_location}{datalake_table_name}",
         format_options=format_options,
         partitions=partition_cols,
         compression="gzip",
@@ -68,7 +74,7 @@ def _load_partitions_into_datalake(hour):
     spark_metastore_loader.update_metastore(
         df=df,
         database_name=database_name,
-        table_name=args.table_name,
+        table_name=datalake_table_name,
         format_options=format_options,
         database_location=database_location,
         partitions=partition_cols,
@@ -78,7 +84,7 @@ def _load_partitions_into_datalake(hour):
     spark_metastore_service.create_new_partitions_from_df(
         df=df,
         database_name=database_name,
-        table_name=args.table_name,
+        table_name=datalake_table_name,
         partition_cols=partition_cols,
     )
 
@@ -108,11 +114,24 @@ if __name__ == "__main__":
     )
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=args.table_name,
+            prod_location=database_location,
+            bucket=args.datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
     spark_metastore_service = SparkMetastoreService(spark_client)
-    spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(write_database_name)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
+    database_name = write_database_name
+    database_location = write_location
+    datalake_table_name = write_table_name
 
     base_dbutils = BaseDBUtils()
     if base_dbutils.get_dbutils() is not None:

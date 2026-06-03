@@ -30,6 +30,3 @@ workflow:
       partitions: [year, month, day]
       extraction_type: incremental
     workgroups: {}
-cluster:
-  type: consolidation_s_memory_cluster
-  databricks_conn_id: databricks_new

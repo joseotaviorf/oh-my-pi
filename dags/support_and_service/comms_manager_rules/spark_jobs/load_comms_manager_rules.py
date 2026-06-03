@@ -13,7 +13,12 @@ from argparse import ArgumentParser
 
 from pyspark.sql.functions import col, dayofmonth, explode, month, to_timestamp, year
 
+from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat, spark
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.loaders.s3_loader import S3Loader
 
 # Job configuration
@@ -358,6 +363,8 @@ def parse_arguments():
     )
     parser.add_argument("execution_date", help="Execution date in YYYY-MM-DD format")
 
+    add_validation_target_args(parser)
+
     return parser.parse_args()
 
 
@@ -423,8 +430,27 @@ def main():
         # Process the communication rules using the modular pipeline
         processed_df = process_communication_rules(latest_file_path)
 
+        db_info = DatalakeMetastoreService.get_db_info(
+            environment, schema, datalake_bucket
+        )
+        write_database_name, write_table_name, write_location = (
+            resolve_datalake_write_target(
+                prod_database=db_info["db_raw_databricks"],
+                prod_table=table_name,
+                prod_location=db_info["db_raw_path"],
+                bucket=datalake_bucket,
+                target_database=args.target_database_name,
+                target_table=args.target_table_name,
+            )
+        )
+        logging.info(
+            "Validation write target: %s.%s",
+            write_database_name,
+            write_table_name,
+        )
+
         # Write the processed data using S3Loader (same pattern as amplitude_new)
-        output_path = f"s3://{datalake_bucket}/raw/{schema}/{table_name}"
+        output_path = f"{write_location}{write_table_name}"
         write_dataframe_with_s3_loader(processed_df, output_path, partitions)
 
         # Show the schema for verification

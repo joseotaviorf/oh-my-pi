@@ -1,0 +1,3 @@
+cluster:
+  type: databricks_16_4_min_memory_cluster
+  databricks_conn_id: databricks_new_env

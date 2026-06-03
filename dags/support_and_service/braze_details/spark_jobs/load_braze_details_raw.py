@@ -8,6 +8,10 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.api.api_enum import APIEnum
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat, sc
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -86,6 +90,7 @@ if __name__ == "__main__":
     parser.add_argument("source")
     parser.add_argument("app_group")
     parser.add_argument("identifier")
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     environment = args.environment
@@ -114,18 +119,28 @@ if __name__ == "__main__":
     file_type = SparkTableStorageFormat.DEFAULT_RAW
     filesystem_path = datalake_info["db_raw_path"]
     database_name = datalake_info["db_raw_databricks"]
-    spark_metastore_service.create_database(database_name)
 
     api_token = dbutils.secrets.get(
         scope="quintoandar", key=getattr(APIEnum, f"BRAZE_{app_group.upper()}")
     )
     instance = "US-03"
     endpoint = "details"
+    table_name = f"{identifier}_{endpoint}_{app_group}"
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=filesystem_path,
+            bucket=datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
+    spark_metastore_service.create_database(write_database_name)
 
     braze_client = BrazeClient(api_token=api_token, instance=instance)
     factory = EndpointFactory(braze_client)
 
-    table_name = f"{identifier}_{endpoint}_{app_group}"
     list_consumer = factory.build(identifier, "list")
     consumer = factory.build(identifier, endpoint)
 
@@ -146,16 +161,18 @@ if __name__ == "__main__":
         logger.info("msg=Starting dataframe load.")
         df = _schema_enforcement(identifier, results)
         s3_loader.load_df(
-            df=df, s3_path=f"{filesystem_path}{table_name}", format_options=file_type
+            df=df,
+            s3_path=f"{write_location}{write_table_name}",
+            format_options=file_type,
         )
 
         spark_metastore_loader.update_metastore(
             df=df,
-            database_name=database_name,
-            table_name=table_name,
+            database_name=write_database_name,
+            table_name=write_table_name,
             format_options=file_type,
-            database_location=filesystem_path,
+            database_location=write_location,
             force_recreate=True,
         )
 
-        spark_metastore_service.refresh_table(database_name, table_name)
+        spark_metastore_service.refresh_table(write_database_name, write_table_name)

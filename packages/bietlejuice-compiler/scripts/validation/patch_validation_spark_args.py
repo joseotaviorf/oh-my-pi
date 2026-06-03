@@ -51,10 +51,33 @@ def _write(path: Path, content: str) -> None:
     path.write_text(content, encoding="utf-8")
 
 
-def _already_patched(content: str) -> bool:
-    if "BaseCoreModelSparkJob" in content or re.search(r"Core\w+BaseSparkJob", content):
+def _uses_core_model_spark_job(content: str) -> bool:
+    return (
+        "BaseCoreModelSparkJob" in content
+        or re.search(r"Core\w+BaseSparkJob", content) is not None
+    )
+
+
+_PROD_WRITE_KW_PATTERN = re.compile(
+    r"(?:database_name=database_name,|table_name=table_name,|database_location=database_location,)"
+)
+
+
+def _needs_prod_write_kw_patch(content: str) -> bool:
+    """True when resolve targets exist but writes still reference prod kwargs."""
+    return (
+        "write_database_name" in content
+        and _PROD_WRITE_KW_PATTERN.search(content) is not None
+    )
+
+
+def _should_skip_patch_file(content: str) -> bool:
+    """Skip Core Model jobs and spark jobs already fully patched for validation."""
+    if _uses_core_model_spark_job(content):
         return True
-    return "resolve_datalake_write_target(" in content
+    if "resolve_datalake_write_target(" not in content:
+        return False
+    return not _needs_prod_write_kw_patch(content)
 
 
 def _insert_imports(content: str) -> str:
@@ -267,16 +290,22 @@ def _patch_get_db_info_block(content: str) -> str:
 
 def _patch_pipeline_writes(content: str) -> str:
     """Patch FullTableLoaderPipeline / IncrementalTableLoaderPipeline kwargs."""
-    if "resolve_datalake_write_target" in content:
+    has_pipeline = (
+        "FullTableLoaderPipeline" in content
+        or "IncrementalTableLoaderPipeline" in content
+    )
+    if not has_pipeline and not _needs_prod_write_kw_patch(content):
+        if "resolve_datalake_write_target(" not in content:
+            content = _patch_get_db_info_block(content)
         return content
-    if (
-        "FullTableLoaderPipeline" not in content
-        and "IncrementalTableLoaderPipeline" not in content
-    ):
-        return content
-    content = _patch_get_db_info_block(content)
+
+    if "write_database_name" not in content:
+        content = _patch_get_db_info_block(content)
     if "write_database_name" not in content:
         return content
+    if not _needs_prod_write_kw_patch(content):
+        return content
+
     content = re.sub(
         r"database_name=write_database_name,\n\s+table_name=write_table_name,\n\s+database_location=write_location,",
         "database_name=write_database_name,\n                table_name=write_table_name,\n                database_location=write_location,",
@@ -392,18 +421,100 @@ def _patch_save_to_datalake_function(content: str) -> str:
     return content[:save_start] + segment + content[save_end:]
 
 
+def _patch_resolve_in_args_helpers(content: str) -> str:
+    """Use args.target_* inside helpers whose first parameter is args."""
+    fn_pattern = re.compile(r"^def (\w+)\(\s*args\b[^)]*\):", re.MULTILINE)
+    matches = list(fn_pattern.finditer(content))
+    if not matches:
+        return content
+
+    chunks: List[str] = []
+    last = 0
+    for idx, match in enumerate(matches):
+        fn_start = match.start()
+        chunks.append(content[last:fn_start])
+        body_start = match.end()
+        body_end = matches[idx + 1].start() if idx + 1 < len(matches) else len(content)
+        next_boundary = re.search(
+            r"\nif __name__ == ",
+            content[body_start:body_end],
+        )
+        if next_boundary:
+            body_end = body_start + next_boundary.start()
+
+        body = content[body_start:body_end]
+        body = body.replace(
+            "target_database=target_database_name",
+            "target_database=args.target_database_name",
+        )
+        body = body.replace(
+            "target_table=target_table_name",
+            "target_table=args.target_table_name",
+        )
+        chunks.append(content[fn_start:body_start])
+        chunks.append(body)
+        last = body_end
+    chunks.append(content[last:])
+    return "".join(chunks)
+
+
+def _parse_arguments_returns_validation_targets(content: str) -> bool:
+    """True when parse_arguments() already exposes validation target args."""
+    parse_fn = re.search(
+        r"def parse_arguments\(\).*?(?=\ndef |\nif __name__|\Z)",
+        content,
+        re.DOTALL,
+    )
+    if not parse_fn:
+        return False
+    body = parse_fn.group(0)
+    return "add_validation_target_args" in body and "args.target_database_name" in body
+
+
+def _append_validation_params(params: str) -> str:
+    extra = "target_database_name: str = None,\n    target_table_name: str = None,\n"
+    params = params.rstrip()
+    if not params:
+        return extra
+    return f"{params},\n    {extra}"
+
+
 def _patch_main_function_targets(content: str) -> str:
     """Pass validation targets into main() for scripts that delegate to main()."""
-    if "def main(" not in content or 'if __name__ == "__main__"' not in content:
+    if "def main(" not in content:
+        return content
+
+    if "target_database_name: str = None" in content:
+        return content
+    if _parse_arguments_returns_validation_targets(content):
         return content
 
     # main() with no parameters uses parse_arguments() internally — do not rewrite signature.
     if re.search(r"def main\(\)\s*:", content):
         return content
 
-    content = _patch_function_signature(content, "main")
+    main_def = re.search(
+        r"def main\(\s*\n?(.*?)\)\s*->",
+        content,
+        re.DOTALL,
+    )
+    if not main_def:
+        main_def = re.search(r"def main\((.*?)\)\s*:", content, re.DOTALL)
+    if not main_def:
+        return content
+
+    params = main_def.group(1)
+    if "target_database_name" in params:
+        return content
+
+    new_params = _append_validation_params(params)
+    content = content.replace(f"def main({params})", f"def main({new_params})", 1)
+
     if "def save_to_datalake(" in content:
         content = _patch_save_to_datalake_function(content)
+
+    if 'if __name__ == "__main__"' not in content:
+        return content
 
     if "add_validation_target_args(parser)" not in content:
         content = re.sub(
@@ -426,7 +537,7 @@ def _patch_main_function_targets(content: str) -> str:
 
 def patch_file(path: Path, *, dry_run: bool = False) -> bool:
     content = _read(path)
-    if _already_patched(content):
+    if _should_skip_patch_file(content):
         return False
 
     original = content
@@ -436,6 +547,7 @@ def patch_file(path: Path, *, dry_run: bool = False) -> bool:
     content = _patch_helper_functions_with_db_info(content)
     content = _patch_get_db_info_block(content)
     content = _patch_pipeline_writes(content)
+    content = _patch_resolve_in_args_helpers(content)
     content = _patch_main_function_targets(content)
 
     if content == original:
