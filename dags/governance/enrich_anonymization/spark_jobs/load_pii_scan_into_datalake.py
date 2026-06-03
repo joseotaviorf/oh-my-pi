@@ -22,8 +22,27 @@ from pyspark.sql.types import (
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.governance.anonymization.brazil_context_heuristics import (
+    apply_context_heuristics_to_nested_cleaned_results,
+)
+from bietlejuice.governance.anonymization.brazil_datetime_heuristics import (
+    apply_datetime_heuristics_to_nested_cleaned_results,
+)
+from bietlejuice.governance.anonymization.brazil_document_heuristics import (
+    apply_brazil_document_to_nested_cleaned_results,
+)
+from bietlejuice.governance.anonymization.brazil_phone_heuristics import (
+    apply_phone_to_nested_cleaned_results,
+)
 from bietlejuice.governance.anonymization.brazil_rg_heuristics import (
     apply_brazil_rg_to_nested_cleaned_results,
+)
+from bietlejuice.governance.anonymization.brazil_score_heuristics import (
+    apply_entity_score_floors_to_nested_cleaned_results,
+)
+from bietlejuice.governance.anonymization.pii_scan_status import (
+    SAMPLE_JSON_SIZE_LIMIT,
+    resolve_scan_status,
 )
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -154,12 +173,46 @@ def clean_result(result, matched_value):
 def _rows_to_analyzer_inputs(rows_list: List) -> Tuple[Dict, Dict]:
     df_dict = {
         row["id_entity"]: row["sample"]
-        if row["len_sample"] < 4000
+        if row["len_sample"] < SAMPLE_JSON_SIZE_LIMIT
         else ["SAMPLE_TOO_BIG"]
         for row in rows_list
     }
     df_dict_columns = {row["id_entity"]: row["list_column_name"] for row in rows_list}
     return df_dict, df_dict_columns
+
+
+def _apply_post_presidio_heuristics(
+    nested_cleaned: list,
+    column_name: str,
+    raw_matched_values: list,
+    *,
+    promote_missing_entities: bool,
+) -> list:
+    nested_cleaned = apply_brazil_document_to_nested_cleaned_results(
+        nested_cleaned,
+        column_name,
+        raw_matched_values,
+        promote_if_missing=False,
+    )
+    nested_cleaned = apply_entity_score_floors_to_nested_cleaned_results(nested_cleaned)
+    nested_cleaned = apply_context_heuristics_to_nested_cleaned_results(
+        nested_cleaned, column_name
+    )
+    nested_cleaned = apply_brazil_rg_to_nested_cleaned_results(
+        nested_cleaned,
+        column_name,
+        raw_matched_values,
+        promote_if_missing=promote_missing_entities,
+    )
+    nested_cleaned = apply_phone_to_nested_cleaned_results(
+        nested_cleaned,
+        column_name,
+        raw_matched_values,
+        promote_if_missing=promote_missing_entities,
+    )
+    return apply_datetime_heuristics_to_nested_cleaned_results(
+        nested_cleaned, column_name
+    )
 
 
 def make_process_partition(recognizer_dict_list):
@@ -199,15 +252,16 @@ def make_process_partition(recognizer_dict_list):
         )
         for col_result, result, row in zip(col_results, results, rows_list):
             column_name = row["column_name"]
+            scan_status = resolve_scan_status(row["len_sample"])
             sample_cleaned = [
                 clean_result(r, matched_value)
                 for (r, matched_value) in zip(result.recognizer_results, result.value)
             ]
-            sample_cleaned = apply_brazil_rg_to_nested_cleaned_results(
+            sample_cleaned = _apply_post_presidio_heuristics(
                 sample_cleaned,
                 column_name,
                 list(result.value),
-                promote_if_missing=True,
+                promote_missing_entities=True,
             )
             col_cleaned = [
                 clean_result(c, c_matched_value)
@@ -215,14 +269,15 @@ def make_process_partition(recognizer_dict_list):
                     col_result.recognizer_results, col_result.value
                 )
             ]
-            col_cleaned = apply_brazil_rg_to_nested_cleaned_results(
+            col_cleaned = _apply_post_presidio_heuristics(
                 col_cleaned,
                 column_name,
                 [column_name],
-                promote_if_missing=True,
+                promote_missing_entities=True,
             )
             yield (
                 *row,
+                scan_status,
                 sample_cleaned,
                 col_cleaned,
             )
@@ -356,6 +411,7 @@ def main():
             StructField("year", IntegerType(), True),
             StructField("month", IntegerType(), True),
             StructField("day", IntegerType(), True),
+            StructField("scan_status", StringType(), True),
             StructField(
                 "sample_results",
                 ArrayType(
@@ -390,6 +446,7 @@ def main():
             "database_name",
             "table_name",
             "column_name",
+            "scan_status",
             "sample_results",
             "year",
             "month",
@@ -412,6 +469,7 @@ def main():
             "database_name",
             "table_name",
             "column_name",
+            "scan_status",
             "sample_results_json",
             col("sample_results_exploded_inner.matched_value").alias(
                 "sample_matched_value"
@@ -429,6 +487,7 @@ def main():
         "database_name",
         "table_name",
         "column_name",
+        "scan_status",
         "sample_results_json",
         "year",
         "month",
@@ -442,6 +501,7 @@ def main():
         "database_name",
         "table_name",
         "column_name",
+        "scan_status",
         "sample_results_json",
         "year",
         "month",
@@ -455,6 +515,7 @@ def main():
             "database_name",
             "table_name",
             "column_name",
+            "scan_status",
             "col_results",
             "year",
             "month",
@@ -475,6 +536,7 @@ def main():
             "database_name",
             "table_name",
             "column_name",
+            "scan_status",
             "col_results_json",
             col("col_results_exploded_inner.matched_value").alias("col_matched_value"),
             col("col_results_exploded_inner.type").alias("type"),
@@ -490,6 +552,7 @@ def main():
         "database_name",
         "table_name",
         "column_name",
+        "scan_status",
         "col_results_json",
         "year",
         "month",
@@ -503,6 +566,7 @@ def main():
         "database_name",
         "table_name",
         "column_name",
+        "scan_status",
         "col_results_json",
         "year",
         "month",
@@ -516,6 +580,7 @@ def main():
             "database_name",
             "table_name",
             "column_name",
+            "scan_status",
             "year",
             "month",
             "day",

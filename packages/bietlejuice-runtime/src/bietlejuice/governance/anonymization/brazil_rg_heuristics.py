@@ -1,7 +1,8 @@
 """Brazil RG classification heuristics for Presidio post-processing (DPLT-967).
 
-RG has no national validation standard; this module reduces false positives while
-keeping recall for formatted and unformatted values in the lake.
+RG has no national validation standard. This module filters weak Presidio hits and
+only promotes missed RGs on columns that semantically expect a document (rg_* or
+document_like). Generic numeric envelopes are never promoted.
 """
 
 from __future__ import annotations
@@ -9,11 +10,22 @@ from __future__ import annotations
 import re
 from typing import Optional
 
+from bietlejuice.governance.anonymization.brazil_document_heuristics import (
+    is_document_like_column,
+    is_valid_cpf,
+)
+
 BRAZIL_RG_ENTITY = "BRAZIL_RG"
+PROMOTED_RG_SCORE = 0.85
 
 PHONE_COLUMN_RE = re.compile(
     r"(?i)(?:^|_)(phone|telefone|celular|whatsapp|mobile|fone|ddd)(?:_|$)|"
     r"phone_|_phone"
+)
+
+EMAIL_COLUMN_RE = re.compile(
+    r"(?i)(?:^|_)(email|e_mail|mail|correio|e-mail)(?:_|$)|"
+    r"email_|_email|_mail$"
 )
 
 RG_COLUMN_RE = re.compile(
@@ -22,6 +34,15 @@ RG_COLUMN_RE = re.compile(
 )
 
 RG_COLUMN_EXCLUDE_RE = re.compile(r"(?i)identidade_genero|gender_identity")
+
+IPV4_VALUE_RE = re.compile(r"^\s*\d{1,3}(?:\.\d{1,3}){3}\s*$")
+
+DATE_VALUE_RE = re.compile(
+    r"(?i)^\s*(?:"
+    r"\d{4}[-/.]\d{1,2}[-/.]\d{1,2}"
+    r"|\d{1,2}[-/.]\d{1,2}[-/.]\d{4}"
+    r")(?:[ t]\d{1,2}:\d{2}(?::\d{2})?(?:\.\d+)?(?:z|[+-]\d{2}:?\d{2})?)?\s*$"
+)
 
 FORMATTED_RG_SP_RE = re.compile(
     r"(?i)(?:^|[^\d])(\d{1,2}[\.\s]?\d{3}[\.\s]?\d{3}[-\s]?[\dXx])(?:[^\d]|$)"
@@ -49,6 +70,12 @@ def is_phone_like_column(column_name: Optional[str]) -> bool:
     return bool(PHONE_COLUMN_RE.search(column_name))
 
 
+def is_email_like_column(column_name: Optional[str]) -> bool:
+    if not column_name:
+        return False
+    return bool(EMAIL_COLUMN_RE.search(column_name))
+
+
 def is_strong_rg_column_name(column_name: Optional[str]) -> bool:
     if not column_name:
         return False
@@ -57,20 +84,29 @@ def is_strong_rg_column_name(column_name: Optional[str]) -> bool:
     return bool(RG_COLUMN_RE.search(column_name))
 
 
-def is_valid_cpf(digits: str) -> bool:
-    if len(digits) != 11 or not digits.isdigit():
+def can_promote_rg(column_name: Optional[str]) -> bool:
+    """RG may only be injected on columns that semantically expect a document."""
+    if not column_name:
         return False
-    if digits == digits[0] * 11:
+    return is_strong_rg_column_name(column_name) or is_document_like_column(column_name)
+
+
+def looks_like_ipv4(value: Optional[str]) -> bool:
+    if value is None:
         return False
+    return bool(IPV4_VALUE_RE.match(str(value)))
 
-    def _check_digit(base: str, weights: list[int]) -> int:
-        total = sum(int(base[i]) * weights[i] for i in range(len(weights)))
-        remainder = total % 11
-        return 0 if remainder < 2 else 11 - remainder
 
-    first = _check_digit(digits[:9], list(range(10, 1, -1)))
-    second = _check_digit(digits[:9] + str(first), list(range(11, 1, -1)))
-    return digits[-2:] == f"{first}{second}"
+def looks_like_date_value(value: Optional[str]) -> bool:
+    if value is None:
+        return False
+    return bool(DATE_VALUE_RE.match(str(value)))
+
+
+def looks_like_email_value(value: Optional[str]) -> bool:
+    if value is None:
+        return False
+    return "@" in str(value)
 
 
 def is_brazil_mobile_like(normalized: str) -> bool:
@@ -87,6 +123,10 @@ def is_money_like(value: str) -> bool:
 
 
 def matches_formatted_ssp_sp(value: str) -> bool:
+    if looks_like_email_value(value):
+        return False
+    if not re.search(r"[\.\s\-]", value):
+        return False
     return bool(FORMATTED_RG_SP_RE.search(value))
 
 
@@ -115,20 +155,32 @@ def ssp_sp_check_digit_valid(normalized: str) -> bool:
 
 def _positive_rg_signals(column_name: str, matched_value: str) -> bool:
     normalized = normalize_rg_value(matched_value)
-    has_column_signal = is_strong_rg_column_name(column_name)
-    has_envelope = matches_rg_structural_envelope(normalized)
+    has_strong_column = is_strong_rg_column_name(column_name)
+    has_document_column = is_document_like_column(column_name)
     has_formatted = matches_formatted_ssp_sp(matched_value)
-    has_sp_dv = has_envelope and ssp_sp_check_digit_valid(normalized)
+    has_sp_dv = matches_rg_structural_envelope(normalized) and ssp_sp_check_digit_valid(
+        normalized
+    )
+    has_envelope = matches_rg_structural_envelope(normalized)
 
-    if is_phone_like_column(column_name):
-        return has_column_signal and (has_envelope or has_formatted or has_sp_dv)
-
-    return has_column_signal or has_envelope or has_formatted or has_sp_dv
+    if has_formatted or has_sp_dv:
+        return has_strong_column or has_document_column
+    if has_strong_column and has_envelope:
+        return True
+    if has_document_column and has_envelope:
+        return True
+    return False
 
 
 def _negative_rg_signals(column_name: str, matched_value: str) -> bool:
     normalized = normalize_rg_value(matched_value)
+    if is_email_like_column(column_name):
+        return True
     if is_money_like(matched_value):
+        return True
+    if looks_like_email_value(matched_value):
+        return True
+    if looks_like_date_value(matched_value):
         return True
     if len(normalized) == 11 and is_valid_cpf(normalized):
         return True
@@ -138,7 +190,10 @@ def _negative_rg_signals(column_name: str, matched_value: str) -> bool:
         len(normalized) == 11
         and normalized.isdigit()
         and not is_strong_rg_column_name(column_name)
+        and not is_document_like_column(column_name)
     ):
+        return True
+    if not is_strong_rg_column_name(column_name) and looks_like_ipv4(matched_value):
         return True
     return False
 
@@ -165,7 +220,7 @@ def apply_brazil_rg_to_cleaned_results(
     raw_matched_values: list,
     promote_if_missing: bool = True,
 ) -> list[dict]:
-    """Filter Presidio RG hits and optionally promote missed true positives."""
+    """Filter Presidio RG hits; optionally promote on document/rg columns only."""
     adjusted = []
     kept_rg = False
     for item in cleaned_results:
@@ -184,21 +239,29 @@ def apply_brazil_rg_to_cleaned_results(
                 }
             )
 
-    if promote_if_missing and not kept_rg:
+    if promote_if_missing and not kept_rg and can_promote_rg(column_name):
         for matched_value in raw_matched_values:
             if matched_value == "SAMPLE_TOO_BIG":
                 continue
             if should_keep_brazil_rg(column_name, matched_value):
-                adjusted.append(
-                    {
-                        "type": BRAZIL_RG_ENTITY,
-                        "score": 0.85,
-                        "matched_value": matched_value,
-                    }
-                )
+                _promote_rg_in_chunk(adjusted, matched_value)
                 break
 
     return adjusted
+
+
+def _promote_rg_in_chunk(chunk: list[dict], matched_value: str) -> None:
+    """Re-type NOT_FOUND to BRAZIL_RG in place for this sample's chunk."""
+    promoted = {
+        "type": BRAZIL_RG_ENTITY,
+        "score": PROMOTED_RG_SCORE,
+        "matched_value": matched_value,
+    }
+    for index, item in enumerate(chunk):
+        if item.get("type") == "NOT_FOUND":
+            chunk[index] = promoted
+            return
+    chunk.append(promoted)
 
 
 def apply_brazil_rg_to_nested_cleaned_results(
@@ -217,28 +280,20 @@ def apply_brazil_rg_to_nested_cleaned_results(
         )
         for chunk in nested_cleaned
     ]
-    if not promote_if_missing:
+    if not promote_if_missing or not can_promote_rg(column_name):
         return adjusted
 
-    has_rg = any(
-        item.get("type") == BRAZIL_RG_ENTITY for chunk in adjusted for item in chunk
-    )
-    if has_rg:
-        return adjusted
-
-    for matched_value in raw_matched_values:
+    # Promote per sample: each chunk is evaluated independently so one sample
+    # that already has RG does not block promotion on other valid samples.
+    for chunk in adjusted:
+        if not chunk:
+            continue
+        matched_value = chunk[0].get("matched_value")
         if matched_value == "SAMPLE_TOO_BIG":
             continue
+        if any(item.get("type") == BRAZIL_RG_ENTITY for item in chunk):
+            continue
         if should_keep_brazil_rg(column_name, matched_value):
-            adjusted.append(
-                [
-                    {
-                        "type": BRAZIL_RG_ENTITY,
-                        "score": 0.85,
-                        "matched_value": matched_value,
-                    }
-                ]
-            )
-            break
+            _promote_rg_in_chunk(chunk, matched_value)
 
     return adjusted

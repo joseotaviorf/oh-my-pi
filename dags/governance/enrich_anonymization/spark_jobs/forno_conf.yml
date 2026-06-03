@@ -3,15 +3,16 @@
 # Source: https://github.com/microsoft/presidio/blob/main/presidio-analyzer/presidio_analyzer/conf/example_recognizers.yaml
 # Documentation: https://microsoft.github.io/presidio/analyzer/adding_recognizers/
 recognizers:
+  # DPLT-968: weak patterns below SCORE_THRESHOLD (0.6); final BRAZIL_CPF via check-digit filter.
   - name: "Brazil CPF Recognizer"
     supported_language: "en"
     patterns:
       - name: "Brazil CPF Regex (weak)"
         regex: "\\b\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2}\\b"
-        score: 0.85
+        score: 0.55
       - name: "Brazil CPF column name Regex (weak)"
         regex: ".*cpf.*"
-        score: 0.85
+        score: 0.55
     context:
       - cpf
     supported_entity: "BRAZIL_CPF"
@@ -26,15 +27,16 @@ recognizers:
         regex: "(?:^|_)(rg|identidade|numero_rg|rg_numero)(?:_|$)"
         score: 0.55
     supported_entity: "BRAZIL_RG"
+  # DPLT-968: weak patterns below SCORE_THRESHOLD (0.6); final BRAZIL_CNPJ via check-digit filter.
   - name: "Brazil CNPJ Recognizer"
     supported_language: "en"
     patterns:
       - name: "Brazil CNPJ regex (weak)"
         regex: "(^\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}$)"
-        score: 0.85
+        score: 0.55
       - name: "Brazil CNPJ column name Regex (weak)"
         regex: "cnpj|CNPJ|cnpj_.*"
-        score: 0.85
+        score: 0.55
     supported_entity: "BRAZIL_CNPJ"
   - name: "Brazil Location Recognizer"
     supported_language: "en"
@@ -47,7 +49,7 @@ recognizers:
         score: 0.85
       - name: "Address column name regex (weak)"
         regex: "\\b(address|addr|street|st|road|rd|avenue|ave|boulevard|blvd|lane|way|drive|place|city|state|endereço|endereco|rua|rua_|avenida|av|logradouro|bairro|cidade|estado|neighborhood|complement|complemento|Apto|apto|apto_|bloco|casa|torre|Torre)\\b"
-        score: 0.85
+        score: 0.55
       - name: "Zip Code column name regex (weak)"
         regex: "\\b(zip(_)?code|zip|postal(_)?code|postcode|cep|código(_)?postal|cod(_)?postal)\\b"
         score: 0.85
@@ -63,8 +65,8 @@ recognizers:
     supported_language: "en"
     patterns:
       - name: "Phone Number column name regex (weak)"
-        regex: "phone_.*|number|telefone"
-        score: 0.85
+        regex: "phone|_phone|phone_|telefone|celular|whatsapp|mobile|fone|number"
+        score: 0.55
     context:
       - Phone Number
       - Telefone
@@ -85,9 +87,10 @@ recognizers:
   - name: "Brazil Name Recognizer"
     supported_language: "en"
     patterns:
+      # DPLT-970/971: column-name signal only; value hits need score >= 0.85 via post-processing.
       - name: "Name column name regex (weak)"
         regex: "nome|nome_completo|name|fullname|full_name|first_name|last_name|nome_.*|sobrenome|last_name"
-        score: 0.85
+        score: 0.55
     context:
       - Nome
       - Name

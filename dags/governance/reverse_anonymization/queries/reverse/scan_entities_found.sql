@@ -79,6 +79,7 @@ WITH dag_info AS (
     sc.year = {year}
     AND sc.month = {month}
     AND sc.day = {day}
+    AND (sc.scan_status = 'COMPLETE' OR sc.scan_status IS NULL)
     AND mv.id_entity IS NULL
 ), sandbox_data as (
   SELECT
@@ -117,6 +118,7 @@ WITH dag_info AS (
     AND sc.year = {year}
     AND sc.month = {month}
     AND sc.day = {day}
+    AND (sc.scan_status = 'COMPLETE' OR sc.scan_status IS NULL)
     AND mv.id_entity IS NULL
 ), union_data as (
     (select * from clean_enrich_dw_data)

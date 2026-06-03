@@ -12,7 +12,7 @@ columns:
   database_name:
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.database_name
-    documentation: This column indicates the schema name of the table
+    description: This column indicates the schema name of the table
   table_name:
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.table_name
@@ -21,6 +21,13 @@ columns:
     lineage:
       - datalake_documentation_metrics_clean.columns_metastore.column_name
     description: This column indicates the name of the column
+  scan_status:
+    lineage:
+      - datalake_anonymization.columns_sample_data.sample
+    description: >
+      Scan completeness for the entity partition row. COMPLETE means Presidio
+      analyzed the sampled values; SAMPLE_TOO_BIG means the JSON sample exceeded
+      the size limit and was not fully scanned (DPLT-969).
   sample_value:
     description: Value analyzed by the analyzer.
   sample_values_entity_found:
