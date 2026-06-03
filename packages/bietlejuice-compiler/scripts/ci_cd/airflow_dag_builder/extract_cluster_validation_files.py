@@ -21,10 +21,12 @@ from typing import Any, Dict, List, Optional, Tuple
 import yaml
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.services.configuration_service import ConfigurationService
 from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
     ValidationClusterSpec,
     _has_load_spark_job,
     build_validation_cluster_spec,
+    normalize_databricks_cluster_topology,
 )
 from scripts.ci_cd.airflow_dag_builder.cluster_yaml_format import (
     assert_no_folded_catalog_namespace,
@@ -62,6 +64,14 @@ def _cluster_file_path(declaration_path: Path) -> Path:
     dag_dir = declaration_path.parent
     dag_name = declaration_path.name.replace("_declaration.yml", "")
     return dag_dir / f"{dag_name}_cluster.yml"
+
+
+def _on_disk_has_validation_stage(cluster_path: Path) -> bool:
+    """DAGs with validation.cluster are still in the validation stage (skip bulk regen/check)."""
+    if not cluster_path.exists():
+        return False
+    document = yaml.safe_load(cluster_path.read_text(encoding="utf-8")) or {}
+    return bool((document.get("validation") or {}).get("cluster"))
 
 
 def _read_text(path: Path) -> str:
@@ -224,11 +234,17 @@ def build_cluster_file_content(
     declaration: dict,
     cluster_args: dict,
 ) -> str:
-    spec = build_validation_cluster_spec(
-        cluster_args=cluster_args,
-        declaration=declaration,
+    config_service = ConfigurationService()
+    normalized_args = normalize_databricks_cluster_topology(
+        cluster_args, config_service
     )
-    content = cluster_text.rstrip("\n") + "\n"
+    prod_block = dump_cluster_yaml({"cluster": normalized_args})
+    spec = build_validation_cluster_spec(
+        cluster_args=normalized_args,
+        declaration=declaration,
+        config_service=config_service,
+    )
+    content = prod_block.rstrip("\n") + "\n"
     if spec is not None:
         content += _format_validation_yaml(spec)
     return _normalize_cluster_file_text(content)
@@ -341,6 +357,11 @@ def main() -> int:
         if args.check and not cluster_path.exists():
             # Phased migration: skip inline cluster: until *_cluster.yml exists.
             continue
+        if _on_disk_has_validation_stage(cluster_path):
+            # Concluded DAGs only: do not rewrite cluster files still in validation stage.
+            if args.check:
+                checked_paths.add(cluster_path.resolve())
+            continue
 
         try:
             cluster_path, cluster_content, updated_declaration = process_declaration(
@@ -395,6 +416,8 @@ def main() -> int:
         for cluster_path in _cluster_file_paths(root):
             if cluster_path.resolve() in checked_paths:
                 continue
+            if _on_disk_has_validation_stage(cluster_path):
+                continue
             try:
                 _, cluster_content = process_cluster_file(cluster_path)
             except Exception as exc:  # noqa: BLE001
@@ -414,6 +437,8 @@ def main() -> int:
     if args.check:
         for cluster_path in _cluster_file_paths(root):
             if cluster_path.resolve() in checked_paths:
+                continue
+            if _on_disk_has_validation_stage(cluster_path):
                 continue
             try:
                 _, cluster_content = process_cluster_file(cluster_path)

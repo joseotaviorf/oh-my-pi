@@ -7,6 +7,7 @@ instance types to Graviton equivalents, and selects a consolidation_* preset fro
 
 from __future__ import annotations
 
+import copy
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -234,6 +235,57 @@ def map_optional_instance_type(
     if not instance_type:
         return None
     return map_instance_type_to_graviton(str(instance_type), use_nvme=use_nvme)
+
+
+_DATABRICKS_TOPOLOGY_FLAT_KEYS = (
+    "node_type_id",
+    "driver_node_type_id",
+    "task_node_type_id",
+)
+_DATABRICKS_TOPOLOGY_NESTED_KEYS = (
+    ("core_nodes", "node_type_id"),
+    ("task_nodes", "node_type_id"),
+)
+
+
+def _map_topology_value(instance_type: str, *, use_nvme: bool) -> str:
+    return map_instance_type_to_graviton(str(instance_type), use_nvme=use_nvme)
+
+
+def normalize_databricks_cluster_topology(
+    cluster_args: dict,
+    config_service: Optional[ConfigurationService] = None,
+) -> dict:
+    """
+    Rewrite Databricks cluster topology overrides to Graviton gen-6 (m6g/r6g/c6g or *gd).
+
+    Uses the same mapping as validation preset selection. EMR clusters are returned unchanged.
+    """
+    service = config_service or ConfigurationService()
+    normalized = copy.deepcopy(cluster_args)
+    effective = merge_cluster_configuration(normalized, service)
+    if is_emr_effective_config(effective):
+        return normalized
+
+    cluster_type = str(normalized.get("type", ""))
+    use_nvme = _uses_photon(effective, cluster_type)
+    custom = normalized.get("custom_configurations")
+    if not isinstance(custom, dict):
+        return normalized
+
+    for key in _DATABRICKS_TOPOLOGY_FLAT_KEYS:
+        value = custom.get(key)
+        if value:
+            custom[key] = _map_topology_value(str(value), use_nvme=use_nvme)
+
+    for parent_key, child_key in _DATABRICKS_TOPOLOGY_NESTED_KEYS:
+        section = custom.get(parent_key)
+        if isinstance(section, dict) and section.get(child_key):
+            section[child_key] = _map_topology_value(
+                str(section[child_key]), use_nvme=use_nvme
+            )
+
+    return normalized
 
 
 def size_tier_from_instance_type(instance_type: str) -> str:

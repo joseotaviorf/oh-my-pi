@@ -35,14 +35,29 @@ validation:
 
 When validation is emitted, `validation.cluster.type` must still differ from prod `cluster.type` (enforced by `DAGDeclarationValidator`).
 
+### Prod topology normalization (Graviton 6g)
+
+When `extract-cluster-validation-files` writes or regenerates `*_cluster.yml`, it **normalizes Databricks prod** `custom_configurations` topology (`node_type_id`, `driver_node_type_id`, nested `core_nodes` / `task_nodes`) using the same `map_instance_type_to_graviton` rules as validation preset selection (`m5a` → `m6g`, `r5d` → `r6g`, photon presets → `*gd` where applicable). EMR clusters are left unchanged.
+
+This keeps prod and `validation.cluster` family-consistent: validation `custom_configurations` should only carry non-topology diffs (`num_workers`, `aws_attributes`, `spark_version`, etc.) unless the matched consolidation preset genuinely differs from normalized prod sizes. Do not hand-edit validation topology keys; re-run the extractor instead.
+
+`promote_cluster_validation_to_prod.py` applies the same normalization after promoting validation to prod.
+
 ### Generator and CI
 
 ```bash
 # Regenerate under a subtree (optional SOURCE_REF when cluster: was removed from declarations)
+# Skips DAGs whose on-disk *_cluster.yml already has validation: (still in validation stage).
 make extract-cluster-validation-files DAG_PATH=dags/platform/ SOURCE_REF=<pre-split-git-ref>
 
-# CI: fail if on-disk *_cluster.yml differs from generator output
+# CI: extract --check (when cluster YAML changes) plus instance-family audit
 make validate-cluster-validation-files
+
+# Extract drift only (regen PRs touching *_cluster.yml)
+make validate-cluster-validation-extract-check
+
+# Tooling PRs (compiler scripts only): Woodpecker `validate-cluster-validation-tooling` runs unit tests + audit
+make audit-cluster-instance-families
 ```
 
 Keep `spark.databricks.sql.initial.catalog.namespace` Jinja on a single line in `*_cluster.yml` (no PyYAML line folding). `validate-cluster-validation-files` rejects folded `quintoandar_{{ var.value.environment }}` values.

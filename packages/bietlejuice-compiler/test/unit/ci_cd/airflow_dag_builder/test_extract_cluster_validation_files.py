@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import yaml
+
 from scripts.ci_cd.airflow_dag_builder.extract_cluster_validation_files import (
     _validate_allow_custom_spark_job_contract,
     _validate_cluster_file_yaml_format,
@@ -151,3 +153,35 @@ class TestExtractClusterValidationFiles:
             _validate_cluster_file_yaml_format(Path("dags/foo/foo_cluster.yml"), ok)
             is None
         )
+
+    def test_build_cluster_file_normalizes_legacy_prod_topology(self):
+        declaration = {
+            "dag": {"name": "legacy_dag"},
+            "workflow": {"type": "query_delta", "layer": "enrich"},
+            "cluster": {
+                "type": "custom_cluster",
+                "custom_configurations": {
+                    "driver_node_type_id": "m5a.xlarge",
+                    "node_type_id": "m5a.large",
+                    "num_workers": 1,
+                    "spark_version": "16.4.x-scala2.12",
+                },
+            },
+        }
+        cluster_args = declaration["cluster"]
+        content = build_cluster_file_content(
+            cluster_text="cluster:\n  type: custom_cluster\n",
+            declaration=declaration,
+            cluster_args=cluster_args,
+        )
+        assert "driver_node_type_id: m6g.xlarge" in content
+        assert "node_type_id: m6g.large" in content
+        assert "m5a." not in content
+        assert "validation:" in content
+        document = yaml.safe_load(content)
+        validation_custom = (
+            document.get("validation", {})
+            .get("cluster", {})
+            .get("custom_configurations", {})
+        )
+        assert "node_type_id" not in validation_custom

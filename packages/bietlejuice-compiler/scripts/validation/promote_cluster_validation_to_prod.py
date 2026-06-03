@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import os
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -19,7 +20,14 @@ from typing import Any, Dict, List, Optional
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
+_COMPILER_ROOT = Path(__file__).resolve().parents[2]
+if str(_COMPILER_ROOT) not in sys.path:
+    sys.path.insert(0, str(_COMPILER_ROOT))
 
+from bietlejuice.services.configuration_service import ConfigurationService
+from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
+    normalize_databricks_cluster_topology,
+)
 from scripts.ci_cd.airflow_dag_builder.cluster_yaml_format import (
     assert_no_folded_catalog_namespace,
     dump_cluster_yaml,
@@ -93,9 +101,15 @@ def promote_cluster_file(cluster_path: Path, *, dry_run: bool = False) -> bool:
     if not isinstance(prod_cluster, dict):
         prod_cluster = {}
 
-    new_document: Dict[str, Any] = {
-        "cluster": merge_promoted_cluster(prod_cluster, validation_cluster)
-    }
+    os.environ.setdefault("ENVIRONMENT", "prod")
+    ConfigurationService._instance_cache.clear()
+    config_service = ConfigurationService()
+
+    promoted_cluster = merge_promoted_cluster(prod_cluster, validation_cluster)
+    promoted_cluster = normalize_databricks_cluster_topology(
+        promoted_cluster, config_service
+    )
+    new_document: Dict[str, Any] = {"cluster": promoted_cluster}
     if "spark_session_configs" in document:
         new_document["spark_session_configs"] = document["spark_session_configs"]
 

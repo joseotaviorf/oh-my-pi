@@ -33,6 +33,7 @@ steps:
         on_empty: false
     depends_on: [setup]
 
+  # Regen / cluster YAML PRs: full extract --check + instance-family audit.
   validate-cluster-validation-files:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true
@@ -47,8 +48,33 @@ steps:
         include:
           - "dags/**/*_cluster.yml"
           - "packages/bietlejuice-core/src/bietlejuice/config/prod_conf.yml"
+        on_empty: false
+    depends_on: [setup]
+
+  # Tooling-only PRs: unit tests for extract/mapping/audit/promote + audit (no full-tree extract --check).
+  validate-cluster-validation-tooling:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    environment:
+      ENVIRONMENT: prod
+    commands:
+      - uv run --directory packages/bietlejuice-compiler pytest test/unit/ci_cd/airflow_dag_builder/test_extract_cluster_validation_files.py test/unit/ci_cd/airflow_dag_builder/test_cluster_validation_mapping.py test/unit/validation/test_audit_cluster_instance_families.py test/unit/ci_cd/airflow_dag_builder/test_promote_cluster_validation_to_prod.py -q
+      - make audit-cluster-instance-families
+    when:
+      event: [push, pull_request]
+      path:
+        include:
+          - ".woodpecker/validations.yml"
+          - "Makefile"
+          - "docs/platform/cluster_validation_dags.md"
           - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/cluster_validation_mapping.py"
           - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/extract_cluster_validation_files.py"
+          - "packages/bietlejuice-compiler/scripts/validation/audit_cluster_instance_families.py"
+          - "packages/bietlejuice-compiler/scripts/validation/promote_cluster_validation_to_prod.py"
+          - "packages/bietlejuice-compiler/test/unit/ci_cd/airflow_dag_builder/test_cluster_validation_mapping.py"
+          - "packages/bietlejuice-compiler/test/unit/ci_cd/airflow_dag_builder/test_extract_cluster_validation_files.py"
+          - "packages/bietlejuice-compiler/test/unit/ci_cd/airflow_dag_builder/test_promote_cluster_validation_to_prod.py"
+          - "packages/bietlejuice-compiler/test/unit/validation/test_audit_cluster_instance_families.py"
         on_empty: false
     depends_on: [setup]
 

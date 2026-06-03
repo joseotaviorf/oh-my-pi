@@ -14,6 +14,7 @@ from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
     is_single_node_cluster,
     map_instance_type_to_graviton,
     match_consolidation_preset,
+    normalize_databricks_cluster_topology,
     size_tier_from_instance_type,
 )
 
@@ -495,3 +496,62 @@ class TestBuildValidationClusterSpec:
         assert spec.custom_configurations["node_type_id"] == "c6g.12xlarge"
         assert spec.custom_configurations["driver_node_type_id"] == "r6g.2xlarge"
         assert spec.custom_configurations["num_workers"] == 8
+
+
+class TestNormalizeDatabricksClusterTopology:
+    def test_maps_legacy_custom_cluster_types_to_graviton(self):
+        cluster_args = {
+            "type": "custom_cluster",
+            "custom_configurations": {
+                "driver_node_type_id": "m5a.xlarge",
+                "node_type_id": "m5a.large",
+                "num_workers": 1,
+            },
+        }
+        normalized = normalize_databricks_cluster_topology(
+            cluster_args, ConfigurationService()
+        )
+        custom = normalized["custom_configurations"]
+        assert custom["driver_node_type_id"] == "m6g.xlarge"
+        assert custom["node_type_id"] == "m6g.large"
+        assert custom["num_workers"] == 1
+
+    def test_maps_consolidation_worker_override_to_graviton(self):
+        cluster_args = {
+            "type": "consolidation_m_general_cluster",
+            "custom_configurations": {
+                "driver_node_type_id": "m6g.xlarge",
+                "node_type_id": "m5a.2xlarge",
+            },
+        }
+        normalized = normalize_databricks_cluster_topology(
+            cluster_args, ConfigurationService()
+        )
+        assert normalized["custom_configurations"]["node_type_id"] == "m6g.2xlarge"
+
+    def test_no_op_for_emr_cluster(self):
+        cluster_args = {
+            "type": "emr_7_12_min_general_2_workers_cluster",
+            "custom_configurations": {
+                "node_type_id": "m7g.2xlarge",
+            },
+        }
+        normalized = normalize_databricks_cluster_topology(
+            cluster_args, ConfigurationService()
+        )
+        assert normalized["custom_configurations"]["node_type_id"] == "m7g.2xlarge"
+
+    def test_heterogeneous_driver_and_worker_preserve_class(self):
+        cluster_args = {
+            "type": "consolidation_s_memory_cluster",
+            "custom_configurations": {
+                "driver_node_type_id": "m5d.xlarge",
+                "node_type_id": "r5d.2xlarge",
+            },
+        }
+        normalized = normalize_databricks_cluster_topology(
+            cluster_args, ConfigurationService()
+        )
+        custom = normalized["custom_configurations"]
+        assert custom["driver_node_type_id"] == "m6g.xlarge"
+        assert custom["node_type_id"] == "r6g.2xlarge"
