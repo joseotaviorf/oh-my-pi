@@ -10,22 +10,38 @@ _JOB_PATHS = [
     "dags/fintech/arquivo_confidencial_integration_report/spark_jobs/load_incremental_arquivo_confidencial_raw.py",
     "dags/fintech/cyber/spark_jobs/load_cyber_raw.py",
     "dags/fintech/cyber_audit_log/spark_jobs/load_cyber_audit_log_raw.py",
+    "dags/fintech/cyber_bureau/spark_jobs/load_cyber_raw.py",
+    "dags/fintech/cyber_complement/spark_jobs/load_cyber_raw.py",
     "dags/fintech/cyber_historical_tree/spark_jobs/load_cyber_historical_tree_raw.py",
+    "dags/fintech/cyber_legal/spark_jobs/load_cyber_raw.py",
+    "dags/fintech/cyber_legal_historical/spark_jobs/load_cyber_raw.py",
     "dags/fintech/google_calendar/spark_jobs/load_google_calendar.py",
     "dags/fintech/grb/spark_jobs/load_grb_raw.py",
+    "dags/fintech/invoice_preview/spark_jobs/load_csv_into_datalake.py",
+    "dags/fintech/itau_statements/spark_jobs/load_raw.py",
     "dags/fintech/meetcall/spark_jobs/load_meetcall_raw.py",
     "dags/fintech/nexxera/spark_jobs/load_csv_into_datalake.py",
     "dags/fintech/paschoalotto/spark_jobs/load_paschoalotto_raw.py",
     "dags/fintech/paschoalotto_report/spark_jobs/load_paschoalotto_report_raw.py",
-    "dags/fintech/itau_statements/spark_jobs/load_raw.py",
+    "dags/fintech/payable_accounts_transactions/spark_jobs/load_sheets_into_datalake.py",
     "dags/fintech/sap_4hana/spark_jobs/load_raw.py",
+    "dags/fintech/velo_neurotech/spark_jobs/load_incremental_data_into_datalake_raw.py",
+    "dags/fintech/velo_neurotech_pj/spark_jobs/load_incremental_data_into_datalake_raw.py",
     "dags/fintech/velo_zendesk/spark_jobs/add_partitions_to_raw_tables.py",
     "dags/fintech/webhelp/spark_jobs/load_webhelp_raw.py",
 ]
+
+
+_JOBS_WITHOUT_WRITE_TARGET = {
+    "dags/fintech/velo_zendesk/spark_jobs/add_partitions_to_raw_tables.py",
+}
 
 
 @pytest.mark.parametrize("job_path", _JOB_PATHS)
 def test_spark_job_registers_validation_write_flags(job_path: str):
     text = (_REPO_ROOT / job_path).read_text(encoding="utf-8")
     assert "add_validation_target_args" in text or "--target-database-name" in text
-    assert "resolve_datalake_write_target(" in text
+    if job_path in _JOBS_WITHOUT_WRITE_TARGET:
+        assert "is_validation_run" in text
+    else:
+        assert "resolve_datalake_write_target(" in text

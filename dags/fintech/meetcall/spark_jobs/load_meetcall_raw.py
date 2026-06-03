@@ -39,7 +39,11 @@ def _get_conn_config(dbutils, dbutils_secret_key):
     return json.loads(conn_config_json)
 
 
-def _send_warning(dbutils, environment, table_name):
+def _send_warning(
+    dbutils,
+    environment,
+    table_name,
+):
     if environment == "prod":
         key = GchatWebhooksEnum.FINTECH_ALERTS_PROD
     else:

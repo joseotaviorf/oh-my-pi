@@ -60,7 +60,12 @@ def _generate_date_range(load_start_date, load_end_date):
     return date_index
 
 
-def __build_warning_messages(environment, s3_path_prefix, table_name, dates):
+def __build_warning_messages(
+    environment,
+    s3_path_prefix,
+    table_name,
+    dates,
+):
 
     messages = []
     for date in dates:

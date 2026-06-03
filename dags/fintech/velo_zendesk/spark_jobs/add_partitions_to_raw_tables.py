@@ -5,10 +5,7 @@ import boto3
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
-from bietlejuice.base.validation.spark_args import (
-    add_validation_target_args,
-    resolve_datalake_write_target,
-)
+from bietlejuice.base.validation.spark_args import add_validation_target_args
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.services.metastore_services import SparkMetastoreService
 from bietlejuice.services.storage_services import S3Service
@@ -61,18 +58,11 @@ if __name__ == "__main__":
 
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
-    write_database_name, write_table_name, write_location = (
-        resolve_datalake_write_target(
-            prod_database=database_name,
-            prod_table=table_name,
-            prod_location=database_location,
-            bucket=datalake_bucket,
-            target_database=args.target_database_name,
-            target_table=args.target_table_name,
-        )
+    is_validation_run = (
+        args.target_database_name is not None and args.target_table_name is not None
     )
 
-    # as Stitch loads the data, we just add partition here
+    # Stitch loads data to prod S3; this job only registers metastore partitions.
     for level in partition_cols:
         partition_location = database_location.replace(
             SOURCE, f"{TABLE_DB_MAPPING[table_name]}/{table_name}"
@@ -81,6 +71,12 @@ if __name__ == "__main__":
             partition_location += "".join(f"{column}={value}")
 
         if s3_service.list_objects(partition_location):
-            metastore_service.add_partitions(
-                write_database_name, write_table_name.lower(), partition_cols
-            )
+            if is_validation_run:
+                logger.info(
+                    f"m={JOB_NAME}, msg=Skipping metastore partition registration in "
+                    "validation mode (Stitch data remains on prod S3 paths)"
+                )
+            else:
+                metastore_service.add_partitions(
+                    database_name, table_name.lower(), partition_cols
+                )

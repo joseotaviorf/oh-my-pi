@@ -121,7 +121,10 @@ def prepare_temp_file(file_text):
     return fl.name
 
 
-def _get_conn_config(dbutils, dbutils_secret_key):
+def _get_conn_config(
+    dbutils,
+    dbutils_secret_key,
+):
     conn_config_json = dbutils.secrets.get(scope="quintoandar", key=dbutils_secret_key)
     credentials = json.loads(conn_config_json)
     certs = (

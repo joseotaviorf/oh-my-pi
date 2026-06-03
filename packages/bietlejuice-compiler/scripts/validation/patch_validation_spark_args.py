@@ -157,8 +157,10 @@ def _target_db_expr(content: str, func_start: int, func_end: int) -> Tuple[str, 
     header = func_body[:header_end] if header_end > 2 else func_body[:500]
     if "target_database_name" in header:
         return "target_database_name", "target_table_name"
-    prefix = content[:func_start]
-    if re.search(r"args\s*=\s*(?:parser\.parse_args|parse_arguments)\(", prefix):
+    if re.search(
+        r"args\s*=\s*(?:parser\.parse_args|arg_parser\.parse_args|parse_arguments)\(",
+        content,
+    ):
         return "args.target_database_name", "args.target_table_name"
     if re.search(r"\bargs\.", func_body):
         return "args.target_database_name", "args.target_table_name"
@@ -270,6 +272,11 @@ def _patch_get_db_info_block(content: str) -> str:
         patched_tail,
     )
     patched_tail = re.sub(
+        r"database_location=database_location,",
+        "database_location=write_location,",
+        patched_tail,
+    )
+    patched_tail = re.sub(
         r"create_new_partitions_from_df\(\s*database_name=database_name",
         "create_new_partitions_from_df(database_name=write_database_name",
         patched_tail,
@@ -326,6 +333,11 @@ def _patch_pipeline_writes(content: str) -> str:
         "database_location=write_location,",
         content,
     )
+    content = re.sub(
+        r"table_name=table_name,\n(\s+)df=df,\n(\s+)partition_cols=",
+        r"table_name=write_table_name,\n\1df=df,\n\2partition_cols=",
+        content,
+    )
     return content
 
 
@@ -356,10 +368,22 @@ def _patch_function_signature(content: str, func_name: str) -> str:
     )
 
 
+_SKIP_SIGNATURE_PATCH = frozenset(
+    {
+        "_send_warning",
+        "_generate_date_range",
+        "__build_warning_messages",
+        "_get_conn_config",
+        "_raise_if_load_failed",
+        "__create_dataframes_for_items",
+    }
+)
+
+
 def _patch_helper_functions_with_db_info(content: str) -> str:
     for match in list(re.finditer(r"^def (\w+)\(", content, re.MULTILINE)):
         name = match.group(1)
-        if name in ("main", "save_to_datalake"):
+        if name in ("main", "save_to_datalake") or name in _SKIP_SIGNATURE_PATCH:
             continue
         func_start = match.start()
         func_end = content.find("\ndef ", func_start + 4)

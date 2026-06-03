@@ -256,9 +256,7 @@ def main():
             table_privileges_dict, full_raw_table_name
         )
     else:
-        table_privileges = TablePrivileges.from_environment_default(
-            f"{write_database_name}.{write_table_name}"
-        )
+        table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
 
     DeltaLoader(spark_client.conn).load_table(
         table_name=full_raw_table_name,

@@ -101,7 +101,31 @@ def _resolve_spark_job_path(
         return None
 
     dag_dir = str(Path(cluster_file).parent)
+    dag_name = Path(cluster_file).stem.replace("_cluster", "")
     line_root = Path(cluster_file).parts[1] if cluster_file.startswith("dags/") else ""
+
+    decl_path = cluster_file.replace("_cluster.yml", "_declaration.yml")
+    decl_text = git_show(ref, decl_path)
+    spark_job_prefix = dag_name
+    if decl_text:
+        prefix_match = re.search(
+            r"^\s*spark_job_prefix:\s*(\S+)", decl_text, re.MULTILINE
+        )
+        if prefix_match:
+            spark_job_prefix = prefix_match.group(1)
+
+    for variant in _job_name_variants(job_name):
+        for prefix in (dag_name, spark_job_prefix):
+            preferred = (
+                f"dags/{line_root}/{prefix}/spark_jobs/{variant}.py"
+                if line_root
+                else f"{dag_dir}/spark_jobs/{variant}.py"
+            )
+            if git_show(ref, preferred):
+                return preferred
+        preferred_in_dag_dir = f"{dag_dir}/spark_jobs/{variant}.py"
+        if git_show(ref, preferred_in_dag_dir):
+            return preferred_in_dag_dir
 
     candidates: List[str] = []
     listing = _run(["git", "ls-tree", "-r", "--name-only", ref, "dags/"])
@@ -113,12 +137,6 @@ def _resolve_spark_job_path(
             if not rel.endswith(f"{variant}.py") or "spark_jobs" not in rel:
                 continue
             if rel.startswith(f"{dag_dir}/"):
-                candidates.append(rel)
-            elif (
-                line_root
-                and rel.startswith(f"dags/{line_root}/")
-                and rel.endswith(f"{variant}.py")
-            ):
                 candidates.append(rel)
 
     if not candidates:
