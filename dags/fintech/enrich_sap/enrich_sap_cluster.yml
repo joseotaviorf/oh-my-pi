@@ -19,5 +19,5 @@ validation:
     databricks_conn_id: databricks_new_env
     custom_configurations:
       node_type_id: r6gd.4xlarge
-      driver_node_type_id: r6gd.2xlarge
+      driver_node_type_id: r6gd.4xlarge
       runtime_engine: PHOTON

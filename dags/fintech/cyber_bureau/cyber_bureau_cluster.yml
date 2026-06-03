@@ -20,5 +20,4 @@ validation:
     - jar: '{artifacts_bucket}/jars/ojdbc8.jar'
     custom_configurations:
       num_workers: 3
-      driver_node_type_id: r6g.2xlarge
   allow_custom_spark_job: true

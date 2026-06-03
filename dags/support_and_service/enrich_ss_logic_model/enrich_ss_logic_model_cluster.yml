@@ -25,7 +25,7 @@ validation:
     custom_configurations:
       num_workers: 5
       node_type_id: m6gd.4xlarge
-      driver_node_type_id: m6gd.2xlarge
+      driver_node_type_id: m6gd.4xlarge
       runtime_engine: PHOTON
       aws_attributes:
         ebs_volume_size: 200

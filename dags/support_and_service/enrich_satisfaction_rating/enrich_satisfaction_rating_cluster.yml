@@ -17,6 +17,5 @@ validation:
     type: consolidation_l_general_cluster
     databricks_conn_id: databricks_new_env
     custom_configurations:
-      driver_node_type_id: m6g.2xlarge
       aws_attributes:
         availability: ON_DEMAND

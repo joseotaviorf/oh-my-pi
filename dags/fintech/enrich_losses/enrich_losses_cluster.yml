@@ -12,4 +12,4 @@ validation:
     databricks_conn_id: databricks_new_env
     custom_configurations:
       num_workers: 5
-      driver_node_type_id: r6g.2xlarge
+      driver_node_type_id: r6g.4xlarge

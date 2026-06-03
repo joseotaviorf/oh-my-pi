@@ -23,6 +23,5 @@ validation:
     databricks_conn_id: databricks_new_env
     custom_configurations:
       num_workers: 20
-      driver_node_type_id: r6g.2xlarge
       aws_attributes:
         ebs_volume_size: 300
