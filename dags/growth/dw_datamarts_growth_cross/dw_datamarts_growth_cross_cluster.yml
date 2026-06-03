@@ -3,8 +3,8 @@ cluster:
   custom_configurations:
     spark_version: 16.4.x-scala2.12
     autotermination_minutes: 20
-    driver_node_type_id: r5a.2xlarge
-    node_type_id: m5a.8xlarge
+    driver_node_type_id: r6g.2xlarge
+    node_type_id: m6g.8xlarge
     num_workers: 3
     aws_attributes:
       first_on_demand: 1
