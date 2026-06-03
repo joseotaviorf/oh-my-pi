@@ -324,9 +324,8 @@ LEFT JOIN
         AND fas.dt_reference <= dis.dt_valid_to
 LEFT JOIN
     dw_compensation.fact_compensations AS fc
-        ON fc.assignment_number = fas.assignment_number
-        AND fas.dt_reference >= fc.dt_valid_from
-        AND fas.dt_reference <= fc.dt_valid_to
+        ON fc.sk_compensation = fas.sk_compensation_version
+        AND fas.sk_compensation_version <> '-1'
 LEFT JOIN
     dw_compensation.dim_event_definition AS ev_raise
         ON ev_raise.sk_event_definition = fc.sk_event_definition

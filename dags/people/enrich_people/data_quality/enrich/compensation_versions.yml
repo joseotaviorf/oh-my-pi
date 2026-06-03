@@ -1,0 +1,71 @@
+---
+table_name: datalake_people.compensation_versions
+alert_channel: PEOPLE_ALERTS
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -5
+    less_than_or_equal_to: 20
+    severity_level: Warning
+
+column_level_validations:
+  sk_compensation:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_salary:
+    is_complete:
+      severity_level: Error
+  id_assignment:
+    is_complete:
+      severity_level: Error
+  person_number:
+    is_complete:
+      severity_level: Error
+  assignment_number:
+    is_complete:
+      severity_level: Error
+  salary_amount:
+    is_complete:
+      severity_level: Error
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.compensation_versions
+         WHERE salary_amount < 0
+        ) = 0
+      severity_level: Error
+  annual_salary:
+    is_complete:
+      severity_level: Error
+  is_salary_approved:
+    is_complete:
+      severity_level: Error
+  dt_valid_from:
+    is_complete:
+      severity_level: Error
+    custom:
+      # SCD bounds: valid-from must not be after valid-to.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_people.compensation_versions
+         WHERE dt_valid_from > dt_valid_to
+        ) = 0
+      severity_level: Error
+  dt_valid_to:
+    is_complete:
+      severity_level: Error
+  dt_reference:
+    is_complete:
+      severity_level: Error
+  is_current:
+    is_complete:
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Error

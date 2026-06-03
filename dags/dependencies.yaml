@@ -367,14 +367,10 @@ bietlejuice.dw_compensation:
   - bietlejuice.dw_time:load-dw-time-dim-absence-type:first-run-of-day
   - bietlejuice.dw_time:load-dw-time-fact-absence-requests:first-run-of-day
   - bietlejuice.enrich_employment:load-enrich-employee-details:first-run-of-day
+  - bietlejuice.enrich_people:load-enrich-compensation-versions:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-event-definition:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-identifier-mapping:first-run-of-day
   - bietlejuice.enrich_people:load-enrich-job-with-salary-table:first-run-of-day
-  - bietlejuice.pin_compensation:load-clean-element-entry-value:first-run-of-day
-  - bietlejuice.pin_compensation:load-clean-element-entry:first-run-of-day
-  - bietlejuice.pin_compensation:load-clean-element-input-value:first-run-of-day
-  - bietlejuice.pin_compensation:load-clean-element-type:first-run-of-day
-  - bietlejuice.pin_compensation:load-clean-salary:first-run-of-day
   - bietlejuice.pin_core:load-clean-all-assignments:first-run-of-day
 bietlejuice.dw_condo_monitoring:
   - bietlejuice.enrich_condo_monitoring:load-enrich-communication:first-run-of-day
@@ -3310,7 +3306,12 @@ bietlejuice.enrich_payments_platform:
   - bietlejuice.wall_street:load-clean-subscription:first-run-of-day
   - bietlejuice.wall_street_fast_lane:load-clean-charge:first-run-of-day
 bietlejuice.enrich_people:
+  - bietlejuice.pin_compensation:load-clean-element-entry-value:first-run-of-day
+  - bietlejuice.pin_compensation:load-clean-element-entry:first-run-of-day
+  - bietlejuice.pin_compensation:load-clean-element-input-value:first-run-of-day
+  - bietlejuice.pin_compensation:load-clean-element-type:first-run-of-day
   - bietlejuice.pin_compensation:load-clean-salary-bases:first-run-of-day
+  - bietlejuice.pin_compensation:load-clean-salary:first-run-of-day
   - bietlejuice.pin_core:load-clean-action-base:first-run-of-day
   - bietlejuice.pin_core:load-clean-action-occurrence:first-run-of-day
   - bietlejuice.pin_core:load-clean-action-reason-base:first-run-of-day

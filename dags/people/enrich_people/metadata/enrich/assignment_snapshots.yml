@@ -35,6 +35,10 @@ columns:
     lineage:
       - datalake_people.job_with_salary_table.id_job
       - datalake_people.job_with_salary_table.dt_valid_from
+  sk_compensation_version:
+    description: Surrogate key for the compensation period effective on dt_reference. Matches dw_compensation.fact_compensations.sk_compensation for equality joins. NULL when no compensation_versions row covers dt_reference for this assignment.
+    lineage:
+      - datalake_people.compensation_versions.sk_compensation
   sk_cost_center_version:
     description: |
       Surrogate key for the cost center version in effect on dt_reference. NULL when there is no organization or no version covers that date.

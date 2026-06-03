@@ -17,4 +17,3 @@ workflow:
   extra_query_template_params:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -1), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
-

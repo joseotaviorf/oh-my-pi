@@ -31,27 +31,22 @@ columns:
       to uniquely identify each consolidated compensation record.
       id_assignment suffices for grain differentiation (1:1 with id_period_of_service).
     lineage:
-      - datalake_pin_compensation_clean.salary.id_salary
-      - datalake_pin_compensation_clean.salary.id_assignment
-      - datalake_pin_compensation_clean.salary.id_job
-      - datalake_pin_compensation_clean.salary.dt_started
-      - datalake_pin_compensation_clean.salary.dt_ended
+      - datalake_people.compensation_versions.sk_compensation
   sk_employee:
     description: Foreign key to dim_employee. References the employee (id_person).
     lineage:
-      - datalake_pin_compensation_clean.salary.id_person
+      - datalake_people.compensation_versions.id_person
   sk_contract:
     description: Foreign key to dim_assignment. References the contract/assignment (id_assignment).
     lineage:
-      - datalake_pin_compensation_clean.salary.id_assignment
+      - datalake_people.compensation_versions.id_assignment
   sk_job_version:
     description: |
       Foreign key to dim_job. References the job version at the time of the salary record.
       Computed with the same MD5(id_job, dt_valid_from) formula as dim_job from
       datalake_people.job_with_salary_table.
     lineage:
-      - datalake_people.job_with_salary_table.id_job
-      - datalake_people.job_with_salary_table.dt_valid_from
+      - datalake_people.compensation_versions.sk_job_version
   sk_event_definition:
     description: |
       Foreign key to dim_event_definition.
@@ -59,19 +54,19 @@ columns:
       NULL on rows created by job-version or assignment history version splits
       (only populated on the originating row where the salary actually changed).
     lineage:
-      - datalake_people.event_definition.id_event_definition
+      - datalake_people.compensation_versions.id_event_definition
   person_number:
     description: Employee's person number (business identifier).
     lineage:
-      - datalake_people.identifier_mapping.person_number
+      - datalake_people.compensation_versions.person_number
   assignment_number:
     description: Assignment number for the employee's position.
     lineage:
-      - datalake_people.identifier_mapping.assignment_number
+      - datalake_people.compensation_versions.assignment_number
   currency_code:
     description: Currency code for salary amounts (e.g., BRL, USD, MXN).
     lineage:
-      - datalake_pin_compensation_clean.salary.currency_code
+      - datalake_people.compensation_versions.currency_code
   plr_target_currency_code:
     description: |
       Currency of the fixed-amount PLR target (target_plr) when sourced from a
@@ -80,11 +75,12 @@ columns:
       dimensionless) or when the employee has no active ICP entry. Useful to flag
       currency mismatch against currency_code.
     lineage:
-      - datalake_pin_compensation_clean.element_type.input_currency_code
+      - datalake_people.compensation_versions.target_plr_currency_code
   salary_range:
     description: Salary bracket derived from amount_salary for analytical grouping. Only populated for BRL salaries; '-1' when currency is not BRL or salary_amount is not available.
     lineage:
-      - datalake_pin_compensation_clean.salary.salary_amount
+      - datalake_people.compensation_versions.salary_amount
+      - datalake_people.compensation_versions.currency_code
     categories:
       "Below R$3,000": Monthly salary below R$3,000.
       "R$3,000 - R$4,999": Monthly salary between R$3,000 and R$4,999.
@@ -96,11 +92,11 @@ columns:
   amount_salary:
     description: Salary amount based on the salary basis frequency (e.g., monthly salary).
     lineage:
-      - datalake_pin_compensation_clean.salary.salary_amount
+      - datalake_people.compensation_versions.salary_amount
   amount_annual_salary:
     description: Calculated total annual salary based on salary amount and annualization factor.
     lineage:
-      - datalake_pin_compensation_clean.salary.annual_salary
+      - datalake_people.compensation_versions.annual_salary
   amount_total_cash:
     description: |
       Total cash compensation including annual salary and PLR target.
@@ -117,41 +113,41 @@ columns:
       between PLR target and salary (e.g. "Annual Target - PLR (Dolar)" in USD vs
       salary in ARS) is not reconciled in this calculation; see plr_target_currency_code.
     lineage:
-      - datalake_pin_compensation_clean.salary.annual_salary
-      - datalake_pin_compensation_clean.salary.salary_amount
-      - datalake_pin_compensation_clean.element_entry_value.screen_entry_value
-      - datalake_pin_compensation_clean.element_type.element_name
+      - datalake_people.compensation_versions.annual_salary
+      - datalake_people.compensation_versions.salary_amount
+      - datalake_people.compensation_versions.target_plr_salary_multiplier
+      - datalake_people.compensation_versions.target_plr
   amount_adjustment:
     description: |
       Monetary amount of the salary adjustment (difference from previous salary).
       NULL on rows created by job-version or assignment history version splits
       (only populated on the originating row where the salary actually changed).
     lineage:
-      - datalake_pin_compensation_clean.salary.adjustment_amount
+      - datalake_people.compensation_versions.adjustment_amount
   pct_adjustment:
     description: |
       Percentage increase of the salary adjustment over the base salary value.
       NULL on rows created by job-version or assignment history version splits
       (only populated on the originating row where the salary actually changed).
     lineage:
-      - datalake_pin_compensation_clean.salary.adjustment_percent
+      - datalake_people.compensation_versions.adjustment_percent
   range_position:
     description: |
       Compensation ratio comparing actual salary to the midpoint of the pay range.
       Formula: salary / mid_value. Values around 1.0 indicate market alignment.
       Primary metric used by the business for compensation analysis.
     lineage:
-      - datalake_pin_compensation_clean.salary.compa_ratio
+      - datalake_people.compensation_versions.range_position
   range_percentile:
     description: |
       Position of salary within the pay range as a percentage.
       Formula: (salary - min) / (max - min). Can be negative (below min) or >100 (above max).
     lineage:
-      - datalake_pin_compensation_clean.salary.range_position
+      - datalake_people.compensation_versions.range_percentile
   is_salary_approved:
     description: Boolean flag indicating if the salary proposal has been approved.
     lineage:
-      - datalake_pin_compensation_clean.salary.is_salary_approved
+      - datalake_people.compensation_versions.is_salary_approved
   is_promotion_movement:
     description: |
       TRUE if this salary change is associated with a promotion event.
@@ -161,11 +157,12 @@ columns:
       Always FALSE on rows created by job-version or assignment history version splits
       (event metadata is only attributed to the originating salary change row).
     lineage:
-      - datalake_people.event_definition.reason_code
+      - datalake_people.compensation_versions.reason_code
   is_eligible_internet_reimbursement:
     description: TRUE if BRL salary < 10,000 (eligible for internet reimbursement); FALSE if BRL salary >= 10,000; NULL when currency is not BRL or salary_amount is not available.
     lineage:
-      - datalake_pin_compensation_clean.salary.salary_amount
+      - datalake_people.compensation_versions.salary_amount
+      - datalake_people.compensation_versions.currency_code
   days_tenure_in_company:
     description: |
       Tenure in the company in days.
@@ -174,7 +171,8 @@ columns:
       the date resets only on true rehire; GLB_TRANSFER continuations preserve the original hire date.
       NULL when identifier_mapping data is unavailable.
     lineage:
-      - datalake_people.identifier_mapping.dt_original_hired
+      - datalake_people.compensation_versions.dt_reference
+      - datalake_people.compensation_versions.dt_original_hired
   days_tenure_in_position:
     description: |
       Tenure in the current job (position) in days, measured from the start of the current stint.
@@ -183,8 +181,8 @@ columns:
       Resets on true rehire (new cycle in identifier_mapping). Reference date LEAST(CURRENT_DATE, dt_valid_to).
       NULL when job history is unavailable.
     lineage:
-      - datalake_pin_core_clean.all_assignments.dt_effective_started
-      - datalake_people.identifier_mapping.id_continuous_employment_cycle
+      - datalake_people.compensation_versions.dt_reference
+      - datalake_people.compensation_versions.dt_stint_start_position
   days_tenure_in_band:
     description: |
       Tenure in the current band in days, measured from the start of the current stint.
@@ -193,43 +191,41 @@ columns:
       Resets on true rehire (new cycle in identifier_mapping). Reference date LEAST(CURRENT_DATE, dt_valid_to).
       NULL when band history is unavailable.
     lineage:
-      - datalake_pin_core_clean.all_assignments.dt_effective_started
-      - datalake_people.identifier_mapping.id_continuous_employment_cycle
-      - datalake_people.job_with_salary_table.band
+      - datalake_people.compensation_versions.dt_reference
+      - datalake_people.compensation_versions.dt_stint_start_band
   months_tenure_in_company:
     description: |
       Tenure in the company in whole months.
       Same logic as days_tenure_in_company (uses dt_original_hired, reference date LEAST(CURRENT_DATE, dt_valid_to)).
     lineage:
-      - datalake_people.identifier_mapping.dt_original_hired
+      - datalake_people.compensation_versions.dt_reference
+      - datalake_people.compensation_versions.dt_original_hired
   months_tenure_in_position:
     description: |
       Tenure in the current job (position) in whole months. Same logic as days_tenure_in_position.
     lineage:
-      - datalake_pin_core_clean.all_assignments.dt_effective_started
-      - datalake_people.identifier_mapping.id_continuous_employment_cycle
+      - datalake_people.compensation_versions.dt_reference
+      - datalake_people.compensation_versions.dt_stint_start_position
   months_tenure_in_band:
     description: |
       Tenure in the current band in whole months. Same logic as days_tenure_in_band.
     lineage:
-      - datalake_pin_core_clean.all_assignments.dt_effective_started
-      - datalake_people.identifier_mapping.id_continuous_employment_cycle
-      - datalake_people.job_with_salary_table.band
+      - datalake_people.compensation_versions.dt_reference
+      - datalake_people.compensation_versions.dt_stint_start_band
   dt_valid_from:
     description: Start date of validity for this salary record (SCD Type 2).
     lineage:
-      - datalake_pin_compensation_clean.salary.dt_started
+      - datalake_people.compensation_versions.dt_valid_from
   dt_valid_to:
     description: |
       End date of validity for this salary record (SCD Type 2).
       `9999-12-31` when the salary row is still open.
     lineage:
-      - datalake_pin_compensation_clean.salary.dt_ended
+      - datalake_people.compensation_versions.dt_valid_to
   is_current:
     description: |
       TRUE if this record represents the current salary for the contract/assignment.
     lineage:
-      - datalake_pin_compensation_clean.salary.dt_started
-      - datalake_pin_compensation_clean.salary.dt_ended
+      - datalake_people.compensation_versions.is_current
   ts_load:
     description: Timestamp recording when data was loaded into the table.

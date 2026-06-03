@@ -1,6 +1,7 @@
 SELECT
     COALESCE(asn.sk_cost_center_version, '-1') AS sk_cost_center_version,
     COALESCE(asn.sk_job_version, '-1') AS sk_job_version,
+    COALESCE(asn.sk_compensation_version, '-1') AS sk_compensation_version,
     COALESCE(ct.sk_contact_version, '-1') AS sk_contact_version,
     COALESCE(doc.sk_documentation_version, '-1') AS sk_documentation_version,
     COALESCE(ec.sk_emergency_contact_version, '-1') AS sk_emergency_contact_version,

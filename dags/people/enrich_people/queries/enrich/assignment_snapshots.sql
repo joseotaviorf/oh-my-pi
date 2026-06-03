@@ -291,6 +291,7 @@ SELECT
         )
     ) AS sk_job_version,
     cc.sk_cost_center_version,
+    cv.sk_compensation AS sk_compensation_version,
     jwst.country AS business_unit_country,
     mh.sk_hierarchy_version,
     ted.id_event_definition AS sk_termination_event_definition,
@@ -450,6 +451,11 @@ LEFT JOIN
 LEFT JOIN
     datalake_gsheets_people_clean.layoffs AS lo
         ON ad.assignment_number = UPPER(lo.id_employee)
+LEFT JOIN
+    datalake_people.compensation_versions AS cv
+        ON cv.assignment_number = ad.assignment_number
+        AND ad.dt_reference >= cv.dt_valid_from
+        AND ad.dt_reference <= cv.dt_valid_to
 QUALIFY
     ROW_NUMBER() OVER (
         PARTITION BY
@@ -459,5 +465,6 @@ QUALIFY
             cc.sk_cost_center_version NULLS LAST,
             pei.id_person_extra_info NULLS LAST,
             jwst.dt_valid_from DESC NULLS LAST,
+            cv.dt_valid_from DESC NULLS LAST,
             all_assign.effective_sequence DESC NULLS LAST
     ) = 1

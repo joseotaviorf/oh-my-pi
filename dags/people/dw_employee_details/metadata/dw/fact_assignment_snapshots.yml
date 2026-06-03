@@ -15,6 +15,10 @@ columns:
     description: Job identifier. Use to get job title and details from dim_job.
     lineage:
       - datalake_people.assignment_snapshots.sk_job_version
+  sk_compensation_version:
+    description: Compensation period identifier. Joins to dw_compensation.fact_compensations.sk_compensation for equality joins without a DW-to-DW dependency. '-1' when no compensation record covers dt_reference.
+    lineage:
+      - datalake_people.assignment_snapshots.sk_compensation_version
   sk_contact_version:
     description: Contact info identifier. Use to get email, phone, and address from dim_contact.
     lineage:

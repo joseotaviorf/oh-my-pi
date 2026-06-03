@@ -31,6 +31,11 @@ workflow:
       - management_hierarchy
       - job_with_salary_table
       - cost_center_history
+      - compensation_versions
+    compensation_versions:
+      - identifier_mapping
+      - job_with_salary_table
+      - event_definition
     codex_log:
       - codex_history_base
       - identifier_mapping
@@ -67,6 +72,9 @@ workflow:
       vacuum_retention_hours: 168
       vacuum_lite: true
     assignment_snapshots:
+      vacuum_retention_hours: 168
+      vacuum_lite: true
+    compensation_versions:
       vacuum_retention_hours: 168
       vacuum_lite: true
     codex_pin_sync_drift:
