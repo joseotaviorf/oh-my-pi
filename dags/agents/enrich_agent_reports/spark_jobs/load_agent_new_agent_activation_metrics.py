@@ -47,13 +47,9 @@ from pyspark.sql.functions import (
     date_trunc,
     datediff,
     last_day,
-    least,
     lit,
     to_date,
     when,
-)
-from pyspark.sql.functions import (
-    max as spark_max,
 )
 from pyspark.sql.functions import (
     min as spark_min,
@@ -391,20 +387,32 @@ def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
         (col("reference_month") >= lit(month_start))
         & (col("reference_month") <= lit(month_end))
     )
-    last_independent = (
-        status.filter(~col("is_passive_lead_receiver"))
-        .groupBy("id_agent")
-        .agg(
-            to_date(spark_max("agent_status_start")).alias(
-                "dt_independent_agent_registered"
-            )
-        )
-        .select(col("id_agent").alias("fi_id_agent"), "dt_independent_agent_registered")
+    _independent_window = (
+        Window.partitionBy("id_agent")
+        .orderBy("reference_month")
+        .rowsBetween(Window.unboundedPreceding, 0)
+    )
+    last_independent = status.withColumn(
+        "dt_independent_agent_registered",
+        to_date(
+            spark_min(
+                when(
+                    ~col("is_passive_lead_receiver") & (col("ciq_status") == "ACTIVE"),
+                    col("agent_status_start"),
+                )
+            ).over(_independent_window)
+        ),
+    ).select(
+        col("id_agent").alias("fi_id_agent"),
+        col("reference_month").alias("fi_reference_month"),
+        "dt_independent_agent_registered",
     )
 
     agent_type_segment = (
         when(
-            (col("s.agent_status") == "ACTIVE") & ~col("s.is_passive_lead_receiver"),
+            (col("s.agent_status") == "ACTIVE")
+            & ~col("s.is_passive_lead_receiver")
+            & (col("s.ciq_status") == "ACTIVE"),
             lit("INDEPENDENT"),
         )
         .when(
@@ -432,7 +440,12 @@ def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
             col("s.id_agent") == col("brk.brk_id_agent"),
             "inner",
         )
-        .join(last_independent, col("s.id_agent") == col("fi_id_agent"), "left")
+        .join(
+            last_independent,
+            (col("s.id_agent") == col("fi_id_agent"))
+            & (col("s.reference_month") == col("fi_reference_month")),
+            "left",
+        )
         .filter(
             _new_broker_within_reference_month(
                 col("s.reference_month"), col("brk.brk_ts_created")
@@ -506,10 +519,7 @@ def build_agent_new_agent_activation_metrics(args: Namespace) -> DataFrame:
             col("s.ciq_status"),
             col("s.agent_status"),
             col("s.is_passive_lead_receiver"),
-            coalesce(
-                col("dt_independent_agent_registered"),
-                to_date(least(col("brk.brk_ts_created"), col("ts_ciq_created"))),
-            ).alias("dt_independent_agent_registered"),
+            col("dt_independent_agent_registered"),
             col("brk.brk_ts_created").alias("ts_agent_created"),
             col("ts_ciq_created"),
             col("tqc_curr.ts_first_activation_tqc_referral"),
