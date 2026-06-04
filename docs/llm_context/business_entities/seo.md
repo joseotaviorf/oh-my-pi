@@ -35,6 +35,7 @@ SEO (Search Engine Optimization) tracks QuintoAndar's organic search visibility 
 - **Page structure** → URL-based page classification (e.g., `/alugar` → "Transacional", `/condominio` → "Condominium")
 - **Page cluster** → content-based grouping (e.g., "Rental Search", "Purchase Search", "Condominio")
 - **Player** → competitor tracked in SEMrush: zapimoveis, quintoandar, olximoveis, chavesnamao, imovelweb, loft, wimoveis, vivareal
+- **QAC** (QuintoAndar Classifieds) → QuintoAndar’s initiative to display the full market inventory from Navent (Imovelweb, Wimoveis, ..) listings as a freemium business model.
 
 ## Tables
 
@@ -46,14 +47,18 @@ SEO (Search Engine Optimization) tracks QuintoAndar's organic search visibility 
 | Daily new and recovered target for Tenant Prospects by channel, region | `delta.datalake_gsheets_clean.rental_prospect_target` |
 | Daily new and recovered target for Buyer Prospects by channel, region | `delta.datalake_gsheets_clean.sale_prospect_target` |
 | Daily keyword-level impressions, clicks, CTR, position with clustering (GSC) | `delta.datalake_google_search_console.keyword_clusters` |
-| Monthly keyword-level rankings, search volume, and competitor comparison (SEMrush) | `delta.datalake_semrush.keyword_clusters` |
+| Monthly keyword-level rankings, search volume, and competitor comparison for Brazil (SEMrush) | `delta.datalake_semrush.keyword_clusters` |
+| Monthly keyword-level rankings, traffic share, and competitive positioning for LATAM classified portals — Argentina, Ecuador, Mexico, Panama, Peru (SEMrush, excluding Brazil) | `datalake_semrush_classified.keywords_from_players` |
+| Daily QAC funnel metrics — ToF, QAC exposure, listing views, lead intent, and lead confirmed — by date, business context, and city (distinct Amplitude users) | `growth.growth_demand_qac_funnel` |
 
 **Critical rules:**
 - For average position, always compute `SUM(posimp) / SUM(impressions)` — `AVG(position)` ignores impression weight and produces misleading results.
 - `datalake_google_search_console.keyword_clusters.is_branded` is an integer (1/0), not a string label; map to `medium` values (`SEO branded`, `SEO non-branded`) when joining with demand performance tables.
 - Join `rental_prospect_target` and `sale_prospect_target` to `dw_public.dim_date` on `date` to derive `month_start` for alignment with monthly observed metrics. Also set `country_code = 'BR'` on target tables when joining to observed metrics.
 - Normalize `business_context` to initial-capital (`Rent`, `Sale`) when combining rows across tables — raw values are lowercase.
-- `datalake_semrush.keyword_clusters` date column is `dt_display` (fixed to 15th of each month); `datalake_google_search_console.keyword_clusters` uses `dt_created`.
+- `datalake_semrush.keyword_clusters` date column is `dt_display` (always fixed to the 15th of each month — an arbitrary ingestion artifact). When a row with `dt_display = DATE '2026-05-15'` exists, it means the **entire month of May 2026** has already been captured, not just data up to the 15th. Always treat `dt_display` as a month identifier: use `DATE_TRUNC('month', dt_display)` to normalize it to the 1st of the month, or filter by year/month only — never interpret the 15th as a mid-month cutoff. `datalake_google_search_console.keyword_clusters` uses `dt_created`.
+- `datalake_semrush_classified.keywords_from_players` uses the same `dt_display` monthly artifact (always fixed to the 15th — treat as month identifier; presence of the 15th means the entire month has been captured). Always filter by `country` when querying a specific market: `mex` (Mexico), `arg` (Argentina), `per` (Peru), `ecu` (Ecuador), `pan` (Panama). Use the `player` column to segment by portal; 26 portals are tracked across the 5 countries.
+- `growth.growth_demand_qac_funnel` brings a QAC metrics overview: one row per `dt_reference` × `metric_name` × `business_context` × `city_group`. Always filter or pivot by `metric_name` to isolate the funnel step of interest. `metric_value` = distinct Amplitude users (`id_amplitude`). Join with other SEO tables only on `dt_reference` + `city_group` — there is no surrogate key FK.
 
 ## Key Metrics
 
@@ -242,3 +247,35 @@ FROM
 ORDER BY 
   1
 ```
+
+## Semantic Context
+
+### Why SEO matters for QuintoAndar
+
+Organic search delivers cost-effective, sustainable traffic with higher long-term ROI than paid channels — it is free and compounds over time. A strong SEO presence builds trust and credibility in the real estate market, making users more likely to choose QuintoAndar over competitors when they find it ranking organically. SEO optimization also directly improves user experience (site speed, mobile-friendliness, navigation), reinforcing conversion and satisfaction across all channels.
+
+### Branded vs Non-Branded
+
+Branded searches include "quintoandar" or variants (5andar, quinto andar) — users have already decided on a platform. Non-branded searches are generic (e.g., "alugar apartamento") — users are still open to options and have not committed to a specific company. QuintoAndar's strategic focus is non-branded: it captures users before brand commitment and ensures long-term sustainability with lower dependency on brand awareness alone.
+
+### Short/Head Tail vs Long Tail
+
+Short-tail queries are broad and high-volume (e.g., "alugar apartamento") — users are still undecided. Long-tail queries are more specific with lower volume but higher conversion intent (e.g., "alugar apartamento de três quartos mobiliados em Pinheiros"). QuintoAndar's current priority is short-tail: higher search volume and more available supply to match demand. This strategic choice depends on business maturity and market strategy and can be revisited over time.
+
+### Informational vs Transactional Journeys
+
+Informational queries target early-stage users seeking knowledge or guides (e.g., "Como é morar em Copacabana"). SEO for this intent captures users before they consider transactions, builds authority, and guides them through the renting/buying process — an underserved content area with growth potential. Transactional queries come from users with strong conversion intent using specific keywords (e.g., "Alugar apartamento em São Paulo" or "business + housetype + location") — these map to High intent clusters in the keyword taxonomy.
+
+### Keyword Clusters
+
+Keywords are grouped by semantic similarity and search intent to align content and pages with user intention. Clusters are categorized into three intent levels: **High intent** (strong conversion intent — buy/rent), **Mid intent** (research phase, comparisons), and **Low intent** (broad informational searches). A key strategic use of clusters is competitor benchmarking: comparing performance within each cluster reveals optimization opportunities such as content coverage gaps, indexation issues, and tech SEO improvements. The **goldenset** is the curated subset of highest-priority keywords for focused optimization effort.
+
+### Google Search Console (GSC) and SEMrush
+
+**GSC** is QuintoAndar's primary source for own-site organic performance: search queries, impressions, clicks, CTR, and average position. A key analytical pattern is identifying queries with high impressions but low CTR — these signal ranking presence without capturing clicks, pointing to content or title optimization opportunities.
+
+**SEMrush** adds the competitive intelligence layer that GSC lacks: keyword rankings and search volume across competitors, domain authority, and backlink profiles. It reveals what drives category-wide visibility and where QuintoAndar has ranking gaps versus players like Zap, Viva Real, and OLX. Use GSC for QuintoAndar's own performance analysis; use SEMrush for market positioning and competitive benchmarking.
+
+### QAC - QuintoAndar Classifieds
+
+QAC is QuintoAndar’s initiative to become the definitive Destination for Housing by displaying the full market inventory, including Navent (Imovelweb, Wimoveis, ..) listings not managed by QuintoAndar. It operates as a freemium model for the 3P Marketplace. Start date of the first QAC version: May 26, 2026 (for city groups of Belo Horizonte, Porto Alegre and Campinas). Mega-Launch start date: July 2026 (for city groups of v1 plus RMSP, Curitiba, Brasilia and Goiânia), with 3P freemium model publicly positioned and aggressive supply display expansion to additional markets.

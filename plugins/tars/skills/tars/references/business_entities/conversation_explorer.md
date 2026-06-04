@@ -2,13 +2,13 @@
 
 ## Overview
 
-Conversation Explorer is a **daily sampled subset** of AI chatbot sessions (target **~7.5K sessions per day**) ingested for qualitative review and taxonomy analytics. Each row in `datalake_conversation_explorer_clean.categorisation` carries **Wall-E session categoriser** outputs (categories, resolution labels, friction signals, AI-generated summaries). **`datalake_conversation_explorer_clean.annotations`** holds **human reviewer notes** keyed to the same Langfuse sessions.
+Conversation Explorer is a **daily sampled subset** of AI chatbot sessions (target **~7.5K sessions per day**) ingested for qualitative review and **session categorization analytics**. Each row in `datalake_conversation_explorer_clean.categorisation` carries **Wall-E session categoriser** outputs (categories, resolution labels, friction signals, AI-generated summaries). **`datalake_conversation_explorer_clean.annotations`** holds **human reviewer notes** keyed to the same Langfuse sessions.
 
 **Scope (for now):** Conversation Explorer data exists **only for the Wall-E chatbot** (`datalake_chatbot.sessions.bot = 'wall-e'`). Do not assume Sonia, Matthew, Concierge, or other bots appear in these tables unless product expands coverage.
 
 Tables are partitioned by `year`, `month`, `day` derived from session activity / annotation time — **always constrain partitions** when querying large ranges.
 
-This domain is **not a census** of chatbot traffic. Any metric framed as “share of all bot sessions” or “% of chatbot volume” using `datalake_chatbot.*` totals is **wrong** unless the question explicitly scopes to Conversation Explorer rows only.
+**⚠️ Conversation Explorer is a SAMPLE — not a census and not a source of truth for global chatbot or Domi metrics.** It is the authoritative source for **session categorization** (domain, user problem, resolution, friction signals) within the sampled extract only. Escalation rate, session volume, bypass, and all other bot-wide KPIs must be computed from the souces described in `chatbot_sessions.md` and other relevant docs. Any metric framed as “global escalation rate”, “share of all bot sessions”, or “% of chatbot volume” using Conversation Explorer data is **wrong**.
 
 ## Glossary and Synonyms
 
@@ -38,7 +38,7 @@ This domain is **not a census** of chatbot traffic. Any metric framed as “shar
 
 - Share of sampled sessions by **domain** (`category`) — denominator: distinct `ce_cat.id_langfuse_session` in the filtered categorisation set
 - Share of sampled sessions by **user problem** (`subcategory`) — same denominator rule; nest under `category` when both dimensions appear
-- Escalation mix among sampled sessions (`is_escalated`) — `%` of filtered CE sessions, not `%` of all chatbot escalations
+- Escalation mix **within the sampled sessions** (`is_escalated`) — `%` of filtered CE sessions only; this is a categorization signal for the sample, **not a global escalation rate** and must never be compared to or substitute `datalake_chatbot.sessions` escalation metrics
 - Resolution / refinement distribution (`resolution_category`, `resolution_refinement_category`) — CE denominator
 - AI resistance / frustration distribution (`ai_resistance`, `frustration`) — CE denominator
 - Annotation penetration — e.g. `%` of sampled sessions with ≥1 human annotation in a **defined lag window** (`DATE(created_at) >= session_date`, plus an upper bound if you measure “within N days”); **do not** align `annotations` partitions to categorisation partitions as if both were session day. Denominator from the same CE cohort as Query 3; never compare to global bot sessions
@@ -68,6 +68,8 @@ This domain is **not a census** of chatbot traffic. Any metric framed as “shar
 **Don't:**
 
 - Compare Conversation Explorer counts or percentages to **total chatbot volume**, **all Langfuse sessions**, or any denominator outside the CE tables for the scoped filter — this invalidates inference
+- Use `is_escalated` from CE tables as a **global escalation rate** — it reflects only the sampled sessions and cannot be projected to all chatbot traffic; for global escalation metrics always use `datalake_chatbot.sessions.is_escalated`
+- Use CE session counts as a proxy for overall chatbot volume or any bot-wide Domi metric — the ~7.5K/day cap makes it a categorization sample, not a traffic census
 - Present raw daily session totals without reminding readers that CE intentionally caps near **~7.5K sessions/day**
 - Assume annotations exist for every sampled session — absence simply means reviewers have not annotated that session in the warehouse extract
 - Reuse **`categorisation` `year/month/day`** as the sole filter on **`annotations`** when measuring coverage — **`annotations.day` is keyed to `created_at`**, not `session_date`, and will undercount whenever reviews land on a later calendar day
