@@ -1,5 +1,5 @@
 cluster:
-  type: consolidation_m_memory_cluster
+  type: consolidation_xs_general_cluster
   access_control_list:
     group_name: analytical-environment-costs
     permission_level: CAN_MANAGE

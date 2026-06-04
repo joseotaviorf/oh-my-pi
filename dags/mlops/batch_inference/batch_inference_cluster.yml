@@ -1,5 +1,5 @@
 cluster:
-  type: consolidation_m_general_single_node_cluster
+  type: consolidation_xl_general_cluster
   access_control_list:
     group_name: mlops
     permission_level: CAN_MANAGE
@@ -9,3 +9,5 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    num_workers: 4
+    driver_node_type_id: m6g.4xlarge

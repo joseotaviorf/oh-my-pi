@@ -12,12 +12,13 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -14), 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
 cluster:
-  type: consolidation_l_memory_cluster
+  type: consolidation_s_general_cluster
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
   databricks_conn_id: databricks_new
   custom_configurations:
+    num_workers: 3
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:

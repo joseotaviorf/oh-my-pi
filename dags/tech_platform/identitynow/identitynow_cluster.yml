@@ -1,5 +1,5 @@
 cluster:
-  type: consolidation_xs_general_single_node_cluster
+  type: consolidation_m_general_cluster
   custom_configurations:
     spark_conf:
       spark.sql.legacy.json.allowEmptyString.enabled: "true"

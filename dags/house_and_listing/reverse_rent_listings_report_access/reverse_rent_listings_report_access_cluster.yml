@@ -1,5 +1,5 @@
 cluster:
-  type: consolidation_xs_general_single_node_cluster
+  type: consolidation_s_general_cluster
   custom_configurations:
     aws_attributes:
       first_on_demand: 1
@@ -12,4 +12,5 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    num_workers: 3
   databricks_conn_id: databricks_new
