@@ -29,6 +29,7 @@ Each entity file follows a standard structure:
 - `business_entities/collections.md` — Overdue payment recovery operations (cobrança)
 - `business_entities/conversation_explorer.md` — Conversation Explorer sampled Wall-E chatbot sessions only (~7.5K/day): taxonomy (`category`/`subcategory`) and human annotations (produto Conversation Explorer / domínio–problema do usuário)
 - `business_entities/department.md` — Support queue routing and SLA targets (departamento / fila / caixa)
+- `business_entities/fs-transact.md` — FS Transact — For Sale transaction funnel: EoF (OS → CCV → Closed Deal) and EoP (CCV → CRI → key delivery), 1P scope, Buyer Prospect, lead times by payment track (funil de transação de venda / CCV / Closed Deal / EoP)
 - `business_entities/inspection.md` — Property inspections (vistorias)
 - `business_entities/losses.md` — Accounting write-offs and provisioning (perdas / PDD)
 - `business_entities/matthew.md` — Collections AI agent for tenants with open balances (agente Matthew / cobrança IA)
