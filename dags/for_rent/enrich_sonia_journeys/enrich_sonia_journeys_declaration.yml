@@ -13,6 +13,10 @@ workflow:
   layer: enrich
   sync: [databricks, trino]
   sql_dialect: databricks
+  tables_customization:
+    ds2ca_reject_view:
+      sync: [trino]
+      sql_dialect: trino
 cluster:
   type: databricks_16_4_xmin_view_cluster
   databricks_conn_id: databricks_new_env

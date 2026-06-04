@@ -1,0 +1,64 @@
+database_name: datalake_sonia_journeys
+table_name: ds2ca_reject_view
+description: |
+  Enrich view for Sonia documentation rejection journey events sourced from CDP transactional data.
+  Joins proposal, house, and user context to provide one row per rejected documentation event and
+  person, including contact fallback fields, address display text, deterministic experiment binning,
+  and a flag indicating whether all rejection reasons are eligible for DS2CA communication.
+domain: For Rent
+owner: data-for-rent@quintoandar.com.br
+columns:
+  pk_event_user:
+    lineage:
+      - datalake_cdp_clean.transactional.id_event
+      - datalake_cdp_clean.transactional.id_person
+    description: |
+      Primary key concatenating CDP event id and person UUID, used as the stable event-person
+      identifier by downstream Sonia/SFMC syncs.
+  id_event:
+    lineage:
+      - datalake_cdp_clean.transactional.id_event
+    description: Unique identifier for the rejected documentation analysis transactional event in CDP.
+  id_house:
+    lineage:
+      - datalake_ebdb_clean.proposal.id_house
+    description: House identifier resolved through the EBDB proposal linked to the rejection event.
+  id_user:
+    lineage:
+      - datalake_cdp_clean.transactional.id_user
+    description: User identifier associated with the rejected documentation analysis event in CDP.
+  uuid_person:
+    lineage:
+      - datalake_cdp_clean.transactional.id_person
+    description: Person UUID associated with the rejected documentation analysis event.
+  user_first_name:
+    lineage:
+      - datalake_ebdb_clean.user.name
+    description: First token of the EBDB user display name, used as fallback personalization in messaging.
+  user_phone:
+    lineage:
+      - datalake_ebdb_clean.user.main_phone
+    description: EBDB user main phone with the leading plus sign removed for messaging compatibility.
+  user_email:
+    lineage:
+      - datalake_ebdb_clean.user.email
+    description: EBDB user email used as a fallback identity and contact field in downstream messaging.
+  ts_event:
+    lineage:
+      - datalake_cdp_clean.transactional.ts_event
+    description: Rejection event timestamp formatted as yyyy-MM-dd HH:mm:ss for downstream compatibility.
+  binning_value:
+    lineage:
+      - datalake_cdp_clean.transactional.id_person
+    description: Deterministic 0-99 hash bucket of uuid_person for experiment splits.
+  address_text:
+    lineage:
+      - datalake_ebdb_clean.house.address
+      - datalake_ebdb_clean.house.number
+    description: Concatenated house address and number for display in downstream message templates.
+  has_only_eligible_rejection_reasons:
+    lineage:
+      - datalake_cdp_clean.transactional.event_properties
+    description: |
+      Integer flag set to 1 when the rejection event has at least one party rejection reason and every
+      reason belongs to the eligible DS2CA rejection-reason allowlist; otherwise set to 0.
