@@ -1,0 +1,41 @@
+---
+database_name: datalake_databricks_pricing
+table_name: dim_dbu_price
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+description: |
+  Source-controlled FINAL price dimension: negotiated Databricks DBU price
+  (USD per DBU) by compute type and contract validity window. Single source of
+  truth that replaces the stale gsheet `databricks_contract_details` and the
+  inline Superset CASE rates. Current rates encode the Oct-2024 $1M/24-month
+  committed-use contract; the prior range carries the expired (2024-09-01)
+  gsheet rates. Static full-refresh seed (no upstream lake table).
+columns:
+  compute_type:
+    description: Databricks compute category the rate applies to (JOBS, ALL_PURPOSE, SQL).
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_dbu_price.sql (compute_type)"
+  contract_note:
+    description: Human-readable provenance of the rate (contract name and validity context).
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_dbu_price.sql (contract_note)"
+  usd_per_dbu:
+    description: Negotiated price in USD charged per DBU for this compute type and validity window.
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_dbu_price.sql (negotiated contract rate)"
+  dt_valid_from:
+    description: Inclusive date from which this rate is effective.
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_dbu_price.sql (dt_valid_from)"
+  dt_valid_to:
+    description: Exclusive end date of the rate window; NULL means the rate is currently active.
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_dbu_price.sql (dt_valid_to)"
+  is_current:
+    description: Boolean flag marking the currently-active rate window for this compute type; derived from `dt_valid_to IS NULL`.
+    lineage:
+      - "derived in dim_dbu_price.sql as (dt_valid_to IS NULL)"
+  ts_load:
+    description: Timestamp the row was written by the DAG (CURRENT_TIMESTAMP at load).
+    lineage:
+      - "derived at load time via CURRENT_TIMESTAMP() in dim_dbu_price.sql"

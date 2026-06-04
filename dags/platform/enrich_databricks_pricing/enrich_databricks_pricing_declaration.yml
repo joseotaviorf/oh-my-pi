@@ -1,0 +1,55 @@
+dag:
+  name: enrich_databricks_pricing
+  owner: Data Life Cycle
+  documentation:
+    dag_purpose: |
+      Source-controlled FINAL price dimensions for the Databricks cost model.
+
+      Publishes two static, auditable price seeds that are the single source of
+      truth for converting Databricks usage into USD:
+
+        - dim_dbu_price: negotiated USD/DBU by compute_type and contract
+          validity window. Replaces the stale gsheet
+          `databricks_contract_details` (prior contract, expired 2024-09-01)
+          and the inline Superset CASE rates. Current rates encode the
+          Oct-2024 $1M/24-month committed-use contract.
+        - dim_ec2_price: standard on-demand USD/hour per EC2 instance type
+          plus a derived spot row (0.37 x on-demand). Replaces the runtime
+          dependency on overwatch.instancedetails with an in-repo seed.
+
+      Both tables are full-refresh static seeds (no date partitions); the data
+      lives in the queries, so there is no upstream lake dependency. They feed
+      the dw_databricks_costs billing-spine cost fact, which prices net DBU and
+      EC2 node-hours by joining usage to these dimensions on the validity
+      windows.
+
+      This DAG is a manually-triggered static seed: it is neither cron-scheduled
+      nor dataset-triggered. Run it once at deploy and again on any contract or
+      price change to (re)materialize the tables the cost fact reads at query time.
+workflow:
+  type: query_delta
+  layer: enrich
+  custom_schema: databricks_pricing
+  default_extraction_type: full
+  has_hive_sync: true
+  tables_customization:
+    dim_dbu_price:
+      extraction_type: full
+      partitions: []
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+    dim_ec2_price:
+      extraction_type: full
+      partitions: []
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+cluster:
+  type: consolidation_s_general_single_node_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1,0 +1,60 @@
+dag:
+  name: dw_databricks_costs
+  owner: Data Life Cycle
+  schedule_start_date: 2026, 6, 4
+  schedule_interval: "0 9 * * *"
+  documentation:
+    dag_purpose: |
+      Billing-spine daily cost fact — the all-workload COST AUTHORITY for the
+      Databricks + EC2 bill. Starts from system.billing.usage itself, so the sum
+      of its DBU equals the billed DBU universe by construction (~100% coverage)
+      across all three workspaces (QuintoAndar 4531937035440038, Prod
+      6170817193817, Forno 4033397625841925) and every compute type — unlike
+      dw_databricks_health.fact_databricks_task_run, which covers only Lakeflow
+      job clusters (~80% DBU, Forno ~54%).
+
+      Self-scheduled daily at 09:00 (cron `0 9 * * *`); it reads only Databricks
+      system tables (system.billing.usage, system.compute.*, system.lakeflow.*)
+      plus the static datalake_databricks_pricing price seeds, so it has no
+      bietlejuice upstream and is NOT dataset-triggered.
+
+      One row per (id_databricks_workspace, dt_usage, billing_origin_product,
+      sku_name, id_cluster, id_warehouse, id_databricks_job). DBU is summed net
+      of record_type (RETRACTION rows are negative and cancel ORIGINAL rows), so
+      corrections converge without de-duplication. Every billed product is bucketed
+      (orchestrated_jobs / interactive / sql_warehouse / ml_serving /
+      streaming_dlt / platform_managed / apps_lakebase / other), the owning
+      workload is classified into provisioner_resolved, DBU is priced from
+      datalake_databricks_pricing.dim_dbu_price (negotiated, list fallback +
+      price_missing flag), and EC2 is priced from system.compute.node_timeline
+      node-hours x datalake_databricks_pricing.dim_ec2_price (on-demand / spot).
+
+      The identity column is workload_name (generic), NOT airflow_dag_id, because
+      this fact spans non-Airflow workloads (interactive notebooks, SQL
+      warehouses, model serving, DLT, platform jobs). It complements — does not
+      replace — the Airflow-only dw_databricks_health.fact_databricks_task_run /
+      fact_databricks_dag_run / dag_health family.
+workflow:
+  type: query_delta
+  layer: dw
+  custom_schema: databricks_costs
+  default_extraction_type: incremental
+  has_hive_sync: true
+  tables_customization:
+    fact_databricks_costs:
+      partitions: [ year, month, day ]
+      table_privileges:
+        data-platform-engineers:
+          - ALL PRIVILEGES
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, -2), 'load_start_date') }}"
+    load_end_date:   "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds,  1), 'load_end_date') }}"
+    environment:     "{{ var.value.environment }}"
+cluster:
+  type: consolidation_s_general_single_node_cluster
+  databricks_conn_id: databricks_new_env
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

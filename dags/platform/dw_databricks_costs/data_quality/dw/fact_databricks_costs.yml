@@ -1,0 +1,99 @@
+---
+table_name: dw_databricks_costs.fact_databricks_costs
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+
+column_level_validations:
+  sk_databricks_cost:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_databricks_workspace:
+    is_complete:
+      severity_level: Error
+  dt_usage:
+    is_complete:
+      severity_level: Error
+  billing_origin_product:
+    is_complete:
+      severity_level: Error
+  bucket:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - orchestrated_jobs
+        - interactive
+        - sql_warehouse
+        - ml_serving
+        - streaming_dlt
+        - platform_managed
+        - apps_lakebase
+        - other
+      severity_level: Error
+  compute_type:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - JOBS
+        - ALL_PURPOSE
+        - SQL
+        - OTHER
+      severity_level: Error
+  dbu:
+    # Net DBU is >= 0 in practice; a net-negative group would only arise from a
+    # RETRACTION exceeding its ORIGINAL in the window. Warning (not Error) so the
+    # correction-aware design does not block on legitimate negative nets.
+    has_min_value:
+      greater_than_or_equal_to: 0
+      severity_level: Warning
+  total_cost_usd:
+    # Billing-spine reconciliation over the fact's [MIN(dt_usage),
+    # MAX(dt_usage)] range: for every (workspace, day, billing_origin_product)
+    # in that range, the fact net DBU must equal system.billing.usage net DBU
+    # for the same key (|delta| <= 1.0 DBU to absorb 4-dp rounding). The FULL
+    # OUTER JOIN flags any mismatch — including an interior billing day wholly
+    # missing from the fact (which the prior "day present in the fact" filter
+    # silently passed). True by construction; guards against logic regressions,
+    # dropped days, and late corrections drifting the totals.
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+             SELECT
+                 id_databricks_workspace AS workspace_id,
+                 dt_usage,
+                 billing_origin_product,
+                 SUM(dbu) AS fact_dbu
+             FROM dw_databricks_costs.fact_databricks_costs
+             GROUP BY id_databricks_workspace, dt_usage, billing_origin_product
+         ) f
+         FULL OUTER JOIN (
+             SELECT
+                 workspace_id,
+                 DATE(usage_date) AS dt_usage,
+                 billing_origin_product,
+                 SUM(usage_quantity) AS bill_dbu
+             FROM system.billing.usage
+             WHERE usage_unit = 'DBU'
+               AND workspace_id IN (4531937035440038, 6170817193817, 4033397625841925)
+              AND DATE(usage_date) BETWEEN (SELECT MIN(dt_usage) FROM dw_databricks_costs.fact_databricks_costs)
+                                       AND (SELECT MAX(dt_usage) FROM dw_databricks_costs.fact_databricks_costs)
+             GROUP BY workspace_id, DATE(usage_date), billing_origin_product
+             HAVING SUM(usage_quantity) <> 0
+         ) b
+           ON  f.workspace_id           = b.workspace_id
+           AND f.dt_usage               = b.dt_usage
+           AND f.billing_origin_product = b.billing_origin_product
+         WHERE ABS(COALESCE(f.fact_dbu, 0) - COALESCE(b.bill_dbu, 0)) > 1.0
+        ) = 0
+      severity_level: Error
+  ts_load:
+    is_complete:
+      severity_level: Warning

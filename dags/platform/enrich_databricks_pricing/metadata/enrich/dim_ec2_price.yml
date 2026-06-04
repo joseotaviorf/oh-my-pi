@@ -1,0 +1,42 @@
+---
+database_name: datalake_databricks_pricing
+table_name: dim_ec2_price
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+description: |
+  Source-controlled FINAL price dimension: EC2 standard price (USD per hour)
+  per instance type and availability. The on_demand rows are a snapshot of
+  overwatch.instancedetails.On_Demand_Cost_Hourly captured 2026-06-04; the spot
+  rows are derived as 0.37 x on-demand (the median AWS spot ratio used by
+  enrich_databricks_health). Replaces the runtime dependency on
+  overwatch.instancedetails with an auditable in-repo seed. Static full-refresh
+  seed (no upstream lake table).
+columns:
+  instance_api_name:
+    description: EC2 instance type API name (e.g. r5a.2xlarge) the hourly rate applies to.
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_ec2_price.sql (snapshot of overwatch.instancedetails.API_Name)"
+  availability:
+    description: Capacity purchasing mode for the rate, either on_demand or spot.
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_ec2_price.sql (on_demand row vs derived spot row)"
+  usd_per_hour:
+    description: Hourly price in USD; on_demand snapshot value or spot = 0.37 x on-demand.
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_ec2_price.sql (snapshot of overwatch.instancedetails.On_Demand_Cost_Hourly; spot derived at 0.37x)"
+  dt_valid_from:
+    description: Inclusive date from which this rate snapshot is effective.
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_ec2_price.sql (dt_valid_from)"
+  dt_valid_to:
+    description: Exclusive end date of the rate window; NULL means the rate is currently active.
+    lineage:
+      - "seed literal in dags/platform/enrich_databricks_pricing/queries/enrich/dim_ec2_price.sql (dt_valid_to)"
+  is_current:
+    description: Boolean flag marking the currently-active rate window; derived from `dt_valid_to IS NULL` (always true for these seeds, which carry no historical windows).
+    lineage:
+      - "derived in dim_ec2_price.sql as (dt_valid_to IS NULL)"
+  ts_load:
+    description: Timestamp the row was written by the DAG (CURRENT_TIMESTAMP at load).
+    lineage:
+      - "derived at load time via CURRENT_TIMESTAMP() in dim_ec2_price.sql"

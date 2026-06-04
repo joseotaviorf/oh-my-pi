@@ -1,0 +1,247 @@
+---
+database_name: dw_databricks_costs
+table_name: fact_databricks_costs
+description: |
+  Billing-spine daily cost fact — the all-workload COST AUTHORITY for the
+  Databricks + EC2 bill. One row per (id_databricks_workspace, dt_usage,
+  billing_origin_product, sku_name, id_cluster, id_warehouse, id_databricks_job),
+  built directly on
+  system.billing.usage so the sum of DBU equals the billed universe by
+  construction (~100% coverage) across QuintoAndar, Prod and Forno workspaces and
+  every compute type. Contrast with dw_databricks_health.fact_databricks_task_run
+  (Lakeflow job clusters only, ~80% DBU).
+
+  DBU is summed net of record_type: RETRACTION rows carry negative
+  usage_quantity and cancel ORIGINAL rows, RESTATEMENT carries the corrected
+  amount, so SUM(usage_quantity) is the corrected net DBU with no de-duplication.
+  Groups that net to exactly zero are dropped.
+
+  Every billed product is mapped to exactly one `bucket` (orchestrated_jobs /
+  interactive / sql_warehouse / ml_serving / streaming_dlt / platform_managed /
+  apps_lakebase / other), the owning workload is classified into
+  `provisioner_resolved`, DBU is priced from
+  datalake_databricks_pricing.dim_dbu_price (negotiated rate by compute_type +
+  contract window, with system.billing.list_prices as fallback and a
+  `price_missing` flag), and EC2 is priced from system.compute.node_timeline
+  node-hours x datalake_databricks_pricing.dim_ec2_price split on-demand / spot.
+
+  The identity column is `workload_name` (generic COALESCE of cluster `dag_id`
+  tag, `application` tag, billing `job_name`, cluster_name) — NOT
+  `airflow_dag_id` — because this fact spans non-Airflow workloads (interactive
+  notebooks, SQL warehouses, model serving, DLT, platform jobs). Governance
+  columns (team_owner, cost_center, ecosystem, environment) come from cluster
+  tags and are NULL when unset or for cluster-less (serverless / warehouse) usage.
+
+  Complements — does not replace — the Airflow-only
+  dw_databricks_health.fact_databricks_task_run / fact_databricks_dag_run /
+  dag_health family.
+
+  Sources: system.billing.usage (spine), system.compute.clusters (latest spec),
+  system.lakeflow.job_run_timeline (trigger_type => is_continuous),
+  system.billing.list_prices (list rate, audit + fallback),
+  system.compute.node_timeline (EC2 node-hours),
+  datalake_databricks_pricing.dim_dbu_price, datalake_databricks_pricing.dim_ec2_price.
+domain: Data Ops & Governance
+owner: data-platform-team@quintoandar.com.br
+columns:
+  sk_databricks_cost:
+    description: |
+      Surrogate key for the cost row.
+      `xxhash64(id_databricks_workspace, dt_usage, billing_origin_product,
+      sku_name, COALESCE(id_cluster, ''), COALESCE(id_warehouse, ''),
+      COALESCE(CAST(id_databricks_job AS STRING), ''))`. Encodes the full
+      seven-key grain (id_databricks_job included so a cluster shared by several
+      jobs yields one unique row per job).
+  id_databricks_workspace:
+    description: Databricks workspace identifier (QuintoAndar, Prod, or Forno).
+    lineage:
+      - system.billing.usage.workspace_id
+  id_cluster:
+    description: Cluster identifier from billing usage metadata. NULL for serverless / SQL-warehouse usage that has no cluster.
+    lineage:
+      - system.billing.usage.usage_metadata
+  id_warehouse:
+    description: SQL warehouse identifier from billing usage metadata. NULL for non-warehouse usage.
+    lineage:
+      - system.billing.usage.usage_metadata
+  id_databricks_job:
+    description: Job identifier from billing usage metadata. NULL for usage not attributed to a job (e.g. interactive notebooks, ad-hoc warehouse queries).
+    lineage:
+      - system.billing.usage.usage_metadata
+  workload_name:
+    description: |
+      Generic workload identity for grouping and joins:
+      COALESCE(cluster `dag_id` tag, cluster `application` tag, billing
+      `usage_metadata.job_name`, cluster_name). NOT normalized to an Airflow
+      DAG id — this fact spans non-Airflow workloads. NULL only when none of the
+      sources resolve (cluster-less usage with no job_name).
+    lineage:
+      - system.compute.clusters.tags
+      - system.billing.usage.usage_metadata
+      - system.compute.clusters.cluster_name
+  billing_origin_product:
+    description: Databricks product that originated the billed usage (JOBS, ALL_PURPOSE, SQL, MODEL_SERVING, DLT, ...). The primary cost driver of `bucket`.
+    lineage:
+      - system.billing.usage.billing_origin_product
+  sku_name:
+    description: Billed Databricks SKU (e.g. `PREMIUM_JOBS_COMPUTE`, `ENTERPRISE_SQL_COMPUTE_SERVERLESS`). Drives the list-price lookup and the serverless flag.
+    lineage:
+      - system.billing.usage.sku_name
+  cluster_source:
+    description: How the cluster was created — JOB, UI, API, etc. UI/API on a JOBS product marks the all-purpose "job on interactive" leak. NULL for cluster-less usage.
+    lineage:
+      - system.compute.clusters.cluster_source
+  cluster_name:
+    description: Cluster name from the latest cluster spec. NULL for cluster-less usage.
+    lineage:
+      - system.compute.clusters.cluster_name
+  compute_type:
+    description: |
+      Coarse pricing class derived from billing_origin_product: JOBS,
+      ALL_PURPOSE (ALL_PURPOSE + INTERACTIVE), SQL, or OTHER. The join key into
+      dim_dbu_price for the negotiated rate.
+    lineage:
+      - system.billing.usage.billing_origin_product
+  bucket:
+    description: |
+      Cost taxonomy bucket — exactly one per row: orchestrated_jobs (JOBS on real
+      job clusters), interactive (ALL_PURPOSE/INTERACTIVE + JOBS on UI/API
+      clusters), sql_warehouse, ml_serving (MODEL_SERVING / VECTOR_SEARCH /
+      FOUNDATION_MODEL_TRAINING / AI_RUNTIME / AI_GATEWAY), streaming_dlt,
+      platform_managed (PREDICTIVE_OPTIMIZATION / LAKEHOUSE_MONITORING /
+      DATA_QUALITY_MONITORING / FINE_GRAINED_ACCESS_CONTROL / ONLINE_TABLES),
+      apps_lakebase (APPS / DATABASE / CLEAN_ROOM), other (unmapped residual).
+    lineage:
+      - system.billing.usage.billing_origin_product
+      - system.compute.clusters.cluster_source
+  provisioner_resolved:
+    description: |
+      Best-effort owner attribution: cluster `provisioner` tag when set; else
+      'interactive' for UI/API clusters; else name heuristics over workload_name
+      (atlasdb, databricks-platform, quintoml-ml, sandbox-test, team-workflow);
+      else 'unresolved'.
+    lineage:
+      - system.compute.clusters.tags
+      - system.compute.clusters.cluster_source
+      - system.compute.clusters.cluster_name
+      - system.billing.usage.usage_metadata
+  team_owner:
+    description: Team or person from the cluster `owner` tag. NULL when unset or for cluster-less usage.
+    lineage:
+      - system.compute.clusters.tags
+  cost_center:
+    description: Internal cost-center code from the cluster `cost-center` tag. NULL when unset.
+    lineage:
+      - system.compute.clusters.tags
+  ecosystem:
+    description: Logical ecosystem from the cluster `ecosystem` tag. NULL when unset.
+    lineage:
+      - system.compute.clusters.tags
+  environment:
+    description: Value from the cluster `environment` tag (`prod`, `forno`, ...). NULL when unset.
+    lineage:
+      - system.compute.clusters.tags
+  dbu:
+    description: |
+      Net DBU billed for this grain, `SUM(usage_quantity)` across all record_type
+      (RETRACTION nets out). DECIMAL(25,4). Sums to the billed DBU universe per
+      (workspace, day, product) by construction.
+    lineage:
+      - system.billing.usage.usage_quantity
+  negotiated_usd_per_dbu:
+    description: |
+      Negotiated USD-per-DBU rate from dim_dbu_price for this row's compute_type
+      and the contract window containing dt_usage. NULL when no negotiated rate
+      matches (e.g. compute_type='OTHER') — `price_missing` then fires and pricing
+      falls back to list.
+    lineage:
+      - datalake_databricks_pricing.dim_dbu_price.usd_per_dbu
+      - datalake_databricks_pricing.dim_dbu_price.compute_type
+      - datalake_databricks_pricing.dim_dbu_price.dt_valid_from
+      - datalake_databricks_pricing.dim_dbu_price.dt_valid_to
+  dbu_cost_usd:
+    description: |
+      DBU cost in USD: `dbu * COALESCE(negotiated_usd_per_dbu, list_usd_per_dbu)`,
+      rounded to 4 dp. Uses the negotiated rate when available, else the AWS list
+      rate (never a silent NULL).
+    lineage:
+      - system.billing.usage.usage_quantity
+      - datalake_databricks_pricing.dim_dbu_price.usd_per_dbu
+      - system.billing.list_prices.pricing
+  dbu_list_cost_usd:
+    description: Audit-only DBU cost at AWS list price (`dbu * list_usd_per_dbu`), rounded to 4 dp. Lets consumers compare negotiated vs list spend.
+    lineage:
+      - system.billing.usage.usage_quantity
+      - system.billing.list_prices.pricing
+  ec2_cost_usd:
+    description: |
+      EC2 / instance compute cost in USD attributed to this row. The cluster-day
+      EC2 cost — node wall-clock hours from node_timeline x dim_ec2_price hourly
+      rate (on-demand / spot) — is apportioned to this row by its DBU share of
+      the (workspace, cluster, dt_usage), so per-row values sum to the
+      cluster-day EC2 cost. 0 for cluster-less (serverless / warehouse) usage.
+    lineage:
+      - system.compute.node_timeline.start_time
+      - system.compute.node_timeline.end_time
+      - system.compute.clusters.driver_node_type
+      - system.compute.clusters.worker_node_type
+      - datalake_databricks_pricing.dim_ec2_price.usd_per_hour
+  on_demand_hours:
+    description: |
+      On-demand node-hours for the cluster-day (driver on-demand or non-spot
+      availability), apportioned to this row by its DBU share of the (workspace,
+      cluster, dt_usage). 0 for cluster-less usage.
+    lineage:
+      - system.compute.node_timeline.start_time
+      - system.compute.node_timeline.end_time
+      - system.compute.clusters.aws_attributes
+  spot_hours:
+    description: |
+      Spot node-hours for the cluster-day (spot availability), apportioned to
+      this row by its DBU share of the (workspace, cluster, dt_usage). 0 for
+      cluster-less usage.
+    lineage:
+      - system.compute.node_timeline.start_time
+      - system.compute.node_timeline.end_time
+      - system.compute.clusters.aws_attributes
+  total_cost_usd:
+    description: Total cost in USD for the row (dbu_cost_usd + COALESCE(ec2_cost_usd, 0)), rounded to 4 dp.
+    lineage:
+      - system.billing.usage.usage_quantity
+      - datalake_databricks_pricing.dim_dbu_price.usd_per_dbu
+      - datalake_databricks_pricing.dim_ec2_price.usd_per_hour
+  is_serverless:
+    description: True when the SKU name contains `SERVERLESS`. Serverless usage has no EC2 node-hours.
+    lineage:
+      - system.billing.usage.sku_name
+  is_continuous:
+    description: True when the job ran with `trigger_type = 'CONTINUOUS'` (streaming) in the load window. False when the usage has no matching continuous job run.
+    lineage:
+      - system.lakeflow.job_run_timeline.trigger_type
+  is_job_on_interactive:
+    description: True when a JOBS product billed against a UI/API-source (all-purpose) cluster — the "job on interactive" leak that inflates the Lakeflow-only health fact.
+    lineage:
+      - system.billing.usage.billing_origin_product
+      - system.compute.clusters.cluster_source
+  price_missing:
+    description: True when no negotiated rate matched in dim_dbu_price and the row fell back to list price. A confidence signal for the cost figure.
+    lineage:
+      - datalake_databricks_pricing.dim_dbu_price.usd_per_dbu
+  dt_usage:
+    description: Usage date (UTC) of the billed DBU. The cost-attribution day.
+    lineage:
+      - system.billing.usage.usage_date
+  ts_load:
+    description: Timestamp the row was written by the DAG.
+  year:
+    description: Year of `dt_usage` (partition column).
+    lineage:
+      - system.billing.usage.usage_date
+  month:
+    description: Month of `dt_usage` (partition column).
+    lineage:
+      - system.billing.usage.usage_date
+  day:
+    description: Day of `dt_usage` (partition column).
+    lineage:
+      - system.billing.usage.usage_date

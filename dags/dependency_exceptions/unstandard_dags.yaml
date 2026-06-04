@@ -10,6 +10,8 @@ bietlejuice.dw_datamarts_spark.static:
   is_static: true
 bietlejuice.dw_date:
   is_static: true
+bietlejuice.enrich_databricks_pricing:
+  is_static: true
 bietlejuice.enrich_public_date:
   is_static: true
 bietlejuice.enrich_static_files:
