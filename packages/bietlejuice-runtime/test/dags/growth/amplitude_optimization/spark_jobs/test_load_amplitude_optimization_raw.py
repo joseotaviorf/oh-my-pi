@@ -19,7 +19,8 @@ for _mod in (
     "bietlejuice.base.spark",
     "bietlejuice.base.validation.spark_args",
     "bietlejuice.clients.db_clients",
-    "bietlejuice.jobs.common.raw_layer_loader",
+    "bietlejuice.base.db",
+    "bietlejuice.pipeline.dataframe_delta_table_loader_pipeline",
     "bietlejuice.services.configuration_service",
     "quintoandar_logger",
 ):

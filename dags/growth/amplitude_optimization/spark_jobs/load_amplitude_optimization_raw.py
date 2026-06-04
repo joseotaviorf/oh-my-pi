@@ -7,10 +7,16 @@ from pyspark.sql.functions import col, input_file_name, lit, regexp_extract
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.api.api_enum import APIEnum
+from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import BaseDBUtils, SparkDataFrameService
-from bietlejuice.base.validation.spark_args import add_validation_target_args
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
-from bietlejuice.jobs.common.raw_layer_loader import RawLayerLoader
+from bietlejuice.pipeline.dataframe_delta_table_loader_pipeline import (
+    DataFrameDeltaTableLoaderPipeline,
+)
 from bietlejuice.services.configuration_service import ConfigurationService
 
 JOB_NAME = "load_amplitude_optimization_raw"
@@ -107,23 +113,42 @@ def main():
 
     df = df.select(transient_expected_cols).na.drop(subset=partition_cols)
 
-    # extraction_type="full" -> overwrite mode; combined with the cluster's dynamic
-    # partitionOverwriteMode this overwrites only the loaded day's partitions, matching
-    # amplitude_new's idempotent per-day behaviour (append would duplicate on re-trigger).
-    # apply_table_privileges=False: the loader's people-analytics grant is People-domain
-    # specific and irrelevant for this Growth table.
-    RawLayerLoader(
-        spark_client=spark_client,
-        environment=args.environment,
-        source=args.source,
-        datalake_bucket=args.datalake_bucket,
-        table_name=table_name,
-        partition_cols=partition_cols,
-        extraction_type="full",
-        logger=logger,
-        target_database_name=args.target_database_name,
-        target_table_name=args.target_table_name,
-    ).load_to_raw(df, apply_table_privileges=False)
+    # Skip the write when filtering/na.drop leaves no rows, matching RawLayerLoader's
+    # empty-input guard. Avoids an unnecessary overwrite (and a static-mode truncate risk).
+    if df.isEmpty():
+        logger.info("m=main, msg=no rows after filtering this date; skipping write")
+        return
+
+    # Prototype: write the raw layer as Delta instead of the legacy partitioned JSON
+    # external table. Delta tracks files/partitions in its transaction log, so downstream
+    # reads skip the driver-side S3 partition listing that dominates the JSON read and gain
+    # columnar pruning + stats. The write target is resolved exactly as RawLayerLoader does,
+    # so in validation it is redirected to the cluster_validation schema + validation S3
+    # prefix and never touches production.
+    db_info = DatalakeMetastoreService.get_db_info(
+        args.environment, args.source, args.datalake_bucket
+    )
+    write_database, write_table, write_location = resolve_datalake_write_target(
+        prod_database=db_info["db_raw_databricks"],
+        prod_table=table_name,
+        prod_location=db_info["db_raw_path"],
+        bucket=args.datalake_bucket,
+        target_database=args.target_database_name,
+        target_table=args.target_table_name,
+    )
+
+    # merge_on=None -> overwrite write; with the cluster's dynamic partitionOverwriteMode
+    # this replaces only the loaded day's partitions (idempotent per-day re-trigger).
+    DataFrameDeltaTableLoaderPipeline(
+        database_name=write_database,
+        table_name=write_table,
+        database_location=write_location,
+        layer="raw",
+        dataframe=df,
+        partitions=partition_cols,
+        merge_on=None,
+        spark=spark_client.conn,
+    ).run()
 
 
 if __name__ == "__main__":
