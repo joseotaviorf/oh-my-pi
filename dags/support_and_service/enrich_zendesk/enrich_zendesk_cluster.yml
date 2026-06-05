@@ -1,8 +1,8 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_l_memory_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
     driver_node_type_id: r6g.2xlarge
-    node_type_id: r6g.4xlarge
     spark_version: 16.4.x-scala2.12
     num_workers: 12
     spark_conf:
@@ -10,13 +10,3 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
-  databricks_conn_id: databricks_new_env
-validation:
-  cluster:
-    type: consolidation_l_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      spark_conf:
-        spark.sql.mapKeyDedupPolicy: LAST_WIN
-      num_workers: 12
-      driver_node_type_id: r6g.2xlarge

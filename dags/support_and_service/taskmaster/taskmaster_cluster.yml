@@ -1,8 +1,7 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_s_general_cluster
+  databricks_conn_id: databricks_new
   custom_configurations:
-    driver_node_type_id: m6g.xlarge
-    node_type_id: m6g.xlarge
     num_workers: 3
     spark_version: 16.4.x-scala2.12
     spark_conf:
@@ -10,12 +9,3 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
-  databricks_conn_id: databricks_new
-validation:
-  cluster:
-    type: consolidation_s_general_cluster
-    databricks_conn_id: databricks_new
-    custom_configurations:
-      spark_conf:
-        spark.sql.session.timeZone: America/Sao_Paulo
-      num_workers: 3
