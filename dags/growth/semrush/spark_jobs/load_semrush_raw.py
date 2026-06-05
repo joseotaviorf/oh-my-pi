@@ -7,7 +7,7 @@ from functools import reduce
 
 import boto3
 from pyspark.sql import DataFrame
-from pyspark.sql.functions import *
+from pyspark.sql.functions import lit
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
@@ -37,6 +37,7 @@ def _create_dataframe_with_standard_columns(
     data = re.sub(
         r"/%23%7B.*%7D/", "/", data_raw
     )  # removing everything between { and }
+    sc = spark.sparkContext
 
     try:
         rdd_data = sc.parallelize(data.split("\r\n"))
