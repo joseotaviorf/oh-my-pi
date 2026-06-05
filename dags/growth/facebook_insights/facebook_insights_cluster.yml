@@ -15,7 +15,7 @@ validation:
     custom_libraries:
     - whl: '{artifacts_bucket}/facebook-api-client-python/quintoandar_facebook_api_client-0.1.2-py2.py3-none-any.whl'
     custom_configurations:
-      spark_version: 13.3.x-scala2.12
       aws_attributes:
         ebs_volume_size: 200
+      spark_version: 13.3.x-scala2.12
   allow_custom_spark_job: true

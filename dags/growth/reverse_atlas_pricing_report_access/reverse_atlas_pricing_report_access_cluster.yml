@@ -23,9 +23,9 @@ validation:
     type: consolidation_m_compute_cluster
     databricks_conn_id: databricks_new
     custom_configurations:
-      num_workers: 6
-      driver_node_type_id: r6g.2xlarge
       aws_attributes:
         ebs_volume_size: 200
         instance_profile_arn: '{{ var.value.instance_profile_secret_arn_reverse_listings_report }}'
+      num_workers: 6
+      driver_node_type_id: r6g.2xlarge
   allow_custom_spark_job: true

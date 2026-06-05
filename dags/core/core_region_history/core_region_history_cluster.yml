@@ -14,7 +14,14 @@ validation:
     type: consolidation_s_memory_cluster
     databricks_conn_id: databricks_new
     custom_configurations:
-      driver_node_type_id: r6g.large
       aws_attributes:
         ebs_volume_size: 200
+      spark_conf:
+        spark.sql.shuffle.partitions: '8'
+        spark.databricks.delta.merge.enableLowShuffle: 'true'
+        spark.databricks.adaptive.autoOptimizeShuffle.enabled: 'true'
+        spark.memory.fraction: '0.8'
+        spark.memory.storageFraction: '0.3'
+        spark.sql.adaptive.skewJoin.enabled: 'true'
+      driver_node_type_id: r6g.large
   allow_custom_spark_job: true

@@ -17,9 +17,9 @@ validation:
     - pypi:
         package: facebook-business==23.0.1
     custom_configurations:
-      spark_version: 13.3.x-scala2.12
-      num_workers: 3
       aws_attributes:
         availability: ON_DEMAND
         ebs_volume_size: 200
+      spark_version: 13.3.x-scala2.12
+      num_workers: 3
   allow_custom_spark_job: true

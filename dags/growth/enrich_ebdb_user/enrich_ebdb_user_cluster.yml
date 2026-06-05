@@ -18,7 +18,9 @@ validation:
     - maven:
         coordinates: graphframes:graphframes:0.8.1-spark3.0-s_2.12
     custom_configurations:
-      num_workers: 3
       aws_attributes:
         ebs_volume_size: 200
+      spark_conf:
+        spark.sql.sources.partitionOverwriteMode: static
+      num_workers: 3
   allow_custom_spark_job: true

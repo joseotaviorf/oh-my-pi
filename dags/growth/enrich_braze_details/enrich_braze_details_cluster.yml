@@ -11,6 +11,6 @@ validation:
     type: consolidation_xs_general_cluster
     databricks_conn_id: databricks_new_env
     custom_configurations:
+      runtime_engine: PHOTON
       node_type_id: m6gd.large
       driver_node_type_id: m6gd.large
-      runtime_engine: PHOTON

@@ -11,7 +11,7 @@ validation:
     type: consolidation_m_general_cluster
     databricks_conn_id: databricks_new
     custom_configurations:
-      num_workers: 3
-      driver_node_type_id: r6g.2xlarge
       aws_attributes:
         ebs_volume_size: 200
+      num_workers: 3
+      driver_node_type_id: r6g.2xlarge

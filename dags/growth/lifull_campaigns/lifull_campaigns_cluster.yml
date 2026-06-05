@@ -17,7 +17,7 @@ validation:
       group_name: analytics-engineers
       permission_level: CAN_MANAGE
     custom_configurations:
-      driver_node_type_id: m6g.large
       aws_attributes:
         ebs_volume_size: 200
+      driver_node_type_id: m6g.large
   allow_custom_spark_job: true

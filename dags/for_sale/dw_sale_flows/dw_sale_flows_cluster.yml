@@ -18,6 +18,7 @@ validation:
       group_name: analytics-engineers
       permission_level: CAN_MANAGE
     custom_configurations:
-      driver_node_type_id: r6g.large
       aws_attributes:
         ebs_volume_size: 200
+      data_security_mode: USER_ISOLATION
+      driver_node_type_id: r6g.large

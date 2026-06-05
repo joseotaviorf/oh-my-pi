@@ -17,4 +17,7 @@ validation:
     type: consolidation_l_compute_cluster
     databricks_conn_id: databricks_new_env
     custom_configurations:
+      autoscale:
+        max_workers: 2
+        min_workers: 1
       driver_node_type_id: c6g.2xlarge

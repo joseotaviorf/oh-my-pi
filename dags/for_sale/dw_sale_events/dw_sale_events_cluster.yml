@@ -18,9 +18,10 @@ validation:
       group_name: analytics-engineers
       permission_level: CAN_MANAGE
     custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      data_security_mode: USER_ISOLATION
+      runtime_engine: PHOTON
       num_workers: 3
       node_type_id: m6gd.xlarge
       driver_node_type_id: m6gd.xlarge
-      runtime_engine: PHOTON
-      aws_attributes:
-        ebs_volume_size: 200

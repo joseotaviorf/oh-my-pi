@@ -11,9 +11,10 @@ validation:
     type: consolidation_l_memory_cluster
     databricks_conn_id: databricks_new_env
     custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+      data_security_mode: USER_ISOLATION
+      runtime_engine: PHOTON
       num_workers: 3
       node_type_id: r6gd.4xlarge
       driver_node_type_id: r6gd.2xlarge
-      runtime_engine: PHOTON
-      aws_attributes:
-        ebs_volume_size: 200

@@ -21,11 +21,11 @@ validation:
     - pypi:
         package: scikit-learn>=0.24.0
     custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
       spark_version: 12.2.x-scala2.12
+      runtime_engine: PHOTON
       num_workers: 3
       node_type_id: m6gd.xlarge
       driver_node_type_id: m6gd.xlarge
-      runtime_engine: PHOTON
-      aws_attributes:
-        ebs_volume_size: 200
   allow_custom_spark_job: true
