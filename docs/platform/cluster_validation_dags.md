@@ -106,6 +106,89 @@ S3 path: `s3a://{datalake_bucket}/validation/cluster_validation/{prod_database}/
 3. Confirm rows in `cluster_validation.*___*` tables and prod tables unchanged
 4. Switch prod `cluster.type` to consolidation when satisfied; remove `validation` block
 
+### Batch trigger on production Astro
+
+Use [`scripts/trigger_cluster_validation_dags.py`](../../scripts/trigger_cluster_validation_dags.py) to trigger many validation DAGs in parallel and stream status to the console as each run completes or fails.
+
+**Prerequisites**
+
+- Production Astro deployment API URL and token (create via `astro deployment token create`)
+- Validation DAGs deployed to Airflow (tag `cluster_validation`)
+
+```bash
+export AIRFLOW_API_URL="https://<prod-deployment>.astronomer.run"
+export AIRFLOW_AUTH_TOKEN="<deployment-api-token>"
+
+# List selected DAGs from the repo only (no Airflow API)
+uv run --project packages/bietlejuice-compiler python scripts/trigger_cluster_validation_dags.py \
+  --lines fintech --list
+
+# Preview triggers: resolves load windows via Airflow (no POST)
+uv run --project packages/bietlejuice-compiler python scripts/trigger_cluster_validation_dags.py \
+  --lines agents \
+  --from-prod-run \
+  --dry-run
+
+# Trigger using each prod DAG's fastest successful run in the last 14 days
+uv run --project packages/bietlejuice-compiler python scripts/trigger_cluster_validation_dags.py \
+  --lines agents \
+  --from-prod-run \
+  --max-parallel 15
+
+# Trigger a line with explicit load window
+uv run --project packages/bietlejuice-compiler python scripts/trigger_cluster_validation_dags.py \
+  --lines agents,fintech \
+  --load-start-date 2024-01-01 \
+  --load-end-date 2024-01-07 \
+  --max-parallel 15
+
+# Trigger all deployed validation DAGs except one line
+uv run --project packages/bietlejuice-compiler python scripts/trigger_cluster_validation_dags.py \
+  --exclude-lines tech_platform \
+  --load-start-date 2024-01-01 \
+  --load-end-date 2024-01-07
+
+# Single DAG smoke test
+uv run --project packages/bietlejuice-compiler python scripts/trigger_cluster_validation_dags.py \
+  --dags journey_optimizer \
+  --load-start-date 2024-01-01 \
+  --load-end-date 2024-01-07
+```
+
+**Useful flags**
+
+| Flag | Purpose |
+|------|---------|
+| `--lines` / `--exclude-lines` | Include or exclude `dags/<line>/` subtrees |
+| `--dags` / `--exclude-dags` | Include or exclude short dag folder names |
+| `--max-parallel` | Max validation DAG runs in flight at once; next starts when one finishes (default 15) |
+| `--max-runs` | Deprecated; skip uses latest validation run state only (default 1) |
+| `--force-retrigger` | Always trigger; ignore existing Airflow runs |
+| `--dag-runs-lookback` | Recent dag runs to inspect per DAG for resume/skip (default 25) |
+| `--poll-interval` | Base seconds between status polls; exponential backoff applies (default 30) |
+| `--poll-max-interval` | Cap on poll backoff delay in seconds (default 300) |
+| `--poll-jitter` | Fractional jitter on poll delays; also staggers the first poll in `[0, base±jitter]` (default 0.25; use 0 to disable) |
+| `--skip-missing` / `--no-skip-missing` | Skip DAGs not yet deployed (default: skip) |
+| `--require-all-deployed` | Fail fast if any selected DAG is missing from Airflow |
+| `--list` | Repo discovery only; no Airflow calls or load dates |
+| `--dry-run` | Query Airflow and print per-DAG load window, prod reference run, and action (`TRIGGER` / `RESUME` / `SKIP`); never triggers |
+| `--from-prod-run` | Per-DAG `load_start_date` / `load_end_date` from prod DAG (mutually exclusive with explicit load dates) |
+| `--prod-run-lookback-days` | Search window for fastest successful prod run (default 14) |
+| `--prod-run-recency-days` | Skip when prod DAG has no success in this many days (default 7) |
+| `--no-prod-run-recency-filter` | Do not skip idle prod DAGs |
+| `--prod-run-lookback-limit` | Max successful prod runs fetched per DAG (default 100) |
+| `--verbose` | Print running task ids while polling |
+
+Before each new trigger, the script **unpauses** the validation DAG if it is paused in Airflow (`PATCH` with `is_paused: false`). DAGs are not re-paused after the run finishes. RESUME and SKIP paths do not change pause state.
+
+While PRs land incrementally, keep `--skip-missing` enabled so only deployed validation DAGs are triggered. Failed runs print Airflow task logs to stderr immediately when they finish.
+
+**`--from-prod-run` load window:** For each validation DAG, the script reads the matching prod DAG (`bietlejuice.{name}`, without `__validation`). Among successful prod runs in the last `--prod-run-lookback-days` (default 14), it picks the run with the shortest duration (ties: most recent `start_date`). Load dates come from that run's `conf` when present, otherwise from `data_interval_start` and `data_interval_end` (end date uses the exclusive-interval rule: calendar day before `data_interval_end`). DAGs whose prod DAG has not succeeded in the last `--prod-run-recency-days` (default 7) are skipped unless `--no-prod-run-recency-filter` is set.
+
+**Re-run / resume:** Before each validation DAG, the script queries recent Airflow runs (`--dag-runs-lookback`, default 25): it **resumes** monitoring any active run (`queued` / `running` / `deferred`), **skips** when the most recent terminal run is `success` (cluster validation is a smoke test; one success is enough signal), and **triggers** when the last run failed or there is no prior success. Use `--force-retrigger` to run again after a success. `--from-prod-run` only chooses the load window sent on **trigger**; it does not affect skip. Dry-run `SKIP` lines include the last successful run id (e.g. `already validated (last run success: manual__...)`). Transient API errors during polling are retried with backoff until the run finishes or `--timeout` is reached.
+
+**Databricks cluster name length:** Databricks limits cluster names to 100 characters. Bietlejuice sets `cluster_name` to `{{ dag.dag_id }}_{{ run_id }}` in `prod_conf.yml`, so validation DAG ids longer than **64 characters** are skipped automatically (reserving 35 characters for `_` plus a typical Airflow `run_id`). Example: `bietlejuice.enrich_braze_events_user_centric_periodicity__validation` (68 chars) is not triggered by the batch script.
+
 ## Eligibility
 
 ```bash

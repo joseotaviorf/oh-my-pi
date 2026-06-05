@@ -5,5 +5,5 @@ cluster:
     permission_level: CAN_MANAGE
   custom_configurations:
     spark_conf:
-      spark.metrics.namespace: "data_products.search"
+      spark.metrics.namespace: data_products.search
   databricks_conn_id: databricks_new

@@ -1,22 +1,14 @@
 cluster:
   type: emr_7_12_consolidation_l_memory_cluster
   custom_configurations:
-    # Cost-saving spot/OD mix: 1 CORE on-demand + 2 TASK spot (~67% spot).
-    # num_workers is the TOTAL (CORE + TASK), so 3 = 1 CORE + 2 TASK.
-    # Master stays ON_DEMAND (m7g.xlarge) per emr_consolidation_base anchor.
     core_nodes:
-        instance_count: 1
+      instance_count: 1
     task_nodes:
-        instance_count: 2
+      instance_count: 2
     spark_conf:
-      # Master / YARN RM (m7g.xlarge — 4 vCPU / 16 GB)
       spark.driver.memory: 8g
-      spark.driver.cores: "4"
-      # Workers are r7g.4xlarge (16 vCPU / 128 GB each); 3 workers (1 CORE + 2 TASK).
-      # 4 execs/worker × 4 cores = 16 cores fully utilized.
-      # 4 × 28g (24g heap + 4g overhead) = 112 GB used / 128 GB per worker.
+      spark.driver.cores: '4'
       spark.executor.memory: 24g
-      spark.executor.cores: "4"
-      # 3 workers × 4 execs/worker = 12 execs max.
-      spark.dynamicAllocation.minExecutors: "2"
-      spark.dynamicAllocation.maxExecutors: "12"
+      spark.executor.cores: '4'
+      spark.dynamicAllocation.minExecutors: '2'
+      spark.dynamicAllocation.maxExecutors: '12'

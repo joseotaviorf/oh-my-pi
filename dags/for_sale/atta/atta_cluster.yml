@@ -3,4 +3,4 @@ cluster:
   custom_configurations:
     master_node_type_id: m7a.xlarge
     task_nodes:
-        instance_count: 1
+      instance_count: 1
