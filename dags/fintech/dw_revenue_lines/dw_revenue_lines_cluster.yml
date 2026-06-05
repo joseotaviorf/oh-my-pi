@@ -1,5 +1,9 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_s_memory_cluster
+  databricks_conn_id: databricks_new_env
+  access_control_list:
+    group_name: analytics-engineers
+    permission_level: CAN_MANAGE
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
@@ -11,19 +15,3 @@ cluster:
     runtime_engine: PHOTON
     spark_version: 13.3.x-scala2.12
     num_workers: 2
-  access_control_list:
-    group_name: analytics-engineers
-    permission_level: CAN_MANAGE
-  databricks_conn_id: databricks_new_env
-validation:
-  cluster:
-    type: consolidation_s_memory_cluster
-    databricks_conn_id: databricks_new_env
-    access_control_list:
-      group_name: analytics-engineers
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      spark_version: 13.3.x-scala2.12
-      runtime_engine: PHOTON
-      node_type_id: r6gd.xlarge
-      driver_node_type_id: r6gd.xlarge

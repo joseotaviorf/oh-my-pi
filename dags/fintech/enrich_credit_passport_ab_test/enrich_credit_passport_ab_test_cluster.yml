@@ -1,5 +1,5 @@
 cluster:
-  type: databricks_16_4_min_memory_cluster
+  type: consolidation_s_memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
@@ -8,13 +8,6 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
       spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true
     autotermination_minutes: 20
-validation:
-  cluster:
-    type: consolidation_s_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      spark_conf:
-        spark.databricks.delta.constraints.allowUnenforcedNotNull.enabled: true
-      num_workers: 3
+    aws_attributes:
+      ebs_volume_size: 200
+    num_workers: 3

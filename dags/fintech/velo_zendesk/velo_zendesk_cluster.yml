@@ -1,8 +1,7 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_m_memory_cluster
+  databricks_conn_id: databricks_new
   custom_configurations:
-    driver_node_type_id: r6g.2xlarge
-    node_type_id: r6g.2xlarge
     spark_version: 13.3.x-scala2.12
     spark_conf:
       spark.driver.maxResultSize: '0'
@@ -12,16 +11,3 @@ cluster:
       max_workers: 6
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
-  databricks_conn_id: databricks_new
-validation:
-  cluster:
-    type: consolidation_m_memory_cluster
-    databricks_conn_id: databricks_new
-    custom_configurations:
-      spark_conf:
-        spark.driver.maxResultSize: '0'
-      spark_version: 13.3.x-scala2.12
-      autoscale:
-        min_workers: 2
-        max_workers: 6
-  allow_custom_spark_job: true

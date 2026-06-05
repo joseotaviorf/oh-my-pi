@@ -1,5 +1,5 @@
 cluster:
-  type: databricks_16_4_min_memory_cluster
+  type: consolidation_s_memory_cluster
   databricks_conn_id: databricks_new
   custom_libraries:
   - jar: '{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar'
@@ -8,14 +8,6 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-validation:
-  cluster:
-    type: consolidation_s_memory_cluster
-    databricks_conn_id: databricks_new
-    custom_libraries:
-    - jar: '{artifacts_bucket}/mysql-connector-java/mysql-connector-java-5.1.47.jar'
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      num_workers: 3
-  allow_custom_spark_job: true
+    aws_attributes:
+      ebs_volume_size: 200
+    num_workers: 3

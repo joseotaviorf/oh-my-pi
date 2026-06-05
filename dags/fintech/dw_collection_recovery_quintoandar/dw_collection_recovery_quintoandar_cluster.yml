@@ -1,5 +1,6 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_xl_memory_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
@@ -7,7 +8,6 @@ cluster:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
     autotermination_minutes: 20
     driver_node_type_id: r6g.2xlarge
-    node_type_id: r6g.8xlarge
     num_workers: 3
     spark_version: 16.4.x-scala2.12
     aws_attributes:
@@ -16,13 +16,3 @@ cluster:
       zone_id: us-east-1d
       ebs_volume_size: 200
       availability: SPOT_WITH_FALLBACK
-  databricks_conn_id: databricks_new_env
-validation:
-  cluster:
-    type: consolidation_xl_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      num_workers: 3
-      driver_node_type_id: r6g.2xlarge
