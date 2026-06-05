@@ -210,7 +210,7 @@ curl -s -u admin:admin http://localhost:8080/api/v1/importErrors
 List tasks to confirm all expected tasks are present:
 ```bash
 curl -s -u admin:admin "http://localhost:8080/api/v1/dags/bietlejuice.{dag_name}/tasks" \
-  | python3 -c "import json,sys; data=json.load(sys.stdin); [print(t['task_id']) for t in data['tasks']]; print(f'Total: {data[\"total_entries\"]}')"
+  | uv run python -c "import json,sys; data=json.load(sys.stdin); [print(t['task_id']) for t in data['tasks']]; print(f'Total: {data[\"total_entries\"]}')"
 ```
 
 If `last_parsed_time` has not updated yet, wait 15–30 seconds and retry.
@@ -271,14 +271,14 @@ Poll the DAG run and task instance states. Use exponential backoff:
 ```bash
 curl -s -u admin:admin \
   "http://localhost:8080/api/v1/dags/bietlejuice.{dag_name}/dagRuns/{dag_run_id}" \
-  | python3 -c "import json,sys; d=json.load(sys.stdin); print(f'DAG state: {d[\"state\"]}')"
+  | uv run python -c "import json,sys; d=json.load(sys.stdin); print(f'DAG state: {d[\"state\"]}')"
 ```
 
 **Check all task instance states:**
 ```bash
 curl -s -u admin:admin \
   "http://localhost:8080/api/v1/dags/bietlejuice.{dag_name}/dagRuns/{dag_run_id}/taskInstances" \
-  | python3 -c "import json,sys; data=json.load(sys.stdin); [print(f'  {t[\"task_id\"]:45s} state={str(t[\"state\"]):15s} duration={t.get(\"duration\",\"\")}') for t in data['task_instances']]"
+  | uv run python -c "import json,sys; data=json.load(sys.stdin); [print(f'  {t[\"task_id\"]:45s} state={str(t[\"state\"]):15s} duration={t.get(\"duration\",\"\")}') for t in data['task_instances']]"
 ```
 
 Typical task execution timeline:
@@ -312,7 +312,7 @@ RUN_ID=<run_id_from_logs>
 
 curl -s -H "Authorization: Bearer $DATABRICKS_TOKEN" \
   "https://dbc-324f044d-4b9d.cloud.databricks.com/api/2.1/jobs/runs/get-output?run_id=$RUN_ID" \
-  | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('error','')); print('---'); print(d.get('error_trace','')[:3000])"
+  | uv run python -c "import json,sys; d=json.load(sys.stdin); print(d.get('error','')); print('---'); print(d.get('error_trace','')[:3000])"
 ```
 
 ---

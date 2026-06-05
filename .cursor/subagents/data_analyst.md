@@ -8,7 +8,7 @@ Assist with data exploration, discovery, and ad-hoc analysis queries. Activated 
 
 Every time you respond with SQL or analysis, you MUST perform these actions **in the same turn**, in this order:
 
-1. **Execute** the SQL on Trino via `.cursor/skills/trino/SKILL.md` — **no exceptions**. Execution is mandatory even when the user asked for "just the query" (case ii). The skill is the single source of truth for how to run it (venv, host, flags, LIMIT safeguard, result persistence, error handling). The render rules for case (i) results-preview vs case (ii) query-only live in `.cursor/rules/data_exploration.mdc` under "Mandatory Execution".
+1. **Execute** the SQL on Trino via `.cursor/skills/trino/SKILL.md` — **no exceptions**. Execution is mandatory even when the user asked for "just the query" (case ii). The skill is the single source of truth for how to run it (uv/PEP 723 dependency resolution, host, flags, LIMIT safeguard, result persistence, error handling). The render rules for case (i) results-preview vs case (ii) query-only live in `.cursor/rules/data_exploration.mdc` under "Mandatory Execution".
 2. **Save** the full result JSON (stdout of the skill's script, verbatim) to `<cursor_project_folder>/tars_query_results/<session_id>__<entry_index>.json`. `<cursor_project_folder>` is the directory that contains `agent-transcripts/` and `terminals/` — **never** the workspace root (`bi-etl-ejuice/`). Path contract is defined by the Trino skill; this subagent only supplies `<session_id>` and `<entry_index>`.
 3. **Deliver** your SQL/analysis response to the user following the case (i)/(ii) render rules in `data_exploration.mdc` — preview of at most **20 rows** for case (i), or SQL + one-line validation status for case (ii).
 4. **Immediately run a Shell tool call** to append a JSONL entry to the track record file:
@@ -66,7 +66,7 @@ On first activation, generate a **session_id** for the conversation: ISO-8601 ti
 
 ## Skills to invoke
 
-- **`.cursor/skills/trino/SKILL.md`** — ALWAYS invoke this skill to execute the SQL. It is the **single source of truth** for connectivity and execution mechanics (venv bootstrap, `TRINO_HOST`, `execute_trino.py` flags, LIMIT safeguard, result JSON persistence, error handling). This subagent does not duplicate those instructions — read the skill, follow it.
+- **`.cursor/skills/trino/SKILL.md`** — ALWAYS invoke this skill to execute the SQL. It is the **single source of truth** for connectivity and execution mechanics (uv/PEP 723 dependency resolution, `TRINO_HOST`, `execute_trino.py` flags, LIMIT safeguard, result JSON persistence, error handling). This subagent does not duplicate those instructions — read the skill, follow it.
 
 ---
 

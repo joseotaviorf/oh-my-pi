@@ -1,6 +1,6 @@
 ---
 name: trino
-description: "Execute SQL against QuintoAndar's Trino cluster. Handles venv bootstrap, host resolution, SSO authentication, LIMIT safeguard, and persistence of results. Pure connectivity/execution — contains NO SQL authoring guidance (dialect, partition filters, layer choice live in data_exploration.mdc). ONLY usable when `@tars` mode is active; never invoke autonomously."
+description: "Execute SQL against QuintoAndar's Trino cluster. Dependencies are declared inline (PEP 723) and resolved by `uv run --script`; handles host resolution, SSO authentication, LIMIT safeguard, and persistence of results. Pure connectivity/execution — contains NO SQL authoring guidance (dialect, partition filters, layer choice live in data_exploration.mdc). ONLY usable when `@tars` mode is active; never invoke autonomously."
 ---
 
 # Trino Execution Skill
@@ -21,35 +21,29 @@ This skill is usable **only when the user has activated `@tars`** (same gating a
 
 ## Execution Workflow
 
-### 1. Bootstrap (first run only)
-
-If `venv` does not exist inside the skill folder, create it and install dependencies. One-time setup, no prior configuration required:
-
-```bash
-[ ! -d .cursor/skills/trino/venv ] && \
-    python3 -m venv .cursor/skills/trino/venv && \
-    .cursor/skills/trino/venv/bin/pip install trino pandas keyring
-```
-
-### 2. Environment
+### 1. Environment
 
 Default Trino host for this repository: **`trino.apps.data-prd.habitat.zone`**. Users are expected to have `TRINO_HOST=trino.apps.data-prd.habitat.zone` in their `.env`. Always pass the host as `"${TRINO_HOST:-trino.apps.data-prd.habitat.zone}"` so the user's override wins and the default is used otherwise. Never hardcode a different host.
 
-### 3. LIMIT safeguard
+The bundled script declares its dependencies inline via a PEP 723 header (`trino`, `pandas`, `keyring`). `uv run --script` resolves them from the global uv cache on first use and reuses them afterwards — there is no venv to bootstrap, and nothing is written under the skill folder. Never run bare `python3` or `pip install` here.
+
+### 2. LIMIT safeguard
 
 Before executing, inspect the SQL. If it has no `LIMIT` clause, append `LIMIT 100000` purely as an execution safeguard so results stay bounded. Aggregates and counts may use a smaller bound. This is an **execution-only** safeguard — the SQL returned to the user in the reply is the original SQL without the safeguard LIMIT (call it out in prose if added).
 
-### 4. Invoke the bundled script
+### 3. Invoke the bundled script
 
-Always invoke the bundled Python script. Do **not** use the `trino` CLI directly — the script handles OAuth2/SSO and caches tokens to prevent repeated prompts:
+Always invoke the bundled script via `uv run --script`. Do **not** use the `trino` CLI directly — the script handles OAuth2/SSO and caches tokens (via `keyring`) to prevent repeated prompts:
 
 ```bash
-.cursor/skills/trino/venv/bin/python3 .cursor/skills/trino/scripts/execute_trino.py \
+uv run --script .cursor/skills/trino/scripts/execute_trino.py \
     --host "${TRINO_HOST:-trino.apps.data-prd.habitat.zone}" \
     --catalog hive \
     --query "YOUR_SQL_HERE" \
     --external-auth
 ```
+
+(The script's shebang is `#!/usr/bin/env -S uv run --script`, so `./.cursor/skills/trino/scripts/execute_trino.py …` also works once it is executable — same uv-resolved deps either way.)
 
 **Mandatory flags:**
 - `--query`: the SQL to execute.
@@ -62,14 +56,14 @@ Always invoke the bundled Python script. Do **not** use the `trino` CLI directly
 
 Single quotes inside the SQL must be escaped with `'\''` when embedded in the shell string.
 
-### 5. Output contract
+### 4. Output contract
 
 The script prints exactly one JSON object to stdout:
 
 - On success: `{ "status": "success", "columns": [...], "data": [[...], ...], "count": N }`.
 - On failure: `{ "status": "error", "message": "..." }`.
 
-### 6. Persist the full result
+### 5. Persist the full result
 
 Save the script's stdout **verbatim** (never copy-paste, never truncate) to:
 
@@ -79,7 +73,7 @@ Save the script's stdout **verbatim** (never copy-paste, never truncate) to:
 
 `<cursor_project_folder>` is the directory that contains `agent-transcripts/` and `terminals/`. **Never** save to the workspace root (`bi-etl-ejuice/`) — always use the Cursor project folder. `<session_id>` and `<entry_index>` are provided by the TARS loop (see `.cursor/subagents/data_analyst.md`). Create the `tars_query_results/` folder on first write. Use shell redirection (`> "<path>"`) — not file-write tools.
 
-### 7. Error handling
+### 6. Error handling
 
 If the JSON has `status: "error"`, do NOT retry silently:
 - Surface the Trino error message to the user.

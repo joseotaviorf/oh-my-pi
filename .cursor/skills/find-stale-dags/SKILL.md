@@ -18,13 +18,10 @@ active, unpaused DAGs that have not had a successful run in **6 months** or more
 
 ## Prerequisites
 
-The `.cursor/skills/trino` venv must exist. Bootstrap once:
-
-```bash
-[ ! -d .cursor/skills/trino/venv ] && \
-    python3 -m venv .cursor/skills/trino/venv && \
-    .cursor/skills/trino/venv/bin/pip install trino pandas keyring
-```
+Only **[uv](https://docs.astral.sh/uv/)** is required. The query script declares its
+dependencies inline (PEP 723: `trino`, `keyring`), so `uv run --script` resolves them from
+the global uv cache on first run and reuses them afterwards — there is no venv to bootstrap
+and nothing is written under the skill folder. Never run bare `python3` or `pip install`.
 
 ---
 
@@ -33,8 +30,7 @@ The `.cursor/skills/trino` venv must exist. Bootstrap once:
 ### 1. Run the canonical query
 
 ```bash
-.cursor/skills/trino/venv/bin/python3 \
-    .cursor/skills/find-stale-dags/scripts/run_query.py
+uv run --script .cursor/skills/find-stale-dags/scripts/run_query.py
 ```
 
 The script prints a formatted table and exits.

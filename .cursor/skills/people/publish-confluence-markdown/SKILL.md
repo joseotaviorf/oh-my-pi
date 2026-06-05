@@ -44,7 +44,7 @@ If editors may have changed Confluence **without** git, optionally call **`getCo
 
 ## Steps (agent)
 
-1. **Prepare payload:** from repo root, run **`packages/bietlejuice-compiler/scripts/confluence/build_confluence_mcp_update_payload.py`** (e.g. `python3 packages/bietlejuice-compiler/scripts/confluence/build_confluence_mcp_update_payload.py`) with **`--markdown`**, **`--cloud-id`**, **`--page-id`**, **`--space-id`**, **`--title`**, **`--version-message`**, and (by default) **draft** status; use **`--output`** under **`/tmp/`** when helpful.
+1. **Prepare payload:** from repo root, run **`packages/bietlejuice-compiler/scripts/confluence/build_confluence_mcp_update_payload.py`** (e.g. `uv run --project packages/bietlejuice-compiler python packages/bietlejuice-compiler/scripts/confluence/build_confluence_mcp_update_payload.py`) with **`--markdown`**, **`--cloud-id`**, **`--page-id`**, **`--space-id`**, **`--title`**, **`--version-message`**, and (by default) **draft** status; use **`--output`** under **`/tmp/`** when helpful.
 2. **Title handling:** ensure the Markdown **body** does not duplicate the Confluence **`title`** (strip the leading `# …` line from the body when they match).
 3. **Invoke MCP:** call **`updateConfluencePage`** on **`plugin-atlassian-atlassian`** with **`status: draft`**, **`contentFormat: markdown`**, and a clear **`versionMessage`**. For **new** pages, use **`createConfluencePage`** with the same hygiene and **`parentId`** when applicable.
 4. **Verification:** confirm the page in the Confluence UI (draft vs current, embeds restored if needed).

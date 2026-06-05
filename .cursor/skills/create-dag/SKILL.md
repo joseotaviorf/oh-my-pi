@@ -284,7 +284,7 @@ When creating SQL for new DAGs, prioritize upstream layers as follows:
 For `enrich` and `dw` DAGs, before writing any `FROM` clause, verify the intended clean source tables are not already fully modelled by a Core Model:
 
 ```bash
-PYTHONPATH=. python3 -c "
+PYTHONPATH=.:packages/bietlejuice-compiler uv run --project packages/bietlejuice-compiler python -c "
 import json
 from scripts.ci_cd.source_layer_validation.core_model_registry import build_core_model_registry
 r = build_core_model_registry()

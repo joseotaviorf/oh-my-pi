@@ -1,11 +1,15 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["trino", "keyring"]
+# ///
 """
 Run the canonical stale-DAG query against the QuintoAndar Trino cluster.
 
 Usage:
-    .cursor/skills/trino/venv/bin/python3 .cursor/skills/find-stale-dags/scripts/run_query.py
-    .cursor/skills/trino/venv/bin/python3 .cursor/skills/find-stale-dags/scripts/run_query.py --months 12
-    .cursor/skills/trino/venv/bin/python3 .cursor/skills/find-stale-dags/scripts/run_query.py --no-filter
+    uv run --script .cursor/skills/find-stale-dags/scripts/run_query.py
+    uv run --script .cursor/skills/find-stale-dags/scripts/run_query.py --months 12
+    uv run --script .cursor/skills/find-stale-dags/scripts/run_query.py --no-filter
 """
 
 import argparse
