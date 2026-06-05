@@ -1,4 +1,4 @@
-database_name: growth
+database_name: metric_growth
 table_name: growth_demand_performance_monthly
 description: |
   Monthly growth demand performance metrics following the Growth marketing taxonomy. One row per month
