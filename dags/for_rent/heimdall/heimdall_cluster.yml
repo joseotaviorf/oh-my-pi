@@ -1,0 +1,5 @@
+cluster:
+  type: consolidation_m_memory_cluster
+  custom_configurations:
+    num_workers: 3
+  databricks_conn_id: databricks_new

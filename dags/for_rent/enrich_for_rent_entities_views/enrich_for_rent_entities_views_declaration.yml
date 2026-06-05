@@ -12,6 +12,3 @@ workflow:
   layer: enrich
   sync: [databricks]
   sql_dialect: databricks
-cluster:
-  type: databricks_16_4_med_general_2_workers_cluster
-  databricks_conn_id: databricks_new

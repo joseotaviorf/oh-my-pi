@@ -15,6 +15,9 @@ from bietlejuice.base.spark import (
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -40,6 +43,7 @@ if __name__ == "__main__":
     parser.add_argument("dag_name")
     parser.add_argument("subscription_id")
     parser.add_argument("table_name")
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     environment = args.environment

@@ -24,15 +24,3 @@ workflow:
       merge_on: [sk_ticket]
     dim_ongoing_repairs:
       z_order_by: [sk_ticket]
-cluster:
-  type: custom_cluster
-  custom_configurations:
-    spark_version: 16.4.x-scala2.12
-    driver_node_type_id: r5a.4xlarge
-    node_type_id: r5a.4xlarge
-    num_workers: 4
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-  databricks_conn_id: databricks_new_env

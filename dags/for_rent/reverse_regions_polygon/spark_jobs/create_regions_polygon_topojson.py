@@ -10,6 +10,9 @@ from sedona.register import SedonaRegistrator
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.service.dag_packages_path_service import DAGPackagesPathService
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.db_consumers import DatabricksConsumer
 from bietlejuice.services.storage_services import S3Service
@@ -42,6 +45,7 @@ if __name__ == "__main__":
     parser.add_argument("output_file_name")
     parser.add_argument("execution_date")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     env = args.env
