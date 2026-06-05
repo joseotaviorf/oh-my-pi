@@ -8,6 +8,12 @@ import boto3
 from pyspark.sql.utils import AnalysisException
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.db.reverse_metastore_mapping import ReverseMetastoreMapping
+from bietlejuice.base.validation.spark_args import add_validation_target_args
+from bietlejuice.base.validation.target_resolver import (
+    resolve_validation_target,
+    validation_database_location,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.consumers.s3_consumer import S3Consumer
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -54,6 +60,7 @@ if __name__ == "__main__":
     parser.add_argument("datalake_bucket", help="bucket for forno/prod datalake")
     parser.add_argument("source", help="source name")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     dag_name = args.dag_name
@@ -70,6 +77,9 @@ if __name__ == "__main__":
         """
     )
     datalake_path_prefix = f"reverse/{source}"
+    reverse_metastore = ReverseMetastoreMapping(bucket=datalake_bucket, source=source)
+    prod_database = reverse_metastore.get_full_database_name()
+    prod_location = reverse_metastore.get_full_database_path()
     spark_client = SparkClient()
     s3_consumer = S3Consumer(spark_client)
 
@@ -81,7 +91,13 @@ if __name__ == "__main__":
     tables_to_send_warning = []
 
     for table in tables:
-        datalake_path = f"s3://{datalake_bucket}/{datalake_path_prefix}/{table}"
+        if args.target_database_name:
+            _, read_table_name = resolve_validation_target(prod_database, table)
+            read_location = validation_database_location(datalake_bucket, prod_database)
+        else:
+            read_table_name = table
+            read_location = prod_location
+        datalake_path = f"{read_location}{read_table_name}"
         try:
             data = s3_consumer.get_data_from_file(path=datalake_path, format="delta")
             df = data.filter(

@@ -27,7 +27,3 @@ workflow:
       clean_table_name: shop_window_listing_business_context_aud
   extra_query_template_params:
     load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_start | ds, 1), 'load_end_date') }}"
-cluster:
-  type: consolidation_s_general_cluster
-  custom_configurations:
-    num_workers: 3

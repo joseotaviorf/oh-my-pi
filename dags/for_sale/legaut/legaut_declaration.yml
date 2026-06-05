@@ -49,8 +49,3 @@ workflow:
       clean_table_name: meusite_unit
       raw_primary_keys: [id]
       clean_primary_keys: [id]
-cluster:
-  type: databricks_13_3_med_memory_general_cluster
-  custom_configurations:
-    aws_attributes:
-      ebs_volume_size: 200

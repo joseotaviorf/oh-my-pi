@@ -1,0 +1,24 @@
+cluster:
+  type: databricks_16_4_med_general_cluster
+  custom_configurations:
+    spark_conf:
+      spark.sql.sources.partitionOverwriteMode: static
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+  custom_libraries:
+  - maven:
+      coordinates: "graphframes:graphframes:0.8.1-spark3.0-s_2.12"
+  databricks_conn_id: databricks_new
+validation:
+  cluster:
+    type: consolidation_s_general_cluster
+    databricks_conn_id: databricks_new
+    custom_libraries:
+    - maven:
+        coordinates: graphframes:graphframes:0.8.1-spark3.0-s_2.12
+    custom_configurations:
+      num_workers: 3
+      aws_attributes:
+        ebs_volume_size: 200
+  allow_custom_spark_job: true

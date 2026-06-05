@@ -1,0 +1,28 @@
+cluster:
+  type: databricks_13_3_min_general_cluster
+  access_control_list:
+    group_name: software-engineers
+    permission_level: CAN_MANAGE
+  custom_libraries:
+  - pypi:
+      package: "profound"
+  databricks_conn_id: databricks_new
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+validation:
+  cluster:
+    type: consolidation_xs_general_cluster
+    databricks_conn_id: databricks_new
+    access_control_list:
+      group_name: software-engineers
+      permission_level: CAN_MANAGE
+    custom_libraries:
+    - pypi:
+        package: profound
+    custom_configurations:
+      spark_version: 13.3.x-scala2.12
+      num_workers: 1
+  allow_custom_spark_job: true

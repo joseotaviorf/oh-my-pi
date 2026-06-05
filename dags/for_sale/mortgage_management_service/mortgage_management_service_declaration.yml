@@ -49,6 +49,3 @@ workflow:
       clean_table_name: mortgage_proposal_aux_aud
       raw_primary_keys: ["id", "rev"]
       clean_primary_keys: ["id", "rev"]
-cluster:
-  type: databricks_16_4_med_general_cluster
-  databricks_conn_id: databricks_new_env
