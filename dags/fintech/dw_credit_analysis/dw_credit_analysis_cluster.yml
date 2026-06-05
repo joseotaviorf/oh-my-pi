@@ -15,4 +15,5 @@ validation:
     type: consolidation_m_general_cluster
     databricks_conn_id: databricks_new_env
     custom_configurations:
+      data_security_mode: USER_ISOLATION
       num_workers: 4

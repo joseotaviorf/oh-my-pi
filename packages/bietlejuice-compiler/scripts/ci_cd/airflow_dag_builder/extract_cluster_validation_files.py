@@ -294,6 +294,7 @@ def process_declaration(
 def process_cluster_file(cluster_path: Path) -> Tuple[Path, Optional[str]]:
     """Regenerate *_cluster.yml from on-disk prod cluster block + declaration."""
     cluster_file_text = _read_text(cluster_path)
+    cluster_document = yaml.safe_load(cluster_file_text) or {}
     cluster_text = extract_cluster_section_text(cluster_file_text)
     if cluster_text is None:
         return cluster_path, None
@@ -305,6 +306,9 @@ def process_cluster_file(cluster_path: Path) -> Tuple[Path, Optional[str]]:
     cluster_args = _parse_cluster_dict(cluster_text)
     declaration = yaml.safe_load(_read_text(declaration_path)) or {}
     declaration_for_validation = {**declaration, "cluster": cluster_args}
+    validation = cluster_document.get("validation")
+    if validation is not None:
+        declaration_for_validation["validation"] = validation
 
     cluster_content = build_cluster_file_content(
         cluster_text=cluster_text,
@@ -363,7 +367,9 @@ def main() -> int:
         if _on_disk_has_validation_stage(cluster_path):
             # Concluded DAGs only: do not rewrite cluster files still in validation stage.
             if args.check:
-                checked_paths.add(cluster_path.resolve())
+                # Defer validation-stage files to the cluster-file check pass below;
+                # their declarations often no longer contain an inline cluster block.
+                continue
             continue
 
         try:
@@ -440,8 +446,6 @@ def main() -> int:
     if args.check:
         for cluster_path in _cluster_file_paths(root):
             if cluster_path.resolve() in checked_paths:
-                continue
-            if _on_disk_has_validation_stage(cluster_path):
                 continue
             try:
                 _, cluster_content = process_cluster_file(cluster_path)

@@ -36,5 +36,7 @@ validation:
     - pypi:
         package: pyxlsb==1.0.9
     custom_configurations:
+      spark_conf:
+        spark.scheduler.taskSetBlacklistTimeout: 1200000
       num_workers: 3
   allow_custom_spark_job: true

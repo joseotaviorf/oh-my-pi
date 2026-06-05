@@ -6,7 +6,7 @@ Opt-in smoke tests on Graviton consolidation cluster presets before changing pro
 
 Add a `validation` block to `{dag}_cluster.yml` (merged into the declaration at compile time). Presence of `validation.cluster` opts the DAG in.
 
-Prod `cluster:` is copied verbatim from the declaration (or kept as-is when already split). Validation is generated from **effective prod topology**, not from prod preset name alone.
+Prod `cluster:` is copied verbatim from the declaration (or kept as-is when already split). Validation is generated from the **effective prod cluster config**, not from prod preset name alone: the generator resolves the prod preset through `ConfigurationService`, applies the same `custom_configurations` deep merge used by runtime, maps topology to ARM, and emits every non-standard difference from the matched consolidation preset explicitly in `validation.cluster`.
 
 ```yaml
 cluster:
@@ -22,18 +22,22 @@ validation:
 
 ### How validation presets are chosen
 
-1. Resolve effective prod with `merge_cluster_configuration` (same as runtime `JobClusterEngine`).
+1. Resolve effective prod with `merge_cluster_configuration` (same as runtime `JobClusterEngine`). Runtime config production is not changed by validation generation; the generator uses it as a read-only oracle.
 2. Map worker and driver `node_type_id` to Graviton (`m5`/`m5a`/`m-fleet` → `m6g`, `r*` → `r6g`, `c*` → `c6g`; size suffix preserved).
 3. **Single-node alignment:** prod single-node → validation `consolidation_*_single_node_*` only; prod multi-node → multi-node consolidation only (never flip modes).
 4. **Worker-first preset match:** pick a consolidation preset whose default `node_type_id` equals the mapped worker type.
 5. **Homogeneous driver/worker** (same instance size): preset must also match `driver_node_type_id`; overrides are only for non-default fields (`spark_version`, `num_workers`, etc.).
 6. **Heterogeneous driver/worker:** match on worker size only; override `driver_node_type_id` when it differs from the preset default (do not copy worker overrides from driver).
-7. Emit `validation.cluster.custom_configurations` only when effective prod differs from the validation preset defaults.
-8. **`aws_attributes` overrides:** when effective prod `aws_attributes` differ from the matched consolidation preset (e.g. `instance_profile_arn` from legacy `databricks_16_4_*_people_cluster` presets, or `ebs_volume_size`, `first_on_demand`, `availability`), emit the full key-level diff under `validation.cluster.custom_configurations.aws_attributes`.
+7. **Photon alignment:** prod Photon clusters keep `runtime_engine: PHOTON`; worker and driver topology are mapped to the Graviton `*gd` families so local SSD expectations remain explicit.
+8. Emit `validation.cluster.custom_configurations` only when effective prod differs from the validation preset defaults. Dictionary fields are diffed recursively (`spark_conf`, `spark_env_vars`, `aws_attributes`, etc.); list/scalar fields are emitted as full replacement values (`init_scripts`, `custom_tags` when list-shaped, `runtime_engine`, etc.).
+9. **Preset-only fields:** if the prod preset has fields the consolidation preset does not have, emit them explicitly in `validation.cluster.custom_configurations`. Example: `custom_cluster_with_sedona` defines an extra Sedona `init_scripts` entry in `prod_conf.yml`; validation must carry that list explicitly because the consolidation preset only has the default `bi-etl-ejuice/init_script.sh`.
+10. **Top-level cluster args:** declaration-level `custom_libraries`, `access_control_list`, and `databricks_conn_id` stay top-level under `validation.cluster`; they are not written into `custom_configurations`.
 
 **Skip validation** when prod is already the sole consolidation preset that matches the topology (e.g. prod `consolidation_m_memory_cluster` with `r6g.2xlarge` worker and driver). The generator omits the `validation:` block entirely.
 
 When validation is emitted, `validation.cluster.type` must still differ from prod `cluster.type` (enforced by `DAGDeclarationValidator`).
+
+Existing validation blocks are also checked against generator output. `validate-cluster-validation-files` fails when a validation-stage `*_cluster.yml` is missing generated effective-prod overrides, so stale blocks should be regenerated instead of relying on runtime fallback behavior.
 
 ### Prod topology normalization (Graviton 6g)
 
@@ -83,7 +87,7 @@ The compiler emits a second DAG: `bietlejuice.{dag_name}__validation`
 ## Write target naming
 
 | Prod | Validation (UC) |
-|------|-----------------|
+| ---- | --------------- |
 | `datalake_{schema}.{table}` | `cluster_validation.datalake_{schema}___{table}` |
 | `dw_{schema}.{table}` | `cluster_validation.dw_{schema}___{table}` |
 | `metric_{schema}.{table}` | `cluster_validation.metric_{schema}___{table}` |

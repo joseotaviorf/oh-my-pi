@@ -23,7 +23,7 @@ validation:
     custom_libraries:
     - whl: '{artifacts_bucket}/sap-4hana-api-client-python/quintoandar_sap_4hana_api_client-0.1.0-py2.py3-none-any.whl'
     custom_configurations:
-      num_workers: 3
       aws_attributes:
         ebs_volume_size: 200
+      num_workers: 3
   allow_custom_spark_job: true

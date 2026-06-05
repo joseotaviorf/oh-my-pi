@@ -17,6 +17,6 @@ validation:
       group_name: analytics-engineers
       permission_level: CAN_MANAGE
     custom_configurations:
-      num_workers: 3
       aws_attributes:
         ebs_volume_size: 200
+      num_workers: 3

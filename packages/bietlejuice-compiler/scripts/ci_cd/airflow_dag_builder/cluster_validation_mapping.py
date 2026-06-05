@@ -672,27 +672,79 @@ def match_consolidation_preset(
     )
 
 
-def _aws_attributes_from_config(config: dict) -> Dict[str, Any]:
-    attrs = config.get("aws_attributes") or {}
-    if not isinstance(attrs, dict):
-        return {}
-    return dict(attrs)
+_TOPOLOGY_KEYS_EXCLUDED_FROM_GENERIC_DIFF = frozenset(
+    {
+        "node_type_id",
+        "driver_node_type_id",
+        "master_node_type_id",
+        "task_node_type_id",
+        "instance_pool_id",
+        "driver_instance_pool_id",
+    }
+)
+
+_CLUSTER_ARGS_ONLY_KEYS = frozenset(
+    {
+        "access_control_list",
+        "aws_conn_id",
+        "custom_libraries",
+        "databricks_conn_id",
+        "emr_retry_delay_seconds",
+        "emr_task_retries",
+        "type",
+    }
+)
 
 
-def _compute_aws_attributes_validation_overrides(
+def _is_equivalent_value(left: Any, right: Any) -> bool:
+    if isinstance(left, dict) or isinstance(right, dict):
+        return left == right
+    if isinstance(left, list) or isinstance(right, list):
+        return left == right
+    return _values_equal(left, right)
+
+
+def _deep_config_diff(
+    prod_target: Dict[str, Any], validation_base: Dict[str, Any]
+) -> dict:
+    diff: Dict[str, Any] = {}
+    for key, prod_value in prod_target.items():
+        if prod_value is None or key in _CLUSTER_ARGS_ONLY_KEYS:
+            continue
+
+        validation_value = validation_base.get(key)
+        if isinstance(prod_value, dict) and isinstance(validation_value, dict):
+            nested_diff = _deep_config_diff(prod_value, validation_value)
+            if nested_diff:
+                diff[key] = nested_diff
+            continue
+
+        if not _is_equivalent_value(prod_value, validation_value):
+            diff[key] = copy.deepcopy(prod_value)
+
+    return diff
+
+
+def _effective_validation_target(
+    *,
     effective_prod: dict,
-    validation_resolved: dict,
-) -> Dict[str, Any]:
-    """Emit aws_attributes keys where effective prod differs from validation preset defaults."""
-    prod_attrs = _aws_attributes_from_config(effective_prod)
-    preset_attrs = _aws_attributes_from_config(validation_resolved)
-    overrides: Dict[str, Any] = {}
-    for key, prod_value in prod_attrs.items():
-        if prod_value is not None and not _values_equal(
-            prod_value, preset_attrs.get(key)
-        ):
-            overrides[key] = prod_value
-    return overrides
+    mapped_worker: str,
+    mapped_driver: Optional[str],
+    prod_cluster_type: str,
+) -> dict:
+    target = copy.deepcopy(effective_prod)
+
+    for key in _TOPOLOGY_KEYS_EXCLUDED_FROM_GENERIC_DIFF:
+        target.pop(key, None)
+
+    target["node_type_id"] = mapped_worker
+    if mapped_driver:
+        target["driver_node_type_id"] = mapped_driver
+
+    if _uses_photon(effective_prod, prod_cluster_type):
+        target["runtime_engine"] = "PHOTON"
+
+    return target
 
 
 def compute_validation_overrides(
@@ -704,40 +756,13 @@ def compute_validation_overrides(
     prod_cluster_type: str = "",
 ) -> Dict[str, Any]:
     """Emit only cluster fields where effective prod differs from validation defaults."""
-    overrides: Dict[str, Any] = {}
-
-    prod_spark = effective_prod.get("spark_version")
-    preset_spark = validation_resolved.get("spark_version")
-    if prod_spark is not None and not _values_equal(prod_spark, preset_spark):
-        overrides["spark_version"] = prod_spark
-
-    prod_workers = effective_prod.get("num_workers")
-    preset_workers = validation_resolved.get("num_workers")
-    if prod_workers is not None and not _values_equal(prod_workers, preset_workers):
-        overrides["num_workers"] = prod_workers
-
-    preset_worker = validation_resolved.get("node_type_id")
-    preset_driver = validation_resolved.get(
-        "master_node_type_id"
-    ) or validation_resolved.get("driver_node_type_id")
-
-    if not _values_equal(mapped_worker, preset_worker):
-        overrides["node_type_id"] = mapped_worker
-    if mapped_driver and not _values_equal(mapped_driver, preset_driver):
-        overrides["driver_node_type_id"] = mapped_driver
-
-    if _uses_photon(effective_prod, prod_cluster_type) and not _values_equal(
-        "PHOTON", validation_resolved.get("runtime_engine")
-    ):
-        overrides["runtime_engine"] = "PHOTON"
-
-    aws_overrides = _compute_aws_attributes_validation_overrides(
-        effective_prod, validation_resolved
+    target = _effective_validation_target(
+        effective_prod=effective_prod,
+        mapped_worker=mapped_worker,
+        mapped_driver=mapped_driver,
+        prod_cluster_type=prod_cluster_type,
     )
-    if aws_overrides:
-        overrides["aws_attributes"] = aws_overrides
-
-    return overrides
+    return _deep_config_diff(target, validation_resolved)
 
 
 def declaration_validation_spark_conf(declaration: dict) -> Dict[str, Any]:
@@ -758,11 +783,41 @@ def merge_declaration_validation_spark_conf(
     extra_spark_conf = declaration_validation_spark_conf(declaration)
     if not extra_spark_conf:
         return custom_configurations
-    merged = dict(custom_configurations)
-    spark_conf = dict(merged.get("spark_conf") or {})
-    spark_conf.update(extra_spark_conf)
-    merged["spark_conf"] = spark_conf
+    merged = copy.deepcopy(custom_configurations)
+    spark_conf = merged.get("spark_conf")
+    if isinstance(spark_conf, dict):
+        merged["spark_conf"] = _deep_merge_missing(spark_conf, extra_spark_conf)
+    else:
+        merged["spark_conf"] = copy.deepcopy(extra_spark_conf)
     return merged
+
+
+def _deep_merge_missing(
+    base: Dict[str, Any], overlay: Dict[str, Any]
+) -> Dict[str, Any]:
+    merged = copy.deepcopy(base)
+    for key, value in overlay.items():
+        if key not in merged:
+            merged[key] = copy.deepcopy(value)
+            continue
+        if isinstance(value, dict) and isinstance(merged.get(key), dict):
+            merged[key] = _deep_merge_missing(merged[key], value)
+    return merged
+
+
+def merge_declaration_validation_custom_configurations(
+    declaration: dict, custom_configurations: Dict[str, Any]
+) -> Dict[str, Any]:
+    """Preserve validation-only spark_conf without letting stale YAML override generation."""
+    return merge_declaration_validation_spark_conf(declaration, custom_configurations)
+
+
+def _validation_cluster_override(declaration: dict) -> Dict[str, Any]:
+    validation = declaration.get("validation") or {}
+    cluster = validation.get("cluster") or {}
+    if not isinstance(cluster, dict):
+        return {}
+    return cluster
 
 
 def build_validation_cluster_spec(
@@ -808,17 +863,24 @@ def build_validation_cluster_spec(
         prod_cluster_type=prod_cluster_type,
     )
 
-    custom_configurations = merge_declaration_validation_spark_conf(
+    custom_configurations = merge_declaration_validation_custom_configurations(
         declaration, custom_configurations
     )
 
     allow_custom_spark_job = _has_load_spark_job(declaration)
+    validation_cluster = _validation_cluster_override(declaration)
 
     return ValidationClusterSpec(
         cluster_type=matched.name,
         custom_configurations=custom_configurations,
-        databricks_conn_id=cluster_args.get("databricks_conn_id"),
-        access_control_list=cluster_args.get("access_control_list"),
-        custom_libraries=cluster_args.get("custom_libraries"),
+        databricks_conn_id=validation_cluster.get(
+            "databricks_conn_id", cluster_args.get("databricks_conn_id")
+        ),
+        access_control_list=validation_cluster.get(
+            "access_control_list", cluster_args.get("access_control_list")
+        ),
+        custom_libraries=validation_cluster.get(
+            "custom_libraries", cluster_args.get("custom_libraries")
+        ),
         allow_custom_spark_job=allow_custom_spark_job,
     )

@@ -16,4 +16,7 @@ validation:
     type: consolidation_m_memory_cluster
     databricks_conn_id: databricks_new_env
     custom_configurations:
+      spark_conf:
+        spark.sql.broadcastTimeout: '600'
+      data_security_mode: USER_ISOLATION
       num_workers: 4

@@ -16,5 +16,7 @@ validation:
     type: consolidation_l_memory_cluster
     databricks_conn_id: databricks_new_env
     custom_configurations:
+      spark_conf:
+        spark.sql.mapKeyDedupPolicy: LAST_WIN
       num_workers: 12
       driver_node_type_id: r6g.2xlarge

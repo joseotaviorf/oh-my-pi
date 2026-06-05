@@ -20,4 +20,6 @@ validation:
     custom_configurations:
       aws_attributes:
         availability: ON_DEMAND
+      spark_conf:
+        spark.driver.maxResultSize: '0'
   allow_custom_spark_job: true

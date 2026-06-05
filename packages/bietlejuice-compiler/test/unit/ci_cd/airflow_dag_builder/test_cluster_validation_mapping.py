@@ -13,6 +13,7 @@ from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
     is_single_node_cluster,
     map_instance_type_to_graviton,
     match_consolidation_preset,
+    merge_declaration_validation_custom_configurations,
     normalize_databricks_cluster_topology,
     size_tier_from_instance_type,
 )
@@ -279,6 +280,65 @@ class TestComputeValidationOverrides:
         )
         assert "aws_attributes" not in overrides
 
+    def test_emits_generic_nested_and_list_diffs(self):
+        overrides = compute_validation_overrides(
+            effective_prod={
+                "node_type_id": "m5a.xlarge",
+                "driver_node_type_id": "m5a.xlarge",
+                "spark_conf": {
+                    "spark.scheduler.mode": "FAIR",
+                    "spark.sql.shuffle.partitions": "24",
+                },
+                "spark_env_vars": {
+                    "SPARK_RUNTIME": "databricks",
+                    "CUSTOM_ENV": "enabled",
+                },
+                "init_scripts": [
+                    {
+                        "s3": {
+                            "destination": (
+                                "{{ var.value.artifacts_bucket }}/sedona/sedona-init.sh"
+                            ),
+                            "region": "",
+                        }
+                    },
+                    {
+                        "s3": {
+                            "destination": (
+                                "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
+                            ),
+                            "region": "",
+                        }
+                    },
+                ],
+            },
+            mapped_worker="m6g.xlarge",
+            mapped_driver="m6g.xlarge",
+            validation_resolved={
+                "node_type_id": "m6g.xlarge",
+                "driver_node_type_id": "m6g.xlarge",
+                "spark_conf": {"spark.scheduler.mode": "FAIR"},
+                "spark_env_vars": {"SPARK_RUNTIME": "databricks"},
+                "init_scripts": [
+                    {
+                        "s3": {
+                            "destination": (
+                                "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
+                            ),
+                            "region": "",
+                        }
+                    }
+                ],
+            },
+        )
+
+        assert "node_type_id" not in overrides
+        assert "driver_node_type_id" not in overrides
+        assert overrides["spark_conf"] == {"spark.sql.shuffle.partitions": "24"}
+        assert overrides["spark_env_vars"] == {"CUSTOM_ENV": "enabled"}
+        assert len(overrides["init_scripts"]) == 2
+        assert "sedona-init.sh" in overrides["init_scripts"][0]["s3"]["destination"]
+
     def test_mapped_worker_and_driver_prefers_master_node_type_id(self):
         effective_prod = {
             "node_type_id": "m7g.2xlarge",
@@ -457,6 +517,37 @@ class TestBuildValidationClusterSpec:
             is True
         )
 
+    def test_existing_validation_custom_config_does_not_override_generated_values(self):
+        declaration = {
+            "validation": {
+                "cluster": {
+                    "custom_configurations": {
+                        "num_workers": 999,
+                        "init_scripts": [{"s3": {"destination": "stale.sh"}}],
+                        "spark_conf": {
+                            "spark.sql.shuffle.partitions": "stale",
+                            "spark.manual.override": "true",
+                        },
+                    },
+                },
+            },
+        }
+        custom_configurations = {
+            "num_workers": 3,
+            "spark_conf": {"spark.sql.shuffle.partitions": "24"},
+        }
+
+        merged = merge_declaration_validation_custom_configurations(
+            declaration, custom_configurations
+        )
+
+        assert merged["num_workers"] == 3
+        assert "init_scripts" not in merged
+        assert merged["spark_conf"] == {
+            "spark.sql.shuffle.partitions": "24",
+            "spark.manual.override": "true",
+        }
+
     def test_photon_declaration_overrides(self):
         declaration = {
             "dag": {"name": "dw_user"},
@@ -526,6 +617,50 @@ class TestBuildValidationClusterSpec:
         assert spec.custom_configurations["node_type_id"] == "c6g.12xlarge"
         assert spec.custom_configurations["driver_node_type_id"] == "r6g.2xlarge"
         assert spec.custom_configurations["num_workers"] == 8
+
+    def test_sedona_preset_emits_preset_only_init_scripts(self):
+        declaration = {
+            "dag": {"name": "ebdb_location"},
+            "workflow": {"type": "query_delta", "layer": "enrich"},
+            "cluster": {
+                "type": "custom_cluster_with_sedona",
+                "custom_configurations": {
+                    "driver_node_type_id": "m6g.xlarge",
+                    "node_type_id": "m6g.xlarge",
+                    "num_workers": 3,
+                    "spark_version": "16.4.x-scala2.12",
+                    "spark_conf": {
+                        "spark.serializer": (
+                            "org.apache.spark.serializer.KryoSerializer"
+                        ),
+                    },
+                },
+                "databricks_conn_id": "databricks_new",
+                "custom_libraries": [
+                    {
+                        "maven": {
+                            "coordinates": (
+                                "org.apache.sedona:"
+                                "sedona-python-adapter-3.0_2.12:1.2.1-incubating"
+                            ),
+                        },
+                    },
+                ],
+            },
+        }
+
+        spec = build_validation_cluster_spec(
+            cluster_args=declaration["cluster"],
+            declaration=declaration,
+        )
+
+        assert spec is not None
+        assert spec.cluster_type == "consolidation_s_general_cluster"
+        assert spec.custom_libraries == declaration["cluster"]["custom_libraries"]
+        init_scripts = spec.custom_configurations["init_scripts"]
+        assert len(init_scripts) == 2
+        assert "sedona-init.sh" in init_scripts[0]["s3"]["destination"]
+        assert "init_script.sh" in init_scripts[1]["s3"]["destination"]
 
 
 class TestNormalizeDatabricksClusterTopology:

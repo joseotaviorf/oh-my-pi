@@ -191,6 +191,49 @@ class TestMergePromotedCluster:
         assert custom["aws_attributes"]["ebs_volume_size"] == 200
         assert custom["spark_conf"] == prod["custom_configurations"]["spark_conf"]
 
+    def test_validation_init_scripts_survive_promotion(self):
+        prod = {
+            "type": "custom_cluster_with_sedona",
+            "custom_configurations": {
+                "node_type_id": "m6g.xlarge",
+                "driver_node_type_id": "m6g.xlarge",
+                "num_workers": 3,
+            },
+        }
+        validation = {
+            "type": "consolidation_s_general_cluster",
+            "custom_configurations": {
+                "num_workers": 3,
+                "init_scripts": [
+                    {
+                        "s3": {
+                            "destination": (
+                                "{{ var.value.artifacts_bucket }}/sedona/sedona-init.sh"
+                            ),
+                            "region": "",
+                        }
+                    },
+                    {
+                        "s3": {
+                            "destination": (
+                                "{{ var.value.artifacts_bucket }}/bi-etl-ejuice/init_script.sh"
+                            ),
+                            "region": "",
+                        }
+                    },
+                ],
+            },
+        }
+
+        merged = merge_promoted_cluster(prod, validation)
+
+        custom = merged["custom_configurations"]
+        assert (
+            custom["init_scripts"]
+            == validation["custom_configurations"]["init_scripts"]
+        )
+        assert "sedona-init.sh" in custom["init_scripts"][0]["s3"]["destination"]
+
 
 class TestPromoteClusterFile:
     def test_promotes_and_preserves_spark_conf(self, tmp_path: Path):

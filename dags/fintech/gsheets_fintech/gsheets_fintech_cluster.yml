@@ -29,6 +29,6 @@ validation:
     - pypi:
         package: google-api-python-client==2.55.0
     custom_configurations:
+      runtime_engine: PHOTON
       node_type_id: r6gd.2xlarge
       driver_node_type_id: r6gd.2xlarge
-      runtime_engine: PHOTON

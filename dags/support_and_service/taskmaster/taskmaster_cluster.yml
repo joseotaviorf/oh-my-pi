@@ -16,4 +16,6 @@ validation:
     type: consolidation_s_general_cluster
     databricks_conn_id: databricks_new
     custom_configurations:
+      spark_conf:
+        spark.sql.session.timeZone: America/Sao_Paulo
       num_workers: 3

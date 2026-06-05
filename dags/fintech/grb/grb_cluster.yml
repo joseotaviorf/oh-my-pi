@@ -15,8 +15,8 @@ validation:
     custom_libraries:
     - jar: '{artifacts_bucket}/jars/mssql-jdbc-12.8.1.jre8.jar'
     custom_configurations:
-      num_workers: 3
-      driver_node_type_id: r6g.2xlarge
       aws_attributes:
         ebs_volume_size: 200
+      num_workers: 3
+      driver_node_type_id: r6g.2xlarge
   allow_custom_spark_job: true

@@ -16,5 +16,7 @@ validation:
     type: consolidation_m_general_cluster
     databricks_conn_id: databricks_new
     custom_configurations:
+      spark_conf:
+        spark.sql.legacy.json.allowEmptyString.enabled: 'true'
       num_workers: 3
   allow_custom_spark_job: true

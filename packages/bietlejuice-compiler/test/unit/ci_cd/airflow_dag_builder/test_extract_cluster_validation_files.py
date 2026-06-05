@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import yaml
@@ -11,6 +12,8 @@ from scripts.ci_cd.airflow_dag_builder.extract_cluster_validation_files import (
     _validate_cluster_file_yaml_format,
     build_cluster_file_content,
     extract_cluster_section_text,
+    main,
+    process_cluster_file,
     remove_cluster_section_text,
 )
 
@@ -211,3 +214,92 @@ class TestExtractClusterValidationFiles:
         assert "# Cost-saving spot/OD mix" in content
         assert "task_nodes:\n        instance_count: 2" in content
         assert "validation:" not in content
+
+    def test_process_cluster_file_preserves_existing_validation_overrides(
+        self, tmp_path
+    ):
+        dag_dir = tmp_path / "ebdb_location"
+        dag_dir.mkdir()
+        declaration_path = dag_dir / "ebdb_location_declaration.yml"
+        declaration_path.write_text(
+            "dag:\n"
+            "  name: ebdb_location\n"
+            "workflow:\n"
+            "  type: query_delta\n"
+            "  layer: enrich\n",
+            encoding="utf-8",
+        )
+        cluster_path = dag_dir / "ebdb_location_cluster.yml"
+        cluster_path.write_text(
+            "cluster:\n"
+            "  type: custom_cluster_with_sedona\n"
+            "  custom_configurations:\n"
+            "    driver_node_type_id: m6g.xlarge\n"
+            "    node_type_id: m6g.xlarge\n"
+            "    num_workers: 3\n"
+            "    spark_version: 16.4.x-scala2.12\n"
+            "validation:\n"
+            "  cluster:\n"
+            "    type: consolidation_s_general_cluster\n"
+            "    custom_configurations:\n"
+            "      num_workers: 999\n"
+            "      init_scripts:\n"
+            "        - s3:\n"
+            "            destination: stale.sh\n"
+            "            region: ''\n"
+            "      spark_conf:\n"
+            "        spark.manual.override: 'true'\n",
+            encoding="utf-8",
+        )
+
+        _, content = process_cluster_file(cluster_path)
+
+        assert content is not None
+        document = yaml.safe_load(content)
+        validation_custom = document["validation"]["cluster"]["custom_configurations"]
+        assert (
+            "sedona-init.sh"
+            in validation_custom["init_scripts"][0]["s3"]["destination"]
+        )
+        assert all(
+            script["s3"]["destination"] != "stale.sh"
+            for script in validation_custom["init_scripts"]
+        )
+        assert validation_custom.get("num_workers") != 999
+        assert validation_custom["spark_conf"] == {"spark.manual.override": "true"}
+
+    def test_check_mode_detects_stale_validation_stage(self, tmp_path, monkeypatch):
+        dag_dir = tmp_path / "ebdb_location"
+        dag_dir.mkdir()
+        declaration_path = dag_dir / "ebdb_location_declaration.yml"
+        declaration_path.write_text(
+            "dag:\n"
+            "  name: ebdb_location\n"
+            "workflow:\n"
+            "  type: query_delta\n"
+            "  layer: enrich\n",
+            encoding="utf-8",
+        )
+        cluster_path = dag_dir / "ebdb_location_cluster.yml"
+        cluster_path.write_text(
+            "cluster:\n"
+            "  type: custom_cluster_with_sedona\n"
+            "  custom_configurations:\n"
+            "    driver_node_type_id: m6g.xlarge\n"
+            "    node_type_id: m6g.xlarge\n"
+            "    num_workers: 3\n"
+            "    spark_version: 16.4.x-scala2.12\n"
+            "validation:\n"
+            "  cluster:\n"
+            "    type: consolidation_s_general_cluster\n"
+            "    custom_configurations:\n"
+            "      num_workers: 3\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            ["extract_cluster_validation_files.py", str(tmp_path), "--check"],
+        )
+
+        assert main() == 1

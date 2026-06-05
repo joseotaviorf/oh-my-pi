@@ -15,8 +15,8 @@ validation:
     custom_libraries:
     - whl: '{artifacts_bucket}/velo-neurotech-api-client-python/quintoandar_velo_neurotech_api_client-0.3.2-py2.py3-none-any.whl'
     custom_configurations:
-      spark_version: 13.3.x-scala2.12
-      num_workers: 3
       aws_attributes:
         ebs_volume_size: 200
+      spark_version: 13.3.x-scala2.12
+      num_workers: 3
   allow_custom_spark_job: true

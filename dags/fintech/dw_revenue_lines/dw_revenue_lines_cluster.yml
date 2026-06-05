@@ -24,6 +24,6 @@ validation:
       permission_level: CAN_MANAGE
     custom_configurations:
       spark_version: 13.3.x-scala2.12
+      runtime_engine: PHOTON
       node_type_id: r6gd.xlarge
       driver_node_type_id: r6gd.xlarge
-      runtime_engine: PHOTON
