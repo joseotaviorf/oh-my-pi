@@ -1,12 +1,6 @@
 cluster:
-  type: databricks_16_4_med_memory_general_cluster
+  type: consolidation_s_memory_cluster
   custom_configurations:
     aws_attributes:
       ebs_volume_size: 200
-validation:
-  cluster:
-    type: consolidation_s_memory_cluster
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      num_workers: 3
+    num_workers: 3
