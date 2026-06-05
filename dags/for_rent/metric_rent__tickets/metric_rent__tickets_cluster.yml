@@ -1,23 +1,15 @@
 cluster:
-  type: databricks_16_4_med_memory_cluster
+  type: consolidation_m_general_cluster
+  databricks_conn_id: databricks_new
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
-  databricks_conn_id: databricks_new
   custom_configurations:
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: USER_ISOLATION
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-validation:
-  cluster:
-    type: consolidation_m_general_cluster
-    databricks_conn_id: databricks_new
-    access_control_list:
-      group_name: analytics-engineers
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      num_workers: 3
-      driver_node_type_id: r6g.2xlarge
-      aws_attributes:
-        ebs_volume_size: 200
+    num_workers: 3
+    driver_node_type_id: r6g.2xlarge
+    aws_attributes:
+      ebs_volume_size: 200

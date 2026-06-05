@@ -1,14 +1,6 @@
 cluster:
-  type: custom_cluster
-  custom_configurations:
-    driver_node_type_id: m6g.xlarge
-    node_type_id: m6g.xlarge
-    spark_version: 13.3.x-scala2.12
-    num_workers: 2
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+  type: consolidation_s_general_cluster
+  databricks_conn_id: databricks_new
   custom_libraries:
   - maven:
       coordinates: org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.1-incubating
@@ -22,24 +14,10 @@ cluster:
       package: pytopojson==1.0.0
   - pypi:
       package: apache-sedona
-  databricks_conn_id: databricks_new
-validation:
-  cluster:
-    type: consolidation_s_general_cluster
-    databricks_conn_id: databricks_new
-    custom_libraries:
-    - maven:
-        coordinates: org.apache.sedona:sedona-python-adapter-3.0_2.12:1.2.1-incubating
-    - maven:
-        coordinates: org.apache.sedona:sedona-viz-3.0_2.12:1.2.1-incubating
-    - maven:
-        coordinates: org.apache.sedona:sedona-viz-3.0_2.12:1.2.1-incubating
-    - maven:
-        coordinates: org.datasyslab:geotools-wrapper:1.3.0-27.2
-    - pypi:
-        package: pytopojson==1.0.0
-    - pypi:
-        package: apache-sedona
-    custom_configurations:
-      spark_version: 13.3.x-scala2.12
-  allow_custom_spark_job: true
+  custom_configurations:
+    spark_version: 13.3.x-scala2.12
+    num_workers: 2
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    data_security_mode: SINGLE_USER
+    spark_conf:
+      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

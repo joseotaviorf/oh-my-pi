@@ -1,9 +1,9 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_l_memory_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
     autotermination_minutes: 20
     driver_node_type_id: r6g.2xlarge
-    node_type_id: r6g.4xlarge
     num_workers: 3
     aws_attributes:
       first_on_demand: 1
@@ -16,13 +16,3 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-  databricks_conn_id: databricks_new_env
-validation:
-  cluster:
-    type: consolidation_l_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      num_workers: 3
-      driver_node_type_id: r6g.2xlarge
-      aws_attributes:
-        ebs_volume_size: 200

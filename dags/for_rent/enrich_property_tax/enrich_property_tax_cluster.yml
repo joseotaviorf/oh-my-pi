@@ -1,8 +1,8 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_xs_general_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
     driver_node_type_id: m6g.xlarge
-    node_type_id: m6g.large
     autoscale:
       min_workers: 1
       max_workers: 2
@@ -11,10 +11,3 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-  databricks_conn_id: databricks_new_env
-validation:
-  cluster:
-    type: consolidation_xs_general_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      driver_node_type_id: m6g.xlarge

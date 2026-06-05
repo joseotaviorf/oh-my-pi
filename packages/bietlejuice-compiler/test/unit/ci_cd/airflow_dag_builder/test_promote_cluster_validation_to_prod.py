@@ -163,6 +163,34 @@ class TestMergePromotedCluster:
         assert custom["node_type_id"] == "m6g.xlarge"
         assert custom["driver_node_type_id"] == "m6g.xlarge"
 
+    def test_preserves_validation_aws_attributes_ebs_volume_size(self):
+        prod = {
+            "type": "databricks_16_4_med_memory_general_cluster",
+            "databricks_conn_id": "databricks_new_env",
+            "custom_configurations": {
+                "single_user_name": "{{ var.value.databricks_single_user_name }}",
+                "data_security_mode": "SINGLE_USER",
+                "spark_conf": {
+                    "spark.databricks.sql.initial.catalog.namespace": (
+                        "quintoandar_{{ var.value.environment }}"
+                    ),
+                },
+            },
+        }
+        validation = {
+            "type": "consolidation_s_memory_cluster",
+            "databricks_conn_id": "databricks_new_env",
+            "custom_configurations": {
+                "num_workers": 3,
+                "aws_attributes": {"ebs_volume_size": 200},
+            },
+        }
+        merged = merge_promoted_cluster(prod, validation)
+        custom = merged["custom_configurations"]
+        assert custom["num_workers"] == 3
+        assert custom["aws_attributes"]["ebs_volume_size"] == 200
+        assert custom["spark_conf"] == prod["custom_configurations"]["spark_conf"]
+
 
 class TestPromoteClusterFile:
     def test_promotes_and_preserves_spark_conf(self, tmp_path: Path):
