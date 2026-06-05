@@ -19,10 +19,6 @@ workflow:
   tables_customization:
     sync_runs: {}
     audience_membership: {}
-    journey_metadata:
-      extraction_type: full
-      partitions: []
-    journey_log: {}
     sync_changelog: {}
 
 cluster:
