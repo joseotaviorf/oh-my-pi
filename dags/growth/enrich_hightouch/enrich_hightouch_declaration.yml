@@ -22,7 +22,7 @@ workflow:
     sync_changelog: {}
 
 cluster:
-  type: databricks_16_4_medium_memory_cluster
+  type: databricks_16_4_min_io-memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
     single_user_name: "{{ var.value.databricks_single_user_name }}"
