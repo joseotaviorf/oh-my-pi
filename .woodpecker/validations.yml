@@ -1,5 +1,6 @@
-# Validations use when.path so steps run only when relevant files change.
-# pull_request evaluates the full PR diff; push uses the commit diff.
+# Path filters: pull_request = full PR diff; push = files in the pushed commit range.
+# Workflows always trigger (release depends_on); skipped steps = success.
+# setup runs only when at least one downstream step would run (union path).
 when:
   - event: pull_request
   - event: push
@@ -21,8 +22,19 @@ steps:
       - uv sync
     when:
       - event: pull_request
+        path: &validations_setup_paths
+          include:
+            - "dags/**"
+            - "packages/**/src/**"
+            - "packages/**/test/**"
+            - "packages/**/scripts/**"
+            - ".woodpecker/validations.yml"
+            - "Makefile"
+            - "docs/platform/cluster_validation_dags.md"
+          on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
+        path: *validations_setup_paths
 
   validate-dag-declaration-files:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest

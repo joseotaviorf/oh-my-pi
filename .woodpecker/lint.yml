@@ -1,3 +1,6 @@
+# Path filters: pull_request = full PR diff; push = files in the pushed commit range.
+# Workflows always trigger (release depends_on); skipped steps = success.
+# setup runs only when at least one downstream step would run (union path).
 when:
   - event: pull_request
   - event: push
@@ -13,8 +16,20 @@ steps:
       - uv sync
     when:
       - event: pull_request
+        path: &lint_setup_paths
+          include:
+            - "packages/**/src/**"
+            - "packages/**/test/**"
+            - "packages/**/scripts/**"
+            - "dags/**/*.py"
+            - "pyproject.toml"
+            - "uv.lock"
+            - "Makefile"
+            - "scripts/*.py"
+          on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
+        path: *lint_setup_paths
 
   check-style-python:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
@@ -23,8 +38,18 @@ steps:
       - make check-style
     when:
       - event: pull_request
+        path: &check_style_python_path
+          include:
+            - "packages/**/src/**"
+            - "packages/**/test/**"
+            - "packages/**/scripts/**"
+            - "pyproject.toml"
+            - "uv.lock"
+            - "Makefile"
+          on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
+        path: *check_style_python_path
     depends_on: [setup]
 
   check-style-dags-python:
@@ -34,8 +59,14 @@ steps:
       - make check-style-dags
     when:
       - event: pull_request
+        path: &check_style_dags_path
+          include:
+            - "dags/**/*.py"
+            - "pyproject.toml"
+          on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
+        path: *check_style_dags_path
     depends_on: [setup]
 
   validate-py39-runtime-typing:
@@ -45,8 +76,16 @@ steps:
       - make validate-py39-runtime-typing
     when:
       - event: pull_request
+        path: &validate_py39_path
+          include:
+            - "packages/bietlejuice-core/src/**"
+            - "packages/bietlejuice-runtime/src/**"
+            - "dags/**/*.py"
+            - "scripts/validate_py39_runtime_typing.py"
+          on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
+        path: *validate_py39_path
     depends_on: [setup]
 
   files-validation-python:
@@ -56,8 +95,14 @@ steps:
       - make files-validation
     when:
       - event: pull_request
+        path: &files_validation_path
+          include:
+            - "packages/bietlejuice-compiler/src/bietlejuice/base/files_validation/**"
+            - "packages/bietlejuice-compiler/test/unit/files_validation/**"
+          on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
+        path: *files_validation_path
     depends_on: [setup]
 
   type-check-python:
@@ -68,6 +113,13 @@ steps:
       - make type-check
     when:
       - event: pull_request
+        path: &type_check_path
+          include:
+            - "packages/**/src/**"
+            - "packages/**/test/**"
+            - "pyproject.toml"
+          on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
+        path: *type_check_path
     depends_on: [setup]

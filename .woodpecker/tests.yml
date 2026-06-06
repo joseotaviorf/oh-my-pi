@@ -1,3 +1,7 @@
+# Path filters: pull_request = full PR diff; push = files in the pushed commit range.
+# Workflows always trigger (release depends_on); skipped steps = success.
+# setup runs only when at least one downstream step would run (union path).
+#
 # Domain validation and core-model coverage use git diff origin/master...HEAD;
 # partial: false ensures the merge base exists (see validations.yml).
 when:
@@ -27,8 +31,22 @@ steps:
       - ln -sfn /opt/bietlejuice/venvs/dbr-16-4 packages/bietlejuice-runtime/envs/dbr-16-4/.venv
     when:
       - event: pull_request
+        path: &tests_setup_paths
+          include:
+            - "packages/**/src/**"
+            - "packages/**/test/**"
+            - "packages/**/scripts/**"
+            - "dags/core/**"
+            - "dags/**/spark_jobs/**"
+            - "dags/**/*.py"
+            - "pyproject.toml"
+            - "uv.lock"
+            - "Makefile"
+            - "packages/bietlejuice-runtime/envs/dbr-16-4/**"
+          on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
+        path: *tests_setup_paths
 
   unit-tests-python:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
@@ -38,8 +56,19 @@ steps:
       - make unit-tests
     when:
       - event: pull_request
+        path: &unit_tests_python_path
+          include:
+            - "packages/**/src/**"
+            - "packages/**/test/**"
+            - "packages/**/scripts/**"
+            - "pyproject.toml"
+            - "uv.lock"
+            - "Makefile"
+            - "packages/bietlejuice-runtime/envs/dbr-16-4/**"
+          on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
+        path: *unit_tests_python_path
     depends_on: [setup]
 
   unit-tests-dags:
@@ -50,8 +79,16 @@ steps:
       - make unit-tests-dags
     when:
       - event: pull_request
+        path: &unit_tests_dags_path
+          include:
+            - "packages/bietlejuice-runtime/test/dags/**"
+            - "packages/bietlejuice-runtime/src/**"
+            - "dags/**/spark_jobs/**"
+            - "dags/**/*.py"
+          on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
+        path: *unit_tests_dags_path
     depends_on: [setup]
 
   integration-tests-python:
@@ -62,8 +99,14 @@ steps:
       - make integration-tests
     when:
       - event: pull_request
+        path: &integration_tests_path
+          include:
+            - "packages/bietlejuice-core/src/**"
+            - "packages/bietlejuice-core/test/**"
+          on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
+        path: *integration_tests_path
     depends_on: [setup]
 
   core-model-tests-and-coverage:
@@ -74,6 +117,17 @@ steps:
       - make core-model-coverage
     when:
       - event: pull_request
+        path: &core_model_tests_path
+          include:
+            - "dags/core/**"
+            - "packages/bietlejuice-runtime/test/core_model_dags/**"
+            - "packages/bietlejuice-runtime/test/unit/base/core_models/**"
+            - "packages/bietlejuice-runtime/src/bietlejuice/base/core_models/**"
+            - "packages/bietlejuice-airflow/src/bietlejuice/base/core_models/**"
+            - "packages/bietlejuice-core/src/bietlejuice/base/core_models/**"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/core_models/**"
+          on_empty: false
       - event: push
         branch: [master, hotfix/*, forno]
+        path: *core_model_tests_path
     depends_on: [setup]

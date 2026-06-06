@@ -4,16 +4,14 @@ Script to check if there are changes in core model related paths.
 
 This script:
 1. Uses git diff to identify changed files
-2. Filters for files matching core model paths:
-   - dags/core/**
-   - packages/bietlejuice-runtime/test/core_model_dags/**
-   - packages/bietlejuice-runtime/src/bietlejuice/base/core_models/**
+2. Filters for files matching core model paths (see CORE_MODEL_PATHS below;
+   must stay in sync with `&core_model_tests_path` in `.woodpecker/tests.yml`)
 3. Returns exit code 0 if no relevant changes, 1 if changes exist
 
 NOTE: After the multi-package restructure, `bietlejuice/base/core_models/` and
 `tests/core_model_dags/` no longer exist at the repo root. The canonical locations
 are under `packages/bietlejuice-runtime/`. Path patterns below must stay in sync with
-the `core-model-tests-and-coverage` step's `when.path` filter in `.woodpecker/tests.yml`.
+the `&core_model_tests_path` anchor on `core-model-tests-and-coverage` in `.woodpecker/tests.yml`.
 """
 
 import argparse
@@ -33,6 +31,7 @@ CORE_MODEL_PATHS = [
     "packages/bietlejuice-runtime/src/bietlejuice/base/core_models/",
     "packages/bietlejuice-airflow/src/bietlejuice/base/core_models/",
     "packages/bietlejuice-core/src/bietlejuice/base/core_models/",
+    "packages/bietlejuice-compiler/scripts/ci_cd/core_models/",
 ]
 
 
