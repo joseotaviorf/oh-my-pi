@@ -13,10 +13,8 @@
 # No custom clone: default plugin-git shallow clone is enough (Docker build only; no git diff).
 
 steps:
-  # Validates that ci-jdk builds for both amd64 and arm64 on feature branches.
+  # Validates that ci-jdk builds for both amd64 and arm64 on PRs.
   # No push — build-only smoke test.
-  # Runs on push to non-master branches (pull_request events are not enabled in
-  # Woodpecker for this repo). Add event: pull_request here once enabled.
   validate-multi-arch-pr:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1
     pull: true
@@ -33,24 +31,14 @@ steps:
       GITHUB_TOKEN:
         from_secret: github_token
     when:
-      - path:
-          include:
-            - '.woodpecker/containers.yml'
-            - '.container/Dockerfile'
-            - '**/pyproject.toml'
-            - '**/uv.lock'
-            - 'packages/bietlejuice-runtime/hatch_build.py'
-        event: push
-        branch:
-          exclude: [master]
-      - path:
-          include:
-            - '.woodpecker/containers.yml'
-            - '.container/Dockerfile'
-            - '**/pyproject.toml'
-            - '**/uv.lock'
-            - 'packages/bietlejuice-runtime/hatch_build.py'
-        event: pull_request
+      event: pull_request
+      path:
+        include:
+          - '.woodpecker/containers.yml'
+          - '.container/Dockerfile'
+          - '**/pyproject.toml'
+          - '**/uv.lock'
+          - 'packages/bietlejuice-runtime/hatch_build.py'
 
   publish-ci-base-prod:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/docker:test-5654ae1

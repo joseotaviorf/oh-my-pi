@@ -19,7 +19,9 @@ steps:
       # Optional: symlink for anything resolving envs/dbr-16-4/.venv/bin/* directly.
       - ln -sfn /opt/bietlejuice/venvs/dbr-16-4 packages/bietlejuice-runtime/envs/dbr-16-4/.venv
     when:
-      event: [push, pull_request]
+      - event: pull_request
+      - event: push
+        branch: [master, hotfix/*]
 
   unit-tests-python:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
@@ -28,7 +30,9 @@ steps:
       - export AWS_DEFAULT_REGION=us-east-1
       - make unit-tests
     when:
-      event: [push, pull_request]
+      - event: pull_request
+      - event: push
+        branch: [master, hotfix/*]
     depends_on: [setup]
 
   unit-tests-dags:
@@ -38,7 +42,9 @@ steps:
       - export AWS_DEFAULT_REGION=us-east-1
       - make unit-tests-dags
     when:
-      event: [push, pull_request]
+      - event: pull_request
+      - event: push
+        branch: [master, hotfix/*]
     depends_on: [setup]
 
   integration-tests-python:
@@ -48,7 +54,9 @@ steps:
       - export AWS_DEFAULT_REGION=us-east-1
       - make integration-tests
     when:
-      event: [push, pull_request]
+      - event: pull_request
+      - event: push
+        branch: [master, hotfix/*]
     depends_on: [setup]
 
   core-model-tests-and-coverage:
@@ -58,5 +66,7 @@ steps:
       - export AWS_DEFAULT_REGION=us-east-1
       - make core-model-coverage
     when:
-      event: [push, pull_request]
+      - event: pull_request
+      - event: push
+        branch: [master, hotfix/*]
     depends_on: [setup]

@@ -6,7 +6,9 @@ steps:
     commands:
       - uv sync
     when:
-      event: [push, pull_request]
+      - event: pull_request
+      - event: push
+        branch: [master, hotfix/*]
 
   check-style-python:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
@@ -14,7 +16,9 @@ steps:
     commands:
       - make check-style
     when:
-      event: [push, pull_request]
+      - event: pull_request
+      - event: push
+        branch: [master, hotfix/*]
     depends_on: [setup]
 
   check-style-dags-python:
@@ -23,7 +27,9 @@ steps:
     commands:
       - make check-style-dags
     when:
-      event: [push, pull_request]
+      - event: pull_request
+      - event: push
+        branch: [master, hotfix/*]
     depends_on: [setup]
 
   validate-py39-runtime-typing:
@@ -32,7 +38,9 @@ steps:
     commands:
       - make validate-py39-runtime-typing
     when:
-      event: [push, pull_request]
+      - event: pull_request
+      - event: push
+        branch: [master, hotfix/*]
     depends_on: [setup]
 
   files-validation-python:
@@ -41,7 +49,9 @@ steps:
     commands:
       - make files-validation
     when:
-      event: [push, pull_request]
+      - event: pull_request
+      - event: push
+        branch: [master, hotfix/*]
     depends_on: [setup]
 
   type-check-python:
@@ -51,5 +61,7 @@ steps:
     commands:
       - make type-check
     when:
-      event: [push, pull_request]
+      - event: pull_request
+      - event: push
+        branch: [master, hotfix/*]
     depends_on: [setup]

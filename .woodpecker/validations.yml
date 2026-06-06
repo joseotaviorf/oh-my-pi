@@ -14,7 +14,9 @@ steps:
     commands:
       - uv sync
     when:
-      event: [push, pull_request]
+      - event: pull_request
+      - event: push
+        branch: [master, hotfix/*, forno]
 
   validate-dag-declaration-files:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
@@ -22,15 +24,18 @@ steps:
     commands:
       - make run-domain-validation MAKE_TARGET=validate-dag-declaration-files MAKE_EXTRA_ARGS="level=debug"
     when:
-      event: [push, pull_request]
-      path:
-        include:
-          - "dags/**/*.yml"
-          - "packages/bietlejuice-airflow/src/bietlejuice/base/airflow/dag_builders/**/*.py"
-          - "packages/bietlejuice-core/src/bietlejuice/base/airflow/dag_builders/**/*.py"
-          - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/**/*.py"
-          - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
-        on_empty: false
+      - event: pull_request
+        path: &dag_declaration_path
+          include:
+            - "dags/**/*.yml"
+            - "packages/bietlejuice-airflow/src/bietlejuice/base/airflow/dag_builders/**/*.py"
+            - "packages/bietlejuice-core/src/bietlejuice/base/airflow/dag_builders/**/*.py"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/**/*.py"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*]
+        path: *dag_declaration_path
     depends_on: [setup]
 
   # Regen / cluster YAML PRs: full extract --check + instance-family audit.
@@ -43,12 +48,15 @@ steps:
     commands:
       - make validate-cluster-validation-files
     when:
-      event: [push, pull_request]
-      path:
-        include:
-          - "dags/**/*_cluster.yml"
-          - "packages/bietlejuice-core/src/bietlejuice/config/prod_conf.yml"
-        on_empty: false
+      - event: pull_request
+        path: &cluster_validation_files_path
+          include:
+            - "dags/**/*_cluster.yml"
+            - "packages/bietlejuice-core/src/bietlejuice/config/prod_conf.yml"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*]
+        path: *cluster_validation_files_path
     depends_on: [setup]
 
   # Tooling-only PRs: unit tests for extract/mapping/audit/promote + audit (no full-tree extract --check).
@@ -61,21 +69,24 @@ steps:
       - uv run --directory packages/bietlejuice-compiler pytest test/unit/ci_cd/airflow_dag_builder/test_extract_cluster_validation_files.py test/unit/ci_cd/airflow_dag_builder/test_cluster_validation_mapping.py test/unit/validation/test_audit_cluster_instance_families.py test/unit/ci_cd/airflow_dag_builder/test_promote_cluster_validation_to_prod.py -q
       - make audit-cluster-instance-families
     when:
-      event: [push, pull_request]
-      path:
-        include:
-          - ".woodpecker/validations.yml"
-          - "Makefile"
-          - "docs/platform/cluster_validation_dags.md"
-          - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/cluster_validation_mapping.py"
-          - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/extract_cluster_validation_files.py"
-          - "packages/bietlejuice-compiler/scripts/validation/audit_cluster_instance_families.py"
-          - "packages/bietlejuice-compiler/scripts/validation/promote_cluster_validation_to_prod.py"
-          - "packages/bietlejuice-compiler/test/unit/ci_cd/airflow_dag_builder/test_cluster_validation_mapping.py"
-          - "packages/bietlejuice-compiler/test/unit/ci_cd/airflow_dag_builder/test_extract_cluster_validation_files.py"
-          - "packages/bietlejuice-compiler/test/unit/ci_cd/airflow_dag_builder/test_promote_cluster_validation_to_prod.py"
-          - "packages/bietlejuice-compiler/test/unit/validation/test_audit_cluster_instance_families.py"
-        on_empty: false
+      - event: pull_request
+        path: &cluster_validation_tooling_path
+          include:
+            - ".woodpecker/validations.yml"
+            - "Makefile"
+            - "docs/platform/cluster_validation_dags.md"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/cluster_validation_mapping.py"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/extract_cluster_validation_files.py"
+            - "packages/bietlejuice-compiler/scripts/validation/audit_cluster_instance_families.py"
+            - "packages/bietlejuice-compiler/scripts/validation/promote_cluster_validation_to_prod.py"
+            - "packages/bietlejuice-compiler/test/unit/ci_cd/airflow_dag_builder/test_cluster_validation_mapping.py"
+            - "packages/bietlejuice-compiler/test/unit/ci_cd/airflow_dag_builder/test_extract_cluster_validation_files.py"
+            - "packages/bietlejuice-compiler/test/unit/ci_cd/airflow_dag_builder/test_promote_cluster_validation_to_prod.py"
+            - "packages/bietlejuice-compiler/test/unit/validation/test_audit_cluster_instance_families.py"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*]
+        path: *cluster_validation_tooling_path
     depends_on: [setup]
 
   validate-dags-up-to-standard:
@@ -84,15 +95,18 @@ steps:
     commands:
       - make run-domain-validation MAKE_TARGET=validate-dags-up-to-standard
     when:
-      event: [push, pull_request]
-      path:
-        include:
-          - "dags/**/*"
-          - "packages/bietlejuice-compiler/scripts/dag_standard_validation/**"
-          - "packages/bietlejuice-airflow/src/bietlejuice/base/airflow/dag_builders/**/*.py"
-          - "packages/bietlejuice-core/src/bietlejuice/base/airflow/dag_builders/**/*.py"
-          - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
-        on_empty: false
+      - event: pull_request
+        path: &dags_up_to_standard_path
+          include:
+            - "dags/**/*"
+            - "packages/bietlejuice-compiler/scripts/dag_standard_validation/**"
+            - "packages/bietlejuice-airflow/src/bietlejuice/base/airflow/dag_builders/**/*.py"
+            - "packages/bietlejuice-core/src/bietlejuice/base/airflow/dag_builders/**/*.py"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*]
+        path: *dags_up_to_standard_path
     depends_on: [setup]
 
   validate-metadata-files-content:
@@ -101,15 +115,18 @@ steps:
     commands:
       - make run-domain-validation MAKE_TARGET=validate-metadata-files-content
     when:
-      event: [push, pull_request]
-      branch:
-        exclude: [forno, hotfix/*]
-      path:
-        include:
-          - "dags/**/*.yml"
-          - "packages/bietlejuice-compiler/scripts/governance_metadata_validation/**"
-          - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
-        on_empty: false
+      - event: pull_request
+        branch:
+          exclude: [forno, hotfix/*]
+        path: &metadata_files_content_path
+          include:
+            - "dags/**/*.yml"
+            - "packages/bietlejuice-compiler/scripts/governance_metadata_validation/**"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
+          on_empty: false
+      - event: push
+        branch: [master]
+        path: *metadata_files_content_path
     depends_on: [setup]
 
   validate-metadata-files-exist:
@@ -118,15 +135,18 @@ steps:
     commands:
       - make run-domain-validation MAKE_TARGET=validate-metadata-files-exist
     when:
-      event: [push, pull_request]
-      branch:
-        exclude: [forno, hotfix/*]
-      path:
-        include:
-          - "dags/**/*.sql"
-          - "packages/bietlejuice-compiler/scripts/governance_metadata_validation/**"
-          - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
-        on_empty: false
+      - event: pull_request
+        branch:
+          exclude: [forno, hotfix/*]
+        path: &metadata_files_exist_path
+          include:
+            - "dags/**/*.sql"
+            - "packages/bietlejuice-compiler/scripts/governance_metadata_validation/**"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
+          on_empty: false
+      - event: push
+        branch: [master]
+        path: *metadata_files_exist_path
     depends_on: [setup]
 
   validate-lineage-consistency:
@@ -135,16 +155,19 @@ steps:
     commands:
       - make run-domain-validation MAKE_TARGET=validate-lineage-consistency
     when:
-      event: [push, pull_request]
-      branch:
-        exclude: [forno, hotfix/*]
-      path:
-        include:
-          - "dags/**/*.sql"
-          - "dags/**/*.yml"
-          - "packages/bietlejuice-compiler/scripts/governance_metadata_validation/**"
-          - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
-        on_empty: false
+      - event: pull_request
+        branch:
+          exclude: [forno, hotfix/*]
+        path: &lineage_consistency_path
+          include:
+            - "dags/**/*.sql"
+            - "dags/**/*.yml"
+            - "packages/bietlejuice-compiler/scripts/governance_metadata_validation/**"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
+          on_empty: false
+      - event: push
+        branch: [master]
+        path: *lineage_consistency_path
     depends_on: [setup]
 
   validate-source-layer-policy:
@@ -153,13 +176,16 @@ steps:
     commands:
       - make run-domain-validation MAKE_TARGET=validate-source-layer-policy
     when:
-      event: [push, pull_request]
-      path:
-        include:
-          - "dags/**/*"
-          - "packages/bietlejuice-compiler/scripts/ci_cd/source_layer_validation/**"
-          - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
-        on_empty: false
+      - event: pull_request
+        path: &source_layer_policy_path
+          include:
+            - "dags/**/*"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/source_layer_validation/**"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*]
+        path: *source_layer_policy_path
     depends_on: [setup]
 
   # validate-dags-dependencies is two steps because ConfigurationService reads
@@ -175,7 +201,7 @@ steps:
     commands: &validate_dags_dependencies_commands
       - make run-domain-validation MAKE_TARGET=validate-dags-dependencies
     when:
-      event: [push, pull_request]
+      event: push
       branch: [forno]
       path: &validate_dags_dependencies_paths
         include:
@@ -197,10 +223,13 @@ steps:
       ENVIRONMENT: prod
     commands: *validate_dags_dependencies_commands
     when:
-      event: [push, pull_request]
-      branch:
-        exclude: [forno]
-      path: *validate_dags_dependencies_paths
+      - event: pull_request
+        branch:
+          exclude: [forno]
+        path: *validate_dags_dependencies_paths
+      - event: push
+        branch: [master, hotfix/*]
+        path: *validate_dags_dependencies_paths
     depends_on: [setup]
 
   validate-dependency-file-correctness:
@@ -209,18 +238,21 @@ steps:
     commands:
       - make validate-dependency-file-correctness
     when:
-      event: [push, pull_request]
-      path:
-        include:
-          - "dags/dependencies.yaml"
-          - "dags/**/*"
-          - "packages/bietlejuice-core/src/bietlejuice/base/dependencies/**/*.py"
-          - "packages/bietlejuice-airflow/src/bietlejuice/base/airflow/**/*.py"
-          - "packages/bietlejuice-core/src/bietlejuice/base/airflow/**/*.py"
-          - "packages/bietlejuice-runtime/src/bietlejuice/base/db/**/*.py"
-          - "packages/bietlejuice-compiler/scripts/ci_cd/validate_dags_dependencies.py"
-          - "packages/bietlejuice-compiler/scripts/dependency_handling/**"
-        on_empty: false
+      - event: pull_request
+        path: &dependency_file_correctness_path
+          include:
+            - "dags/dependencies.yaml"
+            - "dags/**/*"
+            - "packages/bietlejuice-core/src/bietlejuice/base/dependencies/**/*.py"
+            - "packages/bietlejuice-airflow/src/bietlejuice/base/airflow/**/*.py"
+            - "packages/bietlejuice-core/src/bietlejuice/base/airflow/**/*.py"
+            - "packages/bietlejuice-runtime/src/bietlejuice/base/db/**/*.py"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/validate_dags_dependencies.py"
+            - "packages/bietlejuice-compiler/scripts/dependency_handling/**"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*]
+        path: *dependency_file_correctness_path
     depends_on: [setup]
 
   validate-core-model-schemas:
@@ -229,12 +261,15 @@ steps:
     commands:
       - make validate-core-model-schemas
     when:
-      event: [push, pull_request]
-      path:
-        include:
-          - "dags/core/**/*"
-          - "packages/bietlejuice-compiler/scripts/ci_cd/validate_core_model_schemas.py"
-        on_empty: false
+      - event: pull_request
+        path: &core_model_schemas_path
+          include:
+            - "dags/core/**/*"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/validate_core_model_schemas.py"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*]
+        path: *core_model_schemas_path
     depends_on: [setup]
 
   validate-core-model-schema-content:
@@ -243,13 +278,16 @@ steps:
     commands:
       - make validate-core-model-schema-content
     when:
-      event: [push, pull_request]
-      path:
-        include:
-          - "dags/core/**/*"
-          - "packages/bietlejuice-compiler/scripts/ci_cd/validate_core_model_schema_content.py"
-          - "packages/bietlejuice-runtime/src/bietlejuice/base/core_models/**/*.py"
-          - "packages/bietlejuice-airflow/src/bietlejuice/base/core_models/**/*.py"
-          - "packages/bietlejuice-core/src/bietlejuice/base/core_models/**/*.py"
-        on_empty: false
+      - event: pull_request
+        path: &core_model_schema_content_path
+          include:
+            - "dags/core/**/*"
+            - "packages/bietlejuice-compiler/scripts/ci_cd/validate_core_model_schema_content.py"
+            - "packages/bietlejuice-runtime/src/bietlejuice/base/core_models/**/*.py"
+            - "packages/bietlejuice-airflow/src/bietlejuice/base/core_models/**/*.py"
+            - "packages/bietlejuice-core/src/bietlejuice/base/core_models/**/*.py"
+          on_empty: false
+      - event: push
+        branch: [master, hotfix/*]
+        path: *core_model_schema_content_path
     depends_on: [setup]
