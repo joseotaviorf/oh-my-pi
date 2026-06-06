@@ -20,11 +20,3 @@ workflow:
     supply_affiliates_volumetry:
       extra_spark_job_arguments:
         - s3://5a-wololo-prod/csv/prospect/update-cluster/volumetry-categories.csv
-cluster:
-  type: databricks_16_4_min_general_2_workers_cluster
-  databricks_conn_id: databricks_new
-  custom_configurations:
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

@@ -1,8 +1,13 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_m_compute_cluster
+  databricks_conn_id: databricks_new
+  access_control_list:
+  - group_name: software-engineers
+    permission_level: CAN_MANAGE
+  - group_name: analytics-engineers
+    permission_level: CAN_MANAGE
   custom_configurations:
     driver_node_type_id: r6g.2xlarge
-    node_type_id: c6g.2xlarge
     num_workers: 3
     spark_version: 16.4.x-scala2.12
     aws_attributes:
@@ -16,25 +21,3 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-  databricks_conn_id: databricks_new
-  access_control_list:
-  - group_name: software-engineers
-    permission_level: CAN_MANAGE
-  - group_name: analytics-engineers
-    permission_level: CAN_MANAGE
-validation:
-  cluster:
-    type: consolidation_m_compute_cluster
-    databricks_conn_id: databricks_new
-    access_control_list:
-    - group_name: software-engineers
-      permission_level: CAN_MANAGE
-    - group_name: analytics-engineers
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-        instance_profile_arn: '{{ var.value.instance_profile_secret_arn_reverse_listings_report }}'
-      num_workers: 3
-      driver_node_type_id: r6g.2xlarge
-  allow_custom_spark_job: true

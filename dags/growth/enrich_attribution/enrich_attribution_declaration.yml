@@ -33,6 +33,3 @@ workflow:
   inner_dependencies:
     online_attribution:
       - tracking_by_device
-cluster:
-  type: databricks_16_4_med_general_photon_cluster
-  databricks_conn_id: databricks_new

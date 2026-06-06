@@ -1,21 +1,12 @@
 cluster:
-  type: databricks_16_4_med_general_cluster
+  type: consolidation_s_general_cluster
   databricks_conn_id: databricks_new
   access_control_list:
-    - group_name: software-engineers
-      permission_level: CAN_MANAGE
-    - group_name: analytics-engineers
-      permission_level: CAN_MANAGE
-validation:
-  cluster:
-    type: consolidation_s_general_cluster
-    databricks_conn_id: databricks_new
-    access_control_list:
-    - group_name: software-engineers
-      permission_level: CAN_MANAGE
-    - group_name: analytics-engineers
-      permission_level: CAN_MANAGE
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      num_workers: 3
+  - group_name: software-engineers
+    permission_level: CAN_MANAGE
+  - group_name: analytics-engineers
+    permission_level: CAN_MANAGE
+  custom_configurations:
+    aws_attributes:
+      ebs_volume_size: 200
+    num_workers: 3

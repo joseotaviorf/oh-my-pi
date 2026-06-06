@@ -12,9 +12,3 @@ workflow:
     - "{table_name}"
   tables_customization:
     listings_locations: {}
-cluster:
-  type: databricks_16_4_min_general_2_workers_cluster
-  databricks_conn_id: databricks_new
-  access_control_list:
-    group_name: software-engineers
-    permission_level: CAN_MANAGE

@@ -1,42 +1,24 @@
 cluster:
-  type: databricks_13_3_high_mem_driver_high_mem_nodes
+  type: consolidation_l_memory_cluster
+  databricks_conn_id: databricks_new
   access_control_list:
     group_name: analytics-engineers
     permission_level: CAN_MANAGE
   custom_libraries:
   - pypi:
-      package: "google-api-python-client"
+      package: google-api-python-client
   - pypi:
-      package: "google-auth>=2.0.0"
+      package: google-auth>=2.0.0
   - pypi:
-      package: "google-cloud-bigquery>=3.10.0"
+      package: google-cloud-bigquery>=3.10.0
   - pypi:
-      package: "google-cloud-bigquery-storage>=2.0.0"
-  databricks_conn_id: databricks_new
+      package: google-cloud-bigquery-storage>=2.0.0
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-validation:
-  cluster:
-    type: consolidation_l_memory_cluster
-    databricks_conn_id: databricks_new
-    access_control_list:
-      group_name: analytics-engineers
-      permission_level: CAN_MANAGE
-    custom_libraries:
-    - pypi:
-        package: google-api-python-client
-    - pypi:
-        package: google-auth>=2.0.0
-    - pypi:
-        package: google-cloud-bigquery>=3.10.0
-    - pypi:
-        package: google-cloud-bigquery-storage>=2.0.0
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      spark_version: 13.3.x-scala2.12
-      num_workers: 5
-  allow_custom_spark_job: true
+    aws_attributes:
+      ebs_volume_size: 200
+    spark_version: 13.3.x-scala2.12
+    num_workers: 5

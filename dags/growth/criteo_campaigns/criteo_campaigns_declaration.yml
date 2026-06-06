@@ -24,13 +24,3 @@ workflow:
   - "{load_end_date}"   # load_end_date
   tables_customization:
     criteo_campaigns: {}
-cluster:
-  type: databricks_13_3_med_general_2_workers_cluster
-  custom_libraries:
-  - whl: "{artifacts_bucket}/criteo-api-client-python/quintoandar_criteo_api_client-0.1.0-py2.py3-none-any.whl"
-  databricks_conn_id: databricks_new
-  custom_configurations:
-    single_user_name: '{{ var.value.databricks_single_user_name }}'
-    data_security_mode: SINGLE_USER
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}

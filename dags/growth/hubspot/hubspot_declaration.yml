@@ -90,8 +90,3 @@ workflow:
       extra_spark_job_arguments:
         - meeting
   execution_timeout_hours: 3
-cluster:
-  type: consolidation_s_memory_single_node_cluster
-  custom_libraries:
-    - whl: "{artifacts_bucket}/hubspot-api-client-python/quintoandar_hubspot_api_client-0.3.0-py2.py3-none-any.whl"
-  databricks_conn_id: databricks_new

@@ -27,15 +27,3 @@ workflow:
       run_optimize: false
       run_vacuum: false
       has_hive_sync: false
-cluster:
-  type: databricks_16_4_high_mem_driver_high_mem_nodes
-  databricks_conn_id: databricks_new
-  custom_configurations:
-    single_user_name: "{{ var.value.databricks_single_user_name }}"
-    data_security_mode: SINGLE_USER
-    aws_attributes:
-      availability: ON_DEMAND
-      ebs_volume_size: 500
-    spark_conf:
-      spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-      spark.driver.maxResultSize: "0"

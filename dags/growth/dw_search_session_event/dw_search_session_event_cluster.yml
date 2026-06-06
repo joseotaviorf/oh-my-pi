@@ -1,5 +1,6 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_m_memory_cluster
+  databricks_conn_id: databricks_new_env
   custom_configurations:
     driver_node_type_id: r6gd.2xlarge
     node_type_id: r6gd.2xlarge
@@ -10,13 +11,3 @@ cluster:
     data_security_mode: USER_ISOLATION
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-  databricks_conn_id: databricks_new_env
-validation:
-  cluster:
-    type: consolidation_m_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      data_security_mode: USER_ISOLATION
-      runtime_engine: PHOTON
-      node_type_id: r6gd.2xlarge
-      driver_node_type_id: r6gd.2xlarge

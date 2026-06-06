@@ -1,9 +1,8 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_l_general_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     driver_node_type_id: c6g.4xlarge
-    node_type_id: m6g.4xlarge
     num_workers: 3
     spark_version: 16.4.x-scala2.12
     single_user_name: '{{ var.value.databricks_single_user_name }}'
@@ -14,16 +13,3 @@ cluster:
       spark.executor.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
     aws_attributes:
       ebs_volume_size: 500
-validation:
-  cluster:
-    type: consolidation_l_general_cluster
-    databricks_conn_id: databricks_new
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 500
-      spark_conf:
-        spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment}}
-        spark.driver.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
-        spark.executor.extraJavaOptions: -XX:MaxMetaspaceSize=1024m -XX:MetaspaceSize=256m
-      num_workers: 3
-      driver_node_type_id: c6g.4xlarge

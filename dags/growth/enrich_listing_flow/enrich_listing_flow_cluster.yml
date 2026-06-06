@@ -1,5 +1,5 @@
 cluster:
-  type: custom_cluster
+  type: consolidation_m_memory_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
@@ -13,14 +13,3 @@ cluster:
     spark_version: 16.4.x-scala2.12
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-validation:
-  cluster:
-    type: consolidation_m_memory_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-      num_workers: 3
-      runtime_engine: PHOTON
-      node_type_id: r6gd.2xlarge
-      driver_node_type_id: r6gd.2xlarge

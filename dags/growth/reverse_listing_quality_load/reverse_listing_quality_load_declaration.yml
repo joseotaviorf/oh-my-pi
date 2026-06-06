@@ -13,11 +13,3 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_end | ds, 'load_end_date') }}"
 
-cluster:
-  type: databricks_16_4_med_general_cluster
-  databricks_conn_id: databricks_new
-  access_control_list:
-    - group_name: software-engineers
-      permission_level: CAN_MANAGE
-    - group_name: analytics-engineers
-      permission_level: CAN_MANAGE

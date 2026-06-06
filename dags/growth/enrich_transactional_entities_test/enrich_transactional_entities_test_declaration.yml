@@ -46,6 +46,3 @@ workflow:
       z_order_by: [id_user, id_house, persona]
       table_properties:
         "delta.enableChangeDataFeed": "true"
-cluster:
-  type: databricks_16_4_rfleet_instance_cluster
-  databricks_conn_id: databricks_new
