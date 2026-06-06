@@ -1,5 +1,8 @@
 # Path filters use Woodpecker `when.path`. Skipped steps count as success so upstream
-# `depends_on: lint/tests/validations` still passes.
+# step deps still pass. lint/tests/validations workflow-level when matches deploy
+# branches + tag (clone-only on forno/tag where step filters are narrower). Release
+# workflow when uses the same push branches so feature-branch pushes do not deadlock
+# depends_on on v3.9 (optional: true requires Woodpecker 3.15+).
 #
 # Layout: shared prerequisites, then the full prod block, then the full forno block
 # (each block in internal pipeline order — not interleaved by pipeline type).
@@ -57,6 +60,11 @@ depends_on:
   - lint
   - tests
   - validations
+
+when:
+  - event: push
+    branch: [master, hotfix/*, forno]
+  - event: tag
 
 clone:
   - name: clone

@@ -1,5 +1,12 @@
 # Domain validation and core-model coverage use git diff origin/master...HEAD;
 # partial: false ensures the merge base exists (see validations.yml).
+when:
+  - event: pull_request
+  - event: push
+    branch: [master, hotfix/*, forno]
+  - event: tag
+    branch: [master, hotfix/*]
+
 clone:
   - name: clone
     image: woodpeckerci/plugin-git

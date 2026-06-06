@@ -11,6 +11,11 @@
 #   master → prod-<target>-latest   + prod-<target>-<sha7>
 #
 # No custom clone: default plugin-git shallow clone is enough (Docker build only; no git diff).
+when:
+  - event: pull_request
+  - event: push
+    branch: [master]
+  - event: manual
 
 steps:
   # Validates that ci-jdk builds for both amd64 and arm64 on PRs.

@@ -1,5 +1,11 @@
 # Validations use when.path so steps run only when relevant files change.
 # pull_request evaluates the full PR diff; push uses the commit diff.
+when:
+  - event: pull_request
+  - event: push
+    branch: [master, hotfix/*, forno]
+  - event: tag
+    branch: [master, hotfix/*]
 
 clone:
   - name: clone
