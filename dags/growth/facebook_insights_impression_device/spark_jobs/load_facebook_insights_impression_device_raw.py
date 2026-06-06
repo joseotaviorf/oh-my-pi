@@ -17,6 +17,10 @@ from bietlejuice.base.spark import (
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.formatters import StringFormatter
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -30,7 +34,14 @@ logger = QuintoAndarLogger(JOB_NAME)
 
 
 def save_to_datalake(
-    dataframe, environment, source, datalake_bucket, table_name, partitions
+    dataframe,
+    environment,
+    source,
+    datalake_bucket,
+    table_name,
+    partitions,
+    target_database_name: str = None,
+    target_table_name: str = None,
 ):
     """
     Saves a Spark DataFrame to the data lake, creating the database structure,
@@ -52,14 +63,24 @@ def save_to_datalake(
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
 
     spark_metastore_service = SparkMetastoreService(spark_client)
-    spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(write_database_name)
 
     s3_loader = S3Loader()
     s3_loader.load_df(
         df=dataframe,
-        s3_path=f"{database_location}{table_name}",
+        s3_path=f"{write_location}{write_table_name}",
         format_options=SparkTableStorageFormat.DEFAULT_RAW,
         partitions=partitions,
         compression="gzip",
@@ -68,18 +89,18 @@ def save_to_datalake(
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
     spark_metastore_loader.update_metastore(
         df=dataframe,
-        database_name=database_name,
-        table_name=table_name,
+        database_name=write_database_name,
+        table_name=write_table_name,
         format_options=SparkTableStorageFormat.DEFAULT_RAW,
-        database_location=database_location,
+        database_location=write_location,
         partitions=partitions,
         force_recreate=True,
     )
 
     spark_metastore_service.create_new_partitions_from_df(
         df=dataframe,
-        database_name=database_name,
-        table_name=table_name,
+        database_name=write_database_name,
+        table_name=write_table_name,
         partition_cols=partitions,
     )
 
@@ -194,7 +215,7 @@ def facebook_insights_request(account_id, table_name, start_date, end_date, brea
         exit(1)
 
 
-def main():
+def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("env")
     parser.add_argument("datalake_bucket")
@@ -206,7 +227,12 @@ def main():
     parser.add_argument("table_name")
     parser.add_argument("breakdown")
 
-    args = parser.parse_args()
+    add_validation_target_args(parser)
+    return parser.parse_args()
+
+
+def main():
+    args = parse_arguments()
 
     env = args.env
     datalake_bucket = args.datalake_bucket
@@ -259,6 +285,8 @@ def main():
         datalake_bucket=datalake_bucket,
         table_name=table_name,
         partitions=ast.literal_eval(partitions),
+        target_database_name=args.target_database_name,
+        target_table_name=args.target_table_name,
     )
 
 

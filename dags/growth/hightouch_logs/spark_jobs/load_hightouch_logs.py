@@ -7,6 +7,10 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.pipeline import FullTableLoaderPipeline
@@ -49,6 +53,8 @@ def load_table_into_datalake(
     load_end_date,
     extraction_type,
     incremental_column,
+    target_database_name: str = None,
+    target_table_name: str = None,
     **params,
 ):
     """
@@ -78,6 +84,16 @@ def load_table_into_datalake(
         )
         database_name = db_info["db_raw_databricks"]
         database_location = db_info["db_raw_path"]
+        write_database_name, write_table_name, write_location = (
+            resolve_datalake_write_target(
+                prod_database=database_name,
+                prod_table=table_name,
+                prod_location=database_location,
+                bucket=datalake_bucket,
+                target_database=target_database_name,
+                target_table=target_table_name,
+            )
+        )
         format_options = SparkTableStorageFormat.DEFAULT_RAW
 
         spark_metastore_service = SparkMetastoreService(spark_client)
@@ -85,7 +101,7 @@ def load_table_into_datalake(
         logging.info(
             "m=__main__, msg=Creating database in Spark Metastore if not exists..."
         )
-        spark_metastore_service.create_database(database_name)
+        spark_metastore_service.create_database(write_database_name)
         df.printSchema()
         if extraction_type == "incremental":
             # Ensure incremental column exists
@@ -116,14 +132,18 @@ def load_table_into_datalake(
             s3_loader = S3Loader()
             s3_loader.load_df(
                 df=df,
-                s3_path=f"{database_location}{table_name}",
+                s3_path=f"{write_location}{write_table_name}",
                 format_options=SparkTableStorageFormat.DEFAULT_RAW,
                 partitions=partition_cols,
                 optimize_dataframe=False,
             )
         else:
             FullTableLoaderPipeline(
-                database_name, table_name, database_location, LayerEnum.RAW, None
+                write_database_name,
+                write_table_name,
+                write_location,
+                LayerEnum.RAW,
+                None,
             ).load_and_register(df, format_options)
         # Initialize S3Loader
 
@@ -156,6 +176,7 @@ def parse_arguments():
     parser.add_argument("input_path", help="Input path")
     parser.add_argument("format", help="Input format")
 
+    add_validation_target_args(parser)
     return parser.parse_args()
 
 
@@ -186,6 +207,8 @@ def main():
         "load_end_date": args.load_end_date,
         "extraction_type": args.extraction_type,
         "incremental_column": args.incremental_column,
+        "target_database_name": args.target_database_name,
+        "target_table_name": args.target_table_name,
     }
     logging.info(
         f"""

@@ -12,6 +12,10 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.metastore_services import SparkMetastoreService
@@ -147,7 +151,13 @@ def _read_sync_changelog_input(
 
 
 def _write_to_raw(
-    df: DataFrame, environment: str, source: str, datalake_bucket: str, table_name: str
+    df: DataFrame,
+    environment: str,
+    source: str,
+    datalake_bucket: str,
+    table_name: str,
+    target_database_name: str = None,
+    target_table_name: str = None,
 ) -> None:
     if UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         current_catalog = UnityCatalogHelper.get_current_catalog()
@@ -156,9 +166,19 @@ def _write_to_raw(
     db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
-    full_table_path = f"{database_location}{table_name}"
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
+    full_table_path = f"{write_location}{write_table_name}"
 
-    SparkMetastoreService(spark_client).create_database(database_name)
+    SparkMetastoreService(spark_client).create_database(write_database_name)
 
     S3Loader().load_df(
         df=df,
@@ -187,6 +207,7 @@ def parse_arguments():
     parser.add_argument(
         "format", help="Input format (unused, kept for interface parity)"
     )
+    add_validation_target_args(parser)
     return parser.parse_args()
 
 
@@ -217,6 +238,8 @@ def main():
         source=args.source,
         datalake_bucket=args.datalake_bucket,
         table_name=args.table_name,
+        target_database_name=args.target_database_name,
+        target_table_name=args.target_table_name,
     )
     logger.info("m=main, msg=spark job finished")
 

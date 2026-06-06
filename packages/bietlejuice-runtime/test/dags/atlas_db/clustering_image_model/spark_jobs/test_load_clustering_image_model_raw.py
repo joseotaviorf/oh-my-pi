@@ -193,7 +193,7 @@ class TestLoadDataframeIntoDatalake(unittest.TestCase):
         )
 
         mock_metastore_svc.create_database.assert_called_once_with(
-            database_name="datalake_clustering_image_model_raw"
+            "datalake_clustering_image_model_raw"
         )
 
         mock_s3_loader.load_df.assert_called_once_with(

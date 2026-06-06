@@ -10,6 +10,10 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.databricks.table_privileges import TablePrivileges
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.metastore_services import SparkMetastoreService
@@ -258,6 +262,8 @@ def save_to_enrich(
     database_base_name: str,
     table_name: str,
     row_count: int,
+    target_database_name: str = None,
+    target_table_name: str = None,
 ) -> None:
     """Write DataFrame to enrich layer (Delta merge), refresh table, apply privileges."""
     db_info = DatalakeMetastoreService.get_db_info(
@@ -265,10 +271,20 @@ def save_to_enrich(
     )
     database_name = db_info["db_enrich_databricks"]
     database_location = db_info["db_enrich_path"]
-    full_table_name = f"{database_name}.{table_name}"
-    s3_path = f"{database_location}{table_name}"
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
+    full_table_name = f"{write_database_name}.{write_table_name}"
+    s3_path = f"{write_location}{write_table_name}"
 
-    SparkMetastoreService(spark_client).create_database(database_name)
+    SparkMetastoreService(spark_client).create_database(write_database_name)
     DeltaLoader().load_table(
         table_name=full_table_name,
         path=s3_path,
@@ -276,14 +292,16 @@ def save_to_enrich(
         partition_by=[],
         merge_on=["business_context", "id_house", "id_user"],
     )
-    SparkMetastoreService(spark_client).refresh_table(database_name, table_name)
+    SparkMetastoreService(spark_client).refresh_table(
+        write_database_name, write_table_name
+    )
     priv = TablePrivileges.from_environment_default(full_table_name)
     if priv and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         priv.apply()
     logger.info(f"m=save_df, table={full_table_name}, rows={row_count:,}")
 
 
-if __name__ == "__main__":
+def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment", default="forno", choices=["forno", "prod"])
     parser.add_argument("bucket", default="5a-datalake-prod")
@@ -295,7 +313,12 @@ if __name__ == "__main__":
         default=(date.today() - timedelta(days=1)).isoformat(),
     )
 
-    args = parser.parse_args()
+    add_validation_target_args(parser)
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_arguments()
     env = args.environment
     datalake_bucket = args.bucket
     database_base_name = args.schema
@@ -324,5 +347,7 @@ if __name__ == "__main__":
             database_base_name,
             table_name,
             row_count,
+            target_database_name=args.target_database_name,
+            target_table_name=args.target_table_name,
         )
         logger.info("m=main, msg=Job finished successfully")

@@ -8,6 +8,10 @@ from pyspark.sql.types import BooleanType
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.udfs.udf_enum import UDFEnum
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -44,6 +48,7 @@ def parse_args() -> Namespace:
     )
     parser.add_argument("table_name", type=str, help="table name that will be created")
 
+    add_validation_target_args(parser)
     return parser.parse_args()
 
 
@@ -145,12 +150,22 @@ def save_df(df: DataFrame, args: Namespace) -> None:
     )
     database_name = db_info["db_enrich_databricks"]
     database_location = db_info["db_enrich_path"]
-    spark_metastore_service.create_database(database_name)
-    s3_path = database_location + args.table_name
-    full_table_name = f"{database_name}.{args.table_name}"
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=args.table_name,
+            prod_location=database_location,
+            bucket=args.datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
+    spark_metastore_service.create_database(write_database_name)
+    s3_path = f"{write_location}{write_table_name}"
+    full_table_name = f"{write_database_name}.{write_table_name}"
 
     loader.load_table(table_name=full_table_name, path=s3_path, source_df=df)
-    spark_metastore_service.refresh_table(database_name, args.table_name)
+    spark_metastore_service.refresh_table(write_database_name, write_table_name)
 
 
 if __name__ == "__main__":

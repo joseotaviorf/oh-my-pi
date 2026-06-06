@@ -7,6 +7,10 @@ from uuid import uuid4
 import boto3
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    is_validation_run,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.services.configuration_service import ConfigurationService
 
@@ -34,22 +38,18 @@ def parse_arguments() -> dict:
         "chunk_size", type=int, help="Chunk Size used for each table message"
     )
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
-    dag_name = args.dag_name
-    database_name = args.database_name
-    table_name = args.table_name
-    event_type = args.event_type
-    sns_topic_arn = args.sns_topic_arn
-    chunk_size = args.chunk_size
-
     return {
-        "dag_name": dag_name,
-        "database_name": database_name,
-        "table_name": table_name,
-        "event_type": event_type,
-        "sns_topic_arn": sns_topic_arn,
-        "chunk_size": chunk_size,
+        "dag_name": args.dag_name,
+        "database_name": args.database_name,
+        "table_name": args.table_name,
+        "event_type": args.event_type,
+        "sns_topic_arn": args.sns_topic_arn,
+        "chunk_size": args.chunk_size,
+        "target_database_name": args.target_database_name,
+        "target_table_name": args.target_table_name,
     }
 
 
@@ -130,6 +130,16 @@ def main():
     Start the pipeline.
     """
     job_args_dict = parse_arguments()
+
+    if is_validation_run(
+        job_args_dict["target_database_name"],
+        job_args_dict["target_table_name"],
+    ):
+        logger.info(
+            f"m={JOB_NAME}, msg=Skipping reverse SNS export in cluster validation mode"
+        )
+        return
+
     config_service = ConfigurationService(job_args_dict["dag_name"])
     sns_topic_arn = config_service.get_config(job_args_dict["sns_topic_arn"])
 

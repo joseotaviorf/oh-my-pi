@@ -14,6 +14,10 @@ from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.notification.gchat_webhooks_enum import GchatWebhooksEnum
 from bietlejuice.base.spark import BaseDBUtils, SparkTableStorageFormat
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -270,6 +274,8 @@ def update_df_with_missing_columns(
     database_name: str,
     table_name: str,
     spark_metastore_service: SparkMetastoreService,
+    fallback_database_name: str = None,
+    fallback_table_name: str = None,
 ) -> DataFrame:
     """
     Updates the DataFrame with the missing columns compared to the table in the database.
@@ -279,12 +285,30 @@ def update_df_with_missing_columns(
         database_name (str): The name of the Datalake.
         table_name (str): The name of the table.
         spark_metastore_service (SparkMetastoreService): The Spark Metastore Service.
+        fallback_database_name (str): Prod database when the write target table does not exist yet.
+        fallback_table_name (str): Prod table when the write target table does not exist yet.
 
       Returns:
         DataFrame: The DataFrame with the missing columns.
     """
+    schema_database_name = database_name
+    schema_table_name = table_name
+    if table_name not in spark_metastore_service.get_table_names(database_name):
+        if (
+            fallback_database_name
+            and fallback_table_name
+            and fallback_table_name
+            in spark_metastore_service.get_table_names(fallback_database_name)
+        ):
+            schema_database_name = fallback_database_name
+            schema_table_name = fallback_table_name
+        else:
+            return df
+
     table_schema = spark_metastore_service.get_table_schema(
-        database_name=database_name, table_name=table_name, ignore_partition_keys=True
+        database_name=schema_database_name,
+        table_name=schema_table_name,
+        ignore_partition_keys=True,
     )
     df_cols = set(df.columns)
     datalake_cols = set([field for field in table_schema])
@@ -295,7 +319,13 @@ def update_df_with_missing_columns(
 
 
 def load_dataframe_into_datalake(
-    datalake_bucket: str, df: DataFrame, environment: str, table_name: str, source: str
+    datalake_bucket: str,
+    df: DataFrame,
+    environment: str,
+    table_name: str,
+    source: str,
+    target_database_name: str = None,
+    target_table_name: str = None,
 ) -> None:
     """
     Loads a spark DataFrame into the datalake.
@@ -320,21 +350,36 @@ def load_dataframe_into_datalake(
 
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
     s3_loader = S3Loader()
     spark_metastore_service = SparkMetastoreService(spark_client)
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    spark_metastore_service.create_database(database_name=database_name)
+    spark_metastore_service.create_database(write_database_name)
     partition_cols = ["date", "device"]
     updated_df = update_df_with_missing_columns(
-        df, database_name, table_name, spark_metastore_service
+        df,
+        write_database_name,
+        write_table_name,
+        spark_metastore_service,
+        fallback_database_name=database_name,
+        fallback_table_name=table_name,
     )
 
     s3_loader.load_df(
         df=updated_df,
-        s3_path=f"{database_location}{table_name}",
+        s3_path=f"{write_location}{write_table_name}",
         format_options=format_options,
         partitions=partition_cols,
         compression="gzip",
@@ -342,27 +387,27 @@ def load_dataframe_into_datalake(
 
     spark_metastore_loader.update_metastore(
         df=updated_df,
-        database_name=database_name,
-        table_name=table_name,
+        database_name=write_database_name,
+        table_name=write_table_name,
         format_options=format_options,
-        database_location=database_location,
+        database_location=write_location,
         partitions=partition_cols,
     )
 
     spark_metastore_service.create_new_partitions_from_df(
         df=updated_df,
-        database_name=database_name,
-        table_name=table_name,
+        database_name=write_database_name,
+        table_name=write_table_name,
         partition_cols=partition_cols,
     )
 
-    full_raw_table_name = f"datalake_{source}_raw.{table_name}"
-    table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
+    full_write_table_name = f"{write_database_name}.{write_table_name}"
+    table_privileges = TablePrivileges.from_environment_default(full_write_table_name)
     if table_privileges and UnityCatalogHelper.is_cluster_unity_catalog_enabled():
         table_privileges.apply()
 
 
-def main():
+def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment")
     parser.add_argument("bucket")
@@ -373,7 +418,12 @@ def main():
     parser.add_argument("folder_or_file_name")
     parser.add_argument("crawl_bucket_path")
 
-    args = parser.parse_args()
+    add_validation_target_args(parser)
+    return parser.parse_args()
+
+
+def main():
+    args = parse_arguments()
 
     environment: str = args.environment
     bucket: str = args.bucket
@@ -433,7 +483,15 @@ def main():
                 )
         return
 
-    load_dataframe_into_datalake(bucket, df, environment, table_name, dag_name)
+    load_dataframe_into_datalake(
+        bucket,
+        df,
+        environment,
+        table_name,
+        dag_name,
+        target_database_name=args.target_database_name,
+        target_table_name=args.target_table_name,
+    )
 
 
 if __name__ == "__main__":

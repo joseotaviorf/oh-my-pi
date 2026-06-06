@@ -15,6 +15,10 @@ from bietlejuice.base.spark import (
     SparkTableStorageFormat,
     spark,
 )
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -68,6 +72,7 @@ if __name__ == "__main__":
     parser.add_argument("load_end_date")
     parser.add_argument("raw_table_name")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     logger.info(
@@ -117,17 +122,27 @@ if __name__ == "__main__":
         db_info = DatalakeMetastoreService.get_db_info(env, source, datalake_bucket)
         database_name = db_info["db_raw_databricks"]
         database_location = db_info["db_raw_path"]
+        write_database_name, write_table_name, write_location = (
+            resolve_datalake_write_target(
+                prod_database=database_name,
+                prod_table=raw_table_name,
+                prod_location=database_location,
+                bucket=datalake_bucket,
+                target_database=args.target_database_name,
+                target_table=args.target_table_name,
+            )
+        )
         format_options = SparkTableStorageFormat.DEFAULT_RAW
 
         spark_metastore_service = SparkMetastoreService(spark_client)
-        spark_metastore_service.create_database(database_name)
+        spark_metastore_service.create_database(write_database_name)
 
         spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
         s3_loader = S3Loader()
 
         s3_loader.load_df(
             df=df,
-            s3_path=f"{database_location}{raw_table_name}",
+            s3_path=f"{write_location}{write_table_name}",
             format_options=format_options,
             partitions=raw_partition_cols,
             optimize_dataframe=False,
@@ -139,16 +154,19 @@ if __name__ == "__main__":
         """
         spark_metastore_loader.update_metastore(
             df,
-            database_name,
-            raw_table_name,
+            write_database_name,
+            write_table_name,
             format_options,
-            database_location,
+            write_location,
             raw_partition_cols,
             force_recreate=False,
         )
 
         spark_metastore_service.create_new_partitions_from_df(
-            database_name, raw_table_name, df, raw_partition_cols
+            database_name=write_database_name,
+            table_name=write_table_name,
+            df=df,
+            partition_cols=raw_partition_cols,
         )
 
     else:

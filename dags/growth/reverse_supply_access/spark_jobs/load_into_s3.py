@@ -6,6 +6,10 @@ from io import StringIO
 import boto3
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    is_validation_run,
+)
 from bietlejuice.services.storage_services import S3Service
 
 JOB_NAME = "load_into_s3"
@@ -25,16 +29,15 @@ def parse_arguments() -> dict:
     parser.add_argument("table_name", help="Name of the table to be loaded")
     parser.add_argument("s3_path", help="The path of S3 to load data")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
-    database_name = args.database_name
-    table_name = args.table_name
-    s3_path = args.s3_path
-
     return {
-        "database_name": database_name,
-        "table_name": table_name,
-        "s3_path": s3_path,
+        "database_name": args.database_name,
+        "table_name": args.table_name,
+        "s3_path": args.s3_path,
+        "target_database_name": args.target_database_name,
+        "target_table_name": args.target_table_name,
     }
 
 
@@ -78,15 +81,23 @@ if __name__ == "__main__":
     """
     job_args_dict = parse_arguments()
 
-    logger.info(
-        f"""m=__main__, 
-            database_name={job_args_dict["database_name"]}, 
-            table_name={job_args_dict["table_name"]}, 
-            s3_path={job_args_dict["s3_path"]}"""
-    )
+    if is_validation_run(
+        job_args_dict["target_database_name"],
+        job_args_dict["target_table_name"],
+    ):
+        logger.info(
+            f"m={JOB_NAME}, msg=Skipping reverse S3 export in cluster validation mode"
+        )
+    else:
+        logger.info(
+            f"""m=__main__, 
+                database_name={job_args_dict["database_name"]}, 
+                table_name={job_args_dict["table_name"]}, 
+                s3_path={job_args_dict["s3_path"]}"""
+        )
 
-    load_table_into_s3(
-        database_name=job_args_dict["database_name"],
-        table_name=job_args_dict["table_name"],
-        s3_path=job_args_dict["s3_path"],
-    )
+        load_table_into_s3(
+            database_name=job_args_dict["database_name"],
+            table_name=job_args_dict["table_name"],
+            s3_path=job_args_dict["s3_path"],
+        )

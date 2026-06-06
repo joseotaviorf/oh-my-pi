@@ -15,6 +15,10 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -37,6 +41,8 @@ def main():
         raw_table_name,
         partition_cols,
         execution_date,
+        target_database_name,
+        target_table_name,
     ) = parse_arguments()
 
     logger.info(
@@ -85,6 +91,8 @@ def main():
             datalake_bucket=datalake_bucket,
             raw_table_name=raw_table_name,
             partition_cols=partition_cols,
+            target_database_name=target_database_name,
+            target_table_name=target_table_name,
         )
     else:
         raise Exception("m=Failed to ingest dataframe")
@@ -273,6 +281,8 @@ def load_dataframe_into_datalake(
     partition_cols: List[str],
     raw_table_name: str,
     schema: str,
+    target_database_name: str = None,
+    target_table_name: str = None,
 ):
     """
     Loads a DataFrame into the Data Lake.
@@ -292,6 +302,16 @@ def load_dataframe_into_datalake(
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=raw_table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
     s3_loader = S3Loader()
@@ -299,14 +319,14 @@ def load_dataframe_into_datalake(
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(write_database_name)
 
     if df.rdd.isEmpty():
         logger.info(f"m=__main__, msg={raw_table_name}'s RDD is empty")
 
     s3_loader.load_df(
         df=df,
-        s3_path=f"{database_location}/{raw_table_name}",
+        s3_path=f"{write_location}{write_table_name}",
         format_options=format_options,
         partitions=partition_cols,
         compression="gzip",
@@ -314,18 +334,18 @@ def load_dataframe_into_datalake(
 
     spark_metastore_loader.update_metastore(
         df=df,
-        database_name=database_name,
-        table_name=raw_table_name,
+        database_name=write_database_name,
+        table_name=write_table_name,
         format_options=format_options,
-        database_location=database_location,
+        database_location=write_location,
         partitions=partition_cols,
         force_recreate=True,
     )
 
     spark_metastore_service.create_new_partitions_from_df(
         df=df,
-        database_name=database_name,
-        table_name=raw_table_name,
+        database_name=write_database_name,
+        table_name=write_table_name,
         partition_cols=partition_cols,
     )
 
@@ -339,6 +359,7 @@ def parse_arguments():
     parser.add_argument("partitions", help="Partition columns name")
     parser.add_argument("execution_date", help="DAG execution_date")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     environment: str = args.environment
@@ -355,6 +376,8 @@ def parse_arguments():
         raw_table_name,
         partition_cols,
         execution_date,
+        args.target_database_name,
+        args.target_table_name,
     )
 
 

@@ -1,8 +1,6 @@
 from argparse import ArgumentParser
 from typing import Optional, Tuple
 
-from bietlejuice.base.validation.target_resolver import validation_database_location
-
 
 def add_validation_target_args(parser: ArgumentParser) -> None:
     """Register optional flags appended by LoadCustomTaskCreator in validation mode."""
@@ -20,6 +18,14 @@ def add_validation_target_args(parser: ArgumentParser) -> None:
     )
 
 
+def is_validation_run(
+    target_database: Optional[str],
+    target_table: Optional[str],
+) -> bool:
+    """True when Airflow passed cluster-validation write-target flags."""
+    return bool(target_database and target_table)
+
+
 def resolve_datalake_write_target(
     *,
     prod_database: str,
@@ -31,6 +37,10 @@ def resolve_datalake_write_target(
 ) -> Tuple[str, str, str]:
     """Return (write_database, write_table, write_location)."""
     if target_database and target_table:
+        from bietlejuice.base.validation.target_resolver import (
+            validation_database_location,
+        )
+
         return (
             target_database,
             target_table,

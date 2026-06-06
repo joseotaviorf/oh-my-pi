@@ -12,6 +12,10 @@ from bietlejuice.base.spark import (
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.s3_loader import S3Loader
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -31,6 +35,8 @@ def process_key(
     transient_location,
     transient_data_schema,
     transient_expected_cols,
+    target_database_name: str = None,
+    target_table_name: str = None,
 ):
     try:
         spark_client = SparkClient()
@@ -39,7 +45,16 @@ def process_key(
         db_info = DatalakeMetastoreService.get_db_info(
             environment, source, datalake_bucket
         )
+        database_name = db_info["db_raw_databricks"]
         database_location = db_info["db_raw_path"]
+        _, write_table_name, write_location = resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
 
         transient_path = (
             f"{transient_location}{key['app_id']}/{key['app_id']}_{execution_date}_*/"
@@ -75,7 +90,7 @@ def process_key(
             s3_loader = S3Loader()
             s3_loader.load_df(
                 df=df,
-                s3_path=f"{database_location}{table_name}",
+                s3_path=f"{write_location}{write_table_name}",
                 format_options=SparkTableStorageFormat.DEFAULT_RAW,
                 partitions=partition_cols,
                 optimize_dataframe=False,
@@ -88,14 +103,19 @@ def process_key(
         )
 
 
-if __name__ == "__main__":
+def parse_arguments():
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("environment")
     parser.add_argument("datalake_bucket")
     parser.add_argument("source")
     parser.add_argument("execution_date")
 
-    args = parser.parse_args()
+    add_validation_target_args(parser)
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parse_arguments()
     environment = args.environment
     datalake_bucket = args.datalake_bucket
     source = args.source
@@ -124,6 +144,8 @@ if __name__ == "__main__":
                     transient_location,
                     transient_data_schema,
                     transient_expected_cols,
+                    args.target_database_name,
+                    args.target_table_name,
                 ),
                 all_keys,
             )

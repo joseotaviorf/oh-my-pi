@@ -9,17 +9,25 @@ from argparse import ArgumentParser
 import pandas as pd
 import requests
 from pyspark.sql.functions import current_date, lit
+from pyspark.sql.functions import max as spark_max
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.pipeline import LayerEnum
 from bietlejuice.base.spark import SparkTableStorageFormat
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    is_validation_run,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.pipeline import FullTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
 
 IPTU_REGION = "iptu_sp"
+# Matches workflow custom_schema in iptu_sp_declaration.yml (shared datalake_iptu_raw DB).
+METASTORE_SOURCE = "iptu"
 JOB_NAME = f"load_{IPTU_REGION}_raw"
 
 logging.getLogger("py4j").setLevel(logging.ERROR)
@@ -34,6 +42,7 @@ def parse_arguments():
     parser.add_argument("source")
     parser.add_argument("execution_date")
 
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     return (
@@ -41,6 +50,8 @@ def parse_arguments():
         args.datalake_bucket,
         args.source,
         args.execution_date,
+        args.target_database_name,
+        args.target_table_name,
     )
 
 
@@ -97,24 +108,78 @@ def get_data(url, year, format):
     return process_zip_file(zip_files, year, format)
 
 
-def load_dataframe_into_datalake(df, table_name, environment, source, datalake_bucket):
-    db_info = DatalakeMetastoreService.get_db_info(environment, source, datalake_bucket)
+def get_last_ingested_year(
+    database_name: str,
+    table_name: str,
+    *,
+    validation_run: bool = False,
+) -> int:
+    """Return the latest ingested IPTU year for the given write target."""
+    if validation_run:
+        metastore = SparkMetastoreService(spark_client)
+        try:
+            if table_name not in metastore.get_table_names(database_name):
+                logger.info(
+                    f"m=get_last_ingested_year, database_name={database_name}, "
+                    f"table_name={table_name}, "
+                    "msg=Validation write target missing; treating as empty."
+                )
+                return 0
+        except Exception:
+            logger.info(
+                f"m=get_last_ingested_year, database_name={database_name}, "
+                f"table_name={table_name}, "
+                "msg=Validation database unavailable; treating as empty."
+            )
+            return 0
+
+    spark.catalog.setCurrentDatabase(database_name)
+    year = (
+        spark.table(table_name)
+        .agg(spark_max("year").alias("year"))
+        .collect()[0]["year"]
+    )
+    return int(year) if year is not None else 0
+
+
+def load_dataframe_into_datalake(
+    df,
+    table_name,
+    environment,
+    source,
+    datalake_bucket,
+    target_database_name: str = None,
+    target_table_name: str = None,
+):
+    db_info = DatalakeMetastoreService.get_db_info(
+        environment, METASTORE_SOURCE, datalake_bucket
+    )
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
     spark_metastore_service = SparkMetastoreService(spark_client)
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(write_database_name)
 
     if df.rdd.isEmpty():
         logger.info(f"m=__main__, msg={table_name}'s RDD is empty")
 
     FullTableLoaderPipeline(
-        database_name,
-        table_name,
-        database_location,
+        write_database_name,
+        write_table_name,
+        write_location,
         LayerEnum.RAW,
         None,
         None,
@@ -127,6 +192,8 @@ def main():
         datalake_bucket,
         source,
         execution_date,
+        target_database_name,
+        target_table_name,
     ) = parse_arguments()
 
     logger.info(
@@ -157,11 +224,22 @@ def main():
     last_iptu_available_year = get_last_iptu_available(
         path=source_url + source_years_path, headers=source_headers, data=source_data
     )
-    last_ingested_year = (
-        spark.sql(f"SELECT MAX(year) AS year FROM datalake_iptu_raw.{table_name}")
-        .select("year")
-        .rdd.flatMap(lambda x: x)
-        .collect()[0]
+    db_info = DatalakeMetastoreService.get_db_info(
+        environment, METASTORE_SOURCE, datalake_bucket
+    )
+    write_database_name, write_table_name, _ = resolve_datalake_write_target(
+        prod_database=db_info["db_raw_databricks"],
+        prod_table=table_name,
+        prod_location=db_info["db_raw_path"],
+        bucket=datalake_bucket,
+        target_database=target_database_name,
+        target_table=target_table_name,
+    )
+    validation_run = is_validation_run(target_database_name, target_table_name)
+    last_ingested_year = get_last_ingested_year(
+        write_database_name,
+        write_table_name,
+        validation_run=validation_run,
     )
 
     if last_iptu_available_year <= last_ingested_year:
@@ -193,6 +271,8 @@ def main():
             environment,
             source,
             datalake_bucket,
+            target_database_name=target_database_name,
+            target_table_name=target_table_name,
         )
 
 

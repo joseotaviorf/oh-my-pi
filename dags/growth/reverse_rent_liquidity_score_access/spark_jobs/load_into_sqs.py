@@ -2,11 +2,15 @@ import json
 import logging
 from argparse import ArgumentParser
 from decimal import Decimal
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import boto3
 from quintoandar_logger import QuintoAndarLogger
 
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    is_validation_run,
+)
 from bietlejuice.services.configuration_service import ConfigurationService
 
 # Masterfeed SQS export for reverse_rent_liquidity_score.rent_liquidity_score (rent liquidity score to Masterfeed).
@@ -20,13 +24,20 @@ logging.getLogger("py4j").setLevel(logging.ERROR)
 logger = QuintoAndarLogger(JOB_NAME)
 
 
-def parse_arguments() -> Tuple[str, str, str]:
+def parse_arguments() -> Tuple[str, str, str, Optional[str], Optional[str]]:
     parser = ArgumentParser(description=JOB_NAME)
     parser.add_argument("dag_name", help="Name of the DAG")
     parser.add_argument("database_name", help="Name of the database where the table is")
     parser.add_argument("table_name", help="Name of the table to be loaded")
+    add_validation_target_args(parser)
     args = parser.parse_args()
-    return args.dag_name, args.database_name, args.table_name
+    return (
+        args.dag_name,
+        args.database_name,
+        args.table_name,
+        args.target_database_name,
+        args.target_table_name,
+    )
 
 
 def json_safe_score(value: Any) -> Any:
@@ -91,7 +102,16 @@ def send_messages(
 
 
 def main() -> None:
-    dag_name, database_name, table_name = parse_arguments()
+    dag_name, database_name, table_name, target_database_name, target_table_name = (
+        parse_arguments()
+    )
+
+    if is_validation_run(target_database_name, target_table_name):
+        logger.info(
+            f"m={JOB_NAME}, msg=Skipping reverse SQS export in cluster validation mode"
+        )
+        return
+
     config_service = ConfigurationService(dag_name)
     queue_url = config_service.get_config("sqs_queue_url")
     payload = transform_payload(database_name, table_name)
