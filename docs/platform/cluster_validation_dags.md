@@ -83,6 +83,7 @@ The compiler emits a second DAG: `bietlejuice.{dag_name}__validation`
 - Load tasks do not publish datasets (`produce_datasets=false`)
 - Cluster preset from `validation.cluster`
 - Airflow tag: `cluster_validation`
+- Tasks use `retries=0` (fail fast; no Airflow task retries)
 
 ## Write target naming
 

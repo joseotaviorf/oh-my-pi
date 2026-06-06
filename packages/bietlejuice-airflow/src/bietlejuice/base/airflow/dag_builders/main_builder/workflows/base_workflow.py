@@ -105,17 +105,21 @@ class BaseWorkflow(BuilderInterface):
         if self.is_validation and "cluster_validation" not in dag_tags:
             dag_tags.append("cluster_validation")
 
+        default_args = {
+            "owner": self.dag_args["owner"],
+            "wait_for_downstream": False,
+            "depends_on_past": False,
+            "on_failure_callback": (
+                jiraops_callback.task_failure_alert if callback_by_task else None
+            ),
+        }
+        if self.is_validation:
+            default_args["retries"] = 0
+
         dag = DAG(
             dag_id=self.dag_id,
             catchup=self.dag_args.get("catchup", False),
-            default_args={
-                "owner": self.dag_args["owner"],
-                "wait_for_downstream": False,
-                "depends_on_past": False,
-                "on_failure_callback": (
-                    jiraops_callback.task_failure_alert if callback_by_task else None
-                ),
-            },
+            default_args=default_args,
             start_date=schedule_start_date,
             schedule=schedule,
             doc_md=doc_md,

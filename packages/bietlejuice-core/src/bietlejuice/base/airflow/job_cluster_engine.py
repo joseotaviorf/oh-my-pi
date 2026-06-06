@@ -233,6 +233,8 @@ class EmrJobClusterEngine(JobClusterEngine):
     """EMR: create cluster, spark-submit per task, terminate after optimize."""
 
     def _emr_operator_retry_kwargs(self) -> Dict[str, Any]:
+        if self._ctx.is_validation:
+            return {"retries": 0}
         cluster = self._ctx.cluster_args
         kwargs: Dict[str, Any] = {
             "retries": cluster.get("emr_task_retries", _DEFAULT_EMR_TASK_RETRIES),

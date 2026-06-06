@@ -155,6 +155,30 @@ class TestValidationWorkflow:
         tags = mock_dag_cls.call_args.kwargs["tags"]
         assert "cluster_validation" in tags
 
+    def test_validation_dag_default_args_retries_zero(self, _dag_instance_mocks):
+        mock_dag_cls = _dag_instance_mocks
+        with mock.patch.dict("os.environ", {"ENVIRONMENT": EnvironmentEnum.PROD}):
+            workflow = BaseWorkflow(
+                dag_args={"name": "pilot", "owner": "Data Engineering"},
+                workflow_args={},
+                cluster_args={},
+                is_validation=True,
+            )
+        workflow.dag_instance()
+        assert mock_dag_cls.call_args.kwargs["default_args"]["retries"] == 0
+
+    def test_prod_dag_default_args_omit_retries(self, _dag_instance_mocks):
+        mock_dag_cls = _dag_instance_mocks
+        with mock.patch.dict("os.environ", {"ENVIRONMENT": EnvironmentEnum.PROD}):
+            workflow = BaseWorkflow(
+                dag_args={"name": "pilot", "owner": "Data Engineering"},
+                workflow_args={},
+                cluster_args={},
+                is_validation=False,
+            )
+        workflow.dag_instance()
+        assert "retries" not in mock_dag_cls.call_args.kwargs["default_args"]
+
     def test_validation_check_include_sync_hive_tasks_returns_false(self):
         table_attributes = mock.MagicMock()
         table_attributes.table_customization = {"has_hive_sync": True}

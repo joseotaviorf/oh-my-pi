@@ -204,7 +204,7 @@ class RawGsheetsWorkflow(BaseWorkflow):
             gsheet: BranchPythonOperator(
                 task_id=StringFormatter.slugify(f"check-{gsheet}-should-run"),
                 python_callable=self.decide_branch,
-                retries=3,
+                retries=0 if self.is_validation else 3,
                 op_kwargs={
                     "table_name": gsheet,
                     "gsheet_raw_task_group": raw_task_groups[gsheet],

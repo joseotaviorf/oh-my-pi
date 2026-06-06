@@ -216,6 +216,40 @@ class TestEmrJobClusterEngineRetries:
         assert kwargs["retries"] == 3
         assert kwargs["retry_delay"] == timedelta(seconds=45)
 
+    def test_validation_emr_operators_use_zero_retries(self, emr_ctx):
+        emr_ctx.is_validation = True
+        emr_ctx.cluster_args["emr_task_retries"] = 7
+        emr_ctx.cluster_args["emr_retry_delay_seconds"] = 90
+        mock_create = MagicMock()
+        mock_submit = MagicMock()
+        mock_term = MagicMock()
+        fake, patcher = self._install_fake_emr_plugin(
+            create_cls=mock_create,
+            submit_cls=mock_submit,
+            terminate_cls=mock_term,
+        )
+        engine = EmrJobClusterEngine(emr_ctx, self._MERGED, MagicMock())
+        with patcher:
+            engine.create_execute_cluster_task(
+                config_service=MagicMock(),
+                minimum_cluster_runtime_version=None,
+                execute_job_cluster_local_id=None,
+            )
+            engine.create_spark_python_task(
+                spark_job_path="s3://b/j.py",
+                task_id="load-foo",
+                job_parameters=["a"],
+                execution_timeout_hours=2,
+            )
+            engine.create_emr_terminate_cluster_task(
+                execute_cluster_task_id="execute-job-cluster",
+                terminate_task_local_suffix=None,
+            )
+        for operator_mock in (mock_create, mock_submit, mock_term):
+            kwargs = operator_mock.call_args.kwargs
+            assert kwargs["retries"] == 0
+            assert "retry_delay" not in kwargs
+
 
 class TestDatabricksJobClusterEngineAcl:
     """ACL resolution moved from ExecuteJobClusterTaskCreator to DatabricksJobClusterEngine."""
