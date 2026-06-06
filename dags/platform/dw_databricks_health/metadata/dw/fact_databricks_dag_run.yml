@@ -74,6 +74,15 @@ columns:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.worker_node_type
       - dw_databricks_health.fact_databricks_task_run.total_dbu_consumed
+  worker_count:
+    description: Configured fixed worker count of the DBU-dominant cluster (`MAX_BY` on total_dbu_consumed). Null when that cluster autoscales.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.worker_count
+      - dw_databricks_health.fact_databricks_task_run.total_dbu_consumed
+  peak_concurrent_workers:
+    description: Maximum peak concurrent worker count observed across tasks in the bucket (`MAX`). Reflects realised worker usage, not configuration.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.peak_concurrent_workers
   primary_cluster_name:
     description: Cluster name of the DBU-dominant cluster in the logical bucket (`MAX_BY` on total_dbu_consumed).
     lineage:
@@ -104,36 +113,6 @@ columns:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.run_type
       - dw_databricks_health.fact_databricks_task_run.total_dbu_consumed
-  n_databricks_job_runs:
-    description: Distinct Databricks parent run ids (`COUNT(DISTINCT id_databricks_run)`) in this logical bucket.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
-  n_failed_databricks_job_runs:
-    description: Distinct parent Databricks runs with `run_result_state = 'FAILED'` in this logical bucket.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
-      - dw_databricks_health.fact_databricks_task_run.run_result_state
-  n_task_runs:
-    description: Task-run rows rolled into this logical bucket (`COUNT(DISTINCT id_databricks_task_run)`).
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.id_databricks_task_run
-  n_failed_task_runs:
-    description: Count of task runs with `is_failed` in this logical bucket.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_failed
-  n_task_runs_with_stage_data:
-    description: Count of task runs with Spark stage attribution (`has_stage_data`).
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.has_stage_data
-  worker_count:
-    description: Configured fixed worker count of the DBU-dominant cluster (`MAX_BY` on total_dbu_consumed). Null when that cluster autoscales.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.worker_count
-      - dw_databricks_health.fact_databricks_task_run.total_dbu_consumed
-  peak_concurrent_workers:
-    description: Maximum peak concurrent worker count observed across tasks in the bucket (`MAX`). Reflects realised worker usage, not configuration.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.peak_concurrent_workers
   total_dbu_consumed:
     description: Sum of task-level `total_dbu_consumed` in the logical bucket.
     lineage:
@@ -178,6 +157,43 @@ columns:
     description: Sum of task-level `total_cost_usd` (negotiated DBU USD + task-attributed calculated EC2) in the bucket.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.total_cost_usd
+  dbu_pricing_sku:
+    description: Dominant DBU billing SKU label — `FIRST` within the logical-run group.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.dbu_pricing_sku
+  dbu_rate_usd:
+    description: Dominant list USD-per-DBU — `FIRST` within the logical-run group.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.dbu_rate_usd
+  n_databricks_job_runs:
+    description: Distinct Databricks parent run ids (`COUNT(DISTINCT id_databricks_run)`) in this logical bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
+  n_failed_databricks_job_runs:
+    description: Distinct parent Databricks runs with `run_result_state = 'FAILED'` in this logical bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.id_databricks_run
+      - dw_databricks_health.fact_databricks_task_run.run_result_state
+  n_task_runs:
+    description: Task-run rows rolled into this logical bucket (`COUNT(DISTINCT id_databricks_task_run)`).
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.id_databricks_task_run
+  n_failed_task_runs:
+    description: Count of task runs with `is_failed` in this logical bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_failed
+  n_task_runs_with_stage_data:
+    description: Count of task runs with Spark stage attribution (`has_stage_data`).
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.has_stage_data
+  n_pool_acquisition_slow_tasks:
+    description: Count of tasks flagged `is_pool_acquisition_slow` in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_pool_acquisition_slow
+  n_stage_attribution_ambiguous_task_runs:
+    description: Count of task runs flagged `is_stage_attribution_ambiguous` in the bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_stage_attribution_ambiguous
   total_wall_clock_seconds:
     description: Wall span from earliest task start to latest task end in the bucket (`MAX(ts_task_ended) - MIN(ts_task_started)`).
     lineage:
@@ -207,119 +223,71 @@ columns:
     description: Maximum cluster startup seconds among tasks in the bucket.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.cluster_startup_seconds
-  weighted_avg_p95_driver_cpu_busy_percent:
-    description: P95 driver CPU busy percent weighted by `execution_duration_seconds` across tasks.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_driver_cpu_busy_percent
-      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
-  weighted_avg_p95_worker_cpu_busy_percent:
-    description: P95 worker CPU busy percent weighted by `execution_duration_seconds` across tasks.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_worker_cpu_busy_percent
-      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
-  weighted_avg_p95_driver_mem_used_percent:
-    description: P95 driver memory used percent weighted by `execution_duration_seconds` across tasks.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_driver_mem_used_percent
-      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
-  weighted_avg_p95_worker_mem_used_percent:
-    description: P95 worker memory used percent weighted by `execution_duration_seconds` across tasks.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_worker_mem_used_percent
-      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
   weighted_avg_p50_driver_cpu_busy_percent:
     description: P50 (median) driver CPU busy percent weighted by `execution_duration_seconds` across tasks.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.p50_driver_cpu_busy_percent
       - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
-  weighted_avg_p50_worker_cpu_busy_percent:
-    description: P50 (median) worker CPU busy percent weighted by `execution_duration_seconds` across tasks.
+  weighted_avg_p95_driver_cpu_busy_percent:
+    description: P95 driver CPU busy percent weighted by `execution_duration_seconds` across tasks.
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p50_worker_cpu_busy_percent
+      - dw_databricks_health.fact_databricks_task_run.p95_driver_cpu_busy_percent
       - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
   weighted_avg_p50_driver_cpu_wait_percent:
     description: P50 (median) driver I/O wait percent weighted by `execution_duration_seconds` across tasks.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.p50_driver_cpu_wait_percent
       - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
-  weighted_avg_p50_worker_cpu_wait_percent:
-    description: P50 (median) worker I/O wait percent weighted by `execution_duration_seconds` across tasks.
+  weighted_avg_p95_driver_cpu_wait_percent:
+    description: P95 driver CPU I/O wait percent weighted by `execution_duration_seconds` across tasks.
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p50_worker_cpu_wait_percent
+      - dw_databricks_health.fact_databricks_task_run.p95_driver_cpu_wait_percent
       - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
   weighted_avg_p50_driver_mem_used_percent:
     description: P50 (median) driver memory used percent weighted by `execution_duration_seconds` across tasks.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.p50_driver_mem_used_percent
       - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
-  weighted_avg_p50_worker_mem_used_percent:
-    description: P50 (median) worker memory used percent weighted by `execution_duration_seconds` across tasks.
+  weighted_avg_p95_driver_mem_used_percent:
+    description: P95 driver memory used percent weighted by `execution_duration_seconds` across tasks.
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p50_worker_mem_used_percent
+      - dw_databricks_health.fact_databricks_task_run.p95_driver_mem_used_percent
       - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
-  weighted_avg_p95_driver_cpu_wait_percent:
-    description: P95 driver CPU I/O wait percent weighted by `execution_duration_seconds` across tasks.
+  weighted_avg_p50_worker_cpu_busy_percent:
+    description: P50 (median) worker CPU busy percent weighted by `execution_duration_seconds` across tasks.
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.p95_driver_cpu_wait_percent
+      - dw_databricks_health.fact_databricks_task_run.p50_worker_cpu_busy_percent
+      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
+  weighted_avg_p95_worker_cpu_busy_percent:
+    description: P95 worker CPU busy percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p95_worker_cpu_busy_percent
+      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
+  weighted_avg_p50_worker_cpu_wait_percent:
+    description: P50 (median) worker I/O wait percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p50_worker_cpu_wait_percent
       - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
   weighted_avg_p95_worker_cpu_wait_percent:
     description: P95 worker CPU I/O wait percent weighted by `execution_duration_seconds` across tasks.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.p95_worker_cpu_wait_percent
       - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
+  weighted_avg_p50_worker_mem_used_percent:
+    description: P50 (median) worker memory used percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p50_worker_mem_used_percent
+      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
+  weighted_avg_p95_worker_mem_used_percent:
+    description: P95 worker memory used percent weighted by `execution_duration_seconds` across tasks.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.p95_worker_mem_used_percent
+      - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
   weighted_avg_local_disk_utilization_pct_p95:
     description: Local disk utilisation P95 weighted by `execution_duration_seconds` across tasks.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.local_disk_utilization_pct_p95
       - dw_databricks_health.fact_databricks_task_run.execution_duration_seconds
-  is_any_task_failed:
-    description: True if any task in the bucket failed.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_failed
-  is_any_task_success:
-    description: True if any task in the bucket succeeded.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_success
-  is_any_databricks_run_failed:
-    description: True if any parent Databricks run in the bucket has `run_result_state = 'FAILED'`.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.run_result_state
-  is_any_photon:
-    description: True when any task in the bucket ran on a Photon DBR image.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_photon
-  is_any_pool_backed:
-    description: True when any task in the bucket used an instance-pool-backed cluster.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_pool_backed
-  is_any_local_nvme:
-    description: True when any task in the bucket used an instance type with local NVMe storage.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.has_local_nvme
-  is_any_sensitive_data:
-    description: True when any task in the bucket carried the sensitive-data cluster tag.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_sensitive_data
-  is_any_stage_attribution_ambiguous:
-    description: True when any task in the bucket had ambiguous Spark stage attribution (`spark_app_count > 1`).
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_stage_attribution_ambiguous
-  is_job_on_interactive:
-    description: |
-      TRUE when any task in the bucket matches the interactive billing slice
-      (`ALL_PURPOSE` / `INTERACTIVE` DBU on the cluster, or `JOBS` on a UI/API cluster).
-      BOOL_OR rollup of `fact_databricks_task_run.is_job_on_interactive`. Filter
-      `NOT is_job_on_interactive` for the orchestrated slice.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_job_on_interactive
-  dbu_negotiated_price_missing:
-    description: TRUE when any task in the bucket fell back to the list DBU rate (no matching negotiated dim_dbu_price row).
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.dbu_negotiated_price_missing
-  n_pool_acquisition_slow_tasks:
-    description: Count of tasks flagged `is_pool_acquisition_slow` in the bucket.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_pool_acquisition_slow
   stage_count:
     description: Sum of Spark stage counts across tasks in the bucket (NULL stage metrics on ambiguous tasks are excluded at task grain).
     lineage:
@@ -332,10 +300,6 @@ columns:
     description: Sum of distinct Spark application counts attributed to tasks in the bucket.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.spark_app_count
-  n_stage_attribution_ambiguous_task_runs:
-    description: Count of task runs flagged `is_stage_attribution_ambiguous` in the bucket.
-    lineage:
-      - dw_databricks_health.fact_databricks_task_run.is_stage_attribution_ambiguous
   total_executor_run_time_ms:
     description: Sum of executor run-time milliseconds across tasks in the bucket.
     lineage:
@@ -393,14 +357,50 @@ columns:
     lineage:
       - dw_databricks_health.fact_databricks_task_run.last_stage_failure_reason
       - dw_databricks_health.fact_databricks_task_run.ts_task_ended
-  dbu_pricing_sku:
-    description: Dominant DBU billing SKU label — `FIRST` within the logical-run group.
+  is_any_task_failed:
+    description: True if any task in the bucket failed.
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.dbu_pricing_sku
-  dbu_rate_usd:
-    description: Dominant list USD-per-DBU — `FIRST` within the logical-run group.
+      - dw_databricks_health.fact_databricks_task_run.is_failed
+  is_any_task_success:
+    description: True if any task in the bucket succeeded.
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.dbu_rate_usd
+      - dw_databricks_health.fact_databricks_task_run.is_success
+  is_any_databricks_run_failed:
+    description: True if any parent Databricks run in the bucket has `run_result_state = 'FAILED'`.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.run_result_state
+  is_any_photon:
+    description: True when any task in the bucket ran on a Photon DBR image.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_photon
+  is_any_pool_backed:
+    description: True when any task in the bucket used an instance-pool-backed cluster.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_pool_backed
+  is_any_local_nvme:
+    description: True when any task in the bucket used an instance type with local NVMe storage.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.has_local_nvme
+  is_any_sensitive_data:
+    description: True when any task in the bucket carried the sensitive-data cluster tag.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_sensitive_data
+  is_any_stage_attribution_ambiguous:
+    description: True when any task in the bucket had ambiguous Spark stage attribution (`spark_app_count > 1`).
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_stage_attribution_ambiguous
+  is_job_on_interactive:
+    description: |
+      TRUE when any task in the bucket matches the interactive billing slice
+      (`ALL_PURPOSE` / `INTERACTIVE` DBU on the cluster, or `JOBS` on a UI/API cluster).
+      BOOL_OR rollup of `fact_databricks_task_run.is_job_on_interactive`. Filter
+      `NOT is_job_on_interactive` for the orchestrated slice.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_job_on_interactive
+  dbu_negotiated_price_missing:
+    description: TRUE when any task in the bucket fell back to the list DBU rate (no matching negotiated dim_dbu_price row).
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.dbu_negotiated_price_missing
   dt_dag_run_started:
     description: Calendar date of the logical run start (minute bucket date).
     lineage:

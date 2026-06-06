@@ -243,22 +243,18 @@ weighted_util AS (
     GROUP BY airflow_dag_id
 )
 SELECT
+    -- --- Keys ---
     wr.airflow_dag_id                                                                        AS airflow_dag_id,
+    -- --- Governance ---
     FIRST(team_owner)                                                                      AS team_owner,
     FIRST(cost_center)                                                                     AS cost_center,
     FIRST(ecosystem)                                                                       AS ecosystem,
     FIRST(environment)                                                                     AS environment,
     FIRST(provisioner)                                                                     AS provisioner,
     FIRST(data_classification)                                                           AS data_classification,
+    -- --- Cluster profile ---
     FIRST(primary_dbr_version)                                                           AS primary_dbr_version,
-
-    COUNT(*) FILTER (WHERE in_7d_window)                                                   AS total_dag_runs_7d,
-    COUNT(*)                                                                               AS total_dag_runs_28d,
-    SUM(n_databricks_job_runs) FILTER (WHERE in_7d_window)                                 AS total_job_runs_7d,
-    SUM(n_databricks_job_runs)                                                           AS total_job_runs_28d,
-    SUM(n_task_runs) FILTER (WHERE in_7d_window)                                          AS total_task_runs_7d,
-    SUM(n_task_runs)                                                                       AS total_task_runs_28d,
-
+    -- --- Cost ---
     ROUND(SUM(total_dbu_consumed) FILTER (WHERE in_7d_window), 4)                           AS total_dbu_consumed_7d,
     ROUND(SUM(total_dbu_consumed),                                  4)                     AS total_dbu_consumed_28d,
     ROUND(SUM(total_dbu_cost_usd) FILTER (WHERE in_7d_window), 4)                       AS total_dbu_cost_usd_7d,
@@ -272,7 +268,6 @@ SELECT
         SUM(total_dbu_cost_usd) / NULLIF(COUNT(*), 0),
         4
     )                                                                                    AS avg_dbu_cost_usd_per_dag_run_28d,
-
     ROUND(SUM(total_ec2_cost_calculated_usd) FILTER (WHERE in_7d_window), 4)             AS total_ec2_cost_calculated_usd_7d,
     ROUND(SUM(total_ec2_cost_calculated_usd),                                  4)         AS total_ec2_cost_calculated_usd_28d,
     ROUND(SUM(ec2_spot_hours) FILTER (WHERE in_7d_window), 4)                           AS ec2_spot_hours_7d,
@@ -283,7 +278,6 @@ SELECT
     BOOL_OR(is_ec2_estimated)                                                          AS has_ec2_estimate_28d,
     BOOL_OR(ec2_pricing_missing) FILTER (WHERE in_7d_window)                           AS has_ec2_pricing_missing_7d,
     BOOL_OR(ec2_pricing_missing)                                                       AS has_ec2_pricing_missing_28d,
-
     ROUND(SUM(total_cost_usd) FILTER (WHERE in_7d_window), 4)                            AS total_cost_usd_7d,
     ROUND(SUM(total_cost_usd),                                  4)                     AS total_cost_usd_28d,
     ROUND(
@@ -295,7 +289,6 @@ SELECT
         SUM(total_cost_usd) / NULLIF(COUNT(*), 0),
         4
     )                                                                                    AS avg_total_cost_usd_per_dag_run_28d,
-
     ROUND(
         SUM(total_cost_usd) FILTER (WHERE in_7d_window)
             / NULLIF(CAST(SUM(total_executor_run_time_ms) FILTER (WHERE in_7d_window) AS DOUBLE) / 1000.0, 0),
@@ -306,7 +299,14 @@ SELECT
             / NULLIF(CAST(SUM(total_executor_run_time_ms) AS DOUBLE) / 1000.0, 0),
         6
     )                                                                                    AS total_cost_usd_per_executor_second_28d,
-
+    -- --- Volume ---
+    COUNT(*) FILTER (WHERE in_7d_window)                                                   AS total_dag_runs_7d,
+    COUNT(*)                                                                               AS total_dag_runs_28d,
+    SUM(n_databricks_job_runs) FILTER (WHERE in_7d_window)                                 AS total_job_runs_7d,
+    SUM(n_databricks_job_runs)                                                           AS total_job_runs_28d,
+    SUM(n_task_runs) FILTER (WHERE in_7d_window)                                          AS total_task_runs_7d,
+    SUM(n_task_runs)                                                                       AS total_task_runs_28d,
+    -- --- Latency ---
     ROUND(AVG(total_duration_seconds) FILTER (WHERE in_7d_window), 2)                   AS avg_total_duration_seconds_7d,
     ROUND(AVG(total_duration_seconds),                                 2)                 AS avg_total_duration_seconds_28d,
     APPROX_PERCENTILE(total_duration_seconds, 0.50) FILTER (WHERE in_7d_window)          AS p50_total_duration_seconds_7d,
@@ -319,9 +319,9 @@ SELECT
     ROUND(AVG(execution_duration_seconds),                             2)               AS avg_execution_duration_seconds_28d,
     ROUND(AVG(setup_duration_seconds) FILTER (WHERE in_7d_window), 2)                  AS avg_setup_duration_seconds_7d,
     ROUND(AVG(setup_duration_seconds),                                 2)               AS avg_setup_duration_seconds_28d,
+    -- --- Startup ---
     APPROX_PERCENTILE(setup_duration_seconds, 0.95) FILTER (WHERE in_7d_window)            AS p95_setup_duration_seconds_7d,
     APPROX_PERCENTILE(setup_duration_seconds, 0.95)                                      AS p95_setup_duration_seconds_28d,
-
     APPROX_PERCENTILE(pre_init_script_seconds, 0.95) FILTER (WHERE in_7d_window)       AS p95_pre_init_script_seconds_7d,
     APPROX_PERCENTILE(pre_init_script_seconds, 0.95)                                   AS p95_pre_init_script_seconds_28d,
     APPROX_PERCENTILE(init_script_seconds, 0.50) FILTER (WHERE in_7d_window)             AS p50_init_script_seconds_7d,
@@ -340,7 +340,45 @@ SELECT
     )                                                                                    AS total_init_minutes_28d,
     APPROX_PERCENTILE(cluster_startup_seconds, 0.95) FILTER (WHERE in_7d_window)       AS p95_cluster_startup_seconds_7d,
     APPROX_PERCENTILE(cluster_startup_seconds, 0.95)                                   AS p95_cluster_startup_seconds_28d,
-
+    -- --- Reliability ---
+    SUM(n_failed_task_runs) FILTER (WHERE in_7d_window)                                AS failed_task_runs_7d,
+    SUM(n_failed_task_runs)                                                            AS failed_task_runs_28d,
+    ROUND(
+        SUM(n_failed_task_runs) FILTER (WHERE in_7d_window) * 100.0
+            / NULLIF(SUM(n_task_runs) FILTER (WHERE in_7d_window), 0),
+        2
+    )                                                                                    AS error_rate_pct_7d,
+    ROUND(
+        SUM(n_failed_task_runs) * 100.0 / NULLIF(SUM(n_task_runs), 0),
+        2
+    )                                                                                    AS error_rate_pct_28d,
+    SUM(CASE WHEN is_any_task_failed THEN 1 ELSE 0 END) FILTER (WHERE in_7d_window)    AS failed_dag_runs_7d,
+    SUM(CASE WHEN is_any_task_failed THEN 1 ELSE 0 END)                                AS failed_dag_runs_28d,
+    ROUND(
+        SUM(CASE WHEN is_any_task_failed THEN 1 ELSE 0 END) FILTER (WHERE in_7d_window) * 100.0
+            / NULLIF(COUNT(*) FILTER (WHERE in_7d_window), 0),
+        2
+    )                                                                                    AS failed_dag_run_rate_pct_7d,
+    ROUND(
+        SUM(CASE WHEN is_any_task_failed THEN 1 ELSE 0 END) * 100.0
+            / NULLIF(COUNT(*), 0),
+        2
+    )                                                                                    AS failed_dag_run_rate_pct_28d,
+    -- --- Cold start ---
+    SUM(n_pool_acquisition_slow_tasks) FILTER (WHERE in_7d_window)                     AS cold_start_count_7d,
+    SUM(n_pool_acquisition_slow_tasks)                                                 AS cold_start_count_28d,
+    ROUND(
+        SUM(n_pool_acquisition_slow_tasks) FILTER (WHERE in_7d_window) * 100.0
+            / NULLIF(SUM(n_task_runs) FILTER (WHERE in_7d_window), 0),
+        2
+    )                                                                                    AS cold_start_rate_pct_7d,
+    ROUND(
+        SUM(n_pool_acquisition_slow_tasks) * 100.0 / NULLIF(SUM(n_task_runs), 0),
+        2
+    )                                                                                    AS cold_start_rate_pct_28d,
+    ROUND(SUM(n_pool_acquisition_slow_tasks) FILTER (WHERE in_7d_window) / 7.0, 2)       AS cold_starts_per_day_7d,
+    ROUND(SUM(n_pool_acquisition_slow_tasks) / 28.0, 2)                                AS cold_starts_per_day_28d,
+    -- --- Utilisation ---
     MAX(wu.avg_p95_driver_cpu_busy_percent_7d)                                           AS avg_p95_driver_cpu_busy_percent_7d,
     MAX(wu.avg_p95_driver_cpu_busy_percent_28d)                                          AS avg_p95_driver_cpu_busy_percent_28d,
     MAX(wu.avg_p95_worker_cpu_busy_percent_7d)                                           AS avg_p95_worker_cpu_busy_percent_7d,
@@ -349,6 +387,10 @@ SELECT
     MAX(wu.avg_p95_driver_mem_used_percent_28d)                                          AS avg_p95_driver_mem_used_percent_28d,
     MAX(wu.avg_p95_worker_mem_used_percent_7d)                                           AS avg_p95_worker_mem_used_percent_7d,
     MAX(wu.avg_p95_worker_mem_used_percent_28d)                                          AS avg_p95_worker_mem_used_percent_28d,
+    MAX(wu.avg_p95_driver_cpu_wait_percent_7d)                                           AS avg_p95_driver_cpu_wait_percent_7d,
+    MAX(wu.avg_p95_driver_cpu_wait_percent_28d)                                          AS avg_p95_driver_cpu_wait_percent_28d,
+    MAX(wu.avg_p95_worker_cpu_wait_percent_7d)                                           AS avg_p95_worker_cpu_wait_percent_7d,
+    MAX(wu.avg_p95_worker_cpu_wait_percent_28d)                                          AS avg_p95_worker_cpu_wait_percent_28d,
     MAX(wu.avg_p50_driver_cpu_busy_percent_7d)                                           AS avg_p50_driver_cpu_busy_percent_7d,
     MAX(wu.avg_p50_driver_cpu_busy_percent_28d)                                          AS avg_p50_driver_cpu_busy_percent_28d,
     MAX(wu.avg_p50_worker_cpu_busy_percent_7d)                                           AS avg_p50_worker_cpu_busy_percent_7d,
@@ -361,13 +403,9 @@ SELECT
     MAX(wu.avg_p50_driver_mem_used_percent_28d)                                          AS avg_p50_driver_mem_used_percent_28d,
     MAX(wu.avg_p50_worker_mem_used_percent_7d)                                           AS avg_p50_worker_mem_used_percent_7d,
     MAX(wu.avg_p50_worker_mem_used_percent_28d)                                          AS avg_p50_worker_mem_used_percent_28d,
-    MAX(wu.avg_p95_driver_cpu_wait_percent_7d)                                           AS avg_p95_driver_cpu_wait_percent_7d,
-    MAX(wu.avg_p95_driver_cpu_wait_percent_28d)                                          AS avg_p95_driver_cpu_wait_percent_28d,
-    MAX(wu.avg_p95_worker_cpu_wait_percent_7d)                                           AS avg_p95_worker_cpu_wait_percent_7d,
-    MAX(wu.avg_p95_worker_cpu_wait_percent_28d)                                          AS avg_p95_worker_cpu_wait_percent_28d,
     MAX(wu.avg_local_disk_utilization_pct_p95_7d)                                        AS avg_local_disk_utilization_pct_p95_7d,
     MAX(wu.avg_local_disk_utilization_pct_p95_28d)                                       AS avg_local_disk_utilization_pct_p95_28d,
-
+    -- --- Right-sizing ratios ---
     ROUND(
         MAX(wu.avg_p95_driver_cpu_busy_percent_7d) - MAX(wu.avg_p95_worker_cpu_busy_percent_7d),
         2
@@ -390,7 +428,7 @@ SELECT
     ROUND(MAX(wu.avg_p95_worker_cpu_busy_percent_28d) / 100.0, 4)                      AS worker_cpu_utilization_ratio_28d,
     ROUND(MAX(wu.avg_p95_driver_cpu_busy_percent_7d)  / 100.0, 4)                      AS driver_cpu_utilization_ratio_7d,
     ROUND(MAX(wu.avg_p95_driver_cpu_busy_percent_28d) / 100.0, 4)                      AS driver_cpu_utilization_ratio_28d,
-
+    -- --- Spark / memory / I/O ---
     SUM(total_disk_bytes_spilled) FILTER (WHERE in_7d_window)                          AS total_disk_bytes_spilled_7d,
     SUM(total_disk_bytes_spilled)                                                      AS total_disk_bytes_spilled_28d,
     SUM(total_memory_bytes_spilled) FILTER (WHERE in_7d_window)                         AS total_memory_bytes_spilled_7d,
@@ -445,6 +483,7 @@ SELECT
         SUM(n_stage_attribution_ambiguous_task_runs) * 100.0 / NULLIF(SUM(n_task_runs), 0),
         2
     )                                                                                    AS stage_attribution_ambiguous_rate_pct_28d,
+    -- --- Cluster adoption ---
     ROUND(
         SUM(CASE WHEN is_any_photon THEN 1 ELSE 0 END) FILTER (WHERE in_7d_window) * 100.0
             / NULLIF(COUNT(*) FILTER (WHERE in_7d_window), 0),
@@ -472,46 +511,7 @@ SELECT
         SUM(CASE WHEN is_any_local_nvme THEN 1 ELSE 0 END) * 100.0 / NULLIF(COUNT(*), 0),
         2
     )                                                                                    AS local_nvme_run_rate_pct_28d,
-
-    SUM(n_failed_task_runs) FILTER (WHERE in_7d_window)                                AS failed_task_runs_7d,
-    SUM(n_failed_task_runs)                                                            AS failed_task_runs_28d,
-    ROUND(
-        SUM(n_failed_task_runs) FILTER (WHERE in_7d_window) * 100.0
-            / NULLIF(SUM(n_task_runs) FILTER (WHERE in_7d_window), 0),
-        2
-    )                                                                                    AS error_rate_pct_7d,
-    ROUND(
-        SUM(n_failed_task_runs) * 100.0 / NULLIF(SUM(n_task_runs), 0),
-        2
-    )                                                                                    AS error_rate_pct_28d,
-
-    SUM(CASE WHEN is_any_task_failed THEN 1 ELSE 0 END) FILTER (WHERE in_7d_window)    AS failed_dag_runs_7d,
-    SUM(CASE WHEN is_any_task_failed THEN 1 ELSE 0 END)                                AS failed_dag_runs_28d,
-    ROUND(
-        SUM(CASE WHEN is_any_task_failed THEN 1 ELSE 0 END) FILTER (WHERE in_7d_window) * 100.0
-            / NULLIF(COUNT(*) FILTER (WHERE in_7d_window), 0),
-        2
-    )                                                                                    AS failed_dag_run_rate_pct_7d,
-    ROUND(
-        SUM(CASE WHEN is_any_task_failed THEN 1 ELSE 0 END) * 100.0
-            / NULLIF(COUNT(*), 0),
-        2
-    )                                                                                    AS failed_dag_run_rate_pct_28d,
-
-    SUM(n_pool_acquisition_slow_tasks) FILTER (WHERE in_7d_window)                     AS cold_start_count_7d,
-    SUM(n_pool_acquisition_slow_tasks)                                                 AS cold_start_count_28d,
-    ROUND(
-        SUM(n_pool_acquisition_slow_tasks) FILTER (WHERE in_7d_window) * 100.0
-            / NULLIF(SUM(n_task_runs) FILTER (WHERE in_7d_window), 0),
-        2
-    )                                                                                    AS cold_start_rate_pct_7d,
-    ROUND(
-        SUM(n_pool_acquisition_slow_tasks) * 100.0 / NULLIF(SUM(n_task_runs), 0),
-        2
-    )                                                                                    AS cold_start_rate_pct_28d,
-    ROUND(SUM(n_pool_acquisition_slow_tasks) FILTER (WHERE in_7d_window) / 7.0, 2)       AS cold_starts_per_day_7d,
-    ROUND(SUM(n_pool_acquisition_slow_tasks) / 28.0, 2)                                AS cold_starts_per_day_28d,
-
+    -- --- Data quality ---
     ROUND(
         SUM(n_task_runs_with_stage_data) FILTER (WHERE in_7d_window) * 100.0
             / NULLIF(SUM(n_task_runs) FILTER (WHERE in_7d_window), 0),
@@ -521,13 +521,12 @@ SELECT
         SUM(n_task_runs_with_stage_data) * 100.0 / NULLIF(SUM(n_task_runs), 0),
         2
     )                                                                                    AS pct_task_runs_with_stage_data_28d,
-
+    -- --- Tail ---
     DATE('{load_start_date}')                                                          AS dt_window_end,
     CURRENT_TIMESTAMP()                                                                  AS ts_load,
     YEAR(DATE('{load_start_date}'))                                                    AS year,
     MONTH(DATE('{load_start_date}'))                                                   AS month,
     DAY(DATE('{load_start_date}'))                                                     AS day
-
 FROM
     window_runs wr
     LEFT JOIN weighted_util wu ON wr.airflow_dag_id = wu.airflow_dag_id

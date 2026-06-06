@@ -60,9 +60,6 @@ columns:
       - dw_databricks_health.fact_databricks_dag_run.airflow_dag_id
     description: Airflow DAG identifier without the bietlejuice. prefix (e.g. enrich_ebdb_booking).
     dimension: True
-  dt_window_end:
-    description: Last day of the rolling windows (inclusive). The 7d window covers (dt_window_end - 6 days)..dt_window_end; the 28d window covers (dt_window_end - 27 days)..dt_window_end. Equal to the data_interval_start of the run that produced this row.
-    dimension: True
   team_owner:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.team_owner
@@ -121,80 +118,6 @@ columns:
       - dw_databricks_health.fact_databricks_dag_run.primary_dbr_version
     description: DBR version of the DBU-dominant cluster in the logical run (`MAX_BY` on total_dbu_consumed).
     dimension: True
-
-  total_dag_runs_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
-    description: Approximate Airflow DAG executions in the 7-day window (distinct minute of ts_run_started).
-    metric:
-      name: Total DAG Runs (7d)
-      description: Distinct parent-run start minutes in the trailing 7-day window (parallel multi-job executions collapse when sharing the same minute).
-      acronym: total_dag_runs_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_dag_runs_28d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
-    description: Approximate Airflow DAG executions in the 28-day window (distinct minute of ts_run_started).
-    metric:
-      name: Total DAG Runs (28d)
-      description: Distinct parent-run start minutes in the trailing 28-day window.
-      acronym: total_dag_runs_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_job_runs_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.n_databricks_job_runs
-    description: Distinct Databricks job runs (id_databricks_run) in the 7-day window.
-    metric:
-      name: Total Job Runs (7d)
-      description: How many Databricks job runs started in the trailing 7-day window (may exceed DAG executions when multiple jobs run in parallel).
-      acronym: total_job_runs_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_job_runs_28d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.n_databricks_job_runs
-    description: Distinct Databricks job runs in the 28-day window.
-    metric:
-      name: Total Job Runs (28d)
-      description: How many Databricks job runs started in the trailing 28-day window.
-      acronym: total_job_runs_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_task_runs_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
-    description: Distinct count of Databricks task runs that started inside the 7-day window for this DAG.
-    metric:
-      name: Total Task Runs (7d)
-      description: Total tasks executed across all runs of this DAG in the trailing 7-day window. One task run is one Spark application.
-      acronym: total_task_runs_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_task_runs_28d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
-    description: Distinct count of Databricks task runs that started inside the 28-day window for this DAG.
-    metric:
-      name: Total Task Runs (28d)
-      description: Total tasks executed across all runs of this DAG in the trailing 28-day window. One task run is one Spark application.
-      acronym: total_task_runs_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-
   total_dbu_consumed_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_dbu_consumed
@@ -263,7 +186,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-
   total_ec2_cost_calculated_usd_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
@@ -402,7 +324,106 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-
+  total_cost_usd_per_executor_second_7d:
+    description: |
+      `total_cost_usd_7d / (sum(total_executor_run_time_ms_7d) / 1000)`. Total cost
+      (negotiated DBU USD + calculated EC2 USD) per second of useful executor compute
+      over the 7-day window. Lower ⇒ better bang-for-the-buck.
+      NULL when stage data is unavailable / ambiguous.
+    metric:
+      name: Total Cost USD per Executor Second (7d)
+      description: Total cost (DBU + EC2) over the 7-day window divided by total executor wall-clock seconds.
+      acronym: total_cost_per_exec_sec_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Right-Sizing Ratios
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_cost_usd_per_executor_second_28d:
+    description: |
+      `total_cost_usd_28d / (sum(total_executor_run_time_ms_28d) / 1000)`. Total cost
+      (negotiated DBU USD + calculated EC2 USD) per second of useful executor compute
+      over the 28-day window. Lower ⇒ better bang-for-the-buck.
+      NULL when stage data is unavailable / ambiguous.
+    metric:
+      name: Total Cost USD per Executor Second (28d)
+      description: Total cost (DBU + EC2) over the 28-day window divided by total executor wall-clock seconds.
+      acronym: total_cost_per_exec_sec_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Right-Sizing Ratios
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_dag_runs_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
+    description: Approximate Airflow DAG executions in the 7-day window (distinct minute of ts_run_started).
+    metric:
+      name: Total DAG Runs (7d)
+      description: Distinct parent-run start minutes in the trailing 7-day window (parallel multi-job executions collapse when sharing the same minute).
+      acronym: total_dag_runs_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_dag_runs_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
+    description: Approximate Airflow DAG executions in the 28-day window (distinct minute of ts_run_started).
+    metric:
+      name: Total DAG Runs (28d)
+      description: Distinct parent-run start minutes in the trailing 28-day window.
+      acronym: total_dag_runs_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_job_runs_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.n_databricks_job_runs
+    description: Distinct Databricks job runs (id_databricks_run) in the 7-day window.
+    metric:
+      name: Total Job Runs (7d)
+      description: How many Databricks job runs started in the trailing 7-day window (may exceed DAG executions when multiple jobs run in parallel).
+      acronym: total_job_runs_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_job_runs_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.n_databricks_job_runs
+    description: Distinct Databricks job runs in the 28-day window.
+    metric:
+      name: Total Job Runs (28d)
+      description: How many Databricks job runs started in the trailing 28-day window.
+      acronym: total_job_runs_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_task_runs_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
+    description: Distinct count of Databricks task runs that started inside the 7-day window for this DAG.
+    metric:
+      name: Total Task Runs (7d)
+      description: Total tasks executed across all runs of this DAG in the trailing 7-day window. One task run is one Spark application.
+      acronym: total_task_runs_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_task_runs_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
+    description: Distinct count of Databricks task runs that started inside the 28-day window for this DAG.
+    metric:
+      name: Total Task Runs (28d)
+      description: Total tasks executed across all runs of this DAG in the trailing 28-day window. One task run is one Spark application.
+      acronym: total_task_runs_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Observability
+      approved_by: jose.rferreira@quintoandar.com.br
   avg_total_duration_seconds_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
@@ -571,7 +592,30 @@ columns:
       business_stage: Platform Operations
       hierarchy: Latency
       approved_by: jose.rferreira@quintoandar.com.br
-
+  p95_pre_init_script_seconds_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.max_pre_init_script_seconds
+    description: P95 of per-run max pre-init-script seconds in the 7-day window.
+    metric:
+      name: P95 Pre-Init Script Seconds (7d)
+      description: Tail pre-init startup time (DBR pull / network setup) over the 7-day window.
+      acronym: p95_pre_init_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+  p95_pre_init_script_seconds_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.max_pre_init_script_seconds
+    description: P95 of per-run max pre-init-script seconds in the 28-day window.
+    metric:
+      name: P95 Pre-Init Script Seconds (28d)
+      description: Tail pre-init startup time over the 28-day window.
+      acronym: p95_pre_init_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
   p50_init_script_seconds_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.max_init_script_seconds
@@ -626,6 +670,30 @@ columns:
       name: p95 Init Script Duration (28d)
       description: Sustained tail of init-script duration over the 28-day window.
       acronym: p95_init_script_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+  p95_post_init_script_seconds_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.max_post_init_script_seconds
+    description: P95 of per-run max post-init-script seconds in the 7-day window.
+    metric:
+      name: P95 Post-Init Script Seconds (7d)
+      description: Tail JVM warm-up time after init scripts over the 7-day window.
+      acronym: p95_post_init_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+  p95_post_init_script_seconds_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.max_post_init_script_seconds
+    description: P95 of per-run max post-init-script seconds in the 28-day window.
+    metric:
+      name: P95 Post-Init Script Seconds (28d)
+      description: Tail JVM warm-up time after init scripts over the 28-day window.
+      acronym: p95_post_init_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Latency
@@ -691,7 +759,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Latency
       approved_by: jose.rferreira@quintoandar.com.br
-
   failed_task_runs_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.n_failed_task_runs
@@ -854,7 +921,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Latency
       approved_by: jose.rferreira@quintoandar.com.br
-
   avg_p95_driver_cpu_busy_percent_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_busy_percent
@@ -947,6 +1013,54 @@ columns:
       name: Avg p95 Worker Mem Used (28d)
       description: Average tail worker-memory utilization. Use with disk_bytes_spilled to confirm spill is memory-driven.
       acronym: avg_p95_worker_mem_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_driver_cpu_wait_percent_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_wait_percent
+    description: Duration-weighted mean of per-run P95 driver CPU I/O wait over the 7-day window. 0..100 scale.
+    metric:
+      name: Avg p95 Driver IO Wait (7d)
+      description: Tail driver I/O wait over the 7-day window. High values indicate the driver is I/O-bound.
+      acronym: avg_p95_driver_wait_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_driver_cpu_wait_percent_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_wait_percent
+    description: Duration-weighted mean of per-run P95 driver CPU I/O wait over the 28-day window. 0..100 scale.
+    metric:
+      name: Avg p95 Driver IO Wait (28d)
+      description: Tail driver I/O wait across runs. High values indicate the driver is I/O-bound.
+      acronym: avg_p95_driver_wait_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_worker_cpu_wait_percent_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_wait_percent
+    description: Duration-weighted mean of per-run P95 worker CPU I/O wait over the 7-day window. 0..100 scale.
+    metric:
+      name: Avg p95 Worker IO Wait (7d)
+      description: Tail worker I/O wait over the 7-day window.
+      acronym: avg_p95_worker_wait_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_worker_cpu_wait_percent_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_wait_percent
+    description: Duration-weighted mean of per-run P95 worker CPU I/O wait over the 28-day window. 0..100 scale.
+    metric:
+      name: Avg p95 Worker IO Wait (28d)
+      description: Tail worker I/O wait across runs.
+      acronym: avg_p95_worker_wait_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cluster Utilization
@@ -1119,7 +1233,114 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cluster Utilization
       approved_by: jose.rferreira@quintoandar.com.br
-
+  driver_minus_worker_cpu_pp_7d:
+    description: |
+      `avg_p95_driver_cpu_busy_percent_7d - avg_p95_worker_cpu_busy_percent_7d`,
+      in percentage points. Positive values mean the driver is hotter than workers
+      at P95 — a classic serial-driver bottleneck (Python UDFs, .toPandas(),
+      .collect(), schema evolution). Sort dashboards by this column to spot DAGs
+      where the worker shape is over-provisioned relative to actual parallel work.
+    metric:
+      name: Driver − Worker CPU (pp, 7d)
+      description: Driver P95 CPU busy minus worker P95 CPU busy, averaged over the 7-day window.
+      acronym: driver_minus_worker_cpu_pp_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Right-Sizing Ratios
+      approved_by: jose.rferreira@quintoandar.com.br
+  driver_minus_worker_cpu_pp_28d:
+    description: |
+      `avg_p95_driver_cpu_busy_percent_28d - avg_p95_worker_cpu_busy_percent_28d`,
+      in percentage points. Positive values mean the driver is hotter than workers
+      at P95 — a classic serial-driver bottleneck. Sort dashboards by this column
+      to spot DAGs where the worker shape is over-provisioned relative to actual
+      parallel work.
+    metric:
+      name: Driver − Worker CPU (pp, 28d)
+      description: Driver P95 CPU busy minus worker P95 CPU busy, averaged over the 28-day window.
+      acronym: driver_minus_worker_cpu_pp_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Right-Sizing Ratios
+      approved_by: jose.rferreira@quintoandar.com.br
+  spill_to_input_ratio_7d:
+    description: |
+      `total_disk_bytes_spilled_7d / total_input_bytes_read_7d`. High values
+      indicate memory pressure (executors too small for working set). Used in
+      lieu of a strict heap-pressure ratio because the fact does not currently
+      carry executor_memory_allocated_bytes. NULL when input bytes are zero.
+    metric:
+      name: Spill-to-Input Ratio (7d)
+      description: Bytes spilled to disk divided by bytes read from input over the 7-day window.
+      acronym: spill_input_ratio_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Right-Sizing Ratios
+      approved_by: jose.rferreira@quintoandar.com.br
+  spill_to_input_ratio_28d:
+    description: |
+      `total_disk_bytes_spilled_28d / total_input_bytes_read_28d`. High values
+      indicate memory pressure (executors too small for working set). Used in
+      lieu of a strict heap-pressure ratio because the fact does not currently
+      carry executor_memory_allocated_bytes. NULL when input bytes are zero.
+    metric:
+      name: Spill-to-Input Ratio (28d)
+      description: Bytes spilled to disk divided by bytes read from input over the 28-day window.
+      acronym: spill_input_ratio_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Right-Sizing Ratios
+      approved_by: jose.rferreira@quintoandar.com.br
+  worker_cpu_utilization_ratio_7d:
+    description: |
+      `avg_p95_worker_cpu_busy_percent_7d / 100`. Objective signal in [0, 1].
+      Values < 0.30 indicate consistently-cold workers — strong oversize candidate.
+      Threshold-based booleans live in the metric_observability.dag_verdict view (DPLT-935).
+    metric:
+      name: Worker CPU Utilization Ratio (7d)
+      description: Worker P95 CPU busy averaged over the 7-day window, normalised to [0, 1].
+      acronym: worker_cpu_util_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Right-Sizing Ratios
+      approved_by: jose.rferreira@quintoandar.com.br
+  worker_cpu_utilization_ratio_28d:
+    description: |
+      `avg_p95_worker_cpu_busy_percent_28d / 100`. Objective signal in [0, 1].
+      Values < 0.30 indicate consistently-cold workers — strong oversize candidate.
+      Threshold-based booleans live in the metric_observability.dag_verdict view (DPLT-935).
+    metric:
+      name: Worker CPU Utilization Ratio (28d)
+      description: Worker P95 CPU busy averaged over the 28-day window, normalised to [0, 1].
+      acronym: worker_cpu_util_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Right-Sizing Ratios
+      approved_by: jose.rferreira@quintoandar.com.br
+  driver_cpu_utilization_ratio_7d:
+    description: |
+      `avg_p95_driver_cpu_busy_percent_7d / 100`. Objective signal in [0, 1].
+      Use with `driver_minus_worker_cpu_pp_7d` to spot serial-driver bottlenecks.
+    metric:
+      name: Driver CPU Utilization Ratio (7d)
+      description: Driver P95 CPU busy averaged over the 7-day window, normalised to [0, 1].
+      acronym: driver_cpu_util_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Right-Sizing Ratios
+      approved_by: jose.rferreira@quintoandar.com.br
+  driver_cpu_utilization_ratio_28d:
+    description: |
+      `avg_p95_driver_cpu_busy_percent_28d / 100`. Objective signal in [0, 1].
+      Use with `driver_minus_worker_cpu_pp_28d` to spot serial-driver bottlenecks.
+    metric:
+      name: Driver CPU Utilization Ratio (28d)
+      description: Driver P95 CPU busy averaged over the 28-day window, normalised to [0, 1].
+      acronym: driver_cpu_util_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Right-Sizing Ratios
+      approved_by: jose.rferreira@quintoandar.com.br
   total_disk_bytes_spilled_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_disk_bytes_spilled
@@ -1311,265 +1532,6 @@ columns:
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Spark Stages
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  worker_cpu_utilization_ratio_7d:
-    description: |
-      `avg_p95_worker_cpu_busy_percent_7d / 100`. Objective signal in [0, 1].
-      Values < 0.30 indicate consistently-cold workers — strong oversize candidate.
-      Threshold-based booleans live in the metric_observability.dag_verdict view (DPLT-935).
-    metric:
-      name: Worker CPU Utilization Ratio (7d)
-      description: Worker P95 CPU busy averaged over the 7-day window, normalised to [0, 1].
-      acronym: worker_cpu_util_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Right-Sizing Ratios
-      approved_by: jose.rferreira@quintoandar.com.br
-  worker_cpu_utilization_ratio_28d:
-    description: |
-      `avg_p95_worker_cpu_busy_percent_28d / 100`. Objective signal in [0, 1].
-      Values < 0.30 indicate consistently-cold workers — strong oversize candidate.
-      Threshold-based booleans live in the metric_observability.dag_verdict view (DPLT-935).
-    metric:
-      name: Worker CPU Utilization Ratio (28d)
-      description: Worker P95 CPU busy averaged over the 28-day window, normalised to [0, 1].
-      acronym: worker_cpu_util_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Right-Sizing Ratios
-      approved_by: jose.rferreira@quintoandar.com.br
-  driver_cpu_utilization_ratio_7d:
-    description: |
-      `avg_p95_driver_cpu_busy_percent_7d / 100`. Objective signal in [0, 1].
-      Use with `driver_minus_worker_cpu_pp_7d` to spot serial-driver bottlenecks.
-    metric:
-      name: Driver CPU Utilization Ratio (7d)
-      description: Driver P95 CPU busy averaged over the 7-day window, normalised to [0, 1].
-      acronym: driver_cpu_util_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Right-Sizing Ratios
-      approved_by: jose.rferreira@quintoandar.com.br
-  driver_cpu_utilization_ratio_28d:
-    description: |
-      `avg_p95_driver_cpu_busy_percent_28d / 100`. Objective signal in [0, 1].
-      Use with `driver_minus_worker_cpu_pp_28d` to spot serial-driver bottlenecks.
-    metric:
-      name: Driver CPU Utilization Ratio (28d)
-      description: Driver P95 CPU busy averaged over the 28-day window, normalised to [0, 1].
-      acronym: driver_cpu_util_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Right-Sizing Ratios
-      approved_by: jose.rferreira@quintoandar.com.br
-  driver_minus_worker_cpu_pp_7d:
-    description: |
-      `avg_p95_driver_cpu_busy_percent_7d - avg_p95_worker_cpu_busy_percent_7d`,
-      in percentage points. Positive values mean the driver is hotter than workers
-      at P95 — a classic serial-driver bottleneck (Python UDFs, .toPandas(),
-      .collect(), schema evolution). Sort dashboards by this column to spot DAGs
-      where the worker shape is over-provisioned relative to actual parallel work.
-    metric:
-      name: Driver − Worker CPU (pp, 7d)
-      description: Driver P95 CPU busy minus worker P95 CPU busy, averaged over the 7-day window.
-      acronym: driver_minus_worker_cpu_pp_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Right-Sizing Ratios
-      approved_by: jose.rferreira@quintoandar.com.br
-  driver_minus_worker_cpu_pp_28d:
-    description: |
-      `avg_p95_driver_cpu_busy_percent_28d - avg_p95_worker_cpu_busy_percent_28d`,
-      in percentage points. Positive values mean the driver is hotter than workers
-      at P95 — a classic serial-driver bottleneck. Sort dashboards by this column
-      to spot DAGs where the worker shape is over-provisioned relative to actual
-      parallel work.
-    metric:
-      name: Driver − Worker CPU (pp, 28d)
-      description: Driver P95 CPU busy minus worker P95 CPU busy, averaged over the 28-day window.
-      acronym: driver_minus_worker_cpu_pp_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Right-Sizing Ratios
-      approved_by: jose.rferreira@quintoandar.com.br
-  spill_to_input_ratio_7d:
-    description: |
-      `total_disk_bytes_spilled_7d / total_input_bytes_read_7d`. High values
-      indicate memory pressure (executors too small for working set). Used in
-      lieu of a strict heap-pressure ratio because the fact does not currently
-      carry executor_memory_allocated_bytes. NULL when input bytes are zero.
-    metric:
-      name: Spill-to-Input Ratio (7d)
-      description: Bytes spilled to disk divided by bytes read from input over the 7-day window.
-      acronym: spill_input_ratio_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Right-Sizing Ratios
-      approved_by: jose.rferreira@quintoandar.com.br
-  spill_to_input_ratio_28d:
-    description: |
-      `total_disk_bytes_spilled_28d / total_input_bytes_read_28d`. High values
-      indicate memory pressure (executors too small for working set). Used in
-      lieu of a strict heap-pressure ratio because the fact does not currently
-      carry executor_memory_allocated_bytes. NULL when input bytes are zero.
-    metric:
-      name: Spill-to-Input Ratio (28d)
-      description: Bytes spilled to disk divided by bytes read from input over the 28-day window.
-      acronym: spill_input_ratio_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Right-Sizing Ratios
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_cost_usd_per_executor_second_7d:
-    description: |
-      `total_cost_usd_7d / (sum(total_executor_run_time_ms_7d) / 1000)`. Total cost
-      (negotiated DBU USD + calculated EC2 USD) per second of useful executor compute
-      over the 7-day window. Lower ⇒ better bang-for-the-buck.
-      NULL when stage data is unavailable / ambiguous.
-    metric:
-      name: Total Cost USD per Executor Second (7d)
-      description: Total cost (DBU + EC2) over the 7-day window divided by total executor wall-clock seconds.
-      acronym: total_cost_per_exec_sec_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Right-Sizing Ratios
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_cost_usd_per_executor_second_28d:
-    description: |
-      `total_cost_usd_28d / (sum(total_executor_run_time_ms_28d) / 1000)`. Total cost
-      (negotiated DBU USD + calculated EC2 USD) per second of useful executor compute
-      over the 28-day window. Lower ⇒ better bang-for-the-buck.
-      NULL when stage data is unavailable / ambiguous.
-    metric:
-      name: Total Cost USD per Executor Second (28d)
-      description: Total cost (DBU + EC2) over the 28-day window divided by total executor wall-clock seconds.
-      acronym: total_cost_per_exec_sec_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Right-Sizing Ratios
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  pct_task_runs_with_stage_data_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.n_task_runs_with_stage_data
-    description: Percentage of task runs in the 7-day window that have Spark event log stage metrics attached. 0..100 scale.
-    metric:
-      name: Stage Data Coverage (7d)
-      description: Data-quality KPI for the 7-day window. < 80% indicates delayed S3 PUTs or driver crashes; spill / memory / shuffle KPIs are unreliable until coverage recovers.
-      acronym: pct_stage_data_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Data Quality
-      approved_by: jose.rferreira@quintoandar.com.br
-  pct_task_runs_with_stage_data_28d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.n_task_runs_with_stage_data
-    description: Percentage of task runs in the 28-day window that have Spark event log stage metrics attached. 0..100 scale.
-    metric:
-      name: Stage Data Coverage (28d)
-      description: Data-quality KPI. < 80% indicates either delayed S3 PUTs of the Spark event logs, a misconfigured `spark.eventLog.dir`, or driver crashes before the log was flushed; spill / memory / shuffle KPIs are unreliable for this DAG until coverage recovers.
-      acronym: pct_stage_data_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Data Quality
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  avg_p95_driver_cpu_wait_percent_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_wait_percent
-    description: Duration-weighted mean of per-run P95 driver CPU I/O wait over the 7-day window. 0..100 scale.
-    metric:
-      name: Avg p95 Driver IO Wait (7d)
-      description: Tail driver I/O wait over the 7-day window. High values indicate the driver is I/O-bound.
-      acronym: avg_p95_driver_wait_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster Utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p95_driver_cpu_wait_percent_28d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_wait_percent
-    description: Duration-weighted mean of per-run P95 driver CPU I/O wait over the 28-day window. 0..100 scale.
-    metric:
-      name: Avg p95 Driver IO Wait (28d)
-      description: Tail driver I/O wait across runs. High values indicate the driver is I/O-bound.
-      acronym: avg_p95_driver_wait_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster Utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p95_worker_cpu_wait_percent_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_wait_percent
-    description: Duration-weighted mean of per-run P95 worker CPU I/O wait over the 7-day window. 0..100 scale.
-    metric:
-      name: Avg p95 Worker IO Wait (7d)
-      description: Tail worker I/O wait over the 7-day window.
-      acronym: avg_p95_worker_wait_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster Utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p95_worker_cpu_wait_percent_28d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_wait_percent
-    description: Duration-weighted mean of per-run P95 worker CPU I/O wait over the 28-day window. 0..100 scale.
-    metric:
-      name: Avg p95 Worker IO Wait (28d)
-      description: Tail worker I/O wait across runs.
-      acronym: avg_p95_worker_wait_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster Utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  p95_pre_init_script_seconds_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.max_pre_init_script_seconds
-    description: P95 of per-run max pre-init-script seconds in the 7-day window.
-    metric:
-      name: P95 Pre-Init Script Seconds (7d)
-      description: Tail pre-init startup time (DBR pull / network setup) over the 7-day window.
-      acronym: p95_pre_init_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Latency
-      approved_by: jose.rferreira@quintoandar.com.br
-  p95_pre_init_script_seconds_28d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.max_pre_init_script_seconds
-    description: P95 of per-run max pre-init-script seconds in the 28-day window.
-    metric:
-      name: P95 Pre-Init Script Seconds (28d)
-      description: Tail pre-init startup time over the 28-day window.
-      acronym: p95_pre_init_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Latency
-      approved_by: jose.rferreira@quintoandar.com.br
-  p95_post_init_script_seconds_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.max_post_init_script_seconds
-    description: P95 of per-run max post-init-script seconds in the 7-day window.
-    metric:
-      name: P95 Post-Init Script Seconds (7d)
-      description: Tail JVM warm-up time after init scripts over the 7-day window.
-      acronym: p95_post_init_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Latency
-      approved_by: jose.rferreira@quintoandar.com.br
-  p95_post_init_script_seconds_28d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.max_post_init_script_seconds
-    description: P95 of per-run max post-init-script seconds in the 28-day window.
-    metric:
-      name: P95 Post-Init Script Seconds (28d)
-      description: Tail JVM warm-up time after init scripts over the 28-day window.
-      acronym: p95_post_init_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Latency
       approved_by: jose.rferreira@quintoandar.com.br
   total_executor_cpu_time_ms_7d:
     lineage:
@@ -1841,7 +1803,33 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cluster Profile
       approved_by: jose.rferreira@quintoandar.com.br
-
+  pct_task_runs_with_stage_data_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs_with_stage_data
+    description: Percentage of task runs in the 7-day window that have Spark event log stage metrics attached. 0..100 scale.
+    metric:
+      name: Stage Data Coverage (7d)
+      description: Data-quality KPI for the 7-day window. < 80% indicates delayed S3 PUTs or driver crashes; spill / memory / shuffle KPIs are unreliable until coverage recovers.
+      acronym: pct_stage_data_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Data Quality
+      approved_by: jose.rferreira@quintoandar.com.br
+  pct_task_runs_with_stage_data_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs_with_stage_data
+    description: Percentage of task runs in the 28-day window that have Spark event log stage metrics attached. 0..100 scale.
+    metric:
+      name: Stage Data Coverage (28d)
+      description: Data-quality KPI. < 80% indicates either delayed S3 PUTs of the Spark event logs, a misconfigured `spark.eventLog.dir`, or driver crashes before the log was flushed; spill / memory / shuffle KPIs are unreliable for this DAG until coverage recovers.
+      acronym: pct_stage_data_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Data Quality
+      approved_by: jose.rferreira@quintoandar.com.br
+  dt_window_end:
+    description: Last day of the rolling windows (inclusive). The 7d window covers (dt_window_end - 6 days)..dt_window_end; the 28d window covers (dt_window_end - 27 days)..dt_window_end. Equal to the data_interval_start of the run that produced this row.
+    dimension: True
   ts_load:
     description: Timestamp when the row was written by this DAG run.
     dimension: False

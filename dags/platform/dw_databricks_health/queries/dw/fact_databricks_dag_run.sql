@@ -19,41 +19,36 @@
 -- Source: dw_databricks_health.fact_databricks_task_run.
 -- ============================================================================
 SELECT
+    -- --- Keys ---
     XXHASH64(
-        CAST(ftr.id_databricks_workspace AS STRING),
-        ftr.airflow_dag_id,
-        CAST(UNIX_TIMESTAMP(date_trunc('MINUTE', ftr.ts_run_started)) AS STRING)
-    )                                                             AS sk_databricks_dag_run,
+            CAST(ftr.id_databricks_workspace AS STRING),
+            ftr.airflow_dag_id,
+            CAST(UNIX_TIMESTAMP(date_trunc('MINUTE', ftr.ts_run_started)) AS STRING)
+        )                                                             AS sk_databricks_dag_run,
     ftr.id_databricks_workspace,
     ftr.airflow_dag_id,
     date_trunc('MINUTE', ftr.ts_run_started)                     AS ts_logical_run_started,
     CAST(DATE_FORMAT(DATE(date_trunc('MINUTE', ftr.ts_run_started)), 'yyyyMMdd') AS INT)
                                                                   AS sk_dag_run_started_date,
-
+    -- --- Governance ---
     FIRST(ftr.team_owner     IGNORE NULLS)                        AS team_owner,
     FIRST(ftr.cost_center    IGNORE NULLS)                        AS cost_center,
     FIRST(ftr.ecosystem      IGNORE NULLS)                        AS ecosystem,
     FIRST(ftr.environment    IGNORE NULLS)                        AS environment,
     FIRST(ftr.provisioner    IGNORE NULLS)                        AS provisioner,
     FIRST(ftr.data_classification IGNORE NULLS)                 AS data_classification,
+    -- --- Cluster profile ---
     MAX_BY(ftr.driver_node_type, ftr.total_dbu_consumed)         AS driver_node_type,
     MAX_BY(ftr.worker_node_type, ftr.total_dbu_consumed)         AS worker_node_type,
+    MAX_BY(ftr.worker_count, ftr.total_dbu_consumed)             AS worker_count,
+    MAX(ftr.peak_concurrent_workers)                             AS peak_concurrent_workers,
     MAX_BY(ftr.cluster_name, ftr.total_dbu_consumed)             AS primary_cluster_name,
     MAX_BY(ftr.cluster_source, ftr.total_dbu_consumed)           AS primary_cluster_source,
     MAX_BY(ftr.dbr_version, ftr.total_dbu_consumed)              AS primary_dbr_version,
     MAX_BY(ftr.min_autoscale_workers, ftr.total_dbu_consumed)    AS primary_min_autoscale_workers,
     MAX_BY(ftr.max_autoscale_workers, ftr.total_dbu_consumed)    AS primary_max_autoscale_workers,
     MAX_BY(ftr.run_type, ftr.total_dbu_consumed)                 AS primary_run_type,
-
-    COUNT(DISTINCT ftr.id_databricks_run)                           AS n_databricks_job_runs,
-    COUNT(DISTINCT CASE WHEN ftr.run_result_state = 'FAILED' THEN ftr.id_databricks_run END)
-                                                                  AS n_failed_databricks_job_runs,
-    COUNT(*)                                                        AS n_task_runs,
-    SUM(CASE WHEN ftr.is_failed THEN 1 ELSE 0 END)                  AS n_failed_task_runs,
-    SUM(CASE WHEN ftr.has_stage_data THEN 1 ELSE 0 END)             AS n_task_runs_with_stage_data,
-    MAX_BY(ftr.worker_count, ftr.total_dbu_consumed)             AS worker_count,
-    MAX(ftr.peak_concurrent_workers)                             AS peak_concurrent_workers,
-
+    -- --- Cost ---
     CAST(
         ROUND(SUM(ftr.total_dbu_consumed), 4) AS DECIMAL(25, 4)
     )                                                               AS total_dbu_consumed,
@@ -86,7 +81,19 @@ SELECT
     CAST(
         ROUND(SUM(ftr.total_cost_usd), 4) AS DECIMAL(38, 4)
     )                                                               AS total_cost_usd,
-
+    FIRST(ftr.dbu_pricing_sku IGNORE NULLS)                       AS dbu_pricing_sku,
+    FIRST(ftr.dbu_rate_usd   IGNORE NULLS)                        AS dbu_rate_usd,
+    -- --- Volume & failure counts ---
+    COUNT(DISTINCT ftr.id_databricks_run)                           AS n_databricks_job_runs,
+    COUNT(DISTINCT CASE WHEN ftr.run_result_state = 'FAILED' THEN ftr.id_databricks_run END)
+                                                                  AS n_failed_databricks_job_runs,
+    COUNT(*)                                                        AS n_task_runs,
+    SUM(CASE WHEN ftr.is_failed THEN 1 ELSE 0 END)                  AS n_failed_task_runs,
+    SUM(CASE WHEN ftr.has_stage_data THEN 1 ELSE 0 END)             AS n_task_runs_with_stage_data,
+    SUM(CASE WHEN ftr.is_pool_acquisition_slow THEN 1 ELSE 0 END) AS n_pool_acquisition_slow_tasks,
+    SUM(CASE WHEN ftr.is_stage_attribution_ambiguous THEN 1 ELSE 0 END)
+                                                                  AS n_stage_attribution_ambiguous_task_runs,
+    -- --- Latency / startup ---
     BIGINT(
         UNIX_TIMESTAMP(MAX(ftr.ts_task_ended)) - UNIX_TIMESTAMP(MIN(ftr.ts_task_started))
     )                                                               AS total_wall_clock_seconds,
@@ -96,91 +103,76 @@ SELECT
     MAX(ftr.init_script_seconds)                                    AS max_init_script_seconds,
     MAX(ftr.post_init_script_seconds)                               AS max_post_init_script_seconds,
     MAX(ftr.cluster_startup_seconds)                                AS max_cluster_startup_seconds,
-
-    ROUND(
-        SUM(ftr.p95_driver_cpu_busy_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
-            / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
-        2
-    )                                                               AS weighted_avg_p95_driver_cpu_busy_percent,
-    ROUND(
-        SUM(ftr.p95_worker_cpu_busy_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
-            / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
-        2
-    )                                                               AS weighted_avg_p95_worker_cpu_busy_percent,
-    ROUND(
-        SUM(ftr.p95_driver_mem_used_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
-            / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
-        2
-    )                                                               AS weighted_avg_p95_driver_mem_used_percent,
-    ROUND(
-        SUM(ftr.p95_worker_mem_used_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
-            / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
-        2
-    )                                                               AS weighted_avg_p95_worker_mem_used_percent,
-    ROUND(
-        SUM(ftr.p95_driver_cpu_wait_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
-            / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
-        2
-    )                                                               AS weighted_avg_p95_driver_cpu_wait_percent,
-    ROUND(
-        SUM(ftr.p95_worker_cpu_wait_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
-            / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
-        2
-    )                                                               AS weighted_avg_p95_worker_cpu_wait_percent,
+    -- --- Utilisation ---
     ROUND(
         SUM(ftr.p50_driver_cpu_busy_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
             / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
         2
     )                                                               AS weighted_avg_p50_driver_cpu_busy_percent,
     ROUND(
-        SUM(ftr.p50_worker_cpu_busy_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
+        SUM(ftr.p95_driver_cpu_busy_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
             / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
         2
-    )                                                               AS weighted_avg_p50_worker_cpu_busy_percent,
+    )                                                               AS weighted_avg_p95_driver_cpu_busy_percent,
     ROUND(
         SUM(ftr.p50_driver_cpu_wait_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
             / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
         2
     )                                                               AS weighted_avg_p50_driver_cpu_wait_percent,
     ROUND(
-        SUM(ftr.p50_worker_cpu_wait_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
+        SUM(ftr.p95_driver_cpu_wait_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
             / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
         2
-    )                                                               AS weighted_avg_p50_worker_cpu_wait_percent,
+    )                                                               AS weighted_avg_p95_driver_cpu_wait_percent,
     ROUND(
         SUM(ftr.p50_driver_mem_used_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
             / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
         2
     )                                                               AS weighted_avg_p50_driver_mem_used_percent,
     ROUND(
+        SUM(ftr.p95_driver_mem_used_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
+            / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
+        2
+    )                                                               AS weighted_avg_p95_driver_mem_used_percent,
+    ROUND(
+        SUM(ftr.p50_worker_cpu_busy_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
+            / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
+        2
+    )                                                               AS weighted_avg_p50_worker_cpu_busy_percent,
+    ROUND(
+        SUM(ftr.p95_worker_cpu_busy_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
+            / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
+        2
+    )                                                               AS weighted_avg_p95_worker_cpu_busy_percent,
+    ROUND(
+        SUM(ftr.p50_worker_cpu_wait_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
+            / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
+        2
+    )                                                               AS weighted_avg_p50_worker_cpu_wait_percent,
+    ROUND(
+        SUM(ftr.p95_worker_cpu_wait_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
+            / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
+        2
+    )                                                               AS weighted_avg_p95_worker_cpu_wait_percent,
+    ROUND(
         SUM(ftr.p50_worker_mem_used_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
             / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
         2
     )                                                               AS weighted_avg_p50_worker_mem_used_percent,
     ROUND(
+        SUM(ftr.p95_worker_mem_used_percent * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
+            / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
+        2
+    )                                                               AS weighted_avg_p95_worker_mem_used_percent,
+    ROUND(
         SUM(ftr.local_disk_utilization_pct_p95 * COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE)))
             / NULLIF(SUM(COALESCE(CAST(ftr.execution_duration_seconds AS DOUBLE), CAST(0 AS DOUBLE))), CAST(0 AS DOUBLE)),
         2
     )                                                               AS weighted_avg_local_disk_utilization_pct_p95,
-
-    MAX(CASE WHEN ftr.is_failed THEN 1 ELSE 0 END) >= 1           AS is_any_task_failed,
-    MAX(CASE WHEN ftr.is_success THEN 1 ELSE 0 END) >= 1          AS is_any_task_success,
-    MAX(CASE WHEN ftr.run_result_state = 'FAILED' THEN 1 ELSE 0 END) >= 1
-                                                                  AS is_any_databricks_run_failed,
-    BOOL_OR(ftr.is_photon)                                       AS is_any_photon,
-    BOOL_OR(ftr.is_pool_backed)                                  AS is_any_pool_backed,
-    BOOL_OR(ftr.has_local_nvme)                                  AS is_any_local_nvme,
-    BOOL_OR(ftr.is_sensitive_data)                               AS is_any_sensitive_data,
-    BOOL_OR(ftr.is_stage_attribution_ambiguous)                  AS is_any_stage_attribution_ambiguous,
-    BOOL_OR(ftr.is_job_on_interactive)                           AS is_job_on_interactive,
-    BOOL_OR(ftr.dbu_negotiated_price_missing)                    AS dbu_negotiated_price_missing,
-    SUM(CASE WHEN ftr.is_pool_acquisition_slow THEN 1 ELSE 0 END) AS n_pool_acquisition_slow_tasks,
-
+    -- --- Spark metrics ---
     SUM(ftr.stage_count)                                          AS stage_count,
     SUM(ftr.failed_stage_count)                                   AS failed_stage_count,
     SUM(ftr.spark_app_count)                                      AS spark_app_count,
-    SUM(CASE WHEN ftr.is_stage_attribution_ambiguous THEN 1 ELSE 0 END)
-                                                                  AS n_stage_attribution_ambiguous_task_runs,
     SUM(ftr.total_executor_run_time_ms)                           AS total_executor_run_time_ms,
     SUM(ftr.total_executor_cpu_time_ms)                           AS total_executor_cpu_time_ms,
     SUM(ftr.total_disk_bytes_spilled)                             AS total_disk_bytes_spilled,
@@ -198,10 +190,19 @@ SELECT
         ftr.last_stage_failure_reason,
         CASE WHEN ftr.last_stage_failure_reason IS NOT NULL THEN ftr.ts_task_ended END
     )                                                             AS last_stage_failure_reason,
-
-    FIRST(ftr.dbu_pricing_sku IGNORE NULLS)                       AS dbu_pricing_sku,
-    FIRST(ftr.dbu_rate_usd   IGNORE NULLS)                        AS dbu_rate_usd,
-
+    -- --- Booleans ---
+    MAX(CASE WHEN ftr.is_failed THEN 1 ELSE 0 END) >= 1           AS is_any_task_failed,
+    MAX(CASE WHEN ftr.is_success THEN 1 ELSE 0 END) >= 1          AS is_any_task_success,
+    MAX(CASE WHEN ftr.run_result_state = 'FAILED' THEN 1 ELSE 0 END) >= 1
+                                                                  AS is_any_databricks_run_failed,
+    BOOL_OR(ftr.is_photon)                                       AS is_any_photon,
+    BOOL_OR(ftr.is_pool_backed)                                  AS is_any_pool_backed,
+    BOOL_OR(ftr.has_local_nvme)                                  AS is_any_local_nvme,
+    BOOL_OR(ftr.is_sensitive_data)                               AS is_any_sensitive_data,
+    BOOL_OR(ftr.is_stage_attribution_ambiguous)                  AS is_any_stage_attribution_ambiguous,
+    BOOL_OR(ftr.is_job_on_interactive)                           AS is_job_on_interactive,
+    BOOL_OR(ftr.dbu_negotiated_price_missing)                    AS dbu_negotiated_price_missing,
+    -- --- Dates / timestamps / partitions ---
     DATE(date_trunc('MINUTE', ftr.ts_run_started))                AS dt_dag_run_started,
     MIN(ftr.ts_run_started)                                       AS ts_run_started_min,
     MAX(ftr.ts_run_ended)                                         AS ts_run_ended_max,

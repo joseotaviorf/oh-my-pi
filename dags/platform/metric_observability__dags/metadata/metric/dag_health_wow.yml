@@ -26,9 +26,6 @@ columns:
       - dw_databricks_health.fact_databricks_dag_run.airflow_dag_id
     description: Airflow / workload identifier (COALESCE chain on the fact).
     dimension: True
-  dt_window_end:
-    description: Last calendar day included in the current 7-day window (inclusive end).
-    dimension: True
   team_owner:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.team_owner
@@ -64,112 +61,6 @@ columns:
       - dw_databricks_health.fact_databricks_dag_run.primary_dbr_version
     description: DBR version of the DBU-dominant cluster in the logical run.
     dimension: True
-
-  total_dag_runs_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
-    description: Distinct minute buckets of parent run start (`date_trunc('MINUTE', ts_run_started)`) in the current window.
-    metric:
-      name: Total DAG Runs Current 7d
-      description: Approximate DAG executions in the trailing 7-day window (parallel multi-job runs sharing the same minute collapse).
-      acronym: total_dag_runs_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_dag_runs_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
-    description: Distinct minute buckets of parent run start in the previous window.
-    metric:
-      name: Total DAG Runs Previous 7d
-      description: Approximate DAG executions in the prior 7-day window.
-      acronym: total_dag_runs_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_dag_runs_change_pct:
-    description: Week-over-week percent change in distinct DAG-run minute buckets.
-    metric:
-      name: Total DAG Runs WoW Change Pct
-      description: Relative change in approximate DAG execution count vs the prior week.
-      acronym: total_dag_runs_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  total_job_runs_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.n_databricks_job_runs
-    description: Count of distinct Databricks job runs (`id_databricks_run`) in the current window.
-    metric:
-      name: Total Job Runs Current 7d
-      description: Distinct Databricks parent runs in the trailing 7-day window.
-      acronym: total_job_runs_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_job_runs_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.n_databricks_job_runs
-    description: Count of distinct Databricks job runs in the previous window.
-    metric:
-      name: Total Job Runs Previous 7d
-      description: Distinct Databricks parent runs in the prior 7-day window.
-      acronym: total_job_runs_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_job_runs_change_pct:
-    description: Week-over-week percent change in distinct job run count.
-    metric:
-      name: Total Job Runs WoW Change Pct
-      description: Relative change in Databricks job run volume vs the prior week.
-      acronym: total_job_runs_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  total_task_runs_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
-    description: Count of distinct task runs in the current window.
-    metric:
-      name: Total Task Runs Current 7d
-      description: Distinct `id_databricks_task_run` rows in the trailing 7-day window.
-      acronym: total_task_runs_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_task_runs_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
-    description: Count of distinct task runs in the previous window.
-    metric:
-      name: Total Task Runs Previous 7d
-      description: Distinct task runs in the prior 7-day window.
-      acronym: total_task_runs_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_task_runs_change_pct:
-    description: Week-over-week percent change in task run count.
-    metric:
-      name: Total Task Runs WoW Change Pct
-      description: Relative change in task-level volume vs the prior week.
-      acronym: total_task_runs_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Observability
-      approved_by: jose.rferreira@quintoandar.com.br
-
   total_dbu_consumed_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_dbu_consumed
@@ -204,7 +95,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-
   total_dbu_cost_usd_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
@@ -239,7 +129,42 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-
+  avg_dbu_cost_usd_per_dag_run_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
+    description: Mean `total_dbu_cost_usd` per logical DAG run (minute bucket) in the current window.
+    metric:
+      name: Avg DBU Cost USD per DAG Run Current 7d
+      description: Mean negotiated DBU USD per approximate DAG execution (total_dbu_cost_usd / total_dag_runs).
+      acronym: avg_dbu_cost_per_dag_run_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_dbu_cost_usd_per_dag_run_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
+    description: Mean `total_dbu_cost_usd` per logical DAG run (minute bucket) in the previous window.
+    metric:
+      name: Avg DBU Cost USD per DAG Run Previous 7d
+      description: Mean system-tables USD per approximate DAG execution in the prior 7-day window.
+      acronym: avg_dbu_cost_per_dag_run_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_dbu_cost_usd_per_dag_run_change_pct:
+    description: Percent change in average negotiated DBU USD per DAG run vs prior week.
+    metric:
+      name: Avg DBU Cost USD per DAG Run WoW Change Pct
+      description: Week-over-week percent change in mean list USD per DAG-run minute bucket.
+      acronym: avg_dbu_cost_per_dag_run_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cost
+      approved_by: jose.rferreira@quintoandar.com.br
   total_ec2_cost_calculated_usd_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
@@ -274,7 +199,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-
   ec2_spot_hours_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.ec2_spot_hours
@@ -309,7 +233,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-
   ec2_on_demand_hours_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.ec2_on_demand_hours
@@ -364,7 +287,6 @@ columns:
       - dw_databricks_health.fact_databricks_dag_run.ec2_pricing_missing
     description: True when any DAG-run in the previous 7-day window had EC2 hours with missing dim_ec2_price coverage.
     dimension: True
-
   total_cost_usd_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
@@ -401,44 +323,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-
-  avg_dbu_cost_usd_per_dag_run_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
-      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
-    description: Mean `total_dbu_cost_usd` per logical DAG run (minute bucket) in the current window.
-    metric:
-      name: Avg DBU Cost USD per DAG Run Current 7d
-      description: Mean negotiated DBU USD per approximate DAG execution (total_dbu_cost_usd / total_dag_runs).
-      acronym: avg_dbu_cost_per_dag_run_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_dbu_cost_usd_per_dag_run_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
-      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
-    description: Mean `total_dbu_cost_usd` per logical DAG run (minute bucket) in the previous window.
-    metric:
-      name: Avg DBU Cost USD per DAG Run Previous 7d
-      description: Mean system-tables USD per approximate DAG execution in the prior 7-day window.
-      acronym: avg_dbu_cost_per_dag_run_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_dbu_cost_usd_per_dag_run_change_pct:
-    description: Percent change in average negotiated DBU USD per DAG run vs prior week.
-    metric:
-      name: Avg DBU Cost USD per DAG Run WoW Change Pct
-      description: Week-over-week percent change in mean list USD per DAG-run minute bucket.
-      acronym: avg_dbu_cost_per_dag_run_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-
   avg_total_cost_usd_per_dag_run_current_7d:
     description: total_cost_usd_current_7d / total_dag_runs_current_7d.
     metric:
@@ -469,7 +353,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-
   total_cost_usd_per_executor_second_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_cost_usd
@@ -509,394 +392,108 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-
-  avg_p95_worker_cpu_busy_percent_current_7d:
+  total_dag_runs_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_busy_percent
-    description: Mean of per-task `p95_worker_cpu_busy_percent` in the current window.
+      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
+    description: Distinct minute buckets of parent run start (`date_trunc('MINUTE', ts_run_started)`) in the current window.
     metric:
-      name: Avg P95 Worker CPU Busy Current 7d
-      description: Mean of worker P95 CPU busy percent in the trailing 7-day window.
-      acronym: avg_p95_worker_cpu_curr_7d
+      name: Total DAG Runs Current 7d
+      description: Approximate DAG executions in the trailing 7-day window (parallel multi-job runs sharing the same minute collapse).
+      acronym: total_dag_runs_curr_7d
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Cluster utilization
+      hierarchy: Observability
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_p95_worker_cpu_busy_percent_previous_7d:
+  total_dag_runs_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_busy_percent
-    description: Mean of `p95_worker_cpu_busy_percent` in the previous window.
+      - dw_databricks_health.fact_databricks_dag_run.dt_dag_run_started
+    description: Distinct minute buckets of parent run start in the previous window.
     metric:
-      name: Avg P95 Worker CPU Busy Previous 7d
-      description: Mean of worker P95 CPU busy percent in the prior 7-day window.
-      acronym: avg_p95_worker_cpu_prev_7d
+      name: Total DAG Runs Previous 7d
+      description: Approximate DAG executions in the prior 7-day window.
+      acronym: total_dag_runs_prev_7d
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Cluster utilization
+      hierarchy: Observability
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_p95_worker_cpu_busy_percent_change_pct:
-    description: Relative percent change in average worker P95 CPU busy vs prior week.
+  total_dag_runs_change_pct:
+    description: Week-over-week percent change in distinct DAG-run minute buckets.
     metric:
-      name: Avg P95 Worker CPU Busy WoW Change Pct
-      description: Week-over-week percent change in mean worker P95 CPU busy.
-      acronym: avg_p95_worker_cpu_wow_chg_pct
+      name: Total DAG Runs WoW Change Pct
+      description: Relative change in approximate DAG execution count vs the prior week.
+      acronym: total_dag_runs_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Cluster utilization
+      hierarchy: Observability
       approved_by: jose.rferreira@quintoandar.com.br
-
-  avg_p95_driver_cpu_busy_percent_current_7d:
+  total_job_runs_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_busy_percent
-    description: Mean of `p95_driver_cpu_busy_percent` in the current window.
+      - dw_databricks_health.fact_databricks_dag_run.n_databricks_job_runs
+    description: Count of distinct Databricks job runs (`id_databricks_run`) in the current window.
     metric:
-      name: Avg P95 Driver CPU Busy Current 7d
-      description: Mean of driver P95 CPU busy percent in the trailing 7-day window.
-      acronym: avg_p95_driver_cpu_curr_7d
+      name: Total Job Runs Current 7d
+      description: Distinct Databricks parent runs in the trailing 7-day window.
+      acronym: total_job_runs_curr_7d
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Cluster utilization
+      hierarchy: Observability
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_p95_driver_cpu_busy_percent_previous_7d:
+  total_job_runs_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_busy_percent
-    description: Mean of `p95_driver_cpu_busy_percent` in the previous window.
+      - dw_databricks_health.fact_databricks_dag_run.n_databricks_job_runs
+    description: Count of distinct Databricks job runs in the previous window.
     metric:
-      name: Avg P95 Driver CPU Busy Previous 7d
-      description: Mean of driver P95 CPU busy percent in the prior 7-day window.
-      acronym: avg_p95_driver_cpu_prev_7d
+      name: Total Job Runs Previous 7d
+      description: Distinct Databricks parent runs in the prior 7-day window.
+      acronym: total_job_runs_prev_7d
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Cluster utilization
+      hierarchy: Observability
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_p95_driver_cpu_busy_percent_change_pct:
-    description: Relative percent change in average driver P95 CPU busy vs prior week.
+  total_job_runs_change_pct:
+    description: Week-over-week percent change in distinct job run count.
     metric:
-      name: Avg P95 Driver CPU Busy WoW Change Pct
-      description: Week-over-week percent change in mean driver P95 CPU busy.
-      acronym: avg_p95_driver_cpu_wow_chg_pct
+      name: Total Job Runs WoW Change Pct
+      description: Relative change in Databricks job run volume vs the prior week.
+      acronym: total_job_runs_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Cluster utilization
+      hierarchy: Observability
       approved_by: jose.rferreira@quintoandar.com.br
-
-  avg_p95_worker_mem_used_percent_current_7d:
+  total_task_runs_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_mem_used_percent
-    description: Mean of `p95_worker_mem_used_percent` in the current window.
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
+    description: Count of distinct task runs in the current window.
     metric:
-      name: Avg P95 Worker Mem Used Current 7d
-      description: Mean of worker P95 memory used percent in the trailing 7-day window.
-      acronym: avg_p95_worker_mem_curr_7d
+      name: Total Task Runs Current 7d
+      description: Distinct `id_databricks_task_run` rows in the trailing 7-day window.
+      acronym: total_task_runs_curr_7d
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Cluster utilization
+      hierarchy: Observability
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_p95_worker_mem_used_percent_previous_7d:
+  total_task_runs_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_mem_used_percent
-    description: Mean of `p95_worker_mem_used_percent` in the previous window.
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
+    description: Count of distinct task runs in the previous window.
     metric:
-      name: Avg P95 Worker Mem Used Previous 7d
-      description: Mean of worker P95 memory used percent in the prior 7-day window.
-      acronym: avg_p95_worker_mem_prev_7d
+      name: Total Task Runs Previous 7d
+      description: Distinct task runs in the prior 7-day window.
+      acronym: total_task_runs_prev_7d
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Cluster utilization
+      hierarchy: Observability
       approved_by: jose.rferreira@quintoandar.com.br
-  avg_p95_worker_mem_used_percent_change_pct:
-    description: Relative percent change in average worker P95 memory used vs prior week.
+  total_task_runs_change_pct:
+    description: Week-over-week percent change in task run count.
     metric:
-      name: Avg P95 Worker Mem Used WoW Change Pct
-      description: Week-over-week percent change in mean worker P95 memory used.
-      acronym: avg_p95_worker_mem_wow_chg_pct
+      name: Total Task Runs WoW Change Pct
+      description: Relative change in task-level volume vs the prior week.
+      acronym: total_task_runs_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Cluster utilization
+      hierarchy: Observability
       approved_by: jose.rferreira@quintoandar.com.br
-
-  avg_p95_driver_mem_used_percent_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_mem_used_percent
-    description: Mean of `p95_driver_mem_used_percent` in the current window.
-    metric:
-      name: Avg P95 Driver Mem Used Current 7d
-      description: Mean of driver P95 memory used percent in the trailing 7-day window.
-      acronym: avg_p95_driver_mem_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p95_driver_mem_used_percent_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_mem_used_percent
-    description: Mean of `p95_driver_mem_used_percent` in the previous window.
-    metric:
-      name: Avg P95 Driver Mem Used Previous 7d
-      description: Mean of driver P95 memory used percent in the prior 7-day window.
-      acronym: avg_p95_driver_mem_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p95_driver_mem_used_percent_change_pct:
-    description: Relative percent change in average driver P95 memory used vs prior week.
-    metric:
-      name: Avg P95 Driver Mem Used WoW Change Pct
-      description: Week-over-week percent change in mean driver P95 memory used.
-      acronym: avg_p95_driver_mem_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  avg_p50_driver_cpu_busy_percent_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_cpu_busy_percent
-    description: Mean of `p50_driver_cpu_busy_percent` in the current window.
-    metric:
-      name: Avg P50 Driver CPU Busy Current 7d
-      description: Mean of driver median CPU busy percent in the trailing 7-day window.
-      acronym: avg_p50_driver_cpu_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p50_driver_cpu_busy_percent_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_cpu_busy_percent
-    description: Mean of `p50_driver_cpu_busy_percent` in the previous window.
-    metric:
-      name: Avg P50 Driver CPU Busy Previous 7d
-      description: Mean of driver median CPU busy percent in the prior 7-day window.
-      acronym: avg_p50_driver_cpu_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p50_driver_cpu_busy_percent_change_pct:
-    description: Relative percent change in average driver median CPU busy vs prior week.
-    metric:
-      name: Avg P50 Driver CPU Busy WoW Change Pct
-      description: Week-over-week percent change in mean driver median CPU busy.
-      acronym: avg_p50_driver_cpu_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  avg_p50_worker_cpu_busy_percent_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_cpu_busy_percent
-    description: Mean of `p50_worker_cpu_busy_percent` in the current window.
-    metric:
-      name: Avg P50 Worker CPU Busy Current 7d
-      description: Mean of worker median CPU busy percent in the trailing 7-day window.
-      acronym: avg_p50_worker_cpu_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p50_worker_cpu_busy_percent_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_cpu_busy_percent
-    description: Mean of `p50_worker_cpu_busy_percent` in the previous window.
-    metric:
-      name: Avg P50 Worker CPU Busy Previous 7d
-      description: Mean of worker median CPU busy percent in the prior 7-day window.
-      acronym: avg_p50_worker_cpu_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p50_worker_cpu_busy_percent_change_pct:
-    description: Relative percent change in average worker median CPU busy vs prior week.
-    metric:
-      name: Avg P50 Worker CPU Busy WoW Change Pct
-      description: Week-over-week percent change in mean worker median CPU busy.
-      acronym: avg_p50_worker_cpu_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  avg_p50_driver_cpu_wait_percent_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_cpu_wait_percent
-    description: Mean of `p50_driver_cpu_wait_percent` in the current window.
-    metric:
-      name: Avg P50 Driver IO Wait Current 7d
-      description: Mean of driver median I/O wait percent in the trailing 7-day window.
-      acronym: avg_p50_driver_wait_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p50_driver_cpu_wait_percent_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_cpu_wait_percent
-    description: Mean of `p50_driver_cpu_wait_percent` in the previous window.
-    metric:
-      name: Avg P50 Driver IO Wait Previous 7d
-      description: Mean of driver median I/O wait percent in the prior 7-day window.
-      acronym: avg_p50_driver_wait_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p50_driver_cpu_wait_percent_change_pct:
-    description: Relative percent change in average driver median I/O wait vs prior week.
-    metric:
-      name: Avg P50 Driver IO Wait WoW Change Pct
-      description: Week-over-week percent change in mean driver median I/O wait.
-      acronym: avg_p50_driver_wait_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  avg_p50_worker_cpu_wait_percent_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_cpu_wait_percent
-    description: Mean of `p50_worker_cpu_wait_percent` in the current window.
-    metric:
-      name: Avg P50 Worker IO Wait Current 7d
-      description: Mean of worker median I/O wait percent in the trailing 7-day window.
-      acronym: avg_p50_worker_wait_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p50_worker_cpu_wait_percent_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_cpu_wait_percent
-    description: Mean of `p50_worker_cpu_wait_percent` in the previous window.
-    metric:
-      name: Avg P50 Worker IO Wait Previous 7d
-      description: Mean of worker median I/O wait percent in the prior 7-day window.
-      acronym: avg_p50_worker_wait_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p50_worker_cpu_wait_percent_change_pct:
-    description: Relative percent change in average worker median I/O wait vs prior week.
-    metric:
-      name: Avg P50 Worker IO Wait WoW Change Pct
-      description: Week-over-week percent change in mean worker median I/O wait.
-      acronym: avg_p50_worker_wait_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  avg_p50_driver_mem_used_percent_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_mem_used_percent
-    description: Mean of `p50_driver_mem_used_percent` in the current window.
-    metric:
-      name: Avg P50 Driver Mem Used Current 7d
-      description: Mean of driver median memory used percent in the trailing 7-day window.
-      acronym: avg_p50_driver_mem_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p50_driver_mem_used_percent_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_mem_used_percent
-    description: Mean of `p50_driver_mem_used_percent` in the previous window.
-    metric:
-      name: Avg P50 Driver Mem Used Previous 7d
-      description: Mean of driver median memory used percent in the prior 7-day window.
-      acronym: avg_p50_driver_mem_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p50_driver_mem_used_percent_change_pct:
-    description: Relative percent change in average driver median memory used vs prior week.
-    metric:
-      name: Avg P50 Driver Mem Used WoW Change Pct
-      description: Week-over-week percent change in mean driver median memory used.
-      acronym: avg_p50_driver_mem_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  avg_p50_worker_mem_used_percent_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_mem_used_percent
-    description: Mean of `p50_worker_mem_used_percent` in the current window.
-    metric:
-      name: Avg P50 Worker Mem Used Current 7d
-      description: Mean of worker median memory used percent in the trailing 7-day window.
-      acronym: avg_p50_worker_mem_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p50_worker_mem_used_percent_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_mem_used_percent
-    description: Mean of `p50_worker_mem_used_percent` in the previous window.
-    metric:
-      name: Avg P50 Worker Mem Used Previous 7d
-      description: Mean of worker median memory used percent in the prior 7-day window.
-      acronym: avg_p50_worker_mem_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_p50_worker_mem_used_percent_change_pct:
-    description: Relative percent change in average worker median memory used vs prior week.
-    metric:
-      name: Avg P50 Worker Mem Used WoW Change Pct
-      description: Week-over-week percent change in mean worker median memory used.
-      acronym: avg_p50_worker_mem_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  avg_local_disk_utilization_pct_p95_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_local_disk_utilization_pct_p95
-      - dw_databricks_health.fact_databricks_dag_run.total_execution_duration_seconds
-    description: Execution-time-weighted mean of `local_disk_utilization_pct_p95` in the current window.
-    metric:
-      name: Avg P95 Local Disk Utilization Current 7d
-      description: Duration-weighted average of per-run P95 local disk utilisation in the trailing 7-day window.
-      acronym: avg_p95_local_disk_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_local_disk_utilization_pct_p95_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_local_disk_utilization_pct_p95
-      - dw_databricks_health.fact_databricks_dag_run.total_execution_duration_seconds
-    description: Execution-time-weighted mean of `local_disk_utilization_pct_p95` in the previous window.
-    metric:
-      name: Avg P95 Local Disk Utilization Previous 7d
-      description: Duration-weighted average of per-run P95 local disk utilisation in the prior 7-day window.
-      acronym: avg_p95_local_disk_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-  avg_local_disk_utilization_pct_p95_change_pct:
-    description: Relative percent change in average P95 local disk utilisation vs prior week.
-    metric:
-      name: Avg P95 Local Disk Utilization WoW Change Pct
-      description: Week-over-week percent change in mean P95 local disk utilisation.
-      acronym: avg_p95_local_disk_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cluster utilization
-      approved_by: jose.rferreira@quintoandar.com.br
-
   avg_total_duration_seconds_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_wall_clock_seconds
@@ -931,7 +528,74 @@ columns:
       business_stage: Platform Operations
       hierarchy: Latency
       approved_by: jose.rferreira@quintoandar.com.br
-
+  p95_pre_init_script_seconds_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.max_pre_init_script_seconds
+    description: P95 of per-run max pre-init-script seconds in the current window.
+    metric:
+      name: P95 Pre-Init Script Seconds Current 7d
+      description: Tail pre-init startup time in the trailing 7-day window.
+      acronym: p95_pre_init_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+  p95_pre_init_script_seconds_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.max_pre_init_script_seconds
+    description: P95 of per-run max pre-init-script seconds in the previous window.
+    metric:
+      name: P95 Pre-Init Script Seconds Previous 7d
+      description: Tail pre-init startup time in the prior 7-day window.
+      acronym: p95_pre_init_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+  p95_pre_init_script_seconds_change_pct:
+    description: Week-over-week percent change in P95 pre-init script seconds.
+    metric:
+      name: P95 Pre-Init Script Seconds WoW Change Pct
+      description: Relative change in tail pre-init startup time vs the prior week.
+      acronym: p95_pre_init_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+  p95_post_init_script_seconds_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.max_post_init_script_seconds
+    description: P95 of per-run max post-init-script seconds in the current window.
+    metric:
+      name: P95 Post-Init Script Seconds Current 7d
+      description: Tail JVM warm-up time in the trailing 7-day window.
+      acronym: p95_post_init_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+  p95_post_init_script_seconds_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.max_post_init_script_seconds
+    description: P95 of per-run max post-init-script seconds in the previous window.
+    metric:
+      name: P95 Post-Init Script Seconds Previous 7d
+      description: Tail JVM warm-up time in the prior 7-day window.
+      acronym: p95_post_init_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+  p95_post_init_script_seconds_change_pct:
+    description: Week-over-week percent change in P95 post-init script seconds.
+    metric:
+      name: P95 Post-Init Script Seconds WoW Change Pct
+      description: Relative change in tail JVM warm-up time vs the prior week.
+      acronym: p95_post_init_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
   error_rate_pct_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.n_failed_task_runs
@@ -968,7 +632,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Reliability
       approved_by: jose.rferreira@quintoandar.com.br
-
   failed_dag_run_rate_pct_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.is_any_task_failed
@@ -1003,7 +666,142 @@ columns:
       business_stage: Platform Operations
       hierarchy: Reliability
       approved_by: jose.rferreira@quintoandar.com.br
-
+  avg_p95_driver_cpu_busy_percent_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_busy_percent
+    description: Mean of `p95_driver_cpu_busy_percent` in the current window.
+    metric:
+      name: Avg P95 Driver CPU Busy Current 7d
+      description: Mean of driver P95 CPU busy percent in the trailing 7-day window.
+      acronym: avg_p95_driver_cpu_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_driver_cpu_busy_percent_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_busy_percent
+    description: Mean of `p95_driver_cpu_busy_percent` in the previous window.
+    metric:
+      name: Avg P95 Driver CPU Busy Previous 7d
+      description: Mean of driver P95 CPU busy percent in the prior 7-day window.
+      acronym: avg_p95_driver_cpu_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_driver_cpu_busy_percent_change_pct:
+    description: Relative percent change in average driver P95 CPU busy vs prior week.
+    metric:
+      name: Avg P95 Driver CPU Busy WoW Change Pct
+      description: Week-over-week percent change in mean driver P95 CPU busy.
+      acronym: avg_p95_driver_cpu_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_worker_cpu_busy_percent_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_busy_percent
+    description: Mean of per-task `p95_worker_cpu_busy_percent` in the current window.
+    metric:
+      name: Avg P95 Worker CPU Busy Current 7d
+      description: Mean of worker P95 CPU busy percent in the trailing 7-day window.
+      acronym: avg_p95_worker_cpu_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_worker_cpu_busy_percent_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_busy_percent
+    description: Mean of `p95_worker_cpu_busy_percent` in the previous window.
+    metric:
+      name: Avg P95 Worker CPU Busy Previous 7d
+      description: Mean of worker P95 CPU busy percent in the prior 7-day window.
+      acronym: avg_p95_worker_cpu_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_worker_cpu_busy_percent_change_pct:
+    description: Relative percent change in average worker P95 CPU busy vs prior week.
+    metric:
+      name: Avg P95 Worker CPU Busy WoW Change Pct
+      description: Week-over-week percent change in mean worker P95 CPU busy.
+      acronym: avg_p95_worker_cpu_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_driver_mem_used_percent_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_mem_used_percent
+    description: Mean of `p95_driver_mem_used_percent` in the current window.
+    metric:
+      name: Avg P95 Driver Mem Used Current 7d
+      description: Mean of driver P95 memory used percent in the trailing 7-day window.
+      acronym: avg_p95_driver_mem_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_driver_mem_used_percent_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_mem_used_percent
+    description: Mean of `p95_driver_mem_used_percent` in the previous window.
+    metric:
+      name: Avg P95 Driver Mem Used Previous 7d
+      description: Mean of driver P95 memory used percent in the prior 7-day window.
+      acronym: avg_p95_driver_mem_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_driver_mem_used_percent_change_pct:
+    description: Relative percent change in average driver P95 memory used vs prior week.
+    metric:
+      name: Avg P95 Driver Mem Used WoW Change Pct
+      description: Week-over-week percent change in mean driver P95 memory used.
+      acronym: avg_p95_driver_mem_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_worker_mem_used_percent_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_mem_used_percent
+    description: Mean of `p95_worker_mem_used_percent` in the current window.
+    metric:
+      name: Avg P95 Worker Mem Used Current 7d
+      description: Mean of worker P95 memory used percent in the trailing 7-day window.
+      acronym: avg_p95_worker_mem_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_worker_mem_used_percent_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_mem_used_percent
+    description: Mean of `p95_worker_mem_used_percent` in the previous window.
+    metric:
+      name: Avg P95 Worker Mem Used Previous 7d
+      description: Mean of worker P95 memory used percent in the prior 7-day window.
+      acronym: avg_p95_worker_mem_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_worker_mem_used_percent_change_pct:
+    description: Relative percent change in average worker P95 memory used vs prior week.
+    metric:
+      name: Avg P95 Worker Mem Used WoW Change Pct
+      description: Week-over-week percent change in mean worker P95 memory used.
+      acronym: avg_p95_worker_mem_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
   avg_p95_driver_cpu_wait_percent_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_wait_percent
@@ -1038,7 +836,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cluster Utilization
       approved_by: jose.rferreira@quintoandar.com.br
-
   avg_p95_worker_cpu_wait_percent_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_wait_percent
@@ -1073,77 +870,246 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cluster Utilization
       approved_by: jose.rferreira@quintoandar.com.br
-
-  p95_pre_init_script_seconds_current_7d:
+  avg_p50_driver_cpu_busy_percent_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.max_pre_init_script_seconds
-    description: P95 of per-run max pre-init-script seconds in the current window.
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_cpu_busy_percent
+    description: Mean of `p50_driver_cpu_busy_percent` in the current window.
     metric:
-      name: P95 Pre-Init Script Seconds Current 7d
-      description: Tail pre-init startup time in the trailing 7-day window.
-      acronym: p95_pre_init_curr_7d
+      name: Avg P50 Driver CPU Busy Current 7d
+      description: Mean of driver median CPU busy percent in the trailing 7-day window.
+      acronym: avg_p50_driver_cpu_curr_7d
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Latency
+      hierarchy: Cluster utilization
       approved_by: jose.rferreira@quintoandar.com.br
-  p95_pre_init_script_seconds_previous_7d:
+  avg_p50_driver_cpu_busy_percent_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.max_pre_init_script_seconds
-    description: P95 of per-run max pre-init-script seconds in the previous window.
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_cpu_busy_percent
+    description: Mean of `p50_driver_cpu_busy_percent` in the previous window.
     metric:
-      name: P95 Pre-Init Script Seconds Previous 7d
-      description: Tail pre-init startup time in the prior 7-day window.
-      acronym: p95_pre_init_prev_7d
+      name: Avg P50 Driver CPU Busy Previous 7d
+      description: Mean of driver median CPU busy percent in the prior 7-day window.
+      acronym: avg_p50_driver_cpu_prev_7d
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Latency
+      hierarchy: Cluster utilization
       approved_by: jose.rferreira@quintoandar.com.br
-  p95_pre_init_script_seconds_change_pct:
-    description: Week-over-week percent change in P95 pre-init script seconds.
+  avg_p50_driver_cpu_busy_percent_change_pct:
+    description: Relative percent change in average driver median CPU busy vs prior week.
     metric:
-      name: P95 Pre-Init Script Seconds WoW Change Pct
-      description: Relative change in tail pre-init startup time vs the prior week.
-      acronym: p95_pre_init_wow_chg_pct
+      name: Avg P50 Driver CPU Busy WoW Change Pct
+      description: Week-over-week percent change in mean driver median CPU busy.
+      acronym: avg_p50_driver_cpu_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Latency
+      hierarchy: Cluster utilization
       approved_by: jose.rferreira@quintoandar.com.br
-
-  p95_post_init_script_seconds_current_7d:
+  avg_p50_worker_cpu_busy_percent_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.max_post_init_script_seconds
-    description: P95 of per-run max post-init-script seconds in the current window.
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_cpu_busy_percent
+    description: Mean of `p50_worker_cpu_busy_percent` in the current window.
     metric:
-      name: P95 Post-Init Script Seconds Current 7d
-      description: Tail JVM warm-up time in the trailing 7-day window.
-      acronym: p95_post_init_curr_7d
+      name: Avg P50 Worker CPU Busy Current 7d
+      description: Mean of worker median CPU busy percent in the trailing 7-day window.
+      acronym: avg_p50_worker_cpu_curr_7d
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Latency
+      hierarchy: Cluster utilization
       approved_by: jose.rferreira@quintoandar.com.br
-  p95_post_init_script_seconds_previous_7d:
+  avg_p50_worker_cpu_busy_percent_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.max_post_init_script_seconds
-    description: P95 of per-run max post-init-script seconds in the previous window.
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_cpu_busy_percent
+    description: Mean of `p50_worker_cpu_busy_percent` in the previous window.
     metric:
-      name: P95 Post-Init Script Seconds Previous 7d
-      description: Tail JVM warm-up time in the prior 7-day window.
-      acronym: p95_post_init_prev_7d
+      name: Avg P50 Worker CPU Busy Previous 7d
+      description: Mean of worker median CPU busy percent in the prior 7-day window.
+      acronym: avg_p50_worker_cpu_prev_7d
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Latency
+      hierarchy: Cluster utilization
       approved_by: jose.rferreira@quintoandar.com.br
-  p95_post_init_script_seconds_change_pct:
-    description: Week-over-week percent change in P95 post-init script seconds.
+  avg_p50_worker_cpu_busy_percent_change_pct:
+    description: Relative percent change in average worker median CPU busy vs prior week.
     metric:
-      name: P95 Post-Init Script Seconds WoW Change Pct
-      description: Relative change in tail JVM warm-up time vs the prior week.
-      acronym: p95_post_init_wow_chg_pct
+      name: Avg P50 Worker CPU Busy WoW Change Pct
+      description: Week-over-week percent change in mean worker median CPU busy.
+      acronym: avg_p50_worker_cpu_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
-      hierarchy: Latency
+      hierarchy: Cluster utilization
       approved_by: jose.rferreira@quintoandar.com.br
-
+  avg_p50_driver_cpu_wait_percent_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_cpu_wait_percent
+    description: Mean of `p50_driver_cpu_wait_percent` in the current window.
+    metric:
+      name: Avg P50 Driver IO Wait Current 7d
+      description: Mean of driver median I/O wait percent in the trailing 7-day window.
+      acronym: avg_p50_driver_wait_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_driver_cpu_wait_percent_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_cpu_wait_percent
+    description: Mean of `p50_driver_cpu_wait_percent` in the previous window.
+    metric:
+      name: Avg P50 Driver IO Wait Previous 7d
+      description: Mean of driver median I/O wait percent in the prior 7-day window.
+      acronym: avg_p50_driver_wait_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_driver_cpu_wait_percent_change_pct:
+    description: Relative percent change in average driver median I/O wait vs prior week.
+    metric:
+      name: Avg P50 Driver IO Wait WoW Change Pct
+      description: Week-over-week percent change in mean driver median I/O wait.
+      acronym: avg_p50_driver_wait_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_worker_cpu_wait_percent_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_cpu_wait_percent
+    description: Mean of `p50_worker_cpu_wait_percent` in the current window.
+    metric:
+      name: Avg P50 Worker IO Wait Current 7d
+      description: Mean of worker median I/O wait percent in the trailing 7-day window.
+      acronym: avg_p50_worker_wait_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_worker_cpu_wait_percent_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_cpu_wait_percent
+    description: Mean of `p50_worker_cpu_wait_percent` in the previous window.
+    metric:
+      name: Avg P50 Worker IO Wait Previous 7d
+      description: Mean of worker median I/O wait percent in the prior 7-day window.
+      acronym: avg_p50_worker_wait_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_worker_cpu_wait_percent_change_pct:
+    description: Relative percent change in average worker median I/O wait vs prior week.
+    metric:
+      name: Avg P50 Worker IO Wait WoW Change Pct
+      description: Week-over-week percent change in mean worker median I/O wait.
+      acronym: avg_p50_worker_wait_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_driver_mem_used_percent_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_mem_used_percent
+    description: Mean of `p50_driver_mem_used_percent` in the current window.
+    metric:
+      name: Avg P50 Driver Mem Used Current 7d
+      description: Mean of driver median memory used percent in the trailing 7-day window.
+      acronym: avg_p50_driver_mem_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_driver_mem_used_percent_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_mem_used_percent
+    description: Mean of `p50_driver_mem_used_percent` in the previous window.
+    metric:
+      name: Avg P50 Driver Mem Used Previous 7d
+      description: Mean of driver median memory used percent in the prior 7-day window.
+      acronym: avg_p50_driver_mem_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_driver_mem_used_percent_change_pct:
+    description: Relative percent change in average driver median memory used vs prior week.
+    metric:
+      name: Avg P50 Driver Mem Used WoW Change Pct
+      description: Week-over-week percent change in mean driver median memory used.
+      acronym: avg_p50_driver_mem_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_worker_mem_used_percent_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_mem_used_percent
+    description: Mean of `p50_worker_mem_used_percent` in the current window.
+    metric:
+      name: Avg P50 Worker Mem Used Current 7d
+      description: Mean of worker median memory used percent in the trailing 7-day window.
+      acronym: avg_p50_worker_mem_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_worker_mem_used_percent_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_mem_used_percent
+    description: Mean of `p50_worker_mem_used_percent` in the previous window.
+    metric:
+      name: Avg P50 Worker Mem Used Previous 7d
+      description: Mean of worker median memory used percent in the prior 7-day window.
+      acronym: avg_p50_worker_mem_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_worker_mem_used_percent_change_pct:
+    description: Relative percent change in average worker median memory used vs prior week.
+    metric:
+      name: Avg P50 Worker Mem Used WoW Change Pct
+      description: Week-over-week percent change in mean worker median memory used.
+      acronym: avg_p50_worker_mem_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_local_disk_utilization_pct_p95_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_local_disk_utilization_pct_p95
+      - dw_databricks_health.fact_databricks_dag_run.total_execution_duration_seconds
+    description: Execution-time-weighted mean of `local_disk_utilization_pct_p95` in the current window.
+    metric:
+      name: Avg P95 Local Disk Utilization Current 7d
+      description: Duration-weighted average of per-run P95 local disk utilisation in the trailing 7-day window.
+      acronym: avg_p95_local_disk_curr_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_local_disk_utilization_pct_p95_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_local_disk_utilization_pct_p95
+      - dw_databricks_health.fact_databricks_dag_run.total_execution_duration_seconds
+    description: Execution-time-weighted mean of `local_disk_utilization_pct_p95` in the previous window.
+    metric:
+      name: Avg P95 Local Disk Utilization Previous 7d
+      description: Duration-weighted average of per-run P95 local disk utilisation in the prior 7-day window.
+      acronym: avg_p95_local_disk_prev_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_local_disk_utilization_pct_p95_change_pct:
+    description: Relative percent change in average P95 local disk utilisation vs prior week.
+    metric:
+      name: Avg P95 Local Disk Utilization WoW Change Pct
+      description: Week-over-week percent change in mean P95 local disk utilisation.
+      acronym: avg_p95_local_disk_wow_chg_pct
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster utilization
+      approved_by: jose.rferreira@quintoandar.com.br
   total_executor_cpu_time_ms_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_executor_cpu_time_ms
@@ -1178,7 +1144,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Spark Stages
       approved_by: jose.rferreira@quintoandar.com.br
-
   total_output_bytes_written_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_output_bytes_written
@@ -1213,7 +1178,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Spark Stages
       approved_by: jose.rferreira@quintoandar.com.br
-
   total_stage_count_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.stage_count
@@ -1248,7 +1212,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Spark Stages
       approved_by: jose.rferreira@quintoandar.com.br
-
   total_failed_stage_count_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.failed_stage_count
@@ -1283,7 +1246,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Spark Stages
       approved_by: jose.rferreira@quintoandar.com.br
-
   failed_stage_rate_pct_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.failed_stage_count
@@ -1320,7 +1282,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Spark Stages
       approved_by: jose.rferreira@quintoandar.com.br
-
   executor_cpu_efficiency_ratio_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_executor_cpu_time_ms
@@ -1357,7 +1318,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Right-Sizing Ratios
       approved_by: jose.rferreira@quintoandar.com.br
-
   stage_attribution_ambiguous_tasks_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.n_stage_attribution_ambiguous_task_runs
@@ -1392,7 +1352,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Data Quality
       approved_by: jose.rferreira@quintoandar.com.br
-
   stage_attribution_ambiguous_rate_pct_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.n_stage_attribution_ambiguous_task_runs
@@ -1429,7 +1388,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Data Quality
       approved_by: jose.rferreira@quintoandar.com.br
-
   photon_run_rate_pct_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.is_any_photon
@@ -1464,7 +1422,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cluster Profile
       approved_by: jose.rferreira@quintoandar.com.br
-
   pool_backed_run_rate_pct_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.is_any_pool_backed
@@ -1499,7 +1456,6 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cluster Profile
       approved_by: jose.rferreira@quintoandar.com.br
-
   local_nvme_run_rate_pct_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.is_any_local_nvme
@@ -1534,7 +1490,9 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cluster Profile
       approved_by: jose.rferreira@quintoandar.com.br
-
+  dt_window_end:
+    description: Last calendar day included in the current 7-day window (inclusive end).
+    dimension: True
   ts_load:
     description: Timestamp when this metric row was materialized.
     dimension: False
