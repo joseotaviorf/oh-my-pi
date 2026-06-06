@@ -111,6 +111,16 @@ columns:
       `provisioner` tag). Use to segment cost by orchestrator/platform.
       NULL for clusters without the tag (typically ad-hoc notebook jobs).
     dimension: True
+  data_classification:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.data_classification
+    description: LGPD / data-classification label from the DBU-dominant cluster in the logical run (`FIRST IGNORE NULLS`).
+    dimension: True
+  primary_dbr_version:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.primary_dbr_version
+    description: DBR version of the DBU-dominant cluster in the logical run (`MAX_BY` on total_dbu_consumed).
+    dimension: True
 
   total_dag_runs_7d:
     lineage:
@@ -941,6 +951,150 @@ columns:
       business_stage: Platform Operations
       hierarchy: Cluster Utilization
       approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_driver_cpu_busy_percent_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_cpu_busy_percent
+    description: Mean of per-task p50_driver_cpu_busy_percent across the 7-day window. 0..100 scale.
+    metric:
+      name: Avg p50 Driver CPU Busy (7d)
+      description: Median driver-CPU utilization over the 7-day window.
+      acronym: avg_p50_driver_cpu_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_driver_cpu_busy_percent_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_cpu_busy_percent
+    description: Mean of per-task p50_driver_cpu_busy_percent across the 28-day window. 0..100 scale.
+    metric:
+      name: Avg p50 Driver CPU Busy (28d)
+      description: Median driver-CPU utilization across runs. Low typical values alongside high p95 indicate bursty driver load.
+      acronym: avg_p50_driver_cpu_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_worker_cpu_busy_percent_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_cpu_busy_percent
+    description: Mean of per-task p50_worker_cpu_busy_percent across the 7-day window. 0..100 scale.
+    metric:
+      name: Avg p50 Worker CPU Busy (7d)
+      description: Median worker-CPU utilization over the 7-day window.
+      acronym: avg_p50_worker_cpu_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_worker_cpu_busy_percent_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_cpu_busy_percent
+    description: Mean of per-task p50_worker_cpu_busy_percent across the 28-day window. 0..100 scale.
+    metric:
+      name: Avg p50 Worker CPU Busy (28d)
+      description: Median worker-CPU utilization. Persistently low typical values are right-sizing candidates.
+      acronym: avg_p50_worker_cpu_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_driver_cpu_wait_percent_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_cpu_wait_percent
+    description: Mean of per-task p50_driver_cpu_wait_percent across the 7-day window. 0..100 scale.
+    metric:
+      name: Avg p50 Driver IO Wait (7d)
+      description: Median driver I/O wait over the 7-day window. High typical values indicate the driver is I/O-bound.
+      acronym: avg_p50_driver_wait_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_driver_cpu_wait_percent_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_cpu_wait_percent
+    description: Mean of per-task p50_driver_cpu_wait_percent across the 28-day window. 0..100 scale.
+    metric:
+      name: Avg p50 Driver IO Wait (28d)
+      description: Median driver I/O wait across runs. High typical values indicate the driver is I/O-bound.
+      acronym: avg_p50_driver_wait_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_worker_cpu_wait_percent_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_cpu_wait_percent
+    description: Mean of per-task p50_worker_cpu_wait_percent across the 7-day window. 0..100 scale.
+    metric:
+      name: Avg p50 Worker IO Wait (7d)
+      description: Median worker I/O wait over the 7-day window. High typical values indicate workers are I/O-bound.
+      acronym: avg_p50_worker_wait_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_worker_cpu_wait_percent_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_cpu_wait_percent
+    description: Mean of per-task p50_worker_cpu_wait_percent across the 28-day window. 0..100 scale.
+    metric:
+      name: Avg p50 Worker IO Wait (28d)
+      description: Median worker I/O wait across runs. High typical values indicate workers are I/O-bound.
+      acronym: avg_p50_worker_wait_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_driver_mem_used_percent_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_mem_used_percent
+    description: Mean of per-task p50_driver_mem_used_percent across the 7-day window. 0..100 scale.
+    metric:
+      name: Avg p50 Driver Mem Used (7d)
+      description: Median driver-memory utilization over the 7-day window.
+      acronym: avg_p50_driver_mem_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_driver_mem_used_percent_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_driver_mem_used_percent
+    description: Mean of per-task p50_driver_mem_used_percent across the 28-day window. 0..100 scale.
+    metric:
+      name: Avg p50 Driver Mem Used (28d)
+      description: Median driver-memory utilization across runs.
+      acronym: avg_p50_driver_mem_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_worker_mem_used_percent_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_mem_used_percent
+    description: Mean of per-task p50_worker_mem_used_percent across the 7-day window. 0..100 scale.
+    metric:
+      name: Avg p50 Worker Mem Used (7d)
+      description: Median worker-memory utilization over the 7-day window.
+      acronym: avg_p50_worker_mem_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p50_worker_mem_used_percent_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p50_worker_mem_used_percent
+    description: Mean of per-task p50_worker_mem_used_percent across the 28-day window. 0..100 scale.
+    metric:
+      name: Avg p50 Worker Mem Used (28d)
+      description: Median worker-memory utilization across runs.
+      acronym: avg_p50_worker_mem_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
   avg_local_disk_utilization_pct_p95_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.weighted_avg_local_disk_utilization_pct_p95
@@ -1319,6 +1473,373 @@ columns:
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Data Quality
+      approved_by: jose.rferreira@quintoandar.com.br
+
+  avg_p95_driver_cpu_wait_percent_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_wait_percent
+    description: Duration-weighted mean of per-run P95 driver CPU I/O wait over the 7-day window. 0..100 scale.
+    metric:
+      name: Avg p95 Driver IO Wait (7d)
+      description: Tail driver I/O wait over the 7-day window. High values indicate the driver is I/O-bound.
+      acronym: avg_p95_driver_wait_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_driver_cpu_wait_percent_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_driver_cpu_wait_percent
+    description: Duration-weighted mean of per-run P95 driver CPU I/O wait over the 28-day window. 0..100 scale.
+    metric:
+      name: Avg p95 Driver IO Wait (28d)
+      description: Tail driver I/O wait across runs. High values indicate the driver is I/O-bound.
+      acronym: avg_p95_driver_wait_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_worker_cpu_wait_percent_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_wait_percent
+    description: Duration-weighted mean of per-run P95 worker CPU I/O wait over the 7-day window. 0..100 scale.
+    metric:
+      name: Avg p95 Worker IO Wait (7d)
+      description: Tail worker I/O wait over the 7-day window.
+      acronym: avg_p95_worker_wait_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  avg_p95_worker_cpu_wait_percent_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.weighted_avg_p95_worker_cpu_wait_percent
+    description: Duration-weighted mean of per-run P95 worker CPU I/O wait over the 28-day window. 0..100 scale.
+    metric:
+      name: Avg p95 Worker IO Wait (28d)
+      description: Tail worker I/O wait across runs.
+      acronym: avg_p95_worker_wait_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Utilization
+      approved_by: jose.rferreira@quintoandar.com.br
+  p95_pre_init_script_seconds_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.max_pre_init_script_seconds
+    description: P95 of per-run max pre-init-script seconds in the 7-day window.
+    metric:
+      name: P95 Pre-Init Script Seconds (7d)
+      description: Tail pre-init startup time (DBR pull / network setup) over the 7-day window.
+      acronym: p95_pre_init_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+  p95_pre_init_script_seconds_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.max_pre_init_script_seconds
+    description: P95 of per-run max pre-init-script seconds in the 28-day window.
+    metric:
+      name: P95 Pre-Init Script Seconds (28d)
+      description: Tail pre-init startup time over the 28-day window.
+      acronym: p95_pre_init_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+  p95_post_init_script_seconds_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.max_post_init_script_seconds
+    description: P95 of per-run max post-init-script seconds in the 7-day window.
+    metric:
+      name: P95 Post-Init Script Seconds (7d)
+      description: Tail JVM warm-up time after init scripts over the 7-day window.
+      acronym: p95_post_init_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+  p95_post_init_script_seconds_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.max_post_init_script_seconds
+    description: P95 of per-run max post-init-script seconds in the 28-day window.
+    metric:
+      name: P95 Post-Init Script Seconds (28d)
+      description: Tail JVM warm-up time after init scripts over the 28-day window.
+      acronym: p95_post_init_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Latency
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_executor_cpu_time_ms_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_executor_cpu_time_ms
+    description: Sum of executor CPU time milliseconds across logical runs in the 7-day window.
+    metric:
+      name: Total Executor CPU Time Ms (7d)
+      description: Aggregate executor CPU time over the 7-day window. Pair with total_executor_run_time_ms for efficiency.
+      acronym: exec_cpu_ms_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Spark Stages
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_executor_cpu_time_ms_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_executor_cpu_time_ms
+    description: Sum of executor CPU time milliseconds across logical runs in the 28-day window.
+    metric:
+      name: Total Executor CPU Time Ms (28d)
+      description: Aggregate executor CPU time over the 28-day window.
+      acronym: exec_cpu_ms_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Spark Stages
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_output_bytes_written_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_output_bytes_written
+    description: Sum of output bytes written across logical runs in the 7-day window.
+    metric:
+      name: Total Output Bytes Written (7d)
+      description: Aggregate sink write volume over the 7-day window.
+      acronym: output_bytes_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Spark Stages
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_output_bytes_written_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_output_bytes_written
+    description: Sum of output bytes written across logical runs in the 28-day window.
+    metric:
+      name: Total Output Bytes Written (28d)
+      description: Aggregate sink write volume over the 28-day window.
+      acronym: output_bytes_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Spark Stages
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_stage_count_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.stage_count
+    description: Sum of Spark stage counts across logical runs in the 7-day window.
+    metric:
+      name: Total Stage Count (7d)
+      description: Aggregate Spark stage count over the 7-day window.
+      acronym: stage_count_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Spark Stages
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_stage_count_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.stage_count
+    description: Sum of Spark stage counts across logical runs in the 28-day window.
+    metric:
+      name: Total Stage Count (28d)
+      description: Aggregate Spark stage count over the 28-day window.
+      acronym: stage_count_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Spark Stages
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_failed_stage_count_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.failed_stage_count
+    description: Sum of failed Spark stage counts across logical runs in the 7-day window.
+    metric:
+      name: Total Failed Stage Count (7d)
+      description: Aggregate failed Spark stages over the 7-day window.
+      acronym: failed_stages_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Spark Stages
+      approved_by: jose.rferreira@quintoandar.com.br
+  total_failed_stage_count_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.failed_stage_count
+    description: Sum of failed Spark stage counts across logical runs in the 28-day window.
+    metric:
+      name: Total Failed Stage Count (28d)
+      description: Aggregate failed Spark stages over the 28-day window.
+      acronym: failed_stages_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Spark Stages
+      approved_by: jose.rferreira@quintoandar.com.br
+  failed_stage_rate_pct_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.failed_stage_count
+      - dw_databricks_health.fact_databricks_dag_run.stage_count
+    description: Failed stages divided by total stages in the 7-day window (0..100).
+    metric:
+      name: Failed Stage Rate Pct (7d)
+      description: Share of Spark stages that failed over the 7-day window.
+      acronym: failed_stage_rate_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Spark Stages
+      approved_by: jose.rferreira@quintoandar.com.br
+  failed_stage_rate_pct_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.failed_stage_count
+      - dw_databricks_health.fact_databricks_dag_run.stage_count
+    description: Failed stages divided by total stages in the 28-day window (0..100).
+    metric:
+      name: Failed Stage Rate Pct (28d)
+      description: Share of Spark stages that failed over the 28-day window.
+      acronym: failed_stage_rate_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Spark Stages
+      approved_by: jose.rferreira@quintoandar.com.br
+  executor_cpu_efficiency_ratio_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_executor_cpu_time_ms
+      - dw_databricks_health.fact_databricks_dag_run.total_executor_run_time_ms
+    description: Ratio of executor CPU time to executor wall-clock time in the 7-day window (0..1).
+    metric:
+      name: Executor CPU Efficiency Ratio (7d)
+      description: CPU efficiency over the 7-day window. Values near 1 indicate CPU-bound work; lower values indicate I/O wait or scheduling overhead.
+      acronym: exec_cpu_eff_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Right-Sizing Ratios
+      approved_by: jose.rferreira@quintoandar.com.br
+  executor_cpu_efficiency_ratio_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.total_executor_cpu_time_ms
+      - dw_databricks_health.fact_databricks_dag_run.total_executor_run_time_ms
+    description: Ratio of executor CPU time to executor wall-clock time in the 28-day window (0..1).
+    metric:
+      name: Executor CPU Efficiency Ratio (28d)
+      description: CPU efficiency over the 28-day window.
+      acronym: exec_cpu_eff_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Right-Sizing Ratios
+      approved_by: jose.rferreira@quintoandar.com.br
+  stage_attribution_ambiguous_tasks_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.n_stage_attribution_ambiguous_task_runs
+    description: Count of task runs with ambiguous Spark stage attribution in the 7-day window.
+    metric:
+      name: Stage Attribution Ambiguous Tasks (7d)
+      description: Tasks where spark_app_count > 1 in the 7-day window; stage metrics may be NULL at task grain.
+      acronym: ambiguous_stage_tasks_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Data Quality
+      approved_by: jose.rferreira@quintoandar.com.br
+  stage_attribution_ambiguous_tasks_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.n_stage_attribution_ambiguous_task_runs
+    description: Count of task runs with ambiguous Spark stage attribution in the 28-day window.
+    metric:
+      name: Stage Attribution Ambiguous Tasks (28d)
+      description: Tasks where spark_app_count > 1 in the 28-day window.
+      acronym: ambiguous_stage_tasks_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Data Quality
+      approved_by: jose.rferreira@quintoandar.com.br
+  stage_attribution_ambiguous_rate_pct_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.n_stage_attribution_ambiguous_task_runs
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
+    description: Share of task runs with ambiguous stage attribution in the 7-day window (0..100).
+    metric:
+      name: Stage Attribution Ambiguous Rate Pct (7d)
+      description: Data-quality KPI for parallel-task DAGs in the 7-day window.
+      acronym: ambiguous_stage_rate_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Data Quality
+      approved_by: jose.rferreira@quintoandar.com.br
+  stage_attribution_ambiguous_rate_pct_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.n_stage_attribution_ambiguous_task_runs
+      - dw_databricks_health.fact_databricks_dag_run.n_task_runs
+    description: Share of task runs with ambiguous stage attribution in the 28-day window (0..100).
+    metric:
+      name: Stage Attribution Ambiguous Rate Pct (28d)
+      description: Data-quality KPI for parallel-task DAGs in the 28-day window.
+      acronym: ambiguous_stage_rate_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Data Quality
+      approved_by: jose.rferreira@quintoandar.com.br
+  photon_run_rate_pct_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_photon
+    description: Share of logical runs that used Photon in the 7-day window (0..100).
+    metric:
+      name: Photon Run Rate Pct (7d)
+      description: Percentage of logical runs with any Photon cluster in the 7-day window.
+      acronym: photon_rate_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Profile
+      approved_by: jose.rferreira@quintoandar.com.br
+  photon_run_rate_pct_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_photon
+    description: Share of logical runs that used Photon in the 28-day window (0..100).
+    metric:
+      name: Photon Run Rate Pct (28d)
+      description: Percentage of logical runs with any Photon cluster in the 28-day window.
+      acronym: photon_rate_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Profile
+      approved_by: jose.rferreira@quintoandar.com.br
+  pool_backed_run_rate_pct_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_pool_backed
+    description: Share of logical runs on pool-backed clusters in the 7-day window (0..100).
+    metric:
+      name: Pool-Backed Run Rate Pct (7d)
+      description: Percentage of logical runs using instance pools in the 7-day window.
+      acronym: pool_rate_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Profile
+      approved_by: jose.rferreira@quintoandar.com.br
+  pool_backed_run_rate_pct_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_pool_backed
+    description: Share of logical runs on pool-backed clusters in the 28-day window (0..100).
+    metric:
+      name: Pool-Backed Run Rate Pct (28d)
+      description: Percentage of logical runs using instance pools in the 28-day window.
+      acronym: pool_rate_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Profile
+      approved_by: jose.rferreira@quintoandar.com.br
+  local_nvme_run_rate_pct_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_local_nvme
+    description: Share of logical runs on local-NVMe instance types in the 7-day window (0..100).
+    metric:
+      name: Local NVMe Run Rate Pct (7d)
+      description: Percentage of logical runs on NVMe-backed shapes in the 7-day window.
+      acronym: nvme_rate_7d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Profile
+      approved_by: jose.rferreira@quintoandar.com.br
+  local_nvme_run_rate_pct_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_any_local_nvme
+    description: Share of logical runs on local-NVMe instance types in the 28-day window (0..100).
+    metric:
+      name: Local NVMe Run Rate Pct (28d)
+      description: Percentage of logical runs on NVMe-backed shapes in the 28-day window.
+      acronym: nvme_rate_28d
+      is_additive: False
+      business_stage: Platform Operations
+      hierarchy: Cluster Profile
       approved_by: jose.rferreira@quintoandar.com.br
 
   ts_load:

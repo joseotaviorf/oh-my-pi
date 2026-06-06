@@ -22,10 +22,13 @@
 --   - datalake_databricks_health.daily_cluster_health (PR 23079 — P50/P95 util, calculated EC2)
 --   - datalake_databricks_health.spark_stage_metrics  (PR 23080 — per stage)
 --
--- Cluster scope: all clusters that appear in Lakeflow task-run timeline for
--- the load window (latest snapshot from system.compute.clusters). No
--- provisioner or environment filter — covers bietlejuice, quintoml, CDP, and
--- other job workloads present in Lakeflow.
+-- Cluster scope: SCOPED to genuinely Airflow-triggered jobs — clusters whose
+-- `provisioner` tag is one of bietlejuice / wonka / quintoml (the Airflow
+-- stack). Non-Airflow job workloads (customer-data-platform, databricks-managed,
+-- and untagged AtlasDB / Overwatch / hand-built Workflows) plus the
+-- interactive-cluster (UI/API) leak are intentionally EXCLUDED here — they are
+-- covered by the billing-spine cost fact (dw_databricks_costs). This keeps
+-- `airflow_dag_id` an honest column across the task / dag / health family.
 --
 -- Cost attribution: system.billing.usage is hour-bucketed (usage_start_time at
 -- HH:00:00). Joining billing rows to task time windows mis-attributes DBU.
@@ -971,3 +974,8 @@ LEFT JOIN
         ON  sptc.workspace_id = s.workspace_id
         AND sptc.run_id       = s.run_id
         AND sptc.task_run_id  = s.task_run_id
+WHERE
+    -- Scope to the Airflow-orchestrated stack only (see header). All other
+    -- workloads (CDP, databricks-managed, AtlasDB/Overwatch/manual, UI/API
+    -- interactive leak) are the cost fact's responsibility, not dag_health's.
+    lcs.tags['provisioner'] IN ('bietlejuice', 'wonka', 'quintoml')

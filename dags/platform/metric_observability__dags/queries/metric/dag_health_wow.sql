@@ -26,12 +26,18 @@ WITH window_runs AS (
         ecosystem,
         environment,
         provisioner,
+        data_classification,
+        primary_dbr_version,
         n_databricks_job_runs,
         n_task_runs,
         n_failed_task_runs,
         n_task_runs_with_stage_data,
+        n_stage_attribution_ambiguous_task_runs,
         n_pool_acquisition_slow_tasks,
         is_any_task_failed,
+        is_any_photon,
+        is_any_pool_backed,
+        is_any_local_nvme,
         total_dbu_consumed,
         total_dbu_cost_usd,
         total_ec2_cost_calculated_usd,
@@ -47,7 +53,21 @@ WITH window_runs AS (
         weighted_avg_p95_worker_cpu_busy_percent           AS p95_worker_cpu_busy_percent,
         weighted_avg_p95_driver_mem_used_percent           AS p95_driver_mem_used_percent,
         weighted_avg_p95_worker_mem_used_percent           AS p95_worker_mem_used_percent,
+        weighted_avg_p95_driver_cpu_wait_percent           AS p95_driver_cpu_wait_percent,
+        weighted_avg_p95_worker_cpu_wait_percent           AS p95_worker_cpu_wait_percent,
+        weighted_avg_p50_driver_cpu_busy_percent           AS p50_driver_cpu_busy_percent,
+        weighted_avg_p50_worker_cpu_busy_percent           AS p50_worker_cpu_busy_percent,
+        weighted_avg_p50_driver_cpu_wait_percent           AS p50_driver_cpu_wait_percent,
+        weighted_avg_p50_worker_cpu_wait_percent           AS p50_worker_cpu_wait_percent,
+        weighted_avg_p50_driver_mem_used_percent           AS p50_driver_mem_used_percent,
+        weighted_avg_p50_worker_mem_used_percent           AS p50_worker_mem_used_percent,
         weighted_avg_local_disk_utilization_pct_p95        AS local_disk_utilization_pct_p95,
+        stage_count,
+        failed_stage_count,
+        total_executor_cpu_time_ms,
+        total_output_bytes_written,
+        max_pre_init_script_seconds                        AS pre_init_script_seconds,
+        max_post_init_script_seconds                       AS post_init_script_seconds,
         dt_dag_run_started >= DATE('{load_start_date}') - INTERVAL 6 DAYS           AS in_current_7d,
         dt_dag_run_started BETWEEN DATE('{load_start_date}') - INTERVAL 13 DAYS
             AND DATE('{load_start_date}') - INTERVAL 7 DAYS                      AS in_previous_7d
@@ -104,6 +124,86 @@ weighted_util AS (
             2
         ) AS avg_p95_worker_mem_used_percent_previous_7d,
         ROUND(
+            SUM(p50_driver_cpu_busy_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_current_7d)
+                / NULLIF(SUM(CASE WHEN p50_driver_cpu_busy_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_current_7d), 0.0),
+            2
+        ) AS avg_p50_driver_cpu_busy_percent_current_7d,
+        ROUND(
+            SUM(p50_driver_cpu_busy_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_previous_7d)
+                / NULLIF(SUM(CASE WHEN p50_driver_cpu_busy_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_previous_7d), 0.0),
+            2
+        ) AS avg_p50_driver_cpu_busy_percent_previous_7d,
+        ROUND(
+            SUM(p50_worker_cpu_busy_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_current_7d)
+                / NULLIF(SUM(CASE WHEN p50_worker_cpu_busy_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_current_7d), 0.0),
+            2
+        ) AS avg_p50_worker_cpu_busy_percent_current_7d,
+        ROUND(
+            SUM(p50_worker_cpu_busy_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_previous_7d)
+                / NULLIF(SUM(CASE WHEN p50_worker_cpu_busy_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_previous_7d), 0.0),
+            2
+        ) AS avg_p50_worker_cpu_busy_percent_previous_7d,
+        ROUND(
+            SUM(p50_driver_cpu_wait_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_current_7d)
+                / NULLIF(SUM(CASE WHEN p50_driver_cpu_wait_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_current_7d), 0.0),
+            2
+        ) AS avg_p50_driver_cpu_wait_percent_current_7d,
+        ROUND(
+            SUM(p50_driver_cpu_wait_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_previous_7d)
+                / NULLIF(SUM(CASE WHEN p50_driver_cpu_wait_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_previous_7d), 0.0),
+            2
+        ) AS avg_p50_driver_cpu_wait_percent_previous_7d,
+        ROUND(
+            SUM(p50_worker_cpu_wait_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_current_7d)
+                / NULLIF(SUM(CASE WHEN p50_worker_cpu_wait_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_current_7d), 0.0),
+            2
+        ) AS avg_p50_worker_cpu_wait_percent_current_7d,
+        ROUND(
+            SUM(p50_worker_cpu_wait_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_previous_7d)
+                / NULLIF(SUM(CASE WHEN p50_worker_cpu_wait_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_previous_7d), 0.0),
+            2
+        ) AS avg_p50_worker_cpu_wait_percent_previous_7d,
+        ROUND(
+            SUM(p50_driver_mem_used_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_current_7d)
+                / NULLIF(SUM(CASE WHEN p50_driver_mem_used_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_current_7d), 0.0),
+            2
+        ) AS avg_p50_driver_mem_used_percent_current_7d,
+        ROUND(
+            SUM(p50_driver_mem_used_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_previous_7d)
+                / NULLIF(SUM(CASE WHEN p50_driver_mem_used_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_previous_7d), 0.0),
+            2
+        ) AS avg_p50_driver_mem_used_percent_previous_7d,
+        ROUND(
+            SUM(p50_worker_mem_used_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_current_7d)
+                / NULLIF(SUM(CASE WHEN p50_worker_mem_used_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_current_7d), 0.0),
+            2
+        ) AS avg_p50_worker_mem_used_percent_current_7d,
+        ROUND(
+            SUM(p50_worker_mem_used_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_previous_7d)
+                / NULLIF(SUM(CASE WHEN p50_worker_mem_used_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_previous_7d), 0.0),
+            2
+        ) AS avg_p50_worker_mem_used_percent_previous_7d,
+        ROUND(
+            SUM(p95_driver_cpu_wait_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_current_7d)
+                / NULLIF(SUM(CASE WHEN p95_driver_cpu_wait_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_current_7d), 0.0),
+            2
+        ) AS avg_p95_driver_cpu_wait_percent_current_7d,
+        ROUND(
+            SUM(p95_driver_cpu_wait_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_previous_7d)
+                / NULLIF(SUM(CASE WHEN p95_driver_cpu_wait_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_previous_7d), 0.0),
+            2
+        ) AS avg_p95_driver_cpu_wait_percent_previous_7d,
+        ROUND(
+            SUM(p95_worker_cpu_wait_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_current_7d)
+                / NULLIF(SUM(CASE WHEN p95_worker_cpu_wait_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_current_7d), 0.0),
+            2
+        ) AS avg_p95_worker_cpu_wait_percent_current_7d,
+        ROUND(
+            SUM(p95_worker_cpu_wait_percent * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_previous_7d)
+                / NULLIF(SUM(CASE WHEN p95_worker_cpu_wait_percent IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_previous_7d), 0.0),
+            2
+        ) AS avg_p95_worker_cpu_wait_percent_previous_7d,
+        ROUND(
             SUM(local_disk_utilization_pct_p95 * COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0)) FILTER (WHERE in_current_7d)
                 / NULLIF(SUM(CASE WHEN local_disk_utilization_pct_p95 IS NOT NULL THEN COALESCE(CAST(execution_duration_seconds AS DOUBLE), 0.0) ELSE 0.0 END) FILTER (WHERE in_current_7d), 0.0),
             2
@@ -123,6 +223,8 @@ SELECT
     FIRST(ecosystem)                                                                       AS ecosystem,
     FIRST(environment)                                                                     AS environment,
     FIRST(provisioner)                                                                     AS provisioner,
+    FIRST(data_classification)                                                           AS data_classification,
+    FIRST(primary_dbr_version)                                                           AS primary_dbr_version,
 
     COUNT(*) FILTER (WHERE in_current_7d)                                                AS total_dag_runs_current_7d,
     COUNT(*) FILTER (WHERE in_previous_7d)                                                AS total_dag_runs_previous_7d,
@@ -363,6 +465,85 @@ SELECT
         ) * 100.0 / NULLIF(MAX(wu.avg_p95_driver_mem_used_percent_previous_7d), 0),
         2
     )                                                                                      AS avg_p95_driver_mem_used_percent_change_pct,
+    MAX(wu.avg_p50_driver_cpu_busy_percent_current_7d)                                     AS avg_p50_driver_cpu_busy_percent_current_7d,
+    MAX(wu.avg_p50_driver_cpu_busy_percent_previous_7d)                                    AS avg_p50_driver_cpu_busy_percent_previous_7d,
+    ROUND(
+        (
+            MAX(wu.avg_p50_driver_cpu_busy_percent_current_7d)
+            - MAX(wu.avg_p50_driver_cpu_busy_percent_previous_7d)
+        ) * 100.0 / NULLIF(MAX(wu.avg_p50_driver_cpu_busy_percent_previous_7d), 0),
+        2
+    )                                                                                      AS avg_p50_driver_cpu_busy_percent_change_pct,
+
+    MAX(wu.avg_p50_worker_cpu_busy_percent_current_7d)                                     AS avg_p50_worker_cpu_busy_percent_current_7d,
+    MAX(wu.avg_p50_worker_cpu_busy_percent_previous_7d)                                    AS avg_p50_worker_cpu_busy_percent_previous_7d,
+    ROUND(
+        (
+            MAX(wu.avg_p50_worker_cpu_busy_percent_current_7d)
+            - MAX(wu.avg_p50_worker_cpu_busy_percent_previous_7d)
+        ) * 100.0 / NULLIF(MAX(wu.avg_p50_worker_cpu_busy_percent_previous_7d), 0),
+        2
+    )                                                                                      AS avg_p50_worker_cpu_busy_percent_change_pct,
+
+    MAX(wu.avg_p50_driver_cpu_wait_percent_current_7d)                                     AS avg_p50_driver_cpu_wait_percent_current_7d,
+    MAX(wu.avg_p50_driver_cpu_wait_percent_previous_7d)                                    AS avg_p50_driver_cpu_wait_percent_previous_7d,
+    ROUND(
+        (
+            MAX(wu.avg_p50_driver_cpu_wait_percent_current_7d)
+            - MAX(wu.avg_p50_driver_cpu_wait_percent_previous_7d)
+        ) * 100.0 / NULLIF(MAX(wu.avg_p50_driver_cpu_wait_percent_previous_7d), 0),
+        2
+    )                                                                                      AS avg_p50_driver_cpu_wait_percent_change_pct,
+
+    MAX(wu.avg_p50_worker_cpu_wait_percent_current_7d)                                     AS avg_p50_worker_cpu_wait_percent_current_7d,
+    MAX(wu.avg_p50_worker_cpu_wait_percent_previous_7d)                                    AS avg_p50_worker_cpu_wait_percent_previous_7d,
+    ROUND(
+        (
+            MAX(wu.avg_p50_worker_cpu_wait_percent_current_7d)
+            - MAX(wu.avg_p50_worker_cpu_wait_percent_previous_7d)
+        ) * 100.0 / NULLIF(MAX(wu.avg_p50_worker_cpu_wait_percent_previous_7d), 0),
+        2
+    )                                                                                      AS avg_p50_worker_cpu_wait_percent_change_pct,
+
+    MAX(wu.avg_p50_driver_mem_used_percent_current_7d)                                     AS avg_p50_driver_mem_used_percent_current_7d,
+    MAX(wu.avg_p50_driver_mem_used_percent_previous_7d)                                    AS avg_p50_driver_mem_used_percent_previous_7d,
+    ROUND(
+        (
+            MAX(wu.avg_p50_driver_mem_used_percent_current_7d)
+            - MAX(wu.avg_p50_driver_mem_used_percent_previous_7d)
+        ) * 100.0 / NULLIF(MAX(wu.avg_p50_driver_mem_used_percent_previous_7d), 0),
+        2
+    )                                                                                      AS avg_p50_driver_mem_used_percent_change_pct,
+
+    MAX(wu.avg_p50_worker_mem_used_percent_current_7d)                                     AS avg_p50_worker_mem_used_percent_current_7d,
+    MAX(wu.avg_p50_worker_mem_used_percent_previous_7d)                                    AS avg_p50_worker_mem_used_percent_previous_7d,
+    ROUND(
+        (
+            MAX(wu.avg_p50_worker_mem_used_percent_current_7d)
+            - MAX(wu.avg_p50_worker_mem_used_percent_previous_7d)
+        ) * 100.0 / NULLIF(MAX(wu.avg_p50_worker_mem_used_percent_previous_7d), 0),
+        2
+    )                                                                                      AS avg_p50_worker_mem_used_percent_change_pct,
+
+    MAX(wu.avg_p95_driver_cpu_wait_percent_current_7d)                                     AS avg_p95_driver_cpu_wait_percent_current_7d,
+    MAX(wu.avg_p95_driver_cpu_wait_percent_previous_7d)                                    AS avg_p95_driver_cpu_wait_percent_previous_7d,
+    ROUND(
+        (
+            MAX(wu.avg_p95_driver_cpu_wait_percent_current_7d)
+            - MAX(wu.avg_p95_driver_cpu_wait_percent_previous_7d)
+        ) * 100.0 / NULLIF(MAX(wu.avg_p95_driver_cpu_wait_percent_previous_7d), 0),
+        2
+    )                                                                                      AS avg_p95_driver_cpu_wait_percent_change_pct,
+
+    MAX(wu.avg_p95_worker_cpu_wait_percent_current_7d)                                     AS avg_p95_worker_cpu_wait_percent_current_7d,
+    MAX(wu.avg_p95_worker_cpu_wait_percent_previous_7d)                                    AS avg_p95_worker_cpu_wait_percent_previous_7d,
+    ROUND(
+        (
+            MAX(wu.avg_p95_worker_cpu_wait_percent_current_7d)
+            - MAX(wu.avg_p95_worker_cpu_wait_percent_previous_7d)
+        ) * 100.0 / NULLIF(MAX(wu.avg_p95_worker_cpu_wait_percent_previous_7d), 0),
+        2
+    )                                                                                      AS avg_p95_worker_cpu_wait_percent_change_pct,
 
     MAX(wu.avg_local_disk_utilization_pct_p95_current_7d)                                  AS avg_local_disk_utilization_pct_p95_current_7d,
     MAX(wu.avg_local_disk_utilization_pct_p95_previous_7d)                                 AS avg_local_disk_utilization_pct_p95_previous_7d,
@@ -433,6 +614,226 @@ SELECT
             ),
         2
     )                                                                                      AS failed_dag_run_rate_pct_change_pct,
+
+    SUM(total_executor_cpu_time_ms) FILTER (WHERE in_current_7d)                           AS total_executor_cpu_time_ms_current_7d,
+    SUM(total_executor_cpu_time_ms) FILTER (WHERE in_previous_7d)                          AS total_executor_cpu_time_ms_previous_7d,
+    ROUND(
+        (
+            SUM(total_executor_cpu_time_ms) FILTER (WHERE in_current_7d)
+            - SUM(total_executor_cpu_time_ms) FILTER (WHERE in_previous_7d)
+        ) * 100.0 / NULLIF(SUM(total_executor_cpu_time_ms) FILTER (WHERE in_previous_7d), 0),
+        2
+    )                                                                                      AS total_executor_cpu_time_ms_change_pct,
+
+    SUM(total_output_bytes_written) FILTER (WHERE in_current_7d)                           AS total_output_bytes_written_current_7d,
+    SUM(total_output_bytes_written) FILTER (WHERE in_previous_7d)                          AS total_output_bytes_written_previous_7d,
+    ROUND(
+        (
+            SUM(total_output_bytes_written) FILTER (WHERE in_current_7d)
+            - SUM(total_output_bytes_written) FILTER (WHERE in_previous_7d)
+        ) * 100.0 / NULLIF(SUM(total_output_bytes_written) FILTER (WHERE in_previous_7d), 0),
+        2
+    )                                                                                      AS total_output_bytes_written_change_pct,
+
+    SUM(stage_count) FILTER (WHERE in_current_7d)                                          AS total_stage_count_current_7d,
+    SUM(stage_count) FILTER (WHERE in_previous_7d)                                         AS total_stage_count_previous_7d,
+    ROUND(
+        (
+            SUM(stage_count) FILTER (WHERE in_current_7d)
+            - SUM(stage_count) FILTER (WHERE in_previous_7d)
+        ) * 100.0 / NULLIF(SUM(stage_count) FILTER (WHERE in_previous_7d), 0),
+        2
+    )                                                                                      AS total_stage_count_change_pct,
+
+    ROUND(
+        SUM(failed_stage_count) FILTER (WHERE in_current_7d) * 100.0
+            / NULLIF(SUM(stage_count) FILTER (WHERE in_current_7d), 0),
+        2
+    )                                                                                      AS failed_stage_rate_pct_current_7d,
+    ROUND(
+        SUM(failed_stage_count) FILTER (WHERE in_previous_7d) * 100.0
+            / NULLIF(SUM(stage_count) FILTER (WHERE in_previous_7d), 0),
+        2
+    )                                                                                      AS failed_stage_rate_pct_previous_7d,
+    ROUND(
+        (
+            SUM(failed_stage_count) FILTER (WHERE in_current_7d) * 100.0
+                / NULLIF(SUM(stage_count) FILTER (WHERE in_current_7d), 0)
+            - SUM(failed_stage_count) FILTER (WHERE in_previous_7d) * 100.0
+                / NULLIF(SUM(stage_count) FILTER (WHERE in_previous_7d), 0)
+        ) * 100.0
+            / NULLIF(
+                SUM(failed_stage_count) FILTER (WHERE in_previous_7d) * 100.0
+                    / NULLIF(SUM(stage_count) FILTER (WHERE in_previous_7d), 0),
+                0
+            ),
+        2
+    )                                                                                      AS failed_stage_rate_pct_change_pct,
+
+    ROUND(
+        SUM(total_executor_cpu_time_ms) FILTER (WHERE in_current_7d)
+            / NULLIF(CAST(SUM(total_executor_run_time_ms) FILTER (WHERE in_current_7d) AS DOUBLE), 0),
+        4
+    )                                                                                      AS executor_cpu_efficiency_ratio_current_7d,
+    ROUND(
+        SUM(total_executor_cpu_time_ms) FILTER (WHERE in_previous_7d)
+            / NULLIF(CAST(SUM(total_executor_run_time_ms) FILTER (WHERE in_previous_7d) AS DOUBLE), 0),
+        4
+    )                                                                                      AS executor_cpu_efficiency_ratio_previous_7d,
+    ROUND(
+        (
+            SUM(total_executor_cpu_time_ms) FILTER (WHERE in_current_7d)
+                / NULLIF(CAST(SUM(total_executor_run_time_ms) FILTER (WHERE in_current_7d) AS DOUBLE), 0)
+            - SUM(total_executor_cpu_time_ms) FILTER (WHERE in_previous_7d)
+                / NULLIF(CAST(SUM(total_executor_run_time_ms) FILTER (WHERE in_previous_7d) AS DOUBLE), 0)
+        ) * 100.0
+            / NULLIF(
+                SUM(total_executor_cpu_time_ms) FILTER (WHERE in_previous_7d)
+                    / NULLIF(CAST(SUM(total_executor_run_time_ms) FILTER (WHERE in_previous_7d) AS DOUBLE), 0),
+                0
+            ),
+        2
+    )                                                                                      AS executor_cpu_efficiency_ratio_change_pct,
+
+    ROUND(
+        SUM(n_stage_attribution_ambiguous_task_runs) FILTER (WHERE in_current_7d) * 100.0
+            / NULLIF(SUM(n_task_runs) FILTER (WHERE in_current_7d), 0),
+        2
+    )                                                                                      AS stage_attribution_ambiguous_rate_pct_current_7d,
+    ROUND(
+        SUM(n_stage_attribution_ambiguous_task_runs) FILTER (WHERE in_previous_7d) * 100.0
+            / NULLIF(SUM(n_task_runs) FILTER (WHERE in_previous_7d), 0),
+        2
+    )                                                                                      AS stage_attribution_ambiguous_rate_pct_previous_7d,
+    ROUND(
+        (
+            SUM(n_stage_attribution_ambiguous_task_runs) FILTER (WHERE in_current_7d) * 100.0
+                / NULLIF(SUM(n_task_runs) FILTER (WHERE in_current_7d), 0)
+            - SUM(n_stage_attribution_ambiguous_task_runs) FILTER (WHERE in_previous_7d) * 100.0
+                / NULLIF(SUM(n_task_runs) FILTER (WHERE in_previous_7d), 0)
+        ) * 100.0
+            / NULLIF(
+                SUM(n_stage_attribution_ambiguous_task_runs) FILTER (WHERE in_previous_7d) * 100.0
+                    / NULLIF(SUM(n_task_runs) FILTER (WHERE in_previous_7d), 0),
+                0
+            ),
+        2
+    )                                                                                      AS stage_attribution_ambiguous_rate_pct_change_pct,
+
+    ROUND(
+        SUM(CASE WHEN is_any_photon THEN 1 ELSE 0 END) FILTER (WHERE in_current_7d) * 100.0
+            / NULLIF(COUNT(*) FILTER (WHERE in_current_7d), 0),
+        2
+    )                                                                                      AS photon_run_rate_pct_current_7d,
+    ROUND(
+        SUM(CASE WHEN is_any_photon THEN 1 ELSE 0 END) FILTER (WHERE in_previous_7d) * 100.0
+            / NULLIF(COUNT(*) FILTER (WHERE in_previous_7d), 0),
+        2
+    )                                                                                      AS photon_run_rate_pct_previous_7d,
+    ROUND(
+        (
+            SUM(CASE WHEN is_any_photon THEN 1 ELSE 0 END) FILTER (WHERE in_current_7d) * 100.0
+                / NULLIF(COUNT(*) FILTER (WHERE in_current_7d), 0)
+            - SUM(CASE WHEN is_any_photon THEN 1 ELSE 0 END) FILTER (WHERE in_previous_7d) * 100.0
+                / NULLIF(COUNT(*) FILTER (WHERE in_previous_7d), 0)
+        ) * 100.0
+            / NULLIF(
+                SUM(CASE WHEN is_any_photon THEN 1 ELSE 0 END) FILTER (WHERE in_previous_7d) * 100.0
+                    / NULLIF(COUNT(*) FILTER (WHERE in_previous_7d), 0),
+                0
+            ),
+        2
+    )                                                                                      AS photon_run_rate_pct_change_pct,
+
+    ROUND(
+        SUM(CASE WHEN is_any_pool_backed THEN 1 ELSE 0 END) FILTER (WHERE in_current_7d) * 100.0
+            / NULLIF(COUNT(*) FILTER (WHERE in_current_7d), 0),
+        2
+    )                                                                                      AS pool_backed_run_rate_pct_current_7d,
+    ROUND(
+        SUM(CASE WHEN is_any_pool_backed THEN 1 ELSE 0 END) FILTER (WHERE in_previous_7d) * 100.0
+            / NULLIF(COUNT(*) FILTER (WHERE in_previous_7d), 0),
+        2
+    )                                                                                      AS pool_backed_run_rate_pct_previous_7d,
+    ROUND(
+        (
+            SUM(CASE WHEN is_any_pool_backed THEN 1 ELSE 0 END) FILTER (WHERE in_current_7d) * 100.0
+                / NULLIF(COUNT(*) FILTER (WHERE in_current_7d), 0)
+            - SUM(CASE WHEN is_any_pool_backed THEN 1 ELSE 0 END) FILTER (WHERE in_previous_7d) * 100.0
+                / NULLIF(COUNT(*) FILTER (WHERE in_previous_7d), 0)
+        ) * 100.0
+            / NULLIF(
+                SUM(CASE WHEN is_any_pool_backed THEN 1 ELSE 0 END) FILTER (WHERE in_previous_7d) * 100.0
+                    / NULLIF(COUNT(*) FILTER (WHERE in_previous_7d), 0),
+                0
+            ),
+        2
+    )                                                                                      AS pool_backed_run_rate_pct_change_pct,
+
+    APPROX_PERCENTILE(pre_init_script_seconds, 0.95) FILTER (WHERE in_current_7d)        AS p95_pre_init_script_seconds_current_7d,
+    APPROX_PERCENTILE(pre_init_script_seconds, 0.95) FILTER (WHERE in_previous_7d)       AS p95_pre_init_script_seconds_previous_7d,
+    ROUND(
+        (
+            APPROX_PERCENTILE(pre_init_script_seconds, 0.95) FILTER (WHERE in_current_7d)
+            - APPROX_PERCENTILE(pre_init_script_seconds, 0.95) FILTER (WHERE in_previous_7d)
+        ) * 100.0 / NULLIF(APPROX_PERCENTILE(pre_init_script_seconds, 0.95) FILTER (WHERE in_previous_7d), 0),
+        2
+    )                                                                                      AS p95_pre_init_script_seconds_change_pct,
+
+    APPROX_PERCENTILE(post_init_script_seconds, 0.95) FILTER (WHERE in_current_7d)         AS p95_post_init_script_seconds_current_7d,
+    APPROX_PERCENTILE(post_init_script_seconds, 0.95) FILTER (WHERE in_previous_7d)        AS p95_post_init_script_seconds_previous_7d,
+    ROUND(
+        (
+            APPROX_PERCENTILE(post_init_script_seconds, 0.95) FILTER (WHERE in_current_7d)
+            - APPROX_PERCENTILE(post_init_script_seconds, 0.95) FILTER (WHERE in_previous_7d)
+        ) * 100.0 / NULLIF(APPROX_PERCENTILE(post_init_script_seconds, 0.95) FILTER (WHERE in_previous_7d), 0),
+        2
+    )                                                                                      AS p95_post_init_script_seconds_change_pct,
+
+    SUM(failed_stage_count) FILTER (WHERE in_current_7d)                                   AS total_failed_stage_count_current_7d,
+    SUM(failed_stage_count) FILTER (WHERE in_previous_7d)                                  AS total_failed_stage_count_previous_7d,
+    ROUND(
+        (
+            SUM(failed_stage_count) FILTER (WHERE in_current_7d)
+            - SUM(failed_stage_count) FILTER (WHERE in_previous_7d)
+        ) * 100.0 / NULLIF(SUM(failed_stage_count) FILTER (WHERE in_previous_7d), 0),
+        2
+    )                                                                                      AS total_failed_stage_count_change_pct,
+
+    SUM(n_stage_attribution_ambiguous_task_runs) FILTER (WHERE in_current_7d)              AS stage_attribution_ambiguous_tasks_current_7d,
+    SUM(n_stage_attribution_ambiguous_task_runs) FILTER (WHERE in_previous_7d)             AS stage_attribution_ambiguous_tasks_previous_7d,
+    ROUND(
+        (
+            SUM(n_stage_attribution_ambiguous_task_runs) FILTER (WHERE in_current_7d)
+            - SUM(n_stage_attribution_ambiguous_task_runs) FILTER (WHERE in_previous_7d)
+        ) * 100.0 / NULLIF(SUM(n_stage_attribution_ambiguous_task_runs) FILTER (WHERE in_previous_7d), 0),
+        2
+    )                                                                                      AS stage_attribution_ambiguous_tasks_change_pct,
+
+    ROUND(
+        SUM(CASE WHEN is_any_local_nvme THEN 1 ELSE 0 END) FILTER (WHERE in_current_7d) * 100.0
+            / NULLIF(COUNT(*) FILTER (WHERE in_current_7d), 0),
+        2
+    )                                                                                      AS local_nvme_run_rate_pct_current_7d,
+    ROUND(
+        SUM(CASE WHEN is_any_local_nvme THEN 1 ELSE 0 END) FILTER (WHERE in_previous_7d) * 100.0
+            / NULLIF(COUNT(*) FILTER (WHERE in_previous_7d), 0),
+        2
+    )                                                                                      AS local_nvme_run_rate_pct_previous_7d,
+    ROUND(
+        (
+            SUM(CASE WHEN is_any_local_nvme THEN 1 ELSE 0 END) FILTER (WHERE in_current_7d) * 100.0
+                / NULLIF(COUNT(*) FILTER (WHERE in_current_7d), 0)
+            - SUM(CASE WHEN is_any_local_nvme THEN 1 ELSE 0 END) FILTER (WHERE in_previous_7d) * 100.0
+                / NULLIF(COUNT(*) FILTER (WHERE in_previous_7d), 0)
+        ) * 100.0
+            / NULLIF(
+                SUM(CASE WHEN is_any_local_nvme THEN 1 ELSE 0 END) FILTER (WHERE in_previous_7d) * 100.0
+                    / NULLIF(COUNT(*) FILTER (WHERE in_previous_7d), 0),
+                0
+            ),
+        2
+    )                                                                                      AS local_nvme_run_rate_pct_change_pct,
 
     DATE('{load_start_date}')                                                              AS dt_window_end,
     CURRENT_TIMESTAMP()                                                                    AS ts_load,

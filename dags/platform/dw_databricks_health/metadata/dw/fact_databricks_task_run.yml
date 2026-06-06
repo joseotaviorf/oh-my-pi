@@ -2,12 +2,15 @@
 database_name: dw_databricks_health
 table_name: fact_databricks_task_run
 description: |
-  Per Databricks task-run health fact for workloads present in Lakeflow
-  (system.lakeflow.job_task_run_timeline). One row per
-  (id_databricks_workspace, id_databricks_run, id_databricks_task_run). Covers
-  all job clusters that appear in the timeline for the load window — including
-  bietlejuice, quintoml / wonka, customer-data-platform, and other
-  provisioners — not only `tags['provisioner'] = 'bietlejuice'`.
+  Per Databricks task-run health fact, SCOPED to genuinely Airflow-triggered
+  jobs — clusters whose `tags['provisioner']` is one of bietlejuice, wonka, or
+  quintoml (the Airflow stack). One row per
+  (id_databricks_workspace, id_databricks_run, id_databricks_task_run).
+  Non-Airflow job workloads (customer-data-platform, databricks-managed, and
+  untagged AtlasDB / Overwatch / hand-built Workflows) plus the interactive
+  UI / API cluster leak are intentionally EXCLUDED here — they are covered by
+  the planned billing-spine cost fact, not this task / dag / health family.
+  This keeps `airflow_dag_id` an honest column across the family.
 
   Joins eight sources:
     - system.lakeflow.job_task_run_timeline (spine — per-task-run, setup time)
