@@ -14,7 +14,7 @@ steps:
     when:
       - event: pull_request
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
 
   check-style-python:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
@@ -24,7 +24,7 @@ steps:
     when:
       - event: pull_request
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
     depends_on: [setup]
 
   check-style-dags-python:
@@ -35,7 +35,7 @@ steps:
     when:
       - event: pull_request
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
     depends_on: [setup]
 
   validate-py39-runtime-typing:
@@ -46,7 +46,7 @@ steps:
     when:
       - event: pull_request
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
     depends_on: [setup]
 
   files-validation-python:
@@ -57,7 +57,7 @@ steps:
     when:
       - event: pull_request
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
     depends_on: [setup]
 
   type-check-python:
@@ -69,5 +69,5 @@ steps:
     when:
       - event: pull_request
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
     depends_on: [setup]

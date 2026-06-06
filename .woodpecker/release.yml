@@ -1,6 +1,6 @@
 # Path filters use Woodpecker `when.path`. Skipped steps count as success so upstream
 # step deps still pass. lint/tests/validations workflow-level when matches deploy
-# branches + tag (clone-only on forno/tag where step filters are narrower). Release
+# branches + tag (clone-only on tag where step filters are narrower). Release
 # workflow when uses the same push branches so feature-branch pushes do not deadlock
 # depends_on on v3.9 (optional: true requires Woodpecker 3.15+).
 #

@@ -40,7 +40,7 @@ steps:
             - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
           on_empty: false
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
         path: *dag_declaration_path
     depends_on: [setup]
 
@@ -61,7 +61,7 @@ steps:
             - "packages/bietlejuice-core/src/bietlejuice/config/prod_conf.yml"
           on_empty: false
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
         path: *cluster_validation_files_path
     depends_on: [setup]
 
@@ -91,7 +91,7 @@ steps:
             - "packages/bietlejuice-compiler/test/unit/validation/test_audit_cluster_instance_families.py"
           on_empty: false
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
         path: *cluster_validation_tooling_path
     depends_on: [setup]
 
@@ -111,7 +111,7 @@ steps:
             - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
           on_empty: false
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
         path: *dags_up_to_standard_path
     depends_on: [setup]
 
@@ -131,7 +131,7 @@ steps:
             - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
           on_empty: false
       - event: push
-        branch: [master]
+        branch: [master, forno]
         path: *metadata_files_content_path
     depends_on: [setup]
 
@@ -151,7 +151,7 @@ steps:
             - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
           on_empty: false
       - event: push
-        branch: [master]
+        branch: [master, forno]
         path: *metadata_files_exist_path
     depends_on: [setup]
 
@@ -172,7 +172,7 @@ steps:
             - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
           on_empty: false
       - event: push
-        branch: [master]
+        branch: [master, forno]
         path: *lineage_consistency_path
     depends_on: [setup]
 
@@ -190,14 +190,13 @@ steps:
             - "packages/bietlejuice-compiler/scripts/ci_cd/run_validation_by_domain.py"
           on_empty: false
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
         path: *source_layer_policy_path
     depends_on: [setup]
 
   # validate-dags-dependencies is two steps because ConfigurationService reads
-  # ENVIRONMENT and branch policy is mutually exclusive: forno for feature branches,
-  # prod for master/hotfix. Commands and path filters are identical — anchors keep
-  # them in sync.
+  # ENVIRONMENT: forno is push-only (no PRs); master/hotfix use prod on push/PR.
+  # Commands and path filters are identical — anchors keep them in sync.
 
   validate-dags-dependencies-forno:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
@@ -257,7 +256,7 @@ steps:
             - "packages/bietlejuice-compiler/scripts/dependency_handling/**"
           on_empty: false
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
         path: *dependency_file_correctness_path
     depends_on: [setup]
 
@@ -274,7 +273,7 @@ steps:
             - "packages/bietlejuice-compiler/scripts/ci_cd/validate_core_model_schemas.py"
           on_empty: false
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
         path: *core_model_schemas_path
     depends_on: [setup]
 
@@ -294,6 +293,6 @@ steps:
             - "packages/bietlejuice-core/src/bietlejuice/base/core_models/**/*.py"
           on_empty: false
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
         path: *core_model_schema_content_path
     depends_on: [setup]

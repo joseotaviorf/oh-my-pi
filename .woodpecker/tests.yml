@@ -28,7 +28,7 @@ steps:
     when:
       - event: pull_request
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
 
   unit-tests-python:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-jdk-latest
@@ -39,7 +39,7 @@ steps:
     when:
       - event: pull_request
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
     depends_on: [setup]
 
   unit-tests-dags:
@@ -51,7 +51,7 @@ steps:
     when:
       - event: pull_request
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
     depends_on: [setup]
 
   integration-tests-python:
@@ -63,7 +63,7 @@ steps:
     when:
       - event: pull_request
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
     depends_on: [setup]
 
   core-model-tests-and-coverage:
@@ -75,5 +75,5 @@ steps:
     when:
       - event: pull_request
       - event: push
-        branch: [master, hotfix/*]
+        branch: [master, hotfix/*, forno]
     depends_on: [setup]
