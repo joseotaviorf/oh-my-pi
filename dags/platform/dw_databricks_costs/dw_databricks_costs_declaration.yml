@@ -27,7 +27,13 @@ dag:
       workload is classified into provisioner_resolved, DBU is priced from
       datalake_databricks_pricing.dim_dbu_price (negotiated, list fallback +
       price_missing flag), and EC2 is priced from system.compute.node_timeline
-      node-hours x datalake_databricks_pricing.dim_ec2_price (on-demand / spot).
+      node-hours x datalake_databricks_pricing.dim_ec2_price (on-demand / spot),
+      with EC2 estimated from billable_usage.machine_hours where node_timeline
+      history is unavailable because of rolling retention.
+
+      DBU reconciliation is strict for settled dates (through max fact date minus
+      two days) and warning-only for the freshest two fact days, where billing
+      corrections and system table lag are expected.
 
       The identity column is workload_name (generic), NOT airflow_dag_id, because
       this fact spans non-Airflow workloads (interactive notebooks, SQL

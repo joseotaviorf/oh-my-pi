@@ -9,13 +9,14 @@ description: |
   bietlejuice, quintoml / wonka, customer-data-platform, and other
   provisioners — not only `tags['provisioner'] = 'bietlejuice'`.
 
-  Joins seven sources:
+  Joins eight sources:
     - system.lakeflow.job_task_run_timeline (spine — per-task-run, setup time)
     - system.lakeflow.job_run_timeline      (parent run state, run_type)
     - system.compute.clusters               (cluster spec snapshots — latest)
     - system.billing.usage                  (DBU per cluster, hourly buckets)
     - system.billing.list_prices            (AWS USD list rate per DBU SKU)
-    - datalake_databricks_health.daily_cluster_health (PR 23079 — P50/P95 util)
+    - datalake_databricks_pricing.dim_dbu_price (negotiated USD/DBU by compute_type)
+    - datalake_databricks_health.daily_cluster_health (workspace-scoped P50/P95 util and task-attributed EC2 source)
     - datalake_databricks_health.spark_stage_metrics  (PR 23080 — Spark stages)
 
   Cost attribution: billing usage rows are hour-bucketed. The fact sums DBU and
@@ -26,15 +27,21 @@ description: |
   billing and avoids both missing DBU (task-window join on hour buckets) and
   double-counting across parallel tasks on one cluster.
 
-  USD conversion uses system.billing.list_prices.pricing.default (list rate
-  in USD per DBU, AWS cloud) joined on sku_name + valid time window on each
-  usage row. `pricing_sku` and `dbu_rate_usd` reflect the dominant SKU by DBU
-  volume on the cluster for the window. pricing_sku and dbu_rate_usd are
-  exposed alongside total_dbu_cost_usd so consumers can audit the conversion or
-  apply their own currency conversion (e.g. BRL via the QuintoAndar finance FX
-  rate). No Graviton or instance-pool discount applies to DBUs (validated in
-  bietlejuice/spark_debugging/mcp_a4_dbu_list_prices.sql); cost savings on
-  those come from EC2 cost and faster wall-clock.
+  USD conversion uses the negotiated rate from datalake_databricks_pricing.dim_dbu_price
+  (keyed on a compute_type derived from billing_origin_product + the usage-date window),
+  falling back to the system.billing.list_prices list rate when no negotiated row matches
+  (`dbu_negotiated_price_missing` flags the fallback). total_dbu_cost_usd is the negotiated cost;
+  total_dbu_list_cost_usd keeps the list-rate audit. `dbu_pricing_sku` identifies
+  the dominant SKU, while `dbu_rate_usd` is the cluster's usage-weighted list rate
+  over the matched list-price validity windows so consumers can audit the conversion
+  or apply their own FX (e.g. BRL via the QuintoAndar finance rate). This
+  mirrors dw_databricks_costs.fact_databricks_costs so the orchestrated slice
+  (NOT is_job_on_interactive — ALL_PURPOSE/INTERACTIVE billing or JOBS on UI/API
+  clusters) reconciles to its bucket='orchestrated_jobs'.
+  EC2 is task-attributed from datalake_databricks_health.daily_cluster_health,
+  joined by workspace, cluster and day. Before retained node_timeline coverage it
+  may come from billable_usage machine-hour estimates and is labeled by
+  ec2_source / is_ec2_estimated.
 
   Stage-attribution caveat: spark_stage_metrics is keyed by id_spark_app,
   not task_run_id (the event-log path layout doesn't carry task_id). We
@@ -224,22 +231,38 @@ columns:
       - system.billing.usage.usage_metadata
   total_dbu_cost_usd:
     description: |
-      Estimated USD for DBUs on this task run — cluster total (`SUM(usage_quantity × list
-      price)` per usage row) multiplied by the same duration share as `total_dbu_consumed`.
-      Uses list price (no enterprise / promotional discount). NULL rate components
-      are treated as zero on each usage row before summing.
+      Estimated USD for DBUs on this task run — cluster total `SUM(usage_quantity ×
+      negotiated rate)` multiplied by the same duration share as `total_dbu_consumed`.
+      The negotiated rate is `datalake_databricks_pricing.dim_dbu_price.usd_per_dbu`
+      keyed on the compute_type derived from `billing_origin_product` and the usage-date
+      window, falling back to the `system.billing.list_prices` list rate when no
+      negotiated row matches (`dbu_negotiated_price_missing` flags the fallback). Mirrors
+      `dw_databricks_costs.fact_databricks_costs.dbu_cost_usd`.
+    lineage:
+      - system.billing.usage.usage_quantity
+      - system.billing.usage.billing_origin_product
+      - datalake_databricks_pricing.dim_dbu_price.usd_per_dbu
+      - system.billing.list_prices.pricing
+  total_dbu_list_cost_usd:
+    description: |
+      List-rate USD audit companion to `total_dbu_cost_usd` — cluster total
+      `SUM(usage_quantity × system.billing.list_prices list rate)` apportioned by the
+      same duration share. Equals `total_dbu_cost_usd` when no negotiated rate applies;
+      otherwise higher (negotiated rates are discounts off list).
     lineage:
       - system.billing.usage.usage_quantity
       - system.billing.list_prices.pricing
   dbu_rate_usd:
     description: |
-      USD-per-DBU list rate for `pricing_sku` evaluated at `load_end_date` from
-      `system.billing.list_prices`. NULL when the dominant SKU has no matching price row.
+      Usage-weighted USD-per-DBU list rate for the cluster's matched
+      `system.billing.list_prices` validity windows. This is derived from
+      SUM(usage_quantity * list_rate) / SUM(usage_quantity), so it remains stable
+      when a load window spans more than one list-price validity period.
     lineage:
       - system.billing.list_prices.pricing
-  pricing_sku:
+  dbu_pricing_sku:
     description: |
-      Dominant Databricks SKU on the cluster for the load window (SKU with the
+      Dominant Databricks DBU billing SKU on the cluster for the load window (SKU with the
       largest summed `usage_quantity` among DBU rows for that cluster). Used with
       `dbu_rate_usd` for audit; the task-level `total_dbu_consumed` / `total_dbu_cost_usd`
       can still blend multiple SKUs at the cluster aggregate before pro-rating.
@@ -247,58 +270,57 @@ columns:
       - system.billing.usage.sku_name
   total_ec2_cost_calculated_usd:
     description: |
-      Cluster-day EC2 USD estimated from `system.compute.node_timeline` wall-clock
-      hours per node × `overwatch.instancedetails.On_Demand_Cost_Hourly` by instance
-      API name. Spot clusters (`aws_attributes.availability` contains SPOT): hourly
-      rate multiplied by 0.37 vs on-demand. Apportioned to this task by the same
-      duration share as DBU (`task_weight`); SUM across tasks on a cluster equals the
-      cluster-day total.
+      Task-attributed share of cluster-day EC2 USD from daily_cluster_health,
+      joined by workspace, cluster and overlapping date. For node_timeline rows,
+      EC2 is split by task overlap and capped by active cluster time; for
+      billable_usage estimates before retained node_timeline coverage, the same task overlap split is used
+      without the active-minute cap because no node_timeline active-minute
+      denominator exists.
     lineage:
       - datalake_databricks_health.daily_cluster_health.total_ec2_cost_calculated_usd
-  spot_hours:
+      - datalake_databricks_health.daily_cluster_health.id_databricks_workspace
+  ec2_spot_hours:
     description: |
-      Sum of driver + worker node-hours on the cluster-day counted as Spot pricing
-      (availability contains SPOT), apportioned to this task by duration share.
-      Instance-hours, not cluster-hours.
+      Task-attributed share of EC2 Spot node wall-clock hours from daily_cluster_health.
+      Not DBU usage quantity. Billable_usage estimates before retained node_timeline coverage classify all
+      hours as on-demand, so estimated rows normally have zero spot hours.
     lineage:
-      - datalake_databricks_health.daily_cluster_health.spot_hours
-  on_demand_hours:
+      - datalake_databricks_health.daily_cluster_health.ec2_spot_hours
+  ec2_on_demand_hours:
     description: |
-      Sum of driver + worker node-hours on the cluster-day counted as on-demand
-      pricing (non-Spot or NULL availability), apportioned to this task by duration share.
-      Instance-hours.
+      Task-attributed share of EC2 on-demand node wall-clock hours from
+      daily_cluster_health. Includes billable_usage machine-hour
+      estimates when node_timeline history is unavailable. Not DBU usage quantity.
     lineage:
-      - datalake_databricks_health.daily_cluster_health.on_demand_hours
-  total_ec2_cost_overwatch_usd:
+      - datalake_databricks_health.daily_cluster_health.ec2_on_demand_hours
+  ec2_source:
     description: |
-      Cluster-day total EC2 / instance compute cost in USD from Overwatch, apportioned
-      to this task by duration share. Useful for cross-checks vs calculated EC2.
+      Source of the EC2 hours and cost used by this task-run attribution:
+      node_timeline, billable_usage_estimate, missing, or not_applicable. Rolled up
+      from daily_cluster_health across all cluster-days overlapped by the task.
     lineage:
-      - datalake_databricks_health.daily_cluster_health.total_ec2_cost_overwatch_usd
-  total_dbu_cost_overwatch_usd:
-    description: |
-      Cluster-day total DBU cost in USD from Overwatch (`overwatch.clusterstatefact`),
-      apportioned to this task by duration share.
-      Independent cross-check of the system-tables-derived `total_dbu_cost_usd` trail —
-      material disagreement (>10%) usually indicates Overwatch-vs-Lakeflow attribution
-      drift on the underlying SKU.
+      - datalake_databricks_health.daily_cluster_health.ec2_source
+  is_ec2_estimated:
+    description: True when any EC2 attributed to this task-run came from the billable_usage.machine_hours estimate before retained node_timeline coverage.
     lineage:
-      - datalake_databricks_health.daily_cluster_health.total_dbu_cost_overwatch_usd
-  total_cost_overwatch_usd:
-    description: |
-      Sum of Overwatch cluster-day DBU USD and EC2 USD (`total_dbu_cost_overwatch_usd`
-      + `total_ec2_cost_overwatch_usd`), both apportioned to this task by duration share.
+      - datalake_databricks_health.daily_cluster_health.is_ec2_estimated
+  ec2_pricing_missing:
+    description: True when any attributed EC2 hours had no matching dim_ec2_price hourly rate and were priced at zero.
     lineage:
-      - datalake_databricks_health.daily_cluster_health.total_dbu_cost_overwatch_usd
-      - datalake_databricks_health.daily_cluster_health.total_ec2_cost_overwatch_usd
+      - datalake_databricks_health.daily_cluster_health.ec2_pricing_missing
+  ec2_unpriced_hours:
+    description: Task-attributed EC2 node-hours priced at zero because no matching dim_ec2_price hourly rate was found.
+    lineage:
+      - datalake_databricks_health.daily_cluster_health.ec2_unpriced_hours
   total_cost_usd:
     description: |
-      Estimated total USD for this task run: system-tables DBU USD (`total_dbu_cost_usd`)
-      plus apportioned calculated EC2 (`total_ec2_cost_calculated_usd`). Uses
-      calculated EC2 so all workspaces are covered; Overwatch-only EC2 remains in
-      `total_ec2_cost_overwatch_usd` for cross-check where Overwatch ingests the workspace.
+      Estimated total USD for this task run: negotiated DBU USD (`total_dbu_cost_usd`)
+      plus task-attributed calculated EC2 (`total_ec2_cost_calculated_usd`, priced from
+      `dim_ec2_price`). This is an operational attribution model, not the company
+      Databricks cost authority.
     lineage:
       - system.billing.usage.usage_quantity
+      - datalake_databricks_pricing.dim_dbu_price.usd_per_dbu
       - system.billing.list_prices.pricing
       - datalake_databricks_health.daily_cluster_health.total_ec2_cost_calculated_usd
   p50_driver_cpu_busy_percent:
@@ -469,6 +491,23 @@ columns:
     description: True when the cluster has a `driver_instance_pool_id` or `worker_instance_pool_id` set.
     lineage:
       - datalake_databricks_health.daily_cluster_health.is_pool_backed
+  is_job_on_interactive:
+    description: |
+      TRUE when the cluster's billing mix matches `fact_databricks_costs` interactive
+      bucket: any `ALL_PURPOSE` / `INTERACTIVE` DBU on the cluster, or `JOBS` DBU on a
+      `cluster_source IN ('UI', 'API')` cluster (the all-purpose leak). FALSE for
+      genuine orchestrated job clusters (`JOBS` billing on `JOB`-source clusters).
+      Filter `WHERE NOT is_job_on_interactive` to reconcile orchestrated DAG cost to
+      `dw_databricks_costs.fact_databricks_costs` `bucket='orchestrated_jobs'`.
+    lineage:
+      - system.billing.usage.billing_origin_product
+      - system.compute.clusters.cluster_source
+  dbu_negotiated_price_missing:
+    description: |
+      TRUE when at least one DBU usage row on the cluster had no matching negotiated
+      `dim_dbu_price` rate and fell back to the list rate for `total_dbu_cost_usd`.
+    lineage:
+      - datalake_databricks_pricing.dim_dbu_price.usd_per_dbu
   is_pool_acquisition_slow:
     description: True when `setup_duration_seconds > 90`. The 90s threshold is the O4 alerting line — sustained high values mean the underlying pool is undersized.
   is_sensitive_data:

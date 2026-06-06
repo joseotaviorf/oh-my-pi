@@ -3,43 +3,55 @@ database_name: datalake_databricks_health
 table_name: daily_cluster_health
 description: |
   Daily per-cluster health snapshot from Databricks system tables, augmented with
-  Overwatch-derived startup timing and cost from `datalake_databricks.daily_clusters`,
-  plus EC2 USD calculated from node_timeline hours and `overwatch.instancedetails`
-  pricing (all workspaces). One row per (id_cluster, dt_cluster_run).
+  Overwatch-derived startup timing from `datalake_databricks.daily_clusters`,
+  plus EC2 USD priced from the source-controlled standard-AWS seed
+  `datalake_databricks_pricing.dim_ec2_price`. One row per
+  (id_databricks_workspace, id_cluster, dt_cluster_run).
 
   P50/P95 CPU/memory/I-O wait + NVMe utilization derived from
   system.compute.node_timeline; cluster shape, DBR version, pool attachment and
-  tags from the latest snapshot of system.compute.clusters; init-script timing
-  and per-cluster DBU/EC2 cost (USD) from datalake_databricks.daily_clusters
-  (which materialises `INIT_SCRIPTS_STARTED` / `INIT_SCRIPTS_FINISHED` / `RUNNING`
-  state transitions from overwatch.clusterstatefact — signals not surfaced by
-  Databricks system tables).
+  tags from the latest snapshot of system.compute.clusters; init-script startup
+  timing from datalake_databricks.daily_clusters (which materialises
+  `INIT_SCRIPTS_STARTED` / `INIT_SCRIPTS_FINISHED` / `RUNNING` state transitions
+  from overwatch.clusterstatefact — signals not surfaced by Databricks system tables).
+  Dates before retained node_timeline coverage starts can carry estimated
+  EC2 from datalake_databricks_usage_clean.billable_usage.machine_hours; resource
+  utilization columns remain NULL for those billable-usage-only rows.
 
   Powers the cluster sizing and consolidation work tracked in
   bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md.
 domain: Data Ops & Governance
 owner: data-platform-team@quintoandar.com.br
 columns:
+  id_databricks_workspace:
+    description: Databricks workspace identifier for the cluster-day. Part of the table grain and required to avoid collisions for reused cluster ids across workspaces.
+    lineage:
+      - system.compute.node_timeline.workspace_id
+      - system.compute.clusters.workspace_id
+      - datalake_databricks_usage_clean.billable_usage.id_workspace
   id_cluster:
-    description: Databricks cluster id (system.compute.clusters.cluster_id).
+    description: Databricks cluster id. For billable-usage-only estimate rows, sourced from the legacy billable usage dump.
     lineage:
       - system.compute.clusters.cluster_id
+      - datalake_databricks_usage_clean.billable_usage.id_cluster
   dag_name:
     description: bietlejuice DAG identifier, extracted from the cluster `application` tag (e.g. `bietlejuice.enrich_ebdb_contract`).
     lineage:
       - system.compute.clusters.tags
   cluster_name:
-    description: Cluster name (typically `<dag_id>_<run_id>` for job clusters).
+    description: Cluster name (typically `<dag_id>_<run_id>` for job clusters). Falls back to billable_usage.cluster_name when no system.compute.clusters spec exists for estimate rows before retained node_timeline coverage.
     lineage:
       - system.compute.clusters.cluster_name
+      - datalake_databricks_usage_clean.billable_usage.cluster_name
   cluster_source:
     description: How the cluster was created — JOB, UI, API, etc.
     lineage:
       - system.compute.clusters.cluster_source
   driver_node_type:
-    description: Driver instance type (e.g. m5a.xlarge, r5d.2xlarge).
+    description: Driver instance type (e.g. m5a.xlarge, r5d.2xlarge). Falls back to billable_usage.cluster_node_type for legacy estimate rows without a system.compute.clusters spec.
     lineage:
       - system.compute.clusters.driver_node_type
+      - datalake_databricks_usage_clean.billable_usage.cluster_node_type
   worker_node_type:
     description: Worker instance type. Null for single-node clusters.
     lineage:
@@ -156,55 +168,69 @@ columns:
       etc.). Photon clusters require NVMe regardless of utilization.
   num_node_observations:
     description: Count of source `system.compute.node_timeline` rows aggregated into this row (sample-size sanity).
-  total_dbu_cost_overwatch_usd:
-    description: |
-      Total DBU cost in USD attributed to this cluster on `dt_cluster_run`, derived by
-      Overwatch from cluster state transitions and the active DBU price list. Independent
-      cross-check against `dw_databricks_health.fact_databricks_task_run.total_dbu_cost_usd`,
-      which derives cost from `system.billing.usage` × `system.billing.list_prices`.
-      Material disagreements (>10%) usually point to Overwatch-vs-Lakeflow attribution
-      drift on the underlying SKU.
-    lineage:
-      - datalake_databricks.daily_clusters.total_dbu_cost
-  total_ec2_cost_overwatch_usd:
-    description: |
-      Total EC2/instance compute cost in USD for driver + workers on `dt_cluster_run`,
-      from Overwatch. Useful for "true cost" views that include AWS infrastructure on top
-      of DBU charges; system tables only expose DBU SKUs, not the underlying EC2 pricing.
-    lineage:
-      - datalake_databricks.daily_clusters.total_ec2_cost
   total_ec2_cost_calculated_usd:
     description: |
-      EC2 USD for this cluster-day from `system.compute.node_timeline` node wall-clock
-      hours × `overwatch.instancedetails.On_Demand_Cost_Hourly` (API_Name = driver or
-      worker node type). Spot (`aws_attributes.availability` contains SPOT): hourly
-      rate multiplied by 0.37 vs on-demand. Note: if `aws_attributes.first_on_demand`
-      is > 0, the driver node is always priced as on-demand. Covers all workspaces
-      with node observations; NULL pricing rows contribute zero.
+      EC2 USD for this workspace/cluster-day. Uses `system.compute.node_timeline`
+      node wall-clock hours × `datalake_databricks_pricing.dim_ec2_price.usd_per_hour`
+      when timeline data exists. Before retained node_timeline coverage, falls back to
+      `billable_usage.machine_hours` estimates where available. Missing instance
+      prices contribute zero and are surfaced by `ec2_pricing_missing`.
     lineage:
       - system.compute.node_timeline.start_time
       - system.compute.node_timeline.end_time
+      - datalake_databricks_usage_clean.billable_usage.machine_hours
       - system.compute.clusters.driver_node_type
       - system.compute.clusters.worker_node_type
       - system.compute.clusters.aws_attributes
-      - overwatch.instancedetails.On_Demand_Cost_Hourly
-  spot_hours:
+      - datalake_databricks_pricing.dim_ec2_price.usd_per_hour
+  ec2_spot_hours:
     description: |
-      Sum of per-node hours on this cluster-day priced as Spot (driver + worker rows
-      where availability contains SPOT, excluding the driver if `first_on_demand` > 0).
-      Sub-hour precision from timeline timestamps.
+      EC2 Spot node wall-clock hours on this cluster-day (driver + worker rows where
+      availability contains SPOT, excluding the driver if `first_on_demand` > 0), priced
+      via `dim_ec2_price`. Not DBU usage quantity. Sub-hour precision from timeline timestamps.
     lineage:
       - system.compute.node_timeline.start_time
       - system.compute.node_timeline.end_time
       - system.compute.clusters.aws_attributes
-  on_demand_hours:
+  ec2_on_demand_hours:
     description: |
-      Sum of per-node hours on this cluster-day priced as on-demand (non-Spot or NULL
-      availability). Sub-hour precision from timeline timestamps.
+      EC2 on-demand node wall-clock hours on this cluster-day (non-Spot or NULL
+      availability), priced via `dim_ec2_price`. For billable_usage estimates,
+      all machine hours are classified as on-demand because the legacy source does
+      not reliably expose spot split. Not DBU usage quantity.
     lineage:
       - system.compute.node_timeline.start_time
       - system.compute.node_timeline.end_time
+      - datalake_databricks_usage_clean.billable_usage.machine_hours
       - system.compute.clusters.aws_attributes
+  ec2_source:
+    description: |
+      Source used for EC2 hours and cost: node_timeline,
+      billable_usage_estimate, or missing.
+    lineage:
+      - system.compute.node_timeline.cluster_id
+      - datalake_databricks_usage_clean.billable_usage.machine_hours
+  is_ec2_estimated:
+    description: True when EC2 cost comes from the billable_usage.machine_hours estimate before retained node_timeline coverage instead of node_timeline.
+    lineage:
+      - datalake_databricks_usage_clean.billable_usage.machine_hours
+  ec2_pricing_missing:
+    description: True when EC2 hours exist but no matching instance hourly rate was found in dim_ec2_price.
+    lineage:
+      - system.compute.node_timeline.start_time
+      - datalake_databricks_usage_clean.billable_usage.machine_hours
+      - datalake_databricks_pricing.dim_ec2_price.usd_per_hour
+  ec2_unpriced_hours:
+    description: EC2 node-hours priced at zero because no matching dim_ec2_price rate was found.
+    lineage:
+      - system.compute.node_timeline.start_time
+      - system.compute.node_timeline.end_time
+      - datalake_databricks_usage_clean.billable_usage.machine_hours
+      - datalake_databricks_pricing.dim_ec2_price.usd_per_hour
+  has_node_timeline_metrics:
+    description: True when this row has node_timeline observations and therefore real utilization metrics; false for billable-usage-only estimate rows.
+    lineage:
+      - system.compute.node_timeline.cluster_id
   is_photon:
     description: True when `dbr_version LIKE '%-photon-%'`. Photon DBR pricing differs from Standard.
   is_pool_backed:

@@ -30,14 +30,14 @@ dag:
           without re-reading the underlying fact)
         - Volume: total_dag_runs, total_job_runs, total_task_runs (DAG-run minute
           buckets vs Databricks job runs vs task runs)
-        - Cost: total_dbu_consumed, total_dbu_cost_usd (billing list),
-          total_ec2_cost_calculated_usd, spot_hours, on_demand_hours (deduped per cluster-day),
-          total_cost_usd (list DBU + deduped calculated EC2),
-          total_ec2_cost_overwatch_usd (legacy deduped Overwatch EC2),
+        - Cost: total_dbu_consumed, total_dbu_cost_usd (negotiated DBU rate,
+          dim_dbu_price with list fallback), total_ec2_cost_calculated_usd,
+          ec2_spot_hours, ec2_on_demand_hours (task/dag-attributed EC2 shares),
+          total_cost_usd (negotiated DBU + task/dag-attributed calculated EC2),
           avg_dbu_cost_usd_per_dag_run, avg_total_cost_usd_per_dag_run,
-          cost_efficiency_usd_per_executor_second,
-          legacy Overwatch totals total_dbu_cost_overwatch_usd,
-          total_cost_overwatch_usd
+          total_cost_usd_per_executor_second, plus EC2 source-quality flags for
+          estimated machine-hour backfills before retained node_timeline coverage
+          and missing EC2 prices
         - Latency: p50/p95/p99 total_duration_seconds, avg/p95
           setup_duration_seconds, p50/p95 init_script_seconds,
           total_init_minutes (cluster-day deduped — drives the
@@ -55,8 +55,10 @@ dag:
           metric_observability.dag_verdict view — DPLT-935 — NOT here.
         - DQ: pct_task_runs_with_stage_data (Spark event log coverage)
 
-      Reads exclusively from dw_databricks_health.fact_databricks_task_run
-      — no other upstream. Consumed by Superset (dashboards), the per-team
+      Reads exclusively from dw_databricks_health.fact_databricks_dag_run
+      — no other upstream. These metric costs are for per-DAG right-sizing and
+      trend analysis; use dw_databricks_costs.fact_databricks_costs for total
+      Platform Databricks cost tracking. Consumed by Superset (dashboards), the per-team
       rollup `metric_observability__teams.team_health` (DPLT-938), and the
       anomaly-detection table `dag_cost_anomalies_d` (DPLT-936).
 workflow:

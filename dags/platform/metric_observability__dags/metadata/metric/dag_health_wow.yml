@@ -12,6 +12,11 @@ description: |
   Use this table to see whether a cluster-spec or pipeline change from the last
   sprint moved cost, utilization, duration, or reliability relative to the week
   before.
+  Cost fields are task/dag-attributed operational estimates, not the company
+  Databricks cost authority. Use dw_databricks_costs.fact_databricks_costs for
+  total Platform cost tracking. EC2 source-quality flags show whether either
+  compared week includes billable_usage machine-hour estimates before retained
+  node_timeline coverage or missing EC2 prices.
 
 domain: Data Life Cycle
 owner: jose.rferreira@quintoandar.com.br
@@ -193,10 +198,10 @@ columns:
   total_dbu_cost_usd_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
-    description: Sum of `total_dbu_cost_usd` (system billing list USD) in the current window.
+    description: Sum of `total_dbu_cost_usd` (negotiated DBU USD) in the current window.
     metric:
       name: Total DBU Cost USD Current 7d
-      description: System-tables list USD cost in the trailing 7-day window.
+      description: Negotiated DBU USD cost in the trailing 7-day window.
       acronym: total_dbu_cost_usd_curr_7d
       is_additive: False
       business_stage: Platform Operations
@@ -208,17 +213,17 @@ columns:
     description: Sum of `total_dbu_cost_usd` in the previous window.
     metric:
       name: Total DBU Cost USD Previous 7d
-      description: System-tables list USD cost in the prior 7-day window.
+      description: Negotiated DBU USD (dim_dbu_price with list fallback) in the prior 7-day window.
       acronym: total_dbu_cost_usd_prev_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
   total_dbu_cost_usd_change_pct:
-    description: Percent change in total system-tables USD cost vs prior week.
+    description: Percent change in negotiated DBU USD vs prior week.
     metric:
       name: Total DBU Cost USD WoW Change Pct
-      description: Week-over-week percent change in total system-tables USD cost.
+      description: Week-over-week percent change in negotiated DBU USD.
       acronym: total_dbu_cost_usd_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
@@ -228,7 +233,7 @@ columns:
   total_ec2_cost_calculated_usd_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
-    description: Sum of calculated EC2 USD at logical DAG-run grain (rolled up from task apportionment).
+    description: Sum of task/dag-attributed calculated EC2 USD at logical DAG-run grain in the current window.
     metric:
       name: Total EC2 Cost Calculated USD Current 7d
       description: Calculated EC2 for the trailing 7-day window.
@@ -240,7 +245,7 @@ columns:
   total_ec2_cost_calculated_usd_previous_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
-    description: Sum of deduped calculated EC2 USD in the previous window.
+    description: Sum of task/dag-attributed calculated EC2 USD in the previous window.
     metric:
       name: Total EC2 Cost Calculated USD Previous 7d
       description: Calculated EC2 for the prior 7-day window.
@@ -250,7 +255,7 @@ columns:
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
   total_ec2_cost_calculated_usd_change_pct:
-    description: Week-over-week percent change in deduped calculated EC2 USD.
+    description: Week-over-week percent change in task/dag-attributed calculated EC2 USD.
     metric:
       name: Total EC2 Cost Calculated USD WoW Change Pct
       description: Relative change in calculated EC2 USD vs the prior week.
@@ -260,84 +265,104 @@ columns:
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
 
-  spot_hours_current_7d:
+  ec2_spot_hours_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.spot_hours
-    description: Sum of Spot instance-hours deduped per cluster-day in the current window.
+      - dw_databricks_health.fact_databricks_dag_run.ec2_spot_hours
+    description: Sum of task/dag-attributed EC2 Spot node wall-clock hours in the current window (not DBU).
     metric:
-      name: Spot Hours Current 7d
-      description: Spot-priced node-hours in the trailing 7-day window.
+      name: EC2 Spot Node Hours Current 7d
+      description: EC2 Spot node-hours priced via dim_ec2_price in the trailing 7-day window.
       acronym: spot_hrs_curr_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  spot_hours_previous_7d:
+  ec2_spot_hours_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.spot_hours
-    description: Sum of Spot instance-hours in the previous window.
+      - dw_databricks_health.fact_databricks_dag_run.ec2_spot_hours
+    description: Sum of EC2 Spot node wall-clock hours in the previous window (not DBU).
     metric:
-      name: Spot Hours Previous 7d
-      description: Spot-priced node-hours in the prior 7-day window.
+      name: EC2 Spot Node Hours Previous 7d
+      description: EC2 Spot node-hours priced via dim_ec2_price in the prior 7-day window.
       acronym: spot_hrs_prev_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  spot_hours_change_pct:
-    description: Week-over-week percent change in Spot instance-hours.
+  ec2_spot_hours_change_pct:
+    description: Week-over-week percent change in EC2 Spot node wall-clock hours.
     metric:
-      name: Spot Hours WoW Change Pct
-      description: Relative change in Spot node-hours vs the prior week.
+      name: EC2 Spot Node Hours WoW Change Pct
+      description: Relative change in EC2 Spot node-hours vs the prior week.
       acronym: spot_hrs_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
 
-  on_demand_hours_current_7d:
+  ec2_on_demand_hours_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.on_demand_hours
-    description: Sum of on-demand instance-hours deduped per cluster-day in the current window.
+      - dw_databricks_health.fact_databricks_dag_run.ec2_on_demand_hours
+    description: Sum of task/dag-attributed EC2 on-demand node wall-clock hours in the current window (not DBU).
     metric:
-      name: On Demand Hours Current 7d
-      description: On-demand node-hours in the trailing 7-day window.
+      name: EC2 On Demand Node Hours Current 7d
+      description: EC2 on-demand node-hours priced via dim_ec2_price in the trailing 7-day window.
       acronym: od_hrs_curr_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  on_demand_hours_previous_7d:
+  ec2_on_demand_hours_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.on_demand_hours
-    description: Sum of on-demand instance-hours in the previous window.
+      - dw_databricks_health.fact_databricks_dag_run.ec2_on_demand_hours
+    description: Sum of EC2 on-demand node wall-clock hours in the previous window (not DBU).
     metric:
-      name: On Demand Hours Previous 7d
-      description: On-demand node-hours in the prior 7-day window.
+      name: EC2 On Demand Node Hours Previous 7d
+      description: EC2 on-demand node-hours priced via dim_ec2_price in the prior 7-day window.
       acronym: od_hrs_prev_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  on_demand_hours_change_pct:
-    description: Week-over-week percent change in on-demand instance-hours.
+  ec2_on_demand_hours_change_pct:
+    description: Week-over-week percent change in EC2 on-demand node wall-clock hours.
     metric:
-      name: On Demand Hours WoW Change Pct
-      description: Relative change in on-demand node-hours vs the prior week.
+      name: EC2 On Demand Node Hours WoW Change Pct
+      description: Relative change in EC2 on-demand node-hours vs the prior week.
       acronym: od_hrs_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
+  has_ec2_estimate_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_ec2_estimated
+    description: True when any DAG-run in the current 7-day window used estimated EC2 from billable_usage machine-hours.
+    dimension: True
+  has_ec2_estimate_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_ec2_estimated
+    description: True when any DAG-run in the previous 7-day window used estimated EC2 from billable_usage machine-hours.
+    dimension: True
+  has_ec2_pricing_missing_current_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.ec2_pricing_missing
+    description: True when any DAG-run in the current 7-day window had EC2 hours with missing dim_ec2_price coverage.
+    dimension: True
+  has_ec2_pricing_missing_previous_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.ec2_pricing_missing
+    description: True when any DAG-run in the previous 7-day window had EC2 hours with missing dim_ec2_price coverage.
+    dimension: True
 
   total_cost_usd_current_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
       - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
-    description: SUM(system billing DBU USD) + SUM(deduped calculated EC2 USD per cluster-day).
+    description: SUM(system billing DBU USD) + SUM(task/dag-attributed calculated EC2 USD).
     metric:
       name: Total Cost USD Current 7d
-      description: DBU list USD plus calculated EC2 in the trailing 7-day window.
+      description: Negotiated DBU USD plus calculated EC2 in the trailing 7-day window.
       acronym: total_cost_curr_7d
       is_additive: False
       business_stage: Platform Operations
@@ -350,7 +375,7 @@ columns:
     description: Same total-cost definition for the prior 7-day window.
     metric:
       name: Total Cost USD Previous 7d
-      description: DBU list USD plus calculated EC2 in the prior 7-day window.
+      description: Negotiated DBU USD plus calculated EC2 in the prior 7-day window.
       acronym: total_cost_prev_7d
       is_additive: False
       business_stage: Platform Operations
@@ -374,7 +399,7 @@ columns:
     description: Mean `total_dbu_cost_usd` per logical DAG run (minute bucket) in the current window.
     metric:
       name: Avg DBU Cost USD per DAG Run Current 7d
-      description: Mean system-tables list USD per approximate DAG execution (total_dbu_cost_usd / total_dag_runs).
+      description: Mean negotiated DBU USD per approximate DAG execution (total_dbu_cost_usd / total_dag_runs).
       acronym: avg_dbu_cost_per_dag_run_curr_7d
       is_additive: False
       business_stage: Platform Operations
@@ -394,7 +419,7 @@ columns:
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
   avg_dbu_cost_usd_per_dag_run_change_pct:
-    description: Percent change in average DBU list USD per DAG run vs prior week.
+    description: Percent change in average negotiated DBU USD per DAG run vs prior week.
     metric:
       name: Avg DBU Cost USD per DAG Run WoW Change Pct
       description: Week-over-week percent change in mean list USD per DAG-run minute bucket.
@@ -435,145 +460,41 @@ columns:
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
 
-  cost_efficiency_usd_per_executor_second_current_7d:
+  total_cost_usd_per_executor_second_current_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_cost_usd
       - dw_databricks_health.fact_databricks_dag_run.total_executor_run_time_ms
     description: |
-      Sum(`total_dbu_cost_usd`) / (sum(`total_executor_run_time_ms`) / 1000) for the current window.
-      Same definition as `dag_health.cost_efficiency_usd_per_executor_second_*`.
+      Sum(`total_cost_usd`) / (sum(`total_executor_run_time_ms`) / 1000) for the current window.
+      Total cost = negotiated DBU USD + calculated EC2 USD. Same definition as
+      `dag_health.total_cost_usd_per_executor_second_*`.
     metric:
-      name: Cost Efficiency USD per Executor Second Current 7d
-      description: USD per executor-second in the trailing 7-day window (same as dag_health).
-      acronym: cost_eff_curr_7d
+      name: Total Cost USD per Executor Second Current 7d
+      description: Total cost (DBU + EC2) per executor-second in the trailing 7-day window.
+      acronym: total_cost_per_exec_sec_curr_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  cost_efficiency_usd_per_executor_second_previous_7d:
+  total_cost_usd_per_executor_second_previous_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
+      - dw_databricks_health.fact_databricks_dag_run.total_cost_usd
       - dw_databricks_health.fact_databricks_dag_run.total_executor_run_time_ms
-    description: Cost efficiency USD per executor-second for the previous window.
+    description: Total cost (DBU + EC2) USD per executor-second for the previous window.
     metric:
-      name: Cost Efficiency USD per Executor Second Previous 7d
-      description: USD per executor-second in the prior 7-day window.
-      acronym: cost_eff_prev_7d
+      name: Total Cost USD per Executor Second Previous 7d
+      description: Total cost (DBU + EC2) per executor-second in the prior 7-day window.
+      acronym: total_cost_per_exec_sec_prev_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  cost_efficiency_usd_per_executor_second_change_pct:
-    description: Relative percent change in cost efficiency vs prior week.
+  total_cost_usd_per_executor_second_change_pct:
+    description: Relative percent change in total cost (DBU + EC2) per executor-second vs prior week.
     metric:
-      name: Cost Efficiency WoW Change Pct
-      description: Week-over-week percent change in USD per executor-second.
-      acronym: cost_eff_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  total_ec2_cost_overwatch_usd_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_overwatch_usd
-    description: Sum of Overwatch EC2 USD rolled up to logical DAG-run grain (from task apportionment).
-    metric:
-      name: Total EC2 Cost Overwatch USD Current 7d
-      description: EC2 portion from Overwatch for the trailing 7-day window (legacy cross-check).
-      acronym: total_ec2_overwatch_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_ec2_cost_overwatch_usd_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_overwatch_usd
-    description: Sum of deduped Overwatch EC2 USD in the previous window.
-    metric:
-      name: Total EC2 Cost Overwatch USD Previous 7d
-      description: EC2 portion from Overwatch for the prior 7-day window.
-      acronym: total_ec2_overwatch_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_ec2_cost_overwatch_usd_change_pct:
-    description: Week-over-week percent change in deduped Overwatch EC2 USD.
-    metric:
-      name: Total EC2 Cost Overwatch USD WoW Change Pct
-      description: Relative change in Overwatch EC2 USD vs the prior week.
-      acronym: total_ec2_overwatch_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  total_dbu_cost_overwatch_usd_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_overwatch_usd
-    description: Legacy Overwatch DBU-only USD; summed once per cluster-day (deduped).
-    metric:
-      name: Total DBU Cost Overwatch USD Current 7d
-      description: Overwatch-reported DBU USD in the trailing 7-day window (legacy allocation).
-      acronym: total_dbu_overwatch_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_dbu_cost_overwatch_usd_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_overwatch_usd
-    description: Legacy Overwatch DBU-only USD; summed once per cluster-day (deduped).
-    metric:
-      name: Total DBU Cost Overwatch USD Previous 7d
-      description: Overwatch-reported DBU USD in the prior 7-day window.
-      acronym: total_dbu_overwatch_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_dbu_cost_overwatch_usd_change_pct:
-    description: Week-over-week percent change in legacy Overwatch DBU USD (deduped).
-    metric:
-      name: Total DBU Cost Overwatch USD WoW Change Pct
-      description: Relative change in Overwatch DBU-only USD vs the prior week.
-      acronym: total_dbu_overwatch_wow_chg_pct
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  total_cost_overwatch_usd_current_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_cost_overwatch_usd
-    description: Sum of legacy Overwatch total_cost_overwatch_usd (DBU + EC2 from Overwatch) deduped once per cluster-day.
-    metric:
-      name: Total Overwatch Cost USD Current 7d
-      description: Full legacy Overwatch cost in the trailing 7-day window.
-      acronym: total_overwatch_curr_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_cost_overwatch_usd_previous_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_cost_overwatch_usd
-    description: Sum of legacy Overwatch total_cost_overwatch_usd deduped once per cluster-day.
-    metric:
-      name: Total Overwatch Cost USD Previous 7d
-      description: Full legacy Overwatch cost in the prior 7-day window.
-      acronym: total_overwatch_prev_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_cost_overwatch_usd_change_pct:
-    description: Week-over-week percent change in legacy full Overwatch USD (deduped).
-    metric:
-      name: Total Overwatch Cost USD WoW Change Pct
-      description: Relative change in full Overwatch USD vs the prior week.
-      acronym: total_overwatch_wow_chg_pct
+      name: Total Cost USD per Executor Second WoW Change Pct
+      description: Week-over-week percent change in total cost per executor-second.
+      acronym: total_cost_per_exec_sec_wow_chg_pct
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost

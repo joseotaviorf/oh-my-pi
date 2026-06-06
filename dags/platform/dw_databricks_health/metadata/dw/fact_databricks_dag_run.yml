@@ -10,6 +10,10 @@ description: |
 
   Downstream metric-layer DAG `metric_observability__dags` consumes this table for
   `dag_health` and `dag_health_wow` (one logical run = one row here).
+  Cost fields are task/dag-attributed operational estimates; use
+  dw_databricks_costs.fact_databricks_costs for total Databricks cost tracking.
+  EC2 source/confidence columns indicate whether values before retained
+  node_timeline coverage came from billable_usage machine-hour estimates.
 
 domain: Data Ops & Governance
 owner: data-platform-team@quintoandar.com.br
@@ -56,6 +60,16 @@ columns:
     description: Governance tag — `FIRST` within the logical-run group.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.provisioner
+  driver_node_type:
+    description: Driver instance type of the DBU-dominant cluster in the logical bucket (`MAX_BY` on total_dbu_consumed).
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.driver_node_type
+      - dw_databricks_health.fact_databricks_task_run.total_dbu_consumed
+  worker_node_type:
+    description: Worker instance type of the DBU-dominant cluster in the logical bucket (`MAX_BY` on total_dbu_consumed). Null for single-node clusters.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.worker_node_type
+      - dw_databricks_health.fact_databricks_task_run.total_dbu_consumed
   n_databricks_job_runs:
     description: Distinct Databricks parent run ids (`COUNT(DISTINCT id_databricks_run)`) in this logical bucket.
     lineage:
@@ -72,40 +86,57 @@ columns:
     description: Count of task runs with Spark stage attribution (`has_stage_data`).
     lineage:
       - dw_databricks_health.fact_databricks_task_run.has_stage_data
+  worker_count:
+    description: Configured fixed worker count of the DBU-dominant cluster (`MAX_BY` on total_dbu_consumed). Null when that cluster autoscales.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.worker_count
+      - dw_databricks_health.fact_databricks_task_run.total_dbu_consumed
+  peak_concurrent_workers:
+    description: Maximum peak concurrent worker count observed across tasks in the bucket (`MAX`). Reflects realised worker usage, not configuration.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.peak_concurrent_workers
   total_dbu_consumed:
     description: Sum of task-level `total_dbu_consumed` in the logical bucket.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.total_dbu_consumed
   total_dbu_cost_usd:
-    description: Sum of task-level `total_dbu_cost_usd` (list-rate USD) in the logical bucket.
+    description: Sum of task-level `total_dbu_cost_usd` (negotiated DBU USD) in the logical bucket.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.total_dbu_cost_usd
+  total_dbu_list_cost_usd:
+    description: Sum of task-level `total_dbu_list_cost_usd` (list-rate USD audit) in the logical bucket.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.total_dbu_list_cost_usd
   total_ec2_cost_calculated_usd:
-    description: Sum of apportioned calculated EC2 USD for tasks in the logical bucket.
+    description: Sum of task-attributed calculated EC2 USD for tasks in the logical bucket. This is an operational attribution, not a full company cost total.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_calculated_usd
-  spot_hours:
-    description: Sum of apportioned Spot instance-hours across tasks in the bucket.
+  ec2_spot_hours:
+    description: Sum of task-attributed EC2 Spot node wall-clock hours across tasks in the bucket (not DBU).
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.spot_hours
-  on_demand_hours:
-    description: Sum of apportioned on-demand instance-hours across tasks in the bucket.
+      - dw_databricks_health.fact_databricks_task_run.ec2_spot_hours
+  ec2_on_demand_hours:
+    description: Sum of task-attributed EC2 on-demand node wall-clock hours across tasks in the bucket (not DBU).
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.on_demand_hours
-  total_ec2_cost_overwatch_usd:
-    description: Sum of apportioned Overwatch EC2 USD across tasks in the bucket.
+      - dw_databricks_health.fact_databricks_task_run.ec2_on_demand_hours
+  ec2_source:
+    description: Source of EC2 hours and cost for this DAG-run bucket, rolled up from task runs with retained node_timeline coverage preferred over billable_usage_estimate, then missing, then not_applicable.
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_ec2_cost_overwatch_usd
-  total_dbu_cost_overwatch_usd:
-    description: Sum of apportioned Overwatch DBU USD across tasks in the bucket.
+      - dw_databricks_health.fact_databricks_task_run.ec2_source
+  is_ec2_estimated:
+    description: True when any task-attributed EC2 in the DAG-run bucket came from billable_usage.machine_hours estimates before retained node_timeline coverage.
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_dbu_cost_overwatch_usd
-  total_cost_overwatch_usd:
-    description: Sum of apportioned Overwatch total USD across tasks in the bucket.
+      - dw_databricks_health.fact_databricks_task_run.is_ec2_estimated
+  ec2_pricing_missing:
+    description: True when any task-attributed EC2 in the DAG-run bucket had missing dim_ec2_price coverage and was priced at zero.
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.total_cost_overwatch_usd
+      - dw_databricks_health.fact_databricks_task_run.ec2_pricing_missing
+  ec2_unpriced_hours:
+    description: Sum of task-attributed EC2 node-hours priced at zero because no matching dim_ec2_price hourly rate was found.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.ec2_unpriced_hours
   total_cost_usd:
-    description: Sum of task-level `total_cost_usd` (DBU list USD + apportioned calculated EC2) in the bucket.
+    description: Sum of task-level `total_cost_usd` (negotiated DBU USD + task-attributed calculated EC2) in the bucket.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.total_cost_usd
   total_wall_clock_seconds:
@@ -162,6 +193,18 @@ columns:
     description: True if any task in the bucket succeeded.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.is_success
+  is_job_on_interactive:
+    description: |
+      TRUE when any task in the bucket matches the interactive billing slice
+      (`ALL_PURPOSE` / `INTERACTIVE` DBU on the cluster, or `JOBS` on a UI/API cluster).
+      BOOL_OR rollup of `fact_databricks_task_run.is_job_on_interactive`. Filter
+      `NOT is_job_on_interactive` for the orchestrated slice.
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.is_job_on_interactive
+  dbu_negotiated_price_missing:
+    description: TRUE when any task in the bucket fell back to the list DBU rate (no matching negotiated dim_dbu_price row).
+    lineage:
+      - dw_databricks_health.fact_databricks_task_run.dbu_negotiated_price_missing
   n_pool_acquisition_slow_tasks:
     description: Count of tasks flagged `is_pool_acquisition_slow` in the bucket.
     lineage:
@@ -206,10 +249,10 @@ columns:
     description: Sum of shuffle bytes written across tasks in the bucket.
     lineage:
       - dw_databricks_health.fact_databricks_task_run.total_shuffle_bytes_written
-  pricing_sku:
-    description: Dominant SKU label — `FIRST` within the logical-run group.
+  dbu_pricing_sku:
+    description: Dominant DBU billing SKU label — `FIRST` within the logical-run group.
     lineage:
-      - dw_databricks_health.fact_databricks_task_run.pricing_sku
+      - dw_databricks_health.fact_databricks_task_run.dbu_pricing_sku
   dbu_rate_usd:
     description: Dominant list USD-per-DBU — `FIRST` within the logical-run group.
     lineage:

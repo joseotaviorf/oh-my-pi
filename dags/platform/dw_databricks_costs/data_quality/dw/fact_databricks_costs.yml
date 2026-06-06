@@ -46,6 +46,54 @@ column_level_validations:
         - SQL
         - OTHER
       severity_level: Error
+  pricing_category:
+    is_complete:
+      severity_level: Warning
+  ec2_source:
+    is_complete:
+      severity_level: Warning
+    is_contained_in:
+      values:
+        - node_timeline
+        - billable_usage_estimate
+        - missing
+        - not_applicable
+      severity_level: Warning
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_databricks_costs.fact_databricks_costs AS fact
+         LEFT JOIN (
+             SELECT
+                 CAST(workspace_id AS BIGINT) AS id_databricks_workspace,
+                 MIN(DATE(start_time))        AS dt_node_timeline_first_available
+             FROM system.compute.node_timeline
+             GROUP BY CAST(workspace_id AS BIGINT)
+         ) AS coverage
+           ON fact.id_databricks_workspace = coverage.id_databricks_workspace
+         WHERE fact.id_cluster IS NOT NULL
+           AND fact.ec2_source = 'missing'
+           AND fact.dt_usage >= coverage.dt_node_timeline_first_available
+           AND fact.dt_usage <= DATE_SUB(CURRENT_DATE(), 2)
+        ) = 0
+      severity_level: Warning
+  ec2_pricing_missing:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM dw_databricks_costs.fact_databricks_costs
+         WHERE ec2_source = 'node_timeline'
+           AND ec2_pricing_missing = TRUE
+        ) = 0
+      severity_level: Warning
+  ec2_unpriced_hours:
+    custom:
+      constraint: |-
+        (SELECT COALESCE(SUM(ec2_unpriced_hours), 0)
+         FROM dw_databricks_costs.fact_databricks_costs
+         WHERE ec2_source = 'node_timeline'
+        ) = 0
+      severity_level: Warning
   dbu:
     # Net DBU is >= 0 in practice; a net-negative group would only arise from a
     # RETRACTION exceeding its ORIGINAL in the window. Warning (not Error) so the
@@ -53,15 +101,6 @@ column_level_validations:
     has_min_value:
       greater_than_or_equal_to: 0
       severity_level: Warning
-  total_cost_usd:
-    # Billing-spine reconciliation over the fact's [MIN(dt_usage),
-    # MAX(dt_usage)] range: for every (workspace, day, billing_origin_product)
-    # in that range, the fact net DBU must equal system.billing.usage net DBU
-    # for the same key (|delta| <= 1.0 DBU to absorb 4-dp rounding). The FULL
-    # OUTER JOIN flags any mismatch — including an interior billing day wholly
-    # missing from the fact (which the prior "day present in the fact" filter
-    # silently passed). True by construction; guards against logic regressions,
-    # dropped days, and late corrections drifting the totals.
     custom:
       constraint: |-
         (SELECT COUNT(*)
@@ -72,6 +111,56 @@ column_level_validations:
                  billing_origin_product,
                  SUM(dbu) AS fact_dbu
              FROM dw_databricks_costs.fact_databricks_costs
+             WHERE dt_usage > DATE_SUB((SELECT MAX(dt_usage) FROM dw_databricks_costs.fact_databricks_costs), 2)
+             GROUP BY id_databricks_workspace, dt_usage, billing_origin_product
+         ) f
+         FULL OUTER JOIN (
+             SELECT
+                 workspace_id,
+                 DATE(usage_date) AS dt_usage,
+                 billing_origin_product,
+                 SUM(usage_quantity) AS bill_dbu
+             FROM system.billing.usage
+             WHERE usage_unit = 'DBU'
+               AND workspace_id IN (4531937035440038, 6170817193817, 4033397625841925)
+               AND DATE(usage_date) BETWEEN DATE_SUB((SELECT MAX(dt_usage) FROM dw_databricks_costs.fact_databricks_costs), 1)
+                                        AND (SELECT MAX(dt_usage) FROM dw_databricks_costs.fact_databricks_costs)
+             GROUP BY workspace_id, DATE(usage_date), billing_origin_product
+             HAVING SUM(usage_quantity) <> 0
+         ) b
+           ON  f.workspace_id           = b.workspace_id
+           AND f.dt_usage               = b.dt_usage
+           AND f.billing_origin_product = b.billing_origin_product
+         WHERE ABS(COALESCE(f.fact_dbu, 0) - COALESCE(b.bill_dbu, 0)) > 1.0
+        ) = 0
+      severity_level: Warning
+  negotiated_usd_per_dbu:
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_databricks_pricing.dim_dbu_price
+         WHERE is_current = TRUE
+           AND dt_valid_to IS NULL
+           AND CURRENT_DATE() > DATE('2026-09-01')
+        ) = 0
+      severity_level: Warning
+  total_cost_usd:
+    # Strict billing-spine reconciliation only for settled dates: every
+    # (workspace, day, billing_origin_product) through max fact date - 2 days must
+    # match system.billing.usage net DBU for the same key (|delta| <= 1.0 DBU).
+    # The freshest two fact days are warning-only under `dbu` because Databricks
+    # billing corrections can land after the daily load.
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM (
+             SELECT
+                 id_databricks_workspace AS workspace_id,
+                 dt_usage,
+                 billing_origin_product,
+                 SUM(dbu) AS fact_dbu
+             FROM dw_databricks_costs.fact_databricks_costs
+             WHERE dt_usage <= DATE_SUB((SELECT MAX(dt_usage) FROM dw_databricks_costs.fact_databricks_costs), 2)
              GROUP BY id_databricks_workspace, dt_usage, billing_origin_product
          ) f
          FULL OUTER JOIN (
@@ -84,7 +173,7 @@ column_level_validations:
              WHERE usage_unit = 'DBU'
                AND workspace_id IN (4531937035440038, 6170817193817, 4033397625841925)
               AND DATE(usage_date) BETWEEN (SELECT MIN(dt_usage) FROM dw_databricks_costs.fact_databricks_costs)
-                                       AND (SELECT MAX(dt_usage) FROM dw_databricks_costs.fact_databricks_costs)
+                                       AND DATE_SUB((SELECT MAX(dt_usage) FROM dw_databricks_costs.fact_databricks_costs), 2)
              GROUP BY workspace_id, DATE(usage_date), billing_origin_product
              HAVING SUM(usage_quantity) <> 0
          ) b
@@ -94,6 +183,18 @@ column_level_validations:
          WHERE ABS(COALESCE(f.fact_dbu, 0) - COALESCE(b.bill_dbu, 0)) > 1.0
         ) = 0
       severity_level: Error
+  price_missing:
+    custom:
+      constraint: |-
+        (SELECT COALESCE(
+                    SUM(CASE WHEN price_missing = TRUE THEN dbu ELSE 0 END)
+                    / NULLIF(SUM(dbu), 0),
+                    0
+                )
+         FROM dw_databricks_costs.fact_databricks_costs
+         WHERE dt_usage >= TO_DATE(CONCAT(YEAR(CURRENT_DATE()), '-01-01'))
+        ) <= 0.05
+      severity_level: Warning
   ts_load:
     is_complete:
       severity_level: Warning

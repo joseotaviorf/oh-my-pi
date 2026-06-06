@@ -22,7 +22,7 @@ description: |
 
   Powers the Phase 4 cluster-cost-observability dashboard:
     - Governance dimensions (team_owner, cost_center, ecosystem, environment, provisioner)
-    - Cost (DBU list USD, calculated EC2 USD, total USD, legacy Overwatch cross-checks), per window
+    - Cost (negotiated DBU USD, task/dag-attributed calculated EC2 USD, total USD), per window
     - Latency (avg/p50/p95/p99 total duration, setup duration), both windows
     - Reliability (error rate, cold start rate), both windows
     - Cluster utilization (driver/worker CPU + memory + local disk utilization), both windows
@@ -44,6 +44,11 @@ description: |
 
   Inherits the cost-attribution caveat from the underlying fact for shared
   interactive clusters; for job clusters (the bietlejuice default) cost is 1:1.
+  This table is for per-DAG trend and right-sizing analysis. Do not sum it as
+  the company Databricks cost total; use dw_databricks_costs.fact_databricks_costs
+  for total Platform cost tracking. EC2 windows before retained node_timeline
+  coverage may include billable_usage machine-hour estimates; use
+  has_ec2_estimate_* flags to surface this source-quality caveat in dashboards.
 
   See bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md
   Phase 1.5 PR 8 for the full design.
@@ -207,10 +212,10 @@ columns:
   total_dbu_cost_usd_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
-    description: Sum of system-billing list DBU USD (`total_dbu_cost_usd` rolled up to logical DAG runs) in the 7-day window.
+    description: Sum of negotiated DBU USD (`total_dbu_cost_usd` rolled up to logical DAG runs) in the 7-day window.
     metric:
       name: Total DBU Cost USD (7d)
-      description: Total estimated USD from Databricks list DBU price for this DAG over the trailing 7-day window.
+      description: Total estimated USD from the negotiated DBU rate for this DAG over the trailing 7-day window.
       acronym: total_dbu_cost_usd_7d
       is_additive: False
       business_stage: Platform Operations
@@ -219,10 +224,10 @@ columns:
   total_dbu_cost_usd_28d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
-    description: Sum of system-billing list DBU USD in the 28-day window.
+    description: Sum of negotiated DBU USD in the 28-day window.
     metric:
       name: Total DBU Cost USD (28d)
-      description: Total estimated USD from Databricks list DBU price for this DAG over the trailing 28-day window.
+      description: Total estimated USD from the negotiated DBU rate for this DAG over the trailing 28-day window.
       acronym: total_dbu_cost_usd_28d
       is_additive: False
       business_stage: Platform Operations
@@ -232,7 +237,7 @@ columns:
     description: Average system DBU USD per approximate DAG execution (total_dbu_cost_usd_7d / total_dag_runs_7d).
     metric:
       name: Avg DBU Cost USD per DAG Run (7d)
-      description: Mean list DBU USD per distinct DAG-run minute bucket over the trailing 7-day window.
+      description: Mean negotiated DBU USD per distinct DAG-run minute bucket over the trailing 7-day window.
       acronym: avg_dbu_cost_per_dag_run_7d
       is_additive: False
       business_stage: Platform Operations
@@ -242,7 +247,7 @@ columns:
     description: Average system DBU USD per approximate DAG execution (total_dbu_cost_usd_28d / total_dag_runs_28d).
     metric:
       name: Avg DBU Cost USD per DAG Run (28d)
-      description: Mean list DBU USD per distinct DAG-run minute bucket over the trailing 28-day window.
+      description: Mean negotiated DBU USD per distinct DAG-run minute bucket over the trailing 28-day window.
       acronym: avg_dbu_cost_per_dag_run_28d
       is_additive: False
       business_stage: Platform Operations
@@ -252,10 +257,10 @@ columns:
   total_ec2_cost_calculated_usd_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
-    description: Sum of calculated EC2 USD at logical DAG-run grain (rolled up from task apportionment).
+    description: Sum of task/dag-attributed calculated EC2 USD at logical DAG-run grain.
     metric:
       name: Total EC2 Cost Calculated USD (7d)
-      description: EC2 from node_timeline × instancedetails pricing for the trailing 7-day window.
+      description: Task/dag-attributed EC2 from daily_cluster_health for the trailing 7-day window; may include billable_usage estimates before retained node_timeline coverage.
       acronym: total_ec2_calc_usd_7d
       is_additive: False
       business_stage: Platform Operations
@@ -264,71 +269,91 @@ columns:
   total_ec2_cost_calculated_usd_28d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
-    description: Sum of calculated EC2 USD at logical DAG-run grain over the 28-day window.
+    description: Sum of task/dag-attributed calculated EC2 USD at logical DAG-run grain over the 28-day window.
     metric:
       name: Total EC2 Cost Calculated USD (28d)
-      description: EC2 from node_timeline × instancedetails pricing for the trailing 28-day window.
+      description: Task/dag-attributed EC2 from daily_cluster_health for the trailing 28-day window; may include billable_usage estimates before retained node_timeline coverage.
       acronym: total_ec2_calc_usd_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  spot_hours_7d:
+  ec2_spot_hours_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.spot_hours
-    description: Sum of Spot-priced instance-hours deduped once per cluster-day.
+      - dw_databricks_health.fact_databricks_dag_run.ec2_spot_hours
+    description: Sum of task/dag-attributed EC2 Spot node wall-clock hours in the 7-day window (not DBU).
     metric:
-      name: Spot Instance Hours (7d)
-      description: Trailing 7-day sum of node-hours billed at Spot rate (0.37 × on-demand).
+      name: EC2 Spot Node Hours (7d)
+      description: Trailing 7-day sum of EC2 node-hours priced at Spot via dim_ec2_price (0.37 × on-demand).
       acronym: spot_hrs_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  spot_hours_28d:
+  ec2_spot_hours_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.spot_hours
-    description: Sum of Spot-priced instance-hours deduped per cluster-day.
+      - dw_databricks_health.fact_databricks_dag_run.ec2_spot_hours
+    description: Sum of task/dag-attributed EC2 Spot node wall-clock hours in the 28-day window (not DBU).
     metric:
-      name: Spot Instance Hours (28d)
-      description: Trailing 28-day sum of node-hours billed at Spot rate.
+      name: EC2 Spot Node Hours (28d)
+      description: Trailing 28-day sum of EC2 node-hours priced at Spot via dim_ec2_price.
       acronym: spot_hrs_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  on_demand_hours_7d:
+  ec2_on_demand_hours_7d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.on_demand_hours
-    description: Sum of on-demand instance-hours deduped once per cluster-day.
+      - dw_databricks_health.fact_databricks_dag_run.ec2_on_demand_hours
+    description: Sum of task/dag-attributed EC2 on-demand node wall-clock hours in the 7-day window (not DBU).
     metric:
-      name: On Demand Instance Hours (7d)
-      description: Trailing 7-day sum of node-hours billed at on-demand list rate.
+      name: EC2 On Demand Node Hours (7d)
+      description: Trailing 7-day sum of EC2 node-hours priced on-demand via dim_ec2_price.
       acronym: od_hrs_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
-  on_demand_hours_28d:
+  ec2_on_demand_hours_28d:
     lineage:
-      - dw_databricks_health.fact_databricks_dag_run.on_demand_hours
-    description: Sum of on-demand instance-hours deduped per cluster-day.
+      - dw_databricks_health.fact_databricks_dag_run.ec2_on_demand_hours
+    description: Sum of task/dag-attributed EC2 on-demand node wall-clock hours in the 28-day window (not DBU).
     metric:
-      name: On Demand Instance Hours (28d)
-      description: Trailing 28-day sum of node-hours billed at on-demand list rate.
+      name: EC2 On Demand Node Hours (28d)
+      description: Trailing 28-day sum of EC2 node-hours priced on-demand via dim_ec2_price.
       acronym: od_hrs_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
       approved_by: jose.rferreira@quintoandar.com.br
+  has_ec2_estimate_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_ec2_estimated
+    description: True when any DAG-run in the 7-day window used estimated EC2 from billable_usage machine-hours.
+    dimension: True
+  has_ec2_estimate_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.is_ec2_estimated
+    description: True when any DAG-run in the 28-day window used estimated EC2 from billable_usage machine-hours.
+    dimension: True
+  has_ec2_pricing_missing_7d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.ec2_pricing_missing
+    description: True when any DAG-run in the 7-day window had EC2 hours with missing dim_ec2_price coverage.
+    dimension: True
+  has_ec2_pricing_missing_28d:
+    lineage:
+      - dw_databricks_health.fact_databricks_dag_run.ec2_pricing_missing
+    description: True when any DAG-run in the 28-day window had EC2 hours with missing dim_ec2_price coverage.
+    dimension: True
   total_cost_usd_7d:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
       - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
-    description: SUM(system billing DBU USD) + SUM(deduped calculated EC2 USD per cluster-day).
+    description: SUM(system billing DBU USD) + SUM(task/dag-attributed calculated EC2 USD).
     metric:
       name: Total Cost USD (7d)
-      description: List DBU USD plus calculated EC2 for the trailing 7-day window.
+      description: Negotiated DBU USD plus calculated EC2 for the trailing 7-day window.
       acronym: total_cost_usd_7d
       is_additive: False
       business_stage: Platform Operations
@@ -338,10 +363,10 @@ columns:
     lineage:
       - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_usd
       - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_calculated_usd
-    description: SUM(system billing DBU USD) + SUM(deduped calculated EC2 USD per cluster-day).
+    description: SUM(system billing DBU USD) + SUM(task/dag-attributed calculated EC2 USD).
     metric:
       name: Total Cost USD (28d)
-      description: List DBU USD plus calculated EC2 for the trailing 28-day window.
+      description: Negotiated DBU USD plus calculated EC2 for the trailing 28-day window.
       acronym: total_cost_usd_28d
       is_additive: False
       business_stage: Platform Operations
@@ -363,79 +388,6 @@ columns:
       name: Avg Total Cost USD per DAG Run (28d)
       description: Mean total USD per approximate DAG execution over the trailing 28-day window.
       acronym: avg_total_cost_per_dag_run_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-
-  total_ec2_cost_overwatch_usd_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_overwatch_usd
-    description: Sum of Overwatch EC2 USD at logical DAG-run grain (rolled up from task apportionment).
-    metric:
-      name: Total EC2 Cost Overwatch USD (7d)
-      description: EC2 portion from Overwatch daily_cluster_health for the trailing 7-day window.
-      acronym: total_ec2_overwatch_usd_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_ec2_cost_overwatch_usd_28d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_ec2_cost_overwatch_usd
-    description: Sum of Overwatch EC2 USD at logical DAG-run grain over the 28-day window.
-    metric:
-      name: Total EC2 Cost Overwatch USD (28d)
-      description: EC2 portion from Overwatch for the trailing 28-day window.
-      acronym: total_ec2_overwatch_usd_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_dbu_cost_overwatch_usd_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_overwatch_usd
-    description: Legacy Overwatch DBU-only USD; summed once per cluster-day (deduped).
-    metric:
-      name: Total DBU Cost Overwatch USD (7d)
-      description: Overwatch-reported DBU USD portion for the trailing 7-day window (legacy allocation).
-      acronym: total_dbu_overwatch_usd_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_dbu_cost_overwatch_usd_28d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_dbu_cost_overwatch_usd
-    description: Legacy Overwatch DBU-only USD; summed once per cluster-day (deduped).
-    metric:
-      name: Total DBU Cost Overwatch USD (28d)
-      description: Overwatch-reported DBU USD portion for the trailing 28-day window (legacy allocation).
-      acronym: total_dbu_overwatch_usd_28d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_cost_overwatch_usd_7d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_cost_overwatch_usd
-    description: Sum of legacy Overwatch total_cost_overwatch_usd (DBU + EC2 from Overwatch) deduped once per cluster-day.
-    metric:
-      name: Total Overwatch Cost USD (7d)
-      description: Full Overwatch cost (DBU + EC2) for this DAG over the trailing 7-day window.
-      acronym: total_overwatch_usd_7d
-      is_additive: False
-      business_stage: Platform Operations
-      hierarchy: Cost
-      approved_by: jose.rferreira@quintoandar.com.br
-  total_cost_overwatch_usd_28d:
-    lineage:
-      - dw_databricks_health.fact_databricks_dag_run.total_cost_overwatch_usd
-    description: Sum of legacy Overwatch total_cost_overwatch_usd deduped once per cluster-day.
-    metric:
-      name: Total Overwatch Cost USD (28d)
-      description: Full Overwatch cost (DBU + EC2) for this DAG over the trailing 28-day window.
-      acronym: total_overwatch_usd_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Cost
@@ -1315,31 +1267,30 @@ columns:
       business_stage: Platform Operations
       hierarchy: Right-Sizing Ratios
       approved_by: jose.rferreira@quintoandar.com.br
-  cost_efficiency_usd_per_executor_second_7d:
+  total_cost_usd_per_executor_second_7d:
     description: |
-      `total_dbu_cost_usd_7d / (sum(total_executor_run_time_ms_7d) / 1000)`. USD spent
-      per second of useful executor compute over the 7-day window. Lower ⇒ better
-      bang-for-the-buck. Captures both cluster-shape efficiency AND scheduling
-      (cold starts and retries inflate cost without inflating executor time).
+      `total_cost_usd_7d / (sum(total_executor_run_time_ms_7d) / 1000)`. Total cost
+      (negotiated DBU USD + calculated EC2 USD) per second of useful executor compute
+      over the 7-day window. Lower ⇒ better bang-for-the-buck.
       NULL when stage data is unavailable / ambiguous.
     metric:
-      name: Cost Efficiency (USD per executor-second, 7d)
-      description: Total USD cost over the 7-day window divided by total executor wall-clock seconds.
-      acronym: cost_per_exec_sec_7d
+      name: Total Cost USD per Executor Second (7d)
+      description: Total cost (DBU + EC2) over the 7-day window divided by total executor wall-clock seconds.
+      acronym: total_cost_per_exec_sec_7d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Right-Sizing Ratios
       approved_by: jose.rferreira@quintoandar.com.br
-  cost_efficiency_usd_per_executor_second_28d:
+  total_cost_usd_per_executor_second_28d:
     description: |
-      `total_dbu_cost_usd_28d / (sum(total_executor_run_time_ms_28d) / 1000)`. USD
-      spent per second of useful executor compute over the 28-day window. Lower
-      ⇒ better bang-for-the-buck. Captures both cluster-shape efficiency AND
-      scheduling overhead. NULL when stage data is unavailable / ambiguous.
+      `total_cost_usd_28d / (sum(total_executor_run_time_ms_28d) / 1000)`. Total cost
+      (negotiated DBU USD + calculated EC2 USD) per second of useful executor compute
+      over the 28-day window. Lower ⇒ better bang-for-the-buck.
+      NULL when stage data is unavailable / ambiguous.
     metric:
-      name: Cost Efficiency (USD per executor-second, 28d)
-      description: Total USD cost over the 28-day window divided by total executor wall-clock seconds.
-      acronym: cost_per_exec_sec_28d
+      name: Total Cost USD per Executor Second (28d)
+      description: Total cost (DBU + EC2) over the 28-day window divided by total executor wall-clock seconds.
+      acronym: total_cost_per_exec_sec_28d
       is_additive: False
       business_stage: Platform Operations
       hierarchy: Right-Sizing Ratios

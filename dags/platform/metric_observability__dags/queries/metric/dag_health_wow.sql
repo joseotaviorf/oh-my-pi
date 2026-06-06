@@ -12,7 +12,7 @@
 --   current_7d:    load_start_date - 6 days through load_start_date
 --
 -- change_pct: ROUND((current - previous) / NULLIF(previous, 0) * 100, 2).
--- `total_cost_usd` sums logical-run totals (DBU USD list + apportioned calculated EC2).
+-- `total_cost_usd` sums logical-run totals (negotiated DBU USD + apportioned calculated EC2).
 --
 -- P95 utilisation metrics: weighted by execution_duration_seconds so that heavier runs
 -- contribute proportionally. Runs with NULL utilisation are excluded from both
@@ -35,12 +35,11 @@ WITH window_runs AS (
         total_dbu_consumed,
         total_dbu_cost_usd,
         total_ec2_cost_calculated_usd,
-        spot_hours,
-        on_demand_hours,
+        ec2_spot_hours,
+        ec2_on_demand_hours,
+        is_ec2_estimated,
+        ec2_pricing_missing,
         total_cost_usd,
-        total_ec2_cost_overwatch_usd,
-        total_dbu_cost_overwatch_usd,
-        total_cost_overwatch_usd,
         total_wall_clock_seconds                           AS total_duration_seconds,
         total_execution_duration_seconds                   AS execution_duration_seconds,
         total_executor_run_time_ms,
@@ -198,42 +197,46 @@ SELECT
     )                                                                                      AS total_ec2_cost_calculated_usd_change_pct,
 
     ROUND(
-        SUM(spot_hours)
+        SUM(ec2_spot_hours)
             FILTER (WHERE in_current_7d),
         4
-    )                                                                                      AS spot_hours_current_7d,
+    )                                                                                      AS ec2_spot_hours_current_7d,
     ROUND(
-        SUM(spot_hours)
+        SUM(ec2_spot_hours)
             FILTER (WHERE in_previous_7d),
         4
-    )                                                                                      AS spot_hours_previous_7d,
+    )                                                                                      AS ec2_spot_hours_previous_7d,
     ROUND(
         (
-            SUM(spot_hours) FILTER (WHERE in_current_7d)
-            - SUM(spot_hours) FILTER (WHERE in_previous_7d)
+            SUM(ec2_spot_hours) FILTER (WHERE in_current_7d)
+            - SUM(ec2_spot_hours) FILTER (WHERE in_previous_7d)
         ) * 100.0
-            / NULLIF(SUM(spot_hours) FILTER (WHERE in_previous_7d), 0),
+            / NULLIF(SUM(ec2_spot_hours) FILTER (WHERE in_previous_7d), 0),
         2
-    )                                                                                      AS spot_hours_change_pct,
+    )                                                                                      AS ec2_spot_hours_change_pct,
 
     ROUND(
-        SUM(on_demand_hours)
+        SUM(ec2_on_demand_hours)
             FILTER (WHERE in_current_7d),
         4
-    )                                                                                      AS on_demand_hours_current_7d,
+    )                                                                                      AS ec2_on_demand_hours_current_7d,
     ROUND(
-        SUM(on_demand_hours)
+        SUM(ec2_on_demand_hours)
             FILTER (WHERE in_previous_7d),
         4
-    )                                                                                      AS on_demand_hours_previous_7d,
+    )                                                                                      AS ec2_on_demand_hours_previous_7d,
     ROUND(
         (
-            SUM(on_demand_hours) FILTER (WHERE in_current_7d)
-            - SUM(on_demand_hours) FILTER (WHERE in_previous_7d)
+            SUM(ec2_on_demand_hours) FILTER (WHERE in_current_7d)
+            - SUM(ec2_on_demand_hours) FILTER (WHERE in_previous_7d)
         ) * 100.0
-            / NULLIF(SUM(on_demand_hours) FILTER (WHERE in_previous_7d), 0),
+            / NULLIF(SUM(ec2_on_demand_hours) FILTER (WHERE in_previous_7d), 0),
         2
-    )                                                                                      AS on_demand_hours_change_pct,
+    )                                                                                      AS ec2_on_demand_hours_change_pct,
+    BOOL_OR(is_ec2_estimated) FILTER (WHERE in_current_7d)                                 AS has_ec2_estimate_current_7d,
+    BOOL_OR(is_ec2_estimated) FILTER (WHERE in_previous_7d)                                AS has_ec2_estimate_previous_7d,
+    BOOL_OR(ec2_pricing_missing) FILTER (WHERE in_current_7d)                              AS has_ec2_pricing_missing_current_7d,
+    BOOL_OR(ec2_pricing_missing) FILTER (WHERE in_previous_7d)                             AS has_ec2_pricing_missing_previous_7d,
 
     ROUND(SUM(total_cost_usd) FILTER (WHERE in_current_7d), 4)                             AS total_cost_usd_current_7d,
     ROUND(SUM(total_cost_usd) FILTER (WHERE in_previous_7d), 4)                             AS total_cost_usd_previous_7d,
@@ -297,86 +300,29 @@ SELECT
     )                                                                                      AS avg_total_cost_usd_per_dag_run_change_pct,
 
     ROUND(
-        SUM(total_dbu_cost_usd) FILTER (WHERE in_current_7d)
+        SUM(total_cost_usd) FILTER (WHERE in_current_7d)
             / NULLIF(CAST(SUM(total_executor_run_time_ms) FILTER (WHERE in_current_7d) AS DOUBLE) / 1000.0, 0),
         6
-    )                                                                                      AS cost_efficiency_usd_per_executor_second_current_7d,
+    )                                                                                      AS total_cost_usd_per_executor_second_current_7d,
     ROUND(
-        SUM(total_dbu_cost_usd) FILTER (WHERE in_previous_7d)
+        SUM(total_cost_usd) FILTER (WHERE in_previous_7d)
             / NULLIF(CAST(SUM(total_executor_run_time_ms) FILTER (WHERE in_previous_7d) AS DOUBLE) / 1000.0, 0),
         6
-    )                                                                                      AS cost_efficiency_usd_per_executor_second_previous_7d,
+    )                                                                                      AS total_cost_usd_per_executor_second_previous_7d,
     ROUND(
         (
-            SUM(total_dbu_cost_usd) FILTER (WHERE in_current_7d)
+            SUM(total_cost_usd) FILTER (WHERE in_current_7d)
                 / NULLIF(CAST(SUM(total_executor_run_time_ms) FILTER (WHERE in_current_7d) AS DOUBLE) / 1000.0, 0)
-            - SUM(total_dbu_cost_usd) FILTER (WHERE in_previous_7d)
+            - SUM(total_cost_usd) FILTER (WHERE in_previous_7d)
                 / NULLIF(CAST(SUM(total_executor_run_time_ms) FILTER (WHERE in_previous_7d) AS DOUBLE) / 1000.0, 0)
         ) * 100.0
             / NULLIF(
-                SUM(total_dbu_cost_usd) FILTER (WHERE in_previous_7d)
+                SUM(total_cost_usd) FILTER (WHERE in_previous_7d)
                     / NULLIF(CAST(SUM(total_executor_run_time_ms) FILTER (WHERE in_previous_7d) AS DOUBLE) / 1000.0, 0),
                 0
             ),
         2
-    )                                                                                      AS cost_efficiency_usd_per_executor_second_change_pct,
-
-    ROUND(
-        SUM(total_ec2_cost_overwatch_usd)
-            FILTER (WHERE in_current_7d),
-        4
-    )                                                                                      AS total_ec2_cost_overwatch_usd_current_7d,
-    ROUND(
-        SUM(total_ec2_cost_overwatch_usd)
-            FILTER (WHERE in_previous_7d),
-        4
-    )                                                                                      AS total_ec2_cost_overwatch_usd_previous_7d,
-    ROUND(
-        (
-            SUM(total_ec2_cost_overwatch_usd) FILTER (WHERE in_current_7d)
-            - SUM(total_ec2_cost_overwatch_usd) FILTER (WHERE in_previous_7d)
-        ) * 100.0
-            / NULLIF(SUM(total_ec2_cost_overwatch_usd) FILTER (WHERE in_previous_7d), 0),
-        2
-    )                                                                                      AS total_ec2_cost_overwatch_usd_change_pct,
-
-    ROUND(
-        SUM(total_dbu_cost_overwatch_usd)
-            FILTER (WHERE in_current_7d),
-        4
-    )                                                                                      AS total_dbu_cost_overwatch_usd_current_7d,
-    ROUND(
-        SUM(total_dbu_cost_overwatch_usd)
-            FILTER (WHERE in_previous_7d),
-        4
-    )                                                                                      AS total_dbu_cost_overwatch_usd_previous_7d,
-    ROUND(
-        (
-            SUM(total_dbu_cost_overwatch_usd) FILTER (WHERE in_current_7d)
-            - SUM(total_dbu_cost_overwatch_usd) FILTER (WHERE in_previous_7d)
-        ) * 100.0
-            / NULLIF(SUM(total_dbu_cost_overwatch_usd) FILTER (WHERE in_previous_7d), 0),
-        2
-    )                                                                                      AS total_dbu_cost_overwatch_usd_change_pct,
-
-    ROUND(
-        SUM(total_cost_overwatch_usd)
-            FILTER (WHERE in_current_7d),
-        4
-    )                                                                                      AS total_cost_overwatch_usd_current_7d,
-    ROUND(
-        SUM(total_cost_overwatch_usd)
-            FILTER (WHERE in_previous_7d),
-        4
-    )                                                                                      AS total_cost_overwatch_usd_previous_7d,
-    ROUND(
-        (
-            SUM(total_cost_overwatch_usd) FILTER (WHERE in_current_7d)
-            - SUM(total_cost_overwatch_usd) FILTER (WHERE in_previous_7d)
-        ) * 100.0
-            / NULLIF(SUM(total_cost_overwatch_usd) FILTER (WHERE in_previous_7d), 0),
-        2
-    )                                                                                      AS total_cost_overwatch_usd_change_pct,
+    )                                                                                      AS total_cost_usd_per_executor_second_change_pct,
 
     MAX(wu.avg_p95_worker_cpu_busy_percent_current_7d)                                     AS avg_p95_worker_cpu_busy_percent_current_7d,
     MAX(wu.avg_p95_worker_cpu_busy_percent_previous_7d)                                    AS avg_p95_worker_cpu_busy_percent_previous_7d,

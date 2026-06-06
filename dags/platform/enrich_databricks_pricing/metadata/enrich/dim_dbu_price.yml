@@ -9,7 +9,10 @@ description: |
   truth that replaces the stale gsheet `databricks_contract_details` and the
   inline Superset CASE rates. Current rates encode the Oct-2024 $1M/24-month
   committed-use contract; the prior range carries the expired (2024-09-01)
-  gsheet rates. Static full-refresh seed (no upstream lake table).
+  gsheet rates. Static full-refresh seed (no upstream lake table). Only
+  JOBS, ALL_PURPOSE and SQL negotiated rates are represented here; products
+  outside those compute classes intentionally use list-price fallback in
+  dw_databricks_costs.fact_databricks_costs rather than invented rates.
 columns:
   compute_type:
     description: Databricks compute category the rate applies to (JOBS, ALL_PURPOSE, SQL).

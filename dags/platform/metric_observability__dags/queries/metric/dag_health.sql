@@ -23,7 +23,7 @@
 --   total_task_runs_* — SUM(n_task_runs).
 --
 -- Cost: SUM task-grain apportioned columns from the DAG-run fact (no cluster-day
--- dedupe). total_cost_usd is DBU USD (list) + apportioned calculated EC2 USD per task,
+-- dedupe). total_cost_usd is negotiated DBU USD + apportioned calculated EC2 USD per task,
 -- summed to logical-run grain.
 --
 -- P95 utilisation metrics (avg_p95_*): weighted by execution_duration_seconds so that
@@ -54,12 +54,11 @@ WITH window_runs AS (
         total_dbu_consumed,
         total_dbu_cost_usd,
         total_ec2_cost_calculated_usd,
-        spot_hours,
-        on_demand_hours,
+        ec2_spot_hours,
+        ec2_on_demand_hours,
+        is_ec2_estimated,
+        ec2_pricing_missing,
         total_cost_usd,
-        total_cost_overwatch_usd,
-        total_ec2_cost_overwatch_usd,
-        total_dbu_cost_overwatch_usd,
         weighted_avg_p95_driver_cpu_busy_percent          AS p95_driver_cpu_busy_percent,
         weighted_avg_p95_worker_cpu_busy_percent          AS p95_worker_cpu_busy_percent,
         weighted_avg_p95_driver_mem_used_percent          AS p95_driver_mem_used_percent,
@@ -173,10 +172,14 @@ SELECT
 
     ROUND(SUM(total_ec2_cost_calculated_usd) FILTER (WHERE in_7d_window), 4)             AS total_ec2_cost_calculated_usd_7d,
     ROUND(SUM(total_ec2_cost_calculated_usd),                                  4)         AS total_ec2_cost_calculated_usd_28d,
-    ROUND(SUM(spot_hours) FILTER (WHERE in_7d_window), 4)                               AS spot_hours_7d,
-    ROUND(SUM(spot_hours),                                  4)                         AS spot_hours_28d,
-    ROUND(SUM(on_demand_hours) FILTER (WHERE in_7d_window), 4)                         AS on_demand_hours_7d,
-    ROUND(SUM(on_demand_hours),                                  4)                   AS on_demand_hours_28d,
+    ROUND(SUM(ec2_spot_hours) FILTER (WHERE in_7d_window), 4)                           AS ec2_spot_hours_7d,
+    ROUND(SUM(ec2_spot_hours),                                  4)                     AS ec2_spot_hours_28d,
+    ROUND(SUM(ec2_on_demand_hours) FILTER (WHERE in_7d_window), 4)                     AS ec2_on_demand_hours_7d,
+    ROUND(SUM(ec2_on_demand_hours),                                  4)               AS ec2_on_demand_hours_28d,
+    BOOL_OR(is_ec2_estimated) FILTER (WHERE in_7d_window)                              AS has_ec2_estimate_7d,
+    BOOL_OR(is_ec2_estimated)                                                          AS has_ec2_estimate_28d,
+    BOOL_OR(ec2_pricing_missing) FILTER (WHERE in_7d_window)                           AS has_ec2_pricing_missing_7d,
+    BOOL_OR(ec2_pricing_missing)                                                       AS has_ec2_pricing_missing_28d,
 
     ROUND(SUM(total_cost_usd) FILTER (WHERE in_7d_window), 4)                            AS total_cost_usd_7d,
     ROUND(SUM(total_cost_usd),                                  4)                     AS total_cost_usd_28d,
@@ -191,23 +194,15 @@ SELECT
     )                                                                                    AS avg_total_cost_usd_per_dag_run_28d,
 
     ROUND(
-        SUM(total_dbu_cost_usd) FILTER (WHERE in_7d_window)
+        SUM(total_cost_usd) FILTER (WHERE in_7d_window)
             / NULLIF(CAST(SUM(total_executor_run_time_ms) FILTER (WHERE in_7d_window) AS DOUBLE) / 1000.0, 0),
         6
-    )                                                                                    AS cost_efficiency_usd_per_executor_second_7d,
+    )                                                                                    AS total_cost_usd_per_executor_second_7d,
     ROUND(
-        SUM(total_dbu_cost_usd)
+        SUM(total_cost_usd)
             / NULLIF(CAST(SUM(total_executor_run_time_ms) AS DOUBLE) / 1000.0, 0),
         6
-    )                                                                                    AS cost_efficiency_usd_per_executor_second_28d,
-
-    ROUND(SUM(total_ec2_cost_overwatch_usd) FILTER (WHERE in_7d_window), 4)             AS total_ec2_cost_overwatch_usd_7d,
-    ROUND(SUM(total_ec2_cost_overwatch_usd),                                  4)         AS total_ec2_cost_overwatch_usd_28d,
-
-    ROUND(SUM(total_dbu_cost_overwatch_usd) FILTER (WHERE in_7d_window), 4)             AS total_dbu_cost_overwatch_usd_7d,
-    ROUND(SUM(total_dbu_cost_overwatch_usd),                                  4)         AS total_dbu_cost_overwatch_usd_28d,
-    ROUND(SUM(total_cost_overwatch_usd) FILTER (WHERE in_7d_window), 4)                 AS total_cost_overwatch_usd_7d,
-    ROUND(SUM(total_cost_overwatch_usd),                                  4)           AS total_cost_overwatch_usd_28d,
+    )                                                                                    AS total_cost_usd_per_executor_second_28d,
 
     ROUND(AVG(total_duration_seconds) FILTER (WHERE in_7d_window), 2)                   AS avg_total_duration_seconds_7d,
     ROUND(AVG(total_duration_seconds),                                 2)                 AS avg_total_duration_seconds_28d,

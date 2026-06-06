@@ -11,6 +11,10 @@
 --
 -- Parallel Databricks jobs in the same minute collapse to one row; costs sum.
 -- P95 cluster metrics are weighted by execution_duration_seconds across tasks.
+-- Cluster sizing (driver/worker node type, worker_count) reflects the DBU-dominant
+-- cluster in the bucket (MAX_BY on total_dbu_consumed); peak_concurrent_workers is the
+-- max observed across tasks. is_job_on_interactive (interactive billing slice) and
+-- dbu_negotiated_price_missing are BOOL_OR rollups.
 --
 -- Source: dw_databricks_health.fact_databricks_task_run.
 -- ============================================================================
@@ -31,11 +35,15 @@ SELECT
     FIRST(ftr.ecosystem      IGNORE NULLS)                        AS ecosystem,
     FIRST(ftr.environment    IGNORE NULLS)                        AS environment,
     FIRST(ftr.provisioner    IGNORE NULLS)                        AS provisioner,
+    MAX_BY(ftr.driver_node_type, ftr.total_dbu_consumed)         AS driver_node_type,
+    MAX_BY(ftr.worker_node_type, ftr.total_dbu_consumed)         AS worker_node_type,
 
     COUNT(DISTINCT ftr.id_databricks_run)                           AS n_databricks_job_runs,
     COUNT(*)                                                        AS n_task_runs,
     SUM(CASE WHEN ftr.is_failed THEN 1 ELSE 0 END)                  AS n_failed_task_runs,
     SUM(CASE WHEN ftr.has_stage_data THEN 1 ELSE 0 END)             AS n_task_runs_with_stage_data,
+    MAX_BY(ftr.worker_count, ftr.total_dbu_consumed)             AS worker_count,
+    MAX(ftr.peak_concurrent_workers)                             AS peak_concurrent_workers,
 
     CAST(
         ROUND(SUM(ftr.total_dbu_consumed), 4) AS DECIMAL(25, 4)
@@ -44,23 +52,28 @@ SELECT
         ROUND(SUM(ftr.total_dbu_cost_usd), 4) AS DECIMAL(37, 4)
     )                                                               AS total_dbu_cost_usd,
     CAST(
+        ROUND(SUM(ftr.total_dbu_list_cost_usd), 4) AS DECIMAL(37, 4)
+    )                                                               AS total_dbu_list_cost_usd,
+    CAST(
         ROUND(SUM(ftr.total_ec2_cost_calculated_usd), 4) AS DECIMAL(38, 4)
     )                                                               AS total_ec2_cost_calculated_usd,
     CAST(
-        ROUND(SUM(ftr.spot_hours), 4) AS DECIMAL(38, 4)
-    )                                                               AS spot_hours,
+        ROUND(SUM(ftr.ec2_spot_hours), 4) AS DECIMAL(38, 4)
+    )                                                               AS ec2_spot_hours,
     CAST(
-        ROUND(SUM(ftr.on_demand_hours), 4) AS DECIMAL(38, 4)
-    )                                                               AS on_demand_hours,
+        ROUND(SUM(ftr.ec2_on_demand_hours), 4) AS DECIMAL(38, 4)
+    )                                                               AS ec2_on_demand_hours,
+    CASE
+        WHEN BOOL_OR(ftr.ec2_source = 'node_timeline') THEN 'node_timeline'
+        WHEN BOOL_OR(ftr.ec2_source = 'billable_usage_estimate') THEN 'billable_usage_estimate'
+        WHEN BOOL_OR(ftr.ec2_source = 'missing') THEN 'missing'
+        ELSE 'not_applicable'
+    END                                                             AS ec2_source,
+    BOOL_OR(ftr.is_ec2_estimated)                                   AS is_ec2_estimated,
+    BOOL_OR(ftr.ec2_pricing_missing)                                AS ec2_pricing_missing,
     CAST(
-        ROUND(SUM(ftr.total_ec2_cost_overwatch_usd), 4) AS DECIMAL(38, 4)
-    )                                                               AS total_ec2_cost_overwatch_usd,
-    CAST(
-        ROUND(SUM(ftr.total_dbu_cost_overwatch_usd), 4) AS DECIMAL(38, 4)
-    )                                                               AS total_dbu_cost_overwatch_usd,
-    CAST(
-        ROUND(SUM(ftr.total_cost_overwatch_usd), 4) AS DECIMAL(38, 4)
-    )                                                               AS total_cost_overwatch_usd,
+        ROUND(SUM(ftr.ec2_unpriced_hours), 4) AS DECIMAL(38, 4)
+    )                                                               AS ec2_unpriced_hours,
     CAST(
         ROUND(SUM(ftr.total_cost_usd), 4) AS DECIMAL(38, 4)
     )                                                               AS total_cost_usd,
@@ -101,6 +114,8 @@ SELECT
 
     MAX(CASE WHEN ftr.is_failed THEN 1 ELSE 0 END) >= 1           AS is_any_task_failed,
     MAX(CASE WHEN ftr.is_success THEN 1 ELSE 0 END) >= 1          AS is_any_task_success,
+    BOOL_OR(ftr.is_job_on_interactive)                           AS is_job_on_interactive,
+    BOOL_OR(ftr.dbu_negotiated_price_missing)                    AS dbu_negotiated_price_missing,
     SUM(CASE WHEN ftr.is_pool_acquisition_slow THEN 1 ELSE 0 END) AS n_pool_acquisition_slow_tasks,
 
     SUM(ftr.total_executor_run_time_ms)                           AS total_executor_run_time_ms,
@@ -114,7 +129,7 @@ SELECT
     SUM(ftr.total_shuffle_bytes_read)                             AS total_shuffle_bytes_read,
     SUM(ftr.total_shuffle_bytes_written)                          AS total_shuffle_bytes_written,
 
-    FIRST(ftr.pricing_sku    IGNORE NULLS)                        AS pricing_sku,
+    FIRST(ftr.dbu_pricing_sku IGNORE NULLS)                       AS dbu_pricing_sku,
     FIRST(ftr.dbu_rate_usd   IGNORE NULLS)                        AS dbu_rate_usd,
 
     DATE(date_trunc('MINUTE', ftr.ts_run_started))                AS dt_dag_run_started,

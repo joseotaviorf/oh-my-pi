@@ -15,6 +15,9 @@ description: |
   usage_quantity and cancel ORIGINAL rows, RESTATEMENT carries the corrected
   amount, so SUM(usage_quantity) is the corrected net DBU with no de-duplication.
   Groups that net to exactly zero are dropped.
+  Data quality enforces strict DBU reconciliation only after billing settles
+  (through max fact date minus two days); the freshest two days are warning-only
+  because Databricks usage corrections can arrive after the daily load.
 
   Every billed product is mapped to exactly one `bucket` (orchestrated_jobs /
   interactive / sql_warehouse / ml_serving / streaming_dlt / platform_managed /
@@ -23,7 +26,9 @@ description: |
   datalake_databricks_pricing.dim_dbu_price (negotiated rate by compute_type +
   contract window, with system.billing.list_prices as fallback and a
   `price_missing` flag), and EC2 is priced from system.compute.node_timeline
-  node-hours x datalake_databricks_pricing.dim_ec2_price split on-demand / spot.
+  node-hours x datalake_databricks_pricing.dim_ec2_price split on-demand / spot,
+  with an explicit billable_usage.machine_hours estimate for dates before
+  retained node_timeline coverage starts.
 
   The identity column is `workload_name` (generic COALESCE of cluster `dag_id`
   tag, `application` tag, billing `job_name`, cluster_name) — NOT
@@ -40,6 +45,7 @@ description: |
   system.lakeflow.job_run_timeline (trigger_type => is_continuous),
   system.billing.list_prices (list rate, audit + fallback),
   system.compute.node_timeline (EC2 node-hours),
+  datalake_databricks_usage_clean.billable_usage (EC2 estimate before retained node_timeline coverage),
   datalake_databricks_pricing.dim_dbu_price, datalake_databricks_pricing.dim_ec2_price.
 domain: Data Ops & Governance
 owner: data-platform-team@quintoandar.com.br
@@ -100,6 +106,14 @@ columns:
       Coarse pricing class derived from billing_origin_product: JOBS,
       ALL_PURPOSE (ALL_PURPOSE + INTERACTIVE), SQL, or OTHER. The join key into
       dim_dbu_price for the negotiated rate.
+    lineage:
+      - system.billing.usage.billing_origin_product
+  pricing_category:
+    description: |
+      Product-level pricing diagnostic. Keeps negotiated compute types as JOBS,
+      ALL_PURPOSE, or SQL, and labels non-negotiated product rows as
+      LIST_FALLBACK_<billing_origin_product> so reports can separate intentional
+      list-price fallback from contracted DBU categories.
     lineage:
       - system.billing.usage.billing_origin_product
   bucket:
@@ -176,13 +190,15 @@ columns:
   ec2_cost_usd:
     description: |
       EC2 / instance compute cost in USD attributed to this row. The cluster-day
-      EC2 cost — node wall-clock hours from node_timeline x dim_ec2_price hourly
-      rate (on-demand / spot) — is apportioned to this row by its DBU share of
-      the (workspace, cluster, dt_usage), so per-row values sum to the
-      cluster-day EC2 cost. 0 for cluster-less (serverless / warehouse) usage.
+      EC2 cost is built from node_timeline node wall-clock hours when available,
+      or from billable_usage.machine_hours estimates where
+      node_timeline has no history. The cluster-day cost is apportioned to this
+      row by its DBU share of the (workspace, cluster, dt_usage), so per-row
+      values sum to the cluster-day EC2 cost. 0 for cluster-less usage.
     lineage:
       - system.compute.node_timeline.start_time
       - system.compute.node_timeline.end_time
+      - datalake_databricks_usage_clean.billable_usage.machine_hours
       - system.compute.clusters.driver_node_type
       - system.compute.clusters.worker_node_type
       - datalake_databricks_pricing.dim_ec2_price.usd_per_hour
@@ -194,6 +210,7 @@ columns:
     lineage:
       - system.compute.node_timeline.start_time
       - system.compute.node_timeline.end_time
+      - datalake_databricks_usage_clean.billable_usage.machine_hours
       - system.compute.clusters.aws_attributes
   spot_hours:
     description: |
@@ -204,12 +221,40 @@ columns:
       - system.compute.node_timeline.start_time
       - system.compute.node_timeline.end_time
       - system.compute.clusters.aws_attributes
+  ec2_source:
+    description: |
+      Source used for EC2 hours and cost on this row: node_timeline for
+      system.compute.node_timeline, billable_usage_estimate for dates before retained node_timeline coverage,
+      machine-hour estimates, missing for cluster-backed rows without EC2 hours,
+      and not_applicable for cluster-less serverless or SQL warehouse rows.
+    lineage:
+      - system.compute.node_timeline.cluster_id
+      - datalake_databricks_usage_clean.billable_usage.machine_hours
+      - system.billing.usage.usage_metadata
+  is_ec2_estimated:
+    description: True when EC2 hours and cost come from the billable_usage.machine_hours estimate before retained node_timeline coverage instead of node_timeline.
+    lineage:
+      - datalake_databricks_usage_clean.billable_usage.machine_hours
+  ec2_pricing_missing:
+    description: True when EC2 hours exist but no matching instance hourly rate was found in dim_ec2_price, so the affected hours were priced at zero.
+    lineage:
+      - system.compute.node_timeline.start_time
+      - datalake_databricks_usage_clean.billable_usage.machine_hours
+      - datalake_databricks_pricing.dim_ec2_price.usd_per_hour
+  ec2_unpriced_hours:
+    description: EC2 node-hours that had no matching dim_ec2_price rate and were therefore priced at zero, apportioned to this row by DBU share.
+    lineage:
+      - system.compute.node_timeline.start_time
+      - system.compute.node_timeline.end_time
+      - datalake_databricks_usage_clean.billable_usage.machine_hours
+      - datalake_databricks_pricing.dim_ec2_price.usd_per_hour
   total_cost_usd:
     description: Total cost in USD for the row (dbu_cost_usd + COALESCE(ec2_cost_usd, 0)), rounded to 4 dp.
     lineage:
       - system.billing.usage.usage_quantity
       - datalake_databricks_pricing.dim_dbu_price.usd_per_dbu
       - datalake_databricks_pricing.dim_ec2_price.usd_per_hour
+      - datalake_databricks_usage_clean.billable_usage.machine_hours
   is_serverless:
     description: True when the SKU name contains `SERVERLESS`. Serverless usage has no EC2 node-hours.
     lineage:

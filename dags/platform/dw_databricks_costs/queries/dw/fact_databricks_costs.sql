@@ -53,8 +53,9 @@
 -- EC2 cost — from system.compute.node_timeline node wall-clock hours priced by
 -- datalake_databricks_pricing.dim_ec2_price (in-repo standard-AWS seed), split
 -- on-demand vs spot from the cluster aws_attributes (availability +
--- first_on_demand). EC2 attaches per (workspace, cluster, day); serverless and
--- non-cluster usage have no node_timeline rows and carry zero EC2.
+-- first_on_demand). Before node_timeline history starts for each workspace, EC2
+-- is estimated from datalake_databricks_usage_clean.billable_usage.machine_hours
+-- where available. Source/confidence columns make this explicit.
 --
 -- Identity column is `workload_name` (NOT `airflow_dag_id`): this fact spans
 -- non-Airflow workloads (interactive notebooks, SQL warehouses, model serving,
@@ -69,6 +70,8 @@
 --   - system.lakeflow.job_run_timeline (trigger_type => is_continuous)
 --   - system.billing.list_prices       (AWS USD list rate per DBU SKU — audit + fallback)
 --   - system.compute.node_timeline     (node wall-clock hours for EC2)
+--   - datalake_databricks_usage_clean.billable_usage (EC2 estimate before
+--                                                     node_timeline coverage)
 --   - datalake_databricks_pricing.dim_dbu_price (negotiated USD/DBU by compute_type, window)
 --   - datalake_databricks_pricing.dim_ec2_price  (standard USD/hour by instance, availability)
 --
@@ -214,7 +217,21 @@ node_observations AS (
     WHERE
         DATE(nt.start_time) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
-ec2_per_cluster_day AS (
+node_timeline_coverage AS (
+    -- system.compute.node_timeline has rolling retention. Use the observed first
+    -- available day per workspace instead of freezing the backfill boundary.
+    SELECT
+        CAST(workspace_id AS BIGINT) AS workspace_id,
+        MIN(DATE(start_time))        AS dt_node_timeline_first_available
+    FROM
+        system.compute.node_timeline
+    WHERE
+        DATE(start_time) <= DATE('{load_end_date}')
+        AND workspace_id IN (4531937035440038, 6170817193817)
+    GROUP BY
+        CAST(workspace_id AS BIGINT)
+),
+node_timeline_ec2_per_cluster_day AS (
     -- EC2 USD + on-demand/spot hours per (workspace, cluster, day), priced from
     -- the in-repo standard-AWS seed dim_ec2_price on (instance, availability, window).
     SELECT
@@ -223,7 +240,11 @@ ec2_per_cluster_day AS (
         n.dt_cluster_run,
         SUM(n.node_hours * COALESCE(ep.usd_per_hour, 0))           AS ec2_cost_usd,
         SUM(IF(n.availability = 'on_demand', n.node_hours, 0))     AS on_demand_hours,
-        SUM(IF(n.availability = 'spot', n.node_hours, 0))          AS spot_hours
+        SUM(IF(n.availability = 'spot', n.node_hours, 0))          AS spot_hours,
+        'node_timeline'                                            AS ec2_source,
+        FALSE                                                      AS is_ec2_estimated,
+        BOOL_OR(ep.usd_per_hour IS NULL)                           AS ec2_pricing_missing,
+        SUM(IF(ep.usd_per_hour IS NULL, n.node_hours, 0))          AS ec2_unpriced_hours
     FROM
         node_observations n
     LEFT JOIN
@@ -236,6 +257,116 @@ ec2_per_cluster_day AS (
         n.workspace_id,
         n.cluster_id,
         n.dt_cluster_run
+),
+billable_usage_cluster_day AS (
+    -- Pre-node_timeline EC2 estimate for 2026 continuity. The legacy table has
+    -- QA/Prod machine hours only; do not synthesize Forno EC2.
+    SELECT
+        CAST(id_workspace AS BIGINT)                               AS workspace_id,
+        id_cluster                                                 AS cluster_id,
+        DATE(ts_execution)                                         AS dt_cluster_run,
+        MAX(cluster_node_type)                                     AS billable_usage_node_type,
+        SUM(COALESCE(machine_hours, 0))                            AS billable_usage_machine_hours
+    FROM
+        datalake_databricks_usage_clean.billable_usage AS billable_usage
+    LEFT JOIN
+        node_timeline_coverage AS coverage
+            ON CAST(billable_usage.id_workspace AS BIGINT) = coverage.workspace_id
+    WHERE
+        DATE(billable_usage.ts_execution) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        AND DATE(billable_usage.ts_execution) < COALESCE(
+            coverage.dt_node_timeline_first_available,
+            DATE_ADD(DATE('{load_end_date}'), 1)
+        )
+        AND machine_hours > 0
+        AND id_workspace IN (4531937035440038, 6170817193817)
+    GROUP BY
+        CAST(id_workspace AS BIGINT),
+        id_cluster,
+        DATE(ts_execution)
+),
+billable_usage_ec2_per_cluster_day AS (
+    -- Best-effort estimate: all billable_usage machine hours are priced as
+    -- on-demand because the legacy source does not reliably expose spot split.
+    SELECT
+        bu.workspace_id,
+        bu.cluster_id,
+        bu.dt_cluster_run,
+        SUM(bu.billable_usage_machine_hours * COALESCE(ep.usd_per_hour, 0))
+                                                                   AS ec2_cost_usd,
+        SUM(bu.billable_usage_machine_hours)                       AS on_demand_hours,
+        CAST(0 AS DOUBLE)                                          AS spot_hours,
+        'billable_usage_estimate'                                  AS ec2_source,
+        TRUE                                                       AS is_ec2_estimated,
+        BOOL_OR(ep.usd_per_hour IS NULL)                           AS ec2_pricing_missing,
+        SUM(
+            IF(ep.usd_per_hour IS NULL, bu.billable_usage_machine_hours, 0)
+        )                                                          AS ec2_unpriced_hours
+    FROM
+        billable_usage_cluster_day bu
+    LEFT JOIN
+        datalake_databricks_pricing.dim_ec2_price ep
+            ON  ep.instance_api_name = bu.billable_usage_node_type
+            AND ep.availability      = 'on_demand'
+            AND bu.dt_cluster_run   >= ep.dt_valid_from
+            AND bu.dt_cluster_run   <  COALESCE(ep.dt_valid_to, DATE '9999-12-31')
+    GROUP BY
+        bu.workspace_id,
+        bu.cluster_id,
+        bu.dt_cluster_run
+),
+ec2_per_cluster_day AS (
+    -- Prefer billable_usage for the pre-node_timeline backfill window when present;
+    -- after that, node_timeline is authoritative and billable_usage is not loaded.
+    SELECT
+        COALESCE(nt.workspace_id, bu.workspace_id)                 AS workspace_id,
+        COALESCE(nt.cluster_id, bu.cluster_id)                     AS cluster_id,
+        COALESCE(nt.dt_cluster_run, bu.dt_cluster_run)             AS dt_cluster_run,
+        CASE
+            WHEN bu.cluster_id IS NOT NULL
+                THEN bu.ec2_cost_usd
+            ELSE nt.ec2_cost_usd
+        END                                                        AS ec2_cost_usd,
+        CASE
+            WHEN bu.cluster_id IS NOT NULL
+                THEN bu.on_demand_hours
+            ELSE nt.on_demand_hours
+        END                                                        AS on_demand_hours,
+        CASE
+            WHEN bu.cluster_id IS NOT NULL
+                THEN bu.spot_hours
+            ELSE nt.spot_hours
+        END                                                        AS spot_hours,
+        CASE
+            WHEN bu.cluster_id IS NOT NULL
+                THEN bu.ec2_source
+            WHEN nt.cluster_id IS NOT NULL
+                THEN nt.ec2_source
+            WHEN bu.cluster_id IS NOT NULL THEN bu.ec2_source
+            ELSE 'missing'
+        END                                                        AS ec2_source,
+        CASE
+            WHEN bu.cluster_id IS NOT NULL
+                THEN bu.is_ec2_estimated
+            ELSE COALESCE(nt.is_ec2_estimated, FALSE)
+        END                                                        AS is_ec2_estimated,
+        CASE
+            WHEN bu.cluster_id IS NOT NULL
+                THEN bu.ec2_pricing_missing
+            ELSE COALESCE(nt.ec2_pricing_missing, FALSE)
+        END                                                        AS ec2_pricing_missing,
+        CASE
+            WHEN bu.cluster_id IS NOT NULL
+                THEN bu.ec2_unpriced_hours
+            ELSE COALESCE(nt.ec2_unpriced_hours, 0)
+        END                                                        AS ec2_unpriced_hours
+    FROM
+        node_timeline_ec2_per_cluster_day AS nt
+    FULL OUTER JOIN
+        billable_usage_ec2_per_cluster_day AS bu
+            ON  nt.workspace_id   = bu.workspace_id
+            AND nt.cluster_id     = bu.cluster_id
+            AND nt.dt_cluster_run = bu.dt_cluster_run
 ),
 enriched AS (
     -- Billing spine + cluster spec + continuity + list price + EC2; derive
@@ -271,6 +402,17 @@ enriched AS (
         ec.spot_hours
             * (b.dbu / NULLIF(SUM(b.dbu) OVER (PARTITION BY b.workspace_id, b.cluster_id, b.usage_date), 0))
                                                            AS spot_hours,
+        CASE
+            WHEN b.cluster_id IS NULL THEN 'not_applicable'
+            WHEN ec.cluster_id IS NOT NULL THEN ec.ec2_source
+            ELSE 'missing'
+        END                                                        AS ec2_source,
+        COALESCE(ec.is_ec2_estimated, FALSE)                       AS is_ec2_estimated,
+        b.cluster_id IS NOT NULL AND COALESCE(ec.ec2_pricing_missing, FALSE)
+                                                                   AS ec2_pricing_missing,
+        ec.ec2_unpriced_hours
+            * (b.dbu / NULLIF(SUM(b.dbu) OVER (PARTITION BY b.workspace_id, b.cluster_id, b.usage_date), 0))
+                                                           AS ec2_unpriced_hours,
         COALESCE(
             NULLIF(TRIM(lcs.tags['dag_id']), ''),
             lcs.tags['application'],
@@ -322,6 +464,10 @@ priced AS (
         e.ec2_cost_usd,
         e.on_demand_hours,
         e.spot_hours,
+        e.ec2_source,
+        e.is_ec2_estimated,
+        e.ec2_pricing_missing,
+        e.ec2_unpriced_hours,
         e.workload_name,
         e.compute_type,
         ddp.usd_per_dbu                                            AS negotiated_usd_per_dbu,
@@ -364,6 +510,10 @@ SELECT
     p.cluster_source,
     p.cluster_name,
     p.compute_type,
+    CASE
+        WHEN p.compute_type IN ('JOBS', 'ALL_PURPOSE', 'SQL') THEN p.compute_type
+        ELSE CONCAT('LIST_FALLBACK_', p.billing_origin_product)
+    END                                                          AS pricing_category,
     CASE
         WHEN p.billing_origin_product = 'JOBS' AND p.cluster_source IN ('UI', 'API')
             THEN 'interactive'
@@ -413,6 +563,10 @@ SELECT
     ROUND(COALESCE(p.ec2_cost_usd, 0), 4)                       AS ec2_cost_usd,
     ROUND(COALESCE(p.on_demand_hours, 0), 4)                    AS on_demand_hours,
     ROUND(COALESCE(p.spot_hours, 0), 4)                         AS spot_hours,
+    p.ec2_source,
+    p.is_ec2_estimated,
+    p.ec2_pricing_missing,
+    ROUND(COALESCE(p.ec2_unpriced_hours, 0), 4)                 AS ec2_unpriced_hours,
     ROUND(p.dbu_cost_usd + COALESCE(p.ec2_cost_usd, 0), 4)      AS total_cost_usd,
 
     -- Booleans.

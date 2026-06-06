@@ -18,6 +18,7 @@
 --   - system.compute.clusters                         (cluster spec — latest)
 --   - system.billing.usage                            (DBU per cluster, hourly buckets)
 --   - system.billing.list_prices                      (AWS USD list rate per DBU SKU)
+--   - datalake_databricks_pricing.dim_dbu_price       (negotiated USD/DBU by compute_type)
 --   - datalake_databricks_health.daily_cluster_health (PR 23079 — P50/P95 util, calculated EC2)
 --   - datalake_databricks_health.spark_stage_metrics  (PR 23080 — per stage)
 --
@@ -32,14 +33,17 @@
 -- allocate to tasks by each task's share of total task wall-clock seconds on
 -- that cluster (equal split when all task durations are zero).
 --
--- USD conversion uses system.billing.list_prices.pricing.default (list rate
--- in USD per DBU, AWS cloud) joined on sku_name + valid time window. No
--- Graviton or instance-pool discount applies to DBUs (validated in
--- bietlejuice/spark_debugging/mcp_a4_dbu_list_prices.sql) — savings on
--- those come from EC2 cost and faster wall-clock, not the DBU rate.
--- Promotional / committed-use discounts are NOT applied; use
--- pricing.effective_list.default in a follow-up if enterprise negotiated
--- pricing is needed.
+-- DBU USD uses the negotiated rate from datalake_databricks_pricing.dim_dbu_price
+-- (keyed on a compute_type derived from billing_origin_product + the usage-date
+-- window), falling back to the system.billing.list_prices list rate when no
+-- negotiated row matches (`dbu_negotiated_price_missing` flags the fallback). total_dbu_cost_usd
+-- is the negotiated cost; total_dbu_list_cost_usd keeps the list-rate audit. This
+-- mirrors dw_databricks_costs.fact_databricks_costs so the orchestrated slice
+-- (NOT is_job_on_interactive) reconciles to its bucket='orchestrated_jobs'.
+-- is_job_on_interactive mirrors fact_databricks_costs bucket != 'orchestrated_jobs':
+-- ALL_PURPOSE / INTERACTIVE billing on the cluster, or JOBS billing on a UI/API
+-- cluster (the all-purpose leak). Filter NOT is_job_on_interactive for the
+-- orchestrated slice.
 --
 -- Stage-attribution strategy:
 --   spark_stage_metrics is keyed by (id_spark_app, id_stage, id_stage_attempt)
@@ -125,15 +129,13 @@ parent_run AS (
         workspace_id, run_id
 ),
 prices_per_sku AS (
-    -- One row per (sku, validity window). Filter to AWS DBU prices in USD.
-    -- price_end_time is NULL for the currently-effective price. We rely on
-    -- list price (pricing.default); promotional / effective_list pricing
-    -- can be swapped in here if QuintoAndar negotiates enterprise rates.
+    -- One row per SKU validity window for the run window. Usage rows join by
+    -- usage_start_time so list-price audits stay correct across price changes.
     SELECT
         sku_name,
-        pricing.default                                    AS unit_price_usd,
         price_start_time,
-        price_end_time
+        price_end_time,
+        MAX(pricing.default)                               AS dbu_list_unit_price_usd
     FROM
         system.billing.list_prices
     WHERE
@@ -142,6 +144,10 @@ prices_per_sku AS (
         AND currency_code = 'USD'
         AND price_start_time <= TIMESTAMP('{load_end_date}')
         AND (price_end_time IS NULL OR price_end_time >= TIMESTAMP('{load_start_date}'))
+    GROUP BY
+        sku_name,
+        price_start_time,
+        price_end_time
 ),
 run_clusters AS (
     SELECT DISTINCT
@@ -151,28 +157,52 @@ run_clusters AS (
         task_run_spine
 ),
 usage_for_run_clusters AS (
+    -- Per usage row: the list rate (system.billing.list_prices) plus the negotiated
+    -- rate from datalake_databricks_pricing.dim_dbu_price (keyed on a compute_type
+    -- derived from billing_origin_product + the usage-date window). The compute_type
+    -- mapping mirrors dw_databricks_costs.fact_databricks_costs.
     SELECT
-        u.workspace_id,
-        u.usage_metadata.cluster_id                        AS cluster_id,
-        u.sku_name,
-        u.usage_quantity,
-        u.usage_start_time,
-        u.usage_metadata.job_name                          AS billing_job_name,
-        COALESCE(p.unit_price_usd, 0)                      AS unit_price_usd
+        usage_billing.workspace_id,
+        usage_billing.usage_metadata.cluster_id            AS cluster_id,
+        usage_billing.sku_name,
+        usage_billing.usage_quantity,
+        usage_billing.usage_start_time,
+        usage_billing.billing_origin_product,
+        usage_billing.usage_metadata.job_name              AS billing_job_name,
+        COALESCE(list_price.dbu_list_unit_price_usd, 0)   AS dbu_list_unit_price_usd,
+        COALESCE(
+            negotiated_dbu.usd_per_dbu,
+            list_price.dbu_list_unit_price_usd,
+            0
+        )                                                  AS dbu_effective_unit_price_usd,
+        negotiated_dbu.usd_per_dbu IS NULL                 AS dbu_negotiated_price_missing
     FROM
-        system.billing.usage u
+        system.billing.usage AS usage_billing
     INNER JOIN
-        run_clusters rc
-            ON  rc.workspace_id              = u.workspace_id
-            AND rc.cluster_id                = u.usage_metadata.cluster_id
+        run_clusters AS run_cluster
+            ON  run_cluster.workspace_id = usage_billing.workspace_id
+            AND run_cluster.cluster_id   = usage_billing.usage_metadata.cluster_id
     LEFT JOIN
-        prices_per_sku p
-            ON  p.sku_name           = u.sku_name
-            AND u.usage_start_time  >= p.price_start_time
-            AND (p.price_end_time IS NULL OR u.usage_start_time < p.price_end_time)
+        prices_per_sku AS list_price
+            ON  list_price.sku_name = usage_billing.sku_name
+            AND usage_billing.usage_start_time >= list_price.price_start_time
+            AND (
+                list_price.price_end_time IS NULL
+                OR usage_billing.usage_start_time < list_price.price_end_time
+            )
+    LEFT JOIN
+        datalake_databricks_pricing.dim_dbu_price AS negotiated_dbu
+            ON  negotiated_dbu.compute_type = CASE
+                    WHEN usage_billing.billing_origin_product = 'JOBS'                          THEN 'JOBS'
+                    WHEN usage_billing.billing_origin_product IN ('ALL_PURPOSE', 'INTERACTIVE') THEN 'ALL_PURPOSE'
+                    WHEN usage_billing.billing_origin_product = 'SQL'                           THEN 'SQL'
+                    ELSE 'OTHER'
+                END
+            AND DATE(usage_billing.usage_start_time) >= negotiated_dbu.dt_valid_from
+            AND DATE(usage_billing.usage_start_time) <  COALESCE(negotiated_dbu.dt_valid_to, DATE '9999-12-31')
     WHERE
-        u.usage_unit = 'DBU'
-        AND DATE(u.usage_start_time) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
+        usage_billing.usage_unit = 'DBU'
+        AND DATE(usage_billing.usage_start_time) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 sku_totals_by_cluster AS (
     SELECT
@@ -189,7 +219,7 @@ cluster_primary_sku AS (
     SELECT
         workspace_id,
         cluster_id,
-        MAX_BY(sku_name, sku_dbu)                          AS pricing_sku
+        MAX_BY(sku_name, sku_dbu)                          AS dbu_pricing_sku
     FROM
         sku_totals_by_cluster
     GROUP BY
@@ -199,34 +229,52 @@ billing_per_cluster AS (
     SELECT
         ufr.workspace_id,
         ufr.cluster_id,
-        SUM(ufr.usage_quantity)                            AS dbu_consumed,
-        SUM(ufr.usage_quantity * ufr.unit_price_usd)       AS cost_usd_estimate,
-        MAX_BY(ufr.billing_job_name, ufr.usage_quantity)    AS billing_job_name
+        SUM(ufr.usage_quantity)                                       AS dbu_consumed,
+        SUM(ufr.usage_quantity * ufr.dbu_effective_unit_price_usd)  AS dbu_cost_usd_estimate,
+        SUM(ufr.usage_quantity * ufr.dbu_list_unit_price_usd)       AS dbu_list_cost_usd_estimate,
+        SUM(ufr.usage_quantity * ufr.dbu_list_unit_price_usd)
+            / NULLIF(SUM(ufr.usage_quantity), 0)                    AS dbu_list_unit_price_usd,
+        MAX_BY(ufr.billing_job_name, ufr.usage_quantity)              AS billing_job_name,
+        MAX(IF(ufr.dbu_negotiated_price_missing, 1, 0)) = 1           AS dbu_negotiated_price_missing
     FROM
         usage_for_run_clusters ufr
     GROUP BY
         ufr.workspace_id, ufr.cluster_id
 ),
+cluster_billing_products AS (
+    -- Billing-origin mix per cluster — drives is_job_on_interactive (mirrors
+    -- fact_databricks_costs bucket: orchestrated_jobs vs interactive).
+    SELECT
+        ufr.workspace_id,
+        ufr.cluster_id,
+        BOOL_OR(ufr.billing_origin_product IN ('ALL_PURPOSE', 'INTERACTIVE'))
+                                                                   AS has_all_purpose_billing,
+        BOOL_OR(ufr.billing_origin_product = 'JOBS')               AS has_jobs_billing
+    FROM
+        usage_for_run_clusters AS ufr
+    GROUP BY
+        ufr.workspace_id, ufr.cluster_id
+),
 task_with_seconds AS (
     SELECT
-        s.workspace_id,
-        s.job_id,
-        s.run_id,
-        s.task_run_id,
-        s.task_key,
-        s.cluster_id,
-        s.ts_task_started,
-        s.ts_task_ended,
-        s.setup_duration_seconds,
-        s.task_result_state,
-        s.dt_task_started,
+        spine.workspace_id,
+        spine.job_id,
+        spine.run_id,
+        spine.task_run_id,
+        spine.task_key,
+        spine.cluster_id,
+        spine.ts_task_started,
+        spine.ts_task_ended,
+        spine.setup_duration_seconds,
+        spine.task_result_state,
+        spine.dt_task_started,
         GREATEST(
-            CAST(unix_timestamp(s.ts_task_ended) AS BIGINT)
-            - CAST(unix_timestamp(s.ts_task_started) AS BIGINT),
+            CAST(unix_timestamp(spine.ts_task_ended) AS BIGINT)
+            - CAST(unix_timestamp(spine.ts_task_started) AS BIGINT),
             CAST(0 AS BIGINT)
         )                                                  AS task_seconds
     FROM
-        task_run_spine s
+        task_run_spine AS spine
 ),
 cluster_task_seconds AS (
     SELECT
@@ -250,63 +298,69 @@ tasks_per_cluster AS (
 ),
 billing_per_task AS (
     SELECT
-        t.workspace_id,
-        t.run_id,
-        t.task_run_id,
+        task_sec.workspace_id,
+        task_sec.run_id,
+        task_sec.task_run_id,
         COALESCE(CAST(bc.dbu_consumed AS DOUBLE), CAST(0 AS DOUBLE))
             * (
                 CASE
                     WHEN COALESCE(cts.cluster_total_seconds, CAST(0 AS BIGINT)) > CAST(0 AS BIGINT)
-                        THEN CAST(t.task_seconds AS DOUBLE) / CAST(cts.cluster_total_seconds AS DOUBLE)
+                        THEN CAST(task_sec.task_seconds AS DOUBLE) / CAST(cts.cluster_total_seconds AS DOUBLE)
                     WHEN COALESCE(tpc.n_tasks, 0) > 0
                         THEN 1.0 / CAST(tpc.n_tasks AS DOUBLE)
                     ELSE CAST(1 AS DOUBLE)
                 END
             )                                              AS total_dbu_consumed,
-        COALESCE(CAST(bc.cost_usd_estimate AS DOUBLE), CAST(0 AS DOUBLE))
+        COALESCE(CAST(bc.dbu_cost_usd_estimate AS DOUBLE), CAST(0 AS DOUBLE))
             * (
                 CASE
                     WHEN COALESCE(cts.cluster_total_seconds, CAST(0 AS BIGINT)) > CAST(0 AS BIGINT)
-                        THEN CAST(t.task_seconds AS DOUBLE) / CAST(cts.cluster_total_seconds AS DOUBLE)
+                        THEN CAST(task_sec.task_seconds AS DOUBLE) / CAST(cts.cluster_total_seconds AS DOUBLE)
                     WHEN COALESCE(tpc.n_tasks, 0) > 0
                         THEN 1.0 / CAST(tpc.n_tasks AS DOUBLE)
                     ELSE CAST(1 AS DOUBLE)
                 END
             )                                              AS total_dbu_cost_usd,
+        COALESCE(CAST(bc.dbu_list_cost_usd_estimate AS DOUBLE), CAST(0 AS DOUBLE))
+            * (
+                CASE
+                    WHEN COALESCE(cts.cluster_total_seconds, CAST(0 AS BIGINT)) > CAST(0 AS BIGINT)
+                        THEN CAST(task_sec.task_seconds AS DOUBLE) / CAST(cts.cluster_total_seconds AS DOUBLE)
+                    WHEN COALESCE(tpc.n_tasks, 0) > 0
+                        THEN 1.0 / CAST(tpc.n_tasks AS DOUBLE)
+                    ELSE CAST(1 AS DOUBLE)
+                END
+            )                                              AS total_dbu_list_cost_usd,
         (
             CASE
                 WHEN COALESCE(cts.cluster_total_seconds, CAST(0 AS BIGINT)) > CAST(0 AS BIGINT)
-                    THEN CAST(t.task_seconds AS DOUBLE) / CAST(cts.cluster_total_seconds AS DOUBLE)
+                    THEN CAST(task_sec.task_seconds AS DOUBLE) / CAST(cts.cluster_total_seconds AS DOUBLE)
                 WHEN COALESCE(tpc.n_tasks, 0) > 0
                     THEN 1.0 / CAST(tpc.n_tasks AS DOUBLE)
                 ELSE CAST(1 AS DOUBLE)
             END
         )                                                  AS task_weight,
-        cps.pricing_sku,
-        pr_eff.unit_price_usd                              AS dbu_rate_usd
+        cps.dbu_pricing_sku,
+        bc.dbu_list_unit_price_usd                        AS dbu_rate_usd,
+        COALESCE(bc.dbu_negotiated_price_missing, FALSE)   AS dbu_negotiated_price_missing
     FROM
-        task_with_seconds t
+        task_with_seconds AS task_sec
     LEFT JOIN
-        cluster_task_seconds cts
-            ON  cts.workspace_id = t.workspace_id
-            AND cts.cluster_id   = t.cluster_id
+        cluster_task_seconds AS cts
+            ON  cts.workspace_id = task_sec.workspace_id
+            AND cts.cluster_id   = task_sec.cluster_id
     LEFT JOIN
-        tasks_per_cluster tpc
-            ON  tpc.workspace_id = t.workspace_id
-            AND tpc.cluster_id   = t.cluster_id
+        tasks_per_cluster AS tpc
+            ON  tpc.workspace_id = task_sec.workspace_id
+            AND tpc.cluster_id   = task_sec.cluster_id
     LEFT JOIN
-        billing_per_cluster bc
-            ON  bc.workspace_id = t.workspace_id
-            AND bc.cluster_id   = t.cluster_id
+        billing_per_cluster AS bc
+            ON  bc.workspace_id = task_sec.workspace_id
+            AND bc.cluster_id   = task_sec.cluster_id
     LEFT JOIN
-        cluster_primary_sku cps
-            ON  cps.workspace_id = t.workspace_id
-            AND cps.cluster_id   = t.cluster_id
-    LEFT JOIN
-        prices_per_sku pr_eff
-            ON  pr_eff.sku_name = cps.pricing_sku
-            AND TIMESTAMP('{load_end_date}') >= pr_eff.price_start_time
-            AND (pr_eff.price_end_time IS NULL OR TIMESTAMP('{load_end_date}') < pr_eff.price_end_time)
+        cluster_primary_sku AS cps
+            ON  cps.workspace_id = task_sec.workspace_id
+            AND cps.cluster_id   = task_sec.cluster_id
 ),
 stage_per_app AS (
     -- Roll up spark_stage_metrics from per-stage to per-spark-application,
@@ -434,6 +488,252 @@ stage_per_task_clean AS (
         IF(spark_app_count > 1, NULL, max_task_skew_ratio)                                   AS max_task_skew_ratio
     FROM
         stage_per_task
+),
+task_cluster_day_overlap AS (
+    -- Wall-clock seconds each task overlaps each cluster-day (UTC). Fixes the
+    -- legacy DATE-range join that pulled full cluster-day EC2 for every calendar
+    -- day touched when a task crossed midnight with short runtime.
+    SELECT
+        spine.workspace_id,
+        spine.run_id,
+        spine.task_run_id,
+        spine.cluster_id,
+        dch.dt_cluster_run,
+        GREATEST(
+            CAST(0 AS BIGINT),
+            CAST(
+                unix_timestamp(
+                    LEAST(spine.ts_task_ended, CAST(DATE_ADD(dch.dt_cluster_run, 1) AS TIMESTAMP))
+                ) AS BIGINT
+            )
+            - CAST(
+                unix_timestamp(
+                    GREATEST(spine.ts_task_started, CAST(dch.dt_cluster_run AS TIMESTAMP))
+                ) AS BIGINT
+            )
+        )                                                  AS overlap_seconds
+    FROM
+        task_run_spine AS spine
+    INNER JOIN
+        datalake_databricks_health.daily_cluster_health AS dch
+            ON  dch.id_databricks_workspace = spine.workspace_id
+            AND dch.id_cluster              = spine.cluster_id
+            AND dch.dt_cluster_run BETWEEN DATE(spine.ts_task_started) AND DATE(spine.ts_task_ended)
+),
+cluster_day_overlap_totals AS (
+    -- Per cluster-day: sum of per-task overlap seconds (splits EC2 among parallel
+    -- tasks) and wall-clock span from earliest task start to latest task end on
+    -- that day (caps attribution when summed overlaps exceed active cluster time).
+    SELECT
+        tcdo.workspace_id,
+        tcdo.cluster_id,
+        tcdo.dt_cluster_run,
+        SUM(tcdo.overlap_seconds)                          AS cluster_day_total_overlap_seconds,
+        GREATEST(
+            CAST(0 AS BIGINT),
+            CAST(
+                unix_timestamp(MAX(
+                    LEAST(spine.ts_task_ended, CAST(DATE_ADD(tcdo.dt_cluster_run, 1) AS TIMESTAMP))
+                )) AS BIGINT
+            )
+            - CAST(
+                unix_timestamp(MIN(
+                    GREATEST(spine.ts_task_started, CAST(tcdo.dt_cluster_run AS TIMESTAMP))
+                )) AS BIGINT
+            )
+        )                                                  AS cluster_day_task_wall_seconds
+    FROM
+        task_cluster_day_overlap AS tcdo
+    INNER JOIN
+        task_run_spine AS spine
+            ON  spine.workspace_id = tcdo.workspace_id
+            AND spine.run_id       = tcdo.run_id
+            AND spine.task_run_id  = tcdo.task_run_id
+    GROUP BY
+        tcdo.workspace_id,
+        tcdo.cluster_id,
+        tcdo.dt_cluster_run
+),
+task_dch_prorated AS (
+    -- EC2 USD + spot/on-demand hours per overlapping cluster-day:
+    --   (task overlap / sum of task overlaps on that cluster-day)
+    --   × min(1, cluster-day task wall span / cluster active seconds)
+    -- Splits parallel tasks without double-counting; caps short/partial-day tasks.
+    SELECT
+        tcdo.workspace_id,
+        tcdo.run_id,
+        tcdo.task_run_id,
+        SUM(
+            dch.total_ec2_cost_calculated_usd
+            * (
+                CAST(tcdo.overlap_seconds AS DOUBLE)
+                / NULLIF(CAST(cdot.cluster_day_total_overlap_seconds AS DOUBLE), 0)
+            )
+            * LEAST(
+                1.0,
+                CASE
+                    WHEN dch.ec2_source = 'billable_usage_estimate' THEN 1.0
+                    ELSE CAST(cdot.cluster_day_task_wall_seconds AS DOUBLE)
+                        / NULLIF(CAST(dch.cluster_active_minutes AS DOUBLE) * 60.0, 0)
+                END
+            )
+        )                                                  AS total_ec2_cost_calculated_usd,
+        SUM(
+            dch.ec2_spot_hours
+            * (
+                CAST(tcdo.overlap_seconds AS DOUBLE)
+                / NULLIF(CAST(cdot.cluster_day_total_overlap_seconds AS DOUBLE), 0)
+            )
+            * LEAST(
+                1.0,
+                CASE
+                    WHEN dch.ec2_source = 'billable_usage_estimate' THEN 1.0
+                    ELSE CAST(cdot.cluster_day_task_wall_seconds AS DOUBLE)
+                        / NULLIF(CAST(dch.cluster_active_minutes AS DOUBLE) * 60.0, 0)
+                END
+            )
+        )                                                  AS ec2_spot_hours,
+        SUM(
+            dch.ec2_on_demand_hours
+            * (
+                CAST(tcdo.overlap_seconds AS DOUBLE)
+                / NULLIF(CAST(cdot.cluster_day_total_overlap_seconds AS DOUBLE), 0)
+            )
+            * LEAST(
+                1.0,
+                CASE
+                    WHEN dch.ec2_source = 'billable_usage_estimate' THEN 1.0
+                    ELSE CAST(cdot.cluster_day_task_wall_seconds AS DOUBLE)
+                        / NULLIF(CAST(dch.cluster_active_minutes AS DOUBLE) * 60.0, 0)
+                END
+            )
+        )                                                  AS ec2_on_demand_hours,
+        CASE
+            WHEN BOOL_OR(dch.ec2_source = 'node_timeline') THEN 'node_timeline'
+            WHEN BOOL_OR(dch.ec2_source = 'billable_usage_estimate') THEN 'billable_usage_estimate'
+            WHEN BOOL_OR(dch.ec2_source = 'missing') THEN 'missing'
+            ELSE 'not_applicable'
+        END                                                AS ec2_source,
+        BOOL_OR(dch.is_ec2_estimated)                      AS is_ec2_estimated,
+        BOOL_OR(dch.ec2_pricing_missing)                   AS ec2_pricing_missing,
+        SUM(
+            dch.ec2_unpriced_hours
+            * (
+                CAST(tcdo.overlap_seconds AS DOUBLE)
+                / NULLIF(CAST(cdot.cluster_day_total_overlap_seconds AS DOUBLE), 0)
+            )
+            * LEAST(
+                1.0,
+                CASE
+                    WHEN dch.ec2_source = 'billable_usage_estimate' THEN 1.0
+                    ELSE CAST(cdot.cluster_day_task_wall_seconds AS DOUBLE)
+                        / NULLIF(CAST(dch.cluster_active_minutes AS DOUBLE) * 60.0, 0)
+                END
+            )
+        )                                                  AS ec2_unpriced_hours
+    FROM
+        task_cluster_day_overlap AS tcdo
+    INNER JOIN
+        datalake_databricks_health.daily_cluster_health AS dch
+            ON  dch.id_databricks_workspace = tcdo.workspace_id
+            AND dch.id_cluster              = tcdo.cluster_id
+            AND dch.dt_cluster_run          = tcdo.dt_cluster_run
+    INNER JOIN
+        cluster_day_overlap_totals AS cdot
+            ON  cdot.workspace_id    = tcdo.workspace_id
+            AND cdot.cluster_id      = tcdo.cluster_id
+            AND cdot.dt_cluster_run  = tcdo.dt_cluster_run
+    GROUP BY
+        tcdo.workspace_id, tcdo.run_id, tcdo.task_run_id
+),
+task_dch_health AS (
+    -- Utilisation + startup metrics across every cluster-day the task overlaps,
+    -- weighted by overlap_seconds (same window as task_dch_prorated).
+    SELECT
+        tcdo.workspace_id,
+        tcdo.run_id,
+        tcdo.task_run_id,
+        MAX(dch.peak_concurrent_workers)                   AS peak_concurrent_workers,
+        ROUND(
+            SUM(dch.p50_driver_cpu_busy_percent * CAST(tcdo.overlap_seconds AS DOUBLE))
+                / NULLIF(SUM(CAST(tcdo.overlap_seconds AS DOUBLE)), 0),
+            2
+        )                                                  AS p50_driver_cpu_busy_percent,
+        ROUND(
+            SUM(dch.p95_driver_cpu_busy_percent * CAST(tcdo.overlap_seconds AS DOUBLE))
+                / NULLIF(SUM(CAST(tcdo.overlap_seconds AS DOUBLE)), 0),
+            2
+        )                                                  AS p95_driver_cpu_busy_percent,
+        ROUND(
+            SUM(dch.p50_driver_cpu_wait_percent * CAST(tcdo.overlap_seconds AS DOUBLE))
+                / NULLIF(SUM(CAST(tcdo.overlap_seconds AS DOUBLE)), 0),
+            3
+        )                                                  AS p50_driver_cpu_wait_percent,
+        ROUND(
+            SUM(dch.p95_driver_cpu_wait_percent * CAST(tcdo.overlap_seconds AS DOUBLE))
+                / NULLIF(SUM(CAST(tcdo.overlap_seconds AS DOUBLE)), 0),
+            3
+        )                                                  AS p95_driver_cpu_wait_percent,
+        ROUND(
+            SUM(dch.p50_worker_cpu_busy_percent * CAST(tcdo.overlap_seconds AS DOUBLE))
+                / NULLIF(SUM(CAST(tcdo.overlap_seconds AS DOUBLE)), 0),
+            2
+        )                                                  AS p50_worker_cpu_busy_percent,
+        ROUND(
+            SUM(dch.p95_worker_cpu_busy_percent * CAST(tcdo.overlap_seconds AS DOUBLE))
+                / NULLIF(SUM(CAST(tcdo.overlap_seconds AS DOUBLE)), 0),
+            2
+        )                                                  AS p95_worker_cpu_busy_percent,
+        ROUND(
+            SUM(dch.p50_worker_cpu_wait_percent * CAST(tcdo.overlap_seconds AS DOUBLE))
+                / NULLIF(SUM(CAST(tcdo.overlap_seconds AS DOUBLE)), 0),
+            3
+        )                                                  AS p50_worker_cpu_wait_percent,
+        ROUND(
+            SUM(dch.p95_worker_cpu_wait_percent * CAST(tcdo.overlap_seconds AS DOUBLE))
+                / NULLIF(SUM(CAST(tcdo.overlap_seconds AS DOUBLE)), 0),
+            3
+        )                                                  AS p95_worker_cpu_wait_percent,
+        ROUND(
+            SUM(dch.p50_driver_mem_used_percent * CAST(tcdo.overlap_seconds AS DOUBLE))
+                / NULLIF(SUM(CAST(tcdo.overlap_seconds AS DOUBLE)), 0),
+            2
+        )                                                  AS p50_driver_mem_used_percent,
+        ROUND(
+            SUM(dch.p95_driver_mem_used_percent * CAST(tcdo.overlap_seconds AS DOUBLE))
+                / NULLIF(SUM(CAST(tcdo.overlap_seconds AS DOUBLE)), 0),
+            2
+        )                                                  AS p95_driver_mem_used_percent,
+        ROUND(
+            SUM(dch.p50_worker_mem_used_percent * CAST(tcdo.overlap_seconds AS DOUBLE))
+                / NULLIF(SUM(CAST(tcdo.overlap_seconds AS DOUBLE)), 0),
+            2
+        )                                                  AS p50_worker_mem_used_percent,
+        ROUND(
+            SUM(dch.p95_worker_mem_used_percent * CAST(tcdo.overlap_seconds AS DOUBLE))
+                / NULLIF(SUM(CAST(tcdo.overlap_seconds AS DOUBLE)), 0),
+            2
+        )                                                  AS p95_worker_mem_used_percent,
+        ROUND(
+            SUM(dch.nvme_utilization_pct_p95 * CAST(tcdo.overlap_seconds AS DOUBLE))
+                / NULLIF(SUM(CAST(tcdo.overlap_seconds AS DOUBLE)), 0),
+            2
+        )                                                  AS nvme_utilization_pct_p95,
+        BOOL_OR(dch.is_photon)                             AS is_photon,
+        BOOL_OR(dch.is_pool_backed)                        AS is_pool_backed,
+        MAX(dch.pre_init_script_seconds)                   AS pre_init_script_seconds,
+        MAX(dch.init_script_seconds)                       AS init_script_seconds,
+        MAX(dch.post_init_script_seconds)                  AS post_init_script_seconds,
+        MAX(dch.cluster_startup_seconds)                   AS cluster_startup_seconds
+    FROM
+        task_cluster_day_overlap AS tcdo
+    INNER JOIN
+        datalake_databricks_health.daily_cluster_health AS dch
+            ON  dch.id_databricks_workspace = tcdo.workspace_id
+            AND dch.id_cluster              = tcdo.cluster_id
+            AND dch.dt_cluster_run          = tcdo.dt_cluster_run
+    GROUP BY
+        tcdo.workspace_id, tcdo.run_id, tcdo.task_run_id
 )
 SELECT
     XXHASH64(s.workspace_id, s.run_id, s.task_run_id)              AS sk_databricks_task_run,
@@ -511,7 +811,7 @@ SELECT
     lcs.worker_count,
     lcs.min_autoscale_workers,
     lcs.max_autoscale_workers,
-    dch.peak_concurrent_workers,
+    dch_health.peak_concurrent_workers,
     pr.run_type,
     pr.run_result_state,
     s.task_result_state,
@@ -523,65 +823,67 @@ SELECT
         - COALESCE(s.setup_duration_seconds, 0)                    AS execution_duration_seconds,
 
     -- CPU: driver then worker (P50 / P95 busy + wait).
-    dch.p50_driver_cpu_busy_percent,
-    dch.p95_driver_cpu_busy_percent,
-    dch.p50_driver_cpu_wait_percent,
-    dch.p95_driver_cpu_wait_percent,
-    dch.p50_worker_cpu_busy_percent,
-    dch.p95_worker_cpu_busy_percent,
-    dch.p50_worker_cpu_wait_percent,
-    dch.p95_worker_cpu_wait_percent,
+    dch_health.p50_driver_cpu_busy_percent,
+    dch_health.p95_driver_cpu_busy_percent,
+    dch_health.p50_driver_cpu_wait_percent,
+    dch_health.p95_driver_cpu_wait_percent,
+    dch_health.p50_worker_cpu_busy_percent,
+    dch_health.p95_worker_cpu_busy_percent,
+    dch_health.p50_worker_cpu_wait_percent,
+    dch_health.p95_worker_cpu_wait_percent,
 
     -- Memory: driver then worker (P50 / P95 used).
-    dch.p50_driver_mem_used_percent,
-    dch.p95_driver_mem_used_percent,
-    dch.p50_worker_mem_used_percent,
-    dch.p95_worker_mem_used_percent,
+    dch_health.p50_driver_mem_used_percent,
+    dch_health.p95_driver_mem_used_percent,
+    dch_health.p50_worker_mem_used_percent,
+    dch_health.p95_worker_mem_used_percent,
 
     -- Disk: /local_disk0 utilization (EBS-backed on standard instances; NVMe on d/i3/g5 families).
-    dch.nvme_utilization_pct_p95                                    AS local_disk_utilization_pct_p95,
+    dch_health.nvme_utilization_pct_p95                             AS local_disk_utilization_pct_p95,
 
-    -- Cost (DBU — system tables list price).
+    -- Cost (DBU — negotiated rate from dim_dbu_price, list fallback).
     CAST(ROUND(COALESCE(b.total_dbu_consumed, 0), 4) AS DECIMAL(25, 4))   AS total_dbu_consumed,
     CAST(ROUND(COALESCE(b.total_dbu_cost_usd, 0), 4) AS DECIMAL(37, 4))
                                                                    AS total_dbu_cost_usd,
+    CAST(ROUND(COALESCE(b.total_dbu_list_cost_usd, 0), 4) AS DECIMAL(37, 4))
+                                                                   AS total_dbu_list_cost_usd,
     b.dbu_rate_usd,
-    b.pricing_sku,
-    CAST(ROUND(COALESCE(dch.total_ec2_cost_calculated_usd, 0) * COALESCE(b.task_weight, 1.0), 4) AS DECIMAL(38, 4))
+    b.dbu_pricing_sku,
+    CAST(ROUND(COALESCE(dch_pro.total_ec2_cost_calculated_usd, 0), 4) AS DECIMAL(38, 4))
                                                                    AS total_ec2_cost_calculated_usd,
-    CAST(ROUND(COALESCE(dch.spot_hours, 0) * COALESCE(b.task_weight, 1.0), 4) AS DECIMAL(38, 4))    AS spot_hours,
-    CAST(ROUND(COALESCE(dch.on_demand_hours, 0) * COALESCE(b.task_weight, 1.0), 4) AS DECIMAL(38, 4))
-                                                                   AS on_demand_hours,
-    -- Cost (Overwatch EC2 + legacy). Apportioned by task weight.
-    CAST(ROUND(dch.total_ec2_cost_overwatch_usd * COALESCE(b.task_weight, 1.0), 4) AS DECIMAL(38, 4)) AS total_ec2_cost_overwatch_usd,
-    CAST(ROUND(dch.total_dbu_cost_overwatch_usd * COALESCE(b.task_weight, 1.0), 4) AS DECIMAL(38, 4)) AS total_dbu_cost_overwatch_usd,
-    -- Overwatch DBU + EC2 combined (legacy bill-allocation cross-check).
-    CAST(
-        ROUND(
-            (COALESCE(CAST(dch.total_dbu_cost_overwatch_usd AS DOUBLE), CAST(0 AS DOUBLE))
-            + COALESCE(CAST(dch.total_ec2_cost_overwatch_usd AS DOUBLE), CAST(0 AS DOUBLE)))
-            * COALESCE(b.task_weight, 1.0),
-            4
-        ) AS DECIMAL(38, 4)
-    )                                                              AS total_cost_overwatch_usd,
-    -- System-tables DBU USD (total_dbu_cost_usd) + calculated EC2 (node_timeline × instancedetails).
+    CAST(ROUND(COALESCE(dch_pro.ec2_spot_hours, 0), 4) AS DECIMAL(38, 4))
+                                                                   AS ec2_spot_hours,
+    CAST(ROUND(COALESCE(dch_pro.ec2_on_demand_hours, 0), 4) AS DECIMAL(38, 4))
+                                                                   AS ec2_on_demand_hours,
+    COALESCE(dch_pro.ec2_source, 'not_applicable')                  AS ec2_source,
+    COALESCE(dch_pro.is_ec2_estimated, FALSE)                       AS is_ec2_estimated,
+    COALESCE(dch_pro.ec2_pricing_missing, FALSE)                    AS ec2_pricing_missing,
+    CAST(ROUND(COALESCE(dch_pro.ec2_unpriced_hours, 0), 4) AS DECIMAL(38, 4))
+                                                                   AS ec2_unpriced_hours,
+    -- Negotiated DBU USD (total_dbu_cost_usd) + overlap-prorated calculated EC2.
     CAST(
         ROUND(
             COALESCE(CAST(b.total_dbu_cost_usd AS DOUBLE), CAST(0 AS DOUBLE))
-            + (COALESCE(CAST(dch.total_ec2_cost_calculated_usd AS DOUBLE), CAST(0 AS DOUBLE)) * COALESCE(b.task_weight, 1.0)),
+            + COALESCE(CAST(dch_pro.total_ec2_cost_calculated_usd AS DOUBLE), CAST(0 AS DOUBLE)),
             4
         ) AS DECIMAL(38, 4)
     )                                                              AS total_cost_usd,
 
     -- Cluster flags.
-    dch.is_photon,
+    dch_health.is_photon,
     (
         COALESCE(lcs.worker_node_type, '') RLIKE 'd[.-]'
         OR COALESCE(lcs.driver_node_type, '') RLIKE 'd[.-]'
         OR COALESCE(lcs.worker_node_type, '') RLIKE '^(i[3-9]|g[4-5]|p[3-5]d|d[2-3])'
         OR COALESCE(lcs.driver_node_type, '') RLIKE '^(i[3-9]|g[4-5]|p[3-5]d|d[2-3])'
     )                                                              AS has_local_nvme,
-    dch.is_pool_backed,
+    dch_health.is_pool_backed,
+    COALESCE(
+        cbp.has_all_purpose_billing
+        OR (cbp.has_jobs_billing AND lcs.cluster_source IN ('UI', 'API')),
+        FALSE
+    )                                                              AS is_job_on_interactive,
+    COALESCE(b.dbu_negotiated_price_missing, FALSE)                 AS dbu_negotiated_price_missing,
 
     -- State / quality flags.
     s.task_result_state = 'SUCCEEDED'                              AS is_success,
@@ -615,10 +917,10 @@ SELECT
     -- Detailed cluster-startup timing (cluster-day attributes — dedupe before summing).
     -- These are less frequently consulted; placed here so the headline metrics above are visible first.
     s.setup_duration_seconds,
-    dch.pre_init_script_seconds,
-    dch.init_script_seconds,
-    dch.post_init_script_seconds,
-    dch.cluster_startup_seconds,
+    dch_health.pre_init_script_seconds,
+    dch_health.init_script_seconds,
+    dch_health.post_init_script_seconds,
+    dch_health.cluster_startup_seconds,
 
     s.dt_task_started,
     s.ts_task_started,
@@ -651,9 +953,19 @@ LEFT JOIN
         AND b.run_id       = s.run_id
         AND b.task_run_id  = s.task_run_id
 LEFT JOIN
-    datalake_databricks_health.daily_cluster_health dch
-        ON  dch.id_cluster     = s.cluster_id
-        AND dch.dt_cluster_run = s.dt_task_started
+    task_dch_prorated AS dch_pro
+        ON  dch_pro.workspace_id = s.workspace_id
+        AND dch_pro.run_id       = s.run_id
+        AND dch_pro.task_run_id  = s.task_run_id
+LEFT JOIN
+    task_dch_health AS dch_health
+        ON  dch_health.workspace_id = s.workspace_id
+        AND dch_health.run_id       = s.run_id
+        AND dch_health.task_run_id  = s.task_run_id
+LEFT JOIN
+    cluster_billing_products AS cbp
+        ON  cbp.workspace_id = s.workspace_id
+        AND cbp.cluster_id   = s.cluster_id
 LEFT JOIN
     stage_per_task_clean sptc
         ON  sptc.workspace_id = s.workspace_id
