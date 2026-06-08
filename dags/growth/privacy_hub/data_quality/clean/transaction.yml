@@ -19,9 +19,11 @@ column_level_validations:
     is_complete:
       severity_level: Error
   id_data_subject:
-    # Every transaction must reference an existing data subject in the clean layer.
-    # Warning (not Error): privacy_hub CDC clean tables load in parallel with no inner_dependency
-    # on data_subject. Valid same-run inserts can transiently fail this check until data_subject finishes.
+    is_complete:
+      severity_level: Error
+  fk_id_data_subject:
+    # Synthetic check key (not a table column). Every transaction must reference an existing data
+    # subject in the clean layer. Warning (not Error): parallel CDC load race with data_subject table.
     custom:
       constraint: |-
         (SELECT COUNT(*)
@@ -32,8 +34,6 @@ column_level_validations:
            WHERE ds.id = t.id_data_subject
          )) = 0
       severity_level: Warning
-    is_complete:
-      severity_level: Error
   type:
     is_complete:
       severity_level: Error
