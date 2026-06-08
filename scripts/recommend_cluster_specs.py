@@ -50,8 +50,6 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 # ---------------------------------------------------------------------------
 # Repository layout
 # ---------------------------------------------------------------------------
@@ -2386,160 +2384,63 @@ def write_report(
 
 
 # ---------------------------------------------------------------------------
-# Validation config generator
+# Validation config generator (implementation in bietlejuice-compiler ci_cd)
 # ---------------------------------------------------------------------------
 
-_ACTIONABLE_COHORTS = {
-    "collapse_to_single",
-    "downsize_workers",
-    "driver_downsize",
-    "protect_oom_risk",
-    "right_size_to_memory_family",
-    "keep_multi_sla",
-    "keep_multi_memory",
-    "keep_multi_compute",
-    "keep_multi_balanced",
-    "keep_multi_cost",
-}
+
+def _ensure_bietlejuice_import_path() -> None:
+    """Make bietlejuice-compiler scripts importable ahead of repo-root scripts/."""
+    compiler_root = REPO_ROOT / "packages" / "bietlejuice-compiler"
+    core_src = REPO_ROOT / "packages" / "bietlejuice-core" / "src"
+    for subpath in (compiler_root, compiler_root / "src", core_src):
+        path_str = str(subpath)
+        while path_str in sys.path:
+            sys.path.remove(path_str)
+        sys.path.insert(0, path_str)
+
+
+_RIGHTSIZING_VALIDATION_MODULE = None
+
+
+def _rightsizing_validation_module():
+    """Load ci_cd validation module without conflicting with repo-root scripts/."""
+    global _RIGHTSIZING_VALIDATION_MODULE
+    if _RIGHTSIZING_VALIDATION_MODULE is not None:
+        return _RIGHTSIZING_VALIDATION_MODULE
+
+    _ensure_bietlejuice_import_path()
+    scripts_mod = sys.modules.get("scripts")
+    if scripts_mod is not None and not hasattr(scripts_mod, "ci_cd"):
+        del sys.modules["scripts"]
+
+    from scripts.ci_cd.airflow_dag_builder import (  # noqa: PLC0415
+        rightsizing_validation_config,
+    )
+
+    _RIGHTSIZING_VALIDATION_MODULE = rightsizing_validation_config
+    return rightsizing_validation_config
 
 
 def generate_validation_config(
     rec: Recommendation,
     databricks_conn_id: str = "databricks_new",
+    *,
+    dags_root: Path = DAGS_ROOT,
 ) -> dict | None:
-    """Return a dict representing the validation.cluster block, or None."""
-    if rec.cohort not in _ACTIONABLE_COHORTS or not rec.recommended_preset:
-        return None
-    if rec.cohort in _KEEP_MULTI_COHORTS:
-        accepted_actions = {
-            "reduce_driver",
-            "reduce_worker_type",
-            "reduce_worker_count",
-        }
-        if not accepted_actions.intersection(rec.actions.split("|")):
-            return None
-
-    val_cluster: dict[str, Any] = {
-        "type": rec.recommended_preset,
-        "databricks_conn_id": databricks_conn_id,
-    }
-    custom_configurations: dict[str, Any] = {}
-    if rec.num_workers_override is not None:
-        custom_configurations["num_workers"] = rec.num_workers_override
-    if rec.driver_override_node_type_id is not None:
-        custom_configurations["driver_node_type_id"] = rec.driver_override_node_type_id
-    if (
-        rec.rec_worker_node_type
-        and rec.rec_worker_node_type != rec.current_worker_node_type
-    ):
-        custom_configurations["node_type_id"] = rec.rec_worker_node_type
-    if custom_configurations:
-        val_cluster["custom_configurations"] = custom_configurations
-
-    return {
-        "dag_id": rec.dag_id,
-        "cohort": rec.cohort,
-        "confidence": rec.confidence,
-        "actions": rec.actions,
-        "est_cost_delta_pct": rec.projected.est_cost_delta_pct,
-        "driver_action": rec.driver_action,
-        "worker_action": rec.worker_action,
-        "blocking_reason": rec.blocking_reason,
-        "validation": {"cluster": val_cluster},
-    }
+    """Return a minimal validation block dict, or None when not actionable."""
+    return _rightsizing_validation_module().generate_validation_config(
+        rec, databricks_conn_id, dags_root=dags_root
+    )
 
 
 def find_dag_cluster_path(dag_name: str, dags_root: Path = DAGS_ROOT) -> Path | None:
     """Find *_cluster.yml for a dag_name by searching dags/ tree."""
-    target = f"{dag_name}_cluster.yml"
-    matches = list(dags_root.rglob(target))
-    return matches[0] if len(matches) == 1 else None
+    return _rightsizing_validation_module().find_dag_cluster_path(dag_name, dags_root)
 
 
 def find_dag_folder(dag_name: str, dags_root: Path = DAGS_ROOT) -> Path | None:
     """Find the DAG folder containing {dag_name}_declaration.yml."""
-    target = f"{dag_name}_declaration.yml"
-    matches = list(dags_root.rglob(target))
-    return matches[0].parent if len(matches) == 1 else None
-
-
-def _get_current_cluster_type(dag_name: str, dags_root: Path) -> str | None:
-    """Read cluster.type from *_declaration.yml for documenting current state."""
-    folder = find_dag_folder(dag_name, dags_root)
-    if not folder:
-        return None
-    decl_path = folder / f"{dag_name}_declaration.yml"
-    if not decl_path.exists():
-        return None
-    try:
-        doc = yaml.safe_load(decl_path.read_text(encoding="utf-8"))
-        return doc.get("cluster", {}).get("type") if isinstance(doc, dict) else None
-    except (OSError, yaml.YAMLError) as exc:
-        logger.warning("Failed to parse YAML %s: %s", decl_path, exc)
-        return None
-
-
-_CLUSTER_FILE_TOP_LEVEL_KEYS = frozenset(
-    {"dag", "workflow", "cluster", "validation", "spark_session_configs"}
-)
-# Prevent yaml.dump from folding long spark_conf keys (e.g. Jinja catalog.namespace).
-_CLUSTER_YAML_DUMP_WIDTH = 10_000
-
-
-def _dump_cluster_yaml(document: dict) -> str:
-    """Dump cluster YAML without folding long Jinja spark_conf values."""
-    text = yaml.dump(
-        document,
-        default_flow_style=False,
-        sort_keys=False,
-        allow_unicode=True,
-        width=_CLUSTER_YAML_DUMP_WIDTH,
-    )
-    if not text.endswith("\n"):
-        text += "\n"
-    return text
-
-
-def _extract_top_level_section_text(text: str, section_key: str) -> str | None:
-    """Return verbatim top-level section block including trailing newline."""
-    prefix = f"{section_key}:"
-    lines = text.splitlines(keepends=True)
-    start_idx: int | None = None
-    for index, line in enumerate(lines):
-        if line.startswith(prefix):
-            start_idx = index
-            break
-    if start_idx is None:
-        return None
-
-    end_idx = len(lines)
-    for index in range(start_idx + 1, len(lines)):
-        stripped = lines[index].strip()
-        if not stripped or stripped.startswith("#"):
-            continue
-        key = lines[index].split(":", 1)[0]
-        if key in _CLUSTER_FILE_TOP_LEVEL_KEYS and not lines[index].startswith(" "):
-            end_idx = index
-            break
-
-    block = "".join(lines[start_idx:end_idx])
-    if not block.endswith("\n"):
-        block += "\n"
-    return block
-
-
-def _format_validation_section_yaml(validation_doc: dict) -> str:
-    """Format validation: block (matches extract_cluster_validation_files.py)."""
-    dumped = _dump_cluster_yaml(validation_doc)
-    lines = ["validation:"]
-    for line in dumped.splitlines():
-        if line.strip():
-            lines.append(f"  {line}")
-    return "\n".join(lines) + "\n"
-
-
-def _normalize_cluster_file_text(text: str) -> str:
-    return text.rstrip("\n") + "\n"
+    return _rightsizing_validation_module().find_dag_folder(dag_name, dags_root)
 
 
 def write_validation_cluster_file(
@@ -2548,56 +2449,12 @@ def write_validation_cluster_file(
     current_cluster_type: str | None,
     databricks_conn_id: str = "databricks_new",
 ) -> None:
-    """Upsert the validation: section in a *_cluster.yml file.
-
-    Preserves the existing cluster: block verbatim (comments, quotes, Jinja).
-    Creates the file if it does not exist.
-    """
-    validation_doc = val_config["validation"]
-    tail_sections: list[str] = []
-
-    if cluster_path.exists():
-        original_text = cluster_path.read_text(encoding="utf-8")
-        cluster_text = _extract_top_level_section_text(original_text, "cluster")
-        if cluster_text is None:
-            logger.warning(
-                "No cluster: section in %s; creating minimal cluster block",
-                cluster_path,
-            )
-            cluster_text = _dump_cluster_yaml(
-                {
-                    "cluster": {
-                        "type": current_cluster_type or "unknown",
-                        "databricks_conn_id": databricks_conn_id,
-                    }
-                }
-            )
-        prod_block = cluster_text.rstrip("\n")
-        for key in ("spark_session_configs",):
-            section = _extract_top_level_section_text(original_text, key)
-            if section:
-                tail_sections.append(section.rstrip("\n"))
-    else:
-        if current_cluster_type:
-            prod_block = _dump_cluster_yaml(
-                {
-                    "cluster": {
-                        "type": current_cluster_type,
-                        "databricks_conn_id": databricks_conn_id,
-                    }
-                }
-            ).rstrip("\n")
-        else:
-            prod_block = ""
-
-    content = prod_block + "\n" + _format_validation_section_yaml(validation_doc)
-    if tail_sections:
-        content += "\n".join(tail_sections) + "\n"
-
-    cluster_path.parent.mkdir(parents=True, exist_ok=True)
-    cluster_path.write_text(
-        _normalize_cluster_file_text(content),
-        encoding="utf-8",
+    """Upsert the validation: section in a *_cluster.yml file."""
+    _rightsizing_validation_module().write_validation_cluster_file(
+        cluster_path,
+        val_config,
+        current_cluster_type,
+        databricks_conn_id,
     )
 
 
@@ -2609,43 +2466,14 @@ def write_validation_configs(
     write_cluster_files: bool = False,
     databricks_conn_id: str = "databricks_new",
 ) -> int:
-    """Write validation_configs.yml and optionally update *_cluster.yml files.
-
-    Returns the number of actionable DAGs written.
-    """
-    entries: list[dict] = []
-    for rec in recs:
-        cfg = generate_validation_config(rec, databricks_conn_id)
-        if not cfg:
-            continue
-        entries.append(cfg)
-
-        if write_cluster_files:
-            dag_name = rec.dag_id.removeprefix("bietlejuice.")
-            cluster_path = find_dag_cluster_path(dag_name, dags_root)
-            if cluster_path is None:
-                folder = find_dag_folder(dag_name, dags_root)
-                if folder:
-                    cluster_path = folder / f"{dag_name}_cluster.yml"
-            if cluster_path is None:
-                print(
-                    f"WARNING: cannot locate cluster file for {rec.dag_id}",
-                    file=sys.stderr,
-                )
-                continue
-            current_type = _get_current_cluster_type(dag_name, dags_root)
-            write_validation_cluster_file(
-                cluster_path, cfg, current_type, databricks_conn_id
-            )
-
-    out_yaml.parent.mkdir(parents=True, exist_ok=True)
-    out_yaml.write_text(
-        yaml.dump(
-            entries, default_flow_style=False, allow_unicode=True, sort_keys=False
-        ),
-        encoding="utf-8",
+    """Write validation_configs.yml and optionally update *_cluster.yml files."""
+    return _rightsizing_validation_module().write_validation_configs(
+        recs,
+        out_yaml,
+        dags_root=dags_root,
+        write_cluster_files=write_cluster_files,
+        databricks_conn_id=databricks_conn_id,
     )
-    return len(entries)
 
 
 # ---------------------------------------------------------------------------
@@ -2706,7 +2534,10 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--databricks-conn-id",
         default="databricks_new",
-        help="databricks_conn_id to use in generated cluster blocks (default databricks_new)",
+        help=(
+            "Fallback databricks_conn_id when prod *_cluster.yml has none "
+            "(default databricks_new)"
+        ),
     )
     parser.add_argument(
         "--trino-host",
@@ -2754,7 +2585,8 @@ def _print_cohort_summary(recs: list[Recommendation]) -> None:
     for cohort in sorted(counts, key=lambda c: -costs.get(c, 0)):
         print(f"{cohort:<35} {counts[cohort]:>5}  ${costs[cohort]:>10.2f}")
     print(f"\nTotal eligible: {len(recs)} DAGs")
-    actionable = sum(1 for r in recs if r.cohort in _ACTIONABLE_COHORTS)
+    actionable_cohorts = _rightsizing_validation_module()._ACTIONABLE_COHORTS
+    actionable = sum(1 for r in recs if r.cohort in actionable_cohorts)
     print(f"Actionable (collapse + downsize + upsize): {actionable} DAGs")
 
 

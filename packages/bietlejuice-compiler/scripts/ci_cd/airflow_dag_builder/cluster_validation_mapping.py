@@ -190,6 +190,19 @@ def is_emr_effective_config(effective: dict) -> bool:
     return spark_version.startswith("emr-")
 
 
+def is_emr_prod_cluster_args(
+    cluster_args: dict,
+    config_service: Optional[ConfigurationService] = None,
+) -> bool:
+    """True when prod cluster runs on EMR (no Databricks shadow validation)."""
+    cluster_type = str(cluster_args.get("type", ""))
+    if cluster_type.startswith(SKIP_CLUSTER_PREFIXES):
+        return True
+    service = config_service or ConfigurationService()
+    effective = merge_cluster_configuration(cluster_args, service)
+    return is_emr_effective_config(effective)
+
+
 def _instance_family(instance_type: str) -> str:
     base = instance_type.split(".", 1)[0].lower()
     for prefix in GENERAL_PREFIXES:
@@ -754,6 +767,7 @@ def compute_validation_overrides(
     mapped_driver: Optional[str],
     validation_resolved: dict,
     prod_cluster_type: str = "",
+    num_workers: Optional[int] = None,
 ) -> Dict[str, Any]:
     """Emit only cluster fields where effective prod differs from validation defaults."""
     target = _effective_validation_target(
@@ -762,7 +776,59 @@ def compute_validation_overrides(
         mapped_driver=mapped_driver,
         prod_cluster_type=prod_cluster_type,
     )
+    if num_workers is not None:
+        target["num_workers"] = num_workers
     return _deep_config_diff(target, validation_resolved)
+
+
+def _recommended_topology(
+    *,
+    recommended_preset: str,
+    recommended_num_workers: Optional[int],
+    recommended_driver_node_type: Optional[str],
+    recommended_worker_node_type: Optional[str],
+    validation_resolved: dict,
+) -> Tuple[str, Optional[str], Optional[int]]:
+    """Resolve mapped worker/driver and num_workers for a rightsizing recommendation."""
+    default_worker = validation_resolved.get("node_type_id")
+    default_driver = validation_resolved.get("driver_node_type_id")
+    default_workers = validation_resolved.get("num_workers")
+
+    single_node = recommended_preset.endswith("_single_node_cluster") or (
+        recommended_num_workers is not None and int(recommended_num_workers) == 0
+    )
+
+    if single_node:
+        mapped_driver = (
+            recommended_driver_node_type
+            or recommended_worker_node_type
+            or default_driver
+        )
+        mapped_worker = mapped_driver or default_worker
+        num_workers = 0 if recommended_num_workers is None else recommended_num_workers
+    else:
+        mapped_worker = (
+            recommended_worker_node_type
+            or recommended_driver_node_type
+            or default_worker
+        )
+        mapped_driver = recommended_driver_node_type or default_driver
+        num_workers = (
+            recommended_num_workers
+            if recommended_num_workers is not None
+            else default_workers
+        )
+
+    if not mapped_worker:
+        raise ValueError(
+            f"Cannot resolve worker topology for recommended preset "
+            f"{recommended_preset!r}"
+        )
+    return (
+        str(mapped_worker),
+        (str(mapped_driver) if mapped_driver is not None else None),
+        num_workers,
+    )
 
 
 def declaration_validation_spark_conf(declaration: dict) -> Dict[str, Any]:
@@ -883,4 +949,57 @@ def build_validation_cluster_spec(
             "custom_libraries", cluster_args.get("custom_libraries")
         ),
         allow_custom_spark_job=allow_custom_spark_job,
+    )
+
+
+def build_rightsizing_validation_cluster_spec(
+    *,
+    prod_cluster_args: dict,
+    declaration: dict,
+    recommended_preset: str,
+    recommended_num_workers: Optional[int] = None,
+    recommended_driver_node_type: Optional[str] = None,
+    recommended_worker_node_type: Optional[str] = None,
+    config_service: Optional[ConfigurationService] = None,
+    databricks_conn_id_fallback: Optional[str] = None,
+) -> Optional[ValidationClusterSpec]:
+    """Build minimal validation.cluster for cluster rightsizing recommendations."""
+    service = config_service or ConfigurationService()
+    if is_emr_prod_cluster_args(prod_cluster_args, service):
+        return None
+
+    effective_prod = merge_cluster_configuration(prod_cluster_args, service)
+    prod_cluster_type = str(prod_cluster_args.get("type", ""))
+    validation_resolved = service.get_config(recommended_preset)
+    mapped_worker, mapped_driver, num_workers = _recommended_topology(
+        recommended_preset=recommended_preset,
+        recommended_num_workers=recommended_num_workers,
+        recommended_driver_node_type=recommended_driver_node_type,
+        recommended_worker_node_type=recommended_worker_node_type,
+        validation_resolved=validation_resolved,
+    )
+
+    custom_configurations = compute_validation_overrides(
+        effective_prod=effective_prod,
+        mapped_worker=mapped_worker,
+        mapped_driver=mapped_driver,
+        validation_resolved=validation_resolved,
+        prod_cluster_type=prod_cluster_type,
+        num_workers=num_workers,
+    )
+    custom_configurations = merge_declaration_validation_custom_configurations(
+        declaration, custom_configurations
+    )
+    driver_override = custom_configurations.get("driver_node_type_id")
+    if driver_override and custom_configurations.get("node_type_id") == driver_override:
+        custom_configurations.pop("node_type_id", None)
+
+    return ValidationClusterSpec(
+        cluster_type=recommended_preset,
+        custom_configurations=custom_configurations,
+        databricks_conn_id=prod_cluster_args.get("databricks_conn_id")
+        or databricks_conn_id_fallback,
+        access_control_list=prod_cluster_args.get("access_control_list"),
+        custom_libraries=prod_cluster_args.get("custom_libraries"),
+        allow_custom_spark_job=_has_load_spark_job(declaration),
     )

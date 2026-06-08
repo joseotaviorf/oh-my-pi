@@ -117,6 +117,67 @@ class TestMergeValidationClusterArgs:
         assert "node_type_id" not in merged["custom_configurations"]
         assert merged["custom_configurations"]["driver_node_type_id"] == "m6g.xlarge"
 
+    def test_strips_emr_only_keys_for_emr_to_databricks_validation(self):
+        prod = {
+            "type": "emr_7_12_consolidation_m_memory_cluster",
+            "custom_configurations": {
+                "core_nodes": {"instance_count": 1},
+                "task_nodes": {"instance_count": 2},
+                "num_task_workers": 2,
+                "spark_conf": {"spark.driver.memory": "8g"},
+            },
+        }
+        validation = {
+            "type": "consolidation_s_general_cluster",
+            "custom_configurations": {
+                "driver_node_type_id": "r6g.2xlarge",
+                "node_type_id": "m6g.xlarge",
+            },
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert merged["custom_configurations"] == {
+            "spark_conf": {"spark.driver.memory": "8g"},
+            "driver_node_type_id": "r6g.2xlarge",
+            "node_type_id": "m6g.xlarge",
+        }
+
+    def test_keeps_emr_keys_for_emr_to_emr_validation(self):
+        prod = {
+            "type": "emr_7_12_consolidation_m_memory_cluster",
+            "custom_configurations": {
+                "core_nodes": {"instance_count": 1},
+                "task_nodes": {"instance_count": 2},
+                "spark_conf": {"spark.driver.memory": "8g"},
+            },
+        }
+        validation = {
+            "type": "emr_7_12_med_general_cluster",
+            "custom_configurations": {"num_workers": 2},
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert merged["custom_configurations"] == {
+            "core_nodes": {"instance_count": 1},
+            "task_nodes": {"instance_count": 2},
+            "spark_conf": {"spark.driver.memory": "8g"},
+            "num_workers": 2,
+        }
+
+    def test_strips_prod_num_workers_for_single_node_validation(self):
+        prod = {
+            "type": "consolidation_l_memory_cluster",
+            "custom_configurations": {
+                "num_workers": 3,
+                "driver_node_type_id": "r6g.8xlarge",
+                "spark_version": "16.4.x-scala2.12",
+            },
+        }
+        validation = {
+            "type": "consolidation_l_memory_single_node_cluster",
+            "custom_configurations": {},
+        }
+        merged = merge_validation_cluster_args(prod, validation)
+        assert "num_workers" not in merged.get("custom_configurations", {})
+
     def test_strips_master_node_type_id_for_consolidation_validation(self):
         prod = {
             "type": "custom_cluster",

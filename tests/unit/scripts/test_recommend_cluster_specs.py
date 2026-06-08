@@ -375,7 +375,6 @@ class TestSingleNodeFirstKeepMultiGuards:
         assert cfg["validation"]["cluster"]["custom_configurations"] == {
             "num_workers": 5,
             "driver_node_type_id": "m6g.large",
-            "node_type_id": "m6g.xlarge",
         }
 
     def test_keep_multi_downsizes_worker_type_without_reducing_count(self):
@@ -407,10 +406,9 @@ class TestSingleNodeFirstKeepMultiGuards:
             == "keep_multi_node|keep_driver|reduce_worker_type|keep_worker_count"
         )
         assert cfg is not None
-        assert (
-            cfg["validation"]["cluster"]["custom_configurations"]["node_type_id"]
-            == "r6g.large"
-        )
+        custom = cfg["validation"]["cluster"]["custom_configurations"]
+        assert custom["driver_node_type_id"] == "m6g.large"
+        assert "node_type_id" not in custom
 
     def test_keep_multi_conservatively_reduces_worker_count_when_sla_allows(self):
         m = _m(
@@ -821,6 +819,68 @@ class TestSqlAndRowMapping:
         metrics = rcs.load_from_csv(csv_path)
 
         assert [m.dag_id for m in metrics] == ["bietlejuice.test_dag"]
+
+
+class TestGenerateValidationConfigContract:
+    """Smoke test that recommend_cluster_specs delegates to ci_cd validation module."""
+
+    def test_delegates_to_ci_cd_module(self, tmp_path, monkeypatch):
+        import os
+
+        os.environ["ENVIRONMENT"] = "prod"
+        dag_dir = tmp_path / "dags" / "growth" / "enrich_semrush_classified"
+        dag_dir.mkdir(parents=True)
+        (dag_dir / "enrich_semrush_classified_cluster.yml").write_text(
+            "cluster:\n"
+            "  type: consolidation_xs_general_single_node_cluster\n"
+            "  databricks_conn_id: databricks_new_env\n",
+            encoding="utf-8",
+        )
+        (dag_dir / "enrich_semrush_classified_declaration.yml").write_text(
+            "dag:\n  name: enrich_semrush_classified\n"
+            "workflow:\n  type: query_delta\n  layer: enrich\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(rcs, "DAGS_ROOT", tmp_path / "dags")
+
+        rec = rcs.Recommendation(
+            dag_id="bietlejuice.enrich_semrush_classified",
+            cohort="collapse_to_single",
+            confidence="high",
+            actions="collapse_to_single",
+            current_preset="consolidation_xs_general_single_node_cluster",
+            current_driver_node_type="m6g.large",
+            current_worker_node_type=None,
+            current_worker_count=0,
+            arm_days=5,
+            arm_runs=10,
+            arm_total_cost_usd=10.0,
+            arm_avg_cost_per_run_usd=1.0,
+            arm_total_cost_estimate_usd=None,
+            arm_avg_total_cost_estimate_usd=None,
+            wall_p50_min=10.0,
+            wall_p95_min=15.0,
+            drv_cpu_p50=10.0,
+            drv_cpu_p95=20.0,
+            drv_mem_p95=30.0,
+            drv_wait_p95=1.0,
+            wrk_cpu_p50=10.0,
+            wrk_cpu_p95=20.0,
+            wrk_mem_p95=30.0,
+            wrk_wait_p95=1.0,
+            recommended_preset="consolidation_xs_memory_single_node_cluster",
+            rec_driver_node_type="r6g.large",
+            rec_worker_count=0,
+            projected=rcs.ProjectedMetrics(est_cost_delta_pct=-20.0),
+        )
+
+        cfg = generate_validation_config(rec, dags_root=tmp_path / "dags")
+
+        assert cfg is not None
+        assert (
+            cfg["validation"]["cluster"]["databricks_conn_id"] == "databricks_new_env"
+        )
+        assert "custom_configurations" not in cfg["validation"]["cluster"]
 
 
 class TestWriteValidationClusterFile:

@@ -3,10 +3,15 @@
 Step-by-step guide for generating single-node-first cluster recommendations and shadow validation configs.
 
 **Script:** [`scripts/recommend_cluster_specs.py`](../../scripts/recommend_cluster_specs.py)  
+**Validation YAML builder:** [`rightsizing_validation_config.py`](../../packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/rightsizing_validation_config.py) (same preset-diff rules as [`extract_cluster_validation_files.py`](../../packages/bietlejuice-compiler/scripts/ci_cd/airflow_dag_builder/extract_cluster_validation_files.py))  
 **Algorithm:** [`cluster_spec_recommender_algorithm.md`](cluster_spec_recommender_algorithm.md)  
 **Validation DAG reference:** [`cluster_validation_dags.md`](cluster_validation_dags.md)
 
 The recommender is report-only. It writes validation configs only; it does not mutate production `cluster:`.
+
+Validation blocks are minimal: only `custom_configurations` that differ from the recommended preset defaults. `databricks_conn_id` is copied from prod `*_cluster.yml`; `--databricks-conn-id` is a fallback when prod omits it.
+
+DAGs whose prod `cluster.type` starts with `emr_` (or resolve to an EMR `spark_version`) are excluded: no `validation:` block is emitted, and `--write-cluster-files` removes any stale validation section.
 
 ---
 
@@ -100,7 +105,7 @@ The older keep/downsize cohort names are not the target decision surface for the
 ```bash
 mkdir -p /tmp/cluster-rightsizing
 
-uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
+ENVIRONMENT=prod uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
   python scripts/recommend_cluster_specs.py \
   --trino \
   --out-dir /tmp/cluster-rightsizing \
@@ -118,7 +123,7 @@ Outputs:
 For offline CSV input:
 
 ```bash
-uv run --no-project --with pandas \
+ENVIRONMENT=prod uv run --no-project --with pandas \
   python scripts/recommend_cluster_specs.py \
   --metrics-csv arm_metrics.csv \
   --out-dir /tmp/cluster-rightsizing \
@@ -157,7 +162,7 @@ Do not promote directly from the report. Every change needs a validation DAG run
 ### Auto-write
 
 ```bash
-uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
+ENVIRONMENT=prod uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
   python scripts/recommend_cluster_specs.py \
   --trino \
   --out-dir /tmp/cluster-rightsizing \
@@ -316,15 +321,15 @@ make create-dag-files
 uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
   python scripts/recommend_cluster_specs.py --trino --list
 
-# 2. Generate validation configs
-uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
+# 2. Generate validation configs (ENVIRONMENT=prod resolves preset defaults)
+ENVIRONMENT=prod uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
   python scripts/recommend_cluster_specs.py \
   --trino \
   --out-dir /tmp/cluster-rightsizing \
   --validation-config /tmp/cluster-rightsizing/validation_configs.yml
 
 # 3. Optional: write validation blocks
-uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
+ENVIRONMENT=prod uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
   python scripts/recommend_cluster_specs.py \
   --trino \
   --out-dir /tmp/cluster-rightsizing \

@@ -19,3 +19,22 @@ cluster:
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
       spark.scheduler.taskSetBlacklistTimeout: 1200000
+validation:
+  cluster:
+    type: consolidation_s_memory_cluster
+    databricks_conn_id: databricks_new
+    custom_libraries:
+    - whl: '{artifacts_bucket}/gsheets-api-client-python/quintoandar_gsheets_api_client-0.3.0-py2.py3-none-any.whl'
+    - pypi:
+        package: google-api-python-client==2.48.0
+    - pypi:
+        package: google-auth==2.23.0
+    - pypi:
+        package: openpyxl==3.1.5
+    - pypi:
+        package: pyxlsb==1.0.9
+    custom_configurations:
+      spark_conf:
+        spark.scheduler.taskSetBlacklistTimeout: 1200000
+      driver_node_type_id: r6g.2xlarge
+  allow_custom_spark_job: true

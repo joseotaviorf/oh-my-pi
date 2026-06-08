@@ -21,3 +21,18 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+validation:
+  cluster:
+    type: consolidation_s_general_cluster
+    databricks_conn_id: databricks_new
+    access_control_list:
+    - group_name: software-engineers
+      permission_level: CAN_MANAGE
+    - group_name: analytics-engineers
+      permission_level: CAN_MANAGE
+    custom_configurations:
+      aws_attributes:
+        ebs_volume_size: 200
+        instance_profile_arn: '{{ var.value.instance_profile_secret_arn_reverse_listings_report }}'
+      driver_node_type_id: r6g.2xlarge
+  allow_custom_spark_job: true

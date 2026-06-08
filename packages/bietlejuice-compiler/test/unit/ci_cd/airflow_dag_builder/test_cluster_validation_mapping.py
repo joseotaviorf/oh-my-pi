@@ -8,6 +8,7 @@ from bietlejuice.services.configuration_service import ConfigurationService
 from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
     _mapped_worker_and_driver,
     build_consolidation_catalog,
+    build_rightsizing_validation_cluster_spec,
     build_validation_cluster_spec,
     compute_validation_overrides,
     is_single_node_cluster,
@@ -755,3 +756,105 @@ class TestNormalizeDatabricksClusterTopology:
         custom = normalized["custom_configurations"]
         assert custom["driver_node_type_id"] == "m6g.xlarge"
         assert custom["node_type_id"] == "r6g.2xlarge"
+
+
+class TestBuildRightsizingValidationClusterSpec:
+    def test_general_to_memory_single_node_omits_preset_defaults(self):
+        declaration = {
+            "dag": {"name": "enrich_semrush_classified"},
+            "workflow": {"type": "query_delta", "layer": "enrich"},
+        }
+        prod_cluster_args = {
+            "type": "consolidation_xs_general_single_node_cluster",
+            "databricks_conn_id": "databricks_new_env",
+            "custom_configurations": {
+                "single_user_name": "{{ var.value.databricks_single_user_name }}",
+                "data_security_mode": "SINGLE_USER",
+                "spark_conf": {
+                    "spark.databricks.sql.initial.catalog.namespace": (
+                        "quintoandar_{{ var.value.environment }}"
+                    ),
+                },
+            },
+        }
+        spec = build_rightsizing_validation_cluster_spec(
+            prod_cluster_args=prod_cluster_args,
+            declaration=declaration,
+            recommended_preset="consolidation_xs_memory_single_node_cluster",
+            recommended_num_workers=0,
+            recommended_driver_node_type="r6g.large",
+        )
+
+        assert spec is not None
+        assert spec.cluster_type == "consolidation_xs_memory_single_node_cluster"
+        assert spec.databricks_conn_id == "databricks_new_env"
+        assert "num_workers" not in spec.custom_configurations
+        assert "node_type_id" not in spec.custom_configurations
+        assert "driver_node_type_id" not in spec.custom_configurations
+        assert spec.custom_configurations == {}
+
+    def test_larger_single_node_driver_override_only(self):
+        declaration = {
+            "dag": {"name": "ebdb_visit_fast_lane"},
+            "workflow": {"type": "query_delta", "layer": "enrich"},
+        }
+        prod_cluster_args = {
+            "type": "consolidation_m_memory_cluster",
+            "databricks_conn_id": "databricks_new",
+        }
+        spec = build_rightsizing_validation_cluster_spec(
+            prod_cluster_args=prod_cluster_args,
+            declaration=declaration,
+            recommended_preset="consolidation_m_memory_single_node_cluster",
+            recommended_num_workers=0,
+            recommended_driver_node_type="r6g.4xlarge",
+        )
+
+        assert spec is not None
+        assert spec.custom_configurations == {
+            "driver_node_type_id": "r6g.4xlarge",
+        }
+
+    def test_keep_multi_num_workers_override_only(self):
+        declaration = {
+            "dag": {"name": "klefki"},
+            "workflow": {"type": "query_delta", "layer": "enrich"},
+        }
+        prod_cluster_args = {
+            "type": "consolidation_xs_memory_cluster",
+            "databricks_conn_id": "databricks_new",
+            "custom_configurations": {
+                "num_workers": 4,
+                "driver_node_type_id": "r6g.2xlarge",
+            },
+        }
+        spec = build_rightsizing_validation_cluster_spec(
+            prod_cluster_args=prod_cluster_args,
+            declaration=declaration,
+            recommended_preset="consolidation_xs_memory_cluster",
+            recommended_num_workers=3,
+            recommended_driver_node_type="r6g.2xlarge",
+            recommended_worker_node_type="r6g.large",
+        )
+
+        assert spec is not None
+        assert spec.custom_configurations.get("num_workers") == 3
+        assert "node_type_id" not in spec.custom_configurations
+
+    def test_returns_none_for_emr_prod_cluster(self):
+        prod_cluster_args = {
+            "type": "emr_7_12_consolidation_m_memory_cluster",
+            "custom_configurations": {
+                "core_nodes": {"instance_count": 1},
+                "task_nodes": {"instance_count": 2},
+            },
+        }
+        spec = build_rightsizing_validation_cluster_spec(
+            prod_cluster_args=prod_cluster_args,
+            declaration={"dag": {"name": "dw_analytical_costs"}},
+            recommended_preset="consolidation_s_general_cluster",
+            recommended_driver_node_type="r6g.2xlarge",
+            recommended_worker_node_type="m6g.xlarge",
+        )
+
+        assert spec is None

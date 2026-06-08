@@ -107,12 +107,13 @@ def _read_text_from_git(git_ref: str, repo_relative: Path) -> str:
     return result.stdout
 
 
-def extract_cluster_section_text(declaration_text: str) -> Optional[str]:
-    """Return verbatim cluster: block including trailing newline, or None."""
-    lines = declaration_text.splitlines(keepends=True)
+def _extract_top_level_section_text(text: str, section_key: str) -> Optional[str]:
+    """Return verbatim top-level section block including trailing newline."""
+    prefix = f"{section_key}:"
+    lines = text.splitlines(keepends=True)
     start_idx: Optional[int] = None
     for index, line in enumerate(lines):
-        if line.startswith("cluster:"):
+        if line.startswith(prefix):
             start_idx = index
             break
     if start_idx is None:
@@ -132,6 +133,16 @@ def extract_cluster_section_text(declaration_text: str) -> Optional[str]:
     if not block.endswith("\n"):
         block += "\n"
     return block
+
+
+def extract_cluster_section_text(declaration_text: str) -> Optional[str]:
+    """Return verbatim cluster: block including trailing newline, or None."""
+    return _extract_top_level_section_text(declaration_text, "cluster")
+
+
+def extract_validation_section_text(cluster_file_text: str) -> Optional[str]:
+    """Return verbatim validation: block including trailing newline, or None."""
+    return _extract_top_level_section_text(cluster_file_text, "validation")
 
 
 def remove_cluster_section_text(declaration_text: str) -> str:
@@ -233,6 +244,7 @@ def build_cluster_file_content(
     cluster_text: str,
     declaration: dict,
     cluster_args: dict,
+    validation_text: Optional[str] = None,
 ) -> str:
     config_service = ConfigurationService()
     normalized_args = normalize_databricks_cluster_topology(
@@ -242,14 +254,17 @@ def build_cluster_file_content(
         prod_block = cluster_text.rstrip("\n")
     else:
         prod_block = dump_cluster_yaml({"cluster": normalized_args}).rstrip("\n")
-    spec = build_validation_cluster_spec(
-        cluster_args=normalized_args,
-        declaration=declaration,
-        config_service=config_service,
-    )
     content = prod_block + "\n"
-    if spec is not None:
-        content += _format_validation_yaml(spec)
+    if validation_text is not None:
+        content += validation_text.rstrip("\n") + "\n"
+    else:
+        spec = build_validation_cluster_spec(
+            cluster_args=normalized_args,
+            declaration=declaration,
+            config_service=config_service,
+        )
+        if spec is not None:
+            content += _format_validation_yaml(spec)
     return _normalize_cluster_file_text(content)
 
 
@@ -310,10 +325,15 @@ def process_cluster_file(cluster_path: Path) -> Tuple[Path, Optional[str]]:
     if validation is not None:
         declaration_for_validation["validation"] = validation
 
+    validation_text: Optional[str] = None
+    if (validation or {}).get("cluster"):
+        validation_text = extract_validation_section_text(cluster_file_text)
+
     cluster_content = build_cluster_file_content(
         cluster_text=cluster_text,
         declaration=declaration_for_validation,
         cluster_args=cluster_args,
+        validation_text=validation_text,
     )
     return cluster_path, cluster_content
 

@@ -9,3 +9,11 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
+validation:
+  cluster:
+    type: consolidation_m_memory_single_node_cluster
+    databricks_conn_id: databricks_new
+    access_control_list:
+      group_name: mlops
+      permission_level: CAN_MANAGE
+  allow_custom_spark_job: true
