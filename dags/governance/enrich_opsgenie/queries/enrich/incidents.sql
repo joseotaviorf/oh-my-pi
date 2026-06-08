@@ -2,8 +2,9 @@ SELECT
   ji.id_issue AS id_issue_jira,
   oa.id_alert,
   ji.summary AS dag_name,
-  pl.line_name AS dag_owner,
-  ji.incident_owner,
+  COALESCE(ji.incident_owner, ji.old_incident_owner) AS incident_owner,
+  ji.dag_owner,
+  pl.line_name AS line_owner,
   pl.layer,
   ji.current_status,
   ji.incident_category,
@@ -18,8 +19,8 @@ SELECT
   (ji.ts_resolved IS NULL) AS is_open,
   (ji.ts_resolved IS NOT NULL) AS is_resolved,
   CASE
-    WHEN ji.incident_owner <> 'AE All'
-      AND ji.incident_owner IS NOT NULL
+    WHEN COALESCE(ji.incident_owner, ji.old_incident_owner) <> 'AE All'
+      AND COALESCE(ji.incident_owner, ji.old_incident_owner) IS NOT NULL
       AND ji.incident_status <> 'Under investigation' -- on call status
       AND ji.assignee IS NOT NULL
       AND ji.incident_category IS NOT NULL

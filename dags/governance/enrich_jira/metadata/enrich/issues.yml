@@ -2,7 +2,7 @@
 database_name: datalake_jira
 table_name: issues
 description: Detailed information from the Issues created in Jira
-domain: governance
+domain: Data Ops & Governance
 owner: giuseppe.giovanelli@quintoandar.com.br
 columns:
   id_issue:
@@ -17,10 +17,6 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Internal Jira project ID related to the issue
-  project_key:
-    lineage:
-      - datalake_jira_clean.project.key
-    description: Project key from Jira, the root digits, used to identify the project
   summary:
     lineage:
       - datalake_jira_clean.issues.fields
@@ -80,7 +76,21 @@ columns:
   incident_owner:
     lineage:
       - datalake_jira_clean.issues.fields
-    description: Person responsible for managing the incident
+    description: >
+      Team or person accountable for the incident. Defaults to the DAG owner but may be
+      manually reassigned to another team (Jira custom field customfield_31231).
+  old_incident_owner:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: >
+      Legacy Jira custom field previously used to populate the incident owner (customfield_12078).
+      Deactivated; retained for historical analysis only.
+  dag_owner:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: >
+      DAG owner value from DAGOwnerEnum, filled by post-callback automation
+      (Jira custom field customfield_30283).
   incident_status:
     lineage:
       - datalake_jira_clean.issues.fields
@@ -141,6 +151,10 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Initial estimate of story points for the issue
+  is_flagged:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: True when the issue has an active Jira flag (customfield_10400).
   is_deleted:
     description: Flag to identify if the issue was deleted
   dt_deleted:
@@ -153,6 +167,10 @@ columns:
     lineage:
       - datalake_jira_clean.issues.fields
     description: Timestamp when the issue was created
+  ts_updated:
+    lineage:
+      - datalake_jira_clean.issues.fields
+    description: Timestamp when the issue was last updated in Jira.
   ts_resolved:
     lineage:
       - datalake_jira_clean.issues.fields

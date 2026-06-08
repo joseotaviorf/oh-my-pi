@@ -18,13 +18,24 @@ columns:
     lineage:
       - datalake_jira.issues.summary
   dag_owner:
-    description: The pipeline line owner associated with the DAG
+    description: >
+      Team responsible for the failing DAG, as configured in the DAG declaration owner field
+      (DAGOwnerEnum), propagated from Jira after the failure callback automation.
     lineage:
-      - datalake_pipeline.dag.line_name
+      - datalake_jira.issues.dag_owner
   incident_owner:
-    description: The owner of the incident in Jira
+    description: >
+      Team or person accountable for the incident in Jira. Uses incident_owner when set;
+      otherwise falls back to old_incident_owner for legacy cards.
     lineage:
       - datalake_jira.issues.incident_owner
+      - datalake_jira.issues.old_incident_owner
+  line_owner:
+    description: >
+      Business line accountable for the incident (product area), e.g. ForSale or ForRent.
+      Distinct from dag_owner, which reflects the DAG squad.
+    lineage:
+      - datalake_pipeline.dag.line_name
   layer:
     description: Data lake processing layer (raw, clean, enrich, dw) of the affected DAG.
     lineage:
