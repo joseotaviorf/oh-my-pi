@@ -289,6 +289,26 @@ steps:
         path: *core_model_schemas_path
     depends_on: [setup]
 
+  validate-jiraops-routine-mute-list:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - make validate-jiraops-routine-exceptions
+      - make validate-jiraops-routine-mute-list
+    when:
+      event: [push, pull_request]
+      path:
+        include:
+          - "dags/dependencies.yaml"
+          - "dags/**/*"
+          - "packages/bietlejuice-airflow/src/bietlejuice/base/jiraops/**/*.py"
+          - "packages/bietlejuice-airflow/src/bietlejuice/base/airflow/**/*.py"
+          - "packages/bietlejuice-compiler/scripts/jiraops/**"
+          - "packages/bietlejuice-compiler/scripts/dependency_handling/**/*.py"
+          - "packages/bietlejuice-core/src/bietlejuice/base/airflow/**/*.py"
+        on_empty: false
+    depends_on: [setup]
+
   validate-core-model-schema-content:
     image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
     pull: true

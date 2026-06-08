@@ -824,6 +824,30 @@ validate-dags-up-to-standard:
 	@echo ""
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/dag_standard_validation/validate_dags_following_current_standards.py $(if $(domain),--domain $(domain),)
 
+.PHONY: validate-jiraops-routine-mute-list
+validate-jiraops-routine-mute-list:
+	@echo ""
+	@echo "Validating jiraops_mute_list.yml"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/jiraops/validate_jiraops_routine_mute_list.py
+
+.PHONY: validate-jiraops-routine-exceptions
+validate-jiraops-routine-exceptions:
+	@echo ""
+	@echo "Validating jiraops_routine_exceptions.yml"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/jiraops/validate_jiraops_routine_exceptions.py
+
+.PHONY: sync-jiraops-routine-mute-list
+sync-jiraops-routine-mute-list:
+	@echo ""
+	@echo "Syncing Jira Ops routine mute list"
+	@echo "=========="
+	@echo ""
+	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/jiraops/sync_jiraops_routine_mute_list.py
+
 .PHONY: validate-metadata-files-content
 validate-metadata-files-content:
 	@echo ""
