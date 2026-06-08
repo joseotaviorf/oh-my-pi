@@ -85,7 +85,6 @@ class JiraOpsCallback:
 
             if include_task_id:
                 message = f"DAG: {dag_id} - Task: {task_id}"
-                extra_properties["TaskPath"] = f"{dag_id}:{task_id}"
                 extra_properties["Task"] = task_id
                 tags.insert(1, task_id)
             else:
