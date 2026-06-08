@@ -1,0 +1,40 @@
+---
+database_name: datalake_rental_management_clean
+table_name: bill_actions
+description: |
+  Actions performed on bills, such as notifications sent to entities,
+  including the action type and optional notification target identifiers.
+owner: gustavo.silva@quintoandar.com.br
+domain: For Rent
+columns:
+  id_bill_action:
+    description: Primary key of the bill action entry.
+    lineage:
+      - datalake_rental_management_raw.bill_actions.id
+  id_bill:
+    description: Foreign key to the bill associated with this action.
+    lineage:
+      - datalake_rental_management_raw.bill_actions.bill_id
+  id_notification_entity:
+    description: |
+      Optional identifier of the entity that received the notification for this action.
+    lineage:
+      - datalake_rental_management_raw.bill_actions.notification_entity_id
+  action_type:
+    description: |
+      Type of action performed on the bill (bill_action_type enum from rental_management).
+    lineage:
+      - datalake_rental_management_raw.bill_actions.action_type
+  notification_entity_name:
+    description: |
+      Optional name of the entity that received the notification for this action.
+    lineage:
+      - datalake_rental_management_raw.bill_actions.notification_entity_name
+  ts_created:
+    description: Timestamp when the bill action entry was created.
+    lineage:
+      - datalake_rental_management_raw.bill_actions.created_at
+  ts_updated:
+    description: Timestamp when the bill action entry was last updated.
+    lineage:
+      - datalake_rental_management_raw.bill_actions.updated_at

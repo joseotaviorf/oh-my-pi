@@ -37,6 +37,7 @@ workflow:
     key_location_return_address: {}
     third_party_bills: {}
     third_party_bills_audit_log: {}
+    bill_actions: {}
     billback:
       transactional_datatype_overrides:
         contractual_penalty: "DECIMAL(38, 10)"
