@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cluster Spec Recommender — Decision Tree</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --panel: #171c24;
+    --panel-2: #1e2530;
+    --ink: #e6edf3;
+    --muted: #8b98a9;
+    --line: #2d3643;
+    --guard: #f0b429;
+    --guard-bg: #2a2410;
+    --single: #38bdf8;
+    --single-bg: #0e2a38;
+    --multi: #a78bfa;
+    --multi-bg: #211a39;
+    --action: #34d399;
+    --action-bg: #0f2e25;
+    --review: #94a3b8;
+    --review-bg: #1c222b;
+    --noop: #64748b;
+    --danger: #f87171;
+    --radius: 10px;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  header h1 {
+    font-size: 26px;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  header p {
+    color: var(--muted);
+    margin: 0 0 4px;
+    font-size: 14px;
+  }
+
+  header code { font-family: var(--mono); font-size: 12.5px; color: var(--single); }
+
+  a { color: var(--single); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 20px 0 8px;
+    padding: 14px 16px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    font-size: 13px;
+  }
+  .legend .item { display: flex; align-items: center; gap: 8px; }
+  .swatch { width: 14px; height: 14px; border-radius: 4px; flex: none; }
+
+  section.phase {
+    margin-top: 26px;
+  }
+  .phase-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin: 0 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* Generic node card */
+  .node {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    background: var(--panel);
+  }
+  .node .label { font-weight: 600; font-size: 14px; }
+  .node .sub { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+  .node code { font-family: var(--mono); font-size: 12px; }
+
+  .start {
+    text-align: center;
+    background: var(--panel-2);
+    border-style: dashed;
+  }
+
+  /* Guard chain: a vertical stack of test → cohort exits */
+  .guard-row {
+    display: grid;
+    grid-template-columns: 1fr 26px 320px;
+    align-items: center;
+    gap: 0 10px;
+    margin-bottom: 10px;
+  }
+  .guard-test {
+    border-left: 3px solid var(--guard);
+    background: var(--guard-bg);
+    border-radius: 8px;
+    padding: 10px 13px;
+  }
+  .guard-test .cond { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+  .guard-test .why { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .arrow-yes {
+    text-align: center;
+    color: var(--guard);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .arrow-yes span { display:block; font-size: 18px; line-height: 1; }
+
+  /* Outcome chips */
+  .cohort {
+    border-radius: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  .cohort .meaning {
+    display: block;
+    font-family: var(--sans);
+    font-weight: 400;
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  .c-action { background: var(--action-bg); border-color: #1f6b53; color: var(--action); }
+  .c-review { background: var(--review-bg); border-color: #3a4350; color: var(--review); }
+  .c-noop   { background: var(--review-bg); border-color: #3a4350; color: var(--noop); }
+
+  .passdown {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin: 4px 0 18px;
+    font-family: var(--mono);
+  }
+  .passdown::before { content: "▼ all guards passed — "; color: var(--line); }
+
+  /* Topology split */
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 8px;
+  }
+  @media (max-width: 760px) { .split { grid-template-columns: 1fr; } }
+
+  .branch {
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .branch-head {
+    padding: 11px 14px;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .branch-head .pill {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 99px;
+  }
+  .single .branch-head { background: var(--single-bg); color: var(--single); }
+  .single .branch-head .pill { background: var(--single); color: #04222f; }
+  .multi .branch-head { background: var(--multi-bg); color: var(--multi); }
+  .multi .branch-head .pill { background: var(--multi); color: #1a1233; }
+
+  .branch-body { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+  .step {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel-2);
+    padding: 10px 12px;
+  }
+  .step .cond { font-family: var(--mono); font-size: 12.5px; }
+  .step .why { color: var(--muted); font-size: 11.5px; margin-top: 3px; }
+  .step.test { border-left: 3px solid var(--guard); }
+
+  .leads {
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    align-items: center;
+    gap: 8px;
+    margin-left: 8px;
+  }
+  .leads .tick { color: var(--guard); font-weight: 700; text-align: center; }
+
+  .fallthrough {
+    margin-top: 2px;
+    display: grid;
+    grid-template-columns: 22px 1fr;
+    align-items: center;
+    gap: 8px;
+    margin-left: 8px;
+  }
+  .fallthrough .tick { color: var(--action); font-weight: 700; text-align: center; }
+
+  .nested {
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: rgba(167,139,250,0.05);
+  }
+  .nested .title { font-size: 12px; color: var(--multi); font-weight: 600; margin-bottom: 8px; }
+
+  .post {
+    margin-top: 22px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+  }
+  .post h3 { margin: 0 0 8px; font-size: 14px; }
+  .post p { color: var(--muted); font-size: 13px; margin: 0 0 10px; }
+  .actions-flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .actions-flow .tok { padding: 5px 9px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel-2); }
+  .actions-flow .tok.ok { color: var(--action); border-color: #1f6b53; }
+  .actions-flow .tok.block { color: var(--danger); border-color: #6b2424; }
+
+  table.thresholds {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 12.5px;
+  }
+  table.thresholds th, table.thresholds td {
+    text-align: left;
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  table.thresholds th { color: var(--muted); font-weight: 600; }
+  table.thresholds td code { font-family: var(--mono); color: var(--single); }
+
+  footer {
+    margin-top: 30px;
+    color: var(--muted);
+    font-size: 12px;
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+  }
+
+  /* ---- Plain-language flowchart (SVG graph) ---- */
+  .glance-intro { color: var(--muted); font-size: 13.5px; margin: 0 0 14px; max-width: 880px; }
+  .glance-intro strong { color: var(--ink); }
+  .flow-fig {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 10px;
+    overflow-x: auto;
+  }
+  .flow-fig svg { width: 100%; min-width: 760px; height: auto; display: block; }
+
+  .edge { stroke: #5b6675; stroke-width: 1.6; fill: none; }
+  .edge.dash { stroke-dasharray: 5 5; }
+  .dia { fill: var(--panel-2); stroke: var(--guard); stroke-width: 1.6; }
+  text.elabel { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+
+  .fo {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center; box-sizing: border-box;
+    font-family: var(--sans); font-size: 12px; line-height: 1.22;
+    padding: 4px 8px; border-radius: 9px; border: 1px solid var(--line);
+  }
+  .fo.start { background: var(--panel-2); border-style: dashed; font-weight: 600; font-size: 12.5px; color: var(--ink); }
+  .fo.dec { background: transparent; border: none; color: var(--ink); font-weight: 600; font-size: 11.5px; padding: 2px; }
+  .fo.rev { background: var(--review-bg); border-color: #3a4350; color: var(--review); }
+  .fo.act { background: var(--action-bg); border-color: #1f6b53; color: var(--action); font-weight: 600; }
+  .fo.keep { background: var(--multi-bg); border-color: #5b4aa0; color: #c4b5fd; font-weight: 600; }
+  .fo.collapse { background: var(--action-bg); border-color: #1f6b53; color: var(--action); font-weight: 700; }
+  .fo.noop { background: var(--review-bg); border-color: #3a4350; color: var(--noop); }
+  .fo.note { background: rgba(167,139,250,0.06); border-style: dashed; border-color: #5b4aa0; color: var(--ink); font-size: 12.5px; text-align: left; }
+  .fo small { display: block; font-weight: 400; color: var(--muted); font-size: 10.5px; margin-top: 3px; line-height: 1.2; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Cluster Spec Recommender — Decision Tree</h1>
+    <p>Single-node-first cluster right-sizing for <code>bi-etl-ejuice</code> DAGs. Source of truth: <code>scripts/recommend_cluster_specs.py</code> (<code>classify()</code>).</p>
+    <p>A multi-node cluster is a cost smell unless measured demand proves it needs multiple machines.</p>
+  </header>
+
+  <div class="legend">
+    <div class="item"><span class="swatch" style="background:var(--guard)"></span> Guard / test condition</div>
+    <div class="item"><span class="swatch" style="background:var(--action)"></span> Actionable cohort (emits validation config)</div>
+    <div class="item"><span class="swatch" style="background:var(--review)"></span> Review cohort (needs data / stability first)</div>
+    <div class="item"><span class="swatch" style="background:var(--noop)"></span> No-op (already healthy)</div>
+    <div class="item"><span class="swatch" style="background:var(--single)"></span> Single-node branch</div>
+    <div class="item"><span class="swatch" style="background:var(--multi)"></span> Multi-node branch</div>
+  </div>
+
+  <!-- PLAIN-LANGUAGE GRAPH -->
+  <section class="phase">
+    <h2 class="phase-title">How it decides — at a glance</h2>
+    <p class="glance-intro">
+      For each DAG the tool looks at the <strong>cluster that actually ran the job</strong> (driver + worker
+      instance types, worker count) and the <strong>utilization it observed</strong> over recent runs
+      (CPU and memory, plus wall-clock time against the schedule). The guiding bias is
+      <strong>single-node-first</strong>: a multi-node Spark cluster is treated as a cost smell unless the
+      measured demand proves it genuinely needs more than one machine. Follow the arrows — each box is a
+      question about the workload, and the coloured boxes are the resulting recommendation.
+    </p>
+
+    <div class="flow-fig" role="img" aria-label="Flowchart of the cluster right-sizing decision process">
+      <svg viewBox="0 0 1300 1140" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L7,3 L0,6 Z" fill="#5b6675"/>
+          </marker>
+        </defs>
+
+        <!-- ===== EDGES (drawn first, under the nodes) ===== -->
+        <!-- start -> D1 -->
+        <line class="edge" x1="650" y1="76" x2="650" y2="96" marker-end="url(#arrow)"/>
+        <!-- D1 down (trustworthy) -> D2 -->
+        <line class="edge" x1="650" y1="202" x2="650" y2="236" marker-end="url(#arrow)"/>
+        <!-- D1 right (not trustworthy) -> review -->
+        <line class="edge" x1="830" y1="150" x2="1038" y2="150" marker-end="url(#arrow)"/>
+        <!-- D2 left (single) -->
+        <path class="edge" d="M470,290 L160,290 L160,362" marker-end="url(#arrow)"/>
+        <!-- D2 right (multi) -->
+        <path class="edge" d="M830,290 L1000,290 L1000,360" marker-end="url(#arrow)"/>
+
+        <!-- single column -->
+        <line class="edge" x1="280" y1="408" x2="298" y2="408" marker-end="url(#arrow)"/>
+        <line class="edge" x1="160" y1="452" x2="160" y2="510" marker-end="url(#arrow)"/>
+        <line class="edge" x1="280" y1="556" x2="298" y2="556" marker-end="url(#arrow)"/>
+        <line class="edge" x1="160" y1="600" x2="160" y2="630" marker-end="url(#arrow)"/>
+
+        <!-- multi column -->
+        <line class="edge" x1="850" y1="408" x2="832" y2="408" marker-end="url(#arrow)"/>
+        <line class="edge" x1="1000" y1="454" x2="1000" y2="500" marker-end="url(#arrow)"/>
+        <line class="edge" x1="850" y1="548" x2="832" y2="548" marker-end="url(#arrow)"/>
+        <line class="edge" x1="1000" y1="594" x2="1000" y2="640" marker-end="url(#arrow)"/>
+        <line class="edge" x1="850" y1="688" x2="832" y2="688" marker-end="url(#arrow)"/>
+        <line class="edge" x1="1000" y1="734" x2="1000" y2="780" marker-end="url(#arrow)"/>
+        <line class="edge" x1="850" y1="828" x2="832" y2="828" marker-end="url(#arrow)"/>
+        <line class="edge" x1="1000" y1="874" x2="1000" y2="900" marker-end="url(#arrow)"/>
+
+        <!-- keep-multi + collapse -> follow-up note -->
+        <path class="edge dash" d="M715,862 L715,994" marker-end="url(#arrow)"/>
+        <path class="edge dash" d="M1000,962 L1000,994" marker-end="url(#arrow)"/>
+
+        <!-- ===== EDGE LABELS ===== -->
+        <text class="elabel" x="662" y="222">yes</text>
+        <text class="elabel" x="934" y="142" text-anchor="middle">not trustworthy</text>
+        <text class="elabel" x="320" y="282" text-anchor="middle">yes · single-node</text>
+        <text class="elabel" x="915" y="282" text-anchor="middle">no · multi-node</text>
+
+        <text class="elabel" x="292" y="402" text-anchor="middle">yes</text>
+        <text class="elabel" x="172" y="486">no</text>
+        <text class="elabel" x="292" y="550" text-anchor="middle">yes</text>
+        <text class="elabel" x="172" y="628">no</text>
+
+        <text class="elabel" x="843" y="400" text-anchor="end">no</text>
+        <text class="elabel" x="1012" y="482">yes</text>
+        <text class="elabel" x="843" y="540" text-anchor="end">no</text>
+        <text class="elabel" x="1012" y="622">yes</text>
+        <text class="elabel" x="843" y="680" text-anchor="end">yes</text>
+        <text class="elabel" x="1012" y="762">no</text>
+        <text class="elabel" x="843" y="820" text-anchor="end">yes</text>
+        <text class="elabel" x="1012" y="892">no</text>
+
+        <!-- ===== DIAMONDS ===== -->
+        <polygon class="dia" points="650,98 830,150 650,202 470,150"/>
+        <polygon class="dia" points="650,238 830,290 650,342 470,290"/>
+        <polygon class="dia" points="160,364 280,408 160,452 40,408"/>
+        <polygon class="dia" points="160,512 280,556 160,600 40,556"/>
+        <polygon class="dia" points="1000,362 1150,408 1000,454 850,408"/>
+        <polygon class="dia" points="1000,502 1150,548 1000,594 850,548"/>
+        <polygon class="dia" points="1000,642 1150,688 1000,734 850,688"/>
+        <polygon class="dia" points="1000,782 1150,828 1000,874 850,828"/>
+
+        <!-- ===== NODE LABELS (foreignObject) ===== -->
+        <!-- start -->
+        <foreignObject x="490" y="20" width="320" height="56">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo start">A DAG's typical cluster + the utilization it actually used</div>
+        </foreignObject>
+
+        <!-- D1 -->
+        <foreignObject x="510" y="112" width="280" height="76">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Is the run history trustworthy and the cluster config stable?</div>
+        </foreignObject>
+        <!-- review exit -->
+        <foreignObject x="1040" y="104" width="250" height="92">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo rev">Park for review<small>too few runs · autoscale · mixed configs · missing metrics · memory spill · price unknown</small></div>
+        </foreignObject>
+
+        <!-- D2 -->
+        <foreignObject x="510" y="252" width="280" height="76">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Is it already a single-node cluster?</div>
+        </foreignObject>
+
+        <!-- single-node decisions -->
+        <foreignObject x="50" y="378" width="220" height="60">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Driver memory almost full? (≥ 88%)</div>
+        </foreignObject>
+        <foreignObject x="50" y="524" width="220" height="64">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Driver barely used? (CPU &lt; 20% and mem &lt; 35%)</div>
+        </foreignObject>
+
+        <!-- single-node outcomes (to the right) -->
+        <foreignObject x="300" y="372" width="230" height="72">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo act">Move to a higher-memory node<small>protect against out-of-memory</small></div>
+        </foreignObject>
+        <foreignObject x="300" y="520" width="230" height="72">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo act">Shrink the node by one size<small>reclaim idle headroom</small></div>
+        </foreignObject>
+        <foreignObject x="40" y="632" width="240" height="56">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo noop">Leave it as-is — already healthy</div>
+        </foreignObject>
+
+        <!-- multi-node decisions -->
+        <foreignObject x="872" y="376" width="256" height="64">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Would the whole job fit on one node? (≤ 82% mem, ≤ 85% CPU)</div>
+        </foreignObject>
+        <foreignObject x="872" y="516" width="256" height="64">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Would it still finish within ~80% of the schedule gap?</div>
+        </foreignObject>
+        <foreignObject x="872" y="656" width="256" height="64">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Are the driver AND the workers both busy?</div>
+        </foreignObject>
+        <foreignObject x="872" y="796" width="256" height="64">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo dec">Would one big node cost more than today's spot mix?</div>
+        </foreignObject>
+
+        <!-- multi-node outcomes (to the left of the multi decisions) -->
+        <foreignObject x="600" y="374" width="230" height="68">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo keep">Keep multi-node<small>too big for one machine</small></div>
+        </foreignObject>
+        <foreignObject x="600" y="514" width="230" height="68">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo keep">Keep multi-node<small>collapsing would miss its SLA</small></div>
+        </foreignObject>
+        <foreignObject x="600" y="654" width="230" height="68">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo keep">Keep multi-node<small>genuinely parallel work</small></div>
+        </foreignObject>
+        <foreignObject x="600" y="794" width="230" height="68">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo keep">Keep multi-node<small>cheaper on spot workers</small></div>
+        </foreignObject>
+
+        <!-- collapse terminal -->
+        <foreignObject x="875" y="902" width="250" height="60">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo collapse">Collapse to a single node</div>
+        </foreignObject>
+
+        <!-- follow-up note -->
+        <foreignObject x="160" y="994" width="980" height="120">
+          <div xmlns="http://www.w3.org/1999/xhtml" class="fo note">
+            <span><strong>Follow-up for every "keep multi-node" result:</strong> the tool still tries to trim the cluster
+            without removing it — shrink the driver, swap workers to a cheaper/smaller instance type, and reduce the
+            worker count — keeping only the changes that stay within the SLA and lower the estimated cost.</span>
+          </div>
+        </foreignObject>
+      </svg>
+    </div>
+    <p class="glance-intro" style="margin-top:14px">
+      The sections below restate this same flow with the exact metric names, thresholds, and cohort labels used in the code.
+    </p>
+  </section>
+
+  <!-- ENTRY -->
+  <section class="phase">
+    <div class="node start">
+      <div class="label">Per-DAG input: cost-dominant ARM cluster config</div>
+      <div class="sub">From <code>dw_databricks_health.fact_databricks_dag_run</code> — successful orchestrated <code>bietlejuice.%</code> runs (non-interactive, no failed tasks/runs).</div>
+    </div>
+  </section>
+
+  <!-- GUARD CHAIN -->
+  <section class="phase">
+    <h2 class="phase-title">1 · Guard chain — evaluated top to bottom; first match exits</h2>
+
+    <div class="guard-row">
+      <div class="guard-test">
+        <div class="cond">arm_days &lt; 3  OR  arm_runs &lt; 3</div>
+        <div class="why">Not enough ARM history to trust the recommendation.</div>
+      </div>
+      <div class="arrow-yes">YES<span>→</span></div>
+      <div class="cohort c-review">needs_more_arm_data<span class="meaning">Collect more ARM runs first.</span></div>
+    </div>
+
+    <div class="guard-row">
+      <div class="guard-test">
+        <div class="cond">topology == "autoscale"</div>
+        <div class="why">Fixed-size recommender does not alter autoscale clusters.</div>
+      </div>
+      <div class="arrow-yes">YES<span>→</span></div>
+      <div class="cohort c-review">autoscale_review<span class="meaning">Out of scope for fixed-size sizing.</span></div>
+    </div>
+
+    <div class="guard-row">
+      <div class="guard-test">
+        <div class="cond">dominant_config_run_share &lt; 0.80  OR  dominant_config_cost_share &lt; 0.80</div>
+        <div class="why">No single config accounts for ≥80% of runs and cost.</div>
+      </div>
+      <div class="arrow-yes">YES<span>→</span></div>
+      <div class="cohort c-review">mixed_config_review<span class="meaning">Stabilize on one config first.</span></div>
+    </div>
+
+    <div class="guard-row">
+      <div class="guard-test">
+        <div class="cond">required metrics missing</div>
+        <div class="why">Driver/worker CPU &amp; memory p50/p95 needed to size.</div>
+      </div>
+      <div class="arrow-yes">YES<span>→</span></div>
+      <div class="cohort c-review">needs_more_telemetry<span class="meaning">Backfill utilization metrics.</span></div>
+    </div>
+
+    <div class="guard-row">
+      <div class="guard-test">
+        <div class="cond">any spill detected</div>
+        <div class="why">Spill signals memory pressure that distorts sizing.</div>
+      </div>
+      <div class="arrow-yes">YES<span>→</span></div>
+      <div class="cohort c-review">spill_pressure_review<span class="meaning">Resolve spill before resizing.</span></div>
+    </div>
+
+    <div class="guard-row">
+      <div class="guard-test">
+        <div class="cond">ec2_pricing_missing  OR  dbu_negotiated_price_missing</div>
+        <div class="why">Cost guard cannot run without price confidence.</div>
+      </div>
+      <div class="arrow-yes">YES<span>→</span></div>
+      <div class="cohort c-review">cost_confidence_review<span class="meaning">Fix pricing inputs first.</span></div>
+    </div>
+
+    <div class="passdown">branch on topology</div>
+  </section>
+
+  <!-- TOPOLOGY SPLIT -->
+  <section class="phase">
+    <h2 class="phase-title">2 · Topology branch</h2>
+    <div class="split">
+
+      <!-- SINGLE -->
+      <div class="branch single">
+        <div class="branch-head"><span class="pill">topology == single</span> Single-node branch</div>
+        <div class="branch-body">
+
+          <div class="step test">
+            <div class="cond">drv_mem_p95 &gt;= 88%</div>
+            <div class="why">Near OOM.</div>
+          </div>
+          <div class="leads">
+            <div class="tick">→</div>
+            <div class="cohort c-action">protect_oom_risk<span class="meaning">Promote to higher-memory family at same tier (compute→general→memory); if already memory, step up one size tier.</span></div>
+          </div>
+
+          <div class="step test">
+            <div class="cond">drv_cpu_p95 &lt; 20%  AND  drv_mem_p95 &lt; 35%  AND  a lower tier exists</div>
+            <div class="why">Excess headroom on a single node.</div>
+          </div>
+          <div class="leads">
+            <div class="tick">→</div>
+            <div class="cohort c-action">driver_downsize<span class="meaning">Downsize the single node one tier.</span></div>
+          </div>
+
+          <div class="fallthrough">
+            <div class="tick">▼</div>
+            <div class="cohort c-noop">healthy_single<span class="meaning">Single-node is acceptable — no validation config.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MULTI -->
+      <div class="branch multi">
+        <div class="branch-head"><span class="pill">topology == multi</span> Multi-node branch</div>
+        <div class="branch-body">
+
+          <div class="step">
+            <div class="cond">size_single_node(m) — additive demand sizer</div>
+            <div class="why">required_mem = Σ(node_mem × mem_p95); required_cores = Σ(node_vcpu × cpu_p95). Accept a node only when mem ≤ 82% and cores ≤ 85%. Family chosen from GiB/core demand.</div>
+          </div>
+
+          <div class="step test">
+            <div class="cond">additive demand metrics missing</div>
+          </div>
+          <div class="leads">
+            <div class="tick">→</div>
+            <div class="cohort c-review">needs_more_telemetry</div>
+          </div>
+
+          <div class="step test">
+            <div class="cond">no single node fits demand</div>
+            <div class="why">Classify which dimension overflowed the largest node.</div>
+          </div>
+          <div class="leads">
+            <div class="tick">→</div>
+            <div>
+              <div class="cohort c-action">keep_multi_memory<span class="meaning">mem ratio &gt; 0.82 over largest node.</span></div>
+              <div class="cohort c-action" style="margin-top:6px">keep_multi_compute<span class="meaning">cores ratio &gt; 0.85 over largest node.</span></div>
+              <div class="cohort c-action" style="margin-top:6px">keep_multi_balanced<span class="meaning">neither single dimension overflows.</span></div>
+            </div>
+          </div>
+
+          <div class="step test">
+            <div class="cond">projected_wall_p95 is None  OR  &gt; 0.80 × schedule_interval_minutes</div>
+            <div class="why">SLA guard — collapse would burn too much of the cadence.</div>
+          </div>
+          <div class="leads">
+            <div class="tick">→</div>
+            <div class="cohort c-action">keep_multi_sla<span class="meaning">Cadence at risk; keep multi-node.</span></div>
+          </div>
+
+          <div class="step test">
+            <div class="cond">drv_cpu_p95 ≥ 70  AND  wrk_cpu_p50 ≥ 50  AND  wrk_mem_p95 ≥ 60</div>
+            <div class="why">Driver and workers are both hot.</div>
+          </div>
+          <div class="leads">
+            <div class="tick">→</div>
+            <div class="cohort c-action">keep_multi_balanced</div>
+          </div>
+
+          <div class="step test">
+            <div class="cond">collapse cost increases vs. blended spot/on-demand</div>
+            <div class="why">Spot is ~0.37× on-demand, so busy spot clusters can be cheaper multi-node.</div>
+          </div>
+          <div class="leads">
+            <div class="tick">→</div>
+            <div class="cohort c-action">keep_multi_cost</div>
+          </div>
+
+          <div class="fallthrough">
+            <div class="tick">▼</div>
+            <div class="cohort c-action">collapse_to_single<span class="meaning">Demand fits a single node within SLA and cost — collapse.</span></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- POST PROCESSING -->
+  <section class="phase">
+    <div class="post">
+      <h3>3 · After classification — right-sizing &amp; the actions trace</h3>
+      <p>Every <code>keep_multi_*</code> exit independently right-sizes the driver and workers (same 82% mem / 85% CPU targets, same GiB/core family ordering), keeping only changes that pass the SLA guard and reduce projected blended cost. The <code>cohort</code> says <em>why</em> a path was taken; the <code>actions</code> column is the decision trace of what was attempted, accepted, or blocked.</p>
+      <div class="actions-flow">
+        <span class="tok ok">collapse_to_single</span>
+        <span class="tok">keep_multi_node</span>
+        <span class="tok ok">reduce_driver</span> / <span class="tok">keep_driver</span>
+        <span class="tok ok">reduce_worker_type</span> / <span class="tok">keep_worker_type</span>
+        <span class="tok ok">reduce_worker_count</span> / <span class="tok">keep_worker_count</span>
+        <span class="tok block">worker_count_blocked_sla</span>
+        <span class="tok block">resize_blocked_cost</span>
+        <span class="tok">no_change</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- THRESHOLDS -->
+  <section class="phase">
+    <div class="post">
+      <h3>Threshold reference</h3>
+      <table class="thresholds">
+        <thead><tr><th>Constant</th><th>Value</th><th>Used by</th></tr></thead>
+        <tbody>
+          <tr><td>min_days / min_runs</td><td><code>3 / 3</code></td><td>needs_more_arm_data</td></tr>
+          <tr><td>_DOMINANT_CONFIG_SHARE_MIN</td><td><code>0.80</code></td><td>mixed_config_review</td></tr>
+          <tr><td>_DRIVER_OOM_P95</td><td><code>88.0%</code></td><td>protect_oom_risk</td></tr>
+          <tr><td>_DRIVER_DOWNSIZE_CPU_P95_MAX</td><td><code>20.0%</code></td><td>driver_downsize</td></tr>
+          <tr><td>_DRIVER_DOWNSIZE_MEM_P95_MAX</td><td><code>35.0%</code></td><td>driver_downsize</td></tr>
+          <tr><td>_SINGLE_NODE_MEM_TARGET</td><td><code>0.82</code></td><td>single-node sizer / keep_multi_memory</td></tr>
+          <tr><td>_SINGLE_NODE_CPU_TARGET</td><td><code>0.85</code></td><td>single-node sizer / keep_multi_compute</td></tr>
+          <tr><td>_SLA_INTERVAL_TARGET</td><td><code>0.80</code></td><td>keep_multi_sla</td></tr>
+          <tr><td>_DRIVER_CPU_BOUND_P95</td><td><code>70.0%</code></td><td>keep_multi_balanced</td></tr>
+          <tr><td>GiB/core family order</td><td><code>≤2 → compute,general,memory · ≤4 → general,memory · &gt;4 → memory</code></td><td>family selection</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    Generated from <code>scripts/recommend_cluster_specs.py</code>. See <code>docs/platform/cluster_spec_recommender_algorithm.md</code> and <code>cluster_spec_recommender_runbook.md</code> for full detail. Thresholds reflect the source at generation time — re-check the script if logic changes.
+  </footer>
+</div>
+</body>
+</html>
