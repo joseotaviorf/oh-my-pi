@@ -10,3 +10,6 @@ workflow:
   layer: dw
   custom_schema: supply_staging
   default_extraction_type: full
+  inner_dependencies:
+    supply_tof_aggregated:
+      - supply_costs_allocation_prospect

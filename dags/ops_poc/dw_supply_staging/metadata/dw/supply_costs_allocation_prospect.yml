@@ -1,0 +1,72 @@
+---
+database_name: dw_supply_staging
+table_name: supply_costs_allocation_prospect
+description: Allocates media costs to supply prospects by business context, campaign, city group and planning cluster using prospect share for proportional distribution. Faalback set to 50/50 between Rent and Sale for prospects without business context or planning cluster.
+domain: Growth
+owner: data-ops-poc@quintoandar.com.br
+columns:
+  date:
+    description: Reference date for costs and prospects.
+    lineage:
+      - dw_growth.fact_media_platform_metrics (via dim_date)
+      - dw_growth.obt_supply.date
+  city_group:
+    description: A grouping of city or clusters of cities and neighborhoods.
+    lineage:
+      - dw_public.dim_region.city_group
+      - dw_growth.obt_supply.city_group
+  naming_convention_sufix:
+    description: Acronym generated from the values of the taxonomy levels, used as input in the campaigns UTM parameters.
+    lineage:
+      - dw_growth.dim_media_setup.naming_convention_sufix
+  nm_campaign:
+    description: Name of the marketing campaign associated with the lead.
+    lineage:
+      - dw_growth.fact_media_platform_metrics.utm_campaign
+      - dw_growth.obt_supply.nm_campaign
+  id_campaign:
+    description: The key for the campaign, representing the unique identifier for each media campaign.
+    lineage:
+      - dw_growth.fact_media_platform_metrics.sk_campaign
+  campaign_strategy_intent:
+    description: Intention of the actions/campaigns adopted in relation to the growth strategy.
+    lineage:
+      - dw_growth.dim_media_setup.campaign_strategy_intent
+  campaign_landing_page:
+    description: Landing page/domain of QuintoAndar to which the campaign directs.
+    lineage:
+      - dw_growth.dim_media_setup.campaign_landing_page
+  campaign_business_context:
+    description: Intention of the actions/campaigns adopted in relation to the business context.
+    lineage:
+      - dw_growth.dim_media_setup.campaign_business_context
+  nm_business_context_mkt:
+    description: Business context of the prospects, with a focus on the supply side allocation. The possible values are 'Rent' and 'Sale'.
+    lineage:
+      - dw_growth.dim_media_setup.nm_business_context_mkt
+  company_report_origin:
+    description: Indicates the origin within the company that the report targets.
+    lineage:
+      - dw_growth.obt_supply.company_report_origin
+  planning_cluster:
+    description: Planning cluster for the lead.
+    lineage:
+      - dw_growth.obt_supply.planning_cluster
+  source:
+    description: QuintoAndar s external platform/operation responsible for generating the result.
+    lineage:
+      - dw_growth.dim_media_setup.source
+  medium:
+    description: Combination of platform intent, media package, branded and recovery audience status dimensions. Where the average package size is mandatory and the others are applied when convenient.
+    lineage:
+      - dw_growth.dim_media_setup.medium
+  funnel_side:
+    description: Side of the funnel to which that campaign was directed.
+    lineage:
+      - dw_growth.dim_media_setup.funnel_side
+  behavior_type:
+    description: Type of user behavior in relation to their search decision and entry into the QuintoAndar environment.
+    lineage:
+      - dw_growth.dim_media_setup.behavior_type
+  shared_cost:
+    description: Cost allocated to prospects proportionally by prospect share within date and campaign.

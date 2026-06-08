@@ -11,7 +11,8 @@ description: |
   obt_supply date.
 columns:
   aux_reference:
-    description: Row source label distinguishing each union branch (e.g. actual volumes, budget, OKR, unique
+    description:
+      Row source label distinguishing each union branch (e.g. actual volumes, budget, OKR, unique
       targets, cost targets, allocated costs, or last-year actuals reshaped to the current year).
   date:
     description: Calendar date for the metric row; aligned to event or target date depending on the row source.
@@ -28,7 +29,8 @@ columns:
       - dw_growth.obt_supply.nm_business_context
       - datalake_supply_staging.supply_targets.business_context
   supply_source:
-    description: High-level supply channel grouping (1P, 3P, CIQ) derived from planning_operation for target rows;
+    description:
+      High-level supply channel grouping (1P, 3P, CIQ) derived from planning_operation for target rows;
       from obt_supply for actual rows.
     lineage:
       - dw_growth.obt_supply.nm_supply_source
@@ -69,7 +71,8 @@ columns:
       - dw_growth.obt_supply.medium
       - dw_growth.dim_media_setup.medium
   nm_campaign:
-    description: Marketing campaign name; for actual rows, coalesced with the latest name from campaign name
+    description:
+      Marketing campaign name; for actual rows, coalesced with the latest name from campaign name
       history when available.
     lineage:
       - dw_growth.obt_supply.nm_campaign
@@ -78,7 +81,7 @@ columns:
     description: Unique identifier for the media campaign used to join taxonomy and cost allocation.
     lineage:
       - datalake_growth_media_platform.campaign_name_history.id_campaign
-      - datalake_supply_staging.supply_costs_allocation_lead.id_campaign
+      - dw_supply_staging.supply_costs_allocation_prospect.id_campaign
   country_code:
     description: ISO country code where the lead or target applies.
     lineage:
@@ -107,12 +110,14 @@ columns:
     lineage:
       - datalake_salesforce_growth_clean.lead.channel
   is_carteirizacao:
-    description: TRUE when the lead matches portfolio Carteirizacao rules (BR outbound, Wololo portfolio, with
+    description:
+      TRUE when the lead matches portfolio Carteirizacao rules (BR outbound, Wololo portfolio, with
       exclusions for specific conversion and affiliate users after 2025-09-01 for RENT).
     lineage:
       - dw_growth.obt_supply.sk_supply
   is_exec_carteirizacao:
-    description: TRUE when the converting user is in the executive Carteirizacao allowlist and other outbound
+    description:
+      TRUE when the converting user is in the executive Carteirizacao allowlist and other outbound
       carteirizacao conditions hold, with the same RENT exclusions as is_carteirizacao.
     lineage:
       - dw_growth.obt_supply.sk_user_conversion
@@ -129,7 +134,8 @@ columns:
     lineage:
       - datalake_salesforce_growth_clean.lead.id_lead
   fl_unique:
-    description: Unique-supply classification from supply_unique_rules, literal Unique for Unique-target rows,
+    description:
+      Unique-supply classification from supply_unique_rules, literal Unique for Unique-target rows,
       or Cross-listing when no rule matches.
     lineage:
       - datalake_supply_staging.supply_unique_rules.fl_unique
@@ -314,16 +320,18 @@ columns:
     lineage:
       - datalake_supply_staging.supply_unique_targets.volumes_first_listings_unique
   tgt_cost:
-    description: Target marketing cost per source from daily_target_supply_sale or daily_target_supply_rental
+    description:
+      Target marketing cost per source from daily_target_supply_sale or daily_target_supply_rental
       GSheets clean tables (summed at the row grain).
     lineage:
       - datalake_gsheets_clean.daily_target_supply_sale.cost_per_source
       - datalake_gsheets_clean.daily_target_supply_rental.cost_per_source
   mkt_cost:
-    description: Allocated shared media cost per lead from supply_costs_allocation_lead, with a 2026 uplift
+    description:
+      Allocated shared media cost per lead from supply_costs_allocation_prospect, with a 2026 uplift
       factor applied to Facebook source rows from 2026-01-01 onward.
     lineage:
-      - datalake_supply_staging.supply_costs_allocation_lead.shared_cost
+      - dw_supply_staging.supply_costs_allocation_prospect.shared_cost
   month_start:
     description: First calendar day of the month for the row date, from dim_date.
     lineage:
@@ -341,7 +349,8 @@ columns:
     lineage:
       - dw_growth.obt_supply.date
   WTD:
-    description: TRUE when the row date is before the weekday of max_date within the same week, used to flag
+    description:
+      TRUE when the row date is before the weekday of max_date within the same week, used to flag
       week-to-date comparable periods.
     lineage:
       - dw_public.dim_date.date
@@ -350,7 +359,8 @@ columns:
     lineage:
       - dw_public.dim_date.date
   YTD:
-    description: TRUE when the row date is in the same year as max_date and not after max_date in month-day order,
+    description:
+      TRUE when the row date is in the same year as max_date and not after max_date in month-day order,
       for year-to-date style filters.
     lineage:
       - dw_public.dim_date.date
