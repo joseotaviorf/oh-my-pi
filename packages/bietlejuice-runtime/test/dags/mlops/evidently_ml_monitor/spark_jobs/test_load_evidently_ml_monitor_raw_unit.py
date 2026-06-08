@@ -14,6 +14,9 @@ sys.modules.setdefault("pyspark.sql.types", MagicMock())
 for _mod in (
     "bietlejuice.base.db",
     "bietlejuice.base.spark",
+    "bietlejuice.base.validation",
+    "bietlejuice.base.validation.spark_args",
+    "bietlejuice.base.validation.target_resolver",
     "bietlejuice.clients.db_clients",
     "bietlejuice.loaders",
     "bietlejuice.loaders.s3_loader",

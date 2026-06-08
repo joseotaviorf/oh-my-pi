@@ -17,6 +17,10 @@ from pyspark.sql.types import (
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkDataFrameService
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders.delta_loader import DeltaLoader
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -63,6 +67,8 @@ def load_table(
     schema: str,
     table_name: str,
     merge_on: Optional[list] = None,
+    target_database_name: Optional[str] = None,
+    target_table_name: Optional[str] = None,
 ) -> None:
     if merge_on is None:
         merge_on = []
@@ -71,11 +77,21 @@ def load_table(
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
     database_name = db_info["db_enrich_databricks"]
     database_location = db_info["db_enrich_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
 
     loader = DeltaLoader()
     loader.load_table(
-        table_name=f"{database_name}.{table_name}",
-        path=f"{database_location}/{table_name}",
+        table_name=f"{write_database_name}.{write_table_name}",
+        path=f"{write_location}/{write_table_name}",
         source_df=dataframe,
         merge_on=merge_on,
     )
@@ -353,6 +369,7 @@ if __name__ == "__main__":
         default=8,
         help="Concurrent table-level Spark queries from the driver (ThreadPoolExecutor).",
     )
+    add_validation_target_args(parser)
 
     args = parser.parse_args()
     env = args.env
@@ -409,4 +426,13 @@ if __name__ == "__main__":
         .optimize_partitions_by_partition_columns(partition_cols)
         .output()
     )
-    load_table(df_load_sample, env, datalake_bucket, schema, table_name, merge_on)
+    load_table(
+        df_load_sample,
+        env,
+        datalake_bucket,
+        schema,
+        table_name,
+        merge_on,
+        target_database_name=args.target_database_name,
+        target_table_name=args.target_table_name,
+    )

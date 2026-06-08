@@ -1,9 +1,16 @@
 """Argparse validation-flag smoke tests for standalone platform Spark jobs."""
 
 import sys
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
+
+_REPO_ROOT = Path(__file__).resolve().parents[6]
+
+_PLATFORM_JOB_PATHS = [
+    "dags/platform/databricks_usage/spark_jobs/load_databricks_usage_raw.py",
+]
 
 _SPARK_STUBS = [
     "pyspark",
@@ -60,6 +67,13 @@ _VALIDATION_FLAGS = [
     "--target-table-name",
     "datalake_databricks___daily_users",
 ]
+
+
+@pytest.mark.parametrize("job_path", _PLATFORM_JOB_PATHS)
+def test_spark_job_registers_validation_write_flags(job_path: str):
+    text = (_REPO_ROOT / job_path).read_text(encoding="utf-8")
+    assert "add_validation_target_args" in text or "--target-database-name" in text
+    assert "resolve_datalake_write_target(" in text
 
 
 class TestPlatformSparkJobValidationArgs:

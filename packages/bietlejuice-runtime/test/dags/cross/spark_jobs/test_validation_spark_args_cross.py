@@ -7,6 +7,7 @@ import pytest
 _REPO_ROOT = Path(__file__).resolve().parents[6]
 
 _JOB_PATHS = [
+    "dags/cross/base/spark_jobs/load_mongo_raw.py",
     "dags/cross/base/spark_jobs/load_growth_intel_crawler_raw.py",
     "dags/cross/kong/spark_jobs/load_kong_raw.py",
     "dags/cross/request_logging/spark_jobs/fetch_data.py",
@@ -14,6 +15,7 @@ _JOB_PATHS = [
 ]
 
 _JOBS_WITH_RESOLVE = {
+    "dags/cross/base/spark_jobs/load_mongo_raw.py",
     "dags/cross/base/spark_jobs/load_growth_intel_crawler_raw.py",
     "dags/cross/kong/spark_jobs/load_kong_raw.py",
     "dags/cross/request_logging/spark_jobs/fetch_data.py",

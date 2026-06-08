@@ -12,6 +12,11 @@ from bietlejuice.base.spark import (
     SparkTableStorageFormat,
 )
 from bietlejuice.base.spark.unity_catalog_helper import UnityCatalogHelper
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
+from bietlejuice.base.validation.target_resolver import managed_table_fqn
 from bietlejuice.clients.db_clients import MongoClient, SparkClient
 from bietlejuice.consumers.db_consumers import MongoConsumer
 from bietlejuice.loaders import SparkMetastoreLoader
@@ -62,6 +67,7 @@ def _load_dataframe_in_datalake(
 
 def _extract_table_from_database(
     table_name: str,
+    write_table_name: str,
     databricks_database_name: str,
     extraction_type: str,
     date_filter_column: str,
@@ -101,7 +107,7 @@ def _extract_table_from_database(
 
         _load_dataframe_in_datalake(
             df=df,
-            table_name=table_name.lower(),
+            table_name=write_table_name,
             is_incremental=True,
             force_recreate=False,
             **load_options,
@@ -109,7 +115,7 @@ def _extract_table_from_database(
 
         spark_metastore_service.create_new_partitions_from_df(
             database_name=databricks_database_name,
-            table_name=table_name.lower(),
+            table_name=write_table_name,
             df=df,
             partition_cols=partition_cols,
         )
@@ -117,9 +123,7 @@ def _extract_table_from_database(
         logger.info("m=_extract_table_from_database, msg=Performing full load...")
         df = mongo_consumer.get_data_from_table(table_name=table_name)
 
-        _load_dataframe_in_datalake(
-            df=df, table_name=table_name.lower(), **load_options
-        )
+        _load_dataframe_in_datalake(df=df, table_name=write_table_name, **load_options)
 
 
 def parse_arguments() -> Namespace:
@@ -147,6 +151,7 @@ def parse_arguments() -> Namespace:
         required=False,
         default=None,
     )
+    add_validation_target_args(parser)
 
     return parser.parse_args()
 
@@ -204,8 +209,21 @@ if __name__ == "__main__":
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-    databricks_database_name = db_info["db_raw_databricks"]
-    database_location = db_info["db_raw_path"]
+    mongo_table_name = table_name
+    prod_database_name = db_info["db_raw_databricks"]
+    prod_database_location = db_info["db_raw_path"]
+    databricks_database_name, write_table_name, database_location = (
+        resolve_datalake_write_target(
+            prod_database=prod_database_name,
+            prod_table=mongo_table_name,
+            prod_location=prod_database_location,
+            bucket=datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
+    if not args.target_database_name or not args.target_table_name:
+        write_table_name = write_table_name.lower()
     spark_metastore_service = SparkMetastoreService(spark_client)
 
     logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
@@ -214,7 +232,12 @@ if __name__ == "__main__":
     s3_loader = S3Loader()
     spark_metastore_loader = SparkMetastoreLoader(spark_metastore_service)
 
-    full_raw_table_name = f"{databricks_database_name}.{table_name}"
+    full_raw_table_name = managed_table_fqn(
+        prod_database_name,
+        mongo_table_name,
+        args.target_database_name,
+        args.target_table_name,
+    )
     if table_privileges_dict is not None:
         table_privileges = TablePrivileges.from_input_dict(
             table_privileges_dict, full_raw_table_name
@@ -223,7 +246,8 @@ if __name__ == "__main__":
         table_privileges = TablePrivileges.from_environment_default(full_raw_table_name)
 
     _extract_table_from_database(
-        table_name=table_name,
+        table_name=mongo_table_name,
+        write_table_name=write_table_name,
         databricks_database_name=databricks_database_name,
         extraction_type=extraction_type,
         date_filter_column=date_filter_column,

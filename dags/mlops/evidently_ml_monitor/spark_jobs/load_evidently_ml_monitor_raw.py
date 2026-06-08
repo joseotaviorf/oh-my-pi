@@ -11,6 +11,10 @@ from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkTableStorageFormat
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.loaders import SparkMetastoreLoader
 from bietlejuice.loaders.s3_loader import S3Loader
@@ -141,6 +145,7 @@ def main() -> None:
         default=None,
         help="First calendar day after the load window (exclusive). Format: YYYY-MM-DD",
     )
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     environment = args.environment
@@ -172,7 +177,17 @@ def main() -> None:
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
     database_name = db_info["db_raw_databricks"]
     database_location = db_info["db_raw_path"]
-    spark_metastore_service.create_database(database_name)
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
+    spark_metastore_service.create_database(write_database_name)
 
     # Read metric files:
     df = _read_metric_files(spark_client.conn, source_root_path, file_format)
@@ -197,7 +212,7 @@ def main() -> None:
 
     format_options = SparkTableStorageFormat.DEFAULT_RAW
 
-    s3_path = f"{database_location}{table_name}"
+    s3_path = f"{write_location}{write_table_name}"
     s3_loader.load_df(
         df=df,
         s3_path=s3_path,
@@ -209,16 +224,17 @@ def main() -> None:
     # Sync com a metastore:
     spark_metastore_loader.update_metastore(
         df=df,
-        database_name=database_name,
-        table_name=table_name,
+        database_name=write_database_name,
+        table_name=write_table_name,
         format_options=format_options,
-        database_location=database_location,
+        database_location=write_location,
         partitions=None,
     )
 
-    spark_metastore_service.refresh_table(database_name, table_name)
+    spark_metastore_service.refresh_table(write_database_name, write_table_name)
     logger.info(
-        f"m={JOB_NAME}, table={database_name}.{table_name}, msg=Load completed."
+        f"m={JOB_NAME}, table={write_database_name}.{write_table_name}, "
+        f"msg=Load completed."
     )
 
 

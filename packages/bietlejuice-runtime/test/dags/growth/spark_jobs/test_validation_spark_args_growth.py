@@ -26,6 +26,7 @@ _JOB_PATHS = [
     "dags/growth/hightouch_logs/spark_jobs/load_hightouch_sync_changelog.py",
     "dags/growth/hightouch_logs/spark_jobs/load_hightouch_sync_runs.py",
     "dags/growth/hightouch_logs/spark_jobs/load_hightouch_sync_snapshot.py",
+    "dags/growth/hubspot/spark_jobs/load_hubspot_raw.py",
     "dags/growth/hmb_ada/spark_jobs/load_hmb_ada_raw.py",
     "dags/growth/lifull_campaigns/spark_jobs/load_lifull_campaigns_raw.py",
     "dags/growth/olos_dialer_test/spark_jobs/load_olos_dialer_raw.py",

@@ -22,6 +22,10 @@ from pyspark.sql.types import (
 from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.db import DatalakeMetastoreService
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.governance.anonymization.brazil_context_heuristics import (
     apply_context_heuristics_to_nested_cleaned_results,
 )
@@ -292,17 +296,29 @@ def load_table(
     schema: str,
     table_name: str,
     partition_cols: list,
+    target_database_name: str = None,
+    target_table_name: str = None,
 ) -> None:
     logger.info("m=load_table,msg='loading table'")
 
     db_info = DatalakeMetastoreService.get_db_info(environment, schema, datalake_bucket)
     database_name = db_info["db_enrich_databricks"]
     database_location = db_info["db_enrich_path"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=target_database_name,
+            target_table=target_table_name,
+        )
+    )
 
     loader = DeltaLoader()
     loader.load_table(
-        table_name=f"{database_name}.{table_name}",
-        path=f"{database_location}/{table_name}",
+        table_name=f"{write_database_name}.{write_table_name}",
+        path=f"{write_location}/{write_table_name}",
         source_df=dataframe,
         partition_by=partition_cols,
     )
@@ -333,6 +349,7 @@ def parse_args() -> argparse.Namespace:
             "DataFrame's natural partitioning."
         ),
     )
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     logger.info(
@@ -595,6 +612,8 @@ def main():
         args.schema,
         args.table_name,
         partition_cols,
+        target_database_name=args.target_database_name,
+        target_table_name=args.target_table_name,
     )
 
 

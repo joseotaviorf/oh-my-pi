@@ -7,6 +7,8 @@ import pytest
 _REPO_ROOT = Path(__file__).resolve().parents[6]
 
 _JOB_PATHS = [
+    "dags/governance/enrich_anonymization/spark_jobs/load_columns_sample_data.py",
+    "dags/governance/enrich_anonymization/spark_jobs/load_pii_scan_into_datalake.py",
     "dags/governance/enrich_datahub_assets/spark_jobs/load_datahub_assets.py",
     "dags/governance/enrich_fairness_assessment/spark_jobs/load_fairness_assessment.py",
     "dags/governance/enrich_jira/spark_jobs/load_deleted_issues.py",
@@ -29,6 +31,8 @@ _JOB_PATHS = [
 ]
 
 _JOBS_WITH_RESOLVE = {
+    "dags/governance/enrich_anonymization/spark_jobs/load_columns_sample_data.py",
+    "dags/governance/enrich_anonymization/spark_jobs/load_pii_scan_into_datalake.py",
     "dags/governance/enrich_datahub_assets/spark_jobs/load_datahub_assets.py",
     "dags/governance/enrich_fairness_assessment/spark_jobs/load_fairness_assessment.py",
     "dags/governance/enrich_jira/spark_jobs/load_deleted_issues.py",

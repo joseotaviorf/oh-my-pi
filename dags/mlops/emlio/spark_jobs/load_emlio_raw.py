@@ -9,6 +9,11 @@ from quintoandar_logger import QuintoAndarLogger
 from bietlejuice.base.db import DatalakeMetastoreService
 from bietlejuice.base.spark import SparkDataFrameService, SparkTableStorageFormat
 from bietlejuice.base.spark.base_spark import BaseDBUtils
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    is_validation_run,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.services.configuration_service import ConfigurationService
 from bietlejuice.services.metastore_services import SparkMetastoreService
@@ -61,6 +66,7 @@ if __name__ == "__main__":
     parser.add_argument("schema")
     parser.add_argument("partition_cols")
     parser.add_argument("execution_date")
+    add_validation_target_args(parser)
     args = parser.parse_args()
 
     environment = args.env
@@ -113,6 +119,19 @@ if __name__ == "__main__":
     format_options = SparkTableStorageFormat.DEFAULT_RAW
     database_location = datalake_info["db_raw_path"]
     database_name = datalake_info["db_raw_databricks"]
+    write_database_name, write_table_name, write_location = (
+        resolve_datalake_write_target(
+            prod_database=database_name,
+            prod_table=table_name,
+            prod_location=database_location,
+            bucket=datalake_bucket,
+            target_database=args.target_database_name,
+            target_table=args.target_table_name,
+        )
+    )
+    if is_validation_run(args.target_database_name, args.target_table_name):
+        load_path = f"{write_location}{write_table_name}"
+        checkpoints_path = f"{write_location}{write_table_name}_checkpoints/"
 
     base_dbutils = BaseDBUtils()
     dbutils = base_dbutils.get_dbutils()
@@ -155,7 +174,7 @@ if __name__ == "__main__":
         .output()
     )
 
-    spark_metastore_service.create_database(database_name)
+    spark_metastore_service.create_database(write_database_name)
 
     streaming_query = (
         part_df.writeStream.partitionBy(partition_cols)
@@ -166,11 +185,13 @@ if __name__ == "__main__":
         .option("mergeSchema", "true")
         .outputMode("append")
         .option("path", load_path)
-        .toTable(database_name + "." + table_name)
+        .toTable(f"{write_database_name}.{write_table_name}")
     )
 
     streaming_query.awaitTermination()
 
-    spark_metastore_service.repair_table_partitions(database_name, table_name)
+    spark_metastore_service.repair_table_partitions(
+        write_database_name, write_table_name
+    )
 
-    spark_metastore_service.refresh_table(database_name, table_name)
+    spark_metastore_service.refresh_table(write_database_name, write_table_name)

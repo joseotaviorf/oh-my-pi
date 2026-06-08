@@ -27,6 +27,10 @@ from bietlejuice.base.spark import (
     SparkDataFrameService,
     SparkTableStorageFormat,
 )
+from bietlejuice.base.validation.spark_args import (
+    add_validation_target_args,
+    resolve_datalake_write_target,
+)
 from bietlejuice.clients.db_clients import SparkClient
 from bietlejuice.pipeline import FullTableLoaderPipeline, IncrementalTableLoaderPipeline
 from bietlejuice.services.configuration_service import ConfigurationService
@@ -130,19 +134,26 @@ class HubSpotSchemaEnum(Enum):
 
 
 def main():
-    environment, datalake_bucket, source, execution_date, table = parse_arguments()
+    args = parse_arguments()
     logger.info(
         f"""
-        m=main, environment={environment}, datalake_bucket={datalake_bucket}, source={source}, execution_date={execution_date},table={table}
+        m=main, environment={args.env}, datalake_bucket={args.datalake_bucket},
+        source={args.source}, execution_date={args.execution_date}, table={args.table}
          msg=Starting Spark job...
         """
     )
 
-    config_service = ConfigurationService(source)
-    tables = get_tables(config_service, execution_date, table)
+    config_service = ConfigurationService(args.source)
+    tables = get_tables(config_service, args.execution_date, args.table)
     transform_tables_into_dataframes(tables)
     load_table_dataframes_into_datalake(
-        tables, environment, source, datalake_bucket, execution_date
+        tables,
+        args.env,
+        args.source,
+        args.datalake_bucket,
+        args.execution_date,
+        args.target_database_name,
+        args.target_table_name,
     )
 
 
@@ -153,10 +164,9 @@ def parse_arguments():
     parser.add_argument("source")
     parser.add_argument("execution_date")
     parser.add_argument("table")
+    add_validation_target_args(parser)
 
-    args = parser.parse_args()
-
-    return args.env, args.datalake_bucket, args.source, args.execution_date, args.table
+    return parser.parse_args()
 
 
 def get_token():
@@ -294,7 +304,13 @@ def filter_dataframe_by_execution_date(df, execution_date):
 
 
 def load_table_dataframes_into_datalake(
-    tables, environment, source, datalake_bucket, execution_date
+    tables,
+    environment,
+    source,
+    datalake_bucket,
+    execution_date,
+    target_database_name=None,
+    target_table_name=None,
 ):
     """Loads the dataframes into S3, either incrementally or fully, depending on the config."""
 
@@ -305,12 +321,24 @@ def load_table_dataframes_into_datalake(
 
     spark_metastore_service = SparkMetastoreService(spark_client)
 
-    logger.info("m=__main__, msg=Creating database in Spark Metastore if not exists...")
-    spark_metastore_service.create_database(database_name)
-
     partition_cols = ["year", "month", "day"]
 
     for table_name, table_content in tables.items():
+        write_database_name, write_table_name, write_location = (
+            resolve_datalake_write_target(
+                prod_database=database_name,
+                prod_table=table_name,
+                prod_location=database_location,
+                bucket=datalake_bucket,
+                target_database=target_database_name,
+                target_table=target_table_name,
+            )
+        )
+        logger.info(
+            "m=__main__, msg=Creating database in Spark Metastore if not exists..."
+        )
+        spark_metastore_service.create_database(write_database_name)
+
         df = table_content.get("dataframe")
 
         if df is None or df.rdd.isEmpty():
@@ -321,16 +349,20 @@ def load_table_dataframes_into_datalake(
             df = create_date_partitions(df, table_content["date_filter_column"])
             df = filter_dataframe_by_execution_date(df, execution_date)
             IncrementalTableLoaderPipeline(
-                database_name,
-                table_name,
-                database_location,
+                write_database_name,
+                write_table_name,
+                write_location,
                 LayerEnum.RAW,
                 None,
                 partition_cols,
             ).load_and_register(df, format_options)
         else:
             FullTableLoaderPipeline(
-                database_name, table_name, database_location, LayerEnum.RAW, None
+                write_database_name,
+                write_table_name,
+                write_location,
+                LayerEnum.RAW,
+                None,
             ).load_and_register(df, format_options)
 
 
