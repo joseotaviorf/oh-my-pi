@@ -218,6 +218,7 @@ def test_task_failure_alert_prod_environment(
 
     expected_extra_properties = {
         "DAG": "test_dag",
+        "TaskPath": "test_dag:test_task",
         "Task": "test_task",
         "DAGOwner": "testOwner",
     }
