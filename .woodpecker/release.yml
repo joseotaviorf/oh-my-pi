@@ -554,3 +554,36 @@ steps:
       event: push
       branch: [forno]
       path: *qube_modules_path
+
+  get-jiraops-credentials-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/plugins/vault
+    pull: true
+    settings:
+      vault_env: prod
+      vault_secrets:
+        - JIRA_OPS_CREDENTIALS_JSON=kv:apps/prod/bi-etl-ejuice/JIRA_OPS_API#value
+      output_file: ./vault-credentials
+    when:
+      event: push
+      branch: [master, hotfix/*]
+      path: &jiraops_mute_list_path
+        include:
+          - "packages/bietlejuice-compiler/scripts/jiraops/jiraops_mute_list.yml"
+          - "packages/bietlejuice-compiler/scripts/jiraops/**"
+          - "packages/bietlejuice-core/src/bietlejuice/base/jiraops/**"
+        on_empty: false
+    depends_on: []
+
+  sync-jiraops-routine-mute-list-prod:
+    image: 796143582747.dkr.ecr.us-east-1.amazonaws.com/quintoandar/bi-etl-ejuice:prod-ci-base-latest
+    pull: true
+    commands:
+      - . ./vault-credentials
+      - bash packages/bietlejuice-compiler/scripts/jiraops/export_jiraops_credentials.sh
+      - . ./vault-credentials
+      - make sync-jiraops-routine-mute-list
+    when:
+      event: push
+      branch: [master, hotfix/*]
+      path: *jiraops_mute_list_path
+    depends_on: [setup, get-jiraops-credentials-prod]

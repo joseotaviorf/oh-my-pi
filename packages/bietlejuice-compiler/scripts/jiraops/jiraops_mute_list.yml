@@ -1,0 +1,93 @@
+DAG:
+  equals:
+    - bietlejuice.authx_scim
+    - bietlejuice.check_dags_dataset_queue
+    - bietlejuice.cloudfront
+    - bietlejuice.clustering_image_model
+    - bietlejuice.consorcio
+    - bietlejuice.conversation_explorer
+    - bietlejuice.copilot_judge_metrics
+    - bietlejuice.core_region_history
+    - bietlejuice.core_support_journey
+    - bietlejuice.cyber_bureau
+    - bietlejuice.cypress_reports
+    - bietlejuice.demand_balancer_service
+    - bietlejuice.dw_buyer_prospect
+    - bietlejuice.dw_collections_landlord
+    - bietlejuice.dw_recon_quintocred_snapshot
+    - bietlejuice.enrich_access_logs
+    - bietlejuice.enrich_ai_collections_quintoandar
+    - bietlejuice.enrich_atlas_db_quality_metrics
+    - bietlejuice.enrich_agents_matias
+    - bietlejuice.enrich_crawler_chaves_na_mao
+    - bietlejuice.enrich_crawler_df_imoveis
+    - bietlejuice.enrich_crawler_loft
+    - bietlejuice.enrich_crawler_olx
+    - bietlejuice.enrich_demand_consolidated_targets
+    - bietlejuice.enrich_eval_model_seamless
+    - bietlejuice.enrich_expected_contribution_margin
+    - bietlejuice.enrich_find_health_metrics
+    - bietlejuice.enrich_google_search_console_classified
+    - bietlejuice.enrich_growth_automatic_daily_costs
+    - bietlejuice.enrich_growth_commission_costs
+    - bietlejuice.enrich_lost_listings
+    - bietlejuice.enrich_sonia_journeys
+    - bietlejuice.grb
+    - bietlejuice.iaf
+    - bietlejuice.identitynow
+    - bietlejuice.istio
+    - bietlejuice.itbi_sp
+    - bietlejuice.journey_optimizer
+    - bietlejuice.knowledge_base
+    - bietlejuice.ledger
+    - bietlejuice.meetcall
+    - bietlejuice.metric_fintech__collections_segmentation
+    - bietlejuice.metric_sale__experiment
+    - bietlejuice.offboarding_categorization
+    - bietlejuice.opa
+    - bietlejuice.partner_payment
+    - bietlejuice.partner_payment_fast_lane
+    - bietlejuice.payable_accounts_transactions
+    - bietlejuice.quires
+    - bietlejuice.release_validations_tests
+    - bietlejuice.reverse_integration_cloudzero
+    - bietlejuice.reverse_sale_listings_report
+    - bietlejuice.salesforce_cdc
+    - bietlejuice.search_metrics_service
+    - bietlejuice.services_integration_validations
+    - bietlejuice.signup
+    - bietlejuice.zordon
+  contains:
+    - bietlejuice.qube_
+    - bietlejuice.gsheets_
+    - bietlejuice.idactum_
+    - bietlejuice.dw_datamarts_
+
+Task:
+  equals:
+    - bietlejuice.*:job-cluster-finished
+    - bietlejuice.*:terminate-cluster
+    - bietlejuice.retsuko_fast_lane:load-clean-entry-partitioned
+    - bietlejuice.retsuko:load-clean-invoice-partitioned
+    - bietlejuice.retsuko_fast_lane:load-clean-invoice-partitioned
+    - bietlejuice.trato_feito:load-clean-segment-distribution
+    - bietlejuice.trato_feito:load-clean-segment-distribution-history
+    - bietlejuice.retsuko:load-raw-entry-partitioned
+    - bietlejuice.retsuko_fast_lane:load-raw-entry-partitioned
+    - bietlejuice.retsuko:load-transactional-entry-partitioned
+    - bietlejuice.retsuko_fast_lane:load-transactional-entry-partitioned
+    - bietlejuice.trato_feito:register-table-clean-audience
+    - bietlejuice.cyber_complement:sync-metadata-raw-delqmst
+  contains:
+    - bietlejuice.*:optimize-
+    - bietlejuice.*:register-
+    - bietlejuice.*:data-quality-tests-
+
+DAGOwner:
+  equals:
+    - Data DS Pricing
+    - Data Governance
+    - Data Life Cycle
+    - Data People
+    - Ops POC
+    - Tech Platform Workforce Productivity
