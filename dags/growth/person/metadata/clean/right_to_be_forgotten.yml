@@ -33,6 +33,8 @@ description: |
   - Hash-based anonymization verification system
   - User feedback collection for service improvement
   - Audit trail preservation for compliance requirements
+
+  **PII disclaimer:** This table contains personally identifiable information (PII) subject to LGPD/GDPR. Restrict access to authorized purposes and apply minimum-necessary scope when querying or exporting data.
 columns:
   id:
     lineage:
@@ -49,6 +51,7 @@ columns:
       **Business Rule:** Required field, cannot be null
       **Compliance:** Links anonymization requests to specific persons
       **Audit:** Maintained for compliance reporting and legal requirements.
+      PII: Links to a natural person — treat as personally identifiable information under LGPD/GDPR.
   id_anonymization:
     lineage:
     - datalake_person_raw.right_to_be_forgotten.hash_id
@@ -66,24 +69,24 @@ columns:
       Free-text explanation provided by the user for requesting data deletion.
       **Purpose:** Captures detailed user feedback for service improvement
       **Content:** User's own words explaining their decision to request anonymization
-      **Privacy:** Subject to anonymization itself after processing
       **Analytics:** Used for understanding user churn and service issues
       **Compliance:** May be required for certain regulatory reporting.
+      PII: Personally identifiable information subject to LGPD/GDPR data protection policies.
   feedback:
     lineage:
     - datalake_person_raw.right_to_be_forgotten.feedback
     description: |
-      Categorized reason for requesting data anonymization/deletion.
-      **Allowed Values:**
-      - 'DONT_USE_ANYMORE': User no longer uses QuintoAndar services
-      - 'ANOTHER_ACCOUNT': User has another account or wants to consolidate
-      - 'TECHNICAL_PROBLEMS': Service issues driving the deletion request
-      - 'BETTER_ALTERNATIVE': Found alternative service provider
-      - 'CUSTOMER_SERVICE': Poor customer service experience
-      - 'COSTS_PROBLEMS': Service pricing concerns
-      - 'OTHER': Reasons not captured by standard categories
-      **Analytics:** Used for categorizing churn reasons and service improvement
-      **Reporting:** Aggregated for business intelligence and compliance reports.
+      Categorized reason the user selected when requesting data anonymization or deletion.
+      Aggregated for churn analysis, service improvement, and compliance reporting.
+      PII: Personal data linked to an individual privacy request under LGPD/GDPR.
+    categories:
+      DONT_USE_ANYMORE: User no longer uses QuintoAndar services.
+      ANOTHER_ACCOUNT: User has another account or wants to consolidate accounts.
+      TECHNICAL_PROBLEMS: Service issues drove the deletion request.
+      BETTER_ALTERNATIVE: User found an alternative service provider.
+      CUSTOMER_SERVICE: Poor customer service experience.
+      COSTS_PROBLEMS: Concerns about service pricing.
+      OTHER: Reason not captured by standard categories.
   version:
     lineage:
     - datalake_person_raw.right_to_be_forgotten.version
@@ -112,17 +115,20 @@ columns:
     lineage:
     - datalake_person_raw.right_to_be_forgotten.year
     description: |
-      Partition column - Year extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (year). Set from the CDC S3 ingest path date at raw ingestion — not
+      derived from ts_updated. Required in WHERE clauses for partition pruning; align filters with the
+      DAG load window (load_start_date/load_end_date), not with record update timestamps.
   month:
     lineage:
     - datalake_person_raw.right_to_be_forgotten.month
     description: |
-      Partition column - Month extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (month, 1–12). Set from the CDC S3 ingest path date at raw ingestion —
+      not derived from ts_updated. Must be filtered together with year and day in every query to
+      enable partition pruning.
   day:
     lineage:
     - datalake_person_raw.right_to_be_forgotten.day
     description: |
-      Partition column - Day extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (day, 1–31). Set from the CDC S3 ingest path date at raw ingestion —
+      not derived from ts_updated. Always filter with year and month.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.

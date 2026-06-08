@@ -1,0 +1,79 @@
+---
+table_name: datalake_person_clean.person
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  uuid_person:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  gender:
+    # Non-null gender must match Person service enum; null is valid when not assigned.
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_person_clean.person
+         WHERE gender IS NOT NULL
+           AND gender NOT IN ('male', 'female')
+        ) = 0
+      severity_level: Warning
+  block_reason:
+    is_contained_in:
+      values:
+        - NOT_BLOCKED
+        - UNBLOCKED
+        - CONFIDENTIAL
+        - GENERAL
+        - PRIVACY_DELETION
+        - PRIVACY_BLOCKED
+        - BYPASS
+      severity_level: Error
+  is_blocked:
+    is_complete:
+      severity_level: Error
+  version:
+    is_complete:
+      severity_level: Error
+  ts_created:
+    is_complete:
+      severity_level: Error
+  ts_updated:
+    is_complete:
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 12
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 31
+      severity_level: Error

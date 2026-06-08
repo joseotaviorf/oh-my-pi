@@ -31,6 +31,8 @@ description: |
   - JSONB extra_info field for document-specific metadata
   - Document numbers are sanitized and validated before storage
   - Supports unique constraints to prevent duplicate documents
+
+  **PII disclaimer:** This table contains personally identifiable information (PII) subject to LGPD/GDPR. Restrict access to authorized purposes and apply minimum-necessary scope when querying or exporting data.
 columns:
   id:
     lineage:
@@ -44,6 +46,7 @@ columns:
     description: |
       Business identifier - Unique UUID for this identity document, automatically generated.
       Used for external API references and document tracking across systems.
+      PII: Personally identifiable information subject to LGPD/GDPR data protection policies.
   id_person:
     lineage:
     - datalake_person_raw.identity_document.person_id
@@ -52,6 +55,7 @@ columns:
       **Relationship:** Many-to-One with person table
       **Business Rule:** Required field, cannot be null
       **Usage:** Links identity documents to the owning person record.
+      PII: Links to a natural person — treat as personally identifiable information under LGPD/GDPR.
   identification_number:
     lineage:
     - datalake_person_raw.identity_document.identification_number
@@ -59,23 +63,22 @@ columns:
       The actual document number as issued by the government authority.
       **Data Processing:** Sanitized based on document type (removes special characters, formatting)
       **Validation:** Format validation applied per document type and issuing country
-      **Security:** Considered highly sensitive PII, encrypted at rest
       **Uniqueness:** Originally enforced unique constraint (may have multiple documents per person now)
       **Examples:** CPF (11 digits), RFC (13 characters), Passport (alphanumeric).
+      PII: Highly sensitive personally identifiable information subject to LGPD/GDPR data protection policies.
   document_type:
     lineage:
     - datalake_person_raw.identity_document.document_type
     description: |
-      Type of government-issued document.
-      **Allowed Values:**
-      - 'CPF': Brazilian individual taxpayer registry (Cadastro de Pessoas Físicas)
-      - 'RG': Brazilian identity card (Registro Geral)
-      - 'RNE': Brazilian foreigner registry (Registro Nacional de Estrangeiro)
-      - 'RFC': Mexican tax registry (Registro Federal de Contribuyentes)
-      - 'CURP': Mexican population registry (Clave Única de Registro de Población)
-      - 'PASSPORT': International travel document
-      **Business Rules:** Must be compatible with issuing country
-      **Validation:** Different validation rules apply per document type.
+      Government-issued document type stored for this person. Must be compatible with
+      issuing_country for KYC and compliance validation.
+    categories:
+      CPF: Brazilian individual taxpayer registry (Cadastro de Pessoas Físicas).
+      RG: Brazilian national identity card (Registro Geral).
+      RNE: Brazilian foreigner registry (Registro Nacional de Estrangeiro).
+      RFC: Mexican tax registry (Registro Federal de Contribuyentes).
+      CURP: Mexican population registry (Clave Única de Registro de Población).
+      PASSPORT: International travel document.
   issuing_country:
     lineage:
     - datalake_person_raw.identity_document.issuing_country
@@ -94,6 +97,7 @@ columns:
       **Common Fields:** verification_details, expiration_date, issue_date, document_status
       **Usage:** Stores verification results, expiration tracking, and document-specific data
       **Querying:** Supports JSON queries for compliance reporting and analytics.
+      PII: May contain personally identifiable information subject to LGPD/GDPR data protection policies.
   attachment_path:
     lineage:
     - datalake_person_raw.identity_document.attachment_path
@@ -103,6 +107,7 @@ columns:
       **Formats:** Typically PDF, JPG, PNG files
       **Compliance:** Required for certain verification levels and audit trails
       **Retention:** Subject to data retention policies and GDPR requirements.
+      PII: Personally identifiable information subject to LGPD/GDPR data protection policies.
   document_validation_status:
     lineage:
     - datalake_person_raw.identity_document.document_validation_status
@@ -120,16 +125,16 @@ columns:
       **Usage:** Display purposes, user interface labels
       **Examples:** "Primary CPF", "Backup Passport", "Work Visa"
       **Optional:** May be system-generated or user-provided.
+      PII: May contain personally identifiable information subject to LGPD/GDPR data protection policies.
   status:
     lineage:
     - datalake_person_raw.identity_document.status
     description: |
-      Lifecycle status of the document record.
-      **Allowed Values:**
-      - 'ACTIVE': Document is current and valid for use
-      - 'INACTIVE': Document is disabled or superseded
-      **Business Rules:** Only ACTIVE documents are used for verification
-      **Lifecycle:** Documents may be deactivated when replaced or expired.
+      Lifecycle status of the document record in Person service. Only active documents are
+      used for verification and onboarding flows.
+    categories:
+      ACTIVE: Document is current and eligible for verification.
+      INACTIVE: Document is disabled or superseded by a newer record.
   version:
     lineage:
     - datalake_person_raw.identity_document.version
@@ -154,17 +159,20 @@ columns:
     lineage:
     - datalake_person_raw.identity_document.year
     description: |
-      Partition column - Year extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (year). Set from the CDC S3 ingest path date at raw ingestion — not
+      derived from ts_updated. Required in WHERE clauses for partition pruning; align filters with the
+      DAG load window (load_start_date/load_end_date), not with record update timestamps.
   month:
     lineage:
     - datalake_person_raw.identity_document.month
     description: |
-      Partition column - Month extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (month, 1–12). Set from the CDC S3 ingest path date at raw ingestion —
+      not derived from ts_updated. Must be filtered together with year and day in every query to
+      enable partition pruning.
   day:
     lineage:
     - datalake_person_raw.identity_document.day
     description: |
-      Partition column - Day extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (day, 1–31). Set from the CDC S3 ingest path date at raw ingestion —
+      not derived from ts_updated. Always filter with year and month.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.

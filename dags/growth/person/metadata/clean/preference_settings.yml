@@ -34,6 +34,8 @@ description: |
   - Extensible design for future preference types
   - Default values applied when preferences not set
   - Audit trail for preference change tracking
+
+  **PII disclaimer:** This table contains personally identifiable information (PII) subject to LGPD/GDPR. Restrict access to authorized purposes and apply minimum-necessary scope when querying or exporting data.
 columns:
   id:
     lineage:
@@ -50,6 +52,7 @@ columns:
       **Business Rule:** Required field, cannot be null
       **Usage:** Links the preferences to the owning person record
       **Constraint:** Unique per person for preference settings.
+      PII: Links to a natural person — treat as personally identifiable information under LGPD/GDPR.
   timezone:
     lineage:
     - datalake_person_raw.preference_settings.timezone
@@ -61,6 +64,7 @@ columns:
       **Scheduling:** Critical for appointment scheduling and notification timing
       **Default:** System defaults to user's country/region timezone if not specified
       **Validation:** Must be a valid IANA timezone identifier.
+      PII: Personal preference data linked to an individual under LGPD/GDPR.
   language:
     lineage:
     - datalake_person_raw.preference_settings.language
@@ -73,6 +77,7 @@ columns:
       **Default:** System defaults based on user's country or browser settings
       **Localization:** Drives content localization and cultural adaptation
       **Support:** Must be supported by the platform's localization system.
+      PII: Personal preference data linked to an individual under LGPD/GDPR.
   version:
     lineage:
     - datalake_person_raw.preference_settings.version
@@ -98,17 +103,20 @@ columns:
     lineage:
     - datalake_person_raw.preference_settings.year
     description: |
-      Partition column - Year extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (year). Set from the CDC S3 ingest path date at raw ingestion — not
+      derived from ts_updated. Required in WHERE clauses for partition pruning; align filters with the
+      DAG load window (load_start_date/load_end_date), not with record update timestamps.
   month:
     lineage:
     - datalake_person_raw.preference_settings.month
     description: |
-      Partition column - Month extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (month, 1–12). Set from the CDC S3 ingest path date at raw ingestion —
+      not derived from ts_updated. Must be filtered together with year and day in every query to
+      enable partition pruning.
   day:
     lineage:
     - datalake_person_raw.preference_settings.day
     description: |
-      Partition column - Day extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (day, 1–31). Set from the CDC S3 ingest path date at raw ingestion —
+      not derived from ts_updated. Always filter with year and month.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.

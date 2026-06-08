@@ -35,6 +35,8 @@ description: |
   - Value sanitization based on identity type before storage
   - Supports validation timestamp tracking for verification workflows
   - Enables partial and fuzzy matching for identity resolution
+
+  **PII disclaimer:** This table contains personally identifiable information (PII) subject to LGPD/GDPR. Restrict access to authorized purposes and apply minimum-necessary scope when querying or exporting data.
 columns:
   id:
     lineage:
@@ -51,58 +53,54 @@ columns:
       **Business Rule:** Required field, cannot be null
       **Usage:** Links identity values to the person they identify
       **Indexing:** Heavily indexed for fast person lookup by identity.
+      PII: Links to a natural person — treat as personally identifiable information under LGPD/GDPR.
   value:
     lineage:
     - datalake_person_raw.person_identity.value
     description: |
-      The actual identity value used for person matching and resolution.
+      The actual identity value used for person matching and resolution. It is directly linked to the type column.
       **Data Processing:** Sanitized based on identity type (email normalization, phone formatting, etc.)
       **Examples:** "user@example.com", "+5511999999999", "12345678901", "google:user123"
-      **Security:** May contain PII, handled according to data protection policies
       **Uniqueness:** Combined with scope and type for uniqueness constraints
       **Matching:** Used in identity resolution algorithms and duplicate detection.
+      PII: Personally identifiable information subject to LGPD/GDPR data protection policies.
   scope:
     lineage:
     - datalake_person_raw.person_identity.scope
     description: |
-      Geographic or system scope that defines the context and validity of the identity.
-      **Allowed Values:**
-      - 'BR': Brazil-specific identities (CPF, Brazilian contacts)
-      - 'MX': Mexico-specific identities (RFC, Mexican contacts)
-      - 'WW': Worldwide identities (passports, international contacts)
-      - 'COGNITO_USER_POOL_BR': Brazil Cognito user pool identities
-      - 'COGNITO_USER_POOL_MX': Mexico Cognito user pool identities
-      **Business Rules:** Determines validation rules and matching algorithms
-      **Compliance:** Used for regulatory compliance and data residency requirements.
+      Geographic or system scope that defines the context and validity of the identity for
+      matching, compliance, and data residency rules.
+    categories:
+      BR: Brazil-specific identities such as CPF and Brazilian contact identifiers.
+      MX: Mexico-specific identities such as RFC and Mexican contact identifiers.
+      COGNITO_USER_POOL_BR: Identities scoped to the Brazil Cognito user pool.
+      COGNITO_USER_POOL_MX: Identities scoped to the Mexico Cognito user pool.
   type:
     lineage:
     - datalake_person_raw.person_identity.type
     description: |
-      Category of identity information stored in this record.
-      **Contact Identities:**
-      - 'EMAIL': Email addresses for digital identification
-      - 'PHONE': Phone numbers for SMS/voice identification
-      **Document Identities:**
-      - 'CPF': Brazilian tax ID for government verification
-      - 'RFC': Mexican tax registry for government verification
-      - 'PASSPORT': International travel document identification
-      **Social Identities:**
-      - 'COGNITO': AWS Cognito user pool identities
-      - 'GOOGLE': Google social login identities
-      - 'APPLE': Apple social login identities
-      **Business Logic:** Different validation and matching rules apply per type.
+      Identity channel for this record. Determines sanitization, validation, and duplicate
+      detection rules applied to the value field.
+    categories:
+      EMAIL: Email address used for digital identification.
+      PHONE: Phone number used for SMS or voice identification.
+      CPF: Brazilian individual taxpayer registry identifier.
+      RFC: Mexican tax registry identifier.
+      PASSPORT: International travel document identifier.
+      COGNITO: AWS Cognito user pool identity reference.
+      GOOGLE: Google social login identity reference.
+      APPLE: Apple social login identity reference.
   validation_type:
     lineage:
     - datalake_person_raw.person_identity.validation_type
     description: |
-      Method or level of validation applied to this identity.
-      **Allowed Values:**
-      - 'SELF': User-provided information, not independently verified
-      - 'INTERNAL': Verified by QuintoAndar's internal validation systems
-      - 'EXPIRED': Previously validated but validation has expired
-      **Trust Levels:** INTERNAL > SELF > EXPIRED for identity matching confidence
-      **Workflow:** Identities may progress through validation states
-      **Business Impact:** Affects matching algorithms and trust scores.
+      Trust level assigned to this identity. Drives matching confidence and eligibility for
+      high-assurance flows such as account recovery.
+    categories:
+      SELF: User-provided value not independently verified by QuintoAndar.
+      INTERNAL: Value verified by internal QuintoAndar validation systems.
+      EXPIRED: Previously verified value whose validation window has lapsed.
+      'NULL': No validation type assigned.
   version:
     lineage:
     - datalake_person_raw.person_identity.version
@@ -136,17 +134,20 @@ columns:
     lineage:
     - datalake_person_raw.person_identity.year
     description: |
-      Partition column - Year extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (year). Set from the CDC S3 ingest path date at raw ingestion — not
+      derived from ts_updated. Required in WHERE clauses for partition pruning; align filters with the
+      DAG load window (load_start_date/load_end_date), not with record update timestamps.
   month:
     lineage:
     - datalake_person_raw.person_identity.month
     description: |
-      Partition column - Month extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (month, 1–12). Set from the CDC S3 ingest path date at raw ingestion —
+      not derived from ts_updated. Must be filtered together with year and day in every query to
+      enable partition pruning.
   day:
     lineage:
     - datalake_person_raw.person_identity.day
     description: |
-      Partition column - Day extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (day, 1–31). Set from the CDC S3 ingest path date at raw ingestion —
+      not derived from ts_updated. Always filter with year and month.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.

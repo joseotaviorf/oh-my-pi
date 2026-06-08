@@ -29,6 +29,8 @@ description: |
   - PRIMARY: Main contact method for critical communications
   - SECONDARY: Backup contact method
   - BUSINESS: Business-related communications only
+
+  **PII disclaimer:** This table contains personally identifiable information (PII) subject to LGPD/GDPR. Restrict access to authorized purposes and apply minimum-necessary scope when querying or exporting data.
 columns:
   id:
     lineage:
@@ -42,6 +44,7 @@ columns:
     description: |
       Business identifier - Unique UUID for this contact information, automatically generated.
       Used for external API references and cross-service communication when referring to specific contact methods.
+      PII: Personally identifiable information subject to LGPD/GDPR data protection policies.
   id_person:
     lineage:
     - datalake_person_raw.contact_info.person_id
@@ -50,6 +53,7 @@ columns:
       **Relationship:** Many-to-One with person table
       **Business Rule:** Required field, cannot be null
       **Usage:** Links contact information to the owning person record.
+      PII: Links to a natural person — treat as personally identifiable information under LGPD/GDPR.
   contact_info:
     lineage:
     - datalake_person_raw.contact_info.contact_info
@@ -57,19 +61,18 @@ columns:
       The actual contact information value (email address, phone number, or push token).
       **Data Processing:** Subject to sanitization based on contact type
       **Validation:** Format validation applied based on category (email format, phone format, etc.)
-      **Security:** Considered PII, handled according to data protection policies
       **Indexing:** Indexed for fast lookup during authentication and contact resolution.
+      PII: Personally identifiable information subject to LGPD/GDPR data protection policies.
   category:
     lineage:
     - datalake_person_raw.contact_info.category
     description: |
-      Type of contact information stored in this record.
-      **Allowed Values:**
-      - 'EMAIL': Email addresses for digital communication
-      - 'PHONE': Phone numbers for SMS and voice communication  
-      - 'PUSH_NOTIFICATION': Device tokens for mobile app notifications
-      **Business Rules:** Determines validation rules and communication preferences
-      **Integration:** Used by notification services to route messages appropriately.
+      Contact channel type for this record. Determines validation rules and which notification
+      services may deliver messages to this contact.
+    categories:
+      EMAIL: Email address for digital communication.
+      PHONE: Phone number for SMS and voice communication.
+      PUSH_NOTIFICATION: Mobile device token for push notifications.
   extra_info:
     lineage:
     - datalake_person_raw.contact_info.extra_info
@@ -79,17 +82,17 @@ columns:
       **Common Fields:** verification_status, country_code, device_info, preferences
       **Usage:** Stores verification tokens, device information, and communication preferences
       **Querying:** Supports JSON queries for filtering and analytics.
+      PII: May contain personally identifiable information subject to LGPD/GDPR data protection policies.
   priority:
     lineage:
     - datalake_person_raw.contact_info.priority
     description: |
-      Priority ranking for this contact method relative to other contacts for the same person.
-      **Allowed Values:**
-      - 'PRIMARY': Main contact method, used for critical communications
-      - 'SECONDARY': Backup contact method, used when primary is unavailable
-      - 'BUSINESS': Dedicated to business communications and marketing
-      **Business Logic:** Notification systems use priority to determine contact order
-      **Rules:** Each person should have one primary contact per category when possible.
+      Relative priority of this contact among the person's contact methods. Notification
+      systems use it to choose the primary channel when multiple contacts exist.
+    categories:
+      PRIMARY: Main contact method for critical communications.
+      SECONDARY: Backup contact used when primary is unavailable.
+      BUSINESS: Contact reserved for business and marketing communications.
   version:
     lineage:
     - datalake_person_raw.contact_info.version
@@ -122,17 +125,20 @@ columns:
     lineage:
     - datalake_person_raw.contact_info.year
     description: |
-      Partition column - Year extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (year). Set from the CDC S3 ingest path date at raw ingestion — not
+      derived from ts_updated. Required in WHERE clauses for partition pruning; align filters with the
+      DAG load window (load_start_date/load_end_date), not with record update timestamps.
   month:
     lineage:
     - datalake_person_raw.contact_info.month
     description: |
-      Partition column - Month extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (month, 1–12). Set from the CDC S3 ingest path date at raw ingestion —
+      not derived from ts_updated. Must be filtered together with year and day in every query to
+      enable partition pruning.
   day:
     lineage:
     - datalake_person_raw.contact_info.day
     description: |
-      Partition column - Day extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (day, 1–31). Set from the CDC S3 ingest path date at raw ingestion —
+      not derived from ts_updated. Always filter with year and month.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.

@@ -22,9 +22,10 @@ description: |
   - Optimistic Locking: Version field prevents concurrent update conflicts
 
   **Audit & Compliance:**
-  - Full audit trail via Hibernate Envers (person_aud table)
   - GDPR compliance through Right to be Forgotten integration
   - Change tracking with user attribution and timestamps
+
+  **PII disclaimer:** This table contains personally identifiable information (PII) subject to LGPD/GDPR. Restrict access to authorized purposes and apply minimum-necessary scope when querying or exporting data.
 columns:
   id:
     lineage:
@@ -39,19 +40,25 @@ columns:
       Business identifier - Unique UUID for this person, automatically generated.
       This UUID is used for external system integration, API responses, and cross-service communication.
       Immutable after creation and serves as the stable external reference for this person.
+      PII: Personally identifiable information subject to LGPD/GDPR data protection policies.
   person_name:
     lineage:
     - datalake_person_raw.person.name
     description: |
       Full name of the person as provided during registration or profile updates.
       Subject to data sanitization for security. May be updated by the person or system administrators.
+      PII: Personally identifiable information subject to LGPD/GDPR data protection policies.
   gender:
     lineage:
     - datalake_person_raw.person.gender
     description: |
-      Person's gender identity. Constrained to specific values for data consistency.
-      **Allowed Values:** 'male', 'female'
-      **Business Rules:** Required for demographic analysis and personalization features.
+      Person's gender identity as stored by the Person service. Used for demographic analysis
+      and personalization where applicable.
+      PII: Personally identifiable information subject to LGPD/GDPR data protection policies.
+    categories:
+      male: Male gender identity.
+      female: Female gender identity.
+      'null': No gender assigned.
   country_code:
     lineage:
     - datalake_person_raw.person.country_code
@@ -60,12 +67,14 @@ columns:
       **Common Values:** 'BR' (Brazil), 'MX' (Mexico)
       **Business Impact:** Determines applicable regulations, document validation rules, and feature availability.
       **Data Governance:** Required field for compliance and localization.
+      PII: Personally identifiable information subject to LGPD/GDPR data protection policies.
   photo:
     lineage:
     - datalake_person_raw.person.photo
     description: |
       URL or path to the person's profile photo. Optional field that may be populated from
       social login providers or direct uploads. Subject to content moderation policies.
+      PII: Personally identifiable information subject to LGPD/GDPR data protection policies.
   version:
     lineage:
     - datalake_person_raw.person.version
@@ -83,22 +92,23 @@ columns:
     lineage:
     - datalake_person_raw.person.block_reason
     description: |
-      Enum indicating the type of block the person currently has.
-      **Values:** NOT_BLOCKED (Default status. Person is not blocked, and was never previously blocked),
-      UNBLOCKED (Person is not blocked, but was previously blocked),
-      CONFIDENTIAL (Person is blocked due to a confidential reason),
-      GENERAL (Person is blocked),
-      PRIVACY_DELETION (Person is blocked, account was anonymized),
-      PRIVACY_BLOCKED (Person is blocked, account anonymization is under analysis),
-      BYPASS (Person is blocked due to executing bypass)
-      **Business Rules:** Blocked users cannot perform certain actions and may have restricted access.
+      Account block classification for the person. Drives access restrictions, privacy workflows,
+      and whether the profile is active or under compliance review.
+    categories:
+      NOT_BLOCKED: Person is active and was never blocked.
+      UNBLOCKED: Person is active after a previous block was lifted.
+      CONFIDENTIAL: Person is blocked for a confidential internal reason.
+      GENERAL: Person is blocked under a standard restriction.
+      PRIVACY_DELETION: Person is blocked because the account was anonymized under LGPD/GDPR.
+      PRIVACY_BLOCKED: Person is blocked while anonymization is under review.
+      BYPASS: Person is blocked due to a bypass-related security action.
   dt_birth:
     lineage:
     - datalake_person_raw.person.birth_date
     description: |
       Person's date of birth. Used for age verification, legal compliance, and demographic analysis.
       **Validation:** Must be a reasonable date (not future, not impossibly old)
-      **Privacy:** Considered sensitive PII, subject to data protection regulations.
+      PII: Personally identifiable information subject to LGPD/GDPR data protection policies.
   ts_created:
     lineage:
     - datalake_person_raw.person.created_at
@@ -117,17 +127,20 @@ columns:
     lineage:
     - datalake_person_raw.person.year
     description: |
-      Partition column - Year extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (year). Set from the CDC S3 ingest path date at raw ingestion — not
+      derived from ts_updated. Required in WHERE clauses for partition pruning; align filters with the
+      DAG load window (load_start_date/load_end_date), not with record update timestamps.
   month:
     lineage:
     - datalake_person_raw.person.month
     description: |
-      Partition column - Month extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (month, 1–12). Set from the CDC S3 ingest path date at raw ingestion —
+      not derived from ts_updated. Must be filtered together with year and day in every query to
+      enable partition pruning.
   day:
     lineage:
     - datalake_person_raw.person.day
     description: |
-      Partition column - Day extracted from the record's processing timestamp.
-      Used for efficient data partitioning and query performance optimization.
+      Table partition column (day, 1–31). Set from the CDC S3 ingest path date at raw ingestion —
+      not derived from ts_updated. Always filter with year and month.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
