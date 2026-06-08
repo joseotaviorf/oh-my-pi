@@ -1,5 +1,9 @@
 database_name: datalake_ebdb_clean
 table_name: restriction_type
+owner: guilherme.rocha@quintoandar.com.br
+domain: House and Listing
+description: CDC mirror of the RestrictionType EBDB lookup table. One row per restriction type (PK id). Reference table
+  listing the types of visit or access restrictions applicable to a house.
 columns:
   id:
     lineage:

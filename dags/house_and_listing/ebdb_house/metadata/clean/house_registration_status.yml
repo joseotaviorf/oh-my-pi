@@ -1,5 +1,9 @@
 database_name: datalake_ebdb_clean
 table_name: house_registration_status
+owner: bruna.prates@quintoandar.com.br
+domain: House and Listing
+description: CDC mirror of the HouseRegistrationStatus EBDB table. One row per registration status record (PK id).
+  Tracks the registration workflow status for each house, including photo shoot scheduling and assignee.
 columns:
   id:
     lineage:

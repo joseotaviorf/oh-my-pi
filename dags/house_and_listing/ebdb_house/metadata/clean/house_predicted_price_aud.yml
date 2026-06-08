@@ -1,5 +1,9 @@
 database_name: datalake_ebdb_clean
 table_name: house_predicted_price_aud
+owner: bruna.prates@quintoandar.com.br
+domain: House and Listing
+description: Audit table for HousePredictedPrice. Tracks all historical changes to predicted prices per house. Sourced
+  from HousePredictedPrice_AUD in EBDB.
 columns:
   id:
     lineage:

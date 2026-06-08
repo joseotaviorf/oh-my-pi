@@ -1,5 +1,9 @@
 database_name: datalake_ebdb_clean
 table_name: house_special_condition
+owner: bruna.prates@quintoandar.com.br
+domain: House and Listing
+description: CDC mirror of the HouseSpecialCondition association table. One row per (house, special condition) pair
+  (PK id_house + id_special_condition). Links each house to its special conditions such as access restrictions or custom rules.
 columns:
   id_house:
     lineage:

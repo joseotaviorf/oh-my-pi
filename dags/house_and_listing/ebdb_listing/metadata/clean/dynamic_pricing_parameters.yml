@@ -1,7 +1,9 @@
 database_name: datalake_ebdb_clean
 table_name: dynamic_pricing_parameters
+owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: Table containing dynamic pricing parameters configuration for rental properties.
+description: CDC mirror of the DynamicPricingParameters EBDB lookup table. One row per parameter set (PK id).
+  Reference table defining the thresholds and ratios used by the dynamic pricing engine (days, visits, offers, rent percentiles).
 columns:
   id:
     lineage:
@@ -22,7 +24,7 @@ columns:
   days_from_automatic_activation:
     lineage:
       - datalake_ebdb_raw.dynamicpricingparameters.daysFromAutomaticActivation
-    description: Number of days from automatic activation of dynamic pricing.
+    description: Number of days elapsed since dynamic pricing was automatically activated for this parameter set.
   offers_threshold:
     lineage:
       - datalake_ebdb_raw.dynamicpricingparameters.offersthreshold
@@ -75,3 +77,20 @@ columns:
     lineage:
       - datalake_ebdb_raw.dynamicpricingparameters.atualizadoem
     description: Timestamp of the last update to this record.
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.op_cdc
+    description: CDC operation type captured by Debezium.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.ts_cdc_transaction
+    description: Timestamp when the CDC system captured this transaction (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricingparameters.ts_database_transaction
+    description: Timestamp of the original database transaction in the source system.

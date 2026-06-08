@@ -1,5 +1,9 @@
 database_name: datalake_ebdb_clean
 table_name: house_registration_status_aud
+owner: bruna.prates@quintoandar.com.br
+domain: House and Listing
+description: Audit table for HouseRegistrationStatus. Tracks all historical changes to registration statuses per house.
+  Sourced from HouseRegistrationStatus_AUD in EBDB.
 columns:
   id_house_registration_status:
     lineage:

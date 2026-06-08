@@ -1,7 +1,9 @@
 database_name: datalake_ebdb_clean
 table_name: dynamic_pricing_house_aud
+owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: Audit table containing the history of changes for dynamic pricing house records.
+description: Audit table for DynamicPricingHouse. One row per change event (PK id + rev).
+  Tracks all historical changes to dynamic pricing configurations per house. Sourced from dynamicpricinghouse_aud in EBDB.
 columns:
   id:
     lineage:
@@ -111,3 +113,20 @@ columns:
     lineage:
       - datalake_ebdb_raw.dynamicpricinghouse_aud.deactivatedAt
     description: Date when dynamic pricing was deactivated for this property.
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.op_cdc
+    description: CDC operation type captured by Debezium.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.ts_cdc_transaction
+    description: Timestamp when the CDC system captured this transaction (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse_aud.ts_database_transaction
+    description: Timestamp of the original database transaction in the source system.

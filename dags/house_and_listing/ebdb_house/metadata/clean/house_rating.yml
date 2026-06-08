@@ -1,5 +1,9 @@
 database_name: datalake_ebdb_clean
 table_name: house_rating
+owner: bruna.prates@quintoandar.com.br
+domain: House and Listing
+description: CDC mirror of the HouseRating EBDB table. One row per rating record (PK id). Contains quality ratings assigned
+  to houses during the registration process.
 columns:
   id:
     lineage:

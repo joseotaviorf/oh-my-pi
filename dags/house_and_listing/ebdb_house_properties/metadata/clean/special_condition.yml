@@ -1,5 +1,9 @@
 database_name: datalake_ebdb_clean
 table_name: special_condition
+owner: bruna.prates@quintoandar.com.br
+domain: House and Listing
+description: CDC mirror of the SpecialCondition EBDB table. One row per special condition record (PK id). Tracks special
+  commercial conditions (e.g., partner agreements, opt-in/out periods) applied to each house.
 columns:
   id:
     lineage:

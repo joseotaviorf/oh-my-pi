@@ -1,7 +1,9 @@
 database_name: datalake_ebdb_clean
 table_name: dynamic_pricing_house
+owner: bruna.prates@quintoandar.com.br
 domain: House and Listing
-description: Table containing dynamic pricing configuration for rental properties.
+description: CDC mirror of the DynamicPricingHouse EBDB table. One row per dynamic pricing configuration record (PK id).
+  Tracks the dynamic pricing setup for each rental property, including status, operation mode, price boundaries and activation dates.
 columns:
   id:
     lineage:
@@ -71,3 +73,20 @@ columns:
     lineage:
       - datalake_ebdb_raw.dynamicpricinghouse.criadoem
     description: Timestamp when this record was created.
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.op_cdc
+    description: CDC operation type captured by Debezium.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.ts_cdc_transaction
+    description: Timestamp when the CDC system captured this transaction (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.dynamicpricinghouse.ts_database_transaction
+    description: Timestamp of the original database transaction in the source system.

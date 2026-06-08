@@ -1,5 +1,9 @@
 database_name: datalake_ebdb_clean
 table_name: special_condition_aud
+owner: bruna.prates@quintoandar.com.br
+domain: House and Listing
+description: Audit table for SpecialCondition. One row per change event (PK id_special_condition + rev). Tracks all historical
+  changes to special conditions per house. Sourced from specialcondition_aud in EBDB.
 columns:
   id_special_condition:
     lineage:

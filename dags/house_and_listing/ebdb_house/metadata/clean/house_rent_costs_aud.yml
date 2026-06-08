@@ -1,6 +1,10 @@
 ---
 database_name: datalake_ebdb_clean
 table_name: house_rent_costs_aud
+owner: bruna.prates@quintoandar.com.br
+domain: House and Listing
+description: Audit table for HouseRentCosts. Tracks all historical changes to rental costs and price trends per house.
+  Sourced from HouseRentCosts_AUD in EBDB.
 columns:
   id:
     lineage:

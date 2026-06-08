@@ -1,5 +1,9 @@
 database_name: datalake_ebdb_clean
 table_name: house_maintenance_condition_aud
+owner: bruna.prates@quintoandar.com.br
+domain: House and Listing
+description: Audit table for HouseMaintenanceCondition. Tracks all historical changes to maintenance conditions per house.
+  Sourced from HouseMaintenanceCondition_AUD in EBDB.
 columns:
   id_house_maintenance_condition:
     lineage:
