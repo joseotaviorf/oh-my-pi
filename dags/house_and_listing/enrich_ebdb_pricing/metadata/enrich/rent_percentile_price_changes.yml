@@ -4,7 +4,7 @@ table_name: rent_percentile_price_changes
 description: Enrich table that handles the rental price change information
   Each row represents the prices estimated by the calculator of each house and it's changes.
 domain: House and Listing
-owner: kleber.inoue@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_house: 
     lineage:

@@ -39,11 +39,11 @@ columns:
   ratio_rent_houses_filled:
     description: Ratio (0-1) of houses in the rent context in which this amenity is not null.
   ratio_houses_true:
-    description: Ratio (0-1) of houses in which this amenity is true.
+    description: Ratio (0-1) of all houses (rent + sale) in which this amenity is marked as true (present).
   ratio_sale_houses_true:
-    description: Ratio (0-1) of houses in the sale context in which this amenity is true.
+    description: Ratio (0-1) of houses in the sale context in which this amenity is marked as true (present).
   ratio_rent_houses_true:
-    description: Ratio (0-1) of houses in the rent context in which this amenity is true.
+    description: Ratio (0-1) of houses in the rent context in which this amenity is marked as true (present).
   ts_first_usage:
     lineage:
       - datalake_ebdb_clean.info_amenities.ts_created

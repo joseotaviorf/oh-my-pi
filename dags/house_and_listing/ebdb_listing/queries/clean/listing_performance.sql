@@ -17,6 +17,9 @@ SELECT
     favorites_flag,
     score_type,
     criadoEm AS ts_created,
-    atualizadoEm AS ts_updated
+    atualizadoEm AS ts_updated,
+  op_cdc,
+  ts_cdc_transaction,
+  ts_database_transaction
 FROM
     datalake_ebdb_raw.ListingPerformance

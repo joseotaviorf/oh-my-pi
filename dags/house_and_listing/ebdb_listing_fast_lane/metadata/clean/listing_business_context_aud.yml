@@ -158,3 +158,20 @@ columns:
     lineage:
       - datalake_ebdb_raw.listingbusinesscontext_aud.criadoem
     description: Timestamp when the listing business context was initially created in the system.
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.op_cdc
+    description: CDC operation type captured by Debezium.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.ts_cdc_transaction
+    description: Timestamp when the CDC system captured this transaction (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.listingbusinesscontext_aud.ts_database_transaction
+    description: Timestamp of the original database transaction in the source system.

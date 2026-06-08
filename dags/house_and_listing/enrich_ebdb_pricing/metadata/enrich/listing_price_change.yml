@@ -31,12 +31,12 @@ columns:
       - datalake_ebdb_clean.house_aud.rev
     description: Foreign key refering to the revision entity of the price change.
   business_context:
-    description: Listing business context.
+    description: Business context in which the price change occurred.
     categories:
       RENT: For rent.
       SALE: For sale.
   change_reason:
-    description: The reason of the price change.
+    description: Reason that triggered the price change event.
   price:
     lineage:
       - datalake_ebdb_clean.house_aud.sale_price

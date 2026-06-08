@@ -4,12 +4,12 @@ table_name: maintenance_condition_history
 description: Table showing the history of changes in the conservation condition of the house. 
     Each row is a status for a property in a certain period of time (when is_last_condition is true, it becomes one row per house)
 domain: House and Listing
-owner: guilherme.ventura@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.house_maintenance_condition_aud.id_house
-    description: ID of the house.
+    description: Unique identifier of the house whose maintenance condition history is being tracked.
   house_condition:
     lineage:
       - datalake_ebdb_clean.house_maintenance_condition_aud.maintenance_condition
@@ -29,5 +29,5 @@ columns:
     description: Flag to indicate if is the actual maintenance condition status.
   dt_condition_started:
     description: Date of when the maintenance condition started.
-  dt_condition_ended: 
-    description: Date of when the maintenance condition ended, if it has ended.
+  dt_condition_ended:
+    description: Date when this maintenance condition period ended. Null if this is the current active condition (see is_last_condition).

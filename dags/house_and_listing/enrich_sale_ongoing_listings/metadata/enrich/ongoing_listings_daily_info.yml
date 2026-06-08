@@ -17,11 +17,11 @@ columns:
     lineage:
       - datalake_quintoandar.aux_date.id_date
   id_sale_listing:
-    description: ID of the sale listing.
+    description: Identifier of the sale listing being tracked as ongoing on this day.
     lineage:
       - datalake_sale_listings.sale_listing.id_sale_listing
   id_house:
-    description: ID of the house.
+    description: Identifier of the house being tracked as an ongoing sale listing on this day.
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.id_house
   id_region:

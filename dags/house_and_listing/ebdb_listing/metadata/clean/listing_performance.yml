@@ -99,3 +99,20 @@ columns:
     lineage:
       - datalake_ebdb_raw.ListingPerformance.atualizadoEm
     description: Timestamp of when the data was updated.
+  op_cdc:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.op_cdc
+    description: CDC operation type captured by Debezium.
+    categories:
+      r: Read/snapshot - initial load of existing records.
+      c: Create - new record inserted.
+      u: Update - existing record modified.
+      d: Delete - record removed.
+  ts_cdc_transaction:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.ts_cdc_transaction
+    description: Timestamp when the CDC system captured this transaction (millisecond precision).
+  ts_database_transaction:
+    lineage:
+      - datalake_ebdb_raw.ListingPerformance.ts_database_transaction
+    description: Timestamp of the original database transaction in the source system.

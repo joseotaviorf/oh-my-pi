@@ -16,6 +16,9 @@ SELECT
   atualizadoEm AS ts_updated,
   firstPublicationDate AS ts_first_publication,
   lastPublicationDate AS ts_last_publication,
-  lastStatusChangedAt AS ts_last_status_changed
+  lastStatusChangedAt AS ts_last_status_changed,
+  op_cdc,
+  ts_cdc_transaction,
+  ts_database_transaction
 FROM
   datalake_ebdb_raw.listingbusinesscontext

@@ -6,6 +6,10 @@ description: Enrich table that handles sale and rental calculator listing predic
 domain: House and Listing
 owner: bruna.prates@quintoandar.com.br
 columns:
+  id_prediction_change:
+    description: Identifier of the specific prediction change event. Foreign key to the prediction model output.
+    lineage:
+      - datalake_ebdb_pricing.listing_prediction_changes.id_prediction_change
   id_house:
     lineage:
       - datalake_ebdb_clean.house_aud.id_house
@@ -20,7 +24,7 @@ columns:
       - datalake_ebdb_clean.house_aud.rev
     description: Foreign key reffering to the revision entity of the price change.
   business_context:
-    description: Listing business context.
+    description: Business context in which the price change occurred.
     categories:
       RENT: For rent.
       SALE: For sale.

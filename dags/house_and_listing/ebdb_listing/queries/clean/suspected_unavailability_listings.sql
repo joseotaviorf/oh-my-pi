@@ -6,6 +6,9 @@ SELECT
     listing_confirmed AS is_confirmed,
     last_contact_attempt_at AS ts_last_contact_attempt,
     created_at AS ts_created,
-    updated_at AS ts_updated
+    updated_at AS ts_updated,
+  op_cdc,
+  ts_cdc_transaction,
+  ts_database_transaction
 FROM
     datalake_ebdb_raw.`SuspectedUnavailabilityListing`

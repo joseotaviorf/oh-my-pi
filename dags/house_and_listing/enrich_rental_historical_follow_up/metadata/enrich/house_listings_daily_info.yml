@@ -4,7 +4,7 @@ description: Enriched table for store the last status of the day of the last hou
   historical informations like CIQ, entrance, and who is living.
   Due to Early Demand and corner cases, duplicated houses, but with different listings are expect in this table for the same reference date (dt_day column).
 domain: House and Listing
-owner: data-for-rent@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_house_listing_day:
     description: The primary key created by a concatenation of id_house_listing and
@@ -16,7 +16,7 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_listing.house_listing.id_house
-    description: The Id of the house.
+    description: Unique identifier of the house being tracked in the daily follow-up.
   id_country:
     lineage:
       - datalake_ebdb_listing.house.id_country
@@ -31,11 +31,10 @@ columns:
     lineage:
       - datalake_ebdb_listing.house.id_user
     description: The landlord's/owner's ID user.
-      day.
   id_occupant:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.id_occupant
-    description: The Id of the occupant of the house.
+    description: Identifier of the current occupant of the house on the tracked day.
     categories:
       '1': None
       '2': Tenant
@@ -48,7 +47,7 @@ columns:
   id_partner_big_agent:
     lineage:
       - datalake_big_agent.house_consultant_history.id_partner
-    description: ID of the agent.
+    description: Identifier of the partner big agent associated with the listing on the tracked day.
   id_region:
     lineage:
       - datalake_ebdb_listing.house.id_region
@@ -80,7 +79,11 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_listing.house.country_code
-    description: Country code of the house.
+    description: Two-letter ISO country code indicating the country where the house is located.
+    categories:
+      BR: Brazil
+      MX: Mexico
+      Undefined: Country could not be determined.
   rental_administrator:
     lineage:
       - datalake_ebdb_listing.rent_listing.rental_administrator
@@ -96,7 +99,12 @@ columns:
   doorman_type:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.doorman_type
-    description: Type of doorman of the house.
+    description: Type of doorman service available at the house building on the tracked day.
+    categories:
+      NaoHaPorteiro: No doorman.
+      horas24: 24-hour doorman.
+      Diurno: Daytime doorman only.
+      Noturno: Nighttime doorman only.
   first_key_location:
     lineage:
       - datalake_ebdb_listing.agents_with_keys.first_key_location
@@ -225,7 +233,11 @@ columns:
   listing_category:
     lineage:
       - datalake_ebdb_listing.house_listing.listing_category
-    description: Which is this listing category.
+    description: Category of the listing on the tracked day, indicating whether it is a new or returning listing.
+    categories:
+      First Listing: First time the house is published on the platform.
+      Re-Listing: House that was previously listed and is being published again.
+      Recovered: House that was recovered from an inactive or cancelled state and republished.
   is_exclusive:
     lineage:
       - datalake_ebdb_listing.house_listing.is_exclusive
@@ -277,4 +289,4 @@ columns:
   month:
     description: The month when this status was observed. Also, it's a partition of this table.
   day:
-    description: The day when this status was observed. Also, it's a partition of this table.
+    description: The day of the month when this status was observed. Also, it's a partition of this table.
