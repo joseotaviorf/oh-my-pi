@@ -25,9 +25,6 @@ SELECT
   deactivatedAt_MOD AS mod_dt_deactivated,
   lastPriceUpdate AS dt_last_price_updated,
   activatedAt AS dt_activated,
-  deactivatedAt AS dt_deactivated,
-  op_cdc,
-  ts_cdc_transaction,
-  ts_database_transaction
+  deactivatedAt AS dt_deactivated
 FROM
     datalake_ebdb_raw.dynamicpricinghouse_aud

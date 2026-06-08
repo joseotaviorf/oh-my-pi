@@ -133,9 +133,6 @@ SELECT
     predictedPrice AS predicted_price,
     salePrice AS sale_price,
     forRent AS is_for_rent,
-    forSale AS is_for_sale,
-    op_cdc,
-    ts_cdc_transaction,
-    ts_database_transaction
+    forSale AS is_for_sale
 FROM
     datalake_ebdb_raw.imovel

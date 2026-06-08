@@ -32,9 +32,6 @@ SELECT
     lastStatusChangedAt AS ts_last_status_changed,
     lastStatusChangedAt_MOD AS mod_ts_last_status_changed,
     atualizadoEm AS ts_updated,
-    criadoEm AS ts_created,
-    op_cdc,
-    ts_cdc_transaction,
-    ts_database_transaction
+    criadoEm AS ts_created
 FROM
     datalake_ebdb_raw.ListingBusinessContext_AUD

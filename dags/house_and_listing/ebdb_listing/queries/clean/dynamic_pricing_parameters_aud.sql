@@ -20,9 +20,6 @@ SELECT
   beginDate AS ts_started,
   endDate AS ts_ended,
   criadoEm AS ts_created,
-  atualizadoEm AS ts_updated,
-  op_cdc,
-  ts_cdc_transaction,
-  ts_database_transaction
-FROM 
+  atualizadoEm AS ts_updated
+FROM
   datalake_ebdb_raw.dynamicpricingparameters_aud

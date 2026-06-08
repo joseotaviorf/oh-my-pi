@@ -7,9 +7,6 @@ SELECT
     sourceType AS source_type,
     imovelOriginated AS house_origin,
     criadoEm AS ts_created,
-    atualizadoEm AS ts_updated,
-    op_cdc,
-    ts_cdc_transaction,
-    ts_database_transaction
+    atualizadoEm AS ts_updated
 FROM
     datalake_ebdb_raw.ImovelListingRelation

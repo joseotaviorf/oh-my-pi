@@ -10,9 +10,6 @@ SELECT
     furniture,
     movingDateDefined AS dt_moving_defined,
     updated_on AS ts_updated,
-    created_on AS ts_created,
-    op_cdc,
-    ts_cdc_transaction,
-    ts_database_transaction
+    created_on AS ts_created
 FROM
     datalake_ebdb_raw.listinginfo

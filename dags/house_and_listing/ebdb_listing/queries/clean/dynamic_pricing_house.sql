@@ -15,9 +15,6 @@ SELECT
   activatedAt AS dt_activated,
   deactivatedAt AS dt_deactivated,
   atualizadoEm AS ts_updated,
-  criadoEm AS ts_created,
-  op_cdc,
-  ts_cdc_transaction,
-  ts_database_transaction
-FROM 
+  criadoEm AS ts_created
+FROM
   datalake_ebdb_raw.dynamicpricinghouse

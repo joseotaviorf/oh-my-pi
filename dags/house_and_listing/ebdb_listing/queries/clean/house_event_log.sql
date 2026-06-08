@@ -10,9 +10,6 @@ SELECT
     event_type,
     journey,
     created_at AS ts_created,
-    updated_at AS ts_updated,
-  op_cdc,
-  ts_cdc_transaction,
-  ts_database_transaction
+    updated_at AS ts_updated
 FROM
     datalake_ebdb_raw.HouseEventLog

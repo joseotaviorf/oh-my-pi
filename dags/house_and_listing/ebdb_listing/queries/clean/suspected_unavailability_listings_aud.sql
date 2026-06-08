@@ -12,9 +12,6 @@ SELECT
     listing_confirmed_MOD AS mod_is_confirmed,
     last_contact_attempt_at_MOD AS mod_ts_last_contact_attempt,
     last_contact_attempt_at AS ts_last_contact_attempt,
-    created_at AS ts_created,
-  op_cdc,
-  ts_cdc_transaction,
-  ts_database_transaction
+    created_at AS ts_created
 FROM
     datalake_ebdb_raw.`SuspectedUnavailabilityListing_AUD`

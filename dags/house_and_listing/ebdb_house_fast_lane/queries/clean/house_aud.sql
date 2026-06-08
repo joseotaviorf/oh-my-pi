@@ -141,9 +141,6 @@ SELECT
     forRent AS is_for_rent,
     forSale AS is_for_sale,
     coalesce(originalusuarioquecadastrou_id, usuarioquecadastrou_id) as id_user_registrant,
-    usuarioquecadastrou_mod as mod_user_registrant,
-    op_cdc,
-    ts_cdc_transaction,
-    ts_database_transaction
+    usuarioquecadastrou_mod as mod_user_registrant
 FROM
     datalake_ebdb_raw.imovel_aud

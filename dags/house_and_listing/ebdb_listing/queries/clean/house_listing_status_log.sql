@@ -6,9 +6,6 @@ SELECT
     substatus_to,
     reason_category,
     reason,
-    additional_context,
-  op_cdc,
-  ts_cdc_transaction,
-  ts_database_transaction
+    additional_context
 FROM
     datalake_ebdb_raw.HouseListingStatusLog
