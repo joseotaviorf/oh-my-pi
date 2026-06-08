@@ -2479,6 +2479,69 @@ def _get_current_cluster_type(dag_name: str, dags_root: Path) -> str | None:
         return None
 
 
+_CLUSTER_FILE_TOP_LEVEL_KEYS = frozenset(
+    {"dag", "workflow", "cluster", "validation", "spark_session_configs"}
+)
+# Prevent yaml.dump from folding long spark_conf keys (e.g. Jinja catalog.namespace).
+_CLUSTER_YAML_DUMP_WIDTH = 10_000
+
+
+def _dump_cluster_yaml(document: dict) -> str:
+    """Dump cluster YAML without folding long Jinja spark_conf values."""
+    text = yaml.dump(
+        document,
+        default_flow_style=False,
+        sort_keys=False,
+        allow_unicode=True,
+        width=_CLUSTER_YAML_DUMP_WIDTH,
+    )
+    if not text.endswith("\n"):
+        text += "\n"
+    return text
+
+
+def _extract_top_level_section_text(text: str, section_key: str) -> str | None:
+    """Return verbatim top-level section block including trailing newline."""
+    prefix = f"{section_key}:"
+    lines = text.splitlines(keepends=True)
+    start_idx: int | None = None
+    for index, line in enumerate(lines):
+        if line.startswith(prefix):
+            start_idx = index
+            break
+    if start_idx is None:
+        return None
+
+    end_idx = len(lines)
+    for index in range(start_idx + 1, len(lines)):
+        stripped = lines[index].strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        key = lines[index].split(":", 1)[0]
+        if key in _CLUSTER_FILE_TOP_LEVEL_KEYS and not lines[index].startswith(" "):
+            end_idx = index
+            break
+
+    block = "".join(lines[start_idx:end_idx])
+    if not block.endswith("\n"):
+        block += "\n"
+    return block
+
+
+def _format_validation_section_yaml(validation_doc: dict) -> str:
+    """Format validation: block (matches extract_cluster_validation_files.py)."""
+    dumped = _dump_cluster_yaml(validation_doc)
+    lines = ["validation:"]
+    for line in dumped.splitlines():
+        if line.strip():
+            lines.append(f"  {line}")
+    return "\n".join(lines) + "\n"
+
+
+def _normalize_cluster_file_text(text: str) -> str:
+    return text.rstrip("\n") + "\n"
+
+
 def write_validation_cluster_file(
     cluster_path: Path,
     val_config: dict,
@@ -2487,27 +2550,53 @@ def write_validation_cluster_file(
 ) -> None:
     """Upsert the validation: section in a *_cluster.yml file.
 
-    Preserves any existing top-level cluster: section.
+    Preserves the existing cluster: block verbatim (comments, quotes, Jinja).
     Creates the file if it does not exist.
     """
-    if cluster_path.exists():
-        try:
-            doc = yaml.safe_load(cluster_path.read_text(encoding="utf-8")) or {}
-        except yaml.YAMLError as exc:
-            logger.warning("Failed to parse YAML %s: %s", cluster_path, exc)
-            doc = {}
-    else:
-        doc = {}
-        if current_cluster_type:
-            doc["cluster"] = {
-                "type": current_cluster_type,
-                "databricks_conn_id": databricks_conn_id,
-            }
+    validation_doc = val_config["validation"]
+    tail_sections: list[str] = []
 
-    doc["validation"] = val_config["validation"]
+    if cluster_path.exists():
+        original_text = cluster_path.read_text(encoding="utf-8")
+        cluster_text = _extract_top_level_section_text(original_text, "cluster")
+        if cluster_text is None:
+            logger.warning(
+                "No cluster: section in %s; creating minimal cluster block",
+                cluster_path,
+            )
+            cluster_text = _dump_cluster_yaml(
+                {
+                    "cluster": {
+                        "type": current_cluster_type or "unknown",
+                        "databricks_conn_id": databricks_conn_id,
+                    }
+                }
+            )
+        prod_block = cluster_text.rstrip("\n")
+        for key in ("spark_session_configs",):
+            section = _extract_top_level_section_text(original_text, key)
+            if section:
+                tail_sections.append(section.rstrip("\n"))
+    else:
+        if current_cluster_type:
+            prod_block = _dump_cluster_yaml(
+                {
+                    "cluster": {
+                        "type": current_cluster_type,
+                        "databricks_conn_id": databricks_conn_id,
+                    }
+                }
+            ).rstrip("\n")
+        else:
+            prod_block = ""
+
+    content = prod_block + "\n" + _format_validation_section_yaml(validation_doc)
+    if tail_sections:
+        content += "\n".join(tail_sections) + "\n"
+
     cluster_path.parent.mkdir(parents=True, exist_ok=True)
     cluster_path.write_text(
-        yaml.dump(doc, default_flow_style=False, allow_unicode=True, sort_keys=False),
+        _normalize_cluster_file_text(content),
         encoding="utf-8",
     )
 

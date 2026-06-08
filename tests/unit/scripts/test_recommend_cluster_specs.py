@@ -874,28 +874,68 @@ class TestWriteValidationClusterFile:
             "driver_node_type_id": "r6g.12xlarge"
         }
 
-    def test_corrupt_existing_cluster_yaml_is_logged_and_overwritten(
-        self, tmp_path, caplog
-    ):
-        import logging
-
+    def test_preserves_cluster_formatting_comments_and_jinja(self, tmp_path):
+        original = (
+            "cluster:\n"
+            "  type: consolidation_m_general_cluster\n"
+            "  custom_configurations:\n"
+            "    # Cost-saving spot/OD mix.\n"
+            "    spark_conf:\n"
+            '      spark.driver.cores: "4"\n'
+            "      spark.databricks.sql.initial.catalog.namespace: "
+            "quintoandar_{{ var.value.environment }}\n"
+        )
         path = tmp_path / "test_cluster.yml"
-        path.write_text("cluster: [invalid yaml", encoding="utf-8")
+        path.write_text(original, encoding="utf-8")
 
-        with caplog.at_level(logging.WARNING):
-            write_validation_cluster_file(
-                path,
-                self._make_cfg("consolidation_m_general_single_node_cluster"),
-                current_cluster_type=None,
-            )
+        write_validation_cluster_file(
+            path,
+            self._make_cfg("consolidation_s_general_cluster"),
+            current_cluster_type=None,
+        )
 
-        doc = yaml.safe_load(path.read_text())
-        assert doc["validation"]["cluster"]["type"] == (
-            "consolidation_m_general_single_node_cluster"
+        text = path.read_text(encoding="utf-8")
+        assert "# Cost-saving spot/OD mix." in text
+        assert 'spark.driver.cores: "4"' in text
+        assert (
+            "spark.databricks.sql.initial.catalog.namespace: "
+            "quintoandar_{{ var.value.environment }}"
+        ) in text
+        assert "environment\n        }}" not in text
+        assert "validation:\n  cluster:" in text
+
+    def test_replaces_existing_validation_section(self, tmp_path):
+        path = tmp_path / "test_cluster.yml"
+        path.write_text(
+            "cluster:\n  type: old_cluster_type\n"
+            "validation:\n  cluster:\n    type: old_validation_type\n",
+            encoding="utf-8",
         )
-        assert any(
-            "Failed to parse YAML" in record.message for record in caplog.records
+
+        write_validation_cluster_file(
+            path,
+            self._make_cfg("consolidation_s_general_cluster"),
+            current_cluster_type=None,
         )
+
+        text = path.read_text(encoding="utf-8")
+        assert text.count("validation:") == 1
+        assert "old_validation_type" not in text
+        assert "consolidation_s_general_cluster" in text
+
+    def test_preserves_corrupt_cluster_text_verbatim(self, tmp_path):
+        path = tmp_path / "test_cluster.yml"
+        path.write_text("cluster: [invalid yaml\n", encoding="utf-8")
+
+        write_validation_cluster_file(
+            path,
+            self._make_cfg("consolidation_m_general_single_node_cluster"),
+            current_cluster_type=None,
+        )
+
+        text = path.read_text(encoding="utf-8")
+        assert text.startswith("cluster: [invalid yaml\n")
+        assert "validation:\n  cluster:" in text
 
 
 class TestAmdCorrection:
