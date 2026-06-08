@@ -47,6 +47,14 @@ columns:
     lineage:
       - datalake_inspection_services_raw.repair_analysis.rent_multiplier
     description: Pricing multiplier based on the rent value of the property, with up to 2 decimal places and a maximum of 99.99.
+  charged_repairs_total:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.charged_repairs_total
+    description: Total number of chargeable repair requests included in this repair analysis. Represents the billing scope of the inspection — each item charged to the tenant counts as one unit. Populated during the analysis enrichment phase. Acts as the denominator for calculating the share of automatically versus manually priced repairs.
+  automatically_priced_repairs_count:
+    lineage:
+      - datalake_inspection_services_raw.repair_analysis.automatically_priced_repairs_count
+    description: Number of repairs whose cost was fully determined by the automatic pricing engine (Inspection Service). Corresponds to items with RepairCostSource.AUTOMATIC. The manual complement can be derived as charged_repairs_total minus automatically_priced_repairs_count. Populated after the automatic pricing phase completes.
   ts_created:
     lineage:
       - datalake_inspection_services_raw.repair_analysis.created_at

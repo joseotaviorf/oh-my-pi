@@ -8,6 +8,8 @@ SELECT
     rent_value,
     city_group_multiplier,
     rent_multiplier,
+    charged_repairs_total,
+    automatically_priced_repairs_count,
     created_at AS ts_created,
     updated_at AS ts_updated,
     year,
