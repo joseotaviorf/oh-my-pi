@@ -53,6 +53,23 @@ SELECT
     day
 FROM 
     datalake_amplitude_clean.170698_search_page_viewed_events 
+WHERE
+    country IN (
+        'Brazil',
+        'Mexico',
+        'Argentina',
+        'Colombia',
+        'Peru',
+        'Chile',
+        'Venezuela',
+        'Ecuador',
+        'Bolivia',
+        'Paraguay',
+        'Uruguay',
+        'Panama',
+        'Dominican Republic',
+        'Costa Rica'
+    )
 UNION ALL
 SELECT 
     'search_results_page_viewed' AS tof_event_type,
@@ -109,3 +126,20 @@ SELECT
     day
 FROM 
     datalake_amplitude_clean.170698_listing_page_viewed_events
+WHERE
+    country IN (
+        'Brazil',
+        'Mexico',
+        'Argentina',
+        'Colombia',
+        'Peru',
+        'Chile',
+        'Venezuela',
+        'Ecuador',
+        'Bolivia',
+        'Paraguay',
+        'Uruguay',
+        'Panama',
+        'Dominican Republic',
+        'Costa Rica'
+    )

@@ -9,6 +9,12 @@ description: |
   source clean tables (no deduplication). Built to power cross-page user journey and TOF taxonomy
   datamarts. Includes QAC (QuintoAndar Classifieds) flags and sub-region on listing events.
   This enrich table is not partitioned — use ts_event or the year/month/day date components for time-range filters.
+  Country filter applied on search_page_viewed and listing_page_viewed branches to exclude non-LATAM
+  crawler traffic (bot activity concentrated in US, Singapore, Ireland, Romania, and similar
+  datacenter regions). Allowed countries: Brazil, Mexico, Argentina, Colombia, Peru, Chile,
+  Venezuela, Ecuador, Bolivia, Paraguay, Uruguay, Panama, Dominican Republic, and Costa Rica.
+  schedule_page_viewed and search_results_page_viewed are not filtered because crawler pressure on
+  those event types is not significant.
 columns:
   tof_event_type:
     description: |
