@@ -12,14 +12,17 @@ import json
 import time
 
 import pandas as pd
+from quintoandar_logger import QuintoAndarLogger
 
 from bietlejuice.base.sst.configs.salesforce import QUERY_ENDPOINT
-from bietlejuice.base.sst.core.api.request import (
-    get_request,
-)
+from bietlejuice.base.sst.core.api.request import get_request
+from bietlejuice.base.sst.core.utils.time import build_start_end_date
+from bietlejuice.base.sst.core.utils.transforms import get_chunks
 from bietlejuice.base.sst.domains.salesforce.api.headers import (
     build_authorization_header,
 )
+
+logger = QuintoAndarLogger("sst.domains.salesforce.api.calls")
 
 
 def build_query(columns, table_name, condition):
@@ -42,24 +45,28 @@ def query_all(base_endpoint, access_token, query: str):
     """
     headers = {"Authorization": f"Bearer {access_token}"}
     endpoint = base_endpoint + QUERY_ENDPOINT
-    data = get_request(
+    # Nit: Response is a tuple payload, logs
+    data, logs = get_request(
         endpoint=endpoint,
         headers=headers,
         params={"q": query},
         timeout=120,
+        return_logs=True,
     )
-
-    records = data.get("records", [])
+    records = list(data.get("records", []))
+    response_logs = [logs]
 
     while not data.get("done", True):
-        data = get_request(
+        data, logs = get_request(
             endpoint=base_endpoint + data.get("nextRecordsUrl"),
             headers=headers,
             timeout=120,
+            return_logs=True,
         )
         records.extend(data.get("records", []))
+        response_logs.append(logs)
 
-    return records
+    return records, response_logs
 
 
 def query_all_with_retry(base_endpoint, access_token, query, max_retries=3):
@@ -146,16 +153,21 @@ def build_fetch_partition_closure(base_endpoint, access_token):
                 idx = row["idx"]
                 query = row["query"]
                 try:
-                    records = query_all_with_retry(
+                    records, logs = query_all_with_retry(
                         base_endpoint=base_endpoint,
                         access_token=access_token,
                         query=query,
                     )
+
+                    # Adding here to avoid serializing at loop level
+                    serialized_logs = json.dumps(logs)
                     for record in records:
                         record.pop("attributes", None)
                         rows.append(
                             {
+                                "id_record": record.get("Id"),
                                 "idx": idx,
+                                "api_logs": serialized_logs,
                                 "success": True,
                                 "error": None,
                                 "query": query,
@@ -166,7 +178,9 @@ def build_fetch_partition_closure(base_endpoint, access_token):
                 except Exception as e:
                     rows.append(
                         {
+                            "id_record": None,
                             "idx": idx,
+                            "api_logs": None,
                             "success": False,
                             "error": str(e),
                             "query": query,
@@ -203,3 +217,91 @@ def paralelize_queries(spark, queries, paralelism):
         [(idx, query) for idx, query in enumerate(queries)],
         ["idx", "query"],
     ).repartition(paralelism)
+
+
+def build_query_chunks(id_lst, columns_name, api_entity, chunk_size=200):
+    """
+    Build a list of queries to be executed against the API based on id_lst and the columns in Salesforce
+    """
+    chunk_lst = get_chunks(id_lst, chunk_size)
+    queries = []
+    for chunk in chunk_lst:
+        id_cond = ", ".join(f"'{id}'" for id in chunk)
+        conditional = f"Id IN ({id_cond})"
+        queries.append(
+            build_query(
+                columns=set(columns_name), table_name=api_entity, condition=conditional
+            )
+        )
+    return queries, chunk_lst
+
+
+@logger(exclude_return=True, exclude=["endpoint", "access_token"])
+def get_updated_lst_system_mod(
+    endpoint,
+    partition_date,
+    api_entity,
+    access_token,
+    days=1,
+):
+    """
+    Some salesforce Objects doesn't support /updated /deleted endpoint.
+    For those we're using SystemModStamp
+    """
+    logger.info("m=get_updated_lst_system_mod, msg=Retrieving UPDATE and DELETE ID's ")
+    start_ts, end_ts = build_start_end_date(partition_date=partition_date, days=days)
+
+    logger.info(
+        f"m=get_updated_lst_system_mod, msg=Time range from {start_ts} to {end_ts}"
+    )
+    soql = f"""
+    SELECT Id FROM {api_entity}
+    WHERE SystemModstamp >= {start_ts}
+      AND SystemModstamp < {end_ts}
+  """
+    logger.info(f"m=get_updated_lst_system_mod, msg=SOQL: {soql}")
+    response, _ = query_all(
+        base_endpoint=endpoint, access_token=access_token, query=soql
+    )
+    id_lst = list(set([item["Id"] for item in response]))
+    logger.info(f"m=get_updated_lst_system_mod, msg={len(id_lst)} records found")
+    return id_lst
+
+
+@logger(exclude_return=True, exclude=["endpoint", "access_token"])
+def get_updated_deleted_lst(endpoint, partition_date, access_token, days=1):
+    updated_endpoint = f"{endpoint}/updated"
+    deleted_endpoint = f"{endpoint}/deleted"
+
+    logger.info("m=get_updated_deleted_lst, msg=Retrieving UPDATE and DELETE ID's ")
+    start_ts, end_ts = build_start_end_date(partition_date=partition_date, days=days)
+    logger.info(
+        f"m=get_updated_deleted_lst, msg=Time range from {start_ts} to {end_ts}"
+    )
+
+    updated_lst = (
+        get_change_lst(
+            endpoint=updated_endpoint,
+            access_token=access_token,
+            start_ts=start_ts,
+            end_ts=end_ts,
+        ).get("ids")
+        or []
+    )
+
+    logger.info(
+        f"m=get_updated_deleted_lst, msg={len(updated_lst)} UPDATES found at time range"
+    )
+
+    deleted_dict = get_change_lst(
+        endpoint=deleted_endpoint,
+        access_token=access_token,
+        start_ts=start_ts,
+        end_ts=end_ts,
+    )
+
+    deleted_lst = [item["id"] for item in deleted_dict.get("deletedRecords", [])]
+    logger.info(
+        f"m=get_updated_deleted_lst, msg={len(deleted_lst)} DELETED ROWS found at time range"
+    )
+    return list(set(deleted_lst + updated_lst))

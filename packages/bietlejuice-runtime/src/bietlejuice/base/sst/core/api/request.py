@@ -1,6 +1,24 @@
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 import requests
+
+
+def get_response_metadata(response: requests.Response, error=None):
+    return {
+        "request_timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+        "method": response.request.method,
+        "url": response.request.url,
+        "final_url": response.url,
+        "status_code": response.status_code,
+        "success": response.ok,
+        "error": error,
+        "elapsed_seconds": response.elapsed.total_seconds(),
+        "response_size_bytes": len(response.content),
+        "content_type": response.headers.get("Content-Type"),
+        "redirected": bool(response.history),
+        "redirect_count": len(response.history),
+    }
 
 
 def post_request(
@@ -8,6 +26,7 @@ def post_request(
     payload: Dict[str, Any] = None,
     headers: Optional[Dict[str, str]] = None,
     timeout: int = 30,
+    return_logs: bool = False,
 ) -> Dict[str, Any]:
     try:
         response = requests.post(
@@ -18,7 +37,9 @@ def post_request(
         )
 
         response.raise_for_status()
-
+        if return_logs:
+            logs = get_response_metadata(response)
+            return response.json(), logs
         return response.json()
 
     except requests.exceptions.HTTPError as error:
@@ -41,6 +62,7 @@ def get_request(
     params: Optional[Dict[str, Any]] = None,
     headers: Optional[Dict[str, str]] = None,
     timeout: int = 30,
+    return_logs: bool = False,
 ) -> Dict[str, Any]:
     try:
         response = requests.get(
@@ -51,6 +73,9 @@ def get_request(
         )
 
         response.raise_for_status()
+        if return_logs:
+            logs = get_response_metadata(response)
+            return response.json(), logs
         return response.json()
 
     except requests.exceptions.HTTPError as error:
