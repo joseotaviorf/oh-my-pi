@@ -5,49 +5,41 @@ description: This table keeps track of every status change of For Sale listings.
   Therefore, a listing can have multiple rows in this table, one for each status change, with its start and end date (if any).
   An example would be the first row of a listing where the first status is editing (pre-publication) and the second is published (post-publication).
 domain: House and Listing
-owner: data-for-sale@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_sale_listing:
     lineage:
       - datalake_sale_listings.sale_status_version_order.id_house
       - datalake_sale_listings.sale_status_version_order.order_version
-    description: >
-      The id of the sale listing.
+    description: Identifier of the sale listing whose status is being tracked.
   id_house:
     lineage:
       - datalake_sale_listings.sale_status_version_order.id_house
-    description: >
-      The id of the house.
+    description: Identifier of the house associated with this sale listing.
   id_user_revision:
     lineage:
       - datalake_sale_listings.sale_status_version_order.id_user_revision
-    description: >
-      The id of the user who made the listing status change for that row.
+    description: The id of the user who made the listing status change for that row.
   id_region:
     lineage:
       - datalake_sale_listings.sale_status_version_order.id_region
-    description: >
-      The id of the region.
+    description: Identifier of the region where the sale listing is active.
   id_company_hubspot:
     lineage:
       - datalake_ebdb_listing.house.id_company_hubspot
-    description: >
-      The id of the Rede company in Hubspot.
+    description: The id of the Rede company in Hubspot.
   uuid_company:
     lineage:
       - datalake_ebdb_listing.house.uuid_company
-    description: >
-      The uuid of the Rede company in the Company domain.
+    description: The uuid of the Rede company in the Company domain.
   partner_3p_supply:
     lineage:
       - datalake_ebdb_listing.house.partner_3p_supply
-    description: >
-      Short name of the Rede partner.
+    description: Short name of the Rede partner.
   status_history:
     lineage:
       - datalake_sale_listings.sale_status_version_order.status_history_new
-    description: >
-      The status of the sale listing at the time of the change.
+    description: The status of the sale listing at the time of the change.
     categories:
       EDITING: If the listing is being edited.
       OPTED_OUT: If a listing has opted out of the funnel before being published.
@@ -57,47 +49,36 @@ columns:
   status_closing_history:
     lineage:
       - datalake_sale_listings.sale_status_version_order.status_closing_history
-    description: >
-      The sale closing status of the sale listing at the time of the change.
+    description: The sale closing status of the sale listing at the time of the change.
     categories:
-      CCV_CANCELED: >
-        If the listing is in the process of sales cancellation during the change
-      CCV_SIGNED: >
-        If the listing is in the process of being sold during the change
-      SALE_COMPLETED: >
-        If the listing is already sold during the change
+      CCV_CANCELED: If the listing is in the process of sales cancellation during the change
+      CCV_SIGNED: If the listing is in the process of being sold during the change
+      SALE_COMPLETED: If the listing is already sold during the change
   status_change_reason:
     lineage:
       - datalake_sale_listings.sale_status_version_order.status_reason
-    description: >
-      The code of reason for the status change.
+    description: The code of reason for the status change.
   status_change_reason_detail:
     lineage:
       - datalake_sale_listings.sale_status_version_order.status_reason_detail
-    description: >
-      The detail of the reason for the status change.
+    description: Detailed reason for the sale listing status change.
   is_last_status:
     lineage:
       - datalake_sale_listings.sale_status_version_order.ts_status_changed_new
-    description: >
-      Whether the status is the last one for the sale listing.
+    description: Whether the status is the last one for the sale listing.
   is_3p_supply:
     lineage:
       - datalake_ebdb_listing.house.is_sale_3p_supply
-    description: >
-      Whether the listing is from a 3rd party supply.
+    description: Whether the listing is from a 3rd party supply.
   ts_first_publication:
     lineage:
       - datalake_sale_listings.sale_status_version_order.ts_first_publication
-    description: >
-      The timestamp of the first publication of the sale listing.
+    description: The timestamp of the first publication of the sale listing.
   ts_status_started:
     lineage:
       - datalake_sale_listings.sale_status_version_order.ts_status_changed_new
-    description: >
-      The timestamp of the start of the status.
+    description: The timestamp of the start of the status.
   ts_status_ended:
     lineage:
       - datalake_sale_listings.sale_status_version_order.ts_status_changed_next
-    description: >
-      The timestamp of the end of the status.
+    description: The timestamp of the end of the status.

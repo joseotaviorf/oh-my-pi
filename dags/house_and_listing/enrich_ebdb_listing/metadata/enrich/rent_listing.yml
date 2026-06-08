@@ -3,7 +3,7 @@ table_name: rent_listing
 description: Information related to ForRent listings. Each line is an unique listing,
   related to an unique house
 domain: House and Listing
-owner: millena.giannini@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_listing_business_context:
     lineage:
@@ -12,15 +12,19 @@ columns:
   id_listing_rent_model:
     lineage:
     - datalake_ebdb_clean.listing_rent_model.id
-    description: Id of the listing rent model
+    description: Identifier of the rent model associated with this rental listing.
   id_house:
     lineage:
     - datalake_ebdb_clean.listing_business_context.id_house
-    description: Id of the house
+    description: Unique identifier of the house record. Links to the house entity in the EBDB system.
   country_code:
     lineage:
     - datalake_ebdb_country.house.country_code
     description: Country code related to the house's country.
+    categories:
+      BR: Brazil
+      MX: Mexico
+      Undefined: Country could not be determined.
   rental_administrator:
     lineage:
     - datalake_ebdb_clean.listing_rent_model.rental_administrator
@@ -31,11 +35,11 @@ columns:
   status:
     lineage:
     - datalake_ebdb_clean.listing_business_context.status
-    description: Status of the listing
+    description: Current status of the rental listing.
   status_reason:
     lineage:
     - datalake_ebdb_clean.listing_business_context.status_reason
-    description: The reason of the status
+    description: Reason for the current status of the rental listing.
   ts_first_publication:
     lineage:
     - datalake_ebdb_clean.listing_business_context.ts_first_publication

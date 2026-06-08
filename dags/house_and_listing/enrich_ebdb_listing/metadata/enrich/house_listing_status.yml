@@ -1,28 +1,32 @@
 ---
 database_name: datalake_ebdb_listing
 table_name: house_listing_status
-description: Information related to ForRent listings. 
+description: Information related to ForRent listings.
   Each line is a listing status, status_reason and version (listing state) with start and end timestamps.
 domain: House and Listing
-owner: jonas.fiorini@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   country_code:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.country_code
-    description: Country code of the house.
+    description: Two-letter ISO country code where the listing is active.
+    categories:
+      BR: Brazil
+      MX: Mexico
+      Undefined: Country could not be determined.
   id_house:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.id_house
-    description: Id of the house.
+    description: Unique identifier of the house record. Links to the house entity in the EBDB system.
   id_house_listing:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.id_house
       - datalake_ebdb_listing.lbc_status_version_order.listing_version
-    description: Id of the listing.
+    description: Composite identifier combining id_house and version (formatted as id_house concatenated with zero-padded version). Uniquely identifies a specific listing version.
   id_region:
     lineage:
       - datalake_ebdb_clean.house.id_region
-    description: Id of the region.
+    description: Identifier of the region where the house is located.
   is_last_status_of_day:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.rev
@@ -34,11 +38,11 @@ columns:
   status_change_reason:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.status_reason
-    description: Status reason of the listing.
+    description: Reason for the most recent status change of this listing.
   status_history:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.status
-    description: Status of the listing. 
+    description: Current status of the listing at the time this record was captured.
   ts_first_publication:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.ts_first_publication
@@ -54,4 +58,4 @@ columns:
   version:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.listing_version
-    description: Listing version.
+    description: Sequential version number of the listing business context (LBC), used to order changes over time.

@@ -4,12 +4,12 @@ description: Information about listing's status and suspension_reason. Each line
   the initial and final date where a house had a specific status and suspension_reason
   in listing_business_context_aud table.
 domain: House and Listing
-owner: jonas.fiorini@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_house:
     lineage:
     - datalake_ebdb_clean.listing_business_context_aud.id_house
-    description: Id of the house
+    description: Identifier of the house whose business context history is being tracked.
   id_user_modified_by:
     lineage:
     - datalake_ebdb_user.user_revision_entity.id_user
@@ -22,6 +22,10 @@ columns:
     lineage:
     - datalake_ebdb_country.house.country_code
     description: Country code of the house
+    categories:
+      BR: Brazil
+      MX: Mexico
+      Undefined: Country could not be determined.
   business_context:
     lineage:
     - datalake_ebdb_clean.listing_business_context_aud.business_context
@@ -33,7 +37,7 @@ columns:
   status:
     lineage:
     - datalake_ebdb_clean.listing_business_context_aud.status
-    description: Status of the house
+    description: Current or historical status of the listing business context.
   status_reason:
     lineage:
     - datalake_ebdb_clean.listing_business_context_aud.status_reason

@@ -2,7 +2,7 @@ database_name: datalake_ebdb_listing
 table_name: listing_business_context
 description: Each row is a house associated with a business context (SALE or RENT)
 domain: House and Listing
-owner: jonas.fiorini@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id:
     lineage:
@@ -11,11 +11,15 @@ columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id_house
-    description: Unique identifier of the house
+    description: Unique identifier of the house record. Links to the house entity in the EBDB system.
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
     description: Country code of the house
+    categories:
+      BR: Brazil
+      MX: Mexico
+      Undefined: Country could not be determined.
   business_context:
     lineage:
       - datalake_ebdb_clean.listing_business_context.business_context
@@ -27,7 +31,7 @@ columns:
   ownership:
     lineage:
       - datalake_ebdb_clean.listing_business_context.ownership
-    description: Ownership of the listing
+    description: Ownership model of the listing, indicating whether it is directly managed by QuintoAndar or through a third-party partner (Rede).
     categories:
       STANDARD: 'Standard listing'
       THIRD_PARTY: 'Third party listing (from Rede)'
@@ -38,11 +42,11 @@ columns:
   status:
     lineage:
       - datalake_ebdb_clean.listing_business_context.status
-    description: Status of the listing
+    description: Current status of the listing business context.
   status_reason:
     lineage:
       - datalake_ebdb_clean.listing_business_context.status_reason
-    description: Reason of the listing status
+    description: Reason associated with the current listing business context status.
   status_closing:
     lineage:
       - datalake_ebdb_clean.listing_business_context.status_closing
@@ -50,7 +54,7 @@ columns:
   short_url:
     lineage:
       - datalake_ebdb_clean.listing_business_context.short_url
-    description: Short URL of the listing
+    description: Short URL used to access the listing on the platform.
   is_rent_context:
     lineage:
       - datalake_ebdb_clean.listing_business_context.business_context

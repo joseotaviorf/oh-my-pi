@@ -1,14 +1,18 @@
 database_name: datalake_ebdb_listing
 table_name: house_listing_special_conditions
-description: Information related to ForRent listings special conditions. 
+description: Information related to ForRent listings special conditions.
   Each line is an unique tuple of listing and special condition type and opt-in and/or opt-out of the special condition.
 domain: House and Listing
-owner: jonas.fiorini@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   country_code:
     lineage:
       - datalake_ebdb_listing.house_listing_category.country_code
-    description: "Code of the country where the house is."
+    description: Two-letter ISO country code where the listing is active.
+    categories:
+      BR: Brazil
+      MX: Mexico
+      Undefined: Country could not be determined.
   dt_opted_in:
     lineage:
       - datalake_ebdb_clean.special_condition_aud.ts_opted_in
@@ -20,7 +24,7 @@ columns:
   id_house_listing:
     lineage:
       - datalake_ebdb_listing.house_listing_category.id_house_listing
-    description: "Id of the house listing."
+    description: Composite identifier combining id_house and version (formatted as id_house concatenated with zero-padded version). Uniquely identifies a specific listing version.
   rn_last_special_condition:
     description: "Row number of the special condition type (the number 1 is the last listing's special condition)."
   rn_first_special_condition:

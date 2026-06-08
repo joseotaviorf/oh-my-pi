@@ -2,7 +2,7 @@ database_name: dw_public
 table_name: dim_condo
 description: Information about condos (residential condominiums). Each line is a cond
 domain: House and Listing
-owner: data-for-rent@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   sk_condo:
     lineage:

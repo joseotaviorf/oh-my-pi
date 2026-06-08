@@ -5,21 +5,21 @@ description:
   Information related to ForRent listings. Each line is an unique listing
   related to a house. The tuple [id_house_listing, id_house] must be unique.
 domain: House and Listing
-owner: jonas.fiorini@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_house_listing:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.id_house
       - datalake_ebdb_listing.lbc_status_version_order.listing_version
-    description: Id of the house listing.
+    description: Primary identifier of the house listing record.
   id_house:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.id_house
-    description: Id of the house.
+    description: Unique identifier of the house record. Links to the house entity in the EBDB system.
   id_contract:
     lineage:
       - datalake_ebdb_contract.contract.id
-    description: Id of the contract.
+    description: Identifier of the active rental contract associated with this listing, if any.
   id_next_house_listing_rented:
     lineage:
       - datalake_ebdb_listing.house_listing_category.id_house_listing
@@ -48,19 +48,23 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.country_code
-    description: Country code.
+    description: Two-letter ISO country code where the listing is active.
+    categories:
+      BR: Brazil
+      MX: Mexico
+      Undefined: Country could not be determined.
   version:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.listing_version
-    description: Listing version.
+    description: Sequential version number of the listing business context (LBC), used to order changes over time.
   status:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.status
-    description: Listing status.
+    description: Current status of the house listing (e.g., published, unpublished, rented).
   status_reason:
     lineage:
       - datalake_ebdb_listing.lbc_status_version_order.status_reason
-    description: Listing status reason.
+    description: Reason associated with the current listing status change.
   rent_type:
     description:
       Indicates if a re-listing resulted in a re-rental or the termination
@@ -96,7 +100,12 @@ columns:
   who_is_living:
     lineage:
       - datalake_ebdb_listing.house_entrance_history.occupant_type
-    description: Who is living in the house.
+    description: Indicates who is currently living in the house at the time of this listing version.
+    categories:
+      Owner: The owner is living in the house.
+      Tenant: A tenant is living in the house.
+      Empty: The house is empty.
+      None: Occupancy information is not available.
   is_exclusive:
     lineage:
       - datalake_ebdb_clean.special_condition_aud.ts_opted_in

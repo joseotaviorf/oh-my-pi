@@ -4,16 +4,16 @@ table_name: listing_business_context_suspension_history
 description: Enrich table that contains the suspension reason history of rental and sale listings.
   Each row is a suspension reason change for each property's business context.
 domain: House and Listing
-owner: matheus.baroni@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.id_house
-    description: Unique identifier for the house entity
+    description: Unique identifier of the house record. Links to the house entity in the EBDB system.
   suspension_reason:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.suspension_reason
-    description: Suspension reason of the listing
+    description: Reason why the listing business context was suspended.
   ts_status_started:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.ts_revision
@@ -25,7 +25,7 @@ columns:
   country_code:
     lineage:
       - datalake_ebdb_country.house.country_code
-    description: Country code
+    description: Two-letter ISO country code of the suspended listing.
     categories:
       BR: Brazil's country code
       MX: Mexico's country code

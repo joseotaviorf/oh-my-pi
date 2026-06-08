@@ -4,7 +4,7 @@ table_name: sale_listing
 description: This table contains the information of all the listings we have had in QuintoAndar ForSale. It shows the current information of features such as price, status, consultant type, etc. 
   It also shows whether the listing is a primary market listing, or a migration listing. Each row represents a different listing.
 domain: House and Listing
-owner: data-for-sale@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_sale_listing:
     lineage:
@@ -31,17 +31,17 @@ columns:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_last_listing
       - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: Number of days between the last publication and the depublication of the listing.
+    description: Number of days between the listing's last publication date and the subsequent depublication date.
   days_first_publication_to_first_depublication:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing
       - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: Number of days between the first publication and the first depublication of the listing.
+    description: Number of days between the listing's first publication date and its first depublication date.
   days_first_publication_to_last_depublication:
     lineage:
       - datalake_ebdb_listing.listing_business_context.ts_first_listing
       - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: Number of days between the first publication and the last depublication of the listing.
+    description: Number of days between the listing's first publication date and its most recent depublication date.
   unpublications:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id

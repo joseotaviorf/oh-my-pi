@@ -2,14 +2,14 @@ database_name: dw_house
 table_name: dim_house_amenities
 description: Information about house amenities. Each line has all the most recent amenities of a house.
 domain: House and Listing
-owner: jonas.fiorini@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   sk_house:
     lineage:
       - datalake_ebdb_clean.info_amenities.id_house
       - datalake_ebdb_clean.info_condo_amenities.id_house
       - datalake_ebdb_clean.house_maintenance_condition.id_house
-    description: Id of the house.
+    description: Surrogate key of the house dimension for this amenities record.
   maintenance_condition:
     lineage:
       - datalake_ebdb_clean.house_maintenance_condition.maintenance_condition

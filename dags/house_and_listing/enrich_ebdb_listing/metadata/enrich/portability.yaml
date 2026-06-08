@@ -2,15 +2,14 @@ database_name: datalake_ebdb_listing
 table_name: portability
 description: This table contains portability records by property
 domain: House and Listing
-owner: camila.simoes@quintoandar.com.br
-
+owner: bruna.prates@quintoandar.com.br
 columns:
   id:
     description: Identification of the portability record
     lineage:
       - datalake_ebdb_clean.portability.id
   id_house:
-    description: House identification
+    description: Unique identifier of the house record. Links to the house entity in the EBDB system.
     lineage:
       - datalake_ebdb_clean.portability.id_house
   id_flow:
@@ -31,6 +30,10 @@ columns:
       - datalake_ebdb_clean.portability.id_region
   country_code:
     description: Identification of the country abbreviation
+    categories:
+      BR: Brazil
+      MX: Mexico
+      Undefined: Country could not be determined.
     lineage:
       - datalake_ebdb_country.house.country_code
   owner_type:
@@ -126,7 +129,7 @@ columns:
     lineage:
       - datalake_ebdb_clean.portability.tenant_data_name
   tenant_data_phone_number:
-    description: Tenant phone number
+    description: Phone number from the tenant associated with the portability request.
     lineage:
       - datalake_ebdb_clean.portability.tenant_data_phone_number
   contract_observations:

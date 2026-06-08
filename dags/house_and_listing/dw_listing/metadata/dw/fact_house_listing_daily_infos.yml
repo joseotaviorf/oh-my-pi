@@ -7,7 +7,7 @@ description:
   The sk_house_listing is not unique in this table, but the sk_house_listing_day is unique. This column is the
   concatenation of sk_house_listing + sk_day.
 domain: House and Listing
-owner: kleber.inoue@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   sk_house_listing_day:
     lineage:
@@ -16,15 +16,15 @@ columns:
   sk_house_listing:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.id_house_listing
-    description: Key of house listing.
+    description: Surrogate key of the house listing dimension.
   sk_house:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.id_house
-    description: Key of house.
+    description: Surrogate key of the house dimension.
   sk_contract:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.id_contract
-    description: Key of the contract.
+    description: Surrogate key of the contract dimension, if a contract is active for this listing on this day.
   sk_owner:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.id_owner
@@ -150,7 +150,11 @@ columns:
   country_code:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.country_code
-    description: Country code of the house.
+    description: Two-letter ISO country code indicating the country where the listing is active.
+    categories:
+      BR: Brazil
+      MX: Mexico
+      Undefined: Country could not be determined.
   year:
     lineage:
       - datalake_rental_historical_follow_up.house_listings_daily_info.year

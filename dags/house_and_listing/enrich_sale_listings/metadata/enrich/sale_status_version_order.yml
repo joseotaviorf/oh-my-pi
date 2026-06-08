@@ -3,113 +3,82 @@ database_name: datalake_sale_listings
 table_name: sale_status_version_order
 description: Table with the publication versioning for all ForSale listings. Used to track the status changes of a listing within the platform. At each status change, a new row will be created for that listing.
 domain: House and Listing
-owner: data-for-sale@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.house_aud.id_house 
-    description: >
-      Foreign key referring to the house ID. 
+    description: Foreign key referring to the house ID. 
   id_user_revision:
     lineage: 
       - datalake_ebdb_clean.user_revision_entity.id_user
-    description: >
-      Foreign key referring to the author who made the status change trigger.
+    description: Foreign key referring to the author who made the status change trigger.
   id_region:
     lineage:
       - datalake_ebdb_clean.house.id_region
-    description: >
-      Foreign key of region where listing is located in.
+    description: Foreign key of region where listing is located in.
   rev:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.rev
-    description: >
-      Unique id for this modification and can be joined with table rev_info to get more details.
+    description: Unique id for this modification and can be joined with table rev_info to get more details.
   status_history:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.status_closing
-    description: >
-      Sale status linked to a certain point in time of the listing.
+    description: Sale status linked to a certain point in time of the listing.
     categories:
-      EDITING: >
-        If the listing is being edited during the change
-      OPTED_OUT: > 
-        If the listing has not even been published yet (probably bug)
-      PUBLISHED: >
-        If the listing is published during the change
-      SUSPENDED: >
-        If the listing is suspended during the change
-      UNPUBLISHED: >
-        If the listing is unpublished during the change
+      EDITING: If the listing is being edited during the change
+      OPTED_OUT: If the listing has not even been published yet (probably bug)
+      PUBLISHED: If the listing is published during the change
+      SUSPENDED: If the listing is suspended during the change
+      UNPUBLISHED: If the listing is unpublished during the change
   status_closing_history:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.status_closing
-    description: >
-      The sale closing status of the sale listing at the time of the change.
+    description: The sale closing status of the sale listing at the time of the change.
     categories:
-      CCV_CANCELED: >
-        If the listing is in the process of sales cancellation during the change
-      CCV_SIGNED: >
-        If the listing is in the process of being sold during the change
-      SALE_COMPLETED: >
-        If the listing is already sold during the change
+      CCV_CANCELED: If the listing is in the process of sales cancellation during the change
+      CCV_SIGNED: If the listing is in the process of being sold during the change
+      SALE_COMPLETED: If the listing is already sold during the change
   status_reason:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.status_reason
-    description: > 
-      Column with the status change reason code referring to the row coming directly from product.
+    description: Column with the status change reason code referring to the row coming directly from product.
   status_reason_detail:
     lineage:
       - datalake_ebdb_clean.user_revision_entity.reason
-    description: > 
-      Column with the phrase referring to the reason code for the status change referring to the line coming directly from product.
+    description: Column with the phrase referring to the reason code for the status change referring to the line coming directly from product.
   status_history_new:
-    description: >
-      Sale status linked to a certain point in time of the listing. However, if the status is null, it will be considered as published.
+    description: Sale status linked to a certain point in time of the listing. However, if the status is null, it will be considered as published.
     categories:
-      EDITING: >
-        If the listing is being edited during the change
-      OPTED_OUT: > 
-        If the listing has not even been published yet (probably bug)
-      PUBLISHED: >
-        If the listing is published during the change
-      SUSPENDED: >
-        If the listing is suspended during the change
-      UNPUBLISHED: >
-        If the listing is unpublished during the change
+      EDITING: If the listing is being edited during the change
+      OPTED_OUT: If the listing has not even been published yet (probably bug)
+      PUBLISHED: If the listing is published during the change
+      SUSPENDED: If the listing is suspended during the change
+      UNPUBLISHED: If the listing is unpublished during the change
   first_publication_change_version:
-    description: >
-      Column with a data of first publication of the listing. For although a rented state is a trigger for a new version, the new version will only be started when there is a new state published.
+    description: Column with a data of first publication of the listing. For although a rented state is a trigger for a new version, the new version will only be started when there is a new state published.
   days_unpublished:
-    description: >
-      The number of days the listing has been in published status on the platform.
+    description: The number of days the listing has been in published status on the platform.
   order_status:
-    description: >
-      Order of the status change of the listing in question.
+    description: Order of the status change of the listing in question.
   order_version:
-    description: >
-      Version of the listing in question, if `1`, listing has already been published, 0 otherwise.
+    description: Version of the listing in question, if `1`, listing has already been published, 0 otherwise.
   max_order_status:
-    description: >
-      Current amount of status change of the listing in question.
+    description: Current amount of status change of the listing in question.
   ts_first_publication:
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.ts_first_publication
-    description: >
-      Timestamp when listing was first published.
+    description: Timestamp when listing was first published.
   ts_status_changed:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: >
-      Timestamp of the date of the status change for the row.
+    description: Timestamp of the date of the status change for the row.
   ts_status_changed_next:
     lineage:
       - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: >
-      Timestamp of the next date of the status change for the row.
+    description: Timestamp of the next date of the status change for the row.
   ts_status_changed_new: 
     lineage:
       - datalake_ebdb_clean.listing_business_context_aud.ts_first_publication
       - datalake_ebdb_user.user_revision_entity.ts_revision
-    description: >
-      Coaleced timestamp with the timestamp of the first publication or the timestamp of the status change. That is, when a listing does not have a defined status, we attach  
+    description: Coaleced timestamp with the timestamp of the first publication or the timestamp of the status change. That is, when a listing does not have a defined status, we attach  

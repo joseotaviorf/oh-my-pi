@@ -25,6 +25,10 @@ columns:
     lineage:
       - datalake_ebdb_country.house.country_code
     description: Country code related to the house's country.
+    categories:
+      BR: Brazil
+      MX: Mexico
+      Undefined: Country could not be determined.
   is_last_condition:
     description: Flag to indicate if is the actual maintenance condition status.
   dt_condition_started:

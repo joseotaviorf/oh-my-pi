@@ -5,31 +5,26 @@ description: Enrich table that handles the price change information and enriches
   Where, each row represents a valid price exchange for the listing. By valid, we mean that we only keep the information from the last price change of the day when there was a price change 
   (if the selling price of this change is different from the first price of the day. If not, it will not count as a price change).
 domain: House and Listing
-owner: ata-for-sale@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_house: 
     lineage:
       - datalake_ebdb_clean.house_aud.id_house
-    description: >
-      Foreign key referring to the house ID. 
+    description: Foreign key referring to the house ID. 
   id_user_revision: 
     lineage:
       - datalake_ebdb_clean.user_revision_entity.id_user
-    description: >
-      Foreign key referring to the author who made the price change.
+    description: Foreign key referring to the author who made the price change.
   id_owner: 
     lineage:
       - datalake_ebdb_clean.house_aud.id_user
-    description: > 
-      Foreign key referring to the seller user ID. 
+    description: Foreign key referring to the seller user ID. 
   id_region: 
     lineage:
       - datalake_ebdb_clean.house_aud.id_region
-    description: >
-      Foreign key of region where listing is located in.
+    description: Foreign key of region where listing is located in.
   status_history:
-    description: >
-      'Sale status linked to a certain point in time of the listing.'
+    description: 'Sale status linked to a certain point in time of the listing.'
     categories:
       CCV_CANCELED: If the listing is in the process of sales cancellation during
         the change
@@ -41,11 +36,9 @@ columns:
       SUSPENDED: If the listing is suspended during the change
       UNPUBLISHED: If the listing is unpublished during the change
   price_segment:
-    description: >
-      'Ticket segmentation of the listing.'
+    description: 'Ticket segmentation of the listing.'
     categories:
-      High Ticket: >
-        If the listing is greater than 1 Million BRL.
+      High Ticket: If the listing is greater than 1 Million BRL.
       Low Ticket: If the listing doesn't fit in the High Ticket category.
     lineage:
       - datalake_region.region.city_group
@@ -53,88 +46,63 @@ columns:
   sale_price: 
     lineage:
       - datalake_ebdb_clean.house_aud.sale_price
-    description: >
-      Published price for a listing in a given time period.
+    description: Published price for a listing in a given time period.
   lag_sale_price:
-    description: >
-      Price previous to the price of the referenced row.
+    description: Price previous to the price of the referenced row.
   last_price_variation:
-    description: >
-      Percent difference between the published price for the row and the previous published price.
+    description: Percent difference between the published price for the row and the previous published price.
   first_price_variation:
-    description: > 
-      Percent difference between the published price for the row and the first published price.
+    description: Percent difference between the published price for the row and the first published price.
   change_type:
-    description: >
-      'Describes the type of price change. We can have the price being increased or decreased.'
+    description: 'Describes the type of price change. We can have the price being increased or decreased.'
     categories:
-      first price: >
-        If there is no previous price.
-      price down: >
-        If the sales price is lower than the previous price.
-      price up: >
-        If the sales price is higher than the previous price.
+      first price: If there is no previous price.
+      price down: If the sales price is lower than the previous price.
+      price up: If the sales price is higher than the previous price.
   change_number: 
-    description: > 
-      Tells the number of listing price changes.
+    description: Tells the number of listing price changes.
   days_with_pricing_scheme:
-    description: >
-      Count how many days the listing stayed at that publication price. If it is the most recent price, it counts up to D-1.
+    description: Count how many days the listing stayed at that publication price. If it is the most recent price, it counts up to D-1.
   calculator_min_sale_price: 
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_10
-    description: > 
-      Calculator column. Tells the minimum price estimated by the calculator output. May also be referred to as 'p_10'.
+    description: Calculator column. Tells the minimum price estimated by the calculator output. May also be referred to as 'p_10'.
   calculator_p30_sale_price:
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_30
-    description: > 
-      Calculator column. Tells the estimated price related to the 30% percentile of the calculator's output. May also be referred to as just 'p_30'.
+    description: Calculator column. Tells the estimated price related to the 30% percentile of the calculator's output. May also be referred to as just 'p_30'.
   calculator_sale_price: 
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_50
-    description: >
-      Column for calculator. Tells the most likely estimated price for the listing. Can also be referred to as just 'p_50'.
+    description: Column for calculator. Tells the most likely estimated price for the listing. Can also be referred to as just 'p_50'.
   calculator_p70_sale_price:
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_70
-    description: > 
-      Calculator column. Tells the estimated price related to the 70% percentile of the calculator's output. May also be referred to as just 'p_70'.
+    description: Calculator column. Tells the estimated price related to the 70% percentile of the calculator's output. May also be referred to as just 'p_70'.
   calculator_max_sale_price: 
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.p_90
-    description: >
-      Calculator column. Tells the maximum price estimated by the calculator output. May also be referred to as 'p_90'.
+    description: Calculator column. Tells the maximum price estimated by the calculator output. May also be referred to as 'p_90'.
   calculator_certainty: 
     lineage:
       - datalake_ebdb_clean.house_predicted_price_aud.certainty
-    description: > 
-      'Calculator column. Tells the certainty level of the prediction calculated by the calculator. It is strongly related to the intensity of the QuintoAndar performance with the listing region.'
+    description: 'Calculator column. Tells the certainty level of the prediction calculated by the calculator. It is strongly related to the intensity of the QuintoAndar performance with the listing region.'
     categories:
-      HIGH: >
-        If the prediction has a low confidence interval, having a high certainty in the prediction.
-      MEDIUM: >
-        If the prediction has a medium confidence interval, having a medium certainty in the prediction.
-      LOW: > 
-        If the prediction has a high confidence interval, having a low certainty in the prediction.
-      NONE: >
-        If the prediction has no certainty at all.
+      HIGH: If the prediction has a low confidence interval, having a high certainty in the prediction.
+      MEDIUM: If the prediction has a medium confidence interval, having a medium certainty in the prediction.
+      LOW: If the prediction has a high confidence interval, having a low certainty in the prediction.
+      NONE: If the prediction has no certainty at all.
   is_first_price:
-    description: >
-      Boolean that tells if the price is the first publication price of the listing.
+    description: Boolean that tells if the price is the first publication price of the listing.
   is_last_price:
-    description: >
-      Boolean that tells if the price is the most recent publication price of the listing.
+    description: Boolean that tells if the price is the most recent publication price of the listing.
   is_smart_price_change: 
-    description: >
-      Boolean that tells if the price change is a smart price change. The Smart Price feature is an algorithm designed to gradually lower the prices of listings that are not receiving demand. That is, if TRUE, the price change was made automatically by the feature.
+    description: Boolean that tells if the price change is a smart price change. The Smart Price feature is an algorithm designed to gradually lower the prices of listings that are not receiving demand. That is, if TRUE, the price change was made automatically by the feature.
   ts_price_started:
     lineage: 
       - datalake_ebdb_clean.user_revision_entity.ts_revision
-    description: > 
-      Timestamp of the beginning of the price scheme observed in that row.
+    description: Timestamp of the beginning of the price scheme observed in that row.
   ts_price_ended:
     lineage: 
       - datalake_ebdb_clean.user_revision_entity.ts_revision
-    description: >
-      Timestamp of the end of the price scheme observed in that row, if any. 
+    description: Timestamp of the end of the price scheme observed in that row, if any. 

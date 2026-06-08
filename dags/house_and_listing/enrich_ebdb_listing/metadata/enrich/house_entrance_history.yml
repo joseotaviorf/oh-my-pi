@@ -123,6 +123,10 @@ columns:
     lineage:
       - datalake_ebdb_country.house.country_code
     description: Country code of the house.
+    categories:
+      BR: Brazil
+      MX: Mexico
+      Undefined: Country could not be determined.
   has_opted_keys_with_agent:
     lineage:
       - datalake_ebdb_clean.access_type_aud.has_opted_keys_with_agent

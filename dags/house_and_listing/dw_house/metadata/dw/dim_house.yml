@@ -7,7 +7,7 @@ columns:
   address:
     lineage:
       - datalake_ebdb_listing.house.address
-    description: Address of the house.
+    description: Full street address of the house.
   bathrooms:
     lineage:
       - datalake_ebdb_listing.house.bathrooms
@@ -23,11 +23,11 @@ columns:
   city:
     lineage:
       - datalake_ebdb_listing.house.city
-    description: City of the house.
+    description: City where the house is located.
   complement:
     lineage:
       - datalake_ebdb_listing.house.complement
-    description: Complement of the house.
+    description: Apartment or unit complement of the house address.
   condo:
     lineage:
       - datalake_ebdb_listing.house.condo
@@ -35,7 +35,7 @@ columns:
   condo_type:
     lineage:
       - datalake_ebdb_listing.house.condo_type
-    description: Condo type of the house.
+    description: Type of condominium where the house is located.
   conservation_status:
     lineage:
       - datalake_ebdb_listing.house.conservation_status
@@ -87,7 +87,7 @@ columns:
   iptu_type:
     lineage:
       - datalake_ebdb_listing.house.iptu_type
-    description: IPTU type of the house.
+    description: Type of IPTU (property tax) applicable to the house.
   is_furnished:
     lineage:
       - datalake_ebdb_listing.house.is_furnished
@@ -107,11 +107,11 @@ columns:
   key_location:
     lineage:
       - datalake_ebdb_listing.house.key_location
-    description: Key location.
+    description: Physical location where the house keys are stored.
   key_type:
     lineage:
       - datalake_ebdb_listing.house.key_type
-    description: Key type of the house.
+    description: Type of key used for the house.
   construction_area:
     lineage:
       - datalake_ebdb_listing.house.land_area
@@ -119,7 +119,7 @@ columns:
   lat:
     lineage:
       - datalake_ebdb_listing.house.lat
-    description: Latitude of the house.
+    description: Latitude coordinate of the house.
   lng:
     lineage:
       - datalake_ebdb_listing.house.lng
@@ -127,7 +127,7 @@ columns:
   neighborhood:
     lineage:
       - datalake_ebdb_listing.house.neighborhood
-    description: Neighborhood of the house.
+    description: Name of the neighborhood where the house is located.
   number:
     lineage:
       - datalake_ebdb_listing.house.number
@@ -135,11 +135,11 @@ columns:
   occupant_type:
     lineage:
       - datalake_ebdb_listing.house.occupant_type
-    description: Occupant type of the house.
+    description: Type of occupant currently in the house.
   parking_slot_type:
     lineage:
       - datalake_ebdb_listing.house.parking_slot_type
-    description: Type of parking slot of the house.
+    description: Type of parking slot associated with the house.
   parking_slots:
     lineage:
       - datalake_ebdb_listing.house.parking_slots

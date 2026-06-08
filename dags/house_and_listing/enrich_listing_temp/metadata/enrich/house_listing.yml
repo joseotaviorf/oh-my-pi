@@ -4,7 +4,7 @@ table_name: house_listing
 description: Information related to ForRent listings. Each line is an unique listing
   related to a house. The tuple [id_house_listing, id_house] must be unique.
 domain: House and Listing
-owner: data-for-rent@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   country_code:
     lineage:

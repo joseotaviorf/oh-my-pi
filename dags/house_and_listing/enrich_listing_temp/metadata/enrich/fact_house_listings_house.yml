@@ -3,7 +3,7 @@ table_name: fact_house_listings_house
 description: Information about events that happened during a house listing's lifetime.
   Each line is a house listing
 domain: House and Listing
-owner: jonas.fiorini@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   sk_house_listing:
     lineage:
