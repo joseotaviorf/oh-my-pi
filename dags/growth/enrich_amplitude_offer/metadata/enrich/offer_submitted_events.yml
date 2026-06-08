@@ -1,154 +1,199 @@
+---
 database_name: datalake_amplitude_offer
 table_name: offer_submitted_events
-owner: data-growth@quintoandar.com
+owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
-description: This table consolidates ForRent offer submitted events from all applications.
+description: |
+  Enrich table consolidating For Rent offer-submitted Amplitude events from multiple app/event
+  streams via UNION ALL. One row per offer submission event in the incremental load window
+  (filtered by year/month/day between load_start_date and load_end_date). Built from
+  170698/183049 legacy offer_submitted events and 170698/183047 offer_submitted_new events
+  (Q3/2024+). Adds marketing attribution (UTM), branded campaign flags, and country context.
+  Partitioned by year, month, and day — always filter on all three partition columns in WHERE
+  clauses to enable partition pruning. Consumed by For Rent DW (dim_offer) and Growth demand
+  conversion pipelines.
 columns:
   id_user:
+    description: |
+      QuintoAndar user identifier of the tenant who submitted the offer. Cast to BIGINT at enrich
+      time from the Amplitude event payload.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.id_user
-      - datalake_amplitude_clean.170135_offer_submitted_events.id_user
       - datalake_amplitude_clean.183049_offer_submitted_events.id_user
       - datalake_amplitude_clean.170698_offer_submitted_new_events.id_user
       - datalake_amplitude_clean.183047_offer_submitted_new_events.id_user
-    description: Id of the user who made the offer.
   id_house:
+    description: |
+      QuintoAndar property identifier associated with the submitted offer. Renamed from
+      ep_id_house in the clean Amplitude events. Cast to BIGINT at enrich time.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.ep_id_house
-      - datalake_amplitude_clean.170135_offer_submitted_events.ep_id_house
       - datalake_amplitude_clean.183049_offer_submitted_events.ep_id_house
       - datalake_amplitude_clean.170698_offer_submitted_new_events.ep_id_house
       - datalake_amplitude_clean.183047_offer_submitted_new_events.ep_id_house
-    description: Id of the house associated with the offer.
+  id_app:
+    description: |
+      Amplitude application identifier (e.g. 170698, 183049) indicating which app stream
+      produced the event.
+    lineage:
+      - datalake_amplitude_clean.170698_offer_submitted_events.id_app
+      - datalake_amplitude_clean.183049_offer_submitted_events.id_app
+      - datalake_amplitude_clean.170698_offer_submitted_new_events.id_app
+      - datalake_amplitude_clean.183047_offer_submitted_new_events.id_app
   id_firestore:
+    description: |
+      Firestore document identifier of the offer. Renamed from ep_id_firestore in clean Amplitude
+      events. Join key to offer entities in transactional and enrich layers.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.ep_id_firestore
-      - datalake_amplitude_clean.170135_offer_submitted_events.ep_id_firestore
       - datalake_amplitude_clean.183049_offer_submitted_events.ep_id_firestore
       - datalake_amplitude_clean.170698_offer_submitted_new_events.ep_id_firestore
       - datalake_amplitude_clean.183047_offer_submitted_new_events.ep_id_firestore
-    description: Id firestore of the offer.
   country_code:
+    description: |
+      User country from Amplitude user_properties JSON ($.country). Parsed via GET_JSON_OBJECT
+      at enrich time.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.user_properties
-      - datalake_amplitude_clean.170135_offer_submitted_events.user_properties
       - datalake_amplitude_clean.183049_offer_submitted_events.user_properties
       - datalake_amplitude_clean.170698_offer_submitted_new_events.user_properties
       - datalake_amplitude_clean.183047_offer_submitted_new_events.user_properties
-    description: Country code of the house associated with the event.
   user_country:
+    description: |
+      Country reported on the Amplitude event payload (device/IP geo) when the offer was submitted.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.country
-      - datalake_amplitude_clean.170135_offer_submitted_events.country
       - datalake_amplitude_clean.183049_offer_submitted_events.country
       - datalake_amplitude_clean.170698_offer_submitted_new_events.country
       - datalake_amplitude_clean.183047_offer_submitted_new_events.country
-    description: Country code of the user who made the event.
   app_type:
+    description: |
+      Application surface or device type where the offer was submitted (from up_app_type).
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.up_app_type
-      - datalake_amplitude_clean.170135_offer_submitted_events.up_app_type
       - datalake_amplitude_clean.183049_offer_submitted_events.up_app_type
       - datalake_amplitude_clean.170698_offer_submitted_new_events.up_app_type
       - datalake_amplitude_clean.183047_offer_submitted_new_events.up_app_type
-    description: App type/device where the event was made.
   version_name:
+    description: |
+      Mobile or web app version name captured in the Amplitude event at submission time.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.version_name
-      - datalake_amplitude_clean.170135_offer_submitted_events.version_name
       - datalake_amplitude_clean.183049_offer_submitted_events.version_name
       - datalake_amplitude_clean.170698_offer_submitted_new_events.version_name
       - datalake_amplitude_clean.183047_offer_submitted_new_events.version_name
-    description: Version name of the app associated with the event.
   utm_source:
+    description: |
+      UTM source parameter (up_utm_source) for marketing attribution on the offer submission.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.up_utm_source
-      - datalake_amplitude_clean.170135_offer_submitted_events.up_utm_source
       - datalake_amplitude_clean.183049_offer_submitted_events.up_utm_source
       - datalake_amplitude_clean.170698_offer_submitted_new_events.up_utm_source
       - datalake_amplitude_clean.183047_offer_submitted_new_events.up_utm_source
-    description: Returns utm_source parameter defined at campaing configuration at marketing platforms
   utm_medium:
+    description: |
+      UTM medium parameter (up_utm_medium) identifying the marketing medium for the submission.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.up_utm_medium
-      - datalake_amplitude_clean.170135_offer_submitted_events.up_utm_medium
       - datalake_amplitude_clean.183049_offer_submitted_events.up_utm_medium
       - datalake_amplitude_clean.170698_offer_submitted_new_events.up_utm_medium
       - datalake_amplitude_clean.183047_offer_submitted_new_events.up_utm_medium
-    description: Returns utm_medium parameter defined at campaing configuration at marketing platforms
   utm_campaign:
+    description: |
+      UTM campaign parameter (up_utm_campaign) identifying the campaign driving the offer
+      submission. Also used to derive branded and is_branded flags.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.up_utm_campaign
-      - datalake_amplitude_clean.170135_offer_submitted_events.up_utm_campaign
       - datalake_amplitude_clean.183049_offer_submitted_events.up_utm_campaign
       - datalake_amplitude_clean.170698_offer_submitted_new_events.up_utm_campaign
       - datalake_amplitude_clean.183047_offer_submitted_new_events.up_utm_campaign
-    description: Returns utm_campaign parameter defined at campaing configuration at marketing platforms
   utm_content:
+    description: |
+      UTM content parameter (up_utm_content) for creative or ad variant tracking.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.up_utm_content
-      - datalake_amplitude_clean.170135_offer_submitted_events.up_utm_content
       - datalake_amplitude_clean.183049_offer_submitted_events.up_utm_content
       - datalake_amplitude_clean.170698_offer_submitted_new_events.up_utm_content
       - datalake_amplitude_clean.183047_offer_submitted_new_events.up_utm_content
-    description: Returns utm_content parameter defined at campaing configuration at marketing platforms
   utm_term:
+    description: |
+      UTM term parameter (up_utm_term) for paid search keyword attribution.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.up_utm_term
-      - datalake_amplitude_clean.170135_offer_submitted_events.up_utm_term
       - datalake_amplitude_clean.183049_offer_submitted_events.up_utm_term
       - datalake_amplitude_clean.170698_offer_submitted_new_events.up_utm_term
       - datalake_amplitude_clean.183047_offer_submitted_new_events.up_utm_term
-    description: Returns utm_term parameter defined at campaing configuration at marketing platforms
   entrance_uri:
+    description: |
+      First-page URI in the user session (up_entrance_uri) when the offer was submitted.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.up_entrance_uri
-      - datalake_amplitude_clean.170135_offer_submitted_events.up_entrance_uri
       - datalake_amplitude_clean.183049_offer_submitted_events.up_entrance_uri
       - datalake_amplitude_clean.170698_offer_submitted_new_events.up_entrance_uri
       - datalake_amplitude_clean.183047_offer_submitted_new_events.up_entrance_uri
-    description: The URL of the first page a user visits in a session
   branded:
-    description: Describes if the campaign associated to the event is Branded or not.
+    description: |
+      Branded vs non-branded campaign bucket. Built from utm_campaign: Branded when campaign
+      contains BRANDED or INSTITUCIONAL (excluding NON-BRANDED); otherwise Outro.
+    categories:
+      Branded: Campaign classified as branded or institutional per UTM naming rules.
+      Outro: Non-branded or unclassified campaign bucket.
+    lineage:
+      - datalake_amplitude_clean.170698_offer_submitted_events.up_utm_campaign
+      - datalake_amplitude_clean.183049_offer_submitted_events.up_utm_campaign
+      - datalake_amplitude_clean.170698_offer_submitted_new_events.up_utm_campaign
+      - datalake_amplitude_clean.183047_offer_submitted_new_events.up_utm_campaign
   is_branded:
-    description: Boolean flag to point if the campaign associated to the event is Branded or not.
+    description: |
+      Boolean flag for branded campaigns. Derived from utm_campaign using the same rules as
+      branded (BRANDED/INSTITUCIONAL keywords, excluding non-branded variants).
+    lineage:
+      - datalake_amplitude_clean.170698_offer_submitted_events.up_utm_campaign
+      - datalake_amplitude_clean.183049_offer_submitted_events.up_utm_campaign
+      - datalake_amplitude_clean.170698_offer_submitted_new_events.up_utm_campaign
+      - datalake_amplitude_clean.183047_offer_submitted_new_events.up_utm_campaign
   dt_event:
+    description: |
+      Calendar date of the offer submission event from Amplitude.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.dt_event
-      - datalake_amplitude_clean.170135_offer_submitted_events.dt_event
       - datalake_amplitude_clean.183049_offer_submitted_events.dt_event
       - datalake_amplitude_clean.170698_offer_submitted_new_events.dt_event
       - datalake_amplitude_clean.183047_offer_submitted_new_events.dt_event
-    description: Date of the event
   ts_event:
+    description: |
+      Timestamp when the offer submission event occurred. UTC timestamp from Amplitude.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.ts_event
-      - datalake_amplitude_clean.170135_offer_submitted_events.ts_event
       - datalake_amplitude_clean.183049_offer_submitted_events.ts_event
       - datalake_amplitude_clean.170698_offer_submitted_new_events.ts_event
       - datalake_amplitude_clean.183047_offer_submitted_new_events.ts_event
-    description: Timestamp of the event
   year:
+    description: |
+      Table partition column (year). Derived from the event date at clean ingestion. Required
+      in WHERE clauses for partition pruning — always combine with month and day to restrict
+      scans to the smallest date window needed.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.year
-      - datalake_amplitude_clean.170135_offer_submitted_events.year
       - datalake_amplitude_clean.183049_offer_submitted_events.year
       - datalake_amplitude_clean.170698_offer_submitted_new_events.year
       - datalake_amplitude_clean.183047_offer_submitted_new_events.year
-    description: Year of the execution date that updated that row.
   month:
+    description: |
+      Table partition column (month, 1–12). Derived from the event date at clean ingestion.
+      Must be filtered together with year and day in every query to enable partition pruning.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.month
-      - datalake_amplitude_clean.170135_offer_submitted_events.month
       - datalake_amplitude_clean.183049_offer_submitted_events.month
       - datalake_amplitude_clean.170698_offer_submitted_new_events.month
       - datalake_amplitude_clean.183047_offer_submitted_new_events.month
-    description: Month of the execution date that updated that row.
   day:
+    description: |
+      Table partition column (day, 1–31). Derived from the event date at clean ingestion.
+      Filter with year and month to narrow the scan. Example:
+      WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_amplitude_clean.170698_offer_submitted_events.day
-      - datalake_amplitude_clean.170135_offer_submitted_events.day
       - datalake_amplitude_clean.183049_offer_submitted_events.day
       - datalake_amplitude_clean.170698_offer_submitted_new_events.day
       - datalake_amplitude_clean.183047_offer_submitted_new_events.day
-    description: Day of the execution date that updated that row.
