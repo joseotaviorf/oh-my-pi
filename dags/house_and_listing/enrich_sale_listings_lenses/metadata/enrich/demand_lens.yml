@@ -3,7 +3,7 @@ table_name: demand_lens
 description: 'An enrich table that has the purpose of creating ranking tiers of ForSale listings, where we could understand how that property is being in demand recently. With this, we will abstract a lot of the analysis.
   Given the demand created by the listing, it can transition between tiers, and when the tier is changed, it creates a new row in the table, with the new tier.'
 domain: House and Listing
-owner: data-for-sale@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_house:
     lineage:

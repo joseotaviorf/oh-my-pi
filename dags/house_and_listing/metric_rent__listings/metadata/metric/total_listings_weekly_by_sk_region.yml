@@ -13,7 +13,7 @@ columns:
   sk_region:
     lineage:
       - dw_public.dim_region.sk_region
-    description: Unique key (sk) of the house's region.
+    description: Surrogate key of the region dimension, identifying the geographic area for this metric.
     dimension: True
   country_code:
     lineage:

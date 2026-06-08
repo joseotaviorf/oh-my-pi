@@ -1,13 +1,13 @@
 database_name: dw_quintoandar
 table_name: fact_listing_price_changes
-description: fact table containing each linsting price change
+description: Fact table containing each listing price change.
 domain: House and Listing
-owner: pedro.domingos@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   sk_smart_price:
     lineage:
     - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
-    description: key of smartprice
+    description: key of smart price
   sk_house_listing:
     lineage:
     - datalake_ebdb_clean.house_aud.id_house
@@ -15,11 +15,11 @@ columns:
   sk_price_started_date:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
-    description: key to indetifiy date when rent started
+    description: key to identify date when rent started
   sk_price_ended_date:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
-    description: key to indetifiy date when rent ended
+    description: key to identify date when rent ended
   is_smart_pricing_enabled:
     lineage:
     - datalake_ebdb_clean.dynamic_pricing_house_aud.is_enabled
@@ -28,7 +28,7 @@ columns:
   rent:
     lineage:
     - datalake_ebdb_clean.house_aud.rent
-    description: rental price
+    description: Rental price of the listing at the time of this price change record.
   days_with_same_rent:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
@@ -36,16 +36,16 @@ columns:
   ts_price_started:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
-    description: timestamp when rent started
+    description: Timestamp when rent started
   ts_price_ended:
     lineage:
     - datalake_ebdb_clean.user_revision_entity.ts_revision
-    description: timestamp when rent ended
+    description: Timestamp when rent ended
   price_change_reason:
-    description: Reason for price change
+    description: Reason that triggered this rental price change.
     categories:
-      smart price: ''
+      smart price: Price change was triggered automatically by the smart pricing model.
   rent_changes:
-    description: Rental price change rank
+    description: Rental price of the listing at the time of this price change record.
   ts_load:
-    description: timestamp when data update
+    description: Timestamp when this price change record was loaded into the data warehouse.

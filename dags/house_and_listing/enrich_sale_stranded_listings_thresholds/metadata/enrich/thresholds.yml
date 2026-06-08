@@ -2,7 +2,7 @@
 database_name: datalake_sale_stranded_listings
 table_name: thresholds
 domain: House and Listing
-owner: data-for-sale@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 description: >
   This table contains the monthly thresholds used to classify sale listings as stranded.
   Thresholds are calculated as the 90th percentile of days in publication for each event type

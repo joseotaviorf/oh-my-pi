@@ -3,7 +3,7 @@ database_name: metric_rent
 table_name: listing_to_rental_8w
 description: Weekly metric of listings with signed contract within 8 weeks after publication.
 domain: House and Listing
-owner: marcus.pinto@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   dt_week_started:
     lineage:
@@ -14,7 +14,7 @@ columns:
     lineage:
       - dw_rent.dim_house_listing.sk_house_listing
       - dw_rent.dim_house_listing.ts_publication
-    description: Volume of listings.
+    description: Number of first-activated listings in the cohort week used to compute the 8-week conversion rate to rental.
     metric:
       name: Listings
       description: Number of the listings published in the week

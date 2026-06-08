@@ -1,99 +1,72 @@
 database_name: datalake_sale_listings_lenses
 table_name: sellability_lens
-description: 'An enrich table that has the purpose of creating ranking tiers of ForSale listings, where we can understand the level of sellability of a listing.. With this, we will abstract a lot of the analysis.
-  Given the typology by the listing and the fluctuation of QuintoAndar sellability factors, it can transition between tiers, and when the tier is changed, it creates a new row in the table, with the new tier.'
+description: Enriched table ranking For Sale listings into sellability tiers.
+  Each row represents a listing in a specific tier period. When the tier changes, a new row is created with the new tier and its start date.
 domain: House and Listing
-owner: data-for-sale@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_house:
     lineage:
       - datalake_ebdb_clean.listing_business_context.id_house
       - datalake_sale_offer.sale_offer.id_house
-    description:  >
-      Column referring to the house ID. Can be joined with dw_house.dim_house and all other sale modeling tables.
+    description: Column referring to the house ID. Can be joined with dw_house.dim_house and all other sale modeling tables.
   region_group:
-    description: >
-      Region clusters created by the ForSale Supply team. Represents groups based on location and some demand and supply metrics.
+    description: Region clusters created by the ForSale Supply team. Represents groups based on location and some demand and supply metrics.
   house_type:
     lineage:
       - datalake_ebdb_clean.house.house_type
-    description: >
-      Type of house.
+    description: Type of house property, used as a feature in the sellability score model.
     categories:
-      Apartamento: >
-        Apartment
-      Casa: >
-        House
-      CasaCondominio: >
-        House in a condominium
-      StudioOuKitchenette: >
-        Studio or Kitchenette
+      Apartamento: Apartment unit within a multi-family building.
+      Casa: Standalone house not located within a condominium.
+      CasaCondominio: House located within a gated condominium or housing complex.
+      StudioOuKitchenette: Studio or kitchenette apartment, typically a single open space combining living and sleeping areas.
   bedrooms:
     lineage:
       - datalake_ebdb_clean.house.bedrooms
-    description: >
-      Number of bedrooms in the house.
+    description: Number of bedrooms in the house.
   price_bin:
     lineage:
       - datalake_sale_listings_lenses.segmentation_bins.tag
-    description: >
-      Descriptive tag for each bin. The listing price is considered to allocate to a bin. That is, if the listing is 150k it will have a tag for the price bin `R$ 120k-300k`.
+    description: Descriptive tag for each bin. The listing price is considered to allocate to a bin.
   total_area_bin:
     lineage:
       - datalake_sale_listings_lenses.segmentation_bins.tag
-    description: >
-        Descriptive tag for each bin. The listing total area is considered to allocate to a bin. That is, if the listing is 90m2 it will have a tag for the total area bin `80m²-120m²`.
+    description: Descriptive tag for each bin. The listing total area is considered to allocate to a bin.
   price_m2_bin:
     lineage:
       - datalake_sale_listings_lenses.segmentation_bins.tag
-    description: >
-        Descriptive tag for each bin. The listing price m2 is considered to allocate to a bin. That is, if the listing is 8k it will have a tag for the price m2 bin `R$ 7k-8k/m²`.
+    description: Descriptive tag for each bin. The listing price m2 is considered to allocate to a bin.
   factor:
-    description: >
-      'The factor is a value that represents the similarity of a listing with the listings that have already been sold by QuintoAndar.
-       It is calculated based on the characteristics of the listing, such as number of bedrooms, number of bathrooms, region cluster, price bins, total area bins and m2 price bins.
-       The higher the factor, the more similar the listing is to the listings that have already been sold by QuintoAndar.'
+    description: Similarity score of a listing compared to listings already sold by QuintoAndar, based on characteristics such as bedrooms, region cluster and price bins. Higher values indicate greater similarity.
   tier:
-    description: >
-      'The tiers created by the Supply team in ForSale represent the segmentation of a listing with respect to its "level".
-       We used the entire history of listings that have been published and signed CCVs, with some cuts such as the number of bathrooms, region cluster, price bins, total area bins and m2 price bins. We then defined a `factor' value for each listing in relation to its characteristics.
+    description: Segmentation of the listing likelihood of being sold, defined by the Supply team.
+      Compares the listing against historical sold listings with similar characteristics to assign a sellability factor. value for each listing in relation to its characteristics.
        In other words, we compare it with QuintoAndar's history and classify whether that listing is similar to listings that have already been sold'
     categories:
-      S5: >
-        It represents listings with a very high degree of sellability, i.e. it is a listing that is very similar to most of the listings that have already been sold.
+      S5: It represents listings with a very high degree of sellability, i.e. it is a listing that is very similar to most of the listings that have already been sold.
         To be considered S5, the listing must have a sellability factor greater than 3.
-      S4: >
-        It represents listings with a high degree of sellability, i.e. it is a listing that is quite similar to most of the listings that have already been sold.
+      S4: It represents listings with a high degree of sellability, i.e. it is a listing that is quite similar to most of the listings that have already been sold.
         To be considered S4, the listing must have a sellability factor greater than 2 and less than or equal to 3.
-      S3: >
-        It represents listings with a moderate degree of sellability, i.e. it is a listing that is moderately similar to most of the listings that have already been sold.
+      S3: It represents listings with a moderate degree of sellability, i.e. it is a listing that is moderately similar to most of the listings that have already been sold.
         To be considered S3, the listing must have a sellability factor greater than 1 and less than or equal to 2.
-      S2: >
-        It represents listings with a low degree of sellability, i.e. it is a listing that is slightly similar to most of the listings that have already been sold.
+      S2: It represents listings with a low degree of sellability, i.e. it is a listing that is slightly similar to most of the listings that have already been sold.
         To be considered S2, the listing must have a sellability factor greater than 0.3 and less than or equal to 1.
-      S1: >
-        It represents listings with a very low degree of sellability, i.e. is a listing typology that is totally different from the listings sold on QuintoAndar.
+      S1: It represents listings with a very low degree of sellability, i.e. is a listing typology that is totally different from the listings sold on QuintoAndar.
         To be considered S1, the listing must have a sellability factor less than or equal to 0.3.
   tier_name:
-    description: >
-      Just a full name of the sellability tier.
+    description: Just a full name of the sellability tier.
     categories:
-      Very Similar: >
-        It represents the S5 tier. Listings with typologies with a long history of sales on QuintoAndar. It is the highest possible tier.
-      Quite Similar: >
-        It represents the S4 tier. Listings with typologies with a considerable number of sales in QuintoAndar's history. It is the second highest tier.
-      Moderately Similar: >
-        It represents the S3 tier. Listings with typologies with a moderate number of sales in QuintoAndar's history. It is the third highest tier.
+      Very Similar: It represents the S5 tier. Listings with typologies with a long history of sales on QuintoAndar. It is the highest possible tier.
+      Quite Similar: It represents the S4 tier. Listings with typologies with a considerable number of sales in QuintoAndar's history. It is the second highest tier.
+      Moderately Similar: It represents the S3 tier. Listings with typologies with a moderate number of sales in QuintoAndar's history. It is the third highest tier.
       Somewhat Similar:
         It represents the S2 tier. Listings with typologies that are slightly similar to the listings already sold by QuintoAndar. It is the fourth highest tier.
       Not Very Similar:
         It represents the S1 tier. Listings with typologies totally different type to the listings that QuintoAndar sells. It is the lowest tier.
   is_last_tier:
-    description: >
-     This column represents a Boolean flag that indicates whether the tier referring to the observed row is the current tier or a tier that is part of a listing's history.
+    description: This column represents a Boolean flag that indicates whether the tier referring to the observed row is the current tier or a tier that is part of a listing's history.
   ts_tier_started:
-    description: >
-      Date of tier change. It is linked to fluctuations in sellability factors. When this factor changes and the listing changes tier, it will have a new row.
+    description: Date of tier change. It is linked to fluctuations in sellability factors. When this factor changes and the listing changes tier, it will have a new row.
   ts_tier_ended:
-    description: >
-      Termination date of the tier. It is strictly linked to the beginning of the next tier for that listing (for the observed row).
+    description: Termination date of the tier. It is strictly linked to the beginning of the next tier for that listing (for the observed row).

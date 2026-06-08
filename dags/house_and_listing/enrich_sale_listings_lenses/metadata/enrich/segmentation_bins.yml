@@ -2,7 +2,7 @@ database_name: datalake_sale_listings_lenses
 table_name: segmentation_bins
 description: 'Static table with price bins, price per square meter and total ara to help you build your analysis. It works as a reference table, and can be joined with the type of attribute, doing a between on the numbers.' 
 domain: House and Listing
-owner: data-for-sale@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_bin:
     description: Identifier number of which attribute type that bin belongs to.

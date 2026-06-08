@@ -8,7 +8,7 @@ description: Number of the listings in a day segmented by sk_region, which
   to Contract Signed uses the less or equal sign to calculate the conversion time.
   If multiplied by 100 we get the percentage of this metric.
 domain: House and Listing
-owner: kleber.inoue@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   publication_date:
     lineage:
@@ -18,7 +18,7 @@ columns:
   sk_region:
     lineage:
       - dw_public.fact_house_listing_flows.sk_region
-    description: Region identifier.
+    description: Surrogate key of the region dimension, identifying the geographic area for this metric.
     dimension: True
   country_code:
     lineage:

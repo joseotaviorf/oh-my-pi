@@ -4,7 +4,7 @@ description: This table keeps track of every status change of For Sale listings.
   Therefore, a listing can have multiple rows in this table, one for each status change, with its start and end date (if any). 
   An example would be the first row of a listing where the first status is editing (pre-publication) and the second is published (post-publication).
 domain: House and Listing
-owner: data-for-sale@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   sk_sale_listing:
     lineage:
@@ -26,8 +26,7 @@ columns:
   sk_broker:
     lineage:
       - core_brokers.brokers.sk_broker
-    description: >
-      Surrogate key of the 3P broker partner for the resolved company; '-1' when the
+    description: Surrogate key of the 3P broker partner for the resolved company; '-1' when the
       company is not in core_brokers.brokers.
   sk_first_publication_date:
     lineage:
@@ -44,7 +43,7 @@ columns:
   status_history:
     lineage:
     - datalake_sale_listings.sale_listing_status.status_history
-    description: 'Sale status linked to a certain point in time of the listing.'
+    description: Sale status linked to a certain point in time of the listing.
     categories:
       EDITING: If the listing is being edited.
       OPTED_OUT: If a listing has opted out of the funnel before being published.
@@ -56,12 +55,9 @@ columns:
       - datalake_sale_listings.sale_listing_status.status_closing_history
     description: Sale closing status linked to a certain point in time of the listing.
     categories:
-      CCV_CANCELED: >
-        If the listing is in the process of sales cancellation during the change
-      CCV_SIGNED: >
-        If the listing is in the process of being sold during the change
-      SALE_COMPLETED: >
-        If the listing is already sold during the change
+      CCV_CANCELED: If the listing is in the process of sales cancellation during the change
+      CCV_SIGNED: If the listing is in the process of being sold during the change
+      SALE_COMPLETED: If the listing is already sold during the change
   status_change_reason:
     lineage:
     - datalake_sale_listings.sale_listing_status.status_change_reason

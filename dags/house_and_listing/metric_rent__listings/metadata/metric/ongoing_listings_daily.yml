@@ -3,7 +3,7 @@ database_name: metric_rent
 table_name: ongoing_listings_daily
 description: Daily table that has the amount of listings with status published.
 domain: House and Listing
-owner: kleber.inoue@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   day:
     lineage:

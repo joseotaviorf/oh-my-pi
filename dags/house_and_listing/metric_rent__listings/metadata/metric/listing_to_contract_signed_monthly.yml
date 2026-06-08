@@ -8,7 +8,7 @@ description: Number of the listings in a month which
   to Contract Signed uses the less or equal sign to calculate the conversion time.
   If multiplied by 100 we get the percentage of this metric.
 domain: House and Listing
-owner: kleber.inoue@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   month:
     lineage:

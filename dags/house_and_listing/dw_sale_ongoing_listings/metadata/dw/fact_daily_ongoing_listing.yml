@@ -8,7 +8,7 @@ description: 'Every row of this table is a snapshot of one sale ongoing listing 
   is because some events happen when the listing is unpublished, so the rows will not appear in this table. To see all ForSale demand events, please use
   the table dw_sale.fact_sale_demand_event.'
 domain: House and Listing
-owner: gustavo.miller@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   sk_snapshot:
     description: Primary key of the table, formed by concatenating sk_house to sk_snapshot_date.

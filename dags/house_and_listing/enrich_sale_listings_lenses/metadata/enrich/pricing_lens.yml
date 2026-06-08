@@ -3,7 +3,7 @@ table_name: pricing_lens
 description: This table contains the lens information regarding Listing pricing. Where each row is a price change, we infer a tier for each price change.
   This tier is assembled based on the seller's pricing relative to the price from QuintoAndar ForSale calculator.
 domain: House and Listing
-owner: data-for-sale@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_house:
     lineage:

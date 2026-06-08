@@ -2,16 +2,16 @@ database_name: dw_quintoandar
 table_name: dim_smart_price
 description: dim table containing all information to listing smart price
 domain: House and Listing
-owner: pedro.domingos@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   sk_smart_price:
     lineage:
     - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
-    description: key of smartprice
+    description: key of smart price
   id_smart_price:
     lineage:
     - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
-    description: key of smartprice
+    description: key of smart price
   is_enabled:
     lineage:
     - datalake_ebdb_clean.dynamic_pricing_house_aud.is_enabled
@@ -22,35 +22,35 @@ columns:
     - datalake_ebdb_clean.dynamic_pricing_house_aud.operation_mode
     description: indicates from whom the initial rent value was taken
     categories:
-      AUTO: ''
-      MANUAL: ''
-      MANUAL_INSIDE_SALES: ''
+      AUTO: Initial rent value was set automatically by the smart pricing model.
+      MANUAL: Initial rent value was set manually by the owner or consultant.
+      MANUAL_INSIDE_SALES: Initial rent value was set manually by the inside sales team.
   status:
     lineage:
     - datalake_ebdb_clean.dynamic_pricing_house_aud.status
-    description: last smart price status in the smaart price flow
+    description: last smart price status in the smart price flow
     categories:
-      ACTIVE: ''
-      INACTIVE: ''
-      PAUSED: ''
-      PENDING: ''
+      ACTIVE: Smart price is active and applying price changes to the listing.
+      INACTIVE: Smart price is inactive and not applying any price changes.
+      PAUSED: Smart price is temporarily paused.
+      PENDING: Smart price is pending activation.
   house_last_status:
     lineage:
     - datalake_ebdb_clean.dynamic_pricing_house.status
-    description: Actual House status
+    description: Last known operational status of the house at the time of smart price calculation.
     categories:
-      ACTIVE: ''
-      INACTIVE: ''
-      PAUSED: ''
-      PENDING: ''
+      ACTIVE: Smart price is active and applying price changes to the listing.
+      INACTIVE: Smart price is inactive and not applying any price changes.
+      PAUSED: Smart price is temporarily paused.
+      PENDING: Smart price is pending activation.
   house_min_rent:
     lineage:
     - datalake_ebdb_clean.dynamic_pricing_house.min_rent
-    description: Actual min rent price
+    description: Minimum rent price boundary used in the smart pricing model for this house.
   house_max_rent:
     lineage:
     - datalake_ebdb_clean.dynamic_pricing_house.initial_rent
-    description: Actual max rent price
+    description: Maximum rent price boundary used in the smart pricing model for this house.
   min_rent_percentile:
     lineage:
     - datalake_ebdb_clean.dynamic_pricing_parameters.min_rent_percentile
@@ -75,11 +75,11 @@ columns:
     lineage:
     - datalake_ebdb_smart_price.smart_price_versioning.status
     - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
-    description: first smartprice activation timestamp
+    description: first smart price activation timestamp
   ts_last_deactivation:
     lineage:
     - datalake_ebdb_smart_price.smart_price_versioning.status
     - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
-    description: Last smartprice deactivation date
+    description: Last smart price deactivation date
   ts_load:
-    description: timestamp to load data
+    description: Timestamp when this smart price record was loaded into the data warehouse.

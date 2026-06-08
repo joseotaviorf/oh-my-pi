@@ -1,10 +1,10 @@
 database_name: dw_sale
 table_name: fact_listings
-description: "This table shows us the publication information and metrics of a listing. We can find information such as region, price, owner, publication information, number of days between first events. 
-  Where each row is a different listing. Listings might not be published any longer or even not having been published at all. Currently we don't have a very complex versioning of a listing, just versioning it if it is published.
-  More infos (https://docs.google.com/presentation/d/15L6waXFmhbG8hf7bjnMsu1UcSAE3sQw5PtpH5bOn6mE/edit#slide=id.g1de71583189_0_0)'"
+description: This table shows publication information and metrics for For Sale listings.
+  Each row is a different listing. Listings may not be published anymore or may never have been published.
+  Versioning is based on publication events only.
 domain: House and Listing
-owner: data-for-sale@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   sk_sale_listing:
     lineage:
@@ -23,8 +23,7 @@ columns:
   sk_company_hubspot:
     lineage:
     - datalake_ebdb_listing.house.id_company_hubspot
-    description: >
-      Foreign key referring to the company ID on Hubspot. Can be joined with dw_quintoandar.dim_company and all other sale modeling tables.
+    description: Foreign key referring to the company ID on Hubspot. Can be joined with dw_quintoandar.dim_company and all other sale modeling tables.
   sk_user_consultant:
     lineage:
     - datalake_big_agent.house_sale_listing_consultant.id_user
@@ -43,8 +42,7 @@ columns:
   sk_broker:
     lineage:
       - core_brokers.brokers.sk_broker
-    description: >
-      Surrogate key of the 3P broker partner for the same company as sk_company when
+    description: Surrogate key of the 3P broker partner for the same company as sk_company when
       is_sale_3p_supply; '-1' when not 3P supply or company is not in core_brokers.brokers.
   price:
     lineage:
@@ -110,7 +108,7 @@ columns:
   days_first_publication_to_first_offer_submitted:
     lineage:
     - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_offer_submitted
-    description: Number of days between the first publication and first offer submitted in Sale.
+    description: Number of days between the listing's first publication and the first offer submission.
   days_first_publication_to_first_offer_accepted:
     lineage:
     - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_first_offer_accepted
@@ -122,23 +120,23 @@ columns:
   days_first_publication_to_house_registry_ended:
     lineage:
     - datalake_sale_listing_demand.sale_listing_demand.days_first_publication_to_house_registry_ended
-    description: Number of days between the first publication and house registry ended in Sale. 
+    description: Number of days between the listing's first publication and the end of the house registry process.
   days_first_booking_to_first_visit_completed:
     lineage:
     - datalake_sale_listing_demand.sale_listing_demand.days_first_booking_to_first_visit_completed
-    description: Number of days between the first booking and first visit completed in Sale.
+    description: Number of days between the first booking and the first completed visit.
   days_first_visit_completed_to_first_offer_submitted:
     lineage:
     - datalake_sale_listing_demand.sale_listing_demand.days_first_visit_completed_to_first_offer_submitted
-    description: Number of days between the first visit completed and first offer submitted in Sale.
+    description: Number of days between the first completed visit and the first offer submission.
   days_first_offer_submitted_to_first_offer_accepted:
     lineage:
     - datalake_sale_listing_demand.sale_listing_demand.days_first_offer_submitted_to_first_offer_accepted
-    description: Number of days between the first offer submitted and first offer accepted in Sale.
+    description: Number of days between the first submitted offer and the first accepted offer.
   days_first_offer_accepted_to_first_sale_agreement_signed:
     lineage:
     - datalake_sale_listing_demand.sale_listing_demand.days_first_offer_accepted_to_first_sale_agreement_signed
-    description: Number of days between the first offer accepted and first sale agreement signed in Sale.
+    description: Number of days between the first accepted offer and the first signed sale agreement.
   total_depublications:
     lineage:
     - datalake_sale_listings.sale_listing.unpublications

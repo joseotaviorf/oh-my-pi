@@ -3,7 +3,7 @@ table_name: listing_quality_lens
 description: 'An enrich table that has the purpose of creating ranking tiers of ForSale listings, where we could understand how complete the listing information is on our platform. With this, we will abstract a lot of the analysis.
   Given some information on amenities and features that we think are relevant to a house sales journey, we create a score that classifies how complete a listing is to be listed. With this, each change in these characteristics and information can lead to a change in tier, creating a new row with a new tier.'
 domain: House and Listing
-owner: data-for-sale@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_house:
     lineage:

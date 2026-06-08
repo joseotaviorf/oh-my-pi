@@ -2,12 +2,12 @@ database_name: dw_quintoandar
 table_name: fact_smart_price_status_changes
 description: fact table containing each smart price status change
 domain: House and Listing
-owner: pedro.domingos@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   sk_smart_price:
     lineage:
     - datalake_ebdb_smart_price.smart_price_versioning.id_smart_price
-    description: key of smartprice
+    description: key of smart price
   sk_house_listing:
     lineage:
     - datalake_ebdb_smart_price.smart_price_versioning.id_house_listing
@@ -19,29 +19,29 @@ columns:
   sk_status_started_date:
     lineage:
     - datalake_ebdb_smart_price.smart_price_versioning.ts_start_status
-    description: key to indetifiy date when status started
+    description: key to identify date when status started
   sk_status_ended_date:
     lineage:
     - datalake_ebdb_smart_price.smart_price_versioning.ts_end_status
-    description: key to indetifiy date when status ended
+    description: key to identify date when status ended
   status:
     lineage:
     - datalake_ebdb_smart_price.smart_price_versioning.status
-    description: smartprice status (ACTIVE / INACTIVE / PENDING (deprecated) - now
+    description: smart price status (ACTIVE / INACTIVE / PENDING (deprecated) - now
       PAUSED)
     categories:
-      ACTIVE: ''
-      INACTIVE: ''
-      PAUSED: ''
-      PENDING: ''
+      ACTIVE: Smart price is active and applying price changes to the listing.
+      INACTIVE: Smart price is inactive and not applying any price changes.
+      PAUSED: Smart price is temporarily paused.
+      PENDING: Smart price is pending activation.
   operation_mode:
     lineage:
     - datalake_ebdb_clean.dynamic_pricing_house_aud.operation_mode
     description: indicates from whom the initial rent value was taken
     categories:
-      AUTO: ''
-      MANUAL: ''
-      MANUAL_INSIDE_SALES: ''
+      AUTO: Initial rent value was set automatically by the smart pricing model.
+      MANUAL: Initial rent value was set manually by the owner or consultant.
+      MANUAL_INSIDE_SALES: Initial rent value was set manually by the inside sales team.
   is_enabled:
     lineage:
     - datalake_ebdb_clean.dynamic_pricing_house_aud.is_enabled
@@ -61,16 +61,16 @@ columns:
     - datalake_ebdb_smart_price.smart_price_versioning.ts_end_status
     description: timestamp of when status ended
   status_change_reason:
-    description: status change reason
+    description: Reason for the smart pricing status change event.
     categories:
-      Owner changed published price: ''
-      Owner deactivated SmP operating in auto mode: ''
-      Owner deactivated SmP operating in manual mode: ''
-      Smart price reached min rent: ''
-      The house is in editing: ''
-      The house was unpublished: ''
-      The smart price was never been activated: ''
-      dunno: ''
-      house listing status change: ''
+      Owner changed published price: Owner manually changed the published rent price, overriding smart pricing.
+      Owner deactivated SmP operating in auto mode: Owner deactivated smart price while it was running in automatic mode.
+      Owner deactivated SmP operating in manual mode: Owner deactivated smart price while it was running in manual mode.
+      Smart price reached min rent: Smart price hit the configured minimum rent boundary and can no longer reduce the price.
+      The house is in editing: Smart price status changed because the house entered editing mode.
+      The house was unpublished: Smart price status changed because the house was unpublished.
+      The smart price was never been activated: Smart price has not been activated for this listing.
+      dunno: Reason for the status change could not be determined.
+      house listing status change: Smart price status changed due to a change in the house listing status.
   ts_load:
-    description: timestamp to load data
+    description: Timestamp when this status change record was loaded into the data warehouse.

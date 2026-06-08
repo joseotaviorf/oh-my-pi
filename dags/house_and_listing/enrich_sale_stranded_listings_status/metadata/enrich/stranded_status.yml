@@ -4,7 +4,7 @@ table_name: stranded_status
 description: >
   Table containing all the status changes from Stranded to ForSale Listings. We use an expected time approach to receive a visit or offer. Each row is a status in a time period for a listing. Learn more: https://docs.google.com/presentation/d/1I7oPsrLn9u4UIEvRhGPucTD21_VsJo1-L4rSvFahMEU/edit
 domain: House and Listing
-owner: data-for-sale@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_sale_listing:
     lineage:

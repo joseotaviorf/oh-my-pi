@@ -3,7 +3,7 @@ database_name: metric_rent
 table_name: ongoing_listings_daily_by_sk_region
 description: Daily table that has the amount of listings with status published segmented by sk_region.
 domain: House and Listing
-owner: kleber.inoue@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   date:
     lineage:
@@ -13,7 +13,7 @@ columns:
   sk_region:
     lineage:
       - dw_rent.fact_house_listing_status.sk_region
-    description: Region identifier.
+    description: Surrogate key of the region dimension, identifying the geographic area for this metric.
     dimension: True
   country_code:
     lineage:

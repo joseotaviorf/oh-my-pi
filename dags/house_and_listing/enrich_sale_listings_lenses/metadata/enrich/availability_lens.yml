@@ -4,7 +4,7 @@ description: 'An enrich table that has the purpose of showing the level of avail
   With this, we can abstract a lot of analysis and understand exactly why the liquidity of a listing is low.
   For this table, factors such as location of the key, hours available for the visit, if the listing is on a rent contract, visits cancelled by the owner, etc. If any of these factors change and alter the tier of a listing, it will create a new row in the table.'
 domain: House and Listing
-owner: data-for-sale@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 columns:
   id_house:
     lineage:
