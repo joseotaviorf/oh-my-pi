@@ -1,79 +1,91 @@
 database_name: datalake_amplitude_clean
 table_name: 440441_sale_offer_list_details_button_clicked_events
-domain: Growth
-owner: rodrigo.cardoso@quintoandar.com.br
-description: This table contains sale_offer_list_details_button_clicked events from app 440441.
-  It tracks user interactions and includes relevant metadata and user properties.
+domain: For Sale
+owner: gustavo.rompe@quintoandar.com.br
+description: |
+  Button click events on the sale offer list details action in the QuintoAndar sale flow (Amplitude
+  app 440441). One row per tap with house, offer, and offer status context extracted from
+  event_properties, plus device and login metadata. Materialized as an incremental subpartition of
+  datalake_amplitude_clean.events filtered by event_type = 'sale_offer_list_details_button_clicked'.
+  Partitioned by year, month, and day — always filter on all three partition columns in WHERE clauses
+  to enable partition pruning; align filters with ts_event.
 columns:
   id_amplitude:
     lineage:
     - datalake_amplitude_clean.events.id_amplitude
-    description: Unique identification number for a triggered amplitude event
+    description: Unique Amplitude identifier for this specific event record. Used as primary key for event tracking and deduplication.
   uuid:
     lineage:
     - datalake_amplitude_clean.events.uuid
-    description: unique triggered event id
+    description: Universally unique identifier for the event. Alternative unique key used for event identification and correlation.
   id_event:
     lineage:
     - datalake_amplitude_clean.events.id_event
-    description: identification number for an amplitude event
+    description: Unique event identifier within Amplitude system. Sequential number for tracking event order and preventing duplicates.
   id_user:
     lineage:
     - datalake_amplitude_clean.events.id_user
-    description: Unique identification number for an user
+    description: Unique user identifier within the QuintoAndar platform. Links events to specific users across sessions.
   id_house:
     lineage:
     - datalake_amplitude_clean.events.event_properties
-    description: Unique identification number for a 5A house, extracted from an event property
+    description: Unique identifier for the property listing associated with the offer. Extracted from event_properties.house_id.
   id_offer:
     lineage:
     - datalake_amplitude_clean.events.event_properties
-    description: Unique identification for an offer, extracted from an event property
+    description: Surrogate key of the sale offer whose details were opened. Extracted from event_properties.sk_offer.
   offer_status:
     lineage:
     - datalake_amplitude_clean.events.event_properties
-    description: status of an offer flow
+    description: Current status of the sale offer flow at click time. Extracted from event_properties.offers_status.
   country:
     lineage:
     - datalake_amplitude_clean.events.country
-    description: Country where the event trigger device was on the action moment
+    description: User's country location derived from IP geolocation at event time. Primarily 'Brazil' for QuintoAndar users.
   region:
     lineage:
     - datalake_amplitude_clean.events.region
-    description: region where the event trigger device was on the action moment
+    description: Geographic region/state derived from IP geolocation at event time (e.g., 'São Paulo', 'Rio de Janeiro').
   city:
     lineage:
     - datalake_amplitude_clean.events.city
-    description: City where the event trigger device was on the action moment
+    description: User's city location derived from IP geolocation at event time. Used for geographic analysis.
   device_type:
     lineage:
     - datalake_amplitude_clean.events.device_type
-    description: device type
+    description: Type category of the device (e.g., 'Mobile', 'Tablet', 'Desktop'). Determines the user interface and interaction patterns.
   os_name:
     lineage:
     - datalake_amplitude_clean.events.os_name
-    description: device operational system name
+    description: Operating system name (e.g., 'iOS', 'Android', 'Windows'). Used for platform-specific analytics and feature compatibility.
   platform:
     lineage:
     - datalake_amplitude_clean.events.event_properties
-    description: platform where the event was triggered off (mobile or desktop)
+    description: Platform where the click occurred (e.g., mobile or desktop). Extracted from event_properties.platform_type.
   login_status:
     lineage:
     - datalake_amplitude_clean.events.user_properties
-    description: user login status
+    description: User authentication state at click time (e.g., logged in vs guest). Extracted from user_properties.login_status.
   ts_event:
     lineage:
     - datalake_amplitude_clean.events.ts_event
-    description: timestamp of a triggered event
+    description: Timestamp when the offer list details button was clicked. Primary timestamp for event ordering and time-based analysis.
   year:
     lineage:
     - datalake_amplitude_clean.events.year
-    description: triggered event year
+    description: |
+      Table partition column (year). Derived from ts_event at clean ingestion. Required in WHERE clauses
+      for partition pruning — always combine with month and day to restrict scans to the smallest date
+      window needed.
   month:
     lineage:
     - datalake_amplitude_clean.events.month
-    description: triggered event month
+    description: |
+      Table partition column (month, 1–12). Derived from ts_event at clean ingestion. Must be filtered
+      together with year and day in every query to enable partition pruning.
   day:
     lineage:
     - datalake_amplitude_clean.events.day
-    description: triggered event day
+    description: |
+      Table partition column (day, 1–31). Derived from ts_event at clean ingestion. Always filter with
+      year and month. Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.

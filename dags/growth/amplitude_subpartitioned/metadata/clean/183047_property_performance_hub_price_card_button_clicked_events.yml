@@ -1,10 +1,13 @@
 database_name: datalake_amplitude_clean
 table_name: 183047_property_performance_hub_price_card_button_clicked_events
-owner: camila.simoes@quintoandar.com.br
+owner: bruna.prates@quintoandar.com.br
 domain: Growth
-description: This table contains property_performance_hub_price_card_button_clicked
-  events from app 183047. It tracks user interactions and includes relevant metadata
-  and user properties.
+description: |
+  Price card button click events in the Property Performance Hub (Amplitude app 183047, event_type
+  property_performance_hub_price_card_button_clicked). One row per click on the price optimization card
+  action with house context and listing performance experiment toggles. Incremental subpartition of
+  datalake_amplitude_clean.events. Partitioned by year, month, and day — filter all three in WHERE for
+  partition pruning; align filters with ts_event.
 columns:
   id_amplitude:
     lineage:
@@ -233,12 +236,19 @@ columns:
   year:
     lineage:
     - datalake_amplitude_clean.events.year
-    description: Year when the event occurred (extracted from ts_event). Partition column for efficient data querying and storage optimization.
+    description: |
+      Table partition column (year). Derived from ts_event at clean ingestion. Required in WHERE clauses
+      for partition pruning — always combine with month and day to restrict scans to the smallest date
+      window needed.
   month:
     lineage:
     - datalake_amplitude_clean.events.month
-    description: Month when the event occurred (extracted from ts_event). Partition column for efficient data querying and storage optimization.
+    description: |
+      Table partition column (month, 1–12). Derived from ts_event at clean ingestion. Must be filtered
+      together with year and day in every query to enable partition pruning.
   day:
     lineage:
     - datalake_amplitude_clean.events.day
-    description: Day when the event occurred (extracted from ts_event). Partition column for efficient data querying and storage optimization.
+    description: |
+      Table partition column (day, 1–31). Derived from ts_event at clean ingestion. Always filter with
+      year and month. Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.

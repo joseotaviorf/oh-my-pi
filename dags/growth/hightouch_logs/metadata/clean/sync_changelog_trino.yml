@@ -2,7 +2,7 @@
 database_name: datalake_hightouch_logs_clean
 table_name: sync_changelog_trino
 domain: Growth
-owner: bruno.sbrito@quintoandar.com.br
+owner: bruno.sbrito@quintoandar.com
 description: |
   Clean layer for Hightouch Warehouse Sync Logs changelog data ingested from the CDP Trino export path
   (source: hightouch_audit.sync_changelog parquet on S3). One row per sync run and model row operation,
