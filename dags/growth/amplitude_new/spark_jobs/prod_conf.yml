@@ -1,6 +1,7 @@
 ---
 custom_records_per_file: 2500000
 raw_partition_cols: [year, month, day, app]
+raw_table_location: s3://5a-datalake-prod/raw/amplitude_new_delta/
 table_name: events
 transient_location: s3://5a-amplitude-events-prod/
 transient_data_schema: |
