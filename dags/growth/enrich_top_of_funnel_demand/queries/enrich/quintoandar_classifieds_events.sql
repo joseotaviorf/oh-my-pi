@@ -30,9 +30,7 @@ WITH qac_events AS (
     FROM
         datalake_amplitude_clean.170698_contact_broker_clicked_events
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION ALL
     SELECT
         id_amplitude,
@@ -65,9 +63,7 @@ WITH qac_events AS (
     FROM
         datalake_amplitude_clean.170698_edit_account_info_clicked_events
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION ALL
     SELECT
         id_amplitude,
@@ -100,9 +96,7 @@ WITH qac_events AS (
     FROM
         datalake_amplitude_clean.170698_classifieds_viewed_events
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION ALL
     SELECT
         id_amplitude,
@@ -135,9 +129,7 @@ WITH qac_events AS (
     FROM
         datalake_amplitude_clean.170698_lead_intent_events
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     UNION ALL
     SELECT
         id_amplitude,
@@ -170,9 +162,7 @@ WITH qac_events AS (
     FROM
         datalake_amplitude_clean.170698_lead_intent_confirmed_events
     WHERE
-        year = {year}
-        AND month = {month}
-        AND day = {day}
+        MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 ),
 qac_region AS (
     SELECT

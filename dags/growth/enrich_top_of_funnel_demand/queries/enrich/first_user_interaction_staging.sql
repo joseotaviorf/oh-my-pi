@@ -11,7 +11,5 @@ FROM
         ON ui.id_tof_user = fui.id_tof_user
         AND ui.business_context = fui.business_context
 WHERE
-    ui.year = {year}
-    AND ui.month = {month}
-    AND ui.day = {day} 
+    MAKE_DATE(ui.year, ui.month, ui.day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
     AND fui.id_tof_user IS NULL
