@@ -1,0 +1,66 @@
+---
+table_name: datalake_privacy_hub_clean.data_subject
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  version:
+    is_complete:
+      severity_level: Error
+  is_deleted:
+    is_complete:
+      severity_level: Error
+  is_onetrust_migrated:
+    is_complete:
+      severity_level: Error
+  ts_created_at:
+    is_complete:
+      severity_level: Error
+  ts_updated_at:
+    is_complete:
+      severity_level: Error
+    custom:
+      # Partition columns must match ts_updated_at derivation at clean ingestion.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_privacy_hub_clean.data_subject
+         WHERE year != YEAR(CAST(ts_updated_at AS TIMESTAMP))
+            OR month != MONTH(CAST(ts_updated_at AS TIMESTAMP))
+            OR day != DAY(CAST(ts_updated_at AS TIMESTAMP))
+        ) = 0
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 12
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 31
+      severity_level: Error

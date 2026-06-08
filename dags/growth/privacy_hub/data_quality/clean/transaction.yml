@@ -1,0 +1,91 @@
+---
+table_name: datalake_privacy_hub_clean.transaction
+alert_channel: "#alerts-de-airflow-dags"
+
+table_level_validations:
+  has_size:
+    greater_than: 0
+    severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -10
+    less_than_or_equal_to: 50
+    severity_level: Warning
+
+column_level_validations:
+  id:
+    is_unique:
+      severity_level: Error
+    is_complete:
+      severity_level: Error
+  id_data_subject:
+    # Every transaction must reference an existing data subject in the clean layer.
+    # Warning (not Error): privacy_hub CDC clean tables load in parallel with no inner_dependency
+    # on data_subject. Valid same-run inserts can transiently fail this check until data_subject finishes.
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_privacy_hub_clean.transaction t
+         WHERE NOT EXISTS (
+           SELECT 1
+           FROM datalake_privacy_hub_clean.data_subject ds
+           WHERE ds.id = t.id_data_subject
+         )) = 0
+      severity_level: Warning
+    is_complete:
+      severity_level: Error
+  type:
+    is_complete:
+      severity_level: Error
+    is_contained_in:
+      values:
+        - OPTIN_ATTEMPT
+        - UPDATE
+      severity_level: Error
+  purpose_status:
+    # Non-null purpose_status must match Privacy Hub enum; null is valid when consent state is unchanged.
+    custom:
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_privacy_hub_clean.transaction
+         WHERE purpose_status IS NOT NULL
+           AND purpose_status NOT IN ('ACTIVE', 'EXPIRED', 'WITHDRAWN')
+        ) = 0
+      severity_level: Warning
+  ts_created_at:
+    is_complete:
+      severity_level: Error
+  ts_updated_at:
+    is_complete:
+      severity_level: Error
+    custom:
+      # Partition columns must match ts_updated_at derivation at clean ingestion.
+      constraint: |-
+        (SELECT COUNT(*)
+         FROM datalake_privacy_hub_clean.transaction
+         WHERE year != YEAR(CAST(ts_updated_at AS TIMESTAMP))
+            OR month != MONTH(CAST(ts_updated_at AS TIMESTAMP))
+            OR day != DAY(CAST(ts_updated_at AS TIMESTAMP))
+        ) = 0
+      severity_level: Error
+  year:
+    is_complete:
+      severity_level: Error
+  month:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 12
+      severity_level: Error
+  day:
+    is_complete:
+      severity_level: Error
+    has_min_value:
+      greater_than_or_equal_to: 1
+      severity_level: Error
+    has_max_value:
+      less_than_or_equal_to: 31
+      severity_level: Error

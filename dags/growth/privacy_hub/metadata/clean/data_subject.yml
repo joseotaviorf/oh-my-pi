@@ -2,57 +2,89 @@
 database_name: datalake_privacy_hub_clean
 table_name: data_subject
 domain: Growth
-description: Clean data subject information from the privacy hub containing personal data subjects and their associated metadata.
+owner: isadora.gallerani@quintoandar.com.br
+description: |
+  Clean layer for data subject profiles from QuintoAndar's Privacy Hub service (PostgreSQL source:
+  privacy_hub.public.data_subject). One row per data subject — a natural person whose personal data
+  is processed by QuintoAndar and whose consent preferences are managed under LGPD. Stores purpose
+  acceptances, controller assignment, category classification, and OneTrust migration status. Parent
+  entity for transaction events (join via transaction.id_data_subject). Used for consent governance,
+  privacy compliance audits, and data subject rights workflows. Part of the privacy_hub DAG (daily CDC).
 columns:
   id:
-    description: Unique identifier for the data subject record.
+    description: |
+      Primary key of the data subject in Privacy Hub. Referenced by transaction.id_data_subject for
+      consent event history.
     lineage:
       - datalake_privacy_hub_raw.data_subject.id
   id_external:
-    description: External identifier for the data subject used for cross-system references.
+    description: |
+      External identifier used to link the Privacy Hub data subject to upstream QuintoAndar systems
+      (e.g. user UUID, person ID). Enables cross-system consent lookups without exposing internal IDs.
     lineage:
       - datalake_privacy_hub_raw.data_subject.external_id
   id_data_controller:
-    description: Identifier of the data controller responsible for the data subject's personal data.
+    description: |
+      Identifier of the data controller (legal entity) responsible for processing this subject's
+      personal data under LGPD. Maps to Privacy Hub data controller registry.
     lineage:
       - datalake_privacy_hub_raw.data_subject.data_controller_id
   id_data_subject_category:
-    description: Identifier of the category that classifies the type of data subject.
+    description: |
+      Identifier of the data subject category (e.g. tenant, owner, visitor) that classifies the
+      person's relationship with QuintoAndar for privacy policy application.
     lineage:
       - datalake_privacy_hub_raw.data_subject.data_subject_category_id
   purpose_acceptances:
-    description: Information about the purposes for which the data subject has provided consent.
+    description: |
+      Structured record of processing purposes the data subject has accepted or revoked. Core consent
+      state managed by Privacy Hub for LGPD lawful basis tracking; format defined by the service schema.
     lineage:
       - datalake_privacy_hub_raw.data_subject.purpose_acceptances
   version:
-    description: Version number of the data subject record for tracking changes over time.
+    description: |
+      Optimistic locking version of the data subject record in Privacy Hub. Increments on each update
+      to track record revision history.
     lineage:
       - datalake_privacy_hub_raw.data_subject.version
   is_deleted:
-    description: Flag indicating whether the data subject record has been marked as deleted.
+    description: |
+      Soft-delete flag indicating the data subject was marked as deleted in Privacy Hub (e.g. right
+      to erasure request processed). Deleted subjects may still appear in historical transactions.
     lineage:
       - datalake_privacy_hub_raw.data_subject.deleted
   is_onetrust_migrated:
-    description: Flag indicating whether the data subject record has been migrated to OneTrust.
+    description: |
+      Flag indicating whether this data subject record was migrated from or synchronized with OneTrust
+      consent management platform during Privacy Hub rollout.
     lineage:
       - datalake_privacy_hub_raw.data_subject.onetrust_migrated
   ts_updated_at:
-    description: Timestamp when the data subject record was last updated.
+    description: |
+      Timestamp when the data subject record was last updated in Privacy Hub. Used as the basis for
+      incremental CDC loads and partition derivation.
     lineage:
       - datalake_privacy_hub_raw.data_subject.updated_at
   ts_created_at:
-    description: Timestamp when the data subject record was first created.
+    description: |
+      Timestamp when the data subject was first registered in Privacy Hub (created_at in source).
     lineage:
       - datalake_privacy_hub_raw.data_subject.created_at
   year:
-    description: Year component extracted from the updated_at timestamp for partitioning.
+    description: |
+      Table partition column (year). Derived from ts_updated_at at clean ingestion. Required in WHERE
+      clauses for partition pruning — always combine with month and day.
     lineage:
       - datalake_privacy_hub_raw.data_subject.updated_at
   month:
-    description: Month component extracted from the updated_at timestamp for partitioning.
+    description: |
+      Table partition column (month, 1–12). Derived from ts_updated_at. Must be filtered together with
+      year and day in every query to enable partition pruning.
     lineage:
       - datalake_privacy_hub_raw.data_subject.updated_at
   day:
-    description: Day component extracted from the updated_at timestamp for partitioning.
+    description: |
+      Table partition column (day, 1–31). Derived from ts_updated_at. Always filter with year and month.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_privacy_hub_raw.data_subject.updated_at

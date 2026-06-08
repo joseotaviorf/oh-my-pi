@@ -2,73 +2,122 @@
 database_name: datalake_privacy_hub_clean
 table_name: transaction
 domain: Growth
-description: Clean transaction records from the privacy hub containing privacy-related transactions and consent management activities.
+owner: isadora.gallerani@quintoandar.com.br
+description: |
+  Clean layer for privacy consent and data-processing transactions from QuintoAndar's Privacy Hub
+  service (PostgreSQL source: privacy_hub.public.transaction). One row per transaction event — each
+  record captures a privacy-related action such as consent grant/revoke, document acceptance, or
+  purpose status change for a data subject. Join to data_subject via id_data_subject. Used by Growth
+  and governance teams for LGPD consent audit trails, OneTrust migration tracking, and privacy
+  compliance reporting. Part of the privacy_hub DAG (daily CDC ingestion from backend-services
+  Privacy Hub).
 columns:
   id:
-    description: Unique identifier for the transaction record.
+    description: |
+      Primary key of the privacy transaction in Privacy Hub. Uniquely identifies each consent or
+      data-processing event recorded by the service.
     lineage:
       - datalake_privacy_hub_raw.transaction.id
   id_data_subject:
-    description: Identifier of the data subject associated with this transaction.
+    description: |
+      Foreign key to the data subject who is the target of this transaction. Join to
+      datalake_privacy_hub_clean.data_subject via id to retrieve subject profile and consent history.
     lineage:
       - datalake_privacy_hub_raw.transaction.data_subject_id
   id_request:
-    description: Identifier of the request that initiated this transaction.
+    description: |
+      Identifier of the Privacy Hub API request that triggered this transaction, when applicable.
+      Useful for tracing a consent action back to the originating user session or integration call.
     lineage:
       - datalake_privacy_hub_raw.transaction.request_id
   id_operator:
-    description: Identifier of the operator who performed or managed this transaction.
+    description: |
+      Identifier of the operator (internal user or system actor) who performed or authorized the
+      transaction, when recorded by Privacy Hub.
     lineage:
       - datalake_privacy_hub_raw.transaction.operator_id
   origin:
-    description: Origin or source system from which the transaction was initiated.
+    description: |
+      Source system or channel that initiated the transaction (e.g. web app, mobile, batch migration).
+      Indicates where the consent or privacy action originated.
     lineage:
       - datalake_privacy_hub_raw.transaction.origin
   document_alias:
-    description: Alias or reference name for the document associated with this transaction.
+    description: |
+      Alias of the privacy document (e.g. terms of use, privacy policy) associated with this
+      transaction, when the event relates to document acceptance.
     lineage:
       - datalake_privacy_hub_raw.transaction.document_alias
   document_version:
-    description: Version number of the document associated with this transaction.
+    description: |
+      Version of the privacy document accepted or referenced in this transaction. Tracks which
+      policy version the data subject consented to.
     lineage:
       - datalake_privacy_hub_raw.transaction.document_version
   purpose_alias:
-    description: Alias or reference name for the purpose of data processing in this transaction.
+    description: |
+      Alias of the data processing purpose involved in this transaction (e.g. marketing, analytics).
+      Maps to Privacy Hub purpose definitions under LGPD lawful basis tracking.
     lineage:
       - datalake_privacy_hub_raw.transaction.purpose_alias
   purpose_status:
-    description: Status of the purpose processing for this transaction.
+    description: |
+      Consent lifecycle status of the processing purpose after this transaction, when the event
+      updates purpose acceptance. Null when the transaction does not alter purpose consent state.
     lineage:
       - datalake_privacy_hub_raw.transaction.purpose_status
+    categories:
+      ACTIVE: Purpose consent is currently active and valid for processing.
+      EXPIRED: Purpose consent expired and is no longer valid for processing.
+      WITHDRAWN: Data subject explicitly withdrew consent for this purpose.
   type:
-    description: Type or category of the transaction.
+    description: |
+      Transaction type in Privacy Hub. Classifies whether the event is a new opt-in attempt or an
+      update to an existing data subject or consent record.
     lineage:
       - datalake_privacy_hub_raw.transaction.type
+    categories:
+      OPTIN_ATTEMPT: New consent opt-in attempt for a data subject or processing purpose.
+      UPDATE: Update to an existing data subject profile or consent state.
   result:
-    description: Result or outcome of the transaction processing.
+    description: |
+      Outcome of the transaction processing in Privacy Hub (e.g. success, failure). Null or empty when
+      the transaction completed without an explicit result code.
     lineage:
       - datalake_privacy_hub_raw.transaction.result
   custom_attributes:
-    description: Additional custom attributes or metadata associated with the transaction.
+    description: |
+      JSON payload of additional metadata attached to the transaction by the originating system.
+      May contain integration-specific context not mapped to standard Privacy Hub columns.
     lineage:
       - datalake_privacy_hub_raw.transaction.custom_attributes
   ts_created_at:
-    description: Timestamp when the transaction record was first created.
+    description: |
+      Timestamp when the transaction was first recorded in Privacy Hub (created_at in source).
     lineage:
       - datalake_privacy_hub_raw.transaction.created_at
   ts_updated_at:
-    description: Timestamp when the transaction record was last updated.
+    description: |
+      Timestamp when the transaction was last updated in Privacy Hub (updated_at in source). Used as
+      the basis for incremental CDC loads and partition derivation.
     lineage:
       - datalake_privacy_hub_raw.transaction.updated_at
   year:
-    description: Year component extracted from the updated_at timestamp for partitioning.
+    description: |
+      Table partition column (year). Derived from ts_updated_at at clean ingestion. Required in WHERE
+      clauses for partition pruning — always combine with month and day to restrict scans to the
+      smallest date window needed.
     lineage:
       - datalake_privacy_hub_raw.transaction.updated_at
   month:
-    description: Month component extracted from the updated_at timestamp for partitioning.
+    description: |
+      Table partition column (month, 1–12). Derived from ts_updated_at. Must be filtered together with
+      year and day in every query to enable partition pruning.
     lineage:
       - datalake_privacy_hub_raw.transaction.updated_at
   day:
-    description: Day component extracted from the updated_at timestamp for partitioning.
+    description: |
+      Table partition column (day, 1–31). Derived from ts_updated_at. Always filter with year and
+      month. Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_privacy_hub_raw.transaction.updated_at

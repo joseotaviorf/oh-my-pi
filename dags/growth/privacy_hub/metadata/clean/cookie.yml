@@ -2,57 +2,94 @@
 database_name: datalake_privacy_hub_clean
 table_name: cookie
 domain: Growth
-description: Clean cookie data from the privacy hub containing information about cookies defined and managed on websites.
+owner: isadora.gallerani@quintoandar.com.br
+description: |
+  Clean layer for catalogued website cookies managed by QuintoAndar's Privacy Hub service
+  (PostgreSQL source: privacy_hub.public.cookie). One row per cookie instance deployed on a QuintoAndar
+  website, linked to a cookie definition and website registry entry. Tracks category, owner, version,
+  and last detection time for cookie consent banner compliance (LGPD/ePrivacy). Complements
+  intercepted_cookie, which holds pre-catalogue detections. Used by Growth and governance for cookie
+  inventory audits and consent policy management. Part of the privacy_hub DAG (daily CDC).
 columns:
   id:
-    description: Unique identifier for the cookie record.
+    description: |
+      Primary key of the catalogued cookie record in Privacy Hub. Uniquely identifies a cookie
+      instance on a specific website.
     lineage:
       - datalake_privacy_hub_raw.cookie.id
   id_cookie_definition:
-    description: Identifier of the cookie definition that this cookie is based on.
+    description: |
+      Foreign key to the cookie definition template in Privacy Hub that describes the cookie's
+      purpose, vendor, and default classification before site-specific overrides.
     lineage:
       - datalake_privacy_hub_raw.cookie.cookie_definition_id
   id_website:
-    description: Identifier of the website where the cookie is used or deployed.
+    description: |
+      Identifier of the QuintoAndar website where this cookie is deployed. Join key to website
+      registry in Privacy Hub and to intercepted_cookie records for the same site.
     lineage:
       - datalake_privacy_hub_raw.cookie.website_id
   owner_email:
-    description: Email address of the owner or person responsible for managing this cookie.
+    description: |
+      Email of the QuintoAndar team member responsible for maintaining this cookie entry in the
+      Privacy Hub catalogue (PII — internal contact only).
     lineage:
       - datalake_privacy_hub_raw.cookie.owner_email
   version:
-    description: Version number of the cookie record for tracking changes over time.
+    description: |
+      Version number of the cookie record in Privacy Hub. Increments when cookie metadata or
+      classification is updated.
     lineage:
       - datalake_privacy_hub_raw.cookie.version
   category:
-    description: Category or classification of the cookie based on its purpose or functionality.
+    description: |
+      Cookie consent category per Privacy Hub classification. Determines whether explicit user
+      opt-in is required before the cookie is set (ePrivacy/LGPD).
     lineage:
       - datalake_privacy_hub_raw.cookie.category
+    categories:
+      STRICTLY_NECESSARY: Essential cookies required for site operation; no opt-in required.
+      FUNCTIONAL: Cookies that enable enhanced functionality or personalisation.
+      PERFORMANCE: Analytics and performance measurement cookies.
+      TARGETING: Advertising and cross-site tracking cookies; opt-in required.
   is_overwritten:
-    description: Flag indicating whether the cookie configuration has been overwritten from its original definition.
+    description: |
+      Flag indicating whether site-specific settings have overridden the default cookie definition
+      classification or metadata in Privacy Hub.
     lineage:
       - datalake_privacy_hub_raw.cookie.is_overwritten
   ts_last_seen_at:
-    description: Timestamp when the cookie was last detected or seen on the website.
+    description: |
+      Timestamp when the cookie was last detected on the website by Privacy Hub's cookie scanner
+      (last_seen in source). Used to identify stale or removed cookies still in the catalogue.
     lineage:
       - datalake_privacy_hub_raw.cookie.last_seen
   ts_updated_at:
-    description: Timestamp when the cookie record was last updated.
+    description: |
+      Timestamp when the cookie record was last updated in Privacy Hub. Used as the basis for
+      incremental CDC loads and partition derivation.
     lineage:
       - datalake_privacy_hub_raw.cookie.updated_at
   ts_created_at:
-    description: Timestamp when the cookie record was first created.
+    description: |
+      Timestamp when the cookie was first catalogued in Privacy Hub (created_at in source).
     lineage:
       - datalake_privacy_hub_raw.cookie.created_at
   year:
-    description: Year component extracted from the updated_at timestamp for partitioning.
+    description: |
+      Table partition column (year). Derived from ts_updated_at at clean ingestion. Required in WHERE
+      clauses for partition pruning — always combine with month and day.
     lineage:
       - datalake_privacy_hub_raw.cookie.updated_at
   month:
-    description: Month component extracted from the updated_at timestamp for partitioning.
+    description: |
+      Table partition column (month, 1–12). Derived from ts_updated_at. Must be filtered together with
+      year and day in every query to enable partition pruning.
     lineage:
       - datalake_privacy_hub_raw.cookie.updated_at
   day:
-    description: Day component extracted from the updated_at timestamp for partitioning.
+    description: |
+      Table partition column (day, 1–31). Derived from ts_updated_at. Always filter with year and month.
+      Example: WHERE year = 2026 AND month = 6 AND day BETWEEN 1 AND 7.
     lineage:
       - datalake_privacy_hub_raw.cookie.updated_at
