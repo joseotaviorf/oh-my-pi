@@ -1,4 +1,18 @@
 WITH
+  auto_pricing_annotations AS (
+    SELECT
+      an.uuid_inspection,
+      an.value AS auto_pricing_result,
+      ROW_NUMBER() OVER (
+        PARTITION BY an.uuid_inspection
+        ORDER BY an.ts_created DESC
+      ) AS rni_pricing
+    FROM
+      datalake_inspection_services_clean.annotation AS an
+    WHERE
+      an.key = 'automatic-repair-pricing'
+      AND an.ts_created >= TIMESTAMP '2026-05-18 00:00:00 UTC'
+  ),
   inspections AS (
     SELECT 
       -- Ids:
@@ -12,6 +26,7 @@ WITH
       di.status AS inspection_status,
       CAST(di.repair_request_ai_flow AS BOOLEAN) AS is_automated_ar,
       di.ai_repair_analysis_control_group AS automation_group,
+      ap.auto_pricing_result,
       --Values:
       fri.total_cost,
       -- Flags: 
@@ -59,6 +74,10 @@ WITH
 			datalake_inspection_services_clean.annotation AS an 
 				ON fi.sk_client_side = an.uuid_inspection
 					AND an.key = 'single-clear-journey'
+    LEFT JOIN
+      auto_pricing_annotations AS ap
+        ON fi.sk_client_side = ap.uuid_inspection
+        AND ap.rni_pricing = 1
     WHERE TRUE
       AND di.inspection_type = 'offboarding'
   )
@@ -77,6 +96,14 @@ SELECT DISTINCT
     dc.rent >= 2500 AS is_high_value,
     ft.is_exit_inspection_opt_out,
     i.is_automated_ar,
+    CASE
+        WHEN COALESCE(ft.total_tentant_repair_ar, 0) = 0
+            THEN TRUE
+        WHEN COALESCE(i.is_automated_ar, FALSE)
+         AND i.auto_pricing_result = 'success'
+            THEN TRUE
+        ELSE FALSE
+    END AS no_human_ar,
     --Values:
     dc.rent AS rent_value,
     ft.fee_final_amount,

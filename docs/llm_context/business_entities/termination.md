@@ -28,7 +28,7 @@ Not all terminations follow every step. Some are canceled before completion, som
 | You need... | Use this table |
 |-------------|----------------|
 | Termination data (status, fees, dates, flags) | `dw_offboarding.fact_terminations` (`ft`) + `dim_termination` (`dt`) |
-| Termination + inspection + repairs + report + mediation + discounts (cross-entity) | `dw_offboarding.obt_offboarding` (`obt`) — everything pre-joined, no manual JOINs needed. Already filters out canceled terminations. Covers: termination status/dates/fees, inspection execution, report access and approval flags by stage (review + budget approval) for both tenant and owner, repair counts by stage, repair costs, mediation, agreement, discounts/bandaid, leadtimes. When unsure about specific columns, search the repo for the SQL that builds this table. |
+| Termination + inspection + repairs + report + mediation + discounts (cross-entity) | `dw_offboarding.obt_offboarding` (`obt`) — everything pre-joined, no manual JOINs needed. Already filters out canceled terminations. Covers: termination status/dates/fees, inspection execution, report access and approval flags by stage (review + budget approval) for both tenant and owner, repair counts by stage, repair costs, mediation, agreement, discounts/bandaid, Kirk automation flags (`is_automated_ar`, `automation_group`, `no_human_ar`), leadtimes. When unsure about specific columns, search the repo for the SQL that builds this table. |
 | Relisting / rerental after termination | `dw_offboarding.fact_house_listing_terminations` (`fhlt`) — **Relisting** (property relisted): `sk_next_house_listing_consolidated <> -1`. **Rerental** (new contract signed): `sk_next_contract <> -1`. Leadtime: `days_termination_to_contract_signed`. These are stages of the same funnel: relisting is the listing event, rerental is the conversion. |
 | Enriched termination source data | `datalake_terminator.termination` (enrich — source for `fact_terminations`) |
 | Mediation details (squad, resolution) | `datalake_offboarding.mediations` (enrich) |
@@ -49,6 +49,7 @@ Not all terminations follow every step. Some are canceled before completion, som
 - Terminations with tenant repairs (`has_repairs`)
 - Relisting rate (`is_relisting`)
 - End-to-end leadtime (`leadtime_total` in `obt_offboarding`)
+- No-human AR rate (`no_human_ar` in `obt_offboarding`) — share of terminations whose repair analysis required no human intervention
 
 ## Relationships with Other Entities
 
@@ -90,6 +91,7 @@ JOIN via `ft.sk_contract` to `dw_rent.dim_contract` (`dc`) or `dw_rent.dim_contr
 - Don't treat every recorded termination as effective — always consider the status
 - Don't confuse repair columns by stage: `total_tentant_repair_ar` (AR), `total_tentant_repair_review` (Review), `total_tentant_repair_ac` (AC)
 - Don't JOIN with `fact_inspection` without applying CAST and Dedup rules — see Inspection entity
+- Don't use `fact_terminations.has_automatic_repair_analysis` or `is_automatic_repair_analysis_opted_out` for analysis — they currently have no analytical value and are kept only for potential future use
 
 ## Golden Queries
 

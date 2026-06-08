@@ -77,22 +77,33 @@ columns:
   ai_processing_failure_reason:
     lineage:
       - datalake_inspections.inspection_booking.ai_processing_failure_reason
-    description: Indicates the reason why Kirk failed to process the request. This column is only populated when a failure occurs.
+    description: |
+      Reason why Kirk failed to automatically create the repair report for this inspection.
+      Populated only when a failure occurs. Covers repair report creation only; repair
+      pricing automation is not included.
   repair_request_ai_flow:
     lineage:
       - datalake_inspections.inspection_booking.repair_request_ai_flow
-    description: Boolean flag indicating whether the AI flow succeeded.
+    description: |
+      Boolean flag indicating whether Kirk — QuintoAndar's AI system — successfully completed
+      the automatic repair report creation flow for this inspection, identifying repair
+      requests from inspection photos. Covers repair report creation only; repair pricing
+      automation is not included.
   ai_repair_analysis_control_group:
     lineage:
       - datalake_inspections.inspection_booking.ai_repair_analysis_control_group
-    description:
-      Boolean flag indicating whether the assessment belongs to the Control Group. 
-      If TRUE, the case passed the eligibility criteria for its current wave but was 
-      not processed by Kirk.
+    description: |
+      Boolean flag indicating whether this inspection belongs to the Kirk control group for
+      automatic repair report creation. TRUE means the inspection met Kirk eligibility
+      criteria for its rollout wave but was deliberately excluded for A/B comparison. Covers
+      repair report creation only; repair pricing automation is not included.
   ai_repair_analysis_wave_name:
     lineage:
       - datalake_inspections.inspection_booking.ai_repair_analysis_wave_name
-    description: Specifies the rollout wave of the Kirk launch. Possible values are Shadow Mode, Wave 1, Wave 2, Wave 3, Wave 4.
+    description: |
+      Kirk rollout wave during which this inspection was processed for automatic repair report
+      creation. Possible values: Shadow Mode, Wave 1, Wave 2, Wave 3, Wave 4. Covers repair
+      report creation only; repair pricing automation is not included.
   is_d0_canceled:
     description: Indicates that the inspection was canceled by the inspector on the scheduled day.
     lineage:

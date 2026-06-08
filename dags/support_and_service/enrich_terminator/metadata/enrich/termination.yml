@@ -176,11 +176,17 @@ columns:
   has_automatic_repair_analysis:
     lineage:
       - datalake_terminator_clean.termination_characteristics.has_automatic_repair_analysis
-    description: This field indicates whether the termination will go through the automated flow.
+    description: |
+      Boolean flag related to the termination's automatic repair analysis routing. It should
+      not be used for analytical purposes, but it is preserved in case it becomes useful in
+      the future.
   is_automatic_repair_analysis_opted_out:
     lineage:
       - datalake_terminator_clean.termination_characteristics.is_automatic_repair_analysis_opted_out
-    description: Indicates whether the automatic repair analysis process should not be performed even if the eligibility criteria have been met.
+    description: |
+      Boolean flag related to opting out of the termination's automatic repair analysis. It
+      should not be used for analytical purposes, but it is preserved in case it becomes useful
+      in the future.
   has_bandaid:
     description: Indicates whether the contract had a bandaid (discount_reviewed_value > 0).
     lineage:

@@ -44,7 +44,11 @@ columns:
   ts_automatic_repair_processing:
     lineage:
       - datalake_inspection_services_clean.inspection_aud.ts_updated
-    description: Timestamp. Inspection at the automatic repair identification stage [offboarding]
+    description: |
+      Timestamp when the tag-based automatic repair identification process started for
+      this inspection [offboarding]. In this flow, repair requests are automatically drafted
+      from tags marked by inspectors — it predates Kirk and is unrelated to Kirk's AI-based
+      report creation and to repair pricing automation.
   ts_sent_to_repair_analysis:
     lineage:
       - datalake_inspection_services_clean.inspection_aud.ts_updated

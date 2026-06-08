@@ -104,11 +104,17 @@ columns:
   has_automatically_identified:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.automatically_identified
-    description: Boalean type information that indicates whether the repair was generated automatically.
+    description: |
+      Boolean indicating whether this repair request was automatically drafted from inspector
+      tags (tag-based flow). This flow predates Kirk and is unrelated to Kirk's
+      AI-based repair report creation and to repair pricing automation.
   has_automatic_identification_accepted:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.automatic_identification_accepted
-    description: Boalean type information that indicates whether the automatically generated repair was accepted.
+    description: |
+      Boolean indicating whether the automatically drafted repair request (from the
+      tag-based flow) was accepted. This flow predates Kirk and is unrelated to Kirk's
+      AI-based repair report creation and to repair pricing automation.
   mod_id_reviewer:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.reviewer_id_mod
@@ -204,11 +210,11 @@ columns:
   mod_has_automatically_identified:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.automatically_identified_mod
-    description: Indicates if the has_automatically_identified field has been changed
+    description: Indicates whether the has_automatically_identified field (tag-based flow) has been modified since the original record was created.
   mod_has_automatic_identification_accepted:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.automatic_identification_accepted_mod
-    description: Indicates if the has_automatic_identification_accepted field has been changed
+    description: Indicates whether the has_automatic_identification_accepted field (tag-based flow) has been modified since the original record was created.
   mod_ts_exempted:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.exempted_at_mod

@@ -5,7 +5,7 @@
 A repair is a request to fix, clean, remove, or replace an item in a rental property. Repairs happen in two distinct contexts: **offboarding repairs** arise from the exit inspection (vistoria de saída) when damages or differences are found, and **ongoing repairs** are maintenance issues reported by the tenant during the active rental contract. Entry inspections (vistoria de entrada) do not generate repairs — they only document item conditions as a baseline for future comparison.
 
 **Offboarding repairs** follow this lifecycle:
-1. **Identification** — during the exit inspection, the inspector (or an automated system) identifies damages and creates repair requests (`fact_repair_request.ts_created`)
+1. **Identification** — during the exit inspection, damages are identified and repair requests created by the inspector or by an automated path: the **Kirk AI system** (automatic laudo creation) or an older tag-based flow (`has_automatically_identified` / `has_automatic_identification_accepted` in `fact_repair_request`, distinct from Kirk). (`fact_repair_request.ts_created`)
 2. **Repair Analysis (AR)** — repairs are assessed, costs estimated, and responsibility assigned (`dim_repair_request.cost`, `dim_repair_request.responsibility`)
 3. **Review (1st review)** — tenant and owner review the repair list; either party may contest items (`fact_repair_request.has_tenant_contestation`)
 4. **Contestation Analysis (AC)** — if contested, a team analyzes the dispute (`fact_contestation`)
@@ -27,6 +27,7 @@ Not all repairs follow every step. Offboarding repairs may be exempted early, ag
 - **Reparo de saída**, **reparo de offboarding** → offboarding repair. Tables: `dw_inspections.fact_repair_request` + `dim_repair_request`
 - **Reparo ongoing**, **reparo de manutenção** → ongoing repair during active contract. Tables: `dw_repairs.fact_ongoing_repairs` + `dim_ongoing_repairs`
 - **AR** (análise de reparos) → Automatic Repair Analysis stage of the offboarding inspection report
+- **Precificação automática de reparos** → automation that prices the repairs in the offboarding laudo. Conceptually part of the **same Kirk project** (a test of what Kirk will eventually cover); separate from Kirk's laudo creation only in the data (different sources). Underlies `obt_offboarding.no_human_ar`; not yet a standalone column. See Inspection entity.
 - **AC** (análise de contestação) → Contestation Analysis stage, when tenant disputes repair items
 - **Contestação** → formal dispute of a repair item by tenant or owner. Table: `dw_inspections.fact_contestation`
 - **Isenção** (exemption) → owner or analyst exempts a repair, removing it from the tenant's responsibility. Table: `dw_inspections.dim_repair_exempted`

@@ -71,11 +71,17 @@ columns:
   has_automatic_repair_analysis:
     lineage:
       - datalake_terminator_raw.termination_characteristics.automatic_repair_analysis
-    description: This field indicates whether the termination will go through the automated flow.
+    description: |
+      Boolean flag related to the termination's automatic repair analysis routing. It should
+      not be used for analytical purposes, but it is preserved in case it becomes useful in
+      the future.
   is_automatic_repair_analysis_opted_out:
     lineage:
       - datalake_terminator_raw.termination_characteristics.automatic_repair_analysis_opted_out
-    description: Indicates whether the automatic repair analysis process should not be performed even if the eligibility criteria have been met.
+    description: |
+      Boolean flag related to opting out of the termination's automatic repair analysis. It
+      should not be used for analytical purposes, but it is preserved in case it becomes useful
+      in the future.
   ts_created:
     lineage:
       - datalake_terminator_raw.termination_characteristics.created_at
@@ -84,3 +90,15 @@ columns:
     lineage:
       - datalake_terminator_raw.termination_characteristics.updated_at
     description: The update timestamp of the termination characteristics.
+  year:
+    lineage:
+      - datalake_terminator_raw.termination_characteristics.year
+    description: Partition column representing the year the record was created.
+  month:
+    lineage:
+      - datalake_terminator_raw.termination_characteristics.month
+    description: Partition column representing the month the record was created.
+  day:
+    lineage:
+      - datalake_terminator_raw.termination_characteristics.day
+    description: Partition column representing the day the record was created.

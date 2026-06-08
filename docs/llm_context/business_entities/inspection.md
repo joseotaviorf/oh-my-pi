@@ -14,7 +14,7 @@ There are two types, determined by the `inspection_type` column in `dim_inspecti
 The lifecycle of an exit inspection typically follows these stages:
 1. **Scheduling** — an appointment is created for the inspection (`fact_inspection.ts_booking_created`)
 2. **Execution** — the inspector visits the property and documents its condition (`fact_inspection.ts_inspected`)
-3. **Repair analysis (AR)** — damages are identified and repair requests are generated via the **Kirk AI system** (automatic) or by a human editing team (manual). Both paths can coexist: an inspection may pass through the automatic AI processing stage (`ts_automatic_repair_processing`) and then also go through manual editing (`ts_sent_to_inspection_editing`) — these timestamps are **not mutually exclusive**. (`fact_report_inspections.ts_sent_to_repair_analysis`)
+3. **Repair analysis (AR)** — damages are identified and repair requests are generated via the **Kirk AI system** (automatic laudo creation) or by a human editing team (manual). A separate, older **tag-based identification flow** also exists, tracked by `ts_automatic_repair_processing`: it drafts repairs from inspector tags, predates Kirk, and is **unrelated to Kirk** (and to automatic repair pricing). Manual editing is tracked by `ts_sent_to_inspection_editing`; these timestamps are **not mutually exclusive**. The AR stage start is `fact_report_inspections.ts_sent_to_repair_analysis`.
 4. **Owner and tenant review (1st review)** — both parties see the report for the first time and may agree or contest items. Each party has separate access and approval tracking: `has_*_access_review` (opened the link) vs `has_*_approved_review` (clicked approve).
 5. **Contestation analysis (AC)** — if the tenant contests, a dedicated team analyzes the dispute (`fact_report_inspections.ts_sent_to_contestation_analysis`)
 6. **Budget approval (2nd review)** — after contestation (if any), a final budget is presented to both parties. Same access/approval pattern: `has_*_access_budget_approval` vs `has_*_approved_budget_approval`.
@@ -33,10 +33,13 @@ Not all inspections go through every stage. Entry inspections (onboarding) are s
 - **AC** (analise de contestacao) → Contestation Analysis stage. Columns with `_ac` suffix.
 - **VT** (vistoria tecnica) → the technical inspection execution moment.
 - **Laudo** (laudo de reparos, repair report) → the repair report. Table: `fact_report_inspections`.
-- **Kirk** → QuintoAndar's AI system that automatically identifies repair requests from inspection photos. Synonyms: IA de reparos, análise automática de reparos, fluxo automático do laudo, fluxo automático de criação do laudo.
+- **Kirk** → QuintoAndar's AI project for automating the repair laudo. Today Kirk automatically identifies repair requests from inspection photos to **create the laudo**; automatic repair pricing is **not yet part of what Kirk does in production** — it is an upcoming capability of the same project, currently running as a separate test (see below). So, for now, treat "Kirk" as laudo creation only. Synonyms: IA de reparos, análise automática de reparos, fluxo automático do laudo, fluxo automático de criação do laudo.
 - **Fluxo automático do laudo / laudo automático** → inspection where Kirk successfully generated repair requests.
 - **Grupo controle (Kirk)** → inspection that was eligible for Kirk processing but deliberately excluded for A/B comparison.
 - **Wave (Kirk)** → rollout phase of Kirk. Values: `'Shadow Mode'`, `'Wave 1'`, `'Wave 2'`, `'Wave 3'`, `'Wave 4'`.
+- **Precificação automática de reparos / automatic repair pricing** → automatically prices the repairs in the laudo. Conceptually part of the **same Kirk project** — it is a test/pilot of what Kirk will eventually cover; for now Kirk only **creates** the laudo and pricing is not included in production. The two are separate **only in the data** (different sources): pricing is tracked via the `automatic-repair-pricing` annotation (rollout 2026-05-18; values `success` / `failed`), not exposed as its own column yet — it underlies `obt_offboarding.no_human_ar`.
+- **AR sem intervenção humana / no human AR** → `obt_offboarding.no_human_ar`. Boolean: TRUE when the repair analysis required no human intervention.
+- **Fluxo de identificação por tags (legado)** → older automatic flow that drafts repair requests from inspector tags (`ts_automatic_repair_processing`, `has_automatically_identified`). Predates Kirk and is unrelated to it and to automatic repair pricing.
 
 ## Tables
 
@@ -53,7 +56,7 @@ Not all inspections go through every stage. Entry inspections (onboarding) are s
 | Automatic discount details | `datalake_inspections.automatic_discounts` (enrich) — JOIN via `fi.sk_client_side = ad.uuid_inspection` |
 | Repair cost at a specific stage (temporal) | `datalake_inspection_services_clean.repair_request_history` (clean) — tracks `cost` per repair over time with `origin` indicating the stage. Only source for per-stage monetary values. |
 | Assessment data | `dw_inspections.dim_assessment` — JOIN via `fi.sk_assessment` |
-| Kirk AI flow flags (automatic laudo creation, control group, wave) — **preferred for exit inspections** | `dw_offboarding.obt_offboarding` — already pre-joined. Columns: `is_automated_ar` (boolean, already cast — Kirk succeeded), `automation_group` (varchar — `TRY_CAST AS BOOLEAN` to filter control group). Use when the analysis is scoped to exit inspections tied to a termination (the most common case). |
+| Kirk AI flow flags (automatic laudo creation, control group, wave) — **preferred for exit inspections** | `dw_offboarding.obt_offboarding` — already pre-joined. Columns: `is_automated_ar` (boolean, already cast — Kirk succeeded), `automation_group` (varchar — `TRY_CAST AS BOOLEAN` to filter control group), `no_human_ar` (boolean — repair analysis required no human intervention). Use when the analysis is scoped to exit inspections tied to a termination (the most common case). |
 | Kirk AI flow flags — **when obt is not appropriate** (all exit inspections, not just terminated ones) | `dw_inspections.dim_inspection` (DW) — JOIN already needed for `inspection_type` filter. Columns: `repair_request_ai_flow` (varchar bool), `ai_repair_analysis_control_group` (varchar bool), `ai_repair_analysis_wave_name`, `ai_processing_failure_reason`. Use `TRY_CAST(col AS BOOLEAN) = TRUE`. Lineage: `datalake_inspections.inspection_booking`. |
 
 **Critical rules:**
@@ -84,6 +87,7 @@ Most inspection-related metrics are anchored to the **Termination** entity, not 
 **Kirk / automatic laudo metrics:**
 - Kirk adoption rate — `COUNT_IF(is_automated_ar) / COUNT(*)` from `dw_offboarding.obt_offboarding` 
 - Agreement rate by laudo flow type — `COUNT_IF(has_agreement) / COUNT(*)` per `fluxo_laudo` group from `obt_offboarding`. Use `has_agreement` as the primary signal (combines early, late, and discount agreements). See Golden Query 4 for the full breakdown.
+- No-human AR rate — `COUNT_IF(no_human_ar) / COUNT(*)` from `dw_offboarding.obt_offboarding`. Share of terminations whose repair analysis required no human intervention (no tenant AR repairs, or Kirk repairs with successful automatic pricing).
 
 ## Relationships with Other Entities
 
@@ -133,7 +137,8 @@ An inspection is linked to one house: `fi.sk_house`.
 - Don't treat "owner contestation" as a formal contestation — it refers to additional repairs requested by the landlord; owner contestation is disabled
 - Don't confuse inspection (vistoria — technical assessment) with visit (visita — prospective tenant viewing)
 - Don't confuse repair **counts** per stage (`total_tentant_repair_ar`, `_review`, `_ac`) with monetary values — these are counts, not costs. `fact_report_inspections.total_cost` and `obt_offboarding.final_tenant_inspection_cost` are the **final** report cost, not per-stage. For monetary value at a specific stage (e.g., AR exit), use `datalake_inspection_services_clean.repair_request_history` — it tracks `cost` per repair over time with an `origin` column indicating the stage
-- **Don't use `ts_automatic_repair_processing` for Kirk-related analyses** — this field tracks a separate process unrelated to Kirk. It is not a proxy for the automatic laudo flow. Use `is_automated_ar` (in `obt_offboarding`) or `repair_request_ai_flow` (in `dim_inspection`) instead.
+- **Don't use `ts_automatic_repair_processing` for Kirk-related analyses** — this field tracks a separate tag-based identification process unrelated to Kirk (and unrelated to automatic repair pricing). It is not a proxy for the automatic laudo flow. Use `is_automated_ar` (in `obt_offboarding`) or `repair_request_ai_flow` (in `dim_inspection`) instead.
+- **Don't read `no_human_ar = TRUE` as "Kirk priced it automatically"** — TRUE also includes terminations with **no tenant AR repairs at all** (nothing to review). `FALSE` means repairs still required human handling: repairs outside the Kirk flow, or Kirk repairs without a successful automatic pricing. It is not a Kirk-vs-control flag — for the A/B split use `is_automated_ar` vs `automation_group`.
 - Don't compare `repair_request_ai_flow = TRUE` against `sem_dados_kirk` (inspections with no Kirk data) as the primary comparison — the `sem_dados_kirk` group contains older inspections that predate Kirk rollout, creating a confounding time effect. Prefer comparing against `ai_repair_analysis_control_group = TRUE` (same eligibility, A/B controlled).
 
 ## Golden Queries
