@@ -69,7 +69,7 @@ Detailed definitions for every column, metric, and flag are maintained in DataHu
 | `fact_absence_requests` | One row per PIN absence submission (Latest state for that submission) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_absence_requests,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_absence_requests.sql) |
 | `fact_employee_hourly_cost_windows` | One row per salary-rate segment per employee | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_employee_hourly_cost_windows,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_employee_hourly_cost_windows.sql) |
 | `fact_employee_punches` | One row per punch-clock event (id_punch) for an employee | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_employee_punches,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_employee_punches.sql) |
-| `fact_hours_bank_rule_totals` | One row per employee and date (Tied to an hourly-bank bucket) | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_hours_bank_rule_totals,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_hours_bank_rule_totals.sql) |
+| `fact_hours_bank_rule_totals` | One row per employee, date, and hourly-bank bucket, with closed/open balance status | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_hours_bank_rule_totals,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_hours_bank_rule_totals.sql) |
 | `fact_time_attendance_requests` | One row per time request | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_time_attendance_requests,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_time_attendance_requests.sql) |
 | `fact_vacation_balances` | One row per employee vacation period | [DataHub](https://datahub.apps.data-prd.habitat.zone/dataset/urn:li:dataset:(urn:li:dataPlatform:trino,hive.dw_time.fact_vacation_balances,PROD)/Schema) · [SQL](https://github.com/quintoandar/bi-etl-ejuice/blob/master/dags/people/dw_time/queries/dw/fact_vacation_balances.sql) |
 
@@ -91,7 +91,7 @@ Detailed definitions for every column, metric, and flag are maintained in DataHu
 
 * **Time catalog** : Each row is one subtype from the Oitchau catalog regarding why a workforce-time request is opened, including labels plus policy-oriented defaults (paid subtype, hourly-bank treatment, weekly-rest discount, active versus retired menu items).
 
-* **Hourly-bank balance line** : Each row is one employee on a calendar balance date within one hourly-bank bucket.
+* **Hourly-bank balance line** : Each row is one employee on a calendar balance date within one hourly-bank bucket. The `is_closed` boolean separates official closed balances (`true`) from open current-period balances (`false`) that can still receive adjustments.
 
 * **Punch event** : Each row is one punch-clock event (entry, break, exit, manual adjustment) registered for an employee on a calendar day with the channel where the punch was created, validation outcome, and creator audit attributes.
 
@@ -172,7 +172,8 @@ LEFT JOIN
     dw_time.dim_hours_bank_rule AS rules
         ON bal.sk_hours_bank_rule = rules.sk_hours_bank_rule
 WHERE
-    bal.dt_hours_bank_balanced BETWEEN ADD_MONTHS(CURRENT_DATE(), -1)
+    bal.is_closed = TRUE
+    AND bal.dt_hours_bank_balanced BETWEEN ADD_MONTHS(CURRENT_DATE(), -1)
         AND DATE_SUB(CURRENT_DATE(), 1)
 LIMIT 100
 ```

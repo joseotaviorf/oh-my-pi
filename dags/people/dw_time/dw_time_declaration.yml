@@ -8,8 +8,8 @@ dag:
       People Data Warehouse schema dw_time for workforce time and attendance analytics. Covers Oitchau integration
       (hours-bank balances, operational request lines, hourly cost windows) and Oracle HCM PIN absence models
       (dim_absence_type, fact_absence_requests, fact_vacation_balances). Dimensions include hours-bank rule slices,
-      request subtypes, and absence type reference; facts expose balances, approval workflows, vacation balances,
-      and optional estimated cost on fact_hours_bank_rule_totals.
+      request subtypes, and absence type reference; facts expose open and closed balances, approval workflows,
+      vacation balances, and optional estimated cost on fact_hours_bank_rule_totals.
 
 workflow:
   type: query_delta
@@ -42,6 +42,9 @@ workflow:
       vacuum_retention_hours: 168
       vacuum_lite: true
     fact_hours_bank_rule_totals:
+      z_order_by:
+        - sk_employee
+        - dt_hours_bank_balanced
       vacuum_retention_hours: 168
       vacuum_lite: true
     fact_employee_hourly_cost_windows:

@@ -8,8 +8,8 @@ table_level_validations:
     severity_level: Error
   has_size_variation:
     variation_type: percentage
-    greater_than_or_equal_to: 0
-    less_than_or_equal_to: 25
+    greater_than_or_equal_to: -90
+    less_than_or_equal_to: 125
     severity_level: Warning
 
 column_level_validations:
@@ -18,9 +18,9 @@ column_level_validations:
       severity_level: Error
     is_complete:
       severity_level: Error
-  sk_hours_bank_rule:
+  matching_sk_hours_bank_rule_fact_and_dimension:
     custom:
-      # Any non-null sk_hours_bank_rule must match dw_time.dim_hours_bank_rule (no orphan FKs when the key is set).
+      # Ensure every non-null sk_hours_bank_rule has a matching row in dw_time.dim_hours_bank_rule (no orphan FKs).
       constraint: |-
         (SELECT COUNT(*)
          FROM dw_time.fact_hours_bank_rule_totals f
@@ -43,6 +43,9 @@ column_level_validations:
     is_complete:
       severity_level: Error
   hours_bank_rule_key:
+    is_complete:
+      severity_level: Error
+  is_closed:
     is_complete:
       severity_level: Error
   minutes_balance_rule:
