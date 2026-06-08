@@ -1,5 +1,5 @@
 cluster:
-  type: consolidation_xs_general_cluster
+  type: consolidation_m_memory_single_node_cluster
   databricks_conn_id: databricks_new_env
   custom_configurations:
     single_user_name: '{{ var.value.databricks_single_user_name }}'
@@ -7,9 +7,3 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-validation:
-  cluster:
-    type: consolidation_m_memory_single_node_cluster
-    databricks_conn_id: databricks_new_env
-    custom_configurations:
-      spark_version: 12.2.x-scala2.12

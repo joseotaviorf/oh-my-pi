@@ -1,5 +1,5 @@
 cluster:
-  type: consolidation_l_memory_cluster
+  type: consolidation_xl_memory_single_node_cluster
   databricks_conn_id: databricks_new
   custom_libraries:
   - jar: '{artifacts_bucket}/jars/ojdbc8.jar'
@@ -10,10 +10,3 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-validation:
-  cluster:
-    type: consolidation_xl_memory_single_node_cluster
-    databricks_conn_id: databricks_new
-    custom_libraries:
-    - jar: '{artifacts_bucket}/jars/ojdbc8.jar'
-  allow_custom_spark_job: true

@@ -1,5 +1,5 @@
 cluster:
-  type: consolidation_m_compute_cluster
+  type: consolidation_xs_memory_cluster
   databricks_conn_id: databricks_new
   custom_configurations:
     autotermination_minutes: 20
@@ -17,14 +17,3 @@ cluster:
     data_security_mode: SINGLE_USER
     spark_conf:
       spark.databricks.sql.initial.catalog.namespace: quintoandar_{{ var.value.environment }}
-validation:
-  cluster:
-    type: consolidation_xs_memory_cluster
-    databricks_conn_id: databricks_new
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-        instance_profile_arn: '{{ var.value.instance_profile_secret_arn_reverse_listings_report }}'
-      num_workers: 6
-      driver_node_type_id: r6g.2xlarge
-  allow_custom_spark_job: true

@@ -1,7 +1,3 @@
 cluster:
-  type: consolidation_l_general_single_node_cluster
+  type: consolidation_l_memory_single_node_cluster
   databricks_conn_id: databricks_new
-validation:
-  cluster:
-    type: consolidation_l_memory_single_node_cluster
-    databricks_conn_id: databricks_new

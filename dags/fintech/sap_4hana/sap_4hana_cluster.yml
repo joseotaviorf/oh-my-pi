@@ -1,5 +1,5 @@
 cluster:
-  type: consolidation_m_memory_cluster
+  type: consolidation_l_memory_single_node_cluster
   databricks_conn_id: databricks_new
   access_control_list:
     group_name: analytics-engineers
@@ -14,16 +14,3 @@ cluster:
     aws_attributes:
       ebs_volume_size: 200
     num_workers: 3
-validation:
-  cluster:
-    type: consolidation_l_memory_single_node_cluster
-    databricks_conn_id: databricks_new
-    access_control_list:
-      group_name: analytics-engineers
-      permission_level: CAN_MANAGE
-    custom_libraries:
-    - whl: '{artifacts_bucket}/sap-4hana-api-client-python/quintoandar_sap_4hana_api_client-0.1.0-py2.py3-none-any.whl'
-    custom_configurations:
-      aws_attributes:
-        ebs_volume_size: 200
-  allow_custom_spark_job: true
