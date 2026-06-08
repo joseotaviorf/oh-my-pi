@@ -75,7 +75,7 @@ salesforce AS (
     CAST(c.id_contract AS INT) AS id_contract_ticket,
     CAST(c.ts_created AS DATE) AS day_ticket_started,
     CASE WHEN rt.record_type_name IN ('Mediação') AND c.omni_channel_queue NOT IN ('Squad 7 - Mediação') THEN 'mediacao' 
-         WHEN rt.record_type_name IN ('Reagendamento de Vistoria') THEN 'Agendamento Vistoria' ELSE NULL END AS tipo_ticket
+         WHEN rt.record_type_name IN ('Reagendamento de Vistoria') THEN 'Reagendamento de Vistoria' ELSE NULL END AS tipo_ticket
   FROM datalake_salesforce_clean.cases AS c
   INNER JOIN datalake_salesforce_clean.record_types AS rt
      ON rt.id_record_type = c.id_record_type
@@ -182,7 +182,8 @@ agendamento_vistoria AS (
 final_with_counts AS (
   SELECT
     t.*,
-    CASE WHEN qtd_agendamento IS NOT NULL AND f.tipo_ticket = 'Agendamento Vistoria' THEN NULL ELSE f.tipo_ticket END tipo_ticket
+    CASE WHEN qtd_agendamento IS NOT NULL AND f.tipo_ticket = 'Agendamento Vistoria' THEN NULL ELSE f.tipo_ticket END tipo_ticket,
+    f.id_ticket
   FROM terminator t
   LEFT JOIN final f
     ON t.id_contract = f.id_contract
@@ -207,6 +208,7 @@ SELECT DISTINCT
   team,
   prediction,
   probability,
+  id_ticket,
   CASE WHEN tipo_ticket = 'Agendamento Vistoria' THEN 'Reagendamento de Vistoria' ELSE tipo_ticket END AS tipo_ticket,
   ts_created,
   ts_log

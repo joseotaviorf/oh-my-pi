@@ -41,6 +41,13 @@ columns:
     description: Model probability from the Emlio output JSON.
     lineage:
       - datalake_emlio_clean.emlio_logs.outputs
+  id_ticket:
+    description: >
+      Support ticket or Salesforce case identifier matched to the offboarding
+      contract timeline for model evaluation.
+    lineage:
+      - dw_customer_support.fact_tickets.sk_ticket
+      - datalake_salesforce_clean.cases.case_number
   tipo_ticket:
     description: >
       Support contact bucket matched to the contract timeline (front, escalated back,
