@@ -19,6 +19,20 @@
       "keywords": ["trino", "data-analysis", "sql", "quintoandar", "bi"],
       "category": "data-analysis",
       "tags": ["trino", "analytics", "sql", "data"]
+    },
+    {
+      "name": "unstable-srat",
+      "source": "./plugins/unstable-srat",
+      "description": "Plugin de exemplo. Disponibiliza o comando /unstable-srat que responde 'hello world'.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Data Engineering"
+      },
+      "homepage": "https://github.com/quintoandar/bi-etl-ejuice/tree/main/plugins/unstable-srat",
+      "repository": "https://github.com/quintoandar/bi-etl-ejuice",
+      "keywords": ["example", "hello-world", "quintoandar", "bi"],
+      "category": "example",
+      "tags": ["example", "hello-world"]
     }
   ]
 }
