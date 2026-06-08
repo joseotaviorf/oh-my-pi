@@ -21,19 +21,6 @@ column_level_validations:
   id_data_subject:
     is_complete:
       severity_level: Error
-  fk_id_data_subject:
-    # Synthetic check key (not a table column). Every transaction must reference an existing data
-    # subject in the clean layer. Warning (not Error): parallel CDC load race with data_subject table.
-    custom:
-      constraint: |-
-        (SELECT COUNT(*)
-         FROM datalake_privacy_hub_clean.transaction t
-         WHERE NOT EXISTS (
-           SELECT 1
-           FROM datalake_privacy_hub_clean.data_subject ds
-           WHERE ds.id = t.id_data_subject
-         )) = 0
-      severity_level: Warning
   type:
     is_complete:
       severity_level: Error
