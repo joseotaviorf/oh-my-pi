@@ -55,18 +55,22 @@ columns:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.comment
     description: Commentary detailing the repair needed
+  exempted_by:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_aud.exempted_by
+    description: Identifier of the reviewer who exempted the repair request.
   repair_service:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.repair_service
-    description: ""
+    description: Service category or provider responsible for executing the repair.
   title:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.title
-    description: ""
+    description: Short title summarizing the repair request.
   cost:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.cost
-    description: ""
+    description: Cost amount associated with the repair request.
   rev:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.rev
@@ -100,7 +104,7 @@ columns:
   is_finished:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.finished
-    description: ""
+    description: Indicates whether the repair request has been finished.
   has_automatically_identified:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.automatically_identified
@@ -231,6 +235,10 @@ columns:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.updated_at_mod
     description: Indicates if the ts_updated field has been changed
+  ts_exempted:
+    lineage:
+      - datalake_inspection_services_raw.repair_request_aud.exempted_at
+    description: Timestamp at which the repair request was exempted.
   ts_granted:
     lineage:
       - datalake_inspection_services_raw.repair_request_aud.granted_at
