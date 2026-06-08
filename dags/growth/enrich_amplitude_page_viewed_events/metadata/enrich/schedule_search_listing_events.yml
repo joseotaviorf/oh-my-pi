@@ -1,161 +1,214 @@
+---
 database_name: datalake_amplitude_page_viewed_events
 table_name: schedule_search_listing_events
-description: This table consolidates and enriches data from multiple Amplitude page view events (schedule, search, and listing pages) to provide a comprehensive view of user journey across key property discovery and scheduling touchpoints.
+owner: isadora.gallerani@quintoandar.com.br
 domain: Growth
-owner: growth@quintoandar.com.br
+description: |
+  Unified enrich table consolidating top-of-funnel Amplitude page view events across schedule,
+  search, search results, and listing pages via UNION ALL. One row per page view event from the
+  source clean tables (no deduplication). Built to power cross-page user journey and TOF taxonomy
+  datamarts. Includes QAC (QuintoAndar Classifieds) flags and sub-region on listing events.
+  This enrich table is not partitioned — use ts_event or the year/month/day date components for time-range filters.
 columns:
   tof_event_type:
-    description: Type of top-of-funnel page view event (schedule_page_viewed, search_page_viewed, search_results_page_viewed or listing_page_viewed) identifying the source branch of the UNION.
+    description: |
+      Source page event branch label assigned in the enrich SQL UNION. Identifies which Amplitude
+      clean table the row originated from. Hardcoded literal per UNION branch — not sourced from a
+      column.
+    categories:
+      schedule_page_viewed: Visit scheduling page view (170698_schedule_page_viewed_events).
+      search_page_viewed: Property search page view (170698_search_page_viewed_events).
+      search_results_page_viewed: Search results page view (170698_search_results_page_viewed_events).
+      listing_page_viewed: Listing detail page view (170698_listing_page_viewed_events).
   id_session:
-    description: Amplitude session identifier of the page view event.
+    description: |
+      Amplitude session identifier grouping events within a single browsing session.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.id_session
       - datalake_amplitude_clean.170698_search_page_viewed_events.id_session
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_session
       - datalake_amplitude_clean.170698_listing_page_viewed_events.id_session
   ep_house_id:
-    description: Unique identifier of the property being viewed, searched, or scheduled across different page types.
+    description: |
+      QuintoAndar property identifier for the listing viewed, searched, or scheduled. Sourced as
+      ep_house_id on schedule/search_results/listing branches and renamed from id_house on the
+      search branch.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.ep_house_id
       - datalake_amplitude_clean.170698_search_page_viewed_events.id_house
-      - datalake_amplitude_clean.170698_search_results_page_viewed_events.ep_id_house
+      - datalake_amplitude_clean.170698_search_results_page_viewed_events.ep_house_id
       - datalake_amplitude_clean.170698_listing_page_viewed_events.ep_house_id
   id_region:
-    description: Sub-region identifier of the listing extracted from event_properties.sub_region_id (sourced from QuintoAndar Classifieds backend). Only populated for listing_page_viewed events; NULL for schedule, search and search_results branches.
+    description: |
+      Sub-region identifier from QuintoAndar Classifieds (event_properties.sub_region_id). Populated
+      only for listing_page_viewed events; NULL for schedule, search, and search_results branches.
     lineage:
       - datalake_amplitude_clean.170698_listing_page_viewed_events.id_region
   id_amplitude:
-    description: Unique identifier for the user in Amplitude analytics across all tracked page events.
+    description: |
+      Amplitude user identifier for the page view event. Not identity-merged in this table — use
+      per-event tables (e.g. listing_page_viewed) for merged id_amplitude when needed.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.id_amplitude
       - datalake_amplitude_clean.170698_search_page_viewed_events.id_amplitude
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_amplitude
       - datalake_amplitude_clean.170698_listing_page_viewed_events.id_amplitude
   id_user:
-    description: User identifier linking events across different pages in the user journey.
+    description: |
+      QuintoAndar user identifier when the visitor is logged in. Nullable for anonymous sessions.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.id_user
       - datalake_amplitude_clean.170698_search_page_viewed_events.id_user
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_user
       - datalake_amplitude_clean.170698_listing_page_viewed_events.id_user
   id_device:
-    description: Device identifier used to track user behavior across different pages and sessions.
+    description: |
+      Amplitude device identifier for cross-session device-level analysis.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.id_device
       - datalake_amplitude_clean.170698_search_page_viewed_events.id_device
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.id_device
       - datalake_amplitude_clean.170698_listing_page_viewed_events.id_device
   business_context:
-    description: Business context or product area where the page view event occurred (e.g., rental, sale).
+    description: |
+      Product line context for the page view (e.g. rental vs sale). Propagated from Amplitude
+      event_properties on each source clean table.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.business_context
       - datalake_amplitude_clean.170698_search_page_viewed_events.business_context
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.business_context
       - datalake_amplitude_clean.170698_listing_page_viewed_events.business_context
   entrance_uri:
-    description: URI path where the user first entered the site or application session.
+    description: |
+      First URI path in the session when the user entered the site or app. Used for landing-page
+      and entry-point analysis.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.entrance_uri
       - datalake_amplitude_clean.170698_search_page_viewed_events.entrance_uri
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.entrance_uri
       - datalake_amplitude_clean.170698_listing_page_viewed_events.entrance_uri
   referrer:
-    description: Referring URL or source that brought the user to the page before the tracked event.
+    description: |
+      HTTP referrer URL or source that navigated the user to the page before this event.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.referrer
       - datalake_amplitude_clean.170698_search_page_viewed_events.referrer
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.referrer
       - datalake_amplitude_clean.170698_listing_page_viewed_events.referrer
   utm_source:
-    description: UTM source parameter indicating the traffic source across all tracked page events.
+    description: |
+      UTM source parameter for marketing attribution on the page view event.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_source
       - datalake_amplitude_clean.170698_search_page_viewed_events.utm_source
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_source
       - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_source
   utm_medium:
-    description: UTM medium parameter indicating the marketing medium used across all tracked page events.
+    description: |
+      UTM medium parameter for marketing attribution on the page view event.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_medium
       - datalake_amplitude_clean.170698_search_page_viewed_events.utm_medium
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_medium
       - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_medium
   utm_campaign:
-    description: UTM campaign parameter identifying the specific marketing campaign across all tracked page events.
+    description: |
+      UTM campaign parameter for marketing attribution on the page view event.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_campaign
       - datalake_amplitude_clean.170698_search_page_viewed_events.utm_campaign
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_campaign
       - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_campaign
   utm_term:
-    description: UTM term parameter for tracking paid search keywords across all tracked page events.
+    description: |
+      UTM term parameter for paid search keyword attribution on the page view event.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_term
       - datalake_amplitude_clean.170698_search_page_viewed_events.utm_term
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_term
       - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_term
   utm_content:
-    description: UTM content parameter for tracking different versions of ads or content across all tracked page events.
+    description: |
+      UTM content parameter for creative or ad variant tracking on the page view event.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.utm_content
       - datalake_amplitude_clean.170698_search_page_viewed_events.utm_content
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.utm_content
       - datalake_amplitude_clean.170698_listing_page_viewed_events.utm_content
   up_platform:
-    description: Platform or application where the event occurred (e.g., web, mobile app, iOS, Android).
+    description: |
+      Platform or application surface where the event was captured (e.g. Web, iOS, Android).
+      From Amplitude user_properties on each source clean table.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.up_platform
       - datalake_amplitude_clean.170698_search_page_viewed_events.up_platform
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.up_platform
       - datalake_amplitude_clean.170698_listing_page_viewed_events.up_platform
   top5_house_id:
-    description: Identifiers of the top 5 houses displayed or interacted with during the page view event.
+    description: |
+      Array or list of house identifiers for the top listings displayed on the page, when captured
+      in Amplitude event properties.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.top5_house_id
       - datalake_amplitude_clean.170698_search_page_viewed_events.top5_house_id
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.top5_house_id
       - datalake_amplitude_clean.170698_listing_page_viewed_events.top5_house_id
   is_qac:
-    description: Flag indicating if the page view event is associated with QuintoAndar Classifieds (QAC). Always False for schedule_page_viewed events (no QAC signal); for search and search_results events derives from nbr_listed_classifieds > 0; for listing events comes directly from event_properties.is_qac.
+    description: |
+      Flag indicating QuintoAndar Classifieds (QAC) inventory on the page. Hardcoded False on
+      schedule_page_viewed branch; derived from nbr_listed_classifieds > 0 on search/search_results;
+      from event_properties.is_qac on listing branch.
     lineage:
       - datalake_amplitude_clean.170698_search_page_viewed_events.is_qac
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.is_qac
       - datalake_amplitude_clean.170698_listing_page_viewed_events.is_qac
   is_qac_region:
-    description: Flag indicating if the page view event is from a QAC region. Always False for schedule_page_viewed events; for search and search_results events derives from nbr_search_classifieds > 0; for listing events derived from is_qac (region-level signal).
+    description: |
+      Flag indicating the event occurred in a QAC-enabled sub-region. Hardcoded False on
+      schedule_page_viewed; derived from nbr_search_classifieds > 0 on search/search_results;
+      aligned with is_qac on listing branch.
     lineage:
       - datalake_amplitude_clean.170698_search_page_viewed_events.is_qac_region
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.is_qac_region
       - datalake_amplitude_clean.170698_listing_page_viewed_events.is_qac_region
   uri:
-    description: URI of the page viewed by the user. NULL for schedule_page_viewed events; populated for search, search_results and listing branches.
+    description: |
+      URI path of the page viewed. NULL for schedule_page_viewed events; populated on search,
+      search_results, and listing branches.
     lineage:
       - datalake_amplitude_clean.170698_search_page_viewed_events.uri
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.uri
       - datalake_amplitude_clean.170698_listing_page_viewed_events.uri
   ts_event:
-    description: Timestamp when the page view event occurred across any of the tracked page types.
+    description: |
+      Timestamp when the page view event occurred. UTC timestamp from Amplitude on each source table.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.ts_event
       - datalake_amplitude_clean.170698_search_page_viewed_events.ts_event
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.ts_event
       - datalake_amplitude_clean.170698_listing_page_viewed_events.ts_event
   year:
-    description: Year extracted from the event timestamp for partitioning and time-based analysis.
+    description: |
+      Calendar year component of ts_event, propagated from source Amplitude clean tables. Not a table
+      partition column in this enrich layer — use for filtering or grouping alongside month and day.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.year
       - datalake_amplitude_clean.170698_search_page_viewed_events.year
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.year
       - datalake_amplitude_clean.170698_listing_page_viewed_events.year
   month:
-    description: Month extracted from the event timestamp for partitioning and time-based analysis.
+    description: |
+      Calendar month component (1–12) of ts_event, propagated from source Amplitude clean tables.
+      Not a table partition column in this enrich layer — combine with year and day for date filters.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.month
       - datalake_amplitude_clean.170698_search_page_viewed_events.month
       - datalake_amplitude_clean.170698_search_results_page_viewed_events.month
       - datalake_amplitude_clean.170698_listing_page_viewed_events.month
   day:
-    description: Day extracted from the event timestamp for partitioning and time-based analysis.
+    description: |
+      Calendar day component (1–31) of ts_event, propagated from source Amplitude clean tables.
+      Not a table partition column in this enrich layer — filter with year and month for specific dates.
     lineage:
       - datalake_amplitude_clean.170698_schedule_page_viewed_events.day
       - datalake_amplitude_clean.170698_search_page_viewed_events.day
