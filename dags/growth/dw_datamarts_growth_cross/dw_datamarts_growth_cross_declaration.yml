@@ -18,11 +18,3 @@ workflow:
       - rent_flow_interactions
     tenant_prospect_status:
       - rent_flow_interactions
-    top_of_funnel_volumes_daily:
-      - performance_marketing_metrics_demand
-      - sale_performance_marketing_metrics_demand
-      - tenant_prospect_status
-    top_of_funnel_volumes_monthly:
-      - performance_marketing_metrics_demand
-      - sale_performance_marketing_metrics_demand
-      - tenant_prospect_status
