@@ -2600,6 +2600,8 @@ consolidation_xl_memory_single_node_cluster:
 notification_webhooks_keys:
     data_quality: GCHAT_DATA_QUALITY_FORNO_WEBHOOK
     stale_dag: GCHAT_STALE_DAG_WEBHOOK
+    dag_rotation: NOTIFICATION_HUB_DAG_ROTATION_WEBHOOK
+    iam_alerts: NOTIFICATION_HUB_IAM_ALERTS_WEBHOOK
 
 vespucio_pipeline_version: "forno-latest"
 vespucio_output_path: "s3://5a-vespucio-forno"
