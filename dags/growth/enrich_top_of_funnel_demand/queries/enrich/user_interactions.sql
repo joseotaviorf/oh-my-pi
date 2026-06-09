@@ -68,8 +68,8 @@ filtered_events AS (
             THEN 'Branded'
             ELSE 'Outro'
         END AS branded,
-        is_qac,
-        is_qac_region,
+        COALESCE(is_qac, FALSE) AS is_qac,
+        COALESCE(is_qac_region, FALSE) AS is_qac_region,
         uri,
         CAST(id_region AS STRING) AS id_region,
         year,

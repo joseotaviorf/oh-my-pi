@@ -111,11 +111,11 @@ columns:
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.utm_content
   is_qac:
-    description: 'Flag indicating if the user interaction event is associated with QuintoAndar Classifieds (QAC).'
+    description: 'Flag indicating if the user interaction event is associated with QuintoAndar Classifieds (QAC). The upstream Amplitude field was not tracked before 2026-05-10; for all events before that date the source value is NULL, which is coalesced to FALSE (non-QAC) in this table.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.is_qac
   is_qac_region:
-    description: 'Flag indicating if the user interaction event is from a QAC region where classifieds inventory is available.'
+    description: 'Flag indicating if the user interaction event is from a QAC region where classifieds inventory is available. Same historical caveat as is_qac: NULL in Amplitude before 2026-05-10, coalesced to FALSE here.'
     lineage:
       - datalake_amplitude_page_viewed_events.schedule_search_listing_events.is_qac_region
   year:
