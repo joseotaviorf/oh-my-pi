@@ -13,6 +13,7 @@ WITH task_queues AS (
 sauron_session_data AS (
   SELECT
     id AS id_session,
+    public_id AS id_sss_session,
     get_json_object(user_data, '$.user_id') AS id_user,
     get_json_object(user_data, '$.user_phone') AS user_phone,
     get_json_object(user_data, '$.user_email') AS user_email,
@@ -26,7 +27,8 @@ sauron_session_data AS (
 ),
 sss_session_data AS (
   SELECT
-    public_id AS id_session,
+    NULL AS id_session,
+    public_id AS id_sss_session,
     get_json_object(user_data, '$.user_id') AS id_user,
     get_json_object(user_data, '$.user_phone') AS user_phone,
     get_json_object(user_data, '$.user_email') AS user_email,
@@ -43,8 +45,8 @@ inapp_sessions AS (
   SELECT DISTINCT
     c.id_chat,
     c.id_session, -- sessões do sauron OU sessões do SSS
-    s.id_session AS id_sauron_session,
-    ss.id_session AS id_sss_session,
+    COALESCE(s.id_session, ss.id_session) AS id_sauron_session,
+    COALESCE(ss.id_sss_session, s.id_sss_session) AS id_sss_session,
     get_json_object(c.attributes, '$.channel_type') AS channel_type,
     COALESCE(ss.id_user, s.id_user) AS id_user,
     COALESCE(ss.user_phone, s.user_phone) AS user_phone,
@@ -56,10 +58,12 @@ inapp_sessions AS (
     datalake_quinto_messenger_clean.chat AS c
   LEFT JOIN
     sss_session_data AS ss
-      ON ss.id_session = c.id_session
+      ON ss.id_sss_session = c.id_session
+      AND c.source = 'support_session'
   LEFT JOIN
     sauron_session_data AS s
       ON s.id_session = c.id_session
+      AND c.source = 'sauron'
   WHERE
     MAKE_DATE(c.year, c.month, c.day) BETWEEN DATE("{load_start_date}") - INTERVAL 7 DAY AND DATE("{load_end_date}")
 ),

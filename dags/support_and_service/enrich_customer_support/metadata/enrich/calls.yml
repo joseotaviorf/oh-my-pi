@@ -17,12 +17,17 @@ columns:
       - datalake_sauron_clean.session.id
       - datalake_support_session_service_clean.support_session.id
     description: >
-      Session identifier from Sauron or Support Session Service, matched to the call via the source_identity field. Nullable when no session is linked to the call.
+      Session identifier from Sauron or Support Session Service, matched to the call when
+      source_identity equals id_call or id_task. Nullable when no session is linked to the call.
   id_sss_session:
     lineage:
+      - datalake_sauron_clean.session.public_id
       - datalake_support_session_service_clean.support_session.public_id
     description: >
-      Public identifier of the session in the Support Session Service (SSS). Null for Sauron-originated sessions or older sessions from SSS.
+      Public session identifier in SSS format, resolved from Sauron public_id or Support Session
+      Service public_id when a call session is linked via source_identity. Populated for Sauron
+      call sessions created on or after 2026-06-03; null for older Sauron sessions or when no
+      session matches the call.
   id_user:
     lineage:
       - datalake_sauron_clean.session.user_data

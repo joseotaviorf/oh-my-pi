@@ -1,6 +1,10 @@
 database_name: datalake_customer_support
 table_name: chats
-description: Task-level customer support chat interactions with one row per Twilio task linked to a valid session, including queue assignment, communication channel context, and response/inactivity metrics.
+description: >
+  Enrich-layer table consolidating Twilio chat tasks with session context from Sauron and Support
+  Session Service. One row per Twilio task linked to a valid session, including queue assignment,
+  channel context, and response/inactivity metrics. Used for support operational analysis and
+  routing quality reporting.
 domain: Support and Services
 owner: data-ae-ss@quintoandar.com.br
 columns:
@@ -16,11 +20,19 @@ columns:
     lineage:
       - datalake_sauron_clean.session.id
       - datalake_quinto_messenger_clean.channel.id_session
-    description: Canonical session identifier resolved from in-app or WhatsApp session sources.
+    description: >
+      Sauron session identifier or WhatsApp channel session id, resolved from in-app chats when
+      chat.source is sauron or from channel.id_session for WhatsApp tasks. Nullable when no valid
+      session is linked to the task.
   id_sss_session:
     lineage:
+      - datalake_sauron_clean.session.public_id
       - datalake_support_session_service_clean.support_session.public_id
-    description: Support Session Service public session identifier linked to the chat when available.
+    description: >
+      Public session identifier in SSS format, resolved from Sauron public_id or Support Session
+      Service public_id when an in-app chat matches chat.id_session and chat.source aligns with
+      the session origin. Populated for Sauron sessions with public_id or SSS sessions; null for
+      WhatsApp-only tasks.
   id_user:
     lineage:
       - datalake_support_session_service_clean.support_session.user_data

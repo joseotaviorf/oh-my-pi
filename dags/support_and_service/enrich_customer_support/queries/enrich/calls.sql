@@ -2,7 +2,7 @@ WITH sss_and_sauron_call_sessions AS (
   SELECT 
     id AS id_session,
     get_json_object(user_data, '$.user_id') AS id_user,
-    NULL AS id_sss_session,
+    public_id AS id_sss_session,
     source_identity
   FROM 
     datalake_sauron_clean.session
@@ -336,5 +336,4 @@ LEFT JOIN
   call_sessions AS cs
     ON cs.source_identity = c.id_call
     OR cs.source_identity = c.id_task
-WHERE
-  c.id_task NOT IN ('WT455822dbec3756a5c183172a15def951')
+    
