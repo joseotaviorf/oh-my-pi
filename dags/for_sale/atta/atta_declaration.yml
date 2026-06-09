@@ -19,6 +19,9 @@ workflow:
       clean_table_name: bank_tracking
     cliente:
       clean_table_name: client_info
+      transactional_datatype_overrides:
+        nr_cnpj_empresa: string
+        nr_cnpj_socio_proprietario: string
     closing:
       clean_table_name: closing
     closing_file:
