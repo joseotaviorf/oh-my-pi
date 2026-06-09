@@ -87,6 +87,7 @@ workflow:
       extra_spark_job_arguments:
         - deduplication_key: "PersonId"
           has_dt_effective: true
+          min_expected_records: 9000
           params:
             onlyData: true
             limit: 100

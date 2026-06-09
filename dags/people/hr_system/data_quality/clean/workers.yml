@@ -5,7 +5,16 @@ table_level_validations:
   has_size:
     greater_than: 9727
     severity_level: Error
+  has_size_variation:
+    variation_type: percentage
+    greater_than_or_equal_to: -5
+    less_than_or_equal_to: 25
+    severity_level: Error
 column_level_validations:
   id_person:
     is_complete:
+      severity_level: Error
+  emails:
+    has_completeness:
+      greater_than_or_equal_to: 0.95
       severity_level: Error

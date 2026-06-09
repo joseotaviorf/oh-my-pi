@@ -63,6 +63,9 @@ class Ingestion:
         )
         self.target_database_name = args.target_database_name
         self.target_table_name = args.target_table_name
+        self.min_expected_records = self.endpoint_details.get(
+            "min_expected_records", None
+        )
 
     def treat_params(self, endpoint_details):
         endpoint_details = json.loads(endpoint_details)
@@ -176,6 +179,17 @@ class Ingestion:
         )
         metastore_service.refresh_table(write_database_name, write_table_name)
 
+    def validate_record_count(self, total_records: int):
+        """Raises ValueError if total_records is below the configured minimum, preventing
+        an incomplete API response from overwriting existing data in the data lake."""
+        if self.min_expected_records and total_records < self.min_expected_records:
+            raise ValueError(
+                f"m={JOB_NAME}, table={self.table_name}, "
+                f"msg=API returned only {total_records} records, "
+                f"expected at least {self.min_expected_records}. "
+                "Aborting write to prevent overwriting existing data with incomplete results."
+            )
+
     def clear_directory(self, layer):
         if self.has_dt_effective == True:
             dbutils.fs.rm(
@@ -264,11 +278,17 @@ if __name__ == "__main__":
         ingestion_table = IngestionTable(ingestion, offset)
         list_ingestion_tables.append(ingestion_table)
     json_data = ingestion.get_data_from_api(list_ingestion_tables)
+    total_records = sum(len(records) for data in json_data for records in data.values())
     for i, data in enumerate(json_data):
         for dt_effective, records in data.items():
             logger.info(
                 f"m={JOB_NAME}, msg=Fetched {len(records)} records from API for dt_effective={dt_effective}"
             )
+    logger.info(
+        f"m={JOB_NAME}, table={ingestion.table_name}, "
+        f"msg=Total records fetched from API across all effective dates: {total_records}"
+    )
+    ingestion.validate_record_count(total_records)
     dfs = ingestion.get_df(json_data)
     for i, df in enumerate(dfs):
         record_count = df.count()
