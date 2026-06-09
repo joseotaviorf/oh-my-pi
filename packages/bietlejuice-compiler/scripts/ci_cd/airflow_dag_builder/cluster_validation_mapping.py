@@ -241,6 +241,26 @@ def _uses_photon(effective_prod: dict, prod_cluster_type: str) -> bool:
     return "photon" in prod_cluster_type.lower()
 
 
+_INSTANCE_TYPE_RE = re.compile(r"^([mrc])(\d+)([a-z]*)\.(.+)$", re.IGNORECASE)
+
+
+def _is_graviton_nvme_instance_type(instance_type: str) -> bool:
+    """True when instance type is Graviton gen-6 with local NVMe (m6gd/r6gd/c6gd)."""
+    match = _INSTANCE_TYPE_RE.match(str(instance_type).strip().lower())
+    if not match:
+        return False
+    generation = int(match.group(2))
+    variant = match.group(3)
+    return generation == 6 and variant == "gd"
+
+
+def _use_nvme_for_topology_value(instance_type: str, *, photon_enabled: bool) -> bool:
+    """NVMe Graviton mapping when explicit *gd or when Photon drives legacy *d → *gd."""
+    if _is_graviton_nvme_instance_type(instance_type):
+        return True
+    return photon_enabled
+
+
 def map_instance_type_to_graviton(instance_type: str, *, use_nvme: bool = False) -> str:
     """Map legacy/x86/fleet instance type to Graviton consolidation equivalent."""
     if not instance_type:
@@ -271,7 +291,10 @@ _DATABRICKS_TOPOLOGY_NESTED_KEYS = (
 )
 
 
-def _map_topology_value(instance_type: str, *, use_nvme: bool) -> str:
+def _map_topology_value(instance_type: str, *, photon_enabled: bool) -> str:
+    use_nvme = _use_nvme_for_topology_value(
+        instance_type, photon_enabled=photon_enabled
+    )
     return map_instance_type_to_graviton(str(instance_type), use_nvme=use_nvme)
 
 
@@ -328,7 +351,7 @@ def normalize_databricks_cluster_topology(
         return normalize_emr_cluster_topology(normalized)
 
     cluster_type = str(normalized.get("type", ""))
-    use_nvme = _uses_photon(effective, cluster_type)
+    photon_enabled = _uses_photon(effective, cluster_type)
     custom = normalized.get("custom_configurations")
     if not isinstance(custom, dict):
         return normalized
@@ -336,13 +359,13 @@ def normalize_databricks_cluster_topology(
     for key in _DATABRICKS_TOPOLOGY_FLAT_KEYS:
         value = custom.get(key)
         if value:
-            custom[key] = _map_topology_value(str(value), use_nvme=use_nvme)
+            custom[key] = _map_topology_value(str(value), photon_enabled=photon_enabled)
 
     for parent_key, child_key in _DATABRICKS_TOPOLOGY_NESTED_KEYS:
         section = custom.get(parent_key)
         if isinstance(section, dict) and section.get(child_key):
             section[child_key] = _map_topology_value(
-                str(section[child_key]), use_nvme=use_nvme
+                str(section[child_key]), photon_enabled=photon_enabled
             )
 
     return normalized
@@ -416,10 +439,13 @@ def _topology_from_mapped_worker(mapped_worker: str) -> Tuple[str, str]:
 def _mapped_worker_and_driver(
     effective_prod: dict, prod_cluster_type: str
 ) -> Tuple[str, Optional[str]]:
-    use_nvme = _uses_photon(effective_prod, prod_cluster_type)
+    photon_enabled = _uses_photon(effective_prod, prod_cluster_type)
+    worker_raw = _infer_logical_instance_type(effective_prod, prod_cluster_type)
     mapped_worker = map_instance_type_to_graviton(
-        _infer_logical_instance_type(effective_prod, prod_cluster_type),
-        use_nvme=use_nvme,
+        worker_raw,
+        use_nvme=_use_nvme_for_topology_value(
+            worker_raw, photon_enabled=photon_enabled
+        ),
     )
     driver_raw = effective_prod.get("master_node_type_id") or effective_prod.get(
         "driver_node_type_id"
@@ -429,9 +455,14 @@ def _mapped_worker_and_driver(
         or effective_prod.get("instance_pool_id")
     ):
         driver_raw = _infer_logical_instance_type(effective_prod, prod_cluster_type)
+    driver_use_nvme = (
+        _use_nvme_for_topology_value(str(driver_raw), photon_enabled=photon_enabled)
+        if driver_raw is not None
+        else False
+    )
     mapped_driver = map_optional_instance_type(
         str(driver_raw) if driver_raw is not None else None,
-        use_nvme=use_nvme,
+        use_nvme=driver_use_nvme,
     )
     return mapped_worker, mapped_driver
 

@@ -7,6 +7,7 @@ import yaml
 
 from scripts.ci_cd.airflow_dag_builder.cluster_yaml_format import (
     assert_no_folded_catalog_namespace,
+    cluster_file_documents_equal,
     dump_cluster_yaml,
 )
 
@@ -26,6 +27,28 @@ class TestDumpClusterYaml:
         text = dump_cluster_yaml(document)
         assert _CATALOG_NAMESPACE_VALUE in text
         assert "environment\n        }}" not in text
+
+
+class TestClusterFileDocumentsEqual:
+    def test_ignores_single_vs_double_quote_scalars(self):
+        single_quoted = """cluster:
+  custom_configurations:
+    single_user_name: '{{ var.value.databricks_single_user_name }}'
+    spark_conf:
+      spark.driver.maxResultSize: '0'
+"""
+        double_quoted = """cluster:
+  custom_configurations:
+    single_user_name: "{{ var.value.databricks_single_user_name }}"
+    spark_conf:
+      spark.driver.maxResultSize: "0"
+"""
+        assert cluster_file_documents_equal(single_quoted, double_quoted)
+
+    def test_detects_real_content_differences(self):
+        left = "cluster:\n  type: consolidation_l_memory_cluster\n"
+        right = "cluster:\n  type: consolidation_m_memory_cluster\n"
+        assert not cluster_file_documents_equal(left, right)
 
 
 class TestAssertNoFoldedCatalogNamespace:

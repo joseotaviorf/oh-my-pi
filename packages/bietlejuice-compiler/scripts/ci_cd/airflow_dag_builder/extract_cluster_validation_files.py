@@ -30,6 +30,7 @@ from scripts.ci_cd.airflow_dag_builder.cluster_validation_mapping import (
 )
 from scripts.ci_cd.airflow_dag_builder.cluster_yaml_format import (
     assert_no_folded_catalog_namespace,
+    cluster_file_documents_equal,
     dump_cluster_yaml,
 )
 
@@ -420,7 +421,7 @@ def main() -> int:
                 errors.append(fmt_err)
                 continue
             expected = _normalize_cluster_file_text(cluster_content)
-            if on_disk != expected:
+            if not cluster_file_documents_equal(on_disk, expected):
                 errors.append(f"{cluster_path}: content differs from generator output")
             else:
                 checked += 1
@@ -488,7 +489,7 @@ def main() -> int:
                 errors.append(fmt_err)
                 continue
             expected = _normalize_cluster_file_text(cluster_content)
-            if on_disk != expected:
+            if not cluster_file_documents_equal(on_disk, expected):
                 errors.append(f"{cluster_path}: content differs from generator output")
             else:
                 checked += 1

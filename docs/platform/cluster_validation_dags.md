@@ -28,7 +28,7 @@ validation:
 4. **Worker-first preset match:** pick a consolidation preset whose default `node_type_id` equals the mapped worker type.
 5. **Homogeneous driver/worker** (same instance size): preset must also match `driver_node_type_id`; overrides are only for non-default fields (`spark_version`, `num_workers`, etc.).
 6. **Heterogeneous driver/worker:** match on worker size only; override `driver_node_type_id` when it differs from the preset default (do not copy worker overrides from driver).
-7. **Photon alignment:** prod Photon clusters keep `runtime_engine: PHOTON`; worker and driver topology are mapped to the Graviton `*gd` families so local SSD expectations remain explicit.
+7. **NVMe / Photon alignment:** prod Photon clusters keep `runtime_engine: PHOTON`; legacy instance types (`m5d`, `r5d`, …) map to Graviton `*gd` families. Explicit `*gd` overrides (`m6gd`, `r6gd`, `c6gd`) are preserved without Photon — local SSD is driven by the instance type, not `runtime_engine`.
 8. Emit `validation.cluster.custom_configurations` only when effective prod differs from the validation preset defaults. Dictionary fields are diffed recursively (`spark_conf`, `spark_env_vars`, `aws_attributes`, etc.); list/scalar fields are emitted as full replacement values (`init_scripts`, `custom_tags` when list-shaped, `runtime_engine`, etc.).
 9. **Preset-only fields:** if the prod preset has fields the consolidation preset does not have, emit them explicitly in `validation.cluster.custom_configurations`. Example: `custom_cluster_with_sedona` defines an extra Sedona `init_scripts` entry in `prod_conf.yml`; validation must carry that list explicitly because the consolidation preset only has the default `bi-etl-ejuice/init_script.sh`.
 10. **Top-level cluster args:** declaration-level `custom_libraries`, `access_control_list`, and `databricks_conn_id` stay top-level under `validation.cluster`; they are not written into `custom_configurations`.
@@ -41,7 +41,7 @@ Existing validation blocks are also checked against generator output. `validate-
 
 ### Prod topology normalization (Graviton 6g)
 
-When `extract-cluster-validation-files` writes or regenerates `*_cluster.yml`, it **normalizes Databricks prod** `custom_configurations` topology (`node_type_id`, `driver_node_type_id`, nested `core_nodes` / `task_nodes`) using the same `map_instance_type_to_graviton` rules as validation preset selection (`m5a` → `m6g`, `r5d` → `r6g`, photon presets → `*gd` where applicable). EMR clusters are left unchanged.
+When `extract-cluster-validation-files` writes or regenerates `*_cluster.yml`, it **normalizes Databricks prod** `custom_configurations` topology (`node_type_id`, `driver_node_type_id`, nested `core_nodes` / `task_nodes`) using the same `map_instance_type_to_graviton` rules as validation preset selection (`m5a` → `m6g`, `r5d` → `r6g` without Photon; Photon or legacy `*d` types → `*gd`; explicit `*gd` overrides are kept as-is). EMR clusters are left unchanged.
 
 This keeps prod and `validation.cluster` family-consistent: validation `custom_configurations` should only carry non-topology diffs (`num_workers`, `aws_attributes`, `spark_version`, etc.) unless the matched consolidation preset genuinely differs from normalized prod sizes. Do not hand-edit validation topology keys; re-run the extractor instead.
 

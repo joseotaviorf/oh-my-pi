@@ -569,6 +569,31 @@ class TestBuildValidationClusterSpec:
         assert spec.custom_configurations["runtime_engine"] == "PHOTON"
         assert spec.custom_configurations["num_workers"] == 3
 
+    def test_explicit_nvme_without_photon_validation_overrides(self):
+        declaration = {
+            "dag": {"name": "enrich_nvme_only"},
+            "workflow": {"type": "query_delta", "layer": "enrich"},
+            "cluster": {
+                "type": "custom_cluster",
+                "databricks_conn_id": "databricks_new_env",
+                "custom_configurations": {
+                    "driver_node_type_id": "r6gd.4xlarge",
+                    "node_type_id": "r6gd.4xlarge",
+                    "num_workers": 5,
+                },
+            },
+        }
+        spec = build_validation_cluster_spec(
+            cluster_args=declaration["cluster"],
+            declaration=declaration,
+        )
+        assert spec is not None
+        assert spec.cluster_type == "consolidation_l_memory_cluster"
+        assert spec.custom_configurations["node_type_id"] == "r6gd.4xlarge"
+        assert spec.custom_configurations["driver_node_type_id"] == "r6gd.4xlarge"
+        assert "runtime_engine" not in spec.custom_configurations
+        assert spec.custom_configurations["num_workers"] == 5
+
     def test_enrich_ebdb_contract_aberrant_compute_worker(self):
         declaration = {
             "dag": {"name": "enrich_ebdb_contract"},
@@ -756,6 +781,38 @@ class TestNormalizeDatabricksClusterTopology:
         custom = normalized["custom_configurations"]
         assert custom["driver_node_type_id"] == "m6g.xlarge"
         assert custom["node_type_id"] == "r6g.2xlarge"
+
+    def test_preserves_explicit_nvme_without_photon(self):
+        cluster_args = {
+            "type": "consolidation_l_memory_cluster",
+            "custom_configurations": {
+                "driver_node_type_id": "r6gd.4xlarge",
+                "node_type_id": "r6gd.4xlarge",
+                "num_workers": 5,
+            },
+        }
+        normalized = normalize_databricks_cluster_topology(
+            cluster_args, ConfigurationService()
+        )
+        custom = normalized["custom_configurations"]
+        assert custom["driver_node_type_id"] == "r6gd.4xlarge"
+        assert custom["node_type_id"] == "r6gd.4xlarge"
+        assert "runtime_engine" not in custom
+
+    def test_legacy_r5d_without_photon_still_maps_to_r6g(self):
+        cluster_args = {
+            "type": "consolidation_l_memory_cluster",
+            "custom_configurations": {
+                "driver_node_type_id": "r5d.4xlarge",
+                "node_type_id": "r5d.4xlarge",
+            },
+        }
+        normalized = normalize_databricks_cluster_topology(
+            cluster_args, ConfigurationService()
+        )
+        custom = normalized["custom_configurations"]
+        assert custom["driver_node_type_id"] == "r6g.4xlarge"
+        assert custom["node_type_id"] == "r6g.4xlarge"
 
 
 class TestBuildRightsizingValidationClusterSpec:
