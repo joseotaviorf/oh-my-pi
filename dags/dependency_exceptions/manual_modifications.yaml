@@ -735,6 +735,33 @@ bietlejuice.enrich_reverses_monitoring:
     - bietlejuice.reverse_webhelp:load-reverse-tickets-contract:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-twilio-spoc:first-run-of-day
     - bietlejuice.reverse_webhelp:load-reverse-recontact:first-run-of-day
+bietlejuice.dw_databricks_costs:
+  add:
+    - bietlejuice.databricks_usage:load-clean-billable-usage
+  remove:
+    - bietlejuice.databricks_usage:load-clean-billable-usage:first-run-of-day
+bietlejuice.enrich_databricks_health:
+  add:
+    - bietlejuice.databricks_usage:load-clean-billable-usage
+    - bietlejuice.enrich_databricks:load-enrich-daily-clusters
+  remove:
+    - bietlejuice.databricks_usage:load-clean-billable-usage:first-run-of-day
+    - bietlejuice.enrich_databricks:load-enrich-daily-clusters:first-run-of-day
+bietlejuice.enrich_spark_event_logs:
+  add:
+    - bietlejuice.enrich_databricks_health:load-enrich-daily-cluster-health
+bietlejuice.dw_databricks_health:
+  add:
+    - bietlejuice.enrich_databricks_health:load-enrich-daily-cluster-health
+    - bietlejuice.enrich_spark_event_logs:load-enrich-spark-stage-metrics
+  remove:
+    - bietlejuice.enrich_databricks_health:load-enrich-daily-cluster-health:first-run-of-day
+    - bietlejuice.enrich_spark_event_logs:load-enrich-spark-stage-metrics:first-run-of-day
+bietlejuice.metric_observability__dags:
+  add:
+    - bietlejuice.dw_databricks_health:load-dw-databricks-health-fact-databricks-dag-run
+  remove:
+    - bietlejuice.dw_databricks_health:load-dw-databricks-health-fact-databricks-dag-run:first-run-of-day
 bietlejuice.enrich_databricks_usage_costs:
   add:
     - bietlejuice.gsheets_platform:done-clean-databricks-contract-details:first-run-of-day

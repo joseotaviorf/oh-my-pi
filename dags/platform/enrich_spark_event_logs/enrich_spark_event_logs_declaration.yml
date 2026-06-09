@@ -1,7 +1,6 @@
 dag:
   name: enrich_spark_event_logs
   owner: Data Life Cycle
-  schedule_interval: "0 0 * * *"
   documentation:
     dag_purpose: |
       Daily ingestion of Spark event logs emitted by every bietlejuice

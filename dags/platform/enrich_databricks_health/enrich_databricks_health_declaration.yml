@@ -3,8 +3,14 @@ dag:
   owner: Data Life Cycle
   documentation:
     dag_purpose: |
-      Daily per-cluster health snapshot derived exclusively from Databricks
-      system tables (system.compute.node_timeline + system.compute.clusters).
+      Daily per-cluster health snapshot from Databricks system tables
+      (system.compute.node_timeline, system.compute.clusters) plus SQL
+      dependencies datalake_databricks_usage_clean.billable_usage and
+      datalake_databricks.daily_clusters. Dataset-triggered after
+      databricks_usage (09:00 UTC) and enrich_databricks (midnight UTC) so
+      upstream tables are fresh before this DAG reads lagged system tables
+      for calendar day D on D+1.
+
       One row per (cluster_id, dt_cluster_run). Captures P50/P95 of CPU,
       memory, I/O wait and NVMe utilization plus cluster shape for every
       cluster with observations in the workspace load window (no provisioner filter).
@@ -12,9 +18,7 @@ dag:
       Powers the cluster sizing / consolidation work tracked in
       bietlejuice/spark_debugging/databricks-driver-cpu-investigation.md and
       replaces the ad-hoc MCP queries that have been used for the past
-      investigation cycle. Independent of (and complementary to)
-      enrich_databricks, which still sources from the deprecated Overwatch
-      tables; that DAG will be migrated to system tables in a follow-up PR.
+      investigation cycle.
 workflow:
   type: query_delta
   layer: enrich
