@@ -3,7 +3,15 @@ dag:
   schedule_start_date: 2019, 1, 1
   owner: Data Growth
   documentation:
-    dag_purpose: Amplitude is a product analytics tool that we use at Quinto Andar to help track visitor behaviour. We use the events in conjunction with our major Facts and Dims; focused mostly on enriching them (such as enriching user information onto leads.) More information about how the tool works can be found on [their site](https://amplitude.com/) This Enrich layer is used for a few datamarts due to timeout issues we have using Athena. As a result we take certain events and materialize them so that the processing time is easier and Athena can handle the load.
+    dag_purpose: Amplitude is a product analytics tool that we use at Quinto Andar to help track visitor behaviour. We use the events in conjunction with our major Facts and Dims; focused mostly on enriching them (such as enriching user information onto leads.) More information about how the tool works can be found on [their site](https://amplitude.com/) This Enrich layer is used for a few datamarts due to timeout issues we have using Athena. As a result we take certain events and materialize them so that the processing time is easier and Athena can handle the load. The output table is partitioned by (year, month, day) and loaded incrementally — consumers should always filter on these columns to enable partition pruning and avoid full table scans.
 workflow:
   type: query_delta
   layer: enrich
+  default_extraction_type: incremental
+  default_partitions:
+    - year
+    - month
+    - day
+  extra_query_template_params:
+    load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
+    load_end_date: "{{ get_date_param(dag_run, macros.ds_add(data_interval_end | ds, -1), 'load_end_date') }}"

@@ -1,4 +1,4 @@
-SELECT  
+SELECT
     'schedule_page_viewed' AS tof_event_type,
     ep_house_id,
     NULL AS id_region,
@@ -23,12 +23,14 @@ SELECT
     year,
     month,
     day
-FROM 
-    datalake_amplitude_clean.170698_schedule_page_viewed_events 
+FROM
+    datalake_amplitude_clean.170698_schedule_page_viewed_events
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 UNION ALL
-SELECT  
+SELECT
     'search_page_viewed' AS tof_event_type,
-    id_house as ep_house_id,
+    id_house AS ep_house_id,
     NULL AS id_region,
     id_user,
     id_amplitude,
@@ -51,8 +53,8 @@ SELECT
     year,
     month,
     day
-FROM 
-    datalake_amplitude_clean.170698_search_page_viewed_events 
+FROM
+    datalake_amplitude_clean.170698_search_page_viewed_events
 WHERE
     country IN (
         'Brazil',
@@ -70,8 +72,9 @@ WHERE
         'Dominican Republic',
         'Costa Rica'
     )
+    AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 UNION ALL
-SELECT 
+SELECT
     'search_results_page_viewed' AS tof_event_type,
     ep_house_id,
     NULL AS id_region,
@@ -96,10 +99,12 @@ SELECT
     year,
     month,
     day
-FROM 
-    datalake_amplitude_clean.170698_search_results_page_viewed_events 
+FROM
+    datalake_amplitude_clean.170698_search_results_page_viewed_events
+WHERE
+    MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
 UNION ALL
-SELECT      
+SELECT
     'listing_page_viewed' AS tof_event_type,
     ep_house_id,
     id_region,
@@ -124,7 +129,7 @@ SELECT
     year,
     month,
     day
-FROM 
+FROM
     datalake_amplitude_clean.170698_listing_page_viewed_events
 WHERE
     country IN (
@@ -143,3 +148,4 @@ WHERE
         'Dominican Republic',
         'Costa Rica'
     )
+    AND MAKE_DATE(year, month, day) BETWEEN DATE('{load_start_date}') AND DATE('{load_end_date}')
