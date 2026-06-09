@@ -363,6 +363,8 @@ bietlejuice.enrich_chattermill:
 bietlejuice.enrich_chatbot:
   add:
     - bietlejuice.enrich_customer_support:load-enrich-tickets:first-run-of-day
+bietlejuice.enrich_ciq_comissioning:
+  override: []
 bietlejuice.enrich_collections_quintoandar:
   remove:
     - bietlejuice.paschoalotto:load-clean-user:first-run-of-day
