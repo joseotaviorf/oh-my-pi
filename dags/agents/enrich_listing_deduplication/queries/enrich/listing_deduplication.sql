@@ -362,4 +362,5 @@ LEFT JOIN
 LEFT JOIN
   listings_full_info AS first_house
     ON first_house.address_parsed_short = lfi.address_parsed_short
+    AND first_house.id_house != lfi.id_house
     AND first_house.first_listing_order = 1
