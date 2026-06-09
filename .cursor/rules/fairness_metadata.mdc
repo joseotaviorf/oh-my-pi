@@ -1,0 +1,116 @@
+---
+alwaysApply: false
+globs: "**/metadata/**/*.yml"
+description: FAIR Findable metadata (F2-01, F2-02) for governance YAML; I1-01 after deploy
+---
+# FAIR metadata authoring (Findable at PR time; Interoperable after deploy)
+
+Governance YAML under `dags/**/metadata/` feeds **fairness assessment** and downstream catalog pipelines. DataHub indexing and data contracts are **Platform-owned** — not remediated via metadata skills.
+
+**Requirement IDs (`F2-01`, `I1-01`, …):** machine keys in `checks_result_json`. For explanations to squads, use business names in **`docs/governance/fair_requirement_glossary.md`** — do not lead with raw IDs in user-facing text.
+
+| Lifecycle stage | What to validate | Tool |
+|-----------------|------------------|------|
+| **PR / authoring** (table may not exist yet) | Substantive **column** descriptions (F2-02) on clean+ | `make validate-fair-metadata` — **only on clean+ metadata changed vs `origin/master`** |
+| **PR / authoring** (table may not exist yet) | Owner, domain, table/column min length, YAML shape | `make validate-metadata-files-content` (Yamale) |
+| **Scope audit** (repo folder / owner / table) | Gate A owners + Gate B F2-02 on **full user-requested inventory** | `make audit-fair-metadata-scope` — see `fair-metadata/SKILL.md`; **`--domain` = repo folder basename** (not YAML `domain:` allowlist) — see `fair-metadata/reference/domain_disambiguation.md` |
+| **PR / authoring** | Metadata `columns` ↔ paired SQL output (sqlglot) | `make validate-lineage-consistency` (Woodpecker: `validate-lineage-consistency`) |
+| **After first deploy** | Documented columns ↔ **physical** schema | Production **I1-01** in `enrich_fairness_assessment` (`columns_metastore` snapshot) |
+
+For schema keys shared with CI Yamale (`database_name`, `lineage`, metric blocks, etc.), see **`governance_metadata.mdc`**. For the allowlisted `domain` values (F2-01 + CI), **this file is canonical** (synced with `METADATA_DOMAIN_CI_ALLOWLIST_PATTERN` in `fairness_assessment/constants.py` and compiler `*_schema.yml`).
+
+## F2-01 — Basic rich metadata (production + lake tiering)
+
+F2-01 (owner, domain, table description) is enforced in **production** via `enrich_fairness_assessment` and offline in **scope audit Gate A** for owners. **Woodpecker does not re-run F2-01** — Yamale (`validate-metadata-files-content`) already validates `owner` email, `domain` allowlist, and min description length where the layer schema requires them.
+
+### Owner activity (`owner_not_active_employee`)
+
+| Context | Behavior |
+|---------|----------|
+| **Woodpecker / `make validate-fair-metadata`** | **F2-02** on clean+ in PR diff. Owner/domain/min length: Yamale. **Owner ACTIVE: online only.** |
+| **Production** | `enrich_fairness_assessment` joins `datalake_people_public.org_chart` (`assignment_status_type = 'ACTIVE'`) — authoritative for tiering. |
+| **Agent (`fair-metadata`)** | `@tars` + `check_owner_active.sql`; **AskQuestion** for replacements — see `fair-metadata/reference/owner_remediation.md`. |
+
+Owner ACTIVE is **not** validated offline (no snapshot file). Use Trino via `@tars` before EXECUTE, or rely on production `enrich_fairness_assessment`.
+
+### Valid `domain` values (F2-01 / CI regex)
+
+`Agents`, `Atlas DB`, `Broker XP`, `Conversational XP`, `Cross`, `Data Life Cycle`, `Data Ops & Governance`, `Data Platform`, `DS Pricing`, `Fintech`, `For Rent`, `For Sale`, `Growth`, `House and Listing`, `International`, `Journey Optimizer`, `MLOps`, `People`, `QCX`, `Rede`, `Support and Services`, `Tech Platform`
+
+Synced with `METADATA_DOMAIN_CI_ALLOWLIST_PATTERN` in `packages/bietlejuice-runtime/src/bietlejuice/governance/fairness_assessment/constants.py` and compiler `*_schema.yml`.
+
+## F2-02 — Substantive column descriptions (blocking in `validate-fair-metadata`)
+
+Woodpecker **`validate-fair-metadata`** runs **F2-02 only** on **clean / core / enrich / dw / metric** files in the PR diff. **Raw is skipped.**
+
+**Typical failure:** `column_description_not_substantive` with per-column `reason_code` from `assess_column_description_quality`.
+
+**Authoring intent:** Descriptions must explain **business meaning** (what the value is, grain, units, caveats). Passing the heuristic alone is insufficient. Agents must not pad with platform boilerplate (e.g. “Persisted in the governance lake for lineage, documentation metrics, and FAIR assessments”). With **`@tars`**, research `docs/llm_context/business_entities/` when relevant, then SQL/spark jobs and Trino samples; if still unclear, **ask the user** — see `fair-metadata/reference/description_remediation.md`.
+
+Every **non-partition** column in `columns:` needs a `description` that passes TDQ heuristics (stricter than Yamale min 10 chars). Partition columns `year`, `month`, `day` and skeleton `_placeholder` are excluded.
+
+### Raw layer
+
+Yamale allows optional `columns:` on raw. **`validate-fair-metadata` does not run on raw.** Prefer column documentation on clean+.
+
+See `fair-metadata/reference/woodpecker_layer_gates.md`.
+
+## Metadata columns vs SQL (PR stage — not I1-01)
+
+Use **`make validate-lineage-consistency`** — same checks as Woodpecker step `validate-lineage-consistency`:
+
+- All columns in the SQL result are documented in metadata
+- All documented columns appear in the SQL result
+- Parsed with **sqlglot** (Databricks dialect); see `packages/bietlejuice-compiler/scripts/governance_metadata_validation/LINEAGE_CONSISTENCY_VALIDATION.md`
+
+This is the right validation when the table **does not exist in the metastore yet**. Do not expect `validate-fair-metadata` to compare YAML to SQL.
+
+For enrich/dw, lineage keys must also match real sources (same script).
+
+## I1-01 — Documented physical fields (production only)
+
+**I1-01** compares `columns_documentation` to the latest **`columns_metastore`** snapshot for the FQN. It applies only when the table is deployed and present in that snapshot.
+
+- New tables: pass F2-01/F2-02 + lineage-consistency in the PR; confirm I1-01 after deploy and the next fairness assessment run (~1 day after `documentation_metrics`).
+- Failure reasons: `undocumented_columns`, `documented_not_in_physical`, `spark_schema_not_in_columns_metastore_snapshot`, `i1_01_not_assessed`.
+
+## Table description quality (advisory)
+
+F2-01 requires a **non-empty** table `description`. **Substantive** table description quality is **advisory** in the CLI (TDQ) — only **column** descriptions block F2-02. Production F2-02 is column-only as well.
+
+## Commands (typical PR)
+
+```bash
+CI_COMMIT_BRANCH=$(git branch --show-current) make validate-fair-metadata
+CI_COMMIT_BRANCH=$(git branch --show-current) make validate-lineage-consistency
+CI_COMMIT_BRANCH=$(git branch --show-current) make validate-metadata-files-content
+```
+
+Scope-wide audit (full domain, owner, or FQN — not PR diff):
+
+```bash
+make audit-fair-metadata-scope domain=governance
+make audit-fair-metadata-scope owner='name@quintoandar.com.br'
+make audit-fair-metadata-scope fqn=datalake_metabase_clean.metabase_table
+make audit-fair-metadata-scope dag=governance/metabase
+```
+
+Single-file FAIR check:
+
+```bash
+uv run --project packages/bietlejuice-runtime python -m bietlejuice.governance.fairness_assessment.validate_metadata_cli -f dags/.../metadata/clean/table.yml
+```
+
+## Remediation source of truth
+
+Prefer **`fairness_assessment.checks_result_json`** from the **most recent run** per FQN (`max ts_assessed`). Remediate only metadata-squad IDs; see `docs/governance/fair_metadata_remediation.md`.
+
+## Agents and squads
+
+- **Humans:** `docs/governance/fair_squad_playbook.md`
+- **Agents:** `.cursor/skills/fair-metadata/SKILL.md` + `reference/plan_gate.md`
+- **Glossary:** `docs/governance/fair_requirement_glossary.md`
+
+## Related production checks
+
+`load_fairness_assessment` evaluates the full MVP matrix (F1–F4, I1–I3, A1, etc.) in `datalake_*_fairness_assessment`. The offline FAIR CLI gates **authoring** (F2-01/F2-02) only; lineage-consistency gates **YAML ↔ SQL** at PR time.

@@ -21,7 +21,7 @@ Run `git diff --name-only origin/master...HEAD` (or against `HEAD` if not yet co
 
 ## Step 2 — Launch subagents in parallel
 
-Use the Task tool for all six subagents below simultaneously.
+Use the Task tool for all eight subagents below simultaneously (A–F, H, I).
 
 **Subagent A — Style check (shell):**
 ```bash
@@ -79,6 +79,12 @@ make validate-source-layer-policy CI_COMMIT_BRANCH=$(git rev-parse --abbrev-ref 
 
 Return: exit code, full output. Note: this check only runs when the branch touches files under `dags/`; if no DAG files are changed, the script exits 0 with a skip message.
 
+**Subagent I — FAIR metadata check (shell):**
+```bash
+CI_COMMIT_BRANCH=$(git branch --show-current) make validate-fair-metadata
+```
+Return: exit code, FAIL lines with F2-01/F2-02 messages. Classify as **blocking** for F2-01 and F2-02 failures; **non-blocking but should fix** for table TDQ advisories only.
+
 ## Step 2b — PR scope check (manual, no subagent)
 
 After gathering the changed files list from Step 1, assess whether the PR is **tightly scoped**:
@@ -102,6 +108,8 @@ Classify scope issues as **non-blocking but should fix** — PRs with unrelated 
 Group all issues by severity:
 
 **Blocking (will fail CI):**
+- FAIR metadata validation failures (`validate-fair-metadata`: F2-02 substantive column descriptions on clean+)
+- `validate-lineage-consistency` failures (metadata columns vs SQL — Woodpecker step when SQL/metadata in diff)
 - Style errors (black/flake8)
 - Lint errors (`make lint`)
 - Missing metadata files
@@ -109,6 +117,7 @@ Group all issues by severity:
 - `personal_data_classification` present in metadata YAML (field not supported by CI yet — remove it)
 
 **Non-blocking but should fix:**
+- Table TDQ advisories from `validate-fair-metadata` (non-blocking)
 - Python convention violations
 - Incomplete metadata (short descriptions, missing lineage)
 - New `bietlejuice/` module with no matching unit test file (config/constants modules exempt)

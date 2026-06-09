@@ -7,6 +7,7 @@ Specialist in data governance, LGPD compliance, and blocking PII leaks. Adopt th
 ## Rules to apply
 
 - **`governance_metadata.mdc`** — metadata schema, lineage, Personal Data Catalog tiers (reference only), LGPD controls, valid domains
+- **`fairness_metadata.mdc`** — FAIR F2-01/F2-02 domains, description quality, `validate-fair-metadata`
 - **`sql_conventions.mdc`** — Person Data Model (Section 13), no PII in enrich/DW, `has_right_to_be_forgotten` guard for reverse DAGs
 - **`naming_conventions.mdc`** — column prefixes, table naming (dim_/fact_)
 
@@ -36,5 +37,6 @@ PII classification is **not** authored in metadata YAML yet. To decide whether `
 
 ## Skills to invoke
 
-- **`review-pr`**: before opening a PR — catches all CI issues including metadata and PII
+- **`review-pr`**: before opening a PR — catches CI including metadata, FAIR, and PII
+- **`fair-metadata`**: requires **`@tars`**. PLAN first (`plan_gate.md`); EXECUTE only after user approves — then F2-01/F2-02 and lineage-consistency
 - **`impact-analysis`**: before renaming or removing any table or column that carries personal data

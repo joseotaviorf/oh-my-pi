@@ -866,6 +866,34 @@ validate-metadata-files-exist:
 	@git fetch --no-tags origin +refs/heads/master
 	@uv run --project packages/bietlejuice-compiler python $(COMPILER_SCRIPTS)/governance_metadata_validation/validate_metadata_files_exist.py -b "$(CI_COMMIT_BRANCH)" -v $(if $(domain),--domain $(domain),)
 
+.PHONY: validate-fair-metadata
+validate-fair-metadata:
+	@echo ""
+	@echo "Validating FAIR metadata (F2-02 substantive column descriptions) on changed clean+ YAML"
+	@echo "=========="
+	@echo ""
+	@git fetch --no-tags origin +refs/heads/master
+	@uv run --project packages/bietlejuice-runtime python -m bietlejuice.governance.fairness_assessment.validate_metadata_cli -b "$(CI_COMMIT_BRANCH)"
+
+.PHONY: audit-fair-metadata-scope
+## Run Gates A/B on the full user-requested scope (not PR diff). Pass exactly one of: domain=, owner=, fqn=, dag=
+audit-fair-metadata-scope:
+	@echo ""
+	@echo "Auditing FAIR metadata scope (Gates A/B)"
+	@echo "=========="
+	@echo ""
+	@if [ -n "$(domain)" ]; then \
+		uv run --project packages/bietlejuice-runtime python -m bietlejuice.governance.fairness_assessment.validate_metadata_cli --audit --domain "$(domain)" $(if $(owner),--owner "$(owner)",); \
+	elif [ -n "$(owner)" ]; then \
+		uv run --project packages/bietlejuice-runtime python -m bietlejuice.governance.fairness_assessment.validate_metadata_cli --audit --owner "$(owner)"; \
+	elif [ -n "$(fqn)" ]; then \
+		uv run --project packages/bietlejuice-runtime python -m bietlejuice.governance.fairness_assessment.validate_metadata_cli --audit --fqn "$(fqn)"; \
+	elif [ -n "$(dag)" ]; then \
+		uv run --project packages/bietlejuice-runtime python -m bietlejuice.governance.fairness_assessment.validate_metadata_cli --audit --dag "$(dag)"; \
+	else \
+		echo "Error: pass scope via domain=, owner=, fqn=, or dag="; exit 1; \
+	fi
+
 .PHONY: validate-lineage-consistency
 validate-lineage-consistency:
 	@echo ""

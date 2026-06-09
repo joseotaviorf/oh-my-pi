@@ -755,7 +755,7 @@ class TestNotifyDagRotationDAG:
         assert "platform" in dag.tags
 
     def test_dag_schedule(self):
-        assert dag.schedule_interval == "0 12 * * *"
+        assert dag.schedule_interval == "0 9 * * *"
 
     def test_dag_does_not_catchup(self):
         assert dag.catchup is False

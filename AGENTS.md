@@ -73,6 +73,7 @@ Validate before opening the PR:
 CI_COMMIT_BRANCH=$(git branch --show-current) make validate-metadata-files-exist
 CI_COMMIT_BRANCH=$(git branch --show-current) make validate-metadata-files-content
 CI_COMMIT_BRANCH=$(git branch --show-current) make validate-lineage-consistency
+CI_COMMIT_BRANCH=$(git branch --show-current) make validate-fair-metadata
 make dependencies-file && git add dags/dependencies.yaml  # always regenerate and commit
 CI_COMMIT_BRANCH=$(git branch --show-current) make validate-dependency-file-correctness
 ```

@@ -27,6 +27,7 @@ Ask the user (or infer from context) which Woodpecker step failed. The full list
 | `validate-metadata-files-content` | `make validate-metadata-files-content` | Metadata |
 | `validate-metadata-files-exist` | `make validate-metadata-files-exist` | Metadata |
 | `validate-lineage-consistency` | `make validate-lineage-consistency` | Metadata |
+| `validate-fair-metadata` | `make validate-fair-metadata` | Metadata |
 | `validate-core-model-schemas` | `make validate-core-model-schemas` | Core model |
 | `validate-core-model-schema-content` | `make validate-core-model-schema-content` | Core model |
 | `validate-cross-layer-joins` | `make validate-cross-layer-joins` | Governance |
@@ -74,7 +75,7 @@ git fetch --no-tags origin +refs/heads/master
 | `metadata file missing for queries/...` | A `.sql` file has no matching `.yml` in `metadata/` | Create `metadata/{layer}/{table_name}.yml` with the required fields |
 | `description too short` | `description:` field < 10 characters | Expand the description |
 | `owner does not match email regex` | `owner:` is not a valid email | Set `owner: user@quintoandar.com.br` |
-| `invalid domain` | `domain:` is not in the allowed list | Use a valid domain (see governance_metadata rule for the full list) |
+| `invalid domain` | `domain:` is not in the allowed list | Use a valid domain (see `fairness_metadata.mdc` / `governance_metadata.mdc` for the FAIR allowlist) |
 | `missing required field: lineage` | Enrich/DW column has no `lineage:` | Add `lineage: [database.table.column]` for each column |
 | `metric column missing dimension or metric block` | Metric-layer column has no `dimension: true` or `metric:` block | Add the appropriate block per the governance_metadata rule |
 | `mapping values are not allowed here` / `mapping values are not allowed in this context` (with `yaml.scanner.ScannerError` and line/column) | An unquoted colon (`:`) in the middle of a YAML string (e.g. in a `description:` line) is interpreted as a key-value separator | At the reported line/column, rephrase to remove the colon (e.g. use em dash "—"), or quote the string; e.g. "TODO in view: confirm" → "TODO in view — confirm" or `"TODO in view: confirm"` |
@@ -179,3 +180,15 @@ The most common reason: CI compares against `origin/master` but locally you have
 git fetch --no-tags origin +refs/heads/master
 make {failing_make_target}
 ```
+
+
+### FAIR metadata failures (`validate-fair-metadata`)
+
+Woodpecker runs **F2-02 only** on clean+ files. Owner/domain/min length errors come from **`validate-metadata-files-content`** (Yamale), not this step.
+
+| Error message pattern | Root cause | Fix |
+|----------------------|-----------|-----|
+| `F2-02 column_description_not_substantive` | Column `description` passes Yamale min length but fails TDQ heuristics | Rewrite using **SQL + declaration only** (no `@tars` required). State business meaning, grain, units — not column name echo or governance-lake filler. For entity context or bulk remediation use **`fair-metadata`** with `@tars`. |
+| `invalid domain` / Yamale domain regex | `domain` not in allowlist | Use exact value from `fairness_metadata.mdc` — fix via metadata content validation |
+| `column in SQL not found in metadata` / `Columns in SQL query but missing in metadata` | Metadata ↔ SQL mismatch | Run `make validate-lineage-consistency`; align `columns:` with SQL (sqlglot) — see `LINEAGE_CONSISTENCY_VALIDATION.md` |
+| `I1-01` in fairness assessment (lake) | Documented columns ≠ physical metastore | Fix after deploy; table must exist in `columns_metastore`; see `fair_metadata_remediation.md` |

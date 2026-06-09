@@ -28,3 +28,4 @@ Loading `data_exploration.mdc`, `.cursor/subagents/data_analyst.md`, or any file
 - DAG declaration files: `.yml` extension only (never `.yaml`).
 - After editing a declaration: run `make create-dag-files` so the `_dag.py` is regenerated.
 - A successful Forno Airflow run is **mandatory** before merging any new DAG.
+- FAIR remediation: **`@tars` required** — skill `fair-metadata` (`fair-metadata/reference/plan_gate.md`): plan first, no metadata YAML edits until user approves execution; then `make validate-fair-metadata` (F2-01/F2-02); see `fairness_metadata.mdc`.

@@ -4,6 +4,8 @@ globs: "**/metadata/**/*.yml"
 ---
 # Governance Metadata Conventions
 
+> **FAIR:** [`fairness_metadata.mdc`](fairness_metadata.mdc) — F2-02 via `make validate-fair-metadata`; schema via `make validate-metadata-files-content`; metadata ↔ SQL via `make validate-lineage-consistency`; lake I1-01 after deploy.
+
 ## The Golden Rule
 Every `.sql` file in `queries/{layer}/` **must** have a matching `.yml` in `metadata/{layer}/` with the same base name. CI fails without it.
 
@@ -23,7 +25,11 @@ columns:
 > PII classification is **not** part of metadata authoring yet — see
 > [Personal Data Handling](#personal-data-handling) below.
 
-**Valid domains:** `Agents`, `Broker XP`, `Cross`, `Data Science`, `For Rent`, `For Sale`, `Governance`, `Growth`, `House and Listing`, `MLOps`, `People`, `Platform`, `QCX`, `Support and Service`, `Tech Platform`
+**Valid domains:** must **full-match** one value below (same list as F2-01 / CI Yamale — canonical source: [`fairness_metadata.mdc`](fairness_metadata.mdc) and `METADATA_DOMAIN_CI_ALLOWLIST_PATTERN` in `fairness_assessment/constants.py`):
+
+`Agents`, `Atlas DB`, `Broker XP`, `Conversational XP`, `Cross`, `Data Life Cycle`, `Data Ops & Governance`, `Data Platform`, `DS Pricing`, `Fintech`, `For Rent`, `For Sale`, `Growth`, `House and Listing`, `International`, `Journey Optimizer`, `MLOps`, `People`, `QCX`, `Rede`, `Support and Services`, `Tech Platform`
+
+**Deprecated labels (do not use in new metadata):** `Governance` → `Data Ops & Governance`; `Platform` → `Data Platform` or `Tech Platform`; `Data Science` → `DS Pricing` or `MLOps`; `Support and Service` → `Support and Services`.
 
 ## Personal Data Handling
 
@@ -125,8 +131,20 @@ ongoing_contracts:
     link_to_metric: "https://quintoandar.sa.looker.com/looks/1234"  # optional
 ```
 
-## Raw / Clean Metadata
-Raw and clean layer metadata have the same structure as enrich/dw but `lineage` points to the source database columns (e.g. `ebdb_public.contract.id`).
+## Raw vs clean (Woodpecker / Yamale — not the same)
+
+| | **raw** (`raw_schema.yml`) | **clean+** (`clean_schema.yml`, core, enrich, dw, metric) |
+|--|---------------------------|------------------------------------------------------|
+| Table `description` | Optional (Yamale) | Required, min 10 chars (Yamale). **FAIR F2-01:** non-empty; write substantive business context (entity/process, grain, main consumers) — table TDQ is advisory at PR time |
+| `owner` | Optional | Optional in schema; required for FAIR F2-01 when file is in PR diff |
+| `columns` | Optional | Required |
+| Column `description` | Optional (Yamale) | Required, min 10 chars (Yamale). **FAIR F2-02 (blocking on clean+):** substantive — business meaning, units/format, derivation logic; not name echo, status-only labels, or platform filler |
+| `lineage` | Not in schema | Required on enrich/dw for derived columns |
+| `tags` on columns | Allowed (e.g. Confidential) | — |
+
+**Description quality (all layers where you document):** Yamale enforces **presence and min length** on clean+; FAIR enforces **substance**. Table and column text should explain *what* the data represents in business terms, *how* it is produced or derived, and *who* uses it — aligned to [`fairness_metadata.mdc`](fairness_metadata.mdc) and [`fair_requirement_glossary.md`](../../docs/governance/fair_requirement_glossary.md) (F2-01 / F2-02). Min 10 characters alone is not enough for clean+ columns in PR CI.
+
+Many **raw** tables are ingested via **Spark jobs** without `queries/raw/*.sql` — lineage-consistency does not apply there. Prefer rich documentation on **clean / enrich / dw**; touch **raw** only when that YAML is in the PR diff or CI failed on it. See `fair-metadata/reference/woodpecker_layer_gates.md` and `fairness_metadata.mdc`.
 
 ## Validation Commands
 ```bash
@@ -141,7 +159,8 @@ make validate-lineage-consistency
 ```
 
 ## Common Mistakes
-- `description` shorter than 10 characters → CI fails.
+- `description` shorter than 10 characters → CI fails on **clean+**, not on raw (raw table description is optional in Yamale).
+- Bulk-editing `metadata/raw/` with owner/domain/column text copied from clean when raw is not in the PR diff → unnecessary; Woodpecker would not require it.
 - `owner` not matching email regex → CI fails.
 - Missing `lineage` on an enrich/dw column that derives from a source → CI fails.
 - Adding `lineage` to a hardcoded literal column (e.g. `'RENT' AS business_context`) → incorrect; remove it.

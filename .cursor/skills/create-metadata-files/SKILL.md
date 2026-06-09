@@ -7,10 +7,10 @@ description: Author and fix metadata YAML files for bi-etl-ejuice. Follows .curs
 
 ## Required rule
 
-**Before creating or editing any metadata file**, read [`.cursor/rules/governance_metadata.mdc`](.cursor/rules/governance_metadata.mdc) and apply it as the authoritative source for:
-- Valid domains
+**Before creating or editing any metadata file**, read [`.cursor/rules/governance_metadata.mdc`](.cursor/rules/governance_metadata.mdc) and [`.cursor/rules/fairness_metadata.mdc`](.cursor/rules/fairness_metadata.mdc), and apply them as the authoritative source for:
+- Valid domains (canonical allowlist in `fairness_metadata.mdc`)
 - Column schema (`description`, `lineage`, categories, metric blocks)
-- Common mistakes and validation commands
+- FAIR F2-01 / F2-02 and common mistakes and validation commands
 
 **Do not** add `personal_data_classification` to metadata YAML — the field is not supported by repo validation/CI yet.
 
@@ -26,7 +26,7 @@ Use this skill when:
 **Automated file creation may contain errors.** The agent is here to guide and help improve the quality of descriptions and metadata structure, but the final output is ultimately the responsibility of the data engineer.
 
 - Always review all generated or modified files before submitting PRs
-- Validate locally with `make validate-metadata-files-content` and `make validate-lineage-consistency`
+- Validate locally with `make validate-metadata-files-content`, `make validate-lineage-consistency`, and `make validate-fair-metadata`
 - Fill or correct any TODO placeholders, generic descriptions, or inferred values that need business context
 
 ## Golden Rule
@@ -37,7 +37,7 @@ Every `.sql` file in `queries/{layer}/` **must** have a matching `.yml` in `meta
 
 Use this workflow when you have **new** `.sql` files (tables) that don't have corresponding metadata yet. It reuses existing validation scripts — no new scripts required.
 
-### Passo 1 — Identificar SQL sem metadata
+### Step 1 — Find SQL files without metadata
 
 ```bash
 make validate-metadata-files-exist
@@ -45,7 +45,7 @@ make validate-metadata-files-exist
 
 If it fails, the output lists files under "Queries that don't have a corresponding metadata file:". Each line has format `file=dags/{domain}/{dag_name}/queries/{layer}/{table}.sql`.
 
-### Passo 2 — Criar esqueleto mínimo para cada SQL
+### Step 2 — Create a minimal skeleton for each SQL file
 
 For each SQL listed, create `dags/{domain}/{dag_name}/metadata/{layer}/{table}.yml` with:
 
@@ -55,7 +55,7 @@ For each SQL listed, create `dags/{domain}/{dag_name}/metadata/{layer}/{table}.y
 Infer values from the path and DAG declaration:
 - `table_name` = SQL filename without `.sql`
 - `database_name` = from [naming_conventions.mdc](.cursor/rules/naming_conventions.mdc): `datalake_{source}_{context}` (enrich), `dw_{schema}` (dw), `metric_{context}` (metric)
-- `domain` = map `dag.owner` from `{dag_name}_declaration.yml` to a valid domain (e.g. "Data SS" → "Support and Service")
+- `domain` = map `dag.owner` from `{dag_name}_declaration.yml` to a valid domain (e.g. "Data SS" → "Support and Services")
 - `owner` = email from `{dag_name}_declaration.yml`
 
 **Raw/Clean skeleton (with placeholder):**
@@ -64,7 +64,7 @@ Infer values from the path and DAG declaration:
 database_name: "datalake_xxx_yyy"
 table_name: "table_name"
 description: "TODO: business description with at least 10 characters."
-domain: "Support and Service"
+domain: "Support and Services"
 owner: "owner@quintoandar.com.br"
 columns:
   _placeholder:
@@ -100,7 +100,20 @@ columns:
     dimension: true
 ```
 
-### Passo 3 — Rodar validate-lineage-consistency para obter as colunas
+
+### Step 3 — FAIR: validate Findable metadata (F2-01, F2-02)
+
+After the skeleton exists, run FAIR authoring checks on changed metadata (does **not** compare YAML to SQL; does **not** run I1-01):
+
+```bash
+CI_COMMIT_BRANCH=$(git branch --show-current) make validate-fair-metadata
+```
+
+Fix F2-01/F2-02 per **`fairness_metadata.mdc`**. For **bulk FAIR remediation or domain audits**, use **`fair-metadata`** with **`@tars`** — PLAN gate mandatory (`.cursor/skills/fair-metadata/reference/plan_gate.md`): post plan and stop; no metadata edits until user approves execution. Creating a **new** table skeleton in this skill is allowed; rewriting many files for FAIR is not — that goes through the plan workflow.
+
+### Step 4 — Run validate-lineage-consistency (metadata ↔ SQL, sqlglot)
+
+Woodpecker step **`validate-lineage-consistency`** — validates metadata `columns` against the paired SQL using **sqlglot** (works before the table exists in the metastore):
 
 ```bash
 make validate-lineage-consistency
@@ -115,22 +128,23 @@ Columns in metadata but missing in SQL query: [_placeholder]
 
 **Extract** the list `[col_a, col_b, col_c]` from the error message — these are the SQL columns.
 
-### Passo 4 — Atualizar o metadata com as colunas reais
+### Step 5 — Update metadata with real columns
 
 - Remove `_placeholder`
 - Add each column from the list with `description` and, for enrich/dw, `lineage`; for metric, use `dimension: true` or `metric: { ... }` per column type
 - Use "TODO" placeholders where needed to pass validation initially
 
-### Passo 5 — Validar em loop
+### Step 6 — Validate in a loop
 
 ```bash
 make validate-metadata-files-content
 make validate-lineage-consistency
+CI_COMMIT_BRANCH=$(git branch --show-current) make validate-fair-metadata
 ```
 
-Fix until both pass. Fill descriptions and lineage per [governance_metadata.mdc](.cursor/rules/governance_metadata.mdc).
+Fix until all pass. Fill descriptions and lineage per [governance_metadata.mdc](.cursor/rules/governance_metadata.mdc) and [fairness_metadata.mdc](.cursor/rules/fairness_metadata.mdc).
 
-### Caso especial: SQL com SELECT *
+### Special case: SQL with SELECT *
 
 If `validate-lineage-consistency` fails with "SQL query uses SELECT * which prevents column validation", ask the user to replace `SELECT *` with explicit column names in the SQL before continuing.
 
@@ -204,15 +218,15 @@ Bad column description examples:
 - `"Rent value"`
 - `"Created date"`
 - `"Status"`
+- `"… Persisted in the governance lake for lineage, documentation metrics, and FAIR assessments."` (platform filler — no business meaning)
 
 ## Step 3 - Apply layer-specific schema rules
 
 ### 3.1 Domain values by layer (must match exactly)
 
-Use one exact value from this list (per [governance_metadata.mdc](.cursor/rules/governance_metadata.mdc)):
-- `Agents`, `Broker XP`, `Cross`, `Data Science`, `For Rent`, `For Sale`, `Governance`, `Growth`, `MLOps`, `People`, `Platform`, `QCX`, `Support and Service`, `Tech Platform`
+Use one exact value from the FAIR/CI allowlist ([`fairness_metadata.mdc`](../../rules/fairness_metadata.mdc), mirrored in [`governance_metadata.mdc`](../../rules/governance_metadata.mdc)):
 
-For the complete and up-to-date list, always consult the governance_metadata.mdc rule.
+`Agents`, `Atlas DB`, `Broker XP`, `Conversational XP`, `Cross`, `Data Life Cycle`, `Data Ops & Governance`, `Data Platform`, `DS Pricing`, `Fintech`, `For Rent`, `For Sale`, `Growth`, `House and Listing`, `International`, `Journey Optimizer`, `MLOps`, `People`, `QCX`, `Rede`, `Support and Services`, `Tech Platform`
 
 ### 3.2 Raw
 

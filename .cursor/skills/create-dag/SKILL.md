@@ -377,7 +377,7 @@ WHERE
 
 Path: `dags/{line}/{normalized_dag_name}/metadata/{layer}/{table_name}.yml`
 
-Every SQL file **must** have a matching metadata YAML. See the `governance_metadata` rule for full schema.
+Every SQL file **must** have a matching metadata YAML. See the `governance_metadata` rule for full schema and `fairness_metadata.mdc` for FAIR F2-01/F2-02 before merge.
 
 **Lineage format:** `{database}.{table}.{column}` where `{database}` is the full metastore name (e.g., `datalake_person_clean`, `datalake_ebdb_clean`, `dw_rent`), not the source database schema name.
 
@@ -407,17 +407,21 @@ columns:
 | `agents` | `Agents` |
 | `people` | `People` |
 | `growth` | `Growth` |
-| `support_and_service` | `Support and Service` |
+| `support_and_service` | `Support and Services` |
 | `broker_xp` | `Broker XP` |
 | `cross` | `Cross` |
-| `governance` | `Governance` |
+| `governance` | `Data Ops & Governance` |
+| `platform` | `Data Life Cycle` or `Data Ops & Governance` (match sibling DAGs) |
 | `mlops` | `MLOps` |
-| `platform` | `Platform` |
 | `qcx` | `QCX` |
 | `tech_platform` | `Tech Platform` |
-| `data_science` | `Data Science` |
+| `conversational_xp` | `Conversational XP` |
+| `atlas_db` | `Atlas DB` |
+| `core` | business domain (e.g. `House and Listing`, `Broker XP`) or `Data Platform` |
+| `international` | `International` |
+| `rede` | `Rede` |
 
-**Valid domains:** `Agents`, `Broker XP`, `Cross`, `Data Science`, `For Rent`, `For Sale`, `Governance`, `Growth`, `MLOps`, `People`, `Platform`, `QCX`, `Support and Service`, `Tech Platform`
+**Valid domains (FAIR / CI allowlist):** see [`fairness_metadata.mdc`](../../rules/fairness_metadata.mdc) — `Agents`, `Atlas DB`, `Broker XP`, `Conversational XP`, `Cross`, `Data Life Cycle`, `Data Ops & Governance`, `Data Platform`, `DS Pricing`, `Fintech`, `For Rent`, `For Sale`, `Growth`, `House and Listing`, `International`, `Journey Optimizer`, `MLOps`, `People`, `QCX`, `Rede`, `Support and Services`, `Tech Platform`.
 
 ---
 
