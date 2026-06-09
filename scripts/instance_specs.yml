@@ -1,0 +1,107 @@
+# Hardware specs for EC2 instance types used by recommend_cluster_specs.py sizing.
+# Prices come exclusively from dim_ec2_price.sql (parsed by generate_instance_catalog.py).
+# Curate this file when adding new instance types to the recommender fleet.
+
+instances:
+  # Compute-optimised  c6g
+  c6g.large: {vcpus: 2, memory_gb: 4, family: compute}
+  c6g.xlarge: {vcpus: 4, memory_gb: 8, family: compute}
+  c6g.2xlarge: {vcpus: 8, memory_gb: 16, family: compute}
+  c6g.4xlarge: {vcpus: 16, memory_gb: 32, family: compute}
+  c6g.8xlarge: {vcpus: 32, memory_gb: 64, family: compute}
+  c6g.12xlarge: {vcpus: 48, memory_gb: 96, family: compute}
+  c6g.16xlarge: {vcpus: 64, memory_gb: 128, family: compute}
+  # Compute  c6gd
+  c6gd.xlarge: {vcpus: 4, memory_gb: 8, family: compute}
+  c6gd.2xlarge: {vcpus: 8, memory_gb: 16, family: compute}
+  c6gd.4xlarge: {vcpus: 16, memory_gb: 32, family: compute}
+  c6gd.8xlarge: {vcpus: 32, memory_gb: 64, family: compute}
+  c6gd.12xlarge: {vcpus: 48, memory_gb: 96, family: compute}
+  c6gd.16xlarge: {vcpus: 64, memory_gb: 128, family: compute}
+  # Compute  c7g
+  c7g.xlarge: {vcpus: 4, memory_gb: 8, family: compute}
+  c7g.2xlarge: {vcpus: 8, memory_gb: 16, family: compute}
+  c7g.4xlarge: {vcpus: 16, memory_gb: 32, family: compute}
+  c7g.8xlarge: {vcpus: 32, memory_gb: 64, family: compute}
+  c7g.12xlarge: {vcpus: 48, memory_gb: 96, family: compute}
+  c7g.16xlarge: {vcpus: 64, memory_gb: 128, family: compute}
+  # General-purpose  m6g
+  m6g.large: {vcpus: 2, memory_gb: 8, family: general}
+  m6g.xlarge: {vcpus: 4, memory_gb: 16, family: general}
+  m6g.2xlarge: {vcpus: 8, memory_gb: 32, family: general}
+  m6g.4xlarge: {vcpus: 16, memory_gb: 64, family: general}
+  m6g.8xlarge: {vcpus: 32, memory_gb: 128, family: general}
+  m6g.12xlarge: {vcpus: 48, memory_gb: 192, family: general}
+  m6g.16xlarge: {vcpus: 64, memory_gb: 256, family: general}
+  # General  m6gd
+  m6gd.large: {vcpus: 2, memory_gb: 8, family: general}
+  m6gd.xlarge: {vcpus: 4, memory_gb: 16, family: general}
+  m6gd.2xlarge: {vcpus: 8, memory_gb: 32, family: general}
+  m6gd.4xlarge: {vcpus: 16, memory_gb: 64, family: general}
+  m6gd.8xlarge: {vcpus: 32, memory_gb: 128, family: general}
+  m6gd.12xlarge: {vcpus: 48, memory_gb: 192, family: general}
+  m6gd.16xlarge: {vcpus: 64, memory_gb: 256, family: general}
+  # General  m7g
+  m7g.large: {vcpus: 2, memory_gb: 8, family: general}
+  m7g.xlarge: {vcpus: 4, memory_gb: 16, family: general}
+  m7g.2xlarge: {vcpus: 8, memory_gb: 32, family: general}
+  m7g.4xlarge: {vcpus: 16, memory_gb: 64, family: general}
+  m7g.8xlarge: {vcpus: 32, memory_gb: 128, family: general}
+  m7g.12xlarge: {vcpus: 48, memory_gb: 192, family: general}
+  m7g.16xlarge: {vcpus: 64, memory_gb: 256, family: general}
+  # General  m7gd
+  m7gd.large: {vcpus: 2, memory_gb: 8, family: general}
+  m7gd.xlarge: {vcpus: 4, memory_gb: 16, family: general}
+  m7gd.2xlarge: {vcpus: 8, memory_gb: 32, family: general}
+  m7gd.4xlarge: {vcpus: 16, memory_gb: 64, family: general}
+  m7gd.8xlarge: {vcpus: 32, memory_gb: 128, family: general}
+  m7gd.12xlarge: {vcpus: 48, memory_gb: 192, family: general}
+  m7gd.16xlarge: {vcpus: 64, memory_gb: 256, family: general}
+  # Memory-optimised  r6g
+  r6g.large: {vcpus: 2, memory_gb: 16, family: memory}
+  r6g.xlarge: {vcpus: 4, memory_gb: 32, family: memory}
+  r6g.2xlarge: {vcpus: 8, memory_gb: 64, family: memory}
+  r6g.4xlarge: {vcpus: 16, memory_gb: 128, family: memory}
+  r6g.8xlarge: {vcpus: 32, memory_gb: 256, family: memory}
+  r6g.12xlarge: {vcpus: 48, memory_gb: 384, family: memory}
+  r6g.16xlarge: {vcpus: 64, memory_gb: 512, family: memory}
+  # Memory  r6gd
+  r6gd.large: {vcpus: 2, memory_gb: 16, family: memory}
+  r6gd.xlarge: {vcpus: 4, memory_gb: 32, family: memory}
+  r6gd.2xlarge: {vcpus: 8, memory_gb: 64, family: memory}
+  r6gd.4xlarge: {vcpus: 16, memory_gb: 128, family: memory}
+  r6gd.8xlarge: {vcpus: 32, memory_gb: 256, family: memory}
+  r6gd.12xlarge: {vcpus: 48, memory_gb: 384, family: memory}
+  r6gd.16xlarge: {vcpus: 64, memory_gb: 512, family: memory}
+  # Memory  r7g
+  r7g.large: {vcpus: 2, memory_gb: 16, family: memory}
+  r7g.xlarge: {vcpus: 4, memory_gb: 32, family: memory}
+  r7g.2xlarge: {vcpus: 8, memory_gb: 64, family: memory}
+  r7g.4xlarge: {vcpus: 16, memory_gb: 128, family: memory}
+  r7g.8xlarge: {vcpus: 32, memory_gb: 256, family: memory}
+  r7g.12xlarge: {vcpus: 48, memory_gb: 384, family: memory}
+  r7g.16xlarge: {vcpus: 64, memory_gb: 512, family: memory}
+  # Memory  r7gd
+  r7gd.large: {vcpus: 2, memory_gb: 16, family: memory}
+  r7gd.xlarge: {vcpus: 4, memory_gb: 32, family: memory}
+  r7gd.2xlarge: {vcpus: 8, memory_gb: 64, family: memory}
+  r7gd.4xlarge: {vcpus: 16, memory_gb: 128, family: memory}
+  r7gd.8xlarge: {vcpus: 32, memory_gb: 256, family: memory}
+  r7gd.12xlarge: {vcpus: 48, memory_gb: 384, family: memory}
+  r7gd.16xlarge: {vcpus: 64, memory_gb: 512, family: memory}
+  # x86 AMD reference (reverse-mapping only)
+  m5a.large: {vcpus: 2, memory_gb: 8, family: general}
+  m5a.xlarge: {vcpus: 4, memory_gb: 16, family: general}
+  m5a.2xlarge: {vcpus: 8, memory_gb: 32, family: general}
+  m5a.4xlarge: {vcpus: 16, memory_gb: 64, family: general}
+  m5a.8xlarge: {vcpus: 32, memory_gb: 128, family: general}
+  c5a.large: {vcpus: 2, memory_gb: 4, family: compute}
+  c5a.xlarge: {vcpus: 4, memory_gb: 8, family: compute}
+  c5a.2xlarge: {vcpus: 8, memory_gb: 16, family: compute}
+  c5a.4xlarge: {vcpus: 16, memory_gb: 32, family: compute}
+  c5a.8xlarge: {vcpus: 32, memory_gb: 64, family: compute}
+  r5a.large: {vcpus: 2, memory_gb: 16, family: memory}
+  r5a.xlarge: {vcpus: 4, memory_gb: 32, family: memory}
+  r5a.2xlarge: {vcpus: 8, memory_gb: 64, family: memory}
+  r5a.4xlarge: {vcpus: 16, memory_gb: 128, family: memory}
+  r5a.8xlarge: {vcpus: 32, memory_gb: 256, family: memory}

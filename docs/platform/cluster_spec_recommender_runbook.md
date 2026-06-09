@@ -41,6 +41,8 @@ Useful flags:
 | `--min-runs` | `3` | Minimum ARM runs |
 | `--trino-host` | prod Trino hostname | Trino endpoint; overridden by `TRINO_HOST` env var when set |
 | `--use-amd-history` | off | Optional AMD fallback for collapse-only candidates |
+| `--validation-outcomes` | off | Write `validation_outcomes.csv` comparing recommendations vs existing `__validation` runs (requires `--trino`) |
+| `--validation-min-runs` | `1` | Minimum validation runs per DAG for outcome comparison |
 
 Set `TRINO_HOST` to point at a non-prod Trino endpoint without changing the command line:
 
@@ -119,6 +121,7 @@ Outputs:
 | `recommendations.csv` | Main review report |
 | `recommendations.json` | Same data in JSON |
 | `validation_configs.yml` | Validation blocks for actionable DAGs |
+| `validation_outcomes.csv` | Optional; projected vs observed metrics for DAGs that already have `__validation` history (see §3b) |
 
 For offline CSV input:
 
@@ -130,7 +133,33 @@ ENVIRONMENT=prod uv run --no-project --with pandas \
   --validation-config /tmp/cluster-rightsizing/validation_configs.yml
 ```
 
-The CSV must include the fields emitted by `build_sql()`, especially cadence and cost fields: `runs_per_day`, `schedule_interval_minutes`, `arm_avg_ec2_cost_usd`, `arm_avg_dbu_cost_usd`, `ec2_spot_hours`, and `ec2_on_demand_hours`.
+The CSV must include the fields emitted by `build_sql()`, especially cadence and cost fields: `runs_per_day`, `schedule_interval_minutes`, `arm_avg_cost_per_run_usd`, `arm_avg_ec2_cost_usd`, `arm_avg_dbu_cost_usd`, `arm_avg_dbu_consumed`, `ec2_spot_hours`, and `ec2_on_demand_hours`.
+
+Rows with `total_cost_usd = 0` are excluded at query time (known ingestion bug on recent load dates). Do not reintroduce `total_dbu_list_cost_usd` — cost authority is negotiated DBU + EC2 only.
+
+### 3b. Compare Against Existing Validation Runs
+
+When shadow validation DAGs already exist, compare projected recommendations against observed validation metrics:
+
+```bash
+ENVIRONMENT=prod uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
+  python scripts/recommend_cluster_specs.py \
+  --trino \
+  --out-dir /tmp/cluster-rightsizing \
+  --validation-config /tmp/cluster-rightsizing/validation_configs.yml \
+  --validation-outcomes /tmp/cluster-rightsizing/validation_outcomes.csv
+```
+
+`validation_outcomes.csv` joins actionable recommendations to `bietlejuice.*__validation` runs. Each row includes projected vs actual cost, driver CPU, memory, wall time, and an `outcome` label:
+
+| `outcome` | Meaning |
+| --- | --- |
+| `pass` | Within thresholds (cost ±15%, CPU ±15 pp, wall inflation for collapse) |
+| `warn` | Borderline drift (cost ±30%, memory, wall) |
+| `fail` | Cost drift beyond warn threshold |
+| `insufficient_validation_data` | No usable validation cost row |
+
+Use this before promoting DAGs that already ran in shadow validation — it is a sanity check, not a substitute for a fresh validation run after changing the recommended spec.
 
 ---
 
@@ -297,6 +326,7 @@ Check:
 - Wall p95 still fits the schedule, especially for hourly jobs.
 - Cost delta is negative for `collapse_to_single`.
 - For `keep_multi_*`, the worker count is preserved and only driver capacity changed unless intentionally reviewed.
+- If `validation_outcomes.csv` was generated, review `outcome` and `delta_*` columns for DAGs with prior shadow runs.
 
 Promotion helper:
 
@@ -328,7 +358,14 @@ ENVIRONMENT=prod uv run --no-project --with "trino==0.337.0,pandas,requests,tzlo
   --out-dir /tmp/cluster-rightsizing \
   --validation-config /tmp/cluster-rightsizing/validation_configs.yml
 
-# 3. Optional: write validation blocks
+# 3. Optional: compare vs existing __validation runs
+ENVIRONMENT=prod uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
+  python scripts/recommend_cluster_specs.py \
+  --trino \
+  --out-dir /tmp/cluster-rightsizing \
+  --validation-outcomes /tmp/cluster-rightsizing/validation_outcomes.csv
+
+# 4. Optional: write validation blocks
 ENVIRONMENT=prod uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
   python scripts/recommend_cluster_specs.py \
   --trino \
@@ -336,7 +373,7 @@ ENVIRONMENT=prod uv run --no-project --with "trino==0.337.0,pandas,requests,tzlo
   --validation-config /tmp/cluster-rightsizing/validation_configs.yml \
   --write-cluster-files
 
-# 4. Compile and validate generated DAG files
+# 5. Compile and validate generated DAG files
 make validate-cluster-validation-files
 make create-dag-files
 ```
@@ -346,8 +383,29 @@ make create-dag-files
 ## Guardrails
 
 - Single-node is the default target, but **SLA and cost gates win**.
-- Do not override the spot/on-demand cost model with external CSV prices; use `dim_ec2_price`.
+- **Cost authority:** `arm_avg_cost_per_run_usd` = negotiated `total_cost_usd` per run (DBU USD + EC2 USD). `arm_avg_dbu_cost_usd` and `arm_avg_ec2_cost_usd` are components. `arm_avg_dbu_consumed` is a DBU scalar for sanity checks only — never sum USD and DBU columns. List DBU (`total_dbu_list_cost_usd`) is not used.
+- **EC2 pricing:** on-demand USD/hour comes from [`dim_ec2_price.sql`](../../dags/platform/enrich_databricks_pricing/queries/enrich/dim_ec2_price.sql) via the generated catalog. Spot = `0.37 × on_demand`. Do not use external Amazon CSV prices in the pipeline.
+- **ARM detection:** Graviton types match `^([a-z][a-z0-9]*[0-9]g(d|n|b)?|a1).` (case-insensitive), including `m6gd`, `m7g`, and `a1`.
 - Do not reduce worker count for `keep_multi_*`; preserve current worker count and minimize driver only.
 - Treat `core` and `fast_lane` as evidence that hot single-node can be acceptable.
 - Treat `opa` and `istio` as evidence that hourly wall-clock pressure can require multi-node even for small data volumes.
 - Never promote without a successful shadow validation run.
+
+---
+
+## Instance Catalog Maintenance
+
+Hardware specs (vCPU, RAM, family) live in [`scripts/instance_specs.yml`](../../scripts/instance_specs.yml). On-demand prices are parsed from the `dim_ec2_price` seed. The recommender imports the generated [`scripts/instance_catalog_data.py`](../../scripts/instance_catalog_data.py).
+
+When adding a new instance type to the fleet:
+
+1. Add `on_demand_usd_hour` to [`dim_ec2_price.sql`](../../dags/platform/enrich_databricks_pricing/queries/enrich/dim_ec2_price.sql).
+2. Add matching `vcpus` / `memory_gb` / `family` to `instance_specs.yml`.
+3. Re-run `enrich_databricks_pricing` so the lake table updates.
+4. Regenerate the recommender catalog:
+
+```bash
+uv run python scripts/generate_instance_catalog.py
+```
+
+The generator emits catalog entries only when both spec YAML and seed price exist; it warns on seed-only or spec-only mismatches.

@@ -21,9 +21,12 @@ from scripts.recommend_cluster_specs import (  # noqa: E402
     AMD_WALL_CORRECTION,
     PRESET_CATALOG,
     DagMetrics,
+    _current_cost_basis,
     build_amd_recommendation,
     build_recommendation,
     build_sql,
+    build_validation_outcomes,
+    build_validation_sql,
     classify,
     classify_amd_for_collapse,
     estimate_cost,
@@ -45,8 +48,8 @@ def _m(**kwargs) -> DagMetrics:
         driver_node_type="m6g.xlarge",
         worker_node_type="m6g.xlarge",
         worker_count=2,
-        arm_total_cost_usd=100.0,
-        arm_avg_cost_per_run_usd=1.0,
+        arm_total_cost_usd=80.0,
+        arm_avg_cost_per_run_usd=8.0,
         arm_total_cost_estimate_usd=80.0,
         arm_avg_total_cost_estimate_usd=8.0,
         arm_total_ec2_cost_usd=30.0,
@@ -75,6 +78,13 @@ def _m(**kwargs) -> DagMetrics:
         and defaults.get("worker_count") not in (0, None)
     ):
         defaults["worker_node_type"] = defaults["driver_node_type"]
+    if (
+        "arm_avg_total_cost_estimate_usd" in kwargs
+        and "arm_avg_cost_per_run_usd" not in kwargs
+    ):
+        defaults["arm_avg_cost_per_run_usd"] = kwargs[
+            "arm_avg_total_cost_estimate_usd"
+        ]
     return DagMetrics(**defaults)
 
 
@@ -255,6 +265,9 @@ class TestAdditiveSingleNodeSizing:
         assert rec.projected.est_drv_mem_p95 == "projected 77.3%"
 
     def test_large_single_node_without_exact_preset_uses_driver_override(self):
+        import os
+
+        os.environ["ENVIRONMENT"] = "prod"
         m = _m(
             driver_node_type="r6g.8xlarge",
             worker_node_type="r6g.8xlarge",
@@ -346,6 +359,9 @@ class TestSingleNodeFirstKeepMultiGuards:
         assert "reduce_driver" not in rec.actions.split("|")
 
     def test_hourly_opa_istio_shape_stays_multi_for_sla_and_minimizes_driver(self):
+        import os
+
+        os.environ["ENVIRONMENT"] = "prod"
         m = _m(
             driver_node_type="m6g.large",
             worker_node_type="m6g.2xlarge",
@@ -378,6 +394,9 @@ class TestSingleNodeFirstKeepMultiGuards:
         }
 
     def test_keep_multi_downsizes_worker_type_without_reducing_count(self):
+        import os
+
+        os.environ["ENVIRONMENT"] = "prod"
         m = _m(
             driver_node_type="m6g.large",
             worker_node_type="r6g.4xlarge",
@@ -730,20 +749,26 @@ class TestSqlAndRowMapping:
 
     def test_sql_projects_cadence_and_cost_authority_inputs(self):
         sql = build_sql(days=90, min_days=3, min_runs=3)
+        amd_sql = rcs.build_amd_sql(days=90, min_days=3, min_runs=3, amd_min_runs=3)
 
         assert "runs_per_day" in sql
         assert "schedule_interval_minutes" in sql
         assert "total_ec2_cost_calculated_usd" in sql
         assert "ec2_spot_hours" in sql
         assert "ec2_on_demand_hours" in sql
-        assert "total_dbu_list_cost_usd" in sql
+        assert "total_dbu_cost_usd" in sql
+        assert "total_dbu_consumed" in sql
+        assert "arm_avg_dbu_consumed" in sql
+        assert "COALESCE(total_cost_usd, 0) > 0" in sql
+        assert "COALESCE(total_cost_usd, 0) > 0" in amd_sql
+        assert "total_dbu_list_cost_usd" not in sql
+        assert "total_dbu_list_cost_usd" not in amd_sql
+        assert "config_total_cost_usd" in sql
         assert "is_job_on_interactive = FALSE" in sql
         assert "is_any_task_failed = FALSE" in sql
         assert "is_any_databricks_run_failed = FALSE" in sql
         assert "NOT REGEXP_LIKE(airflow_dag_id, '__validation$')" in sql
-        assert "NOT REGEXP_LIKE(airflow_dag_id, '__validation$')" in rcs.build_amd_sql(
-            days=90, min_days=3, min_runs=3, amd_min_runs=3
-        )
+        assert "NOT REGEXP_LIKE(airflow_dag_id, '__validation$')" in amd_sql
 
     def test_amd_sql_matches_arm_filters_and_percentiles(self):
         amd_sql = rcs.build_amd_sql(days=90, min_days=3, min_runs=3, amd_min_runs=3)
@@ -781,6 +806,7 @@ class TestSqlAndRowMapping:
                 "arm_avg_ec2_cost_usd": "3",
                 "arm_total_dbu_cost_usd": "100",
                 "arm_avg_dbu_cost_usd": "10",
+                "arm_avg_dbu_consumed": "2.5",
                 "ec2_spot_hours": "20",
                 "ec2_on_demand_hours": "10",
                 "wall_p50_min": "20",
@@ -802,6 +828,14 @@ class TestSqlAndRowMapping:
         assert metrics.schedule_interval_minutes == pytest.approx(720.0)
         assert metrics.arm_avg_ec2_cost_usd == pytest.approx(3.0)
         assert metrics.ec2_spot_hours == pytest.approx(20.0)
+        assert metrics.arm_avg_dbu_consumed == pytest.approx(2.5)
+
+    def test_current_cost_basis_uses_negotiated_total_only(self):
+        m = _m(
+            arm_avg_cost_per_run_usd=8.0,
+            arm_avg_total_cost_estimate_usd=99.0,
+        )
+        assert _current_cost_basis(m) == pytest.approx(8.0)
 
     def test_load_from_csv_ignores_validation_dags(self, tmp_path):
         csv_path = tmp_path / "metrics.csv"
@@ -819,6 +853,99 @@ class TestSqlAndRowMapping:
         metrics = rcs.load_from_csv(csv_path)
 
         assert [m.dag_id for m in metrics] == ["bietlejuice.test_dag"]
+
+    def test_load_from_csv_excludes_zero_cost_runs_at_sql_layer(self):
+        sql = build_sql(days=90, min_days=3, min_runs=3)
+        assert "COALESCE(total_cost_usd, 0) > 0" in sql
+
+    def test_validation_sql_targets_validation_suffix(self):
+        sql = build_validation_sql(days=90, validation_min_runs=1)
+        assert "bietlejuice.%__validation" in sql
+        assert "prod_dag_id" in sql
+        assert "COALESCE(total_cost_usd, 0) > 0" in sql
+        assert "HAVING COUNT(*) >= 1" in sql
+
+    def test_build_validation_outcomes_pass_warn_fail(self):
+        rec = build_recommendation(
+            _m(
+                dag_id="bietlejuice.test_dag",
+                worker_count=0,
+                worker_node_type=None,
+                wall_p95_min=10.0,
+                drv_cpu_p50=20.0,
+                drv_mem_p95=40.0,
+                arm_avg_cost_per_run_usd=1.0,
+            )
+        )
+        rec.cohort = "collapse_to_single"
+        rec.projected.est_cost_per_run_usd = 0.8
+        rec.projected.est_drv_cpu_p50 = 30.0
+        rec.projected.est_drv_mem_p95 = "projected 45.0%"
+
+        pass_rows = [
+            {
+                "prod_dag_id": "bietlejuice.test_dag",
+                "validation_runs": "3",
+                "actual_avg_cost_per_run_usd": "0.82",
+                "actual_drv_cpu_p50": "32.0",
+                "actual_drv_mem_p95": "44.0",
+                "actual_wall_p95_min": "11.0",
+            }
+        ]
+        outcomes = build_validation_outcomes([rec], pass_rows)
+        assert len(outcomes) == 1
+        assert outcomes[0].outcome == "pass"
+
+        warn_rows = [
+            {
+                **pass_rows[0],
+                "actual_avg_cost_per_run_usd": "0.95",
+            }
+        ]
+        warn_outcomes = build_validation_outcomes([rec], warn_rows)
+        assert warn_outcomes[0].outcome == "warn"
+
+        fail_rows = [
+            {
+                **pass_rows[0],
+                "actual_avg_cost_per_run_usd": "1.5",
+            }
+        ]
+        fail_outcomes = build_validation_outcomes([rec], fail_rows)
+        assert fail_outcomes[0].outcome == "fail"
+
+
+class TestInstanceCatalogGenerator:
+    def test_generated_prices_match_dim_ec2_price_seed(self):
+        import importlib.util
+
+        from scripts.instance_catalog_data import EC2_ON_DEMAND_USD_PER_HOUR
+
+        spec = importlib.util.spec_from_file_location(
+            "generate_instance_catalog",
+            REPO_ROOT / "scripts/generate_instance_catalog.py",
+        )
+        gen_mod = importlib.util.module_from_spec(spec)
+        assert spec.loader is not None
+        spec.loader.exec_module(gen_mod)
+        seed_prices = gen_mod.parse_dim_ec2_price_seed(
+            REPO_ROOT
+            / "dags/platform/enrich_databricks_pricing/queries/enrich/dim_ec2_price.sql"
+        )
+        for name, price in EC2_ON_DEMAND_USD_PER_HOUR.items():
+            assert seed_prices[name] == pytest.approx(price)
+
+    def test_spot_ratio_matches_seed_derivation(self):
+        from scripts.instance_catalog_data import EC2_ON_DEMAND_USD_PER_HOUR
+
+        assert rcs._SPOT_TO_ON_DEMAND_RATIO == pytest.approx(0.37)
+        spot_price = rcs._instance_price("m6g.xlarge", spot=True)
+        od_price = EC2_ON_DEMAND_USD_PER_HOUR["m6g.xlarge"]
+        assert spot_price == pytest.approx(od_price * 0.37)
+
+    def test_catalog_has_expanded_graviton_variants(self):
+        assert "m7gd.xlarge" in rcs.INSTANCE_CATALOG
+        assert "c7g.xlarge" in rcs.INSTANCE_CATALOG
 
 
 class TestGenerateValidationConfigContract:

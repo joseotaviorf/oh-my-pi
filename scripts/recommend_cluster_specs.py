@@ -13,6 +13,13 @@ cluster where safe.  Produces:
       validation: block, which the existing trigger_cluster_validation_dags.py
       picks up for shadow validation.
 
+  validation_outcomes.csv  (with --validation-outcomes PATH, requires --trino)
+      Projected vs observed metrics for DAGs that already have __validation runs.
+
+Cost authority: negotiated total_cost_usd (DBU USD + EC2 USD) from
+fact_databricks_dag_run; EC2 rates from dim_ec2_price seed via
+scripts/instance_catalog_data.py (regenerate with generate_instance_catalog.py).
+
 Eligibility: ≥ --min-days ARM days AND ≥ --min-runs ARM runs.
 Scope: bietlejuice.* DAGs only; PHASE1/PHASE2 workflow types (same as the
        existing cluster-validation tooling).
@@ -24,6 +31,12 @@ Usage
       python scripts/recommend_cluster_specs.py \\
       --trino --validation-config validation_configs.yml
 
+  # Compare recommendations vs existing shadow validation runs:
+  uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \\
+      python scripts/recommend_cluster_specs.py \\
+      --trino --validation-outcomes validation_outcomes.csv \\
+      --out-dir /tmp/recs
+
   # From a pre-exported CSV (no Trino needed):
   uv run --no-project --with pandas \\
       python scripts/recommend_cluster_specs.py \\
@@ -32,6 +45,9 @@ Usage
   # Dry-run: list DAGs and their cohorts, no files written:
   uv run --no-project --with "trino==0.337.0,pandas,...,orjson" \\
       python scripts/recommend_cluster_specs.py --trino --list
+
+Docs: docs/platform/cluster_spec_recommender_runbook.md
+      docs/platform/cluster_spec_recommender_algorithm.md
 """
 
 from __future__ import annotations
@@ -69,7 +85,7 @@ AMD_WALL_CORRECTION = (
 # ARM detection
 # ---------------------------------------------------------------------------
 
-ARM_REGEX = re.compile(r"^[a-z][a-z0-9]*[0-9]g[a-z]?\.")
+ARM_REGEX = re.compile(r"^([a-z][a-z0-9]*[0-9]g(d|n|b)?|a1)\.", re.IGNORECASE)
 
 # ---------------------------------------------------------------------------
 # Instance catalog  (ARM Graviton + x86 AMD fallback for reverse-mapping)
@@ -87,113 +103,24 @@ class InstanceSpec:
     family: str  # compute | general | memory
 
 
-INSTANCE_CATALOG: dict[str, InstanceSpec] = {
-    # Compute-optimised  c6g  (1 vCPU : 2 GiB)
-    "c6g.large": InstanceSpec(2, 4, "compute"),
-    "c6g.xlarge": InstanceSpec(4, 8, "compute"),
-    "c6g.2xlarge": InstanceSpec(8, 16, "compute"),
-    "c6g.4xlarge": InstanceSpec(16, 32, "compute"),
-    "c6g.8xlarge": InstanceSpec(32, 64, "compute"),
-    "c6g.12xlarge": InstanceSpec(48, 96, "compute"),
-    "c6g.16xlarge": InstanceSpec(64, 128, "compute"),
-    # General-purpose  m6g  (1 vCPU : 4 GiB)
-    "m6g.large": InstanceSpec(2, 8, "general"),
-    "m6g.xlarge": InstanceSpec(4, 16, "general"),
-    "m6g.2xlarge": InstanceSpec(8, 32, "general"),
-    "m6g.4xlarge": InstanceSpec(16, 64, "general"),
-    "m6g.8xlarge": InstanceSpec(32, 128, "general"),
-    "m6g.12xlarge": InstanceSpec(48, 192, "general"),
-    "m6g.16xlarge": InstanceSpec(64, 256, "general"),
-    # General  m6gd  (NVMe local-disk variant, same vCPU/RAM)
-    "m6gd.large": InstanceSpec(2, 8, "general"),
-    "m6gd.xlarge": InstanceSpec(4, 16, "general"),
-    "m6gd.2xlarge": InstanceSpec(8, 32, "general"),
-    "m6gd.4xlarge": InstanceSpec(16, 64, "general"),
-    "m6gd.8xlarge": InstanceSpec(32, 128, "general"),
-    # General  m7g  (Graviton Gen 7)
-    "m7g.large": InstanceSpec(2, 8, "general"),
-    "m7g.xlarge": InstanceSpec(4, 16, "general"),
-    "m7g.2xlarge": InstanceSpec(8, 32, "general"),
-    "m7g.4xlarge": InstanceSpec(16, 64, "general"),
-    "m7g.8xlarge": InstanceSpec(32, 128, "general"),
-    "m7g.12xlarge": InstanceSpec(48, 192, "general"),
-    "m7g.16xlarge": InstanceSpec(64, 256, "general"),
-    # Memory-optimised  r6g  (1 vCPU : 8 GiB)
-    "r6g.large": InstanceSpec(2, 16, "memory"),
-    "r6g.xlarge": InstanceSpec(4, 32, "memory"),
-    "r6g.2xlarge": InstanceSpec(8, 64, "memory"),
-    "r6g.4xlarge": InstanceSpec(16, 128, "memory"),
-    "r6g.8xlarge": InstanceSpec(32, 256, "memory"),
-    "r6g.12xlarge": InstanceSpec(48, 384, "memory"),
-    "r6g.16xlarge": InstanceSpec(64, 512, "memory"),
-    # Memory  r6gd  (NVMe local-disk variant)
-    "r6gd.large": InstanceSpec(2, 16, "memory"),
-    "r6gd.xlarge": InstanceSpec(4, 32, "memory"),
-    "r6gd.2xlarge": InstanceSpec(8, 64, "memory"),
-    "r6gd.4xlarge": InstanceSpec(16, 128, "memory"),
-    "r6gd.8xlarge": InstanceSpec(32, 256, "memory"),
-    # Memory  r7g  (Graviton Gen 7)
-    "r7g.large": InstanceSpec(2, 16, "memory"),
-    "r7g.xlarge": InstanceSpec(4, 32, "memory"),
-    "r7g.2xlarge": InstanceSpec(8, 64, "memory"),
-    "r7g.4xlarge": InstanceSpec(16, 128, "memory"),
-    "r7g.8xlarge": InstanceSpec(32, 256, "memory"),
-    "r7g.12xlarge": InstanceSpec(48, 384, "memory"),
-    "r7g.16xlarge": InstanceSpec(64, 512, "memory"),
-    # x86 AMD  (reference only — not recommended targets)
-    "m5a.large": InstanceSpec(2, 8, "general"),
-    "m5a.xlarge": InstanceSpec(4, 16, "general"),
-    "m5a.2xlarge": InstanceSpec(8, 32, "general"),
-    "m5a.4xlarge": InstanceSpec(16, 64, "general"),
-    "m5a.8xlarge": InstanceSpec(32, 128, "general"),
-    "c5a.large": InstanceSpec(2, 4, "compute"),
-    "c5a.xlarge": InstanceSpec(4, 8, "compute"),
-    "c5a.2xlarge": InstanceSpec(8, 16, "compute"),
-    "c5a.4xlarge": InstanceSpec(16, 32, "compute"),
-    "c5a.8xlarge": InstanceSpec(32, 64, "compute"),
-    "r5a.large": InstanceSpec(2, 16, "memory"),
-    "r5a.xlarge": InstanceSpec(4, 32, "memory"),
-    "r5a.2xlarge": InstanceSpec(8, 64, "memory"),
-    "r5a.4xlarge": InstanceSpec(16, 128, "memory"),
-    "r5a.8xlarge": InstanceSpec(32, 256, "memory"),
-}
+try:
+    from scripts.instance_catalog_data import (  # noqa: PLC0415
+        EC2_ON_DEMAND_USD_PER_HOUR,
+        INSTANCE_SPECS_RAW,
+    )
+except ImportError:
+    from instance_catalog_data import (  # type: ignore[no-redef]  # noqa: PLC0415
+        EC2_ON_DEMAND_USD_PER_HOUR,
+        INSTANCE_SPECS_RAW,
+    )
 
-EC2_ON_DEMAND_USD_PER_HOUR: dict[str, float] = {
-    "c6g.large": 0.068,
-    "c6g.xlarge": 0.136,
-    "c6g.2xlarge": 0.272,
-    "c6g.4xlarge": 0.544,
-    "c6g.8xlarge": 1.088,
-    "c6g.12xlarge": 1.632,
-    "c6g.16xlarge": 2.176,
-    "m6g.large": 0.077,
-    "m6g.xlarge": 0.154,
-    "m6g.2xlarge": 0.308,
-    "m6g.4xlarge": 0.616,
-    "m6g.8xlarge": 1.232,
-    "m6g.12xlarge": 1.848,
-    "m6g.16xlarge": 2.464,
-    "m7g.large": 0.0816,
-    "m7g.xlarge": 0.1632,
-    "m7g.2xlarge": 0.3264,
-    "m7g.4xlarge": 0.6528,
-    "m7g.8xlarge": 1.3056,
-    "m7g.12xlarge": 1.9584,
-    "m7g.16xlarge": 2.6112,
-    "r6g.large": 0.1,
-    "r6g.xlarge": 0.2016,
-    "r6g.2xlarge": 0.4032,
-    "r6g.4xlarge": 0.8064,
-    "r6g.8xlarge": 1.6128,
-    "r6g.12xlarge": 2.42,
-    "r6g.16xlarge": 3.2256,
-    "r7g.large": 0.1071,
-    "r7g.xlarge": 0.2142,
-    "r7g.2xlarge": 0.4284,
-    "r7g.4xlarge": 0.8568,
-    "r7g.8xlarge": 1.7136,
-    "r7g.12xlarge": 2.5704,
-    "r7g.16xlarge": 3.4272,
+INSTANCE_CATALOG: dict[str, InstanceSpec] = {
+    name: InstanceSpec(
+        vcpus=int(spec["vcpus"]),
+        memory_gb=int(spec["memory_gb"]),
+        family=str(spec["family"]),
+    )
+    for name, spec in INSTANCE_SPECS_RAW.items()
 }
 
 _SPOT_TO_ON_DEMAND_RATIO = 0.37
@@ -339,6 +266,7 @@ class DagMetrics:
     arm_avg_ec2_cost_usd: float | None = None
     arm_total_dbu_cost_usd: float | None = None
     arm_avg_dbu_cost_usd: float | None = None
+    arm_avg_dbu_consumed: float | None = None
     ec2_spot_hours: float | None = None
     ec2_on_demand_hours: float | None = None
     total_memory_bytes_spilled: float = 0.0
@@ -611,8 +539,7 @@ def _collapse_wall_inflation(m: DagMetrics) -> float:
 
 
 def _current_cost_basis(m: DagMetrics) -> float:
-    if m.arm_avg_total_cost_estimate_usd is not None:
-        return m.arm_avg_total_cost_estimate_usd
+    """Per-run total USD (negotiated DBU + EC2). Never mix USD with DBU scalars."""
     return m.arm_avg_cost_per_run_usd
 
 
@@ -1647,12 +1574,12 @@ WITH runs AS (
         worker_count,
         primary_min_autoscale_workers,
         primary_max_autoscale_workers,
-        total_dbu_list_cost_usd                          AS cost_usd,
-        total_dbu_list_cost_usd                          AS dbu_cost_usd,
+        total_dbu_cost_usd                               AS dbu_cost_usd,
+        total_dbu_consumed,
         total_ec2_cost_calculated_usd                    AS ec2_cost_usd,
         ec2_spot_hours,
         ec2_on_demand_hours,
-        total_cost_usd                                   AS total_cost_usd,
+        total_cost_usd,
         total_wall_clock_seconds,
         weighted_avg_p50_driver_cpu_busy_percent         AS drv_cpu_p50,
         weighted_avg_p95_driver_cpu_busy_percent         AS drv_cpu_p95,
@@ -1677,9 +1604,10 @@ WITH runs AS (
         dbu_negotiated_price_missing,
         CASE
             WHEN REGEXP_LIKE(
-                COALESCE(worker_node_type, driver_node_type),
-                '^[a-z][a-z0-9]*[0-9]g[a-z]?\\.')
-            THEN 'arm' ELSE 'x86'
+                LOWER(COALESCE(worker_node_type, driver_node_type)),
+                '^([a-z][a-z0-9]*[0-9]g(d|n|b)?|a1)[.]'
+            ) THEN 'arm'
+            ELSE 'x86'
         END AS arch
     FROM dw_databricks_health.fact_databricks_dag_run
     WHERE dt_dag_run_started >= CURRENT_DATE - INTERVAL '{days}' DAY
@@ -1689,6 +1617,7 @@ WITH runs AS (
       AND is_job_on_interactive = FALSE
       AND is_any_task_failed = FALSE
       AND is_any_databricks_run_failed = FALSE
+      AND COALESCE(total_cost_usd, 0) > 0
 ),
 arm_runs AS (
     SELECT *
@@ -1705,7 +1634,6 @@ config_runs AS (
         primary_max_autoscale_workers,
         COUNT(*)                                                                  AS config_run_count,
         COUNT(DISTINCT CAST(dt_dag_run_started AS DATE))                          AS config_day_count,
-        SUM(cost_usd)                                                             AS config_cost_usd,
         SUM(total_cost_usd)                                                       AS config_total_cost_usd
     FROM arm_runs
     GROUP BY
@@ -1720,7 +1648,7 @@ dag_totals AS (
     SELECT
         airflow_dag_id,
         COUNT(*)                                                                  AS total_run_count,
-        SUM(cost_usd)                                                             AS total_cost_usd
+        SUM(total_cost_usd)                                                       AS total_cost_usd
     FROM arm_runs
     GROUP BY airflow_dag_id
 ),
@@ -1729,11 +1657,11 @@ dominant_config AS (
         config_runs.*,
         ROUND(config_runs.config_run_count / CAST(dag_totals.total_run_count AS DOUBLE), 4)
                                                                                   AS dominant_config_run_share,
-        ROUND(config_runs.config_cost_usd / NULLIF(dag_totals.total_cost_usd, 0), 4)
+        ROUND(config_runs.config_total_cost_usd / NULLIF(dag_totals.total_cost_usd, 0), 4)
                                                                                   AS dominant_config_cost_share,
         ROW_NUMBER() OVER (
             PARTITION BY config_runs.airflow_dag_id
-            ORDER BY config_runs.config_cost_usd DESC, config_runs.config_run_count DESC
+            ORDER BY config_runs.config_total_cost_usd DESC, config_runs.config_run_count DESC
         )                                                                         AS rn
     FROM config_runs
     JOIN dag_totals
@@ -1779,14 +1707,15 @@ per_dag AS (
         ARBITRARY(worker_count)                                                     AS worker_count,
         ARBITRARY(primary_min_autoscale_workers)                                    AS primary_min_autoscale_workers,
         ARBITRARY(primary_max_autoscale_workers)                                    AS primary_max_autoscale_workers,
-        ROUND(SUM(cost_usd), 4)                                                    AS arm_total_cost_usd,
-        ROUND(AVG(cost_usd), 6)                                                    AS arm_avg_cost_per_run_usd,
+        ROUND(SUM(total_cost_usd), 4)                                              AS arm_total_cost_usd,
+        ROUND(AVG(total_cost_usd), 6)                                              AS arm_avg_cost_per_run_usd,
         ROUND(SUM(total_cost_usd), 4)                                              AS arm_total_cost_estimate_usd,
         ROUND(AVG(total_cost_usd), 6)                                              AS arm_avg_total_cost_estimate_usd,
         ROUND(SUM(ec2_cost_usd), 4)                                                AS arm_total_ec2_cost_usd,
         ROUND(AVG(ec2_cost_usd), 6)                                                AS arm_avg_ec2_cost_usd,
         ROUND(SUM(dbu_cost_usd), 4)                                                AS arm_total_dbu_cost_usd,
         ROUND(AVG(dbu_cost_usd), 6)                                                AS arm_avg_dbu_cost_usd,
+        ROUND(AVG(total_dbu_consumed), 6)                                          AS arm_avg_dbu_consumed,
         ROUND(SUM(ec2_spot_hours), 4)                                              AS ec2_spot_hours,
         ROUND(SUM(ec2_on_demand_hours), 4)                                         AS ec2_on_demand_hours,
         ARBITRARY(dominant_config_run_share)                                       AS dominant_config_run_share,
@@ -1865,7 +1794,7 @@ WITH runs AS (
         worker_count,
         primary_min_autoscale_workers,
         primary_max_autoscale_workers,
-        total_dbu_list_cost_usd                          AS cost_usd,
+        total_cost_usd,
         total_wall_clock_seconds,
         weighted_avg_p50_driver_cpu_busy_percent         AS drv_cpu_p50,
         weighted_avg_p95_driver_cpu_busy_percent         AS drv_cpu_p95,
@@ -1877,9 +1806,10 @@ WITH runs AS (
         weighted_avg_p95_worker_cpu_wait_percent         AS wrk_wait_p95,
         CASE
             WHEN REGEXP_LIKE(
-                COALESCE(worker_node_type, driver_node_type),
-                '^[a-z][a-z0-9]*[0-9]g[a-z]?\\.')
-            THEN 'arm' ELSE 'x86'
+                LOWER(COALESCE(worker_node_type, driver_node_type)),
+                '^([a-z][a-z0-9]*[0-9]g(d|n|b)?|a1)[.]'
+            ) THEN 'arm'
+            ELSE 'x86'
         END AS arch
     FROM dw_databricks_health.fact_databricks_dag_run
     WHERE dt_dag_run_started >= CURRENT_DATE - INTERVAL '{days}' DAY
@@ -1889,6 +1819,7 @@ WITH runs AS (
       AND is_job_on_interactive = FALSE
       AND is_any_task_failed = FALSE
       AND is_any_databricks_run_failed = FALSE
+      AND COALESCE(total_cost_usd, 0) > 0
 ),
 arm_eligible AS (
     -- DAGs that already have enough ARM data — exclude from AMD correction pool.
@@ -1913,7 +1844,7 @@ config_runs AS (
         primary_min_autoscale_workers,
         primary_max_autoscale_workers,
         COUNT(*)                                                                  AS config_run_count,
-        SUM(cost_usd)                                                             AS config_cost_usd
+        SUM(total_cost_usd)                                                       AS config_total_cost_usd
     FROM amd_pool
     GROUP BY
         airflow_dag_id,
@@ -1927,7 +1858,7 @@ dag_totals AS (
     SELECT
         airflow_dag_id,
         COUNT(*)                                                                  AS total_run_count,
-        SUM(cost_usd)                                                             AS total_cost_usd
+        SUM(total_cost_usd)                                                       AS total_cost_usd
     FROM amd_pool
     GROUP BY airflow_dag_id
 ),
@@ -1936,11 +1867,11 @@ dominant_config AS (
         config_runs.*,
         ROUND(config_runs.config_run_count / CAST(dag_totals.total_run_count AS DOUBLE), 4)
                                                                                   AS dominant_config_run_share,
-        ROUND(config_runs.config_cost_usd / NULLIF(dag_totals.total_cost_usd, 0), 4)
+        ROUND(config_runs.config_total_cost_usd / NULLIF(dag_totals.total_cost_usd, 0), 4)
                                                                                   AS dominant_config_cost_share,
         ROW_NUMBER() OVER (
             PARTITION BY config_runs.airflow_dag_id
-            ORDER BY config_runs.config_cost_usd DESC, config_runs.config_run_count DESC
+            ORDER BY config_runs.config_total_cost_usd DESC, config_runs.config_run_count DESC
         )                                                                         AS rn
     FROM config_runs
     JOIN dag_totals
@@ -1973,8 +1904,8 @@ per_dag AS (
         ARBITRARY(driver_node_type)                                                 AS driver_node_type,
         ARBITRARY(worker_node_type)                                                 AS worker_node_type,
         ARBITRARY(worker_count)                                                     AS worker_count,
-        ROUND(SUM(cost_usd), 4)                                                    AS arm_total_cost_usd,
-        ROUND(AVG(cost_usd), 6)                                                    AS arm_avg_cost_per_run_usd,
+        ROUND(SUM(total_cost_usd), 4)                                              AS arm_total_cost_usd,
+        ROUND(AVG(total_cost_usd), 6)                                              AS arm_avg_cost_per_run_usd,
         ARBITRARY(dominant_config_run_share)                                       AS dominant_config_run_share,
         ARBITRARY(dominant_config_cost_share)                                      AS dominant_config_cost_share,
         ROUND(APPROX_PERCENTILE(total_wall_clock_seconds, 0.5)  / 60.0, 1)        AS wall_p50_min,
@@ -2000,6 +1931,336 @@ def build_amd_sql(days: int, min_days: int, min_runs: int, amd_min_runs: int) ->
     return _AMD_SQL_TEMPLATE.format(
         days=days, min_days=min_days, min_runs=min_runs, amd_min_runs=amd_min_runs
     )
+
+
+_VALIDATION_OUTCOMES_SQL = """\
+-- Observed metrics from __validation shadow DAG runs (compare vs recommendations).
+WITH runs AS (
+    SELECT
+        REGEXP_REPLACE(airflow_dag_id, '__validation$', '')                    AS prod_dag_id,
+        dt_dag_run_started,
+        driver_node_type,
+        worker_node_type,
+        worker_count,
+        total_cost_usd,
+        total_dbu_cost_usd                               AS dbu_cost_usd,
+        total_ec2_cost_calculated_usd                    AS ec2_cost_usd,
+        total_wall_clock_seconds,
+        weighted_avg_p50_driver_cpu_busy_percent         AS drv_cpu_p50,
+        weighted_avg_p95_driver_cpu_busy_percent         AS drv_cpu_p95,
+        weighted_avg_p95_driver_mem_used_percent         AS drv_mem_p95,
+        weighted_avg_p50_worker_cpu_busy_percent         AS wrk_cpu_p50,
+        weighted_avg_p95_worker_cpu_busy_percent         AS wrk_cpu_p95,
+        weighted_avg_p95_worker_mem_used_percent         AS wrk_mem_p95
+    FROM dw_databricks_health.fact_databricks_dag_run
+    WHERE dt_dag_run_started >= CURRENT_DATE - INTERVAL '{days}' DAY
+      AND airflow_dag_id LIKE 'bietlejuice.%__validation'
+      AND is_job_on_interactive = FALSE
+      AND is_any_task_failed = FALSE
+      AND is_any_databricks_run_failed = FALSE
+      AND COALESCE(total_cost_usd, 0) > 0
+),
+per_dag AS (
+    SELECT
+        prod_dag_id,
+        COUNT(*)                                                                   AS validation_runs,
+        ROUND(AVG(total_cost_usd), 6)                                              AS actual_avg_cost_per_run_usd,
+        ROUND(AVG(dbu_cost_usd), 6)                                                AS actual_avg_dbu_cost_usd,
+        ROUND(AVG(ec2_cost_usd), 6)                                                AS actual_avg_ec2_cost_usd,
+        ROUND(APPROX_PERCENTILE(total_wall_clock_seconds, 0.5)  / 60.0, 1)        AS actual_wall_p50_min,
+        ROUND(APPROX_PERCENTILE(total_wall_clock_seconds, 0.95) / 60.0, 1)        AS actual_wall_p95_min,
+        ROUND(APPROX_PERCENTILE(drv_cpu_p50, 0.5), 1)                             AS actual_drv_cpu_p50,
+        ROUND(APPROX_PERCENTILE(drv_cpu_p95, 0.95), 1)                            AS actual_drv_cpu_p95,
+        ROUND(APPROX_PERCENTILE(drv_mem_p95, 0.95), 1)                            AS actual_drv_mem_p95,
+        ROUND(APPROX_PERCENTILE(wrk_cpu_p50, 0.5), 1)                             AS actual_wrk_cpu_p50,
+        ROUND(APPROX_PERCENTILE(wrk_cpu_p95, 0.95), 1)                            AS actual_wrk_cpu_p95,
+        ROUND(APPROX_PERCENTILE(wrk_mem_p95, 0.95), 1)                            AS actual_wrk_mem_p95,
+        ARBITRARY(driver_node_type)                                                 AS actual_driver_node_type,
+        ARBITRARY(worker_node_type)                                                 AS actual_worker_node_type,
+        ARBITRARY(worker_count)                                                     AS actual_worker_count
+    FROM runs
+    GROUP BY prod_dag_id
+    HAVING COUNT(*) >= {validation_min_runs}
+)
+SELECT * FROM per_dag
+ORDER BY validation_runs DESC
+"""
+
+_VALIDATION_COST_PASS_PCT = 15.0
+_VALIDATION_COST_WARN_PCT = 30.0
+_VALIDATION_CPU_PASS_PP = 15.0
+_VALIDATION_WALL_INFLATION_MAX = 1.2
+
+
+def build_validation_sql(days: int, validation_min_runs: int) -> str:
+    return _VALIDATION_OUTCOMES_SQL.format(
+        days=days, validation_min_runs=validation_min_runs
+    )
+
+
+@dataclass
+class ValidationOutcome:
+    dag_id: str
+    cohort: str
+    recommended_preset: str | None
+    rec_driver_node_type: str | None
+    rec_worker_node_type: str | None
+    rec_worker_count: int | None
+    projected_est_cost_per_run_usd: float | None
+    projected_est_drv_cpu_p50: float | None
+    projected_est_drv_mem_p95: str | None
+    projected_est_wall_p95_min: float | None
+    validation_runs: int
+    actual_avg_cost_per_run_usd: float | None
+    actual_drv_cpu_p50: float | None
+    actual_drv_mem_p95: float | None
+    actual_wall_p95_min: float | None
+    actual_driver_node_type: str | None
+    actual_worker_node_type: str | None
+    actual_worker_count: int | None
+    delta_cost_pct: float | None
+    delta_drv_cpu_p50: float | None
+    delta_drv_mem_p95: float | None
+    delta_wall_p95_min: float | None
+    outcome: str
+
+
+def _parse_projected_mem_pct(value: str | None) -> float | None:
+    if not value:
+        return None
+    match = re.search(r"([\d.]+)\s*%", value)
+    if not match:
+        return None
+    return float(match.group(1))
+
+
+def _validation_outcome_label(
+    rec: Recommendation,
+    actual_cost: float | None,
+    actual_drv_cpu_p50: float | None,
+    actual_drv_mem_p95: float | None,
+    actual_wall_p95: float | None,
+    delta_cost_pct: float | None,
+    delta_drv_cpu_p50: float | None,
+    delta_drv_mem_p95: float | None,
+    delta_wall_p95_min: float | None,
+) -> str:
+    if actual_cost is None:
+        return "insufficient_validation_data"
+
+    fails = 0
+    warns = 0
+
+    if delta_cost_pct is not None:
+        if abs(delta_cost_pct) > _VALIDATION_COST_WARN_PCT:
+            fails += 1
+        elif abs(delta_cost_pct) > _VALIDATION_COST_PASS_PCT:
+            warns += 1
+
+    if delta_drv_cpu_p50 is not None:
+        if abs(delta_drv_cpu_p50) > _VALIDATION_CPU_PASS_PP:
+            warns += 1
+
+    if delta_drv_mem_p95 is not None:
+        if abs(delta_drv_mem_p95) > 20.0:
+            warns += 1
+
+    if (
+        rec.cohort == "collapse_to_single"
+        and actual_wall_p95 is not None
+        and rec.wall_p95_min
+        and rec.wall_p95_min > 0
+        and actual_wall_p95 > rec.wall_p95_min * _VALIDATION_WALL_INFLATION_MAX
+    ):
+        warns += 1
+
+    if fails:
+        return "fail"
+    if warns:
+        return "warn"
+    return "pass"
+
+
+def build_validation_outcomes(
+    recs: list[Recommendation],
+    validation_rows: list[dict[str, Any]],
+) -> list[ValidationOutcome]:
+    actionable = _rightsizing_validation_module()._ACTIONABLE_COHORTS
+    rec_by_id = {r.dag_id: r for r in recs if r.cohort in actionable}
+    outcomes: list[ValidationOutcome] = []
+
+    for row in validation_rows:
+        dag_id = str(row.get("prod_dag_id") or "")
+        rec = rec_by_id.get(dag_id)
+        if rec is None:
+            continue
+
+        actual_cost = _f_row(row.get("actual_avg_cost_per_run_usd"))
+        projected_cost = rec.projected.est_cost_per_run_usd
+        delta_cost_pct = None
+        if actual_cost is not None and projected_cost is not None and projected_cost > 0:
+            delta_cost_pct = round(
+                (actual_cost - projected_cost) / projected_cost * 100, 1
+            )
+
+        actual_drv_cpu = _f_row(row.get("actual_drv_cpu_p50"))
+        projected_drv_cpu = rec.projected.est_drv_cpu_p50
+        delta_drv_cpu = None
+        if actual_drv_cpu is not None and projected_drv_cpu is not None:
+            delta_drv_cpu = round(actual_drv_cpu - projected_drv_cpu, 1)
+
+        actual_drv_mem = _f_row(row.get("actual_drv_mem_p95"))
+        projected_drv_mem = _parse_projected_mem_pct(rec.projected.est_drv_mem_p95)
+        delta_drv_mem = None
+        if actual_drv_mem is not None and projected_drv_mem is not None:
+            delta_drv_mem = round(actual_drv_mem - projected_drv_mem, 1)
+
+        actual_wall = _f_row(row.get("actual_wall_p95_min"))
+        projected_wall = rec.wall_p95_min
+        delta_wall = None
+        if actual_wall is not None and projected_wall is not None:
+            delta_wall = round(actual_wall - projected_wall, 1)
+
+        outcome = _validation_outcome_label(
+            rec,
+            actual_cost,
+            actual_drv_cpu,
+            actual_drv_mem,
+            actual_wall,
+            delta_cost_pct,
+            delta_drv_cpu,
+            delta_drv_mem,
+            delta_wall,
+        )
+
+        outcomes.append(
+            ValidationOutcome(
+                dag_id=dag_id,
+                cohort=rec.cohort,
+                recommended_preset=rec.recommended_preset,
+                rec_driver_node_type=rec.rec_driver_node_type,
+                rec_worker_node_type=rec.rec_worker_node_type,
+                rec_worker_count=rec.rec_worker_count,
+                projected_est_cost_per_run_usd=projected_cost,
+                projected_est_drv_cpu_p50=projected_drv_cpu,
+                projected_est_drv_mem_p95=rec.projected.est_drv_mem_p95,
+                projected_est_wall_p95_min=projected_wall,
+                validation_runs=int(float(str(row.get("validation_runs") or 0))),
+                actual_avg_cost_per_run_usd=actual_cost,
+                actual_drv_cpu_p50=actual_drv_cpu,
+                actual_drv_mem_p95=actual_drv_mem,
+                actual_wall_p95_min=actual_wall,
+                actual_driver_node_type=str(row.get("actual_driver_node_type") or "")
+                or None,
+                actual_worker_node_type=str(row.get("actual_worker_node_type") or "")
+                or None,
+                actual_worker_count=(
+                    int(_f_row(row.get("actual_worker_count")) or 0)
+                    if _f_row(row.get("actual_worker_count")) is not None
+                    else None
+                ),
+                delta_cost_pct=delta_cost_pct,
+                delta_drv_cpu_p50=delta_drv_cpu,
+                delta_drv_mem_p95=delta_drv_mem,
+                delta_wall_p95_min=delta_wall,
+                outcome=outcome,
+            )
+        )
+
+    return outcomes
+
+
+def _f_row(v: Any) -> float | None:
+    s = str(v).strip() if v is not None else ""
+    if s in ("", "None", "nan", "NaN"):
+        return None
+    return float(s)
+
+
+def _i_row(v: Any, default: int = 0) -> int:
+    s = str(v).strip() if v is not None else ""
+    if s in ("", "None", "nan", "NaN"):
+        return default
+    return int(float(s))
+
+
+_VALIDATION_OUTCOME_FIELDS = [
+    "dag_id",
+    "cohort",
+    "recommended_preset",
+    "rec_driver_node_type",
+    "rec_worker_node_type",
+    "rec_worker_count",
+    "projected_est_cost_per_run_usd",
+    "projected_est_drv_cpu_p50",
+    "projected_est_drv_mem_p95",
+    "projected_est_wall_p95_min",
+    "validation_runs",
+    "actual_avg_cost_per_run_usd",
+    "actual_drv_cpu_p50",
+    "actual_drv_mem_p95",
+    "actual_wall_p95_min",
+    "actual_driver_node_type",
+    "actual_worker_node_type",
+    "actual_worker_count",
+    "delta_cost_pct",
+    "delta_drv_cpu_p50",
+    "delta_drv_mem_p95",
+    "delta_wall_p95_min",
+    "outcome",
+]
+
+
+def write_validation_outcomes(
+    outcomes: list[ValidationOutcome],
+    out_csv: Path,
+) -> None:
+    out_csv.parent.mkdir(parents=True, exist_ok=True)
+    with out_csv.open("w", newline="", encoding="utf-8") as fh:
+        writer = csv.DictWriter(fh, fieldnames=_VALIDATION_OUTCOME_FIELDS)
+        writer.writeheader()
+        for outcome in outcomes:
+            writer.writerow(asdict(outcome))
+
+
+def fetch_validation_rows(
+    sql: str,
+    trino_host: str | None = None,
+) -> list[dict[str, Any]]:
+    """Run validation SQL and return raw row dicts."""
+    host = resolve_trino_host(trino_host)
+    with tempfile.NamedTemporaryFile(suffix=".csv", delete=False) as tmp:
+        csv_path = tmp.name
+
+    cmd = [
+        sys.executable,
+        str(EXECUTE_TRINO),
+        "--host",
+        host,
+        "--catalog",
+        "delta",
+        "--external-auth",
+        "--query",
+        sql,
+        "--csv-output",
+        csv_path,
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"execute_trino.py failed (exit {result.returncode}):\n"
+            f"stdout: {result.stdout[:500]}\nstderr: {result.stderr[:500]}"
+        )
+
+    out = json.loads(result.stdout)
+    if out.get("status") != "success":
+        raise RuntimeError(f"Trino query failed: {out.get('message', out)}")
+
+    rows: list[dict[str, Any]] = []
+    with open(csv_path, newline="", encoding="utf-8") as fh:
+        reader = csv.DictReader(fh)
+        rows.extend(reader)
+    return rows
 
 
 def resolve_trino_host(cli_host: str | None = None) -> str:
@@ -2189,6 +2450,7 @@ def _row_to_metrics(row: dict[str, Any]) -> DagMetrics:
         arm_avg_ec2_cost_usd=_f(row.get("arm_avg_ec2_cost_usd")),
         arm_total_dbu_cost_usd=_f(row.get("arm_total_dbu_cost_usd")),
         arm_avg_dbu_cost_usd=_f(row.get("arm_avg_dbu_cost_usd")),
+        arm_avg_dbu_consumed=_f(row.get("arm_avg_dbu_consumed")),
         ec2_spot_hours=_f(row.get("ec2_spot_hours")),
         ec2_on_demand_hours=_f(row.get("ec2_on_demand_hours")),
         total_memory_bytes_spilled=_f(row.get("total_memory_bytes_spilled")) or 0.0,
@@ -2569,6 +2831,18 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         metavar="N",
         help="Minimum AMD run count for AMD correction pool (default 10)",
     )
+    parser.add_argument(
+        "--validation-outcomes",
+        metavar="PATH",
+        help="Write validation_outcomes.csv comparing recommendations vs __validation runs",
+    )
+    parser.add_argument(
+        "--validation-min-runs",
+        type=int,
+        default=1,
+        metavar="N",
+        help="Minimum validation runs per DAG for outcome comparison (default 1)",
+    )
     return parser.parse_args(argv)
 
 
@@ -2660,6 +2934,15 @@ def main(argv: list[str] | None = None) -> int:
             databricks_conn_id=args.databricks_conn_id,
         )
         print(f"Wrote {out_yaml} ({n} actionable DAGs)", file=sys.stderr)
+
+    if args.validation_outcomes and args.trino:
+        val_sql = build_validation_sql(args.days, args.validation_min_runs)
+        print("Querying validation run outcomes …", file=sys.stderr)
+        val_rows = fetch_validation_rows(val_sql, trino_host)
+        outcomes = build_validation_outcomes(recs, val_rows)
+        val_csv = Path(args.validation_outcomes)
+        write_validation_outcomes(outcomes, val_csv)
+        print(f"Wrote {val_csv} ({len(outcomes)} matched DAGs)", file=sys.stderr)
 
     _print_cohort_summary(recs)
     return 0

@@ -27,8 +27,37 @@ The live query reads `dw_databricks_health.fact_databricks_dag_run` for successf
 - `is_job_on_interactive = FALSE`
 - `is_any_task_failed = FALSE`
 - `is_any_databricks_run_failed = FALSE`
+- `COALESCE(total_cost_usd, 0) > 0` (excludes zero-cost rows from a known ingestion bug on recent load dates)
+- `NOT REGEXP_LIKE(airflow_dag_id, '__validation$')` (prod DAGs only in the main query)
 
-The query selects the cost-dominant ARM cluster config per DAG. If one config does not account for at least 80% of runs and cost, the DAG goes to `mixed_config_review`.
+ARM runs are identified with a case-insensitive Graviton regex:
+
+```text
+^([a-z][a-z0-9]*[0-9]g(d|n|b)?|a1)[.]
+```
+
+This covers `m6g`, `m6gd`, `m7g`, `c6g`, `r6gd`, `a1`, and mixed-case node types from Databricks.
+
+The query selects the **total-cost-dominant** ARM cluster config per DAG (`SUM(total_cost_usd)`). If one config does not account for at least 80% of runs and cost share, the DAG goes to `mixed_config_review`.
+
+### Cost Attribution
+
+Costs follow the same chain as `fact_databricks_dag_run` attribution:
+
+```text
+dim_dbu_price (negotiated USD/DBU) ──┐
+dim_ec2_price (on_demand USD/hr) ────┼──► fact_databricks_task_run ──► fact_databricks_dag_run ──► recommender
+```
+
+| Column | Unit | Aggregation | Use |
+| --- | --- | --- | --- |
+| `total_cost_usd` | USD | `SUM` (period), `AVG` (per run) | Cost basis, dominant-config ranking |
+| `total_dbu_cost_usd` | USD | `SUM`, `AVG` | DBU component in cost projection |
+| `total_ec2_cost_calculated_usd` | USD | `SUM`, `AVG` | EC2 component in cost projection |
+| `total_dbu_consumed` | DBU (scalar) | `AVG` only | Sanity vs `dim_dbu_price`; never summed with USD |
+| `total_dbu_list_cost_usd` | USD | — | **Not used** (audit-only list rate) |
+
+`_current_cost_basis()` returns `arm_avg_cost_per_run_usd` (= `AVG(total_cost_usd)`). Implied $/DBU is a ratio: `AVG(total_dbu_cost_usd) / AVG(total_dbu_consumed)`.
 
 ### Key Inputs
 
@@ -40,11 +69,17 @@ The query selects the cost-dominant ARM cluster config per DAG. If one config do
 | `drv_cpu_p50/p95`, `drv_mem_p50/p95` | Driver utilization |
 | `wrk_cpu_p50/p95`, `wrk_mem_p50/p95` | Worker utilization |
 | `worker_count`, `driver_node_type`, `worker_node_type` | Current topology and capacity |
-| `arm_avg_ec2_cost_usd`, `arm_avg_dbu_cost_usd` | Cost guard basis |
+| `arm_avg_cost_per_run_usd` | Per-run total USD (negotiated DBU + EC2) |
+| `arm_avg_ec2_cost_usd`, `arm_avg_dbu_cost_usd` | Cost guard components |
+| `arm_avg_dbu_consumed` | Per-run DBU intensity (sanity only) |
 | `ec2_spot_hours`, `ec2_on_demand_hours` | Evidence of spot/on-demand blend |
 | spill and pricing flags | Quality gates |
 
-EC2 prices are sourced from the in-repo cost authority `datalake_databricks_pricing.dim_ec2_price`. Spot is modeled as `0.37 x on_demand` (a 63% discount), matching `fact_databricks_costs`.
+### Instance Catalog
+
+EC2 on-demand USD/hour is generated from [`dim_ec2_price.sql`](../../dags/platform/enrich_databricks_pricing/queries/enrich/dim_ec2_price.sql). Hardware specs (vCPU, RAM, family) live in [`scripts/instance_specs.yml`](../../scripts/instance_specs.yml). The generator [`scripts/generate_instance_catalog.py`](../../scripts/generate_instance_catalog.py) joins both into [`scripts/instance_catalog_data.py`](../../scripts/instance_catalog_data.py).
+
+Spot is modeled as `0.37 × on_demand` (a 63% discount), matching `dim_ec2_price` seed derivation and `daily_cluster_health`.
 
 ---
 
@@ -178,7 +213,7 @@ Where `worker_activity` is the max of worker p50/p95 CPU and p95 memory pressure
 
 ## Cost Guard
 
-Single-node clusters are on-demand. Multi-node workers are often spot. The cost guard compares the rejected single-node candidate against actual blended telemetry:
+Single-node clusters are on-demand. Multi-node workers are often spot. The cost guard compares the rejected single-node candidate against `arm_avg_cost_per_run_usd` (negotiated total USD per run from telemetry):
 
 ```text
 single_node_projected_cost =
@@ -347,6 +382,29 @@ validation:
 
 ---
 
+## Validation Outcome Comparison
+
+After recommendations are built, optional `--validation-outcomes PATH` compares actionable cohorts against existing `bietlejuice.*__validation` runs (same lookback window, `validation_min_runs` default 1).
+
+For each matched prod DAG:
+
+| Compared | Projected source | Actual source |
+| --- | --- | --- |
+| Cost per run | `projected.est_cost_per_run_usd` | `AVG(total_cost_usd)` from validation runs |
+| Driver CPU p50 | `projected.est_drv_cpu_p50` | validation `APPROX_PERCENTILE` |
+| Driver mem p95 | parsed from `projected.est_drv_mem_p95` | validation aggregate |
+| Wall p95 | prod `wall_p95_min` (baseline) | validation wall p95 |
+
+Initial thresholds:
+
+- Cost: `pass` if `|delta_cost_pct| ≤ 15%`; `warn` if `≤ 30%`; else `fail`
+- Driver CPU p50: `warn` if `|delta| > 15` percentage points
+- Collapse cohorts: `warn` if validation wall p95 exceeds `1.2 ×` prod wall p95
+
+Rows without validation history are skipped. See the runbook for operational usage.
+
+---
+
 ## Verification
 
 The implementation is covered by `tests/unit/scripts/test_recommend_cluster_specs.py`.
@@ -356,6 +414,7 @@ Required checks before relying on a recommendation batch:
 ```bash
 uv run pytest tests/unit/scripts/test_recommend_cluster_specs.py
 make check-style
+uv run python scripts/generate_instance_catalog.py   # after seed or instance_specs.yml changes
 uv run --no-project --with "trino==0.337.0,pandas,requests,tzlocal,lz4,zstandard,orjson" \
   python scripts/recommend_cluster_specs.py --trino --list
 ```
