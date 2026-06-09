@@ -20,7 +20,7 @@ workflow:
   tables_customization:
     managed_devices:
       extraction_type: full
-      merge_on: [id_device]
+      merge_on: []
       partitions: []
   default_table_privileges:
     auditlogs:
