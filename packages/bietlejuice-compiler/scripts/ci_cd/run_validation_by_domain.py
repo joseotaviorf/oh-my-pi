@@ -29,6 +29,7 @@ from typing import List, Optional, Tuple
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+from bietlejuice.ci.ci_diff_ref import resolve_diff_from_ref
 from scripts.services.git_service import GitService
 
 ALL_DOMAINS: List[str] = [
@@ -83,17 +84,12 @@ def _fetch_master() -> None:
 def _changed_files(branch: str) -> Optional[List[str]]:
     """Returns paths of files changed in *branch* vs master, or None on error.
 
-    Long-lived branches (master, forno, hotfix/*) compare HEAD~1..HEAD so that
-    only the files introduced by the current push commit are checked. Feature
-    branches compare origin/master..HEAD to capture all their accumulated
-    changes since branching from master.
+    Woodpecker pull_request pipelines always use origin/master..HEAD (full PR diff).
+    Push pipelines on long-lived branches (master, forno, hotfix/*) use HEAD~1..HEAD.
+    Feature branches compare origin/master..HEAD.
     """
     git_service = GitService()
-    from_ref = (
-        "HEAD~1"
-        if branch in ("master", "forno") or branch.startswith("hotfix/")
-        else "origin/master"
-    )
+    from_ref = resolve_diff_from_ref(branch)
     try:
         diff = git_service.get_modified_files_from_diff(from_ref, "HEAD")
         return list(diff.keys())

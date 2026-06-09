@@ -19,6 +19,7 @@ from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
 import yaml
 
+from bietlejuice.ci.ci_diff_ref import resolve_diff_from_ref
 from scripts.ci_cd.domain_cli import (
     branch_name_arg_type,
     domain_arg_type,
@@ -48,8 +49,6 @@ from scripts.ci_cd.source_layer_validation.layer_policy_matrix import (
 from scripts.ci_cd.source_layer_validation.read_dag_declaration import (
     get_workflow_layer_and_type,
 )
-
-# Repo root on path (Makefile uses PYTHONPATH=.)
 from scripts.services.git_service import GitService
 
 
@@ -388,7 +387,7 @@ def main() -> None:
         "-b",
         "--branch",
         type=branch_name_arg_type,
-        help="Branch name; diff against origin/master (or HEAD~1 on master)",
+        help="Branch name; diff base resolved via resolve_diff_from_ref (CI-aware)",
     )
     parser.add_argument(
         "-a",
@@ -429,11 +428,7 @@ def main() -> None:
             parser.error("Provide -b BRANCH or use -a/--all-dags")
 
         git_service = GitService()
-        if branch == "master":
-            from_branch = "HEAD~1"
-        else:
-            from_branch = "origin/master"
-            git_service.fetch("master")
+        from_branch = resolve_diff_from_ref(branch)
 
         changed_files = git_service.get_modified_files_from_diff(from_branch, "HEAD")
         skip_reason, dag_roots = get_branch_mode_affected_roots(changed_files, profile)

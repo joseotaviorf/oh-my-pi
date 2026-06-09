@@ -5,6 +5,7 @@ from pathlib import Path
 import yaml
 from yamale import YamaleError
 
+from bietlejuice.ci.ci_diff_ref import resolve_diff_from_ref
 from scripts.ci_cd.domain_cli import (
     branch_name_arg_type,
     domain_arg_type,
@@ -103,10 +104,7 @@ def get_metadata_file_paths(mode, input, domain=None):
                 ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
             ).strip()
         input = branch_name_arg_type(input)
-        if input == "master":
-            from_branch = "HEAD~1"
-        else:
-            from_branch = "origin/master"
+        from_branch = resolve_diff_from_ref(input)
         files = [
             (file, status)
             for file, status in git_service.get_modified_files_from_diff(

@@ -23,6 +23,8 @@ from typing import List, Tuple
 sys.path.append(str(Path(__file__).parent.parent.parent))
 from services.git_service import GitService
 
+from bietlejuice.ci.ci_diff_ref import resolve_diff_from_ref
+
 # Path patterns to check for changes (matched via str.startswith against git-diff paths)
 CORE_MODEL_PATHS = [
     "dags/core/",
@@ -97,12 +99,7 @@ def get_changed_files(mode, input) -> List[Tuple[str, str]]:
         return [("all", "A")]
     elif mode == "branch":
         git_service = GitService()
-        if input == "master":
-            from_branch = "HEAD~1"
-        else:
-            from_branch = "origin/master"
-            # Fetch master branch to ensure we have the latest changes
-            git_service.fetch("master")
+        from_branch = resolve_diff_from_ref(input)
 
         # Get all changed files
         changed_files = git_service.get_modified_files_from_diff(from_branch, "HEAD")

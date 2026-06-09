@@ -33,6 +33,7 @@ from typing import Any, DefaultDict, Dict, List, Optional, Sequence, Set, Tuple
 
 import yaml
 
+from bietlejuice.ci.ci_diff_ref import resolve_diff_from_ref
 from bietlejuice.governance.fairness_assessment.constants import (
     PARTITION_COLUMN_NAMES_LOWERCASE,
 )
@@ -453,10 +454,7 @@ def print_scope_audit_report(
 
 
 def _git_branch_files(branch: str) -> List[Path]:
-    if branch == "master":
-        from_ref = "HEAD~1"
-    else:
-        from_ref = "origin/master"
+    from_ref = resolve_diff_from_ref(branch)
     subprocess.run(
         ["git", "fetch", "--no-tags", "origin", "+refs/heads/master"],
         check=False,

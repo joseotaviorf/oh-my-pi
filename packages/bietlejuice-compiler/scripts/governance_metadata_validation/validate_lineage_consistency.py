@@ -21,6 +21,7 @@ from typing import Dict, List, Set, Tuple
 import yaml
 from sqlglot import exp, parse_one
 
+from bietlejuice.ci.ci_diff_ref import resolve_diff_from_ref
 from scripts.ci_cd.domain_cli import (
     branch_name_arg_type,
     domain_arg_type,
@@ -465,7 +466,7 @@ def get_files_to_validate(mode: str, input_value) -> List[Tuple[str, str, str]]:
     elif mode == "branch":
         # Git diff mode — branch name is used only for comparison, not as a path
         git_service = GitService()
-        from_branch = "HEAD~1" if input_value == "master" else "origin/master"
+        from_branch = resolve_diff_from_ref(input_value)
 
         changed_files_dict = git_service.get_modified_files_from_diff(
             from_branch, "HEAD"

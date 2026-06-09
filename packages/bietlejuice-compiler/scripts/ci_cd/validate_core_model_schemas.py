@@ -21,6 +21,8 @@ import yaml
 sys.path.append(str(Path(__file__).parent.parent))
 from services.git_service import GitService
 
+from bietlejuice.ci.ci_diff_ref import resolve_diff_from_ref
+
 
 def validate_and_sanitize_file_path(file_path: str) -> Path:
     """
@@ -174,10 +176,7 @@ def get_schema_files_to_validate(mode, input) -> List[Tuple[Path, str]]:
                     files.append((schema_file, "A"))
     elif mode == "branch":
         git_service = GitService()
-        if input == "master":
-            from_branch = "HEAD~1"
-        else:
-            from_branch = "origin/master"
+        from_branch = resolve_diff_from_ref(input)
 
         # Get all changed files
         changed_files = git_service.get_modified_files_from_diff(from_branch, "HEAD")

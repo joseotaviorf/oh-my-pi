@@ -194,6 +194,25 @@ def test_git_branch_files_filters_metadata_paths(
     ]
 
 
+@mock.patch(
+    "bietlejuice.governance.fairness_assessment.validate_metadata_cli.subprocess.check_output"
+)
+@mock.patch(
+    "bietlejuice.governance.fairness_assessment.validate_metadata_cli.subprocess.run"
+)
+def test_git_branch_files_uses_full_pr_diff_when_target_branch_is_master_on_pull_request(
+    mock_run: mock.MagicMock,
+    mock_check_output: mock.MagicMock,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    mock_check_output.return_value = "M\tdags/foo/metadata/clean/table.yml\n"
+    monkeypatch.setenv("CI_PIPELINE_EVENT", "pull_request")
+    # Act
+    _git_branch_files("master")
+    # Assert — Woodpecker sets CI_COMMIT_BRANCH=master on PRs targeting master
+    assert mock_check_output.call_args[0][0][-1] == "origin/master...HEAD"
+
+
 # --------------------------------------------------------------------------- #
 # resolve_scope_paths
 # --------------------------------------------------------------------------- #
