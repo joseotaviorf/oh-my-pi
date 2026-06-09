@@ -154,10 +154,10 @@ SELECT
         'locationInformationMissing',
         'unparseableAddressComplement',
         'addressComplementStructMismatch',
-        'incompletelocation_street',
-        'incompletelocation_number',
-        'incompletelocation_complement',
-        'incompletelocation_zipcode'
+        'incompleteLocationStreet',
+        'incompleteLocationNumber',
+        'incompleteLocationComplement',
+        'incompleteLocationZipcode'
       ),
         swf.status_reason)) >= 1
     THEN 'LISTING_INFO'
