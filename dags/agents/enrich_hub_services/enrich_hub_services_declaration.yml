@@ -5,9 +5,9 @@ dag:
   owner: Data Agents
   documentation:
     dag_purpose: |
-      Enriched Hub Services layer: secretariat allocation and hierarchy, business unit region,
-      member profiles and hub linkage, business unit dimension with region attributes, profile
-      snapshots, and daily member–hub allocation for agents and downstream consumers.
+      Enriched Hub Services layer: business unit region, member profiles and hub linkage,
+      business unit dimension with region attributes, profile snapshots, and daily
+      member–hub allocation for agents and downstream consumers.
 workflow:
   type: query_delta
   layer: enrich
@@ -15,8 +15,6 @@ workflow:
     load_start_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_start_date') }}"
     load_end_date: "{{ get_date_param(dag_run, data_interval_start | ds, 'load_end_date') }}"
   inner_dependencies:
-    daily_secretariat_allocation:
-      - secretariat_allocation_history
     member_profile:
       - business_unit
     member_hub_allocation:
@@ -24,9 +22,6 @@ workflow:
     agent_hub_alocation:
       - member_profile
   tables_customization:
-    daily_secretariat_allocation:
-      partitions: [dt_snapshot]
-      extraction_type: incremental
     profile:
       extraction_type: incremental
       partitions: [year, month, day]
