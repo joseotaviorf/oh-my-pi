@@ -4143,6 +4143,7 @@ bietlejuice.enrich_terminator:
 bietlejuice.enrich_ticket_rate_classification_snapshot:
   - bietlejuice.gsheets_static:load-clean-ticket-rate-classification:first-run-of-day
 bietlejuice.enrich_tiers:
+  - bietlejuice.enrich_agent:load-enrich-agent:first-run-of-day
   - bietlejuice.enrich_ciq:load-enrich-ciq-agents:first-run-of-day
   - bietlejuice.enrich_ciq:load-enrich-ciq-users:first-run-of-day
   - bietlejuice.enrich_demand_conversion_events:load-enrich-prospect-daily-results:first-run-of-day

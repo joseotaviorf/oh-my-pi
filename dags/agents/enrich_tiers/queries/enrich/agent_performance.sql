@@ -1,6 +1,7 @@
 WITH metric_period_process AS (
     SELECT DISTINCT
         mp.id AS id_metric_period,
+        mp.metric AS metric_name,
         mp.dt_init AS dt_metric_period_started,
         mp.dt_end AS dt_metric_period_ended
     FROM
@@ -230,18 +231,32 @@ SELECT
 FROM OS2CCV_BY_compound_metric
 )
 SELECT
-    id_user,
-    id_agent,
-    uuid_person,
-    id_metric_period,
-    metric_name,
-    metric_value,
-    is_valid,
-    dt_metric_period_started,
-    dt_metric_period_ended,
-    dt_last_processing,
+    acc.id_user,
+    acc.id_agent,
+    acc.uuid_person,
+    mpp.id_metric_period,
+    mpp.metric_name,
+    COALESCE(cap.metric_value, 0) AS metric_value,
+    COALESCE(cap.is_valid, TRUE) AS is_valid,
+    mpp.dt_metric_period_started,
+    mpp.dt_metric_period_ended,
+    COALESCE(cap.dt_last_processing, CURRENT_DATE) AS dt_last_processing,
     -- keeping partitions immutable for the merge pipeline (aligned with metric_events / agent_allocation)
-    YEAR(dt_metric_period_started) AS year,
-    MONTH(dt_metric_period_started) AS month,
-    DAY(dt_metric_period_started) AS day
-FROM combined_agent_performance
+    YEAR(mpp.dt_metric_period_started) AS year,
+    MONTH(mpp.dt_metric_period_started) AS month,
+    DAY(mpp.dt_metric_period_started) AS day
+FROM
+    datalake_agent_accreditation.agent AS acc
+CROSS JOIN
+    metric_period_process AS mpp
+LEFT JOIN
+    combined_agent_performance AS cap
+        ON cap.id_user = acc.id_user
+        AND cap.id_metric_period = mpp.id_metric_period
+        AND cap.metric_name = mpp.metric_name
+WHERE
+    acc.id_user IS NOT NULL
+    AND (
+        acc.status != "INACTIVE"
+        OR (acc.status == "INACTIVE" AND acc.ts_last_status_changed >= ADD_MONTHS(DATE('{load_end_date}'), -6))
+    )
