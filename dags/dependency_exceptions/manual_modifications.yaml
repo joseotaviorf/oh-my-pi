@@ -240,8 +240,7 @@ bietlejuice.dw_sale_visits:
     - bietlejuice.enrich_booking:load-enrich-booking:first-run-of-day
     - bietlejuice.enrich_secretariat:load-enrich-daily-secretariat-allocation:first-run-of-day
 bietlejuice.dw_secretariat_user:
-  remove:
-    - bietlejuice.enrich_secretariat:load-enrich-secretariat-allocation-history:first-run-of-day
+  override: []
 bietlejuice.dw_table_snapshot:
   remove:
     - bietlejuice.enrich_airflow:load-enrich-dag:first-run-of-day
@@ -399,6 +398,8 @@ bietlejuice.enrich_neurotech_quintocred:
   remove:
     - bietlejuice.velo_neurotech:load-clean-logs-credit-granting:first-run-of-day
     - bietlejuice.velo_neurotech:load-clean-logs-scoping-policy:first-run-of-day
+bietlejuice.enrich_secretariat:
+  override: []
 bietlejuice.core_offer:
   add:
     - bietlejuice.rental_transact_fast_lane:load-clean-offer
