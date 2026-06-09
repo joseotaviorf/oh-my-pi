@@ -11,6 +11,7 @@ columns:
     - datalake_nexxera.cnab_charges.document_number
     - datalake_retsuko.invoice.payment_company_use_number
     - datalake_checkout_clean.boleto.your_number
+    - datalake_checkout_clean.bolecode.your_number
     - datalake_vans_clean.boleto.company_use
     - datalake_vans_clean.boleto.document_number
     - datalake_pas.ledger.id_external_payment
@@ -38,11 +39,13 @@ columns:
     description: 'Payment method used in checkout sources'
     lineage:
     - datalake_checkout_clean.boleto
+    - datalake_checkout_clean.bolecode
     - datalake_vans_clean.boleto
   payment_status:
     description: 'Payment status in checkout sources'
     lineage:
     - datalake_checkout_clean.boleto.status
+    - datalake_checkout_clean.bolecode.status
     - datalake_vans_clean.boleto.status
   bank_amount:
     description: "Amount received in bank statements from Nexxera"
@@ -53,9 +56,10 @@ columns:
     lineage:
       - datalake_retsuko.invoice.paid_amount
   vans_checkout_amount:
-    description: "Amount recorded in Vans checkout system from boleto payments"
+    description: "Amount recorded in Vans checkout system from boleto and bolecode payments"
     lineage:
       - datalake_checkout_clean.boleto.paid_amount
+      - datalake_checkout_clean.bolecode.paid_amount
       - datalake_vans_clean.boleto.paid_amount
   sap_amount:
     description: "Amount recorded in SAP system for financial entries"
@@ -73,6 +77,7 @@ columns:
     description: "Status comparing bank and Vans checkout amounts and dates (ok/not recorded/recorded with divergent date or value)"
     lineage:
       - datalake_checkout_clean.boleto
+      - datalake_checkout_clean.bolecode
       - datalake_vans_clean.boleto
   status_sap:
     description: "Status comparing bank and SAP amounts and dates (ok/not recorded/recorded with divergent date or value)"
@@ -84,6 +89,7 @@ columns:
       - datalake_nexxera.cnab_charges
       - datalake_pas.ledger
       - datalake_checkout_clean.boleto
+      - datalake_checkout_clean.bolecode
       - datalake_vans_clean.boleto
       - datalake_retsuko.invoice
   is_bank_concilied_detail:
@@ -122,6 +128,8 @@ columns:
     description: "Date when the payment was recorded in Vans checkout system"
     lineage:
       - datalake_checkout_clean.boleto.ts_paid
+      - datalake_checkout_clean.bolecode.ts_paid
+      - datalake_checkout_clean.bolecode.dt_credit
       - datalake_vans_clean.boleto.dt_paid
       - dw_public.dim_date.next_brz_fintech_business_day
   dt_sap_paid:

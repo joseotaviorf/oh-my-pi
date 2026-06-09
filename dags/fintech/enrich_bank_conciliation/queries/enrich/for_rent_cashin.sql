@@ -183,14 +183,27 @@ sap AS (
 ),
 
 vans_checkout_union AS (
+    -- Source 1: Checkout boleto — CK/*C## use your_number; otherwise our_number (original behavior)
     SELECT
-        NULLIF(b.your_number, '') AS company_use,
+        COALESCE(
+            CASE
+                WHEN UPPER(TRIM(b.your_number)) LIKE 'CK%' THEN NULLIF(TRIM(b.your_number), '')
+                WHEN TRIM(b.your_number) RLIKE '^[0-9]+C[0-9]+$' THEN NULLIF(TRIM(b.your_number), '')
+                ELSE NULL
+            END,
+            NULLIF(TRIM(b.our_number), ''),
+            NULLIF(REGEXP_REPLACE(SUBSTRING(TRIM(b.your_number), 20, 20), '^0+', ''), '')
+        ) AS company_use,
         b.id_finance_entity AS id_invoice,
         DATE(b.ts_paid) AS ts_paid,
         'BOLETO' AS payment_method,
         b.status AS payment_status,
         b.paid_amount,
-        NULLIF(CAST(TRIM(b.our_number) AS INTEGER), '') AS our_number
+        COALESCE(
+            NULLIF(CAST(TRIM(b.our_number) AS INTEGER), ''),
+            NULLIF(CAST(REGEXP_REPLACE(SUBSTRING(TRIM(b.your_number), 20, 20), '^0+', '') AS INTEGER), '')
+        ) AS our_number,
+        'checkout_boleto' AS payment_source
     FROM
         datalake_checkout_clean.boleto b
     WHERE
@@ -198,19 +211,47 @@ vans_checkout_union AS (
         AND b.id NOT IN (5855, 5856, 5857)
         AND b.status IN ('PAID', 'PAID_AFTER_DUE_DATE')
         AND (b.beneficiary_account = '39221' OR b.beneficiary_account IS NULL)
+        -- Bolecode supersedes boleto for the same our_number (avoids BOLETO row with due_amount vs PIX paid_amount)
+        AND NOT EXISTS (
+            SELECT 1
+            FROM datalake_checkout_clean.bolecode bc
+            WHERE
+                bc.requester_name = b.requester_name
+                AND bc.status IN ('PAID', 'PAID_AFTER_DUE_DATE')
+                AND NULLIF(TRIM(bc.our_number), '') IS NOT NULL
+                AND NULLIF(TRIM(bc.our_number), '') = NULLIF(TRIM(b.our_number), '')
+        )
     QUALIFY
         ROW_NUMBER() OVER (PARTITION BY b.your_number ORDER BY b.ts_paid DESC) = 1
 
     UNION ALL
 
+    -- Source 2: Vans boleto — resolve BL barcodes with same substring rule as francesinha
     SELECT
-        COALESCE(NULLIF(b.company_use, ''), NULLIF(b.document_number, '')) AS company_use,
+        CASE
+            WHEN UPPER(COALESCE(NULLIF(b.company_use, ''), NULLIF(b.document_number, ''))) LIKE 'CK%'
+                OR COALESCE(NULLIF(b.company_use, ''), NULLIF(b.document_number, '')) RLIKE '^[0-9]+C[0-9]+$'
+                THEN COALESCE(NULLIF(b.company_use, ''), NULLIF(b.document_number, ''))
+            WHEN COALESCE(NULLIF(b.company_use, ''), NULLIF(b.document_number, '')) RLIKE '^[0-9]+$'
+                THEN COALESCE(NULLIF(b.company_use, ''), NULLIF(b.document_number, ''))
+            WHEN UPPER(COALESCE(NULLIF(b.company_use, ''), NULLIF(b.document_number, ''))) LIKE '%BL%'
+                THEN NULLIF(
+                    REGEXP_REPLACE(
+                        SUBSTRING(TRIM(COALESCE(NULLIF(b.company_use, ''), NULLIF(b.document_number, ''))), 20, 20),
+                        '^0+',
+                        ''
+                    ),
+                    ''
+                )
+            ELSE COALESCE(NULLIF(b.company_use, ''), NULLIF(b.document_number, ''))
+        END AS company_use,
         b.id_related_document AS id_invoice,
         DATE(b.dt_paid) AS ts_paid,
         'BOLETO' AS payment_method,
         UPPER(regexp_extract(b.status, '/(.*)', 1)) AS payment_status,
         b.paid_amount AS paid_amount,
-        NULLIF(CAST(b.our_number AS INTEGER), '') AS our_number
+        NULLIF(CAST(b.our_number AS INTEGER), '') AS our_number,
+        'vans_boleto' AS payment_source
     FROM
         datalake_vans_clean.boleto b
     WHERE
@@ -222,8 +263,24 @@ vans_checkout_union AS (
     
     UNION ALL 
 
+    -- Source 3: Checkout bolecode — CK/*C## use your_number; else our_number (matches pre-fix behavior for BL cases)
     SELECT
-        NULLIF(b.our_number, '') AS company_use,
+        COALESCE(
+            CASE
+                WHEN UPPER(TRIM(b.your_number)) LIKE 'CK%' THEN NULLIF(TRIM(b.your_number), '')
+                WHEN TRIM(b.your_number) RLIKE '^[0-9]+C[0-9]+$' THEN NULLIF(TRIM(b.your_number), '')
+                ELSE NULL
+            END,
+            NULLIF(TRIM(b.our_number), ''),
+            NULLIF(
+                REGEXP_REPLACE(
+                    SUBSTRING(TRIM(COALESCE(b.your_number, b.id_transaction)), 20, 20),
+                    '^0+',
+                    ''
+                ),
+                ''
+            )
+        ) AS company_use,
         o.id_finance_entity AS id_invoice,
         DATE(b.ts_paid) AS ts_paid,
         CASE
@@ -232,7 +289,20 @@ vans_checkout_union AS (
         END AS payment_method,
         b.status AS payment_status,
         b.paid_amount,
-        NULLIF(b.our_number, '') AS our_number
+        COALESCE(
+            NULLIF(CAST(TRIM(b.our_number) AS INTEGER), ''),
+            NULLIF(
+                CAST(
+                    REGEXP_REPLACE(
+                        SUBSTRING(TRIM(COALESCE(b.your_number, b.id_transaction)), 20, 20),
+                        '^0+',
+                        ''
+                    ) AS INTEGER
+                ),
+                ''
+            )
+        ) AS our_number,
+        'checkout_bolecode' AS payment_source
     FROM
       datalake_checkout_clean.bolecode b
     INNER JOIN datalake_checkout_clean.charge c 
@@ -244,16 +314,25 @@ vans_checkout_union AS (
         AND b.status IN ('PAID', 'PAID_AFTER_DUE_DATE')
         AND (b.beneficiary_account = '39221' OR b.beneficiary_account IS NULL)
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY b.our_number ORDER BY b.ts_paid DESC) = 1
+        ROW_NUMBER() OVER (
+            PARTITION BY COALESCE(
+                NULLIF(TRIM(b.our_number), ''),
+                REGEXP_REPLACE(SUBSTRING(TRIM(COALESCE(b.your_number, b.id_transaction)), 20, 20), '^0+', '')
+            )
+            ORDER BY b.ts_paid DESC
+        ) = 1
 ),
 
-pre_vans_checkout AS (
+pre_vans_checkout_raw AS (
     SELECT
         REPLACE(REPLACE(UPPER(REGEXP_REPLACE(vc.company_use, '^0000', '')), 'C!', ''), 'C]', '') AS company_use,
         vc.id_invoice,
         vc.payment_method,
         vc.payment_status,
-        IF(vc.payment_method = 'PIX' AND dd.is_brz_fintech_business_day = TRUE, ts_paid, dd.next_brz_fintech_business_day) AS dt_paid,
+        vc.payment_source,
+        vc.our_number,
+        vc.ts_paid,
+        IF(vc.payment_method = 'PIX' AND dd.is_brz_fintech_business_day = TRUE, vc.ts_paid, dd.next_brz_fintech_business_day) AS dt_paid,
         vc.paid_amount
     FROM
         vans_checkout_union vc
@@ -261,9 +340,40 @@ pre_vans_checkout AS (
         dw_public.dim_date dd
             ON vc.ts_paid = dd.date
     WHERE
-        UPPER(vc.company_use) NOT LIKE 'B%'
+        -- Drop only unresolved BL barcodes; old B% filter removed (it dropped valid BL→our_number rows)
+        vc.company_use IS NOT NULL
+        AND TRIM(vc.company_use) != ''
+        AND UPPER(vc.company_use) NOT LIKE 'BL%'
+),
+
+pre_vans_checkout AS (
+    -- One row per company_use + dt_paid; prefer bolecode PIX over boleto duplicate
+    SELECT
+        company_use,
+        id_invoice,
+        payment_method,
+        payment_status,
+        dt_paid,
+        paid_amount,
+        our_number
+    FROM
+        pre_vans_checkout_raw
     QUALIFY
-        ROW_NUMBER() OVER (PARTITION BY our_number, paid_amount ORDER BY CASE WHEN id_invoice IS NOT NULL THEN company_use ELSE our_number END DESC) = 1
+        ROW_NUMBER() OVER (
+            PARTITION BY company_use, dt_paid
+            ORDER BY
+                CASE payment_source
+                    WHEN 'checkout_bolecode' THEN 1
+                    WHEN 'checkout_boleto' THEN 2
+                    WHEN 'vans_boleto' THEN 3
+                END,
+                CASE
+                    WHEN payment_method = 'PIX' THEN 0
+                    WHEN payment_method = 'BOLETO' THEN 1
+                    ELSE 2
+                END,
+                ts_paid DESC
+        ) = 1
 ),
 
 vans_checkout_base AS (
@@ -273,10 +383,10 @@ vans_checkout_base AS (
         payment_method,
         payment_status,
         dt_paid,
-        SUM(paid_amount) AS amount
+        our_number,
+        paid_amount AS amount
     FROM
-        pre_vans_checkout vc
-    GROUP BY 1,2,3,4,5
+        pre_vans_checkout
 ),
 
 vans_checkout AS (
@@ -284,14 +394,79 @@ vans_checkout AS (
     FROM vans_checkout_base
 ),
 
+-- Join keys: company_use and our_number (covers BL bank rows keyed by numeric our_number)
+vans_checkout_for_join AS (
+    SELECT
+        company_use AS join_key,
+        company_use,
+        id_invoice,
+        payment_method,
+        payment_status,
+        dt_paid,
+        amount,
+        rn
+    FROM
+        vans_checkout
+
+    UNION ALL
+
+    SELECT
+        CAST(our_number AS STRING) AS join_key,
+        company_use,
+        id_invoice,
+        payment_method,
+        payment_status,
+        dt_paid,
+        amount,
+        rn
+    FROM
+        vans_checkout
+    WHERE
+        our_number IS NOT NULL
+        AND CAST(our_number AS STRING) != company_use
+),
+
+vans_checkout_matched AS (
+    SELECT
+        join_key,
+        company_use,
+        id_invoice,
+        payment_method,
+        payment_status,
+        dt_paid,
+        amount,
+        rn
+    FROM
+        vans_checkout_for_join
+    QUALIFY
+        ROW_NUMBER() OVER (
+            PARTITION BY join_key, rn
+            ORDER BY
+                CASE WHEN payment_method = 'PIX' THEN 0 WHEN payment_method = 'BOLETO' THEN 1 ELSE 2 END,
+                company_use
+        ) = 1
+),
+
+known_company_use AS (
+    SELECT company_use FROM seu_barriga
+    UNION
+    SELECT company_use FROM francesinha
+    UNION
+    SELECT company_use FROM sap
+),
+
 df_all AS (
     SELECT company_use, rn FROM seu_barriga
     UNION DISTINCT
-    SELECT company_use, rn FROM vans_checkout
+    SELECT company_use, rn FROM francesinha
     UNION DISTINCT
     SELECT company_use, rn FROM sap
     UNION DISTINCT
-    SELECT company_use, rn FROM francesinha
+    -- FIX: drop checkout-only orphan keys (e.g. our_number 483365 with no bank/retsuko match)
+    SELECT vc.company_use, vc.rn
+    FROM vans_checkout vc
+    INNER JOIN known_company_use kcu
+        ON kcu.company_use = vc.company_use
 ),
 
 df AS (
@@ -314,7 +489,7 @@ df AS (
             WHEN f.amount != vc.amount AND f.dt_paid != DATE(vc.dt_paid) THEN 'recorded with a divergent date and value'
             WHEN f.amount != vc.amount AND f.dt_paid = DATE(vc.dt_paid) THEN 'recorded with a divergent value'
             WHEN f.amount = vc.amount AND f.dt_paid != DATE(vc.dt_paid) THEN 'recorded with a divergent date'
-            WHEN vc.company_use IS NULL THEN 'not recorded'
+            WHEN vc.join_key IS NULL THEN 'not recorded'
             ELSE 'not ok'
         END AS status_vans_checkout,
         CASE
@@ -343,8 +518,8 @@ df AS (
         francesinha f
             ON f.company_use = cs.company_use AND f.rn = cs.rn
     LEFT JOIN
-        vans_checkout vc
-            ON vc.company_use = cs.company_use AND vc.rn = cs.rn
+        vans_checkout_matched vc
+            ON vc.join_key = cs.company_use AND vc.rn = cs.rn
     LEFT JOIN
         seu_barriga sb
             ON sb.company_use = cs.company_use AND sb.rn = cs.rn
