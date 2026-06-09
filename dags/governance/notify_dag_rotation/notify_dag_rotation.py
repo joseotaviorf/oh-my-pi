@@ -583,7 +583,7 @@ with DAG(
         "alerts, and POSTs the summary to notification-hub (DAG_Rotation space). "
         "Migrated from the Databricks Post-OnCall notebook (DBP-1491)."
     ),
-    schedule="0 12 * * *",
+    schedule="0 9 * * *",
     catchup=False,
     tags=["monitoring", "platform", "oncall"],
 ) as dag:
