@@ -107,22 +107,22 @@ WITH house as (
         complemento_bruto,
         matching_rule,
         CASE
-          WHEN matching_rule = 'regra_bloco_unico' THEN COALESCE(ltrim(regexp_extract(norm, '(\\d+)', 1), '0'), '')
-          WHEN matching_rule = 'regra_apenas_numeros' THEN COALESCE(ltrim(norm, '0'), '0')
+          WHEN matching_rule = 'regra_bloco_unico' THEN COALESCE(LTRIM('0', regexp_extract(norm, '(\\d+)', 1)), '')
+          WHEN matching_rule = 'regra_apenas_numeros' THEN COALESCE(LTRIM('0', norm), '0')
           WHEN matching_rule IN ('regra_apenas_casa', 'regra_casa_dir') THEN ''
-          WHEN matching_rule = 'regra_casa_numero' THEN COALESCE(ltrim(regexp_extract(norm, '^\\b(casa|cs|csa|cobertura|sobrado|garden)\\b\\s+(\\d+)$', 2), '0'), '0')
-          WHEN matching_rule IN ('regra_casa_letra', 'regra_apenas_letra') THEN CAST(ascii(NULLIF(regexp_extract(norm, '([a-z])$', 1), '')) - 96 AS STRING)
-          WHEN matching_rule = 'regra_m1' THEN COALESCE(ltrim(regexp_extract(norm, '(\\d+)$', 1), '0'), '0')
-          WHEN matching_rule = 'regra_m2' THEN COALESCE(ltrim(regexp_extract(norm, '(\\d+)$', 1), '0'), '0')
-          WHEN matching_rule = 'regra_m3' THEN COALESCE(ltrim(regexp_extract(norm, '^\\b(apartamento|apto|apt|ap|kitnet|kit|studio|unidade|und|un)\\b\\s+(\\d+)', 2), '0'), '0')
-          WHEN matching_rule = 'regra_m4' THEN COALESCE(ltrim(regexp_extract(norm, '^(\\d+)', 1), '0'), '0')
-          WHEN matching_rule = 'regra_m_nb' THEN COALESCE(ltrim(regexp_extract(norm, '^(\\d+)', 1), '0'), '0')
-          WHEN matching_rule = 'regra_letra_numero' THEN COALESCE(ltrim(regexp_extract(norm, '(\\d+)', 1), '0'), '0')
-          WHEN matching_rule = 'regra_numero_letra_separada' THEN COALESCE(ltrim(regexp_extract(norm, '^(\\d+)', 1), '0'), '0')
-          WHEN matching_rule = 'regra_fallback_apt' THEN COALESCE(ltrim(regexp_extract(norm, '\\b(apartamento|apto|apt|ap|kitnet|kit|studio|unidade|und|un)\\b\\s*(\\d+)', 2), '0'), '0')
-          WHEN matching_rule = 'regra_fallback_apt_letra' THEN CAST(ascii(NULLIF(regexp_extract(norm, '^\\b(?:apartamento|apto|apt|ap|kitnet|kit|studio|unidade|und|un)\\b\\s*([a-z])\\s*$', 1), '')) - 96 AS STRING)
-          WHEN matching_rule = 'regra_fallback_bloco' THEN COALESCE(ltrim(regexp_extract(norm, '(\\d+)', 1), '0'), '')
-          WHEN matching_rule = 'regra_fallback_numero' THEN COALESCE(ltrim(regexp_extract(norm, '(\\d+)', 1), '0'), '0')
+          WHEN matching_rule = 'regra_casa_numero' THEN COALESCE(LTRIM('0', regexp_extract(norm, '^\\b(casa|cs|csa|cobertura|sobrado|garden)\\b\\s+(\\d+)$', 2)), '0')
+          WHEN matching_rule IN ('regra_casa_letra', 'regra_apenas_letra') THEN CAST(ASCII(NULLIF(regexp_extract(norm, '([a-z])$', 1), '')) - 96 AS STRING)
+          WHEN matching_rule = 'regra_m1' THEN COALESCE(LTRIM('0', regexp_extract(norm, '(\\d+)$', 1)), '0')
+          WHEN matching_rule = 'regra_m2' THEN COALESCE(LTRIM('0', regexp_extract(norm, '(\\d+)$', 1)), '0')
+          WHEN matching_rule = 'regra_m3' THEN COALESCE(LTRIM('0', regexp_extract(norm, '^\\b(apartamento|apto|apt|ap|kitnet|kit|studio|unidade|und|un)\\b\\s+(\\d+)', 2)), '0')
+          WHEN matching_rule = 'regra_m4' THEN COALESCE(LTRIM('0', regexp_extract(norm, '^(\\d+)', 1)), '0')
+          WHEN matching_rule = 'regra_m_nb' THEN COALESCE(LTRIM('0', regexp_extract(norm, '^(\\d+)', 1)), '0')
+          WHEN matching_rule = 'regra_letra_numero' THEN COALESCE(LTRIM('0', regexp_extract(norm, '(\\d+)', 1)), '0')
+          WHEN matching_rule = 'regra_numero_letra_separada' THEN COALESCE(LTRIM('0', regexp_extract(norm, '^(\\d+)', 1)), '0')
+          WHEN matching_rule = 'regra_fallback_apt' THEN COALESCE(LTRIM('0', regexp_extract(norm, '\\b(apartamento|apto|apt|ap|kitnet|kit|studio|unidade|und|un)\\b\\s*(\\d+)', 2)), '0')
+          WHEN matching_rule = 'regra_fallback_apt_letra' THEN CAST(ASCII(NULLIF(regexp_extract(norm, '^\\b(?:apartamento|apto|apt|ap|kitnet|kit|studio|unidade|und|un)\\b\\s*([a-z])\\s*$', 1), '')) - 96 AS STRING)
+          WHEN matching_rule = 'regra_fallback_bloco' THEN COALESCE(LTRIM('0', regexp_extract(norm, '(\\d+)', 1)), '')
+          WHEN matching_rule = 'regra_fallback_numero' THEN COALESCE(LTRIM('0', regexp_extract(norm, '(\\d+)', 1)), '0')
           ELSE ''
         END AS number_complement,
         CASE
@@ -133,7 +133,7 @@ WITH house as (
                       length(TRIM(regexp_extract(norm, '^\\b(?:bloco|torre|bl|blc|b|t|tr)\\b\\s+(.*?)\\s+\\b(?:apartamento|apto|apt|ap|kitnet|kit|studio|unidade|und|un)\\b', 1))) = 1 
                       AND regexp_like(TRIM(regexp_extract(norm, '^\\b(?:bloco|torre|bl|blc|b|t|tr)\\b\\s+(.*?)\\s+\\b(?:apartamento|apto|apt|ap|kitnet|kit|studio|unidade|und|un)\\b', 1)), '^[a-z]$')
                   THEN 
-                      CAST(ascii(NULLIF(TRIM(regexp_extract(norm, '^\\b(?:bloco|torre|bl|blc|b|t|tr)\\b\\s+(.*?)\\s+\\b(?:apartamento|apto|apt|ap|kitnet|kit|studio|unidade|und|un)\\b', 1)), '')) - 96 AS STRING)
+                      CAST(ASCII(NULLIF(TRIM(regexp_extract(norm, '^\\b(?:bloco|torre|bl|blc|b|t|tr)\\b\\s+(.*?)\\s+\\b(?:apartamento|apto|apt|ap|kitnet|kit|studio|unidade|und|un)\\b', 1)), '')) - 96 AS STRING)
                   ELSE 
                       TRIM(regexp_extract(norm, '^\\b(?:bloco|torre|bl|blc|b|t|tr)\\b\\s+(.*?)\\s+\\b(?:apartamento|apto|apt|ap|kitnet|kit|studio|unidade|und|un)\\b', 1))
               END              
@@ -143,7 +143,7 @@ WITH house as (
                       length(TRIM(regexp_extract(norm, '^\\b(?:bloco|torre|bl|blc|b|t|tr)\\b\\s+(.*?)\\s+\\d+$', 1))) = 1 
                       AND regexp_like(TRIM(regexp_extract(norm, '^\\b(?:bloco|torre|bl|blc|b|t|tr)\\b\\s+(.*?)\\s+\\d+$', 1)), '^[a-z]$')
                   THEN 
-                      CAST(ascii(NULLIF(TRIM(regexp_extract(norm, '^\\b(?:bloco|torre|bl|blc|b|t|tr)\\b\\s+(.*?)\\s+\\d+$', 1)), '')) - 96 AS STRING)
+                      CAST(ASCII(NULLIF(TRIM(regexp_extract(norm, '^\\b(?:bloco|torre|bl|blc|b|t|tr)\\b\\s+(.*?)\\s+\\d+$', 1)), '')) - 96 AS STRING)
                   ELSE 
                       TRIM(regexp_extract(norm, '^\\b(?:bloco|torre|bl|blc|b|t|tr)\\b\\s+(.*?)\\s+\\d+$', 1))
               END              
@@ -153,7 +153,7 @@ WITH house as (
                       length(regexp_extract(norm, '\\b(bloco|torre|bl|blc|b|t|tr)\\b\\s+([a-z0-9].*)$', 2)) = 1 
                       AND regexp_like(regexp_extract(norm, '\\b(bloco|torre|bl|blc|b|t|tr)\\b\\s+([a-z0-9].*)$', 2), '^[a-z]$')
                   THEN 
-                      CAST(ascii(NULLIF(regexp_extract(norm, '\\b(bloco|torre|bl|blc|b|t|tr)\\b\\s+([a-z])$', 2), '')) - 96 AS STRING)
+                      CAST(ASCII(NULLIF(regexp_extract(norm, '\\b(bloco|torre|bl|blc|b|t|tr)\\b\\s+([a-z])$', 2), '')) - 96 AS STRING)
                   ELSE 
                       TRIM(regexp_extract(norm, '\\b(bloco|torre|bl|blc|b|t|tr)\\b\\s+([a-z0-9].*)$', 2))
               END               
@@ -162,19 +162,19 @@ WITH house as (
                   WHEN 
                       regexp_like(regexp_extract(norm, '([0-9a-z])\\s*$', 1), '^[a-z]$')
                   THEN 
-                      CAST(ascii(NULLIF(regexp_extract(norm, '([a-z])\\s*$', 1), '')) - 96 AS STRING)
+                      CAST(ASCII(NULLIF(regexp_extract(norm, '([a-z])\\s*$', 1), '')) - 96 AS STRING)
                   ELSE 
                       regexp_extract(norm, '([0-9])\\s*$', 1)
               END              
-          WHEN matching_rule = 'regra_letra_numero' THEN CAST(ascii(NULLIF(regexp_extract(norm, '([a-z])', 1), '')) - 96 AS STRING)              
-          WHEN matching_rule = 'regra_numero_letra_separada' THEN CAST(ascii(NULLIF(regexp_extract(norm, '([a-z])$', 1), '')) - 96 AS STRING)              
-          WHEN matching_rule = 'regra_fallback_apt' THEN COALESCE(CAST(ascii(NULLIF(regexp_extract(norm, '\\d+\\s*([a-z])$', 1), '')) - 96 AS STRING), '')              
+          WHEN matching_rule = 'regra_letra_numero' THEN CAST(ASCII(NULLIF(regexp_extract(norm, '([a-z])', 1), '')) - 96 AS STRING)              
+          WHEN matching_rule = 'regra_numero_letra_separada' THEN CAST(ASCII(NULLIF(regexp_extract(norm, '([a-z])$', 1), '')) - 96 AS STRING)              
+          WHEN matching_rule = 'regra_fallback_apt' THEN COALESCE(CAST(ASCII(NULLIF(regexp_extract(norm, '\\d+\\s*([a-z])$', 1), '')) - 96 AS STRING), '')              
           WHEN matching_rule = 'regra_fallback_bloco' THEN
               CASE
                   WHEN 
                       regexp_like(regexp_extract(norm, '\\b(bloco|torre|bl|blc|b|t|tr)\\b\\s*([a-z0-9]+)', 2), '^[a-z]$')
                   THEN 
-                      CAST(ascii(NULLIF(regexp_extract(norm, '\\b(bloco|torre|bl|blc|b|t|tr)\\b\\s*([a-z])', 2), '')) - 96 AS STRING)
+                      CAST(ASCII(NULLIF(regexp_extract(norm, '\\b(bloco|torre|bl|blc|b|t|tr)\\b\\s*([a-z])', 2), '')) - 96 AS STRING)
                   ELSE 
                       regexp_extract(norm, '\\b(bloco|torre|bl|blc|b|t|tr)\\b\\s*([0-9a-z]+)', 2)
               END              
@@ -197,7 +197,7 @@ WITH house as (
     matching_rule,
     number_complement,
     CASE
-      WHEN regexp_like(raw_extra, '^\\d+$') THEN COALESCE(ltrim(raw_extra, '0'), '0')
+      WHEN regexp_like(raw_extra, '^\\d+$') THEN COALESCE(LTRIM('0', raw_extra), '0')
       ELSE raw_extra
     END AS extra_complement,
     (
