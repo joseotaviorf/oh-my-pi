@@ -1,7 +1,7 @@
 ---
 database_name: dw_growth
 table_name: fact_supply_events
-owner: henrique.paulo@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
   This table contains the events related to the supply flow, each row is an event

@@ -1,90 +1,141 @@
 database_name: datalake_lead_tracking
 table_name: rene_descartes_acquisition_data
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
-description: This table contains acquisition data extracted from the René Descartes service that will be used to track our leads in the supply domain.
+owner: gabriel.salla@quintoandar.com
+description: |
+  Supply lead acquisition taxonomy from the René Descartes service, flattened for the lead tracking
+  context. One row per René Descartes house lead joined to its acquisition metadata
+  (`house_lead` LEFT JOIN `acquisition_misc_data` on `id_acquisition`). Marketing and operations
+  dimensions (UTM fields, affiliate, platform, contact channel, landing page) are extracted from the
+  `acquisition_campaign` JSON payload. Incremental load filtered on `ts_event` (`ts_created`) using
+  the DAG load window (`load_start_date` / `load_end_date`, 6-day lookback). Used to enrich supply
+  lead attribution alongside Amplitude-based tracking. Part of the enrich_lead_tracking DAG.
+  Not partitioned — `year`, `month`, and `day` are date components derived from `ts_event`, not
+  table partition columns.
 columns:
   id_lead:
-    description: The unique identifier for each lead in the dataset.
-    lineage: 
+    description: |
+      Primary key — René Descartes house lead identifier (`house_lead.id`). Grain of the table;
+      join key to René Descartes clean entities and supply lead analytics.
+    lineage:
       - datalake_rene_descartes_clean.house_lead.id
   id_lead_ebdb:
-    description: The lead's identifier in the EBDB/Monolith.
-    lineage: 
+    description: |
+      EBDB/Monolith lead identifier mapped from René Descartes (`house_lead.id_lead_ebdb`). Links
+      supply leads to the canonical lead record in datalake_ebdb_clean.lead.
+    lineage:
       - datalake_rene_descartes_clean.house_lead.id_lead_ebdb
   id_firestore:
-    description: The lead's identifier in the Firestore database.
-    lineage: 
+    description: |
+      External reference identifier stored as Firestore document id (`house_lead.id_external_reference`).
+      Deprecated by the P&T team — prefer `id_lead_ebdb` for cross-system joins.
+    lineage:
       - datalake_rene_descartes_clean.house_lead.id_external_reference
   affiliate_type:
-    description: The type of affiliate associated with the lead's acquisition campaign.
-    lineage: 
+    description: |
+      Affiliate type from the acquisition campaign JSON (`$.affiliateType`). Classifies partner or
+      affiliate program associated with the lead source.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   campaign:
-    description: The campaign of the lead, referring to utm_campaign where the lead originated.
-    lineage: 
+    description: |
+      UTM campaign from the acquisition campaign JSON (`$.utmCampaign`). Marketing campaign name or
+      code that generated the lead.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   medium:
-    description: The medium of the lead, referring to utm_medium where the lead originated.
-    lineage: 
+    description: |
+      UTM medium from the acquisition campaign JSON (`$.utmMedium`). Channel type (e.g. cpc, email,
+      referral) for the acquisition touchpoint.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   source:
-    description: The source of the lead, referring to utm_source where the lead originated.
-    lineage: 
+    description: |
+      UTM source from the acquisition campaign JSON (`$.utmSource`). Traffic origin identifier
+      (e.g. google, facebook, partner name).
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   ops_agent:
-    description: The operational agent responsible for handling the lead.
-    lineage: 
+    description: |
+      Operations team label from the acquisition campaign JSON (`$.team`). Identifies the internal
+      team or agent group associated with lead handling.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   ops_partner:
-    description: The operational partner associated with the lead.
-    lineage: 
+    description: |
+      Operations partner or company from the acquisition campaign JSON (`$.company`). External partner
+      organization tied to the acquisition flow.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   application:
-    description: The origin or application from which the lead originated.
-    lineage: 
+    description: |
+      Originating application or channel from the acquisition campaign JSON (`$.origin`). Indicates
+      which product surface or entry point created the lead.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   city:
-    description: The city associated with the lead's acquisition.
-    lineage: 
+    description: |
+      City associated with the acquisition from the campaign JSON (`$.cidade`). Geographic context
+      captured at lead intake in René Descartes.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   landing_page:
-    description: The landing page URL where the lead first arrived.
-    lineage: 
+    description: |
+      Referrer or landing page URL/path from the acquisition campaign JSON (`$.referrer`). First page
+      or referral context where the lead entered the funnel.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   ops_approach:
-    description: The approach used by operational teams to engage with the lead.
-    lineage: 
+    description: |
+      Contact approach type from the acquisition campaign JSON (`$.contactType`). Describes how
+      operations teams engaged or classified the outreach (e.g. inbound vs outbound style).
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   ops_contact_medium:
-    description: The medium through which operational teams contacted the lead.
-    lineage: 
+    description: |
+      Contact channel from the acquisition campaign JSON (`$.contactChannel`). Medium used for
+      operational contact (e.g. phone, whatsapp, form).
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   platform:
-    description: The platform where the lead was acquired.
-    lineage: 
+    description: |
+      Platform from the acquisition campaign JSON (`$.platform`). Device or surface where the lead
+      was captured (e.g. web, mobile).
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   lead_type:
-    description: The type of lead
-    lineage: 
+    description: |
+      Lead type classification from the acquisition campaign JSON (`$.type`). René Descartes category
+      for the supply lead (business-specific enum values).
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   original_lead:
-    description: The identifier of the original lead if the current lead is a result of reprocessing process.
-    lineage: 
+    description: |
+      Original lead identifier when this row is a reprocessed or derived lead (`$.originalLead` in
+      acquisition_campaign JSON). Null when the lead is not linked to a prior record.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.acquisition_campaign
   ts_event:
-    description: The timestamp of the lead creation event.
-    lineage: 
+    description: |
+      Timestamp when the acquisition record was created in René Descartes (`acquisition_misc_data
+      .ts_created`). Drives incremental load filtering and event-time analysis.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.ts_created
   year:
-    description: The year when the lead data was processed.
-    lineage: 
+    description: |
+      Calendar year component derived from `ts_event` (passed through from acquisition_misc_data).
+      Convenience column for time-based filtering and aggregations — not a table partition column.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.year
   month:
-    description: The month when the lead data was processed.
-    lineage: 
+    description: |
+      Calendar month component (1–12) derived from `ts_event` (passed through from
+      acquisition_misc_data). Not a table partition column.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.month
   day:
-    description: The day when the lead data was processed.
-    lineage: 
+    description: |
+      Calendar day component (1–31) derived from `ts_event` (passed through from
+      acquisition_misc_data). Not a table partition column.
+    lineage:
       - datalake_rene_descartes_clean.acquisition_misc_data.day

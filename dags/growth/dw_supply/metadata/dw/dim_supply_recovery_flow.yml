@@ -1,7 +1,7 @@
 ---
 database_name: dw_growth
 table_name: dim_supply_recovery_flow
-owner: arthur.gonzaga@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
   Table with information about the recovery flows related to supply events, such as the type of reprocessing, reprocessing entity, mailing table.

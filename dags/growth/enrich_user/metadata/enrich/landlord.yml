@@ -3,7 +3,7 @@ database_name: datalake_user
 table_name: landlord
 description: Landlord users and their respective journey step. Each row is a daily snapshot of a user
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_snapshot:
     description: The snapshot id, which is the D-1 date in the format "yyyyMMdd"

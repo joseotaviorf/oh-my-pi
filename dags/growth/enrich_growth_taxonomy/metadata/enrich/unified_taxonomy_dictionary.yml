@@ -1,8 +1,8 @@
 ---
 database_name: datalake_growth_taxonomy
 table_name: unified_taxonomy_dictionary
-owner: arthur.gonzaga@quintoandar.com.br
-domain: growth
+owner: gabriel.salla@quintoandar.com
+domain: Growth
 description: This dictionary contains the relation between taxonomy levels and the extracted data from Supply and Demand events.
   It is used to enrich the taxonomy data with the UTM medium, source and campaign to connect with a new naming convention.
   Here, the unified taxonomy union Supply and Demand taxonomies and demand dictionary is taken as the primary source as it contains more classifications. 

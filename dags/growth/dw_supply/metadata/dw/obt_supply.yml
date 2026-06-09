@@ -1,7 +1,7 @@
 ---
 database_name: dw_growth
 table_name: obt_supply
-owner: henrique.paulo@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
   Table with joined information about the supply events (our facts and dimensions).

@@ -30,6 +30,22 @@ WITH enriched_data AS (
         ON hda.id = l.id_house_draft
 )
 
-SELECT *
-FROM enriched_data
-WHERE business_context IS NOT NULL
+SELECT
+    enriched_data.id_draft,
+    enriched_data.id_house,
+    enriched_data.id_region,
+    enriched_data.city,
+    enriched_data.id_user_registrant,
+    enriched_data.business_context,
+    enriched_data.status,
+    enriched_data.type,
+    enriched_data.ops_team,
+    enriched_data.ops_company,
+    enriched_data.ops_contact_type,
+    enriched_data.ops_contact_channel,
+    enriched_data.ts_created,
+    enriched_data.ts_updated
+FROM
+    enriched_data
+WHERE
+    enriched_data.business_context IS NOT NULL

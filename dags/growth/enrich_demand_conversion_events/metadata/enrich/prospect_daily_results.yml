@@ -1,7 +1,7 @@
 ---
 database_name: datalake_demand_flows
 table_name: prospect_daily_results
-owner: "@data-growth"
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: This table contains records of demand prospect conversion events across Rent and Sale business contexts. Each record represents a specific action (booking a visit, submitting an offer, or initiating a talk to an agent) performed by a prospect. This table also adds ad hoc rules and the construction of naming_convention_sufix.
 columns:

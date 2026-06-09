@@ -1,7 +1,7 @@
 ---
 database_name: datalake_demand_flows
 table_name: top_of_funnel_results
-owner: "@data-growth"
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: "This table tracks the top of the funnel interactions by users across different platforms and marketing channels. It includes ad hoc rules for media setup identification, user interaction details, and platform categorization."
 columns:

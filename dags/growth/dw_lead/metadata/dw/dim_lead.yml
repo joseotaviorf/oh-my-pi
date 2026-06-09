@@ -3,7 +3,7 @@ table_name: dim_lead
 description: A lead is a potential property owner who might list with QuintoAndar group. A lead can be related to none, one or more properties.
   Each line is a lead.
 domain: Growth
-owner: ana.araujo@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   sk_lead:
     lineage:

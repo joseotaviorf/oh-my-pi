@@ -1,33 +1,73 @@
 database_name: datalake_lead_tracking
 table_name: lead_first_event_tracking
+domain: Growth
+owner: gabriel.salla@quintoandar.com
+description: |
+  First-touch marketing attribution per EBDB lead for the lead tracking context. One row per lead
+  (`id_lead`) with UTM parameters, platform, referring domain, and geography taken from the winning
+  Amplitude attribution row in datalake_amplitude_lead.lead_origin (highest `rule_num`, deduplicated
+  with `ROW_NUMBER`). Tracking string columns are normalized with REGEXP_REPLACE to remove
+  non-printable characters while preserving Latin accented letters. Joined to EBDB leads that have a
+  matched Amplitude origin event. Consumed by dw_lead.dim_lead and rent/sale listing flow facts for
+  acquisition source analysis. Part of the enrich_lead_tracking DAG. Not partitioned.
 columns:
   id_lead:
+    description: |
+      Primary key — EBDB lead identifier. One row per lead after deduplication of Amplitude
+      attribution candidates. Join key to datalake_ebdb_clean.lead and downstream DW dimensions.
     lineage:
       - datalake_ebdb_clean.lead.id
   tracking_campaign:
+    description: |
+      UTM campaign (`utm_campaign`) from the winning first-touch Amplitude attribution row.
+      Normalized to strip non-printable characters while keeping Latin accented letters.
     lineage:
       - datalake_amplitude_lead.lead_origin.utm_campaign
   tracking_medium:
+    description: |
+      UTM medium (`utm_medium`) from the winning first-touch Amplitude attribution row. Normalized
+      with the same character-stripping rule as other tracking fields.
     lineage:
       - datalake_amplitude_lead.lead_origin.utm_medium
   tracking_source:
+    description: |
+      UTM source (`utm_source`) from the winning first-touch Amplitude attribution row. Identifies
+      the traffic origin channel (e.g. google, facebook, direct).
     lineage:
       - datalake_amplitude_lead.lead_origin.utm_source
   tracking_content:
+    description: |
+      UTM content (`utm_content`) from the winning first-touch Amplitude attribution row. Used to
+      differentiate ads or links within the same campaign.
     lineage:
       - datalake_amplitude_lead.lead_origin.utm_content
   tracking_term:
+    description: |
+      UTM term (`utm_term`) from the winning first-touch Amplitude attribution row. Typically carries
+      paid-search keywords when present.
     lineage:
       - datalake_amplitude_lead.lead_origin.utm_term
   tracking_platform:
+    description: |
+      Platform or surface (e.g. web, mobile) from the winning first-touch Amplitude attribution row.
+      Derived from `platform` in lead_origin.
     lineage:
       - datalake_amplitude_lead.lead_origin.platform
   tracking_referring_domain:
+    description: |
+      Referring domain of the first-touch Amplitude event. Indicates the external site or domain that
+      sent traffic before lead creation.
     lineage:
       - datalake_amplitude_lead.lead_origin.referring_domain
   tracking_region:
+    description: |
+      Geographic region from the winning first-touch Amplitude attribution row, based on event
+      geolocation properties.
     lineage:
       - datalake_amplitude_lead.lead_origin.region
   tracking_city:
+    description: |
+      City from the winning first-touch Amplitude attribution row, based on event geolocation
+      properties.
     lineage:
       - datalake_amplitude_lead.lead_origin.city

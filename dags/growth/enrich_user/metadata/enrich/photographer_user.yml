@@ -5,7 +5,7 @@ description:
   Ebdb Users daily snapshot classified as active photographers, considering
   photographers that are active.
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_snapshot:
     description: The snapshot id, which is the D-1 date in the format "yyyyMMdd"

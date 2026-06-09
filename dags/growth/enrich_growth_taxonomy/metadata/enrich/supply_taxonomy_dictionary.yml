@@ -1,8 +1,8 @@
 ---
 database_name: datalake_growth_taxonomy
 table_name: supply_taxonomy_dictionary
-owner: arthur.gonzaga@quintoandar.com.br
-domain: growth
+owner: gabriel.salla@quintoandar.com
+domain: Growth
 description: This dictionary contains the relation between taxonomy levels and the extracted data from Amplitude and Rene Descartes.
   It is used to enrich the taxonomy data with the UTM medium, source and campaign to connect with a new naming convention.
 columns: 

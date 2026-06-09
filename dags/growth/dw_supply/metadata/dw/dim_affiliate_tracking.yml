@@ -1,7 +1,7 @@
 ---
 database_name: dw_growth
 table_name: dim_affiliate_tracking
-owner: arthur.gonzaga@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
   Table with information about affiliate tracking, such as the affiliate type, start and end dates, and referred user. Its a SCD dimension.

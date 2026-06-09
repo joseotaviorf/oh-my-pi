@@ -2,7 +2,7 @@ database_name: datalake_bob
 table_name: house_draft_business_context
 description: This table contains house draft enriched with house information and business context. Each row means a draft for a business context.
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   id_draft:
     description: Identifier for house draft.

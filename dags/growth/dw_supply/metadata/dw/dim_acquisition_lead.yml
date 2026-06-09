@@ -1,7 +1,7 @@
 ---
 database_name: dw_growth
 table_name: dim_acquisition_lead
-owner: arthur.gonzaga@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
   Table with information about acquisition leads, such as the lead type, source, and campaign.

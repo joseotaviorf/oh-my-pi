@@ -1,7 +1,7 @@
 database_name: datalake_ebdb_user
 table_name: user_doorman
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   id:
     lineage:

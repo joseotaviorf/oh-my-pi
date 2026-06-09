@@ -1,106 +1,72 @@
 database_name: datalake_criteo
 table_name: criteo_campaigns  
-owner: arthur.gonzaga@quintoandar.com.br
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
-description: Table load Criteo Costs Report by region from gsheets sent by Criteo team.
+description: Criteo paid media campaign performance report broken down by advertiser, campaign, ad set, and geographic region.
+  Data is sourced from a Google Sheets file sent by the Criteo team and loaded incrementally by report date.
+  Partitioned by `year`, `month` and `day`, always use these columns in the WHERE clause to enable partition pruning.
 columns:
   id_advertiser:
-    description: Advertiser id of the campaign
+    description: Unique identifier of the Criteo advertiser account.
     lineage:
       - datalake_gsheets_clean.criteo_costs.id_advertiser
   id_campaign:
-    description: Unique identifier of the campaign.
+    description: Unique identifier of the Criteo campaign.
     lineage:
       - datalake_gsheets_clean.criteo_costs.id_campaign
   id_ad_set:
-    description: Unique identifier of the ad_set. 
+    description: Unique identifier of the ad set within the campaign.
     lineage:
       - datalake_gsheets_raw.criteo_costs.id_ad_set
   advertiser_name:
-    description: Name of the Advertiser
+    description: Display name of the Criteo advertiser account.
     lineage:
       - datalake_gsheets_clean.criteo_costs.advertiser_name
   campaign_name:
-    description: Name of the campaign
+    description: Display name of the Criteo campaign.
     lineage:
       - datalake_gsheets_clean.criteo_costs.campaign_name
   ad_set:
-    description: Name of the campaign
+    description: Display name of the ad set within the campaign.
     lineage:
       - datalake_gsheets_clean.criteo_costs.ad_set
   region:
-    description: Region of the campaign
+    description: Geographic region targeted by the campaign ad set.
     lineage:
       - datalake_gsheets_clean.criteo_costs.region
   zip_code:
-    description: Zip code of the region
+    description: Zip code of the geographic region targeted by the campaign ad set.
     lineage:
       - datalake_gsheets_clean.criteo_costs.zip_code
   cost:
-    description: Total cost of the campaign
+    description: Total media spend for the campaign ad set on the report date, in the advertiser's currency.
     lineage:
       - datalake_gsheets_clean.criteo_costs.cost
-  sales:
-    description: Total sales of the campaign
-    lineage:
-      - datalake_gsheets_clean.criteo_costs.sales
-  audience:
-    description: Total audience of the campaign
-    lineage:
-      - datalake_gsheets_clean.criteo_costs.audience
   clicks:
-    description: Total clicks of the campaign
+    description: Total number of clicks recorded for the campaign ad set on the report date.
     lineage:
       - datalake_gsheets_clean.criteo_costs.clicks
-  cpc:
-    description: Cost per click of the campaign
-    lineage:
-      - datalake_gsheets_clean.criteo_costs.cpc
-  ctr:
-    description: Click through rate of the campaign
-    lineage:
-      - datalake_gsheets_clean.criteo_costs.ctr
   displays:
-    description: Total displays of the campaign
+    description: Total number of ad impressions (displays) served for the campaign ad set on the report date.
     lineage:
       - datalake_gsheets_clean.criteo_costs.displays
-  exposed_users:
-    description: Total exposed users of the campaign
-    lineage:
-      - datalake_gsheets_clean.criteo_costs.exposed_users
-  reach:
-    description: Total reach of the campaign
-    lineage:
-      - datalake_gsheets_clean.criteo_costs.reach
-  visits:
-    description: Total visits of the campaign
-    lineage:
-      - datalake_gsheets_clean.criteo_costs.visits
-  win_rate:
-    description: Win rate of the campaign
-    lineage:
-      - datalake_gsheets_clean.criteo_costs.win_rate
-  bounce_rate:
-    description: Bounce rate of the campaign
-    lineage:
-      - datalake_gsheets_clean.criteo_costs.bounce_rate
-  cost_per_visit:
-    description: Cost per visit of the campaign
-    lineage:
-      - datalake_gsheets_clean.criteo_costs.cost_per_visit
-  cpo:
-    description: Cost per order of the campaign
-    lineage:
-      - datalake_gsheets_clean.criteo_costs.cpo
-  cvr:
-    description: Conversion rate of the campaign
-    lineage:
-      - datalake_gsheets_clean.criteo_costs.cvr
   dt_report:
-    description: Date of the results of campaign
+    description: Date to which the campaign performance metrics in this row refer.
     lineage:
       - datalake_gsheets_clean.criteo_costs.dt_report
   ts_load:
-    description: Timestamp of the load
+    description: Timestamp when the row was ingested into the data lake.
     lineage:
       - datalake_gsheets_clean.criteo_costs.ts_load
+  year:
+    description: Calendar year of dt_report, used as partition column.
+    lineage:
+      - datalake_gsheets_clean.criteo_costs.dt_report
+  month:
+    description: Calendar month of dt_report, used as partition column.
+    lineage:
+      - datalake_gsheets_clean.criteo_costs.dt_report
+  day:
+    description: Calendar day of dt_report, used as partition column.
+    lineage:
+      - datalake_gsheets_clean.criteo_costs.dt_report

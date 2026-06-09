@@ -5,7 +5,7 @@ description:
   Tenant users and their respective journey step. Each row in the table represents a
   specific customer on a daily snapshot.
 domain: Growth
-owner: arthur.gonzaga@quintoandar.com.br
+owner: isadora.gallerani@quintoandar.com.br
 columns:
   id_snapshot:
     lineage:

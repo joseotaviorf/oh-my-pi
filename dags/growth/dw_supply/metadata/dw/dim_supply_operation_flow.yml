@@ -1,7 +1,7 @@
 ---
 database_name: dw_growth
 table_name: dim_supply_operation_flow
-owner: arthur.gonzaga@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 domain: Growth
 description: |
   Table with information about the operations related to supply events, such as the objective, agent, partner, contact medium, and approach.

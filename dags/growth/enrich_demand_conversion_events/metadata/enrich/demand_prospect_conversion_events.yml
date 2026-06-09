@@ -1,7 +1,7 @@
 ---
 database_name: datalake_demand_flows
 table_name: demand_prospect_conversion_events
-owner: "@data-growth"
+owner: henrique.paulo@quintoandar.com.br
 domain: Growth
 description: Each row of this table is a demand prospect conversion event (visit booked, offer submitted or talk to agent) from both Rent and Sale business contexts.
 columns:

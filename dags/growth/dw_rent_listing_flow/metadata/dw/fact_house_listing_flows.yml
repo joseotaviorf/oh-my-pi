@@ -2,7 +2,7 @@ database_name: dw_public
 table_name: fact_house_listing_flows
 description: Fact table that contains each listing flow, which is a flow from the lead creation to a property being listed in our platform. Each line is a listing flow.
 domain: Growth
-owner: ana.araujo@quintoandar.com.br
+owner: gabriel.salla@quintoandar.com
 columns:
   sk_house_listing_flow:
     lineage:
